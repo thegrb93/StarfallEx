@@ -1,0 +1,9 @@
+"AddonInfo"
+{
+	"name"        "Starfall Processor"
+	"version"     "SVN"
+	"author_name" "Colonel Thirty Two"
+	"author_url"  "http://code.google.com/p/col32swiremodaddons/"
+	"info"        "Starfall Processor"
+	"override"    "0"
+}
