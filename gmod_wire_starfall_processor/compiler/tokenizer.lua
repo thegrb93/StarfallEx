@@ -166,10 +166,8 @@ function SF_Tokenizer:NextSymbol()
 			tokenname = "end"
 		elseif self.tokendata:match("^[ijk]$") and self.character ~= "(" then
 			tokenname, self.tokendata = "num", "1"..self.tokendata
-		elseif SFLib.types[self.tokendata] then
-			tokenname = "typ"
 		else
-			tokenname = "fun"
+			tokenname = "var"
 		end
 		
 	elseif self:NextPattern("^[A-Z][a-zA-Z0-9_]*") then

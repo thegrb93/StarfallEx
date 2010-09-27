@@ -7,14 +7,26 @@ function SF_Compiler:Error(message, instr)
 end
 
 function SF_Compiler:Process(root, inputs, outputs, params)
-	self.contexts = {{}}
+	self.contexts = {}
+	self:PushContext()
 	
 	self.inputs = inputs
 	self.outputs = outputs
+	
+	self.code = ""
+end
+
+function SF_Compiler:AddCode(code)
+	self.code = self.code .. code .. "\n"
 end
 
 function SF_Compiler:PushContext()
-	self.contexts[#self.contexts + 1] = {}
+	local tbl = {
+		vars = {},
+		code = "",
+		cost = 0
+	}
+	self.contexts[#self.contexts + 1] = tbl
 end
 
 function SF_Compiler:DefineVar(name, typ)

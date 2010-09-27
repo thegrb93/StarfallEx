@@ -88,13 +88,6 @@ end
 
 /******************************************************************************/
 
--- Alias table.
--- If you accept the key token, then it will return true if
--- it finds any token in the array (or itself).
-SF_Parser.aliases = {
-	fun = {"typ" = true}, -- Constructors are functions.
-}
-
 function SF_Parser:GetToken()
 	return self.token
 end
@@ -140,7 +133,7 @@ end
 
 function SF_Parser:AcceptRoamingToken(name)
 	local token = self.readtoken
-	if not token and token[1] ~= name and not (SF_Parser.aliases[name] and SF_Parser.aliases[name][token[1]]) then
+	if not token or token[1] ~= name then
 		return false
 	end
 	
@@ -261,8 +254,21 @@ function SF_Parser:StmtFor()
 		
 		local var = self:GetTokenData()
 		
+		if self:AcceptRoamingToken("in") then
+			-- Foreach, V only
+			local elist = self:Expr1()
+			
+			if not no_pa and not self:AcceptRoamingToken("rpa") then
+				self:Error("Right parenthesis ()) missing, to close condition")
+			end
+			
+			local sfor = self:Instruction(trace, "fori", var, elist, self:Block("for statenent"))
+			loopdepth = loopdepth - 1
+			
+			return sfor
+			
 		if self:AcceptRoamingToken("com") then
-			-- Foreach
+			-- Foreach, K + V
 			if not self:AcceptRoamingToken("var") then
 				self:Error("Variable expected for the value")
 			end
@@ -279,7 +285,7 @@ function SF_Parser:StmtFor()
 				self:Error("Right parenthesis ()) missing, to close condition")
 			end
 			
-			local sfor = self:Instruction(trace, "forea", var, var2, elist, self:Block("for statenent"))
+			local sfor = self:Instruction(trace, "forkv", var, var2, elist, self:Block("for statenent"))
 			loopdepth = loopdepth - 1
 			
 			return sfor
@@ -311,61 +317,6 @@ function SF_Parser:StmtFor()
 		end
 		
 		
-	end
-	
-	return self:StmtForEach()
-end
-
-function SF_Parser:StmtForEach()
-	if self:AcceptRoamingToken("fea") then
-		local trace = self:GetTokenTrace()
-		loopdepth = loopdepth + 1
-		
-		if not self:AcceptRoamingToken("lpa") then
-			self:Error("Left parenthesis missing (() after foreach statement")
-		end
-		
-		if not self:AcceptRoamingToken("var") then
-			self:Error("Variable expected to hold the key")
-		end
-		local keyvar = self:GetTokenData()
-		
-		if not self:AcceptRoamingToken("com") then
-			self:Error("Comma (,) expected after key variable")
-		end
-		
-		if not self:AcceptRoamingToken("var") then
-			self:Error("Variable expected to hold the value")
-		end
-		local valvar = self:GetTokenData()
-		
-		if not self:AcceptRoamingToken("col") then
-			self:Error("Colon (:) expected to separate type from variable")
-		end
-		
-		if not self:AcceptRoamingToken("fun") and not self:AcceptRoamingToken("udf") then
-			self:Error("Type expected after colon")
-		end
-		local valtype = self:GetTokenData()
-		if valtype == "number" then valtype = "normal" end
-		if wire_expression_types[string.upper(valtype)] == nil then
-			self:Error("Unknown type: "..valtype)
-		end
-		valtype = wire_expression_types[string.upper(valtype)][1]
-		
-		if not self:AcceptRoamingToken("ass") then
-			self:Error("Equals sign (=) expected after value type to specify table")
-		end
-		
-		local tableexpr = self:Expr1()
-		
-		if not self:AcceptRoamingToken("rpa") then
-			self:Error("Missing right parenthesis after foreach statement")
-		end
-		
-		local sfea = self:Instruction(trace, "fea", keyvar, valvar, valtype, tableexpr, self:Block("foreach statement"))
-		loopdepth = loopdepth -1
-		return sfea
 	end
 	
 	return self:StmtBreak()
@@ -414,10 +365,6 @@ function SF_Parser:StmtIncDec()
 	return self:StmtAssignOper()
 end
 
-function SF_Parser:StmtVarDecl()
-
-end
-
 function SF_Parser:StmtAssignOper()
 	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
@@ -439,6 +386,29 @@ function SF_Parser:StmtAssignOper()
 	return self:StmtIndex()
 end
 
+function SF_Parser:StmtVarDecl()
+	if self:AcceptRoamingToken("var") then
+		local trace = self:GetTokenTrace()
+		local typ = self:GetTokenData()
+		if self:AcceptRoamingToken("var") then
+			local name = self:GetTokenData()
+			local expr = nil
+			
+			if self:AcceptRoamingToken("ass") then
+				expr = self:Expr1()
+			end
+			
+			self:Instruction("decl", typ, name, expr)
+		elseif self:AcceptRoamingToken("ass") then
+			local expr = self:Expr1()
+			return self:Instruction("decl", nil, typ, expr)
+		else
+			self:TrackBack()
+		end
+		
+	end
+end
+
 function SF_Parser:StmtIndex()
 	if self:AcceptRoamingToken("var") then
 		local tbpos = self.index
@@ -452,8 +422,8 @@ function SF_Parser:StmtIndex()
 		
 			local expr = self:Expr1()
 			if self:AcceptRoamingToken("com") then
-				if !self:AcceptRoamingToken("fun") then
-					self:Error("Indexing operator ([]) requires a lower case type [X,t]")
+				if !self:AcceptRoamingToken("var") then
+					self:Error("Indexing operator ([]) requires a type [X,t]")
 				end
 				
 				local longtp = self:GetTokenData()
@@ -463,13 +433,11 @@ function SF_Parser:StmtIndex()
 				end
 				
 				if self:AcceptRoamingToken("ass") then
-					if longtp == "number" then longtp = "normal" end
-					if wire_expression_types[string.upper(longtp)] == nil then
-						self:Error("Indexing operator ([]) does not support the type [" .. longtp .. "]")
+					if SFLib.types[longtp] == nil then
+						self:Error("No such type: " .. longtp)
 					end
 					
-					local tp = wire_expression_types[string.upper(longtp)][1]
-					return self:Instruction(trace, "set", var, expr, self:StmtIndex(), tp)
+					return self:Instruction(trace, "set", var, expr, self:StmtIndex(), longtp)
 				end
 			elseif self:AcceptRoamingToken("rsb") then
 				if self:AcceptRoamingToken("ass") then
@@ -705,8 +673,8 @@ function SF_Parser:Expr11()
 
 	while true do
 		if self:AcceptTailingToken("col") then
-			if !self:AcceptTailingToken("fun") then
-				if self:AcceptRoamingToken("fun") then
+			if !self:AcceptTailingToken("var") then
+				if self:AcceptRoamingToken("var") then
 					self:Error("Method operator (:) must not be preceded by whitespace")
 				else
 					self:Error("Method operator (:) must be followed by method name")
@@ -752,8 +720,8 @@ function SF_Parser:Expr11()
 		
 			local aexpr = self:Expr1()
 			if self:AcceptRoamingToken("com") then
-				if !self:AcceptRoamingToken("fun") then
-					self:Error("Indexing operator ([]) requires a lower case type [X,t]")
+				if !self:AcceptRoamingToken("var") then
+					self:Error("Indexing operator ([]) requires a type [X,t]")
 				end
 				
 				local longtp = self:GetTokenData()
@@ -797,7 +765,7 @@ function SF_Parser:Expr12()
 		return expr
 	end
 	
-	if self:AcceptRoamingToken("fun") then
+	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
 		local fun = self:GetTokenData()
 		
@@ -805,7 +773,7 @@ function SF_Parser:Expr12()
 			if self:AcceptRoamingToken("lpa") then
 				self:Error("Left parenthesis (() must not be preceded by whitespace")
 			else
-				self:Error("Left parenthesis (() must appear after function name, variables must start with uppercase letter,")
+				self:Error("Left parenthesis (() must appear after function name")
 			end
 		end
 		
@@ -847,6 +815,7 @@ function SF_Parser:Expr13()
 		return self:Instruction(trace, "str", str)
 	end
 	
+	-- TODO: Provide functions instead of operators for trigger+is wiered?
 	if self:AcceptRoamingToken("trg") then
 		local trace = self:GetTokenTrace()
 	
@@ -862,7 +831,7 @@ function SF_Parser:Expr13()
 		return self:Instruction(trace, "trg", var)
 	end
 	
-	if self:AcceptRoamingToken("dlt") then
+	--[[if self:AcceptRoamingToken("dlt") then
 		local trace = self:GetTokenTrace()
 	
 		if !self:AcceptTailingToken("var") then
@@ -877,7 +846,7 @@ function SF_Parser:Expr13()
 		self.delta[var] = true
 		
 		return self:Instruction(trace, "dlt", var)
-	end
+	end]]
 	
 	if self:AcceptRoamingToken("imp") then
 		local trace = self:GetTokenTrace()
@@ -999,7 +968,10 @@ function SF_Parser:ExprError()
 			self:Error("Else-if keyword (elseif) must be part of an if-statement")
 		elseif self:AcceptRoamingToken("els") then
 			self:Error("Else keyword (else) must be part of an if-statement")
-			
+		
+		elseif self:AcceptRoamingToken("in") then
+			self:Error("In keyword (in) must be used inside a for loop")
+		
 		else
 			self:Error("Unexpected token found (" .. self.readtoken[1] .. ")")
 		end

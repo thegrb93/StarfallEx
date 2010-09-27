@@ -91,26 +91,65 @@ function SFLib:AddType(name, tbl)
 			tbl[k] = v
 		end
 		self.types[name] = tbl
-		tbl._registered = true
 	end
 end
 
-local function add_placeholder_type(name)
-	if SFLib.types[name] then return end
-	SFLib.types[name] = {_registered = false}
-end
+-- Functions without a base type.
+-- This is a Tree; the first node is the base type (or "_none_")
+-- All other nodes are argument types, or "_ellipsis_"
+SFLib.functions = {_none_ = {}}
+-- Name = true pairs, used for checking variables
+SFLib.global_functions = {}
 
--- Functions without a base type
-SFLib.functions = {}
-
-function SFLib:AddFunction(name, base, args)
-	local basetable
-	if base == nil then
-		basetable = self.functions
+local function get_or_add(tbl, key)
+	if tbl[key] then return tbl[key] end
 	else
-		if not self.types[base] 
-		basetable = SFLib.types
+		tbl[key] = {}
+		return tbl[key]
 	end
+end
+
+function SFLib:AddFunction(func, name, base, args)
+	local node
+	if base == nil then
+		node = self.functions._none_
+		self.global_functions[name] = true
+	else
+		node = self.functions[base]
+		if node == nil then
+			error("No such type: "..base,0)
+		end
+	end
+	
+	for _,arg in ipairs(args) do
+		if not self.types[arg] then
+			error("No such type: "..arg,0)
+		end
+		node = get_or_add(node, arg)
+	end
+	
+	node[name] = func
+end
+
+function SFLib:GetFunction(name, base, args)
+	local node
+	if base == nil then node = self.functions._none_
+	else node = self.functions[base] end
+	
+	local closest_ellipsis = nil
+	for _,arg in ipairs(args) do
+		if node._ellipsis_ and node._ellipsis_.name then
+			closest_ellipsis = node._ellipsis_.name
+		end
+		
+		if node[arg] then
+			node = node[arg]
+		else
+			return closest_ellipsis
+		end
+	end
+	
+	return node[name] or closest_ellipsis
 end
 
 function SFLib:FinalizeFunctions()
