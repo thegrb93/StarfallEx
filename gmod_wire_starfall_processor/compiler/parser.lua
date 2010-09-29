@@ -399,9 +399,9 @@ function SF_Parser:StmtVarDecl()
 			end
 			
 			self:Instruction("decl", typ, name, expr)
-		elseif self:AcceptRoamingToken("ass") then
+		--[[elseif self:AcceptRoamingToken("ass") then
 			local expr = self:Expr1()
-			return self:Instruction("decl", nil, typ, expr)
+			return self:Instruction("decl", nil, typ, expr)]]
 		else
 			self:TrackBack()
 		end
