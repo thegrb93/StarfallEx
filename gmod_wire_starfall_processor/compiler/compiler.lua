@@ -44,7 +44,9 @@ function SF_Compiler:PushContext()
 	self.contexts[#self.contexts + 1] = tbl
 end
 
-function SF_Compiler:PopContext()
+function SF_Compiler:PopContext(ending)
+	ending = ending or "end"
+	
 	local tbl = self.contexts[#self.contexts]
 	self.contexts[#self.contexts] = nil
 	
@@ -57,9 +59,12 @@ function SF_Compiler:PopContext()
 	end
 	
 	self:AddCode("SF_Self:IncrementCost("..tbl.cost..")\n")
+	self:AddCode(tbl.code.."\n"..ending.."\n")
 end
 
 function SF_Compiler:AddCode(code)
+	-- Adds code to the current context.
+	-- ONLY statement instructions should call this!
 	local tbl = self.contexts[#self.contexts]
 	tbl.code = tbl.code .. code
 end
@@ -73,11 +78,11 @@ end
 -- Variable Management                      --
 -- ---------------------------------------- --
 
-function SF_Compiler:DefineVar(args)
-	local name, typ = args[2], args[3]
+function SF_Compiler:DefineVar(name, typ, instr)
+	--local name, typ = args[2], args[3]
 	local curcontext = self.contexts[#self.contexts]
 	if curcontext[name] ~= typ then
-		self:Error("Type mismach for variable " .. name .. " (expected " .. curcontext[name] .. ", got " .. typ)
+		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,instr)..", got "..tp..")",args)
 	end
 	
 	curcontext[name] = typ
@@ -92,17 +97,17 @@ function SF_Compiler:DefineGlobalVar(name, typ)
 	self.contexts[1][name] = typ
 end]]
 
-function SF_Compiler:GetVarType(name)
+function SF_Compiler:GetVarType(name, instr)
 	for i = #self.contexts, 1, -1 do
 		if self.contexts[i][name] then
 			return self.contexts[i][name]
 		end
 	end
 	
-	--if self.outputs[name] then return self.outputs[name] end
-	--if self.inputs[name] then return self.inputs[name] end
+	if self.outputs[name] then return self.outputs[name] end
+	if self.inputs[name] then return self.inputs[name] end
 	
-	return self.outputs[name] or self.inputs[name] or self:Error("Undefined variable (" .. name .. ")")
+	self:Error("Undefined variable (" .. name .. ")", instr)
 end
 
 -- ---------------------------------------- --
@@ -111,10 +116,20 @@ end
 
 function SF_Compiler:InstrDECL(args)
 	local typ, name, val = args[3],args[4],args[5]
-	self:DefineVar(name, typ)
+	self:DefineVar(name, typ, instr)
 	
 	if val then
-		-- TODO: Put assignment code here
+		local ex, tp = self:Evaluate(args,3)
+		self:AddCode(name .. " = " .. ex)
+	end
+end
+
+function SF_Compiler:InstrASS(args)
+	local var = args[3]
+	
+	local ex, tp = self:Evaluate(args,2)
+	if tp ~= self:GetVarType(var) then
+		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,instr)..", got "..tp..")",args)
 	end
 end
 
@@ -127,6 +142,21 @@ function SF_Compiler:InstrVAR(args)
 	
 	local typ = self:GetVarType(name)
 	return self:GenerateLua_VariableReference(name), typ
+end
+
+function SF_Compiler:InstrNUM(args)
+	local num = args[3]
+	
+	return num, "number"
+end
+
+function SF_Compiler:InstrSTR(args)
+	local str = args[3]
+	
+	str = str:replace('"',"\\\"")
+	str = "\""..str.."\""
+	
+	return str, "string"
 end
 
 -- ---------------------------------------- --

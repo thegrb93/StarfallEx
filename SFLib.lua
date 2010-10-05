@@ -97,9 +97,34 @@ end
 -- Functions without a base type.
 -- This is a Tree; the first node is the base type (or "_none_")
 -- All other nodes are argument types, or "_ellipsis_"
-SFLib.functions = {_none_ = {}}
+--SFLib.functions = {_none_ = {}}
 -- Name = true pairs, used for checking variables
-SFLib.global_functions = {}
+
+SFLib.functions = {}
+
+function SFLib:FuncToStr(name, base, args)
+	-- Returns a string representation of a function.
+	-- Note: the function doesn't have to be defined.
+	
+	local out = ""
+	if base then
+		out = base..":"
+	end
+	out = out .. name
+	for _,arg in ipairs(args) do
+		out = out .. arg .. ","
+	end
+	return out:sub(1,out:len()-1)
+end
+
+function SFLib:FuncTypToStr(base, args)
+	-- Returns the string type of a function
+	-- [base]:arg1,arg2,arg3
+	-- There is a ":" even if no base type is available
+	
+	local imploded = string.Implode(args,",")
+	return (base or "") .. ":" .. imploded
+end
 
 local function get_or_add(tbl, key)
 	if tbl[key] then return tbl[key] end
@@ -110,7 +135,16 @@ local function get_or_add(tbl, key)
 end
 
 function SFLib:AddFunction(func, name, base, args)
-	local node
+	local node = get_or_add(self.functions, name)
+	
+	local key = (base or "")..":"..string.Implode(args,",")
+	if node[key] then
+		error("Function " .. self:FuncToStr(name, base, args) .. " defined more than once")
+	end
+	
+	node[key] = func
+
+	--[[local node
 	if base == nil then
 		node = self.functions._none_
 		self.global_functions[name] = true
@@ -128,7 +162,7 @@ function SFLib:AddFunction(func, name, base, args)
 		node = get_or_add(node, arg)
 	end
 	
-	node[name] = func
+	node[name] = func]]
 end
 
 function SFLib:GetFunction(name, base, args)
