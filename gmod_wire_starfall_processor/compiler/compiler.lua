@@ -8,12 +8,19 @@ end
 
 function SF_Compiler:Process(root, inputs, outputs, params)
 	self.contexts = {}
-	self:PushContext()
+	self:PushContext("do")
 	
 	self.inputs = inputs
 	self.outputs = outputs
 	
 	self.code = ""
+	
+	self:PopContext()
+	
+	-- Debug code
+	if #self.contexts > 0 then
+		error("SF Internal Error: Did not pop all contexts.")
+	end
 end
 
 function SF_Compiler:EvaluateStatement(args, index)
@@ -35,13 +42,14 @@ end
 -- ---------------------------------------- --
 -- Context Management                       --
 -- ---------------------------------------- --
-function SF_Compiler:PushContext()
+function SF_Compiler:PushContext(beginning)
 	local tbl = {
 		vars = {},
 		code = "",
 		cost = 0
 	}
 	self.contexts[#self.contexts + 1] = tbl
+	self:AddCode(beginning or "")
 end
 
 function SF_Compiler:PopContext(ending)
@@ -107,6 +115,10 @@ function SF_Compiler:GetVarType(name, instr)
 	if self.outputs[name] then return self.outputs[name] end
 	if self.inputs[name] then return self.inputs[name] end
 	
+	if SFLib.functions[name] then
+		return "function"
+	end
+	
 	self:Error("Undefined variable (" .. name .. ")", instr)
 end
 
@@ -116,7 +128,7 @@ end
 
 function SF_Compiler:InstrDECL(args)
 	local typ, name, val = args[3],args[4],args[5]
-	self:DefineVar(name, typ, instr)
+	self:DefineVar(name, typ, args)
 	
 	if val then
 		local ex, tp = self:Evaluate(args,3)
@@ -128,8 +140,8 @@ function SF_Compiler:InstrASS(args)
 	local var = args[3]
 	
 	local ex, tp = self:Evaluate(args,2)
-	if tp ~= self:GetVarType(var) then
-		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,instr)..", got "..tp..")",args)
+	if tp ~= self:GetVarType(var, args) then
+		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,args)..", got "..tp..")",args)
 	end
 end
 
@@ -153,10 +165,30 @@ end
 function SF_Compiler:InstrSTR(args)
 	local str = args[3]
 	
-	str = str:replace('"',"\\\"")
+	str = str:replace('"',"\\\""):replace("\n","\\n")
 	str = "\""..str.."\""
 	
 	return str, "string"
+end
+
+function SF_Compiler:InstrCALL(args)
+	local ex, tp = self:Evaluate(args,1)
+	local instrs = args[4]
+	
+	local exprs = {}
+	local tps = {}
+	
+	if tp ~= "function" then
+		self:Error("Tried to call non-function value",args)
+	end
+	
+	for i=1,#args[4] do
+		local ex, tp = self:Evaluate(args[4], i - 2)
+		tps[#tps + 1] = tp
+		exprs[#exprs + 1] = ex
+	end
+	
+	
 end
 
 -- ---------------------------------------- --
@@ -172,6 +204,10 @@ function SF_Compiler:GenerateLua_VariableReference(name)
 	
 	if self.outputs[name] then return "SF_Ent.outputs[\"" .. name .. "\"]" end
 	if self.inputs[name] then return "SF_Ent.inputs[\"" .. name .. "\"]" end
+	
+	if SFLib.functions[name] then
+		return "SFLib.functions[\""..name.."\"]"
+	end
 	
 	error("Internal Error: Tried to generate Lua code for undefined variable \""..name.."\"! Post your code & this error at wiremod.com.")
 end
