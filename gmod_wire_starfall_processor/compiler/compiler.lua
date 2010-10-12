@@ -132,11 +132,16 @@ function SF_Compiler:InstrDECL(args)
 	
 	if val then
 		local ex, tp = self:Evaluate(args,3)
+		if tp ~= typ then
+			self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,args)..", got "..tp..")",args)
+		end
 		self:AddCode(name .. " = " .. ex)
+	else
+		self:AddCode(name .. " = SFLib.types[\""..typ.."\"]._zero"
 	end
 end
 
-function SF_Compiler:InstrASS(args)
+function SF_Compiler:InstrASSIGN(args)
 	local var = args[3]
 	
 	local ex, tp = self:Evaluate(args,2)

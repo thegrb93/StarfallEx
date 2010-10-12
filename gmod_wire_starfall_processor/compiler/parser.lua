@@ -12,18 +12,19 @@ AddCSLuaFile("parser.lua")
 --[[ Not correct
 
 - seQuence
-SeqSPace 	- "sIF qSP"
-SeqCOmma 	- "sIF, qSP"
+SeqSPace 		- "sIF qSP"
+SeqCOmma 		- "sIF, qSP"
 
 - Statements
-StmtIF		- "if(eVR) { qSP } fEI"
-StmtEXpr 	- "eVR"
+
+StmtDeClare 	- "type var", "type var = sEX"
+StmtASsign 		- "var = sEX"
+StmtEXpr 		- "eVR"
 
 - Expressions
-ExprVaR		- "var"
+ExprPRimitive	- strings, numbers, other primitive data types
+ExprVaR			- "var"
 
-- iF blocks
-IfElseIf	- "elseif { q1 } i1"
 
 ]]
 /******************************************************************************/
@@ -152,10 +153,107 @@ end
 
 -- ----------------------------------- --
 
-local loopdepth
-
 function SF_Parser:Root()
-	loopdepth = 0
-	return self:Stmts()
+	self.loopdepth = 0
+	
+	local trace = self:GetTokenTrace()
+	local stmts = self:Instruction(trace, "seq")
+
+	if !self:HasTokens() then return stmts end
+	
+	while true do
+		if self:AcceptRoamingToken("com") then
+			self:Error("Statement separator (,) must not appear multiple times")
+		end
+		
+		stmts[#stmts + 1] = self:Stmt1()
+		
+		if !self:HasTokens() then break end
+		
+		if !self:AcceptRoamingToken("com") then
+			if self.readtoken[3] == false then
+				self:Error("Statements must be separated by comma (,) or whitespace")
+			end
+		end
+	end
+	
+	return stmts
 end
 
+function SF_Parser:StmtDecl()
+	if self:AcceptRoamingToken("var") then
+		local trace = self:GetTokenTrace()
+		local typ = self:GetTokenData()
+		
+		if self:AcceptRoamingToken("var") then
+			local var = self:GetTokenData()
+			
+			if not SFLib.types[typ] then
+				self:Error("Unknown type: "..typ, trace)
+			end
+			
+			if self:AcceptRoamingToken("ass") then
+				return self:Instruction(trace, "decl", typ, var, self:StmtExpr())
+			else
+				return self:Instruction(trace, "decl", typ, var, nil)
+			end
+		else
+			self:TrackBack()
+		end
+	end
+	
+	return SF_Parser:StmtAssign()
+end
+
+function SF_Parser:StmtAssign()
+	if self:AcceptRoamingToken("var") then
+		local trace = self:GetTokenTrace()
+		local var = self:GetTokenData()
+		
+		if self:AcceptRoamingToken("ass") then
+			return self:Instruction(trace, "assign", self:StmtExpr())
+		else
+			self:TrackBack()
+		end
+	end
+end
+
+function SF_Parser:StmtExpr()
+	return SF_Parser:ExprPrimitive()
+end
+
+-- ----------------------------------- --
+
+function SF_Parser:ExprPrimitive()
+	if self:AcceptRoamingToken("str") then
+		return self:Instruction(self:GetTokenTrace(), "str", self:GetTokenData())
+	elseif self:AcceptRoamingToken("num") then
+		return self:Instruction(self:GetTokenTrace(), "num", self:GetTokenData())
+	end
+	
+	return self:ExprVar()
+end
+
+function SF_Parser:ExprVar()
+	if self:AcceptRoamingToken("var") then
+		return self:Instruction(self:GetTokenTrace(), "var", self:GetTokenData())
+	end
+	
+	return self:ExprError()
+end
+
+function SF_Parser:ExprError()
+	local err
+	
+	if not self:HasTokens() then
+		err = "Further input of code required; incomplete expression"
+	end
+	
+	-- TODO: Put error detection code here
+	
+	if not err then
+		err = "Unexpected token found: "..self:GetToken()[1]
+	end
+	
+	self:Error(err)
+end
