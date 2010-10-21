@@ -120,7 +120,7 @@ end
 function SF_Tokenizer:NextSymbol()
 	local tokenname
 	
-	if self:NextPattern("^[0-9]+%.?[0-9]*") then
+	if self:NextPattern("^[0-9]*%.?[0-9]*") then
 		-- real/imaginary/quaternion number literals
 		local errorpos = self.tokendata:match("^0()[0-9]") or self.tokendata:find("%.$")
 		if self:NextPattern("^[eE][+-]?[0-9][0-9]*") then
@@ -152,18 +152,12 @@ function SF_Tokenizer:NextSymbol()
 			tokenname = "for"
 		elseif self.tokendata == "in" then
 			tokenname = "in"
-		--elseif self.tokendata == "foreach" then
-		--	tokenname = "fea"
 		elseif self.tokendata == "break" then
 			tokenname = "brk"
 		elseif self.tokendata == "continue" then
 			tokenname = "cnt"
 		elseif self.tokendata == "function" then
 			tokenname = "udf"
-		elseif self.tokendata == "then" or self.tokendawta == "do" then
-			tokenname = "blk"
-		elseif self.tokendata == "end" then
-			tokenname = "end"
 		elseif self.tokendata:match("^[ijk]$") and self.character ~= "(" then
 			tokenname, self.tokendata = "num", "1"..self.tokendata
 		else

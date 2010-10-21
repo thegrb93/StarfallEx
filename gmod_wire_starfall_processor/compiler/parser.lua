@@ -23,6 +23,7 @@ StmtEXpr 		- "eVR"
 
 - Expressions
 ExprPRimitive	- strings, numbers, other primitive data types
+ExprCAll 		- "var([sEX,...])"
 ExprVaR			- "var"
 
 
@@ -234,6 +235,14 @@ function SF_Parser:ExprPrimitive()
 	return self:ExprVar()
 end
 
+function SF_Parser:ExprCall()
+	local begin = self:ExprCall()
+	if self:AcceptLeadingToken("lpa") then
+		local exprs, tps = {}, {}
+		
+	end
+end
+
 function SF_Parser:ExprVar()
 	if self:AcceptRoamingToken("var") then
 		return self:Instruction(self:GetTokenTrace(), "var", self:GetTokenData())
@@ -247,9 +256,9 @@ function SF_Parser:ExprError()
 	
 	if not self:HasTokens() then
 		err = "Further input of code required; incomplete expression"
+	else
+		-- TODO: Put error detection code here
 	end
-	
-	-- TODO: Put error detection code here
 	
 	if not err then
 		err = "Unexpected token found: "..self:GetToken()[1]

@@ -87,18 +87,9 @@ function SFLib:AddType(name, tbl)
 	if types[name] == nil then
 		self.types[name] = tbl
 	else
-		for k,v in pairs(self.types[name]) do
-			tbl[k] = v
-		end
-		self.types[name] = tbl
+		error("Starfall: Type "..name.." defined more than once")
 	end
 end
-
--- Functions without a base type.
--- This is a Tree; the first node is the base type (or "_none_")
--- All other nodes are argument types, or "_ellipsis_"
---SFLib.functions = {_none_ = {}}
--- Name = true pairs, used for checking variables
 
 SFLib.functions = {}
 
@@ -134,62 +125,52 @@ local function get_or_add(tbl, key)
 	end
 end
 
-function SFLib:AddFunction(func, name, base, args)
+function SFLib:AddFunction(name, base, args, rt, func)
 	local node = get_or_add(self.functions, name)
 	
 	local key = (base or "")..":"..string.Implode(args,",")
 	if node[key] then
-		error("Function " .. self:FuncToStr(name, base, args) .. " defined more than once")
+		error("Starfall: Function " .. self:FuncToStr(name, base, args) .. " defined more than once")
 	end
 	
 	node[key] = func
-
-	--[[local node
-	if base == nil then
-		node = self.functions._none_
-		self.global_functions[name] = true
-	else
-		node = self.functions[base]
-		if node == nil then
-			error("No such type: "..base,0)
-		end
-	end
-	
-	for _,arg in ipairs(args) do
-		if not self.types[arg] then
-			error("No such type: "..arg,0)
-		end
-		node = get_or_add(node, arg)
-	end
-	
-	node[name] = func]]
+	node["rt:"..key] = rt
 end
 
 function SFLib:GetFunction(name, base, args)
-	local node
-	if base == nil then node = self.functions._none_
-	else node = self.functions[base] end
+	local node = SFLib.functions[name]
+	if not node then return nil end
 	
-	local closest_ellipsis = nil
-	for _,arg in ipairs(args) do
-		if node._ellipsis_ and node._ellipsis_.name then
-			closest_ellipsis = node._ellipsis_.name
+	local imploded = string.Implode(",",args)
+	if node[imploded] then
+		-- Exact match
+		return node[imploded], node["rt:"..imploded]
+	end
+	
+	-- No match, look for ellipsis
+	for i=#args,0,-1 do
+		local str = ""
+		for j=1,i do
+			str = str .. args[j] .. ","
 		end
-		
-		if node[arg] then
-			node = node[arg]
-		else
-			return closest_ellipsis
+		str = str .. "..."
+		if node[str] then
+			return node[str], node["rt:"..str]
 		end
 	end
 	
-	return node[name] or closest_ellipsis
+	-- No match
+	return nil
 end
 
-function SFLib:FinalizeFunctions()
-	for name, tbl in pairs(SFLib.types) do
-		if not tbl._registered then
-			Msg("[W] Undeclared type " .. name .. "\n")
-		end
-	end
-end
+-- ---------------------------------------- --
+-- Per-Player Ops Counters                  --
+-- ---------------------------------------- --
+SFLib.ops = {}
+
+hook.Add("PlayerInitialSpawn", "sf_perplayer_ops", function(ply)
+	ops[ply] = 0
+end)
+hook.Add("PlayerDisconnected", "sf_perplayer_ops_dc",function(ply)
+	ops[ply] = nil
+end)
