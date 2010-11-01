@@ -65,7 +65,7 @@ function SF_Compiler:PopContext(ending)
 		for _,var in ipairs(tbl.vars) do
 			varsdef = varsdef .. var .. ", "
 		end
-		self:AddCode(varsdef:sub(1,varsdef:len()-2)
+		self:AddCode(varsdef:sub(1,varsdef:len()-2))
 	end
 
 	self:AddCode("SF_Self:IncrementCost("..tbl.cost..")\n")
@@ -143,7 +143,7 @@ function SF_Compiler:InstrDECL(args)
 		end
 		self:AddCode(name .. " = " .. ex)
 	else
-		self:AddCode(name .. " = SFLib.types[\""..typ.."\"]._zero"
+		self:AddCode(name .. " = SFLib.types[\""..typ.."\"]._zero")
 	end
 end
 

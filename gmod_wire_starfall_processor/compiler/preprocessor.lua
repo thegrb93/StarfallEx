@@ -69,22 +69,22 @@ end
 -- Methods                             --
 -- ----------------------------------- --
 
-SF_PProcessor:Process(code, ...)
+function SF_PProcessor:Process(code, ...)
 	-- Processes code, you should call this.
 	local instance = setmetatable({}, SF_PProcessor)
 	return pcall(SF_PProcessor.Parse, instance, code, ...)
 end
 
-SF_PProcessor:AddDirective(name, handler)
+function SF_PProcessor:AddDirective(name, handler)
 	self.directives[name] = handler
 end
 
-SF_PProcessor:Error(msg, index)
+function SF_PProcessor:Error(msg, index)
 	local line, col = get_line(self.code, index)
 	error(msg .. "at line " .. line .. ", column " .. col, 0)
 end
 
-SF_PProcessor:Parse(code, ...)
+function SF_PProcessor:Parse(code, ...)
 	self.code = code
 	self.data = {}
 	self.incode = false

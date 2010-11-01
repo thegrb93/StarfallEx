@@ -213,19 +213,19 @@ function SF_Tokenizer:NextSymbol()
 					self:SkipCharacter()
 				elseif self.character == "d" then
 					local str = ""
-					local continue = true
+					local acontinue = true
 					self:SkipCharacter()
 					
 					for i = 1, 3 do
 						if self.character == '"' or self.character:match("[0-9]") == nil then
-							continue = false
+							acontinue = false
 							break
 						end
 						str = str..self.character
 						self:SkipCharacter()
 					end
 					
-					if continue then
+					if acontinue then
 						local num = tonumber(str)
 						if num >= 32 and num <= 255 then
 							self.tokendata = self.tokendata .. string.char(num)
@@ -233,19 +233,19 @@ function SF_Tokenizer:NextSymbol()
 					end
 				elseif self.character == "h" then
 					local str = ""
-					local continue = true
+					local acontinue = true
 					self:SkipCharacter()
 					
 					for i = 1, 2 do
 						if self.character == '"' or self.character:match("[0-9a-fA-F]") == nil then
-							continue = false
+							acontinue = false
 							break
 						end
 						str = str..self.character:lower()
 						self:SkipCharacter()
 					end
 					
-					if continue then
+					if acontinue then
 						local num = tonumber(str,16)
 						if num >= 32 and num <= 255 then
 							self.tokendata = self.tokendata .. string.char(num)
