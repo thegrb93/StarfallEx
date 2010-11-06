@@ -9,22 +9,24 @@
 
 AddCSLuaFile("tokenizer.lua")
 
+//SFLib = SFLib or {}
+
 SF_Tokenizer = SF_Tokenizer or {}
 SF_Tokenizer.__index = SF_Tokenizer
 
-function SF_Tokenizer.Execute(...)
+function SF_Tokenizer:Process(...)
 	-- instantiate SF_Tokenizer
 	local instance = setmetatable({}, SF_Tokenizer)
 	
-	-- and pcall the new instance's Process method.
-	return pcall(SF_Tokenizer.Process, instance, ...)
+	-- and pcall the new instance's Execute method.
+	return pcall(SF_Tokenizer.Execute, instance, ...)
 end
 
 function SF_Tokenizer:Error(message, offset)
 	error(message .. " at line " .. self.tokenline .. ", char " .. (self.tokenchar+(offset or 0)), 0)
 end
 
-function SF_Tokenizer:Process(buffer, params)
+function SF_Tokenizer:Execute(buffer, params)
 	self.buffer = buffer
 	self.length = buffer:len()
 	self.position = 0
@@ -120,7 +122,7 @@ end
 function SF_Tokenizer:NextSymbol()
 	local tokenname
 	
-	if self:NextPattern("^[0-9]*%.?[0-9]*") then
+	if self:NextPattern("^[0-9]+%.?[0-9]*") or self:NextPattern("^.[0-9]+") then
 		-- real/imaginary/quaternion number literals
 		local errorpos = self.tokendata:match("^0()[0-9]") or self.tokendata:find("%.$")
 		if self:NextPattern("^[eE][+-]?[0-9][0-9]*") then

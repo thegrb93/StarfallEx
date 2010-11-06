@@ -188,3 +188,4 @@ local function directive_name(args, data, code, index)
 	data.name = args:Trim()
 	return code
 end
+SF_PProcessor:AddDirective("name", directive_name)

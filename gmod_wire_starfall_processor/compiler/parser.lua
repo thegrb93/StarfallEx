@@ -33,12 +33,12 @@ ExprVaR			- "var"
 SF_Parser = {}
 SF_Parser.__index = SF_Parser
 
-function SF_Parser.Execute(...)
+function SF_Parser:Process(...)
 	-- instantiate Parser
 	local instance = setmetatable({}, SF_Parser)
 	
-	-- and pcall the new instance's Process method.
-	return pcall(SF_Parser.Process, instance, ...)
+	-- and pcall the new instance's Execute method.
+	return pcall(SF_Parser.Execute, instance, ...)
 end
 
 function SF_Parser:Error(message, token)
@@ -49,17 +49,17 @@ function SF_Parser:Error(message, token)
 	end
 end
 
-function SF_Parser:Process(tokens, params)
+function SF_Parser:Execute(tokens, params)
 	self.tokens = tokens
 	
 	self.index = 0
 	self.count = #tokens
-	self.delta = {}
 	
+	PrintTable(tokens)
 	self:NextToken()
 	local tree = self:Root()
 	
-	return tree, self.delta
+	return tree
 end
 
 /******************************************************************************/
@@ -78,7 +78,7 @@ end
 
 
 function SF_Parser:Instruction(trace, name, ...)
-	return {name, trace, ...} //
+	return {name, trace, ...}
 end
 
 
@@ -160,14 +160,15 @@ function SF_Parser:Root()
 	local trace = self:GetTokenTrace()
 	local stmts = self:Instruction(trace, "seq")
 
-	if !self:HasTokens() then return stmts end
+	if !self:HasTokens() then Msg("No tokens!\n") return stmts end
 	
 	while true do
+		Msg("Iter\n")
 		if self:AcceptRoamingToken("com") then
 			self:Error("Statement separator (,) must not appear multiple times")
 		end
 		
-		stmts[#stmts + 1] = self:Stmt1()
+		stmts[#stmts + 1] = self:StmtDecl()
 		
 		if !self:HasTokens() then break end
 		
