@@ -3,7 +3,8 @@
    [ By Colonel Thirty Two                 ]
    [---------------------------------------]]
 
-local SFLib = SFLib or {}
+AddCSLuaFile("SFLib.lua")
+SFLib = SFLib or {}
 
 function SFLib.limitString(text, length)
 	if #text <= length then
@@ -118,7 +119,7 @@ function SFLib:FuncTypToStr(base, args)
 end
 
 local function get_or_add(tbl, key)
-	if tbl[key] then return tbl[key] end
+	if tbl[key] then return tbl[key]
 	else
 		tbl[key] = {}
 		return tbl[key]
@@ -169,8 +170,9 @@ end
 SFLib.ops = {}
 
 hook.Add("PlayerInitialSpawn", "sf_perplayer_ops", function(ply)
-	ops[ply] = 0
+	SFLib.ops[ply] = 0
 end)
 hook.Add("PlayerDisconnected", "sf_perplayer_ops_dc",function(ply)
-	ops[ply] = nil
+	SFLib.ops[ply] = nil
 end)
+
