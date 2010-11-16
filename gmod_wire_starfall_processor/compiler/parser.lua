@@ -169,9 +169,8 @@ function SF_Parser:Root()
 	local stmts = self:Instruction(trace, "seq")
 
 	if !self:HasTokens() then return stmts end
-	
-	local count = 0
-	while count < 20 do
+
+	while true do
 		if self:AcceptRoamingToken("com") then
 			self:Error("Statement separator (,) must not appear multiple times")
 		end
@@ -187,9 +186,6 @@ function SF_Parser:Root()
 		end
 		count = count + 1
 	end
-	if count >= 20 then
-		self:Error("Stupid infinite loop... it's at self:Root()")
-	end
 	
 	return stmts
 end
@@ -204,7 +200,8 @@ function SF_Parser:StmtDecl()
 			local var = self:GetTokenData()
 			
 			if not SFLib.types[typ] then
-				self:Error("Unknown type: "..typ, trace)
+				self:TrackBack()
+				self:Error("Unknown type: "..typ)
 			end
 			
 			if self:AcceptRoamingToken("ass") then
