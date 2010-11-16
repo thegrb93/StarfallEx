@@ -9,7 +9,7 @@
 
 AddCSLuaFile("parser.lua")
 
---[[ Not correct
+--[[
 
 - seQuence
 SeqSPace 		- "sIF qSP"
@@ -88,15 +88,20 @@ end
 
 function SF_Parser:NextToken()
 	if self.index <= self.count then
+		Msg("Advancing tokens. Index="..self.index.."... ")
 		if self.index > 0 then
+			Msg("Reading from readtoken\n")
 			self.token = self.readtoken
 		else
+			Msg("Creating fake token\n")
 			self.token = {"", "", false, 1, 1}
 		end
 		
 		self.index = self.index + 1
+		Msg("New Readtoken: ".. (self.tokens[self.index] or {"nil"})[1] .. ", index = "..self.index.."\n")
 		self.readtoken = self.tokens[self.index]
 	else
+		Msg("No more tokens ("..self.index.."/"..self.count..")\n")
 		self.readtoken = nil
 	end
 end
@@ -108,11 +113,14 @@ end
 
 
 function SF_Parser:AcceptRoamingToken(name)
+	Msg("Trying to accept token "..name.."...")
 	local token = self.readtoken
 	if not token or token[1] ~= name then
+		Msg(" Failed, token name is "..(token or {"nil"})[1].."\n")
 		return false
 	end
 	
+	Msg(" Accepted.\n")
 	self:NextToken()
 	return true
 end
@@ -160,10 +168,10 @@ function SF_Parser:Root()
 	local trace = self:GetTokenTrace()
 	local stmts = self:Instruction(trace, "seq")
 
-	if !self:HasTokens() then Msg("No tokens!\n") return stmts end
+	if !self:HasTokens() then return stmts end
 	
-	while true do
-		Msg("Iter\n")
+	local count = 0
+	while count < 20 do
 		if self:AcceptRoamingToken("com") then
 			self:Error("Statement separator (,) must not appear multiple times")
 		end
@@ -177,12 +185,17 @@ function SF_Parser:Root()
 				self:Error("Statements must be separated by comma (,) or whitespace")
 			end
 		end
+		count = count + 1
+	end
+	if count >= 20 then
+		self:Error("Stupid infinite loop... it's at self:Root()")
 	end
 	
 	return stmts
 end
 
 function SF_Parser:StmtDecl()
+	Msg("--Beginning Declaration statement--\n")
 	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
 		local typ = self:GetTokenData()
@@ -204,29 +217,33 @@ function SF_Parser:StmtDecl()
 		end
 	end
 	
-	return SF_Parser:StmtAssign()
+	return self:StmtAssign()
 end
 
 function SF_Parser:StmtAssign()
+	Msg("--Beginning Assignment statement--\n")
 	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
 		local var = self:GetTokenData()
 		
 		if self:AcceptRoamingToken("ass") then
-			return self:Instruction(trace, "assign", self:StmtExpr())
+			return self:Instruction(trace, "assign", var, self:StmtExpr())
 		else
 			self:TrackBack()
 		end
 	end
+	
+	return self:StmtExpr()
 end
 
 function SF_Parser:StmtExpr()
-	return SF_Parser:ExprPrimitive()
+	return self:ExprPrimitive()
 end
 
 -- ----------------------------------- --
 
 function SF_Parser:ExprPrimitive()
+	Msg("--Beginning Primitive expression--\n")
 	if self:AcceptRoamingToken("str") then
 		return self:Instruction(self:GetTokenTrace(), "str", self:GetTokenData())
 	elseif self:AcceptRoamingToken("num") then
@@ -245,6 +262,7 @@ function SF_Parser:ExprCall()
 end
 
 function SF_Parser:ExprVar()
+	Msg("--Beginning Variable expression--\n")
 	if self:AcceptRoamingToken("var") then
 		return self:Instruction(self:GetTokenTrace(), "var", self:GetTokenData())
 	end
@@ -261,7 +279,7 @@ function SF_Parser:ExprError()
 		-- TODO: Put error detection code here
 	end
 	
-	if not err then
+	if err == nil then
 		err = "Unexpected token found: "..self:GetToken()[1]
 	end
 	
