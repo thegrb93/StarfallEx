@@ -184,7 +184,6 @@ function SF_Parser:Root()
 				self:Error("Statements must be separated by comma (,) or whitespace")
 			end
 		end
-		count = count + 1
 	end
 	
 	return stmts
