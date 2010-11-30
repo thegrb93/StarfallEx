@@ -85,7 +85,7 @@ end
 -- Types
 SFLib.types = {}
 function SFLib:AddType(name, tbl)
-	if types[name] == nil then
+	if self.types[name] == nil then
 		self.types[name] = tbl
 	else
 		error("Starfall: Type "..name.." defined more than once")
