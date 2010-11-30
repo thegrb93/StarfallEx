@@ -1,10 +1,10 @@
 /******************************************************************************\
-  Expression 2 Parser for Garry's Mod
-  Andreas "Syranide" Svensson, me@syranide.com
-  
-  Modified for Starfall
+  Starfall Parser for Garry's Mod
   By Colonel Thirty Two
   initrd.gz@gmail.com
+  
+  Based on the Expression 2 Parser by
+  Andreas "Syranide" Svensson, me@syranide.com
 \******************************************************************************/
 
 AddCSLuaFile("parser.lua")
@@ -19,11 +19,12 @@ SeqCOmma 		- "sIF, qSP"
 
 StmtDeClare 	- "type var", "type var = sEX"
 StmtASsign 		- "var = sEX"
+StmtIF			- "if(ePR) { sSP }"
 StmtEXpr 		- "eVR"
 
 - Expressions
 ExprPRimitive	- strings, numbers, other primitive data types
-ExprCAll 		- "var([sEX,...])"
+ExprCAllIndex	- "var([sEX,...]), var[I], var:var([sEX,...])"
 ExprVaR			- "var"
 
 
@@ -88,20 +89,20 @@ end
 
 function SF_Parser:NextToken()
 	if self.index <= self.count then
-		Msg("Advancing tokens. Index="..self.index.."... ")
+		--Msg("Advancing tokens. Index="..self.index.."... ")
 		if self.index > 0 then
-			Msg("Reading from readtoken\n")
+			--Msg("Reading from readtoken\n")
 			self.token = self.readtoken
 		else
-			Msg("Creating fake token\n")
+			--Msg("Creating fake token\n")
 			self.token = {"", "", false, 1, 1}
 		end
 		
 		self.index = self.index + 1
-		Msg("New Readtoken: ".. (self.tokens[self.index] or {"nil"})[1] .. ", index = "..self.index.."\n")
+		--Msg("New Readtoken: ".. (self.tokens[self.index] or {"nil"})[1] .. ", index = "..self.index.."\n")
 		self.readtoken = self.tokens[self.index]
 	else
-		Msg("No more tokens ("..self.index.."/"..self.count..")\n")
+		--Msg("No more tokens ("..self.index.."/"..self.count..")\n")
 		self.readtoken = nil
 	end
 end
@@ -113,14 +114,14 @@ end
 
 
 function SF_Parser:AcceptRoamingToken(name)
-	Msg("Trying to accept token "..name.."...")
+	--Msg("Trying to accept token "..name.."...")
 	local token = self.readtoken
 	if not token or token[1] ~= name then
-		Msg(" Failed, token name is "..(token or {"nil"})[1].."\n")
+		--Msg(" Failed, token name is "..(token or {"nil"})[1].."\n")
 		return false
 	end
 	
-	Msg(" Accepted.\n")
+	--Msg(" Accepted.\n")
 	self:NextToken()
 	return true
 end
@@ -160,6 +161,51 @@ function SF_Parser:RecurseLeft(func, tbl)
 	return expr
 end
 
+function SF_Parser:Condition(msg)
+	msg = msg or "condition"
+	if not self:AcceptRoamingToken("lpa") then
+		self:Error("Left parenthesis (() missing to begin "..msg)
+	end
+	
+	local expr = self:StmtExpr()
+	
+	if not self:AcceptRoamingToken("rpa") then
+		self:Error("Right parenthesis ()) missing to end "..msg)
+	end
+	
+	return expr
+end
+
+function SF_Parser:Block(msg)
+	msg = msg or "block"
+	local trace = self:GetTokenTrace()
+	local stmts = self:Instruction(trace,"seq")
+	
+	if not self:AcceptRoamingToken("lcb") then
+		self:Error("Left curly bracket ({) missing to start "..msg)
+	end
+	
+	local token = self:GetToken()
+	
+	if self:AcceptRoamingToken("rcb") then return stmts end
+	
+	while self:HasTokens() do
+		if self:AcceptRoamingToken("com") then
+			self:Error("Statement seperator (,) must not appear multiple times")
+		elseif self:AcceptRoamingToken("rcb") then
+			self:Error("Statement seperator (,) must be suceeded by a statement")
+		end
+		
+		stmts[#stmts+1] = self:StmtDeclare()
+		
+		if self:AcceptRoamingToken("rcb") then return stmts end
+		
+		if not self:AcceptRoamingToken("com") then
+			
+		end
+	end
+end
+
 -- ----------------------------------- --
 
 function SF_Parser:Root()
@@ -190,7 +236,7 @@ function SF_Parser:Root()
 end
 
 function SF_Parser:StmtDecl()
-	Msg("--Beginning Declaration statement--\n")
+	--Msg("--Beginning Declaration statement--\n")
 	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
 		local typ = self:GetTokenData()
@@ -217,7 +263,7 @@ function SF_Parser:StmtDecl()
 end
 
 function SF_Parser:StmtAssign()
-	Msg("--Beginning Assignment statement--\n")
+	--Msg("--Beginning Assignment statement--\n")
 	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
 		local var = self:GetTokenData()
@@ -229,7 +275,16 @@ function SF_Parser:StmtAssign()
 		end
 	end
 	
-	return self:StmtExpr()
+	return self:StmtIf()
+end
+
+function SF_Parser:StmtIf()
+	if self:AcceptRoamingToken("if") then
+		if not self:AcceptRoamingToken("lpa") then
+			self:Error("Left Parenthesis (() missing to close 
+		end
+	end
+	return StmtExpr()
 end
 
 function SF_Parser:StmtExpr()
@@ -239,7 +294,7 @@ end
 -- ----------------------------------- --
 
 function SF_Parser:ExprPrimitive()
-	Msg("--Beginning Primitive expression--\n")
+	--Msg("--Beginning Primitive expression--\n")
 	if self:AcceptRoamingToken("str") then
 		return self:Instruction(self:GetTokenTrace(), "str", self:GetTokenData())
 	elseif self:AcceptRoamingToken("num") then
@@ -249,16 +304,42 @@ function SF_Parser:ExprPrimitive()
 	return self:ExprVar()
 end
 
-function SF_Parser:ExprCall()
-	local begin = self:ExprCall()
-	if self:AcceptLeadingToken("lpa") then
-		local exprs, tps = {}, {}
+function SF_Parser:ExprGroup()
+	if self:AcceptRoamingToken("lpa") then
+		local token = self:GetToken()
+		local expr = self:Expr1()
 		
+		if not self:AcceptRoamingToken("rpa") then
+			self:Error("Right parenthesis ()) missing to close grouped equasion",token)
+		end
+		return expr
+	end
+end
+
+function SF_Parser:ExprCallIndex()
+	local begin = self:ExprVar()
+	while true do
+		if self:AcceptTailingToken("lpa") then
+			-- Function
+			local trace,token = self:GetTokenTrace(),self:GetToken()
+			local exprs = {}
+			while self:AcceptRoamingToken("com") do
+				exprs[#exprs+1] = self:ExprPrimitive()
+			end
+			
+			if not self:AcceptRoamingToken("rpa") then
+				self:Error("Right parenthesis ()) missing to close function argument list",token)
+			end
+			
+			return self:Instruction(trace,"call",begin,exprs)
+		elseif self:AcceptRoamingToken("lpa") then
+			
+		end
 	end
 end
 
 function SF_Parser:ExprVar()
-	Msg("--Beginning Variable expression--\n")
+	--Msg("--Beginning Variable expression--\n")
 	if self:AcceptRoamingToken("var") then
 		return self:Instruction(self:GetTokenTrace(), "var", self:GetTokenData())
 	end

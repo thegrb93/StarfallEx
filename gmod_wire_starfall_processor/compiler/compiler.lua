@@ -1,20 +1,39 @@
+/******************************************************************************\
+  Starfall Compiler for Garry's Mod
+  By Colonel Thirty Two
+  initrd.gz@gmail.com
+  
+  Based on the Expression 2 Compiler by
+  Andreas "Syranide" Svensson, me@syranide.com
+\******************************************************************************/
 
-local SF_Compiler = SF_Compiler or {}
+
+SF_Compiler = SF_Compiler or {}
 SF_Compiler.__index = SF_Compiler
 
 function SF_Compiler:Error(message, instr)
 	error(message .. " at line " .. instr[2][1] .. ", char " .. instr[2][2], 0)
 end
 
-function SF_Compiler:Process(root, inputs, outputs, params)
-	self.contexts = {}
-	self:PushContext("do")
+function SF_Compiler:Process(...)
+	local instance = setmetatable({},SF_Compiler)
+	return pcall(SF_Compiler.Execute,instance,...)
+end
 
+function SF_Compiler:Execute(root, inputs, outputs, params)
+	self.contexts = {}
 	self.inputs = inputs
 	self.outputs = outputs
-	
+	self.params = params
 	self.code = ""
-	Compiler["Instr" .. string.upper(root[1])](self, root)
+	
+	self:PushContext("do")
+	
+	local first_instr = "Instr"..string.upper(root[1])
+	if not SF_Compiler[first_instr] then
+		error("No such instruction: "..first_instr)
+	end
+	SF_Compiler[first_instr](self, root)
 	self:PopContext()
 
 	-- Debug code
@@ -50,26 +69,23 @@ function SF_Compiler:PushContext(beginning)
 		code = "",
 		cost = 0
 	}
+	self:AddCode((beginning or "").."\n")
 	self.contexts[#self.contexts + 1] = tbl
-	self:AddCode(beginning or "")
 end
 
 function SF_Compiler:PopContext(ending)
-	ending = ending or "end"
 
 	local tbl = self.contexts[#self.contexts]
 	self.contexts[#self.contexts] = nil
 
-	if tbl.vars[1] then
-		local varsdef = "local "
-		for _,var in ipairs(tbl.vars) do
-			varsdef = varsdef .. var .. ", "
-		end
-		self:AddCode(varsdef:sub(1,varsdef:len()-2))
+	local varsdef = "local "
+	for var,_ in pairs(tbl.vars) do
+		varsdef = varsdef .. var .. ", "
 	end
+	if varsdef:len() > 6 then self:AddCode(varsdef:sub(1,varsdef:len()-2).."\n") end
 
 	self:AddCode("SF_Self:IncrementCost("..tbl.cost..")\n")
-	self:AddCode(tbl.code.."\n"..ending.."\n")
+	self:AddCode(tbl.code.."\n"..(ending or "end").."\n")
 end
 
 function SF_Compiler:AddCode(code)
@@ -95,11 +111,11 @@ end
 function SF_Compiler:DefineVar(name, typ, instr)
 	--local name, typ = args[2], args[3]
 	local curcontext = self.contexts[#self.contexts]
-	if curcontext[name] ~= typ then
+	if curcontext[name] and curcontext[name] ~= typ then
 		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,instr)..", got "..tp..")",args)
 	end
 
-	curcontext[name] = typ
+	curcontext.vars[name] = typ
 end
 
 --[[TODO: Don't think we need this
@@ -113,8 +129,8 @@ end]]
 
 function SF_Compiler:GetVarType(name, instr)
 	for i = #self.contexts, 1, -1 do
-		if self.contexts[i][name] then
-			return self.contexts[i][name]
+		if self.contexts[i].vars[name] then
+			return self.contexts[i].vars[name]
 		end
 	end
 
@@ -124,13 +140,19 @@ function SF_Compiler:GetVarType(name, instr)
 	if SFLib.functions[name] then
 		return "function"
 	end
-
+	
 	self:Error("Undefined variable (" .. name .. ")", instr)
 end
 
 -- ---------------------------------------- --
 -- Instructions - Statements                --
 -- ---------------------------------------- --
+
+function SF_Compiler:InstrSEQ(args)
+	for i=1,#args-2 do
+		self:EvaluateStatement(args,i)
+	end
+end
 
 function SF_Compiler:InstrDECL(args)
 	local typ, name, val = args[3],args[4],args[5]
