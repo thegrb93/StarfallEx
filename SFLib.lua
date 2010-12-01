@@ -14,6 +14,9 @@ function SFLib.limitString(text, length)
 	end
 end
 
+-- TODO: Load this
+SFLib.builtins = {}
+
 -- Operators
 SFLib.optree_inv = {
 	add  = "+",
@@ -82,87 +85,124 @@ for token,op in pairs(SFLib.optree_inv) do
 	end
 end
 
--- Types
-SFLib.types = {}
-function SFLib:AddType(name, tbl)
-	if self.types[name] == nil then
-		self.types[name] = tbl
-	else
-		error("Starfall: Type "..name.." defined more than once")
-	end
+function SFLib.GetType(data)
+	local lua_type = type(data)
+	if lua_type ~= "table" then return lua_type end
+	return data.type
 end
 
-SFLib.functions = {}
-
-function SFLib:FuncToStr(name, base, args)
-	-- Returns a string representation of a function.
-	-- Note: the function doesn't have to be defined.
+function SFLib.GetClass(data)
+	local lua_type = type(data)
+	if lua_type ~= "table" then
+		return SFLib.builtins[lua_type:sub(1,1):upper()..lua_type:sub(2)]
+	end
 	
-	local out = ""
-	if base then
-		out = base..":"
-	end
-	out = out .. name
-	for _,arg in ipairs(args) do
-		out = out .. arg .. ","
-	end
-	return out:sub(1,out:len()-1)
+	return getmetatable(data)
 end
 
-function SFLib:FuncTypToStr(base, args)
-	-- Returns the string type of a function
-	-- [base]:arg1,arg2,arg3
-	-- There is a ":" even if no base type is available
-	
-	local imploded = string.Implode(args,",")
-	return (base or "") .. ":" .. imploded
+-- ---------------------------------------- --
+-- Lua Function Overloading                 --
+-- ---------------------------------------- --
+-[[ Copyright 2010, Declan White (Deco Da Man), All rights reserved. ]]
+
+local new_data =
+        debug.getuservalue
+    and function(data, mt)
+        local o = newproxy()
+        debug.setuservalue(o, data)
+        debug.setmetatable(o, mt)
+        return o
+    end
+    or  function(data, mt)
+        return setmetatable(data, mt)
+    end
+;
+local get_data =
+        debug.getuservalue
+    or  function(o) return o end
+;
+
+local OVERLOAD_META = {
+    __call = function(self, ...)
+        local args, args_n = {...}, select('#', ...)
+        local sublevel = get_data(self)
+        local levels = {sublevel}
+        for arg_i = 1, args_n do
+            sublevel = sublevel[type(args[arg_i])]
+            if not sublevel then
+                for level_i = #levels, 1, -1 do
+                    if levels[level_i]._ then
+                        return levels[level_i]._(unpack(args))
+                    end
+                end
+                local type_stack = {}
+                for arg_2i = 1, args_n do
+                    table.insert(type_stack, type(args[arg_2i])..(arg_2i == arg_i and "*" or ""))
+                end
+                error("no matching overload ("..table.concat(type_stack, ",")..")", 2)
+            end
+            table.insert(levels, sublevel)
+        end
+        if sublevel._ then
+            sublevel._(unpack(args))
+        end
+    end,
+}
+
+function SFLib.overload(overloads)
+    return new_data(overloads, OVERLOAD_META)
 end
 
-local function get_or_add(tbl, key)
-	if tbl[key] then return tbl[key]
-	else
-		tbl[key] = {}
-		return tbl[key]
-	end
-end
-
-function SFLib:AddFunction(name, base, args, rt, func)
-	local node = get_or_add(self.functions, name)
-	
-	local key = (base or "")..":"..string.Implode(args,",")
-	if node[key] then
-		error("Starfall: Function " .. self:FuncToStr(name, base, args) .. " defined more than once")
-	end
-	
-	node[key] = func
-	node["rt:"..key] = rt
-end
-
-function SFLib:GetFunction(name, base, args)
-	local node = SFLib.functions[name]
-	if not node then return nil end
-	
-	local imploded = string.Implode(",",args)
-	if node[imploded] then
-		-- Exact match
-		return node[imploded], node["rt:"..imploded]
-	end
-	
-	-- No match, look for ellipsis
-	for i=#args,0,-1 do
-		local str = ""
-		for j=1,i do
-			str = str .. args[j] .. ","
+-- Adds newfunc, an actual lua function, to oldfunc, an overloaded function,
+-- with the additional types being arguments
+-- Added by Colonel Thirty Two
+function SFLib.addoverload(oldfunc,newfunc,...)
+	local node = oldfunc
+	for _,d in ipairs(...) do
+		if node[d] then
+			node = node[d]
+		else
+			node[d] = {}
+			node = node[d]
 		end
-		str = str .. "..."
-		if node[str] then
-			return node[str], node["rt:"..str]
-		end
 	end
-	
-	-- No match
-	return nil
+	node["_"] = newfunc
 end
+
+-- example usage
+--[[
+test = OVERLOAD{
+    ["number"] = {
+        ["table"] = {
+            _ = function(n, t, ...)
+                print("n, t", n, t, ...)
+            end,
+        },
+        ["string"] = {
+            _ = function(n, s, ...)
+                print("n, s", n, s, ...)
+            end,
+            ["number"] = {
+                _ = function(n, s, n2, ...)
+                    print("n, s, n", n, s, n2, ...)
+                end,
+            },
+            ["string"] = {
+                ["number"] = {
+                    _ = function(n, s, s2, n2, ...)
+                        print("n, s, s, n", n, s, s2, n2, ...)
+                    end
+                }
+            }
+        },
+    },
+    ["string"] = function(s, ...)
+        print("s", s, ...)
+    end,
+    ["boolean"] = function(b, ...)
+        print("b", b, ...)
+    end,
+} ]]
 
 -- ---------------------------------------- --
 -- Per-Player Ops Counters                  --

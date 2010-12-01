@@ -1,44 +1,96 @@
-local type_number = {}
+local module_builtins = {}
 
-type_number._zero = 0
+-- ------------------------------------ --
+-- Number Type                          --
+-- ------------------------------------ --
+-- Nothing fancy here
 
--- List of all types compatible with all arithmetic operators
-type_number._op_arit_compatible = {"number"=true}
--- "lua" means to translate the statement to use lua operators in the script.
--- Ex. 1 + 2 translates to 1 + 2 in lua and not SFLib.types.number._op_add(1, 2)
-type_number._op_add = "lua"
-type_number._op_sub = "lua"
-type_number._op_mul = "lua"
-type_number._op_div = "lua"
-
-SFLib:AddFunction("abs", nil, "number", "number", function(x)
-	return math.abs(x)
-end)
-
-SFLib:AddFunction("sum", nil, "...", "number", function(...)
-	local x = {...}
-	local sum = 0
-	for _,i in ipairs(x) do
-		if type(x) ~= "number" then continue end
-		sum = sum + i
-	end
-	return sum
-end)
-
---[[
-sffunction number abs(number x)
-	return math.abs(x)
+local Number = {}
+Number.type = "Number"
+function Number:__construct(data)
+	return tonumber(data) or error("<ArgumentError> Can't convert "..SFLib.GetType(data).." to number.")
 end
 
-sffunction number sum(number x, ...)
-	local sum = 0
-	
-	for i,val in ipairs(varargs) do
-		if vartypes[i] ~= "number" then
-			error("Argument is not a number",0)
-		end
-		sum = sum + val
+-- Operators --
+-- Built into Lua's number type
+
+module_builtins.Number = Number
+
+-- ------------------------------------ --
+-- String Type                          --
+-- ------------------------------------ --
+local String = {}
+String.type = "String"
+
+-- Operators --
+-- Need to alias .. with +
+String.__alias_concat = true
+
+-- ------------------------------------ --
+-- Vector Type                          --
+-- ------------------------------------ --
+
+local sfvector = {}
+sfvector.__index = sfvector
+sfvector.type = "Vector"
+
+function sfvector:__construct(x,y,z)
+	local v = setmetatable({},sfvector)
+	v.x = tonumber(x) or error("<ArugmentError> Can't convert "..SFLib.GetType(x).."to number.")
+	v.y = tonumber(y) or error("<ArugmentError> Can't convert "..SFLib.GetType(x).."to number.")
+	v.z = tonumber(z) or error("<ArugmentError> Can't convert "..SFLib.GetType(x).."to number.")
+	return v
+end
+
+-- Operators --
+
+function sfvector:__add(other)
+	if SFLib.GetType(other) == "Vector" then
+		return sfvector:__construct(self.x+other.x, self.y+other.y, self.z+other.z)
+	else
+		error("<ArgumentError> Can't add Vector and "..SFLib.GetType(other))
 	end
-	
-	return sum
-end]]
+end
+
+function sfvector:__sub(other)
+	if SFLib.GetType(other) == "Vector" then
+		return sfvector:__construct(self.x-other.x, self.y-other.y, self.z-other.z)
+	else
+		error("<ArgumentError> Can't subtract Vector and "..SFLib.GetType(other))
+	end
+end
+
+function sfvector:__mul(other)
+	local num = tonumber(other) or error("<ArgumentError> Can't multiply Vector and "..SFLib.GetType(other))
+	return sfvector:__construct(self.x*num, self.y*num, self.y*num)
+end
+
+function sfvector:__div(other)
+	local num = tonumber(other) or error("<ArgumentError> Can't divide Vector and "..SFLib.GetType(other))
+	return sfvector:__construct(self.x/num, self.y/num, self.y/num)
+end
+
+-- Methods --
+
+function sfvector:x()
+	return self.x
+end
+
+function sfvector:y()
+	return self.y
+end
+
+function sfvector:z()
+	return self.z()
+end
+
+local sqrt = math.sqrt
+function sfvector:length()
+	return sqrt(self.x*self.x + self.y*self.y + self.z*self.z)
+end
+
+function sfvector:length2()
+	return self.x*self.x + self.y*self.y + self.z*self.z
+end
+
+module_builtins.Vector = sfvector
