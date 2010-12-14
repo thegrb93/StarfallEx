@@ -17,14 +17,13 @@ SeqCOmma 		- "sIF, qSP"
 
 - Statements
 
-StmtDeClare 	- "type var", "type var = sEX"
 StmtASsign 		- "var = sEX"
 StmtIF			- "if(ePR) { sSP }"
 StmtEXpr 		- "eVR"
 
 - Expressions
-ExprPRimitive	- strings, numbers, other primitive data types
-ExprCAllIndex	- "var([sEX,...]), var[I], var:var([sEX,...])"
+ExprPRimitive	- strings, numbers, other primitive data types. TODO: Move below ExprCallIndex
+ExprCAllIndex	- "var([sEX,...]), var[I], var:var([sEX,...]), var.var"
 ExprVaR			- "var"
 
 
@@ -235,6 +234,7 @@ function SF_Parser:Root()
 	return stmts
 end
 
+--[[
 function SF_Parser:StmtDecl()
 	--Msg("--Beginning Declaration statement--\n")
 	if self:AcceptRoamingToken("var") then
@@ -260,7 +260,7 @@ function SF_Parser:StmtDecl()
 	end
 	
 	return self:StmtAssign()
-end
+end]]
 
 function SF_Parser:StmtAssign()
 	--Msg("--Beginning Assignment statement--\n")
@@ -281,7 +281,7 @@ end
 function SF_Parser:StmtIf()
 	if self:AcceptRoamingToken("if") then
 		if not self:AcceptRoamingToken("lpa") then
-			self:Error("Left Parenthesis (() missing to close 
+			self:Error("Left Parenthesis (() missing to open if condition")
 		end
 	end
 	return StmtExpr()
@@ -331,11 +331,21 @@ function SF_Parser:ExprCallIndex()
 				self:Error("Right parenthesis ()) missing to close function argument list",token)
 			end
 			
-			return self:Instruction(trace,"call",begin,exprs)
+			expr = self:Instruction(trace,"call",begin,exprs)
 		elseif self:AcceptRoamingToken("lpa") then
-			
+			-- Invalid (?)
+		elseif self:AcceptRoamingToken("indx") then
+			-- Constant index
+			local trace, token = self:GetTokenTrace(), self:GetToken()
+			if not self:AcceptTrailingToken("var") then
+				self:Error("Identifier expected after indexing operator (.)",token)
+			end
+			expr = self:Instruction(trace,"indx",true,self:GetTokenData())
+		else
+			break
 		end
 	end
+	return expr
 end
 
 function SF_Parser:ExprVar()

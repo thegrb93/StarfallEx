@@ -108,40 +108,9 @@ end
 -- Variable Management                      --
 -- ---------------------------------------- --
 
-function SF_Compiler:DefineVar(name, typ, instr)
-	--local name, typ = args[2], args[3]
+function SF_Compiler:DefineVar(name)
 	local curcontext = self.contexts[#self.contexts]
-	if curcontext[name] and curcontext[name] ~= typ then
-		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,instr)..", got "..tp..")",args)
-	end
-
 	curcontext.vars[name] = typ
-end
-
---[[TODO: Don't think we need this
-function SF_Compiler:DefineGlobalVar(name, typ)
-	if self.contexts[1][name] ~= typ then
-		self:Error("Type mismatch for variable " .. name .. " (expected " .. self.contexts[1][name] .. ", got " .. typ)
-	end
-
-	self.contexts[1][name] = typ
-end]]
-
-function SF_Compiler:GetVarType(name, instr)
-	for i = #self.contexts, 1, -1 do
-		if self.contexts[i].vars[name] then
-			return self.contexts[i].vars[name]
-		end
-	end
-
-	if self.outputs[name] then return self.outputs[name] end
-	if self.inputs[name] then return self.inputs[name] end
-
-	if SFLib.functions[name] then
-		return "function"
-	end
-	
-	self:Error("Undefined variable (" .. name .. ")", instr)
 end
 
 -- ---------------------------------------- --
@@ -151,21 +120,6 @@ end
 function SF_Compiler:InstrSEQ(args)
 	for i=1,#args-2 do
 		self:EvaluateStatement(args,i)
-	end
-end
-
-function SF_Compiler:InstrDECL(args)
-	local typ, name, val = args[3],args[4],args[5]
-	self:DefineVar(name, typ, args)
-
-	if val then
-		local ex, tp = self:Evaluate(args,3)
-		if tp ~= typ then
-			self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,args)..", got "..tp..")",args)
-		end
-		self:AddCode(name .. " = " .. ex)
-	else
-		self:AddCode(name .. " = SFLib.types[\""..typ.."\"]._zero")
 	end
 end
 
@@ -185,8 +139,7 @@ end
 function SF_Compiler:InstrVAR(args)
 	local name = args[3]
 
-	local typ = self:GetVarType(name)
-	return self:GenerateLua_VariableReference(name), typ
+	return self:GenerateLua_VariableReference(name)
 end
 
 function SF_Compiler:InstrNUM(args)
@@ -237,10 +190,6 @@ function SF_Compiler:GenerateLua_VariableReference(name)
 
 	if self.outputs[name] then return "SF_Ent.outputs[\"" .. name .. "\"]" end
 	if self.inputs[name] then return "SF_Ent.inputs[\"" .. name .. "\"]" end
-
-	if SFLib.functions[name] then
-		return "SFLib.functions[\""..name.."\"]"
-	end
 
 	error("Internal Error: Tried to generate Lua code for undefined variable \""..name.."\"! Post your code & this error at wiremod.com.")
 end

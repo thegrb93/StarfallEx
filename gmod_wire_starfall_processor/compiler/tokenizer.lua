@@ -140,8 +140,8 @@ function SF_Tokenizer:NextSymbol()
 		
 		tokenname = "num"
 		
-	elseif self:NextPattern("^[a-z][a-zA-Z0-9_]*") then
-		-- keywords/functions
+	elseif self:NextPattern("^[A-Za-z_][a-zA-Z0-9_]*") then
+		-- keywords/variable
 		if self.tokendata == "if" then
 			tokenname = "if"
 		elseif self.tokendata == "elseif" then
@@ -166,11 +166,11 @@ function SF_Tokenizer:NextSymbol()
 			tokenname = "var"
 		end
 		
-	elseif self:NextPattern("^[A-Z][a-zA-Z0-9_]*") then
+--[[	elseif self:NextPattern("^[A-Z][a-zA-Z0-9_]*") then
 		-- variables
-		tokenname = "var"
+		tokenname = "var"]]
 		
-	elseif self.character == "_" then
+	--[[elseif self.character == "_" then
 		-- constants
 		self:NextCharacter()
 		self:NextPattern("^[A-Z0-9_]*")
@@ -188,7 +188,7 @@ function SF_Tokenizer:NextSymbol()
 			self:Error("Unknown constant found ("..self.tokendata..")")
 		else
 			self:Error("Constant ("..self.tokendata..") has invalid data type ("..tp..")")
-		end
+		end]]
 		
 	elseif self.character == "\"" then
 		-- strings
