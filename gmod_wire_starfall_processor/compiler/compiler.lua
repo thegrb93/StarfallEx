@@ -44,20 +44,10 @@ function SF_Compiler:Execute(root, inputs, outputs, params)
 	return self.code
 end
 
-function SF_Compiler:EvaluateStatement(args, index)
-	local name = string.upper(args[index + 2][1])
-	local ex, tp = SF_Compiler["Instr" .. name](self, args[index + 2])
-	return ex, tp
-end
-
 function SF_Compiler:Evaluate(args, index)
-	local ex, tp = self:EvaluateStatement(args, index)
-
-	if tp == "" then
-		self:Error("Function has no return value (void), cannot be part of expression or assigned", args)
-	end
-
-	return ex, tp
+	local name = string.upper(args[index + 2][1])
+	local ex = SF_Compiler["Instr" .. name](self, args[index + 2])
+	return ex
 end
 
 -- ---------------------------------------- --
@@ -88,6 +78,10 @@ function SF_Compiler:PopContext(ending)
 	self:AddCode(tbl.code.."\n"..(ending or "end").."\n")
 end
 
+function SF_Compiler:CurrentContext()
+	return self.contexts[#self.contexts]
+end
+
 function SF_Compiler:AddCode(code)
 	-- Adds code to the current context.
 	-- ONLY statement instructions should call this!
@@ -109,8 +103,11 @@ end
 -- ---------------------------------------- --
 
 function SF_Compiler:DefineVar(name)
-	local curcontext = self.contexts[#self.contexts]
-	curcontext.vars[name] = typ
+	self:CurrentContext().vars[name] = true
+end
+
+function SF_Compiler:IsVarDefined(name)
+	return self:CurrentContext().vars[name] ~= nil
 end
 
 -- ---------------------------------------- --
@@ -119,17 +116,18 @@ end
 
 function SF_Compiler:InstrSEQ(args)
 	for i=1,#args-2 do
-		self:EvaluateStatement(args,i)
+		local code = self:Evaluate(args,i)
+		if code then self:AddCode(code) end
 	end
 end
 
 function SF_Compiler:InstrASSIGN(args)
 	local var = args[3]
-
-	local ex, tp = self:Evaluate(args,2)
-	if tp ~= self:GetVarType(var, args) then
-		self:Error("Types for variable "..var.." do not match (expected "..self:GetVarType(var,args)..", got "..tp..")",args)
-	end
+	local ex = self:Evaluate(args,2)
+	
+	self:DefineVar(var)
+	
+	self:AddCode(self:GenerateLua_VariableReference(var) .. " = " .. ex .. "\n")
 end
 
 -- ---------------------------------------- --
@@ -138,7 +136,6 @@ end
 
 function SF_Compiler:InstrVAR(args)
 	local name = args[3]
-
 	return self:GenerateLua_VariableReference(name)
 end
 
@@ -151,30 +148,37 @@ end
 function SF_Compiler:InstrSTR(args)
 	local str = args[3]
 
-	str = str:replace('"',"\\\""):replace("\n","\\n")
+	str = str:Replace('"',"\\\""):Replace("\n","\\n"):Replace("\\","\\\\")
 	str = "\""..str.."\""
 
 	return str, "string"
 end
 
 function SF_Compiler:InstrCALL(args)
-	local ex, tp = self:Evaluate(args,1)
+	local ex = self:Evaluate(args,1)
 	local instrs = args[4]
 
 	local exprs = {}
-	local tps = {}
-
-	if tp ~= "function" then
-		self:Error("Tried to call non-function value",args)
-	end
 
 	for i=1,#args[4] do
-		local ex, tp = self:Evaluate(args[4], i - 2)
-		tps[#tps + 1] = tp
+		local ex = self:Evaluate(args[4], i - 2)
 		exprs[#exprs + 1] = ex
 	end
 
 
+end
+
+function SF_Compiler:InstrINDX(args)
+	local ex1 = self:Evaluate(args,2)
+	local isConstant = args[3]
+	
+	if isConstant then
+		-- Var.name
+		return ex1 .. "." .. args[5]
+	else
+		-- Var[expr]
+		return ex1 .. "." .. self:Evaluate(args,3)
+	end
 end
 
 -- ---------------------------------------- --
@@ -183,8 +187,8 @@ end
 
 function SF_Compiler:GenerateLua_VariableReference(name)
 	for i = #self.contexts, 1, -1 do
-		if self.contexts[i][name] then
-			return self.contexts[i][name]
+		if self.contexts[i].vars[name] then
+			return name
 		end
 	end
 

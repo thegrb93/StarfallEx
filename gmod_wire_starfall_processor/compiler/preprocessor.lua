@@ -54,7 +54,7 @@ end
 local function find_string_end(text, start)
 	-- Finds the end of a string, ignoring escaped quotation marks
 	local index = text:find('"',start+1)
-	while text:sub(text, index-1, index) == "\\\"" do
+	while text:sub(index-1, index) == "\\\"" do
 		index = text:find('"',index+1)
 		if index == nil then
 			-- Unterminated string

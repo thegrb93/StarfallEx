@@ -23,7 +23,7 @@ StmtEXpr 		- "eVR"
 
 - Expressions
 ExprPRimitive	- strings, numbers, other primitive data types. TODO: Move below ExprCallIndex
-ExprCAllIndex	- "var([sEX,...]), var[I], var:var([sEX,...]), var.var"
+ExprCallIndex	- "eCI([sEX,...]), eCI[sEX], eCI.var"
 ExprVaR			- "var"
 
 
@@ -220,7 +220,7 @@ function SF_Parser:Root()
 			self:Error("Statement separator (,) must not appear multiple times")
 		end
 		
-		stmts[#stmts + 1] = self:StmtDecl()
+		stmts[#stmts + 1] = self:StmtAssign()
 		
 		if !self:HasTokens() then break end
 		
@@ -288,21 +288,10 @@ function SF_Parser:StmtIf()
 end
 
 function SF_Parser:StmtExpr()
-	return self:ExprPrimitive()
+	return self:ExprGroup()
 end
 
 -- ----------------------------------- --
-
-function SF_Parser:ExprPrimitive()
-	--Msg("--Beginning Primitive expression--\n")
-	if self:AcceptRoamingToken("str") then
-		return self:Instruction(self:GetTokenTrace(), "str", self:GetTokenData())
-	elseif self:AcceptRoamingToken("num") then
-		return self:Instruction(self:GetTokenTrace(), "num", self:GetTokenData())
-	end
-	
-	return self:ExprVar()
-end
 
 function SF_Parser:ExprGroup()
 	if self:AcceptRoamingToken("lpa") then
@@ -314,10 +303,12 @@ function SF_Parser:ExprGroup()
 		end
 		return expr
 	end
+	
+	return self:ExprCallIndex()
 end
 
 function SF_Parser:ExprCallIndex()
-	local begin = self:ExprVar()
+	local expr = self:ExprPrimitive()
 	while true do
 		if self:AcceptTailingToken("lpa") then
 			-- Function
@@ -337,15 +328,36 @@ function SF_Parser:ExprCallIndex()
 		elseif self:AcceptRoamingToken("indx") then
 			-- Constant index
 			local trace, token = self:GetTokenTrace(), self:GetToken()
-			if not self:AcceptTrailingToken("var") then
+			if not self:AcceptTailingToken("var") then
 				self:Error("Identifier expected after indexing operator (.)",token)
 			end
-			expr = self:Instruction(trace,"indx",true,self:GetTokenData())
+			expr = self:Instruction(trace,"indx",true,expr,self:GetTokenData())
+		elseif self:AcceptTailingToken("lsb") then
+			-- Variable index
+			local trace = self:GetTokenTrace()
+			local aexpr = self:StmtExpr()
+			if not self:AcceptRoamingToken("rsb") then
+				self:Error("Right square bracket (]) expected after index")
+			end
+			expr = self:Instruction(trace,"indx",true,expr,aexpr)
+		elseif self:AcceptRoamingToken("lsb") then
+			self:Error("Left square bracket ([) must be immediately following a value")
 		else
 			break
 		end
 	end
 	return expr
+end
+
+function SF_Parser:ExprPrimitive()
+	--Msg("--Beginning Primitive expression--\n")
+	if self:AcceptRoamingToken("str") then
+		return self:Instruction(self:GetTokenTrace(), "str", self:GetTokenData())
+	elseif self:AcceptRoamingToken("num") then
+		return self:Instruction(self:GetTokenTrace(), "num", self:GetTokenData())
+	end
+	
+	return self:ExprVar()
 end
 
 function SF_Parser:ExprVar()
