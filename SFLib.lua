@@ -42,9 +42,9 @@ SFLib.optree_inv = {
 	leq  = "<=",
 	gth  = ">",
 	
-	["not"] = "not",
-	["and"] = "and",
-	["or"] = "or",
+	["not"] = "!",
+	["and"] = "&&",
+	["or"] = "||",
 	
 	qsm  = "?",
 	col  = ":",
@@ -58,8 +58,9 @@ SFLib.optree_inv = {
 	lsb  = "[",
 	rsb  = "]",
 	
-	trg  = "~",
-	imp  = "->",
+	bwa = "&",
+	bwo = "|",
+	indx = ".",
 }
 
 SFLib.optree = {}
@@ -103,7 +104,7 @@ end
 -- ---------------------------------------- --
 -- Lua Function Overloading                 --
 -- ---------------------------------------- --
--[[ Copyright 2010, Declan White (Deco Da Man), All rights reserved. ]]
+--[[ Copyright 2010, Declan White (Deco Da Man), All rights reserved. ]]
 
 local new_data =
         debug.getuservalue
