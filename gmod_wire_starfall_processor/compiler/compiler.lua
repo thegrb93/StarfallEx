@@ -18,6 +18,7 @@ end
 function SF_Compiler:Process(...)
 	local instance = setmetatable({},SF_Compiler)
 	return pcall(SF_Compiler.Execute,instance,...)
+	--return instance:Execute(...)
 end
 
 function SF_Compiler:Execute(root, inputs, outputs, params)
@@ -45,6 +46,7 @@ function SF_Compiler:Execute(root, inputs, outputs, params)
 end
 
 function SF_Compiler:Evaluate(args, index)
+	
 	local name = string.upper(args[index + 2][1])
 	local ex = SF_Compiler["Instr" .. name](self, args[index + 2])
 	return ex
@@ -130,6 +132,38 @@ function SF_Compiler:InstrASSIGN(args)
 	self:AddCode(self:GenerateLua_VariableReference(var) .. " = " .. ex .. "\n")
 end
 
+function SF_Compiler:InstrIF(args)
+	local firstcond, elifcond, elsecond = args[3], args[4], args[5]
+	
+	self:AddCode("if ("..self:Evaluate(firstcond,-1)..") then\n")
+	self:PushContext()
+	self:Evaluate(firstcond,0)
+	self:AddCode("\n")
+	self:PopContext("")
+	
+	if elifcond[1] ~= nil then
+		Msg("Elseif\n")
+		for _,cond in ipairs(elifcond) do
+			self:AddCode("elseif ("..self:Evaluate(cond,-1)..") then\n")
+			self:PushContext()
+			self:Evaluate(cond,0)
+			self:AddCode("\n")
+			self:PopContext("")
+		end
+	end
+	
+	if elsecond ~= nil then
+		Msg("Else\n")
+		self:AddCode("else\n")
+		self:PushContext()
+		self:Evaluate(args,3)
+		self:AddCode("\n")
+		self:PopContext("")
+	end
+	
+	self:AddCode("end\n")
+end
+
 -- ---------------------------------------- --
 -- Instructions - Expression                --
 -- ---------------------------------------- --
@@ -152,6 +186,11 @@ function SF_Compiler:InstrSTR(args)
 	str = "\""..str.."\""
 
 	return str, "string"
+end
+
+function SF_Compiler:InstrGROUP(args)
+	local ex = self:Evaluate(args,1)
+	return "("..ex..")"
 end
 
 function SF_Compiler:InstrCALL(args)

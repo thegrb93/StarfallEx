@@ -17,13 +17,15 @@ SeqCOmma 		- "sIF, qSP"
 
 - Statements
 
+StmtFIrst		- sAS
 StmtASsign 		- "var = sEX"
 StmtIF			- "if(ePR) { sSP }"
 StmtEXpr 		- "eVR"
 
 - Expressions
-ExprPRimitive	- strings, numbers, other primitive data types. TODO: Move below ExprCallIndex
-ExprCallIndex	- "eCI([sEX,...]), eCI[sEX], eCI.var"
+ExprGroup		- "( eCI )"
+ExprCallIndex	- "eCI([sEX,...])", "eCI[sEX]", "eCI.var"
+ExprPRimitive	- strings, numbers, other primitive data types.
 ExprVaR			- "var"
 
 
@@ -55,7 +57,6 @@ function SF_Parser:Execute(tokens, params)
 	self.index = 0
 	self.count = #tokens
 	
-	PrintTable(tokens)
 	self:NextToken()
 	local tree = self:Root()
 	
@@ -127,14 +128,14 @@ end
 
 function SF_Parser:AcceptTailingToken(name)
 	local token = self.readtoken
-	if !token or token[3] then return false end
+	if  not token or token[3] then return false end
 	
 	return self:AcceptRoamingToken(name)
 end
 
 function SF_Parser:AcceptLeadingToken(name)
 	local token = self.tokens[self.index + 1]
-	if !token or token[3] then return false end
+	if not token or token[3] then return false end
 	
 	return self:AcceptRoamingToken(name)
 end
@@ -162,47 +163,64 @@ end
 
 function SF_Parser:Condition(msg)
 	msg = msg or "condition"
+	Msg("Parser: Accepting lpa for condition...\n")
 	if not self:AcceptRoamingToken("lpa") then
 		self:Error("Left parenthesis (() missing to begin "..msg)
 	end
 	
+	Msg("Parser: Accepting expresssion...\n")
 	local expr = self:StmtExpr()
 	
+	Msg("Parser: Accepting rpa for condition...\n")
 	if not self:AcceptRoamingToken("rpa") then
 		self:Error("Right parenthesis ()) missing to end "..msg)
 	end
 	
+	Msg("Parser: All good!\n")
+	
 	return expr
 end
 
-function SF_Parser:Block(msg)
-	msg = msg or "block"
+function SF_Parser:Block(block_type)
 	local trace = self:GetTokenTrace()
-	local stmts = self:Instruction(trace,"seq")
+	local stmts = self:Instruction(trace, "seq")
 	
 	if not self:AcceptRoamingToken("lcb") then
-		self:Error("Left curly bracket ({) missing to start "..msg)
+		--self:Error("Left curly bracket ({) must appear after "..(block_type or "condition"))
+		stmts[#stmts+1] = self:StmtFirst()
 	end
 	
 	local token = self:GetToken()
 	
-	if self:AcceptRoamingToken("rcb") then return stmts end
+	if self:AcceptRoamingToken("rcb") then
+		return stmts
+	end
 	
-	while self:HasTokens() do
-		if self:AcceptRoamingToken("com") then
-			self:Error("Statement seperator (,) must not appear multiple times")
-		elseif self:AcceptRoamingToken("rcb") then
-			self:Error("Statement seperator (,) must be suceeded by a statement")
-		end
-		
-		stmts[#stmts+1] = self:StmtDeclare()
-		
-		if self:AcceptRoamingToken("rcb") then return stmts end
-		
-		if not self:AcceptRoamingToken("com") then
+	if self:HasTokens() then
+		while true do
+			if self:AcceptRoamingToken("com") then
+				self:Error("Statement separator (,) must not appear multiple times")
+			elseif self:AcceptRoamingToken("rcb") then
+				self:Error("Statement separator (,) must be suceeded by statement")
+			end
 			
+			stmts[#stmts + 1] = self:StmtFirst()
+			
+			if self:AcceptRoamingToken("rcb") then
+				return stmts
+			end
+			
+			if not self:AcceptRoamingToken("com") then
+				if not self:HasTokens() then break end
+			
+				if self.readtoken[3] == false then
+					self:Error("Statements must be separated by comma (,) or whitespace")
+				end
+			end
 		end
 	end
+	
+	self:Error("Right curly bracket (}) missing, to close statement block", token)
 end
 
 -- ----------------------------------- --
@@ -220,7 +238,7 @@ function SF_Parser:Root()
 			self:Error("Statement separator (,) must not appear multiple times")
 		end
 		
-		stmts[#stmts + 1] = self:StmtAssign()
+		stmts[#stmts + 1] = self:StmtFirst()
 		
 		if !self:HasTokens() then break end
 		
@@ -262,6 +280,10 @@ function SF_Parser:StmtDecl()
 	return self:StmtAssign()
 end]]
 
+function SF_Parser:StmtFirst()
+	return self:StmtAssign()
+end
+
 function SF_Parser:StmtAssign()
 	--Msg("--Beginning Assignment statement--\n")
 	if self:AcceptRoamingToken("var") then
@@ -280,11 +302,24 @@ end
 
 function SF_Parser:StmtIf()
 	if self:AcceptRoamingToken("if") then
-		if not self:AcceptRoamingToken("lpa") then
-			self:Error("Left Parenthesis (() missing to open if condition")
+		local trace = self:GetTokenTrace()
+		
+		local firstcond = {self:Condition("if condition"), self:Block("if block")}
+		
+		local elifcond = {}
+		while self:AcceptRoamingToken("eif") do
+			local cond = self:Condition("elseif condition")
+			local block = self:Block("elseif block")
+			elifcond[#elifcond+1] = {cond,block}
 		end
+		
+		local elsecond = nil
+		if self:AcceptRoamingToken("els") then
+			elsecond = self:Block("else block")
+		end
+		return self:Instruction(trace,"if",firstcond, elifcond, elsecond)
 	end
-	return StmtExpr()
+	return self:StmtExpr()
 end
 
 function SF_Parser:StmtExpr()
@@ -296,12 +331,13 @@ end
 function SF_Parser:ExprGroup()
 	if self:AcceptRoamingToken("lpa") then
 		local token = self:GetToken()
-		local expr = self:Expr1()
+		local trace = self:GetTokenTrace()
+		local expr = self:StmtExpr()
 		
 		if not self:AcceptRoamingToken("rpa") then
 			self:Error("Right parenthesis ()) missing to close grouped equasion",token)
 		end
-		return expr
+		return self:Instruction(trace,"group",expr)
 	end
 	
 	return self:ExprCallIndex()
