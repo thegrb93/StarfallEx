@@ -53,8 +53,8 @@ SFLib.optree_inv = {
 	
 	lpa  = "(",
 	rpa  = ")",
-	rcb  = "{",
-	lcb  = "}",
+	rcb  = "}",
+	lcb  = "{",
 	lsb  = "[",
 	rsb  = "]",
 	
