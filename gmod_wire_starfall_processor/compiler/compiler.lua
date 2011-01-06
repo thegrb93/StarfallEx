@@ -138,30 +138,32 @@ function SF_Compiler:InstrIF(args)
 	self:AddCode("if ("..self:Evaluate(firstcond,-1)..") then\n")
 	self:PushContext()
 	self:Evaluate(firstcond,0)
-	self:AddCode("\n")
 	self:PopContext("")
 	
 	if elifcond[1] ~= nil then
-		Msg("Elseif\n")
 		for _,cond in ipairs(elifcond) do
 			self:AddCode("elseif ("..self:Evaluate(cond,-1)..") then\n")
 			self:PushContext()
 			self:Evaluate(cond,0)
-			self:AddCode("\n")
 			self:PopContext("")
 		end
 	end
 	
 	if elsecond ~= nil then
-		Msg("Else\n")
 		self:AddCode("else\n")
 		self:PushContext()
 		self:Evaluate(args,3)
-		self:AddCode("\n")
 		self:PopContext("")
 	end
 	
 	self:AddCode("end\n")
+end
+
+function SF_Compiler:InstrWHILE(args)
+	self:AddCode("while ("..self:Evaluate(args,1)..") do\n")
+	self:PushContext()
+	self:Evaluate(args,2)
+	self:PopContext()
 end
 
 -- ---------------------------------------- --

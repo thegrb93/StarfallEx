@@ -12,14 +12,15 @@ AddCSLuaFile("parser.lua")
 --[[
 
 - seQuence
-SeqSPace 		- "sIF qSP"
-SeqCOmma 		- "sIF, qSP"
+SeqSPace 		- "sFI qSP"
+SeqCOmma 		- "sFI, qSP"
 
 - Statements
 
 StmtFIrst		- sAS
 StmtASsign 		- "var = sEX"
-StmtIF			- "if(ePR) { sSP }"
+StmtIF			- "if(sEX) { qSP }"
+StmtWhiLe		- "while(sEX) { qSP }"
 StmtEXpr 		- "eVR"
 
 - Expressions
@@ -318,6 +319,16 @@ function SF_Parser:StmtIf()
 			elsecond = self:Block("else block")
 		end
 		return self:Instruction(trace,"if",firstcond, elifcond, elsecond)
+	end
+	return self:StmtWhile()
+end
+
+function SF_Parser:StmtWhile()
+	if self:AcceptRoamingToken("whl") then
+		local trace = self:GetTokenTrace()
+		local cond = self:Condition("while condition")
+		local block = self:Block("while block")
+		return self:Instruction(trace,"while",cond,block)
 	end
 	return self:StmtExpr()
 end
