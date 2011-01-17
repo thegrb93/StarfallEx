@@ -87,6 +87,7 @@ end
 function SF_Compiler:AddCode(code)
 	-- Adds code to the current context.
 	-- ONLY statement instructions should call this!
+	--if not code then return end
 	local tbl = self.contexts[#self.contexts]
 	if tbl then
 		tbl.code = tbl.code .. code
@@ -104,12 +105,23 @@ end
 -- Variable Management                      --
 -- ---------------------------------------- --
 
-function SF_Compiler:DefineVar(name)
-	self:CurrentContext().vars[name] = true
+function SF_Compiler:DefineVar(name, islocal)
+	-- Defines variable "name". If islocal is true, then creates it in
+	-- the current context. If false, does a trace through each context
+	-- layer for the variable name, and use that context's varable (or
+	-- defines it in global if it hasn't been defined yet.)
+	if islocal then
+		self:CurrentContext().vars[name] = true
+	elseif not self:IsVarDefined(name) then
+		self.contexts[1].vars[name] = true
+	end
 end
 
 function SF_Compiler:IsVarDefined(name)
-	return self:CurrentContext().vars[name] ~= nil
+	for i=#self.contexts,1,-1 do
+		if self.contexts[i].vars[name] then return true end
+	end
+	return false
 end
 
 -- ---------------------------------------- --
@@ -125,11 +137,14 @@ end
 
 function SF_Compiler:InstrASSIGN(args)
 	local var = args[3]
-	local ex = self:Evaluate(args,2)
+	local islocal = args[5]
 	
-	self:DefineVar(var)
+	self:DefineVar(var, islocal)
 	
-	self:AddCode(self:GenerateLua_VariableReference(var) .. " = " .. ex .. "\n")
+	if args[4] then
+		local ex = self:Evaluate(args,2)
+		self:AddCode(self:GenerateLua_VariableReference(var) .. " = " .. ex .. "\n")
+	end
 end
 
 function SF_Compiler:InstrIF(args)
@@ -163,6 +178,19 @@ function SF_Compiler:InstrWHILE(args)
 	self:AddCode("while ("..self:Evaluate(args,1)..") do\n")
 	self:PushContext()
 	self:Evaluate(args,2)
+	self:PopContext()
+end
+
+function SF_Compiler:InstrFOR(args)
+	local varname = args[3]
+	
+	self:AddCode("for "..varname.." = ("..self:Evaluate(args,2).."), ("..self:Evaluate(args,3)..")")
+	if args[6] then
+		self:AddCode(", ("..self:Evaluate(args,4)..")")
+	end
+	self:AddCode(" do\n")
+	self:PushContext()
+	self:Evaluate(args,5)
 	self:PopContext()
 end
 

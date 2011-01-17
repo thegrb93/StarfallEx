@@ -18,9 +18,10 @@ SeqCOmma 		- "sFI, qSP"
 - Statements
 
 StmtFIrst		- sAS
-StmtASsign 		- "var = sEX"
+StmtASsign 		- "[local] var = sEX"
 StmtIF			- "if(sEX) { qSP }"
 StmtWhiLe		- "while(sEX) { qSP }"
+StmtFOr			- "for(var = sEX, sEX [,sEX]) { qSP }", Not implemented --> "for(var in sEX) { qSP }"
 StmtEXpr 		- "eVR"
 
 - Expressions
@@ -253,49 +254,30 @@ function SF_Parser:Root()
 	return stmts
 end
 
---[[
-function SF_Parser:StmtDecl()
-	--Msg("--Beginning Declaration statement--\n")
-	if self:AcceptRoamingToken("var") then
-		local trace = self:GetTokenTrace()
-		local typ = self:GetTokenData()
-		
-		if self:AcceptRoamingToken("var") then
-			local var = self:GetTokenData()
-			
-			if not SFLib.types[typ] then
-				self:TrackBack()
-				self:Error("Unknown type: "..typ)
-			end
-			
-			if self:AcceptRoamingToken("ass") then
-				return self:Instruction(trace, "decl", typ, var, self:StmtExpr())
-			else
-				return self:Instruction(trace, "decl", typ, var, nil)
-			end
-		else
-			self:TrackBack()
-		end
-	end
-	
-	return self:StmtAssign()
-end]]
-
 function SF_Parser:StmtFirst()
 	return self:StmtAssign()
 end
 
 function SF_Parser:StmtAssign()
-	--Msg("--Beginning Assignment statement--\n")
+	local islocal = false
+	local trace
+	if self:AcceptRoamingToken("local") then
+		islocal = true
+	end
+	
 	if self:AcceptRoamingToken("var") then
 		local trace = self:GetTokenTrace()
 		local var = self:GetTokenData()
 		
 		if self:AcceptRoamingToken("ass") then
-			return self:Instruction(trace, "assign", var, self:StmtExpr())
-		else
+			return self:Instruction(trace, "assign", var, self:StmtExpr(), islocal)
+		elseif not islocal then
 			self:TrackBack()
+		else
+			return self:Instruction(trace, "assign", var, nil, islocal)
 		end
+	elseif islocal then
+		self:Error("Local keyword (local) must be preceding a variable.")
 	end
 	
 	return self:StmtIf()
@@ -329,6 +311,49 @@ function SF_Parser:StmtWhile()
 		local cond = self:Condition("while condition")
 		local block = self:Block("while block")
 		return self:Instruction(trace,"while",cond,block)
+	end
+	return self:StmtFor()
+end
+
+function SF_Parser:StmtFor()
+	if self:AcceptRoamingToken("for") then
+		local trace = self:GetTokenTrace()
+		
+		if not self:AcceptRoamingToken("lpa") then
+			self:Error("Left parenthesis (() missing to open for loop conditions")
+		end
+		
+		if not self:AcceptRoamingToken("var") then
+			self:Error("Variable expected")
+		end
+		
+		local varname = self:GetTokenData()
+		
+		if not self:AcceptRoamingToken("ass") then
+			self:Error("Assignment operator (=) expected")
+		end
+		
+		local begin = self:StmtExpr()
+		
+		if not self:AcceptRoamingToken("com") then
+			self:Error("Comma expected, preceding end value")
+		end
+		
+		local aend = self:StmtExpr()
+		
+		local step = nil
+		if self:AcceptRoamingToken("com") then
+			step = self:stmtExpr()
+		end
+		
+		if not self:AcceptRoamingToken("rpa") then
+			self:Error("Right parenthesis ()) expected to close for condition")
+		end
+		
+		local block = self:Block("for loop")
+		
+		return self:Instruction(trace, "for", varname, begin, aend, step, block)
+		
 	end
 	return self:StmtExpr()
 end
