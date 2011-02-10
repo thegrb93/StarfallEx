@@ -246,7 +246,33 @@ function SF_Compiler:InstrINDX(args)
 		return ex1 .. "." .. args[5]
 	else
 		-- Var[expr]
-		return ex1 .. "." .. self:Evaluate(args,3)
+		return ex1 .. "[" .. self:Evaluate(args,3) .. "]"
+	end
+end
+
+function SF_Compiler:InstrNEGATE(args)
+	return "-" .. self:Evaluate(args,1)
+end
+
+function SF_Compiler:InstrNOT(args)
+	return "not " .. self:Evaluate(args,1)
+end
+
+local operators = {
+	["and"] = "and",
+	["or"] = "or",
+	["not"] = "not",
+	
+	add = "+",
+	sub = "-",
+	mul = "*",
+	div = "/"
+}
+
+for name, keyword in pairs(operators) do
+	SF_Compiler["Instr"..string.upper(name)] = function(self, args)
+		local e1, e2 = self:Evaluate(args,1), self:Evaluate(args,2)
+		return e1 .. " "..keyword.." "..e2
 	end
 end
 

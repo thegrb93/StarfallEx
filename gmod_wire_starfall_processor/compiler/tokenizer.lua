@@ -164,6 +164,8 @@ function SF_Tokenizer:NextSymbol()
 			tokenname = "local"
 		elseif self.tokendata == "function" then
 			tokenname = "udf"
+--		elseif self.tokendata == "import" then
+--			tokenname = "import"
 		elseif self.tokendata:match("^[ijk]$") and self.character ~= "(" then
 			tokenname, self.tokendata = "num", "1"..self.tokendata
 		else

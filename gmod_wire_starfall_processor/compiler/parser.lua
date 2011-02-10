@@ -25,7 +25,15 @@ StmtFOr			- "for(var = sEX, sEX [,sEX]) { qSP }", Not implemented --> "for(var i
 StmtEXpr 		- "eVR"
 
 - Expressions
-ExprGroup		- "( eCI )"
+ExprOR			- "eOR || eAN"
+ExprANd			- "eAN && eEQ"
+ExprEQuality	- "eEQ == eGL", "eEQ != eGL"
+ExprGreaterLess	- "eGL > eAS", "eGL < eAS", "eGL >= eAS", "eGL <= eAS"
+ExprAddSub		- "eAS + eMD", "eAS - eMD"
+ExprMulDiv		- "eMD * eEX", "eMD * eEX"
+ExprEXponent	- "eEX ^ ePR"
+ExprPRefix		- "+eGR", "-eGR", "!eGR"
+ExprGRoup		- "( eCI )"
 ExprCallIndex	- "eCI([sEX,...])", "eCI[sEX]", "eCI.var"
 ExprPRimitive	- strings, numbers, other primitive data types.
 ExprVaR			- "var"
@@ -359,10 +367,60 @@ function SF_Parser:StmtFor()
 end
 
 function SF_Parser:StmtExpr()
-	return self:ExprGroup()
+	return self:ExprOr()
 end
 
 -- ----------------------------------- --
+
+function SF_Parser:ExprOr()
+	return self:RecurseLeft(self.ExprAnd, {"or"})
+end
+
+function SF_Parser:ExprAnd()
+	return self:RecurseLeft(self.ExprEquality, {"and"})
+end
+
+function SF_Parser:ExprEquality()
+	return self:RecurseLeft(self.ExprGreaterLess, {"eq", "neq"})
+end
+
+function SF_Parser:ExprGreaterLess()
+	return self:RecurseLeft(self.ExprAddSub, {"gth", "lth", "geq", "leq"})
+end
+
+function SF_Parser:ExprAddSub()
+	return self:RecurseLeft(self.ExprMulDiv, {"add", "sub"})
+end
+
+function SF_Parser:ExprMulDiv()
+	return self:RecurseLeft(self.ExprExponent, {"mul", "div", "mod"})
+end
+
+function SF_Parser:ExprExponent()
+	return self:RecurseLeft(self.ExprPrefix, {"exp"})
+end
+
+function SF_Parser:ExprPrefix()
+	if self:AcceptLeadingToken("add") then
+		return self:ExprGroup()
+	elseif self:AcceptRoamingToken("add") then
+		self:Error("Identity operator (+) must not be succeeded by whitespace")
+	end
+	
+	if self:AcceptLeadingToken("sub") then
+		return self:Instruction(self:GetTokenTrace(), "negate", self:ExprGroup())
+	elseif self:AcceptRoamingToken("sub") then
+		self:Error("Negation operator (-) must not be succeeded by whitespace")
+	end
+	
+	if self:AcceptLeadingToken("not") then
+		return self:Instruction(self:GetTokenTrace(), "not", self:Expr10())
+	elseif self:AcceptRoamingToken("not") then
+		self:Error("Logical not operator (-) must not be succeeded by whitespace")
+	end
+	
+	return self:ExprGroup()
+end
 
 function SF_Parser:ExprGroup()
 	if self:AcceptRoamingToken("lpa") then

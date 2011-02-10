@@ -129,7 +129,7 @@ local OVERLOAD_META = {
         local sublevel = get_data(self)
         local levels = {sublevel}
         for arg_i = 1, args_n do
-            sublevel = sublevel[type(args[arg_i])]
+            sublevel = sublevel[SFLib.GetType(args[arg_i])]
             if not sublevel then
                 for level_i = #levels, 1, -1 do
                     if levels[level_i]._ then
@@ -138,9 +138,9 @@ local OVERLOAD_META = {
                 end
                 local type_stack = {}
                 for arg_2i = 1, args_n do
-                    table.insert(type_stack, type(args[arg_2i])..(arg_2i == arg_i and "*" or ""))
+                    table.insert(type_stack, SFLib.GetType(args[arg_2i])..(arg_2i == arg_i and "*" or ""))
                 end
-                error("no matching overload ("..table.concat(type_stack, ",")..")", 2)
+                error("Function cannot be called with argument types: ("..table.concat(type_stack, ",")..")", 2)
             end
             table.insert(levels, sublevel)
         end
@@ -150,14 +150,14 @@ local OVERLOAD_META = {
     end,
 }
 
-function SFLib.overload(overloads)
+function SFLib.Overload(overloads)
     return new_data(overloads, OVERLOAD_META)
 end
 
 -- Adds newfunc, an actual lua function, to oldfunc, an overloaded function,
 -- with the additional types being arguments
 -- Added by Colonel Thirty Two
-function SFLib.addoverload(oldfunc,newfunc,...)
+function SFLib.AddOverload(oldfunc,newfunc,...)
 	local node = oldfunc
 	for _,d in ipairs(...) do
 		if node[d] then
@@ -211,9 +211,36 @@ test = OVERLOAD{
 SFLib.ops = {}
 
 hook.Add("PlayerInitialSpawn", "sf_perplayer_ops", function(ply)
-	SFLib.ops[ply] = 0
+	SFLib.ops[ply:GetID()] = 0
 end)
 hook.Add("PlayerDisconnected", "sf_perplayer_ops_dc",function(ply)
-	SFLib.ops[ply] = nil
+	SFLib.ops[ply:GetID()] = nil
 end)
 
+-- ---------------------------------------- --
+-- Library Loading                          --
+-- ---------------------------------------- --
+SFLib.serverlibs = {}
+
+function SFLib:AddServerLibrary(name, lib)
+	self.serverlibs[name] = lib
+end
+
+-- Returns SF code to lode library "name" as "targetname".
+-- Throws an error if library doesn't exist.
+-- TODO: Add checking for admin-only libraries?
+function SFLib:LoadServerLibrary(name, targetname)
+	if self.serverlibs[name] == nil then
+		error("No such library: "..name,0)
+	end
+	return "local "..targetname.." = SFLib.serverlibs["..name.."]\n"
+end
+
+-- Loads a client library into a processor, and returns the
+-- code line to load the library as variable "targetname"
+function SFLib:LoadClientLibrary(code, ent, name, targetname)
+	if not ent.libs[name] then
+		ent.libs[name] = code
+	end
+	return "local "..targetname.." = SF_Self.libs["..name.."]\n"
+end
