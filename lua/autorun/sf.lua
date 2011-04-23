@@ -41,7 +41,10 @@ env_table.__index = function(self, index)
 end
 
 
-SF_Compiler.envTable.print = print
+SF_Compiler.envTable.print = function(msg)
+	if msg == nil or type(msg) ~= "string" then error("print() called with nonstring argument!") end
+	SF_Compiler.currentChip.ply:PrintMessage(HUD_PRINTTALK, msg)
+end
 
 
 -- Runs a function inside of a Starfall context.
@@ -57,11 +60,11 @@ function SF_Compiler.RunStarfallFunction(context, func, ...)
 	local ok, rt = pcall(func, ...)
 	local ops = 0
 	SF_Compiler.currentChip = nil
-	if not ok then return ok, ops end
+	if not ok then return false, rt end
 	
 	local softops = ops - SF_Compiler.softQuota:GetInt()
 	if softops > 0 then context.softQuotaUsed = context.softQuotaUsed + softops end
-	return ok, rt
+	return true, rt
 end
 
 -- Calls a function while counting the number of lines executed. Only counts lines that share
