@@ -34,8 +34,8 @@ end
 function ENT:Compile(code)
 	local ok, context = SF_Compiler.Compile(code,self.player,self)
 	if not ok then
-		--GAMEMODE:AddNotify("Error:"..context,NOTIFY_ERROR,5)
 		ErrorNoHalt(context.."\n")
+		WireLib.ClientError(context, self.player)
 		return
 	end
 	
@@ -46,6 +46,7 @@ function ENT:Compile(code)
 	local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.func)
 	if not ok then
 		ErrorNoHalt(msg.."\n")
+		WireLib.ClientError(msg, self.player)
 		return
 	end
 end
@@ -56,7 +57,11 @@ function ENT:Think()
 	
 	if self.context then
 		if self.context.environment.think and type(self.context.environment.think) == "function" then
-			SF_Compiler.RunStarfallFunction(self.context, self.context.environment.think)
+			local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.environment.think)
+			if not ok then
+				ErrorNoHalt(msg.."\n")
+				WireLib.ClientError(msg, self.player)
+			end
 		end
 	end
 	
