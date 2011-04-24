@@ -1,15 +1,24 @@
 LibTransfer = LibTransfer or {}
 
+--------------------------------- Variables ---------------------------------
+
 -- If true, uses datastream to send stuff to client, otherwise uses
 -- usermessages + glon.
 LibTransfer.useDatastream = false
 LibTransfer.queue_s2c = {}
-LibTransfer.queue_c2s = {}
+LibTransfer.queue_c2s = {} -- Job structure: {name, encoded, original, accepted, cursor}
 
 LibTransfer.callbacks = {}
 
+--------------------------------- Methods ---------------------------------
+
 function LibTransfer:QueueTask(name, data)
-	RunConsoleCommand(
+	if LibTransfer.useDatastream then
+		datastream.StreamToServer("libtransfer_c2s",data)
+	else
+		queue_c2s[#queue_c2s+1] = {name, LibTransfer.encode(data), data, false, 1}
+		RunConsoleCommand("libtransfer_c2s_begin "..name)
+	end
 end
 
 function LibTransfer:SetCallback(name, func)
@@ -17,7 +26,8 @@ function LibTransfer:SetCallback(name, func)
 end
 
 
--- From E2Lib
+--------------------------------- Encoding ---------------------------------
+-- Copied from E2Lib
 do
 	local enctbl = {}
 	local dectbl = {}
@@ -68,20 +78,30 @@ local function pop_queue(queue)
 	return t
 end
 
+--------------------------------- Client to Server (Sending) ---------------------------------
+
+-- Console commands
 local function callback_concmd_timer()
 	local job = LibTransfer.queue_c2s[1]
-	if not job then return true end
+	if not job or not job[4] then return true end
 	
+	local newcursor = min(job[5] + 450, #job[2])
+	local chunk = job[2]:sub(job[5], newcursor-1)
+	job[5] = newcursor
+	RunConsoleCommand("libtransfer_c2s_chunk "..chunk)
 	
+	if newcursor == #job[2] then
+		RunConsoleCommand("libtransfer_c2s_end")
+		pop_queue(LibTrnasfer.queue_c2s)
+	end
+	
+	return true
 end
+timer.Create("libtransfer_c2s_concommand",0.001,0,callback_concmd_timer)
 
-local function callback_datastream(handler,id,encoded,decoded)
-	local name = decoded[1]
-	local data = decoded[2]
-	LibTransfer.callbacks[name](data)
-end
-datastream.Hook("libtransfer_datastream_s2c",callback_datastream)
+--------------------------------- Server to Client (Recieving) ---------------------------------
 
+-- Usermessages
 local function callback_umsg_start(data)
 	local name = data:ReadString()
 	LibTransfer.queue_s2c[#(LibTransfer.queue_s2c)+1] = {name,""}
@@ -97,3 +117,11 @@ end
 usermessage.Hook("libtransfer_s2c_start",callback_umsg_start)
 usermessage.Hook("libtransfer_s2c_chunk",callback_umsg_chunk)
 usermessage.Hook("libtransfer_s2c_end",callback_umsg_end)
+
+-- Datastream
+local function callback_datastream(handler,id,encoded,decoded)
+	local name = decoded[1]
+	local data = decoded[2]
+	LibTransfer.callbacks[name](data)
+end
+datastream.Hook("libtransfer_datastream_s2c",callback_datastream)

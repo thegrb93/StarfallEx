@@ -27,25 +27,19 @@ local min = math.min
 
 SF_Compiler = SF_Compiler or {}
 
-SF_Compiler.softQuota = CreateConVar("starfall_quota", "10000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
+--SF_Compiler.softQuota = CreateConVar("starfall_quota", "10000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
 SF_Compiler.hardQuota = CreateConVar("starfall_hardquota", "20000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
-SF_Compiler.softQuotaAmount = CreateConVar("starfall_softquota", "10000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
+--SF_Compiler.softQuotaAmount = CreateConVar("starfall_softquota", "10000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
 
 local env_table = {}
 SF_Compiler.envTable = env_table
-env_table.__index = function(self, index)
+env_table.__index = env_table
+--[[env_table.__index = function(self, index)
 	if index == "___sf_private" and debug.getinfo(2,"s").source == "Starfall" then
 		error("Script tried to access protected variable ___sf_private.",0)
 	end
 	return rawget(self,index) or env_table[index]
-end
-
-
-SF_Compiler.envTable.print = function(msg)
-	if msg == nil or type(msg) ~= "string" then error("print() called with nonstring argument!") end
-	SF_Compiler.currentChip.ply:PrintMessage(HUD_PRINTTALK, msg)
-end
-
+end]]
 
 -- Runs a function inside of a Starfall context.
 -- Throws an error if you try to run this inside of func.
@@ -55,15 +49,16 @@ function SF_Compiler.RunStarfallFunction(context, func, ...)
 		error("Tried to execute multiple SF processors, or RunStarfallFunction did not clean up properly", 0)
 	end
 	SF_Compiler.currentChip = context
-	--local ok, ops, rt = pcall(SF_Compiler.RunFuncWithOpsQuota, func,
-	--	min(SF_Compiler.hardQuota:GetInt(), SF_Compiler.softQuota:GetInt() + SF_Compiler.softQuotaAmount:GetInt() - context.softQuotaUsed), ...)
-	local ok, rt = pcall(func, ...)
-	local ops = 0
+	local ok, ops, rt = pcall(SF_Compiler.RunFuncWithOpsQuota, func,
+		--min(SF_Compiler.hardQuota:GetInt(), SF_Compiler.softQuota:GetInt() + SF_Compiler.softQuotaAmount:GetInt() - context.softQuotaUsed), ...)
+		SF_Compiler.hardQuota:GetInt(), ...)
+	--local ok, rt = pcall(func, ...)
+	--local ops = 0
 	SF_Compiler.currentChip = nil
-	if not ok then return false, rt end
+	if not ok then return false, ops end
 	
-	local softops = ops - SF_Compiler.softQuota:GetInt()
-	if softops > 0 then context.softQuotaUsed = context.softQuotaUsed + softops end
+	--local softops = ops - SF_Compiler.softQuota:GetInt()
+	--if softops > 0 then context.softQuotaUsed = context.softQuotaUsed + softops end
 	return true, rt
 end
 
@@ -73,11 +68,11 @@ function SF_Compiler.RunFuncWithOpsQuota(func, max, ...)
 	if max == nil then max = 1000000 end
 	local used = 0
 	
-	local source = debug.getinfo(func,"s").source
+	local source = debug.getinfo(func,"S").source
 	
 	local function SF_OpHook(event, lineno)
 		if event ~= "line" then return end
-		if debug.getinfo(2,"s").source ~= source then return end
+		if debug.getinfo(2,"S").source ~= source then return end
 		used = used + 1
 		if used > max then
 			debug.sethook(nil)
@@ -90,6 +85,10 @@ function SF_Compiler.RunFuncWithOpsQuota(func, max, ...)
 	debug.sethook(nil)
 	
 	return used, rt
+end
+
+function SF_Compiler.AddFunction(name, func)
+	SF_Compiler.envTable[name] = func
 end
 
 function SF_Compiler.Compile(code, ply, ent)
@@ -115,3 +114,17 @@ function SF_Compiler.Reset(sf)
 	sf.environment = setmetatable({},env_table)
 	debug.setfenv(sf.func,sf.environment)
 end
+
+function SF_Compiler.ReloadLibraries()
+	print("SF: Loading libraries...")
+	do
+		local list = file.FindInLua("autorun/sflibs/*.lua")
+		for _,filename in pairs(list) do
+			print("SF: Including sflibs/"..filename)
+			include("sflibs/"..filename)
+		end
+	end
+	print("SF: End loading libraries")
+end
+--concommand.Add("sf_reload_libraries",SF_Compiler.ReloadLibraries,nil,"Reloads starfall libraries")
+SF_Compiler.ReloadLibraries()

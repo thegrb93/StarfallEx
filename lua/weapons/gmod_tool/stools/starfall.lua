@@ -27,6 +27,12 @@ function TOOL:LeftClick( trace )
 	if trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
+	if ValidEntity(trace.Entity) and trace.Entity:GetClass() == "gmod_starfall" then
+		local code = self:GetOwner():GetInfo("sf_code_buffer")
+		trace.Entity:Compile(code)
+		return true
+	end
+	
 	self:SetStage(0)
 
 	local model = self:GetClientInfo( "Model" )

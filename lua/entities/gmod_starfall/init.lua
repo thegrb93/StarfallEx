@@ -40,6 +40,9 @@ function ENT:Compile(code)
 	end
 	
 	self.context = context
+	context.data.inputs = {}
+	context.data.inputVals = {}
+	context.data.outputs = {}
 	local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.func)
 	if not ok then
 		ErrorNoHalt(msg.."\n")
@@ -51,13 +54,17 @@ function ENT:Think()
 	self.BaseClass.Think(self)
 	self:NextThink(CurTime())
 	
+	if self.context then
+		if self.context.environment.think and type(self.context.environment.think) == "function" then
+			SF_Compiler.RunStarfallFunction(self.context, self.context.environment.think)
+		end
+	end
+	
 	return true
 end
 
 function ENT:TriggerInput(key, value)
-end
-
-function ENT:TriggerOutputs()
+	self.context.data.inputVals[key] = value
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)

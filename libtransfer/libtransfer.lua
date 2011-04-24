@@ -1,5 +1,7 @@
 LibTransfer = LibTransfer or {}
 
+--------------------------------- Variables ---------------------------------
+
 -- If true, uses datastream to send stuff to client, otherwise uses
 -- usermessages + glon.
 LibTransfer.useDatastream = false
@@ -8,6 +10,13 @@ LibTransfer.jobs_c2s = {}
 
 LibTransfer.callbacks = {}
 
+--------------------------------- Methods ---------------------------------
+-- Developers should look here
+
+-- Adds a send task to the queue.
+-- ply  = Recipient
+-- name = Task name
+-- data = A table of data to send
 function LibTransfer:QueueTask(ply, name, data)
 	local queue = get_add(self.jobs_s2c, ply:UniqueID())
 	
@@ -18,11 +27,13 @@ function LibTransfer:QueueTask(ply, name, data)
 	end
 end
 
+-- Sets the function to be called when a task with the specified name is completed.
 function LibTransfer:SetCallback(name, func)
 	self.callbacks[name] = func
 end
 
--- From E2Lib
+--------------------------------- Encoding ---------------------------------
+-- Copied from E2Lib
 do
 	local enctbl = {}
 	local dectbl = {}
@@ -82,6 +93,8 @@ local function pop_queue(queue)
 	return t
 end
 
+--------------------------------- Server To Client (Sending) ---------------------------------
+
 local min = math.min
 local function umsg_send_timer()
 	for pid, queue in pairs(jobs_s2c) do
@@ -104,13 +117,18 @@ local function umsg_send_timer()
 end
 timer.Create("libtransfer_s2c_umsg",0.001,0,umsg_send_timer)
 
+--------------------------------- Client To Server (Recieving) ---------------------------------
+
+-- Console Commands
+
 local fucntion callback_concmd_begin(ply,cmd,args)
-	if not LibTransfer.acceptCallbacks[args[0]] then
-		SendUserMessage("libtransfer_c2s_accepted",ply,false)
+--	if not LibTransfer.acceptCallbacks[args[0]] then
+	if not LibTransfer.callbacks[args[0]] then
+		SendUserMessage("libtransfer_c2s_accepted", args[0], ply, false)
 		return
 	end
 	
-	SendUserMessage("libtransfer_c2s_accepted",ply,true)
+	SendUserMessage("libtransfer_c2s_accepted", args[0], ply, true)
 	local queue = get_add(LibTransfer.jobs_c2s, ply:UniqueID())
 	queue[#queue+1] = {ply,args[0],""}
 end
@@ -118,12 +136,12 @@ end
 local function callback_concmd_chunk(ply,cmd,args)
 	local pid = ply:UniqueID()
 	if LibTransfer.jobs_c2s[pid] == nil then
-		ErrorNoHalt("LibRransfer Error: Player "..ply:GetName().." sent data but has no queue!")
-		return nil
+		ErrorNoHalt("LibTransfer Error: Player "..ply:GetName().." sent data but has no queue!")
+		return
 	end
 	if LibTransfer.jobs_c2s[pid][1] == nil then
 		ErrorNoHalt("LibTransfer Error: Player "..ply:GetName().." sent data but queue is empty!")
-		return nil
+		return
 	end
 	
 	local job = LibTransfer.jobs_c2s[pid][1]
@@ -133,20 +151,22 @@ end
 local function callback_concmd_end(ply,cmd,args)
 	local pid = ply:UniqueID()
 	if LibTransfer.jobs_c2s[pid] == nil then
-		ErrorNoHalt("LibRransfer Error: Player "..ply:GetName().." tried to end job but has no queue!")
-		return nil
+		ErrorNoHalt("LibTransfer Error: Player "..ply:GetName().." tried to end job but has no queue!")
+		return
 	end
 	if LibTransfer.jobs_c2s[pid][1] == nil then
 		ErrorNoHalt("LibTransfer Error: Player "..ply:GetName().." tried to end job but queue is empty!")
-		return nil
+		return
 	end
 	
 	local job = pop_queue(LibTransfer.jobs_c2s[pid])
 	LibTransfer.callbacks[job[2]](ply,job[3])
 end
-concommand.Add("libtransfer_c2s_start",callback_concmd_start)
+concommand.Add("libtransfer_c2s_begin",callback_concmd_begin)
 concommand.Add("libtransfer_c2s_chunk",callback_concmd_chunk)
 concommand.Add("libtransfer_c2s_end",callback_concmd_end)
+
+-- Datastream
 
 local function callback_datastream_accept(ply,handler,id)
 	return true
