@@ -14,7 +14,7 @@ if CLIENT then
 end
 
 if SERVER then
-	CreateConVar('sbox_maxstarfall', 10)
+	CreateConVar('sbox_maxwire_starfall', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 end
 
 TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
