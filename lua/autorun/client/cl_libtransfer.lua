@@ -12,7 +12,7 @@ LibTransfer.debug = false
 LibTransfer.queue_s2c = {}
 LibTransfer.queue_c2s = {} -- Job structure: {name, encoded, original, accepted, cursor}
 
-LibTransfer.callbacks = {}
+LibTransfer.callbacks = LibTransfer.callbacks or {}
 
 --------------------------------- Methods ---------------------------------
 

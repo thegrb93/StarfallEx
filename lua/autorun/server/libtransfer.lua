@@ -29,7 +29,7 @@ LibTransfer.debug = false
 LibTransfer.jobs_s2c = {}
 LibTransfer.jobs_c2s = {}
 
-LibTransfer.callbacks = {}
+LibTransfer.callbacks = LibTransfer.callbacks or {}
 
 --------------------------------- Methods ---------------------------------
 -- Developers should look here

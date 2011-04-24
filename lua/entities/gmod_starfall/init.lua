@@ -34,8 +34,7 @@ end
 function ENT:Compile(code)
 	local ok, context = SF_Compiler.Compile(code,self.player,self)
 	if not ok then
-		ErrorNoHalt(context.."\n")
-		WireLib.ClientError(context, self.player)
+		self:Error(msg)
 		return
 	end
 	
@@ -45,8 +44,7 @@ function ENT:Compile(code)
 	context.data.outputs = {}
 	local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.func)
 	if not ok then
-		ErrorNoHalt(msg.."\n")
-		WireLib.ClientError(msg, self.player)
+		self:Error(msg)
 		return
 	end
 end
@@ -60,17 +58,24 @@ function ENT:Think()
 	self.BaseClass.Think(self)
 	self:NextThink(CurTime())
 	
-	if self.context then
-		if self.context.environment.think and type(self.context.environment.think) == "function" then
-			local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.environment.think)
-			if not ok then
-				ErrorNoHalt(msg.."\n")
-				WireLib.ClientError(msg, self.player)
-			end
-		end
-	end
+	self:RunHook("Think")
 	
 	return true
+end
+
+function ENT:Error(msg)
+	self.error = true
+	ErrorNoHalt(msg.."\n")
+	WireLib.ClientError(msg, self.player)
+end
+
+function ENT:RunHook(name, ...)
+	if not self.context or self.error then return end
+	local ok, msg = SF_Compiler.CallHook(name, self.context, ...)
+	if ok == false then
+		self:Error(msg)
+	end
+	return msg
 end
 
 function ENT:TriggerInput(key, value)

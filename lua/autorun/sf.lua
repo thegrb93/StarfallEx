@@ -102,7 +102,7 @@ function SF_Compiler.Compile(code, ply, ent)
 	
 	func = CompileString(code, "Starfall")
 	if func == nil or type(func) == "string" then
-		return false, "Unknown"
+		return false, "Unknown Error (Probably syntax)"
 	end
 	sf.func = func
 	
@@ -113,6 +113,20 @@ end
 function SF_Compiler.Reset(sf)
 	sf.environment = setmetatable({},env_table)
 	debug.setfenv(sf.func,sf.environment)
+end
+
+SF_Compiler.modules = {}
+function SF_Compiler.AddModule(name,tbl)
+	print("SF: Adding module "..name)
+	SF_Compiler.modules[name] = tbl
+end
+
+SF_Compiler.hooks = {}
+function SF_Compiler.CallHook(name, context, ...)
+	if SF_Compiler.hooks[context] and SF_Compiler.hooks[context][name] then
+		return SF_Compiler.RunStarfallFunction(context, SF_Compiler.hooks[context][name], ...)
+	end
+	return nil
 end
 
 function SF_Compiler.ReloadLibraries()
