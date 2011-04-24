@@ -51,6 +51,11 @@ function ENT:Compile(code)
 	end
 end
 
+function ENT:SendCode(ply, code)
+	if ply ~= self.player then return end
+	self:Compile(code)
+end
+
 function ENT:Think()
 	self.BaseClass.Think(self)
 	self:NextThink(CurTime())
