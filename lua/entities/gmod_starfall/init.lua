@@ -65,7 +65,7 @@ end
 
 function ENT:Error(msg)
 	self.error = true
-	ErrorNoHalt(msg.."\n")
+	ErrorNoHalt(msg.." (from processor of "..self.player:Nick()..")\n")
 	WireLib.ClientError(msg, self.player)
 end
 
@@ -80,6 +80,7 @@ end
 
 function ENT:TriggerInput(key, value)
 	self.context.data.inputVals[key] = value
+	self:RunHook("Input",key,value)
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)

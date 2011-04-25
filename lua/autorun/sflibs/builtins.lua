@@ -2,6 +2,7 @@
 --------------------------- Math ---------------------------
 SF_Compiler.AddFunction("Vector",Vector)
 SF_Compiler.AddFunction("math",math)
+SF_Compiler.AddFunction("string",string)
 
 --------------------------- Modules ---------------------------
 

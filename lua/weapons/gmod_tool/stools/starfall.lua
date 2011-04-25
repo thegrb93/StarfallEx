@@ -40,14 +40,12 @@ elseif CLIENT then
 			SF_Editor = vgui.Create("Expression2EditorFrame")
 			SF_Editor:Setup("SF Editor", "Starfall", nil)
 		end
-		MsgN("SF: Opening editor...")
 		SF_Editor:Open()
 	end
 	
 	function SF_Upload(entid)
 		local code = ""
 		if SF_Editor then code = SF_Editor:GetCode() end
-		MsgN("SF: Sending code to entity "..entid..":\n"..code)
 		LibTransfer:QueueTask("starfall_upload",{entid,code})
 	end
 	
@@ -64,9 +62,7 @@ function TOOL:LeftClick( trace )
 	if trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
-	MsgN("SF: DEBUG: LClick")
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_starfall" then
-		MsgN("SF: DEBUG: Clicked on a processor.")
 		self:GetOwner():SendLua("SF_Upload("..trace.Entity:EntIndex()..")")
 		return true
 	end
