@@ -23,7 +23,7 @@ function ENT:Initialize()
 	self.Inputs = WireLib.CreateInputs(self, {})
 	self.Outputs = WireLib.CreateOutputs(self, {})
 	
-	self:SetOverlayText("Starfall\n(none)")
+	self:SetOverlayText("Starfall")
 	local r,g,b,a = self:GetColor()
 	self:SetColor(255, 0, 0, a)
 end
@@ -33,8 +33,9 @@ end
 
 function ENT:Compile(code)
 	local ok, context = SF_Compiler.Compile(code,self.player,self)
+	self.error = false
 	if not ok then
-		self:Error(msg)
+		self:Error(context)
 		return
 	end
 	
@@ -79,8 +80,7 @@ function ENT:RunHook(name, ...)
 end
 
 function ENT:TriggerInput(key, value)
-	self.context.data.inputVals[key] = value
-	self:RunHook("Input",key,value)
+	SF_Compiler.RunInternalHook("WireInputChanged",self,key,value)
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)

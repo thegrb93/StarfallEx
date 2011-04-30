@@ -9,9 +9,19 @@ local function arrcpy(arr)
 	return arr2
 end
 
--- TODO: Add types argument
+--------------------------- Serializers ---------------------------
 
-local valid_types = {
+local function identitySerializer(data) return data end
+local inputSerializers =
+{
+	NORMAL = identitySerializer,
+	STRING = identitySerializer,
+	VECTOR = identitySerializer,
+	WIRELINK = function(wl) return nil end,
+}
+
+local outputSerializers =
+{
 	NORMAL = function(data)
 		if data == nil or type(data) ~= "number" then error("Tried to output non-number to number output.",3) end
 		return data
@@ -23,8 +33,10 @@ local valid_types = {
 	VECTOR = function(data)
 		if type(data) ~= "Vector" then error("Tried to output non-vector to vector output.",3) end
 		return data
-	end,
+	end
 }
+
+--------------------------- Basic Wire Functions ---------------------------
 
 function wire_module.setPorts(inputs, outputs)
 	if inputs == nil then inputs = {} end
@@ -50,7 +62,7 @@ function wire_module.setPorts(inputs, outputs)
 		if inp[2] == nil then typ = "NORMAL"
 		else typ = inp[2]:upper():Trim() end
 		
-		if not valid_types[typ] then error("Invalid input type: "..typ..".",2) end
+		if not inputSerializers[typ] then error("Invalid input type: "..typ..".",2) end
 		
 		local index = #inNames + 1
 		inNames[index] = name
@@ -70,7 +82,7 @@ function wire_module.setPorts(inputs, outputs)
 		if inp[2] == nil then typ = "NORMAL"
 		else typ = inp[2]:upper():Trim() end
 		
-		if not valid_types[typ] then error("Invalid output type: "..typ..".",2) end
+		if not outputSerializers[typ] then error("Invalid output type: "..typ..".",2) end
 		
 		local index = #outNames + 1
 		outNames[index] = name
@@ -99,7 +111,7 @@ function wire_module.setOutput(name, value)
 	local context = SF_Compiler.currentChip
 	if not context.data.outputs[name] then return false end
 	
-	local realvalue = valid_types[context.data.outputs[name]](value)
+	local realvalue = outputSerializers[context.data.outputs[name]](value)
 	
 	Wire_TriggerOutput(context.ent, name, realvalue)
 	return true
@@ -119,4 +131,73 @@ function wire_module.isOutputWired(name)
 	return context.ent.Outputs[name].Src and context.ent.Outputs[name].Src:IsValid()
 end
 
+--------------------------- Wirelink ---------------------------
+
+local function getWirelink(name)
+	if type(name) ~= "string" then error("Passed non-string argument for input name",3) end
+	local context = SF_Compiler.currentChip
+	if context.data.inputs[name] ~= "WIRELINK" then error("Input "..name.." is not a wirelink", 3) end
+	local wl = context.ent.Inputs[name].Value
+	if wl == nil or not wl:IsValid() or not wl.extended then
+		error("Wirelink "..name.." is not wired or invalid",3)
+	end
+	return wl
+end
+
+function wire_module.wirelinkGetOutput(wlname,outputname)
+	if outputname == nil or type(outputname) ~= "string" then error("Non-string passed to wirelinkGetOutput",2) end
+	
+	local context = SF_Compiler.currentChip
+	
+	local wl = getWirelink(wlname)
+	if not wl.Outputs[outputname] then error("Wirelink "..wlname.." does not have output "..outputname,2) end
+	local value, typ = wl.Outputs[outputname].Value, wl.Outputs[outputname].Type
+	
+	if not inputSerializers[typ] then error("Output "..outputname.." has an incompatible type: "..typ,2) end
+	return inputSerializers[typ](value)
+end
+
+function wire_module.wirelinkSetInput(wlname,inputname,value)
+	if outputname == nil or type(outputname) ~= "string" then error("Non-string passed to wirelinkSetInput",2) end
+	
+	local context = SF_Compiler.currentChip
+	
+	local wl = getWirelink(wlname)
+	if not wl.Inputs[inputname] then error("Wirelink "..wlname.." does not have input "..inputname,2) end
+	
+	if not outputSerializers[typ] then error("Output "..outputname.." has an incompatible type: "..typ,2) end
+	WireLib.TriggerInput(wl, inputname, outputSerializers[typ](value))
+end
+
+function wire_module.wirelinkIsHiSpeed(wlname)
+	local wl = getWirelink(wlname)
+	if wl.ReadCell or wl.WriteCell then return true else return false end
+end
+
+function wire_module.wirelinkReadCell(wlname, cell)
+	if type(cell) ~= "number" then error("Passed non-number cell argument to wirelinkReadCell",2) end
+	local wl = getWirelink(wlname)
+	
+	if not wl.ReadCell then error("Wirelink "..wlname.." has no readable hispeed memory",2) end
+	local byte = wl:ReadCell(cell)
+	if not byte then return nil end
+	return byte
+end
+
+function wire_module.wirelinkWriteCell(wlname, cell, value)
+	if type(cell) ~= "number" then error("Passed non-number cell argument to wirelinkWriteCell",2) end
+	if type(value) ~= "number" then error("Passed non-number value argument to wirelinkWriteCell",2) end
+	local wl = getWirelink(wlname)
+	
+	if not wl.WriteCell then error("Wirelink "..wlname.." has no writeable hispeed memory",2) end
+	return wl:WriteCell(cell, value)
+end
+
 SF_Compiler.AddModule("wire",wire_module)
+
+local function inputhook(ent, name, value)
+	if inputSerializers[ent.Inputs[name].Type] then
+		ent:RunHook("Input",name, inputSerializers[ent.Inputs[name].Type](value))
+	end
+end
+SF_Compiler.AddInternalHook("WireInputChanged",inputhook)

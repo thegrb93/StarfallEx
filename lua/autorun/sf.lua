@@ -41,6 +41,8 @@ env_table.__index = env_table
 	return rawget(self,index) or env_table[index]
 end]]
 
+SF_Compiler.hooks = SF_Compiler.hooks or {}
+
 -- Runs a function inside of a Starfall context.
 -- Throws an error if you try to run this inside of func.
 -- Returns (ok, msg or whatever func returns)
@@ -91,6 +93,18 @@ function SF_Compiler.AddFunction(name, func)
 	SF_Compiler.envTable[name] = func
 end
 
+function SF_Compiler.AddInternalHook(name, func)
+	if not SF_Compiler.hooks[name] then SF_Compiler.hooks[name] = {} end
+	SF_Compiler.hooks[name][func] = true
+end
+
+function SF_Compiler.RunInternalHook(name, ...)
+	if not SF_Compiler.hooks[name] then return end
+	for func,_ in pairs(SF_Compiler.hooks[name]) do
+		func(...)
+	end
+end
+
 function SF_Compiler.Compile(code, ply, ent)
 	local sf = {}
 	sf.softQuotaUsed = 0
@@ -100,9 +114,13 @@ function SF_Compiler.Compile(code, ply, ent)
 	sf.ply = ply
 	sf.data = {}
 	
-	func = CompileString(code, "Starfall")
-	if func == nil or type(func) == "string" then
-		return false, "Unknown Error (Probably syntax)"
+	local ok, func = pcall(CompileString, code, "Starfall", false)
+	if not ok then return false, func end
+	
+	if func == nil then
+		return false, "Unknown Compiler Error"
+	elseif type(func) == "string" then
+		return false, func
 	end
 	sf.func = func
 	
