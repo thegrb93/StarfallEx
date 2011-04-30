@@ -1,3 +1,8 @@
+
+if CLIENT then return end
+
+AddCSLuaFile("autorun/client/cl_libtransfer.lua")
+
 LibTransfer = LibTransfer or {}
 
 -- Helper functions

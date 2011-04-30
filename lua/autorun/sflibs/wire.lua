@@ -180,7 +180,6 @@ function wire_module.wirelinkReadCell(wlname, cell)
 	
 	if not wl.ReadCell then error("Wirelink "..wlname.." has no readable hispeed memory",2) end
 	local byte = wl:ReadCell(cell)
-	if not byte then return nil end
 	return byte
 end
 

@@ -1,3 +1,5 @@
+if SERVER then return end
+
 LibTransfer = LibTransfer or {}
 
 --------------------------------- Variables ---------------------------------
