@@ -100,7 +100,11 @@ end
 
 function wire_module.getInput(name)
 	if name == nil or type(name) ~= "string" then error("Non-string name passed to getInput()",2) end
-	return SF_Compiler.currentChip.data.inputVals[name]
+	if not SF_Compiler.currentChip.ent.Inputs[name] or not SF_Compiler.currentChip.ent.Inputs[name]:IsValid() then
+		return nil
+	end
+	local context = SF_Compiler.currentChip
+	return inputSerializers[context.data.inputs[name]](context.ent.Inputs[name].Value)
 end
 
 function wire_module.setOutput(name, value)

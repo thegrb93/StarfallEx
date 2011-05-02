@@ -41,9 +41,10 @@ function ENT:Compile(code)
 	
 	self.context = context
 	context.data.inputs = {}
-	context.data.inputVals = {}
 	context.data.outputs = {}
+	SF_Compiler.RunInternalHook("preexec",self.context,nil)
 	local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.func)
+	SF_Compiler.RunInternalHook("postexec",self.context,nil)
 	if not ok then
 		self:Error(msg)
 		return
@@ -72,10 +73,13 @@ end
 
 function ENT:RunHook(name, ...)
 	if not self.context or self.error then return end
+	
+	SF_Compiler.RunInternalHook("preexec",self.context,name)
 	local ok, msg = SF_Compiler.CallHook(name, self.context, ...)
 	if ok == false then
 		self:Error(msg)
 	end
+	SF_Compiler.RunInternalHook("postexec",self.context,name)
 	return msg
 end
 
