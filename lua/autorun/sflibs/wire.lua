@@ -100,7 +100,7 @@ end
 
 function wire_module.getInput(name)
 	if name == nil or type(name) ~= "string" then error("Non-string name passed to getInput()",2) end
-	if not SF_Compiler.currentChip.ent.Inputs[name] or not SF_Compiler.currentChip.ent.Inputs[name]:IsValid() then
+	if not SF_Compiler.currentChip.ent.Inputs[name] or not SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid() then
 		return nil
 	end
 	local context = SF_Compiler.currentChip
