@@ -32,8 +32,13 @@ function ENT:OnRestore()
 end
 
 function ENT:Compile(code)
-	local ok, context = SF_Compiler.Compile(code,self.player,self)
+	if self.context and not self.error then
+		SF_Compiler.RunInternalHook("deinit",self.context,false)
+	end
+	
 	self.error = false
+	self.context = nil
+	local ok, context = SF_Compiler.Compile(code,self.player,self)
 	if not ok then
 		self:Error(context)
 		return
@@ -42,6 +47,9 @@ function ENT:Compile(code)
 	self.context = context
 	context.data.inputs = {}
 	context.data.outputs = {}
+	
+	SF_Compiler.RunInternalHook("init",context)
+	
 	SF_Compiler.RunInternalHook("preexec",self.context,nil)
 	local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.func)
 	SF_Compiler.RunInternalHook("postexec",self.context,nil)
@@ -67,8 +75,13 @@ end
 
 function ENT:Error(msg)
 	self.error = true
+	SF_Compiler.RunInternalHook("deinit",self.context,true,msg)
 	ErrorNoHalt(msg.." (from processor of "..self.player:Nick()..")\n")
 	WireLib.ClientError(msg, self.player)
+end
+
+function ENT:OnRemove()
+	SF_Compiler.RunInternalHook("deinit",self.context,false)
 end
 
 function ENT:RunHook(name, ...)
