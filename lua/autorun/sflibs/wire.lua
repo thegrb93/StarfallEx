@@ -1,4 +1,5 @@
 
+SF_WireLibrary = {}
 local wire_module = {}
 
 local function arrcpy(arr)
@@ -17,21 +18,26 @@ local inputSerializers =
 	NORMAL = identitySerializer,
 	STRING = identitySerializer,
 	VECTOR = identitySerializer,
+	ANGLE = identitySerializer,
 	WIRELINK = function(wl) return nil end,
 }
 
 local outputSerializers =
 {
 	NORMAL = function(data)
-		if data == nil or type(data) ~= "number" then error("Tried to output non-number to number output.",3) end
+		if data == nil or type(data) ~= "number" then error("Tried to output "..type(data).." to number output.",3) end
 		return data
 	end,
 	STRING = function(data)
-		if data == nil or type(data) ~= "string" then error("Tried to output non-string to string output.",3) end
+		if data == nil or type(data) ~= "string" then error("Tried to output "..type(data).." to string output.",3) end
 		return data
 	end,
 	VECTOR = function(data)
-		if type(data) ~= "Vector" then error("Tried to output non-vector to vector output.",3) end
+		if type(data) ~= "Vector" then error("Tried to output "..type(data).." to vector output.",3) end
+		return data
+	end,
+	ANGLE = function(data)
+		if type(data) ~= "Angle" then error("Tried to output "..type(data).." to angle output.",3) end
 		return data
 	end
 }
@@ -100,7 +106,9 @@ end
 
 function wire_module.getInput(name)
 	if name == nil or type(name) ~= "string" then error("Non-string name passed to getInput()",2) end
-	if not SF_Compiler.currentChip.ent.Inputs[name] or not SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid() then
+	if not (SF_Compiler.currentChip.ent.Inputs[name] and
+	        SF_Compiler.currentChip.ent.Inputs[name].Src and
+	        SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid()) then
 		return nil
 	end
 	local context = SF_Compiler.currentChip
@@ -113,12 +121,11 @@ function wire_module.setOutput(name, value)
 	end
 	
 	local context = SF_Compiler.currentChip
-	if not context.data.outputs[name] then return false end
+	if not context.data.outputs[name] then error("Output "..name.." does not exist",2) end
 	
 	local realvalue = outputSerializers[context.data.outputs[name]](value)
 	
 	Wire_TriggerOutput(context.ent, name, realvalue)
-	return true
 end
 
 function wire_module.isInputWired(name)
@@ -204,3 +211,13 @@ local function inputhook(ent, name, value)
 	end
 end
 SF_Compiler.AddInternalHook("WireInputChanged",inputhook)
+
+--------------------------- Library Functions ---------------------------
+
+function SF_WireLibrary.AddInputType(typename, serializer)
+	inputSerializers[typename] = serializer
+end
+
+function SF_WireLibrary.AddOutputType(typename, serializer)
+	outputSerializers[typename] = serializer
+end

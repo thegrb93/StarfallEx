@@ -75,13 +75,17 @@ end
 
 function ENT:Error(msg)
 	self.error = true
-	SF_Compiler.RunInternalHook("deinit",self.context,true,msg)
+	if self.context then
+		SF_Compiler.RunInternalHook("deinit",self.context,true,msg)
+	end
 	ErrorNoHalt(msg.." (from processor of "..self.player:Nick()..")\n")
 	WireLib.ClientError(msg, self.player)
 end
 
 function ENT:OnRemove()
-	SF_Compiler.RunInternalHook("deinit",self.context,false)
+	if not self.error then
+		SF_Compiler.RunInternalHook("deinit",self.context,false)
+	end
 end
 
 function ENT:RunHook(name, ...)
@@ -89,10 +93,10 @@ function ENT:RunHook(name, ...)
 	
 	SF_Compiler.RunInternalHook("preexec",self.context,name)
 	local ok, msg = SF_Compiler.CallHook(name, self.context, ...)
+	SF_Compiler.RunInternalHook("postexec",self.context,name)
 	if ok == false then
 		self:Error(msg)
 	end
-	SF_Compiler.RunInternalHook("postexec",self.context,name)
 	return msg
 end
 

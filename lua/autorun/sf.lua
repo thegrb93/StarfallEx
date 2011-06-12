@@ -136,7 +136,8 @@ end
 SF_Compiler.modules = {}
 function SF_Compiler.AddModule(name,tbl)
 	print("SF: Adding module "..name)
-	SF_Compiler.modules[name] = tbl
+	tbl.__index = tbl
+	SF_Compiler.modules[name] = setmetatable({},tbl)
 end
 
 SF_Compiler.hooks = {}
@@ -157,6 +158,7 @@ function SF_Compiler.ReloadLibraries()
 		end
 	end
 	print("SF: End loading libraries")
+	SF_Compiler.RunInternalHook("postload")
 end
 --concommand.Add("sf_reload_libraries",SF_Compiler.ReloadLibraries,nil,"Reloads starfall libraries")
 SF_Compiler.ReloadLibraries()
