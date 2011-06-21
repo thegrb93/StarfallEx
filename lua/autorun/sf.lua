@@ -34,12 +34,6 @@ SF_Compiler.hardQuota = CreateConVar("starfall_hardquota", "20000", {FCVAR_ARCHI
 local env_table = {}
 SF_Compiler.envTable = env_table
 env_table.__index = env_table
---[[env_table.__index = function(self, index)
-	if index == "___sf_private" and debug.getinfo(2,"s").source == "Starfall" then
-		error("Script tried to access protected variable ___sf_private.",0)
-	end
-	return rawget(self,index) or env_table[index]
-end]]
 
 SF_Compiler.hooks = SF_Compiler.hooks or {}
 
@@ -72,6 +66,7 @@ function SF_Compiler.RunFuncWithOpsQuota(func, max, ...)
 	
 	local source = debug.getinfo(func,"S").source
 	
+	-- TODO: Optimize
 	local function SF_OpHook(event, lineno)
 		if event ~= "line" then return end
 		if debug.getinfo(2,"S").source ~= source then return end
@@ -137,7 +132,7 @@ SF_Compiler.modules = {}
 function SF_Compiler.AddModule(name,tbl)
 	print("SF: Adding module "..name)
 	tbl.__index = tbl
-	SF_Compiler.modules[name] = setmetatable({},tbl)
+	SF_Compiler.modules[name] = tbl
 end
 
 SF_Compiler.hooks = {}

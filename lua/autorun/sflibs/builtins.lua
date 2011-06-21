@@ -11,8 +11,8 @@ SF_Compiler.AddFunction("pairs",pairs)
 --------------------------- Modules ---------------------------
 
 SF_Compiler.AddFunction("loadModule", function(name)
-	if name == nil or type(name) ~= "string" then error("Invalid arguments to loadModule",2) end
-	local mod = SF_Compiler.modules[name]
+	if type(name) ~= "string" then error("Invalid arguments to loadModule",2) end
+	local mod = setmetatable({},SF_Compiler.modules[name])
 	--if mod.__initialize then mod.__initialize(SF_Compiler.currentChip) end
 	return mod
 end)

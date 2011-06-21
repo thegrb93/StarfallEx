@@ -23,7 +23,7 @@ function ENT:Initialize()
 	self.Inputs = WireLib.CreateInputs(self, {})
 	self.Outputs = WireLib.CreateOutputs(self, {})
 	
-	self:SetOverlayText("Starfall")
+	self:SetOverlayText("Starfall\nInactive (No code)")
 	local r,g,b,a = self:GetColor()
 	self:SetColor(255, 0, 0, a)
 end
@@ -57,6 +57,7 @@ function ENT:Compile(code)
 		self:Error(msg)
 		return
 	end
+	self:SetOverlayText("Starfall\nActive")
 end
 
 function ENT:SendCode(ply, code)
@@ -80,6 +81,7 @@ function ENT:Error(msg)
 	end
 	ErrorNoHalt(msg.." (from processor of "..self.player:Nick()..")\n")
 	WireLib.ClientError(msg, self.player)
+	self:SetOverlayText("Starfall\nInactive (Error)")
 end
 
 function ENT:OnRemove()
