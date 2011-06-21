@@ -1,6 +1,7 @@
 
 SF_Entities = {}
 local ents_module = {}
+SF_Compiler.AddModule("entities",ents_module)
 local ents_wrapper = {}
 ents_wrapper.__index = ents_wrapper
 
@@ -91,29 +92,13 @@ function SF_Entities.GetPhysObject(entity)
 	return entity:GetPhysicsObject()
 end
 
--- TODO: Real permissions system (?)
-function SF_Entities.CanAffect( ply, ent )
-	ply = SF_Entities.GetOwner(ply)
-	if ply == nil then return false end
-	
-	if ply:IsSuperAdmin() then return true end
-	
-	if not SF_Entities.IsValid(ent) then return false end
-	
-	local owner = SF_Entities.GetOwner(ent)
-	if not SF_Entities.IsValid(owner) then return false end
-	if owner == ply then return true end
-	
-	if _R.Player.CPPIGetFriends then
-		local friends = owner:CPPIGetFriends()
-		if type( friends ) != "table" then return false end
+--------------------------- Module ---------------------------
+function ents_module:self()
+	return SF_Entities.WrapEntity(SF_Compiler.currentChip.ent)
+end
 
-		for _,friend in pairs(friends) do
-			if ply == friend then return true end
-		end
-	end
-	
-	return false
+function ents_module:owner()
+	return SF_Entities.WrapEntity(SF_Compiler.currentChip.ply)
 end
 
 --------------------------- Methods ---------------------------
@@ -122,18 +107,18 @@ end
 
 function ents_wrapper:isValid()
 	local ent = SF_Entities.UnwrapEntity(self)
-	return ent and ent:IsValid()
+	return SF_Entities.IsValid(ent)
 end
 
 function ents_wrapper:index()
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:EntIndex()
 end
 
 function ents_wrapper:class()
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetClass()
 end
 
@@ -141,31 +126,31 @@ end
 
 function ents_wrapper:pos()
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetPos()
 end
 
 function ents_wrapper:ang()
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetAngles()
 end
 
 function ents_wrapper:mass()
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetPhysicsObject():GetMass()
 end
 
 function ents_wrapper:vel()
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetVelocity()
 end
 
 function ents_wrapper:toWorld(data)
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	
 	if type(data) == "Vector" then
 		return ent:LocalToWorld(data)
@@ -178,7 +163,7 @@ end
 
 function ents_wrapper:toLocal(data)
 	local ent = SF_Entities.UnwrapEntity(self)
-	if not ent:IsValid() then return nil end
+	if not SF_Entities.IsValid(ent) then return nil end
 	
 	if type(data) == "Vector" then
 		return ent:WorldToLocal(data)
@@ -187,4 +172,89 @@ function ents_wrapper:toLocal(data)
 	else
 		error("Passed "..type(data).." to toLocal (must be angle or vector)",2)
 	end
+end
+
+-- -- Physics -- --
+
+function ents_wrapper:applyForce(vec, offset)
+	if type(vec) ~= "Vector" then error(type(vec).."-typed force vector passed to applyForce()",2)
+	elseif offset ~= nil and type(offset) ~= "Vector" then error(type(vec).."-typed offset vector passed to applyForce()",2) end
+	
+	local ent = SF_Entities.UnwrapEntity(self)
+	if not SF_Entities.IsValid(ent) then return false end
+	if not SF_Permissions.CanModifyEntity(ent) then return false end
+	
+	if offset == nil then
+		ent:GetPhysicsObject():ApplyForceCenter(vec)
+	else
+		ent:GetPhysicsObject():ApplyForceOffset(vec,offset)
+	end
+	return true
+end
+
+function ents_wrapper:applyAngForce(ang)
+	if type(ang) ~= "Angle" then error(type(ang).."-typed force angle passed to applyAngForce()",2) end
+	local ent = SF_Entities.UnwrapEntity(self)
+	if not SF_Entities.IsValid(ent) then return false end
+	if not SF_Permissions.CanModifyEntity(ent) then return false end
+	
+	local phys = ent:GetPhysicsObject()
+	
+	-- assign vectors
+	local up = ent:GetUp()
+	local left = ent:GetRight() * -1
+	local forward = ent:GetForward()
+	
+	-- apply pitch force
+	if ang.p ~= 0 then
+		local pitch = up      * (ang.p * 0.5)
+		phys:ApplyForceOffset( forward, pitch )
+		phys:ApplyForceOffset( forward * -1, pitch * -1 )
+	end
+	
+	-- apply yaw force
+	if ang.y ~= 0 then
+		local yaw   = forward * (ang.y * 0.5)
+		phys:ApplyForceOffset( left, yaw )
+		phys:ApplyForceOffset( left * -1, yaw * -1 )
+	end
+	
+	-- apply roll force
+	if ang.r ~= 0 then
+		local roll  = left    * (ang.r * 0.5)
+		phys:ApplyForceOffset( up, roll )
+		phys:ApplyForceOffset( up * -1, roll * -1 )
+	end
+	
+	return true
+end
+
+function ents_wrapper:applyTorque(tq)
+	if type(tq) ~= "Vector" then error(type(tq).."-typed torque vector passed to applyTorque()",2) end
+	local this = SF_Entities.UnwrapEntity(self)
+	if not SF_Entities.IsValid(this) then return false end
+	if not SF_Permissions.CanModifyEntity(this) then return false end
+	
+	local phys = this:GetPhysicsObject()
+	
+	local torqueamount = tq:Length()
+	
+	-- Convert torque from local to world axis
+	tq = phys:LocalToWorld( tq ) - phys:GetPos()
+	
+	-- Find two vectors perpendicular to the torque axis
+	local off
+	if abs(tq.x) > torqueamount * 0.1 or abs(tq.z) > torqueamount * 0.1 then
+		off = Vector(-tq.z, 0, tq.x)
+	else
+		off = Vector(-tq.y, tq.x, 0)
+	end
+	off = off:GetNormal() * torqueamount * 0.5
+	
+	local dir = ( tq:Cross(off) ):GetNormal()
+	
+	phys:ApplyForceOffset( dir, off )
+	phys:ApplyForceOffset( dir * -1, off * -1 )
+	
+	return true
 end

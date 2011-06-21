@@ -1,5 +1,5 @@
 
---------------------------- Base ---------------------------
+--------------------------- Lua Functions ---------------------------
 SF_Compiler.AddFunction("Vector",Vector)
 SF_Compiler.AddFunction("Angle",Angle)
 SF_Compiler.AddFunction("math",math)
@@ -11,9 +11,9 @@ SF_Compiler.AddFunction("pairs",pairs)
 --------------------------- Modules ---------------------------
 
 SF_Compiler.AddFunction("loadModule", function(name)
-	if type(name) ~= "string" then error("Invalid arguments to loadModule",2) end
+	if type(name) ~= "string" then error(type(name).."-typed name passed to loadModule",2) end
+	if not SF_Permissions.CanLoadModule(name) then error("Cannot load library "..name..": Permission Denied",2) end
 	local mod = setmetatable({},SF_Compiler.modules[name])
-	--if mod.__initialize then mod.__initialize(SF_Compiler.currentChip) end
 	return mod
 end)
 

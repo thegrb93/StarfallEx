@@ -51,7 +51,6 @@ elseif CLIENT then
     language.Add( "Tool_starfall_0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
 	language.Add( "sboxlimit_starfall", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Wire Starfall", "Undone Starfall" )
-	--CreateConVar("sf_code_buffer", "", {FCVAR_USERINFO})
 	
 	function SF_InitEditor()
 		if not SF_Editor then

@@ -35,8 +35,6 @@ local env_table = {}
 SF_Compiler.envTable = env_table
 env_table.__index = env_table
 
-SF_Compiler.hooks = SF_Compiler.hooks or {}
-
 -- Runs a function inside of a Starfall context.
 -- Throws an error if you try to run this inside of func.
 -- Returns (ok, msg or whatever func returns)
@@ -145,6 +143,8 @@ end
 
 function SF_Compiler.ReloadLibraries()
 	print("SF: Loading libraries...")
+	SF_Compiler.modules = {}
+	SF_Compiler.hooks = {}
 	do
 		local list = file.FindInLua("autorun/sflibs/*.lua")
 		for _,filename in pairs(list) do
