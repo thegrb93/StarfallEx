@@ -1,10 +1,12 @@
 
---------------------------- Math ---------------------------
+--------------------------- Base ---------------------------
 SF_Compiler.AddFunction("Vector",Vector)
 SF_Compiler.AddFunction("Angle",Angle)
 SF_Compiler.AddFunction("math",math)
 SF_Compiler.AddFunction("string",string)
 SF_Compiler.AddFunction("tostring",tostring)
+SF_Compiler.AddFunction("ipairs",ipairs)
+SF_Compiler.AddFunction("pairs",pairs)
 
 --------------------------- Modules ---------------------------
 
@@ -38,8 +40,10 @@ end)
 --------------------------- Output ---------------------------
 
 SF_Compiler.AddFunction("print",function(msg)
-	if msg == nil or type(msg) ~= "string" then error("print() called with nonstring argument.") end
-	SF_Compiler.currentChip.ply:PrintMessage(HUD_PRINTTALK, msg)
+	nmsg = tostring(msg)
+	if type(nmsg) ~= "string" then error(type(msg).."-typed message passed to print() (no tostring available)",2) end
+	
+	SF_Compiler.currentChip.ply:PrintMessage(HUD_PRINTTALK, nmsg)
 end)
 
 local clamp = math.Clamp

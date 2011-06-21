@@ -83,9 +83,11 @@ function ENT:Error(msg)
 end
 
 function ENT:OnRemove()
-	if not self.error then
+	if not self.error or not self.context then
 		SF_Compiler.RunInternalHook("deinit",self.context,false)
 	end
+	self.error = true
+	self.context = nil
 end
 
 function ENT:RunHook(name, ...)
@@ -102,6 +104,19 @@ end
 
 function ENT:TriggerInput(key, value)
 	SF_Compiler.RunInternalHook("WireInputChanged",self,key,value)
+end
+
+function ENT:ReadCell(address)
+	local ret = self:RunHook("ReadCell",address)
+	if type(ret) ~= "number" then
+		self:Error("Returned "..type(ret).." to hook ReadCell (expected number)")
+		return 0
+	end
+	return ret
+end
+
+function ENT:WriteCell(address, data)
+	self:RunHook("WriteCell",address,data)
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)

@@ -82,7 +82,7 @@ function wire_module.setPorts(inputs, outputs)
 		
 		local name = inp[1]:Trim()
 		if name == "" then error("Invalid wire name in inputs array.",2) end
-		if inrecord[name] then error("Duplicate output: "..name,3) end
+		if outrecord[name] then error("Duplicate output: "..name,3) end
 		
 		local typ
 		if inp[2] == nil then typ = "NORMAL"
@@ -105,7 +105,7 @@ function wire_module.setPorts(inputs, outputs)
 end
 
 function wire_module.getInput(name)
-	if name == nil or type(name) ~= "string" then error("Non-string name passed to getInput()",2) end
+	if type(name) ~= "string" then error(type(name).."-typed name passed to getInput()",2) end
 	if not (SF_Compiler.currentChip.ent.Inputs[name] and
 	        SF_Compiler.currentChip.ent.Inputs[name].Src and
 	        SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid()) then
@@ -116,7 +116,7 @@ function wire_module.getInput(name)
 end
 
 function wire_module.setOutput(name, value)
-	if name == nil or type(name) ~= "string" then
+	if type(name) ~= "string" then
 		error("Nonstring name passed to setOutput.",2)
 	end
 	
@@ -129,14 +129,14 @@ function wire_module.setOutput(name, value)
 end
 
 function wire_module.isInputWired(name)
-	if name == nil or type(name) ~= "string" then error("Non-string passed to isInputWired",2) end
+	if type(name) ~= "string" then error(type(name).."-typed name passed to isInputWired",2) end
 	local context = SF_Compiler.currentChip
 	if not context.data.inputs[name] then error("Input "..name.." does not exist",2) end
 	return context.ent.Inputs[name].Src and context.ent.Inputs[name].Src:IsValid()
 end
 
 function wire_module.isOutputWired(name)
-	if name == nil or type(name) ~= "string" then error("Non-string passed to isOutputWired",2) end
+	if type(name) ~= "string" then error(type(name).."-typed name passed to isOutputWired",2) end
 	local context = SF_Compiler.currentChip
 	if not context.data.outputs[name] then error("Output "..name.." does not exist",2) end
 	return context.ent.Outputs[name].Src and context.ent.Outputs[name].Src:IsValid()
@@ -145,7 +145,7 @@ end
 --------------------------- Wirelink ---------------------------
 
 local function getWirelink(name)
-	if type(name) ~= "string" then error("Passed non-string argument for input name",3) end
+	if type(name) ~= "string" then error(type(name).."-typed name passed to getWirelink",3) end
 	local context = SF_Compiler.currentChip
 	if context.data.inputs[name] ~= "WIRELINK" then error("Input "..name.." is not a wirelink", 3) end
 	local wl = context.ent.Inputs[name].Value
@@ -156,7 +156,7 @@ local function getWirelink(name)
 end
 
 function wire_module.wirelinkGetOutput(wlname,outputname)
-	if outputname == nil or type(outputname) ~= "string" then error("Non-string passed to wirelinkGetOutput",2) end
+	if outputname == nil or type(outputname) ~= "string" then error(type(name).."-typed name passed to wirelinkGetOutput",2) end
 	
 	local context = SF_Compiler.currentChip
 	
@@ -169,14 +169,14 @@ function wire_module.wirelinkGetOutput(wlname,outputname)
 end
 
 function wire_module.wirelinkSetInput(wlname,inputname,value)
-	if outputname == nil or type(outputname) ~= "string" then error("Non-string passed to wirelinkSetInput",2) end
+	if inputname == nil or type(inputname) ~= "string" then error(type(name).."-typed name passed to wirelinkSetInput",2) end
 	
 	local context = SF_Compiler.currentChip
 	
 	local wl = getWirelink(wlname)
 	if not wl.Inputs[inputname] then error("Wirelink "..wlname.." does not have input "..inputname,2) end
 	
-	if not outputSerializers[typ] then error("Output "..outputname.." has an incompatible type: "..typ,2) end
+	if not outputSerializers[typ] then error("Input "..inputname.." has an incompatible type: "..typ,2) end
 	WireLib.TriggerInput(wl, inputname, outputSerializers[typ](value))
 end
 
@@ -211,6 +211,36 @@ local function inputhook(ent, name, value)
 	end
 end
 SF_Compiler.AddInternalHook("WireInputChanged",inputhook)
+
+--------------------------- Easy-Access Metatable ---------------------------
+local wire_ports_metatable = {}
+
+function wire_ports_metatable:__index(name)
+	if type(name) ~= "string" then error(type(name).."-typed name passed to ports metatable",2) end
+	if not (SF_Compiler.currentChip.ent.Inputs[name] and
+	        SF_Compiler.currentChip.ent.Inputs[name].Src and
+	        SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid()) then
+		return nil
+	end
+	local context = SF_Compiler.currentChip
+	return inputSerializers[context.data.inputs[name]](context.ent.Inputs[name].Value)
+end
+
+function wire_ports_metatable:__newindex(name,value)
+	if type(name) ~= "string" then
+		error("Nonstring name passed to ports metatable.",2)
+	end
+	
+	local context = SF_Compiler.currentChip
+	if not context.data.outputs[name] then error("Output "..name.." does not exist",2) end
+	
+	local realvalue = outputSerializers[context.data.outputs[name]](value)
+	
+	Wire_TriggerOutput(context.ent, name, realvalue)
+end
+
+wire_module.ports = setmetatable({},wire_ports_metatable)
+
 
 --------------------------- Library Functions ---------------------------
 
