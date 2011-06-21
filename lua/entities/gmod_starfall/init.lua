@@ -107,6 +107,8 @@ function ENT:TriggerInput(key, value)
 end
 
 function ENT:ReadCell(address)
+	if self.error or not self.context then return 0 end
+
 	local ret = self:RunHook("ReadCell",address)
 	if type(ret) ~= "number" then
 		self:Error("Returned "..type(ret).." to hook ReadCell (expected number)")
