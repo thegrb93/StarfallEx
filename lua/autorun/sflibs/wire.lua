@@ -25,19 +25,19 @@ local inputSerializers =
 local outputSerializers =
 {
 	NORMAL = function(data)
-		if data == nil or type(data) ~= "number" then error("Tried to output "..type(data).." to number output.",3) end
+		SF_Compiler.CheckType(data,"number",1)
 		return data
 	end,
 	STRING = function(data)
-		if data == nil or type(data) ~= "string" then error("Tried to output "..type(data).." to string output.",3) end
+		SF_Compiler.CheckType(data,"string",1)
 		return data
 	end,
 	VECTOR = function(data)
-		if type(data) ~= "Vector" then error("Tried to output "..type(data).." to vector output.",3) end
+		SF_Compiler.CheckType(data,"Vector",1)
 		return data
 	end,
 	ANGLE = function(data)
-		if type(data) ~= "Angle" then error("Tried to output "..type(data).." to angle output.",3) end
+		SF_Compiler.CheckType(data,"Angle",1)
 		return data
 	end
 }
@@ -45,8 +45,8 @@ local outputSerializers =
 --------------------------- Basic Wire Functions ---------------------------
 
 function wire_module.setPorts(inputs, outputs)
-	if inputs == nil then inputs = {} end
-	if outputs == nil then outputs = {} end
+	SF_Compiler.CheckType(inputs, "table")
+	SF_Compiler.CheckType(outputs, "table")
 	
 	local inNames = {}
 	local inTypes = {}
@@ -57,7 +57,7 @@ function wire_module.setPorts(inputs, outputs)
 	local outrecord = {}
 	
 	for _,name in ipairs(inputs) do
-		if type(name) ~= "string" then error("Nonstring argument in inputs array.",2) end
+		if type(name) ~= "string" then error("Nonstring argument in inputs array ("..(tostring(name) or "?")..").",2) end
 		local inp = string.Explode(":",name)
 		
 		local name = inp[1]:Trim()
@@ -77,7 +77,7 @@ function wire_module.setPorts(inputs, outputs)
 	end
 	
 	for _,name in ipairs(outputs) do
-		if type(name) ~= "string" then error("Nonstring argument in inputs array.",2) end
+		if type(name) ~= "string" then error("Nonstring argument in outputs array ("..(tostring(name) or "?")..").",2) end
 		local inp = string.Explode(":",name)
 		
 		local name = inp[1]:Trim()
@@ -105,7 +105,7 @@ function wire_module.setPorts(inputs, outputs)
 end
 
 function wire_module.getInput(name)
-	if type(name) ~= "string" then error(type(name).."-typed name passed to getInput()",2) end
+	SF_Compiler.CheckType(name,"string")
 	if not (SF_Compiler.currentChip.ent.Inputs[name] and
 	        SF_Compiler.currentChip.ent.Inputs[name].Src and
 	        SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid()) then
@@ -116,9 +116,7 @@ function wire_module.getInput(name)
 end
 
 function wire_module.setOutput(name, value)
-	if type(name) ~= "string" then
-		error("Nonstring name passed to setOutput.",2)
-	end
+	SF_Compiler.CheckType(name,"string")
 	
 	local context = SF_Compiler.currentChip
 	if not context.data.outputs[name] then error("Output "..name.." does not exist",2) end
@@ -129,14 +127,14 @@ function wire_module.setOutput(name, value)
 end
 
 function wire_module.isInputWired(name)
-	if type(name) ~= "string" then error(type(name).."-typed name passed to isInputWired",2) end
+	SF_Compiler.CheckType(name,"string")
 	local context = SF_Compiler.currentChip
 	if not context.data.inputs[name] then error("Input "..name.." does not exist",2) end
 	return context.ent.Inputs[name].Src and context.ent.Inputs[name].Src:IsValid()
 end
 
 function wire_module.isOutputWired(name)
-	if type(name) ~= "string" then error(type(name).."-typed name passed to isOutputWired",2) end
+	SF_Compiler.CheckType(name,"string")
 	local context = SF_Compiler.currentChip
 	if not context.data.outputs[name] then error("Output "..name.." does not exist",2) end
 	return context.ent.Outputs[name].Src and context.ent.Outputs[name].Src:IsValid()
@@ -145,7 +143,7 @@ end
 --------------------------- Wirelink ---------------------------
 
 local function getWirelink(name)
-	if type(name) ~= "string" then error(type(name).."-typed name passed to getWirelink",3) end
+	SF_Compiler.CheckType(name,"string",1)
 	local context = SF_Compiler.currentChip
 	if context.data.inputs[name] ~= "WIRELINK" then error("Input "..name.." is not a wirelink", 3) end
 	local wl = context.ent.Inputs[name].Value
@@ -156,8 +154,8 @@ local function getWirelink(name)
 end
 
 function wire_module.wirelinkGetOutput(wlname,outputname)
-	if outputname == nil or type(outputname) ~= "string" then error(type(name).."-typed name passed to wirelinkGetOutput",2) end
-	
+	SF_Compiler.CheckType(outputname,"string")
+
 	local context = SF_Compiler.currentChip
 	
 	local wl = getWirelink(wlname)
@@ -169,12 +167,13 @@ function wire_module.wirelinkGetOutput(wlname,outputname)
 end
 
 function wire_module.wirelinkSetInput(wlname,inputname,value)
-	if inputname == nil or type(inputname) ~= "string" then error(type(name).."-typed name passed to wirelinkSetInput",2) end
+	SF_Compiler.CheckType(inputname,"string")
 	
 	local context = SF_Compiler.currentChip
 	
 	local wl = getWirelink(wlname)
 	if not wl.Inputs[inputname] then error("Wirelink "..wlname.." does not have input "..inputname,2) end
+	local typ = wl.Inputs[inputname].Type
 	
 	if not outputSerializers[typ] then error("Input "..inputname.." has an incompatible type: "..typ,2) end
 	WireLib.TriggerInput(wl, inputname, outputSerializers[typ](value))
@@ -186,7 +185,7 @@ function wire_module.wirelinkIsHiSpeed(wlname)
 end
 
 function wire_module.wirelinkReadCell(wlname, cell)
-	if type(cell) ~= "number" then error("Passed non-number cell argument to wirelinkReadCell",2) end
+	SF_Compiler.CheckType(cell,"number")
 	local wl = getWirelink(wlname)
 	
 	if not wl.ReadCell then error("Wirelink "..wlname.." has no readable hispeed memory",2) end
@@ -195,8 +194,8 @@ function wire_module.wirelinkReadCell(wlname, cell)
 end
 
 function wire_module.wirelinkWriteCell(wlname, cell, value)
-	if type(cell) ~= "number" then error("Passed non-number cell argument to wirelinkWriteCell",2) end
-	if type(value) ~= "number" then error("Passed non-number value argument to wirelinkWriteCell",2) end
+	SF_Compiler.CheckType(cell,"number")
+	SF_Compiler.CheckType(value,"number")
 	local wl = getWirelink(wlname)
 	
 	if not wl.WriteCell then error("Wirelink "..wlname.." has no writeable hispeed memory",2) end
@@ -216,7 +215,7 @@ SF_Compiler.AddInternalHook("WireInputChanged",inputhook)
 local wire_ports_metatable = {}
 
 function wire_ports_metatable:__index(name)
-	if type(name) ~= "string" then error(type(name).."-typed name passed to ports metatable",2) end
+	SF_Compiler.CheckType(name,"string")
 	if not (SF_Compiler.currentChip.ent.Inputs[name] and
 	        SF_Compiler.currentChip.ent.Inputs[name].Src and
 	        SF_Compiler.currentChip.ent.Inputs[name].Src:IsValid()) then
@@ -227,9 +226,7 @@ function wire_ports_metatable:__index(name)
 end
 
 function wire_ports_metatable:__newindex(name,value)
-	if type(name) ~= "string" then
-		error("Nonstring name passed to ports metatable.",2)
-	end
+	SF_Compiler.CheckType(name,"string")
 	
 	local context = SF_Compiler.currentChip
 	if not context.data.outputs[name] then error("Output "..name.." does not exist",2) end

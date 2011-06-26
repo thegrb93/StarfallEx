@@ -4,24 +4,35 @@ local ents_module = {}
 SF_Compiler.AddModule("entities",ents_module)
 local ents_wrapper = {}
 ents_wrapper.__index = ents_wrapper
+ents_wrapper.__newindex = function(key,value)
+	-- Prevent people from overriding functions globally
+	error("Attempted to assign an index to an entity",2)
+end
+ents_wrapper.type = "Entity"
 
-SF_Entities.wrapper2real = setmetatable({},{__mode="k"})
-SF_Entities.real2wrapper = setmetatable({},{__mode="v"})
+local wrapper2real = setmetatable({},{__mode="k"})
+local real2wrapper = setmetatable({},{__mode="v"})
 
+SF_Entities.metatable = ents_wrapper
 --------------------------- Library ---------------------------
 
 function SF_Entities.UnwrapEntity(wrapper)
-	return SF_Entities.wrapper2real[wrapper]
+	return wrapper2real[wrapper]
 end
 
 function SF_Entities.WrapEntity(ent)
 	if not ent then return nil end
-	if SF_Entities.real2wrapper[ent] then return SF_Entities.real2wrapper[ent] end
+	if real2wrapper[ent] then return real2wrapper[ent] end
 	
 	local wrapper = setmetatable({},ents_wrapper)
-	SF_Entities.wrapper2real[wrapper] = ent
-	SF_Entities.real2wrapper[ent] = wrapper
+	wrapper2real[wrapper] = ent
+	real2wrapper[ent] = wrapper
 	return wrapper
+end
+
+function SF_Entities.IsWrappedEntity(ent)
+	if not ent then return false end
+	return getmetatable(ent) == ents_wrapper
 end
 
 local function postload()
@@ -31,8 +42,8 @@ local function postload()
 
 	SF_WireLibrary.AddOutputType("ENTITY", function(data)
 		if data == nil then return nil end
-		if type(data) ~= "table" then error("Tried to output non-entity type to entity output",3) end
-		if getmetatable(data) ~= ents_wrapper then error("Tried to output non-entity type to entity output",3) end
+		SF_Compiler.CheckType(data,"Entity")
+		if not SF_Entities.IsWrappedEntity(data) then error("Tried to output non-entity type to entity output",3) end
 		
 		return SF_Entities.UnwrapEntity(data)
 	end)
@@ -157,7 +168,7 @@ function ents_wrapper:toWorld(data)
 	elseif type(data) == "Angle" then
 		return ent:LocalToWorldAngles(data)
 	else
-		error("Passed bad argument to toWorld (must be angle or vector)",2)
+		SF_Compiler.ThrowTypeError(data,"vector or angle")
 	end
 end
 
@@ -170,15 +181,15 @@ function ents_wrapper:toLocal(data)
 	elseif type(data) == "Angle" then
 		return ent:WorldToLocalAngles(data)
 	else
-		error("Passed "..type(data).." to toLocal (must be angle or vector)",2)
+		SF_Compiler.ThrowTypeError(data,"vector or angle")
 	end
 end
 
 -- -- Physics -- --
 
 function ents_wrapper:applyForce(vec, offset)
-	if type(vec) ~= "Vector" then error(type(vec).."-typed force vector passed to applyForce()",2)
-	elseif offset ~= nil and type(offset) ~= "Vector" then error(type(vec).."-typed offset vector passed to applyForce()",2) end
+	SF_Compiler.CheckType(vec,"Vector")
+	if offset ~= nil then SF_Compiler.CheckType(offset,"Vector") end
 	
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return false end
@@ -193,7 +204,7 @@ function ents_wrapper:applyForce(vec, offset)
 end
 
 function ents_wrapper:applyAngForce(ang)
-	if type(ang) ~= "Angle" then error(type(ang).."-typed force angle passed to applyAngForce()",2) end
+	SF_Compiler.CheckType(ang,"Vector")
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return false end
 	if not SF_Permissions.CanModifyEntity(ent) then return false end
@@ -230,7 +241,7 @@ function ents_wrapper:applyAngForce(ang)
 end
 
 function ents_wrapper:applyTorque(tq)
-	if type(tq) ~= "Vector" then error(type(tq).."-typed torque vector passed to applyTorque()",2) end
+	SF_Compiler.CheckType(tq,"Vector")
 	local this = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(this) then return false end
 	if not SF_Permissions.CanModifyEntity(this) then return false end

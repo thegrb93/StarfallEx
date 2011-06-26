@@ -35,10 +35,9 @@ local function mangle_timer_name(context, name)
 end
 
 function mtime.timer(name, delay, reps)
-	if type(name) ~= "string" then error("Non-string timer name",2) end
-	if type(delay) ~= "number" then error("Non-number timer delay",2) end
-	if reps == nil then reps = 0
-	elseif type(reps) ~= "number" then error("Non-number timer repititions",2) end
+	SF_Compiler.CheckType(name,"string")
+	SF_Compiler.CheckType(delay,"number")
+	if reps ~= nil then SF_Compiler.CheckType(reps,"number") end
 	
 	local context = SF_Compiler.currentChip
 	local timername = mangle_timer_name(context,name)
@@ -53,7 +52,7 @@ function mtime.timer(name, delay, reps)
 end
 
 function mtime.destroyTimer(name)
-	if type(name) ~= "string" then error("Non-string timer name",2) end
+	SF_Compiler.CheckType(name,"string")
 	local context = SF_Compiler.currentChip
 	local timername = mangle_timer_name(context,name)
 	
