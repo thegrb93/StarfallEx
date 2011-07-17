@@ -9,8 +9,8 @@ LibTransfer = LibTransfer or {}
 LibTransfer.callbacks = LibTransfer.callbacks or {}
 
 if SERVER then
-	local function callback(ply, data)
-		local ent = ents.GetByIndex(data[1])
+	local function callback(ply, task)
+		local ent = ents.GetByIndex(task.entid)
 		if ent == nil then
 			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
 			return
@@ -21,8 +21,7 @@ if SERVER then
 			return
 		end
 		
-		local code = data[2]
-		ent:SendCode(ply,code)
+		ent:SendCode(ply,task)
 	end
 	LibTransfer.callbacks["starfall_upload"] = callback
 	
@@ -55,7 +54,25 @@ elseif CLIENT then
 	function SF_InitEditor()
 		if not SF_Editor then
 			SF_Editor = vgui.Create("Expression2EditorFrame")
-			SF_Editor:Setup("SF Editor", "Starfall", nil)
+			SF_Editor:Setup("SF Editor", "Starfall", "nothing") -- Setting the editor type to not nil keeps the validator line
+			
+			-- Remove syntax highlighting
+			local func = function(self, row) return {{self.Rows[row], { Color(255, 255, 255, 255), false}}} end
+			SF_Editor:SetSyntaxColorLine( func )
+			
+			function SF_Editor:Validate(gotoerror)
+				local err = CompileString(self:GetCode(), "SF:"..self:GetChosenFile(), false)
+				
+				if type(err) == "string" then
+					self.C['Val'].panel:SetBGColor(128, 0, 0, 180)
+					self.C['Val'].panel:SetFGColor(255, 255, 255, 128)
+					self.C['Val'].panel:SetText( "   " .. err )
+				else
+					self.C['Val'].panel:SetBGColor(0, 128, 0, 180)
+					self.C['Val'].panel:SetFGColor(255, 255, 255, 128)
+					self.C['Val'].panel:SetText( "   No Syntax Errors" )
+				end
+			end
 		end
 	end
 	
@@ -66,9 +83,16 @@ elseif CLIENT then
 	concommand.Add("sf_open_editor", SF_OpenEditor)
 	
 	function SF_Upload(entid)
-		local code = ""
-		if SF_Editor then code = SF_Editor:GetCode() end
-		LibTransfer:QueueTask("starfall_upload",{entid,code})
+		if not SF_Editor then return end
+		local task = {}
+		
+		local currcode = SF_Editor:GetCode()
+		local currpath = SF_Editor:GetChosenFile() or "main"
+		task.entid = entid
+		task.includes = SF_PProcessor.BuildSendList(currpath, currcode)
+		task.mainpath = currpath
+		
+		LibTransfer:QueueTask("starfall_upload",task)
 	end
 end
 

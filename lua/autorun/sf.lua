@@ -27,9 +27,7 @@ local min = math.min
 
 SF_Compiler = {}
 
---SF_Compiler.softQuota = CreateConVar("starfall_quota", "10000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
 SF_Compiler.hardQuota = CreateConVar("starfall_hardquota", "20000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
---SF_Compiler.softQuotaAmount = CreateConVar("starfall_softquota", "10000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
 
 --------------------------- Execution ---------------------------
 
@@ -37,56 +35,62 @@ local env_table = {}
 SF_Compiler.env_table = env_table
 env_table.__index = env_table
 
-function SF_Compiler.Compile(code, ply, ent)
-	local sf = {}
-	sf.softQuotaUsed = 0
-	sf.original = code
-	sf.environment = {}
-	sf.ent = ent
-	sf.ply = ply
-	sf.data = {}
-	
-	local ok, func = pcall(CompileString, code, "Starfall", false)
-	if not ok then return false, func end
-	
-	if func == nil then
-		return false, "Unknown Compiler Error"
-	elseif type(func) == "string" then
-		return false, func
-	end
-	sf.func = func
-	
-	SF_Compiler.Reset(sf)
-	return true, sf
+function SF_Compiler.CreateContext(ent, ply, includes, mainfile)
+	local context = {}
+	context.original = includes
+	context.originalmain = mainfile
+	context.environment = setmetatable({},env_table)
+	context.ent = ent
+	context.ply = ply
+	context.data = {}
+	return context
 end
 
-function SF_Compiler.Reset(sf)
-	sf.environment = setmetatable({},env_table)
-	debug.setfenv(sf.func,sf.environment)
+function SF_Compiler.Compile(ent)
+	local context = ent.context
+	local includes = context.original
+	local mainfile = context.originalmain
+	local loaded = {}
+	local ops = 0
+
+	local function recursiveLoad(path)
+		if loaded[path] then return end
+		loaded[path] = true
+		for _,nextpath in ipairs(includes[path].includes) do
+			recursiveLoad(nextpath)
+		end
+		
+		local func = CompileString(includes[path].code, "SF:"..path, false)
+		if type(func) == "string" then
+			error(path..": "..func, 0)
+		end
+		
+		local ok, aops, msg = SF_Compiler.RunStarfallFunction(context, debug.setfenv(func,context.environment), ops)
+		if not ok then error(msg) end
+		ops = ops + aops
+	end
+	
+	local ok, msg = pcall(recursiveLoad, mainfile)
+	return ok, msg
 end
 
 -- Runs a function inside of a Starfall context.
 -- Throws an error if you try to run this inside of func.
--- Returns (ok, msg or whatever func returns)
-function SF_Compiler.RunStarfallFunction(context, func, ...)
+-- Returns (ok, ops used,s msg or whatever func returns)
+function SF_Compiler.RunStarfallFunction(context, func, ops, ...)
 	if SF_Compiler.currentChip ~= nil then
 		error("Tried to execute multiple SF processors simultaneously, or RunStarfallFunction did not clean up properly", 0)
 	end
+	
 	SF_Compiler.currentChip = context
-	local ok, ops, rt = pcall(SF_Compiler.RunFuncWithOpsQuota, func,
-		--min(SF_Compiler.hardQuota:GetInt(), SF_Compiler.softQuota:GetInt() + SF_Compiler.softQuotaAmount:GetInt() - context.softQuotaUsed), ...)
-		SF_Compiler.hardQuota:GetInt(), ...)
-	--local ok, rt = pcall(func, ...)
-	--local ops = 0
+	local ok, ops, rt = pcall(SF_Compiler.RunFuncWithOpsQuota, func, SF_Compiler.hardQuota:GetInt(), ops or 0, ...)
 	SF_Compiler.currentChip = nil
 	if not ok then return false, ops end
 	
-	--local softops = ops - SF_Compiler.softQuota:GetInt()
-	--if softops > 0 then context.softQuotaUsed = context.softQuotaUsed + softops end
-	return true, rt
+	return true, ops, rt
 end
 
--- debug.gethook() returns "external hook" instead of a function... |:/
+-- debug.gethook() returns the string "external hook" instead of a function... |:/
 -- (I think) it basically just errors after like 500,000 lines
 local function infloop_detection_replacement()
 	error("Infinite Loop Detected!",2)
@@ -94,26 +98,23 @@ end
 
 -- Calls a function while counting the number of lines executed. Only counts lines that share
 -- the same source file as the function called.
-function SF_Compiler.RunFuncWithOpsQuota(func, max, ...)
-	if max == nil then max = 1000000 end
+function SF_Compiler.RunFuncWithOpsQuota(func, max, start, ...)
+	if not max then max = 1000000 end
 	local used = 0
-	
-	local source = debug.getinfo(func,"S").source
 	
 	local oldhookfunc, oldhookmask, oldhookcount = debug.gethook()
 	
 	-- TODO: Optimize
 	local function SF_OpHook(event, lineno)
 		if event ~= "line" then return end
-		if debug.getinfo(2,"S").source ~= source then return end
-		used = used + 1
+		used = used + 10
 		if used > max then
 			debug.sethook(infloop_detection_replacement,oldhookmask)
 			error("Ops quota exceeded",3)
 		end
 	end
 	
-	debug.sethook(SF_OpHook,"l")
+	debug.sethook(SF_OpHook,"l",10)
 	local rt = func(...)
 	debug.sethook(infloop_detection_replacement,oldhookmask,oldhookcount)
 	
@@ -145,9 +146,9 @@ end
 SF_Compiler.hooks = {}
 function SF_Compiler.CallHook(name, context, ...)
 	if SF_Compiler.hooks[context] and SF_Compiler.hooks[context][name] then
-		return SF_Compiler.RunStarfallFunction(context, SF_Compiler.hooks[context][name], ...)
+		local ok, ops, rt = SF_Compiler.RunStarfallFunction(context, SF_Compiler.hooks[context][name], 0, ...)
+		return ok, rt
 	end
-	return nil
 end
 
 --------------------------- Library Functions ---------------------------

@@ -31,38 +31,34 @@ end
 function ENT:OnRestore()
 end
 
-function ENT:Compile(code)
+function ENT:Compile(task)
 	if self.context and not self.error then
 		SF_Compiler.RunInternalHook("deinit",self.context,false)
 	end
 	
 	self.error = false
-	self.context = nil
-	local ok, context = SF_Compiler.Compile(code,self.player,self)
-	if not ok then
-		self:Error(context)
-		return
-	end
+	self.context = SF_Compiler.CreateContext(self, self.player, task.includes, task.mainpath)
 	
-	self.context = context
-	context.data.inputs = {}
-	context.data.outputs = {}
+	self.context.data.inputs = {}
+	self.context.data.outputs = {}
 	
-	SF_Compiler.RunInternalHook("init",context)
+	SF_Compiler.RunInternalHook("init",self.context)
 	
 	SF_Compiler.RunInternalHook("preexec",self.context,nil)
-	local ok, msg = SF_Compiler.RunStarfallFunction(self.context, self.context.func)
-	SF_Compiler.RunInternalHook("postexec",self.context,nil)
+	local ok, msg = SF_Compiler.Compile(self)
+	SF_Compiler.RunInternalHook("postexec",self.context,msg)
+	
 	if not ok then
 		self:Error(msg)
 		return
 	end
+	
 	self:SetOverlayText("Starfall\nActive")
 end
 
-function ENT:SendCode(ply, code)
+function ENT:SendCode(ply, task)
 	if ply ~= self.player then return end
-	self:Compile(code)
+	self:Compile(task)
 end
 
 function ENT:Think()

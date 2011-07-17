@@ -8,6 +8,13 @@ SF_Compiler.env_table.tostring = tostring
 SF_Compiler.env_table.ipairs = ipairs
 SF_Compiler.env_table.pairs = pairs
 
+SF_Compiler.env_table.setmetatable = function(obj, metatbl)
+	SF_Compiler.CheckType(obj,"table")
+	SF_Compiler.CheckType(metatbl,"table")
+	if getmetatable(obj) then error("Object already has a metatable",2) end
+	return setmetatable(obj,metatbl)
+end
+
 --------------------------- Modules ---------------------------
 
 local function loadModule(name)
