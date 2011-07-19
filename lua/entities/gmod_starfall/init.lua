@@ -1,16 +1,4 @@
 
---[[
-
-SF Entity
-{
-	Inputs
-	Outputs
-	context
-	player
-}
-
-]]
-
 AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
@@ -94,7 +82,7 @@ function ENT:RunHook(name, ...)
 	SF_Compiler.RunInternalHook("preexec",self.context,name)
 	local ok, msg = SF_Compiler.CallHook(name, self.context, ...)
 	SF_Compiler.RunInternalHook("postexec",self.context,name)
-	if ok == false then
+	if msg and not ok then
 		self:Error(msg)
 	end
 	return msg

@@ -1,31 +1,7 @@
---[[
-
-Starfall Context Structure:
-{
-	softQuotaUsed   (num) Soft quota used
-	original        (str) Source code
-	environment     (tbl) Variables, functions
-	func            (fn)  The compiled script
-	ent             (ent) The SF entity
-	data            (tbl) Data used by modules
-	ply             (ent) Person who owns the chip
-}
-
-SF_Compiler variables:
-{
-	softQuota       (convar) Amount of ops before the overflow is added into the soft quota
-	hardQuota       (convar) Amount of ops to be used in a single execution before the processor shuts down
-	softQuotaAmount (convar) Total quota for the soft quota
-
-	envTable        (tbl) Metatable for context.environment
-	currentChip     (tbl) Context of the chip currently running, or nil if no chip is running
-}
-
-]]
-
-local min = math.min
 
 SF_Compiler = {}
+SF_Compiler.indexReplacements = {} -- Stores tables:function pairs that we need to replace __index with
+SF_Compiler.indexOriginals = {}
 
 SF_Compiler.hardQuota = CreateConVar("starfall_hardquota", "20000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
 
@@ -66,7 +42,7 @@ function SF_Compiler.Compile(ent)
 		end
 		
 		local ok, aops, msg = SF_Compiler.RunStarfallFunction(context, debug.setfenv(func,context.environment), ops)
-		if not ok then error(msg) end
+		if not ok then error(msg,0) end
 		ops = ops + aops
 	end
 	
@@ -85,7 +61,7 @@ function SF_Compiler.RunStarfallFunction(context, func, ops, ...)
 	SF_Compiler.currentChip = context
 	local ok, ops, rt = pcall(SF_Compiler.RunFuncWithOpsQuota, func, SF_Compiler.hardQuota:GetInt(), ops or 0, ...)
 	SF_Compiler.currentChip = nil
-	if not ok then return false, ops end
+	if not ok then return false, 0, ops end
 	
 	return true, ops, rt
 end
@@ -149,6 +125,7 @@ function SF_Compiler.CallHook(name, context, ...)
 		local ok, ops, rt = SF_Compiler.RunStarfallFunction(context, SF_Compiler.hooks[context][name], 0, ...)
 		return ok, rt
 	end
+	return false, nil
 end
 
 --------------------------- Library Functions ---------------------------
@@ -197,8 +174,8 @@ function SF_Compiler.ReloadLibraries()
 	SF_Compiler.modules = {}
 	SF_Compiler.hooks = {}
 	do
-		local list = file.FindInLua("autorun/sflibs/*.lua")
-		for _,filename in pairs(list) do
+		local l = file.FindInLua("starfall/sflibs/*.lua")
+		for _,filename in pairs(l) do
 			print("SF: Including sflibs/"..filename)
 			include("sflibs/"..filename)
 		end
