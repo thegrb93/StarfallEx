@@ -4,11 +4,8 @@ local ents_module = {}
 SF_Compiler.AddModule("entities",ents_module)
 local ents_wrapper = {}
 ents_wrapper.__index = ents_wrapper
-ents_wrapper.__newindex = function(key,value)
-	-- Prevent people from overriding functions globally
-	error("Attempted to assign an index to an entity",2)
-end
-ents_wrapper.type = "Entity"
+ents_wrapper.__newindex = function(key,value) end
+ents_wrapper.__metatable = "Entity"
 
 local wrapper2real = setmetatable({},{__mode="k"})
 local real2wrapper = setmetatable({},{__mode="v"})
@@ -32,7 +29,7 @@ end
 
 function SF_Entities.IsWrappedEntity(ent)
 	if not ent then return false end
-	return getmetatable(ent) == ents_wrapper
+	return debug.getmetatable(ent) == "Entity"
 end
 
 local function postload()

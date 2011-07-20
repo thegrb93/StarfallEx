@@ -2,9 +2,7 @@
 local mtime = {}
 SF_Compiler.AddModule("time",mtime)
 
--- ------------------------------------------- --
--- Time                                        --
--- ------------------------------------------- --
+--------------------------- Time ---------------------------
 
 function mtime.currTime()
 	return CurTime()
@@ -18,9 +16,7 @@ function mtime.sysTime()
 	return SysTime()
 end
 
--- ------------------------------------------- --
--- Timers                                      --
--- ------------------------------------------- --
+--------------------------- Timers ---------------------------
 
 local function timercb(ent, tname, realname)
 	if ent and ent:IsValid() then
@@ -37,7 +33,7 @@ end
 function mtime.timer(name, delay, reps)
 	SF_Compiler.CheckType(name,"string")
 	SF_Compiler.CheckType(delay,"number")
-	if reps ~= nil then SF_Compiler.CheckType(reps,"number") end
+	reps = SF_Compiler.CheckType(reps or 0,"number")
 	
 	local context = SF_Compiler.currentChip
 	local timername = mangle_timer_name(context,name)

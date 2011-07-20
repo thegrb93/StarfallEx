@@ -1,15 +1,27 @@
 
+--------------------------- Variables ---------------------------
+
 SF_Compiler = {}
 SF_Compiler.indexReplacements = {} -- Stores tables:function pairs that we need to replace __index with
 SF_Compiler.indexOriginals = {}
+SF_Compiler.hooks = {}
+SF_Compiler.modules = {}
 
 SF_Compiler.hardQuota = CreateConVar("starfall_hardquota", "20000", {FCVAR_ARCHIVE,FCVAR_REPLICATED})
-
---------------------------- Execution ---------------------------
 
 local env_table = {}
 SF_Compiler.env_table = env_table
 env_table.__index = env_table
+
+--------------------------- Local Functions ---------------------------
+
+-- debug.gethook() returns the string "external hook" instead of a function... |:/
+-- (I think) it basically just errors after like 500,000 lines
+local function infloop_detection_replacement()
+	error("Infinite Loop Detected!",2)
+end
+
+--------------------------- Compiling ---------------------------
 
 function SF_Compiler.CreateContext(ent, ply, includes, mainfile)
 	local context = {}
@@ -50,6 +62,8 @@ function SF_Compiler.Compile(ent)
 	return ok, msg
 end
 
+--------------------------- Execution ---------------------------
+
 -- Runs a function inside of a Starfall context.
 -- Throws an error if you try to run this inside of func.
 -- Returns (ok, ops used,s msg or whatever func returns)
@@ -59,17 +73,21 @@ function SF_Compiler.RunStarfallFunction(context, func, ops, ...)
 	end
 	
 	SF_Compiler.currentChip = context
+	
+	for lib, func in pairs(SF_Compiler.indexReplacements) do
+		lib.__index = func
+	end
+	
 	local ok, ops, rt = pcall(SF_Compiler.RunFuncWithOpsQuota, func, SF_Compiler.hardQuota:GetInt(), ops or 0, ...)
+	
+	for lib, func in pairs(SF_Compiler.indexOriginals) do
+		lib.__index = func
+	end
+	
 	SF_Compiler.currentChip = nil
 	if not ok then return false, 0, ops end
 	
 	return true, ops, rt
-end
-
--- debug.gethook() returns the string "external hook" instead of a function... |:/
--- (I think) it basically just errors after like 500,000 lines
-local function infloop_detection_replacement()
-	error("Infinite Loop Detected!",2)
 end
 
 -- Calls a function while counting the number of lines executed. Only counts lines that share
@@ -98,10 +116,12 @@ function SF_Compiler.RunFuncWithOpsQuota(func, max, start, ...)
 end
 
 --------------------------- Modules ---------------------------
-SF_Compiler.modules = {}
 function SF_Compiler.AddModule(name,tbl)
 	print("SF: Adding module "..name)
-	tbl.__index = tbl
+	if not tbl.__index then
+		tbl.__index = tbl
+	end
+	tbl.__metatable = "Module"
 	SF_Compiler.modules[name] = tbl
 end
 
@@ -119,7 +139,6 @@ function SF_Compiler.RunInternalHook(name, ...)
 	end
 end
 
-SF_Compiler.hooks = {}
 function SF_Compiler.CallHook(name, context, ...)
 	if SF_Compiler.hooks[context] and SF_Compiler.hooks[context][name] then
 		local ok, ops, rt = SF_Compiler.RunStarfallFunction(context, SF_Compiler.hooks[context][name], 0, ...)
@@ -134,16 +153,19 @@ end
 -- Note: can be faked
 function SF_Compiler.GetType(obj)
 	local typ = type(obj)
-	if typ == "table" and obj.type then return obj.type
+	if typ == "table" and type(getmetatable(obj)) == "string" then return getmetatable(obj) end
 	else return typ end
 end
+
+local dgetmetatable = debug.getmetatable
 
 -- Checks the type of an object using SF_Compiler.GetType. Throws a formatted error on mismatch.
 -- desired = a metatable or a a type() string (note that getmetatable("<any string>") ~= string)
 -- level = amount of levels away from the library function (0 or nil = the library function, 1 = a function inside of that, etc.)
 function SF_Compiler.CheckType(obj, desired, level)
-	if getmetatable(obj) == desired then return obj
-	elseif type(obj) == desired then return obj
+	local typ = type(desired)
+	if type(obj) == desired then return obj
+	elseif dgetmetatable(obj) == desired then return obj
 	else
 		level = level or 0
 		

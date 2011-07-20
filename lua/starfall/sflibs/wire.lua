@@ -2,14 +2,6 @@
 SF_WireLibrary = {}
 local wire_module = {}
 
-local function arrcpy(arr)
-	local arr2 = {}
-	for _,d in ipairs(arr) do
-		arr2[d] = true
-	end
-	return arr2
-end
-
 --------------------------- Serializers ---------------------------
 
 local function identitySerializer(data) return data end
@@ -45,8 +37,8 @@ local outputSerializers =
 --------------------------- Basic Wire Functions ---------------------------
 
 function wire_module.setPorts(inputs, outputs)
-	SF_Compiler.CheckType(inputs, "table")
-	SF_Compiler.CheckType(outputs, "table")
+	inputs = SF_Compiler.CheckType(inputs or {}, "table")
+	outputs = SF_Compiler.CheckType(outputs or {}, "table")
 	
 	local inNames = {}
 	local inTypes = {}
@@ -65,7 +57,7 @@ function wire_module.setPorts(inputs, outputs)
 		if inrecord[name] then error("Duplicate input: "..name,3) end
 		
 		local typ
-		if inp[2] == nil then typ = "NORMAL"
+		if not inp[2] then typ = "NORMAL"
 		else typ = inp[2]:upper():Trim() end
 		
 		if not inputSerializers[typ] then error("Invalid input type: "..typ..".",2) end
@@ -235,6 +227,8 @@ function wire_ports_metatable:__newindex(name,value)
 	
 	Wire_TriggerOutput(context.ent, name, realvalue)
 end
+
+wire_ports_metatable.__metatable = "Ports Table"
 
 wire_module.ports = setmetatable({},wire_ports_metatable)
 
