@@ -1,6 +1,7 @@
-if SERVER then return end
 
-LibTransfer = LibTransfer or {}
+if LibTransfer then return end
+
+LibTransfer = {}
 
 --------------------------------- Variables ---------------------------------
 

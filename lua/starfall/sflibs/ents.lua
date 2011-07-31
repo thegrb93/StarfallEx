@@ -101,11 +101,11 @@ function SF_Entities.GetPhysObject(entity)
 end
 
 --------------------------- Module ---------------------------
-function ents_module:self()
+function ents_module.self()
 	return SF_Entities.WrapEntity(SF_Compiler.currentChip.ent)
 end
 
-function ents_module:owner()
+function ents_module.owner()
 	return SF_Entities.WrapEntity(SF_Compiler.currentChip.ply)
 end
 
@@ -114,17 +114,20 @@ end
 -- -- Internal information -- --
 
 function ents_wrapper:isValid()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	return SF_Entities.IsValid(ent)
 end
 
 function ents_wrapper:index()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:EntIndex()
 end
 
 function ents_wrapper:class()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetClass()
@@ -133,30 +136,35 @@ end
 -- -- Physical information -- --
 
 function ents_wrapper:pos()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetPos()
 end
 
 function ents_wrapper:ang()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetAngles()
 end
 
 function ents_wrapper:mass()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetPhysicsObject():GetMass()
 end
 
 function ents_wrapper:vel()
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	return ent:GetVelocity()
 end
 
 function ents_wrapper:toWorld(data)
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	
@@ -170,6 +178,7 @@ function ents_wrapper:toWorld(data)
 end
 
 function ents_wrapper:toLocal(data)
+	SF_Compiler.CheckType(self,ents_wrapper)
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return nil end
 	
@@ -185,6 +194,7 @@ end
 -- -- Physics -- --
 
 function ents_wrapper:applyForce(vec, offset)
+	SF_Compiler.CheckType(self,ents_wrapper)
 	SF_Compiler.CheckType(vec,"Vector")
 	if offset ~= nil then SF_Compiler.CheckType(offset,"Vector") end
 	
@@ -201,6 +211,7 @@ function ents_wrapper:applyForce(vec, offset)
 end
 
 function ents_wrapper:applyAngForce(ang)
+	SF_Compiler.CheckType(self,ents_wrapper)
 	SF_Compiler.CheckType(ang,"Vector")
 	local ent = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(ent) then return false end
@@ -238,6 +249,7 @@ function ents_wrapper:applyAngForce(ang)
 end
 
 function ents_wrapper:applyTorque(tq)
+	SF_Compiler.CheckType(self,ents_wrapper)
 	SF_Compiler.CheckType(tq,"Vector")
 	local this = SF_Entities.UnwrapEntity(self)
 	if not SF_Entities.IsValid(this) then return false end

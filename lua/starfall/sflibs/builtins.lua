@@ -13,6 +13,7 @@ SF_Compiler.env_table.Angle = Angle
 SF_Compiler.env_table.tostring = tostring
 SF_Compiler.env_table.ipairs = ipairs
 SF_Compiler.env_table.pairs = pairs
+SF_Compiler.env_table.Matrix = Matrix
 SF_Compiler.env_table.setmetatable = function(tbl, meta)
 	SF_Compiler.CheckType(tbl,"table")
 	SF_Compiler.CheckType(meta,"table") -- Prevent setmetatable(""), etc
@@ -46,15 +47,15 @@ end
 local str_orig, str_gm = filterGmodLua(string)
 local str_index_orig = getmetatable("").__index
 SF_Compiler.env_table.string = setmetatable({},createRefMtbl(str_orig))
-local function str_index_repl(self,k)
+--[[local function str_index_repl(self,k)
 	if not str_gm[k] then return str_index_orig(self,k) end
-end
+end]]
 
-SF_Compiler.indexReplacements[getmetatable("")] = str_index_repl
+SF_Compiler.indexReplacements[getmetatable("")] = str_orig
 SF_Compiler.indexOriginals[getmetatable("")] = str_index_orig
 
 -- Math library
-local math_orig, math_gm = filterGmodLua(math)
+local math_orig, _ = filterGmodLua(math)
 math_orig.clamp = math.Clamp
 math_orig.round = math.Round
 math_orig.randfloat = math.Rand
@@ -81,7 +82,7 @@ local function hook(name, func)
 	local hooks = SF_Compiler.hooks
 	local context = SF_Compiler.currentChip
 	if not hooks[context] then hooks[context] = {} end
-	hooks[context][name] = func
+	hooks[context][string.lower(name)] = func
 end
 SF_Compiler.env_table.hook = hook
 

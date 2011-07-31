@@ -140,6 +140,7 @@ function SF_Compiler.RunInternalHook(name, ...)
 end
 
 function SF_Compiler.CallHook(name, context, ...)
+	name = string.lower(name)
 	if SF_Compiler.hooks[context] and SF_Compiler.hooks[context][name] then
 		local ok, ops, rt = SF_Compiler.RunStarfallFunction(context, SF_Compiler.hooks[context][name], 0, ...)
 		return ok, rt
@@ -150,10 +151,9 @@ end
 --------------------------- Library Functions ---------------------------
 
 -- Returns the type of an object, also checking the "type" index of a table
--- Note: can be faked
 function SF_Compiler.GetType(obj)
 	local typ = type(obj)
-	if typ == "table" and type(getmetatable(obj)) == "string" then return getmetatable(obj) end
+	if typ == "table" and type(getmetatable(obj)) == "string" then return getmetatable(obj)
 	else return typ end
 end
 
@@ -163,7 +163,6 @@ local dgetmetatable = debug.getmetatable
 -- desired = a metatable or a a type() string (note that getmetatable("<any string>") ~= string)
 -- level = amount of levels away from the library function (0 or nil = the library function, 1 = a function inside of that, etc.)
 function SF_Compiler.CheckType(obj, desired, level)
-	local typ = type(desired)
 	if type(obj) == desired then return obj
 	elseif dgetmetatable(obj) == desired then return obj
 	else
@@ -198,8 +197,13 @@ function SF_Compiler.ReloadLibraries()
 	do
 		local l = file.FindInLua("starfall/sflibs/*.lua")
 		for _,filename in pairs(l) do
-			print("SF: Including sflibs/"..filename)
-			include("sflibs/"..filename)
+			if string.sub(filename,-7,-1) == "_cl.lua" then
+				MsgN("SF: Adding sflibs/"..filename.." to Clientside list")
+				AddCSLuaFile(filename)
+			else
+				MsgN("SF: Including sflibs/"..filename)
+				include("sflibs/"..filename)
+			end
 		end
 	end
 	print("SF: End loading libraries")

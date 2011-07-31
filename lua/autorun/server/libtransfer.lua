@@ -1,9 +1,9 @@
 
-if CLIENT then return end
+if LibTransfer then return end
 
 AddCSLuaFile("autorun/client/cl_libtransfer.lua")
 
-LibTransfer = LibTransfer or {}
+LibTransfer = {}
 
 -- Helper functions
 local function get_add(tbl, key)
@@ -76,7 +76,7 @@ do
 		local hex = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' }
 		
 		
-		for i = 1,valid_chars:len() do
+		for i = 1,#valid_chars do
 			local char = valid_chars:sub(i, i)
 			enctbl[char] = true
 		end
