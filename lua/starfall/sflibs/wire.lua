@@ -52,13 +52,13 @@ function wire_module.setPorts(inputs, outputs)
 		if type(name) ~= "string" then error("Nonstring argument in inputs array ("..(tostring(name) or "?")..").",2) end
 		local inp = string.Explode(":",name)
 		
-		local name = inp[1]:Trim()
+		local name = string.Trim(inp[1])
 		if name == "" then error("Invalid wire name in inputs array.",2) end
 		if inrecord[name] then error("Duplicate input: "..name,3) end
 		
 		local typ
 		if not inp[2] then typ = "NORMAL"
-		else typ = inp[2]:upper():Trim() end
+		else typ = string.Trim(inp[2]:upper()) end
 		
 		if not inputSerializers[typ] then error("Invalid input type: "..typ..".",2) end
 		
@@ -72,13 +72,13 @@ function wire_module.setPorts(inputs, outputs)
 		if type(name) ~= "string" then error("Nonstring argument in outputs array ("..(tostring(name) or "?")..").",2) end
 		local inp = string.Explode(":",name)
 		
-		local name = inp[1]:Trim()
+		local name = string.Trim(inp[1])
 		if name == "" then error("Invalid wire name in inputs array.",2) end
 		if outrecord[name] then error("Duplicate output: "..name,3) end
 		
 		local typ
 		if inp[2] == nil then typ = "NORMAL"
-		else typ = inp[2]:upper():Trim() end
+		else typ = string.Trim(inp[2]:upper()) end
 		
 		if not outputSerializers[typ] then error("Invalid output type: "..typ..".",2) end
 		
