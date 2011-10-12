@@ -1,0 +1,601 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../../files/Compiler.html">Compiler.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Editor.html">Editor.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Instance.html">Instance.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Libraries.html">Libraries.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Permissions.html">Permissions.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Preprocessor.html">Preprocessor.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/SFLib.html">SFLib.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_cl/ents.html">libs_cl/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/builtins.html">libs_sh/builtins.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/files.html">libs_sh/files.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/find.html">libs_sh/find.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/time.html">libs_sh/time.lua</a>
+	</li>
+
+	<li><strong>libs_sh/trace.lua</strong></li>
+	
+	<li>
+		<a href="../../files/libs_sv/ents.html">libs_sv/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sv/wire.html">libs_sv/wire.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/reload.html">reload.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>libs_sh/trace.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#trace_library.trace">trace_library.trace</a>&nbsp;(start, endpos, filter, mask)</td>
+	<td class="summary">Does a line trace </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#trace_library.traceHull">trace_library.traceHull</a>&nbsp;(start, endpos, minbox, maxbox, filter, mask)</td>
+	<td class="summary">Does a swept-AABB trace </td>
+	</tr>
+
+</table>
+
+
+
+
+<h2>Tables</h2>
+<table class="table_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#trace_library">trace_library</a></td>
+	<td class="summary">Enumerations stored in the trace_library table </td>
+	</tr>
+
+</table>
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="trace_library.trace"></a><strong>trace_library.trace</strong>&nbsp;(start, endpos, filter, mask)</dt>
+<dd>
+Does a line trace
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>start</em></code>: Start position
+	</li>
+	
+	<li>
+	  <code><em>endpos</em></code>: End position
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Entity/array of entities to filter
+	</li>
+	
+	<li>
+	  <code><em>mask</em></code>: Trace mask
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="trace_library.traceHull"></a><strong>trace_library.traceHull</strong>&nbsp;(start, endpos, minbox, maxbox, filter, mask)</dt>
+<dd>
+Does a swept-AABB trace
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>start</em></code>: Start position
+	</li>
+	
+	<li>
+	  <code><em>endpos</em></code>: End position
+	</li>
+	
+	<li>
+	  <code><em>minbox</em></code>: Lower box corner
+	</li>
+	
+	<li>
+	  <code><em>maxbox</em></code>: Upper box corner
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Entity/array of entities to filter
+	</li>
+	
+	<li>
+	  <code><em>mask</em></code>: Trace mask
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+<h2><a name="tables"></a>Tables</h2>
+<dl class="table">
+
+<dt><a name="trace_library"></a><strong>trace_library</strong></dt>
+<dd>Enumerations stored in the trace_library table<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>MAT_ANTLION</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_BLOODYFLESH</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_CONCRETE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_DIRT</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_FLESH</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_GRATE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_ALIENFLESH</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_CLIP</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_PLASTIC</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_METAL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_SAND</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_FOLIAGE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_COMPUTER</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_SLOSH</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_TILE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_VENT</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_WOOD</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MAT_GLASS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_GENERIC</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_HEAD</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_CHEST</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_STOMACH</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_LEFTARM</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_RIGHTARM</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_LEFTLEG</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_RIGHTLEG</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>HITGROUP_GEAR</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_SPLITAREAPORTAL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_SOLID_BRUSHONLY</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_WATER</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_BLOCKLOS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_OPAQUE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_VISIBLE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_DEADSOLID</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_PLAYERSOLID_BRUSHONLY</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_NPCWORLDSTATIC</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_NPCSOLID_BRUSHONLY</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_CURRENT</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_SHOT_PORTAL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_SOLID</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_BLOCKLOS_AND_NPCS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_OPAQUE_AND_NPCS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_VISIBLE_AND_NPCS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_PLAYERSOLID</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_NPCSOLID</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_SHOT_HULL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_SHOT</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>MASK_ALL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_EMPTY</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_SOLID</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_WINDOW</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_AUX</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_GRATE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_SLIME</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_WATER</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_BLOCKLOS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_OPAQUE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_TESTFOGVOLUME</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_TEAM4</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_TEAM3</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_TEAM1</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_TEAM2</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_IGNORE_NODRAW_OPAQUE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_MOVEABLE</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_AREAPORTAL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_PLAYERCLIP</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_MONSTERCLIP</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_CURRENT_0</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_CURRENT_90</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_CURRENT_180</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_CURRENT_270</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_CURRENT_UP</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_CURRENT_DOWN</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_ORIGIN</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_MONSTER</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_DEBRIS</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_DETAIL</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_TRANSLUCENT</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_LADDER</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>CONTENTS_HITBOX</em></code>: 
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

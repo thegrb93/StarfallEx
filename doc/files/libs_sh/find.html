@@ -1,0 +1,459 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../../files/Compiler.html">Compiler.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Editor.html">Editor.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Instance.html">Instance.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Libraries.html">Libraries.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Permissions.html">Permissions.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/Preprocessor.html">Preprocessor.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/SFLib.html">SFLib.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_cl/ents.html">libs_cl/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/builtins.html">libs_sh/builtins.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/files.html">libs_sh/files.lua</a>
+	</li>
+
+	<li><strong>libs_sh/find.lua</strong></li>
+	
+	<li>
+		<a href="../../files/libs_sh/time.html">libs_sh/time.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sh/trace.html">libs_sh/trace.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sv/ents.html">libs_sv/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/libs_sv/wire.html">libs_sv/wire.lua</a>
+	</li>
+
+	<li>
+		<a href="../../files/reload.html">reload.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>libs_sh/find.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.all">find_library.all</a>&nbsp;(filter)</td>
+	<td class="summary">Finds all entitites </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.allPlayers">find_library.allPlayers</a>&nbsp;(filter)</td>
+	<td class="summary">Finds all players (including bots) </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.byClass">find_library.byClass</a>&nbsp;(class, filter)</td>
+	<td class="summary">Finds entities by class name </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.byModel">find_library.byModel</a>&nbsp;(model, filter)</td>
+	<td class="summary">Finds entities by model </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.canFind">find_library.canFind</a>&nbsp;()</td>
+	<td class="summary">Checks if a find function can be performed </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.inBox">find_library.inBox</a>&nbsp;(min, max, filter)</td>
+	<td class="summary">Finds entities in a box </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.inCone">find_library.inCone</a>&nbsp;(pos, dir, distance, radius, filter)</td>
+	<td class="summary">Finds entities in a cone </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#find_library.inSphere">find_library.inSphere</a>&nbsp;(center, radius, filter)</td>
+	<td class="summary">Finds entities in a sphere </td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="find_library.all"></a><strong>find_library.all</strong>&nbsp;(filter)</dt>
+<dd>
+Finds all entitites
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.allPlayers"></a><strong>find_library.allPlayers</strong>&nbsp;(filter)</dt>
+<dd>
+Finds all players (including bots)
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.byClass"></a><strong>find_library.byClass</strong>&nbsp;(class, filter)</dt>
+<dd>
+Finds entities by class name
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>class</em></code>: The class name
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.byModel"></a><strong>find_library.byModel</strong>&nbsp;(model, filter)</dt>
+<dd>
+Finds entities by model
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>model</em></code>: The model file
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.canFind"></a><strong>find_library.canFind</strong>&nbsp;()</dt>
+<dd>
+Checks if a find function can be performed
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.inBox"></a><strong>find_library.inBox</strong>&nbsp;(min, max, filter)</dt>
+<dd>
+Finds entities in a box
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>min</em></code>: Bottom corner
+	</li>
+	
+	<li>
+	  <code><em>max</em></code>: Top corner
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.inCone"></a><strong>find_library.inCone</strong>&nbsp;(pos, dir, distance, radius, filter)</dt>
+<dd>
+Finds entities in a cone
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>pos</em></code>: The cone vertex position
+	</li>
+	
+	<li>
+	  <code><em>dir</em></code>: The direction to project the cone
+	</li>
+	
+	<li>
+	  <code><em>distance</em></code>: The length to project the cone
+	</li>
+	
+	<li>
+	  <code><em>radius</em></code>: The angle of the cone
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="find_library.inSphere"></a><strong>find_library.inSphere</strong>&nbsp;(center, radius, filter)</dt>
+<dd>
+Finds entities in a sphere
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>center</em></code>: Center of the sphere
+	</li>
+	
+	<li>
+	  <code><em>radius</em></code>: Sphere radius
+	</li>
+	
+	<li>
+	  <code><em>filter</em></code>: Optional function to filter results
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>An array of found entities</ul>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

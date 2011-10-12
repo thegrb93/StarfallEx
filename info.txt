@@ -1,9 +1,9 @@
 "AddonInfo"
 {
 	"name"        "Starfall"
-	"version"     "0.0000000001"
+	"version"     "0.2"
 	"author_name" "Colonel Thirty Two"
-	"author_url"  "ssh://localhost"
-	"info"        "hi"
+	"author_url"  "http://colonelthirtytwo.tumblr.com/"
+	"info"        "The Starfall Scripting Environment"
 	"override"    "0"
 }

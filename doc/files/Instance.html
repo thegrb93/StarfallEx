@@ -1,0 +1,534 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/Compiler.html">Compiler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Editor.html">Editor.lua</a>
+	</li>
+
+	<li><strong>Instance.lua</strong></li>
+	
+	<li>
+		<a href="../files/Libraries.html">Libraries.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Permissions.html">Permissions.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Preprocessor.html">Preprocessor.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/SFLib.html">SFLib.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_cl/ents.html">libs_cl/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/builtins.html">libs_sh/builtins.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/files.html">libs_sh/files.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/find.html">libs_sh/find.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/time.html">libs_sh/time.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/trace.html">libs_sh/trace.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sv/ents.html">libs_sv/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sv/wire.html">libs_sv/wire.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/reload.html">reload.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>Instance.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:cleanup">SF.Instance:cleanup</a>&nbsp;(hook, ok, errmsg)</td>
+	<td class="summary">Internal function - Do not call.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:deinitialize">SF.Instance:deinitialize</a>&nbsp;()</td>
+	<td class="summary">Deinitializes the instance.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:initialize">SF.Instance:initialize</a>&nbsp;()</td>
+	<td class="summary">Runs the scripts inside of the instance.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:prepare">SF.Instance:prepare</a>&nbsp;(hook)</td>
+	<td class="summary">Internal function - Do not call.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:resetOps">SF.Instance:resetOps</a>&nbsp;()</td>
+	<td class="summary">Resets the amount of operations used.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:runFunction">SF.Instance:runFunction</a>&nbsp;(func, ...)</td>
+	<td class="summary">Runs an arbitrary function under the SF instance.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:runLibraryHook">SF.Instance:runLibraryHook</a>&nbsp;(hook, ...)</td>
+	<td class="summary">Runs a library hook.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:runScriptHook">SF.Instance:runScriptHook</a>&nbsp;(hook, ...)</td>
+	<td class="summary">Runs a script hook.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Instance:runWithOps">SF.Instance:runWithOps</a>&nbsp;(func, ...)</td>
+	<td class="summary">Internal function - do not call.</td>
+	</tr>
+
+</table>
+
+
+
+
+<h2>Tables</h2>
+<table class="table_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#Instance">Instance</a></td>
+	<td class="summary">Instance fields </td>
+	</tr>
+
+</table>
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="SF.Instance:cleanup"></a><strong>SF.Instance:cleanup</strong>&nbsp;(hook, ok, errmsg)</dt>
+<dd>
+Internal function - Do not call. Cleans up the script. This is done automatically by Initialize and RunScriptHook.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>hook</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>ok</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>errmsg</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:deinitialize"></a><strong>SF.Instance:deinitialize</strong>&nbsp;()</dt>
+<dd>
+Deinitializes the instance. After this, the instance should be discarded.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:initialize"></a><strong>SF.Instance:initialize</strong>&nbsp;()</dt>
+<dd>
+Runs the scripts inside of the instance. This should be called once after compiling/unpacking so that scripts can register hooks and such. It should not be called more than once.
+
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>True if no script errors occured</li>
+	
+	<li>The error message, if applicable</li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:prepare"></a><strong>SF.Instance:prepare</strong>&nbsp;(hook)</dt>
+<dd>
+Internal function - Do not call. Prepares the script to be executed. This is done automatically by Initialize and RunScriptHook.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>hook</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:resetOps"></a><strong>SF.Instance:resetOps</strong>&nbsp;()</dt>
+<dd>
+Resets the amount of operations used.
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:runFunction"></a><strong>SF.Instance:runFunction</strong>&nbsp;(func, ...)</dt>
+<dd>
+Runs an arbitrary function under the SF instance. This can be used to run your own hooks when using the integrated hook system doesn't make sense (ex timers).
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>func</em></code>: Function to run
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: Arguments to pass to func
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:runLibraryHook"></a><strong>SF.Instance:runLibraryHook</strong>&nbsp;(hook, ...)</dt>
+<dd>
+Runs a library hook. Alias to SF.Libraries.CallHook(hook, self, ...).
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>hook</em></code>: Hook to run.
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: Additional arguments.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:runScriptHook"></a><strong>SF.Instance:runScriptHook</strong>&nbsp;(hook, ...)</dt>
+<dd>
+Runs a script hook. This calls script code.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>hook</em></code>: The hook to call.
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: Arguments to pass to the hook's registered function.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>True if it executed ok, false if not or if there was no hook</li>
+	
+	<li>Either the function return values, the error message, or nil if no hook was registered</li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Instance:runWithOps"></a><strong>SF.Instance:runWithOps</strong>&nbsp;(func, ...)</dt>
+<dd>
+Internal function - do not call. Runs a function while incrementing the instance ops coutner. It counts in increments of 10. This does no setup work and shouldn't be called by client code
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>func</em></code>: The function to run
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: Arguments to func
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>True if ok</li>
+	
+	<li>Any values func returned</li>
+	
+</ol>
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+<h2><a name="tables"></a>Tables</h2>
+<dl class="table">
+
+<dt><a name="Instance"></a><strong>Instance</strong></dt>
+<dd>Instance fields<br /><br />
+
+
+<h3>Fields:</h3>
+<ul>
+	
+	<li>
+	  <code><em>env</em></code>: Environment table for the script
+	</li>
+	
+	<li>
+	  <code><em>data</em></code>: Data that libraries can store.
+	</li>
+	
+	<li>
+	  <code><em>ppdata</em></code>: Preprocessor data
+	</li>
+	
+	<li>
+	  <code><em>ops</em></code>: Currently used ops.
+	</li>
+	
+	<li>
+	  <code><em>hooks</em></code>: Registered hooks
+	</li>
+	
+	<li>
+	  <code><em>scripts</em></code>: The compiled script functions.
+	</li>
+	
+	<li>
+	  <code><em>initialized</em></code>: True if initialized, nil if not.
+	</li>
+	
+	<li>
+	  <code><em>permissions</em></code>: Permissions manager
+	</li>
+	
+	<li>
+	  <code><em>error</em></code>: True if instance is errored and should not be executed
+	</li>
+	
+	<li>
+	  <code><em>mainfile</em></code>: The main file
+	</li>
+	
+	<li>
+	  <code><em>player</em></code>: The "owner" of the instance
+	</li>
+	
+</ul>
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>

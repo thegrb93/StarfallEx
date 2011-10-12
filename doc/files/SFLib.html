@@ -1,0 +1,359 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
+	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
+</head>
+
+<body>
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+<div id="main">
+
+<div id="navigation">
+
+
+<h1>LuaDoc</h1>
+<ul>
+	
+	<li><a href="../index.html">Index</a></li>
+	
+</ul>
+
+
+<!-- Module list -->
+
+
+
+<!-- File list -->
+
+<h1>Files</h1>
+<ul>
+
+	<li>
+		<a href="../files/Compiler.html">Compiler.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Editor.html">Editor.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Instance.html">Instance.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Libraries.html">Libraries.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Permissions.html">Permissions.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/Preprocessor.html">Preprocessor.lua</a>
+	</li>
+
+	<li><strong>SFLib.lua</strong></li>
+	
+	<li>
+		<a href="../files/libs_cl/ents.html">libs_cl/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/builtins.html">libs_sh/builtins.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/files.html">libs_sh/files.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/find.html">libs_sh/find.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/time.html">libs_sh/time.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sh/trace.html">libs_sh/trace.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sv/ents.html">libs_sv/ents.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/libs_sv/wire.html">libs_sv/wire.lua</a>
+	</li>
+
+	<li>
+		<a href="../files/reload.html">reload.lua</a>
+	</li>
+
+</ul>
+
+
+
+
+
+
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h1>File <code>SFLib.lua</code></h1>
+
+
+
+
+
+
+
+<h2>Functions</h2>
+<table class="function_list">
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.CheckType">SF.CheckType</a>&nbsp;(val, typ, level, default)</td>
+	<td class="summary">Checks the type of val.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.CreateContext">SF.CreateContext</a>&nbsp;(env, directives, permissions, ops, libs)</td>
+	<td class="summary">Creates a new context.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.CreateWrapper">SF.CreateWrapper</a>&nbsp;(metatable)</td>
+	<td class="summary">Creates wrap/unwrap functions for sensitive values, by using a lookup table (which is set to have weak keys and values) </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.RunScriptHook">SF.RunScriptHook</a>&nbsp;(hook, ...)</td>
+	<td class="summary">Calls a script hook on all processors.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.Typedef">SF.Typedef</a>&nbsp;(name, base)</td>
+	<td class="summary">Creates a type that is safe for SF scripts to use.</td>
+	</tr>
+
+</table>
+
+
+
+
+
+
+<br/>
+<br/>
+
+
+
+
+<h2><a name="functions"></a>Functions</h2>
+<dl class="function">
+
+
+
+<dt><a name="SF.CheckType"></a><strong>SF.CheckType</strong>&nbsp;(val, typ, level, default)</dt>
+<dd>
+Checks the type of val. Errors if the types don't match
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>val</em></code>: The value to be checked.
+	</li>
+	
+	<li>
+	  <code><em>typ</em></code>: A string type or metatable.
+	</li>
+	
+	<li>
+	  <code><em>level</em></code>: Level at which to error at. 3 is added to this value. Default is 0.
+	</li>
+	
+	<li>
+	  <code><em>default</em></code>: A value to return if val is nil.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.CreateContext"></a><strong>SF.CreateContext</strong>&nbsp;(env, directives, permissions, ops, libs)</dt>
+<dd>
+Creates a new context. A context is used to define what scripts will have access to.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>env</em></code>: The environment metatable to use for the script. Default is SF.DefaultEnvironment
+	</li>
+	
+	<li>
+	  <code><em>directives</em></code>: Additional Preprocessor directives to use. Default is an empty table
+	</li>
+	
+	<li>
+	  <code><em>permissions</em></code>: The permissions manager to use. Default is SF.DefaultPermissions
+	</li>
+	
+	<li>
+	  <code><em>ops</em></code>: Operations quota. Default is specified by the convar "sf_defaultquota"
+	</li>
+	
+	<li>
+	  <code><em>libs</em></code>: Additional (local) libraries for the script to access. Default is an empty table.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.CreateWrapper"></a><strong>SF.CreateWrapper</strong>&nbsp;(metatable)</dt>
+<dd>
+Creates wrap/unwrap functions for sensitive values, by using a lookup table (which is set to have weak keys and values)
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>metatable</em></code>: The metatable to assign the wrapped value.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>The function to wrap sensitive values to a SF-safe table</li>
+	
+	<li>The function to unwrap the SF-safe table to the sensitive table</li>
+	
+</ol>
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.RunScriptHook"></a><strong>SF.RunScriptHook</strong>&nbsp;(hook, ...)</dt>
+<dd>
+Calls a script hook on all processors.
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>hook</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.Typedef"></a><strong>SF.Typedef</strong>&nbsp;(name, base)</dt>
+<dd>
+Creates a type that is safe for SF scripts to use. Instances of the type cannot access the type's metatable
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>base</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+</dd>
+
+
+</dl>
+
+
+
+
+
+
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->	
+</body>
+</html>
