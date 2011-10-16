@@ -4,6 +4,8 @@
 -- @author Colonel Thirty Two
 -------------------------------------------------------------------------------
 
+-- TODO: Make an @include-only parser
+
 SF.Preprocessor = {}
 SF.Preprocessor.directives = {}
 

@@ -8,6 +8,11 @@ SF.Libraries = {}
 SF.Libraries.libraries = {}
 SF.Libraries.hooks = {}
 
+--- Place to store local libraries
+-- @name SF.Libraries.Local
+-- @class table
+SF.Libraries.Local = {}
+
 --- Registers a global library. The library will be accessible from any Starfall Instance, regardless of context.
 -- This will automatically set __index and __metatable.
 -- @param name The library name

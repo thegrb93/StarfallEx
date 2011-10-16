@@ -3,6 +3,12 @@ SF.Editor = {}
 
 -- TODO: Server-side controls
 
+--- Includes table
+-- @name Includes table
+-- @class table
+-- @field mainfile Main file
+-- @field files filename : file contents pairs
+
 if CLIENT then
 	--- (Client) Intializes the editor, if not initialized already
 	function SF.Editor.init()

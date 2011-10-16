@@ -69,6 +69,10 @@
 	</li>
 
 	<li>
+		<a href="../files/libs_cl/screen.html">libs_cl/screen.lua</a>
+	</li>
+
+	<li>
 		<a href="../files/libs_sh/builtins.html">libs_sh/builtins.lua</a>
 	</li>
 
@@ -133,7 +137,7 @@
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#SF.CreateWrapper">SF.CreateWrapper</a>&nbsp;(metatable)</td>
+	<td class="name" nowrap><a href="#SF.CreateWrapper">SF.CreateWrapper</a>&nbsp;(metatable, weakwrapper, weaksensitive)</td>
 	<td class="summary">Creates wrap/unwrap functions for sensitive values, by using a lookup table (which is set to have weak keys and values) </td>
 	</tr>
 
@@ -245,7 +249,7 @@ Creates a new context. A context is used to define what scripts will have access
 
 
 
-<dt><a name="SF.CreateWrapper"></a><strong>SF.CreateWrapper</strong>&nbsp;(metatable)</dt>
+<dt><a name="SF.CreateWrapper"></a><strong>SF.CreateWrapper</strong>&nbsp;(metatable, weakwrapper, weaksensitive)</dt>
 <dd>
 Creates wrap/unwrap functions for sensitive values, by using a lookup table (which is set to have weak keys and values)
 
@@ -255,6 +259,14 @@ Creates wrap/unwrap functions for sensitive values, by using a lookup table (whi
 	
 	<li>
 	  <code><em>metatable</em></code>: The metatable to assign the wrapped value.
+	</li>
+	
+	<li>
+	  <code><em>weakwrapper</em></code>: Make the wrapper weak inside the internal lookup table. Default: True
+	</li>
+	
+	<li>
+	  <code><em>weaksensitive</em></code>: Make the sensitive data weak inside the internal lookup table. Default: True
 	</li>
 	
 </ul>

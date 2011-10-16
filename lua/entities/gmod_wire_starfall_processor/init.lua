@@ -40,7 +40,7 @@ function ENT:Compile(codetbl, mainfile)
 end
 
 function ENT:Error(msg, override)
-	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg)
+	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
 	WireLib.ClientError(msg, self.owner)
 	if self.instance then
 		self.instance:deinitialize()

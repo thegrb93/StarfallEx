@@ -96,11 +96,25 @@ end
 --- Creates wrap/unwrap functions for sensitive values, by using a lookup table
 -- (which is set to have weak keys and values)
 -- @param metatable The metatable to assign the wrapped value.
+-- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
+-- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.CreateWrapper(metatable)
-	local sensitive2sf = setmetatable({},{__mode="kv"})
-	local sf2sensitive = setmetatable({},{__mode="kv"})
+function SF.CreateWrapper(metatable, weakwrapper, weaksensitive)
+	local s2sfmode = ""
+	local sf2smode = ""
+	
+	if weakwrapper == nil or weakwrapper then
+		sf2smode = "k"
+		s2sfmode = "v"
+	end
+	if weaksensitive == nil or weaksensitive then
+		sf2smode = sf2smode.."v"
+		s2sfmode = s2sfmode.."k"
+	end 
+
+	local sensitive2sf = setmetatable({},{__mode=s2sfmode})
+	local sf2sensitive = setmetatable({},{__mode=sf2smode})
 	
 	local function wrap(value)
 		if sensitive2sf[value] then return sensitive2sf[value] end

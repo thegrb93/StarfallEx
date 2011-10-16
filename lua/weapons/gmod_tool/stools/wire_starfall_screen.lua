@@ -1,5 +1,5 @@
-TOOL.Category		= "Wire - Control"
-TOOL.Name			= "Starfall - Processor"
+TOOL.Category		= "Wire - Display"
+TOOL.Name			= "Starfall - Screen"
 TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
@@ -18,21 +18,21 @@ if SERVER then
 			return
 		end
 		
-		if ent:GetClass() ~= "gmod_wire_starfall_processor" then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
+		if ent:GetClass() ~= "gmod_wire_starfall_screen" then
+			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall screen entity.\n")
 			return
 		end
 		
 		ent:CodeSent(ply,task)
 	end
-	LibTransfer.callbacks["starfall_upload"] = callback
+	LibTransfer.callbacks["starfallscreen_upload"] = callback
 	
 	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
 	function MakeSF( pl, Pos, Ang, model)
-		if !pl:CheckLimit( "starfall_processor" ) then return false end
+		if !pl:CheckLimit( "starfall_screen" ) then return false end
 
-		local sf = ents.Create( "gmod_wire_starfall_processor" )
+		local sf = ents.Create( "gmod_wire_starfall_screen" )
 		if !IsValid(sf) then return false end
 
 		sf:SetAngles( Ang )
@@ -42,22 +42,22 @@ if SERVER then
 
 		sf.owner = pl
 
-		pl:AddCount( "starfall_processor", sf )
+		pl:AddCount( "starfall_screen", sf )
 
 		return sf
 	end
 	
 	function RequestSend(ply,ent)
-		umsg.Start("starfall_requpload",ply)
+		umsg.Start("starfallscreen_requpload",ply)
 			umsg.Entity(ent)
 		umsg.End()
 	end
 else
-	language.Add( "Tool_wire_starfall_processor_name", "Starfall - Processor (Wire)" )
-    language.Add( "Tool_wire_starfall_processor_desc", "Spawns a starfall processor" )
-    language.Add( "Tool_wire_starfall_processor_0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
-	language.Add( "sboxlimit_wire_starfall_processor", "You've hit the Starfall processor limit!" )
-	language.Add( "undone_Wire Starfall Processor", "Undone Starfall Processor" )
+	language.Add( "Tool_wire_starfall_screen_name", "Starfall - Screen (Wire)" )
+    language.Add( "Tool_wire_starfall_screen_desc", "Spawns a starfall screen" )
+    language.Add( "Tool_wire_starfall_screen_0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
+	language.Add( "sboxlimit_wire_starfall_screen", "You've hit the Starfall Screen limit!" )
+	language.Add( "undone_Wire Starfall Screen", "Undone Starfall Screen" )
 	
 	local function sendreq(msg)
 		local ent = msg:ReadEntity()
@@ -69,17 +69,17 @@ else
 		local ok, buildlist = SF.Editor.BuildIncludesTable()
 		if ok then
 			buildlist.entid = ent:EntIndex()
-			LibTransfer.QueueTask("starfall_upload",buildlist)
+			LibTransfer.QueueTask("starfallscreen_upload",buildlist)
 		else
 			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
 		end
 	end
-	usermessage.Hook("starfall_requpload",sendreq)
+	usermessage.Hook("starfallscreen_requpload",sendreq)
 end
 
-TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
+TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
 
-cleanup.Register( "starfall_processor" )
+cleanup.Register( "starfall_screen" )
 
 
 function TOOL:LeftClick( trace )
@@ -87,7 +87,7 @@ function TOOL:LeftClick( trace )
 	if trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
-	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_processor" then
+	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_screen" then
 		RequestSend(self:GetOwner(),trace.Entity)
 		return true
 	end
@@ -96,7 +96,7 @@ function TOOL:LeftClick( trace )
 
 	local model = self:GetClientInfo( "Model" )
 	local ply = self:GetOwner()
-	if !self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
+	if !self:GetSWEP():CheckLimit( "starfall_screen" ) then return false end
 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90
@@ -108,13 +108,13 @@ function TOOL:LeftClick( trace )
 
 	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
 
-	undo.Create("Wire Starfall Processor")
+	undo.Create("Wire Starfall Screen")
 		undo.AddEntity( sf )
 		undo.AddEntity( const )
 		undo.SetPlayer( ply )
 	undo.Finish()
 
-	ply:AddCleanup( "starfall_processor", sf )
+	ply:AddCleanup( "starfall_screen", sf )
 	
 	RequestSend(ply,sf)
 
@@ -139,7 +139,7 @@ end
 if CLIENT then
 	local lastclick = CurTime()
 	function TOOL.BuildCPanel(panel)
-		panel:AddControl("Header", { Text = "#Tool_wire_starfall_processor_name", Description = "#Tool_wire_starfall_processor_desc" })
+		panel:AddControl("Header", { Text = "#Tool_wire_starfall_screen_name", Description = "#Tool_wire_starfall_screen_desc" })
 		
 		local filebrowser = vgui.Create("wire_expression2_browser")
 		panel:AddPanel(filebrowser)
