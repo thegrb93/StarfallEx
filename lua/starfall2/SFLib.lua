@@ -48,7 +48,7 @@ end
 function SF.Typedef(name, base)
 	local tbl = base or {}
 	tbl.__metatable = tbl.__metatable or name
-	tbl.__index = tbl.__index or function(self,k) if k:sub(1,2) ~= "__" then return tbl[k] end end
+	tbl.__index = tbl.__index or function(self,k) return k:sub(1,2) ~= "__" and tbl[k] or nil end
 	return tbl
 end
 
@@ -88,7 +88,8 @@ function SF.CheckType(val, typ, level, default)
 		end
 		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-		error("Type mismatch (Expected "..typname..", got "..SF_Compiler.GetType(typ)..") in function "..funcname,level)
+		local mt = getmetatable(val)
+		error("Type mismatch (Expected "..typname..", got "..(type(mt) == "string" and mt or type(val))..") in function "..funcname,level)
 	end
 	
 end
@@ -108,7 +109,7 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive)
 		sf2smode = "k"
 		s2sfmode = "v"
 	end
-	if weaksensitive == nil or weaksensitive then
+	if weaksensitive then
 		sf2smode = sf2smode.."v"
 		s2sfmode = s2sfmode.."k"
 	end 
@@ -136,6 +137,14 @@ if SERVER then
 	local l
 	MsgN("-SF - Loading Libraries")
 
+	MsgN("- Loading shared libraries")
+	l = file.FindInLua("starfall2/libs_sh/*.lua")
+	for _,filename in pairs(l) do
+		print("-  Loading "..filename)
+		include("starfall2/libs_sh/"..filename)
+		AddCSLuaFile("starfall2/libs_sh/"..filename)
+	end
+	MsgN("- End loading shared libraries")
 	
 	MsgN("- Loading SF server-side libraries")
 	l = file.FindInLua("starfall2/libs_sv/*.lua")
@@ -153,23 +162,19 @@ if SERVER then
 		AddCSLuaFile("starfall2/libs_cl/"..filename)
 	end
 	MsgN("- End loading client-side libraries")
-
-
-	MsgN("- Loading shared libraries")
-	l = file.FindInLua("starfall2/libs_sh/*.lua")
-	for _,filename in pairs(l) do
-		print("-  Loading "..filename)
-		include("starfall2/libs_sh/"..filename)
-		AddCSLuaFile("starfall2/libs_sh/"..filename)
-	end
-	MsgN("- End loading shared libraries")
-
 	
 	MsgN("-End Loading SF Libraries")
 else
 	local l
 	MsgN("-SF - Loading Libraries")
 
+	MsgN("- Loading shared libraries")
+	l = file.FindInLua("starfall2/libs_sh/*.lua")
+	for _,filename in pairs(l) do
+		print("-  Loading "..filename)
+		include("starfall2/libs_sh/"..filename)
+	end
+	MsgN("- End loading shared libraries")
 	
 	MsgN("- Loading client-side libraries")
 	l = file.FindInLua("starfall2/libs_cl/*.lua")
@@ -178,15 +183,6 @@ else
 		include("starfall2/libs_cl/"..filename)
 	end
 	MsgN("- End loading client-side libraries")
-
-
-	MsgN("- Loading shared libraries")
-	l = file.FindInLua("starfall2/libs_sh/*.lua")
-	for _,filename in pairs(l) do
-		print("-  Loading "..filename)
-		include("starfall2/libs_sh/"..filename)
-	end
-	MsgN("- End loading shared libraries")
 
 	
 	MsgN("-End Loading SF Libraries")

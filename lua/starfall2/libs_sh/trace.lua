@@ -1,5 +1,4 @@
 local trace_library = {}
-SF.Libraries.Register("trace",trace_library)
 
 local dgetmeta = debug.getmetatable
 
@@ -15,9 +14,8 @@ for line in lines:gmatch("([^\n]*)\n") do
 end
 ]]
 
---- Enumerations stored in the trace_library table
--- @name trace_library
--- @class table
+--- Provides functions for doing line/AABB traces
+-- @shared
 -- @field MAT_ANTLION
 -- @field MAT_BLOODYFLESH
 -- @field MAT_CONCRETE
@@ -98,6 +96,7 @@ end
 -- @field CONTENTS_TRANSLUCENT
 -- @field CONTENTS_LADDER
 -- @field CONTENTS_HITBOX
+SF.Libraries.Register("trace",trace_library)
 
 -- Material Enumeration
 trace_library.MAT_ANTLION = MAT_ANTLION

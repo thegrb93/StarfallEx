@@ -1,7 +1,6 @@
 -------------------------------------------------------------------------------
 -- Builtins.lua
 -- Functions built-in to the default environment
--- @class file
 -------------------------------------------------------------------------------
 
 local function createRefMtbl(target)
@@ -13,6 +12,11 @@ local function createRefMtbl(target)
 end
 
 local dgetmeta = debug.getmetatable
+
+--- Built in values. These don't need to be loaded; they are in the default environment.
+-- @name builtin
+-- @class library
+-- @libtbl SF.DefaultEnvironment
 
 -- ------------------------- Lua Ports ------------------------- --
 -- This part is messy because of LuaDoc stuff.
@@ -158,9 +162,17 @@ end
 -- Restricts access to builtin type's metatables
 
 local function createSafeIndexFunc(mt)
-	local old_index
-	local function new_index(self, k)
-		if k:sub(1,2) ~= "__" then return old_index(self,k) end
+	local old_index = mt.__index
+	
+	local new_index
+	if type(old_index) == "function" then
+		function new_index(self, k)
+			return k:sub(1,2) ~= "__" and old_index(self,k) or nil
+		end
+	else
+		function new_index(self,k)
+			return k:sub(1,2) ~= "__" and old_index[k] or nil
+		end
 	end
 	
 	local function protect()

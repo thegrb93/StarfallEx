@@ -1,15 +1,36 @@
 --- Screen library
 -- @author Colonel Thirty Two
--- Screens are 512x512 units. Most, if not all, functions require
+
+--- Screen library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
-
+-- @entity wire_starfall_screen
 SF.Libraries.Local.Screen = SF.Typedef("Library: screen")
+
+--- Vertex format
+-- @name Vertex Format
+-- @class table
+-- @field x X coordinate
+-- @field y Y coordinate
+-- @field u U coordinate (optional, default is 0)
+-- @field v V coordinate (optional, default is 0)
 
 local render = render
 local surface = surface
 local clamp = math.Clamp
 local max = math.max
+local cam = cam
+local dgetmeta = debug.getmetatable
+local matrix_meta = _R.VMatrix
+
+local matrix = Matrix()
+SF.Libraries.AddHook("prepare",function(instance, hook)
+	if hook == "render" then
+		matrix = Matrix() -- Reset transformation matrix
+	end
+end)
+
+local texturecache = {}
 
 local validfonts = {
 	DebugFixed = true,
@@ -81,7 +102,69 @@ local function fixcolorT(tbl)
 	}
 end
 
+local meshmt = {}
+local wrapmesh, unwrapmesh = SF.CreateWrapper(meshmt,true,false)
+
+local function checkvertex(vert)
+	print("\tVertex:")
+	print(string.format("\t\tx= %s",vert.x))
+	print(string.format("\t\ty= %s",vert.y))
+	print(string.format("\t\tu= %s",vert.u))
+	print(string.format("\t\tv= %s",vert.v))
+	print("\tEnd vertex.")
+	local copy = {
+		x = SF.CheckType(vert.x,"number",1),
+		y = SF.CheckType(vert.y,"number",1),
+		u = tonumber(vert.u) or 0,
+		v = tonumber(vert.v) or 0,
+	}
+	return copy
+end
+
+function meshmt:__index(k)
+	SF.CheckType(self,meshmt)
+	SF.CheckType(k,"number")
+	local mesh = unwrapmesh(self)
+	if not mesh then return nil end
+	if k <= 0 or k > #mesh then return nil end
+	return table.Copy(mesh[i])
+end
+
+function meshmt:__len()
+	SF.CheckType(self,meshmt)
+	local mesh = unwrapmesh(self)
+	return mesh and #mesh or nil
+end
+
+function meshmt:__newindex(k,v)
+	SF.CheckType(self,meshmt)
+	SF.CheckType(k,"number")
+	SF.CheckType(v,"table")
+	local mesh = unwrapmesh(self)
+	if not mesh then return end
+	if k <= 0 or k > (#mesh)+1 then return error("mesh index out of bounds: "..k.." out of "..#mesh,2) end
+	mesh[k] = checkvertex(v)
+end
+
+
+SF.Typedef("2D Mesh",meshmt)
+
 -- ------------------------------------------------------------------ --
+
+--- Sets the transformation matrix
+-- @param m The matrix
+function SF.Libraries.Local.Screen.setMatrix(m)
+	SF.CheckType(m,matrix_meta)
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	matrix = m
+end
+
+--- Gets the transformation matrix
+-- @return The matrix
+function SF.Libraries.Local.Screen.getMatrix()
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	return matrix
+end
 
 --- Sets the draw color
 -- @param r Red value or 0
@@ -103,6 +186,24 @@ function SF.Libraries.Local.Screen.setTextColor(r,g,b,a)
 	surface.SetTextColor(fixcolorA(r,g,b,a))
 end
 
+function SF.Libraries.Local.Screen.getTextureID(tx)
+	if #file.Find("materials/"..tx..".*",true) > 0 then
+		 local id = surface.GetTextureID(tx)
+		 texturecache[id] = tx
+		 return id
+	end
+end
+
+--- Sets the texture
+function SF.Libraries.Local.Screen.setTexture(id)
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	if not id then
+		surface.SetTexture(nil)
+	elseif texturecache[id] then
+		surface.SetTexture(id)
+	end
+end
+
 --- Clears the screen.
 -- @param r Red value or 0
 -- @param g Green value or 0
@@ -119,8 +220,11 @@ end
 -- @param h Height
 function SF.Libraries.Local.Screen.drawRect(x,y,w,h)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	
+	cam.PushModelMatrix(matrix)
 	surface.DrawRect(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
+	cam.PopModelMatrix()
 end
 
 --- Draws a rectangle outline using the current color.
@@ -130,8 +234,11 @@ end
 -- @param h Height
 function SF.Libraries.Local.Screen.drawRectOutline(x,y,w,h)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	
+	cam.PushModelMatrix(matrix)
 	surface.DrawOutlinedRect(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
+	cam.PopModelMatrix()
 end
 
 --- Draws a circle
@@ -141,8 +248,39 @@ end
 -- @param c Color (doesn't follow setColor...)
 function SF.Libraries.Local.Screen.drawCircle(x,y,r,c)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	cam.PushModelMatrix(matrix)
 	surface.DrawCircle(tonumber(x) or 0, tonumber(y) or 0, max(tonumber(r) or 1, 0),
 		fixcolorT(c))
+	cam.PopModelMatrix()
+end
+
+--- Draws a textured rectangle.
+-- @param x X coordinate
+-- @param y Y coordinate
+-- @param w Width
+-- @param h Height
+function SF.Libraries.Local.Screen.drawTexturedRect(x,y,w,h)
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	cam.PushModelMatrix(matrix)
+	surface.DrawTexturedRect(tonumber(x) or 0, tonumber(y) or 0,
+		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
+	cam.PopModelMatrix(matrix)
+end
+
+--- Draws a textured rectangle with UV coordinates
+-- @param x X coordinate
+-- @param y Y coordinate
+-- @param w Width
+-- @param h Height
+-- @param tw Texture width
+-- @param th Texture height
+function SF.Libraries.Local.Screen.drawTexturedRectUV(x,y,w,h,tw,th)
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	cam.PushModelMatrix(matrix)
+	surface.DrawTexturedRectUV(tonumber(x) or 0, tonumber(y) or 0,
+		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
+		max(tonumber(tw) or 0, 0), max(tonumber(th) or 0, 0))
+	cam.PopModelMatrix(matrix)
 end
 
 --- Draws a line
@@ -152,10 +290,13 @@ end
 -- @param y2 Y end coordinate
 function SF.Libraries.Local.Screen.drawLine(x1,y1,x2,y2)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	
+	cam.PushModelMatrix(matrix)
 	surface.DrawLine(tonumber(x1) or 0, tonumber(y1) or 0, tonumber(x2) or 0, tonumber(y2) or 0)
+	cam.PopModelMatrix()
 end
 
--- Creates a font
+-- Creates a font. Does not require rendering hook
 -- @param font Base font to use
 -- @param size Font size
 -- @param weight Font weight (default: 400)
@@ -200,5 +341,48 @@ function SF.Libraries.Local.Screen.drawText(font,x,y,text)
 	SF.CheckType(text,"string")
 	surface.SetTextPos(tonumber(x) or 0, tonumber(y) or 0)
 	surface.SetFont(font)
+	
+	cam.PushModelMatrix(matrix)
 	surface.DrawText(text)
+	cam.PopModelMatrix()
+end
+
+--- Compiles a 2D mesh. This is needed so that meshes don't have to be
+-- type-checked each frame. Meshes can be indexed by a number, in which
+-- a copy of the vertex at that spot is returned. They can also be assigned
+-- a new vertex at 1 <= i <= #mesh+1. And the length of the mesh can be taken.
+-- @param verts Array of verticies to convert.
+function SF.Libraries.Local.Screen.createMesh(verts)
+	SF.CheckType(verts,"table")
+	local mesh = {}
+	local meshtbl = wrapmesh(mesh)
+	print(string.format("DEBUG: Creating mesh from %d verticies!",#verts))
+	for i=1,#verts do
+		local v = verts[i]
+		SF.CheckType(v,"table")
+		mesh[i] = checkvertex(v)
+	end
+	print("DEBUG: End creating mesh")
+	return meshtbl
+end
+
+--- Draws a polygon (mesh). Takes a compiled/uncompiled mesh to draw.
+-- Note that if you do use an uncompiled mesh, you will use up ops
+-- very quickly!
+-- @param Compiled mesh or array of vertexes
+function SF.Libraries.Local.Screen.drawPoly(mesh)
+	if dgetmeta(mesh) ~= meshmt then
+		print("DEBUG: Compiling mesh at runtime!")
+		SF.CheckType(mesh,"table")
+		verts = mesh
+		mesh = {}
+		for i=1,#verts do
+			local v = verts[i]
+			SF.CheckType(v,"table")
+			mesh[i] = checkvertex(v)
+		end
+	end
+	cam.PushModelMatrix(matrix)
+	surface.DrawPoly(mesh)
+	cam.PopModelMatrix()
 end

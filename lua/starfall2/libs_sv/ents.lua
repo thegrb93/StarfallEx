@@ -1,8 +1,9 @@
+assert(SF.Entities)
 
-SF.Entities = {}
-
-local ents_lib = {}
-local ents_metatable = SF.Typedef("Entity")
+local ents_lib = SF.Entities.Library
+local ents_metatable = SF.Entities.Metatable
+local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
+--- Entities Library
 SF.Libraries.Register("ents",ents_lib)
 
 SF.Permissions:registerPermission({
@@ -13,31 +14,6 @@ SF.Permissions:registerPermission({
 })
 
 -- ------------------------- Internal Library ------------------------- --
-
-local wrap, unwrap = SF.CreateWrapper(ents_metatable)
-
---- Wraps a real entity to an entity wrapper
--- @name SF.Entities.Wrap
--- @class function
--- @param ent
-SF.Entities.Wrap = wrap
---- Unwraps an entity wrapper to a real entity
--- @name SF.Entities.Unwrap
--- @class function
--- @param wrapped
-SF.Entities.Unwrap = unwrap
---- The entity wrapper metatable
--- @name SF.Entities.Metatable
--- @class table
-SF.Entities.Metatable = ents_metatable
-
---- Returns true if valid, false if not
-function SF.Entities.IsValid(entity)
-	if entity == nil then return false end
-	if not entity:IsValid() then return false end
-	if entity:IsWorld() then return false end
-	return true
-end
 
 --- Gets the entity's owner
 -- TODO: Optimize this!
@@ -77,14 +53,6 @@ function SF.Entities.GetOwner(entity)
 	return nil
 end
 
---- Gets the physics object of the entity
--- @return The physobj, or nil if the entity isn't valid or isn't vphysics
-function SF.Entities.GetPhysObject(entity)
-	if not ents.IsValid(entity) then return nil end
-	if entity:GetMoveType() ~= MOVETYPE_VPHYSICS then return nil end
-	return entity:GetPhysicsObject()
-end
-
 --- Checks to see if a player can modify an entity without the override permission
 -- @param ply The player
 -- @param ent The entity being modified
@@ -116,15 +84,11 @@ local function postload()
 end
 SF.Libraries.AddHook("postload",postload)
 
--- ------------------------- Library functions ------------------------- --
-
---- Returns the entity representing a processor that this script is running on.
--- May be nil
-function ents_lib.self()
-	local ent = SF.instance.data.entity
-	if ent then 
-		return wrap(ent)
-	else return nil end
+--- Gets the owner of the entity
+function ents_metatable:owner()
+	SF.CheckType(self,ents_metatable)
+	local ent = unwrap(self)
+	return wrap(getOwner(self))
 end
 
 --- Returns whoever created the script
@@ -136,121 +100,6 @@ end
 function ents_lib.player()
 	return wrap(SF.instance.player)
 end
-
--- ------------------------- Methods ------------------------- --
-
-function ents_metatable:__tostring()
-	local ent = unwrap(self)
-	if not ent then return "Invalid Entity"
-	else return tostring(ent) end
-end
-
---- Checks if an entity is valid.
--- @return True if valid, false if not
-function ents_metatable:isValid()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	return isValid(ent)
-end
-
---- Gets the owner of the entity
-function ents_metatable:owner()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	return wrap(getOwner(self))
-end
-
---- Returns the EntIndex of the entity
--- @return The numerical index of the entity
-function ents_metatable:index()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	return ent:EntIndex()
-end
-
---- Returns the class of the entity
--- @return The string class name
-function ents_metatable:class()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	return ent:GetClass()
-end
-
---- Returns the position of the entity
--- @return The position vector
-function ents_metatable:pos()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	return ent:GetPos()
-end
-
---- Returns the angle of the entity
--- @return The angle
-function ents_metatable:ang()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	return ent:GetAngles()
-end
-
---- Returns the mass of the entity
--- @return The numerical mass
-function ents_metatable:mass()
-	SF.CheckType(self,ents_metatable)
-	
-	local ent = unwrap(self)
-	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
-	local phys = getPhysObject(ent)
-	if not phys then return false, "entity has no physics object" end
-	
-	return phys:GetMass()
-end
-
---- Returns the velocity of the entity
--- @return The velocity vector
-function ents_metatable:vel()
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	return ent:GetVelocity()
-end
-
---- Converts a vector in entity local space to world space
--- @param data Local space vector
-function ents_metatable:toWorld(data)
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	
-	if type(data) == "Vector" then
-		return ent:LocalToWorld(data)
-	elseif type(data) == "Angle" then
-		return ent:LocalToWorldAngles(data)
-	else
-		SF.CheckType(data, "angle or vector") -- force error
-	end
-end
-
---- Converts a vector in world space to entity local space
--- @param data Local space vector
-function ents_metatable:toLocal(data)
-	SF.CheckType(self,ents_metatable)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil end
-	
-	if type(data) == "Vector" then
-		return ent:WorldToLocal(data)
-	elseif type(data) == "Angle" then
-		return ent:WorldToLocalAngles(data)
-	else
-		SF.CheckType(data, "angle or vector") -- force error
-	end
-end
-
 
 --- Applies linear force to the entity
 -- @param vec The force vector

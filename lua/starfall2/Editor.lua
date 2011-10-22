@@ -20,7 +20,7 @@ if CLIENT then
 		SF.Editor.editor:SetSyntaxColorLine( function(self, row) return {{self.Rows[row], Color(255,255,255)}} end)
 		
 		function SF.Editor.editor:Validate(gotoerror)
-			local err = CompileString(self:GetCode(), "SF:"..self:GetChosenFile(), false)
+			local err = CompileString(self:GetCode(), "SF:"..(self:GetChosenFile() or "main"), false)
 			
 			if type(err) == "string" then
 				self.C['Val'].panel:SetBGColor(128, 0, 0, 180)

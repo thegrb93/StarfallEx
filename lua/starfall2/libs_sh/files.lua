@@ -1,7 +1,8 @@
 local files_library = {}
+--- File functions. Allows modification of files.
 SF.Libraries.Register("files",files_library)
 
--- Access Files permission
+--- Access Files permission
 -- @name Access Files Permission
 -- @class table
 -- @field name "Access Files"

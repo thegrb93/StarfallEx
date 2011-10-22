@@ -1,5 +1,6 @@
 
 local time_library = {}
+--- Deals with time and timers.
 SF.Libraries.Register("time",time_library)
 
 -- ------------------------- Time ------------------------- --

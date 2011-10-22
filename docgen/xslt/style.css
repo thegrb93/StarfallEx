@@ -1,0 +1,58 @@
+
+#sidebar-index
+{
+	float: left;
+	padding-right: 10px;
+	margin-right: 20px;
+	width: 400px;
+	border-right: 3px solid #000;
+}
+
+#sidebar-index h2
+{
+	margin-bottom: 2px;
+}
+
+#sidebar-index table
+{
+	border: 1px solid black;
+	background-color: #CCC;
+	width: 100%;
+}
+#sidebar-index table th
+{
+	text-align: left;
+	border-bottom: 1px solid black;
+}
+
+.content
+{
+	float: left;
+}
+
+.content h2
+{
+	margin-bottom: 2px;
+}
+
+.content h1
+{
+	margin-bottom: 2px;
+}
+
+.content table
+{
+	border: 1px solid black;
+	background-color: #CCC;
+}
+
+.content table th
+{
+	text-align: left;
+	border-bottom: 1px solid black;
+}
+
+.footer
+{
+	clear: both;
+}
