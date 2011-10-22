@@ -111,7 +111,7 @@ function ents_metatable:applyForce(vec, offset)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -132,7 +132,7 @@ function ents_metatable:applyAngForce(ang)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -173,7 +173,7 @@ function ents_metatable:applyTorque(tq)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -203,11 +203,11 @@ end
 -- @param vec New position
 function ents_metatable:setPos(vec)
 	SF.CheckType(self,ents_metatable)
-	SF.CheckType(pos,"Vector")
+	SF.CheckType(vec,"Vector")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -226,7 +226,7 @@ function ents_metatable:setAng(ang)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -239,11 +239,11 @@ end
 -- @param vel New velocity
 function ents_metatable:setVel(vel)
 	SF.CheckType(self,ents_metatable)
-	SF.CheckType(ang,"Vector")
+	SF.CheckType(vel,"Vector")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -256,7 +256,7 @@ function ents_metatable:setFrozen(ent, freeze)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -270,7 +270,7 @@ function ents_metatable:setNotSolid(notsolid)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	
 	ent:SetNotSolid(notsolid and true or false)
 	return true
@@ -281,7 +281,7 @@ function ents_metatable:enableGravity(grav)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
