@@ -202,7 +202,7 @@ end
 --- Sets the entitiy's position
 -- @param vec New position
 function ents_metatable:setPos(vec)
-	SF.CheckType(ent,ents_metatable)
+	SF.CheckType(self,ents_metatable)
 	SF.CheckType(pos,"Vector")
 	
 	local ent = unwrap(self)
