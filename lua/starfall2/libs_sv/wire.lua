@@ -1,6 +1,9 @@
 
-SF.Wire = {}
 local wire_library = {}
+--- Wire library. Handles wire inputs/outputs, wirelinks, etc.
+SF.Libraries.Register("wire",wire_library)
+
+SF.Wire = {}
 SF.Wire.Library = wire_library
 
 local wirelink_metatable = {}
