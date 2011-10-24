@@ -101,7 +101,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 				local directive, args = string.match(line,"--@([^ ]+)%s*(.*)$")
 				local func = directives[directive] or SF.Preprocessor.directives[directive]
 				if func then
-					func(args, data)
+					func(args, filename, data)
 				end
 			end
 		end

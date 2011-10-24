@@ -70,6 +70,7 @@ if CLIENT then
 		codename = codename or SF.Editor.getOpenFile() or "main"
 		tbl.mainfile = codename
 		tbl.files = {}
+		tbl.includes = {}
 
 		local loaded = {}
 		local ppdata = {}
@@ -82,7 +83,7 @@ if CLIENT then
 			if path == codename and maincode then
 				code = maincode
 			else
-				code = file.Read("Starfall/"+path) or error("Bad include: "..path,0)
+				code = file.Read("Starfall/"..path) or error("Bad include: "..path,0)
 			end
 			
 			tbl.files[path] = code
