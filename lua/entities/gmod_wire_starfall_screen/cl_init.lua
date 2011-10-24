@@ -6,18 +6,7 @@ include("starfall2/SFLib.lua")
 include("libtransfer/libtransfer.lua")
 
 
-local context = SF.CreateContext(nil, nil, nil, nil, {screen=SF.Libraries.Local.Screen})
-
---LibTransfer.Hook("sf_screen_download",function(data)
-	--local ent = data.ent
-	--if not ent or ent:GetClass() ~= "gmod_wire_starfall_screen" then
-		--ErrorNoHalt("SF Screen Data sent to non-sf-screen entity!")
-		--return
-	--end
-	
-	--ent:CodeSent(data.files, data.main, data.owner)
---end)
-
+local context = SF.CreateContext(nil, nil, nil, nil, SF.Libraries.CreateLocalTbl{"screen"})
 datastream.Hook("sf_screen_download",function(handler, id, encoded, decoded)
 	for i=1,#decoded do
 		data = decoded[i]

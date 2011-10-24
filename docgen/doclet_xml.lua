@@ -240,7 +240,7 @@ function start(doc)
 				lxml:append("serverside")
 			end
 		end
-	end
+	enddocument_file
 	
 	-- Create index xml file
 	do

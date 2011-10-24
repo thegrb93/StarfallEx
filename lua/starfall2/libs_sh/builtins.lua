@@ -15,6 +15,7 @@ local dgetmeta = debug.getmetatable
 
 --- Built in values. These don't need to be loaded; they are in the default environment.
 -- @name builtin
+-- @shared
 -- @class library
 -- @libtbl SF.DefaultEnvironment
 
@@ -69,12 +70,12 @@ SF.DefaultEnvironment.type = type
 -- @class function
 -- @param tbl
 SF.DefaultEnvironment.next = next
---- Same as Lua's assert
+--- Same as Lua's assert. TODO: lua's assert doesn't work.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
 -- @param condition
 -- @param msg
-SF.DefaultEnvironment.assert = assert
+SF.DefaultEnvironment.assert = function(ok, msg) if not ok then error(msg or "assertion failed!",2) end end
 
 --- Same as Lua's setmetatable. Doesn't work on most internal metatables
 SF.DefaultEnvironment.setmetatable = function(tbl, meta)
@@ -98,8 +99,7 @@ SF.DefaultEnvironment.error = function(msg) error(msg,2) end
 local function filterGmodLua(lib)
 	local original, gm = {}, {}
 	for name, func in pairs(lib) do
-		local char = name:sub(1,1)
-		if char:upper() == char then
+		if name:match("^[A-Z]") then
 			gm[name] = func
 		else
 			original[name] = func
@@ -109,8 +109,9 @@ local function filterGmodLua(lib)
 end
 
 -- String library
-local str_orig, str_gm = filterGmodLua(string)
--- Lua's (not glua's) string library
+local str_orig, _ = filterGmodLua(string)
+--- Lua's (not glua's) string library
+-- @name SF.DefaultEnvironment.string
 -- @class table
 SF.DefaultEnvironment.string = setmetatable({},createRefMtbl(str_orig))
 
@@ -121,9 +122,16 @@ math_orig.round = math.Round
 math_orig.randfloat = math.Rand
 math_orig.calcBSplineN = nil
 
--- Lua's (not glua's) math library, plus clamp, round, and randfloat
+--- Lua's (not glua's) math library, plus clamp, round, and randfloat
+-- @name SF.DefaultEnvironment.math
 -- @class table
 SF.DefaultEnvironment.math = setmetatable({},createRefMtbl(math_orig))
+
+local table_orig, _ = filterGmodLua(table)
+--- Lua's (not glua's) table library
+-- @name SF.DefaultEnvironment.table
+-- @class table
+SF.DefaultEnvironment.table = setmetatable({},createRefMtbl(table_orig))
 
 -- ------------------------- Functions ------------------------- --
 
@@ -149,13 +157,13 @@ function SF.DefaultEnvironment.setHook(name, func)
 end
 
 if SERVER then
-	--- Prints a message to the owner's chat.
+	--- Prints a message to the player's chat. Limited to 255 characters on the server.
 	function SF.DefaultEnvironment.print(s)
 		SF.instance.player:PrintMessage(HUD_PRINTTALK, tostring(s):sub(1,255))
 	end
 else
 	function SF.DefaultEnvironment.print(s)
-		SF.instance.player:PrintMessage(HUD_PRINTTALK, tostring(s))
+		LocalPlayer():PrintMessage(HUD_PRINTTALK, tostring(s))
 	end
 end
 -- ------------------------- Restrictions ------------------------- --

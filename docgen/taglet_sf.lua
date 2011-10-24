@@ -96,46 +96,30 @@ local function check_function (line)
 end
 
 --- Checks if the line contains a library registration
+-- (call to SF.Libraries.Register or SF.Libraries.RegisterLocal)
 -- @param line string with line text
 -- @return the library name or nil if not found
 -- @return the table name used to store the library
 local function check_library(line)
 	line = util.trim(line)
+
+	-- Global library
 	local name, tblref = line:match("^SF%.Libraries%.Register%(\"([^\"]+)\",([%w_]+)%)$")
 	if name then
 		return name, tblref
 	end
-	
-	local tblref = line:match("^(SF%.Libraries%.Local%.[%w_]+)%s*=.*$")
-	if not tblref then return nil end
-	return (tblref and tblref:sub(20):lower() or nil), tblref
+
+	-- Local library
+	local name, tblref = line:match("^SF%.Libraries%.RegisterLocal%(%s*\"([^\"]+)\"%s*,([%w_]+)%s*%)$")
+	return name, tblref
 end
 
--------------------------------------------------------------------------------
--- Checks if the line contains a module definition.
--- @param line string with line text
--- @param currentmodule module already found, if any
--- @return the name of the defined module, or nil if there is no module 
--- definition
-
-local function check_module (line, currentmodule)
+--- Checks if the line contains a class creation
+local function check_class(line)
 	line = util.trim(line)
-	
-	-- module"x.y"
-	-- module'x.y'
-	-- module[[x.y]]
-	-- module("x.y")
-	-- module('x.y')
-	-- module([[x.y]])
-	-- module(...)
 
-	local r, _, modulename = string.find(line, "^module%s*[%s\"'(%[]+([^,\"')%]]+)")
-	if r then
-		-- found module definition
-		logger:debug(string.format("found module `%s'", modulename))
-		return modulename
-	end
-	return currentmodule
+	local name, tblref = line:match("^SF.Typedef%(%s*[\"']([^\"']+)[\"'],%s*([%w_]+)%s*%)$")
+	return name, tblref
 end
 
 -------------------------------------------------------------------------------
@@ -178,7 +162,7 @@ local function parse_code (f, line, modulename)
 			return line, code, modulename
 		else
 			-- look for a module definition
-			modulename = check_module(line, modulename)
+			--modulename = check_module(line, modulename)
 
 			table.insert(code, line)
 			line = f:read()
@@ -214,6 +198,7 @@ local function parse_comment (block, first_line, libs)
 	if code ~= nil then
 		local func_info = check_function(code)
 		local libname, libtbl = check_library(code)
+		--local typname, typtbl = check_class(code)
 		if func_info then
 			block.class = "function"
 			block.name = func_info.name

@@ -1,11 +1,13 @@
 --- Screen library
 -- @author Colonel Thirty Two
 
+local screen_library = {}
+
 --- Screen library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
 -- @entity wire_starfall_screen
-SF.Libraries.Local.Screen = SF.Typedef("Library: screen")
+SF.Libraries.RegisterLocal("screen",screen_library)
 
 --- Vertex format
 -- @name Vertex Format
@@ -103,7 +105,7 @@ local function fixcolorT(tbl)
 end
 
 local meshmt = {}
-local wrapmesh, unwrapmesh = SF.CreateWrapper(meshmt,true,false)
+local wrapmesh, unwrapmesh = SF.CreateWrapper(meshmt)
 
 local function checkvertex(vert)
 	print("\tVertex:")
@@ -153,7 +155,7 @@ SF.Typedef("2D Mesh",meshmt)
 
 --- Sets the transformation matrix
 -- @param m The matrix
-function SF.Libraries.Local.Screen.setMatrix(m)
+function screen_library.setMatrix(m)
 	SF.CheckType(m,matrix_meta)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	matrix = m
@@ -161,7 +163,7 @@ end
 
 --- Gets the transformation matrix
 -- @return The matrix
-function SF.Libraries.Local.Screen.getMatrix()
+function screen_library.getMatrix()
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	return matrix
 end
@@ -171,7 +173,7 @@ end
 -- @param g Green value or 0
 -- @param b Blue value or 0
 -- @param a Alpha value or 0
-function SF.Libraries.Local.Screen.setColor(r,g,b,a)
+function screen_library.setColor(r,g,b,a)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	surface.SetDrawColor(fixcolorA(r,g,b,a))
 end
@@ -181,12 +183,12 @@ end
 -- @param g Green value or 0
 -- @param b Blue value or 0
 -- @param a Alpha value or 0
-function SF.Libraries.Local.Screen.setTextColor(r,g,b,a)
+function screen_library.setTextColor(r,g,b,a)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	surface.SetTextColor(fixcolorA(r,g,b,a))
 end
 
-function SF.Libraries.Local.Screen.getTextureID(tx)
+function screen_library.getTextureID(tx)
 	if #file.Find("materials/"..tx..".*",true) > 0 then
 		 local id = surface.GetTextureID(tx)
 		 texturecache[id] = tx
@@ -195,7 +197,7 @@ function SF.Libraries.Local.Screen.getTextureID(tx)
 end
 
 --- Sets the texture
-function SF.Libraries.Local.Screen.setTexture(id)
+function screen_library.setTexture(id)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	if not id then
 		surface.SetTexture(nil)
@@ -208,7 +210,7 @@ end
 -- @param r Red value or 0
 -- @param g Green value or 0
 -- @param b Blue value or 0
-function SF.Libraries.Local.Screen.clear(r,g,b)
+function screen_library.clear(r,g,b)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	render.Clear( fixcolor(r,g,b), 255 )
 end
@@ -218,7 +220,7 @@ end
 -- @param y Bottom left corner y coordinate
 -- @param w Width
 -- @param h Height
-function SF.Libraries.Local.Screen.drawRect(x,y,w,h)
+function screen_library.drawRect(x,y,w,h)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	
 	cam.PushModelMatrix(matrix)
@@ -232,7 +234,7 @@ end
 -- @param y Bottom left corner y coordinate
 -- @param w Width
 -- @param h Height
-function SF.Libraries.Local.Screen.drawRectOutline(x,y,w,h)
+function screen_library.drawRectOutline(x,y,w,h)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	
 	cam.PushModelMatrix(matrix)
@@ -246,7 +248,7 @@ end
 -- @param y Center y coordinate
 -- @param r Radius
 -- @param c Color (doesn't follow setColor...)
-function SF.Libraries.Local.Screen.drawCircle(x,y,r,c)
+function screen_library.drawCircle(x,y,r,c)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawCircle(tonumber(x) or 0, tonumber(y) or 0, max(tonumber(r) or 1, 0),
@@ -259,7 +261,7 @@ end
 -- @param y Y coordinate
 -- @param w Width
 -- @param h Height
-function SF.Libraries.Local.Screen.drawTexturedRect(x,y,w,h)
+function screen_library.drawTexturedRect(x,y,w,h)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRect(tonumber(x) or 0, tonumber(y) or 0,
@@ -274,7 +276,7 @@ end
 -- @param h Height
 -- @param tw Texture width
 -- @param th Texture height
-function SF.Libraries.Local.Screen.drawTexturedRectUV(x,y,w,h,tw,th)
+function screen_library.drawTexturedRectUV(x,y,w,h,tw,th)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRectUV(tonumber(x) or 0, tonumber(y) or 0,
@@ -288,7 +290,7 @@ end
 -- @param y1 Y start coordinate
 -- @param x2 X end coordinate
 -- @param y2 Y end coordinate
-function SF.Libraries.Local.Screen.drawLine(x1,y1,x2,y2)
+function screen_library.drawLine(x1,y1,x2,y2)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	
 	cam.PushModelMatrix(matrix)
@@ -305,7 +307,7 @@ end
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
 -- @param A table representing the font (doesn't contain anything)
---function SF.Libraries.Local.Screen.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
+--function screen_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	--if not validfonts[font] then return nil, "invalid font" end
 	
 	--size = tonumber(size) or 12
@@ -336,7 +338,7 @@ end
 -- @param x X coordinate
 -- @param y Y coordinate
 -- @param text Text to draw
-function SF.Libraries.Local.Screen.drawText(font,x,y,text)
+function screen_library.drawText(font,x,y,text)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
 	surface.SetTextPos(tonumber(x) or 0, tonumber(y) or 0)
@@ -352,7 +354,7 @@ end
 -- a copy of the vertex at that spot is returned. They can also be assigned
 -- a new vertex at 1 <= i <= #mesh+1. And the length of the mesh can be taken.
 -- @param verts Array of verticies to convert.
-function SF.Libraries.Local.Screen.createMesh(verts)
+function screen_library.createMesh(verts)
 	SF.CheckType(verts,"table")
 	local mesh = {}
 	local meshtbl = wrapmesh(mesh)
@@ -370,7 +372,7 @@ end
 -- Note that if you do use an uncompiled mesh, you will use up ops
 -- very quickly!
 -- @param Compiled mesh or array of vertexes
-function SF.Libraries.Local.Screen.drawPoly(mesh)
+function screen_library.drawPoly(mesh)
 	if dgetmeta(mesh) ~= meshmt then
 		print("DEBUG: Compiling mesh at runtime!")
 		SF.CheckType(mesh,"table")

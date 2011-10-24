@@ -3,6 +3,7 @@ local timer = timer
 
 local time_library = {}
 --- Deals with time and timers.
+-- @shared
 SF.Libraries.Register("time",time_library)
 
 -- ------------------------- Time ------------------------- --

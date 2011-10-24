@@ -3,8 +3,6 @@ assert(SF.Entities)
 local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
---- Entities Library
-SF.Libraries.Register("ents",ents_lib)
 
 SF.Permissions:registerPermission({
 	name = "Modify All Entities",
@@ -57,8 +55,7 @@ end
 -- @param ply The player
 -- @param ent The entity being modified
 function SF.Entities.CanModify(ply, ent)
-	if CPPI and ent:CPPICanPhysgun(ply) then return true end
-	return SF.Entitites.GetOwner(ent) == ply
+	return (CPPI and ent:CPPICanPhysgun(ply)) or SF.Entities.GetOwner(ent) == ply
 end
 
 local isValid = SF.Entities.IsValid
@@ -211,9 +208,9 @@ function ents_metatable:setPos(vec)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not util.IsInWorld(pos) then return false, "position not in world" end
+	--if not util.IsInWorld(pos) then return false, "position not in world" end
 	
-	phys:SetPos(pos)
+	phys:SetPos(vec)
 	phys:Wake()
 	return true
 end

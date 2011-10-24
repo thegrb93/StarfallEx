@@ -77,5 +77,43 @@
 	</html>
 </xsl:template>
 
+<xsl:template match="file">
+	<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>File: <xsl:value-of select="name"/></title>
+	</head>
+	<body>
+	<xsl:call-template name="sidebar-index"/>
+	<div class="content" id="file-content">
+		<h1>File: <xsl:value-of select="name"/></h1>
+		<p class="file-desc">
+			<xsl:value-of select="description"/>
+		</p>
+		<hr />
+		<h2>Functions</h2>
+		<table class="file-table" id="file-table-functions">
+			<tr class="file-table-heading">
+				<th>Name</th>
+				<th>Params</th>
+				<th>Summary</th>
+			</tr>
+			<xsl:for-each select="functions/function">
+				<tr>
+					<td><xsl:value-of select="name"/></td>
+					<td>
+						<!-- TODO: Put params here -->
+					</td>
+					<td><xsl:value-of select="summary"/></td>
+				</tr>
+			</xsl:for-each>
+		</table>
+	</div>
+	<div class="footer" id = "index-footer">
+		Generated with Colonel Thirty Two's SF Taglet + XML Doclet for LuaDoc
+	</div>
+	</body>
+	</html>
+</xsl:template>
 
 </xsl:stylesheet>
