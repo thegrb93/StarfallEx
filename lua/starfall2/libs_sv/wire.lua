@@ -79,7 +79,7 @@ end
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. May be modified by the function.
 function wire_library.createInputs(names, types)
-	SF.CheckType(name,"table")
+	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
 	if not ent then error("No entity to create inputs on",2) end
@@ -105,7 +105,7 @@ end
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. May be modified by the function.
 function wire_library.createOutputs(names, types)
-	SF.CheckType(name,"table")
+	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
 	if not ent then error("No entity to create outputs on",2) end
