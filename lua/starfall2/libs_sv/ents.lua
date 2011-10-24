@@ -208,7 +208,7 @@ function ents_metatable:setPos(vec)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	--if not util.IsInWorld(pos) then return false, "position not in world" end
+	-- TODO: Clamp insane positions to prevent crashing.
 	
 	phys:SetPos(vec)
 	phys:Wake()
@@ -244,7 +244,7 @@ function ents_metatable:setVel(vel)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	ent:SetVelocity(vel)
+	phys:SetVelocity(vel)
 	return true
 end
 
