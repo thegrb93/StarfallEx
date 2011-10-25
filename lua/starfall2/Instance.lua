@@ -91,7 +91,7 @@ function SF.Instance:initialize()
 	self:runLibraryHook("initialize")
 	self:prepare("_initialize")
 	
-	for i=#self.scripts,1,-1 do
+	for i=1,#self.scripts do
 		local func = self.scripts[i]
 		local ok, err = self:runWithOps(func)
 		if not ok then

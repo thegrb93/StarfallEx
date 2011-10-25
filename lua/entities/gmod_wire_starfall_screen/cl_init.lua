@@ -59,12 +59,12 @@ function ENT:CodeSent(files, main, owner)
 	
 	function self.renderfunc()
 		self.instance.data.screen.isRendering = true
-		self:runHook("render")
+		self:runScriptHook("render")
 		if self.instance then self.instance.data.screen.isRendering = nil end
 	end
 end
 
-function ENT:runHook(hook, ...)
+function ENT:runScriptHook(hook, ...)
 	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
 		local ok, rt = self.instance:runScriptHook(hook, ...)
 		if not ok then self:Error(rt)

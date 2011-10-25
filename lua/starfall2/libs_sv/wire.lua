@@ -7,7 +7,7 @@ SF.Wire = {}
 SF.Wire.Library = wire_library
 
 local wirelink_metatable = {}
-local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable)
+local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 
 ---
 -- @class table
@@ -251,7 +251,8 @@ function wire_ports_metatable:__index(name)
 	if not (input and input.Src and input.Src:IsValid()) then
 		return nil
 	end
-	return inputConverters[context.data.inputs[name]](context.ent.Inputs[name].Value)
+	return inputConverters[ent.Inputs[name].Type](ent.Inputs[name].Value)
+	--return inputConverters[context.data.inputs[name]](context.ent.Inputs[name].Value)
 end
 
 function wire_ports_metatable:__newindex(name,value)
