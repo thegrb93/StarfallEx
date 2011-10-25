@@ -92,6 +92,26 @@ end
 --- Throws an error. Can't change the level yet.
 SF.DefaultEnvironment.error = function(msg) error(msg,2) end
 
+--- Returns if this script is being ran on the client
+function SF.DefaultEnvironment.isClient()
+	return CLIENT
+end
+
+--- Returns if this script is being ran on the server
+function SF.DefaultEnvironment.isServer()
+	return SERVER
+end
+
+--- Gets the amount of ops used so far
+function SF.DefaultEnvironment.opsUsed()
+	return SF.instance.ops
+end
+
+--- Gets the ops hard quota
+function SF.DefaultEnvironment.opsMax()
+	return SF.instance.context.ops
+end
+
 -- The below modules have the Gmod functions removed (the ones that begin with a capital letter),
 -- as requested by Divran
 

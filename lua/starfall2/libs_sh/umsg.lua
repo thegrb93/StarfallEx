@@ -9,7 +9,7 @@ if SERVER then
 	-- -------------------------------------------------------------- --
 	-- SERVER
 	
-	SF.Libraries.AddHook("intialize",function(inst)
+	SF.Libraries.AddHook("initialize",function(inst)
 		inst.data.umsg = {
 			used = false,
 			amount = 0,
@@ -259,7 +259,7 @@ else
 	function umsg_metatable:reset()
 		SF.CheckType(self,umsg_metatable)
 		local msg = unwrapumsg(self)
-		msg and msg:Reset()
+		if msg then msg:Reset() end
 	end
 	
 	usermessage.Hook("sf_umsg_extension", function(msg)
