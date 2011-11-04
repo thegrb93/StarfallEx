@@ -185,7 +185,7 @@ if SERVER then
 	function umsg_library.stop()
 		local umsgdata = SF.instance.data.umsg
 		if not umsgdata.entering then error("umsg not started",2) end
-		umsg.entering = false
+		umsgdata.entering = false
 		umsg.Stop()
 	end
 	
