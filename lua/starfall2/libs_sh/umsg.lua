@@ -186,7 +186,7 @@ if SERVER then
 		local umsgdata = SF.instance.data.umsg
 		if not umsgdata.entering then error("umsg not started",2) end
 		umsgdata.entering = false
-		umsg.Stop()
+		umsg.End()
 	end
 	
 	
