@@ -52,7 +52,7 @@ function SF.Instance:runWithOps(func,...)
 	
 	debug.sethook(ophook,"",1)
 	local rt = {pcall(func, ...)}
-	--debug.sethook(infloop_detection_replacement,"",500000000) -- TODO: Fix this so that it doesn't break stuff. Is it the "l"?
+	--debug.sethook(infloop_detection_replacement,"",500000000) -- TODO: Fix this so that it doesn't break stuff. Is/was it the "l"?
 	debug.sethook(nil)
 	
 	--MsgN("SF: Exectued "..(self.ops-beginops).." instructions in "..(SysTime()-begin).." seconds")

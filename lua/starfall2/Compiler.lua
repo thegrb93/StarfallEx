@@ -50,6 +50,11 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 			end
 		end
 		
+		if code[path] == "" then
+			-- Passing an empty string to CompileString gives wierd results...
+			error(path..": No code.",0)
+		end
+		
 		local func = CompileString(code[path], "SF:"..path, false)
 		if type(func) == "string" then
 			error(path..": "..func, 0)

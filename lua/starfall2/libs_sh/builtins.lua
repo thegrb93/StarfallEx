@@ -76,6 +76,11 @@ SF.DefaultEnvironment.next = next
 -- @param condition
 -- @param msg
 SF.DefaultEnvironment.assert = function(ok, msg) if not ok then error(msg or "assertion failed!",2) end end
+--- Same as Lua's unpack
+-- @name SF.DefaultEnvironment.unpack
+-- @class function
+-- @param tbl
+SF.DefaultEnvironment.unpack = unpack
 
 --- Same as Lua's setmetatable. Doesn't work on most internal metatables
 SF.DefaultEnvironment.setmetatable = function(tbl, meta)

@@ -27,13 +27,13 @@ if SERVER then
 	end
 	LibTransfer.callbacks["starfallscreen_upload"] = callback
 	
-	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
+	CreateConVar('sbox_maxstarfall_screen', 3, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
 	function MakeSF( pl, Pos, Ang, model)
-		if !pl:CheckLimit( "starfall_screen" ) then return false end
+		if not pl:CheckLimit( "starfall_screen" ) then return false end
 
 		local sf = ents.Create( "gmod_wire_starfall_screen" )
-		if !IsValid(sf) then return false end
+		if not IsValid(sf) then return false end
 
 		sf:SetAngles( Ang )
 		sf:SetPos( Pos )
@@ -56,7 +56,7 @@ else
 	language.Add( "Tool_wire_starfall_screen_name", "Starfall - Screen (Wire)" )
     language.Add( "Tool_wire_starfall_screen_desc", "Spawns a starfall screen" )
     language.Add( "Tool_wire_starfall_screen_0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
-	language.Add( "sboxlimit_wire_starfall_screen", "You've hit the Starfall Screen limit!" )
+	language.Add( "SBox_max_starfall_Screen", "You've hit the Starfall Screen limit!" )
 	language.Add( "undone_Wire Starfall Screen", "Undone Starfall Screen" )
 	
 	local function sendreq(msg)
