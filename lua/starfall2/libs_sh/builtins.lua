@@ -97,15 +97,8 @@ end
 --- Throws an error. Can't change the level yet.
 SF.DefaultEnvironment.error = function(msg) error(msg,2) end
 
---- Returns if this script is being ran on the client
-function SF.DefaultEnvironment.isClient()
-	return CLIENT
-end
-
---- Returns if this script is being ran on the server
-function SF.DefaultEnvironment.isServer()
-	return SERVER
-end
+SF.DefaultEnvironment.CLIENT = CLIENT
+SF.DefaultEnvironment.SERVER = SERVER
 
 --- Gets the amount of ops used so far
 function SF.DefaultEnvironment.opsUsed()
