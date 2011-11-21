@@ -1,13 +1,11 @@
 --- Screen library
 -- @author Colonel Thirty Two
 
-local screen_library = {}
-
 --- Screen library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
 -- @entity wire_starfall_screen
-SF.Libraries.RegisterLocal("screen",screen_library)
+local screen_library, _ = SF.Libraries.RegisterLocal("screen")
 
 --- Vertex format
 -- @name Vertex Format
@@ -104,7 +102,7 @@ local function fixcolorT(tbl)
 	}
 end
 
-local meshmt = {}
+local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
 local wrapmesh, unwrapmesh = SF.CreateWrapper(meshmt)
 
 local function checkvertex(vert)
@@ -123,8 +121,8 @@ local function checkvertex(vert)
 	return copy
 end
 
-function meshmt:__index(k)
-	SF.CheckType(self,meshmt)
+function mesh_metamethods:__index(k)
+	SF.CheckType(self,mesh_metamethods)
 	SF.CheckType(k,"number")
 	local mesh = unwrapmesh(self)
 	if not mesh then return nil end
@@ -132,14 +130,14 @@ function meshmt:__index(k)
 	return table.Copy(mesh[i])
 end
 
-function meshmt:__len()
-	SF.CheckType(self,meshmt)
+function mesh_metamethods:__len()
+	SF.CheckType(self,mesh_metamethods)
 	local mesh = unwrapmesh(self)
 	return mesh and #mesh or nil
 end
 
-function meshmt:__newindex(k,v)
-	SF.CheckType(self,meshmt)
+function mesh_metamethods:__newindex(k,v)
+	SF.CheckType(self,mesh_metamethods)
 	SF.CheckType(k,"number")
 	SF.CheckType(v,"table")
 	local mesh = unwrapmesh(self)
@@ -147,9 +145,6 @@ function meshmt:__newindex(k,v)
 	if k <= 0 or k > (#mesh)+1 then return error("mesh index out of bounds: "..k.." out of "..#mesh,2) end
 	mesh[k] = checkvertex(v)
 end
-
-
-SF.Typedef("2D Mesh",meshmt)
 
 -- ------------------------------------------------------------------ --
 
@@ -373,7 +368,7 @@ end
 -- very quickly!
 -- @param Compiled mesh or array of vertexes
 function screen_library.drawPoly(mesh)
-	if dgetmeta(mesh) ~= meshmt then
+	if dgetmeta(mesh) ~= mesh_metamethods then
 		print("DEBUG: Compiling mesh at runtime!")
 		SF.CheckType(mesh,"table")
 		verts = mesh

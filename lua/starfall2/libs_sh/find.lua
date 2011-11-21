@@ -1,10 +1,9 @@
 --- Find functions
 --- @author Colonel Thirty Two
 
-local find_library = {}
 --- Find library. Finds entities in various shapes.
 -- @shared
-SF.Libraries.Register("find",find_library)
+local find_library, _ = SF.Libraries.Register("find")
 
 local find_cooldown
 if SERVER then

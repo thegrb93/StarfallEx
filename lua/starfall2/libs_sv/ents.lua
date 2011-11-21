@@ -2,6 +2,7 @@ assert(SF.Entities)
 
 local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
+local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
 
 SF.Permissions:registerPermission({
@@ -82,7 +83,7 @@ end
 SF.Libraries.AddHook("postload",postload)
 
 --- Gets the owner of the entity
-function ents_metatable:owner()
+function ents_methods:owner()
 	SF.CheckType(self,ents_metatable)
 	local ent = unwrap(self)
 	return wrap(getOwner(self))
@@ -101,7 +102,7 @@ end
 --- Applies linear force to the entity
 -- @param vec The force vector
 -- @param offset An optional offset position (TODO: Local or world?)
-function ents_metatable:applyForce(vec, offset)
+function ents_methods:applyForce(vec, offset)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	if offset then SF.CheckType(offset,"Vector") end
@@ -123,7 +124,7 @@ end
 --- Applies angular force to the entity
 -- @param ang The force angle
 -- @depreciated Gmod has no phys:ApplyAngleForce function, so this uses black magic
-function ents_metatable:applyAngForce(ang)
+function ents_methods:applyAngForce(ang)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
@@ -164,7 +165,7 @@ end
 
 --- Applies torque
 -- @param tq The torque vector
-function ents_metatable:applyTorque(tq)
+function ents_methods:applyTorque(tq)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(tq,"Vector")
 	
@@ -198,7 +199,7 @@ end
 
 --- Sets the entitiy's position
 -- @param vec New position
-function ents_metatable:setPos(vec)
+function ents_methods:setPos(vec)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	
@@ -217,7 +218,7 @@ end
 
 --- Sets the entity's angles
 -- @param ang New angles
-function ents_metatable:setAng(ang)
+function ents_methods:setAng(ang)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
@@ -234,7 +235,7 @@ end
 
 --- Sets the entity's linear velocity
 -- @param vel New velocity
-function ents_metatable:setVel(vel)
+function ents_methods:setVel(vel)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vel,"Vector")
 	
@@ -248,7 +249,7 @@ function ents_metatable:setVel(vel)
 	return true
 end
 
-function ents_metatable:setFrozen(ent, freeze)
+function ents_methods:setFrozen(ent, freeze)
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
@@ -262,7 +263,7 @@ function ents_metatable:setFrozen(ent, freeze)
 	return true
 end
 
-function ents_metatable:setNotSolid(notsolid)
+function ents_methods:setNotSolid(notsolid)
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
@@ -273,7 +274,7 @@ function ents_metatable:setNotSolid(notsolid)
 	return true
 end
 
-function ents_metatable:enableGravity(grav)
+function ents_methods:enableGravity(grav)
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)

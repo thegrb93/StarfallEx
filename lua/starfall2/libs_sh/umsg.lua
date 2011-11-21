@@ -1,9 +1,8 @@
 
 local umsg = umsg
 
-local umsg_library = {}
 --- Usermessages library. Used for sending data from the server to the client.
-SF.Libraries.Register("umsg",umsg_library)
+local umsg_library, _ = SF.Libraries.Register("umsg",umsg_library)
 
 if SERVER then
 	-- -------------------------------------------------------------- --
@@ -195,69 +194,69 @@ else
 	-- -------------------------------------------------------------- --
 	-- CLIENT
 	
-	local umsg_metatable = {}
-	local wrapumsg, unwrapumsg = SF.CreateWrapper(umsg_metatable)
+	local umsg_methods, umsg_metamethods = SF.Typedef("usermessage")
+	local wrapumsg, unwrapumsg = SF.CreateWrapper(umsg_methods)
 	
 	--- Reads a char
 	-- @client
-	function umsg_metatable:char()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:char()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadChar()
 	end
 	
 	--- Reads a bool
 	-- @client
-	function umsg_metatable:bool()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:bool()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadBool()
 	end
 	
 	--- Reads a short
 	-- @client
-	function umsg_metatable:short()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:short()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadShort()
 	end
 	
 	--- Reads a long
 	-- @client
-	function umsg_metatable:long()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:long()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadLong()
 	end
 	
 	--- Reads a vector
 	-- @client
-	function umsg_metatable:vector()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:vector()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadVector()
 	end
 	
 	--- Reads an angle
 	-- @client
-	function umsg_metatable:angle()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:angle()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadAngle()
 	end
 	
 	--- Reads a string
 	-- @client
-	function umsg_metatable:string()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:string()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		return msg and msg:ReadString()
 	end
 	
 	--- Resets the position in the umsg
 	-- @client
-	function umsg_metatable:reset()
-		SF.CheckType(self,umsg_metatable)
+	function umsg_methods:reset()
+		SF.CheckType(self,umsg_metamethods)
 		local msg = unwrapumsg(self)
 		if msg then msg:Reset() end
 	end

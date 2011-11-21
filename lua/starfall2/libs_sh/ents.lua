@@ -3,18 +3,18 @@
 
 SF.Entities = {}
 
-local ents_lib = {}
-local ents_metatable = SF.Typedef("Entity")
-local wrap, unwrap = SF.CreateWrapper(ents_metatable,true,true)
+local ents_methods, ents_metamethods = SF.Typedef("Entity")
+local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true)
 --- Entities Library
 -- @shared
-SF.Libraries.Register("ents",ents_lib)
+local ents_lib, _ = SF.Libraries.Register("ents",ents_lib)
 
 -- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = wrap
 SF.Entities.Unwrap = unwrap
-SF.Entities.Metatable = ents_metatable
+SF.Entities.Methods = ents_methods
+SF.Entities.Metatable = ents_metamethods
 SF.Entities.Library = ents_lib
 
 --- Returns true if valid and is not the world, false if not
@@ -58,7 +58,7 @@ end
 
 --- To string
 -- @shared
-function ents_metatable:__tostring()
+function ents_metamethods:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
@@ -67,16 +67,16 @@ end
 --- Checks if an entity is valid.
 -- @shared
 -- @return True if valid, false if not
-function ents_metatable:isValid()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:isValid()
+	SF.CheckType(self,ents_metamethods)
 	return isValid(unwrap(self))
 end
 
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity
-function ents_metatable:index()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:index()
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:EntIndex()
@@ -85,8 +85,8 @@ end
 --- Returns the class of the entity
 -- @shared
 -- @return The string class name
-function ents_metatable:class()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:class()
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:GetClass()
@@ -95,8 +95,8 @@ end
 --- Returns the position of the entity
 -- @shared
 -- @return The position vector
-function ents_metatable:pos()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:pos()
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:GetPos()
@@ -105,8 +105,8 @@ end
 --- Returns the angle of the entity
 -- @shared
 -- @return The angle
-function ents_metatable:ang()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:ang()
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:GetAngles()
@@ -115,8 +115,8 @@ end
 --- Returns the mass of the entity
 -- @shared
 -- @return The numerical mass
-function ents_metatable:mass()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:mass()
+	SF.CheckType(self,ents_metamethods)
 	
 	local ent = unwrap(self)
 	local phys = getPhysObject(ent)
@@ -128,8 +128,8 @@ end
 --- Returns the velocity of the entity
 -- @shared
 -- @return The velocity vector
-function ents_metatable:vel()
-	SF.CheckType(self,ents_metatable)
+function ents_methods:vel()
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:GetVelocity()
@@ -138,8 +138,8 @@ end
 --- Converts a vector in entity local space to world space
 -- @shared
 -- @param data Local space vector
-function ents_metatable:toWorld(data)
-	SF.CheckType(self,ents_metatable)
+function ents_methods:toWorld(data)
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	
@@ -155,8 +155,8 @@ end
 --- Converts a vector in world space to entity local space
 -- @shared
 -- @param data Local space vector
-function ents_metatable:toLocal(data)
-	SF.CheckType(self,ents_metatable)
+function ents_methods:toLocal(data)
+	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	

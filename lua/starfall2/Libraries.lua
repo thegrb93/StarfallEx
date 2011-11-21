@@ -13,20 +13,21 @@ SF.Libraries.hooks = {}
 -- @class table
 SF.Libraries.Local = {}
 
---- Registers a global library. The library will be accessible from any Starfall Instance, regardless of context.
--- This will automatically set __index and __metatable if none exist.
+--- Creates and registers a global library. The library will be accessible from any Starfall Instance, regardless of context.
+-- This will automatically set __index and __metatable.
 -- @param name The library name
--- @param lib The table containing the library functions.
-function SF.Libraries.Register(name, lib)
-	SF.Typedef("Library: "..name,lib)
-	SF.Libraries.libraries[name] = lib
+function SF.Libraries.Register(name)
+	local methods, metamethods = SF.Typedef("Library: "..name)
+	SF.Libraries.libraries[name] = metamethods
+	return methods, metamethods
 end
 
---- Registers a local library. The library must be added to the context's
+--- Creates and registers a local library. The library must be added to the context's
 -- local libraries field.
-function SF.Libraries.RegisterLocal(name, lib)
-	SF.Typedef("Library: "..name,lib)
-	SF.Libraries.Local[name] = lib
+function SF.Libraries.RegisterLocal(name)
+	local methods, metamethods = SF.Typedef("Library: "..name)
+	SF.Libraries.Local[name] = metamethods
+	return methods, metamethods
 end
 
 --- Gets a global library by name

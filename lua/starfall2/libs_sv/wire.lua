@@ -1,18 +1,18 @@
 
-local wire_library = {}
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-SF.Libraries.Register("wire",wire_library)
+local wire_library, _ = SF.Libraries.Register("wire",wire_library)
 
 SF.Wire = {}
 SF.Wire.Library = wire_library
 
-local wirelink_metatable = {}
+local wirelink_metatable, wirelink_metamethods = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 
 ---
 -- @class table
 -- @name SF.Wire.WlMetatable
-SF.Wire.WlMetatable = wirelink_metatable
+SF.Wire.WlMetatable = wirelink_metamethods
+SF.Wire.WlMethods = wirelink_metatable
 
 ---
 -- @class function
@@ -237,11 +237,10 @@ function wirelink_metatable:isWired(name)
 	else return false end
 end
 
--- ------------------------- Easy-Access Metatable ------------------------- --
--- TODO: Replace with a wirelink to instance.data.entity
-local wire_ports_metatable = {}
+-- ------------------------- Ports Metatable ------------------------- --
+local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 
-function wire_ports_metatable:__index(name)
+function wire_ports_metamethods:__index(name)
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity
@@ -252,10 +251,9 @@ function wire_ports_metatable:__index(name)
 		return nil
 	end
 	return inputConverters[ent.Inputs[name].Type](ent.Inputs[name].Value)
-	--return inputConverters[context.data.inputs[name]](context.ent.Inputs[name].Value)
 end
 
-function wire_ports_metatable:__newindex(name,value)
+function wire_ports_metamethods:__newindex(name,value)
 	SF.CheckType(name,"string")
 
 	local instance = SF.instance
@@ -268,5 +266,4 @@ function wire_ports_metatable:__newindex(name,value)
 	Wire_TriggerOutput(ent, name, outputSerializers[output.Type](value))
 end
 
-SF.Typedef("Ports",wire_ports_metatable)
 wire_library.ports = setmetatable({},wire_ports_metatable)

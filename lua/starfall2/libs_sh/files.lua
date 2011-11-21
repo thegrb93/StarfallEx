@@ -1,7 +1,7 @@
-local files_library = {}
+
 --- File functions. Allows modification of files.
 -- @shared
-SF.Libraries.Register("files",files_library)
+local files_library, _ = SF.Libraries.Register("files")
 
 --- Access Files permission
 -- @name Access Files Permission

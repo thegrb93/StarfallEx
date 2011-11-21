@@ -44,12 +44,14 @@ function SF.RunScriptHook(hook,...)
 end
 
 --- Creates a type that is safe for SF scripts to use. Instances of the type
--- cannot access the type's metatable
-function SF.Typedef(name, base)
-	local tbl = base or {}
-	tbl.__metatable = tbl.__metatable or name
-	tbl.__index = tbl.__index or function(self,k) return k:sub(1,2) ~= "__" and tbl[k] or nil end
-	return tbl
+-- cannot access the type's metatable or metamethods.
+-- @return The table to store normal methods
+-- @return The table to store metamethods
+function SF.Typedef(name)
+	local methods, metamethods = {}, {}
+	metamethods.__metatable = name
+	metamethods.__index = methods
+	return methods, metamethods
 end
 
 --- Creates a new context. A context is used to define what scripts will have access to.
