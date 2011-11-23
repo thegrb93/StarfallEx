@@ -20,6 +20,15 @@ datastream.Hook("sf_screen_download",function(handler, id, encoded, decoded)
 	end
 end)
 
+usermessage.Hook( "starfall_screen_used", function ( data )
+	local screen = Entity( data:ReadShort() )
+	local activator = Entity( data:ReadShort() )
+	local x = data:ReadFloat()
+	local y = data:ReadFloat()
+	
+	screen:runScriptHook( "screen_use", SF.Entities.Wrap( activator ), x, y )
+end)
+
 function ENT:Initialize()
 	self.gpu = GPULib.WireGPU(self)
 end
