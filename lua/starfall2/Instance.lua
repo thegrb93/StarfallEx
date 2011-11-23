@@ -62,21 +62,21 @@ end
 
 --- Internal function - Do not call. Prepares the script to be executed.
 -- This is done automatically by Initialize and RunScriptHook.
-function SF.Instance:prepare(hook)
+function SF.Instance:prepare(hook, name)
 	assert(self.initialized, "Instance not initialized!")
 	assert(not self.error, "Instance is errored!")
 	assert(not SF.instance)
 	
-	self:runLibraryHook("prepare",hook)
+	self:runLibraryHook("prepare",hook, name)
 	SF.instance = self
 end
 
 --- Internal function - Do not call. Cleans up the script.
 -- This is done automatically by Initialize and RunScriptHook.
-function SF.Instance:cleanup(hook, ok, errmsg)
+function SF.Instance:cleanup(hook, name, ok, errmsg)
 	assert(SF.instance == self)
 	
-	self:runLibraryHook("cleanup",hook, ok, errmsg)
+	self:runLibraryHook("cleanup",hook, name, ok, errmsg)
 	SF.instance = nil
 end
 
@@ -89,7 +89,7 @@ function SF.Instance:initialize()
 	assert(not self.initialized, "Already initialized!")
 	self.initialized = true
 	self:runLibraryHook("initialize")
-	self:prepare("_initialize")
+	self:prepare("_initialize","_initialize")
 	
 	for i=1,#self.scripts do
 		local func = self.scripts[i]
@@ -103,7 +103,7 @@ function SF.Instance:initialize()
 	
 	SF.allInstances[self] = self
 	
-	self:cleanup("_intialize",false)
+	self:cleanup("_intialize","_initialize",false)
 	return true
 end
 
@@ -111,24 +111,90 @@ end
 -- @param hook The hook to call.
 -- @param ... Arguments to pass to the hook's registered function.
 -- @return True if it executed ok, false if not or if there was no hook
--- @return Either the function return values, the error message, or nil if no hook was registered
+-- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
-	hook = hook:lower()
-	local hookfunc = self.hooks[hook]
-	if not hookfunc then return false, nil end
-	
-	self:prepare(hook)
-	
-	local ok, err = self:runWithOps(hookfunc,...)
-	if not ok then
-		self:cleanup(hook, true, err)
-		self.error = true
-		return false, err
+	for tbl in self:iterTblScriptHook(hook,...) do
+		if not tbl[1] then return false, tbl[2] end
 	end
-	
-	self:cleanup(hook,false)
-	
-	return true, err
+	return true
+end
+
+--- Runs a script hook until one of them returns a true value. Returns those values.
+-- @param hook The hook to call.
+-- @param ... Arguments to pass to the hook's registered function.
+-- @return True if it executed ok, false if not or if there was no hook
+-- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
+function SF.Instance:runScriptHookForResult(hook,...)
+	for tbl in self:iterTblScriptHook(hook,...) do
+		if not tbl[1] then return false, tbl[2]
+		elseif tbl[2] then
+			return unpack(tbl)
+		end
+	end
+	return true
+end
+
+-- Some small efficiency thing
+local noop = function() end
+
+--- Creates an iterator that calls each registered function for a hook
+-- @param hook The hook to call.
+-- @param ... Arguments to pass to the hook's registered function.
+-- @return An iterator function returning pcall-like results for each registered function.
+function SF.Instance:iterScriptHook(hook,...)
+	local hooks = self.hooks[hook:lower()]
+	if not hooks then return noop end
+	local index = nil
+	local args = {...}
+	return function()
+		if self.error then return end
+		local name, func = next(hooks,index)
+		if not name then return end
+		index = name
+		
+		self:prepare(hook,name)
+		
+		local results = {self:runWithOps(func,unpack(args))}
+		if not results[1] then
+			self:cleanup(hook,name,true,results[2])
+			self.error = true
+			return false, results[2]
+		end
+		
+		self:cleanup(hook,name,false)
+		
+		return unpack(results)
+	end
+end
+
+--- Like SF.Instance:iterSciptHook, except that it returns an array of pcall-like values instead of unpacking them
+-- @param hook The hook to call.
+-- @param ... Arguments to pass to the hook's registered function.
+-- @return An iterator function returning a table of pcall-like results for each registered function.
+function SF.Instance:iterTblScriptHook(hook,...)
+	local hooks = self.hooks[hook:lower()]
+	if not hooks then return noop end
+	local index = nil
+	local args = {...}
+	return function()
+		if self.error then return end
+		local name, func = next(hooks,index)
+		if not name then return end
+		index = name
+		
+		self:prepare(hook,name)
+		
+		local results = {self:runWithOps(func,unpack(args))}
+		if not results[1] then
+			self:cleanup(hook,name,true,results[2])
+			self.error = true
+			return results
+		end
+		
+		self:cleanup(hook,name,false)
+		
+		return results
+	end
 end
 
 --- Runs a library hook. Alias to SF.Libraries.CallHook(hook, self, ...).
@@ -144,7 +210,7 @@ end
 -- @param func Function to run
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func,...)
-	self:prepare("_runFunction")
+	self:prepare("_runFunction",func)
 	
 	local ok, err = self:runWithOps(func,...)
 	if not ok then
@@ -153,7 +219,7 @@ function SF.Instance:runFunction(func,...)
 		return false, err
 	end
 	
-	self:cleanup("_runFunction",false)
+	self:cleanup("_runFunction",func,false)
 	
 	return true, err
 end

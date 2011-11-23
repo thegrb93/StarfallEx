@@ -83,7 +83,7 @@ function ENT:TriggerInput(key, value)
 end
 
 function ENT:ReadCell(address)
-	return tonumber(self:RunScriptHook("readcell",address)) or 0
+	return tonumber(self:RunScriptHookForResult("readcell",address)) or 0
 end
 
 function ENT:WriteCell(address, data)
@@ -93,6 +93,13 @@ end
 function ENT:RunScriptHook(hook, ...)
 	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
 		local ok, rt = self.instance:runScriptHook(hook, ...)
+		if not ok then self:Error(rt) end
+	end
+end
+
+function ENT:RunScriptHookForResult(hook,...)
+	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
+		local ok, rt = self.instance:runScriptHookForResult(hook, ...)
 		if not ok then self:Error(rt)
 		else return rt end
 	end
