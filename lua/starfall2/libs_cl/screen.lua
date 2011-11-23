@@ -411,7 +411,7 @@ function screen_library.screenPos( ply )
 	monitor = WireGPU_Monitors[ screen:GetModel() ]
 		
 	-- Monitor does not have a valid screen point
-	if (!monitor) then return {-1,-1} end
+	if (!monitor) then return nil end
 		
 	Ang = screen:LocalToWorldAngles( monitor.rot )
 	Pos = screen:LocalToWorld( monitor.offset )
