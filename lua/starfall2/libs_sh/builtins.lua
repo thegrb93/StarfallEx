@@ -3,14 +3,6 @@
 -- Functions built-in to the default environment
 -------------------------------------------------------------------------------
 
-local function createRefMtbl(target)
-	local tbl = {}
-	tbl.__index = function(self,k) if k:sub(1,2) ~= "__" then return target[k] end end
-	tbl.__newindex = function() end
-	SF.Typedef("Module", tbl)
-	return tbl
-end
-
 local dgetmeta = debug.getmetatable
 
 --- Built in values. These don't need to be loaded; they are in the default environment.
@@ -114,8 +106,9 @@ end
 -- as requested by Divran
 
 -- Filters Gmod Lua files based on Garry's naming convention.
-local function filterGmodLua(lib)
-	local original, gm = {}, {}
+local function filterGmodLua(lib, original, gm)
+	original = original or {}
+	gm = gm or {}
 	for name, func in pairs(lib) do
 		if name:match("^[A-Z]") then
 			gm[name] = func
@@ -127,29 +120,34 @@ local function filterGmodLua(lib)
 end
 
 -- String library
-local str_orig, _ = filterGmodLua(string)
+local string_methods, string_metatable = SF.Typedef("Library: string")
+filterGmodLua(string,string_methods)
+string_metatable.__newindex = function() end
 --- Lua's (not glua's) string library
 -- @name SF.DefaultEnvironment.string
 -- @class table
-SF.DefaultEnvironment.string = setmetatable({},createRefMtbl(str_orig))
+SF.DefaultEnvironment.string = setmetatable({},string_metatable)
 
 -- Math library
-local math_orig, _ = filterGmodLua(math)
-math_orig.clamp = math.Clamp
-math_orig.round = math.Round
-math_orig.randfloat = math.Rand
-math_orig.calcBSplineN = nil
-
+local math_methods, math_metatable = SF.Typedef("Library: math")
+filterGmodLua(math,math_methods)
+math_metatable.__newindex = function() end
+math_methods.clamp = math.Clamp
+math_methods.round = math.Round
+math_methods.randfloat = math.Rand
+math_methods.calcBSplineN = nil
 --- Lua's (not glua's) math library, plus clamp, round, and randfloat
 -- @name SF.DefaultEnvironment.math
 -- @class table
-SF.DefaultEnvironment.math = setmetatable({},createRefMtbl(math_orig))
+SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 
-local table_orig, _ = filterGmodLua(table)
+local table_methods, table_metatable = SF.Typedef("Library: table")
+filterGmodLua(string,table_methods)
+table_metatable.__newindex = function() end
 --- Lua's (not glua's) table library
 -- @name SF.DefaultEnvironment.table
 -- @class table
-SF.DefaultEnvironment.table = setmetatable({},createRefMtbl(table_orig))
+SF.DefaultEnvironment.table = setmetatable({},table_metatable)
 
 -- ------------------------- Functions ------------------------- --
 
