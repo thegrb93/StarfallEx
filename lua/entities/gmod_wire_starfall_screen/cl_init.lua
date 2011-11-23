@@ -23,10 +23,8 @@ end)
 usermessage.Hook( "starfall_screen_used", function ( data )
 	local screen = Entity( data:ReadShort() )
 	local activator = Entity( data:ReadShort() )
-	local x = data:ReadFloat()
-	local y = data:ReadFloat()
 	
-	screen:runScriptHook( "screen_use", SF.Entities.Wrap( activator ), x, y )
+	screen:runScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
 end)
 
 function ENT:Initialize()
