@@ -29,8 +29,7 @@ end
 
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
--- It counts in increments of 10. This does no setup work and shouldn't
--- be called by client code
+-- This does no setup work and shouldn't be called by client code
 -- @param func The function to run
 -- @param ... Arguments to func
 -- @return True if ok
@@ -39,10 +38,9 @@ function SF.Instance:runWithOps(func,...)
 	local maxops = self.context.ops
 	
 	local function ophook(event)
-		--if event ~= "line" then return end
-		self.ops = self.ops + 1
+		self.ops = self.ops + 500
 		if self.ops > maxops then
-			maxops = 0/0 -- Prevent the hook from being triggered again outside of the pcall
+			debug.sethook(nil)
 			error("Ops quota exceeded.",0)
 		end
 	end
@@ -50,10 +48,9 @@ function SF.Instance:runWithOps(func,...)
 	--local begin = SysTime()
 	--local beginops = self.ops
 	
-	debug.sethook(ophook,"",1)
+	debug.sethook(ophook,"",500)
 	local rt = {pcall(func, ...)}
-	--debug.sethook(infloop_detection_replacement,"",500000000) -- TODO: Fix this so that it doesn't break stuff. Is/was it the "l"?
-	debug.sethook(nil)
+	debug.sethook(infloop_detection_replacement,"",500000000)
 	
 	--MsgN("SF: Exectued "..(self.ops-beginops).." instructions in "..(SysTime()-begin).." seconds")
 	
@@ -65,7 +62,7 @@ end
 function SF.Instance:prepare(hook, name)
 	assert(self.initialized, "Instance not initialized!")
 	assert(not self.error, "Instance is errored!")
-	assert(not SF.instance)
+	assert(SF.instance == nil)
 	
 	self:runLibraryHook("prepare",hook, name)
 	SF.instance = self
@@ -75,7 +72,6 @@ end
 -- This is done automatically by Initialize and RunScriptHook.
 function SF.Instance:cleanup(hook, name, ok, errmsg)
 	assert(SF.instance == self)
-	
 	self:runLibraryHook("cleanup",hook, name, ok, errmsg)
 	SF.instance = nil
 end

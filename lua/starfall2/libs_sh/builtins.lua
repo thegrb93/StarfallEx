@@ -222,16 +222,16 @@ local vector_restrict, vector_unrestrict = createSafeIndexFunc(_R.Vector)
 local angle_restrict, angle_unrestrict = createSafeIndexFunc(_R.Angle)
 local matrix_restrict, matrix_unrestrict = createSafeIndexFunc(_R.VMatrix)
 
-local function restrict(instance, hook)
-	vector_restrict()
+local function restrict(instance, hook, name, ok, err)
+	--[[vector_restrict()
 	angle_restrict()
-	matrix_restrict()
+	matrix_restrict()]]
 end
 
-local function unrestrict(instance, hook)
-	vector_unrestrict()
+local function unrestrict(instance, hook, name, ok, err)
+	--[[vector_unrestrict()
 	angle_unrestrict()
-	matrix_unrestrict()
+	matrix_unrestrict()]]
 end
 
 SF.Libraries.AddHook("prepare", restrict)

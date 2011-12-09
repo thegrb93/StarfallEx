@@ -58,6 +58,9 @@ local outputConverters =
 	end
 }
 
+SF.Wire.InputConverters = inputConverters
+SF.Wire.OutputConverters = outputConverters
+
 --- Adds an input type
 -- @param name Input type name. Case insensitive.
 -- @param converter The function used to convert the wire data to SF data (eg, wrapping)
@@ -126,7 +129,7 @@ function wire_library.createOutputs(names, types)
 	WireLib.AdjustSpecialOutputs(ent,names,types)
 end
 
---- Returns the wirelink representing this entity. This is how you read inputs.
+--- Returns the wirelink representing this entity.
 function wire_library.self()
 	local ent = SF.instance.data.entity
 	if not ent then error("No entity",2) end
@@ -255,7 +258,6 @@ end
 
 function wire_ports_metamethods:__newindex(name,value)
 	SF.CheckType(name,"string")
-
 	local instance = SF.instance
 	local ent = instance.data.entity
 	if not ent then error("No entity",2) end
@@ -263,7 +265,7 @@ function wire_ports_metamethods:__newindex(name,value)
 	local output = ent.Outputs[name]
 	if not output then return end
 	
-	Wire_TriggerOutput(ent, name, outputSerializers[output.Type](value))
+	Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
 end
 
-wire_library.ports = setmetatable({},wire_ports_metatable)
+wire_library.ports = setmetatable({},wire_ports_metamethods)

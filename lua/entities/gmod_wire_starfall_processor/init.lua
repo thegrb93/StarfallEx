@@ -73,13 +73,7 @@ function ENT:OnRemove()
 end
 
 function ENT:TriggerInput(key, value)
-	if self.instance and not self.instance.error then
-		self.instance:runScriptHook("input",key,value)
-	end
-end
-
-function ENT:TriggerInput(key, value)
-
+	self:RunScriptHook("input",key, SF.Wire.InputConverters[self.Inputs[key].Type](value))
 end
 
 function ENT:ReadCell(address)
