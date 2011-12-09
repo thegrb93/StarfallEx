@@ -28,6 +28,7 @@ function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
+	self:SetUseType( 3 )
 	
 	self.Inputs = WireLib.CreateInputs(self, {})
 	self.Outputs = WireLib.CreateOutputs(self, {})
@@ -61,6 +62,16 @@ function ENT:Think()
 	end
 	
 	return true
+end
+
+-- Sends a umsgs to all clients about the use.
+function ENT:Use( activator )
+	if activator:IsPlayer() then
+		umsg.Start( "starfall_screen_used" )
+			umsg.Short( self:EntIndex() )
+			umsg.Short( activator:EntIndex() )
+		umsg.End( )
+	end
 end
 
 function ENT:OnRemove()
