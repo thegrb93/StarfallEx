@@ -99,7 +99,7 @@ function SF.Instance:initialize()
 	
 	SF.allInstances[self] = self
 	
-	self:cleanup("_intialize","_initialize",false)
+	self:cleanup("_initialize","_initialize",false)
 	return true
 end
 
