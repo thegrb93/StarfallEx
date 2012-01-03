@@ -165,7 +165,7 @@ wirelink_metatable.__newindex = function(self,k,v)
 	if type(k) == "number" then
 		SF.CheckType(v,"number")
 		if not wl.WriteCell then return end
-		
+		else wl:WriteCell(k,v) end
 	else
 		local input = wl.Inputs[k]
 		if not input or not outputConverters[input.Type] then return end

@@ -57,7 +57,7 @@ function SF.Libraries.CreateLocalTbl(arr)
 end
 
 --- Registers a library hook. These hooks are only available to SF libraries,
--- and are called by Libraries.RunHook.
+-- and are called by Libraries.CallHook.
 -- @param hookname The name of the hook.
 -- @param func The function to call
 function SF.Libraries.AddHook(hookname, func)
