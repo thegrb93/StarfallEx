@@ -19,9 +19,10 @@ function ents_lib.owner()
 	return wrap(SF.instance.player)
 end
 
+local localplayer = wrap(LocalPlayer())
 --- Returns the local player
 function ents_lib.player()
-	return wrap(LocalPlayer())
+	return localplayer
 end
 
 -- TODO: Write special clientside functions

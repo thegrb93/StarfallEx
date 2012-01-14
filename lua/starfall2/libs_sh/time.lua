@@ -8,7 +8,7 @@ local time_library, _ = SF.Libraries.Register("time",time_library)
 -- ------------------------- Time ------------------------- --
 
 --- Same as GLua's CurTime()
-function time_library.currTime()
+function time_library.curTime()
 	return CurTime()
 end
 
@@ -38,25 +38,21 @@ end
 
 --- Creates a timer
 -- @param name The timer name
--- @param func The function to call when the tiemr is fired
 -- @param delay The time, in seconds, to set the timer to.
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
-function time_library.timer(name, func, delay, reps)
+-- @param func The function to call when the tiemr is fired
+-- @param ... Arguments to func
+function time_library.timer(name, delay, reps, func, ...)
 	SF.CheckType(name,"string")
-	SF.CheckType(func,"function")
 	SF.CheckType(delay,"number")
 	reps = SF.CheckType(reps,"number",0,1)
+	SF.CheckType(func,"function")
 	
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	if timer.IsTimer(timername) then
-		timer.Adjust(timername, delay, reps)
-	else
-		timer.Create(timername, delay, reps, timercb, instance, name, timername, func)
-		timer.Start(timername)
-		instance.data.timers[name] = true
-	end
+	timer.Create(timername, delay, reps, timercb, instance, name, timername, func)
+	instance.data.timers[name] = true
 end
 
 --- Removes a timer

@@ -366,6 +366,7 @@ end
 --- Draws a polygon (mesh). Takes a compiled/uncompiled mesh to draw.
 -- Note that if you do use an uncompiled mesh, you will use up ops
 -- very quickly!
+-- TODO: Fix this
 -- @param Compiled mesh or array of vertexes
 function screen_library.drawPoly(mesh)
 	if dgetmeta(mesh) ~= mesh_metamethods then
@@ -384,24 +385,9 @@ function screen_library.drawPoly(mesh)
 	cam.PopModelMatrix()
 end
 
--- Use handling
--- Copied from GPULib
-local function ScaleCursor( this, x, y )
-	if (this.Scaling) then			
-		local xMin = this.xScale[1]
-		local xMax = this.xScale[2]
-		local yMin = this.yScale[1]
-		local yMax = this.yScale[2]
-		
-		x = (x * (xMax-xMin)) / 512 + xMin
-		y = (y * (yMax-yMin)) / 512 + yMin
-	end
-	
-	return x, y
-end
-
--- Copied from GPULib
+--- Gets a 2D cursor position where ply is aiming.
 function screen_library.screenPos( ply )
+	-- Taken from EGPLib
 	local Normal, Pos, monitor, Ang
 	local screen = SF.instance.data.entity
 	
@@ -411,7 +397,7 @@ function screen_library.screenPos( ply )
 	monitor = WireGPU_Monitors[ screen:GetModel() ]
 		
 	-- Monitor does not have a valid screen point
-	if (!monitor) then return nil end
+	if not monitor then return nil end
 		
 	Ang = screen:LocalToWorldAngles( monitor.rot )
 	Pos = screen:LocalToWorld( monitor.offset )
@@ -424,15 +410,14 @@ function screen_library.screenPos( ply )
 	local A = Normal:Dot(Dir)
 	
 	-- If ray is parallel or behind the screen
-	if (A == 0 or A > 0) then return nil end
+	if A == 0 or A > 0 then return nil end
 	
 	local B = Normal:Dot(Pos-Start) / A
 		if (B >= 0) then
 		local HitPos = WorldToLocal( Start + Dir * B, Angle(), Pos, Ang )
 		local x = (0.5+HitPos.x/(monitor.RS*512/monitor.RatioX)) * 512
 		local y = (0.5-HitPos.y/(monitor.RS*512)) * 512	
-		if (x < 0 or x > 512 or y < 0 or y > 512) then return nil end -- Aiming off the screen 
-		x, y = ScaleCursor( screen, x, y )
+		if x < 0 or x > 512 or y < 0 or y > 512 then return nil end -- Aiming off the screen 
 		return x, y
 	end
 	
