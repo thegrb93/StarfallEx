@@ -35,10 +35,10 @@ end
 -- @param path Filepath relative to data/StarfallScriptData/. Cannot contain '..'
 -- @return True if OK, nil if error
 -- @return Error message if applicable
-function files_library.write(path)
+function files_library.write(path, data)
 	if path:find("..",1,true) then return nil, "path contains '..'" end
 	if not SF.instance.permissions:checkPermission("Access Files") then return nil, "access denied" end
-	file.Write("StarfallScriptData/"..path)
+	file.Write("StarfallScriptData/"..path, data)
 	return true
 end
 
