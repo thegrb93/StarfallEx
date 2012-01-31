@@ -3,7 +3,7 @@ local timer = timer
 
 --- Deals with time and timers.
 -- @shared
-local time_library, _ = SF.Libraries.Register("time",time_library)
+local time_library, _ = SF.Libraries.Register("time")
 
 -- ------------------------- Time ------------------------- --
 
@@ -28,7 +28,7 @@ local function timercb(instance, tname, realname, func)
 	if not instance.error then
 		instance:runFunction(func)
 	else
-		timer.Destroy(realname)
+		timerx.Destroy(realname)
 	end
 end
 
@@ -51,7 +51,7 @@ function time_library.timer(name, delay, reps, func, ...)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	timer.Create(timername, delay, reps, timercb, instance, name, timername, func)
+	timerx.Create(timername, delay, reps, timercb, instance, name, timername, func)
 	instance.data.timers[name] = true
 end
 
@@ -62,7 +62,7 @@ function time_library.destroyTimer(name)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	if timer.IsTimer(timername) then timer.Destroy(timername) end
+	if timerx.IsTimer(timername) then timerx.Destroy(timername) end
 	instance.data.timers[name] = nil
 end
 
@@ -74,7 +74,7 @@ local function deinit(instance)
 	if instance.data.timers ~= nil then
 		for name,_ in pairs(instance.data.timers) do
 			local realname = mangle_timer_name(instance,name)
-			timer.Destroy(realname)
+			timerx.Destroy(realname)
 		end
 	end
 	instance.data.timers = nil

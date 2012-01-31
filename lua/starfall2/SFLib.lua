@@ -84,7 +84,7 @@ function SF.CheckType(val, typ, level, default)
 		
 		local typname
 		if type(typ) == "table" then
-			assert(typ.__metatable and type(typ.__metatabl) == "string")
+			assert(typ.__metatable and type(typ.__metatable) == "string")
 			typname = typ.__metatable
 		else
 			typname = typ

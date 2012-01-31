@@ -7,7 +7,7 @@ local ents_methods, ents_metamethods = SF.Typedef("Entity")
 local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true)
 --- Entities Library
 -- @shared
-local ents_lib, _ = SF.Libraries.Register("ents",ents_lib)
+local ents_lib, _ = SF.Libraries.Register("ents")
 
 -- ------------------------- Internal functions ------------------------- --
 

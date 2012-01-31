@@ -1,6 +1,6 @@
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library, _ = SF.Libraries.Register("wire",wire_library)
+local wire_library, _ = SF.Libraries.Register("wire")
 
 SF.Wire = {}
 SF.Wire.Library = wire_library

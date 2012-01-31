@@ -2,7 +2,7 @@
 local umsg = umsg
 
 --- Usermessages library. Used for sending data from the server to the client.
-local umsg_library, _ = SF.Libraries.Register("umsg",umsg_library)
+local umsg_library, _ = SF.Libraries.Register("umsg")
 
 if SERVER then
 	-- -------------------------------------------------------------- --

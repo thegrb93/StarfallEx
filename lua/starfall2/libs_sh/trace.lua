@@ -95,7 +95,7 @@ end
 -- @field CONTENTS_TRANSLUCENT
 -- @field CONTENTS_LADDER
 -- @field CONTENTS_HITBOX
-local trace_library, _ = SF.Libraries.Register("trace",trace_library)
+local trace_library, _ = SF.Libraries.Register("trace")
 
 -- Material Enumeration
 trace_library.MAT_ANTLION = MAT_ANTLION

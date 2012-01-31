@@ -104,13 +104,13 @@ local function check_library(line)
 	line = util.trim(line)
 
 	-- Global library
-	local name, tblref = line:match("^SF%.Libraries%.Register%(\"([^\"]+)\",([%w_]+)%)$")
+	local name, tblref = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(\"([^\"]+)\".-%)$")
 	if name then
 		return name, tblref
 	end
 
 	-- Local library
-	local name, tblref = line:match("^SF%.Libraries%.RegisterLocal%(%s*\"([^\"]+)\"%s*,([%w_]+)%s*%)$")
+	local name, tblref = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.RegisterLocal%(\"([^\"]+)\".-%)$")
 	return name, tblref
 end
 
@@ -245,6 +245,8 @@ local function parse_comment (block, first_line, libs)
 		assert(block.name, "Unnamed library")
 		assert(block.libtbl, "No library table for "..block.name)
 		libs[block.libtbl] = block
+		block.field = block.fields or {}
+		block.functions = block.functions or {}
 	elseif block.class == "function" then
 		local libtbl, fname = block.name:match("(.*)[%.:]([^%.:]+)$")
 		
