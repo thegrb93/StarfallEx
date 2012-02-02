@@ -2,9 +2,9 @@ include('shared.lua')
 
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 
-include("starfall2/SFLib.lua")
+include("starfall/SFLib.lua")
 include("libtransfer/libtransfer.lua")
-
+assert(SF, "Starfall didn't load correctly!")
 
 local context = SF.CreateContext(nil, nil, nil, nil, SF.Libraries.CreateLocalTbl{"screen"})
 datastream.Hook("sf_screen_download",function(handler, id, encoded, decoded)
