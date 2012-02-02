@@ -164,7 +164,7 @@ wirelink_metatable.__newindex = function(self,k,v)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if type(k) == "number" then
 		SF.CheckType(v,"number")
-		if not wl.WriteCell then return end
+		if not wl.WriteCell then return
 		else wl:WriteCell(k,v) end
 	else
 		local input = wl.Inputs[k]
