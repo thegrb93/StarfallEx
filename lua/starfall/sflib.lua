@@ -4,22 +4,22 @@ SF = {}
 
 -- Send files to client
 if SERVER then
-	AddCSLuaFile("SFLib.lua")
-	AddCSLuaFile("Compiler.lua")
-	AddCSLuaFile("Instance.lua")
-	AddCSLuaFile("Libraries.lua")
-	AddCSLuaFile("Preprocess.lua")
-	AddCSLuaFile("Permissions.lua")
-	AddCSLuaFile("Editor.lua")
+	AddCSLuaFile("sflib.lua")
+	AddCSLuaFile("compiler.lua")
+	AddCSLuaFile("instance.lua")
+	AddCSLuaFile("libraries.lua")
+	AddCSLuaFile("preprocess.lua")
+	AddCSLuaFile("permissions.lua")
+	AddCSLuaFile("editor.lua")
 end
 
 -- Load files
-include("Compiler.lua")
-include("Instance.lua")
-include("Libraries.lua")
-include("Preprocessor.lua")
-include("Permissions.lua")
-include("Editor.lua")
+include("compiler.lua")
+include("instance.lua")
+include("libraries.lua")
+include("preprocessor.lua")
+include("permissions.lua")
+include("editor.lua")
 
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of Lua instructions to allow Starfall scripts to execute")

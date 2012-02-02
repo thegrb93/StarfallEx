@@ -3,7 +3,7 @@ AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 
-include("starfall2/SFLib.lua")
+include("starfall/SFLib.lua")
 include("libtransfer/libtransfer.lua")
 assert(SF, "Starfall didn't load correctly!")
 
