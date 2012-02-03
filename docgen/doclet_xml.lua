@@ -173,6 +173,7 @@ local function document_file(fdoc)
 	end
 	
 	local levels = count_dir_levels(fdoc.name)+1
+	fxml:append("docroot")[1] = string.rep("../",levels)
 	writexml(docpath, fxml, string.rep("../",levels).."page.xsl")
 end
 

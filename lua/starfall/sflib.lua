@@ -26,11 +26,24 @@ SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR
 
 local dgetmeta = debug.getmetatable
 
---- The default environment
-SF.DefaultEnvironment = {}
-local DefaultEnvironment = SF.DefaultEnvironment
-DefaultEnvironment.__index = DefaultEnvironment
-DefaultEnvironment.__metatable = "Environment"
+--- Creates a type that is safe for SF scripts to use. Instances of the type
+-- cannot access the type's metatable or metamethods.
+-- @return The table to store normal methods
+-- @return The table to store metamethods
+function SF.Typedef(name)
+	local methods, metamethods = {}, {}
+	metamethods.__metatable = name
+	metamethods.__index = methods
+	return methods, metamethods
+end
+
+do
+	local env, metatable = SF.Typedef("Environment")
+	--- The default environment metatable
+	SF.DefaultEnvironmentMT = metatable
+	--- The default environment contents
+	SF.DefaultEnvironment = env
+end
 
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
@@ -43,26 +56,15 @@ function SF.RunScriptHook(hook,...)
 	end
 end
 
---- Creates a type that is safe for SF scripts to use. Instances of the type
--- cannot access the type's metatable or metamethods.
--- @return The table to store normal methods
--- @return The table to store metamethods
-function SF.Typedef(name)
-	local methods, metamethods = {}, {}
-	metamethods.__metatable = name
-	metamethods.__index = methods
-	return methods, metamethods
-end
-
 --- Creates a new context. A context is used to define what scripts will have access to.
--- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironment
+-- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
 -- @param permissions The permissions manager to use. Default is SF.DefaultPermissions
 -- @param ops Operations quota. Default is specified by the convar "sf_defaultquota"
 -- @param libs Additional (local) libraries for the script to access. Default is an empty table.
 function SF.CreateContext(env, directives, permissions, ops, libs)
 	local context = {}
-	context.env = env or DefaultEnvironment
+	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
 	context.permissions = permissions or SF.Permissions
 	context.ops = ops or SF.defaultquota:GetInt()

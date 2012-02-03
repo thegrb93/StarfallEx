@@ -51,7 +51,7 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 		end
 		
 		if code[path] == "" then
-			-- Passing an empty string to CompileString gives wierd results...
+			-- Passing an empty string to CompileString returns an error because Lua does not have empty statements (at least in 5.1)
 			error(path..": No code.",0)
 		end
 		

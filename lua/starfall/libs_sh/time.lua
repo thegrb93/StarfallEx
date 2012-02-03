@@ -28,7 +28,7 @@ local function timercb(instance, tname, realname, func)
 	if not instance.error then
 		instance:runFunction(func)
 	else
-		timerx.Destroy(realname)
+		timerx.Remove(realname)
 	end
 end
 
@@ -62,7 +62,7 @@ function time_library.destroyTimer(name)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	if timerx.IsTimer(timername) then timerx.Destroy(timername) end
+	if timerx.IsTimer(timername) then timerx.Remove(timername) end
 	instance.data.timers[name] = nil
 end
 
@@ -74,7 +74,7 @@ local function deinit(instance)
 	if instance.data.timers ~= nil then
 		for name,_ in pairs(instance.data.timers) do
 			local realname = mangle_timer_name(instance,name)
-			timerx.Destroy(realname)
+			timerx.Remove(realname)
 		end
 	end
 	instance.data.timers = nil

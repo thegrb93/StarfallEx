@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:template name="sidebar-index">
+	<xsl:param name="docroot" />
 	<div id="sidebar-index">
 		<h2 id="sidebar-index-header-files">Files</h2>
 		<table id="sidebar-index-table-files">
@@ -11,8 +12,18 @@
 			</tr>
 			<xsl:for-each select="index/files/file">
 				<tr>
-					<td><xsl:value-of select="name"/></td>
-					<td><xsl:value-of select="path"/></td>
+					<td>
+						<a>
+							<xsl:attribute name="href">
+								<xsl:value-of select="concat(docroot,path)"/>
+							</xsl:attribute>
+							<xsl:value-of select="name"/>
+						</a>
+						
+					</td>
+					<td>
+						<xsl:value-of select="path"/>
+					</td>
 				</tr>
 			</xsl:for-each>
 		</table>
