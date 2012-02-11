@@ -15,6 +15,12 @@ local print = print
 
 module 'taglet_sf'
 
+-- LuaDoc doesn't like ../ in pathnames when specifying where to look for lua files.
+-- This trims out the '../lua/starfall/" that will pretty much always be there.
+local function fix_filepath(fname)
+	return fname:match("^..[/\\]lua[/\\]starfall[/\\]?(.*)$") or fname
+end
+
 local function printTable(tbl, tabs, printed)
 	tabs = tabs or 0
 	printed = printed or {}
@@ -343,6 +349,7 @@ function parse_file (filepath, doc)
 	end
 	f:close()
 	-- store blocks in file hierarchy
+	local filepath = fix_filepath(filepath)
 	assert(doc.files[filepath] == nil, string.format("doc for file `%s' already defined", filepath))
 	table.insert(doc.files, filepath)
 	doc.files[filepath] = {
