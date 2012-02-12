@@ -8,28 +8,6 @@ local package = package
 local string = require"string"
 local table = require"table"
 
-local function writeTable(tbl, out, tabs, printed)
-	tabs = tabs or 0
-	printed = printed or {}
-	local indention = string.rep("\t",tabs)
-	for k,v in pairs(tbl) do
-		if type(v) == "table" then
-			if not printed[v] then
-				out:write(indention,tostring(k),"\n")
-				out:write(indention,"{\n")
-				printed[v] = k
-				writeTable(v,out,tabs+1,printed)
-				printed[v] = nil
-				out:write(indention,"}\n")
-			else
-				out:write(indentation,tostring(k),"\t=\t[table:",printed[v],"]\n")
-			end
-		else
-			out:write(indention,tostring(k),"\t=\t",tostring(v),"\n")
-		end
-	end
-end
-
 module "docletsfhtml"
 
 -------------------------------------------------------------------------------
@@ -226,12 +204,6 @@ end
 -- @param doc Table with the structured documentation.
 
 function start (doc)
-	-- DEBUG
-	local docout = assert(lfs.open(options.output_dir.."/doc.txt","w"))
-	writeTable(doc,docout)
-	docout:close()
-	docout = nil
-
 	-- Generate index file
 	if (#doc.files > 0 or #doc.libraries > 0) and (not options.noindexpage) then
 		local filename = options.output_dir.."index.html"

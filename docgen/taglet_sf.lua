@@ -110,8 +110,8 @@ local function check_library(line)
 	line = util.trim(line)
 
 	-- Global library
-	local name, tblref = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(\"([^\"]+)\".-%)$")
-	if name then
+	local tblref, name = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(\"([^\"]+)\".-%)$")
+	if tblref then
 		return name, tblref
 	end
 
