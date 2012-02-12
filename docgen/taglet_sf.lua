@@ -21,30 +21,6 @@ local function fix_filepath(fname)
 	return fname:match("^..[/\\]lua[/\\]starfall[/\\]?(.*)$") or fname
 end
 
-local function printTable(tbl, tabs, printed)
-	tabs = tabs or 0
-	printed = printed or {}
-	local indention = string.rep("\t",tabs)
-	for k,v in pairs(tbl) do
-		local dont_print = false
-		if type(v) == "table" then
-			if not printed[v] then
-				print(indention..tostring(k))
-				print(indention.."{")
-				printed[v] = k
-				printTable(v,tabs+1,printed)
-				printed[v] = nil
-				print(indention.."}")
-			else
-				print(indentation..tostring(k),"=","[table:"..printed[v].."]")
-			end
-		else
-			print(indention..tostring(k),"=",v)
-		end
-	end
-end
-
-
 -------------------------------------------------------------------------------
 -- Creates an iterator for an array base on a class type.
 -- @param t array to iterate over
@@ -116,7 +92,7 @@ local function check_library(line)
 	end
 
 	-- Local library
-	local name, tblref = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.RegisterLocal%(\"([^\"]+)\".-%)$")
+	local tblref, name = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.RegisterLocal%(\"([^\"]+)\".-%)$")
 	return name, tblref
 end
 
