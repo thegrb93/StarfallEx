@@ -25,7 +25,7 @@
 
 <div id="content">
 
-<h1>Module <code><?lua=module_doc.name?></code></h1>
+<h1>Library <code><?lua=module_doc.name?></code></h1>
 
 <p><?lua=module_doc.description?></p>
 <?lua if module_doc.copyright then?>
@@ -52,7 +52,7 @@
 <?lua for _, func_name in ipairs(module_doc.functions) do
   local func_data = module_doc.functions[func_name]?>
 	<tr>
-	<td class="name" nowrap><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(module_doc.functions[func_name].param, ", ")?>)</td>
+	<td class="name" nowrap><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_data.name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(module_doc.functions[func_name].param, ", ")?>)</td>
 	<td class="summary"><?lua=module_doc.functions[func_name].summary?></td>
 	</tr>
 <?lua end?>

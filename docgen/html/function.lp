@@ -1,6 +1,6 @@
 <?lua 
 if module_doc then
-	from = "modules/"..module_doc.name
+	from = "libraries/"..module_doc.name
 elseif file_doc then
 	from = "files/.."..file_doc.name
 else
