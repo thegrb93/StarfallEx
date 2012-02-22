@@ -365,9 +365,9 @@ end
 
 --- Draws a polygon (mesh). Takes a compiled/uncompiled mesh to draw.
 -- Note that if you do use an uncompiled mesh, you will use up ops
--- very quickly!
+-- very quickly! (Doesn't seem to work at the moment)
 -- TODO: Fix this
--- @param Compiled mesh or array of vertexes
+-- @param mesh Compiled mesh or array of vertexes
 function screen_library.drawPoly(mesh)
 	if dgetmeta(mesh) ~= mesh_metamethods then
 		print("DEBUG: Compiling mesh at runtime!")

@@ -1,6 +1,5 @@
--------------------------------------------------------------------------------
--- @release $Id: standard.lua,v 1.39 2007/12/21 17:50:48 tomas Exp $
--------------------------------------------------------------------------------
+
+--- Taglet for SF, mostly copied from LuaDoc's standard taglet.
 
 local assert, pairs, tostring, type = assert, pairs, tostring, type
 local io = require "io"

@@ -1,7 +1,5 @@
--------------------------------------------------------------------------------
--- Handlers for several tags
--- @release $Id: tags.lua,v 1.8 2007/09/05 12:39:09 tomas Exp $
--------------------------------------------------------------------------------
+
+--- Taglet Tags for Starfall, mostly copied from LuaDocs.
 
 local luadoc = require "luadoc"
 local util = require "luadoc.util"
