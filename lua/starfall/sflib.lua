@@ -8,7 +8,7 @@ if SERVER then
 	AddCSLuaFile("compiler.lua")
 	AddCSLuaFile("instance.lua")
 	AddCSLuaFile("libraries.lua")
-	AddCSLuaFile("preprocess.lua")
+	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions.lua")
 	AddCSLuaFile("editor.lua")
 end
