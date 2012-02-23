@@ -142,7 +142,7 @@ math_methods.calcBSplineN = nil
 SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 
 local table_methods, table_metatable = SF.Typedef("Library: table")
-filterGmodLua(string,table_methods)
+filterGmodLua(table,table_methods)
 table_metatable.__newindex = function() end
 --- Lua's (not glua's) table library
 -- @name SF.DefaultEnvironment.table
