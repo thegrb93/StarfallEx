@@ -71,6 +71,7 @@ else
 		if ok then
 			buildlist.entid = ent:EntIndex()
 			LibTransfer.QueueTask("starfall_upload",buildlist)
+			uploading = true;
 		else
 			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
 		end
@@ -142,6 +143,14 @@ if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_starfall_processor_name", Description = "#Tool_wire_starfall_processor_desc" })
 		
+		local modelPanel = WireDermaExts.ModelSelect(panel, "wire_starfall_processor_Model", list.Get("Wire_gate_Models"), 2)
+		panel:AddControl("Label", {Text = ""})
+		
+		local docButton = vgui.Create("DButton" , panel)
+		panel:AddPanel(docButton)
+		docButton:SetText("Starfall LuaDoc")
+		docButton.DoClick = function(button) gui.OpenURL("http://colonelthirtytwo.net/sfdoc/") end
+		
 		local filebrowser = vgui.Create("wire_expression2_browser")
 		panel:AddPanel(filebrowser)
 		filebrowser:Setup("Starfall")
@@ -157,5 +166,48 @@ if CLIENT then
 				SF.Editor.editor:LoadFile(dir)
 			end
 		end
+		
+		local openEditor = vgui.Create("DButton", panel)
+		panel:AddPanel(openEditor)
+		openEditor:SetText("Open Editor")
+		openEditor.DoClick = SF.Editor.open
+	end
+	
+	-- ------------------------------- Tool screen ------------------------------- --
+	surface.CreateFont("Lucida Console", 25, 1000, true, false, "SFToolScreenFont")
+	local function drawText(text, y, color) draw.DrawText(text, "SFToolScreenFont", 5, 32*y, color,0) end
+	
+	local uploadingCursor = 0;
+	local uploadingPercent = 0;
+	
+	function TOOL:RenderToolScreen()
+		if uploading then
+			if not uploadData then
+				uploadData = LibTransfer.queue_c2s[#(LibTransfer.queue_c2s)] or {};
+				uploadData.dataSize = string.len(uploadData[2])
+				
+				if uploadData[1] != "starfall_upload" then uploadData = nil end
+			end
+			
+			if uploadData then
+				uploadingCursor = uploadData[5]
+				uploadingPercent = math.Clamp((uploadingCursor / uploadData.dataSize) * 100, 0, 100)
+					
+				if uploadingCursor >= uploadData.dataSize then
+					uploading = nil; uploadData = nil;
+				end
+			end
+		end
+		
+		cam.Start2D()
+			surface.SetDrawColor(0, 0, 0, 255)
+			surface.DrawRect(0, 0, 256, 256)
+	
+			drawText("SF Flasher", 1, Color(224, 244, 244, 255))
+			
+			drawText(string.format("Sent: %.2f KB", uploadingCursor / 1024), 3, Color(224, 244, 244, 255))
+			drawText(string.format("Progress: %.0f %%", uploadingPercent), 4, Color(244, 244, 244, 255))
+			if uploading then drawText("UPLOADING", 6, Color(0, 128, 0, 255)) end
+		cam.End2D()
 	end
 end
