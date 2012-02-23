@@ -121,6 +121,6 @@ SF.Preprocessor.SetGlobalDirective("include",directive_include)
 
 local function directive_name(args, filename, data)
 	if not data.scriptnames then data.scriptnames = {} end
-	data.scriptnames[filename] = data
+	data.scriptnames[filename] = args
 end
 SF.Preprocessor.SetGlobalDirective("name",directive_name)
