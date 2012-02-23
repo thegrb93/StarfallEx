@@ -186,7 +186,7 @@ if CLIENT then
 				uploadData = LibTransfer.queue_c2s[#(LibTransfer.queue_c2s)] or {};
 				uploadData.dataSize = string.len(uploadData[2])
 				
-				if uploadData[1] != "starfall_upload" then uploadData = nil end
+				if uploadData[1] ~= "starfall_upload" then uploadData = nil end
 			end
 			
 			if uploadData then

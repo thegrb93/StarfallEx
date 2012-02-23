@@ -22,13 +22,13 @@ hook("input", "inputTrigger", function(InputName, InputValue)
     if InputName == "A" then
         A = InputValue
         
-    elseif InputName == "Increment" and InputValue != 0 then
+    elseif InputName == "Increment" and InputValue ~= 0 then
         Value = Value+A
         
-    elseif InputName == "Decrement" and InputValue != 0 then
+    elseif InputName == "Decrement" and InputValue ~= 0 then
         Value = Value-A
     
-    elseif InputName == "Reset" and InputValue != 0 then
+    elseif InputName == "Reset" and InputValue ~= 0 then
         Value = 0
     end
     

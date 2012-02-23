@@ -23,7 +23,7 @@ function ENT:Initialize()
 end
 
 function ENT:UpdateName(state)
-	if state != "" then state = "\n"..state end
+	if state ~= "" then state = "\n"..state end
 	
 	if self.instance and self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
 		self:SetOverlayText("Starfall Processor\n"..tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])..state)

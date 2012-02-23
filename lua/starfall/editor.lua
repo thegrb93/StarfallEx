@@ -176,7 +176,7 @@ if CLIENT then
 					
 					if table.HasValue(keywords, sstr) then
 						tokenname = "keyword"
-					elseif SF.DefaultEnvironment[sstr] != nil then
+					elseif SF.DefaultEnvironment[sstr] ~= nil then
 						tokenname = "globals"
 					else
 						tokenname = "expression"
@@ -187,7 +187,7 @@ if CLIENT then
 					self.stringDelimiter = self.character
 					self:NextCharacter()
 					
-					while self.character and self.character != self.stringDelimiter do
+					while self.character and self.character ~= self.stringDelimiter do
 						if self.character == "\\" then self:NextCharacter() end
 						self:NextCharacter()
 					end
