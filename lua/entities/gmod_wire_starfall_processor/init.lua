@@ -17,9 +17,19 @@ function ENT:Initialize()
 	self.Inputs = WireLib.CreateInputs(self, {})
 	self.Outputs = WireLib.CreateOutputs(self, {})
 	
-	self:SetOverlayText("Starfall Processor\nInactive (No code)")
+	self:UpdateName("Inactive (No code)")
 	local r,g,b,a = self:GetColor()
 	self:SetColor(255, 0, 0, a)
+end
+
+function ENT:UpdateName(state)
+	if state != "" then state = "\n"..state end
+	
+	if self.instance and self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
+		self:SetOverlayText("Starfall Processor\n"..tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])..state)
+	else
+		self:SetOverlayText("Starfall Processor"..state)
+	end
 end
 
 function ENT:OnRestore()
@@ -36,17 +46,24 @@ function ENT:Compile(codetbl, mainfile)
 		self:Error(msg)
 		return
 	end
-	self:SetOverlayText("Starfall Processor\nActive")
+	
+	self:UpdateName("")
+	local r,g,b,a = self:GetColor()
+	self:SetColor(255, 255, 255, a)
 end
 
 function ENT:Error(msg, override)
 	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
 	WireLib.ClientError(msg, self.owner)
+	
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
 	end
-	self:SetOverlayText("Starfall Processor\nInactive (Error)")
+	
+	self:UpdateName("Inactive (Error)")
+	local r,g,b,a = self:GetColor()
+	self:SetColor(255, 0, 0, a)
 end
 
 function ENT:CodeSent(ply, task)
@@ -97,6 +114,12 @@ function ENT:RunScriptHookForResult(hook,...)
 		if not ok then self:Error(rt)
 		else return rt end
 	end
+end
+
+function ENT:BuildDupeInfo()
+	-- TODO Fix duplication doesnt work
+	--local info = self.BaseClass.BuildDupeInfo(self) or {}
+	return {}
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)
