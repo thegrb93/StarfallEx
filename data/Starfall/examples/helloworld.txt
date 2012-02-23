@@ -1,0 +1,5 @@
+--@name Hello world
+
+-- Prints "Hello, world!" and tests math library
+print("Hello, world!")
+print("PI is: "..tostring(math.pi))
