@@ -28,6 +28,7 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 	instance.ops = 0
 	instance.hooks = {}
 	instance.scripts = {}
+	instance.source = code
 	instance.initialized = false
 	instance.context = context
 	instance.mainfile = mainfile
