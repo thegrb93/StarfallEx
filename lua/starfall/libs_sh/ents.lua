@@ -36,7 +36,7 @@ function SF.Entities.GetPhysObject(ent)
 --	if entity:GetMoveType() ~= MOVETYPE_VPHYSICS then return nil end
 --	return entity:GetPhysicsObject()
 end
-local getPhysObj = SF.Entities.GetPhysObject
+local getPhysObject = SF.Entities.GetPhysObject
 
 -- ------------------------- Library functions ------------------------- --
 
