@@ -42,28 +42,39 @@ local function FindComments( line )
 					pos = found + 1
 				end
 			elseif char == "[" then
-				if line:sub(found,found+1) == "[[" then
+				local level = line:sub(found+1):match("^(=*)")
+				if level then level = string.len(level) else level = 0 end
+				
+				if line:sub(found+level+1, found+level+1) == "[" then
 					-- Block string start
 					count = count + 1
-					ret[count] = {type = "stringblock", pos = found}
-					pos = found + 2
+					ret[count] = {type = "stringblock", pos = found, level = level}
+					pos = found + level + 2
 				else
 					pos = found + 1
 				end
 			elseif char == "]" then
-				if line:sub(found,found+1) == "]]" then
+				local level = line:sub(found+1):match("^(=*)")
+				if level then level = string.len(level) else level = 0 end
+				
+				if line:sub(found+level+1,found+level+1) == "]" then
 					-- Ending
 					count = count + 1
-					ret[count] = {type = "end", pos = found}
-					pos = found + 2
+					ret[count] = {type = "end", pos = found, level = level}
+					pos = found + level + 2
 				else
 					pos = found + 1
 				end
-			elseif char == "\"" and line:sub(found-1,found-1) ~= "\\" then
-				-- String
-				count = count + 1
-				ret[count] = {type = "string", pos = found}
-				pos = found + 1
+			elseif char == "\"" then
+				if line:sub(found-1,found-1) == "\\" and line:sub(found-2,found-1) ~= "\\\\" then
+					-- Escaped character
+					pos = found+1
+				else
+					-- String
+					count = count + 1
+					ret[count] = {type = "string", pos = found}
+					pos = found + 1
+				end
 			end
 			
 			if oldpos == pos then error("Regex found something, but nothing handled it") end
@@ -80,6 +91,7 @@ end
 -- @param data The data table passed to the directives.
 function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 	local ending = nil
+	local endingLevel = nil
 	
 	local str = source
 	while str ~= "" do
@@ -88,7 +100,14 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 		
 		for _,comment in ipairs(FindComments(line)) do
 			if ending then
-				if comment.type == ending then
+				if comment.type ~= ending then continue end
+				
+				if endingLevel then
+					if comment.level and comment.level == endingLevel then
+						ending = nil
+						endingLevel = nil
+						end
+				else
 					ending = nil
 				end
 			elseif comment.type == "start" then
@@ -97,6 +116,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 				ending = "string"
 			elseif comment.type == "stringblock" then
 				ending = "end"
+				endingLevel = comment.level
 			elseif comment.type == "line" then
 				local directive, args = string.match(line,"--@([^ ]+)%s*(.*)$")
 				local func = directives[directive] or SF.Preprocessor.directives[directive]
