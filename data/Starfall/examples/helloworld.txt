@@ -1,5 +1,39 @@
 --@name Hello world
+-- Converted example from Expression2, does the same
 
--- Prints "Hello, world!" and tests math library
-print("Hello, world!")
-print("PI is: "..tostring(math.pi))
+-- Load libraries
+local wire = loadLibrary("wire")
+
+-- Create inputs/outputs
+wire.createInputs(
+    {"A", "B"}, 
+    {"normal", "normal"}
+)
+
+wire.createOutputs(
+    {"Add", "Sub", "Mul", "Div", "GreaterThan", "Highest", "Lowest", "Vec"},
+    {"normal", "normal", "normal", "normal", "normal", "normal", "normal", "vector"}
+)
+
+-- Trigger
+local A = wire.ports.A
+local B = wire.ports.B
+hook("input", "inputTrigger", function(InputName, InputValue)
+    if InputName == "A" then A = InputValue end
+    if InputName == "B" then B = InputValue end
+    if not A or not B then return end
+    
+    print("Calc")
+    wire.ports.Add = A + B
+    wire.ports.Sub = A - B
+    wire.ports.Mul = A * B
+    wire.ports.Div = A / B
+    
+    wire.ports.Highest = math.max(A, B)
+    wire.ports.Lowest = math.min(A, B)
+    
+    local vec = Vector(A, B, 0)
+    vec = vec + Vector(0, 0, A+B)
+    vec = vec:Normalize()
+    wire.ports.Vec = vec
+end) 
