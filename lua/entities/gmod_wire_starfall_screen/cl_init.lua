@@ -45,7 +45,6 @@ function ENT:OnRemove()
 end
 
 function ENT:Error(msg)
-	ErrorNoHalt("Screen of ".. (self.owner and self.owner:Nick() or "<unknown>") .." errored: "..msg.."\n")
 	WireLib.AddNotify(self.owner, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1)
 	if self.instance then
 		self.instance:deinitialize()
