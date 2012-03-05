@@ -100,15 +100,15 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 		
 		for _,comment in ipairs(FindComments(line)) do
 			if ending then
-				if comment.type ~= ending then continue end
-				
-				if endingLevel then
-					if comment.level and comment.level == endingLevel then
+				if comment.type == ending then
+					if endingLevel then
+						if comment.level and comment.level == endingLevel then
+							ending = nil
+							endingLevel = nil
+							end
+					else
 						ending = nil
-						endingLevel = nil
-						end
-				else
-					ending = nil
+					end
 				end
 			elseif comment.type == "start" then
 				ending = "end"
