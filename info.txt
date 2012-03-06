@@ -1,9 +1,9 @@
 "AddonInfo"
 {
 	"name"        "Starfall"
-	"version"     "0.2"
-	"author_name" "Colonel Thirty Two"
-	"author_url"  "http://colonelthirtytwo.tumblr.com/"
+	"version"     "Git"
+	"author_name" "Alex 'Colonel Thirty Two' Parrill"
+	"author_url"  "http://colonelthirtytwo.net"
 	"info"        "The Starfall Scripting Environment"
 	"override"    "0"
 }
