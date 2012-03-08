@@ -262,6 +262,7 @@ else
 	end
 	
 	usermessage.Hook("sf_umsg_extension", function(msg)
+		MsgN( "umsg received" )
 		local wrapped = wrapumsg(msg)
 		SF.RunScriptHook("umsg",wrapped)
 	end)

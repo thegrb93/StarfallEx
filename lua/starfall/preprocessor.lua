@@ -124,3 +124,9 @@ local function directive_name(args, filename, data)
 	data.scriptnames[filename] = args
 end
 SF.Preprocessor.SetGlobalDirective("name",directive_name)
+
+local function directive_sharedscreen(args, filename, data)
+	if not data.sharedscreen then data.sharedscreen = true end
+	
+end
+SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)

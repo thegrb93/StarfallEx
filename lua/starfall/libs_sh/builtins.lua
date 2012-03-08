@@ -78,7 +78,7 @@ SF.DefaultEnvironment.unpack = unpack
 SF.DefaultEnvironment.setmetatable = function(tbl, meta)
 	SF.CheckType(tbl,"table")
 	SF.CheckType(meta,"table")
-	if dgetmeta(tbl).__metatable then error("cannot change a protected metatable",2) end
+	--if dgetmeta(tbl).__metatable then error("cannot change a protected metatable",2) end
 	return setmetatable(tbl,meta)
 end
 --- Same as Lua's getmetatable. Doesn't work on most internal metatables
