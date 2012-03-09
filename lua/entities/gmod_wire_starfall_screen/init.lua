@@ -123,6 +123,9 @@ function ENT:Use( activator )
 			umsg.Short( activator:EntIndex() )
 		umsg.End( )
 	end
+	if self.sharedscreen then
+		self:RunScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
+	end
 end
 
 function ENT:OnRemove()
