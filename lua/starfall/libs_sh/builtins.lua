@@ -75,12 +75,7 @@ SF.DefaultEnvironment.assert = function(ok, msg) if not ok then error(msg or "as
 SF.DefaultEnvironment.unpack = unpack
 
 --- Same as Lua's setmetatable. Doesn't work on most internal metatables
-SF.DefaultEnvironment.setmetatable = function(tbl, meta)
-	SF.CheckType(tbl,"table")
-	SF.CheckType(meta,"table")
-	if dgetmeta(tbl).__metatable then error("cannot change a protected metatable",2) end
-	return setmetatable(tbl,meta)
-end
+SF.DefaultEnvironment.setmetatable = setmetatable
 --- Same as Lua's getmetatable. Doesn't work on most internal metatables
 SF.DefaultEnvironment.getmetatable = function(tbl)
 	SF.CheckType(tbl,"table")
@@ -189,49 +184,20 @@ else
 		LocalPlayer():PrintMessage(HUD_PRINTTALK, tostring(s))
 	end
 end
+
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
-local function createSafeIndexFunc(mt)
-	local old_index = mt.__index
-	
-	local new_index
-	if type(old_index) == "function" then
-		function new_index(self, k)
-			return k:sub(1,2) ~= "__" and old_index(self,k) or nil
-		end
-	else
-		function new_index(self,k)
-			return k:sub(1,2) ~= "__" and old_index[k] or nil
-		end
-	end
-	
-	local function protect()
-		old_index = mt.__index
-		mt.__index = new_index
-	end
-
-	local function unprotect()
-		mt.__index = old_index
-	end
-
-	return protect, unprotect
-end
-
-local vector_restrict, vector_unrestrict = createSafeIndexFunc(_R.Vector)
-local angle_restrict, angle_unrestrict = createSafeIndexFunc(_R.Angle)
-local matrix_restrict, matrix_unrestrict = createSafeIndexFunc(_R.VMatrix)
-
 local function restrict(instance, hook, name, ok, err)
-	vector_restrict()
-	angle_restrict()
-	matrix_restrict()
+	_R.Vector.__metatable = "Vector"
+	_R.Angle.__metatable = "Angle"
+	_R.VMatrix.__metatable = "VMatrix"
 end
 
 local function unrestrict(instance, hook, name, ok, err)
-	vector_unrestrict()
-	angle_unrestrict()
-	matrix_unrestrict()
+	_R.Vector.__metatable = nil
+	_R.Angle.__metatable = nil
+	_R.VMatrix.__metatable = nil
 end
 
 SF.Libraries.AddHook("prepare", restrict)
