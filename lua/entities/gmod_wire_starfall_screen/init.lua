@@ -40,6 +40,47 @@ end
 function ENT:OnRestore()
 end
 
+function ENT:UpdateName(state)
+	if state ~= "" then state = "\n"..state end
+	
+	if self.instance and self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
+		self:SetOverlayText("Starfall Processor\n"..tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])..state)
+	else
+		self:SetOverlayText("Starfall Processor"..state)
+	end
+end
+
+function ENT:Compile(codetbl, mainfile)
+	local ok, instance = SF.Compiler.Compile(codetbl,context,mainfile,self.owner)
+	if not ok then self:Error(instance) return end
+	self.instance = instance
+	instance.data.entity = self
+	
+	local ok, msg = instance:initialize()
+	if not ok then
+		self:Error(msg)
+		return
+	end
+	
+	self:UpdateName("")
+	local r,g,b,a = self:GetColor()
+	self:SetColor(255, 255, 255, a)
+end
+
+function ENT:Error(msg, override)
+	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
+	WireLib.ClientError(msg, self.owner)
+	
+	if self.instance then
+		self.instance:deinitialize()
+		self.instance = nil
+	end
+	
+	self:UpdateName("Inactive (Error)")
+	local r,g,b,a = self:GetColor()
+	self:SetColor(255, 0, 0, a)
+end
+
 function ENT:CodeSent(ply, task)
 	if ply ~= self.owner then return end
 	self.task = task
@@ -51,6 +92,15 @@ function ENT:CodeSent(ply, task)
 			main = task.mainfile,
 		}})
 	screens[self] = self
+
+	local ppdata = {}
+	
+	SF.Preprocessor.ParseDirectives(task.mainfile, task.files[task.mainfile], {}, ppdata)
+	
+	if ppdata.sharedscreen then 
+		self:Compile(task.files, task.mainfile)
+		self.sharedscreen = true
+	end
 end
 
 function ENT:Think()
@@ -65,13 +115,16 @@ function ENT:Think()
 	return true
 end
 
--- Sends a umsgs to all clients about the use.
+-- Sends a umsg to all clients about the use.
 function ENT:Use( activator )
 	if activator:IsPlayer() then
 		umsg.Start( "starfall_screen_used" )
 			umsg.Short( self:EntIndex() )
 			umsg.Short( activator:EntIndex() )
 		umsg.End( )
+	end
+	if self.sharedscreen then
+		self:RunScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
 	end
 end
 
@@ -80,6 +133,13 @@ function ENT:OnRemove()
 	screens[self] = nil
 	self.instance:deinitialize()
 	self.instance = nil
+end
+
+function ENT:RunScriptHook(hook, ...)
+	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
+		local ok, rt = self.instance:runScriptHook(hook, ...)
+		if not ok then self:Error(rt) end
+	end
 end
 
 function ENT:TriggerInput(key, value)
