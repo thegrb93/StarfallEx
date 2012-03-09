@@ -1,0 +1,37 @@
+--@name Increment/Decrement gate
+--@author Cenius
+
+-- Load libraries
+local wire = loadLibrary("wire")
+
+-- Create inputs/outputs
+wire.createInputs(
+    {"A", "Increment", "Decrement", "Reset"}, 
+    {"normal", "normal", "normal", "normal"}
+)
+
+wire.createOutputs({"Value", "Test"}, {"normal", "normal"})
+
+-- Read the initial values
+local A = wire.ports["A"]
+local Value = 0
+
+-- Input trigger
+hook("input", "inputTrigger", function(InputName, InputValue)
+    -- Do the stuff
+    if InputName == "A" then
+        A = InputValue
+        
+    elseif InputName == "Increment" and InputValue ~= 0 then
+        Value = Value+A
+        
+    elseif InputName == "Decrement" and InputValue ~= 0 then
+        Value = Value-A
+    
+    elseif InputName == "Reset" and InputValue ~= 0 then
+        Value = 0
+    end
+    
+    -- Update value
+    wire.ports["Value"] = Value
+end)

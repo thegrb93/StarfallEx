@@ -1,0 +1,17 @@
+-- Very simple function to see the table contents
+function PrintTable(t, tabs)
+    if not t then return end
+    if not tabs then tabs = 0 end
+    
+    for k,v in pairs(t) do
+        local data = string.rep("\t", tabs)..tostring(k).." = "
+        
+        if type(v) == "table" and tabs < 10 then
+            print(data.."{")
+            PrintTable(v, tabs+1)
+            print(string.rep("\t", tabs).."}")
+        else
+            print(data..tostring(v))
+        end
+    end
+end

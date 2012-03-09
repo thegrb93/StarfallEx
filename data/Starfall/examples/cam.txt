@@ -1,0 +1,71 @@
+--@name Ray tracing camera
+--@author Cenius
+
+-- Load libraries
+local wire = loadLibrary("wire")
+local trace = loadLibrary("trace")
+local ents = loadLibrary("ents")
+local entity = ents.self()
+
+-- Init wires
+wire.createInputs({"DigitalScreen", "Render"}, {"wirelink", "normal"})
+if not wire.ports.DigitalScreen or not wire.ports.Render then
+    error("Connect the inputs first! Then reload the chip.")
+end
+
+--------------------------------------------------------------------
+
+-- Main table
+local RayTrackingCamera = {
+    -- Setup
+    Width = 128,
+    Height = 128,
+    MaxDist = 3000,
+    SpeedModify = 0.1, -- from 0 to 1. do not set up to more than 0.5 - umsg spam is guaranted! 
+    
+    -- Initial values
+    X = 0, Y = 0, 
+    Pos = Vector(0, 0, 0), Angle = Angle(0, 0, 0),
+}
+
+-- Main function
+function RayTrackingCamera:Trace(screen)
+    local Dir = Vector(
+        (self.X / self.Width) - 0.5,
+        (self.Y / self.Height) - 0.5,
+        1
+    )
+    Dir:Rotate(self.Angle); 
+    
+    local tr = trace.trace(self.Pos, Dir*self.MaxDist + self.Pos, {entity})
+    screen[self.X + self.Y*self.Height] = 999 * tr.Fraction
+    
+    self.X = self.X + 1
+    if self.X == self.Width then
+        self.X = 0; self.Y = self.Y+1
+        if self.Y == self.Height then
+            self.Y = 0
+        end
+    end
+end
+
+-- Refresh values
+function RayTrackingCamera:ResetView()
+    self.Pos = entity:pos()
+    self.Angle = entity:ang()
+end
+
+--------------------------------------------------------------------
+wire.ports.DigitalScreen[1048574] = 1 -- Clear
+wire.ports.DigitalScreen[1048572] = RayTrackingCamera.Height
+wire.ports.DigitalScreen[1048573] = RayTrackingCamera.Width
+
+hook("think", "rayTrackingCameraThink", function()
+    RayTrackingCamera:ResetView()
+    
+    if wire.ports.Render == 1 then
+        while opsUsed() < (opsMax() * RayTrackingCamera.SpeedModify) do
+            RayTrackingCamera:Trace(wire.ports.DigitalScreen)
+        end
+    end
+end)

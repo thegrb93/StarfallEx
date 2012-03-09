@@ -1,0 +1,29 @@
+-- This code is copied from Expression2's writeString
+function writeString(wl, str, X, Y, textcolor, bgcolor, flash)
+    if not textcolor then textcolor = 999 end
+    if not bgcoor then bgcolor = 0 end
+    if not flash then flash = 0 end
+     
+    local Params = flash*1000000 + bgcolor*1000 + textcolor
+    local Xorig = X
+    
+    for i = 1, #str do
+        local Byte = string.byte(str, i)
+        if Byte == 10 then
+            Y = Y+1
+            X = Xorig -- shouldn't this be 0 as well? would be more consistent.
+        else
+            if X >= 30 then
+                X = 0
+                Y = Y + 1
+            end
+            
+            local Address = 2*(Y*30+(X))
+            X = X + 1
+            if Address>=1080 or Address<0 then return end
+            
+            wl[Address] = Byte
+            wl[Address+1] = Params
+        end
+    end
+end
