@@ -103,7 +103,7 @@ local function fixcolorT(tbl)
 end
 
 local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
-local wrapmesh, unwrapmesh = SF.CreateWrapper(meshmt)
+local wrapmesh, unwrapmesh = SF.CreateWrapper(mesh_metamethods)
 
 local function checkvertex(vert)
 	print("\tVertex:")
