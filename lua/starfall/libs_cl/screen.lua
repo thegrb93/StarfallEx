@@ -7,6 +7,12 @@
 -- @entity wire_starfall_screen
 local screen_library, _ = SF.Libraries.RegisterLocal("screen")
 
+screen_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
+screen_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
+screen_library.TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
+screen_library.TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
+screen_library.TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
+
 --- Vertex format
 -- @name Vertex Format
 -- @class table
@@ -23,9 +29,12 @@ local cam = cam
 local dgetmeta = debug.getmetatable
 local matrix_meta = _R.VMatrix
 
+local currentcolor
+
 local matrix = Matrix()
 SF.Libraries.AddHook("prepare",function(instance, hook)
 	if hook == "render" then
+		currentcolor = Color(0,0,0,0)
 		matrix = Matrix() -- Reset transformation matrix
 	end
 end)
@@ -81,25 +90,24 @@ local validfonts = {
 local defined_fonts = {}
 
 local function fixcolor(r,g,b)
-	return clamp(tonumber(r) or 0,0,255),
+	return Color(clamp(tonumber(r) or 0,0,255),
 		clamp(tonumber(g) or 0,0,255),
-		clamp(tonumber(b) or 0,0,255)
+		clamp(tonumber(b) or 0,0,255))
 end
 
 local function fixcolorA(r,g,b,a)
-	return clamp(tonumber(r) or 0,0,255),
+	return Color(clamp(tonumber(r) or 0,0,255),
 		clamp(tonumber(g) or 0,0,255),
 		clamp(tonumber(b) or 0,0,255),
-		clamp(tonumber(a) or 255,0,255)
+		clamp(tonumber(a) or 255,0,255))
 end
 
 local function fixcolorT(tbl)
-	return {
-		r = clamp(tonumber(tbl and tbl.r) or 0,0,255),
-		g = clamp(tonumber(tbl and tbl.g) or 0,0,255),
-		b = clamp(tonumber(tbl and tbl.b) or 0,0,255),
-		a = clamp(tonumber(tbl and tbl.a) or 255,0,255),
-	}
+	return Color(
+		clamp(tonumber(tbl and tbl.r) or 0,0,255),
+		clamp(tonumber(tbl and tbl.g) or 0,0,255),
+		clamp(tonumber(tbl and tbl.b) or 0,0,255),
+		clamp(tonumber(tbl and tbl.a) or 255,0,255))
 end
 
 local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
@@ -170,17 +178,10 @@ end
 -- @param a Alpha value or 0
 function screen_library.setColor(r,g,b,a)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
-	surface.SetDrawColor(fixcolorA(r,g,b,a))
-end
-
---- Sets the text color
--- @param r Red value or 0
--- @param g Green value or 0
--- @param b Blue value or 0
--- @param a Alpha value or 0
-function screen_library.setTextColor(r,g,b,a)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
-	surface.SetTextColor(fixcolorA(r,g,b,a))
+	local c = fixcolorA(r,g,b,a)
+	currentcolor = c
+	surface.SetDrawColor(c)
+	surface.SetTextColor(c)
 end
 
 function screen_library.getTextureID(tx)
@@ -207,7 +208,7 @@ end
 -- @param b Blue value or 0
 function screen_library.clear(r,g,b)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
-	render.Clear( fixcolor(r,g,b), 255 )
+	render.Clear( fixcolor(r,g,b) )
 end
 
 --- Draws a rectangle using the current color. 
@@ -333,14 +334,14 @@ end
 -- @param x X coordinate
 -- @param y Y coordinate
 -- @param text Text to draw
-function screen_library.drawText(font,x,y,text)
+-- @param alignment Text alignment
+function screen_library.drawText(font,x,y,text,alignment)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
-	surface.SetTextPos(tonumber(x) or 0, tonumber(y) or 0)
-	surface.SetFont(font)
+	SF.CheckType(font,"string")
 	
 	cam.PushModelMatrix(matrix)
-	surface.DrawText(text)
+	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
 	cam.PopModelMatrix()
 end
 

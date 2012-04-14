@@ -33,7 +33,7 @@ usermessage.Hook( "starfall_screen_used", function ( data )
 end)
 
 function ENT:Initialize()
-	self.gpu = GPULib.WireGPU(self)
+	self.GPU = GPULib.WireGPU(self)
 end
 
 function ENT:Think()
@@ -43,7 +43,7 @@ function ENT:Think()
 end
 
 function ENT:OnRemove()
-	self.gpu:Finalize()
+	self.GPU:Finalize()
 	if self.instance then
 		self.instance:deinitialize()
 	end
@@ -118,8 +118,8 @@ function ENT:Draw()
 	Wire_Render(self)
 	
 	if self.renderfunc then
-		self.gpu:RenderToGPU(self.renderfunc)
+		self.GPU:RenderToGPU(self.renderfunc)
 	end
 	
-	self.gpu:Render()
+	self.GPU:Render()
 end

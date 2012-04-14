@@ -19,50 +19,42 @@ local pcall = pcall
 local ErrorNoHalt = ErrorNoHalt
 local table_remove = table.remove
 
--- Localize
-local Create
-local Simple
-local Adjust
-local Start
-local Pause
-local Remove
-local Get
-local Exists
-
-------------------------------------------------------
--- timer.Create
--- Creates a new timer and starts it. To create a new timer without starting it, use timer.Adjust.
--- Returns the created timer.
-------------------------------------------------------
-function Create( name, delay, reps, func, ... )
-	local curtimer = Adjust( name, delay, reps, func, ... )
-	Start( name )
-	return curtimer
+--- Creates a new timer and starts it. To create a new timer without starting it, use timer.Adjust.
+-- @param name The name of the timer
+-- @param delay the length until the timer stops running
+-- @param reps how many times the timer should repeat 0 is infinite
+-- @param func the callback function the timer calls when it has ended
+-- @param ... the paramaters that will be passed to the functione when it is called
+-- @returns the created timer.
+function timerx.create( name, delay, reps, func, ... )
+	local curtimer = timerx.adjust( name, delay, reps, func, ... )
+	timerx.start( name )
 end
 
-
-------------------------------------------------------
--- timer.Simple
--- Creates a simple timer with no name (Can't be adjusted, stopped, or removed).
-------------------------------------------------------
-function Simple( delay, func, ... )
-	timers[#timers+1] = {
-							stoptime = CurTime() + delay,
-							delay = delay,
-							reps = 1,
-							totalreps = 0,
-							func = func,
-							args = {...},
-							running = true
-						}
+--- Creates a simple timer with no name (Can't be adjusted, stopped, or removed)
+-- @param delay the length until the timer stops running
+-- @param func the callback function the timer calls when it has ended
+-- @param ... the paramaters that will be passed to the functione when it is called
+function timerx.simple( delay, func, ... )
+	local id = #timers+1
+	timers[id] = { stoptime = CurTime() + delay }
+	local time = timers[id]
+	time.delay = delay
+	time.reps = 1
+	time.totalreps = 0
+	time.func = func
+	time.args = {...}
+	time.running = true
 end
 
-------------------------------------------------------
--- timer.Adjust
--- Adjusts a timer's settings. Creates a new timer if the specified timer doesn't exist.
--- Returns the created timer.
-------------------------------------------------------
-function Adjust( name, delay, reps, func, ... )
+--- Adjusts a timer's settings. Creates a new timer if the specified timer doesn't exist.
+-- @param name The name of the timer
+-- @param delay the length until the timer stops running
+-- @param reps how many times the timer should repeat 0 is infinite
+-- @param func the callback function the timer calls when it has ended
+-- @param ... the paramaters that will be passed to the functione when it is called
+-- @returns the created timer.
+function timerx.adjust( name, delay, reps, func, ... )
 	if not name then return end
 	
 	local timerID = timers_lookup[name]
@@ -95,18 +87,14 @@ function Adjust( name, delay, reps, func, ... )
 		timerID = #timers+1
 		timers[timerID] = curtimer
 		timers_lookup[name] = timerID
-		
-		return curtimer
 	end
 end
 
-------------------------------------------------------
--- timer.Start
--- Starts a timer.
--- Returns true if successful, else false.
-------------------------------------------------------
-function Start( name )
-	if Exists( name ) then
+--- Starts a timer.
+-- @param name The name of the timer
+-- @returns true if successful, else false.
+function timerx.start( name )
+	if timerx.exists( name ) then
 		local curtimer = timers[timers_lookup[name]]
 		if not curtimer.running then
 			curtimer.starttime = CurTime()
@@ -123,13 +111,11 @@ function Start( name )
 	return false
 end
 
-------------------------------------------------------
--- timer.Pause
--- Pauses a timer. The timer's remaining delay time will be paused as well.
--- Returns true if successful, else false.
-------------------------------------------------------
-function Pause( name )
-	if Exists( name ) then
+--- Pauses a timer. The timer's remaining delay time will be paused as well.
+-- @param name The name of the timer
+-- @returns true if successful, else false.
+function timerx.pause( name )
+	if timerx.exists( name ) then
 		local curtimer = timers[timers_lookup[name]]
 		curtimer.difference = curtimer.stoptime - curtimer.starttime -- Save the time difference
 		curtimer.running = false
@@ -138,12 +124,10 @@ function Pause( name )
 	return false
 end
 
-------------------------------------------------------
--- timer.Remove
--- Removes the timer specified
--- Returns true if successful, else false.
-------------------------------------------------------
-function Remove( name )
+--- Removes the timer specified
+-- @param name The name of the timer
+-- @returns true if successful, else false.
+function timerx.remove( name )
 	if name then
 		local timerID = timers_lookup[name]
 		if timerID then
@@ -155,31 +139,21 @@ function Remove( name )
 	return false
 end
 
-------------------------------------------------------
--- timer.Get
--- Returns the timer specified. If no timer is specified, returns all timers.
-------------------------------------------------------
-function Get( name )
-	if Exists( name ) then
-		return timers[timers_lookup[name]]
-	else
-		return timers
-	end
+--- Retrieves the timer table with the specified name
+-- @param name The name of the timer
+-- @returns the timer specified. If no timer is specified, returns all timers.
+function timerx.get( name )
+	return timers[timers_lookup[name]]
 end
 
-------------------------------------------------------
--- timer.Exists
--- Returns true if the specified timer exists, else false
-------------------------------------------------------
-function Exists( name )
-	return (name and timers_lookup[name])
+--- Checks if a given timer exists
+-- @param name The name of the timer
+-- @returns true if the specified timer exists, else false
+function timerx.exists( name )
+	return timers_lookup[name] and true or false
 end
 
-------------------------------------------------------
--- Check
--- Triggers the timers.
-------------------------------------------------------
-local function Check()
+hook.Add( "Think", "timer think", function()
 	for i=#timers,1,-1 do -- Loop backwards so that we can remove timers without causing issues.
 		local curtimer = timers[i]
 		
@@ -197,24 +171,12 @@ local function Check()
 			
 			if not ok or (curtimer.reps ~= 0 and curtimer.totalreps >= curtimer.reps) then -- Lua error and/or timer repetitions are up. Remove timer.
 				if curtimer.name then -- It's a normal timer
-					Remove( curtimer.name )
+					timerx.remove( curtimer.name )
 				else -- it's a simple timer
 					table_remove( timers, i )
 				end
 			end
 		end
 	end
-end
-hook.Add( "Think", "timer think", Check )
+end)
 
-------------------------------------------------------
--- Store in global table
-------------------------------------------------------
-timerx.Create = Create
-timerx.Simple = Simple
-timerx.Adjust = Adjust
-timerx.Start  = Start
-timerx.Pause  = Pause
-timerx.Remove = Remove
-timerx.Get    = Get
-timerx.Exists = Exists

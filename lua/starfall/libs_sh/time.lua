@@ -28,12 +28,12 @@ local function timercb(instance, tname, realname, func)
 	if not instance.error then
 		instance:runFunction(func)
 	else
-		timerx.Remove(realname)
+		timerx.remove(realname)
 	end
 end
 
 local function mangle_timer_name(instance, name)
-	return "sftimer_"..tostring(instance).."_"..name
+	return string.format("sftimer_%s_%s",tostring(instance),name)
 end
 
 --- Creates a timer
@@ -51,8 +51,19 @@ function time_library.timer(name, delay, reps, func, ...)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	timerx.Create(timername, delay, reps, timercb, instance, name, timername, func)
+	timerx.create(timername, delay, reps, timercb, instance, name, timername, func)
 	instance.data.timers[name] = true
+end
+
+--- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
+-- @param delay the time, in second, to set the timer to
+-- @param func the function to call when the timer is fired
+-- @param ... Arguments passed to the function
+function time_library.stimer( delay, func, ... )
+	SF.CheckType( delay, "number" )
+	SF.CheckType( func, "function" )
+
+	timerx.simple( delay, simplecb, SF.instance, func, {...} )
 end
 
 --- Removes a timer
@@ -62,7 +73,7 @@ function time_library.destroyTimer(name)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	if timerx.IsTimer(timername) then timerx.Remove(timername) end
+	if timerx.exists(timername) then timerx.remove(timername) end
 	instance.data.timers[name] = nil
 end
 
@@ -74,7 +85,7 @@ local function deinit(instance)
 	if instance.data.timers ~= nil then
 		for name,_ in pairs(instance.data.timers) do
 			local realname = mangle_timer_name(instance,name)
-			timerx.Remove(realname)
+			timerx.remove(realname)
 		end
 	end
 	instance.data.timers = nil
