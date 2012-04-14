@@ -84,7 +84,7 @@ cleanup.Register( "starfall_screen" )
 
 
 function TOOL:LeftClick( trace )
-	if !trace.HitPos then return false end
+	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
@@ -97,7 +97,7 @@ function TOOL:LeftClick( trace )
 
 	local model = self:GetClientInfo( "Model" )
 	local ply = self:GetOwner()
-	if !self:GetSWEP():CheckLimit( "starfall_screen" ) then return false end
+	if not self:GetSWEP():CheckLimit( "starfall_screen" ) then return false end
 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90

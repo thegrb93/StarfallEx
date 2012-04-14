@@ -162,7 +162,7 @@ if CLIENT then
 				self.tokendata = ""
 
 				self:NextPattern(" *")
-				if !self.character then break end
+				if not self.character then break end
 	
 				-- Numbers
 				if self:NextPattern("^0[xb][0-9A-F]+") then
