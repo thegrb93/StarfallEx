@@ -5,6 +5,12 @@
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
 -- @entity wire_starfall_screen
+-- @field TEXT_ALIGN_LEFT
+-- @field TEXT_ALIGN_CENTER
+-- @field TEXT_ALIGN_RIGHT
+-- @field TEXT_ALIGN_TOP
+-- @field TEXT_ALIGN_BOTTOM
+
 local screen_library, _ = SF.Libraries.RegisterLocal("screen")
 
 screen_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
@@ -243,12 +249,11 @@ end
 -- @param x Center x coordinate
 -- @param y Center y coordinate
 -- @param r Radius
--- @param c Color (doesn't follow setColor...)
-function screen_library.drawCircle(x,y,r,c)
+function screen_library.drawCircle(x,y,r)
 	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawCircle(tonumber(x) or 0, tonumber(y) or 0, max(tonumber(r) or 1, 0),
-		fixcolorT(c))
+		currentcolor)
 	cam.PopModelMatrix()
 end
 
