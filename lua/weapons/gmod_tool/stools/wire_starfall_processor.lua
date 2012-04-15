@@ -31,10 +31,10 @@ if SERVER then
 	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
 	function MakeSF( pl, Pos, Ang, model)
-		if !pl:CheckLimit( "starfall_processor" ) then return false end
+		if not pl:CheckLimit( "starfall_processor" ) then return false end
 
 		local sf = ents.Create( "gmod_wire_starfall_processor" )
-		if !IsValid(sf) then return false end
+		if not IsValid(sf) then return false end
 
 		sf:SetAngles( Ang )
 		sf:SetPos( Pos )
@@ -85,7 +85,7 @@ cleanup.Register( "starfall_processor" )
 
 
 function TOOL:LeftClick( trace )
-	if !trace.HitPos then return false end
+	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
@@ -98,7 +98,7 @@ function TOOL:LeftClick( trace )
 
 	local model = self:GetClientInfo( "Model" )
 	local ply = self:GetOwner()
-	if !self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
+	if not self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90
