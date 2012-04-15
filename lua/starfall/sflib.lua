@@ -220,7 +220,7 @@ local safe_types = {
 function SF.Sanitize( ... )
 	-- Sanitize ALL the things.
 	local return_list = {}
-	if not args then args = {...} end
+	local args = {...}
 	
 	for key, value in pairs(args) do
 		local typ = type( value )
