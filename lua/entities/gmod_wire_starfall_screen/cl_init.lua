@@ -73,6 +73,7 @@ function ENT:Error(msg)
 end
 
 function ENT:CodeSent(files, main, owner)
+	if self.instance then self.instance:deinitialize() end
 	self.owner = owner
 	local ok, instance = SF.Compiler.Compile(files,context,main,owner,{ent=self,screen={}})
 	if not ok then self:Error(instance) return end
