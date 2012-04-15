@@ -48,5 +48,5 @@ function SF.Callback.new()
 	table.listeners = {}
 	setmetatable( table, P_meta )
 	
-	
+	return table
 end
