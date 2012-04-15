@@ -21,7 +21,7 @@ include("libraries.lua")
 include("preprocessor.lua")
 include("permissions.lua")
 include("editor.lua")
-include("callback.lua")
+
 
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of Lua instructions to allow Starfall scripts to execute")
@@ -40,6 +40,9 @@ function SF.Typedef(name)
 	metamethods.__index = methods
 	return methods, metamethods
 end
+
+-- Include this file after Typedef as this file relies on it.
+include("callback.lua")
 
 do
 	local env, metatable = SF.Typedef("Environment")
