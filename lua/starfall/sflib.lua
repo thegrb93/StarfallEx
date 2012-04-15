@@ -22,7 +22,6 @@ include("preprocessor.lua")
 include("permissions.lua")
 include("editor.lua")
 
-
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of Lua instructions to allow Starfall scripts to execute")
 
@@ -179,23 +178,29 @@ function SF.UnwrapObject( object )
 	return unwrap and unwrap(object)
 end
 
+local wrappedfunctions = setmetatable({},{__mode="kv"})
+local wrappedfunctions2instance = setmetatable({},{__mode="kv"})
 --- Wraps the given starfall function so that it may called directly by GMLua
--- @param function the starfall function getting wrapped
--- @return a function that when called will call the wrapped starfall function
-function SF.WrapFunction( func )
-	local instance = SF.instance
-	
-	if instance.data.publicfuncs[func] then
-		return instance.data.publicfuncs[func]
-	end
+-- @param func The starfall function getting wrapped
+-- @param instance The instance the function originated from
+-- @return a function That when called will call the wrapped starfall function
+function SF.WrapFunction( func, instance )
+	if wrappedfunctions[func] then return wrappedfunctions[func] end
 	
 	local function returned_func( ... )
 		return SF.Unsanitize( instance:runFunction( func, SF.Sanitize(...) ) )
 	end
-	
-	instance.data.publicfuncs[func] = returned_func
+	wrappedfunctions[func] = returned_func
+	wrappedfunctions2instance[func] = instance
 	
 	return returned_func
+end
+
+--- Gets the instance a wrapped function is bound to
+-- @param func Function
+-- @return Instance
+function SF.WrappedFunctionInstance(func)
+	return wrappedfunctions2instance[func]
 end
 
 -- A list of safe data types
