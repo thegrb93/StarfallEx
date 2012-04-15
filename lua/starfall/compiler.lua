@@ -33,6 +33,9 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 	instance.context = context
 	instance.mainfile = mainfile
 	instance.permissions = setmetatable({},context.permissions)
+	instance.data.publicfuncs = {}
+	
+	setmetatable( instance.data.publicfuncs, {["__mode"] = "kv"})
 	
 	local loaded = {}
 
