@@ -11,7 +11,7 @@ if SERVER then
 	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions.lua")
 	AddCSLuaFile("editor.lua")
-	AddCSLuaFile("callback.lus")
+	AddCSLuaFile("callback.lua")
 end
 
 -- Load files
