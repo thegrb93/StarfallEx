@@ -68,18 +68,20 @@ if CLIENT then
 	local operatorstr = "%+%-/%*%^%%#=~,%.%(%)%[%]{}_" -- A string of all operators, used in the patterns below
 	
 	--[[
-	--Sublime text editor inspired colors
+	-- E2 colors
 	local colors = {
-		["keyword"]	= { Color(249,  38, 114), false}, -- pink
-		["operator"]	= { Color(249,  38, 114), false}, -- pink
-		["number"]		= { Color(174, 129, 255), false}, -- purpleish
-		["variable"]	= { Color(248, 248, 242), false}, -- white
-		["string"]		= { Color(230, 219, 116), false}, -- yellowish
-		["function"]	= { Color(102, 217, 239), false}, -- teal
+		["keyword"]		= { Color(160,240,240), false }, -- teal
+		["operator"]	= { Color(224,224,224), false }, -- white
 		
-		["comment"]		= { Color(117, 113,  94), false}, -- grey
+		["function"]	= { Color(160,160,240), false }, -- blue
+		["number"]		= { Color(240,160,160), false }, -- light red
+		["variable"]	= { Color(160,240,160), false }, -- green
 		
-		["notfound"]	= { Color(240,  96,  96), false}, -- dark red
+		["string"]		= { Color(160,160,160), false }, -- gray
+		["comment"]		= { Color(160,160,160), false }, -- gray
+		
+		["ppcommand"]	= { Color(240,240,160), false }, -- pink
+		["notfound"]	= { Color(240, 96, 96), false }, -- dark red
 	}
 	
 	-- Colors originally by Cenius; slightly modified by Divran
@@ -101,20 +103,18 @@ if CLIENT then
 	}
 	]]
 	
-	-- E2 colors
+	--Sublime text editor inspired colors
 	local colors = {
-		["keyword"]		= { Color(160,240,240), false }, -- teal
-		["operator"]	= { Color(224,224,224), false }, -- white
+		["keyword"]	= { Color(249,  38, 114), false}, -- pink
+		["operator"]	= { Color(248, 248, 248), false}, -- pink
+		["number"]		= { Color(174, 129, 255), false}, -- purpleish
+		["variable"]	= { Color(248, 248, 242), false}, -- white
+		["string"]		= { Color(230, 219, 116), false}, -- yellowish
+		["function"]	= { Color(102, 217, 239), false}, -- teal
 		
-		["function"]	= { Color(160,160,240), false }, -- blue
-		["number"]		= { Color(240,160,160), false }, -- light red
-		["variable"]	= { Color(160,240,160), false }, -- green
+		["comment"]		= { Color(133, 133, 133), false}, -- grey
 		
-		["string"]		= { Color(160,160,160), false }, -- gray
-		["comment"]		= { Color(160,160,160), false }, -- gray
-		
-		["ppcommand"]	= { Color(240,240,160), false }, -- pink
-		["notfound"]	= { Color(240, 96, 96), false }, -- dark red
+		["notfound"]	= { Color(240,  96,  96), false}, -- dark red
 	}
 	
 	-- cols[n] = { tokendata, color }
