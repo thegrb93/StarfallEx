@@ -25,6 +25,8 @@ SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR
 	"The default number of Lua instructions to allow Starfall scripts to execute")
 
 local dgetmeta = debug.getmetatable
+local object_wrappers = {}
+local object_unwrappers = {}
 
 --- Creates a type that is safe for SF scripts to use. Instances of the type
 -- cannot access the type's metatable or metamethods.
@@ -104,9 +106,14 @@ end
 -- @param metatable The metatable to assign the wrapped value.
 -- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
 -- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
+-- @param target_metatable (optional) The metatable of the object that will get
+-- 		wrapped by these wrapper functions.  This is required if you want to
+-- 		have the object be auto-recognized by the generic SF.WrapObject
+--		function.
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.CreateWrapper(metatable, weakwrapper, weaksensitive)
+function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, 
+			target_metatable )
 	local s2sfmode = ""
 	local sf2smode = ""
 	
@@ -134,7 +141,135 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive)
 		return sf2sensitive[value]
 	end
 	
+	if nil ~= target_metatable then
+		object_wrappers[target_metatable] = wrap
+	end
+	
+	object_unwrappers[metatable] = unwrap
+	
 	return wrap, unwrap
+end
+
+--- Wraps the given object so that it is safe to pass into starfall
+-- It will wrap it as long as we have the metatable of the object that is
+-- getting wrapped.
+-- @param object the object needing to get wrapped as it's passed into starfall
+-- @return returns nil if the object doesn't have a known wrapper,
+-- or returns the wrapped object if it does have a wrapper.
+function SF.WrapObject( object )
+	local metatable = dgetmeta(object)
+	
+	local wrap = object_wrappers[metatable]
+	return wrap and wrap(object)
+end
+
+--- Takes a wrapped starfall object and returns the unwrapped version
+-- @param object the wrapped starfall object, should work on any starfall
+-- wrapped object.
+-- @return the unwrapped starfall object
+function SF.UnwrapObject( object )
+	local metatable = degetmeta(object)
+	
+	local unwrap = object_unwrappers[metatable]
+	return unwrap and unwrap(object)
+end
+
+--- Wraps the given starfall function so that it may called directly by GMLua
+-- @param function the starfall function getting wrapped
+-- @return a function that when called will call the wrapped starfall function
+function SF.WrapFunction( func )
+	local instance = SF.instance
+	
+	local function returned_func( ... )
+		return SF.Unsanitize( instance:runFunction( func, SF.Sanitize(...) ) )
+	end
+	
+	return returned_func
+end
+
+-- A list of safe data types
+local safe_types = {
+	["number"  ] = true,
+	["string"  ] = true,
+	["Vector"  ] = true,
+	["Angle"   ] = true,
+	["Angle"   ] = true,
+	["Matrix"  ] = true,
+	["boolean" ] = true,
+	["nil"     ] = true,
+}
+
+--- Sanitizes and returns its argument list.
+-- Basic types are returned unchanged. Non-object tables will be
+-- recursed into and their keys and values will be sanitized. Object
+-- types will be wrapped if a wrapper is available. When a wrapper is
+-- not available objects will be replaced with nil, so as to prevent
+-- any possiblitiy of leakage. Functions will always be replaced with
+-- nil as there is no way to verify that they are safe.
+function SF.Sanitize( ... )
+	-- Sanitize ALL the things.
+	local return_list = {}
+	if not args then args = {...} end
+	
+	for key, value in pairs(args) do
+		local typ = type( value )
+		if safe_types[ typ ] then
+			return_list[key] = value
+			
+		elseif typ == "Entity" then
+			return_list[key] = SF.Entities.Wrap(value)
+			
+		elseif typ == "function" then
+			return_list[key] = nil
+			
+		elseif typ == "table" and dgetmeta(value) ~= nil then
+			return_list[key] = SF.WrapObject(value)
+			
+		elseif typ == "table" then
+			local table = {}
+			for k,v in pairs(value) do
+				table[SF.Sanitize(k)] = SF.Sanitize(v)
+			end
+			
+			return_list[key] = table
+			
+		else 
+			return_list[key] = nil
+		end
+	end
+	
+	return unpack(return_list)
+end
+
+--- Takes output from starfall and does it's best to make the output
+-- fully usable outside of starfall environment
+function SF.Unsanitize( ... )
+	local return_list = {}
+	
+	local args = {...}
+	
+	for key, value in pairs( args ) do
+		if type(value) == "table" and dgetmeta(value) then
+			local unwrapped = SF.UnwrapObject(value)
+			if nil == unwrapped then
+				unwrapped = value
+			end
+			return_list[key] = unwrapped
+		
+		elseif type(value) == "table" then
+			for k,v in pairs(value) do
+				return_list[SF.Unsanitize(k)] = SF.Unsanitize(v)
+			end
+			
+		elseif type(value) == "Entity" then
+			local unwrap = SF.Entities.Unwrap(value)
+			
+			return_list[key] = unwrap
+		
+		else
+			return_list[key] = value
+		end
+	end
 end
 
 -- Library loading
