@@ -1,9 +1,15 @@
+
 assert(SF.Entities)
 
+local huge = math.huge
 local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
+
+local function fix_nan(v)
+	if v < huge and v > -huge then return v else return 0 end
+end
 
 SF.Permissions:registerPermission({
 	name = "Modify All Entities",
@@ -112,6 +118,12 @@ function ents_methods:applyForce(vec, offset)
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
+	
+	-- TODO: This prevents server crashing when using insane amounts of force.
+	-- GM13 doesn't seem to suffer from this issue.
+	vec.x = fix_nan(vec.x)
+	vec.y = fix_nan(vec.y)
+	vec.z = fix_nan(vec.z)
 	
 	if offset == nil then
 		phys:ApplyForceCenter(vec)
