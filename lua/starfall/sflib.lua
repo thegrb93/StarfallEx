@@ -11,6 +11,7 @@ if SERVER then
 	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions.lua")
 	AddCSLuaFile("editor.lua")
+	AddCSLuaFile("callback.lua")
 end
 
 -- Load files
@@ -20,6 +21,7 @@ include("libraries.lua")
 include("preprocessor.lua")
 include("permissions.lua")
 include("editor.lua")
+include("callback.lua")
 
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of Lua instructions to allow Starfall scripts to execute")
@@ -180,9 +182,15 @@ end
 function SF.WrapFunction( func )
 	local instance = SF.instance
 	
+	if instance.data.publicfuncs[func] then
+		return instance.data.publicfuncs[func]
+	end
+	
 	local function returned_func( ... )
 		return SF.Unsanitize( instance:runFunction( func, SF.Sanitize(...) ) )
 	end
+	
+	instance.data.publicfuncs[func] = returned_func
 	
 	return returned_func
 end
