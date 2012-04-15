@@ -113,6 +113,7 @@ if CLIENT then
 		["function"]	= { Color(102, 217, 239), false}, -- teal
 		
 		["comment"]		= { Color(133, 133, 133), false}, -- grey
+		["ppcommand"]   = { Color(240, 210, 110), false}, -- orangeish
 		
 		["notfound"]	= { Color(240,  96,  96), false}, -- dark red
 	}
@@ -318,8 +319,7 @@ if CLIENT then
 	end
 	
 	local code1 = "--@name \n--@author \n\n"
-	local code2 = "--[[\n" ..
-[[    Starfall Scripting Environment
+	local code2 = "--[[\n" .. [[    Starfall Scripting Environment
 
     More info: http://colonelthirtytwo.net/index.php/starfall/
     Reference Page: http://colonelthirtytwo.net/sfdoc/
