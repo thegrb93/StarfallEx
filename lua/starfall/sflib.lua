@@ -226,24 +226,16 @@ function SF.Sanitize( ... )
 		local typ = type( value )
 		if safe_types[ typ ] then
 			return_list[key] = value
-			
-		elseif typ == "Entity" then
+		elseif typ == "Entity" or typ == "Player" or typ == "NPC" then
 			return_list[key] = SF.Entities.Wrap(value)
-			
-		elseif typ == "function" then
-			return_list[key] = nil
-			
-		elseif typ == "table" and dgetmeta(value) ~= nil then
+		elseif typ == "table" and object_unwrappers[dgetmeta(value)] then
 			return_list[key] = SF.WrapObject(value)
-			
 		elseif typ == "table" then
-			local table = {}
+			local tbl = {}
 			for k,v in pairs(value) do
-				table[SF.Sanitize(k)] = SF.Sanitize(v)
+				tbl[SF.Sanitize(k)] = SF.Sanitize(v)
 			end
-			
-			return_list[key] = table
-			
+			return_list[key] = tbl
 		else 
 			return_list[key] = nil
 		end
@@ -260,27 +252,19 @@ function SF.Unsanitize( ... )
 	local args = {...}
 	
 	for key, value in pairs( args ) do
-		if type(value) == "table" and dgetmeta(value) then
-			local unwrapped = SF.UnwrapObject(value)
-			if nil == unwrapped then
-				unwrapped = value
-			end
-			return_list[key] = unwrapped
-		
-		elseif type(value) == "table" then
+		local typ = type(value)
+		if (typ == "table" and object_unwrappers[dgetmeta(value)]) then
+			return_list[key] = SF.UnwrapObject(value) or value
+		elseif typ == "table" then
 			for k,v in pairs(value) do
 				return_list[SF.Unsanitize(k)] = SF.Unsanitize(v)
 			end
-			
-		elseif type(value) == "Entity" then
-			local unwrap = SF.Entities.Unwrap(value)
-			
-			return_list[key] = unwrap
-		
 		else
 			return_list[key] = value
 		end
 	end
+	
+	return unpack(args)
 end
 
 -- Library loading
