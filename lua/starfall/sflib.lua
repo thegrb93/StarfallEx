@@ -264,7 +264,7 @@ function SF.Unsanitize( ... )
 		elseif type(value) == "Entity" then
 			local unwrap = SF.Entities.Unwrap(value)
 			
-			return_list[key] = value
+			return_list[key] = unwrap
 		
 		else
 			return_list[key] = value
