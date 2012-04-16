@@ -269,7 +269,7 @@ function SF.Unsanitize( ... )
 		end
 	end
 	
-	return unpack(args)
+	return unpack( return_list )
 end
 
 -- Library loading
