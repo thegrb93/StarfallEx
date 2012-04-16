@@ -5,9 +5,7 @@
 -- @server
 local chat, _ = SF.Libraries.Register("chat") 
 
-local cb_instances = {}
-
-cb_instances.global = SF.Callback.new()
+local callbacks = {}
 
 ---------------------------------------------------------------------
 -- Internal Function
@@ -15,14 +13,20 @@ cb_instances.global = SF.Callback.new()
 
 hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
 	local hidden
-	for _, func in pairs(cb_instances.global.listeners) do
-		local success, hide = pcall( func, msg, ply )
-		local instance = func("STARFALL_GET_INSTANCE")
-		
-		if not success then MsgN(hide) end
-		
-		if hide and ply == instance.player then
-			hidden = true
+	for instance, tbl in pairs(callbacks) do
+		for _, func in pairs(tbl) do
+			local wrapped_player = SF.Entities.Wrap(ply)
+			local success, hide = pcall( 
+					instance.runFunction,
+					instance,
+					func, 
+					msg, 
+					wrapped_player 
+			)
+			
+			if hide and ply == instance.player then
+				hidden = true
+			end
 		end
 	end
 	
@@ -34,9 +38,7 @@ hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
 end)
 
 SF.Libraries.AddHook( "deinitialize", function( instance ) 
-	for _, v in pairs( instance.data.publicfuncs ) do
-		cb_instances.global:removeListener( v )
-	end
+	callbacks[instance] = nil
 end
 )
 
@@ -45,14 +47,17 @@ end
 -- Library functions
 ---------------------------------------------------------------------
 
---- Registers a new listener function to chat
+--- Registers a new listener function to chat.
 -- @param func the function that will listen to chat
 function chat.listen( func )
-	cb_instances.global:addListener( SF.WrapFunction(func) )
+	local instance = SF.instance
+	if not callbacks[instance] then callbacks[instance] = {} end
+	
+	callbacks[SF.instance][func] = func
 end
 
---- Removes listener from listening to chat
+--- Removes listener from listening to chat.
 -- @param func the function getting removed
 function chat.stop( func )
-	cb_instances.global:removeListener( SF.WrapFunction(func) )
+	callback[SF.instance][func] = nil
 end
