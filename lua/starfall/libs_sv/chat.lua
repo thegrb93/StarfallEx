@@ -48,6 +48,11 @@ end
 ---------------------------------------------------------------------
 
 --- Registers a new listener function to chat.
+-- When you register to listen to this, whenever a chat message is received
+-- the callback will pass (message, player).  Message of course being the
+-- chat message being sent to chat, and player being the player sending it.
+-- If you return true to this and it is your chat, it will hide your chat 
+-- for you.
 -- @param func the function that will listen to chat
 function chat.listen( func )
 	local instance = SF.instance
