@@ -12,29 +12,38 @@ local callbacks = {}
 ---------------------------------------------------------------------
 
 hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
-	local hidden
-	for instance, tbl in pairs(callbacks) do
-		for _, func in pairs(tbl) do
-			local wrapped_player = SF.Entities.Wrap(ply)
-			local success, hide = pcall( 
-					instance.runFunction,
-					instance,
-					func, 
-					msg, 
-					wrapped_player 
-			)
-			
-			if hide and ply == instance.player then
-				hidden = true
-			end
-		end
-	end
-	
-	if hidden then 
-		return "" 
-	else
-		return msg
-	end
+    local hidden
+    local steamid = ply:SteamID()
+    local wrapped_player = SF.Entities.Wrap(ply)
+    
+    local function call_handler (instance, handler)
+        local success, hide = pcall(
+                instance.runFunction,
+                instance,
+                handler,
+                msg,
+                wrapped_player
+        )
+        
+        if success and hide and ply == instance.player then
+            hidden = true
+        end
+    end
+
+    for instance, tbl in pairs(callbacks) do
+        for _, func in pairs(tbl.global) do
+            call_handler( instance, handler )
+        end
+        for _, func in pairs(tbl[steamid]) do
+            call_handler( instance, handler )
+        end
+    end
+    
+    if hidden then
+        return ""
+    else
+        return msg
+    end
 end)
 
 SF.Libraries.AddHook( "deinitialize", function( instance ) 
@@ -54,15 +63,41 @@ end
 -- If you return true to this and it is your chat, it will hide your chat 
 -- for you.
 -- @param func the function that will listen to chat
-function chat.listen( func )
+-- @param ply the specific player you want to listen for
+function chat.listen( func, ply )
 	local instance = SF.instance
-	if not callbacks[instance] then callbacks[instance] = {} end
+	if not callbacks[instance] then 
+		callbacks[instance] = {} 
+		callbacks[instance]["global"] = {}
+	end
 	
-	callbacks[SF.instance][func] = func
+	ply = SF.Entities.Unwrap( ply )
+	
+	if type(ply) ~= "Player" and nil ~= ply then
+		error("Invalid player entity passed to chat.listen", 2)
+	end
+	
+	if not ply then
+		callbacks[instance]["global"][func] = func
+	else
+		local steamid = ply:SteamID()
+		if not callbacks[instance][steamid] then
+			callbacks[instance][steamid] = {}
+		end
+		
+		callbacks[instance][steamid][func] = func
+	end
 end
 
 --- Removes listener from listening to chat.
 -- @param func the function getting removed
-function chat.stop( func )
-	callback[SF.instance][func] = nil
+-- @param ply the player that you are no longer listening to.
+function chat.stop( func, ply )
+	local instance = SF.instance
+	if not ply then
+		callback[instance]["global"][func] = nil
+	else
+		local steamid = SF.Entities.Unwrap(ply):SteamID()
+		callback[instance][steamid][func] = nil
+	end
 end
