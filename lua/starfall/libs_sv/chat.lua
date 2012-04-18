@@ -13,9 +13,11 @@ local callbacks = {}
 
 hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
 	local hidden
+	local steamid = ply:SteamID()
+	local wrapped_player = SF.Entities.Wrap(ply)
+	
 	for instance, tbl in pairs(callbacks) do
-		for _, func in pairs(tbl) do
-			local wrapped_player = SF.Entities.Wrap(ply)
+		for _, func in pairs(tbl.global) do
 			local success, hide = pcall( 
 					instance.runFunction,
 					instance,
@@ -24,7 +26,20 @@ hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
 					wrapped_player 
 			)
 			
-			if hide and ply == instance.player then
+			if success and hide and ply == instance.player then
+				hidden = true
+			end
+		end
+		for _, func in pairs(tbl[steamid]) do
+			local success, hide = pcall(
+					instance.runFunction,
+					instance,
+					func,
+					msg,
+					wrapped_player
+			)
+			
+			if success and hide and ply == instance.player then
 				hidden = true
 			end
 		end
@@ -54,15 +69,41 @@ end
 -- If you return true to this and it is your chat, it will hide your chat 
 -- for you.
 -- @param func the function that will listen to chat
-function chat.listen( func )
+-- @param ply the specific player you want to listen for
+function chat.listen( func, ply )
 	local instance = SF.instance
-	if not callbacks[instance] then callbacks[instance] = {} end
+	if not callbacks[instance] then 
+		callbacks[instance] = {} 
+		callbacks[instance]["global"] = {}
+	end
 	
-	callbacks[SF.instance][func] = func
+	ply = SF.Entities.Unwrap( ply )
+	
+	if type(ply) ~= "Player" then
+		error("Invalid player entity passed to chat.listen")
+	end
+	local steamid = ply:SteamID()
+	
+	if not ply then
+		callbacks[instance]["global"][func] = func
+	else
+		if not callbacks[instance][steamid] then
+			callbacks[instance][steamid] = {}
+		end
+		
+		callbacks[instance][steamid][func] = func
+	end
 end
 
 --- Removes listener from listening to chat.
 -- @param func the function getting removed
-function chat.stop( func )
-	callback[SF.instance][func] = nil
+-- @param ply the player that you are no longer listening to.
+function chat.stop( func, ply )
+	local instance = SF.instance
+	if not ply then
+		callback[instance]["global"][func] = nil
+	else
+		local steamid = SF.Entities.Unwrap(ply):SteamID()
+		callback[instance][steamid][func] = nil
+	end
 end
