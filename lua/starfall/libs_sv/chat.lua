@@ -76,11 +76,11 @@ function chat.listen( func, ply )
 	if type(ply) ~= "Player" and nil ~= ply then
 		error("Invalid player entity passed to chat.listen", 2)
 	end
-	local steamid = ply:SteamID()
 	
 	if not ply then
 		callbacks[instance]["global"][func] = func
 	else
+		local steamid = ply:SteamID()
 		if not callbacks[instance][steamid] then
 			callbacks[instance][steamid] = {}
 		end
