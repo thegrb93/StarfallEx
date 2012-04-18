@@ -12,44 +12,38 @@ local callbacks = {}
 ---------------------------------------------------------------------
 
 hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
-	local hidden
-	local steamid = ply:SteamID()
-	local wrapped_player = SF.Entities.Wrap(ply)
-	
-	for instance, tbl in pairs(callbacks) do
-		for _, func in pairs(tbl.global) do
-			local success, hide = pcall( 
-					instance.runFunction,
-					instance,
-					func, 
-					msg, 
-					wrapped_player 
-			)
-			
-			if success and hide and ply == instance.player then
-				hidden = true
-			end
-		end
-		for _, func in pairs(tbl[steamid]) do
-			local success, hide = pcall(
-					instance.runFunction,
-					instance,
-					func,
-					msg,
-					wrapped_player
-			)
-			
-			if success and hide and ply == instance.player then
-				hidden = true
-			end
-		end
-	end
-	
-	if hidden then 
-		return "" 
-	else
-		return msg
-	end
+    local hidden
+    local steamid = ply:SteamID()
+    local wrapped_player = SF.Entities.Wrap(ply)
+    
+    local function call_handler (instance, handler)
+        local success, hide = pcall(
+                instance.runFunction,
+                instance,
+                handler,
+                msg,
+                wrapped_player
+        )
+        
+        if success and hide and ply == instance.player then
+            hidden = true
+        end
+    end
+
+    for instance, tbl in pairs(callbacks) do
+        for _, func in pairs(tbl.global) do
+            call_handler( instance, handler )
+        end
+        for _, func in pairs(tbl[steamid]) do
+            call_handler( instance, handler )
+        end
+    end
+    
+    if hidden then
+        return ""
+    else
+        return msg
+    end
 end)
 
 SF.Libraries.AddHook( "deinitialize", function( instance ) 
