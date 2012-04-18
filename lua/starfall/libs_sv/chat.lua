@@ -73,8 +73,8 @@ function chat.listen( func, ply )
 	
 	ply = SF.Entities.Unwrap( ply )
 	
-	if type(ply) ~= "Player" then
-		error("Invalid player entity passed to chat.listen")
+	if type(ply) ~= "Player" and nil ~= ply then
+		error("Invalid player entity passed to chat.listen", 2)
 	end
 	local steamid = ply:SteamID()
 	
