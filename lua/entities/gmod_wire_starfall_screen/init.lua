@@ -146,7 +146,7 @@ end
 
 function ENT:TriggerInput(key, value)
 	if self.instance and not self.instance.error then
-		self.instance:runScriptHook("input",key,value)
+		self.instance:RunScriptHook("input",key,value)
 	end
 end
 
