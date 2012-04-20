@@ -14,39 +14,95 @@
 -- @field value Boolean. True to allow, false to deny
 
 SF.Permissions = {}
-SF.Permissions.__index = SF.Permissions
 
-SF.Permissions.permissions = {}
+local P = SF.Permissions
+P.__index = P
 
---- Called to assign the permissions manager to an Instance. The default implementation sets
--- self.instance to the passed argument.
-function SF.Permissions:assign(instance)
-	self.instance = instance
+do
+	local lockmeta = {
+		__newindex = function (table, key, value)
+			error( "attempting to assign to a read-only table", 2 )
+		end,
+		__metatable = "constant"
+	}
+	
+	local result_vals = {
+		DENY	= setmetatable( {}, lockmeta ),
+		ALLOW	= setmetatable( {}, lockmeta ),
+		NEUTRAL	= setmetatable( {}, lockmeta )
+	}
+	
+	P.Result = setmetatable( {}, {
+		__index = result_vals,
+		__newindex = lockmeta.__newindex,
+		__metatable = "enum"
+	} )
 end
 
---- Requests a set of permissions. The default implementation of this does nothing, but implementors
--- can use this to change the permissions of a script dynamically
--- @param permissions A list of permission names to request
-function SF.Permissions:requestPermissions(permissions)
-	-- Nothing
+local DENY		= P.Result.DENY
+local ALLOW		= P.Result.ALLOW
+local NEUTRAL	= P.Result.NEUTRAL
+
+local providers = {}
+
+local have_owner = false
+
+--- Adds a provider implementation to the set used by this library.
+-- Providers must implement the {@link SF.Permissions.Provider} interface.
+-- @param provider the provider to be registered
+function P.registerProvider (provider)
+	if type( provider ) ~= "table"
+			or type( provider.supportsOwner ) ~= "function"
+			or type( provider.isOwner ) ~= "function"
+			or type( provider.check ) ~= "function" then
+		error( "given object does not implement the provider interface", 2 )
+	end
+	
+	providers[ provider ] = provider
+	
+	if provider:supportsOwner() then
+		have_owner = true
+	end
 end
 
---- Creates a new permission
--- @param tbl The permission data to register
-function SF.Permissions:registerPermission(tbl)
-	self.permissions[tbl.name] = tbl
+--- Checks whether a player may perform an action.
+-- @param principal the player performing the action to be authorized
+-- @param target the object on which the action is being performed
+-- @param key a string identifying the action being performed
+-- @return boolean whether the action is permitted
+function P.check (principal, target, key)
+	-- server owners can do whatever they want
+	if have_owner then
+		-- this can't be merged into the check loop below because that 
+		for _, provider in pairs( providers ) do
+			if provider:isOwner( principal ) then return true end
+		end
+	elseif principal:IsSuperAdmin() then
+		return true
+	end
+	
+	local allow = false;
+	for _, provider in pairs( providers ) do
+		local result = provider:check( principal, target, key )
+		if DENY == result then
+			-- a single deny overrides any allows, just deny it now
+			return false
+		elseif ALLOW == result then
+			-- an allow can be overridden by a deny, so remember and keep going
+			allow = true
+		end
+		-- otherwise, this provider has no opinion, just go on to the next one
+	end
+	
+	return allow
 end
 
---- Returns data about a permission
--- @param name The name of the permission
--- @return The permission data table
-function SF.Permissions:getPermissionData(name)
-	return self.permissions[name]
-end
-
---- Checks a permission
--- @param name The permission name
--- @return True to allow
-function SF.Permissions:checkPermission(name)
-	return self.permissions[name].value
+-- Find and include all provider files.
+do
+	-- TODO: Update this to GM13
+	local files = file.FindInLua("starfall/permissions/*.lua")
+	
+	for _, file in pairs( files ) do
+		include( "starfall/permissions/" .. file )
+	end
 end
