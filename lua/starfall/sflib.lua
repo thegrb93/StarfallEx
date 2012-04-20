@@ -47,7 +47,7 @@ if SERVER then
 	AddCSLuaFile("instance.lua")
 	AddCSLuaFile("libraries.lua")
 	AddCSLuaFile("preprocessor.lua")
-	AddCSLuaFile("permissions.lua")
+	AddCSLuaFile("permissions/core.lua")
 	AddCSLuaFile("editor.lua")
 	AddCSLuaFile("callback.lua")
 end
@@ -57,7 +57,7 @@ include("compiler.lua")
 include("instance.lua")
 include("libraries.lua")
 include("preprocessor.lua")
-include("permissions.lua")
+include("permissions/core.lua")
 include("editor.lua")
 
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
