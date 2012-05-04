@@ -232,5 +232,3 @@ function SF.Instance:deinitialize()
 	SF.allInstances[self] = self
 	self.error = true
 end
-
--- TODO: Serialization

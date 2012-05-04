@@ -272,6 +272,34 @@ function SF.Unsanitize( ... )
 	return unpack( return_list )
 end
 
+
+local serialize_replace_regex = "[\"\n]"
+local serialize_replace_tbl = {["\n"] = "£", ['"'] = "€"}
+--- Serializes an instance's code in a format compatible with the duplicator library
+-- @param sources The table of filename = source entries. Ususally instance.source
+-- @param mainfile The main filename. Usually instance.mainfile
+function SF.SerializeCode(sources, mainfile)
+	local rt = {source = {}}
+	for filename, source in pairs(sources) do
+		rt.source[filename] = string.gsub(source, serialize_replace_regex, serialize_replace_tbl)
+	end
+	rt.mainfile = mainfile
+	return rt
+end
+
+local deserialize_replace_regex = "[£€]"
+local deserialize_replace_tbl = {["£"] = "\n", ['€'] = '"'}
+--- Deserializes an instance's code.
+-- @return The table of filename = source entries
+-- @return The main filename
+function SF.DeserializeCode(tbl)
+	local sources = {}
+	for filename, source in pairs(tbl.source) do
+		sources[filename] = string.gsub(source, deserialize_replace_regex, deserialize_replace_tbl)
+	end
+	return sources, tbl.mainfile
+end
+
 -- Library loading
 if SERVER then
 	local l

@@ -118,33 +118,20 @@ function ENT:RunScriptHookForResult(hook,...)
 	end
 end
 
--- Workaround for Issue #67
--- https://github.com/GmodStarfall/Starfall/issues/67
-do
-	local instance = nil
-	function ENT:PreEntityCopy()
-		-- Neccesary to tell the base wire entity to update BuildDupeInfo
-		if self.BaseClass.PreEntityCopy then self.BaseClass.PreEntityCopy(self) end
-		instance = self.instance
-		self.instance = nil
-	end
-	
-	function ENT:PostEntityCopy()
-		if self.BaseClass.PostEntityCopy then self.BaseClass.PostEntityCopy(self) end
-		self.instance = assert(instance)
-		instance = nil
-	end
-end
-
 function ENT:BuildDupeInfo()
 	local info = self.BaseClass.BuildDupeInfo(self) or {}
-	info.starfall_sourcecode = self.instance.source
-	info.starfall_mainfile = self.instance.mainfile
+	if self.instance then
+		info.starfall = SF.SerializeCode(self.instance.source, self.instance.mainfile)
+	end
 	return info
 end
 
 function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
 	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
 	self.owner = ply
-	self:Compile(info.starfall_sourcecode, info.starfall_mainfile)
+	
+	if info.starfall then
+		local code, main = SF.DeserializeCode(info.starfall)
+		self:Compile(code, main)
+	end
 end

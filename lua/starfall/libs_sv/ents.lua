@@ -41,6 +41,10 @@ function SF.Entities.GetOwner(entity)
 		if valid(ply) then return ply end
 	end
 	
+	if entity.owner and valid(entity.owner) and entity.owner:isPlayer() then
+		return entity.owner
+	end
+	
 	local OnDieFunctions = entity.OnDieFunctions
 	if OnDieFunctions then
 		if OnDieFunctions.GetCountUpdate and OnDieFunctions.GetCountUpdate.Args and OnDieFunctions.GetCountUpdate.Args[1] then
