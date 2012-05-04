@@ -150,6 +150,32 @@ function ENT:TriggerInput(key, value)
 	end
 end
 
-function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)
-	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID, GetConstByID)
+-- Workaround for Issue #67
+-- https://github.com/GmodStarfall/Starfall/issues/67
+do
+	local instance = nil
+	function ENT:PreEntityCopy()
+		-- Neccesary to tell the base wire entity to update BuildDupeInfo
+		if self.BaseClass.PreEntityCopy then self.BaseClass.PreEntityCopy(self) end
+		instance = self.instance
+		self.instance = nil
+	end
+	
+	function ENT:PostEntityCopy()
+		if self.BaseClass.PostEntityCopy then self.BaseClass.PostEntityCopy(self) end
+		self.instance = instance
+		instance = nil
+	end
+end
+
+function ENT:BuildDupeInfo()
+	local info = self.BaseClass.BuildDupeInfo(self) or {}
+	info.starfall_task = self.task
+	return info
+end
+
+function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
+	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
+	self.owner = ply
+	self:CodeSent(ply, info.starfall_task)
 end
