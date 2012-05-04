@@ -191,7 +191,7 @@ function SF.WrapFunction( func, instance )
 		return SF.Unsanitize( instance:runFunction( func, SF.Sanitize(...) ) )
 	end
 	wrappedfunctions[func] = returned_func
-	wrappedfunctions2instance[func] = instance
+	wrappedfunctions2instance[returned_func] = instance
 	
 	return returned_func
 end
@@ -269,7 +269,7 @@ function SF.Unsanitize( ... )
 		end
 	end
 	
-	return unpack(args)
+	return unpack( return_list )
 end
 
 -- Library loading
