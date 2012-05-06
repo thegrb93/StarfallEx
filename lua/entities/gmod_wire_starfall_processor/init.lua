@@ -119,11 +119,19 @@ function ENT:RunScriptHookForResult(hook,...)
 end
 
 function ENT:BuildDupeInfo()
-	-- TODO Fix duplication doesnt work
-	--local info = self.BaseClass.BuildDupeInfo(self) or {}
-	return {}
+	local info = self.BaseClass.BuildDupeInfo(self) or {}
+	if self.instance then
+		info.starfall = SF.SerializeCode(self.instance.source, self.instance.mainfile)
+	end
+	return info
 end
 
-function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID, GetConstByID)
-	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID, GetConstByID)
+function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
+	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
+	self.owner = ply
+	
+	if info.starfall then
+		local code, main = SF.DeserializeCode(info.starfall)
+		self:Compile(code, main)
+	end
 end
