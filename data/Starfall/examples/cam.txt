@@ -38,7 +38,7 @@ function RayTrackingCamera:Trace(screen)
     Dir:Rotate(self.Angle); 
     
     local tr = trace.trace(self.Pos, Dir*self.MaxDist + self.Pos, {entity})
-    screen[self.X + self.Y*self.Height] = 999 * tr.Fraction
+    screen[self.X + self.Y*self.Width] = 999 * tr.Fraction
     
     self.X = self.X + 1
     if self.X == self.Width then
