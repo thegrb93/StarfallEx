@@ -153,10 +153,10 @@ if SERVER then
 		umsg.Vector(val)
 	end
 	
-	--- Adds a angle. Takes up 12 bytes.
+	--- Adds an angle. Takes up 12 bytes.
 	-- @param val Value
 	-- @server
-	function umsg_library.vector(val)
+	function umsg_library.angle(val)
 		SF.CheckType(val,"Angle")
 		local umsgdata = SF.instance.data.umsg
 		if not umsgdata.entering then

@@ -268,4 +268,8 @@ function wire_ports_metamethods:__newindex(name,value)
 	Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
 end
 
+--- Ports table. Reads from this table will read from the wire input
+-- of the same name. Writes will write to the wire output of the same name.
+-- @class table
+-- @name wire_library.ports
 wire_library.ports = setmetatable({},wire_ports_metamethods)
