@@ -29,7 +29,7 @@ function P:removeListener( func )
 end
 
 --- Calls all of the stored listeners, passing them the data you pass
--- @params ... data
+-- @param ... data
 -- @return if any function errors, returns the error message
 function P:dispatch( ... )
 	local error = nil

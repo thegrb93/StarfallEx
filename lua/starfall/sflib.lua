@@ -116,8 +116,7 @@ end
 --		function.
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, 
-			target_metatable )
+function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable)
 	local s2sfmode = ""
 	local sf2smode = ""
 	
