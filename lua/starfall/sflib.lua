@@ -1,6 +1,39 @@
 
-if SF then return end -- Already loaded
+if SF ~= nil then return end -- Already loaded
 SF = {}
+
+-- Do a couple of checks for retarded mods that disable the debug table
+-- and run it after all addons load
+do
+	local function zassert(cond, str)
+		if not cond then error("STARFALL LOAD ABORT: "..str,0) end
+	end
+
+	zassert(debug, "debug table removed")
+
+	-- Check for modified getinfo
+	local info = debug.getinfo(0,"S")
+	zassert(info, "debug.getinfo modified to return nil")
+	zassert(info.what == "C", "debug.getinfo modified")
+
+	-- Check for modified setfenv
+	info = debug.getinfo(debug.setfenv, "S")
+	zassert(info.what == "C", "debug.setfenv modified")
+
+	-- Check get/setmetatable
+	info = debug.getinfo(debug.getmetatable)
+	zassert(info.what == "C", "debug.getmetatable modified")
+	info = debug.getinfo(debug.setmetatable)
+	zassert(info.what == "C", "debug.setmetatable modified")
+
+	-- Lock the debug table
+	local olddebug = debug
+	debug = setmetatable({}, {
+		__index = olddebug,
+		__newindex = function(self,k,v) print("Addon tried to modify debug table") end,
+		__metatable = "nope.avi",
+	})
+end
 
 -- Send files to client
 if SERVER then
