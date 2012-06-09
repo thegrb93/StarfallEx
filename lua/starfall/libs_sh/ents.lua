@@ -9,6 +9,11 @@ local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true)
 -- @shared
 local ents_lib, _ = SF.Libraries.Register("ents")
 
+-- This is slightly more efficient
+function ValidEntity(ent)
+	return ent and ent:IsValid()
+end
+
 -- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = wrap
