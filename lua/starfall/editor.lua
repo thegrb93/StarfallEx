@@ -113,7 +113,7 @@ if CLIENT then
 		["function"]	= { Color(102, 217, 239), false}, -- teal
 		
 		["comment"]		= { Color(133, 133, 133), false}, -- grey
-		["ppcommand"]   = { Color(240, 210, 110), false}, -- orangeish
+		["ppcommand"]   = { Color(240, 240, 160), false}, -- It was the same as "string". Hurt eyes. (Copy-paste mistake?) Now the same as from E2's editor
 		
 		["notfound"]	= { Color(240,  96,  96), false}, -- dark red
 	}
@@ -345,7 +345,6 @@ if CLIENT then
 		end
 		
 		local editor = SF.Editor.editor:GetCurrentEditor()
-		editor:SetText( code1 .. code2 )
 		editor.Start = editor:MovePosition({1,1}, #code1)
 		editor.Caret = editor:MovePosition(editor.Start, #code2)
 		
