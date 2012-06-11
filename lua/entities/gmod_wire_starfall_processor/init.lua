@@ -7,7 +7,19 @@ include("starfall/SFLib.lua")
 include("libtransfer/libtransfer.lua")
 assert(SF, "Starfall didn't load correctly!")
 
+ENT.WireDebugName = "Starfall Processor"
+ENT.OverlayDelay = 0
+
 local context = SF.CreateContext()
+local name = nil
+
+function ENT:UpdateState(state)
+	if name then
+		self:SetOverlayText("Starfall Processor\n"..name.."\n"..state)
+	else
+		self:SetOverlayText("Starfall Processor\n"..state)
+	end
+end
 
 function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -17,22 +29,9 @@ function ENT:Initialize()
 	self.Inputs = WireLib.CreateInputs(self, {})
 	self.Outputs = WireLib.CreateOutputs(self, {})
 	
-	self:UpdateName("Inactive (No code)")
+	self:UpdateState("Inactive (No code)")
 	local r,g,b,a = self:GetColor()
 	self:SetColor(255, 0, 0, a)
-end
-
-function ENT:UpdateName(state)
-	if state ~= "" then state = "\n"..state end
-	
-	if self.instance and self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
-		self:SetOverlayText("Starfall Processor\n"..tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])..state)
-	else
-		self:SetOverlayText("Starfall Processor"..state)
-	end
-end
-
-function ENT:OnRestore()
 end
 
 function ENT:Compile(codetbl, mainfile)
@@ -48,8 +47,16 @@ function ENT:Compile(codetbl, mainfile)
 		self:Error(msg)
 		return
 	end
-	
-	self:UpdateName("")
+
+	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
+		name = tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])
+	end
+
+	if not name or string.len(name) <= 0 then
+		name = "generic"
+	end
+
+	self:UpdateState("(None)")
 	local r,g,b,a = self:GetColor()
 	self:SetColor(255, 255, 255, a)
 end
@@ -63,7 +70,7 @@ function ENT:Error(msg, override)
 		self.instance = nil
 	end
 	
-	self:UpdateName("Inactive (Error)")
+	self:UpdateState("Inactive (Error)")
 	local r,g,b,a = self:GetColor()
 	self:SetColor(255, 0, 0, a)
 end
@@ -75,13 +82,15 @@ end
 
 function ENT:Think()
 	self.BaseClass.Think(self)
-	self:NextThink(CurTime())
 	
 	if self.instance and not self.instance.error then
+		self:UpdateState(tostring(self.instance.ops).." ops, "..tostring(math.floor(self.instance.ops / self.instance.context.ops * 100)).."%")
+
 		self.instance:resetOps()
 		self:RunScriptHook("think")
 	end
-	
+
+	self:NextThink(CurTime())
 	return true
 end
 
@@ -116,6 +125,9 @@ function ENT:RunScriptHookForResult(hook,...)
 		if not ok then self:Error(rt)
 		else return rt end
 	end
+end
+
+function ENT:OnRestore()
 end
 
 function ENT:BuildDupeInfo()
