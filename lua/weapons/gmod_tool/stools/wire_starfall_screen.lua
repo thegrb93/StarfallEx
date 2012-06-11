@@ -4,120 +4,68 @@ TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
--- ------------------------------- Sending / Recieving ------------------------------- --
+TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
+
 include("libtransfer/libtransfer.lua")
 include("starfall/sflib.lua")
 
-local MakeSF
-local RequestSend
-
-if SERVER then
-	local function callback(ply, task)
-		local ent = ents.GetByIndex(task.entid)
-		if not ent or not ent:IsValid() then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
-			return
-		end
-		
-		if ent:GetClass() ~= "gmod_wire_starfall_screen" then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall screen entity.\n")
-			return
-		end
-		
-		ent:CodeSent(ply,task)
-	end
-	LibTransfer.callbacks["starfallscreen_upload"] = callback
+if CLIENT then
+	language.Add("Tool_wire_starfall_screen_name", 	"Starfall - Screen (Wire)")
+    language.Add("Tool_wire_starfall_screen_desc", 	"Spawns a starfall screen")
+    language.Add("Tool_wire_starfall_screen_0", 		"Primary: Spawns a screen and uploads code, Secondary: Opens editor")
 	
-	CreateConVar('sbox_maxstarfall_screen', 3, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
-	
-	function MakeSF( pl, Pos, Ang, model)
-		if not pl:CheckLimit( "starfall_screen" ) then return false end
+	language.Add("Undone_Wire Starfall Screen", 		"Undone Starfall Screen")
 
-		local sf = ents.Create( "gmod_wire_starfall_screen" )
-		if not IsValid(sf) then return false end
-
-		sf:SetAngles( Ang )
-		sf:SetPos( Pos )
-		sf:SetModel( model )
-		sf:Spawn()
-
-		sf.owner = pl
-
-		pl:AddCount( "starfall_screen", sf )
-
-		return sf
-	end
-	
-	function RequestSend(ply,ent)
-		umsg.Start("starfallscreen_requpload",ply)
-			umsg.Entity(ent)
-		umsg.End()
-	end
-else
-	language.Add( "Tool_wire_starfall_screen_name", "Starfall - Screen (Wire)" )
-    language.Add( "Tool_wire_starfall_screen_desc", "Spawns a starfall screen" )
-    language.Add( "Tool_wire_starfall_screen_0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
-	language.Add( "SBox_max_starfall_Screen", "You've hit the Starfall Screen limit!" )
-	language.Add( "undone_Wire Starfall Screen", "Undone Starfall Screen" )
-	
-	local function sendreq(msg)
-		local ent = msg:ReadEntity()
-		if not SF.Editor.editor then return end
-		
-		local code = SF.Editor.getCode()
-		--if code:match("^%s*.*%s*$") == "" then return end
-		
-		local ok, buildlist = SF.Editor.BuildIncludesTable()
-		if ok then
-			buildlist.entid = ent:EntIndex()
-			LibTransfer.QueueTask("starfallscreen_upload",buildlist)
-		else
-			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
-		end
-	end
-	usermessage.Hook("starfallscreen_requpload",sendreq)
+	language.Add("Cleanup_wire_starfall_screens",   	"Starfall screens")
+	language.Add("Cleaned_wire_starfall_screens",   	"Cleaned up all Wire Starfall Screens")
+	language.Add("SBoxLimit_wire_starfall_screens", 	"You've hit the Starfall screen limit!")
 end
+cleanup.Register("wire_starfall_screens")
 
-TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
-
-cleanup.Register( "starfall_screen" )
-
-
-function TOOL:LeftClick( trace )
+function TOOL:LeftClick(trace)
 	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() then return false end
-	if CLIENT then return true end
 
+	-- If there's no physics object then we can't constraint it!
+    if SERVER and !util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone) then return false
+    elseif CLIENT then return true end
+
+	-- Upload code to existing entity?
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_screen" then
-		RequestSend(self:GetOwner(),trace.Entity)
+		SF.RequestUpload(self:GetOwner(), trace.Entity)
 		return true
 	end
-	
-	self:SetStage(0)
 
-	local model = self:GetClientInfo( "Model" )
+	--self:SetStage(0) -- What is this? No doc in official gmod wiki
+
+	local model = self:GetClientInfo("Model")
 	local ply = self:GetOwner()
-	if not self:GetSWEP():CheckLimit( "starfall_screen" ) then return false end
 
+	-- Limit check
+	if not self:GetSWEP():CheckLimit("wire_starfall_screens") then return false end
+
+	-- Make the entity 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90
 
-	local sf = MakeSF( ply, trace.HitPos, Ang, model)
+	local sf = MakeSFScreen(ply, trace.HitPos, Ang, model)
+	if not sf then return false end
 
+	-- Fix position
 	local min = sf:OBBMins()
-	sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
+	sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
 
-	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
+	local constraint = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
 
+	-- Undo
 	undo.Create("Wire Starfall Screen")
-		undo.AddEntity( sf )
-		undo.AddEntity( const )
-		undo.SetPlayer( ply )
+		undo.AddEntity(sf)
+		undo.AddEntity(constraint)
+		undo.SetPlayer(ply)
 	undo.Finish()
-
-	ply:AddCleanup( "starfall_screen", sf )
 	
-	RequestSend(ply,sf)
+	-- Request client to send code
+	SF.RequestUpload(ply, sf)
 
 	return true
 end
@@ -127,20 +75,44 @@ function TOOL:RightClick( trace )
 	return false
 end
 
-function TOOL:Reload(trace)
-	return false
-end
+if SERVER then
+	CreateConVar("sbox_maxwire_starfall_screens", 3, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 
-function TOOL:DrawHUD()
-end
+	-- (Server) General function to spawn a screen
+	function MakeSFScreen(ply, pos, ang, model)
+		if not ply:CheckLimit("wire_starfall_screens") then return nil end
 
-function TOOL:Think()
-end
+		local sf = ents.Create("gmod_wire_starfall_screen")
+		if not IsValid(sf) then return nil end
 
-if CLIENT then
+		sf:SetAngles(ang)
+		sf:SetPos(pos)
+		sf:SetModel(model)
+		sf:Spawn()
+
+		sf.owner = ply
+		sf:SetPlayer(ply)
+
+		ply:AddCount("wire_starfall_screens", sf)
+		ply:AddCleanup("wire_starfall_screens", sf)
+
+		return sf
+	end
+
+else
 	local lastclick = CurTime()
+
+	-- (Client)
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_starfall_screen_name", Description = "#Tool_wire_starfall_screen_desc" })
+		
+		local modelPanel = WireDermaExts.ModelSelect(panel, "wire_starfall_screen_Model", list.Get("WireScreenModels"), 2)
+		panel:AddControl("Label", {Text = ""})
+		
+		local docButton = vgui.Create("DButton" , panel)
+		panel:AddPanel(docButton)
+		docButton:SetText("Starfall LuaDoc")
+		docButton.DoClick = function(button) gui.OpenURL("http://colonelthirtytwo.net/sfdoc/") end
 		
 		local filebrowser = vgui.Create("wire_expression2_browser")
 		panel:AddPanel(filebrowser)
@@ -157,5 +129,15 @@ if CLIENT then
 				SF.Editor.editor:LoadFile(dir)
 			end
 		end
+		
+		local openEditor = vgui.Create("DButton", panel)
+		panel:AddPanel(openEditor)
+		openEditor:SetText("Open Editor")
+		openEditor.DoClick = SF.Editor.open
+	end	
+
+	function TOOL.RenderToolScreen()
+		SF.RenderToolScreen()
 	end
 end
+
