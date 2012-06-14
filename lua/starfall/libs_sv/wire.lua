@@ -35,7 +35,7 @@ local inputConverters =
 	STRING = identity,
 	VECTOR = identity,
 	ANGLE = identity,
-	WIRELINK = function(wl) return wlwrap(wl) end,
+	WIRELINK = function(wl) return wl ~= nil and wlwrap(wl) end,
 }
 
 local outputConverters =
