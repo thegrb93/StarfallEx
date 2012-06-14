@@ -204,7 +204,7 @@ end
 -- wrapped object.
 -- @return the unwrapped starfall object
 function SF.UnwrapObject( object )
-	local metatable = degetmeta(object)
+	local metatable = dgetmeta(object)
 	
 	local unwrap = object_unwrappers[metatable]
 	return unwrap and unwrap(object)
@@ -293,16 +293,19 @@ function SF.Unsanitize( ... )
 		if (typ == "table" and object_unwrappers[dgetmeta(value)]) then
 			return_list[key] = SF.UnwrapObject(value) or value
 		elseif typ == "table" then
+			return_list[key] = {}
+
 			for k,v in pairs(value) do
-				return_list[SF.Unsanitize(k)] = SF.Unsanitize(v)
+				return_list[key][SF.Unsanitize(k)] = SF.Unsanitize(v)
 			end
 		else
 			return_list[key] = value
 		end
 	end
-	
+
 	return unpack( return_list )
 end
+
 
 
 local serialize_replace_regex = "[\"\n]"

@@ -28,6 +28,50 @@ SF.Wire.WlUnwrap = wlunwrap
 
 -- ------------------------- Internal Library ------------------------- --
 
+-- Allowed Expression2's types in tables and their short names
+local expression2types = {
+	n = "NORMAL",
+	s = "STRING",
+	v = "VECTOR",
+	a = "ANGLE",
+	xwl = "WIRELINK",
+	e = "ENTITY",
+	t = "TABLE"
+}
+
+local function convertFromExpression2(value, shortTypeName)
+	local typ = expression2types[shortTypeName]
+	if not typ or not SF.Wire.InputConverters[typ] then return nil end
+
+	return SF.Wire.InputConverters[typ](value)
+end
+
+local function convertToExpression2(value)
+	local typ = type(value)
+
+	-- Simple type?
+	if typ == "number" then return value, "n"
+	elseif typ == "string" then return value, "s"
+	elseif typ == "Vector" then return {value.x, value.y, value.z}, "v"
+	elseif typ == "Angle" then return {value.p, value.y, value.r}, "a"
+
+	-- We've got a table there. Is it wrapped object?
+	elseif typ == "table" then
+		local value = SF.Unsanitize(value)
+		typ = type(value)
+
+		if typ == "table" then 
+			-- It is still table, do recursive convert
+			return SF.Wire.OutputConverters.TABLE(value), "t"
+
+		-- Unwrapped entity (wirelink goes to this, but it returns it as entity; don't think somebody needs to put wirelinks in table)
+		elseif typ == "Entity" then return value, "e" end
+	end
+
+	-- Nothing found / unallowed type
+	return nil, nil
+end
+
 local function identity(data) return data end
 local inputConverters =
 {
@@ -35,7 +79,25 @@ local inputConverters =
 	STRING = identity,
 	VECTOR = identity,
 	ANGLE = identity,
-	WIRELINK = function(wl) return wlwrap(wl) end,
+	WIRELINK = function(wl) return wl ~= nil and wlwrap(wl) end,
+
+	TABLE = function(tbl)
+		if not tbl.istable or not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
+		if tbl.size == 0 then return {} end -- Don't waste our time
+		local conv = {}
+
+		-- Key-numeric part of table
+		for key, typ in ipairs(tbl.ntypes) do
+			conv[key] = convertFromExpression2(tbl.n[key], typ)
+		end
+
+		-- Key-string part of table
+		for key, typ in pairs(tbl.stypes) do
+			conv[key] = convertFromExpression2(tbl.s[key], typ)
+		end
+
+		return conv
+	end
 }
 
 local outputConverters =
@@ -55,6 +117,31 @@ local outputConverters =
 	ANGLE = function(data)
 		SF.CheckType(data,"Angle",1)
 		return data
+	end,
+
+	TABLE = function(data)
+		SF.CheckType(data,"table",1)
+
+		local tbl = {istable=true, size=0, n={}, ntypes={}, s={}, stypes={}}
+
+		for key, value in pairs(data) do
+			local value, shortType = convertToExpression2(value)
+
+			if shortType then
+				if type(key) == "string" then
+					tbl.s[key] = value
+					tbl.stypes[key] = shortType
+					tbl.size = tbl.size+1
+
+				elseif type(key) == "number" then
+					tbl.n[key] = value
+					tbl.ntypes[key] = shortType
+					tbl.size = tbl.size+1
+				end
+			end
+		end
+
+		return tbl
 	end
 }
 
