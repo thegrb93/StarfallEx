@@ -4,142 +4,106 @@ TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
--- ------------------------------- Sending / Recieving ------------------------------- --
+TOOL.ClientConVar["Model"] = "models/bull/gates/processor.mdl"
+
 include("libtransfer/libtransfer.lua")
 include("starfall/sflib.lua")
 
-local MakeSF
-local RequestSend
-
-if SERVER then
-	local function callback(ply, task)
-		local ent = ents.GetByIndex(task.entid)
-		if not ent or not ent:IsValid() then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
-			return
-		end
-		
-		if ent:GetClass() ~= "gmod_wire_starfall_processor" then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
-			return
-		end
-		
-		ent:CodeSent(ply,task)
-	end
-	LibTransfer.callbacks["starfall_upload"] = callback
+if CLIENT then
+	language.Add("Tool_wire_starfall_processor_name", 	"Starfall - Processor (Wire)")
+    language.Add("Tool_wire_starfall_processor_desc", 	"Spawns a starfall processor")
+    language.Add("Tool_wire_starfall_processor_0", 		"Primary: Spawns a processor and uploads code, Secondary: Opens editor")
 	
-	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
-	
-	function MakeSF( pl, Pos, Ang, model)
-		if not pl:CheckLimit( "starfall_processor" ) then return false end
+	language.Add("Undone_Wire Starfall Processor", 		"Undone Starfall Processor")
 
-		local sf = ents.Create( "gmod_wire_starfall_processor" )
-		if not IsValid(sf) then return false end
-
-		sf:SetAngles( Ang )
-		sf:SetPos( Pos )
-		sf:SetModel( model )
-		sf:Spawn()
-
-		sf.owner = pl
-
-		pl:AddCount( "starfall_processor", sf )
-
-		return sf
-	end
-	
-	function RequestSend(ply,ent)
-		umsg.Start("starfall_requpload",ply)
-			umsg.Entity(ent)
-		umsg.End()
-	end
-else
-	language.Add( "Tool_wire_starfall_processor_name", "Starfall - Processor (Wire)" )
-    language.Add( "Tool_wire_starfall_processor_desc", "Spawns a starfall processor" )
-    language.Add( "Tool_wire_starfall_processor_0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
-	language.Add( "sboxlimit_wire_starfall_processor", "You've hit the Starfall processor limit!" )
-	language.Add( "undone_Wire Starfall Processor", "Undone Starfall Processor" )
-	
-	local function sendreq(msg)
-		local ent = msg:ReadEntity()
-		if not SF.Editor.editor then return end
-		
-		local code = SF.Editor.getCode()
-		--if code:match("^%s*.*%s*$") == "" then return end
-		
-		local ok, buildlist = SF.Editor.BuildIncludesTable()
-		if ok then
-			buildlist.entid = ent:EntIndex()
-			LibTransfer.QueueTask("starfall_upload",buildlist)
-			uploading = true;
-		else
-			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
-		end
-	end
-	usermessage.Hook("starfall_requpload",sendreq)
+	language.Add("Cleanup_wire_starfall_processors",   	"Starfall processors")
+	language.Add("Cleaned_wire_starfall_processors",   	"Cleaned up all Wire Starfall Processors")
+	language.Add("SBoxLimit_wire_starfall_processors", 	"You've hit the Starfall processor limit!")
 end
+cleanup.Register("wire_starfall_processors")
 
-TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
-
-cleanup.Register( "starfall_processor" )
-
-
-function TOOL:LeftClick( trace )
+function TOOL:LeftClick(trace)
 	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() then return false end
-	if CLIENT then return true end
 
+	-- If there's no physics object then we can't constraint it!
+    if SERVER and !util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone) then return false
+    elseif CLIENT then return true end
+
+	-- Upload code to existing entity?
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_processor" then
-		RequestSend(self:GetOwner(),trace.Entity)
+		SF.RequestUpload(self:GetOwner(), trace.Entity)
 		return true
 	end
-	
-	self:SetStage(0)
 
-	local model = self:GetClientInfo( "Model" )
+	--self:SetStage(0) -- What is this? No doc in official gmod wiki
+
+	local model = self:GetClientInfo("Model")
 	local ply = self:GetOwner()
-	if not self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
 
+	-- Limit check
+	if not self:GetSWEP():CheckLimit("wire_starfall_processors") then return false end
+
+	-- Make the entity 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90
 
-	local sf = MakeSF( ply, trace.HitPos, Ang, model)
+	local sf = MakeSF(ply, trace.HitPos, Ang, model)
+	if not sf then return false end
 
+	-- Fix position
 	local min = sf:OBBMins()
-	sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
+	sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
 
-	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
+	local constraint = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
 
+	-- Undo
 	undo.Create("Wire Starfall Processor")
-		undo.AddEntity( sf )
-		undo.AddEntity( const )
-		undo.SetPlayer( ply )
+		undo.AddEntity(sf)
+		undo.AddEntity(constraint)
+		undo.SetPlayer(ply)
 	undo.Finish()
-
-	ply:AddCleanup( "starfall_processor", sf )
 	
-	RequestSend(ply,sf)
+	-- Request client to send code
+	SF.RequestUpload(ply, sf)
 
 	return true
 end
 
-function TOOL:RightClick( trace )
+function TOOL:RightClick(trace)
 	if SERVER then self:GetOwner():SendLua("SF.Editor.open()") end
+
 	return false
 end
 
-function TOOL:Reload(trace)
-	return false
-end
+if SERVER then
+	CreateConVar("sbox_maxwire_starfall_processors", 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 
-function TOOL:DrawHUD()
-end
+	-- (Server) General function to spawn a processor
+	function MakeSF(ply, pos, ang, model)
+		if not ply:CheckLimit("wire_starfall_processors") then return nil end
 
-function TOOL:Think()
-end
+		local sf = ents.Create("gmod_wire_starfall_processor")
+		if not IsValid(sf) then return nil end
 
-if CLIENT then
+		sf:SetAngles(ang)
+		sf:SetPos(pos)
+		sf:SetModel(model)
+		sf:Spawn()
+
+		sf.owner = ply
+		sf:SetPlayer(ply)
+
+		ply:AddCount("wire_starfall_processors", sf)
+		ply:AddCleanup("wire_starfall_processors", sf)
+
+		return sf
+	end
+
+else
 	local lastclick = CurTime()
+
+	-- (Client)
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_starfall_processor_name", Description = "#Tool_wire_starfall_processor_desc" })
 		
@@ -171,16 +135,23 @@ if CLIENT then
 		panel:AddPanel(openEditor)
 		openEditor:SetText("Open Editor")
 		openEditor.DoClick = SF.Editor.open
-	end
+	end	
+end
+
+--------------------------------- ToolScreen ---------------------------------
+local uploading
+
+if CLIENT then
+	surface.CreateFont("Lucida Console", 100, 1000, true, false, "SFToolScreenFont")
 	
-	-- ------------------------------- Tool screen ------------------------------- --
-	surface.CreateFont("Lucida Console", 25, 1000, true, false, "SFToolScreenFont")
-	local function drawText(text, y, color) draw.DrawText(text, "SFToolScreenFont", 5, 32*y, color,0) end
-	
-	local uploadingCursor = 0;
-	local uploadingPercent = 0;
-	
-	function TOOL:RenderToolScreen()
+	local uploadingCursor = 0
+	local uploadingPercent = 0
+
+	local boxes = 10
+	local dPerBox = math.pi * 2 / boxes
+	local tex = surface.GetTextureID("gui/gradient_down")
+
+	function SF.RenderToolScreen()
 		if uploading then
 			if not uploadData then
 				uploadData = LibTransfer.queue_c2s[#(LibTransfer.queue_c2s)] or {};
@@ -191,23 +162,93 @@ if CLIENT then
 			
 			if uploadData then
 				uploadingCursor = uploadData[5]
-				uploadingPercent = math.Clamp((uploadingCursor / uploadData.dataSize) * 100, 0, 100)
+				uploadingPercent = math.Clamp((uploadingCursor / uploadData.dataSize) * 100, 0, 100) -- Clamp to avoid division by zero
 					
 				if uploadingCursor >= uploadData.dataSize then
-					uploading = nil; uploadData = nil;
+					uploading = nil
+					uploadData = nil
 				end
 			end
 		end
 		
 		cam.Start2D()
-			surface.SetDrawColor(0, 0, 0, 255)
+			surface.SetDrawColor(64, 64, 64, 255)
 			surface.DrawRect(0, 0, 256, 256)
-	
-			drawText("SF Flasher", 1, Color(224, 244, 244, 255))
 			
-			drawText(string.format("Sent: %.2f KB", uploadingCursor / 1024), 3, Color(224, 244, 244, 255))
-			drawText(string.format("Progress: %.0f %%", uploadingPercent), 4, Color(244, 244, 244, 255))
-			if uploading then drawText("UPLOADING", 6, Color(0, 128, 0, 255)) end
+			draw.DrawText("SF", "SFToolScreenFont", 128 - 64, 128 - 64, Color(224, 244, 244, 255), 0)
+
+			-- Neat progress bar by Cenius
+			for box=1, boxes do
+				local posx = 128 + math.cos(box * dPerBox) * 100
+				local posy = 128 + math.sin(box * dPerBox) * 100
+				local ang = math.Rad2Deg(math.atan2(128 - posx, 128 - posy))
+
+				local clr = 0
+				local startprogress = ((boxes + boxes/4 + box) % boxes) / boxes
+				local progress = uploadingPercent / 100
+				if progress > startprogress then
+					if progress < (startprogress+(1/boxes)) and progress < 0.98 then -- < 0.98 because when upload finishes we don't know exactly progress
+						clr = (progress % startprogress) * 10 * 255
+					else
+						clr = 255
+					end
+				end
+
+				surface.SetTexture(tex)
+				surface.SetDrawColor(255 - clr, clr, 0, 255)
+				surface.DrawTexturedRectRotated(posx, posy, 48, 24, ang)
+			end
+
 		cam.End2D()
 	end
+	
+	function TOOL.RenderToolScreen()
+		SF.RenderToolScreen()
+	end
+end
+
+
+--------------------------------- Uploading ---------------------------------
+if SERVER then
+	-- (Server) Makes client feel we really need his code
+	function SF.RequestUpload(ply, ent)
+		ply:ConCommand("wire_starfall_requpload "..ent:EntIndex())
+	end
+
+	-- (Server) Code from client arrived
+	local function onUploadReceived(ply, task)
+		local ent = ents.GetByIndex(task.entid)
+
+		if not ent or not ent:IsValid() then
+			--ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
+			-- There is possibly to spam with these errors. (Quickly spawn and undo entity)
+			return
+		end
+		
+		if ent:GetClass() ~= "gmod_wire_starfall_processor" and ent:GetClass() ~= "gmod_wire_starfall_screen" then
+			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor / screen entity.\n")
+			-- This is only for debug. There is also a way to spam server's console using this.
+			return
+		end
+		
+		ent:CodeSent(ply, task)
+	end
+	LibTransfer.callbacks["starfall_upload"] = onUploadReceived
+else
+	-- (Client) Send code
+	concommand.Add("wire_starfall_requpload", function(ply, cmds, args)
+		if not SF.Editor.isInitialized() then SF.Editor.init() return end
+		
+		local code = SF.Editor.getCode()
+		--if code:match("^%s*.*%s*$") == "" then return end
+		
+		local ok, buildlist = SF.Editor.BuildIncludesTable()
+		if ok then
+			buildlist.entid = tonumber(args[1])
+			LibTransfer.QueueTask("starfall_upload", buildlist)
+			uploading = true
+		else
+			WireLib.AddNotify("File not found: "..buildlist, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1)
+		end
+	end)
 end
