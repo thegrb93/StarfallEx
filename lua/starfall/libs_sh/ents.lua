@@ -125,6 +125,19 @@ function ents_methods:mass()
 	return phys:GetMass()
 end
 
+--- Returns the principle moments of inertia of the entity
+-- @shared
+-- @return The principle moments of inertia as a vector
+function ents_methods:inertia()
+	SF.CheckType(self,ents_metamethods)
+	
+	local ent = unwrap(self)
+	local phys = getPhysObject(ent)
+	if not phys then return false, "entity has no physics object or is not valid" end
+	
+	return phys:GetInertia()
+end
+
 --- Returns the velocity of the entity
 -- @shared
 -- @return The velocity vector
@@ -133,6 +146,16 @@ function ents_methods:vel()
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:GetVelocity()
+end
+
+--- Returns the angular velocity of the entity
+-- @shared
+-- @return The angular velocity vector
+function ents_methods:angVelVector()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:GetAngleVelocity()
 end
 
 --- Converts a vector in entity local space to world space
