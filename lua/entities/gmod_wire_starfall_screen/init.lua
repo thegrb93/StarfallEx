@@ -145,9 +145,7 @@ function ENT:RunScriptHook(hook, ...)
 end
 
 function ENT:TriggerInput(key, value)
-	if self.instance and not self.instance.error then
-		self.instance:RunScriptHook("input",key,value)
-	end
+	self:RunScriptHook("input",key,value)
 end
 
 function ENT:BuildDupeInfo()
