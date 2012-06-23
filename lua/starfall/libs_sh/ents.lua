@@ -102,6 +102,36 @@ function ents_methods:pos()
 	return ent:GetPos()
 end
 
+--- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
+-- @shared
+-- @return The outer bounding box size
+function ents_methods:obbSize()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:OBBMaxs() - ent:OBBMins()
+end
+
+--- Returns the world position of the entity's outer bounding box
+-- @shared
+-- @return The position vector of the outer bounding box center
+function ents_methods:obbCenter()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:LocalToWorld(ent:OBBCenter())
+end
+
+--- Returns the world position of the entity's mass center
+-- @shared
+-- @return The position vector of the mass center
+function ents_methods:massCenter()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:LocalToWorld(ent:GetMassCenter())
+end
+
 --- Returns the angle of the entity
 -- @shared
 -- @return The angle
