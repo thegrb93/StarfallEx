@@ -26,6 +26,7 @@ end
 
 local function class (tag, block, text)
 	block[tag] = text
+	if text == "hook" then block.param = block.param or {} end
 	block.classForced = true
 end
 
@@ -84,17 +85,20 @@ end
 
 local function param (tag, block, text)
 	block[tag] = block[tag] or {}
-	-- TODO: make this pattern more flexible, accepting empty descriptions
+	local i
+	
 	local _, _, name, desc = string.find(text, "^([_%w%.]+)%s*(.*)")
 	if not name then
 		luadoc.logger:warn("parameter `name' not defined [["..text.."]]: skipping")
 		return
 	end
-	local i = table.foreachi(block[tag], function (i, v)
+	
+	i = table.foreachi(block[tag], function (i, v)
 		if v == name then
 			return i
 		end
 	end)
+	
 	if i == nil then
 		if not block.classForced then
 			luadoc.logger:warn(string.format("documenting undefined parameter `%s'", name))

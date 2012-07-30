@@ -1,6 +1,12 @@
 --- Screen library
 -- @author Colonel Thirty Two
 
+--- Called when the screen can draw a frame. You may want to unhook from this if you don't need
+-- to render anything for a bit
+-- @name render
+-- @class hook
+-- @client
+
 --- Screen library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
