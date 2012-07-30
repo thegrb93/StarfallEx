@@ -1,5 +1,6 @@
---- Shared stuff between client-side entities library and
--- server-side entities library
+-------------------------------------------------------------------------------
+-- Shared entity library functions
+-------------------------------------------------------------------------------
 
 SF.Entities = {}
 

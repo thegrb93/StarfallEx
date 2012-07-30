@@ -92,6 +92,21 @@ function module_link (modulename, doc, from)
 	return href
 end
 
+function hook_link(hookname, doc, from)
+	assert(hookname)
+	assert(doc)
+	from = from or ""
+	
+	if doc.hooks[hookname] == nil then
+--		logger:error(string.format("unresolved reference to hook `%s'", hookname))
+		return
+	end
+	
+	local href = "hooks.html"
+	string.gsub(from, "/", function () href = "../" .. href end)
+	return href
+end
+
 -------------------------------------------------------------------------------
 -- Returns the name of the html file to be generated from a lua(doc) file.
 -- Files with "lua" or "luadoc" extensions are replaced by "html" extension.
@@ -180,23 +195,15 @@ end
 -- Assembly the output filename for an input file.
 -- TODO: change the name of this function
 function out_file (filename)
-	local h = filename
-	h = string.gsub(h, "lua$", "html")
-	h = string.gsub(h, "luadoc$", "html")
-	h = "files/" .. h
---	h = options.output_dir .. string.gsub (h, "^.-([%w_]+%.html)$", "%1")
-	h = options.output_dir .. h
-	return h
+	filename = string.gsub(string.gsub(filename, "luadoc$", "html"), "lua$", "html")
+	return string.format("%sfiles/%s.html", options.output_dir, filename)
 end
 
 -------------------------------------------------------------------------------
 -- Assembly the output filename for a module.
 -- TODO: change the name of this function
 function out_module (modulename)
-	local h = modulename .. ".html"
-	h = "libraries/" .. h
-	h = options.output_dir .. h
-	return h
+	return string.format("%slibraries/%s.html", options.output_dir, modulename)
 end
 
 -----------------------------------------------------------------
@@ -246,6 +253,14 @@ function start (doc)
 			f:close()
 		end
 	end
+	
+	local filename = options.output_dir.."hooks.html"
+	logger:info("generating file `%s'", filename)
+	local f = lfs.open(filename, "w")
+	assert(f, string.format("could not open `%s' for writing", filename))
+	io.output(f)
+	include("hooks.lp", {doc=doc, hook_doc=doc})
+	f:close()
 	
 	-- copy extra files
 	local f = lfs.open(options.output_dir.."luadoc.css", "w")

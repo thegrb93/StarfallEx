@@ -1,3 +1,6 @@
+-------------------------------------------------------------------------------
+-- Wire library.
+-------------------------------------------------------------------------------
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library, _ = SF.Libraries.Register("wire")
@@ -360,3 +363,24 @@ end
 -- @class table
 -- @name wire_library.ports
 wire_library.ports = setmetatable({},wire_ports_metamethods)
+
+-- ------------------------- Hook Documentation ------------------------- --
+
+--- Called when an input on a wired SF chip is written to
+-- @name input
+-- @class hook
+-- @param input The input name
+-- @param value The value of the input
+
+--- Called when a high speed device reads from a wired SF chip
+-- @name readcell
+-- @class hook
+-- @server
+-- @param address The address requested
+-- @return The value read
+
+--- Called when a high speed device writes to a wired SF chip
+-- @name writecell
+-- @class hook
+-- @param address The address written to
+-- @param data The data being written

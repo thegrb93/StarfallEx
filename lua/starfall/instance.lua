@@ -1,6 +1,7 @@
 ---------------------------------------------------------------------
--- SF Instance class
--- @author Colonel Thirty Two
+-- SF Instance class.
+-- Contains the compiled SF script and essential data. Essentially
+-- the execution context.
 ---------------------------------------------------------------------
 
 SF.Instance = {}

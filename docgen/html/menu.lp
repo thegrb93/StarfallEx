@@ -1,6 +1,8 @@
 <?lua 
 if module_doc then
 	from = "libraries/"..module_doc.name
+elseif hook_doc then
+	from = "hooks.html"
 elseif file_doc then
 	from = "files/.."..file_doc.name
 else
@@ -34,6 +36,18 @@ end?>
 </ul>
 <?lua end?>
 
+<h1>Hooks</h1>
+<ul>
+<?lua for _, hookname in ipairs(doc.hooks) do
+	if hook_doc and hook_doc.name == hookname then?>
+	<li><strong><?lua=hookname?></strong></li>
+	<?lua else?>
+	<li>
+		<a href="<?lua=docletsfhtml.hook_link(hookname, doc, from)?>#<?lua=hookname?>"><?lua=hookname?></a>
+	</li>
+<?lua 	end
+end?>
+</ul>
 
 <!-- File list -->
 <?lua if not options.nofiles and #doc.files > 0 then?>

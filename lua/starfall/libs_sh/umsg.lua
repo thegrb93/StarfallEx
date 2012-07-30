@@ -1,8 +1,16 @@
+-------------------------------------------------------------------------------
+-- Networking library.
+-------------------------------------------------------------------------------
 
 local umsg = umsg
 
 --- Usermessages library. Used for sending data from the server to the client.
 local umsg_library, _ = SF.Libraries.Register("umsg")
+
+--- Called when a usermessage is recieved
+-- @name umsg
+-- @class hook
+-- @param data The umsg object
 
 if SERVER then
 	-- -------------------------------------------------------------- --

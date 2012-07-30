@@ -1,5 +1,6 @@
---- Find functions
---- @author Colonel Thirty Two
+-------------------------------------------------------------------------------
+-- Find functions
+-------------------------------------------------------------------------------
 
 --- Find library. Finds entities in various shapes.
 -- @shared
