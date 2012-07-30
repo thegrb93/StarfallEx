@@ -244,11 +244,13 @@ if CLIENT then
 								found = true
 								break
 							else -- No match. Check function name instead
-								for funcname,func in pairs( lib.__index ) do
-									if self.tokendata == funcname then -- match!
-										addToken( "function", self.tokendata )
-										found = true
-										break
+								if type(lib.__index) == "table" then
+									for funcname,func in pairs( lib.__index ) do
+										if self.tokendata == funcname then -- match!
+											addToken( "function", self.tokendata )
+											found = true
+											break
+										end
 									end
 								end
 							end
