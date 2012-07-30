@@ -1,6 +1,5 @@
 ---------------------------------------------------------------------
 -- SF callback class.
--- @author Daranable
 ---------------------------------------------------------------------
 
 -- Initialize the class, and set it's __index value to itself.

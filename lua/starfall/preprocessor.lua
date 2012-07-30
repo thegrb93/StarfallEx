@@ -1,7 +1,6 @@
 -------------------------------------------------------------------------------
 -- SF Preprocessor.
 -- Processes code for compile time directives.
--- @author Colonel Thirty Two
 -------------------------------------------------------------------------------
 
 -- TODO: Make an @include-only parser

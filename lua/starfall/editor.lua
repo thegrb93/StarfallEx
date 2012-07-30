@@ -1,3 +1,8 @@
+-------------------------------------------------------------------------------
+-- SF Editor.
+-- Functions for setting up the code editor, as well as helper functions for
+-- sending code over the network.
+-------------------------------------------------------------------------------
 
 SF.Editor = {}
 
