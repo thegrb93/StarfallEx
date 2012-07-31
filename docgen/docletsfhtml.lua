@@ -196,7 +196,7 @@ end
 -- TODO: change the name of this function
 function out_file (filename)
 	filename = string.gsub(string.gsub(filename, "luadoc$", "html"), "lua$", "html")
-	return string.format("%sfiles/%s.html", options.output_dir, filename)
+	return string.format("%sfiles/%s", options.output_dir, filename)
 end
 
 -------------------------------------------------------------------------------
