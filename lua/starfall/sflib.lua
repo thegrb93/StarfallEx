@@ -2,10 +2,7 @@
 -- The main Starfall library
 -------------------------------------------------------------------------------
 
-if SF ~= nil then
-	ErrorNoHalt("Warning: Multiple installations of Starfall detected. This can cause problems!")
-	return
-end
+if SF ~= nil then return end
 SF = {}
 
 -- Do a couple of checks for retarded mods that disable the debug table
