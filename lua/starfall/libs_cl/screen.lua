@@ -471,13 +471,13 @@ end
 ---
 -- @name Screen information table
 -- @class table
--- @field Name Pretty name
--- @field offset Offset of screen from prop (?)
--- @field RS Scale (?)
+-- @field Name Pretty name of model
+-- @field offset Offset of screen from prop
+-- @field RS Resolution/scale
 -- @field RatioX Inverted Aspect ratio (height divided by width)
--- @field x1 Corner of screen in local coordinates
--- @field x2 Corner of screen in local coordinates
--- @field y1 Corner of screen in local coordinates
--- @field y2 Corner of screen in local coordinates
--- @field z Screen plane offset in local coordinates
+-- @field x1 Corner of screen in local coordinates (relative to offset?)
+-- @field x2 Corner of screen in local coordinates (relative to offset?)
+-- @field y1 Corner of screen in local coordinates (relative to offset?)
+-- @field y2 Corner of screen in local coordinates (relative to offset?)
+-- @field z Screen plane offset in local coordinates (relative to offset?)
 -- @field rot Screen rotation
