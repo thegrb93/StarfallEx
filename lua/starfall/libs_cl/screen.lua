@@ -286,6 +286,21 @@ function screen_library.drawTexturedRectUV(x,y,w,h,tw,th)
 	cam.PopModelMatrix(matrix)
 end
 
+--- Draws a rotated, textured rectangle.
+-- @param x X coordinate of center of rect
+-- @param y Y coordinate of center of rect
+-- @param w Width
+-- @param h Height
+-- @param rot Rotation in degrees
+function screen_library.drawTexturedRectRotated(x,y,w,h,rot)
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	cam.PushModelMatrix(matrix)
+	surface.DrawTexturedRectRotated(tonumber(x) or 0, tonumber(y) or 0,
+		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
+		tonumber(rot) or 0)
+	cam.PopModelMatrix(matrix)
+end
+
 --- Draws a line
 -- @param x1 X start coordinate
 -- @param y1 Y start coordinate
