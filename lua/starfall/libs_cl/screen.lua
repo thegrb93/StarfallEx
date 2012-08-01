@@ -123,48 +123,41 @@ local function fixcolorT(tbl)
 		clamp(tonumber(tbl and tbl.a) or 255,0,255))
 end
 
-local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
-local wrapmesh, unwrapmesh = SF.CreateWrapper(mesh_metamethods)
+local poly_methods, poly_metamethods = SF.Typedef("Polygon")
+local wrappoly, unwrappoly = SF.CreateWrapper(poly_metamethods)
 
 local function checkvertex(vert)
-	print("\tVertex:")
-	print(string.format("\t\tx= %s",vert.x))
-	print(string.format("\t\ty= %s",vert.y))
-	print(string.format("\t\tu= %s",vert.u))
-	print(string.format("\t\tv= %s",vert.v))
-	print("\tEnd vertex.")
-	local copy = {
-		x = SF.CheckType(vert.x,"number",1),
-		y = SF.CheckType(vert.y,"number",1),
-		u = tonumber(vert.u) or 0,
-		v = tonumber(vert.v) or 0,
+	return {
+		x = SF.CheckType(vert.x or vert[1],"number",1),
+		y = SF.CheckType(vert.y or vert[2],"number",1),
+		u = tonumber(vert.u or vert[3]) or 0,
+		v = tonumber(vert.v or vert[4]) or 0,
 	}
-	return copy
 end
 
-function mesh_metamethods:__index(k)
-	SF.CheckType(self,mesh_metamethods)
+function poly_metamethods:__index(k)
+	SF.CheckType(self,poly_metamethods)
 	SF.CheckType(k,"number")
-	local mesh = unwrapmesh(self)
-	if not mesh then return nil end
-	if k <= 0 or k > #mesh then return nil end
-	return table.Copy(mesh[i])
+	local poly = unwrappoly(self)
+	if not poly then return nil end
+	if k <= 0 or k > #poly then return nil end
+	return table.Copy(poly[i])
 end
 
-function mesh_metamethods:__len()
-	SF.CheckType(self,mesh_metamethods)
-	local mesh = unwrapmesh(self)
-	return mesh and #mesh or nil
+function poly_metamethods:__len()
+	SF.CheckType(self,poly_metamethods)
+	local poly = unwrappoly(self)
+	return poly and #poly or nil
 end
 
-function mesh_metamethods:__newindex(k,v)
-	SF.CheckType(self,mesh_metamethods)
+function poly_metamethods:__newindex(k,v)
+	SF.CheckType(self,poly_metamethods)
 	SF.CheckType(k,"number")
 	SF.CheckType(v,"table")
-	local mesh = unwrapmesh(self)
-	if not mesh then return end
-	if k <= 0 or k > (#mesh)+1 then return error("mesh index out of bounds: "..k.." out of "..#mesh,2) end
-	mesh[k] = checkvertex(v)
+	local poly = unwrappoly(self)
+	if not poly then return end
+	if k <= 0 or k > (#poly)+1 then return error("poly index out of bounds: "..k.." out of "..#poly,2) end
+	poly[k] = checkvertex(v)
 end
 
 -- ------------------------------------------------------------------ --
@@ -293,6 +286,21 @@ function screen_library.drawTexturedRectUV(x,y,w,h,tw,th)
 	cam.PopModelMatrix(matrix)
 end
 
+--- Draws a rotated, textured rectangle.
+-- @param x X coordinate of center of rect
+-- @param y Y coordinate of center of rect
+-- @param w Width
+-- @param h Height
+-- @param rot Rotation in degrees
+function screen_library.drawTexturedRectRotated(x,y,w,h,rot)
+	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	cam.PushModelMatrix(matrix)
+	surface.DrawTexturedRectRotated(tonumber(x) or 0, tonumber(y) or 0,
+		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
+		tonumber(rot) or 0)
+	cam.PopModelMatrix(matrix)
+end
+
 --- Draws a line
 -- @param x1 X start coordinate
 -- @param y1 Y start coordinate
@@ -357,44 +365,47 @@ function screen_library.drawText(font,x,y,text,alignment)
 	cam.PopModelMatrix()
 end
 
---- Compiles a 2D mesh. This is needed so that meshes don't have to be
--- type-checked each frame. Meshes can be indexed by a number, in which
+--- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
+function screen_library.vertex(x,y,u,v)
+	return {x=x, y=y, u=u, v=v}
+end
+
+--- Compiles a 2D poly. This is needed so that poly don't have to be
+-- type-checked each frame. Polys can be indexed by a number, in which
 -- a copy of the vertex at that spot is returned. They can also be assigned
--- a new vertex at 1 <= i <= #mesh+1. And the length of the mesh can be taken.
+-- a new vertex at 1 <= i <= #poly+1. And the length of the poly can be taken.
 -- @param verts Array of verticies to convert.
-function screen_library.createMesh(verts)
+function screen_library.createPoly(verts)
 	SF.CheckType(verts,"table")
-	local mesh = {}
-	local meshtbl = wrapmesh(mesh)
-	print(string.format("DEBUG: Creating mesh from %d verticies!",#verts))
+	local poly = {}
+	local wrappedpoly = wrappoly(poly)
 	for i=1,#verts do
 		local v = verts[i]
 		SF.CheckType(v,"table")
-		mesh[i] = checkvertex(v)
+		poly[i] = checkvertex(v)
 	end
-	print("DEBUG: End creating mesh")
-	return meshtbl
+	return wrappedpoly
 end
 
---- Draws a polygon (mesh). Takes a compiled/uncompiled mesh to draw.
--- Note that if you do use an uncompiled mesh, you will use up ops
+--- Draws a polygon. Takes a compiled/uncompiled poly to draw.
+-- Note that if you do use an uncompiled poly, you will use up ops
 -- very quickly! (Doesn't seem to work at the moment)
--- TODO: Fix this
--- @param mesh Compiled mesh or array of vertexes
-function screen_library.drawPoly(mesh)
-	if dgetmeta(mesh) ~= mesh_metamethods then
-		print("DEBUG: Compiling mesh at runtime!")
-		SF.CheckType(mesh,"table")
-		verts = mesh
-		mesh = {}
+-- @param poly Compiled poly or array of vertexes
+function screen_library.drawPoly(poly)
+	if dgetmeta(poly) ~= poly_metamethods then
+		SF.CheckType(poly,"table")
+		local verts = poly
+		poly = {}
 		for i=1,#verts do
 			local v = verts[i]
 			SF.CheckType(v,"table")
-			mesh[i] = checkvertex(v)
+			poly[i] = checkvertex(v)
 		end
+	else
+		poly = unwrappoly(poly)
 	end
 	cam.PushModelMatrix(matrix)
-	surface.DrawPoly(mesh)
+	surface.DrawPoly(poly)
 	cam.PopModelMatrix()
 end
 
@@ -436,3 +447,37 @@ function screen_library.screenPos( ply )
 	
 	return nil
 end
+
+--- Returns information about the screen, such as dimentions and rotation.
+-- Note: this does a table copy so move it out of your draw hook
+-- @return A table describing the screen.
+function screen_library.getScreenInfo()
+	local gpu = SF.instance.data.gpu
+	if not gpu then return end
+	local info, _, _ = gpu:GetInfo()
+	return table.Copy(info)
+end
+
+--- Returns the screen surface's world position and angle
+-- @return The screen position
+-- @return The screen angle
+function screen_library.getScreenPos()
+	local gpu = SF.instance.data.gpu
+	if not gpu then return end
+	local _, pos, rot = gpu:GetInfo()
+	return pos, rot
+end
+
+---
+-- @name Screen information table
+-- @class table
+-- @field Name Pretty name of model
+-- @field offset Offset of screen from prop
+-- @field RS Resolution/scale
+-- @field RatioX Inverted Aspect ratio (height divided by width)
+-- @field x1 Corner of screen in local coordinates (relative to offset?)
+-- @field x2 Corner of screen in local coordinates (relative to offset?)
+-- @field y1 Corner of screen in local coordinates (relative to offset?)
+-- @field y2 Corner of screen in local coordinates (relative to offset?)
+-- @field z Screen plane offset in local coordinates (relative to offset?)
+-- @field rot Screen rotation
