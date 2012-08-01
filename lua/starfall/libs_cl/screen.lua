@@ -123,41 +123,41 @@ local function fixcolorT(tbl)
 		clamp(tonumber(tbl and tbl.a) or 255,0,255))
 end
 
-local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
-local wrapmesh, unwrapmesh = SF.CreateWrapper(mesh_metamethods)
+local poly_methods, poly_metamethods = SF.Typedef("Polygon")
+local wrappoly, unwrappoly = SF.CreateWrapper(poly_metamethods)
 
 local function checkvertex(vert)
 	return {
-		x = SF.CheckType(vert.x,"number",1),
-		y = SF.CheckType(vert.y,"number",1),
-		u = tonumber(vert.u) or 0,
-		v = tonumber(vert.v) or 0,
+		x = SF.CheckType(vert.x or vert[1],"number",1),
+		y = SF.CheckType(vert.y or vert[2],"number",1),
+		u = tonumber(vert.u or vert[3]) or 0,
+		v = tonumber(vert.v or vert[4]) or 0,
 	}
 end
 
-function mesh_metamethods:__index(k)
-	SF.CheckType(self,mesh_metamethods)
+function poly_metamethods:__index(k)
+	SF.CheckType(self,poly_metamethods)
 	SF.CheckType(k,"number")
-	local mesh = unwrapmesh(self)
-	if not mesh then return nil end
-	if k <= 0 or k > #mesh then return nil end
-	return table.Copy(mesh[i])
+	local poly = unwrappoly(self)
+	if not poly then return nil end
+	if k <= 0 or k > #poly then return nil end
+	return table.Copy(poly[i])
 end
 
-function mesh_metamethods:__len()
-	SF.CheckType(self,mesh_metamethods)
-	local mesh = unwrapmesh(self)
-	return mesh and #mesh or nil
+function poly_metamethods:__len()
+	SF.CheckType(self,poly_metamethods)
+	local poly = unwrappoly(self)
+	return poly and #poly or nil
 end
 
-function mesh_metamethods:__newindex(k,v)
-	SF.CheckType(self,mesh_metamethods)
+function poly_metamethods:__newindex(k,v)
+	SF.CheckType(self,poly_metamethods)
 	SF.CheckType(k,"number")
 	SF.CheckType(v,"table")
-	local mesh = unwrapmesh(self)
-	if not mesh then return end
-	if k <= 0 or k > (#mesh)+1 then return error("mesh index out of bounds: "..k.." out of "..#mesh,2) end
-	mesh[k] = checkvertex(v)
+	local poly = unwrappoly(self)
+	if not poly then return end
+	if k <= 0 or k > (#poly)+1 then return error("poly index out of bounds: "..k.." out of "..#poly,2) end
+	poly[k] = checkvertex(v)
 end
 
 -- ------------------------------------------------------------------ --
@@ -350,41 +350,42 @@ function screen_library.drawText(font,x,y,text,alignment)
 	cam.PopModelMatrix()
 end
 
---- Compiles a 2D mesh. This is needed so that meshes don't have to be
--- type-checked each frame. Meshes can be indexed by a number, in which
+--- Compiles a 2D poly. This is needed so that poly don't have to be
+-- type-checked each frame. Polys can be indexed by a number, in which
 -- a copy of the vertex at that spot is returned. They can also be assigned
--- a new vertex at 1 <= i <= #mesh+1. And the length of the mesh can be taken.
+-- a new vertex at 1 <= i <= #poly+1. And the length of the poly can be taken.
 -- @param verts Array of verticies to convert.
-function screen_library.createMesh(verts)
+function screen_library.createPoly(verts)
 	SF.CheckType(verts,"table")
-	local mesh = {}
-	local meshtbl = wrapmesh(mesh)
+	local poly = {}
+	local wrappedpoly = wrappoly(poly)
 	for i=1,#verts do
 		local v = verts[i]
 		SF.CheckType(v,"table")
-		mesh[i] = checkvertex(v)
+		poly[i] = checkvertex(v)
 	end
-	return meshtbl
+	return wrappedpoly
 end
 
---- Draws a polygon (mesh). Takes a compiled/uncompiled mesh to draw.
--- Note that if you do use an uncompiled mesh, you will use up ops
+--- Draws a polygon. Takes a compiled/uncompiled poly to draw.
+-- Note that if you do use an uncompiled poly, you will use up ops
 -- very quickly! (Doesn't seem to work at the moment)
--- TODO: Fix this
--- @param mesh Compiled mesh or array of vertexes
-function screen_library.drawPoly(mesh)
-	if dgetmeta(mesh) ~= mesh_metamethods then
-		SF.CheckType(mesh,"table")
-		verts = mesh
-		mesh = {}
+-- @param poly Compiled poly or array of vertexes
+function screen_library.drawPoly(poly)
+	if dgetmeta(poly) ~= poly_metamethods then
+		SF.CheckType(poly,"table")
+		local verts = poly
+		poly = {}
 		for i=1,#verts do
 			local v = verts[i]
 			SF.CheckType(v,"table")
-			mesh[i] = checkvertex(v)
+			poly[i] = checkvertex(v)
 		end
+	else
+		poly = unwrappoly(poly)
 	end
 	cam.PushModelMatrix(matrix)
-	surface.DrawPoly(mesh)
+	surface.DrawPoly(poly)
 	cam.PopModelMatrix()
 end
 
