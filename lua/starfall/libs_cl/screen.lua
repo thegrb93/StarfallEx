@@ -442,3 +442,37 @@ function screen_library.screenPos( ply )
 	
 	return nil
 end
+
+--- Returns information about the screen, such as dimentions and rotation.
+-- Note: this does a table copy so move it out of your draw hook
+-- @return A table describing the screen.
+function screen_library.getScreenInfo()
+	local gpu = SF.instance.data.gpu
+	if not gpu then return end
+	local info, _, _ = gpu:GetInfo()
+	return table.Copy(info)
+end
+
+--- Returns the screen surface's world position and angle
+-- @return The screen position
+-- @return The screen angle
+function screen_library.getScreenPos()
+	local gpu = SF.instance.data.gpu
+	if not gpu then return end
+	local _, pos, rot = gpu:GetInfo()
+	return pos, rot
+end
+
+---
+-- @name Screen information table
+-- @class table
+-- @field Name Pretty name
+-- @field offset Offset of screen from prop (?)
+-- @field RS Scale (?)
+-- @field RatioX Inverted Aspect ratio (height divided by width)
+-- @field x1 Corner of screen in local coordinates
+-- @field x2 Corner of screen in local coordinates
+-- @field y1 Corner of screen in local coordinates
+-- @field y2 Corner of screen in local coordinates
+-- @field z Screen plane offset in local coordinates
+-- @field rot Screen rotation

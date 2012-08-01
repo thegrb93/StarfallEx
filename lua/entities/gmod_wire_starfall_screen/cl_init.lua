@@ -80,6 +80,7 @@ function ENT:CodeSent(files, main, owner)
 	
 	self.instance = instance
 	instance.data.entity = self
+	instance.data.gpu = self.GPU
 	local ok, msg = instance:initialize()
 	if not ok then self:Error(msg) end
 	
