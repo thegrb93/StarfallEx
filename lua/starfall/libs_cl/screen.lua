@@ -127,19 +127,12 @@ local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
 local wrapmesh, unwrapmesh = SF.CreateWrapper(mesh_metamethods)
 
 local function checkvertex(vert)
-	print("\tVertex:")
-	print(string.format("\t\tx= %s",vert.x))
-	print(string.format("\t\ty= %s",vert.y))
-	print(string.format("\t\tu= %s",vert.u))
-	print(string.format("\t\tv= %s",vert.v))
-	print("\tEnd vertex.")
-	local copy = {
+	return {
 		x = SF.CheckType(vert.x,"number",1),
 		y = SF.CheckType(vert.y,"number",1),
 		u = tonumber(vert.u) or 0,
 		v = tonumber(vert.v) or 0,
 	}
-	return copy
 end
 
 function mesh_metamethods:__index(k)
@@ -366,13 +359,11 @@ function screen_library.createMesh(verts)
 	SF.CheckType(verts,"table")
 	local mesh = {}
 	local meshtbl = wrapmesh(mesh)
-	print(string.format("DEBUG: Creating mesh from %d verticies!",#verts))
 	for i=1,#verts do
 		local v = verts[i]
 		SF.CheckType(v,"table")
 		mesh[i] = checkvertex(v)
 	end
-	print("DEBUG: End creating mesh")
 	return meshtbl
 end
 
@@ -383,7 +374,6 @@ end
 -- @param mesh Compiled mesh or array of vertexes
 function screen_library.drawPoly(mesh)
 	if dgetmeta(mesh) ~= mesh_metamethods then
-		print("DEBUG: Compiling mesh at runtime!")
 		SF.CheckType(mesh,"table")
 		verts = mesh
 		mesh = {}
