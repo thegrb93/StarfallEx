@@ -365,6 +365,11 @@ function screen_library.drawText(font,x,y,text,alignment)
 	cam.PopModelMatrix()
 end
 
+--- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
+function screen_library.vertex(x,y,u,v)
+	return {x=x, y=y, u=u, v=v}
+end
+
 --- Compiles a 2D poly. This is needed so that poly don't have to be
 -- type-checked each frame. Polys can be indexed by a number, in which
 -- a copy of the vertex at that spot is returned. They can also be assigned
