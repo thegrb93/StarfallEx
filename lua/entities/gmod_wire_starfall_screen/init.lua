@@ -4,7 +4,6 @@ AddCSLuaFile('shared.lua')
 include('shared.lua')
 
 include("starfall/SFLib.lua")
-include("libtransfer/libtransfer.lua")
 assert(SF, "Starfall didn't load correctly!")
 
 local context = SF.CreateContext()
