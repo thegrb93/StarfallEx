@@ -5,28 +5,71 @@ TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
 -- ------------------------------- Sending / Recieving ------------------------------- --
-include("libtransfer/libtransfer.lua")
 include("starfall/sflib.lua")
 
 local MakeSF
 local RequestSend
 
 if SERVER then
-	local function callback(ply, task)
-		local ent = ents.GetByIndex(task.entid)
-		if not ent or not ent:IsValid() then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
-			return
-		end
+	if net then -- Have GM13 net library
+		net.Recieve("starfall_processor_upload", function(len, ply)
+			local ent = net.ReadEntity()
+			if not ent or not ent:IsValid() then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
+				return
+			end
+			
+			if ent:GetClass() ~= "gmod_wire_starfall_processor" then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
+				return
+			end
+			
+			local mainfile = net.ReadString()
+			local numfiles = net.ReadByte()
+			local task = {
+				mainfile = mainfile,
+				files = {},
+			}
+			
+			for i=1,numfiles do
+				local filename = net.ReadString()
+				local code = net.ReadString()
+				task.files[filename] = code
+			end
+			
+			ent:CodeSent(ply,task)
+		end)
 		
-		if ent:GetClass() ~= "gmod_wire_starfall_processor" then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
-			return
+		RequestSend = function(ply, ent)
+			net.Start("starfall_processor_requpload")
+			net.WriteEntity(ent)
+			net.Send(ply)
 		end
+	else
+		datastream.Hook("starfall_processor_upload", function(ply, handler, id, encoded, tbl)
+			local ent = tbl.entity
+			if not ent or not ent:IsValid() then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
+				return
+			end
+			
+			if ent:GetClass() ~= "gmod_wire_starfall_processor" then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
+				return
+			end
+			
+			ent:CodeSent(ply,tbl)
+		end)
+		hook.Add("AcceptStream", "starfall_processor_upload_acceptstream", function(pl, handler, id)
+			return handler == "starfall_processor_upload"
+		end)
 		
-		ent:CodeSent(ply,task)
+		RequestSend = function(ply, ent)
+			umsg.Start("starfall_processor_requpload",ply)
+			umsg.Entity(ent)
+			umsg.End()
+		end
 	end
-	LibTransfer.callbacks["starfall_upload"] = callback
 	
 	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
@@ -47,12 +90,6 @@ if SERVER then
 
 		return sf
 	end
-	
-	function RequestSend(ply,ent)
-		umsg.Start("starfall_requpload",ply)
-			umsg.Entity(ent)
-		umsg.End()
-	end
 else
 	language.Add( "Tool_wire_starfall_processor_name", "Starfall - Processor (Wire)" )
     language.Add( "Tool_wire_starfall_processor_desc", "Spawns a starfall processor" )
@@ -60,23 +97,51 @@ else
 	language.Add( "sboxlimit_wire_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Wire Starfall Processor", "Undone Starfall Processor" )
 	
-	local function sendreq(msg)
-		local ent = msg:ReadEntity()
-		if not SF.Editor.editor then return end
-		
-		local code = SF.Editor.getCode()
-		--if code:match("^%s*.*%s*$") == "" then return end
-		
-		local ok, buildlist = SF.Editor.BuildIncludesTable()
-		if ok then
-			buildlist.entid = ent:EntIndex()
-			LibTransfer.QueueTask("starfall_upload",buildlist)
-			uploading = true;
-		else
-			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+	if net then
+		net.Recieve("starfall_processor_requpload", function(len, ply)
+			if not SF.Editor.editor then return end
+			
+			local ent = net.ReadEntity()
+			local code = SF.Editor.getCode()
+			
+			local ok, buildlist = SF.Editor.BuildIncludesTable()
+			if ok then
+				net.Start("starfall_processor_upload")
+					net.WriteEntity(ent)
+					net.WriteString(buildlist.mainfile)
+					net.WriteByte(buildlist.filecount)
+					for name, file in pairs(buildlist.files) do
+						net.WriteString(name)
+						net.WriteString(file)
+					end
+					
+				net.SendToServer()
+			else
+				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			end
+		end)
+	else
+		local function AcceptedCB(accepted, tempid, id)
+			if not accepted then
+				WireLib.AddNotify("Code stream was denied by server.", NOTIFY_ERROR, 7 ,NOTIFYSOUND_ERROR1)
+			end
 		end
+		usermessage.Hook("starfall_processor_requpload", function(msg)
+			local ent = msg:ReadEntity()
+			if not SF.Editor.editor then return end
+			
+			local code = SF.Editor.getCode()
+			--if code:match("^%s*.*%s*$") == "" then return end
+			
+			local ok, buildlist = SF.Editor.BuildIncludesTable()
+			if ok then
+				buildlist.entity = ent
+				datastream.StreamToServer("starfall_processor_upload", buildlist, nil, AcceptedCB)
+			else
+				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			end
+		end)
 	end
-	usermessage.Hook("starfall_requpload",sendreq)
 end
 
 TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
@@ -171,43 +236,5 @@ if CLIENT then
 		panel:AddPanel(openEditor)
 		openEditor:SetText("Open Editor")
 		openEditor.DoClick = SF.Editor.open
-	end
-	
-	-- ------------------------------- Tool screen ------------------------------- --
-	surface.CreateFont("Lucida Console", 25, 1000, true, false, "SFToolScreenFont")
-	local function drawText(text, y, color) draw.DrawText(text, "SFToolScreenFont", 5, 32*y, color,0) end
-	
-	local uploadingCursor = 0;
-	local uploadingPercent = 0;
-	
-	function TOOL:RenderToolScreen()
-		if uploading then
-			if not uploadData then
-				uploadData = LibTransfer.queue_c2s[#(LibTransfer.queue_c2s)] or {};
-				uploadData.dataSize = string.len(uploadData[2])
-				
-				if uploadData[1] ~= "starfall_upload" then uploadData = nil end
-			end
-			
-			if uploadData then
-				uploadingCursor = uploadData[5]
-				uploadingPercent = math.Clamp((uploadingCursor / uploadData.dataSize) * 100, 0, 100)
-					
-				if uploadingCursor >= uploadData.dataSize then
-					uploading = nil; uploadData = nil;
-				end
-			end
-		end
-		
-		cam.Start2D()
-			surface.SetDrawColor(0, 0, 0, 255)
-			surface.DrawRect(0, 0, 256, 256)
-	
-			drawText("SF Flasher", 1, Color(224, 244, 244, 255))
-			
-			drawText(string.format("Sent: %.2f KB", uploadingCursor / 1024), 3, Color(224, 244, 244, 255))
-			drawText(string.format("Progress: %.0f %%", uploadingPercent), 4, Color(244, 244, 244, 255))
-			if uploading then drawText("UPLOADING", 6, Color(0, 128, 0, 255)) end
-		cam.End2D()
 	end
 end
