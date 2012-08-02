@@ -61,7 +61,7 @@ if SERVER then
 			ent:CodeSent(ply,tbl)
 		end)
 		hook.Add("AcceptStream", "starfall_processor_upload_acceptstream", function(pl, handler, id)
-			return handler == "starfall_processor_upload"
+			return (handler == "starfall_processor_upload") or nil
 		end)
 		
 		RequestSend = function(ply, ent)
@@ -205,36 +205,42 @@ end
 
 if CLIENT then
 	local lastclick = CurTime()
+	
+	local function GotoDocs(button)
+		gui.OpenURL("http://colonelthirtytwo.net/sfdoc/")
+	end
+	
+	local function FileBrowserOnFileClick(self)
+		SF.Editor.init()
+		if dir == self.File.FileDir and CurTime() - lastclick < 1 then
+			SF.Editor.editor:Open(dir)
+		else
+			dir = self.File.FileDir
+			SF.Editor.editor:LoadFile(dir)
+		end
+		lastclick = CurTime()
+	end
+	
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_starfall_processor_name", Description = "#Tool_wire_starfall_processor_desc" })
 		
 		local modelPanel = WireDermaExts.ModelSelect(panel, "wire_starfall_processor_Model", list.Get("Wire_gate_Models"), 2)
 		panel:AddControl("Label", {Text = ""})
 		
-		local docButton = vgui.Create("DButton" , panel)
-		panel:AddPanel(docButton)
-		docButton:SetText("Starfall LuaDoc")
-		docButton.DoClick = function(button) gui.OpenURL("http://colonelthirtytwo.net/sfdoc/") end
+		local docbutton = vgui.Create("DButton" , panel)
+		panel:AddPanel(docbutton)
+		docbutton:SetText("Starfall Documentation")
+		docbutton.DoClick = GotoDocs
 		
 		local filebrowser = vgui.Create("wire_expression2_browser")
 		panel:AddPanel(filebrowser)
 		filebrowser:Setup("Starfall")
 		filebrowser:SetSize(235,400)
+		filebrowser.OnFileClick = FileBrowserOnFileClick
 		
-		function filebrowser:OnFileClick()
-			SF.Editor.init()
-			lastclick = CurTime()
-			if(dir == self.File.FileDir and CurTime() - lastclick < 1) then
-				SF.Editor.editor:Open(dir)
-			else
-				dir = self.File.FileDir
-				SF.Editor.editor:LoadFile(dir)
-			end
-		end
-		
-		local openEditor = vgui.Create("DButton", panel)
-		panel:AddPanel(openEditor)
-		openEditor:SetText("Open Editor")
-		openEditor.DoClick = SF.Editor.open
+		local openeditor = vgui.Create("DButton", panel)
+		panel:AddPanel(openeditor)
+		openeditor:SetText("Open Editor")
+		openeditor.DoClick = SF.Editor.open
 	end
 end
