@@ -4,68 +4,193 @@ TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
-TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
-
-include("libtransfer/libtransfer.lua")
+-- ------------------------------- Sending / Recieving ------------------------------- --
 include("starfall/sflib.lua")
 
-if CLIENT then
-	language.Add("Tool_wire_starfall_screen_name", 	"Starfall - Screen (Wire)")
-    language.Add("Tool_wire_starfall_screen_desc", 	"Spawns a starfall screen")
-    language.Add("Tool_wire_starfall_screen_0", 		"Primary: Spawns a screen and uploads code, Secondary: Opens editor")
+local MakeSF
+local RequestSend
+
+if SERVER then
 	
-	language.Add("Undone_Wire Starfall Screen", 		"Undone Starfall Screen")
+	if net then -- Have GM13 net library
+		net.Recieve("starfall_screen_upload", function(len, ply)
+			local ent = net.ReadEntity()
+			if not ent or not ent:IsValid() then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
+				return
+			end
+			
+			if ent:GetClass() ~= "gmod_wire_starfall_screen" then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall screen entity.\n")
+				return
+			end
+			
+			local mainfile = net.ReadString()
+			local numfiles = net.ReadByte()
+			local task = {
+				mainfile = mainfile,
+				files = {},
+			}
+			
+			for i=1,numfiles do
+				local filename = net.ReadString()
+				local code = net.ReadString()
+				task.files[filename] = code
+			end
+			
+			ent:CodeSent(ply,task)
+		end)
+		
+		RequestSend = function(ply, ent)
+			net.Start("starfall_screen_requpload")
+			net.WriteEntity(ent)
+			net.Send(ply)
+		end
+	else
+		datastream.Hook("starfall_screen_upload", function(ply, handler, id, encoded, tbl)
+			local ent = tbl.entity
+			if not ent or not ent:IsValid() then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
+				return
+			end
+			
+			if ent:GetClass() ~= "gmod_wire_starfall_screen" then
+				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall screen entity.\n")
+				return
+			end
+			
+			ent:CodeSent(ply,tbl)
+		end)
+		hook.Add("AcceptStream", "starfall_screen_upload_acceptstream", function(pl, handler, id)
+			return (handler == "starfall_screen_upload") or nil
+		end)
+		
+		RequestSend = function(ply, ent)
+			umsg.Start("starfall_screen_requpload",ply)
+			umsg.Entity(ent)
+			umsg.End()
+		end
+	end
+	
+	CreateConVar('sbox_maxstarfall_screen', 3, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
+	
+	function MakeSF( pl, Pos, Ang, model)
+		if not pl:CheckLimit( "starfall_screen" ) then return false end
 
-	language.Add("Cleanup_wire_starfall_screens",   	"Starfall screens")
-	language.Add("Cleaned_wire_starfall_screens",   	"Cleaned up all Wire Starfall Screens")
-	language.Add("SBoxLimit_wire_starfall_screens", 	"You've hit the Starfall screen limit!")
+		local sf = ents.Create( "gmod_wire_starfall_screen" )
+		if not IsValid(sf) then return false end
+
+		sf:SetAngles( Ang )
+		sf:SetPos( Pos )
+		sf:SetModel( model )
+		sf:Spawn()
+
+		sf.owner = pl
+
+		pl:AddCount( "starfall_screen", sf )
+
+		return sf
+	end
+	
+	function RequestSend(ply,ent)
+		umsg.Start("starfall_screen_requpload",ply)
+			umsg.Entity(ent)
+		umsg.End()
+	end
+else
+	language.Add( "Tool_wire_starfall_screen_name", "Starfall - Screen (Wire)" )
+    language.Add( "Tool_wire_starfall_screen_desc", "Spawns a starfall screen" )
+    language.Add( "Tool_wire_starfall_screen_0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
+	language.Add( "SBox_max_starfall_Screen", "You've hit the Starfall Screen limit!" )
+	language.Add( "undone_Wire Starfall Screen", "Undone Starfall Screen" )
+	
+	if net then
+		net.Recieve("starfall_screen_requpload", function(len, ply)
+			if not SF.Editor.editor then return end
+			
+			local ent = net.ReadEntity()
+			local code = SF.Editor.getCode()
+			
+			local ok, buildlist = SF.Editor.BuildIncludesTable()
+			if ok then
+				net.Start("starfall_screen_upload")
+					net.WriteEntity(ent)
+					net.WriteString(buildlist.mainfile)
+					net.WriteByte(buildlist.filecount)
+					for name, file in pairs(buildlist.files) do
+						net.WriteString(name)
+						net.WriteString(file)
+					end
+					
+				net.SendToServer()
+			else
+				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			end
+		end)
+	else
+		local function AcceptedCB(accepted, tempid, id)
+			if not accepted then
+				WireLib.AddNotify("Code stream was denied by server.", NOTIFY_ERROR, 7 ,NOTIFYSOUND_ERROR1)
+			end
+		end
+		usermessage.Hook("starfall_screen_requpload", function(msg)
+			local ent = msg:ReadEntity()
+			if not SF.Editor.editor then return end
+			
+			local code = SF.Editor.getCode()
+			--if code:match("^%s*.*%s*$") == "" then return end
+			
+			local ok, buildlist = SF.Editor.BuildIncludesTable()
+			if ok then
+				buildlist.entity = ent
+				datastream.StreamToServer("starfall_screen_upload", buildlist, nil, AcceptedCB)
+			else
+				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			end
+		end)
+	end
 end
-cleanup.Register("wire_starfall_screens")
 
-function TOOL:LeftClick(trace)
+TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
+
+cleanup.Register( "starfall_screen" )
+
+
+function TOOL:LeftClick( trace )
 	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() then return false end
+	if CLIENT then return true end
 
-	-- If there's no physics object then we can't constraint it!
-    if SERVER and !util.IsValidPhysicsObject(trace.Entity, trace.PhysicsBone) then return false
-    elseif CLIENT then return true end
-
-	-- Upload code to existing entity?
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_screen" then
-		SF.RequestUpload(self:GetOwner(), trace.Entity)
+		RequestSend(self:GetOwner(),trace.Entity)
 		return true
 	end
+	
+	self:SetStage(0)
 
-	--self:SetStage(0) -- What is this? No doc in official gmod wiki
-
-	local model = self:GetClientInfo("Model")
+	local model = self:GetClientInfo( "Model" )
 	local ply = self:GetOwner()
+	if not self:GetSWEP():CheckLimit( "starfall_screen" ) then return false end
 
-	-- Limit check
-	if not self:GetSWEP():CheckLimit("wire_starfall_screens") then return false end
-
-	-- Make the entity 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90
 
-	local sf = MakeSFScreen(ply, trace.HitPos, Ang, model)
-	if not sf then return false end
+	local sf = MakeSF( ply, trace.HitPos, Ang, model)
 
-	-- Fix position
 	local min = sf:OBBMins()
-	sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
+	sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
 
-	local constraint = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
+	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
 
-	-- Undo
 	undo.Create("Wire Starfall Screen")
-		undo.AddEntity(sf)
-		undo.AddEntity(constraint)
-		undo.SetPlayer(ply)
+		undo.AddEntity( sf )
+		undo.AddEntity( const )
+		undo.SetPlayer( ply )
 	undo.Finish()
+
+	ply:AddCleanup( "starfall_screen", sf )
 	
-	-- Request client to send code
-	SF.RequestUpload(ply, sf)
+	RequestSend(ply,sf)
 
 	return true
 end
@@ -75,69 +200,54 @@ function TOOL:RightClick( trace )
 	return false
 end
 
-if SERVER then
-	CreateConVar("sbox_maxwire_starfall_screens", 3, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
+function TOOL:Reload(trace)
+	return false
+end
 
-	-- (Server) General function to spawn a screen
-	function MakeSFScreen(ply, pos, ang, model)
-		if not ply:CheckLimit("wire_starfall_screens") then return nil end
+function TOOL:DrawHUD()
+end
 
-		local sf = ents.Create("gmod_wire_starfall_screen")
-		if not IsValid(sf) then return nil end
+function TOOL:Think()
+end
 
-		sf:SetAngles(ang)
-		sf:SetPos(pos)
-		sf:SetModel(model)
-		sf:Spawn()
-
-		sf.owner = ply
-		sf:SetPlayer(ply)
-
-		ply:AddCount("wire_starfall_screens", sf)
-		ply:AddCleanup("wire_starfall_screens", sf)
-
-		return sf
-	end
-
-else
+if CLIENT then
 	local lastclick = CurTime()
-
-	-- (Client)
+	
+	local function GotoDocs(button)
+		gui.OpenURL("http://colonelthirtytwo.net/sfdoc/")
+	end
+	
+	local function FileBrowserOnFileClick(self)
+		SF.Editor.init()
+		if dir == self.File.FileDir and CurTime() - lastclick < 1 then
+			SF.Editor.editor:Open(dir)
+		else
+			dir = self.File.FileDir
+			SF.Editor.editor:LoadFile(dir)
+		end
+		lastclick = CurTime()
+	end
+	
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_starfall_screen_name", Description = "#Tool_wire_starfall_screen_desc" })
 		
-		local modelPanel = WireDermaExts.ModelSelect(panel, "wire_starfall_screen_Model", list.Get("WireScreenModels"), 2)
+		local modelpanel = WireDermaExts.ModelSelect(panel, "wire_starfall_screne_Model", list.Get("WireScreenModels"), 2)
 		panel:AddControl("Label", {Text = ""})
 		
-		local docButton = vgui.Create("DButton" , panel)
-		panel:AddPanel(docButton)
-		docButton:SetText("Starfall LuaDoc")
-		docButton.DoClick = function(button) gui.OpenURL("http://colonelthirtytwo.net/sfdoc/") end
+		local docbutton = vgui.Create("DButton" , panel)
+		panel:AddPanel(docbutton)
+		docbutton:SetText("Starfall Documentation")
+		docbutton.DoClick = GotoDocs
 		
 		local filebrowser = vgui.Create("wire_expression2_browser")
 		panel:AddPanel(filebrowser)
 		filebrowser:Setup("Starfall")
 		filebrowser:SetSize(235,400)
+		filebrowser.OnFileClick = FileBrowserOnFileClick
 		
-		function filebrowser:OnFileClick()
-			SF.Editor.init()
-			lastclick = CurTime()
-			if(dir == self.File.FileDir and CurTime() - lastclick < 1) then
-				SF.Editor.editor:Open(dir)
-			else
-				dir = self.File.FileDir
-				SF.Editor.editor:LoadFile(dir)
-			end
-		end
-		
-		local openEditor = vgui.Create("DButton", panel)
-		panel:AddPanel(openEditor)
-		openEditor:SetText("Open Editor")
-		openEditor.DoClick = SF.Editor.open
-	end	
-
-	function TOOL.RenderToolScreen()
-		SF.RenderToolScreen()
+		local openeditor = vgui.Create("DButton", panel)
+		panel:AddPanel(openeditor)
+		openeditor:SetText("Open Editor")
+		openeditor.DoClick = SF.Editor.open
 	end
 end
-

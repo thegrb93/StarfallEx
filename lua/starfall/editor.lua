@@ -406,6 +406,7 @@ if CLIENT then
 		codename = codename or SF.Editor.getOpenFile() or "main"
 		tbl.mainfile = codename
 		tbl.files = {}
+		tbl.filecount = 0
 		tbl.includes = {}
 
 		local loaded = {}
@@ -427,7 +428,13 @@ if CLIENT then
 			
 			if ppdata.includes and ppdata.includes[path] then
 				local inc = ppdata.includes[path]
-				tbl.includes[path] = inc
+				if not tbl.includes[path] then
+					tbl.includes[path] = inc
+					tbl.filecount = tbl.filecount + 1
+				else
+					assert(tbl.includes[path] == inc)
+				end
+				
 				for i=1,#inc do
 					recursiveLoad(inc[i])
 				end
