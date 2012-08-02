@@ -389,7 +389,7 @@ end
 
 --- Draws a polygon. Takes a compiled/uncompiled poly to draw.
 -- Note that if you do use an uncompiled poly, you will use up ops
--- very quickly! (Doesn't seem to work at the moment)
+-- very quickly!
 -- @param poly Compiled poly or array of vertexes
 function screen_library.drawPoly(poly)
 	if dgetmeta(poly) ~= poly_metamethods then
@@ -410,7 +410,7 @@ function screen_library.drawPoly(poly)
 end
 
 --- Gets a 2D cursor position where ply is aiming.
-function screen_library.screenPos( ply )
+function screen_library.cursorPos( ply )
 	-- Taken from EGPLib
 	local Normal, Pos, monitor, Ang
 	local screen = SF.instance.data.entity
