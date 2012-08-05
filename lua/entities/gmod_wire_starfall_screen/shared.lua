@@ -9,3 +9,11 @@ ENT.Instructions    = ""
 
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
+
+function ENT:runScriptHook(hook, ...)
+	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
+		local ok, rt = self.instance:runScriptHook(hook, ...)
+		if not ok then self:Error(rt)
+		else return rt end
+	end
+end
