@@ -48,6 +48,29 @@ function ents_lib.owner()
 	return wrap(SF.instance.player)
 end
 
+--- Same as ents_lib.owner() on the server. On the client, returns the local player
+-- @name ents_lib.player
+-- @class function
+-- @return Either the owner (server) or the local player (client)
+if SERVER then
+	ents_lib.player = ents_lib.owner
+else
+	function ents_lib.player()
+		return wrap(LocalPlayer())
+	end
+end
+
+--[[
+--- Returns whoever created the script
+function ents_lib.owner()
+	return wrap(SF.instance.player)
+end
+
+--- Same as ents_lib.owner() on the server.
+function ents_lib.player()
+	return wrap(SF.instance.player)
+end
+]]
 -- ------------------------- Methods ------------------------- --
 
 --- To string

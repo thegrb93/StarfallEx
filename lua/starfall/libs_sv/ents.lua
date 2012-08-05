@@ -102,16 +102,6 @@ function ents_methods:owner()
 	return wrap(getOwner(self))
 end
 
---- Returns whoever created the script
-function ents_lib.owner()
-	return wrap(SF.instance.player)
-end
-
---- Same as ents_lib.owner() on the server.
-function ents_lib.player()
-	return wrap(SF.instance.player)
-end
-
 --- Applies linear force to the entity
 -- @param vec The force vector
 -- @param offset An optional offset position (TODO: Local or world?)
