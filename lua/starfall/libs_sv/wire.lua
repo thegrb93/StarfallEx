@@ -184,7 +184,7 @@ function wire_library.createInputs(names, types)
 		if type(newname) ~= "string" then error("Non-string input name: "..newname,2) end
 		if type(newtype) ~= "string" then error("Non-string input type: "..newtype,2) end
 		newtype = newtype:upper()
-		if not newname:match("^[A-Z][a-zA-Z]*$") then error("Invalid input name: "..newname,2) end
+		if not newname:match("^[%u][%a%d]*$") then error("Invalid input name: "..newname,2) end
 		if not inputConverters[newtype] then error("Invalid/unsupported input type: "..newtype,2) end
 		names[i] = newname
 		types[i] = newtype
@@ -210,7 +210,7 @@ function wire_library.createOutputs(names, types)
 		if type(newname) ~= "string" then error("Non-string output name: "..newname,2) end
 		if type(newtype) ~= "string" then error("Non-string output type: "..newtype,2) end
 		newtype = newtype:upper()
-		if not newname:match("^[A-Z][a-zA-Z]*$") then error("Invalid output name: "..newname,2) end
+		if not newname:match("^[%u][%a%d]*$") then error("Invalid output name: "..newname,2) end
 		if not outputConverters[newtype] then error("Invalid/unsupported output type: "..newtype,2) end
 		names[i] = newname
 		types[i] = newtype

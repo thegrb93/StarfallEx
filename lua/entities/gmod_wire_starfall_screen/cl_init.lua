@@ -36,8 +36,12 @@ function ENT:Initialize()
 end
 
 function ENT:Think()
+	self.BaseClass.Think(self)
+	self:NextThink(CurTime())
+	
 	if self.instance and not self.instance.error then
 		self.instance:resetOps()
+		self:runScriptHook("think")
 	end
 end
 
@@ -103,14 +107,6 @@ function ENT:CodeSent(files, main, owner)
 			end
 			draw.DrawText("Press USE to copy to your clipboard", "Starfall_ErrorFont", 512 - 16*25, 512-16*2, Color(255, 255, 255, 255))
 		end
-	end
-end
-
-function ENT:runScriptHook(hook, ...)
-	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
-		local ok, rt = self.instance:runScriptHook(hook, ...)
-		if not ok then self:Error(rt)
-		else return rt end
 	end
 end
 
