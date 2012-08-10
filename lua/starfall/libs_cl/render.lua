@@ -2,6 +2,8 @@
 -- Render library
 -------------------------------------------------------------------------------
 
+local MATRIX_STACK_LIMIT = 8
+
 --- Called when a frame is requested to be drawn. You may want to unhook from this if you don't need
 -- to render anything for a bit
 -- @name render
@@ -44,11 +46,9 @@ local matrix_meta = _R.VMatrix
 
 local currentcolor
 
-local matrix = Matrix()
 SF.Libraries.AddHook("prepare",function(instance, hook)
 	if hook == "render" then
 		currentcolor = Color(0,0,0,0)
-		matrix = Matrix() -- Reset transformation matrix
 	end
 end)
 
@@ -162,19 +162,24 @@ end
 
 -- ------------------------------------------------------------------ --
 
---- Sets the transformation matrix
+--- Pushes a matrix onto the matrix stack.
 -- @param m The matrix
-function render_library.setMatrix(m)
+function render_library.pushMatrix(m)
 	SF.CheckType(m,matrix_meta)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	matrix = m
+	local renderdata = SF.instance.data.render
+	if not renderdata.isRendering then error("Not in rendering hook.",2) end
+	if renderdata.matricies + 1 > MATRIX_STACK_LIMIT then error("Pushed too many matricies",2) end
+	renderdata.matricies = renderdata.matricies + 1
+	cam.PushModelMatrix(m)
 end
 
---- Gets the transformation matrix
--- @return The matrix
-function render_library.getMatrix()
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	return matrix
+--- Pops a matrix from the matrix stack.
+function render_library.popMatrix()
+	local renderdata = SF.instance.data.render
+	if not renderdata.isRendering then error("Not in rendering hook.",2) end
+	if renderdata.matricies <= 0 then error("Popped too many matricies",2) end
+	renderdata.matricies = renderdata.matricies - 1
+	cam.PopModelMatrix()
 end
 
 --- Sets the draw color
@@ -221,11 +226,8 @@ end
 -- @param h Height
 function render_library.drawRect(x,y,w,h)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	
-	cam.PushModelMatrix(matrix)
 	surface.DrawRect(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
-	cam.PopModelMatrix()
 end
 
 --- Draws a rectangle outline using the current color.
@@ -235,11 +237,8 @@ end
 -- @param h Height
 function render_library.drawRectOutline(x,y,w,h)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	
-	cam.PushModelMatrix(matrix)
 	surface.DrawOutlinedRect(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
-	cam.PopModelMatrix()
 end
 
 --- Draws a circle
@@ -248,10 +247,8 @@ end
 -- @param r Radius
 function render_library.drawCircle(x,y,r)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	cam.PushModelMatrix(matrix)
 	surface.DrawCircle(tonumber(x) or 0, tonumber(y) or 0, max(tonumber(r) or 1, 0),
 		currentcolor)
-	cam.PopModelMatrix()
 end
 
 --- Draws a textured rectangle.
@@ -261,10 +258,9 @@ end
 -- @param h Height
 function render_library.drawTexturedRect(x,y,w,h)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	cam.PushModelMatrix(matrix)
+	
 	surface.DrawTexturedRect(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
-	cam.PopModelMatrix(matrix)
 end
 
 --- Draws a textured rectangle with UV coordinates
@@ -276,11 +272,9 @@ end
 -- @param th Texture height
 function render_library.drawTexturedRectUV(x,y,w,h,tw,th)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRectUV(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
 		max(tonumber(tw) or 0, 0), max(tonumber(th) or 0, 0))
-	cam.PopModelMatrix(matrix)
 end
 
 --- Draws a rotated, textured rectangle.
@@ -291,11 +285,9 @@ end
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotated(x,y,w,h,rot)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRectRotated(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
 		tonumber(rot) or 0)
-	cam.PopModelMatrix(matrix)
 end
 
 --- Draws a line
@@ -305,10 +297,7 @@ end
 -- @param y2 Y end coordinate
 function render_library.drawLine(x1,y1,x2,y2)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	
-	cam.PushModelMatrix(matrix)
 	surface.DrawLine(tonumber(x1) or 0, tonumber(y1) or 0, tonumber(x2) or 0, tonumber(y2) or 0)
-	cam.PopModelMatrix()
 end
 
 -- Creates a font. Does not require rendering hook
@@ -357,9 +346,7 @@ function render_library.drawText(font,x,y,text,alignment)
 	SF.CheckType(text,"string")
 	SF.CheckType(font,"string")
 	
-	cam.PushModelMatrix(matrix)
 	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
-	cam.PopModelMatrix()
 end
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
@@ -401,9 +388,7 @@ function render_library.drawPoly(poly)
 	else
 		poly = unwrappoly(poly)
 	end
-	cam.PushModelMatrix(matrix)
 	surface.DrawPoly(poly)
-	cam.PopModelMatrix()
 end
 
 --- Gets a 2D cursor position where ply is aiming.
