@@ -1,14 +1,14 @@
 -------------------------------------------------------------------------------
--- Screen library
+-- Render library
 -------------------------------------------------------------------------------
 
---- Called when the screen can draw a frame. You may want to unhook from this if you don't need
+--- Called when a frame is requested to be drawn. You may want to unhook from this if you don't need
 -- to render anything for a bit
 -- @name render
 -- @class hook
 -- @client
 
---- Screen library. Screens are 512x512 units. Most functions require
+--- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
 -- @entity wire_starfall_screen
@@ -18,13 +18,13 @@
 -- @field TEXT_ALIGN_TOP
 -- @field TEXT_ALIGN_BOTTOM
 
-local screen_library, _ = SF.Libraries.RegisterLocal("screen")
+local render_library, _ = SF.Libraries.RegisterLocal("render")
 
-screen_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
-screen_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
-screen_library.TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
-screen_library.TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
-screen_library.TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
+render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
+render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
+render_library.TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
+render_library.TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
+render_library.TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
 
 --- Vertex format
 -- @name Vertex Format
@@ -164,16 +164,16 @@ end
 
 --- Sets the transformation matrix
 -- @param m The matrix
-function screen_library.setMatrix(m)
+function render_library.setMatrix(m)
 	SF.CheckType(m,matrix_meta)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	matrix = m
 end
 
 --- Gets the transformation matrix
 -- @return The matrix
-function screen_library.getMatrix()
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.getMatrix()
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	return matrix
 end
 
@@ -182,15 +182,15 @@ end
 -- @param g Green value or 0
 -- @param b Blue value or 0
 -- @param a Alpha value or 0
-function screen_library.setColor(r,g,b,a)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.setColor(r,g,b,a)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	local c = fixcolorA(r,g,b,a)
 	currentcolor = c
 	surface.SetDrawColor(c)
 	surface.SetTextColor(c)
 end
 
-function screen_library.getTextureID(tx)
+function render_library.getTextureID(tx)
 	if #file.Find("materials/"..tx..".*",true) > 0 then
 		 local id = surface.GetTextureID(tx)
 		 texturecache[id] = tx
@@ -199,8 +199,8 @@ function screen_library.getTextureID(tx)
 end
 
 --- Sets the texture
-function screen_library.setTexture(id)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.setTexture(id)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	if not id then
 		surface.SetTexture(nil)
 	elseif texturecache[id] then
@@ -208,13 +208,10 @@ function screen_library.setTexture(id)
 	end
 end
 
---- Clears the screen.
--- @param r Red value or 0
--- @param g Green value or 0
--- @param b Blue value or 0
-function screen_library.clear(r,g,b)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
-	render.Clear( fixcolor(r,g,b) )
+--- Clears the surface.
+function render_library.clear()
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	render.Clear()
 end
 
 --- Draws a rectangle using the current color. 
@@ -222,8 +219,8 @@ end
 -- @param y Bottom left corner y coordinate
 -- @param w Width
 -- @param h Height
-function screen_library.drawRect(x,y,w,h)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawRect(x,y,w,h)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	
 	cam.PushModelMatrix(matrix)
 	surface.DrawRect(tonumber(x) or 0, tonumber(y) or 0,
@@ -236,8 +233,8 @@ end
 -- @param y Bottom left corner y coordinate
 -- @param w Width
 -- @param h Height
-function screen_library.drawRectOutline(x,y,w,h)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawRectOutline(x,y,w,h)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	
 	cam.PushModelMatrix(matrix)
 	surface.DrawOutlinedRect(tonumber(x) or 0, tonumber(y) or 0,
@@ -249,8 +246,8 @@ end
 -- @param x Center x coordinate
 -- @param y Center y coordinate
 -- @param r Radius
-function screen_library.drawCircle(x,y,r)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawCircle(x,y,r)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawCircle(tonumber(x) or 0, tonumber(y) or 0, max(tonumber(r) or 1, 0),
 		currentcolor)
@@ -262,8 +259,8 @@ end
 -- @param y Y coordinate
 -- @param w Width
 -- @param h Height
-function screen_library.drawTexturedRect(x,y,w,h)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawTexturedRect(x,y,w,h)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRect(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
@@ -277,8 +274,8 @@ end
 -- @param h Height
 -- @param tw Texture width
 -- @param th Texture height
-function screen_library.drawTexturedRectUV(x,y,w,h,tw,th)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawTexturedRectUV(x,y,w,h,tw,th)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRectUV(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
@@ -292,8 +289,8 @@ end
 -- @param w Width
 -- @param h Height
 -- @param rot Rotation in degrees
-function screen_library.drawTexturedRectRotated(x,y,w,h,rot)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawTexturedRectRotated(x,y,w,h,rot)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	cam.PushModelMatrix(matrix)
 	surface.DrawTexturedRectRotated(tonumber(x) or 0, tonumber(y) or 0,
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
@@ -306,8 +303,8 @@ end
 -- @param y1 Y start coordinate
 -- @param x2 X end coordinate
 -- @param y2 Y end coordinate
-function screen_library.drawLine(x1,y1,x2,y2)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawLine(x1,y1,x2,y2)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	
 	cam.PushModelMatrix(matrix)
 	surface.DrawLine(tonumber(x1) or 0, tonumber(y1) or 0, tonumber(x2) or 0, tonumber(y2) or 0)
@@ -323,7 +320,7 @@ end
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
 -- @param A table representing the font (doesn't contain anything)
---function screen_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
+--function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	--if not validfonts[font] then return nil, "invalid font" end
 	
 	--size = tonumber(size) or 12
@@ -355,8 +352,8 @@ end
 -- @param y Y coordinate
 -- @param text Text to draw
 -- @param alignment Text alignment
-function screen_library.drawText(font,x,y,text,alignment)
-	if not SF.instance.data.screen.isRendering then error("Not in rendering hook.",2) end
+function render_library.drawText(font,x,y,text,alignment)
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
 	SF.CheckType(font,"string")
 	
@@ -366,7 +363,7 @@ function screen_library.drawText(font,x,y,text,alignment)
 end
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
-function screen_library.vertex(x,y,u,v)
+function render_library.vertex(x,y,u,v)
 	return {x=x, y=y, u=u, v=v}
 end
 
@@ -375,7 +372,7 @@ end
 -- a copy of the vertex at that spot is returned. They can also be assigned
 -- a new vertex at 1 <= i <= #poly+1. And the length of the poly can be taken.
 -- @param verts Array of verticies to convert.
-function screen_library.createPoly(verts)
+function render_library.createPoly(verts)
 	SF.CheckType(verts,"table")
 	local poly = {}
 	local wrappedpoly = wrappoly(poly)
@@ -391,7 +388,7 @@ end
 -- Note that if you do use an uncompiled poly, you will use up ops
 -- very quickly!
 -- @param poly Compiled poly or array of vertexes
-function screen_library.drawPoly(poly)
+function render_library.drawPoly(poly)
 	if dgetmeta(poly) ~= poly_metamethods then
 		SF.CheckType(poly,"table")
 		local verts = poly
@@ -410,10 +407,11 @@ function screen_library.drawPoly(poly)
 end
 
 --- Gets a 2D cursor position where ply is aiming.
-function screen_library.cursorPos( ply )
+function render_library.cursorPos( ply )
 	-- Taken from EGPLib
 	local Normal, Pos, monitor, Ang
 	local screen = SF.instance.data.entity
+	if not screen then return nil end
 	
 	ply = SF.Entities.Unwrap( ply )
 	
@@ -451,8 +449,8 @@ end
 --- Returns information about the screen, such as dimentions and rotation.
 -- Note: this does a table copy so move it out of your draw hook
 -- @return A table describing the screen.
-function screen_library.getScreenInfo()
-	local gpu = SF.instance.data.gpu
+function render_library.getScreenInfo()
+	local gpu = SF.instance.data.render.gpu
 	if not gpu then return end
 	local info, _, _ = gpu:GetInfo()
 	return table.Copy(info)
@@ -461,8 +459,8 @@ end
 --- Returns the screen surface's world position and angle
 -- @return The screen position
 -- @return The screen angle
-function screen_library.getScreenPos()
-	local gpu = SF.instance.data.gpu
+function render_library.getScreenPos()
+	local gpu = SF.instance.data.render.gpu
 	if not gpu then return end
 	local _, pos, rot = gpu:GetInfo()
 	return pos, rot
