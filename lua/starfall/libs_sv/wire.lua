@@ -8,14 +8,14 @@ local wire_library, _ = SF.Libraries.Register("wire")
 SF.Wire = {}
 SF.Wire.Library = wire_library
 
-local wirelink_metatable, wirelink_metamethods = SF.Typedef("Wirelink")
+local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 
 ---
 -- @class table
 -- @name SF.Wire.WlMetatable
-SF.Wire.WlMetatable = wirelink_metamethods
-SF.Wire.WlMethods = wirelink_metatable
+SF.Wire.WlMetatable = wirelink_metatable
+SF.Wire.WlMethods = wirelink_methods
 
 ---
 -- @class function
@@ -82,7 +82,7 @@ local inputConverters =
 	STRING = identity,
 	VECTOR = identity,
 	ANGLE = identity,
-	WIRELINK = function(wl) return wl ~= nil and wlwrap(wl) end,
+	WIRELINK = function(wl) return wlwrap(wl) end,
 
 	TABLE = function(tbl)
 		if not tbl.istable or not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
@@ -228,17 +228,17 @@ end
 
 -- ------------------------- Wirelink ------------------------- --
 
---- Retrieves an output. Returns nil if the input doesn't exist.
+--- Retrieves an output. Returns nil if the output doesn't exist.
 wirelink_metatable.__index = function(self,k)
 	SF.CheckType(self,wirelink_metatable)
-	if wirelink_metatable[k] and k:sub(1,2) ~= "__" then return wirelink_metatable[k]
+	if wirelink_methods[k] then
+		return wirelink_methods[k]
 	else
 		local wl = wlunwrap(self)
 		if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 		
 		if type(k) == "number" then
-			if not wl.ReadCell then return nil
-			else return wl:ReadCell(k) end
+			return wl.ReadCell and wl.ReadCell(k) or nil
 		else
 			local output = wl.Outputs[k]
 			if not output or not inputConverters[output.Type] then return end
@@ -263,16 +263,14 @@ wirelink_metatable.__newindex = function(self,k,v)
 	end
 end
 
-SF.Typedef("Wirelink",wirelink_metatable)
-
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
-function wirelink_metatable:isValid()
+function wirelink_methods:isValid()
 	SF.CheckType(self,wirelink_metatable)
 	return wlunwrap(self) and true or false
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
-function wirelink_metatable:inputType(name)
+function wirelink_methods:inputType(name)
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl then return end
@@ -281,7 +279,7 @@ function wirelink_metatable:inputType(name)
 end
 
 --- Returns the type of output name, or nil if it doesn't exist
-function wirelink_metatable:outputType(name)
+function wirelink_methods:outputType(name)
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl then return end
@@ -290,37 +288,53 @@ function wirelink_metatable:outputType(name)
 end
 
 --- Returns the entity that the wirelink represents
-function wirelink_metatable:entity()
+function wirelink_methods:entity()
 	SF.CheckType(self,wirelink_metatable)
 	return SF.Entities.Wrap(wlunwrap(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
-function wirelink_metatable:inputs()
+function wirelink_methods:inputs()
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
-	local inputs = {}
-	for i=1,#wl.Inputs do
-		inputs[i] = wl.Inputs[i].Name
+	local Inputs = wl.Inputs
+	
+	local inputNames = {}
+	for _,port in pairs(Inputs) do
+		inputNames[#inputNames+1] = port.Name
 	end
-	return inputs
+	
+	local function portsSorter(a,b)
+		return Inputs[a].Num < Inputs[b].Num
+	end
+	table.sort(inputNames, portsSorter)
+	
+	return inputNames
 end
 
 --- Returns a table of all of the wirelink's outputs
-function wirelink_metatable:outputs()
+function wirelink_methods:outputs()
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
-	local outputs = {}
-	for i=1,#wl.Outputs do
-		outputs[i] = wl.Outputs[i].Name
+	local Outputs = wl.Outputs
+	
+	local outputNames = {}
+	for _,port in pairs(Outputs) do
+		outputNames[#outputNames+1] = port.Name
 	end
-	return outputs
+	
+	local function portsSorter(a,b)
+		return Outputs[a].Num < Outputs[b].Num
+	end
+	table.sort(outputNames, portsSorter)
+	
+	return outputNames
 end
 
 --- Checks if an input is wired.
-function wirelink_metatable:isWired(name)
+function wirelink_methods:isWired(name)
 	SF.CheckType(self,wirelink_metatable)
 	SF.CheckType(name,"string")
 	local wl = wlunwrap(self)
