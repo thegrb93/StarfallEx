@@ -86,7 +86,7 @@ if SERVER then
 	--- Adds a boolean. Takes up 1 byte.
 	-- @param val Value
 	-- @server
-	function umsg_library.char(val)
+	function umsg_library.bool(val)
 		SF.CheckType(val,"boolean")
 		local umsgdata = SF.instance.data.umsg
 		if not umsgdata.entering then
