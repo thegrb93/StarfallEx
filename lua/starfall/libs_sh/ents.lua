@@ -200,9 +200,9 @@ end
 -- @return The angular velocity vector
 function ents_methods:angVelVector()
 	SF.CheckType(self,ents_metamethods)
-	local ent = unwrap(self)
-	if not isValid(ent) then return nil, "invalid entity" end
-	return ent:GetAngleVelocity()
+	local phys = getPhysObject(unwrap(self))
+	if not phys then return false, "entity has no physics object or is not valid" end
+	return phys:GetAngleVelocity()
 end
 
 --- Converts a vector in entity local space to world space
