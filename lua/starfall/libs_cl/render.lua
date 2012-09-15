@@ -210,11 +210,13 @@ function render_library.setColor(r,g,b,a)
 	surface.SetTextColor(c)
 end
 
+--- Looks up a texture ID by file name.
+-- @param tx Texture file path
 function render_library.getTextureID(tx)
-	if #file.Find("materials/"..tx..".*",true) > 0 then
-		 local id = surface.GetTextureID(tx)
-		 texturecache[id] = tx
-		 return id
+	local id = surface.GetTextureID(tx)
+	if id then
+		texturecache[id] = tx
+		return id
 	end
 end
 
