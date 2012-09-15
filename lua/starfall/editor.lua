@@ -70,8 +70,6 @@ if CLIENT then
 		["_"] = true,
 	}
 	
-	local operatorstr = "%+%-/%*%^%%#=~,%.%(%)%[%]{}_" -- A string of all operators, used in the patterns below
-	
 	--[[
 	-- E2 colors
 	local colors = {
@@ -108,19 +106,16 @@ if CLIENT then
 	}
 	]]
 	
-	--Sublime text editor inspired colors
 	local colors = {
-		["keyword"]	= { Color(249,  38, 114), false}, -- pink
-		["operator"]	= { Color(248, 248, 248), false}, -- pink
-		["number"]		= { Color(174, 129, 255), false}, -- purpleish
-		["variable"]	= { Color(248, 248, 242), false}, -- white
-		["string"]		= { Color(230, 219, 116), false}, -- yellowish
-		["function"]	= { Color(102, 217, 239), false}, -- teal
-		
-		["comment"]		= { Color(133, 133, 133), false}, -- grey
-		["ppcommand"]   = { Color(240, 240, 160), false}, -- It was the same as "string". Hurt eyes. (Copy-paste mistake?) Now the same as from E2's editor
-		
-		["notfound"]	= { Color(240,  96,  96), false}, -- dark red
+		["keyword"]     = { Color(100, 100, 255), false},
+		["operator"]    = { Color(150, 150, 200), false},
+		["brackets"]    = { Color(120, 120, 255), false},
+		["number"]      = { Color(174, 129, 255), false},
+		["variable"]    = { Color(248, 248, 242), false},
+		["string"]      = { Color(230, 219, 116), false},
+		["comment"]     = { Color(133, 133, 133), false},
+		["ppcommand"]   = { Color(170, 170, 170), false},
+		["notfound"]    = { Color(240,  96,  96), false},
 	}
 	
 	-- cols[n] = { tokendata, color }
@@ -223,53 +218,19 @@ if CLIENT then
 			self.tokendata = ""
 			
 			-- Eat all spaces
-			local spaces = self:SkipPattern( "^ *" )
+			local spaces = self:SkipPattern( "^%s*" )
 			if spaces then addToken( "comment", spaces ) end
 	
 			if self:NextPattern( "^%a[%w_]*" ) then -- Variables and keywords
 				if keywords[self.tokendata] then
 					addToken( "keyword", self.tokendata )
 				else
-					local found = false
-					
-					local builtins = SF.DefaultEnvironment
-					for funcname,_ in pairs( builtins ) do
-						if self.tokendata == funcname then
-							addToken( "function", self.tokendata )
-							found = true
-							break
-						end
-					end
-					
-					if not found then
-						local libraries = SF.Libraries.libraries
-						for libname,lib in pairs( libraries ) do -- Check library name
-							if self.tokendata == libname then -- match!
-								addToken( "function", self.tokendata )
-								found = true
-								break
-							else -- No match. Check function name instead
-								if type(lib.__index) == "table" then
-									for funcname,func in pairs( lib.__index ) do
-										if self.tokendata == funcname then -- match!
-											addToken( "function", self.tokendata )
-											found = true
-											break
-										end
-									end
-								end
-							end
-						end
-					end
-					
-					if not found then
-						--print("Found variable '" .. self.tokendata .. "'" )
-						addToken( "variable", self.tokendata )
-					end
+					--print("Found variable '" .. self.tokendata .. "'" )
+					addToken( "variable", self.tokendata )
 				end
 				
 				self.tokendata = ""
-			elseif self:NextPattern( "^%d+" ) then -- Numbers
+			elseif self:NextPattern( "^%d*%.?%d+" ) then -- Numbers
 				addToken( "number", self.tokendata )
 				self.tokendata = ""
 			
@@ -306,10 +267,12 @@ if CLIENT then
 					self:NextPattern( ".*" )
 					addToken( "string", self.tokendata )
 				end
-				
 				self.tokendata = ""
-			elseif self:NextPattern( "^[" .. operatorstr .. "]" ) then -- Operators
+			elseif self:NextPattern( "^[%+%-/%*%^%%#=~,;:%._]" ) then -- Operators
 				addToken( "operator", self.tokendata )
+				self.tokendata = ""
+			elseif self:NextPattern("^[%(%)%[%]{}]") then
+				addToken( "brackets", self.tokendata)
 				self.tokendata = ""
 			else
 				self:NextCharacter()
