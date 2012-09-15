@@ -240,7 +240,7 @@ wirelink_metatable.__index = function(self,k)
 		if type(k) == "number" then
 			return wl.ReadCell and wl.ReadCell(k) or nil
 		else
-			local output = wl.Outputs[k]
+			local output = wl.Outputs and wl.Outputs[k]
 			if not output or not inputConverters[output.Type] then return end
 			return inputConverters[output.Type](output.Value)
 		end
@@ -257,9 +257,9 @@ wirelink_metatable.__newindex = function(self,k,v)
 		if not wl.WriteCell then return
 		else wl:WriteCell(k,v) end
 	else
-		local input = wl.Inputs[k]
+		local input = wl.Inputs and wl.Inputs[k]
 		if not input or not outputConverters[input.Type] then return end
-		Wire_TriggerOutput(wl,input.Name,outputConverters[input.Type](v))
+		WireLib.TriggerInput(wl,k,outputConverters[input.Type](v))
 	end
 end
 
@@ -299,6 +299,7 @@ function wirelink_methods:inputs()
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local Inputs = wl.Inputs
+	if not Inputs then return {} end
 	
 	local inputNames = {}
 	for _,port in pairs(Inputs) do
@@ -319,6 +320,7 @@ function wirelink_methods:outputs()
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local Outputs = wl.Outputs
+	if not Outputs then return {} end
 	
 	local outputNames = {}
 	for _,port in pairs(Outputs) do

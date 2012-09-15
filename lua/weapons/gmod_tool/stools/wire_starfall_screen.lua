@@ -10,8 +10,10 @@ include("starfall/sflib.lua")
 local MakeSF
 local RequestSend
 
+TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
+cleanup.Register( "starfall_screen" )
+
 if SERVER then
-	
 	if net then -- Have GM13 net library
 		net.Recieve("starfall_screen_upload", function(len, ply)
 			local ent = net.ReadEntity()
@@ -151,11 +153,6 @@ else
 	end
 end
 
-TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
-
-cleanup.Register( "starfall_screen" )
-
-
 function TOOL:LeftClick( trace )
 	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() then return false end
@@ -231,7 +228,7 @@ if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool_wire_starfall_screen_name", Description = "#Tool_wire_starfall_screen_desc" })
 		
-		local modelpanel = WireDermaExts.ModelSelect(panel, "wire_starfall_screne_Model", list.Get("WireScreenModels"), 2)
+		local modelpanel = WireDermaExts.ModelSelect(panel, "wire_starfall_screen_Model", list.Get("WireScreenModels"), 2)
 		panel:AddControl("Label", {Text = ""})
 		
 		local docbutton = vgui.Create("DButton" , panel)
