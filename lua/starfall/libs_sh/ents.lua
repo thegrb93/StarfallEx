@@ -1,5 +1,6 @@
---- Shared stuff between client-side entities library and
--- server-side entities library
+-------------------------------------------------------------------------------
+-- Shared entity library functions
+-------------------------------------------------------------------------------
 
 SF.Entities = {}
 
@@ -26,10 +27,6 @@ SF.Entities.Library = ents_lib
 -- @param entity Entity to check
 function SF.Entities.IsValid(entity)
 	return entity and entity:IsValid() and not entity:IsWorld()
---	if entity == nil then return false end
---	if not entity:IsValid() then return false end
---	if entity:IsWorld() then return false end
---	return true
 end
 local isValid = SF.Entities.IsValid
 
@@ -37,9 +34,6 @@ local isValid = SF.Entities.IsValid
 -- @return The physobj, or nil if the entity isn't valid or isn't vphysics
 function SF.Entities.GetPhysObject(ent)
 	return (isValid(ent) and ent:GetMoveType() == MOVETYPE_VPHYSICS and ent:GetPhysicsObject()) or nil
---	if not ents.IsValid(entity) then return nil end
---	if entity:GetMoveType() ~= MOVETYPE_VPHYSICS then return nil end
---	return entity:GetPhysicsObject()
 end
 local getPhysObject = SF.Entities.GetPhysObject
 
@@ -59,6 +53,29 @@ function ents_lib.owner()
 	return wrap(SF.instance.player)
 end
 
+--- Same as ents_lib.owner() on the server. On the client, returns the local player
+-- @name ents_lib.player
+-- @class function
+-- @return Either the owner (server) or the local player (client)
+if SERVER then
+	ents_lib.player = ents_lib.owner
+else
+	function ents_lib.player()
+		return wrap(LocalPlayer())
+	end
+end
+
+--[[
+--- Returns whoever created the script
+function ents_lib.owner()
+	return wrap(SF.instance.player)
+end
+
+--- Same as ents_lib.owner() on the server.
+function ents_lib.player()
+	return wrap(SF.instance.player)
+end
+]]
 -- ------------------------- Methods ------------------------- --
 
 --- To string
@@ -107,6 +124,36 @@ function ents_methods:pos()
 	return ent:GetPos()
 end
 
+--- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
+-- @shared
+-- @return The outer bounding box size
+function ents_methods:obbSize()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:OBBMaxs() - ent:OBBMins()
+end
+
+--- Returns the world position of the entity's outer bounding box
+-- @shared
+-- @return The position vector of the outer bounding box center
+function ents_methods:obbCenter()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:LocalToWorld(ent:OBBCenter())
+end
+
+--- Returns the world position of the entity's mass center
+-- @shared
+-- @return The position vector of the mass center
+function ents_methods:massCenter()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:LocalToWorld(ent:GetMassCenter())
+end
+
 --- Returns the angle of the entity
 -- @shared
 -- @return The angle
@@ -130,6 +177,19 @@ function ents_methods:mass()
 	return phys:GetMass()
 end
 
+--- Returns the principle moments of inertia of the entity
+-- @shared
+-- @return The principle moments of inertia as a vector
+function ents_methods:inertia()
+	SF.CheckType(self,ents_metamethods)
+	
+	local ent = unwrap(self)
+	local phys = getPhysObject(ent)
+	if not phys then return false, "entity has no physics object or is not valid" end
+	
+	return phys:GetInertia()
+end
+
 --- Returns the velocity of the entity
 -- @shared
 -- @return The velocity vector
@@ -138,6 +198,16 @@ function ents_methods:vel()
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:GetVelocity()
+end
+
+--- Returns the angular velocity of the entity
+-- @shared
+-- @return The angular velocity vector
+function ents_methods:angVelVector()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:GetAngleVelocity()
 end
 
 --- Converts a vector in entity local space to world space
@@ -172,4 +242,31 @@ function ents_methods:toLocal(data)
 	else
 		SF.CheckType(data, "angle or vector") -- force error
 	end
+end
+
+--- Gets the model of an entity
+-- @shared
+function ents_methods:model()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:GetModel()
+end
+
+--- Gets the entitiy's eye angles
+-- @shared
+function ents_methods:eyeAngles()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:EyeAngles()
+end
+
+--- Gets the entity's eye position
+-- @shared
+function ents_methods:eyePos()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:EyePos()
 end

@@ -4,7 +4,6 @@ AddCSLuaFile('shared.lua')
 include('shared.lua')
 
 include("starfall/SFLib.lua")
-include("libtransfer/libtransfer.lua")
 assert(SF, "Starfall didn't load correctly!")
 
 local context = SF.CreateContext()
@@ -111,7 +110,7 @@ function ENT:Think()
 	
 	if self.instance and not self.instance.error then
 		self.instance:resetOps()
-		self:RunScriptHook("think")
+		self:runScriptHook("think")
 	end
 	
 	return true
@@ -126,7 +125,7 @@ function ENT:Use( activator )
 		umsg.End( )
 	end
 	if self.sharedscreen then
-		self:RunScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
+		self:runScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
 	end
 end
 
@@ -137,17 +136,8 @@ function ENT:OnRemove()
 	self.instance = nil
 end
 
-function ENT:RunScriptHook(hook, ...)
-	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
-		local ok, rt = self.instance:runScriptHook(hook, ...)
-		if not ok then self:Error(rt) end
-	end
-end
-
 function ENT:TriggerInput(key, value)
-	if self.instance and not self.instance.error then
-		self.instance:RunScriptHook("input",key,value)
-	end
+	self:runScriptHook("input",key,value)
 end
 
 function ENT:BuildDupeInfo()

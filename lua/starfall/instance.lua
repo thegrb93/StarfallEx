@@ -1,6 +1,7 @@
 ---------------------------------------------------------------------
--- SF Instance class
--- @author Colonel Thirty Two
+-- SF Instance class.
+-- Contains the compiled SF script and essential data. Essentially
+-- the execution context.
 ---------------------------------------------------------------------
 
 SF.Instance = {}
@@ -229,6 +230,6 @@ end
 --- Deinitializes the instance. After this, the instance should be discarded.
 function SF.Instance:deinitialize()
 	self:runLibraryHook("deinitialize")
-	SF.allInstances[self] = self
+	SF.allInstances[self] = nil
 	self.error = true
 end

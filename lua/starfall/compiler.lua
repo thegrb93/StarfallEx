@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------
--- SF Compiler. Compiles code into an uninitialized Instance.
--- @author Colonel Thirty Two
+-- SF Compiler.
+-- Compiles code into an uninitialized Instance.
 ---------------------------------------------------------------------
 
 SF.Compiler = {}

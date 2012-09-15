@@ -383,6 +383,11 @@ function parse_file (filepath, doc)
 		doc.libraries[t.name] = t
 	end
 	
+	for t in class_iterator(blocks, "hook")() do
+		table.insert(doc.hooks, t.name)
+		doc.hooks[t.name] = t
+	end
+	
 	return doc
 end
 
@@ -454,9 +459,11 @@ function start (files, doc)
 	doc = doc or {
 		files = {},
 		libraries = {},
+		hooks = {},
 	}
 	assert(doc.files, "undefined `files' field")
 	assert(doc.libraries, "undefined `libraries' field")
+	assert(doc.hooks, "undefined `hooks' field")
 	
 	table.foreachi(files, function (_, path)
 		local attr = lfs.attributes(path)
@@ -472,6 +479,7 @@ function start (files, doc)
 	-- order arrays alphabetically
 	recsort(doc.files)
 	recsort(doc.libraries)
+	recsort(doc.hooks)
 
 	return doc
 end

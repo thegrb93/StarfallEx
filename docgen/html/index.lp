@@ -39,7 +39,15 @@
 </table>
 <?lua end?>
 
-
+<h2>Hooks</h2>
+<table class="hook_list">
+<?lua for _, hookname in ipairs(doc.hooks) do?>
+	<tr>
+		<td class="name"><a href="<?lua=docletsfhtml.hook_link(hookname, doc)?>"><?lua=hookname?></a></td>
+		<td class="summary"><?lua=doc.hooks[hookname].summary?></td>
+	</tr>
+<?lua end?>
+</table>
 
 <?lua if not options.nofiles and #doc.files > 0 then?>
 <h2>Files</h2>

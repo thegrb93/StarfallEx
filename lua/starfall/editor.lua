@@ -1,3 +1,8 @@
+-------------------------------------------------------------------------------
+-- SF Editor.
+-- Functions for setting up the code editor, as well as helper functions for
+-- sending code over the network.
+-------------------------------------------------------------------------------
 
 SF.Editor = {}
 
@@ -113,7 +118,7 @@ if CLIENT then
 		["function"]	= { Color(102, 217, 239), false}, -- teal
 		
 		["comment"]		= { Color(133, 133, 133), false}, -- grey
-		["ppcommand"]   = { Color(240, 210, 110), false}, -- orangeish
+		["ppcommand"]   = { Color(240, 240, 160), false}, -- It was the same as "string". Hurt eyes. (Copy-paste mistake?) Now the same as from E2's editor
 		
 		["notfound"]	= { Color(240,  96,  96), false}, -- dark red
 	}
@@ -244,11 +249,13 @@ if CLIENT then
 								found = true
 								break
 							else -- No match. Check function name instead
-								for funcname,func in pairs( lib.__index ) do
-									if self.tokendata == funcname then -- match!
-										addToken( "function", self.tokendata )
-										found = true
-										break
+								if type(lib.__index) == "table" then
+									for funcname,func in pairs( lib.__index ) do
+										if self.tokendata == funcname then -- match!
+											addToken( "function", self.tokendata )
+											found = true
+											break
+										end
 									end
 								end
 							end
@@ -345,7 +352,6 @@ if CLIENT then
 		end
 		
 		local editor = SF.Editor.editor:GetCurrentEditor()
-		editor:SetText( code1 .. code2 )
 		editor.Start = editor:MovePosition({1,1}, #code1)
 		editor.Caret = editor:MovePosition(editor.Start, #code2)
 		
@@ -400,6 +406,7 @@ if CLIENT then
 		codename = codename or SF.Editor.getOpenFile() or "main"
 		tbl.mainfile = codename
 		tbl.files = {}
+		tbl.filecount = 0
 		tbl.includes = {}
 
 		local loaded = {}
@@ -421,7 +428,13 @@ if CLIENT then
 			
 			if ppdata.includes and ppdata.includes[path] then
 				local inc = ppdata.includes[path]
-				tbl.includes[path] = inc
+				if not tbl.includes[path] then
+					tbl.includes[path] = inc
+					tbl.filecount = tbl.filecount + 1
+				else
+					assert(tbl.includes[path] == inc)
+				end
+				
 				for i=1,#inc do
 					recursiveLoad(inc[i])
 				end

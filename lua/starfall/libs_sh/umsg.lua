@@ -1,8 +1,16 @@
+-------------------------------------------------------------------------------
+-- Networking library.
+-------------------------------------------------------------------------------
 
 local umsg = umsg
 
 --- Usermessages library. Used for sending data from the server to the client.
 local umsg_library, _ = SF.Libraries.Register("umsg")
+
+--- Called when a usermessage is recieved
+-- @name umsg
+-- @class hook
+-- @param data The umsg object
 
 if SERVER then
 	-- -------------------------------------------------------------- --
@@ -78,7 +86,7 @@ if SERVER then
 	--- Adds a boolean. Takes up 1 byte.
 	-- @param val Value
 	-- @server
-	function umsg_library.char(val)
+	function umsg_library.bool(val)
 		SF.CheckType(val,"boolean")
 		local umsgdata = SF.instance.data.umsg
 		if not umsgdata.entering then

@@ -1,6 +1,42 @@
+-------------------------------------------------------------------------------
+-- The main Starfall library
+-------------------------------------------------------------------------------
 
-if SF then return end -- Already loaded
+if SF ~= nil then return end
 SF = {}
+
+-- Do a couple of checks for retarded mods that disable the debug table
+-- and run it after all addons load
+do
+	local function zassert(cond, str)
+		if not cond then error("STARFALL LOAD ABORT: "..str,0) end
+	end
+
+	zassert(debug, "debug table removed")
+
+	-- Check for modified getinfo
+	local info = debug.getinfo(0,"S")
+	zassert(info, "debug.getinfo modified to return nil")
+	zassert(info.what == "C", "debug.getinfo modified")
+
+	-- Check for modified setfenv
+	info = debug.getinfo(debug.setfenv, "S")
+	zassert(info.what == "C", "debug.setfenv modified")
+
+	-- Check get/setmetatable
+	info = debug.getinfo(debug.getmetatable)
+	zassert(info.what == "C", "debug.getmetatable modified")
+	info = debug.getinfo(debug.setmetatable)
+	zassert(info.what == "C", "debug.setmetatable modified")
+
+	-- Lock the debug table
+	local olddebug = debug
+	debug = setmetatable({}, {
+		__index = olddebug,
+		__newindex = function(self,k,v) print("Addon tried to modify debug table") end,
+		__metatable = "nope.avi",
+	})
+end
 
 -- Send files to client
 if SERVER then
@@ -133,6 +169,7 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 	local sf2sensitive = setmetatable({},{__mode=sf2smode})
 	
 	local function wrap(value)
+		if value == nil then return nil end
 		if sensitive2sf[value] then return sensitive2sf[value] end
 		local tbl = setmetatable({},metatable)
 		sensitive2sf[value] = tbl
@@ -171,7 +208,7 @@ end
 -- wrapped object.
 -- @return the unwrapped starfall object
 function SF.UnwrapObject( object )
-	local metatable = degetmeta(object)
+	local metatable = dgetmeta(object)
 	
 	local unwrap = object_unwrappers[metatable]
 	return unwrap and unwrap(object)
@@ -260,16 +297,19 @@ function SF.Unsanitize( ... )
 		if (typ == "table" and object_unwrappers[dgetmeta(value)]) then
 			return_list[key] = SF.UnwrapObject(value) or value
 		elseif typ == "table" then
+			return_list[key] = {}
+
 			for k,v in pairs(value) do
-				return_list[SF.Unsanitize(k)] = SF.Unsanitize(v)
+				return_list[key][SF.Unsanitize(k)] = SF.Unsanitize(v)
 			end
 		else
 			return_list[key] = value
 		end
 	end
-	
+
 	return unpack( return_list )
 end
+
 
 
 local serialize_replace_regex = "[\"\n]"

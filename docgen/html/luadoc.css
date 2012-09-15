@@ -221,6 +221,16 @@ table.module_list td
 table.module_list td.name { background-color: #f0f0f0; }
 table.module_list td.summary { width: 100%; }
 
+table.hook_list td
+{
+	border-width: 1px;
+	padding: 3px;
+	border-style: solid;
+	border-color: #cccccc;
+}
+table.hook_list td.name { background-color: #f0f0f0; }
+table.hook_list td.summary { width: 100%; }
+
 table.file_list
 {
 	border-width: 1px;
@@ -277,6 +287,10 @@ table.table_list td.summary { width: 100%; }
 dl.function dt {border-top: 1px solid #ccc; padding-top: 1em;}
 dl.function dd {padding-bottom: 1em;}
 dl.function h3 {padding-top: 1em; margin: 0; font-size: medium;}
+
+dl.hook dt {border-top: 1px solid #ccc; padding-top: 1em;}
+dl.hook dd {padding-bottom: 1em;}
+dl.hook h3 {padding-top: 1em; margin: 0; font-size: medium;}
 
 dl.table dt {border-top: 1px solid #ccc; padding-top: 1em;}
 dl.table dd {padding-bottom: 1em;}

@@ -1,3 +1,6 @@
+-------------------------------------------------------------------------------
+-- Time library
+-------------------------------------------------------------------------------
 
 local timer = timer
 
@@ -77,11 +80,16 @@ function time_library.destroyTimer(name)
 	instance.data.timers[name] = nil
 end
 
-local function init(instance)
-	instance.data.timers = {}
+--- Returns time between frames on client and ticks on server. Same thing as G.FrameTime in GLua
+function time_library.frameTime()
+	return FrameTime()
 end
 
-local function deinit(instance)
+SF.Libraries.AddHook("initialize",function(instance)
+	instance.data.timers = {}
+end)
+
+SF.Libraries.AddHook("deinitialize",function(instance)
 	if instance.data.timers ~= nil then
 		for name,_ in pairs(instance.data.timers) do
 			local realname = mangle_timer_name(instance,name)
@@ -89,7 +97,4 @@ local function deinit(instance)
 		end
 	end
 	instance.data.timers = nil
-end
-
-SF.Libraries.AddHook("initialize",init)
-SF.Libraries.AddHook("deinitialize",deinit)
+end)
