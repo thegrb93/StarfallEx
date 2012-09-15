@@ -6,6 +6,11 @@ SF.Entities = {}
 
 local ents_methods, ents_metamethods = SF.Typedef("Entity")
 local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true)
+
+SF.Players = {}
+
+local player_methods, player_metamethods = SF.Typedef("Player")
+local pl_wrap, pl_unwrap = SF.CreateWrapper(player_metamethods,true,true)
 --- Entities Library
 -- @shared
 local ents_lib, _ = SF.Libraries.Register("ents")
@@ -17,6 +22,38 @@ SF.Entities.Unwrap = unwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 SF.Entities.Library = ents_lib
+
+SF.Players.Wrap = wrap
+SF.Players.Unwrap = unwrap
+SF.Players.Methods = player_methods
+SF.Players.Metatable = player_metamethods
+
+-- ------------------------- Player API functions ------------------------- --
+
+local old_wrap = wrap
+local old_unwrap = unwrap
+
+local function ent_wrap( ent )
+	if type( ent ) == "Player" then
+		return pl_wrap( ent )
+	else
+		return old_wrap( ent )
+	end
+end
+
+local function ent_unwrap( ent )
+	if debug.getmetatable( ent ) == player_metamethods then
+		return pl_unwrap( ent )
+	else
+		return old_unwrap( ent )
+	end
+end
+
+wrap = ent_wrap
+unwrap = ent_unwrap
+SF.Entities.Wrap = wrap
+SF.Entities.Unwrap = unwrap
+
 
 --- Returns true if valid and is not the world, false if not
 -- @param entity Entity to check
@@ -200,8 +237,8 @@ end
 -- @return The angular velocity vector
 function ents_methods:angVelVector()
 	SF.CheckType(self,ents_metamethods)
-	local phys = getPhysObject(unwrap(self))
-	if not phys then return false, "entity has no physics object or is not valid" end
+	local phys = getPhysObject(unwrap(self)) 	
+	if not phys then return false, "entity has no physics object or is not valid" end	
 	return phys:GetAngleVelocity()
 end
 
@@ -264,4 +301,251 @@ function ents_methods:eyePos()
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:EyePos()
+end
+
+-- ------------------------- Player Methods ------------------------- --
+
+player_methods.__index = SF.Entities.Methods
+
+function player_methods:alive( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Alive()
+end
+
+function player_methods:armor( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Armor()
+end
+
+function player_methods:crouching( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Crouching()
+end
+
+function player_methods:deaths( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Deaths()
+end
+
+function player_methods:flashlightIsOn( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:FlashlightIsOn()
+end
+
+function player_methods:frags( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Frags()
+end
+
+function player_methods:getActiveWeapon( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetActiveWeapon():ClassName()
+end
+
+function player_methods:getAimVector( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetAimVector()
+end
+
+function player_methods:getFOV()
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetFOV()
+end
+
+function player_methods:getJumpPower( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetJumpPower()
+end
+
+function player_methods:getMaxSpeed( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetMaxSpeed()
+end
+
+function player_methods:getName( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetName()
+end
+
+function player_methods:getRunSpeed( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetRunSpeed()
+end
+
+function player_methods:getShootPos( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:GetShootPos()
+end
+
+function player_methods:inVehicle( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:InVehicle()
+end
+
+function player_methods:isAdmin( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsAdmin( )
+end
+
+function player_methods:isBot( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsBot( )
+end
+
+function player_methods:isConnected( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsConnected( )
+end
+
+function player_methods:isFrozen( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsFrozen( )
+end
+
+function player_methods:isNPC( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsNPC( )
+end
+
+function player_methods:isPlayer( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsPlayer()
+end
+
+function player_methods:isSuperAdmin( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsSuperAdmin( )
+end
+
+function player_methods:isUserGroup( group )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:IsUserGroup( group )
+end
+
+function player_methods:name()
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Name()
+end
+
+function player_methods:nick()
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Nick()
+end
+
+function player_methods:ping()
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Ping()
+end
+
+function player_methods:steamID( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:SteamID( )
+end
+
+function player_methods:steamID64( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:SteamID64( )
+end
+
+function player_methods:team( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:Team()
+end
+
+function player_methods:getTeamName( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return team.GetName( ent:Team( ) )
+end
+
+function player_methods:uniqueID( )
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:UniqueID() 
+end
+
+function player_methods:userID()
+	SF.CheckType( self, player_metamethods )
+	local ent = unwrap( self )
+	
+	return ent:UserID() 
+end
+
+-- ------------------------- Client Methods ------------------------- --
+
+if CLIENT then
+	function player_methods:getFriendStatus( )
+		SF.CheckType( self, player_metamethods )
+		local ent = unwrap( self )
+		
+		return ent:GetFriendStatus( )
+	end
+	
+	function player_methods:isMuted( )
+		SF.CheckType( self, player_metamethods )
+		local ent = unwrap( self )
+		
+		return ent:IsMuted( )
+	end
+	
 end
