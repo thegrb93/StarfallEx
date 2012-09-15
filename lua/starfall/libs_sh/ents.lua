@@ -308,192 +308,224 @@ end
 player_methods.__index = SF.Entities.Methods
 
 function player_methods:alive( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Alive()
 end
 
 function player_methods:armor( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Armor()
 end
 
 function player_methods:crouching( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Crouching()
 end
 
 function player_methods:deaths( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Deaths()
 end
 
 function player_methods:flashlightIsOn( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:FlashlightIsOn()
 end
 
 function player_methods:frags( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Frags()
 end
 
 function player_methods:getActiveWeapon( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetActiveWeapon():ClassName()
 end
 
 function player_methods:getAimVector( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetAimVector()
 end
 
 function player_methods:getFOV()
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetFOV()
 end
 
 function player_methods:getJumpPower( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetJumpPower()
 end
 
 function player_methods:getMaxSpeed( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetMaxSpeed()
 end
 
 function player_methods:getName( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetName()
 end
 
 function player_methods:getRunSpeed( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetRunSpeed()
 end
 
 function player_methods:getShootPos( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:GetShootPos()
 end
 
 function player_methods:inVehicle( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:InVehicle()
 end
 
 function player_methods:isAdmin( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsAdmin( )
 end
 
 function player_methods:isBot( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsBot( )
 end
 
 function player_methods:isConnected( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsConnected( )
 end
 
 function player_methods:isFrozen( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsFrozen( )
 end
 
 function player_methods:isNPC( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsNPC( )
 end
 
 function player_methods:isPlayer( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsPlayer()
 end
 
 function player_methods:isSuperAdmin( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsSuperAdmin( )
 end
 
 function player_methods:isUserGroup( group )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:IsUserGroup( group )
 end
 
 function player_methods:name()
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Name()
 end
 
 function player_methods:nick()
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Nick()
 end
 
 function player_methods:ping()
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Ping()
 end
 
 function player_methods:steamID( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:SteamID( )
 end
 
 function player_methods:steamID64( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:SteamID64( )
 end
 
 function player_methods:team( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return ent:Team()
 end
 
 function player_methods:getTeamName( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return team.GetName( ply:Team( ) )
 end
 
 function player_methods:uniqueID( )
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return self:UniqueID() 
 end
 
 function player_methods:userID()
+	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
 	return self:UserID() 
@@ -503,12 +535,14 @@ end
 
 if CLIENT then
 	function player_methods:getFriendStatus( )
+		SF.CheckType( self, player_metamethods )
 		local ent = unwrap( self )
 		
 		return ent:GetFriendStatus( )
 	end
 	
 	function player_methods:isMuted( )
+		SF.CheckType( self, player_metamethods )
 		local ent = unwrap( self )
 		
 		return ent:IsMuted( )
