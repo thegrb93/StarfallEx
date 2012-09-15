@@ -10,6 +10,9 @@ include("starfall/sflib.lua")
 local MakeSF
 local RequestSend
 
+TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
+cleanup.Register( "starfall_processor" )
+
 if SERVER then
 	if net then -- Have GM13 net library
 		net.Recieve("starfall_processor_upload", function(len, ply)
@@ -143,11 +146,6 @@ else
 		end)
 	end
 end
-
-TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
-
-cleanup.Register( "starfall_processor" )
-
 
 function TOOL:LeftClick( trace )
 	if not trace.HitPos then return false end
