@@ -2,23 +2,76 @@ include( "shared.lua" )
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+-- Umsgs may be recieved before the entity is initialized, place
+-- them in here until initialization.
+local msgQueueNames = {}
+local msgQueueData = {}
+
+local function msgQueueAdd(umname, ent, udata)
+	local names, data = msgQueueNames[ent], msgQueueData[ent]
+	if not names then
+		names, data = {}, {}
+		msgQueueNames[ent] = names
+		msgQueueData[ent] = data
+	end
+	
+	local i = #names+1
+	names[i] = umname
+	data[i] = udata
+end
+
+local function msgQueueProcess(ent)
+	local names, data = msgQueueNames[ent], msgQueueData[ent]
+	if names then
+		for i=1,#names do
+			local name = names[i]
+			if name == "scale" then
+				ent:SetScale(data[i])
+			elseif name == "clip" then
+				ent:UpdateClip(unpack(data[i]))
+			end
+		end
+		
+		msgQueueNames[ent] = nil
+		msgQueueData[ent] = nil
+	end
+end
+
 -- ------------------------ MAIN FUNCTIONS ------------------------ --
 
-function ENT:Initialize( )
+function ENT:Initialize()
 	self.clips = {}
 	self.unlit = false
-	
-	self:SetScale(Vector(1,1,1))
+	self.scale = Vector(1,1,1)
+	msgQueueProcess(self)
 end
 
 function ENT:Draw()
-	self:SetupClipping()
+	-- Setup clipping
+	local l = #self.clips
+	if l > 0 then
+		render.EnableClipping(true)
+		for i=1,l do
+			local clip = self.clips[i]
+			if clip.enabled then
+				local norm = clip.normal
+				local origin = clip.origin
+				
+				if clip.islocal then
+					norm = self:LocalToWorld(norm) - self:GetPos()
+					origin = self:LocalToWorld(origin)
+				end
+				render.PushCustomClipPlane(norm, norm:Dot(origin))
+			end
+		end
+	end
 	render.SuppressEngineLighting(self.unlit)
 	
 	self:DrawModel()
 	
-	render.SuppressEngineLighting( false )
-	self:FinishClipping()
+	render.SuppressEngineLighting(false)
+	for i=1,#self.clips do render.PopCustomClipPlane() end
+	render.EnableClipping(false)
 end
 
 -- ------------------------ CLIPPING ------------------------ --
@@ -37,33 +90,17 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 	clip.islocal = islocal
 end
 
---- Draw utility; do not call. Gets ready to render clipping
-function ENT:SetupClipping()
-	local l = #self.clips
-	if l > 0 then
-		render.EnableClipping( true )
-
-		for i=1,l do
-			local clip = self.clips[i]
-			if clip.enabled then
-				local norm = clip.normal
-				local origin = clip.origin
-				
-				if clip.islocal then
-					norm = self:LocalToWorld(norm) - self:GetPos()
-					origin = self:LocalToWorld(origin)
-				end
-				
-				render.PushCustomClipPlane(norm, norm:Dot(origin))
-			end
-		end
+usermessage.Hook("starfall_hologram_clip", function(um, ent)
+	local holoent = ent or um:ReadEntity()
+	if not holoent:GetTable() then
+		-- Uninitialized
+		msgQueueAdd("clip", holoent, {um:ReadShort(), um:ReadBool(),
+			um:ReadVector(), um:ReadVector(), um:ReadBool()})
+	else
+		holoent:UpdateClip(um:ReadShort(), um:ReadBool(), um:ReadVector(),
+			um:ReadVector(), um:ReadBool())
 	end
-end
-
---- Draw utility; do not call. Undo's ENT:SetupClipping
-function ENT:FinishClipping()
-	for i=1,#self.clips do render.PopCustomClipPlane() end
-end
+end)
 
 -- ------------------------ SCALING ------------------------ --
 
@@ -85,3 +122,13 @@ function ENT:SetScale(scale)
 	
 	self:SetRenderBounds(propmax, propmin)
 end
+
+usermessage.Hook("starfall_hologram_scale", function(um, ent)
+	local holoent = ent or um:ReadEntity()
+	if not holoent:GetTable() then
+		-- Uninitialized
+		msgQueueAdd("scale", holoent, um:ReadVector())
+	else
+		holoent:SetScale(um:ReadVector())
+	end
+end)
