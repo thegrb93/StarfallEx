@@ -315,8 +315,6 @@ if CLIENT then
 		end
 		
 		local editor = SF.Editor.editor:GetCurrentEditor()
-		editor.Start = editor:MovePosition({1,1}, #code1)
-		editor.Caret = editor:MovePosition(editor.Start, #code2)
 		
 		function SF.Editor.editor:Validate(gotoerror)
 			local err = CompileString(self:GetCode(), "SF:"..(self:GetChosenFile() or "main"), false)
