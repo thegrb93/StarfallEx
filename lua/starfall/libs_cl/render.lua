@@ -2,8 +2,6 @@
 -- Render library
 -------------------------------------------------------------------------------
 
-local MATRIX_STACK_LIMIT = 8
-
 --- Called when a frame is requested to be drawn. You may want to unhook from this if you don't need
 -- to render anything for a bit
 -- @name render
@@ -45,10 +43,19 @@ local dgetmeta = debug.getmetatable
 local matrix_meta = _R.VMatrix
 
 local currentcolor
+local MATRIX_STACK_LIMIT = 8
+local matrix_stack = {}
 
 SF.Libraries.AddHook("prepare",function(instance, hook)
 	if hook == "render" then
 		currentcolor = Color(0,0,0,0)
+	end
+end)
+
+SF.Libraries.AddHook("cleanup", function(instance, hook)
+	for i=#matrix_stack,1,-1 do
+		cam.PopModelMatrix()
+		matrix_stack[i] = nil
 	end
 end)
 
@@ -168,17 +175,25 @@ function render_library.pushMatrix(m)
 	SF.CheckType(m,matrix_meta)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then error("Not in rendering hook.",2) end
-	if renderdata.matricies + 1 > MATRIX_STACK_LIMIT then error("Pushed too many matricies",2) end
-	renderdata.matricies = renderdata.matricies + 1
-	cam.PushModelMatrix(m)
+	local id = #matrix_stack
+	if id + 1 > MATRIX_STACK_LIMIT then error("Pushed too many matricies",2) end
+	
+	local newmatrix
+	if matrix_stack[id] then
+		newmatrix = matrix_stack[id] * m
+	else
+		newmatrix = m
+	end
+	matrix_stack[id+1] = newmatrix
+	cam.PushModelMatrix(newmatrix)
 end
 
 --- Pops a matrix from the matrix stack.
 function render_library.popMatrix()
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then error("Not in rendering hook.",2) end
-	if renderdata.matricies <= 0 then error("Popped too many matricies",2) end
-	renderdata.matricies = renderdata.matricies - 1
+	if #matrix_stack <= 0 then error("Popped too many matricies",2) end
+	matrix_stack[#matrix_stack] = nil
 	cam.PopModelMatrix()
 end
 

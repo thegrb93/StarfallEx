@@ -94,12 +94,7 @@ function ENT:CodeSent(files, main, owner)
 		if self.instance then
 			data.render.isRendering = true
 			self:runScriptHook("render")
-			
 			data.render.isRendering = nil
-			for i=1,data.render.matricies do
-				cam.PopModelMatrix()
-			end
-			data.render.matricies = 0
 			
 		elseif self.error then
 			surface.SetTexture(0)
