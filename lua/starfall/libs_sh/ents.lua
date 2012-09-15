@@ -514,21 +514,21 @@ function player_methods:getTeamName( )
 	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
-	return team.GetName( ply:Team( ) )
+	return team.GetName( ent:Team( ) )
 end
 
 function player_methods:uniqueID( )
 	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
-	return self:UniqueID() 
+	return ent:UniqueID() 
 end
 
 function player_methods:userID()
 	SF.CheckType( self, player_metamethods )
 	local ent = unwrap( self )
 	
-	return self:UserID() 
+	return ent:UserID() 
 end
 
 -- ------------------------- Client Methods ------------------------- --
