@@ -13,44 +13,38 @@ local callbacks = {}
 ---------------------------------------------------------------------
 
 hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
+	print("hook executed")
     local hidden
     local steamid = ply:SteamID()
     local wrapped_player = SF.Entities.Wrap(ply)
     
     local function call_handler (instance, handler)
-        local success, err, hide = pcall(
-                instance.runFunction,
-                instance,
-                handler,
-                msg,
-                wrapped_player
-        )
+		if instance.error then return end
+		local ok, rt, traceback = instance:runFunction(handler, msg, wrapped_player)
         
-        print( err )
-        
-        if success and hide and ply == instance.player then
+        if ok and rt and ply == instance.player then
             hidden = true
-        end
+        elseif not ok then
+			ErrorNoHalt("SF Instance of "..instance.player:Nick().." errored: "..tostring(rt).."\n"..traceback)
+			print(traceback)
+			WireLib.ClientError("SF: "..tostring(rt), instance.player)
+		end
     end
 
     for inst, tbl in pairs(callbacks) do
         for _, func in pairs(tbl.global) do
-            call_handler( inst, func )
+            call_handler(inst, func)
         end
         
         local player_table = tbl[steamid]
         if player_table then
 	        for _, func in pairs(player_table) do
-	            call_handler( inst, func )
+	            call_handler(inst, func)
 	        end
 	    end
     end
     
-    if hidden then
-        return ""
-    else
-        return msg
-    end
+	return hidden and "" or nil
 end)
 
 SF.Libraries.AddHook( "deinitialize", function( instance ) 
@@ -84,16 +78,11 @@ function chat.listen( func, ply )
 		error("Invalid player entity passed to chat.listen", 2)
 	end
 	
-	if not ply then
-		callbacks[instance]["global"][func] = func
-	else
-		local steamid = ply:SteamID()
-		if not callbacks[instance][steamid] then
-			callbacks[instance][steamid] = {}
-		end
-		
-		callbacks[instance][steamid][func] = func
+	local cbid = ply and ply:SteamID() or "global"
+	if not callbacks[instance][cbid] then
+		callbacks[instance][cbid] = {}
 	end
+	callbacks[instance][cbid][func] = func
 end
 
 --- Removes listener from listening to chat.
@@ -101,10 +90,9 @@ end
 -- @param ply the player that you are no longer listening to.
 function chat.stop( func, ply )
 	local instance = SF.instance
-	if not ply then
-		callback[instance]["global"][func] = nil
-	else
-		local steamid = SF.Entities.Unwrap(ply):SteamID()
-		callback[instance][steamid][func] = nil
-	end
+	
+	ply = SF.Entities.Unwrap(ply)
+	
+	local cbid = ply and ply:SteamID() or "global"
+	callback[instance][cbid][func] = nil
 end
