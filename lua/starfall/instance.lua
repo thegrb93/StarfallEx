@@ -209,7 +209,7 @@ end
 function SF.Instance:runFunction(func,...)
 	self:prepare("_runFunction",func)
 	
-	local ok, err = self:runWithOps(func,...)
+	local ret = { self:runWithOps(func,...) }
 	if not ok then
 		self:cleanup("_runFunction", true, err)
 		self.error = true
@@ -218,7 +218,7 @@ function SF.Instance:runFunction(func,...)
 	
 	self:cleanup("_runFunction",func,false)
 	
-	return true, err
+	return unpack( ret )
 end
 
 --- Resets the amount of operations used.

@@ -18,7 +18,7 @@ hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
     local wrapped_player = SF.Entities.Wrap(ply)
     
     local function call_handler (instance, handler)
-        local success, hide = pcall(
+        local success, err, hide = pcall(
                 instance.runFunction,
                 instance,
                 handler,
@@ -26,18 +26,24 @@ hook.Add( "PlayerSay", "starfall_chat_receive", function( ply, msg, toall )
                 wrapped_player
         )
         
+        print( err )
+        
         if success and hide and ply == instance.player then
             hidden = true
         end
     end
 
-    for instance, tbl in pairs(callbacks) do
+    for inst, tbl in pairs(callbacks) do
         for _, func in pairs(tbl.global) do
-            call_handler( instance, handler )
+            call_handler( inst, func )
         end
-        for _, func in pairs(tbl[steamid]) do
-            call_handler( instance, handler )
-        end
+        
+        local player_table = tbl[steamid]
+        if player_table then
+	        for _, func in pairs(player_table) do
+	            call_handler( inst, func )
+	        end
+	    end
     end
     
     if hidden then
