@@ -80,6 +80,35 @@ function hologram_methods:setAngVel(angvel)
 end
 ]]
 
+--- Parents this hologram to the specified hologram
+function hologram_methods:setParent(parent, attachment)
+	SF.CheckType(self, hologram_metamethods)
+	local child = unwrap(self)
+	if not child then return end
+	
+	if parent then
+		SF.CheckType(parent, hologram_metamethods)
+		local parent = unwrap(parent)
+		if not parent then return end
+		
+		-- Prevent cyclic parenting ( = crashes )
+		local checkparent = parent
+		while IsValid(checkparent:GetParent()) do
+			checkparent = checkparent:GetParent()
+			if checkparent == child then return end
+		end
+		
+		child:SetParent(parent)
+		
+		if attachment then
+			SF.CheckType(attachment, "string")
+			child:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		end
+	else
+		child:SetParent(nil)
+	end
+end
+
 --- Sets the hologram scale
 function hologram_methods:setScale(scale)
 	SF.CheckType(self, hologram_metamethods)
