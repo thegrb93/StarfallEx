@@ -225,15 +225,10 @@ if CLIENT then
 				if keywords[self.tokendata] then
 					addToken( "keyword", self.tokendata )
 				else
-					--print("Found variable '" .. self.tokendata .. "'" )
 					addToken( "variable", self.tokendata )
 				end
-				
-				self.tokendata = ""
 			elseif self:NextPattern( "^%d*%.?%d+" ) then -- Numbers
 				addToken( "number", self.tokendata )
-				self.tokendata = ""
-			
 			elseif self:NextPattern( "^%-%-" ) then -- Comment
 				if self:NextPattern( "^@" ) then -- ppcommand
 					self:NextPattern( ".*" ) -- Eat all the rest
@@ -249,16 +244,12 @@ if CLIENT then
 					self:NextPattern( ".*" ) -- Skip the rest
 					addToken( "comment", self.tokendata )
 				end
-				
-				self.tokendata = ""
 			elseif self:NextPattern( "^[\"']" ) then -- Single line string
 				if findStringEnding( self,row, self.tokendata ) then -- String ending found
 					addToken( "string", self.tokendata )
-					self.tokendata = ""
 				else -- No ending found
 					self:NextPattern( ".*" ) -- Eat everything
 					addToken( "string", self.tokendata )
-					self.tokendata = ""
 				end
 			elseif self:NextPattern( "^%[%[" ) then -- Multi line strings
 				if findMultilineEnding( self, row, "string" ) then -- Ending found
@@ -267,22 +258,15 @@ if CLIENT then
 					self:NextPattern( ".*" )
 					addToken( "string", self.tokendata )
 				end
-				self.tokendata = ""
 			elseif self:NextPattern( "^[%+%-/%*%^%%#=~,;:%._]" ) then -- Operators
 				addToken( "operator", self.tokendata )
-				self.tokendata = ""
 			elseif self:NextPattern("^[%(%)%[%]{}]") then
 				addToken( "brackets", self.tokendata)
-				self.tokendata = ""
 			else
 				self:NextCharacter()
 				addToken( "notfound", self.tokendata )
 			end
-			
-		end
-		
-		if self.tokendata ~= "" then
-			addToken( "notfound", self.tokendata )
+			self.tokendata = ""
 		end
 		
 		return cols
@@ -303,6 +287,25 @@ if CLIENT then
 		
 		SF.Editor.editor = vgui.Create("Expression2EditorFrame")
 		SF.Editor.editor:Setup("SF Editor", "Starfall", "nothing") -- Setting the editor type to not nil keeps the validator line
+		
+		-- Add "Sound Browser" button
+		do
+			local editor = SF.Editor.editor
+			local SoundBrw = editor:addComponent(vgui.Create("Button", editor), -205, 30, -125, 20)
+			SoundBrw.panel:SetText("")
+			SoundBrw.panel.Font = "E2SmallFont"
+			SoundBrw.panel.Paint = function(button)
+				local w,h = button:GetSize()
+				draw.RoundedBox(1, 0, 0, w, h, editor.colors.col_FL)
+				if ( button.Hovered ) then draw.RoundedBox(0, 1, 1, w - 2, h - 2, Color(0,0,0,192)) end
+				surface.SetFont(button.Font)
+				surface.SetTextPos( 3, 4 )
+				surface.SetTextColor( 255, 255, 255, 255 )
+				surface.DrawText("  Sound Browser")
+			end
+			SoundBrw.panel.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
+			editor.C.SoundBrw = SoundBrw
+		end
 		
 		SF.Editor.editor:SetSyntaxColorLine( SyntaxColorLine )
 		--SF.Editor.editor:SetSyntaxColorLine( function(self, row) return {{self.Rows[row], Color(255,255,255)}} end)
