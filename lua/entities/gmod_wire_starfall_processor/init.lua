@@ -60,8 +60,11 @@ function ENT:Compile(codetbl, mainfile)
 	self:SetColor(255, 255, 255, a)
 end
 
-function ENT:Error(msg, override)
+function ENT:Error(msg, traceback)
 	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
+	if traceback then
+		print(traceback)
+	end
 	WireLib.ClientError(msg, self.owner)
 	
 	if self.instance then

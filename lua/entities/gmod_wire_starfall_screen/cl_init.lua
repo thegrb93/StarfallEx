@@ -5,7 +5,7 @@ ENT.RenderGroup = RENDERGROUP_OPAQUE
 include("starfall/SFLib.lua")
 assert(SF, "Starfall didn't load correctly!")
 
-local context = SF.CreateContext(nil, nil, nil, nil, SF.Libraries.CreateLocalTbl{"screen"})
+local context = SF.CreateContext(nil, nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"})
 datastream.Hook("sf_screen_download",function(handler, id, encoded, decoded)
 	for i=1,#decoded do
 		data = decoded[i]
@@ -78,20 +78,23 @@ end
 function ENT:CodeSent(files, main, owner)
 	if self.instance then self.instance:deinitialize() end
 	self.owner = owner
-	local ok, instance = SF.Compiler.Compile(files,context,main,owner,{ent=self,screen={}})
+	local ok, instance = SF.Compiler.Compile(files,context,main,owner,{ent=self,render={}})
 	if not ok then self:Error(instance) return end
 	
 	self.instance = instance
 	instance.data.entity = self
-	instance.data.gpu = self.GPU
+	instance.data.render.gpu = self.GPU
+	instance.data.render.matricies = 0
 	local ok, msg = instance:initialize()
 	if not ok then self:Error(msg) end
 	
+	local data = instance.data
+	
 	function self.renderfunc()
 		if self.instance then
-			self.instance.data.screen.isRendering = true
+			data.render.isRendering = true
 			self:runScriptHook("render")
-			if self.instance then self.instance.data.screen.isRendering = nil end
+			data.render.isRendering = nil
 			
 		elseif self.error then
 			surface.SetTexture(0)
@@ -106,6 +109,7 @@ function ENT:CodeSent(files, main, owner)
 				draw.DrawText("Source: "..self.error.source, "Starfall_ErrorFont", 16, 512-16*5, Color(255, 255, 255, 255))
 			end
 			draw.DrawText("Press USE to copy to your clipboard", "Starfall_ErrorFont", 512 - 16*25, 512-16*2, Color(255, 255, 255, 255))
+			self.renderfunc = nil
 		end
 	end
 end

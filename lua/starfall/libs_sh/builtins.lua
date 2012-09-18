@@ -185,6 +185,35 @@ else
 	end
 end
 
+--- Runs an --@include'd script and caches the result.
+-- Works pretty much like standard Lua require()
+function SF.DefaultEnvironment.require(file)
+	SF.CheckType(file, "string")
+	local loaded = SF.instance.data.reqloaded
+	if not loaded then
+		loaded = {}
+		SF.instance.data.reqloaded = loaded
+	end
+	
+	if loaded[file] then
+		return loaded[file]
+	else
+		local func = SF.instance.scripts[file]
+		if not func then error("Can't find file '"..file.."' (did you forget to --@include it?)",2) end
+		loaded[file] = func() or true
+		return loaded[file]
+	end
+end
+
+--- Runs an --@include'd file and returns the result.
+-- Pretty much like standard Lua dofile()
+function SF.DefaultEnvironment.dofile(file)
+	SF.CheckType(file, "string")
+	local func = SF.instance.scripts[file]
+	if not func then error("Can't find file '"..file.."' (did you forget to --@include it?)",2) end
+	return func()
+end
+
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 

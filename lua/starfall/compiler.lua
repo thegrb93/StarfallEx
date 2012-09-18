@@ -15,7 +15,11 @@ SF.Compiler = {}
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
 function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreprocess)
-
+	if type(code) == "string" then
+		mainfile = mainfile or "generic"
+		code = {mainfile=code}
+	end
+	
 	local instance = setmetatable({},SF.Instance)
 	
 	data = data or {}
@@ -34,40 +38,24 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 	instance.mainfile = mainfile
 	instance.permissions = setmetatable({},context.permissions)
 	
-	local loaded = {}
-
-	local function recursiveLoad(path)
-		if loaded[path] then return end
-		loaded[path] = true
-		
+	for filename, source in pairs(code) do
 		if not dontpreprocess then
-			SF.Preprocessor.ParseDirectives(path,code[path],context.directives,instance.ppdata)
+			SF.Preprocessor.ParseDirectives(filename,source,context.directives,instance.ppdata)
 		end
 		
-		if instance.ppdata.includes and instance.ppdata.includes[path] then
-			local inc = instance.ppdata.includes[path]
-			for i=1,#inc do
-				recursiveLoad(inc[i])
+		if string.match(source, "^[%s\n]*$") then
+			-- Lua doesn't have empty statements, so an empty file gives a syntax error
+			instance.scripts[filename] = function() end
+		else
+			local func = CompileString(source, "SF:"..filename, false)
+			if type(func) == "string" then
+				return false, func
 			end
+			debug.setfenv(func, instance.env)
+			instance.scripts[filename] = func
 		end
-		
-		if code[path] == "" then
-			-- Passing an empty string to CompileString returns an error because Lua does not have empty statements (at least in 5.1)
-			error(path..": No code.",0)
-		end
-		
-		local func = CompileString(code[path], "SF:"..path, false)
-		if type(func) == "string" then
-			error(path..": "..func, 0)
-		end
-		debug.setfenv(func,instance.env)
-		
-		instance.scripts[#instance.scripts+1] = func
 	end
 	
-	local ok, msg = pcall(recursiveLoad, mainfile)
-	if ok then
-		instance.permissions:assign(instance)
-		return true, instance
-	else return false, msg end
+	instance.permissions:assign(instance)
+	return true, instance
 end
