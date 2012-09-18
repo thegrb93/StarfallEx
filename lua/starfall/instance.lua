@@ -138,8 +138,8 @@ end
 function SF.Instance:runScriptHookForResult(hook,...)
 	for ok,tbl,traceback in self:iterTblScriptHook(hook,...) do
 		if not ok then return false, tbl, traceback
-		elseif tbl then
-			return unpack(tbl)
+		elseif tbl and tbl[1] then
+			return true, unpack(tbl)
 		end
 	end
 	return true
@@ -148,10 +148,11 @@ end
 -- Some small efficiency thing
 local noop = function() end
 
---- Creates an iterator that calls each registered function for a hook
+--- Creates an iterator that calls each registered function for a hook.
 -- @param hook The hook to call.
 -- @param ... Arguments to pass to the hook's registered function.
--- @return An iterator function returning pcall-like results for each registered function.
+-- @return An iterator function returning the ok status, and then either the hook
+-- results or the error message and traceback
 function SF.Instance:iterScriptHook(hook,...)
 	local hooks = self.hooks[hook:lower()]
 	if not hooks then return noop end
@@ -173,14 +174,14 @@ function SF.Instance:iterScriptHook(hook,...)
 		end
 		
 		self:cleanup(hook,name,false)
-		return unpack(tbl)
+		return true, unpack(tbl)
 	end
 end
 
---- Like SF.Instance:iterSciptHook, except that it returns an array of pcall-like values instead of unpacking them
--- @param hook The hook to call.
+--- Like SF.Instance:iterSciptHook, except that it doesn't unpack the hook results.
 -- @param ... Arguments to pass to the hook's registered function.
--- @return An iterator function returning a table of pcall-like results for each registered function.
+-- @return An iterator function returning the ok status, then either the table of
+-- hook results or the error message and traceback
 function SF.Instance:iterTblScriptHook(hook,...)
 	local hooks = self.hooks[hook:lower()]
 	if not hooks then return noop end
@@ -198,11 +199,11 @@ function SF.Instance:iterTblScriptHook(hook,...)
 		if not ok then
 			self:cleanup(hook,name,true,tbl,traceback)
 			self.error = true
-			return ok, tbl, traceback
+			return false, tbl, traceback
 		end
 		
 		self:cleanup(hook,name,false)
-		return ok, tbl
+		return true, tbl
 	end
 end
 
@@ -221,15 +222,15 @@ end
 function SF.Instance:runFunction(func,...)
 	self:prepare("_runFunction",func)
 	
-	local ok, err, traceback = self:runWithOps(func,...)
+	local ok, tbl, traceback = self:runWithOps(func,...)
 	if not ok then
-		self:cleanup("_runFunction",func,true,err,traceback)
+		self:cleanup("_runFunction",func,true,tbl,traceback)
 		self.error = true
-		return false, err, traceback
+		return false, tbl, traceback
 	end
 	
 	self:cleanup("_runFunction",func,false)
-	return true, unpack(err)
+	return true, unpack(tbl)
 end
 
 --- Resets the amount of operations used.

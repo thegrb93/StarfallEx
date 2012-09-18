@@ -258,7 +258,7 @@ function render_library.drawRectOutline(x,y,w,h)
 		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
 end
 
---- Draws a circle
+--- Draws a circle outline
 -- @param x Center x coordinate
 -- @param y Center y coordinate
 -- @param r Radius
