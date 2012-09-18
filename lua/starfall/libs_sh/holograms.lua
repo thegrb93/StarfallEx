@@ -54,10 +54,31 @@ end
 --- Sets the hologram angle
 function hologram_methods:setAng(ang)
 	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(pos, "Angle")
+	SF.CheckType(ang, "Angle")
 	local holo = unwrap(self)
 	if holo then holo:SetAngles(ang) end
 end
+
+--- Sets the hologram linear velocity
+function hologram_methods:setVel(vel)
+	SF.CheckType(self, hologram_metamethods)
+	SF.CheckType(vel, "Vector")
+	local holo = unwrap(self)
+	if holo then holo:SetLocalVelocity(vel) end
+end
+
+--[[
+-- Currently only works in GM13 (maybe)
+
+-- Sets the hologram's angular velocity.
+-- @param angvel *Vector* angular velocity.
+function hologram_methods:setAngVel(angvel)
+	SF.CheckType(self, hologram_metamethods)
+	SF.CheckType(angvel, "Angle")
+	local holo = unwrap(self)
+	if holo then holo:SetLocalAngularVelocity(angvel) end
+end
+]]
 
 --- Sets the hologram scale
 function hologram_methods:setScale(scale)
