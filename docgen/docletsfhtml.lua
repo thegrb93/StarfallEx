@@ -33,13 +33,7 @@ end
 -- Include the result of a lp template into the current stream.
 
 function include (template, env)
-	-- template_dir is relative to package.path
-	local templatepath = options.template_dir .. template
-	
-	local templatepath = search("./html", templatepath)
-	--assert(templatepath, string.format("template `%s' not found", template))
-	
-	templatepath = "./html/"..template
+	local templatepath = "./html/"..template
 	
 	env = env or {}
 	env.table = table

@@ -6,18 +6,22 @@ local io = require "io"
 local lfs = require "lfs"
 local luadoc = require "luadoc"
 local util = require "luadoc.util"
-local tags = require "taglet_sf_tags"
+local tags = require "tagletsftags"
 local string = require "string"
 local table = require "table"
 
 local print = print
 
-module 'taglet_sf'
+module 'tagletsf'
 
--- LuaDoc doesn't like ../ in pathnames when specifying where to look for lua files.
--- This trims out the '../lua/starfall/" that will pretty much always be there.
+-- Trims out the initial directory in file paths.
+-- ex. if we say "document /home/user/code/*" we don't want
+-- files to be named '/home/user/code/myfile.lua', we just
+-- want 'myfile.lua'
+-- Requires options.basepath to be set
 local function fix_filepath(fname)
-	return fname:match("^..[/\\]lua[/\\]starfall[/\\]?(.*)$") or fname
+	return options.basepath and fname:match("^"..options.basepath:gsub("[/\\]", "[/\\]").."[/\\]?(.*)$") or fname
+	--fname:match("^..[/\\]lua[/\\]starfall[/\\]?(.*)$") or fname
 end
 
 -------------------------------------------------------------------------------
@@ -466,13 +470,15 @@ function start (files, doc)
 	assert(doc.hooks, "undefined `hooks' field")
 	
 	table.foreachi(files, function (_, path)
-		local attr = lfs.attributes(path)
-		assert(attr, string.format("error stating path `%s'", path))
+		local mode, err = lfs.attributes(path, "mode")
+		assert(mode, string.format("error stating path '%s': %s", path, err or "unknown error"))
 		
-		if attr.mode == "file" then
+		if mode == "file" then
 			doc = file(path, doc)
-		elseif attr.mode == "directory" then
+		elseif mode == "directory" then
 			doc = directory(path, doc)
+		else
+			error(string.format("error stating path '%s': unknown file mode", path))
 		end
 	end)
 	

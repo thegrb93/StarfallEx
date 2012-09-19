@@ -7,7 +7,7 @@ local string = require "string"
 local table = require "table"
 local assert, type, tostring = assert, type, tostring
 
-module "taglet_sf_tags"
+module "tagletsftags"
 
 -------------------------------------------------------------------------------
 
@@ -48,6 +48,11 @@ end
 
 local function entity(tag, block, text)
 	block[tag] = text
+end
+
+local function include(tag, block, text)
+	-- Supress "undefined handler for tag `include'" warnings as the --@include
+	-- preprocessing parameter appears a couple of times.
 end
 
 -------------------------------------------------------------------------------
@@ -193,6 +198,7 @@ handlers["entity"] = entity
 handlers["client"] = side
 handlers["server"] = side
 handlers["shared"] = shared
+handlers["include"] = include
 
 -------------------------------------------------------------------------------
 
