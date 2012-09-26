@@ -3,33 +3,29 @@
 -- @shared
 local serverinfo_library, _ = SF.Libraries.Register("serverinfo")
 
---- Same as Glua's physenv.GetPerformanceSettings()
---@return Table containing physics environment settings 
-function serverinfo_library.GetPerformanceSettings()
-	return physenv.GetPerformanceSettings()
+--- Returns a table containing physics environment settings. See GLua's physenv.GetPerformanceSettings()
+-- for more info.
+function serverinfo_library.performanceSettings()
+	return table.Copy(physenv.GetPerformanceSettings())
 end
 
---- Same as Glua's physenv.GetGravity()
---@return Vector describing acceleration due to gravity setting
-function serverinfo_library.GetGravity()
+--- Returns the server's acceleration due to gravity vector.
+function serverinfo_library.gravity()
 	return physenv.GetGravity()
 end
 
---- Same as Glua's physenv.GetAirDensity()
---@return Number describing air density setting
-function serverinfo_library.GetAirDensity()
+--- Returns the air density. See Glua's physenv.GetAirDensity()
+function serverinfo_library.airDensity()
 	return physenv.GetAirDensity()
 end
 
---- Same as Glua's game.GetMap()
---@return The map name as a string
-function serverinfo_library.GetMap()
+--- Returns the map name
+function serverinfo_library.map()
 	return game.GetMap()
 end
 
---- Returns The hostname convar
---@return The hostname convar
-function serverinfo_library.GetHostname() 
+--- Returns The hostname
+function serverinfo_library.hostname() 
 	return GetConVar("hostname"):GetString()
 end
 
@@ -39,28 +35,26 @@ function serverinfo_library.isLan()
 end
 
 --- Returns the gamemode as a String
---@return The name of the gamemode
-function serverinfo_library.GetGamemode()
+function serverinfo_library.gamemode()
 	return gmod.GetGamemode().Name
 end
 
---- Same as GLua's SinglePlayer()
-function serverinfo_library.SinglePlayer()
+--- Returns whether or not the current game is single player
+function serverinfo_library.isSinglePlayer()
 	return SinglePlayer()
 end
 
---- Same as GLua's isDedicatedServer()
+--- Returns whether or not the server is a dedicated server
 function serverinfo_library.isDedicatedServer()
 	return isDedicatedServer()
 end
 
 --- Returns the number of players on the server
---@return The number of players on the server
 function serverinfo_library.numPlayers()
 	return #player.GetAll()
 end
 
---- Same as GLua's MaxPlayers()
-function serverinfo_library.MaxPlayers()
+--- Returns the maximum player limit
+function serverinfo_library.maxPlayers()
 	return MaxPlayers()
 end
