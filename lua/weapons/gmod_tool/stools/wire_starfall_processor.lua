@@ -14,64 +14,41 @@ TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
 cleanup.Register( "starfall_processor" )
 
 if SERVER then
-	if net then -- Have GM13 net library
-		net.Recieve("starfall_processor_upload", function(len, ply)
-			local ent = net.ReadEntity()
-			if not ent or not ent:IsValid() then
-				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
-				return
-			end
-			
-			if ent:GetClass() ~= "gmod_wire_starfall_processor" then
-				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
-				return
-			end
-			
-			local mainfile = net.ReadString()
-			local numfiles = net.ReadByte()
-			local task = {
-				mainfile = mainfile,
-				files = {},
-			}
-			
-			for i=1,numfiles do
-				local filename = net.ReadString()
-				local code = net.ReadString()
-				task.files[filename] = code
-			end
-			
-			ent:CodeSent(ply,task)
-		end)
-		
-		RequestSend = function(ply, ent)
-			net.Start("starfall_processor_requpload")
-			net.WriteEntity(ent)
-			net.Send(ply)
+	util.AddNetworkString("starfall_processor_requpload")
+	util.AddNetworkString("starfall_processor_upload")
+	
+	net.Receive("starfall_processor_upload", function(len, ply)
+		local ent = net.ReadEntity()
+		if not ent or not ent:IsValid() then
+			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
+			return
 		end
-	else
-		datastream.Hook("starfall_processor_upload", function(ply, handler, id, encoded, tbl)
-			local ent = tbl.entity
-			if not ent or not ent:IsValid() then
-				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
-				return
-			end
-			
-			if ent:GetClass() ~= "gmod_wire_starfall_processor" then
-				ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
-				return
-			end
-			
-			ent:CodeSent(ply,tbl)
-		end)
-		hook.Add("AcceptStream", "starfall_processor_upload_acceptstream", function(pl, handler, id)
-			return (handler == "starfall_processor_upload") or nil
-		end)
 		
-		RequestSend = function(ply, ent)
-			umsg.Start("starfall_processor_requpload",ply)
-			umsg.Entity(ent)
-			umsg.End()
+		if ent:GetClass() ~= "gmod_wire_starfall_processor" then
+			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
+			return
 		end
+		
+		local mainfile = net.ReadString()
+		local numfiles = net.ReadUInt(16)
+		local task = {
+			mainfile = mainfile,
+			files = {},
+		}
+		
+		for i=1,numfiles do
+			local filename = net.ReadString()
+			local code = net.ReadString()
+			task.files[filename] = code
+		end
+		
+		ent:CodeSent(ply,task)
+	end)
+	
+	RequestSend = function(ply, ent)
+		net.Start("starfall_processor_requpload")
+		net.WriteEntity(ent)
+		net.Send(ply)
 	end
 	
 	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
@@ -94,9 +71,9 @@ if SERVER then
 		return sf
 	end
 else
-	language.Add( "Tool_wire_starfall_processor_name", "Starfall - Processor (Wire)" )
-    language.Add( "Tool_wire_starfall_processor_desc", "Spawns a starfall processor" )
-    language.Add( "Tool_wire_starfall_processor_0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
+	language.Add( "Tool.wire_starfall_processor.name", "Starfall - Processor (Wire)" )
+	language.Add( "Tool.wire_starfall_processor.desc", "Spawns a starfall processor" )
+	language.Add( "Tool.wire_starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
 	language.Add( "sboxlimit_wire_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Wire Starfall Processor", "Undone Starfall Processor" )
 	
@@ -220,7 +197,7 @@ if CLIENT then
 	end
 	
 	function TOOL.BuildCPanel(panel)
-		panel:AddControl("Header", { Text = "#Tool_wire_starfall_processor_name", Description = "#Tool_wire_starfall_processor_desc" })
+		panel:AddControl("Header", { Text = "#Tool.wire_starfall_processor.name", Description = "#Tool.wire_starfall_processor.desc" })
 		
 		local modelPanel = WireDermaExts.ModelSelect(panel, "wire_starfall_processor_Model", list.Get("Wire_gate_Models"), 2)
 		panel:AddControl("Label", {Text = ""})
