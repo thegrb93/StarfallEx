@@ -259,7 +259,9 @@ function ents_methods:setVel(vel)
 	return true
 end
 
-function ents_methods:setFrozen(ent, freeze)
+--- Sets the entity frozen state
+-- @param freeze Should the entity be frozen?
+function ents_methods:setFrozen(freeze)
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
@@ -273,6 +275,8 @@ function ents_methods:setFrozen(ent, freeze)
 	return true
 end
 
+--- Sets the entity solid state
+-- @param notsolid Should the entity be not solid?
 function ents_methods:setNotSolid(notsolid)
 	SF.CheckType(self,ents_metatable)
 	
@@ -284,6 +288,8 @@ function ents_methods:setNotSolid(notsolid)
 	return true
 end
 
+--- Sets entity gravity
+-- @param grav Should the entity respect gravity?
 function ents_methods:enableGravity(grav)
 	SF.CheckType(self,ents_metatable)
 	
