@@ -32,7 +32,7 @@ function files_library.read(path)
 	SF.CheckType(path, "string")
 	if path:find("..",1,true) then return nil, "path contains '..'" end
 	if not SF.instance.permissions:checkPermission("Access Files") then return nil, "access denied" end
-	local contents = file.Read("StarfallScriptData/"..path)
+	local contents = file.Read("StarfallScriptData/"..path, "DATA")
 	if contents then return contents else return nil, "file not found" end
 end
 
@@ -70,7 +70,7 @@ function files_library.exists(path)
 	SF.CheckType(path, "string")
 	if path:find("..",1,true) then return nil, "path contains '..'" end
 	if not SF.instance.permissions:checkPermission("Access Files") then return nil, "access denied" end
-	return file.Exists(path)
+	return file.Exists("StarfallScriptData/"..path, "DATA")
 end
 
 --- Deletes a file
@@ -81,7 +81,7 @@ function files_library.delete(path)
 	SF.CheckType(path, "string")
 	if path:find("..",1,true) then return nil, "path contains '..'" end
 	if not SF.instance.permissions:checkPermission("Access Files") then return nil, "access denied" end
-	if not file.Exists(path) then return nil, "doesn't exist" end
+	if not file.Exists("StarfallScriptData/"..path, "DATA") then return nil, "doesn't exist" end
 	file.Delete(path)
 	return true
 end
