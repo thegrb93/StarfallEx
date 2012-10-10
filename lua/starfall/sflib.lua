@@ -67,12 +67,26 @@ local object_unwrappers = {}
 
 --- Creates a type that is safe for SF scripts to use. Instances of the type
 -- cannot access the type's metatable or metamethods.
+-- @param name Name of table
+-- @param supermeta The metatable to inheret from
 -- @return The table to store normal methods
 -- @return The table to store metamethods
-function SF.Typedef(name)
+function SF.Typedef(name, supermeta)
 	local methods, metamethods = {}, {}
 	metamethods.__metatable = name
 	metamethods.__index = methods
+	
+	metamethods.__supertypes = {[metamethods] = true}
+	
+	if supermeta then
+		setmetatable(methods, {__index=supermeta.__index})
+		metamethods.__supertypes[supermeta] = true
+		if supermeta.__supertypes then
+			for k,_ in pairs(supermeta.__supertypes) do
+				metamethods.__supertypes[k] = true
+			end
+		end
+	end
 	return methods, metamethods
 end
 
@@ -120,10 +134,13 @@ end
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
 -- @param default A value to return if val is nil.
 function SF.CheckType(val, typ, level, default)
-	if not val and default then return default
+	if val == nil and default then return default
 	elseif type(val) == typ then return val
-	elseif dgetmeta(val) == typ then return val
 	else
+		local meta = dgetmeta(val)
+		if meta == typ or (meta.__supertypes and meta.__supertypes[typ] ) then return val end
+		
+		-- Failed, throw error
 		level = (level or 0) + 3
 		
 		local typname
