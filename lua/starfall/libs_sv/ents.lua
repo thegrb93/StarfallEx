@@ -45,7 +45,7 @@ function SF.Entities.GetOwner(entity)
 		if valid(ply) then return ply end
 	end
 	
-	if entity.owner and valid(entity.owner) and entity.owner:isPlayer() then
+	if entity.owner and valid(entity.owner) and entity.owner:IsPlayer() then
 		return entity.owner
 	end
 	
