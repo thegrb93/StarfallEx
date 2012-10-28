@@ -40,7 +40,7 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local matrix_meta = _R.VMatrix
+local matrix_meta = debug.getregistry().VMatrix
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
