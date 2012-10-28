@@ -7,6 +7,12 @@ assert(SF, "Starfall didn't load correctly!")
 
 local context = SF.CreateContext(nil, nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"})
 
+surface.CreateFont("Starfall_ErrorFont", {
+	font = "arial",
+	size = 26,
+	weight = 200
+})
+
 do
 	local dlScreen = nil
 	local dlOwner = nil
@@ -117,7 +123,6 @@ function ENT:CodeSent(files, main, owner)
 			surface.SetDrawColor(0, 0, 0, 120)
 			surface.DrawRect(0, 0, 512, 512)
 			
-			surface.CreateFont("arial", 26, 200, true, false, "Starfall_ErrorFont")
 			draw.DrawText("Error occurred in Starfall Screen:", "Starfall_ErrorFont", 32, 16, Color(0, 255, 255, 255)) -- Cyan
 			draw.DrawText(tostring(self.error.msg), "Starfall_ErrorFont", 16, 80, Color(255, 0, 0, 255))
 			if self.error.source and self.error.line then
