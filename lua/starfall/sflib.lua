@@ -5,6 +5,8 @@
 if SF ~= nil then return end
 SF = {}
 
+jit.off() -- Needed so ops counting will work reliably.
+
 -- Do a couple of checks for retarded mods that disable the debug table
 -- and run it after all addons load
 do
