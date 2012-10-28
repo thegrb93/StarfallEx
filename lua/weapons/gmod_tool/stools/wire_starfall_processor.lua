@@ -110,17 +110,6 @@ if CLIENT then
 		gui.OpenURL("http://colonelthirtytwo.net/sfdoc/")
 	end
 	
-	local function FileBrowserOnFileClick(self)
-		SF.Editor.init()
-		if dir == self.File.FileDir and CurTime() - lastclick < 1 then
-			SF.Editor.editor:Open(dir)
-		else
-			dir = self.File.FileDir
-			SF.Editor.editor:LoadFile(dir)
-		end
-		lastclick = CurTime()
-	end
-	
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.wire_starfall_processor.name", Description = "#Tool.wire_starfall_processor.desc" })
 		
@@ -136,7 +125,9 @@ if CLIENT then
 		panel:AddPanel(filebrowser)
 		filebrowser:Setup("Starfall")
 		filebrowser:SetSize(235,400)
-		filebrowser.OnFileClick = FileBrowserOnFileClick
+		function filebrowser:OnFileOpen(filepath, newtab)
+			SF.Editor.editor:Open(filepath, nil, newtab)
+		end
 		
 		local openeditor = vgui.Create("DButton", panel)
 		panel:AddPanel(openeditor)
