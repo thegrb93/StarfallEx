@@ -76,10 +76,7 @@ function hologram_methods:setVel(vel)
 	if holo then holo:SetLocalVelocity(vel) end
 end
 
---[[
--- Currently only works in GM13 (maybe)
-
--- Sets the hologram's angular velocity.
+--- Sets the hologram's angular velocity.
 -- @param angvel *Vector* angular velocity.
 function hologram_methods:setAngVel(angvel)
 	SF.CheckType(self, hologram_metamethods)
@@ -87,7 +84,6 @@ function hologram_methods:setAngVel(angvel)
 	local holo = SF.Entities.Unwrap(self)
 	if holo then holo:SetLocalAngularVelocity(angvel) end
 end
-]]
 
 --- Parents this hologram to the specified hologram
 function hologram_methods:setParent(parent, attachment)

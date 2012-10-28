@@ -108,7 +108,9 @@ end)
 -- @param scale Vector scale
 function ENT:SetScale(scale)
 	self.scale = scale
-	self:SetModelScale(scale)
+	local m = Matrix()
+	m:Scale(scale)
+	self:EnableMatrix("RenderMultiply", m)
 
 	local propmax = self:OBBMaxs()
 	local propmin = self:OBBMins()
