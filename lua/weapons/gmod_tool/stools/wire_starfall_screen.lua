@@ -84,7 +84,12 @@ function TOOL:LeftClick( trace )
 	if CLIENT then return true end
 
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_screen" then
-		RequestSend(self:GetOwner(),trace.Entity)
+		local ent = trace.Entity
+		SF.RequestCode(ply, function(mainfile, files)
+			if not mainfile then return end
+			if not IsValid(ent) then return end
+			ent:CodeSent(ply, files, mainfile)
+		end)
 		return true
 	end
 	
@@ -112,14 +117,10 @@ function TOOL:LeftClick( trace )
 
 	ply:AddCleanup( "starfall_screen", sf )
 	
-	--RequestSend(ply,sf)
-	SF.RequestCode(ply,function(mainfile, files)
+	SF.RequestCode(ply, function(mainfile, files)
 		if not mainfile then return end
-		local task = {
-			mainfile = mainfile,
-			files = {},
-		}
-		ent:CodeSent(ply, task)
+		if not IsValid(sf) then return end
+		sf:CodeSent(ply, files, mainfile)
 	end)
 
 	return true

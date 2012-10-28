@@ -6,18 +6,34 @@ include("starfall/SFLib.lua")
 assert(SF, "Starfall didn't load correctly!")
 
 local context = SF.CreateContext(nil, nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"})
-datastream.Hook("sf_screen_download",function(handler, id, encoded, decoded)
-	for i=1,#decoded do
-		data = decoded[i]
-		local ent = data.ent
-		if not ent or ent:GetClass() ~= "gmod_wire_starfall_screen" then
-			ErrorNoHalt("SF Screen data sent to wrong entity: "..tostring(ent))
-			return
+
+do
+	local dlScreen = nil
+	local dlOwner = nil
+	local dlMain = nil
+	local dlFiles = nil
+
+	net.Receive("starfall_screen_download", function(len)
+		if not dlScreen then
+			dlScreen = net.ReadEntity()
+			dlOwner = net.ReadEntity()
+			dlMain = net.ReadString()
+			dlFiles = {}
+			--print("Begin recieving, mainfile:", updata.mainfile)
+		else
+			if net.ReadBit() ~= 0 then
+				--print("End recieving data")
+				dlScreen:CodeSent(dlFiles, dlMain, dlOwner)
+				dlScreen, dlFiles, dlMain, dlOwner = nil, nil, nil, nil
+				return
+			end
+			local filename = net.ReadString()
+			local filedata = net.ReadString()
+			--print("\tRecieved data for:", filename, "len:", #filedata)
+			dlFiles[filename] = dlFiles[filename] and dlFiles[filename]..filedata or filedata
 		end
-		
-		ent:CodeSent(data.files, data.main, data.owner)
-	end
-end)
+	end)
+end
 
 usermessage.Hook( "starfall_screen_used", function ( data )
 	local screen = Entity( data:ReadShort() )
