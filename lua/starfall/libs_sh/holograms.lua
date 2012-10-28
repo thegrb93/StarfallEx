@@ -31,7 +31,7 @@ SF.Libraries.AddHook("deinitialize", function(inst)
 	local holo = next(holos)
 	while holo do
 		local holoent = SF.Entities.Unwrap(holo)
-		if ValidEntity(holoent) then
+		if IsValid(holoent) then
 			holoent:Remove()
 		end
 		holos[holo] = nil
@@ -165,7 +165,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 		error("Invalid flex: "..flexid,2)
 	end
 	local holoent = SF.Entities.Unwrap(self)
-	if ValidEntity(holoent) then
+	if IsValid(holoent) then
 		holoent:SetFlexWeight(self, weight)
 	end
 end
@@ -175,7 +175,7 @@ function hologram_methods:setFlexScale(scale)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(scale, "number")
 	local holoent = SF.Entities.Unwrap(self)
-	if ValidEntity(holoent) then
+	if IsValid(holoent) then
 		holoent:SetFlexScale(scale)
 	end
 end
@@ -186,7 +186,7 @@ if SERVER then
 	function hologram_methods:remove()
 		SF.CheckType(self, hologram_metamethods)
 		local holoent = SF.Entities.Unwrap(self)
-		if ValidEntity(holoent) then
+		if IsValid(holoent) then
 			holoent:Remove()
 		end
 	end
