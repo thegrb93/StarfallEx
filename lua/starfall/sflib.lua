@@ -473,7 +473,9 @@ else
 			net.Start("starfall_upload")
 			net.WriteBit(false)
 			net.SendToServer()
-			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			if buildlist then
+				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			end
 		end
 	end)
 end
