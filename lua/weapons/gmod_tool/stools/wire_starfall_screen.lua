@@ -70,41 +70,12 @@ if SERVER then
 
 		return sf
 	end
-	
-	function RequestSend(ply,ent)
-		umsg.Start("starfall_screen_requpload",ply)
-			umsg.Entity(ent)
-		umsg.End()
-	end
 else
 	language.Add( "Tool.wire_starfall_screen.name", "Starfall - Screen (Wire)" )
 	language.Add( "Tool.wire_starfall_screen.desc", "Spawns a starfall screen" )
 	language.Add( "Tool.wire_starfall_screen.0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
 	language.Add( "SBox_max_starfall_Screen", "You've hit the Starfall Screen limit!" )
 	language.Add( "undone_Wire Starfall Screen", "Undone Starfall Screen" )
-
-	net.Receive("starfall_screen_requpload", function(len, ply)
-		if not SF.Editor.editor then return end
-		
-		local ent = net.ReadEntity()
-		local code = SF.Editor.getCode()
-		
-		local ok, buildlist = SF.Editor.BuildIncludesTable()
-		if ok then
-			net.Start("starfall_screen_upload")
-				net.WriteEntity(ent)
-				net.WriteString(buildlist.mainfile)
-				net.WriteUInt(buildlist.filecount, 16)
-				for name, file in pairs(buildlist.files) do
-					net.WriteString(name)
-					net.WriteString(file)
-				end
-				
-			net.SendToServer()
-		else
-			WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
-		end
-	end)
 end
 
 function TOOL:LeftClick( trace )
@@ -141,7 +112,15 @@ function TOOL:LeftClick( trace )
 
 	ply:AddCleanup( "starfall_screen", sf )
 	
-	RequestSend(ply,sf)
+	--RequestSend(ply,sf)
+	SF.RequestCode(ply,function(mainfile, files)
+		if not mainfile then return end
+		local task = {
+			mainfile = mainfile,
+			files = {},
+		}
+		ent:CodeSent(ply, task)
+	end)
 
 	return true
 end

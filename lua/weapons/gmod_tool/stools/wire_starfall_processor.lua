@@ -8,49 +8,11 @@ TOOL.Tab			= "Wire"
 include("starfall/sflib.lua")
 
 local MakeSF
-local RequestSend
 
 TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
 cleanup.Register( "starfall_processor" )
 
 if SERVER then
-	util.AddNetworkString("starfall_processor_requpload")
-	util.AddNetworkString("starfall_processor_upload")
-	
-	net.Receive("starfall_processor_upload", function(len, ply)
-		local ent = net.ReadEntity()
-		if not ent or not ent:IsValid() then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a nonexistant entity.\n")
-			return
-		end
-		
-		if ent:GetClass() ~= "gmod_wire_starfall_processor" then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall processor entity.\n")
-			return
-		end
-		
-		local mainfile = net.ReadString()
-		local numfiles = net.ReadUInt(16)
-		local task = {
-			mainfile = mainfile,
-			files = {},
-		}
-		
-		for i=1,numfiles do
-			local filename = net.ReadString()
-			local code = net.ReadString()
-			task.files[filename] = code
-		end
-		
-		ent:CodeSent(ply,task)
-	end)
-	
-	RequestSend = function(ply, ent)
-		net.Start("starfall_processor_requpload")
-		net.WriteEntity(ent)
-		net.Send(ply)
-	end
-	
 	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
 	function MakeSF( pl, Pos, Ang, model)
@@ -76,52 +38,6 @@ else
 	language.Add( "Tool.wire_starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
 	language.Add( "sboxlimit_wire_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Wire Starfall Processor", "Undone Starfall Processor" )
-	
-	if net then
-		net.Recieve("starfall_processor_requpload", function(len, ply)
-			if not SF.Editor.editor then return end
-			
-			local ent = net.ReadEntity()
-			local code = SF.Editor.getCode()
-			
-			local ok, buildlist = SF.Editor.BuildIncludesTable()
-			if ok then
-				net.Start("starfall_processor_upload")
-					net.WriteEntity(ent)
-					net.WriteString(buildlist.mainfile)
-					net.WriteByte(buildlist.filecount)
-					for name, file in pairs(buildlist.files) do
-						net.WriteString(name)
-						net.WriteString(file)
-					end
-					
-				net.SendToServer()
-			else
-				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
-			end
-		end)
-	else
-		local function AcceptedCB(accepted, tempid, id)
-			if not accepted then
-				WireLib.AddNotify("Code stream was denied by server.", NOTIFY_ERROR, 7 ,NOTIFYSOUND_ERROR1)
-			end
-		end
-		usermessage.Hook("starfall_processor_requpload", function(msg)
-			local ent = msg:ReadEntity()
-			if not SF.Editor.editor then return end
-			
-			local code = SF.Editor.getCode()
-			--if code:match("^%s*.*%s*$") == "" then return end
-			
-			local ok, buildlist = SF.Editor.BuildIncludesTable()
-			if ok then
-				buildlist.entity = ent
-				datastream.StreamToServer("starfall_processor_upload", buildlist, nil, AcceptedCB)
-			else
-				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
-			end
-		end)
-	end
 end
 
 function TOOL:LeftClick( trace )
@@ -130,7 +46,12 @@ function TOOL:LeftClick( trace )
 	if CLIENT then return true end
 
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_processor" then
-		RequestSend(self:GetOwner(),trace.Entity)
+		local ent = trace.Entity
+		SF.RequestCode(self:GetOwner(), function(mainfile, files)
+			if not mainfile then return end
+			if not IsValid(ent) then return end -- Probably removed during transfer
+			ent:Compile(files, mainfile)
+		end)
 		return true
 	end
 	
@@ -158,7 +79,11 @@ function TOOL:LeftClick( trace )
 
 	ply:AddCleanup( "starfall_processor", sf )
 	
-	RequestSend(ply,sf)
+	SF.RequestCode(ply, function(mainfile, files)
+		if not mainfile then return end
+		if not IsValid(sf) then return end -- Probably removed during transfer
+		sf:Compile(files, mainfile)
+	end)
 
 	return true
 end

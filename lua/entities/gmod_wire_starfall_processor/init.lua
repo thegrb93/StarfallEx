@@ -77,11 +77,6 @@ function ENT:Error(msg, traceback)
 	self:SetColor(255, 0, 0, a)
 end
 
-function ENT:CodeSent(ply, task)
-	if ply ~= self.owner then return end
-	self:Compile(task.files, task.mainfile)
-end
-
 function ENT:Think()
 	self.BaseClass.Think(self)
 	
