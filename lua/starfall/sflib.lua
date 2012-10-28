@@ -395,6 +395,7 @@ if SERVER then
 			needHeader=true,
 			callback = callback,
 		}
+		return true
 	end
 
 	hook.Add("PlayerDisconnected", "SF_requestcode_cleanup", function(ply)

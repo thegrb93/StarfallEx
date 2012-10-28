@@ -83,20 +83,23 @@ function TOOL:LeftClick( trace )
 	if trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
+	local ply = self:GetOwner()
+
 	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_screen" then
 		local ent = trace.Entity
-		SF.RequestCode(ply, function(mainfile, files)
+		if not SF.RequestCode(ply, function(mainfile, files)
 			if not mainfile then return end
 			if not IsValid(ent) then return end
 			ent:CodeSent(ply, files, mainfile)
-		end)
+		end) then
+			WireLib.AddNotify(ply,"Cannot upload SF code, please wait for the current upload to finish.",NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+		end
 		return true
 	end
 	
 	self:SetStage(0)
 
 	local model = self:GetClientInfo( "Model" )
-	local ply = self:GetOwner()
 	if not self:GetSWEP():CheckLimit( "starfall_screen" ) then return false end
 
 	local Ang = trace.HitNormal:Angle()
@@ -117,11 +120,13 @@ function TOOL:LeftClick( trace )
 
 	ply:AddCleanup( "starfall_screen", sf )
 	
-	SF.RequestCode(ply, function(mainfile, files)
+	if not SF.RequestCode(ply, function(mainfile, files)
 		if not mainfile then return end
 		if not IsValid(sf) then return end
 		sf:CodeSent(ply, files, mainfile)
-	end)
+	end) then
+		WireLib.AddNotify(ply,"Cannot upload SF code, please wait for the current upload to finish.",NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+	end
 
 	return true
 end
