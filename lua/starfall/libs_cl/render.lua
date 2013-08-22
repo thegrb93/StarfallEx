@@ -40,7 +40,7 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local matrix_meta = _R.VMatrix
+local matrix_meta = debug.getregistry().VMatrix
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
@@ -231,9 +231,9 @@ function render_library.setTexture(id)
 end
 
 --- Clears the surface.
-function render_library.clear()
+function render_library.clear(r,g,b,a)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	render.Clear()
+	render.Clear(r or 0, g or 0, b or 0, a or 255)
 end
 
 --- Draws a rectangle using the current color. 
@@ -317,6 +317,7 @@ function render_library.drawLine(x1,y1,x2,y2)
 	surface.DrawLine(tonumber(x1) or 0, tonumber(y1) or 0, tonumber(x2) or 0, tonumber(y2) or 0)
 end
 
+--[[
 -- Creates a font. Does not require rendering hook
 -- @param font Base font to use
 -- @param size Font size
@@ -326,31 +327,31 @@ end
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
 -- @param A table representing the font (doesn't contain anything)
---function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
-	--if not validfonts[font] then return nil, "invalid font" end
+function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
+	if not validfonts[font] then return nil, "invalid font" end
 	
-	--size = tonumber(size) or 12
-	--weight = tonumber(weight) or 400
-	--blur = tonumber(blur) or 0
-	--antialias = antialias and true or false
-	--additive = additive and true or false
-	--shadow = shadow and true or false
-	--outline = outline and true or false
+	size = tonumber(size) or 12
+	weight = tonumber(weight) or 400
+	blur = tonumber(blur) or 0
+	antialias = antialias and true or false
+	additive = additive and true or false
+	shadow = shadow and true or false
+	outline = outline and true or false
 	
-	--local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d",
-		--font, size, weight, blur,
-		--antialias and 1 or 0,
-		--additive and 1 or 0,
-		--shadow and 1 or 0,
-		--outline and 1 or 0)
+	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d",
+		font, size, weight, blur,
+		antialias and 1 or 0,
+		additive and 1 or 0,
+		shadow and 1 or 0,
+		outline and 1 or 0)
 	
-	--if not defined_fonts[name] then
-		--surface.CreateFont(font, size, weight, antialias, additive, name,
-			--shadow, outline, blur)
-		--defined_fonts[name] = true
-	--end
-	--return name
---end
+	if not defined_fonts[name] then
+		surface.CreateFont(font, size, weight, antialias, additive, name,
+			shadow, outline, blur)
+		defined_fonts[name] = true
+	end
+	return name
+end
 
 --- Draws text using a font
 -- @param font Font table returned by createFont
@@ -365,6 +366,7 @@ function render_library.drawText(font,x,y,text,alignment)
 	
 	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
 end
+]]
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
 function render_library.vertex(x,y,u,v)

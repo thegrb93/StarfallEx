@@ -31,7 +31,7 @@ SF.Libraries.AddHook("deinitialize", function(inst)
 	local holo = next(holos)
 	while holo do
 		local holoent = SF.Entities.Unwrap(holo)
-		if ValidEntity(holoent) then
+		if IsValid(holoent) then
 			holoent:Remove()
 		end
 		holos[holo] = nil
@@ -76,10 +76,7 @@ function hologram_methods:setVel(vel)
 	if holo then holo:SetLocalVelocity(vel) end
 end
 
---[[
--- Currently only works in GM13 (maybe)
-
--- Sets the hologram's angular velocity.
+--- Sets the hologram's angular velocity.
 -- @param angvel *Vector* angular velocity.
 function hologram_methods:setAngVel(angvel)
 	SF.CheckType(self, hologram_metamethods)
@@ -87,7 +84,6 @@ function hologram_methods:setAngVel(angvel)
 	local holo = SF.Entities.Unwrap(self)
 	if holo then holo:SetLocalAngularVelocity(angvel) end
 end
-]]
 
 --- Parents this hologram to the specified hologram
 function hologram_methods:setParent(parent, attachment)
@@ -165,7 +161,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 		error("Invalid flex: "..flexid,2)
 	end
 	local holoent = SF.Entities.Unwrap(self)
-	if ValidEntity(holoent) then
+	if IsValid(holoent) then
 		holoent:SetFlexWeight(self, weight)
 	end
 end
@@ -175,7 +171,7 @@ function hologram_methods:setFlexScale(scale)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(scale, "number")
 	local holoent = SF.Entities.Unwrap(self)
-	if ValidEntity(holoent) then
+	if IsValid(holoent) then
 		holoent:SetFlexScale(scale)
 	end
 end
@@ -186,7 +182,7 @@ if SERVER then
 	function hologram_methods:remove()
 		SF.CheckType(self, hologram_metamethods)
 		local holoent = SF.Entities.Unwrap(self)
-		if ValidEntity(holoent) then
+		if IsValid(holoent) then
 			holoent:Remove()
 		end
 	end

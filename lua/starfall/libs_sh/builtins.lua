@@ -217,6 +217,7 @@ end
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
+local _R = debug.getregistry()
 local function restrict(instance, hook, name, ok, err)
 	_R.Vector.__metatable = "Vector"
 	_R.Angle.__metatable = "Angle"

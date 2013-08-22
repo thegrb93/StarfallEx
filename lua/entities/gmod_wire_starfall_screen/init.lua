@@ -9,18 +9,45 @@ assert(SF, "Starfall didn't load correctly!")
 local context = SF.CreateContext()
 local screens = {}
 
-hook.Add("PlayerInitialSpawn","sf_screen_download",function(ply)
-	local tbl = {}
-	for _,s in pairs(screens) do
-		tbl[#tbl+1] = {
-			ent = s,
-			owner = s.owner,
-			files = s.task.files,
-			main = s.task.mainfile,
-		}
+util.AddNetworkString("starfall_screen_download")
+
+local function sendScreenCode(screen, owner, files, mainfile, recipient)
+	--print("Sending SF code")
+	net.Start("starfall_screen_download")
+	net.WriteEntity(screen)
+	net.WriteEntity(owner)
+	net.WriteString(mainfile)
+	if recipient then net.Send(recipient) else net.Broadcast() end
+	--print("\tHeader sent")
+
+	local fname = next(files)
+	while fname do
+		--print("\tSending data for:", fname)
+		local fdata = files[fname]
+		local offset = 1
+		repeat
+			net.Start("starfall_screen_download")
+			net.WriteBit(false)
+			net.WriteString(fname)
+			local data = fdata:sub(offset, offset+60000)
+			net.WriteString(data)
+			if recipient then net.Send(recipient) else net.Broadcast() end
+
+			--print("\t\tSent data from", offset, "to", offset + #data)
+			offset = offset + #data + 1
+		until offset > #fdata
+		fname = next(files, fname)
 	end
-	if #tbl > 0 then
-		datastream.StreamToClients(ply,"sf_screen_download",tbl)
+
+	net.Start("starfall_screen_download")
+	net.WriteBit(true)
+	if recipient then net.Send(recipient) else net.Broadcast() end
+	--print("Done sending")
+end
+
+hook.Add("PlayerInitialSpawn","sf_screen_download",function(ply)
+	for _,s in pairs(screens) do
+		sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
 	end
 end)
 
@@ -49,25 +76,6 @@ function ENT:UpdateName(state)
 	end
 end
 
-function ENT:Compile(codetbl, mainfile)
-	if self.instance then self.instance:deinitialize() end
-	
-	local ok, instance = SF.Compiler.Compile(codetbl,context,mainfile,self.owner)
-	if not ok then self:Error(instance) return end
-	self.instance = instance
-	instance.data.entity = self
-	
-	local ok, msg = instance:initialize()
-	if not ok then
-		self:Error(msg)
-		return
-	end
-	
-	self:UpdateName("")
-	local r,g,b,a = self:GetColor()
-	self:SetColor(255, 255, 255, a)
-end
-
 function ENT:Error(msg, override)
 	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
 	WireLib.ClientError(msg, self.owner)
@@ -82,24 +90,31 @@ function ENT:Error(msg, override)
 	self:SetColor(255, 0, 0, a)
 end
 
-function ENT:CodeSent(ply, task)
+function ENT:CodeSent(ply, files, mainfile)
 	if ply ~= self.owner then return end
-	self.task = task
-	datastream.StreamToClients(player.GetHumans(), "sf_screen_download",
-		{{
-			ent = self,
-			owner = ply,
-			files = task.files,
-			main = task.mainfile,
-		}})
+	self.files = files
+	self.mainfile = mainfile
 	screens[self] = self
+	sendScreenCode(self, ply, files, mainfile)
 
 	local ppdata = {}
-	
-	SF.Preprocessor.ParseDirectives(task.mainfile, task.files[task.mainfile], {}, ppdata)
+	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
 	
 	if ppdata.sharedscreen then 
-		self:Compile(task.files, task.mainfile)
+		local ok, instance = SF.Compiler.Compile(files,context,mainfile,ply)
+		if not ok then self:Error(instance) return end
+		self.instance = instance
+		instance.data.entity = self
+		
+		local ok, msg = instance:initialize()
+		if not ok then
+			self:Error(msg)
+			return
+		end
+		
+		self:UpdateName("")
+		local r,g,b,a = self:GetColor()
+		self:SetColor(Color(255, 255, 255, a))
 		self.sharedscreen = true
 	end
 end

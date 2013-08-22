@@ -90,15 +90,25 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 	clip.islocal = islocal
 end
 
-usermessage.Hook("starfall_hologram_clip", function(um, ent)
-	local holoent = ent or um:ReadEntity()
+net.Receive("starfall_hologram_clip", function()
+	local holoent = ent or net.ReadEntity()
 	if not holoent:GetTable() then
 		-- Uninitialized
-		msgQueueAdd("clip", holoent, {um:ReadShort(), um:ReadBool(),
-			um:ReadVector(), um:ReadVector(), um:ReadBool()})
+		msgQueueAdd("clip", holoent, {
+			net.ReadUInt(16),
+			net.ReadBit() ~= 0,
+			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
+			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
+			net.ReadBit() ~= 0
+		})
 	else
-		holoent:UpdateClip(um:ReadShort(), um:ReadBool(), um:ReadVector(),
-			um:ReadVector(), um:ReadBool())
+		holoent:UpdateClip(
+			net.ReadUInt(16),
+			net.ReadBit() ~= 0,
+			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
+			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
+			net.ReadBit() ~= 0
+		)
 	end
 end)
 
@@ -108,7 +118,9 @@ end)
 -- @param scale Vector scale
 function ENT:SetScale(scale)
 	self.scale = scale
-	self:SetModelScale(scale)
+	local m = Matrix()
+	m:Scale(scale)
+	self:EnableMatrix("RenderMultiply", m)
 
 	local propmax = self:OBBMaxs()
 	local propmin = self:OBBMins()
@@ -123,12 +135,12 @@ function ENT:SetScale(scale)
 	self:SetRenderBounds(propmax, propmin)
 end
 
-usermessage.Hook("starfall_hologram_scale", function(um, ent)
-	local holoent = ent or um:ReadEntity()
+net.Receive("starfall_hologram_scale", function()
+	local holoent = ent or net.ReadEntity()
 	if not holoent:GetTable() then
 		-- Uninitialized
-		msgQueueAdd("scale", holoent, um:ReadVector())
+		msgQueueAdd("scale", holoent, Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()))
 	else
-		holoent:SetScale(um:ReadVector())
+		holoent:SetScale(Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()))
 	end
 end)

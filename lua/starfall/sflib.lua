@@ -5,6 +5,8 @@
 if SF ~= nil then return end
 SF = {}
 
+jit.off() -- Needed so ops counting will work reliably.
+
 -- Do a couple of checks for retarded mods that disable the debug table
 -- and run it after all addons load
 do
@@ -157,6 +159,8 @@ function SF.CheckType(val, typ, level, default)
 	end
 	
 end
+
+-- ------------------------------------------------------------------------- --
 
 --- Creates wrap/unwrap functions for sensitive values, by using a lookup table
 -- (which is set to have weak keys and values)
@@ -327,7 +331,7 @@ function SF.Unsanitize( ... )
 	return unpack( return_list )
 end
 
-
+-- ------------------------------------------------------------------------- --
 
 local serialize_replace_regex = "[\"\n]"
 local serialize_replace_tbl = {["\n"] = "£", ['"'] = "€"}
@@ -356,13 +360,134 @@ function SF.DeserializeCode(tbl)
 	return sources, tbl.mainfile
 end
 
--- Library loading
+-- ------------------------------------------------------------------------- --
+
+if SERVER then
+	util.AddNetworkString("starfall_requpload")
+	util.AddNetworkString("starfall_upload")
+	
+	local uploaddata = {}
+	-- Packet structure:
+	-- 
+	-- Initialize packet:
+	--   Bit: False to cancel transfer
+	--   String: Main filename
+	-- Payload packets:
+	--   Bit: End transmission. If true, no other data is included
+	--   String: Filename. Multiple packets with the same filename are to be concactenated onto each other in the order they were sent
+	--   String: File data
+
+	--- Requests a player to send whatever code they have open in his/her editor to
+	-- the server.
+	-- @server
+	-- @param ply Player to request code from
+	-- @param callback Called when all of the code is recieved. Arguments are either the main filename and a table
+	-- of filename->code pairs, or nil if the client couldn't handle the request (due to bad includes, etc)
+	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
+	function SF.RequestCode(ply, callback)
+		if uploaddata[ply] then return false end
+		
+		net.Start("starfall_requpload")
+		net.WriteEntity(ent)
+		net.Send(ply)
+
+		uploaddata[ply] = {
+			files={},
+			mainfile = nil,
+			needHeader=true,
+			callback = callback,
+		}
+		return true
+	end
+
+	hook.Add("PlayerDisconnected", "SF_requestcode_cleanup", function(ply)
+		callbacks[ply] = nil
+	end)
+	
+	net.Receive("starfall_upload", function(len, ply)
+		local updata = uploaddata[ply]
+		if not updata then
+			ErrorNoHalt("SF: Player "..ply:GetName().." tried to upload code without being requested (expect this message multiple times)\n")
+			return
+		end
+		
+		if updata.needHeader then
+			if net.ReadBit() == 0 then
+				--print("Recieved cancel packet")
+				updata.callback(nil, nil)
+				uploaddata[ply] = nil
+				return
+			end
+			updata.mainfile = net.ReadString()
+			updata.needHeader = nil
+			--print("Begin recieving, mainfile:", updata.mainfile)
+		else
+			if net.ReadBit() ~= 0 then
+				--print("End recieving data")
+				updata.callback(updata.mainfile, updata.files)
+				uploaddata[ply] = nil
+				return
+			end
+			local filename = net.ReadString()
+			local filedata = net.ReadString()
+			--print("\tRecieved data for:", filename, "len:", #filedata)
+			updata.files[filename] = updata.files[filename] and updata.files[filename]..filedata or filedata
+		end
+
+	end)
+else
+	net.Receive("starfall_requpload", function(len)
+		local ok, list = SF.Editor.BuildIncludesTable()
+		if ok then
+			--print("Uploading SF code")
+			net.Start("starfall_upload")
+			net.WriteBit(true)
+			net.WriteString(list.mainfile)
+			net.SendToServer()
+			--print("\tHeader sent")
+
+			local fname = next(list.files)
+			while fname do
+				--print("\tSending data for:", fname)
+				local fdata = list.files[fname]
+				local offset = 1
+				repeat
+					net.Start("starfall_upload")
+					net.WriteBit(false)
+					net.WriteString(fname)
+					local data = fdata:sub(offset, offset+60000)
+					net.WriteString(data)
+					net.SendToServer()
+
+					--print("\t\tSent data from", offset, "to", offset + #data)
+					offset = offset + #data + 1
+				until offset > #fdata
+				fname = next(list.files, fname)
+			end
+
+			net.Start("starfall_upload")
+			net.WriteBit(true)
+			net.SendToServer()
+			--print("Done sending")
+		else
+			net.Start("starfall_upload")
+			net.WriteBit(false)
+			net.SendToServer()
+			if buildlist then
+				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			end
+		end
+	end)
+end
+
+-- ------------------------------------------------------------------------- --
+
 if SERVER then
 	local l
 	MsgN("-SF - Loading Libraries")
 
 	MsgN("- Loading shared libraries")
-	l = file.FindInLua("starfall/libs_sh/*.lua")
+	l = file.Find("starfall/libs_sh/*.lua", "LUA")
 	for _,filename in pairs(l) do
 		print("-  Loading "..filename)
 		include("starfall/libs_sh/"..filename)
@@ -371,7 +496,7 @@ if SERVER then
 	MsgN("- End loading shared libraries")
 	
 	MsgN("- Loading SF server-side libraries")
-	l = file.FindInLua("starfall/libs_sv/*.lua")
+	l = file.Find("starfall/libs_sv/*.lua", "LUA")
 	for _,filename in pairs(l) do
 		print("-  Loading "..filename)
 		include("starfall/libs_sv/"..filename)
@@ -380,7 +505,7 @@ if SERVER then
 
 	
 	MsgN("- Adding client-side libraries to send list")
-	l = file.FindInLua("starfall/libs_cl/*.lua")
+	l = file.Find("starfall/libs_cl/*.lua", "LUA")
 	for _,filename in pairs(l) do
 		print("-  Adding "..filename)
 		AddCSLuaFile("starfall/libs_cl/"..filename)
@@ -393,7 +518,7 @@ else
 	MsgN("-SF - Loading Libraries")
 
 	MsgN("- Loading shared libraries")
-	l = file.FindInLua("starfall/libs_sh/*.lua")
+	l = file.Find("starfall/libs_sh/*.lua", "LUA")
 	for _,filename in pairs(l) do
 		print("-  Loading "..filename)
 		include("starfall/libs_sh/"..filename)
@@ -401,7 +526,7 @@ else
 	MsgN("- End loading shared libraries")
 	
 	MsgN("- Loading client-side libraries")
-	l = file.FindInLua("starfall/libs_cl/*.lua")
+	l = file.Find("starfall/libs_cl/*.lua", "LUA")
 	for _,filename in pairs(l) do
 		print("-  Loading "..filename)
 		include("starfall/libs_cl/"..filename)

@@ -55,7 +55,7 @@ function time_library.timer(name, delay, reps, func)
 		end
 	end
 	
-	if timer.IsTimer(timername) then
+	if timer.Exists(timername) then
 		timer.Stop(timername)
 		timer.Adjust(timername, delay, reps, timercb)
 		timer.Start(timername)
@@ -87,7 +87,7 @@ function time_library.destroyTimer(name)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	if timer.IsTimer(timername) then timer.Remove(timername) end
+	if timer.Exists(timername) then timer.Remove(timername) end
 	instance.data.timers[name] = nil
 end
 

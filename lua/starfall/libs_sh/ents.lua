@@ -12,7 +12,7 @@ local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true)
 local ents_lib, _ = SF.Libraries.Register("ents")
 
 -- This is slightly more efficient
-function ValidEntity(ent)
+function IsValid(ent)
 	return ent and ent:IsValid()
 end
 
