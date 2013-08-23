@@ -6,23 +6,28 @@ local timer = timer
 
 --- Deals with time and timers.
 -- @shared
-local time_library, _ = SF.Libraries.Register("time")
+local timer_library, _ = SF.Libraries.Register("timer")
 
 -- ------------------------- Time ------------------------- --
 
 --- Same as GLua's CurTime()
-function time_library.curTime()
+function timer_library.curtime()
 	return CurTime()
 end
 
 --- Same as GLua's RealTime()
-function time_library.realTime()
+function timer_library.realtime()
 	return RealTime()
 end
 
 --- Same as GLua's SysTime()
-function time_library.sysTime()
+function timer_library.systime()
 	return SysTime()
+end
+
+--- Returns time between frames on client and ticks on server. Same thing as G.FrameTime in GLua
+function timer_library.frametime()
+	return FrameTime()
 end
 
 -- ------------------------- Timers ------------------------- --
@@ -31,12 +36,12 @@ local function mangle_timer_name(instance, name)
 	return string.format("sftimer_%s_%s",tostring(instance),name)
 end
 
---- Creates a timer
+--- Creates (and starts) a timer
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
 -- @param func The function to call when the tiemr is fired
-function time_library.timer(name, delay, reps, func)
+function timer_library.create(name, delay, reps, func)
 	SF.CheckType(name,"string")
 	SF.CheckType(delay,"number")
 	reps = SF.CheckType(reps,"number",0,1)
@@ -45,30 +50,74 @@ function time_library.timer(name, delay, reps, func)
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance,name)
 	
-	local timercb = function()
-		if not instance.error then
-			instance:runFunction(func)
-		else
-			-- timer.Remove borks when called within the same timer
-			timer.Stop(timername)
-			timer.Simple(0, function() timer.Remove(timername) end)
+	local function timercb()
+		local ok, tbl = instance:runFunction(func)
+		if not ok and instance.runOnError then
+			instance:runOnError( tbl[1] )
+			timer.Remove( timername )
 		end
 	end
 	
-	if timer.Exists(timername) then
-		timer.Stop(timername)
-		timer.Adjust(timername, delay, reps, timercb)
-		timer.Start(timername)
-	else
-		timer.Create(timername, delay, reps, timercb)
-	end
+	timer.Create(timername, delay, reps, timercb )
+	
 	instance.data.timers[name] = true
 end
+
+--- Removes a timer
+-- @param name The timer name
+function timer_library.remove(name)
+	SF.CheckType(name,"string")
+	local instance = SF.instance
+	
+	timer.Stop(mangle_timer_name(instance,name))
+	instance.data.timers[name] = nil
+end
+
+--- Stops a timer
+-- @param name The timer name
+function timer_library.stop(name)
+	SF.CheckType(name,"string")
+	
+	timer.Stop(mangle_timer_name(instance,name))
+end
+
+--- Starts a timer
+-- @param name The timer name
+function timer_library.start(name)
+	SF.CheckType(name,"string")
+	
+	timer.Start(mangle_timer_name(instance,name))
+end
+
+--- Adjusts a timer
+-- @param name The timer name
+function timer_library.adjust(name)
+	SF.CheckType(name,"string")
+	
+	timer.Adjust(mangle_timer_name(instance,name))
+end
+
+--- Pauses a timer
+-- @param name The timer name
+function timer_library.pause(name)
+	SF.CheckType(name,"string")
+	
+	timer.Pause(mangle_timer_name(instance,name))
+end
+
+--- Unpauses a timer
+-- @param name The timer name
+function timer_library.unpause(name)
+	SF.CheckType(name,"string")
+	
+	timer.UnPause(mangle_timer_name(instance,name))
+end
+
 
 --- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
 -- @param delay the time, in second, to set the timer to
 -- @param func the function to call when the timer is fired
-function time_library.stimer(delay, func)
+function timer_library.simple(delay, func)
 	SF.CheckType( delay, "number" )
 	SF.CheckType( func, "function" )
 	
@@ -76,24 +125,10 @@ function time_library.stimer(delay, func)
 	timer.Simple(delay, function()
 		if not instance.error then
 			instance:runFunction(func)
+		elseif instance.runOnError then
+			instance:runOnError( "timer error" )
 		end
 	end)
-end
-
---- Removes a timer
--- @param name Timer name
-function time_library.destroyTimer(name)
-	SF.CheckType(name,"string")
-	local instance = SF.instance
-	local timername = mangle_timer_name(instance,name)
-	
-	if timer.Exists(timername) then timer.Remove(timername) end
-	instance.data.timers[name] = nil
-end
-
---- Returns time between frames on client and ticks on server. Same thing as G.FrameTime in GLua
-function time_library.frameTime()
-	return FrameTime()
 end
 
 SF.Libraries.AddHook("initialize",function(instance)
