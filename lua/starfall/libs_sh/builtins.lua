@@ -160,12 +160,18 @@ end
 
 if SERVER then
 	--- Prints a message to the player's chat. Limited to 255 characters on the server.
-	function SF.DefaultEnvironment.print(s)
-		SF.instance.player:PrintMessage(HUD_PRINTTALK, tostring(s):sub(1,255))
+	function SF.DefaultEnvironment.print(...)
+		local str = ""
+		local tbl = {...}
+		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
+		SF.instance.player:PrintMessage(HUD_PRINTTALK, str:sub(1,255))
 	end
 else
-	function SF.DefaultEnvironment.print(s)
-		LocalPlayer():PrintMessage(HUD_PRINTTALK, tostring(s))
+	function SF.DefaultEnvironment.print(...)
+		local str = ""
+		local tbl = {...}
+		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
+		LocalPlayer():PrintMessage(HUD_PRINTTALK, str)
 	end
 end
 

@@ -2,8 +2,6 @@
 -- Hook library
 -------------------------------------------------------------------------------
 
-local hook = hook
-
 --- Deals with hooks
 -- @shared
 local hook_library, _ = SF.Libraries.Register("hook")
