@@ -206,16 +206,23 @@ end
 -- @param data Local space vector
 function ents_methods:toWorld(data)
 	SF.CheckType(self,ents_metamethods)
+	SF.CheckType(data, "Vector")
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	
-	if type(data) == "Vector" then
-		return ent:LocalToWorld(data)
-	elseif type(data) == "Angle" then
-		return ent:LocalToWorldAngles(data)
-	else
-		SF.CheckType(data, "angle or vector") -- force error
-	end
+	return ent:LocalToWorld( data )
+end
+
+--- Converts an angle in entity local space to world space
+-- @shared
+-- @param data Local space angle
+function ents_methods:toWorldAngles(data)
+	SF.CheckType(self,ents_metamethods)
+	SF.CheckType(data, "Angle")
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	
+	return ent:LocalToWorldAngles( data )
 end
 
 --- Converts a vector in world space to entity local space
@@ -223,16 +230,23 @@ end
 -- @param data Local space vector
 function ents_methods:toLocal(data)
 	SF.CheckType(self,ents_metamethods)
+	SF.CheckType(data, "Vector")
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
 	
-	if type(data) == "Vector" then
-		return ent:WorldToLocal(data)
-	elseif type(data) == "Angle" then
-		return ent:WorldToLocalAngles(data)
-	else
-		SF.CheckType(data, "angle or vector") -- force error
-	end
+	return ent:WorldToLocal(data)
+end
+
+--- Converts an angle in world space to entity local space
+-- @shared
+-- @param data Local space angle
+function ents_methods:toLocalAngles(data)
+	SF.CheckType(self,ents_metamethods)
+	SF.CheckType(data, "Angle")
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	
+	return ent:WorldToLocalAngles(data)
 end
 
 --- Gets the model of an entity
