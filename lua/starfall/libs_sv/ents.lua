@@ -103,13 +103,25 @@ function ents_methods:owner()
 	return wrap(getOwner(self))
 end
 
+local function check( v )
+	return 	-math.huge < v.x and v.x < math.huge and
+			-math.huge < v.y and v.y < math.huge and
+			-math.huge < v.z and v.z < math.huge
+end
+
+local function checka( a )
+	return 	-math.huge < v.p and v.p < math.huge and
+			-math.huge < v.y and v.y < math.huge and
+			-math.huge < v.r and v.r < math.huge
+end
+
 --- Applies linear force to the entity
 -- @param vec The force vector
 -- @param offset An optional offset position (TODO: Local or world?)
-function ents_methods:applyForce(vec, offset)
+function ents_methods:applyForce(vec)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
-	if offset then SF.CheckType(offset,"Vector") end
+	if not check( vec ) then return false, "infinite vector" end
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
@@ -117,17 +129,28 @@ function ents_methods:applyForce(vec, offset)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	-- TODO: This prevents server crashing when using insane amounts of force.
-	-- GM13 doesn't seem to suffer from this issue.
-	vec.x = fix_nan(vec.x)
-	vec.y = fix_nan(vec.y)
-	vec.z = fix_nan(vec.z)
+	phys:ApplyForceCenter( vec )
 	
-	if offset == nil then
-		phys:ApplyForceCenter(vec)
-	else
-		phys:ApplyForceOffset(vec,offset)
-	end
+	return true
+end
+
+--- Applies linear force to the entity with an offset
+-- @param vec The force vector
+-- @param offset An optional offset position (TODO: Local or world?)
+function ents_methods:applyOffsetForce(vec, offset)
+	SF.CheckType(self,ents_metatable)
+	SF.CheckType(vec,"Vector")
+	SF.CheckType(offset,"Vector")
+	if not check( vec ) or not check( offset ) then return false, "infinite vector" end
+	
+	local ent = unwrap(self)
+	if not isValid(ent) then return false, "entity not valid" end
+	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+	local phys = getPhysObject(ent)
+	if not phys then return false, "entity has no physics object" end
+	
+	phys:ApplyForceOffset( vec, offset )
+	
 	return true
 end
 
@@ -201,6 +224,7 @@ function ents_methods:applyTorque(tq)
 	
 	local dir = ( tq:Cross(off) ):GetNormal()
 	
+	if not check( dir ) or not check( off ) then return end
 	phys:ApplyForceOffset( dir, off )
 	phys:ApplyForceOffset( dir * -1, off * -1 )
 	
@@ -216,13 +240,9 @@ function ents_methods:setPos(vec)
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
-	local phys = getPhysObject(ent)
-	if not phys then return false, "entity has no physics object" end
 	
 	-- TODO: Clamp insane positions to prevent crashing.
-	
-	phys:SetPos(vec)
-	phys:Wake()
+	SF.setPos( ent, vec )
 	return true
 end
 
@@ -235,11 +255,8 @@ function ents_methods:setAng(ang)
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
-	local phys = getPhysObject(ent)
-	if not phys then return false, "entity has no physics object" end
 	
-	phys:SetAngle(ang)
-	phys:Wake()
+	SF.setAng( ent, ang )
 	return true
 end
 

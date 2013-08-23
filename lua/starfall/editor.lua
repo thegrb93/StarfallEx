@@ -75,6 +75,7 @@ if CLIENT then
 	local colors = {
 		["keyword"]		= { Color(160,240,240), false }, -- teal
 		["operator"]	= { Color(224,224,224), false }, -- white
+		["brackets"]	= { Color(224,224,224), false }, -- white
 		
 		["function"]	= { Color(160,160,240), false }, -- blue
 		["number"]		= { Color(240,160,160), false }, -- light red
@@ -86,11 +87,12 @@ if CLIENT then
 		["ppcommand"]	= { Color(240,240,160), false }, -- pink
 		["notfound"]	= { Color(240, 96, 96), false }, -- dark red
 	}
-	
+
 	-- Colors originally by Cenius; slightly modified by Divran
 	local colors = {
 		["keyword"]		= { Color(160, 240, 240), false},
 		["operator"]	= { Color(224, 224, 224), false},
+		["brackets"]	= { Color(224, 224, 224), false},
 		["function"]	= { Color(160, 160, 240), false}, -- Was originally called "expression"
 		
 		["number"]		= { Color(240, 160, 160), false}, 
@@ -105,7 +107,6 @@ if CLIENT then
 		["notfound"]	= { Color(240,  96,  96), false}, 
 	}
 	]]
-	
 	local colors = {
 		["keyword"]     = { Color(100, 100, 255), false},
 		["operator"]    = { Color(150, 150, 200), false},
@@ -258,7 +259,7 @@ if CLIENT then
 					self:NextPattern( ".*" )
 					addToken( "string", self.tokendata )
 				end
-			elseif self:NextPattern( "^[%+%-/%*%^%%#=~,;:%._]" ) then -- Operators
+			elseif self:NextPattern( "^[%+%-/%*%^%%#=~,;:%._<>]" ) then -- Operators
 				addToken( "operator", self.tokendata )
 			elseif self:NextPattern("^[%(%)%[%]{}]") then
 				addToken( "brackets", self.tokendata)

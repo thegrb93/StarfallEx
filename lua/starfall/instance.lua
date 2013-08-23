@@ -61,7 +61,7 @@ function SF.Instance:runWithOps(func,...)
 	
 	debug.sethook(ophook,"",500)
 	local ok, rt = xpcall(wrapperfunc, xpcall_callback)
-	debug.sethook(infloop_detection_replacement,"",500000000)
+	debug.sethook(nil)
 	
 	--MsgN("SF: Exectued "..(self.ops-beginops).." instructions in "..(SysTime()-begin).." seconds")
 	
