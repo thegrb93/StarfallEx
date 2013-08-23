@@ -29,8 +29,8 @@ function ENT:Initialize()
 	self.Outputs = WireLib.CreateOutputs(self, {})
 	
 	self:UpdateState("Inactive (No code)")
-	local r,g,b,a = self:GetColor()
-	self:SetColor(255, 0, 0, a)
+	local clr = self:GetColor()
+	self:SetColor(Color(255, 0, 0, clr.a))
 end
 
 function ENT:Compile(codetbl, mainfile)
@@ -56,8 +56,8 @@ function ENT:Compile(codetbl, mainfile)
 	end
 
 	self:UpdateState("(None)")
-	local r,g,b,a = self:GetColor()
-	self:SetColor(255, 255, 255, a)
+	local clr = self:GetColor()
+	self:SetColor(Color(255, 255, 255, clr.a))
 end
 
 function ENT:Error(msg, traceback)
@@ -73,8 +73,8 @@ function ENT:Error(msg, traceback)
 	end
 	
 	self:UpdateState("Inactive (Error)")
-	local r,g,b,a = self:GetColor()
-	self:SetColor(255, 0, 0, a)
+	local clr = self:GetColor()
+	self:SetColor(Color(255, 0, 0, clr.a))
 end
 
 function ENT:Think()
