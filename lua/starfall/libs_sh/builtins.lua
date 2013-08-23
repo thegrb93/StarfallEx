@@ -158,22 +158,6 @@ function SF.DefaultEnvironment.loadLibrary(name)
 	end
 end
 
---- Sets a hook function
-function SF.DefaultEnvironment.hook(hookname, name, func)
-	SF.CheckType(hookname,"string")
-	SF.CheckType(name,"string")
-	if func then SF.CheckType(func,"function") end
-	
-	local inst = SF.instance
-	local hooks = inst.hooks[hookname:lower()]
-	if not hooks then
-		hooks = {}
-		inst.hooks[hookname:lower()] = hooks
-	end
-	
-	hooks[name] = func
-end
-
 if SERVER then
 	--- Prints a message to the player's chat. Limited to 255 characters on the server.
 	function SF.DefaultEnvironment.print(s)
