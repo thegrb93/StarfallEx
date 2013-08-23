@@ -157,7 +157,18 @@ function SF.CheckType(val, typ, level, default)
 		local mt = getmetatable(val)
 		error("Type mismatch (Expected "..typname..", got "..(type(mt) == "string" and mt or type(val))..") in function "..funcname,level)
 	end
-	
+
+end
+
+function SF.GetType( val )
+	local mt = dgetmeta( val )
+
+	if mt.__metatable and type(mt.__metatable) == "string" then
+		return mt.__metatable
+	else
+		return type(val)
+	end
+
 end
 
 -- ------------------------------------------------------------------------- --

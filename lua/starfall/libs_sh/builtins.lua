@@ -56,7 +56,7 @@ SF.DefaultEnvironment.pairs = pairs
 -- @name SF.DefaultEnvironment.type
 -- @class function
 -- @param obj
-SF.DefaultEnvironment.type = type
+SF.DefaultEnvironment.type = SF.GetType
 --- Same as Lua's next
 -- @name SF.DefaultEnvironment.next
 -- @class function
