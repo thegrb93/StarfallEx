@@ -110,14 +110,12 @@ function net_library.writeTable( t )
 	
 	SF.CheckType( t, "table" )
 	
-	--write( instance, "Table", SF.Unsanitize(t) )
-	write( instance, "Table", t )
+	write( instance, "Table", SF.Unsanitize(t) )
 	return true
 end
 
 function net_library.readTable()
-	--return SF.Sanitize(net.ReadTable())
-	return net.ReadTable()
+	return SF.Sanitize(net.ReadTable())
 end
 
 net.Receive( "SF_netmessage", function( len )

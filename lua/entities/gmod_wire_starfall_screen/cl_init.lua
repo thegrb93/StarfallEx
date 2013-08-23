@@ -110,6 +110,8 @@ function ENT:CodeSent(files, main, owner)
 	local ok, msg = instance:initialize()
 	if not ok then self:Error(msg) end
 	
+	instance.runOnError = function(inst,msg) self:Error(msg) end
+	
 	local data = instance.data
 	
 	function self.renderfunc()

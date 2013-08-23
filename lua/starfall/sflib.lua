@@ -110,7 +110,15 @@ SF.allInstances = setmetatable({},{__mode="kv"})
 --- Calls a script hook on all processors.
 function SF.RunScriptHook(hook,...)
 	for _,instance in pairs(SF.allInstances) do
-		if not instance.error then instance:runScriptHook(hook,...) end
+		if not instance.error then
+			local ok, err = instance:runScriptHook(hook,...)
+			if not ok then
+				instance.error = true
+				if instance.runOnError then
+					instance:runOnError( err )
+				end
+			end
+		end
 	end
 end
 
@@ -157,18 +165,18 @@ function SF.CheckType(val, typ, level, default)
 		local mt = getmetatable(val)
 		error("Type mismatch (Expected "..typname..", got "..(type(mt) == "string" and mt or type(val))..") in function "..funcname,level)
 	end
-
 end
 
+--- Gets the type of val.
+-- @param val The value to be checked.
 function SF.GetType( val )
 	local mt = dgetmeta( val )
 
-	if mt.__metatable and type(mt.__metatable) == "string" then
+	if mt and mt.__metatable and type(mt.__metatable) == "string" then
 		return mt.__metatable
 	else
 		return type(val)
 	end
-
 end
 
 -- ------------------------------------------------------------------------- --

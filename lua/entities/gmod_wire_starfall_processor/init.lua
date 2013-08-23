@@ -46,6 +46,8 @@ function ENT:Compile(codetbl, mainfile)
 		self:Error(msg)
 		return
 	end
+	
+	instance.runOnError = function(inst,msg) self:Error(msg) end
 
 	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
 		name = tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])
