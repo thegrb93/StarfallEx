@@ -161,6 +161,15 @@ function SF.DefaultEnvironment.loadLibrary(name)
 	end
 end
 
+--- Gets a list of all libraries
+function SF.DefaultEnvironment.getLibraries()
+	local ret = {}
+	for k,v in pairs( SF.Libraries.libraries ) do
+		ret[#ret+1] = k
+	end
+	return ret
+end
+
 if SERVER then
 	--- Prints a message to the player's chat. Limited to 255 characters on the server.
 	function SF.DefaultEnvironment.print(...)
