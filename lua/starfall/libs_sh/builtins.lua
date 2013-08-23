@@ -56,7 +56,10 @@ SF.DefaultEnvironment.pairs = pairs
 -- @name SF.DefaultEnvironment.type
 -- @class function
 -- @param obj
-SF.DefaultEnvironment.type = SF.GetType
+SF.DefaultEnvironment.type = function( val )
+	local tp = getmetatable( val )
+	return type(tp) == "string" and tp or type( val )
+end
 --- Same as Lua's next
 -- @name SF.DefaultEnvironment.next
 -- @class function

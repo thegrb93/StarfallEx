@@ -170,13 +170,7 @@ end
 --- Gets the type of val.
 -- @param val The value to be checked.
 function SF.GetType( val )
-	local mt = dgetmeta( val )
-
-	if mt and mt.__metatable and type(mt.__metatable) == "string" then
-		return mt.__metatable
-	else
-		return type(val)
-	end
+	return debug.getmetatable( val ) or type( val )
 end
 
 -- ------------------------------------------------------------------------- --
