@@ -170,22 +170,44 @@ function SF.DefaultEnvironment.getLibraries()
 	return ret
 end
 
+
+
 if SERVER then
-	--- Prints a message to the player's chat. Limited to 255 characters on the server.
+	--- Prints a message to the player's chat.
 	function SF.DefaultEnvironment.print(...)
 		local str = ""
 		local tbl = {...}
 		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
-		SF.instance.player:PrintMessage(HUD_PRINTTALK, str:sub(1,255))
+		SF.instance.player:ChatPrint(str)
 	end
 else
+	--- Prints a message to the player's chat.
 	function SF.DefaultEnvironment.print(...)
 		local str = ""
 		local tbl = {...}
 		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
-		LocalPlayer():PrintMessage(HUD_PRINTTALK, str)
+		LocalPlayer():ChatPrint(str)
 	end
 end
+
+local function printTableX( target, t, indent, alreadyprinted )
+	for k,v in pairs( t ) do
+		if SF.GetType( v ) == "table" and not alreadyprinted[v] then
+			alreadyprinted[v] = true
+			printTableX( target, v, indent + 1, alreadyprinted )
+			target:ChatPrint( string.rep( "\t", indent ) .. tostring(k) .. ":" )
+		else
+			target:ChatPrint( string.rep( "\t", indent ) .. tostring(k) .. "\t=\t" .. tostring(v) )
+		end
+	end
+end
+
+function SF.DefaultEnvironment.printTable( t )
+	SF.CheckType( t, "table" )
+
+	printTableX( (SERVER and SF.instance.player or LocalPlayer()), t, 0, {[t] = true} )
+end
+
 
 --- Runs an --@include'd script and caches the result.
 -- Works pretty much like standard Lua require()
