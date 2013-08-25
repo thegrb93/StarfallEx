@@ -19,8 +19,16 @@ function SF.Entities.Wrap(obj)
 	return w
 end
 
--- ------------------------------------------------------------------------- --
+--- To string
+-- @shared
+function player_metamethods:__tostring()
+	local ent = SF.Entities.Unwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
 
+
+-- ------------------------------------------------------------------------- --
 function player_methods:alive( )
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
