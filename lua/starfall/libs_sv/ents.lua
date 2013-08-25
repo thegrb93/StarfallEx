@@ -100,7 +100,7 @@ SF.Libraries.AddHook("postload",postload)
 function ents_methods:owner()
 	SF.CheckType(self,ents_metatable)
 	local ent = unwrap(self)
-	return wrap(getOwner(self))
+	return wrap(getOwner(ent))
 end
 
 local function check( v )
@@ -113,6 +113,37 @@ local function checka( a )
 	return 	-math.huge < v.p and v.p < math.huge and
 			-math.huge < v.y and v.y < math.huge and
 			-math.huge < v.r and v.r < math.huge
+end
+
+local function parent_check( child, parent )
+	while isValid( parent ) do
+		if (child == parent) then
+			return false
+		end
+		parent = parent:GetParent()
+	end
+	return true
+end
+
+function ents_methods:parent( ent )
+	SF.CheckType( self, ents_metatable )
+
+	local ent = unwrap( ent )
+	local this = unwrap( self )
+
+	if not isValid( ent ) then return false, "entity not valid" end
+	if not parent_check( this, ent ) then return false, "cannot parent to self" end
+	--print("getOwner: ,",ent:GetOwner())
+	if SF.Entities.GetOwner( ent ) ~= SF.instance.player then return false, "cannot parent to something which is not yours!" end
+	if not canModify(SF.instance.player, this) or not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
+
+	this:SetParent( ent )
+end
+
+function ents_methods:unparent()
+
+	local this = unwrap(self)
+	this:SetParent( nil )
 end
 
 --- Applies linear force to the entity
@@ -292,6 +323,18 @@ function ents_methods:setFrozen(freeze)
 	return true
 end
 
+--- Checks the entities frozen state
+function ents_methods:isFrozen()
+	SF.CheckType( self, ents_metatable )
+
+	local ent = unwrap( self )
+	if not isValid( ent ) then
+		return false
+	end
+	local phys = ent:GetPhysicsObject()
+	if phys:IsMoveable() then return false else return true end
+end
+
 --- Sets the entity solid state
 -- @param notsolid Should the entity be not solid?
 function ents_methods:setNotSolid(notsolid)
@@ -319,4 +362,34 @@ function ents_methods:enableGravity(grav)
 	phys:EnableGravity(grav and true or false)
 	phys:Wake()
 	return true
+end
+
+local function ent1or2(ent,con,num)
+	if not con then return nil end
+	if num then
+		con = con[num]
+		if not con then return nil end
+	end
+	if con.Ent1==ent then return con.Ent2 end
+	return con.Ent1
+end
+
+function ents_methods:isWeldedTo()
+	local this = unwrap(self)
+	if not isValid(this) then return nil end
+	if not constraint.HasConstraints(this) then return nil end
+
+	return ent1or2(this,constraint.FindConstraint(this, "Weld"))
+end
+
+function ents_methods:getUp()
+	return unwrap(self):GetUp()
+end
+
+function ents_methods:getRight()
+	return unwrap(self):GetRight()
+end
+
+function ents_methods:getForward()
+	return unwrap(self):GetForward()
 end

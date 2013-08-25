@@ -71,7 +71,7 @@ function find_library.inSphere(center, radius, filter)
 	SF.CheckType(radius,"number")
 	
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown(instance) then error("You cannot run a find right now; use 'find_library.canFind()'",2) end
 	
 	return convert(ents.FindInSphere(center, radius), filter)
 end
@@ -90,7 +90,7 @@ function find_library.inCone(pos, dir, distance, radius, filter)
 	SF.CheckType(radius,"number")
 	
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown(instance) then error("You cannot run a find right now; use 'find_library.canFind()'",2) end
 	
 	return convert(ents.FindInCone(pos,dir,distance,radius), filter)
 end
@@ -103,7 +103,7 @@ function find_library.byClass(class, filter)
 	SF.CheckType(class,"string")
 	
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown(instance) then error("You cannot run a find right now; use 'find_library.canFind()'",2) end
 	
 	return convert(ents.FindByClass(class), filter)
 end
@@ -116,7 +116,7 @@ function find_library.byModel(model, filter)
 	SF.CheckType(model,"string")
 	
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown(instance) then error("You cannot run a find right now; use 'find_library.canFind()'",2) end
 	
 	return convert(ents.FindByModel(model), filter)
 end
@@ -126,7 +126,7 @@ end
 -- @return An array of found entities
 function find_library.allPlayers(filter)
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown(instance) then error("You cannot run a find right now; use 'find_library.canFind()'",2) end
 	
 	return convert(player.GetAll(), filter)
 end
@@ -136,7 +136,7 @@ end
 -- @return An array of found entities
 function find_library.all(filter)
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown(instance) then error("You cannot run a find right now; use 'find_library.canFind()'",2) end
 	
 	return convert(ents.GetAll(), filter)
 end

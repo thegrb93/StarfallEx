@@ -73,6 +73,7 @@ local object_unwrappers = {}
 -- @param supermeta The metatable to inheret from
 -- @return The table to store normal methods
 -- @return The table to store metamethods
+SF.Types = {}
 function SF.Typedef(name, supermeta)
 	local methods, metamethods = {}, {}
 	metamethods.__metatable = name
@@ -89,6 +90,8 @@ function SF.Typedef(name, supermeta)
 			end
 		end
 	end
+
+	SF.Types[name] = metamethods
 	return methods, metamethods
 end
 
@@ -148,7 +151,7 @@ function SF.CheckType(val, typ, level, default)
 	elseif type(val) == typ then return val
 	else
 		local meta = dgetmeta(val)
-		if meta == typ or (meta.__supertypes and meta.__supertypes[typ] ) then return val end
+		if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ]) then return val end
 		
 		-- Failed, throw error
 		level = (level or 0) + 3
@@ -279,6 +282,7 @@ local safe_types = {
 	["number"  ] = true,
 	["string"  ] = true,
 	["Vector"  ] = true,
+	["Color"   ] = true,
 	["Angle"   ] = true,
 	["Angle"   ] = true,
 	["Matrix"  ] = true,

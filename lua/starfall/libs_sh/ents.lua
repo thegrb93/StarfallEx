@@ -72,6 +72,13 @@ function ents_metamethods:__tostring()
 	else return tostring(ent) end
 end
 
+function ents_methods:setColor( clr )
+	SF.CheckType( clr, SF.Types["Color"] )
+
+	local this = unwrap(self)
+	this:SetColor(clr)
+end
+
 --- Checks if an entity is valid.
 -- @shared
 -- @return True if valid, false if not
