@@ -85,12 +85,12 @@ local inputConverters =
 	WIRELINK = function(wl) return wlwrap(wl) end,
 
 	TABLE = function(tbl)
-		if not tbl.istable or not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
+		if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
 		if tbl.size == 0 then return {} end -- Don't waste our time
 		local conv = {}
 
 		-- Key-numeric part of table
-		for key, typ in ipairs(tbl.ntypes) do
+		for key, typ in pairs(tbl.ntypes) do
 			conv[key] = convertFromExpression2(tbl.n[key], typ)
 		end
 

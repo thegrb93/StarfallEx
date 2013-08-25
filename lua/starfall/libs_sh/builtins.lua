@@ -42,16 +42,27 @@ SF.DefaultEnvironment.tostring = tostring
 -- @class function
 -- @param obj
 SF.DefaultEnvironment.tonumber = tonumber
+
+local function mynext( t, idx )
+	SF.CheckType( t, "table" )
+	
+	local dm = dgetmeta( t )
+	if dm and type(dm.__metatable) == "string" then
+		return next(dm.__index,idx)
+	else
+		return next(t,idx)
+	end
+end
 --- Same as Lua's ipairs
 -- @name SF.DefaultEnvironment.ipairs
 -- @class function
 -- @param tbl
-SF.DefaultEnvironment.ipairs = ipairs
+SF.DefaultEnvironment.ipairs = function( t ) return mynext, t, 0 end
 --- Same as Lua's pairs
 -- @name SF.DefaultEnvironment.pairs
 -- @class function
 -- @param tbl
-SF.DefaultEnvironment.pairs = pairs
+SF.DefaultEnvironment.pairs = function( t ) return mynext, t, nil end
 --- Same as Lua's type
 -- @name SF.DefaultEnvironment.type
 -- @class function
@@ -64,7 +75,7 @@ end
 -- @name SF.DefaultEnvironment.next
 -- @class function
 -- @param tbl
-SF.DefaultEnvironment.next = next
+SF.DefaultEnvironment.next = mynext
 --- Same as Lua's assert. TODO: lua's assert doesn't work.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
@@ -121,6 +132,7 @@ end
 local string_methods, string_metatable = SF.Typedef("Library: string")
 filterGmodLua(string,string_methods)
 string_metatable.__newindex = function() end
+string_metatable.explode = function(str,separator,withpattern) return string.Explode(separator,str,withpattern) end
 --- Lua's (not glua's) string library
 -- @name SF.DefaultEnvironment.string
 -- @class table
@@ -191,11 +203,11 @@ else
 end
 
 local function printTableX( target, t, indent, alreadyprinted )
-	for k,v in pairs( t ) do
+	for k,v in SF.DefaultEnvironment.pairs( t ) do
 		if SF.GetType( v ) == "table" and not alreadyprinted[v] then
 			alreadyprinted[v] = true
-			printTableX( target, v, indent + 1, alreadyprinted )
 			target:ChatPrint( string.rep( "\t", indent ) .. tostring(k) .. ":" )
+			printTableX( target, v, indent + 1, alreadyprinted )
 		else
 			target:ChatPrint( string.rep( "\t", indent ) .. tostring(k) .. "\t=\t" .. tostring(v) )
 		end
