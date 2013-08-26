@@ -24,6 +24,9 @@ local cos   = math.cos
 local sinh  = math.sinh
 local cosh  = math.cosh
 local acos  = math.acos
+local min 	= math.min
+
+local delta = wire_expression2_delta or 0.0000001000000
 
 local isValid = SF.Entities.IsValid -- For checking shit
 
@@ -84,22 +87,26 @@ end
 
 local argTypesToQuat = {}
 --- Converts a number to a Quaternion format for generation
--- @param args Table, containing a number to be used at the first index
-argTypesToQuat["number"] = function(args)
-	return quicknew(args[1], 0, 0, 0)
+-- @param args
+argTypesToQuat["number"] = function(num)
+	return quicknew(num, 0, 0, 0)
+end
+
+--- Converts 4 numbers to a Quaternion format for generation
+-- @param args
+argTypesToQuat["numbernumbernumbernumber"] = function(a,b,c,d)
+	return quicknew(a,b,c,d)
 end
 
 --- Converts a Vector to a Quaternion format for generation
--- @param args Table, containing a Vector to be used at the first index
-argTypesToQuat["Vector"] = function(args)
-	local vec = args[1]
+-- @param args
+argTypesToQuat["Vector"] = function(vec)
 	return quicknew(0, vec.x, vec.y, vec.z)
 end
 
 --- Converts an Angle to a Quaternion format for generation
--- @param args Table, containing an Angle to be used at the first index
-argTypesToQuat["Angle"] = function(args)
-	local ang = args[1]
+-- @param args
+argTypesToQuat["Angle"] = function(ang)
 	local p, y, r = ang.p, ang.y, ang.r
 	p = p*deg2rad*0.5
 	y = y*deg2rad*0.5
@@ -111,17 +118,14 @@ argTypesToQuat["Angle"] = function(args)
 end
 
 --- Converts a Number/Vector combination to a Quaternion format for generation
--- @param args Table, containing a Number to be used at the first index, containing a Vector to be used at the second index.
-argTypesToQuat["numberVector"] = function(args)
-	local vec = args[2]
-	return quicknew(args[1], vec.x, vec.y, vec.z) -- TODO Cannot change protect metatable? fix this
+-- @param args
+argTypesToQuat["numberVector"] = function(num,vec)
+	return quicknew(num, vec.x, vec.y, vec.z) -- TODO Cannot change protect metatable? fix this
 end
 
 --- Converts two Vectors to a Quaternion format for generation using Cross product and the angle between them
--- @param args Table, containing forward vector to be used at the first index, containing up vector to be used at the second index
-argTypesToQuat["VectorVector"] = function(args)
-	local forward = args[1]
-	local up = args[2]
+-- @param args
+argTypesToQuat["VectorVector"] = function(forward,up)
 	local x = Vector(forward.x, forward.y, forward.z)
 	local z = Vector(up.x, up.y, up.z)
 	local y = z:Cross(x):GetNormalized() --up x forward = left
@@ -150,14 +154,13 @@ end
 
 --- Converts an Entity to a Quaternion format for generation
 -- @param args Table, containing an Entity to be used at the first index.
-argTypesToQuat["Entity"] = function(args)
-	local ent = args[1]
-
-	if not isValid( SF.UnwrapObject(ent) ) then
+argTypesToQuat["Entity"] = function(ent)
+	ent = SF.UnwrapObject( ent )
+	
+	if not isValid( ent ) then
 		return quicknew( 0, 0, 0, 0 )
 	end
 
-	ent = SF.UnwrapObject(ent)
 	local ang = ent:GetAngles()
 	local p, y, r = ang.p, ang.y, ang.r
 	p = p*deg2rad*0.5
@@ -176,18 +179,16 @@ end
 -- See argTypesToQuat table for examples of acceptable inputs.
 function quat_lib.New( self, ...)
 	local args = {...}
-
+	
 	local argtypes = ""
-	for i=1,math.min(#args,4) do
+	for i=1,min(#args,4) do
 		argtypes = argtypes .. SF.GetType( args[i] )
 	end
-
-	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes](args) or quicknew(0,0,0,0)
+	
+	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes](...) or quicknew(0,0,0,0)
 end
 
 quat_lib_metamethods.__call = quat_lib.New
-
-
 
 
 local function format(value)
