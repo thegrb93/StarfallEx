@@ -178,11 +178,11 @@ function quat_lib.New( self, ...)
 	local args = {...}
 
 	local argtypes = ""
-	for i=1,math.max(#args,4) do
+	for i=1,math.min(#args,4) do
 		argtypes = argtypes .. SF.GetType( args[i] )
 	end
 
-	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes] or quicknew(0,0,0,0)
+	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes](args) or quicknew(0,0,0,0)
 end
 
 quat_lib_metamethods.__call = quat_lib.New
