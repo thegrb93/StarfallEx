@@ -128,6 +128,10 @@ local function filterGmodLua(lib, original, gm)
 	return original, gm
 end
 
+-- Default Hook Library
+--- TODO: Consult if this is actually wanted or not :/
+SF.DefaultEnvironment.hook = SF.Libraries.Get("hook")
+
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string")
 filterGmodLua(string,string_methods)

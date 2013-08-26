@@ -33,7 +33,7 @@ function hook_library.run(hookname, ...)
 	local lower = hookname:lower()
 	if instance.hooks[lower] then
 		for k,v in pairs( instance.hooks[lower] ) do
-			local ok, tbl = instance:runFunction( v )
+			local ok, tbl, traceback = instance:runWithOps(v, ...)--instance:runFunction( v )
 			if not ok and instance.runOnError then
 				instance.runOnError( tbl[1] )
 				hook_library.remove( hookname, k )
@@ -58,3 +58,4 @@ function hook_library.remove( hookname, name )
 		instance.hooks[lower][name] = nil
 	end
 end
+
