@@ -177,40 +177,12 @@ end
 function quat_lib.New( self, ...)
 	local args = {...}
 
-	local numargs = #args
-	local argtypes
-
-	if numargs == 0 then
-		local new = quicknew(0,0,0,0)
-		--setmetatable( new, quat_metamethods )
-		return new
+	local argtypes = ""
+	for i=1,math.max(#args,4) do
+		argtypes = argtypes .. SF.GetType( args[i] )
 	end
 
-	-- please forgive me :( <-- NO
-	if numargs == 1 then argtypes = SF.GetType(args[1]) end
-
-	if numargs == 4 and (SF.GetType(args[1]) == "number" and SF.GetType(args[2]) == "number" and SF.GetType(args[3]) == "number" and SF.GetType(args[4]) == "number") then
-		return quicknew(args[1], args[2], args[3], args[4])
-	end
-
-	if numargs > 1  then argtypes = SF.GetType(args[1]) .. SF.GetType(args[2]) end
-
-	local argstonew = argTypesToQuat[argtypes]
-
-	if not argstonew then
-		argstonew = argTypesToQuat[SF.GetType(args[1])]
-
-		if not argstonew then
-			local new = quicknew(0,0,0,0)
-			--setmetatable( new, quat_metamethods )
-			return new
-		end
-	end
-
-	local new = argstonew(args)
-	--setmetatable( new, quat_metamethods )
-
-	return new
+	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes] or quicknew(0,0,0,0)
 end
 
 quat_lib_metamethods.__call = quat_lib.New
