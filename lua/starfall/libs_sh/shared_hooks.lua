@@ -5,82 +5,57 @@
 -- Feel free to redefine how these are added
 ---------------------------------------------------------------------
 
+local wrap = SF.Entities.Wrap
+local unpack = unpack
+
 --- GM:EndEntityDriving( Entity ent, Player ply )
 -- Called right before an entity stops driving. Overriding this hook will cause it to not call drive/End and the player will not stop driving.
-hook.Add("EndEntityDriving", "runScriptHook_EndEntityDriving", function(...)
+hook.Add("EndEntityDriving", "runScriptHook_EndEntityDriving", function( e, p)
+	local args = {}
+	args[1] = wrap(e)
+	args[2] = wrap(p)
 
-	SF.RunScriptHook("EndEntityDriving", ...)
+	SF.RunScriptHook("EndEntityDriving", unpack( args ) )
 end)
 
 --- GM:EntityRemoved( Entity ent )
 -- Called right before the removal of an entity.
-hook.Add("EntityRemoved", "runScriptHook_EntityRemoved", function(...)
+hook.Add("EntityRemoved", "runScriptHook_EntityRemoved", function(e)
 
-	SF.RunScriptHook("EntityRemoved", ...)
-end)
-
---- GM:FinishMove( Player ply, CMoveData moveData )
--- Called after Move.
-hook.Add("FinishMove", "runScriptHook_FinishMove", function(...)
-
-	SF.RunScriptHook("FinishMove", ...)
-end)
-
---- GM:GrabEarAnimation( Player ply )
--- Called when a player opens chat and grabs their ear
---- TODO DOESN'T APPEAR TO WORK
-hook.Add("GrabEarAnimation", "runScriptHook_GrabEarAnimation", function(...)
-
-	SF.RunScriptHook("GrabEarAnimation", ...)
-end)
-
---- GM:KeyRelease( Entity player, number key )
--- Runs when a IN key was released by a player.
---- TODO REMOVE AS POTENTIALLY VERY ABUSIVE
-hook.Add("KeyRelease", "runScriptHook_KeyRelease", function(...)
-
-	SF.RunScriptHook("KeyRelease", ...)
-end)
-
---- GM:MouthMoveAnimation( Player ply )
--- Called when a player uses voice chat and moves their mouth
---- TODO DOESN'T APPEAR TO WORK
-hook.Add("MouthMoveAnimation", "runScriptHook_MouthMoveAnimation", function(...)
-
-	SF.RunScriptHook("MouthMoveAnimation", ...)
+	SF.RunScriptHook("EntityRemoved", wrap(e) )
 end)
 
 --- GM:OnEntityCreated( Entity entity )
 -- Called right after the Entity has been made visible to Lua.
-hook.Add("OnEntityCreated", "runScriptHook_OnEntityCreated", function(...)
+hook.Add("OnEntityCreated", "runScriptHook_OnEntityCreated", function(e)
 
-	SF.RunScriptHook("OnEntityCreated", ...)
-end)
-
---- GM:PlayerConnect( string name, string ip )
--- commands to run when a player connects
-hook.Add("PlayerConnect", "runScriptHook_PlayerConnect", function(...)
-
-	SF.RunScriptHook("PlayerConnect", ...)
+	SF.RunScriptHook("OnEntityCreated", wrap(e) )
 end)
 
 --- GM:PlayerHurt( Player victim, Entity attacker, number healthRemaining, number damageTaken )
 -- Called when a player gets hurt.
-hook.Add("PlayerHurt", "runScriptHook_PlayerHurt", function(...)
+hook.Add("PlayerHurt", "runScriptHook_PlayerHurt", function( v, a, h, d)
+	local args = {}
+	args[1] = wrap(v)
+	args[2] = wrap(a)
+	args[3] = h
+	args[4] = d
 
-	SF.RunScriptHook("PlayerHurt", ...)
+	SF.RunScriptHook("PlayerHurt", unpack( args ) )
 end)
 
 --- GM:PlayerNoClip( )
 -- Called when a player tries to switch noclip mode
-hook.Add("PlayerNoClip", "runScriptHook_PlayerNoClip", function(...)
+hook.Add("PlayerNoClip", "runScriptHook_PlayerNoClip", function(p,b)
+	local args = { wrap(p), b}
 
-	SF.RunScriptHook("PlayerNoClip", ...)
+	SF.RunScriptHook("PlayerNoClip", unpack( args ) )
 end)
 
 --- GM:StartEntityDriving( Entity ent, Player ply )
 -- Called right before an entity starts driving. Overriding this hook will cause it to not call drive/Start and the player will not begin driving the entity.
-hook.Add("StartEntityDriving", "runScriptHook_StartEntityDriving", function(...)
+hook.Add("StartEntityDriving", "runScriptHook_StartEntityDriving", function(e, p)
+	local args = { wrap(e), wrap(p) }
 
-	SF.RunScriptHook("StartEntityDriving", ...)
+	SF.RunScriptHook("StartEntityDriving", unpack( args ) )
 end)
