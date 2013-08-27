@@ -86,7 +86,7 @@ local hooks = {}
 -- @param hookname The hook name. In-SF hookname will have its first character lowercased
 -- @param customfunc Optional custom function
 function SF.hookAdd( hookname, customfunc )
-	hooks[hookname] = true
+	hooks[#hooks+1] = hookname
 	local hookname2 = string.lower(string.sub(hookname,1,1)) .. string.sub(hookname,2)
 	hook.Add( hookname, "SF_" .. hookname, customfunc or function(...)
 		run( hookname2, wrapArguments( ... ) )
