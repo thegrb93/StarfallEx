@@ -127,20 +127,40 @@ function ents_methods:obbSize()
 	return ent:OBBMaxs() - ent:OBBMins()
 end
 
---- Returns the world position of the entity's outer bounding box
+--- Returns the local position of the entity's outer bounding box
 -- @shared
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenter()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:OBBCenter()
+end
+
+--- Returns the world position of the entity's outer bounding box
+-- @shared
+-- @return The position vector of the outer bounding box center
+function ents_methods:obbCenterW()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:LocalToWorld(ent:OBBCenter())
+end
+
+--- Returns the local position of the entity's mass center
+-- @shared
+-- @return The position vector of the mass center
+function ents_methods:massCenter()
+	SF.CheckType(self,ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then return nil, "invalid entity" end
+	return ent:GetMassCenter()
 end
 
 --- Returns the world position of the entity's mass center
 -- @shared
 -- @return The position vector of the mass center
-function ents_methods:massCenter()
+function ents_methods:massCenterW()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
