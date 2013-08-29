@@ -233,6 +233,23 @@ function SF.Instance:runFunction(func,...)
 	return true, unpack(tbl)
 end
 
+--- Exactly the same as runFunction except doesn't unpack the return values
+-- @param func Function to run
+-- @param ... Arguments to pass to func
+function SF.Instance:runFunctionT(func,...)
+	self:prepare("_runFunction",func)
+	
+	local ok, tbl, traceback = self:runWithOps(func,...)
+	if not ok then
+		self:cleanup("_runFunction",func,true,tbl,traceback)
+		self.error = true
+		return false, tbl, traceback
+	end
+	
+	self:cleanup("_runFunction",func,false)
+	return true, tbl
+end
+
 --- Resets the amount of operations used.
 function SF.Instance:resetOps()
 	self:runLibraryHook("resetOps")
