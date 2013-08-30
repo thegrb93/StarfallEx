@@ -5,6 +5,7 @@
 --- Deals with hooks
 -- @shared
 local hook_library, _ = SF.Libraries.Register("hook")
+local registered_instances = {}
 
 --- Sets a hook function
 function hook_library.add(hookname, name, func)
@@ -20,6 +21,7 @@ function hook_library.add(hookname, name, func)
 	end
 	
 	hooks[name] = func
+	registered_instances[inst] = true
 end
 
 --- Run a hook
@@ -56,9 +58,22 @@ function hook_library.remove( hookname, name )
 	local lower = hookname:lower()
 	if instance.hooks[lower] then
 		instance.hooks[lower][name] = nil
+		
+		if not next(instance.hooks[lower]) then
+			instance.hooks[lower] = nil
+		end
+	end
+	
+	if not next(instance.hooks) then
+		registered_instances[instance] = nil
 	end
 end
 
+SF.Libraries.AddHook("deinitialize",function(instance)
+	registered_instances[instance] = nil
+end)
+
+--[[
 local blocked_types = {
 	PhysObj = true,
 	NPC = true,
@@ -76,20 +91,38 @@ end
 -- Helper function for hookAdd
 local function wrapArguments( ... )
 	local t = {...}
-	return  wrap(t[1]), wrap(t[2]), wrap(t[3]), wrap(t[4]), wrap(t[5]), wrap(t[6])
+	return wrap(t[1]), wrap(t[2]), wrap(t[3]), wrap(t[4]), wrap(t[5]), wrap(t[6])
+end
+]]
+
+local wrapArguments = SF.Sanitize
+
+--local run = SF.RunScriptHook
+
+local function run( hookname, customfunc, ... )
+	for instance,_ in pairs( registered_instances ) do
+		if instance.hooks[hookname] then
+			for name, func in pairs( instance.hooks[hookname] ) do
+				local ok, ret = instance:runFunctionT( func, ... )
+				if ok and customfunc then
+					return customfunc( instance, ret )
+				end
+			end
+		end
+	end
 end
 
-local run = SF.RunScriptHook
+
 local hooks = {}
 --- Add a GMod hook so that SF gets access to it
 -- @shared
--- @param hookname The hook name. In-SF hookname will have its first character lowercased
+-- @param hookname The hook name. In-SF hookname will be lowercased
 -- @param customfunc Optional custom function
 function SF.hookAdd( hookname, customfunc )
-	hooks[hookname] = true
-	local hookname2 = string.lower(string.sub(hookname,1,1)) .. string.sub(hookname,2)
-	hook.Add( hookname, "SF_" .. hookname, customfunc or function(...)
-		run( hookname2, wrapArguments( ... ) )
+	hooks[#hooks+1] = hookname
+	local lower = hookname:lower()
+	hook.Add( hookname, "SF_" .. hookname, function(...)
+		return run( lower, customfunc, wrapArguments( ... ) )
 	end)
 end
 
@@ -114,7 +147,7 @@ if SERVER then
 	add( "PlayerInitialSpawn" )
 	add( "PlayerSpawn" )
 	add( "PlayerLeaveVehicle" )
-	add( "PlayerSay" )
+	add( "PlayerSay", function( instance, args ) if args then return args[1] end end )
 	add( "PlayerSpray" )
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
