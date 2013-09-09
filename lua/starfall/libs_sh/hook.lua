@@ -73,6 +73,13 @@ SF.Libraries.AddHook("deinitialize",function(instance)
 	registered_instances[instance] = nil
 end)
 
+SF.Libraries.AddHook("cleanup",function(instance)
+	if instance.error then
+		registered_instances[instance] = nil
+		instance.hooks = {}
+	end
+end)
+
 --[[
 local blocked_types = {
 	PhysObj = true,
