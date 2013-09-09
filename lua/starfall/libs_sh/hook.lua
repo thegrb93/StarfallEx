@@ -112,7 +112,10 @@ local function run( hookname, customfunc, ... )
 			for name, func in pairs( instance.hooks[hookname] ) do
 				local ok, ret = instance:runFunctionT( func, ... )
 				if ok and customfunc then
-					return customfunc( instance, ret )
+					local a,b,c,d,e,f,g,h = customfunc( instance, ret )
+					if a ~= nil then
+						return a,b,c,d,e,f,g,h
+					end
 				end
 			end
 		end
