@@ -216,6 +216,7 @@ if SERVER then
 else
 	--- Prints a message to the player's chat.
 	function SF.DefaultEnvironment.print(...)
+		if SF.instance.player ~= LocalPlayer() then return end
 		local str = ""
 		local tbl = {...}
 		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
@@ -224,6 +225,7 @@ else
 end
 
 local function printTableX( target, t, indent, alreadyprinted )
+	if CLIENT and target ~= LocalPlayer() then return end
 	for k,v in SF.DefaultEnvironment.pairs( t ) do
 		if SF.GetType( v ) == "table" and not alreadyprinted[v] then
 			alreadyprinted[v] = true

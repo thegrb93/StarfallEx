@@ -125,7 +125,7 @@ local function parent_check( child, parent )
 	return true
 end
 
-function ents_methods:parent( ent )
+function ents_methods:parent( ent ) --- TODO: Add permission checks to this!
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( ent )
@@ -140,7 +140,7 @@ function ents_methods:parent( ent )
 	this:SetParent( ent )
 end
 
-function ents_methods:unparent()
+function ents_methods:unparent() --- TODO: Add permission checks to this!
 
 	local this = unwrap(self)
 	this:SetParent( nil )
@@ -149,7 +149,7 @@ end
 --- Applies linear force to the entity
 -- @param vec The force vector
 -- @param offset An optional offset position (TODO: Local or world?)
-function ents_methods:applyForce(vec)
+function ents_methods:applyForceCenter(vec)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	if not check( vec ) then return false, "infinite vector" end
@@ -168,7 +168,7 @@ end
 --- Applies linear force to the entity with an offset
 -- @param vec The force vector
 -- @param offset An optional offset position (TODO: Local or world?)
-function ents_methods:applyOffsetForce(vec, offset)
+function ents_methods:applyForceOffset(vec, offset)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	SF.CheckType(offset,"Vector")
@@ -262,6 +262,18 @@ function ents_methods:applyTorque(tq)
 	return true
 end
 
+local clmp = math.Clamp
+local function clampPos( pos )
+	pos.x = clmp( pos.x, -16384, 16384 )
+	pos.y = clmp( pos.y, -16384, 16384 )
+	pos.z = clmp( pos.z, -16384, 16384 )
+	return pos
+end
+
+local function isnan(n)
+	return n~=n
+end
+
 --- Sets the entitiy's position
 -- @param vec New position
 function ents_methods:setPos(vec)
@@ -271,29 +283,37 @@ function ents_methods:setPos(vec)
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
-	
-	-- TODO: Clamp insane positions to prevent crashing.
-	SF.setPos( ent, vec )
+
+	-- Changed to not use SF functions because it's really a local thing. Clamping is done though.
+	if isnan(vec.x) or isnan(vec.y) or isnan(vec.z) then return end
+	ent:SetPos( clampPos(vec) )
+
 	return true
 end
 
+local huge, abs = math.huge, math.abs
+
 --- Sets the entity's angles
 -- @param ang New angles
-function ents_methods:setAng(ang)
+function ents_methods:setAngles(ang)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
-	
-	SF.setAng( ent, ang )
+
+	-- Changed to not use SF functions because it's really a local
+	if isnan( ang.pitch ) or isnan( ang.yaw ) or isnan( ang.roll ) then return end
+	if abs( ang.pitch ) == huge or abs( ang.yaw ) == huge or abs( ang.roll ) == huge then return false end
+	ent:SetAngles(ang)
+
 	return true
 end
 
 --- Sets the entity's linear velocity
 -- @param vel New velocity
-function ents_methods:setVel(vel)
+function ents_methods:setVelocity(vel)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vel,"Vector")
 	
