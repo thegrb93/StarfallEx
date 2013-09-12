@@ -262,18 +262,6 @@ function ents_methods:applyTorque(tq)
 	return true
 end
 
-local clmp = math.Clamp
-local function clampPos( pos )
-	pos.x = clmp( pos.x, -16384, 16384 )
-	pos.y = clmp( pos.y, -16384, 16384 )
-	pos.z = clmp( pos.z, -16384, 16384 )
-	return pos
-end
-
-local function isnan(n)
-	return n~=n
-end
-
 --- Sets the entitiy's position
 -- @param vec New position
 function ents_methods:setPos(vec)
@@ -284,9 +272,7 @@ function ents_methods:setPos(vec)
 	if not isValid(ent) then return false, "entity not valid" end
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 
-	-- Changed to not use SF functions because it's really a local thing. Clamping is done though.
-	if isnan(vec.x) or isnan(vec.y) or isnan(vec.z) then return end
-	ent:SetPos( clampPos(vec) )
+	SF.setPos( ent, vec )
 
 	return true
 end
@@ -303,10 +289,7 @@ function ents_methods:setAngles(ang)
 	if not isValid(ent) then return false, "entity not valid" end
 	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 
-	-- Changed to not use SF functions because it's really a local
-	if isnan( ang.pitch ) or isnan( ang.yaw ) or isnan( ang.roll ) then return end
-	if abs( ang.pitch ) == huge or abs( ang.yaw ) == huge or abs( ang.roll ) == huge then return false end
-	ent:SetAngles(ang)
+	SF.setAng( ent, ang )
 
 	return true
 end
