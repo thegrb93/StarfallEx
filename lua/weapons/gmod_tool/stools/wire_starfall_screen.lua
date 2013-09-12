@@ -166,7 +166,7 @@ if CLIENT then
 		
 		local filebrowser = vgui.Create("wire_expression2_browser")
 		panel:AddPanel(filebrowser)
-		filebrowser:Setup("Starfall")
+		filebrowser:Setup("starfall")
 		filebrowser:SetSize(235,400)
 		function filebrowser:OnFileOpen(filepath, newtab)
 			SF.Editor.editor:Open(filepath, nil, newtab)
