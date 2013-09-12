@@ -287,7 +287,11 @@ if CLIENT then
 		if SF.Editor.editor then return end
 		
 		SF.Editor.editor = vgui.Create("Expression2EditorFrame")
-		SF.Editor.editor:Setup("SF Editor", "Starfall", "nothing") -- Setting the editor type to not nil keeps the validator line
+		SF.Editor.editor:Setup("SF Editor", "starfall", "nothing") -- Setting the editor type to not nil keeps the validator line
+		
+		if not file.Exists("starfall", "DATA") then
+			file.CreateDir("starfall")
+		end
 		
 		-- Add "Sound Browser" button
 		do
