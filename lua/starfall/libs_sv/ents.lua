@@ -277,8 +277,6 @@ function ents_methods:setPos(vec)
 	return true
 end
 
-local huge, abs = math.huge, math.abs
-
 --- Sets the entity's angles
 -- @param ang New angles
 function ents_methods:setAngles(ang)

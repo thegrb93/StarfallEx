@@ -225,7 +225,6 @@ else
 end
 
 local function printTableX( target, t, indent, alreadyprinted )
-	if CLIENT and target ~= LocalPlayer() then return end
 	for k,v in SF.DefaultEnvironment.pairs( t ) do
 		if SF.GetType( v ) == "table" and not alreadyprinted[v] then
 			alreadyprinted[v] = true
@@ -238,6 +237,7 @@ local function printTableX( target, t, indent, alreadyprinted )
 end
 
 function SF.DefaultEnvironment.printTable( t )
+	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
 	SF.CheckType( t, "table" )
 
 	printTableX( (SERVER and SF.instance.player or LocalPlayer()), t, 0, {[t] = true} )
