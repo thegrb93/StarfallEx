@@ -10,11 +10,10 @@ ENT.WireDebugName = "Starfall Processor"
 ENT.OverlayDelay = 0
 
 local context = SF.CreateContext()
-local name = nil
 
 function ENT:UpdateState(state)
-	if name then
-		self:SetOverlayText("Starfall Processor\n"..name.."\n"..state)
+	if self.name then
+		self:SetOverlayText("Starfall Processor\n"..self.name.."\n"..state)
 	else
 		self:SetOverlayText("Starfall Processor\n"..state)
 	end
@@ -49,12 +48,14 @@ function ENT:Compile(codetbl, mainfile)
 	
 	instance.runOnError = function(inst,msg) self:Error(msg) end
 
+	self.name = nil
+
 	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
-		name = tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])
+		self.name = tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])
 	end
 
-	if not name or string.len(name) <= 0 then
-		name = "generic"
+	if not self.name or string.len(self.name) <= 0 then
+		self.name = "generic"
 	end
 
 	self:UpdateState("(None)")
