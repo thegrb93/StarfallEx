@@ -90,7 +90,7 @@ end
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity
-function ents_methods:index()
+function ents_methods:entIndex()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -100,7 +100,7 @@ end
 --- Returns the class of the entity
 -- @shared
 -- @return The string class name
-function ents_methods:class()
+function ents_methods:getClass()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -110,7 +110,7 @@ end
 --- Returns the position of the entity
 -- @shared
 -- @return The position vector
-function ents_methods:pos()
+function ents_methods:getPos()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -170,7 +170,7 @@ end
 --- Returns the angle of the entity
 -- @shared
 -- @return The angle
-function ents_methods:ang()
+function ents_methods:getAngles()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -180,7 +180,7 @@ end
 --- Returns the mass of the entity
 -- @shared
 -- @return The numerical mass
-function ents_methods:mass()
+function ents_methods:getMass()
 	SF.CheckType(self,ents_metamethods)
 	
 	local ent = unwrap(self)
@@ -193,7 +193,7 @@ end
 --- Returns the principle moments of inertia of the entity
 -- @shared
 -- @return The principle moments of inertia as a vector
-function ents_methods:inertia()
+function ents_methods:getInertia()
 	SF.CheckType(self,ents_metamethods)
 	
 	local ent = unwrap(self)
@@ -206,7 +206,7 @@ end
 --- Returns the velocity of the entity
 -- @shared
 -- @return The velocity vector
-function ents_methods:vel()
+function ents_methods:getVelocity()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -216,7 +216,7 @@ end
 --- Returns the angular velocity of the entity
 -- @shared
 -- @return The angular velocity vector
-function ents_methods:angVelVector()
+function ents_methods:getAngleVelocity()
 	SF.CheckType(self,ents_metamethods)
 	local phys = getPhysObject(unwrap(self)) 	
 	if not phys then return false, "entity has no physics object or is not valid" end	
@@ -226,7 +226,7 @@ end
 --- Converts a vector in entity local space to world space
 -- @shared
 -- @param data Local space vector
-function ents_methods:toWorld(data)
+function ents_methods:localToWorld(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Vector")
 	local ent = unwrap(self)
@@ -238,7 +238,7 @@ end
 --- Converts an angle in entity local space to world space
 -- @shared
 -- @param data Local space angle
-function ents_methods:toWorldAngles(data)
+function ents_methods:localToWorldAngles(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Angle")
 	local ent = unwrap(self)
@@ -250,7 +250,7 @@ end
 --- Converts a vector in world space to entity local space
 -- @shared
 -- @param data Local space vector
-function ents_methods:toLocal(data)
+function ents_methods:worldToLocal(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Vector")
 	local ent = unwrap(self)
@@ -262,7 +262,7 @@ end
 --- Converts an angle in world space to entity local space
 -- @shared
 -- @param data Local space angle
-function ents_methods:toLocalAngles(data)
+function ents_methods:worldToLocalAngles(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Angle")
 	local ent = unwrap(self)
@@ -273,7 +273,7 @@ end
 
 --- Gets the model of an entity
 -- @shared
-function ents_methods:model()
+function ents_methods:getModel()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end

@@ -13,33 +13,33 @@ surface.CreateFont("Starfall_ErrorFont", {
 	weight = 200
 })
 
-do
-	local dlScreen = nil
-	local dlOwner = nil
-	local dlMain = nil
-	local dlFiles = nil
 
-	net.Receive("starfall_screen_download", function(len)
-		if not dlScreen then
-			dlScreen = net.ReadEntity()
-			dlOwner = net.ReadEntity()
-			dlMain = net.ReadString()
-			dlFiles = {}
-			--print("Begin recieving, mainfile:", updata.mainfile)
-		else
-			if net.ReadBit() ~= 0 then
-				--print("End recieving data")
-				dlScreen:CodeSent(dlFiles, dlMain, dlOwner)
-				dlScreen, dlFiles, dlMain, dlOwner = nil, nil, nil, nil
-				return
-			end
-			local filename = net.ReadString()
-			local filedata = net.ReadString()
-			--print("\tRecieved data for:", filename, "len:", #filedata)
-			dlFiles[filename] = dlFiles[filename] and dlFiles[filename]..filedata or filedata
+local dlScreen = nil
+local dlOwner = nil
+local dlMain = nil
+local dlFiles = nil
+
+net.Receive("starfall_screen_download", function(len)
+	if not dlScreen then
+		dlScreen = net.ReadEntity()
+		dlOwner = net.ReadEntity()
+		dlMain = net.ReadString()
+		dlFiles = {}
+		--print("Begin recieving, mainfile:", updata.mainfile)
+	else
+		if net.ReadBit() ~= 0 then
+			--print("End recieving data")
+			dlScreen:CodeSent(dlFiles, dlMain, dlOwner)
+			dlScreen, dlFiles, dlMain, dlOwner = nil, nil, nil, nil
+			return
 		end
-	end)
-end
+		local filename = net.ReadString()
+		local filedata = net.ReadString()
+		--print("\tRecieved data for:", filename, "len:", #filedata)
+		dlFiles[filename] = dlFiles[filename] and dlFiles[filename]..filedata or filedata
+	end
+end)
+
 
 usermessage.Hook( "starfall_screen_used", function ( data )
 	local screen = Entity( data:ReadShort() )
