@@ -375,22 +375,26 @@ local function ent1or2(ent,con,num)
 	return con.Ent1
 end
 
+--- Gets what the entity is welded to
 function ents_methods:isWeldedTo()
 	local this = unwrap(self)
 	if not isValid(this) then return nil end
 	if not constraint.HasConstraints(this) then return nil end
 
-	return ent1or2(this,constraint.FindConstraint(this, "Weld"))
+	return wrap( ent1or2(this,constraint.FindConstraint(this, "Weld")) )
 end
 
+--- Gets the entities up vector
 function ents_methods:getUp()
 	return unwrap(self):GetUp()
 end
 
+--- Gets the entities right vector
 function ents_methods:getRight()
 	return unwrap(self):GetRight()
 end
 
+--- Gets the entities forward vector
 function ents_methods:getForward()
 	return unwrap(self):GetForward()
 end
