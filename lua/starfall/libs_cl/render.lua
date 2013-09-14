@@ -179,15 +179,14 @@ function render_library.pushMatrix(m)
 	if not renderdata.isRendering then error("Not in rendering hook.",2) end
 	local id = #matrix_stack
 	if id + 1 > MATRIX_STACK_LIMIT then error("Pushed too many matricies",2) end
-	
 	local newmatrix
 	if matrix_stack[id] then
-		newmatrix = matrix_stack[id] * m
+		newmatrix = matrix_stack[id] * v_unwrap(m)
 	else
-		newmatrix = m
+		newmatrix = v_unwrap(m)
 	end
 	matrix_stack[id+1] = newmatrix
-	cam.PushModelMatrix(v_unwrap(newmatrix))
+	cam.PushModelMatrix(newmatrix)
 end
 
 --- Pops a matrix from the matrix stack.
