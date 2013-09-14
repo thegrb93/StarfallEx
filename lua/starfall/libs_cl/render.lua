@@ -40,7 +40,9 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local matrix_meta = debug.getregistry().VMatrix
+local matrix_meta = SF.VMatrix.Metatable --debug.getregistry().VMatrix
+
+local v_unwrap = SF.VMatrix.Unwrap
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
@@ -185,7 +187,7 @@ function render_library.pushMatrix(m)
 		newmatrix = m
 	end
 	matrix_stack[id+1] = newmatrix
-	cam.PushModelMatrix(newmatrix)
+	cam.PushModelMatrix(v_unwrap(newmatrix))
 end
 
 --- Pops a matrix from the matrix stack.

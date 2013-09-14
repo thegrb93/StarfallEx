@@ -31,7 +31,7 @@ SF.DefaultEnvironment.Angle = Angle
 --- Same as the Gmod VMatrix type
 -- @name SF.DefaultEnvironment.VMatrix
 -- @class function
-SF.DefaultEnvironment.Matrix = Matrix
+--SF.DefaultEnvironment.Matrix = Matrix
 --- Same as Lua's tostring
 -- @name SF.DefaultEnvironment.tostring
 -- @class function
