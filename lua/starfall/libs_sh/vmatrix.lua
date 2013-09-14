@@ -77,9 +77,9 @@ function vmatrix_methods:translate( vec )
 	v:Translate( vec )
 end
 
-function vmatrix_metamethods:__mul( lhs, rhs )
+function vmatrix_metamethods.__mul( lhs, rhs )
 	SF.CheckType( lhs, vmatrix_metamethods )
 	SF.CheckType( rhs, vmatrix_metamethods )
 
-	return unwrap(rhs) * unwrap(rhs)
+	return wrap(unwrap(rhs) * unwrap(rhs))
 end
