@@ -318,7 +318,6 @@ function render_library.drawLine(x1,y1,x2,y2)
 	surface.DrawLine(tonumber(x1) or 0, tonumber(y1) or 0, tonumber(x2) or 0, tonumber(y2) or 0)
 end
 
---[[
 -- Creates a font. Does not require rendering hook
 -- @param font Base font to use
 -- @param size Font size
@@ -331,7 +330,7 @@ end
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	if not validfonts[font] then return nil, "invalid font" end
 	
-	size = tonumber(size) or 12
+	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
 	blur = tonumber(blur) or 0
 	antialias = antialias and true or false
@@ -347,8 +346,9 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 		outline and 1 or 0)
 	
 	if not defined_fonts[name] then
-		surface.CreateFont(font, size, weight, antialias, additive, name,
-			shadow, outline, blur)
+		surface.CreateFont(name, {size = size, weight = weight,
+			antialias=antialias, additive = additive, font = font,
+			shadow = shadow, outline = outline, blur = blue})
 		defined_fonts[name] = true
 	end
 	return name
@@ -367,7 +367,6 @@ function render_library.drawText(font,x,y,text,alignment)
 	
 	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
 end
-]]
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
 function render_library.vertex(x,y,u,v)
