@@ -450,7 +450,7 @@ if SERVER then
 	end
 
 	hook.Add("PlayerDisconnected", "SF_requestcode_cleanup", function(ply)
-		callbacks[ply] = nil
+		uploaddata[ply] = nil
 	end)
 	
 	net.Receive("starfall_upload", function(len, ply)
