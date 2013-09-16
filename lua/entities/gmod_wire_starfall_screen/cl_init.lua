@@ -18,6 +18,7 @@ local dlScreen = nil
 local dlOwner = nil
 local dlMain = nil
 local dlFiles = nil
+local hashes = {}
 
 net.Receive("starfall_screen_download", function(len)
 	if not dlScreen then
@@ -40,6 +41,28 @@ net.Receive("starfall_screen_download", function(len)
 	end
 end)
 
+net.Receive("starfall_screen_update", function(len)
+	local screen = net.ReadEntity()
+	if screen == NULL then return end
+	
+	local dirty = false
+	local finish = net.ReadBit()
+	while not finish do
+		local file = net.ReadString()
+		local hash = net.ReadString()
+		if hashes[file] ~= hash then
+			dirty = true
+			hashes[file] = hash
+		end
+		finish = net.ReadBit()
+	end
+	if dirty then
+		net.Start("starfall_screen_download")
+			net.WriteEntity(screen)
+		net.SendToServer()
+	end
+end)
+
 
 usermessage.Hook( "starfall_screen_used", function ( data )
 	local screen = Entity( data:ReadShort() )
@@ -55,6 +78,9 @@ end)
 
 function ENT:Initialize()
 	self.GPU = GPULib.WireGPU(self)
+	net.Start("starfall_screen_download")
+		net.WriteEntity(self)
+	net.SendToServer()
 end
 
 function ENT:Think()

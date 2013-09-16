@@ -10,6 +10,7 @@ local context = SF.CreateContext()
 local screens = {}
 
 util.AddNetworkString("starfall_screen_download")
+util.AddNetworkString("starfall_screen_update")
 
 local function sendScreenCode(screen, owner, files, mainfile, recipient)
 	--print("Sending SF code")
@@ -45,10 +46,9 @@ local function sendScreenCode(screen, owner, files, mainfile, recipient)
 	--print("Done sending")
 end
 
-hook.Add("PlayerInitialSpawn","sf_screen_download",function(ply)
-	for _,s in pairs(screens) do
-		sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
-	end
+net.Receive("starfall_screen_download", function(len, ply)
+	local screen = net.ReadEntity()
+	sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
 end)
 
 function ENT:Initialize()
@@ -95,7 +95,16 @@ function ENT:CodeSent(ply, files, mainfile)
 	self.files = files
 	self.mainfile = mainfile
 	screens[self] = self
-	sendScreenCode(self, ply, files, mainfile)
+	net.Start("starfall_screen_update")
+		net.WriteEntity(self)
+		for k,v in pairs(files) do
+			net.WriteBit(false)
+			net.WriteString(k)
+			net.WriteString(util.CRC(v))
+		end
+		net.WriteBit(true)
+	net.Broadcast()
+	--sendScreenCode(self, ply, files, mainfile)
 
 	local ppdata = {}
 	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
