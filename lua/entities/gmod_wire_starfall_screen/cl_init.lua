@@ -31,6 +31,8 @@ net.Receive("starfall_screen_download", function(len)
 		if net.ReadBit() ~= 0 then
 			--print("End recieving data")
 			dlScreen:CodeSent(dlFiles, dlMain, dlOwner)
+			dlScreen.files = dlFiles
+			dlScreen.mainfile = dlMain
 			dlScreen, dlFiles, dlMain, dlOwner = nil, nil, nil, nil
 			return
 		end
@@ -44,13 +46,15 @@ end)
 net.Receive("starfall_screen_update", function(len)
 	local screen = net.ReadEntity()
 	if screen == NULL then return end
-	
+
 	local dirty = false
 	local finish = net.ReadBit()
-	while not finish do
+
+	while finish == 0 do
 		local file = net.ReadString()
 		local hash = net.ReadString()
-		if hashes[file] ~= hash then
+
+		if hash ~= hashes[file] then
 			dirty = true
 			hashes[file] = hash
 		end
@@ -60,6 +64,8 @@ net.Receive("starfall_screen_update", function(len)
 		net.Start("starfall_screen_download")
 			net.WriteEntity(screen)
 		net.SendToServer()
+	else
+		screen:CodeSent(screen.files, screen.mainfile, screen.owner)
 	end
 end)
 
@@ -124,6 +130,7 @@ function ENT:Error(msg)
 end
 
 function ENT:CodeSent(files, main, owner)
+	if not files or not main or not owner then return end
 	if self.instance then self.instance:deinitialize() end
 	self.owner = owner
 	local ok, instance = SF.Compiler.Compile(files,context,main,owner,{ent=self,render={}})

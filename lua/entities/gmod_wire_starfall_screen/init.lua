@@ -48,6 +48,7 @@ end
 
 net.Receive("starfall_screen_download", function(len, ply)
 	local screen = net.ReadEntity()
+	if not screen.mainfile then return end
 	sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
 end)
 
@@ -95,6 +96,7 @@ function ENT:CodeSent(ply, files, mainfile)
 	self.files = files
 	self.mainfile = mainfile
 	screens[self] = self
+
 	net.Start("starfall_screen_update")
 		net.WriteEntity(self)
 		for k,v in pairs(files) do
