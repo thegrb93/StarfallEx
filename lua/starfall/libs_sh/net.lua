@@ -7,9 +7,11 @@ local net = net
 --- Net message library. Used for sending data from the server to the client and back
 local net_library, _ = SF.Libraries.Register("net")
 
-local function can_send( instance )
+local function can_send( instance, noupdate )
 	if instance.data.net.lasttime < CurTime() - 1 then
-		instance.data.net.lasttime = CurTime()
+		if not noupdate then
+			instance.data.net.lasttime = CurTime()
+		end
 		return true
 	else
 		return false
@@ -207,6 +209,10 @@ function net_library.bytesWritten()
 	if not instance.data.net.started then error("net message not started",2) end
 
 	return net.BytesWritten()
+end
+
+function net_library.canSend()
+	return can_send(SF.instance, true)
 end
 
 net.Receive( "SF_netmessage", function( len )
