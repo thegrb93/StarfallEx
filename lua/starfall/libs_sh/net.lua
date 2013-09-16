@@ -20,35 +20,35 @@ local function write( instance, type, value, setting )
 	instance.data.net.data[#instance.data.net.data+1] = { "Write" .. type, value, setting }
 end
 
+SF.Libraries.AddHook( "initialize", function( instance )
+	instance.data.net = {
+		started = false,
+		lasttime = 0,
+		data = {},
+	}
+end)
+
+SF.Libraries.AddHook( "deinitialize", function( instance )
+	if instance.data.net.started then
+		instance.data.net.started = false
+	end
+end)
+
 if SERVER then
 	util.AddNetworkString( "SF_netmessage" )
-
-	SF.Libraries.AddHook( "initialize", function( instance )
-		instance.data.net = {
-			started = false,
-			lasttime = 0,
-			data = {},
-		}
-	end)
-	
-	SF.Libraries.AddHook( "deinitialize", function( instance )
-		if instance.data.net.started then
-			instance.data.net.started = false
-		end
-	end)
 	
 	local function checktargets( target )
 		if target then
-			if type(target) == "table" then
+			if SF.GetType(target) == "table" then
 				local newtarget = {}
 				for i=1,#target do
-					SF.CheckType( SF.Unwrap(target[i]), "Player" )
-					newtarget[i] = SF.Unwrap(target[i])
+					SF.CheckType( SF.Entities.Unwrap(target[i]), "Player", 1 )
+					newtarget[i] = SF.Entities.Unwrap(target[i])
 				end
 				return net.Send, newtarget
 			else
-				SF.CheckType( SF.Unwrap(target), "Player" )
-				return net.Send, SF.Unwrap(target)
+				SF.CheckType( SF.Entities.Unwrap(target), "Player", 1 ) -- TODO: unhacky this
+				return net.Send, SF.Entities.Unwrap(target)
 			end
 		else
 			return net.Broadcast
@@ -58,7 +58,7 @@ if SERVER then
 	function net_library.send( target )
 		local instance = SF.instance
 		if not instance.data.net.started then error("net message not started",2) end
-		
+
 		local sendfunc, newtarget = checktargets( target )
 		
 		local data = instance.data.net.data
