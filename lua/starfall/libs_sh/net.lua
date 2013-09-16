@@ -204,7 +204,7 @@ end
 
 function net_library.bytesWritten()
 	local instance = SF.instance
-	if not instance.data.net.started then error("net message not started",2)
+	if not instance.data.net.started then error("net message not started",2) end
 
 	return net.BytesWritten()
 end
