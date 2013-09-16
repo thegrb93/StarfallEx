@@ -118,6 +118,97 @@ function net_library.readTable()
 	return SF.Sanitize(net.ReadTable())
 end
 
+function net_library.writeString( t )
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2) end
+
+	SF.CheckType( t, "string" )
+
+	write( instance, "String", t )
+	return true
+end
+
+function net_library.readString()
+	return net.ReadString()
+end
+
+function net_library.writeInt( t, n )
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2) end
+
+	SF.CheckType( t, "number" )
+
+	write( instance, "Int", t, n )
+	return true
+end
+
+function net_library.readInt(n)
+	return net.ReadInt(n)
+end
+
+function net_library.writeUInt( t, n )
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2) end
+
+	SF.CheckType( t, "number" )
+
+	write( instance, "UInt", t, n )
+	return true
+end
+
+function net_library.readUInt(n)
+	return net.ReadUInt(n)
+end
+
+function net_library.writeBit( t )
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2) end
+
+	SF.CheckType( t, "boolean" )
+
+	write( instance, "Bit", t )
+	return true
+end
+
+function net_library.readBit()
+	return net.ReadBit()
+end
+
+function net_library.writeDouble( t )
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2) end
+
+	SF.CheckType( t, "number" )
+
+	write( instance, "Double", t )
+	return true
+end
+
+function net_library.readDouble()
+	return net.ReadDouble()
+end
+
+function net_library.writeFloat( t )
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2) end
+
+	SF.CheckType( t, "number" )
+
+	write( instance, "Float", t )
+	return true
+end
+
+function net_library.readFloat()
+	return net.ReadFloat()
+end
+
+function net_library.bytesWritten()
+	local instance = SF.instance
+	if not instance.data.net.started then error("net message not started",2)
+
+	return net.BytesWritten()
+end
+
 net.Receive( "SF_netmessage", function( len )
 	SF.RunScriptHook( "net", net.ReadString(), len )
 end)
