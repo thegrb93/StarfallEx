@@ -150,7 +150,7 @@ function poly_metamethods:__index(k)
 	local poly = unwrappoly(self)
 	if not poly then return nil end
 	if k <= 0 or k > #poly then return nil end
-	return table.Copy(poly[i])
+	return table.Copy(poly[k])
 end
 
 function poly_metamethods:__len()
