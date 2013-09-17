@@ -219,6 +219,6 @@ function net_library.canSend()
 	return can_send(SF.instance, true)
 end
 
-net.Receive( "SF_netmessage", function( len )
-	SF.RunScriptHook( "net", net.ReadString(), len )
+net.Receive( "SF_netmessage", function( len, ply )
+	SF.RunScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
 end)
