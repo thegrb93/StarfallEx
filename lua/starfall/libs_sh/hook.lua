@@ -108,15 +108,17 @@ local wrapArguments = SF.Sanitize
 
 local function run( hookname, customfunc, ... )
 	for instance,_ in pairs( registered_instances ) do
-		if instance.hooks[hookname] then
-			for name, func in pairs( instance.hooks[hookname] ) do
-				local ok, ret = instance:runFunctionT( func, ... )
-				if ok and customfunc then
-					local a,b,c,d,e,f,g,h = customfunc( instance, ret )
-					if a ~= nil then
-						return a,b,c,d,e,f,g,h
-					end
-				end
+		local ret = {instance:runScriptHookForResult( hookname, ... )}
+		
+		local ok = table.remove( ret, 1 )
+		if not ok then
+			if IsValid(instance.data.entity) then
+				instance.data.entity:Error( "Hook '" .. hookname .. "' errored with " .. ret[1], ret[2] )
+			end
+		elseif customfunc then
+			local a,b,c,d,e,f,g,h = customfunc( instance, ret )
+			if a ~= nil then
+				return a,b,c,d,e,f,g,h
 			end
 		end
 	end
@@ -136,11 +138,23 @@ function SF.hookAdd( hookname, customfunc )
 	end)
 end
 
+local hooklist = {}
+local function buildHookList()
+	for i=1,#hooks do
+		hooklist[i] = hooks[i]:lower()
+	end
+	hooklist[#hooklist+1] = "think"
+	hooklist[#hooklist+1] = "starfall_use"
+	if CLIENT then
+		hooklist[#hooklist+1] = "render"
+	end
+end
+		
 
 --- Gets a list of all available hooks
 -- @shared
 function hook_library.getList()
-	return setmetatable({},{__metatable = "table", __index = hooks, __newindex = function() end})
+	return setmetatable({},{__metatable = "table", __index = hooklist, __newindex = function() end})
 end
 
 local add = SF.hookAdd
@@ -184,3 +198,5 @@ add( "EntityRemoved" )
 -- Other
 add( "EndEntityDriving" )
 add( "StartEntityDriving" )
+
+buildHookList()

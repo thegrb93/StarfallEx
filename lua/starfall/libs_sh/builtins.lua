@@ -136,7 +136,7 @@ SF.DefaultEnvironment.hook = SF.Libraries.Get("hook")
 local string_methods, string_metatable = SF.Typedef("Library: string")
 filterGmodLua(string,string_methods)
 string_metatable.__newindex = function() end
-string_metatable.explode = function(str,separator,withpattern) return string.Explode(separator,str,withpattern) end
+string_methods.explode = function(str,separator,withpattern) return string.Explode(separator,str,withpattern) end
 --- Lua's (not glua's) string library
 -- @name SF.DefaultEnvironment.string
 -- @class table
