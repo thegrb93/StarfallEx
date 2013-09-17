@@ -139,12 +139,14 @@ function net_library.writeInt( t, n )
 	if not instance.data.net.started then error("net message not started",2) end
 
 	SF.CheckType( t, "number" )
+	SF.CheckType( n, "number" )
 
 	write( instance, "Int", t, n )
 	return true
 end
 
 function net_library.readInt(n)
+	SF.CheckType( n, "number" )
 	return net.ReadInt(n)
 end
 
@@ -153,12 +155,14 @@ function net_library.writeUInt( t, n )
 	if not instance.data.net.started then error("net message not started",2) end
 
 	SF.CheckType( t, "number" )
+	SF.CheckType( n, "number" )
 
 	write( instance, "UInt", t, n )
 	return true
 end
 
 function net_library.readUInt(n)
+	SF.CheckType( n, "number" )
 	return net.ReadUInt(n)
 end
 
