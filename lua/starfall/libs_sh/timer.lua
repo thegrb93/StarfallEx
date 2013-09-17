@@ -123,10 +123,12 @@ function timer_library.simple(delay, func)
 	
 	local instance = SF.instance
 	timer.Simple(delay, function()
-		if not instance.error then
-			instance:runFunction(func)
-		elseif instance.runOnError then
-			instance:runOnError( "timer error" )
+		if instance.data.entity ~= NULL then
+			if not instance.error then
+				instance:runFunction(func)
+			elseif instance.runOnError then
+				instance:runOnError( "timer error" )
+			end
 		end
 	end)
 end
