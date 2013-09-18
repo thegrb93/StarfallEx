@@ -286,6 +286,25 @@ if CLIENT then
 		if SF.Editor.editor then return end
 		
 		SF.Editor.editor = vgui.Create("Expression2EditorFrame")
+
+		-- Change default event registration so we can have custom animations for starfall
+		function SF.Editor.editor:SetV(bool)
+			local wire_expression2_editor_worldclicker = GetConVar("wire_expression2_editor_worldclicker")
+
+			if bool then
+				self:MakePopup()
+				self:InvalidateLayout(true)
+				if self.E2 then self:Validate() end
+			end
+			self:SetVisible(bool)
+			self:SetKeyBoardInputEnabled(bool)
+			self:GetParent():SetWorldClicker(wire_expression2_editor_worldclicker:GetBool() and bool) -- Enable this on the background so we can update E2's without closing the editor
+			if CanRunConsoleCommand() then
+				RunConsoleCommand("starfall_event", bool and "editor_open" or "editor_close")
+			end
+		end
+
+
 		SF.Editor.editor:Setup("SF Editor", "starfall", "nothing") -- Setting the editor type to not nil keeps the validator line
 		
 		if not file.Exists("starfall", "DATA") then
@@ -417,5 +436,88 @@ if CLIENT then
 			error(msg,0)
 		end
 	end
+
+
+	-- CLIENT ANIMATION
+
+	local busy_players = {}
+	hook.Add("EntityRemoved", "starfall_busy_animation", function(ply)
+		busy_players[ply] = nil
+	end)
+
+	local emitter = ParticleEmitter(vector_origin)
+
+	net.Receive("starfall_editor_status", function(len)
+		local ply = net.ReadEntity()
+		local status = net.ReadBit() ~= 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
+		if not ply:IsValid() or ply == LocalPlayer() then return end
+
+		busy_players[ply] = status or nil
+	end)
+
+	local rolldelta = math.rad(80)
+	timer.Create("starfall_editor_status", 1/3, 0, function()
+		rolldelta = -rolldelta
+		for ply, _ in pairs(busy_players) do
+			local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1") or ply:LookupBone("ValveBiped.HC_Head_Bone") or 0
+			local BonePos, BoneAng = ply:GetBonePosition(BoneIndx)
+			local particle = emitter:Add("radon/starfall2", BonePos + Vector(math.random(-10,10), math.random(-10,10), 60+math.random(0,10)))
+			if particle then
+				particle:SetColor(math.random(30,50),math.random(40,150),math.random(180,220) )
+				particle:SetVelocity(Vector(0, 0, -40))
+
+				particle:SetDieTime(1.5)
+				particle:SetLifeTime(0)
+
+				particle:SetStartSize(10)
+				particle:SetEndSize(5)
+
+				particle:SetStartAlpha(255)
+				particle:SetEndAlpha(0)
+
+				particle:SetRollDelta(rolldelta)
+			end
+		end
+	end)
+
 else
+
+	-- SERVER STUFF HERE
+	-- -------------- client-side event handling ------------------
+	-- this might fit better elsewhere
+
+	util.AddNetworkString("starfall_editor_status")
+
+	resource.AddFile( "materials/radon/starfall2.png" )
+	resource.AddFile( "materials/radon/starfall2.vmt" )
+	resource.AddFile( "materials/radon/starfall2.vtf" )
+
+	local starfall_event = {}
+
+
+	concommand.Add("starfall_event", function(ply, command, args)
+		local handler = starfall_event[args[1]]
+		if not handler then return end
+		return handler(ply, args)
+	end)
+
+
+	-- actual editor open/close handlers
+
+
+	function starfall_event.editor_open(ply, args)
+		net.Start("starfall_editor_status")
+		net.WriteEntity(ply)
+		net.WriteBit(true)
+		net.Broadcast()
+	end
+
+
+	function starfall_event.editor_close(ply, args)
+		net.Start("starfall_editor_status")
+		net.WriteEntity(ply)
+		net.WriteBit(false)
+		net.Broadcast()
+	end
+
 end
