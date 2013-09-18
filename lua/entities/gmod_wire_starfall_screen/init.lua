@@ -13,17 +13,17 @@ util.AddNetworkString("starfall_screen_download")
 util.AddNetworkString("starfall_screen_update")
 
 local function sendScreenCode(screen, owner, files, mainfile, recipient)
-	print("Sending SF code")
+	--print("Sending SF code for: " .. tostring(recipient))
 	net.Start("starfall_screen_download")
 	net.WriteEntity(screen)
 	net.WriteEntity(owner)
 	net.WriteString(mainfile)
 	if recipient then net.Send(recipient) else net.Broadcast() end
-	print("\tHeader sent")
+	--print("\tHeader sent")
 
 	local fname = next(files)
 	while fname do
-		print("\tSending data for:", fname)
+		--print("\tSending data for:", fname)
 		local fdata = files[fname]
 		local offset = 1
 		repeat
@@ -43,36 +43,42 @@ local function sendScreenCode(screen, owner, files, mainfile, recipient)
 	net.Start("starfall_screen_download")
 	net.WriteBit(true)
 	if recipient then net.Send(recipient) else net.Broadcast() end
-	print("Done sending")
-	print(files[mainfile])
+	--print("Done sending")
 end
 
 local requests = {}
 
-local function sendCodeRequest(ply, screen)
+local function sendCodeRequest(ply, screenid)
+	local screen = Entity(screenid)
 	if not IsValid(screen) then debug.Trace() end
 
-	if not screen.mainfile and not requests[screen] then
-		requests[screen] = {player = ply, tries = 0 }
+	if not screen.mainfile then
+		if not requests[screenid] then requests[screenid] = {} end
+		if requests[screenid][player] then return end
+		requests[screenid][ply] = true
 		return
 
 		--[[if timer.Exists("starfall_send_code_request") then return end
 		timer.Create("starfall_send_code_request", .5, 1, retryCodeRequests) ]]
 	elseif screen.mainfile then
-		requests[screen] = nil
+		if requests[screenid] then
+			requests[screenid][ply] = nil
+		end
 		sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
 	end
 end
 
 local function retryCodeRequests()
-	for k,v in pairs(requests) do
-		sendCodeRequest(v.player, k)
+	for screenid,plys in pairs(requests) do
+		for ply,_ in pairs(requests[screenid]) do
+			sendCodeRequest(ply, screenid)
+		end
 	end
 end
 
 net.Receive("starfall_screen_download", function(len, ply)
 	local screen = net.ReadEntity()
-	sendCodeRequest(ply, screen)
+	sendCodeRequest(ply, screen:EntIndex())
 end)
 
 function ENT:Initialize()
@@ -169,9 +175,8 @@ function ENT:Think()
 
 	i = i + 1
 
-	if i % 66 == 0 then
+	if i % 22 == 0 then
 		retryCodeRequests()
-		PrintTable(requests)
 		i = 0
 	end
 
