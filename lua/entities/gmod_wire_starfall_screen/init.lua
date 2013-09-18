@@ -46,10 +46,33 @@ local function sendScreenCode(screen, owner, files, mainfile, recipient)
 	--print("Done sending")
 end
 
+local requests = {}
+
+local function retryCodeRequests()
+	for k,v in pairs(requests) do
+		sendCodeRequest(v.player, k)
+
+		v.tries = v.tries + 1
+		if v.tries >= 3 then
+			requests[k] = nil
+		end
+	end
+end
+
+local function sendCodeRequest(ply, screen)
+	if not screen.mainfile then
+		requests[screen] = {player = ply, tries = 0}
+
+		if timer.Exists("starfall_send_code_request") then return end
+		timer.Create("starfall_send_code_request", .5, 1, retryCodeRequests)
+	end
+	requests[screen] = nil
+	sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
+end
+
 net.Receive("starfall_screen_download", function(len, ply)
 	local screen = net.ReadEntity()
-	if not screen.mainfile then return end
-	sendScreenCode(screen, screen.owner, screen.files, screen.mainfile, ply)
+	sendCodeRequest(ply, screen)
 end)
 
 function ENT:Initialize()
@@ -93,20 +116,24 @@ end
 
 function ENT:CodeSent(ply, files, mainfile)
 	if ply ~= self.owner then return end
+	local update = self.mainfile ~= nil
+
 	self.files = files
 	self.mainfile = mainfile
 	screens[self] = self
 
-	net.Start("starfall_screen_update")
-		net.WriteEntity(self)
-		for k,v in pairs(files) do
-			net.WriteBit(false)
-			net.WriteString(k)
-			net.WriteString(util.CRC(v))
-		end
-		net.WriteBit(true)
-	net.Broadcast()
-	--sendScreenCode(self, ply, files, mainfile)
+	if update then
+		net.Start("starfall_screen_update")
+			net.WriteEntity(self)
+			for k,v in pairs(files) do
+				net.WriteBit(false)
+				net.WriteString(k)
+				net.WriteString(util.CRC(v))
+			end
+			net.WriteBit(true)
+		net.Broadcast()
+		--sendScreenCode(self, ply, files, mainfile)
+	end
 
 	local ppdata = {}
 	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
