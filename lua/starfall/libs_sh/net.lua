@@ -8,10 +8,8 @@ local net = net
 local net_library, _ = SF.Libraries.Register("net")
 
 local function can_send( instance, noupdate )
-	if instance.data.net.lasttime < CurTime() - 1 then
-		if not noupdate then
-			instance.data.net.lasttime = CurTime()
-		end
+	if instance.data.net.burst > 0 then
+		if not noupdate then instance.data.net.burst = instance.data.net.burst - 1 end
 		return true
 	else
 		return false
@@ -22,17 +20,30 @@ local function write( instance, type, value, setting )
 	instance.data.net.data[#instance.data.net.data+1] = { "Write" .. type, value, setting }
 end
 
+local instances = {}
 SF.Libraries.AddHook( "initialize", function( instance )
 	instance.data.net = {
 		started = false,
-		lasttime = 0,
+		burst = 10,
 		data = {},
 	}
+	
+	instances[instance] = true
 end)
 
 SF.Libraries.AddHook( "deinitialize", function( instance )
 	if instance.data.net.started then
 		instance.data.net.started = false
+	end
+	
+	instances[instance] = nil
+end)
+
+timer.Create( "SF_Net_BurstCounter", 0.5, 0, function()
+	for instance, b in pairs( instances ) do
+		if instance.data.net.burst < 10 then
+			instance.data.net.burst = instance.data.net.burst + 1
+		end
 	end
 end)
 
