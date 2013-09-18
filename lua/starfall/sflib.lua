@@ -64,8 +64,6 @@ SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR
 	"The default number of Lua instructions to allow Starfall scripts to execute")
 
 local dgetmeta = debug.getmetatable
-local object_wrappers = {}
-local object_unwrappers = {}
 
 --- Creates a type that is safe for SF scripts to use. Instances of the type
 -- cannot access the type's metatable or metamethods.
@@ -93,6 +91,10 @@ function SF.Typedef(name, supermeta)
 
 	SF.Types[name] = metamethods
 	return methods, metamethods
+end
+
+function SF.GetTypeDef( name )
+	return SF.Types[name]
 end
 
 -- Include this file after Typedef as this file relies on it.
@@ -179,6 +181,8 @@ end
 
 -- ------------------------------------------------------------------------- --
 
+local object_wrappers = {}
+
 --- Creates wrap/unwrap functions for sensitive values, by using a lookup table
 -- (which is set to have weak keys and values)
 -- @param metatable The metatable to assign the wrapped value.
@@ -220,12 +224,20 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 	end
 	
 	if nil ~= target_metatable then
-		object_wrappers[target_metatable] = wrap
+		object_wrappers[metatable] = wrap
+		metatable.__wrap = wrap
 	end
 	
-	object_unwrappers[metatable] = unwrap
+	metatable.__unwrap = unwrap
 	
 	return wrap, unwrap
+end
+
+--- Adds an additional wrapper for an object
+-- @param object_meta metatable of object
+-- @param wrapper function that wraps object
+function SF.AddObjectWrapper( object_meta, wrapper )
+	object_wrappers[object_meta] = wrapper
 end
 
 --- Wraps the given object so that it is safe to pass into starfall
@@ -248,8 +260,9 @@ end
 function SF.UnwrapObject( object )
 	local metatable = dgetmeta(object)
 	
-	local unwrap = object_unwrappers[metatable]
-	return unwrap and unwrap(object)
+	if metatable and metatable.__unwrap then
+		return metatable.__unwrap( object )
+	end
 end
 
 local wrappedfunctions = setmetatable({},{__mode="kv"})
@@ -306,9 +319,7 @@ function SF.Sanitize( ... )
 		local typ = type( value )
 		if safe_types[ typ ] then
 			return_list[key] = value
-		elseif typ == "Entity" or typ == "Player" or typ == "NPC" then
-			return_list[key] = SF.Entities.Wrap(value)
-		elseif typ == "table" and object_unwrappers[dgetmeta(value)] then
+		elseif (typ == "table" or typ == "Entity" or typ == "Player" or typ == "NPC") and SF.WrapObject(value) then
 			return_list[key] = SF.WrapObject(value)
 		elseif typ == "table" then
 			local tbl = {}
@@ -333,8 +344,8 @@ function SF.Unsanitize( ... )
 	
 	for key, value in pairs( args ) do
 		local typ = type(value)
-		if (typ == "table" and object_unwrappers[dgetmeta(value)]) then
-			return_list[key] = SF.UnwrapObject(value) or value
+		if typ == "table" and SF.UnwrapObject(value) then
+			return_list[key] = SF.UnwrapObject(value)
 		elseif typ == "table" then
 			return_list[key] = {}
 

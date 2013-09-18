@@ -8,16 +8,18 @@ local player_methods, player_metamethods = SF.Typedef("Player", SF.Entities.Meta
 SF.Players.Methods = player_methods
 SF.Players.Metatable = player_metamethods
 
--- Overload entity wrap functions to handle players
+-- wrapper/unwrapper
 local dsetmeta = debug.setmetatable
-local old_ent_wrap = SF.Entities.Wrap
-function SF.Entities.Wrap(obj)
-	local w = old_ent_wrap(obj)
-	if type(obj) == "Player" then
-		dsetmeta(w, player_metamethods)
-	end
-	return w
+
+function player_metamethods.__wrap( object )
+	object = SF.Entities.Wrap( object )
+	dsetmeta( object, player_metamethods )
+	return object
 end
+
+SF.AddObjectWrapper( debug.getregistry().Player, player_metamethods.__wrap )
+
+player_metamethods.__unwrap = SF.Entities.Unwrap
 
 --- To string
 -- @shared

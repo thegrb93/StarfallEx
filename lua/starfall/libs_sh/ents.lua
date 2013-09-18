@@ -19,7 +19,6 @@ SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 SF.Entities.Library = ents_lib
 
-
 --- Returns true if valid and is not the world, false if not
 -- @param entity Entity to check
 function SF.Entities.IsValid(entity)
@@ -47,7 +46,7 @@ end
 
 --- Returns whoever created the script
 function ents_lib.owner()
-	return SF.Entities.Wrap(SF.instance.player)
+	return SF.WrapObject(SF.instance.player)
 end
 
 --- Same as ents_lib.owner() on the server. On the client, returns the local player
@@ -58,8 +57,18 @@ if SERVER then
 	ents_lib.player = ents_lib.owner
 else
 	function ents_lib.player()
-		return SF.Entities.Wrap(LocalPlayer())
+		return SF.WrapObject(LocalPlayer())
 	end
+end
+
+--- Returns the entity with index 'num'
+-- @name ents_lib.entity
+-- @class function
+-- @return entity
+function ents_lib.entity( num )
+	SF.CheckType( num, "number" )
+	
+	return SF.WrapObject(Entity(num))
 end
 
 -- ------------------------- Methods ------------------------- --
