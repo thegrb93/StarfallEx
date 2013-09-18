@@ -276,10 +276,9 @@ if CLIENT then
 	local code1 = "--@name \n--@author \n\n"
 	local code2 = "--[[\n" .. [[    Starfall Scripting Environment
 
-    More info: http://colonelthirtytwo.net/index.php/starfall/
-    Reference Page: http://colonelthirtytwo.net/sfdoc/
+    More info: http://gmodstarfall.github.io/Starfall/
+    Reference Page: http://sf.inp.io
     Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
-    Blog: http://blog.colonelthirtytwo.net/
 ]] .. "]]"
 
 	--- (Client) Intializes the editor, if not initialized already

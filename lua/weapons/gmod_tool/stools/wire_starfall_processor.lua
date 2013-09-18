@@ -138,7 +138,7 @@ if CLIENT then
 	local lastclick = CurTime()
 	
 	local function GotoDocs(button)
-		gui.OpenURL("http://colonelthirtytwo.net/sfdoc/")
+		gui.OpenURL("http://sf.inp.io") -- old one: http://colonelthirtytwo.net/sfdoc/
 	end
 	
 	function TOOL.BuildCPanel(panel)
