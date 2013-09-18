@@ -24,7 +24,7 @@ end
 
 local function convert(results, func)
 	if func then SF.CheckType(func,"function",1) end
-	local wrap = SF.Entities.Wrap
+	local wrap = SF.WrapObject
 	
 	local t = {}
 	local count = 1
