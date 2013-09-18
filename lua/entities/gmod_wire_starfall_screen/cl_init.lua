@@ -45,7 +45,7 @@ end)
 
 net.Receive("starfall_screen_update", function(len)
 	local screen = net.ReadEntity()
-	if screen == NULL then return end
+	if not IsValid(screen) then return end
 
 	local dirty = false
 	local finish = net.ReadBit()
