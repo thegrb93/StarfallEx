@@ -138,14 +138,14 @@ function ENT:CodeSent(ply, files, mainfile)
 	local ppdata = {}
 	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
 	
-	if ppdata.sharedscreen then 
+	if ppdata.sharedscreen then		
 		local ok, instance = SF.Compiler.Compile(files,context,mainfile,ply)
 		if not ok then self:Error(instance) return end
 
-		--[[if self.instance then
+		if self.instance then
 			self.instance:deinitialize()
 			self.instance = nil
-		end ]]
+		end
 
 		self.instance = instance
 		instance.data.entity = self
