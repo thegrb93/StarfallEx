@@ -96,7 +96,7 @@ SF.DefaultEnvironment.getmetatable = function(tbl)
 	return getmetatable(tbl)
 end
 --- Throws an error. Can't change the level yet.
-SF.DefaultEnvironment.error = function(msg) error(msg,2) end
+SF.DefaultEnvironment.error = function(msg) error(msg or "",2) end
 
 SF.DefaultEnvironment.CLIENT = CLIENT
 SF.DefaultEnvironment.SERVER = SERVER
