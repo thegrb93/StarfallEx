@@ -183,15 +183,26 @@ SF.DefaultEnvironment.table = setmetatable({},table_metatable)
 -- ------------------------- Functions ------------------------- --
 
 --- Loads a library.
-function SF.DefaultEnvironment.loadLibrary(name)
-	SF.CheckType(name,"string")
+-- @name SF.DefaultEnvironment.loadLibrary
+-- @class function
+-- @param ... A list of strings representing libraries eg "hook", "ent", "render"
+function SF.DefaultEnvironment.loadLibrary(...)
+	local t = {...}
+	local r = {}
+
 	local instance = SF.instance
-	
-	if instance.context.libs[name] then
-		return setmetatable({},instance.context.libs[name])
-	else
-		return SF.Libraries.Get(name)
+
+	for _,v in pairs(t) do
+		SF.CheckType(v,"string")
+
+		if instance.context.libs[v] then
+			r[#r+1] = setmetatable({}, instance.context.libs[v])
+		else
+			r[#r+1] = SF.Libraries.Get(v)
+		end
 	end
+
+	return unpack(r)
 end
 
 --- Gets a list of all libraries
