@@ -68,6 +68,10 @@ if SERVER then
 		end
 	end
 	
+	--- Send the net message
+	-- @server
+	-- @param target The player to send the message to or nil for broadcast
+
 	function net_library.send( target )
 		local instance = SF.instance
 		if not instance.data.net.started then error("net message not started",2) end
@@ -88,6 +92,8 @@ if SERVER then
 		sendfunc( newtarget )
 	end
 else
+	--- Send the net message to the server
+	-- @client
 	function net_library.send()
 		local instance = SF.instance
 		if not instance.data.net.started then error("net message not started",2) end
@@ -107,6 +113,9 @@ else
 	end
 end
 
+--- Starts the net message
+-- @shared
+-- @param name The message name
 function net_library.start( name )
 	SF.CheckType( name, "string" )
 	local instance = SF.instance
@@ -116,6 +125,10 @@ function net_library.start( name )
 	instance.data.net.data = {}
 	write( instance, "String", name )
 end
+
+--- Writes a table to the net message
+-- @shared
+-- @param table The table to be written
 
 function net_library.writeTable( t )
 	local instance = SF.instance
@@ -127,9 +140,17 @@ function net_library.writeTable( t )
 	return true
 end
 
+--- Reads a table from the net message
+-- @shared
+-- @return The table that was read
+
 function net_library.readTable()
 	return SF.Sanitize(net.ReadTable())
 end
+
+--- Writes a string to the net message
+-- @shared
+-- @param string The string to be written
 
 function net_library.writeString( t )
 	local instance = SF.instance
@@ -141,9 +162,18 @@ function net_library.writeString( t )
 	return true
 end
 
+--- Reads a string from the net message
+-- @shared
+-- @return The string that was read
+
 function net_library.readString()
 	return net.ReadString()
 end
+
+--- Writes an integer to the net message
+-- @shared
+-- @param integer The integer to be written
+-- @param bitCount The amount of bits the integer consists of
 
 function net_library.writeInt( t, n )
 	local instance = SF.instance
@@ -156,10 +186,20 @@ function net_library.writeInt( t, n )
 	return true
 end
 
+--- Reads an integer from the net message
+-- @shared
+-- @param bitCount The amount of bits to read
+-- @return The integer that was read
+
 function net_library.readInt(n)
 	SF.CheckType( n, "number" )
 	return net.ReadInt(n)
 end
+
+--- Writes an unsigned integer to the net message
+-- @shared
+-- @param integer The integer to be written
+-- @param bitCount The amount of bits the integer consists of. Should not be greater than 32
 
 function net_library.writeUInt( t, n )
 	local instance = SF.instance
@@ -172,10 +212,19 @@ function net_library.writeUInt( t, n )
 	return true
 end
 
+--- Reads an unsigned integer from the net message
+-- @shared
+-- @param bitCount The amount of bits to read
+-- @return The unsigned integer that was read
+
 function net_library.readUInt(n)
 	SF.CheckType( n, "number" )
 	return net.ReadUInt(n)
 end
+
+--- Writes a bit to the net message
+-- @shared
+-- @param bit The bit to be written. (boolean)
 
 function net_library.writeBit( t )
 	local instance = SF.instance
@@ -187,9 +236,17 @@ function net_library.writeBit( t )
 	return true
 end
 
+--- Reads a bit from the net message
+-- @shared
+-- @return The bit that was read. (0 for false, 1 for true)
+
 function net_library.readBit()
 	return net.ReadBit()
 end
+
+--- Writes a double to the net message
+-- @shared
+-- @param double The double to be written
 
 function net_library.writeDouble( t )
 	local instance = SF.instance
@@ -201,9 +258,17 @@ function net_library.writeDouble( t )
 	return true
 end
 
+--- Reads a double from the net message
+-- @shared
+-- @return The double that was read
+
 function net_library.readDouble()
 	return net.ReadDouble()
 end
+
+--- Writes a float to the net message
+-- @shared
+-- @param double The float to be written
 
 function net_library.writeFloat( t )
 	local instance = SF.instance
@@ -215,9 +280,16 @@ function net_library.writeFloat( t )
 	return true
 end
 
+--- Reads a float from the net message
+-- @shared
+-- @return The float that was read
+
 function net_library.readFloat()
 	return net.ReadFloat()
 end
+
+--- Gets the amount of bytes written so far
+-- @return The amount of bytes written so far
 
 function net_library.bytesWritten()
 	local instance = SF.instance
@@ -225,6 +297,9 @@ function net_library.bytesWritten()
 
 	return net.BytesWritten()
 end
+
+--- Checks whether you can currently send a net message
+-- @return A boolean that states whether or not you can currently send a net message
 
 function net_library.canSend()
 	return can_send(SF.instance, true)
