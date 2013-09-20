@@ -81,31 +81,7 @@ SF.Libraries.AddHook("cleanup",function(instance,name,func,err)
 	end
 end)
 
---[[
-local blocked_types = {
-	PhysObj = true,
-	NPC = true,
-}
-local function wrap( value )
-	if type(value) == "table" then
-		return setmetatable( {}, {__metatable = "table", __index = value, __newindex = function() end} )
-	elseif blocked_types[type(value)] then
-		return nil
-	else
-		return SF.WrapObject( value ) or value
-	end
-end
-
--- Helper function for hookAdd
-local function wrapArguments( ... )
-	local t = {...}
-	return wrap(t[1]), wrap(t[2]), wrap(t[3]), wrap(t[4]), wrap(t[5]), wrap(t[6])
-end
-]]
-
 local wrapArguments = SF.Sanitize
-
---local run = SF.RunScriptHook
 
 local function run( hookname, customfunc, ... )
 	for instance,_ in pairs( registered_instances ) do
@@ -140,7 +116,6 @@ function SF.hookAdd( hookname, customfunc )
 end
 
 local add = SF.hookAdd
-
 
 if SERVER then
 	-- Server hooks
