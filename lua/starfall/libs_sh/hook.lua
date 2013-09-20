@@ -33,17 +33,17 @@ function hook_library.run(hookname, ...)
 	
 	local instance = SF.instance
 	local lower = hookname:lower()
-	if instance.hooks[lower] then
-		for k,v in pairs( instance.hooks[lower] ) do
-			local ok, tbl, traceback = instance:runWithOps(v, ...)--instance:runFunction( v )
-			if not ok and instance.runOnError then
-				instance.runOnError( tbl[1] )
-				hook_library.remove( hookname, k )
-			elseif next(tbl) ~= nil then
-				return unpack( tbl )
-			end
-		end		
+	
+	SF.instance = nil -- Pretend we're not running an instance
+	local ret = {instance:runScriptHookForResult( lower, ... )}
+	SF.instance = instance -- Set it back
+	
+	local ok = table.remove( ret, 1 )
+	if not ok then
+		instance.data.entity:Error( "Hook '" .. lower .. "' errored with " .. ret[1], ret[2] )
 	end
+	
+	return unpack(ret)
 end
 
 --- Remove a hook
