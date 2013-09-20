@@ -145,6 +145,8 @@ function ENT:CodeSent(files, main, owner)
 	local ok, msg = instance:initialize()
 	if not ok then self:Error(msg) end
 	
+	if not self.instance then return end
+	
 	local data = instance.data
 	
 	function self.renderfunc()

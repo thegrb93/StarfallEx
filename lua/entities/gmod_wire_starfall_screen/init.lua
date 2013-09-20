@@ -164,6 +164,8 @@ function ENT:CodeSent(ply, files, mainfile)
 			return
 		end
 		
+		if not self.instance then return end
+		
 		self:UpdateName("")
 		local r,g,b,a = self:GetColor()
 		self:SetColor(Color(255, 255, 255, a))

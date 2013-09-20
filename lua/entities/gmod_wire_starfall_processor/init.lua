@@ -48,6 +48,8 @@ function ENT:Compile(codetbl, mainfile)
 		self:Error(msg)
 		return
 	end
+	
+	if not self.instance then return end
 
 	self.name = nil
 
