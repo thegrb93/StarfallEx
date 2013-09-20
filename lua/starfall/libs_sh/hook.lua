@@ -139,25 +139,6 @@ function SF.hookAdd( hookname, customfunc )
 	end)
 end
 
-local hooklist = {}
-local function buildHookList()
-	for i=1,#hooks do
-		hooklist[i] = hooks[i]:lower()
-	end
-	hooklist[#hooklist+1] = "think"
-	hooklist[#hooklist+1] = "starfall_use"
-	if CLIENT then
-		hooklist[#hooklist+1] = "render"
-	end
-end
-		
-
---- Gets a list of all available hooks
--- @shared
-function hook_library.getList()
-	return setmetatable({},{__metatable = "table", __index = hooklist, __newindex = function() end})
-end
-
 local add = SF.hookAdd
 
 
@@ -199,5 +180,3 @@ add( "EntityRemoved" )
 -- Other
 add( "EndEntityDriving" )
 add( "StartEntityDriving" )
-
-buildHookList()
