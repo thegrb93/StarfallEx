@@ -244,8 +244,7 @@ end
 -- @param h Height
 function render_library.drawRect(x,y,w,h)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawRect(tonumber(x) or 0, tonumber(y) or 0,
-		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
+	surface.DrawRect(x,y,w,h)
 end
 
 --- Draws a rectangle outline using the current color.
@@ -255,8 +254,7 @@ end
 -- @param h Height
 function render_library.drawRectOutline(x,y,w,h)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawOutlinedRect(tonumber(x) or 0, tonumber(y) or 0,
-		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
+	surface.DrawOutlinedRect(x,y,w,h)
 end
 
 --- Draws a circle outline
@@ -265,8 +263,7 @@ end
 -- @param r Radius
 function render_library.drawCircle(x,y,r)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawCircle(tonumber(x) or 0, tonumber(y) or 0, max(tonumber(r) or 1, 0),
-		currentcolor)
+	surface.DrawCircle(x,y,r,currentcolor)
 end
 
 --- Draws a textured rectangle.
@@ -276,9 +273,7 @@ end
 -- @param h Height
 function render_library.drawTexturedRect(x,y,w,h)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	
-	surface.DrawTexturedRect(tonumber(x) or 0, tonumber(y) or 0,
-		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0))
+	surface.DrawTexturedRect(x,y,w,h)
 end
 
 --- Draws a textured rectangle with UV coordinates
@@ -290,9 +285,7 @@ end
 -- @param th Texture height
 function render_library.drawTexturedRectUV(x,y,w,h,tw,th)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawTexturedRectUV(tonumber(x) or 0, tonumber(y) or 0,
-		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
-		max(tonumber(tw) or 0, 0), max(tonumber(th) or 0, 0))
+	surface.DrawTexturedRectUV(x,y,w,h,tw,th)
 end
 
 --- Draws a rotated, textured rectangle.
@@ -303,9 +296,7 @@ end
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotated(x,y,w,h,rot)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawTexturedRectRotated(tonumber(x) or 0, tonumber(y) or 0,
-		max(tonumber(w) or 0, 0), max(tonumber(h) or 0, 0),
-		tonumber(rot) or 0)
+	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
 
 --- Draws a line
@@ -315,7 +306,7 @@ end
 -- @param y2 Y end coordinate
 function render_library.drawLine(x1,y1,x2,y2)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawLine(tonumber(x1) or 0, tonumber(y1) or 0, tonumber(x2) or 0, tonumber(y2) or 0)
+	surface.DrawLine(x1,y1,x2,y2)
 end
 
 -- Creates a font. Does not require rendering hook
@@ -328,7 +319,7 @@ end
 -- @param outline Enable outline?
 -- @param A table representing the font (doesn't contain anything)
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
-	if not validfonts[font] then return nil, "invalid font" end
+	if not validfonts[font] then error( "invalid font" ) end
 	
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
