@@ -281,11 +281,13 @@ end
 -- @param y Y coordinate
 -- @param w Width
 -- @param h Height
--- @param tw Texture width
--- @param th Texture height
-function render_library.drawTexturedRectUV(x,y,w,h,tw,th)
+-- @param startU Texture mapping at rectangle origin
+-- @param startV Texture mapping at rectangle origin
+-- @param endV Texture mapping at rectangle end
+-- @param endV Texture mapping at rectangle end
+function render_library.drawTexturedRectUV(x,y,w,h,startU,startV,endU,endV)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	surface.DrawTexturedRectUV(x,y,w,h,tw,th)
+	surface.DrawTexturedRectUV(x,y,w,h,startU,startV,endU,endV)
 end
 
 --- Draws a rotated, textured rectangle.
@@ -345,18 +347,35 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	return name
 end
 
+--- Sets the font
+-- @param font Value returned by createFont
+function render_library.setFont( font )
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	SF.CheckType(font,"string")
+	
+	surface.SetFont( font )
+end
+
+--- Gets the size of the specified text. Don't forget to use setFont before calling this function
+-- @param text Text to get the size of
+function render_library.getTextSize( text )
+	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	SF.CheckType(text,"string")
+	
+	return surface.GetTextSize( text )
+end
+
 --- Draws text using a font
--- @param font Font table returned by createFont
+-- @param text Text to draw
 -- @param x X coordinate
 -- @param y Y coordinate
--- @param text Text to draw
--- @param alignment Text alignment
-function render_library.drawText(font,x,y,text,alignment)
+function render_library.drawText(text,x,y)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
 	SF.CheckType(font,"string")
 	
-	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
+	surface.SetTextPos( x, y )
+	surface.DrawText( text )
 end
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
