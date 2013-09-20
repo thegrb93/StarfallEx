@@ -53,7 +53,7 @@ function timer_library.create(name, delay, reps, func)
 	local function timercb()
 		local ok, msg, traceback = instance:runFunction(func)
 		if not ok then
-			instance:error( msg, traceback )
+			instance:Error( msg, traceback )
 			timer.Remove( timername )
 		end
 	end
@@ -126,7 +126,7 @@ function timer_library.simple(delay, func)
 		if IsValid(instance.data.entity) and not instance.error then
 			local ok, msg, traceback = instance:runFunction(func)
 			if not ok then
-				instance:error( "simple timer errored with: " .. msg, traceback )
+				instance:Error( "simple timer errored with: " .. msg, traceback )
 			end
 		end
 	end)

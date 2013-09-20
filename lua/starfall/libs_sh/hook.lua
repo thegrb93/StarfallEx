@@ -40,7 +40,7 @@ function hook_library.run(hookname, ...)
 	
 	local ok = table.remove( ret, 1 )
 	if not ok then
-		instance:error( "Hook '" .. lower .. "' errored with " .. ret[1], ret[2] )
+		instance:Error( "Hook '" .. lower .. "' errored with " .. ret[1], ret[2] )
 		return
 	end
 	
@@ -89,9 +89,7 @@ local function run( hookname, customfunc, ... )
 		
 		local ok = table.remove( ret, 1 )
 		if not ok then
-			if IsValid(instance.data.entity) then
-				instance.data.entity:Error( "Hook '" .. hookname .. "' errored with " .. ret[1], ret[2] )
-			end
+			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[1], ret[2] )
 		elseif customfunc then
 			local a,b,c,d,e,f,g,h = customfunc( instance, ret )
 			if a ~= nil then

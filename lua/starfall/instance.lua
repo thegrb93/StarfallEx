@@ -264,7 +264,7 @@ function SF.Instance:deinitialize()
 end
 
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
-function SF.Instance:error(msg,traceback)
+function SF.Instance:Error(msg,traceback)
 	
 	if self.runOnError then -- We have a custom error function, use that instead
 		self.runOnError( msg, traceback )
