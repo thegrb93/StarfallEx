@@ -51,9 +51,9 @@ function timer_library.create(name, delay, reps, func)
 	local timername = mangle_timer_name(instance,name)
 	
 	local function timercb()
-		local ok, tbl = instance:runFunction(func)
-		if not ok and instance.runOnError then
-			instance:runOnError( tbl[1] )
+		local ok, msg, traceback = instance:runFunction(func)
+		if not ok then
+			instance:error( msg, traceback )
 			timer.Remove( timername )
 		end
 	end
@@ -123,11 +123,10 @@ function timer_library.simple(delay, func)
 	
 	local instance = SF.instance
 	timer.Simple(delay, function()
-		if IsValid(instance.data.entity) then
-			if not instance.error then
-				instance:runFunction(func)
-			elseif instance.runOnError then
-				instance:runOnError( "timer error" )
+		if IsValid(instance.data.entity) and not instance.error then
+			local ok, msg, traceback = instance:runFunction(func)
+			if not ok then
+				instance:error( "simple timer errored with: " .. msg, traceback )
 			end
 		end
 	end)

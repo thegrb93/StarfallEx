@@ -134,6 +134,8 @@ function ENT:CodeSent(files, main, owner)
 	if self.instance then self.instance:deinitialize() end
 	self.owner = owner
 	local ok, instance = SF.Compiler.Compile(files,context,main,owner,{ent=self,render={}})
+	instance.runOnError = function(inst,...) self:Error(...) end
+	
 	if not ok then self:Error(instance) return end
 	
 	self.instance = instance
@@ -142,8 +144,6 @@ function ENT:CodeSent(files, main, owner)
 	instance.data.render.matricies = 0
 	local ok, msg = instance:initialize()
 	if not ok then self:Error(msg) end
-	
-	instance.runOnError = function(inst,msg) self:Error(msg) end
 	
 	local data = instance.data
 	

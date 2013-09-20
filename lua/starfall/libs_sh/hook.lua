@@ -40,7 +40,8 @@ function hook_library.run(hookname, ...)
 	
 	local ok = table.remove( ret, 1 )
 	if not ok then
-		instance.data.entity:Error( "Hook '" .. lower .. "' errored with " .. ret[1], ret[2] )
+		instance:error( "Hook '" .. lower .. "' errored with " .. ret[1], ret[2] )
+		return
 	end
 	
 	return unpack(ret)
