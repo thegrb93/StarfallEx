@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
 -- @shared
-local holograms_library, _ = SF.Libraries.Register("holograms")
+local holograms_library, holograms_library_metamethods = SF.Libraries.Register("holograms")
 
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
 
@@ -250,7 +250,7 @@ if SERVER then
 	--- Creates a hologram.
 	-- @server
 	-- @return The hologram object
-	function holograms_library.create(pos, ang, model, scale)
+	local function createHolo(self, pos, ang, model, scale)
 		SF.CheckType(pos, "Vector")
 		SF.CheckType(ang, "Angle")
 		SF.CheckType(model, "string")
@@ -285,6 +285,8 @@ if SERVER then
 			-- TODO: Need to fire a umsg here to assign clientside ownership(?)
 		end
 	end
+
+	holograms_library_metamethods.__call = createHolo
 
 	--- Checks if a user can spawn anymore holograms.
 	-- @server
