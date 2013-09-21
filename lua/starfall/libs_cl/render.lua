@@ -109,7 +109,15 @@ local validfonts = {
 	BudgetLabel = true,
 }
 
-local defined_fonts = {}
+surface.CreateFont("sf_screen_font_Default_16_400_9_0000", {size = 16, weight = 400,
+		antialias=false, additive = false, font = "Default",
+		shadow = false, outline = false, blur = 0})
+
+local defined_fonts = {
+	["sf_screen_font_Default_16_400_9_0000"] = true
+}
+
+local defaultFont = "sf_screen_font_Default_16_400_9_0000"
 
 local function fixcolor(r,g,b)
 	return Color(clamp(tonumber(r) or 0,0,255),
@@ -341,7 +349,7 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	if not defined_fonts[name] then
 		surface.CreateFont(name, {size = size, weight = weight,
 			antialias=antialias, additive = additive, font = font,
-			shadow = shadow, outline = outline, blur = blue})
+			shadow = shadow, outline = outline, blur = blur})
 		defined_fonts[name] = true
 	end
 	return name
@@ -350,10 +358,22 @@ end
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
 -- @param text Text to get the size of
 function render_library.getTextSize( text )
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
 	
+	surface.SetFont(SF.instance.data.render.font or defaultFont)
 	return surface.GetTextSize( text )
+end
+
+--- Sets the font
+function render_library.setFont(font)
+	if not defined_fonts[font] then error("Font does not exist.", 2) end
+	SF.instance.data.render.font = font
+	--surface.SetFont(font)
+end
+
+--TODO
+function render_library.getDefaultFont()
+	return defaultFont
 end
 
 --- Draws text using a font
@@ -362,10 +382,11 @@ end
 -- @param y Y coordinate
 -- @param text Text to draw
 -- @param alignment Text alignment
-function render_library.drawText(font,x,y,text,alignment)
+function render_library.drawText(x,y,text,alignment)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
-	SF.CheckType(font,"string")
+	
+	local font = SF.instance.data.render.font or defaultFont
 	
 	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
 end
