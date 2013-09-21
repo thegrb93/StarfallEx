@@ -347,15 +347,6 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	return name
 end
 
---- Sets the font
--- @param font Value returned by createFont
-function render_library.setFont( font )
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	SF.CheckType(font,"string")
-	
-	surface.SetFont( font )
-end
-
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
 -- @param text Text to get the size of
 function render_library.getTextSize( text )
@@ -366,16 +357,17 @@ function render_library.getTextSize( text )
 end
 
 --- Draws text using a font
--- @param text Text to draw
+-- @param font Font table returned by createFont
 -- @param x X coordinate
 -- @param y Y coordinate
-function render_library.drawText(text,x,y)
+-- @param text Text to draw
+-- @param alignment Text alignment
+function render_library.drawText(font,x,y,text,alignment)
 	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
 	SF.CheckType(text,"string")
 	SF.CheckType(font,"string")
 	
-	surface.SetTextPos( x, y )
-	surface.DrawText( text )
+	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
 end
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
