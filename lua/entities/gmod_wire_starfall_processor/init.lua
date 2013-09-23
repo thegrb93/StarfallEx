@@ -36,10 +36,10 @@ function ENT:Compile(codetbl, mainfile)
 	if self.instance then self.instance:deinitialize() end
 	
 	local ok, instance = SF.Compiler.Compile(codetbl,context,mainfile,self.owner)
+	if not ok then self:Error(instance) return end
 	
 	instance.runOnError = function(inst,...) self:Error(...) end
 	
-	if not ok then self:Error(instance) return end
 	self.instance = instance
 	instance.data.entity = self
 	

@@ -146,9 +146,9 @@ function ENT:CodeSent(ply, files, mainfile)
 	
 	if ppdata.sharedscreen then		
 		local ok, instance = SF.Compiler.Compile(files,context,mainfile,ply)
-		instance.runOnError = function(inst,...) self:Error(...) end
-	
 		if not ok then self:Error(instance) return end
+		
+		instance.runOnError = function(inst,...) self:Error(...) end
 
 		if self.instance then
 			self.instance:deinitialize()
