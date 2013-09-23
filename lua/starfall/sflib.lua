@@ -247,10 +247,6 @@ end
 -- @return returns nil if the object doesn't have a known wrapper,
 -- or returns the wrapped object if it does have a wrapper.
 function SF.WrapObject( object )
-	if type(object) == "Entity" then -- This is required because Player and Entity share a metatable
-		return SF.Entities and SF.Entities.Wrap(object)
-	end
-
 	local metatable = dgetmeta(object)
 	
 	local wrap = object_wrappers[metatable]
