@@ -223,8 +223,8 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		return sf2sensitive[value]
 	end
 	
-	if nil ~= target_metatable then
-		object_wrappers[metatable] = wrap
+	if target_metatable ~= nil then
+		object_wrappers[target_metatable] = wrap
 		metatable.__wrap = wrap
 	end
 	
