@@ -233,11 +233,20 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 	return wrap, unwrap
 end
 
---- Adds an additional wrapper for an object
+--- Helper function for adding custom wrappers
 -- @param object_meta metatable of object
+-- @param sf_object_meta starfall metatable of object
 -- @param wrapper function that wraps object
-function SF.AddObjectWrapper( object_meta, wrapper )
+function SF.AddObjectWrapper( object_meta, sf_object_meta, wrapper )
+	sf_object_meta.__wrap = wrapper
 	object_wrappers[object_meta] = wrapper
+end
+
+--- Helper function for adding custom unwrappers
+-- @param object_meta metatable of object
+-- @param unwrapper function that unwraps object
+function SF.AddObjectUnwrapper( object_meta, unwrapper )
+	object_meta.__unwrap = unwrapper
 end
 
 --- Wraps the given object so that it is safe to pass into starfall
