@@ -162,8 +162,9 @@ end
 function ents_methods:massCenter()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
-	if not isValid(ent) then return nil, "invalid entity" end
-	return ent:GetMassCenter()
+	local phys = getPhysObject(ent)
+	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
+	return phys:GetMassCenter()
 end
 
 --- Returns the world position of the entity's mass center
@@ -172,8 +173,9 @@ end
 function ents_methods:massCenterW()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
-	if not isValid(ent) then return nil, "invalid entity" end
-	return ent:LocalToWorld(ent:GetMassCenter())
+	local phys = getPhysObject(ent)
+	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
+	return ent:LocalToWorld(phys:GetMassCenter())
 end
 
 --- Returns the angle of the entity
@@ -194,7 +196,7 @@ function ents_methods:getMass()
 	
 	local ent = unwrap(self)
 	local phys = getPhysObject(ent)
-	if not phys then return false, "entity has no physics object or is not valid" end
+	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
 	
 	return phys:GetMass()
 end
@@ -207,7 +209,7 @@ function ents_methods:getInertia()
 	
 	local ent = unwrap(self)
 	local phys = getPhysObject(ent)
-	if not phys then return false, "entity has no physics object or is not valid" end
+	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
 	
 	return phys:GetInertia()
 end
@@ -228,7 +230,7 @@ end
 function ents_methods:getAngleVelocity()
 	SF.CheckType(self,ents_metamethods)
 	local phys = getPhysObject(unwrap(self)) 	
-	if not phys then return false, "entity has no physics object or is not valid" end	
+	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end	
 	return phys:GetAngleVelocity()
 end
 
