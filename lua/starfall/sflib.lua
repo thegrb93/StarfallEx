@@ -381,7 +381,7 @@ end
 local minx, miny, minz = -16384, -16384, -16384
 local maxx, maxy, maxz = 16384, 16384, 16384
 local clamp = math.Clamp
-function SF.clampPos(pos)
+local function clampPos(pos)
 	pos.x = clamp(pos.x, minx, maxx)
 	pos.y = clamp(pos.y, miny, maxy)
 	pos.z = clamp(pos.z, minz, maxz)
@@ -390,7 +390,7 @@ end
 
 function SF.setPos(ent, pos)
 	if isnan(pos.x) or isnan(pos.y) or isnan(pos.z) then return end
-	return ent:SetPos(E2Lib.clampPos(pos))
+	return ent:SetPos(clampPos(pos))
 end
 
 local huge, abs = math.huge, math.abs
