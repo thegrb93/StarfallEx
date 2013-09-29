@@ -227,7 +227,7 @@ if SERVER then
 		for _, v in pairs( plyCount ) do
 			c = c + v
 		end
-		if c >= GetConVar("sf_holograms_defaultquota"):GetInt() then return true else return false end
+		if c >= SF.Holograms.defaultquota:GetInt() then return true else return false end
 	end
 
 	--- Checks if the users personal limit of holograms has been exhausted
@@ -235,7 +235,7 @@ if SERVER then
 	-- @param i Instance to use, this will relate to the player in question
 	-- @return True/False depending on if the personal limit has been reached for SF Holograms
 	local function personal_max_reached( i )
-		return plyCount[i.player] >= GetConVar("sf_holograms_personalquota"):GetInt()
+		return plyCount[i.player] >= SF.Holograms.personalquota:GetInt()
 	end
 
 	timer.Create("SF_Hologram_BurstCounter", 1/4, 0, function()
@@ -257,8 +257,8 @@ if SERVER then
 
 		local instance = SF.instance
 		if not can_spawn( instance ) then return error("Can't spawn holograms that often",2) end
-		if personal_max_reached( instance ) then return error("Can't spawn holograms, maximum personal limit of "..GetConVar("sf_holograms_personalquota"):GetInt().." has been reached", 2 ) end
-		if max_reached() then return error("Can't spawn holograms, maximum limit of "..GetConVar("sf_holograms_defaultquota"):GetInt().." has been reached", 2) end
+		if personal_max_reached( instance ) then return error("Can't spawn holograms, maximum personal limit of "..SF.Holograms.personalquota:GetInt().." has been reached", 2 ) end
+		if max_reached() then return error("Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2) end
 
 		local holodata = instance.data.holograms
 		local holoent = ents.Create("gmod_starfall_hologram")
