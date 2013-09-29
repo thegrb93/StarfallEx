@@ -88,6 +88,14 @@ function ents_methods:setColor( clr )
 	this:SetColor(clr)
 end
 
+--- Gets the color of an entity
+-- @shared
+-- @return Color
+function ents_methods:getColor()
+	local this = unwrap(self)
+	return this:GetColor()
+end
+
 --- Checks if an entity is valid.
 -- @shared
 -- @return True if valid, false if not
