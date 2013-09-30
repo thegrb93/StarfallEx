@@ -7,6 +7,12 @@ local net = net
 --- Net message library. Used for sending data from the server to the client and back
 local net_library, _ = SF.Libraries.Register("net")
 
+local burst_limit = CreateConVar( "sf_net_burst_limit", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
+					"The net message burst limit." )
+
+local burst_interval = CreateConVar( "sf_net_burst_interval", "0.1", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
+						"The interval of the timer that adds one more available net message. Requires a map reload to update." )
+
 local function can_send( instance, noupdate )
 	if instance.data.net.burst > 0 then
 		if not noupdate then instance.data.net.burst = instance.data.net.burst - 1 end
@@ -24,7 +30,7 @@ local instances = {}
 SF.Libraries.AddHook( "initialize", function( instance )
 	instance.data.net = {
 		started = false,
-		burst = 10,
+		burst = burst_limit:GetInt(),
 		data = {},
 	}
 	
@@ -39,9 +45,9 @@ SF.Libraries.AddHook( "deinitialize", function( instance )
 	instances[instance] = nil
 end)
 
-timer.Create( "SF_Net_BurstCounter", 0.5, 0, function()
+timer.Create( "SF_Net_BurstCounter", burst_interval:GetFloat(), 0, function()
 	for instance, b in pairs( instances ) do
-		if instance.data.net.burst < 10 then
+		if instance.data.net.burst < burst_limit:GetInt() then
 			instance.data.net.burst = instance.data.net.burst + 1
 		end
 	end
@@ -70,7 +76,7 @@ if SERVER then
 	
 	--- Send the net message
 	-- @server
-	-- @param target The player to send the message to or nil for broadcast
+	-- @param target The player or table of players to send the message to, or nil to send to everyone
 
 	function net_library.send( target )
 		local instance = SF.instance
