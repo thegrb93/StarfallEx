@@ -238,7 +238,7 @@ wirelink_metatable.__index = function(self,k)
 		if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 		
 		if type(k) == "number" then
-			return wl.ReadCell and wl.ReadCell(k) or nil
+			return wl.ReadCell and wl:ReadCell(k) or nil
 		else
 			local output = wl.Outputs and wl.Outputs[k]
 			if not output or not inputConverters[output.Type] then return end
