@@ -23,6 +23,10 @@ If you want to contribute to Starfall, you are required to abide to this set of 
 - Add comments in your code if it is not obvious what it does. As a rule of thumb: If it took you more than 5 seconds to figure the line out, add a comment
 - Function and variable names are supposed to be in camelCase, constructor functions, however, are supposed to be in CamelCase
 - No parantheses around if conditions/loop headers unless necessary
+- Use spaces inside parantheses. For example: print( "Hello" )
+- Use spaces before the argument list of a function. For example: fuction func (var1, var2)
+- Use spaces after semicolons
+- Do not use semicolons at the end of statements
 - Short circuiting (a = b and c or d) is ok if used as ternary operator. Do not use it for logic.
 
 **Release strategy**
