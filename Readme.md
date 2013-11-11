@@ -26,6 +26,7 @@ If you want to contribute to Starfall, you are required to abide to this set of 
 - Use spaces inside parantheses. For example: print( "Hello" )
 - Use spaces before the argument list of a function. For example: fuction func (var1, var2)
 - Use spaces after semicolons
+- Use spaces before any operator and after any binary operator
 - Do not use semicolons at the end of statements
 - Short circuiting (a = b and c or d) is ok if used as ternary operator. Do not use it for logic.
 
