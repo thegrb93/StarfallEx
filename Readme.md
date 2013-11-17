@@ -45,8 +45,13 @@ If you want to contribute to Starfall, you are required to abide to this set of 
   - E.g. Good: `print( a and "Hello" or "Hi" )`; Bad: `a and print("Hello") or print("Hi")`;
 
 **Release strategy**
-- We are using [Semantic Versioning](http://semver.org) in the format of Major.Minor.Subminor
-- Only changes in major version can break compatibility, backwards compatibility is guaranteed within the same major version
-- Functions can be deprecated between minor versions and will then be removed in the next major release
-- Every minor release will get its own branch. This branch will be tagged once it gets released. Hotfixes and patches will be added to the release branch and tagged
-- Features never get added to a release branch once it got released
+- We are using [Semantic Versioning](http://semver.org) in the format of `Major.Minor.Sub-minor`.
+  - E.g. `2.0.5`. 
+- Only changes in major version can break compatibility, backwards compatibility is guaranteed within the same major version.
+  - E.g. `2.x.x` set will always be cross-compatible. 
+- Functions can be deprecated between minor versions and will then be removed in the next major release.
+  - E.g function `helloWorld()` may become deprecated between `2.0.0` and `2.1.0` and will be removed in `3.0.0`.
+- Branch naming will follow `Major.Minor`.
+- Minor versions will belong in a branch specifically for that release. The leading commit will be tagged upon release. 
+- When Hotfixes and patches are required, they will be added to the branch for that release and tagged.
+- Once a branch is released, features **cannot** be added to it.
