@@ -27,7 +27,7 @@ If you want to contribute to Starfall, you are required to abide to this set of 
 - Use tabs for indentation, don't use spaces or other whitespace characters.
 - Use [LuaDoc-style](http://keplerproject.github.io/luadoc/manual.html) comments on external user API functions and libraries. Use reasonable documentation for internal API functions and libraries.
 - Add comments when code functionality is not clear or when the purpose of the code is not obvious.
-  - See: [http://http://www.codinghorror.com/blog/2008/07/coding-without-comments.html](http://http://www.codinghorror.com/blog/2008/07/coding-without-comments.html).
+  - See: [http://codinghorror.com/blog/2008/07/coding-without-comments.html](http://codinghorror.com/blog/2008/07/coding-without-comments.html).
 - Function and variable names are supposed to be in `camelCase`, constructor functions, however, are supposed to be in `CamelCase`.
 - No parentheses around conditionals used for program logic.
   - E.g. if conditions/loop headers, unless absolutely necessary.
