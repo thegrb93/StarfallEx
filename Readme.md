@@ -6,7 +6,7 @@ Starfall Scripting Environment
  * Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
  * Blog: http://blog.colonelthirtytwo.net/
 
-Contribor information
+Contributor information
 ======================================================
 
 If you want to contribute to Starfall, you are required to abide to this set of rules, to make developing Starfall a pleasant experience for everyone and to keep up the quality.
