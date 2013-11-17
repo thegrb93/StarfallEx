@@ -12,10 +12,14 @@ Contributor information
 
 If you want to contribute to Starfall, you are required to abide to this set of rules, to make developing Starfall a pleasant experience for everyone and to keep up the quality.
 
-**Commit messages**
-- There should only ever be one logical change per commit.
-- Commits must have descriptive commit messages. For example: Added function newFunction()
-- New features are never pushed directly into the repo, make a pull request with your feature branch an another developer will review it
+**Commit message guidelines**
+- There should only ever be one logical change per commit. Separate them into clear cut changes, regardless of size.
+- Commit messages must be descriptive and concise.
+  - E.g Good: `Added function: newFunction()`; Bad: `fixing the fix of the fix`.
+- New features are never pushed directly into the repo, make a pull request with your feature branch an another developer will review it.
+- Personal style can be implemented, as long as it adheres to the previous guidelines.
+  - E.g [`"[Added] Burst/PersonalQuota/DefaultQuota for SF Holograms"`](https://github.com/INPStarfall/Starfall/commit/7dfb693a5937d18d4e9f6c0135773bc6326b9c60), [`"Fix entities not getting wrapped by SF.WrapObject"`](https://github.com/INPStarfall/Starfall/commit/644dac74aef7800ecab1e6a2b8d17f26843d3842) & [`"Added ents_methods:getColor()"`](https://github.com/INPStarfall/Starfall/commit/9ceee328bd884819b3015dedda3b197b12134ef3).
+- This is an example of what ***NOT*** to do: [`"fixes and changes"`](https://github.com/INPStarfall/Starfall/commit/d6b36328ce19da9a9b7f04e4c09266c8fd60a466).
 
 **Codestyle guidelines**
 - No GLua-specific syntax. 
