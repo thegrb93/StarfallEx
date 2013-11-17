@@ -1,5 +1,5 @@
 Starfall Scripting Environment
-==============================
+----------
 
  * More info: http://colonelthirtytwo.net/index.php/starfall/
  * Reference Page: http://colonelthirtytwo.net/sfdoc/
@@ -7,7 +7,8 @@ Starfall Scripting Environment
  * Blog: http://blog.colonelthirtytwo.net/
 
 Contributor information
-======================================================
+----------
+
 
 If you want to contribute to Starfall, you are required to abide to this set of rules, to make developing Starfall a pleasant experience for everyone and to keep up the quality.
 
