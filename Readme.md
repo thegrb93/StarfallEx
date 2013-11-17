@@ -1,10 +1,9 @@
 Starfall Scripting Environment
 ----------
 
- * More info: http://colonelthirtytwo.net/index.php/starfall/
- * Reference Page: http://colonelthirtytwo.net/sfdoc/
- * Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
- * Blog: http://blog.colonelthirtytwo.net/
+*Note: Links are subject to change.*
+- Development Thread: [`http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html`](http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html?goto=newpost).
+- Documentation: [`http://sf.inp.io`](http://sf.inp.io).
 
 Contributor information
 ----------
