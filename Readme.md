@@ -55,3 +55,7 @@ If you want to contribute to Starfall, you are required to abide to this set of 
 - Minor versions will belong in a branch specifically for that release. The leading commit will be tagged upon release. 
 - When Hotfixes and patches are required, they will be added to the branch for that release and tagged.
 - Once a branch is released, features **cannot** be added to it.
+
+
+----------
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/INPStarfall/starfall/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
