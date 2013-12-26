@@ -32,8 +32,10 @@ If you want to contribute to Starfall, you are required to abide to this set of 
   - E.g. if conditions/loop headers, unless absolutely necessary.
 - Use spaces between parentheses and their enclosing body. 
   - E.g. `print( "Hello" )` & `function f ( args )` & `f( args )`.
+- Use spaces between square braces and their enclosing body.
+  - E.g. `_deserialize[ lastType ]( s, i, len )` & `tbl[ 5 ] = "bob"`.
 - Use spaces before the argument list of a function definition. 
-  - E.g. `fuction func (var1, var2)`.
+  - E.g. `fuction func ( var1, var2 )`.
 - Use spaces after semicolons, as well as commas. 
   - E.g. `f( a1, a2, a3 ); f2( a1, a2, a3 )`.
 - Use spaces before any unary operator; before and after any binary operator. 
