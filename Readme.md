@@ -5,11 +5,11 @@ Starfall Scripting Environment
 - Development Thread: [`http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html`](http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html?goto=newpost).
 - Documentation: [`http://sf.inp.io`](http://sf.inp.io).
 
-Contributor information
+Contributor Information
 ----------
 
 
-If you want to contribute to Starfall, you are required to abide to this set of rules, to make developing Starfall a pleasant experience for everyone and to keep up the quality.
+If you want to contribute to Starfall, you are required to abide by these sets of rules, to make developing Starfall a pleasant experience for everyone and to maintain the quality of the codebase.
 
 **Commit message guidelines**
 - There should only ever be one logical change per commit. Separate them into clear cut changes, regardless of size.
