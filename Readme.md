@@ -5,11 +5,11 @@ Starfall Scripting Environment
 - Development Thread: [`http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html`](http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html?goto=newpost).
 - Documentation: [`http://sf.inp.io`](http://sf.inp.io).
 
-Contributor information
+Contributor Information
 ----------
 
 
-If you want to contribute to Starfall, you are required to abide to this set of rules, to make developing Starfall a pleasant experience for everyone and to keep up the quality.
+If you want to contribute to Starfall, you are required to abide by these sets of rules, to make developing Starfall a pleasant experience for everyone and to maintain the quality of the codebase.
 
 **Commit message guidelines**
 - There should only ever be one logical change per commit. Separate them into clear cut changes, regardless of size.
@@ -32,10 +32,21 @@ If you want to contribute to Starfall, you are required to abide to this set of 
   - E.g. if conditions/loop headers, unless absolutely necessary.
 - Use spaces between parentheses and their enclosing body. 
   - E.g. `print( "Hello" )` & `function f ( args )` & `f( args )`.
-- Use spaces before the argument list of a function definition. 
-  - E.g. `fuction func (var1, var2)`.
-- Use spaces after semicolons, as well as commas. 
+- Use spaces after commas, as well as semicolons.
   - E.g. `f( a1, a2, a3 ); f2( a1, a2, a3 )`.
+- Use spaces between square braces and their enclosing body.
+  - E.g. `_deserialize[ lastType ]( s, i, len )` & `tbl[ 5 ] = "bob"`.
+- Use spaces between curly braces and their enclosing body, it is also acceptable to use a newline with appropriate indentation instead. ( See table literal multi-line example below. )
+  - E.g `local tbl = { "Hi", 2, var }`
+- Table literals must be delimited by commas which proceed their values. The last value must not have a proceeding comma.
+  - E.g
+	    local tbl2 = {
+		    "Multi-line",
+		    2,
+		    lastVal
+	    }
+- Use spaces before the argument list of a function definition. 
+  - E.g. `fuction func ( var1, var2 )`.
 - Use spaces before any unary operator; before and after any binary operator. 
   - E.g. `local var = 5 + 3` and `local var2 = -var + 3`.
 - Use of one-liners/ single-line multi-statements is discouraged. 
