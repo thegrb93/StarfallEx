@@ -19,7 +19,7 @@ local dsetmeta = debug.setmetatable
 local old_ent_wrap = SF.Entities.Wrap
 function SF.Entities.Wrap(obj)
 	local w = old_ent_wrap(obj)
-	if obj:IsValid() and obj:GetClass() == "gmod_starfall_hologram" then
+	if IsValid(obj) and obj:IsValid() and obj:GetClass() == "gmod_starfall_hologram" then
 		dsetmeta(w, hologram_metamethods)
 	end
 	return w
