@@ -8,21 +8,6 @@
 -- @shared
 local files_library, _ = SF.Libraries.Register("files")
 
---- Access Files permission
--- @name Access Files Permission
--- @class table
--- @field name "Access Files"
--- @field desc "Allows access to data/starfallscriptdata/"
--- @field level 1
--- @field value True if clientside, false if serverside
-
-SF.Permissions:registerPermission({
-	name = "Access Files",
-	desc = "Allows access to data/starfallscriptdata/",
-	level = 1,
-	value = 1,
-})
-
 file.CreateDir("starfallscriptdata/")
 
 --- Reads a file from path

@@ -8,7 +8,7 @@ setmetatable( P, P )
 -- localize the result set
 local ALLOW = SF.Permissions.Result.ALLOW
 local DENY = SF.Permissions.Result.DENY
-local NEUTRAL = SF.Permissions.Resulr.NEUTRAL
+local NEUTRAL = SF.Permissions.Result.NEUTRAL
 
 local ES = SF.DB.escape;
 

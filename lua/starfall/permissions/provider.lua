@@ -3,7 +3,7 @@
 --
 SF.Permissions.Provider = {}
 
-local P = SF.Permisssions.Provider
+local P = SF.Permissions.Provider
 P.__index = P
 
 -- localize the Result enum

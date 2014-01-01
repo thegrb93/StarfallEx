@@ -19,13 +19,6 @@ local function fix_nan(v)
 	if v < huge and v > -huge then return v else return 0 end
 end
 
-SF.Permissions:registerPermission({
-	name = "Modify All Entities",
-	desc = "Allow modification of entities not created by the owner",
-	level = 1,
-	value = false,
-})
-
 -- ------------------------- Internal Library ------------------------- --
 
 --- Gets the entity's owner

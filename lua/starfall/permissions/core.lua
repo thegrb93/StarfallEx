@@ -99,22 +99,30 @@ end
 
 -- Find and include all provider files.
 do
+	local function IncludeClientFile ( file )
+		if SERVER then
+			AddCSLuaFile( file )
+		else
+			include( file )
+		end
+	end
+	
 	if SERVER then
 		include( "starfall/permissions/provider.lua" )
 	end
+	
 	IncludeClientFile( "starfall/permissions/provider.lua" )
 	
 	-- TODO: Update this to GM13
 	if SERVER then
-		local files = file.FindInLua("starfall/permissions/providers_sv/*.lua")
+		local files = file.Find( "starfall/permissions/providers_sv/*.lua", "LUA" )
 		
 		for _, file in pairs( files ) do
-			include( "starfall/permissions/providers_sv" .. file )
+			include( "starfall/permissions/providers_sv/" .. file )
 		end
 	end
 	
-	local cl_files = file.FindInLua(
-			"starfall/permission/providers_cl/*.lua" )
+	local cl_files = file.Find( "starfall/permission/providers_cl/*.lua", "LUA" )
 	
 	for _, file in pairs( cl_files ) do
 		IncludeClientFile( "starfall/permission/providers_cl/" .. file )
