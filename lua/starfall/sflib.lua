@@ -42,23 +42,25 @@ end
 
 -- Send files to client
 if SERVER then
-	AddCSLuaFile("sflib.lua")
-	AddCSLuaFile("compiler.lua")
-	AddCSLuaFile("instance.lua")
-	AddCSLuaFile("libraries.lua")
-	AddCSLuaFile("preprocessor.lua")
-	AddCSLuaFile("permissions/core.lua")
-	AddCSLuaFile("editor.lua")
-	AddCSLuaFile("callback.lua")
+	AddCSLuaFile( "sflib.lua" )
+	AddCSLuaFile( "compiler.lua" )
+	AddCSLuaFile( "instance.lua" )
+	AddCSLuaFile( "libraries.lua" )
+	AddCSLuaFile( "preprocessor.lua" )
+	AddCSLuaFile( "database.lua" )
+	AddCSLuaFile( "permissions/core.lua" )
+	AddCSLuaFile( "editor.lua" )
+	AddCSLuaFile( "callback.lua" )
 end
 
 -- Load files
-include("compiler.lua")
-include("instance.lua")
-include("libraries.lua")
-include("preprocessor.lua")
-include("permissions/core.lua")
-include("editor.lua")
+include( "compiler.lua" )
+include( "instance.lua" )
+include( "libraries.lua" )
+include( "preprocessor.lua" )
+include( "database.lua" )
+include( "permissions/core.lua" )
+include( "editor.lua" )
 
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of Lua instructions to allow Starfall scripts to execute")
@@ -421,6 +423,7 @@ end
 
 local serialize_replace_regex = "[\"\n]"
 local serialize_replace_tbl = { [ "\n" ] = string.char( 5 ), [ '"' ] = string.char( 4 ) }
+
 --- Serializes an instance's code in a format compatible with the duplicator library
 -- @param sources The table of filename = source entries. Ususally instance.source
 -- @param mainfile The main filename. Usually instance.mainfile
