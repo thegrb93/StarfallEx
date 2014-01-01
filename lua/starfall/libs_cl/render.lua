@@ -119,27 +119,6 @@ local defined_fonts = {
 
 local defaultFont = "sf_screen_font_Default_16_400_9_0000"
 
-local function fixcolor(r,g,b)
-	return Color(clamp(tonumber(r) or 0,0,255),
-		clamp(tonumber(g) or 0,0,255),
-		clamp(tonumber(b) or 0,0,255))
-end
-
-local function fixcolorA(r,g,b,a)
-	return Color(clamp(tonumber(r) or 0,0,255),
-		clamp(tonumber(g) or 0,0,255),
-		clamp(tonumber(b) or 0,0,255),
-		clamp(tonumber(a) or 255,0,255))
-end
-
-local function fixcolorT(tbl)
-	return Color(
-		clamp(tonumber(tbl and tbl.r) or 0,0,255),
-		clamp(tonumber(tbl and tbl.g) or 0,0,255),
-		clamp(tonumber(tbl and tbl.b) or 0,0,255),
-		clamp(tonumber(tbl and tbl.a) or 255,0,255))
-end
-
 local poly_methods, poly_metamethods = SF.Typedef("Polygon")
 local wrappoly, unwrappoly = SF.CreateWrapper(poly_metamethods)
 
@@ -207,16 +186,12 @@ function render_library.popMatrix()
 end
 
 --- Sets the draw color
--- @param r Red value or 0
--- @param g Green value or 0
--- @param b Blue value or 0
--- @param a Alpha value or 0
-function render_library.setColor(r,g,b,a)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	local c = fixcolorA(r,g,b,a)
-	currentcolor = c
-	surface.SetDrawColor(c)
-	surface.SetTextColor(c)
+-- @param clr Color type
+function render_library.setColor ( clr )
+    SF.CheckType( clr, SF.Types[ "Color" ] )
+    currentcolor = clr
+    surface.SetDrawColor( clr )
+    surface.SetDrawColor( clr )
 end
 
 --- Looks up a texture ID by file name.
@@ -239,10 +214,17 @@ function render_library.setTexture(id)
 	end
 end
 
---- Clears the surface.
-function render_library.clear(r,g,b,a)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
-	render.Clear(r or 0, g or 0, b or 0, a or 255)
+--- Clears the surface
+-- @param clr Color type to clear with
+function render_library.clear ( clr )
+    if clr == nil then
+        if not SF.instance.data.render.isRendering then error( "Not in a rendering hook.", 2 ) end
+        render.Clear( 0, 0, 0, 255 )
+    else
+        SF.CheckType( clr, SF.Types[ "Color" ] )
+        if not SF.instance.data.render.isRendering then error( "Not in a rendering hook.", 2 ) end
+        render.Clear( clr.r, clr.g, clr.b, clr.a )
+    end
 end
 
 --- Draws a rectangle using the current color. 
