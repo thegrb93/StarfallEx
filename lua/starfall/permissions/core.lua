@@ -113,7 +113,6 @@ do
 	
 	IncludeClientFile( "starfall/permissions/provider.lua" )
 	
-	-- TODO: Update this to GM13
 	if SERVER then
 		local files = file.Find( "starfall/permissions/providers_sv/*.lua", "LUA" )
 		

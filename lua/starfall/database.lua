@@ -1,11 +1,14 @@
 SF.DB = {}
 
-SF.DB.escape = sql.SQLStr
 SF.DB.query = sql.Query
 SF.DB.querySingleValue = sql.QueryValue
 
 function SF.DB.querySingleRow ( query )
 	return sql.QueryRow( query, 0 )
+end
+
+function SF.DB.escape ( str )
+	return sql.SQLStr( str ):sub( 2, -2 )
 end
 
 local function queryMultiple ( statements )

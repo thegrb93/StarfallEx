@@ -18,15 +18,19 @@ function P:check (principal, target, key)
 	
 	local result = SF.DB.query( [[
 		SELECT grant.grant
-		FROM starfall_perms_user_roles AS role
-		INNER JOIN starfall_perms_grants AS grant ON grant.role = role.id
-		WHERE role.player = ']] .. ES( principal:SteamID() ) .. [['
-			AND grant.key = ']] .. ES( key ) .. [['
-			AND grant.target = ']] .. ES( target ) .. [[']]
+		FROM starfall_perms_player_roles AS role
+		INNER JOIN starfall_perms_grants AS grant ON grant.role = role.rowid
+		WHERE role.player = "]] .. ES( principal:SteamID() ) .. [["
+			AND grant.key = "]] .. ES( key ) .. [["
+			AND grant.target = "]] .. ES( target ) .. [["]]
 	)
+
+	if result == false then
+		error( "error in default provider " .. sql.LastError() )
+	end
 	
 	local allow = false;
-	for _, row in pairs( result ) do
+	for _, row in pairs( result or {} ) do
 		local grant = row[ 'grant' ]
 		
 		if "1" == grant then
