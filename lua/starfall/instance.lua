@@ -17,7 +17,6 @@ SF.Instance.__index = SF.Instance
 -- @field hooks Registered hooks
 -- @field scripts The compiled script functions.
 -- @field initialized True if initialized, nil if not.
--- @field permissions Permissions manager
 -- @field error True if instance is errored and should not be executed
 -- @field mainfile The main file
 -- @field player The "owner" of the instance
