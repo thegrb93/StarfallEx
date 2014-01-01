@@ -284,6 +284,33 @@ function SF.DefaultEnvironment.dofile(file)
 	return func()
 end
 
+--- Lua's pcall function
+SF.DefaultEnvironment.pcall = pcall
+
+--- GLua's loadstring, modified for safe use in Starfall
+-- Works like loadstring, except that it executes by default in the main environment
+SF.DefaultEnvironment.loadstring = function (str)
+	local func = CompileString(str, 'SF: '..tostring(SF.instance.env), false)
+	if type(func) == 'function' then
+		setfenv(func, SF.instance.env)
+	end
+	
+	return func
+end
+
+--- Lua's setfenv, modified for safe use in Starfall
+-- Works like setfenv, but is restricted on functions
+SF.DefaultEnvironment.setfenv = function(f, table)
+	if type(f) ~= 'function' then error('Main Thread is protected!') end
+	return setfenv(f,table)
+end
+
+--- Simple version of Lua's getfenv
+-- Returns the current environment
+SF.DefaultEnvironment.getfenv = function()
+	return getfenv()
+end
+
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
