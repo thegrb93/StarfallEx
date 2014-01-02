@@ -7,33 +7,34 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 local msgQueueNames = {}
 local msgQueueData = {}
 
-local function msgQueueAdd(umname, ent, udata)
-	local names, data = msgQueueNames[ent], msgQueueData[ent]
+local function msgQueueAdd ( umname, ent, udata )
+	local names, data = msgQueueNames[ ent ], msgQueueData[ ent ]
 	if not names then
 		names, data = {}, {}
-		msgQueueNames[ent] = names
-		msgQueueData[ent] = data
+		msgQueueNames[ ent ] = names
+		msgQueueData[ ent ] = data
 	end
 	
-	local i = #names+1
-	names[i] = umname
-	data[i] = udata
+	local i = #names + 1
+	names[ i ] = umname
+	data[ i ] = udata
 end
 
-local function msgQueueProcess(ent)
-	local names, data = msgQueueNames[ent], msgQueueData[ent]
+local function msgQueueProcess ( ent )
+	local entid = ent:EntIndex()
+	local names, data = msgQueueNames[ entid ], msgQueueData[ entid ]
 	if names then
-		for i=1,#names do
-			local name = names[i]
+		for i = 1 , #names do
+			local name = names[ i ]
 			if name == "scale" then
-				ent:SetScale(data[i])
+				ent:SetScale( data[ i ] )
 			elseif name == "clip" then
-				ent:UpdateClip(unpack(data[i]))
+				ent:UpdateClip( unpack( data[ i ] ) )
 			end
 		end
 		
-		msgQueueNames[ent] = nil
-		msgQueueData[ent] = nil
+		msgQueueNames[ entid ] = nil
+		msgQueueData[ entid ] = nil
 	end
 end
 
@@ -90,37 +91,38 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 	clip.islocal = islocal
 end
 
-net.Receive("starfall_hologram_clip", function()
-	local holoent = ent or net.ReadEntity()
+net.Receive("starfall_hologram_clip", function ()
+	local entid = net.ReadUInt( 32 )
+	local holoent = Entity( entid )
 	if not holoent:GetTable() then
 		-- Uninitialized
-		msgQueueAdd("clip", holoent, {
-			net.ReadUInt(16),
+		msgQueueAdd( "clip", entid, {
+			net.ReadUInt( 16 ),
 			net.ReadBit() ~= 0,
-			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
-			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
+			Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ),
+			Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ),
 			net.ReadBit() ~= 0
-		})
+		} )
 	else
-		holoent:UpdateClip(
-			net.ReadUInt(16),
+		holoent:UpdateClip (
+			net.ReadUInt( 16 ),
 			net.ReadBit() ~= 0,
-			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
-			Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()),
+			Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ),
+			Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ),
 			net.ReadBit() ~= 0
 		)
 	end
-end)
+end )
 
 -- ------------------------ SCALING ------------------------ --
 
 --- Sets the hologram scale
 -- @param scale Vector scale
-function ENT:SetScale(scale)
+function ENT:SetScale ( scale )
 	self.scale = scale
 	local m = Matrix()
-	m:Scale(scale)
-	self:EnableMatrix("RenderMultiply", m)
+	m:Scale( scale )
+	self:EnableMatrix( "RenderMultiply", m )
 
 	local propmax = self:OBBMaxs()
 	local propmin = self:OBBMins()
@@ -132,15 +134,16 @@ function ENT:SetScale(scale)
 	propmin.y = scale.y * propmin.y
 	propmin.z = scale.z * propmin.z
 	
-	self:SetRenderBounds(propmax, propmin)
+	self:SetRenderBounds( propmax, propmin )
 end
 
-net.Receive("starfall_hologram_scale", function()
-	local holoent = ent or net.ReadEntity()
+net.Receive("starfall_hologram_scale", function ()
+	local entid = net.ReadUInt( 32 )
+	local holoent = Entity( entid )
 	if not holoent:GetTable() then
 		-- Uninitialized
-		msgQueueAdd("scale", holoent, Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()))
+		msgQueueAdd( "scale", entid, Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()) )
 	else
-		holoent:SetScale(Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()))
+		holoent:SetScale( Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ) )
 	end
-end)
+end )
