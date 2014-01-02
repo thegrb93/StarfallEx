@@ -44,6 +44,7 @@ function ENT:Initialize()
 	self.clips = {}
 	self.unlit = false
 	self.scale = Vector(1,1,1)
+	self.initialised = true
 	msgQueueProcess(self)
 end
 
@@ -94,7 +95,7 @@ end
 net.Receive("starfall_hologram_clip", function ()
 	local entid = net.ReadUInt( 32 )
 	local holoent = Entity( entid )
-	if not holoent:GetTable() then
+	if ( not IsValid( holoent ) ) or ( not holoent.initialised ) then
 		-- Uninitialized
 		msgQueueAdd( "clip", entid, {
 			net.ReadUInt( 16 ),
@@ -140,7 +141,7 @@ end
 net.Receive("starfall_hologram_scale", function ()
 	local entid = net.ReadUInt( 32 )
 	local holoent = Entity( entid )
-	if not holoent:GetTable() then
+	if ( not IsValid ( holoent ) ) or ( not holoent.initialised ) then
 		-- Uninitialized
 		msgQueueAdd( "scale", entid, Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()) )
 	else
