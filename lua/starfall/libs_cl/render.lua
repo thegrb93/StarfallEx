@@ -188,10 +188,10 @@ end
 --- Sets the draw color
 -- @param clr Color type
 function render_library.setColor ( clr )
-    SF.CheckType( clr, SF.Types[ "Color" ] )
-    currentcolor = clr
-    surface.SetDrawColor( clr )
-    surface.SetDrawColor( clr )
+	SF.CheckType( clr, SF.Types[ "Color" ] )
+	currentcolor = clr
+	surface.SetDrawColor( clr )
+	surface.SetTextColor( clr )
 end
 
 --- Looks up a texture ID by file name.
