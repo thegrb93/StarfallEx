@@ -17,3 +17,11 @@ function ENT:runScriptHook(hook, ...)
 		else return rt end
 	end
 end
+
+function ENT:runScriptHookForResult(hook,...)
+	if self.instance and not self.instance.error and self.instance.hooks[hook:lower()] then
+		local ok, rt = self.instance:runScriptHookForResult(hook, ...)
+		if not ok then self:Error(rt)
+		else return rt end
+	end
+end
