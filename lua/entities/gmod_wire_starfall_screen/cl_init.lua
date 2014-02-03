@@ -152,6 +152,7 @@ function ENT:CodeSent(files, main, owner)
 	function self.renderfunc()
 		if self.instance then
 			data.render.isRendering = true
+			draw.NoTexture()
 			self:runScriptHook("render")
 			data.render.isRendering = nil
 			
