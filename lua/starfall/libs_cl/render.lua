@@ -196,21 +196,30 @@ end
 
 --- Looks up a texture ID by file name.
 -- @param tx Texture file path
-function render_library.getTextureID(tx)
-	local id = surface.GetTextureID(tx)
+function render_library.getTextureID ( tx )
+	local id = surface.GetTextureID( tx )
 	if id then
-		texturecache[id] = tx
+		texturecache[ id ] = { tx }
+		local cacheentry = texturecache[ id ]
+		local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
+		cacheentry[ 2 ] = CreateMaterial( "SF_TEXTURE_" .. id, "UnlitGeneric", {
+			[ "$nolod" ] = 1,
+			[ "$ignorez" ] = 1,
+			[ "$vertexcolor" ] = 1,
+			[ "$vertexalpha" ] = 1
+		} )
+		cacheentry[ 2 ]:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
 		return id
 	end
 end
 
 --- Sets the texture
-function render_library.setTexture(id)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+function render_library.setTexture ( id )
+	if not SF.instance.data.render.isRendering then error( "Not in rendering hook.", 2 ) end
 	if not id then
-		surface.SetTexture(nil)
-	elseif texturecache[id] then
-		surface.SetTexture(id)
+		draw.NoTexture()
+	elseif texturecache[ id ] then
+		surface.SetMaterial( texturecache[ id ][ 2 ] )
 	end
 end
 
