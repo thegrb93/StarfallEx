@@ -9,7 +9,7 @@ include("starfall/sflib.lua")
 
 local MakeSF
 
-TOOL.ClientConVar[ "Model" ] = "models/jaanus/wiretool/wiretool_siren.mdl"
+TOOL.ClientConVar[ "Model" ] = "models/spacecode/sfchip.mdl"
 cleanup.Register( "starfall_processor" )
 
 if SERVER then
@@ -144,7 +144,10 @@ if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.wire_starfall_processor.name", Description = "#Tool.wire_starfall_processor.desc" })
 		
-		local modelPanel = WireDermaExts.ModelSelect(panel, "wire_starfall_processor_Model", list.Get("Wire_gate_Models"), 2)
+		local gateModels = list.Get( "Starfall_gate_Models" )
+		table.Merge( gateModels, list.Get( "Wire_gate_Models" ) )
+		
+		local modelPanel = WireDermaExts.ModelSelect( panel, "wire_starfall_processor_Model", gateModels, 2 )
 		panel:AddControl("Label", {Text = ""})
 		
 		local docbutton = vgui.Create("DButton" , panel)
