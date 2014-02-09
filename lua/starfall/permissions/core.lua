@@ -121,9 +121,9 @@ do
 		end
 	end
 	
-	local cl_files = file.Find( "starfall/permission/providers_cl/*.lua", "LUA" )
+	local cl_files = file.Find( "starfall/permissions/providers_cl/*.lua", "LUA" )
 	
 	for _, file in pairs( cl_files ) do
-		IncludeClientFile( "starfall/permission/providers_cl/" .. file )
+		IncludeClientFile( "starfall/permissions/providers_cl/" .. file )
 	end
 end

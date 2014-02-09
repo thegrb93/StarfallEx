@@ -8,11 +8,11 @@ setmetatable( P, P )
 -- localize the result set
 local ALLOW = SF.Permissions.Result.ALLOW
 local DENY = SF.Permissions.Result.DENY
-local NEUTRAL = SF.Permissions.Resulr.NEUTRAL
+local NEUTRAL = SF.Permissions.Result.NEUTRAL
 
 -- define what permission keys we will allow
 local keys = {
-	["file.read" ] = true
+	["file.read" ] = true,
 	["file.write"] = true
 }
 
