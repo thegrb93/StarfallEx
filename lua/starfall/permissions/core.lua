@@ -18,6 +18,14 @@ SF.Permissions = {}
 local P = SF.Permissions
 P.__index = P
 
+P.privileges = {}
+
+if SERVER then
+	util.AddNetworkString( "starfall_permissions_privileges" )
+else
+	P.serverPrivileges = {}
+end
+
 do
 	local lockmeta = {
 		__newindex = function (table, key, value)
@@ -71,6 +79,8 @@ end
 -- @param key a string identifying the action being performed
 -- @return boolean whether the action is permitted
 function P.check (principal, target, key)
+	if not P.privileges[key] then print("WARNING: Starfall privilege " .. key .. " was not registered!") end
+
 	-- server owners can do whatever they want
 	if have_owner then
 		-- this can't be merged into the check loop below because that 
@@ -95,6 +105,27 @@ function P.check (principal, target, key)
 	end
 	
 	return allow
+end
+
+--- Registers a privilege
+-- @param id unique identifier of the privilege being registered
+-- @param name Human readable name of the privilege
+-- @param description a short description of the privilege
+function P.registerPrivilege ( id, name, description )
+	P.privileges[ id ] = { name = name, description = description }
+
+	-- The second check is not really necessary, but since it will resolve to false most of the time, we can save some time
+	if SERVER and #player.GetAll() > 0 then
+		net.Start( "starfall_permissions_privileges" )
+			net.WriteInt( #P.privileges, 16 )
+
+			for k, v in pairs( P.privileges ) do
+				net.WriteString( k )
+				net.WriteString( v.name )
+				net.WriteString( v.description )
+			end
+		net.Broadcast()
+	end
 end
 
 -- Find and include all provider files.
@@ -126,4 +157,35 @@ do
 	for _, file in pairs( cl_files ) do
 		IncludeClientFile( "starfall/permissions/providers_cl/" .. file )
 	end
+end
+
+-- Send serverside privileges to client
+
+if SERVER then
+	local function sendPrivileges ( ply )
+		net.Start( "starfall_permissions_privileges" )
+			net.WriteInt( #P.privileges, 16 )
+
+			for k, v in pairs( P.privileges ) do
+				net.WriteString( k )
+				net.WriteString( v.name )
+				net.WriteString( v.description )
+			end
+		if ply then
+			net.Send( ply )
+		else
+			net.Broadcast()
+		end
+	end
+
+	sendPrivileges()
+
+	hook.Add( "PlayerInitialSpawn", "starfall_permissions", sendPrivileges )
+else
+	net.Receive( "starfall_permissions_privileges", function()
+		local len = net.ReadInt( 16 )
+		for i = 1, len do
+			P.serverPrivileges[ net.ReadString() ] = { name = net.ReadString(), description = net.ReadString() }
+		end
+	end )
 end
