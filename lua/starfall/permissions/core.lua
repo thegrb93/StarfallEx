@@ -151,7 +151,16 @@ do
 			include( "starfall/permissions/providers_sv/" .. file )
 		end
 	end
-	
+
+	local sh_files = file.Find( "starfall/permissions/providers_sh/*.lua", "LUA" )
+
+	for _, file in pairs( sh_files ) do
+		if SERVER then
+			AddCSLuaFile( "starfall/permissions/providers_sh/" .. file )
+		end
+		include( "starfall/permissions/providers_sh/" .. file )
+	end
+
 	local cl_files = file.Find( "starfall/permissions/providers_cl/*.lua", "LUA" )
 	
 	for _, file in pairs( cl_files ) do
