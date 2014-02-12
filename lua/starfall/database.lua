@@ -40,31 +40,12 @@ else
 
 	[==[	INSERT INTO starfall_meta VALUES ("schema_version", "0.1")]==],
 
-	[==[	-- the roles used by the default permissions provider
-		CREATE TABLE starfall_perms_roles (
-			id INTEGER PRIMARY KEY,
-			name TEXT NOT NULL,
-			description TEXT
-		)]==],
-
-	[==[	-- maps players (identified by their Steam ID) into roles
-		CREATE TABLE starfall_perms_player_roles (
-			player TEXT NOT NULL,
-			role INTEGER NOT NULL,
-			PRIMARY KEY (player, role),
-			FOREIGN KEY (role) REFERENCES starfall_perms_roles (id)
-				ON DELETE CASCADE ON UPDATE CASCADE
-		)]==],
-
 	[==[	-- grants permissions to roles
 		CREATE TABLE starfall_perms_grants (
-			role INTEGER NOT NULL,
+			role INTEGER NOT NULL, -- 0 = user, 1 = admin, 2 = superadmin
 			key TEXT NOT NULL,
-			target TEXT,
-			grant INTEGER CHECK (grant IN (0, 1)),
-			PRIMARY KEY (role, key, target),
-			FOREIGN KEY (role) REFERENCES starfall_perms_roles (id)
-				ON DELETE CASCADE ON UPDATE CASCADE
+			grant INTEGER CHECK (grant IN (0, 1, 2)), -- 0 = NEUTRAL, 1 = ALLOW, 2 = DENY
+			PRIMARY KEY (role, key)
 		)]==]
 	} )
 	sql.Commit()

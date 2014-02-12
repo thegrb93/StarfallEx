@@ -12,37 +12,49 @@ local NEUTRAL = SF.Permissions.Result.NEUTRAL
 
 local ES = SF.DB.escape;
 
+local function getUsergroupID ( ply )
+	if ply:IsSuperAdmin() then
+		return 2
+	elseif ply:IsAdmin() then
+		return 1
+	end
+	return 0
+end
+
+local function getUsergroupName ( ply )
+	if ply:IsSuperAdmin() then
+		return "superadmin"
+	elseif ply:IsAdmin() then
+		return "admin"
+	end
+	return "user"
+end
+
 function P:check (principal, target, key)
-	-- if target is not a string, we don't care about the permission 
-	if type( target ) ~= "string" then return NEUTRAL end
-	
 	local result = SF.DB.query( [[
-		SELECT grant.grant
-		FROM starfall_perms_player_roles AS role
-		INNER JOIN starfall_perms_grants AS grant ON grant.role = role.rowid
-		WHERE role.player = "]] .. ES( principal:SteamID() ) .. [["
-			AND grant.key = "]] .. ES( key ) .. [["
-			AND grant.target = "]] .. ES( target ) .. [["]]
+		SELECT grant
+		FROM starfall_perms_grants
+		WHERE	role = ]] .. ES( getUsergroupID( principal ) ) .. [[
+			AND key = "]] .. ES( key ) .. [["]]
 	)
 
 	if result == false then
 		error( "error in default provider " .. sql.LastError() )
 	end
 	
-	local allow = false;
-	for _, row in pairs( result or {} ) do
+	if result and #result >= 1 then
+		local row = result[1]
 		local grant = row[ 'grant' ]
-		
-		if "1" == grant then
-			allow = true
-		elseif "0" == grant then
+
+		if "0" == grant then
+			return NEUTRAL
+		elseif "1" == grant then
+			return ALLOW
+		elseif "2" == grant then
 			return DENY
 		end
-	end
-	
-	if allow then
-		return ALLOW
 	else
+		print( "WARNING: privilege " .. key .. " not set for " .. getUsergroupName( principal ) )
 		return NEUTRAL
 	end
 end
