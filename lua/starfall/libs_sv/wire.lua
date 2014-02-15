@@ -31,6 +31,17 @@ SF.Wire.Library = wire_library
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs" )
+	P.registerPrivilege( "wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs" )
+	P.registerPrivilege( "wire.output", "Output", "Allows the user to set the value of an output" )
+	P.registerPrivilege( "wire.input", "Input", "Allows the user to read the value of an input" )
+	P.registerPrivilege( "wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink" )
+	P.registerPrivilege( "wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink" )
+end
+
 ---
 -- @class table
 -- @name SF.Wire.WlMetatable
@@ -191,7 +202,8 @@ end
 -- letter and contain only alphabetical characters.
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. May be modified by the function.
-function wire_library.createInputs(names, types)
+function wire_library.createInputs ( names, types )
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" ) then return end
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
@@ -217,7 +229,8 @@ end
 -- letter and contain only alphabetical characters.
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. May be modified by the function.
-function wire_library.createOutputs(names, types)
+function wire_library.createOutputs ( names, types )
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" ) then return end
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
@@ -250,6 +263,7 @@ end
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
 wirelink_metatable.__index = function(self,k)
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.read" ) then return end
 	SF.CheckType(self,wirelink_metatable)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
@@ -269,6 +283,7 @@ end
 
 --- Writes to an input.
 wirelink_metatable.__newindex = function(self,k,v)
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.write" ) then return end
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
@@ -369,7 +384,8 @@ end
 -- ------------------------- Ports Metatable ------------------------- --
 local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 
-function wire_ports_metamethods:__index(name)
+function wire_ports_metamethods:__index ( name )
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.input" ) then return end
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity
@@ -382,7 +398,8 @@ function wire_ports_metamethods:__index(name)
 	return inputConverters[ent.Inputs[name].Type](ent.Inputs[name].Value)
 end
 
-function wire_ports_metamethods:__newindex(name,value)
+function wire_ports_metamethods:__newindex ( name, value )
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.output" ) then return end
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity

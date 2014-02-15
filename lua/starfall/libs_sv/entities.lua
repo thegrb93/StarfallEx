@@ -15,6 +15,20 @@ local ents_metatable = SF.Entities.Metatable
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
 
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "entities.parent", "Parent", "Allows the user to parent an entity to another entity" )
+	P.registerPrivilege( "entities.unparent", "Unparent", "Allows the user to remove the parent of an entity" ) -- TODO: maybe merge with entities.parent?
+	P.registerPrivilege( "entities.applyForce", "Apply force", "Allows the user to apply force to an entity" )
+	P.registerPrivilege( "entities.setPos", "Set Position", "Allows the user to teleport an entity to another location" )
+	P.registerPrivilege( "entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation" )
+	P.registerPrivilege( "entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity" )
+	P.registerPrivilege( "entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity" )
+	P.registerPrivilege( "entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity" )
+	P.registerPrivilege( "entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity" )
+end
+
 local function fix_nan(v)
 	if v < huge and v > -huge then return v else return 0 end
 end
@@ -125,7 +139,8 @@ end
 
 --- Parents the entity to another entity
 -- @param ent Entity to parent to
-function ents_methods:parent( ent ) --- TODO: Add permission checks to this!
+function ents_methods:parent( ent )
+	if not SF.Permissions.check( SF.instance.player, { this, ent }, "entities.parent" ) then return end
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( ent )
@@ -133,16 +148,12 @@ function ents_methods:parent( ent ) --- TODO: Add permission checks to this!
 
 	if not isValid( ent ) then return false, "entity not valid" end
 	if not parent_check( this, ent ) then return false, "cannot parent to self" end
-	--print("getOwner: ,",ent:GetOwner())
-	if SF.Entities.GetOwner( ent ) ~= SF.instance.player then return false, "cannot parent to something which is not yours!" end
-	if not canModify(SF.instance.player, this) or not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 
 	this:SetParent( ent )
 end
 
---- Unparents the entity
-function ents_methods:unparent() --- TODO: Add permission checks to this!
-
+function ents_methods:unparent()
+	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then return end
 	local this = unwrap(self)
 	this:SetParent( nil )
 end
@@ -151,13 +162,13 @@ end
 -- @param vec The force vector
 -- @param offset An optional offset position
 function ents_methods:applyForceCenter(vec)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	if not check( vec ) then return false, "infinite vector" end
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -170,6 +181,7 @@ end
 -- @param vec The force vector
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset(vec, offset)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	SF.CheckType(offset,"Vector")
@@ -177,7 +189,6 @@ function ents_methods:applyForceOffset(vec, offset)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -190,12 +201,12 @@ end
 -- @param ang The force angle
 -- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
 function ents_methods:applyAngForce(ang)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -232,12 +243,12 @@ end
 -- @param tq The torque vector
 -- @deprecated Gmod has no phys:ApplyTorque function, so this uses black magic
 function ents_methods:applyTorque(tq)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(tq,"Vector")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -267,12 +278,12 @@ end
 --- Sets the entitiy's position
 -- @param vec New position
 function ents_methods:setPos(vec)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.setPos" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 
 	SF.setPos( ent, vec )
 
@@ -282,12 +293,12 @@ end
 --- Sets the entity's angles
 -- @param ang New angles
 function ents_methods:setAngles(ang)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.setAngles" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 
 	SF.setAng( ent, ang )
 
@@ -297,12 +308,12 @@ end
 --- Sets the entity's linear velocity
 -- @param vel New velocity
 function ents_methods:setVelocity(vel)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.setVelocity" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vel,"Vector")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -313,11 +324,11 @@ end
 --- Sets the entity frozen state
 -- @param freeze Should the entity be frozen?
 function ents_methods:setFrozen(freeze)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.setFrozen" ) then return end
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
@@ -345,7 +356,6 @@ end
 function ents_methods:setSolid ( solid )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
-	if not canModify( SF.instance.player, ent ) or SF.instance.permissions:checkPermission( "Modify All Entities" ) then return false, "access denied" end
 	
 	ent:SetNotSolid( not solid )
 end
@@ -353,11 +363,11 @@ end
 --- Sets entity gravity
 -- @param grav Should the entity respect gravity?
 function ents_methods:enableGravity(grav)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.enableGravity" ) then return end
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	

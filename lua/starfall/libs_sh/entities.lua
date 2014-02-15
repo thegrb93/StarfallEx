@@ -13,6 +13,12 @@ local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true,debug.getregist
 -- @shared
 local ents_lib, _ = SF.Libraries.Register("entities")
 
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "entities.setColor", "Set Color", "Allows the user to change the color of an entity" )
+end
+
 -- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = wrap
@@ -90,6 +96,7 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor( clr )
+	if not SF.Permissions.check( SF.instance.player, this, "entities.setColor" ) then return end
 	SF.CheckType( clr, SF.Types["Color"] )
 
 	local this = unwrap( self )

@@ -1,4 +1,3 @@
-
 --- Sound functions. Plays and manipulates sounds, optionally
 -- attaching them to an entity.
 
@@ -8,6 +7,13 @@ local sound_library, _ = SF.Libraries.Register("sounds")
 local sound_methods, sound_metamethods = SF.Typedef("Sound")
 local wrap, unwrap = SF.CreateWrapper(sound_metamethods,true,false)
 
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "sound.create", "Sound", "Allows the user to create sounds" )
+	P.registerPrivilege( "sound.modify", "Sound", "Allows the user to modify sounds" )
+end
+
 --- Creates a sound and attaches it to an entity. You need to do sound:Play() before
 -- the sound will play however.
 -- @param path Filepath to the sound file
@@ -15,6 +21,7 @@ local wrap, unwrap = SF.CreateWrapper(sound_metamethods,true,false)
 -- @return The sound object. Keep this around to ensure it isn't GC'd (and thus stopped)
 -- before it is done playing.
 function sound_library.create(entity, path)
+	if not SF.Permissions.check( SF.instance.player, path, "sound.create" ) then return end
 	SF.CheckType(path, "string")
 	SF.CheckType(entity, SF.Entities.Metatable)
 	if path:match('["?]') then SF.throw( "Invalid sound path: " .. path, 2 ) end
@@ -28,6 +35,7 @@ end
 -- @param amplitude (Optinal) Loudness of the sound, from 0 to 255
 -- @param pitch (Optional) Pitch percent, from 0 to 255
 function sound_library.emitWorld(origin, path, amplitude, pitch)
+	if not SF.Permissions.check( SF.instance.player, path, "sound.create" ) then return end
 	SF.CheckType(path, "string")
 	SF.CheckType(origin, "Vector")
 	if amplitude then
@@ -48,6 +56,7 @@ end
 -- @param soundlevel (Optional) The sound level. See sound:setLevel() for more info
 -- @param pitch (Optional) Pitch percent, from 0 to 255
 function sound_library.emitEntity(entity, path, soundlevel, pitch)
+	if not SF.Permissions.check( SF.instance.player, path, "sound.create" ) then return end
 	SF.CheckType(entity, SF.Entities.Metatable)
 	SF.CheckType(path, "string")
 	if soundlevel then
@@ -77,6 +86,7 @@ end
 
 --- Plays the sound.
 function sound_methods:play()
+	if not SF.Permissions.check( SF.instance.player, this, "sound.modify" ) then return end
 	SF.CheckType(self, sound_metamethods)
 	unwrap(self):Play()
 end
@@ -85,6 +95,7 @@ end
 -- @param pitch The sound pitch as a percent from 0 to 255
 -- @param delta (Optinal) The transition time between the current pitch and the new one
 function sound_methods:setPitch(pitch, delta)
+	if not SF.Permissions.check( SF.instance.player, this, "sound.modify" ) then return end
 	SF.CheckType(self, sound_metamethods)
 	SF.CheckType(pitch, "number")
 	if delta then
@@ -97,6 +108,7 @@ end
 --- Sets the sound volume
 -- @param vol Volume as a percent between 0 and 1
 function sound_methods:setVolume(vol)
+	if not SF.Permissions.check( SF.instance.player, this, "sound.modify" ) then return end
 	SF.CheckType(self, sound_metamethods)
 	SF.CheckType(vol, "number")
 	unwrap(self):ChangeVolume(math.Clamp(vol,0,1))
@@ -107,6 +119,7 @@ end
 -- (use decibel value from the 'code' column, not the actual enum or 'value' column).
 -- @param level New level
 function sound_methods:setLevel(level)
+	if not SF.Permissions.check( SF.instance.player, this, "sound.modify" ) then return end
 	SF.CheckType(self, sound_metamethods)
 	SF.CheckType(level, "number")
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
@@ -115,6 +128,7 @@ end
 --- Stops or fades out the sound.
 -- @param fade (Optional) Time, in seconds, to fade out the sound. Not given = stop immediately
 function sound_methods:stop(fade)
+	if not SF.Permissions.check( SF.instance.player, this, "sound.modify" ) then return end
 	SF.CheckType(self, sound_metamethods)
 	if fade then
 		SF.CheckType(fade, "number")
