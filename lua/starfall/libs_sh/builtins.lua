@@ -285,7 +285,16 @@ function SF.DefaultEnvironment.dofile(file)
 end
 
 --- Lua's pcall function
-SF.DefaultEnvironment.pcall = pcall
+function SF.DefaultEnvironment.pcall ( ... )
+    ok, err = pcall( ... )
+
+    -- don't catch quota errors
+    if SF.instance.ops > SF.instance.context.ops then
+        error( err, 0 )
+    end
+
+    return ok, err
+end
 
 --- GLua's loadstring, modified for safe use in Starfall
 -- Works like loadstring, except that it executes by default in the main environment
