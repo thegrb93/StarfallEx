@@ -6,11 +6,14 @@ local holograms_library, holograms_library_metamethods = SF.Libraries.Register("
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
 
 SF.Holograms = {}
-SF.Holograms.defaultquota = CreateConVar("sf_holograms_defaultquota", "7200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of holograms allowed to spawn via Starfall scripts across all instances")
+SF.Holograms.defaultquota = CreateConVar( "sf_holograms_defaultquota", "7200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The default number of holograms allowed to spawn via Starfall scripts across all instances" )
 
-SF.Holograms.personalquota = CreateConVar("sf_holograms_personalquota", "300", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of holograms allowed to spawn via Starfall scripts for a single instance")
+SF.Holograms.personalquota = CreateConVar( "sf_holograms_personalquota", "300", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The default number of holograms allowed to spawn via Starfall scripts for a single instance" )
+
+SF.Holograms.burstrate = CreateConVar( "sf_holograms_burstrate", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+    "The default number of holograms allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
 
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
@@ -32,7 +35,7 @@ SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.holograms = {
 		holos = {},
 		count = 0,
-		burst = 10
+		burst = SF.Holograms.burstrate:GetInt() or 10
 	}
 
 	insts[inst] = true
@@ -235,13 +238,13 @@ if SERVER then
 		return plyCount[i.player] >= SF.Holograms.personalquota:GetInt()
 	end
 
-	timer.Create("SF_Hologram_BurstCounter", 1/4, 0, function()
+	timer.Create( "SF_Hologram_BurstCounter", 1/4, 0, function()
 		for i, _ in pairs( insts ) do
-			if i.data.holograms.burst < 10 then
+			if i.data.holograms.burst < SF.Holograms.burstrate:GetInt() or 10 then -- Should allow for dynamic changing of burst rate from the server.
 				i.data.holograms.burst = i.data.holograms.burst + 1
 			end
 		end
-	end)
+	end )
 
 	--- Creates a hologram.
 	-- @server
