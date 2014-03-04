@@ -316,3 +316,27 @@ function ents_methods:eyePos()
 	if not isValid(ent) then return nil, "invalid entity" end
 	return ent:EyePos()
 end
+
+--- Gets an entities' material
+-- @shared
+-- @class function
+-- @return Material
+function ents_methods:getMaterial ()
+    local ent = unwrap( self )
+    if not isValid( ent ) then return nil, "invalid entity" end
+    return ent:GetMaterial() or ""
+end
+
+--- Sets an entities' material
+-- @shared
+-- @class function
+-- @param material, string, New material name.
+-- @return The Entity being modified.
+function ents_methods:setMaterial ( material )
+    SF.CheckType( material, "string" )
+
+    local ent = unwrap( self )
+    if not isValid( ent ) then return nil, "invalid entity" end
+    ent:SetMaterial( material )
+    return wrap( ent )
+end
