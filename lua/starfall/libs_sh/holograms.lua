@@ -202,9 +202,6 @@ if SERVER then
 			holoent:Remove()
 		end
 	end
-end
-
-if SERVER then
 
 	--- Updates/Checks burst constraints
 	-- @class function
@@ -281,9 +278,9 @@ if SERVER then
 			return holo
 			-- TODO: Need to fire a umsg here to assign clientside ownership(?)
 		end
-	end
+    end
 
-	holograms_library_metamethods.__call = createHolo
+    holograms_library.create = createHolo
 
 	--- Checks if a user can spawn anymore holograms.
 	-- @server
