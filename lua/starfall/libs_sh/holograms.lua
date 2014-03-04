@@ -249,41 +249,40 @@ if SERVER then
 	--- Creates a hologram.
 	-- @server
 	-- @return The hologram object
-	local function createHolo(self, pos, ang, model, scale)
-		SF.CheckType(pos, "Vector")
-		SF.CheckType(ang, "Angle")
-		SF.CheckType(model, "string")
-		if scale then SF.CheckType(scale, "Vector") end
+    function holograms_library.create( pos, ang, model, scale )
+        SF.CheckType( pos, "Vector" )
+        SF.CheckType( ang, "Angle" )
+        SF.CheckType( model, "string" )
+        if scale then SF.CheckType( scale, "Vector" ) end
 
-		local instance = SF.instance
-		if not can_spawn( instance ) then return error("Can't spawn holograms that often",2) end
-		if personal_max_reached( instance ) then return error("Can't spawn holograms, maximum personal limit of "..SF.Holograms.personalquota:GetInt().." has been reached", 2 ) end
-		if max_reached() then return error("Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2) end
+        local instance = SF.instance
+        if not can_spawn( instance ) then return error( "Can't spawn holograms that often", 2 )
+        elseif personal_max_reached( instance ) then return error( "Can't spawn holograms, maximum personal limit of "..SF.Holograms.personalquota:GetInt().." has been reached", 2 )
+        elseif max_reached() then return error( "Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2 ) end
 
-		local holodata = instance.data.holograms
-		local holoent = ents.Create("gmod_starfall_hologram")
-		if holoent and holoent:IsValid() then
-			holoent:SetPos(pos)
-			holoent:SetAngles(ang)
-			holoent:SetModel(model)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata)
-			holoent:Spawn()
-			if scale then
-				holoent:SetScale(scale)
-			end
-		
-			local holo = SF.Entities.Wrap(holoent)
-		
-			holodata.holos[holo] = holo
-			holodata.count = holodata.count + 1
+        local holodata = instance.data.holograms
+        local holoent = ents.Create( "gmod_starfall_hologram" )
+        if holoent and holoent:IsValid() then
+            holoent:SetPos( pos )
+            holoent:SetAngles( ang )
+            holoent:SetModel( model )
+            holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata )
+            holoent:Spawn()
 
-			plyCount[instance.player] = plyCount[instance.player] + 1
-			return holo
-			-- TODO: Need to fire a umsg here to assign clientside ownership(?)
-		end
+            if scale then
+                holoent:SetScale( scale )
+            end
+
+            local holo = SF.Entities.Wrap( holoent )
+
+            holodata.holos[ holo ] = holo
+            holodata.count = holodata.count + 1
+
+            plyCount[ instance.player ] = plyCount[ instance.player ] + 1
+            return holo
+            -- TODO: Need to fire a umsg here to assign clientside ownership(?)
+        end
     end
-
-    holograms_library.create = createHolo
 
 	--- Checks if a user can spawn anymore holograms.
 	-- @server
