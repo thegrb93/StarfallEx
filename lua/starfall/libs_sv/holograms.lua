@@ -6,11 +6,14 @@ local holograms_library, holograms_library_metamethods = SF.Libraries.Register("
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
 
 SF.Holograms = {}
-SF.Holograms.defaultquota = CreateConVar("sf_holograms_defaultquota", "7200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of holograms allowed to spawn via Starfall scripts across all instances")
+SF.Holograms.defaultquota = CreateConVar( "sf_holograms_defaultquota", "7200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The default number of holograms allowed to spawn via Starfall scripts across all instances" )
 
-SF.Holograms.personalquota = CreateConVar("sf_holograms_personalquota", "300", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of holograms allowed to spawn via Starfall scripts for a single instance")
+SF.Holograms.personalquota = CreateConVar( "sf_holograms_personalquota", "300", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The default number of holograms allowed to spawn via Starfall scripts for a single instance" )
+
+SF.Holograms.burstrate = CreateConVar( "sf_holograms_burstrate", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+    "The default number of holograms allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
 
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
@@ -32,7 +35,7 @@ SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.holograms = {
 		holos = {},
 		count = 0,
-		burst = 10
+		burst = SF.Holograms.burstrate:GetInt() or 10
 	}
 
 	insts[inst] = true
@@ -192,102 +195,99 @@ function hologram_methods:setFlexScale(scale)
 	end
 end
 
-if SERVER then
-	--- Deletes the hologram
-	-- @server
-	function hologram_methods:remove()
-		SF.CheckType(self, hologram_metamethods)
-		local holoent = SF.Entities.Unwrap(self)
-		if IsValid(holoent) then
-			holoent:Remove()
-		end
-	end
 
-	--- Updates/Checks burst constraints
-	-- @class function
-	-- @param instance Instance table for the burst values related to current SF Instance / Player
-	-- @param noupdate False if updating the burst should be done.
-	local function can_spawn(instance, noupdate)
-		if instance.data.holograms.burst > 0 then
-			if not noupdate then instance.data.holograms.burst = instance.data.holograms.burst - 1 end
-			return true
-		else
-			return false
-		end
-	end
-
-	--- Checks if the total number of holograms across all instances has reached the max limit.
-	-- @class function
-	-- @return True/False depending on if limit has been reached for SF Holograms
-	local function max_reached()
-		local c = 0
-		for _, v in pairs( plyCount ) do
-			c = c + v
-		end
-		if c >= SF.Holograms.defaultquota:GetInt() then return true else return false end
-	end
-
-	--- Checks if the users personal limit of holograms has been exhausted
-	-- @class function
-	-- @param i Instance to use, this will relate to the player in question
-	-- @return True/False depending on if the personal limit has been reached for SF Holograms
-	local function personal_max_reached( i )
-		return plyCount[i.player] >= SF.Holograms.personalquota:GetInt()
-	end
-
-	timer.Create("SF_Hologram_BurstCounter", 1/4, 0, function()
-		for i, _ in pairs( insts ) do
-			if i.data.holograms.burst < 10 then
-				i.data.holograms.burst = i.data.holograms.burst + 1
-			end
-		end
-	end)
-
-	--- Creates a hologram.
-	-- @server
-	-- @return The hologram object
-	local function createHolo(self, pos, ang, model, scale)
-		SF.CheckType(pos, "Vector")
-		SF.CheckType(ang, "Angle")
-		SF.CheckType(model, "string")
-		if scale then SF.CheckType(scale, "Vector") end
-
-		local instance = SF.instance
-		if not can_spawn( instance ) then return error("Can't spawn holograms that often",2) end
-		if personal_max_reached( instance ) then return error("Can't spawn holograms, maximum personal limit of "..SF.Holograms.personalquota:GetInt().." has been reached", 2 ) end
-		if max_reached() then return error("Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2) end
-
-		local holodata = instance.data.holograms
-		local holoent = ents.Create("gmod_starfall_hologram")
-		if holoent and holoent:IsValid() then
-			holoent:SetPos(pos)
-			holoent:SetAngles(ang)
-			holoent:SetModel(model)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata)
-			holoent:Spawn()
-			if scale then
-				holoent:SetScale(scale)
-			end
-		
-			local holo = SF.Entities.Wrap(holoent)
-		
-			holodata.holos[holo] = holo
-			holodata.count = holodata.count + 1
-
-			plyCount[instance.player] = plyCount[instance.player] + 1
-			return holo
-			-- TODO: Need to fire a umsg here to assign clientside ownership(?)
-		end
+--- Deletes the hologram
+-- @server
+function hologram_methods:remove()
+    SF.CheckType(self, hologram_metamethods)
+    local holoent = SF.Entities.Unwrap(self)
+    if IsValid(holoent) then
+        holoent:Remove()
     end
-
-    holograms_library.create = createHolo
-
-	--- Checks if a user can spawn anymore holograms.
-	-- @server
-	-- @return True if user can spawn holograms, False if not.
-	function holograms_library.canSpawn()
-		local instance = SF.instance
-		return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
 end
 
+--- Updates/Checks burst constraints
+-- @class function
+-- @param instance Instance table for the burst values related to current SF Instance / Player
+-- @param noupdate False if updating the burst should be done.
+local function can_spawn(instance, noupdate)
+    if instance.data.holograms.burst > 0 then
+        if not noupdate then instance.data.holograms.burst = instance.data.holograms.burst - 1 end
+        return true
+    else
+        return false
+    end
+end
+
+--- Checks if the total number of holograms across all instances has reached the max limit.
+-- @class function
+-- @return True/False depending on if limit has been reached for SF Holograms
+local function max_reached()
+    local c = 0
+    for _, v in pairs( plyCount ) do
+        c = c + v
+    end
+    if c >= SF.Holograms.defaultquota:GetInt() then return true else return false end
+end
+
+--- Checks if the users personal limit of holograms has been exhausted
+-- @class function
+-- @param i Instance to use, this will relate to the player in question
+-- @return True/False depending on if the personal limit has been reached for SF Holograms
+local function personal_max_reached( i )
+    return plyCount[i.player] >= SF.Holograms.personalquota:GetInt()
+end
+
+timer.Create( "SF_Hologram_BurstCounter", 1/4, 0, function()
+    for i, _ in pairs( insts ) do
+        if i.data.holograms.burst < SF.Holograms.burstrate:GetInt() or 10 then -- Should allow for dynamic changing of burst rate from the server.
+            i.data.holograms.burst = i.data.holograms.burst + 1
+        end
+    end
+end )
+
+--- Creates a hologram.
+-- @server
+-- @return The hologram object
+function holograms_library.create( pos, ang, model, scale )
+    SF.CheckType( pos, "Vector" )
+    SF.CheckType( ang, "Angle" )
+    SF.CheckType( model, "string" )
+    if scale then SF.CheckType( scale, "Vector" ) end
+
+    local instance = SF.instance
+    if not can_spawn( instance ) then return error( "Can't spawn holograms that often", 2 )
+    elseif personal_max_reached( instance ) then return error( "Can't spawn holograms, maximum personal limit of "..SF.Holograms.personalquota:GetInt().." has been reached", 2 )
+    elseif max_reached() then return error( "Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2 ) end
+
+    local holodata = instance.data.holograms
+    local holoent = ents.Create( "gmod_starfall_hologram" )
+    if holoent and holoent:IsValid() then
+        holoent:SetPos( pos )
+        holoent:SetAngles( ang )
+        holoent:SetModel( model )
+        holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata )
+        holoent:Spawn()
+
+        if scale then
+            holoent:SetScale( scale )
+        end
+
+        local holo = SF.Entities.Wrap( holoent )
+
+        holodata.holos[ holo ] = holo
+        holodata.count = holodata.count + 1
+
+        plyCount[ instance.player ] = plyCount[ instance.player ] + 1
+        return holo
+        -- TODO: Need to fire a umsg here to assign clientside ownership(?)
+    end
+end
+
+--- Checks if a user can spawn anymore holograms.
+-- @server
+-- @return True if user can spawn holograms, False if not.
+function holograms_library.canSpawn()
+    local instance = SF.instance
+    return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
 end
