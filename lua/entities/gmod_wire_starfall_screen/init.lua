@@ -1,4 +1,3 @@
-
 AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
@@ -214,8 +213,16 @@ function ENT:OnRemove()
 	self.instance = nil
 end
 
-function ENT:TriggerInput(key, value)
-	self:runScriptHook("input",key,value)
+function ENT:TriggerInput ( key, value )
+	self:runScriptHook( "input", key, value )
+end
+
+function ENT:ReadCell ( address )
+	return tonumber( self:runScriptHookForResult( "readcell", address ) ) or 0
+end
+
+function ENT:WriteCell ( address, data )
+	self:runScriptHook( "writecell", address, data )
 end
 
 function ENT:BuildDupeInfo()
