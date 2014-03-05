@@ -48,7 +48,7 @@ function ENT:Initialize()
 	msgQueueProcess(self)
 end
 
-function ENT:setupClip()
+function ENT:setupClip ()
     -- Setup Clipping
     local l = #self.clips
     if l > 0 then
@@ -69,14 +69,14 @@ function ENT:setupClip()
     end
 end
 
-function ENT:finishClip()
+function ENT:finishClip ()
     for i = 1, #self.clips do
         render.PopCustomClipPlane()
     end
     render.EnableClipping( false )
 end
 
-function ENT:setupRenderGroup()
+function ENT:setupRenderGroup ()
     local alpha = self:GetColor().a
 
     if alpha == 0 then return end

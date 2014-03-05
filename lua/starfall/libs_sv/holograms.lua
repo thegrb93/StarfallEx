@@ -211,7 +211,7 @@ end
 -- @class function
 -- @param color Color object to set the hologram to
 function hologram_methods:setColor( color )
-    SF.CheckType( color, SF.Types["Color"] )
+    SF.CheckType( color, SF.Types[ "Color" ] )
 
     local this = SF.Entities.Unwrap( self )
     if IsValid( this ) then
