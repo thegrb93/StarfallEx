@@ -48,32 +48,55 @@ function ENT:Initialize()
 	msgQueueProcess(self)
 end
 
+function ENT:setupClip ()
+    -- Setup Clipping
+    local l = #self.clips
+    if l > 0 then
+        render.EnableClipping( true )
+        for i = 1, l do
+            local clip = self.clips[ i ]
+            if clip.enabled then
+                local norm = clip.normal
+                local origin = clip.origin
+
+                if clip.islocal then
+                    norm = self:LocalToWorld( norm ) - self:GetPos()
+                    origin = self:LocalToWorld( origin )
+                end
+                render.PushCustomClipPlane( norm, norm:Dot( origin ) )
+            end
+        end
+    end
+end
+
+function ENT:finishClip ()
+    for i = 1, #self.clips do
+        render.PopCustomClipPlane()
+    end
+    render.EnableClipping( false )
+end
+
+function ENT:setupRenderGroup ()
+    local alpha = self:GetColor().a
+
+    if alpha == 0 then return end
+
+    if alpha ~= 255 then
+        self.RenderGroup = RENDERGROUP_BOTH
+    else
+        self.RenderGroup = RENDERGROUP_OPAQUE
+    end
+end
+
 function ENT:Draw()
-	-- Setup clipping
-	local l = #self.clips
-	if l > 0 then
-		render.EnableClipping(true)
-		for i=1,l do
-			local clip = self.clips[i]
-			if clip.enabled then
-				local norm = clip.normal
-				local origin = clip.origin
-				
-				if clip.islocal then
-					norm = self:LocalToWorld(norm) - self:GetPos()
-					origin = self:LocalToWorld(origin)
-				end
-				render.PushCustomClipPlane(norm, norm:Dot(origin))
-			end
-		end
-	end
-	render.SuppressEngineLighting(self.unlit)
-	
+    self:setupRenderGroup()
+    self:setupClip()
+
+	render.SuppressEngineLighting( self.unlit )
 	self:DrawModel()
-	
-	render.SuppressEngineLighting(false)
-	for i=1,#self.clips do render.PopCustomClipPlane() end
-	render.EnableClipping(false)
+	render.SuppressEngineLighting( false )
+
+    self:finishClip()
 end
 
 -- ------------------------ CLIPPING ------------------------ --

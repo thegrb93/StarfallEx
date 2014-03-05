@@ -206,6 +206,20 @@ function hologram_methods:remove()
     end
 end
 
+--- Sets the color ( and alpha ) of a hologram
+-- @server
+-- @class function
+-- @param color Color object to set the hologram to
+function hologram_methods:setColor( color )
+    SF.CheckType( color, SF.Types[ "Color" ] )
+
+    local this = SF.Entities.Unwrap( self )
+    if IsValid( this ) then
+        this:SetColor( color )
+        this:SetRenderMode( this:GetColor().a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
+    end
+end
+
 --- Updates/Checks burst constraints
 -- @class function
 -- @param instance Instance table for the burst values related to current SF Instance / Player
