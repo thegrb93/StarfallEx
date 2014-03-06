@@ -340,3 +340,36 @@ function ents_methods:setMaterial ( material )
     ent:SetMaterial( material )
     return wrap( ent )
 end
+
+--- Sets an entities' bodygroup
+-- @shared
+-- @class function
+-- @param bodygroup Number, The ID of the bodygroup you're setting.
+-- @param value Number, The value you're setting the bodygroup to.
+-- @return The Entity being modified.
+function ents_methods:setBodygroup ( bodygroup, value )
+    SF.CheckType( bodygroup, "number" )
+    SF.CheckType( value, "number" )
+
+    local ent = unwrap( self )
+    if not isValid( ent ) then return nil, "invalid entity" end
+
+    ent:SetBodyGroup( bodygroup, value )
+
+    return wrap( ent )
+end
+
+--- Sets the skin of the entity
+-- @shared
+-- @class function
+-- @param skinIndex Number, Index of the skin to use.
+-- @return The Entity being modified.
+function ents_methods:setSkin ( skinIndex )
+    SF.CheckType( skinIndex, "number" )
+
+    local ent = unwrap( self )
+    if not isValid( ent ) then return nil, "invalid entity" end
+
+    ent:SetSkin( skinIndex )
+    return wrap( ent )
+end
