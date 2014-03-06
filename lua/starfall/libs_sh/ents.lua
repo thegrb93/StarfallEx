@@ -348,7 +348,6 @@ end
 -- @param value Number, The value you're setting the bodygroup to.
 -- @return The Entity being modified.
 function ents_methods:setBodygroup ( bodygroup, value )
-    SF.CheckType( self, ents_metamethods )
     SF.CheckType( bodygroup, "number" )
     SF.CheckType( value, "number" )
 
@@ -366,7 +365,6 @@ end
 -- @param skinIndex Number, Index of the skin to use.
 -- @return The Entity being modified.
 function ents_methods:setSkin ( skinIndex )
-    SF.CheckType( self, ents_metamethods )
     SF.CheckType( skinIndex, "number" )
 
     local ent = unwrap( self )
