@@ -71,5 +71,5 @@ end
 function vmatrix_metamethods.__mul( lhs, rhs )
 	SF.CheckType( rhs, vmatrix_metamethods )
 
-	return wrap(unwrap(rhs) * unwrap(rhs))
+	return wrap(unwrap(lhs) * unwrap(rhs))
 end
