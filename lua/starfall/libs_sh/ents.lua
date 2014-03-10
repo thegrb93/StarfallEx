@@ -9,7 +9,7 @@ local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true,debug.getregist
 
 --- Entities Library
 -- @shared
-local ents_lib, _ = SF.Libraries.Register("ents")
+local ents_lib, _ = SF.Libraries.Register("entities")
 
 -- ------------------------- Internal functions ------------------------- --
 
