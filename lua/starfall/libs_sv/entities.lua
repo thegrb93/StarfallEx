@@ -187,7 +187,7 @@ end
 
 --- Applies angular force to the entity
 -- @param ang The force angle
--- @depreciated Gmod has no phys:ApplyAngleForce function, so this uses black magic
+-- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
 function ents_methods:applyAngForce(ang)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
@@ -229,6 +229,7 @@ end
 
 --- Applies torque
 -- @param tq The torque vector
+-- @deprecated Gmod has no phys:ApplyTorque function, so this uses black magic
 function ents_methods:applyTorque(tq)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(tq,"Vector")
