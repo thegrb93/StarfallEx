@@ -32,7 +32,7 @@
 <!--<tr><td colspan="2">Modules</td></tr>-->
 <?lua for _, modulename in ipairs(doc.libraries) do?>
 	<tr>
-		<td class="name"><a href="<?lua=docletsfhtml.module_link(modulename, doc)?>"><?lua=modulename?></a></td>
+		<td class="name"><a href="<?lua=docletsfhtml.module_link(modulename, doc)?>"><?lua=doc.libraries[modulename].deprecated and "<del>" or ""?><?lua=modulename?><?lua=doc.libraries[modulename].deprecated and "</del>" or ""?></a></td>
 		<td class="summary"><?lua=doc.libraries[modulename].summary?></td>
 	</tr>
 <?lua end?>

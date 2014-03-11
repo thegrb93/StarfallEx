@@ -28,6 +28,7 @@
 <h1>Library <code><?lua=module_doc.name?></code></h1>
 
 <p><?lua=module_doc.description?></p>
+<?lua=module_doc.deprecated and "<strong><font color=red>This library has been deprecated and will be removed in the future for the following reason:</font> " .. module_doc.deprecated .. "</strong>" or ""?>
 <?lua if module_doc.copyright then?>
 <p>Copyright &copy; <?lua=module_doc.copyright?></p>
 <?lua end?>
@@ -52,7 +53,7 @@
 <?lua for _, func_name in ipairs(module_doc.functions) do
   local func_data = module_doc.functions[func_name]?>
 	<tr>
-	<td class="name" nowrap><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_data.name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(module_doc.functions[func_name].param, ", ")?>)</td>
+	<td class="name" nowrap><?lua=func_data.deprecated and "<del>" or ""?><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_data.name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(module_doc.functions[func_name].param, ", ")?>)<?lua=func_data.deprecated and "</del>" or ""?></td>
 	<td class="summary"><?lua=module_doc.functions[func_name].summary?></td>
 	</tr>
 <?lua end?>
