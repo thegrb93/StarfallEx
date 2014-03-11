@@ -52,7 +52,7 @@
 <?lua for _, func_name in ipairs(file_doc.functions) do
   local func_data = file_doc.functions[func_name]?>
 	<tr>
-	<td class="name" nowrap><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(func_data.param, ", ")?>)</td>
+	<td class="name" nowrap><?lua=func_data.deprecated and "<del>" or ""?><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(func_data.param, ", ")?>)<?lua=func_data.deprecated and "</del>" or ""?></td>
 	<td class="summary"><?lua=func_data.summary?></td>
 	</tr>
 <?lua end?>

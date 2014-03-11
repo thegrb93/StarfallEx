@@ -8,9 +8,11 @@ else
 end
 ?>
 
-<dt><?lua=func.private and "local " or ""?><a name="<?lua=func.name?>"></a><strong><?lua=func.name?></strong>&nbsp;(<?lua=table.concat(func.param, ", ")?>)</dt>
+<dt><?lua=func.deprecated and "<del>" or ""?><?lua=func.private and "local " or ""?><a name="<?lua=func.name?>"></a><strong><?lua=func.name?></strong>&nbsp;(<?lua=table.concat(func.param, ", ")?>)<?lua=func.deprecated and "</del>" or ""?></dt>
 <dd>
 <?lua=func.description or ""?>
+
+<?lua=func.deprecated and "<br /><strong><font color=\"red\">Deprecated:</font> " .. func.deprecated .. "</strong>" or ""?>
 
 <?lua if type(func.param) == "table" and #func.param > 0 then?>
 <h3>Parameters:</h3>

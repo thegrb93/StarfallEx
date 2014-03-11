@@ -164,7 +164,7 @@ end
 
 -------------------------------------------------------------------------------
 
-local function depreciated(tag, block, text)
+local function deprecated ( tag, block, text )
 	block[tag] = text
 end
 
@@ -180,25 +180,25 @@ end
 -------------------------------------------------------------------------------
 
 local handlers = {}
-handlers["author"] = author
-handlers["class"] = class
-handlers["copyright"] = copyright
-handlers["description"] = description
-handlers["field"] = field
-handlers["name"] = name
-handlers["param"] = param
-handlers["release"] = release
-handlers["return"] = ret
-handlers["see"] = see
-handlers["usage"] = usage
-handlers["depreciated"] = depreciated
-handlers["library"] = library
-handlers["libtbl"] = libtbl
-handlers["entity"] = entity
-handlers["client"] = side
-handlers["server"] = side
-handlers["shared"] = shared
-handlers["include"] = include
+handlers[ "author" ] = author
+handlers[ "class" ] = class
+handlers[ "copyright" ] = copyright
+handlers[ "description" ] = description
+handlers[ "field" ] = field
+handlers[ "name" ] = name
+handlers[ "param" ] = param
+handlers[ "release" ] = release
+handlers[ "return" ] = ret
+handlers[ "see" ] = see
+handlers[ "usage" ] = usage
+handlers[ "deprecated" ] = deprecated
+handlers[ "library" ] = library
+handlers[ "libtbl" ] = libtbl
+handlers[ "entity" ] = entity
+handlers[ "client" ] = side
+handlers[ "server" ] = side
+handlers[ "shared" ] = shared
+handlers[ "include" ] = include
 
 -------------------------------------------------------------------------------
 

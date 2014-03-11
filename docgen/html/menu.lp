@@ -25,11 +25,12 @@ end
 <h1>Libraries</h1>
 <ul>
 <?lua for _, modulename in ipairs(doc.libraries) do
+	local module_data = doc.libraries[modulename]
 	if module_doc and module_doc.name == modulename then?>
-	<li><strong><?lua=modulename?></strong></li>
+		<li><strong><?lua=module_data.deprecated and "<del>" or ""?><?lua=modulename?><?lua=module_data.deprecated and "</del>" or ""?></strong></li>
 	<?lua else?>
 	<li>
-		<a href="<?lua=docletsfhtml.module_link(modulename, doc, from)?>"><?lua=modulename?></a>
+		<a href="<?lua=docletsfhtml.module_link(modulename, doc, from)?>"><?lua=module_data.deprecated and "<del>" or ""?><?lua=modulename?><?lua=module_data.deprecated and "</del>" or ""?></a>
 	</li>
 <?lua 	end
 end?>
