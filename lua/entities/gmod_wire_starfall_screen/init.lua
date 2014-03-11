@@ -49,7 +49,6 @@ local requests = {}
 
 local function sendCodeRequest(ply, screenid)
 	local screen = Entity(screenid)
-	if not IsValid(screen) then debug.Trace() end
 
 	if not screen.mainfile then
 		if not requests[screenid] then requests[screenid] = {} end
