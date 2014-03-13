@@ -63,9 +63,10 @@
 <?lua if module_doc.tables and #module_doc.tables > 0 then?>
 <h2>Tables</h2>
 <table class="table_list">
-<?lua for _, tab_name in ipairs(module_doc.tables) do?>
+<?lua for _, tab_name in ipairs(module_doc.tables) do
+	local tab_data = module_doc.tables[tab_name]?>
 	<tr>
-	<td class="name" nowrap><a href="#<?lua=tab_name?>"><?lua=tab_name?></a></td>
+	<td class="name" nowrap><a href="#<?lua=tab_data.name?>"><?lua=tab_name?></a></td>
 	<td class="summary"><?lua=module_doc.tables[tab_name].summary?></td>
 	</tr>
 <?lua end?>
