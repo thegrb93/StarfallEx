@@ -142,8 +142,7 @@ string_methods.explode = function(str,separator,withpattern) return string.Explo
 -- @class table
 SF.DefaultEnvironment.string = setmetatable({},string_metatable)
 
--- Color Type
-
+--- Color type
 local color_methods, color_metatable = SF.Typedef("Color")
 color_metatable.__newindex = function() end
 

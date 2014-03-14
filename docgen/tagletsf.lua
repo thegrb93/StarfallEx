@@ -100,10 +100,11 @@ local function check_library(line)
 end
 
 --- Checks if the line contains a class creation
-local function check_class(line)
+local function check_class ( line )
 	line = util.trim(line)
 
-	local name, tblref = line:match("^SF.Typedef%(%s*[\"']([^\"']+)[\"'],%s*([%w_]+)%s*%)$")
+	local tblref, name = line:match( "^%s*local%s+([%w_]+).-=%s*SF.Typedef%(%s*[\"']([^\"']+)[\"'].-%)$" )
+
 	return name, tblref
 end
 
@@ -162,7 +163,7 @@ end
 -- @param block block with comment field
 -- @return block parameter
 
-local function parse_comment (block, first_line, libs)
+local function parse_comment ( block, first_line, libs, classes )
 
 	-- get the first non-empty line of code
 	local code = table.foreachi(block.code, function(_, line)
@@ -181,9 +182,10 @@ local function parse_comment (block, first_line, libs)
 	
 	-- parse first line of code
 	if code ~= nil then
-		local func_info = check_function(code)
-		local libname, libtbl = check_library(code)
-		--local typname, typtbl = check_class(code)
+		local func_info = check_function( code )
+		local libname, libtbl = check_library( code )
+		local typname, typtbl = check_class( code )
+
 		if func_info then
 			block.class = "function"
 			block.name = func_info.name
@@ -193,9 +195,15 @@ local function parse_comment (block, first_line, libs)
 			block.class = "library"
 			block.name = libname
 			block.libtbl = libtbl
-			block.field = {}
+			block.fields = {}
 			block.functions = {}
 			block.tables = {}
+		elseif typname then
+			block.class = "class"
+			block.name = typname
+			block.typtbl = typtbl
+			block.fields = {}
+			block.methods = {}
 		else
 			block.param = {}
 		end
@@ -231,14 +239,18 @@ local function parse_comment (block, first_line, libs)
 		assert(block.name, "Unnamed library")
 		assert(block.libtbl, "No library table for "..block.name)
 		libs[block.libtbl] = block
-		block.field = block.fields or {}
+		block.fields = block.fields or {}
 		block.functions = block.functions or {}
 		block.tables = block.tables or {}
 	elseif block.class == "function" then
 		local libtbl, fname = block.name:match("(.*)[%.:]([^%.:]+)$")
 		
-		if libtbl and not block.library and libs[libtbl] then
-			block.library = libtbl
+		if libtbl and not block.library then
+			if libs[ libtbl ] then
+				block.library = libtbl
+			elseif classes[ libtbl ] then
+				block.classlib = libtbl
+			end
 		end
 		if block.library then
 			local lib = libs[block.library]
@@ -246,6 +258,12 @@ local function parse_comment (block, first_line, libs)
 			block.library = lib.name
 			table.insert(lib.functions,fname)
 			lib.functions[fname] = block
+		elseif block.classlib then
+			local class = classes[ block.classlib ]
+			assert( class, "no such class: " .. block.classlib )
+			block.classlib = class.name
+			table.insert( class.methods, fname )
+			class.methods[ fname ] = block
 		end
 	elseif block.class == "table" then
 		local libtbl, tname = block.name:match("(.*)%.([^%.]+)$")
@@ -260,6 +278,12 @@ local function parse_comment (block, first_line, libs)
 			table.insert(lib.tables,tname)
 			lib.tables[tname] = block
 		end
+	elseif block.class == "class" then
+		assert( block.name, "Unnamed class" )
+		assert( block.typtbl, "No type table for " .. block.name )
+		classes[ block.typtbl ] = block
+		block.fields = block.fields or {}
+		block.methods = block.methods or {}
 	end
 
 	-- extracts summary information from the description
@@ -280,7 +304,7 @@ end
 -- @return block parsed
 -- @return modulename if found
 
-local function parse_block (f, line, libs, first)
+local function parse_block ( f, line, libs, classes, first )
 	local block = {
 		comment = {},
 		code = {},
@@ -293,7 +317,7 @@ local function parse_block (f, line, libs, first)
 			line, block.code, modulename = parse_code(f, line, modulename)
 			
 			-- parse information in block comment
-			block = parse_comment(block, first, libs)
+			block = parse_comment( block, first, libs, classes )
 
 			return line, block, modulename
 		else
@@ -318,6 +342,7 @@ end
 function parse_file (filepath, doc)
 	local blocks = {}
 	local libs = {}
+	local classes = {}
 	local modulename = nil
 	
 	-- read each line
@@ -329,7 +354,7 @@ function parse_file (filepath, doc)
 		if string.find(line, "^[\t ]*%-%-%-") then
 			-- reached a luadoc block
 			local block
-			line, block, modulename = parse_block(f, line, libs, first)
+			line, block, modulename = parse_block( f, line, libs, classes, first )
 			table.insert(blocks, block)
 		else
 			-- look for a module definition
@@ -392,6 +417,12 @@ function parse_file (filepath, doc)
 		doc.hooks[t.name] = t
 	end
 	
+	doc.files[ filepath ].classes = {}
+	for t in class_iterator( blocks, "class" )() do
+		table.insert( doc.classes, t.name )
+		doc.classes[ t.name ] = t
+	end
+
 	return doc
 end
 
@@ -464,10 +495,12 @@ function start (files, doc)
 		files = {},
 		libraries = {},
 		hooks = {},
+		classes = {}
 	}
-	assert(doc.files, "undefined `files' field")
-	assert(doc.libraries, "undefined `libraries' field")
-	assert(doc.hooks, "undefined `hooks' field")
+	assert( doc.files, "undefined `files' field" )
+	assert( doc.libraries, "undefined `libraries' field" )
+	assert( doc.hooks, "undefined `hooks' field" )
+	assert( doc.classes, "undefined `classes' field" )
 	
 	table.foreachi(files, function (_, path)
 		local mode, err = lfs.attributes(path, "mode")
@@ -483,9 +516,10 @@ function start (files, doc)
 	end)
 	
 	-- order arrays alphabetically
-	recsort(doc.files)
-	recsort(doc.libraries)
-	recsort(doc.hooks)
+	recsort( doc.files )
+	recsort( doc.libraries )
+	recsort( doc.hooks )
+	recsort( doc.classes )
 
 	return doc
 end

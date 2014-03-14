@@ -57,9 +57,9 @@ end
 
 -------------------------------------------------------------------------------
 
-local function field (tag, block, text)
-	if block.class ~= "table" and block.class ~= "library" then
-		luadoc.logger:warn("documenting `field' for block that is not a table or library")
+local function field ( tag, block, text )
+	if block.class ~= "table" and block.class ~= "library" and block.class ~= "class" then
+		luadoc.logger:warn( "documenting `field' for block that is not a table, library or class" )
 	end
 	block[tag] = block[tag] or {}
 

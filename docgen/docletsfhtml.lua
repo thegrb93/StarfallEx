@@ -86,6 +86,20 @@ function module_link (modulename, doc, from)
 	return href
 end
 
+function class_link ( typename, doc, from )
+	assert( typename )
+	assert( doc )
+	from = from or ""
+
+	if doc.classes[ typename ] == nil then
+		return
+	end
+
+	local href = "classes/" .. typename .. ".html"
+	string.gsub( from, "/", function () href = "../" .. href end )
+	return href
+end
+
 function hook_link(hookname, doc, from)
 	assert(hookname)
 	assert(doc)
@@ -200,6 +214,13 @@ function out_module (modulename)
 	return string.format("%slibraries/%s.html", options.output_dir, modulename)
 end
 
+-------------------------------------------------------------------------------
+-- Assembly the output filename for a module.
+-- TODO: change the name of this function
+function out_class ( typename )
+	return string.format( "%sclasses/%s.html", options.output_dir, typename )
+end
+
 -----------------------------------------------------------------
 -- Generate the output.
 -- @param doc Table with the structured documentation.
@@ -248,6 +269,20 @@ function start (doc)
 		end
 	end
 	
+	-- Process classes
+	for _, classname in ipairs( doc.classes ) do
+		local class_doc = doc.classes[ classname ]
+		-- assembly the filename
+		local filename = out_class( classname )
+		logger:info( string.format( "generating file `%s'", filename ) )
+
+		local f = lfs.open( filename, "w" )
+		assert( f, string.format( "could not open `%s' for writing", filename ) )
+		io.output( f )
+		include( "class.lp", { doc = doc, class_doc = class_doc } )
+		f:close()
+	end
+
 	local filename = options.output_dir.."hooks.html"
 	logger:info("generating file `%s'", filename)
 	local f = lfs.open(filename, "w")

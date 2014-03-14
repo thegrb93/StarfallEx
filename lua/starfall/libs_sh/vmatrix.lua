@@ -1,6 +1,7 @@
 -- Credits to Radon & Xandaros
 SF.VMatrix = {}
 
+--- VMatrix type
 local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix") -- Define our own VMatrix based off of standard VMatrix
 local wrap, unwrap = SF.CreateWrapper( vmatrix_metamethods, true, false )
 

@@ -5,6 +5,8 @@ elseif hook_doc then
 	from = "hooks.html"
 elseif file_doc then
 	from = "files/.."..file_doc.name
+elseif class_doc then
+	from = "classes/.." .. class_doc.name
 else
 	from = ""
 end
@@ -37,6 +39,18 @@ end?>
 </ul>
 <?lua end?>
 
+<h1>Types</h1>
+<ul>
+	<?lua for _, typename in ipairs( doc.classes ) do
+		local class_data = doc.classes[ typename ]
+		if class_doc and class_doc.name == typename then?>
+			<li><strong><?lua=class_data.deprecated and "<del>" or ""?><?lua=typename?><?lua=class_data.deprecated and "</del>" or ""?></strong></li>
+		<?lua else ?>
+			<li><a href="<?lua=docletsfhtml.class_link( typename, doc, from )?>"><?lua=class_data.deprecated and "<del>" or ""?><?lua=typename?><?lua=class_data.deprecated and "</del>" or ""?></a></li>
+		<?lua end
+	end ?>
+</ul>
+
 <h1>Hooks</h1>
 <ul>
 <?lua for _, hookname in ipairs(doc.hooks) do
@@ -44,7 +58,7 @@ end?>
 	<li><strong><?lua=hookname?></strong></li>
 	<?lua else?>
 	<li>
-		<a href="<?lua=docletsfhtml.hook_link(hookname, doc, from)?>#<?lua=hookname?>"><?lua=hookname?></a>
+		<a href="<?lua=docletsfhtml.hook_link( hookname, doc, from )?>#<?lua=hookname?>"><?lua=hookname?></a>
 	</li>
 <?lua 	end
 end?>
