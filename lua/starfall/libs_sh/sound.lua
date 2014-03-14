@@ -4,6 +4,7 @@
 
 local sound_library, _ = SF.Libraries.Register("sounds")
 
+--- Sound type
 local sound_methods, sound_metamethods = SF.Typedef("Sound")
 local wrap, unwrap = SF.CreateWrapper(sound_metamethods,true,false)
 

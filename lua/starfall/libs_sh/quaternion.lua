@@ -33,6 +33,7 @@ local isValid = SF.Entities.IsValid -- For checking shit
 local deg2rad = math.pi/180
 local rad2deg = 180/math.pi
 
+--- Quaternion type
 local quat_methods, quat_metamethods = SF.Typedef("Quaternion")
 --[[quat_metamethods = {__index = quat_lib}
 quat_lib.__metatable = quat_metamethods

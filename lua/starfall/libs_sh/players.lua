@@ -3,6 +3,7 @@
 -------------------------------------------------------------------------------
 
 SF.Players = {}
+--- Player type
 local player_methods, player_metamethods = SF.Typedef("Player", SF.Entities.Metatable)
 
 SF.Players.Methods = player_methods

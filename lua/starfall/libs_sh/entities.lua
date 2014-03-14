@@ -4,6 +4,7 @@
 
 SF.Entities = {}
 
+--- Entity type
 local ents_methods, ents_metamethods = SF.Typedef("Entity")
 local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true,debug.getregistry().Entity)
 
