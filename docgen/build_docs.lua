@@ -9,7 +9,7 @@ return luadoc.main({sourcecode}, {
 	basepath = sourcecode,
 	--template_dir = "luadoc/doclet/html/",
 	nomodules = false,
-	nofiles = false,
+	nofiles = true,
 	verbose = false,
 	taglet = "tagletsf",
 	doclet = "docletsfhtml",
