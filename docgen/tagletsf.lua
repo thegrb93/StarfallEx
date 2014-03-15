@@ -202,8 +202,8 @@ local function parse_comment ( block, first_line, libs, classes )
 			block.class = "class"
 			block.name = typname
 			block.typtbl = typtbl
-			block.fields = {}
-			block.methods = {}
+			block.fields = block.fields or {}
+			block.methods = block.methods or {}
 		else
 			block.param = {}
 		end
@@ -416,11 +416,26 @@ function parse_file (filepath, doc)
 		table.insert(doc.hooks, t.name)
 		doc.hooks[t.name] = t
 	end
-	
-	doc.files[ filepath ].classes = {}
+
+	local function union ( tbl1, tbl2 )
+		for k, v in pairs( tbl2 ) do
+			if type( k ) == "number" then
+				table.insert( tbl1, v )
+			else
+				tbl1[ k ] = v
+			end
+		end
+	end
+
 	for t in class_iterator( blocks, "class" )() do
-		table.insert( doc.classes, t.name )
-		doc.classes[ t.name ] = t
+		if not doc.classes[ t.name ] then
+			table.insert( doc.classes, t.name )
+			doc.classes[ t.name ] = t
+		else
+			local class = doc.classes[ t.name ]
+			union( class.fields, t.fields )
+			union( class.methods, t.methods )
+		end
 	end
 
 	return doc
@@ -478,6 +493,9 @@ local function recsort (tab)
 	for f, doc in pairs(tab) do
 		if doc.functions then
 			table.sort(doc.functions)
+		end
+		if doc.methods then
+			table.sort( doc.methods )
 		end
 		if doc.tables then
 			table.sort(doc.tables)
