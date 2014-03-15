@@ -6,8 +6,12 @@ assert(SF.Entities)
 
 local huge = math.huge
 local abs = math.abs
+
 local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
+--- Entity type
+--@class class
+--@name Entity
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
 

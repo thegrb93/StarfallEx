@@ -20,6 +20,14 @@ local function author (tag, block, text)
 	table.insert (block[tag], text)
 end
 
+local function check_class( line )
+	line = util.trim( line )
+
+	local tblref = line:match( "^%s*local%s+([%w_]+).-=" )
+
+	return tblref
+end
+
 -------------------------------------------------------------------------------
 -- Set the class of a comment block. Classes can be "module", "function", 
 -- "table". The first two classes are automatic, extracted from the source code
@@ -27,6 +35,9 @@ end
 local function class (tag, block, text)
 	block[tag] = text
 	if text == "hook" then block.param = block.param or {} end
+	if text == "class" then
+		block.typtbl = check_class( block.code[ 1 ] )
+	end
 	block.classForced = true
 end
 
