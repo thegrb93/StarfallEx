@@ -224,16 +224,38 @@ function ENT:WriteCell ( address, data )
 	self:runScriptHook( "writecell", address, data )
 end
 
-function ENT:BuildDupeInfo()
-	local info = self.BaseClass.BuildDupeInfo(self) or {}
-	info.starfall = SF.SerializeCode(self.task.files, self.task.mainfile)
+-- A modified copy of garry's table.Copy function
+function tableCopy ( t, lookup_table )
+	if ( t == nil ) then return nil end
+
+	local copy = {}
+	setmetatable( copy, debug.getmetatable( t ) )
+	for i, v in pairs( t ) do
+		if ( not istable( v ) ) then
+			copy[ i ] = v
+		else
+			lookup_table = lookup_table or {}
+			lookup_table[ t ] = copy
+			if lookup_table[ v ] then
+				copy[ i ] = lookup_table[ v ] -- we already copied this table. reuse the copy.
+			else
+				copy[ i ] = table.Copy( v, lookup_table ) -- not yet copied. copy it.
+			end
+		end
+	end
+	return copy
+end
+
+function ENT:BuildDupeInfo ()
+	table.Copy = tableCopy --TODO: Remove once table.Copy is fixed
+	local info = self.BaseClass.BuildDupeInfo( self ) or {}
+	info.starfall = SF.SerializeCode( self.files, self.mainfile )
 	return info
 end
 
-function ENT:ApplyDupeInfo(ply, ent, info, GetEntByID)
-	self.BaseClass.ApplyDupeInfo(self, ply, ent, info, GetEntByID)
+function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID  )
+	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
 	self.owner = ply
-	local code, main = SF.DeserializeCode(info.starfall)
-	local task = {files = code, mainfile = main}
-	self:CodeSent(ply, task)
+	local code, main = SF.DeserializeCode( info.starfall )
+	self:CodeSent( ply, code, main )
 end
