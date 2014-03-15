@@ -403,7 +403,7 @@ end
 -- ------------------------------------------------------------------------- --
 
 local serialize_replace_regex = "[\"\n]"
-local serialize_replace_tbl = {["\n"] = "£", ['"'] = ""}
+local serialize_replace_tbl = { [ "\n" ] = string.char( 5 ), [ '"' ] = string.char( 4 ) }
 --- Serializes an instance's code in a format compatible with the duplicator library
 -- @param sources The table of filename = source entries. Ususally instance.source
 -- @param mainfile The main filename. Usually instance.mainfile
@@ -416,8 +416,8 @@ function SF.SerializeCode(sources, mainfile)
 	return rt
 end
 
-local deserialize_replace_regex = "[£]"
-local deserialize_replace_tbl = {["£"] = "\n", [''] = '"'}
+local deserialize_replace_regex = "[" .. string.char( 5 ) .. string.char( 4 ) .. "]"
+local deserialize_replace_tbl = { [ string.char( 5 )[ 1 ] ] = "\n", [ string.char( 4 )[ 1 ] ] = '"' }
 --- Deserializes an instance's code.
 -- @return The table of filename = source entries
 -- @return The main filename
