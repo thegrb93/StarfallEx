@@ -337,17 +337,15 @@ function ents_methods:isFrozen()
 	if phys:IsMoveable() then return false else return true end
 end
 
---- Sets the entity solid state
--- @param notsolid Should the entity be not solid?
-function ents_methods:setNotSolid(notsolid)
-	SF.CheckType(self,ents_metatable)
+--- Sets the entity to be Solid or not.
+-- For more information please refer to GLua function http://wiki.garrysmod.com/page/Entity/SetNotSolid
+-- @param solid Boolean, Should the entity be solid?
+function ents_methods:setSolid ( solid )
+	local ent = unwrap( self )
+	if not isValid( ent ) then return false, "entity not valid" end
+	if not canModify( SF.instance.player, ent ) or SF.instance.permissions:checkPermission( "Modify All Entities" ) then return false, "access denied" end
 	
-	local ent = unwrap(self)
-	if not isValid(ent) then return false, "entity not valid" end
-	if not canModify(SF.instance.player, ent) or SF.instance.permissions:checkPermission("Modify All Entities") then return false, "access denied" end
-	
-	ent:SetNotSolid(notsolid and true or false)
-	return true
+	ent:SetNotSolid( not solid )
 end
 
 --- Sets entity gravity
