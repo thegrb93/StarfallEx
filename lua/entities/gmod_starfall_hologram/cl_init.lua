@@ -42,7 +42,6 @@ end
 
 function ENT:Initialize()
 	self.clips = {}
-	self.unlit = false
 	self.scale = Vector(1,1,1)
 	self.initialised = true
 	msgQueueProcess(self)
@@ -92,7 +91,7 @@ function ENT:Draw()
     self:setupRenderGroup()
     self:setupClip()
 
-	render.SuppressEngineLighting( self.unlit )
+	render.SuppressEngineLighting( self:GetNWBool( "suppressEngineLighting" ) )
 	self:DrawModel()
 	render.SuppressEngineLighting( false )
 

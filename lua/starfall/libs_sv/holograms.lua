@@ -220,6 +220,20 @@ function hologram_methods:setColor( color )
     end
 end
 
+--- Suppress Engine Lighting of a hologram. Disabled by default.
+-- @server
+-- @class function
+-- @param enable Boolean to represent if shading should be set or not.
+function hologram_methods:suppressEngineLighting ( suppress )
+    SF.CheckType( suppress, "boolean" )
+
+    local this = SF.Entities.Unwrap( self )
+    if IsValid( this ) then
+        this:SetNetworkedBool( "suppressEngineLighting", suppress )
+    end
+end
+
+
 --- Updates/Checks burst constraints
 -- @class function
 -- @param instance Instance table for the burst values related to current SF Instance / Player
