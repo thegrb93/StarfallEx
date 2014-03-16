@@ -131,14 +131,14 @@ end
 -- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
 -- @param permissions The permissions manager to use. Default is SF.DefaultPermissions
--- @param ops Operations quota. Default is specified by the convar "sf_defaultquota"
+-- @param ops Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
 -- @param libs Additional (local) libraries for the script to access. Default is an empty table.
 function SF.CreateContext(env, directives, permissions, ops, libs)
 	local context = {}
 	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
 	context.permissions = permissions or SF.Permissions
-	context.ops = ops or SF.defaultquota:GetInt()
+	context.ops = ops or function () return SF.defaultquota:GetInt() end
 	context.libs = libs or {}
 	return context
 end

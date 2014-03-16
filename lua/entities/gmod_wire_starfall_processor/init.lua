@@ -87,7 +87,7 @@ function ENT:Think()
 	self.BaseClass.Think(self)
 	
 	if self.instance and not self.instance.error then
-		self:UpdateState(tostring(self.instance.ops).." ops, "..tostring(math.floor(self.instance.ops / self.instance.context.ops * 100)).."%")
+		self:UpdateState( tostring( self.instance.ops ) .. " ops, " .. tostring( math.floor( self.instance.ops / self.instance.context.ops() * 100 ) ) .. "%" )
 
 		self.instance:resetOps()
 		self:RunScriptHook("think")

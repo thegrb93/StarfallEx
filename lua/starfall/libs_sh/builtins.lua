@@ -108,7 +108,7 @@ end
 
 --- Gets the ops hard quota
 function SF.DefaultEnvironment.opsMax()
-	return SF.instance.context.ops
+	return SF.instance.context.ops()
 end
 
 -- The below modules have the Gmod functions removed (the ones that begin with a capital letter),
@@ -288,7 +288,7 @@ function SF.DefaultEnvironment.pcall ( ... )
     ok, err = pcall( ... )
 
     -- don't catch quota errors
-    if SF.instance.ops > SF.instance.context.ops then
+    if SF.instance.ops > SF.instance.context.ops() then
         error( err, 0 )
     end
 
