@@ -285,7 +285,7 @@ end
 
 --- Lua's pcall function
 function SF.DefaultEnvironment.pcall ( ... )
-    ok, err = pcall( ... )
+    local ok, err = pcall( ... )
 
     -- don't catch quota errors
     if SF.instance.ops > SF.instance.context.ops() then
