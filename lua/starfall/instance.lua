@@ -36,7 +36,7 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func,...)
-	local maxops = self.context.ops
+	local maxops = self.context.ops()
 	
 	local function ophook(event)
 		self.ops = self.ops + 500
