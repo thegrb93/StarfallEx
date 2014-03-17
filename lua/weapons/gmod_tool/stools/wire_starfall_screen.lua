@@ -56,7 +56,7 @@ if SERVER then
 	function MakeSF( pl, Pos, Ang, model)
 		if not pl:CheckLimit( "starfall_screen" ) then return false end
 
-		local sf = ents.Create( "gmod_wire_starfall_screen" )
+		local sf = ents.Create( "starfall_screen" )
 		if not IsValid(sf) then return false end
 
 		sf:SetAngles( Ang )
