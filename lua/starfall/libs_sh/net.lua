@@ -4,7 +4,7 @@
 
 local net = net
 
--- Net message library. Used for sending data from the server to the client and back
+--- Net message library. Used for sending data from the server to the client and back
 local net_library, _ = SF.Libraries.Register("net")
 
 local burst_limit = CreateConVar( "sf_net_burst_limit", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
@@ -87,13 +87,14 @@ if SERVER then
 		local data = instance.data.net.data
 		if #data == 0 then return false end
 		net.Start( "SF_netmessage" )
-		for i=1,#data do
-			local writefunc = data[i][1]
-			local writevalue = data[i][2]
-			local writesetting = data[i][3]
+			net.WriteEntity( SF.instance.data.entity )
+			for i=1, #data do
+				local writefunc = data[ i ][ 1 ]
+				local writevalue = data[ i ][ 2 ]
+				local writesetting = data[ i ][ 3 ]
 			
-			net[writefunc]( writevalue, writesetting )
-		end
+				net[ writefunc ]( writevalue, writesetting )
+			end
 		
 		sendfunc( newtarget )
 	end
@@ -107,13 +108,14 @@ else
 		local data = instance.data.net.data
 		if #data == 0 then return false end
 		net.Start( "SF_netmessage" )
-		for i=1,#data do
-			local writefunc = data[i][1]
-			local writevalue = data[i][2]
-			local writesetting = data[i][3]
+			net.WriteEntity( SF.instance.data.entity )
+			for i=1, #data do
+				local writefunc = data[ i ][ 1 ]
+				local writevalue = data[ i ][ 2 ]
+				local writesetting = data[ i ][ 3 ]
 			
-			net[writefunc]( writevalue, writesetting )
-		end
+				net[ writefunc ]( writevalue, writesetting )
+			end
 		
 		net.SendToServer()
 	end
@@ -312,5 +314,8 @@ function net_library.canSend()
 end
 
 net.Receive( "SF_netmessage", function( len, ply )
-	SF.RunScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
+	local ent = net.ReadEntity()
+	if ent:IsValid() and ent:GetClass() == "starfall_screen" then
+		ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
+	end
 end)
