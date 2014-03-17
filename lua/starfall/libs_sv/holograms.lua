@@ -23,7 +23,7 @@ local dsetmeta = debug.setmetatable
 local old_ent_wrap = SF.Entities.Wrap
 function SF.Entities.Wrap(obj)
 	local w = old_ent_wrap(obj)
-	if IsValid(obj) and obj:IsValid() and obj:GetClass() == "gmod_starfall_hologram" then
+	if IsValid(obj) and obj:IsValid() and obj:GetClass() == "starfall_hologram" then
 		dsetmeta(w, hologram_metamethods)
 	end
 	return w
@@ -294,7 +294,7 @@ function holograms_library.create( pos, ang, model, scale )
     elseif max_reached() then return error( "Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2 ) end
 
     local holodata = instance.data.holograms
-    local holoent = ents.Create( "gmod_starfall_hologram" )
+    local holoent = ents.Create( "starfall_hologram" )
     if holoent and holoent:IsValid() then
         holoent:SetPos( pos )
         holoent:SetAngles( ang )
