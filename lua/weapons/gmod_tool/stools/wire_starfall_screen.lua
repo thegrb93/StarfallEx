@@ -24,7 +24,7 @@ if SERVER then
 			return
 		end
 		
-		if ent:GetClass() ~= "gmod_wire_starfall_screen" then
+		if ent:GetClass() ~= "starfall_screen" then
 			ErrorNoHalt("SF: Player "..ply:GetName().." tried to send code to a non-starfall screen entity.\n")
 			return
 		end
@@ -71,11 +71,11 @@ if SERVER then
 		return sf
 	end
 else
-	language.Add( "Tool.wire_starfall_screen.name", "Starfall - Screen (Wire)" )
-	language.Add( "Tool.wire_starfall_screen.desc", "Spawns a starfall screen" )
-	language.Add( "Tool.wire_starfall_screen.0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
-	language.Add( "SBox_max_starfall_Screen", "You've hit the Starfall Screen limit!" )
-	language.Add( "undone_Wire Starfall Screen", "Undone Starfall Screen" )
+	language.Add( "Tool.starfall_screen.name", "Starfall - Screen" )
+	language.Add( "Tool.starfall_screen.desc", "Spawns a starfall screen" )
+	language.Add( "Tool.starfall_screen.0", "Primary: Spawns a screen / uploads code, Secondary: Opens editor" )
+	language.Add( "sboxlimit_starfall_Screen", "You've hit the Starfall Screen limit!" )
+	language.Add( "undone_Starfall Screen", "Undone Starfall Screen" )
 end
 
 function TOOL:LeftClick( trace )
@@ -85,7 +85,7 @@ function TOOL:LeftClick( trace )
 
 	local ply = self:GetOwner()
 
-	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_screen" then
+	if trace.Entity:IsValid() and trace.Entity:GetClass() == "starfall_screen" then
 		local ent = trace.Entity
 		if not SF.RequestCode(ply, function(mainfile, files)
 			if not mainfile then return end
@@ -112,7 +112,7 @@ function TOOL:LeftClick( trace )
 
 	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
 
-	undo.Create("Wire Starfall Screen")
+	undo.Create( "Starfall Screen" )
 		undo.AddEntity( sf )
 		undo.AddEntity( const )
 		undo.SetPlayer( ply )
@@ -154,9 +154,9 @@ if CLIENT then
 	end
 	
 	function TOOL.BuildCPanel(panel)
-		panel:AddControl("Header", { Text = "#Tool.wire_starfall_screen.name", Description = "#Tool.wire_starfall_screen.desc" })
+		panel:AddControl( "Header", { Text = "#Tool.starfall_screen.name", Description = "#Tool.starfall_screen.desc" } )
 		
-		local modelpanel = WireDermaExts.ModelSelect(panel, "wire_starfall_screen_Model", list.Get("WireScreenModels"), 2)
+		local modelpanel = WireDermaExts.ModelSelect( panel, "starfall_screen_Model", list.Get( "WireScreenModels" ), 2 )
 		panel:AddControl("Label", {Text = ""})
 		
 		local docbutton = vgui.Create("DButton" , panel)

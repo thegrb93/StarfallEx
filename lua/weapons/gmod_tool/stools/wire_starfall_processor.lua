@@ -33,11 +33,11 @@ if SERVER then
 		return sf
 	end
 else
-	language.Add( "Tool.wire_starfall_processor.name", "Starfall - Processor (Wire)" )
-	language.Add( "Tool.wire_starfall_processor.desc", "Spawns a starfall processor (Press shift+f to switch to screen and back again)" )
-	language.Add( "Tool.wire_starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
-	language.Add( "sboxlimit_wire_starfall_processor", "You've hit the Starfall processor limit!" )
-	language.Add( "undone_Wire Starfall Processor", "Undone Starfall Processor" )
+	language.Add( "Tool.starfall_processor.name", "Starfall - Processor" )
+	language.Add( "Tool.starfall_processor.desc", "Spawns a starfall processor (Press shift+f to switch to screen and back again)" )
+	language.Add( "Tool.starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
+	language.Add( "sboxlimit_starfall_processor", "You've hit the Starfall processor limit!" )
+	language.Add( "undone_Starfall Processor", "Undone Starfall Processor" )
 end
 
 function TOOL:LeftClick( trace )
@@ -47,7 +47,7 @@ function TOOL:LeftClick( trace )
 
 	local ply = self:GetOwner()
 
-	if trace.Entity:IsValid() and trace.Entity:GetClass() == "gmod_wire_starfall_processor" then
+	if trace.Entity:IsValid() and trace.Entity:GetClass() == "starfall_processor" then
 		local ent = trace.Entity
 		if not SF.RequestCode(ply, function(mainfile, files)
 			if not mainfile then return end
@@ -74,7 +74,7 @@ function TOOL:LeftClick( trace )
 
 	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
 
-	undo.Create("Wire Starfall Processor")
+	undo.Create( "Starfall Processor" )
 		undo.AddEntity( sf )
 		undo.AddEntity( const )
 		undo.SetPlayer( ply )
@@ -121,16 +121,16 @@ if CLIENT then
 		if not pressed then return end
 	
 		if bind == "impulse 100" and ply:KeyDown( IN_SPEED ) then
-			local self = get_active_tool(ply, "wire_starfall_processor")
+			local self = get_active_tool( ply, "starfall_processor" )
 			if not self then
-				self = get_active_tool(ply, "wire_starfall_screen")
+				self = get_active_tool( ply, "starfall_screen" )
 				if not self then return end
 				
-				RunConsoleCommand( "gmod_tool", "wire_starfall_processor" ) -- switch back to processor
+				RunConsoleCommand( "gmod_tool", "starfall_processor" ) -- switch back to processor
 				return true
 			end
 			
-			RunConsoleCommand( "gmod_tool", "wire_starfall_screen" ) -- switch to screen
+			RunConsoleCommand( "gmod_tool", "starfall_screen" ) -- switch to screen
 			return true
 		end
 	end)
@@ -142,12 +142,12 @@ if CLIENT then
 	end
 	
 	function TOOL.BuildCPanel(panel)
-		panel:AddControl("Header", { Text = "#Tool.wire_starfall_processor.name", Description = "#Tool.wire_starfall_processor.desc" })
+		panel:AddControl( "Header", { Text = "#Tool.starfall_processor.name", Description = "#Tool.starfall_processor.desc" } )
 		
 		local gateModels = list.Get( "Starfall_gate_Models" )
 		table.Merge( gateModels, list.Get( "Wire_gate_Models" ) )
 		
-		local modelPanel = WireDermaExts.ModelSelect( panel, "wire_starfall_processor_Model", gateModels, 2 )
+		local modelPanel = WireDermaExts.ModelSelect( panel, "starfall_processor_Model", gateModels, 2 )
 		panel:AddControl("Label", {Text = ""})
 		
 		local docbutton = vgui.Create("DButton" , panel)
