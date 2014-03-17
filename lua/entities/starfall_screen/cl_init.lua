@@ -30,9 +30,11 @@ net.Receive("starfall_screen_download", function(len)
 	else
 		if net.ReadBit() ~= 0 then
 			--print("End recieving data")
-			dlScreen:CodeSent(dlFiles, dlMain, dlOwner)
-			dlScreen.files = dlFiles
-			dlScreen.mainfile = dlMain
+			if dlScreen:IsValid() then
+				dlScreen:CodeSent( dlFiles, dlMain, dlOwner )
+				dlScreen.files = dlFiles
+				dlScreen.mainfile = dlMain
+			end
 			dlScreen, dlFiles, dlMain, dlOwner = nil, nil, nil, nil
 			return
 		end
