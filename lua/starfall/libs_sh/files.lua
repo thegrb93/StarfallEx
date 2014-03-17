@@ -4,7 +4,7 @@
 -- File functions
 -------------------------------------------------------------------------------
 
---- File functions. Allows modification of files.
+-- File functions. Allows modification of files.
 -- @shared
 local files_library, _ = SF.Libraries.Register("files")
 

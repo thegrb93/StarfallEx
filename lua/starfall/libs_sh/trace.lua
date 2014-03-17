@@ -226,6 +226,7 @@ end
 -- @param endpos End position
 -- @param filter Entity/array of entities to filter
 -- @param mask Trace mask
+-- @return Result of the trace
 function trace_library.trace(start,endpos,filter,mask)
 	SF.CheckType(start,"Vector")
 	SF.CheckType(endpos,"Vector")
@@ -249,6 +250,7 @@ end
 -- @param maxbox Upper box corner
 -- @param filter Entity/array of entities to filter
 -- @param mask Trace mask
+-- @return Result of the trace
 function trace_library.traceHull(start,endpos,minbox,maxbox,filter,mask)
 	SF.CheckType(start,"Vector")
 	SF.CheckType(endpos,"Vector")

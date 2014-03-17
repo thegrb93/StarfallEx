@@ -43,6 +43,8 @@
 		-	Removed two redundant arguments in the serialization functable.
 --]]
 
+--- vON Library
+-- @shared
 local von, _ = SF.Libraries.Register("von")
 
 local _deserialize, _serialize, _d_meta, _s_meta, d_findVariable, s_anyVariable
@@ -403,5 +405,18 @@ _s_meta = {
 	end
 }
 
+--- Deserialize a string
+-- @shared
+-- @class function
+-- @name von.deserialize
+-- @param str String to deserialize
+-- @return Table
 von.deserialize = setmetatable(_deserialize,_d_meta)
+
+--- Serialize a table
+-- @shared
+-- @class function
+-- @name von.serialize
+-- @param tbl Table to serialize
+-- @return String
 von.serialize = setmetatable(_serialize,_s_meta)

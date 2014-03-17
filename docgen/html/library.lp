@@ -73,6 +73,19 @@
 </table>
 <?lua end?>
 
+<?lua if module_doc.fields and #module_doc.fields > 0 then?>
+<h2>Fields</h2>
+<table class="table_list">
+<?lua for _, field_name in ipairs(module_doc.fields) do
+	local field_data = module_doc.fields[field_name]?>
+	<tr>
+	<td class="name" nowrap><a href="#<?lua=field_data.name?>"><?lua=field_name?></a></td>
+	<td class="summary"><?lua=module_doc.fields[field_name].summary?></td>
+	</tr>
+<?lua end?>
+</table>
+<?lua end?>
+
 
 <br/>
 <br/>

@@ -3,6 +3,7 @@
 -- @shared
 local holograms_library, holograms_library_metamethods = SF.Libraries.Register("holograms")
 
+--- Hologram type
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
 
 SF.Holograms = {}
@@ -72,6 +73,7 @@ end
 -- ------------------------------------------------------------------------- --
 
 --- Sets the hologram position.
+-- @param pos New position
 function hologram_methods:setPos(pos)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(pos, "Vector")
@@ -80,6 +82,7 @@ function hologram_methods:setPos(pos)
 end
 
 --- Sets the hologram angle
+-- @param ang New angles
 function hologram_methods:setAng(ang)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(ang, "Angle")
@@ -88,6 +91,7 @@ function hologram_methods:setAng(ang)
 end
 
 --- Sets the hologram linear velocity
+-- @param vel New velocity
 function hologram_methods:setVel(vel)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(vel, "Vector")
@@ -134,6 +138,7 @@ function hologram_methods:setParent(parent, attachment)
 end
 
 --- Sets the hologram scale
+-- @param scale New scale
 function hologram_methods:setScale(scale)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(scale, "Vector")

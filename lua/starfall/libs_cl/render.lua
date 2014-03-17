@@ -214,6 +214,7 @@ function render_library.getTextureID ( tx )
 end
 
 --- Sets the texture
+-- @param id Texture id
 function render_library.setTexture ( id )
 	if not SF.instance.data.render.isRendering then error( "Not in rendering hook.", 2 ) end
 	if not id then
@@ -237,8 +238,8 @@ function render_library.clear ( clr )
 end
 
 --- Draws a rectangle using the current color. 
--- @param x Bottom left corner x coordinate
--- @param y Bottom left corner y coordinate
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
 function render_library.drawRect(x,y,w,h)
@@ -247,8 +248,8 @@ function render_library.drawRect(x,y,w,h)
 end
 
 --- Draws a rectangle outline using the current color.
--- @param x Bottom left corner x coordinate
--- @param y Bottom left corner y coordinate
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
 function render_library.drawRectOutline(x,y,w,h)
@@ -266,8 +267,8 @@ function render_library.drawCircle(x,y,r)
 end
 
 --- Draws a textured rectangle.
--- @param x X coordinate
--- @param y Y coordinate
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRect(x,y,w,h)
@@ -276,8 +277,8 @@ function render_library.drawTexturedRect(x,y,w,h)
 end
 
 --- Draws a textured rectangle with UV coordinates
--- @param x X coordinate
--- @param y Y coordinate
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
 -- @param startU Texture mapping at rectangle origin
@@ -348,6 +349,8 @@ end
 
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
 -- @param text Text to get the size of
+-- @return width of the text
+-- @return height of the text
 function render_library.getTextSize( text )
 	SF.CheckType(text,"string")
 	
@@ -356,13 +359,15 @@ function render_library.getTextSize( text )
 end
 
 --- Sets the font
+-- @param font The font to use
 function render_library.setFont(font)
 	if not defined_fonts[font] then error("Font does not exist.", 2) end
 	SF.instance.data.render.font = font
 	--surface.SetFont(font)
 end
 
---TODO
+--- Gets the default font
+-- @return Default font
 function render_library.getDefaultFont()
 	return defaultFont
 end
@@ -383,6 +388,11 @@ function render_library.drawText(x,y,text,alignment)
 end
 
 --- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
+-- @param x x coordinate
+-- @param y y coordinate
+-- @param u u texture coordinate
+-- @param v v texture coordinate
+-- @return vertex table
 function render_library.vertex(x,y,u,v)
 	return {x=x, y=y, u=u, v=v}
 end
@@ -392,6 +402,7 @@ end
 -- a copy of the vertex at that spot is returned. They can also be assigned
 -- a new vertex at 1 <= i <= #poly+1. And the length of the poly can be taken.
 -- @param verts Array of verticies to convert.
+-- @return compiled polygon
 function render_library.createPoly(verts)
 	SF.CheckType(verts,"table")
 	local poly = {}
@@ -425,6 +436,9 @@ function render_library.drawPoly(poly)
 end
 
 --- Gets a 2D cursor position where ply is aiming.
+-- @param ply player to get cursor position from
+-- @return x position
+-- @return y position
 function render_library.cursorPos( ply )
 	-- Taken from EGPLib
 	local Normal, Pos, monitor, Ang

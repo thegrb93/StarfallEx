@@ -5,6 +5,7 @@
 SF.Entities = {}
 
 --- Entity type
+-- @shared
 local ents_methods, ents_metamethods = SF.Typedef("Entity")
 local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true,debug.getregistry().Entity)
 
@@ -38,6 +39,7 @@ local getPhysObject = SF.Entities.GetPhysObject
 
 --- Returns the entity representing a processor that this script is running on.
 -- May be nil
+-- @return Starfall entity
 function ents_lib.self()
 	local ent = SF.instance.data.entity
 	if ent then 
@@ -46,6 +48,7 @@ function ents_lib.self()
 end
 
 --- Returns whoever created the script
+-- @return Owner entity
 function ents_lib.owner()
 	return SF.WrapObject(SF.instance.player)
 end
@@ -65,6 +68,7 @@ end
 --- Returns the entity with index 'num'
 -- @name ents_lib.entity
 -- @class function
+-- @param num Entity index
 -- @return entity
 function ents_lib.entity( num )
 	SF.CheckType( num, "number" )
@@ -82,6 +86,9 @@ function ents_metamethods:__tostring()
 	else return tostring(ent) end
 end
 
+--- Sets the color of the entity
+-- @shared
+-- @param clr New color
 function ents_methods:setColor( clr )
 	SF.CheckType( clr, SF.Types["Color"] )
 
@@ -246,6 +253,7 @@ end
 --- Converts a vector in entity local space to world space
 -- @shared
 -- @param data Local space vector
+-- @return data as world space vector
 function ents_methods:localToWorld(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Vector")
@@ -258,6 +266,7 @@ end
 --- Converts an angle in entity local space to world space
 -- @shared
 -- @param data Local space angle
+-- @return data as world space angle
 function ents_methods:localToWorldAngles(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Angle")
@@ -269,7 +278,8 @@ end
 
 --- Converts a vector in world space to entity local space
 -- @shared
--- @param data Local space vector
+-- @param data World space vector
+-- @return data as local space vector
 function ents_methods:worldToLocal(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Vector")
@@ -281,7 +291,8 @@ end
 
 --- Converts an angle in world space to entity local space
 -- @shared
--- @param data Local space angle
+-- @param data World space angle
+-- @return data as local space angle
 function ents_methods:worldToLocalAngles(data)
 	SF.CheckType(self,ents_metamethods)
 	SF.CheckType(data, "Angle")
@@ -293,6 +304,7 @@ end
 
 --- Gets the model of an entity
 -- @shared
+-- @return Model of the entity
 function ents_methods:getModel()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
@@ -302,6 +314,7 @@ end
 
 --- Gets the entitiy's eye angles
 -- @shared
+-- @return Angles of the entity's eyes
 function ents_methods:eyeAngles()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
@@ -311,6 +324,8 @@ end
 
 --- Gets the entity's eye position
 -- @shared
+-- @return Eye position of the entity
+-- @return In case of a ragdoll, the position of the other eye
 function ents_methods:eyePos()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
