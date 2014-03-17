@@ -20,6 +20,7 @@ local dgetmeta = debug.getmetatable
 -- @param x
 -- @param y
 -- @param z
+-- @return New vector
 SF.DefaultEnvironment.Vector = Vector
 --- Same as the Gmod angle type
 -- @name SF.DefaultEnvironment.Angle
@@ -27,6 +28,7 @@ SF.DefaultEnvironment.Vector = Vector
 -- @param p Pitch
 -- @param y Yaw
 -- @param r Roll
+-- @return New angle
 SF.DefaultEnvironment.Angle = Angle
 --- Same as the Gmod VMatrix type
 -- @name SF.DefaultEnvironment.VMatrix
@@ -36,11 +38,13 @@ SF.DefaultEnvironment.Angle = Angle
 -- @name SF.DefaultEnvironment.tostring
 -- @class function
 -- @param obj
+-- @return obj as string
 SF.DefaultEnvironment.tostring = tostring
 --- Same as Lua's tonumber
 -- @name SF.DefaultEnvironment.tonumber
 -- @class function
 -- @param obj
+-- @return obj as number
 SF.DefaultEnvironment.tonumber = tonumber
 
 local function mynext( t, idx )
@@ -56,17 +60,24 @@ end
 --- Same as Lua's ipairs
 -- @name SF.DefaultEnvironment.ipairs
 -- @class function
--- @param tbl
-SF.DefaultEnvironment.ipairs = function( t ) return mynext, t, 0 end
+-- @param tbl Table to iterate over
+-- @return Iterator function
+-- @return Table tbl
+-- @return 0 as current index
+SF.DefaultEnvironment.ipairs = function( tbl ) return mynext, tbl, 0 end
 --- Same as Lua's pairs
 -- @name SF.DefaultEnvironment.pairs
 -- @class function
--- @param tbl
-SF.DefaultEnvironment.pairs = function( t ) return mynext, t, nil end
+-- @param tbl Table to iterate over
+-- @return Iterator function
+-- @return Table tbl
+-- @return nil as current index
+SF.DefaultEnvironment.pairs = function( tbl ) return mynext, tbl, nil end
 --- Same as Lua's type
 -- @name SF.DefaultEnvironment.type
 -- @class function
--- @param obj
+-- @param obj Object to get type of
+-- @return 
 SF.DefaultEnvironment.type = function( val )
 	local tp = getmetatable( val )
 	return type(tp) == "string" and tp or type( val )
@@ -74,39 +85,57 @@ end
 --- Same as Lua's next
 -- @name SF.DefaultEnvironment.next
 -- @class function
--- @param tbl
+-- @param tbl Table to get the next key-value pair of
+-- @param k Previous key (can be nil)
+-- @return Key or nil
+-- @return Value or nil
 SF.DefaultEnvironment.next = mynext
---- Same as Lua's assert. TODO: lua's assert doesn't work.
+--- Same as Lua's assert.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
 -- @param condition
 -- @param msg
-SF.DefaultEnvironment.assert = function(ok, msg) if not ok then error(msg or "assertion failed!",2) end end
+SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then error( msg or "assertion failed!", 2 ) end end
 --- Same as Lua's unpack
 -- @name SF.DefaultEnvironment.unpack
 -- @class function
 -- @param tbl
+-- @return Elements of tbl
 SF.DefaultEnvironment.unpack = unpack
 
 --- Same as Lua's setmetatable. Doesn't work on most internal metatables
+-- @param tbl The table to set the metatable of
+-- @param meta The metatable to use
+-- @return tbl with metatable set to meta
 SF.DefaultEnvironment.setmetatable = setmetatable
 --- Same as Lua's getmetatable. Doesn't work on most internal metatables
+-- @param tbl Table to get metatable of
+-- @return The metatable of tbl
 SF.DefaultEnvironment.getmetatable = function(tbl)
 	SF.CheckType(tbl,"table")
 	return getmetatable(tbl)
 end
 --- Throws an error. Can't change the level yet.
+-- @param msg Error message
 SF.DefaultEnvironment.error = function(msg) error(msg or "an unspecified error occured",2) end
 
+--- Constant that denotes whether the code is executed on the client
+-- @name SF.DefaultEnvironment.CLIENT
+-- @class field
 SF.DefaultEnvironment.CLIENT = CLIENT
+--- Constant that denotes whether the code is executed on the server
+-- @name SF.DefaultEnvironment.SERVER
+-- @class field
 SF.DefaultEnvironment.SERVER = SERVER
 
 --- Gets the amount of ops used so far
+-- @return Operations used in this second
 function SF.DefaultEnvironment.opsUsed()
 	return SF.instance.ops
 end
 
 --- Gets the ops hard quota
+-- @return Maximum operations per second
 function SF.DefaultEnvironment.opsMax()
 	return SF.instance.context.ops()
 end
@@ -127,10 +156,6 @@ local function filterGmodLua(lib, original, gm)
 	end
 	return original, gm
 end
-
--- Default Hook Library
---- TODO: Consult if this is actually wanted or not :/
-SF.DefaultEnvironment.hook = SF.Libraries.Get("hook")
 
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string")
@@ -153,8 +178,9 @@ color_metatable.__newindex = function() end
 -- @param g - Green
 -- @param b - Blue
 -- @param a - Alpha
-SF.DefaultEnvironment.Color = function(...)
-	return setmetatable(Color(...),color_metatable)
+-- @return New color
+SF.DefaultEnvironment.Color = function ( r, g, b, a )
+	return setmetatable( Color( r, g, b, a ), color_metatable )
 end
 
 
@@ -185,6 +211,7 @@ SF.DefaultEnvironment.table = setmetatable({},table_metatable)
 -- @name SF.DefaultEnvironment.loadLibrary
 -- @class function
 -- @param ... A list of strings representing libraries eg "hook", "ent", "render"
+-- @return Loaded libraries
 function SF.DefaultEnvironment.loadLibrary(...)
 	local t = {...}
 	local r = {}
@@ -205,6 +232,7 @@ function SF.DefaultEnvironment.loadLibrary(...)
 end
 
 --- Gets a list of all libraries
+-- @return Table containing the names of each available library
 function SF.DefaultEnvironment.getLibraries()
 	local ret = {}
 	for k,v in pairs( SF.Libraries.libraries ) do
@@ -217,6 +245,8 @@ end
 
 if SERVER then
 	--- Prints a message to the player's chat.
+	-- @shared
+	-- @param ... Values to print
 	function SF.DefaultEnvironment.print(...)
 		local str = ""
 		local tbl = {...}
@@ -224,7 +254,7 @@ if SERVER then
 		SF.instance.player:ChatPrint(str)
 	end
 else
-	--- Prints a message to the player's chat.
+	-- Prints a message to the player's chat.
 	function SF.DefaultEnvironment.print(...)
 		if SF.instance.player ~= LocalPlayer() then return end
 		local str = ""
@@ -246,16 +276,20 @@ local function printTableX( target, t, indent, alreadyprinted )
 	end
 end
 
-function SF.DefaultEnvironment.printTable( t )
+--- Prints a table to player's chat
+-- @param tbl Table to print
+function SF.DefaultEnvironment.printTable( tbl )
 	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
-	SF.CheckType( t, "table" )
+	SF.CheckType( tbl, "table" )
 
-	printTableX( (SERVER and SF.instance.player or LocalPlayer()), t, 0, {[t] = true} )
+	printTableX( (SERVER and SF.instance.player or LocalPlayer()), tbl, 0, {[t] = true} )
 end
 
 
---- Runs an --@include'd script and caches the result.
+--- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
+-- @param file The file to include. Make sure to --@include it
+-- @return Return value of the script
 function SF.DefaultEnvironment.require(file)
 	SF.CheckType(file, "string")
 	local loaded = SF.instance.data.reqloaded
@@ -274,8 +308,10 @@ function SF.DefaultEnvironment.require(file)
 	end
 end
 
---- Runs an --@include'd file and returns the result.
+--- Runs an included script, but does not cache the result.
 -- Pretty much like standard Lua dofile()
+-- @param file The file to include. Make sure to --@include it
+-- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
 	SF.CheckType(file, "string")
 	local func = SF.instance.scripts[file]
@@ -283,9 +319,11 @@ function SF.DefaultEnvironment.dofile(file)
 	return func()
 end
 
---- Lua's pcall function
-function SF.DefaultEnvironment.pcall ( ... )
-    local ok, err = pcall( ... )
+-- @param func Function to call
+-- @return True if the call was successful
+-- @return If the call was successful, the return values. Otherwise, the error message
+function SF.DefaultEnvironment.pcall ( func )
+    local ok, err = pcall( func )
 
     -- don't catch quota errors
     if SF.instance.ops > SF.instance.context.ops() then
@@ -295,8 +333,10 @@ function SF.DefaultEnvironment.pcall ( ... )
     return ok, err
 end
 
---- GLua's loadstring, modified for safe use in Starfall
+--- GLua's loadstring
 -- Works like loadstring, except that it executes by default in the main environment
+-- @param str String to execute
+-- @return Function of str
 function SF.DefaultEnvironment.loadstring ( str )
 	local func = CompileString( str, "SF: " .. tostring( SF.instance.env ), false )
 	
@@ -308,15 +348,19 @@ function SF.DefaultEnvironment.loadstring ( str )
 	return func
 end
 
---- Lua's setfenv, modified for safe use in Starfall
+--- Lua's setfenv
 -- Works like setfenv, but is restricted on functions
-function SF.DefaultEnvironment.setfenv ( f, table )
-	if type( f ) ~= "function" then error( "Main Thread is protected!" ) end
-	return setfenv( f, table )
+-- @param func Function to change environment of
+-- @param tbl New environment
+-- @return func with environment set to tbl
+function SF.DefaultEnvironment.setfenv ( func, tbl )
+	if type( func ) ~= "function" then error( "Main Thread is protected!" ) end
+	return setfenv( func, tbl )
 end
 
 --- Simple version of Lua's getfenv
 -- Returns the current environment
+-- @return Current environment
 function SF.DefaultEnvironment.getfenv ()
 	return getfenv()
 end

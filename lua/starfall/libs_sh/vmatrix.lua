@@ -2,7 +2,7 @@
 SF.VMatrix = {}
 
 --- VMatrix type
-local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix") -- Define our own VMatrix based off of standard VMatrix
+local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix")
 local wrap, unwrap = SF.CreateWrapper( vmatrix_metamethods, true, false )
 
 SF.VMatrix.Methods = vmatrix_methods
@@ -10,22 +10,32 @@ SF.VMatrix.Metatable = vmatrix_metamethods
 SF.VMatrix.Wrap = wrap
 SF.VMatrix.Unwrap = unwrap
 
+--- Returns a new VMatrix
+-- @return New VMatrix
 SF.DefaultEnvironment.Matrix = function()
 	return wrap(Matrix())
 end
 
+--- Returns angles
+-- @return Angles
 function vmatrix_methods:getAngles()
 	return unwrap(self):GetAngles()
 end
 
+--- Returns scale
+-- @return Scale
 function vmatrix_methods:getScale()
 	return unwrap(self):GetScale()
 end
 
+--- Returns translation
+-- @return Translation
 function vmatrix_methods:getTranslation()
 	return unwrap(self):GetTranslation()
 end
 
+--- Rotate the matrix
+-- @param ang Angle to rotate by
 function vmatrix_methods:rotate( ang )
 	SF.CheckType( ang, "Angle")
 
@@ -34,6 +44,8 @@ function vmatrix_methods:rotate( ang )
 
 end
 
+--- Scale the matrix
+-- @param vec Vector to scale by
 function vmatrix_methods:scale( vec )
 	SF.CheckType( vec, "Vector" )
 
@@ -41,6 +53,8 @@ function vmatrix_methods:scale( vec )
 	v:Scale( vec )
 end
 
+--- Scales the absolute translation
+-- @param num Amount to scale by
 function vmatrix_methods:scaleTranslation( num )
 	SF.CheckType( num, "Number" )
 
@@ -48,6 +62,8 @@ function vmatrix_methods:scaleTranslation( num )
 	v:ScaleTranslation( num )
 end
 
+--- Sets the angles
+-- @param ang New angles
 function vmatrix_methods:setAngles( ang )
 	SF.CheckType( ang, "Angle" )
 
@@ -55,6 +71,8 @@ function vmatrix_methods:setAngles( ang )
 	v:SetAngles( ang )
 end
 
+--- Sets the translation
+-- @param vec New translation
 function vmatrix_methods:setTranslation( vec )
 	SF.CheckType( vec, "Vector" )
 
@@ -62,6 +80,8 @@ function vmatrix_methods:setTranslation( vec )
 	v:SetTranslation( vec )
 end
 
+--- Translate the matrix
+-- @param vec Vector to translate by
 function vmatrix_methods:translate( vec )
 	SF.CheckType( vec, "Vector" )
 

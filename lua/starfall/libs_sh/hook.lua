@@ -8,6 +8,9 @@ local hook_library, _ = SF.Libraries.Register("hook")
 local registered_instances = {}
 
 --- Sets a hook function
+-- @param hookname Name of the event
+-- @param name Unique identifier
+-- @param func Function to run
 function hook_library.add(hookname, name, func)
 	SF.CheckType(hookname,"string")
 	SF.CheckType(name,"string")

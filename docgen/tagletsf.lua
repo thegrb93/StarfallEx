@@ -278,6 +278,29 @@ local function parse_comment ( block, first_line, libs, classes )
 			table.insert(lib.tables,tname)
 			lib.tables[tname] = block
 		end
+	elseif block.class == "field" then
+		local libtbl, fname = block.name:match("(.*)[%.:]([^%.:]+)$")
+		
+		if libtbl and not block.library then
+			if libs[ libtbl ] then
+				block.library = libtbl
+			elseif classes[ libtbl ] then
+				block.classlib = libtbl
+			end
+		end
+		if block.library then
+			local lib = libs[ block.library ]
+			assert( lib, "no such library: " .. block.library )
+			block.library = lib.name
+			table.insert( lib.fields, fname )
+			lib.fields[ fname ] = block
+		elseif block.classlib then
+			local class = classes[ block.library ]
+			assert( class, "no such class: " .. block.classlib )
+			block.classlib = class.name
+			table.insert( class.fields, fname )
+			class.fields[ fname ] = block
+		end
 	elseif block.class == "class" then
 		assert( block.name, "Unnamed class" )
 		assert( block.typtbl, "No type table for " .. block.name )

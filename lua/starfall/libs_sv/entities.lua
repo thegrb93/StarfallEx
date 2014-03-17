@@ -101,6 +101,7 @@ end
 SF.Libraries.AddHook("postload",postload)
 
 --- Gets the owner of the entity
+-- @return Owner
 function ents_methods:owner()
 	SF.CheckType(self,ents_metatable)
 	local ent = unwrap(self)
@@ -129,6 +130,8 @@ local function parent_check( child, parent )
 	return true
 end
 
+--- Parents the entity to another entity
+-- @param ent Entity to parent to
 function ents_methods:parent( ent ) --- TODO: Add permission checks to this!
 	SF.CheckType( self, ents_metatable )
 
@@ -144,6 +147,7 @@ function ents_methods:parent( ent ) --- TODO: Add permission checks to this!
 	this:SetParent( ent )
 end
 
+--- Unparents the entity
 function ents_methods:unparent() --- TODO: Add permission checks to this!
 
 	local this = unwrap(self)
@@ -152,7 +156,7 @@ end
 
 --- Applies linear force to the entity
 -- @param vec The force vector
--- @param offset An optional offset position (TODO: Local or world?)
+-- @param offset An optional offset position
 function ents_methods:applyForceCenter(vec)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
@@ -171,7 +175,7 @@ end
 
 --- Applies linear force to the entity with an offset
 -- @param vec The force vector
--- @param offset An optional offset position (TODO: Local or world?)
+-- @param offset An optional offset position
 function ents_methods:applyForceOffset(vec, offset)
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
@@ -330,6 +334,7 @@ function ents_methods:setFrozen(freeze)
 end
 
 --- Checks the entities frozen state
+-- @return True if entity is frozen
 function ents_methods:isFrozen()
 	SF.CheckType( self, ents_metatable )
 

@@ -39,6 +39,7 @@ local function convert(results, func)
 end
 
 --- Checks if a find function can be performed
+-- @return True if find functions can be used
 function find_library.canFind()
 	local data = SF.instance.data
 	if not data.findcooldown then data.findcooldown = 0 end

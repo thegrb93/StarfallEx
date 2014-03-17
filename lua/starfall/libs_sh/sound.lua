@@ -67,6 +67,7 @@ end
 
 --- Returns the duration of the sound in seconds. Only works on .wav files,
 -- and there are other issues as well.
+-- @return Sound duration
 function sound_library.duration(path)
 	SF.CheckType(path, "string")
 	return SoundDuration(path)
@@ -104,6 +105,7 @@ end
 --- Sets the sound level. This determines the sound attenuation. Only works when the sound is not playing.
 -- See https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel for values and more info
 -- (use decibel value from the 'code' column, not the actual enum or 'value' column).
+-- @param level New level
 function sound_methods:setLevel(level)
 	SF.CheckType(self, sound_metamethods)
 	SF.CheckType(level, "number")
@@ -123,6 +125,7 @@ function sound_methods:stop(fade)
 end
 
 --- Checks if the sound is playing
+-- @return True if the sound is playing
 function sound_methods:isPlaying()
 	SF.CheckType(self, sound_metamethods)
 	return unwrap(self):isPlaying()
