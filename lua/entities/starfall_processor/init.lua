@@ -66,8 +66,16 @@ function ENT:Compile(codetbl, mainfile)
 	self:SetColor(Color(255, 255, 255, clr.a))
 end
 
-function ENT:Error(msg, traceback)
-	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
+function ENT:Error ( msg, traceback )
+	if type( msg ) == "table" then
+		if msg.message then
+			local line = msg.line
+			local file = msg.file
+
+			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
+		end
+	end
+	ErrorNoHalt( "Processor of " .. self.owner:Nick() .. " errored: " .. tostring( msg ) .. "\n" )
 	if traceback then
 		print(traceback)
 	end

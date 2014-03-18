@@ -105,7 +105,15 @@ function ENT:UpdateName(state)
 end
 
 function ENT:Error(msg, override)
-	ErrorNoHalt("Processor of "..self.owner:Nick().." errored: "..msg.."\n")
+	if type( msg ) == "table" then
+		if msg.message then
+			local line = msg.line
+			local file = msg.file
+
+			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
+		end
+	end
+	ErrorNoHalt( "Processor of " .. self.owner:Nick() .. " errored: " .. tostring( msg ) .. "\n" )
 	WireLib.ClientError(msg, self.owner)
 	
 	if self.instance then

@@ -17,7 +17,7 @@ local wrap, unwrap = SF.CreateWrapper(sound_metamethods,true,false)
 function sound_library.create(entity, path)
 	SF.CheckType(path, "string")
 	SF.CheckType(entity, SF.Entities.Metatable)
-	if path:match('["?]') then error("Invalid sound path: "..path,2) end
+	if path:match('["?]') then SF.throw( "Invalid sound path: " .. path, 2 ) end
 	
 	entity = SF.Entities.Unwrap(entity)
 	if not (entity and entity:IsValid()) then return end
@@ -38,7 +38,7 @@ function sound_library.emitWorld(origin, path, amplitude, pitch)
 		SF.CheckType(pitch, "number")
 		pitch = math.Clamp(pitch, 0, 255)
 	end
-	if path:match('["?]') then error("Invalid sound path: "..path,2) end
+	if path:match('["?]') then SF.throw( "Invalid sound path: " .. path, 2 ) end
 	
 	WorldSound(path, origin, amplitude, pitch)
 end
@@ -58,7 +58,7 @@ function sound_library.emitEntity(entity, path, soundlevel, pitch)
 		SF.CheckType(pitch, "number")
 		pitch = math.Clamp(pitch, 0, 255)
 	end
-	if path:match('["?]') then error("Invalid sound path: "..path,2) end
+	if path:match('["?]') then SF.throw( "Invalid sound path: " .. path, 2 ) end
 	
 	entity = SF.Entities.Unwrap(entity)
 	if not (entity and entity:IsValid()) then return end

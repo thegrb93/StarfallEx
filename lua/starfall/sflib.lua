@@ -65,6 +65,23 @@ SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR
 
 local dgetmeta = debug.getmetatable
 
+--- Throws an error like the throw function in builtins
+-- @param msg Message
+-- @param level Which level in the stacktrace to blame
+-- @param uncatchable Makes this exception uncatchable
+function SF.throw ( msg, level, uncatchable )
+	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
+	local filename = info.short_src:match( "^SF:(.*)$" ) or info.short_src
+	local err = {
+		uncatchable = false,
+		file = filename,
+		line = info.currentline,
+		message = msg,
+		uncatchable = uncatchable
+	}
+	error( err )
+end
+
 --- Creates a type that is safe for SF scripts to use. Instances of the type
 -- cannot access the type's metatable or metamethods.
 -- @param name Name of table
@@ -168,7 +185,7 @@ function SF.CheckType(val, typ, level, default)
 		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
-		error("Type mismatch (Expected "..typname..", got "..(type(mt) == "string" and mt or type(val))..") in function "..funcname,level)
+		SF.throw( "Type mismatch (Expected " .. typname .. ", got " .. ( type( mt ) == "string" and mt or type( val ) ) .. ") in function " .. funcname, level )
 	end
 end
 

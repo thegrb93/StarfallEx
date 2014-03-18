@@ -152,7 +152,7 @@ function poly_metamethods:__newindex(k,v)
 	SF.CheckType(v,"table")
 	local poly = unwrappoly(self)
 	if not poly then return end
-	if k <= 0 or k > (#poly)+1 then return error("poly index out of bounds: "..k.." out of "..#poly,2) end
+	if k <= 0 or k > (#poly)+1 then return SF.throw( "poly index out of bounds: " .. k .. " out of " .. #poly, 2 ) end
 	poly[k] = checkvertex(v)
 end
 
@@ -163,9 +163,9 @@ end
 function render_library.pushMatrix(m)
 	SF.CheckType(m,matrix_meta)
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then error("Not in rendering hook.",2) end
+	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	local id = #matrix_stack
-	if id + 1 > MATRIX_STACK_LIMIT then error("Pushed too many matricies",2) end
+	if id + 1 > MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
 	local newmatrix
 	if matrix_stack[id] then
 		newmatrix = matrix_stack[id] * v_unwrap(m)
@@ -179,8 +179,8 @@ end
 --- Pops a matrix from the matrix stack.
 function render_library.popMatrix()
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then error("Not in rendering hook.",2) end
-	if #matrix_stack <= 0 then error("Popped too many matricies",2) end
+	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if #matrix_stack <= 0 then SF.throw( "Popped too many matricies", 2 ) end
 	matrix_stack[#matrix_stack] = nil
 	cam.PopModelMatrix()
 end
@@ -216,7 +216,7 @@ end
 --- Sets the texture
 -- @param id Texture id
 function render_library.setTexture ( id )
-	if not SF.instance.data.render.isRendering then error( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if not id then
 		draw.NoTexture()
 	elseif texturecache[ id ] then
@@ -228,11 +228,11 @@ end
 -- @param clr Color type to clear with
 function render_library.clear ( clr )
     if clr == nil then
-        if not SF.instance.data.render.isRendering then error( "Not in a rendering hook.", 2 ) end
+        if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
         render.Clear( 0, 0, 0, 255 )
     else
         SF.CheckType( clr, SF.Types[ "Color" ] )
-        if not SF.instance.data.render.isRendering then error( "Not in a rendering hook.", 2 ) end
+        if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
         render.Clear( clr.r, clr.g, clr.b, clr.a )
     end
 end
@@ -243,7 +243,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRect(x,y,w,h)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawRect(x,y,w,h)
 end
 
@@ -253,7 +253,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRectOutline(x,y,w,h)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawOutlinedRect(x,y,w,h)
 end
 
@@ -262,7 +262,7 @@ end
 -- @param y Center y coordinate
 -- @param r Radius
 function render_library.drawCircle(x,y,r)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawCircle(x,y,r,currentcolor)
 end
 
@@ -272,7 +272,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRect(x,y,w,h)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawTexturedRect(x,y,w,h)
 end
 
@@ -286,7 +286,7 @@ end
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
 function render_library.drawTexturedRectUV(x,y,w,h,startU,startV,endU,endV)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawTexturedRectUV(x,y,w,h,startU,startV,endU,endV)
 end
 
@@ -297,7 +297,7 @@ end
 -- @param h Height
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotated(x,y,w,h,rot)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
 
@@ -307,7 +307,7 @@ end
 -- @param x2 X end coordinate
 -- @param y2 Y end coordinate
 function render_library.drawLine(x1,y1,x2,y2)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	surface.DrawLine(x1,y1,x2,y2)
 end
 
@@ -321,7 +321,7 @@ end
 -- @param outline Enable outline?
 -- @param A table representing the font (doesn't contain anything)
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
-	if not validfonts[font] then error( "invalid font" ) end
+	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
 	
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -361,7 +361,7 @@ end
 --- Sets the font
 -- @param font The font to use
 function render_library.setFont(font)
-	if not defined_fonts[font] then error("Font does not exist.", 2) end
+	if not defined_fonts[font] then SF.throw( "Font does not exist.", 2 ) end
 	SF.instance.data.render.font = font
 	--surface.SetFont(font)
 end
@@ -379,7 +379,7 @@ end
 -- @param text Text to draw
 -- @param alignment Text alignment
 function render_library.drawText(x,y,text,alignment)
-	if not SF.instance.data.render.isRendering then error("Not in rendering hook.",2) end
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType(text,"string")
 	
 	local font = SF.instance.data.render.font or defaultFont

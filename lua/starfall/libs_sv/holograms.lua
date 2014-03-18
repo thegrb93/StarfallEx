@@ -182,7 +182,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 	SF.CheckType(weight, "number")
 	flexid = math.floor(flexid)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
-		error("Invalid flex: "..flexid,2)
+		SF.throw( "Invalid flex: "..flexid, 2 )
 	end
 	local holoent = SF.Entities.Unwrap(self)
 	if IsValid(holoent) then
@@ -289,9 +289,9 @@ function holograms_library.create( pos, ang, model, scale )
     if scale then SF.CheckType( scale, "Vector" ) end
 
     local instance = SF.instance
-    if not can_spawn( instance ) then return error( "Can't spawn holograms that often", 2 )
-    elseif personal_max_reached( instance ) then return error( "Can't spawn holograms, maximum personal limit of "..SF.Holograms.personalquota:GetInt().." has been reached", 2 )
-    elseif max_reached() then return error( "Can't spawn holograms, maximum limit of "..SF.Holograms.defaultquota:GetInt().." has been reached", 2 ) end
+    if not can_spawn( instance ) then return SF.throw( "Can't spawn holograms that often", 2 )
+    elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2 )
+    elseif max_reached() then return SF.throw( "Can't spawn holograms, maximum limit of " .. SF.Holograms.defaultquota:GetInt() .. " has been reached", 2 ) end
 
     local holodata = instance.data.holograms
     local holoent = ents.Create( "starfall_hologram" )
