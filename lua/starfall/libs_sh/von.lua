@@ -58,7 +58,7 @@ function d_findVariable(s, i, len, lastType)
 	while true do
 		--	Stop at the end. Throw an error. This function MUST NOT meet the end!
 		if i > len then
-			error("vON: Reached end of string, cannot form proper variable.")
+			SF.throw( "vON: Reached end of string, cannot form proper variable.", 3 )
 		end
 
 		--	Cache the character. Nobody wants to look for the same character ten times.
@@ -102,7 +102,7 @@ function d_findVariable(s, i, len, lastType)
 
 			--	This will occur if the very first character in the vON code is wrong.
 		else
-			error("vON: Malformed data... Can't find a proper type definition. Char#" .. i .. ":" .. c)
+			SF.throw( "vON: Malformed data... Can't find a proper type definition. Char#" .. i .. ":" .. c, 3 )
 		end
 
 		--	Move the pointer one step forward.
@@ -146,7 +146,7 @@ _deserialize = {
 
 					--	Otherwise, the data has to be damaged.
 				else
-					error("vON: Reached end of string, incomplete table definition.")
+					SF.throw( "vON: Reached end of string, incomplete table definition.", 2 )
 				end
 			end
 
@@ -192,7 +192,7 @@ _deserialize = {
 					--	But, if there's a key read already...
 				elseif key then
 					--	Then this is malformed.
-					error("vON: Malformed table... Two keys declared successively? Char#" .. i .. ":" .. c)
+					SF.throw( "vON: Malformed table... Two keys declared successively? Char#" .. i .. ":" .. c, 2 )
 
 					--	Otherwise the key will be read.
 				else
@@ -221,7 +221,7 @@ _deserialize = {
 			return tonumber(sub(s, i, a - 1)), a - 1
 		end
 
-		error("vON: Number definition started... Found no end.")
+		SF.throw( "vON: Number definition started... Found no end.", 3 )
 	end,
 
 
@@ -241,7 +241,7 @@ _deserialize = {
 		end
 
 		--	Any other supposely "boolean" is just a sign of malformed data.
-		error("vON: Invalid value on boolean type... Char#" .. i .. ": " .. c)
+		SF.throw( "vON: Invalid value on boolean type... Char#" .. i .. ": " .. c, 3 )
 	end,
 
 
@@ -263,7 +263,7 @@ _deserialize = {
 					return res .. sub(s, i, a - 2), a
 				end
 			else
-				error("vON: String definition started... Found no end.")
+				SF.throw( "vON: String definition started... Found no end.", 3 )
 			end
 		end
 	end
@@ -393,7 +393,7 @@ _d_meta = {
 		if type(str) == "string" then
 			return _d_table(str, nil, #str, true)
 		end
-		error("vON: You must deserialize a string, not a "..type(str))
+		SF.throw( "vON: You must deserialize a string, not a " .. type( str ), 2 )
 	end
 }
 _s_meta = {
@@ -401,7 +401,7 @@ _s_meta = {
 		if type(data) == "table" then
 			return _s_table(data, nil, nil, nil, nil, true)
 		end
-		error("vON: You must serialize a table, not a "..type(data))
+		SF.throw( "vON: You must serialize a table, not a " .. type( data ), 2 )
 	end
 }
 

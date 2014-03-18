@@ -175,17 +175,17 @@ function wire_library.createInputs(names, types)
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
-	if not ent then error("No entity to create inputs on",2) end
+	if not ent then SF.throw( "No entity to create inputs on", 2 ) end
 	
-	if #names ~= #types then error("Table lengths not equal",2) end
+	if #names ~= #types then SF.throw( "Table lengths not equal", 2 ) end
 	for i=1,#names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) ~= "string" then error("Non-string input name: "..newname,2) end
-		if type(newtype) ~= "string" then error("Non-string input type: "..newtype,2) end
+		if type(newname) ~= "string" then SF.throw( "Non-string input name: " .. newname, 2 ) end
+		if type(newtype) ~= "string" then SF.throw( "Non-string input type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
-		if not newname:match("^[%u][%a%d]*$") then error("Invalid input name: "..newname,2) end
-		if not inputConverters[newtype] then error("Invalid/unsupported input type: "..newtype,2) end
+		if not newname:match( "^[%u][%a%d]*$" ) then SF.throw( "Invalid input name: " .. newname, 2 ) end
+		if not inputConverters[ newtype ] then SF.throw( "Invalid/unsupported input type: " .. newtype, 2 ) end
 		names[i] = newname
 		types[i] = newtype
 	end
@@ -201,17 +201,17 @@ function wire_library.createOutputs(names, types)
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
-	if not ent then error("No entity to create outputs on",2) end
+	if not ent then SF.throw( "No entity to create outputs on", 2 ) end
 	
-	if #names ~= #types then error("Table lengths not equal",2) end
+	if #names ~= #types then SF.throw( "Table lengths not equal", 2 ) end
 	for i=1,#names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) ~= "string" then error("Non-string output name: "..newname,2) end
-		if type(newtype) ~= "string" then error("Non-string output type: "..newtype,2) end
+		if type(newname) ~= "string" then SF.throw( "Non-string output name: " .. newname, 2 ) end
+		if type(newtype) ~= "string" then SF.throw( "Non-string output type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
-		if not newname:match("^[%u][%a%d]*$") then error("Invalid output name: "..newname,2) end
-		if not outputConverters[newtype] then error("Invalid/unsupported output type: "..newtype,2) end
+		if not newname:match("^[%u][%a%d]*$") then SF.throw( "Invalid output name: " .. newname, 2 ) end
+		if not outputConverters[newtype] then SF.throw( "Invalid/unsupported output type: " .. newtype, 2 ) end
 		names[i] = newname
 		types[i] = newtype
 	end
@@ -222,7 +222,7 @@ end
 --- Returns the wirelink representing this entity.
 function wire_library.self()
 	local ent = SF.instance.data.entity
-	if not ent then error("No entity",2) end
+	if not ent then SF.throw( "No entity", 2 ) end
 	return wlwrap(ent)
 end
 
@@ -353,7 +353,7 @@ function wire_ports_metamethods:__index(name)
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity
-	if not ent then error("No entity",2) end
+	if not ent then SF.throw( "No entity", 2 ) end
 
 	local input = ent.Inputs[name]
 	if not (input and input.Src and input.Src:IsValid()) then
@@ -366,7 +366,7 @@ function wire_ports_metamethods:__newindex(name,value)
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity
-	if not ent then error("No entity",2) end
+	if not ent then SF.throw( "No entity", 2 ) end
 
 	local output = ent.Outputs[name]
 	if not output then return end

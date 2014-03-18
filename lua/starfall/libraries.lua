@@ -50,7 +50,7 @@ function SF.Libraries.CreateLocalTbl(arr)
 	local tbl = {}
 	for i=1,#arr do
 		local lib = arr[i]
-		tbl[lib] = SF.Libraries.Local[lib] or error(string.format("Requested nonexistant library '%s'",lib),2)
+		tbl[lib] = SF.Libraries.Local[lib] or SF.throw( string.format( "Requested nonexistant library '%s'", lib ), 2 )
 	end
 	return tbl
 end

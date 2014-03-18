@@ -110,7 +110,15 @@ end
 
 function ENT:Error(msg)
 	-- Notice owner
-	WireLib.AddNotify(self.owner, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1)
+	if type( msg ) == "table" then
+		if msg.message then
+			local line = msg.line
+			local file = msg.file
+
+			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
+		end
+	end
+	WireLib.AddNotify( self.owner, tostring( msg ), NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 	
 	-- Process error message
 	self.error = {}

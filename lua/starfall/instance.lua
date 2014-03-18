@@ -42,7 +42,7 @@ function SF.Instance:runWithOps(func,...)
 		self.ops = self.ops + 500
 		if self.ops > maxops then
 			debug.sethook(nil)
-			error("Operations quota exceeded.",0)
+			SF.throw( "Operations quota exceeded.", 0, true )
 		end
 	end
 	

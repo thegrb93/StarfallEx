@@ -95,7 +95,7 @@ SF.DefaultEnvironment.next = mynext
 -- @class function
 -- @param condition
 -- @param msg
-SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then error( msg or "assertion failed!", 2 ) end end
+SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then SF.throw( msg or "assertion failed!", 2 ) end end
 --- Same as Lua's unpack
 -- @name SF.DefaultEnvironment.unpack
 -- @class function
@@ -115,9 +115,6 @@ SF.DefaultEnvironment.getmetatable = function(tbl)
 	SF.CheckType(tbl,"table")
 	return getmetatable(tbl)
 end
---- Throws an error. Can't change the level yet.
--- @param msg Error message
-SF.DefaultEnvironment.error = function(msg) error(msg or "an unspecified error occured",2) end
 
 --- Constant that denotes whether the code is executed on the client
 -- @name SF.DefaultEnvironment.CLIENT
@@ -302,7 +299,7 @@ function SF.DefaultEnvironment.require(file)
 		return loaded[file]
 	else
 		local func = SF.instance.scripts[file]
-		if not func then error("Can't find file '"..file.."' (did you forget to --@include it?)",2) end
+		if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
 		loaded[file] = func() or true
 		return loaded[file]
 	end
@@ -315,22 +312,8 @@ end
 function SF.DefaultEnvironment.dofile(file)
 	SF.CheckType(file, "string")
 	local func = SF.instance.scripts[file]
-	if not func then error("Can't find file '"..file.."' (did you forget to --@include it?)",2) end
+	if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
 	return func()
-end
-
--- @param func Function to call
--- @return True if the call was successful
--- @return If the call was successful, the return values. Otherwise, the error message
-function SF.DefaultEnvironment.pcall ( func )
-    local ok, err = pcall( func )
-
-    -- don't catch quota errors
-    if SF.instance.ops > SF.instance.context.ops() then
-        error( err, 0 )
-    end
-
-    return ok, err
 end
 
 --- GLua's loadstring
@@ -354,7 +337,7 @@ end
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv ( func, tbl )
-	if type( func ) ~= "function" then error( "Main Thread is protected!" ) end
+	if type( func ) ~= "function" then SF.throw( "Main Thread is protected!", 2 ) end
 	return setfenv( func, tbl )
 end
 
@@ -363,6 +346,49 @@ end
 -- @return Current environment
 function SF.DefaultEnvironment.getfenv ()
 	return getfenv()
+end
+
+--- Try to execute a function and catch possible exceptions
+-- Similar to xpcall, but a bit more in-depth
+-- @param func Function to execute
+-- @param catch Function to execute in case func fails
+function SF.DefaultEnvironment.try ( func, catch )
+	local ok, err = pcall( func )
+	if ok then return end
+
+	if type( err ) == "table" then
+		if err.uncatchable then
+			error( err )
+		end
+	end
+	catch( err )
+end
+
+--- Throws an exception
+-- @param msg Message
+-- @param level Which level in the stacktrace to blame. Defaults to one of invalid
+-- @param uncatchable Makes this exception uncatchable
+function SF.DefaultEnvironment.throw ( msg, level, uncatchable )
+	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
+	local filename = info.short_src:match( "^SF:(.*)$" )
+	if not filename then
+		info = debug.getinfo( 2, "Sl" )
+		filename = info.short_src:match( "^SF:(.*)$" )
+	end
+	local err = {
+		uncatchable = false,
+		file = filename,
+		line = info.currentline,
+		message = msg,
+		uncatchable = uncatchable
+	}
+	error( err )
+end
+
+--- Throws a raw exception.
+-- @param msg Exception message
+function SF.DefaultEnvironment.error ( msg )
+	error( msg or "an unspecified error occured", 2 )
 end
 
 -- ------------------------- Restrictions ------------------------- --
