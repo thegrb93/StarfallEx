@@ -85,17 +85,17 @@ end
 -- @param line string with line text
 -- @return the library name or nil if not found
 -- @return the table name used to store the library
-local function check_library(line)
-	line = util.trim(line)
+local function check_library ( line )
+	line = util.trim( line )
 
 	-- Global library
-	local tblref, name = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(\"([^\"]+)\".-%)$")
+	local tblref, name = line:match( "^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(%s*\"([^\"]+)\".-%)$" )
 	if tblref then
 		return name, tblref
 	end
 
 	-- Local library
-	local tblref, name = line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.RegisterLocal%(\"([^\"]+)\".-%)$")
+	local tblref, name = line:match( "^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.RegisterLocal%(\"([^\"]+)\".-%)$" )
 	return name, tblref
 end
 
