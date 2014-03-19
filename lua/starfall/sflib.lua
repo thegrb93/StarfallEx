@@ -451,6 +451,7 @@ end
 if SERVER then
 	util.AddNetworkString("starfall_requpload")
 	util.AddNetworkString("starfall_upload")
+	util.AddNetworkString( "starfall_addnotify" )
 	
 	local uploaddata = {}
 	-- Packet structure:
@@ -521,6 +522,28 @@ if SERVER then
 		end
 
 	end)
+
+    function SF.AddNotify ( ply, msg, notifyType, duration, sound )
+
+        -- If the first arg is a string, it can't be a player, so shift all values.
+        if type( ply ) == "string" then
+            ply, msg, notifyType, duration, sound = nil, ply, msg, notifyType, duration
+        end
+
+        if ply and not IsValid( ply ) then return end
+
+        net.Start( "starfall_addnotify" )
+        net.WriteString( msg )
+        net.WriteUInt( notifyType, 8 or 0, 8 )
+        net.WriteFloat( duration )
+        net.WriteUInt( sound, 8 or 0, 8 )
+        if ply then
+            net.Send( ply )
+        else
+            net.Broadcast()
+        end
+    end
+
 else
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
@@ -564,6 +587,37 @@ else
 			end
 		end
 	end)
+
+    local sounds = {
+        [ NOTIFYSOUND_DRIP1 ] = "ambient/water/drip1.wav",
+        [ NOTIFYSOUND_DRIP2 ] = "ambient/water/drip2.wav",
+        [ NOTIFYSOUND_DRIP3 ] = "ambient/water/drip3.wav",
+        [ NOTIFYSOUND_DRIP4 ] = "ambient/water/drip4.wav",
+        [ NOTIFYSOUND_DRIP5 ] = "ambient/water/drip5.wav",
+        [ NOTIFYSOUND_ERROR1 ] = "buttons/button10.wav",
+        [ NOTIFYSOUND_CONFIRM1 ] = "buttons/button3.wav",
+        [ NOTIFYSOUND_CONFIRM2 ] = "buttons/button14.wav",
+        [ NOTIFYSOUND_CONFIRM3 ] = "buttons/button15.wav",
+        [ NOTIFYSOUND_CONFIRM4 ] = "buttons/button17.wav"
+    }
+
+    function SF.AddNotify ( ply, msg, type, duration, sound )
+        if not IsValid( ply ) then return end
+
+        if ply ~= LocalPlayer() then
+            return
+        end
+
+        GAMEMODE:AddNotify( msg, type, duration )
+
+        if sound and sounds[ sound ] then
+            surface.PlaySound( sounds[ sound ] )
+        end
+    end
+
+    net.Receive( "starfall_addnotify", function ()
+        SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), net.ReadUInt( 8 ) )
+    end )
 end
 
 -- ------------------------------------------------------------------------- --
