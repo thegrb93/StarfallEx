@@ -223,6 +223,12 @@ function SF.DefaultEnvironment.loadLibrary(...)
 		else
 			r[#r+1] = SF.Libraries.Get(v)
 		end
+
+		local dm = debug.getmetatable( r[#r] )
+		if dm ~= nil and dm.onLoad then
+			dm.onLoad()
+		end
+
 	end
 
 	return unpack(r)
