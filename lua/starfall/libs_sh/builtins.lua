@@ -397,6 +397,13 @@ function SF.DefaultEnvironment.error ( msg )
 	error( msg or "an unspecified error occured", 2 )
 end
 
+--- Execute a console command
+-- @param cmd Command to execute
+function SF.DefaultEnvironment.concmd ( cmd )
+	SF.CheckType( cmd, "string" )
+	SF.instance.player:ConCommand( cmd )
+end
+
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
