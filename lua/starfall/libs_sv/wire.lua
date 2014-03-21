@@ -203,7 +203,7 @@ end
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. May be modified by the function.
 function wire_library.createInputs ( names, types )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
@@ -230,7 +230,7 @@ end
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. May be modified by the function.
 function wire_library.createOutputs ( names, types )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
@@ -263,7 +263,7 @@ end
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
 wirelink_metatable.__index = function(self,k)
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.read" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.read" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(self,wirelink_metatable)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
@@ -283,7 +283,7 @@ end
 
 --- Writes to an input.
 wirelink_metatable.__newindex = function(self,k,v)
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.write" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
@@ -385,7 +385,7 @@ end
 local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 
 function wire_ports_metamethods:__index ( name )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.input" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.input" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity
@@ -399,7 +399,7 @@ function wire_ports_metamethods:__index ( name )
 end
 
 function wire_ports_metamethods:__newindex ( name, value )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.output" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "wire.output" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity

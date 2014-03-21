@@ -23,7 +23,7 @@ file.CreateDir("starfallscriptdata/")
 -- @return Contents, or nil if error
 -- @return Error message if applicable
 function files_library.read(path)
-	if not SF.Permissions.check( SF.instance.player, path, "file.read" ) then return end
+	if not SF.Permissions.check( SF.instance.player, path, "file.read" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(path, "string")
 	if path:find("..",1,true) then error("path contains '..'") return end
 	local contents = file.Read("starfallscriptdata/"..path, "DATA")
@@ -35,7 +35,7 @@ end
 -- @return True if OK, nil if error
 -- @return Error message if applicable
 function files_library.write(path, data)
-	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then return end
+	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(path, "string")
 	SF.CheckType(data, "string")
 	if path:find("..",1,true) then error("path contains '..'") return end
@@ -48,7 +48,7 @@ end
 -- @param data String that will be appended to the file.
 -- @return Error message if applicable
 function files_library.append(path,data)
-	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then return end
+	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(path, "string")
 	SF.CheckType(data, "string")
 	if path:find("..",1,true) then error("path contains '..'") return end
@@ -61,7 +61,7 @@ end
 -- @return True if exists, false if not, nil if error
 -- @return Error message if applicable
 function files_library.exists(path)
-	if not SF.Permissions.check( SF.instance.player, path, "file.exists" ) then return end
+	if not SF.Permissions.check( SF.instance.player, path, "file.exists" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(path, "string")
 	if path:find("..",1,true) then error("path contains '..'") return end
 	return file.Exists("starfallscriptdata/"..path, "DATA")
@@ -72,7 +72,7 @@ end
 -- @return True if successful, nil if error
 -- @return Error message if applicable
 function files_library.delete(path)
-	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then return end
+	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(path, "string")
 	if path:find("..",1,true) then error("path contains '..'") return end
 	if not file.Exists("starfallscriptdata/"..path, "DATA") then error("doesn't exist") return end

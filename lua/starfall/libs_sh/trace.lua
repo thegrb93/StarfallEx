@@ -234,7 +234,7 @@ end
 -- @param mask Trace mask
 -- @return Result of the trace
 function trace_library.trace(start,endpos,filter,mask)
-	if not SF.Permissions.check( SF.instance.player, nil, "trace" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(start,"Vector")
 	SF.CheckType(endpos,"Vector")
 	filter = convertFilter(SF.CheckType(filter,"table",0,{}))
@@ -259,7 +259,7 @@ end
 -- @param mask Trace mask
 -- @return Result of the trace
 function trace_library.traceHull(start,endpos,minbox,maxbox,filter,mask)
-	if not SF.Permissions.check( SF.instance.player, nil, "trace" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(start,"Vector")
 	SF.CheckType(endpos,"Vector")
 	SF.CheckType(minbox,"Vector")

@@ -59,7 +59,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inBox(min, max, filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(min,"Vector")
 	SF.CheckType(max,"Vector")
 	if filter then SF.CheckType(filter,"function") end
@@ -76,7 +76,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inSphere(center, radius, filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(center,"Vector")
 	SF.CheckType(radius,"number")
 	
@@ -94,7 +94,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inCone(pos, dir, distance, radius, filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(pos,"Vector")
 	SF.CheckType(dir,"Vector")
 	SF.CheckType(distance,"number")
@@ -111,7 +111,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byClass(class, filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(class,"string")
 	
 	local instance = SF.instance
@@ -125,7 +125,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byModel(model, filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(model,"string")
 	
 	local instance = SF.instance
@@ -138,7 +138,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.allPlayers(filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	local instance = SF.instance
 	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	
@@ -149,7 +149,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.all(filter)
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return end
+	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	local instance = SF.instance
 	if not updateCooldown(instance) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	

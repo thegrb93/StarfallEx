@@ -145,7 +145,7 @@ function ents_methods:parent ( ent )
 	local ent = unwrap( ent )
 	local this = unwrap( self )
 
-	if not SF.Permissions.check( SF.instance.player, { this, ent }, "entities.parent" ) then return end
+	if not SF.Permissions.check( SF.instance.player, { this, ent }, "entities.parent" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	if not isValid( ent ) then return false, "entity not valid" end
 	if not parent_check( this, ent ) then return false, "cannot parent to self" end
@@ -155,7 +155,7 @@ end
 
 function ents_methods:unparent ()
 	local this = unwrap(self)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then return end
+	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then SF.throw( "Insufficient permissions", 2 ) end
 	this:SetParent( nil )
 end
 
@@ -172,7 +172,7 @@ function ents_methods:applyForceCenter(vec)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:ApplyForceCenter( vec )
 	
@@ -193,7 +193,7 @@ function ents_methods:applyForceOffset(vec, offset)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:ApplyForceOffset( vec, offset )
 	
@@ -212,7 +212,7 @@ function ents_methods:applyAngForce(ang)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	-- assign vectors
 	local up = ent:GetUp()
@@ -255,7 +255,7 @@ function ents_methods:applyTorque(tq)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	local torqueamount = tq:Length()
 	
@@ -289,7 +289,7 @@ function ents_methods:setPos(vec)
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setPos" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setPos" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	SF.setPos( ent, vec )
 
@@ -305,7 +305,7 @@ function ents_methods:setAngles(ang)
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setAngles" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setAngles" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	SF.setAng( ent, ang )
 
@@ -323,7 +323,7 @@ function ents_methods:setVelocity(vel)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setVelocity" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setVelocity" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:SetVelocity(vel)
 	return true
@@ -339,7 +339,7 @@ function ents_methods:setFrozen(freeze)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setFrozen" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setFrozen" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:EnableMotion(not (freeze and true or false))
 	phys:Wake()
@@ -366,7 +366,7 @@ function ents_methods:setSolid ( solid )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	ent:SetNotSolid( not solid )
 end
@@ -381,7 +381,7 @@ function ents_methods:enableGravity(grav)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableGravity" ) then return end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableGravity" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:EnableGravity(grav and true or false)
 	phys:Wake()
