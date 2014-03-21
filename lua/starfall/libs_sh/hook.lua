@@ -156,3 +156,172 @@ add( "EntityRemoved" )
 -- Other
 add( "EndEntityDriving" )
 add( "StartEntityDriving" )
+
+--- Called when an entity is being picked up by a gravity gun
+-- @name GravGunOnPickedUp
+-- @class hook
+-- @server
+-- @param ply Player picking up an object
+-- @param ent Entity being picked up
+
+--- Called when an entity is being dropped by a gravity gun
+-- @name GravGunOnDropped
+-- @class hook
+-- @server
+-- @param ply Player dropping the object
+-- @param ent Entity being dropped
+
+--- Called when an entity is being frozen
+-- @name OnPhysgunFreeze
+-- @class hook
+-- @server
+-- @param physgun Entity of the physgun
+-- @param physobj PhysObj of the entity
+-- @param ent Entity being frozen
+-- @param ply Player freezing the entity
+
+--- Called when a player reloads his physgun
+-- @name OnPhysgunReload
+-- @class hook
+-- @server
+-- @param physgun Entity of the physgun
+-- @param ply Player reloading the physgun
+
+--- Called when a player dies
+-- @name PlayerDeath
+-- @class hook
+-- @server
+-- @param ply Player who died
+-- @param inflictor Entity used to kill the player
+-- @param attacker Entity that killed the player
+
+--- Called when a player disconnects
+-- @name PlayerDisconnected
+-- @class hook
+-- @server
+-- @param ply Player that disconnected
+
+--- Called when a player spawns for the first time
+-- @name PlayerInitialSpawn
+-- @param player Player who spawned
+-- @server
+
+--- Called when a player spawns
+-- @name PlayerSpawn
+-- @class hook
+-- @server
+-- @param player Player who spawned
+
+--- Called when a players leaves a vehicle
+-- @name PlayerLeaveVehicle
+-- @class hook
+-- @server
+-- @param ply Player who left a vehicle
+-- @param vehicle Vehicle that was left
+
+--- Called when a player sends a chat message
+-- @name PlayerSay
+-- @class hook
+-- @server
+-- @param ply Player that sent the message
+-- @param text Content of the message
+-- @param teamChat True if team chat
+-- @return New text. "" to stop from displaying. Nil to keep original.
+
+--- Called when a players sprays his logo
+-- @name PlayerSpray
+-- @class hook
+-- @server
+-- @param ply Player that sprayed
+
+--- Called when a player holds their use key and looks at an entity.
+-- Will continuously run.
+-- @name PlayerUse
+-- @server
+-- @class hook
+-- @param ply Player using the entity
+-- @param ent Entity being used
+
+--- Called when a players turns their flashlight on or off
+-- @name PlayerSwitchFlashlight
+-- @class hook
+-- @server
+-- @param ply Player switching flashlight
+-- @param state New flashlight state. True if on.
+
+--- Called when a player gets hurt
+-- @name PlayerHurt
+-- @class hook
+-- @shared
+-- @param ply Player being hurt
+-- @param attacker Entity causing damage to the player
+-- @param newHealth New health of the player
+-- @param damageTaken Amount of damage the player has taken
+
+--- Called when a player toggles noclip
+-- @name PlayerNoClip
+-- @class hook
+-- @shared
+-- @param ply Player toggling noclip
+-- @param newState New noclip state. True if on.
+
+--- Called when a player presses a key
+-- @name KeyPress
+-- @class hook
+-- @shared
+-- @param ply Player pressing the key
+-- @param key The key being pressed
+
+--- Called when a player releases a key
+-- @name KeyRelease
+-- @class hook
+-- @shared
+-- @param ply Player releasing the key
+-- @param key The key being released
+
+--- Called when a player punts with the gravity gun
+-- @name GravGunPunt
+-- @class hook
+-- @shared
+-- @param ply Player punting the gravgun
+-- @param ent Entity being punted
+
+--- Called when an entity gets picked up by a physgun
+-- @name PhysgunPickup
+-- @class hook
+-- @shared
+-- @param ply Player picking up the entity
+-- @param ent Entity being picked up
+
+--- Called when an entity being held by a physgun gets dropped
+-- @name PhysgunDrop
+-- @class hook
+-- @shared
+-- @param ply Player droppig the entity
+-- @param ent Entity being dropped
+
+--- Called when an entity gets created
+-- @name OnEntityCreated
+-- @class hook
+-- @shared
+-- @param ent New entity
+
+--- Called when an entity is removed
+-- @name EntityRemoved
+-- @class hook
+-- @shared
+-- @param ent Entity being removed
+
+--- Called when a player stops driving an entity
+-- @name EndEntityDriving
+-- @class hook
+-- @shared
+-- @param ent Entity that had been driven
+-- @param ply Player that drove the entity
+
+--- Called when a player starts driving an entity
+-- @name StartEntityDriving
+-- @class hook
+-- @shared
+-- @param ent Entity being driven
+-- @param Player that is driving the entity
