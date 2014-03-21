@@ -140,11 +140,12 @@ end
 --- Parents the entity to another entity
 -- @param ent Entity to parent to
 function ents_methods:parent( ent )
-	if not SF.Permissions.check( SF.instance.player, { this, ent }, "entities.parent" ) then return end
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( ent )
 	local this = unwrap( self )
+	
+	if not SF.Permissions.check( SF.instance.player, { this, ent }, "entities.parent" ) then return end
 
 	if not isValid( ent ) then return false, "entity not valid" end
 	if not parent_check( this, ent ) then return false, "cannot parent to self" end
@@ -153,8 +154,8 @@ function ents_methods:parent( ent )
 end
 
 function ents_methods:unparent()
-	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then return end
 	local this = unwrap(self)
+	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then return end
 	this:SetParent( nil )
 end
 
@@ -162,7 +163,6 @@ end
 -- @param vec The force vector
 -- @param offset An optional offset position
 function ents_methods:applyForceCenter(vec)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	if not check( vec ) then return false, "infinite vector" end
@@ -171,6 +171,8 @@ function ents_methods:applyForceCenter(vec)
 	if not isValid(ent) then return false, "entity not valid" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
+	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
 	
 	phys:ApplyForceCenter( vec )
 	
@@ -181,7 +183,6 @@ end
 -- @param vec The force vector
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset(vec, offset)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	SF.CheckType(offset,"Vector")
@@ -192,6 +193,8 @@ function ents_methods:applyForceOffset(vec, offset)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
+
 	phys:ApplyForceOffset( vec, offset )
 	
 	return true
@@ -201,7 +204,6 @@ end
 -- @param ang The force angle
 -- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
 function ents_methods:applyAngForce(ang)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
@@ -209,6 +211,8 @@ function ents_methods:applyAngForce(ang)
 	if not isValid(ent) then return false, "entity not valid" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
+	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
 	
 	-- assign vectors
 	local up = ent:GetUp()
@@ -243,7 +247,6 @@ end
 -- @param tq The torque vector
 -- @deprecated Gmod has no phys:ApplyTorque function, so this uses black magic
 function ents_methods:applyTorque(tq)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.applyForce" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(tq,"Vector")
 	
@@ -251,6 +254,8 @@ function ents_methods:applyTorque(tq)
 	if not isValid(ent) then return false, "entity not valid" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
+	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then return end
 	
 	local torqueamount = tq:Length()
 	
@@ -278,12 +283,13 @@ end
 --- Sets the entitiy's position
 -- @param vec New position
 function ents_methods:setPos(vec)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.setPos" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vec,"Vector")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
+
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setPos" ) then return end
 
 	SF.setPos( ent, vec )
 
@@ -293,13 +299,14 @@ end
 --- Sets the entity's angles
 -- @param ang New angles
 function ents_methods:setAngles(ang)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.setAngles" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(ang,"Angle")
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setAngles" ) then return end
+	
 	SF.setAng( ent, ang )
 
 	return true
@@ -308,7 +315,6 @@ end
 --- Sets the entity's linear velocity
 -- @param vel New velocity
 function ents_methods:setVelocity(vel)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.setVelocity" ) then return end
 	SF.CheckType(self,ents_metatable)
 	SF.CheckType(vel,"Vector")
 	
@@ -317,6 +323,8 @@ function ents_methods:setVelocity(vel)
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
 	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setVelocity" ) then return end
+	
 	phys:SetVelocity(vel)
 	return true
 end
@@ -324,13 +332,14 @@ end
 --- Sets the entity frozen state
 -- @param freeze Should the entity be frozen?
 function ents_methods:setFrozen(freeze)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.setFrozen" ) then return end
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
+	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setFrozen" ) then return end
 	
 	phys:EnableMotion(not (freeze and true or false))
 	phys:Wake()
@@ -357,19 +366,22 @@ function ents_methods:setSolid ( solid )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
 	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then return end
+	
 	ent:SetNotSolid( not solid )
 end
 
 --- Sets entity gravity
 -- @param grav Should the entity respect gravity?
 function ents_methods:enableGravity(grav)
-	if not SF.Permissions.check( SF.instance.player, this, "entities.enableGravity" ) then return end
 	SF.CheckType(self,ents_metatable)
 	
 	local ent = unwrap(self)
 	if not isValid(ent) then return false, "entity not valid" end
 	local phys = getPhysObject(ent)
 	if not phys then return false, "entity has no physics object" end
+	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableGravity" ) then return end
 	
 	phys:EnableGravity(grav and true or false)
 	phys:Wake()

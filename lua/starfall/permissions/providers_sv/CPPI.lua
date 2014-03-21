@@ -1,6 +1,6 @@
 --- Provides permissions for entities based on CPPI if present
 
-local P = setmetatable( {}, SF.Permissions.Provider )
+local P = setmetatable( {}, { __index = SF.Permissions.Provider } )
 
 local ALLOW = SF.Permissions.Result.ALLOW
 local DENY = SF.Permissions.Result.DENY
@@ -11,7 +11,7 @@ local canTool = {
 	[ "entities.unparent" ] = true,
 	[ "entities.setSolid" ] = true,
 	[ "entities.enableGravity" ] = true,
-	{ "entities.setColor" ] = true
+	[ "entities.setColor" ] = true
 }
 
 local canPhysgun = {

@@ -54,7 +54,6 @@ function P:check (principal, target, key)
 			return DENY
 		end
 	else
-		print( "WARNING: privilege " .. key .. " not set for " .. getUsergroupName( principal ) )
 		return NEUTRAL
 	end
 end

@@ -96,11 +96,11 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor( clr )
-	if not SF.Permissions.check( SF.instance.player, this, "entities.setColor" ) then return end
 	SF.CheckType( clr, SF.Types["Color"] )
 
 	local this = unwrap( self )
 	if IsValid( this ) then
+		if not SF.Permissions.check( SF.instance.player, this, "entities.setColor" ) then return end
 		this:SetColor( clr )
 		this:SetRenderMode( clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
 	end
