@@ -11,38 +11,33 @@ local screens = {}
 util.AddNetworkString("starfall_screen_download")
 util.AddNetworkString("starfall_screen_update")
 
-local function sendScreenCode(screen, owner, files, mainfile, recipient)
-	--print("Sending SF code for: " .. tostring(recipient))
-	net.Start("starfall_screen_download")
-	net.WriteEntity(screen)
-	net.WriteEntity(owner)
-	net.WriteString(mainfile)
-	if recipient then net.Send(recipient) else net.Broadcast() end
-	--print("\tHeader sent")
+local function sendScreenCode ( screen, owner, files, mainfile, recipient )
+	net.Start( "starfall_screen_download" )
+	net.WriteEntity( screen )
+	net.WriteEntity( owner )
+	net.WriteString( mainfile )
+	if recipient then net.Send( recipient ) else net.Broadcast() end
 
-	local fname = next(files)
+	local fname = next( files )
 	while fname do
-		--print("\tSending data for:", fname)
-		local fdata = files[fname]
+		local fdata = files[ fname ]
 		local offset = 1
 		repeat
-			net.Start("starfall_screen_download")
-			net.WriteBit(false)
-			net.WriteString(fname)
-			local data = fdata:sub(offset, offset+60000)
-			net.WriteString(data)
-			if recipient then net.Send(recipient) else net.Broadcast() end
+			net.Start( "starfall_screen_download" )
+			net.WriteBit( false )
+			net.WriteString( fname )
+			local data = fdata:sub( offset, offset + 60000 )
+			net.WriteString( data )
+			if recipient then net.Send( recipient ) else net.Broadcast() end
 
-			--print("\t\tSent data from", offset, "to", offset + #data)
 			offset = offset + #data + 1
 		until offset > #fdata
-		fname = next(files, fname)
+		fname = next( files, fname )
 	end
 
-	net.Start("starfall_screen_download")
-	net.WriteBit(true)
-	if recipient then net.Send(recipient) else net.Broadcast() end
-	--print("Done sending")
+	net.Start( "starfall_screen_download" )
+	net.WriteBit( true )
+	if recipient then net.Send( recipient ) else net.Broadcast() end
 end
 
 local requests = {}
@@ -56,8 +51,6 @@ local function sendCodeRequest(ply, screenid)
 		requests[screenid][ply] = true
 		return
 
-		--[[if timer.Exists("starfall_send_code_request") then return end
-		timer.Create("starfall_send_code_request", .5, 1, retryCodeRequests) ]]
 	elseif screen.mainfile then
 		if requests[screenid] then
 			requests[screenid][ply] = nil
@@ -79,51 +72,13 @@ net.Receive("starfall_screen_download", function(len, ply)
 	sendCodeRequest(ply, screen:EntIndex())
 end)
 
-function ENT:Initialize()
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-	self:SetSolid(SOLID_VPHYSICS)
+function ENT:Initialize ()
+    baseclass.Get( self.Base ).Initialize( self )
 	self:SetUseType( 3 )
-	
-	self.Inputs = WireLib.CreateInputs(self, {})
-	self.Outputs = WireLib.CreateOutputs(self, {})
-	
-	local r,g,b,a = self:GetColor()
 end
 
-function ENT:OnRestore()
-end
-
-function ENT:UpdateName(state)
-	if state ~= "" then state = "\n"..state end
-	
-	if self.instance and self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[self.instance.mainfile] then
-		self:SetOverlayText("Starfall Processor\n"..tostring(self.instance.ppdata.scriptnames[self.instance.mainfile])..state)
-	else
-		self:SetOverlayText("Starfall Processor"..state)
-	end
-end
-
-function ENT:Error(msg, override)
-	if type( msg ) == "table" then
-		if msg.message then
-			local line = msg.line
-			local file = msg.file
-
-			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
-		end
-	end
-	ErrorNoHalt( "Processor of " .. self.owner:Nick() .. " errored: " .. tostring( msg ) .. "\n" )
-	WireLib.ClientError(msg, self.owner)
-	
-	if self.instance then
-		self.instance:deinitialize()
-		self.instance = nil
-	end
-	
-	self:UpdateName("Inactive (Error)")
-	local r,g,b,a = self:GetColor()
-	self:SetColor(255, 0, 0, a)
+function ENT:Error ( msg )
+    self.BaseClass.Error( self, msg )
 end
 
 function ENT:CodeSent(ply, files, mainfile)
@@ -214,26 +169,11 @@ function ENT:Use( activator )
 end
 
 function ENT:OnRemove()
-	if not self.instance then return end
-	screens[self] = nil
-	self.instance:deinitialize()
-	self.instance = nil
+    self.BaseClass.OnRemove( self )
+    screens[ self ] = nil
 end
 
-function ENT:TriggerInput ( key, value )
-	self:runScriptHook( "input", key, value )
-end
-
-function ENT:ReadCell ( address )
-	return tonumber( self:runScriptHookForResult( "readcell", address ) ) or 0
-end
-
-function ENT:WriteCell ( address, data )
-	self:runScriptHook( "writecell", address, data )
-end
-
--- A modified copy of garry's table.Copy function
-function tableCopy ( t, lookup_table )
+local function tableCopy ( t, lookup_table )
 	if ( t == nil ) then return nil end
 
 	local copy = {}
@@ -255,15 +195,17 @@ function tableCopy ( t, lookup_table )
 end
 
 function ENT:BuildDupeInfo ()
-	table.Copy = tableCopy --TODO: Remove once table.Copy is fixed
 	local info = self.BaseClass.BuildDupeInfo( self ) or {}
+
 	info.starfall = SF.SerializeCode( self.files, self.mainfile )
+
 	return info
 end
 
 function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID  )
 	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
 	self.owner = ply
+
 	local code, main = SF.DeserializeCode( info.starfall )
 	self:CodeSent( ply, code, main )
 end

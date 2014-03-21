@@ -1,5 +1,5 @@
 ENT.Type            = "anim"
-ENT.Base            = "base_wire_entity"
+ENT.Base            = "base_starfall_entity"
 
 ENT.PrintName       = "Starfall"
 ENT.Author          = "Colonel Thirty Two"
