@@ -92,8 +92,11 @@ end
 function ents_methods:setColor( clr )
 	SF.CheckType( clr, SF.Types["Color"] )
 
-	local this = unwrap(self)
-	this:SetColor(clr)
+	local this = unwrap( self )
+	if IsValid( this ) then
+		this:SetColor( clr )
+		this:SetRenderMode( clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
+	end
 end
 
 --- Gets the color of an entity
