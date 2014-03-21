@@ -400,6 +400,7 @@ end
 --- Execute a console command
 -- @param cmd Command to execute
 function SF.DefaultEnvironment.concmd ( cmd )
+	if CLIENT and SF.instance.player ~= LocalPlayer() then return end -- only execute on owner of screen
 	SF.CheckType( cmd, "string" )
 	SF.instance.player:ConCommand( cmd )
 end
