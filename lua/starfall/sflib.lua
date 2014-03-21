@@ -42,23 +42,25 @@ end
 
 -- Send files to client
 if SERVER then
-	AddCSLuaFile("sflib.lua")
-	AddCSLuaFile("compiler.lua")
-	AddCSLuaFile("instance.lua")
-	AddCSLuaFile("libraries.lua")
-	AddCSLuaFile("preprocessor.lua")
-	AddCSLuaFile("permissions.lua")
-	AddCSLuaFile("editor.lua")
-	AddCSLuaFile("callback.lua")
+	AddCSLuaFile( "sflib.lua" )
+	AddCSLuaFile( "compiler.lua" )
+	AddCSLuaFile( "instance.lua" )
+	AddCSLuaFile( "libraries.lua" )
+	AddCSLuaFile( "preprocessor.lua" )
+	AddCSLuaFile( "database.lua" )
+	AddCSLuaFile( "permissions/core.lua" )
+	AddCSLuaFile( "editor.lua" )
+	AddCSLuaFile( "callback.lua" )
 end
 
 -- Load files
-include("compiler.lua")
-include("instance.lua")
-include("libraries.lua")
-include("preprocessor.lua")
-include("permissions.lua")
-include("editor.lua")
+include( "compiler.lua" )
+include( "instance.lua" )
+include( "libraries.lua" )
+include( "preprocessor.lua" )
+include( "database.lua" )
+include( "permissions/core.lua" )
+include( "editor.lua" )
 
 SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of Lua instructions to allow Starfall scripts to execute")
@@ -147,14 +149,12 @@ end
 --- Creates a new context. A context is used to define what scripts will have access to.
 -- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
--- @param permissions The permissions manager to use. Default is SF.DefaultPermissions
 -- @param ops Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
 -- @param libs Additional (local) libraries for the script to access. Default is an empty table.
-function SF.CreateContext(env, directives, permissions, ops, libs)
+function SF.CreateContext ( env, directives, ops, libs )
 	local context = {}
 	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
-	context.permissions = permissions or SF.Permissions
 	context.ops = ops or function () return SF.defaultquota:GetInt() end
 	context.libs = libs or {}
 	return context
@@ -421,6 +421,7 @@ end
 
 local serialize_replace_regex = "[\"\n]"
 local serialize_replace_tbl = { [ "\n" ] = string.char( 5 ), [ '"' ] = string.char( 4 ) }
+
 --- Serializes an instance's code in a format compatible with the duplicator library
 -- @param sources The table of filename = source entries. Ususally instance.source
 -- @param mainfile The main filename. Usually instance.mainfile
