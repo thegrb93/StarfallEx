@@ -30,7 +30,7 @@ local function getUsergroupName ( ply )
 	return "user"
 end
 
-function P:check (principal, target, key)
+function P:check ( principal, target, key )
 	local result = SF.DB.query( [[
 		SELECT grant
 		FROM starfall_perms_grants
@@ -41,9 +41,9 @@ function P:check (principal, target, key)
 	if result == false then
 		error( "error in default provider " .. sql.LastError() )
 	end
-	
+
 	if result and #result >= 1 then
-		local row = result[1]
+		local row = result[ 1 ]
 		local grant = row[ 'grant' ]
 
 		if "0" == grant then
@@ -57,8 +57,6 @@ function P:check (principal, target, key)
 		return NEUTRAL
 	end
 end
-
-
 
 -- register the provider
 SF.Permissions.registerProvider( P )

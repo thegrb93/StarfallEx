@@ -11,14 +11,14 @@ local NEUTRAL = SF.Permissions.Result.NEUTRAL
 
 --- Checks whether this provider knows who the server owners are.
 -- @return boolean whether this provider supports the isOwner method
-function P:supportsOwner()
+function P:supportsOwner ()
 	return false
 end
 
 --- Checks whether a player is considered the owner of the server.
 -- @param principal the player to examine
 -- @return boolean whether the player is in the owners group
-function P:isOwner (principal)
+function P:isOwner ( principal )
 	return false
 end
 
@@ -27,6 +27,6 @@ end
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
 -- @return one of the SF.Permissions.Role values
-function P:check (principal, target, key)
+function P:check ( principal, target, key )
 	return NEUTRAL
 end

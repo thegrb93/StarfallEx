@@ -28,18 +28,18 @@ end
 
 do
 	local lockmeta = {
-		__newindex = function (table, key, value)
+		__newindex = function ( table, key, value )
 			error( "attempting to assign to a read-only table", 2 )
 		end,
 		__metatable = "constant"
 	}
-	
+
 	local result_vals = {
 		DENY	= setmetatable( {}, lockmeta ),
 		ALLOW	= setmetatable( {}, lockmeta ),
 		NEUTRAL	= setmetatable( {}, lockmeta )
 	}
-	
+
 	P.Result = setmetatable( {}, {
 		__index = result_vals,
 		__newindex = lockmeta.__newindex,
@@ -47,9 +47,9 @@ do
 	} )
 end
 
-local DENY		= P.Result.DENY
-local ALLOW		= P.Result.ALLOW
-local NEUTRAL	= P.Result.NEUTRAL
+local DENY = P.Result.DENY
+local ALLOW = P.Result.ALLOW
+local NEUTRAL = P.Result.NEUTRAL
 
 local providers = {}
 
@@ -58,16 +58,16 @@ local have_owner = false
 --- Adds a provider implementation to the set used by this library.
 -- Providers must implement the {@link SF.Permissions.Provider} interface.
 -- @param provider the provider to be registered
-function P.registerProvider (provider)
+function P.registerProvider ( provider )
 	if type( provider ) ~= "table"
 			or type( provider.supportsOwner ) ~= "function"
 			or type( provider.isOwner ) ~= "function"
 			or type( provider.check ) ~= "function" then
 		error( "given object does not implement the provider interface", 2 )
 	end
-	
+
 	providers[ provider ] = provider
-	
+
 	if provider:supportsOwner() then
 		have_owner = true
 	end
@@ -78,20 +78,20 @@ end
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
 -- @return boolean whether the action is permitted
-function P.check (principal, target, key)
-	if not P.privileges[key] then print("WARNING: Starfall privilege " .. key .. " was not registered!") end
+function P.check ( principal, target, key )
+	if not P.privileges[ key ] then print( "WARNING: Starfall privilege " .. key .. " was not registered!" ) end
 
 	-- server owners can do whatever they want
 	if have_owner then
-		-- this can't be merged into the check loop below because that 
+		-- this can't be merged into the check loop below because that
 		for _, provider in pairs( providers ) do
 			if provider:isOwner( principal ) then return true end
 		end
 	elseif principal:IsSuperAdmin() then
 		return true
 	end
-	
-	local allow = false;
+
+	local allow = false
 	for _, provider in pairs( providers ) do
 		local result = provider:check( principal, target, key )
 		if DENY == result then
@@ -103,7 +103,7 @@ function P.check (principal, target, key)
 		end
 		-- otherwise, this provider has no opinion, just go on to the next one
 	end
-	
+
 	return allow
 end
 
@@ -137,16 +137,16 @@ do
 			include( file )
 		end
 	end
-	
+
 	if SERVER then
 		include( "starfall/permissions/provider.lua" )
 	end
-	
+
 	IncludeClientFile( "starfall/permissions/provider.lua" )
-	
+
 	if SERVER then
 		local files = file.Find( "starfall/permissions/providers_sv/*.lua", "LUA" )
-		
+
 		for _, file in pairs( files ) do
 			include( "starfall/permissions/providers_sv/" .. file )
 		end
@@ -162,7 +162,7 @@ do
 	end
 
 	local cl_files = file.Find( "starfall/permissions/providers_cl/*.lua", "LUA" )
-	
+
 	for _, file in pairs( cl_files ) do
 		IncludeClientFile( "starfall/permissions/providers_cl/" .. file )
 	end
@@ -191,7 +191,7 @@ if SERVER then
 
 	hook.Add( "PlayerInitialSpawn", "starfall_permissions", sendPrivileges )
 else
-	net.Receive( "starfall_permissions_privileges", function()
+	net.Receive( "starfall_permissions_privileges", function ()
 		local len = net.ReadInt( 16 )
 		for i = 1, len do
 			P.serverPrivileges[ net.ReadString() ] = { name = net.ReadString(), description = net.ReadString() }

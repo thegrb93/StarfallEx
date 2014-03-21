@@ -49,7 +49,7 @@ else
 		)]==]
 	} )
 	sql.Commit()
-	
+
 	if result == false then
 		error( "error importing Starfall schema " .. sql.LastError() )
 	end
