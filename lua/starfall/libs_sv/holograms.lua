@@ -225,6 +225,19 @@ function hologram_methods:setColor( color )
     end
 end
 
+--- Sets the model of a hologram
+-- @server
+-- @class function
+-- @param model string model path
+function hologram_methods:setModel ( model )
+    SF.CheckType( model, "string" )
+
+    local this = SF.Entities.Unwrap( self )
+    if IsValid( this ) then
+        this:SetModel( model )
+    end
+end
+
 --- Suppress Engine Lighting of a hologram. Disabled by default.
 -- @server
 -- @class function
