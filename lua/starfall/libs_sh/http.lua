@@ -1,3 +1,5 @@
+--- HTTP Library
+
 --- Http library. Requests content from urls.
 -- @shared
 local http_library, _ = SF.Libraries.Register( "http" )

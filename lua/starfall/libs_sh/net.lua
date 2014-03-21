@@ -319,3 +319,10 @@ net.Receive( "SF_netmessage", function( len, ply )
 		ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
 	end
 end)
+
+--- Called when a net message arrives
+-- @name net
+-- @class hook
+-- @param name Name of the arriving net message
+-- @param len Length of the arriving net message in bytes
+-- @param ply On server, the player that sent the message. Nil on client.
