@@ -3,7 +3,27 @@
 -------------------------------------------------------------------------------
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library, _ = SF.Libraries.Register("wire")
+local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
+
+function wire_metamethods.onLoad ()
+    local ent = SF.instance.data.entity
+    if ent.Inputs ~= nil and ent.Outputs ~= nil then return end
+    ent.Inputs = WireLib.CreateInputs( ent, {} )
+    ent.Outputs = WireLib.CreateOutputs( ent, {} )
+
+    function ent:TriggerInput ( key, value )
+        self:RunScriptHook( "input", key, SF.Wire.InputConverters[ self.Inputs[ key ].Type ]( value ) )
+    end
+
+    function ent:ReadCell ( address )
+        return tonumber( self:RunScriptHookForResult( "readcell", address ) ) or 0
+    end
+
+    function ent:WriteCell ( address, data )
+        self:RunScriptHook( "writecell", address, data )
+	end
+
+end
 
 SF.Wire = {}
 SF.Wire.Library = wire_library
