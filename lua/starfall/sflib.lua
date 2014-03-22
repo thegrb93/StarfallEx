@@ -584,7 +584,7 @@ else
 			net.WriteBit(false)
 			net.SendToServer()
 			if buildlist then
-				WireLib.AddNotify("File not found: "..buildlist,NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+				SF.AddNotify( "File not found: " .. buildlist, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 			end
 		end
 	end)

@@ -34,12 +34,12 @@ end
 function ENT:Error ( msg )
     ErrorNoHalt( "Processor of " .. self.owner:Nick() .. " errored: " .. msg .. "\n" )
 
+	SF.AddNotify( self.instance.player, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+
     if self.instance then
         self.instance:deinitialize()
         self.instance = nil
     end
-
-    SF.AddNotify( msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 
 end
 
