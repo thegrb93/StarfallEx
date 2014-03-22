@@ -155,14 +155,31 @@ SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
 -- @name include
 -- @class directive
 -- @param path Path to the file
+-- @usage
+-- \--@include lib/someLibrary.txt
+-- 
+-- require( "lib/someLibrary.txt" )
+-- -- CODE
 
 --- Set the name of the script.
 -- This will become the name of the tab and will show on the overlay of the processor
 -- @name name
 -- @class directive
 -- @param name Name of the script
+-- @usage
+-- \--@name Awesome script
+-- -- CODE
 
 --- For screens, make the script run on the server, as well.
 -- You can use "if SERVER" and "if CLIENT" to determine if the script is currently being run on the server or the client, respectively.
 -- @name sharedscreen
 -- @class directive
+--@usage
+-- \--@sharedscreen
+--
+-- if SERVER then
+-- \	-- Do important calculations
+-- \	-- Send net message
+-- else
+-- \	-- Display result of important calculations
+-- end
