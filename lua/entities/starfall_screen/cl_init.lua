@@ -115,7 +115,7 @@ function ENT:Error ( msg )
 			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
 		end
 	end
-	WireLib.AddNotify( self.owner, tostring( msg ), NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+	SF.AddNotify( self.owner, tostring( msg ), NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 	
 	-- Process error message
 	self.error = {}

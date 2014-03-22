@@ -92,7 +92,7 @@ function TOOL:LeftClick( trace )
 			if not IsValid(ent) then return end
 			ent:CodeSent(ply, files, mainfile)
 		end) then
-			WireLib.AddNotify(ply,"Cannot upload SF code, please wait for the current upload to finish.",NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+			SF.AddNotify( ply, "Cannot upload SF code, please wait for the current upload to finish.", NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 		end
 		return true
 	end
@@ -125,7 +125,7 @@ function TOOL:LeftClick( trace )
 		if not IsValid(sf) then return end
 		sf:CodeSent(ply, files, mainfile)
 	end) then
-		WireLib.AddNotify(ply,"Cannot upload SF code, please wait for the current upload to finish.",NOTIFY_ERROR,7,NOTIFYSOUND_ERROR1)
+		SF.AddNotify( ply, "Cannot upload SF code, please wait for the current upload to finish.", NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 	end
 
 	return true
