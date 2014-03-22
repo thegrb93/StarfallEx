@@ -228,7 +228,7 @@ local function parse_comment ( block, first_line, libs, classes )
 			currenttag = tag
 			currenttext = text
 		else
-			currenttext = util.concat(currenttext, line)
+			currenttext = util.concat( currenttext, "\n" .. line )
 			assert(string.sub(currenttext, 1, 1) ~= " ", string.format("`%s', `%s'", currenttext, line))
 		end
 	end)
@@ -440,6 +440,11 @@ function parse_file (filepath, doc)
 		doc.hooks[t.name] = t
 	end
 
+	for t in class_iterator( blocks, "directive" )() do
+		table.insert( doc.directives, t.name )
+		doc.directives[ t.name ] = t
+	end
+
 	local function union ( tbl1, tbl2 )
 		for k, v in pairs( tbl2 ) do
 			if type( k ) == "number" then
@@ -536,11 +541,13 @@ function start (files, doc)
 		files = {},
 		libraries = {},
 		hooks = {},
+		directives = {},
 		classes = {}
 	}
 	assert( doc.files, "undefined `files' field" )
 	assert( doc.libraries, "undefined `libraries' field" )
 	assert( doc.hooks, "undefined `hooks' field" )
+	assert( doc.directives, "undefined `directives' field" )
 	assert( doc.classes, "undefined `classes' field" )
 	
 	table.foreachi(files, function (_, path)
@@ -560,6 +567,7 @@ function start (files, doc)
 	recsort( doc.files )
 	recsort( doc.libraries )
 	recsort( doc.hooks )
+	recsort( doc.directives )
 	recsort( doc.classes )
 
 	return doc

@@ -115,6 +115,18 @@ function hook_link(hookname, doc, from)
 	return href
 end
 
+function directive_link ( dirname, doc, from )
+	assert( dirname )
+	assert( doc )
+	from = from or ""
+
+	if doc.directives[ dirname ] == nil then return end
+
+	local href = "directives.html"
+	string.gsub( from, "/", function () href = "../" .. href end )
+	return href
+end
+
 -------------------------------------------------------------------------------
 -- Returns the name of the html file to be generated from a lua(doc) file.
 -- Files with "lua" or "luadoc" extensions are replaced by "html" extension.
@@ -291,6 +303,14 @@ function start (doc)
 	include("hooks.lp", {doc=doc, hook_doc=doc})
 	f:close()
 	
+	local filename = options.output_dir .. "directives.html"
+	logger:info( "generating file `%s'", filename )
+	local f = lfs.open( filename, "w" )
+	assert( f, string.format( "could not open `%s' for writing", filename ) )
+	io.output( f )
+	include( "directives.lp", { doc = doc, dir_doc = doc } )
+	f:close()
+
 	-- copy extra files
 	local f = lfs.open(options.output_dir.."luadoc.css", "w")
 	io.output(f)

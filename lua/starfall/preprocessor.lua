@@ -149,3 +149,20 @@ local function directive_sharedscreen(args, filename, data)
 	
 end
 SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
+
+--- Mark a file to be included in the upload.
+-- This is required to use the file in require() and dofile()
+-- @name include
+-- @class directive
+-- @param path Path to the file
+
+--- Set the name of the script.
+-- This will become the name of the tab and will show on the overlay of the processor
+-- @name name
+-- @class directive
+-- @param name Name of the script
+
+--- For screens, make the script run on the server, as well.
+-- You can use "if SERVER" and "if CLIENT" to determine if the script is currently being run on the server or the client, respectively.
+-- @name sharedscreen
+-- @class directive
