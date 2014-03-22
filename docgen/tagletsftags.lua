@@ -35,6 +35,7 @@ end
 local function class (tag, block, text)
 	block[tag] = text
 	if text == "hook" then block.param = block.param or {} end
+	if text == "directive" then block.param = block.param or {} end
 	if text == "class" then
 		block.typtbl = check_class( block.code[ 1 ] )
 	end

@@ -7,6 +7,8 @@ elseif file_doc then
 	from = "files/.."..file_doc.name
 elseif class_doc then
 	from = "classes/.." .. class_doc.name
+elseif dir_doc then
+	from = "directives/.." .. dir_doc.name
 else
 	from = ""
 end
@@ -21,6 +23,19 @@ end
 	<?lua end?>
 </ul>
 
+
+<h1>Preprocessor directives</h1>
+<ul>
+<?lua for _, directive in ipairs(doc.directives) do
+	if dir_doc and dir_doc.name == directive then?>
+	<li><strong><?lua=directive?></strong></li>
+	<?lua else?>
+	<li>
+		<a href="<?lua=docletsfhtml.directive_link( directive, doc, from )?>#<?lua=directive?>">--@<?lua=directive?></a>
+	</li>
+<?lua 	end
+end?>
+</ul>
 
 <!-- Module list -->
 <?lua if not options.nolibs and #doc.libraries > 0 then?>
