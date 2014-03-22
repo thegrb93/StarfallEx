@@ -219,7 +219,7 @@ local function parse_comment ( block, first_line, libs, classes )
 	table.foreachi(block.comment, function (_, line)
 		line = util.trim_comment(line)
 		
-		local r, _, tag, text = string.find(line, "@([_%w%.]+)%s*(.*)")
+		local r, _, tag, text = string.find( line, "^@([_%w%.]+)%s*(.*)" )
 		if r ~= nil then
 			-- found new tag, add previous one, and start a new one
 			-- TODO: what to do with invalid tags? issue an error? or log a warning?
@@ -228,6 +228,7 @@ local function parse_comment ( block, first_line, libs, classes )
 			currenttag = tag
 			currenttext = text
 		else
+			line = line:gsub( "^\\", "" )
 			currenttext = util.concat( currenttext, "\n" .. line )
 			assert(string.sub(currenttext, 1, 1) ~= " ", string.format("`%s', `%s'", currenttext, line))
 		end
