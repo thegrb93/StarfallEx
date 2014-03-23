@@ -47,16 +47,6 @@ SF.DefaultEnvironment.tostring = tostring
 -- @return obj as number
 SF.DefaultEnvironment.tonumber = tonumber
 
-local function mynext( t, idx )
-	SF.CheckType( t, "table" )
-	
-	local dm = dgetmeta( t )
-	if dm and type(dm.__metatable) == "string" then
-		return next(dm.__index,idx)
-	else
-		return next(t,idx)
-	end
-end
 --- Same as Lua's ipairs
 -- @name SF.DefaultEnvironment.ipairs
 -- @class function
@@ -64,7 +54,8 @@ end
 -- @return Iterator function
 -- @return Table tbl
 -- @return 0 as current index
-SF.DefaultEnvironment.ipairs = function( tbl ) return mynext, tbl, 0 end
+SF.DefaultEnvironment.ipairs = ipairs
+
 --- Same as Lua's pairs
 -- @name SF.DefaultEnvironment.pairs
 -- @class function
@@ -72,7 +63,8 @@ SF.DefaultEnvironment.ipairs = function( tbl ) return mynext, tbl, 0 end
 -- @return Iterator function
 -- @return Table tbl
 -- @return nil as current index
-SF.DefaultEnvironment.pairs = function( tbl ) return mynext, tbl, nil end
+SF.DefaultEnvironment.pairs = pairs
+
 --- Same as Lua's type
 -- @name SF.DefaultEnvironment.type
 -- @class function
