@@ -163,7 +163,7 @@ function ENT:Use( activator )
 		umsg.End( )
 	end
 	if self.sharedscreen then
-		self:runScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
+		self:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
 	end
 end
 

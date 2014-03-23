@@ -498,6 +498,11 @@ function render_library.getScreenPos()
 	return pos, rot
 end
 
+--- Called when a player uses the screen
+-- @name starfallUsed
+-- @class hook
+-- @param activator Player using the screen
+
 ---
 -- @name Screen information table
 -- @class table

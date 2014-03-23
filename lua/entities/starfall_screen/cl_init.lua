@@ -73,7 +73,7 @@ usermessage.Hook( "starfall_screen_used", function ( data )
 	local screen = Entity( data:ReadShort() )
 	local activator = Entity( data:ReadShort() )
 	
-	screen:runScriptHook( "starfall_used", SF.Entities.Wrap( activator ) )
+	screen:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
 	
 	-- Error message copying
 	if screen.error then
