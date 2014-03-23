@@ -311,7 +311,7 @@ function render_library.drawLine(x1,y1,x2,y2)
 	surface.DrawLine(x1,y1,x2,y2)
 end
 
--- Creates a font. Does not require rendering hook
+--- Creates a font. Does not require rendering hook
 -- @param font Base font to use
 -- @param size Font size
 -- @param weight Font weight (default: 400)
@@ -319,7 +319,6 @@ end
 -- @param additive If true, adds brightness to pixels behind it rather than drawing over them.
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
--- @param A table representing the font (doesn't contain anything)
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
 	
@@ -372,8 +371,7 @@ function render_library.getDefaultFont()
 	return defaultFont
 end
 
---- Draws text using a font
--- @param font Font table returned by createFont
+--- Draws text.
 -- @param x X coordinate
 -- @param y Y coordinate
 -- @param text Text to draw
