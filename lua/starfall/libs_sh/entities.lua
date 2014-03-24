@@ -185,7 +185,7 @@ end
 --- Returns the local position of the entity's mass center
 -- @shared
 -- @return The position vector of the mass center
-function ents_methods:massCenter()
+function ents_methods:getMassCenter ()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	local phys = getPhysObject(ent)
@@ -196,7 +196,7 @@ end
 --- Returns the world position of the entity's mass center
 -- @shared
 -- @return The position vector of the mass center
-function ents_methods:massCenterW()
+function ents_methods:getMassCenterW ()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	local phys = getPhysObject(ent)
@@ -325,7 +325,7 @@ end
 --- Gets the entitiy's eye angles
 -- @shared
 -- @return Angles of the entity's eyes
-function ents_methods:eyeAngles()
+function ents_methods:getEyeAngles ()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -336,7 +336,7 @@ end
 -- @shared
 -- @return Eye position of the entity
 -- @return In case of a ragdoll, the position of the other eye
-function ents_methods:eyePos()
+function ents_methods:getEyePos ()
 	SF.CheckType(self,ents_metamethods)
 	local ent = unwrap(self)
 	if not isValid(ent) then return nil, "invalid entity" end
@@ -398,4 +398,19 @@ function ents_methods:setSkin ( skinIndex )
 
     ent:SetSkin( skinIndex )
     return wrap( ent )
+end
+
+--- Gets the entities up vector
+function ents_methods:getUp ()
+	return unwrap(self):GetUp ()
+end
+
+--- Gets the entities right vector
+function ents_methods:getRight ()
+	return unwrap(self):GetRight ()
+end
+
+--- Gets the entities forward vector
+function ents_methods:getForward ()
+	return unwrap(self):GetForward  ()
 end

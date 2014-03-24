@@ -5,27 +5,27 @@ local serverinfo_library, _ = SF.Libraries.Register("serverinfo")
 
 --- Returns a table containing physics environment settings. See GLua's physenv.GetPerformanceSettings()
 -- for more info.
-function serverinfo_library.performanceSettings()
+function serverinfo_library.getPerformanceSettings ()
 	return table.Copy(physenv.GetPerformanceSettings())
 end
 
 --- Returns the server's acceleration due to gravity vector.
-function serverinfo_library.gravity()
+function serverinfo_library.getGravity ()
 	return physenv.GetGravity()
 end
 
 --- Returns the air density. See Glua's physenv.GetAirDensity()
-function serverinfo_library.airDensity()
+function serverinfo_library.getAirDensity ()
 	return physenv.GetAirDensity()
 end
 
 --- Returns the map name
-function serverinfo_library.map()
+function serverinfo_library.getMap ()
 	return game.GetMap()
 end
 
 --- Returns The hostname
-function serverinfo_library.hostname() 
+function serverinfo_library.getHostname ()
 	return GetConVar("hostname"):GetString()
 end
 
@@ -35,12 +35,12 @@ function serverinfo_library.isLan()
 end
 
 --- Returns the gamemode as a String
-function serverinfo_library.gamemode()
+function serverinfo_library.getGamemode ()
 	return gmod.GetGamemode().Name
 end
 
 --- Returns whether or not the current game is single player
-function serverinfo_library.isSinglePlayer()
+function serverinfo_library.isSinglePlayer ()
 	return SinglePlayer()
 end
 
