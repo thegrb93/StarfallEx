@@ -68,10 +68,11 @@ net.Receive( "starfall_screen_update", function ( len )
 	end
 end )
 
+net.Receive( "starfall_screen_used", function ( len )
+	local screen = net.ReadEntity()
+	local activator = net.ReadEntity()
 
-usermessage.Hook( "starfall_screen_used", function ( data )
-	local screen = Entity( data:ReadShort() )
-	local activator = Entity( data:ReadShort() )
+	if not IsValid( screen ) then return end
 	
 	screen:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
 	

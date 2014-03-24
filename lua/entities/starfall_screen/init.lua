@@ -8,8 +8,9 @@ assert(SF, "Starfall didn't load correctly!")
 local context = SF.CreateContext()
 local screens = {}
 
-util.AddNetworkString("starfall_screen_download")
-util.AddNetworkString("starfall_screen_update")
+util.AddNetworkString( "starfall_screen_download" )
+util.AddNetworkString( "starfall_screen_update" )
+util.AddNetworkString( "starfall_screen_used" )
 
 local function sendScreenCode ( screen, owner, files, mainfile, recipient )
 	net.Start( "starfall_screen_download" )
@@ -154,13 +155,13 @@ function ENT:Think()
 	return true
 end
 
--- Sends a umsg to all clients about the use.
+-- Sends a net message to all clients about the use.
 function ENT:Use( activator )
 	if activator:IsPlayer() then
-		umsg.Start( "starfall_screen_used" )
-			umsg.Short( self:EntIndex() )
-			umsg.Short( activator:EntIndex() )
-		umsg.End( )
+		net.Start( "starfall_screen_used" )
+			net.WriteEntity( self )
+			net.WriteEntity( activator )
+		net.Broadcast()
 	end
 	if self.sharedscreen then
 		self:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
