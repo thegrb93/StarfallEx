@@ -81,7 +81,7 @@ end
 -- @param k Previous key (can be nil)
 -- @return Key or nil
 -- @return Value or nil
-SF.DefaultEnvironment.next = mynext
+SF.DefaultEnvironment.next = next
 --- Same as Lua's assert.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
