@@ -13,7 +13,8 @@ local NEUTRAL = SF.Permissions.Result.NEUTRAL
 -- define what permission keys we will allow
 local keys = {
 	[ "file.read" ] = true,
-	[ "file.write" ] = true
+	[ "file.write" ] = true,
+	[ "file.exists" ] = true
 }
 
 function P:check ( principal, target, key )
