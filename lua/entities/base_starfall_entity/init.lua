@@ -8,6 +8,7 @@ function ENT:Initialize ()
     self:PhysicsInit( SOLID_VPHYSICS )
     self:SetMoveType( MOVETYPE_VPHYSICS )
     self:SetSolid( SOLID_VPHYSICS )
+    self.instance = nil
 
     self.tableCopy = function ( t, lookup_table )
 		if ( t == nil ) then return nil end
@@ -34,9 +35,8 @@ end
 function ENT:Error ( msg )
     ErrorNoHalt( "Processor of " .. self.owner:Nick() .. " errored: " .. msg .. "\n" )
 
-	SF.AddNotify( self.instance.player, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
-
     if self.instance then
+	SF.AddNotify( self.instance.player, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
         self.instance:deinitialize()
         self.instance = nil
     end
