@@ -88,16 +88,14 @@ local wrapArguments = SF.Sanitize
 
 local function run( hookname, customfunc, ... )
 	for instance,_ in pairs( registered_instances ) do
-		local ret = {instance:runScriptHookForResult( hookname, ... )}
+		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
 		
 		local ok = table.remove( ret, 1 )
-		if not ok then
+		if ok then
+			if not customfunc then return end
+			return customfunc( instance, ret, ... )
+		else
 			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[1], ret[2] )
-		elseif customfunc then
-			local a,b,c,d,e,f,g,h = customfunc( instance, ret )
-			if a ~= nil then
-				return a,b,c,d,e,f,g,h
-			end
 		end
 	end
 end
@@ -112,7 +110,7 @@ function SF.hookAdd( hookname, customfunc )
 	hooks[#hooks+1] = hookname
 	local lower = hookname:lower()
 	hook.Add( hookname, "SF_" .. hookname, function(...)
-		return run( lower, customfunc, wrapArguments( ... ) )
+		return run( lower, customfunc, ... )
 	end)
 end
 
@@ -129,7 +127,10 @@ if SERVER then
 	add( "PlayerInitialSpawn" )
 	add( "PlayerSpawn" )
 	add( "PlayerLeaveVehicle" )
-	add( "PlayerSay", function( instance, args ) if args then return args[1] end end )
+	add( "PlayerSay", function( instance, args, ply )
+		if instance.player ~= ply then return end
+		if args then return args[1] end
+	end )
 	add( "PlayerSpray" )
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
