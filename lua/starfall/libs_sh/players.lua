@@ -36,7 +36,7 @@ end
 --- Returns whether the player is alive
 -- @shared
 -- @return True if player alive
-function player_methods:getAlive ()
+function player_methods:isAlive ()
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
 	return ent and ent:Alive()
@@ -72,7 +72,7 @@ end
 --- Returns whether the player's flashlight is on
 -- @shared
 -- @return True if player has flashlight on
-function player_methods:flashlightIsOn( )
+function player_methods:isFlashlightOn( )
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
 	return ent and ent:FlashlightIsOn()
