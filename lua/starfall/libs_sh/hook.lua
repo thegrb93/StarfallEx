@@ -50,6 +50,53 @@ function hook_library.run(hookname, ...)
 	return unpack(ret)
 end
 
+--- Remote hook.
+-- This hook can be called from other instances
+-- @name remote
+-- @class hook
+-- @shared
+-- @param sender The entity that caused the hook to run
+-- @param owner The owner of the sender
+-- @param ... The payload that was supplied when calling the hook
+
+--- Run a hook remotely.
+-- This will call the hook "remote" on either a specified entity or all instances on the server/client
+-- @shared
+-- @param recipient Starfall entity to call the hook on. Nil to run on every starfall entity
+-- @param ... Payload. These parameters will be used to call the hook functions
+-- @return tbl A list of the resultset of each called hook
+function hook_library.runRemote ( recipient, ... )
+	if recipient then SF.CheckType( recipient, SF.Entities.Metatable ) end
+
+	local recipients
+	if recipient then
+		local ent = SF.Entities.Unwrap( recipient )
+		if not ent.instance then SF.throw( "Entity has no starfall instance", 2 ) end
+		recipients = {
+			[ ent.instance ] = true
+		}
+	else
+		recipients = registered_instances
+	end
+
+	local instance = SF.instance
+
+	for k, _ in pairs( recipients ) do
+		SF.instance = nil
+		local result = { k:runScriptHookForResult( "remote", instance.data.entity, instance.player, ... ) }
+
+		local ok = table.remove( result, 1 )
+		if not ok then
+			if not result[1] then return end -- Call failed because of non-existent hook. Ignore
+			k:Error( "Hook 'remote' errored with " .. result[1], result[2] )
+			-- Their fault - don't return
+		end
+	end
+
+	SF.instance = instance
+	return result
+end
+
 --- Remove a hook
 -- @shared
 -- @param hookname The hook name
