@@ -406,18 +406,3 @@ function ents_methods:isWeldedTo()
 
 	return wrap( ent1or2(this,constraint.FindConstraint(this, "Weld")) )
 end
-
---- Gets the entities up vector
-function ents_methods:getUp()
-	return unwrap(self):GetUp()
-end
-
---- Gets the entities right vector
-function ents_methods:getRight()
-	return unwrap(self):GetRight()
-end
-
---- Gets the entities forward vector
-function ents_methods:getForward()
-	return unwrap(self):GetForward()
-end
