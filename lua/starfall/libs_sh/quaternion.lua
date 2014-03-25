@@ -1,3 +1,7 @@
+--- Quaternion library
+
+--- Quaternion library
+-- @deprecated Pure Lua implementation. This can be done with a user library.
 local quat_lib, quat_lib_metamethods = SF.Libraries.Register("quaternion")
 
 --[[
@@ -34,6 +38,7 @@ local deg2rad = math.pi/180
 local rad2deg = 180/math.pi
 
 --- Quaternion type
+-- @deprecated Pure Lua implementation. This can be done with a user library.
 local quat_methods, quat_metamethods = SF.Typedef("Quaternion")
 --[[quat_metamethods = {__index = quat_lib}
 quat_lib.__metatable = quat_metamethods
