@@ -19,6 +19,10 @@ do
 	P.registerPrivilege( "entities.setColor", "Set Color", "Allows the user to change the color of an entity" )
 end
 
+local materialBlacklist = {
+	[ "pp/copy" ] = true
+}
+
 -- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = wrap
@@ -360,6 +364,7 @@ end
 -- @return The Entity being modified.
 function ents_methods:setMaterial ( material )
     SF.CheckType( material, "string" )
+    if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
 
     local ent = unwrap( self )
     if not isValid( ent ) then return nil, "invalid entity" end
