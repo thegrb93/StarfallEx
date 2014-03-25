@@ -54,6 +54,15 @@ function SF.Instance:runWithOps(func,...)
 		return {func(unpack(args))}
 	end
 	local function xpcall_callback(err)
+		if type( err ) == "table" then
+			if err.message then
+				local line= err.line
+				local file = err.file
+
+				err = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. err.message
+			end
+		end
+		err = tostring( err )
 		traceback = debug.traceback(err, 2)
 		return err
 	end
