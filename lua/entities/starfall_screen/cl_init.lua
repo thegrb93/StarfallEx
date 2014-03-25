@@ -83,6 +83,7 @@ net.Receive( "starfall_screen_used", function ( len )
 end )
 
 function ENT:Initialize ()
+	self.BaseClass.Initialize( self )
 	self.GPU = GPULib.WireGPU( self )
 	net.Start( "starfall_screen_download" )
 		net.WriteEntity( self )
@@ -106,17 +107,8 @@ function ENT:OnRemove ()
 	end
 end
 
-function ENT:Error ( msg )
-	-- Notice owner
-	if type( msg ) == "table" then
-		if msg.message then
-			local line = msg.line
-			local file = msg.file
-
-			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
-		end
-	end
-	SF.AddNotify( self.owner, tostring( msg ), NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+function ENT:Error ( msg, traceback )
+	msg = self.BaseClass.Error( self, msg, traceback )
 	
 	-- Process error message
 	self.error = {}
@@ -150,8 +142,8 @@ function ENT:CodeSent ( files, main, owner )
 	instance.data.entity = self
 	instance.data.render.gpu = self.GPU
 	instance.data.render.matricies = 0
-	local ok, msg = instance:initialize()
-	if not ok then self:Error( msg ) end
+	local ok, msg, traceback = instance:initialize()
+	if not ok then self:Error( msg, traceback ) end
 	
 	if not self.instance then return end
 	

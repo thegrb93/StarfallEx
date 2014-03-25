@@ -13,7 +13,7 @@ function ENT:UpdateState ( state )
 end
 
 function ENT:Initialize ()
-    self.BaseClass.Initialize( self )
+	self.BaseClass.Initialize( self )
 	
 	self:UpdateState( "Inactive ( No code )" )
 	self:SetColor( Color( 255, 0, 0, self:GetColor().a ) )
@@ -30,9 +30,9 @@ function ENT:Compile ( codetbl, mainfile )
 	self.instance = instance
 	instance.data.entity = self
 	
-	local ok, msg = instance:initialize()
+	local ok, msg, traceback = instance:initialize ()
 	if not ok then
-		self:Error( msg )
+		self:Error( msg, traceback )
 		return
 	end
 	
@@ -50,11 +50,10 @@ function ENT:Compile ( codetbl, mainfile )
 end
 
 function ENT:Error ( msg, traceback )
-    self.BaseClass.Error( self, msg )
+	self.BaseClass.Error( self, msg, traceback )
 
-    if traceback then print( traceback ) end
 	self:UpdateState( "Inactive (Error)" )
-    self:SetColor( Color( 255, 0, 0, 255 ) )
+	self:SetColor( Color( 255, 0, 0, 255 ) )
 end
 
 function ENT:Think ()
@@ -72,7 +71,7 @@ function ENT:Think ()
 end
 
 function ENT:OnRemove ()
-    self.BaseClass.OnRemove( self )
+	self.BaseClass.OnRemove( self )
 end
 
 function ENT:RunScriptHook ( hook, ... )
