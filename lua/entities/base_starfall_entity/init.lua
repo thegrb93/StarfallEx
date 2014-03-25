@@ -4,13 +4,13 @@ AddCSLuaFile( "shared.lua" )
 include( "shared.lua" )
 
 function ENT:Initialize ()
-    baseclass.Get( "base_gmodentity" ).Initialize( self )
-    self:PhysicsInit( SOLID_VPHYSICS )
-    self:SetMoveType( MOVETYPE_VPHYSICS )
-    self:SetSolid( SOLID_VPHYSICS )
-    self.instance = nil
+	baseclass.Get( "base_gmodentity" ).Initialize( self )
+	self:PhysicsInit( SOLID_VPHYSICS )
+	self:SetMoveType( MOVETYPE_VPHYSICS )
+	self:SetSolid( SOLID_VPHYSICS )
+	self.instance = nil
 
-    self.tableCopy = function ( t, lookup_table )
+	self.tableCopy = function ( t, lookup_table )
 		if ( t == nil ) then return nil end
 
 		local copy = {}
@@ -29,25 +29,14 @@ function ENT:Initialize ()
 			end
 		end
 		return copy
-    end
-end
-
-function ENT:Error ( msg )
-    ErrorNoHalt( "Processor of " .. self.owner:Nick() .. " errored: " .. msg .. "\n" )
-
-    if self.instance then
-	SF.AddNotify( self.instance.player, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
-        self.instance:deinitialize()
-        self.instance = nil
-    end
-
+	end
 end
 
 function ENT:OnRemove ()
-    if not self.instance then return end
+	if not self.instance then return end
 
-    self.instance:deinitialize()
-    self.instance = nil
+	self.instance:deinitialize()
+	self.instance = nil
 end
 
 function ENT:onRestore ()

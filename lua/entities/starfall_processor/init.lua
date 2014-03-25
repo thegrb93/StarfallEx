@@ -13,7 +13,7 @@ function ENT:UpdateState ( state )
 end
 
 function ENT:Initialize ()
-    self.BaseClass.Initialize( self )
+	self.BaseClass.Initialize( self )
 	
 	self:UpdateState( "Inactive ( No code )" )
 	self:SetColor( Color( 255, 0, 0, self:GetColor().a ) )

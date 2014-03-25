@@ -9,4 +9,5 @@ end
 
 function ENT:Initialize ()
     self:SetRenderBounds( getRenderBounds( self ) )
+    self.instance = nil
 end

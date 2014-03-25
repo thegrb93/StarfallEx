@@ -74,7 +74,7 @@ net.Receive("starfall_screen_download", function(len, ply)
 end)
 
 function ENT:Initialize ()
-    baseclass.Get( self.Base ).Initialize( self )
+	self.BaseClass.Initialize( self )
 	self:SetUseType( 3 )
 end
 

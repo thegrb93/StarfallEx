@@ -6,6 +6,7 @@ util.AddNetworkString "starfall_hologram_scale"
 util.AddNetworkString "starfall_hologram_clip"
 
 function ENT:Initialize()
+	self.BaseClass.Initialize()
 	self:SetSolid(SOLID_NONE)
 	self:SetMoveType(MOVETYPE_NOCLIP) -- TODO: custom movetype hook?
 	self:DrawShadow( false )
