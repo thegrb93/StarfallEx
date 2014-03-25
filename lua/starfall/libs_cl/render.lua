@@ -319,6 +319,52 @@ end
 -- @param additive If true, adds brightness to pixels behind it rather than drawing over them.
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
+-- @param blue Enable blur?
+-- @usage
+-- Base font can be one of:
+-- \- DebugFixed
+-- \- DebugFixedSmall
+-- \- DefaultFixedOutline
+-- \- MenuItem
+-- \- Default
+-- \- TabLarge
+-- \- DefaultBold
+-- \- DefaultUnderline
+-- \- DefaultSmall
+-- \- DefaultSmallDropShadow
+-- \- DefaultVerySmall
+-- \- DefaultLarge
+-- \- UiBold
+-- \- MenuLarge
+-- \- ConsoleText
+-- \- Marlett
+-- \- Trebuchet18
+-- \- Trebuchet19
+-- \- Trebuchet20
+-- \- Trebuchet22
+-- \- Trebuchet24
+-- \- HUDNumber
+-- \- HUDNumber1
+-- \- HUDNumber2
+-- \- HUDNumber3
+-- \- HUDNumber4
+-- \- HUDNumber5
+-- \- HudHintTextLarge
+-- \- HudHintTextSmall
+-- \- CenterPrintText
+-- \- HudSelectionText
+-- \- DefaultFixed
+-- \- DefaultFixedDropShadow
+-- \- CloseCaption_Normal
+-- \- CloseCaption_Bold
+-- \- CloseCaption_BoldItalic
+-- \- TitleFont
+-- \- TitleFont2
+-- \- ChatFont
+-- \- TargetID
+-- \- TargetIDSmall
+-- \- HL2MPTypeDeath
+-- \- BudgetLabel
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
 	
