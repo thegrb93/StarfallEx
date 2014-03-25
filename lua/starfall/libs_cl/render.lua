@@ -385,16 +385,6 @@ function render_library.drawText(x,y,text,alignment)
 	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
 end
 
---- Creates a vertex for use with polygons. This just creates a table; it doesn't really do anything special
--- @param x x coordinate
--- @param y y coordinate
--- @param u u texture coordinate
--- @param v v texture coordinate
--- @return vertex table
-function render_library.vertex(x,y,u,v)
-	return {x=x, y=y, u=u, v=v}
-end
-
 --- Compiles a 2D poly. This is needed so that poly don't have to be
 -- type-checked each frame. Polys can be indexed by a number, in which
 -- a copy of the vertex at that spot is returned. They can also be assigned

@@ -117,13 +117,13 @@ SF.DefaultEnvironment.CLIENT = CLIENT
 -- @class field
 SF.DefaultEnvironment.SERVER = SERVER
 
---- Gets the amount of ops used so far
+-- Gets the amount of ops used so far
 -- @return Operations used in this second
 function SF.DefaultEnvironment.opsUsed()
 	return SF.instance.ops
 end
 
---- Gets the ops hard quota
+-- Gets the ops hard quota
 -- @return Maximum operations per second
 function SF.DefaultEnvironment.opsMax()
 	return SF.instance.context.ops()
