@@ -107,8 +107,8 @@ function ENT:OnRemove ()
 	end
 end
 
-function ENT:Error ( msg )
-	msg = self.BaseClass.Error( self, msg )
+function ENT:Error ( msg, traceback )
+	msg = self.BaseClass.Error( self, msg, traceback )
 	
 	-- Process error message
 	self.error = {}
@@ -142,8 +142,8 @@ function ENT:CodeSent ( files, main, owner )
 	instance.data.entity = self
 	instance.data.render.gpu = self.GPU
 	instance.data.render.matricies = 0
-	local ok, msg = instance:initialize()
-	if not ok then self:Error( msg ) end
+	local ok, msg, traceback = instance:initialize()
+	if not ok then self:Error( msg, traceback ) end
 	
 	if not self.instance then return end
 	

@@ -453,6 +453,7 @@ if SERVER then
 	util.AddNetworkString("starfall_requpload")
 	util.AddNetworkString("starfall_upload")
 	util.AddNetworkString( "starfall_addnotify" )
+	util.AddNetworkString( "starfall_console_print" )
 	
 	local uploaddata = {}
 	-- Packet structure:
@@ -545,6 +546,19 @@ if SERVER then
         end
     end
 
+    function SF.Print ( ply, msg )
+	if type( ply ) == "string" then
+		ply, msg = nil, ply
+	end
+
+	net.Start( "starfall_console_print" )
+		net.WriteString( msg )
+	if ply then
+		net.Send( ply )
+	else
+		net.Broadcast()
+	end
+    end
 else
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
@@ -618,6 +632,10 @@ else
 
     net.Receive( "starfall_addnotify", function ()
         SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), net.ReadUInt( 8 ) )
+    end )
+
+    net.Receive( "starfall_console_print", function ()
+	print( net.ReadString() )
     end )
 end
 

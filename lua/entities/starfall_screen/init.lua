@@ -78,8 +78,8 @@ function ENT:Initialize ()
 	self:SetUseType( 3 )
 end
 
-function ENT:Error ( msg )
-    self.BaseClass.Error( self, msg )
+function ENT:Error ( msg, traceback )
+    self.BaseClass.Error( self, msg, traceback )
 end
 
 function ENT:CodeSent(ply, files, mainfile)
@@ -120,9 +120,9 @@ function ENT:CodeSent(ply, files, mainfile)
 		self.instance = instance
 		instance.data.entity = self
 		
-		local ok, msg = instance:initialize()
+		local ok, msg, traceback = instance:initialize()
 		if not ok then
-			self:Error(msg)
+			self:Error( msg, traceback )
 			return
 		end
 		

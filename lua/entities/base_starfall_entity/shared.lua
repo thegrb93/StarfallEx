@@ -10,7 +10,7 @@ ENT.Instructions    = ""
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
-function ENT:Error ( msg )
+function ENT:Error ( msg, traceback )
 	if type( msg ) == "table" then
 		if msg.message then
 			local line= msg.line
@@ -28,6 +28,14 @@ function ENT:Error ( msg )
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
+	end
+
+	if traceback then
+		if SERVER then
+			SF.Print( self.owner, traceback )
+		else
+			print( traceback )
+		end
 	end
 
 	return msg
