@@ -213,7 +213,11 @@ function SF.DefaultEnvironment.loadLibrary(...)
 		if instance.context.libs[v] then
 			r[#r+1] = setmetatable({}, instance.context.libs[v])
 		else
-			r[#r+1] = SF.Libraries.Get(v)
+			local lib = SF.Libraries.Get( v )
+			if not lib then
+				SF.throw( "Invalid library: " .. v, 2 )
+			end
+			r[ #r + 1 ] = lib
 		end
 
 		local dm = debug.getmetatable( r[#r] )
