@@ -202,7 +202,7 @@ end
 -- letter and contain only alphabetical characters.
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. May be modified by the function.
-function wire_library.createInputs ( names, types )
+function wire_library.adjustInputs ( names, types )
 	if not SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
@@ -229,7 +229,7 @@ end
 -- letter and contain only alphabetical characters.
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. May be modified by the function.
-function wire_library.createOutputs ( names, types )
+function wire_library.adjustOutputs ( names, types )
 	if not SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
