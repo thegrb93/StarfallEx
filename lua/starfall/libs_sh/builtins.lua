@@ -14,6 +14,15 @@ local dgetmeta = debug.getmetatable
 -- ------------------------- Lua Ports ------------------------- --
 -- This part is messy because of LuaDoc stuff.
 
+local function pascalToCamel ( t, r )
+	local r = r or {}
+	for k, v in pairs( t ) do
+		k = k:gsub( "^%l", string.lower )
+		r[ k ] = v
+	end
+	return r
+end
+
 --- Same as the Gmod vector type
 -- @name SF.DefaultEnvironment.Vector
 -- @class function
