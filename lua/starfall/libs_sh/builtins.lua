@@ -23,14 +23,6 @@ local function pascalToCamel ( t, r )
 	return r
 end
 
---- Same as the Gmod vector type
--- @name SF.DefaultEnvironment.Vector
--- @class function
--- @param x
--- @param y
--- @param z
--- @return New vector
-SF.DefaultEnvironment.Vector = Vector
 --- Same as the Gmod angle type
 -- @name SF.DefaultEnvironment.Angle
 -- @class function
