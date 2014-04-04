@@ -12,12 +12,12 @@ function ENT:Initialize()
 	self:DrawShadow( false )
 end
 
-function ENT:SetScale(scale)
-	net.Start("starfall_hologram_scale")
-		net.WriteEntity(self)
-		net.WriteDouble(scale.x)
-		net.WriteDouble(scale.y)
-		net.WriteDouble(scale.z)
+function ENT:SetScale ( scale )
+	net.Start( "starfall_hologram_scale" )
+		net.WriteUInt( self:EntIndex(), 32 )
+		net.WriteDouble( scale.x )
+		net.WriteDouble( scale.y )
+		net.WriteDouble( scale.z )
 	net.Broadcast()
 end
 
