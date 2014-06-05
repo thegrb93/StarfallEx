@@ -2,13 +2,14 @@
 -- Serverside Entity functions
 -------------------------------------------------------------------------------
 
-assert(SF.Entities)
+assert( SF.Entities )
 
 local huge = math.huge
 local abs = math.abs
 
 local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
+
 --- Entity type
 --@class class
 --@name Entity
@@ -92,12 +93,12 @@ local canModify = SF.Entities.CanModify
 -- Add wire inputs/outputs
 local function postload ()
 	if SF.Wire then
-		SF.Wire.AddInputType( "ENTITY", function(data)
+		SF.Wire.AddInputType( "ENTITY", function ( data )
 			if data == nil then return nil end
-			return wrap(data)
+			return wrap( data )
 		end )
 
-		SF.Wire.AddOutputType( "ENTITY", function(data)
+		SF.Wire.AddOutputType( "ENTITY", function ( data )
 			if data == nil then return nil end
 			SF.CheckType( data,ents_metatable )
 			
@@ -109,19 +110,19 @@ SF.Libraries.AddHook( "postload", postload )
 
 --- Gets the owner of the entity
 -- @return Owner
-function ents_methods:getOwner()
+function ents_methods:getOwner ()
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 	return wrap( getOwner( ent ) )
 end
 
-local function check( v )
+local function check ( v )
 	return 	-math.huge < v.x and v.x < math.huge and
 			-math.huge < v.y and v.y < math.huge and
 			-math.huge < v.z and v.z < math.huge
 end
 
-local function parent_check( child, parent )
+local function parent_check ( child, parent )
 	while isValid( parent ) do
 		if child == parent then
 			return false
@@ -176,15 +177,15 @@ end
 --- Applies linear force to the entity with an offset
 -- @param vec The force vector
 -- @param offset An optional offset position
-function ents_methods:applyForceOffset(vec, offset)
-	SF.CheckType(self,ents_metatable)
-	SF.CheckType(vec,"Vector")
-	SF.CheckType(offset,"Vector")
+function ents_methods:applyForceOffset ( vec, offset )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( vec, "Vector" )
+	SF.CheckType( offset, "Vector" )
 	if not check( vec ) or not check( offset ) then return false, "infinite vector" end
 	
-	local ent = unwrap(self)
-	if not isValid(ent) then return false, "entity not valid" end
-	local phys = getPhysObject(ent)
+	local ent = unwrap( self )
+	if not isValid( ent ) then return false, "entity not valid" end
+	local phys = getPhysObject( ent )
 	if not phys then return false, "entity has no physics object" end
 	
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -197,7 +198,7 @@ end
 --- Applies angular force to the entity
 -- @param ang The force angle
 -- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
-function ents_methods:applyAngForce( ang )
+function ents_methods:applyAngForce ( ang )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( ang, "Angle" )
 	
@@ -382,7 +383,7 @@ function ents_methods:enableGravity ( grav )
 	return true
 end
 
-local function ent1or2( ent, con, num )
+local function ent1or2 ( ent, con, num )
 	if not con then return nil end
 	if num then
 		con = con[ num ]

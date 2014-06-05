@@ -6,12 +6,12 @@ SF.Entities = {}
 
 --- Entity type
 -- @shared
-local ents_methods, ents_metamethods = SF.Typedef("Entity")
-local wrap, unwrap = SF.CreateWrapper(ents_metamethods,true,true,debug.getregistry().Entity)
+local ents_methods, ents_metamethods = SF.Typedef( "Entity" )
+local wrap, unwrap = SF.CreateWrapper( ents_metamethods, true, true, debug.getregistry().Entity )
 
 --- Entities Library
 -- @shared
-local ents_lib, _ = SF.Libraries.Register("entities")
+local ents_lib, _ = SF.Libraries.Register( "entities" )
 
 -- Register privileges
 do
@@ -100,7 +100,7 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor ( clr )
-	SF.CheckType( clr, SF.Types["Color"] )
+	SF.CheckType( clr, SF.Types[ "Color" ] )
 
 	local this = unwrap( self )
 	if IsValid( this ) then
