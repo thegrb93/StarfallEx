@@ -107,6 +107,7 @@ local validfonts = {
 	TargetIDSmall = true,
 	HL2MPTypeDeath = true,
 	BudgetLabel = true,
+	[ "DejaVu Sans Mono" ] = true
 }
 
 surface.CreateFont("sf_screen_font_Default_16_400_9_0000", {size = 16, weight = 400,
@@ -321,7 +322,7 @@ end
 -- @param outline Enable outline?
 -- @param blue Enable blur?
 -- @usage
--- Base font can be one of:
+-- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- DebugFixed
 -- \- DebugFixedSmall
 -- \- DefaultFixedOutline
@@ -365,6 +366,7 @@ end
 -- \- TargetIDSmall
 -- \- HL2MPTypeDeath
 -- \- BudgetLabel
+-- \- DejaVu Sans Mono (shipped, monospaced)
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
 	
