@@ -1,0 +1,50 @@
+--@name Sync
+--@author INP
+--@sharedscreen
+
+-- Code executed on both client and server, note the --@sharedscreen above
+local hook, net = loadLibrary( "hook", "net" )
+
+if SERVER then
+    -- Code only executed on the server, note the --@sharedscreen above
+    local randomNumber = math.floor( math.random() * 100 )
+
+    hook.add( "net", "net", function ( name, len, ply )
+        -- ply being the client that sent the net message
+        -- A client is asking for the number
+        if name == "request" then
+            -- Send it to the client
+            net.start( "number" )
+                -- 8 is the amount of bits to use for the transmission
+                net.writeInt( randomNumber, 8 )
+            net.send( ply )
+        end
+    end )
+else
+    -- Code only executed on the client
+    local render = loadLibrary( "render" )
+    local randomNumber
+
+    local font = render.createFont( "Default", 62 )
+
+    -- Send a request for the number to the server
+    net.start( "request" )
+    net.send()
+
+    hook.add( "net", "net", function ( name, len )
+        -- No client argument, since it can only come from the server
+        -- The server is sending us the number
+        if name == "number" then
+            randomNumber = net.readInt( 8 )
+        end
+    end )
+
+    hook.add( "render", "render", function ()
+        render.clear()
+        if randomNumber then
+            render.setColor( Color( 0,255,255,255 ) )
+            render.setFont( font )
+            render.drawText( 20, 20, tostring( randomNumber ) )
+        end
+    end )
+end
