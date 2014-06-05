@@ -133,13 +133,12 @@ function ENT:CodeSent ( files, main, owner )
 	if not files or not main or not owner then return end
 	if self.instance then self.instance:deinitialize() end
 	self.owner = owner
-	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { ent=self, render={} } )
+	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
 	
 	instance.runOnError = function ( inst, ... ) self:Error( ... ) end
 	
 	self.instance = instance
-	instance.data.entity = self
 	instance.data.render.gpu = self.GPU
 	instance.data.render.matricies = 0
 	local ok, msg, traceback = instance:initialize()
