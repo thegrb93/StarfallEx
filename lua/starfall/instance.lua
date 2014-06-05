@@ -81,7 +81,7 @@ function SF.Instance:runWithOps(func,...)
 end
 
 --- Internal function - Do not call. Prepares the script to be executed.
--- This is done automatically by Initialize and RunScriptHook.
+-- This is done automatically by Initialize and runScriptHook.
 function SF.Instance:prepare(hook, name)
 	assert(self.initialized, "Instance not initialized!")
 	assert(not self.error, "Instance is errored!")
@@ -92,7 +92,7 @@ function SF.Instance:prepare(hook, name)
 end
 
 --- Internal function - Do not call. Cleans up the script.
--- This is done automatically by Initialize and RunScriptHook.
+-- This is done automatically by Initialize and runScriptHook.
 function SF.Instance:cleanup(hook, name, ok, errmsg)
 	assert(SF.instance == self)
 	self:runLibraryHook("cleanup",hook, name, ok, errmsg)

@@ -22,13 +22,12 @@ end
 function ENT:Compile ( codetbl, mainfile )
 	if self.instance then self.instance:deinitialize() end
 	
-	local ok, instance = SF.Compiler.Compile( codetbl, context, mainfile, self.owner )
+	local ok, instance = SF.Compiler.Compile( codetbl, context, mainfile, self.owner, { entity = self } )
 	if not ok then self:Error( instance ) return end
 	
 	instance.runOnError = function ( inst, ... ) self:Error( ... ) end
 	
 	self.instance = instance
-	instance.data.entity = self
 	
 	local ok, msg, traceback = instance:initialize ()
 	if not ok then
@@ -63,7 +62,7 @@ function ENT:Think ()
 		self:UpdateState( tostring( self.instance.ops ) .. " ops, " .. tostring( math.floor( self.instance.ops / self.instance.context.ops() * 100 ) ) .. "%" )
 
 		self.instance:resetOps()
-		self:RunScriptHook( "think" )
+		self:runScriptHook( "think" )
 	end
 
 	self:NextThink( CurTime() )
@@ -74,14 +73,14 @@ function ENT:OnRemove ()
 	self.BaseClass.OnRemove( self )
 end
 
-function ENT:RunScriptHook ( hook, ... )
+function ENT:runScriptHook ( hook, ... )
 	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
 		local ok, rt = self.instance:runScriptHook( hook, ... )
 		if not ok then self:Error( rt ) end
 	end
 end
 
-function ENT:RunScriptHookForResult ( hook,... )
+function ENT:runScriptHookForResult ( hook,... )
 	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
 		local ok, rt = self.instance:runScriptHookForResult( hook, ... )
 		if not ok then self:Error( rt )

@@ -15,9 +15,10 @@ SF.Libraries.Local = {}
 --- Creates and registers a global library. The library will be accessible from any Starfall Instance, regardless of context.
 -- This will automatically set __index and __metatable.
 -- @param name The library name
-function SF.Libraries.Register(name)
-	local methods, metamethods = SF.Typedef("Library: "..name)
-	SF.Libraries.libraries[name] = metamethods
+function SF.Libraries.Register ( name )
+	local methods, metamethods = SF.Typedef( "Library: " .. name )
+	SF.Libraries.libraries[ name ] = metamethods
+	SF.DefaultEnvironment[ name ] = setmetatable( {}, metamethods )
 	return methods, metamethods
 end
 

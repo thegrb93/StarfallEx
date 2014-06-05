@@ -36,6 +36,22 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 	instance.initialized = false
 	instance.context = context
 	instance.mainfile = mainfile
+
+	-- Add local libraries
+	for k, v in pairs( context.libs ) do instance.env[ k ] = setmetatable( {}, v ) end
+
+	-- Call onLoad functions
+	for k, v in pairs( context.env.__index ) do
+		if type( v ) == "table" then
+			local meta = debug.getmetatable( v )
+			if meta.onLoad then meta.onLoad( instance ) end
+		end
+	end
+	for k, v in pairs( context.libs ) do
+		if type( v ) == "table" then
+			if v.onLoad then v.onLoad( instance ) end
+		end
+	end
 	
 	for filename, source in pairs(code) do
 		if not dontpreprocess then

@@ -107,7 +107,7 @@ function ENT:CodeSent(ply, files, mainfile)
 	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
 	
 	if ppdata.sharedscreen then		
-		local ok, instance = SF.Compiler.Compile(files,context,mainfile,ply)
+		local ok, instance = SF.Compiler.Compile( files, context, mainfile, ply, { entity = self } )
 		if not ok then self:Error(instance) return end
 		
 		instance.runOnError = function(inst,...) self:Error(...) end
@@ -118,7 +118,6 @@ function ENT:CodeSent(ply, files, mainfile)
 		end
 
 		self.instance = instance
-		instance.data.entity = self
 		
 		local ok, msg, traceback = instance:initialize()
 		if not ok then
