@@ -534,6 +534,89 @@ function render_library.getScreenPos()
 	return pos, rot
 end
 
+local globalRTs = {}
+local globalRTcount = 0
+
+--- Creates a new render target to draw onto
+-- @param name The name of the render target
+-- @param width The width of the render target
+-- @param height The height of the render target
+function render_library.createRenderTarget ( name, width, height )
+	SF.CheckType( name, "string" )
+	SF.CheckType( width, "number" )
+	SF.CheckType( height, "number" )
+
+	if height > 1024 or width > 1024 then
+		SF.throw( "Rendertarget dimensions out of bounds", 2 )
+	end
+
+	local data = SF.instance.data.render
+	data.rendertargets = data.rendertargets or {}
+	data.rendertargetcount = data.rendertargetcount or 0
+
+	if data.rendertargetcount >= 2 then
+		SF.throw( "Rendertarget limit reached", 2 )
+	end
+
+	data.rendertargetcount = data.rendertargetcount + 1
+	globalRTcount = globalRTcount + 1
+	local rtname = "Starfall_CustomRT_" .. globalRTcount
+	local rt = GetRenderTarget( rtname, width, height, false )
+	globalRTs[ rtname ] = { rt }
+	data.rendertargets[ name ] = rtname
+end
+
+--- Selects the render target to draw on.
+-- Nil for the visible RT.
+-- @param name Name of the render target to use
+function render_library.selectRenderTarget ( name )
+	local data = SF.instance.data.render
+	data.oldRT = data.oldRT or render.GetRenderTarget()
+	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not name then
+		if data.usingRT then
+			cam.End2D()
+			render.PopRenderTarget()
+			cam.Start2D()
+			data.usingRT = false
+		end
+		return
+	end
+	SF.CheckType( name, "string" )
+	local rt = globalRTs[ data.rendertargets[ name ] ][ 1 ]
+	if not rt then SF.Throw( "Invalid Rendertarget", 2 ) end
+
+	cam.End2D()
+	if data.usingRT then
+		render.PopRenderTarget()
+	end
+	render.PushRenderTarget( rt, 0, 0, rt:Width(), rt:Height() )
+	cam.Start2D()
+	data.usingRT = true
+end
+
+--- Sets the active texture to the render target with the specified name.
+-- Nil to reset.
+-- @param name Name of the render target to use
+function render_library.setRenderTargetTexture ( name )
+	if not name then
+		draw.NoTexture()
+	else
+		SF.CheckType( name, "string" )
+		local data = SF.instance.data.render
+		local rtname = data.rendertargets[ name ]
+		local rt = globalRTs[ rtname ][ 1 ]
+		local mat = globalRTs[ rtname ][ 2 ] or CreateMaterial( rtname, "UnlitGeneric", {
+			[ "$nolod" ] = 1,
+			[ "$ignorez" ] = 1,
+			[ "$vertexcolor" ] = 1,
+			[ "$vertexalpha" ] = 1
+		} )
+		mat:SetTexture( "$basetexture", rt )
+		surface.SetMaterial( mat )
+	end
+end
+
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
