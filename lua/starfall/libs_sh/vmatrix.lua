@@ -4,6 +4,7 @@ SF.VMatrix = {}
 --- VMatrix type
 local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix")
 local wrap, unwrap = SF.CreateWrapper( vmatrix_metamethods, true, false )
+local vunwrap = SF.UnwrapObject
 
 SF.VMatrix.Methods = vmatrix_methods
 SF.VMatrix.Metatable = vmatrix_metamethods
@@ -46,19 +47,20 @@ end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
-function vmatrix_methods:scale( vec )
-	SF.CheckType( vec, "Vector" )
+function vmatrix_methods:scale ( vec )
+	SF.CheckType( vec, SF.Type[ "Vector" ] )
+	local vec = vunwrap( vec )
 
-	local v = unwrap(self)
+	local v = unwrap( self )
 	v:Scale( vec )
 end
 
 --- Scales the absolute translation
 -- @param num Amount to scale by
-function vmatrix_methods:scaleTranslation( num )
+function vmatrix_methods:scaleTranslation ( num )
 	SF.CheckType( num, "Number" )
 
-	local v = unwrap(self)
+	local v = unwrap( self )
 	v:ScaleTranslation( num )
 end
 
@@ -73,8 +75,9 @@ end
 
 --- Sets the translation
 -- @param vec New translation
-function vmatrix_methods:setTranslation( vec )
-	SF.CheckType( vec, "Vector" )
+function vmatrix_methods:setTranslation ( vec )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+	local vec = vunwrap( vec )
 
 	local v = unwrap(self)
 	v:SetTranslation( vec )
@@ -82,10 +85,11 @@ end
 
 --- Translate the matrix
 -- @param vec Vector to translate by
-function vmatrix_methods:translate( vec )
-	SF.CheckType( vec, "Vector" )
+function vmatrix_methods:translate ( vec )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+	local vec = vunwrap( vec )
 
-	local v = unwrap(self)
+	local v = unwrap( self )
 	v:Translate( vec )
 end
 

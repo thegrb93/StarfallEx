@@ -9,6 +9,8 @@ SF.Entities = {}
 local ents_methods, ents_metamethods = SF.Typedef( "Entity" )
 local wrap, unwrap = SF.CreateWrapper( ents_metamethods, true, true, debug.getregistry().Entity )
 
+local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+
 --- Entities Library
 -- @shared
 local ents_lib, _ = SF.Libraries.Register( "entities" )
@@ -153,7 +155,7 @@ function ents_methods:getPos ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:GetPos()
+	return SF.WrapObject( ent:GetPos() )
 end
 
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
@@ -163,7 +165,7 @@ function ents_methods:obbSize ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:OBBMaxs() - ent:OBBMins()
+	return SF.WrapObject( ent:OBBMaxs() - ent:OBBMins() )
 end
 
 --- Returns the local position of the entity's outer bounding box
@@ -173,7 +175,7 @@ function ents_methods:obbCenter ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:OBBCenter()
+	return SF.WrapObject( ent:OBBCenter() )
 end
 
 --- Returns the world position of the entity's outer bounding box
@@ -183,7 +185,7 @@ function ents_methods:obbCenterW ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:LocalToWorld( ent:OBBCenter() )
+	return SF.WrapObject( ent:LocalToWorld( ent:OBBCenter() ) )
 end
 
 --- Returns the local position of the entity's mass center
@@ -194,7 +196,7 @@ function ents_methods:getMassCenter ()
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
-	return phys:GetMassCenter()
+	return SF.WrapObject( phys:GetMassCenter() )
 end
 
 --- Returns the world position of the entity's mass center
@@ -205,7 +207,7 @@ function ents_methods:getMassCenterW ()
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
-	return ent:LocalToWorld( phys:GetMassCenter() )
+	return SF.WrapObject( ent:LocalToWorld( phys:GetMassCenter() ) )
 end
 
 --- Returns the angle of the entity
@@ -251,7 +253,7 @@ function ents_methods:getVelocity ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:GetVelocity()
+	return SF.WrapObject( ent:GetVelocity() )
 end
 
 --- Returns the angular velocity of the entity
@@ -261,7 +263,7 @@ function ents_methods:getAngleVelocity ()
 	SF.CheckType( self, ents_metamethods )
 	local phys = getPhysObject( unwrap( self ) )
 	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end	
-	return phys:GetAngleVelocity()
+	return SF.WrapObject( phys:GetAngleVelocity() )
 end
 
 --- Converts a vector in entity local space to world space
@@ -270,11 +272,11 @@ end
 -- @return data as world space vector
 function ents_methods:localToWorld( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, "Vector" )
+	SF.CheckType( data, SF.Types[ "Vector" ] )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
 	
-	return ent:LocalToWorld( data )
+	return SF.WrapObject( ent:LocalToWorld( vunwrap( data ) ) )
 end
 
 --- Converts an angle in entity local space to world space
@@ -287,7 +289,7 @@ function ents_methods:localToWorldAngles ( data )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
 	
-	return ent:LocalToWorldAngles( data )
+	return SF.WrapObject( ent:LocalToWorldAngles( data ) )
 end
 
 --- Converts a vector in world space to entity local space
@@ -296,11 +298,11 @@ end
 -- @return data as local space vector
 function ents_methods:worldToLocal ( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, "Vector" )
+	SF.CheckType( data, SF.Types[ "Vector" ] )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
 	
-	return ent:WorldToLocal( data )
+	return SF.WrapObject( ent:WorldToLocal( vunwrap( data ) ) )
 end
 
 --- Converts an angle in world space to entity local space
@@ -313,7 +315,7 @@ function ents_methods:worldToLocalAngles ( data )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
 	
-	return ent:WorldToLocalAngles( data )
+	return SF.WrapObject( ent:WorldToLocalAngles( data ) )
 end
 
 --- Gets the model of an entity
@@ -344,7 +346,7 @@ function ents_methods:getEyePos ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:EyePos()
+	return SF.WrapObject( ent:EyePos() )
 end
 
 --- Gets an entities' material
@@ -407,15 +409,15 @@ end
 
 --- Gets the entities up vector
 function ents_methods:getUp ()
-	return unwrap( self ):GetUp ()
+	return SF.WrapObject( unwrap( self ):GetUp() )
 end
 
 --- Gets the entities right vector
 function ents_methods:getRight ()
-	return unwrap( self ):GetRight ()
+	return SF.WrapObject( unwrap( self ):GetRight() )
 end
 
 --- Gets the entities forward vector
 function ents_methods:getForward ()
-	return unwrap( self ):GetForward  ()
+	return SF.WrapObject( unwrap( self ):GetForward() )
 end

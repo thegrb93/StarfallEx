@@ -4,6 +4,8 @@
 
 local dgetmeta = debug.getmetatable
 
+local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+
 --[[
 -- Here's a neat little script to convert enumerations wiki.gmod.com-style
 -- into something usable in code
@@ -222,8 +224,12 @@ local function convertFilter(filter)
 	end
 end
 
-local function convertResult(res)
+local function convertResult ( res )
 	if res.Entity then res.Entity = wrap(res.Entity) end
+	if res.HitNormal then res.HitNormal = vwrap( res.HitNormal ) end
+	if res.HitPos then res.HitPos = vwrap( res.HitPos ) end
+	if res.Normal then res.Normal = vwrap( res.Normal ) end
+	if res.StartPos then res.StartPos = vwrap( res.StartPos ) end
 	return res
 end
 
@@ -233,12 +239,15 @@ end
 -- @param filter Entity/array of entities to filter
 -- @param mask Trace mask
 -- @return Result of the trace
-function trace_library.trace(start,endpos,filter,mask)
+function trace_library.trace ( start, endpos, filter, mask )
 	if not SF.Permissions.check( SF.instance.player, nil, "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType(start,"Vector")
-	SF.CheckType(endpos,"Vector")
-	filter = convertFilter(SF.CheckType(filter,"table",0,{}))
-	if mask ~= nil then mask = SF.CheckType(mask,"number") end
+	SF.CheckType( start, SF.Types[ "Vector" ] )
+	SF.CheckType( endpos, SF.Types[ "Vector" ] )
+
+	local start, endpos = vunwrap( start ), vunwrap( endpos )
+
+	filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+	if mask ~= nil then mask = SF.CheckType( mask, "number" ) end
 
 	local trace = {
 		start = start,
@@ -247,7 +256,7 @@ function trace_library.trace(start,endpos,filter,mask)
 		mask = mask
 	}
 	
-	return convertResult(util.TraceLine(trace))
+	return convertResult( util.TraceLine( trace ) )
 end
 
 --- Does a swept-AABB trace
@@ -258,14 +267,17 @@ end
 -- @param filter Entity/array of entities to filter
 -- @param mask Trace mask
 -- @return Result of the trace
-function trace_library.traceHull(start,endpos,minbox,maxbox,filter,mask)
+function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 	if not SF.Permissions.check( SF.instance.player, nil, "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType(start,"Vector")
-	SF.CheckType(endpos,"Vector")
-	SF.CheckType(minbox,"Vector")
-	SF.CheckType(maxbox,"Vector")
-	filter = convertFilter(SF.CheckType(filter,"table",0,{}))
-	if mask ~= nil then mask = SF.CheckType(mask,"number") end
+	SF.CheckType( start, SF.Types[ "Vector" ] )
+	SF.CheckType( endpos, SF.Types[ "Vector" ] )
+	SF.CheckType( minbox, SF.Types[ "Vector" ] )
+	SF.CheckType( maxbox, SF.Types[ "Vector" ] )
+
+	local start, endpos, minbox, maxbox = vunwrap( start ), vunwrap( endpos ), vunwrap( minbox ), vunwrap( maxbox )
+
+	filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+	if mask ~= nil then mask = SF.CheckType( mask, "number" ) end
 
 	local trace = {
 		start = start,
@@ -276,5 +288,5 @@ function trace_library.traceHull(start,endpos,minbox,maxbox,filter,mask)
 		maxs = maxbox
 	}
 	
-	return convertResult(util.TraceHull(trace))
+	return convertResult( util.TraceHull( trace ) )
 end

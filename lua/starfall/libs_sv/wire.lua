@@ -31,6 +31,7 @@ SF.Wire.Library = wire_library
 
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
+local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 
 -- Register privileges
 do
@@ -145,9 +146,9 @@ local outputConverters =
 		SF.CheckType(data,"string",1)
 		return data
 	end,
-	VECTOR = function(data)
-		SF.CheckType(data,"Vector",1)
-		return data
+	VECTOR = function ( data )
+		SF.CheckType( data, SF.Types[ "Vector" ], 1 )
+		return vunwrap( data )
 	end,
 	ANGLE = function(data)
 		SF.CheckType(data,"Angle",1)

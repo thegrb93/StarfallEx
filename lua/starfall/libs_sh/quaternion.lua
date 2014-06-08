@@ -4,6 +4,8 @@
 -- @deprecated Pure Lua implementation. This can be done with a user library.
 local quat_lib, quat_lib_metamethods = SF.Libraries.Register("quaternion")
 
+local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+
 --[[
 -- Quaternion Support
 -- Converted from Wiremod's E2 Quaternion library for general lua use
@@ -544,11 +546,11 @@ function quat_methods:forward()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
 
-	return Vector(
+	return vwrap( Vector(
 	this1 * this1 + this2 * this2 - this3 * this3 - this4 * this4,
 	t3 * this2 + t4 * this1,
 	t4 * this2 - t3 * this1
-	)
+	) )
 end
 
 --- Returns vector pointing right for <this>
@@ -556,11 +558,11 @@ function quat_methods:right()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
 
-	return Vector(
+	return vwrap( Vector(
 	t4 * this1 - t2 * this3,
 	this2 * this2 - this1 * this1 + this4 * this4 - this3 * this3,
 	- t2 * this1 - t3 * this4
-	)
+	) )
 end
 
 --- Returns vector pointing up for <this>
@@ -568,11 +570,11 @@ function quat_methods:up()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
 
-	return Vector(
+	return vwrap( Vector(
 	t3 * this1 + t2 * this4,
 	t3 * this4 - t2 * this1,
 	this1 * this1 - this2 * this2 - this3 * this3 + this4 * this4
-	)
+	) )
 end
 
 --[[****************************************************************************]]
@@ -618,10 +620,10 @@ end
 function quat_lib.rotationAxis(q)
 	local m2 = q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 
-	if m2 == 0 then return Vector( 0, 0, 1 ) end
+	if m2 == 0 then return vwrap( Vector( 0, 0, 1 ) ) end
 
 	local m = sqrt(m2)
-	return Vector( q[2] / m, q[3] / m, q[4] / m)
+	return vwrap( Vector( q[ 2 ] / m, q[ 3 ] / m, q[ 4 ] / m ) )
 end
 
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff)
@@ -630,21 +632,21 @@ function quat_lib.rotationVector(q)
 	local l2 = q[1]*q[1] + q[2]*q[2] + q[3]*q[3] + q[4]*q[4]
 	local m2 = math.max( q[2]*q[2] + q[3]*q[3] + q[4]*q[4], 0 )
 
-	if l2 == 0 or m2 == 0 then return Vector( 0, 0, 0 ) end
+	if l2 == 0 or m2 == 0 then return vwrap( Vector( 0, 0, 0 ) ) end
 
 	local s = 2 * acos( math.Clamp( q[1] / sqrt(l2), -1, 1 ) ) * rad2deg
 
 	if s > 180 then s = s - 360 end
 
 	s = s / sqrt(m2)
-	return Vector( q[2] * s, q[3] * s, q[4] * s )
+	return vwrap( Vector( q[ 2 ] * s, q[ 3 ] * s, q[ 4 ] * s ) )
 end
 
 --[[****************************************************************************]]
 
 --- Converts <q> to a vector by dropping the real component
 function quat_lib.vec(q)
-	return Vector( q[2], q[3], q[4] )
+	return vwrap( Vector( q[ 2 ], q[ 3 ], q[ 4 ] ) )
 end
 
 --[[****************************************************************************]]

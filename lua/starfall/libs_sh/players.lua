@@ -6,6 +6,8 @@ SF.Players = {}
 --- Player type
 local player_methods, player_metamethods = SF.Typedef("Player", SF.Entities.Metatable)
 
+local vwrap = SF.WrapObject
+
 SF.Players.Methods = player_methods
 SF.Players.Metatable = player_metamethods
 
@@ -102,7 +104,7 @@ end
 function player_methods:getAimVector ()
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
-	return ent and ent:GetAimVector()
+	return ent and vwrap( ent:GetAimVector() )
 end
 
 --- Returns the player's field of view
@@ -156,7 +158,7 @@ end
 function player_methods:getShootPos ()
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
-	return ent and ent:GetShootPos()
+	return ent and vwrap( ent:GetShootPos() )
 end
 
 --- Returns whether the player is in a vehicle
