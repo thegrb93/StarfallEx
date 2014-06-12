@@ -23,18 +23,6 @@ local function pascalToCamel ( t, r )
 	return r
 end
 
---- Same as the Gmod angle type
--- @name SF.DefaultEnvironment.Angle
--- @class function
--- @param p Pitch
--- @param y Yaw
--- @param r Roll
--- @return New angle
---SF.DefaultEnvironment.Angle = Angle
---- Same as the Gmod VMatrix type
--- @name SF.DefaultEnvironment.VMatrix
--- @class function
---SF.DefaultEnvironment.Matrix = Matrix
 --- Same as Lua's tostring
 -- @name SF.DefaultEnvironment.tostring
 -- @class function
