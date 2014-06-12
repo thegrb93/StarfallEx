@@ -69,4 +69,3 @@ If you want to contribute to Starfall, you are required to abide by these sets o
 
 
 ----------
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/INPStarfall/starfall/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
