@@ -206,7 +206,8 @@ end
 -- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
 function ents_methods:applyAngForce ( ang )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( ang, "Angle" )
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	local ang = SF.UnwrapObject( ang )
 	
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
@@ -304,8 +305,9 @@ end
 -- @param ang New angles
 function ents_methods:setAngles ( ang )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( ang, "Angle" )
-	
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	local ang = SF.UnwrapObject( ang )
+
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
 

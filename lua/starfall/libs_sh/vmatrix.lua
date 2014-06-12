@@ -20,7 +20,7 @@ end
 --- Returns angles
 -- @return Angles
 function vmatrix_methods:getAngles()
-	return unwrap(self):GetAngles()
+	return SF.WrapObject( unwrap( self ):GetAngles() )
 end
 
 --- Returns scale
@@ -38,10 +38,10 @@ end
 --- Rotate the matrix
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate( ang )
-	SF.CheckType( ang, "Angle")
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
 
 	local v = unwrap(self)
-	v:Rotate( ang )
+	v:Rotate( SF.WrapObject( ang ) )
 
 end
 
@@ -67,10 +67,10 @@ end
 --- Sets the angles
 -- @param ang New angles
 function vmatrix_methods:setAngles( ang )
-	SF.CheckType( ang, "Angle" )
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
 
 	local v = unwrap(self)
-	v:SetAngles( ang )
+	v:SetAngles( SF.WrapObject( ang ) )
 end
 
 --- Sets the translation

@@ -217,7 +217,7 @@ function ents_methods:getAngles ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:GetAngles()
+	return SF.WrapObject( ent:GetAngles() )
 end
 
 --- Returns the mass of the entity
@@ -335,7 +335,7 @@ function ents_methods:getEyeAngles ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return nil, "invalid entity" end
-	return ent:EyeAngles()
+	return SF.WrapObject( ent:EyeAngles() )
 end
 
 --- Gets the entity's eye position

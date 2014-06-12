@@ -86,11 +86,11 @@ end
 
 --- Sets the hologram angle
 -- @param ang New angles
-function hologram_methods:setAng(ang)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(ang, "Angle")
-	local holo = SF.Entities.Unwrap(self)
-	if holo then holo:SetAngles(ang) end
+function hologram_methods:setAng ( ang )
+	SF.CheckType( self, hologram_metamethods )
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	local holo = SF.Entities.Unwrap( self )
+	if holo then holo:SetAngles( SF.Angles.Unwrap( ang ) ) end
 end
 
 --- Sets the hologram linear velocity
@@ -105,11 +105,11 @@ end
 
 --- Sets the hologram's angular velocity.
 -- @param angvel *Vector* angular velocity.
-function hologram_methods:setAngVel(angvel)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(angvel, "Angle")
-	local holo = SF.Entities.Unwrap(self)
-	if holo then holo:SetLocalAngularVelocity(angvel) end
+function hologram_methods:setAngVel ( angvel )
+	SF.CheckType( self, hologram_metamethods )
+	SF.CheckType( angvel, SF.Types[ "Angle" ] )
+	local holo = SF.Entities.Unwrap( self )
+	if holo then holo:SetLocalAngularVelocity( SF.Angles.Unwrap( angvel ) ) end
 end
 
 --- Parents this hologram to the specified hologram
@@ -290,7 +290,7 @@ end )
 -- @return The hologram object
 function holograms_library.create ( pos, ang, model, scale )
     SF.CheckType( pos, SF.Types[ "Vector" ] )
-    SF.CheckType( ang, "Angle" )
+    SF.CheckType( ang, SF.Types[ "Angle" ] )
     SF.CheckType( model, "string" )
     if scale then
 		SF.CheckType( scale, SF.Types[ "Vector" ] )
@@ -298,6 +298,7 @@ function holograms_library.create ( pos, ang, model, scale )
 	end
 
 	local pos = vunwrap( pos )
+	local ang = SF.Angles.Unwrap( ang )
 
     local instance = SF.instance
     if not can_spawn( instance ) then return SF.throw( "Can't spawn holograms that often", 2 )

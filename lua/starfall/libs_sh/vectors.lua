@@ -95,7 +95,7 @@ end
 --- Get the vector's angle.
 -- @return Angle
 function vec_methods:getAngle ()
-	return unwrap( self ):Angle()
+	return SF.WrapObject( unwrap( self ):Angle() )
 end
 
 --- Returns the Angle between two vectors.
@@ -103,7 +103,7 @@ end
 -- @return Angle
 function vec_methods:getAngleEx ( v )
 	SF.CheckType( v, SF.Types[ "Vector" ] )
-	return unwrap( self ):AngleEx( unwrap( v ) )
+	return SF.WrapObject( unwrap( self ):AngleEx( unwrap( v ) ) )
 end
 
 --- Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.
@@ -208,8 +208,8 @@ end
 -- @param a Angle to rotate by.
 -- @return nil.
 function vec_methods:rotate ( a )
-	SF.CheckType( a, "Angle" )
-	unwrap( self ):Rotate( a )
+	SF.CheckType( a, SF.Types[ "Angle" ] )
+	unwrap( self ):Rotate( SF.UnwrapObject( a ) )
 end
 
 --- Copies the values from the second vector to the first vector. Self-Modifies.

@@ -150,8 +150,8 @@ local outputConverters =
 		SF.CheckType( data, SF.Types[ "Vector" ], 1 )
 		return vunwrap( data )
 	end,
-	ANGLE = function(data)
-		SF.CheckType(data,"Angle",1)
+	ANGLE = function ( data )
+		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
 		return data
 	end,
 

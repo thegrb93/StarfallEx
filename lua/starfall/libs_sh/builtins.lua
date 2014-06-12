@@ -30,7 +30,7 @@ end
 -- @param y Yaw
 -- @param r Roll
 -- @return New angle
-SF.DefaultEnvironment.Angle = Angle
+--SF.DefaultEnvironment.Angle = Angle
 --- Same as the Gmod VMatrix type
 -- @name SF.DefaultEnvironment.VMatrix
 -- @class function
