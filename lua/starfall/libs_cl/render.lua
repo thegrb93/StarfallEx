@@ -48,18 +48,30 @@ local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 
-SF.Libraries.AddHook("prepare",function(instance, hook)
+local globalRTs = {}
+local globalRTcount = 0
+
+SF.Libraries.AddHook( "prepare", function ( instance )
 	if hook == "render" then
 		currentcolor = Color(0,0,0,0)
 	end
-end)
+end )
 
-SF.Libraries.AddHook("cleanup", function(instance, hook)
+SF.Libraries.AddHook( "cleanup", function ( instance )
 	for i=#matrix_stack,1,-1 do
 		cam.PopModelMatrix()
 		matrix_stack[i] = nil
 	end
-end)
+end )
+
+SF.Libraries.AddHook( "deinitialize", function ( instance )
+	local data = instance.data.render
+	if data.rendertargets then
+		for k, v in pairs( data.rendertargets ) do
+			globalRTs[ v ][ 2 ] = true -- mark as available
+		end
+	end
+end )
 
 local texturecache = {}
 
@@ -534,21 +546,20 @@ function render_library.getScreenPos()
 	return pos, rot
 end
 
-local globalRTs = {}
-local globalRTcount = 0
-
---- Creates a new render target to draw onto
--- @param name The name of the render target
--- @param width The width of the render target
--- @param height The height of the render target
-function render_library.createRenderTarget ( name, width, height )
-	SF.CheckType( name, "string" )
-	SF.CheckType( width, "number" )
-	SF.CheckType( height, "number" )
-
-	if height > 1024 or width > 1024 then
-		SF.throw( "Rendertarget dimensions out of bounds", 2 )
+local function findAvailableRT ()
+	for k, v in pairs( globalRTs ) do
+		if v[ 2 ] then
+			return k, v
+		end
 	end
+	return nil
+end
+
+--- Creates a new render target to draw onto.
+-- The dimensions will always be 1024x1024
+-- @param name The name of the render target
+function render_library.createRenderTarget ( name)
+	SF.CheckType( name, "string" )
 
 	local data = SF.instance.data.render
 	data.rendertargets = data.rendertargets or {}
@@ -559,10 +570,14 @@ function render_library.createRenderTarget ( name, width, height )
 	end
 
 	data.rendertargetcount = data.rendertargetcount + 1
-	globalRTcount = globalRTcount + 1
-	local rtname = "Starfall_CustomRT_" .. globalRTcount
-	local rt = GetRenderTarget( rtname, width, height, false )
-	globalRTs[ rtname ] = { rt }
+	local rtname, rt = findAvailableRT()
+	if not rt then
+		globalRTcount = globalRTcount + 1
+		rtname = "Starfall_CustomRT_" .. globalRTcount
+		rt = { GetRenderTarget( rtname, 1024, 1024, false ) }
+		globalRTs[ rtname ] = rt
+	end
+	rt[ 2 ] = false
 	data.rendertargets[ name ] = rtname
 end
 
@@ -599,11 +614,12 @@ end
 -- Nil to reset.
 -- @param name Name of the render target to use
 function render_library.setRenderTargetTexture ( name )
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if not name then
 		draw.NoTexture()
 	else
 		SF.CheckType( name, "string" )
-		local data = SF.instance.data.render
 		local rtname = data.rendertargets[ name ]
 		local rt = globalRTs[ rtname ][ 1 ]
 		local mat = globalRTs[ rtname ][ 2 ] or CreateMaterial( rtname, "UnlitGeneric", {
