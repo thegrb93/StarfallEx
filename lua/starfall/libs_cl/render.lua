@@ -558,7 +558,8 @@ end
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
 -- @param name The name of the render target
-function render_library.createRenderTarget ( name)
+-- @bug The drawing will be offset by 16 pixels to the left and 16 to the top and the resolution is actually 992x992. So drawing to 16,16 will draw in the top-left corner and 1007,1007 to the bottom-right.
+function render_library.createRenderTarget ( name )
 	SF.CheckType( name, "string" )
 
 	local data = SF.instance.data.render
