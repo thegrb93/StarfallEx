@@ -189,6 +189,10 @@ local function shared(tag, block, text)
 	block.server = true
 end
 
+local function bug( tag, block, text )
+	block[ tag ] = text
+end
+
 -------------------------------------------------------------------------------
 
 local handlers = {}
@@ -211,6 +215,7 @@ handlers[ "client" ] = side
 handlers[ "server" ] = side
 handlers[ "shared" ] = shared
 handlers[ "include" ] = include
+handlers[ "bug" ] = bug
 
 -------------------------------------------------------------------------------
 
