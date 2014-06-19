@@ -7,6 +7,8 @@ local sound_library, _ = SF.Libraries.Register("sounds")
 local sound_methods, sound_metamethods = SF.Typedef("Sound")
 local wrap, unwrap = SF.CreateWrapper(sound_metamethods,true,false)
 
+local vunwrap = SF.UnwrapObject
+
 -- Register privileges
 do
 	local P = SF.Permissions
@@ -34,21 +36,24 @@ end
 --- Plays a sound from a fixed point in the world.
 -- @param amplitude (Optinal) Loudness of the sound, from 0 to 255
 -- @param pitch (Optional) Pitch percent, from 0 to 255
-function sound_library.emitWorld(origin, path, amplitude, pitch)
+function sound_library.emitWorld ( origin, path, amplitude, pitch )
 	if not SF.Permissions.check( SF.instance.player, path, "sound.create" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType(path, "string")
-	SF.CheckType(origin, "Vector")
+	SF.CheckType( path, "string" )
+	SF.CheckType( origin, SF.Types[ "Vector" ] )
+
+	local origin = vunwrap( origin )
+
 	if amplitude then
-		SF.CheckType(amplitude, "number")
-		amplitude = math.Clamp(amplitude, 0, 255)
+		SF.CheckType( amplitude, "number" )
+		amplitude = math.Clamp( amplitude, 0, 255 )
 	end
 	if pitch then
-		SF.CheckType(pitch, "number")
-		pitch = math.Clamp(pitch, 0, 255)
+		SF.CheckType( pitch, "number" )
+		pitch = math.Clamp( pitch, 0, 255 )
 	end
 	if path:match('["?]') then SF.throw( "Invalid sound path: " .. path, 2 ) end
 	
-	WorldSound(path, origin, amplitude, pitch)
+	WorldSound( path, origin, amplitude, pitch )
 end
 
 --- Plays a sound from an entity. Quick alternative to sounds.create if you don't

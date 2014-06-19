@@ -6,6 +6,8 @@
 -- @shared
 local find_library, _ = SF.Libraries.Register("find")
 
+local vunwrap = SF.UnwrapObject
+
 -- Register privileges
 do
 	local P = SF.Permissions
@@ -58,16 +60,19 @@ end
 -- @param max Top corner
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inBox(min, max, filter)
+function find_library.inBox ( min, max, filter )
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType(min,"Vector")
-	SF.CheckType(max,"Vector")
-	if filter then SF.CheckType(filter,"function") end
+	SF.CheckType( min, SF.Types[ "Vector" ] )
+	SF.CheckType( max, SF.Types[ "Vector" ] )
+
+	local min, max = vunwrap( min ), vunwrap( max )
+
+	if filter then SF.CheckType( filter, "function" ) end
 	
 	local instance = SF.instance
-	if not updateCooldown(instance) then return end
+	if not updateCooldown( instance ) then return end
 	
-	return convert(ents.FindInBox(min, max), filter)
+	return convert( ents.FindInBox( min, max ), filter )
 end
 
 --- Finds entities in a sphere
@@ -75,15 +80,17 @@ end
 -- @param radius Sphere radius
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inSphere(center, radius, filter)
+function find_library.inSphere ( center, radius, filter )
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType(center,"Vector")
-	SF.CheckType(radius,"number")
+	SF.CheckType( center, SF.Types[ "Vector" ] )
+	SF.CheckType( radius, "number" )
+
+	local center = vunwrap( center )
 	
 	local instance = SF.instance
 	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	
-	return convert(ents.FindInSphere(center, radius), filter)
+	return convert( ents.FindInSphere( center, radius ), filter )
 end
 
 --- Finds entities in a cone
@@ -93,17 +100,19 @@ end
 -- @param radius The angle of the cone
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inCone(pos, dir, distance, radius, filter)
+function find_library.inCone ( pos, dir, distance, radius, filter )
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType(pos,"Vector")
-	SF.CheckType(dir,"Vector")
-	SF.CheckType(distance,"number")
-	SF.CheckType(radius,"number")
+	SF.CheckType( pos, SF.Types[ "Vector" ] )
+	SF.CheckType( dir, SF.Types[ "Vector" ] )
+	SF.CheckType( distance, "number" )
+	SF.CheckType( radius, "number" )
+
+	local pos, dir = vunwrap( pos ), vunwrap( dir )
 	
 	local instance = SF.instance
-	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2) end
+	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	
-	return convert(ents.FindInCone(pos,dir,distance,radius), filter)
+	return convert( ents.FindInCone( pos, dir, distance, radius ), filter )
 end
 
 --- Finds entities by class name

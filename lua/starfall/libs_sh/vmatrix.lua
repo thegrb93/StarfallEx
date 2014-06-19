@@ -4,6 +4,7 @@ SF.VMatrix = {}
 --- VMatrix type
 local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix")
 local wrap, unwrap = SF.CreateWrapper( vmatrix_metamethods, true, false )
+local vunwrap = SF.UnwrapObject
 
 SF.VMatrix.Methods = vmatrix_methods
 SF.VMatrix.Metatable = vmatrix_metamethods
@@ -19,7 +20,7 @@ end
 --- Returns angles
 -- @return Angles
 function vmatrix_methods:getAngles()
-	return unwrap(self):GetAngles()
+	return SF.WrapObject( unwrap( self ):GetAngles() )
 end
 
 --- Returns scale
@@ -37,44 +38,46 @@ end
 --- Rotate the matrix
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate( ang )
-	SF.CheckType( ang, "Angle")
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
 
 	local v = unwrap(self)
-	v:Rotate( ang )
+	v:Rotate( SF.WrapObject( ang ) )
 
 end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
-function vmatrix_methods:scale( vec )
-	SF.CheckType( vec, "Vector" )
+function vmatrix_methods:scale ( vec )
+	SF.CheckType( vec, SF.Type[ "Vector" ] )
+	local vec = vunwrap( vec )
 
-	local v = unwrap(self)
+	local v = unwrap( self )
 	v:Scale( vec )
 end
 
 --- Scales the absolute translation
 -- @param num Amount to scale by
-function vmatrix_methods:scaleTranslation( num )
+function vmatrix_methods:scaleTranslation ( num )
 	SF.CheckType( num, "Number" )
 
-	local v = unwrap(self)
+	local v = unwrap( self )
 	v:ScaleTranslation( num )
 end
 
 --- Sets the angles
 -- @param ang New angles
 function vmatrix_methods:setAngles( ang )
-	SF.CheckType( ang, "Angle" )
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
 
 	local v = unwrap(self)
-	v:SetAngles( ang )
+	v:SetAngles( SF.WrapObject( ang ) )
 end
 
 --- Sets the translation
 -- @param vec New translation
-function vmatrix_methods:setTranslation( vec )
-	SF.CheckType( vec, "Vector" )
+function vmatrix_methods:setTranslation ( vec )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+	local vec = vunwrap( vec )
 
 	local v = unwrap(self)
 	v:SetTranslation( vec )
@@ -82,10 +85,11 @@ end
 
 --- Translate the matrix
 -- @param vec Vector to translate by
-function vmatrix_methods:translate( vec )
-	SF.CheckType( vec, "Vector" )
+function vmatrix_methods:translate ( vec )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+	local vec = vunwrap( vec )
 
-	local v = unwrap(self)
+	local v = unwrap( self )
 	v:Translate( vec )
 end
 

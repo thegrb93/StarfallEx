@@ -531,7 +531,7 @@ function render_library.getScreenPos()
 	local gpu = SF.instance.data.render.gpu
 	if not gpu then return end
 	local _, pos, rot = gpu:GetInfo()
-	return pos, rot
+	return SF.WrapObject( pos ), SF.WrapObject( rot )
 end
 
 --- Called when a player uses the screen

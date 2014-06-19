@@ -15,6 +15,7 @@ local ents_metatable = SF.Entities.Metatable
 --@name Entity
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
+local vunwrap = SF.UnwrapObject
 
 -- Register privileges
 do
@@ -159,7 +160,8 @@ end
 -- @param offset An optional offset position
 function ents_methods:applyForceCenter ( vec )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( vec, "Vector" )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+	local vec = vunwrap( vec )
 	if not check( vec ) then return false, "infinite vector" end
 	
 	local ent = unwrap( self )
@@ -179,8 +181,12 @@ end
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset ( vec, offset )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( vec, "Vector" )
-	SF.CheckType( offset, "Vector" )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+	SF.CheckType( offset, SF.Types[ "Vector" ] )
+
+	local vec = vunwrap( vec )
+	local offset = vunwrap( offset )
+
 	if not check( vec ) or not check( offset ) then return false, "infinite vector" end
 	
 	local ent = unwrap( self )
@@ -200,7 +206,8 @@ end
 -- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
 function ents_methods:applyAngForce ( ang )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( ang, "Angle" )
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	local ang = SF.UnwrapObject( ang )
 	
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
@@ -243,7 +250,9 @@ end
 -- @deprecated Gmod has no phys:ApplyTorque function, so this uses black magic
 function ents_methods:applyTorque ( tq )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( tq, "Vector" )
+	SF.CheckType( tq, SF.Types[ "Vector" ] )
+
+	local tq = vunwrap( tq )
 	
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
@@ -280,7 +289,8 @@ end
 function ents_methods:setPos ( vec )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( vec, "Vector" )
-	
+
+	local vec = vunwrap( vec )
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
 
@@ -295,8 +305,9 @@ end
 -- @param ang New angles
 function ents_methods:setAngles ( ang )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( ang, "Angle" )
-	
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	local ang = SF.UnwrapObject( ang )
+
 	local ent = unwrap( self )
 	if not isValid( ent ) then return false, "entity not valid" end
 
@@ -311,9 +322,11 @@ end
 -- @param vel New velocity
 function ents_methods:setVelocity ( vel )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( vel, "Vector" )
-	
+	SF.CheckType( vel, SF.Types[ "Vector" ] )
+
+	local vel = vunwrap( vel )
 	local ent = unwrap( self )
+
 	if not isValid( ent ) then return false, "entity not valid" end
 	local phys = getPhysObject( ent )
 	if not phys then return false, "entity has no physics object" end
