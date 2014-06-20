@@ -152,7 +152,14 @@ function ENT:CodeSent ( files, main, owner )
 		if self.instance then
 			data.render.isRendering = true
 			draw.NoTexture()
+			surface.SetDrawColor( 255, 255, 255, 255 )
+
 			self:runScriptHook( "render" )
+
+			if data.render.usingRT then
+				render.PopRenderTarget()
+				data.render.usingRT = false
+			end
 			data.render.isRendering = nil
 			
 		elseif self.error then
@@ -173,7 +180,7 @@ function ENT:CodeSent ( files, main, owner )
 end
 
 function ENT:Draw ()
-    baseclass.Get( self.Base ).Draw( self )
+	baseclass.Get( self.Base ).Draw( self )
 	self:DrawModel()
 	Wire_Render( self )
 	

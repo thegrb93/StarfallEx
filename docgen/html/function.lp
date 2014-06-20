@@ -50,6 +50,11 @@ end
 </ol>
 <?lua end?>
 
+<?lua if func.bug then ?>
+<h3><font color=red>Known bug:</font></h3>
+<ul><?lua=func.bug?></ul>
+<?lua end ?>
+
 <?lua if type(func.see) == "string" then ?>
 <h3>See also:</h3>
 	<ul><a href="#<?lua=func.see?>"><?lua=func.see?></a></ul>
