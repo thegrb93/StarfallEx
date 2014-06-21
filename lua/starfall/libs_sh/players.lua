@@ -95,7 +95,7 @@ end
 function player_methods:getActiveWeapon ()
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
-	return ent and ent:GetActiveWeapon():ClassName()
+	return ent and ent:GetActiveWeapon():GetClass()
 end
 
 --- Returns the player's aim vector
