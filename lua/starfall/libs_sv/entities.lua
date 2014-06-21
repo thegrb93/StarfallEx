@@ -288,7 +288,7 @@ end
 -- @param vec New position
 function ents_methods:setPos ( vec )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( vec, "Vector" )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
 
 	local vec = vunwrap( vec )
 	local ent = unwrap( self )
