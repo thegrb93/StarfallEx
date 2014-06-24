@@ -175,6 +175,14 @@ math_methods.calcBSplineN = nil
 -- @class table
 SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 
+local os_methods, os_metatable = SF.Typedef( "Library: os" )
+filterGmodLua( os, os_methods )
+os_metatable.__newindex = function () end
+--- GLua's os library. http://wiki.garrysmod.com/page/Category:os
+-- @name SF.DefaultEnvironment.os
+-- @class table
+SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
+
 local table_methods, table_metatable = SF.Typedef("Library: table")
 filterGmodLua(table,table_methods)
 table_metatable.__newindex = function() end
