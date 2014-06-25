@@ -285,8 +285,9 @@ end
 -- @return data as world space angle
 function ents_methods:localToWorldAngles ( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, "Angle" )
+	SF.CheckType( data, SF.Types[ "Angle" ] )
 	local ent = unwrap( self )
+	local data = SF.UnwrapObject( data )
 	if not isValid( ent ) then return nil, "invalid entity" end
 	
 	return SF.WrapObject( ent:LocalToWorldAngles( data ) )
@@ -311,8 +312,9 @@ end
 -- @return data as local space angle
 function ents_methods:worldToLocalAngles ( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, "Angle" )
+	SF.CheckType( data, SF.Types[ "Angle" ] )
 	local ent = unwrap( self )
+	local data = SF.UnwrapObject( data )
 	if not isValid( ent ) then return nil, "invalid entity" end
 	
 	return SF.WrapObject( ent:WorldToLocalAngles( data ) )
