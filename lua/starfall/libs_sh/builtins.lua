@@ -85,10 +85,13 @@ SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then
 SF.DefaultEnvironment.unpack = unpack
 
 --- Same as Lua's setmetatable. Doesn't work on most internal metatables
+-- @name SF.DefaultEnvironment.setmetatable
+-- @class function
 -- @param tbl The table to set the metatable of
 -- @param meta The metatable to use
 -- @return tbl with metatable set to meta
 SF.DefaultEnvironment.setmetatable = setmetatable
+
 --- Same as Lua's getmetatable. Doesn't work on most internal metatables
 -- @param tbl Table to get metatable of
 -- @return The metatable of tbl
