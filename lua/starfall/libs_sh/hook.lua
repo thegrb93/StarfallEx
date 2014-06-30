@@ -134,17 +134,21 @@ end)
 local wrapArguments = SF.Sanitize
 
 local function run( hookname, customfunc, ... )
+	local result = {}
 	for instance,_ in pairs( registered_instances ) do
 		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
 		
 		local ok = table.remove( ret, 1 )
 		if ok then
-			if not customfunc then return end
-			return customfunc( instance, ret, ... )
+			if customfunc then
+				local sane = customfunc( instance, ret, ... )
+				result = sane ~= nil and { sane } or result
+			end
 		else
 			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[1], ret[2] )
 		end
 	end
+	return unpack( result )
 end
 
 
