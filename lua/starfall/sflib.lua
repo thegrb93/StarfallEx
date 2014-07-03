@@ -62,8 +62,23 @@ include( "database.lua" )
 include( "permissions/core.lua" )
 include( "editor.lua" )
 
-SF.defaultquota = CreateConVar("sf_defaultquota", "100000", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of Lua instructions to allow Starfall scripts to execute")
+SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 64, { FCVAR_REPLICATED }, "Default number of elements for the CPU Quota Buffer." )
+
+-- We need to make sure that we clear the table if we shrink it, otherwise leftover values will affect the avg.
+cvars.AddChangeCallback( "sf_timebuffersize", function ( n, o, u )
+	if o > u then
+		for _, v in pairs( SF.allInstances ) do
+			v.cpuTime.buffer = {}
+		end
+	end
+end )
+
+if SERVER then
+	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.84, {}, "Default CPU Time Quota for serverside." )
+else
+	SF.cpuQuota = CreateClientConVar( "sf_timebuffer", 0.84, false, false )
+end
+
 
 local dgetmeta = debug.getmetatable
 
@@ -151,11 +166,14 @@ end
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
 -- @param ops Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
 -- @param libs Additional (local) libraries for the script to access. Default is an empty table.
-function SF.CreateContext ( env, directives, ops, libs )
+function SF.CreateContext ( env, directives, cpuTime, libs )
 	local context = {}
 	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
-	context.ops = ops or function () return SF.defaultquota:GetInt() end
+	context.cpuTime = cpuTime or {
+		getBufferN = function () return SF.cpuBufferN:GetInt() or 3 end,
+		getMax = function () return SF.cpuQuota:GetFloat() end
+	}
 	context.libs = libs or {}
 	return context
 end

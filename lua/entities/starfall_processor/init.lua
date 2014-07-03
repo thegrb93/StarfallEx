@@ -59,9 +59,12 @@ function ENT:Think ()
 	self.BaseClass.Think( self )
 	
 	if self.instance and not self.instance.error then
-		self:UpdateState( tostring( self.instance.ops ) .. " ops, " .. tostring( math.floor( self.instance.ops / self.instance.context.ops() * 100 ) ) .. "%" )
 
-		self.instance:resetOps()
+		local bufferAvg = self.instance.cpuTime:getBufferAverage()
+
+		self:UpdateState( tostring( math.Round( bufferAvg * 1000000 ) ) .. " us.\n" .. tostring( math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 ) ) .. "%" )
+
+		self.instance:updateCPUBuffer()
 		self:runScriptHook( "think" )
 	end
 

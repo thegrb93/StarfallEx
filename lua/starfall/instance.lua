@@ -21,12 +21,6 @@ SF.Instance.__index = SF.Instance
 -- @field mainfile The main file
 -- @field player The "owner" of the instance
 
--- debug.gethook() returns the string "external hook" instead of a function... |:/
--- (I think) it basically just errors after 500000000 lines
-local function infloop_detection_replacement()
-	error("Infinite Loop Detected!",2)
-end
-
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code
@@ -35,25 +29,15 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func,...)
-	local maxops = self.context.ops()
-	
-	local function ophook(event)
-		self.ops = self.ops + 500
-		if self.ops > maxops then
-			debug.sethook(nil)
-			SF.throw( "Operations quota exceeded.", 0, true )
-		end
-	end
-	
-	--local begin = SysTime()
-	--local beginops = self.ops
-	
-	local args = {...}
+
+	local args = { ... }
 	local traceback
-	local wrapperfunc = function()
-		return {func(unpack(args))}
+
+	local wrapperfunc = function ()
+		return { func( unpack( args ) ) }
 	end
-	local function xpcall_callback(err)
+
+	local function xpcall_callback ( err )
 		if type( err ) == "table" then
 			if err.message then
 				local line= err.line
@@ -63,16 +47,28 @@ function SF.Instance:runWithOps(func,...)
 			end
 		end
 		err = tostring( err )
-		traceback = debug.traceback(err, 2)
+		traceback = debug.traceback( err, 2 )
 		return err
 	end
-	
-	debug.sethook(ophook,"",500)
-	local ok, rt = xpcall(wrapperfunc, xpcall_callback)
-	debug.sethook(nil)
-	
-	--MsgN("SF: Exectued "..(self.ops-beginops).." instructions in "..(SysTime()-begin).." seconds")
-	
+
+	local oldSysTime = SysTime()
+
+	local function cpuCheck ()
+		self.cpuTime.current = self.cpuTime.current + ( SysTime() - oldSysTime )
+
+		local ind = self.cpuTime.bufferI
+		self.cpuTime.buffer[ ind ] = self.cpuTime.current
+
+		if self.cpuTime:getBufferAverage() > SF.cpuQuota:GetFloat() then
+			debug.sethook( nil )
+			SF.throw( "CPU Quota exceeded.", 0, true )
+		end
+	end
+
+	debug.sethook( cpuCheck, "", 500 )
+	local ok, rt = xpcall( wrapperfunc, xpcall_callback )
+	debug.sethook( nil )
+
 	if ok then
 		return true, rt
 	else
@@ -108,6 +104,21 @@ end
 function SF.Instance:initialize()
 	assert(not self.initialized, "Already initialized!")
 	self.initialized = true
+	self.cpuTime = {
+		buffer = {},
+		bufferI = 1,
+		current = 0
+	} -- CPU Time Buffer
+
+	local ins = self
+	function self.cpuTime:getBufferAverage ()
+		local r = 0
+		for _, v in pairs( self.buffer ) do
+			r = r + v
+		end
+		return r / ins.context.cpuTime:getBufferN()
+	end
+
 	self:runLibraryHook("initialize")
 	self:prepare("_initialize","_initialize")
 	
@@ -258,12 +269,6 @@ function SF.Instance:runFunctionT(func,...)
 	return true, tbl
 end
 
---- Resets the amount of operations used.
-function SF.Instance:resetOps()
-	self:runLibraryHook("resetOps")
-	self.ops = 0
-end
-
 --- Deinitializes the instance. After this, the instance should be discarded.
 function SF.Instance:deinitialize()
 	self:runLibraryHook("deinitialize")
@@ -281,4 +286,11 @@ function SF.Instance:Error(msg,traceback)
 	
 	-- Default behavior
 	self:deinitialize()
+end
+
+--- Updates the buffer index for the CPU Time buffer.
+function SF.Instance:updateCPUBuffer ()
+	self.cpuTime.current = 0
+	self.cpuTime.bufferI = ( self.cpuTime.bufferI % self.context.cpuTime.getBufferN() ) + 1
+	self.cpuTime.buffer[ self.cpuTime.bufferI ] = 0
 end

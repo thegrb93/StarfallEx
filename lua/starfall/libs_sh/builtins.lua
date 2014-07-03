@@ -109,16 +109,25 @@ SF.DefaultEnvironment.CLIENT = CLIENT
 -- @class field
 SF.DefaultEnvironment.SERVER = SERVER
 
--- Gets the amount of ops used so far
--- @return Operations used in this second
-function SF.DefaultEnvironment.opsUsed()
-	return SF.instance.ops
+--- Returns the current count for this Think's CPU Time.
+-- This value increases as more executions are done, may not be exactly as you want.
+-- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
+-- @return Current quota used this Think
+function SF.DefaultEnvironment.quotaUsed ()
+	return SF.instance.cpuTime.current
 end
 
--- Gets the ops hard quota
--- @return Maximum operations per second
-function SF.DefaultEnvironment.opsMax()
-	return SF.instance.context.ops()
+--- Gets the Average CPU Time in the buffer
+-- @return Average CPU Time of the buffer.
+function SF.DefaultEnvironment.quotaAverage ()
+	return SF.instance.cpuTime:getBufferAverage()
+end
+
+--- Gets the CPU Time max.
+-- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
+-- @return Max SysTime allowed to take for execution of the chip in a Think.
+function SF.DefaultEnvironment.quotaMax ()
+	return SF.instance.context.cpuTime.getMax()
 end
 
 -- The below modules have the Gmod functions removed (the ones that begin with a capital letter),
