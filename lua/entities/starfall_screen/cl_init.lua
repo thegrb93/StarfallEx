@@ -95,7 +95,7 @@ function ENT:Think ()
 	self:NextThink( CurTime() )
 	
 	if self.instance and not self.instance.error then
-		self.instance:resetOps()
+		self.instance:updateCPUBuffer()
 		self:runScriptHook( "think" )
 	end
 end
