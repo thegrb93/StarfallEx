@@ -55,68 +55,49 @@ end)
 
 if SERVER then
 	util.AddNetworkString( "SF_netmessage" )
-	
-	local function checktargets( target )
+end
+
+--- Send a net message from client->server, or server->client.
+--@shared
+--@param target Optional target location to send the net message.
+function net_library.send ( target )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	local data = instance.data.net.data
+	if #data == 0 then return false end
+	net.Start( "SF_netmessage" )
+	net.WriteEntity( SF.instance.data.entity )
+	for i = 1, #data do
+		local writefunc = data[ i ][ 1 ]
+		local writevalue = data[ i ][ 2 ]
+		local writesetting = data[ i ][ 3 ]
+
+		net[ writefunc ]( writevalue, writesetting )
+	end
+
+	if SERVER then
+		local sendfunc
+		local newtarget
+
 		if target then
-			if SF.GetType(target) == "table" then
-				local newtarget = {}
-				for i=1,#target do
-					SF.CheckType( SF.Entities.Unwrap(target[i]), "Player", 1 )
-					newtarget[i] = SF.Entities.Unwrap(target[i])
+			if SF.GetType( target ) == "table" then
+				local nt = { }
+				for i = 1, #target do
+					SF.CheckType( SF.Entities.Unwrap( target[ i ] ), "Player", 1 )
+					nt[ i ] = SF.Entities.Unwrap( target[ i ] )
 				end
-				return net.Send, newtarget
+				sendfunc, newtarget = net.Send, nt
 			else
-				SF.CheckType( SF.Entities.Unwrap(target), "Player", 1 ) -- TODO: unhacky this
-				return net.Send, SF.Entities.Unwrap(target)
+				SF.CheckType( SF.Entities.Unwrap( target ), "Player", 1 ) -- TODO: unhacky this
+				sendfunc, newtarget = net.Send, SF.Entities.Unwrap( target )
 			end
 		else
-			return net.Broadcast
+			sendfunc = net.Broadcast
 		end
-	end
-	
-	--- Send the net message
-	-- @server
-	-- @param target The player or table of players to send the message to, or nil to send to everyone
 
-	function net_library.send( target )
-		local instance = SF.instance
-		if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
-
-		local sendfunc, newtarget = checktargets( target )
-		
-		local data = instance.data.net.data
-		if #data == 0 then return false end
-		net.Start( "SF_netmessage" )
-			net.WriteEntity( SF.instance.data.entity )
-			for i=1, #data do
-				local writefunc = data[ i ][ 1 ]
-				local writevalue = data[ i ][ 2 ]
-				local writesetting = data[ i ][ 3 ]
-			
-				net[ writefunc ]( writevalue, writesetting )
-			end
-		
 		sendfunc( newtarget )
-	end
-else
-	--- Send the net message to the server
-	-- @client
-	function net_library.send()
-		local instance = SF.instance
-		if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
-		
-		local data = instance.data.net.data
-		if #data == 0 then return false end
-		net.Start( "SF_netmessage" )
-			net.WriteEntity( SF.instance.data.entity )
-			for i=1, #data do
-				local writefunc = data[ i ][ 1 ]
-				local writevalue = data[ i ][ 2 ]
-				local writesetting = data[ i ][ 3 ]
-			
-				net[ writefunc ]( writevalue, writesetting )
-			end
-		
+	else
 		net.SendToServer()
 	end
 end
@@ -134,16 +115,38 @@ function net_library.start( name )
 	write( instance, "String", name )
 end
 
+--- Blacklist for net messages.
+-- If an item with the same type as the key is found, then it will throw an error.
+-- Key must be exactly as is reported by type( var ) otherwise it won't catch it.
+local blacklist = {
+	[ "VMatrix" ] = true
+}
+
+local function checkTblForBlacklist ( t )
+	for _, v in pairs( t ) do
+		if type( v ) == "table" and not SF.UnwrapObject( v ) then
+			checkTblForBlacklist( v )
+		else
+			local typmeta = getmetatable( v )
+			local typ = type( typmeta ) == "string" and typmeta or type( v )
+			if blacklist[ typ ] then
+				SF.throw( "Item of type " .. typ .. " cannot be sent through a net message", 3 )
+			end
+		end
+	end
+end
+
 --- Writes a table to the net message
 -- @shared
--- @param table The table to be written
-
+-- @param t The table to be written. This will be checked for blacklisted types. eg VMatrix.
 function net_library.writeTable( t )
 	local instance = SF.instance
 	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
 	
 	SF.CheckType( t, "table" )
-	
+
+	checkTblForBlacklist( t )
+
 	write( instance, "Table", SF.Unsanitize(t) )
 	return true
 end
@@ -158,7 +161,7 @@ end
 
 --- Writes a string to the net message
 -- @shared
--- @param string The string to be written
+-- @param t The string to be written
 
 function net_library.writeString( t )
 	local instance = SF.instance
@@ -180,8 +183,8 @@ end
 
 --- Writes an integer to the net message
 -- @shared
--- @param integer The integer to be written
--- @param bitCount The amount of bits the integer consists of
+-- @param t The integer to be written
+-- @param n The amount of bits the integer consists of
 
 function net_library.writeInt( t, n )
 	local instance = SF.instance
@@ -196,7 +199,7 @@ end
 
 --- Reads an integer from the net message
 -- @shared
--- @param bitCount The amount of bits to read
+-- @param n The amount of bits to read
 -- @return The integer that was read
 
 function net_library.readInt(n)
@@ -206,8 +209,8 @@ end
 
 --- Writes an unsigned integer to the net message
 -- @shared
--- @param integer The integer to be written
--- @param bitCount The amount of bits the integer consists of. Should not be greater than 32
+-- @param t The integer to be written
+-- @param n The amount of bits the integer consists of. Should not be greater than 32
 
 function net_library.writeUInt( t, n )
 	local instance = SF.instance
@@ -222,7 +225,7 @@ end
 
 --- Reads an unsigned integer from the net message
 -- @shared
--- @param bitCount The amount of bits to read
+-- @param n The amount of bits to read
 -- @return The unsigned integer that was read
 
 function net_library.readUInt(n)
@@ -232,7 +235,7 @@ end
 
 --- Writes a bit to the net message
 -- @shared
--- @param bit The bit to be written. (boolean)
+-- @param t The bit to be written. (boolean)
 
 function net_library.writeBit( t )
 	local instance = SF.instance
@@ -254,7 +257,7 @@ end
 
 --- Writes a double to the net message
 -- @shared
--- @param double The double to be written
+-- @param t The double to be written
 
 function net_library.writeDouble( t )
 	local instance = SF.instance
@@ -276,7 +279,7 @@ end
 
 --- Writes a float to the net message
 -- @shared
--- @param double The float to be written
+-- @param t The float to be written
 
 function net_library.writeFloat( t )
 	local instance = SF.instance
