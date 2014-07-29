@@ -338,11 +338,11 @@ end
 local safe_types = {
 	["number"  ] = true,
 	["string"  ] = true,
-	["Vector"  ] = true,
-	["Color"   ] = true,
-	["Angle"   ] = true,
-	["Angle"   ] = true,
-	["Matrix"  ] = true,
+	["Vector"  ] = false,
+	["Color"   ] = false,
+	["Angle"   ] = false,
+	["Entity"  ] = false,
+	["VMatrix" ] = false,
 	["boolean" ] = true,
 	["nil"     ] = true,
 }
@@ -357,26 +357,27 @@ local safe_types = {
 function SF.Sanitize( ... )
 	-- Sanitize ALL the things.
 	local return_list = {}
-	local args = {...}
+	local args = { ... }
 	
-	for key, value in pairs(args) do
-		local typ = type( value )
+	for key, value in pairs( args ) do
+		local typmeta = getmetatable( value )
+		local typ = type( typmeta ) == "string" and typmeta or type( value )
 		if safe_types[ typ ] then
-			return_list[key] = value
-		elseif (typ == "table" or typ == "Entity" or typ == "Player" or typ == "NPC") and SF.WrapObject(value) then
-			return_list[key] = SF.WrapObject(value)
+			return_list[ key ] = value
+		elseif SF.WrapObject( value ) then
+			return_list[ key ] = SF.WrapObject( value )
 		elseif typ == "table" then
 			local tbl = {}
-			for k,v in pairs(value) do
-				tbl[SF.Sanitize(k)] = SF.Sanitize(v)
+			for k,v in pairs( value ) do
+				tbl[ SF.Sanitize( k ) ] = SF.Sanitize( v )
 			end
-			return_list[key] = tbl
+			return_list[ key ] = tbl
 		else 
-			return_list[key] = nil
+			return_list[ key ] = nil
 		end
 	end
 	
-	return unpack(return_list)
+	return unpack( return_list )
 end
 
 --- Takes output from starfall and does it's best to make the output

@@ -157,23 +157,6 @@ string_methods.explode = function(str,separator,withpattern) return string.Explo
 -- @class table
 SF.DefaultEnvironment.string = setmetatable({},string_metatable)
 
---- Color type
-local color_methods, color_metatable = SF.Typedef("Color")
-color_metatable.__newindex = function() end
-
---- Same as the Gmod Color type
--- @name SF.DefaultEnvironment.Color
--- @class function
--- @param r - Red
--- @param g - Green
--- @param b - Blue
--- @param a - Alpha
--- @return New color
-SF.DefaultEnvironment.Color = function ( r, g, b, a )
-	return setmetatable( Color( r, g, b, a ), color_metatable )
-end
-
-
 -- Math library
 local math_methods, math_metatable = SF.Typedef("Library: math")
 filterGmodLua(math,math_methods)
