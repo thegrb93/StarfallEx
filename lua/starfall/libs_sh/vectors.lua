@@ -56,6 +56,14 @@ function vec_metamethods:__mul ( n )
 	return wrap( unwrap( self ):__mul( n ) )
 end
 
+--- division metamethod
+-- @param n Scalar to divide the Vector by
+-- @return Scaled vector.
+function vec_metamethods:__div ( n )
+	SF.CheckType( n, "number" )
+	return SF.WrapObject( unwrap( self ):__div( n ) )
+end
+
 --- add metamethod
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
