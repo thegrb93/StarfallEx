@@ -16,7 +16,9 @@ SF.Angles.Metatable = ang_metamethods
 
 --- __newindex metamethod
 function ang_metamethods.__newindex ( t, k, v )
-	if k == "p" or k =="y" or k == "r" then
+	if type( k ) == "number" and k >= 1 and k <= 3 then
+			SF.UnwrapObject( t ).__newindex( SF.UnwrapObject( t ), k, v )
+	elseif k == "p" or k == "y" or k == "r" then
 		SF.UnwrapObject( t ).__newindex( SF.UnwrapObject( t ), k, v )
 	else
 		rawset( t, k, v )
@@ -26,7 +28,9 @@ end
 local _p = ang_metamethods.__index
 --- __index metamethod
 function ang_metamethods.__index ( t, k )
-	if k == "p" or k =="y" or k == "r" then
+	if type( k ) == "number" and k >= 1 and k <= 3 then
+			return unwrap( t )[ k ]
+	elseif k == "p" or k == "y" or k == "r" then
 		return unwrap( t )[ k ]
 	end
 	return _p[ k ]
