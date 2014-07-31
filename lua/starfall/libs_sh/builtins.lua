@@ -148,14 +148,14 @@ local function filterGmodLua(lib, original, gm)
 end
 
 -- String library
-local string_methods, string_metatable = SF.Typedef("Library: string")
-filterGmodLua(string,string_methods)
-string_metatable.__newindex = function() end
-string_methods.explode = function(str,separator,withpattern) return string.Explode(separator,str,withpattern) end
+local string_methods, string_metatable = SF.Typedef( "Library: string" )
+filterGmodLua( string, string_methods )
+string_metatable.__newindex = function () end
+
 --- Lua's (not glua's) string library
 -- @name SF.DefaultEnvironment.string
 -- @class table
-SF.DefaultEnvironment.string = setmetatable({},string_metatable)
+SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
 
 -- Math library
 local math_methods, math_metatable = SF.Typedef("Library: math")
