@@ -221,25 +221,25 @@ else
 	end
 end
 
-local function printTableX( target, t, indent, alreadyprinted )
+local function printTableX ( target, t, indent, alreadyprinted )
 	for k,v in SF.DefaultEnvironment.pairs( t ) do
-		if SF.GetType( v ) == "table" and not alreadyprinted[v] then
-			alreadyprinted[v] = true
-			target:ChatPrint( string.rep( "\t", indent ) .. tostring(k) .. ":" )
+		if SF.GetType( v ) == "table" and not alreadyprinted[ v ] then
+			alreadyprinted[ v ] = true
+			target:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. ":" )
 			printTableX( target, v, indent + 1, alreadyprinted )
 		else
-			target:ChatPrint( string.rep( "\t", indent ) .. tostring(k) .. "\t=\t" .. tostring(v) )
+			target:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. "\t=\t" .. tostring( v ) )
 		end
 	end
 end
 
 --- Prints a table to player's chat
 -- @param tbl Table to print
-function SF.DefaultEnvironment.printTable( tbl )
+function SF.DefaultEnvironment.printTable ( tbl )
 	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
 	SF.CheckType( tbl, "table" )
 
-	printTableX( (SERVER and SF.instance.player or LocalPlayer()), tbl, 0, {[t] = true} )
+	printTableX( ( SERVER and SF.instance.player or LocalPlayer() ), tbl, 0, { t = true } )
 end
 
 
