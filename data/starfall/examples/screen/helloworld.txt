@@ -1,9 +1,17 @@
 --@name Hello World
 --@author INP
 
-local render, hook = loadLibrary( "render", "hook" )
+local render = render -- Libraries are referenced through globals in your environment
+local hook = hook -- You can change the name you use by doing local assignment
 
-local font = render.createFont( "Default", 62 ) -- 62 is max font size
+--[[
+    eg:
+    local ren = render
+    local drawstuff = render
+    local w = wire
+    local t = timer
+    local mathLib = math
+]]
 
 hook.add( "render", "helloworld_render", function ()
     render.clear() -- Clear the screen to allow for easy refresh (comment it out and see what happens)
