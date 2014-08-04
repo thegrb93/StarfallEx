@@ -74,9 +74,9 @@ cvars.AddChangeCallback( "sf_timebuffersize", function ( n, o, u )
 end )
 
 if SERVER then
-	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.84, {}, "Default CPU Time Quota for serverside." )
+	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.004, {}, "Default CPU Time Quota for serverside." )
 else
-	SF.cpuQuota = CreateClientConVar( "sf_timebuffer", 0.84, false, false )
+	SF.cpuQuota = CreateClientConVar( "sf_timebuffer", 0.004, false, false )
 end
 
 
