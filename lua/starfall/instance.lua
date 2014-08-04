@@ -54,7 +54,7 @@ function SF.Instance:runWithOps(func,...)
 	local oldSysTime = SysTime()
 
 	local function cpuCheck ()
-		self.cpuTime.current = self.cpuTime.current + ( SysTime() - oldSysTime )
+		self.cpuTime.current =  SysTime() - oldSysTime
 
 		local ind = self.cpuTime.bufferI
 		self.cpuTime.buffer[ ind ] = self.cpuTime.current
