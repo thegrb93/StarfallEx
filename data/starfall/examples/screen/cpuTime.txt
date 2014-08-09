@@ -1,0 +1,52 @@
+--@name cpuTime Example
+--@author INP - Radon
+
+-- This function helps us check if we can run.
+-- Use a mixture of quotaUsed() and quotaAverage()
+-- quotaUsed() returns the value of the current buffer.
+-- quotaAverage() gives the cpuTime average across the whole buffer.
+-- You chip will quota if quotaAverage() > quotaMax()
+-- n is a parameter between 0 and 1 that represents the percent. 0.8 = 80%.
+local function quotaCheck ( n )
+    return ( quotaUsed() < quotaMax() * n ) and ( quotaAverage() < quotaMax() )
+end
+
+-- Round function to certain dp.
+local function round ( num, idp )
+  local mult = 10 ^ ( idp or 0 )
+  return math.floor( num * mult + 0.5 ) / mult
+end
+
+-- Standard render hook, see hooks.
+hook.add( "render", "", function ()
+    -- Clear the screen first.
+    -- But we'll use setColor & drawRect so we can get some blur
+    -- This draws what looks to be a black background, but is just a low alpha rect the size of the screen.
+    render.setColor( Color( 0, 0, 0, 50 ) )
+    render.drawRect( 0, 0, 512, 512 )
+
+    -- While our quota is less than 2 percent.
+    -- This will result in higher FPS, thus more render calls.
+    -- You'd think this would affect the rendering of the cube, it doesn't.
+    -- If you increase this check to 99%, FPS will significantly drop, and the movement would be slower.
+    -- Play with this value and see the effects on percentage and your FPS.
+    while( quotaCheck( 0.01 ) ) do
+
+        -- We'll block out the top 100 px, so we can see our text.
+        render.setColor( Color( 0, 0, 0, 255 ) )
+        render.drawRect( 0, 0, 512, 512 / 4  )
+    
+        render.setColor( Color( 255, 255, 255 ) )    
+        -- Then print some stats to the screen
+        -- We should have enough cpuTime left to do this after using 80%
+        render.drawText( 10, 10, "Quota Used: " .. round( quotaUsed(), 6 ) .. "s" )
+        render.drawText( 10, 30, "Quota Avg: " .. round( quotaAverage(), 6 ) .. "s" )
+        render.drawText( 10, 50, "Quota Max: " .. round( quotaMax(), 6 ) .. "s" )
+        render.drawText( 10, 70, "Percent: " .. round( quotaAverage() / quotaMax() * 100, 2 ) .. "%" )
+        
+        -- Now we can draw a funky box that oscillates back and forth in the middle of the screen.
+        render.setColor( Color( math.random( 200, 255 ), math.random( 200, 255 ), math.random( 200, 255 ) ) )
+        render.drawRect( math.abs( math.sin( timer.curtime() ) * ( 512 - 100 ) ), 512 / 2, 100, 200 )
+        
+    end
+end )
