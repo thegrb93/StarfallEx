@@ -224,15 +224,6 @@ local function convertFilter(filter)
 	end
 end
 
-local function convertResult ( res )
-	if res.Entity then res.Entity = wrap(res.Entity) end
-	if res.HitNormal then res.HitNormal = vwrap( res.HitNormal ) end
-	if res.HitPos then res.HitPos = vwrap( res.HitPos ) end
-	if res.Normal then res.Normal = vwrap( res.Normal ) end
-	if res.StartPos then res.StartPos = vwrap( res.StartPos ) end
-	return res
-end
-
 --- Does a line trace
 -- @param start Start position
 -- @param endpos End position
@@ -256,7 +247,7 @@ function trace_library.trace ( start, endpos, filter, mask )
 		mask = mask
 	}
 	
-	return convertResult( util.TraceLine( trace ) )
+	return SF.Sanitize( util.TraceLine( trace ) )
 end
 
 --- Does a swept-AABB trace
@@ -288,5 +279,5 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 		maxs = maxbox
 	}
 	
-	return convertResult( util.TraceHull( trace ) )
+	return SF.Sanitize( util.TraceHull( trace ) )
 end
