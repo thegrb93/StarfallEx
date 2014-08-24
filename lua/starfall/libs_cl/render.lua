@@ -230,11 +230,13 @@ end
 -- @param id Texture id
 function render_library.setTexture ( id )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if not id then
-		draw.NoTexture()
-	elseif texturecache[ id ] then
+	if id then
+		SF.CheckType( id, "number" )
 		surface.SetMaterial( texturecache[ id ][ 2 ] )
+		return
 	end
+
+	draw.NoTexture()
 end
 
 --- Clears the surface
@@ -255,9 +257,13 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRect(x,y,w,h)
+function render_library.drawRect ( x, y, w, h )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawRect(x,y,w,h)
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	surface.DrawRect( x, y, w, h )
 end
 
 --- Draws a rectangle outline using the current color.
@@ -265,18 +271,25 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRectOutline(x,y,w,h)
+function render_library.drawRectOutline ( x, y, w, h )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawOutlinedRect(x,y,w,h)
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	surface.DrawOutlinedRect( x, y, w, h )
 end
 
 --- Draws a circle outline
 -- @param x Center x coordinate
 -- @param y Center y coordinate
 -- @param r Radius
-function render_library.drawCircle(x,y,r)
+function render_library.drawCircle ( x, y, r )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawCircle(x,y,r,currentcolor)
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( r, "number" )
+	surface.DrawCircle( x, y, r, currentcolor )
 end
 
 --- Draws a textured rectangle.
@@ -284,9 +297,13 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawTexturedRect(x,y,w,h)
+function render_library.drawTexturedRect ( x, y, w, h )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawTexturedRect(x,y,w,h)
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	surface.DrawTexturedRect ( x, y, w, h )
 end
 
 --- Draws a textured rectangle with UV coordinates
@@ -298,9 +315,17 @@ end
 -- @param startV Texture mapping at rectangle origin
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
-function render_library.drawTexturedRectUV(x,y,w,h,startU,startV,endU,endV)
+function render_library.drawTexturedRectUV ( x, y, w, h, startU, startV, endU, endV )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawTexturedRectUV(x,y,w,h,startU,startV,endU,endV)
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	SF.CheckType( startU, "number" )
+	SF.CheckType( startV, "number" )
+	SF.CheckType( endU, "number" )
+	SF.CheckType( endV, "number" )
+	surface.DrawTexturedRectUV( x, y, w, h, startU, startV, endU, endV )
 end
 
 --- Draws a rotated, textured rectangle.
@@ -309,9 +334,15 @@ end
 -- @param w Width
 -- @param h Height
 -- @param rot Rotation in degrees
-function render_library.drawTexturedRectRotated(x,y,w,h,rot)
+function render_library.drawTexturedRectRotated ( x, y, w, h, rot )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawTexturedRectRotated(x, y, w, h, rot)
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	SF.CheckType( rot, "number" )
+
+	surface.DrawTexturedRectRotated( x, y, w, h, rot )
 end
 
 --- Draws a line
@@ -319,9 +350,13 @@ end
 -- @param y1 Y start coordinate
 -- @param x2 X end coordinate
 -- @param y2 Y end coordinate
-function render_library.drawLine(x1,y1,x2,y2)
+function render_library.drawLine ( x1, y1, x2, y2 )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	surface.DrawLine(x1,y1,x2,y2)
+	SF.CheckType( x1, "number" )
+	SF.CheckType( y1, "number" )
+	SF.CheckType( x2, "number" )
+	SF.CheckType( y2, "number" )
+	surface.DrawLine( x1, y1, x2, y2 )
 end
 
 --- Creates a font. Does not require rendering hook
@@ -436,13 +471,18 @@ end
 -- @param y Y coordinate
 -- @param text Text to draw
 -- @param alignment Text alignment
-function render_library.drawText(x,y,text,alignment)
+function render_library.drawText ( x, y, text, alignment )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType(text,"string")
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( text, "string" )
+	if alignment then
+		SF.CheckType( alignment, "number" )
+	end
 	
 	local font = SF.instance.data.render.font or defaultFont
 	
-	draw.DrawText(text, font, tonumber(x) or 0, tonumber(y) or 0, currentcolor, tonumber(alignment) or TEXT_ALIGN_LEFT)
+	draw.DrawText( text, font, x, y, currentcolor, alignment or TEXT_ALIGN_LEFT )
 end
 
 --- Compiles a 2D poly. This is needed so that poly don't have to be
