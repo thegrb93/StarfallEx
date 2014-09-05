@@ -674,6 +674,32 @@ function render_library.setRenderTargetTexture ( name )
 	end
 end
 
+--- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
+function render_library.capturePixels ()
+	local data = SF.instance.data.render
+	if not data.isRendering then
+		SF.throw( "Not in rendering hook.", 2 )
+	end
+	render.CapturePixels()
+end
+
+--- Reads the color of the specified pixel.
+-- @param x Pixel x-coordinate.
+-- @param y Pixel y-coordinate.
+-- @return Color object with ( r, g, b, 255 ) from the specified pixel.
+function render_library.readPixel ( x, y )
+	local data = SF.instance.data.render
+	if not data.isRendering then
+		SF.throw( "Not in rendering hook.", 2 )
+	end
+	
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+
+	local r, g, b = render.ReadPixel( x, y )
+	return SF.Color.Wrap( Color( r, g, b, 255 ) )
+end
+
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
