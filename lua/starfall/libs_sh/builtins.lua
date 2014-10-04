@@ -58,7 +58,7 @@ SF.DefaultEnvironment.pairs = pairs
 -- @name SF.DefaultEnvironment.type
 -- @class function
 -- @param obj Object to get type of
--- @return 
+-- @return The name of the object's type.
 SF.DefaultEnvironment.type = function( obj )
 	local tp = getmetatable( obj )
 	return type(tp) == "string" and tp or type( obj )
