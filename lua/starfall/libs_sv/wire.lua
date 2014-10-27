@@ -52,6 +52,8 @@ do
 	P.registerPrivilege( "wire.input", "Input", "Allows the user to read the value of an input" )
 	P.registerPrivilege( "wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink" )
 	P.registerPrivilege( "wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink" )
+	P.registerPrivilege( "wire.createWire", "Create Wire", "Allows the user to create a wire between two entities" )
+	P.registerPrivilege( "wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities" )
 end
 
 ---
@@ -269,6 +271,101 @@ function wire_library.self()
 	local ent = SF.instance.data.entity
 	if not ent then SF.throw( "No entity", 2 ) end
 	return wlwrap(ent)
+end
+
+--- Wires two entities together
+-- @param entI Entity with input
+-- @param entO Entity with output
+-- @param inputname Input to be wired
+-- @param outputname Output to be wired
+function wire_library.create ( entI, entO, inputname, outputname )
+	SF.CheckType( entI, SF.Types[ "Entity" ] )
+	SF.CheckType( entO, SF.Types[ "Entity" ] )
+	SF.CheckType( inputname, "string" )
+	SF.CheckType( outputname, "string" )
+		
+	local entI = SF.Entities.Unwrap( entI )
+	local entO = SF.Entities.Unwrap( entO )
+	
+	if not SF.Entities.IsValid( entI ) then SF.Throw( "Invalid source" ) end
+	if not SF.Entities.IsValid( entO ) then SF.Throw( "Invalid target" ) end
+	
+	if not SF.Permissions.check( SF.instance.player, entI, "wire.createWire" ) or not SF.Permissions.check( SF.instance.player, entO, "wire.createWire" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	if not entI.Inputs then SF.Throw( "Source has no valid inputs" ) end
+	if not entO.Outputs then SF.Throw( "Target has no valid outputs" ) end
+	
+	if inputname == "" then SF.Throw( "Invalid input name" ) end
+	if outputname == "" then SF.Throw( "Invalid output name" ) end
+	
+	if not entI.Inputs[ inputname ] then SF.Throw( "Invalid source input: " .. inputname ) end
+	if not entO.Outputs[ outputname ] then SF.Throw( "Invalid source output: " .. outputname ) end
+	if entI.Inputs[ inputname ].Src then
+		local CheckInput = entI.Inputs[ inputname ]
+		if CheckInput.SrcId == outputname and CheckInput.Src == entO then SF.Throw( "Source \"" .. inputname .. "\" is already wired to target \"" .. outputname .. "\"" ) end
+	end
+		
+	WireLib.Link_Start( SF.instance.player:UniqueID(), entI, entI:WorldToLocal( entI:GetPos() ), inputname, "cable/rope", Vector( 255, 255, 255 ), 0 )
+	WireLib.Link_End( SF.instance.player:UniqueID(), entO, entO:WorldToLocal( entO:GetPos() ), outputname, SF.instance.player )
+end
+
+--- Unwires an entity's input
+-- @param entI Entity with input
+-- @param inputname Input to be un-wired
+function wire_library.delete ( entI, inputname )
+	SF.CheckType( entI, SF.Types[ "Entity" ] )
+	SF.CheckType( inputname, "string" )
+	
+	local entI = SF.Entities.Unwrap( entI )
+	
+	if not SF.Entities.IsValid( entI ) then SF.Throw( "Invalid source" ) end
+	
+	if not SF.Permissions.check( SF.instance.player, entI, "wire.deleteWire" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	if not entI.Inputs or not entI.Inputs[ inputname ] then SF.Throw( "Entity does not have input: " .. inputname ) end
+	if not entI.Inputs[ inputname ].Src then SF.Throw( "Input \"" .. inputname .. "\" is not wired" ) end
+	
+	WireLib.Link_Clear( entI, inputname )
+end
+
+--- Returns a table of entity's inputs
+-- @param entI Entity with input(s)
+-- @return Table of entity's inputs
+function wire_library.getInputs ( entI )
+	SF.CheckType( entI, SF.Types[ "Entity" ] )
+	
+	local entI = SF.Entities.Unwrap( entI )
+	
+	if not SF.Entities.IsValid( entI ) then SF.Throw( "Invalid source" ) end
+	
+	local ret = {}
+	
+	for k, v in pairs( entI.Inputs ) do
+		if k ~= "" then
+			table.insert( ret, k )
+		end
+	end
+	return ret
+end
+
+--- Returns a table of entity's outputs
+-- @param entO Entity with output(s)
+-- @return Table of entity's outputs
+function wire_library.getOutputs ( entO )
+	SF.CheckType( entO, SF.Types[ "Entity" ] )
+	
+	local entO = SF.Entities.Unwrap( entO )
+	
+	if not SF.Entities.IsValid( entO ) then SF.Throw( "Invalid target" ) end
+	
+	local ret = {}
+	
+	for k, v in pairs( entO.Outputs ) do
+		if k ~= "" then
+			table.insert( ret, k )
+		end
+	end
+	return ret
 end
 
 -- ------------------------- Wirelink ------------------------- --

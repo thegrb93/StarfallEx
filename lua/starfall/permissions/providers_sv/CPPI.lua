@@ -11,7 +11,9 @@ local canTool = {
 	[ "entities.unparent" ] = true,
 	[ "entities.setSolid" ] = true,
 	[ "entities.enableGravity" ] = true,
-	[ "entities.setColor" ] = true
+	[ "entities.setColor" ] = true,
+	[ "wire.createWire" ] = true,
+	[ "wire.deleteWire" ] = true
 }
 
 local canPhysgun = {
