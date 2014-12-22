@@ -36,7 +36,7 @@ SF.Entities.Library = ents_lib
 --- Returns true if valid and is not the world, false if not
 -- @param entity Entity to check
 function SF.Entities.IsValid ( entity )
-	return entity and entity:IsValid() and not entity:IsWorld()
+	return IsValid( entity ) and not entity:IsWorld()
 end
 local isValid = SF.Entities.IsValid
 
