@@ -54,6 +54,8 @@ do
 	P.registerPrivilege( "wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink" )
 	P.registerPrivilege( "wire.createWire", "Create Wire", "Allows the user to create a wire between two entities" )
 	P.registerPrivilege( "wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities" )
+	P.registerPrivilege( "wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity" )
+	P.registerPrivilege( "wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity" )
 end
 
 ---
@@ -328,44 +330,40 @@ function wire_library.delete ( entI, inputname )
 	WireLib.Link_Clear( entI, inputname )
 end
 
+local function parseEntity( ent, io )
+	
+	if ent then
+		SF.CheckType( ent, SF.Types[ "Entity" ] )
+		ent = SF.Entities.Unwrap( ent )
+		if not SF.Permissions.check( SF.instance.player, ent, "wire.get" .. io ) then SF.throw( "Insufficient permissions", 2 ) end
+	else
+		ent = SF.instance.data.entity or nil
+	end
+	
+	if not SF.Entities.IsValid( ent ) then SF.throw( "Invalid source" ) end
+
+	local ret = {}
+	for k, v in pairs( ent[ io ] ) do
+		if k ~= "" then
+			table.insert( ret, k )
+		end
+	end	
+
+	return ret
+end
+
 --- Returns a table of entity's inputs
 -- @param entI Entity with input(s)
 -- @return Table of entity's inputs
 function wire_library.getInputs ( entI )
-	SF.CheckType( entI, SF.Types[ "Entity" ] )
-	
-	local entI = SF.Entities.Unwrap( entI )
-	
-	if not SF.Entities.IsValid( entI ) then SF.Throw( "Invalid source" ) end
-	
-	local ret = {}
-	
-	for k, v in pairs( entI.Inputs ) do
-		if k ~= "" then
-			table.insert( ret, k )
-		end
-	end
-	return ret
+	return parseEntity( entI, "Inputs" )
 end
 
 --- Returns a table of entity's outputs
 -- @param entO Entity with output(s)
 -- @return Table of entity's outputs
 function wire_library.getOutputs ( entO )
-	SF.CheckType( entO, SF.Types[ "Entity" ] )
-	
-	local entO = SF.Entities.Unwrap( entO )
-	
-	if not SF.Entities.IsValid( entO ) then SF.Throw( "Invalid target" ) end
-	
-	local ret = {}
-	
-	for k, v in pairs( entO.Outputs ) do
-		if k ~= "" then
-			table.insert( ret, k )
-		end
-	end
-	return ret
+	return parseEntity( entO, "Outputs" )
 end
 
 -- ------------------------- Wirelink ------------------------- --
