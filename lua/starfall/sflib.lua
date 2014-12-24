@@ -51,6 +51,7 @@ if SERVER then
 	AddCSLuaFile( "permissions/core.lua" )
 	AddCSLuaFile( "editor.lua" )
 	AddCSLuaFile( "callback.lua" )
+	AddCSLuaFile( "sfhelper.lua" )
 end
 
 -- Load files
@@ -61,6 +62,7 @@ include( "preprocessor.lua" )
 include( "database.lua" )
 include( "permissions/core.lua" )
 include( "editor.lua" )
+include( "sfhelper.lua" )
 
 SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 16, { FCVAR_REPLICATED }, "Default number of elements for the CPU Quota Buffer." )
 
