@@ -336,7 +336,7 @@ if CLIENT then
 			local SFHelp = editor:addComponent( vgui.Create( "Button" , editor ), -262, 30, -207, 20 )
 			SFHelp.panel:SetText( "" )
 			SFHelp.panel.Font = "E2SmallFont"
-			SFHelp.panel.Paint = function( button )
+			SFHelp.panel.Paint = function ( button )
 				local w, h = button:GetSize( )
 				draw.RoundedBox( 1, 0, 0, w, h, editor.colors.col_FL )
 				if button.Hovered then 
@@ -347,7 +347,7 @@ if CLIENT then
 				surface.SetTextColor( 255, 255, 255, 255 )
 				surface.DrawText( "  SFHelper" )
 			end
-			SFHelp.panel.DoClick = function( )
+			SFHelp.panel.DoClick = function ( )
 				SF.Helper.show( )
 			end
 			editor.C.SFHelp = SFHelp

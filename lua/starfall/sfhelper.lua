@@ -14,7 +14,7 @@ local settings_set = false
 
 if CLIENT then
 	function helper.getDocs()
-		http.Fetch( "http://jazzelhawk.zapto.org/doc.json", function( body, len, headers, code ) -- <<-- Change this to official website
+		http.Fetch( "http://sf.inp.io/doc.json", function( body, len, headers, code )
 			SF.Docs = util.JSONToTable( body )
 			docs_set = true
 		end, function( error ) print("Starfall failed to load documentation, Error: ", error) end )
