@@ -46,7 +46,7 @@ function helper.create()
 	helper.Frame:SetScreenLock( true )
 	helper.Frame:SetDeleteOnClose( false )
 	helper.Frame:SetVisible( false )
-	helper.Frame:SetTitle( "SF Helper - By Jazzelhawk" )
+	helper.Frame:SetTitle( "SF Helper" )
 	helper.Frame._PerformLayout = helper.Frame.PerformLayout
 	function helper.Frame:PerformLayout( ... )
 		local w, h = helper.Frame:GetSize()
@@ -631,7 +631,7 @@ function helper.create()
 
 	helper.AboutView.Panel = vgui.Create( "DPanel", helper.AboutView )
 
-	helper.AboutView.About = Label( "Starfall is a Lua sandbox for Garry's mod. It allows players to write Lua scripts for the server without exposing server functionality that could be used maliciously. Since it works with Lua code directly, it's much faster than similar projects like E2 or Lemongate.\n\nStarfall by default includes a 'processor' entity, which is a purely server-side environment with an entity representation, and can have Wiremod inputs/outputs. It also includes a 'screen' entity, which runs code both on the server and each client to allow for fast, lag-free drawing that was previously only possible with GPU.\n\nThis Starfall helper was made by Jazzelhawk.", helper.AboutView.Panel )
+	helper.AboutView.About = Label( "Starfall is a Lua sandbox for Garry's mod. It allows players to write Lua scripts for the server without exposing server functionality that could be used maliciously. Since it works with Lua code directly, it's much faster than similar projects like E2 or Lemongate.\n\nStarfall by default includes a 'processor' entity, which is a purely server-side environment with an entity representation, and can have Wiremod inputs/outputs. It also includes a 'screen' entity, which runs code both on the server and each client to allow for fast, lag-free drawing that was previously only possible with GPU.\n\nThis Starfall Helper was originally made by Jazzelhawk.", helper.AboutView.Panel )
 	helper.AboutView.About:SetPos( 10, 10 )
 	helper.AboutView.About:SetFont( "HelperText" )
 	helper.AboutView.About:SizeToContents()
