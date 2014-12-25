@@ -234,7 +234,7 @@ end
 --- Suppress Engine Lighting of a hologram. Disabled by default.
 -- @server
 -- @class function
--- @param enable Boolean to represent if shading should be set or not.
+-- @param suppress Boolean to represent if shading should be set or not.
 function hologram_methods:suppressEngineLighting ( suppress )
     SF.CheckType( suppress, "boolean" )
 
