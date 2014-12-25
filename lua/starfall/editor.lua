@@ -333,20 +333,22 @@ if CLIENT then
 		-- Add "SFHelper" button
 		do
 			local editor = SF.Editor.editor
-			local SFHelp = editor:addComponent(vgui.Create("Button", editor), -262, 30, -207, 20)
-			SFHelp.panel:SetText("")
+			local SFHelp = editor:addComponent( vgui.Create( "Button" , editor ), -262, 30, -207, 20 )
+			SFHelp.panel:SetText( "" )
 			SFHelp.panel.Font = "E2SmallFont"
-			SFHelp.panel.Paint = function(button)
-				local w, h = button:GetSize()
-				draw.RoundedBox(1, 0, 0, w, h, editor.colors.col_FL)
-				if button.Hovered then draw.RoundedBox(0, 1, 1, w - 2, h - 2, Color(0, 0, 0, 192)) end
-				surface.SetFont(button.Font)
-				surface.SetTextPos(3, 4)
-				surface.SetTextColor(255, 255, 255, 255)
-				surface.DrawText("  SFHelper")
+			SFHelp.panel.Paint = function( button )
+				local w, h = button:GetSize( )
+				draw.RoundedBox( 1, 0, 0, w, h, editor.colors.col_FL )
+				if button.Hovered then 
+					draw.RoundedBox( 0, 1, 1, w - 2, h - 2, Color(0, 0, 0, 192) ) 
+				end
+				surface.SetFont( button.Font )
+				surface.SetTextPos( 3, 4 )
+				surface.SetTextColor( 255, 255, 255, 255 )
+				surface.DrawText( "  SFHelper" )
 			end
-			SFHelp.panel.DoClick = function()
-				SF.Helper.show()
+			SFHelp.panel.DoClick = function( )
+				SF.Helper.show( )
 			end
 			editor.C.SFHelp = SFHelp
 		end
