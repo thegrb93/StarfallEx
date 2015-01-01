@@ -276,7 +276,8 @@ if CLIENT then
 	local code1 = "--@name \n--@author \n\n"
 	local code2 = "--[[\n" .. [[    Starfall Scripting Environment
 
-    More info: http://gmodstarfall.github.io/Starfall/
+    More info: http://inpstarfall.github.io/Starfall
+    Github: http://github.com/INPStarfall/Starfall
     Reference Page: http://sf.inp.io
     Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
 ]] .. "]]"
