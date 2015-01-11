@@ -1,412 +1,733 @@
 -------------------------------------------------------------------------------
--- SF Editor.
--- Functions for setting up the code editor, as well as helper functions for
--- sending code over the network.
+--	SF Editor
+--	Originally created by Jazzelhawk
+--	
+--	To do:
+--	Find new icons
 -------------------------------------------------------------------------------
 
 SF.Editor = {}
 
--- TODO: Server-side controls
+local addon_path = nil
 
---- Includes table
--- @name Includes table
--- @class table
--- @field mainfile Main file
--- @field files filename : file contents pairs
+do
+	local tbl = debug.getinfo( 1 )
+	local file = tbl.short_src
+	addon_path = string.TrimRight( string.match( file, ".-/.-/" ), "/" )
+end
 
 if CLIENT then
 
-	local keywords = {
-		["if"] = true,
-		["elseif"] = true,
-		["else"] = true,
-		["then"] = true,
-		["end"] = true,
-		
-		["while"] = true,
-		["for"] = true,
-		["in"] = true,
-		
-		["do"] = true,
-		["repeat"] = true,
-		["until"] = true,
-		
-		["function"] = true,
-		["local"] = true,
-		["return"] = true,
-		
-		["and"] = true,
-		["or"] = true,
-		["not"] = true,
-		
-		["true"] = true,
-		["false"] = true,
-		["nil"] = true,
-	}
-	
-	local operators = {
-		["+"] = true,
-		["-"] = true,
-		["/"] = true,
-		["*"] = true,
-		["^"] = true,
-		["%"] = true,
-		["#"] = true,
-		["="] = true,
-		["=="] = true,
-		["~="] = true,
-		[","] = true,
-		["."] = true,
-		["<"] = true,
-		[">"] = true,
-		
-		["{"] = true,
-		["}"] = true,
-		["("] = true,
-		[")"] = true,
-		["["] = true,
-		["]"] = true,
-		
-		["_"] = true,
-	}
-	
-	--[[
-	-- E2 colors
-	local colors = {
-		["keyword"]		= { Color(160,240,240), false }, -- teal
-		["operator"]	= { Color(224,224,224), false }, -- white
-		["brackets"]	= { Color(224,224,224), false }, -- white
-		
-		["function"]	= { Color(160,160,240), false }, -- blue
-		["number"]		= { Color(240,160,160), false }, -- light red
-		["variable"]	= { Color(160,240,160), false }, -- green
-		
-		["string"]		= { Color(160,160,160), false }, -- gray
-		["comment"]		= { Color(160,160,160), false }, -- gray
-		
-		["ppcommand"]	= { Color(240,240,160), false }, -- pink
-		["notfound"]	= { Color(240, 96, 96), false }, -- dark red
+	include( "sfderma.lua" )
+
+	-- Colors
+	SF.Editor.colors = {}
+	SF.Editor.colors.dark 		= Color( 36, 41, 53 )
+	SF.Editor.colors.meddark 	= Color( 48, 57, 92 )
+	SF.Editor.colors.med 		= Color( 78, 122, 199 )
+	SF.Editor.colors.medlight 	= Color( 127, 178, 240 )
+	SF.Editor.colors.light 		= Color( 173, 213, 247 )
+
+	-- Icons
+	SF.Editor.icons = {}
+	SF.Editor.icons.arrowr 		= Material( "radon/arrow_right.png", "noclamp smooth" )
+	SF.Editor.icons.arrowl 		= Material( "radon/arrow_left.png", "noclamp smooth" )
+
+	local defaultCode = [[--@name 
+--@author 
+
+--[[
+	Starfall Scripting Environment
+
+	More info: http://inpstarfall.github.io/Starfall
+	Github: http://github.com/INPStarfall/Starfall
+	Reference Page: http://sf.inp.io
+	Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
+
+	Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
+]].."]]"
+
+	local invalid_filename_chars = {
+		["*"] = "",
+		["?"] = "",
+		[">"] = "",
+		["<"] = "",
+		["|"] = "",
+		["\\"] = "",
+		['"'] = "",
 	}
 
-	-- Colors originally by Cenius; slightly modified by Divran
-	local colors = {
-		["keyword"]		= { Color(160, 240, 240), false},
-		["operator"]	= { Color(224, 224, 224), false},
-		["brackets"]	= { Color(224, 224, 224), false},
-		["function"]	= { Color(160, 160, 240), false}, -- Was originally called "expression"
-		
-		["number"]		= { Color(240, 160, 160), false}, 
-		["string"]		= { Color(160, 160, 160), false}, -- Changed to lighter grey so it isn't the same as comments
-		["variable"]	= { Color(180, 180, 260), false}, -- Was originally called "globals".
-		
-		--["comment"] 	= { Color(0, 255, 0), false}, -- Cenius' original comment color was green... imo not very nice
-		["comment"]		= { Color(128,128,128), false }, -- Changed to grey
-		
-		["ppcommand"]	= { Color(240, 240, 160), false},
-		
-		["notfound"]	= { Color(240,  96,  96), false}, 
-	}
-	]]
-	local colors = {
-		["keyword"]     = { Color(100, 100, 255), false},
-		["operator"]    = { Color(150, 150, 200), false},
-		["brackets"]    = { Color(120, 120, 255), false},
-		["number"]      = { Color(174, 129, 255), false},
-		["variable"]    = { Color(248, 248, 242), false},
-		["string"]      = { Color(230, 219, 116), false},
-		["comment"]     = { Color(133, 133, 133), false},
-		["ppcommand"]   = { Color(170, 170, 170), false},
-		["notfound"]    = { Color(240,  96,  96), false},
-	}
-	
-	-- cols[n] = { tokendata, color }
-	local cols = {}
-	local lastcol
-	local function addToken(tokenname, tokendata)
-		local color = colors[tokenname]
-		if lastcol and color == lastcol[2] then
-			lastcol[1] = lastcol[1] .. tokendata
-		else
-			cols[#cols + 1] = { tokendata, color, tokenname }
-			lastcol = cols[#cols]
-		end
-	end
-	
-	local string_gsub = string.gsub
-	local string_find = string.find
-	local string_sub = string.sub
-	local string_format = string.format
-	
-	local function findStringEnding(self,row,char)
-		char = char or '"'
-		
-		while self.character do
-			if self:NextPattern( ".-"..char ) then -- Found another string char (' or ")
-				if self.tokendata[#self.tokendata-1] ~= "\\" then -- Ending found
-					return true
-				end
-			else -- Didn't find another :(
-				return false
-			end
-			
-			self:NextCharacter()		
-		end
-		
-		return false
-	end
+	CreateClientConVar( "starfall_editor_wide", 800, true, false )
+	CreateClientConVar( "starfall_editor_tall", 600, true, false )
+	CreateClientConVar( "starfall_editor_posx", ScrW()/2-400, true, false )
+	CreateClientConVar( "starfall_editor_posy", ScrH()/2-300, true, false )
 
-	local function findMultilineEnding(self,row,what) -- also used to close multiline comments
-		if self:NextPattern( ".-%]%]" ) then -- Found ending
-			return true
-		end
-		
-		self.multiline = what
-		return false
-	end
-	
-	local table_concat = table.concat
-	local string_gmatch = string.gmatch
-	
-	local function findInitialMultilineEnding(self,row,what)
-		if row == self.Scroll[1] then
-			-- This code checks if the visible code is inside a string or a block comment
-			self.multiline = nil
-			local singleline = false
+	CreateClientConVar( "starfall_fileviewer_wide", 253, true, false )
+	CreateClientConVar( "starfall_fileviewer_tall", 600, true, false )
+	CreateClientConVar( "starfall_fileviewer_posx", ScrW()/2-400-253, true, false )
+	CreateClientConVar( "starfall_fileviewer_posy", ScrH()/2-300, true, false )
+	CreateClientConVar( "starfall_fileviewer_locked", 1, true, false )
 
-			local str = string_gsub( table_concat( self.Rows, "\n", 1, self.Scroll[1]-1 ), "\r", "" )
-			
-			for before, char, after in string_gmatch( str, "()([%-\"'\n%[%]])()" ) do
-				before = string_sub( str, before-1, before-1 )
-				after = string_sub( str, after, after+2 )
-				
-				if not self.multiline and not singleline then
-					if char == '"' or char == "'" or (char == "-" and after[1] == "-" and after ~= "-[[") then
-						singleline = true
-					elseif char == "-" and after == "-[[" then
-						self.multiline = "comment"
-					elseif char == "[" and after[1] == "[" then
-						self.multiline = "string"
-					end
-				elseif singleline and ((char == "'" or char == '"') and before ~= "\\" or char == "\n") then
-					singleline = false
-				elseif self.multiline and char == "]" and after[1] == "]" then
-					self.multiline = nil
-				end
-			end
-		end
-	end
+	CreateClientConVar( "starfall_editor_widgets", 1, true, false )
+	CreateClientConVar( "starfall_editor_linenumbers", 1, true, false )
+	CreateClientConVar( "starfall_editor_gutter", 1, true, false )
+	CreateClientConVar( "starfall_editor_invisiblecharacters", 0, true, false )
+	CreateClientConVar( "starfall_editor_indentguides", 1, true, false )
+	CreateClientConVar( "starfall_editor_activeline", 1, true, false )
+	CreateClientConVar( "starfall_editor_autocompletion", 1, true, false )
+	CreateClientConVar( "starfall_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
 
-	-- TODO: remove all the commented debug prints
-	local function SyntaxColorLine(self,row)
-		cols,lastcol = {}, nil
-		self:ResetTokenizer(row)
-		findInitialMultilineEnding(self,row,self.multiline)
-		self:NextCharacter()
-		
-		if self.multiline then
-			if findMultilineEnding(self,row,self.multiline) then
-				addToken( self.multiline, self.tokendata )
-				self.multiline = nil
-			else
-				self:NextPattern( ".*" )
-				addToken( self.multiline, self.tokendata )
-				return cols
-			end
-			self.tokendata = ""
-		end
+	local aceFiles = {}
+	local htmlEditorCode = nil
 
-		while self.character do
-			self.tokendata = ""
-			
-			-- Eat all spaces
-			local spaces = self:SkipPattern( "^%s*" )
-			if spaces then addToken( "comment", spaces ) end
-	
-			if self:NextPattern( "^%a[%w_]*" ) then -- Variables and keywords
-				if keywords[self.tokendata] then
-					addToken( "keyword", self.tokendata )
-				else
-					addToken( "variable", self.tokendata )
-				end
-			elseif self:NextPattern( "^%d*%.?%d+" ) then -- Numbers
-				addToken( "number", self.tokendata )
-			elseif self:NextPattern( "^%-%-" ) then -- Comment
-				if self:NextPattern( "^@" ) then -- ppcommand
-					self:NextPattern( ".*" ) -- Eat all the rest
-					addToken( "ppcommand", self.tokendata )
-				elseif self:NextPattern( "^%[%[" ) then -- Multi line comment
-					if findMultilineEnding( self, row, "comment" ) then -- Ending found
-						addToken( "comment", self.tokendata )
-					else -- Ending not found
-						self:NextPattern( ".*" )
-						addToken( "comment", self.tokendata )
-					end
-				else
-					self:NextPattern( ".*" ) -- Skip the rest
-					addToken( "comment", self.tokendata )
-				end
-			elseif self:NextPattern( "^[\"']" ) then -- Single line string
-				if findStringEnding( self,row, self.tokendata ) then -- String ending found
-					addToken( "string", self.tokendata )
-				else -- No ending found
-					self:NextPattern( ".*" ) -- Eat everything
-					addToken( "string", self.tokendata )
-				end
-			elseif self:NextPattern( "^%[%[" ) then -- Multi line strings
-				if findMultilineEnding( self, row, "string" ) then -- Ending found
-					addToken( "string", self.tokendata )
-				else -- Ending not found
-					self:NextPattern( ".*" )
-					addToken( "string", self.tokendata )
-				end
-			elseif self:NextPattern( "^[%+%-/%*%^%%#=~,;:%._<>]" ) then -- Operators
-				addToken( "operator", self.tokendata )
-			elseif self:NextPattern("^[%(%)%[%]{}]") then
-				addToken( "brackets", self.tokendata)
-			else
-				self:NextCharacter()
-				addToken( "notfound", self.tokendata )
-			end
-			self.tokendata = ""
-		end
-		
-		return cols
-	end
-	
-	local code1 = "--@name \n--@author \n\n"
-	local code2 = "--[[\n" .. [[    Starfall Scripting Environment
-
-    More info: http://inpstarfall.github.io/Starfall
-    Github: http://github.com/INPStarfall/Starfall
-    Reference Page: http://sf.inp.io
-    Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
-]] .. "]]"
-
-	--- (Client) Intializes the editor, if not initialized already
 	function SF.Editor.init()
-		if SF.Editor.editor then return end
-		
-		SF.Editor.editor = vgui.Create("Expression2EditorFrame")
-
-		-- Change default event registration so we can have custom animations for starfall
-		function SF.Editor.editor:SetV(bool)
-			local wire_expression2_editor_worldclicker = GetConVar("wire_expression2_editor_worldclicker")
-
-			if bool then
-				self:MakePopup()
-				self:InvalidateLayout(true)
-				if self.E2 then self:Validate() end
-			end
-			self:SetVisible(bool)
-			self:SetKeyBoardInputEnabled(bool)
-			self:GetParent():SetWorldClicker(wire_expression2_editor_worldclicker:GetBool() and bool) -- Enable this on the background so we can update E2's without closing the editor
-			if CanRunConsoleCommand() then
-				RunConsoleCommand("starfall_event", bool and "editor_open" or "editor_close")
-			end
+		if not SF.Editor.safeToInit then 
+			SF.AddNotify( LocalPlayer(), "Starfall is downloading editor files, please wait.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
+			return 
+		end
+		if SF.Editor.initialized or #aceFiles == 0 or htmlEditorCode == nil then 
+			SF.AddNotify( LocalPlayer(), "Failed to initialize Starfall editor.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+			return
 		end
 
-
-		SF.Editor.editor:Setup( "SF Editor", "starfall", "" ) -- Setting the editor type to not nil keeps the validator line
-		
-		if not file.Exists("starfall", "DATA") then
-			file.CreateDir("starfall")
-		end
-		
-		-- Set Existing 'Save As' & 'Save & Exit' Button Size.
-		do
-			local editor = SF.Editor.editor
-			local sav = editor.C.SavAs
-			local sae = editor.C.SaE
-
-			sav:SetSize( 100, 20 )
-			sae:SetSize( 100, 20 )
+		if not file.Exists( "starfall", "DATA" ) then
+			file.CreateDir( "starfall" )
 		end
 
-		-- Add "Sound Browser" button
-		do
-			local editor = SF.Editor.editor
-			local SoundBrw = vgui.Create( "DButton", editor.C.Menu )
-			SoundBrw:SetText( "Sound Browser" )
-			SoundBrw:SetSize( 100, 20 )
-			SoundBrw:Dock( RIGHT )
-			SoundBrw.DoClick = function ()
-				RunConsoleCommand( "wire_sound_browser_open" )
-			end
-			editor.C.SoundBrw = SoundBrw
+		SF.Editor.editor = SF.Editor.createEditor()
+		SF.Editor.editor:close()
+		SF.Editor.fileViewer = SF.Editor.createFileViewer()
+		SF.Editor.fileViewer:close()
+		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
+		SF.Editor.settingsWindow:close()
+
+		SF.Editor.runJS = function( ... ) 
+			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
 		end
-		
-		-- Add "SFHelper" button
-		do
-			local editor = SF.Editor.editor
-			local SFHelp = vgui.Create( "DButton", editor.C.Menu )
-			SFHelp:SetText( "SFHelper" )
-			SFHelp:SetSize( 100, 20 )
-			SFHelp:Dock( RIGHT )
-			SFHelp.DoClick = function ()
-				SF.Helper.show()
-			end
-			editor.C.SFHelp = SFHelp
-		end
-		
-		SF.Editor.editor:SetSyntaxColorLine( SyntaxColorLine )
-		--SF.Editor.editor:SetSyntaxColorLine( function(self, row) return {{self.Rows[row], Color(255,255,255)}} end)
-		
-		-- This prefills our code when a new 'tab' is made.
-		function SF.Editor.editor:OnTabCreated ( tab )
-			local editor = tab.Panel
-			editor:SetText( code1 .. code2 )
-			editor.Start = editor:MovePosition( { 1, 1 }, #code1 )
-			editor.Caret = editor:MovePosition( editor.Start, #code2 )
-		end
-		
-		local editor = SF.Editor.editor:GetCurrentEditor()
-		
-		function SF.Editor.editor:Validate ( gotoerror )
-			local err = CompileString( self:GetCode(), "SF:" .. ( self:GetChosenFile() or "main" ), false )
-			
-			if type( err ) == "string" then
-				self.C.Val:SetBGColor( 128, 0, 0, 180 )
-				self.C.Val:SetFGColor( 255, 255, 255, 128 )
-				self.C.Val:SetText( "   " .. err )
-			else
-				self.C.Val:SetBGColor( 0, 128, 0, 180 )
-				self.C.Val:SetFGColor( 255, 255, 255, 128 )
-				self.C.Val:SetText( "   No Syntax Errors" )
-			end
-		end
+
+		SF.Editor.updateSettings()
+
+		SF.Editor.initialized = true
+
+		SF.Editor.addTab()
+
+		return true
 	end
-	
-	--- (Client) Returns true if initialized
-	function SF.Editor.isInitialized()
-		return SF.Editor.editor and true or false
-	end
-	
-	--- (Client) Opens the editor. Initializes it first if needed.
+
 	function SF.Editor.open()
-		SF.Editor.init()
-		SF.Editor.editor:Open()
+		if not SF.Editor.initialized then 
+			SF.Editor.init()
+		end
+
+		SF.Editor.editor:open()
+
+		if CanRunConsoleCommand() then
+			RunConsoleCommand( "starfall_event", "editor_open" )
+		end
 	end
-	
-	--- (Client) Gets the filename of the currently selected file.
-	-- @return The open file or nil if no files opened or not initialized
-	function SF.Editor.getOpenFile()
-		if not SF.Editor.editor then return nil end
-		return SF.Editor.editor:GetChosenFile()
+
+	function SF.Editor.close()
+		SF.Editor.editor:close()
+
+		if CanRunConsoleCommand() then
+			RunConsoleCommand( "starfall_event", "editor_close" )
+		end
 	end
-	
-	--- (Client) Gets the current code inside of the editor
-	-- @return Code string or nil if not initialized
+
+	function SF.Editor.updateCode() -- Incase anyone needs to force update the code
+		SF.Editor.runJS( "console.log(\"RUNLUA:SF.Editor.getActiveTab().code = \\\"\" + addslashes(editor.getValue()) + \"\\\"\")" )
+	end
+
 	function SF.Editor.getCode()
-		if not SF.Editor.editor then return nil end
-		return SF.Editor.editor:GetCode()
+		return SF.Editor.getActiveTab().code
 	end
-	
+
+	function SF.Editor.getOpenFile()
+		return SF.Editor.getActiveTab():GetText()
+	end
+
+	function SF.Editor.getTabHolder()
+		return SF.Editor.editor.components[ "tabHolder" ]
+	end
+
+	function SF.Editor.getActiveTab()
+		return SF.Editor.getTabHolder():getActiveTab()
+	end
+
+	function SF.Editor.selectTab( tab )
+		local tabHolder = SF.Editor.getTabHolder()
+		if type( tab ) == "number" then
+			tab = math.min( tab, #tabHolder.tabs )
+			tab = tabHolder.tabs[ tab ]  
+		end
+		if tab == nil then
+			SF.Editor.selectTab( 1 )
+			return
+		end
+
+		tabHolder:selectTab( tab )
+
+		SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
+	end
+
+	function SF.Editor.addTab( filename, code, name )
+		filename = filename or "generic"
+		code = code or defaultCode
+
+		SF.Editor.runJS( "newEditSession(\""..string.JavascriptSafe( code or defaultCode ).."\")" )
+
+		local tab = SF.Editor.getTabHolder():addTab( filename )
+		tab.code = code
+		tab.name = name
+
+		function tab:DoClick()
+			SF.Editor.selectTab( self )
+		end
+
+		SF.Editor.selectTab( tab )
+	end
+
+	function SF.Editor.removeTab( tab )
+		local tabHolder = SF.Editor.getTabHolder()
+		if type( tab ) == "number" then
+			tab = tabHolder.tabs[ tab ]  
+		end
+		if tab == nil then return end
+
+		tabHolder:removeTab( tab )
+	end
+
+	function SF.Editor.saveActiveTab()
+		if string.GetExtensionFromFilename( SF.Editor.getOpenFile() ) ~= "txt" then return end
+		local saveFile = "starfall/"..SF.Editor.getOpenFile()
+		file.Write( saveFile, SF.Editor.getActiveTab().code )
+		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+	end
+
+	function SF.Editor.doValidation( forceShow )
+
+		local function valid()
+			local code = SF.Editor.getActiveTab().code
+
+			local err = CompileString( code, "Validation", false )
+
+			if type( err ) ~= "string" then 
+				if forceShow then SF.AddNotify( LocalPlayer(), "Validation successful", NOTIFY_GENERIC, 3, NOTIFYSOUND_DRIP3 ) end
+				SF.Editor.runJS( "editor.session.clearAnnotations(); clearErrorLines()" )
+				return 
+			end
+
+			local row = tonumber( err:match( "%d+" ) ) - 1
+			local message = err:match( ": .+$" ):sub( 3 )
+
+			SF.Editor.runJS( string.format( "editor.session.setAnnotations([{row: %d, text: \"%s\", type: \"error\"}])", row, message:JavascriptSafe() ) )
+			SF.Editor.runJS( [[
+				clearErrorLines();
+
+				var Range = ace.require("ace/range").Range;
+				var range = new Range(]] .. row .. [[, 1, ]] .. row .. [[, Infinity);
+
+				editor.session.addMarker(range, "ace_error", "screenLine");
+
+			]] )
+			
+			if not forceShow then return end
+
+			SF.Editor.runJS( "editor.session.unfold({row: " .. row .. ", column: 0})" )
+			SF.Editor.runJS( "editor.scrollToLine( " .. row .. ", true )" )
+
+
+		end
+		if forceShow then valid() return end
+		if not timer.Exists( "validationTimer" ) or ( timer.Exists( "validationTimer") and not timer.Adjust( "validationTimer", 0.5, 1, valid ) ) then
+			timer.Remove( "validationTimer" )
+			timer.Create( "validationTimer", 0.5, 1, valid )
+		end
+
+	end
+
+	local function createLibraryMap()
+
+		local map = {}
+
+		for lib, tbl in pairs( SF.Types ) do
+			if ( lib == "Environment" or lib:find( "Library: " ) ) and type( tbl.__index ) == "table" then
+				lib = lib:Replace( "Library: ", "" )
+				map[ lib ] = {}
+				for name, val in pairs( tbl.__index ) do
+					table.insert( map[ lib ], name )
+				end
+			end
+		end
+
+		map.Angle = {}
+		for name, val in pairs( SF.Angles.Methods ) do
+			table.insert( map.Angle, name )
+		end
+		map.Color = {}
+		for name, val in pairs( SF.Color.Methods ) do
+			table.insert( map.Color, name )
+		end
+		map.Entity = {}
+		for name, val in pairs( SF.Entities.Methods ) do
+			table.insert( map.Entity, name )
+		end
+		map.Player = {}
+		for name, val in pairs( SF.Players.Methods ) do
+			table.insert( map.Player, name )
+		end
+		map.Sound = {}
+		for name, val in pairs( SF.Sounds.Methods ) do
+			table.insert( map.Sound, name )
+		end
+		map.VMatrix = {}
+		for name, val in pairs( SF.VMatrix.Methods ) do
+			table.insert( map.VMatrix, name )
+		end
+		map.Vector = {}
+		for name, val in pairs( SF.Vectors.Methods ) do
+			table.insert( map.Vector, name )
+		end
+
+		return map
+
+	end
+
+	function SF.Editor.createEditor()
+		local editor = vgui.Create( "StarfallFrame" )
+		editor:SetSize( 800, 600 )
+		editor:SetTitle( "Starfall Code Editor" )
+		editor:Center()
+
+		local buttonHolder = editor.components[ "buttonHolder" ]
+
+		-- Exit button
+		buttonHolder.buttons[ 1 ].DoClick = function( self )
+			SF.Editor.close()
+		end
+
+		-- Remove buttonLock
+		buttonHolder.buttons[ 2 ]:Remove()
+		buttonHolder.buttons[ 2 ] = nil
+
+		local buttonSaveExit = vgui.Create( "StarfallButton", buttonHolder )
+		buttonSaveExit:SetText( "Save and Exit" )
+		function buttonSaveExit:DoClick()
+			SF.Editor.saveActiveTab()
+			SF.Editor.close()
+		end
+		buttonHolder:addButton( buttonSaveExit )
+
+		local buttonSettings = vgui.Create( "StarfallButton", buttonHolder )
+		buttonSettings:SetText( "Settings" )
+		function buttonSettings:DoClick()
+			SF.Editor.settingsWindow:open()
+		end
+		buttonHolder:addButton( buttonSettings )
+
+		local buttonHelper = vgui.Create( "StarfallButton", buttonHolder )	
+		buttonHelper:SetText( "SF Helper" )
+		function buttonHelper:DoClick()
+			SF.Helper.show()
+		end
+		buttonHolder:addButton( buttonHelper )
+
+		local buttonFiles = vgui.Create( "StarfallButton", buttonHolder )
+		buttonFiles:SetText( "Files" )
+		function buttonFiles:DoClick()
+			SF.Editor.fileViewer:open()
+		end
+		buttonHolder:addButton( buttonFiles )
+
+		local buttonSaveAs = vgui.Create( "StarfallButton", buttonHolder )
+		buttonSaveAs:SetText( "Save As" )
+		function buttonSaveAs:DoClick()
+			Derma_StringRequestNoBlur(
+				"Save File",
+				"",
+				string.StripExtension( SF.Editor.getOpenFile() ),
+				function( text )
+					if text == "" then return end
+					text = string.gsub( text, ".", invalid_filename_chars )
+					local saveFile = "starfall/"..text..".txt"
+					file.Write( saveFile, SF.Editor.getActiveTab().code )
+					SF.Editor.getActiveTab():SetText( text .. ".txt" )
+					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.Editor.fileViewer.components["tree"]:reloadTree()
+				end
+			)
+		end
+		buttonHolder:addButton( buttonSaveAs )
+
+		local buttonSave = vgui.Create( "StarfallButton", buttonHolder )
+		buttonSave:SetText( "Save" )
+		function buttonSave:DoClick()
+			SF.Editor.saveActiveTab()
+		end
+		buttonHolder:addButton( buttonSave )
+
+		local buttonNewFile = vgui.Create( "StarfallButton", buttonHolder )
+		buttonNewFile:SetText( "New tab" )
+		function buttonNewFile:DoClick()
+			SF.Editor.addTab()
+		end
+		buttonHolder:addButton( buttonNewFile )
+
+		local buttonCloseTab = vgui.Create( "StarfallButton", buttonHolder )
+		buttonCloseTab:SetText( "Close tab" )
+		function buttonCloseTab:DoClick()
+			SF.Editor.removeTab( SF.Editor.getActiveTab() )
+		end
+		buttonHolder:addButton( buttonCloseTab )
+
+		local html = vgui.Create( "DHTML", editor )
+		html:SetPos( 5, 54 )
+		htmlEditorCode = htmlEditorCode:Replace( "<script>//replace//</script>", table.concat( aceFiles ) )
+		html:SetHTML( htmlEditorCode )
+
+		html:SetAllowLua( true )
+
+		local map = createLibraryMap()
+
+		html:QueueJavascript( "libraryMap = JSON.parse(\"" .. util.TableToJSON( map ):JavascriptSafe() .. "\")" )
+
+		local libs = {}
+		local functions = {}
+		table.ForEach( map, function( lib, vals )
+			if lib == "Environment" or lib:GetChar( 1 ):upper() ~= lib:GetChar( 1 ) then
+				table.insert( libs, lib )
+			end
+			table.ForEach( vals, function( key, val )
+				table.insert( functions, val )
+			end )
+		end )
+
+		html:QueueJavascript( "createStarfallMode(\"" .. table.concat( libs, "|" ) .. "\", \"" .. table.concat( table.Add( table.Copy( functions ), libs ), "|" ) .. "\")" )
+
+		function html:PerformLayout( ... )
+		 	self:SetSize( editor:GetWide() - 10, editor:GetTall() - 59 )
+		end
+		function html:OnKeyCodePressed( key, notfirst )
+
+			local function repeatKey()
+				timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function() self:OnKeyCodePressed( key, true ) end )
+			end
+
+			if GetConVarNumber( "starfall_editor_fixkeys" ) == 0 then return end
+			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and 
+				( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				if key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.modifyNumber(1)" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.modifyNumber(-1)" )
+					repeatKey()
+				elseif key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectWordLeft()" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectWordRight()" )
+					repeatKey()
+				end
+			elseif input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) then
+				if key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectLeft()" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectRight()" )
+					repeatKey()
+				elseif key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectUp()" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectDown()" )
+					repeatKey()
+				elseif key == KEY_HOME and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectLineStart()" )
+					repeatKey()
+				elseif key == KEY_END and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectLineEnd()" )
+					repeatKey()
+				end
+			elseif input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) then
+				if key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateWordLeft()" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateWordRight()" )
+					repeatKey()
+				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.removeWordLeft()" )
+					repeatKey()
+				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.removeWordRight()" )
+					repeatKey()
+				elseif key == KEY_SPACE and input.IsKeyDown( key ) then
+					SF.Editor.doValidation( true )
+				elseif key == KEY_C and input.IsKeyDown( key ) then
+					self:QueueJavascript( "console.log(\"RUNLUA:SetClipboardText(\\\"\"+ addslashes(editor.getSelectedText()) +\"\\\")\")" )
+				end
+			elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
+				if key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.moveLinesUp()" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.moveLinesDown()" )
+					repeatKey()
+				end
+			else
+				if key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateLeft(1)" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateRight(1)" )
+					repeatKey()
+				elseif key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateUp(1)" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateDown(1)" )
+					repeatKey()
+				elseif key == KEY_HOME and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateLineStart()" )
+					repeatKey()
+				elseif key == KEY_END and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateLineEnd()" )
+					repeatKey()
+				elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateFileStart()" )
+					repeatKey()
+				elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateFileEnd()" )
+					repeatKey()
+				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.remove('left')" )
+					repeatKey()
+				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.remove('right')" )
+					repeatKey()
+				elseif key == KEY_ENTER and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
+					repeatKey()
+				elseif key == KEY_INSERT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.toggleOverwrite()" )
+					repeatKey()
+				elseif key == KEY_TAB and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.indent()" )
+					repeatKey()
+				end
+			end
+		end
+		editor:AddComponent( "htmlPanel", html )
+
+		function editor:OnOpen()
+			html:Call( "editor.focus()" )
+			html:RequestFocus()
+		end
+
+		local tabHolder = vgui.Create( "StarfallTabHolder", editor )
+		tabHolder:SetPos( 5, 30 )
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save", function()
+			if not tabHolder.targetTab then return end
+			local fileName = tabHolder.targetTab:GetText()
+
+			if string.GetExtensionFromFilename( fileName ) ~= "txt" then return end
+			local saveFile = "starfall/"..fileName
+			file.Write( saveFile, tabHolder.targetTab.code )
+			SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+			tabHolder.targetTab = nil
+		end }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save As", function()
+			if not tabHolder.targetTab then return end
+			local fileName = tabHolder.targetTab:GetText()
+
+			Derma_StringRequestNoBlur(
+				"Save File",
+				"",
+				string.StripExtension( fileName ),
+				function( text )
+					if text == "" then return end
+					text = string.gsub( text, ".", invalid_filename_chars )
+					local saveFile = "starfall/"..text..".txt"
+					file.Write( saveFile, tabHolder.targetTab.code )
+					tabHolder.targetTab:SetText( text .. ".txt" )
+					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+					SF.Editor.fileViewer.components["tree"]:reloadTree()
+					tabHolder.targetTab = nil
+				end
+			)
+		end }
+		function tabHolder:OnRemoveTab( tabIndex )
+			SF.Editor.runJS( "removeEditSession("..tabIndex..")" )
+
+			if #self.tabs == 0 then
+				SF.Editor.addTab()
+			end
+			SF.Editor.selectTab( tabIndex )
+		end
+		editor:AddComponent( "tabHolder", tabHolder )
+
+		function editor:OnThink()
+			if self.Dragged or self.Resized then
+				SF.Editor.saveSettings()
+			end
+		end
+
+		return editor
+	end
+
+	function SF.Editor.createFileViewer()
+		local fileViewer = vgui.Create( "StarfallFrame" )
+		fileViewer:SetSize( 200, 600 )
+		fileViewer:SetTitle( "Starfall File Viewer" )
+		fileViewer:Center()
+
+		local browser = vgui.Create( "StarfallFileBrowser", fileViewer )
+
+		local searchBox, tree = browser:getComponents()
+		tree:setup( "starfall" )
+		function tree:OnNodeSelected( node )
+			if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
+			local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
+			local code = file.Read( node:GetFileName(), "DATA" )
+
+			for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
+				if v:GetText() == fileName and v.code == code then
+					SF.Editor.selectTab( v )
+					return
+				end
+			end
+
+			local data = {}
+			SF.Preprocessor.ParseDirectives( "file", code, {}, data )
+			SF.Editor.addTab( fileName, code, data.scriptnames and data.scriptnames.file or "" )
+		end
+
+		fileViewer:AddComponent( "browser", browser )
+
+		local buttonHolder = fileViewer.components[ "buttonHolder" ]
+
+		local buttonLock = buttonHolder.buttons[ 2 ]
+		buttonLock._DoClick = buttonLock.DoClick
+		buttonLock.DoClick = function( self )
+			self:_DoClick()
+			SF.Editor.saveSettings()
+		end
+
+		local buttonRefresh = vgui.Create( "StarfallButton", buttonHolder )
+		buttonRefresh:SetText( "Refresh" )
+		buttonRefresh:SetHoverColor( Color( 7, 70, 0 ) )
+		buttonRefresh:SetColor( Color( 26, 104, 17 ) )
+		buttonRefresh:SetLabelColor( Color( 103, 155, 153 ) )
+		function buttonRefresh:DoClick()
+			tree:reloadTree()
+			searchBox:SetValue( "Search..." )
+		end
+		buttonHolder:addButton( buttonRefresh )
+
+		function fileViewer:OnThink()
+			if self.Dragged or self.Resized then
+				SF.Editor.saveSettings()
+			end
+		end
+
+		return fileViewer
+	end
+
+	function SF.Editor.createSettingsWindow()
+		local frame = vgui.Create( "StarfallFrame" )
+		frame:SetSize( 200, 400 )
+		frame:SetTitle( "Starfall Settings" )
+		frame:Center()
+		frame:SetVisible( true )
+		frame:MakePopup( true )
+
+		local panel = vgui.Create( "StarfallPanel", frame )
+		panel:SetPos( 5, 40 )
+		function panel:PerformLayout()
+			self:SetSize( frame:GetWide() - 10, frame:GetTall() - 45 )
+		end
+		frame:AddComponent( "panel", panel )
+
+		local function setDoClick( panel )
+			function panel:OnChange()
+				SF.Editor.updateSettings()
+			end
+
+			return panel
+		end
+
+		local form = vgui.Create( "DForm", panel )	
+		form:Dock( FILL )
+		form.Header:SetVisible( false )
+		form.Paint = function() end
+		setDoClick(form:CheckBox( "Show fold widgets", "starfall_editor_widgets" ))
+		setDoClick(form:CheckBox( "Show line numbers", "starfall_editor_linenumbers" ))
+		setDoClick(form:CheckBox( "Show gutter", "starfall_editor_gutter" ))
+		setDoClick(form:CheckBox( "Show invisible characters", "starfall_editor_invisiblecharacters" ))
+		setDoClick(form:CheckBox( "Show indenting guides", "starfall_editor_indentguides" ))
+		setDoClick(form:CheckBox( "Highlight active line", "starfall_editor_activeline" ))
+		setDoClick(form:CheckBox( "Auto completion", "starfall_editor_autocompletion" ))
+		setDoClick(form:CheckBox( "Fix keys not working on Linux", "starfall_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+
+		return frame
+	end
+
+	function SF.Editor.saveSettings()
+		local frame = SF.Editor.editor
+		RunConsoleCommand( "starfall_editor_wide", frame:GetWide() )
+		RunConsoleCommand( "starfall_editor_tall", frame:GetTall() )
+		local x, y = frame:GetPos()
+		RunConsoleCommand( "starfall_editor_posx", x )
+		RunConsoleCommand( "starfall_editor_posy", y )
+
+		local frame = SF.Editor.fileViewer
+		RunConsoleCommand( "starfall_fileviewer_wide", frame:GetWide() )
+		RunConsoleCommand( "starfall_fileviewer_tall", frame:GetTall() )
+		local x, y = frame:GetPos()
+		RunConsoleCommand( "starfall_fileviewer_posx", x )
+		RunConsoleCommand( "starfall_fileviewer_posy", y )
+		RunConsoleCommand( "starfall_fileviewer_locked", frame.locked and 1 or 0 )
+	end
+
+	function SF.Editor.updateSettings()
+		local frame = SF.Editor.editor
+		frame:SetWide( GetConVarNumber( "starfall_editor_wide" ) )
+		frame:SetTall( GetConVarNumber( "starfall_editor_tall" ) )
+		frame:SetPos( GetConVarNumber( "starfall_editor_posx" ), GetConVarNumber( "starfall_editor_posy" ) )
+
+		local frame = SF.Editor.fileViewer
+		frame:SetWide( GetConVarNumber( "starfall_fileviewer_wide" ) )
+		frame:SetTall( GetConVarNumber( "starfall_fileviewer_tall" ) )
+		frame:SetPos( GetConVarNumber( "starfall_fileviewer_posx" ), GetConVarNumber( "starfall_fileviewer_posy" ) )
+		frame:lock( SF.Editor.editor )
+		frame.locked = tobool(GetConVarNumber( "starfall_fileviewer_locked" ))
+
+		local buttonLock = frame.components[ "buttonHolder" ].buttons[ 2 ]
+		buttonLock.active = frame.locked
+		buttonLock:SetText( frame.locked and "Locked" or "Unlocked" )
+
+		local js = SF.Editor.runJS
+		js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "starfall_editor_widgets" ) .. ")" )
+		js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "starfall_editor_linenumbers" ) .. ")" )
+		js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "starfall_editor_gutter" ) .. ")" )
+		js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "starfall_editor_invisiblecharacters" ) .. ")" )
+		js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "starfall_editor_indentguides" ) .. ")" )
+		js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "starfall_editor_activeline" ) .. ")" )
+		js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "starfall_editor_activeline" ) .. ")" )
+		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "starfall_editor_autocompletion" ) .. ")" )
+	end
+
 	--- (Client) Builds a table for the compiler to use
 	-- @param maincode The source code for the main chunk
 	-- @param codename The name of the main chunk
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
-	function SF.Editor.BuildIncludesTable(maincode, codename)
+	function SF.Editor.BuildIncludesTable( maincode, codename )
+		if not SF.Editor.initialized then
+			if not SF.Editor.init() then return end
+		end
 		local tbl = {}
 		maincode = maincode or SF.Editor.getCode()
 		codename = codename or SF.Editor.getOpenFile() or "main"
@@ -418,125 +739,185 @@ if CLIENT then
 		local loaded = {}
 		local ppdata = {}
 
-		local function recursiveLoad(path)
-			if loaded[path] then return end
-			loaded[path] = true
+		local function recursiveLoad( path )
+			if loaded[ path ] then return end
+			loaded[ path ] = true
 			
 			local code
 			if path == codename and maincode then
 				code = maincode
 			else
-				code = file.Read("Starfall/"..path, "DATA") or error("Bad include: "..path,0)
+				code = file.Read( "starfall/"..path, "DATA" ) or error( "Bad include: " .. path, 0 )
 			end
 			
-			tbl.files[path] = code
-			SF.Preprocessor.ParseDirectives(path,code,{},ppdata)
+			tbl.files[ path ] = code
+			SF.Preprocessor.ParseDirectives( path, code, {}, ppdata )
 			
-			if ppdata.includes and ppdata.includes[path] then
-				local inc = ppdata.includes[path]
-				if not tbl.includes[path] then
-					tbl.includes[path] = inc
+			if ppdata.includes and ppdata.includes[ path ] then
+				local inc = ppdata.includes[ path ]
+				if not tbl.includes[ path ] then
+					tbl.includes[ path ] = inc
 					tbl.filecount = tbl.filecount + 1
 				else
-					assert(tbl.includes[path] == inc)
+					assert( tbl.includes[ path ] == inc )
 				end
 				
-				for i=1,#inc do
-					recursiveLoad(inc[i])
+				for i = 1, #inc do
+					recursiveLoad( inc[i] )
 				end
 			end
 		end
-		local ok, msg = pcall(recursiveLoad, codename)
+		local ok, msg = pcall( recursiveLoad, codename )
 		if ok then
 			return true, tbl
-		elseif msg:sub(1,13) == "Bad include: " then
+		elseif msg:sub( 1, 13 ) == "Bad include: " then
 			return false, msg
 		else
-			error(msg,0)
+			error( msg, 0 )
 		end
 	end
 
+	net.Receive( "starfall_editor_getacefiles", function( len )
+		local index = net.ReadInt( 8 )
+		aceFiles[ index ] = net.ReadString()
+		
+		if not tobool( net.ReadBit() ) then 
+			net.Start( "starfall_editor_getacefiles" )
+			net.SendToServer()
+		else
+			SF.Editor.safeToInit = true
+			SF.Editor.init()
+		end
+	end )
+	net.Receive( "starfall_editor_geteditorcode", function( len )
+		htmlEditorCode = net.ReadString()
+	end )
 
 	-- CLIENT ANIMATION
 
-	local busy_players = {}
-	hook.Add("EntityRemoved", "starfall_busy_animation", function(ply)
-		busy_players[ply] = nil
-	end)
+	local busy_players = { }
+	hook.Add( "EntityRemoved", "starfall_busy_animation", function( ply )
+		busy_players[ ply ] = nil
+	end )
 
-	local emitter = ParticleEmitter(vector_origin)
+	local emitter = ParticleEmitter( vector_origin )
 
-	net.Receive("starfall_editor_status", function(len)
+	net.Receive( "starfall_editor_status", function( len )
 		local ply = net.ReadEntity()
 		local status = net.ReadBit() ~= 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
 		if not ply:IsValid() or ply == LocalPlayer() then return end
 
-		busy_players[ply] = status or nil
-	end)
+		busy_players[ ply ] = status or nil
+	end )
 
-	local rolldelta = math.rad(80)
-	timer.Create("starfall_editor_status", 1/3, 0, function()
+	local rolldelta = math.rad( 80 )
+	timer.Create( "starfall_editor_status", 1 / 3, 0, function( )
 		rolldelta = -rolldelta
-		for ply, _ in pairs(busy_players) do
-			local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1") or ply:LookupBone("ValveBiped.HC_Head_Bone") or 0
-			local BonePos, BoneAng = ply:GetBonePosition(BoneIndx)
-			local particle = emitter:Add("radon/starfall2", BonePos + Vector(math.random(-10,10), math.random(-10,10), 60+math.random(0,10)))
+		for ply, _ in pairs( busy_players ) do
+			local BoneIndx = ply:LookupBone( "ValveBiped.Bip01_Head1" ) or ply:LookupBone( "ValveBiped.HC_Head_Bone" ) or 0
+			local BonePos, BoneAng = ply:GetBonePosition( BoneIndx )
+			local particle = emitter:Add( "radon/starfall2", BonePos + Vector( math.random( -10, 10 ), math.random( -10, 10 ), 60 + math.random( 0, 10 ) ) )
 			if particle then
-				particle:SetColor(math.random(30,50),math.random(40,150),math.random(180,220) )
-				particle:SetVelocity(Vector(0, 0, -40))
+				particle:SetColor( math.random( 30, 50 ), math.random( 40, 150 ), math.random( 180, 220 ) )
+				particle:SetVelocity( Vector( 0, 0, -40 ) )
 
-				particle:SetDieTime(1.5)
-				particle:SetLifeTime(0)
+				particle:SetDieTime( 1.5 )
+				particle:SetLifeTime( 0 )
 
-				particle:SetStartSize(10)
-				particle:SetEndSize(5)
+				particle:SetStartSize( 10 )
+				particle:SetEndSize( 5 )
 
-				particle:SetStartAlpha(255)
-				particle:SetEndAlpha(0)
+				particle:SetStartAlpha( 255 )
+				particle:SetEndAlpha( 0 )
 
-				particle:SetRollDelta(rolldelta)
+				particle:SetRollDelta( rolldelta )
 			end
 		end
-	end)
+	end )
 
-else
+elseif SERVER then
 
-	-- SERVER STUFF HERE
-	-- -------------- client-side event handling ------------------
-	-- this might fit better elsewhere
+	util.AddNetworkString( "starfall_editor_status" )
+	util.AddNetworkString( "starfall_editor_getacefiles" )
+	util.AddNetworkString( "starfall_editor_geteditorcode" )
 
-	util.AddNetworkString("starfall_editor_status")
+	local function getFiles( dir, dir2 )
+		local files = {}
+		local dir2 = dir2 or ""
+		local f, directories = file.Find( dir .. "/" .. dir2 .. "/*", "GAME" )
+		for k, v in pairs( f ) do
+			files[ #files + 1 ] = dir2 .. "/" .. v
+		end
+		for k, v in pairs( directories ) do
+			table.Add( files, getFiles( dir, dir2 .. "/" .. v ) )
+		end
+		return files
+	end
 
-	resource.AddFile( "materials/radon/starfall2.png" )
-	resource.AddFile( "materials/radon/starfall2.vmt" )
-	resource.AddFile( "materials/radon/starfall2.vtf" )
+	local acefiles = {}
+
+	do
+		local netSize = 64000
+
+		local files = file.Find( addon_path .. "/html/starfall/ace/*", "GAME" )
+
+		local out = ""
+
+		for k, v in pairs( files ) do
+			out = out .. "<script>\n" .. file.Read( addon_path .. "/html/starfall/ace/" .. v, "GAME" ) .. "</script>\n"
+		end
+
+		for i = 1, math.ceil( out:len() / netSize ) do
+			acefiles[i] = out:sub( (i - 1)*netSize + 1, i*netSize )
+		end
+	end
+
+
+	local plyIndex = {}
+	local function sendAceFile( len, ply )
+		local index = plyIndex[ ply ]
+		net.Start( "starfall_editor_getacefiles" )
+			net.WriteInt( index, 8 )
+			net.WriteString( acefiles[ index ] )
+			net.WriteBit( index == #acefiles )
+		net.Send( ply )
+		plyIndex[ ply ] = index + 1
+	end
+
+	hook.Add( "PlayerInitialSpawn", "starfall_file_init", function( ply )
+		net.Start( "starfall_editor_geteditorcode" )
+			net.WriteString( file.Read( addon_path .. "/html/starfall/editor.html", "GAME" ) )
+		net.Send( ply )
+
+		plyIndex[ ply ] = 1
+		sendAceFile( nil, ply )
+	end )
+
+	net.Receive( "starfall_editor_getacefiles", sendAceFile )
+
+	for k, v in pairs( getFiles( addon_path, "materials/radon" ) ) do
+		resource.AddFile( v )
+	end
 
 	local starfall_event = {}
 
-
-	concommand.Add("starfall_event", function(ply, command, args)
-		local handler = starfall_event[args[1]]
+	concommand.Add( "starfall_event", function( ply, command, args )
+		local handler = starfall_event[ args[ 1 ] ]
 		if not handler then return end
-		return handler(ply, args)
-	end)
+		return handler( ply, args )
+	end )
 
-
-	-- actual editor open/close handlers
-
-
-	function starfall_event.editor_open(ply, args)
-		net.Start("starfall_editor_status")
-		net.WriteEntity(ply)
-		net.WriteBit(true)
+	function starfall_event.editor_open( ply, args )
+		net.Start( "starfall_editor_status" )
+		net.WriteEntity( ply )
+		net.WriteBit( true )
 		net.Broadcast()
 	end
 
-
-	function starfall_event.editor_close(ply, args)
-		net.Start("starfall_editor_status")
-		net.WriteEntity(ply)
-		net.WriteBit(false)
+	function starfall_event.editor_close( ply, args )
+		net.Start( "starfall_editor_status" )
+		net.WriteEntity( ply )
+		net.WriteBit( false )
 		net.Broadcast()
 	end
-
 end

@@ -164,12 +164,32 @@ if CLIENT then
 		docbutton:SetText("Starfall Documentation")
 		docbutton.DoClick = GotoDocs
 		
-		local filebrowser = vgui.Create("wire_expression2_browser")
-		panel:AddPanel(filebrowser)
-		filebrowser:Setup("starfall")
-		filebrowser:SetSize(235,400)
-		function filebrowser:OnFileOpen(filepath, newtab)
-			SF.Editor.editor:Open(filepath, nil, newtab)
+		local filebrowser = vgui.Create( "StarfallFileBrowser" )
+		panel:AddPanel( filebrowser )
+		filebrowser.tree:setup( "starfall" )
+		filebrowser:SetSize( 235,400 )
+		
+		local lastClick = 0
+		filebrowser.tree.DoClick = function( self, node )
+			if CurTime() <= lastClick + 0.5 then
+				if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
+				local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
+				local code = file.Read( node:GetFileName(), "DATA" )
+
+				for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
+					if v:GetText() == fileName and v.code == code then
+						SF.Editor.selectTab( v )
+						SF.Editor.open()
+						return
+					end
+				end
+
+				local data = {}
+				SF.Preprocessor.ParseDirectives( "file", code, {}, data )
+				SF.Editor.addTab( fileName, code, data.scriptnames and data.scriptnames.file or "" )
+				SF.Editor.open()
+			end
+			lastClick = CurTime()
 		end
 		
 		local openeditor = vgui.Create("DButton", panel)
