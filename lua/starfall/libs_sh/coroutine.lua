@@ -12,10 +12,10 @@ local coroutines = setmetatable( {}, { __mode = "v" } )
 
 local function createCoroutine ( func )
 	-- Can't use coroutine.create, because of a bug that prevents halting the program when it exceeds quota
-	local wrappedFunc = coroutine.wrap( function ()
-		local args = coroutine.yield( coroutine.running() ) -- Hack to get the coroutine from a wrapped function. Necessary because coroutine.create is not available
-		return func( args )
-	end )
+
+	-- Hack to get the coroutine from a wrapped function. Necessary because coroutine.create is not available
+	local wrappedFunc = coroutine.wrap( function() return func( coroutine.yield( coroutine.running() ) ) end ) 
+	
 	local thread = wrappedFunc()
 
 	coroutines[ thread ] = wrappedFunc
