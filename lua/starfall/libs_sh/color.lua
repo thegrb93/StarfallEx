@@ -23,19 +23,28 @@ SF.DefaultEnvironment.Color = function ( ... )
 	return wrap( Color( ... ) )
 end
 
+-- Lookup table.
+-- Index 1->4 have associative rgba for use in __index. Saves lots of checks
+-- String based indexing returns string, just a pass through.
+-- Think of rgb as a template for members of Color that are expected.
+local rgb = { [ 1 ] = "r", [ 2 ] = "g", [ 3 ] = "b", [ 4 ] = "a", r = "r", g = "g", b = "b", a = "a" }
+
 --- __newindex metamethod
 function color_metatable.__newindex ( t, k, v )
-	rawset( t, k, v )
+	if rgb[ k ] then
+		rawset( SF.UnwrapObject( t ), rgb[ k ], v )
+	else
+		rawset( t, k, v )
+	end
 end
-
-local _p = color_metatable.__index
 
 --- __index metamethod
 function color_metatable.__index ( t, k )
-	if k == "r" or k == "g" or k == "b" or k == "a" then
-		return unwrap( t )[ k ]
+	if rgb[ k ] then
+		return rawget( SF.UnwrapObject( t ), rgb[ k ] )
+	else
+		return rawget( t, k )
 	end
-	return _p[ k ]
 end
 
 --- __tostring metamethod
