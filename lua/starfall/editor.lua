@@ -306,50 +306,44 @@ if CLIENT then
 		end
 
 
-		SF.Editor.editor:Setup("SF Editor", "starfall", "nothing") -- Setting the editor type to not nil keeps the validator line
+		SF.Editor.editor:Setup( "SF Editor", "starfall", "" ) -- Setting the editor type to not nil keeps the validator line
 		
 		if not file.Exists("starfall", "DATA") then
 			file.CreateDir("starfall")
 		end
 		
+		-- Set Existing 'Save As' & 'Save & Exit' Button Size.
+		do
+			local editor = SF.Editor.editor
+			local sav = editor.C.SavAs
+			local sae = editor.C.SaE
+
+			sav:SetSize( 100, 20 )
+			sae:SetSize( 100, 20 )
+		end
+
 		-- Add "Sound Browser" button
 		do
 			local editor = SF.Editor.editor
-			local SoundBrw = editor:addComponent(vgui.Create("Button", editor), -205, 30, -125, 20)
-			SoundBrw.panel:SetText("")
-			SoundBrw.panel.Font = "E2SmallFont"
-			SoundBrw.panel.Paint = function(button)
-				local w,h = button:GetSize()
-				draw.RoundedBox(1, 0, 0, w, h, editor.colors.col_FL)
-				if ( button.Hovered ) then draw.RoundedBox(0, 1, 1, w - 2, h - 2, Color(0,0,0,192)) end
-				surface.SetFont(button.Font)
-				surface.SetTextPos( 3, 4 )
-				surface.SetTextColor( 255, 255, 255, 255 )
-				surface.DrawText("  Sound Browser")
+			local SoundBrw = vgui.Create( "DButton", editor.C.Menu )
+			SoundBrw:SetText( "Sound Browser" )
+			SoundBrw:SetSize( 100, 20 )
+			SoundBrw:Dock( RIGHT )
+			SoundBrw.DoClick = function ()
+				RunConsoleCommand( "wire_sound_browser_open" )
 			end
-			SoundBrw.panel.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
 			editor.C.SoundBrw = SoundBrw
 		end
 		
 		-- Add "SFHelper" button
 		do
 			local editor = SF.Editor.editor
-			local SFHelp = editor:addComponent( vgui.Create( "Button" , editor ), -262, 30, -207, 20 )
-			SFHelp.panel:SetText( "" )
-			SFHelp.panel.Font = "E2SmallFont"
-			SFHelp.panel.Paint = function ( button )
-				local w, h = button:GetSize( )
-				draw.RoundedBox( 1, 0, 0, w, h, editor.colors.col_FL )
-				if button.Hovered then 
-					draw.RoundedBox( 0, 1, 1, w - 2, h - 2, Color(0, 0, 0, 192) ) 
-				end
-				surface.SetFont( button.Font )
-				surface.SetTextPos( 3, 4 )
-				surface.SetTextColor( 255, 255, 255, 255 )
-				surface.DrawText( "  SFHelper" )
-			end
-			SFHelp.panel.DoClick = function ( )
-				SF.Helper.show( )
+			local SFHelp = vgui.Create( "DButton", editor.C.Menu )
+			SFHelp:SetText( "SFHelper" )
+			SFHelp:SetSize( 100, 20 )
+			SFHelp:Dock( RIGHT )
+			SFHelp.DoClick = function ()
+				SF.Helper.show()
 			end
 			editor.C.SFHelp = SFHelp
 		end
@@ -357,26 +351,27 @@ if CLIENT then
 		SF.Editor.editor:SetSyntaxColorLine( SyntaxColorLine )
 		--SF.Editor.editor:SetSyntaxColorLine( function(self, row) return {{self.Rows[row], Color(255,255,255)}} end)
 		
-		function SF.Editor.editor:OnTabCreated( tab )
+		-- This prefills our code when a new 'tab' is made.
+		function SF.Editor.editor:OnTabCreated ( tab )
 			local editor = tab.Panel
 			editor:SetText( code1 .. code2 )
-			editor.Start = editor:MovePosition({1,1}, #code1)
-			editor.Caret = editor:MovePosition(editor.Start, #code2)
+			editor.Start = editor:MovePosition( { 1, 1 }, #code1 )
+			editor.Caret = editor:MovePosition( editor.Start, #code2 )
 		end
 		
 		local editor = SF.Editor.editor:GetCurrentEditor()
 		
-		function SF.Editor.editor:Validate(gotoerror)
-			local err = CompileString(self:GetCode(), "SF:"..(self:GetChosenFile() or "main"), false)
+		function SF.Editor.editor:Validate ( gotoerror )
+			local err = CompileString( self:GetCode(), "SF:" .. ( self:GetChosenFile() or "main" ), false )
 			
-			if type(err) == "string" then
-				self.C['Val'].panel:SetBGColor(128, 0, 0, 180)
-				self.C['Val'].panel:SetFGColor(255, 255, 255, 128)
-				self.C['Val'].panel:SetText( "   " .. err )
+			if type( err ) == "string" then
+				self.C.Val:SetBGColor( 128, 0, 0, 180 )
+				self.C.Val:SetFGColor( 255, 255, 255, 128 )
+				self.C.Val:SetText( "   " .. err )
 			else
-				self.C['Val'].panel:SetBGColor(0, 128, 0, 180)
-				self.C['Val'].panel:SetFGColor(255, 255, 255, 128)
-				self.C['Val'].panel:SetText( "   No Syntax Errors" )
+				self.C.Val:SetBGColor( 0, 128, 0, 180 )
+				self.C.Val:SetFGColor( 255, 255, 255, 128 )
+				self.C.Val:SetText( "   No Syntax Errors" )
 			end
 		end
 	end
