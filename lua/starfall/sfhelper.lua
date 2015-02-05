@@ -32,6 +32,9 @@ if CLIENT then
 end
 
 local function saveSettings()
+	helper.Settings.FrameWidth, helper.Settings.FrameHeight = w, h
+	helper.Settings.FrameX, helper.Settings.FrameY = helper.Frame:GetPos()
+	helper.Settings.DivHeight = helper.DocView.Div:GetTopHeight()
 	file.Write( "sfhelpersettings.txt", util.TableToJSON( helper.Settings ) )
 end
 
@@ -729,10 +732,6 @@ function helper.resize()
 		helper.DocView.Div:SetTopHeight( settings.DivHeight )
 		settings_set = true
 	end
-
-	settings.FrameWidth, settings.FrameHeight = w, h
-	settings.FrameX, settings.FrameY = helper.Frame:GetPos()
-	settings.DivHeight = helper.DocView.Div:GetTopHeight()
 
 	lastw, lasth = w, h
 end
