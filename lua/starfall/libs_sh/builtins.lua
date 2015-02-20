@@ -265,15 +265,64 @@ function SF.DefaultEnvironment.require(file)
 	end
 end
 
+--- Runs an included script and caches the result.
+-- Works pretty much like standard Lua require()
+-- @param dir The directory to include. Make sure to --@includedir it
+-- @return Table of return values of the scripts
+function SF.DefaultEnvironment.requiredir( dir )
+    SF.CheckType( dir, "string")
+    local loaded = SF.instance.data.reqloaded
+    if not loaded then
+        loaded = {}
+        SF.instance.data.reqloaded = loaded
+    end
+
+    local returns = {}
+
+    local files = file.Find( "starfall/" .. dir .. "/*", "DATA" )
+    for _, file in pairs( files ) do
+        file = dir .. "/" .. file
+        if loaded[ file ] then
+            returns[ file ] = loaded[file]
+        else
+            local func = SF.instance.scripts[file]
+            if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@includedir it?)", 2 ) end
+            loaded[ file ] = func( ) or true
+            returns[ file ] = loaded[file]
+        end
+    end
+
+    return returns
+end
+
 --- Runs an included script, but does not cache the result.
 -- Pretty much like standard Lua dofile()
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
-	SF.CheckType(file, "string")
-	local func = SF.instance.scripts[file]
-	if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
-	return func()
+    SF.CheckType(file, "string")
+    local func = SF.instance.scripts[file]
+    if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
+    return func()
+end
+
+--- Runs an included directory, but does not cache the result.
+-- @param dir The directory to include. Make sure to --@includedir it
+-- @return Table of return values of the scripts
+function SF.DefaultEnvironment.dodir( dir )
+    SF.CheckType( dir, "string" )
+
+    local returns = {}
+
+    local files = file.Find( "starfall/" .. dir .. "/*", "DATA" )
+    for _, file in pairs( files ) do
+        file = dir .. "/" .. file
+        local func = SF.instance.scripts[file]
+        if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@includedir it?)", 2 ) end
+        returns[ file ] = func()
+    end
+
+    return returns
 end
 
 --- GLua's loadstring
