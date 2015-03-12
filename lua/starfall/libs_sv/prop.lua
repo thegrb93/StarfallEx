@@ -133,6 +133,8 @@ function props_library.create ( pos, ang, model, frozen )
 		end
 	end
 	
+	instance.player:AddCleanup( "props", propent )
+	
 	gamemode.Call( "PlayerSpawnedProp", instance.player, model, propent )
 	FixInvalidPhysicsObject( propent )
 
