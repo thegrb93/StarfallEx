@@ -11,7 +11,10 @@ local canTool = {
 	[ "entities.unparent" ] = true,
 	[ "entities.setSolid" ] = true,
 	[ "entities.enableGravity" ] = true,
+	[ "entities.enableMotion" ] = true,
+	[ "entities.enableDrag" ] = true,
 	[ "entities.setColor" ] = true,
+	[ "entities.remove" ] = true,
 	[ "wire.createWire" ] = true,
 	[ "wire.deleteWire" ] = true
 }
