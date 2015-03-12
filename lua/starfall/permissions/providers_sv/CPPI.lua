@@ -10,6 +10,7 @@ local canTool = {
 	[ "entities.parent" ] = true,
 	[ "entities.unparent" ] = true,
 	[ "entities.setSolid" ] = true,
+	[ "entities.setMass" ] = true,
 	[ "entities.enableGravity" ] = true,
 	[ "entities.enableMotion" ] = true,
 	[ "entities.enableDrag" ] = true,
