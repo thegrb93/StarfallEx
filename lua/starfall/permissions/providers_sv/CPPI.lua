@@ -13,7 +13,15 @@ local canTool = {
 	[ "entities.enableGravity" ] = true,
 	[ "entities.setColor" ] = true,
 	[ "wire.createWire" ] = true,
-	[ "wire.deleteWire" ] = true
+	[ "wire.deleteWire" ] = true,
+	[ "constraints.weld" ] = true,
+	[ "constraints.axis" ] = true,
+	[ "constraints.ballsocket" ] = true,
+	[ "constraints.ballsocketadv" ] = true,
+	[ "constraints.slider" ] = true,
+	[ "constraints.rope" ] = true,
+	[ "constraints.elastic" ] = true,
+	[ "constraints.nocollide" ] = true
 }
 
 local canPhysgun = {
