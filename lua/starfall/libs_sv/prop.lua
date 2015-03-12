@@ -15,6 +15,11 @@ SF.Props.personalquota = CreateConVar( "sf_props_personalquota", "100", {FCVAR_A
 SF.Props.burstrate = CreateConVar( "sf_props_burstrate", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The default number of props allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
 
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "prop.create", "Create prop", "Allows the user to create props" )
+end
 
 local insts = {}
 local plyCount = {}
@@ -102,6 +107,9 @@ end )
 -- @server
 -- @return The prop object
 function props_library.create ( pos, ang, model, frozen )
+	
+	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then SF.throw( "Insufficient permissions", 2 ) end
+
 	SF.CheckType( pos, SF.Types[ "Vector" ] )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )
 	SF.CheckType( model, "string" )
@@ -150,7 +158,11 @@ end
 --- Checks if a user can spawn anymore props.
 -- @server
 -- @return True if user can spawn props, False if not.
-function props_library.canSpawn()
+function props_library.canSpawn ()
+
+	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return false end
+	
 	local instance = SF.instance
 	return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
+	
 end
