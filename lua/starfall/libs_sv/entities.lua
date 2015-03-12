@@ -28,6 +28,7 @@ do
 	P.registerPrivilege( "entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity" )
 	P.registerPrivilege( "entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity" )
 	P.registerPrivilege( "entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity" )
+	P.registerPrivilege( "entities.setMass", "Set Mass", "Allows the user to change the mass of an entity" )
 	P.registerPrivilege( "entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity" )
 	P.registerPrivilege( "entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion" )
 	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence" )
@@ -394,6 +395,21 @@ function ents_methods:setSolid ( solid )
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	ent:SetNotSolid( not solid )
+end
+
+--- Sets the entity's mass
+-- @param number mass
+function ents_methods:setMass ( mass )
+	local ent = unwrap( self )
+	
+	if not isValid( ent ) then return false, "entity not valid" end
+	local phys = getPhysObject( ent )
+	if not phys then return false, "entity has no physics object" end
+	
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	phys:SetMass( math.Clamp(mass, 1, 50000) )
+	return true
 end
 
 --- Sets entity gravity
