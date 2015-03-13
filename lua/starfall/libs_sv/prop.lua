@@ -7,13 +7,16 @@ local vunwrap = SF.UnwrapObject
 
 SF.Props = {}
 SF.Props.defaultquota = CreateConVar( "sf_props_defaultquota", "200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of props allowed to spawn via Starfall scripts across all instances" )
+	"The number of props allowed to spawn via Starfall scripts across all instances" )
 
 SF.Props.personalquota = CreateConVar( "sf_props_personalquota", "100", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of props allowed to spawn via Starfall scripts for a single instance" )
+	"The number of props allowed to spawn via Starfall scripts for a single instance" )
 
+SF.Props.burstmax = CreateConVar( "sf_props_burstmax", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The number of props allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
+	
 SF.Props.burstrate = CreateConVar( "sf_props_burstrate", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of props allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
+	"The rate at which the burst regenerates per second." )
 
 -- Register privileges
 do
@@ -28,7 +31,7 @@ SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.props = {
 		props = {},
 		count = 0,
-		burst = SF.Props.burstrate:GetInt() or 10
+		burst = SF.Props.burstmax:GetInt() or 4
 	}
 
 	insts[inst] = true
@@ -95,13 +98,19 @@ local function personal_max_reached( i )
 	return plyCount[i.player] >= SF.Props.personalquota:GetInt()
 end
 
-timer.Create( "SF_Prop_BurstCounter", 1/4, 0, function()
+local function regenerateBurst()
 	for i, _ in pairs( insts ) do
-		if i.data.props.burst < SF.Props.burstrate:GetInt() or 10 then -- Should allow for dynamic changing of burst rate from the server.
+		if i.data.props.burst < SF.Props.burstmax:GetInt() or 4 then -- Should allow for dynamic changing of burst rate from the server.
 			i.data.props.burst = i.data.props.burst + 1
 		end
 	end
-end )
+end
+
+timer.Create( "SF_Prop_BurstCounter", 1 / math.max( SF.Props.burstrate:GetFloat() or 4, 0.0001 ), 0, regenerateBurst )
+
+cvars.AddChangeCallback( "sf_props_burstrate", function( convar_name, value_old, value_new )
+	timer.Adjust( "SF_Prop_BurstCounter", 1 / math.max( SF.Props.burstrate:GetFloat() or 4, 0.0001 ), 0, regenerateBurst )
+end ) 
 
 --- Creates a prop.
 -- @server
@@ -164,5 +173,14 @@ function props_library.canSpawn ()
 	
 	local instance = SF.instance
 	return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
+	
+end
+
+--- Returns how many props per second the user can spawn
+-- @server
+-- @return Number of props per second the user can spawn
+function props_library.spawnRate ()
+
+	return SF.Props.burstrate:GetFloat() or 4
 	
 end
