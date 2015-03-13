@@ -128,7 +128,7 @@ function props_library.create ( pos, ang, model, frozen )
 	local propdata = instance.data.props
 	local propent = ents.Create( "prop_physics" )
 	
-	propent:CallOnRemove( "starfall_propgram_delete", propOnDestroy, propdata, instance.player )
+	propent:CallOnRemove( "starfall_prop_delete", propOnDestroy, propdata, instance.player )
 	propent:SetPos( pos )
 	propent:SetAngles( ang )
 	propent:SetModel( model )
