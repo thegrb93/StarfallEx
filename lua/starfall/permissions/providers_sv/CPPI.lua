@@ -25,7 +25,8 @@ local canTool = {
 	[ "constraints.slider" ] = true,
 	[ "constraints.rope" ] = true,
 	[ "constraints.elastic" ] = true,
-	[ "constraints.nocollide" ] = true
+	[ "constraints.nocollide" ] = true,
+	[ "constraints.any" ] = true
 }
 
 local canPhysgun = {
