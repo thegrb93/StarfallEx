@@ -46,13 +46,13 @@ SF.Libraries.AddHook("deinitialize", function(inst)
 		props[prop] = nil
 		prop = next(props)
 	end
-	plyCount[inst.player] = plyCount[inst.player] - inst.data.props.count
 	inst.data.props.count = 0
 
 	insts[inst]= nil
 end)
 
-local function propOnDestroy(propent, propdata)
+local function propOnDestroy(propent, propdata, ply)
+	plyCount[ply] = plyCount[ply] - 1
 	if not propdata.props then return end
 	local prop = SF.Entities.Wrap(propent)
 	if propdata.props[prop] then
@@ -128,7 +128,7 @@ function props_library.create ( pos, ang, model, frozen )
 	local propdata = instance.data.props
 	local propent = ents.Create( "prop_physics" )
 	
-	propent:CallOnRemove( "starfall_propgram_delete", propOnDestroy, propdata )
+	propent:CallOnRemove( "starfall_propgram_delete", propOnDestroy, propdata, instance.player )
 	propent:SetPos( pos )
 	propent:SetAngles( ang )
 	propent:SetModel( model )
