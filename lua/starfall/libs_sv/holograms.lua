@@ -10,13 +10,16 @@ local vunwrap = SF.UnwrapObject
 
 SF.Holograms = {}
 SF.Holograms.defaultquota = CreateConVar( "sf_holograms_defaultquota", "7200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of holograms allowed to spawn via Starfall scripts across all instances" )
+	"The number of holograms allowed to spawn via Starfall scripts across all instances" )
 
 SF.Holograms.personalquota = CreateConVar( "sf_holograms_personalquota", "300", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The default number of holograms allowed to spawn via Starfall scripts for a single instance" )
+	"The number of holograms allowed to spawn via Starfall scripts for a single instance" )
 
-SF.Holograms.burstrate = CreateConVar( "sf_holograms_burstrate", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-    "The default number of holograms allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
+SF.Holograms.burstmax = CreateConVar( "sf_holograms_burstmax", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+    "The number of holograms allowed to spawn in a short interval of time via Starfall scripts for a single instance ( burst )" )
+	
+SF.Holograms.burstrate = CreateConVar( "sf_holograms_burstrate", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The rate at which the burst regenerates per second." )
 
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
@@ -38,7 +41,7 @@ SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.holograms = {
 		holos = {},
 		count = 0,
-		burst = SF.Holograms.burstrate:GetInt() or 10
+		burst = SF.Holograms.burstmax:GetInt() or 10
 	}
 
 	insts[inst] = true
@@ -277,13 +280,19 @@ local function personal_max_reached( i )
     return plyCount[i.player] >= SF.Holograms.personalquota:GetInt()
 end
 
-timer.Create( "SF_Hologram_BurstCounter", 1/4, 0, function()
-    for i, _ in pairs( insts ) do
-        if i.data.holograms.burst < SF.Holograms.burstrate:GetInt() or 10 then -- Should allow for dynamic changing of burst rate from the server.
-            i.data.holograms.burst = i.data.holograms.burst + 1
-        end
-    end
-end )
+local function regenerateBurst()
+	for i, _ in pairs( insts ) do
+		if i.data.holograms.burst < SF.Holograms.burstmax:GetInt() or 10 then -- Should allow for dynamic changing of burst rate from the server.
+			i.data.holograms.burst = i.data.holograms.burst + 1
+		end
+	end
+end
+
+timer.Create( "SF_Hologram_BurstCounter", 1 / math.max( SF.Holograms.burstrate:GetFloat() or 4, 0.0001 ), 0, regenerateBurst )
+
+cvars.AddChangeCallback( "sf_holograms_burstrate", function( convar_name, value_old, value_new )
+	timer.Adjust( "SF_Hologram_BurstCounter", 1 / math.max( SF.Holograms.burstrate:GetFloat() or 4, 0.0001 ), 0, regenerateBurst )
+end ) 
 
 --- Creates a hologram.
 -- @server
@@ -335,4 +344,13 @@ end
 function holograms_library.canSpawn()
     local instance = SF.instance
     return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
+end
+
+--- Returns how many holograms per second the user can spawn
+-- @server
+-- @return Number of holograms per second the user can spawn
+function holograms_library.spawnRate ()
+
+	return SF.Holograms.burstrate:GetFloat() or 4
+	
 end
