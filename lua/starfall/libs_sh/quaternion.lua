@@ -602,6 +602,35 @@ function quat_lib.qRotation(rv1)
 	return quicknew( cos(ang2), rv1.x * sang2len , rv1.y * sang2len, rv1.z * sang2len )
 end
 
+--- Returns the euler angle of rotation in degrees
+function quat_lib.rotationEulerAngle(q)
+	local l = sqrt(q[1]*q[1]+q[2]*q[2]+q[3]*q[3]+q[4]*q[4])
+	if l == 0 then return SF.WrapObject( Angle( 0, 0, 0) ) end
+	local q1, q2, q3, q4 = q[1]/l, q[2]/l, q[3]/l, q[4]/l
+
+	local x = Vector(q1*q1 + q2*q2 - q3*q3 - q4*q4,
+		2*q3*q2 + 2*q4*q1,
+		2*q4*q2 - 2*q3*q1)
+
+	local y = Vector(2*q2*q3 - 2*q4*q1,
+		q1*q1 - q2*q2 + q3*q3 - q4*q4,
+		2*q2*q1 + 2*q3*q4)
+
+	local ang = x:Angle()
+	if ang.p > 180 then ang.p = ang.p - 360 end
+	if ang.y > 180 then ang.y = ang.y - 360 end
+
+	local yyaw = Vector(0,1,0)
+	yyaw:Rotate(Angle(0,ang.y,0))
+
+	ang.roll = acos(math.Clamp(y:Dot(yyaw), -1, 1))*rad2deg
+
+	local dot = q2*q1 + q3*q4
+	if dot < 0 then ang.roll = -ang.roll end
+
+	return SF.WrapObject( ang )
+end
+
 --- Returns the angle of rotation in degrees (by coder0xff)
 function quat_lib.rotationAngle(q)
 	local l2 = q[1]*q[1] + q[2]*q[2] + q[3]*q[3] + q[4]*q[4]
