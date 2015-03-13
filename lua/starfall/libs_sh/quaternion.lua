@@ -602,7 +602,7 @@ function quat_lib.qRotation(rv1)
 	return quicknew( cos(ang2), rv1.x * sang2len , rv1.y * sang2len, rv1.z * sang2len )
 end
 
---- Returns the euler angle of rotation in degrees (by sparky)
+--- Returns the euler angle of rotation in degrees
 function quat_lib.rotationEulerAngle(q)
 	local l = sqrt(q[1]*q[1]+q[2]*q[2]+q[3]*q[3]+q[4]*q[4])
 	if l == 0 then return SF.WrapObject( Angle( 0, 0, 0) ) end
