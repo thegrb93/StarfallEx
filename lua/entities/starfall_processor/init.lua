@@ -19,17 +19,116 @@ function ENT:Initialize ()
 	self:SetColor( Color( 255, 0, 0, self:GetColor().a ) )
 end
 
-function ENT:Compile ( codetbl, mainfile )
-	if self.instance then self.instance:deinitialize() end
+
+util.AddNetworkString( "starfall_processor_download" )
+util.AddNetworkString( "starfall_processor_update" )
+util.AddNetworkString( "starfall_processor_update_links" )
+util.AddNetworkString( "starfall_processor_used" )
+util.AddNetworkString( "starfall_processor_link" )
+
+local function sendCode ( proc, owner, files, mainfile, recipient )
+	net.Start( "starfall_processor_download" )
+	net.WriteEntity( proc )
+	net.WriteEntity( owner )
+	net.WriteString( mainfile )
+	if recipient then net.Send( recipient ) else net.Broadcast() end
+
+	local fname = next( files )
+	while fname do
+		local fdata = files[ fname ]
+		local offset = 1
+		repeat
+			net.Start( "starfall_processor_download" )
+			net.WriteBit( false )
+			net.WriteString( fname )
+			local data = fdata:sub( offset, offset + 60000 )
+			net.WriteString( data )
+			if recipient then net.Send( recipient ) else net.Broadcast() end
+
+			offset = offset + #data + 1
+		until offset > #fdata
+		fname = next( files, fname )
+	end
+
+	net.Start( "starfall_processor_download" )
+	net.WriteBit( true )
+	if recipient then net.Send( recipient ) else net.Broadcast() end
+end
+
+local requests = {}
+
+local function sendCodeRequest(ply, procid)
+	local proc = Entity(procid)
+
+	if not proc.mainfile then
+		if not requests[procid] then requests[procid] = {} end
+		if requests[procid][player] then return end
+		requests[procid][ply] = true
+		return
+
+	elseif proc.mainfile then
+		if requests[procid] then
+			requests[procid][ply] = nil
+		end
+		sendCode(proc, proc.owner, proc.files, proc.mainfile, ply)
+	end
+end
+
+local function retryCodeRequests()
+	for procid,plys in pairs(requests) do
+		for ply,_ in pairs(requests[procid]) do
+			sendCodeRequest(ply, procid)
+		end
+	end
+end
+
+net.Receive("starfall_processor_download", function(len, ply)
+	local proc = net.ReadEntity()
+	sendCodeRequest(ply, proc:EntIndex())
+end)
+
+net.Receive("starfall_processor_update_links", function(len, ply)
+	local ply = net.ReadEntity()
+	local linked = net.ReadEntity()
+	if IsValid( linked.link ) then
+		linked:LinkEnt( linked.link, ply )
+	end
+end)
+
+function ENT:Compile(files, mainfile)
+	local update = self.mainfile ~= nil
+
+	self.files = files
+	self.mainfile = mainfile
+
+	if update then
+		net.Start("starfall_processor_update")
+			net.WriteEntity(self)
+			for k,v in pairs(files) do
+				net.WriteBit(false)
+				net.WriteString(k)
+				net.WriteString(util.CRC(v))
+			end
+			net.WriteBit(true)
+		net.Broadcast()
+	end
+
+	local ppdata = {}
+	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
+		
+	local ok, instance = SF.Compiler.Compile( files, context, mainfile, self.owner, { entity = self } )
+	if not ok then self:Error(instance) return end
 	
-	local ok, instance = SF.Compiler.Compile( codetbl, context, mainfile, self.owner, { entity = self } )
-	if not ok then self:Error( instance ) return end
-	
-	instance.runOnError = function ( inst, ... ) self:Error( ... ) end
-	
+	instance.runOnError = function(inst,...) self:Error(...) end
+
+	if self.instance then
+		self.instance:deinitialize()
+		self.instance = nil
+	end
+
 	self.instance = instance
 	
-	local ok, msg, traceback = instance:initialize ()
+	local ok, msg, traceback = instance:initialize()
 	if not ok then
 		self:Error( msg, traceback )
 		return
@@ -46,6 +145,12 @@ function ENT:Compile ( codetbl, mainfile )
 	self:UpdateState( "( None )" )
 	local clr = self:GetColor()
 	self:SetColor( Color( 255, 255, 255, clr.a ) )
+	
+	for k, v in pairs(ents.GetAll()) do
+		if v.link == self then
+			v:LinkEnt( self )
+		end
+	end
 end
 
 function ENT:Error ( msg, traceback )
@@ -74,21 +179,6 @@ end
 
 function ENT:OnRemove ()
 	self.BaseClass.OnRemove( self )
-end
-
-function ENT:runScriptHook ( hook, ... )
-	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
-		local ok, rt = self.instance:runScriptHook( hook, ... )
-		if not ok then self:Error( rt ) end
-	end
-end
-
-function ENT:runScriptHookForResult ( hook,... )
-	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
-		local ok, rt = self.instance:runScriptHookForResult( hook, ... )
-		if not ok then self:Error( rt )
-		else return rt end
-	end
 end
 
 function ENT:BuildDupeInfo ()
