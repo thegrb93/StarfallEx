@@ -25,6 +25,17 @@ function ENT:Draw ()
     end
 end
 
+function ENT:Think ()
+	self.BaseClass.Think( self )
+	
+	if self.instance and not self.instance.error then
+		self:runScriptHook( "think" )
+	end
+
+	self:NextThink( CurTime() )
+	return true
+end
+
 function ENT:CodeSent ( files, main, owner )
 	if not files or not main or not owner then return end
 	if self.instance then self.instance:deinitialize() end
