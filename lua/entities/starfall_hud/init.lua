@@ -30,7 +30,7 @@ function ENT:LinkVehicle( ent )
 	vehiclelinks[ent] = self
 end
 
-hook.Add("PlayerEnteredVehicle","EGP_HUD_PlayerEnteredVehicle",function( ply, vehicle )
+hook.Add("PlayerEnteredVehicle","Starfall_HUD_PlayerEnteredVehicle",function( ply, vehicle )
 	for k,v in pairs( vehiclelinks ) do
 		if vehicle == k and v:IsValid() then
 			vehicle:CallOnRemove("remove_sf_hud", function()
@@ -49,7 +49,7 @@ hook.Add("PlayerEnteredVehicle","EGP_HUD_PlayerEnteredVehicle",function( ply, ve
 	end
 end)
 
-hook.Add("PlayerLeaveVehicle","EGP_HUD_PlayerLeaveVehicle",function( ply, vehicle )
+hook.Add("PlayerLeaveVehicle","Starfall_HUD_PlayerLeaveVehicle",function( ply, vehicle )
 	for k,v in pairs( vehiclelinks ) do
 		if vehicle == k and v:IsValid() then
 			net.Start( "starfall_hud_set_enabled" )
