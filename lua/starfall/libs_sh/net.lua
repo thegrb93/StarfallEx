@@ -318,7 +318,7 @@ end
 
 net.Receive( "SF_netmessage", function( len, ply )
 	local ent = net.ReadEntity()
-	if ent:IsValid() and ent:GetClass() == "starfall_screen" then
+	if ent:IsValid() and ent.runScriptHook then
 		ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
 	end
 end)

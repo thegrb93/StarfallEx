@@ -34,7 +34,7 @@ if SERVER then
 	end
 else
 	language.Add( "Tool.starfall_processor.name", "Starfall - Processor" )
-	language.Add( "Tool.starfall_processor.desc", "Spawns a starfall processor (Press shift+f to switch to screen and back again)" )
+	language.Add( "Tool.starfall_processor.desc", "Spawns a starfall processor" )
 	language.Add( "Tool.starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
 	language.Add( "sboxlimit_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Starfall Processor", "Undone Starfall Processor" )
@@ -109,32 +109,6 @@ function TOOL:Think()
 end
 
 if CLIENT then
-	local function get_active_tool(ply, tool)
-		-- find toolgun
-		local activeWep = ply:GetActiveWeapon()
-		if not IsValid(activeWep) or activeWep:GetClass() ~= "gmod_tool" or activeWep.Mode ~= tool then return end
-
-		return activeWep:GetToolObject(tool)
-	end
-	
-	hook.Add("PlayerBindPress", "wire_adv", function(ply, bind, pressed)
-		if not pressed then return end
-	
-		if bind == "impulse 100" and ply:KeyDown( IN_SPEED ) then
-			local self = get_active_tool( ply, "starfall_processor" )
-			if not self then
-				self = get_active_tool( ply, "starfall_screen" )
-				if not self then return end
-				
-				RunConsoleCommand( "gmod_tool", "starfall_processor" ) -- switch back to processor
-				return true
-			end
-			
-			RunConsoleCommand( "gmod_tool", "starfall_screen" ) -- switch to screen
-			return true
-		end
-	end)
-
 	local lastclick = CurTime()
 	
 	local function GotoDocs(button)
