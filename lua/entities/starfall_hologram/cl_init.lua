@@ -169,3 +169,9 @@ net.Receive("starfall_hologram_scale", function ()
 		holoent:SetScale( Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ) )
 	end
 end )
+
+hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(ent)
+	if ent.scale and ent.SetScale then
+		ent:SetScale(ent.scale)
+	end
+end)
