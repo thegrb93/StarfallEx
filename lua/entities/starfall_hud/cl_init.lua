@@ -31,7 +31,7 @@ function ENT:DrawHUD()
 	data.render.isRendering = true
 	draw.NoTexture()
 	surface.SetDrawColor( 255, 255, 255, 255 )
-
+	
 	if instance.hooks[ "render" ] then
 		local ok, rt = instance:runScriptHook( "render" )
 		if not ok then self:Error( rt ) end

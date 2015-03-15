@@ -34,3 +34,23 @@ function ENT:LinkEnt ( ent, ply )
 	if ply then net.Send(ply) else net.Broadcast() end
 end
 
+function ENT:BuildDupeInfo ()
+	local info = self.BaseClass.BuildDupeInfo( self ) or {}
+
+	if IsValid(self.link) then
+		info.link = self.link:EntIndex()
+	end
+
+	return info
+end
+
+function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )
+	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
+	
+	if info.link then
+		local e = GetEntByID( info.link )
+		if IsValid( e ) then
+			self:LinkEnt( e )
+		end
+	end
+end

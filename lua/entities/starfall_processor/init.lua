@@ -160,8 +160,16 @@ function ENT:Error ( msg, traceback )
 	self:SetColor( Color( 255, 0, 0, 255 ) )
 end
 
+local i = 0
 function ENT:Think ()
 	self.BaseClass.Think( self )
+	
+	i = i + 1
+
+	if i % 22 == 0 then
+		retryCodeRequests()
+		i = 0
+	end
 	
 	if self.instance and not self.instance.error then
 
@@ -185,7 +193,7 @@ function ENT:BuildDupeInfo ()
 	local info = self.BaseClass.BuildDupeInfo( self ) or {}
 
 	if self.instance then
-		info.starfall = SF.SerializeCode( self.instance.source, self.instance.mainfile )
+		info.starfall = SF.SerializeCode( self.files, self.mainfile )
 	end
 
 	return info
