@@ -73,7 +73,110 @@ SF.Libraries.AddHook( "deinitialize", function ( instance )
 	end
 end )
 
-local texturecache = {}
+---URL Textures
+local LoadingURLQueue = {}
+
+local texturecache
+
+local function CheckURLDownloads()
+	local numqueued = #LoadingURLQueue
+	local urltable = LoadingURLQueue[numqueued]
+	
+	if urltable then
+		if urltable.Panel then
+			if not urltable.Panel:IsLoading() then
+				timer.Simple(0.2,function()
+					local tex = urltable.Panel:GetHTMLMaterial():GetTexture("$basetexture")
+					tex:Download()
+					urltable.Material:SetTexture("$basetexture", tex)
+					tex:Download()
+					urltable.Panel:Remove()
+					if urltable.cb then urltable.cb() end
+				end)		
+				texturecache[urltable.Url] = urltable.Material
+				LoadingURLQueue[numqueued] = nil					
+			else
+				if CurTime() > urltable.Timeout then
+					urltable.Panel:Remove()
+					LoadingURLQueue[numqueued] = nil
+				end
+			end
+		
+		else		
+			local Panel = vgui.Create( "DHTML" )
+			Panel:SetSize( 1024, 1024 )
+			Panel:SetAlpha( 0 )
+			Panel:SetMouseInputEnabled( false )
+			Panel:SetHTML(
+			[[
+				<style type="text/css">
+					html 
+					{			
+						overflow:hidden;
+						margin: -7.5px -7.5px;
+					}
+				</style>
+				
+				<body>
+					<img src="]] .. urltable.Url .. [[" alt="" width="1024" height="1024" />
+				</body>
+			]]
+			)
+			urltable.Timeout = CurTime()+20
+			urltable.Panel = Panel
+		end
+	end
+	
+	if #LoadingURLQueue == 0 then
+		timer.Destroy("EGP_URLMaterialChecker")
+	end
+end
+
+local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } ) 
+
+local function LoadURLMaterial( tbl, url, cb )
+	--Count the number of materials
+	local totalMaterials = 0, key
+	while true do
+		key = next(texturecache, key)
+		if not key then break end
+		totalMaterials = totalMaterials + 1
+	end
+	
+	local queuesize = #LoadingURLQueue
+	totalMaterials = totalMaterials + queuesize
+	
+	if totalMaterials>=cv_max_url_materials:GetInt() then
+		tbl.material = false
+		return
+	end
+	
+	local ShaderInfo = {
+		["$vertexcolor"] = 1,
+		["$vertexalpha"] = 1,
+		["$ignorez"] = 1,
+		["$nolod"] = 1
+	}
+	local urlmaterial = CreateMaterial("egp_urltex_" .. util.CRC(url .. SysTime()), "UnlitGeneric", ShaderInfo)
+	tbl[url] = urlmaterial
+				
+	if queuesize == 0 then
+		timer.Create("EGP_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
+	end
+	
+	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, cb = cb}
+
+end
+
+texturecache = setmetatable({},{__mode = "v", __index = function(tbl, mat)
+	if mat:sub(1,4)=="http" then
+		mat = string.gsub( mat, "[^%w _~%.%-/:]", function( str )
+			return string.format( "%%%02X", string.byte( str ) )
+		end )
+		
+		LoadURLMaterial(tbl, mat)
+	end			
+end})
 
 local validfonts = {
 	DebugFixed = true,
@@ -212,16 +315,15 @@ end
 function render_library.getTextureID ( tx )
 	local id = surface.GetTextureID( tx )
 	if id then
-		texturecache[ id ] = { tx }
-		local cacheentry = texturecache[ id ]
 		local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
-		cacheentry[ 2 ] = CreateMaterial( "SF_TEXTURE_" .. id, "UnlitGeneric", {
+		local cacheentry = CreateMaterial( "SF_TEXTURE_" .. id, "UnlitGeneric", {
 			[ "$nolod" ] = 1,
 			[ "$ignorez" ] = 1,
 			[ "$vertexcolor" ] = 1,
 			[ "$vertexalpha" ] = 1
 		} )
-		cacheentry[ 2 ]:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
+		cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
+		texturecache[ id ] = cacheentry
 		return id
 	end
 end
@@ -230,9 +332,8 @@ end
 -- @param id Texture id
 function render_library.setTexture ( id )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if id then
-		SF.CheckType( id, "number" )
-		surface.SetMaterial( texturecache[ id ][ 2 ] )
+	if id and texturecache[ id ] then
+		surface.SetMaterial( texturecache[ id ] )
 		return
 	end
 
