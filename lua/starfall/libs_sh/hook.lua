@@ -377,3 +377,8 @@ add( "StartEntityDriving" )
 -- @shared
 -- @param ent Entity being driven
 -- @param Player that is driving the entity
+
+--- Called when the starfall chip is removed
+-- @name Removed
+-- @class hook
+-- @server

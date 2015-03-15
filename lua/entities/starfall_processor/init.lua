@@ -187,6 +187,7 @@ end
 
 function ENT:OnRemove ()
 	self.BaseClass.OnRemove( self )
+	self:runScriptHook( "Removed" )
 end
 
 function ENT:BuildDupeInfo ()
