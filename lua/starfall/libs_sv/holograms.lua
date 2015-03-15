@@ -247,6 +247,84 @@ function hologram_methods:suppressEngineLighting ( suppress )
     end
 end
 
+--- Animates a hologram
+-- @server
+-- @class function
+-- @param Animation number or string name
+-- @param Animation starting frame number
+-- @param Animation speed. (1 is normal)
+function hologram_methods:setAnimation(animation, frame, rate)
+	local Holo = SF.Entities.Unwrap( self )
+	if not IsValid( Holo ) then return end
+
+	if type(animation)=="string" then
+		animation = Holo:LookupSequence(animation)
+	end
+	
+	frame = frame or 0
+	rate = rate or 1
+	
+	if not Holo.Animated then
+		-- This must be run once on entities that will be animated
+		Holo.Animated = true
+		Holo.AutomaticFrameAdvance = true
+		
+		local OldThink = Holo.Think
+		function Holo:Think()
+			OldThink(self)
+			self:NextThink( CurTime() )
+			return true
+		end
+	end
+	Holo:ResetSequence(animation)
+	Holo:SetCycle(frame)
+	Holo:SetPlaybackRate(rate)
+end
+
+--- Get the length of the current animation
+-- @server
+-- @class function
+function hologram_methods:getAnimationLength( )
+	local Holo = SF.Entities.Unwrap( self )
+	if not IsValid( Holo ) then return -1 end
+	
+	return Holo:SequenceDuration()
+end
+
+--- Convert animation name into animation number
+-- @server
+-- @class function
+-- @param Animation name
+function hologram_methods:getAnimationNumber( animation )
+	local Holo = SF.Entities.Unwrap( self )
+	if not IsValid( Holo ) then return 0 end
+	
+	return Holo:LookupSequence(animation) or 0
+end
+
+--- Set the pose value of an animation
+-- @server
+-- @class function
+-- @param Pose parameter
+-- @param Pose value
+function hologram_methods:setPose( pose, value )
+	local Holo = SF.Entities.Unwrap( self )
+	if not IsValid( Holo ) then return end
+	
+	Holo:SetPoseParameter( pose, value )
+end
+
+--- Get the pose value of an animation
+-- @server
+-- @class function
+-- @param Pose parameter
+function hologram_methods:getPose( pose )
+	local Holo = SF.Entities.Unwrap( self )
+	if not IsValid( Holo ) then return end
+	
+	return Holo:GetPoseParameter( pose )
+end
+
 
 --- Updates/Checks burst constraints
 -- @class function
