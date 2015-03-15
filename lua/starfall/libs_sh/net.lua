@@ -8,19 +8,11 @@ local net = net
 local net_library, _ = SF.Libraries.Register("net")
 
 local burst_limit = CreateConVar( "sf_net_burst_limit", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-					"The net message burst limit." )
+					"The net message burst limit in kB." )
 
 local burst_interval = CreateConVar( "sf_net_burst_interval", "0.1", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-						"The interval of the timer that adds one more available net message. Requires a map reload to update." )
+						"The interval of the timer that adds 1kB more available net message. Requires a map reload to update." )
 
-local function can_send( instance, noupdate )
-	if instance.data.net.burst > 0 then
-		if not noupdate then instance.data.net.burst = instance.data.net.burst - 1 end
-		return true
-	else
-		return false
-	end
-end
 
 local function write( instance, type, value, setting )
 	instance.data.net.data[#instance.data.net.data+1] = { "Write" .. type, value, setting }
@@ -76,6 +68,8 @@ function net_library.send ( target )
 		net[ writefunc ]( writevalue, writesetting )
 	end
 
+	instance.data.net.burst = instance.data.net.burst - net.BytesWritten() / 1000
+	
 	if SERVER then
 		local sendfunc
 		local newtarget
@@ -108,7 +102,7 @@ end
 function net_library.start( name )
 	SF.CheckType( name, "string" )
 	local instance = SF.instance
-	if not can_send( instance ) then return SF.throw( "can't send net messages that often", 2 ) end
+	if instance.data.net.burst <= 0 then return SF.throw( "can't send that much data that often", 2 ) end
 	
 	instance.data.net.started = true
 	instance.data.net.data = {}
@@ -313,7 +307,7 @@ end
 -- @return A boolean that states whether or not you can currently send a net message
 
 function net_library.canSend()
-	return can_send(SF.instance, true)
+	return SF.instance.data.net.burst > 0
 end
 
 net.Receive( "SF_netmessage", function( len, ply )
