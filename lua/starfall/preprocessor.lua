@@ -170,12 +170,6 @@ SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
 -- \--@name Awesome script
 -- -- CODE
 
---- For screens, make the script run on the server, as well.
--- You can use "if SERVER" and "if CLIENT" to determine if the script is currently being run on the server or the client, respectively.
--- @name sharedscreen
--- @class directive
---@usage
--- \--@sharedscreen
 --
 -- if SERVER then
 -- \	-- Do important calculations

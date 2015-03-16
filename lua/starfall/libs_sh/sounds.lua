@@ -75,11 +75,11 @@ end
 
 --- Stops the sound from being played.
 -- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
-function sound_methods:stop ( dt )
+function sound_methods:stop ( fade )
 	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if dt then
-		SF.CheckType( dt, "number" )
-		unwrap( self ):FadeOut( math.max( dt, 0 ) )
+	if fade then
+		SF.CheckType( fade, "number" )
+		unwrap( self ):FadeOut( math.max( fade, 0 ) )
 	else
 		unwrap( self ):Stop()
 	end
@@ -87,38 +87,38 @@ end
 
 --- Sets the volume of the sound.
 -- @param vol Volume to set to, between 0 and 1.
--- @param dt Time in seconds to transition to this new volume.
-function sound_methods:setVolume ( vol, dt )
+-- @param fade Time in seconds to transition to this new volume.
+function sound_methods:setVolume ( vol, fade )
 	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( vol, "number" )
 
-	if dt then
-		SF.CheckType( dt, "number" )
-		dt = math.abs( dt, 0 )
+	if fade then
+		SF.CheckType( fade, "number" )
+		fade = math.abs( fade, 0 )
 	else	
-		dt = 0
+		fade = 0
 	end
 
 	vol = math.Clamp( vol, 0, 1 )
-	unwrap( self ):ChangeVolume( vol, dt )
+	unwrap( self ):ChangeVolume( vol, fade )
 end
 
 --- Sets the pitch of the sound.
 -- @param pitch Pitch to set to, between 0 and 255.
--- @param dt Time in seconds to transition to this new pitch.
-function sound_methods:setPitch ( pitch, dt )
+-- @param fade Time in seconds to transition to this new pitch.
+function sound_methods:setPitch ( pitch, fade )
 	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( pitch, "number" )
 	
-	if dt then
-		SF.CheckType( dt, "number" )
-		dt = math.max( dt, 0 )
+	if fade then
+		SF.CheckType( fade, "number" )
+		fade = math.max( fade, 0 )
 	else	
-		dt = 0
+		fade = 0
 	end
 
 	pitch = math.Clamp( pitch, 0, 255 )
-	unwrap( self ):ChangePitch( pitch, dt )
+	unwrap( self ):ChangePitch( pitch, fade )
 end
 
 --- Returns whether the sound is being played.

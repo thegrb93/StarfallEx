@@ -250,9 +250,9 @@ end
 --- Animates a hologram
 -- @server
 -- @class function
--- @param Animation number or string name
--- @param Animation starting frame number
--- @param Animation speed. (1 is normal)
+-- @param animation number or string name
+-- @param frame The starting frame number
+-- @param rate Frame speed. (1 is normal)
 function hologram_methods:setAnimation(animation, frame, rate)
 	local Holo = SF.Entities.Unwrap( self )
 	if not IsValid( Holo ) then return end
@@ -284,6 +284,7 @@ end
 --- Get the length of the current animation
 -- @server
 -- @class function
+-- @return Length of current animation in seconds
 function hologram_methods:getAnimationLength( )
 	local Holo = SF.Entities.Unwrap( self )
 	if not IsValid( Holo ) then return -1 end
@@ -293,8 +294,8 @@ end
 
 --- Convert animation name into animation number
 -- @server
--- @class function
--- @param Animation name
+-- @param animation Name of the animation
+-- @return Animation index
 function hologram_methods:getAnimationNumber( animation )
 	local Holo = SF.Entities.Unwrap( self )
 	if not IsValid( Holo ) then return 0 end
@@ -302,11 +303,11 @@ function hologram_methods:getAnimationNumber( animation )
 	return Holo:LookupSequence(animation) or 0
 end
 
---- Set the pose value of an animation
+--- Set the pose value of an animation. Turret/Head angles for example.
 -- @server
 -- @class function
--- @param Pose parameter
--- @param Pose value
+-- @param pose Name of the pose parameter
+-- @param value Value to set it to.
 function hologram_methods:setPose( pose, value )
 	local Holo = SF.Entities.Unwrap( self )
 	if not IsValid( Holo ) then return end
@@ -317,7 +318,8 @@ end
 --- Get the pose value of an animation
 -- @server
 -- @class function
--- @param Pose parameter
+-- @param pose Pose parameter name
+-- @return Value of the pose parameter
 function hologram_methods:getPose( pose )
 	local Holo = SF.Entities.Unwrap( self )
 	if not IsValid( Holo ) then return end

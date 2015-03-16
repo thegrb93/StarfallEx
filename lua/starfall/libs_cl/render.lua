@@ -329,7 +329,7 @@ function render_library.getTextureID ( tx )
 end
 
 --- Sets the texture
--- @param id Texture id
+-- @param id Texture id or url to an online image.
 function render_library.setTexture ( id )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if id and texturecache[ id ] then

@@ -166,7 +166,7 @@ end
 --- Creates a new context. A context is used to define what scripts will have access to.
 -- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
--- @param ops Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
+-- @param cpuTime Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
 -- @param libs Additional (local) libraries for the script to access. Default is an empty table.
 function SF.CreateContext ( env, directives, cpuTime, libs )
 	local context = {}

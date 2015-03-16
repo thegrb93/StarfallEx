@@ -81,13 +81,13 @@ function vec_metamethods:__sub ( v )
 end
 
 --- unary minus metamethod
--- @returns negated vector.
+-- @return negated vector.
 function vec_metamethods:__unm ()
 	return wrap( unwrap( self ):__unm() )
 end
 
 --- equivalence metamethod
--- @returns bool if both sides are equal.
+-- @return bool if both sides are equal.
 function vec_metamethods:__eq ( ... )
 	return SF.Sanitize( unwrap( self ):__eq( SF.Unsanitize( ... ) ) )
 end

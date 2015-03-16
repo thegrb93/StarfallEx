@@ -161,7 +161,6 @@ end
 
 --- Applies linear force to the entity
 -- @param vec The force vector
--- @param offset An optional offset position
 function ents_methods:applyForceCenter ( vec )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( vec, SF.Types[ "Vector" ] )
@@ -398,7 +397,7 @@ function ents_methods:setSolid ( solid )
 end
 
 --- Sets the entity's mass
--- @param number mass
+-- @param mass number mass
 function ents_methods:setMass ( mass )
 	local ent = unwrap( self )
 	
@@ -413,7 +412,7 @@ function ents_methods:setMass ( mass )
 end
 
 --- Sets entity gravity
--- @param grav Should the entity respect gravity?
+-- @param grav Bool should the entity respect gravity?
 function ents_methods:enableGravity ( grav )
 	SF.CheckType( self, ents_metatable )
 	
@@ -430,7 +429,7 @@ function ents_methods:enableGravity ( grav )
 end
 
 --- Sets the entity drag state
--- @param drag Should the entity have air resistence?
+-- @param drag Bool should the entity have air resistence?
 function ents_methods:enableDrag ( drag )
 	SF.CheckType( self, ents_metatable )
 	
@@ -446,7 +445,7 @@ function ents_methods:enableDrag ( drag )
 end
 
 --- Sets the entity movement state
--- @param movement Should the entity move?
+-- @param move Bool should the entity move?
 function ents_methods:enableMotion ( move )
 	SF.CheckType( self, ents_metatable )
 	
