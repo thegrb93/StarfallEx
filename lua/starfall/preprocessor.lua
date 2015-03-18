@@ -138,6 +138,19 @@ local function directive_include(args, filename, data)
 end
 SF.Preprocessor.SetGlobalDirective("include",directive_include)
 
+local function directive_includedir( args, filename, data )
+	if not data.includes then data.includes = {} end
+	if not data.includes[filename] then data.includes[filename] = {} end
+
+	local incl = data.includes[filename]
+
+	local files = file.Find( "starfall/" ..args.. "/*", "DATA" )
+	for _, v in pairs( files ) do
+		incl[ #incl+1 ] = args .. "/" .. v
+	end
+end
+SF.Preprocessor.SetGlobalDirective( "includedir", directive_includedir )
+
 local function directive_name(args, filename, data)
 	if not data.scriptnames then data.scriptnames = {} end
 	data.scriptnames[filename] = args
@@ -159,6 +172,18 @@ SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
 -- \--@include lib/someLibrary.txt
 -- 
 -- require( "lib/someLibrary.txt" )
+-- -- CODE
+
+--- Mark a directory to be included in the upload.
+-- This is optional to include all files in the directory in require() and dofile()
+-- @name includedir
+-- @class directive
+-- @param path Path to the directory
+-- @usage
+-- \--@includedir lib
+--
+-- require( "lib/someLibraryInLib.txt" )
+-- require( "lib/someOtherLibraryInLib.txt" )
 -- -- CODE
 
 --- Set the name of the script.
