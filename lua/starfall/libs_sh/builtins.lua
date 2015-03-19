@@ -282,14 +282,7 @@ function SF.DefaultEnvironment.requiredir( dir )
     local files = file.Find( "starfall/" .. dir .. "/*", "DATA" )
     for _, file in pairs( files ) do
         file = dir .. "/" .. file
-        if loaded[ file ] then
-            returns[ file ] = loaded[file]
-        else
-            local func = SF.instance.scripts[file]
-            if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@includedir it?)", 2 ) end
-            loaded[ file ] = func( ) or true
-            returns[ file ] = loaded[file]
-        end
+        returns[ file ] = SF.DefaultEnvironment.require( file )
     end
 
     return returns
@@ -317,9 +310,7 @@ function SF.DefaultEnvironment.dodir( dir )
     local files = file.Find( "starfall/" .. dir .. "/*", "DATA" )
     for _, file in pairs( files ) do
         file = dir .. "/" .. file
-        local func = SF.instance.scripts[file]
-        if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@includedir it?)", 2 ) end
-        returns[ file ] = func()
+		returns[ file ] = SF.DefaultEnvironment.dofile( file )
     end
 
     return returns
