@@ -268,22 +268,29 @@ end
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
 -- @param dir The directory to include. Make sure to --@includedir it
+-- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
-function SF.DefaultEnvironment.requiredir( dir )
+function SF.DefaultEnvironment.requiredir( dir, loadpriority )
     SF.CheckType( dir, "string")
-    local loaded = SF.instance.data.reqloaded
-    if not loaded then
-        loaded = {}
-        SF.instance.data.reqloaded = loaded
-    end
-
+    if loadpriority then SF.CheckType( loadpriority, "table" ) end
+    
     local returns = {}
 
-    local files = file.Find( "starfall/" .. dir .. "/*", "DATA" )
-    for _, file in pairs( files ) do
-        file = dir .. "/" .. file
-        returns[ file ] = SF.DefaultEnvironment.require( file )
+    if loadpriority then
+        for i = 1, #loadpriority do
+            for file, _ in pairs( SF.instance.scripts ) do
+                if string.find( file, dir .. "/" .. loadpriority[ i ] , 1 ) == 1 then
+                    returns[ file ] = SF.DefaultEnvironment.require( file )
+                end
+            end
+        end
     end
+
+	for file, _ in pairs( SF.instance.scripts ) do
+		if string.find( file, dir, 1 ) == 1 and not returns[ file ] then
+			returns[ file ] = SF.DefaultEnvironment.require( file )
+		end
+	end
 
     return returns
 end
@@ -301,16 +308,28 @@ end
 
 --- Runs an included directory, but does not cache the result.
 -- @param dir The directory to include. Make sure to --@includedir it
+-- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
-function SF.DefaultEnvironment.dodir( dir )
+function SF.DefaultEnvironment.dodir( dir, loadpriority )
     SF.CheckType( dir, "string" )
+    if loadpriority then SF.CheckType( loadpriority, "table" ) end
 
     local returns = {}
 
-    local files = file.Find( "starfall/" .. dir .. "/*", "DATA" )
-    for _, file in pairs( files ) do
-        file = dir .. "/" .. file
-		returns[ file ] = SF.DefaultEnvironment.dofile( file )
+    if loadpriority then
+        for i = 0, #loadpriority do
+            for file, _ in pairs( SF.instance.scripts ) do
+                if string.find( file, dir .. "/" .. loadpriority[ i ] , 1 ) == 1 then
+                    returns[ file ] = SF.DefaultEnvironment.dofile( file )
+                end
+            end
+        end
+    end
+
+    for file, _ in pairs( SF.instance.scripts ) do
+		if string.find( file, dir, 1 ) == 1 then
+			returns[ file ] = SF.DefaultEnvironment.dofile( file )
+		end
     end
 
     return returns
