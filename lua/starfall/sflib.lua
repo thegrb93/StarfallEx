@@ -618,8 +618,8 @@ else
 			net.Start("starfall_upload")
 			net.WriteBit(false)
 			net.SendToServer()
-			if buildlist then
-				SF.AddNotify( "File not found: " .. buildlist, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+			if list then
+				SF.AddNotify( LocalPlayer(), list, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 			end
 		end
 	end)
