@@ -2,8 +2,8 @@ SF.Bass = {}
 
 --- Bass type
 -- @client
-local bass_methods, sound_metamethods = SF.Typedef( "Bass" )
-local wrap, unwrap = SF.CreateWrapper( sound_metamethods, true, false, debug.getregistry().IGModAudioChannel )
+local bass_methods, bass_metamethods = SF.Typedef( "Bass" )
+local wrap, unwrap = SF.CreateWrapper( bass_metamethods, true, false, debug.getregistry().IGModAudioChannel )
 
 --- Bass library.
 -- @client
@@ -12,7 +12,7 @@ local bass_library, _ = SF.Libraries.Register( "bass" )
 SF.Bass.Wrap = wrap
 SF.Bass.Unwrap = unwrap
 SF.Bass.Methods = bass_methods
-SF.Bass.Metatable = sound_metamethods
+SF.Bass.Metatable = bass_metamethods
 
 
 -- Register functions to be called when the chip is initialised and deinitialised
@@ -26,7 +26,9 @@ SF.Libraries.AddHook( "deinitialize", function ( inst )
 	local sounds = inst.data.bass.sounds
 	local s = next( sounds )
 	while s do
-		unwrap( s ):Stop()
+		if s:IsValid() then
+			s:Stop()
+		end
 		sounds[ s ] = nil
 		s = next( sounds )
 	end
@@ -90,44 +92,68 @@ end
 
 --- Starts to play the sound.
 function bass_methods:play ()
-	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
-	SF.CheckType( self, sound_metamethods )
-	unwrap( self ):Play()
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	if IsValid(uw) then
+		uw:Play()
+	end
 end
 
 --- Stops playing the sound.
 function bass_methods:stop ( )
-	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
-	unwrap( self ):Stop()
+	local uw =  unwrap( self )
+	SF.CheckType( self, bass_metamethods )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	if IsValid(uw) then
+		uw:Stop()
+	end
 end
 
 --- Sets the volume of the sound.
 -- @param vol Volume to set to, between 0 and 1.
 function bass_methods:setVolume ( vol )
-	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
 	SF.CheckType( vol, "number" )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
-	vol = math.Clamp( vol, 0, 1 )
-	unwrap( self ):SetVolume( vol )
+	if IsValid(uw) then
+		uw:SetVolume( math.Clamp( vol, 0, 1 ) )
+	end
 end
 
 --- Sets the pitch of the sound.
 -- @param pitch Pitch to set to, between 0 and 3.
 function bass_methods:setPitch ( pitch )
-	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
 	SF.CheckType( pitch, "number" )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
-	pitch = math.Clamp( pitch, 0, 3 )
-	unwrap( self ):SetPlaybackRate( pitch )
+	if IsValid(uw) then
+		uw:SetPlaybackRate( math.Clamp( pitch, 0, 3 ) )
+	end
 end
 
 --- Sets the position of the sound
 -- @param pos Where to position the sound
 function bass_methods:setPos ( pos )
-	if not SF.Permissions.check( SF.instance.player, unwrap( self ), "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
 	SF.CheckType( pos, SF.Types[ "Vector" ] )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
-	unwrap( self ):SetPos( SF.UnwrapObject( pos ) )
+	if IsValid(uw) then
+		uw:SetPos( SF.UnwrapObject( pos ) )
+	end
 end
 
 
