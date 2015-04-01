@@ -25,3 +25,8 @@ function ENT:runScriptHookForResult ( hook, ... )
 		else return rt end
 	end
 end
+
+function ENT:OnRemove ()
+	self:runScriptHook( "Removed" )
+	self.BaseClass.OnRemove( self )
+end

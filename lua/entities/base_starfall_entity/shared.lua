@@ -40,3 +40,10 @@ function ENT:Error ( msg, traceback )
 
 	return msg
 end
+
+function ENT:OnRemove ()
+	if not self.instance then return end
+
+	self.instance:deinitialize()
+	self.instance = nil
+end

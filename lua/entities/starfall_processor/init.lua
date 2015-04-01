@@ -185,11 +185,6 @@ function ENT:Think ()
 	return true
 end
 
-function ENT:OnRemove ()
-	self.BaseClass.OnRemove( self )
-	self:runScriptHook( "Removed" )
-end
-
 function ENT:BuildDupeInfo ()
 	local info = self.BaseClass.BuildDupeInfo( self ) or {}
 
