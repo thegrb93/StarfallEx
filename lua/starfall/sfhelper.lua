@@ -21,20 +21,20 @@ if CLIENT then
 	end
 	helper.getDocs()
 
-	CreateClientConVar( "starfall_helper_wide", 930, true, false )
-	CreateClientConVar( "starfall_helper_tall", 615, true, false )
-	CreateClientConVar( "starfall_helper_posx", ( ScrW() - 930 ) / 2, true, false )
-	CreateClientConVar( "starfall_helper_posy", ( ScrH() - 615 ) / 2, true, false )
-	CreateClientConVar( "starfall_helper_divheight", 400, true, false )
+	CreateClientConVar( "sf_helper_width", 930, true, false )
+	CreateClientConVar( "sf_helper_height", 615, true, false )
+	CreateClientConVar( "sf_helper_posx", ( ScrW() - 930 ) / 2, true, false )
+	CreateClientConVar( "sf_helper_posy", ( ScrH() - 615 ) / 2, true, false )
+	CreateClientConVar( "sf_helper_divheight", 400, true, false )
 end
 
 local function saveSettings()
-	RunConsoleCommand( "starfall_helper_wide", helper.Frame:GetWide() )
-	RunConsoleCommand( "starfall_helper_tall", helper.Frame:GetTall() )
+	RunConsoleCommand( "sf_helper_width", helper.Frame:GetWide() )
+	RunConsoleCommand( "sf_helper_height", helper.Frame:GetTall() )
 	local x, y = helper.Frame:GetPos()
-	RunConsoleCommand( "starfall_helper_posx", x )
-	RunConsoleCommand( "starfall_helper_posy", y )
-	RunConsoleCommand( "starfall_helper_divheight", helper.DocView.Div:GetTopHeight() )
+	RunConsoleCommand( "sf_helper_posx", x )
+	RunConsoleCommand( "sf_helper_posy", y )
+	RunConsoleCommand( "sf_helper_divheight", helper.DocView.Div:GetTopHeight() )
 end
 
 function helper.create()
@@ -725,9 +725,9 @@ function helper.resize()
 	helper.AboutView.VBar:SetScroll( helper.AboutView.VBar:GetScroll() )
 
 	if not settings_set then
-		helper.Frame:SetSize( GetConVarNumber( "starfall_helper_wide" ), GetConVarNumber( "starfall_helper_tall" ) )
-		helper.Frame:SetPos( GetConVarNumber( "starfall_helper_posx" ), GetConVarNumber( "starfall_helper_posy" ) )
-		timer.Simple( 0.5, function() helper.DocView.Div:SetTopHeight( GetConVarNumber( "starfall_helper_divheight" ) ) end )
+		helper.Frame:SetSize( GetConVarNumber( "sf_helper_width" ), GetConVarNumber( "sf_helper_height" ) )
+		helper.Frame:SetPos( GetConVarNumber( "sf_helper_posx" ), GetConVarNumber( "sf_helper_posy" ) )
+		timer.Simple( 0.5, function () helper.DocView.Div:SetTopHeight( GetConVarNumber( "sf_helper_divheight" ) ) end )
 		settings_set = true
 	end
 
