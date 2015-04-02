@@ -220,6 +220,14 @@ if CLIENT then
 		editor:SetTitle( "Starfall Code Editor" )
 		editor:Center()
 
+		function editor:OnKeyCodePressed( keyCode )
+			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				SF.Editor.saveActiveTab()
+			elseif keyCode == KEY_Q and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				SF.Editor.close()
+			end
+		end
+
 		local buttonHolder = editor.components[ "buttonHolder" ]
 
 		local buttonSaveExit = vgui.Create( "StarfallButton", buttonHolder )

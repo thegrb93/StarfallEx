@@ -62,14 +62,6 @@
 				editSessions.splice( index - 1, 1 );
 			}
 
-			editor.commands.addCommand({
-				name: "save",
-				bindKey: {win: "Ctrl-S", mac: "Command-S"},
-				exec: function(editor){
-					console.log("RUNLUA:SF.Editor.saveActiveTab()");
-				}
-			});
-
 			//fixes console showing up when pressing ' or @ button
 			editor.commands.addCommand({
 				name: "console1",
