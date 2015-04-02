@@ -186,10 +186,32 @@ if CLIENT then
 	end
 
 	function SF.Editor.saveActiveTab()
-		if string.GetExtensionFromFilename( SF.Editor.getOpenFile() ) ~= "txt" then return end
+		if string.GetExtensionFromFilename( SF.Editor.getOpenFile() ) ~= "txt" then SF.Editor.saveActiveTabAs() return end
 		local saveFile = "starfall/"..SF.Editor.getOpenFile()
 		file.Write( saveFile, SF.Editor.getActiveTab().code )
 		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+	end
+
+	function SF.Editor.saveActiveTabAs()
+
+		local ppdata = {}
+		SF.Preprocessor.ParseDirectives( SF.Editor.getOpenFile(), SF.Editor.getActiveTab().code, {}, ppdata )
+		local name = ppdata.scriptnames[ SF.Editor.getOpenFile() ]
+
+		Derma_StringRequestNoBlur(
+				"Save File",
+				"",
+				name or string.StripExtension( SF.Editor.getOpenFile() ),
+				function( text )
+					if text == "" then return end
+					text = string.gsub( text, ".", invalid_filename_chars )
+					local saveFile = "starfall/"..text..".txt"
+					file.Write( saveFile, SF.Editor.getActiveTab().code )
+					SF.Editor.getActiveTab():SetText( text .. ".txt" )
+					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.Editor.fileViewer.components["tree"]:reloadTree()
+				end
+			)
 	end
 
 	function SF.Editor.createEditor()
@@ -232,20 +254,7 @@ if CLIENT then
 		local buttonSaveAs = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveAs:SetText( "Save As" )
 		function buttonSaveAs:DoClick()
-			Derma_StringRequestNoBlur(
-				"Save File",
-				"",
-				string.StripExtension( SF.Editor.getOpenFile() ),
-				function( text )
-					if text == "" then return end
-					text = string.gsub( text, ".", invalid_filename_chars )
-					local saveFile = "starfall/"..text..".txt"
-					file.Write( saveFile, SF.Editor.getActiveTab().code )
-					SF.Editor.getActiveTab():SetText( text .. ".txt" )
-					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
-					SF.Editor.fileViewer.components["tree"]:reloadTree()
-				end
-			)
+			SF.Editor.saveActiveTabAs()
 		end
 		buttonHolder:addButton( buttonSaveAs )
 
