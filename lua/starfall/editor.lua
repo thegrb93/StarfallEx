@@ -55,25 +55,25 @@ if CLIENT then
 		['"'] = "",
 	}
 
-	CreateClientConVar( "starfall_editor_wide", 800, true, false )
-	CreateClientConVar( "starfall_editor_tall", 600, true, false )
-	CreateClientConVar( "starfall_editor_posx", ScrW()/2-400, true, false )
-	CreateClientConVar( "starfall_editor_posy", ScrH()/2-300, true, false )
+	CreateClientConVar( "sf_editor_width", 1100, true, false )
+	CreateClientConVar( "sf_editor_height", 760, true, false )
+	CreateClientConVar( "sf_editor_posx", ScrW()/2-1100/2, true, false )
+	CreateClientConVar( "sf_editor_posy", ScrH()/2-760/2, true, false )
 
-	CreateClientConVar( "starfall_fileviewer_wide", 253, true, false )
-	CreateClientConVar( "starfall_fileviewer_tall", 600, true, false )
-	CreateClientConVar( "starfall_fileviewer_posx", ScrW()/2-400-253, true, false )
-	CreateClientConVar( "starfall_fileviewer_posy", ScrH()/2-300, true, false )
-	CreateClientConVar( "starfall_fileviewer_locked", 1, true, false )
+	CreateClientConVar( "sf_fileviewer_width", 263, true, false )
+	CreateClientConVar( "sf_fileviewer_height", 600, true, false )
+	CreateClientConVar( "sf_fileviewer_posx", ScrW()/2-1100/2-263, true, false )
+	CreateClientConVar( "sf_fileviewer_posy", ScrH()/2-600/2, true, false )
+	CreateClientConVar( "sf_fileviewer_locked", 1, true, false )
 
-	CreateClientConVar( "starfall_editor_widgets", 1, true, false )
-	CreateClientConVar( "starfall_editor_linenumbers", 1, true, false )
-	CreateClientConVar( "starfall_editor_gutter", 1, true, false )
-	CreateClientConVar( "starfall_editor_invisiblecharacters", 0, true, false )
-	CreateClientConVar( "starfall_editor_indentguides", 1, true, false )
-	CreateClientConVar( "starfall_editor_activeline", 1, true, false )
-	CreateClientConVar( "starfall_editor_autocompletion", 1, true, false )
-	CreateClientConVar( "starfall_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
+	CreateClientConVar( "sf_editor_widgets", 1, true, false )
+	CreateClientConVar( "sf_editor_linenumbers", 1, true, false )
+	CreateClientConVar( "sf_editor_gutter", 1, true, false )
+	CreateClientConVar( "sf_editor_invisiblecharacters", 0, true, false )
+	CreateClientConVar( "sf_editor_indentguides", 1, true, false )
+	CreateClientConVar( "sf_editor_activeline", 1, true, false )
+	CreateClientConVar( "sf_editor_autocompletion", 1, true, false )
+	CreateClientConVar( "sf_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
 
 	local aceFiles = {}
 	local htmlEditorCode = nil
@@ -285,7 +285,7 @@ if CLIENT then
 				timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function() self:OnKeyCodePressed( key, true ) end )
 			end
 
-			if GetConVarNumber( "starfall_editor_fixkeys" ) == 0 then return end
+			if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
 			if key == KEY_LEFT and input.IsKeyDown( key ) then
 				self:QueueJavascript( "editor.navigateLeft(1)" )
 				repeatKey()
@@ -500,47 +500,47 @@ if CLIENT then
 		form:Dock( FILL )
 		form.Header:SetVisible( false )
 		form.Paint = function() end
-		setDoClick(form:CheckBox( "Show fold widgets", "starfall_editor_widgets" ))
-		setDoClick(form:CheckBox( "Show line numbers", "starfall_editor_linenumbers" ))
-		setDoClick(form:CheckBox( "Show gutter", "starfall_editor_gutter" ))
-		setDoClick(form:CheckBox( "Show invisible characters", "starfall_editor_invisiblecharacters" ))
-		setDoClick(form:CheckBox( "Show indenting guides", "starfall_editor_indentguides" ))
-		setDoClick(form:CheckBox( "Highlight active line", "starfall_editor_activeline" ))
-		setDoClick(form:CheckBox( "Auto completion (Ctrl-Space)", "starfall_editor_autocompletion" )):SetTooltip( "Doesn't work with Linux for some reason" )
-		setDoClick(form:CheckBox( "Fix keys not working on Linux", "starfall_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+		setDoClick(form:CheckBox( "Show fold widgets", "sf_editor_widgets" ))
+		setDoClick(form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ))
+		setDoClick(form:CheckBox( "Show gutter", "sf_editor_gutter" ))
+		setDoClick(form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ))
+		setDoClick(form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ))
+		setDoClick(form:CheckBox( "Highlight active line", "sf_editor_activeline" ))
+		setDoClick(form:CheckBox( "Auto completion (Ctrl-Space)", "sf_editor_autocompletion" )):SetTooltip( "Doesn't work with Linux for some reason" )
+		setDoClick(form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
 
 		return frame
 	end
 
 	function SF.Editor.saveSettings()
 		local frame = SF.Editor.editor
-		RunConsoleCommand( "starfall_editor_wide", frame:GetWide() )
-		RunConsoleCommand( "starfall_editor_tall", frame:GetTall() )
+		RunConsoleCommand( "sf_editor_width", frame:GetWide() )
+		RunConsoleCommand( "sf_editor_height", frame:GetTall() )
 		local x, y = frame:GetPos()
-		RunConsoleCommand( "starfall_editor_posx", x )
-		RunConsoleCommand( "starfall_editor_posy", y )
+		RunConsoleCommand( "sf_editor_posx", x )
+		RunConsoleCommand( "sf_editor_posy", y )
 
 		local frame = SF.Editor.fileViewer
-		RunConsoleCommand( "starfall_fileviewer_wide", frame:GetWide() )
-		RunConsoleCommand( "starfall_fileviewer_tall", frame:GetTall() )
+		RunConsoleCommand( "sf_fileviewer_width", frame:GetWide() )
+		RunConsoleCommand( "sf_fileviewer_height", frame:GetTall() )
 		local x, y = frame:GetPos()
-		RunConsoleCommand( "starfall_fileviewer_posx", x )
-		RunConsoleCommand( "starfall_fileviewer_posy", y )
-		RunConsoleCommand( "starfall_fileviewer_locked", frame.locked and 1 or 0 )
+		RunConsoleCommand( "sf_fileviewer_posx", x )
+		RunConsoleCommand( "sf_fileviewer_posy", y )
+		RunConsoleCommand( "sf_fileviewer_locked", frame.locked and 1 or 0 )
 	end
 
 	function SF.Editor.updateSettings()
 		local frame = SF.Editor.editor
-		frame:SetWide( GetConVarNumber( "starfall_editor_wide" ) )
-		frame:SetTall( GetConVarNumber( "starfall_editor_tall" ) )
-		frame:SetPos( GetConVarNumber( "starfall_editor_posx" ), GetConVarNumber( "starfall_editor_posy" ) )
+		frame:SetWide( GetConVarNumber( "sf_editor_width" ) )
+		frame:SetTall( GetConVarNumber( "sf_editor_height" ) )
+		frame:SetPos( GetConVarNumber( "sf_editor_posx" ), GetConVarNumber( "sf_editor_posy" ) )
 
 		local frame = SF.Editor.fileViewer
-		frame:SetWide( GetConVarNumber( "starfall_fileviewer_wide" ) )
-		frame:SetTall( GetConVarNumber( "starfall_fileviewer_tall" ) )
-		frame:SetPos( GetConVarNumber( "starfall_fileviewer_posx" ), GetConVarNumber( "starfall_fileviewer_posy" ) )
+		frame:SetWide( GetConVarNumber( "sf_fileviewer_width" ) )
+		frame:SetTall( GetConVarNumber( "sf_fileviewer_height" ) )
+		frame:SetPos( GetConVarNumber( "sf_fileviewer_posx" ), GetConVarNumber( "sf_fileviewer_posy" ) )
 		frame:lock( SF.Editor.editor )
-		frame.locked = tobool(GetConVarNumber( "starfall_fileviewer_locked" ))
+		frame.locked = tobool(GetConVarNumber( "sf_fileviewer_locked" ))
 		if frame.locked then
 			frame.buttonLock.active = true
 			frame.buttonLock:SetText( "Locked" )
@@ -548,14 +548,14 @@ if CLIENT then
 
 		local html = SF.Editor.editor.components[ "htmlPanel" ]
 		local js = html.QueueJavascript
-		js( html, "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "starfall_editor_widgets" ) .. ")" )
-		js( html, "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "starfall_editor_linenumbers" ) .. ")" )
-		js( html, "editor.setOption(\"showGutter\", " .. GetConVarNumber( "starfall_editor_gutter" ) .. ")" )
-		js( html, "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "starfall_editor_invisiblecharacters" ) .. ")" )
-		js( html, "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "starfall_editor_indentguides" ) .. ")" )
-		js( html, "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "starfall_editor_activeline" ) .. ")" )
-		js( html, "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "starfall_editor_activeline" ) .. ")" )
-		js( html, "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "starfall_editor_autocompletion" ) .. ")" )
+		js( html, "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
+		js( html, "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
+		js( html, "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
+		js( html, "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ")" )
+		js( html, "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ")" )
+		js( html, "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
+		js( html, "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
+		js( html, "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
 	end
 
 	--- (Client) Builds a table for the compiler to use
