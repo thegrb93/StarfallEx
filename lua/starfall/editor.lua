@@ -198,11 +198,33 @@ if CLIENT then
 		tabHolder:removeTab( tab )
 	end
 
-	function SF.Editor.saveActiveTab()
-		if string.GetExtensionFromFilename( SF.Editor.getOpenFile() ) ~= "txt" then return end
-		local saveFile = "starfall/"..SF.Editor.getOpenFile()
-		file.Write( saveFile, SF.Editor.getActiveTab().code )
+	function SF.Editor.saveTab( tab )
+		if string.GetExtensionFromFilename( tab:GetText() ) ~= "txt" then SF.Editor.saveTabAs( tab ) return end
+		local saveFile = "starfall/" .. tab:GetText()
+		file.Write( saveFile, tab.code )
 		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+	end
+
+	function SF.Editor.saveTabAs( tab )
+
+		local ppdata = {}
+		SF.Preprocessor.ParseDirectives( tab:GetText(), tab.code, {}, ppdata )
+		local name = ppdata.scriptnames[ tab:GetText() ]
+
+		Derma_StringRequestNoBlur(
+				"Save File",
+				"",
+				name or string.StripExtension( tab:GetText() ),
+				function( text )
+					if text == "" then return end
+					text = string.gsub( text, ".", invalid_filename_chars )
+					local saveFile = "starfall/" .. text .. ".txt"
+					file.Write( saveFile, tab.code )
+					tab:SetText( text .. ".txt" )
+					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+					SF.Editor.fileViewer.components["tree"]:reloadTree()
+				end
+			)
 	end
 
 	function SF.Editor.doValidation( forceShow )
@@ -314,7 +336,7 @@ if CLIENT then
 		local buttonSaveExit = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveExit:SetText( "Save and Exit" )
 		function buttonSaveExit:DoClick()
-			SF.Editor.saveActiveTab()
+			SF.Editor.saveTab( SF.Editor.getActiveTab() )
 			SF.Editor.close()
 		end
 		buttonHolder:addButton( buttonSaveExit )
@@ -343,27 +365,14 @@ if CLIENT then
 		local buttonSaveAs = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveAs:SetText( "Save As" )
 		function buttonSaveAs:DoClick()
-			Derma_StringRequestNoBlur(
-				"Save File",
-				"",
-				string.StripExtension( SF.Editor.getOpenFile() ),
-				function( text )
-					if text == "" then return end
-					text = string.gsub( text, ".", invalid_filename_chars )
-					local saveFile = "starfall/"..text..".txt"
-					file.Write( saveFile, SF.Editor.getActiveTab().code )
-					SF.Editor.getActiveTab():SetText( text .. ".txt" )
-					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
-					SF.Editor.fileViewer.components["tree"]:reloadTree()
-				end
-			)
+			SF.Editor.saveTabAs( SF.Editor.getActiveTab() )
 		end
 		buttonHolder:addButton( buttonSaveAs )
 
 		local buttonSave = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSave:SetText( "Save" )
 		function buttonSave:DoClick()
-			SF.Editor.saveActiveTab()
+			SF.Editor.saveTab( SF.Editor.getActiveTab() )
 		end
 		buttonHolder:addButton( buttonSave )
 
@@ -531,33 +540,13 @@ if CLIENT then
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save", function()
 			if not tabHolder.targetTab then return end
-			local fileName = tabHolder.targetTab:GetText()
-
-			if string.GetExtensionFromFilename( fileName ) ~= "txt" then return end
-			local saveFile = "starfall/"..fileName
-			file.Write( saveFile, tabHolder.targetTab.code )
-			SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+			SF.Editor.saveTab( tabHolder.targetTab )
 			tabHolder.targetTab = nil
 		end }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save As", function()
 			if not tabHolder.targetTab then return end
-			local fileName = tabHolder.targetTab:GetText()
-
-			Derma_StringRequestNoBlur(
-				"Save File",
-				"",
-				string.StripExtension( fileName ),
-				function( text )
-					if text == "" then return end
-					text = string.gsub( text, ".", invalid_filename_chars )
-					local saveFile = "starfall/"..text..".txt"
-					file.Write( saveFile, tabHolder.targetTab.code )
-					tabHolder.targetTab:SetText( text .. ".txt" )
-					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
-					SF.Editor.fileViewer.components["tree"]:reloadTree()
-					tabHolder.targetTab = nil
-				end
-			)
+			SF.Editor.saveTabAs( tabHolder.targetTab )
+			tabHolder.targetTab = nil
 		end }
 		function tabHolder:OnRemoveTab( tabIndex )
 			SF.Editor.runJS( "removeEditSession("..tabIndex..")" )

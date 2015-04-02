@@ -78,7 +78,7 @@
 				name: "save",
 				bindKey: {win: "Ctrl-S", mac: "Command-S"},
 				exec: function(editor){
-					console.log("RUNLUA:SF.Editor.saveActiveTab()");
+					console.log("RUNLUA:SF.Editor.saveTab( SF.Editor.getActiveTab() )");
 				}
 			});
 			editor.commands.addCommand({
