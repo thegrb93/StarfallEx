@@ -76,6 +76,7 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_activeline", 1, true, false )
 	CreateClientConVar( "sf_editor_autocompletion", 1, true, false )
 	CreateClientConVar( "sf_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
+	CreateClientConVar( "sf_editor_fixconsolebug", 0, true, false )
 
 	local aceFiles = {}
 	local htmlEditorCode = nil
@@ -693,6 +694,7 @@ if CLIENT then
 		setDoClick(form:CheckBox( "Highlight active line", "sf_editor_activeline" ))
 		setDoClick(form:CheckBox( "Auto completion", "sf_editor_autocompletion" ))
 		setDoClick(form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+		setDoClick(form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" )):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
 
 		return frame
 	end
