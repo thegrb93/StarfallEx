@@ -313,7 +313,28 @@ if CLIENT then
 		end
 
 		return map
+	end
 
+	function SF.Editor.refreshTab( tab )
+
+		local tabHolder = SF.Editor.getTabHolder()
+		if type( tab ) == "number" then
+			tab = tabHolder.tabs[ tab ]  
+		end
+		if tab == nil then return end
+
+		local fileName = tab:GetText()
+		local tabIndex = tabHolder:getTabIndex( tab )
+
+		if string.GetExtensionFromFilename( fileName ) ~= "txt" or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
+			SF.AddNotify( LocalPlayer(), "Unable to refresh tab as file doesn't exist", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+			return 
+		end
+
+		local fileData = file.Read( "starfall/" .. fileName, "DATA" )
+
+		SF.Editor.runJS( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. fileData:JavascriptSafe() .. "\" )" )
+		SF.AddNotify( LocalPlayer(), "Refreshed tab: " .. fileName, NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 	end
 
 	function SF.Editor.createEditor()
@@ -556,6 +577,15 @@ if CLIENT then
 			SF.Editor.saveTabAs( tabHolder.targetTab )
 			tabHolder.targetTab = nil
 		end }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function()
+			if not tabHolder.targetTab then return end
+			
+			SF.Editor.refreshTab( tabHolder.targetTab )
+
+			tabHolder.targetTab = nil
+		end }
+
 		function tabHolder:OnRemoveTab( tabIndex )
 			SF.Editor.runJS( "removeEditSession("..tabIndex..")" )
 
