@@ -50,6 +50,7 @@ if SERVER then
 	AddCSLuaFile( "database.lua" )
 	AddCSLuaFile( "permissions/core.lua" )
 	AddCSLuaFile( "editor.lua" )
+	AddCSLuaFile( "sfderma.lua" )
 	AddCSLuaFile( "callback.lua" )
 	AddCSLuaFile( "sfhelper.lua" )
 end
