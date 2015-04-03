@@ -214,6 +214,30 @@ if CLIENT then
 			)
 	end
 
+	function SF.Editor.refreshTab( tab )
+
+		local tabHolder = SF.Editor.getTabHolder()
+		if type( tab ) == "number" then
+			tab = tabHolder.tabs[ tab ]  
+		end
+		if tab == nil then return end
+
+		dontShowError = dontShowError or false
+
+		local fileName = tab:GetText()
+		local tabIndex = tabHolder:getTabIndex( tab )
+
+		if string.GetExtensionFromFilename( fileName ) ~= "txt" or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
+			SF.AddNotify( LocalPlayer(), "Unable to refresh as file doesn't exist", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+			return 
+		end
+
+		local fileData = file.Read( "starfall/" .. fileName, "DATA" )
+
+		SF.Editor.editor.components.htmlPanel:QueueJavascript( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. string.JavascriptSafe( fileData ) .. "\" )" )
+
+	end
+
 	function SF.Editor.createEditor()
 		local editor = vgui.Create( "StarfallFrame" )
 		editor:SetSize( 800, 600 )
@@ -387,6 +411,15 @@ if CLIENT then
 				end
 			)
 		end }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function()
+			if not tabHolder.targetTab then return end
+			
+			SF.Editor.refreshTab( tabHolder.targetTab )
+
+			tabHolder.targetTab = nil
+		end }
+
 		function tabHolder:OnRemoveTab( tabIndex )
 			SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "removeEditSession("..tabIndex..")" )
 
