@@ -361,16 +361,18 @@ PANEL.Paint = function( panel, w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
 end
 function PANEL:open()
-	self:SetVisible( true )
-	self:SetKeyBoardInputEnabled( true )
-	self:MakePopup()
-	self:InvalidateLayout( true )
-
 	for k, v in pairs( self.lockChildren ) do
 		if v.locked then
 			v:open()
 		end
 	end
+
+	self:SetVisible( true )
+	self:SetKeyBoardInputEnabled( true )
+	self:MakePopup()
+	self:InvalidateLayout( true )
+
+	self:OnOpen()
 end
 function PANEL:close()
 	for k, v in pairs( self.lockChildren ) do
@@ -382,7 +384,9 @@ function PANEL:close()
 	self:SetKeyBoardInputEnabled( false )
 	self:Close()
 end
-
+function PANEL:OnOpen()
+	
+end
 vgui.Register( "StarfallFrame", PANEL, "DFrame" )
 -- End Starfall Frame
 
@@ -578,6 +582,10 @@ function PANEL:addTab( text )
 			end
 		end
 		menu:Open()
+	end
+
+	function tab:DoMiddleClick()
+		SF.Editor.removeTab( self )
 	end
 
 	self.tabs[ #self.tabs + 1 ] = tab

@@ -43,6 +43,8 @@ if CLIENT then
 	Github: http://github.com/INPStarfall/Starfall
 	Reference Page: http://sf.inp.io
 	Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
+
+	Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
 ]].."]]"
 
 	local invalid_filename_chars = {
@@ -74,6 +76,7 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_activeline", 1, true, false )
 	CreateClientConVar( "sf_editor_autocompletion", 1, true, false )
 	CreateClientConVar( "sf_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
+	CreateClientConVar( "sf_editor_fixconsolebug", 0, true, false )
 
 	local aceFiles = {}
 	local htmlEditorCode = nil
@@ -211,11 +214,43 @@ if CLIENT then
 			)
 	end
 
+	function SF.Editor.refreshTab( tab )
+
+		local tabHolder = SF.Editor.getTabHolder()
+		if type( tab ) == "number" then
+			tab = tabHolder.tabs[ tab ]  
+		end
+		if tab == nil then return end
+
+		dontShowError = dontShowError or false
+
+		local fileName = tab:GetText()
+		local tabIndex = tabHolder:getTabIndex( tab )
+
+		if string.GetExtensionFromFilename( fileName ) ~= "txt" or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
+			SF.AddNotify( LocalPlayer(), "Unable to refresh as file doesn't exist", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+			return 
+		end
+
+		local fileData = file.Read( "starfall/" .. fileName, "DATA" )
+
+		SF.Editor.editor.components.htmlPanel:QueueJavascript( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. string.JavascriptSafe( fileData ) .. "\" )" )
+
+	end
+
 	function SF.Editor.createEditor()
 		local editor = vgui.Create( "StarfallFrame" )
 		editor:SetSize( 800, 600 )
 		editor:SetTitle( "Starfall Code Editor" )
 		editor:Center()
+
+		function editor:OnKeyCodePressed( keyCode )
+			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				SF.Editor.saveActiveTab()
+			elseif keyCode == KEY_Q and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				SF.Editor.close()
+			end
+		end
 
 		local buttonHolder = editor.components[ "buttonHolder" ]
 
@@ -338,6 +373,11 @@ if CLIENT then
 		end
 		editor:AddComponent( "htmlPanel", html )
 
+		function editor:OnOpen()
+			html:Call( "editor.focus()" )
+			html:RequestFocus()
+		end
+
 		local tabHolder = vgui.Create( "StarfallTabHolder", editor )
 		tabHolder:SetPos( 5, 30 )
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
@@ -371,6 +411,15 @@ if CLIENT then
 				end
 			)
 		end }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function()
+			if not tabHolder.targetTab then return end
+			
+			SF.Editor.refreshTab( tabHolder.targetTab )
+
+			tabHolder.targetTab = nil
+		end }
+
 		function tabHolder:OnRemoveTab( tabIndex )
 			SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "removeEditSession("..tabIndex..")" )
 
@@ -517,6 +566,7 @@ if CLIENT then
 		setDoClick(form:CheckBox( "Highlight active line", "sf_editor_activeline" ))
 		setDoClick(form:CheckBox( "Auto completion (Ctrl-Space)", "sf_editor_autocompletion" )):SetTooltip( "Doesn't work with Linux for some reason" )
 		setDoClick(form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+		setDoClick(form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" )):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
 
 		return frame
 	end
