@@ -363,11 +363,16 @@ function PANEL:close()
 		end
 	end
 
+	self:OnClose()
+
 	self:SetKeyBoardInputEnabled( false )
 	self:Close()
 end
 function PANEL:OnOpen()
 	
+end
+function PANEL:OnClose()
+
 end
 vgui.Register( "StarfallFrame", PANEL, "DFrame" )
 -- End Starfall Frame

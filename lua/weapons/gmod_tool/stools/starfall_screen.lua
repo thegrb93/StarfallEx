@@ -177,16 +177,14 @@ if CLIENT then
 				local code = file.Read( node:GetFileName(), "DATA" )
 
 				for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
-					if v:GetText() == fileName and v.code == code then
+					if v.filename == fileName and v.code == code then
 						SF.Editor.selectTab( v )
 						SF.Editor.open()
 						return
 					end
 				end
 
-				local data = {}
-				SF.Preprocessor.ParseDirectives( "file", code, {}, data )
-				SF.Editor.addTab( fileName, code, data.scriptnames and data.scriptnames.file or "" )
+				SF.Editor.addTab( fileName, code )
 				SF.Editor.open()
 			end
 			lastClick = CurTime()
