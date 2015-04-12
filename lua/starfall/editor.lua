@@ -109,8 +109,6 @@ if CLIENT then
 
 		SF.Editor.initialized = true
 		SF.Editor.editor:open()
-
-		SF.Editor.addTab()
 	end
 
 	function SF.Editor.open()
@@ -147,7 +145,7 @@ if CLIENT then
 	end
 
 	function SF.Editor.getOpenFile()
-		return SF.Editor.getActiveTab():GetText()
+		return SF.Editor.getActiveTab().filename
 	end
 
 	function SF.Editor.getTabHolder()
@@ -174,15 +172,26 @@ if CLIENT then
 		SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
 	end
 
-	function SF.Editor.addTab( filename, code, name )
-		filename = filename or "generic"
+	function SF.Editor.addTab( filename, code )
+
+		local name = filename or "generic"
+
+		if code then
+			local ppdata = {}
+			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
+			if ppdata.scriptnames.file ~= "" then 
+				name = ppdata.scriptnames.file
+			end
+		end
+
 		code = code or defaultCode
 
 		SF.Editor.runJS( "newEditSession(\""..string.JavascriptSafe( code or defaultCode ).."\")" )
 
-		local tab = SF.Editor.getTabHolder():addTab( filename )
+		local tab = SF.Editor.getTabHolder():addTab( name )
 		tab.code = code
 		tab.name = name
+		tab.filename = filename
 		SF.Editor.selectTab( tab )
 	end
 
@@ -197,29 +206,35 @@ if CLIENT then
 	end
 
 	function SF.Editor.saveTab( tab )
-		if string.GetExtensionFromFilename( tab:GetText() ) ~= "txt" then SF.Editor.saveTabAs( tab ) return end
-		local saveFile = "starfall/" .. tab:GetText()
+		if not tab.filename then SF.Editor.saveTabAs( tab ) return end
+		local saveFile = "starfall/" .. tab.filename
 		file.Write( saveFile, tab.code )
+		SF.Editor.updateTabName( tab )
 		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 	end
 
 	function SF.Editor.saveTabAs( tab )
 
-		local ppdata = {}
-		SF.Preprocessor.ParseDirectives( tab:GetText(), tab.code, {}, ppdata )
-		local name = ppdata.scriptnames[ tab:GetText() ]
+		SF.Editor.updateTabName( tab )
+
+		local saveName = ""
+		if tab.filename then
+			saveName = string.StripExtension( tab.filename )
+		else
+			saveName = tab.name or "generic"
+		end
 
 		Derma_StringRequestNoBlur(
 				"Save File",
 				"",
-				name or string.StripExtension( tab:GetText() ),
+				saveName,
 				function( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = "starfall/" .. text .. ".txt"
 					file.Write( saveFile, tab.code )
-					tab:SetText( text .. ".txt" )
 					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+					SF.Editor.updateTabName( tab )
 					SF.Editor.fileViewer.components["tree"]:reloadTree()
 				end
 			)
@@ -321,10 +336,12 @@ if CLIENT then
 		end
 		if tab == nil then return end
 
-		local fileName = tab:GetText()
+		SF.Editor.updateTabName( tab )
+
+		local fileName = tab.filename
 		local tabIndex = tabHolder:getTabIndex( tab )
 
-		if string.GetExtensionFromFilename( fileName ) ~= "txt" or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
+		if not fileName or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
 			SF.AddNotify( LocalPlayer(), "Unable to refresh tab as file doesn't exist", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 			return 
 		end
@@ -332,7 +349,21 @@ if CLIENT then
 		local fileData = file.Read( "starfall/" .. fileName, "DATA" )
 
 		SF.Editor.runJS( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. fileData:JavascriptSafe() .. "\" )" )
+
+		SF.Editor.updateTabName( tab )
+
 		SF.AddNotify( LocalPlayer(), "Refreshed tab: " .. fileName, NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+	end
+
+	function SF.Editor.updateTabName( tab )
+		local ppdata = {}
+		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
+		if ppdata.scriptnames.tab ~= "" then 
+			tab.name = ppdata.scriptnames.tab
+		else
+			tab.name = tab.filename or "generic"
+		end
+		tab:SetText( tab.name )
 	end
 
 	function SF.Editor.createEditor()
@@ -584,6 +615,17 @@ if CLIENT then
 			SF.Editor.selectTab( tabIndex )
 		end
 		editor:AddComponent( "tabHolder", tabHolder )
+		
+		function editor:OnClose()
+			local tabs = {}
+			for k, v in pairs( tabHolder.tabs ) do
+				tabs[ k ] = {}
+				tabs[ k ].filename = v.filename
+				tabs[ k ].name = v.name
+				tabs[ k ].code = v.code
+			end
+			file.Write( "sf_tabs.txt", util.TableToJSON( tabs ) )
+		end
 
 		return editor
 	end
@@ -659,15 +701,13 @@ if CLIENT then
 			local code = file.Read( node:GetFileName(), "DATA" )
 
 			for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
-				if v:GetText() == fileName and v.code == code then
+				if v.filename == fileName and v.code == code then
 					SF.Editor.selectTab( v )
 					return
 				end
 			end
 
-			local data = {}
-			SF.Preprocessor.ParseDirectives( "file", code, {}, data )
-			SF.Editor.addTab( fileName, code, data.scriptnames and data.scriptnames.file or "" )
+			SF.Editor.addTab( fileName, code )
 		end
 		fileViewer:AddComponent( "tree", tree )
 
@@ -769,6 +809,22 @@ if CLIENT then
 		js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 		js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
+
+		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
+		if tabs ~= nil then
+			for k, v in pairs( tabs ) do
+				SF.Editor.runJS( "newEditSession(\"" .. v.code:JavascriptSafe() .."\")" )
+
+				local tab = SF.Editor.getTabHolder():addTab( v.name )
+				tab.code = v.code
+				tab.name = v.name
+				tab.filename = v.filename
+			end
+			SF.Editor.selectTab( 1 )
+		else
+			SF.Editor.addTab()
+		end
+
 	end
 
 	--- (Client) Builds a table for the compiler to use
