@@ -163,6 +163,12 @@ local function directive_sharedscreen(args, filename, data)
 end
 SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
 
+local function directive_model( args, filename, data )
+	if not data.models then data.models = {} end
+	data.models[ filename ] = args
+end
+SF.Preprocessor.SetGlobalDirective( "model", directive_model )
+
 --- Mark a file to be included in the upload.
 -- This is required to use the file in require() and dofile()
 -- @name include
@@ -202,3 +208,12 @@ SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
 -- else
 -- \	-- Display result of important calculations
 -- end
+
+--- Set the model of the processor entity.
+-- This does not set the model of the screen entity
+-- @name model
+-- @class directive
+-- @param model String of the model
+-- @usage
+-- \--@model models/props_junk/watermelon01.mdl
+-- -- CODE
