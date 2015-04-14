@@ -1,4 +1,5 @@
-TOOL.Category		= "Wire - Display"
+TOOL.Category		= "Visuals/Screens"
+TOOL.Wire_MultiCategories = { "Chips, Gates" }
 TOOL.Name			= "Starfall - Components"
 TOOL.Command		= nil
 TOOL.ConfigName		= ""
