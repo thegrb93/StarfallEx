@@ -156,4 +156,18 @@ function bass_methods:setPos ( pos )
 	end
 end
 
+--- Sets the fade distance of the sound
+-- @param min The channel's volume is at maximum when the listener is within this distance
+-- @param max The channel's volume stops decreasing when the listener is beyond this distance.
+function bass_methods:setFade ( min, max )
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if IsValid(uw) then
+		uw:Set3DFadeDistance( math.Clamp(min,50,1000), math.Clamp(max,10000,200000) )
+	end
+end
+
 
