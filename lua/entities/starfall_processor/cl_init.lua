@@ -28,9 +28,7 @@ end
 function ENT:Think ()
 	self.BaseClass.Think( self )
 	
-	if self.instance and not self.instance.error then
-		self:runScriptHook( "think" )
-	end
+	self:runScriptHook( "think" )
 
 	self:NextThink( CurTime() )
 	return true

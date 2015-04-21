@@ -52,14 +52,12 @@ function bass_library.loadFile ( path, flags, callback )
 	local instance = SF.instance
 
 	sound.PlayFile( path, flags, function(snd, er, name)
-		SF.instance = instance
 		if er then
-			callback( nil, er, name )
+			instance:runFunction( callback, nil, er, name )
 		else
 			instance.data.bass.sounds[ snd ] = true
-			callback( wrap( snd ), nil, nil )
+			instance:runFunction( callback, wrap( snd ), 0, "" )
 		end
-		SF.instance = nil
 	end)
 end
 
@@ -77,14 +75,12 @@ function bass_library.loadURL ( path, flags, callback )
 	local instance = SF.instance
 	
 	sound.PlayURL( path, flags, function(snd, er, name)
-		SF.instance = instance
 		if er then
-			callback( nil, er, name )
+			instance:runFunction( callback, nil, er, name )
 		else
 			instance.data.bass.sounds[ snd ] = true
-			callback( wrap( snd ), nil, nil )
+			instance:runFunction( callback, wrap( snd ), 0, "" )
 		end
-		SF.instance = nil
 	end)
 end
 
