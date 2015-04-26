@@ -166,4 +166,30 @@ function bass_methods:setFade ( min, max )
 	end
 end
 
+--- Sets if the sound should loop or not.
+-- @param loop Boolean if the sound should loop or not.
+function bass_methods:setLooping ( loop )
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if IsValid(uw) then
+		uw:EnableLooping( loop )
+	end
+end
+
+--- Gets the length of a sound
+-- @return Length in seconds of the sound
+function bass_methods:getLength ()
+	local uw = unwrap( self )
+	SF.CheckType( self, bass_metamethods )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if IsValid(uw) then
+		return uw:GetLength()
+	end
+end
+
 
