@@ -91,7 +91,7 @@ function P.check ( principal, target, key )
 		return true
 	end
 
-	local allow = false
+	local allow = true
 	for _, provider in pairs( providers ) do
 		local result = provider:check( principal, target, key )
 		if DENY == result then
