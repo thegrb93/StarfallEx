@@ -177,7 +177,7 @@ function ENT:Think ()
 
 		self:UpdateState( tostring( math.Round( bufferAvg * 1000000 ) ) .. " us.\n" .. tostring( math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 ) ) .. "%" )
 
-		self.instance:updateCPUBuffer()
+		self.instance:resetCPUBuffer()
 		self:runScriptHook( "think" )
 	end
 

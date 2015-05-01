@@ -56,9 +56,6 @@ function SF.Instance:runWithOps(func,...)
 	local function cpuCheck ()
 		self.cpuTime.current =  SysTime() - oldSysTime
 
-		local ind = self.cpuTime.bufferI
-		self.cpuTime.buffer[ ind ] = self.cpuTime.current
-
 		if self.cpuTime:getBufferAverage() > SF.cpuQuota:GetFloat() then
 			debug.sethook( nil )
 			SF.throw( "CPU Quota exceeded.", 0, true )
@@ -105,18 +102,14 @@ function SF.Instance:initialize()
 	assert(not self.initialized, "Already initialized!")
 	self.initialized = true
 	self.cpuTime = {
-		buffer = {},
-		bufferI = 1,
+		buffer = 0,
 		current = 0
 	} -- CPU Time Buffer
 
 	local ins = self
 	function self.cpuTime:getBufferAverage ()
-		local r = 0
-		for _, v in pairs( self.buffer ) do
-			r = r + v
-		end
-		return r / ins.context.cpuTime:getBufferN()
+		local n = ins.context.cpuTime:getBufferN()
+		return (self.buffer * (n - 1) + self.current) / n
 	end
 
 	self:runLibraryHook("initialize")
@@ -289,8 +282,6 @@ function SF.Instance:Error(msg,traceback)
 end
 
 --- Updates the buffer index for the CPU Time buffer.
-function SF.Instance:updateCPUBuffer ()
+function SF.Instance:resetCPUBuffer ()
 	self.cpuTime.current = 0
-	self.cpuTime.bufferI = ( self.cpuTime.bufferI % self.context.cpuTime.getBufferN() ) + 1
-	self.cpuTime.buffer[ self.cpuTime.bufferI ] = 0
 end
