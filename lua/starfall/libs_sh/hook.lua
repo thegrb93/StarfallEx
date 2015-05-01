@@ -165,6 +165,11 @@ function SF.hookAdd( hookname, customfunc )
 	end)
 end
 
+local function returnOnlyOnYourself( instance, args, ply )
+	if instance.player ~= ply then return end
+	if args then return args[1] end
+end
+
 local add = SF.hookAdd
 
 if SERVER then
@@ -178,13 +183,11 @@ if SERVER then
 	add( "PlayerInitialSpawn" )
 	add( "PlayerSpawn" )
 	add( "PlayerLeaveVehicle" )
-	add( "PlayerSay", function( instance, args, ply )
-		if instance.player ~= ply then return end
-		if args then return args[1] end
-	end )
+	add( "PlayerSay", returnOnlyOnYourself )
 	add( "PlayerSpray" )
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
+	add( "PlayerCanPickupWeapon", returnOnlyOnYourself  )
 	
 	hook.Add("EntityTakeDamage", "SF_EntityTakeDamage", function( target, dmg )
 		local lower = ("EntityTakeDamage"):lower()
@@ -211,10 +214,7 @@ add( "KeyRelease" )
 add( "GravGunPunt" )
 add( "PhysgunPickup" )
 add( "PhysgunDrop" )
-add( "PlayerSwitchWeapon", function( instance, args, ply )
-	if instance.player ~= ply then return end
-	if args then return args[1] end
-end )
+add( "PlayerSwitchWeapon", returnOnlyOnYourself )
 
 -- Entity hooks
 add( "OnEntityCreated" )
@@ -316,6 +316,13 @@ add( "StartEntityDriving" )
 -- @server
 -- @param ply Player switching flashlight
 -- @param state New flashlight state. True if on.
+
+--- Called when a wants to pick up a weapon
+-- @name PlayerCanPickupWeapon
+-- @class hook
+-- @server
+-- @param ply Player
+-- @param wep Weapon
 
 --- Called when a player gets hurt
 -- @name PlayerHurt
