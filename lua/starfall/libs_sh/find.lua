@@ -15,7 +15,7 @@ do
 end
 
 local function convert(results, func)
-	if func then SF.CheckType(func,"function",1) end
+	if func then SF.CheckType(func,"function") end
 	local wrap = SF.WrapObject
 	
 	local t = {}
