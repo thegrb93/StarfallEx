@@ -14,22 +14,6 @@ do
 	P.registerPrivilege( "find", "Find", "Allows the user to access the find library" )
 end
 
-local find_cooldown
-if SERVER then
-	find_cooldown = CreateConVar("sf_find_cooldown_sv", "0.01", {FCVAR_REPLICATED, FCVAR_ARCHIVE, FCVAR_DONTRECORD})
-else
-	find_cooldown = CreateConVar("sf_find_cooldown_cl", "0.01", {FCVAR_ARCHIVE, FCVAR_DONTRECORD})
-end
-
-local function updateCooldown(instance)
-	if not instance.data.findcooldown then instance.data.findcooldown = 0 end
-	local time = CurTime()
-	
-	if instance.data.findcooldown > time then return false end
-	instance.data.findcooldown = time + find_cooldown:GetFloat()
-	return true
-end
-
 local function convert(results, func)
 	if func then SF.CheckType(func,"function",1) end
 	local wrap = SF.WrapObject
@@ -46,15 +30,6 @@ local function convert(results, func)
 	return t
 end
 
---- Checks if a find function can be performed
--- @return True if find functions can be used
-function find_library.canFind()
-	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then return false end
-	local data = SF.instance.data
-	if not data.findcooldown then data.findcooldown = 0 end
-	return data.findcooldown <= CurTime()
-end
-
 --- Finds entities in a box
 -- @param min Bottom corner
 -- @param max Top corner
@@ -67,11 +42,6 @@ function find_library.inBox ( min, max, filter )
 
 	local min, max = vunwrap( min ), vunwrap( max )
 
-	if filter then SF.CheckType( filter, "function" ) end
-	
-	local instance = SF.instance
-	if not updateCooldown( instance ) then return end
-	
 	return convert( ents.FindInBox( min, max ), filter )
 end
 
@@ -86,9 +56,6 @@ function find_library.inSphere ( center, radius, filter )
 	SF.CheckType( radius, "number" )
 
 	local center = vunwrap( center )
-	
-	local instance = SF.instance
-	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	
 	return convert( ents.FindInSphere( center, radius ), filter )
 end
@@ -109,9 +76,6 @@ function find_library.inCone ( pos, dir, distance, radius, filter )
 
 	local pos, dir = vunwrap( pos ), vunwrap( dir )
 	
-	local instance = SF.instance
-	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
-	
 	return convert( ents.FindInCone( pos, dir, distance, radius ), filter )
 end
 
@@ -122,10 +86,7 @@ end
 function find_library.byClass(class, filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(class,"string")
-	
-	local instance = SF.instance
-	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
-	
+		
 	return convert(ents.FindByClass(class), filter)
 end
 
@@ -136,10 +97,7 @@ end
 function find_library.byModel(model, filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(model,"string")
-	
-	local instance = SF.instance
-	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
-	
+		
 	return convert(ents.FindByModel(model), filter)
 end
 
@@ -148,8 +106,6 @@ end
 -- @return An array of found entities
 function find_library.allPlayers(filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	local instance = SF.instance
-	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	
 	return convert(player.GetAll(), filter)
 end
@@ -159,8 +115,6 @@ end
 -- @return An array of found entities
 function find_library.all(filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	local instance = SF.instance
-	if not updateCooldown(instance) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) end
 	
 	return convert(ents.GetAll(), filter)
 end
