@@ -53,7 +53,7 @@ function TOOL:LeftClick( trace )
 			if not mainfile then return end
 			if not IsValid(ent) then return end -- Probably removed during transfer
 			ent:Compile(files, mainfile)
-			if ent.instance.ppdata.models and ent.instance.mainfile and ent.instance.ppdata.models[ ent.instance.mainfile ] then
+			if sf.instance and ent.instance.ppdata.models and ent.instance.mainfile and ent.instance.ppdata.models[ ent.instance.mainfile ] then
 				ent:SetModel( tostring( ent.instance.ppdata.models[ ent.instance.mainfile ] ) )
 				ent:PhysicsInit( SOLID_VPHYSICS )
 			end
@@ -90,7 +90,7 @@ function TOOL:LeftClick( trace )
 		if not mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
 		sf:Compile(files, mainfile)
-		if sf.instance.ppdata.models and sf.instance.mainfile and sf.instance.ppdata.models[ sf.instance.mainfile ] then
+		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile and sf.instance.ppdata.models[ sf.instance.mainfile ] then
 			sf:SetModel( tostring( sf.instance.ppdata.models[ sf.instance.mainfile ] ) )
 			sf:PhysicsInit( SOLID_VPHYSICS )
 		end
