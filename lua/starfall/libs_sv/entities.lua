@@ -160,7 +160,7 @@ function ents_methods:unparent ()
 end
 
 --- Plays a sound on the entity
--- @param snd string soundName
+-- @param snd string Sound path
 -- @param lvl number soundLevel=75
 -- @param pitch pitchPercent=100
 -- @param volume volume=1
