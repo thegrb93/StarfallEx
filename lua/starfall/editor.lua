@@ -196,7 +196,10 @@ if CLIENT then
 
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( SF.Editor.getOpenFile(), SF.Editor.getActiveTab().code, {}, ppdata )
-		local name = ppdata.scriptnames[ SF.Editor.getOpenFile() ]
+		local name = nil
+		if ppdata.scriptnames then
+			name = ppdata.scriptnames[ SF.Editor.getOpenFile() ]
+		end
 
 		Derma_StringRequestNoBlur(
 				"Save File",
