@@ -185,6 +185,17 @@ if SERVER then
 	add( "PlayerSpray" )
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
+	
+	hook.Add("EntityTakeDamage", "SF_EntityTakeDamage", function( target, dmg )
+		local lower = ("EntityTakeDamage"):lower()
+		run( lower, nil, target, dmg:GetAttacker(), 
+			dmg:GetInflictor(), 
+			dmg:GetDamage(), 
+			dmg:GetDamageType(), 
+			dmg:GetDamagePosition(), 
+			dmg:GetDamageForce())
+	end)
+	
 else
 	-- Client hooks
 	-- todo
@@ -200,10 +211,15 @@ add( "KeyRelease" )
 add( "GravGunPunt" )
 add( "PhysgunPickup" )
 add( "PhysgunDrop" )
+add( "PlayerSwitchWeapon", function( instance, args, ply )
+	if instance.player ~= ply then return end
+	if args then return args[1] end
+end )
 
 -- Entity hooks
 add( "OnEntityCreated" )
 add( "EntityRemoved" )
+add( "PropBreak" )
 
 -- Other
 add( "EndEntityDriving" )
@@ -352,6 +368,14 @@ add( "StartEntityDriving" )
 -- @param ply Player droppig the entity
 -- @param ent Entity being dropped
 
+--- Called when a player switches their weapon
+-- @name PlayerSwitchWeapon
+-- @class hook
+-- @shared
+-- @param ply Player droppig the entity
+-- @param oldwep Old weapon
+-- @param newweapon New weapon
+
 --- Called when an entity gets created
 -- @name OnEntityCreated
 -- @class hook
@@ -363,6 +387,25 @@ add( "StartEntityDriving" )
 -- @class hook
 -- @shared
 -- @param ent Entity being removed
+
+--- Called when an entity is broken
+-- @name PropBreak
+-- @class hook
+-- @shared
+-- @param ply Player who broke it
+-- @param ent Entity broken
+
+--- Called when an entity is damaged
+-- @name EntityTakeDamage
+-- @class hook
+-- @server
+-- @param target Entity that is hurt
+-- @param attacker Entity that attacked
+-- @param inflictor Entity that inflicted the damage
+-- @param amount How much damage
+-- @param type Type of the damage
+-- @param position Position of the damage
+-- @param force Force of the damage
 
 --- Called when a player stops driving an entity
 -- @name EndEntityDriving
