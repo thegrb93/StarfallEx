@@ -134,7 +134,6 @@ end
 function ents_methods:entIndex ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return ent:EntIndex()
 end
 
@@ -144,7 +143,6 @@ end
 function ents_methods:getClass ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return ent:GetClass()
 end
 
@@ -154,7 +152,6 @@ end
 function ents_methods:getPos ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:GetPos() )
 end
 
@@ -164,7 +161,6 @@ end
 function ents_methods:obbSize ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:OBBMaxs() - ent:OBBMins() )
 end
 
@@ -174,7 +170,6 @@ end
 function ents_methods:obbCenter ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:OBBCenter() )
 end
 
@@ -184,7 +179,6 @@ end
 function ents_methods:obbCenterW ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:LocalToWorld( ent:OBBCenter() ) )
 end
 
@@ -195,7 +189,7 @@ function ents_methods:getMassCenter ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
+	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	return SF.WrapObject( phys:GetMassCenter() )
 end
 
@@ -206,7 +200,7 @@ function ents_methods:getMassCenterW ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
+	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	return SF.WrapObject( ent:LocalToWorld( phys:GetMassCenter() ) )
 end
 
@@ -216,7 +210,6 @@ end
 function ents_methods:getAngles ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:GetAngles() )
 end
 
@@ -228,7 +221,7 @@ function ents_methods:getMass ()
 	
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
+	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	
 	return phys:GetMass()
 end
@@ -241,7 +234,7 @@ function ents_methods:getInertia ()
 	
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end
+	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	
 	return phys:GetInertia()
 end
@@ -262,7 +255,7 @@ end
 function ents_methods:getAngleVelocity ()
 	SF.CheckType( self, ents_metamethods )
 	local phys = getPhysObject( unwrap( self ) )
-	if not phys or not phys:IsValid() then return nil, "entity has no physics object or is not valid" end	
+	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end	
 	return SF.WrapObject( phys:GetAngleVelocity() )
 end
 
@@ -274,7 +267,6 @@ function ents_methods:localToWorld( data )
 	SF.CheckType( self, ents_metamethods )
 	SF.CheckType( data, SF.Types[ "Vector" ] )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	
 	return SF.WrapObject( ent:LocalToWorld( vunwrap( data ) ) )
 end
@@ -288,7 +280,6 @@ function ents_methods:localToWorldAngles ( data )
 	SF.CheckType( data, SF.Types[ "Angle" ] )
 	local ent = unwrap( self )
 	local data = SF.UnwrapObject( data )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	
 	return SF.WrapObject( ent:LocalToWorldAngles( data ) )
 end
@@ -301,7 +292,6 @@ function ents_methods:worldToLocal ( data )
 	SF.CheckType( self, ents_metamethods )
 	SF.CheckType( data, SF.Types[ "Vector" ] )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	
 	return SF.WrapObject( ent:WorldToLocal( vunwrap( data ) ) )
 end
@@ -315,7 +305,6 @@ function ents_methods:worldToLocalAngles ( data )
 	SF.CheckType( data, SF.Types[ "Angle" ] )
 	local ent = unwrap( self )
 	local data = SF.UnwrapObject( data )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	
 	return SF.WrapObject( ent:WorldToLocalAngles( data ) )
 end
@@ -326,7 +315,6 @@ end
 function ents_methods:getModel ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return ent:GetModel()
 end
 
@@ -336,7 +324,6 @@ end
 function ents_methods:getEyeAngles ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:EyeAngles() )
 end
 
@@ -347,7 +334,6 @@ end
 function ents_methods:getEyePos ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
 	return SF.WrapObject( ent:EyePos() )
 end
 
@@ -357,7 +343,6 @@ end
 -- @return Material
 function ents_methods:getMaterial ()
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
     return ent:GetMaterial() or ""
 end
 
@@ -367,7 +352,6 @@ end
 -- @return Material
 function ents_methods:getSubMaterial ( index )
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
     return ent:GetSubMaterial( index ) or ""
 end
 
@@ -377,7 +361,6 @@ end
 -- @return Material
 function ents_methods:getMaterials ()
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
     return ent:GetMaterials() or {}
 end
 
@@ -391,7 +374,6 @@ function ents_methods:setMaterial ( material )
     if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
 
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
     ent:SetMaterial( material )
     return wrap( ent )
 end
@@ -407,7 +389,6 @@ function ents_methods:setSubMaterial ( index, material )
     if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
 
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
     ent:SetSubMaterial( index, material )
     return wrap( ent )
 end
@@ -423,7 +404,6 @@ function ents_methods:setBodygroup ( bodygroup, value )
     SF.CheckType( value, "number" )
 
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
 
     ent:SetBodyGroup( bodygroup, value )
 
@@ -439,7 +419,6 @@ function ents_methods:setSkin ( skinIndex )
     SF.CheckType( skinIndex, "number" )
 
     local ent = unwrap( self )
-    if not isValid( ent ) then return nil, "invalid entity" end
 
     ent:SetSkin( skinIndex )
     return wrap( ent )
