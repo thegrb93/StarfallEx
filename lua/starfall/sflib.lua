@@ -67,15 +67,6 @@ include( "sfhelper.lua" )
 
 SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 16, { FCVAR_REPLICATED }, "Default number of elements for the CPU Quota Buffer." )
 
--- We need to make sure that we clear the table if we shrink it, otherwise leftover values will affect the avg.
-cvars.AddChangeCallback( "sf_timebuffersize", function ( n, o, u )
-	if o > u then
-		for _, v in pairs( SF.allInstances ) do
-			v.cpuTime.buffer = {}
-		end
-	end
-end )
-
 if SERVER then
 	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.004, {}, "Default CPU Time Quota for serverside." )
 else

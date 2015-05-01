@@ -52,15 +52,20 @@ function SF.Instance:runWithOps(func,...)
 	end
 
 	local oldSysTime = SysTime()
-
+	local averateCPU = nil
+	
 	local function cpuCheck ()
-		self.cpuTime.current =  SysTime() - oldSysTime
+		self.cpu_current =  SysTime() - oldSysTime
+		
+		averateCPU = self:movingCPUAverage()
 
-		if self.cpuTime:getBufferAverage() > SF.cpuQuota:GetFloat() then
+		if averateCPU > self.context.cpuTime:getMax() then
 			debug.sethook( nil )
 			SF.throw( "CPU Quota exceeded.", 0, true )
 		end
 	end
+	
+	if averageCPU then self.cpu_average = averageCPU end
 
 	debug.sethook( cpuCheck, "", 500 )
 	local ok, rt = xpcall( wrapperfunc, xpcall_callback )
@@ -101,16 +106,9 @@ end
 function SF.Instance:initialize()
 	assert(not self.initialized, "Already initialized!")
 	self.initialized = true
-	self.cpuTime = {
-		buffer = 0,
-		current = 0
-	} -- CPU Time Buffer
 
-	local ins = self
-	function self.cpuTime:getBufferAverage ()
-		local n = ins.context.cpuTime:getBufferN()
-		return (self.buffer * (n - 1) + self.current) / n
-	end
+	self.cpu_average = 0
+	self.cpu_current = 0
 
 	self:runLibraryHook("initialize")
 	self:prepare("_initialize","_initialize")
@@ -281,7 +279,7 @@ function SF.Instance:Error(msg,traceback)
 	self:deinitialize()
 end
 
---- Updates the buffer index for the CPU Time buffer.
-function SF.Instance:resetCPUBuffer ()
-	self.cpuTime.current = 0
+function SF.Instance:movingCPUAverage()
+	local n = self.context.cpuTime:getBufferN()
+	return (self.cpu_average * (n - 1) + self.cpu_current) / n
 end
