@@ -496,7 +496,7 @@ if SERVER then
 	-- of filename->code pairs, or nil if the client couldn't handle the request (due to bad includes, etc)
 	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
 	function SF.RequestCode(ply, callback)
-		if uploaddata[ply] then return false end
+		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
 		
 		net.Start("starfall_requpload")
 		net.WriteEntity(ent)
@@ -507,6 +507,7 @@ if SERVER then
 			mainfile = nil,
 			needHeader=true,
 			callback = callback,
+			timeout = CurTime() + 1
 		}
 		return true
 	end
