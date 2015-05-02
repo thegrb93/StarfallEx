@@ -73,6 +73,16 @@ function timer_library.remove(name)
 	instance.data.timers[name] = nil
 end
 
+--- Checks if a timer exists
+-- @param name The timer name
+-- @return bool if the timer exists
+function timer_library.exists(name)
+	SF.CheckType(name,"string")
+	local instance = SF.instance
+	
+	return timer.Exists(mangle_timer_name(instance,name))
+end
+
 --- Stops a timer
 -- @param name The timer name
 function timer_library.stop(name)
