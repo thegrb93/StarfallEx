@@ -131,8 +131,8 @@ function props_library.create ( pos, ang, model, frozen )
 	if not can_spawn( instance ) then return SF.throw( "Can't spawn props that often", 2 )
 	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 )
 	elseif max_reached() then return SF.throw( "Can't spawn props, maximum limit of " .. SF.Props.defaultquota:GetInt() .. " has been reached", 2 ) end
-	if not IsValid( instance.player ) then return SF.Entities.Wrap( NULL ) end
-	if not gamemode.Call( "PlayerSpawnProp", instance.player, model ) then return SF.Entities.Wrap( NULL ) end
+	if not IsValid( instance.player ) then return end
+	if not gamemode.Call( "PlayerSpawnProp", instance.player, model ) then return end
 
 	local propdata = instance.data.props
 	local propent = ents.Create( "prop_physics" )
@@ -162,6 +162,85 @@ function props_library.create ( pos, ang, model, frozen )
 
 	plyCount[ instance.player ] = plyCount[ instance.player ] + 1
 	return prop
+end
+
+--- Creates a sent.
+-- @server
+-- @return The sent object
+function props_library.createSent ( pos, ang, class, frozen )
+	
+	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	SF.CheckType( pos, SF.Types[ "Vector" ] )
+	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	SF.CheckType( class, "string" )
+	frozen = frozen and true or false
+
+	local pos = vunwrap( pos )
+	local ang = SF.Angles.Unwrap( ang )
+
+	local instance = SF.instance
+	if not can_spawn( instance ) then return SF.throw( "Can't spawn props that often", 2 )
+	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 )
+	elseif max_reached() then return SF.throw( "Can't spawn props, maximum limit of " .. SF.Props.defaultquota:GetInt() .. " has been reached", 2 ) end
+	if not IsValid( instance.player ) then return end
+	
+
+	local swep = list.Get( "Weapon" )[ class ]
+	local sent = list.Get( "SpawnableEntities" )[ class ]
+
+	local propdata = instance.data.props
+	local entity
+	local hookcall
+	
+	if swep then
+	
+		if ( ( !swep.Spawnable && !instance.player:IsAdmin() ) || 
+		      ( swep.AdminOnly && !instance.player:IsAdmin() ) ) then return end
+		if ( !gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
+
+
+		entity = ents.Create( swep.ClassName )
+		
+		hookcall = "PlayerSpawnedSWEP"
+	
+	elseif sent then
+	
+		if ( sent.AdminOnly && !instance.player:IsAdmin() ) then return false end
+		if ( !gamemode.Call( "PlayerSpawnSENT", instance.player, class ) ) then return end
+	
+		entity = ents.Create( sent.ClassName )
+	
+		hookcall = "PlayerSpawnedSENT"
+	
+	end
+	
+	if ( IsValid( entity ) ) then
+		
+		entity:CallOnRemove( "starfall_prop_delete", propOnDestroy, propdata, instance.player )
+		entity:SetPos( pos )
+		entity:SetAngles( ang )
+		
+		entity:Spawn()
+		entity:Activate()
+		
+		local phys = entity:GetPhysicsObject()
+		if phys:IsValid() then
+			phys:EnableMotion(not frozen)
+		end
+		
+		instance.player:AddCleanup( "props", entity )
+		gamemode.Call( hookcall, instance.player, entity )
+	
+		local wrapped = SF.Entities.Wrap( entity )
+
+		propdata.props[ wrapped ] = wrapped
+		propdata.count = propdata.count + 1
+
+		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
+	
+		return wrapped
+	end
 end
 
 --- Checks if a user can spawn anymore props.
