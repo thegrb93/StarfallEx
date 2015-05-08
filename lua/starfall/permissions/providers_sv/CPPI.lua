@@ -16,6 +16,7 @@ local canTool = {
 	[ "entities.enableDrag" ] = true,
 	[ "entities.setColor" ] = true,
 	[ "entities.remove" ] = true,
+	[ "entities.emitSound" ] = true,
 	[ "wire.createWire" ] = true,
 	[ "wire.deleteWire" ] = true,
 	[ "constraints.weld" ] = true,
@@ -39,7 +40,6 @@ local canPhysgun = {
 
 function P:check ( principal, target, key )
 	if not CPPI then return NEUTRAL end
-	if type( target ) ~= "Entity" and type( target ) ~= "Player" then return NEUTRAL end
 
 	if canTool[ key ] then
 		if target:CPPICanTool( principal, "starfall_ent_lib" ) then return ALLOW end

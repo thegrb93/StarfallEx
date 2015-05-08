@@ -91,7 +91,7 @@ end
 
 --- Returns the name of the player's active weapon
 -- @shared
--- @return Name of weapon
+-- @return The weapon
 function player_methods:getActiveWeapon ()
 	SF.CheckType( self, player_metamethods )
 	local ent = SF.Entities.Unwrap( self )
