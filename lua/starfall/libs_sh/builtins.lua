@@ -418,6 +418,26 @@ function SF.DefaultEnvironment.concmd ( cmd )
 	SF.instance.player:ConCommand( cmd )
 end
 
+--- Set the value of a table index without invoking a metamethod
+--@param table The table to modify
+--@param key The index of the table
+--@param value The value to set the index equal to
+function SF.DefaultEnvironment.rawset( table, key, value )
+    SF.CheckType( table, "table" )
+
+    rawset( table, key, value )
+end
+
+--- Gets the value of a table index without invoking a metamethod
+--@param table The table to get the value from
+--@param key The index of the table
+--@return The value of the index
+function SF.DefaultEnvironment.rawget( table, key, value )
+    SF.CheckType( table, "table" )
+
+    return rawget( table, key )
+end
+
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
