@@ -176,7 +176,7 @@ if CLIENT then
 		if code then
 			local ppdata = {}
 			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
-			if ppdata.scriptnames.file ~= "" then 
+			if ppdata.scriptnames and ppdata.scriptnames.file ~= "" then 
 				name = ppdata.scriptnames.file
 			end
 		end
@@ -238,6 +238,7 @@ if CLIENT then
 					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 					SF.Editor.updateTabName( tab )
 					SF.Editor.fileViewer.components["tree"]:reloadTree()
+					tab.filename = saveName .. ".txt"
 				end
 			)
 	end
@@ -360,7 +361,7 @@ if CLIENT then
 	function SF.Editor.updateTabName( tab )
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
-		if ppdata.scriptnames.tab ~= "" then 
+		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then 
 			tab.name = ppdata.scriptnames.tab
 		else
 			tab.name = tab.filename or "generic"
