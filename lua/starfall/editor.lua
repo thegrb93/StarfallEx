@@ -163,8 +163,18 @@ if CLIENT then
 		SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
 	end
 
-	function SF.Editor.addTab( filename, code, name )
-		filename = filename or "generic"
+	function SF.Editor.addTab( filename, code )
+
+		local name = filename or "generic"
+
+		if code then
+			local ppdata = {}
+			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
+			if ppdata.scriptnames and ppdata.scriptnames.file ~= "" then 
+				name = ppdata.scriptnames.file
+			end
+		end
+
 		code = code or defaultCode
 
 		SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "newEditSession(\""..string.JavascriptSafe( code or defaultCode ).."\")" )
@@ -213,6 +223,7 @@ if CLIENT then
 					SF.Editor.getActiveTab():SetText( text .. ".txt" )
 					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
 					SF.Editor.fileViewer.components["tree"]:reloadTree()
+					tab.filename = saveName .. ".txt"
 				end
 			)
 	end
@@ -239,6 +250,20 @@ if CLIENT then
 
 		SF.Editor.editor.components.htmlPanel:QueueJavascript( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. string.JavascriptSafe( fileData ) .. "\" )" )
 
+		SF.Editor.updateTabName( tab )
+
+		SF.AddNotify( LocalPlayer(), "Refreshed tab: " .. fileName, NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+	end
+
+	function SF.Editor.updateTabName( tab )
+		local ppdata = {}
+		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
+		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then 
+			tab.name = ppdata.scriptnames.tab
+		else
+			tab.name = tab.filename or "generic"
+		end
+		tab:SetText( tab.name )
 	end
 
 	function SF.Editor.createEditor()
