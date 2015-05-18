@@ -77,3 +77,12 @@ function file_library.delete ( path )
 	file.Delete( path )
 	return true
 end
+
+--- Creates a directory
+-- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+function file_library.createDir ( path )
+	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.CheckType( path, "string" )
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'" ) return end
+	file.CreateDir( "sf_filedata/" .. path )
+end
