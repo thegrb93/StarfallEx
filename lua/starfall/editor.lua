@@ -165,8 +165,10 @@ if CLIENT then
 
 	function SF.Editor.addTab( filename, code )
 
-		local name = filename or "generic"
+		filename = filename or "generic"
 
+		local name = filename
+		
 		if code then
 			local ppdata = {}
 			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
