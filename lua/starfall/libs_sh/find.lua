@@ -70,7 +70,7 @@ function find_library.inBox ( min, max, filter )
 	if filter then SF.CheckType( filter, "function" ) end
 	
 	local instance = SF.instance
-	if not updateCooldown( instance ) then return end
+	if not updateCooldown( instance ) then SF.throw( "You cannot run a find right now; use 'find_library.canFind()'", 2 ) return end
 	
 	return convert( ents.FindInBox( min, max ), filter )
 end
