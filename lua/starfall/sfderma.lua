@@ -361,6 +361,7 @@ PANEL.Paint = function( panel, w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
 end
 function PANEL:open()
+
 	for k, v in pairs( self.lockChildren ) do
 		if v.locked then
 			v:open()
@@ -381,11 +382,16 @@ function PANEL:close()
 		end
 	end
 
+	self:OnClose()
+
 	self:SetKeyBoardInputEnabled( false )
 	self:Close()
 end
 function PANEL:OnOpen()
 	
+end
+function PANEL:OnClose()
+
 end
 vgui.Register( "StarfallFrame", PANEL, "DFrame" )
 -- End Starfall Frame

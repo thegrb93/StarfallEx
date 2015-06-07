@@ -63,9 +63,9 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_posy", ScrH()/2-760/2, true, false )
 
 	CreateClientConVar( "sf_fileviewer_width", 263, true, false )
-	CreateClientConVar( "sf_fileviewer_height", 600, true, false )
+	CreateClientConVar( "sf_fileviewer_height", 760, true, false )
 	CreateClientConVar( "sf_fileviewer_posx", ScrW()/2-1100/2-263, true, false )
-	CreateClientConVar( "sf_fileviewer_posy", ScrH()/2-600/2, true, false )
+	CreateClientConVar( "sf_fileviewer_posy", ScrH()/2-760/2, true, false )
 	CreateClientConVar( "sf_fileviewer_locked", 1, true, false )
 
 	CreateClientConVar( "sf_editor_widgets", 1, true, false )
@@ -82,7 +82,14 @@ if CLIENT then
 	local htmlEditorCode = nil
 
 	function SF.Editor.init()
-		if SF.Editor.initialized or #aceFiles == 0 or htmlEditorCode == nil or not SF.Editor.safeToInit then return end
+		if not SF.Editor.safeToInit then 
+			SF.AddNotify( LocalPlayer(), "Starfall is downloading editor files, please wait.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
+			return 
+		end
+		if SF.Editor.initialized or #aceFiles == 0 or htmlEditorCode == nil then 
+			SF.AddNotify( LocalPlayer(), "Failed to initialize Starfall editor.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+			return
+		end
 
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
@@ -94,12 +101,14 @@ if CLIENT then
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.settingsWindow:close()
 
+		SF.Editor.runJS = function( ... ) 
+			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
+		end
+
 		SF.Editor.updateSettings()
 
 		SF.Editor.initialized = true
 		SF.Editor.editor:open()
-
-		SF.Editor.addTab()
 	end
 
 	function SF.Editor.open()
@@ -124,7 +133,7 @@ if CLIENT then
 	end
 
 	function SF.Editor.updateCode() -- Incase anyone needs to force update the code
-		SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "console.log(\"RUNLUA:SF.Editor.getActiveTab().code = \\\"\" + addslashes(editor.getValue()) + \"\\\"\")" )
+		SF.Editor.runJS( "console.log(\"RUNLUA:SF.Editor.getActiveTab().code = \\\"\" + addslashes(editor.getValue()) + \"\\\"\")" )
 	end
 
 	function SF.Editor.getCode()
@@ -136,7 +145,7 @@ if CLIENT then
 	end
 
 	function SF.Editor.getOpenFile()
-		return SF.Editor.getActiveTab():GetText()
+		return SF.Editor.getActiveTab().filename
 	end
 
 	function SF.Editor.getTabHolder()
@@ -160,15 +169,13 @@ if CLIENT then
 
 		tabHolder:selectTab( tab )
 
-		SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
+		SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
 	end
 
 	function SF.Editor.addTab( filename, code )
 
-		filename = filename or "generic"
+		local name = filename or "generic"
 
-		local name = filename
-		
 		if code then
 			local ppdata = {}
 			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
@@ -179,11 +186,12 @@ if CLIENT then
 
 		code = code or defaultCode
 
-		SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "newEditSession(\""..string.JavascriptSafe( code or defaultCode ).."\")" )
+		SF.Editor.runJS( "newEditSession(\""..string.JavascriptSafe( code or defaultCode ).."\")" )
 
-		local tab = SF.Editor.getTabHolder():addTab( filename )
+		local tab = SF.Editor.getTabHolder():addTab( name )
 		tab.code = code
 		tab.name = name
+		tab.filename = filename
 		SF.Editor.selectTab( tab )
 	end
 
@@ -197,37 +205,128 @@ if CLIENT then
 		tabHolder:removeTab( tab )
 	end
 
-	function SF.Editor.saveActiveTab()
-		if string.GetExtensionFromFilename( SF.Editor.getOpenFile() ) ~= "txt" then SF.Editor.saveActiveTabAs() return end
-		local saveFile = "starfall/"..SF.Editor.getOpenFile()
-		file.Write( saveFile, SF.Editor.getActiveTab().code )
-		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+	function SF.Editor.saveTab( tab )
+		if not tab.filename then SF.Editor.saveTabAs( tab ) return end
+		local saveFile = "starfall/" .. tab.filename
+		file.Write( saveFile, tab.code )
+		SF.Editor.updateTabName( tab )
+		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 	end
 
-	function SF.Editor.saveActiveTabAs()
+	function SF.Editor.saveTabAs( tab )
 
-		local ppdata = {}
-		SF.Preprocessor.ParseDirectives( SF.Editor.getOpenFile(), SF.Editor.getActiveTab().code, {}, ppdata )
-		local name = nil
-		if ppdata.scriptnames then
-			name = ppdata.scriptnames[ SF.Editor.getOpenFile() ]
+		SF.Editor.updateTabName( tab )
+
+		local saveName = ""
+		if tab.filename then
+			saveName = string.StripExtension( tab.filename )
+		else
+			saveName = tab.name or "generic"
 		end
 
 		Derma_StringRequestNoBlur(
 				"Save File",
 				"",
-				name or string.StripExtension( SF.Editor.getOpenFile() ),
+				saveName,
 				function( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
-					local saveFile = "starfall/"..text..".txt"
-					file.Write( saveFile, SF.Editor.getActiveTab().code )
-					SF.Editor.getActiveTab():SetText( text .. ".txt" )
-					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					local saveFile = "starfall/" .. text .. ".txt"
+					file.Write( saveFile, tab.code )
+					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+					SF.Editor.updateTabName( tab )
 					SF.Editor.fileViewer.components["tree"]:reloadTree()
 					tab.filename = saveName .. ".txt"
 				end
 			)
+	end
+
+	function SF.Editor.doValidation( forceShow )
+
+		local function valid()
+			local code = SF.Editor.getActiveTab().code
+
+			local err = CompileString( code, "Validation", false )
+
+			if type( err ) ~= "string" then 
+				if forceShow then SF.AddNotify( LocalPlayer(), "Validation successful", NOTIFY_GENERIC, 3, NOTIFYSOUND_DRIP3 ) end
+				SF.Editor.runJS( "editor.session.clearAnnotations(); clearErrorLines()" )
+				return 
+			end
+
+			local row = tonumber( err:match( "%d+" ) ) - 1
+			local message = err:match( ": .+$" ):sub( 3 )
+
+			SF.Editor.runJS( string.format( "editor.session.setAnnotations([{row: %d, text: \"%s\", type: \"error\"}])", row, message:JavascriptSafe() ) )
+			SF.Editor.runJS( [[
+				clearErrorLines();
+
+				var Range = ace.require("ace/range").Range;
+				var range = new Range(]] .. row .. [[, 1, ]] .. row .. [[, Infinity);
+
+				editor.session.addMarker(range, "ace_error", "screenLine");
+
+			]] )
+			
+			if not forceShow then return end
+
+			SF.Editor.runJS( "editor.session.unfold({row: " .. row .. ", column: 0})" )
+			SF.Editor.runJS( "editor.scrollToLine( " .. row .. ", true )" )
+
+
+		end
+		if forceShow then valid() return end
+		if not timer.Exists( "validationTimer" ) or ( timer.Exists( "validationTimer") and not timer.Adjust( "validationTimer", 0.5, 1, valid ) ) then
+			timer.Remove( "validationTimer" )
+			timer.Create( "validationTimer", 0.5, 1, valid )
+		end
+
+	end
+
+	local function createLibraryMap()
+
+		local map = {}
+
+		for lib, tbl in pairs( SF.Types ) do
+			if ( lib == "Environment" or lib:find( "Library: " ) ) and type( tbl.__index ) == "table" then
+				lib = lib:Replace( "Library: ", "" )
+				map[ lib ] = {}
+				for name, val in pairs( tbl.__index ) do
+					table.insert( map[ lib ], name )
+				end
+			end
+		end
+
+		map.Angle = {}
+		for name, val in pairs( SF.Angles.Methods ) do
+			table.insert( map.Angle, name )
+		end
+		map.Color = {}
+		for name, val in pairs( SF.Color.Methods ) do
+			table.insert( map.Color, name )
+		end
+		map.Entity = {}
+		for name, val in pairs( SF.Entities.Methods ) do
+			table.insert( map.Entity, name )
+		end
+		map.Player = {}
+		for name, val in pairs( SF.Players.Methods ) do
+			table.insert( map.Player, name )
+		end
+		map.Sound = {}
+		for name, val in pairs( SF.Sounds.Methods ) do
+			table.insert( map.Sound, name )
+		end
+		map.VMatrix = {}
+		for name, val in pairs( SF.VMatrix.Methods ) do
+			table.insert( map.VMatrix, name )
+		end
+		map.Vector = {}
+		for name, val in pairs( SF.Vectors.Methods ) do
+			table.insert( map.Vector, name )
+		end
+
+		return map
 	end
 
 	function SF.Editor.refreshTab( tab )
@@ -238,19 +337,19 @@ if CLIENT then
 		end
 		if tab == nil then return end
 
-		dontShowError = dontShowError or false
+		SF.Editor.updateTabName( tab )
 
-		local fileName = tab:GetText()
+		local fileName = tab.filename
 		local tabIndex = tabHolder:getTabIndex( tab )
 
-		if string.GetExtensionFromFilename( fileName ) ~= "txt" or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
-			SF.AddNotify( LocalPlayer(), "Unable to refresh as file doesn't exist", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+		if not fileName or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
+			SF.AddNotify( LocalPlayer(), "Unable to refresh tab as file doesn't exist", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 			return 
 		end
 
 		local fileData = file.Read( "starfall/" .. fileName, "DATA" )
 
-		SF.Editor.editor.components.htmlPanel:QueueJavascript( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. string.JavascriptSafe( fileData ) .. "\" )" )
+		SF.Editor.runJS( "editSessions[ " .. tabIndex .. " - 1 ].setValue( \"" .. fileData:JavascriptSafe() .. "\" )" )
 
 		SF.Editor.updateTabName( tab )
 
@@ -276,7 +375,7 @@ if CLIENT then
 
 		function editor:OnKeyCodePressed( keyCode )
 			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
-				SF.Editor.saveActiveTab()
+				SF.Editor.saveTab( SF.Editor.getActiveTab() )
 			elseif keyCode == KEY_Q and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
 				SF.Editor.close()
 			end
@@ -287,7 +386,7 @@ if CLIENT then
 		local buttonSaveExit = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveExit:SetText( "Save and Exit" )
 		function buttonSaveExit:DoClick()
-			SF.Editor.saveActiveTab()
+			SF.Editor.saveTab( SF.Editor.getActiveTab() )
 			SF.Editor.close()
 		end
 		buttonHolder:addButton( buttonSaveExit )
@@ -316,14 +415,14 @@ if CLIENT then
 		local buttonSaveAs = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveAs:SetText( "Save As" )
 		function buttonSaveAs:DoClick()
-			SF.Editor.saveActiveTabAs()
+			SF.Editor.saveTabAs( SF.Editor.getActiveTab() )
 		end
 		buttonHolder:addButton( buttonSaveAs )
 
 		local buttonSave = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSave:SetText( "Save" )
 		function buttonSave:DoClick()
-			SF.Editor.saveActiveTab()
+			SF.Editor.saveTab( SF.Editor.getActiveTab() )
 		end
 		buttonHolder:addButton( buttonSave )
 
@@ -348,7 +447,22 @@ if CLIENT then
 
 		html:SetAllowLua( true )
 
-		html:QueueJavascript( "createStarfallMode(\"" .. table.concat( table.GetKeys( SF.DefaultEnvironment ), "|" ) .. "\")")
+		local map = createLibraryMap()
+
+		html:QueueJavascript( "libraryMap = JSON.parse(\"" .. util.TableToJSON( map ):JavascriptSafe() .. "\")" )
+
+		local libs = {}
+		local functions = {}
+		table.ForEach( map, function( lib, vals )
+			if lib == "Environment" or lib:GetChar( 1 ):upper() ~= lib:GetChar( 1 ) then
+				table.insert( libs, lib )
+			end
+			table.ForEach( vals, function( key, val )
+				table.insert( functions, val )
+			end )
+		end )
+
+		html:QueueJavascript( "createStarfallMode(\"" .. table.concat( libs, "|" ) .. "\", \"" .. table.concat( table.Add( table.Copy( functions ), libs ), "|" ) .. "\")" )
 
 		function html:PerformLayout( ... )
 		 	self:SetSize( editor:GetWide() - 10, editor:GetTall() - 59 )
@@ -360,45 +474,108 @@ if CLIENT then
 			end
 
 			if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
-			if key == KEY_LEFT and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateLeft(1)" )
-				repeatKey()
-			elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateRight(1)" )
-				repeatKey()
-			elseif key == KEY_UP and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateUp(1)" )
-				repeatKey()
-			elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateDown(1)" )
-				repeatKey()
-			elseif key == KEY_HOME and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateLineStart()" )
-				repeatKey()
-			elseif key == KEY_END and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateLineEnd()" )
-				repeatKey()
-			elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateFileStart()" )
-				repeatKey()
-			elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.navigateFileEnd()" )
-				repeatKey()
-			elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.remove('left')" )
-				repeatKey()
-			elseif key == KEY_DELETE and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.remove('right')" )
-				repeatKey()
-			elseif key == KEY_ENTER and input.IsKeyDown( key ) then
-				self:QueueJavascript( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
-				repeatKey()
-			elseif key == KEY_INSERT and input.IsKeyDown( key ) then
-				repeatKey()
-				self:QueueJavascript( "editor.toggleOverwrite()" )
-			elseif key == KEY_TAB and input.IsKeyDown( key ) then
-				repeatKey()
-				self:QueueJavascript( "editor.indent()" )
+			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and 
+				( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				if key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.modifyNumber(1)" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.modifyNumber(-1)" )
+					repeatKey()
+				elseif key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectWordLeft()" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectWordRight()" )
+					repeatKey()
+				end
+			elseif input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) then
+				if key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectLeft()" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectRight()" )
+					repeatKey()
+				elseif key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectUp()" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectDown()" )
+					repeatKey()
+				elseif key == KEY_HOME and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectLineStart()" )
+					repeatKey()
+				elseif key == KEY_END and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.selection.selectLineEnd()" )
+					repeatKey()
+				end
+			elseif input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) then
+				if key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateWordLeft()" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateWordRight()" )
+					repeatKey()
+				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.removeWordLeft()" )
+					repeatKey()
+				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.removeWordRight()" )
+					repeatKey()
+				elseif key == KEY_SPACE and input.IsKeyDown( key ) then
+					SF.Editor.doValidation( true )
+				elseif key == KEY_C and input.IsKeyDown( key ) then
+					self:QueueJavascript( "console.log(\"RUNLUA:SetClipboardText(\\\"\"+ addslashes(editor.getSelectedText()) +\"\\\")\")" )
+				end
+			elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
+				if key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.moveLinesUp()" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.moveLinesDown()" )
+					repeatKey()
+				end
+			else
+				if key == KEY_LEFT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateLeft(1)" )
+					repeatKey()
+				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateRight(1)" )
+					repeatKey()
+				elseif key == KEY_UP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateUp(1)" )
+					repeatKey()
+				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateDown(1)" )
+					repeatKey()
+				elseif key == KEY_HOME and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateLineStart()" )
+					repeatKey()
+				elseif key == KEY_END and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateLineEnd()" )
+					repeatKey()
+				elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateFileStart()" )
+					repeatKey()
+				elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.navigateFileEnd()" )
+					repeatKey()
+				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.remove('left')" )
+					repeatKey()
+				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.remove('right')" )
+					repeatKey()
+				elseif key == KEY_ENTER and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
+					repeatKey()
+				elseif key == KEY_INSERT and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.toggleOverwrite()" )
+					repeatKey()
+				elseif key == KEY_TAB and input.IsKeyDown( key ) then
+					self:QueueJavascript( "editor.indent()" )
+					repeatKey()
+				end
 			end
 		end
 		editor:AddComponent( "htmlPanel", html )
@@ -413,33 +590,13 @@ if CLIENT then
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save", function()
 			if not tabHolder.targetTab then return end
-			local fileName = tabHolder.targetTab:GetText()
-
-			if string.GetExtensionFromFilename( fileName ) ~= "txt" then return end
-			local saveFile = "starfall/"..fileName
-			file.Write( saveFile, tabHolder.targetTab.code )
-			SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+			SF.Editor.saveTab( tabHolder.targetTab )
 			tabHolder.targetTab = nil
 		end }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save As", function()
 			if not tabHolder.targetTab then return end
-			local fileName = tabHolder.targetTab:GetText()
-
-			Derma_StringRequestNoBlur(
-				"Save File",
-				"",
-				string.StripExtension( fileName ),
-				function( text )
-					if text == "" then return end
-					text = string.gsub( text, ".", invalid_filename_chars )
-					local saveFile = "starfall/"..text..".txt"
-					file.Write( saveFile, tabHolder.targetTab.code )
-					tabHolder.targetTab:SetText( text .. ".txt" )
-					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
-					SF.Editor.fileViewer.components["tree"]:reloadTree()
-					tabHolder.targetTab = nil
-				end
-			)
+			SF.Editor.saveTabAs( tabHolder.targetTab )
+			tabHolder.targetTab = nil
 		end }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function()
@@ -451,7 +608,7 @@ if CLIENT then
 		end }
 
 		function tabHolder:OnRemoveTab( tabIndex )
-			SF.Editor.editor.components[ "htmlPanel" ]:QueueJavascript( "removeEditSession("..tabIndex..")" )
+			SF.Editor.runJS( "removeEditSession("..tabIndex..")" )
 
 			if #self.tabs == 0 then
 				SF.Editor.addTab()
@@ -459,6 +616,17 @@ if CLIENT then
 			SF.Editor.selectTab( tabIndex )
 		end
 		editor:AddComponent( "tabHolder", tabHolder )
+		
+		function editor:OnClose()
+			local tabs = {}
+			for k, v in pairs( tabHolder.tabs ) do
+				tabs[ k ] = {}
+				tabs[ k ].filename = v.filename
+				tabs[ k ].name = v.name
+				tabs[ k ].code = v.code
+			end
+			file.Write( "sf_tabs.txt", util.TableToJSON( tabs ) )
+		end
 
 		return editor
 	end
@@ -534,15 +702,13 @@ if CLIENT then
 			local code = file.Read( node:GetFileName(), "DATA" )
 
 			for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
-				if v:GetText() == fileName and v.code == code then
+				if v.filename == fileName and v.code == code then
 					SF.Editor.selectTab( v )
 					return
 				end
 			end
 
-			local data = {}
-			SF.Preprocessor.ParseDirectives( "file", code, {}, data )
-			SF.Editor.addTab( fileName, code, data.scriptnames and data.scriptnames.file or "" )
+			SF.Editor.addTab( fileName, code )
 		end
 		fileViewer:AddComponent( "tree", tree )
 
@@ -594,7 +760,7 @@ if CLIENT then
 		setDoClick(form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ))
 		setDoClick(form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ))
 		setDoClick(form:CheckBox( "Highlight active line", "sf_editor_activeline" ))
-		setDoClick(form:CheckBox( "Auto completion (Ctrl-Space)", "sf_editor_autocompletion" )):SetTooltip( "Doesn't work with Linux for some reason" )
+		setDoClick(form:CheckBox( "Auto completion", "sf_editor_autocompletion" ))
 		setDoClick(form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
 		setDoClick(form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" )):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
 
@@ -635,16 +801,31 @@ if CLIENT then
 			frame.buttonLock:SetText( "Locked" )
 		end
 
-		local html = SF.Editor.editor.components[ "htmlPanel" ]
-		local js = html.QueueJavascript
-		js( html, "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
-		js( html, "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
-		js( html, "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
-		js( html, "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ")" )
-		js( html, "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ")" )
-		js( html, "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
-		js( html, "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
-		js( html, "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
+		local js = SF.Editor.runJS
+		js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
+		js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
+		js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
+		js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ")" )
+		js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ")" )
+		js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
+		js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
+		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
+
+		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
+		if tabs ~= nil then
+			for k, v in pairs( tabs ) do
+				SF.Editor.runJS( "newEditSession(\"" .. v.code:JavascriptSafe() .."\")" )
+
+				local tab = SF.Editor.getTabHolder():addTab( v.name )
+				tab.code = v.code
+				tab.name = v.name
+				tab.filename = v.filename
+			end
+			SF.Editor.selectTab( 1 )
+		else
+			SF.Editor.addTab()
+		end
+
 	end
 
 	--- (Client) Builds a table for the compiler to use
@@ -790,9 +971,6 @@ elseif SERVER then
 		for k, v in pairs( files ) do
 			out = out .. "<script>\n" .. file.Read( addon_path .. "/html/starfall/ace/" .. v, "GAME" ) .. "</script>\n"
 		end
-
-		--out:Replace( "workerPath:null", "workerPath:\"\"" )
-		--out:Replace( "suffix:\".js\"", "suffix:\".txt\"" )
 
 		for i = 1, math.ceil( out:len() / netSize ) do
 			acefiles[i] = out:sub( (i - 1)*netSize + 1, i*netSize )
