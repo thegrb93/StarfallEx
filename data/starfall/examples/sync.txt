@@ -1,11 +1,8 @@
 --@name Sync
 --@author INP
---@sharedscreen
-
--- Code executed on both client and server, note the --@sharedscreen above
 
 if SERVER then
-    -- Code only executed on the server, note the --@sharedscreen above
+    -- Code only executed on the server
     local randomNumber = math.floor( math.random() * 100 )
 
     hook.add( "net", "uniqueHookNameHere", function ( name, len, ply )

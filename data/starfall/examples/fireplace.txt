@@ -2,6 +2,8 @@
 --@author INP - Radon
 --@include lib/class.txt
 
+if SERVER then return end
+
 -- Credits to Natty for original fireplace idea as an example
 -- Credits to funkake for working out the kinks
 

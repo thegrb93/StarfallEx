@@ -1,6 +1,8 @@
 --@name Coroutine Example
 --@author Radon
 
+if not SERVER then return end
+
 -- Some functions for checking our quota usage.
 local function checkQ ( n )
     return quotaUsed() < quotaMax() * n

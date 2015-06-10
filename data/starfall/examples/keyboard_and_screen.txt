@@ -1,0 +1,58 @@
+--@name keyboard_and_screen
+--@author Sparky
+
+if SERVER then
+    
+    wire.adjustInputs({"Keyboard","Console"},{"Wirelink","Wirelink"})
+    
+    KeyboardEnt = find.byClass("gmod_wire_keyboard",
+        function(e) return e:getOwner()==entities.owner() end)[1]
+    ConsoleEnt = find.byClass("gmod_wire_consolescreen",
+        function(e) return e:getOwner()==entities.owner() end)[1]
+    
+    hook.add("input","getwirelinks",function(name, val)
+        if name == "Console" then
+            Console = val
+        elseif name == "Keyboard" then
+            Keyboard = val
+        end
+    end)
+    
+    wire.delete(entities.self(),"Keyboard") --Just in case it's already connected
+    wire.delete(entities.self(),"Console")
+    wire.create(entities.self(), KeyboardEnt, "Keyboard", "wirelink")
+    wire.create(entities.self(), ConsoleEnt, "Console", "wirelink")
+    
+    ConsolePos = 0
+    key_funcs = {
+        [127] = function()
+            Console[ConsolePos] = 0
+            Console[2045] = ConsolePos
+            ConsolePos = math.max(ConsolePos - 2, 0)
+        end,
+        [9] = function() end,
+        [154] = function() end,
+        [155] = function() end,
+        [158] = function() end,
+        [159] = function() end,
+    }
+    hook.add("Think","CheckKeys",function()
+        if Keyboard and Console then
+            Console[2046] = 1
+            while Keyboard[0] > 0 do
+                --print(Keyboard[1])
+                if key_funcs[Keyboard[1]] then key_funcs[Keyboard[1]]()
+                else
+                    Console[ConsolePos] = Keyboard[1]
+                    Console[ConsolePos+1] = 999
+                    
+                    ConsolePos = ConsolePos + 2
+                    Console[2045] = ConsolePos
+                end
+                
+                Keyboard[0] = 0
+            end
+        end
+    end)
+    
+end

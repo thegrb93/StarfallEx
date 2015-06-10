@@ -1,6 +1,8 @@
 --@name cpuTime Example
 --@author INP - Radon
 
+if CLIENT then return end
+
 -- This function helps us check if we can run.
 -- Use a mixture of quotaUsed() and quotaAverage()
 -- quotaUsed() returns the value of the current buffer.
