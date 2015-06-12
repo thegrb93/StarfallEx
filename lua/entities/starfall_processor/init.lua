@@ -138,6 +138,12 @@ function ENT:Compile(files, mainfile)
 
 	self.name = nil
 
+	if self.Inputs then
+		for k, v in pairs(self.Inputs) do
+			self:TriggerInput( k, v.Value )
+		end
+	end
+	
 	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[ self.instance.mainfile ] then
 		self.name = tostring( self.instance.ppdata.scriptnames[ self.instance.mainfile ] )
 	end
