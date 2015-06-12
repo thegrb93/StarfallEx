@@ -9,7 +9,7 @@ assert( SF, "Starfall didn't load correctly!" )
 local context = SF.CreateContext()
 
 function ENT:UpdateState ( state )
-	self:SetOverlayText( "- Starfall Processor -\n[ " .. ( self.name or "Generic ( No-Name )" ) .. " ]\n" .. state )
+	baseclass.Get( "base_gmodentity" ).SetOverlayText( self, "- Starfall Processor -\n[ " .. ( self.name or "Generic ( No-Name )" ) .. " ]\n" .. state )
 end
 
 function ENT:Initialize ()

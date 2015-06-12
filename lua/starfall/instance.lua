@@ -52,25 +52,25 @@ function SF.Instance:runWithOps(func,...)
 	end
 
 	local oldSysTime = SysTime()
-	local averateCPU = nil
+	local averageCPU = nil
 	
 	local function cpuCheck ()
 		self.cpu_current =  SysTime() - oldSysTime
 		
-		averateCPU = self:movingCPUAverage()
+		averageCPU = self:movingCPUAverage()
 
-		if averateCPU > self.context.cpuTime:getMax() then
+		if averageCPU > self.context.cpuTime:getMax() then
 			debug.sethook( nil )
 			SF.throw( "CPU Quota exceeded.", 0, true )
 		end
 	end
-	
-	if averageCPU then self.cpu_average = averageCPU end
 
 	debug.sethook( cpuCheck, "", 500 )
 	local ok, rt = xpcall( wrapperfunc, xpcall_callback )
 	debug.sethook( nil )
 
+	if averageCPU then self.cpu_average = averageCPU end
+	
 	if ok then
 		return true, rt
 	else
