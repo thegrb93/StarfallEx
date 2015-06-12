@@ -8,9 +8,10 @@ local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
 function wire_metamethods.onLoad ( instance )
 	if not WireLib then return end
 	local ent = instance.data.entity
-	if ent.Inputs ~= nil and ent.Outputs ~= nil then return end
-	ent.Inputs = WireLib.CreateInputs( ent, {} )
-	ent.Outputs = WireLib.CreateOutputs( ent, {} )
+	if ent.Inputs == nil or ent.Outputs == nil then
+		WireLib.CreateInputs( ent, {} )
+		WireLib.CreateOutputs( ent, {} )
+	end
 
 	function ent:TriggerInput ( key, value )
 		local tmp = SF.instance

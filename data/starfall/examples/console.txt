@@ -6,7 +6,6 @@ if SERVER then
     wire.adjustInputs({"Keyboard","Console"},{"Wirelink","Wirelink"})
     
     hook.add("input","getwirelinks",function(name, val)
-        print(name,val)
         if name == "Console" then
             Console = val
         elseif name == "Keyboard" then
@@ -19,6 +18,7 @@ if SERVER then
     
     local function updateCursor()
         Console[2045] = ConsolePos
+        Console[2046] = 1
     end
     local function cls()
         Console[2041] = 1
@@ -76,30 +76,31 @@ if SERVER then
     key_funcs[142] = key_funcs[13]
     
     local function main_loop()
-        while Keyboard[0] > 0 do
-            if cincb then
-                if key_funcs[Keyboard[1]] then key_funcs[Keyboard[1]]()
-                else
-                    --print(Keyboard[1])
-                    Console[ConsolePos] = Keyboard[1]
-                    Console[ConsolePos+1] = 999
-                    
-                    ConsolePos = ConsolePos + 2
-                    updateCursor()
-                end
+        if not Keyboard or not Console then
+            Initialized = false
+        else
+            if not Initialized then
+                Initialized = true
+                main()
             end
-        
-            Keyboard[0] = 0
+            while Keyboard[0] > 0 do
+                if cincb then
+                    if key_funcs[Keyboard[1]] then key_funcs[Keyboard[1]]()
+                    else
+                        --print(Keyboard[1])
+                        Console[ConsolePos] = Keyboard[1]
+                        Console[ConsolePos+1] = 999
+                        
+                        ConsolePos = ConsolePos + 2
+                        updateCursor()
+                    end
+                end
+            
+                Keyboard[0] = 0
+            end
         end
     end
-    hook.add("Think","CheckWires",function()
-        if Keyboard and Console then
-            Console[2046] = 1
-            main()
-            hook.remove("Think","CheckWires")
-            hook.add("Think","Mainloop",main_loop)
-        end
-    end)
+    hook.add("Think","Mainloop",main_loop)
 
     function main()
         cls()
