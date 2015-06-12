@@ -81,6 +81,7 @@ if SERVER then
         else
             if not Initialized then
                 Initialized = true
+                cls()
                 main()
             end
             while Keyboard[0] > 0 do
@@ -103,15 +104,14 @@ if SERVER then
     hook.add("Think","Mainloop",main_loop)
 
     function main()
-        cls()
         cout("Type hello: ")
         cin(function(str)
             if str == "hello" then
-                cout("Hi!")
+                cout("Hi!\n")
             else
-                cout("WRONG!!!")
+                cout("WRONG!!!\n",800999)
             end
-            timer.simple(3,main)
+            timer.simple(0,main)
         end)
     end
 end
