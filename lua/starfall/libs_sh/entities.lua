@@ -128,6 +128,38 @@ function ents_methods:isValid ()
 	return isValid( unwrap( self ) )
 end
 
+--- Checks if an entity is a player.
+-- @shared
+-- @return True if player, false if not
+function ents_methods:isPlayer ()
+	SF.CheckType( self, ents_metamethods )
+	return unwrap( self ):IsPlayer()
+end
+
+--- Checks if an entity is a weapon.
+-- @shared
+-- @return True if weapon, false if not
+function ents_methods:isWeapon ()
+	SF.CheckType( self, ents_metamethods )
+	return unwrap( self ):IsWeapon()
+end
+
+--- Checks if an entity is a vehicle.
+-- @shared
+-- @return True if vehicle, false if not
+function ents_methods:isVehicle ()
+	SF.CheckType( self, ents_metamethods )
+	return unwrap( self ):IsVehicle()
+end
+
+--- Checks if an entity is an npc.
+-- @shared
+-- @return True if npc, false if not
+function ents_methods:isNPC ()
+	SF.CheckType( self, ents_metamethods )
+	return unwrap( self ):IsNPC()
+end
+
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity
