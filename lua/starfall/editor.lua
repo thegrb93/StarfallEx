@@ -106,15 +106,16 @@ if CLIENT then
 		end
 
 		SF.Editor.updateSettings()
+		SF.Editor.editor:close()
 
 		SF.Editor.initialized = true
-		SF.Editor.editor:open()
+
+		return true
 	end
 
 	function SF.Editor.open()
 		if not SF.Editor.initialized then 
 			SF.Editor.init()
-			return
 		end
 
 		SF.Editor.editor:open()
@@ -137,10 +138,6 @@ if CLIENT then
 	end
 
 	function SF.Editor.getCode()
-		if not SF.Editor.initialized then -- stops someone trying to place a chip before editor is initialized 
-			SF.Editor.init()
-			return ""
-		end
 		return SF.Editor.getActiveTab().code
 	end
 
@@ -192,6 +189,11 @@ if CLIENT then
 		tab.code = code
 		tab.name = name
 		tab.filename = filename
+
+		function tab:DoClick()
+			SF.Editor.selectTab( self )
+		end
+
 		SF.Editor.selectTab( tab )
 	end
 
@@ -382,6 +384,15 @@ if CLIENT then
 		end
 
 		local buttonHolder = editor.components[ "buttonHolder" ]
+
+		-- Exit button
+		buttonHolder.buttons[ 1 ].DoClick = function( self )
+			SF.Editor.close()
+		end
+
+		-- Remove buttonLock
+		buttonHolder.buttons[ 2 ]:Remove()
+		buttonHolder.buttons[ 2 ] = nil
 
 		local buttonSaveExit = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveExit:SetText( "Save and Exit" )
@@ -622,10 +633,16 @@ if CLIENT then
 			for k, v in pairs( tabHolder.tabs ) do
 				tabs[ k ] = {}
 				tabs[ k ].filename = v.filename
-				tabs[ k ].name = v.name
 				tabs[ k ].code = v.code
 			end
+			tabs.selectedTab = SF.Editor.getTabHolder():getTabIndex( SF.Editor.getActiveTab() )
 			file.Write( "sf_tabs.txt", util.TableToJSON( tabs ) )
+		end
+
+		function editor:OnThink()
+			if self.Dragged or self.Resized then
+				SF.Editor.saveSettings()
+			end
 		end
 
 		return editor
@@ -637,65 +654,10 @@ if CLIENT then
 		fileViewer:SetTitle( "Starfall File Viewer" )
 		fileViewer:Center()
 
-		local searchBox = vgui.Create( "DTextEntry", fileViewer )
-		searchBox:Dock( TOP )
-		searchBox:DockMargin( 0, 5, 0, 0 )
-		searchBox:SetValue( "Search..." )
+		local browser = vgui.Create( "StarfallFileBrowser", fileViewer )
 
-		searchBox._OnGetFocus = searchBox.OnGetFocus
-		function searchBox:OnGetFocus()
-			if self:GetValue() == "Search..." then
-				self:SetValue( "" )
-			end
-			searchBox:_OnGetFocus()
-		end
-
-		searchBox._OnLoseFocus = searchBox.OnLoseFocus
-		function searchBox:OnLoseFocus()
-			if self:GetValue() == "" then
-				self:SetText( "Search..." )
-			end
-			searchBox:_OnLoseFocus()
-		end
-
-		function searchBox:OnChange()
-			local tree = fileViewer.components[ "tree" ]
-
-			if self:GetValue() == "" then
-				tree:reloadTree()
-				return
-			end
-
-			tree.Root.ChildNodes:Clear()
-			local function addFiles( search, dir, node, makenode )
-				if makenode then
-					local folder = string.Trim( string.reverse( string.match( string.reverse( dir ), ".-/" ) ), "/" )
-					node = node:AddNode( folder )
-					node:SetExpanded( true )
-				end
-				search = string.lower( search )
-				local allFiles, allFolders = file.Find( dir .. "/*", "DATA" )
-				for k, v in pairs( allFolders ) do
-					addFiles( search, dir.."/"..v, node, true )
-				end
-				for k, v in pairs( allFiles ) do
-					if string.find( string.lower( v ), search ) then
-						node:AddNode( v, "icon16/page_white.png" )
-					end
-				end
-				if not node.ChildNodes then
-					node:Remove()
-				end
-			end
-			addFiles( self:GetValue(), "starfall", tree.Root )
-			tree.Root:SetExpanded( true )
-		end
-
-		fileViewer:AddComponent( "searchBox", searchBox )
-
-		local tree = vgui.Create( "StarfallFileBrowser", fileViewer )
+		local searchBox, tree = browser:getComponents()
 		tree:setup( "starfall" )
-		tree:Dock( FILL )
 		function tree:OnNodeSelected( node )
 			if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
 			local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
@@ -710,9 +672,18 @@ if CLIENT then
 
 			SF.Editor.addTab( fileName, code )
 		end
-		fileViewer:AddComponent( "tree", tree )
 
-		local buttonHolder  = fileViewer.components[ "buttonHolder" ]
+		fileViewer:AddComponent( "browser", browser )
+
+		local buttonHolder = fileViewer.components[ "buttonHolder" ]
+
+		local buttonLock = buttonHolder.buttons[ 2 ]
+		buttonLock._DoClick = buttonLock.DoClick
+		buttonLock.DoClick = function( self )
+			self:_DoClick()
+			SF.Editor.saveSettings()
+		end
+
 		local buttonRefresh = vgui.Create( "StarfallButton", buttonHolder )
 		buttonRefresh:SetText( "Refresh" )
 		buttonRefresh:SetHoverColor( Color( 7, 70, 0 ) )
@@ -723,6 +694,12 @@ if CLIENT then
 			searchBox:SetValue( "Search..." )
 		end
 		buttonHolder:addButton( buttonRefresh )
+
+		function fileViewer:OnThink()
+			if self.Dragged or self.Resized then
+				SF.Editor.saveSettings()
+			end
+		end
 
 		return fileViewer
 	end
@@ -796,10 +773,10 @@ if CLIENT then
 		frame:SetPos( GetConVarNumber( "sf_fileviewer_posx" ), GetConVarNumber( "sf_fileviewer_posy" ) )
 		frame:lock( SF.Editor.editor )
 		frame.locked = tobool(GetConVarNumber( "sf_fileviewer_locked" ))
-		if frame.locked then
-			frame.buttonLock.active = true
-			frame.buttonLock:SetText( "Locked" )
-		end
+
+		local buttonLock = frame.components[ "buttonHolder" ].buttons[ 2 ]
+		buttonLock.active = frame.locked
+		buttonLock:SetText( frame.locked and "Locked" or "Unlocked" )
 
 		local js = SF.Editor.runJS
 		js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
@@ -812,20 +789,16 @@ if CLIENT then
 		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
 
 		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
-		if tabs ~= nil then
+		if tabs ~= nil and #tabs ~= 0 then
 			for k, v in pairs( tabs ) do
-				SF.Editor.runJS( "newEditSession(\"" .. v.code:JavascriptSafe() .."\")" )
-
-				local tab = SF.Editor.getTabHolder():addTab( v.name )
-				tab.code = v.code
-				tab.name = v.name
-				tab.filename = v.filename
+				if type( v ) ~= "number" then
+					SF.Editor.addTab( v.filename, v.code )
+				end
 			end
-			SF.Editor.selectTab( 1 )
+			SF.Editor.selectTab( tabs.selectedTab or 1 )
 		else
 			SF.Editor.addTab()
 		end
-
 	end
 
 	--- (Client) Builds a table for the compiler to use
@@ -834,6 +807,9 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
 	function SF.Editor.BuildIncludesTable( maincode, codename )
+		if not SF.Editor.initialized then
+			if not SF.Editor.init() then return end
+		end
 		local tbl = {}
 		maincode = maincode or SF.Editor.getCode()
 		codename = codename or SF.Editor.getOpenFile() or "main"
@@ -892,6 +868,7 @@ if CLIENT then
 			net.SendToServer()
 		else
 			SF.Editor.safeToInit = true
+			SF.Editor.init()
 		end
 	end )
 	net.Receive( "starfall_editor_geteditorcode", function( len )
