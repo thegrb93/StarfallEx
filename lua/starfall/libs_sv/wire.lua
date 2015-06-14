@@ -369,6 +369,21 @@ function wire_library.getOutputs ( entO )
 	return parseEntity( entO, "Outputs" )
 end
 
+--- Returns a wirelink to a wire entity
+-- @param ent Wire entity
+-- @return Wirelink of the entity
+function wire_library.getWirelink ( ent )
+	SF.CheckType( ent, SF.Types[ "Entity" ] )
+	ent = SF.Entities.Unwrap( ent )
+	if not ent:IsValid() then return end
+	
+	if not ent.extended then
+		WireLib.CreateWirelinkOutput( SF.instance.player, ent, {true} )
+	end
+	
+	return wlwrap(ent)
+end
+
 -- ------------------------- Wirelink ------------------------- --
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
