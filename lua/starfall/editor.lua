@@ -850,6 +850,44 @@ if CLIENT then
 			end
 		end
 		local ok, msg = pcall( recursiveLoad, codename )
+
+		local function findCycle ( file, visited, recStack )
+			if not visited[ file ] then
+				--Mark the current file as visited and part of recursion stack
+				visited[ file ] = true
+				recStack[ file ] = true
+
+				--Recurse for all the files included in this file
+				for k, v in pairs( ppdata.includes[ file ] or {} ) do
+					if recStack[ v ] then
+						return true, file
+					elseif not visited[ v ] then
+						local cyclic, cyclicFile = findCycle( v, visited, recStack )
+						if cyclic then return true, cyclicFile end
+					end
+				end
+			end
+			
+			--Remove this file from the recursion stack
+			recStack[ file ] = false
+			return false, nil
+		end
+
+		local isCyclic = false
+		local cyclicFile = nil
+		for k, v in pairs( ppdata.includes or {} ) do
+			local cyclic, file = findCycle( k, {}, {} )
+			if cyclic then
+				isCyclic = true
+				cyclicFile = file
+				break
+			end
+		end
+		
+		if isCyclic then
+			return false, "Loop in includes from: " .. cyclicFile
+		end
+
 		if ok then
 			return true, tbl
 		elseif msg:sub( 1, 13 ) == "Bad include: " then
