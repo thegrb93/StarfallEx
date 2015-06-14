@@ -40,6 +40,8 @@ end
 SF.Wire = {}
 SF.Wire.Library = wire_library
 
+--- Wirelink type
+-- @server
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
