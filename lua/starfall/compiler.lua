@@ -57,7 +57,7 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 		if not dontpreprocess then
 			SF.Preprocessor.ParseDirectives( filename, source, context.directives, instance.ppdata, instance )
 		else
-			print("No preprocess")
+			print( "No preprocess" )
 		end
 		
 		if string.match(source, "^[%s\n]*$") then

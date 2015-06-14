@@ -7,22 +7,22 @@ local function splitString ( str, delim )
 	local cur   = ""
 	local start = 1
 	for i = 1, #str do
-		if str[i] == delim then
-			ret[#ret+1] = cur
+		if str[ i ] == delim then
+			ret[ #ret + 1 ] = cur
 			cur = ""
 		else
-			cur = cur .. str[i]
+			cur = cur .. str[ i ]
 		end
 	end
 	if cur ~= "" then
-		ret[#ret+1] = cur
+		ret[ #ret + 1 ] = cur
 	end
 	return ret
 end
 
 -- Register inputs and outputs directives
 -- errText is either input or output, used for error messages
-local function parseInOutputs( str, errText )
+local function parseInOutputs ( str, errText )
 	local args = splitString( str, " ")
 	local names = {}
 	local types = {}
@@ -51,7 +51,7 @@ local function parseInOutputs( str, errText )
 	return names, types
 end
 
-SF.Preprocessor.SetGlobalDirective( "inputs", function( args, filename, data, instance )
+SF.Preprocessor.SetGlobalDirective( "inputs", function ( args, filename, data, instance )
 	if not args or args == "" then
 		print( "Invalid arguments to @inputs" )
 		return true
@@ -63,9 +63,9 @@ SF.Preprocessor.SetGlobalDirective( "inputs", function( args, filename, data, in
 	if not names then return true end
 
 	WireLib.AdjustSpecialInputs( instance.data.entity, names, types )
-end)
+end )
 
-SF.Preprocessor.SetGlobalDirective( "outputs", function( args, filename, data, instance )
+SF.Preprocessor.SetGlobalDirective( "outputs", function ( args, filename, data, instance )
 	if not args or args == "" then
 		print( "Invalid arguments to @outputs" )
 		return true
@@ -77,7 +77,7 @@ SF.Preprocessor.SetGlobalDirective( "outputs", function( args, filename, data, i
 	if not names then return true end
 
 	WireLib.AdjustSpecialOutputs( instance.data.entity, names, types )
-end)
+end )
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
