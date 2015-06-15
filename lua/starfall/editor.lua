@@ -81,7 +81,7 @@ if CLIENT then
 	local aceFiles = {}
 	local htmlEditorCode = nil
 
-	function SF.Editor.init()
+	function SF.Editor.init ()
 		if not SF.Editor.safeToInit then 
 			SF.AddNotify( LocalPlayer(), "Starfall is downloading editor files, please wait.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
 			return 
@@ -101,11 +101,24 @@ if CLIENT then
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.settingsWindow:close()
 
-		SF.Editor.runJS = function( ... ) 
+		SF.Editor.runJS = function ( ... ) 
 			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
 		end
 
 		SF.Editor.updateSettings()
+
+		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
+		if tabs ~= nil and #tabs ~= 0 then
+			for k, v in pairs( tabs ) do
+				if type( v ) ~= "number" then
+					SF.Editor.addTab( v.filename, v.code )
+				end
+			end
+			SF.Editor.selectTab( tabs.selectedTab or 1 )
+		else
+			SF.Editor.addTab()
+		end
+
 		SF.Editor.editor:close()
 
 		SF.Editor.initialized = true
@@ -113,7 +126,7 @@ if CLIENT then
 		return true
 	end
 
-	function SF.Editor.open()
+	function SF.Editor.open ()
 		if not SF.Editor.initialized then 
 			SF.Editor.init()
 		end
@@ -125,7 +138,7 @@ if CLIENT then
 		end
 	end
 
-	function SF.Editor.close()
+	function SF.Editor.close ()
 		SF.Editor.editor:close()
 
 		if CanRunConsoleCommand() then
@@ -133,27 +146,27 @@ if CLIENT then
 		end
 	end
 
-	function SF.Editor.updateCode() -- Incase anyone needs to force update the code
+	function SF.Editor.updateCode () -- Incase anyone needs to force update the code
 		SF.Editor.runJS( "console.log(\"RUNLUA:SF.Editor.getActiveTab().code = \\\"\" + addslashes(editor.getValue()) + \"\\\"\")" )
 	end
 
-	function SF.Editor.getCode()
+	function SF.Editor.getCode ()
 		return SF.Editor.getActiveTab().code
 	end
 
-	function SF.Editor.getOpenFile()
+	function SF.Editor.getOpenFile ()
 		return SF.Editor.getActiveTab().filename
 	end
 
-	function SF.Editor.getTabHolder()
+	function SF.Editor.getTabHolder ()
 		return SF.Editor.editor.components[ "tabHolder" ]
 	end
 
-	function SF.Editor.getActiveTab()
+	function SF.Editor.getActiveTab ()
 		return SF.Editor.getTabHolder():getActiveTab()
 	end
 
-	function SF.Editor.selectTab( tab )
+	function SF.Editor.selectTab ( tab )
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
 			tab = math.min( tab, #tabHolder.tabs )
@@ -169,7 +182,7 @@ if CLIENT then
 		SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
 	end
 
-	function SF.Editor.addTab( filename, code )
+	function SF.Editor.addTab ( filename, code )
 
 		local name = filename or "generic"
 
@@ -190,14 +203,14 @@ if CLIENT then
 		tab.name = name
 		tab.filename = filename
 
-		function tab:DoClick()
+		function tab:DoClick ()
 			SF.Editor.selectTab( self )
 		end
 
 		SF.Editor.selectTab( tab )
 	end
 
-	function SF.Editor.removeTab( tab )
+	function SF.Editor.removeTab ( tab )
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
 			tab = tabHolder.tabs[ tab ]  
@@ -207,7 +220,7 @@ if CLIENT then
 		tabHolder:removeTab( tab )
 	end
 
-	function SF.Editor.saveTab( tab )
+	function SF.Editor.saveTab ( tab )
 		if not tab.filename then SF.Editor.saveTabAs( tab ) return end
 		local saveFile = "starfall/" .. tab.filename
 		file.Write( saveFile, tab.code )
@@ -215,7 +228,7 @@ if CLIENT then
 		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 	end
 
-	function SF.Editor.saveTabAs( tab )
+	function SF.Editor.saveTabAs ( tab )
 
 		SF.Editor.updateTabName( tab )
 
@@ -230,22 +243,22 @@ if CLIENT then
 				"Save File",
 				"",
 				saveName,
-				function( text )
+				function ( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = "starfall/" .. text .. ".txt"
 					file.Write( saveFile, tab.code )
 					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+					SF.Editor.fileViewer.components[ "browser" ].tree:reloadTree()
+					tab.filename = text .. ".txt"
 					SF.Editor.updateTabName( tab )
-					SF.Editor.fileViewer.components["tree"]:reloadTree()
-					tab.filename = saveName .. ".txt"
 				end
 			)
 	end
 
-	function SF.Editor.doValidation( forceShow )
+	function SF.Editor.doValidation ( forceShow )
 
-		local function valid()
+		local function valid ()
 			local code = SF.Editor.getActiveTab().code
 
 			local err = CompileString( code, "Validation", false )
@@ -285,7 +298,7 @@ if CLIENT then
 
 	end
 
-	local function createLibraryMap()
+	local function createLibraryMap ()
 
 		local map = {}
 
@@ -331,7 +344,7 @@ if CLIENT then
 		return map
 	end
 
-	function SF.Editor.refreshTab( tab )
+	function SF.Editor.refreshTab ( tab )
 
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
@@ -358,7 +371,7 @@ if CLIENT then
 		SF.AddNotify( LocalPlayer(), "Refreshed tab: " .. fileName, NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 	end
 
-	function SF.Editor.updateTabName( tab )
+	function SF.Editor.updateTabName ( tab )
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
 		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then 
@@ -369,13 +382,13 @@ if CLIENT then
 		tab:SetText( tab.name )
 	end
 
-	function SF.Editor.createEditor()
+	function SF.Editor.createEditor ()
 		local editor = vgui.Create( "StarfallFrame" )
 		editor:SetSize( 800, 600 )
 		editor:SetTitle( "Starfall Code Editor" )
 		editor:Center()
 
-		function editor:OnKeyCodePressed( keyCode )
+		function editor:OnKeyCodePressed ( keyCode )
 			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
 				SF.Editor.saveTab( SF.Editor.getActiveTab() )
 			elseif keyCode == KEY_Q and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
@@ -385,71 +398,76 @@ if CLIENT then
 
 		local buttonHolder = editor.components[ "buttonHolder" ]
 
-		-- Exit button
-		buttonHolder.buttons[ 1 ].DoClick = function( self )
+		buttonHolder:getButton( "Close" ).DoClick = function ( self )
 			SF.Editor.close()
 		end
 
-		-- Remove buttonLock
-		buttonHolder.buttons[ 2 ]:Remove()
-		buttonHolder.buttons[ 2 ] = nil
+		buttonHolder:removeButton( "Lock" )
 
 		local buttonSaveExit = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveExit:SetText( "Save and Exit" )
-		function buttonSaveExit:DoClick()
+		function buttonSaveExit:DoClick ()
 			SF.Editor.saveTab( SF.Editor.getActiveTab() )
 			SF.Editor.close()
 		end
-		buttonHolder:addButton( buttonSaveExit )
+		buttonHolder:addButton( "SaveExit", buttonSaveExit )
 
 		local buttonSettings = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSettings:SetText( "Settings" )
-		function buttonSettings:DoClick()
-			SF.Editor.settingsWindow:open()
+		function buttonSettings:DoClick ()
+			if SF.Editor.settingsWindow:IsVisible() then
+				SF.Editor.settingsWindow:close()
+			else
+				SF.Editor.settingsWindow:open()
+			end
 		end
-		buttonHolder:addButton( buttonSettings )
+		buttonHolder:addButton( "Settings", buttonSettings )
 
 		local buttonHelper = vgui.Create( "StarfallButton", buttonHolder )	
 		buttonHelper:SetText( "SF Helper" )
-		function buttonHelper:DoClick()
+		function buttonHelper:DoClick ()
 			SF.Helper.show()
 		end
-		buttonHolder:addButton( buttonHelper )
+		buttonHolder:addButton( "Helper", buttonHelper )
 
 		local buttonFiles = vgui.Create( "StarfallButton", buttonHolder )
 		buttonFiles:SetText( "Files" )
-		function buttonFiles:DoClick()
-			SF.Editor.fileViewer:open()
+		function buttonFiles:DoClick ()
+			if SF.Editor.fileViewer:IsVisible() then
+				SF.Editor.fileViewer:close()
+			else
+				SF.Editor.fileViewer:open()
+			end
 		end
-		buttonHolder:addButton( buttonFiles )
+		buttonHolder:addButton( "Files", buttonFiles )
 
 		local buttonSaveAs = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSaveAs:SetText( "Save As" )
-		function buttonSaveAs:DoClick()
+		function buttonSaveAs:DoClick ()
 			SF.Editor.saveTabAs( SF.Editor.getActiveTab() )
 		end
-		buttonHolder:addButton( buttonSaveAs )
+		buttonHolder:addButton( "SaveAs", buttonSaveAs )
 
 		local buttonSave = vgui.Create( "StarfallButton", buttonHolder )
 		buttonSave:SetText( "Save" )
-		function buttonSave:DoClick()
+		function buttonSave:DoClick ()
 			SF.Editor.saveTab( SF.Editor.getActiveTab() )
 		end
-		buttonHolder:addButton( buttonSave )
+		buttonHolder:addButton( "Save", buttonSave )
 
 		local buttonNewFile = vgui.Create( "StarfallButton", buttonHolder )
 		buttonNewFile:SetText( "New tab" )
-		function buttonNewFile:DoClick()
+		function buttonNewFile:DoClick ()
 			SF.Editor.addTab()
 		end
-		buttonHolder:addButton( buttonNewFile )
+		buttonHolder:addButton( "NewFile", buttonNewFile )
 
 		local buttonCloseTab = vgui.Create( "StarfallButton", buttonHolder )
 		buttonCloseTab:SetText( "Close tab" )
-		function buttonCloseTab:DoClick()
+		function buttonCloseTab:DoClick ()
 			SF.Editor.removeTab( SF.Editor.getActiveTab() )
 		end
-		buttonHolder:addButton( buttonCloseTab )
+		buttonHolder:addButton( "CloseTab", buttonCloseTab )
 
 		local html = vgui.Create( "DHTML", editor )
 		html:SetPos( 5, 54 )
@@ -464,24 +482,24 @@ if CLIENT then
 
 		local libs = {}
 		local functions = {}
-		table.ForEach( map, function( lib, vals )
+		table.ForEach( map, function ( lib, vals )
 			if lib == "Environment" or lib:GetChar( 1 ):upper() ~= lib:GetChar( 1 ) then
 				table.insert( libs, lib )
 			end
-			table.ForEach( vals, function( key, val )
+			table.ForEach( vals, function ( key, val )
 				table.insert( functions, val )
 			end )
 		end )
 
 		html:QueueJavascript( "createStarfallMode(\"" .. table.concat( libs, "|" ) .. "\", \"" .. table.concat( table.Add( table.Copy( functions ), libs ), "|" ) .. "\")" )
 
-		function html:PerformLayout( ... )
+		function html:PerformLayout ( ... )
 		 	self:SetSize( editor:GetWide() - 10, editor:GetTall() - 59 )
 		end
-		function html:OnKeyCodePressed( key, notfirst )
+		function html:OnKeyCodePressed ( key, notfirst )
 
-			local function repeatKey()
-				timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function() self:OnKeyCodePressed( key, true ) end )
+			local function repeatKey ()
+				timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () self:OnKeyCodePressed( key, true ) end )
 			end
 
 			if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
@@ -591,7 +609,7 @@ if CLIENT then
 		end
 		editor:AddComponent( "htmlPanel", html )
 
-		function editor:OnOpen()
+		function editor:OnOpen ()
 			html:Call( "editor.focus()" )
 			html:RequestFocus()
 		end
@@ -599,18 +617,18 @@ if CLIENT then
 		local tabHolder = vgui.Create( "StarfallTabHolder", editor )
 		tabHolder:SetPos( 5, 30 )
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
-		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save", function()
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save", function ()
 			if not tabHolder.targetTab then return end
 			SF.Editor.saveTab( tabHolder.targetTab )
 			tabHolder.targetTab = nil
 		end }
-		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save As", function()
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Save As", function ()
 			if not tabHolder.targetTab then return end
 			SF.Editor.saveTabAs( tabHolder.targetTab )
 			tabHolder.targetTab = nil
 		end }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
-		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function()
+		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function ()
 			if not tabHolder.targetTab then return end
 			
 			SF.Editor.refreshTab( tabHolder.targetTab )
@@ -618,7 +636,7 @@ if CLIENT then
 			tabHolder.targetTab = nil
 		end }
 
-		function tabHolder:OnRemoveTab( tabIndex )
+		function tabHolder:OnRemoveTab ( tabIndex )
 			SF.Editor.runJS( "removeEditSession("..tabIndex..")" )
 
 			if #self.tabs == 0 then
@@ -628,7 +646,7 @@ if CLIENT then
 		end
 		editor:AddComponent( "tabHolder", tabHolder )
 		
-		function editor:OnClose()
+		function editor:OnClose ()
 			local tabs = {}
 			for k, v in pairs( tabHolder.tabs ) do
 				tabs[ k ] = {}
@@ -639,7 +657,7 @@ if CLIENT then
 			file.Write( "sf_tabs.txt", util.TableToJSON( tabs ) )
 		end
 
-		function editor:OnThink()
+		function editor:OnThink ()
 			if self.Dragged or self.Resized then
 				SF.Editor.saveSettings()
 			end
@@ -648,7 +666,7 @@ if CLIENT then
 		return editor
 	end
 
-	function SF.Editor.createFileViewer()
+	function SF.Editor.createFileViewer ()
 		local fileViewer = vgui.Create( "StarfallFrame" )
 		fileViewer:SetSize( 200, 600 )
 		fileViewer:SetTitle( "Starfall File Viewer" )
@@ -658,7 +676,7 @@ if CLIENT then
 
 		local searchBox, tree = browser:getComponents()
 		tree:setup( "starfall" )
-		function tree:OnNodeSelected( node )
+		function tree:OnNodeSelected ( node )
 			if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
 			local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
 			local code = file.Read( node:GetFileName(), "DATA" )
@@ -677,9 +695,9 @@ if CLIENT then
 
 		local buttonHolder = fileViewer.components[ "buttonHolder" ]
 
-		local buttonLock = buttonHolder.buttons[ 2 ]
+		local buttonLock = buttonHolder:getButton( "Lock" )
 		buttonLock._DoClick = buttonLock.DoClick
-		buttonLock.DoClick = function( self )
+		buttonLock.DoClick = function ( self )
 			self:_DoClick()
 			SF.Editor.saveSettings()
 		end
@@ -689,22 +707,30 @@ if CLIENT then
 		buttonRefresh:SetHoverColor( Color( 7, 70, 0 ) )
 		buttonRefresh:SetColor( Color( 26, 104, 17 ) )
 		buttonRefresh:SetLabelColor( Color( 103, 155, 153 ) )
-		function buttonRefresh:DoClick()
+		function buttonRefresh:DoClick ()
 			tree:reloadTree()
 			searchBox:SetValue( "Search..." )
 		end
-		buttonHolder:addButton( buttonRefresh )
+		buttonHolder:addButton( "Refresh", buttonRefresh )
 
-		function fileViewer:OnThink()
+		function fileViewer:OnThink ()
 			if self.Dragged or self.Resized then
 				SF.Editor.saveSettings()
 			end
 		end
 
+		function fileViewer:OnOpen ()
+			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Files" ).active = true
+		end
+
+		function fileViewer:OnClose ()
+			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Files" ).active = false
+		end
+
 		return fileViewer
 	end
 
-	function SF.Editor.createSettingsWindow()
+	function SF.Editor.createSettingsWindow ()
 		local frame = vgui.Create( "StarfallFrame" )
 		frame:SetSize( 200, 400 )
 		frame:SetTitle( "Starfall Settings" )
@@ -714,13 +740,13 @@ if CLIENT then
 
 		local panel = vgui.Create( "StarfallPanel", frame )
 		panel:SetPos( 5, 40 )
-		function panel:PerformLayout()
+		function panel:PerformLayout ()
 			self:SetSize( frame:GetWide() - 10, frame:GetTall() - 45 )
 		end
 		frame:AddComponent( "panel", panel )
 
-		local function setDoClick( panel )
-			function panel:OnChange()
+		local function setDoClick ( panel )
+			function panel:OnChange ()
 				SF.Editor.updateSettings()
 			end
 
@@ -730,7 +756,7 @@ if CLIENT then
 		local form = vgui.Create( "DForm", panel )	
 		form:Dock( FILL )
 		form.Header:SetVisible( false )
-		form.Paint = function() end
+		form.Paint = function () end
 		setDoClick(form:CheckBox( "Show fold widgets", "sf_editor_widgets" ))
 		setDoClick(form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ))
 		setDoClick(form:CheckBox( "Show gutter", "sf_editor_gutter" ))
@@ -741,10 +767,18 @@ if CLIENT then
 		setDoClick(form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
 		setDoClick(form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" )):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
 
+		function frame:OnOpen ()
+			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = true
+		end
+
+		function frame:OnClose ()
+			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = false
+		end
+
 		return frame
 	end
 
-	function SF.Editor.saveSettings()
+	function SF.Editor.saveSettings ()
 		local frame = SF.Editor.editor
 		RunConsoleCommand( "sf_editor_width", frame:GetWide() )
 		RunConsoleCommand( "sf_editor_height", frame:GetTall() )
@@ -761,7 +795,7 @@ if CLIENT then
 		RunConsoleCommand( "sf_fileviewer_locked", frame.locked and 1 or 0 )
 	end
 
-	function SF.Editor.updateSettings()
+	function SF.Editor.updateSettings ()
 		local frame = SF.Editor.editor
 		frame:SetWide( GetConVarNumber( "sf_editor_width" ) )
 		frame:SetTall( GetConVarNumber( "sf_editor_height" ) )
@@ -774,7 +808,7 @@ if CLIENT then
 		frame:lock( SF.Editor.editor )
 		frame.locked = tobool(GetConVarNumber( "sf_fileviewer_locked" ))
 
-		local buttonLock = frame.components[ "buttonHolder" ].buttons[ 2 ]
+		local buttonLock = frame.components[ "buttonHolder" ]:getButton( "Lock" )
 		buttonLock.active = frame.locked
 		buttonLock:SetText( frame.locked and "Locked" or "Unlocked" )
 
@@ -787,18 +821,6 @@ if CLIENT then
 		js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 		js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
-
-		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
-		if tabs ~= nil and #tabs ~= 0 then
-			for k, v in pairs( tabs ) do
-				if type( v ) ~= "number" then
-					SF.Editor.addTab( v.filename, v.code )
-				end
-			end
-			SF.Editor.selectTab( tabs.selectedTab or 1 )
-		else
-			SF.Editor.addTab()
-		end
 	end
 
 	--- (Client) Builds a table for the compiler to use
@@ -806,7 +828,7 @@ if CLIENT then
 	-- @param codename The name of the main chunk
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
-	function SF.Editor.BuildIncludesTable( maincode, codename )
+	function SF.Editor.BuildIncludesTable ( maincode, codename )
 		if not SF.Editor.initialized then
 			if not SF.Editor.init() then return end
 		end
@@ -821,7 +843,7 @@ if CLIENT then
 		local loaded = {}
 		local ppdata = {}
 
-		local function recursiveLoad( path )
+		local function recursiveLoad ( path )
 			if loaded[ path ] then return end
 			loaded[ path ] = true
 			
@@ -859,7 +881,7 @@ if CLIENT then
 		end
 	end
 
-	net.Receive( "starfall_editor_getacefiles", function( len )
+	net.Receive( "starfall_editor_getacefiles", function ( len )
 		local index = net.ReadInt( 8 )
 		aceFiles[ index ] = net.ReadString()
 		
@@ -871,20 +893,20 @@ if CLIENT then
 			SF.Editor.init()
 		end
 	end )
-	net.Receive( "starfall_editor_geteditorcode", function( len )
+	net.Receive( "starfall_editor_geteditorcode", function ( len )
 		htmlEditorCode = net.ReadString()
 	end )
 
 	-- CLIENT ANIMATION
 
 	local busy_players = { }
-	hook.Add( "EntityRemoved", "starfall_busy_animation", function( ply )
+	hook.Add( "EntityRemoved", "starfall_busy_animation", function ( ply )
 		busy_players[ ply ] = nil
 	end )
 
 	local emitter = ParticleEmitter( vector_origin )
 
-	net.Receive( "starfall_editor_status", function( len )
+	net.Receive( "starfall_editor_status", function ( len )
 		local ply = net.ReadEntity()
 		local status = net.ReadBit() ~= 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
 		if not ply:IsValid() or ply == LocalPlayer() then return end
@@ -893,7 +915,7 @@ if CLIENT then
 	end )
 
 	local rolldelta = math.rad( 80 )
-	timer.Create( "starfall_editor_status", 1 / 3, 0, function( )
+	timer.Create( "starfall_editor_status", 1 / 3, 0, function ()
 		rolldelta = -rolldelta
 		for ply, _ in pairs( busy_players ) do
 			local BoneIndx = ply:LookupBone( "ValveBiped.Bip01_Head1" ) or ply:LookupBone( "ValveBiped.HC_Head_Bone" ) or 0
@@ -923,7 +945,7 @@ elseif SERVER then
 	util.AddNetworkString( "starfall_editor_getacefiles" )
 	util.AddNetworkString( "starfall_editor_geteditorcode" )
 
-	local function getFiles( dir, dir2 )
+	local function getFiles ( dir, dir2 )
 		local files = {}
 		local dir2 = dir2 or ""
 		local f, directories = file.Find( dir .. "/" .. dir2 .. "/*", "GAME" )
@@ -956,7 +978,7 @@ elseif SERVER then
 
 
 	local plyIndex = {}
-	local function sendAceFile( len, ply )
+	local function sendAceFile ( len, ply )
 		local index = plyIndex[ ply ]
 		net.Start( "starfall_editor_getacefiles" )
 			net.WriteInt( index, 8 )
@@ -966,7 +988,7 @@ elseif SERVER then
 		plyIndex[ ply ] = index + 1
 	end
 
-	hook.Add( "PlayerInitialSpawn", "starfall_file_init", function( ply )
+	hook.Add( "PlayerInitialSpawn", "starfall_file_init", function ( ply )
 		net.Start( "starfall_editor_geteditorcode" )
 			net.WriteString( file.Read( addon_path .. "/html/starfall/editor.html", "GAME" ) )
 		net.Send( ply )
@@ -983,20 +1005,20 @@ elseif SERVER then
 
 	local starfall_event = {}
 
-	concommand.Add( "starfall_event", function( ply, command, args )
+	concommand.Add( "starfall_event", function ( ply, command, args )
 		local handler = starfall_event[ args[ 1 ] ]
 		if not handler then return end
 		return handler( ply, args )
 	end )
 
-	function starfall_event.editor_open( ply, args )
+	function starfall_event.editor_open ( ply, args )
 		net.Start( "starfall_editor_status" )
 		net.WriteEntity( ply )
 		net.WriteBit( true )
 		net.Broadcast()
 	end
 
-	function starfall_event.editor_close( ply, args )
+	function starfall_event.editor_close ( ply, args )
 		net.Start( "starfall_editor_status" )
 		net.WriteEntity( ply )
 		net.WriteBit( false )

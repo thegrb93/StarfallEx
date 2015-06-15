@@ -7,7 +7,7 @@ PANEL = {}
 
 PANEL.windows = {}
 
-function PANEL:Init()
+function PANEL:Init ()
 	self.windows[ #self.windows + 1 ] = self
 
 	self.lockParent = nil
@@ -26,7 +26,7 @@ function PANEL:Init()
 	self.components = {}
 
 	self._PerformLayout = self.PerformLayout
-	function self:PerformLayout( ... )
+	function self:PerformLayout ( ... )
 		local w, h = self:GetSize()
 		if w < 105 + self.components[ "buttonHolder" ]:GetWide() then w = 105 + self.components[ "buttonHolder" ]:GetWide() end
 		if h < 315 then h = 315 end
@@ -43,41 +43,55 @@ function PANEL:Init()
 	-- Button Holder
 	local buttonHolder = vgui.Create( "DPanel", self )
 	buttonHolder.buttons = {}
-	buttonHolder.Paint = function() end
+	buttonHolder.Paint = function () end
 	buttonHolder:SetHeight( 22 )
 	local spacing = 3
-	function buttonHolder:PerformLayout( ... )
+	function buttonHolder:PerformLayout ( ... )
 		local wide = 0
 		for k, v in pairs( self.buttons ) do
-			wide = wide + v:GetWide() + spacing
+			wide = wide + v.button:GetWide() + spacing
 		end
 		self:SetWide( wide )
 
 		self:SetPos( frame:GetWide() - 5 - self:GetWide(), 5 )
 		local pos = self:GetWide() + spacing
 		for k, v in pairs( self.buttons ) do
-			pos = pos - spacing - v:GetWide()
-			v:SetPos( pos, 0 )
+			pos = pos - spacing - v.button:GetWide()
+			v.button:SetPos( pos, 0 )
 		end
 	end
-	function buttonHolder:addButton( button )
-		self.buttons[ #self.buttons + 1 ] = button
+	function buttonHolder:addButton ( name, button )
+		self.buttons[ #self.buttons + 1 ] = { name = name, button = button }
 		button:PerformLayout()
 		self:PerformLayout()
+	end
+	function buttonHolder:getButton ( buttonName )
+		for k, v in pairs( self.buttons ) do
+			if v.name == buttonName then return v.button end
+		end
+	end
+	function buttonHolder:removeButton ( button )
+		if button == nil then return end
+		for k, v in pairs( self.buttons ) do
+			if v.button == button or v.name == button then
+				v.button:Remove()
+				self.buttons[ k ] = nil
+			end
+		end
 	end
 	self:AddComponent( "buttonHolder", buttonHolder )
 	-- End Button Holder
 
 	local buttonClose = vgui.Create( "StarfallButton", buttonHolder )
 	buttonClose:SetText( "Close" )
-	function buttonClose:DoClick()
+	function buttonClose:DoClick ()
 		frame:close()
 	end
-	buttonHolder:addButton( buttonClose )
+	buttonHolder:addButton( "Close", buttonClose )
 
 	local buttonLock = vgui.Create( "StarfallButton", buttonHolder )
 	buttonLock:SetText( "Unlocked" )
-	function buttonLock:DoClick()
+	function buttonLock:DoClick ()
 		if self.active then
 			self.active = false
 			self:SetText( "Unlocked" )
@@ -90,9 +104,9 @@ function PANEL:Init()
 			end
 		end
 	end
-	buttonHolder:addButton( buttonLock )
+	buttonHolder:addButton( "Lock", buttonLock )
 end
-function PANEL:Think()
+function PANEL:Think ()
 	-- Overwriting default think function, mostly copied from default function
 	local mousex = math.Clamp( gui.MouseX(), 1, ScrW() - 1 )
 	local mousey = math.Clamp( gui.MouseY(), 1, ScrH() - 1 )
@@ -280,10 +294,10 @@ function PANEL:Think()
 	self.Dragged = nil
 	self.Resized = nil
 end
-function PANEL:OnThink()
+function PANEL:OnThink ()
 
 end
-function PANEL:OnMousePressed()
+function PANEL:OnMousePressed ()
 	-- Pretty much copied from default function again
 	if self.m_bSizable then
 		if gui.MouseX() > ( self.x + self:GetWide() - 20 ) and
@@ -311,25 +325,25 @@ function PANEL:OnMousePressed()
 		return
 	end
 end
-function PANEL:AddComponent( name, component )
+function PANEL:AddComponent ( name, component )
 	self.components[ name ] = component
 end
-function PANEL:addLockChild( frame )
+function PANEL:addLockChild ( frame )
 	if table.HasValue( self.lockChildren, frame ) then return end
 	self.lockChildren[ #self.lockChildren + 1 ] = frame
 end
-function PANEL:removeLockChild( frame )
+function PANEL:removeLockChild ( frame )
 	if not table.HasValue( self.lockChildren, frame ) then return end
 	table.RemoveByValue( self.lockChildren, frame )
 end
-function PANEL:setLockParent( frame )
+function PANEL:setLockParent ( frame )
 	self.lockParent = frame
 end
-function PANEL:lock( frame )
+function PANEL:lock ( frame )
 	self:setLockParent( frame )
 	frame:addLockChild( self )
 end
-function PANEL:moveLockChildren( x, y )
+function PANEL:moveLockChildren ( x, y )
 	for k, v in pairs( self.lockChildren ) do
 		if v.locked then 
 			local vx, vy = v:GetPos()
@@ -338,10 +352,10 @@ function PANEL:moveLockChildren( x, y )
 		end
 	end
 end
-PANEL.Paint = function( panel, w, h )
+PANEL.Paint = function ( panel, w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
 end
-function PANEL:open()
+function PANEL:open ()
 
 	for k, v in pairs( self.lockChildren ) do
 		if v.locked then
@@ -356,7 +370,7 @@ function PANEL:open()
 
 	self:OnOpen()
 end
-function PANEL:close()
+function PANEL:close ()
 	for k, v in pairs( self.lockChildren ) do
 		if v.locked then
 			v:close()
@@ -368,10 +382,10 @@ function PANEL:close()
 	self:SetKeyBoardInputEnabled( false )
 	self:Close()
 end
-function PANEL:OnOpen()
+function PANEL:OnOpen ()
 	
 end
-function PANEL:OnClose()
+function PANEL:OnClose ()
 
 end
 vgui.Register( "StarfallFrame", PANEL, "DFrame" )
@@ -383,20 +397,20 @@ vgui.Register( "StarfallFrame", PANEL, "DFrame" )
 -- Starfall Button
 PANEL = {}
 
-function PANEL:Init()
+function PANEL:Init ()
 	self:SetText( "" )
 	self:SetSize( 22, 22 )
 end
-function PANEL:SetIcon( icon )
+function PANEL:SetIcon ( icon )
 	self.icon = SF.Editor.icons[ icon ]
 end
-function PANEL:PerformLayout()
+function PANEL:PerformLayout ()
 	if self:GetText() ~= "" then
 		self:SizeToContentsX()
 		self:SetWide( self:GetWide() + 14 )
 	end
 end
-PANEL.Paint = function( button, w, h )
+PANEL.Paint = function ( button, w, h )
 	if button.Hovered or button.active then
 		draw.RoundedBox( 0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med )
 	else
@@ -408,19 +422,19 @@ PANEL.Paint = function( button, w, h )
 		surface.DrawTexturedRect( 2, 2, w - 4, h - 4 )
 	end
 end
-function PANEL:UpdateColours( skin )
+function PANEL:UpdateColours ( skin )
 	return self:SetTextStyleColor( self.labelCol or SF.Editor.colors.light )
 end
-function PANEL:SetHoverColor( col )
+function PANEL:SetHoverColor ( col )
 	self.backgroundHoverCol = col
 end
-function PANEL:SetColor( col )
+function PANEL:SetColor ( col )
 	self.backgroundCol = col
 end
-function PANEL:SetLabelColor( col )
+function PANEL:SetLabelColor ( col )
 	self.labelCol = col
 end
-function PANEL:DoClick()
+function PANEL:DoClick ()
 
 end
 
@@ -432,7 +446,7 @@ vgui.Register( "StarfallButton", PANEL, "DButton" )
 
 -- Starfall Panel
 PANEL = {}
-PANEL.Paint = function( panel, w, h )
+PANEL.Paint = function ( panel, w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.medlight )
 end
 vgui.Register( "StarfallPanel", PANEL, "DPanel" )
@@ -444,7 +458,7 @@ vgui.Register( "StarfallPanel", PANEL, "DPanel" )
 -- Tab Holder
 PANEL = {}
 
-function PANEL:Init()
+function PANEL:Init ()
 	self:SetTall( 22 )
 	self.offsetTabs = 0
 	self.tabs = {}
@@ -455,7 +469,7 @@ function PANEL:Init()
 	self.offsetRight:SetVisible( false )
 	self.offsetRight:SetSize( 22, 22 )
 	self.offsetRight:SetIcon( "arrowr" )
-	function self.offsetRight:PerformLayout()
+	function self.offsetRight:PerformLayout ()
 		local wide = 0
 		if parent.offsetLeft:IsVisible() then 
 			wide = parent.offsetLeft:GetWide() + 2 
@@ -469,7 +483,7 @@ function PANEL:Init()
 		end
 		self:SetPos( wide, 0 )
 	end
-	function self.offsetRight:DoClick()
+	function self.offsetRight:DoClick ()
 		parent.offsetTabs = parent.offsetTabs + 1
 		if parent.offsetTabs > #parent.tabs - 1 then
 			parent.offsetTabs = #parent.tabs - 1
@@ -481,7 +495,7 @@ function PANEL:Init()
 	self.offsetLeft:SetVisible( false )
 	self.offsetLeft:SetSize( 22, 22 )
 	self.offsetLeft:SetIcon( "arrowl" )
-	function self.offsetLeft:DoClick()
+	function self.offsetLeft:DoClick ()
 		parent.offsetTabs = parent.offsetTabs - 1
 		if parent.offsetTabs < 0 then
 			parent.offsetTabs = 0
@@ -491,12 +505,12 @@ function PANEL:Init()
 
 	self.menuoptions = {}
 
-	self.menuoptions[ #self.menuoptions + 1 ] = { "Close", function()
+	self.menuoptions[ #self.menuoptions + 1 ] = { "Close", function ()
 		if not self.targetTab then return end
 		self:removeTab( self.targetTab )
 		self.targetTab = nil
 	end }
-	self.menuoptions[ #self.menuoptions + 1 ] = { "Close Other Tabs", function()
+	self.menuoptions[ #self.menuoptions + 1 ] = { "Close Other Tabs", function ()
 		if not self.targetTab then return end
 		local n = 1
 		while #self.tabs ~= 1 do
@@ -510,8 +524,8 @@ function PANEL:Init()
 		self.targetTab = nil
 	end }
 end 
-PANEL.Paint = function() end
-function PANEL:PerformLayout()
+PANEL.Paint = function () end
+function PANEL:PerformLayout ()
 	local parent = self:GetParent()
 	self:SetWide( parent:GetWide() - 10 )
 	self.offsetRight:PerformLayout()
@@ -549,17 +563,17 @@ function PANEL:PerformLayout()
 		self.offsetLeft:SetVisible( false )
 	end
 end
-function PANEL:addTab( text )
+function PANEL:addTab ( text )
 	local panel = self
 	local tab = vgui.Create( "StarfallButton", self )
 	tab:SetText( text )
 	tab.isTab = true
 
-	function tab:DoClick()
+	function tab:DoClick ()
 		panel:selectTab( self )
 	end
 
-	function tab:DoRightClick()
+	function tab:DoRightClick ()
 		panel.targetTab = self
 		local menu = vgui.Create( "DMenu", panel:GetParent() )
 		for k, v in pairs( panel.menuoptions ) do
@@ -573,7 +587,7 @@ function PANEL:addTab( text )
 		menu:Open()
 	end
 
-	function tab:DoMiddleClick()
+	function tab:DoMiddleClick ()
 		panel:removeTab( self )
 	end
 
@@ -581,7 +595,7 @@ function PANEL:addTab( text )
 
 	return tab
 end
-function PANEL:removeTab( tab )
+function PANEL:removeTab ( tab )
 	local tabIndex 
 	if type( tab ) == "number" then
 		tabIndex = tab
@@ -595,15 +609,15 @@ function PANEL:removeTab( tab )
 
 	self:OnRemoveTab( tabIndex )
 end
-function PANEL:getActiveTab()
+function PANEL:getActiveTab ()
 	for k,v in pairs( self.tabs ) do
 		if v.active then return v end
 	end
 end
-function PANEL:getTabIndex( tab )
+function PANEL:getTabIndex ( tab )
 	return table.KeyFromValue( self.tabs, tab )
 end
-function PANEL:selectTab( tab )
+function PANEL:selectTab ( tab )
 	if type( tab ) == "number" then
 		tab = self.tabs[ tab ]  
 	end
@@ -625,7 +639,7 @@ function PANEL:selectTab( tab )
 		end
 	end
 end
-function PANEL:OnRemoveTab( tabIndex )
+function PANEL:OnRemoveTab ( tabIndex )
 
 end
 vgui.Register( "StarfallTabHolder", PANEL, "DPanel" )
@@ -647,22 +661,22 @@ local invalid_filename_chars = {
 
 PANEL = {}
 
-function PANEL:Init()
+function PANEL:Init ()
 
 end
-function PANEL:setup( folder )
+function PANEL:setup ( folder )
 	self.folder = folder
 	self.Root = self.RootNode:AddFolder( folder, folder, "DATA", true )
 	self.Root:SetExpanded( true )
 end
-function PANEL:reloadTree()
+function PANEL:reloadTree ()
 	self.Root:Remove()
 	self:setup( self.folder )
 end
-function PANEL:DoRightClick( node )
+function PANEL:DoRightClick ( node )
 	self:openMenu( node )
 end
-function PANEL:openMenu( node )
+function PANEL:openMenu ( node )
 	local menu
 	if node:GetFileName() then
 		menu = "file"
@@ -671,16 +685,16 @@ function PANEL:openMenu( node )
 	end
 	self.menu = vgui.Create( "DMenu", self:GetParent() )
 	if menu == "file" then
-		self.menu:AddOption( "Open", function()
+		self.menu:AddOption( "Open", function ()
 			self:OnNodeSelected( node )
 		end )
 		self.menu:AddSpacer()
-		self.menu:AddOption( "Rename", function()
+		self.menu:AddOption( "Rename", function ()
 			Derma_StringRequestNoBlur(
 				"Rename file",
 				"",
 				string.StripExtension( node:GetText() ),
-				function( text )
+				function ( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = "starfall/"..text..".txt"
@@ -693,12 +707,12 @@ function PANEL:openMenu( node )
 			)
 		end )
 		self.menu:AddSpacer()
-		self.menu:AddOption( "Delete", function()
+		self.menu:AddOption( "Delete", function ()
 			Derma_Query(
 				"Are you sure you want to delete this file?",
 				"Delete file",
 				"Delete",
-				function()
+				function ()
 					file.Delete( node:GetFileName() )
 					SF.AddNotify( LocalPlayer(), "File deleted: " .. node:GetFileName(), NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
 					self:reloadTree()
@@ -707,12 +721,12 @@ function PANEL:openMenu( node )
 			)
 		end )
 	elseif menu == "folder" then
-		self.menu:AddOption( "New file", function()
+		self.menu:AddOption( "New file", function ()
 			Derma_StringRequestNoBlur(
 				"New file",
 				"",
 				"",
-				function( text )
+				function ( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = node:GetFolder().."/"..text..".txt"
@@ -723,12 +737,12 @@ function PANEL:openMenu( node )
 			)
 		end )
 		self.menu:AddSpacer()
-		self.menu:AddOption( "New folder", function()
+		self.menu:AddOption( "New folder", function ()
 			Derma_StringRequestNoBlur(
 				"New folder",
 				"",
 				"",
-				function( text )
+				function ( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = node:GetFolder().."/"..text
@@ -752,7 +766,7 @@ derma.DefineControl( "StarfallFileTree", "", PANEL, "DTree" )
 -- File Browser
 PANEL = {}
 
-function PANEL:Init()
+function PANEL:Init ()
 
 	self:Dock( FILL )
 	self:DockMargin( 0, 5, 0, 0 )
@@ -767,7 +781,7 @@ function PANEL:Init()
 	searchBox:SetValue( "Search..." )
 
 	searchBox._OnGetFocus = searchBox.OnGetFocus
-	function searchBox:OnGetFocus()
+	function searchBox:OnGetFocus ()
 		if self:GetValue() == "Search..." then
 			self:SetValue( "" )
 		end
@@ -775,14 +789,14 @@ function PANEL:Init()
 	end
 
 	searchBox._OnLoseFocus = searchBox.OnLoseFocus
-	function searchBox:OnLoseFocus()
+	function searchBox:OnLoseFocus ()
 		if self:GetValue() == "" then
 			self:SetText( "Search..." )
 		end
 		searchBox:_OnLoseFocus()
 	end
 
-	function searchBox:OnChange()
+	function searchBox:OnChange ()
 
 		if self:GetValue() == "" then
 			tree:reloadTree()
@@ -790,7 +804,7 @@ function PANEL:Init()
 		end
 
 		tree.Root.ChildNodes:Clear()
-		local function containsFile( dir, search )
+		local function containsFile ( dir, search )
 			local files, folders = file.Find( dir .. "/*", "DATA" )
 			for k, file in pairs( files ) do
 				if string.find( string.lower( file ), string.lower( search ) ) then return true end
@@ -800,7 +814,7 @@ function PANEL:Init()
 			end
 			return false
 		end
-		local function addFiles( search, dir, node )
+		local function addFiles ( search, dir, node )
 			local allFiles, allFolders = file.Find( dir .. "/*", "DATA" )
 			for k, v in pairs( allFolders ) do
 				if containsFile( dir .. "/" .. v, search ) then
@@ -821,7 +835,7 @@ function PANEL:Init()
 	self.searchBox = searchBox
 
 end
-function PANEL:getComponents()
+function PANEL:getComponents ()
 	return self.searchBox, self.tree
 end
 

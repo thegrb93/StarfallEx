@@ -23,9 +23,9 @@ file.CreateDir( "sf_filedata/" )
 function file_library.read ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.read" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then error( "path contains '..'" ) return end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
 	local contents = file.Read( "sf_filedata/" .. path, "DATA" )
-	if contents then return contents else error( "file not found" ) return end
+	if contents then return contents else SF.throw( "file not found", 2 ) return end
 end
 
 --- Writes to a file
@@ -36,7 +36,7 @@ function file_library.write ( path, data )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
 	SF.CheckType( data, "string" )
-	if path:find( "..", 1, true ) then error( "path contains '..'" ) return end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
 	file.Write( "sf_filedata/" .. path, data )
 	return true
 end
@@ -49,7 +49,7 @@ function file_library.append ( path, data )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
 	SF.CheckType( data, "string" )
-	if path:find( "..", 1, true ) then error( "path contains '..'" ) return end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
 	file.Append( "sf_filedata/" .. path, data )
 	return true
 end
@@ -61,7 +61,7 @@ end
 function file_library.exists ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.exists" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then error( "path contains '..'" ) return end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
 	return file.Exists( "sf_filedata/" .. path, "DATA" )
 end
 
@@ -72,8 +72,8 @@ end
 function file_library.delete ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then error( "path contains '..'" ) return end
-	if not file.Exists( "sf_filedata/" .. path, "DATA" ) then error( "doesn't exist" ) return end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if not file.Exists( "sf_filedata/" .. path, "DATA" ) then SF.throw( "file not found", 2 ) return end
 	file.Delete( path )
 	return true
 end
@@ -83,6 +83,6 @@ end
 function file_library.createDir ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'" ) return end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
 	file.CreateDir( "sf_filedata/" .. path )
 end
