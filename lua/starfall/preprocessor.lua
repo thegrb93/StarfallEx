@@ -10,7 +10,7 @@ SF.Preprocessor.directives = {}
 
 --- Sets a global preprocessor directive.
 -- @param directive The directive to set.
--- @param func The callback. Takes the directive arguments, the file name, instance.ppdata and the instance
+-- @param func The callback. Takes the directive arguments, the file name, and instance.data
 function SF.Preprocessor.SetGlobalDirective(directive, func)
 	SF.Preprocessor.directives[directive] = func
 end
@@ -88,8 +88,7 @@ end
 -- @param source The source code to parse.
 -- @param directives A table of additional directives to use.
 -- @param data The data table passed to the directives.
--- @param instance The instance
-function SF.Preprocessor.ParseDirectives ( filename, source, directives, data, instance )
+function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 	local ending = nil
 	local endingLevel = nil
 	
@@ -121,7 +120,7 @@ function SF.Preprocessor.ParseDirectives ( filename, source, directives, data, i
 				local directive, args = string.match(line,"--@([^ ]+)%s*(.*)$")
 				local func = directives[directive] or SF.Preprocessor.directives[directive]
 				if func then
-					func( args, filename, data, instance )
+					func(args, filename, data)
 				end
 			end
 		end

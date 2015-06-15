@@ -2,83 +2,6 @@
 -- Wire library.
 -------------------------------------------------------------------------------
 
-local function splitString ( str, delim )
-	local ret   = {}
-	local cur   = ""
-	local start = 1
-	for i = 1, #str do
-		if str[ i ] == delim then
-			ret[ #ret + 1 ] = cur
-			cur = ""
-		else
-			cur = cur .. str[ i ]
-		end
-	end
-	if cur ~= "" then
-		ret[ #ret + 1 ] = cur
-	end
-	return ret
-end
-
--- Register inputs and outputs directives
--- errText is either input or output, used for error messages
-local function parseInOutputs ( str, errText )
-	local args = splitString( str, " ")
-	local names = {}
-	local types = {}
-	for k, v in pairs( args ) do
-		local split = splitString( v, ":" )
-		if #split ~= 2 then
-			print( "Invalid argument to @" .. errText .. "s" )
-			return false
-		end
-
-		local name = split[ 1 ]
-		local typ  = split[ 2 ]:upper()
-
-		if not name:match( "^%u[%a%d]*$" ) then
-			print( "Invalid " .. errText .. " name: " .. name )
-			return false
-		end
-		if not SF.Wire.InputConverters[ typ ] then
-			print( "Invalid/Unknown " .. errText .. " type: " .. typ )
-			return false
-		end
-
-		names[ #names + 1 ] = name
-		types[ #types + 1 ] = typ
-	end
-	return names, types
-end
-
-SF.Preprocessor.SetGlobalDirective( "inputs", function ( args, filename, data, instance )
-	if not args or args == "" then
-		print( "Invalid arguments to @inputs" )
-		return true
-	end
-
-	if not instance or not instance.data.entity then return end
-
-	local names, types = parseInOutputs( args, "input" )
-	if not names then return true end
-
-	WireLib.AdjustSpecialInputs( instance.data.entity, names, types )
-end )
-
-SF.Preprocessor.SetGlobalDirective( "outputs", function ( args, filename, data, instance )
-	if not args or args == "" then
-		print( "Invalid arguments to @outputs" )
-		return true
-	end
-
-	if not instance or not instance.data.entity then return end
-
-	local names, types = parseInOutputs( args, "output" )
-	if not names then return true end
-
-	WireLib.AdjustSpecialOutputs( instance.data.entity, names, types )
-end )
-
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
 
@@ -111,6 +34,7 @@ function wire_metamethods.onLoad ( instance )
 		self:runScriptHook( "writecell", address, data )
 		SF.instance = tmp
 	end
+
 end
 
 SF.Wire = {}
