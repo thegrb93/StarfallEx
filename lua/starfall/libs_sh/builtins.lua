@@ -180,6 +180,8 @@ SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
 
 local table_methods, table_metatable = SF.Typedef("Library: table")
 filterGmodLua(table,table_methods)
+table_methods.sortByKey = table.SortByKey
+table_methods.sortByMember = table.SortByMember
 table_metatable.__newindex = function() end
 --- Lua's (not glua's) table library
 -- @name SF.DefaultEnvironment.table
@@ -206,8 +208,8 @@ if SERVER then
 	-- @param ... Values to print
 	function SF.DefaultEnvironment.print(...)
 		local str = ""
-		local tbl = {...}
-		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
+		local tbl = {n=select('#', ...), ...}
+		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
 		SF.instance.player:ChatPrint(str)
 	end
 else
@@ -215,8 +217,8 @@ else
 	function SF.DefaultEnvironment.print(...)
 		if SF.instance.player ~= LocalPlayer() then return end
 		local str = ""
-		local tbl = {...}
-		for i=1,#tbl do str = str .. tostring(tbl[i]) .. (i == #tbl and "" or "\t") end
+		local tbl = {n=select('#', ...), ...}
+		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
 		LocalPlayer():ChatPrint(str)
 	end
 end
