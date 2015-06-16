@@ -129,6 +129,7 @@ if CLIENT then
 	function SF.Editor.open ()
 		if not SF.Editor.initialized then 
 			SF.Editor.init()
+			if not SF.Editor.initialized then return end
 		end
 
 		SF.Editor.editor:open()

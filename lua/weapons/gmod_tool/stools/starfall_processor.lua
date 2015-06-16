@@ -47,44 +47,36 @@ function TOOL:LeftClick( trace )
 
 	local ply = self:GetOwner()
 
-	if trace.Entity:IsValid() and trace.Entity:GetClass() == "starfall_processor" then
-		local ent = trace.Entity
-		if not SF.RequestCode(ply, function(mainfile, files)
-			if not mainfile then return end
-			if not IsValid(ent) then return end -- Probably removed during transfer
-			ent:Compile(files, mainfile)
-			if ent.instance and ent.instance.ppdata.models and ent.instance.mainfile and ent.instance.ppdata.models[ ent.instance.mainfile ] then
-				ent:SetModel( tostring( ent.instance.ppdata.models[ ent.instance.mainfile ] ) )
-				ent:PhysicsInit( SOLID_VPHYSICS )
-			end
-		end) then
-			SF.AddNotify( ply, "Cannot upload SF code, please wait for the current upload to finish.", NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
-		end
-		return true
-	end
+	local ent = trace.Entity
+	local sf
+	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
+		sf = ent
+	else
 	
-	self:SetStage(0)
+		--self:SetStage(0)
 
-	local model = self:GetClientInfo( "Model" )
-	if not self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
+		local model = self:GetClientInfo( "Model" )
+		if not self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
 
-	local Ang = trace.HitNormal:Angle()
-	Ang.pitch = Ang.pitch + 90
+		local Ang = trace.HitNormal:Angle()
+		Ang.pitch = Ang.pitch + 90
 
-	local sf = MakeSF( ply, trace.HitPos, Ang, model)
+		sf = MakeSF( ply, trace.HitPos, Ang, model)
 
-	local min = sf:OBBMins()
-	sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
+		local min = sf:OBBMins()
+		sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
 
-	local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
+		local const = WireLib.Weld(sf, ent, trace.PhysicsBone, true)
 
-	undo.Create( "Starfall Processor" )
-		undo.AddEntity( sf )
-		undo.AddEntity( const )
-		undo.SetPlayer( ply )
-	undo.Finish()
+		undo.Create( "Starfall Processor" )
+			undo.AddEntity( sf )
+			undo.AddEntity( const )
+			undo.SetPlayer( ply )
+		undo.Finish()
 
-	ply:AddCleanup( "starfall_processor", sf )
+		ply:AddCleanup( "starfall_processor", sf )
+		
+	end
 	
 	if not SF.RequestCode(ply, function(mainfile, files)
 		if not mainfile then return end
@@ -102,7 +94,21 @@ function TOOL:LeftClick( trace )
 end
 
 function TOOL:RightClick( trace )
-	if SERVER then self:GetOwner():SendLua("SF.Editor.open()") end
+	if SERVER then 
+	
+		local ply = self:GetOwner()
+		local ent = trace.Entity
+		
+		net.Start("starfall_openeditor")
+		if IsValid( ent ) and ent:GetClass() == "starfall_processor" then
+			net.WriteEntity( ent )
+		else
+			net.WriteEntity( nil )
+		end
+		net.Send(ply)
+		
+	end
+	
 	return false
 end
 

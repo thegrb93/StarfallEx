@@ -467,6 +467,7 @@ if SERVER then
 	util.AddNetworkString("starfall_upload")
 	util.AddNetworkString( "starfall_addnotify" )
 	util.AddNetworkString( "starfall_console_print" )
+	util.AddNetworkString( "starfall_openeditor" )
 	
 	local uploaddata = {}
 	-- Packet structure:
@@ -490,7 +491,6 @@ if SERVER then
 		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
 		
 		net.Start("starfall_requpload")
-		net.WriteEntity(ent)
 		net.Send(ply)
 
 		uploaddata[ply] = {
@@ -574,6 +574,18 @@ if SERVER then
 		end
 	end
 else
+	net.Receive("starfall_openeditor",function(len)
+		local gate = net.ReadEntity()
+		
+		SF.Editor.open()
+		
+		if gate:IsValid() then
+			for name, code in pairs(gate.files) do
+				SF.Editor.addTab( name, code )
+			end
+		end
+	end)
+	
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
 		if ok then
