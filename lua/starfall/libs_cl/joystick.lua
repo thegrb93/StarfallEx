@@ -22,7 +22,7 @@ end
 --- Gets the axis data value.
 -- @param enum Joystick number. Starts at 0
 -- @param axis Joystick axis number. Ranges from 0 to 7.
--- @return 0 - 32767 where 16383 is the middle.
+-- @return 0 - 65535 where 32767 is the middle.
 function joystick_library.getAxis( enum, axis )
 	if joystick then
 		refresh( enum )
@@ -33,7 +33,7 @@ end
 --- Gets the pov data value.
 -- @param enum Joystick number. Starts at 0
 -- @param pov Joystick pov number. Ranges from 0 to 7.
--- @return 0 - 32767 where 16383 is the middle.
+-- @return 0 - 65535 where 32767 is the middle.
 function joystick_library.getPov( enum, pov )
 	if joystick then
 		refresh( enum )
