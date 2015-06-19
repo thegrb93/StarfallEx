@@ -1,4 +1,6 @@
 
+--- Joystick library.
+-- @client
 local joystick_library, _ = SF.Libraries.Register("joystick")
 
 
@@ -9,6 +11,7 @@ end
 local next_updates = {}
 
 local function refresh( enum )
+	enum = math.Clamp( enum, 0, 12 )
 	local next_update = next_updates[ enum ] or 0
 	if CurTime()>next_update then
 		next_updates[ enum ] = CurTime() + 0.0303
