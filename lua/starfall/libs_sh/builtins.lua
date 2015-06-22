@@ -458,10 +458,3 @@ end
 
 SF.Libraries.AddHook("prepare", restrict)
 SF.Libraries.AddHook("cleanup", unrestrict)
-
--- ------------------------- Hook Documentation ------------------------- --
-
---- Think hook. Called once per game tick
--- @name think
--- @class hook
--- @shared

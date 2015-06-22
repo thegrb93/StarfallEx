@@ -428,7 +428,17 @@ add( "StartEntityDriving" )
 -- @param ent Entity being driven
 -- @param ply Player that is driving the entity
 
+--- Think hook. Called each game tick
+-- @name think
+-- @class hook
+-- @shared
+
 --- Called when the starfall chip is removed
 -- @name Removed
+-- @class hook
+-- @server
+
+--- Called when the starfall chip is duplicated and the duplication is finished. Use this to know when all duplcated constraints are initialized.
+-- @name DupeFinished
 -- @class hook
 -- @server
