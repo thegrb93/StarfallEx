@@ -230,3 +230,12 @@ function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )
 		self:Compile( code, main )
 	end
 end
+
+local function dupefinished( TimedPasteData, TimedPasteDataCurrent )
+	for k,v in pairs( TimedPasteData[TimedPasteDataCurrent].CreatedEntities ) do
+		if IsValid(v) and v:GetClass() == "starfall_processor" then
+			v:runScriptHook( "dupefinished" )
+		end
+	end
+end
+hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished )
