@@ -1,6 +1,7 @@
---- Input library
+
+--- Input library.
 -- @client
-local input_library, _ = SF.Libraries.Register( "input" )
+local input_methods, input_metamethods = SF.Libraries.Register( "input" )
 
 do
 	local P = SF.Permissions
@@ -14,7 +15,7 @@ end
 -- @return The id of the first key bound
 -- @return The name of the first key bound
 
-function input_library.lookupBinding( binding )
+function input_methods.lookupBinding( binding )
 	SF.CheckType( binding, "string" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -22,14 +23,14 @@ function input_library.lookupBinding( binding )
 	local bind = input.LookupBinding( binding )
 	if bind then
 		bind = bind:upper( )
-		return input_library.KEY[ bind ] or input_library.MOUSE[ bind ], bind
+		return input_methods.KEY[ bind ] or input_methods.MOUSE[ bind ], bind
 	end
 end
 
 --- Gets whether a key is down
 -- @param key The key id, see input.KEY
 -- @return True if the key is down
-function input_library.isKeyDown( key )
+function input_methods.isKeyDown( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input.key" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -40,7 +41,7 @@ end
 --- Gets the name of a key from the id
 -- @param key The key id, see input.KEY
 -- @return The name of the key
-function input_library.getKeyName( key )
+function input_methods.getKeyName( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -50,7 +51,7 @@ end
 
 --- Gets whether the shift key is down
 -- @return True if the shift key is down
-function input_library.isShiftDown( )
+function input_methods.isShiftDown( )
 	if not SF.Permissions.check( SF.instance.player, nil, "input.key" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	return input.IsShiftDown( )
@@ -58,7 +59,7 @@ end
 
 --- Gets whether the control key is down
 -- @return True if the control key is down
-function input_library.isControlDown( )
+function input_methods.isControlDown( )
 	if not SF.Permissions.check( SF.instance.player, nil, "input.key" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	return input.IsControlDown( )
@@ -67,7 +68,7 @@ end
 --- Gets the position of the mouse
 -- @return The x position of the mouse
 -- @return The y position of the mouse
-function input_library.getCursorPos( )
+function input_methods.getCursorPos( )
 	if not SF.Permissions.check( SF.instance.player, nil, "input.mouse" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	return input.GetCursorPos( )
@@ -76,7 +77,7 @@ end
 --- Gets whether a mouse button is down
 -- @param key The mouse button, see input.MOUSE
 -- @return True if the mouse button is down
-function input_library.isMBDown( key )
+function input_methods.isMBDown( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input.mouse" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -127,7 +128,7 @@ end )
 --- Gets whether the key was pressed this frame
 -- @param key The key id, see input.KEY
 -- @return True if the key was pressed
-function input_library.wasKeyPressed( key )
+function input_methods.wasKeyPressed( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input.key" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -138,7 +139,7 @@ end
 --- Gets whether the key was released this frame
 -- @param key The key id, see input.KEY
 -- @return True if the key was released
-function input_library.wasKeyReleased( key )
+function input_methods.wasKeyReleased( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input.key" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -198,7 +199,7 @@ end )
 --- Gets whether the mouse button was pressed this frame
 -- @param key The button id, see input.MOUSE
 -- @return True if the button was pressed
-function input_library.wasMBPressed( key )
+function input_methods.wasMBPressed( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input.mouse" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -209,7 +210,7 @@ end
 --- Gets whether the mouse button was released this frame
 -- @param key The key id, see input.MOUSE
 -- @return True if the button was released
-function input_library.wasMBReleased( key )
+function input_methods.wasMBReleased( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input.mouse" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -370,9 +371,9 @@ local _KEY = {
 }
 
 --- ENUMs of keyboard keys
--- @name input_library.KEY
+-- @name input_methods.KEY
 -- @class table
-input_library.KEY = setmetatable( {}, {
+input_methods.KEY = setmetatable( {}, {
 	__index = _KEY,
 	__newindex = function( )
 	end,
@@ -400,9 +401,9 @@ local _MOUSE = {
 }
 
 --- ENUMs of mouse buttons
--- @name input_library.MOUSE
+-- @name input_methods.MOUSE
 -- @class table
-input_library.MOUSE = setmetatable( {}, {
+input_methods.MOUSE = setmetatable( {}, {
 	__index = _MOUSE,
 	__newindex = function( )
 	end,
@@ -412,7 +413,7 @@ input_library.MOUSE = setmetatable( {}, {
 --- Gets the name of a mouse button from the id
 -- @param key The button id, see input.MOUSE
 -- @return The name of the mouse button
-function input_library.getMBName( key )
+function input_methods.getMBName( key )
 	SF.CheckType( key, "number" )
 
 	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
