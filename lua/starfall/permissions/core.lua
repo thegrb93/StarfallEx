@@ -87,8 +87,6 @@ function P.check ( principal, target, key )
 		for _, provider in pairs( providers ) do
 			if provider:isOwner( principal ) then return true end
 		end
-	elseif principal:IsSuperAdmin() then
-		return true
 	end
 
 	local allow = true

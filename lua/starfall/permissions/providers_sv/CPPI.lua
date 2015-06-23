@@ -40,13 +40,13 @@ local canPhysgun = {
 
 function P:check ( principal, target, key )
 	if not CPPI then return NEUTRAL end
-
-	if not IsValid( target:CPPIGetOwner() ) then return DENY end
 	
 	if canTool[ key ] then
+		if not IsValid( target:CPPIGetOwner() ) then return DENY end
 		if target:CPPICanTool( principal, "starfall_ent_lib" ) then return ALLOW end
 		return DENY
 	elseif canPhysgun[ key ] then
+		if not IsValid( target:CPPIGetOwner() ) then return DENY end
 		if target:CPPICanPhysgun( principal ) then return ALLOW end
 		return DENY
 	end
