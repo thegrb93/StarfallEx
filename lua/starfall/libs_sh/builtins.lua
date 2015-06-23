@@ -372,7 +372,7 @@ end
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
--- @param catch Function to execute in case func fails
+-- @param catch Optional function to execute in case func fails
 function SF.DefaultEnvironment.try ( func, catch )
 	local ok, err = pcall( func )
 	if ok then return end
@@ -382,7 +382,7 @@ function SF.DefaultEnvironment.try ( func, catch )
 			error( err )
 		end
 	end
-	catch( err )
+	if catch then catch( err ) end
 end
 
 --- Throws an exception
