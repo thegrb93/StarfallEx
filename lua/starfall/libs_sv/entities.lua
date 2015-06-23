@@ -356,7 +356,7 @@ function ents_methods:remove ()
 
 	local ent = unwrap( self )
 
-	if ent:IsPlayer() or ent:EntIndex()==0 then SF.throw( "Entity is not valid", 2 ) end
+	if not ent:IsValid() or ent:GetClass() ~= "prop_physics" then SF.throw( "Entity is not valid", 2 ) end
 	
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.remove" ) then SF.throw( "Insufficient permissions", 2 ) end
 
