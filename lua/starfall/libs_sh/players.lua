@@ -314,6 +314,19 @@ function player_methods:getEyeTrace ()
 	return SF.Sanitize( SF.UnwrapObject( self ):GetEyeTrace() )
 end
 
+--- Returns whether or not the player is pushing the key
+-- @shared
+-- @return table trace data
+function player_methods:keyDown ( key )
+	SF.CheckType( self, player_metamethods )
+	SF.CheckType( key, "number" )
+	
+	local ent = SF.Entities.Unwrap( self )
+	if not IsValid( ent ) then return false end
+	
+	return ent:KeyDown( key )
+end
+
 if CLIENT then
 	--- Returns the relationship of the player to the local client
 	-- @return One of: "friend", "blocked", "none", "requested"
