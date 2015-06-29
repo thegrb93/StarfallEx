@@ -162,6 +162,8 @@ local math_methods, math_metatable = SF.Typedef("Library: math")
 filterGmodLua(math,math_methods)
 math_metatable.__newindex = function() end
 math_methods.clamp = math.Clamp
+math_methods.angnorm = math.NormalizeAngle
+math_methods.sign = function(a) return a>0 and 1 or -1 end
 math_methods.round = math.Round
 math_methods.randfloat = math.Rand
 math_methods.calcBSplineN = nil
