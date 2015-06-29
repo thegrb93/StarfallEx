@@ -517,7 +517,7 @@ function wire_ports_metamethods:__index ( name )
 	if not ent then SF.throw( "No entity", 2 ) end
 
 	local input = ent.Inputs[name]
-	if not (input and input.Src and input.Src:IsValid()) then
+	if not input then
 		return nil
 	end
 	return inputConverters[ent.Inputs[name].Type](ent.Inputs[name].Value)
