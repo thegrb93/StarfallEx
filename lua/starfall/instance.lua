@@ -51,15 +51,12 @@ function SF.Instance:runWithOps(func,...)
 		return err
 	end
 
-	local oldSysTime = SysTime()
-	local averageCPU = nil
+	local oldSysTime = SysTime() - self.cpu_total
 	
 	local function cpuCheck ()
-		self.cpu_current =  SysTime() - oldSysTime
-		
-		averageCPU = self:movingCPUAverage()
+		self.cpu_total = SysTime() - oldSysTime
 
-		if averageCPU > self.context.cpuTime:getMax() then
+		if self:movingCPUAverage() > self.context.cpuTime:getMax() then
 			debug.sethook( nil )
 			SF.throw( "CPU Quota exceeded.", 0, true )
 		end
@@ -68,8 +65,6 @@ function SF.Instance:runWithOps(func,...)
 	debug.sethook( cpuCheck, "", 500 )
 	local ok, rt = xpcall( wrapperfunc, xpcall_callback )
 	debug.sethook( nil )
-
-	if averageCPU then self.cpu_average = averageCPU end
 	
 	if ok then
 		return true, rt
@@ -107,8 +102,8 @@ function SF.Instance:initialize()
 	assert(not self.initialized, "Already initialized!")
 	self.initialized = true
 
+	self.cpu_total = 0
 	self.cpu_average = 0
-	self.cpu_current = 0
 
 	self:runLibraryHook("initialize")
 	self:prepare("_initialize","_initialize")
@@ -281,5 +276,5 @@ end
 
 function SF.Instance:movingCPUAverage()
 	local n = self.context.cpuTime:getBufferN()
-	return (self.cpu_average * (n - 1) + self.cpu_current) / n
+	return (self.cpu_average * (n - 1) + self.cpu_total) / n
 end
