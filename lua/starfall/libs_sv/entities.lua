@@ -264,8 +264,8 @@ end
 
 --- Applies torque
 -- @param tq The torque vector
--- @deprecated Gmod has no phys:ApplyTorque function, so this uses black magic
-function ents_methods:applyTorque ( tq )
+-- @param offset Optional offset position
+function ents_methods:applyTorque ( tq, offset )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( tq, SF.Types[ "Vector" ] )
 
@@ -279,8 +279,14 @@ function ents_methods:applyTorque ( tq )
 
 	local torqueamount = tq:Length()
 	
+	if offset then 
+		SF.CheckType( offset, SF.Types[ "Vector" ] )
+		offset = vunwrap( offset )
+	else
+		offset = phys:GetPos() 
+	end
 	-- Convert torque from local to world axis
-	tq = phys:LocalToWorld( tq ) - phys:GetPos()
+	tq = phys:LocalToWorld( tq ) - offset
 	
 	-- Find two vectors perpendicular to the torque axis
 	local off
