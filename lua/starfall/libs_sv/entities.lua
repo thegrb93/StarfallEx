@@ -34,11 +34,14 @@ do
 	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence" )
 	P.registerPrivilege( "entities.remove", "Remove", "Allows the user to remove entities" )
 	P.registerPrivilege( "entities.emitSound", "Emitsound", "Allows the user to play sounds on entities" )
+	P.registerPrivilege( "entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity" )
 end
 
 local function fix_nan ( v )
 	if v < huge and v > -huge then return v else return 0 end
 end
+
+local isValid = SF.Entities.IsValid
 
 -- ------------------------- Internal Library ------------------------- --
 
@@ -46,8 +49,7 @@ end
 -- TODO: Optimize this!
 -- @return The entities owner, or nil if not found
 function SF.Entities.GetOwner ( entity )
-	local valid = SF.Entities.IsValid
-	if not valid( entity ) then return end
+	if not isValid( entity ) then return end
 	
 	if entity.IsPlayer and entity:IsPlayer() then
 		return entity
@@ -55,15 +57,15 @@ function SF.Entities.GetOwner ( entity )
 	
 	if CPPI then
 		local owner = entity:CPPIGetOwner()
-		if valid( owner ) then return owner end
+		if isValid( owner ) then return owner end
 	end
 	
 	if entity.GetPlayer then
 		local ply = entity:GetPlayer()
-		if valid( ply ) then return ply end
+		if isValid( ply ) then return ply end
 	end
 	
-	if entity.owner and valid( entity.owner ) and entity.owner:IsPlayer() then
+	if entity.owner and isValid( entity.owner ) and entity.owner:IsPlayer() then
 		return entity.owner
 	end
 	
@@ -78,7 +80,7 @@ function SF.Entities.GetOwner ( entity )
 	
 	if entity.GetOwner then
 		local ply = entity:GetOwner()
-		if valid( ply ) then return ply end
+		if isValid( ply ) then return ply end
 	end
 
 	return nil
@@ -91,7 +93,6 @@ function SF.Entities.CanModify ( ply, ent )
 	return ( CPPI and ent:CPPICanPhysgun( ply ) ) or SF.Entities.GetOwner( ent ) == ply
 end
 
-local isValid = SF.Entities.IsValid
 local getPhysObject = SF.Entities.GetPhysObject
 local getOwner = SF.Entities.GetOwner
 local canModify = SF.Entities.CanModify
@@ -304,6 +305,175 @@ function ents_methods:applyTorque ( tq, offset )
 	phys:ApplyForceOffset( dir * -1, off * -1 )
 	
 	return true
+end
+
+
+util.AddNetworkString( "sf_setentityrenderproperty" )
+
+local renderProperties = {
+	[1] = function( clr ) --Color
+		net.WriteUInt( clr.r, 8 )
+		net.WriteUInt( clr.g, 8 )
+		net.WriteUInt( clr.b, 8 )
+		net.WriteUInt( clr.a, 8 )
+	end,
+	[2] = function( draw ) --Nodraw
+		net.WriteBit( draw )
+	end,
+	[3] = function( material ) --Material
+		net.WriteString( material )
+	end,
+	[4] = function( index, material ) --Submaterial
+		net.WriteUInt( index, 16 )
+		net.WriteString( material )
+	end,
+	[5] = function( bodygroup, value ) --Bodygroup
+		net.WriteUInt( bodygroup, 16 )
+		net.WriteUInt( value, 16 )
+	end,
+	[6] = function( skin ) --Skin
+		net.WriteUInt( skin, 16 )
+	end
+}
+
+local function sendRenderPropertyToClient( ply, ent, func, ... )
+	SF.CheckType( ply, SF.Types[ "Player" ] )
+	ply = unwrap( ply )
+	if isValid( ply ) and ply:IsPlayer() then
+		net.Start( "sf_setentityrenderproperty" )
+		net.WriteEntity( ent )
+		net.WriteUInt( func, 4 )
+		renderProperties[ func ]( ... )
+		net.Send( ply )
+	end
+end
+
+--- Sets the color of the entity
+-- @server
+-- @param clr New color
+-- @param ply Optional player arguement to set the entity's color only for that player
+function ents_methods:setColor ( clr, ply )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( clr, SF.Types[ "Color" ] )
+
+	local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then return end
+	
+	if ply then
+		sendRenderPropertyToClient( ply, ent, 1, clr )
+	else
+		ent:SetColor( clr )
+		ent:SetRenderMode( clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
+	end
+
+end
+
+--- Sets the whether an entity should be drawn or not
+-- @server
+-- @param draw Whether to draw the entity or not.
+-- @param ply Optional player arguement to set drawing of an entity only for that player
+function ents_methods:setNoDraw ( draw, ply )
+	SF.CheckType( self, ents_metatable )
+	
+	local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then return end
+	
+	if ply then
+		sendRenderPropertyToClient( ply, ent, 2, draw and true or false )
+	else
+		ent:SetNoDraw( draw and true or false )
+	end
+end
+
+local materialBlacklist = {
+	[ "pp/copy" ] = true
+}
+
+--- Sets an entities' material
+-- @server
+-- @class function
+-- @param material, string, New material name.
+-- @param ply Optional player arguement to set material of an entity only for that player
+function ents_methods:setMaterial ( material, ply )
+	SF.CheckType( self, ents_metatable )
+    SF.CheckType( material, "string" )
+    if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
+
+	local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then return end
+	
+	if ply then
+		sendRenderPropertyToClient( ply, ent, 3, material )
+	else
+		ent:SetMaterial( material )
+	end
+end
+
+--- Sets an entities' submaterial
+-- @server
+-- @class function
+-- @param index, number, submaterial index.
+-- @param material, string, New material name.
+-- @param ply Optional player arguement to set material of an entity only for that player
+function ents_methods:setSubMaterial ( index, material, ply )
+	SF.CheckType( self, ents_metatable )
+    SF.CheckType( material, "string" )
+    if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
+
+    local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then return end
+	
+	if ply then
+		sendRenderPropertyToClient( ply, 4, index, material )
+	else
+		ent:SetSubMaterial( index, material )
+	end
+end
+
+--- Sets an entities' bodygroup
+-- @server
+-- @class function
+-- @param bodygroup Number, The ID of the bodygroup you're setting.
+-- @param value Number, The value you're setting the bodygroup to.
+-- @param ply Optional player arguement to set bodygroup of an entity only for that player
+function ents_methods:setBodygroup ( bodygroup, value, ply )
+	SF.CheckType( self, ents_metatable )
+    SF.CheckType( bodygroup, "number" )
+    SF.CheckType( value, "number" )
+
+    local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then return end
+	
+	if ply then
+		sendRenderPropertyToClient( ply, 5, bodygroup, value )
+	else
+		ent:SetBodyGroup( bodygroup, value )
+	end
+end
+
+--- Sets the skin of the entity
+-- @server
+-- @class function
+-- @param skinIndex Number, Index of the skin to use.
+-- @param ply Optional player arguement to set material of an entity only for that player
+function ents_methods:setSkin ( skinIndex, ply )
+	SF.CheckType( self, ents_metatable )
+    SF.CheckType( skinIndex, "number" )
+
+    local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then return end
+
+	if ply then
+		sendRenderPropertyToClient( ply, 6, skinIndex )
+	else
+		ent:SetSkin( skinIndex )
+	end
 end
 
 --- Sets the entitiy's position

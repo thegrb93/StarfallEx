@@ -15,16 +15,6 @@ local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 -- @shared
 local ents_lib, _ = SF.Libraries.Register( "entities" )
 
--- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege( "entities.setColor", "Set Color", "Allows the user to change the color of an entity" )
-end
-
-local materialBlacklist = {
-	[ "pp/copy" ] = true
-}
-
 -- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = wrap
@@ -36,7 +26,7 @@ SF.Entities.Library = ents_lib
 --- Returns true if valid and is not the world, false if not
 -- @param entity Entity to check
 function SF.Entities.IsValid ( entity )
-	return IsValid( entity ) and not entity:IsWorld()
+	return entity and entity:IsValid()
 end
 local isValid = SF.Entities.IsValid
 
@@ -75,6 +65,37 @@ else
 	function ents_lib.player ()
 		return SF.WrapObject( LocalPlayer() )
 	end
+	
+	local renderProperties = {
+		[1] = function( ent ) --Color	
+			ent:SetColor( Color( net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ) ) )
+		end,
+		[2] = function( ent ) --Nodraw
+			ent:SetNoDraw( net.ReadBit() == 1 )
+		end,
+		[3] = function( ent ) --Material
+			ent:SetMaterial( net.ReadString() )
+		end,
+		[4] = function( ent ) --Submaterial
+			ent:SetSubMaterial( net.ReadUInt( 16 ), net.ReadString() )
+		end,
+		[5] = function( ent ) --Bodygroup
+			ent:SetBodyGroup( net.ReadUInt( 16 ), net.ReadUInt ( 16 ) )
+		end,
+		[6] = function( ent ) --Skin
+			ent:SetSkin( net.ReadUInt( 16 ) )
+		end
+	}
+	
+	--Net function that allows the server to set the render properties of entities for specific players
+	net.Receive( "sf_setentityrenderproperty", function()
+		local ent = net.ReadEntity()
+		if not ent:IsValid() then return end
+		local property = net.ReadUInt( 4 )
+		if not renderProperties[ property ] then return end
+		
+		renderProperties[ property ]( ent )
+	end)
 end
 
 --- Returns the entity with index 'num'
@@ -96,20 +117,6 @@ function ents_metamethods:__tostring ()
 	local ent = unwrap( self )
 	if not ent then return "(null entity)"
 	else return tostring( ent ) end
-end
-
---- Sets the color of the entity
--- @shared
--- @param clr New color
-function ents_methods:setColor ( clr )
-	SF.CheckType( clr, SF.Types[ "Color" ] )
-
-	local this = unwrap( self )
-	if IsValid( this ) then
-		if not SF.Permissions.check( SF.instance.player, this, "entities.setColor" ) then return end
-		this:SetColor( clr )
-		this:SetRenderMode( clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
-	end
 end
 
 --- Gets the color of an entity
@@ -277,7 +284,7 @@ end
 function ents_methods:getVelocity ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = unwrap( self )
-	if not isValid( ent ) then return nil, "invalid entity" end
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	return SF.WrapObject( ent:GetVelocity() )
 end
 
@@ -394,66 +401,6 @@ end
 function ents_methods:getMaterials ()
     local ent = unwrap( self )
     return ent:GetMaterials() or {}
-end
-
---- Sets an entities' material
--- @shared
--- @class function
--- @param material, string, New material name.
--- @return The Entity being modified.
-function ents_methods:setMaterial ( material )
-    SF.CheckType( material, "string" )
-    if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
-
-    local ent = unwrap( self )
-    ent:SetMaterial( material )
-    return wrap( ent )
-end
-
---- Sets an entities' submaterial
--- @shared
--- @class function
--- @param index, number, submaterial index.
--- @param material, string, New material name.
--- @return The Entity being modified.
-function ents_methods:setSubMaterial ( index, material )
-    SF.CheckType( material, "string" )
-    if materialBlacklist[ material ] then SF.throw( "This material has been blacklisted", 2 ) end
-
-    local ent = unwrap( self )
-    ent:SetSubMaterial( index, material )
-    return wrap( ent )
-end
-
---- Sets an entities' bodygroup
--- @shared
--- @class function
--- @param bodygroup Number, The ID of the bodygroup you're setting.
--- @param value Number, The value you're setting the bodygroup to.
--- @return The Entity being modified.
-function ents_methods:setBodygroup ( bodygroup, value )
-    SF.CheckType( bodygroup, "number" )
-    SF.CheckType( value, "number" )
-
-    local ent = unwrap( self )
-
-    ent:SetBodyGroup( bodygroup, value )
-
-    return wrap( ent )
-end
-
---- Sets the skin of the entity
--- @shared
--- @class function
--- @param skinIndex Number, Index of the skin to use.
--- @return The Entity being modified.
-function ents_methods:setSkin ( skinIndex )
-    SF.CheckType( skinIndex, "number" )
-
-    local ent = unwrap( self )
-
-    ent:SetSkin( skinIndex )
-    return wrap( ent )
 end
 
 --- Gets the entities up vector
