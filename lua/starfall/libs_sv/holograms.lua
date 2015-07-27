@@ -35,17 +35,16 @@ function SF.Entities.Wrap(obj)
 end
 
 local insts = {}
-local plyCount = {}
+local plyCount = setmetatable({}, {__mode="k"})
 
 SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.holograms = {
 		holos = {},
-		count = 0,
 		burst = SF.Holograms.burstmax:GetInt() or 10
 	}
 
 	insts[inst] = true
-	plyCount[inst.player] = plyCount[inst.player] or inst.data.holograms.count
+	plyCount[inst.player] = plyCount[inst.player] or 0
 end)
 
 SF.Libraries.AddHook("deinitialize", function(inst)
@@ -59,19 +58,15 @@ SF.Libraries.AddHook("deinitialize", function(inst)
 		holos[holo] = nil
 		holo = next(holos)
 	end
-	plyCount[inst.player] = plyCount[inst.player] - inst.data.holograms.count
-	inst.data.holograms.count = 0
-
 	insts[inst]= nil
 end)
 
-local function hologramOnDestroy(holoent, holodata)
+local function hologramOnDestroy(holoent, holodata, ply)
+	plyCount[ply] = plyCount[ply] - 1
 	if not holodata.holos then return end
 	local holo = SF.Entities.Wrap(holoent)
 	if holodata.holos[holo] then
-		holodata.holos[holo] = nil
-		holodata.count = holodata.count - 1
-		assert(holodata.count >= 0)
+		holodata.holos[holo] = nil		
 	end
 end
 
@@ -400,7 +395,7 @@ function holograms_library.create ( pos, ang, model, scale )
         holoent:SetPos( pos )
         holoent:SetAngles( ang )
         holoent:SetModel( model )
-        holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata )
+        holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata, instance.player )
         holoent:Spawn()
 
         if scale then
@@ -410,7 +405,6 @@ function holograms_library.create ( pos, ang, model, scale )
         local holo = SF.Entities.Wrap( holoent )
 
         holodata.holos[ holo ] = holo
-        holodata.count = holodata.count + 1
 
         plyCount[ instance.player ] = plyCount[ instance.player ] + 1
         return holo

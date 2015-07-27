@@ -25,17 +25,16 @@ do
 end
 
 local insts = {}
-local plyCount = {}
+local plyCount = setmetatable({}, {__mode="k"})
 
 SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.props = {
 		props = {},
-		count = 0,
 		burst = SF.Props.burstmax:GetInt() or 4
 	}
 
 	insts[inst] = true
-	plyCount[inst.player] = plyCount[inst.player] or inst.data.props.count
+	plyCount[inst.player] = plyCount[inst.player] or 0
 end)
 
 SF.Libraries.AddHook("deinitialize", function(inst)
@@ -49,7 +48,6 @@ SF.Libraries.AddHook("deinitialize", function(inst)
 		props[prop] = nil
 		prop = next(props)
 	end
-	inst.data.props.count = 0
 
 	insts[inst]= nil
 end)
@@ -60,8 +58,6 @@ local function propOnDestroy(propent, propdata, ply)
 	local prop = SF.Entities.Wrap(propent)
 	if propdata.props[prop] then
 		propdata.props[prop] = nil
-		propdata.count = propdata.count - 1
-		assert(propdata.count >= 0)
 	end
 end
 
@@ -158,9 +154,8 @@ function props_library.create ( pos, ang, model, frozen )
 	local prop = SF.Entities.Wrap( propent )
 
 	propdata.props[ prop ] = prop
-	propdata.count = propdata.count + 1
-
 	plyCount[ instance.player ] = plyCount[ instance.player ] + 1
+	
 	return prop
 end
 
@@ -235,7 +230,6 @@ function props_library.createSent ( pos, ang, class, frozen )
 		local wrapped = SF.Entities.Wrap( entity )
 
 		propdata.props[ wrapped ] = wrapped
-		propdata.count = propdata.count + 1
 
 		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
 	
