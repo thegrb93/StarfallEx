@@ -182,6 +182,7 @@ if SERVER then
 	add( "PlayerDisconnected" )
 	add( "PlayerInitialSpawn" )
 	add( "PlayerSpawn" )
+	add( "PlayerEnteredVehicle" )
 	add( "PlayerLeaveVehicle" )
 	add( "PlayerSay", returnOnlyOnYourself )
 	add( "PlayerSpray" )
@@ -279,6 +280,14 @@ add( "StartEntityDriving" )
 -- @class hook
 -- @server
 -- @param player Player who spawned
+
+--- Called when a players enters a vehicle
+-- @name PlayerEnteredVehicle
+-- @class hook
+-- @server
+-- @param ply Player who entered a vehicle
+-- @param vehicle Vehicle that was entered
+-- @param num Role
 
 --- Called when a players leaves a vehicle
 -- @name PlayerLeaveVehicle
