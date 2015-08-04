@@ -195,34 +195,13 @@ function ENT:BuildDupeInfo ()
 	if self.instance then
 		info.starfall = SF.SerializeCode( self.files, self.mainfile )
 	end
-	
-	if self.Inputs or self.Outputs then
-		info.wiretypes = {
-			inputs = {names = {}, types = {}},
-			outputs = {names = {}, types = {}}
-		}
-		for k, v in pairs(self.Inputs) do
-			info.wiretypes.inputs.names[#info.wiretypes.inputs.names + 1] = k
-			info.wiretypes.inputs.types[#info.wiretypes.inputs.types + 1] = v.Type
-		end
-		for k, v in pairs(self.Outputs) do
-			info.wiretypes.outputs.names[#info.wiretypes.outputs.names + 1] = k
-			info.wiretypes.outputs.types[#info.wiretypes.outputs.types + 1] = v.Type
-		end
-	end
 
 	return info
 end
 
-function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )
-	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
+function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )	
+	WireLib.ApplyDupeInfo( ply, ent, info, GetEntByID )
 	self.owner = ply
-	
-	if info.Wires then
-		WireLib.CreateSpecialInputs(self.Entity,info.wiretypes.inputs.names,info.wiretypes.inputs.types)
-		WireLib.CreateSpecialOutputs(self.Entity,info.wiretypes.outputs.names,info.wiretypes.outputs.types)
-		WireLib.ApplyDupeInfo( ply, ent, info, GetEntByID )
-	end
 	
 	if info.starfall then
 		local code, main = SF.DeserializeCode( info.starfall )

@@ -15,7 +15,7 @@ cleanup.Register( "starfall_processor" )
 if SERVER then
 	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
-	function MakeSF( pl, Pos, Ang, model)
+	function MakeSF( pl, Pos, Ang, model, inputs, outputs)
 		if not pl:CheckLimit( "starfall_processor" ) then return false end
 
 		local sf = ents.Create( "starfall_processor" )
@@ -27,11 +27,19 @@ if SERVER then
 		sf:Spawn()
 
 		sf.owner = pl
-
+		
+		if inputs and inputs[1] and inputs[2] then
+			sf.Inputs = WireLib.AdjustSpecialInputs(sf, inputs[1], inputs[2])
+		end
+		if outputs and outputs[1] and outputs[2] then
+			sf.Outputs = WireLib.AdjustSpecialOutputs(sf, outputs[1], outputs[2])
+		end
+		
 		pl:AddCount( "starfall_processor", sf )
 
 		return sf
 	end
+	duplicator.RegisterEntityClass("starfall_processor", MakeSF, "Pos", "Ang", "Model", "_inputs", "_outputs")
 else
 	language.Add( "Tool.starfall_processor.name", "Starfall - Processor" )
 	language.Add( "Tool.starfall_processor.desc", "Spawns a starfall processor" )

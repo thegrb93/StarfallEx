@@ -240,7 +240,7 @@ function wire_library.adjustInputs ( names, types )
 		names[i] = newname
 		types[i] = newtype
 	end
-	
+	ent._inputs = {names, types}
 	WireLib.AdjustSpecialInputs(ent,names,types)
 end
 
@@ -267,7 +267,7 @@ function wire_library.adjustOutputs ( names, types )
 		names[i] = newname
 		types[i] = newtype
 	end
-	
+	ent._outputs = {names, types}	
 	WireLib.AdjustSpecialOutputs(ent,names,types)
 end
 
