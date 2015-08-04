@@ -21,6 +21,12 @@ end
 SF.AddObjectWrapper( debug.getregistry().Vehicle, vehicle_metamethods, wrap )
 SF.AddObjectUnwrapper( vehicle_metamethods, SF.Entities.Unwrap )
 
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "vehicle.eject", "Vehicle eject", "Removes a driver from vehicle" )
+end
+
 --- To string
 -- @shared
 function vehicle_metamethods:__tostring()
@@ -36,7 +42,20 @@ if SERVER then
 	function vehicle_methods:getDriver ()
 		SF.CheckType( self, vehicle_metamethods )
 		local ent = SF.Entities.Unwrap( self )
+		if not IsValid(ent) then return end
 		return SF.WrapObject( ent:GetDriver() )
+	end
+	
+	--- Ejects the driver of the vehicle
+	-- @server
+	function vehicle_methods:ejectDriver ()
+		SF.CheckType( self, vehicle_metamethods )
+		local ent = SF.Entities.Unwrap( self )
+		if not IsValid(ent) then return end
+		local driver = ent:GetDriver()
+		if driver:IsValid() then
+			driver:ExitVehicle()
+		end
 	end
 
 	--- Returns a passenger of a vehicle
