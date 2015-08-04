@@ -98,24 +98,6 @@ local getPhysObject = SF.Entities.GetPhysObject
 local getOwner = SF.Entities.GetOwner
 local canModify = SF.Entities.CanModify
 
--- Add wire inputs/outputs
-local function postload ()
-	if SF.Wire then
-		SF.Wire.AddInputType( "ENTITY", function ( data )
-			if data == nil then return nil end
-			return wrap( data )
-		end )
-
-		SF.Wire.AddOutputType( "ENTITY", function ( data )
-			if data == nil then return nil end
-			SF.CheckType( data,ents_metatable )
-			
-			return unwrap( data )
-		end )
-	end
-end
-SF.Libraries.AddHook( "postload", postload )
-
 --- Gets the owner of the entity
 -- @return Owner
 function ents_methods:getOwner ()

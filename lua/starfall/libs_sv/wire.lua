@@ -132,7 +132,8 @@ local inputConverters =
 	STRING = identity,
 	VECTOR = identity,
 	ANGLE = identity,
-	WIRELINK = function(wl) return wlwrap(wl) end,
+	WIRELINK = vwrap,
+	ENTITY = vwrap,
 
 	TABLE = function(tbl)
 		if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
@@ -159,6 +160,10 @@ local outputConverters =
 		SF.CheckType(data,"number",1)
 		return data
 	end,
+	NUMBER = function(data)
+		SF.CheckType(data,"number",1)
+		return data
+	end,
 	STRING = function(data)
 		SF.CheckType(data,"string",1)
 		return data
@@ -170,6 +175,10 @@ local outputConverters =
 	ANGLE = function ( data )
 		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
 		return data
+	end,
+	ENTITY = function ( data )
+		SF.CheckType( data, SF.Types[ "Entity" ] )
+		return vunwrap( data )
 	end,
 
 	TABLE = function(data)
