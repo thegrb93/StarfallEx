@@ -194,6 +194,18 @@ function ents_methods:getPos ()
 	return SF.WrapObject( ent:GetPos() )
 end
 
+--- Returns the matrix of the entity
+-- @shared
+-- @param bone Bone of the entity (def 0)
+-- @return The matrix
+function ents_methods:getMatrix (bone)
+	SF.CheckType( self, ents_metamethods )
+	bone = SF.CheckType( bone, "number", 0, 0 )
+	
+	local ent = unwrap( self )
+	return vwrap( ent:GetBoneMatrix(bone) )
+end
+
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
 -- @shared
 -- @return The outer bounding box size

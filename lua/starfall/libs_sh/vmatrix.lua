@@ -3,8 +3,8 @@ SF.VMatrix = {}
 
 --- VMatrix type
 local vmatrix_methods, vmatrix_metamethods = SF.Typedef( "VMatrix" )
-local wrap, unwrap = SF.CreateWrapper( vmatrix_metamethods, true, false )
-local vunwrap = SF.UnwrapObject
+local wrap, unwrap = SF.CreateWrapper( vmatrix_metamethods, true, false, debug.getregistry().VMatrix )
+local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 
 SF.VMatrix.Methods = vmatrix_methods
 SF.VMatrix.Metatable = vmatrix_metamethods
@@ -42,6 +42,24 @@ function vmatrix_methods:rotate ( ang )
 
 	local v = unwrap( self )
 	v:Rotate( SF.UnwrapObject( ang ) )
+
+end
+
+--- Inverts the matrix
+-- @return inverted matrix
+function vmatrix_methods:getInverse ( )
+
+	local v = unwrap( self )
+	return wrap( v:GetInverse() )
+
+end
+
+--- Inverts the matrix efficiently for translations and rotations
+-- @return inverted matrix
+function vmatrix_methods:getInverseTR ( )
+
+	local v = unwrap( self )
+	return wrap( v:GetInverseTR() )
 
 end
 
@@ -94,7 +112,5 @@ function vmatrix_methods:translate ( vec )
 end
 
 function vmatrix_metamethods.__mul ( lhs, rhs )
-	SF.CheckType( rhs, vmatrix_metamethods )
-
-	return wrap( unwrap( lhs ) * unwrap( rhs ) )
+	return vwrap( vunwrap( lhs ) * vunwrap( rhs ) )
 end
