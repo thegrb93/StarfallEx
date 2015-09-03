@@ -4,50 +4,50 @@
 
 --- Deals with hooks
 -- @shared
-local hook_library, _ = SF.Libraries.Register("hook")
+local hook_library, _ = SF.Libraries.Register( "hook" )
 local registered_instances = {}
 
 --- Sets a hook function
 -- @param hookname Name of the event
 -- @param name Unique identifier
 -- @param func Function to run
-function hook_library.add(hookname, name, func)
-	SF.CheckType(hookname,"string")
-	SF.CheckType(name,"string")
-	if func then SF.CheckType(func,"function") else return end
+function hook_library.add ( hookname, name, func )
+	SF.CheckType( hookname, "string" )
+	SF.CheckType( name, "string" )
+	if func then SF.CheckType( func, "function" ) else return end
 	
 	local inst = SF.instance
-	local hooks = inst.hooks[hookname:lower()]
+	local hooks = inst.hooks[ hookname:lower() ]
 	if not hooks then
 		hooks = {}
-		inst.hooks[hookname:lower()] = hooks
+		inst.hooks[ hookname:lower() ] = hooks
 	end
 	
-	hooks[name] = func
-	registered_instances[inst] = true
+	hooks[ name ] = func
+	registered_instances[ inst ] = true
 end
 
 --- Run a hook
 -- @shared
 -- @param hookname The hook name
 -- @param ... arguments
-function hook_library.run(hookname, ...)
-	SF.CheckType(hookname,"string")
+function hook_library.run ( hookname, ... )
+	SF.CheckType( hookname, "string" )
 	
 	local instance = SF.instance
 	local lower = hookname:lower()
 	
 	SF.instance = nil -- Pretend we're not running an instance
-	local ret = {instance:runScriptHookForResult( lower, ... )}
+	local ret = { instance:runScriptHookForResult( lower, ... ) }
 	SF.instance = instance -- Set it back
 	
 	local ok = table.remove( ret, 1 )
 	if not ok then
-		instance:Error( "Hook '" .. lower .. "' errored with " .. ret[1], ret[2] )
+		instance:Error( "Hook '" .. lower .. "' errored with " .. ret[ 1 ], ret[ 2 ] )
 		return
 	end
 	
-	return unpack(ret)
+	return unpack( ret )
 end
 
 --- Remote hook.
@@ -81,14 +81,15 @@ function hook_library.runRemote ( recipient, ... )
 
 	local instance = SF.instance
 
+	local result = {}
 	for k, _ in pairs( recipients ) do
 		SF.instance = nil
-		local result = { k:runScriptHookForResult( "remote", instance.data.entity, instance.player, ... ) }
+		result = { k:runScriptHookForResult( "remote", instance.data.entity, instance.player, ... ) }
 
 		local ok = table.remove( result, 1 )
 		if not ok then
-			if not result[1] then return end -- Call failed because of non-existent hook. Ignore
-			k:Error( "Hook 'remote' errored with " .. result[1], result[2] )
+			if not result[ 1 ] then continue end -- Call failed because of non-existent hook. Ignore
+			k:Error( "Hook 'remote' errored with " .. result[ 1 ], result[ 2 ] )
 			-- Their fault - don't return
 		end
 	end
@@ -101,39 +102,39 @@ end
 -- @shared
 -- @param hookname The hook name
 -- @param name The unique name for this hook
-function hook_library.remove( hookname, name )
-	SF.CheckType(hookname,"string")
-	SF.CheckType(name,"string")
+function hook_library.remove ( hookname, name )
+	SF.CheckType( hookname, "string" )
+	SF.CheckType( name, "string" )
 	local instance = SF.instance
 	
 	local lower = hookname:lower()
-	if instance.hooks[lower] then
-		instance.hooks[lower][name] = nil
+	if instance.hooks[ lower ] then
+		instance.hooks[ lower ][ name ] = nil
 		
-		if not next(instance.hooks[lower]) then
-			instance.hooks[lower] = nil
+		if not next( instance.hooks[ lower ] ) then
+			instance.hooks[ lower ] = nil
 		end
 	end
 	
-	if not next(instance.hooks) then
-		registered_instances[instance] = nil
+	if not next( instance.hooks ) then
+		registered_instances[ instance ] = nil
 	end
 end
 
-SF.Libraries.AddHook("deinitialize",function(instance)
-	registered_instances[instance] = nil
-end)
+SF.Libraries.AddHook( "deinitialize", function ( instance )
+	registered_instances[ instance ] = nil
+end )
 
-SF.Libraries.AddHook("cleanup",function(instance,name,func,err)
+SF.Libraries.AddHook( "cleanup", function ( instance, name, func, err )
 	if name == "_runFunction" and err == true then
-		registered_instances[instance] = nil
+		registered_instances[ instance ] = nil
 		instance.hooks = {}
 	end
 end)
 
 local wrapArguments = SF.Sanitize
 
-local function run( hookname, customfunc, ... )
+local function run ( hookname, customfunc, ... )
 	local result = {}
 	for instance,_ in pairs( registered_instances ) do
 		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
@@ -145,7 +146,7 @@ local function run( hookname, customfunc, ... )
 				result = sane ~= nil and { sane } or result
 			end
 		else
-			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[1], ret[2] )
+			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[ 1 ], ret[ 2 ] )
 		end
 	end
 	return unpack( result )
@@ -157,10 +158,10 @@ local hooks = {}
 -- @shared
 -- @param hookname The hook name. In-SF hookname will be lowercased
 -- @param customfunc Optional custom function
-function SF.hookAdd( hookname, customfunc )
-	hooks[#hooks+1] = hookname
+function SF.hookAdd ( hookname, customfunc )
+	hooks[ #hooks + 1 ] = hookname
 	local lower = hookname:lower()
-	hook.Add( hookname, "SF_" .. hookname, function(...)
+	hook.Add( hookname, "SF_" .. hookname, function ( ... )
 		return run( lower, customfunc, ... )
 	end)
 end
