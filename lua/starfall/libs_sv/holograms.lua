@@ -420,6 +420,18 @@ function holograms_library.canSpawn()
     return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
 end
 
+--- Checks how many holograms can be spawned
+-- @server
+-- @return number of holograms able to be spawned
+function holograms_library.hologramsLeft ()
+
+	if not SF.Permissions.check( SF.instance.player,  nil, "hologram.create" ) then return 0 end
+	
+	local instance = SF.instance
+	return math.min( SF.Holograms.personalquota:GetInt() - plyCount[instance.player], instance.data.holos.burst )
+	
+end
+
 --- Returns how many holograms per second the user can spawn
 -- @server
 -- @return Number of holograms per second the user can spawn
