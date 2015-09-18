@@ -249,6 +249,18 @@ function props_library.canSpawn ()
 	
 end
 
+--- Checks how many props can be spawned
+-- @server
+-- @return number of props able to be spawned
+function props_library.propsLeft ()
+
+	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return 0 end
+	
+	local instance = SF.instance
+	return math.min( SF.Props.personalquota:GetInt() - plyCount[instance.player], instance.data.props.burst )
+	
+end
+
 --- Returns how many props per second the user can spawn
 -- @server
 -- @return Number of props per second the user can spawn
