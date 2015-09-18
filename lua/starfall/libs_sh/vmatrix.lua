@@ -17,6 +17,12 @@ SF.DefaultEnvironment.Matrix = function ()
 	return wrap( Matrix() )
 end
 
+--- tostring metamethod
+-- @return string representing the matrix.
+function vmatrix_metamethods:__tostring ()
+	return unwrap( self ):__tostring()
+end
+
 --- Returns angles
 -- @return Angles
 function vmatrix_methods:getAngles ()
