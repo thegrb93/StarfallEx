@@ -70,6 +70,13 @@ end
 --- Converts the color from RGB to HSV.
 --@shared
 --@return A triplet of numbers representing HSV.
-function color_methods:toHSV ()
+function color_methods:rgbToHSV ()
 	return ColorToHSV( unwrap( self ) )
+end
+
+--- Converts the color from HSV to RGB.
+--@shared
+--@return A triplet of numbers representing HSV.
+function color_methods:hsvToRGB ()
+	return HSVToColor( self.r, self.g, self.b )
 end
