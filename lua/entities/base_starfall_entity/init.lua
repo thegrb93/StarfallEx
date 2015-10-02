@@ -19,12 +19,12 @@ function ENT:BuildDupeInfo ()
 end
 
 function ENT:ApplyDupeInfo ()
-	return {}
 end
 
 function ENT:PreEntityCopy ()
 	local i = self:BuildDupeInfo()
 	if i then
+		self.EntityMods.SFDupeInfo = nil
 		duplicator.StoreEntityModifier( self, "SFDupeInfo", i )
 	end
 end
