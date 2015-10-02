@@ -78,7 +78,12 @@ end
 function SF.Instance:prepare(hook, name)
 	assert(self.initialized, "Instance not initialized!")
 	assert(not self.error, "Instance is errored!")
-	assert(SF.instance == nil)
+	
+	if SF.instance ~= nil then
+		self.instanceStack = self.instanceStack or {}
+		self.instanceStack[#self.instanceStack + 1] = SF.instance
+		SF.instance = nil
+	end
 	
 	self:runLibraryHook("prepare",hook, name)
 	SF.instance = self
@@ -89,7 +94,16 @@ end
 function SF.Instance:cleanup(hook, name, ok, errmsg)
 	assert(SF.instance == self)
 	self:runLibraryHook("cleanup",hook, name, ok, errmsg)
-	SF.instance = nil
+	
+	if self.instanceStack then
+		SF.instance = self.instanceStack[#self.instanceStack]
+		if #self.instanceStack == 1 then self.instanceStack = nil
+		else self.instanceStack[#self.instanceStack] = nil
+		end
+	else
+		SF.instance = nil
+	end
+	
 end
 
 --- Runs the scripts inside of the instance. This should be called once after
