@@ -24,7 +24,9 @@ end
 function ENT:PreEntityCopy ()
 	local i = self:BuildDupeInfo()
 	if i then
-		self.EntityMods.SFDupeInfo = nil
+		if self.EntityMods then
+			self.EntityMods.SFDupeInfo = nil
+		end
 		duplicator.StoreEntityModifier( self, "SFDupeInfo", i )
 	end
 end
