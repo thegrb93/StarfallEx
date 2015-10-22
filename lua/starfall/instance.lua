@@ -62,9 +62,15 @@ function SF.Instance:runWithOps(func,...)
 		end
 	end
 
-	debug.sethook( cpuCheck, "", 500 )
-	local ok, rt = xpcall( wrapperfunc, xpcall_callback )
-	debug.sethook( nil )
+	local ok, rt
+	if self.instanceStack then
+		ok, rt = xpcall( wrapperfunc, xpcall_callback )
+	else
+		debug.sethook( cpuCheck, "", 500 )
+		ok, rt = xpcall( wrapperfunc, xpcall_callback )
+		debug.sethook( nil )
+	end
+	
 	
 	if ok then
 		return true, rt
