@@ -424,7 +424,7 @@ Elastic two entities </td>
 	<tr>
 	<td class="name" nowrap><a href="#constraint_library.getTable">getTable</a>&nbsp;(ent)</td>
 	<td class="summary">
-Creates a table of constraints on an entity </td>
+Returns the table of constraints on an entity </td>
 	</tr>
 
 	<tr>
@@ -434,7 +434,7 @@ Nocollides two entities </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#constraint_library.rope">rope</a>&nbsp;(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, rigid)</td>
+	<td class="name" nowrap><a href="#constraint_library.rope">rope</a>&nbsp;(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)</td>
 	<td class="summary">
 Ropes two entities </td>
 	</tr>
@@ -834,7 +834,7 @@ Elastic two entities
 <dt><a name="constraint_library.getTable"></a><strong>constraint_library.getTable</strong>&nbsp;(ent)</dt>
 <dd>
 
-Creates a table of constraints on an entity
+Returns the table of constraints on an entity
 
 
 
@@ -843,7 +843,7 @@ Creates a table of constraints on an entity
 <ul>
 	
 	<li>
-	  <code><em>ent</em></code>: Target entity
+	  <code><em>ent</em></code>: The entity
 	</li>
 	
 </ul>
@@ -908,7 +908,7 @@ Nocollides two entities
 
 
 
-<dt><a name="constraint_library.rope"></a><strong>constraint_library.rope</strong>&nbsp;(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, rigid)</dt>
+<dt><a name="constraint_library.rope"></a><strong>constraint_library.rope</strong>&nbsp;(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)</dt>
 <dd>
 
 Ropes two entities
@@ -961,6 +961,10 @@ Ropes two entities
 	
 	<li>
 	  <code><em>width</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>material</em></code>: 
 	</li>
 	
 	<li>
@@ -1128,27 +1132,27 @@ Welds two entities
 <ul>
 	
 	<li>
-	  <code><em>e1</em></code>: 
+	  <code><em>e1</em></code>: The first entity
 	</li>
 	
 	<li>
-	  <code><em>e2</em></code>: 
+	  <code><em>e2</em></code>: The second entity
 	</li>
 	
 	<li>
-	  <code><em>bone1</em></code>: 
+	  <code><em>bone1</em></code>: Number bone of the first entity
 	</li>
 	
 	<li>
-	  <code><em>bone2</em></code>: 
+	  <code><em>bone2</em></code>: Number bone of the second entity
 	</li>
 	
 	<li>
-	  <code><em>force_lim</em></code>: 
+	  <code><em>force_lim</em></code>: Max force the weld can take before breaking
 	</li>
 	
 	<li>
-	  <code><em>nocollide</em></code>: 
+	  <code><em>nocollide</em></code>: Bool whether or not to nocollide the two entities
 	</li>
 	
 </ul>
