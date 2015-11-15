@@ -80,15 +80,36 @@ if CLIENT then
 
 	local aceFiles = {}
 	local htmlEditorCode = nil
+	local initializingEditor = false
 
-	function SF.Editor.init ()
-		if not SF.Editor.safeToInit then 
-			SF.AddNotify( LocalPlayer(), "Starfall is downloading editor files, please wait.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
-			return 
-		end
-		if SF.Editor.initialized or #aceFiles == 0 or htmlEditorCode == nil then 
-			SF.AddNotify( LocalPlayer(), "Failed to initialize Starfall editor.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+	function SF.Editor.init ( leave_open )
+		if initializingEditor then 
+			SF.AddNotify( LocalPlayer(), "Editor is busy loading...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
 			return
+		end
+		
+		if not SF.Editor.safeToInit or not htmlEditorCode then
+			initializingEditor = true
+			SF.AddNotify( LocalPlayer(), "Loading editor now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
+			local timeout = CurTime()+30
+			
+			net.Start( "starfall_editor_geteditorcode" )
+			net.SendToServer()
+			
+			hook.Add("Think", "SF_LoadingEditor", function()
+				if not SF.Editor.safeToInit or not htmlEditorCode then
+					if CurTime() > timeout then
+						initializingEditor = false
+						SF.AddNotify( LocalPlayer(), "Failed downloading the editor files...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+						hook.Remove("Think", "SF_LoadingEditor")
+					end
+				else
+					initializingEditor = false
+					hook.Remove("Think", "SF_LoadingEditor")
+					SF.Editor.init ( leave_open )
+				end
+			end)
+			return 
 		end
 
 		if not file.Exists( "starfall", "DATA" ) then
@@ -120,16 +141,18 @@ if CLIENT then
 		end
 
 		SF.Editor.editor:close()
-
 		SF.Editor.initialized = true
-
+		if leave_open then
+			SF.Editor.open()
+		end
+		
 		return true
 	end
 
 	function SF.Editor.open ()
-		if not SF.Editor.initialized then 
-			SF.Editor.init()
-			if not SF.Editor.initialized then return end
+		if not SF.Editor.initialized then
+			SF.Editor.init ( true )
+			return false
 		end
 
 		SF.Editor.editor:open()
@@ -137,6 +160,7 @@ if CLIENT then
 		if CanRunConsoleCommand() then
 			RunConsoleCommand( "starfall_event", "editor_open" )
 		end
+		return true
 	end
 
 	function SF.Editor.close ()
@@ -830,9 +854,7 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
 	function SF.Editor.BuildIncludesTable ( maincode, codename )
-		if not SF.Editor.initialized then
-			if not SF.Editor.init() then return end
-		end
+		if not SF.Editor.initialized then SF.Editor.init() return false, "Editor needs to finish loading..." end
 		local tbl = {}
 		maincode = maincode or SF.Editor.getCode()
 		codename = codename or SF.Editor.getOpenFile() or "main"
@@ -929,7 +951,6 @@ if CLIENT then
 			net.SendToServer()
 		else
 			SF.Editor.safeToInit = true
-			SF.Editor.init()
 		end
 	end )
 	net.Receive( "starfall_editor_geteditorcode", function ( len )
@@ -1019,15 +1040,21 @@ elseif SERVER then
 	local plyIndex = {}
 	local function sendAceFile ( len, ply )
 		local index = plyIndex[ ply ]
+		local finished = index == #acefiles
 		net.Start( "starfall_editor_getacefiles" )
 			net.WriteInt( index, 8 )
 			net.WriteString( acefiles[ index ] )
-			net.WriteBit( index == #acefiles )
+			net.WriteBit( finished )
 		net.Send( ply )
-		plyIndex[ ply ] = index + 1
+		
+		if finished then
+			plyIndex[ ply ] = nil
+		else
+			plyIndex[ ply ] = index + 1
+		end
 	end
 
-	hook.Add( "PlayerInitialSpawn", "starfall_file_init", function ( ply )
+	net.Receive("starfall_editor_geteditorcode", function ( len, ply )
 		net.Start( "starfall_editor_geteditorcode" )
 			net.WriteString( file.Read( addon_path .. "/html/starfall/editor.html", "GAME" ) )
 		net.Send( ply )

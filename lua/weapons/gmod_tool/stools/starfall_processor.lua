@@ -131,10 +131,11 @@ function TOOL:Think()
 end
 
 if CLIENT then
+
 	local lastclick = CurTime()
 	
 	local function GotoDocs(button)
-		gui.OpenURL("http://sf.inp.io") -- old one: http://colonelthirtytwo.net/sfdoc/
+		gui.OpenURL("http://thegrb93.github.io/StarfallEx/") -- old one: http://sf.inp.io") -- old one: http://colonelthirtytwo.net/sfdoc/
 	end
 	
 	function TOOL.BuildCPanel(panel)
@@ -159,6 +160,8 @@ if CLIENT then
 		local lastClick = 0
 		filebrowser.tree.DoClick = function( self, node )
 			if CurTime() <= lastClick + 0.5 then
+				if not SF.Editor.initialized then SF.Editor.init() return end
+				
 				if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
 				local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
 				local code = file.Read( node:GetFileName(), "DATA" )

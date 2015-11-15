@@ -579,7 +579,7 @@ else
 		
 		SF.Editor.open()
 		
-		if gate:IsValid() then
+		if IsValid(gate) then
 			for name, code in pairs(gate.files) do
 				SF.Editor.addTab( name, code )
 			end

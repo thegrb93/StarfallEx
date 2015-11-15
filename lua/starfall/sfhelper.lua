@@ -10,17 +10,10 @@ SF.Helper = {}
 SF.Docs = {}
 local helper = SF.Helper
 local docs_set = false
+local docs_downloading = false
 local settings_set = false
 
 if CLIENT then
-	function helper.getDocs()
-		http.Fetch( "http://thegrb93.github.io/StarfallEx/doc.json", function( body, len, headers, code )
-			SF.Docs = util.JSONToTable( body )
-			docs_set = true
-		end, function( error ) print("Starfall failed to load documentation, Error: ", error) end )
-	end
-	helper.getDocs()
-
 	CreateClientConVar( "sf_helper_width", 930, true, false )
 	CreateClientConVar( "sf_helper_height", 615, true, false )
 	CreateClientConVar( "sf_helper_posx", ( ScrW() - 930 ) / 2, true, false )
@@ -644,8 +637,24 @@ function helper.create()
 end
 
 function helper.show()
+	if docs_downloading then return end
 	if not docs_set then
-		helper.getDocs()
+		docs_downloading = true
+		SF.AddNotify( LocalPlayer(), "Loading starfall helper now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+		
+		http.Fetch( "http://thegrb93.github.io/StarfallEx/doc.json", 
+		function( body, len, headers, code )
+			SF.Docs = util.JSONToTable( body )
+			docs_set = true
+			docs_downloading = false
+			helper.show()
+		end, 
+		function( error ) 
+			print("Starfall failed to load documentation, Error: ", error) 
+			SF.AddNotify( LocalPlayer(), "Failed to load the helper...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
+			docs_downloading = false
+		end )
+		
 		return
 	end
 
