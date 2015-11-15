@@ -167,7 +167,7 @@ math_methods.sign = function(a) return a>0 and 1 or -1 end
 math_methods.round = math.Round
 math_methods.randfloat = math.Rand
 math_methods.calcBSplineN = nil
---- Lua's (not glua's) math library, plus clamp, round, and randfloat
+--- Lua's (not glua's) math library, plus clamp, angnorm, sign, round, and randfloat, calcBSplineN
 -- @name SF.DefaultEnvironment.math
 -- @class table
 SF.DefaultEnvironment.math = setmetatable({},math_metatable)
@@ -175,7 +175,7 @@ SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 local os_methods, os_metatable = SF.Typedef( "Library: os" )
 filterGmodLua( os, os_methods )
 os_metatable.__newindex = function () end
---- GLua's os library. http://wiki.garrysmod.com/page/Category:os
+--- GLua's os library. http://wiki.garrysmod.com/page/Category:os, plus sortByKey, sortByMember
 -- @name SF.DefaultEnvironment.os
 -- @class table
 SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
