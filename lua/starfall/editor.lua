@@ -496,7 +496,7 @@ if CLIENT then
 
 		local html = vgui.Create( "DHTML", editor )
 		html:SetPos( 5, 54 )
-		htmlEditorCode = htmlEditorCode:Replace( "<script>//replace//</script>", table.concat( aceFiles ) )
+		htmlEditorCode = htmlEditorCode:Replace( "<script>//replace//</script>", util.Decompress( table.concat( aceFiles ) ) )
 		html:SetHTML( htmlEditorCode )
 
 		html:SetAllowLua( true )
@@ -944,7 +944,7 @@ if CLIENT then
 
 	net.Receive( "starfall_editor_getacefiles", function ( len )
 		local index = net.ReadInt( 8 )
-		aceFiles[ index ] = net.ReadString()
+		aceFiles[ index ] = net.ReadData( ( len / 8 ) - 1)
 		
 		if not tobool( net.ReadBit() ) then 
 			net.Start( "starfall_editor_getacefiles" )
@@ -1025,13 +1025,15 @@ elseif SERVER then
 
 		local files = file.Find( addon_path .. "/html/starfall/ace/*", "GAME" )
 
-		local out = ""
+		local out = {}
 
 		for k, v in pairs( files ) do
-			out = out .. "<script>\n" .. file.Read( addon_path .. "/html/starfall/ace/" .. v, "GAME" ) .. "</script>\n"
+			out[#out+1] = "<script>\n" .. file.Read( addon_path .. "/html/starfall/ace/" .. v, "GAME" ) .. "</script>\n"
 		end
+		
+		out = util.Compress( table.concat(out) )
 
-		for i = 1, math.ceil( out:len() / netSize ) do
+		for i = 1, math.ceil( #out / netSize ) do
 			acefiles[i] = out:sub( (i - 1)*netSize + 1, i*netSize )
 		end
 	end
@@ -1043,7 +1045,7 @@ elseif SERVER then
 		local finished = index == #acefiles
 		net.Start( "starfall_editor_getacefiles" )
 			net.WriteInt( index, 8 )
-			net.WriteString( acefiles[ index ] )
+			net.WriteData( acefiles[ index ], #acefiles[ index ] )
 			net.WriteBit( finished )
 		net.Send( ply )
 		

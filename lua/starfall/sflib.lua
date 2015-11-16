@@ -574,10 +574,10 @@ if SERVER then
 		end
 	end
 else
-	net.Receive("starfall_openeditor",function(len)
-		local gate = net.ReadEntity()
+	net.Receive("starfall_openeditor",function(len)		
+		if not SF.Editor.open() then return end
 		
-		SF.Editor.open()
+		local gate = net.ReadEntity()
 		
 		if IsValid(gate) then
 			for name, code in pairs(gate.files) do
