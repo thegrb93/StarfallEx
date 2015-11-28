@@ -78,7 +78,7 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
 	CreateClientConVar( "sf_editor_fixconsolebug", 0, true, false )
 
-	local aceFiles = {}
+	local editorUrl = "http://thegrb93.github.io/StarfallEx/starfall/"
 	local htmlEditorCode = nil
 	local initializingEditor = false
 
@@ -88,27 +88,65 @@ if CLIENT then
 			return
 		end
 		
-		if not SF.Editor.safeToInit or not htmlEditorCode then
+		if not htmlEditorCode then
+			
 			initializingEditor = true
 			SF.AddNotify( LocalPlayer(), "Loading editor now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
-			local timeout = CurTime()+30
 			
-			net.Start( "starfall_editor_geteditorcode" )
-			net.SendToServer()
-			
-			hook.Add("Think", "SF_LoadingEditor", function()
-				if not SF.Editor.safeToInit or not htmlEditorCode then
-					if CurTime() > timeout then
-						initializingEditor = false
-						SF.AddNotify( LocalPlayer(), "Failed downloading the editor files...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
-						hook.Remove("Think", "SF_LoadingEditor")
-					end
-				else
-					initializingEditor = false
-					hook.Remove("Think", "SF_LoadingEditor")
+			local function finishedInit(successful, error_code)
+				if not initializingEditor then return end
+				initializingEditor = false
+				hook.Remove("Think", "SF_LoadingEditor")
+				if successful then
 					SF.Editor.init ( leave_open )
+				else
+					print("Starfall failed to load editor, Error: ", error_code) 
+					SF.AddNotify( LocalPlayer(), "Failed to load the editor...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+				end
+			end
+			
+			local aceFiles = {"ace/ace.js", "ace/ext-whitespace.js", "ace/ext-elastic_tabstops_lite.js", "ace/mode-lua.js", "ace/ext-emmet.js", "ace/ext-split.js", "ace/ext-old_ie.js", "ace/worker-lua.js", "ace/ext-linking.js", "ace/ext-beautify.js", "ace/ext-modelist.js", "ace/ext-textarea.js", "ace/ext-chromevox.js", "ace/ext-searchbox.js", "ace/ext-statusbar.js", "ace/ext-themelist.js", "ace/theme-monokai.js", "ace/ext-spellcheck.js", "ace/keybinding-vim.js", "ace/ext-error_marker.js", "ace/keybinding-emacs.js", "ace/ext-settings_menu.js", "ace/ext-language_tools.js", "ace/ext-keybinding_menu.js", "ace/ext-static_highlight.js",}
+			local editorcode
+			local editorscripts = {}
+			local function getAceFile()
+				if not initializingEditor then return end
+				local nextindex = #editorscripts + 1
+				if aceFiles[nextindex] then
+					http.Fetch( editorUrl..aceFiles[nextindex], 
+					function( body, len, headers, code )
+						editorscripts[nextindex] = "<script>\n" .. body .. "</script>\n"
+						getAceFile()
+					end, 
+					function( error_code ) 
+						finishedInit( false, error_code )
+					end )
+				else
+					htmlEditorCode = editorcode:Replace( "<script>//replace//</script>",  table.concat( editorscripts ) )
+				end
+			end
+			local function getEditorFile()
+				http.Fetch( editorUrl.."editor.html", 
+				function( body, len, headers, code )
+					editorcode = body
+					getAceFile()
+				end, 
+				function( error_code ) 
+					finishedInit( false, error_code )
+				end )
+			end
+			getEditorFile()
+			
+			local timeout = CurTime() + 30
+			hook.Add("Think", "SF_LoadingEditor", function()
+				if htmlEditorCode then
+					finishedInit( true )
+				else
+					if CurTime() > timeout then
+						finishedInit( false, "Download Timed Out" )
+					end
 				end
 			end)
+			
 			return 
 		end
 
@@ -496,7 +534,6 @@ if CLIENT then
 
 		local html = vgui.Create( "DHTML", editor )
 		html:SetPos( 5, 54 )
-		htmlEditorCode = htmlEditorCode:Replace( "<script>//replace//</script>", util.Decompress( table.concat( aceFiles ) ) )
 		html:SetHTML( htmlEditorCode )
 
 		html:SetAllowLua( true )
@@ -942,21 +979,6 @@ if CLIENT then
 		end
 	end
 
-	net.Receive( "starfall_editor_getacefiles", function ( len )
-		local index = net.ReadInt( 8 )
-		aceFiles[ index ] = net.ReadData( ( len / 8 ) - 1)
-		
-		if not tobool( net.ReadBit() ) then 
-			net.Start( "starfall_editor_getacefiles" )
-			net.SendToServer()
-		else
-			SF.Editor.safeToInit = true
-		end
-	end )
-	net.Receive( "starfall_editor_geteditorcode", function ( len )
-		htmlEditorCode = net.ReadString()
-	end )
-
 	-- CLIENT ANIMATION
 
 	local busy_players = { }
@@ -1002,8 +1024,6 @@ if CLIENT then
 elseif SERVER then
 
 	util.AddNetworkString( "starfall_editor_status" )
-	util.AddNetworkString( "starfall_editor_getacefiles" )
-	util.AddNetworkString( "starfall_editor_geteditorcode" )
 
 	local function getFiles ( dir, dir2 )
 		local files = {}
@@ -1017,55 +1037,6 @@ elseif SERVER then
 		end
 		return files
 	end
-
-	local acefiles = {}
-
-	do
-		local netSize = 64000
-
-		local files = file.Find( addon_path .. "/html/starfall/ace/*", "GAME" )
-
-		local out = {}
-
-		for k, v in pairs( files ) do
-			out[#out+1] = "<script>\n" .. file.Read( addon_path .. "/html/starfall/ace/" .. v, "GAME" ) .. "</script>\n"
-		end
-		
-		out = util.Compress( table.concat(out) )
-
-		for i = 1, math.ceil( #out / netSize ) do
-			acefiles[i] = out:sub( (i - 1)*netSize + 1, i*netSize )
-		end
-	end
-
-
-	local plyIndex = {}
-	local function sendAceFile ( len, ply )
-		local index = plyIndex[ ply ]
-		local finished = index == #acefiles
-		net.Start( "starfall_editor_getacefiles" )
-			net.WriteInt( index, 8 )
-			net.WriteData( acefiles[ index ], #acefiles[ index ] )
-			net.WriteBit( finished )
-		net.Send( ply )
-		
-		if finished then
-			plyIndex[ ply ] = nil
-		else
-			plyIndex[ ply ] = index + 1
-		end
-	end
-
-	net.Receive("starfall_editor_geteditorcode", function ( len, ply )
-		net.Start( "starfall_editor_geteditorcode" )
-			net.WriteString( file.Read( addon_path .. "/html/starfall/editor.html", "GAME" ) )
-		net.Send( ply )
-
-		plyIndex[ ply ] = 1
-		sendAceFile( nil, ply )
-	end )
-
-	net.Receive( "starfall_editor_getacefiles", sendAceFile )
 
 	for k, v in pairs( getFiles( addon_path, "materials/radon" ) ) do
 		resource.AddFile( v )
