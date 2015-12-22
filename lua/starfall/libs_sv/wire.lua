@@ -176,7 +176,7 @@ local outputConverters =
 	end,
 	ANGLE = function ( data )
 		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
-		return data
+		return vunwrap( data )
 	end,
 	ENTITY = function ( data )
 		SF.CheckType( data, SF.Types[ "Entity" ] )
