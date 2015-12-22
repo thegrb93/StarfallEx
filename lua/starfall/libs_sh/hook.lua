@@ -448,7 +448,7 @@ add( "StartEntityDriving" )
 -- @class hook
 -- @server
 
---- Called when the starfall chip is duplicated and the duplication is finished. Use this to know when all duplcated constraints are initialized.
--- @name DupeFinished
+--- Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.
+-- @name Initialize
 -- @class hook
 -- @server

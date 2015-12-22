@@ -137,13 +137,6 @@ function ENT:Compile(files, mainfile)
 	if not self.instance then return end
 
 	self.name = nil
-
-	if self.Inputs then
-		for k, v in pairs(self.Inputs) do
-			self:TriggerInput( k, v.Value )
-		end
-	end
-	
 	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[ self.instance.mainfile ] then
 		self.name = tostring( self.instance.ppdata.scriptnames[ self.instance.mainfile ] )
 	end
@@ -157,6 +150,14 @@ function ENT:Compile(files, mainfile)
 			v:LinkEnt( self )
 		end
 	end
+	
+	if self.Inputs then
+		for k, v in pairs(self.Inputs) do
+			self:TriggerInput( k, v.Value )
+		end
+	end
+	
+	self:runScriptHook( "initialize" )
 end
 
 function ENT:Error ( msg, traceback )
@@ -212,7 +213,7 @@ end
 local function dupefinished( TimedPasteData, TimedPasteDataCurrent )
 	for k,v in pairs( TimedPasteData[TimedPasteDataCurrent].CreatedEntities ) do
 		if IsValid(v) and v:GetClass() == "starfall_processor" then
-			v:runScriptHook( "dupefinished" )
+			v:runScriptHook( "initialize" )
 		end
 	end
 end

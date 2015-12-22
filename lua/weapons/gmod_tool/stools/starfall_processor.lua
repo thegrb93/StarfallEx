@@ -83,7 +83,6 @@ function TOOL:LeftClick( trace )
 		undo.Finish()
 
 		ply:AddCleanup( "starfall_processor", sf )
-		
 	end
 	
 	if not SF.RequestCode(ply, function(mainfile, files)
