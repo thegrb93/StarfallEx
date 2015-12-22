@@ -230,7 +230,6 @@ end
 
 --- Applies angular force to the entity
 -- @param ang The force angle
--- @deprecated Gmod has no phys:ApplyAngleForce function, so this uses black magic
 function ents_methods:applyAngForce ( ang )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )

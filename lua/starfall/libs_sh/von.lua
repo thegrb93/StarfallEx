@@ -45,7 +45,6 @@
 
 --- vON Library
 -- @shared
--- @deprecated Pure Lua implementation. This can be done with a user library.
 local von, _ = SF.Libraries.Register("von")
 
 local _deserialize, _serialize, _d_meta, _s_meta, d_findVariable, s_anyVariable
