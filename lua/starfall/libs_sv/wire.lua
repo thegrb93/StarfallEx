@@ -134,7 +134,7 @@ local inputConverters =
 	STRING = identity,
 	VECTOR = identity,
 	ANGLE = identity,
-	WIRELINK = vwrap,
+	WIRELINK = wlwrap,
 	ENTITY = vwrap,
 
 	TABLE = function(tbl)
