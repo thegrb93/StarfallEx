@@ -9,6 +9,20 @@ local eunwrap = SF.Entities.Unwrap
 local vwrap = SF.WrapObject
 local ewrap = SF.Entities.Wrap
 
+local function checkConstraint(e, t)
+	if e then
+		if e:IsValid() then
+			if not SF.Permissions.check( SF.instance.player, e, t ) then
+				SF.throw( "Insufficient permissions", 3 )
+			end
+		elseif not e:IsWorld() then
+			SF.throw( "Invalid Entity", 3 )
+		end
+	else
+		SF.throw( "Invalid Entity", 3 )
+	end
+end
+
 -- Register privileges
 do
 	local P = SF.Permissions
@@ -38,9 +52,8 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	local ent1 = eunwrap( e1 )
 	local ent2 = eunwrap( e2 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.weld" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.weld" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.weld" )
+	checkConstraint( ent2, "constraints.weld" )
 
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -64,9 +77,8 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	local vec2 = vunwrap( v2 )
 	local axis = laxis and vunwrap( laxis ) or nil
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.axis" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.axis" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.axis" )
+	checkConstraint( ent2, "constraints.axis" )
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -89,9 +101,8 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	local ent2 = eunwrap( e2 )
 	local vec1 = vunwrap( v1 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.ballsocket" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.ballsocket" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.ballsocket" )
+	checkConstraint( ent2, "constraints.ballsocket" )
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -118,9 +129,8 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	local maxs = vunwrap( maxv ) or Vector ( 0, 0, 0 )
 	local frictions = vunwrap( frictionv ) or Vector ( 0, 0, 0 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.ballsocketadv" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.ballsocketadv" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.ballsocketadv" )
+	checkConstraint( ent2, "constraints.ballsocketadv" )
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -145,9 +155,8 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	local vec1 = vunwrap( v1 )
 	local vec2 = vunwrap( v2 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.elastic" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.elastic" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.elastic" )
+	checkConstraint( ent2, "constraints.elastic" )
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -179,9 +188,8 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	local vec1 = vunwrap( v1 )
 	local vec2 = vunwrap( v2 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.rope" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.rope" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.rope" )
+	checkConstraint( ent2, "constraints.rope" )
 
 
 	bone1 = bone1 or 0
@@ -214,9 +222,8 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	local vec1 = vunwrap( v1 )
 	local vec2 = vunwrap( v2 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.slider" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.slider" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.slider" )
+	checkConstraint( ent2, "constraints.slider" )
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -234,9 +241,8 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	local ent1 = eunwrap( e1 )
 	local ent2 = eunwrap( e2 )
 	
-	if not IsValid( ent1 ) or not IsValid( ent2 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.nocollide" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent2, "constraints.nocollide" ) then SF.throw( "Insufficient permissions", 2 ) end
+	checkConstraint( ent1, "constraints.nocollide" )
+	checkConstraint( ent2, "constraints.nocollide" )
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
