@@ -87,16 +87,8 @@ function SF.Entities.GetOwner ( entity )
 	return nil
 end
 
---- Checks to see if a player can modify an entity without the override permission
--- @param ply The player
--- @param ent The entity being modified
-function SF.Entities.CanModify ( ply, ent )
-	return ( CPPI and ent:CPPICanPhysgun( ply ) ) or SF.Entities.GetOwner( ent ) == ply
-end
-
 local getPhysObject = SF.Entities.GetPhysObject
 local getOwner = SF.Entities.GetOwner
-local canModify = SF.Entities.CanModify
 
 --- Gets the owner of the entity
 -- @return Owner
@@ -311,6 +303,25 @@ function ents_methods:applyTorque ( tq, offset )
 	phys:ApplyForceOffset( dir * -1, off * -1 )
 end
 
+--- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
+-- @param func The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
+function ents_methods:addCollisionListener ( func )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( func, "function" )
+	local ent = unwrap( self )
+	if ent.SF_CollisionCallback then SF.throw( "The entity is already listening to collisions!", 2 ) end
+	ent.SF_CollisionCallback = true
+	
+	local instance = SF.instance
+	ent:AddCallback("PhysicsCollide", function(ent, data)
+		instance:runFunction( func, setmetatable({}, {
+			__index=function(t,k)
+				return SF.WrapObject( data[k] )
+			end,
+			__metatable={}
+		}))
+	end)
+end
 
 util.AddNetworkString( "sf_setentityrenderproperty" )
 
