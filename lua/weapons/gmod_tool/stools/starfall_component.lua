@@ -106,6 +106,8 @@ function TOOL:RightClick( trace )
 	if CLIENT then return true end
 
 	local ent = trace.Entity
+	local ply = self:GetOwner()
+	
 	if self:GetStage() == 0 then -- stage 0: right-clicking on our own class selects it
 		if ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" then
 			self.Component = ent
