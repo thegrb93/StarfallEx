@@ -18,7 +18,10 @@ net.Receive( "starfall_processor_used", function ( len )
 	local instance = screen.link.instance
 	if instance and instance.hooks[ "starfallUsed" ] then
 		local ok, rt = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
-		if not ok then self:Error( rt ) end
+		if not ok then 
+			screen.link:Error( rt )
+			screen:Error( rt ) 
+		end
 	end
 	
 	-- Error message copying
@@ -47,7 +50,10 @@ function ENT:Initialize ()
 
 			if instance.hooks[ "render" ] then
 				local ok, rt = instance:runScriptHook( "render" )
-				if not ok then self:Error( rt ) end
+				if not ok then
+					self.link:Error( rt )
+					self:Error( rt ) 
+				end
 			end
 
 			if data.render.usingRT then
@@ -87,11 +93,6 @@ function ENT:Error ( msg, traceback )
 		self.error.source, self.error.line, self.error.msg = nil, nil, msg
 	else
 		self.error.msg = string.TrimLeft( self.error.msg )
-	end
-	
-	if self.instance then
-		self.instance:deinitialize()
-		self.instance = nil
 	end
 	
 	--self:SetOverlayText( "Starfall Screen\nInactive ( Error )" )

@@ -34,7 +34,10 @@ function ENT:DrawHUD()
 	
 	if instance.hooks[ "render" ] then
 		local ok, rt = instance:runScriptHook( "render" )
-		if not ok then self:Error( rt ) end
+		if not ok then
+			self.link:Error( rt )
+			self:Error( rt ) 
+		end
 	end
 
 	if data.render.usingRT then
@@ -56,7 +59,8 @@ function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
 				return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
 			end
 		else
-			self:Error( rt )
+			self.link:Error( rt )
+			self:Error( rt ) 
 		end
 	end
 end
