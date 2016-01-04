@@ -28,6 +28,7 @@ function ENT:DrawHUD()
 	local instance = self.link.instance
 	local data = instance.data
 	
+	data.render.renderEnt = self
 	data.render.isRendering = true
 	draw.NoTexture()
 	surface.SetDrawColor( 255, 255, 255, 255 )

@@ -631,10 +631,11 @@ end
 function render_library.cursorPos( ply )
 	-- Taken from EGPLib
 	local Normal, Pos, monitor, Ang
-	local screen = SF.instance.data.entity
+	local screen = SF.instance.data.render.renderEnt
 	if not screen then return nil end
 	
 	ply = SF.Entities.Unwrap( ply )
+	if not ply then SF.throw("Invalid Player", 2) end
 	
 	-- Get monitor screen pos & size
 	monitor = WireGPU_Monitors[ screen:GetModel() ]
