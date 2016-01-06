@@ -51,7 +51,7 @@ end
 
 --- __tostring metamethod
 function color_metatable:__tostring ()
-	return unwrap( self ):__tostring()
+	return self.r .. " " .. self.g .. " " .. self.b .. " " .. self.a
 end
 
 --- __concat metamethod

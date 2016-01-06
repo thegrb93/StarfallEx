@@ -124,7 +124,7 @@ end
 -- @return Color
 function ents_methods:getColor ()
 	local this = unwrap( self )
-	return this:GetColor()
+	return SF.Color.Wrap( this:GetColor() )
 end
 
 --- Checks if an entity is valid.
