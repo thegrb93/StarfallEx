@@ -128,13 +128,13 @@ local function CheckURLDownloads()
 	end
 	
 	if #LoadingURLQueue == 0 then
-		timer.Destroy("EGP_URLMaterialChecker")
+		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
 
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } ) 
 
-local function LoadURLMaterial( tbl, url, cb )
+local function LoadURLMaterial( url, cb )
 	--Count the number of materials
 	local totalMaterials = 0, key
 	while true do
@@ -147,7 +147,6 @@ local function LoadURLMaterial( tbl, url, cb )
 	totalMaterials = totalMaterials + queuesize
 	
 	if totalMaterials>=cv_max_url_materials:GetInt() then
-		tbl.material = false
 		return
 	end
 	
@@ -157,26 +156,17 @@ local function LoadURLMaterial( tbl, url, cb )
 		["$ignorez"] = 1,
 		["$nolod"] = 1
 	}
-	local urlmaterial = CreateMaterial("egp_urltex_" .. util.CRC(url .. SysTime()), "UnlitGeneric", ShaderInfo)
-	tbl[url] = urlmaterial
+	local urlmaterial = CreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()), "UnlitGeneric", ShaderInfo)
 				
 	if queuesize == 0 then
-		timer.Create("EGP_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
+		timer.Create("SF_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
 	end
 	
 	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, cb = cb}
-
+	return urlmaterial
 end
 
-texturecache = setmetatable({},{__mode = "v", __index = function(tbl, mat)
-	if mat:sub(1,4)=="http" then
-		mat = string.gsub( mat, "[^%w _~%.%-/:]", function( str )
-			return string.format( "%%%02X", string.byte( str ) )
-		end )
-		
-		LoadURLMaterial(tbl, mat)
-	end			
-end})
+texturecache = setmetatable({},{__mode = "k"})
 
 local validfonts = {
 	DebugFixed = true,
@@ -310,22 +300,37 @@ function render_library.setColor ( clr )
 	surface.SetTextColor( clr )
 end
 
---- Looks up a texture ID by file name.
--- @param tx Texture file path
+--- Looks up a texture by file name. Use with render.setTexture to draw with it.
+--- Make sure to store the texture to use it rather than calling this slow function repeatedly.
+-- @param tx Texture file path, or a http url
 function render_library.getTextureID ( tx )
-	local id = surface.GetTextureID( tx )
-	if id then
-		local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
-		local cacheentry = CreateMaterial( "SF_TEXTURE_" .. id, "UnlitGeneric", {
-			[ "$nolod" ] = 1,
-			[ "$ignorez" ] = 1,
-			[ "$vertexcolor" ] = 1,
-			[ "$vertexalpha" ] = 1
-		} )
-		cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
-		texturecache[ id ] = cacheentry
-		return id
+
+	if tx:sub(1,4)=="http" then
+		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
+			return string.format( "%%%02X", string.byte( str ) )
+		end )
+		
+		local tbl = {}
+		texturecache[ tbl ] = LoadURLMaterial( tx )
+		return tbl
+	else
+		local id = surface.GetTextureID( tx )
+		if id then
+			local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
+			local cacheentry = CreateMaterial( "SF_TEXTURE_" .. id, "UnlitGeneric", {
+				[ "$nolod" ] = 1,
+				[ "$ignorez" ] = 1,
+				[ "$vertexcolor" ] = 1,
+				[ "$vertexalpha" ] = 1
+			} )
+			cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
+			
+			local tbl = {}
+			texturecache[ tbl ] = cacheentry
+			return tbl
+		end
 	end
+	
 end
 
 --- Sets the texture
