@@ -154,7 +154,7 @@
 	</li>
 
 	<li>
-		<a href="../libraries/von.html"><del>von</del></a>
+		<a href="../libraries/von.html">von</a>
 	</li>
 
 	<li>
@@ -199,10 +199,6 @@
 <ul>
 
 	<li>
-		<a href="../hooks.html#DupeFinished">DupeFinished</a>
-	</li>
-
-	<li>
 		<a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
 	</li>
 
@@ -224,6 +220,10 @@
 
 	<li>
 		<a href="../hooks.html#GravGunPunt">GravGunPunt</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#Initialize">Initialize</a>
 	</li>
 
 	<li>
@@ -504,7 +504,7 @@ Gets the size of the specified text.</td>
 	<tr>
 	<td class="name" nowrap><a href="#render_library.getTextureID">getTextureID</a>&nbsp;(tx)</td>
 	<td class="summary">
-Looks up a texture ID by file name.</td>
+Looks up a texture by file name.</td>
 	</tr>
 
 	<tr>
@@ -1367,7 +1367,8 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 <dt><a name="render_library.getTextureID"></a><strong>render_library.getTextureID</strong>&nbsp;(tx)</dt>
 <dd>
 
-Looks up a texture ID by file name.
+Looks up a texture by file name. Use with render.setTexture to draw with it. 
+Make sure to store the texture to use it rather than calling this slow function repeatedly.
 
 
 
@@ -1376,7 +1377,7 @@ Looks up a texture ID by file name.
 <ul>
 	
 	<li>
-	  <code><em>tx</em></code>: Texture file path
+	  <code><em>tx</em></code>: Texture file path, or a http url
 	</li>
 	
 </ul>

@@ -156,7 +156,7 @@
 	</li>
 
 	<li>
-		<a href="../libraries/von.html"><del>von</del></a>
+		<a href="../libraries/von.html">von</a>
 	</li>
 
 	<li>
@@ -201,10 +201,6 @@
 <ul>
 
 	<li>
-		<a href="../hooks.html#DupeFinished">DupeFinished</a>
-	</li>
-
-	<li>
 		<a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
 	</li>
 
@@ -226,6 +222,10 @@
 
 	<li>
 		<a href="../hooks.html#GravGunPunt">GravGunPunt</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#Initialize">Initialize</a>
 	</li>
 
 	<li>
@@ -388,7 +388,13 @@ Entity type</p>
 <table class="function_list">
 
 	<tr>
-		<td class="name" nowrap><del><a href="#ents_methods:applyAngForce">applyAngForce</a>&nbsp;(ang)</del></td>
+		<td class="name" nowrap><a href="#ents_methods:addCollisionListener">addCollisionListener</a>&nbsp;(func)</td>
+		<td class="summary">
+Allows detecting collisions on an entity.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:applyAngForce">applyAngForce</a>&nbsp;(ang)</td>
 		<td class="summary">
 Applies angular force to the entity </td>
 	</tr>
@@ -766,12 +772,43 @@ Converts an angle in world space to entity local space </td>
 
 
 
-<dt><del><a name="ents_methods:applyAngForce"></a><strong>ents_methods:applyAngForce</strong>&nbsp;(ang)</del></dt>
+<dt><a name="ents_methods:addCollisionListener"></a><strong>ents_methods:addCollisionListener</strong>&nbsp;(func)</dt>
+<dd>
+
+Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>func</em></code>: The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:applyAngForce"></a><strong>ents_methods:applyAngForce</strong>&nbsp;(ang)</dt>
 <dd>
 
 Applies angular force to the entity
 
-<br /><strong><font color="red">Deprecated:</font> Gmod has no phys:ApplyAngleForce function, so this uses black magic</strong>
+
 
 
 <h3>Parameters:</h3>
