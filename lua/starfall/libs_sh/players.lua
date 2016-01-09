@@ -314,8 +314,34 @@ function player_methods:getEyeTrace ()
 	return SF.Sanitize( SF.UnwrapObject( self ):GetEyeTrace() )
 end
 
---- Returns whether or not the player is pushing the key
+--- Returns whether or not the player is pushing the key.
 -- @shared
+-- @param key Key to check.
+---IN_KEY.ALT1
+---IN_KEY.ALT2
+---IN_KEY.ATTACK
+---IN_KEY.ATTACK2
+---IN_KEY.BACK
+---IN_KEY.DUCK
+---IN_KEY.FORWARD
+---IN_KEY.JUMP
+---IN_KEY.LEFT
+---IN_KEY.MOVELEFT
+---IN_KEY.MOVERIGHT
+---IN_KEY.RELOAD
+---IN_KEY.RIGHT
+---IN_KEY.SCORE
+---IN_KEY.SPEED
+---IN_KEY.USE
+---IN_KEY.WALK
+---IN_KEY.ZOOM
+---IN_KEY.GRENADE1
+---IN_KEY.GRENADE2
+---IN_KEY.WEAPON1
+---IN_KEY.WEAPON2
+---IN_KEY.BULLRUSH
+---IN_KEY.CANCEL
+---IN_KEY.RUN
 -- @return table trace data
 function player_methods:keyDown ( key )
 	SF.CheckType( self, player_metamethods )
