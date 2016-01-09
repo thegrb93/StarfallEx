@@ -286,7 +286,7 @@ end
 function SF.Instance:Error(msg,traceback)
 	
 	if self.runOnError then -- We have a custom error function, use that instead
-		self.runOnError( msg, traceback )
+		self:runOnError( msg, traceback )
 		return
 	end
 	
