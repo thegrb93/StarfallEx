@@ -31,10 +31,11 @@ SF.Instance.__index = SF.Instance
 function SF.Instance:runWithOps(func,...)
 
 	local args = { ... }
+	local nargs = select( "#", ... )
 	local traceback
 
 	local wrapperfunc = function ()
-		return { func( unpack( args ) ) }
+		return { func( unpack( args, 1, nargs ) ) }
 	end
 
 	local function xpcall_callback ( err )
@@ -51,21 +52,21 @@ function SF.Instance:runWithOps(func,...)
 		return err
 	end
 
-	local oldSysTime = SysTime() - self.cpu_total
-	
-	local function cpuCheck ()
-		self.cpu_total = SysTime() - oldSysTime
-
-		if self:movingCPUAverage() > self.context.cpuTime:getMax() then
-			debug.sethook( nil )
-			SF.throw( "CPU Quota exceeded.", 0, true )
-		end
-	end
-
 	local ok, rt
 	if self.instanceStack then
+		--Already measuring cpu time. Just call it
 		ok, rt = xpcall( wrapperfunc, xpcall_callback )
 	else
+		--Start measuring cpu time
+		local oldSysTime = SysTime()
+		local function cpuCheck ()
+			self.cpu_total = SysTime() - oldSysTime
+
+			if self:movingCPUAverage() > self.context.cpuTime:getMax() then
+				debug.sethook( nil )
+				SF.throw( "CPU Quota exceeded.", 0, true )
+			end
+		end
 		debug.sethook( cpuCheck, "", 500 )
 		ok, rt = xpcall( wrapperfunc, xpcall_callback )
 		debug.sethook( nil )
