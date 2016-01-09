@@ -452,9 +452,9 @@ if CLIENT then
 		editor:Center()
 
 		function editor:OnKeyCodePressed ( keyCode )
-			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
 				SF.Editor.saveTab( SF.Editor.getActiveTab() )
-			elseif keyCode == KEY_Q and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+			elseif keyCode == KEY_Q and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
 				SF.Editor.close()
 			end
 		end
@@ -566,7 +566,7 @@ if CLIENT then
 
 			if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
 			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and 
-				( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+				( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
 				if key == KEY_UP and input.IsKeyDown( key ) then
 					self:QueueJavascript( "editor.modifyNumber(1)" )
 					repeatKey()
@@ -600,7 +600,7 @@ if CLIENT then
 					self:QueueJavascript( "editor.selection.selectLineEnd()" )
 					repeatKey()
 				end
-			elseif input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) then
+			elseif (input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL )) and not input.IsKeyDown( KEY_LALT ) then
 				if key == KEY_LEFT and input.IsKeyDown( key ) then
 					self:QueueJavascript( "editor.navigateWordLeft()" )
 					repeatKey()
