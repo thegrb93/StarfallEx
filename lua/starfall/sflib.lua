@@ -65,10 +65,10 @@ include( "permissions/core.lua" )
 include( "editor.lua" )
 include( "sfhelper.lua" )
 
-SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 16, { FCVAR_REPLICATED }, "Default number of elements for the CPU Quota Buffer." )
+SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, { FCVAR_REPLICATED }, "Window width of the CPU time quota moving average." )
 
 if SERVER then
-	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.004, {}, "Default CPU Time Quota for serverside." )
+	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.004, {}, "Max average CPU time for serverside." )
 else
 	SF.cpuQuota = CreateClientConVar( "sf_timebuffer", 0.015, false, false )
 end
