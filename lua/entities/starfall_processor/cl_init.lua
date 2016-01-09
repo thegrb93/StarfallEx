@@ -28,7 +28,12 @@ end
 function ENT:Think ()
 	self.BaseClass.Think( self )
 	
-	self:runScriptHook( "think" )
+	if self.instance and not self.instance.error then
+		local bufferAvg = self.instance:movingCPUAverage()
+		self.instance.cpu_total = 0
+		self.instance.cpu_average = bufferAvg
+		self:runScriptHook( "think" )
+	end
 
 	self:NextThink( CurTime() )
 	return true
