@@ -482,6 +482,10 @@ if CLIENT then
 		html:SetMouseInputEnabled( true )
 		html:SetAllowLua( true )
 		html:OpenURL( editorUrl )
+		html:AddFunction( "console", "copyCode", function( code )
+			SF.Editor.getActiveTab().code = code
+			SF.Editor.doValidation()
+		end)
 			
 		local function FinishedLoadingEditor()
 			local map = createLibraryMap()
@@ -1269,6 +1273,7 @@ if CLIENT then
 			js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 			js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 			js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
+			js( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
 			js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ")" )
 			js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ")" )
 		end
