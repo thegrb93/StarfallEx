@@ -119,6 +119,45 @@ function ents_metamethods:__tostring ()
 	else return tostring( ent ) end
 end
 
+--- Gets the parent of an entity
+-- @shared
+-- @return Entity's parent or nil
+function ents_methods:getParent()
+	local ent = unwrap(self)
+	return ent and wrap(ent:GetParent())
+end
+
+--- Gets the attachment index the entity is parented to
+-- @shared
+-- @return number index of the attachment the entity is parented to or 0
+function ents_methods:getAttachmentParent()
+	local ent = unwrap(self)
+	return ent and ent:GetParentAttachment() or 0
+end
+
+--- Gets the attachment index via the entity and it's attachment name
+-- @shared
+-- @param name
+-- @return number of the attachment index, or 0 if it doesn't exist
+function ents_methods:lookupAttachment(name)
+	local ent = unwrap(self)
+	return ent and ent:LookupAttachment(name) or 0
+end
+
+--- Gets the position and angle of an attachment
+-- @shared
+-- @param index The index of the attachment
+-- @return vector position, and angle orientation
+function ents_methods:getAttachment(index)
+	local ent = unwrap(self)
+	if ent then
+		local t = ent:GetAttachment(index)
+		if t then
+			return vwrap(t.Pos), vwrap(t.Ang)
+		end
+	end
+end
+
 --- Gets the color of an entity
 -- @shared
 -- @return Color
