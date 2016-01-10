@@ -84,7 +84,7 @@ end
 
 --- Sets the hologram angle
 -- @param ang New angles
-function hologram_methods:setAng ( ang )
+function hologram_methods:setAngles ( ang )
 	SF.CheckType( self, hologram_metamethods )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )
 	local holo = SF.Entities.Unwrap( self )
