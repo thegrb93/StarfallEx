@@ -74,10 +74,6 @@
 	</li>
 
 	<li>
-		<a href="../libraries/entities.html">entities</a>
-	</li>
-
-	<li>
 		<a href="../libraries/fastlz.html">fastlz</a>
 	</li>
 
@@ -146,6 +142,10 @@
 	</li>
 
 	<li>
+		<a href="../libraries/team.html">team</a>
+	</li>
+
+	<li>
 		<a href="../libraries/timer.html">timer</a>
 	</li>
 
@@ -171,11 +171,15 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
+			<li><a href="../classes/Bone.html">Bone</a></li>
+		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Npc.html">Npc</a></li>
 		
 			<li><a href="../classes/Player.html">Player</a></li>
 		
@@ -208,6 +212,10 @@
 
 	<li>
 		<a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#FinishChat">FinishChat</a>
 	</li>
 
 	<li>
@@ -275,6 +283,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
 	</li>
 
@@ -312,6 +324,10 @@
 
 	<li>
 		<a href="../hooks.html#Removed">Removed</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#StartChat">StartChat</a>
 	</li>
 
 	<li>
@@ -410,6 +426,12 @@ Runs an included script, but does not cache the result.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.entity">entity</a>&nbsp;(num)</td>
+	<td class="summary">
+Returns the entity with index 'num' </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.error">error</a>&nbsp;(msg)</td>
 	<td class="summary">
 Throws a raw exception.</td>
@@ -454,9 +476,21 @@ Same as Lua's next </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.owner">owner</a>&nbsp;()</td>
+	<td class="summary">
+Returns whoever created the chip </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.pairs">pairs</a>&nbsp;(tbl)</td>
 	<td class="summary">
 Same as Lua's pairs </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.player">player</a>&nbsp;()</td>
+	<td class="summary">
+Same as owner() on the server.</td>
 	</tr>
 
 	<tr>
@@ -511,6 +545,12 @@ Runs an included script and caches the result.</td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.requiredir">requiredir</a>&nbsp;(dir, loadpriority)</td>
 	<td class="summary">
 Runs an included script and caches the result.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.self">self</a>&nbsp;()</td>
+	<td class="summary">
+Returns the entity representing a processor that this script is running on.</td>
 	</tr>
 
 	<tr>
@@ -784,6 +824,40 @@ Pretty much like standard Lua dofile()
 
 
 
+<dt><a name="SF.DefaultEnvironment.entity"></a><strong>SF.DefaultEnvironment.entity</strong>&nbsp;(num)</dt>
+<dd>
+
+Returns the entity with index 'num'
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>num</em></code>: Entity index
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>entity</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="SF.DefaultEnvironment.error"></a><strong>SF.DefaultEnvironment.error</strong>&nbsp;(msg)</dt>
 <dd>
 
@@ -1021,6 +1095,31 @@ Same as Lua's next
 
 
 
+<dt><a name="SF.DefaultEnvironment.owner"></a><strong>SF.DefaultEnvironment.owner</strong>&nbsp;()</dt>
+<dd>
+
+Returns whoever created the chip
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Owner entity</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="SF.DefaultEnvironment.pairs"></a><strong>SF.DefaultEnvironment.pairs</strong>&nbsp;(tbl)</dt>
 <dd>
 
@@ -1053,6 +1152,31 @@ Same as Lua's pairs
 	<li>nil as current index</li>
 	
 </ol>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.player"></a><strong>SF.DefaultEnvironment.player</strong>&nbsp;()</dt>
+<dd>
+
+Same as owner() on the server. On the client, returns the local player
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Either the owner (server) or the local player (client)</ul>
 
 
 
@@ -1348,6 +1472,31 @@ Works pretty much like standard Lua require()
 
 <h3>Return value:</h3>
 <ul>Table of return values of the scripts</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.self"></a><strong>SF.DefaultEnvironment.self</strong>&nbsp;()</dt>
+<dd>
+
+Returns the entity representing a processor that this script is running on.
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Starfall entity</ul>
 
 
 

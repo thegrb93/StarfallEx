@@ -76,10 +76,6 @@
 	</li>
 
 	<li>
-		<a href="../libraries/entities.html">entities</a>
-	</li>
-
-	<li>
 		<a href="../libraries/fastlz.html">fastlz</a>
 	</li>
 
@@ -146,6 +142,10 @@
 	</li>
 
 	<li>
+		<a href="../libraries/team.html">team</a>
+	</li>
+
+	<li>
 		<a href="../libraries/timer.html">timer</a>
 	</li>
 
@@ -171,11 +171,15 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
+			<li><a href="../classes/Bone.html">Bone</a></li>
+		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Npc.html">Npc</a></li>
 		
 			<li><a href="../classes/Player.html">Player</a></li>
 		
@@ -208,6 +212,10 @@
 
 	<li>
 		<a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#FinishChat">FinishChat</a>
 	</li>
 
 	<li>
@@ -275,6 +283,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
 	</li>
 
@@ -312,6 +324,10 @@
 
 	<li>
 		<a href="../hooks.html#Removed">Removed</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#StartChat">StartChat</a>
 	</li>
 
 	<li>
@@ -428,7 +444,7 @@ Gets whether the shift key is down </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#input_methods.lookupBinding">lookupBinding</a>&nbsp;(binding, bind)</td>
+	<td class="name" nowrap><a href="#input_methods.lookupBinding">lookupBinding</a>&nbsp;(binding)</td>
 	<td class="summary">
 Gets the first key that is bound to the command passed </td>
 	</tr>
@@ -692,7 +708,7 @@ Gets whether the shift key is down
 
 
 
-<dt><a name="input_methods.lookupBinding"></a><strong>input_methods.lookupBinding</strong>&nbsp;(binding, bind)</dt>
+<dt><a name="input_methods.lookupBinding"></a><strong>input_methods.lookupBinding</strong>&nbsp;(binding)</dt>
 <dd>
 
 Gets the first key that is bound to the command passed
@@ -704,11 +720,7 @@ Gets the first key that is bound to the command passed
 <ul>
 	
 	<li>
-	  <code><em>binding</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>bind</em></code>: The name of the bind
+	  <code><em>binding</em></code>: The name of the bind
 	</li>
 	
 </ul>

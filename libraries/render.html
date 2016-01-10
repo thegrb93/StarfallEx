@@ -76,10 +76,6 @@
 	</li>
 
 	<li>
-		<a href="../libraries/entities.html">entities</a>
-	</li>
-
-	<li>
 		<a href="../libraries/fastlz.html">fastlz</a>
 	</li>
 
@@ -146,6 +142,10 @@
 	</li>
 
 	<li>
+		<a href="../libraries/team.html">team</a>
+	</li>
+
+	<li>
 		<a href="../libraries/timer.html">timer</a>
 	</li>
 
@@ -171,11 +171,15 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
+			<li><a href="../classes/Bone.html">Bone</a></li>
+		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Npc.html">Npc</a></li>
 		
 			<li><a href="../classes/Player.html">Player</a></li>
 		
@@ -208,6 +212,10 @@
 
 	<li>
 		<a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#FinishChat">FinishChat</a>
 	</li>
 
 	<li>
@@ -275,6 +283,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
 	</li>
 
@@ -312,6 +324,10 @@
 
 	<li>
 		<a href="../hooks.html#Removed">Removed</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#StartChat">StartChat</a>
 	</li>
 
 	<li>
@@ -400,7 +416,7 @@ Clears the surface </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.createFont">createFont</a>&nbsp;(font, size, weight, antialias, additive, shadow, outline, blur, blue)</td>
+	<td class="name" nowrap><a href="#render_library.createFont">createFont</a>&nbsp;(font, size, weight, antialias, additive, shadow, outline, blur)</td>
 	<td class="summary">
 Creates a font.</td>
 	</tr>
@@ -486,7 +502,7 @@ Gets the default font </td>
 	<tr>
 	<td class="name" nowrap><a href="#render_library.getScreenInfo">getScreenInfo</a>&nbsp;()</td>
 	<td class="summary">
-Returns information about the screen, such as dimentions and rotation.</td>
+Returns information about the screen, such as world offsets, dimentions, and rotation.</td>
 	</tr>
 
 	<tr>
@@ -502,7 +518,7 @@ Gets the size of the specified text.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.getTextureID">getTextureID</a>&nbsp;(tx)</td>
+	<td class="name" nowrap><a href="#render_library.getTextureID">getTextureID</a>&nbsp;(tx, cb)</td>
 	<td class="summary">
 Looks up a texture by file name.</td>
 	</tr>
@@ -523,6 +539,18 @@ Pushes a matrix onto the matrix stack.</td>
 	<td class="name" nowrap><a href="#render_library.readPixel">readPixel</a>&nbsp;(x, y)</td>
 	<td class="summary">
 Reads the color of the specified pixel.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.scrH">scrH</a>&nbsp;()</td>
+	<td class="summary">
+Returns the Y resolution of the local player's screen </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.scrW">scrW</a>&nbsp;()</td>
+	<td class="summary">
+Returns the X resolution of the local player's screen </td>
 	</tr>
 
 	<tr>
@@ -553,6 +581,12 @@ Sets the active texture to the render target with the specified name.</td>
 	<td class="name" nowrap><a href="#render_library.setTexture">setTexture</a>&nbsp;(id)</td>
 	<td class="summary">
 Sets the texture </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.setTextureFromScreen">setTextureFromScreen</a>&nbsp;(ent)</td>
+	<td class="summary">
+Sets the texture of a screen entity </td>
 	</tr>
 
 </table>
@@ -626,7 +660,7 @@ Clears the surface
 
 
 
-<dt><a name="render_library.createFont"></a><strong>render_library.createFont</strong>&nbsp;(font, size, weight, antialias, additive, shadow, outline, blur, blue)</dt>
+<dt><a name="render_library.createFont"></a><strong>render_library.createFont</strong>&nbsp;(font, size, weight, antialias, additive, shadow, outline, blur)</dt>
 <dd>
 
 Creates a font. Does not require rendering hook
@@ -666,11 +700,7 @@ Creates a font. Does not require rendering hook
 	</li>
 	
 	<li>
-	  <code><em>blur</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>blue</em></code>: Enable blur?
+	  <code><em>blur</em></code>: Enable blur?
 	</li>
 	
 </ul>
@@ -1270,7 +1300,7 @@ Gets the default font
 <dt><a name="render_library.getScreenInfo"></a><strong>render_library.getScreenInfo</strong>&nbsp;()</dt>
 <dd>
 
-Returns information about the screen, such as dimentions and rotation. 
+Returns information about the screen, such as world offsets, dimentions, and rotation. 
 Note: this does a table copy so move it out of your draw hook
 
 
@@ -1364,7 +1394,7 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 
 
 
-<dt><a name="render_library.getTextureID"></a><strong>render_library.getTextureID</strong>&nbsp;(tx)</dt>
+<dt><a name="render_library.getTextureID"></a><strong>render_library.getTextureID</strong>&nbsp;(tx, cb)</dt>
 <dd>
 
 Looks up a texture by file name. Use with render.setTexture to draw with it. 
@@ -1378,6 +1408,10 @@ Make sure to store the texture to use it rather than calling this slow function 
 	
 	<li>
 	  <code><em>tx</em></code>: Texture file path, or a http url
+	</li>
+	
+	<li>
+	  <code><em>cb</em></code>: Optional callback for when a url texture finishes loading. param1 - The texture url, param2 - The texture table
 	</li>
 	
 </ul>
@@ -1477,6 +1511,56 @@ Reads the color of the specified pixel.
 
 <h3>Return value:</h3>
 <ul>Color object with ( r, g, b, 255 ) from the specified pixel.</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.scrH"></a><strong>render_library.scrH</strong>&nbsp;()</dt>
+<dd>
+
+Returns the Y resolution of the local player's screen
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>the Y resolution of the local player's screen</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.scrW"></a><strong>render_library.scrW</strong>&nbsp;()</dt>
+<dd>
+
+Returns the X resolution of the local player's screen
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>the X resolution of the local player's screen</ul>
 
 
 
@@ -1626,6 +1710,37 @@ Sets the texture
 	
 	<li>
 	  <code><em>id</em></code>: Texture id or url to an online image.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.setTextureFromScreen"></a><strong>render_library.setTextureFromScreen</strong>&nbsp;(ent)</dt>
+<dd>
+
+Sets the texture of a screen entity
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ent</em></code>: Screen entity
 	</li>
 	
 </ul>

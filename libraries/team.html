@@ -143,10 +143,8 @@
 		<a href="../libraries/sounds.html">sounds</a>
 	</li>
 
-	<li>
-		<a href="../libraries/team.html">team</a>
-	</li>
-
+		<li><strong>team</strong></li>
+	
 	<li>
 		<a href="../libraries/timer.html">timer</a>
 	</li>
@@ -159,8 +157,10 @@
 		<a href="../libraries/von.html">von</a>
 	</li>
 
-		<li><strong>wire</strong></li>
-	
+	<li>
+		<a href="../libraries/wire.html">wire</a>
+	</li>
+
 </ul>
 
 
@@ -387,10 +387,10 @@
 
 <div id="content">
 
-<h1>Library <code>wire</code></h1>
+<h1>Library <code>team</code></h1>
 
 <p>
-Wire library. Handles wire inputs/outputs, wirelinks, etc.</p>
+Library for retreiving information about teams</p>
 
 
 
@@ -402,67 +402,74 @@ Wire library. Handles wire inputs/outputs, wirelinks, etc.</p>
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.adjustInputs">adjustInputs</a>&nbsp;(names, types)</td>
+	<td class="name" nowrap><a href="#team_library.bestAutoJoinTeam">bestAutoJoinTeam</a>&nbsp;()</td>
 	<td class="summary">
-Creates/Modifies wire inputs.</td>
+Returns team with least players </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.adjustOutputs">adjustOutputs</a>&nbsp;(names, types)</td>
+	<td class="name" nowrap><a href="#team_library.exists">exists</a>&nbsp;(ind)</td>
 	<td class="summary">
-Creates/Modifies wire outputs.</td>
+Returns whether or not the team exists </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.create">create</a>&nbsp;(entI, entO, inputname, outputname)</td>
+	<td class="name" nowrap><a href="#team_library.getAllTeams">getAllTeams</a>&nbsp;()</td>
 	<td class="summary">
-Wires two entities together </td>
+Returns a table containing team information </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.delete">delete</a>&nbsp;(entI, inputname)</td>
+	<td class="name" nowrap><a href="#team_library.getColor">getColor</a>&nbsp;(ind)</td>
 	<td class="summary">
-Unwires an entity's input </td>
+Returns the color of a team </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.getInputs">getInputs</a>&nbsp;(entI)</td>
+	<td class="name" nowrap><a href="#team_library.getJoinable">getJoinable</a>&nbsp;(ind)</td>
 	<td class="summary">
-Returns a table of entity's inputs </td>
+Returns whether or not a team can be joined </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.getOutputs">getOutputs</a>&nbsp;(entO)</td>
+	<td class="name" nowrap><a href="#team_library.getName">getName</a>&nbsp;(ind)</td>
 	<td class="summary">
-Returns a table of entity's outputs </td>
+Returns the name of a team </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.getWirelink">getWirelink</a>&nbsp;(ent)</td>
+	<td class="name" nowrap><a href="#team_library.getNumDeaths">getNumDeaths</a>&nbsp;(ind)</td>
 	<td class="summary">
-Returns a wirelink to a wire entity </td>
+Returns number of deaths of all players on a team </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.self">self</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#team_library.getNumFrags">getNumFrags</a>&nbsp;(ind)</td>
 	<td class="summary">
-Returns the wirelink representing this entity.</td>
+Returns number of frags of all players on a team </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#team_library.getNumPlayers">getNumPlayers</a>&nbsp;(ind)</td>
+	<td class="summary">
+Returns number of players on a team </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#team_library.getPlayers">getPlayers</a>&nbsp;(ind)</td>
+	<td class="summary">
+Returns the table of players on a team </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#team_library.getScore">getScore</a>&nbsp;(ind)</td>
+	<td class="summary">
+Returns the score of a team </td>
 	</tr>
 
 </table>
 
 
-
-<h2>Tables</h2>
-<table class="table_list">
-
-	<tr>
-	<td class="name" nowrap><a href="#wire_library.ports">ports</a></td>
-	<td class="summary">
-Ports table.</td>
-	</tr>
-
-</table>
 
 
 
@@ -478,32 +485,21 @@ Ports table.</td>
 
 
 
-<dt><a name="wire_library.adjustInputs"></a><strong>wire_library.adjustInputs</strong>&nbsp;(names, types)</dt>
+<dt><a name="team_library.bestAutoJoinTeam"></a><strong>team_library.bestAutoJoinTeam</strong>&nbsp;()</dt>
 <dd>
 
-Creates/Modifies wire inputs. All wire ports must begin with an uppercase 
-letter and contain only alphabetical characters.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>names</em></code>: An array of input names. May be modified by the function.
-	</li>
-	
-	<li>
-	  <code><em>types</em></code>: An array of input types. May be modified by the function.
-	</li>
-	
-</ul>
+Returns team with least players
 
 
 
 
 
+
+
+
+
+<h3>Return value:</h3>
+<ul>index of the best team to join</ul>
 
 
 
@@ -514,11 +510,10 @@ letter and contain only alphabetical characters.
 
 
 
-<dt><a name="wire_library.adjustOutputs"></a><strong>wire_library.adjustOutputs</strong>&nbsp;(names, types)</dt>
+<dt><a name="team_library.exists"></a><strong>team_library.exists</strong>&nbsp;(ind)</dt>
 <dd>
 
-Creates/Modifies wire outputs. All wire ports must begin with an uppercase 
-letter and contain only alphabetical characters.
+Returns whether or not the team exists
 
 
 
@@ -527,120 +522,7 @@ letter and contain only alphabetical characters.
 <ul>
 	
 	<li>
-	  <code><em>names</em></code>: An array of output names. May be modified by the function.
-	</li>
-	
-	<li>
-	  <code><em>types</em></code>: An array of output types. May be modified by the function.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="wire_library.create"></a><strong>wire_library.create</strong>&nbsp;(entI, entO, inputname, outputname)</dt>
-<dd>
-
-Wires two entities together
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>entI</em></code>: Entity with input
-	</li>
-	
-	<li>
-	  <code><em>entO</em></code>: Entity with output
-	</li>
-	
-	<li>
-	  <code><em>inputname</em></code>: Input to be wired
-	</li>
-	
-	<li>
-	  <code><em>outputname</em></code>: Output to be wired
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="wire_library.delete"></a><strong>wire_library.delete</strong>&nbsp;(entI, inputname)</dt>
-<dd>
-
-Unwires an entity's input
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>entI</em></code>: Entity with input
-	</li>
-	
-	<li>
-	  <code><em>inputname</em></code>: Input to be un-wired
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="wire_library.getInputs"></a><strong>wire_library.getInputs</strong>&nbsp;(entI)</dt>
-<dd>
-
-Returns a table of entity's inputs
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>entI</em></code>: Entity with input(s)
+	  <code><em>ind</em></code>: Index of the team
 	</li>
 	
 </ul>
@@ -651,7 +533,7 @@ Returns a table of entity's inputs
 
 
 <h3>Return value:</h3>
-<ul>Table of entity's inputs</ul>
+<ul>boolean</ul>
 
 
 
@@ -662,10 +544,35 @@ Returns a table of entity's inputs
 
 
 
-<dt><a name="wire_library.getOutputs"></a><strong>wire_library.getOutputs</strong>&nbsp;(entO)</dt>
+<dt><a name="team_library.getAllTeams"></a><strong>team_library.getAllTeams</strong>&nbsp;()</dt>
 <dd>
 
-Returns a table of entity's outputs
+Returns a table containing team information
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>table containing team information</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="team_library.getColor"></a><strong>team_library.getColor</strong>&nbsp;(ind)</dt>
+<dd>
+
+Returns the color of a team
 
 
 
@@ -674,7 +581,7 @@ Returns a table of entity's outputs
 <ul>
 	
 	<li>
-	  <code><em>entO</em></code>: Entity with output(s)
+	  <code><em>ind</em></code>: Index of the team
 	</li>
 	
 </ul>
@@ -685,7 +592,7 @@ Returns a table of entity's outputs
 
 
 <h3>Return value:</h3>
-<ul>Table of entity's outputs</ul>
+<ul>Color of the team</ul>
 
 
 
@@ -696,10 +603,10 @@ Returns a table of entity's outputs
 
 
 
-<dt><a name="wire_library.getWirelink"></a><strong>wire_library.getWirelink</strong>&nbsp;(ent)</dt>
+<dt><a name="team_library.getJoinable"></a><strong>team_library.getJoinable</strong>&nbsp;(ind)</dt>
 <dd>
 
-Returns a wirelink to a wire entity
+Returns whether or not a team can be joined
 
 
 
@@ -708,7 +615,7 @@ Returns a wirelink to a wire entity
 <ul>
 	
 	<li>
-	  <code><em>ent</em></code>: Wire entity
+	  <code><em>ind</em></code>: Index of the team
 	</li>
 	
 </ul>
@@ -719,7 +626,7 @@ Returns a wirelink to a wire entity
 
 
 <h3>Return value:</h3>
-<ul>Wirelink of the entity</ul>
+<ul>boolean</ul>
 
 
 
@@ -730,18 +637,200 @@ Returns a wirelink to a wire entity
 
 
 
-<dt><a name="wire_library.self"></a><strong>wire_library.self</strong>&nbsp;()</dt>
+<dt><a name="team_library.getName"></a><strong>team_library.getName</strong>&nbsp;(ind)</dt>
 <dd>
 
-Returns the wirelink representing this entity.
+Returns the name of a team
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ind</em></code>: Index of the team
+	</li>
+	
+</ul>
 
 
 
 
 
 
+<h3>Return value:</h3>
+<ul>String name of the team</ul>
 
 
+
+
+
+</dd>
+
+
+
+
+<dt><a name="team_library.getNumDeaths"></a><strong>team_library.getNumDeaths</strong>&nbsp;(ind)</dt>
+<dd>
+
+Returns number of deaths of all players on a team
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ind</em></code>: Index of the team
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>number of deaths</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="team_library.getNumFrags"></a><strong>team_library.getNumFrags</strong>&nbsp;(ind)</dt>
+<dd>
+
+Returns number of frags of all players on a team
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ind</em></code>: Index of the team
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>number of frags</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="team_library.getNumPlayers"></a><strong>team_library.getNumPlayers</strong>&nbsp;(ind)</dt>
+<dd>
+
+Returns number of players on a team
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ind</em></code>: Index of the team
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>number of players</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="team_library.getPlayers"></a><strong>team_library.getPlayers</strong>&nbsp;(ind)</dt>
+<dd>
+
+Returns the table of players on a team
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ind</em></code>: Index of the team
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Table of players</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="team_library.getScore"></a><strong>team_library.getScore</strong>&nbsp;(ind)</dt>
+<dd>
+
+Returns the score of a team
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ind</em></code>: Index of the team
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Number score of the team</ul>
 
 
 
@@ -754,21 +843,6 @@ Returns the wirelink representing this entity.
 
 
 
-
-<h2><a name="tables"></a>Tables</h2>
-<dl class="table">
-
-<dt><a name="wire_library.ports"></a><strong>wire_library.ports</strong></dt>
-<dd>
-Ports table. Reads from this table will read from the wire input 
-of the same name. Writes will write to the wire output of the same name.<br /><br />
-
-
-
-</dd>
-
-
-</dl>
 
 
 

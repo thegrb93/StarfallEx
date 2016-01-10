@@ -76,10 +76,6 @@
 	</li>
 
 	<li>
-		<a href="../libraries/entities.html">entities</a>
-	</li>
-
-	<li>
 		<a href="../libraries/fastlz.html">fastlz</a>
 	</li>
 
@@ -147,6 +143,10 @@
 		<a href="../libraries/sounds.html">sounds</a>
 	</li>
 
+	<li>
+		<a href="../libraries/team.html">team</a>
+	</li>
+
 		<li><strong>timer</strong></li>
 	
 	<li>
@@ -171,11 +171,15 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
+			<li><a href="../classes/Bone.html">Bone</a></li>
+		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Npc.html">Npc</a></li>
 		
 			<li><a href="../classes/Player.html">Player</a></li>
 		
@@ -208,6 +212,10 @@
 
 	<li>
 		<a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#FinishChat">FinishChat</a>
 	</li>
 
 	<li>
@@ -275,6 +283,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
 	</li>
 
@@ -312,6 +324,10 @@
 
 	<li>
 		<a href="../hooks.html#Removed">Removed</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#StartChat">StartChat</a>
 	</li>
 
 	<li>
@@ -392,7 +408,7 @@ Adjusts a timer </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#timer_library.create">create</a>&nbsp;(name, delay, reps, func)</td>
+	<td class="name" nowrap><a href="#timer_library.create">create</a>&nbsp;(name, delay, reps, func, simple)</td>
 	<td class="summary">
 Creates (and starts) a timer </td>
 	</tr>
@@ -512,7 +528,7 @@ Adjusts a timer
 
 
 
-<dt><a name="timer_library.create"></a><strong>timer_library.create</strong>&nbsp;(name, delay, reps, func)</dt>
+<dt><a name="timer_library.create"></a><strong>timer_library.create</strong>&nbsp;(name, delay, reps, func, simple)</dt>
 <dd>
 
 Creates (and starts) a timer
@@ -537,6 +553,10 @@ Creates (and starts) a timer
 	
 	<li>
 	  <code><em>func</em></code>: The function to call when the tiemr is fired
+	</li>
+	
+	<li>
+	  <code><em>simple</em></code>: 
 	</li>
 	
 </ul>

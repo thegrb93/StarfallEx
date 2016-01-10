@@ -24,7 +24,7 @@
 <h1>LuaDoc</h1>
 <ul>
 	
-	<li><a href="../index.html">Index</a></li>
+	<li><strong>Index</strong></li>
 	
 </ul>
 
@@ -159,8 +159,10 @@
 		<a href="../libraries/von.html">von</a>
 	</li>
 
-		<li><strong>wire</strong></li>
-	
+	<li>
+		<a href="../libraries/wire.html">wire</a>
+	</li>
+
 </ul>
 
 
@@ -179,7 +181,7 @@
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
 		
-			<li><a href="../classes/Npc.html">Npc</a></li>
+			<li><strong>Npc</strong></li>
 		
 			<li><a href="../classes/Player.html">Player</a></li>
 		
@@ -387,10 +389,10 @@
 
 <div id="content">
 
-<h1>Library <code>wire</code></h1>
+<h1>Type <code>Npc</code></h1>
 
 <p>
-Wire library. Handles wire inputs/outputs, wirelinks, etc.</p>
+Npc type</p>
 
 
 
@@ -398,73 +400,70 @@ Wire library. Handles wire inputs/outputs, wirelinks, etc.</p>
 
 
 
-<h2>Functions</h2>
+<h2>Methods</h2>
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.adjustInputs">adjustInputs</a>&nbsp;(names, types)</td>
-	<td class="summary">
-Creates/Modifies wire inputs.</td>
+		<td class="name" nowrap><a href="#npc_methods:addEntityRelationship">addEntityRelationship</a>&nbsp;(ent, disp, priority)</td>
+		<td class="summary">
+Adds a relationship to the npc with an entity </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.adjustOutputs">adjustOutputs</a>&nbsp;(names, types)</td>
-	<td class="summary">
-Creates/Modifies wire outputs.</td>
+		<td class="name" nowrap><a href="#npc_methods:addRelationship">addRelationship</a>&nbsp;(str)</td>
+		<td class="summary">
+Adds a relationship to the npc </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.create">create</a>&nbsp;(entI, entO, inputname, outputname)</td>
-	<td class="summary">
-Wires two entities together </td>
+		<td class="name" nowrap><a href="#npc_methods:attackMelee">attackMelee</a>&nbsp;()</td>
+		<td class="summary">
+Makes the npc do a melee attack </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.delete">delete</a>&nbsp;(entI, inputname)</td>
-	<td class="summary">
-Unwires an entity's input </td>
+		<td class="name" nowrap><a href="#npc_methods:attackRange">attackRange</a>&nbsp;()</td>
+		<td class="summary">
+Makes the npc do a ranged attack </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.getInputs">getInputs</a>&nbsp;(entI)</td>
-	<td class="summary">
-Returns a table of entity's inputs </td>
+		<td class="name" nowrap><a href="#npc_methods:getEnemy">getEnemy</a>&nbsp;()</td>
+		<td class="summary">
+Gets what the npc is fighting </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.getOutputs">getOutputs</a>&nbsp;(entO)</td>
-	<td class="summary">
-Returns a table of entity's outputs </td>
+		<td class="name" nowrap><a href="#npc_methods:getRelationship">getRelationship</a>&nbsp;(ent)</td>
+		<td class="summary">
+Gets the npc's relationship to the target </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.getWirelink">getWirelink</a>&nbsp;(ent)</td>
-	<td class="summary">
-Returns a wirelink to a wire entity </td>
+		<td class="name" nowrap><a href="#npc_methods:goRun">goRun</a>&nbsp;(vec)</td>
+		<td class="summary">
+Makes the npc run to a destination </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#wire_library.self">self</a>&nbsp;()</td>
-	<td class="summary">
-Returns the wirelink representing this entity.</td>
+		<td class="name" nowrap><a href="#npc_methods:goWalk">goWalk</a>&nbsp;(vec)</td>
+		<td class="summary">
+Makes the npc walk to a destination </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#npc_methods:setEnemy">setEnemy</a>&nbsp;(ent)</td>
+		<td class="summary">
+Tell the npc to fight this </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#npc_methods:stop">stop</a>&nbsp;()</td>
+		<td class="summary">
+Stops the npc </td>
 	</tr>
 
 </table>
-
-
-
-<h2>Tables</h2>
-<table class="table_list">
-
-	<tr>
-	<td class="name" nowrap><a href="#wire_library.ports">ports</a></td>
-	<td class="summary">
-Ports table.</td>
-	</tr>
-
-</table>
-
-
 
 
 
@@ -472,17 +471,15 @@ Ports table.</td>
 <br/>
 
 
-
-<h2><a name="functions"></a>Functions</h2>
+<h2><a name="methods"></a>Methods</h2>
 <dl class="function">
 
 
 
-<dt><a name="wire_library.adjustInputs"></a><strong>wire_library.adjustInputs</strong>&nbsp;(names, types)</dt>
+<dt><a name="npc_methods:addEntityRelationship"></a><strong>npc_methods:addEntityRelationship</strong>&nbsp;(ent, disp, priority)</dt>
 <dd>
 
-Creates/Modifies wire inputs. All wire ports must begin with an uppercase 
-letter and contain only alphabetical characters.
+Adds a relationship to the npc with an entity
 
 
 
@@ -491,11 +488,15 @@ letter and contain only alphabetical characters.
 <ul>
 	
 	<li>
-	  <code><em>names</em></code>: An array of input names. May be modified by the function.
+	  <code><em>ent</em></code>: The target entity
 	</li>
 	
 	<li>
-	  <code><em>types</em></code>: An array of input types. May be modified by the function.
+	  <code><em>disp</em></code>: String of the relationship. (hate fear like neutral)
+	</li>
+	
+	<li>
+	  <code><em>priority</em></code>: number how strong the relationship is. Higher number is stronger
 	</li>
 	
 </ul>
@@ -514,11 +515,10 @@ letter and contain only alphabetical characters.
 
 
 
-<dt><a name="wire_library.adjustOutputs"></a><strong>wire_library.adjustOutputs</strong>&nbsp;(names, types)</dt>
+<dt><a name="npc_methods:addRelationship"></a><strong>npc_methods:addRelationship</strong>&nbsp;(str)</dt>
 <dd>
 
-Creates/Modifies wire outputs. All wire ports must begin with an uppercase 
-letter and contain only alphabetical characters.
+Adds a relationship to the npc
 
 
 
@@ -527,11 +527,7 @@ letter and contain only alphabetical characters.
 <ul>
 	
 	<li>
-	  <code><em>names</em></code>: An array of output names. May be modified by the function.
-	</li>
-	
-	<li>
-	  <code><em>types</em></code>: An array of output types. May be modified by the function.
+	  <code><em>str</em></code>: The relationship string. http://wiki.garrysmod.com/page/NPC/AddRelationship
 	</li>
 	
 </ul>
@@ -550,34 +546,13 @@ letter and contain only alphabetical characters.
 
 
 
-<dt><a name="wire_library.create"></a><strong>wire_library.create</strong>&nbsp;(entI, entO, inputname, outputname)</dt>
+<dt><a name="npc_methods:attackMelee"></a><strong>npc_methods:attackMelee</strong>&nbsp;()</dt>
 <dd>
 
-Wires two entities together
+Makes the npc do a melee attack
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>entI</em></code>: Entity with input
-	</li>
-	
-	<li>
-	  <code><em>entO</em></code>: Entity with output
-	</li>
-	
-	<li>
-	  <code><em>inputname</em></code>: Input to be wired
-	</li>
-	
-	<li>
-	  <code><em>outputname</em></code>: Output to be wired
-	</li>
-	
-</ul>
 
 
 
@@ -593,26 +568,13 @@ Wires two entities together
 
 
 
-<dt><a name="wire_library.delete"></a><strong>wire_library.delete</strong>&nbsp;(entI, inputname)</dt>
+<dt><a name="npc_methods:attackRange"></a><strong>npc_methods:attackRange</strong>&nbsp;()</dt>
 <dd>
 
-Unwires an entity's input
+Makes the npc do a ranged attack
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>entI</em></code>: Entity with input
-	</li>
-	
-	<li>
-	  <code><em>inputname</em></code>: Input to be un-wired
-	</li>
-	
-</ul>
 
 
 
@@ -628,10 +590,35 @@ Unwires an entity's input
 
 
 
-<dt><a name="wire_library.getInputs"></a><strong>wire_library.getInputs</strong>&nbsp;(entI)</dt>
+<dt><a name="npc_methods:getEnemy"></a><strong>npc_methods:getEnemy</strong>&nbsp;()</dt>
 <dd>
 
-Returns a table of entity's inputs
+Gets what the npc is fighting
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Entity the npc is fighting</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="npc_methods:getRelationship"></a><strong>npc_methods:getRelationship</strong>&nbsp;(ent)</dt>
+<dd>
+
+Gets the npc's relationship to the target
 
 
 
@@ -640,7 +627,7 @@ Returns a table of entity's inputs
 <ul>
 	
 	<li>
-	  <code><em>entI</em></code>: Entity with input(s)
+	  <code><em>ent</em></code>: Target entity
 	</li>
 	
 </ul>
@@ -651,7 +638,7 @@ Returns a table of entity's inputs
 
 
 <h3>Return value:</h3>
-<ul>Table of entity's inputs</ul>
+<ul>string relationship of the npc with the target</ul>
 
 
 
@@ -662,10 +649,10 @@ Returns a table of entity's inputs
 
 
 
-<dt><a name="wire_library.getOutputs"></a><strong>wire_library.getOutputs</strong>&nbsp;(entO)</dt>
+<dt><a name="npc_methods:goRun"></a><strong>npc_methods:goRun</strong>&nbsp;(vec)</dt>
 <dd>
 
-Returns a table of entity's outputs
+Makes the npc run to a destination
 
 
 
@@ -674,7 +661,7 @@ Returns a table of entity's outputs
 <ul>
 	
 	<li>
-	  <code><em>entO</em></code>: Entity with output(s)
+	  <code><em>vec</em></code>: The position of the destination
 	</li>
 	
 </ul>
@@ -684,9 +671,6 @@ Returns a table of entity's outputs
 
 
 
-<h3>Return value:</h3>
-<ul>Table of entity's outputs</ul>
-
 
 
 
@@ -696,10 +680,10 @@ Returns a table of entity's outputs
 
 
 
-<dt><a name="wire_library.getWirelink"></a><strong>wire_library.getWirelink</strong>&nbsp;(ent)</dt>
+<dt><a name="npc_methods:goWalk"></a><strong>npc_methods:goWalk</strong>&nbsp;(vec)</dt>
 <dd>
 
-Returns a wirelink to a wire entity
+Makes the npc walk to a destination
 
 
 
@@ -708,7 +692,7 @@ Returns a wirelink to a wire entity
 <ul>
 	
 	<li>
-	  <code><em>ent</em></code>: Wire entity
+	  <code><em>vec</em></code>: The position of the destination
 	</li>
 	
 </ul>
@@ -718,8 +702,36 @@ Returns a wirelink to a wire entity
 
 
 
-<h3>Return value:</h3>
-<ul>Wirelink of the entity</ul>
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="npc_methods:setEnemy"></a><strong>npc_methods:setEnemy</strong>&nbsp;(ent)</dt>
+<dd>
+
+Tell the npc to fight this
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>ent</em></code>: Target entity
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -730,10 +742,10 @@ Returns a wirelink to a wire entity
 
 
 
-<dt><a name="wire_library.self"></a><strong>wire_library.self</strong>&nbsp;()</dt>
+<dt><a name="npc_methods:stop"></a><strong>npc_methods:stop</strong>&nbsp;()</dt>
 <dd>
 
-Returns the wirelink representing this entity.
+Stops the npc
 
 
 
@@ -744,24 +756,6 @@ Returns the wirelink representing this entity.
 
 
 
-
-
-
-</dd>
-
-
-</dl>
-
-
-
-
-<h2><a name="tables"></a>Tables</h2>
-<dl class="table">
-
-<dt><a name="wire_library.ports"></a><strong>wire_library.ports</strong></dt>
-<dd>
-Ports table. Reads from this table will read from the wire input 
-of the same name. Writes will write to the wire output of the same name.<br /><br />
 
 
 

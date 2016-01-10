@@ -76,10 +76,6 @@
 	</li>
 
 	<li>
-		<a href="../libraries/entities.html">entities</a>
-	</li>
-
-	<li>
 		<a href="../libraries/fastlz.html">fastlz</a>
 	</li>
 
@@ -148,6 +144,10 @@
 	</li>
 
 	<li>
+		<a href="../libraries/team.html">team</a>
+	</li>
+
+	<li>
 		<a href="../libraries/timer.html">timer</a>
 	</li>
 
@@ -173,11 +173,15 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
+			<li><a href="../classes/Bone.html">Bone</a></li>
+		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><strong>Entity</strong></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Npc.html">Npc</a></li>
 		
 			<li><a href="../classes/Player.html">Player</a></li>
 		
@@ -210,6 +214,10 @@
 
 	<li>
 		<a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#FinishChat">FinishChat</a>
 	</li>
 
 	<li>
@@ -277,6 +285,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
 	</li>
 
@@ -314,6 +326,10 @@
 
 	<li>
 		<a href="../hooks.html#Removed">Removed</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#StartChat">StartChat</a>
 	</li>
 
 	<li>
@@ -472,6 +488,18 @@ Returns the angle of the entity </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:getAttachment">getAttachment</a>&nbsp;(index)</td>
+		<td class="summary">
+Gets the position and angle of an attachment </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:getAttachmentParent">getAttachmentParent</a>&nbsp;()</td>
+		<td class="summary">
+Gets the attachment index the entity is parented to </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:getClass">getClass</a>&nbsp;()</td>
 		<td class="summary">
 Returns the class of the entity </td>
@@ -556,6 +584,12 @@ Gets the owner of the entity </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:getParent">getParent</a>&nbsp;()</td>
+		<td class="summary">
+Gets the parent of an entity </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:getPos">getPos</a>&nbsp;()</td>
 		<td class="summary">
 Returns the position of the entity </td>
@@ -637,6 +671,12 @@ Converts a vector in entity local space to world space </td>
 		<td class="name" nowrap><a href="#ents_methods:localToWorldAngles">localToWorldAngles</a>&nbsp;(data)</td>
 		<td class="summary">
 Converts an angle in entity local space to world space </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:lookupAttachment">lookupAttachment</a>&nbsp;(name)</td>
+		<td class="summary">
+Gets the attachment index via the entity and it's attachment name </td>
 	</tr>
 
 	<tr>
@@ -1211,6 +1251,65 @@ Returns the angle of the entity
 
 
 
+<dt><a name="ents_methods:getAttachment"></a><strong>ents_methods:getAttachment</strong>&nbsp;(index)</dt>
+<dd>
+
+Gets the position and angle of an attachment
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>index</em></code>: The index of the attachment
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>vector position, and angle orientation</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:getAttachmentParent"></a><strong>ents_methods:getAttachmentParent</strong>&nbsp;()</dt>
+<dd>
+
+Gets the attachment index the entity is parented to
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>number index of the attachment the entity is parented to or 0</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="ents_methods:getClass"></a><strong>ents_methods:getClass</strong>&nbsp;()</dt>
 <dd>
 
@@ -1563,6 +1662,31 @@ Gets the owner of the entity
 
 <h3>Return value:</h3>
 <ul>Owner</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:getParent"></a><strong>ents_methods:getParent</strong>&nbsp;()</dt>
+<dd>
+
+Gets the parent of an entity
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Entity's parent or nil</ul>
 
 
 
@@ -1931,6 +2055,40 @@ Converts an angle in entity local space to world space
 
 <h3>Return value:</h3>
 <ul>data as world space angle</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:lookupAttachment"></a><strong>ents_methods:lookupAttachment</strong>&nbsp;(name)</dt>
+<dd>
+
+Gets the attachment index via the entity and it's attachment name
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>number of the attachment index, or 0 if it doesn't exist</ul>
 
 
 
