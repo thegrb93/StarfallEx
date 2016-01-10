@@ -59,15 +59,21 @@ if CLIENT then
 
 	CreateClientConVar( "sf_editor_width", 1100, true, false )
 	CreateClientConVar( "sf_editor_height", 760, true, false )
-	CreateClientConVar( "sf_editor_posx", ScrW()/2-1100/2, true, false )
-	CreateClientConVar( "sf_editor_posy", ScrH()/2-760/2, true, false )
+	CreateClientConVar( "sf_editor_posx", ScrW() / 2 - 1100 / 2, true, false )
+	CreateClientConVar( "sf_editor_posy", ScrH() / 2 - 760 / 2, true, false )
 
 	CreateClientConVar( "sf_fileviewer_width", 263, true, false )
 	CreateClientConVar( "sf_fileviewer_height", 760, true, false )
-	CreateClientConVar( "sf_fileviewer_posx", ScrW()/2-1100/2-263, true, false )
-	CreateClientConVar( "sf_fileviewer_posy", ScrH()/2-760/2, true, false )
+	CreateClientConVar( "sf_fileviewer_posx", ScrW() / 2 - 1100 / 2 - 263, true, false )
+	CreateClientConVar( "sf_fileviewer_posy", ScrH() / 2 - 760 / 2, true, false )
 	CreateClientConVar( "sf_fileviewer_locked", 1, true, false )
 
+	CreateClientConVar( "sf_modelviewer_width", 930, true, false )
+	CreateClientConVar( "sf_modelviewer_height", 615, true, false )
+	CreateClientConVar( "sf_modelviewer_posx", ScrW() / 2 - 930 / 2, true, false )
+	CreateClientConVar( "sf_modelviewer_posy", ScrH() / 2 - 615 / 2, true, false )
+
+	CreateClientConVar( "sf_editor_wordwrap", 1, true, false )
 	CreateClientConVar( "sf_editor_widgets", 1, true, false )
 	CreateClientConVar( "sf_editor_linenumbers", 1, true, false )
 	CreateClientConVar( "sf_editor_gutter", 1, true, false )
@@ -77,78 +83,12 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_autocompletion", 1, true, false )
 	CreateClientConVar( "sf_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
 	CreateClientConVar( "sf_editor_fixconsolebug", 0, true, false )
+	CreateClientConVar( "sf_editor_disablelinefolding", 0, true, false )
+	CreateClientConVar( "sf_editor_fontsize", 13, true, false )
 
-	local editorUrl = "http://thegrb93.github.io/StarfallEx/starfall/"
-	local htmlEditorCode = nil
-	local initializingEditor = false
+	local editorUrl = "http://thegrb93.github.io/StarfallEx/starfall/editor.html"
 
-	function SF.Editor.init ( leave_open )
-		if initializingEditor then 
-			SF.AddNotify( LocalPlayer(), "Editor is busy loading...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
-			return
-		end
-		
-		if not htmlEditorCode then
-			
-			initializingEditor = true
-			SF.AddNotify( LocalPlayer(), "Loading editor now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
-			
-			local function finishedInit(successful, error_code)
-				if not initializingEditor then return end
-				initializingEditor = false
-				hook.Remove("Think", "SF_LoadingEditor")
-				if successful then
-					SF.Editor.init ( leave_open )
-				else
-					print("Starfall failed to load editor, Error: ", error_code) 
-					SF.AddNotify( LocalPlayer(), "Failed to load the editor...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
-				end
-			end
-			
-			local aceFiles = {"ace/ace.js", "ace/ext-whitespace.js", "ace/ext-elastic_tabstops_lite.js", "ace/mode-lua.js", "ace/ext-emmet.js", "ace/ext-split.js", "ace/ext-old_ie.js", "ace/worker-lua.js", "ace/ext-linking.js", "ace/ext-beautify.js", "ace/ext-modelist.js", "ace/ext-textarea.js", "ace/ext-chromevox.js", "ace/ext-searchbox.js", "ace/ext-statusbar.js", "ace/ext-themelist.js", "ace/theme-monokai.js", "ace/ext-spellcheck.js", "ace/keybinding-vim.js", "ace/ext-error_marker.js", "ace/keybinding-emacs.js", "ace/ext-settings_menu.js", "ace/ext-language_tools.js", "ace/ext-keybinding_menu.js", "ace/ext-static_highlight.js",}
-			local editorcode
-			local editorscripts = {}
-			local function getAceFile()
-				if not initializingEditor then return end
-				local nextindex = #editorscripts + 1
-				if aceFiles[nextindex] then
-					http.Fetch( editorUrl..aceFiles[nextindex], 
-					function( body, len, headers, code )
-						editorscripts[nextindex] = "<script>\n" .. body .. "</script>\n"
-						getAceFile()
-					end, 
-					function( error_code ) 
-						finishedInit( false, error_code )
-					end )
-				else
-					htmlEditorCode = editorcode:Replace( "<script>//replace//</script>",  table.concat( editorscripts ) )
-				end
-			end
-			local function getEditorFile()
-				http.Fetch( editorUrl.."editor.html", 
-				function( body, len, headers, code )
-					editorcode = body
-					getAceFile()
-				end, 
-				function( error_code ) 
-					finishedInit( false, error_code )
-				end )
-			end
-			getEditorFile()
-			
-			local timeout = CurTime() + 30
-			hook.Add("Think", "SF_LoadingEditor", function()
-				if htmlEditorCode then
-					finishedInit( true )
-				else
-					if CurTime() > timeout then
-						finishedInit( false, "Download Timed Out" )
-					end
-				end
-			end)
-			
-			return 
-		end
+	function SF.Editor.init ()
 
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
@@ -156,49 +96,26 @@ if CLIENT then
 
 		SF.Editor.editor = SF.Editor.createEditor()
 		SF.Editor.fileViewer = SF.Editor.createFileViewer()
-		SF.Editor.fileViewer:close()
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
-		SF.Editor.settingsWindow:close()
+		SF.Editor.modelViewer = SF.Editor.createModelViewer()
 
 		SF.Editor.runJS = function ( ... ) 
 			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
 		end
 
-		SF.Editor.updateSettings()
-
-		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
-		if tabs ~= nil and #tabs ~= 0 then
-			for k, v in pairs( tabs ) do
-				if type( v ) ~= "number" then
-					SF.Editor.addTab( v.filename, v.code )
-				end
-			end
-			SF.Editor.selectTab( tabs.selectedTab or 1 )
-		else
-			SF.Editor.addTab()
-		end
-
-		SF.Editor.editor:close()
 		SF.Editor.initialized = true
-		if leave_open then
-			SF.Editor.open()
-		end
-		
-		return true
 	end
 
 	function SF.Editor.open ()
 		if not SF.Editor.initialized then
-			SF.Editor.init ( true )
-			return false
+			SF.Editor.init ()
 		end
-
+		
 		SF.Editor.editor:open()
 
 		if CanRunConsoleCommand() then
 			RunConsoleCommand( "starfall_event", "editor_open" )
 		end
-		return true
 	end
 
 	function SF.Editor.close ()
@@ -214,7 +131,10 @@ if CLIENT then
 	end
 
 	function SF.Editor.getCode ()
-		return SF.Editor.getActiveTab().code
+		if SF.Editor.getActiveTab() then
+			return SF.Editor.getActiveTab().code
+		end
+		return ""
 	end
 
 	function SF.Editor.getOpenFile ()
@@ -259,7 +179,12 @@ if CLIENT then
 
 		code = code or defaultCode
 
-		SF.Editor.runJS( "newEditSession(\""..string.JavascriptSafe( code or defaultCode ).."\")" )
+		-- Settings to pass to editor when creating a new session
+		local settings = util.TableToJSON({
+			wrap = GetConVarNumber( "sf_editor_wordwrap" )
+		}):JavascriptSafe()
+
+		SF.Editor.runJS( "newEditSession(\"" .. string.JavascriptSafe( code or defaultCode ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
 
 		local tab = SF.Editor.getTabHolder():addTab( name )
 		tab.code = code
@@ -323,6 +248,7 @@ if CLIENT then
 
 		local function valid ()
 			local code = SF.Editor.getActiveTab().code
+			if code and code == "" then SF.Editor.runJS( "editor.session.clearAnnotations(); clearErrorLines()" ) return end
 
 			local err = CompileString( code, "Validation", false )
 
@@ -447,7 +373,7 @@ if CLIENT then
 
 	function SF.Editor.createEditor ()
 		local editor = vgui.Create( "StarfallFrame" )
-		editor:SetSize( 800, 600 )
+		editor:DockPadding( 0, 0, 0, 0 )
 		editor:SetTitle( "Starfall Code Editor" )
 		editor:Center()
 
@@ -489,9 +415,24 @@ if CLIENT then
 		local buttonHelper = vgui.Create( "StarfallButton", buttonHolder )	
 		buttonHelper:SetText( "SF Helper" )
 		function buttonHelper:DoClick ()
-			SF.Helper.show()
+			if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
+				SF.Helper.Frame:close()
+			else
+				SF.Helper.show()
+			end
 		end
 		buttonHolder:addButton( "Helper", buttonHelper )
+
+		local buttonModels = vgui.Create( "StarfallButton", buttonHolder )	
+		buttonModels:SetText( "Model Viewer" )
+		function buttonModels:DoClick ()
+			if SF.Editor.modelViewer:IsVisible() then
+				SF.Editor.modelViewer:close()
+			else
+				SF.Editor.modelViewer:open()
+			end
+		end
+		buttonHolder:addButton( "Model Viewer", buttonModels )
 
 		local buttonFiles = vgui.Create( "StarfallButton", buttonHolder )
 		buttonFiles:SetText( "Files" )
@@ -533,142 +474,169 @@ if CLIENT then
 		buttonHolder:addButton( "CloseTab", buttonCloseTab )
 
 		local html = vgui.Create( "DHTML", editor )
-		html:SetPos( 5, 54 )
-		html:SetHTML( htmlEditorCode )
-
+		html:Dock( FILL )
+		html:DockMargin( 5, 59, 5, 5 )
+		html:SetKeyboardInputEnabled( true )
+		html:SetMouseInputEnabled( true )
 		html:SetAllowLua( true )
+		html:OpenURL( editorUrl )
+			
+		local function FinishedLoadingEditor()
+			local map = createLibraryMap()
+			html:QueueJavascript( "libraryMap = JSON.parse(\"" .. util.TableToJSON( map ):JavascriptSafe() .. "\")" )
 
-		local map = createLibraryMap()
-
-		html:QueueJavascript( "libraryMap = JSON.parse(\"" .. util.TableToJSON( map ):JavascriptSafe() .. "\")" )
-
-		local libs = {}
-		local functions = {}
-		table.ForEach( map, function ( lib, vals )
-			if lib == "Environment" or lib:GetChar( 1 ):upper() ~= lib:GetChar( 1 ) then
-				table.insert( libs, lib )
-			end
-			table.ForEach( vals, function ( key, val )
-				table.insert( functions, val )
+			local libs = {}
+			local functions = {}
+			table.ForEach( map, function ( lib, vals )
+				if lib == "Environment" or lib:GetChar( 1 ):upper() ~= lib:GetChar( 1 ) then
+					table.insert( libs, lib )
+				end
+				table.ForEach( vals, function ( key, val )
+					table.insert( functions, val )
+				end )
 			end )
-		end )
 
-		html:QueueJavascript( "createStarfallMode(\"" .. table.concat( libs, "|" ) .. "\", \"" .. table.concat( table.Add( table.Copy( functions ), libs ), "|" ) .. "\")" )
+			html:QueueJavascript( "createStarfallMode(\"" .. table.concat( libs, "|" ) .. "\", \"" .. table.concat( table.Add( table.Copy( functions ), libs ), "|" ) .. "\")" )
 
-		function html:PerformLayout ( ... )
-		 	self:SetSize( editor:GetWide() - 10, editor:GetTall() - 59 )
-		end
-		function html:OnKeyCodePressed ( key, notfirst )
+			function html:OnKeyCodePressed ( key, notfirst )
 
-			local function repeatKey ()
-				timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () self:OnKeyCodePressed( key, true ) end )
+				local function repeatKey ()
+					timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () self:OnKeyCodePressed( key, true ) end )
+				end
+
+				if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
+				if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and 
+					( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) then
+					if key == KEY_UP and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.modifyNumber(1)" )
+						repeatKey()
+					elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.modifyNumber(-1)" )
+						repeatKey()
+					elseif key == KEY_LEFT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectWordLeft()" )
+						repeatKey()
+					elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectWordRight()" )
+						repeatKey()
+					end
+				elseif input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) then
+					if key == KEY_LEFT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectLeft()" )
+						repeatKey()
+					elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectRight()" )
+						repeatKey()
+					elseif key == KEY_UP and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectUp()" )
+						repeatKey()
+					elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectDown()" )
+						repeatKey()
+					elseif key == KEY_HOME and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectLineStart()" )
+						repeatKey()
+					elseif key == KEY_END and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.selection.selectLineEnd()" )
+						repeatKey()
+					end
+				elseif input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) then
+					if key == KEY_LEFT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateWordLeft()" )
+						repeatKey()
+					elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateWordRight()" )
+						repeatKey()
+					elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.removeWordLeft()" )
+						repeatKey()
+					elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.removeWordRight()" )
+						repeatKey()
+					elseif key == KEY_SPACE and input.IsKeyDown( key ) then
+						SF.Editor.doValidation( true )
+					elseif key == KEY_C and input.IsKeyDown( key ) then
+						self:QueueJavascript( "console.log(\"RUNLUA:SetClipboardText(\\\"\"+ addslashes(editor.getSelectedText()) +\"\\\")\")" )
+					end
+				elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
+					if key == KEY_UP and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.moveLinesUp()" )
+						repeatKey()
+					elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.moveLinesDown()" )
+						repeatKey()
+					end
+				else
+					if key == KEY_LEFT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateLeft(1)" )
+						repeatKey()
+					elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateRight(1)" )
+						repeatKey()
+					elseif key == KEY_UP and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateUp(1)" )
+						repeatKey()
+					elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateDown(1)" )
+						repeatKey()
+					elseif key == KEY_HOME and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateLineStart()" )
+						repeatKey()
+					elseif key == KEY_END and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateLineEnd()" )
+						repeatKey()
+					elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateFileStart()" )
+						repeatKey()
+					elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.navigateFileEnd()" )
+						repeatKey()
+					elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.remove('left')" )
+						repeatKey()
+					elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.remove('right')" )
+						repeatKey()
+					elseif key == KEY_ENTER and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
+						repeatKey()
+					elseif key == KEY_INSERT and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.toggleOverwrite()" )
+						repeatKey()
+					elseif key == KEY_TAB and input.IsKeyDown( key ) then
+						self:QueueJavascript( "editor.indent()" )
+						repeatKey()
+					end
+				end
 			end
+			
+			SF.Editor.updateSettings()
 
-			if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
-			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and 
-				( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
-				if key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.modifyNumber(1)" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.modifyNumber(-1)" )
-					repeatKey()
-				elseif key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectWordLeft()" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectWordRight()" )
-					repeatKey()
+			local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
+			if tabs ~= nil and #tabs ~= 0 then
+				for k, v in pairs( tabs ) do
+					if type( v ) ~= "number" then
+						SF.Editor.addTab( v.filename, v.code )
+					end
 				end
-			elseif input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) then
-				if key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectLeft()" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectRight()" )
-					repeatKey()
-				elseif key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectUp()" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectDown()" )
-					repeatKey()
-				elseif key == KEY_HOME and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectLineStart()" )
-					repeatKey()
-				elseif key == KEY_END and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectLineEnd()" )
-					repeatKey()
-				end
-			elseif (input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL )) and not input.IsKeyDown( KEY_LALT ) then
-				if key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateWordLeft()" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateWordRight()" )
-					repeatKey()
-				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.removeWordLeft()" )
-					repeatKey()
-				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.removeWordRight()" )
-					repeatKey()
-				elseif key == KEY_SPACE and input.IsKeyDown( key ) then
-					SF.Editor.doValidation( true )
-				elseif key == KEY_C and input.IsKeyDown( key ) then
-					self:QueueJavascript( "console.log(\"RUNLUA:SetClipboardText(\\\"\"+ addslashes(editor.getSelectedText()) +\"\\\")\")" )
-				end
-			elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
-				if key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.moveLinesUp()" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.moveLinesDown()" )
-					repeatKey()
-				end
+				SF.Editor.selectTab( tabs.selectedTab or 1 )
 			else
-				if key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateLeft(1)" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateRight(1)" )
-					repeatKey()
-				elseif key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateUp(1)" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateDown(1)" )
-					repeatKey()
-				elseif key == KEY_HOME and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateLineStart()" )
-					repeatKey()
-				elseif key == KEY_END and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateLineEnd()" )
-					repeatKey()
-				elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateFileStart()" )
-					repeatKey()
-				elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateFileEnd()" )
-					repeatKey()
-				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.remove('left')" )
-					repeatKey()
-				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.remove('right')" )
-					repeatKey()
-				elseif key == KEY_ENTER and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
-					repeatKey()
-				elseif key == KEY_INSERT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.toggleOverwrite()" )
-					repeatKey()
-				elseif key == KEY_TAB and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.indent()" )
-					repeatKey()
+				SF.Editor.addTab()
+			end
+			
+		end
+		
+		local readyTime
+		hook.Add("Think","SF_LoadingEditor",function()
+			if not html:IsLoading() then
+				if not readyTime then readyTime = CurTime()+0.1 end
+				if CurTime() > readyTime then
+					hook.Remove("Think","SF_LoadingEditor")
+					FinishedLoadingEditor()
 				end
 			end
-		end
+		end)
+		
 		editor:AddComponent( "htmlPanel", html )
 
 		function editor:OnOpen ()
@@ -717,12 +685,21 @@ if CLIENT then
 			end
 			tabs.selectedTab = SF.Editor.getTabHolder():getTabIndex( SF.Editor.getActiveTab() )
 			file.Write( "sf_tabs.txt", util.TableToJSON( tabs ) )
-		end
 
-		function editor:OnThink ()
-			if self.Dragged or self.Resized then
-				SF.Editor.saveSettings()
-			end
+			SF.Editor.saveSettings()
+
+			local activeWep = LocalPlayer():GetActiveWeapon()
+			if IsValid( activeWep ) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
+				local model = nil
+				local ppdata = {}
+				SF.Preprocessor.ParseDirectives( "file", SF.Editor.getCode(), {}, ppdata )
+				if ppdata.models and ppdata.models.file ~= "" then
+					model = ppdata.models.file 
+				end
+
+				local tool = activeWep:GetToolObject( "starfall_processor" )
+				tool.ClientConVar[ "HologramModel" ] = model
+			end 
 		end
 
 		return editor
@@ -775,18 +752,13 @@ if CLIENT then
 		end
 		buttonHolder:addButton( "Refresh", buttonRefresh )
 
-		function fileViewer:OnThink ()
-			if self.Dragged or self.Resized then
-				SF.Editor.saveSettings()
-			end
-		end
-
 		function fileViewer:OnOpen ()
 			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Files" ).active = true
 		end
 
 		function fileViewer:OnClose ()
 			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Files" ).active = false
+			SF.Editor.saveSettings()
 		end
 
 		return fileViewer
@@ -797,37 +769,53 @@ if CLIENT then
 		frame:SetSize( 200, 400 )
 		frame:SetTitle( "Starfall Settings" )
 		frame:Center()
-		frame:SetVisible( true )
-		frame:MakePopup( true )
 
 		local panel = vgui.Create( "StarfallPanel", frame )
-		panel:SetPos( 5, 40 )
-		function panel:PerformLayout ()
-			self:SetSize( frame:GetWide() - 10, frame:GetTall() - 45 )
-		end
+		panel:Dock( FILL )
+		panel:DockMargin( 0, 5, 0, 0 )
 		frame:AddComponent( "panel", panel )
+
+		local scrollPanel = vgui.Create( "DScrollPanel", panel )
+		scrollPanel:Dock( FILL )
+		scrollPanel:SetPaintBackgroundEnabled( false )
+
+		local form = vgui.Create( "DForm", scrollPanel )	
+		form:Dock( FILL )
+		form:DockPadding( 0, 10, 0, 10 )
+		form.Header:SetVisible( false )
+		form.Paint = function () end
 
 		local function setDoClick ( panel )
 			function panel:OnChange ()
-				SF.Editor.updateSettings()
+				SF.Editor.saveSettings()
+				timer.Simple( 0.1, function () SF.Editor.updateSettings() end )
 			end
 
 			return panel
 		end
+		local function setWang( wang, label )
+			function wang:OnValueChanged()
+				SF.Editor.saveSettings()
+				timer.Simple( 0.1, function () SF.Editor.updateSettings() end )
+			end
+			wang:GetParent():DockPadding( 10, 1, 10, 1 )
+			wang:Dock( RIGHT )
 
-		local form = vgui.Create( "DForm", panel )	
-		form:Dock( FILL )
-		form.Header:SetVisible( false )
-		form.Paint = function () end
-		setDoClick(form:CheckBox( "Show fold widgets", "sf_editor_widgets" ))
-		setDoClick(form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ))
-		setDoClick(form:CheckBox( "Show gutter", "sf_editor_gutter" ))
-		setDoClick(form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ))
-		setDoClick(form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ))
-		setDoClick(form:CheckBox( "Highlight active line", "sf_editor_activeline" ))
-		setDoClick(form:CheckBox( "Auto completion", "sf_editor_autocompletion" ))
-		setDoClick(form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" )):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
-		setDoClick(form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" )):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
+			return wang, label
+		end
+		
+		setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
+		setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
+		setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
+		setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
+		setDoClick( form:CheckBox( "Show gutter", "sf_editor_gutter" ) )
+		setDoClick( form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ) )
+		setDoClick( form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ) )
+		setDoClick( form:CheckBox( "Highlight active line", "sf_editor_activeline" ) )
+		setDoClick( form:CheckBox( "Auto completion", "sf_editor_autocompletion" ) )
+		setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+		setDoClick( form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
+		setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_disablelinefolding" ) )
 
 		function frame:OnOpen ()
 			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = true
@@ -836,6 +824,383 @@ if CLIENT then
 		function frame:OnClose ()
 			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = false
 		end
+
+		return frame
+	end
+
+	function SF.Editor.createModelViewer ()
+		local frame = vgui.Create( "StarfallFrame" )
+		frame:SetTitle( "Model Viewer - Click an icon to insert model filename into editor" )
+		frame:SetVisible( false )
+		frame:Center()
+
+		function frame:OnOpen ()
+			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Model Viewer" ).active = true
+		end
+
+		function frame:OnClose ()
+			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Model Viewer" ).active = false
+			SF.Editor.saveSettings()
+		end
+
+		local sidebarPanel = vgui.Create( "StarfallPanel", frame )
+		sidebarPanel:Dock( LEFT )
+		sidebarPanel:SetSize( 190, 10 )
+		sidebarPanel:DockMargin( 0, 0, 4, 0 )
+		sidebarPanel.Paint = function () end
+
+		frame.ContentNavBar = vgui.Create( "ContentSidebar", sidebarPanel )
+		frame.ContentNavBar:Dock( FILL )
+		frame.ContentNavBar:DockMargin( 0, 0, 0, 0 )
+		frame.ContentNavBar.Tree:SetBackgroundColor( Color( 240, 240, 240 ) )
+		frame.ContentNavBar.Tree.OnNodeSelected = function ( self, node ) 
+			if not IsValid( node.propPanel ) then return end
+
+			if IsValid( frame.PropPanel.selected ) then
+				frame.PropPanel.selected:SetVisible( false )
+				frame.PropPanel.selected = nil
+			end
+
+			frame.PropPanel.selected = node.propPanel
+
+			frame.PropPanel.selected:Dock( FILL )
+			frame.PropPanel.selected:SetVisible( true )
+			frame.PropPanel:InvalidateParent()
+			
+			frame.HorizontalDivider:SetRight( frame.PropPanel.selected )
+		end
+
+		frame.PropPanel = vgui.Create( "StarfallPanel", frame )
+		frame.PropPanel:Dock( FILL )
+		function frame.PropPanel:Paint ( w, h )
+			draw.RoundedBox( 0, 0, 0, w, h, Color( 240, 240, 240 ) )
+		end
+
+		frame.HorizontalDivider = vgui.Create( "DHorizontalDivider", frame )
+		frame.HorizontalDivider:Dock( FILL )
+		frame.HorizontalDivider:SetLeftWidth( 175 )
+		frame.HorizontalDivider:SetLeftMin( 175 )
+		frame.HorizontalDivider:SetRightMin( 450 )
+		
+		frame.HorizontalDivider:SetLeft( sidebarPanel )
+		frame.HorizontalDivider:SetRight( frame.PropPanel )
+
+		local root = frame.ContentNavBar.Tree:AddNode( "Your Spawnlists" )
+		root:SetExpanded( true )
+		root.info = {}
+		root.info.id = 0
+
+		local function hasGame ( name )
+			for k, v in pairs( engine.GetGames() ) do
+				if v.folder == name and v.mounted then
+					return true
+				end
+			end
+			return false
+		end
+
+		local function addModel ( container, obj )
+
+			local icon = vgui.Create( "SpawnIcon", container )
+			
+			if ( obj.body ) then
+				obj.body = string.Trim( tostring(obj.body), "B" )
+			end
+			
+			if ( obj.wide ) then
+				icon:SetWide( obj.wide )
+			end
+			
+			if ( obj.tall ) then
+				icon:SetTall( obj.tall )
+			end
+			
+			icon:InvalidateLayout( true )
+			
+			icon:SetModel( obj.model, obj.skin or 0, obj.body )
+			
+			icon:SetTooltip( string.Replace( string.GetFileFromFilename( obj.model ), ".mdl", "" ) )
+
+			icon.DoClick = function ( icon ) 
+				SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" ) 
+				SF.AddNotify( LocalPlayer(), "\"" .. string.gsub( obj.model, "\\", "/" ) .. "\" inserted into editor.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP1 )
+				frame:close()
+			end
+			icon.OpenMenu = function ( icon )
+
+				local menu = DermaMenu()
+				local submenu = menu:AddSubMenu( "Re-Render", function () icon:RebuildSpawnIcon() end )
+					submenu:AddOption( "This Icon", function () icon:RebuildSpawnIcon() end )
+					submenu:AddOption( "All Icons", function () container:RebuildAll() end )
+			
+				local ChangeIconSize = function ( w, h )
+					
+					icon:SetSize( w, h )
+					icon:InvalidateLayout( true )
+					container:OnModified()
+					container:Layout()
+					icon:SetModel( obj.model, obj.skin or 0, obj.body )
+				
+				end
+
+				local submenu = menu:AddSubMenu( "Resize", function () end )
+					submenu:AddOption( "64 x 64 (default)", function () ChangeIconSize( 64, 64 ) end )
+					submenu:AddOption( "64 x 128", function () ChangeIconSize( 64, 128 ) end )
+					submenu:AddOption( "64 x 256", function () ChangeIconSize( 64, 256 ) end )
+					submenu:AddOption( "64 x 512", function () ChangeIconSize( 64, 512 ) end )
+					submenu:AddSpacer()
+					submenu:AddOption( "128 x 64", function () ChangeIconSize( 128, 64 ) end )
+					submenu:AddOption( "128 x 128", function () ChangeIconSize( 128, 128 ) end )
+					submenu:AddOption( "128 x 256", function () ChangeIconSize( 128, 256 ) end )
+					submenu:AddOption( "128 x 512", function () ChangeIconSize( 128, 512 ) end )
+					submenu:AddSpacer()
+					submenu:AddOption( "256 x 64", function () ChangeIconSize( 256, 64 ) end )
+					submenu:AddOption( "256 x 128", function () ChangeIconSize( 256, 128 ) end )
+					submenu:AddOption( "256 x 256", function () ChangeIconSize( 256, 256 ) end )
+					submenu:AddOption( "256 x 512", function () ChangeIconSize( 256, 512 ) end )
+					submenu:AddSpacer()
+					submenu:AddOption( "512 x 64", function () ChangeIconSize( 512, 64 ) end )
+					submenu:AddOption( "512 x 128", function () ChangeIconSize( 512, 128 ) end )
+					submenu:AddOption( "512 x 256", function () ChangeIconSize( 512, 256 ) end )
+					submenu:AddOption( "512 x 512", function () ChangeIconSize( 512, 512 ) end )
+
+				menu:AddSpacer()
+				menu:AddOption( "Delete", function () icon:Remove() end )
+				menu:Open()
+				
+			end
+
+			icon:InvalidateLayout( true )
+			
+			if ( IsValid( container ) ) then
+				container:Add( icon )
+			end
+
+			return icon
+
+		end
+
+		local function addBrowseContent ( viewPanel, node, name, icon, path, pathid )
+			local models = node:AddFolder( name, path .. "models", pathid, false )
+			models:SetIcon( icon )
+
+			models.OnNodeSelected = function ( self, node )
+
+				if viewPanel and viewPanel.currentNode and viewPanel.currentNode == node then return end
+
+				viewPanel:Clear( true )
+				viewPanel.currentNode = node
+				
+				local path = node:GetFolder()
+				local searchString = path .. "/*.mdl"
+
+				local Models = file.Find( searchString, node:GetPathID() )
+				for k, v in pairs( Models ) do
+					if not IsUselessModel( v ) then
+						addModel( viewPanel, { model = path .. "/" .. v } )
+					end
+				end
+
+				node.propPanel = viewPanel
+				frame.ContentNavBar.Tree:OnNodeSelected( node )
+
+				viewPanel.currentNode = node
+
+			end
+		end
+
+		local function addAddonContent ( panel, folder, path )
+			local files, folders = file.Find( folder .. "*", path )
+
+			for k, v in pairs( files ) do
+				if string.EndsWith( v, ".mdl" ) then
+					addModel( panel, { model = folder .. v } )
+				end
+			end
+
+			for k, v in pairs( folders ) do
+				addAddonContent( panel, folder .. v .. "/", path )
+			end
+		end
+
+		local function fillNavBar ( propTable, parentNode )
+			for k, v in SortedPairs( propTable ) do
+				if v.parentid == parentNode.info.id and ( v.needsapp ~= "" and hasGame( v.needsapp ) or v.needsapp == "" ) then
+					local node = parentNode:AddNode( v.name, v.icon )
+					node:SetExpanded( true )
+					node.info = v
+
+					node.propPanel = vgui.Create( "ContentContainer", frame.PropPanel )
+					node.propPanel:DockMargin( 5, 0, 0, 0 )
+					node.propPanel:SetVisible( false )
+
+					for i, object in SortedPairs( node.info.contents ) do
+						if object.type == "model" then
+							addModel( node.propPanel, object )
+						elseif object.type == "header" then
+							if not object.text or type( object.text ) ~= "string" then return end
+
+							local label = vgui.Create( "ContentHeader", node.propPanel )
+							label:SetText( object.text )
+							
+							node.propPanel:Add( label )
+						end
+					end
+
+					fillNavBar( propTable, node )
+				end
+			end
+		end
+
+		if table.Count( spawnmenu.GetPropTable() ) == 0 then
+			hook.Call( "PopulatePropMenu", GAMEMODE )
+		end
+
+		fillNavBar( spawnmenu.GetPropTable(), root )
+		frame.OldSpawnlists = frame.ContentNavBar.Tree:AddNode( "#spawnmenu.category.browse", "icon16/cog.png" )
+		frame.OldSpawnlists:SetExpanded( true )
+
+		-- Games
+		local gamesNode = frame.OldSpawnlists:AddNode( "#spawnmenu.category.games", "icon16/folder_database.png" )
+
+		local viewPanel = vgui.Create( "ContentContainer", frame.PropPanel )
+		viewPanel:DockMargin( 5, 0, 0, 0 )
+		viewPanel:SetVisible( false )
+
+		local games = engine.GetGames()
+		table.insert( games, {
+			title = "All",
+			folder = "GAME",
+			icon = "all",
+			mounted = true
+		} )
+		table.insert( games, {
+			title = "Garry's Mod",
+			folder = "garrysmod",
+			mounted = true
+		} )
+		
+		for _, game in SortedPairsByMemberValue( games, "title" ) do
+			
+			if game.mounted then
+				addBrowseContent( viewPanel, gamesNode, game.title, "games/16/" .. ( game.icon or game.folder ) .. ".png", "", game.folder )
+			end
+		end
+
+		-- Addons
+		local addonsNode = frame.OldSpawnlists:AddNode( "#spawnmenu.category.addons", "icon16/folder_database.png" )
+
+		local viewPanel = vgui.Create( "ContentContainer", frame.PropPanel )
+		viewPanel:DockMargin( 5, 0, 0, 0 )
+		viewPanel:SetVisible( false )
+
+		function addonsNode:OnNodeSelected ( node )
+			if node == addonsNode then return end
+			viewPanel:Clear( true )
+			addAddonContent( viewPanel, "models/", node.addon.title )
+			node.propPanel = viewPanel
+			frame.ContentNavBar.Tree:OnNodeSelected( node )
+		end
+		for _, addon in SortedPairsByMemberValue( engine.GetAddons(), "title" ) do
+			if addon.downloaded and addon.mounted and addon.models > 0 then
+				local node = addonsNode:AddNode( addon.title .. " ("..addon.models..")", "icon16/bricks.png" )
+				node.addon = addon
+			end
+		end
+
+		-- Search box
+		local viewPanel = vgui.Create( "ContentContainer", frame.PropPanel )
+		viewPanel:DockMargin( 5, 0, 0, 0 )
+		viewPanel:SetVisible( false )
+
+		frame.searchBox = vgui.Create( "DTextEntry", sidebarPanel )
+		frame.searchBox:Dock( TOP )
+		frame.searchBox:SetValue( "Search..." )
+		frame.searchBox:SetTooltip( "Press enter to search" )
+		frame.searchBox.propPanel = viewPanel
+
+		frame.searchBox._OnGetFocus = frame.searchBox.OnGetFocus
+		function frame.searchBox:OnGetFocus ()
+			if self:GetValue() == "Search..." then
+				self:SetValue( "" )
+			end
+			frame.searchBox:_OnGetFocus()
+		end
+
+		frame.searchBox._OnLoseFocus = frame.searchBox.OnLoseFocus
+		function frame.searchBox:OnLoseFocus ()
+			if self:GetValue() == "" then
+				self:SetText( "Search..." )
+			end
+			frame.searchBox:_OnLoseFocus()
+		end
+
+		function frame.searchBox:updateHeader ()
+			self.header:SetText( frame.searchBox.results .. " Results for \"" .. self.search .. "\"" )
+		end
+
+		local searchTime = nil
+
+		function frame.searchBox:getAllModels ( time, folder, extension, path )
+			if searchTime and time ~= searchTime then return end
+			if self.results and self.results >= 256 then return end
+			self.load = self.load + 1
+			local files, folders = file.Find( folder .. "/*", path )
+
+			for k, v in pairs( files ) do
+				local file = folder .. v
+				if v:EndsWith( extension ) and file:find( self.search:PatternSafe() ) and not IsUselessModel( file ) then
+					addModel( self.propPanel, { model = file } )
+					self.results = self.results + 1
+					self:updateHeader()
+				end
+				if self.results >= 256 then break end
+			end
+
+			for k, v in pairs( folders ) do
+				timer.Simple( k * 0.02, function()
+					if searchTime and time ~= searchTime then return end
+					if self.results >= 256 then return end
+					self:getAllModels( time, folder .. v .. "/", extension, path )
+				end )
+			end
+			timer.Simple( 1, function () 
+				if searchTime and time ~= searchTime then return end
+				self.load = self.load - 1 
+			end )
+		end
+
+		function frame.searchBox:OnEnter ()
+			if self:GetValue() == "" then return end
+
+			self.propPanel:Clear()
+
+			self.results = 0
+			self.load = 1
+			self.search = self:GetText()
+
+			self.header = vgui.Create( "ContentHeader", self.propPanel )
+			self.loading = vgui.Create( "ContentHeader", self.propPanel )
+			self:updateHeader()
+			self.propPanel:Add( self.header )
+			self.propPanel:Add( self.loading )
+
+			searchTime = CurTime()
+			self:getAllModels( searchTime, "models/", ".mdl", "GAME" )
+			self.load = self.load - 1
+
+			frame.ContentNavBar.Tree:OnNodeSelected( self )
+		end
+		hook.Add( "Think", "sf_header_update", function ()
+			if frame.searchBox.loading and frame.searchBox.propPanel:IsVisible() then
+				frame.searchBox.loading:SetText( "Loading" .. string.rep( ".", math.floor( CurTime() ) % 4 ) )
+			end
+			if frame.searchBox.load and frame.searchBox.load <= 0 then
+				frame.searchBox.loading:Remove()
+				frame.searchBox.loading = nil
+				frame.searchBox.load = nil
+			end
+		end )
 
 		return frame
 	end
@@ -855,6 +1220,13 @@ if CLIENT then
 		RunConsoleCommand( "sf_fileviewer_posx", x )
 		RunConsoleCommand( "sf_fileviewer_posy", y )
 		RunConsoleCommand( "sf_fileviewer_locked", frame.locked and 1 or 0 )
+
+		local frame = SF.Editor.modelViewer
+		RunConsoleCommand( "sf_modelviewer_width", frame:GetWide() )
+		RunConsoleCommand( "sf_modelviewer_height", frame:GetTall() )
+		local x, y = frame:GetPos()
+		RunConsoleCommand( "sf_modelviewer_posx", x )
+		RunConsoleCommand( "sf_modelviewer_posy", y )
 	end
 
 	function SF.Editor.updateSettings ()
@@ -874,7 +1246,17 @@ if CLIENT then
 		buttonLock.active = frame.locked
 		buttonLock:SetText( frame.locked and "Locked" or "Unlocked" )
 
+		local frame = SF.Editor.modelViewer
+		frame:SetWide( GetConVarNumber( "sf_modelviewer_width" ) )
+		frame:SetTall( GetConVarNumber( "sf_modelviewer_height" ) )
+		frame:SetPos( GetConVarNumber( "sf_modelviewer_posx" ), GetConVarNumber( "sf_modelviewer_posy" ) )
+
 		local js = SF.Editor.runJS
+		js( [[
+			editSessions.forEach( function( session ) {
+				session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
+			} )
+		]] )
 		js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
 		js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
 		js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
@@ -883,6 +1265,8 @@ if CLIENT then
 		js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 		js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
 		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
+		js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ")" )
+		js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ")" )
 	end
 
 	--- (Client) Builds a table for the compiler to use
@@ -891,7 +1275,7 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
 	function SF.Editor.BuildIncludesTable ( maincode, codename )
-		if not SF.Editor.initialized then SF.Editor.init() return false, "Editor needs to finish loading..." end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		local tbl = {}
 		maincode = maincode or SF.Editor.getCode()
 		codename = codename or SF.Editor.getOpenFile() or "main"
