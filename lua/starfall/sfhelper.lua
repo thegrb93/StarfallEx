@@ -34,27 +34,27 @@ function helper.create()
 
 	helper.Views = {}
 
-	helper.Frame = vgui.Create( "DFrame" )
+	helper.Frame = vgui.Create( "StarfallFrame" )
 	helper.Frame:SetSize( 930, 615 )
 	helper.Frame:Center( )
-	helper.Frame:SetSizable( true )
-	helper.Frame:SetScreenLock( true )
-	helper.Frame:SetDeleteOnClose( false )
-	helper.Frame:SetVisible( false )
 	helper.Frame:SetTitle( "SF Helper" )
-	helper.Frame._PerformLayout = helper.Frame.PerformLayout
-	function helper.Frame:PerformLayout( ... )
+	helper.Frame._PerformLayout2 = helper.Frame.PerformLayout
+	function helper.Frame:PerformLayout ( ... )
 		local w, h = helper.Frame:GetSize()
 		if w < 620 then w = 620 end
 		if h < 410 then h = 410 end
 		helper.Frame:SetSize( w, h )
 
-		self:_PerformLayout( ... )
+		self:_PerformLayout2( ... )
 		helper.resize( )
-	end   
-	function helper.Frame:OnClose()
+	end
+	function helper.Frame:OnOpen ()
+		SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Helper" ).active = true
+	end
+	function helper.Frame:OnClose ()
+		SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Helper" ).active = false
 		saveSettings()
-	end           
+	end
 
 	helper.ScrollPanel = vgui.Create( "DScrollPanel", helper.Frame )
 	helper.ScrollPanel:SetPos( 5, 30 )
@@ -67,7 +67,7 @@ function helper.create()
 	local function createList( name, listfunc )
 		local Cat = helper.CatList:Add( name )
 		if name ~= "SF Helper" then Cat:SetExpanded( false ) end
-		local DPanel = vgui.Create( "DPanel", Cat )
+		local DPanel = vgui.Create( "StarfallPanel", Cat )
 		DPanel:SetPos( 2, 22 )
 
 		local List = vgui.Create( "DListView", DPanel )
@@ -234,7 +234,7 @@ function helper.create()
 
 	---- Index View ----
 	--------------------
-	helper.IndexView = vgui.Create( "DPanel", helper.Frame )
+	helper.IndexView = vgui.Create( "StarfallPanel", helper.Frame )
 	helper.IndexView:SetPos( 166, 30 )
 	helper.Views.Index = helper.IndexView
 
@@ -329,7 +329,7 @@ function helper.create()
 	helper.DocView:SetVisible( false )
 	helper.Views.Doc = helper.DocView
 
-	helper.DocView.Panel = vgui.Create( "DPanel", helper.DocView )
+	helper.DocView.Panel = vgui.Create( "StarfallPanel", helper.DocView )
 
 	helper.DocView.Title = Label( "", helper.DocView.Panel )
 	helper.DocView.Title:SetPos( 10, 5 )
@@ -364,7 +364,7 @@ function helper.create()
 		list:AddColumn( name ):SetFixedWidth( 150 )
 		list:AddColumn( "Description" )
 		helper.DocView[ name .. "List" ] = list
-		helper.LabelLists[ #helper.LabelLists + 1 ] = { label=label, list=list, func=func, name=string.lower( name ) }
+		helper.LabelLists[ #helper.LabelLists + 1 ] = { label = label, list = list, func = func, name = string.lower( name ) }
 
 		function list:OnRowSelected( LineID, Line )
 			for _, labellist in pairs( helper.LabelLists ) do 
@@ -375,16 +375,17 @@ function helper.create()
 			update( LineID, Line )
 		end
 	end
-	createDocList( "Functions", function( view, doc )
+	local function formatText( text, dontRemoveNewLines )
+		text = text:Trim()
+		if not dontRemoveNewLines then text = string.Replace( text, "\n", "" ) end
+		text = string.gsub( text, "<[^>]*>", "" )
+		return text
+	end
+	createDocList( "Functions", function ( view, doc )
 		local height = 16
 		for _, func in ipairs( doc.functions ) do
 			local func_data = doc.functions[ func ]
-			local description = string.Replace( string.Trim( func_data.summary ), "\n", "" )
-			description = string.Replace( description, "<a href=\"", "( " )
-			description = string.Replace( description, "\">", ", " )
-			description = string.Replace( description, "</br>", "" )
-			description = string.Replace( description, "</a>", " )" )
-			local line = view.FunctionsList:AddLine( func .. " (" .. table.concat( func_data.param, ", " ) .. ")" , description )
+			local line = view.FunctionsList:AddLine( func .. "( " .. table.concat( func_data.param, ", " ) .. " )", formatText( func_data.summary ) )
 			line.func = func
 			height = height + 17
 		end
@@ -396,7 +397,7 @@ function helper.create()
 		local height = 16
 		for _, table in ipairs( doc.tables ) do
 			local table_data = doc.tables[ table ]
-			local line = view.TablesList:AddLine( table , string.Replace( string.Trim( table_data.summary ), "\n", "" ) )
+			local line = view.TablesList:AddLine( table, formatText( table_data.summary ) )
 			line.table = table
 			height = height + 17
 		end
@@ -408,7 +409,7 @@ function helper.create()
 		local height = 16
 		for _, field in ipairs( doc.fields ) do
 			local field_data = doc.fields[ field ]
-			view.FieldsList:AddLine( field , string.Replace( string.Trim( field_data.summary ), "\n", "" ) )
+			view.FieldsList:AddLine( field, formatText( field_data.summary ) )
 			height = height + 17
 		end
 		return height
@@ -417,12 +418,7 @@ function helper.create()
 		local height = 16
 		for _, func in ipairs( doc.methods ) do
 			local func_data = doc.methods[ func ]
-			local description = string.Replace( string.Trim( func_data.summary ), "\n", "" )
-			description = string.Replace( description, "<a href=\"", "( " )
-			description = string.Replace( description, "\">", ", " )
-			description = string.Replace( description, "</br>", "" )
-			description = string.Replace( description, "</a>", " )" )
-			local line = view.MethodsList:AddLine( func .. " (" .. table.concat( func_data.param, ", " ) .. ")" , description )
+			local line = view.MethodsList:AddLine( func .. "( " .. table.concat( func_data.param, ", " ) .. " )", formatText( func_data.summary ) )
 			line.func = func
 			height = height + 17
 		end
@@ -434,7 +430,7 @@ function helper.create()
 		local height = 16
 		for _, hook in ipairs( doc.hooks ) do
 			local hook_data = doc.hooks[ hook ]
-			local line = view.HooksList:AddLine( hook , string.Replace( string.Trim( hook_data.summary ), "\n", "" ) )
+			local line = view.HooksList:AddLine( hook, formatText( hook_data.summary ) )
 			line.hook = hook
 			height = height + 17
 		end
@@ -446,7 +442,7 @@ function helper.create()
 		local height = 16
 		for _, directive in ipairs( doc.directives ) do
 			local directive_data = doc.directives[ directive ]
-			local line = view.DirectivesList:AddLine( directive , string.Replace( string.Trim( directive_data.summary ), "\n", "" ) )
+			local line = view.DirectivesList:AddLine( directive, formatText( directive_data.summary ) )
 			line.directive = directive
 			height = height + 17
 		end
@@ -465,17 +461,17 @@ function helper.create()
 		directive = nil or directive 
 
 		if not directive then
-			infopanel.funcName:SetText( string.Replace( func.name .. "( " .. table.concat( func.param, ", " ) .. " )", "\n", "" ) )
+			infopanel.funcName:SetText( formatText( func.name .. "( " .. table.concat( func.param, ", " ) .. " )" ) )
 		else
-			infopanel.funcName:SetText( string.Replace( "--@" .. func.name .. " " .. table.concat( func.param, ", " ), "\n", "" ) )
+			infopanel.funcName:SetText( formatText( "--@" .. func.name .. " " .. table.concat( func.param, ", " ) ) )
 		end
 		infopanel.funcName.Enabled = true
 
-		infopanel.description:SetText( string.Replace( func.description or "", "\n", "" ) )
+		infopanel.description:SetText( formatText( func.description or "", true ) )
 		infopanel.description.Enabled = true
 
 		if func.deprecated then 
-			infopanel.deprecated:SetText( "Deprecated: " .. string.Replace( func.deprecated, "\n", "" ) ) 
+			infopanel.deprecated:SetText( "Deprecated: " .. formatText( func.deprecated ) ) 
 			infopanel.deprecated.Enabled = true
 		else 
 			infopanel.deprecated.Enabled = false
@@ -487,7 +483,7 @@ function helper.create()
 				params = params .. "» " .. func.param[ p ] .. ": " .. ( func.param[ func.param[ p ] ] or "" ) .. ( p ~= #func.param and "\n" or "" ) 
 			end
 			infopanel.parameters:SetText( "Parameters: " )
-			infopanel.parameterList:SetText( params )
+			infopanel.parameterList:SetText( formatText( params, true ) )
 			infopanel.parameters.Enabled = true
 			infopanel.parameterList.Enabled = true
 		elseif #func.param == 0 then
@@ -497,7 +493,7 @@ function helper.create()
 
 		if type( func.ret ) == "string" then
 			infopanel.returnvalue:SetText( "Return value: " )
-			infopanel.returnvalueList:SetText( func.ret )
+			infopanel.returnvalueList:SetText( formatText( func.ret, true ) )
 			infopanel.returnvalue.Enabled = true
 			infopanel.returnvalueList.Enabled = true
 		elseif type( func.ret ) == "table" then
@@ -508,7 +504,7 @@ function helper.create()
 				rets = rets .. count .. ". " .. ret .. "\n"
 				count = count + 1
 			end
-			infopanel.returnvalueList:SetText( rets )
+			infopanel.returnvalueList:SetText( formatText( rets, true ) )
 			infopanel.returnvalue.Enabled = true
 			infopanel.returnvalueList.Enabled = true
 		else
@@ -538,7 +534,7 @@ function helper.create()
 	helper.DocView.Info:SetTall( 150 )
 	helper.DocView.Info:SetVisible( false )
 
-	helper.DocView.InfoPanel = vgui.Create( "DPanel", helper.DocView.Info )
+	helper.DocView.InfoPanel = vgui.Create( "StarfallPanel", helper.DocView.Info )
 	helper.DocView.InfoPanel:SetSize( 200, 100 )
 	local infopanel = helper.DocView.InfoPanel
 
@@ -624,7 +620,7 @@ function helper.create()
 	helper.AboutView:SetVisible( false )
 	helper.Views.About = helper.AboutView
 
-	helper.AboutView.Panel = vgui.Create( "DPanel", helper.AboutView )
+	helper.AboutView.Panel = vgui.Create( "StarfallPanel", helper.AboutView )
 
 	helper.AboutView.About = Label( "Starfall is a Lua sandbox for Garry's mod. It allows players to write Lua scripts for the server without exposing server functionality that could be used maliciously. Since it works with Lua code directly, it's much faster than similar projects like E2 or Lemongate.\n\nStarfall by default includes a 'processor' entity, which is a purely server-side environment with an entity representation, and can have Wiremod inputs/outputs. It also includes a 'screen' entity, which runs code both on the server and each client to allow for fast, lag-free drawing that was previously only possible with GPU.\n\nThis Starfall Helper was originally made by Jazzelhawk.", helper.AboutView.Panel )
 	helper.AboutView.About:SetPos( 10, 10 )
@@ -659,8 +655,7 @@ function helper.show()
 	end
 
 	if not helper.Frame then helper.create() end
-	helper.Frame:MakePopup()
-	helper.Frame:SetVisible(true)
+	helper.Frame:open()
 end
 
 local lastw, lasth = 0, 0
