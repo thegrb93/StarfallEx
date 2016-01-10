@@ -26,43 +26,43 @@
 	</head>
 	<body>
 		<div id="editor"></div>
-		<script>//replace//</script>
+		<script src="ace/ace.js" type="text/javascript" charset="utf-8"></script>
+		<script src="ace/ext-language_tools.js"></script>
 		<script>
-			function addslashes(string) {
-				return string.replace(/\\/g, '\\\\').
-					replace(/\u0008/g, '\\b').
-					replace(/\t/g, '\\t').
-					replace(/\n/g, '\\n').
-					replace(/\f/g, '\\f').
-					replace(/\r/g, '\\r').
-					replace(/'/g, '\\\'').
-					replace(/"/g, '\\"');
-			}
-
 			ace.require("ace/ext/language_tools");
 			var editor = ace.edit("editor");
 			editor.setTheme("ace/theme/monokai");
 			editor.getSession().setMode("ace/mode/lua");
-			editor.getSession().setUseWrapMode(true);
 			editor.setShowPrintMargin(false);
 			editor.setOptions({
 				dragEnabled: false,
 				enableLiveAutocompletion: true,
-				scrollSpeed: 1,
+				enableBasicAutocompletion: true,
+				scrollSpeed: 0.5,
 				useSoftTabs: false,
-				enableMutliselect: false
+				enableMultiselect: false
 			});
 
 			editor.on("change", function(){
-				console.log("RUNLUA:SF.Editor.getActiveTab().code = \"" + addslashes(editor.getValue()) + "\"; SF.Editor.doValidation()")
+				console.copyCode(editor.getValue())
+			});
+
+			var setScrollSpeed = null;
+			setScrollSpeed = editor.on("change", function() {
+				if(editor.completer && editor.completer.popup) {
+					editor.completer.popup.setScrollSpeed(0.3)
+					editor.off("change", setScrollSpeed)
+				}
 			});
 
 			var editSessions = [];
 			libraryMap = null;
 
-			function newEditSession( code ) {
+			function newEditSession( code, settings ) {
 				var session = ace.createEditSession( code, "ace/mode/starfall" )
-				session.setUseWrapMode(true);
+				if ( settings.wrap != null ) {
+					session.setUseWrapMode( settings.wrap )
+				}
 				editSessions.push(session);
 			}
 
@@ -88,6 +88,22 @@
 					if(markers[id].clazz == "ace_error"){
 						editor.session.removeMarker(id)
 					}
+				}
+			}
+
+			var foldBinds = [
+				editor.commands.commands.fold,
+				editor.commands.commands.unfold,
+				editor.commands.commands.foldall,
+				editor.commands.commands.unfoldall,
+				editor.commands.commands.foldOther 
+			]
+
+			function setFoldKeybinds( bool ) {
+				if ( bool ) {
+					editor.commands.removeCommands( foldBinds )
+				} else {
+					editor.commands.addCommands( foldBinds )
 				}
 			}
 
@@ -183,7 +199,10 @@
 									}
 								]
 							},
-
+							{
+								token : "string",
+								regex : "\\-\\-@.*$"
+							},
 							{
 								token : "comment",
 								regex : "\\-\\-.*$"
@@ -221,6 +240,17 @@
 							}, {
 								token : "string",		   // ' string
 								regex : "'(?:[^\\\\]|\\\\.)*?'"
+							}, {
+								token : [
+									"keyword", "text", "entity.name.function", "entity.name.function", 
+									"text", "paren.lparen", "variable.parameter", "paren.rparen"
+								],
+								regex : "(function)(\\s+)((?:[a-zA-Z_]\\w*[.:])*)([a-zA-Z_]\\w*)(\\s*)(\\()([^)]*)(\\))"
+							}, {
+								token : [
+									"keyword", "text", "paren.lparen", "variable.parameter", "paren.rparen"
+								],
+								regex : "(function)(\\s*)(\\()([^)]*)(\\))"
 							}, {
 								token : "constant.numeric", // float
 								regex : floatNumber
