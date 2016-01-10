@@ -102,6 +102,8 @@ if CLIENT then
 		SF.Editor.runJS = function ( ... ) 
 			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
 		end
+		
+		SF.Editor.updateSettings ()
 
 		SF.Editor.initialized = true
 	end
@@ -610,7 +612,7 @@ if CLIENT then
 				end
 			end
 			
-			SF.Editor.updateSettings()
+			SF.Editor.updateSettings( true )
 
 			local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 			if tabs ~= nil and #tabs ~= 0 then
@@ -788,7 +790,7 @@ if CLIENT then
 		local function setDoClick ( panel )
 			function panel:OnChange ()
 				SF.Editor.saveSettings()
-				timer.Simple( 0.1, function () SF.Editor.updateSettings() end )
+				timer.Simple( 0.1, function () SF.Editor.updateSettings( true ) end )
 			end
 
 			return panel
@@ -796,7 +798,7 @@ if CLIENT then
 		local function setWang( wang, label )
 			function wang:OnValueChanged()
 				SF.Editor.saveSettings()
-				timer.Simple( 0.1, function () SF.Editor.updateSettings() end )
+				timer.Simple( 0.1, function () SF.Editor.updateSettings( true ) end )
 			end
 			wang:GetParent():DockPadding( 10, 1, 10, 1 )
 			wang:Dock( RIGHT )
@@ -1229,7 +1231,7 @@ if CLIENT then
 		RunConsoleCommand( "sf_modelviewer_posy", y )
 	end
 
-	function SF.Editor.updateSettings ()
+	function SF.Editor.updateSettings ( ace )
 		local frame = SF.Editor.editor
 		frame:SetWide( GetConVarNumber( "sf_editor_width" ) )
 		frame:SetTall( GetConVarNumber( "sf_editor_height" ) )
@@ -1251,22 +1253,24 @@ if CLIENT then
 		frame:SetTall( GetConVarNumber( "sf_modelviewer_height" ) )
 		frame:SetPos( GetConVarNumber( "sf_modelviewer_posx" ), GetConVarNumber( "sf_modelviewer_posy" ) )
 
-		local js = SF.Editor.runJS
-		js( [[
-			editSessions.forEach( function( session ) {
-				session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
-			} )
-		]] )
-		js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
-		js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
-		js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
-		js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ")" )
-		js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ")" )
-		js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
-		js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
-		js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
-		js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ")" )
-		js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ")" )
+		if ace then
+			local js = SF.Editor.runJS
+			js( [[
+				editSessions.forEach( function( session ) {
+					session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
+				} )
+			]] )
+			js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
+			js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
+			js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
+			js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ")" )
+			js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ")" )
+			js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
+			js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
+			js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
+			js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ")" )
+			js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ")" )
+		end
 	end
 
 	--- (Client) Builds a table for the compiler to use
