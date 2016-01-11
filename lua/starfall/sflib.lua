@@ -575,7 +575,7 @@ if SERVER then
 	end
 else
 	net.Receive("starfall_openeditor",function(len)		
-		if not SF.Editor.open() then return end
+		SF.Editor.open()
 		
 		local gate = net.ReadEntity()
 		
