@@ -58,7 +58,7 @@ function SF.Instance:runWithOps(func,...)
 		ok, rt = xpcall( wrapperfunc, xpcall_callback )
 	else
 		--Start measuring cpu time
-		local oldSysTime = SysTime()
+		local oldSysTime = SysTime() - self.cpu_total
 		local function cpuCheck ()
 			self.cpu_total = SysTime() - oldSysTime
 
