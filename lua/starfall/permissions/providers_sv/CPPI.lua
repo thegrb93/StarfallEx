@@ -17,6 +17,7 @@ local canTool = {
 	[ "entities.setColor" ] = true,
 	[ "entities.remove" ] = true,
 	[ "entities.emitSound" ] = true,
+	[ "entities.setRenderPropery" ] = true,
 	[ "wire.createWire" ] = true,
 	[ "wire.deleteWire" ] = true,
 	[ "constraints.weld" ] = true,
