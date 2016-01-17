@@ -303,15 +303,25 @@ end
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
 -- @param tx Texture file path, or a http url
-function render_library.getTextureID ( tx )
+-- @param cb Optional callback for when a url texture finishes loading. param1 - The texture url, param2 - The texture table
+function render_library.getTextureID ( tx, cb )
 
 	if tx:sub(1,4)=="http" then
 		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
 			return string.format( "%%%02X", string.byte( str ) )
 		end )
 		
+		local instance = SF.instance
+		
 		local tbl = {}
-		texturecache[ tbl ] = LoadURLMaterial( tx )
+		texturecache[ tbl ] = LoadURLMaterial( tx, function()
+			if cb then
+				local ok, msg, traceback = instance:runFunction( cb, tbl, tx )
+				if not ok then
+					instance:Error( msg, traceback )
+				end
+			end
+		end)
 		return tbl
 	else
 		local id = surface.GetTextureID( tx )
