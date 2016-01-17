@@ -37,9 +37,7 @@ function hook_library.run ( hookname, ... )
 	local instance = SF.instance
 	local lower = hookname:lower()
 	
-	SF.instance = nil -- Pretend we're not running an instance
 	local ret = { instance:runScriptHookForResult( lower, ... ) }
-	SF.instance = instance -- Set it back
 	
 	local ok = table.remove( ret, 1 )
 	if not ok then
@@ -81,21 +79,20 @@ function hook_library.runRemote ( recipient, ... )
 
 	local instance = SF.instance
 
-	local result = {}
+	local results = {}
 	for k, _ in pairs( recipients ) do
-		SF.instance = nil
-		result = { k:runScriptHookForResult( "remote", instance.data.entity, instance.player, ... ) }
-
+	
+		local result = { k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... ) }
 		local ok = table.remove( result, 1 )
-		if not ok then
-			if not result[ 1 ] then continue end -- Call failed because of non-existent hook. Ignore
+		
+		if ok and result[1] then
+			results[ #results + 1 ] = result
+		else
 			k:Error( "Hook 'remote' errored with " .. result[ 1 ], result[ 2 ] )
-			-- Their fault - don't return
 		end
+		
 	end
-
-	SF.instance = instance
-	return result
+	return results
 end
 
 --- Remove a hook

@@ -16,25 +16,16 @@ function wire_metamethods.onLoad ( instance )
 	end
 
 	function ent:TriggerInput ( key, value )
-		local tmp = SF.instance
-		SF.instance = nil
 		self:runScriptHook( "input", key, SF.Wire.InputConverters[ self.Inputs[ key ].Type ]( value ) )
-		SF.instance = tmp
 	end
 
 	function ent:ReadCell ( address )
-		local tmp = SF.instance
-		SF.instance = nil
 		local ret = tonumber( self:runScriptHookForResult( "readcell", address ) ) or 0
-		SF.instance = tmp
 		return ret
 	end
 
 	function ent:WriteCell ( address, data )
-		local tmp = SF.instance
-		SF.instance = nil
 		self:runScriptHook( "writecell", address, data )
-		SF.instance = tmp
 	end
 
 end
