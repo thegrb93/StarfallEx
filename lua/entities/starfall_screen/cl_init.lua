@@ -44,6 +44,8 @@ function ENT:Initialize ()
 			local instance = self.link.instance
 			local data = instance.data
 			
+			data.render.gpu = self.GPU
+			data.render.matricies = 0
 			data.render.renderEnt = self
 			data.render.isRendering = true
 			draw.NoTexture()
@@ -101,11 +103,6 @@ end
 
 function ENT:LinkEnt ( ent )
 	self.link = ent
-	
-	if ent.instance then
-		ent.instance.data.render.gpu = self.GPU
-		ent.instance.data.render.matricies = 0
-	end
 end
 
 function ENT:Draw ()

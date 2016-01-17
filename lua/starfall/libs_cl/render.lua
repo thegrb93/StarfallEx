@@ -683,7 +683,7 @@ function render_library.cursorPos( ply )
 	return nil
 end
 
---- Returns information about the screen, such as dimentions and rotation.
+--- Returns information about the screen, such as world offsets, dimentions, and rotation.
 -- Note: this does a table copy so move it out of your draw hook
 -- @return A table describing the screen.
 function render_library.getScreenInfo()
