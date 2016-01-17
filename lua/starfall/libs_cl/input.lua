@@ -101,7 +101,10 @@ local function runInputHook( hookname, scope, key )
 		if not SF.Permissions.check( instance.player, nil, "input." .. scope ) then SF.throw( "Insufficient permissions", 2 ) end
 		
 		
-		instance:runScriptHook( hookname, key )
+		local ok, err, tr = instance:runScriptHook( hookname, key )
+		if not ok then
+			instance:Error( "Hook 'input' errored with " .. err, tr )
+		end
 	end
 end
 
