@@ -60,7 +60,7 @@ if SERVER then
 
 	--- Returns a passenger of a vehicle
 	-- @server
-	-- @param passenger The number of the passenger to get
+	-- @param n The index of the passenger to get
 	-- @return amount of ammo
 	function vehicle_methods:getPassenger ( n )
 		SF.CheckType( self, vehicle_metamethods )

@@ -93,13 +93,13 @@ function SF.throw ( msg, level, uncatchable )
 	error( err )
 end
 
+SF.Types = {}
 --- Creates a type that is safe for SF scripts to use. Instances of the type
 -- cannot access the type's metatable or metamethods.
 -- @param name Name of table
 -- @param supermeta The metatable to inheret from
 -- @return The table to store normal methods
 -- @return The table to store metamethods
-SF.Types = {}
 function SF.Typedef(name, supermeta)
 	local methods, metamethods = {}, {}
 	metamethods.__metatable = name

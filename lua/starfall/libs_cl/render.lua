@@ -483,7 +483,7 @@ end
 -- @param additive If true, adds brightness to pixels behind it rather than drawing over them.
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
--- @param blue Enable blur?
+-- @param blur Enable blur?
 -- @usage
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- DebugFixed

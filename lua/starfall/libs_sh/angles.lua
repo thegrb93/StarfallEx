@@ -43,7 +43,7 @@ function ang_metamethods:__tostring ()
 end
 
 --- __mul metamethod ang1 * ang2.
--- @param a Angle to multiply by.
+-- @param n Angle to multiply by.
 -- @return resultant angle.
 function ang_metamethods:__mul ( n )
 	SF.CheckType( n, "number" )

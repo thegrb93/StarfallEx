@@ -270,14 +270,15 @@ add( "StartEntityDriving" )
 
 --- Called when a player spawns for the first time
 -- @name PlayerInitialSpawn
--- @param player Player who spawned
+-- @class hook
 -- @server
+-- @param ply Player who spawned
 
 --- Called when a player spawns
 -- @name PlayerSpawn
 -- @class hook
 -- @server
--- @param player Player who spawned
+-- @param ply Player who spawned
 
 --- Called when a players enters a vehicle
 -- @name PlayerEnteredVehicle

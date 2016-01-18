@@ -11,7 +11,7 @@ do
 end
 
 --- Gets the first key that is bound to the command passed
--- @param bind The name of the bind
+-- @param binding The name of the bind
 -- @return The id of the first key bound
 -- @return The name of the first key bound
 

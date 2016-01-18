@@ -94,25 +94,21 @@ end
 
 local argTypesToQuat = {}
 --- Converts a number to a Quaternion format for generation
--- @param args
 argTypesToQuat["number"] = function(num)
 	return quicknew(num, 0, 0, 0)
 end
 
 --- Converts 4 numbers to a Quaternion format for generation
--- @param args
 argTypesToQuat["numbernumbernumbernumber"] = function(a,b,c,d)
 	return quicknew(a,b,c,d)
 end
 
 --- Converts a Vector to a Quaternion format for generation
--- @param args
 argTypesToQuat["Vector"] = function(vec)
 	return quicknew(0, vec.x, vec.y, vec.z)
 end
 
 --- Converts an Angle to a Quaternion format for generation
--- @param args
 argTypesToQuat["Angle"] = function(ang)
 	local p, y, r = ang.p, ang.y, ang.r
 	p = p*deg2rad*0.5
@@ -125,13 +121,11 @@ argTypesToQuat["Angle"] = function(ang)
 end
 
 --- Converts a Number/Vector combination to a Quaternion format for generation
--- @param args
 argTypesToQuat["numberVector"] = function(num,vec)
 	return quicknew(num, vec.x, vec.y, vec.z) -- TODO Cannot change protect metatable? fix this
 end
 
 --- Converts two Vectors to a Quaternion format for generation using Cross product and the angle between them
--- @param args
 argTypesToQuat["VectorVector"] = function(forward,up)
 	local x = Vector(forward.x, forward.y, forward.z)
 	local z = Vector(up.x, up.y, up.z)
@@ -160,7 +154,6 @@ argTypesToQuat["VectorVector"] = function(forward,up)
 end
 
 --- Converts an Entity to a Quaternion format for generation
--- @param args Table, containing an Entity to be used at the first index.
 argTypesToQuat["Entity"] = function(ent)
 	ent = SF.UnwrapObject( ent )
 	
