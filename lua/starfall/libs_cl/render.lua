@@ -829,6 +829,18 @@ function render_library.readPixel ( x, y )
 	return SF.Color.Wrap( Color( r, g, b, 255 ) )
 end
 
+--- Returns the X resolution of the local player's screen
+-- @name render_library.scrW
+-- @class function
+-- @return the X resolution of the local player's screen
+render_library.scrW = ScrW
+
+--- Returns the Y resolution of the local player's screen
+-- @name render_library.scrH
+-- @class function
+-- @return the Y resolution of the local player's screen
+render_library.scrH = ScrH
+
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
