@@ -11,17 +11,12 @@ local wrap, unwrap = SF.CreateWrapper( ents_metamethods, true, true, debug.getre
 
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 
---- Entities Library
--- @shared
-local ents_lib, _ = SF.Libraries.Register( "entities" )
-
 -- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = wrap
 SF.Entities.Unwrap = unwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
-SF.Entities.Library = ents_lib
 
 --- Returns true if valid and is not the world, false if not
 -- @param entity Entity to check
@@ -39,30 +34,21 @@ local getPhysObject = SF.Entities.GetPhysObject
 
 -- ------------------------- Library functions ------------------------- --
 
---- Returns the entity representing a processor that this script is running on.
--- May be nil
--- @return Starfall entity
-function ents_lib.self ()
+function SF.DefaultEnvironment.self ()
 	local ent = SF.instance.data.entity
 	if ent then 
 		return SF.Entities.Wrap( ent )
-	else return nil end
+	end
 end
 
---- Returns whoever created the script
--- @return Owner entity
-function ents_lib.owner ()
+function SF.DefaultEnvironment.owner ()
 	return SF.WrapObject( SF.instance.player )
 end
 
---- Same as ents_lib.owner() on the server. On the client, returns the local player
--- @name ents_lib.player
--- @class function
--- @return Either the owner (server) or the local player (client)
 if SERVER then
-	ents_lib.player = ents_lib.owner
+	SF.DefaultEnvironment.player = SF.DefaultEnvironment.owner
 else
-	function ents_lib.player ()
+	function SF.DefaultEnvironment.player ()
 		return SF.WrapObject( LocalPlayer() )
 	end
 	
@@ -98,12 +84,7 @@ else
 	end)
 end
 
---- Returns the entity with index 'num'
--- @name ents_lib.entity
--- @class function
--- @param num Entity index
--- @return entity
-function ents_lib.entity ( num )
+function SF.DefaultEnvironment.entity ( num )
 	SF.CheckType( num, "number" )
 	
 	return SF.WrapObject( Entity( num ) )

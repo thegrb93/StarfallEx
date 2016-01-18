@@ -23,6 +23,31 @@ local function pascalToCamel ( t, r )
 	return r
 end
 
+--- Returns the entity representing a processor that this script is running on.
+-- @name SF.DefaultEnvironment.self
+-- @class function
+-- @return Starfall entity
+SF.DefaultEnvironment.self = nil
+
+--- Returns whoever created the chip
+-- @name SF.DefaultEnvironment.owner
+-- @class function
+-- @return Owner entity
+SF.DefaultEnvironment.owner = nil
+
+--- Same as owner() on the server. On the client, returns the local player
+-- @name SF.DefaultEnvironment.player
+-- @class function
+-- @return Either the owner (server) or the local player (client)
+SF.DefaultEnvironment.player = nil
+
+--- Returns the entity with index 'num'
+-- @name SF.DefaultEnvironment.entity
+-- @class function
+-- @param num Entity index
+-- @return entity
+SF.DefaultEnvironment.entity = nil
+
 --- Same as Lua's tostring
 -- @name SF.DefaultEnvironment.tostring
 -- @class function
