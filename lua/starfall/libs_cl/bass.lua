@@ -100,8 +100,8 @@ end
 
 --- Starts to play the sound.
 function bass_methods:play ()
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 	
@@ -112,8 +112,8 @@ end
 
 --- Stops playing the sound.
 function bass_methods:stop ( )
-	local uw =  unwrap( self )
 	SF.CheckType( self, bass_metamethods )
+	local uw =  unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 	
@@ -125,9 +125,9 @@ end
 --- Sets the volume of the sound.
 -- @param vol Volume to set to, between 0 and 1.
 function bass_methods:setVolume ( vol )
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
 	SF.CheckType( vol, "number" )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
@@ -139,9 +139,9 @@ end
 --- Sets the pitch of the sound.
 -- @param pitch Pitch to set to, between 0 and 3.
 function bass_methods:setPitch ( pitch )
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
 	SF.CheckType( pitch, "number" )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
@@ -153,9 +153,9 @@ end
 --- Sets the position of the sound
 -- @param pos Where to position the sound
 function bass_methods:setPos ( pos )
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
 	SF.CheckType( pos, SF.Types[ "Vector" ] )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
@@ -168,8 +168,8 @@ end
 -- @param min The channel's volume is at maximum when the listener is within this distance
 -- @param max The channel's volume stops decreasing when the listener is beyond this distance.
 function bass_methods:setFade ( min, max )
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
@@ -181,8 +181,8 @@ end
 --- Sets if the sound should loop or not.
 -- @param loop Boolean if the sound should loop or not.
 function bass_methods:setLooping ( loop )
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
@@ -194,13 +194,29 @@ end
 --- Gets the length of a sound
 -- @return Length in seconds of the sound
 function bass_methods:getLength ()
-	local uw = unwrap( self )
 	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
 		
 	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	if IsValid(uw) then
 		return uw:GetLength()
+	end
+end
+
+--- Gets the FFT of a sound
+-- @param n Sample size of the hamming window. Must be power of 2
+-- @return FFT table of the sound
+function bass_methods:getFFT ( n )
+	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if IsValid(uw) then
+		local arr = {}
+		uw:FFT( arr, n )
+		return arr
 	end
 end
 
