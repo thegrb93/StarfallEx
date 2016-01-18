@@ -136,14 +136,14 @@ local function run ( hookname, customfunc, ... )
 	for instance,_ in pairs( registered_instances ) do
 		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
 		
-		local ok = table.remove( ret, 1 )
+		local ok = ret[1]
 		if ok then
 			if customfunc then
-				local sane = customfunc( instance, ret, ... )
-				result = sane ~= nil and { sane } or result
+				local sane = customfunc( instance, {unpack(ret, 2)}, ... )
+				if sane ~= nil then result = { sane } end
 			end
 		else
-			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[ 1 ], ret[ 2 ] )
+			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[ 2 ], ret[ 3 ] )
 		end
 	end
 	return unpack( result )
