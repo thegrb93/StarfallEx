@@ -3,11 +3,15 @@
 -- @server
 local constraint_library, constraint_library_metamethods = SF.Libraries.Register("constraint")
 
-local ents_metatable = SF.Entities.Metatable
-local vunwrap = SF.UnwrapObject
-local eunwrap = SF.Entities.Unwrap
 local vwrap = SF.WrapObject
-local ewrap = SF.Entities.Wrap
+local vunwrap = SF.UnwrapObject
+local ewrap, eunwrap, ents_metatable
+
+SF.Libraries.AddHook("postload", function()
+	ewrap = SF.Entities.Wrap
+	eunwrap = SF.Entities.Unwrap
+	ents_metatable = SF.Entities.Metatable
+end)
 
 local function checkConstraint(e, t)
 	if e then
