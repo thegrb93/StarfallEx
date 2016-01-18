@@ -7,6 +7,7 @@ local timer = timer
 --- Deals with time and timers.
 -- @shared
 local timer_library, _ = SF.Libraries.Register("timer")
+local max_timers = CreateConVar( "sf_maxtimers", "200", {FCVAR_ARCHIVE,FCVAR_REPLICATED}, "The max number of timers that can be created" )
 
 -- ------------------------- Time ------------------------- --
 
@@ -33,7 +34,13 @@ end
 -- ------------------------- Timers ------------------------- --
 
 local function mangle_timer_name(instance, name)
-	return string.format("sftimer_%s_%s",tostring(instance),name)
+	return "sftimer_"..tostring(instance).."_"..name
+end
+
+local simple_int = 0
+local function mangle_simpletimer_name(instance)
+	simple_int = simple_int + 1
+	return "sftimersimple_"..tostring(instance).."_"..simple_int
 end
 
 --- Creates (and starts) a timer
@@ -41,16 +48,31 @@ end
 -- @param delay The time, in seconds, to set the timer to.
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
 -- @param func The function to call when the tiemr is fired
-function timer_library.create(name, delay, reps, func)
+function timer_library.create(name, delay, reps, func, simple)
 	SF.CheckType(name,"string")
 	SF.CheckType(delay,"number")
 	reps = SF.CheckType(reps,"number",0,1)
 	SF.CheckType(func,"function")
 	
 	local instance = SF.instance
-	local timername = mangle_timer_name(instance,name)
+	if instance.data.timer_count > max_timers:GetInt() then SF.throw( "Max timers exceeded!", 2 ) end
+	instance.data.timer_count = instance.data.timer_count + 1
+	
+	local timername
+	if simple then
+		timername = mangle_simpletimer_name(instance)
+	else
+		timername = mangle_timer_name(instance,name)
+	end
 	
 	local function timercb()
+		if reps ~= 0 then
+			reps = reps - 1
+			if reps==0 then
+				instance.data.timer_count = instance.data.timer_count - 1
+			end
+		end
+		
 		local ok, msg, traceback = instance:runFunction(func)
 		if not ok then
 			instance:Error( msg, traceback )
@@ -61,6 +83,13 @@ function timer_library.create(name, delay, reps, func)
 	timer.Create(timername, delay, reps, timercb )
 	
 	instance.data.timers[name] = true
+end
+
+--- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
+-- @param delay the time, in second, to set the timer to
+-- @param func the function to call when the timer is fired
+function timer_library.simple(delay, func)
+	timer_library.create("", delay, 1, func, true)
 end
 
 --- Removes a timer
@@ -124,26 +153,9 @@ function timer_library.unpause(name)
 end
 
 
---- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
--- @param delay the time, in second, to set the timer to
--- @param func the function to call when the timer is fired
-function timer_library.simple(delay, func)
-	SF.CheckType( delay, "number" )
-	SF.CheckType( func, "function" )
-	
-	local instance = SF.instance
-	timer.Simple(delay, function()
-		if IsValid(instance.data.entity) and not instance.error then
-			local ok, msg, traceback = instance:runFunction(func)
-			if not ok then
-				instance:Error( "simple timer errored with: " .. msg, traceback )
-			end
-		end
-	end)
-end
-
 SF.Libraries.AddHook("initialize",function(instance)
 	instance.data.timers = {}
+	instance.data.timer_count = 0
 end)
 
 SF.Libraries.AddHook("deinitialize",function(instance)
