@@ -200,7 +200,8 @@ if SERVER then
 	
 else
 	-- Client hooks
-	-- todo
+	add( "StartChat", function() end )
+	add( "FinishChat", function() end )
 end
 
 -- Shared hooks
@@ -450,3 +451,13 @@ add( "StartEntityDriving" )
 -- @name Initialize
 -- @class hook
 -- @server
+
+--- Called when the local player opens their chat window.
+-- @name StartChat
+-- @class hook
+-- @client
+
+--- Called when the local player closes their chat window.
+-- @name FinishChat
+-- @class hook
+-- @client
