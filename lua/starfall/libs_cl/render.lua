@@ -64,12 +64,16 @@ SF.Libraries.AddHook( "cleanup", function ( instance )
 	end
 end )
 
+
+SF.Libraries.AddHook("initialize",function(instance)
+	instance.data.rendertargets = {}
+	instance.data.rendertargetcount = 0
+end)
+
 SF.Libraries.AddHook( "deinitialize", function ( instance )
-	local data = instance.data.render
-	if data.rendertargets then
-		for k, v in pairs( data.rendertargets ) do
-			globalRTs[ v ][ 2 ] = true -- mark as available
-		end
+	local data = instance.data
+	for k, v in pairs( data.rendertargets ) do
+		globalRTs[ v ][ 2 ] = true -- mark as available
 	end
 end )
 
@@ -132,6 +136,17 @@ local function CheckURLDownloads()
 	end
 end
 
+
+local function sfCreateMaterial( name )
+	return CreateMaterial( name, "UnlitGeneric", {
+				[ "$nolod" ] = 1,
+				[ "$ignorez" ] = 1,
+				[ "$vertexcolor" ] = 1,
+				[ "$vertexalpha" ] = 1
+			} )
+end
+
+
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } ) 
 
 local function LoadURLMaterial( url, cb )
@@ -150,13 +165,7 @@ local function LoadURLMaterial( url, cb )
 		return
 	end
 	
-	local ShaderInfo = {
-		["$vertexcolor"] = 1,
-		["$vertexalpha"] = 1,
-		["$ignorez"] = 1,
-		["$nolod"] = 1
-	}
-	local urlmaterial = CreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()), "UnlitGeneric", ShaderInfo)
+	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()))
 				
 	if queuesize == 0 then
 		timer.Create("SF_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
@@ -327,12 +336,7 @@ function render_library.getTextureID ( tx, cb )
 		local id = surface.GetTextureID( tx )
 		if id then
 			local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
-			local cacheentry = CreateMaterial( "SF_TEXTURE_" .. id, "UnlitGeneric", {
-				[ "$nolod" ] = 1,
-				[ "$ignorez" ] = 1,
-				[ "$vertexcolor" ] = 1,
-				[ "$vertexalpha" ] = 1
-			} )
+			local cacheentry = sfCreateMaterial( "SF_TEXTURE_" .. id )
 			cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
 			
 			local tbl = {}
@@ -349,10 +353,25 @@ function render_library.setTexture ( id )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if id and texturecache[ id ] then
 		surface.SetMaterial( texturecache[ id ] )
-		return
+	else
+		draw.NoTexture()
+	end
+end
+
+local GPU_Material = sfCreateMaterial( "SF_Materal_From_Screen" )
+--- Sets the texture of a screen entity
+-- @param ent Screen entity
+function render_library.setTextureFromScreen ( ent )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+
+	ent = SF.Entities.Unwrap( ent )
+	if IsValid( ent ) and ent.GPU and ent.GPU.RT then
+		GPU_Material:SetTexture("$basetexture", ent.GPU.RT)
+		surface.SetMaterial( GPU_Material )
+	else
+		draw.NoTexture()
 	end
 
-	draw.NoTexture()
 end
 
 --- Clears the surface
@@ -720,8 +739,6 @@ function render_library.createRenderTarget ( name )
 	SF.CheckType( name, "string" )
 
 	local data = SF.instance.data.render
-	data.rendertargets = data.rendertargets or {}
-	data.rendertargetcount = data.rendertargetcount or 0
 
 	if data.rendertargetcount >= 2 then
 		SF.throw( "Rendertarget limit reached", 2 )
@@ -732,7 +749,7 @@ function render_library.createRenderTarget ( name )
 	if not rt then
 		globalRTcount = globalRTcount + 1
 		rtname = "Starfall_CustomRT_" .. globalRTcount
-		rt = { GetRenderTarget( rtname, 1024, 1024, false ) }
+		rt = { GetRenderTarget( rtname, 1024, 1024, false ), false, sfCreateMaterial( rtname ) }
 		globalRTs[ rtname ] = rt
 	end
 	rt[ 2 ] = false
@@ -774,21 +791,16 @@ end
 function render_library.setRenderTargetTexture ( name )
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if not name then
-		draw.NoTexture()
-	else
-		SF.CheckType( name, "string" )
-		local rtname = data.rendertargets[ name ]
-		local rt = globalRTs[ rtname ][ 1 ]
-		local mat = globalRTs[ rtname ][ 2 ] or CreateMaterial( rtname, "UnlitGeneric", {
-			[ "$nolod" ] = 1,
-			[ "$ignorez" ] = 1,
-			[ "$vertexcolor" ] = 1,
-			[ "$vertexalpha" ] = 1
-		} )
-		mat:SetTexture( "$basetexture", rt )
+	SF.CheckType( name, "string" )
+	
+	local rtname = data.rendertargets[ name ]
+	if rtname and globalRTs[ rtname ] then
+		local mat = globalRTs[ rtname ][ 3 ]
+		mat:SetTexture( "$basetexture", globalRTs[ rtname ][ 1 ] )
 		surface.SetMaterial( mat )
 	end
+	
+	draw.NoTexture()
 end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
