@@ -51,7 +51,7 @@ local matrix_stack = {}
 local globalRTs = {}
 local globalRTcount = 0
 
-SF.Libraries.AddHook( "prepare", function ( instance )
+SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	if hook == "render" then
 		currentcolor = Color(0,0,0,0)
 	end
