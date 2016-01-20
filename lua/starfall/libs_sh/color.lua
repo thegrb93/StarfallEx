@@ -11,6 +11,7 @@ SF.Color.Metatable = color_metatable
 SF.Color.Wrap = wrap
 SF.Color.Unwrap = unwrap
 
+local dgetmeta = debug.getmetatable
 --- Same as the Gmod Color type
 -- @name SF.DefaultEnvironment.Color
 -- @class function
@@ -67,16 +68,41 @@ function color_metatable:__eq ( c )
 	return unwrap( self ):__eq( unwrap( c ) )
 end
 
+--- multiplication metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Scaled color.
+function color_metatable.__mul ( lhs, rhs )
+	if dgetmeta( lhs ) == color_metatable then
+		SF.CheckType( rhs, "number" )
+		local c = unwrap( lhs )
+		return wrap( Color( c.r * rhs, c.g * rhs, c.b * rhs, c.a * rhs ) )
+	else
+		SF.CheckType( lhs, "number" )
+		local c = unwrap( rhs )
+		return wrap( Color( c.r * lhs, c.g * lhs, c.b * lhs, c.a * lhs ) )
+	end
+end
+
+--- division metamethod
+-- @param rhs Right side of equation
+-- @return Scaled color.
+function color_metatable:__div ( rhs )
+	SF.CheckType( rhs, "number" )
+	local c = unwrap( self )
+	return wrap( Color( c.r / rhs, c.g / rhs, c.b / rhs, c.a / rhs ) )
+end
+
 --- Converts the color from RGB to HSV.
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:rgbToHSV ()
-	return ColorToHSV( unwrap( self ) )
+	return wrap( ColorToHSV( unwrap( self ) ) )
 end
 
 --- Converts the color from HSV to RGB.
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:hsvToRGB ()
-	return HSVToColor( self.r, self.g, self.b )
+	return wrap( HSVToColor( self.r, self.g, self.b ) )
 end

@@ -14,6 +14,8 @@ SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods
 
+local dgetmeta = debug.getmetatable
+
 --- __newindex metamethod
 function vec_metamethods.__newindex ( t, k, v )
 	if type( k ) == "number" then
@@ -49,11 +51,17 @@ function vec_metamethods:__tostring ()
 end
 
 --- multiplication metamethod
--- @param n Scalar to multiply against vector
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
 -- @return Scaled vector.
-function vec_metamethods:__mul ( n )
-	SF.CheckType( n, "number" )
-	return wrap( unwrap( self ):__mul( n ) )
+function vec_metamethods.__mul ( lhs, rhs )
+	if dgetmeta( lhs ) == vec_metamethods then
+		SF.CheckType( rhs, "number" )
+		return wrap( unwrap( lhs ) * rhs )
+	else
+		SF.CheckType( lhs, "number" )
+		return wrap( unwrap( rhs ) * lhs )
+	end
 end
 
 --- division metamethod
