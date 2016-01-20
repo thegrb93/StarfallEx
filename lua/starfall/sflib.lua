@@ -540,13 +540,7 @@ if SERVER then
 	end)
 
 	function SF.AddNotify ( ply, msg, notifyType, duration, sound )
-
-		-- If the first arg is a string, it can't be a player, so shift all values.
-		if type( ply ) == "string" then
-			ply, msg, notifyType, duration, sound = nil, ply, msg, notifyType, duration
-		end
-
-		if ply and not IsValid( ply ) then return end
+		if not IsValid( ply ) then return end
 
 		net.Start( "starfall_addnotify" )
 		net.WriteString( msg )
@@ -561,17 +555,9 @@ if SERVER then
 	end
 
 	function SF.Print ( ply, msg )
-		if type( ply ) == "string" then
-			ply, msg = nil, ply
-		end
-
 		net.Start( "starfall_console_print" )
 			net.WriteString( msg )
-		if ply then
-			net.Send( ply )
-		else
-			net.Broadcast()
-		end
+		net.Send( ply )
 	end
 else
 	net.Receive("starfall_openeditor",function(len)		
@@ -668,7 +654,9 @@ else
 	end )
 
 	net.Receive( "starfall_console_print", function ()
-		print( net.ReadString() )
+		local msg = net.ReadString()
+		print( msg )
+		SetClipboardText( msg )
 	end )
 end
 
