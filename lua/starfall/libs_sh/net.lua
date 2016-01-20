@@ -303,6 +303,31 @@ function net_library.bytesWritten()
 	return net.BytesWritten()
 end
 
+-- Writes a chunk of binary data to the message
+-- @shared
+-- @param s The binary data to be sent
+-- @param n The length of the binary data to be sent, in bytes
+
+function net_library.writeData( s, n )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( s, "string" )
+	SF.CheckType( n, "number" )
+
+	write( instance, "Data", s, n )
+	return true
+end
+
+-- Reads a chunk of binary data from the message
+-- @shared
+-- @param n The length of the data to be read, in bytes
+
+function net_library.readData( n )
+	SF.CheckType( n, "number" )
+	return net.ReadData( n )
+end
+
 --- Checks whether you can currently send a net message
 -- @return A boolean that states whether or not you can currently send a net message
 
