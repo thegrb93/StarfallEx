@@ -58,10 +58,14 @@ function bass_library.loadFile ( path, flags, callback )
 				instance:Error( msg, traceback )
 			end
 		else
-			instance.data.bass.sounds[ snd ] = true
-			local ok, msg, traceback = instance:runFunction( callback, wrap( snd ), 0, "" )
-			if not ok then
-				instance:Error( msg, traceback )
+			if instance.error then
+				snd:Stop()
+			else
+				instance.data.bass.sounds[ snd ] = true
+				local ok, msg, traceback = instance:runFunction( callback, wrap( snd ), 0, "" )
+				if not ok then
+					instance:Error( msg, traceback )
+				end
 			end
 		end
 	end)
@@ -87,10 +91,14 @@ function bass_library.loadURL ( path, flags, callback )
 				instance:Error( msg, traceback )
 			end
 		else
-			instance.data.bass.sounds[ snd ] = true
-			local ok, msg, traceback = instance:runFunction( callback, wrap( snd ), 0, "" )
-			if not ok then
-				instance:Error( msg, traceback )
+			if instance.error then
+				snd:Stop()
+			else
+				instance.data.bass.sounds[ snd ] = true
+				local ok, msg, traceback = instance:runFunction( callback, wrap( snd ), 0, "" )
+				if not ok then
+					instance:Error( msg, traceback )
+				end
 			end
 		end
 	end)
