@@ -1,11 +1,13 @@
 include( "shared.lua" )
 
+DEFINE_BASECLASS( "base_gmodentity" )
+
 ENT.RenderGroup = RENDERGROUP_OPAQUE
 
 local context = SF.CreateContext( nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"} )
 
 function ENT:Initialize()
-	self.BaseClass.Initialize( self )
+    self:SetRenderBounds( self:OBBMins(), self:OBBMaxs() )
 
 	net.Start( "starfall_processor_download" )
 		net.WriteEntity( self )
@@ -13,12 +15,12 @@ function ENT:Initialize()
 end
 
 function ENT:GetOverlayText ()
-    local message = baseclass.Get( "base_gmodentity" ).GetOverlayText( self )
+    local message = BaseClass.GetOverlayText( self )
     return message or ""
 end
 
 function ENT:Draw ()
-    self.BaseClass.Draw( self )
+    BaseClass.Draw( self )
     self:DrawModel()
     if self:BeingLookedAtByLocalPlayer() then
         AddWorldTip( self:EntIndex(), self:GetOverlayText(), 0.5, self:GetPos(), self )
@@ -26,7 +28,7 @@ function ENT:Draw ()
 end
 
 function ENT:Think ()
-	self.BaseClass.Think( self )
+	BaseClass.Think( self )
 	
 	if self.instance and not self.instance.error then
 		local bufferAvg = self.instance:movingCPUAverage()

@@ -8,6 +8,9 @@ local vehiclelinks = setmetatable({}, {__mode="k"})
 
 function ENT:Initialize ()
 	self.BaseClass.Initialize( self )
+	self:PhysicsInit( SOLID_VPHYSICS )
+	self:SetMoveType( MOVETYPE_VPHYSICS )
+	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 end
 

@@ -13,7 +13,9 @@ function ENT:UpdateState ( state )
 end
 
 function ENT:Initialize ()
-	self.BaseClass.Initialize( self )
+	self:PhysicsInit( SOLID_VPHYSICS )
+	self:SetMoveType( MOVETYPE_VPHYSICS )
+	self:SetSolid( SOLID_VPHYSICS )
 	
 	self:UpdateState( "Inactive ( No code )" )
 	self:SetColor( Color( 255, 0, 0, self:GetColor().a ) )
@@ -160,13 +162,6 @@ function ENT:Compile(files, mainfile)
 	self:runScriptHook( "initialize" )
 end
 
-function ENT:Error ( msg, traceback )
-	self.BaseClass.Error( self, msg, traceback )
-
-	self:UpdateState( "Inactive (Error)" )
-	self:SetColor( Color( 255, 0, 0, 255 ) )
-end
-
 local i = 0
 function ENT:Think ()
 	self.BaseClass.Think( self )
@@ -189,6 +184,32 @@ function ENT:Think ()
 	self:NextThink( CurTime() )
 	return true
 end
+
+function ENT:PreEntityCopy ()
+	local i = self:BuildDupeInfo()
+	if i then
+		if self.EntityMods then
+			self.EntityMods.SFDupeInfo = nil
+		end
+		duplicator.StoreEntityModifier( self, "SFDupeInfo", i )
+	end
+end
+
+local function EntityLookup(CreatedEntities)
+	return function(id, default)
+		if id == nil then return default end
+		if id == 0 then return game.GetWorld() end
+		local ent = CreatedEntities[id] or (isnumber(id) and ents.GetByIndex(id))
+		if IsValid(ent) then return ent else return default end
+	end
+end
+
+function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
+	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
+		ent:ApplyDupeInfo( ply, ent, ent.EntityMods.SFDupeInfo, EntityLookup(CreatedEntities) )
+	end
+end
+
 
 function ENT:BuildDupeInfo ()
 	local info = WireLib.BuildDupeInfo(self)

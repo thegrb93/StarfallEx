@@ -1,9 +1,9 @@
 ENT.Type            = "anim"
-ENT.Base            = "base_starfall_entity"
+ENT.Base            = "base_gmodentity"
 
-ENT.PrintName       = "Starfall Screen"
-ENT.Author          = "Colonel Thirty Two"
-ENT.Contact         = "initrd.gz@gmail.com"
+ENT.PrintName       = "Starfall HUD"
+ENT.Author          = "-|Sparky|-"
+ENT.Contact         = ""
 ENT.Purpose         = ""
 ENT.Instructions    = ""
 

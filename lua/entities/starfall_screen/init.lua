@@ -5,6 +5,9 @@ include('shared.lua')
 
 function ENT:Initialize ()
 	self.BaseClass.Initialize( self )
+	self:PhysicsInit( SOLID_VPHYSICS )
+	self:SetMoveType( MOVETYPE_VPHYSICS )
+	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 end
 
@@ -35,7 +38,7 @@ function ENT:LinkEnt ( ent, ply )
 end
 
 function ENT:BuildDupeInfo ()
-	local info = self.BaseClass.BuildDupeInfo( self ) or {}
+	local info = {}
 
 	if IsValid(self.link) then
 		info.link = self.link:EntIndex()
@@ -45,8 +48,6 @@ function ENT:BuildDupeInfo ()
 end
 
 function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )
-	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
-	
 	if info.link then
 		local e = GetEntByID( info.link )
 		if IsValid( e ) then

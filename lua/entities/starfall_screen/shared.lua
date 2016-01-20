@@ -1,5 +1,5 @@
 ENT.Type            = "anim"
-ENT.Base            = "base_starfall_entity"
+ENT.Base            = "base_gmodentity"
 
 ENT.PrintName       = "Starfall Screen"
 ENT.Author          = "Colonel Thirty Two"
