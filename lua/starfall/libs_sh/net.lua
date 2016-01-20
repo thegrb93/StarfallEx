@@ -321,7 +321,7 @@ end
 
 -- Reads a chunk of binary data from the message
 -- @shared
--- @param n The length of the data to be read, in bytes
+-- @param n The length of the binary data to be read, in bytes
 
 function net_library.readData( n )
 	SF.CheckType( n, "number" )
