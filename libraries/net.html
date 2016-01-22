@@ -376,6 +376,59 @@
 
 </ul>
 
+<h1>Examples</h1>
+<ul>
+
+	<li>
+		<a href="../examples/fireplace.lua.html">fireplace.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/coroutine.lua.html">coroutine.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/include.lua.html">include.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/console.lua.html">console.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/class.lua.html">class.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/sync.lua.html">sync.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/music_player.lua.html">music_player.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/included.lua.html">included.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/helloworld.lua.html">helloworld.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
+	</li>
+
+</ul>
+
 <!-- File list -->
 
 
@@ -402,21 +455,21 @@ Net message library. Used for sending data from the server to the client and bac
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#net_library.bytesWritten">bytesWritten</a>&nbsp;()</td>
+	<td class="name" nowrap><a href="#net_library.getBytesLeft">getBytesLeft</a>&nbsp;()</td>
 	<td class="summary">
-Gets the amount of bytes written so far </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#net_library.canSend">canSend</a>&nbsp;()</td>
-	<td class="summary">
-Checks whether you can currently send a net message </td>
+Returns available bandwidth in bytes </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#net_library.readBit">readBit</a>&nbsp;()</td>
 	<td class="summary">
 Reads a bit from the net message </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#net_library.readData">readData</a>&nbsp;(n)</td>
+	<td class="summary">
+Reads a string from the net message </td>
 	</tr>
 
 	<tr>
@@ -444,12 +497,6 @@ Reads a string from the net message </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#net_library.readTable">readTable</a>&nbsp;()</td>
-	<td class="summary">
-Reads a table from the net message </td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#net_library.readUInt">readUInt</a>&nbsp;(n)</td>
 	<td class="summary">
 Reads an unsigned integer from the net message </td>
@@ -474,6 +521,12 @@ Writes a bit to the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.writeData">writeData</a>&nbsp;(t, n)</td>
+	<td class="summary">
+Writes string containing null characters to the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.writeDouble">writeDouble</a>&nbsp;(t)</td>
 	<td class="summary">
 Writes a double to the net message </td>
@@ -494,13 +547,7 @@ Writes an integer to the net message </td>
 	<tr>
 	<td class="name" nowrap><a href="#net_library.writeString">writeString</a>&nbsp;(t)</td>
 	<td class="summary">
-Writes a string to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#net_library.writeTable">writeTable</a>&nbsp;(t)</td>
-	<td class="summary">
-Writes a table to the net message </td>
+Writes a string to the net message.</td>
 	</tr>
 
 	<tr>
@@ -527,10 +574,10 @@ Writes an unsigned integer to the net message </td>
 
 
 
-<dt><a name="net_library.bytesWritten"></a><strong>net_library.bytesWritten</strong>&nbsp;()</dt>
+<dt><a name="net_library.getBytesLeft"></a><strong>net_library.getBytesLeft</strong>&nbsp;()</dt>
 <dd>
 
-Gets the amount of bytes written so far
+Returns available bandwidth in bytes
 
 
 
@@ -541,32 +588,7 @@ Gets the amount of bytes written so far
 
 
 <h3>Return value:</h3>
-<ul>The amount of bytes written so far</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="net_library.canSend"></a><strong>net_library.canSend</strong>&nbsp;()</dt>
-<dd>
-
-Checks whether you can currently send a net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>A boolean that states whether or not you can currently send a net message</ul>
+<ul>number of bytes that can be sent</ul>
 
 
 
@@ -592,6 +614,40 @@ Reads a bit from the net message
 
 <h3>Return value:</h3>
 <ul>The bit that was read. (0 for false, 1 for true)</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.readData"></a><strong>net_library.readData</strong>&nbsp;(n)</dt>
+<dd>
+
+Reads a string from the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>n</em></code>: How many characters are in the data
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The string that was read</ul>
 
 
 
@@ -701,31 +757,6 @@ Reads a string from the net message
 
 <h3>Return value:</h3>
 <ul>The string that was read</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="net_library.readTable"></a><strong>net_library.readTable</strong>&nbsp;()</dt>
-<dd>
-
-Reads a table from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The table that was read</ul>
 
 
 
@@ -863,6 +894,41 @@ Writes a bit to the net message
 
 
 
+<dt><a name="net_library.writeData"></a><strong>net_library.writeData</strong>&nbsp;(t, n)</dt>
+<dd>
+
+Writes string containing null characters to the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>t</em></code>: The string to be written
+	</li>
+	
+	<li>
+	  <code><em>n</em></code>: How much of the string to write
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.writeDouble"></a><strong>net_library.writeDouble</strong>&nbsp;(t)</dt>
 <dd>
 
@@ -963,7 +1029,7 @@ Writes an integer to the net message
 <dt><a name="net_library.writeString"></a><strong>net_library.writeString</strong>&nbsp;(t)</dt>
 <dd>
 
-Writes a string to the net message
+Writes a string to the net message. Null characters will terminate the string.
 
 
 
@@ -973,37 +1039,6 @@ Writes a string to the net message
 	
 	<li>
 	  <code><em>t</em></code>: The string to be written
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="net_library.writeTable"></a><strong>net_library.writeTable</strong>&nbsp;(t)</dt>
-<dd>
-
-Writes a table to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>t</em></code>: The table to be written. This will be checked for blacklisted types. eg VMatrix.
 	</li>
 	
 </ul>

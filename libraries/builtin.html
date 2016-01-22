@@ -376,6 +376,59 @@
 
 </ul>
 
+<h1>Examples</h1>
+<ul>
+
+	<li>
+		<a href="../examples/fireplace.lua.html">fireplace.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/coroutine.lua.html">coroutine.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/include.lua.html">include.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/console.lua.html">console.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/class.lua.html">class.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/sync.lua.html">sync.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/music_player.lua.html">music_player.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/included.lua.html">included.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/helloworld.lua.html">helloworld.lua</a>
+	</li>
+
+	<li>
+		<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
+	</li>
+
+</ul>
+
 <!-- File list -->
 
 
@@ -405,6 +458,12 @@ Built in values. These don't need to be loaded; they are in the default environm
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.assert">assert</a>&nbsp;(condition, msg)</td>
 	<td class="summary">
 Same as Lua's assert.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.chip">chip</a>&nbsp;()</td>
+	<td class="summary">
+Returns the entity representing a processor that this script is running on.</td>
 	</tr>
 
 	<tr>
@@ -545,12 +604,6 @@ Runs an included script and caches the result.</td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.requiredir">requiredir</a>&nbsp;(dir, loadpriority)</td>
 	<td class="summary">
 Runs an included script and caches the result.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.self">self</a>&nbsp;()</td>
-	<td class="summary">
-Returns the entity representing a processor that this script is running on.</td>
 	</tr>
 
 	<tr>
@@ -710,6 +763,31 @@ Same as Lua's assert.
 
 
 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.chip"></a><strong>SF.DefaultEnvironment.chip</strong>&nbsp;()</dt>
+<dd>
+
+Returns the entity representing a processor that this script is running on.
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Starfall entity</ul>
 
 
 
@@ -1472,31 +1550,6 @@ Works pretty much like standard Lua require()
 
 <h3>Return value:</h3>
 <ul>Table of return values of the scripts</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="SF.DefaultEnvironment.self"></a><strong>SF.DefaultEnvironment.self</strong>&nbsp;()</dt>
-<dd>
-
-Returns the entity representing a processor that this script is running on.
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Starfall entity</ul>
 
 
 
