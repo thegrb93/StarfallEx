@@ -487,8 +487,15 @@ function file (filepath, doc)
 	end)
 	
 	if valid then
-		logger:info(string.format("processing file `%s'", filepath))
-		doc = parse_file(filepath, doc)
+		-- Check if the file is an example file
+		if string.find(filepath, "/examples/") then
+			local name = fix_filepath(filepath):sub(10)
+			local f = io.open(filepath, "r")
+			doc.examples[name] = f:read("*all")
+		else
+			logger:info(string.format("processing file `%s'", filepath))
+			doc = parse_file(filepath, doc)
+		end
 	end
 	
 	return doc
@@ -543,13 +550,15 @@ function start (files, doc)
 		libraries = {},
 		hooks = {},
 		directives = {},
-		classes = {}
+		classes = {},
+		examples = {}
 	}
 	assert( doc.files, "undefined `files' field" )
 	assert( doc.libraries, "undefined `libraries' field" )
 	assert( doc.hooks, "undefined `hooks' field" )
 	assert( doc.directives, "undefined `directives' field" )
 	assert( doc.classes, "undefined `classes' field" )
+	assert( doc.examples, "undefined `examples' field" )
 	
 	table.foreachi(files, function (_, path)
 		local mode, err = lfs.attributes(path, "mode")
@@ -570,6 +579,7 @@ function start (files, doc)
 	recsort( doc.hooks )
 	recsort( doc.directives )
 	recsort( doc.classes )
+	recsort( doc.examples )
 
 	return doc
 end

@@ -186,6 +186,21 @@ function helper.create()
 
 		return height
 	end )
+	
+	createList( "Examples", function( List )
+		local height = 16
+		for name, code in pairs(SF.Docs.examples) do
+			local Line = List:AddLine( name )
+			height = height + 17
+		end
+
+		function List:OnRowSelected( LineID, Line )
+			helper.openView( "Doc" )
+			helper.updateDocView( Line, 5 )
+		end
+
+		return height
+	end )
 
 	function helper.clearViews()
 		for _, View in pairs( helper.Views ) do
@@ -229,7 +244,7 @@ function helper.create()
 	surface.CreateFont( "CodeBlock", {
 		font = "Courier New",
 		size = 16,
-		weight = 540
+		weight = 500
 	} )
 
 	---- Index View ----
@@ -289,15 +304,30 @@ function helper.create()
 			view.Doc = {}
 			view.Doc.directives = SF.Docs.directives
 			view.Doc.description = "List of preprocessor directives"
+		elseif Type == 5 then
+			view.Title:SetText( view.DocName )
+			view.Doc = {example=SF.Docs.examples[view.DocName]}
 		end
 		local doc = view.Doc
 		view.Title:SizeToContents()
 
-		view.Description:SetText( string.Replace( doc.description, "\n", "" ) )
-		view.Description:SizeToContents()
-		view.Description:SetWrap( true )
-		view.Description:SetAutoStretchVertical( true )
-
+		if doc.description then
+			view.Description:SetText( string.Replace( doc.description, "\n", "" ) )
+			view.Description:SizeToContents()
+			view.Description:SetWrap( true )
+			view.Description:SetAutoStretchVertical( true )
+			view.Description.Enabled = true
+		else
+			view.Description.Enabled = false
+		end
+		
+		if doc.example then
+			view.exampleCode:SetText( doc.example )
+			view.exampleCode:SetVisible(true)
+		else
+			view.exampleCode:SetVisible(false)
+		end
+			
 		if doc.deprecated then
 			view.Deprecated:SetVisible( true )
 			view.Deprecated.Enabled = true
@@ -349,6 +379,15 @@ function helper.create()
 	helper.DocView.Deprecated:SetWrap( true )
 	helper.DocView.Deprecated:SetAutoStretchVertical( true )
 	helper.DocView.Deprecated.m_colText = Color( 210, 0, 0 )
+	
+	helper.DocView.exampleCode = vgui.Create( "DTextEntry", helper.DocView.Panel )
+	helper.DocView.exampleCode:SetMultiline( true )
+	helper.DocView.exampleCode:SetEditable( true )
+	helper.DocView.exampleCode:SetPos( 25, 60 )
+	helper.DocView.exampleCode:SetSize( 800, 1600 )
+	helper.DocView.exampleCode:SetFont( "CodeBlock" )
+	helper.DocView.exampleCode.m_colText = Color( 60, 60, 60 )
+	helper.DocView.exampleCode:SetVisible(false)
 
 	helper.LabelLists = {}
 	local function createDocList( name, func, update )
@@ -638,7 +677,7 @@ function helper.show()
 		docs_downloading = true
 		SF.AddNotify( LocalPlayer(), "Loading starfall helper now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 		
-		http.Fetch( "http://thegrb93.github.io/StarfallEx/doc.json", 
+		http.Fetch( "https://dl.dropboxusercontent.com/u/72472980/doc.json", 
 		function( body, len, headers, code )
 			SF.Docs = util.JSONToTable( body )
 			docs_set = true
@@ -693,6 +732,10 @@ function helper.resize()
 	if helper.DocView.Deprecated.Enabled then
 		helper.DocView.Deprecated:SetPos( 25, runningHeight )
 		runningHeight = runningHeight + helper.DocView.Deprecated:GetTall() + 10
+	end
+	if helper.DocView.exampleCode:IsVisible() then
+		helper.DocView.exampleCode:SetPos( 25, runningHeight )
+		runningHeight = runningHeight + helper.DocView.exampleCode:GetTall() + 10
 	end
 	for _, labellist in pairs( helper.LabelLists ) do 
 		labellist.list:SetWide( w2 - 50 )

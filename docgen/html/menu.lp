@@ -9,6 +9,8 @@ elseif class_doc then
 	from = "classes/.." .. class_doc.name
 elseif dir_doc then
 	from = "directives/.." .. dir_doc.name
+elseif example_doc then
+	from = "examples/.." .. example_doc.name
 else
 	from = ""
 end
@@ -74,6 +76,19 @@ end?>
 	<?lua else?>
 	<li>
 		<a href="<?lua=docletsfhtml.hook_link( hookname, doc, from )?>#<?lua=hookname?>"><?lua=hookname?></a>
+	</li>
+<?lua 	end
+end?>
+</ul>
+
+<h1>Examples</h1>
+<ul>
+<?lua for name, example in pairs(doc.examples) do
+	if example_doc and example_doc.name == name then?>
+	<li><strong><?lua=name?></strong></li>
+	<?lua else?>
+	<li>
+		<a href="<?lua=docletsfhtml.example_link( name, doc, from )?>"><?lua=name?></a>
 	</li>
 <?lua 	end
 end?>

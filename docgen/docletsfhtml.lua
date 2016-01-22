@@ -39,6 +39,7 @@ function include (template, env)
 	env.table = table
 	env.io = io
 	env.lp = lp
+	env.pairs = pairs
 	env.ipairs = ipairs
 	env.tonumber = tonumber
 	env.tostring = tostring
@@ -123,6 +124,18 @@ function directive_link ( dirname, doc, from )
 	if doc.directives[ dirname ] == nil then return end
 
 	local href = "directives.html"
+	string.gsub( from, "/", function () href = "../" .. href end )
+	return href
+end
+
+function example_link ( dirname, doc, from )
+	assert( dirname )
+	assert( doc )
+	from = from or ""
+
+	if doc.examples[ dirname ] == nil then return end
+
+	local href = "examples/" .. dirname .. ".html"
 	string.gsub( from, "/", function () href = "../" .. href end )
 	return href
 end
@@ -233,6 +246,10 @@ function out_class ( typename )
 	return string.format( "%sclasses/%s.html", options.output_dir, typename )
 end
 
+function out_example ( typename )
+	return string.format( "%sexamples/%s.html", options.output_dir, typename )
+end
+
 -----------------------------------------------------------------
 -- Generate the output.
 -- @param doc Table with the structured documentation.
@@ -292,6 +309,19 @@ function start (doc)
 		assert( f, string.format( "could not open `%s' for writing", filename ) )
 		io.output( f )
 		include( "class.lp", { doc = doc, class_doc = class_doc } )
+		f:close()
+	end
+	
+	-- Process examples
+	for name, example in pairs( doc.examples ) do
+		-- assembly the filename
+		local filename = out_example( name )
+		logger:info( string.format( "generating file `%s'", filename ) )
+
+		local f = lfs.open( filename, "w" )
+		assert( f, string.format( "could not open `%s' for writing", filename ) )
+		io.output( f )
+		include( "examples.lp", { doc = doc, example_doc = {name = name, code=example, path=filename}} )
 		f:close()
 	end
 
