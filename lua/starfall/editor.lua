@@ -39,9 +39,8 @@ if CLIENT then
 --[[
 	Starfall Scripting Environment
 
-	More info: http://inpstarfall.github.io/Starfall
-	Github: http://github.com/INPStarfall/Starfall
-	Reference Page: http://sf.inp.io
+	Github: https://github.com/thegrb93/StarfallEx
+	Reference Page: http://thegrb93.github.io/Starfall/
 	Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
 
 	Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts

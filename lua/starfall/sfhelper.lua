@@ -677,7 +677,7 @@ function helper.show()
 		docs_downloading = true
 		SF.AddNotify( LocalPlayer(), "Loading starfall helper now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
 		
-		http.Fetch( "https://dl.dropboxusercontent.com/u/72472980/doc.json", 
+		http.Fetch( "http://thegrb93.github.io/StarfallEx/doc.json", 
 		function( body, len, headers, code )
 			SF.Docs = util.JSONToTable( body )
 			docs_set = true
