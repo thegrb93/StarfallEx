@@ -13,20 +13,26 @@ net.Receive( "starfall_processor_used", function ( len )
 	local screen = net.ReadEntity()
 	local activator = net.ReadEntity()
 
-	if not IsValid( screen ) or not screen.link then return end
+	if not IsValid( screen ) then return end
 	
-	local instance = screen.link.instance
-	if instance and instance.hooks[ "starfallUsed" ] then
-		local ok, rt = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
-		if not ok then 
-			screen.link:Error( rt )
-			screen:Error( rt ) 
+	if screen.link then
+		local instance = screen.link.instance
+		if instance and instance.hooks[ "starfallUsed" ] then
+			local ok, rt = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
+			if not ok then 
+				screen.link:Error( rt )
+				screen:Error( rt ) 
+			end
 		end
 	end
 	
 	-- Error message copying
-	if screen.error then
-		SetClipboardText( string.format( "%q", screen.error.orig ) )
+	if activator == LocalPlayer() then
+		if screen.error then
+			SetClipboardText( string.format( "%q", screen.error.orig ) )
+		elseif screen:GetDTString( 0 ) then
+			SetClipboardText( screen:GetDTString( 0 ) )
+		end
 	end
 end )
 

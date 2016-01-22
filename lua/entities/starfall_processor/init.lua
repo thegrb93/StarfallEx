@@ -16,11 +16,21 @@ function ENT:Initialize ()
 	self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetMoveType( MOVETYPE_VPHYSICS )
 	self:SetSolid( SOLID_VPHYSICS )
+	self:SetUseType( SIMPLE_USE )
 	
 	self:UpdateState( "Inactive ( No code )" )
 	self:SetColor( Color( 255, 0, 0, self:GetColor().a ) )
 end
 
+-- Sends a net message to all clients about the use.
+function ENT:Use( activator )
+	if activator:IsPlayer() then
+		net.Start( "starfall_processor_used" )
+			net.WriteEntity( self )
+			net.WriteEntity( activator )
+		net.Broadcast()
+	end
+end
 
 util.AddNetworkString( "starfall_processor_download" )
 util.AddNetworkString( "starfall_processor_update" )

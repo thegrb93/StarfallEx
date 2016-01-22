@@ -30,6 +30,7 @@ function ENT:Error ( msg, traceback )
 	if SERVER then
 		self:UpdateState( "Inactive (Error)" )
 		self:SetColor( Color( 255, 0, 0, 255 ) )
+		self:SetDTString( 0, traceback )
 	end
 	
 	if type( msg ) == "table" then

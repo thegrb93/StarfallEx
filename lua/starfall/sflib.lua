@@ -654,9 +654,7 @@ else
 	end )
 
 	net.Receive( "starfall_console_print", function ()
-		local msg = net.ReadString()
-		print( msg )
-		SetClipboardText( msg )
+		print( net.ReadString() )
 	end )
 end
 
