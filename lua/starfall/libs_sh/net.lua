@@ -88,7 +88,7 @@ function net_library.send ( target )
 				sendfunc, newtarget = net.Send, nt
 			else
 				sendfunc, newtarget = net.Send, SF.Entities.Unwrap( target )
-				if not IsValid( target ) or not target:IsPlayer() then SF.throw( "Invalid player", 2 ) end
+				if not IsValid( newtarget ) or not newtarget:IsPlayer() then SF.throw( "Invalid player", 2 ) end
 			end
 		else
 			sendfunc = net.Broadcast
