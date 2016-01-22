@@ -34,7 +34,7 @@ local getPhysObject = SF.Entities.GetPhysObject
 
 -- ------------------------- Library functions ------------------------- --
 
-function SF.DefaultEnvironment.self ()
+function SF.DefaultEnvironment.chip ()
 	local ent = SF.instance.data.entity
 	if ent then 
 		return SF.Entities.Wrap( ent )

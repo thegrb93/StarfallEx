@@ -24,10 +24,10 @@ local function pascalToCamel ( t, r )
 end
 
 --- Returns the entity representing a processor that this script is running on.
--- @name SF.DefaultEnvironment.self
+-- @name SF.DefaultEnvironment.chip
 -- @class function
 -- @return Starfall entity
-SF.DefaultEnvironment.self = nil
+SF.DefaultEnvironment.chip = nil
 
 --- Returns whoever created the chip
 -- @name SF.DefaultEnvironment.owner
