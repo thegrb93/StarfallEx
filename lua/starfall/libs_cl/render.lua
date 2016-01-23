@@ -66,12 +66,12 @@ end )
 
 
 SF.Libraries.AddHook("initialize",function(instance)
-	instance.data.rendertargets = {}
-	instance.data.rendertargetcount = 0
+	instance.data.render.rendertargets = {}
+	instance.data.render.rendertargetcount = 0
 end)
 
 SF.Libraries.AddHook( "deinitialize", function ( instance )
-	local data = instance.data
+	local data = instance.data.render
 	for k, v in pairs( data.rendertargets ) do
 		globalRTs[ v ][ 2 ] = true -- mark as available
 	end
