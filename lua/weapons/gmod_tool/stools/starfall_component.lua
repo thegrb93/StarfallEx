@@ -159,7 +159,7 @@ if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl( "Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" } )
 		
-		local modelpanel = WireDermaExts.ModelSelect( panel, "starfall_screen_Model", list.Get( "WireScreenModels" ), 2 )
+		local modelpanel = WireDermaExts.ModelSelect( panel, "starfall_component_Model", list.Get( "WireScreenModels" ), 2 )
 		panel:AddControl("Label", {Text = ""})
 		
 
