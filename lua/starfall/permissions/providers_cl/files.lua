@@ -24,7 +24,7 @@ function P:check ( principal, target, key )
 	if keys[ key ] and principal == LocalPlayer() then
 		return ALLOW
 	else
-		return NEUTRAL
+		return DENY
 	end
 end
 
