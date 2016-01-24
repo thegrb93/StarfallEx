@@ -178,12 +178,14 @@ end
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
 -- @param default A value to return if val is nil.
 function SF.CheckType(val, typ, level, default)
-	if val == nil and default then return default
-	elseif type(val) == typ then return val
+	local meta = dgetmeta(val)
+	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ]) then 
+		return val
+	elseif type(val) == typ then
+		return val
+	elseif val == nil and default then
+		return default
 	else
-		local meta = dgetmeta(val)
-		if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ]) then return val end
-		
 		-- Failed, throw error
 		level = (level or 0) + 3
 		

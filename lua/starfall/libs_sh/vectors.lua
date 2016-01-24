@@ -76,7 +76,7 @@ end
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
 function vec_metamethods:__add ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return wrap( unwrap( self ):__add( unwrap( v ) ) )
 end
 
@@ -84,7 +84,7 @@ end
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
 function vec_metamethods:__sub ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return wrap( unwrap( self ):__sub( unwrap( v ) ) )
 end
 
@@ -104,7 +104,7 @@ end
 -- @param v Vector to add
 -- @return nil
 function vec_methods:add ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	unwrap( self ):Add( unwrap( v ) )
 end
 
@@ -118,7 +118,7 @@ end
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return SF.WrapObject( unwrap( self ):AngleEx( unwrap( v ) ) )
 end
 
@@ -126,7 +126,7 @@ end
 -- @param v Second Vector
 -- @return Vector
 function vec_methods:cross ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return wrap( unwrap( self ):Cross( unwrap( v ) ) )
 end
 
@@ -134,7 +134,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistance ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return unwrap( self ):Distance( unwrap( v ) )
 end
 
@@ -142,7 +142,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistanceSqr ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return unwrap( self ):DistToSqr( unwrap( v ) )
 end
 
@@ -150,7 +150,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:dot ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	return unwrap( self ):Dot( unwrap( v ) )
 end
 
@@ -165,7 +165,7 @@ end
 -- @param t Tolerance number.
 -- @return bool True/False.
 function vec_methods:isEqualTol ( v, t )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	SF.CheckType( t, "number" )
 	return unwrap( self ):IsEqualTol( unwrap( v ), t )
 end
@@ -232,7 +232,7 @@ end
 -- @param v Second Vector
 -- @return nil
 function vec_methods:set ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	unwrap( self ):Set( unwrap( v ) )
 end
 
@@ -240,7 +240,7 @@ end
 -- @param v Second Vector.
 -- @return nil
 function vec_methods:sub ( v )
-	SF.CheckType( v, SF.Types[ "Vector" ] )
+	SF.CheckType( v, vec_metamethods )
 	unwrap( self ):Sub( unwrap( v ) )
 end
 
@@ -255,7 +255,7 @@ end
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
 function vec_methods:withinAABox ( v1, v2 )
-	SF.CheckType( v1, SF.Types[ "Vector" ] )
-	SF.CheckType( v2, SF.Types[ "Vector" ] )
+	SF.CheckType( v1, vec_metamethods )
+	SF.CheckType( v2, vec_metamethods )
 	return unwrap( self ):WithinAABox( unwrap( v1 ), unwrap( v2 ) )
 end
