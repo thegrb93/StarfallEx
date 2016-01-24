@@ -389,6 +389,24 @@ function ents_methods:getModel ()
 	return ent:GetModel()
 end
 
+--- Gets the max health of an entity
+-- @shared
+-- @return Max Health of the entity
+function ents_methods:getMaxHealth ()
+	SF.CheckType( self, ents_metamethods )
+	local ent = unwrap( self )
+	return ent:GetMaxHealth()
+end
+
+--- Gets the health of an entity
+-- @shared
+-- @return Health of the entity
+function ents_methods:getHealth ()
+	SF.CheckType( self, ents_metamethods )
+	local ent = unwrap( self )
+	return ent:Health()
+end
+
 --- Gets the entitiy's eye angles
 -- @shared
 -- @return Angles of the entity's eyes
