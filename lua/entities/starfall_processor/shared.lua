@@ -26,13 +26,7 @@ function ENT:runScriptHookForResult ( hook, ... )
 	end
 end
 
-function ENT:Error ( msg, traceback )
-	if SERVER then
-		self:UpdateState( "Inactive (Error)" )
-		self:SetColor( Color( 255, 0, 0, 255 ) )
-		self:SetDTString( 0, traceback )
-	end
-	
+function ENT:Error ( msg, traceback )	
 	if type( msg ) == "table" then
 		if msg.message then
 			local line= msg.line
@@ -43,6 +37,12 @@ function ENT:Error ( msg, traceback )
 	end
 	msg = tostring( msg )
 
+	if SERVER then
+		self:UpdateState( "Inactive (Error)" )
+		self:SetColor( Color( 255, 0, 0, 255 ) )
+		self:SetDTString( 0, traceback or msg )
+	end
+	
 	SF.AddNotify( self.owner, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 	if self.instance then
 		self.instance:deinitialize()
