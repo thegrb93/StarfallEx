@@ -68,6 +68,28 @@ function color_metatable:__eq ( c )
 	return unwrap( self ):__eq( unwrap( c ) )
 end
 
+--- addition metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Added color.
+function color_metatable.__add ( lhs, rhs )
+	SF.CheckType( lhs, color_metatable )
+	SF.CheckType( rhs, color_metatable )
+	local a, b = unwrap( lhs ), unwrap( rhs )
+	return wrap( Color( a.r + b.r, a.g + b.g, a.b + b.b, a.a + b.a ) )
+end
+
+--- subtraction metamethod
+-- @param lhs Left side of equation
+-- @param rhs Right side of equation
+-- @return Subtracted color.
+function color_metatable.__sub ( lhs, rhs )
+	SF.CheckType( lhs, color_metatable )
+	SF.CheckType( rhs, color_metatable )
+	local a, b = unwrap( lhs ), unwrap( rhs )
+	return wrap( Color( a.r - b.r, a.g - b.g, a.b - b.b, a.a - b.a ) )
+end
+
 --- multiplication metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
