@@ -56,9 +56,17 @@ end
 -- @return Scaled vector.
 function vec_metamethods.__mul ( lhs, rhs )
 	if dgetmeta( lhs ) == vec_metamethods then
+		if dgetmeta( rhs ) == vec_metamethods then
+			local a, b = unwrap( lhs ), unwrap( rhs )
+			return wrap( Vector( a.x * b.x, a.y * b.y, a.z * b.z ) )
+		end
 		SF.CheckType( rhs, "number" )
 		return wrap( unwrap( lhs ) * rhs )
 	else
+		if dgetmeta( lhs ) == vec_metamethods then
+			local a, b = unwrap( lhs ), unwrap( rhs )
+			return wrap( Vector( a.x * b.x, a.y * b.y, a.z * b.z ) )
+		end
 		SF.CheckType( lhs, "number" )
 		return wrap( unwrap( rhs ) * lhs )
 	end
