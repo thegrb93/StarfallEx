@@ -68,7 +68,7 @@ end
 
 
 local hook_pref = "starfall_hud_hook_"
-
+local Hint_FirstPrint = true
 net.Receive( "starfall_hud_set_enabled" , function()
 	local ent = net.ReadEntity()
 	local enable = net.ReadInt(8)

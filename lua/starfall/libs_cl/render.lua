@@ -44,12 +44,32 @@ local matrix_meta = SF.VMatrix.Metatable --debug.getregistry().VMatrix
 
 local v_unwrap = SF.VMatrix.Unwrap
 
+
+local function sfCreateMaterial( name )
+	return CreateMaterial( name, "UnlitGeneric", {
+				[ "$nolod" ] = 1,
+				[ "$ignorez" ] = 1,
+				[ "$vertexcolor" ] = 1,
+				[ "$vertexalpha" ] = 1
+			} )
+end
+
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 
 local globalRTs = {}
 local globalRTcount = 0
+local RT_Material = sfCreateMaterial( "SF_RT_Material" )
+
+local function findAvailableRT ()
+	for k, v in pairs( globalRTs ) do
+		if v[ 2 ] then
+			return k, v
+		end
+	end
+	return nil
+end
 
 SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	if hook == "render" then
@@ -61,6 +81,13 @@ SF.Libraries.AddHook( "cleanup", function ( instance )
 	for i=#matrix_stack,1,-1 do
 		cam.PopModelMatrix()
 		matrix_stack[i] = nil
+	end
+	local data = instance.data.render
+	if data.usingRT then
+		render.SetRenderTarget()
+		cam.End2D()
+		render.SetViewPort(unpack(data.oldViewPort))
+		data.usingRT = false
 	end
 end )
 
@@ -117,12 +144,21 @@ local function CheckURLDownloads()
 					html 
 					{			
 						overflow:hidden;
-						margin: -7.5px -7.5px;
+						margin: -8px -8px;
+					}
+					.imagebox {
+						background-image: url(]] .. urltable.Url .. [[);
+						background-size: contain;
+						position: absolute;
+						background-position: center;
+						background-repeat: no-repeat;
+						height: 100%;
+						width: 100%;
 					}
 				</style>
 				
 				<body>
-					<img src="]] .. urltable.Url .. [[" alt="" width="1024" height="1024" />
+					<div class="imagebox"></div>
 				</body>
 			]]
 			)
@@ -135,17 +171,6 @@ local function CheckURLDownloads()
 		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
-
-
-local function sfCreateMaterial( name )
-	return CreateMaterial( name, "UnlitGeneric", {
-				[ "$nolod" ] = 1,
-				[ "$ignorez" ] = 1,
-				[ "$vertexcolor" ] = 1,
-				[ "$vertexalpha" ] = 1
-			} )
-end
-
 
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } ) 
 
@@ -358,7 +383,77 @@ function render_library.setTexture ( id )
 	end
 end
 
-local GPU_Material = sfCreateMaterial( "SF_Materal_From_Screen" )
+--- Creates a new render target to draw onto.
+-- The dimensions will always be 1024x1024
+-- @param name The name of the render target
+function render_library.createRenderTarget ( name )
+	SF.CheckType( name, "string" )
+
+	local data = SF.instance.data.render
+
+	if data.rendertargetcount >= 2 then
+		SF.throw( "Rendertarget limit reached", 2 )
+	end
+
+	data.rendertargetcount = data.rendertargetcount + 1
+	local rtname, rt = findAvailableRT()
+	if not rt then
+		globalRTcount = globalRTcount + 1
+		rtname = "Starfall_CustomRT_" .. globalRTcount
+		rt = { GetRenderTarget( rtname, 1024, 1024 ), false }
+		globalRTs[ rtname ] = rt
+	end
+	rt[ 2 ] = false
+	data.rendertargets[ name ] = rtname
+end
+
+--- Selects the render target to draw on.
+-- Nil for the visible RT.
+-- @param name Name of the render target to use
+function render_library.selectRenderTarget ( name )
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if name then
+		SF.CheckType( name, "string" )
+		local rt = globalRTs[ data.rendertargets[ name ] ][ 1 ]
+		if not rt then SF.Throw( "Invalid Rendertarget", 2 ) end
+
+		if not data.usingRT then
+			data.oldViewPort = {0, 0, ScrW(), ScrH()}
+			render.SetViewPort( 0, 0, 1024, 1024 )
+			cam.Start2D()
+			render.SetStencilEnable( false )
+		end
+		render.SetRenderTarget( rt )
+		data.usingRT = true
+	else
+		if data.usingRT then
+			render.SetRenderTarget()
+			cam.End2D()
+			render.SetViewPort(unpack(data.oldViewPort))
+			data.usingRT = false
+			render.SetStencilEnable( true )
+		end
+	end
+end
+
+--- Sets the active texture to the render target with the specified name.
+-- Nil to reset.
+-- @param name Name of the render target to use
+function render_library.setRenderTargetTexture ( name )
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( name, "string" )
+	
+	local rtname = data.rendertargets[ name ]
+	if rtname and globalRTs[ rtname ] then
+		RT_Material:SetTexture( "$basetexture", globalRTs[ rtname ][ 1 ] )
+		surface.SetMaterial( RT_Material )
+	else
+		draw.NoTexture()
+	end
+end
+
 --- Sets the texture of a screen entity
 -- @param ent Screen entity
 function render_library.setTextureFromScreen ( ent )
@@ -366,8 +461,8 @@ function render_library.setTextureFromScreen ( ent )
 
 	ent = SF.Entities.Unwrap( ent )
 	if IsValid( ent ) and ent.GPU and ent.GPU.RT then
-		GPU_Material:SetTexture("$basetexture", ent.GPU.RT)
-		surface.SetMaterial( GPU_Material )
+		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
+		surface.SetMaterial( RT_Material )
 	else
 		draw.NoTexture()
 	end
@@ -706,101 +801,26 @@ end
 -- Note: this does a table copy so move it out of your draw hook
 -- @return A table describing the screen.
 function render_library.getScreenInfo()
-	local gpu = SF.instance.data.render.gpu
+	local gpu = SF.instance.data.render.renderEnt.GPU
 	if not gpu then return end
 	local info, _, _ = gpu:GetInfo()
 	return table.Copy(info)
+end
+
+--- Returns the entity currently being rendered to
+-- @return Entity of the screen or hud being rendered
+function render_library.getScreenEntity()
+	return SF.Entities.Wrap( SF.instance.data.render.renderEnt )
 end
 
 --- Returns the screen surface's world position and angle
 -- @return The screen position
 -- @return The screen angle
 function render_library.getScreenPos()
-	local gpu = SF.instance.data.render.gpu
+	local gpu = SF.instance.data.render.renderEnt.GPU
 	if not gpu then return end
 	local _, pos, rot = gpu:GetInfo()
 	return SF.WrapObject( pos ), SF.WrapObject( rot )
-end
-
-local function findAvailableRT ()
-	for k, v in pairs( globalRTs ) do
-		if v[ 2 ] then
-			return k, v
-		end
-	end
-	return nil
-end
-
---- Creates a new render target to draw onto.
--- The dimensions will always be 1024x1024
--- @param name The name of the render target
--- @bug The drawing will be offset by 16 pixels to the left and 16 to the top and the resolution is actually 992x992. So drawing to 16,16 will draw in the top-left corner and 1007,1007 to the bottom-right.
-function render_library.createRenderTarget ( name )
-	SF.CheckType( name, "string" )
-
-	local data = SF.instance.data.render
-
-	if data.rendertargetcount >= 2 then
-		SF.throw( "Rendertarget limit reached", 2 )
-	end
-
-	data.rendertargetcount = data.rendertargetcount + 1
-	local rtname, rt = findAvailableRT()
-	if not rt then
-		globalRTcount = globalRTcount + 1
-		rtname = "Starfall_CustomRT_" .. globalRTcount
-		rt = { GetRenderTarget( rtname, 1024, 1024, false ), false, sfCreateMaterial( rtname ) }
-		globalRTs[ rtname ] = rt
-	end
-	rt[ 2 ] = false
-	data.rendertargets[ name ] = rtname
-end
-
---- Selects the render target to draw on.
--- Nil for the visible RT.
--- @param name Name of the render target to use
-function render_library.selectRenderTarget ( name )
-	local data = SF.instance.data.render
-	data.oldRT = data.oldRT or render.GetRenderTarget()
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if not name then
-		if data.usingRT then
-			cam.End2D()
-			render.PopRenderTarget()
-			cam.Start2D()
-			data.usingRT = false
-		end
-		return
-	end
-	SF.CheckType( name, "string" )
-	local rt = globalRTs[ data.rendertargets[ name ] ][ 1 ]
-	if not rt then SF.Throw( "Invalid Rendertarget", 2 ) end
-
-	cam.End2D()
-	if data.usingRT then
-		render.PopRenderTarget()
-	end
-	render.PushRenderTarget( rt, 0, 0, rt:Width(), rt:Height() )
-	cam.Start2D()
-	data.usingRT = true
-end
-
---- Sets the active texture to the render target with the specified name.
--- Nil to reset.
--- @param name Name of the render target to use
-function render_library.setRenderTargetTexture ( name )
-	local data = SF.instance.data.render
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( name, "string" )
-	
-	local rtname = data.rendertargets[ name ]
-	if rtname and globalRTs[ rtname ] then
-		local mat = globalRTs[ rtname ][ 3 ]
-		mat:SetTexture( "$basetexture", globalRTs[ rtname ][ 1 ] )
-		surface.SetMaterial( mat )
-	end
-	
-	draw.NoTexture()
 end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
