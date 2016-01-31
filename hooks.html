@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -334,6 +338,10 @@
 
 	<li>
 		<a href="hooks.html#StartEntityDriving">StartEntityDriving</a>
+	</li>
+
+	<li>
+		<a href="hooks.html#calcview">calcview</a>
 	</li>
 
 	<li>
@@ -645,6 +653,12 @@ Called when the local player opens their chat window.</td>
 	<td class="name" nowrap><a href="#StartEntityDriving">StartEntityDriving</a>&nbsp;(ent, ply)</td>
 	<td class="summary">
 Called when a player starts driving an entity </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#calcview">calcview</a>&nbsp;(pos, ang, fov, znear, zfar)</td>
+	<td class="summary">
+Called when the engine wants to calculate the player's view </td>
 	</tr>
 
 	<tr>
@@ -1586,6 +1600,48 @@ Called when a player starts driving an entity
 	</dd>
 
 	
+	<dt><a name="calcview"></a><strong>calcview</strong>&nbsp;(pos, ang, fov, znear, zfar)</dt>
+	<dd>
+	
+Called when the engine wants to calculate the player's view
+
+	
+	<h3>Parameters:</h3>
+	<ul>
+		
+		<li>
+		  <code><em>pos</em></code>: Current position of the camera
+		</li>
+		
+		<li>
+		  <code><em>ang</em></code>: Current angles of the camera
+		</li>
+		
+		<li>
+		  <code><em>fov</em></code>: Current fov of the camera
+		</li>
+		
+		<li>
+		  <code><em>znear</em></code>: Current near plane of the camera
+		</li>
+		
+		<li>
+		  <code><em>zfar</em></code>: Current far plane of the camera
+		</li>
+		
+	</ul>
+	
+
+	
+
+	
+	<h3>Return value:</h3>
+	<ul>table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}</ul>
+	
+
+	</dd>
+
+	
 	<dt><a name="input"></a><strong>input</strong>&nbsp;(input, value)</dt>
 	<dd>
 	
@@ -1751,8 +1807,7 @@ This hook can be called from other instances
 	<dt><a name="render"></a><strong>render</strong>&nbsp;()</dt>
 	<dd>
 	
-Called when a frame is requested to be drawn. You may want to unhook from this if you don't need 
-to render anything for a bit
+Called when a frame is requested to be drawn.
 
 	
 

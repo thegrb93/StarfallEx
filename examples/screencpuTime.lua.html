@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -443,7 +451,7 @@
 <h1>screencpuTime.lua</h1>
 
 <pre>--@name cpuTime Example
---@author INP - Radon
+--@author INP - Radon + Sparky
 
 if SERVER then return end
 
@@ -463,39 +471,38 @@ local function round ( num, idp )
   return math.floor( num * mult + 0.5 ) / mult
 end
 
+local rt = render.createRenderTarget( "Background" )
 -- Standard render hook, see hooks.
 hook.add( "render", "", function ()
-    -- Clear the screen first.
-    -- But we'll use setColor & drawRect so we can get some blur
-    -- This draws what looks to be a black background, but is just a low alpha rect the size of the screen.
+    render.setColor( Color( 255, 255, 255 ) )    
+    -- Print some stats to the screen
+    render.drawText( 10, 10, "Quota Used: " .. round( quotaUsed()*1000000 ) .. "us" )
+    render.drawText( 10, 30, "Quota Avg: " .. round( quotaAverage()*1000000 ) .. "us" )
+    render.drawText( 10, 50, "Quota Max: " .. round( quotaMax()*1000000 ) .. "us" )
+    render.drawText( 10, 70, "Percent: " .. round( quotaAverage() / quotaMax() * 100, 2 ) .. "%" )
+    
+	-- Set the rendertarget to our background so that we can make a bluring effect
+	render.selectRenderTarget( "Background" )
     render.setColor( Color( 0, 0, 0, 50 ) )
-    render.drawRect( 0, 0, 512, 512 )
-
+    render.drawRect( 0, 0, 1024, 1024 )
+	
     -- While our quota is less than 2 percent.
     -- This will result in higher FPS, thus more render calls.
     -- You'd think this would affect the rendering of the cube, it doesn't.
     -- If you increase this check to 99%, FPS will significantly drop, and the movement would be slower.
     -- Play with this value and see the effects on percentage and your FPS.
     while( quotaCheck( 0.01 ) ) do
-
-        -- We'll block out the top 100 px, so we can see our text.
-        render.setColor( Color( 0, 0, 0, 255 ) )
-        render.drawRect( 0, 0, 512, 512 / 4  )
-    
-        render.setColor( Color( 255, 255, 255 ) )    
-        -- Then print some stats to the screen
-        -- We should have enough cpuTime left to do this after using 80%
-        render.drawText( 10, 10, "Quota Used: " .. round( quotaUsed(), 6 ) .. "s" )
-        render.drawText( 10, 30, "Quota Avg: " .. round( quotaAverage(), 6 ) .. "s" )
-        render.drawText( 10, 50, "Quota Max: " .. round( quotaMax(), 6 ) .. "s" )
-        render.drawText( 10, 70, "Percent: " .. round( quotaAverage() / quotaMax() * 100, 2 ) .. "%" )
-        
         -- Now we can draw a funky box that oscillates back and forth in the middle of the screen.
-        render.setColor( Color( math.random( 200, 255 ), math.random( 200, 255 ), math.random( 200, 255 ) ) )
-        render.drawRect( math.abs( math.sin( timer.curtime() ) * ( 512 - 100 ) ), 512 / 2, 100, 200 )
-        
+        render.setColor( Color( math.random( 100, 255 ), math.random( 100, 255 ), math.random( 100, 255 ) ) )
+        render.drawRect( math.sin( timer.curtime()*2 ) * 380 + ( 512 - 100 ), 512 / 2, 200, 400 )
     end
-end )
+    render.selectRenderTarget( nil )
+    
+	-- Draw the resulting rendertarget
+    render.setRenderTargetTexture( "Background" )
+    render.setColor( Color( 255, 255, 255 ) )
+    render.drawTexturedRect( 0, 128, 512, 384 )
+end)
 </pre>
 
 

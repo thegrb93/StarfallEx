@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -549,13 +557,19 @@ Scalar Multiplication of the vector.</td>
 	<tr>
 		<td class="name" nowrap><a href="#vec_methods:normalize">normalize</a>&nbsp;()</td>
 		<td class="summary">
-Normalise the vector, same direction, length 0.</td>
+Normalise the vector, same direction, length 1.</td>
 	</tr>
 
 	<tr>
 		<td class="name" nowrap><a href="#vec_methods:rotate">rotate</a>&nbsp;(a)</td>
 		<td class="summary">
 Rotate the vector by Angle a.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#vec_methods:rotateAroundAxis">rotateAroundAxis</a>&nbsp;(axis, degrees, radians)</td>
+		<td class="summary">
+Return rotated vector by an axis </td>
 	</tr>
 
 	<tr>
@@ -1055,7 +1069,7 @@ Scalar Multiplication of the vector. Self-Modifies.
 <dt><a name="vec_methods:normalize"></a><strong>vec_methods:normalize</strong>&nbsp;()</dt>
 <dd>
 
-Normalise the vector, same direction, length 0. Self-Modifies.
+Normalise the vector, same direction, length 1. Self-Modifies.
 
 
 
@@ -1101,6 +1115,48 @@ Rotate the vector by Angle a. Self-Modifies.
 
 <h3>Return value:</h3>
 <ul>nil.</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="vec_methods:rotateAroundAxis"></a><strong>vec_methods:rotateAroundAxis</strong>&nbsp;(axis, degrees, radians)</dt>
+<dd>
+
+Return rotated vector by an axis
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>axis</em></code>: Axis the rotate around
+	</li>
+	
+	<li>
+	  <code><em>degrees</em></code>: Angle to rotate by in degrees or nil if radians.
+	</li>
+	
+	<li>
+	  <code><em>radians</em></code>: Angle to rotate by in radians or nil if degrees.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Rotated vector</ul>
 
 
 

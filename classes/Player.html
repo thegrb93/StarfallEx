@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -577,6 +585,24 @@ Returns the player's user ID </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#player_methods:getViewEntity">getViewEntity</a>&nbsp;()</td>
+		<td class="summary">
+Returns the player's current view entity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#player_methods:getWeapon">getWeapon</a>&nbsp;(wep)</td>
+		<td class="summary">
+Returns the specified weapon or nil if the player doesn't have it </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#player_methods:getWeapons">getWeapons</a>&nbsp;()</td>
+		<td class="summary">
+Returns a table of weapons the player is carrying </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#player_methods:inVehicle">inVehicle</a>&nbsp;()</td>
 		<td class="summary">
 Returns whether the player is in a vehicle </td>
@@ -658,6 +684,18 @@ Returns whether the player belongs to a usergroup </td>
 		<td class="name" nowrap><a href="#player_methods:keyDown">keyDown</a>&nbsp;(key)</td>
 		<td class="summary">
 Returns whether or not the player is pushing the key.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#player_methods:setViewEntity">setViewEntity</a>&nbsp;(e)</td>
+		<td class="summary">
+Sets the view entity of the player.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#player_methods:stripWeapon">stripWeapon</a>&nbsp;(wep)</td>
+		<td class="summary">
+Strips the specified weapon </td>
 	</tr>
 
 </table>
@@ -1173,6 +1211,90 @@ Returns the player's user ID
 
 
 
+<dt><a name="player_methods:getViewEntity"></a><strong>player_methods:getViewEntity</strong>&nbsp;()</dt>
+<dd>
+
+Returns the player's current view entity
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Player's current view entity</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="player_methods:getWeapon"></a><strong>player_methods:getWeapon</strong>&nbsp;(wep)</dt>
+<dd>
+
+Returns the specified weapon or nil if the player doesn't have it
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>wep</em></code>: String weapon class
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>weapon</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="player_methods:getWeapons"></a><strong>player_methods:getWeapons</strong>&nbsp;()</dt>
+<dd>
+
+Returns a table of weapons the player is carrying
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Table of weapons</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="player_methods:inVehicle"></a><strong>player_methods:inVehicle</strong>&nbsp;()</dt>
 <dd>
 
@@ -1556,6 +1678,68 @@ IN_KEY.RUN
 
 <h3>Return value:</h3>
 <ul>table trace data</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="player_methods:setViewEntity"></a><strong>player_methods:setViewEntity</strong>&nbsp;(e)</dt>
+<dd>
+
+Sets the view entity of the player. Only works if they are linked to a hud.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>e</em></code>: Entity to set the player's view entity to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="player_methods:stripWeapon"></a><strong>player_methods:stripWeapon</strong>&nbsp;(wep)</dt>
+<dd>
+
+Strips the specified weapon
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>wep</em></code>: String weapon class
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 

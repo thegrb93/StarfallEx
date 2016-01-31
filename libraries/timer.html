@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -335,6 +339,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -482,6 +490,12 @@ Checks if a timer exists </td>
 	<td class="name" nowrap><a href="#timer_library.frametime">frametime</a>&nbsp;()</td>
 	<td class="summary">
 Returns time between frames on client and ticks on server.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#timer_library.getTimersLeft">getTimersLeft</a>&nbsp;()</td>
+	<td class="summary">
+Returns number of available timers </td>
 	</tr>
 
 	<tr>
@@ -696,6 +710,31 @@ Returns time between frames on client and ticks on server. Same thing as G.Frame
 
 
 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="timer_library.getTimersLeft"></a><strong>timer_library.getTimersLeft</strong>&nbsp;()</dt>
+<dd>
+
+Returns number of available timers
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Number of available timers</ul>
 
 
 

@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="hooks.html#input">input</a>
 	</li>
 
@@ -450,6 +458,12 @@
 <table class="hook_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#client">--@client</a>&nbsp;</td>
+	<td class="summary">
+Set the processor to only run on the client.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#include">--@include</a>&nbsp;path</td>
 	<td class="summary">
 Mark a file to be included in the upload.</td>
@@ -473,12 +487,35 @@ Set the model of the processor entity.</td>
 Set the name of the script.</td>
 	</tr>
 
+	<tr>
+	<td class="name" nowrap><a href="#server">--@server</a>&nbsp;</td>
+	<td class="summary">
+Set the processor to only run on the server.</td>
+	</tr>
+
 </table>
 
 <br/>
 <br/>
 
 <dl class="hook">
+
+	
+	<dt><a name="client"></a><strong>--@client</strong>&nbsp;</dt>
+	<dd>
+	
+Set the processor to only run on the client. Shared is default
+
+	
+
+	
+	<h3>Usage:</h3>
+	<ul><pre class=example>
+--@client 
+-- CODE</pre></ul>
+	
+
+	</dd>
 
 	
 	<dt><a name="include"></a><strong>--@include</strong>&nbsp;path</dt>
@@ -580,6 +617,23 @@ This will become the name of the tab and will show on the overlay of the process
 	<h3>Usage:</h3>
 	<ul><pre class=example>
 --@name Awesome script 
+-- CODE</pre></ul>
+	
+
+	</dd>
+
+	
+	<dt><a name="server"></a><strong>--@server</strong>&nbsp;</dt>
+	<dd>
+	
+Set the processor to only run on the server. Shared is default
+
+	
+
+	
+	<h3>Usage:</h3>
+	<ul><pre class=example>
+--@server 
 -- CODE</pre></ul>
 	
 

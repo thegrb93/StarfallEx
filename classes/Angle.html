@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -487,9 +495,9 @@ Normalise angles eg (0,181,1) -> (0,-179,1).</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods:rotateAroundAxis">rotateAroundAxis</a>&nbsp;(v, r)</td>
+		<td class="name" nowrap><a href="#ang_methods:rotateAroundAxis">rotateAroundAxis</a>&nbsp;(v, deg, rad)</td>
 		<td class="summary">
-Rotates the angle around the specified axis by the specified degrees.</td>
+Return Rotated angle around the specified axis.</td>
 	</tr>
 
 	<tr>
@@ -642,10 +650,10 @@ Normalise angles eg (0,181,1) -> (0,-179,1).
 
 
 
-<dt><a name="ang_methods:rotateAroundAxis"></a><strong>ang_methods:rotateAroundAxis</strong>&nbsp;(v, r)</dt>
+<dt><a name="ang_methods:rotateAroundAxis"></a><strong>ang_methods:rotateAroundAxis</strong>&nbsp;(v, deg, rad)</dt>
 <dd>
 
-Rotates the angle around the specified axis by the specified degrees.
+Return Rotated angle around the specified axis.
 
 
 
@@ -654,11 +662,15 @@ Rotates the angle around the specified axis by the specified degrees.
 <ul>
 	
 	<li>
-	  <code><em>v</em></code>: Axis
+	  <code><em>v</em></code>: Vector axis
 	</li>
 	
 	<li>
-	  <code><em>r</em></code>: Number of degrees.
+	  <code><em>deg</em></code>: Number of degrees or nil if radians.
+	</li>
+	
+	<li>
+	  <code><em>rad</em></code>: Number of radians or nil if degrees.
 	</li>
 	
 </ul>
@@ -669,7 +681,7 @@ Rotates the angle around the specified axis by the specified degrees.
 
 
 <h3>Return value:</h3>
-<ul>nil</ul>
+<ul>The modified angle</ul>
 
 
 

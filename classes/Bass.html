@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -469,6 +477,12 @@ Gets the length of a sound </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#bass_methods:getTime">getTime</a>&nbsp;()</td>
+		<td class="summary">
+Gets the current time of a sound </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#bass_methods:play">play</a>&nbsp;()</td>
 		<td class="summary">
 Starts to play the sound.</td>
@@ -496,6 +510,12 @@ Sets the pitch of the sound.</td>
 		<td class="name" nowrap><a href="#bass_methods:setPos">setPos</a>&nbsp;(pos)</td>
 		<td class="summary">
 Sets the position of the sound </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#bass_methods:setTime">setTime</a>&nbsp;(time)</td>
+		<td class="summary">
+Sets the current time of a sound </td>
 	</tr>
 
 	<tr>
@@ -572,6 +592,31 @@ Gets the length of a sound
 
 <h3>Return value:</h3>
 <ul>Length in seconds of the sound</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="bass_methods:getTime"></a><strong>bass_methods:getTime</strong>&nbsp;()</dt>
+<dd>
+
+Gets the current time of a sound
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Current time in seconds of the sound</ul>
 
 
 
@@ -714,6 +759,37 @@ Sets the position of the sound
 	
 	<li>
 	  <code><em>pos</em></code>: Where to position the sound
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="bass_methods:setTime"></a><strong>bass_methods:setTime</strong>&nbsp;(time)</dt>
+<dd>
+
+Sets the current time of a sound
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>time</em></code>: Time to set a sound in seconds
 	</li>
 	
 </ul>

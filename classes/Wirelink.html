@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -463,6 +471,18 @@ Returns the entity that the wirelink represents </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#wirelink_methods:getWiredTo">getWiredTo</a>&nbsp;(name)</td>
+		<td class="summary">
+Returns what an input of the wirelink is wired to.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#wirelink_methods:getWiredToName">getWiredToName</a>&nbsp;(name)</td>
+		<td class="summary">
+Returns the name of the output an input of the wirelink is wired to.</td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#wirelink_methods:inputType">inputType</a>&nbsp;(name)</td>
 		<td class="summary">
 Returns the type of input name, or nil if it doesn't exist </td>
@@ -523,6 +543,74 @@ Returns the entity that the wirelink represents
 
 
 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="wirelink_methods:getWiredTo"></a><strong>wirelink_methods:getWiredTo</strong>&nbsp;(name)</dt>
+<dd>
+
+Returns what an input of the wirelink is wired to.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Name of the input
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The entity the wirelink is wired to</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="wirelink_methods:getWiredToName"></a><strong>wirelink_methods:getWiredToName</strong>&nbsp;(name)</dt>
+<dd>
+
+Returns the name of the output an input of the wirelink is wired to.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Name of the input of the wirelink.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>String name of the output that the input is wired to.</ul>
 
 
 
@@ -620,7 +708,7 @@ Checks if an input is wired.
 <ul>
 	
 	<li>
-	  <code><em>name</em></code>: 
+	  <code><em>name</em></code>: Name of the input to check
 	</li>
 	
 </ul>

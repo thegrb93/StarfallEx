@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -523,6 +531,12 @@ Sets the entity movement state </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:enableSphere">enableSphere</a>&nbsp;(enabled)</td>
+		<td class="summary">
+Sets the physics of an entity to be a sphere </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:entIndex">entIndex</a>&nbsp;()</td>
 		<td class="summary">
 Returns the EntIndex of the entity </td>
@@ -579,7 +593,13 @@ Gets the entity's eye position </td>
 	<tr>
 		<td class="name" nowrap><a href="#ents_methods:getForward">getForward</a>&nbsp;()</td>
 		<td class="summary">
-Gets the entities forward vector </td>
+Gets the entity's forward vector </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:getHealth">getHealth</a>&nbsp;()</td>
+		<td class="summary">
+Gets the health of an entity </td>
 	</tr>
 
 	<tr>
@@ -625,6 +645,12 @@ Returns the matrix of the entity </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:getMaxHealth">getMaxHealth</a>&nbsp;()</td>
+		<td class="summary">
+Gets the max health of an entity </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:getModel">getModel</a>&nbsp;()</td>
 		<td class="summary">
 Gets the model of an entity </td>
@@ -651,7 +677,13 @@ Returns the position of the entity </td>
 	<tr>
 		<td class="name" nowrap><a href="#ents_methods:getRight">getRight</a>&nbsp;()</td>
 		<td class="summary">
-Gets the entities right vector </td>
+Gets the entity's right vector </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:getSkin">getSkin</a>&nbsp;()</td>
+		<td class="summary">
+Gets the skin number of the entity </td>
 	</tr>
 
 	<tr>
@@ -663,7 +695,7 @@ Gets an entities' submaterial </td>
 	<tr>
 		<td class="name" nowrap><a href="#ents_methods:getUp">getUp</a>&nbsp;()</td>
 		<td class="summary">
-Gets the entities up vector </td>
+Gets the entity's up vector </td>
 	</tr>
 
 	<tr>
@@ -715,6 +747,12 @@ Gets what the entity is welded to </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:linkComponent">linkComponent</a>&nbsp;(e)</td>
+		<td class="summary">
+Links starfall components to a starfall processor or vehicle.</td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:localToWorld">localToWorld</a>&nbsp;(data)</td>
 		<td class="summary">
 Converts a vector in entity local space to world space </td>
@@ -754,6 +792,12 @@ Returns the x, y, z size of the entity's outer bounding box (local to the entity
 		<td class="name" nowrap><a href="#ents_methods:remove">remove</a>&nbsp;()</td>
 		<td class="summary">
 Removes an entity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:removeTrails">removeTrails</a>&nbsp;()</td>
+		<td class="summary">
+Removes trails from the entity </td>
 	</tr>
 
 	<tr>
@@ -799,7 +843,13 @@ Sets the whether an entity should be drawn or not </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ents_methods:setParent">setParent</a>&nbsp;(ent)</td>
+		<td class="name" nowrap><a href="#ents_methods:setNocollideAll">setNocollideAll</a>&nbsp;(nocollide)</td>
+		<td class="summary">
+Set's the entity to collide with nothing but the world </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setParent">setParent</a>&nbsp;(ent, attachment)</td>
 		<td class="summary">
 Parents the entity to another entity </td>
 	</tr>
@@ -808,6 +858,18 @@ Parents the entity to another entity </td>
 		<td class="name" nowrap><a href="#ents_methods:setPos">setPos</a>&nbsp;(vec)</td>
 		<td class="summary">
 Sets the entitiy's position </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setRenderFX">setRenderFX</a>&nbsp;(renderfx, ply)</td>
+		<td class="summary">
+Sets the renderfx of the entity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setRenderMode">setRenderMode</a>&nbsp;(rendermode, ply)</td>
+		<td class="summary">
+Sets the rende mode of the entity </td>
 	</tr>
 
 	<tr>
@@ -826,6 +888,12 @@ Sets the entity to be Solid or not.</td>
 		<td class="name" nowrap><a href="#ents_methods:setSubMaterial">setSubMaterial</a>&nbsp;(index, material, ply)</td>
 		<td class="summary">
 Sets an entities' submaterial </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setTrails">setTrails</a>&nbsp;(startSize, endSize, length, material, color, attachmentID, additive)</td>
+		<td class="summary">
+Adds a trail to the entity with the specified attributes.</td>
 	</tr>
 
 	<tr>
@@ -1229,6 +1297,37 @@ Sets the entity movement state
 
 
 
+<dt><a name="ents_methods:enableSphere"></a><strong>ents_methods:enableSphere</strong>&nbsp;(enabled)</dt>
+<dd>
+
+Sets the physics of an entity to be a sphere
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>enabled</em></code>: Bool should the entity be spherical?
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="ents_methods:entIndex"></a><strong>ents_methods:entIndex</strong>&nbsp;()</dt>
 <dd>
 
@@ -1456,7 +1555,7 @@ Gets the entity's eye position
 	
 	<li>Eye position of the entity</li>
 	
-	<li>In case of a ragdoll, the position of the other eye</li>
+	<li>In case of a ragdoll, the position of the second eye</li>
 	
 </ol>
 
@@ -1472,7 +1571,7 @@ Gets the entity's eye position
 <dt><a name="ents_methods:getForward"></a><strong>ents_methods:getForward</strong>&nbsp;()</dt>
 <dd>
 
-Gets the entities forward vector
+Gets the entity's forward vector
 
 
 
@@ -1481,6 +1580,34 @@ Gets the entities forward vector
 
 
 
+
+<h3>Return value:</h3>
+<ul>Vector forward</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:getHealth"></a><strong>ents_methods:getHealth</strong>&nbsp;()</dt>
+<dd>
+
+Gets the health of an entity
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Health of the entity</ul>
 
 
 
@@ -1605,7 +1732,7 @@ Gets an entities' material
 
 
 <h3>Return value:</h3>
-<ul>Material</ul>
+<ul>String material</ul>
 
 
 
@@ -1665,6 +1792,31 @@ Returns the matrix of the entity
 
 <h3>Return value:</h3>
 <ul>The matrix</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:getMaxHealth"></a><strong>ents_methods:getMaxHealth</strong>&nbsp;()</dt>
+<dd>
+
+Gets the max health of an entity
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Max Health of the entity</ul>
 
 
 
@@ -1778,7 +1930,7 @@ Returns the position of the entity
 <dt><a name="ents_methods:getRight"></a><strong>ents_methods:getRight</strong>&nbsp;()</dt>
 <dd>
 
-Gets the entities right vector
+Gets the entity's right vector
 
 
 
@@ -1787,6 +1939,34 @@ Gets the entities right vector
 
 
 
+
+<h3>Return value:</h3>
+<ul>Vector right</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:getSkin"></a><strong>ents_methods:getSkin</strong>&nbsp;()</dt>
+<dd>
+
+Gets the skin number of the entity
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Skin number</ul>
 
 
 
@@ -1820,7 +2000,7 @@ Gets an entities' submaterial
 
 
 <h3>Return value:</h3>
-<ul>Material</ul>
+<ul>String material</ul>
 
 
 
@@ -1834,7 +2014,7 @@ Gets an entities' submaterial
 <dt><a name="ents_methods:getUp"></a><strong>ents_methods:getUp</strong>&nbsp;()</dt>
 <dd>
 
-Gets the entities up vector
+Gets the entity's up vector
 
 
 
@@ -1843,6 +2023,9 @@ Gets the entities up vector
 
 
 
+
+<h3>Return value:</h3>
+<ul>Vector up</ul>
 
 
 
@@ -2035,6 +2218,37 @@ Gets what the entity is welded to
 
 
 
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:linkComponent"></a><strong>ents_methods:linkComponent</strong>&nbsp;(e)</dt>
+<dd>
+
+Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>e</em></code>: Entity to link the component to. nil to clear links.
+	</li>
+	
+</ul>
 
 
 
@@ -2249,6 +2463,28 @@ Removes an entity
 
 
 
+<dt><a name="ents_methods:removeTrails"></a><strong>ents_methods:removeTrails</strong>&nbsp;()</dt>
+<dd>
+
+Removes trails from the entity
+
+
+
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="ents_methods:setAngles"></a><strong>ents_methods:setAngles</strong>&nbsp;(ang)</dt>
 <dd>
 
@@ -2300,7 +2536,7 @@ Sets an entities' bodygroup
 	</li>
 	
 	<li>
-	  <code><em>ply</em></code>: Optional player arguement to set bodygroup of an entity only for that player
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -2335,7 +2571,7 @@ Sets the color of the entity
 	</li>
 	
 	<li>
-	  <code><em>ply</em></code>: Optional player arguement to set the entity's color only for that player
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -2432,7 +2668,7 @@ Sets an entities' material
 	</li>
 	
 	<li>
-	  <code><em>ply</em></code>: Optional player arguement to set material of an entity only for that player
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -2467,7 +2703,7 @@ Sets the whether an entity should be drawn or not
 	</li>
 	
 	<li>
-	  <code><em>ply</em></code>: Optional player arguement to set drawing of an entity only for that player
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -2486,7 +2722,38 @@ Sets the whether an entity should be drawn or not
 
 
 
-<dt><a name="ents_methods:setParent"></a><strong>ents_methods:setParent</strong>&nbsp;(ent)</dt>
+<dt><a name="ents_methods:setNocollideAll"></a><strong>ents_methods:setNocollideAll</strong>&nbsp;(nocollide)</dt>
+<dd>
+
+Set's the entity to collide with nothing but the world
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>nocollide</em></code>: Whether to collide with nothing except world or not.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:setParent"></a><strong>ents_methods:setParent</strong>&nbsp;(ent, attachment)</dt>
 <dd>
 
 Parents the entity to another entity
@@ -2499,6 +2766,10 @@ Parents the entity to another entity
 	
 	<li>
 	  <code><em>ent</em></code>: Entity to parent to
+	</li>
+	
+	<li>
+	  <code><em>attachment</em></code>: Optional string attachment name to parent to
 	</li>
 	
 </ul>
@@ -2548,6 +2819,76 @@ Sets the entitiy's position
 
 
 
+<dt><a name="ents_methods:setRenderFX"></a><strong>ents_methods:setRenderFX</strong>&nbsp;(renderfx, ply)</dt>
+<dd>
+
+Sets the renderfx of the entity
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>renderfx</em></code>: Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
+	</li>
+	
+	<li>
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:setRenderMode"></a><strong>ents_methods:setRenderMode</strong>&nbsp;(rendermode, ply)</dt>
+<dd>
+
+Sets the rende mode of the entity
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>rendermode</em></code>: Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
+	</li>
+	
+	<li>
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="ents_methods:setSkin"></a><strong>ents_methods:setSkin</strong>&nbsp;(skinIndex, ply)</dt>
 <dd>
 
@@ -2564,7 +2905,7 @@ Sets the skin of the entity
 	</li>
 	
 	<li>
-	  <code><em>ply</em></code>: Optional player arguement to set material of an entity only for that player
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -2635,7 +2976,62 @@ Sets an entities' submaterial
 	</li>
 	
 	<li>
-	  <code><em>ply</em></code>: Optional player arguement to set material of an entity only for that player
+	  <code><em>ply</em></code>: Optional player arguement to set only for that player. Can also be table of players.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:setTrails"></a><strong>ents_methods:setTrails</strong>&nbsp;(startSize, endSize, length, material, color, attachmentID, additive)</dt>
+<dd>
+
+Adds a trail to the entity with the specified attributes.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>startSize</em></code>: The start size of the trail
+	</li>
+	
+	<li>
+	  <code><em>endSize</em></code>: The end size of the trail
+	</li>
+	
+	<li>
+	  <code><em>length</em></code>: The length size of the trail
+	</li>
+	
+	<li>
+	  <code><em>material</em></code>: The material of the trail
+	</li>
+	
+	<li>
+	  <code><em>color</em></code>: The color of the trail
+	</li>
+	
+	<li>
+	  <code><em>attachmentID</em></code>: Optional attachmentid the trail should attach to
+	</li>
+	
+	<li>
+	  <code><em>additive</em></code>: If the trail's rendering is additive
 	</li>
 	
 </ul>

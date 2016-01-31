@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -337,6 +341,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -481,21 +489,9 @@ Get the pose value of an animation </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#hologram_methods:remove">remove</a>&nbsp;()</td>
-		<td class="summary">
-Deletes the hologram </td>
-	</tr>
-
-	<tr>
 		<td class="name" nowrap><a href="#hologram_methods:setAngVel">setAngVel</a>&nbsp;(angvel)</td>
 		<td class="summary">
 Sets the hologram's angular velocity.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#hologram_methods:setAngles">setAngles</a>&nbsp;(ang)</td>
-		<td class="summary">
-Sets the hologram angle </td>
 	</tr>
 
 	<tr>
@@ -526,18 +522,6 @@ Sets the weight (value) of a flex.</td>
 		<td class="name" nowrap><a href="#hologram_methods:setModel">setModel</a>&nbsp;(model)</td>
 		<td class="summary">
 Sets the model of a hologram </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#hologram_methods:setParent">setParent</a>&nbsp;(parent, attachment)</td>
-		<td class="summary">
-Parents this hologram to the specified hologram </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#hologram_methods:setPos">setPos</a>&nbsp;(pos)</td>
-		<td class="summary">
-Sets the hologram position.</td>
 	</tr>
 
 	<tr>
@@ -693,28 +677,6 @@ Get the pose value of an animation
 
 
 
-<dt><a name="hologram_methods:remove"></a><strong>hologram_methods:remove</strong>&nbsp;()</dt>
-<dd>
-
-Deletes the hologram
-
-
-
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
 <dt><a name="hologram_methods:setAngVel"></a><strong>hologram_methods:setAngVel</strong>&nbsp;(angvel)</dt>
 <dd>
 
@@ -728,37 +690,6 @@ Sets the hologram's angular velocity.
 	
 	<li>
 	  <code><em>angvel</em></code>: *Vector* angular velocity.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="hologram_methods:setAngles"></a><strong>hologram_methods:setAngles</strong>&nbsp;(ang)</dt>
-<dd>
-
-Sets the hologram angle
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>ang</em></code>: New angles
 	</li>
 	
 </ul>
@@ -960,72 +891,6 @@ Sets the model of a hologram
 
 
 
-<dt><a name="hologram_methods:setParent"></a><strong>hologram_methods:setParent</strong>&nbsp;(parent, attachment)</dt>
-<dd>
-
-Parents this hologram to the specified hologram
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>parent</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>attachment</em></code>: 
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="hologram_methods:setPos"></a><strong>hologram_methods:setPos</strong>&nbsp;(pos)</dt>
-<dd>
-
-Sets the hologram position.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>pos</em></code>: New position
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
 <dt><a name="hologram_methods:setPose"></a><strong>hologram_methods:setPose</strong>&nbsp;(pose, value)</dt>
 <dd>
 
@@ -1073,7 +938,7 @@ Sets the hologram scale
 <ul>
 	
 	<li>
-	  <code><em>scale</em></code>: New scale
+	  <code><em>scale</em></code>: Vector new scale
 	</li>
 	
 </ul>

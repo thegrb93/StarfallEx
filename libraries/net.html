@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 	<li>
@@ -335,6 +339,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -461,9 +469,21 @@ Returns available bandwidth in bytes </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.readAngle">readAngle</a>&nbsp;()</td>
+	<td class="summary">
+Reads an angle from the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.readBit">readBit</a>&nbsp;()</td>
 	<td class="summary">
 Reads a bit from the net message </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#net_library.readColor">readColor</a>&nbsp;()</td>
+	<td class="summary">
+Reads a color from the net message </td>
 	</tr>
 
 	<tr>
@@ -479,6 +499,12 @@ Reads a double from the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.readEntity">readEntity</a>&nbsp;()</td>
+	<td class="summary">
+Reads a entity from the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.readFloat">readFloat</a>&nbsp;()</td>
 	<td class="summary">
 Reads a float from the net message </td>
@@ -488,6 +514,12 @@ Reads a float from the net message </td>
 	<td class="name" nowrap><a href="#net_library.readInt">readInt</a>&nbsp;(n)</td>
 	<td class="summary">
 Reads an integer from the net message </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#net_library.readMatrix">readMatrix</a>&nbsp;()</td>
+	<td class="summary">
+Reads a matrix from the net message </td>
 	</tr>
 
 	<tr>
@@ -503,6 +535,12 @@ Reads an unsigned integer from the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.readVector">readVector</a>&nbsp;()</td>
+	<td class="summary">
+Reads a vector from the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.send">send</a>&nbsp;(target)</td>
 	<td class="summary">
 Send a net message from client->server, or server->client.</td>
@@ -515,9 +553,21 @@ Starts the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.writeAngle">writeAngle</a>&nbsp;(t)</td>
+	<td class="summary">
+Writes an angle to the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.writeBit">writeBit</a>&nbsp;(t)</td>
 	<td class="summary">
 Writes a bit to the net message </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#net_library.writeColor">writeColor</a>&nbsp;(t)</td>
+	<td class="summary">
+Writes an color to the net message </td>
 	</tr>
 
 	<tr>
@@ -533,6 +583,12 @@ Writes a double to the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.writeEntity">writeEntity</a>&nbsp;(t)</td>
+	<td class="summary">
+Writes an entity to the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.writeFloat">writeFloat</a>&nbsp;(t)</td>
 	<td class="summary">
 Writes a float to the net message </td>
@@ -545,6 +601,12 @@ Writes an integer to the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.writeMatrix">writeMatrix</a>&nbsp;(t)</td>
+	<td class="summary">
+Writes an matrix to the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.writeString">writeString</a>&nbsp;(t)</td>
 	<td class="summary">
 Writes a string to the net message.</td>
@@ -554,6 +616,12 @@ Writes a string to the net message.</td>
 	<td class="name" nowrap><a href="#net_library.writeUInt">writeUInt</a>&nbsp;(t, n)</td>
 	<td class="summary">
 Writes an unsigned integer to the net message </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#net_library.writeVector">writeVector</a>&nbsp;(t)</td>
+	<td class="summary">
+Writes an vector to the net message </td>
 	</tr>
 
 </table>
@@ -599,6 +667,31 @@ Returns available bandwidth in bytes
 
 
 
+<dt><a name="net_library.readAngle"></a><strong>net_library.readAngle</strong>&nbsp;()</dt>
+<dd>
+
+Reads an angle from the net message
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The angle that was read</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.readBit"></a><strong>net_library.readBit</strong>&nbsp;()</dt>
 <dd>
 
@@ -614,6 +707,31 @@ Reads a bit from the net message
 
 <h3>Return value:</h3>
 <ul>The bit that was read. (0 for false, 1 for true)</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.readColor"></a><strong>net_library.readColor</strong>&nbsp;()</dt>
+<dd>
+
+Reads a color from the net message
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The color that was read</ul>
 
 
 
@@ -683,6 +801,31 @@ Reads a double from the net message
 
 
 
+<dt><a name="net_library.readEntity"></a><strong>net_library.readEntity</strong>&nbsp;()</dt>
+<dd>
+
+Reads a entity from the net message
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The entity that was read</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.readFloat"></a><strong>net_library.readFloat</strong>&nbsp;()</dt>
 <dd>
 
@@ -742,6 +885,31 @@ Reads an integer from the net message
 
 
 
+<dt><a name="net_library.readMatrix"></a><strong>net_library.readMatrix</strong>&nbsp;()</dt>
+<dd>
+
+Reads a matrix from the net message
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The matrix that was read</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.readString"></a><strong>net_library.readString</strong>&nbsp;()</dt>
 <dd>
 
@@ -791,6 +959,31 @@ Reads an unsigned integer from the net message
 
 <h3>Return value:</h3>
 <ul>The unsigned integer that was read</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.readVector"></a><strong>net_library.readVector</strong>&nbsp;()</dt>
+<dd>
+
+Reads a vector from the net message
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The vector that was read</ul>
 
 
 
@@ -863,6 +1056,37 @@ Starts the net message
 
 
 
+<dt><a name="net_library.writeAngle"></a><strong>net_library.writeAngle</strong>&nbsp;(t)</dt>
+<dd>
+
+Writes an angle to the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>t</em></code>: The angle to be written
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.writeBit"></a><strong>net_library.writeBit</strong>&nbsp;(t)</dt>
 <dd>
 
@@ -876,6 +1100,37 @@ Writes a bit to the net message
 	
 	<li>
 	  <code><em>t</em></code>: The bit to be written. (boolean)
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.writeColor"></a><strong>net_library.writeColor</strong>&nbsp;(t)</dt>
+<dd>
+
+Writes an color to the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>t</em></code>: The color to be written
 	</li>
 	
 </ul>
@@ -960,6 +1215,37 @@ Writes a double to the net message
 
 
 
+<dt><a name="net_library.writeEntity"></a><strong>net_library.writeEntity</strong>&nbsp;(t)</dt>
+<dd>
+
+Writes an entity to the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>t</em></code>: The entity to be written
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.writeFloat"></a><strong>net_library.writeFloat</strong>&nbsp;(t)</dt>
 <dd>
 
@@ -1026,6 +1312,37 @@ Writes an integer to the net message
 
 
 
+<dt><a name="net_library.writeMatrix"></a><strong>net_library.writeMatrix</strong>&nbsp;(t)</dt>
+<dd>
+
+Writes an matrix to the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>t</em></code>: The matrix to be written
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="net_library.writeString"></a><strong>net_library.writeString</strong>&nbsp;(t)</dt>
 <dd>
 
@@ -1074,6 +1391,37 @@ Writes an unsigned integer to the net message
 	
 	<li>
 	  <code><em>n</em></code>: The amount of bits the integer consists of. Should not be greater than 32
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.writeVector"></a><strong>net_library.writeVector</strong>&nbsp;(t)</dt>
+<dd>
+
+Writes an vector to the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>t</em></code>: The vector to be written
 	</li>
 	
 </ul>

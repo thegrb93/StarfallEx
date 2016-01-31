@@ -33,6 +33,10 @@
 <ul>
 
 	<li>
+		<a href="../directives.html#client">--@client</a>
+	</li>
+
+	<li>
 		<a href="../directives.html#include">--@include</a>
 	</li>
 
@@ -48,6 +52,10 @@
 		<a href="../directives.html#name">--@name</a>
 	</li>
 
+	<li>
+		<a href="../directives.html#server">--@server</a>
+	</li>
+
 </ul>
 
 <!-- Module list -->
@@ -57,10 +65,6 @@
 
 	<li>
 		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-	<li>
-		<a href="../libraries/bit.html">bit</a>
 	</li>
 
 		<li><strong>builtin</strong></li>
@@ -335,6 +339,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#calcview">calcview</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -522,6 +530,12 @@ Same as Lua's ipairs </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.isValid">isValid</a>&nbsp;(object)</td>
+	<td class="summary">
+Returns if the table has an isValid function and isValid returns true.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.loadstring">loadstring</a>&nbsp;(str)</td>
 	<td class="summary">
 GLua's loadstring 
@@ -607,6 +621,12 @@ Runs an included script and caches the result.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.setName">setName</a>&nbsp;(name)</td>
+	<td class="summary">
+Sets the chip's display name </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.setfenv">setfenv</a>&nbsp;(func, tbl)</td>
 	<td class="summary">
 Lua's setfenv 
@@ -682,27 +702,33 @@ ENUMs of mouse buttons for use with input library </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.bit">bit</a></td>
+	<td class="summary">
+Bit library.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.math">math</a></td>
 	<td class="summary">
-Lua's (not glua's) math library, plus clamp, angnorm, sign, round, and randfloat, calcBSplineN </td>
+The math library.</td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.os">os</a></td>
 	<td class="summary">
-GLua's os library.</td>
+The os library.</td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.string">string</a></td>
 	<td class="summary">
-Lua's (not glua's) string library </td>
+String library http://wiki.garrysmod.com/page/Category:string </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.table">table</a></td>
 	<td class="summary">
-Lua's (not glua's) table library </td>
+Table library.</td>
 	</tr>
 
 </table>
@@ -1084,6 +1110,40 @@ Same as Lua's ipairs
 	<li>0 as current index</li>
 	
 </ol>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.isValid"></a><strong>SF.DefaultEnvironment.isValid</strong>&nbsp;(object)</dt>
+<dd>
+
+Returns if the table has an isValid function and isValid returns true.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>object</em></code>: Table to check
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>If it is valid</ul>
 
 
 
@@ -1560,6 +1620,37 @@ Works pretty much like standard Lua require()
 
 
 
+<dt><a name="SF.DefaultEnvironment.setName"></a><strong>SF.DefaultEnvironment.setName</strong>&nbsp;(name)</dt>
+<dd>
+
+Sets the chip's display name
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Name
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="SF.DefaultEnvironment.setfenv"></a><strong>SF.DefaultEnvironment.setfenv</strong>&nbsp;(func, tbl)</dt>
 <dd>
 
@@ -1881,9 +1972,18 @@ ENUMs of mouse buttons for use with input library<br /><br />
 </dd>
 
 
+<dt><a name="SF.DefaultEnvironment.bit"></a><strong>SF.DefaultEnvironment.bit</strong></dt>
+<dd>
+Bit library. http://wiki.garrysmod.com/page/Category:bit<br /><br />
+
+
+
+</dd>
+
+
 <dt><a name="SF.DefaultEnvironment.math"></a><strong>SF.DefaultEnvironment.math</strong></dt>
 <dd>
-Lua's (not glua's) math library, plus clamp, angnorm, sign, round, and randfloat, calcBSplineN<br /><br />
+The math library. http://wiki.garrysmod.com/page/Category:math<br /><br />
 
 
 
@@ -1892,7 +1992,7 @@ Lua's (not glua's) math library, plus clamp, angnorm, sign, round, and randfloat
 
 <dt><a name="SF.DefaultEnvironment.os"></a><strong>SF.DefaultEnvironment.os</strong></dt>
 <dd>
-GLua's os library. http://wiki.garrysmod.com/page/Category:os, plus sortByKey, sortByMember<br /><br />
+The os library. http://wiki.garrysmod.com/page/Category:os<br /><br />
 
 
 
@@ -1901,7 +2001,7 @@ GLua's os library. http://wiki.garrysmod.com/page/Category:os, plus sortByKey, s
 
 <dt><a name="SF.DefaultEnvironment.string"></a><strong>SF.DefaultEnvironment.string</strong></dt>
 <dd>
-Lua's (not glua's) string library<br /><br />
+String library http://wiki.garrysmod.com/page/Category:string<br /><br />
 
 
 
@@ -1910,7 +2010,7 @@ Lua's (not glua's) string library<br /><br />
 
 <dt><a name="SF.DefaultEnvironment.table"></a><strong>SF.DefaultEnvironment.table</strong></dt>
 <dd>
-Lua's (not glua's) table library<br /><br />
+Table library. http://wiki.garrysmod.com/page/Category:table<br /><br />
 
 
 
