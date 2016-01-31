@@ -150,3 +150,8 @@ function ENT:Draw ()
 		render.SetStencilEnable( false )
 	cam.PopModelMatrix( )
 end
+
+function ENT:GetResolution()
+	return 512/self.Aspect, 512
+end
+

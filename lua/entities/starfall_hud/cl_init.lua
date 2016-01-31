@@ -70,6 +70,10 @@ function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
 	end
 end
 
+function ENT:GetResolution()
+	return ScrW(), ScrH()
+end
+
 
 local hook_pref = "starfall_hud_hook_"
 local Hint_FirstPrint = true

@@ -761,7 +761,7 @@ function render_library.cursorPos( ply )
 	-- Taken from EGPLib
 	local Normal, Pos, monitor, Ang
 	local screen = SF.instance.data.render.renderEnt
-	if not screen then return nil end
+	if not screen or screen:GetClass()~="starfall_screen" then return end
 	
 	ply = SF.Entities.Unwrap( ply )
 	if not ply then SF.throw("Invalid Player", 2) end
@@ -799,28 +799,19 @@ end
 
 --- Returns information about the screen, such as world offsets, dimentions, and rotation.
 -- Note: this does a table copy so move it out of your draw hook
+-- @param e The screen to get info from.
 -- @return A table describing the screen.
-function render_library.getScreenInfo()
-	local gpu = SF.instance.data.render.renderEnt.GPU
-	if not gpu then return end
-	local info, _, _ = gpu:GetInfo()
-	return table.Copy(info)
+function render_library.getScreenInfo( e )	
+	local screen = SF.Entities.UnWrap( e )
+	if screen and screen:GetClass()=="starfall_screen" then
+		return SF.Sanitize( WireGPU_Monitors[ screen:GetModel() ] or {} )
+	end
 end
 
 --- Returns the entity currently being rendered to
 -- @return Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
 	return SF.Entities.Wrap( SF.instance.data.render.renderEnt )
-end
-
---- Returns the screen surface's world position and angle
--- @return The screen position
--- @return The screen angle
-function render_library.getScreenPos()
-	local gpu = SF.instance.data.render.renderEnt.GPU
-	if not gpu then return end
-	local _, pos, rot = gpu:GetInfo()
-	return SF.WrapObject( pos ), SF.WrapObject( rot )
 end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
@@ -849,17 +840,13 @@ function render_library.readPixel ( x, y )
 	return SF.Color.Wrap( Color( r, g, b, 255 ) )
 end
 
---- Returns the X resolution of the local player's screen
--- @name render_library.scrW
+--- Returns the render context's width and height
 -- @class function
--- @return the X resolution of the local player's screen
-render_library.scrW = ScrW
-
---- Returns the Y resolution of the local player's screen
--- @name render_library.scrH
--- @class function
--- @return the Y resolution of the local player's screen
-render_library.scrH = ScrH
+-- @return the X size of the current render context
+-- @return the Y size of the current render context
+function render_library.getResolution()
+	return SF.instance.data.render.renderEnt:GetResolution()
+end
 
 --- Called when a player uses the screen
 -- @name starfallUsed
