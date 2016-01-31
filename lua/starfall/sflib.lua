@@ -567,7 +567,7 @@ else
 		
 		local gate = net.ReadEntity()
 		
-		if IsValid(gate) then
+		if IsValid(gate) and gate.files then
 			for name, code in pairs(gate.files) do
 				SF.Editor.addTab( name, code )
 			end

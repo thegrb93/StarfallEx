@@ -28,6 +28,9 @@ function ENT:DrawHUD()
 	local instance = self.link.instance
 	local data = instance.data
 	
+	render.PushFilterMag( TEXFILTER.ANISOTROPIC )
+	render.PushFilterMin( TEXFILTER.ANISOTROPIC )
+	
 	data.render.renderEnt = self
 	data.render.isRendering = true
 	draw.NoTexture()
@@ -37,7 +40,6 @@ function ENT:DrawHUD()
 		local ok, rt = instance:runScriptHook( "render" )
 		if not ok then
 			self.link:Error( rt )
-			self:Error( rt ) 
 		end
 	end
 
@@ -45,6 +47,9 @@ function ENT:DrawHUD()
 		render.PopRenderTarget()
 		data.render.usingRT = false
 	end
+	
+	render.PopFilterMag()
+	render.PopFilterMin()
 	data.render.isRendering = nil
 end
 
@@ -61,7 +66,6 @@ function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
 			end
 		else
 			self.link:Error( rt )
-			self:Error( rt ) 
 		end
 	end
 end

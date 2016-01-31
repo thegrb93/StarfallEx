@@ -92,6 +92,7 @@ if CLIENT then
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
 		end
+		if SF.Editor.editor then return end
 
 		SF.Editor.editor = SF.Editor.createEditor()
 		SF.Editor.fileViewer = SF.Editor.createFileViewer()
@@ -103,8 +104,6 @@ if CLIENT then
 		end
 		
 		SF.Editor.updateSettings ()
-
-		SF.Editor.initialized = true
 	end
 
 	function SF.Editor.open ()
@@ -630,6 +629,7 @@ if CLIENT then
 				SF.Editor.addTab()
 			end
 			
+			SF.Editor.initialized = true
 		end
 		
 		local readyTime
@@ -1284,7 +1284,7 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
 	function SF.Editor.BuildIncludesTable ( maincode, codename )
-		if not SF.Editor.initialized then SF.Editor.init() end
+		if not SF.Editor.initialized then SF.Editor.init() return false, "Loading Editor" end
 		local tbl = {}
 		maincode = maincode or SF.Editor.getCode()
 		codename = codename or SF.Editor.getOpenFile() or "main"
