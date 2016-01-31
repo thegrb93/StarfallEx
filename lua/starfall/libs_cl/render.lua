@@ -802,9 +802,9 @@ end
 -- @param e The screen to get info from.
 -- @return A table describing the screen.
 function render_library.getScreenInfo( e )	
-	local screen = SF.Entities.UnWrap( e )
-	if screen and screen:GetClass()=="starfall_screen" then
-		return SF.Sanitize( WireGPU_Monitors[ screen:GetModel() ] or {} )
+	local screen = SF.Entities.Unwrap( e )
+	if screen then
+		return SF.Sanitize( screen.ScreenInfo )
 	end
 end
 
