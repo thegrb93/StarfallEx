@@ -36,6 +36,7 @@ do
 	P.registerPrivilege( "entities.remove", "Remove", "Allows the user to remove entities" )
 	P.registerPrivilege( "entities.emitSound", "Emitsound", "Allows the user to play sounds on entities" )
 	P.registerPrivilege( "entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity" )
+	P.registerPrivilege( "entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity" )
 end
 
 local function fix_nan ( v )
@@ -136,6 +137,40 @@ function ents_methods:unparent ()
 	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then SF.throw( "Insufficient permissions", 2 ) end
 	this:SetParent( nil )
 end
+
+--- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
+-- @param e Entity to link the component to. nil to clear links.
+function ents_methods:linkComponent ( e )
+	SF.CheckType( self, ents_metatable )
+	local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	if e then
+		SF.CheckType( e, ents_metatable )
+		local link = unwrap( e )
+		if not isValid( link ) then SF.throw( "Entity is not valid", 2 ) end
+		if not SF.Permissions.check( SF.instance.player, link, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
+		
+		if link:GetClass()=="starfall_processor" and ( ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" ) then
+			ent:LinkEnt( link )
+		elseif link:IsVehicle() and ent:GetClass()=="starfall_hud" then
+			ent:LinkVehicle( link )
+		else
+			SF.throw( "Invalid Link Entity", 2 )
+		end
+	else
+		if ent:GetClass()=="starfall_screen" then
+			ent:LinkEnt( nil )
+		elseif ent:GetClass()=="starfall_hud" then
+			ent:LinkEnt( nil )
+			ent:LinkVehicle( nil )
+		else
+			SF.throw( "Invalid Link Entity", 2 )
+		end
+	end
+end
+
 
 --- Plays a sound on the entity
 -- @param snd string Sound path

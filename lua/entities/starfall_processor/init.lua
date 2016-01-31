@@ -157,12 +157,6 @@ function ENT:Compile(files, mainfile)
 	local clr = self:GetColor()
 	self:SetColor( Color( 255, 255, 255, clr.a ) )
 	
-	for k, v in pairs(ents.GetAll()) do
-		if v.link == self then
-			v:LinkEnt( self )
-		end
-	end
-	
 	if self.Inputs then
 		for k, v in pairs(self.Inputs) do
 			self:TriggerInput( k, v.Value )

@@ -30,7 +30,16 @@ function ENT:LinkEnt ( ent, ply )
 end
 
 function ENT:LinkVehicle( ent )
-	vehiclelinks[ent] = self
+	if ent then
+		vehiclelinks[ent] = self
+	else
+		--Clear links
+		for k,v in pairs( vehiclelinks ) do
+			if self == v then
+				vehiclelinks[k] = nil
+			end
+		end
+	end
 end
 
 function ENT:BuildDupeInfo ()

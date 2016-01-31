@@ -17,7 +17,7 @@ if SERVER then
 else
 	language.Add( "Tool.starfall_component.name", "Starfall - Component" )
 	language.Add( "Tool.starfall_component.desc", "Spawns a starfall component" )
-	language.Add( "Tool.starfall_component.0", "Primary: Spawns a component, Secondary: Link to processor" )
+	language.Add( "Tool.starfall_component.0", "Primary: Spawns a component, Secondary: Link to processor, Reload: Clear the link" )
 	language.Add( "Tool.starfall_component.1", "Now select the processor to link to.")
 	language.Add( "sboxlimit_starfall_components", "You've hit the Starfall Component limit!" )
 	language.Add( "undone_Starfall Screen", "Undone Starfall Screen" )
@@ -146,6 +146,20 @@ function TOOL:RightClick( trace )
 end
 
 function TOOL:Reload(trace)
+	if not trace.HitPos or not IsValid(trace.Entity) or trace.Entity:IsPlayer() then return false end
+	if CLIENT then return true end
+	
+	local ent = trace.Entity
+	
+	if ent:GetClass()=="starfall_screen" then
+		ent:LinkEnt( nil )
+		return true
+	elseif ent:GetClass()=="starfall_hud" then
+		ent:LinkEnt( nil )
+		ent:LinkVehicle( nil )
+		return true
+	end
+	
 	return false
 end
 
