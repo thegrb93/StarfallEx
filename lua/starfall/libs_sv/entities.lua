@@ -117,7 +117,8 @@ end
 
 --- Parents the entity to another entity
 -- @param ent Entity to parent to
-function ents_methods:setParent ( ent )
+-- @param attachment Optional string attachment name to parent to
+function ents_methods:setParent ( ent, attachment )
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( ent )
@@ -129,6 +130,10 @@ function ents_methods:setParent ( ent )
 	if not parent_check( this, ent ) then SF.throw( "Cannot parent to self", 2 ) end
 
 	this:SetParent( ent )
+	if attachment then
+		SF.CheckType(attachment, "string")
+		this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+	end
 end
 
 --- Unparents the entity from another entity
