@@ -107,7 +107,7 @@ end )
 ---URL Textures
 local LoadingURLQueue = {}
 
-local texturecache
+local texturecache, texturecachehttp
 
 local function CheckURLDownloads()
 	local numqueued = #LoadingURLQueue
@@ -123,8 +123,7 @@ local function CheckURLDownloads()
 					tex:Download()
 					urltable.Panel:Remove()
 					if urltable.cb then urltable.cb() end
-				end)		
-				texturecache[urltable.Url] = urltable.Material
+				end)	
 				LoadingURLQueue[numqueued] = nil					
 			else
 				if CurTime() > urltable.Timeout then
@@ -178,7 +177,7 @@ local function LoadURLMaterial( url, cb )
 	--Count the number of materials
 	local totalMaterials = 0, key
 	while true do
-		key = next(texturecache, key)
+		key = next(texturecachehttp, key)
 		if not key then break end
 		totalMaterials = totalMaterials + 1
 	end
@@ -201,6 +200,7 @@ local function LoadURLMaterial( url, cb )
 end
 
 texturecache = setmetatable({},{__mode = "k"})
+texturecachehttp = setmetatable({},{__mode = "k"})
 
 local validfonts = {
 	DebugFixed = true,
@@ -338,6 +338,7 @@ end
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
 -- @param tx Texture file path, or a http url
 -- @param cb Optional callback for when a url texture finishes loading. param1 - The texture url, param2 - The texture table
+-- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
 function render_library.getTextureID ( tx, cb )
 
 	if tx:sub(1,4)=="http" then
@@ -348,7 +349,7 @@ function render_library.getTextureID ( tx, cb )
 		local instance = SF.instance
 		
 		local tbl = {}
-		texturecache[ tbl ] = LoadURLMaterial( tx, function()
+		texturecachehttp[ tbl ] = LoadURLMaterial( tx, function()
 			if cb then
 				local ok, msg, traceback = instance:runFunction( cb, tbl, tx )
 				if not ok then
@@ -356,6 +357,7 @@ function render_library.getTextureID ( tx, cb )
 				end
 			end
 		end)
+		if not texturecachehttp[ tbl ] then return end
 		return tbl
 	else
 		local id = surface.GetTextureID( tx )
@@ -373,11 +375,17 @@ function render_library.getTextureID ( tx, cb )
 end
 
 --- Sets the texture
--- @param id Texture id or url to an online image.
+-- @param id Texture table. Get it with render.getTextureID
 function render_library.setTexture ( id )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if id and texturecache[ id ] then
-		surface.SetMaterial( texturecache[ id ] )
+	if id then
+		if texturecache[ id ] then
+			surface.SetMaterial( texturecache[ id ] )
+		elseif texturecachehttp[ id ] then
+			surface.SetMaterial( texturecachehttp[ id ] )
+		else
+			draw.NoTexture()
+		end
 	else
 		draw.NoTexture()
 	end
