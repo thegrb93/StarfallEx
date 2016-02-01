@@ -713,3 +713,47 @@ function ents_methods:isWeldedTo ()
 
 	return wrap( ent1or2( this, constraint.FindConstraint( this, "Weld" ) ) )
 end
+
+
+--- Adds a trail to the entity with the specified attributes.
+-- @param startSize The start size of the trail
+-- @param endSize The end size of the trail
+-- @param length The length size of the trail
+-- @param material The material of the trail
+-- @param color The color of the trail
+-- @param attachmentID Optional attachmentid the trail should attach to
+-- @param additive If the trail's rendering is additive
+function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( material, "string" )
+	
+	local ent = unwrap( self )
+
+	if string.find(material, '"', 1, true) then SF.throw( "Invalid Material", 2 ) end
+	if not IsValid(ent) then SF.throw( "Invalid Entity", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	local Data = {
+		Color = SF.Color.Unwrap( color ),
+		Length = length,
+		StartSize = math.Clamp( startSize, 0, 128 ),
+		EndSize = math.Clamp( endSize, 0, 128 ),
+		Material = material,
+		AttachmentID = attachmentID,
+		Additive = additive,
+	}
+
+	duplicator.EntityModifiers.trail(SF.instance.player, ent, Data)
+end
+
+--- Removes trails from the entity
+function ents_methods:removeTrails()
+	SF.CheckType( self, ents_metatable )
+	local ent = unwrap( self )
+
+	if not IsValid(ent) then SF.throw( "Invalid Entity", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
+end
+
