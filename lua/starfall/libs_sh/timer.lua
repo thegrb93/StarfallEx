@@ -70,19 +70,19 @@ function timer_library.create(name, delay, reps, func, simple)
 			reps = reps - 1
 			if reps==0 then
 				instance.data.timer_count = instance.data.timer_count - 1
+				instance.data.timers[timername] = nil
 			end
 		end
 		
 		local ok, msg, traceback = instance:runFunction(func)
 		if not ok then
 			instance:Error( msg, traceback )
-			timer.Remove( timername )
 		end
 	end
 	
 	timer.Create(timername, delay, reps, timercb )
 	
-	instance.data.timers[name] = true
+	instance.data.timers[timername] = true
 end
 
 --- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
@@ -98,8 +98,9 @@ function timer_library.remove(name)
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	
-	timer.Stop(mangle_timer_name(instance,name))
-	instance.data.timers[name] = nil
+	local timername = mangle_timer_name(instance,name)
+	timer.Stop(timername)
+	instance.data.timers[timername] = nil
 end
 
 --- Checks if a timer exists
@@ -159,11 +160,7 @@ SF.Libraries.AddHook("initialize",function(instance)
 end)
 
 SF.Libraries.AddHook("deinitialize",function(instance)
-	if instance.data.timers ~= nil then
-		for name,_ in pairs(instance.data.timers) do
-			local realname = mangle_timer_name(instance,name)
-			timer.Remove(realname)
-		end
+	for name,_ in pairs(instance.data.timers) do
+		timer.Remove(name)
 	end
-	instance.data.timers = nil
 end)
