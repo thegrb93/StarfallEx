@@ -498,6 +498,7 @@ function wirelink_methods:outputs()
 end
 
 --- Checks if an input is wired.
+-- @param name Name of the input to check
 function wirelink_methods:isWired(name)
 	SF.CheckType(self,wirelink_metatable)
 	SF.CheckType(name,"string")
@@ -506,6 +507,20 @@ function wirelink_methods:isWired(name)
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then return true
 	else return false end
+end
+
+--- Returns what an input of the wirelink is wired to.
+-- @param name Name of the input
+-- @return The entity the wirelink is wired to
+function wirelink_methods:getWiredTo(name)
+	SF.CheckType(self,wirelink_metatable)
+	SF.CheckType(name,"string")
+	local wl = wlunwrap(self)
+	if not wl then return nil end
+	local input = wl.Inputs[name]
+	if input and input.Src and input.Src:IsValid() then
+		return SF.Entities.Wrap( input.Src )
+	end
 end
 
 -- ------------------------- Ports Metatable ------------------------- --
