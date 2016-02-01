@@ -99,8 +99,11 @@ function timer_library.remove(name)
 	local instance = SF.instance
 	
 	local timername = mangle_timer_name(instance,name)
-	timer.Stop(timername)
-	instance.data.timers[timername] = nil
+	if instance.data.timers[timername] then
+		instance.data.timer_count = instance.data.timer_count - 1
+		instance.data.timers[timername] = nil
+		timer.Stop(timername)
+	end
 end
 
 --- Checks if a timer exists
@@ -117,8 +120,14 @@ end
 -- @param name The timer name
 function timer_library.stop(name)
 	SF.CheckType(name,"string")
+	local instance = SF.instance
 	
-	timer.Stop(mangle_timer_name(instance,name))
+	local timername = mangle_timer_name(instance,name)
+	if instance.data.timers[timername] then
+		instance.data.timer_count = instance.data.timer_count - 1
+		instance.data.timers[timername] = nil
+		timer.Stop(timername)
+	end
 end
 
 --- Starts a timer
