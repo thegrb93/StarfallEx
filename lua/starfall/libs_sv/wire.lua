@@ -523,6 +523,20 @@ function wirelink_methods:getWiredTo(name)
 	end
 end
 
+--- Returns the name of the output an input of the wirelink is wired to.
+-- @param name Name of the input of the wirelink.
+-- @return String name of the output that the input is wired to.
+function wirelink_methods:getWiredToName(name)
+	SF.CheckType(self,wirelink_metatable)
+	SF.CheckType(name,"string")
+	local wl = wlunwrap(self)
+	if not wl then return nil end
+	local input = wl.Inputs[name]
+	if input and input.Src and input.Src:IsValid() then
+		return input.SrcId
+	end
+end
+
 -- ------------------------- Ports Metatable ------------------------- --
 local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 
