@@ -17,7 +17,7 @@ SF.Compiler = {}
 function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreprocess)
 	if type(code) == "string" then
 		mainfile = mainfile or "generic"
-		code = {mainfile=code}
+		code = {[mainfile]=code}
 	end
 	
 	local instance = setmetatable({},SF.Instance)
