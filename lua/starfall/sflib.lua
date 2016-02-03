@@ -693,7 +693,58 @@ if SERVER then
 	MsgN("- End loading client-side libraries")
 	
 	MsgN("-End Loading SF Libraries")
+	
+	-- Command to reload the libraries
+	util.AddNetworkString("sf_reloadlibrary")
+	concommand.Add("sf_reloadlibrary", function(ply, com, arg)
+		if ply:IsValid() and not ply:IsSuperAdmin() then return end
+		if not arg[1] then return end
+		
+		local function sendToClient(name)
+			net.Start("sf_reloadlibrary")
+			local data = util.Compress(file.Read(name,"LUA"))
+			net.WriteString(arg[1])
+			net.WriteData(data, #data)
+			net.Broadcast()
+		end
+		
+		local sv_filename = "starfall/libs_sv/"..arg[1]..".lua"
+		local sh_filename = "starfall/libs_sh/"..arg[1]..".lua"
+		local cl_filename = "starfall/libs_cl/"..arg[1]..".lua"
+		
+		local postload
+		if file.Exists( sv_filename, "LUA" ) then
+			print("Reloaded library: " .. arg[1])
+			include(sv_filename)
+			postload = true
+		end
+		if file.Exists( sh_filename, "LUA" ) then
+			print("Reloaded library: " .. arg[1])
+			include(sh_filename)
+			sendToClient(sh_filename)
+			postload = true
+		end
+		if file.Exists( cl_filename, "LUA" ) then
+			sendToClient(cl_filename)
+		end
+		if postload then
+			SF.Libraries.CallHook("postload")
+		end
+	end)
+	
 else
+
+	net.Receive("sf_reloadlibrary", function(len)
+		local name = net.ReadString()
+		print("Reloaded library: " .. name)
+		local file = util.Decompress(net.ReadData(len/8 - #name - 1))
+		if file then
+			local func = CompileString( file, "SF: Reload Library "..name )
+			func()
+			SF.Libraries.CallHook("postload")
+		end
+	end)
+
 	local l
 	MsgN("-SF - Loading Libraries")
 
