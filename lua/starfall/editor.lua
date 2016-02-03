@@ -35,6 +35,7 @@ if CLIENT then
 
 	local defaultCode = [[--@name 
 --@author 
+--@shared 
 
 --[[
 	Starfall Scripting Environment

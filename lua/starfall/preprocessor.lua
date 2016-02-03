@@ -169,6 +169,16 @@ local function directive_model( args, filename, data )
 end
 SF.Preprocessor.SetGlobalDirective( "model", directive_model )
 
+SF.Preprocessor.SetGlobalDirective( "server", function( args, filename, data )
+	if not data.serverorclient then data.serverorclient = {} end
+	data.serverorclient[ filename ] = "server"
+end)
+
+SF.Preprocessor.SetGlobalDirective( "client", function( args, filename, data )
+	if not data.serverorclient then data.serverorclient = {} end
+	data.serverorclient[ filename ] = "client"
+end)
+
 --- Mark a file to be included in the upload.
 -- This is required to use the file in require() and dofile()
 -- @name include
@@ -216,4 +226,18 @@ SF.Preprocessor.SetGlobalDirective( "model", directive_model )
 -- @param model String of the model
 -- @usage
 -- \--@model models/props_junk/watermelon01.mdl
+-- -- CODE
+
+--- Set the processor to only run on the server. Shared is default
+-- @name server
+-- @class directive
+-- @usage
+-- \--@server
+-- -- CODE
+
+--- Set the processor to only run on the client. Shared is default
+-- @name client
+-- @class directive
+-- @usage
+-- \--@client
 -- -- CODE
