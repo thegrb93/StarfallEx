@@ -9,9 +9,9 @@ local file_library, _ = SF.Libraries.Register( "file" )
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "file.read", "Read files", "Allows the user to read files from data/sf_scriptdata directory" )
-	P.registerPrivilege( "file.write", "Write files", "Allows the user to write files to data/sf_scriptdata directory" )
-	P.registerPrivilege( "file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_scriptdata exists" )
+	P.registerPrivilege( "file.read", "Read files", "Allows the user to read files from data/sf_filedata directory" )
+	P.registerPrivilege( "file.write", "Write files", "Allows the user to write files to data/sf_filedata directory" )
+	P.registerPrivilege( "file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists" )
 end
 
 file.CreateDir( "sf_filedata/" )
@@ -85,4 +85,17 @@ function file_library.createDir ( path )
 	SF.CheckType( path, "string" )
 	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
 	file.CreateDir( "sf_filedata/" .. path )
+end
+
+--- Enumerates a directory
+-- @param path The folder to enumerate, relative to data/sf_filedata/. Cannot contain '..'
+-- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
+-- @return Table of file names
+-- @return Table of directory names
+function file_library.find ( path, sorting )
+	if not SF.Permissions.check( SF.instance.player, path, "file.exists" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.CheckType( path, "string" )
+	if sorting then SF.CheckType( sorting, "string" ) end
+	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	return file.Find( "sf_filedata/" .. path, "DATA", sorting )
 end
