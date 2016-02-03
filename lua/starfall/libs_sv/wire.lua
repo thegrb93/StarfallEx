@@ -294,8 +294,8 @@ function wire_library.create ( entI, entO, inputname, outputname )
 	local entI = SF.Entities.Unwrap( entI )
 	local entO = SF.Entities.Unwrap( entO )
 	
-	if not SF.Entities.IsValid( entI ) then SF.throw( "Invalid source" ) end
-	if not SF.Entities.IsValid( entO ) then SF.throw( "Invalid target" ) end
+	if not IsValid( entI ) then SF.throw( "Invalid source" ) end
+	if not IsValid( entO ) then SF.throw( "Invalid target" ) end
 	
 	if not SF.Permissions.check( SF.instance.player, entI, "wire.createWire" ) or not SF.Permissions.check( SF.instance.player, entO, "wire.createWire" ) then SF.throw( "Insufficient permissions", 2 ) end
 	
@@ -325,7 +325,7 @@ function wire_library.delete ( entI, inputname )
 	
 	local entI = SF.Entities.Unwrap( entI )
 	
-	if not SF.Entities.IsValid( entI ) then SF.throw( "Invalid source" ) end
+	if not IsValid( entI ) then SF.throw( "Invalid source" ) end
 	
 	if not SF.Permissions.check( SF.instance.player, entI, "wire.deleteWire" ) then SF.throw( "Insufficient permissions", 2 ) end
 	
@@ -345,7 +345,7 @@ local function parseEntity( ent, io )
 		ent = SF.instance.data.entity or nil
 	end
 	
-	if not SF.Entities.IsValid( ent ) then SF.throw( "Invalid source" ) end
+	if not IsValid( ent ) then SF.throw( "Invalid source" ) end
 
 	local ret = {}
 	for k, v in pairs( ent[ io ] ) do

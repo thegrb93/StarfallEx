@@ -7,7 +7,7 @@ local holograms_library, holograms_library_metamethods = SF.Libraries.Register("
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
 
 local ang_meta, vec_meta, ent_meta
-local vunwrap, aunwrap, ewrap, eunwrap, cwrap, cunwrap
+local vunwrap, aunwrap, ewrap, eunwrap
 
 SF.Libraries.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable

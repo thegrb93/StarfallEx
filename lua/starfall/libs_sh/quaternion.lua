@@ -34,7 +34,7 @@ local min 	= math.min
 
 local delta = wire_expression2_delta or 0.0000001000000
 
-local isValid = SF.Entities.IsValid -- For checking shit
+local isValid = IsValid
 
 local deg2rad = math.pi/180
 local rad2deg = 180/math.pi

@@ -7,23 +7,32 @@ SF.Entities = {}
 --- Entity type
 -- @shared
 local ents_methods, ents_metamethods = SF.Typedef( "Entity" )
-local wrap, unwrap = SF.CreateWrapper( ents_metamethods, true, true, debug.getregistry().Entity )
 
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local ewrap, eunwrap = SF.CreateWrapper( ents_metamethods, true, true, debug.getregistry().Entity )
+local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
+local ang_meta, vec_meta
+local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap
+local isValid = IsValid
+
+SF.Libraries.AddHook("postload", function()
+	ang_meta = SF.Angles.Metatable
+	vec_meta = SF.Vectors.Metatable
+
+	vwrap = SF.Vectors.Wrap
+	vunwrap = SF.Vectors.Unwrap
+	awrap = SF.Angles.Wrap
+	aunwrap = SF.Angles.Unwrap
+	cwrap = SF.Color.Wrap
+	cunwrap = SF.Color.Unwrap
+end)
 
 -- ------------------------- Internal functions ------------------------- --
 
-SF.Entities.Wrap = wrap
-SF.Entities.Unwrap = unwrap
+SF.Entities.Wrap = ewrap
+SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 
---- Returns true if valid and is not the world, false if not
--- @param entity Entity to check
-function SF.Entities.IsValid ( entity )
-	return entity and entity:IsValid()
-end
-local isValid = SF.Entities.IsValid
 
 --- Gets the physics object of the entity
 -- @return The physobj, or nil if the entity isn't valid or isn't vphysics
@@ -37,7 +46,7 @@ local getPhysObject = SF.Entities.GetPhysObject
 function SF.DefaultEnvironment.chip ()
 	local ent = SF.instance.data.entity
 	if ent then 
-		return SF.Entities.Wrap( ent )
+		return ewrap( ent )
 	end
 end
 
@@ -95,7 +104,7 @@ end
 --- To string
 -- @shared
 function ents_metamethods:__tostring ()
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	if not ent then return "(null entity)"
 	else return tostring( ent ) end
 end
@@ -104,15 +113,15 @@ end
 -- @shared
 -- @return Entity's parent or nil
 function ents_methods:getParent()
-	local ent = unwrap(self)
-	return ent and wrap(ent:GetParent())
+	local ent = eunwrap(self)
+	return ent and ewrap(ent:GetParent())
 end
 
 --- Gets the attachment index the entity is parented to
 -- @shared
 -- @return number index of the attachment the entity is parented to or 0
 function ents_methods:getAttachmentParent()
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	return ent and ent:GetParentAttachment() or 0
 end
 
@@ -121,7 +130,7 @@ end
 -- @param name
 -- @return number of the attachment index, or 0 if it doesn't exist
 function ents_methods:lookupAttachment(name)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	return ent and ent:LookupAttachment(name) or 0
 end
 
@@ -130,11 +139,11 @@ end
 -- @param index The index of the attachment
 -- @return vector position, and angle orientation
 function ents_methods:getAttachment(index)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if ent then
 		local t = ent:GetAttachment(index)
 		if t then
-			return vwrap(t.Pos), vwrap(t.Ang)
+			return vwrap(t.Pos), awrap(t.Ang)
 		end
 	end
 end
@@ -143,8 +152,8 @@ end
 -- @shared
 -- @return Color
 function ents_methods:getColor ()
-	local this = unwrap( self )
-	return SF.Color.Wrap( this:GetColor() )
+	local this = eunwrap( self )
+	return cwrap( this:GetColor() )
 end
 
 --- Checks if an entity is valid.
@@ -152,7 +161,7 @@ end
 -- @return True if valid, false if not
 function ents_methods:isValid ()
 	SF.CheckType( self, ents_metamethods )
-	return isValid( unwrap( self ) )
+	return isValid( eunwrap( self ) )
 end
 
 --- Checks if an entity is a player.
@@ -160,7 +169,7 @@ end
 -- @return True if player, false if not
 function ents_methods:isPlayer ()
 	SF.CheckType( self, ents_metamethods )
-	return unwrap( self ):IsPlayer()
+	return eunwrap( self ):IsPlayer()
 end
 
 --- Checks if an entity is a weapon.
@@ -168,7 +177,7 @@ end
 -- @return True if weapon, false if not
 function ents_methods:isWeapon ()
 	SF.CheckType( self, ents_metamethods )
-	return unwrap( self ):IsWeapon()
+	return eunwrap( self ):IsWeapon()
 end
 
 --- Checks if an entity is a vehicle.
@@ -176,7 +185,7 @@ end
 -- @return True if vehicle, false if not
 function ents_methods:isVehicle ()
 	SF.CheckType( self, ents_metamethods )
-	return unwrap( self ):IsVehicle()
+	return eunwrap( self ):IsVehicle()
 end
 
 --- Checks if an entity is an npc.
@@ -184,7 +193,7 @@ end
 -- @return True if npc, false if not
 function ents_methods:isNPC ()
 	SF.CheckType( self, ents_metamethods )
-	return unwrap( self ):IsNPC()
+	return eunwrap( self ):IsNPC()
 end
 
 --- Returns the EntIndex of the entity
@@ -192,7 +201,7 @@ end
 -- @return The numerical index of the entity
 function ents_methods:entIndex ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	return ent:EntIndex()
 end
 
@@ -201,7 +210,7 @@ end
 -- @return The string class name
 function ents_methods:getClass ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	return ent:GetClass()
 end
 
@@ -210,8 +219,8 @@ end
 -- @return The position vector
 function ents_methods:getPos ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:GetPos() )
+	local ent = eunwrap( self )
+	return vwrap( ent:GetPos() )
 end
 
 --- Returns the matrix of the entity
@@ -222,8 +231,8 @@ function ents_methods:getMatrix (bone)
 	SF.CheckType( self, ents_metamethods )
 	bone = SF.CheckType( bone, "number", 0, 0 )
 	
-	local ent = unwrap( self )
-	return vwrap( ent:GetBoneMatrix(bone) )
+	local ent = eunwrap( self )
+	return owrap( ent:GetBoneMatrix(bone) )
 end
 
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
@@ -231,8 +240,8 @@ end
 -- @return The outer bounding box size
 function ents_methods:obbSize ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:OBBMaxs() - ent:OBBMins() )
+	local ent = eunwrap( self )
+	return vwrap( ent:OBBMaxs() - ent:OBBMins() )
 end
 
 --- Returns the local position of the entity's outer bounding box
@@ -240,8 +249,8 @@ end
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenter ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:OBBCenter() )
+	local ent = eunwrap( self )
+	return vwrap( ent:OBBCenter() )
 end
 
 --- Returns the world position of the entity's outer bounding box
@@ -249,8 +258,8 @@ end
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenterW ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:LocalToWorld( ent:OBBCenter() ) )
+	local ent = eunwrap( self )
+	return vwrap( ent:LocalToWorld( ent:OBBCenter() ) )
 end
 
 --- Returns the local position of the entity's mass center
@@ -258,10 +267,10 @@ end
 -- @return The position vector of the mass center
 function ents_methods:getMassCenter ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
-	return SF.WrapObject( phys:GetMassCenter() )
+	return vwrap( phys:GetMassCenter() )
 end
 
 --- Returns the world position of the entity's mass center
@@ -269,10 +278,10 @@ end
 -- @return The position vector of the mass center
 function ents_methods:getMassCenterW ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
-	return SF.WrapObject( ent:LocalToWorld( phys:GetMassCenter() ) )
+	return vwrap( ent:LocalToWorld( phys:GetMassCenter() ) )
 end
 
 --- Returns the angle of the entity
@@ -280,8 +289,8 @@ end
 -- @return The angle
 function ents_methods:getAngles ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:GetAngles() )
+	local ent = eunwrap( self )
+	return awrap( ent:GetAngles() )
 end
 
 --- Returns the mass of the entity
@@ -290,7 +299,7 @@ end
 function ents_methods:getMass ()
 	SF.CheckType( self, ents_metamethods )
 	
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	
@@ -303,11 +312,11 @@ end
 function ents_methods:getInertia ()
 	SF.CheckType( self, ents_metamethods )
 	
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	
-	return SF.WrapObject( phys:GetInertia() )
+	return vwrap( phys:GetInertia() )
 end
 
 --- Returns the velocity of the entity
@@ -315,9 +324,9 @@ end
 -- @return The velocity vector
 function ents_methods:getVelocity ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	return SF.WrapObject( ent:GetVelocity() )
+	return vwrap( ent:GetVelocity() )
 end
 
 --- Returns the angular velocity of the entity
@@ -325,9 +334,9 @@ end
 -- @return The angular velocity vector
 function ents_methods:getAngleVelocity ()
 	SF.CheckType( self, ents_metamethods )
-	local phys = getPhysObject( unwrap( self ) )
+	local phys = getPhysObject( eunwrap( self ) )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end	
-	return SF.WrapObject( phys:GetAngleVelocity() )
+	return vwrap( phys:GetAngleVelocity() )
 end
 
 --- Converts a vector in entity local space to world space
@@ -336,10 +345,10 @@ end
 -- @return data as world space vector
 function ents_methods:localToWorld( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, SF.Types[ "Vector" ] )
-	local ent = unwrap( self )
+	SF.CheckType( data, vec_meta )
+	local ent = eunwrap( self )
 	
-	return SF.WrapObject( ent:LocalToWorld( vunwrap( data ) ) )
+	return vwrap( ent:LocalToWorld( vunwrap( data ) ) )
 end
 
 --- Converts an angle in entity local space to world space
@@ -348,11 +357,11 @@ end
 -- @return data as world space angle
 function ents_methods:localToWorldAngles ( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, SF.Types[ "Angle" ] )
-	local ent = unwrap( self )
-	local data = SF.UnwrapObject( data )
+	SF.CheckType( data, ang_meta )
+	local ent = eunwrap( self )
+	local data = aunwrap( data )
 	
-	return SF.WrapObject( ent:LocalToWorldAngles( data ) )
+	return awrap( ent:LocalToWorldAngles( data ) )
 end
 
 --- Converts a vector in world space to entity local space
@@ -361,10 +370,10 @@ end
 -- @return data as local space vector
 function ents_methods:worldToLocal ( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, SF.Types[ "Vector" ] )
-	local ent = unwrap( self )
+	SF.CheckType( data, vec_meta )
+	local ent = eunwrap( self )
 	
-	return SF.WrapObject( ent:WorldToLocal( vunwrap( data ) ) )
+	return vwrap( ent:WorldToLocal( vunwrap( data ) ) )
 end
 
 --- Converts an angle in world space to entity local space
@@ -373,11 +382,11 @@ end
 -- @return data as local space angle
 function ents_methods:worldToLocalAngles ( data )
 	SF.CheckType( self, ents_metamethods )
-	SF.CheckType( data, SF.Types[ "Angle" ] )
-	local ent = unwrap( self )
-	local data = SF.UnwrapObject( data )
+	SF.CheckType( data, ang_meta )
+	local ent = eunwrap( self )
+	local data = aunwrap( data )
 	
-	return SF.WrapObject( ent:WorldToLocalAngles( data ) )
+	return awrap( ent:WorldToLocalAngles( data ) )
 end
 
 --- Gets the model of an entity
@@ -385,7 +394,7 @@ end
 -- @return Model of the entity
 function ents_methods:getModel ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	return ent:GetModel()
 end
 
@@ -394,7 +403,7 @@ end
 -- @return Max Health of the entity
 function ents_methods:getMaxHealth ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	return ent:GetMaxHealth()
 end
 
@@ -403,7 +412,7 @@ end
 -- @return Health of the entity
 function ents_methods:getHealth ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
+	local ent = eunwrap( self )
 	return ent:Health()
 end
 
@@ -412,8 +421,8 @@ end
 -- @return Angles of the entity's eyes
 function ents_methods:getEyeAngles ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:EyeAngles() )
+	local ent = eunwrap( self )
+	return awrap( ent:EyeAngles() )
 end
 
 --- Gets the entity's eye position
@@ -422,8 +431,8 @@ end
 -- @return In case of a ragdoll, the position of the other eye
 function ents_methods:getEyePos ()
 	SF.CheckType( self, ents_metamethods )
-	local ent = unwrap( self )
-	return SF.WrapObject( ent:EyePos() )
+	local ent = eunwrap( self )
+	return vwrap( ent:EyePos() )
 end
 
 --- Gets an entities' material
@@ -431,7 +440,7 @@ end
 -- @class function
 -- @return Material
 function ents_methods:getMaterial ()
-    local ent = unwrap( self )
+    local ent = eunwrap( self )
     return ent:GetMaterial() or ""
 end
 
@@ -440,7 +449,7 @@ end
 -- @class function
 -- @return Material
 function ents_methods:getSubMaterial ( index )
-    local ent = unwrap( self )
+    local ent = eunwrap( self )
     return ent:GetSubMaterial( index ) or ""
 end
 
@@ -449,21 +458,21 @@ end
 -- @class function
 -- @return Material
 function ents_methods:getMaterials ()
-    local ent = unwrap( self )
+    local ent = eunwrap( self )
     return ent:GetMaterials() or {}
 end
 
 --- Gets the entities up vector
 function ents_methods:getUp ()
-	return SF.WrapObject( unwrap( self ):GetUp() )
+	return vwrap( eunwrap( self ):GetUp() )
 end
 
 --- Gets the entities right vector
 function ents_methods:getRight ()
-	return SF.WrapObject( unwrap( self ):GetRight() )
+	return vwrap( eunwrap( self ):GetRight() )
 end
 
 --- Gets the entities forward vector
 function ents_methods:getForward ()
-	return SF.WrapObject( unwrap( self ):GetForward() )
+	return vwrap( eunwrap( self ):GetForward() )
 end

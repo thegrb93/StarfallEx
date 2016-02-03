@@ -43,7 +43,7 @@ local function fix_nan ( v )
 	if v < huge and v > -huge then return v else return 0 end
 end
 
-local isValid = SF.Entities.IsValid
+local isValid = IsValid
 
 -- ------------------------- Internal Library ------------------------- --
 
