@@ -713,15 +713,15 @@ if SERVER then
 		local cl_filename = "starfall/libs_cl/"..arg[1]..".lua"
 		
 		local postload
-		if file.Exists( sv_filename, "LUA" ) then
-			print("Reloaded library: " .. arg[1])
-			include(sv_filename)
-			postload = true
-		end
 		if file.Exists( sh_filename, "LUA" ) then
 			print("Reloaded library: " .. arg[1])
 			include(sh_filename)
 			sendToClient(sh_filename)
+			postload = true
+		end
+		if file.Exists( sv_filename, "LUA" ) then
+			print("Reloaded library: " .. arg[1])
+			include(sv_filename)
 			postload = true
 		end
 		if file.Exists( cl_filename, "LUA" ) then
