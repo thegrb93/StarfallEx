@@ -101,6 +101,11 @@ SF.Types = {}
 -- @return The table to store normal methods
 -- @return The table to store metamethods
 function SF.Typedef(name, supermeta)
+	--Keep the original type so we don't screw up inheritance
+	if SF.Types[name] then
+		return SF.Types[name].__index, SF.Types[name]
+	end
+
 	local methods, metamethods = {}, {}
 	metamethods.__metatable = name
 	metamethods.__index = methods
