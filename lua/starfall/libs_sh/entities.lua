@@ -307,7 +307,7 @@ function ents_methods:getInertia ()
 	local phys = getPhysObject( ent )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	
-	return phys:GetInertia()
+	return SF.WrapObject( phys:GetInertia() )
 end
 
 --- Returns the velocity of the entity
