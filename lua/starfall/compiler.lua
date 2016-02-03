@@ -58,7 +58,10 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 			SF.Preprocessor.ParseDirectives(filename,source,context.directives,instance.ppdata)
 		end
 		
-		local serverorclient = instance.ppdata.serverorclient[ filename ]
+		local serverorclient
+		if  instance.ppdata.serverorclient then
+			serverorclient = instance.ppdata.serverorclient[ filename ]
+		end
 		
 		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
 			-- Lua doesn't have empty statements, so an empty file gives a syntax error
