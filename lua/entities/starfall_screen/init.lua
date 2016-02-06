@@ -24,8 +24,8 @@ function ENT:Use( activator )
 	
 	local instance = self.link.instance
 	if instance and instance.hooks[ "starfallUsed" ] then
-		local ok, rt = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
-		if not ok then self:Error( rt ) end
+		local ok, rt, tb = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
+		if not ok then self:Error( rt, tb ) end
 	end
 end
 

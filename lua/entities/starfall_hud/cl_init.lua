@@ -37,9 +37,9 @@ function ENT:DrawHUD()
 	surface.SetDrawColor( 255, 255, 255, 255 )
 	
 	if instance.hooks[ "render" ] then
-		local ok, rt = instance:runScriptHook( "render" )
+		local ok, rt, tb = instance:runScriptHook( "render" )
 		if not ok then
-			self.link:Error( rt )
+			self.link:Error( rt, tb )
 		end
 	end
 

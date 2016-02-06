@@ -19,10 +19,10 @@ net.Receive( "starfall_processor_used", function ( len )
 	if screen.link then
 		local instance = screen.link.instance
 		if instance and instance.hooks[ "starfallUsed" ] then
-			local ok, rt = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
+			local ok, rt, tb = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
 			if not ok then 
-				screen.link:Error( rt )
-				screen:Error( rt ) 
+				screen.link:Error( rt, tb )
+				screen:Error( rt, tb ) 
 			end
 		end
 	end
@@ -90,10 +90,10 @@ function ENT:RenderScreen()
 		surface.SetDrawColor( 255, 255, 255, 255 )
 
 		if instance.hooks[ "render" ] then
-			local ok, rt = instance:runScriptHook( "render" )
+			local ok, rt, tb = instance:runScriptHook( "render" )
 			if not ok then
-				self.link:Error( rt )
-				self:Error( rt ) 
+				self.link:Error( rt, tb )
+				self:Error( rt, tb ) 
 			end
 		end
 

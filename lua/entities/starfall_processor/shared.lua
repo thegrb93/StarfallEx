@@ -12,21 +12,21 @@ ENT.AdminSpawnable  = false
 
 function ENT:runScriptHook ( hook, ... )
 	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
-		local ok, rt = self.instance:runScriptHook( hook, ... )
-		if not ok then self:Error( rt )
+		local ok, rt, tb = self.instance:runScriptHook( hook, ... )
+		if not ok then self:Error( rt, tb )
 		else return rt end
 	end
 end
 
 function ENT:runScriptHookForResult ( hook, ... )
 	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
-		local ok, rt = self.instance:runScriptHookForResult( hook, ... )
-		if not ok then self:Error( rt )
+		local ok, rt, tb = self.instance:runScriptHookForResult( hook, ... )
+		if not ok then self:Error( rt, tb )
 		else return rt end
 	end
 end
 
-function ENT:Error ( msg, traceback )	
+function ENT:Error ( msg, traceback )
 	if type( msg ) == "table" then
 		if msg.message then
 			local line= msg.line
