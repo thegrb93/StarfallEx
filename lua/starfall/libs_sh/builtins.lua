@@ -159,25 +159,20 @@ end
 -- as requested by Divran
 
 -- Filters Gmod Lua files based on Garry's naming convention.
-local function filterGmodLua(lib, original, gm)
-	original = original or {}
-	gm = gm or {}
+local function filterGmodLua(lib, original)
 	for name, func in pairs(lib) do
-		if name:match("^[A-Z]") then
-			gm[name] = func
-		else
-			original[name] = func
-		end
+		if not type(name)=="string" then continue end
+		name = name:gsub("^[A-Z]", string.lower)
+		original[name] = func
 	end
-	return original, gm
 end
 
 -- String library
-local string_methods, string_metatable = SF.Typedef( "Library: string" )
+local string_methods, string_metatable = SF.Typedef("Library: string" )
 filterGmodLua( string, string_methods )
 string_metatable.__newindex = function () end
 
---- Lua's (not glua's) string library
+--- String library http://wiki.garrysmod.com/page/Category:string
 -- @name SF.DefaultEnvironment.string
 -- @class table
 SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
@@ -186,13 +181,7 @@ SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
 local math_methods, math_metatable = SF.Typedef("Library: math")
 filterGmodLua(math,math_methods)
 math_metatable.__newindex = function() end
-math_methods.clamp = math.Clamp
-math_methods.angnorm = math.NormalizeAngle
-math_methods.sign = function(a) return a>0 and 1 or -1 end
-math_methods.round = math.Round
-math_methods.randfloat = math.Rand
-math_methods.calcBSplineN = nil
---- Lua's (not glua's) math library, plus clamp, angnorm, sign, round, and randfloat, calcBSplineN
+--- The math library. http://wiki.garrysmod.com/page/Category:math
 -- @name SF.DefaultEnvironment.math
 -- @class table
 SF.DefaultEnvironment.math = setmetatable({},math_metatable)
@@ -200,17 +189,15 @@ SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 local os_methods, os_metatable = SF.Typedef( "Library: os" )
 filterGmodLua( os, os_methods )
 os_metatable.__newindex = function () end
---- GLua's os library. http://wiki.garrysmod.com/page/Category:os, plus sortByKey, sortByMember
+--- The os library. http://wiki.garrysmod.com/page/Category:os
 -- @name SF.DefaultEnvironment.os
 -- @class table
 SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
 
 local table_methods, table_metatable = SF.Typedef("Library: table")
 filterGmodLua(table,table_methods)
-table_methods.sortByKey = table.SortByKey
-table_methods.sortByMember = table.SortByMember
 table_metatable.__newindex = function() end
---- Lua's (not glua's) table library
+--- Table library. http://wiki.garrysmod.com/page/Category:table
 -- @name SF.DefaultEnvironment.table
 -- @class table
 SF.DefaultEnvironment.table = setmetatable({},table_metatable)
