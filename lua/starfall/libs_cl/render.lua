@@ -478,19 +478,6 @@ function render_library.setTextureFromScreen ( ent )
 
 end
 
---- Clears the surface
--- @param clr Color type to clear with
-function render_library.clear ( clr )
-    if clr == nil then
-        if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
-        render.Clear( 0, 0, 0, 255 )
-    else
-        SF.CheckType( clr, SF.Types[ "Color" ] )
-        if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
-        render.Clear( clr.r, clr.g, clr.b, clr.a )
-    end
-end
-
 --- Draws a rectangle using the current color. 
 -- @param x Top left corner x coordinate
 -- @param y Top left corner y coordinate
