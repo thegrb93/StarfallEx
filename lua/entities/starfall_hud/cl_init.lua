@@ -55,17 +55,10 @@ end
 
 
 function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
-	if not self.link or not self.link.instance then return end
-	
-	local instance = self.link.instance
-	if instance.hooks[ "calcview" ] then
-		local ok, rt = instance:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar)
-		if ok then
-			if rt and type(rt) == "table" then
-				return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
-			end
-		else
-			self.link:Error( rt )
+	if self.link then
+		local rt = self.link:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
+		if rt and type(rt) == "table" then
+			return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
 		end
 	end
 end
