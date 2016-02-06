@@ -2,11 +2,22 @@
 -- Render library
 -------------------------------------------------------------------------------
 
---- Called when a frame is requested to be drawn. You may want to unhook from this if you don't need
--- to render anything for a bit
+--- Called when a frame is requested to be drawn.
 -- @name render
 -- @class hook
 -- @client
+
+
+--- Called when the engine wants to calculate the player's view
+-- @name calcview
+-- @class hook
+-- @client
+-- @param pos Current position of the camera
+-- @param ang Current angles of the camera
+-- @param fov Current fov of the camera
+-- @param znear Current near plane of the camera
+-- @param zfar Current far plane of the camera
+-- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}
 
 --- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
