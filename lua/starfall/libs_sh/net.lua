@@ -268,6 +268,116 @@ function net_library.readFloat()
 	return net.ReadFloat()
 end
 
+--- Writes an angle to the net message
+-- @shared
+-- @param t The angle to be written
+
+function net_library.writeAngle( t )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( t, SF.Types["Angle"] )
+
+	write( instance, "Angle", 12, SF.Angles.Unwrap( t ) )
+	return true
+end
+
+--- Reads an angle from the net message
+-- @shared
+-- @return The angle that was read
+
+function net_library.readAngle()
+	return SF.Angles.Wrap( net.ReadAngle() )
+end
+
+--- Writes an vector to the net message
+-- @shared
+-- @param t The vector to be written
+
+function net_library.writeVector( t )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( t, SF.Types["Vector"] )
+
+	write( instance, "Vector", 12, SF.Vectors.Unwrap( t ) )
+	return true
+end
+
+--- Reads a vector from the net message
+-- @shared
+-- @return The vector that was read
+
+function net_library.readVector()
+	return SF.Vectors.Wrap( net.ReadVector() )
+end
+
+--- Writes an matrix to the net message
+-- @shared
+-- @param t The matrix to be written
+
+function net_library.writeMatrix( t )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( t, SF.Types["VMatrix"] )
+
+	write( instance, "Matrix", 64, SF.VMatrix.Unwrap( t ) )
+	return true
+end
+
+--- Reads a matrix from the net message
+-- @shared
+-- @return The matrix that was read
+
+function net_library.readMatrix()
+	return SF.VMatrix.Wrap( net.ReadMatrix() )
+end
+
+--- Writes an color to the net message
+-- @shared
+-- @param t The color to be written
+
+function net_library.writeColor( t )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( t, SF.Types["Color"] )
+
+	write( instance, "Color", 4, SF.Color.Unwrap( t ) )
+	return true
+end
+
+--- Reads a color from the net message
+-- @shared
+-- @return The color that was read
+
+function net_library.readColor()
+	return SF.Color.Wrap( net.ReadColor() )
+end
+
+--- Writes an entity to the net message
+-- @shared
+-- @param t The entity to be written
+
+function net_library.writeEntity( t )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( t, SF.Types["Entity"] )
+
+	write( instance, "Entity", 2, SF.UnwrapObject( t ) )
+	return true
+end
+
+--- Reads a entity from the net message
+-- @shared
+-- @return The entity that was read
+
+function net_library.readEntity()
+	return SF.WrapObject( net.ReadEntity() )
+end
+
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
