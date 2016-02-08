@@ -134,6 +134,7 @@ local wrapArguments = SF.Sanitize
 local function run ( hookname, customfunc, ... )
 	local result = {}
 	for instance,_ in pairs( registered_instances ) do
+		if not instance.hooks[ hookname ] then continue end
 		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
 		
 		local ok = ret[1]
