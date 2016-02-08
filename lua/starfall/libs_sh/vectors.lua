@@ -236,6 +236,25 @@ function vec_methods:rotate ( a )
 	unwrap( self ):Rotate( SF.UnwrapObject( a ) )
 end
 
+--- Return rotated vector by an axis
+-- @param axis Axis the rotate around
+-- @param radians Angle to rotate by in radians.
+-- @return Rotated vector
+function vec_methods:rotateAroundAxis(axis, radians)
+	SF.CheckType( self, vec_metamethods )
+	SF.CheckType( axis, vec_metamethods )
+	SF.CheckType( radians, "number" )
+	
+	local ca, sa = math.cos(radians), math.sin(radians)
+	local x,y,z,x2,y2,z2 = axis.x, axis.y, axis.z, self.x, self.y, self.z
+	local length = (x*x+y*y+z*z)^0.5
+	x,y,z = x/length, y/length, z/length
+
+	return wrap( Vector((ca + (x^2)*(1-ca)) * x2 + (x*y*(1-ca) - z*sa) * y2 + (x*z*(1-ca) + y*sa) * z2,
+			(y*x*(1-ca) + z*sa) * x2 + (ca + (y^2)*(1-ca)) * y2 + (y*z*(1-ca) - x*sa) * z2,
+			(z*x*(1-ca) - y*sa) * x2 + (z*y*(1-ca) + x*sa) * y2 + (ca + (z^2)*(1-ca)) * z2) )
+end
+
 --- Copies the values from the second vector to the first vector. Self-Modifies.
 -- @param v Second Vector
 -- @return nil
