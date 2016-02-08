@@ -5,6 +5,7 @@ local holograms_library, holograms_library_metamethods = SF.Libraries.Register("
 
 --- Hologram type
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
+local wrap, unwrap = SF.CreateWrapper( hologram_metamethods, true, false, nil, SF.Entities.Metatable )
 
 local ang_meta, vec_meta, ent_meta
 local vunwrap, aunwrap, ewrap, eunwrap
@@ -27,6 +28,8 @@ SF.Holograms.personalquota = CreateConVar( "sf_holograms_personalquota", "100", 
 
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
+SF.Holograms.Wrap = wrap
+SF.Holograms.Unwrap = unwrap
 
 local plyCount = setmetatable({}, {__mode="k"})
 
@@ -62,7 +65,7 @@ function hologram_methods:setVel ( vel )
 	SF.CheckType( self, hologram_metamethods )
 	SF.CheckType( vel, vec_meta )
 	local vel = vunwrap( vel )
-	local holo = eunwrap( self )
+	local holo = unwrap( self )
 	if holo then holo:SetLocalVelocity( vel ) end
 end
 
@@ -71,7 +74,7 @@ end
 function hologram_methods:setAngVel ( angvel )
 	SF.CheckType( self, hologram_metamethods )
 	SF.CheckType( angvel, ang_meta )
-	local holo = eunwrap( self )
+	local holo = unwrap( self )
 	if holo then holo:SetLocalAngularVelocity( aunwrap( angvel ) ) end
 end
 
@@ -81,7 +84,7 @@ function hologram_methods:setScale ( scale )
 	SF.CheckType( self, hologram_metamethods )
 	SF.CheckType( scale, vec_meta )
 	local scale = vunwrap( scale )
-	local holo = eunwrap( self )
+	local holo = unwrap( self )
 	if holo then
 		holo:SetScale( scale )
 	end
@@ -98,7 +101,7 @@ function hologram_methods:setClip ( index, enabled, origin, normal, islocal )
 
 	local origin, normal = vunwrap( origin ), vunwrap( normal )
 
-	local holo = eunwrap( self )
+	local holo = unwrap( self )
 	if holo then
 		holo:UpdateClip( index, enabled, origin, normal, islocal )
 	end
@@ -108,7 +111,7 @@ end
 -- These IDs become invalid when the hologram's model changes.
 function hologram_methods:getFlexes()
 	SF.CheckType(self, hologram_metamethods)
-	local holoent = eunwrap(self)
+	local holoent = unwrap(self)
 	local flexes = {}
 	for i=0,holoent:GetFlexNum()-1 do
 		flexes[holoent:GetFlexName(i)] = i
@@ -125,7 +128,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
 		SF.throw( "Invalid flex: "..flexid, 2 )
 	end
-	local holoent = eunwrap(self)
+	local holoent = unwrap(self)
 	if IsValid(holoent) then
 		holoent:SetFlexWeight(self, weight)
 	end
@@ -135,7 +138,7 @@ end
 function hologram_methods:setFlexScale(scale)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(scale, "number")
-	local holoent = eunwrap(self)
+	local holoent = unwrap(self)
 	if IsValid(holoent) then
 		holoent:SetFlexScale(scale)
 	end
@@ -149,7 +152,7 @@ function hologram_methods:setModel ( model )
     SF.CheckType( model, "string" )
 	if not util.IsValidModel( model ) then SF.throw( "Model is invalid", 2 ) end
 
-    local this = eunwrap( self )
+    local this = unwrap( self )
     if IsValid( this ) then
         this:SetModel( model )
     end
@@ -162,7 +165,7 @@ end
 function hologram_methods:suppressEngineLighting ( suppress )
     SF.CheckType( suppress, "boolean" )
 
-    local this = eunwrap( self )
+    local this = unwrap( self )
     if IsValid( this ) then
         this:SetNetworkedBool( "suppressEngineLighting", suppress )
     end
@@ -175,7 +178,7 @@ end
 -- @param frame The starting frame number
 -- @param rate Frame speed. (1 is normal)
 function hologram_methods:setAnimation(animation, frame, rate)
-	local Holo = eunwrap( self )
+	local Holo = unwrap( self )
 	if not IsValid( Holo ) then return end
 
 	if type(animation)=="string" then
@@ -207,7 +210,7 @@ end
 -- @class function
 -- @return Length of current animation in seconds
 function hologram_methods:getAnimationLength( )
-	local Holo = eunwrap( self )
+	local Holo = unwrap( self )
 	if not IsValid( Holo ) then return -1 end
 	
 	return Holo:SequenceDuration()
@@ -218,7 +221,7 @@ end
 -- @param animation Name of the animation
 -- @return Animation index
 function hologram_methods:getAnimationNumber( animation )
-	local Holo = eunwrap( self )
+	local Holo = unwrap( self )
 	if not IsValid( Holo ) then return 0 end
 	
 	return Holo:LookupSequence(animation) or 0
@@ -230,7 +233,7 @@ end
 -- @param pose Name of the pose parameter
 -- @param value Value to set it to.
 function hologram_methods:setPose( pose, value )
-	local Holo = eunwrap( self )
+	local Holo = unwrap( self )
 	if not IsValid( Holo ) then return end
 	
 	Holo:SetPoseParameter( pose, value )
@@ -242,7 +245,7 @@ end
 -- @param pose Pose parameter name
 -- @return Value of the pose parameter
 function hologram_methods:getPose( pose )
-	local Holo = eunwrap( self )
+	local Holo = unwrap( self )
 	if not IsValid( Holo ) then return end
 	
 	return Holo:GetPoseParameter( pose )
@@ -288,7 +291,7 @@ function holograms_library.create ( pos, ang, model, scale )
 		
 		hook.Call( "PlayerSpawnedSENT", GAMEMODE, instance.player, holoent )
 		
-        return ewrap( holoent )
+        return wrap( holoent )
     end
 end
 

@@ -218,6 +218,8 @@ end
 -- ------------------------------------------------------------------------- --
 
 local object_wrappers = {}
+local sensitive2sf_tables = {}
+local sf2sensitive_tables = {}
 
 --- Creates wrap/unwrap functions for sensitive values, by using a lookup table
 -- (which is set to have weak keys and values)
@@ -230,7 +232,7 @@ local object_wrappers = {}
 --		function.
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable)
+function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta)
 	local s2sfmode = ""
 	local sf2smode = ""
 	
@@ -243,8 +245,16 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		s2sfmode = s2sfmode.."k"
 	end 
 
-	local sensitive2sf = setmetatable({},{__mode=s2sfmode})
-	local sf2sensitive = setmetatable({},{__mode=sf2smode})
+	local sensitive2sf, sf2sensitive
+	if shared_meta then
+		sensitive2sf = sensitive2sf_tables[ shared_meta ]
+		sf2sensitive = sf2sensitive_tables[ shared_meta ]
+	else
+		sensitive2sf = setmetatable({},{__mode=s2sfmode})
+		sf2sensitive = setmetatable({},{__mode=sf2smode})
+		sensitive2sf_tables[ metatable ] = sensitive2sf
+		sf2sensitive_tables[ metatable ] = sf2sensitive
+	end
 	
 	local function wrap(value)
 		if value == nil then return nil end
