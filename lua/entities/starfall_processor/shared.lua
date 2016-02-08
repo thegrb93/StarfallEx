@@ -11,7 +11,7 @@ ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
 function ENT:runScriptHook ( hook, ... )
-	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
+	if self.instance and not self.instance.error then
 		local ok, rt, tb = self.instance:runScriptHook( hook, ... )
 		if not ok then self:Error( rt, tb )
 		else return rt end
@@ -19,7 +19,7 @@ function ENT:runScriptHook ( hook, ... )
 end
 
 function ENT:runScriptHookForResult ( hook, ... )
-	if self.instance and not self.instance.error and self.instance.hooks[ hook:lower() ] then
+	if self.instance and not self.instance.error then
 		local ok, rt, tb = self.instance:runScriptHookForResult( hook, ... )
 		if not ok then self:Error( rt, tb )
 		else return rt end
