@@ -389,8 +389,6 @@ net.Receive( "SF_netmessage", function( len, ply )
 	if ent:IsValid() and ent.runScriptHook then
 		if ent.instance then
 			ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
-		else
-			ent:Error( "Received net message before instance was initialized." )
 		end
 	end
 end)
