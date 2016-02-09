@@ -582,11 +582,16 @@ else
 		
 		local gate = net.ReadEntity()
 		
-		if IsValid(gate) and gate.files then
-			for name, code in pairs(gate.files) do
-				SF.Editor.addTab( name, code )
+		hook.Add("Think","WaitForEditor",function()
+			if SF.Editor.initialized then
+				if IsValid(gate) and gate.files then
+					for name, code in pairs(gate.files) do
+						SF.Editor.addTab( name, code )
+					end
+				end
+				hook.Remove("Think","WaitForEditor")
 			end
-		end
+		end)
 	end)
 	
 	net.Receive("starfall_requpload", function(len)
