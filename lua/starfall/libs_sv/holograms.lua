@@ -299,8 +299,8 @@ end
 -- @server
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
-    local instance = SF.instance
-    return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
+	if not SF.Permissions.check( SF.instance.player,  nil, "hologram.create" ) then return false end
+    return plyCount[ SF.instance.player ] < SF.Holograms.personalquota:GetInt()
 end
 
 --- Checks how many holograms can be spawned
@@ -308,5 +308,5 @@ end
 -- @return number of holograms able to be spawned
 function holograms_library.hologramsLeft ()
 	if not SF.Permissions.check( SF.instance.player,  nil, "hologram.create" ) then return 0 end
-	return SF.Holograms.personalquota:GetInt() - plyCount[SF.instance.player]
+	return SF.Holograms.personalquota:GetInt() - plyCount[ SF.instance.player ]
 end
