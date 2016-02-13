@@ -104,14 +104,23 @@ function ang_methods:getRight ()
 	return SF.WrapObject( unwrap( self ):Right() )
 end
 
---- Rotates the angle around the specified axis by the specified degrees.
--- @param v Axis
--- @param r Number of degrees.
--- @return nil
-function ang_methods:rotateAroundAxis ( v, r )
+--- Return Rotated angle around the specified axis.
+-- @param v Vector axis
+-- @param deg Number of degrees or nil if radians.
+-- @param rad Number of radians or nil if degrees.
+-- @return The modified angle
+function ang_methods:rotateAroundAxis ( v, deg, rad )
 	SF.CheckType( v, SF.Types[ "Vector" ] )
-	SF.CheckType( r, "number" )
-	unwrap( self ):RotateAroundAxis( SF.UnwrapObject( v ), r )
+	if rad then
+		SF.CheckType( rad, "number" )
+		deg = math.deg( rad )
+	else
+		SF.CheckType( deg, "number" )
+	end
+	local ret = Angle()
+	ret:Set( unwrap( self ) )
+	ret:RotateAroundAxis( SF.UnwrapObject( v ), deg )
+	return wrap( ret )
 end
 
 --- Copies p,y,r from second angle to the first.

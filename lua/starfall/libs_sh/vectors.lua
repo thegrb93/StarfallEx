@@ -238,13 +238,18 @@ end
 
 --- Return rotated vector by an axis
 -- @param axis Axis the rotate around
--- @param radians Angle to rotate by in radians.
+-- @param degrees Angle to rotate by in degrees or nil if radians.
+-- @param radians Angle to rotate by in radians or nil if degrees.
 -- @return Rotated vector
-function vec_methods:rotateAroundAxis(axis, radians)
+function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	SF.CheckType( self, vec_metamethods )
 	SF.CheckType( axis, vec_metamethods )
-	SF.CheckType( radians, "number" )
-	
+	if degrees then
+		SF.CheckType( degrees, "number" )
+		radians = math.rad(degrees)
+	else
+		SF.CheckType( radians, "number" )
+	end
 	local ca, sa = math.cos(radians), math.sin(radians)
 	local x,y,z,x2,y2,z2 = axis.x, axis.y, axis.z, self.x, self.y, self.z
 	local length = (x*x+y*y+z*z)^0.5
