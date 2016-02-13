@@ -25,7 +25,6 @@ function ang_metamethods.__newindex ( t, k, v )
 	end
 end
 
-local _p = ang_metamethods.__index
 --- __index metamethod
 function ang_metamethods.__index ( t, k )
 	if type( k ) == "number" and k >= 1 and k <= 3 then
@@ -33,7 +32,7 @@ function ang_metamethods.__index ( t, k )
 	elseif k == "p" or k == "y" or k == "r" then
 		return unwrap( t )[ k ]
 	end
-	return _p[ k ]
+	return ang_methods[ k ]
 end
 
 --- tostring metamethod.

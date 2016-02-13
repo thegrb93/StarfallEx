@@ -103,12 +103,13 @@ SF.Types = {}
 function SF.Typedef(name, supermeta)
 	--Keep the original type so we don't screw up inheritance
 	if SF.Types[name] then
-		return SF.Types[name].__index, SF.Types[name]
+		return SF.Types[name].__methods, SF.Types[name]
 	end
 
 	local methods, metamethods = {}, {}
 	metamethods.__metatable = name
 	metamethods.__index = methods
+	metamethods.__methods = methods
 	
 	metamethods.__supertypes = {[metamethods] = true}
 	
