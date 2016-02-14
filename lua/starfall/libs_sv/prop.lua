@@ -6,10 +6,8 @@ local props_library, props_library_metamethods = SF.Libraries.Register("prop")
 local vunwrap = SF.UnwrapObject
 
 SF.Props = {}
-SF.Props.defaultquota = CreateConVar( "sf_props_defaultquota", "200", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The number of props allowed to spawn via Starfall scripts across all instances" )
 
-SF.Props.personalquota = CreateConVar( "sf_props_personalquota", "100", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+SF.Props.personalquota = CreateConVar( "sf_props_personalquota", "-1", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The number of props allowed to spawn via Starfall scripts for a single instance" )
 
 SF.Props.burstmax = CreateConVar( "sf_props_burstmax", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
@@ -75,22 +73,12 @@ local function can_spawn(instance, noupdate)
 	end
 end
 
---- Checks if the total number of props across all instances has reached the max limit.
--- @class function
--- @return True/False depending on if limit has been reached for SF Props
-local function max_reached()
-	local c = 0
-	for _, v in pairs( plyCount ) do
-		c = c + v
-	end
-	if c >= SF.Props.defaultquota:GetInt() then return true else return false end
-end
-
 --- Checks if the users personal limit of props has been exhausted
 -- @class function
 -- @param i Instance to use, this will relate to the player in question
 -- @return True/False depending on if the personal limit has been reached for SF Props
 local function personal_max_reached( i )
+	if SF.Props.personalquota:GetInt() < 0 then return false end
 	return plyCount[i.player] >= SF.Props.personalquota:GetInt()
 end
 
@@ -125,9 +113,7 @@ function props_library.create ( pos, ang, model, frozen )
 
 	local instance = SF.instance
 	if not can_spawn( instance ) then return SF.throw( "Can't spawn props that often", 2 )
-	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 )
-	elseif max_reached() then return SF.throw( "Can't spawn props, maximum limit of " .. SF.Props.defaultquota:GetInt() .. " has been reached", 2 ) end
-	if not IsValid( instance.player ) then return end
+	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 	if not gamemode.Call( "PlayerSpawnProp", instance.player, model ) then return end
 
 	local propdata = instance.data.props
@@ -176,10 +162,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	local instance = SF.instance
 	if not can_spawn( instance ) then return SF.throw( "Can't spawn props that often", 2 )
-	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 )
-	elseif max_reached() then return SF.throw( "Can't spawn props, maximum limit of " .. SF.Props.defaultquota:GetInt() .. " has been reached", 2 ) end
-	if not IsValid( instance.player ) then return end
-	
+	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 
 	local swep = list.Get( "Weapon" )[ class ]
 	local sent = list.Get( "SpawnableEntities" )[ class ]
@@ -245,7 +228,7 @@ function props_library.canSpawn ()
 	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return false end
 	
 	local instance = SF.instance
-	return not personal_max_reached( instance ) and not max_reached() and can_spawn( instance, true )
+	return not personal_max_reached( instance ) and can_spawn( instance, true )
 	
 end
 
@@ -257,6 +240,8 @@ function props_library.propsLeft ()
 	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return 0 end
 	
 	local instance = SF.instance
+	
+	if SF.Props.personalquota:GetInt() < 0 then return -1 end
 	return math.min( SF.Props.personalquota:GetInt() - plyCount[instance.player], instance.data.props.burst )
 	
 end
