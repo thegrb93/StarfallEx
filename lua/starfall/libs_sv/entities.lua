@@ -125,7 +125,7 @@ function ents_methods:setParent ( ent, attachment )
 	local this = unwrap( self )
 
 	if not SF.Permissions.check( SF.instance.player, this, "entities.parent" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.parent" ) then SF.throw( "Insufficient permissions", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.parent" ) and not ent:IsPlayer() then SF.throw( "Insufficient permissions", 2 ) end
 
 	if not parent_check( this, ent ) then SF.throw( "Cannot parent to self", 2 ) end
 
