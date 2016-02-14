@@ -42,39 +42,6 @@ function ENT:LinkVehicle( ent )
 	end
 end
 
-function ENT:BuildDupeInfo ()
-	local info = self.BaseClass.BuildDupeInfo( self ) or {}
-
-	if IsValid(self.link) then
-		info.link = self.link:EntIndex()
-	end
-	info.linkedvehicles = {}
-	for k, v in pairs( vehiclelinks ) do
-		if v == self and k:IsValid() then
-			info.linkedvehicles[#info.linkedvehicles + 1] = k:EntIndex()
-		end
-	end
-
-	return info
-end
-
-function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )
-	self.BaseClass.ApplyDupeInfo( self, ply, ent, info, GetEntByID )
-	
-	if info.link then
-		local e = GetEntByID( info.link )
-		if IsValid( e ) then
-			self:LinkEnt( e )
-		end
-	end
-	for k, v in pairs(info.linkedvehicles) do
-		local e = GetEntByID( v )
-		if IsValid( e ) then
-			self:LinkVehicle( e )
-		end
-	end
-end
-
 hook.Add("PlayerEnteredVehicle","Starfall_HUD_PlayerEnteredVehicle",function( ply, vehicle )
 	for k,v in pairs( vehiclelinks ) do
 		if vehicle == k and v:IsValid() then
@@ -104,3 +71,44 @@ hook.Add("PlayerLeaveVehicle","Starfall_HUD_PlayerLeaveVehicle",function( ply, v
 		end
 	end
 end)
+
+function ENT:PreEntityCopy ()
+	if self.EntityMods then self.EntityMods.SFLink = nil end
+	local info = {}
+	if IsValid(self.link) then
+		info.link = self.link:EntIndex()
+	end
+	local linkedvehicles = {}
+	for k, v in pairs( vehiclelinks ) do
+		if v == self and k:IsValid() then
+			linkedvehicles[#linkedvehicles + 1] = k:EntIndex()
+		end
+	end
+	if #linkedvehicles > 0 then
+		info.linkedvehicles = linkedvehicles
+	end
+	if info.link or info.linkedvehicles then
+		duplicator.StoreEntityModifier( self, "SFLink", info )
+	end
+end
+
+function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
+	if ent.EntityMods and ent.EntityMods.SFLink then
+		local info = ent.EntityMods.SFLink
+		if info.link then
+			local e = CreatedEntities[ info.link ]
+			if IsValid( e ) then
+				self:LinkEnt( e )
+			end
+		end
+		
+		if info.linkedvehicles then
+			for k, v in pairs(info.linkedvehicles) do
+				local e = CreatedEntities[ v ]
+				if IsValid( e ) then
+					self:LinkVehicle( e )
+				end
+			end
+		end
+	end
+end

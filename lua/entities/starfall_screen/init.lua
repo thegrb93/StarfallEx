@@ -37,21 +37,21 @@ function ENT:LinkEnt ( ent, ply )
 	if ply then net.Send(ply) else net.Broadcast() end
 end
 
-function ENT:BuildDupeInfo ()
-	local info = {}
-
+function ENT:PreEntityCopy ()
+	if self.EntityMods then self.EntityMods.SFLink = nil end
 	if IsValid(self.link) then
-		info.link = self.link:EntIndex()
+		duplicator.StoreEntityModifier( self, "SFLink", { link = self.link:EntIndex() } )
 	end
-
-	return info
 end
 
-function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )
-	if info.link then
-		local e = GetEntByID( info.link )
-		if IsValid( e ) then
-			self:LinkEnt( e )
+function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
+	if ent.EntityMods and ent.EntityMods.SFLink then
+		local info = ent.EntityMods.SFLink
+		if info.link then
+			local e = CreatedEntities[ info.link ]
+			if IsValid( e ) then
+				self:LinkEnt( e )
+			end
 		end
 	end
 end

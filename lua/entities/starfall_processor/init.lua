@@ -190,12 +190,12 @@ function ENT:Think ()
 end
 
 function ENT:PreEntityCopy ()
-	local i = self:BuildDupeInfo()
-	if i then
-		if self.EntityMods then
-			self.EntityMods.SFDupeInfo = nil
-		end
-		duplicator.StoreEntityModifier( self, "SFDupeInfo", i )
+	if self.EntityMods then self.EntityMods.SFDupeInfo = nil end
+	
+	if self.instance then
+		local info = WireLib.BuildDupeInfo(self)
+		info.starfall = SF.SerializeCode( self.files, self.mainfile )
+		duplicator.StoreEntityModifier( self, "SFDupeInfo", info )
 	end
 end
 
@@ -207,31 +207,17 @@ local function EntityLookup(CreatedEntities)
 		if IsValid(ent) then return ent else return default end
 	end
 end
-
 function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
-		ent:ApplyDupeInfo( ply, ent, ent.EntityMods.SFDupeInfo, EntityLookup(CreatedEntities) )
-	end
-end
-
-
-function ENT:BuildDupeInfo ()
-	local info = WireLib.BuildDupeInfo(self)
-
-	if self.instance then
-		info.starfall = SF.SerializeCode( self.files, self.mainfile )
-	end
-
-	return info
-end
-
-function ENT:ApplyDupeInfo ( ply, ent, info, GetEntByID )	
-	WireLib.ApplyDupeInfo( ply, ent, info, GetEntByID )
-	self.owner = ply
+		local info = ent.EntityMods.SFDupeInfo
+		
+		WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup )
+		self.owner = ply
 	
-	if info.starfall then
-		local code, main = SF.DeserializeCode( info.starfall )
-		self:Compile( code, main )
+		if info.starfall then
+			local code, main = SF.DeserializeCode( info.starfall )
+			self:Compile( code, main )
+		end
 	end
 end
 
