@@ -428,17 +428,21 @@ end
 --- Gets the entity's eye position
 -- @shared
 -- @return Eye position of the entity
--- @return In case of a ragdoll, the position of the other eye
+-- @return In case of a ragdoll, the position of the second eye
 function ents_methods:getEyePos ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = eunwrap( self )
-	return vwrap( ent:EyePos() )
+	local pos1, pos2 = ent:EyePos()
+	if pos2 then
+		return vwrap( pos1 ), vwrap( pos2 )
+	end
+	return vwrap( pos1 )
 end
 
 --- Gets an entities' material
 -- @shared
 -- @class function
--- @return Material
+-- @return String material
 function ents_methods:getMaterial ()
     local ent = eunwrap( self )
     return ent:GetMaterial() or ""
@@ -447,7 +451,7 @@ end
 --- Gets an entities' submaterial
 -- @shared
 -- @class function
--- @return Material
+-- @return String material
 function ents_methods:getSubMaterial ( index )
     local ent = eunwrap( self )
     return ent:GetSubMaterial( index ) or ""
@@ -462,17 +466,31 @@ function ents_methods:getMaterials ()
     return ent:GetMaterials() or {}
 end
 
---- Gets the entities up vector
+--- Gets the skin number of the entity
+-- @shared
+-- @return Skin number
+function ents_methods:getSkin ()
+    local ent = eunwrap( self )
+    return ent:GetSkin()
+end
+
+--- Gets the entity's up vector
+-- @shared
+-- @return Vector up
 function ents_methods:getUp ()
 	return vwrap( eunwrap( self ):GetUp() )
 end
 
---- Gets the entities right vector
+--- Gets the entity's right vector
+-- @shared
+-- @return Vector right
 function ents_methods:getRight ()
 	return vwrap( eunwrap( self ):GetRight() )
 end
 
---- Gets the entities forward vector
+--- Gets the entity's forward vector
+-- @shared
+-- @return Vector forward
 function ents_methods:getForward ()
 	return vwrap( eunwrap( self ):GetForward() )
 end
