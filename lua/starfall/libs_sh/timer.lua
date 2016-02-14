@@ -162,6 +162,12 @@ function timer_library.unpause(name)
 	timer.UnPause(mangle_timer_name(instance,name))
 end
 
+--- Returns number of available timers
+-- @return Number of available timers
+function timer_library.getTimersLeft()
+	return max_timers:GetInt() - SF.instance.data.timer_count
+end
+
 
 SF.Libraries.AddHook("initialize",function(instance)
 	instance.data.timers = {}
