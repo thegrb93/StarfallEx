@@ -696,6 +696,44 @@ function ents_methods:enableMotion ( move )
 end
 
 
+--- Sets the physics of an entity to be a sphere
+-- @param enabled Bool should the entity be spherical?
+function ents_methods:enableSphere ( enabled )
+	SF.CheckType( self, ents_metatable )
+
+	local ent = unwrap( self )
+	
+	if ent:GetClass() ~= "prop_physics" then SF.throw( "This function only works for prop_physics", 2 ) end
+	local phys = getPhysObject( ent )
+	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	local ismove = phys:IsMoveable()
+	local mass = phys:GetMass()
+	
+	if enabled then
+		if ent:GetMoveType() == MOVETYPE_VPHYSICS then
+			local OBB = ent:OBBMaxs() - ent:OBBMins()
+			local radius = math.max( OBB.x, OBB.y, OBB.z) / 2 
+			ent:PhysicsInitSphere( radius, phys:GetMaterial() )
+			ent:SetCollisionBounds( Vector( -radius, -radius, -radius ) , Vector( radius, radius, radius ) )
+		end
+	else
+		if ent:GetMoveType() ~= MOVETYPE_VPHYSICS then
+			ent:PhysicsInit( SOLID_VPHYSICS )
+			ent:SetMoveType( MOVETYPE_VPHYSICS )
+			ent:SetSolid( SOLID_VPHYSICS )
+		end
+	end
+	
+	-- New physobject after applying spherical collisions
+	local phys = ent:GetPhysicsObject()
+	phys:SetMass( mass )
+	phys:EnableMotion( ismove )
+	phys:Wake()
+end
+
+
 local function ent1or2 ( ent, con, num )
 	if not con then return nil end
 	if num then
