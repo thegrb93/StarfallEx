@@ -765,24 +765,18 @@ end
 -- @return x position
 -- @return y position
 function render_library.cursorPos( ply )
-	-- Taken from EGPLib
-	local Normal, Pos, monitor, Ang
 	local screen = SF.instance.data.render.renderEnt
 	if not screen or screen:GetClass()~="starfall_screen" then return end
-	
+
 	ply = SF.Entities.Unwrap( ply )
 	if not ply then SF.throw("Invalid Player", 2) end
 	
+	local Normal, Pos
 	-- Get monitor screen pos & size
-	monitor = WireGPU_Monitors[ screen:GetModel() ]
+
+	Pos = screen:LocalToWorld( screen.Origin )
 		
-	-- Monitor does not have a valid screen point
-	if not monitor then return nil end
-		
-	Ang = screen:LocalToWorldAngles( monitor.rot )
-	Pos = screen:LocalToWorld( monitor.offset )
-		
-	Normal = Ang:Up()
+	Normal = -screen.Transform:GetUp():GetNormalized()
 	
 	local Start = ply:GetShootPos()
 	local Dir = ply:GetAimVector()
@@ -793,11 +787,12 @@ function render_library.cursorPos( ply )
 	if A == 0 or A > 0 then return nil end
 	
 	local B = Normal:Dot(Pos-Start) / A
-		if (B >= 0) then
-		local HitPos = WorldToLocal( Start + Dir * B, Angle(), Pos, Ang )
-		local x = (0.5+HitPos.x/(monitor.RS*512/monitor.RatioX)) * 512
-		local y = (0.5-HitPos.y/(monitor.RS*512)) * 512	
-		if x < 0 or x > 512 or y < 0 or y > 512 then return nil end -- Aiming off the screen 
+	if (B >= 0) then
+		local w = 512/screen.Aspect
+		local HitPos = WorldToLocal( Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles() )
+		local x = HitPos.x/screen.Scale
+		local y = HitPos.y/screen.Scale
+		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen 
 		return x, y
 	end
 	
