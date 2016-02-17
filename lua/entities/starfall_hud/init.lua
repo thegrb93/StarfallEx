@@ -14,11 +14,26 @@ function ENT:Initialize ()
 	self:SetUseType( SIMPLE_USE )
 end
 
-function ENT:Use( activator )
+function ENT:SetHudEnabled( ply, mode )
 	net.Start( "starfall_hud_set_enabled" )
 		net.WriteEntity( self )
-		net.WriteInt(-1, 8)
-	net.Send( activator )
+		net.WriteInt( mode, 8 )
+	net.Send( ply )
+	
+	if mode == 1 then
+		ply.sfhudenabled = true
+	elseif mode == -1 then
+		ply.sfhudenabled = not ply.sfhudenabled
+	else
+		ply.sfhudenabled = nil
+	end
+	if not ply.sfhudenabled then
+		ply:SetViewEntity()
+	end
+end
+
+function ENT:Use( ply )
+	self:SetHudEnabled( ply, -1 )
 end
 
 function ENT:LinkEnt ( ent, ply )
@@ -45,18 +60,11 @@ end
 hook.Add("PlayerEnteredVehicle","Starfall_HUD_PlayerEnteredVehicle",function( ply, vehicle )
 	for k,v in pairs( vehiclelinks ) do
 		if vehicle == k and v:IsValid() then
-			vehicle:CallOnRemove("remove_sf_hud", function()
+			vehicle:CallOnRemove("remove_sf_hud"..v:EntIndex(), function()
 				if not IsValid( v ) then return end
-				net.Start( "starfall_hud_set_enabled" )
-					net.WriteEntity( v )
-					net.WriteInt(0, 8)
-				net.Send( ply )
+				v:SetHudEnabled( ply, 0 )
 			end)
-			
-			net.Start( "starfall_hud_set_enabled" )
-				net.WriteEntity( v )
-				net.WriteInt(1, 8)
-			net.Send( ply )
+			v:SetHudEnabled( ply, 1 )
 		end
 	end
 end)
@@ -64,10 +72,7 @@ end)
 hook.Add("PlayerLeaveVehicle","Starfall_HUD_PlayerLeaveVehicle",function( ply, vehicle )
 	for k,v in pairs( vehiclelinks ) do
 		if vehicle == k and v:IsValid() then
-			net.Start( "starfall_hud_set_enabled" )
-				net.WriteEntity( v )
-				net.WriteInt(0, 8)
-			net.Send( ply )
+			v:SetHudEnabled( ply, 0 )
 		end
 	end
 end)

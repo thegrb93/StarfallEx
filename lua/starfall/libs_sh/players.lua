@@ -318,6 +318,29 @@ function player_methods:getEyeTrace ()
 	return SF.Sanitize( SF.UnwrapObject( self ):GetEyeTrace() )
 end
 
+--- Returns the player's current view entity
+-- @shared
+-- @return Player's current view entity
+function player_methods:getViewEntity ()
+	SF.CheckType( self, player_metamethods )
+	return ewrap( eunwrap( self ):GetViewEntity() )
+end
+
+if SERVER then
+	--- Sets the view entity of the player. Only works if they are linked to a hud.
+	-- @server
+	-- @param e Entity to set the player's view entity to
+	function player_methods:setViewEntity ( e )
+		local pl = eunwrap( self )
+		local ent = eunwrap( e )
+		if not (ent and ent:IsValid()) then SF.throw("Invalid Entity", 2) end
+		
+		if pl.sfhudenabled then
+			pl:SetViewEntity( ent )
+		end
+	end
+end
+
 --- Returns whether or not the player is pushing the key.
 -- @shared
 -- @param key Key to check.
