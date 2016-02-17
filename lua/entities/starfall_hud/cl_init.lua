@@ -55,7 +55,7 @@ end
 
 
 function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
-	if self.link then
+	if IsValid( self.link ) then
 		local rt = self.link:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
 		if rt and type(rt) == "table" then
 			return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}

@@ -81,7 +81,7 @@ function ENT:LinkEnt ( ent )
 end
 
 function ENT:RenderScreen()
-	if self.link and self.link.instance then
+	if IsValid( self.link ) and self.link.instance then
 		local instance = self.link.instance
 		local data = instance.data
 		
