@@ -68,6 +68,8 @@ function color_metatable:__eq ( c )
 	return unwrap( self ):__eq( unwrap( c ) )
 end
 
+local clamp = math.Clamp
+
 --- addition metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
@@ -76,7 +78,7 @@ function color_metatable.__add ( lhs, rhs )
 	SF.CheckType( lhs, color_metatable )
 	SF.CheckType( rhs, color_metatable )
 	local a, b = unwrap( lhs ), unwrap( rhs )
-	return wrap( Color( a.r + b.r, a.g + b.g, a.b + b.b, a.a + b.a ) )
+	return wrap( Color( clamp( a.r + b.r, 0, 255 ), clamp( a.g + b.g, 0, 255 ), clamp( a.b + b.b, 0, 255 ), clamp( a.a + b.a, 0, 255 ) ) )
 end
 
 --- subtraction metamethod
@@ -87,7 +89,7 @@ function color_metatable.__sub ( lhs, rhs )
 	SF.CheckType( lhs, color_metatable )
 	SF.CheckType( rhs, color_metatable )
 	local a, b = unwrap( lhs ), unwrap( rhs )
-	return wrap( Color( a.r - b.r, a.g - b.g, a.b - b.b, a.a - b.a ) )
+	return wrap( Color( clamp( a.r - b.r, 0, 255 ), clamp( a.g - b.g, 0, 255 ), clamp( a.b - b.b, 0, 255 ), clamp( a.a - b.a, 0, 255 ) ) )
 end
 
 --- multiplication metamethod
@@ -98,11 +100,11 @@ function color_metatable.__mul ( lhs, rhs )
 	if dgetmeta( lhs ) == color_metatable then
 		SF.CheckType( rhs, "number" )
 		local c = unwrap( lhs )
-		return wrap( Color( c.r * rhs, c.g * rhs, c.b * rhs, c.a * rhs ) )
+		return wrap( Color( clamp( c.r * rhs, 0, 255 ), clamp( c.g * rhs, 0, 255 ), clamp( c.b * rhs, 0, 255 ), clamp( c.a * rhs, 0, 255 ) ) )
 	else
 		SF.CheckType( lhs, "number" )
 		local c = unwrap( rhs )
-		return wrap( Color( c.r * lhs, c.g * lhs, c.b * lhs, c.a * lhs ) )
+		return wrap( Color( clamp( c.r * lhs, 0, 255 ), clamp( c.g * lhs, 0, 255 ), clamp( c.b * lhs, 0, 255 ), clamp( c.a * lhs, 0, 255 ) ) )
 	end
 end
 
@@ -112,7 +114,7 @@ end
 function color_metatable:__div ( rhs )
 	SF.CheckType( rhs, "number" )
 	local c = unwrap( self )
-	return wrap( Color( c.r / rhs, c.g / rhs, c.b / rhs, c.a / rhs ) )
+	return wrap( Color( clamp( c.r / rhs, 0, 255 ), clamp( c.g / rhs, 0, 255 ), clamp( c.b / rhs, 0, 255 ), clamp( c.a / rhs, 0, 255 ) ) )
 end
 
 --- Converts the color from RGB to HSV.
