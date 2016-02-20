@@ -32,6 +32,13 @@ function ENT:SetHudEnabled( ply, mode )
 	end
 end
 
+function ENT:OnRemove()
+	net.Start( "starfall_hud_set_enabled" )
+		net.WriteEntity( self )
+		net.WriteInt( 0, 8 )
+	net.Broadcast()
+end
+
 function ENT:Use( ply )
 	self:SetHudEnabled( ply, -1 )
 end
