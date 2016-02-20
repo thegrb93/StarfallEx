@@ -211,7 +211,7 @@ function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
 		
-		WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup )
+		WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup( CreatedEntities ) )
 		self.owner = ply
 	
 		if info.starfall then
