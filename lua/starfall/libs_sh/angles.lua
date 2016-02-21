@@ -41,12 +41,20 @@ function ang_metamethods:__tostring ()
 	return unwrap( self ):__tostring()
 end
 
---- __mul metamethod ang1 * ang2.
--- @param n Angle to multiply by.
+--- __mul metamethod ang1 * n.
+-- @param n Number to multiply by.
 -- @return resultant angle.
 function ang_metamethods:__mul ( n )
 	SF.CheckType( n, "number" )
 	return SF.WrapObject( unwrap( self ):__mul( n ) )
+end
+
+--- __div metamethod ang1 / n.
+-- @param n Number to divided by.
+-- @return resultant angle.
+function ang_metamethods:__div ( n )
+	SF.CheckType( n, "number" )
+	return SF.WrapObject( unwrap( self ):__mul( 1/n ) )
 end
 
 --- __unm metamethod -ang.
