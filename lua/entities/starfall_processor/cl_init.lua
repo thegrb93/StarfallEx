@@ -2,7 +2,7 @@ include( "shared.lua" )
 
 DEFINE_BASECLASS( "base_gmodentity" )
 
-ENT.RenderGroup = RENDERGROUP_OPAQUE
+ENT.RenderGroup = RENDERGROUP_BOTH
 
 local context = SF.CreateContext( nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"} )
 

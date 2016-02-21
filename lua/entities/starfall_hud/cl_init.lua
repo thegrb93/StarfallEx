@@ -1,6 +1,6 @@
 include( "shared.lua" )
 
---ENT.RenderGroup = RENDERGROUP_OPAQUE
+ENT.RenderGroup = RENDERGROUP_BOTH
 
 
 function ENT:Initialize ()
