@@ -202,6 +202,14 @@ table_metatable.__newindex = function() end
 -- @class table
 SF.DefaultEnvironment.table = setmetatable({},table_metatable)
 
+local bit_methods, bit_metatable = SF.Typedef("Library: bit")
+filterGmodLua(bit,bit_methods)
+bit_metatable.__newindex = function() end
+--- Bit library. http://wiki.garrysmod.com/page/Category:bit
+-- @name SF.DefaultEnvironment.bit
+-- @class table
+SF.DefaultEnvironment.bit = setmetatable({},bit_metatable)
+
 -- ------------------------- Functions ------------------------- --
 
 --- Gets a list of all libraries
