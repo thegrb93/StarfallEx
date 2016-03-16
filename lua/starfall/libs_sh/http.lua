@@ -6,6 +6,12 @@ local http_library, _ = SF.Libraries.Register( "http" )
 local http_interval = CreateConVar( "sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made" )
 local http_max_active = CreateConVar( "sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time" )
 
+local http_server_allowed, http_client_allowed
+if SERVER then
+	http_server_allowed = CreateConVar( "sf_http_allowsv", "0", { FCVAR_ARCHIVE, FCVAR_SERVER_CAN_EXECUTE }, "Should http be allowed to run on the server?" )
+else
+	http_client_allowed = CreateConVar( "sf_http_allowcl", "0", { FCVAR_ARCHIVE }, "Should http from other starfalls be allowed?" )
+end
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
 SF.Libraries.AddHook( "initialize", function( instance )
@@ -51,6 +57,8 @@ end
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 function http_library.get ( url, callbackSuccess, callbackFail )
 	local instance = SF.instance
+	if SERVER and not http_server_allowed:GetBool() then SF.throw( "Server doesn't allow http. ( sf_http_allowsv 0 )") end
+	if CLIENT and instance.player~=LocalPlayer() and not http_client_allowed:GetBool() then SF.throw("Http from others isn't allowed. ( sf_http_allowcl 0 )") end
 	
 	httpRequestReady( instance )
 	
@@ -74,6 +82,8 @@ end
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 function http_library.post ( url, params, callbackSuccess, callbackFail )
 	local instance = SF.instance
+	if SERVER and not http_server_allowed:GetBool() then SF.throw( "Server doesn't allow http. ( sf_http_allowsv 0 )") end
+	if CLIENT and instance.player~=LocalPlayer() and not http_client_allowed:GetBool() then SF.throw("Http from others isn't allowed. ( sf_http_allowcl 0 )") end
 	
 	httpRequestReady( instance )
 	
