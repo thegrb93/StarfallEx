@@ -326,6 +326,24 @@ function player_methods:getViewEntity ()
 	return ewrap( eunwrap( self ):GetViewEntity() )
 end
 
+--- Returns a table of weapons the player is carrying
+-- @shared
+-- @return Table of weapons
+function player_methods:getWeapons()
+	SF.CheckType( self, player_metamethods )
+	return SF.Sanitize( eunwrap( self ):GetWeapons() )
+end
+
+--- Returns the specified weapon or nil if the player doesn't have it
+-- @shared
+-- @param wep String weapon class
+-- @return weapon
+function player_methods:getWeapon( wep )
+	SF.CheckType( self, player_metamethods )
+	SF.CheckType( wep, "string" )
+	return ewrap( eunwrap( self ):GetWeapon( wep ) )
+end
+
 if SERVER then
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
