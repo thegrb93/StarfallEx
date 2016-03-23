@@ -208,8 +208,9 @@ end
 SF.Libraries.AddHook("postload",postload)
 
 local function convertFilter(filter)
-	if unwrap(filter) then
-		return {filter}
+	local unwrapped = unwrap(filter)
+	if unwrapped then
+		return {unwrapped}
 	else
 		local l = {}
 		local count = 1
