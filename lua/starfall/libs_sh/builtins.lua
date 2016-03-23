@@ -462,6 +462,18 @@ function SF.DefaultEnvironment.rawget( table, key, value )
     return rawget( table, key )
 end
 
+--- Returns if the table has an isValid function and isValid returns true.
+--@param object Table to check
+--@return If it is valid
+function SF.DefaultEnvironment.isValid( object )
+
+	if ( !object ) then return false end
+	if ( !object.isValid ) then return false end
+
+	return object:isValid()
+
+end
+
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
