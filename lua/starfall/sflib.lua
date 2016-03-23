@@ -304,7 +304,7 @@ end
 -- or returns the wrapped object if it does have a wrapper.
 function SF.WrapObject( object )
 	local metatable = dgetmeta(object)
-	
+	if not metatable then return object end
 	local wrap = object_wrappers[metatable]
 	return wrap and wrap(object)
 end
