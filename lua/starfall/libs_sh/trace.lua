@@ -248,7 +248,12 @@ function trace_library.trace ( start, endpos, filter, mask )
 		mask = mask
 	}
 	
-	return SF.Sanitize( util.TraceLine( trace ) )
+	local data = util.TraceLine( trace )
+	return setmetatable({}, {
+		__index=function(t,k)
+			return SF.WrapObject( data[k] )
+		end
+	})
 end
 
 --- Does a swept-AABB trace
@@ -280,5 +285,10 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 		maxs = maxbox
 	}
 	
-	return SF.Sanitize( util.TraceHull( trace ) )
+	local data = util.TraceHull( trace )
+	return setmetatable({}, {
+		__index=function(t,k)
+			return SF.WrapObject( data[k] )
+		end
+	})
 end

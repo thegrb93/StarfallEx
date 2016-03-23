@@ -357,8 +357,7 @@ function ents_methods:addCollisionListener ( func )
 		local ok, msg, traceback = instance:runFunction( func, setmetatable({}, {
 			__index=function(t,k)
 				return SF.WrapObject( data[k] )
-			end,
-			__metatable={}
+			end
 		}))
 
 		if not ok then
