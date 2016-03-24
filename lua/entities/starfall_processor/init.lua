@@ -8,8 +8,10 @@ assert( SF, "Starfall didn't load correctly!" )
 
 local context = SF.CreateContext()
 
+DEFINE_BASECLASS( "base_gmodentity" )
+
 function ENT:UpdateState ( state )
-	baseclass.Get( "base_gmodentity" ).SetOverlayText( self, "- Starfall Processor -\n[ " .. ( self.name or "Generic ( No-Name )" ) .. " ]\n" .. state )
+	BaseClass.SetOverlayText( self, "- Starfall Processor -\n[ " .. ( self.name or "Generic ( No-Name )" ) .. " ]\n" .. state )
 end
 
 function ENT:Initialize ()
@@ -168,7 +170,7 @@ end
 
 local i = 0
 function ENT:Think ()
-	self.BaseClass.Think( self )
+	BaseClass.Think( self )
 	
 	i = i + 1
 
