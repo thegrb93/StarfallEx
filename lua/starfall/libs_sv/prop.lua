@@ -36,17 +36,16 @@ SF.Libraries.AddHook("initialize",function(inst)
 end)
 
 SF.Libraries.AddHook("deinitialize", function(inst)
-	local props = inst.data.props.props
-	local prop = next(props)
-	while prop do
-		local propent = SF.Entities.Unwrap(prop)
-		if IsValid(propent) then
-			propent:Remove()
+	if inst.data.props.clean ~= false then --Return true on nil too
+		for prop, _ in pairs(inst.data.props.props) do
+			local propent = SF.Entities.Unwrap(prop)
+			if IsValid(propent) then
+				propent:Remove()
+			end
 		end
-		props[prop] = nil
-		prop = next(props)
 	end
-
+	
+	inst.data.props.props = nil
 	insts[inst]= nil
 end)
 
@@ -254,3 +253,10 @@ function props_library.spawnRate ()
 	return SF.Props.burstrate:GetFloat() or 4
 	
 end
+
+--- Sets whether the chip should remove created props when the chip is removed
+-- @param on Boolean whether the props should be cleaned or not
+function props_library.setPropClean( on )
+	SF.instance.data.props.clean = on
+end
+
