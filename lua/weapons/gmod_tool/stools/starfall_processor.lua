@@ -59,6 +59,7 @@ function TOOL:LeftClick( trace )
 	local sf
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
+		sf.owner = ply
 	else
 	
 		--self:SetStage(0)
