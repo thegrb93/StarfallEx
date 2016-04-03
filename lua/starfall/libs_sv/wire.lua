@@ -123,8 +123,8 @@ local inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = identity,
-	ANGLE = identity,
+	VECTOR = vwrap,
+	ANGLE = vwrap,
 	WIRELINK = wlwrap,
 	ENTITY = vwrap,
 
