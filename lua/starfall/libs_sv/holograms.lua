@@ -149,13 +149,13 @@ end
 -- @class function
 -- @param model string model path
 function hologram_methods:setModel ( model )
-    SF.CheckType( model, "string" )
+	SF.CheckType( model, "string" )
 	if not util.IsValidModel( model ) then SF.throw( "Model is invalid", 2 ) end
 
-    local this = unwrap( self )
-    if IsValid( this ) then
-        this:SetModel( model )
-    end
+	local this = unwrap( self )
+	if IsValid( this ) then
+		this:SetModel( model )
+	end
 end
 
 --- Suppress Engine Lighting of a hologram. Disabled by default.
@@ -163,12 +163,12 @@ end
 -- @class function
 -- @param suppress Boolean to represent if shading should be set or not.
 function hologram_methods:suppressEngineLighting ( suppress )
-    SF.CheckType( suppress, "boolean" )
+	SF.CheckType( suppress, "boolean" )
 
-    local this = unwrap( self )
-    if IsValid( this ) then
-        this:SetNetworkedBool( "suppressEngineLighting", suppress )
-    end
+	local this = unwrap( self )
+	if IsValid( this ) then
+		this:SetNetworkedBool( "suppressEngineLighting", suppress )
+	end
 end
 
 --- Animates a hologram
@@ -255,11 +255,11 @@ end
 -- @server
 -- @return The hologram object
 function holograms_library.create ( pos, ang, model, scale )
-    SF.CheckType( pos, vec_meta )
-    SF.CheckType( ang, ang_meta )
-    SF.CheckType( model, "string" )
+	SF.CheckType( pos, vec_meta )
+	SF.CheckType( ang, ang_meta )
+	SF.CheckType( model, "string" )
 	if not util.IsValidModel( model ) then SF.throw( "Model is invalid", 2 ) end
-    if scale then
+	if scale then
 		SF.CheckType( scale, vec_meta )
 		scale = vunwrap( scale )
 	end
@@ -267,32 +267,32 @@ function holograms_library.create ( pos, ang, model, scale )
 	local pos = vunwrap( pos )
 	local ang = aunwrap( ang )
 
-    local instance = SF.instance
-    local holodata = instance.data.holograms
+	local instance = SF.instance
+	local holodata = instance.data.holograms
 	
-    if plyCount[ instance.player ] >= SF.Holograms.personalquota:GetInt() then 
+	if plyCount[ instance.player ] >= SF.Holograms.personalquota:GetInt() then 
 		SF.throw( "Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2 ) 
 	end
 
-    local holoent = ents.Create( "starfall_hologram" )
-    if holoent and holoent:IsValid() then
+	local holoent = ents.Create( "starfall_hologram" )
+	if holoent and holoent:IsValid() then
 		SF.setPos( holoent, pos )
 		SF.setAng( holoent, ang )
-        holoent:SetModel( model )
-        holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata, instance.player )
-        holoent:Spawn()
+		holoent:SetModel( model )
+		holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata, instance.player )
+		holoent:Spawn()
 
-        if scale then
-            holoent:SetScale( scale )
-        end
+		if scale then
+			holoent:SetScale( scale )
+		end
 
-        holodata.holos[ holoent ] = true
-        plyCount[ instance.player ] = plyCount[ instance.player ] + 1
+		holodata.holos[ holoent ] = true
+		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
 		
 		hook.Call( "PlayerSpawnedSENT", GAMEMODE, instance.player, holoent )
 		
-        return wrap( holoent )
-    end
+		return wrap( holoent )
+	end
 end
 
 --- Checks if a user can spawn anymore holograms.
@@ -300,7 +300,7 @@ end
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
 	if not SF.Permissions.check( SF.instance.player,  nil, "hologram.create" ) then return false end
-    return plyCount[ SF.instance.player ] < SF.Holograms.personalquota:GetInt()
+	return plyCount[ SF.instance.player ] < SF.Holograms.personalquota:GetInt()
 end
 
 --- Checks how many holograms can be spawned
