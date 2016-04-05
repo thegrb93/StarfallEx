@@ -314,8 +314,14 @@ end
 -- @shared
 -- @return table trace data
 function player_methods:getEyeTrace ()
-	if not SF.Permissions.check( SF.instance.player, SF.UnwrapObject( self ), "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
-	return SF.Sanitize( SF.UnwrapObject( self ):GetEyeTrace() )
+	if not SF.Permissions.check( SF.instance.player, eunwrap( self ), "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	local data = eunwrap( self ):GetEyeTrace()
+	return setmetatable({}, {
+		__index=function(t,k)
+			return vwrap( data[k] )
+		end
+	})
 end
 
 --- Returns the player's current view entity
