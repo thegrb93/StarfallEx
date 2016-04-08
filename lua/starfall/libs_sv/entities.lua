@@ -349,6 +349,7 @@ function ents_methods:addCollisionListener ( func )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( func, "function" )
 	local ent = unwrap( self )
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
 	if ent.SF_CollisionCallback then SF.throw( "The entity is already listening to collisions!", 2 ) end
 	ent.SF_CollisionCallback = true
 
@@ -364,6 +365,16 @@ function ents_methods:addCollisionListener ( func )
 			instance:Error( msg, traceback )
 		end
 	end)
+end
+
+--- Set's the collision group
+-- @param nocolllide Whether to collide with nothing except world or not.
+function ents_methods:setNocollideAll ( nocolllide )
+	SF.CheckType( self, ents_metatable )
+	local ent = unwrap( self )
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
+	
+	ent:SetCollisionGroup ( nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE )
 end
 
 util.AddNetworkString( "sf_setentityrenderproperty" )
@@ -391,25 +402,48 @@ local renderProperties = {
 	end,
 	[6] = function( skin ) --Skin
 		net.WriteUInt( skin, 16 )
+	end,
+	[7] = function( mode ) --Rendermode
+		net.WriteUInt( mode, 8 )
+	end,
+	[8] = function( fx ) --Renderfx
+		net.WriteUInt( fx, 8 )
 	end
 }
 
 local function sendRenderPropertyToClient( ply, ent, func, ... )
-	SF.CheckType( ply, SF.Types[ "Player" ] )
-	ply = unwrap( ply )
-	if isValid( ply ) and ply:IsPlayer() then
-		net.Start( "sf_setentityrenderproperty" )
-		net.WriteEntity( ent )
-		net.WriteUInt( func, 4 )
-		renderProperties[ func ]( ... )
-		net.Send( ply )
+	local meta = debug.getmetatable( ply )
+	if meta == SF.Types[ "Player" ] then 
+		ply = unwrap( ply )
+		if not ( IsValid( ply ) and ply:IsPlayer() ) then
+			SF.throw( "Tried to use invalid player", 3 )
+		end
+	elseif meta == nil and type( ply ) == "table" then
+		local ply2 = ply
+		ply = {}
+		for k, v in pairs( ply2 ) do
+			local p = unwrap( v )
+			if IsValid( p ) and p:IsPlayer() then
+				ply[k] = p
+			else
+				SF.throw ( "Invalid player object in table of players", 3 )
+			end
+		end
+	else
+		SF.throw( "Expected player or table of players.", 3 )
 	end
+	
+	net.Start( "sf_setentityrenderproperty" )
+	net.WriteEntity( ent )
+	net.WriteUInt( func, 4 )
+	renderProperties[ func ]( ... )
+	net.Send( ply )
 end
 
 --- Sets the color of the entity
 -- @server
 -- @param clr New color
--- @param ply Optional player arguement to set the entity's color only for that player
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
 function ents_methods:setColor ( clr, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( clr, SF.Types[ "Color" ] )
@@ -421,8 +455,10 @@ function ents_methods:setColor ( clr, ply )
 	if ply then
 		sendRenderPropertyToClient( ply, ent, 1, clr )
 	else
+		local rendermode = ( clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
 		ent:SetColor( clr )
-		ent:SetRenderMode( clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA )
+		ent:SetRenderMode( rendermode )
+		duplicator.StoreEntityModifier( ent, "colour", { Color = clr, RenderMode = rendermode } )
 	end
 
 end
@@ -430,7 +466,7 @@ end
 --- Sets the whether an entity should be drawn or not
 -- @server
 -- @param draw Whether to draw the entity or not.
--- @param ply Optional player arguement to set drawing of an entity only for that player
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
 function ents_methods:setNoDraw ( draw, ply )
 	SF.CheckType( self, ents_metatable )
 
@@ -453,7 +489,7 @@ local materialBlacklist = {
 -- @server
 -- @class function
 -- @param material, string, New material name.
--- @param ply Optional player arguement to set material of an entity only for that player
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
 function ents_methods:setMaterial ( material, ply )
 	SF.CheckType( self, ents_metatable )
     SF.CheckType( material, "string" )
@@ -467,6 +503,7 @@ function ents_methods:setMaterial ( material, ply )
 		sendRenderPropertyToClient( ply, ent, 3, material )
 	else
 		ent:SetMaterial( material )
+		duplicator.StoreEntityModifier( ent, "material", { MaterialOverride = material } )
 	end
 end
 
@@ -475,7 +512,7 @@ end
 -- @class function
 -- @param index, number, submaterial index.
 -- @param material, string, New material name.
--- @param ply Optional player arguement to set material of an entity only for that player
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
 function ents_methods:setSubMaterial ( index, material, ply )
 	SF.CheckType( self, ents_metatable )
     SF.CheckType( material, "string" )
@@ -497,7 +534,7 @@ end
 -- @class function
 -- @param bodygroup Number, The ID of the bodygroup you're setting.
 -- @param value Number, The value you're setting the bodygroup to.
--- @param ply Optional player arguement to set bodygroup of an entity only for that player
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
 function ents_methods:setBodygroup ( bodygroup, value, ply )
 	SF.CheckType( self, ents_metatable )
     SF.CheckType( bodygroup, "number" )
@@ -518,7 +555,7 @@ end
 -- @server
 -- @class function
 -- @param skinIndex Number, Index of the skin to use.
--- @param ply Optional player arguement to set material of an entity only for that player
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
 function ents_methods:setSkin ( skinIndex, ply )
 	SF.CheckType( self, ents_metatable )
     SF.CheckType( skinIndex, "number" )
@@ -531,6 +568,48 @@ function ents_methods:setSkin ( skinIndex, ply )
 		sendRenderPropertyToClient( ply, 6, skinIndex )
 	else
 		ent:SetSkin( skinIndex )
+	end
+end
+
+--- Sets the rende mode of the entity
+-- @server
+-- @class function
+-- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
+function ents_methods:setRenderMode ( rendermode, ply )
+	SF.CheckType( self, ents_metatable )
+    SF.CheckType( rendermode, "number" )
+
+    local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if ply then
+		sendRenderPropertyToClient( ply, 7, rendermode )
+	else
+		ent:SetRenderMode( rendermode )
+		duplicator.StoreEntityModifier( ent, "colour", { RenderMode = rendermode } )
+	end
+end
+
+--- Sets the renderfx of the entity
+-- @server
+-- @class function
+-- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
+-- @param ply Optional player arguement to set only for that player. Can also be table of players.
+function ents_methods:setRenderFX ( renderfx, ply )
+	SF.CheckType( self, ents_metatable )
+    SF.CheckType( renderfx, "number" )
+
+    local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if ply then
+		sendRenderPropertyToClient( ply, 8, renderfx )
+	else
+		ent:SetRenderFX( renderfx )
+		duplicator.StoreEntityModifier( ent, "colour", { RenderFX = renderfx } )
 	end
 end
 

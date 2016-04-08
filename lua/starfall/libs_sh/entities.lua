@@ -79,7 +79,13 @@ else
 		end,
 		[6] = function( ent ) --Skin
 			ent:SetSkin( net.ReadUInt( 16 ) )
-		end
+		end,
+		[7] = function( ent ) --Rendermode
+			ent:SetRenderMode( net.ReadUInt( 8 ) )
+		end,
+		[8] = function( ent ) --Renderfx
+			ent:SetRenderFX( net.ReadUInt( 8 ) )
+		end,
 	}
 	
 	--Net function that allows the server to set the render properties of entities for specific players
