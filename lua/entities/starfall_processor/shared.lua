@@ -10,6 +10,12 @@ ENT.Instructions    = ""
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
+ENT.States = {
+	Normal = 1,
+	Error = 2,
+	None = 3,
+}
+
 function ENT:runScriptHook ( hook, ... )
 	if self.instance and not self.instance.error then
 		local ok, rt, tb = self.instance:runScriptHook( hook, ... )
@@ -28,22 +34,26 @@ end
 
 function ENT:Error ( msg, traceback )
 	if type( msg ) == "table" then
-		if msg.message then
-			local line= msg.line
-			local file = msg.file
+		self.error = table.Copy( msg )
+		self.error.message = type( self.error.message )=="string" and self.error.message or tostring( msg )
+	else
+		self.error = {}
+		self.error.source, self.error.line, self.error.message = string.match( tostring( msg ), "%[@?SF:(%a+):(%d+)](.+)$" )
 
-			msg = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. msg.message
+		if not self.error.source or not self.error.line or not self.error.message then
+			self.error.source, self.error.line, self.error.message = nil, nil, msg
+		else
+			self.error.message = string.TrimLeft( self.error.message )
 		end
 	end
-	msg = tostring( msg )
-
+	
 	if SERVER then
-		self:UpdateState( "Inactive (Error)" )
+		self:SetNWInt( "State", self.States.Error )
 		self:SetColor( Color( 255, 0, 0, 255 ) )
-		self:SetDTString( 0, traceback or msg )
+		self:SetDTString( 0, traceback or self.error.message )
 	end
 	
-	SF.AddNotify( self.owner, msg, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+	SF.AddNotify( self.owner, self.error.message, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
@@ -57,7 +67,7 @@ function ENT:Error ( msg, traceback )
 		end
 	end
 
-	return msg
+	return self.error.message
 end
 
 function ENT:OnRemove ()

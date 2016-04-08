@@ -12,19 +12,30 @@ function ENT:Initialize()
 	net.Start( "starfall_processor_download" )
 		net.WriteEntity( self )
 	net.SendToServer()
+	
+	self.CPUpercent = 0
+	self.CPUus = 0
 end
 
-function ENT:GetOverlayText ()
-    local message = BaseClass.GetOverlayText( self )
-    return message or ""
-end
 
-function ENT:Draw ()
-    BaseClass.Draw( self )
-    self:DrawModel()
-    if self:BeingLookedAtByLocalPlayer() then
-        AddWorldTip( self:EntIndex(), self:GetOverlayText(), 0.5, self:GetPos(), self )
-    end
+function ENT:GetOverlayText()
+	local state = self:GetNWInt( "State", 1 )
+	local clientstr, serverstr
+	if self.instance and not self.instance.error then
+		clientstr = tostring( self.CPUus ) .. "us. (" .. tostring( self.CPUpercent ) .. "%)"
+	else
+		clientstr = "Errored"
+	end
+	if state == 1 then
+		serverstr = tostring( self:GetNWInt( "CPUus", 0 ) ) .. "us. (" .. tostring( self:GetNWFloat( "CPUpercent", 0 ) ) .. "%)"
+	elseif state == 2 then
+		serverstr = "Errored"
+	end
+	if serverstr then
+		return "- Starfall Processor -\n[ " .. ( self.name or "Generic ( No-Name )" ) .. " ]\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
+	else
+		return "(None)"
+	end
 end
 
 function ENT:Think ()
@@ -32,6 +43,8 @@ function ENT:Think ()
 	
 	if self.instance and not self.instance.error then
 		local bufferAvg = self.instance:movingCPUAverage()
+		self.CPUus = math.Round( bufferAvg * 1000000 )
+		self.CPUpercent = math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 )
 		self.instance.cpu_total = 0
 		self.instance.cpu_average = bufferAvg
 		self:runScriptHook( "think" )
@@ -44,6 +57,7 @@ end
 function ENT:CodeSent ( files, main, owner )
 	if not files or not main or not owner then return end
 	if self.instance then self.instance:deinitialize() end
+	self.error = nil
 	self.owner = owner
 	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
@@ -53,6 +67,10 @@ function ENT:CodeSent ( files, main, owner )
 	self.instance = instance
 	local ok, msg, traceback = instance:initialize()
 	if not ok then self:Error( msg, traceback ) end
+	
+	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[ self.instance.mainfile ] then
+		self.name = tostring( self.instance.ppdata.scriptnames[ self.instance.mainfile ] )
+	end
 end
 
 

@@ -25,14 +25,14 @@ net.Receive( "starfall_processor_used", function ( len )
 				screen:Error( rt, tb ) 
 			end
 		end
-	end
-	
-	-- Error message copying
-	if activator == LocalPlayer() then
-		if screen.error then
-			SetClipboardText( string.format( "%q", screen.error.orig ) )
-		elseif screen:GetDTString( 0 ) then
-			SetClipboardText( screen:GetDTString( 0 ) )
+		
+		-- Error message copying
+		if activator == LocalPlayer() then
+			if screen.link.error and screen.link.error.message then
+				SetClipboardText( string.format( "%q", screen.link.error.message ) )
+			elseif screen:GetDTString( 0 ) then
+				SetClipboardText( screen:GetDTString( 0 ) )
+			end
 		end
 	end
 end )
@@ -61,60 +61,47 @@ function ENT:Initialize ()
 	end
 end
 
-function ENT:Error ( msg, traceback )
-	
-	-- Process error message
-	self.error = {}
-	self.error.orig = msg
-	self.error.source, self.error.line, self.error.msg = string.match( msg, "%[@?SF:(%a+):(%d+)](.+)$" )
-
-	if not self.error.source or not self.error.line or not self.error.msg then
-		self.error.source, self.error.line, self.error.msg = nil, nil, msg
-	else
-		self.error.msg = string.TrimLeft( self.error.msg )
-	end
-	
-end
-
 function ENT:LinkEnt ( ent )
 	self.link = ent
 end
 
 function ENT:RenderScreen()
-	if IsValid( self.link ) and self.link.instance then
-		local instance = self.link.instance
-		local data = instance.data
-		
-		data.render.matricies = 0
-		data.render.renderEnt = self
-		data.render.isRendering = true
-		draw.NoTexture()
-		surface.SetDrawColor( 255, 255, 255, 255 )
+	if IsValid( self.link ) then
+		if self.link.instance then
+			local instance = self.link.instance
+			local data = instance.data
+			
+			data.render.matricies = 0
+			data.render.renderEnt = self
+			data.render.isRendering = true
+			draw.NoTexture()
+			surface.SetDrawColor( 255, 255, 255, 255 )
 
-		if instance.hooks[ "render" ] then
-			local ok, rt, tb = instance:runScriptHook( "render" )
-			if not ok then
-				self.link:Error( rt, tb )
-				self:Error( rt, tb ) 
+			if instance.hooks[ "render" ] then
+				local ok, rt, tb = instance:runScriptHook( "render" )
+				if not ok then
+					self.link:Error( rt, tb )
+				end
 			end
-		end
 
-		if data.render.usingRT then
-			render.PopRenderTarget()
-			data.render.usingRT = false
-		end
-		data.render.isRendering = nil
+			if data.render.usingRT then
+				render.PopRenderTarget()
+				data.render.usingRT = false
+			end
+			data.render.isRendering = nil
 		
-	elseif self.error then
-		surface.SetTexture( 0 )
-		surface.SetDrawColor( 0, 0, 0, 120 )
-		surface.DrawRect( 0, 0, 512, 512 )
-		
-		draw.DrawText( "Error occurred in Starfall:", "Starfall_ErrorFont", 32, 16, Color( 0, 255, 255, 255 ) ) -- Cyan
-		draw.DrawText( tostring( self.error.msg ), "Starfall_ErrorFont", 16, 80, Color( 255, 0, 0, 255 ) )
-		if self.error.source and self.error.line then
-			draw.DrawText( "Line: " .. tostring( self.error.line), "Starfall_ErrorFont", 16, 512 - 16 * 7, Color( 255, 255, 255, 255 ) )
-			draw.DrawText( "Source: " .. self.error.source, "Starfall_ErrorFont", 16, 512 - 16 * 5, Color( 255, 255, 255, 255 ) )
+		elseif self.link.error then
+			local error = self.link.error
+			surface.SetTexture( 0 )
+			surface.SetDrawColor( 0, 0, 0, 120 )
+			surface.DrawRect( 0, 0, 512, 512 )
+			
+			draw.DrawText( "Error occurred in Starfall:", "Starfall_ErrorFont", 32, 16, Color( 0, 255, 255, 255 ) ) -- Cyan
+			draw.DrawText( tostring( error.message ), "Starfall_ErrorFont", 16, 80, Color( 255, 0, 0, 255 ) )
+			if error.source and error.line then
+				draw.DrawText( "Line: " .. tostring( error.line), "Starfall_ErrorFont", 16, 512 - 16 * 7, Color( 255, 255, 255, 255 ) )
+				draw.DrawText( "Source: " .. error.source, "Starfall_ErrorFont", 16, 512 - 16 * 5, Color( 255, 255, 255, 255 ) )
+			end
 		end
 	end
 end

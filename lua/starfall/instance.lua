@@ -40,7 +40,7 @@ function SF.Instance:runWithOps(func,...)
 
 	local function xpcall_callback ( err )
 		if type( err ) == "table" then
-			if err.message then
+			if type( err.message ) == "string" then
 				local line= err.line
 				local file = err.file
 

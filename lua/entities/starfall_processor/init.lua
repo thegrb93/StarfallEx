@@ -8,11 +8,6 @@ assert( SF, "Starfall didn't load correctly!" )
 
 local context = SF.CreateContext()
 
-DEFINE_BASECLASS( "base_gmodentity" )
-
-function ENT:UpdateState ( state )
-	BaseClass.SetOverlayText( self, "- Starfall Processor -\n[ " .. ( self.name or "Generic ( No-Name )" ) .. " ]\n" .. state )
-end
 
 function ENT:Initialize ()
 	self:PhysicsInit( SOLID_VPHYSICS )
@@ -20,7 +15,7 @@ function ENT:Initialize ()
 	self:SetSolid( SOLID_VPHYSICS )
 	self:SetUseType( SIMPLE_USE )
 	
-	self:UpdateState( "Inactive ( No code )" )
+	self:SetNWInt( "State", self.States.None )
 	self:SetColor( Color( 255, 0, 0, self:GetColor().a ) )
 end
 
@@ -111,7 +106,7 @@ end)
 
 function ENT:Compile(files, mainfile)
 	local update = self.mainfile ~= nil
-
+	self.error = nil
 	self.files = files
 	self.mainfile = mainfile
 
@@ -155,7 +150,6 @@ function ENT:Compile(files, mainfile)
 		self.name = tostring( self.instance.ppdata.scriptnames[ self.instance.mainfile ] )
 	end
 
-	self:UpdateState( "( None )" )
 	local clr = self:GetColor()
 	self:SetColor( Color( 255, 255, 255, clr.a ) )
 	
@@ -166,12 +160,11 @@ function ENT:Compile(files, mainfile)
 	end
 	
 	self:runScriptHook( "initialize" )
+	self:SetNWInt( "State", self.States.Normal )
 end
 
 local i = 0
-function ENT:Think ()
-	BaseClass.Think( self )
-	
+function ENT:Think ()	
 	i = i + 1
 
 	if i % 22 == 0 then
@@ -181,7 +174,8 @@ function ENT:Think ()
 	
 	if self.instance and not self.instance.error then		
 		local bufferAvg = self.instance:movingCPUAverage()
-		self:UpdateState( tostring( math.Round( bufferAvg * 1000000 ) ) .. " us.\n" .. tostring( math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 ) ) .. "%" )
+		self:SetNWInt( "CPUus", math.Round( bufferAvg * 1000000 ) )
+		self:SetNWFloat( "CPUpercent", math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 ) )
 		self.instance.cpu_total = 0
 		self.instance.cpu_average = bufferAvg
 		self:runScriptHook( "think" )
