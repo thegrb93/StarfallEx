@@ -94,6 +94,7 @@ function SF.throw ( msg, level, uncatchable )
 end
 
 SF.Types = {}
+local typemetatables = {}
 --- Creates a type that is safe for SF scripts to use. Instances of the type
 -- cannot access the type's metatable or metamethods.
 -- @param name Name of table
@@ -124,6 +125,7 @@ function SF.Typedef(name, supermeta)
 	end
 
 	SF.Types[name] = metamethods
+	typemetatables[ metamethods ] = true
 	return methods, metamethods
 end
 
@@ -185,9 +187,7 @@ end
 -- @param default A value to return if val is nil.
 function SF.CheckType(val, typ, level, default)
 	local meta = dgetmeta(val)
-	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ]) then 
-		return val
-	elseif type(val) == typ then
+	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) or type(val) == typ then 
 		return val
 	elseif val == nil and default then
 		return default
