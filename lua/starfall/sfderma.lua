@@ -692,8 +692,9 @@ function PANEL:openMenu ( node )
 				function ( text )
 					if text == "" then return end
 					text = string.gsub( text, ".", invalid_filename_chars )
-					local saveFile = "starfall/"..text..".txt"
-					local contents = file.Read( node:GetFileName() )
+					local oldFile = node:GetFileName()
+					local saveFile = string.GetPathFromFilename( oldFile ) .. "/" .. text ..".txt"
+					local contents = file.Read( oldFile )
 					file.Delete( node:GetFileName() )
 					file.Write( saveFile, contents )
 					SF.AddNotify( LocalPlayer(), "File renamed as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
