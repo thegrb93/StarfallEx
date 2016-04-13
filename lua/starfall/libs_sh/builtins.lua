@@ -234,17 +234,6 @@ if SERVER then
 		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
 		SF.instance.player:ChatPrint(str)
 	end
-	
-	--- Sets the chip's display name
-	-- @server
-	-- @param name Name
-	function SF.DefaultEnvironment.setName( name )
-		SF.CheckType( name, "string" )
-		local e = SF.instance.data.entity
-		if IsValid( e ) then
-			e.name = name
-		end
-	end
 else
 	-- Prints a message to the player's chat.
 	function SF.DefaultEnvironment.print(...)
@@ -253,6 +242,17 @@ else
 		local tbl = {n=select('#', ...), ...}
 		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
 		LocalPlayer():ChatPrint(str)
+	end
+	
+	--- Sets the chip's display name
+	-- @client
+	-- @param name Name
+	function SF.DefaultEnvironment.setName( name )
+		SF.CheckType( name, "string" )
+		local e = SF.instance.data.entity
+		if IsValid( e ) then
+			e.name = name
+		end
 	end
 end
 

@@ -62,15 +62,15 @@ function ENT:CodeSent ( files, main, owner )
 	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
 	
+	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then
+		self.name = tostring( instance.ppdata.scriptnames[ instance.mainfile ] )
+	end
+	
 	instance.runOnError = function ( inst, ... ) self:Error( ... ) end
 	
 	self.instance = instance
 	local ok, msg, traceback = instance:initialize()
 	if not ok then self:Error( msg, traceback ) end
-	
-	if self.instance.ppdata.scriptnames and self.instance.mainfile and self.instance.ppdata.scriptnames[ self.instance.mainfile ] then
-		self.name = tostring( self.instance.ppdata.scriptnames[ self.instance.mainfile ] )
-	end
 end
 
 
