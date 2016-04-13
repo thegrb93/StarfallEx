@@ -748,6 +748,37 @@ function PANEL:openMenu ( node )
 				end
 			)
 		end )
+		self.menu:AddSpacer()
+		self.menu:AddOption( "Delete", function ()
+			Derma_Query(
+				"Are you sure you want to delete this folder?",
+				"Delete folder",
+				"Delete",
+				function ()
+					-- Recursive delete
+					local folders = {}
+					folders[ #folders + 1 ] = node:GetFolder()
+					while #folders > 0 do
+						local folder = folders[ #folders ]
+						local files, directories = file.Find( folder.."/*", "DATA" )
+						for I=1, #files do
+							file.Delete( folder .. "/" .. files[I] )
+						end
+						if #directories == 0 then
+							file.Delete( folder )
+							folders[ #folders ] = nil
+						else
+							for I=1, #directories do
+								folders[ #folders + 1 ] = folder .. "/" .. directories[ I ]
+							end
+						end
+					end
+					SF.AddNotify( LocalPlayer(), "Folder deleted: " .. node:GetFolder(), NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					self:reloadTree()
+				end,
+				"Cancel"
+			)
+		end )
 	end
 	self.menu:Open()
 end
