@@ -771,7 +771,7 @@ else
 		print("Reloaded library: " .. name)
 		local file = util.Decompress(net.ReadData(len/8 - #name - 1))
 		if file then
-			local func = CompileString( file, "SF: Reload Library "..name )
+			local func = CompileString( file, "starfall/" .. name .. ".lua" )
 			func()
 			SF.Libraries.CallHook("postload")
 		end
