@@ -159,18 +159,42 @@ local hooks = {}
 function SF.hookAdd ( hookname, customfunc )
 	hooks[ #hooks + 1 ] = hookname
 	local lower = hookname:lower()
-	hook.Add( hookname, "SF_" .. hookname, function ( ... )
-		return run( lower, customfunc, ... )
-	end)
+	
+	--Ensure that SF hooks are called after all other hooks.
+	local detour = GAMEMODE[ hookname ]
+	if detour then
+		GAMEMODE[ hookname ] = function ( self, ... )
+			local a, b, c, d, e, f = run( lower, customfunc, ... )
+			if ( a != nil ) then
+				return a, b, c, d, e, f
+			else
+				return detour( self, ... )
+			end
+		end
+	else
+		GAMEMODE[ hookname ] = function ( self, ... )
+			return run( lower, customfunc, ... )
+		end
+	end
 end
 
+--Can only return if you are the first argument
 local function returnOnlyOnYourself( instance, args, ply )
 	if instance.player ~= ply then return end
 	if args then return args[1] end
 end
 
-local add = SF.hookAdd
+--Can only return false on yourself
+local function returnOnlyOnYourselfFalse( instance, args, ply )
+	if instance.player ~= ply then return end
+	if args and args[1]==false then return false end
+end
 
+if SFHooksAdded then return end
+SFHooksAdded = true
+	
+local add = SF.hookAdd
+	
 if SERVER then
 	-- Server hooks
 	add( "GravGunOnPickedUp" )
@@ -187,7 +211,7 @@ if SERVER then
 	add( "PlayerSpray" )
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
-	add( "PlayerCanPickupWeapon", returnOnlyOnYourself  )
+	add( "PlayerCanPickupWeapon", returnOnlyOnYourselfFalse  )
 	
 	hook.Add("EntityTakeDamage", "SF_EntityTakeDamage", function( target, dmg )
 		local lower = ("EntityTakeDamage"):lower()
@@ -215,7 +239,7 @@ add( "KeyRelease" )
 add( "GravGunPunt" )
 add( "PhysgunPickup" )
 add( "PhysgunDrop" )
-add( "PlayerSwitchWeapon", returnOnlyOnYourself )
+add( "PlayerSwitchWeapon", returnOnlyOnYourselfFalse )
 
 -- Entity hooks
 add( "OnEntityCreated" )
