@@ -8,7 +8,20 @@ local coroutine = coroutine
 local _, thread_metamethods = SF.Typedef( "thread" )
 local wrap, unwrap = SF.CreateWrapper( thread_metamethods, true, false )
 
-local coroutines = setmetatable( {}, { __mode = "v" } )
+
+SF.Libraries.AddHook("initialize",function(instance)
+	instance.data.coroutines = setmetatable( {}, { __mode = "v" } )
+end)
+
+SF.Libraries.AddHook("deinitialize",function(instance)
+	for thread, wrapped in pairs(instance.data.coroutines) do
+		local unwrapped = unwrap( wrapped )
+		unwrapped.thread = nil
+		unwrapped.func = nil
+		instance.data.coroutines[ thread ] = nil
+	end
+end)
+
 
 local function createCoroutine ( func )
 	-- Can't use coroutine.create, because of a bug that prevents halting the program when it exceeds quota
@@ -18,9 +31,11 @@ local function createCoroutine ( func )
 	
 	local thread = wrappedFunc()
 
-	coroutines[ thread ] = wrappedFunc
+	local wrappedThread = wrap( { thread = thread, func = wrappedFunc } )
 	
-	return wrappedFunc, thread
+	SF.instance.data.coroutines[ thread ] = wrappedThread
+	
+	return wrappedFunc, wrappedThread
 end
 
 --- Creates a new coroutine.
@@ -28,12 +43,8 @@ end
 -- @return coroutine
 function coroutine_library.create ( func )
 	SF.CheckType( func, "function" )
-
-	local wrappedFunc, thread = createCoroutine( func )
-
-	local ret = { func = wrappedFunc, thread = thread }
-
-	return wrap( ret )
+	local wrappedFunc, wrappedThread = createCoroutine( func )
+	return wrappedThread
 end
 
 --- Creates a new coroutine.
@@ -41,9 +52,7 @@ end
 -- @return A function that, when called, resumes the created coroutine. Any parameters to that function will be passed to the coroutine.
 function coroutine_library.wrap ( func )
 	SF.CheckType( func, "function" )
-	
-	local wrappedFunc, thread = createCoroutine( func )
-
+	local wrappedFunc, wrappedThread = createCoroutine( func )
 	return wrappedFunc
 end
 
@@ -77,12 +86,12 @@ end
 -- @return Currently running coroutine
 function coroutine_library.running ()
 	local thread = coroutine.running()
-	return wrap( { thread = thread, func = coroutines[ thread ] } )
+	return SF.instance.data.coroutines[ thread ]
 end
 
 --- Suspends the coroutine for a number of seconds. Note that the coroutine will not resume automatically, but any attempts to resume the coroutine while it is waiting will not resume the coroutine and act as if the coroutine suspended itself immediately.
 -- @param time Time in seconds to suspend the coroutine
 function coroutine_library.wait ( time )
-	coroutine.wait( time )
 	SF.CheckType( time, "number" )
+	coroutine.wait( time )
 end
