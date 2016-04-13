@@ -830,6 +830,14 @@ function PANEL:Init ()
 	end
 	self.searchBox = searchBox
 
+	self.Update = vgui.Create("DButton", self)
+	self.Update:SetTall(20)
+	self.Update:Dock(BOTTOM)
+	self.Update:DockMargin(0, 0, 0, 0)
+	self.Update:SetText("Update")
+	self.Update.DoClick = function(button)
+		tree:reloadTree()
+	end
 end
 function PANEL:getComponents ()
 	return self.searchBox, self.tree
