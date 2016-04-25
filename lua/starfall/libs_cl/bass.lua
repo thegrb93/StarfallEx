@@ -212,6 +212,33 @@ function bass_methods:getLength ()
 	end
 end
 
+--- Sets the current time of a sound
+-- @param time Time to set a sound in seconds
+function bass_methods:setTime ( time )
+	SF.CheckType( self, bass_metamethods )
+	SF.CheckType( time, "number" )
+	local uw = unwrap( self )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if IsValid(uw) then
+		uw:SetTime( time )
+	end
+end
+
+--- Gets the current time of a sound
+-- @return Current time in seconds of the sound
+function bass_methods:getTime ()
+	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
+		
+	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	if IsValid(uw) then
+		return uw:GetTime()
+	end
+end
+
 --- Gets the FFT of a sound
 -- @param n Sample size of the hamming window. Must be power of 2
 -- @return FFT table of the sound
