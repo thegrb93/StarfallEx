@@ -19,7 +19,6 @@ file.CreateDir( "sf_filedata/" )
 --- Reads a file from path
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return Contents, or nil if error
--- @return Error message if applicable
 function file_library.read ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.read" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
@@ -31,33 +30,36 @@ end
 --- Writes to a file
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return True if OK, nil if error
--- @return Error message if applicable
 function file_library.write ( path, data )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
 	SF.CheckType( data, "string" )
 	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
-	file.Write( "sf_filedata/" .. path, data )
-	return true
+	
+	local f = file.Open( "sf_filedata/" .. path, "wb", "DATA" )
+	if not f then SF.throw( "Couldn't open file for writing.", 2 ) return end
+	f:Write( data )
+	f:Close()
 end
 
 --- Appends a string to the end of a file
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @param data String that will be appended to the file.
--- @return Error message if applicable
 function file_library.append ( path, data )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
 	SF.CheckType( data, "string" )
 	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
-	file.Append( "sf_filedata/" .. path, data )
-	return true
+	
+	local f = file.Open( "sf_filedata/" .. path, "ab", "DATA" )
+	if not f then SF.throw( "Couldn't open file for writing.", 2 ) return end
+	f:Write( data )
+	f:Close()
 end
 
 --- Checks if a file exists
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return True if exists, false if not, nil if error
--- @return Error message if applicable
 function file_library.exists ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.exists" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
@@ -68,7 +70,6 @@ end
 --- Deletes a file
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return True if successful, nil if error
--- @return Error message if applicable
 function file_library.delete ( path )
 	if not SF.Permissions.check( SF.instance.player, path, "file.write" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType( path, "string" )
