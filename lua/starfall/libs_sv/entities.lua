@@ -367,9 +367,9 @@ function ents_methods:addCollisionListener ( func )
 	end)
 end
 
---- Set's the collision group
--- @param nocolllide Whether to collide with nothing except world or not.
-function ents_methods:setNocollideAll ( nocolllide )
+--- Set's the entity to collide with nothing but the world
+-- @param nocollide Whether to collide with nothing except world or not.
+function ents_methods:setNocollideAll ( nocollide )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
