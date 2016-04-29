@@ -222,7 +222,7 @@ function vec_methods:setZero ()
 	unwrap( self ):Zero()
 end
 
---- Normalise the vector, same direction, length 0. Self-Modifies.
+--- Normalise the vector, same direction, length 1. Self-Modifies.
 -- @return nil
 function vec_methods:normalize ()
 	unwrap( self ):Normalize()
