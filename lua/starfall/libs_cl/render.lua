@@ -375,6 +375,7 @@ function render_library.getTextureID ( tx, cb )
 		local id = surface.GetTextureID( tx )
 		if id then
 			local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
+			if not mat then return end
 			local cacheentry = sfCreateMaterial( "SF_TEXTURE_" .. id )
 			cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
 			
