@@ -13,18 +13,11 @@ surface.CreateFont( "Starfall_ErrorFont", {
 net.Receive( "starfall_processor_used", function ( len )
 	local screen = net.ReadEntity()
 	local activator = net.ReadEntity()
-
 	if not IsValid( screen ) then return end
 	
-	if screen.link then
-		local instance = screen.link.instance
-		if instance and instance.hooks[ "starfallUsed" ] then
-			local ok, rt, tb = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
-			if not ok then 
-				screen.link:Error( rt, tb )
-				screen:Error( rt, tb ) 
-			end
-		end
+	if IsValid( screen.link ) then
+	
+		screen.link:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
 		
 		-- Error message copying
 		if activator == LocalPlayer() then
@@ -77,12 +70,7 @@ function ENT:RenderScreen()
 			draw.NoTexture()
 			surface.SetDrawColor( 255, 255, 255, 255 )
 
-			if instance.hooks[ "render" ] then
-				local ok, rt, tb = instance:runScriptHook( "render" )
-				if not ok then
-					self.link:Error( rt, tb )
-				end
-			end
+			self.link:runScriptHook( "render" )
 
 			if data.render.usingRT then
 				render.PopRenderTarget()
