@@ -168,7 +168,7 @@ end
 
 -- Send serverside privileges to client
 
-if SERVER then
+--[[if SERVER then
 	local function sendPrivileges ( ply )
 		net.Start( "starfall_permissions_privileges" )
 			net.WriteInt( #P.privileges, 16 )
@@ -195,4 +195,4 @@ else
 			P.serverPrivileges[ net.ReadString() ] = { name = net.ReadString(), description = net.ReadString() }
 		end
 	end )
-end
+end]]
