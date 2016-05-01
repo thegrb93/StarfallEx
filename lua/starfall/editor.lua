@@ -84,6 +84,7 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_fixkeys", system.IsLinux() and 1 or 0, true, false ) --maybe osx too? need someone to check
 	CreateClientConVar( "sf_editor_fixconsolebug", 0, true, false )
 	CreateClientConVar( "sf_editor_disablelinefolding", 0, true, false )
+	CreateClientConVar( "sf_editor_keybindings", "ace", true, false )
 	CreateClientConVar( "sf_editor_fontsize", 13, true, false )
 
 	local editorUrl = "http://thegrb93.github.io/StarfallEx/starfall/editor.html"
@@ -812,6 +813,11 @@ if CLIENT then
 		end
 		
 		setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
+		local combobox, label = form:ComboBox( "Keybinding", "sf_editor_keybindings" )
+		combobox:AddChoice( "ace" )
+		combobox:AddChoice( "vim" )
+		combobox:AddChoice( "emacs" )
+		
 		setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
 		setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
 		setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
@@ -1265,17 +1271,18 @@ if CLIENT then
 					session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
 				} )
 			]] )
-			js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ")" )
-			js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ")" )
-			js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ")" )
-			js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ")" )
-			js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ")" )
-			js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
-			js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ")" )
-			js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
-			js( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ")" )
-			js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ")" )
-			js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ")" )
+			js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ");" )
+			js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ");" )
+			js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ");" )
+			js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ");" )
+			js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ");" )
+			js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
+			js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
+			js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ");" )
+			js( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ");" )
+			js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ");" )
+			js( "editor.setKeyboardHandler(\"ace/keyboard/" .. GetConVarString( "sf_editor_keybindings") .. "\");" )
+			js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ");" )
 		end
 	end
 
