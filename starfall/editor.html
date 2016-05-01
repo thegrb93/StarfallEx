@@ -30,6 +30,8 @@
 		<script src="ace/ext-language_tools.js"></script>
 		<script>
 			ace.require("ace/ext/language_tools");
+			ace.require("ace/keyboard/vim")
+			ace.require("ace/keyboard/emacs")
 			var editor = ace.edit("editor");
 			editor.setTheme("ace/theme/monokai");
 			editor.getSession().setMode("ace/mode/lua");
