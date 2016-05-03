@@ -48,12 +48,12 @@ function net_library.start( name )
 	SF.CheckType( name, "string" )
 	local instance = SF.instance
 	if instance.data.net.started then SF.throw( "net message was already started", 2) end
-	
+
 	instance.data.net.started = true
-	instance.data.net.burst = math.min( burst_limit:GetFloat()*1000, instance.data.net.burst + ( CurTime() - instance.data.net.last_send ) / burst_interval:GetFloat() * 1000 )
+	instance.data.net.burst = math.min( burst_limit:GetFloat()*1000, instance.data.net.burst + ( ( CurTime() - instance.data.net.last_send ) / burst_interval:GetFloat() ) * 1000 )
 	instance.data.net.last_send = CurTime()
 	instance.data.net.data = {}
-	
+
 	write( instance, "String", #name, name )
 end
 
@@ -72,7 +72,7 @@ function net_library.send ( target )
 		net[ data[ i ][ 1 ] ]( unpack( data[ i ][ 2 ] ) )
 	end
 
-	
+
 	if SERVER then
 		local sendfunc, newtarget
 
@@ -97,7 +97,7 @@ function net_library.send ( target )
 	else
 		net.SendToServer()
 	end
-	
+
 	instance.data.net.started = false
 end
 
