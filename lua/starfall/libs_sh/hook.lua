@@ -15,14 +15,14 @@ function hook_library.add ( hookname, name, func )
 	SF.CheckType( hookname, "string" )
 	SF.CheckType( name, "string" )
 	if func then SF.CheckType( func, "function" ) else return end
-	
+
 	local inst = SF.instance
 	local hooks = inst.hooks[ hookname:lower() ]
 	if not hooks then
 		hooks = {}
 		inst.hooks[ hookname:lower() ] = hooks
 	end
-	
+
 	hooks[ name ] = func
 	registered_instances[ inst ] = true
 end
@@ -33,18 +33,18 @@ end
 -- @param ... arguments
 function hook_library.run ( hookname, ... )
 	SF.CheckType( hookname, "string" )
-	
+
 	local instance = SF.instance
 	local lower = hookname:lower()
-	
+
 	local ret = { instance:runScriptHookForResult( lower, ... ) }
-	
+
 	local ok = table.remove( ret, 1 )
 	if not ok then
 		instance:Error( "Hook '" .. lower .. "' errored with " .. ret[ 1 ], ret[ 2 ] )
 		return
 	end
-	
+
 	return unpack( ret )
 end
 
@@ -81,16 +81,16 @@ function hook_library.runRemote ( recipient, ... )
 
 	local results = {}
 	for k, _ in pairs( recipients ) do
-	
+
 		local result = { k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... ) }
 		local ok = table.remove( result, 1 )
-		
+
 		if ok and result[1] then
 			results[ #results + 1 ] = result
 		else
 			k:Error( "Hook 'remote' errored with " .. result[ 1 ], result[ 2 ] )
 		end
-		
+
 	end
 	return results
 end
@@ -103,16 +103,16 @@ function hook_library.remove ( hookname, name )
 	SF.CheckType( hookname, "string" )
 	SF.CheckType( name, "string" )
 	local instance = SF.instance
-	
+
 	local lower = hookname:lower()
 	if instance.hooks[ lower ] then
 		instance.hooks[ lower ][ name ] = nil
-		
+
 		if not next( instance.hooks[ lower ] ) then
 			instance.hooks[ lower ] = nil
 		end
 	end
-	
+
 	if not next( instance.hooks ) then
 		registered_instances[ instance ] = nil
 	end
@@ -136,7 +136,7 @@ local function run ( hookname, customfunc, ... )
 	for instance,_ in pairs( registered_instances ) do
 		if not instance.hooks[ hookname ] then continue end
 		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
-		
+
 		local ok = ret[1]
 		if ok then
 			if customfunc then
@@ -159,7 +159,7 @@ local hooks = {}
 function SF.hookAdd ( hookname, customfunc )
 	hooks[ #hooks + 1 ] = hookname
 	local lower = hookname:lower()
-	
+
 	--Ensure that SF hooks are called after all other hooks.
 	local detour = GAMEMODE[ hookname ]
 	if detour then
@@ -192,9 +192,9 @@ end
 
 if SFHooksAdded then return end
 SFHooksAdded = true
-	
+
 local add = SF.hookAdd
-	
+
 if SERVER then
 	-- Server hooks
 	add( "GravGunOnPickedUp" )
@@ -212,17 +212,17 @@ if SERVER then
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
 	add( "PlayerCanPickupWeapon", returnOnlyOnYourselfFalse  )
-	
+
 	hook.Add("EntityTakeDamage", "SF_EntityTakeDamage", function( target, dmg )
 		local lower = ("EntityTakeDamage"):lower()
-		run( lower, nil, target, dmg:GetAttacker(), 
-			dmg:GetInflictor(), 
-			dmg:GetDamage(), 
-			dmg:GetDamageType(), 
-			dmg:GetDamagePosition(), 
-			dmg:GetDamageForce())
+		run( lower, nil, target, dmg:GetAttacker(),
+			dmg:GetInflictor(),
+			dmg:GetDamage(),
+			dmg:GetDamageType(),
+			dmg:GetDamagePosition(),
+			dmg:GetDamageForce() )
 	end)
-	
+
 else
 	-- Client hooks
 	add( "StartChat", function() end )
@@ -249,6 +249,7 @@ add( "PropBreak" )
 -- Other
 add( "EndEntityDriving" )
 add( "StartEntityDriving" )
+add( "Tick" )
 
 --- Called when an entity is being picked up by a gravity gun
 -- @name GravGunOnPickedUp
@@ -462,8 +463,13 @@ add( "StartEntityDriving" )
 -- @param ent Entity being driven
 -- @param ply Player that is driving the entity
 
---- Think hook. Called each game tick
+--- Think hook. Called each frame on the client and each game tick on the server.
 -- @name think
+-- @class hook
+-- @shared
+
+--- Tick hook. Called each game tick on both the server and client.
+-- @name tick
 -- @class hook
 -- @shared
 
