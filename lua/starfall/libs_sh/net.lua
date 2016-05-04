@@ -22,7 +22,6 @@ end
 
 local function write( instance, type, size, ... )
 	instance.data.net.size = instance.data.net.size + size
-	burst_tick()
 
 	instance.data.net.data[#instance.data.net.data+1] = { "Write" .. type, {...} }
 end
@@ -74,7 +73,7 @@ function net_library.send ( target )
 	burst_tick()
 	instance.data.net.burst = instance.data.net.burst - instance.data.net.size
 
-	if instance.data.net.burst < -8 then -- 8 bytes overhead because we're dealing with floating point calculations
+	if instance.data.net.burst < -8 then -- 8 bytes overhead
 		SF.throw( "Net message exceeds limit!", 3 )
 	end
 
@@ -395,7 +394,7 @@ end
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
 	burst_tick()
-	return SF.instance.data.net.burst
+	return SF.instance.data.net.burst - SF.instance.data.net.size
 end
 
 net.Receive( "SF_netmessage", function( len, ply )
