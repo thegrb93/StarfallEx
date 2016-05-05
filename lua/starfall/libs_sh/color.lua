@@ -130,7 +130,8 @@ end
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:rgbToHSV ()
-	return wrap( ColorToHSV( unwrap( self ) ) )
+	local hsv = ColorToHSV( unwrap( self ) )
+	return wrap( { hsv.r, hsv.g, hsv.b, (hsv.a or 255) } )
 end
 
 --- Converts the color from HSV to RGB.
