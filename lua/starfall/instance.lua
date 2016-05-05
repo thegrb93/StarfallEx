@@ -84,7 +84,8 @@ end
 -- This is done automatically by Initialize and runScriptHook.
 function SF.Instance:prepare(hook, name)
 	assert(self.initialized, "Instance not initialized!")
-	assert(not self.error, "Instance is errored!")
+	--Functions calling this one will silently halt.
+	if self.error then return true end
 	
 	if SF.instance ~= nil then
 		self.instanceStack = self.instanceStack or {}
@@ -190,7 +191,7 @@ function SF.Instance:iterScriptHook(hook,...)
 		if not name then return end
 		index = name
 		
-		self:prepare(hook,name)
+		if self:prepare(hook,name) then return true end
 		
 		local ok, tbl, traceback = self:runWithOps(func,unpack(args))
 		if not ok then
@@ -219,7 +220,7 @@ function SF.Instance:iterTblScriptHook(hook,...)
 		if not name then return end
 		index = name
 		
-		self:prepare(hook,name)
+		if self:prepare(hook,name) then return true end
 		
 		local ok, tbl, traceback = self:runWithOps(func,unpack(args))
 		if not ok then
@@ -246,7 +247,7 @@ end
 -- @param func Function to run
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func,...)
-	self:prepare("_runFunction",func)
+	if self:prepare("_runFunction",func) then return true end
 	
 	local ok, tbl, traceback = self:runWithOps(func,...)
 	if not ok then
@@ -263,7 +264,7 @@ end
 -- @param func Function to run
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunctionT(func,...)
-	self:prepare("_runFunction",func)
+	if self:prepare("_runFunction",func) then return true end
 	
 	local ok, tbl, traceback = self:runWithOps(func,...)
 	if not ok then
