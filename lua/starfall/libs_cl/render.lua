@@ -124,7 +124,7 @@ local texturecache, texturecachehttp
 local function CheckURLDownloads()
 	local numqueued = #LoadingURLQueue
 	local urltable = LoadingURLQueue[numqueued]
-	
+
 	if urltable then
 		if urltable.Panel then
 			if not urltable.Panel:IsLoading() then
@@ -135,16 +135,16 @@ local function CheckURLDownloads()
 					tex:Download()
 					urltable.Panel:Remove()
 					if urltable.cb then urltable.cb() end
-				end)	
-				LoadingURLQueue[numqueued] = nil					
+				end)
+				LoadingURLQueue[numqueued] = nil
 			else
 				if CurTime() > urltable.Timeout then
 					urltable.Panel:Remove()
 					LoadingURLQueue[numqueued] = nil
 				end
 			end
-		
-		else		
+
+		else
 			local Panel = vgui.Create( "DHTML" )
 			Panel:SetSize( 1024, 1024 )
 			Panel:SetAlpha( 0 )
@@ -152,8 +152,8 @@ local function CheckURLDownloads()
 			Panel:SetHTML(
 			[[
 				<style type="text/css">
-					html 
-					{			
+					html
+					{
 						overflow:hidden;
 						margin: -8px -8px;
 					}
@@ -167,7 +167,7 @@ local function CheckURLDownloads()
 						width: 100%;
 					}
 				</style>
-				
+
 				<body>
 					<div class="imagebox"></div>
 				</body>
@@ -177,13 +177,13 @@ local function CheckURLDownloads()
 			urltable.Panel = Panel
 		end
 	end
-	
+
 	if #LoadingURLQueue == 0 then
 		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
 
-local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } ) 
+local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } )
 
 local function LoadURLMaterial( url, cb )
 	--Count the number of materials
@@ -193,20 +193,20 @@ local function LoadURLMaterial( url, cb )
 		if not key then break end
 		totalMaterials = totalMaterials + 1
 	end
-	
+
 	local queuesize = #LoadingURLQueue
 	totalMaterials = totalMaterials + queuesize
-	
+
 	if totalMaterials>=cv_max_url_materials:GetInt() then
 		return
 	end
-	
+
 	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()))
-				
+
 	if queuesize == 0 then
 		timer.Create("SF_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
 	end
-	
+
 	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, cb = cb}
 	return urlmaterial
 end
@@ -342,11 +342,19 @@ end
 
 --- Sets the draw color
 -- @param clr Color type
-function render_library.setColor ( clr )
+function render_library.setColor( clr )
 	SF.CheckType( clr, SF.Types[ "Color" ] )
 	currentcolor = clr
 	surface.SetDrawColor( clr )
 	surface.SetTextColor( clr )
+end
+
+--- Sets the draw color by RGBA values
+function render_library.setRGBA( r, g, b, a )
+	SF.CheckType( r, "number" ) SF.CheckType( g, "number" ) SF.CheckType( b, "number" ) SF.CheckType( a, "number" )
+	currentcolor = Color( r, g, b, a )
+	surface.SetDrawColor( r, g, b, a )
+	surface.SetTextColor( r, g, b, a )
 end
 
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
@@ -360,9 +368,9 @@ function render_library.getTextureID ( tx, cb )
 		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
 			return string.format( "%%%02X", string.byte( str ) )
 		end )
-		
+
 		local instance = SF.instance
-		
+
 		local tbl = {}
 		texturecachehttp[ tbl ] = LoadURLMaterial( tx, function()
 			if cb then
@@ -381,13 +389,13 @@ function render_library.getTextureID ( tx, cb )
 			if not mat then return end
 			local cacheentry = sfCreateMaterial( "SF_TEXTURE_" .. id )
 			cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
-			
+
 			local tbl = {}
 			texturecache[ tbl ] = cacheentry
 			return tbl
 		end
 	end
-	
+
 end
 
 --- Sets the texture
@@ -468,7 +476,7 @@ function render_library.setRenderTargetTexture ( name )
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( name, "string" )
-	
+
 	local rtname = data.rendertargets[ name ]
 	if rtname and globalRTs[ rtname ] then
 		RT_Material:SetTexture( "$basetexture", globalRTs[ rtname ][ 1 ] )
@@ -508,7 +516,7 @@ function render_library.clear ( clr )
 	end
 end
 
---- Draws a rectangle using the current color. 
+--- Draws a rectangle using the current color.
 -- @param x Top left corner x coordinate
 -- @param y Top left corner y coordinate
 -- @param w Width
@@ -672,7 +680,7 @@ end
 -- \- DejaVu Sans Mono (shipped, monospaced)
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
-	
+
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
 	blur = tonumber(blur) or 0
@@ -680,14 +688,14 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	additive = additive and true or false
 	shadow = shadow and true or false
 	outline = outline and true or false
-	
+
 	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d",
 		font, size, weight, blur,
 		antialias and 1 or 0,
 		additive and 1 or 0,
 		shadow and 1 or 0,
 		outline and 1 or 0)
-	
+
 	if not defined_fonts[name] then
 		surface.CreateFont(name, {size = size, weight = weight,
 			antialias=antialias, additive = additive, font = font,
@@ -703,7 +711,7 @@ end
 -- @return height of the text
 function render_library.getTextSize( text )
 	SF.CheckType(text,"string")
-	
+
 	surface.SetFont(SF.instance.data.render.font or defaultFont)
 	return surface.GetTextSize( text )
 end
@@ -735,9 +743,9 @@ function render_library.drawText ( x, y, text, alignment )
 	if alignment then
 		SF.CheckType( alignment, "number" )
 	end
-	
+
 	local font = SF.instance.data.render.font or defaultFont
-	
+
 	draw.DrawText( text, font, x, y, currentcolor, alignment or TEXT_ALIGN_LEFT )
 end
 
@@ -789,32 +797,32 @@ function render_library.cursorPos( ply )
 
 	ply = SF.Entities.Unwrap( ply )
 	if not ply then SF.throw("Invalid Player", 2) end
-	
+
 	local Normal, Pos
 	-- Get monitor screen pos & size
 
 	Pos = screen:LocalToWorld( screen.Origin )
-		
+
 	Normal = -screen.Transform:GetUp():GetNormalized()
-	
+
 	local Start = ply:GetShootPos()
 	local Dir = ply:GetAimVector()
-	
+
 	local A = Normal:Dot(Dir)
-	
+
 	-- If ray is parallel or behind the screen
 	if A == 0 or A > 0 then return nil end
-	
+
 	local B = Normal:Dot(Pos-Start) / A
 	if (B >= 0) then
 		local w = 512/screen.Aspect
 		local HitPos = WorldToLocal( Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles() )
 		local x = HitPos.x/screen.Scale
 		local y = HitPos.y/screen.Scale
-		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen 
+		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen
 		return x, y
 	end
-	
+
 	return nil
 end
 
@@ -822,7 +830,7 @@ end
 -- Note: this does a table copy so move it out of your draw hook
 -- @param e The screen to get info from.
 -- @return A table describing the screen.
-function render_library.getScreenInfo( e )	
+function render_library.getScreenInfo( e )
 	local screen = SF.Entities.Unwrap( e )
 	if screen then
 		return SF.Sanitize( screen.ScreenInfo )
@@ -853,7 +861,7 @@ function render_library.readPixel ( x, y )
 	if not data.isRendering then
 		SF.throw( "Not in rendering hook.", 2 )
 	end
-	
+
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 
