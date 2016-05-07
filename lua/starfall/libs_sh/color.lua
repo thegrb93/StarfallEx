@@ -5,6 +5,7 @@ SF.Color = {}
 local color_methods, color_metatable = SF.Typedef( "Color", {} )
 
 local function wrap_color( table )
+	if not table[4] then table[4] = 255 end
 	return setmetatable( table, color_metatable )
 end
 
@@ -130,8 +131,8 @@ end
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:rgbToHSV ()
-	local hsv = ColorToHSV( unwrap( self ) )
-	return wrap( { hsv.r, hsv.g, hsv.b, (hsv.a or 255) } )
+	local h, s, v = ColorToHSV( self )
+	return wrap( { h, s, v, 255 } )
 end
 
 --- Converts the color from HSV to RGB.
