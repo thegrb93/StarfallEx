@@ -5,6 +5,7 @@ SF.Color = {}
 local color_methods, color_metatable = SF.Typedef( "Color", {} )
 
 local function wrap_color( table )
+	if not table[4] then table[4] = 255 end
 	return setmetatable( table, color_metatable )
 end
 
