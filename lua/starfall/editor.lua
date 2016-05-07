@@ -1312,7 +1312,11 @@ if CLIENT then
 			if path == codename and maincode then
 				code = maincode
 			else
-				code = file.Read( "starfall/"..path, "DATA" ) or error( "Bad include: " .. path, 0 )
+				code = file.Read( "starfall/"..path, "DATA" )
+			end
+			if not code then
+				print( "Bad include: " .. path )
+				return
 			end
 			
 			tbl.files[ path ] = code
