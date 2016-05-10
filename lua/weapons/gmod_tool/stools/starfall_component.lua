@@ -11,6 +11,8 @@ include("starfall/sflib.lua")
 TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
 TOOL.ClientConVar[ "Type" ] = 1
 cleanup.Register( "starfall_components" )
+duplicator.Allow( "starfall_screen" )
+duplicator.Allow( "starfall_hud" )
 
 if SERVER then	
 	CreateConVar('sbox_maxstarfall_components', 3, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
