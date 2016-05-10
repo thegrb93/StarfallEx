@@ -669,14 +669,15 @@ function ents_methods:remove ()
 	ent:Remove()
 end
 
---- Breaks an entity
-function ents_methods:destroy ()
+--- Invokes the entity's breaking animation and removes it.
+function ents_methods:breakEnt ()
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( self )
-	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
+	if not isValid( ent ) or ent:IsPlayer() or ent:IsFlagSet( FL_KILLME ) then SF.throw( "Entity is not valid", 2 ) end
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.remove" ) then SF.throw( "Insufficient permissions", 2 ) end
 
+	ent:AddFlags( FL_KILLME )
 	ent:Fire( "break", 1, 0 )
 end
 
