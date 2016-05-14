@@ -86,7 +86,7 @@ net.Receive( "starfall_hud_set_enabled" , function()
 				hook.Remove("CalcView", hook_name) 
 			end ) 
 			hook.Add("HUDPaint", hook_name, function() ent:DrawHUD() end)
-			hook.Add("CalcView", hook_name, function() return ent:DoCalcView() end)
+			hook.Add("CalcView", hook_name, function(...) return ent:DoCalcView(...) end)
 			if (Hint_FirstPrint) then
 				LocalPlayer():ChatPrint("Starfall HUD Connected. NOTE: Type 'sf_hud_unlink' in the console to disconnect yourself from all HUDs.")
 				Hint_FirstPrint = nil
