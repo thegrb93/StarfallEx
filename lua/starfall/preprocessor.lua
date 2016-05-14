@@ -145,8 +145,10 @@ local function directive_includedir( args, filename, data )
 	local incl = data.includes[filename]
 
 	local files = file.Find( "starfall/" ..args.. "/*", "DATA" )
-	for _, v in pairs( files ) do
-		incl[ #incl+1 ] = args .. "/" .. v
+	if files then
+		for _, v in pairs( files ) do
+			incl[ #incl+1 ] = args .. "/" .. v
+		end
 	end
 end
 SF.Preprocessor.SetGlobalDirective( "includedir", directive_includedir )
