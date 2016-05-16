@@ -24,7 +24,6 @@ SF.Vectors.Wrap = wrap
 SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods
-SF.Vectors.Verbose = verbose
 
 local dgetmeta = debug.getmetatable
 
