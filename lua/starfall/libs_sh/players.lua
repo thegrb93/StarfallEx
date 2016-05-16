@@ -359,7 +359,7 @@ if SERVER then
 		local ent = eunwrap( e )
 		if not (ent and ent:IsValid()) then SF.throw("Invalid Entity", 2) end
 		
-		if pl.sfhudenabled then
+		if IsValid(pl.sfhudenabled) and pl.sfhudenabled.link == SF.instance.data.entity then
 			pl:SetViewEntity( ent )
 		end
 	end

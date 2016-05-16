@@ -21,9 +21,10 @@ function ENT:SetHudEnabled( ply, mode )
 	net.Send( ply )
 	
 	if mode == 1 then
-		ply.sfhudenabled = true
+		ply.sfhudenabled = self
 	elseif mode == -1 then
-		ply.sfhudenabled = not ply.sfhudenabled
+		if ply.sfhudenabled then ply.sfhudenabled = nil
+		else ply.sfhudenabled = self end
 	else
 		ply.sfhudenabled = nil
 	end
