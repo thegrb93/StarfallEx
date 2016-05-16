@@ -6,7 +6,11 @@
 -- @shared
 local find_library, _ = SF.Libraries.Register("find")
 
-local vunwrap = SF.UnwrapObject
+local vunwrap
+
+SF.Libraries.AddHook("postload", function()
+	vunwrap = SF.Vectors.Unwrap
+end)
 
 -- Register privileges
 do
@@ -17,7 +21,7 @@ end
 local function convert(results, func)
 	if func then SF.CheckType(func,"function") end
 	local wrap = SF.WrapObject
-	
+
 	local t = {}
 	local count = 1
 	for i=1,#results do
@@ -56,7 +60,7 @@ function find_library.inSphere ( center, radius, filter )
 	SF.CheckType( radius, "number" )
 
 	local center = vunwrap( center )
-	
+
 	return convert( ents.FindInSphere( center, radius ), filter )
 end
 
@@ -75,7 +79,7 @@ function find_library.inCone ( pos, dir, distance, radius, filter )
 	SF.CheckType( radius, "number" )
 
 	local pos, dir = vunwrap( pos ), vunwrap( dir )
-	
+
 	return convert( ents.FindInCone( pos, dir, distance, radius ), filter )
 end
 
@@ -86,7 +90,7 @@ end
 function find_library.byClass(class, filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(class,"string")
-		
+
 	return convert(ents.FindByClass(class), filter)
 end
 
@@ -97,7 +101,7 @@ end
 function find_library.byModel(model, filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
 	SF.CheckType(model,"string")
-		
+
 	return convert(ents.FindByModel(model), filter)
 end
 
@@ -106,7 +110,7 @@ end
 -- @return An array of found entities
 function find_library.allPlayers(filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	
+
 	return convert(player.GetAll(), filter)
 end
 
@@ -115,6 +119,6 @@ end
 -- @return An array of found entities
 function find_library.all(filter)
 	if not SF.Permissions.check( SF.instance.player, nil, "find" ) then SF.throw( "Insufficient permissions", 2 ) end
-	
+
 	return convert(ents.GetAll(), filter)
 end

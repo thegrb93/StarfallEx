@@ -10,14 +10,17 @@ SF.Npcs.Methods = npc_methods
 SF.Npcs.Metatable = npc_metatable
 
 local dsetmeta = debug.setmetatable
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local vwrap, vunwrap
 local wrap, unwrap, ents_metatable
 
 SF.Libraries.AddHook("postload", function()
 	wrap = SF.Entities.Wrap
 	unwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable
-	
+
+	vwrap   = SF.Vectors.Wrap
+	vunwrap = SF.Vectors.Unwrap
+
 	SF.AddObjectWrapper( debug.getregistry().NPC, npc_metatable, function( object )
 		object = wrap( object )
 		dsetmeta( object, npc_metatable )
@@ -159,4 +162,3 @@ function npc_methods:goRun(vec)
 	npc:SetLastPosition( vunwrap(vec) )
 	npc:SetSchedule( SCHED_FORCED_GO_RUN )
 end
-

@@ -10,6 +10,10 @@ local function wrap_vector( table )
 	return setmetatable( table, vec_metamethods )
 end
 
+local function vwrap_vector( v )
+	return wrap_vector( { v.x, v.y, v.z } )
+end
+
 local function unwrap_vector( obj )
 	return Vector( (obj[1] or 0), (obj[2] or 0), (obj[3] or 0) )
 end
@@ -20,7 +24,7 @@ SF.DefaultEnvironment.Vector = function ( ... )
 	return wrap( { ... } )
 end
 
-SF.Vectors.Wrap = wrap
+SF.Vectors.Wrap = vwrap_vector
 SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods
