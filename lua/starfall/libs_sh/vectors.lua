@@ -2,52 +2,65 @@ SF.Vectors = {}
 
 --- Vector type
 -- @shared
-local vec_methods, vec_metamethods = SF.Typedef( "Vector" )
-local wrap, unwrap = SF.CreateWrapper( vec_metamethods, true, false, debug.getregistry().Vector )
 
-SF.DefaultEnvironment.Vector = function ( ... )
-	return wrap( Vector( ... ) )
+local vec_methods, vec_metamethods = SF.Typedef( "Vector" )
+
+local function wrap_vector( table )
+	for i=1, 3 do if type( table[i] ) ~= "number" then table[i] = 0 end end
+	return setmetatable( table, vec_metamethods )
 end
 
-SF.Vectors.Wrap = wrap
+local function vwrap_vector( v )
+	return wrap_vector( { v.x, v.y, v.z } )
+end
+
+local function unwrap_vector( obj )
+	return Vector( (obj[1] or 0), (obj[2] or 0), (obj[3] or 0) )
+end
+
+local wrap, unwrap = wrap_vector, unwrap_vector
+
+SF.DefaultEnvironment.Vector = function ( ... )
+	return wrap( { ... } )
+end
+
+SF.Vectors.Wrap = vwrap_vector
 SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods
 
 local dgetmeta = debug.getmetatable
 
+-- Lookup table.
+-- Index 1->3 have associative xyz for use in __index. Saves lots of checks
+-- String based indexing returns string, just a pass through.
+local xyz = { x = 1, y = 2, z = 3 }
+
 --- __newindex metamethod
 function vec_metamethods.__newindex ( t, k, v )
-	if type( k ) == "number" then
-		if k >= 1 and k <= 3 then
-			SF.UnwrapObject( t ).__newindex( SF.UnwrapObject( t ), k, v )
-		end
-	elseif k == "x" or k =="y" or k == "z" then
-		SF.UnwrapObject( t ).__newindex( SF.UnwrapObject( t ), k, v )
+	if xyz[ k ] then
+		rawset( t, xyz[ k ], v )
 	else
 		rawset( t, k, v )
 	end
 end
 
-local _p = vec_metamethods.__index
+local _p = vec_metamethods.__methods
+
 --- __index metamethod
 function vec_metamethods.__index ( t, k )
-	if type( k ) == "number" then
-		if k >= 1 and k <= 3 then
-			return unwrap( t )[ k ]
-		end
+	if xyz[ k ] then
+		return rawget( t, xyz[ k ] )
 	else
-		if k == "x" or k =="y" or k == "z" then
-			return unwrap( t )[ k ]
-		end
+		return _p[ k ]
 	end
-	return _p[ k ]
 end
 
 --- tostring metamethod
 -- @return string representing the vector.
 function vec_metamethods:__tostring ()
-	return unwrap( self ):__tostring()
+	return "[" .. tostring( self.x ) .. ", " .. tostring( self.y ) .. ", " ..
+		tostring( self.z ) .. "]"
 end
 
 --- multiplication metamethod
@@ -57,16 +70,18 @@ end
 function vec_metamethods.__mul ( lhs, rhs )
 	if dgetmeta( lhs ) == vec_metamethods then
 		if dgetmeta( rhs ) == vec_metamethods then
-			local a, b = unwrap( lhs ), unwrap( rhs )
-			return wrap( Vector( a.x * b.x, a.y * b.y, a.z * b.z ) )
+			return wrap( { lhs[1] * rhs[1], lhs[2] * rhs[2],
+				lhs[3] * rhs[3] } )
 		end
+
 		SF.CheckType( rhs, "number" )
-		return wrap( unwrap( lhs ) * rhs )
+		return wrap( { lhs[1] * rhs, lhs[2] * rhs, lhs[3] * rhs } )
 	else
 		if dgetmeta( lhs ) == vec_metamethods then
-			local a, b = unwrap( lhs ), unwrap( rhs )
-			return wrap( Vector( a.x * b.x, a.y * b.y, a.z * b.z ) )
+			return wrap( { lhs[1] * rhs[1], lhs[2] * rhs[2],
+				lhs[3] * rhs[3] } )
 		end
+
 		SF.CheckType( lhs, "number" )
 		return wrap( unwrap( rhs ) * lhs )
 	end
@@ -75,37 +90,54 @@ end
 --- division metamethod
 -- @param n Scalar to divide the Vector by
 -- @return Scaled vector.
-function vec_metamethods:__div ( n )
-	SF.CheckType( n, "number" )
-	return SF.WrapObject( unwrap( self ):__div( n ) )
+function vec_metamethods:__div ( rhs )
+	SF.CheckType( self, vec_metamethods )
+	SF.CheckType( rhs, "number" )
+
+	return wrap( { self[1] / rhs, self[2] / rhs, self[3] / rhs } )
 end
 
 --- add metamethod
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
-function vec_metamethods:__add ( v )
-	SF.CheckType( v, vec_metamethods )
-	return wrap( unwrap( self ):__add( unwrap( v ) ) )
+function vec_metamethods:__add ( rhs )
+	SF.CheckType( self, vec_metamethods )
+	SF.CheckType( rhs, vec_metamethods )
+
+	return wrap( { self[1] + rhs[1], self[2] + rhs[2], self[3] + rhs[3] } )
 end
 
 --- sub metamethod
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
-function vec_metamethods:__sub ( v )
-	SF.CheckType( v, vec_metamethods )
-	return wrap( unwrap( self ):__sub( unwrap( v ) ) )
+function vec_metamethods:__sub ( rhs )
+	SF.CheckType( self, vec_metamethods )
+	SF.CheckType( rhs, vec_metamethods )
+
+	return wrap( { self[1] - rhs[1], self[2] - rhs[2], self[3] - rhs[3] } )
 end
 
 --- unary minus metamethod
 -- @return negated vector.
 function vec_metamethods:__unm ()
-	return wrap( unwrap( self ):__unm() )
+	SF.CheckType( self, vec_metamethods )
+
+	return wrap( { self[1] * -1, self[2] * -1, self[3] * -1 } )
 end
 
 --- equivalence metamethod
 -- @return bool if both sides are equal.
-function vec_metamethods:__eq ( ... )
-	return SF.Sanitize( unwrap( self ):__eq( SF.Unsanitize( ... ) ) )
+function vec_metamethods:__eq ( rhs )
+	SF.CheckType( self, vec_metamethods )
+	SF.CheckType( rhs, vec_metamethods )
+
+	if #rhs ~= #self then return false end
+
+	for k, v in pairs( rhs ) do
+		if v ~= self[k] then return false end
+	end
+
+	return true
 end
 
 --- Add vector - Modifies self.
@@ -113,7 +145,10 @@ end
 -- @return nil
 function vec_methods:add ( v )
 	SF.CheckType( v, vec_metamethods )
-	unwrap( self ):Add( unwrap( v ) )
+
+	for k, p in pairs( self ) do
+		self[k] = p + v[k]
+	end
 end
 
 --- Get the vector's angle.
@@ -213,7 +248,21 @@ end
 -- @return nil
 function vec_methods:mul ( n )
 	SF.CheckType( n, "number" )
-	unwrap( self ):Mul( n )
+
+	for k, p in pairs( self ) do
+		self[k] = p * n
+	end
+end
+
+--- Scalar Division of the vector. Self-Modifies.
+-- @param n Scalar to divide by.
+-- @return nil
+function vec_methods:div ( n )
+	SF.CheckType( n, "number" )
+
+	for k, p in pairs( self ) do
+		self[k] = p / n
+	end
 end
 
 --- Set's all vector fields to 0.
@@ -244,12 +293,14 @@ end
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	SF.CheckType( self, vec_metamethods )
 	SF.CheckType( axis, vec_metamethods )
+
 	if degrees then
 		SF.CheckType( degrees, "number" )
 		radians = math.rad(degrees)
 	else
 		SF.CheckType( radians, "number" )
 	end
+
 	local ca, sa = math.cos(radians), math.sin(radians)
 	local x,y,z,x2,y2,z2 = axis.x, axis.y, axis.z, self.x, self.y, self.z
 	local length = (x*x+y*y+z*z)^0.5
@@ -263,9 +314,12 @@ end
 --- Copies the values from the second vector to the first vector. Self-Modifies.
 -- @param v Second Vector
 -- @return nil
-function vec_methods:set ( v )
+function vec_methods:set( v )
 	SF.CheckType( v, vec_metamethods )
-	unwrap( self ):Set( unwrap( v ) )
+
+	for k, p in pairs( self ) do
+		self[k] = v[k]
+	end
 end
 
 --- Subtract v from this Vector. Self-Modifies.
@@ -273,7 +327,10 @@ end
 -- @return nil
 function vec_methods:sub ( v )
 	SF.CheckType( v, vec_metamethods )
-	unwrap( self ):Sub( unwrap( v ) )
+
+	for k, p in pairs( self ) do
+		self[k] = p - v[k]
+	end
 end
 
 --- Translates the vectors position into 2D user screen coordinates. Self-Modifies.

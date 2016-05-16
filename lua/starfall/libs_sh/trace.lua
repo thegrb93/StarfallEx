@@ -4,7 +4,11 @@
 
 local dgetmeta = debug.getmetatable
 
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local vwrap, vunwrap
+SF.Libraries.AddHook("postload", function()
+	vwrap   = SF.Vectors.Wrap
+	vunwrap = SF.Vectors.Unwrap
+end)
 
 --[[
 -- Here's a neat little script to convert enumerations wiki.gmod.com-style
@@ -247,7 +251,7 @@ function trace_library.trace ( start, endpos, filter, mask )
 		filter = filter,
 		mask = mask
 	}
-	
+
 	local data = util.TraceLine( trace )
 	return setmetatable({}, {
 		__index=function(t,k)
@@ -284,7 +288,7 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 		mins = minbox,
 		maxs = maxbox
 	}
-	
+
 	local data = util.TraceHull( trace )
 	return setmetatable({}, {
 		__index=function(t,k)

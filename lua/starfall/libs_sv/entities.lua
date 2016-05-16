@@ -15,7 +15,11 @@ local ents_metatable = SF.Entities.Metatable
 --@name Entity
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
-local vunwrap = SF.UnwrapObject
+local vunwrap
+
+SF.Libraries.AddHook("postload", function()
+	vunwrap = SF.Vectors.Unwrap
+end)
 
 -- Register privileges
 do
@@ -150,13 +154,13 @@ function ents_methods:linkComponent ( e )
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
-	
+
 	if e then
 		SF.CheckType( e, ents_metatable )
 		local link = unwrap( e )
 		if not isValid( link ) then SF.throw( "Entity is not valid", 2 ) end
 		if not SF.Permissions.check( SF.instance.player, link, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
-		
+
 		if link:GetClass()=="starfall_processor" and ( ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" ) then
 			ent:LinkEnt( link )
 		elseif link:IsVehicle() and ent:GetClass()=="starfall_hud" then
@@ -373,7 +377,7 @@ function ents_methods:setNocollideAll ( nocollide )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
-	
+
 	ent:SetCollisionGroup ( nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE )
 end
 
@@ -413,7 +417,7 @@ local renderProperties = {
 
 local function sendRenderPropertyToClient( ply, ent, func, ... )
 	local meta = debug.getmetatable( ply )
-	if meta == SF.Types[ "Player" ] then 
+	if meta == SF.Types[ "Player" ] then
 		ply = unwrap( ply )
 		if not ( IsValid( ply ) and ply:IsPlayer() ) then
 			SF.throw( "Tried to use invalid player", 3 )
@@ -432,7 +436,7 @@ local function sendRenderPropertyToClient( ply, ent, func, ... )
 	else
 		SF.throw( "Expected player or table of players.", 3 )
 	end
-	
+
 	net.Start( "sf_setentityrenderproperty" )
 	net.WriteEntity( ent )
 	net.WriteUInt( func, 4 )
@@ -781,19 +785,19 @@ function ents_methods:enableSphere ( enabled )
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( self )
-	
+
 	if ent:GetClass() ~= "prop_physics" then SF.throw( "This function only works for prop_physics", 2 ) end
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" ) then SF.throw( "Insufficient permissions", 2 ) end
-	
+
 	local ismove = phys:IsMoveable()
 	local mass = phys:GetMass()
-	
+
 	if enabled then
 		if ent:GetMoveType() == MOVETYPE_VPHYSICS then
 			local OBB = ent:OBBMaxs() - ent:OBBMins()
-			local radius = math.max( OBB.x, OBB.y, OBB.z) / 2 
+			local radius = math.max( OBB.x, OBB.y, OBB.z) / 2
 			ent:PhysicsInitSphere( radius, phys:GetMaterial() )
 			ent:SetCollisionBounds( Vector( -radius, -radius, -radius ) , Vector( radius, radius, radius ) )
 		end
@@ -804,7 +808,7 @@ function ents_methods:enableSphere ( enabled )
 			ent:SetSolid( SOLID_VPHYSICS )
 		end
 	end
-	
+
 	-- New physobject after applying spherical collisions
 	local phys = ent:GetPhysicsObject()
 	phys:SetMass( mass )
@@ -843,7 +847,7 @@ end
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( material, "string" )
-	
+
 	local ent = unwrap( self )
 
 	if string.find(material, '"', 1, true) then SF.throw( "Invalid Material", 2 ) end
@@ -873,4 +877,3 @@ function ents_methods:removeTrails()
 
 	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
 end
-
