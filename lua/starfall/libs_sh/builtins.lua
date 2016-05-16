@@ -385,6 +385,8 @@ function SF.DefaultEnvironment.loadstring ( str )
 	return func
 end
 
+local SF_Methods = {}
+
 --- Lua's setfenv
 -- Works like setfenv, but is restricted on functions
 -- @param func Function to change environment of
@@ -392,6 +394,7 @@ end
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv ( func, tbl )
 	if type( func ) ~= "function" then SF.throw( "Main Thread is protected!", 2 ) end
+	if SF_Methods[ func ] then SF.throw( "SF methods are protected.", 2 ) end
 	return setfenv( func, tbl )
 end
 
@@ -489,23 +492,43 @@ end
 -- Restricts access to builtin type's metatables
 
 local _R = debug.getregistry()
-local function restrict(instance, hook, name, ok, err)
+local function restrict( instance, hook, name, ok, err )
 	_R.Vector.__metatable = "Vector"
 	_R.Angle.__metatable = "Angle"
 	_R.VMatrix.__metatable = "VMatrix"
 end
 
-local function unrestrict(instance, hook, name, ok, err)
+local function unrestrict( instance, hook, name, ok, err )
 	_R.Vector.__metatable = nil
 	_R.Angle.__metatable = nil
 	_R.VMatrix.__metatable = nil
 end
 
-SF.Libraries.AddHook("prepare", restrict)
-SF.Libraries.AddHook("cleanup", unrestrict)
+SF.Libraries.AddHook( "prepare", restrict )
+SF.Libraries.AddHook( "cleanup", unrestrict )
 
-
---------------------------- ENUMS -----------------------------------
+-- Creates a list of all the methods used in SF to blacklist in setfenv
+SF.Libraries.AddHook( "postload", function ( ... ) 
+	for _, tbl in pairs( SF.Types ) do
+		for _, method in pairs( tbl.__methods ) do
+			if type( method ) == "function" then
+				SF_Methods[ method ] = true
+			end
+		end
+	end
+	for _, tbl in pairs( SF.Libraries.libraries ) do
+		for _, method in pairs( tbl.__methods ) do
+			if type( method ) == "function" then
+				SF_Methods[ method ] = true
+			end
+		end
+	end
+	for _, method in pairs( SF.DefaultEnvironmentMT.__methods ) do
+		if type( method ) == "function" then
+			SF_Methods[ method ] = true
+		end
+	end
+end )
 
 local _KEY = {
 	[ "FIRST" ] = 0,
