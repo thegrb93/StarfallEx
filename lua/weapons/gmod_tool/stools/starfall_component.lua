@@ -41,6 +41,7 @@ function TOOL:LeftClick( trace )
 	if component_type == "1" then
 	
 		local model = self:GetClientInfo( "Model" )
+		if not (util.IsValidModel( model ) and util.IsValidProp( model )) then return false end
 		local Ang = trace.HitNormal:Angle()
 		Ang.pitch = Ang.pitch + 90
 
@@ -169,6 +170,31 @@ function TOOL:DrawHUD()
 end
 
 function TOOL:Think()
+
+	local Type = self:GetClientInfo( "Type" )
+	local model
+	if Type=="1" then 
+		model = self:GetClientInfo( "Model" )
+	else
+		model = "models/bull/dynamicbutton.mdl"
+	end
+	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != model ) then
+		self:MakeGhostEntity( model, Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
+	end
+
+	local trace = util.TraceLine( util.GetPlayerTrace( self:GetOwner() ) )
+	if ( !trace.Hit ) then return end
+	local ent = self.GhostEntity
+	
+	if not IsValid(ent) then return end
+
+	local Ang = trace.HitNormal:Angle()
+	Ang.pitch = Ang.pitch + 90
+
+	local min = ent:OBBMins()
+	ent:SetPos( trace.HitPos - trace.HitNormal * min.z )
+	ent:SetAngles( Ang )
+
 end
 
 if CLIENT then		
