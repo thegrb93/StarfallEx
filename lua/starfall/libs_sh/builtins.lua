@@ -88,6 +88,7 @@ SF.DefaultEnvironment.type = function( obj )
 	local tp = getmetatable( obj )
 	return type(tp) == "string" and tp or type( obj )
 end
+
 --- Same as Lua's next
 -- @name SF.DefaultEnvironment.next
 -- @class function
@@ -96,12 +97,14 @@ end
 -- @return Key or nil
 -- @return Value or nil
 SF.DefaultEnvironment.next = next
+
 --- Same as Lua's assert.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
 -- @param condition
 -- @param msg
 SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then SF.throw( msg or "assertion failed!", 2 ) end end
+
 --- Same as Lua's unpack
 -- @name SF.DefaultEnvironment.unpack
 -- @class function
@@ -129,6 +132,7 @@ end
 -- @name SF.DefaultEnvironment.CLIENT
 -- @class field
 SF.DefaultEnvironment.CLIENT = CLIENT
+
 --- Constant that denotes whether the code is executed on the server
 -- @name SF.DefaultEnvironment.SERVER
 -- @class field
@@ -385,16 +389,13 @@ function SF.DefaultEnvironment.loadstring ( str )
 	return func
 end
 
-local SF_Methods = {}
-
 --- Lua's setfenv
 -- Works like setfenv, but is restricted on functions
 -- @param func Function to change environment of
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv ( func, tbl )
-	if type( func ) ~= "function" then SF.throw( "Main Thread is protected!", 2 ) end
-	if SF_Methods[ func ] then SF.throw( "SF methods are protected.", 2 ) end
+	if type( func ) ~= "function" or getfenv( func ) == _G then SF.throw( "Main Thread is protected!", 2 ) end
 	return setfenv( func, tbl )
 end
 
@@ -456,7 +457,6 @@ function SF.DefaultEnvironment.concmd ( cmd )
 	SF.instance.player:ConCommand( cmd )
 end
 
-
 --- Returns if the table has an isValid function and isValid returns true.
 --@param object Table to check
 --@return If it is valid
@@ -487,29 +487,6 @@ end
 
 SF.Libraries.AddHook( "prepare", restrict )
 SF.Libraries.AddHook( "cleanup", unrestrict )
-
--- Creates a list of all the methods used in SF to blacklist in setfenv
-SF.Libraries.AddHook( "postload", function ( ... ) 
-	for _, tbl in pairs( SF.Types ) do
-		for _, method in pairs( tbl.__methods ) do
-			if type( method ) == "function" then
-				SF_Methods[ method ] = true
-			end
-		end
-	end
-	for _, tbl in pairs( SF.Libraries.libraries ) do
-		for _, method in pairs( tbl.__methods ) do
-			if type( method ) == "function" then
-				SF_Methods[ method ] = true
-			end
-		end
-	end
-	for _, method in pairs( SF.DefaultEnvironmentMT.__methods ) do
-		if type( method ) == "function" then
-			SF_Methods[ method ] = true
-		end
-	end
-end )
 
 local _KEY = {
 	[ "FIRST" ] = 0,
