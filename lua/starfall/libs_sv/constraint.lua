@@ -64,6 +64,10 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	force_lim = force_lim or 0
 	nocollide = nocollide and true or false
 	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( force_lim, "number" )
+	
 	constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
 end
 
@@ -91,6 +95,12 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	friction = friction or 0
 	nocollide = nocollide and 1 or 0
 	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( force_lim, "number" )
+	SF.CheckType( torque_lim, "number" )
+	SF.CheckType( friction, "number" )
+	
 	constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
 end
 
@@ -114,6 +124,11 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	torque_lim = torque_lim or 0
 	nocollide = nocollide and 1 or 0
 	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( force_lim, "number" )
+	SF.CheckType( torque_lim, "number" )
+	
 	constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
 end
 
@@ -124,6 +139,9 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	SF.CheckType( e2, ents_metatable )
 	SF.CheckType( v1, SF.Types[ "Vector" ] )
 	SF.CheckType( v2, SF.Types[ "Vector" ] )
+	SF.CheckType( minv, SF.Types[ "Vector" ] )
+	SF.CheckType( maxv, SF.Types[ "Vector" ] )
+	SF.CheckType( frictionv, SF.Types[ "Vector" ] )
 	
 	local ent1 = eunwrap( e1 )
 	local ent2 = eunwrap( e2 )
@@ -142,6 +160,11 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	torque_lim = torque_lim or 0
 	rotateonly = rotateonly and 1 or 0
 	nocollide = nocollide and 1 or 0
+	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( force_lim, "number" )
+	SF.CheckType( torque_lim, "number" )
 	
 	constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
 end
@@ -167,13 +190,20 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	const = const or 1000
 	damp = damp or 100
 	rdamp = rdamp or 0
-	width = math.Clamp( width or 0, 0, 50)
+	width = width or 0
 	strech = strech and true or false
+	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( const, "number" )
+	SF.CheckType( damp, "number" )
+	SF.CheckType( rdamp, "number" )
+	SF.CheckType( width, "number" )
 	
 	e1.Elastics = e1.Elastics or {}
 	e2.Elastics = e2.Elastics or {}
 	
-	local e = constraint.Elastic( ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", width, strech )
+	local e = constraint.Elastic( ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", math.Clamp( width, 0, 50), strech )
 	
 	e1.Elastics[index] = e
 	e2.Elastics[index] = e
@@ -201,13 +231,20 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	length = length or 0
 	addlength = addlength or 0
 	force_lim = force_lim or 0
-	width = math.Clamp( width or 0, 0, 50)
+	width = width or 0
 	rigid = rigid and true or false
+	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( length, "number" )
+	SF.CheckType( addlength, "number" )
+	SF.CheckType( force_lim, "number" )
+	SF.CheckType( width, "number" )
 	
 	e1.Ropes = e1.Ropes or {}
 	e2.Ropes = e2.Ropes or {}
 	
-	local e = constraint.Rope( ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, width, material, rigid )
+	local e = constraint.Rope( ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, math.Clamp( width, 0, 50), material, rigid )
 	
 	e1.Ropes[index] = e
 	e2.Ropes[index] = e
@@ -231,9 +268,13 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
-	width = math.Clamp( width or 0, 0, 50)
+	width = width or 0
+	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	SF.CheckType( width, "number" )
 
-	constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, width, "cable/cable2")
+	constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp( width, 0, 50), "cable/cable2")
 end
 
 --- Nocollides two entities
@@ -251,6 +292,9 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
 	
+	SF.CheckType( bone1, "number" )
+	SF.CheckType( bone2, "number" )
+	
 	constraint.NoCollide(ent1, ent2, bone1, bone2)
 end
 
@@ -263,7 +307,9 @@ function constraint_library.setRopeLength(index, e, length)
 	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
 	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.rope" ) then SF.throw( "Insufficient permissions", 2 ) end
 
-	length = math.max( length or 0, 0)
+	
+	SF.CheckType( length, "number" )
+	length = math.max( length, 0 )
 
 	
 	if e.Ropes then
@@ -283,7 +329,8 @@ function constraint_library.setElasticLength(index, e, length)
 	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
 	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.elastic" ) then SF.throw( "Insufficient permissions", 2 ) end
 
-	length = math.max( length or 0, 0)
+	SF.CheckType( length, "number" )
+	length = math.max( length, 0 )
 
 	if e.Elastics then
 		local con = e.Elastics[index]
