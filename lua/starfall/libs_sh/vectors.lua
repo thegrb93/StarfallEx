@@ -3,109 +3,133 @@ SF.Vectors = {}
 --- Vector type
 -- @shared
 local vec_methods, vec_metamethods = SF.Typedef( "Vector" )
-local wrap, unwrap = SF.CreateWrapper( vec_metamethods, true, false, debug.getregistry().Vector )
 
-SF.DefaultEnvironment.Vector = function ( ... )
-	return wrap( Vector( ... ) )
+local function wrap( tbl )
+	return setmetatable( { (tonumber(tbl[1]) or 0), (tonumber(tbl[2]) or 0), (tonumber(tbl[3]) or 0) }, vec_metamethods )
 end
 
-SF.Vectors.Wrap = wrap
+local function unwrap( obj )
+	return Vector( (obj[1] or 0), (obj[2] or 0), (obj[3] or 0) )
+end
+
+local function vwrap( vec )
+	return wrap( { vec.x, vec.y, vec.z } )
+end
+
+SF.AddObjectWrapper( debug.getregistry().Vector, vec_metamethods, vwrap )
+SF.AddObjectUnwrapper( vec_metamethods, unwrap )
+
+SF.DefaultEnvironment.Vector = function ( ... )
+	return wrap( { ... } )
+end
+
+SF.Vectors.Wrap = vwrap
 SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods
 
 local dgetmeta = debug.getmetatable
 
+-- Lookup table.
+-- Index 1->3 have associative xyz for use in __index. Saves lots of checks
+-- String based indexing returns string, just a pass through.
+local xyz = { x = 1, y = 2, z = 3 }
+
 --- __newindex metamethod
 function vec_metamethods.__newindex ( t, k, v )
-	if type( k ) == "number" then
-		if k >= 1 and k <= 3 then
-			SF.UnwrapObject( t ).__newindex( SF.UnwrapObject( t ), k, v )
-		end
-	elseif k == "x" or k =="y" or k == "z" then
-		SF.UnwrapObject( t ).__newindex( SF.UnwrapObject( t ), k, v )
+	if xyz[ k ] then
+		rawset( t, xyz[ k ], v )
 	else
 		rawset( t, k, v )
 	end
 end
 
-local _p = vec_metamethods.__index
+local _p = vec_metamethods.__methods
+
 --- __index metamethod
 function vec_metamethods.__index ( t, k )
-	if type( k ) == "number" then
-		if k >= 1 and k <= 3 then
-			return unwrap( t )[ k ]
-		end
+	if xyz[ k ] then
+		return rawget( t, xyz[ k ] )
 	else
-		if k == "x" or k =="y" or k == "z" then
-			return unwrap( t )[ k ]
-		end
+		return _p[k]
 	end
-	return _p[ k ]
 end
+
+local table_concat = table.concat
 
 --- tostring metamethod
 -- @return string representing the vector.
-function vec_metamethods:__tostring ()
-	return unwrap( self ):__tostring()
+function vec_metamethods.__tostring ( a )
+	return table_concat( a, ' ', 1, 3 )
 end
 
 --- multiplication metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Scaled vector.
-function vec_metamethods.__mul ( lhs, rhs )
-	if dgetmeta( lhs ) == vec_metamethods then
-		if dgetmeta( rhs ) == vec_metamethods then
-			local a, b = unwrap( lhs ), unwrap( rhs )
-			return wrap( Vector( a.x * b.x, a.y * b.y, a.z * b.z ) )
+function vec_metamethods.__mul ( a, b )
+	if dgetmeta( a ) == vec_metamethods then
+		if dgetmeta( b ) == vec_metamethods then
+			return wrap( { a[1]*b[1], a[2]*b[2], a[3]*b[3] } )
 		end
-		SF.CheckType( rhs, "number" )
-		return wrap( unwrap( lhs ) * rhs )
+
+		SF.CheckType( b, "number" )
+		return wrap( { a[1]*b, a[2]*b, a[3]*b } )
 	else
-		if dgetmeta( lhs ) == vec_metamethods then
-			local a, b = unwrap( lhs ), unwrap( rhs )
-			return wrap( Vector( a.x * b.x, a.y * b.y, a.z * b.z ) )
-		end
-		SF.CheckType( lhs, "number" )
-		return wrap( unwrap( rhs ) * lhs )
+		SF.CheckType( a, "number" )
+		return wrap( { b[1]*a, b[2]*a, b[3]*a } )
 	end
 end
 
 --- division metamethod
 -- @param n Scalar to divide the Vector by
 -- @return Scaled vector.
-function vec_metamethods:__div ( n )
+function vec_metamethods.__div ( a, n )
+	SF.CheckType( a, vec_metamethods )
 	SF.CheckType( n, "number" )
-	return SF.WrapObject( unwrap( self ):__div( n ) )
+
+	return wrap( { a[1]/n, a[2]/n, a[3]/n } )
 end
 
 --- add metamethod
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
-function vec_metamethods:__add ( v )
-	SF.CheckType( v, vec_metamethods )
-	return wrap( unwrap( self ):__add( unwrap( v ) ) )
+function vec_metamethods.__add ( a, b )
+	SF.CheckType( a, vec_metamethods )
+	SF.CheckType( b, vec_metamethods )
+
+	return wrap( { a[1]+b[1], a[2]+b[2], a[3]+b[3] } )
 end
 
 --- sub metamethod
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
-function vec_metamethods:__sub ( v )
-	SF.CheckType( v, vec_metamethods )
-	return wrap( unwrap( self ):__sub( unwrap( v ) ) )
+function vec_metamethods.__sub ( a, b )
+	SF.CheckType( a, vec_metamethods )
+	SF.CheckType( b, vec_metamethods )
+
+	return wrap( { a[1]-b[1], a[2]-b[2], a[3]-b[3] } )
 end
 
 --- unary minus metamethod
 -- @return negated vector.
 function vec_metamethods:__unm ()
-	return wrap( unwrap( self ):__unm() )
+	return wrap( { -a[1], -a[2], -a[3] } )
 end
 
 --- equivalence metamethod
 -- @return bool if both sides are equal.
-function vec_metamethods:__eq ( ... )
-	return SF.Sanitize( unwrap( self ):__eq( SF.Unsanitize( ... ) ) )
+function vec_metamethods.__eq ( a, b )
+	if dgetmeta(a) ~= vec_metamethods then return false end
+	if dgetmeta(b) ~= vec_metamethods then return false end
+
+	if #a ~= #b then return false end
+
+	for k, v in pairs( a ) do
+		if v ~= b[k] then return false end
+	end
+
+	return true
 end
 
 --- Add vector - Modifies self.
@@ -113,7 +137,10 @@ end
 -- @return nil
 function vec_methods:add ( v )
 	SF.CheckType( v, vec_metamethods )
-	unwrap( self ):Add( unwrap( v ) )
+
+	for k, n in pairs( v ) do
+		self[k] = self[k] + n
+	end
 end
 
 --- Get the vector's angle.
@@ -143,7 +170,8 @@ end
 -- @return Number
 function vec_methods:getDistance ( v )
 	SF.CheckType( v, vec_metamethods )
-	return unwrap( self ):Distance( unwrap( v ) )
+
+	return math_sqrt( (v[1]-self[1])^2 + (v[2]-self[1])^2 + (v[3]-self[1])^2 )
 end
 
 --- Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an expensive process.
@@ -151,7 +179,8 @@ end
 -- @return Number
 function vec_methods:getDistanceSqr ( v )
 	SF.CheckType( v, vec_metamethods )
-	return unwrap( self ):DistToSqr( unwrap( v ) )
+
+	return (v[1]-self[1])^2 + (v[2]-self[1])^2 + (v[3]-self[1])^2
 end
 
 --- Dot product is the cosine of the angle between both vectors multiplied by their lengths. A.B = ||A||||B||cosA.
@@ -159,13 +188,18 @@ end
 -- @return Number
 function vec_methods:dot ( v )
 	SF.CheckType( v, vec_metamethods )
-	return unwrap( self ):Dot( unwrap( v ) )
+
+	return ( self[1]*v[1] + self[2]*v[2] + self[3]*v[3] )
 end
+
+local math_sqrt = math.sqrt
 
 --- Returns a new vector with the same direction by length of 1.
 -- @return Vector Normalised
 function vec_methods:getNormalized ()
-	return wrap( unwrap( self ):GetNormalized() )
+	local len = math_sqrt( self[1]^2 + self[2]^2 + self[3]^2 )
+
+	return wrap( { self[1] / len, self[2] / len, self[3] / len } )
 end
 
 --- Is this vector and v equal within tolerance t.
@@ -175,37 +209,43 @@ end
 function vec_methods:isEqualTol ( v, t )
 	SF.CheckType( v, vec_metamethods )
 	SF.CheckType( t, "number" )
+
 	return unwrap( self ):IsEqualTol( unwrap( v ), t )
 end
 
 --- Are all fields zero.
 -- @return bool True/False
 function vec_methods:isZero ()
-	return unwrap( self ):IsZero()
+	if self[1] ~= 0 then return false
+	elseif self[2] ~= 0 then return false
+	elseif self[3] ~= 0 then return false
+	end
+
+	return true
 end
 
 --- Get the vector's Length.
 -- @return number Length.
 function vec_methods:getLength ()
-	return unwrap( self ):Length()
+	return math_sqrt( self[1]^2 + self[2]^2 + self[3]^2 )
 end
 
 --- Get the vector's length squared ( Saves computation by skipping the square root ).
 -- @return number length squared.
 function vec_methods:getLengthSqr ()
-	return unwrap( self ):LengthSqr()
+	return ( self[1]^2 + self[2]^2 + self[3]^2 )
 end
 
 --- Returns the length of the vector in two dimensions, without the Z axis.
 -- @return number length
 function vec_methods:getLength2D ()
-	return unwrap( self ):Length2D()
+	return math_sqrt( self[1]^2 + self[2]^2 )
 end
 
 --- Returns the length squared of the vector in two dimensions, without the Z axis. ( Saves computation by skipping the square root )
 -- @return number length squared.
 function vec_methods:getLength2DSqr ()
-	return unwrap( self ):Length2DSqr()
+	return ( self[1]^2 + self[2]^2 )
 end
 
 --- Scalar Multiplication of the vector. Self-Modifies.
@@ -213,19 +253,59 @@ end
 -- @return nil
 function vec_methods:mul ( n )
 	SF.CheckType( n, "number" )
-	unwrap( self ):Mul( n )
+
+	self[1] = self[1] * n
+	self[2] = self[2] * n
+	self[3] = self[3] * n
+end
+
+--- "Scalar Division" of the vector. Self-Modifies.
+-- @param n Scalar to divide by.
+-- @return nil
+function vec_methods:div ( n )
+	SF.CheckType( n, "number" )
+
+	self[1] = self[1] / n
+	self[2] = self[2] / n
+	self[3] = self[3] / n
+end
+
+--- Multiply self with a Vector. Self-Modifies. ( convenience function )
+-- @param v Vector to multiply with
+function vec_methods:vmul ( v )
+	SF.CheckType( v, vector_metatable )
+
+	self[1] = self[1] * v[1]
+	self[2] = self[2] * v[2]
+	self[3] = self[3] * v[3]
+end
+
+--- Divide self by a Vector. Self-Modifies. ( convenience function )
+-- @param v Vector to divide by
+function vec_methods:vdiv ( v )
+	SF.CheckType( v, vector_metatable )
+
+	self[1] = self[1] / v[1]
+	self[2] = self[2] / v[2]
+	self[3] = self[3] / v[3]
 end
 
 --- Set's all vector fields to 0.
 -- @return nil
 function vec_methods:setZero ()
-	unwrap( self ):Zero()
+	self[1] = 0
+	self[2] = 0
+	self[3] = 0
 end
 
 --- Normalise the vector, same direction, length 1. Self-Modifies.
 -- @return nil
 function vec_methods:normalize ()
-	unwrap( self ):Normalize()
+	local len = math_sqrt( self[1]^2 + self[2]^2 + self[3]^2 )
+
+	self[1] = self[1] / len
+	self[2] = self[2] / len
+	self[3] = self[3] / len
 end
 
 --- Rotate the vector by Angle a. Self-Modifies.
@@ -233,7 +313,13 @@ end
 -- @return nil.
 function vec_methods:rotate ( a )
 	SF.CheckType( a, SF.Types[ "Angle" ] )
-	unwrap( self ):Rotate( SF.UnwrapObject( a ) )
+
+	local vec = unwrap( self )
+	vec:Rotate( SF.UnwrapObject( a ) )
+
+	self[1] = vec.x
+	self[2] = vec.y
+	self[3] = vec.z
 end
 
 --- Return rotated vector by an axis
@@ -244,20 +330,22 @@ end
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	SF.CheckType( self, vec_metamethods )
 	SF.CheckType( axis, vec_metamethods )
+
 	if degrees then
 		SF.CheckType( degrees, "number" )
 		radians = math.rad(degrees)
 	else
 		SF.CheckType( radians, "number" )
 	end
+
 	local ca, sa = math.cos(radians), math.sin(radians)
 	local x,y,z,x2,y2,z2 = axis.x, axis.y, axis.z, self.x, self.y, self.z
 	local length = (x*x+y*y+z*z)^0.5
 	x,y,z = x/length, y/length, z/length
 
-	return wrap( Vector((ca + (x^2)*(1-ca)) * x2 + (x*y*(1-ca) - z*sa) * y2 + (x*z*(1-ca) + y*sa) * z2,
+	return wrap( { (ca + (x^2)*(1-ca)) * x2 + (x*y*(1-ca) - z*sa) * y2 + (x*z*(1-ca) + y*sa) * z2,
 			(y*x*(1-ca) + z*sa) * x2 + (ca + (y^2)*(1-ca)) * y2 + (y*z*(1-ca) - x*sa) * z2,
-			(z*x*(1-ca) - y*sa) * x2 + (z*y*(1-ca) + x*sa) * y2 + (ca + (z^2)*(1-ca)) * z2) )
+			(z*x*(1-ca) - y*sa) * x2 + (z*y*(1-ca) + x*sa) * y2 + (ca + (z^2)*(1-ca)) * z2 } )
 end
 
 --- Copies the values from the second vector to the first vector. Self-Modifies.
@@ -265,7 +353,10 @@ end
 -- @return nil
 function vec_methods:set ( v )
 	SF.CheckType( v, vec_metamethods )
-	unwrap( self ):Set( unwrap( v ) )
+
+	self[1] = (v[1] or 0)
+	self[2] = (v[2] or 0)
+	self[3] = (v[3] or 0)
 end
 
 --- Subtract v from this Vector. Self-Modifies.
@@ -273,7 +364,10 @@ end
 -- @return nil
 function vec_methods:sub ( v )
 	SF.CheckType( v, vec_metamethods )
-	unwrap( self ):Sub( unwrap( v ) )
+
+	self[1] = self[1] - (v[1] or 0)
+	self[2] = self[2] - (v[2] or 0)
+	self[3] = self[3] - (v[3] or 0)
 end
 
 --- Translates the vectors position into 2D user screen coordinates. Self-Modifies.
@@ -289,5 +383,10 @@ end
 function vec_methods:withinAABox ( v1, v2 )
 	SF.CheckType( v1, vec_metamethods )
 	SF.CheckType( v2, vec_metamethods )
-	return unwrap( self ):WithinAABox( unwrap( v1 ), unwrap( v2 ) )
+
+	if self[1] < v1[1] or self[1] > v2[1] then return false end
+	if self[2] < v1[2] or self[2] > v2[2] then return false end
+	if self[3] < v1[3] or self[3] > v2[3] then return false end
+
+	return true
 end
