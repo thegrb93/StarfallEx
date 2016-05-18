@@ -228,26 +228,7 @@ end
 
 
 
-if SERVER then
-	--- Prints a message to the player's chat.
-	-- @shared
-	-- @param ... Values to print
-	function SF.DefaultEnvironment.print(...)
-		local str = ""
-		local tbl = {n=select('#', ...), ...}
-		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
-		SF.instance.player:ChatPrint(str)
-	end
-else
-	-- Prints a message to the player's chat.
-	function SF.DefaultEnvironment.print(...)
-		if SF.instance.player ~= LocalPlayer() then return end
-		local str = ""
-		local tbl = {n=select('#', ...), ...}
-		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
-		LocalPlayer():ChatPrint(str)
-	end
-	
+if CLIENT then	
 	--- Sets the chip's display name
 	-- @client
 	-- @param name Name
@@ -257,6 +238,13 @@ else
 		if IsValid( e ) then
 			e.name = name
 		end
+	end
+	
+	--- Sets clipboard text. Only works on the owner of the chip.
+	-- @param txt Text to set to the clipboard
+	function SF.DefaultEnvironment.setClipboardText( txt )
+		if SF.instance.player ~= LocalPlayer() then return end
+		SetClipboardText( txt )
 	end
 end
 
@@ -270,6 +258,17 @@ local function printTableX ( target, t, indent, alreadyprinted )
 			target:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. "\t=\t" .. tostring( v ) )
 		end
 	end
+end
+
+-- Prints a message to the player's chat.
+-- @shared
+-- @param ... Values to print
+function SF.DefaultEnvironment.print(...)
+	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
+	local str = ""
+	local tbl = {n=select('#', ...), ...}
+	for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
+	( SERVER and SF.instance.player or LocalPlayer() ):ChatPrint(str)
 end
 
 --- Prints a table to player's chat
