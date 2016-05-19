@@ -65,7 +65,7 @@ end
 
 --- __tostring metamethod
 function color_metatable.__tostring ( c )
-	return c.r .. " " .. c.g .. " " .. c.b .. " " .. c.a
+	return c[1] .. " " .. c[2] .. " " .. c[3] .. " " .. c[4]
 end
 
 --- __concat metamethod
@@ -99,7 +99,7 @@ function color_metatable.__add ( a, b )
 	SF.CheckType( a, color_metatable )
 	SF.CheckType( b, color_metatable )
 
-	return wrap( { clamp( a.r+b.r ), clamp( a.g+b.g ), clamp( a.b+b.b ), clamp( a.a+b.a ) } )
+	return wrap( { clamp( a[1]+b[1] ), clamp( a[2]+b[2] ), clamp( a[3]+b[3] ), clamp( a[4]+b[4] ) } )
 end
 
 --- subtraction metamethod
@@ -110,7 +110,7 @@ function color_metatable.__sub ( a, b )
 	SF.CheckType( a, color_metatable )
 	SF.CheckType( b, color_metatable )
 
-	return wrap( { clamp( a.r-b.r ), clamp( a.g-b.g ), clamp( a.b-b.b ), clamp( a.a-b.a ) } )
+	return wrap( { clamp( a[1]-b[1] ), clamp( a[2]-b[2] ), clamp( a[3]-b[3] ), clamp( a[4]-b[4] ) } )
 end
 
 --- multiplication metamethod
@@ -121,11 +121,11 @@ function color_metatable.__mul ( a, b )
 	if dgetmeta( a ) == color_metatable then
 		SF.CheckType( b, "number" )
 
-		return wrap( { clamp( a.r*b ), clamp( a.g*b ), clamp( a.b*b ), clamp( a.a*b ) } )
+		return wrap( { clamp( a[1]*b ), clamp( a[2]*b ), clamp( a[3]*b ), clamp( a[4]*b ) } )
 	else
 		SF.CheckType( a, "number" )
 
-		return wrap( { clamp( b.r*a ), clamp( b.g*a ), clamp( b.b*a ), clamp( b.a*a ) } )
+		return wrap( { clamp( b[1]*a ), clamp( b[2]*a ), clamp( b[3]*a ), clamp( b[4]*a ) } )
 	end
 end
 
@@ -136,7 +136,7 @@ function color_metatable.__div ( a, b )
 	SF.CheckType( a, color_metatable )
 	SF.CheckType( b, "number" )
 
-	return wrap( { clamp( a.r/b ), clamp( a.g/b ), clamp( a.b/b ), clamp( a.a/b ) } )
+	return wrap( { clamp( a[1]/b ), clamp( a[2]/b ), clamp( a[3]/b ), clamp( a[4]/b ) } )
 end
 
 --- Converts the color from RGB to HSV.
@@ -151,6 +151,6 @@ end
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:hsvToRGB ()
-	local rgb = HSVToColor( self.r, self.g, self.b )
-	return wrap( { rgb.r, rgb.g, rgb.b, (rgb.a or 255) } )
+	local rgb = HSVToColor( self[1], self[2], self[3] )
+	return wrap( { rgb[1], rgb[2], rgb[3], (rgb[4] or 255) } )
 end
