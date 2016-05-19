@@ -132,16 +132,16 @@ end
 
 --- Return the Forward Vector ( direction the angle points ).
 -- @return vector normalised.
-function ang_methods:getForward ()
-	return SF.WrapObject( unwrap( self ):Forward() )
+function ang_methods.getForward ( a )
+	return SF.WrapObject( unwrap( a ):Forward() )
 end
 
 --- Returns if p,y,r are all 0.
 -- @return boolean
-function ang_methods:isZero ()
-	if self[1] ~= 0 then return false
-	elseif self[2] ~= 0 then return false
-	elseif self[3] ~= 0 then return false
+function ang_methods.isZero ( a )
+	if a[1] ~= 0 then return false
+	elseif a[2] ~= 0 then return false
+	elseif a[3] ~= 0 then return false
 	end
 
 	return true
@@ -149,16 +149,16 @@ end
 
 --- Normalise angles eg (0,181,1) -> (0,-179,1).
 -- @return nil
-function ang_methods:normalize ()
-	self[1] = math_nAng( self[1] )
-	self[2] = math_nAng( self[2] )
-	self[3] = math_nAng( self[3] )
+function ang_methods.normalize ( a )
+	a[1] = math_nAng( a[1] )
+	a[2] = math_nAng( a[2] )
+	a[3] = math_nAng( a[3] )
 end
 
 --- Return the Right Vector relative to the angle dir.
 -- @return vector normalised.
-function ang_methods:getRight ()
-	return SF.WrapObject( unwrap( self ):Right() )
+function ang_methods.getRight ( a )
+	return SF.WrapObject( unwrap( a ):Right() )
 end
 
 --- Return Rotated angle around the specified axis.
@@ -166,7 +166,7 @@ end
 -- @param deg Number of degrees or nil if radians.
 -- @param rad Number of radians or nil if degrees.
 -- @return The modified angle
-function ang_methods:rotateAroundAxis ( v, deg, rad )
+function ang_methods.rotateAroundAxis ( a, v, deg, rad )
 	SF.CheckType( v, SF.Types[ "Vector" ] )
 
 	if rad then
@@ -178,7 +178,7 @@ function ang_methods:rotateAroundAxis ( v, deg, rad )
 
 	local ret = Angle()
 
-	ret:Set( unwrap( self ) )
+	ret:Set( unwrap( a ) )
 	ret:RotateAroundAxis( SF.UnwrapObject( v ), deg )
 
 	return wrap( ret )
@@ -187,24 +187,24 @@ end
 --- Copies p,y,r from second angle to the first.
 -- @param a Angle to copy from.
 -- @return nil
-function ang_methods:set ( a )
-	SF.CheckType( a, ang_metamethods )
+function ang_methods.set ( a, b )
+	SF.CheckType( b, ang_metamethods )
 
-	self[1] = (a[1] or 0)
-	self[2] = (a[2] or 0)
-	self[3] = (a[3] or 0)
+	a[1] = (b[1] or 0)
+	a[2] = (b[2] or 0)
+	a[3] = (b[3] or 0)
 end
 
 --- Return the Up Vector relative to the angle dir.
 -- @return vector normalised.
-function ang_methods:getUp ()
-	return SF.WrapObject( unwrap( self ):Up() )
+function ang_methods.getUp ( a )
+	return SF.WrapObject( unwrap( a ):Up() )
 end
 
 --- Sets p,y,r to 0. This is faster than doing it manually.
 -- @return nil
-function ang_methods:setZero ()
-	self[1] = 0
-	self[2] = 0
-	self[3] = 0
+function ang_methods.setZero ( a )
+	a[1] = 0
+	a[2] = 0
+	a[3] = 0
 end
