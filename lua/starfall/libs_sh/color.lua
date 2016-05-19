@@ -152,5 +152,5 @@ end
 --@return A triplet of numbers representing HSV.
 function color_methods:hsvToRGB ()
 	local rgb = HSVToColor( self[1], self[2], self[3] )
-	return wrap( { rgb[1], rgb[2], rgb[3], (rgb[4] or 255) } )
+	return wrap( { rgb.r, rgb.g, rgb.b, (rgb.a or 255) } )
 end
