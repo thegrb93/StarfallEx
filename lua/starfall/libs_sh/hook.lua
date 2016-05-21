@@ -225,8 +225,8 @@ if SERVER then
 
 else
 	-- Client hooks
-	add( "StartChat", function() end )
-	add( "FinishChat", function() end )
+	add( "StartChat" )
+	add( "FinishChat" )
 end
 
 -- Shared hooks
