@@ -402,7 +402,7 @@ end
 -- Returns the current environment
 -- @return Current environment
 function SF.DefaultEnvironment.getfenv ()
-	local fenv = getfenv()
+	local fenv = getfenv(2)
 	if fenv ~= _G then return fenv end
 end
 
