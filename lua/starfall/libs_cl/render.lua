@@ -793,7 +793,7 @@ end
 -- @return y position
 function render_library.cursorPos( ply )
 	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()~="starfall_screen" then return end
+	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
 
 	ply = SF.Entities.Unwrap( ply )
 	if not ply then SF.throw("Invalid Player", 2) end
