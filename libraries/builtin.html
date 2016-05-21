@@ -379,6 +379,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#tick">tick</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#writecell">writecell</a>
 	</li>
 
@@ -567,12 +571,6 @@ Same as owner() on the server.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.print">print</a>&nbsp;(...)</td>
-	<td class="summary">
-Prints a message to the player's chat.</td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.printTable">printTable</a>&nbsp;(tbl)</td>
 	<td class="summary">
 Prints a table to player's chat </td>
@@ -597,18 +595,6 @@ Returns the current count for this Think's CPU Time.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.rawget">rawget</a>&nbsp;(table, key, value)</td>
-	<td class="summary">
-Gets the value of a table index without invoking a metamethod </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.rawset">rawset</a>&nbsp;(table, key, value)</td>
-	<td class="summary">
-Set the value of a table index without invoking a metamethod </td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.require">require</a>&nbsp;(file)</td>
 	<td class="summary">
 Runs an included script and caches the result.</td>
@@ -618,6 +604,12 @@ Runs an included script and caches the result.</td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.requiredir">requiredir</a>&nbsp;(dir, loadpriority)</td>
 	<td class="summary">
 Runs an included script and caches the result.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.setClipboardText">setClipboardText</a>&nbsp;(txt)</td>
+	<td class="summary">
+Sets clipboard text.</td>
 	</tr>
 
 	<tr>
@@ -686,19 +678,200 @@ Same as Lua's unpack </td>
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.IN_KEY">IN_KEY</a></td>
 	<td class="summary">
-ENUMs of in_keys for use with player:keyDown </td>
+ENUMs of in_keys for use with player:keyDown: 
+ALT1, 
+ALT2, 
+ATTACK, 
+ATTACK2, 
+BACK, 
+DUCK, 
+FORWARD, 
+JUMP, 
+LEFT, 
+MOVELEFT, 
+MOVERIGHT, 
+RELOAD, 
+RIGHT, 
+SCORE, 
+SPEED, 
+USE, 
+WALK, 
+ZOOM, 
+GRENADE1, 
+GRENADE2, 
+WEAPON1, 
+WEAPON2, 
+BULLRUSH, 
+CANCEL, 
+RUN </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.KEY">KEY</a></td>
 	<td class="summary">
-ENUMs of keyboard keys for use with input library </td>
+ENUMs of keyboard keys for use with input library: 
+FIRST, 
+NONE, 
+0, 
+1, 
+2, 
+3, 
+4, 
+5, 
+6, 
+7, 
+8, 
+9, 
+A, 
+B, 
+C, 
+D, 
+E, 
+F, 
+G, 
+H, 
+I, 
+J, 
+K, 
+L, 
+M, 
+N, 
+O, 
+P, 
+Q, 
+R, 
+S, 
+T, 
+U, 
+V, 
+W, 
+X, 
+Y, 
+Z, 
+KP_INS, 
+PAD_0, 
+KP_END, 
+PAD_1, 
+KP_DOWNARROW , 
+PAD_2, 
+KP_PGDN, 
+PAD_3, 
+KP_LEFTARROW, 
+PAD_4, 
+KP_5 , 
+PAD_5, 
+KP_RIGHTARROW, 
+PAD_6, 
+KP_HOME, 
+PAD_7, 
+KP_UPARROW, 
+PAD_8, 
+KP_PGUP, 
+PAD_9, 
+PAD_DIVIDE, 
+KP_SLASH, 
+KP_MULTIPLY, 
+PAD_MULTIPLY, 
+KP_MINUS, 
+PAD_MINUS, 
+KP_PLUS, 
+PAD_PLUS, 
+KP_ENTER, 
+PAD_ENTER, 
+KP_DEL, 
+PAD_DECIMAL, 
+LBRACKET, 
+RBRACKET, 
+SEMICOLON, 
+APOSTROPHE, 
+BACKQUOTE, 
+COMMA, 
+PERIOD, 
+SLASH, 
+BACKSLASH, 
+MINUS, 
+EQUAL, 
+ENTER, 
+SPACE, 
+BACKSPACE, 
+TAB, 
+CAPSLOCK, 
+NUMLOCK, 
+ESCAPE, 
+SCROLLLOCK, 
+INS, 
+INSERT, 
+DEL, 
+DELETE, 
+HOME, 
+END, 
+PGUP, 
+PAGEUP, 
+PGDN, 
+PAGEDOWN, 
+PAUSE, 
+BREAK, 
+SHIFT, 
+LSHIFT, 
+RSHIFT, 
+ALT, 
+LALT, 
+RALT, 
+CTRL, 
+LCONTROL, 
+RCTRL, 
+RCONTROL, 
+LWIN, 
+RWIN, 
+APP, 
+UPARROW, 
+UP, 
+LEFTARROW, 
+LEFT, 
+DOWNARROW, 
+DOWN, 
+RIGHTARROW, 
+RIGHT, 
+F1, 
+F2, 
+F3, 
+F4, 
+F5, 
+F6, 
+F7, 
+F8, 
+F9, 
+F10, 
+F11, 
+F12, 
+CAPSLOCKTOGGLE, 
+NUMLOCKTOGGLE, 
+SCROLLLOCKTOGGLE, 
+LAST, 
+COUNT </td>
 	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.MOUSE">MOUSE</a></td>
 	<td class="summary">
-ENUMs of mouse buttons for use with input library </td>
+ENUMs of mouse buttons for use with input library: 
+MOUSE1, 
+LEFT, 
+MOUSE2, 
+RIGHT, 
+MOUSE3, 
+MIDDLE, 
+MOUSE4, 
+4, 
+MOUSE5, 
+5, 
+MWHEELUP, 
+WHEEL_UP, 
+MWHEELDOWN, 
+WHEEL_DOWN, 
+COUNT, 
+FIRST, 
+LAST </td>
 	</tr>
 
 	<tr>
@@ -1325,37 +1498,6 @@ Same as owner() on the server. On the client, returns the local player
 
 
 
-<dt><a name="SF.DefaultEnvironment.print"></a><strong>SF.DefaultEnvironment.print</strong>&nbsp;(...)</dt>
-<dd>
-
-Prints a message to the player's chat.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>...</em></code>: Values to print
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
 <dt><a name="SF.DefaultEnvironment.printTable"></a><strong>SF.DefaultEnvironment.printTable</strong>&nbsp;(tbl)</dt>
 <dd>
 
@@ -1465,87 +1607,6 @@ If used on screens, will show 0 if only rendering is done. Operations must be do
 
 
 
-<dt><a name="SF.DefaultEnvironment.rawget"></a><strong>SF.DefaultEnvironment.rawget</strong>&nbsp;(table, key, value)</dt>
-<dd>
-
-Gets the value of a table index without invoking a metamethod
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>table</em></code>: The table to get the value from
-	</li>
-	
-	<li>
-	  <code><em>key</em></code>: The index of the table
-	</li>
-	
-	<li>
-	  <code><em>value</em></code>: 
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The value of the index</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="SF.DefaultEnvironment.rawset"></a><strong>SF.DefaultEnvironment.rawset</strong>&nbsp;(table, key, value)</dt>
-<dd>
-
-Set the value of a table index without invoking a metamethod
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>table</em></code>: The table to modify
-	</li>
-	
-	<li>
-	  <code><em>key</em></code>: The index of the table
-	</li>
-	
-	<li>
-	  <code><em>value</em></code>: The value to set the index equal to
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
 <dt><a name="SF.DefaultEnvironment.require"></a><strong>SF.DefaultEnvironment.require</strong>&nbsp;(file)</dt>
 <dd>
 
@@ -1610,6 +1671,37 @@ Works pretty much like standard Lua require()
 
 <h3>Return value:</h3>
 <ul>Table of return values of the scripts</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.setClipboardText"></a><strong>SF.DefaultEnvironment.setClipboardText</strong>&nbsp;(txt)</dt>
+<dd>
+
+Sets clipboard text. Only works on the owner of the chip.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>txt</em></code>: Text to set to the clipboard
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -1947,7 +2039,32 @@ Same as Lua's unpack
 
 <dt><a name="SF.DefaultEnvironment.IN_KEY"></a><strong>SF.DefaultEnvironment.IN_KEY</strong></dt>
 <dd>
-ENUMs of in_keys for use with player:keyDown<br /><br />
+ENUMs of in_keys for use with player:keyDown: 
+ALT1, 
+ALT2, 
+ATTACK, 
+ATTACK2, 
+BACK, 
+DUCK, 
+FORWARD, 
+JUMP, 
+LEFT, 
+MOVELEFT, 
+MOVERIGHT, 
+RELOAD, 
+RIGHT, 
+SCORE, 
+SPEED, 
+USE, 
+WALK, 
+ZOOM, 
+GRENADE1, 
+GRENADE2, 
+WEAPON1, 
+WEAPON2, 
+BULLRUSH, 
+CANCEL, 
+RUN<br /><br />
 
 
 
@@ -1956,7 +2073,146 @@ ENUMs of in_keys for use with player:keyDown<br /><br />
 
 <dt><a name="SF.DefaultEnvironment.KEY"></a><strong>SF.DefaultEnvironment.KEY</strong></dt>
 <dd>
-ENUMs of keyboard keys for use with input library<br /><br />
+ENUMs of keyboard keys for use with input library: 
+FIRST, 
+NONE, 
+0, 
+1, 
+2, 
+3, 
+4, 
+5, 
+6, 
+7, 
+8, 
+9, 
+A, 
+B, 
+C, 
+D, 
+E, 
+F, 
+G, 
+H, 
+I, 
+J, 
+K, 
+L, 
+M, 
+N, 
+O, 
+P, 
+Q, 
+R, 
+S, 
+T, 
+U, 
+V, 
+W, 
+X, 
+Y, 
+Z, 
+KP_INS, 
+PAD_0, 
+KP_END, 
+PAD_1, 
+KP_DOWNARROW , 
+PAD_2, 
+KP_PGDN, 
+PAD_3, 
+KP_LEFTARROW, 
+PAD_4, 
+KP_5 , 
+PAD_5, 
+KP_RIGHTARROW, 
+PAD_6, 
+KP_HOME, 
+PAD_7, 
+KP_UPARROW, 
+PAD_8, 
+KP_PGUP, 
+PAD_9, 
+PAD_DIVIDE, 
+KP_SLASH, 
+KP_MULTIPLY, 
+PAD_MULTIPLY, 
+KP_MINUS, 
+PAD_MINUS, 
+KP_PLUS, 
+PAD_PLUS, 
+KP_ENTER, 
+PAD_ENTER, 
+KP_DEL, 
+PAD_DECIMAL, 
+LBRACKET, 
+RBRACKET, 
+SEMICOLON, 
+APOSTROPHE, 
+BACKQUOTE, 
+COMMA, 
+PERIOD, 
+SLASH, 
+BACKSLASH, 
+MINUS, 
+EQUAL, 
+ENTER, 
+SPACE, 
+BACKSPACE, 
+TAB, 
+CAPSLOCK, 
+NUMLOCK, 
+ESCAPE, 
+SCROLLLOCK, 
+INS, 
+INSERT, 
+DEL, 
+DELETE, 
+HOME, 
+END, 
+PGUP, 
+PAGEUP, 
+PGDN, 
+PAGEDOWN, 
+PAUSE, 
+BREAK, 
+SHIFT, 
+LSHIFT, 
+RSHIFT, 
+ALT, 
+LALT, 
+RALT, 
+CTRL, 
+LCONTROL, 
+RCTRL, 
+RCONTROL, 
+LWIN, 
+RWIN, 
+APP, 
+UPARROW, 
+UP, 
+LEFTARROW, 
+LEFT, 
+DOWNARROW, 
+DOWN, 
+RIGHTARROW, 
+RIGHT, 
+F1, 
+F2, 
+F3, 
+F4, 
+F5, 
+F6, 
+F7, 
+F8, 
+F9, 
+F10, 
+F11, 
+F12, 
+CAPSLOCKTOGGLE, 
+NUMLOCKTOGGLE, 
+SCROLLLOCKTOGGLE, 
+LAST, 
+COUNT<br /><br />
 
 
 
@@ -1965,7 +2221,24 @@ ENUMs of keyboard keys for use with input library<br /><br />
 
 <dt><a name="SF.DefaultEnvironment.MOUSE"></a><strong>SF.DefaultEnvironment.MOUSE</strong></dt>
 <dd>
-ENUMs of mouse buttons for use with input library<br /><br />
+ENUMs of mouse buttons for use with input library: 
+MOUSE1, 
+LEFT, 
+MOUSE2, 
+RIGHT, 
+MOUSE3, 
+MIDDLE, 
+MOUSE4, 
+4, 
+MOUSE5, 
+5, 
+MWHEELUP, 
+WHEEL_UP, 
+MWHEELDOWN, 
+WHEEL_DOWN, 
+COUNT, 
+FIRST, 
+LAST<br /><br />
 
 
 

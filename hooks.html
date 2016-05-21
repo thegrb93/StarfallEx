@@ -381,6 +381,10 @@
 	</li>
 
 	<li>
+		<a href="hooks.html#tick">tick</a>
+	</li>
+
+	<li>
 		<a href="hooks.html#writecell">writecell</a>
 	</li>
 
@@ -668,13 +672,13 @@ Called when an input on a wired SF chip is written to </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#inputPressed">inputPressed</a>&nbsp;(name)</td>
+	<td class="name" nowrap><a href="#inputPressed">inputPressed</a>&nbsp;(button)</td>
 	<td class="summary">
 Called when a button is pressed </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#inputReleased">inputReleased</a>&nbsp;(name)</td>
+	<td class="name" nowrap><a href="#inputReleased">inputReleased</a>&nbsp;(button)</td>
 	<td class="summary">
 Called when a button is released </td>
 	</tr>
@@ -713,6 +717,12 @@ Called when a player uses the screen </td>
 	<td class="name" nowrap><a href="#think">think</a>&nbsp;()</td>
 	<td class="summary">
 Think hook.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#tick">tick</a>&nbsp;()</td>
+	<td class="summary">
+Tick hook.</td>
 	</tr>
 
 	<tr>
@@ -1669,7 +1679,7 @@ Called when an input on a wired SF chip is written to
 	</dd>
 
 	
-	<dt><a name="inputPressed"></a><strong>inputPressed</strong>&nbsp;(name)</dt>
+	<dt><a name="inputPressed"></a><strong>inputPressed</strong>&nbsp;(button)</dt>
 	<dd>
 	
 Called when a button is pressed
@@ -1679,7 +1689,7 @@ Called when a button is pressed
 	<ul>
 		
 		<li>
-		  <code><em>name</em></code>: Name of the key
+		  <code><em>button</em></code>: Number of the button
 		</li>
 		
 	</ul>
@@ -1692,7 +1702,7 @@ Called when a button is pressed
 	</dd>
 
 	
-	<dt><a name="inputReleased"></a><strong>inputReleased</strong>&nbsp;(name)</dt>
+	<dt><a name="inputReleased"></a><strong>inputReleased</strong>&nbsp;(button)</dt>
 	<dd>
 	
 Called when a button is released
@@ -1702,7 +1712,7 @@ Called when a button is released
 	<ul>
 		
 		<li>
-		  <code><em>name</em></code>: Name of the key
+		  <code><em>button</em></code>: Number of the button
 		</li>
 		
 	</ul>
@@ -1844,7 +1854,21 @@ Called when a player uses the screen
 	<dt><a name="think"></a><strong>think</strong>&nbsp;()</dt>
 	<dd>
 	
-Think hook. Called each game tick
+Think hook. Called each frame on the client and each game tick on the server.
+
+	
+
+	
+
+	
+
+	</dd>
+
+	
+	<dt><a name="tick"></a><strong>tick</strong>&nbsp;()</dt>
+	<dd>
+	
+Tick hook. Called each game tick on both the server and client.
 
 	
 

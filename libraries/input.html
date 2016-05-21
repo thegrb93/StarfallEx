@@ -379,6 +379,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#tick">tick</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#writecell">writecell</a>
 	</li>
 
@@ -475,12 +479,6 @@ Gets the name of a key from the id </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#input_methods.getMBName">getMBName</a>&nbsp;(key)</td>
-	<td class="summary">
-Gets the name of a mouse button from the id </td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#input_methods.isControlDown">isControlDown</a>&nbsp;()</td>
 	<td class="summary">
 Gets whether the control key is down </td>
@@ -493,12 +491,6 @@ Gets whether a key is down </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#input_methods.isMBDown">isMBDown</a>&nbsp;(key)</td>
-	<td class="summary">
-Gets whether a mouse button is down </td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#input_methods.isShiftDown">isShiftDown</a>&nbsp;()</td>
 	<td class="summary">
 Gets whether the shift key is down </td>
@@ -508,30 +500,6 @@ Gets whether the shift key is down </td>
 	<td class="name" nowrap><a href="#input_methods.lookupBinding">lookupBinding</a>&nbsp;(binding)</td>
 	<td class="summary">
 Gets the first key that is bound to the command passed </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#input_methods.wasKeyPressed">wasKeyPressed</a>&nbsp;(key)</td>
-	<td class="summary">
-Gets whether the key was pressed this frame </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#input_methods.wasKeyReleased">wasKeyReleased</a>&nbsp;(key)</td>
-	<td class="summary">
-Gets whether the key was released this frame </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#input_methods.wasMBPressed">wasMBPressed</a>&nbsp;(key)</td>
-	<td class="summary">
-Gets whether the mouse button was pressed this frame </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#input_methods.wasMBReleased">wasMBReleased</a>&nbsp;(key)</td>
-	<td class="summary">
-Gets whether the mouse button was released this frame </td>
 	</tr>
 
 </table>
@@ -595,7 +563,7 @@ Gets the name of a key from the id
 <ul>
 	
 	<li>
-	  <code><em>key</em></code>: The key id, see input.KEY
+	  <code><em>key</em></code>: The key id, see input
 	</li>
 	
 </ul>
@@ -607,40 +575,6 @@ Gets the name of a key from the id
 
 <h3>Return value:</h3>
 <ul>The name of the key</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="input_methods.getMBName"></a><strong>input_methods.getMBName</strong>&nbsp;(key)</dt>
-<dd>
-
-Gets the name of a mouse button from the id
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>key</em></code>: The button id, see input.MOUSE
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The name of the mouse button</ul>
 
 
 
@@ -688,7 +622,7 @@ Gets whether a key is down
 <ul>
 	
 	<li>
-	  <code><em>key</em></code>: The key id, see input.KEY
+	  <code><em>key</em></code>: The key id, see input
 	</li>
 	
 </ul>
@@ -700,40 +634,6 @@ Gets whether a key is down
 
 <h3>Return value:</h3>
 <ul>True if the key is down</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="input_methods.isMBDown"></a><strong>input_methods.isMBDown</strong>&nbsp;(key)</dt>
-<dd>
-
-Gets whether a mouse button is down
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>key</em></code>: The mouse button, see input.MOUSE
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the mouse button is down</ul>
 
 
 
@@ -799,142 +699,6 @@ Gets the first key that is bound to the command passed
 	<li>The name of the first key bound</li>
 	
 </ol>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="input_methods.wasKeyPressed"></a><strong>input_methods.wasKeyPressed</strong>&nbsp;(key)</dt>
-<dd>
-
-Gets whether the key was pressed this frame
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>key</em></code>: The key id, see input.KEY
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the key was pressed</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="input_methods.wasKeyReleased"></a><strong>input_methods.wasKeyReleased</strong>&nbsp;(key)</dt>
-<dd>
-
-Gets whether the key was released this frame
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>key</em></code>: The key id, see input.KEY
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the key was released</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="input_methods.wasMBPressed"></a><strong>input_methods.wasMBPressed</strong>&nbsp;(key)</dt>
-<dd>
-
-Gets whether the mouse button was pressed this frame
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>key</em></code>: The button id, see input.MOUSE
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the button was pressed</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="input_methods.wasMBReleased"></a><strong>input_methods.wasMBReleased</strong>&nbsp;(key)</dt>
-<dd>
-
-Gets whether the mouse button was released this frame
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>key</em></code>: The key id, see input.MOUSE
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the button was released</ul>
 
 
 

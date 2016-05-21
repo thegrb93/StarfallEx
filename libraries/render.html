@@ -379,6 +379,10 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#tick">tick</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#writecell">writecell</a>
 	</li>
 
@@ -585,7 +589,7 @@ Gets the size of the specified text.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.getTextureID">getTextureID</a>&nbsp;(tx, cb)</td>
+	<td class="name" nowrap><a href="#render_library.getTextureID">getTextureID</a>&nbsp;(tx, cb, alignment)</td>
 	<td class="summary">
 Looks up a texture by file name.</td>
 	</tr>
@@ -624,6 +628,12 @@ Sets the draw color </td>
 	<td class="name" nowrap><a href="#render_library.setFont">setFont</a>&nbsp;(font)</td>
 	<td class="summary">
 Sets the font </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.setRGBA">setRGBA</a>&nbsp;(r, g, b, a)</td>
+	<td class="summary">
+Sets the draw color by RGBA values </td>
 	</tr>
 
 	<tr>
@@ -1480,7 +1490,7 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 
 
 
-<dt><a name="render_library.getTextureID"></a><strong>render_library.getTextureID</strong>&nbsp;(tx, cb)</dt>
+<dt><a name="render_library.getTextureID"></a><strong>render_library.getTextureID</strong>&nbsp;(tx, cb, alignment)</dt>
 <dd>
 
 Looks up a texture by file name. Use with render.setTexture to draw with it. 
@@ -1498,6 +1508,10 @@ Make sure to store the texture to use it rather than calling this slow function 
 	
 	<li>
 	  <code><em>cb</em></code>: Optional callback for when a url texture finishes loading. param1 - The texture url, param2 - The texture table
+	</li>
+	
+	<li>
+	  <code><em>alignment</em></code>: Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
 	</li>
 	
 </ul>
@@ -1686,6 +1700,49 @@ Sets the font
 	
 	<li>
 	  <code><em>font</em></code>: The font to use
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.setRGBA"></a><strong>render_library.setRGBA</strong>&nbsp;(r, g, b, a)</dt>
+<dd>
+
+Sets the draw color by RGBA values
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>r</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>g</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>b</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>a</em></code>: 
 	</li>
 	
 </ul>
