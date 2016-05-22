@@ -2,23 +2,26 @@ SF.Color = {}
 
 --- Color type
 --@shared
-local color_methods, color_metatable = SF.Typedef( "Color" )
+local color_methods, color_metatable = SF.Typedef( "Color", {} )
 
-local function wrap_color( table )
-	if not table[4] then table[4] = 255 end
-	return setmetatable( table, color_metatable )
+local function wrap( tbl )
+	return setmetatable( { (tonumber(tbl[1]) or 255), (tonumber(tbl[2]) or 255), (tonumber(tbl[3]) or 255), (tonumber(tbl[4]) or 255) }, color_metatable )
 end
 
-local function unwrap_color( obj )
-	return Color( (obj[1] or 255), (obj[2] or 255),
-		(obj[3] or 255), (obj[4] or 255) )
+local function unwrap( obj )
+	return Color( (obj[1] or 255), (obj[2] or 255), (obj[3] or 255), (obj[4] or 255) )
 end
 
-local wrap, unwrap = wrap_color, unwrap_color
+local function cwrap( clr )
+	return wrap( { clr.r, clr.g, clr.b, clr.a } )
+end
+
+SF.AddObjectWrapper( debug.getregistry().Color, color_metatable, cwrap )
+SF.AddObjectUnwrapper( color_metatable, unwrap )
 
 SF.Color.Methods = color_methods
 SF.Color.Metatable = color_metatable
-SF.Color.Wrap = wrap
+SF.Color.Wrap = cwrap
 SF.Color.Unwrap = unwrap
 
 local dgetmeta = debug.getmetatable
@@ -49,14 +52,11 @@ function color_metatable.__newindex ( t, k, v )
 	end
 end
 
-local _p = color_metatable.__index
+local _p = color_metatable.__methods
 
 --- __index metamethod
 function color_metatable.__index ( t, k )
-	local val = rawget( t, k )
-	if val then
-		return val
-	elseif rgb[ k ] then
+	if rgb[ k ] then
 		return rawget( t, rgb[ k ] )
 	else
 		return _p[k]
@@ -64,8 +64,8 @@ function color_metatable.__index ( t, k )
 end
 
 --- __tostring metamethod
-function color_metatable:__tostring ()
-	return self.r .. " " .. self.g .. " " .. self.b .. " " .. self.a
+function color_metatable.__tostring ( c )
+	return c[1] .. " " .. c[2] .. " " .. c[3] .. " " .. c[4]
 end
 
 --- __concat metamethod
@@ -75,59 +75,68 @@ function color_metatable.__concat ( ... )
 end
 
 --- __eq metamethod
-function color_metatable:__eq ( c )
-	SF.CheckType( self, color_metatable )
-	SF.CheckType( c, color_metatable )
-	return ( unwrap(self):__eq(unwrap(c)) )
+function color_metatable.__eq ( a, b )
+	if dgetmeta(a) ~= color_metatable then return false end
+	if dgetmeta(b) ~= color_metatable then return false end
+
+	if #a ~= #b then return false end
+
+	for k, v in pairs( a ) do
+		if v ~= b[k] then return false end
+	end
+
+	return true
 end
 
-local clamp = math.Clamp
+local math_Clamp = math.Clamp
+local clamp = function(v) return math_Clamp( v, 0, 255 ) end
 
 --- addition metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Added color.
-function color_metatable.__add ( lhs, rhs )
-	SF.CheckType( lhs, color_metatable )
-	SF.CheckType( rhs, color_metatable )
-	local a, b = lhs, rhs
-	return wrap( { clamp( a.r + b.r, 0, 255 ), clamp( a.g + b.g, 0, 255 ), clamp( a.b + b.b, 0, 255 ), clamp( a.a + b.a, 0, 255 ) } )
+function color_metatable.__add ( a, b )
+	SF.CheckType( a, color_metatable )
+	SF.CheckType( b, color_metatable )
+
+	return wrap( { clamp( a[1]+b[1] ), clamp( a[2]+b[2] ), clamp( a[3]+b[3] ), clamp( a[4]+b[4] ) } )
 end
 
 --- subtraction metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Subtracted color.
-function color_metatable.__sub ( lhs, rhs )
-	SF.CheckType( lhs, color_metatable )
-	SF.CheckType( rhs, color_metatable )
-	local a, b = lhs, rhs
-	return wrap( { clamp( a.r - b.r, 0, 255 ), clamp( a.g - b.g, 0, 255 ), clamp( a.b - b.b, 0, 255 ), clamp( a.a - b.a, 0, 255 ) } )
+function color_metatable.__sub ( a, b )
+	SF.CheckType( a, color_metatable )
+	SF.CheckType( b, color_metatable )
+
+	return wrap( { clamp( a[1]-b[1] ), clamp( a[2]-b[2] ), clamp( a[3]-b[3] ), clamp( a[4]-b[4] ) } )
 end
 
 --- multiplication metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Scaled color.
-function color_metatable.__mul ( lhs, rhs )
-	if dgetmeta( lhs ) == color_metatable then
-		SF.CheckType( rhs, "number" )
-		local c = lhs
-		return wrap( { clamp( c.r * rhs, 0, 255 ), clamp( c.g * rhs, 0, 255 ), clamp( c.b * rhs, 0, 255 ), clamp( c.a * rhs, 0, 255 ) } )
+function color_metatable.__mul ( a, b )
+	if dgetmeta( a ) == color_metatable then
+		SF.CheckType( b, "number" )
+
+		return wrap( { clamp( a[1]*b ), clamp( a[2]*b ), clamp( a[3]*b ), clamp( a[4]*b ) } )
 	else
-		SF.CheckType( lhs, "number" )
-		local c = rhs
-		return wrap( { clamp( c.r * lhs, 0, 255 ), clamp( c.g * lhs, 0, 255 ), clamp( c.b * lhs, 0, 255 ), clamp( c.a * lhs, 0, 255 ) } )
+		SF.CheckType( a, "number" )
+
+		return wrap( { clamp( b[1]*a ), clamp( b[2]*a ), clamp( b[3]*a ), clamp( b[4]*a ) } )
 	end
 end
 
 --- division metamethod
 -- @param rhs Right side of equation
 -- @return Scaled color.
-function color_metatable:__div ( rhs )
-	SF.CheckType( rhs, "number" )
-	local c = self
-	return wrap( { clamp( c.r / rhs, 0, 255 ), clamp( c.g / rhs, 0, 255 ), clamp( c.b / rhs, 0, 255 ), clamp( c.a / rhs, 0, 255 ) } )
+function color_metatable.__div ( a, b )
+	SF.CheckType( a, color_metatable )
+	SF.CheckType( b, "number" )
+
+	return wrap( { clamp( a[1]/b ), clamp( a[2]/b ), clamp( a[3]/b ), clamp( a[4]/b ) } )
 end
 
 --- Converts the color from RGB to HSV.
@@ -135,13 +144,13 @@ end
 --@return A triplet of numbers representing HSV.
 function color_methods:rgbToHSV ()
 	local h, s, v = ColorToHSV( self )
-	return wrap( { h, s, v, self.a } )
+	return wrap( { h, s, v, 255 } )
 end
 
 --- Converts the color from HSV to RGB.
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:hsvToRGB ()
-	local rgb = HSVToColor( self.r, self.g, self.b )
-	return wrap( { rgb.r, rgb.g, rgb.b, self.a } )
+	local rgb = HSVToColor( self[1], self[2], self[3] )
+	return wrap( { rgb.r, rgb.g, rgb.b, (rgb.a or 255) } )
 end
