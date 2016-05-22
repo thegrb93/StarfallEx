@@ -36,6 +36,11 @@ function ENT:GetOverlayText()
 	end
 end
 
+function ENT:DrawTranslucent()
+	self:DrawModel()
+	Wire_Render( self )
+end
+
 function ENT:Think ()
 	BaseClass.Think( self )
 	

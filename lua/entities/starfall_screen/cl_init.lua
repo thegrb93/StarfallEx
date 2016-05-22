@@ -1,6 +1,6 @@
 include( "shared.lua" )
 
-ENT.RenderGroup = RENDERGROUP_OPAQUE
+ENT.RenderGroup = RENDERGROUP_BOTH
 
 local render = render
 
@@ -96,7 +96,10 @@ end
 
 function ENT:Draw ()
 	self:DrawModel()
-	Wire_Render( self )
+end
+
+function ENT:DrawTranslucent ()
+	self:DrawModel()
 	
 	if halo.RenderedEntity() == self or not self.ScreenInfo then return end
 	-- Draw screen here

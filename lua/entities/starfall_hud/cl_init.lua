@@ -17,9 +17,7 @@ function ENT:LinkEnt ( ent )
 end
 
 function ENT:Draw ()
-	baseclass.Get( self.Base ).Draw( self )
 	self:DrawModel()
-	Wire_Render( self )
 end
 
 function ENT:DrawHUD()
