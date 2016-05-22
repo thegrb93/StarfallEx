@@ -34,7 +34,7 @@ local dgetmeta = debug.getmetatable
 -- @param a - Alpha
 -- @return New color
 SF.DefaultEnvironment.Color = function ( r, g, b, a )
-	return wrap( { r or 0, g or 0, b or 0, a or 0 } )
+	return wrap( { r or 255, g or 255, b or 255, a or 255 } )
 end
 
 -- Lookup table.
