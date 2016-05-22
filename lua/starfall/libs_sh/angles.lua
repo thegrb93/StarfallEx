@@ -5,11 +5,11 @@ SF.Angles = {}
 local ang_methods, ang_metamethods = SF.Typedef( "Angle" )
 
 local function wrap( tbl )
-	return setmetatable( { (tonumber(tbl[1]) or 0), (tonumber(tbl[2]) or 0), (tonumber(tbl[3]) or 0) }, ang_metamethods )
+	return setmetatable( tbl, ang_metamethods )
 end
 
 local function unwrap( obj )
-	return Angle( (obj[1] or 0), (obj[2] or 0), (obj[3] or 0) )
+	return Angle( obj[1], obj[2], obj[3] )
 end
 
 local function awrap( ang )
@@ -19,8 +19,8 @@ end
 SF.AddObjectWrapper( debug.getregistry().Angle, ang_metamethods, awrap )
 SF.AddObjectUnwrapper( ang_metamethods, unwrap )
 
-SF.DefaultEnvironment.Angle = function ( ... )
-	return wrap( { ... } )
+SF.DefaultEnvironment.Angle = function ( p, y, r )
+	return wrap( { p or 0, y or 0, r or 0 } )
 end
 
 SF.Angles.Wrap 	= awrap
@@ -74,7 +74,7 @@ end
 function ang_metamethods.__mul ( a, n )
 	SF.CheckType( n, "number" )
 
-	return wrap( normalizedAngTable( { a[1]*n, a[2]*n, a[3]*n } ) )
+	return wrap( { a[1]*n, a[2]*n, a[3]*n } )
 end
 
 --- __div metamethod ang1 / n.
@@ -155,6 +155,13 @@ function ang_methods.normalize ( a )
 	a[3] = math_nAng( a[3] )
 end
 
+--- Returnes a normalized angle
+-- @return Normalized angle table
+function ang_methods.getNormalized ( a )
+	SF.CheckType( a, ang_metamethods )
+	return wrap( normalizedAngTable( a ) )
+end
+
 --- Return the Right Vector relative to the angle dir.
 -- @return vector normalised.
 function ang_methods.getRight ( a )
@@ -181,7 +188,7 @@ function ang_methods.rotateAroundAxis ( a, v, deg, rad )
 	ret:Set( unwrap( a ) )
 	ret:RotateAroundAxis( SF.UnwrapObject( v ), deg )
 
-	return wrap( ret )
+	return awrap( ret )
 end
 
 --- Copies p,y,r from second angle to the first.

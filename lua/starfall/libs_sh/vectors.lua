@@ -5,11 +5,11 @@ SF.Vectors = {}
 local vec_methods, vec_metamethods = SF.Typedef( "Vector" )
 
 local function wrap( tbl )
-	return setmetatable( { (tonumber(tbl[1]) or 0), (tonumber(tbl[2]) or 0), (tonumber(tbl[3]) or 0) }, vec_metamethods )
+	return setmetatable( tbl, vec_metamethods )
 end
 
 local function unwrap( obj )
-	return Vector( (obj[1] or 0), (obj[2] or 0), (obj[3] or 0) )
+	return Vector( obj[1], obj[2], obj[3] )
 end
 
 local function vwrap( vec )
@@ -19,8 +19,8 @@ end
 SF.AddObjectWrapper( debug.getregistry().Vector, vec_metamethods, vwrap )
 SF.AddObjectUnwrapper( vec_metamethods, unwrap )
 
-SF.DefaultEnvironment.Vector = function ( ... )
-	return wrap( { ... } )
+SF.DefaultEnvironment.Vector = function ( x, y, z )
+	return wrap( { x or 0, y or 0, z or 0 } )
 end
 
 SF.Vectors.Wrap = vwrap
@@ -139,9 +139,9 @@ end
 function vec_methods.add ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = tonumber(a[1] + v[1]) or 0
-	a[2] = tonumber(a[2] + v[2]) or 0
-	a[3] = tonumber(a[3] + v[3]) or 0
+	a[1] = a[1] + v[1]
+	a[2] = a[2] + v[2]
+	a[3] = a[3] + v[3]
 end
 
 --- Get the vector's angle.
@@ -185,7 +185,7 @@ end
 function vec_methods.getDistanceSqr ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	return (tonumber((v[1]-a[1])^2 + (v[2]-a[2])^2 + (v[3]-a[3])^2) or 0)
+	return ((v[1]-a[1])^2 + (v[2]-a[2])^2 + (v[3]-a[3])^2)
 end
 
 --- Dot product is the cosine of the angle between both vectors multiplied by their lengths. A.B = ||A||||B||cosA.
@@ -194,7 +194,7 @@ end
 function vec_methods.dot ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	return (tonumber( a[1]*v[1] + a[2]*v[2] + a[3]*v[3] ) or 0)
+	return ( a[1]*v[1] + a[2]*v[2] + a[3]*v[3] )
 end
 
 --- Returns a new vector with the same direction by length of 1.
@@ -236,7 +236,7 @@ end
 --- Get the vector's length squared ( Saves computation by skipping the square root ).
 -- @return number length squared.
 function vec_methods.getLengthSqr ( a )
-	return (tonumber( a[1]^2 + a[2]^2 + a[3]^2 ) or 0)
+	return ( a[1]^2 + a[2]^2 + a[3]^2 )
 end
 
 --- Returns the length of the vector in two dimensions, without the Z axis.
@@ -248,7 +248,7 @@ end
 --- Returns the length squared of the vector in two dimensions, without the Z axis. ( Saves computation by skipping the square root )
 -- @return number length squared.
 function vec_methods.getLength2DSqr ( a )
-	return (tonumber( a[1]^2 + a[2]^2 ) or 0)
+	return ( a[1]^2 + a[2]^2 )
 end
 
 --- Scalar Multiplication of the vector. Self-Modifies.
@@ -257,9 +257,9 @@ end
 function vec_methods.mul ( a, n )
 	SF.CheckType( n, "number" )
 
-	a[1] = tonumber(a[1] * n) or 0
-	a[2] = tonumber(a[2] * n) or 0
-	a[3] = tonumber(a[3] * n) or 0
+	a[1] = a[1] * n
+	a[2] = a[2] * n
+	a[3] = a[3] * n
 end
 
 --- "Scalar Division" of the vector. Self-Modifies.
@@ -268,9 +268,9 @@ end
 function vec_methods.div ( a, n )
 	SF.CheckType( n, "number" )
 
-	a[1] = tonumber(a[1] / n) or 0
-	a[2] = tonumber(a[2] / n) or 0
-	a[3] = tonumber(a[3] / n) or 0
+	a[1] = a[1] / n
+	a[2] = a[2] / n
+	a[3] = a[3] / n
 end
 
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
@@ -278,9 +278,9 @@ end
 function vec_methods.vmul ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = tonumber(a[1] * v[1]) or 0
-	a[2] = tonumber(a[2] * v[2]) or 0
-	a[3] = tonumber(a[3] * v[3]) or 0
+	a[1] = a[1] * v[1]
+	a[2] = a[2] * v[2]
+	a[3] = a[3] * v[3]
 end
 
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
@@ -288,9 +288,9 @@ end
 function vec_methods.vdiv ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = tonumber(a[1] / v[1]) or 0
-	a[2] = tonumber(a[2] / v[2]) or 0
-	a[3] = tonumber(a[3] / v[3]) or 0
+	a[1] = a[1] / v[1]
+	a[2] = a[2] / v[2]
+	a[3] = a[3] / v[3]
 end
 
 --- Set's all vector fields to 0.
@@ -306,9 +306,9 @@ end
 function vec_methods.normalize ( a )
 	local len = math_sqrt( a[1]^2 + a[2]^2 + a[3]^2 )
 
-	a[1] = tonumber(a[1] / len) or 0
-	a[2] = tonumber(a[2] / len) or 0
-	a[3] = tonumber(a[3] / len) or 0
+	a[1] = a[1] / len
+	a[2] = a[2] / len
+	a[3] = a[3] / len
 end
 
 --- Rotate the vector by Angle a. Self-Modifies.
@@ -356,9 +356,9 @@ end
 function vec_methods.set ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = (v[1] or 0)
-	a[2] = (v[2] or 0)
-	a[3] = (v[3] or 0)
+	a[1] = v[1]
+	a[2] = v[2]
+	a[3] = v[3]
 end
 
 --- Subtract v from this Vector. Self-Modifies.
@@ -367,9 +367,9 @@ end
 function vec_methods.sub ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = tonumber(a[1] - (v[1] or 0)) or 0
-	a[2] = tonumber(a[2] - (v[2] or 0)) or 0
-	a[3] = tonumber(a[3] - (v[3] or 0)) or 0
+	a[1] = a[1] - v[1]
+	a[2] = a[2] - v[2]
+	a[3] = a[3] - v[3]
 end
 
 --- Translates the vectors position into 2D user screen coordinates. Self-Modifies.

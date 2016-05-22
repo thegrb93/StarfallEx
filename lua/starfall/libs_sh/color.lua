@@ -5,11 +5,11 @@ SF.Color = {}
 local color_methods, color_metatable = SF.Typedef( "Color", {} )
 
 local function wrap( tbl )
-	return setmetatable( { (tonumber(tbl[1]) or 255), (tonumber(tbl[2]) or 255), (tonumber(tbl[3]) or 255), (tonumber(tbl[4]) or 255) }, color_metatable )
+	return setmetatable( tbl, color_metatable )
 end
 
 local function unwrap( obj )
-	return Color( (obj[1] or 255), (obj[2] or 255), (obj[3] or 255), (obj[4] or 255) )
+	return Color( (tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255) )
 end
 
 local function cwrap( clr )
@@ -33,8 +33,8 @@ local dgetmeta = debug.getmetatable
 -- @param b - Blue
 -- @param a - Alpha
 -- @return New color
-SF.DefaultEnvironment.Color = function ( ... )
-	return wrap( { ... } )
+SF.DefaultEnvironment.Color = function ( r, g, b, a )
+	return wrap( { r or 255, g or 255, b or 255, a or 255 } )
 end
 
 -- Lookup table.
