@@ -324,7 +324,7 @@ function render_library.pushMatrix(m)
 	else
 		newmatrix = v_unwrap(m)
 	end
-	if renderdata.renderEnt then
+	if IsValid(renderEnt) and renderdata.renderEnt:GetClass()=="starfall_screen" then
 		newmatrix = renderdata.renderEnt.Transform * newmatrix
 	end
 	matrix_stack[id+1] = newmatrix
