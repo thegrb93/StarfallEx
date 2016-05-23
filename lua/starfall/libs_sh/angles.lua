@@ -97,16 +97,7 @@ end
 -- @param a Angle to check against.
 -- @return bool
 function ang_metamethods.__eq ( a, b )
-	if dgetmeta(a) ~= ang_metamethods then return false end
-	if dgetmeta(b) ~= ang_metamethods then return false end
-
-	if #a ~= #b then return false end
-
-	for k, v in pairs( a ) do
-		if v ~= b[k] then return false end
-	end
-
-	return true
+	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
 --- __add metamethod ang1 + ang2.

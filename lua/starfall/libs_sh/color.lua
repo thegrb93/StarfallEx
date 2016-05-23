@@ -76,16 +76,7 @@ end
 
 --- __eq metamethod
 function color_metatable.__eq ( a, b )
-	if dgetmeta(a) ~= color_metatable then return false end
-	if dgetmeta(b) ~= color_metatable then return false end
-
-	if #a ~= #b then return false end
-
-	for k, v in pairs( a ) do
-		if v ~= b[k] then return false end
-	end
-
-	return true
+	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3] and a[4]==b[4]
 end
 
 local math_Clamp = math.Clamp
