@@ -156,7 +156,7 @@ end
 function vec_methods.cross ( a, v )
 	SF.CheckType( v, vec_metamethods )
 
-	return wrap( unwrap( a ):Cross( unwrap( v ) ) )
+	return wrap( { a[2]*v[3] - a[3]*v[2], a[3]*v[1] - a[1]*v[3], a[1]*v[2] - a[2]*v[1] } )
 end
 
 local math_sqrt = math.sqrt
