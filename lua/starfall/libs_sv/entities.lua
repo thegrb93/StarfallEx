@@ -481,8 +481,9 @@ function ents_methods:setNoDraw ( draw, ply )
 	end
 end
 
-local materialBlacklist = {
-	[ "pp/copy" ] = true
+local shaderBlacklist = {
+	[ "UnlitGeneric" ] = true,
+	[ "LightmappedGeneric" ] = true,
 }
 
 --- Sets an entities' material
@@ -493,7 +494,8 @@ local materialBlacklist = {
 function ents_methods:setMaterial ( material, ply )
 	SF.CheckType( self, ents_metatable )
     SF.CheckType( material, "string" )
-    if materialBlacklist[ material:lower() ] then SF.throw( "This material has been blacklisted", 2 ) end
+	local mat = Material( material )
+    if shaderBlacklist[ mat:GetShader() ] then SF.throw( "This material has been blacklisted", 2 ) end
 
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
@@ -516,7 +518,8 @@ end
 function ents_methods:setSubMaterial ( index, material, ply )
 	SF.CheckType( self, ents_metatable )
     SF.CheckType( material, "string" )
-    if materialBlacklist[ material:lower() ] then SF.throw( "This material has been blacklisted", 2 ) end
+	local mat = Material( material )
+    if shaderBlacklist[ mat:GetShader() ] then SF.throw( "This material has been blacklisted", 2 ) end
 
     local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
