@@ -37,6 +37,7 @@ if SERVER then
 		end
 		
 		pl:AddCount( "starfall_processor", sf )
+		pl:AddCleanup( "starfall_processor", sf )
 
 		return sf
 	end
@@ -47,6 +48,7 @@ else
 	language.Add( "Tool.starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
 	language.Add( "sboxlimit_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Starfall Processor", "Undone Starfall Processor" )
+	language.Add( "Cleanup_starfall_processor", "Starfall Processors" )
 end
 
 function TOOL:LeftClick( trace )
@@ -85,7 +87,6 @@ function TOOL:LeftClick( trace )
 			undo.SetPlayer( ply )
 		undo.Finish()
 
-		ply:AddCleanup( "starfall_processor", sf )
 	end
 	
 	if not SF.RequestCode(ply, function(mainfile, files)
