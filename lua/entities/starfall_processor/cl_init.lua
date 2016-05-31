@@ -7,8 +7,6 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 local context = SF.CreateContext( nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"} )
 
 function ENT:Initialize()
-    self:SetRenderBounds( self:OBBMins(), self:OBBMaxs() )
-
 	net.Start( "starfall_processor_download" )
 		net.WriteEntity( self )
 	net.SendToServer()
@@ -36,6 +34,11 @@ function ENT:GetOverlayText()
 	else
 		return "(None)"
 	end
+end
+
+function ENT:DrawTranslucent()
+	self:DrawModel()
+	Wire_Render( self )
 end
 
 function ENT:Think ()

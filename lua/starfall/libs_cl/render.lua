@@ -151,26 +151,21 @@ local function CheckURLDownloads()
 			Panel:SetMouseInputEnabled( false )
 			Panel:SetHTML(
 			[[
-				<style type="text/css">
+				<html><head><style type="text/css">
 					html
 					{
 						overflow:hidden;
 						margin: -8px -8px;
 					}
-					.imagebox {
+					body {
 						background-image: url(]] .. urltable.Url .. [[);
 						background-size: contain;
-						position: absolute;
-						background-position: center;
+						background-position: ]] .. urltable.Alignment .. [[;
 						background-repeat: no-repeat;
 						height: 100%;
 						width: 100%;
 					}
-				</style>
-
-				<body>
-					<div class="imagebox"></div>
-				</body>
+				</style></head><body></body></html>
 			]]
 			)
 			urltable.Timeout = CurTime()+20
@@ -185,7 +180,7 @@ end
 
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } )
 
-local function LoadURLMaterial( url, cb )
+local function LoadURLMaterial( url, alignment, cb )
 	--Count the number of materials
 	local totalMaterials = 0, key
 	while true do
@@ -207,7 +202,7 @@ local function LoadURLMaterial( url, cb )
 		timer.Create("SF_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
 	end
 
-	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, cb = cb}
+	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
 	return urlmaterial
 end
 
@@ -324,7 +319,7 @@ function render_library.pushMatrix(m)
 	else
 		newmatrix = v_unwrap(m)
 	end
-	if renderdata.renderEnt then
+	if renderdata.renderEnt and renderdata.renderEnt.Transform then
 		newmatrix = renderdata.renderEnt.Transform * newmatrix
 	end
 	matrix_stack[id+1] = newmatrix
@@ -361,18 +356,31 @@ end
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
 -- @param tx Texture file path, or a http url
 -- @param cb Optional callback for when a url texture finishes loading. param1 - The texture url, param2 - The texture table
+-- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
-function render_library.getTextureID ( tx, cb )
+function render_library.getTextureID ( tx, cb, alignment )
 
 	if tx:sub(1,4)=="http" then
 		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
 			return string.format( "%%%02X", string.byte( str ) )
 		end )
 
+		if alignment then
+			SF.CheckType( alignment, "string" )
+			local args = string.Split( alignment, " " )
+			local validargs = {["left"]=true,["center"]=true,["right"]=true,["top"]=true,["bottom"]=true}
+			if #args ~= 1 and #args ~= 2 then SF.throw( "Invalid urltexture alignment given." ) end
+			for i=1, #args do
+				if not validargs[args[i]] then SF.throw( "Invalid urltexture alignment given." ) end
+			end
+		else
+			alignment = "center"
+		end
+		
 		local instance = SF.instance
 
 		local tbl = {}
-		texturecachehttp[ tbl ] = LoadURLMaterial( tx, function()
+		texturecachehttp[ tbl ] = LoadURLMaterial( tx, alignment, function()
 			if cb then
 				local ok, msg, traceback = instance:runFunction( cb, tbl, tx )
 				if not ok then
@@ -793,7 +801,7 @@ end
 -- @return y position
 function render_library.cursorPos( ply )
 	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()~="starfall_screen" then return end
+	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
 
 	ply = SF.Entities.Unwrap( ply )
 	if not ply then SF.throw("Invalid Player", 2) end

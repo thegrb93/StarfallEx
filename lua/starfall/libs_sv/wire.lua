@@ -25,7 +25,8 @@ function wire_metamethods.onLoad ( instance )
 	end
 
 	function ent:WriteCell ( address, data )
-		self:runScriptHook( "writecell", address, data )
+		local ret = self:runScriptHookForResult( "writecell", address, data )
+		return ret==nil or ret==true
 	end
 
 end

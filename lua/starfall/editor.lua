@@ -705,8 +705,7 @@ if CLIENT then
 					model = ppdata.models.file 
 				end
 
-				local tool = activeWep:GetToolObject( "starfall_processor" )
-				tool.ClientConVar[ "HologramModel" ] = model
+				RunConsoleCommand("starfall_processor_ScriptModel", model or "")
 			end 
 		end
 

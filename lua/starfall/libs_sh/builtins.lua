@@ -88,6 +88,7 @@ SF.DefaultEnvironment.type = function( obj )
 	local tp = getmetatable( obj )
 	return type(tp) == "string" and tp or type( obj )
 end
+
 --- Same as Lua's next
 -- @name SF.DefaultEnvironment.next
 -- @class function
@@ -96,12 +97,14 @@ end
 -- @return Key or nil
 -- @return Value or nil
 SF.DefaultEnvironment.next = next
+
 --- Same as Lua's assert.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
 -- @param condition
 -- @param msg
 SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then SF.throw( msg or "assertion failed!", 2 ) end end
+
 --- Same as Lua's unpack
 -- @name SF.DefaultEnvironment.unpack
 -- @class function
@@ -129,6 +132,7 @@ end
 -- @name SF.DefaultEnvironment.CLIENT
 -- @class field
 SF.DefaultEnvironment.CLIENT = CLIENT
+
 --- Constant that denotes whether the code is executed on the server
 -- @name SF.DefaultEnvironment.SERVER
 -- @class field
@@ -224,26 +228,7 @@ end
 
 
 
-if SERVER then
-	--- Prints a message to the player's chat.
-	-- @shared
-	-- @param ... Values to print
-	function SF.DefaultEnvironment.print(...)
-		local str = ""
-		local tbl = {n=select('#', ...), ...}
-		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
-		SF.instance.player:ChatPrint(str)
-	end
-else
-	-- Prints a message to the player's chat.
-	function SF.DefaultEnvironment.print(...)
-		if SF.instance.player ~= LocalPlayer() then return end
-		local str = ""
-		local tbl = {n=select('#', ...), ...}
-		for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
-		LocalPlayer():ChatPrint(str)
-	end
-	
+if CLIENT then	
 	--- Sets the chip's display name
 	-- @client
 	-- @param name Name
@@ -253,6 +238,13 @@ else
 		if IsValid( e ) then
 			e.name = name
 		end
+	end
+	
+	--- Sets clipboard text. Only works on the owner of the chip.
+	-- @param txt Text to set to the clipboard
+	function SF.DefaultEnvironment.setClipboardText( txt )
+		if SF.instance.player ~= LocalPlayer() then return end
+		SetClipboardText( txt )
 	end
 end
 
@@ -266,6 +258,17 @@ local function printTableX ( target, t, indent, alreadyprinted )
 			target:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. "\t=\t" .. tostring( v ) )
 		end
 	end
+end
+
+-- Prints a message to the player's chat.
+-- @shared
+-- @param ... Values to print
+function SF.DefaultEnvironment.print(...)
+	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
+	local str = ""
+	local tbl = {n=select('#', ...), ...}
+	for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
+	( SERVER and SF.instance.player or LocalPlayer() ):ChatPrint(str)
 end
 
 --- Prints a table to player's chat
@@ -391,7 +394,7 @@ end
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv ( func, tbl )
-	if type( func ) ~= "function" then SF.throw( "Main Thread is protected!", 2 ) end
+	if type( func ) ~= "function" or getfenv( func ) == _G then SF.throw( "Main Thread is protected!", 2 ) end
 	return setfenv( func, tbl )
 end
 
@@ -399,7 +402,8 @@ end
 -- Returns the current environment
 -- @return Current environment
 function SF.DefaultEnvironment.getfenv ()
-	return getfenv()
+	local fenv = getfenv(2)
+	if fenv ~= _G then return fenv end
 end
 
 --- Try to execute a function and catch possible exceptions
@@ -453,26 +457,6 @@ function SF.DefaultEnvironment.concmd ( cmd )
 	SF.instance.player:ConCommand( cmd )
 end
 
---- Set the value of a table index without invoking a metamethod
---@param table The table to modify
---@param key The index of the table
---@param value The value to set the index equal to
-function SF.DefaultEnvironment.rawset( table, key, value )
-    SF.CheckType( table, "table" )
-
-    rawset( table, key, value )
-end
-
---- Gets the value of a table index without invoking a metamethod
---@param table The table to get the value from
---@param key The index of the table
---@return The value of the index
-function SF.DefaultEnvironment.rawget( table, key, value )
-    SF.CheckType( table, "table" )
-
-    return rawget( table, key )
-end
-
 --- Returns if the table has an isValid function and isValid returns true.
 --@param object Table to check
 --@return If it is valid
@@ -489,23 +473,20 @@ end
 -- Restricts access to builtin type's metatables
 
 local _R = debug.getregistry()
-local function restrict(instance, hook, name, ok, err)
+local function restrict( instance, hook, name, ok, err )
 	_R.Vector.__metatable = "Vector"
 	_R.Angle.__metatable = "Angle"
 	_R.VMatrix.__metatable = "VMatrix"
 end
 
-local function unrestrict(instance, hook, name, ok, err)
+local function unrestrict( instance, hook, name, ok, err )
 	_R.Vector.__metatable = nil
 	_R.Angle.__metatable = nil
 	_R.VMatrix.__metatable = nil
 end
 
-SF.Libraries.AddHook("prepare", restrict)
-SF.Libraries.AddHook("cleanup", unrestrict)
-
-
---------------------------- ENUMS -----------------------------------
+SF.Libraries.AddHook( "prepare", restrict )
+SF.Libraries.AddHook( "cleanup", unrestrict )
 
 local _KEY = {
 	[ "FIRST" ] = 0,
@@ -659,7 +640,146 @@ local _KEY = {
 	[ "COUNT" ] = 106
 }
 
---- ENUMs of keyboard keys for use with input library
+--- ENUMs of keyboard keys for use with input library:
+-- FIRST,
+-- NONE,
+-- 0,
+-- 1,
+-- 2,
+-- 3,
+-- 4,
+-- 5,
+-- 6,
+-- 7,
+-- 8,
+-- 9,
+-- A,
+-- B,
+-- C,
+-- D,
+-- E,
+-- F,
+-- G,
+-- H,
+-- I,
+-- J,
+-- K,
+-- L,
+-- M,
+-- N,
+-- O,
+-- P,
+-- Q,
+-- R,
+-- S,
+-- T,
+-- U,
+-- V,
+-- W,
+-- X,
+-- Y,
+-- Z,
+-- KP_INS,
+-- PAD_0,
+-- KP_END,
+-- PAD_1,
+-- KP_DOWNARROW ,
+-- PAD_2,
+-- KP_PGDN,
+-- PAD_3,
+-- KP_LEFTARROW,
+-- PAD_4,
+-- KP_5 ,
+-- PAD_5,
+-- KP_RIGHTARROW,
+-- PAD_6,
+-- KP_HOME,
+-- PAD_7,
+-- KP_UPARROW,
+-- PAD_8,
+-- KP_PGUP,
+-- PAD_9,
+-- PAD_DIVIDE,
+-- KP_SLASH,
+-- KP_MULTIPLY,
+-- PAD_MULTIPLY,
+-- KP_MINUS,
+-- PAD_MINUS,
+-- KP_PLUS,
+-- PAD_PLUS,
+-- KP_ENTER,
+-- PAD_ENTER,
+-- KP_DEL,
+-- PAD_DECIMAL,
+-- LBRACKET,
+-- RBRACKET,
+-- SEMICOLON,
+-- APOSTROPHE,
+-- BACKQUOTE,
+-- COMMA,
+-- PERIOD,
+-- SLASH,
+-- BACKSLASH,
+-- MINUS,
+-- EQUAL,
+-- ENTER,
+-- SPACE,
+-- BACKSPACE,
+-- TAB,
+-- CAPSLOCK,
+-- NUMLOCK,
+-- ESCAPE,
+-- SCROLLLOCK,
+-- INS,
+-- INSERT,
+-- DEL,
+-- DELETE,
+-- HOME,
+-- END,
+-- PGUP,
+-- PAGEUP,
+-- PGDN,
+-- PAGEDOWN,
+-- PAUSE,
+-- BREAK,
+-- SHIFT,
+-- LSHIFT,
+-- RSHIFT,
+-- ALT,
+-- LALT,
+-- RALT,
+-- CTRL,
+-- LCONTROL,
+-- RCTRL,
+-- RCONTROL,
+-- LWIN,
+-- RWIN,
+-- APP,
+-- UPARROW,
+-- UP,
+-- LEFTARROW,
+-- LEFT,
+-- DOWNARROW,
+-- DOWN,
+-- RIGHTARROW,
+-- RIGHT,
+-- F1,
+-- F2,
+-- F3,
+-- F4,
+-- F5,
+-- F6,
+-- F7,
+-- F8,
+-- F9,
+-- F10,
+-- F11,
+-- F12,
+-- CAPSLOCKTOGGLE,
+-- NUMLOCKTOGGLE,
+-- SCROLLLOCKTOGGLE,
+-- LAST,
+-- COUNT
 -- @name SF.DefaultEnvironment.KEY
 -- @class table
 SF.DefaultEnvironment.KEY = setmetatable( {}, {
@@ -689,7 +809,24 @@ local _MOUSE = {
 	[ "LAST" ] = 113
 }
 
---- ENUMs of mouse buttons for use with input library
+--- ENUMs of mouse buttons for use with input library:
+-- MOUSE1,
+-- LEFT,
+-- MOUSE2,
+-- RIGHT,
+-- MOUSE3,
+-- MIDDLE,
+-- MOUSE4,
+-- 4,
+-- MOUSE5,
+-- 5,
+-- MWHEELUP,
+-- WHEEL_UP,
+-- MWHEELDOWN,
+-- WHEEL_DOWN,
+-- COUNT,
+-- FIRST,
+-- LAST
 -- @name SF.DefaultEnvironment.MOUSE
 -- @class table
 SF.DefaultEnvironment.MOUSE = setmetatable( {}, {
@@ -727,7 +864,32 @@ local _INKEY = {
 	[ "RUN" ] = IN_RUN,
 }
 
---- ENUMs of in_keys for use with player:keyDown
+--- ENUMs of in_keys for use with player:keyDown:
+-- ALT1,
+-- ALT2,
+-- ATTACK,
+-- ATTACK2,
+-- BACK,
+-- DUCK,
+-- FORWARD,
+-- JUMP,
+-- LEFT,
+-- MOVELEFT,
+-- MOVERIGHT,
+-- RELOAD,
+-- RIGHT,
+-- SCORE,
+-- SPEED,
+-- USE,
+-- WALK,
+-- ZOOM,
+-- GRENADE1,
+-- GRENADE2,
+-- WEAPON1,
+-- WEAPON2,
+-- BULLRUSH,
+-- CANCEL,
+-- RUN
 -- @name SF.DefaultEnvironment.IN_KEY
 -- @class table
 SF.DefaultEnvironment.IN_KEY = setmetatable( {}, {

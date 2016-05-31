@@ -10,6 +10,7 @@ include("starfall/sflib.lua")
 local MakeSF
 
 TOOL.ClientConVar[ "Model" ] = "models/spacecode/sfchip.mdl"
+TOOL.ClientConVar[ "ScriptModel" ] = ""
 cleanup.Register( "starfall_processor" )
 
 if SERVER then
@@ -36,6 +37,7 @@ if SERVER then
 		end
 		
 		pl:AddCount( "starfall_processor", sf )
+		pl:AddCleanup( "starfall_processor", sf )
 
 		return sf
 	end
@@ -46,6 +48,7 @@ else
 	language.Add( "Tool.starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
 	language.Add( "sboxlimit_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Starfall Processor", "Undone Starfall Processor" )
+	language.Add( "Cleanup_starfall_processor", "Starfall Processors" )
 end
 
 function TOOL:LeftClick( trace )
@@ -65,6 +68,7 @@ function TOOL:LeftClick( trace )
 		--self:SetStage(0)
 
 		local model = self:GetClientInfo( "Model" )
+		if not (util.IsValidModel( model ) and util.IsValidProp( model )) then return false end
 		if not self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
 
 		local Ang = trace.HitNormal:Angle()
@@ -83,16 +87,18 @@ function TOOL:LeftClick( trace )
 			undo.SetPlayer( ply )
 		undo.Finish()
 
-		ply:AddCleanup( "starfall_processor", sf )
 	end
 	
 	if not SF.RequestCode(ply, function(mainfile, files)
 		if not mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
 		sf:Compile(files, mainfile)
-		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile and sf.instance.ppdata.models[ sf.instance.mainfile ] then
-			sf:SetModel( tostring( sf.instance.ppdata.models[ sf.instance.mainfile ] ) )
-			sf:PhysicsInit( SOLID_VPHYSICS )
+		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
+			local model = sf.instance.ppdata.models[ sf.instance.mainfile ]
+			if util.IsValidModel( model ) and util.IsValidProp( model ) then
+				sf:SetModel( tostring( sf.instance.ppdata.models[ sf.instance.mainfile ] ) )
+				sf:PhysicsInit( SOLID_VPHYSICS )
+			end
 		end
 	end) then
 		SF.AddNotify( ply, "Cannot upload SF code, please wait for the current upload to finish.", NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
@@ -128,6 +134,36 @@ function TOOL:DrawHUD()
 end
 
 function TOOL:Think()
+
+	local model = self:GetClientInfo( "ScriptModel" )
+	if model=="" then
+		model = self:GetClientInfo( "Model" )
+	end
+	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != model ) then
+		self:MakeGhostEntity( model, Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
+	end
+
+	local trace = util.TraceLine( util.GetPlayerTrace( self:GetOwner() ) )
+	if ( !trace.Hit ) then return end
+	local ent = self.GhostEntity
+	
+	if not IsValid(ent) then return end
+	if ( trace.Entity && trace.Entity:GetClass() == "starfall_processor" || trace.Entity:IsPlayer() ) then
+
+		ent:SetNoDraw( true )
+		return
+
+	end
+
+	local Ang = trace.HitNormal:Angle()
+	Ang.pitch = Ang.pitch + 90
+
+	local min = ent:OBBMins()
+	ent:SetPos( trace.HitPos - trace.HitNormal * min.z )
+	ent:SetAngles( Ang )
+
+	ent:SetNoDraw( false )
+
 end
 
 if CLIENT then
