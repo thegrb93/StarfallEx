@@ -128,7 +128,7 @@ function PlayerButtonUp(ply, button)
 end
 
 hook.Add( "PlayerButtonDown", "SF_PlayerButtonDown", PlayerButtonDown)
-hook.Add( "PlayerButtonUp", "SF_PlayerButtonDown", PlayerButtonUp)
+hook.Add( "PlayerButtonUp", "SF_PlayerButtonUp", PlayerButtonUp)
 
 ---- Called when a button is pressed
 --- @name inputPressed
