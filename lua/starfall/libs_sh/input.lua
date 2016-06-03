@@ -120,11 +120,15 @@ local function runInputHook( hookname, key )
 end
 
 function PlayerButtonDown(ply, button)
-	runInputHook( "inputPressed", button )
+	if IsFirstTimePredicted() then
+		runInputHook( "inputPressed", button )
+	end
 end
 
 function PlayerButtonUp(ply, button)
-	runInputHook( "inputReleased", button )
+	if IsFirstTimePredicted() then
+		runInputHook( "inputReleased", button )
+	end
 end
 
 hook.Add( "PlayerButtonDown", "SF_PlayerButtonDown", PlayerButtonDown)
