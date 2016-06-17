@@ -786,7 +786,9 @@ _d_meta = {
 			return _d_table(str, nil, #str, true, {{}, allowIdRewriting})
 		end
 		SF.throw( "vON: You must deserialize a string, not a " .. type( str ), 2 )
-	end
+	end,
+	__newindex = function() end,
+	__metatable = false
 }
 _s_meta = {
 	__call = function(self, data, checkRecursion)
@@ -802,7 +804,9 @@ _s_meta = {
 			return _s_table(data, nil, nil, nil, nil, true, {false})
 		end
 		SF.throw( "vON: You must serialize a table, not a " .. type( data ), 2 )
-	end
+	end,
+	__newindex = function() end,
+	__metatable = false
 }
 
 --- Deserialize a string
@@ -811,7 +815,7 @@ _s_meta = {
 -- @name von.deserialize
 -- @param str String to deserialize
 -- @return Table
-von.deserialize = setmetatable(_deserialize,_d_meta)
+von.deserialize = setmetatable({},_d_meta)
 
 --- Serialize a table
 -- @shared
@@ -819,4 +823,4 @@ von.deserialize = setmetatable(_deserialize,_d_meta)
 -- @name von.serialize
 -- @param tbl Table to serialize
 -- @return String
-von.serialize = setmetatable(_serialize,_s_meta)
+von.serialize = setmetatable({},_s_meta)
