@@ -110,6 +110,8 @@ function net_library.send ( target )
 		net.SendToServer()
 	end
 
+	instance.data.net.size = 0
+	instance.data.net.data = {}
 	instance.data.net.started = false
 end
 
