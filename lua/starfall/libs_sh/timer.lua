@@ -135,15 +135,21 @@ end
 function timer_library.start(name)
 	SF.CheckType(name,"string")
 	
-	timer.Start(mangle_timer_name(instance,name))
+	timer.Start(mangle_timer_name(SF.instance,name))
 end
 
 --- Adjusts a timer
 -- @param name The timer name
-function timer_library.adjust(name)
+-- @param delay The time, in seconds, to set the timer to.
+-- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
+-- @param func The function to call when the tiemr is fired
+function timer_library.adjust(name, delay, reps, func)
 	SF.CheckType(name,"string")
+	SF.CheckType(delay,"number")
+	reps = SF.CheckType(reps,"number",0,1)
+	if func then SF.CheckType(func,"function") end
 	
-	timer.Adjust(mangle_timer_name(instance,name))
+	timer.Adjust(mangle_timer_name(SF.instance,name), delay, reps, func)
 end
 
 --- Pauses a timer
@@ -151,7 +157,7 @@ end
 function timer_library.pause(name)
 	SF.CheckType(name,"string")
 	
-	timer.Pause(mangle_timer_name(instance,name))
+	timer.Pause(mangle_timer_name(SF.instance,name))
 end
 
 --- Unpauses a timer
@@ -159,7 +165,7 @@ end
 function timer_library.unpause(name)
 	SF.CheckType(name,"string")
 	
-	timer.UnPause(mangle_timer_name(instance,name))
+	timer.UnPause(mangle_timer_name(SF.instance,name))
 end
 
 --- Returns number of available timers
