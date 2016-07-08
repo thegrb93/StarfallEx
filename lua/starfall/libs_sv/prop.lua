@@ -195,8 +195,9 @@ function props_library.createSent ( pos, ang, class, frozen )
 	if ( IsValid( entity ) ) then
 		
 		entity:CallOnRemove( "starfall_prop_delete", propOnDestroy, propdata, instance.player )
-		entity:SetPos( pos )
-		entity:SetAngles( ang )
+		
+		SF.setPos( entity, pos )
+		SF.setAng( entity, ang )
 		
 		entity:Spawn()
 		entity:Activate()
