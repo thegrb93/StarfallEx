@@ -857,7 +857,9 @@ function render_library.capturePixels ()
 	if not data.isRendering then
 		SF.throw( "Not in rendering hook.", 2 )
 	end
-	render.CapturePixels()
+	if SF.instance.data.render.usingRT then
+		render.CapturePixels()
+	end
 end
 
 --- Reads the color of the specified pixel.
