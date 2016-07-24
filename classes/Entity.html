@@ -177,8 +177,6 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><strong>Entity</strong></li>
@@ -426,6 +424,10 @@
 	</li>
 
 	<li>
+		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
+	</li>
+
+	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
 
@@ -544,6 +546,12 @@ Sets the physics of an entity to be a sphere </td>
 		<td class="name" nowrap><a href="#ents_methods:entIndex">entIndex</a>&nbsp;()</td>
 		<td class="summary">
 Returns the EntIndex of the entity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:extinguish">extinguish</a>&nbsp;()</td>
+		<td class="summary">
+Extinguishes an entity </td>
 	</tr>
 
 	<tr>
@@ -709,6 +717,12 @@ Returns the velocity of the entity </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:ignite">ignite</a>&nbsp;(length, radius)</td>
+		<td class="summary">
+Ignites an entity </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:isFrozen">isFrozen</a>&nbsp;()</td>
 		<td class="summary">
 Checks the entities frozen state </td>
@@ -856,6 +870,12 @@ Set's the entity to collide with nothing but the world </td>
 		<td class="name" nowrap><a href="#ents_methods:setParent">setParent</a>&nbsp;(ent, attachment)</td>
 		<td class="summary">
 Parents the entity to another entity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setPhysMaterial">setPhysMaterial</a>&nbsp;(mat)</td>
+		<td class="summary">
+Sets the physical material of the entity </td>
 	</tr>
 
 	<tr>
@@ -1347,6 +1367,28 @@ Returns the EntIndex of the entity
 
 <h3>Return value:</h3>
 <ul>The numerical index of the entity</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:extinguish"></a><strong>ents_methods:extinguish</strong>&nbsp;()</dt>
+<dd>
+
+Extinguishes an entity
+
+
+
+
+
+
+
+
 
 
 
@@ -2055,6 +2097,41 @@ Returns the velocity of the entity
 
 <h3>Return value:</h3>
 <ul>The velocity vector</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:ignite"></a><strong>ents_methods:ignite</strong>&nbsp;(length, radius)</dt>
+<dd>
+
+Ignites an entity
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>length</em></code>: How long the fire lasts
+	</li>
+	
+	<li>
+	  <code><em>radius</em></code>: (optional) How large the fire hitbox is (entity obb is the max)
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -2774,6 +2851,37 @@ Parents the entity to another entity
 	
 	<li>
 	  <code><em>attachment</em></code>: Optional string attachment name to parent to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:setPhysMaterial"></a><strong>ents_methods:setPhysMaterial</strong>&nbsp;(mat)</dt>
+<dd>
+
+Sets the physical material of the entity
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mat</em></code>: Material to use
 	</li>
 	
 </ul>

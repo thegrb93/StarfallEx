@@ -189,7 +189,7 @@
 		
 			<li><a href="../classes/Quaternion.html">Quaternion</a></li>
 		
-			<li><strong>Sound</strong></li>
+			<li><a href="../classes/Sound.html">Sound</a></li>
 		
 			<li><a href="../classes/VMatrix.html">VMatrix</a></li>
 		
@@ -423,10 +423,8 @@
 		<a href="../examples/music_player.lua.html">music_player.lua</a>
 	</li>
 
-	<li>
-		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
-	</li>
-
+	<li><strong>Filetransfer.lua</strong></li>
+	
 	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
@@ -456,246 +454,166 @@
 
 <div id="content">
 
-<h1>Type <code>Sound</code></h1>
+<h1>Filetransfer.lua</h1>
 
-<p>
-Sound type</p>
+<pre>--@name Filetransfer
+--@author Sparky
+--@shared
 
+--File transfer library. Allows sending strings much larger than the limit size.
+--Example usage
+---------------------
+----SERVER
+---------------------
+--local filetransfer = require("filetransfer.txt")
+--
+--net.start("myfile")
+--filetransfer.write("mydata")
+--net.send()
 
+---------------------
+----CLIENT
+---------------------
+--hook.add("net","",function(name,len)
+--	if name=="myfile" then
+--		filetransfer.read(function(data)
+--			if data then
+--				print(data)
+--			end
+--		end)
+--	end
+--end)
 
+local filetransfer = {}
+filetransfer.uploadcache = {}
+filetransfer.downloadqueue = {}
 
+local packetsize = 1000
 
+local function duelSend(ply)
+    if SERVER then
+        net.send(ply)
+    else
+        net.send()
+    end
+end
 
+local function processQueue()
+    local item = filetransfer.downloadqueue[1]
+    if not item then return end
+    
+    net.start("ftreqdata")
+    net.writeUInt(item.index, 16)
+    net.writeUInt(#item.pieces, 16)
+    duelSend(item.ply)
+    
+    if timer.exists("ftdownloadtimeout"..item.index) then
+        timer.adjust("ftdownloadtimeout"..item.index, 10, 1)
+    else
+        timer.create("ftdownloadtimeout"..item.index, 10, 1, function()
+            item.callback(nil)
+            table.remove(filetransfer.downloadqueue, 1)
+			timer.remove("ftkeepalive"..item.index)
+            processQueue()
+        end)
+    end
+end
 
-<h2>Methods</h2>
-<table class="function_list">
+local function sendData(index, ply)
+    local part = net.readUInt(16)
+    local function timetosend()
+        local data = filetransfer.uploadcache[index]
+        if not data then return end
+        local senddata = string.sub(data, part*packetsize+1, math.min(part*packetsize+packetsize, #data))
+            
+        if net.getBytesLeft()<#senddata+100 then
+            timer.simple(0.1, timetosend)
+            return
+        end
+        
+        net.start("ftrecvdata")
+        net.writeUInt(index, 16)
+        net.writeData(senddata, #senddata)
+        duelSend(ply)
+    end
+    timetosend()
+end
 
-	<tr>
-		<td class="name" nowrap><a href="#sound_methods:isPlaying">isPlaying</a>&nbsp;()</td>
-		<td class="summary">
-Returns whether the sound is being played.</td>
-	</tr>
+local function gotData(index, ply)
+    local item = filetransfer.downloadqueue[1]
+    if not item then return end
+    
+    item.pieces[#item.pieces+1] = net.readData(packetsize)
+    
+    if #item.pieces == item.numpieces then
+        local data = fastlz.decompress(table.concat(item.pieces))
+        item.callback(data)
+        table.remove(filetransfer.downloadqueue, 1)
+        timer.remove("ftdownloadtimeout"..item.index)
+		timer.remove("ftkeepalive"..item.index)
+    end
+    processQueue()
+end
 
-	<tr>
-		<td class="name" nowrap><a href="#sound_methods:play">play</a>&nbsp;()</td>
-		<td class="summary">
-Starts to play the sound.</td>
-	</tr>
+function filetransfer.write(data)
+    local compressed = fastlz.compress(data)
+    local index = 1
+    while filetransfer.uploadcache[index] do
+        index = index + 1
+    end
+    filetransfer.uploadcache[index] = compressed
+    
+    timer.create("ftcachetimeout"..index,10,1,function() filetransfer.uploadcache[index] = nil end)
+    
+    net.writeUInt(index, 16)
+    net.writeUInt(math.ceil(#compressed/packetsize),16)
+end
 
-	<tr>
-		<td class="name" nowrap><a href="#sound_methods:setPitch">setPitch</a>&nbsp;(pitch, fade)</td>
-		<td class="summary">
-Sets the pitch of the sound.</td>
-	</tr>
+function filetransfer.read(callback, ply)
+    local index = net.readUInt(16)
+    local numpieces = net.readUInt(16)
+    local item = {
+        index = index,
+        numpieces = numpieces,
+        pieces = {},
+        ply = ply,
+        callback = callback
+    }
+    
+    local queuelen = #filetransfer.downloadqueue
+    filetransfer.downloadqueue[queuelen+1] = item
+    if queuelen == 0 then
+        processQueue()
+    end
+	timer.create("ftkeepalive"..index, 3, 0, function()
+		net.start("ftkeepalive")
+		net.writeUInt(index,16)
+		duelSend(ply)
+	end)
+end
 
-	<tr>
-		<td class="name" nowrap><a href="#sound_methods:setSoundLevel">setSoundLevel</a>&nbsp;(level)</td>
-		<td class="summary">
-Sets the sound level in dB.</td>
-	</tr>
+hook.add("net","filetransfer",function(name,len,ply)
+    
+    local index = net.readUInt(16)
+    if CLIENT then ply = nil end
+    
+    if name == "ftrecvdata" then
+        gotData(index, ply)
+    elseif name == "ftkeepalive" then
+        timer.adjust("ftcachetimeout"..index,10,1)
+    elseif name == "ftreqdata" then
+        timer.adjust("ftcachetimeout"..index,10,1)
+        sendData(index, ply)
+    end
+    
+end)
 
-	<tr>
-		<td class="name" nowrap><a href="#sound_methods:setVolume">setVolume</a>&nbsp;(vol, fade)</td>
-		<td class="summary">
-Sets the volume of the sound.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#sound_methods:stop">stop</a>&nbsp;(fade)</td>
-		<td class="summary">
-Stops the sound from being played.</td>
-	</tr>
-
-</table>
-
+return filetransfer
+</pre>
 
 
 <br/>
 <br/>
-
-
-<h2><a name="methods"></a>Methods</h2>
-<dl class="function">
-
-
-
-<dt><a name="sound_methods:isPlaying"></a><strong>sound_methods:isPlaying</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the sound is being played.
-
-
-
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="sound_methods:play"></a><strong>sound_methods:play</strong>&nbsp;()</dt>
-<dd>
-
-Starts to play the sound.
-
-
-
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="sound_methods:setPitch"></a><strong>sound_methods:setPitch</strong>&nbsp;(pitch, fade)</dt>
-<dd>
-
-Sets the pitch of the sound.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>pitch</em></code>: Pitch to set to, between 0 and 255.
-	</li>
-	
-	<li>
-	  <code><em>fade</em></code>: Time in seconds to transition to this new pitch.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="sound_methods:setSoundLevel"></a><strong>sound_methods:setSoundLevel</strong>&nbsp;(level)</dt>
-<dd>
-
-Sets the sound level in dB.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>level</em></code>: dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="sound_methods:setVolume"></a><strong>sound_methods:setVolume</strong>&nbsp;(vol, fade)</dt>
-<dd>
-
-Sets the volume of the sound.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>vol</em></code>: Volume to set to, between 0 and 1.
-	</li>
-	
-	<li>
-	  <code><em>fade</em></code>: Time in seconds to transition to this new volume.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="sound_methods:stop"></a><strong>sound_methods:stop</strong>&nbsp;(fade)</dt>
-<dd>
-
-Stops the sound from being played.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>fade</em></code>: Time in seconds to fade out, if nil or 0 the sound stops instantly.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-</dl>
-
-
 
 </div> <!-- id="content" -->
 
@@ -705,6 +623,6 @@ Stops the sound from being played.
 	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
 </div> <!-- id="about" -->
 
-</div> <!-- id="container" -->	
+</div> <!-- id="container" -->
 </body>
 </html>

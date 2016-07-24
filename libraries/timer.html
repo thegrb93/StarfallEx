@@ -175,8 +175,6 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
@@ -424,6 +422,10 @@
 	</li>
 
 	<li>
+		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
+	</li>
+
+	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
 
@@ -467,7 +469,7 @@ Deals with time and timers.</p>
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><a href="#timer_library.adjust">adjust</a>&nbsp;(name)</td>
+	<td class="name" nowrap><a href="#timer_library.adjust">adjust</a>&nbsp;(name, delay, reps, func)</td>
 	<td class="summary">
 Adjusts a timer </td>
 	</tr>
@@ -568,7 +570,7 @@ Unpauses a timer </td>
 
 
 
-<dt><a name="timer_library.adjust"></a><strong>timer_library.adjust</strong>&nbsp;(name)</dt>
+<dt><a name="timer_library.adjust"></a><strong>timer_library.adjust</strong>&nbsp;(name, delay, reps, func)</dt>
 <dd>
 
 Adjusts a timer
@@ -581,6 +583,18 @@ Adjusts a timer
 	
 	<li>
 	  <code><em>name</em></code>: The timer name
+	</li>
+	
+	<li>
+	  <code><em>delay</em></code>: The time, in seconds, to set the timer to.
+	</li>
+	
+	<li>
+	  <code><em>reps</em></code>: The repititions of the tiemr. 0 = infinte, nil = 1
+	</li>
+	
+	<li>
+	  <code><em>func</em></code>: The function to call when the tiemr is fired
 	</li>
 	
 </ul>

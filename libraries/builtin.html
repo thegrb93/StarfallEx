@@ -175,8 +175,6 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
@@ -424,6 +422,10 @@
 	</li>
 
 	<li>
+		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
+	</li>
+
+	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
 
@@ -571,6 +573,12 @@ Same as owner() on the server.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.printMesssage">printMesssage</a>&nbsp;(mtype, text)</td>
+	<td class="summary">
+Prints a message to your chat, console, or the center of your screen.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.printTable">printTable</a>&nbsp;(tbl)</td>
 	<td class="summary">
 Prints a table to player's chat </td>
@@ -616,6 +624,12 @@ Sets clipboard text.</td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.setName">setName</a>&nbsp;(name)</td>
 	<td class="summary">
 Sets the chip's display name </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.setSoftQuota">setSoftQuota</a>&nbsp;(quota)</td>
+	<td class="summary">
+Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.</td>
 	</tr>
 
 	<tr>
@@ -1498,6 +1512,41 @@ Same as owner() on the server. On the client, returns the local player
 
 
 
+<dt><a name="SF.DefaultEnvironment.printMesssage"></a><strong>SF.DefaultEnvironment.printMesssage</strong>&nbsp;(mtype, text)</dt>
+<dd>
+
+Prints a message to your chat, console, or the center of your screen.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mtype</em></code>: How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
+	</li>
+	
+	<li>
+	  <code><em>text</em></code>: The message text.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="SF.DefaultEnvironment.printTable"></a><strong>SF.DefaultEnvironment.printTable</strong>&nbsp;(tbl)</dt>
 <dd>
 
@@ -1725,6 +1774,37 @@ Sets the chip's display name
 	
 	<li>
 	  <code><em>name</em></code>: Name
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.setSoftQuota"></a><strong>SF.DefaultEnvironment.setSoftQuota</strong>&nbsp;(quota)</dt>
+<dd>
+
+Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>quota</em></code>: The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 	</li>
 	
 </ul>

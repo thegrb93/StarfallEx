@@ -175,8 +175,6 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
@@ -424,6 +422,10 @@
 	</li>
 
 	<li>
+		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
+	</li>
+
+	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
 
@@ -487,12 +489,6 @@ Creates a font.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.createPoly">createPoly</a>&nbsp;(verts)</td>
-	<td class="summary">
-Compiles a 2D poly.</td>
-	</tr>
-
-	<tr>
 	<td class="name" nowrap><a href="#render_library.createRenderTarget">createRenderTarget</a>&nbsp;(name)</td>
 	<td class="summary">
 Creates a new render target to draw onto.</td>
@@ -502,6 +498,54 @@ Creates a new render target to draw onto.</td>
 	<td class="name" nowrap><a href="#render_library.cursorPos">cursorPos</a>&nbsp;(ply)</td>
 	<td class="summary">
 Gets a 2D cursor position where ply is aiming.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.disableScissorRect">disableScissorRect</a>&nbsp;()</td>
+	<td class="summary">
+Disables a scissoring rect which limits the drawing area.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DBeam">draw3DBeam</a>&nbsp;(startPos, endPos, width, textureStart, textureEnd)</td>
+	<td class="summary">
+Draws textured beam.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DBox">draw3DBox</a>&nbsp;(origin, angle, mins, maxs)</td>
+	<td class="summary">
+Draws a box in 3D space </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DLine">draw3DLine</a>&nbsp;(startPos, endPos)</td>
+	<td class="summary">
+Draws a 3D Line </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DQuad">draw3DQuad</a>&nbsp;(vert1, vert2, vert3, vert4)</td>
+	<td class="summary">
+Draws 2 connected triangles.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DSphere">draw3DSphere</a>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</td>
+	<td class="summary">
+Draws a sphere </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DWireframeBox">draw3DWireframeBox</a>&nbsp;(origin, angle, mins, maxs)</td>
+	<td class="summary">
+Draws a wireframe box in 3D space </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.draw3DWireframeSphere">draw3DWireframeSphere</a>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</td>
+	<td class="summary">
+Draws a wireframe sphere </td>
 	</tr>
 
 	<tr>
@@ -535,9 +579,27 @@ Draws a rectangle outline using the current color.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#render_library.drawRoundedBox">drawRoundedBox</a>&nbsp;(r, x, y, w, h)</td>
+	<td class="summary">
+Draws a rounded rectangle using the current color </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.drawRoundedBoxEx">drawRoundedBoxEx</a>&nbsp;(r, x, y, w, h, tl, tr, bl, br)</td>
+	<td class="summary">
+Draws a rounded rectangle using the current color </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.drawSimpleText">drawSimpleText</a>&nbsp;(x, y, text, xalign, yalign)</td>
+	<td class="summary">
+Draws text more easily and quickly but no new lines or tabs.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#render_library.drawText">drawText</a>&nbsp;(x, y, text, alignment)</td>
 	<td class="summary">
-Draws text.</td>
+Draws text with newlines and tabs </td>
 	</tr>
 
 	<tr>
@@ -559,9 +621,27 @@ Draws a textured rectangle with UV coordinates </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#render_library.enableDepth">enableDepth</a>&nbsp;(enable)</td>
+	<td class="summary">
+Enables or disables Depth Buffer </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.enableScissorRect">enableScissorRect</a>&nbsp;(startX, startY, endX, endY)</td>
+	<td class="summary">
+Enables a scissoring rect which limits the drawing area.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#render_library.getDefaultFont">getDefaultFont</a>&nbsp;()</td>
 	<td class="summary">
 Gets the default font </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.getRenderTargetMaterial">getRenderTargetMaterial</a>&nbsp;(name)</td>
+	<td class="summary">
+Returns the model material name that uses the render target.</td>
 	</tr>
 
 	<tr>
@@ -595,15 +675,33 @@ Looks up a texture by file name.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#render_library.parseMarkup">parseMarkup</a>&nbsp;(str, maxsize, markup)</td>
+	<td class="summary">
+Constructs a markup object for quick styled text drawing.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#render_library.popMatrix">popMatrix</a>&nbsp;()</td>
 	<td class="summary">
 Pops a matrix from the matrix stack.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.pushMatrix">pushMatrix</a>&nbsp;(m)</td>
+	<td class="name" nowrap><a href="#render_library.popViewMatrix">popViewMatrix</a>&nbsp;()</td>
+	<td class="summary">
+Pops a view matrix from the matrix stack.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.pushMatrix">pushMatrix</a>&nbsp;(m, world)</td>
 	<td class="summary">
 Pushes a matrix onto the matrix stack.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.pushViewMatrix">pushViewMatrix</a>&nbsp;(tbl)</td>
+	<td class="summary">
+Pushes a perspective matrix onto the view matrix stack.</td>
 	</tr>
 
 	<tr>
@@ -652,6 +750,12 @@ Sets the texture </td>
 	<td class="name" nowrap><a href="#render_library.setTextureFromScreen">setTextureFromScreen</a>&nbsp;(ent)</td>
 	<td class="summary">
 Sets the texture of a screen entity </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.traceSurfaceColor">traceSurfaceColor</a>&nbsp;(vec1, vec2)</td>
+	<td class="summary">
+Does a trace and returns the color of the textel the trace hits.</td>
 	</tr>
 
 </table>
@@ -776,89 +880,23 @@ Creates a font. Does not require rendering hook
 <h3>Usage:</h3>
 <ul><pre class=example>
 Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall): 
-- DebugFixed 
-- DebugFixedSmall 
-- DefaultFixedOutline 
-- MenuItem 
-- Default 
-- TabLarge 
-- DefaultBold 
-- DefaultUnderline 
-- DefaultSmall 
-- DefaultSmallDropShadow 
-- DefaultVerySmall 
-- DefaultLarge 
-- UiBold 
-- MenuLarge 
-- ConsoleText 
-- Marlett 
-- Trebuchet18 
-- Trebuchet19 
-- Trebuchet20 
-- Trebuchet22 
-- Trebuchet24 
-- HUDNumber 
-- HUDNumber1 
-- HUDNumber2 
-- HUDNumber3 
-- HUDNumber4 
-- HUDNumber5 
-- HudHintTextLarge 
-- HudHintTextSmall 
-- CenterPrintText 
-- HudSelectionText 
-- DefaultFixed 
-- DefaultFixedDropShadow 
-- CloseCaption_Normal 
-- CloseCaption_Bold 
-- CloseCaption_BoldItalic 
-- TitleFont 
-- TitleFont2 
-- ChatFont 
-- TargetID 
-- TargetIDSmall 
-- HL2MPTypeDeath 
-- BudgetLabel 
-- DejaVu Sans Mono (shipped, monospaced)</pre></ul>
+- Akbar 
+- Coolvetica 
+- Roboto 
+- Courier New 
+- Verdana 
+- Arial 
+- HalfLife2 
+- hl2mp 
+- csd 
+- Tahoma 
+- Trebuchet 
+- Trebuchet MS 
+- DejaVu Sans Mono 
+- Lucida Console 
+- Times New Roman</pre></ul>
 
 
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="render_library.createPoly"></a><strong>render_library.createPoly</strong>&nbsp;(verts)</dt>
-<dd>
-
-Compiles a 2D poly. This is needed so that poly don't have to be 
-type-checked each frame. Polys can be indexed by a number, in which 
-a copy of the vertex at that spot is returned. They can also be assigned 
-a new vertex at 1 <= i <= #poly+1. And the length of the poly can be taken.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>verts</em></code>: Array of verticies to convert.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>compiled polygon</ul>
 
 
 
@@ -931,6 +969,325 @@ Gets a 2D cursor position where ply is aiming.
 	<li>y position</li>
 	
 </ol>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.disableScissorRect"></a><strong>render_library.disableScissorRect</strong>&nbsp;()</dt>
+<dd>
+
+Disables a scissoring rect which limits the drawing area.
+
+
+
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DBeam"></a><strong>render_library.draw3DBeam</strong>&nbsp;(startPos, endPos, width, textureStart, textureEnd)</dt>
+<dd>
+
+Draws textured beam.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>startPos</em></code>: Beam start position.
+	</li>
+	
+	<li>
+	  <code><em>endPos</em></code>: Beam end position.
+	</li>
+	
+	<li>
+	  <code><em>width</em></code>: The width of the beam.
+	</li>
+	
+	<li>
+	  <code><em>textureStart</em></code>: The start coordinate of the texture used.
+	</li>
+	
+	<li>
+	  <code><em>textureEnd</em></code>: The end coordinate of the texture used.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DBox"></a><strong>render_library.draw3DBox</strong>&nbsp;(origin, angle, mins, maxs)</dt>
+<dd>
+
+Draws a box in 3D space
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>origin</em></code>: Origin of the box.
+	</li>
+	
+	<li>
+	  <code><em>angle</em></code>: Orientation  of the box
+	</li>
+	
+	<li>
+	  <code><em>mins</em></code>: Start position of the box, relative to origin.
+	</li>
+	
+	<li>
+	  <code><em>maxs</em></code>: End position of the box, relative to origin.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DLine"></a><strong>render_library.draw3DLine</strong>&nbsp;(startPos, endPos)</dt>
+<dd>
+
+Draws a 3D Line
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>startPos</em></code>: Starting position
+	</li>
+	
+	<li>
+	  <code><em>endPos</em></code>: Ending position
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DQuad"></a><strong>render_library.draw3DQuad</strong>&nbsp;(vert1, vert2, vert3, vert4)</dt>
+<dd>
+
+Draws 2 connected triangles.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>vert1</em></code>: First vertex.
+	</li>
+	
+	<li>
+	  <code><em>vert2</em></code>: The second vertex.
+	</li>
+	
+	<li>
+	  <code><em>vert3</em></code>: The third vertex.
+	</li>
+	
+	<li>
+	  <code><em>vert4</em></code>: The fourth vertex.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DSphere"></a><strong>render_library.draw3DSphere</strong>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</dt>
+<dd>
+
+Draws a sphere
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>pos</em></code>: Position of the sphere
+	</li>
+	
+	<li>
+	  <code><em>radius</em></code>: Radius of the sphere
+	</li>
+	
+	<li>
+	  <code><em>longitudeSteps</em></code>: The amount of longitude steps. The larger this number is, the smoother the sphere is
+	</li>
+	
+	<li>
+	  <code><em>latitudeSteps</em></code>: The amount of latitude steps. The larger this number is, the smoother the sphere is
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DWireframeBox"></a><strong>render_library.draw3DWireframeBox</strong>&nbsp;(origin, angle, mins, maxs)</dt>
+<dd>
+
+Draws a wireframe box in 3D space
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>origin</em></code>: Origin of the box.
+	</li>
+	
+	<li>
+	  <code><em>angle</em></code>: Orientation  of the box
+	</li>
+	
+	<li>
+	  <code><em>mins</em></code>: Start position of the box, relative to origin.
+	</li>
+	
+	<li>
+	  <code><em>maxs</em></code>: End position of the box, relative to origin.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.draw3DWireframeSphere"></a><strong>render_library.draw3DWireframeSphere</strong>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</dt>
+<dd>
+
+Draws a wireframe sphere
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>pos</em></code>: Position of the sphere
+	</li>
+	
+	<li>
+	  <code><em>radius</em></code>: Radius of the sphere
+	</li>
+	
+	<li>
+	  <code><em>longitudeSteps</em></code>: The amount of longitude steps. The larger this number is, the smoother the sphere is
+	</li>
+	
+	<li>
+	  <code><em>latitudeSteps</em></code>: The amount of latitude steps. The larger this number is, the smoother the sphere is
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -1026,9 +1383,7 @@ Draws a line
 <dt><a name="render_library.drawPoly"></a><strong>render_library.drawPoly</strong>&nbsp;(poly)</dt>
 <dd>
 
-Draws a polygon. Takes a compiled/uncompiled poly to draw. 
-Note that if you do use an uncompiled poly, you will use up ops 
-very quickly!
+Draws a polygon.
 
 
 
@@ -1037,7 +1392,7 @@ very quickly!
 <ul>
 	
 	<li>
-	  <code><em>poly</em></code>: Compiled poly or array of vertexes
+	  <code><em>poly</em></code>: Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
 	</li>
 	
 </ul>
@@ -1142,10 +1497,167 @@ Draws a rectangle outline using the current color.
 
 
 
+<dt><a name="render_library.drawRoundedBox"></a><strong>render_library.drawRoundedBox</strong>&nbsp;(r, x, y, w, h)</dt>
+<dd>
+
+Draws a rounded rectangle using the current color
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>r</em></code>: The corner radius
+	</li>
+	
+	<li>
+	  <code><em>x</em></code>: Top left corner x coordinate
+	</li>
+	
+	<li>
+	  <code><em>y</em></code>: Top left corner y coordinate
+	</li>
+	
+	<li>
+	  <code><em>w</em></code>: Width
+	</li>
+	
+	<li>
+	  <code><em>h</em></code>: Height
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.drawRoundedBoxEx"></a><strong>render_library.drawRoundedBoxEx</strong>&nbsp;(r, x, y, w, h, tl, tr, bl, br)</dt>
+<dd>
+
+Draws a rounded rectangle using the current color
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>r</em></code>: The corner radius
+	</li>
+	
+	<li>
+	  <code><em>x</em></code>: Top left corner x coordinate
+	</li>
+	
+	<li>
+	  <code><em>y</em></code>: Top left corner y coordinate
+	</li>
+	
+	<li>
+	  <code><em>w</em></code>: Width
+	</li>
+	
+	<li>
+	  <code><em>h</em></code>: Height
+	</li>
+	
+	<li>
+	  <code><em>tl</em></code>: Boolean Top left corner
+	</li>
+	
+	<li>
+	  <code><em>tr</em></code>: Boolean Top right corner
+	</li>
+	
+	<li>
+	  <code><em>bl</em></code>: Boolean Bottom left corner
+	</li>
+	
+	<li>
+	  <code><em>br</em></code>: Boolean Bottom right corner
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.drawSimpleText"></a><strong>render_library.drawSimpleText</strong>&nbsp;(x, y, text, xalign, yalign)</dt>
+<dd>
+
+Draws text more easily and quickly but no new lines or tabs.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>x</em></code>: X coordinate
+	</li>
+	
+	<li>
+	  <code><em>y</em></code>: Y coordinate
+	</li>
+	
+	<li>
+	  <code><em>text</em></code>: Text to draw
+	</li>
+	
+	<li>
+	  <code><em>xalign</em></code>: Text x alignment
+	</li>
+	
+	<li>
+	  <code><em>yalign</em></code>: Text y alignment
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="render_library.drawText"></a><strong>render_library.drawText</strong>&nbsp;(x, y, text, alignment)</dt>
 <dd>
 
-Draws text.
+Draws text with newlines and tabs
 
 
 
@@ -1334,6 +1846,80 @@ Draws a textured rectangle with UV coordinates
 
 
 
+<dt><a name="render_library.enableDepth"></a><strong>render_library.enableDepth</strong>&nbsp;(enable)</dt>
+<dd>
+
+Enables or disables Depth Buffer
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>enable</em></code>: true to enable
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.enableScissorRect"></a><strong>render_library.enableScissorRect</strong>&nbsp;(startX, startY, endX, endY)</dt>
+<dd>
+
+Enables a scissoring rect which limits the drawing area. Only works 2D contexts such as HUD or render targets.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>startX</em></code>: X start coordinate of the scissor rect.
+	</li>
+	
+	<li>
+	  <code><em>startY</em></code>: Y start coordinate of the scissor rect.
+	</li>
+	
+	<li>
+	  <code><em>endX</em></code>: Y end coordinate of the scissor rect.
+	</li>
+	
+	<li>
+	  <code><em>endY</em></code>: 
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="render_library.getDefaultFont"></a><strong>render_library.getDefaultFont</strong>&nbsp;()</dt>
 <dd>
 
@@ -1349,6 +1935,41 @@ Gets the default font
 
 <h3>Return value:</h3>
 <ul>Default font</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.getRenderTargetMaterial"></a><strong>render_library.getRenderTargetMaterial</strong>&nbsp;(name)</dt>
+<dd>
+
+Returns the model material name that uses the render target. 
+Alternatively, just construct the name yourself with "!StarfallCustomModel_"..name..chip():entIndex()
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Render target name
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Model material name. Send this to the server to set the entity's material.</ul>
 
 
 
@@ -1533,6 +2154,48 @@ Make sure to store the texture to use it rather than calling this slow function 
 
 
 
+<dt><a name="render_library.parseMarkup"></a><strong>render_library.parseMarkup</strong>&nbsp;(str, maxsize, markup)</dt>
+<dd>
+
+Constructs a markup object for quick styled text drawing.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>str</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>maxsize</em></code>: The max width of the markup
+	</li>
+	
+	<li>
+	  <code><em>markup</em></code>: The markup string to parse
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="render_library.popMatrix"></a><strong>render_library.popMatrix</strong>&nbsp;()</dt>
 <dd>
 
@@ -1555,7 +2218,29 @@ Pops a matrix from the matrix stack.
 
 
 
-<dt><a name="render_library.pushMatrix"></a><strong>render_library.pushMatrix</strong>&nbsp;(m)</dt>
+<dt><a name="render_library.popViewMatrix"></a><strong>render_library.popViewMatrix</strong>&nbsp;()</dt>
+<dd>
+
+Pops a view matrix from the matrix stack.
+
+
+
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.pushMatrix"></a><strong>render_library.pushMatrix</strong>&nbsp;(m, world)</dt>
 <dd>
 
 Pushes a matrix onto the matrix stack.
@@ -1568,6 +2253,41 @@ Pushes a matrix onto the matrix stack.
 	
 	<li>
 	  <code><em>m</em></code>: The matrix
+	</li>
+	
+	<li>
+	  <code><em>world</em></code>: Should the transformation be relative to the screen or world?
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.pushViewMatrix"></a><strong>render_library.pushViewMatrix</strong>&nbsp;(tbl)</dt>
+<dd>
+
+Pushes a perspective matrix onto the view matrix stack.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>tbl</em></code>: The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
 	</li>
 	
 </ul>
@@ -1707,6 +2427,31 @@ Sets the font
 
 
 
+<h3>Usage:</h3>
+<ul><pre class=example>Use a font created by render.createFont or use one of these already defined fonts: 
+- DebugFixed 
+- DebugFixedSmall 
+- Default 
+- Marlett 
+- Trebuchet18 
+- Trebuchet24 
+- HudHintTextLarge 
+- HudHintTextSmall 
+- CenterPrintText 
+- HudSelectionText 
+- CloseCaption_Normal 
+- CloseCaption_Bold 
+- CloseCaption_BoldItalic 
+- ChatFont 
+- TargetID 
+- TargetIDSmall 
+- HL2MPTypeDeath 
+- BudgetLabel 
+- HudNumbers 
+- DermaDefault 
+- DermaDefaultBold 
+- DermaLarge</pre></ul>
+
 
 
 
@@ -1845,6 +2590,44 @@ Sets the texture of a screen entity
 
 
 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.traceSurfaceColor"></a><strong>render_library.traceSurfaceColor</strong>&nbsp;(vec1, vec2)</dt>
+<dd>
+
+Does a trace and returns the color of the textel the trace hits.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>vec1</em></code>: The starting vector
+	</li>
+	
+	<li>
+	  <code><em>vec2</em></code>: The ending vector
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The color vector. use vector:toColor to convert it to a color.</ul>
 
 
 

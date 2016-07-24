@@ -177,8 +177,6 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
@@ -426,6 +424,10 @@
 	</li>
 
 	<li>
+		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
+	</li>
+
+	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
 
@@ -469,55 +471,73 @@ Angle Type</p>
 <table class="function_list">
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.getForward">getForward</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:getForward">getForward</a>&nbsp;()</td>
 		<td class="summary">
 Return the Forward Vector ( direction the angle points ).</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.getNormalized">getNormalized</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:getNormalized">getNormalized</a>&nbsp;()</td>
 		<td class="summary">
 Returnes a normalized angle </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.getRight">getRight</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:getRight">getRight</a>&nbsp;()</td>
 		<td class="summary">
 Return the Right Vector relative to the angle dir.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.getUp">getUp</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:getUp">getUp</a>&nbsp;()</td>
 		<td class="summary">
 Return the Up Vector relative to the angle dir.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.isZero">isZero</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:isZero">isZero</a>&nbsp;()</td>
 		<td class="summary">
 Returns if p,y,r are all 0.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.normalize">normalize</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:normalize">normalize</a>&nbsp;()</td>
 		<td class="summary">
 Normalise angles eg (0,181,1) -> (0,-179,1).</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.rotateAroundAxis">rotateAroundAxis</a>&nbsp;(a, v, deg, rad)</td>
+		<td class="name" nowrap><a href="#ang_methods:rotateAroundAxis">rotateAroundAxis</a>&nbsp;(v, deg, rad)</td>
 		<td class="summary">
 Return Rotated angle around the specified axis.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.set">set</a>&nbsp;(a, b)</td>
+		<td class="name" nowrap><a href="#ang_methods:set">set</a>&nbsp;(b)</td>
 		<td class="summary">
-Copies p,y,r from second angle to the first.</td>
+Copies p,y,r from angle to another.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#ang_methods.setZero">setZero</a>&nbsp;(a)</td>
+		<td class="name" nowrap><a href="#ang_methods:setP">setP</a>&nbsp;(p)</td>
+		<td class="summary">
+Set's the angle's pitch and returns it.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ang_methods:setR">setR</a>&nbsp;(r)</td>
+		<td class="summary">
+Set's the angle's roll and returns it.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ang_methods:setY">setY</a>&nbsp;(y)</td>
+		<td class="summary">
+Set's the angle's yaw and returns it.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ang_methods:setZero">setZero</a>&nbsp;()</td>
 		<td class="summary">
 Sets p,y,r to 0.</td>
 	</tr>
@@ -535,22 +555,13 @@ Sets p,y,r to 0.</td>
 
 
 
-<dt><a name="ang_methods.getForward"></a><strong>ang_methods.getForward</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:getForward"></a><strong>ang_methods:getForward</strong>&nbsp;()</dt>
 <dd>
 
 Return the Forward Vector ( direction the angle points ).
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
 
 
 
@@ -569,22 +580,13 @@ Return the Forward Vector ( direction the angle points ).
 
 
 
-<dt><a name="ang_methods.getNormalized"></a><strong>ang_methods.getNormalized</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:getNormalized"></a><strong>ang_methods:getNormalized</strong>&nbsp;()</dt>
 <dd>
 
 Returnes a normalized angle
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
 
 
 
@@ -603,7 +605,7 @@ Returnes a normalized angle
 
 
 
-<dt><a name="ang_methods.getRight"></a><strong>ang_methods.getRight</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:getRight"></a><strong>ang_methods:getRight</strong>&nbsp;()</dt>
 <dd>
 
 Return the Right Vector relative to the angle dir.
@@ -611,15 +613,6 @@ Return the Right Vector relative to the angle dir.
 
 
 
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
-
 
 
 
@@ -637,7 +630,7 @@ Return the Right Vector relative to the angle dir.
 
 
 
-<dt><a name="ang_methods.getUp"></a><strong>ang_methods.getUp</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:getUp"></a><strong>ang_methods:getUp</strong>&nbsp;()</dt>
 <dd>
 
 Return the Up Vector relative to the angle dir.
@@ -645,15 +638,6 @@ Return the Up Vector relative to the angle dir.
 
 
 
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
-
 
 
 
@@ -671,22 +655,13 @@ Return the Up Vector relative to the angle dir.
 
 
 
-<dt><a name="ang_methods.isZero"></a><strong>ang_methods.isZero</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:isZero"></a><strong>ang_methods:isZero</strong>&nbsp;()</dt>
 <dd>
 
 Returns if p,y,r are all 0.
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
 
 
 
@@ -705,22 +680,13 @@ Returns if p,y,r are all 0.
 
 
 
-<dt><a name="ang_methods.normalize"></a><strong>ang_methods.normalize</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:normalize"></a><strong>ang_methods:normalize</strong>&nbsp;()</dt>
 <dd>
 
 Normalise angles eg (0,181,1) -> (0,-179,1).
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
 
 
 
@@ -739,7 +705,7 @@ Normalise angles eg (0,181,1) -> (0,-179,1).
 
 
 
-<dt><a name="ang_methods.rotateAroundAxis"></a><strong>ang_methods.rotateAroundAxis</strong>&nbsp;(a, v, deg, rad)</dt>
+<dt><a name="ang_methods:rotateAroundAxis"></a><strong>ang_methods:rotateAroundAxis</strong>&nbsp;(v, deg, rad)</dt>
 <dd>
 
 Return Rotated angle around the specified axis.
@@ -749,10 +715,6 @@ Return Rotated angle around the specified axis.
 
 <h3>Parameters:</h3>
 <ul>
-	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
 	
 	<li>
 	  <code><em>v</em></code>: Vector axis
@@ -785,10 +747,10 @@ Return Rotated angle around the specified axis.
 
 
 
-<dt><a name="ang_methods.set"></a><strong>ang_methods.set</strong>&nbsp;(a, b)</dt>
+<dt><a name="ang_methods:set"></a><strong>ang_methods:set</strong>&nbsp;(b)</dt>
 <dd>
 
-Copies p,y,r from second angle to the first.
+Copies p,y,r from angle to another.
 
 
 
@@ -797,11 +759,7 @@ Copies p,y,r from second angle to the first.
 <ul>
 	
 	<li>
-	  <code><em>a</em></code>: Angle to copy from.
-	</li>
-	
-	<li>
-	  <code><em>b</em></code>: 
+	  <code><em>b</em></code>: Angle to copy from.
 	</li>
 	
 </ul>
@@ -823,10 +781,10 @@ Copies p,y,r from second angle to the first.
 
 
 
-<dt><a name="ang_methods.setZero"></a><strong>ang_methods.setZero</strong>&nbsp;(a)</dt>
+<dt><a name="ang_methods:setP"></a><strong>ang_methods:setP</strong>&nbsp;(p)</dt>
 <dd>
 
-Sets p,y,r to 0. This is faster than doing it manually.
+Set's the angle's pitch and returns it.
 
 
 
@@ -835,10 +793,103 @@ Sets p,y,r to 0. This is faster than doing it manually.
 <ul>
 	
 	<li>
-	  <code><em>a</em></code>: 
+	  <code><em>p</em></code>: The pitch
 	</li>
 	
 </ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The modified angle</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ang_methods:setR"></a><strong>ang_methods:setR</strong>&nbsp;(r)</dt>
+<dd>
+
+Set's the angle's roll and returns it.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>r</em></code>: The roll
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The modified angle</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ang_methods:setY"></a><strong>ang_methods:setY</strong>&nbsp;(y)</dt>
+<dd>
+
+Set's the angle's yaw and returns it.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>y</em></code>: The yaw
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The modified angle</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ang_methods:setZero"></a><strong>ang_methods:setZero</strong>&nbsp;()</dt>
+<dd>
+
+Sets p,y,r to 0. This is faster than doing it manually.
+
+
+
 
 
 

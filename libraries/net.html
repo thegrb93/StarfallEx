@@ -175,8 +175,6 @@
 		
 			<li><a href="../classes/Bass.html">Bass</a></li>
 		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
 			<li><a href="../classes/Color.html">Color</a></li>
 		
 			<li><a href="../classes/Entity.html">Entity</a></li>
@@ -424,6 +422,10 @@
 	</li>
 
 	<li>
+		<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
+	</li>
+
+	<li>
 		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 	</li>
 
@@ -527,6 +529,12 @@ Reads a matrix from the net message </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#net_library.readStream">readStream</a>&nbsp;(cb)</td>
+	<td class="summary">
+Reads a large string stream from the net message </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#net_library.readString">readString</a>&nbsp;()</td>
 	<td class="summary">
 Reads a string from the net message </td>
@@ -608,6 +616,12 @@ Writes an integer to the net message </td>
 	<td class="name" nowrap><a href="#net_library.writeMatrix">writeMatrix</a>&nbsp;(t)</td>
 	<td class="summary">
 Writes an matrix to the net message </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#net_library.writeStream">writeStream</a>&nbsp;(str)</td>
+	<td class="summary">
+Streams a large 20MB string.</td>
 	</tr>
 
 	<tr>
@@ -904,6 +918,37 @@ Reads a matrix from the net message
 
 <h3>Return value:</h3>
 <ul>The matrix that was read</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.readStream"></a><strong>net_library.readStream</strong>&nbsp;(cb)</dt>
+<dd>
+
+Reads a large string stream from the net message
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>cb</em></code>: Callback to run when the stream is finished. The first parameter in the callback is the data.
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -1329,6 +1374,37 @@ Writes an matrix to the net message
 	
 	<li>
 	  <code><em>t</em></code>: The matrix to be written
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="net_library.writeStream"></a><strong>net_library.writeStream</strong>&nbsp;(str)</dt>
+<dd>
+
+Streams a large 20MB string.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>str</em></code>: The string to be written
 	</li>
 	
 </ul>
