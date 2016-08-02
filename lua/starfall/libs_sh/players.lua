@@ -350,6 +350,12 @@ function player_methods:getWeapon( wep )
 	return ewrap( eunwrap( self ):GetWeapon( wep ) )
 end
 
+-- Returns the entity that the player is standing on
+function player_methods:getGroundEntity()
+	SF.CheckType( self, player_metamethods )
+	return ewrap( eunwrap( self ):GetGroundEntity() )
+end
+
 if SERVER then
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
