@@ -351,6 +351,8 @@ function player_methods:getWeapon( wep )
 end
 
 -- Returns the entity that the player is standing on
+-- @shared
+-- @return Ground entity
 function player_methods:getGroundEntity()
 	SF.CheckType( self, player_metamethods )
 	return ewrap( eunwrap( self ):GetGroundEntity() )
