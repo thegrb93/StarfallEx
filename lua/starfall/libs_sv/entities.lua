@@ -100,9 +100,9 @@ function ents_methods:getOwner ()
 end
 
 local function check ( v )
-	return 	-math.huge < v.x and v.x < math.huge and
-			-math.huge < v.y and v.y < math.huge and
-			-math.huge < v.z and v.z < math.huge
+	return 	-math.huge < v[1] and v[1] < math.huge and
+			-math.huge < v[2] and v[2] < math.huge and
+			-math.huge < v[3] and v[3] < math.huge
 end
 
 local function parent_check ( child, parent )
@@ -265,9 +265,12 @@ end
 function ents_methods:applyAngForce ( ang )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )
+	
 	local ang = SF.UnwrapObject( ang )
-
 	local ent = unwrap( self )
+	
+	if not check( ang ) then SF.throw( "infinite angle", 2) end
+	
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
@@ -654,6 +657,8 @@ function ents_methods:setVelocity ( vel )
 
 	local vel = vunwrap( vel )
 	local ent = unwrap( self )
+	
+	if not check( vel ) then SF.throw( "infinite vector", 2) end
 
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
