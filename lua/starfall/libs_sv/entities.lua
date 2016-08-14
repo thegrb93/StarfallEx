@@ -120,6 +120,7 @@ end
 -- @param attachment Optional string attachment name to parent to
 function ents_methods:setParent ( ent, attachment )
 	SF.CheckType( self, ents_metatable )
+	SF.CheckType( ent, ents_metatable )
 
 	local ent = unwrap( ent )
 	local this = unwrap( self )
