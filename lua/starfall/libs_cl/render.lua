@@ -777,6 +777,22 @@ function render_library.drawSimpleText ( x, y, text, xalign, yalign )
 	draw.SimpleText( text, font, x, y, currentcolor, xalign, yalign )
 end
 
+--- Constructs a markup object for quick styled text drawing.
+-- @param markup The markup string to parse
+-- @param maxsize The max width of the markup
+-- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
+function render_library.parseMarkup( str, maxsize )
+	SF.CheckType( str, "string" )
+	SF.CheckType( maxsize, "number" )
+	local marked = markup.Parse( str, maxsize )
+	local markedindex = marked.__index
+	return setmetatable(marked, {
+		__newindex = function() end,
+		__index = markedindex,
+		__metatable = ""
+	})
+end
+
 --- Compiles a 2D poly. This is needed so that poly don't have to be
 -- type-checked each frame. Polys can be indexed by a number, in which
 -- a copy of the vertex at that spot is returned. They can also be assigned
