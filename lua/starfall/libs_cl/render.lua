@@ -253,6 +253,7 @@ local validfonts = {
 	TargetIDSmall = true,
 	HL2MPTypeDeath = true,
 	BudgetLabel = true,
+	Roboto = true,
 	[ "DejaVu Sans Mono" ] = true
 }
 
@@ -264,7 +265,7 @@ local defined_fonts = {
 	["sf_screen_font_Default_16_400_9_0000"] = true
 }
 
-local defaultFont = "sf_screen_font_Default_16_400_9_0000"
+local defaultFont = next(defined_fonts)
 
 local poly_methods, poly_metamethods = SF.Typedef("Polygon")
 local wrappoly, unwrappoly = SF.CreateWrapper(poly_metamethods)
@@ -738,7 +739,7 @@ function render_library.getDefaultFont()
 	return defaultFont
 end
 
---- Draws text.
+--- Draws text with newlines and tabs
 -- @param x X coordinate
 -- @param y Y coordinate
 -- @param text Text to draw
@@ -754,7 +755,26 @@ function render_library.drawText ( x, y, text, alignment )
 
 	local font = SF.instance.data.render.font or defaultFont
 
-	draw.DrawText( text, font, x, y, currentcolor, alignment or TEXT_ALIGN_LEFT )
+	draw.DrawText( text, font, x, y, currentcolor, alignment )
+end
+
+--- Draws text more easily and quickly but no new lines or tabs.
+-- @param x X coordinate
+-- @param y Y coordinate
+-- @param text Text to draw
+-- @param xalign Text x alignment
+-- @param yalign Text y alignment
+function render_library.drawSimpleText ( x, y, text, xalign, yalign )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( text, "string" )
+	if xalign then SF.CheckType( xalign, "number" ) end
+	if yalign then SF.CheckType( yalign, "number" ) end
+
+	local font = SF.instance.data.render.font or defaultFont
+
+	draw.SimpleText( text, font, x, y, currentcolor, xalign, yalign )
 end
 
 --- Compiles a 2D poly. This is needed so that poly don't have to be
