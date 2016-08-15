@@ -754,6 +754,7 @@ end
 -- For more information please refer to GLua function http://wiki.garrysmod.com/page/Entity/SetNotSolid
 -- @param solid Boolean, Should the entity be solid?
 function ents_methods:setSolid ( solid )
+	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -764,6 +765,7 @@ end
 --- Sets the entity's mass
 -- @param mass number mass
 function ents_methods:setMass ( mass )
+	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 
 	local phys = getPhysObject( ent )
@@ -772,6 +774,21 @@ function ents_methods:setMass ( mass )
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:SetMass( math.Clamp(mass, 1, 50000) )
+end
+
+--- Sets the physical material of the entity
+-- @param mat Material to use
+function ents_methods:setPhysMaterial( mat )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( mat, "string" )
+	local ent = unwrap( self )
+
+	local phys = getPhysObject( ent )
+	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	construct.SetPhysProp( nil, ent, 0, phys, {Material = mat} ) 
 end
 
 --- Sets entity gravity
