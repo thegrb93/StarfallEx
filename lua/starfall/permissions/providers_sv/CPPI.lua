@@ -16,6 +16,7 @@ local canTool = {
 	[ "entities.enableDrag" ] = true,
 	[ "entities.applyDamage" ] = true,
 	[ "entities.remove" ] = true,
+	[ "entities.ignite" ] = true,
 	[ "entities.emitSound" ] = true,
 	[ "entities.setRenderPropery" ] = true,
 	[ "entities.canTool" ] = true,

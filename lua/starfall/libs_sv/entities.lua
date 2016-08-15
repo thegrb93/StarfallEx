@@ -34,6 +34,7 @@ do
 	P.registerPrivilege( "entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion" )
 	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence" )
 	P.registerPrivilege( "entities.remove", "Remove", "Allows the user to remove entities" )
+	P.registerPrivilege( "entities.ignite", "Ignite", "Allows the user to ignite entities" )
 	P.registerPrivilege( "entities.emitSound", "Emitsound", "Allows the user to play sounds on entities" )
 	P.registerPrivilege( "entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity" )
 	P.registerPrivilege( "entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity" )
@@ -690,6 +691,38 @@ function ents_methods:breakEnt ()
 
 	ent:AddFlags( FL_KILLME )
 	ent:Fire( "break", 1, 0 )
+end
+
+--- Ignites an entity
+-- @param length How long the fire lasts
+-- @param radius (optional) How large the fire hitbox is (entity obb is the max)
+function ents_methods:ignite( length, radius )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( length, "number" )
+
+	local ent = unwrap( self )
+
+	if radius then
+		SF.CheckType( radius, "number" )
+		local obbmins, obbmaxs = ent:OBBMins(), ent:OBBMaxs()
+		radius = math.Clamp( radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2 )
+	end
+
+	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.ignite" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	ent:Ignite( length, radius )
+end
+
+--- Extinguishes an entity
+function ents_methods:extinguish()
+	SF.CheckType( self, ents_metatable )
+
+	local ent = unwrap( self )
+	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.ignite" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	ent:Extinguish()
 end
 
 --- Sets the entity frozen state
