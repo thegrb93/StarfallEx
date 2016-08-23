@@ -469,13 +469,6 @@ function SF.DefaultEnvironment.isValid( object )
 
 end
 
---- Displays a message in chat, console, or in the center of the screen. Will only show up on your own system.
---@param msgtype What message type to display; See http://wiki.garrysmod.com/page/Enums/HUD.
---@param text Message text.
-function SF.DefaultEnvironment.printMessage( msgtype, text )
-	SF.instance.player:PrintMessage( msgtype, text )
-end
-
 -- ------------------------- Restrictions ------------------------- --
 -- Restricts access to builtin type's metatables
 
