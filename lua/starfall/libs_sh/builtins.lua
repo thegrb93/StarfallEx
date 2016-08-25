@@ -246,6 +246,15 @@ if CLIENT then
 		if SF.instance.player ~= LocalPlayer() then return end
 		SetClipboardText( txt )
 	end
+	
+	--- Prints a message to your chat, console, or the center of your screen.
+	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
+	-- @param text The message text.
+	function SF.DefaultEnvironment.printMesssage( mtype, text )
+		if SF.instance.player ~= LocalPlayer() then return end
+		SF.CheckType( text, "string" )
+		SF.instance.player:PrintMessage( mtype, text )
+	end
 end
 
 local function printTableX ( target, t, indent, alreadyprinted )
