@@ -244,6 +244,7 @@ if CLIENT then
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText( txt )
 		if SF.instance.player ~= LocalPlayer() then return end
+		SF.CheckType( txt, "string" )
 		SetClipboardText( txt )
 	end
 	
