@@ -110,8 +110,7 @@ SF.Libraries.AddHook("initialize",function(instance)
 end)
 
 SF.Libraries.AddHook( "deinitialize", function ( instance )
-	local data = instance.data.render
-	for k, v in pairs( data.rendertargets ) do
+	for k, v in pairs( instance.data.render.rendertargets ) do
 		globalRTs[ v ][ 2 ] = true -- mark as available
 	end
 end )
@@ -408,6 +407,11 @@ function render_library.createRenderTarget ( name )
 		globalRTs[ rtname ] = rt
 	end
 	rt[ 2 ] = false
+	rt[ 3 ] = CreateMaterial( "StarfallCustomModel_"..name..SF.instance.data.entity:EntIndex(), "VertexLitGeneric", {
+		[ "$model" ] = 1,
+	} )
+	rt[3]:SetTexture("$basetexture", rt[1])
+	
 	data.rendertargets[ name ] = rtname
 end
 
@@ -455,6 +459,20 @@ function render_library.setRenderTargetTexture ( name )
 		surface.SetMaterial( RT_Material )
 	else
 		draw.NoTexture()
+	end
+end
+
+--- Returns the model material name that uses the render target.
+--- Alternatively, just construct the name yourself with "!StarfallCustomModel_"..name..chip():entIndex() 
+-- @param name Render target name
+-- @return Model material name. Send this to the server to set the entity's material.
+function render_library.getRenderTargetMaterial( name )
+	local data = SF.instance.data.render
+	SF.CheckType( name, "string" )
+
+	local rtname = data.rendertargets[ name ]
+	if rtname and globalRTs[ rtname ] then
+		return "!"..tostring(globalRTs[ rtname ][ 3 ])
 	end
 end
 
