@@ -492,7 +492,7 @@ local shaderBlacklist = {
 local function invalidMaterial( material )
 	if string.find( string.lower( material ) , "pp[%./\\]+copy" ) then return true end
 	local mat = Material( material )
-	if shaderBlacklist[ mat:GetShader() ] then return true end
+	if mat and shaderBlacklist[ mat:GetShader() ] then return true end
 end
 
 --- Sets an entities' material
