@@ -172,6 +172,9 @@ argTypesToQuat["Entity"] = function(ent)
 	return qmul(qy,qmul(qp,qr))
 end
 
+argTypesToQuat["Vehicle"] = argTypesToQuat["Entity"]
+argTypesToQuat["Weapon"] = argTypesToQuat["Entity"]
+
 
 
 --- Creates a new Quaternion given a variety of inputs
@@ -235,7 +238,7 @@ local function format(value)
 
 	dbginfo = dbginfo .. k
 
-	if dbginfo == "" then dbginfo = "0 LAWL" end
+	if dbginfo == "" then dbginfo = "0" end
 
 	return dbginfo
 end
