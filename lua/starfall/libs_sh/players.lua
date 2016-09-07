@@ -84,6 +84,15 @@ function player_methods:isFlashlightOn( )
 	return ent and ent:FlashlightIsOn()
 end
 
+--- Returns true if the player is noclipped
+-- @shared
+-- @return true if the player is noclipped
+function player_methods:isNoclipped()
+	SF.CheckType( self, player_metamethods )
+	local ent = eunwrap( self )
+	return ent and ent:GetMoveType() == MOVETYPE_NOCLIP
+end
+
 --- Returns the amount of kills of the player
 -- @shared
 -- @return Amount of kills
