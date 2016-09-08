@@ -506,6 +506,46 @@ function render_library.clear ( clr )
 	end
 end
 
+--- Draws a rounded rectangle using the current color
+-- @param r The corner radius
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
+-- @param w Width
+-- @param h Height
+function render_library.drawRoundedBox ( r, x, y, w, h )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( r, "number" )
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	draw.RoundedBox( r, x, y, w, h, currentcolor )
+end
+
+--- Draws a rounded rectangle using the current color
+-- @param r The corner radius
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
+-- @param w Width
+-- @param h Height
+-- @param tl Boolean Top left corner
+-- @param tr Boolean Top right corner
+-- @param bl Boolean Bottom left corner
+-- @param br Boolean Bottom right corner
+function render_library.drawRoundedBoxEx ( r, x, y, w, h, tl, tr, bl, br )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( r, "number" )
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	SF.CheckType( tl, "boolean" )
+	SF.CheckType( tr, "boolean" )
+	SF.CheckType( bl, "boolean" )
+	SF.CheckType( br, "boolean" )
+	draw.RoundedBoxEx( r, x, y, w, h, currentcolor, tl, tr, bl, br )
+end
+
 --- Draws a rectangle using the current color.
 -- @param x Top left corner x coordinate
 -- @param y Top left corner y coordinate
