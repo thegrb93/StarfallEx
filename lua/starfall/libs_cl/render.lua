@@ -120,29 +120,25 @@ local LoadingURLQueue = {}
 
 local texturecache, texturecachehttp
 
-local function CheckURLDownloads()
-	local numqueued = #LoadingURLQueue
-	local urltable = LoadingURLQueue[numqueued]
 
-	if urltable then
-		if urltable.Panel then
-			if not urltable.Panel:IsLoading() then
+local function CheckURLDownloads()
+	local requestTbl = LoadingURLQueue[1]
+	if requestTbl then
+		if requestTbl.Panel then
+			if not requestTbl.Panel:IsLoading() then
 				timer.Simple(0.2,function()
-					local tex = urltable.Panel:GetHTMLMaterial():GetTexture("$basetexture")
-					tex:Download()
-					urltable.Material:SetTexture("$basetexture", tex)
-					tex:Download()
-					urltable.Panel:Remove()
-					if urltable.cb then urltable.cb() end
+					local tex = requestTbl.Panel:GetHTMLMaterial():GetTexture("$basetexture")
+					requestTbl.Material:SetTexture("$basetexture", tex)
+					requestTbl.Panel:Remove()
+					if requestTbl.cb then requestTbl.cb() end
 				end)
-				LoadingURLQueue[numqueued] = nil
+				table.remove(LoadingURLQueue, 1)
 			else
-				if CurTime() > urltable.Timeout then
-					urltable.Panel:Remove()
-					LoadingURLQueue[numqueued] = nil
+				if CurTime() > requestTbl.Timeout then
+					requestTbl.Panel:Remove()
+					table.remove(LoadingURLQueue, 1)
 				end
 			end
-
 		else
 			local Panel = vgui.Create( "DHTML" )
 			Panel:SetSize( 1024, 1024 )
@@ -157,9 +153,9 @@ local function CheckURLDownloads()
 						margin: -8px -8px;
 					}
 					body {
-						background-image: url(]] .. urltable.Url .. [[);
+						background-image: url(]] .. requestTbl.Url .. [[);
 						background-size: contain;
-						background-position: ]] .. urltable.Alignment .. [[;
+						background-position: ]] .. requestTbl.Alignment .. [[;
 						background-repeat: no-repeat;
 						height: 100%;
 						width: 100%;
@@ -167,12 +163,10 @@ local function CheckURLDownloads()
 				</style></head><body></body></html>
 			]]
 			)
-			urltable.Timeout = CurTime()+20
-			urltable.Panel = Panel
+			requestTbl.Timeout = CurTime()+10
+			requestTbl.Panel = Panel
 		end
-	end
-
-	if #LoadingURLQueue == 0 then
+	else
 		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
@@ -180,29 +174,17 @@ end
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } )
 
 local function LoadURLMaterial( url, alignment, cb )
-	--Count the number of materials
-	local totalMaterials = 0, key
-	while true do
-		key = next(texturecachehttp, key)
-		if not key then break end
-		totalMaterials = totalMaterials + 1
-	end
-
-	local queuesize = #LoadingURLQueue
-	totalMaterials = totalMaterials + queuesize
-
-	if totalMaterials>=cv_max_url_materials:GetInt() then
-		return
-	end
-
+	if table.Count(texturecachehttp) + #LoadingURLQueue >= cv_max_url_materials:GetInt() then return end
+	
 	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()))
-
-	if queuesize == 0 then
-		timer.Create("SF_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
+		
+	if #LoadingURLQueue == 0 then
+		timer.Create("SF_URLMaterialChecker",1,0,CheckURLDownloads)
 	end
-
-	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
+	LoadingURLQueue[#LoadingURLQueue + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
+	
 	return urlmaterial
+	
 end
 
 texturecache = setmetatable({},{__mode = "k"})
