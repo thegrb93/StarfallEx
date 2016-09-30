@@ -6,15 +6,18 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 
 local context = SF.CreateContext( nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"} )
 
-function ENT:Initialize()
-	net.Start( "starfall_processor_download" )
-		net.WriteEntity( self )
-	net.SendToServer()
-	
+function ENT:Initialize()	
 	self.CPUpercent = 0
 	self.CPUus = 0
 end
 
+hook.Add("NetworkEntityCreated","starfall_chip_reset",function(ent)
+	if ent:GetClass()=="starfall_processor" then
+		net.Start( "starfall_processor_download" )
+		net.WriteEntity( ent )
+		net.SendToServer()
+	end
+end)
 
 function ENT:GetOverlayText()
 	local state = self:GetNWInt( "State", 1 )
