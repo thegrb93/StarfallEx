@@ -289,8 +289,6 @@ function holograms_library.create ( pos, ang, model, scale )
 		holodata.holos[ holoent ] = true
 		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
 		
-		hook.Call( "PlayerSpawnedSENT", GAMEMODE, instance.player, holoent )
-		
 		return wrap( holoent )
 	end
 end
