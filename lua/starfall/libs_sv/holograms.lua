@@ -282,6 +282,10 @@ function holograms_library.create ( pos, ang, model, scale )
 		holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata, instance.player )
 		holoent:Spawn()
 
+		if CPPI then
+			holoent:CPPISetOwner( instance.player )
+		end
+		
 		if scale then
 			holoent:SetScale( scale )
 		end
