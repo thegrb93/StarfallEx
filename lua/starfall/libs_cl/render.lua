@@ -191,62 +191,53 @@ texturecache = setmetatable({},{__mode = "k"})
 texturecachehttp = setmetatable({},{__mode = "k"})
 
 local validfonts = {
+	akbar = "Akbar",
+	coolvetica = "Coolvetica",
+	roboto = "Roboto",
+	["courier new"] = "Courier New",
+	verdana = "Verdana",
+	arial = "Arial",
+	halflife2 = "HalfLife2",
+	hl2mp = "hl2mp",
+	csd = "csd",
+	tahoma = "Tahoma",
+	trebuchet = "Trebuchet",
+	["trebuchet ms"] = "Trebuchet MS",
+	[ "dejavu sans mono" ] = "DejaVu Sans Mono",
+	[ "lucida console" ] = "Lucida Console",
+	[ "times new roman" ] = "Times New Roman"
+}
+
+local defined_fonts = {
 	DebugFixed = true,
 	DebugFixedSmall = true,
-	DefaultFixedOutline = true,
-	MenuItem = true,
 	Default = true,
-	TabLarge = true,
-	DefaultBold = true,
-	DefaultUnderline = true,
-	DefaultSmall = true,
-	DefaultSmallDropShadow = true,
-	DefaultVerySmall = true,
-	DefaultLarge = true,
-	UiBold = true,
-	MenuLarge = true,
-	ConsoleText = true,
 	Marlett = true,
 	Trebuchet18 = true,
-	Trebuchet19 = true,
-	Trebuchet20 = true,
-	Trebuchet22 = true,
 	Trebuchet24 = true,
-	HUDNumber = true,
-	HUDNumber1 = true,
-	HUDNumber2 = true,
-	HUDNumber3 = true,
-	HUDNumber4 = true,
-	HUDNumber5 = true,
 	HudHintTextLarge = true,
 	HudHintTextSmall = true,
 	CenterPrintText = true,
 	HudSelectionText = true,
-	DefaultFixed = true,
-	DefaultFixedDropShadow = true,
 	CloseCaption_Normal = true,
 	CloseCaption_Bold = true,
 	CloseCaption_BoldItalic = true,
-	TitleFont = true,
-	TitleFont2 = true,
 	ChatFont = true,
 	TargetID = true,
 	TargetIDSmall = true,
 	HL2MPTypeDeath = true,
 	BudgetLabel = true,
-	Roboto = true,
-	[ "DejaVu Sans Mono" ] = true
+	HudNumbers = true,
+	DermaDefault = true,
+	DermaDefaultBold = true,
+	DermaLarge = true,
 }
+-- Using an already defined font's name will use its font
+for k, v in pairs(defined_fonts) do
+	validfonts[string.lower(k)] = k
+end
 
-surface.CreateFont("sf_screen_font_Default_16_400_9_0000", {size = 16, weight = 400,
-		antialias=false, additive = false, font = "Default",
-		shadow = false, outline = false, blur = 0})
-
-local defined_fonts = {
-	["sf_screen_font_Default_16_400_9_0000"] = true
-}
-
-local defaultFont = next(defined_fonts)
+local defaultFont
 
 -- ------------------------------------------------------------------ --
 
@@ -646,52 +637,25 @@ end
 -- @param blur Enable blur?
 -- @usage
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
--- \- DebugFixed
--- \- DebugFixedSmall
--- \- DefaultFixedOutline
--- \- MenuItem
--- \- Default
--- \- TabLarge
--- \- DefaultBold
--- \- DefaultUnderline
--- \- DefaultSmall
--- \- DefaultSmallDropShadow
--- \- DefaultVerySmall
--- \- DefaultLarge
--- \- UiBold
--- \- MenuLarge
--- \- ConsoleText
--- \- Marlett
--- \- Trebuchet18
--- \- Trebuchet19
--- \- Trebuchet20
--- \- Trebuchet22
--- \- Trebuchet24
--- \- HUDNumber
--- \- HUDNumber1
--- \- HUDNumber2
--- \- HUDNumber3
--- \- HUDNumber4
--- \- HUDNumber5
--- \- HudHintTextLarge
--- \- HudHintTextSmall
--- \- CenterPrintText
--- \- HudSelectionText
--- \- DefaultFixed
--- \- DefaultFixedDropShadow
--- \- CloseCaption_Normal
--- \- CloseCaption_Bold
--- \- CloseCaption_BoldItalic
--- \- TitleFont
--- \- TitleFont2
--- \- ChatFont
--- \- TargetID
--- \- TargetIDSmall
--- \- HL2MPTypeDeath
--- \- BudgetLabel
--- \- DejaVu Sans Mono (shipped, monospaced)
+-- \- Akbar
+-- \- Coolvetica
+-- \- Roboto
+-- \- Courier New
+-- \- Verdana
+-- \- Arial
+-- \- HalfLife2
+-- \- hl2mp
+-- \- csd
+-- \- Tahoma
+-- \- Trebuchet
+-- \- Trebuchet MS
+-- \- DejaVu Sans Mono
+-- \- Lucida Console
+-- \- Times New Roman
+
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
-	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
+	font = validfonts[string.lower(font)]
+	if not font then SF.throw( "invalid font", 2 ) end
 
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -716,6 +680,7 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	end
 	return name
 end
+defaultFont = render_library.createFont("Default", 16, 400, false, false, false, false, 0)
 
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
 -- @param text Text to get the size of
@@ -730,6 +695,29 @@ end
 
 --- Sets the font
 -- @param font The font to use
+-- @usage Use a font created by render.createFont or use one of these already defined fonts:
+-- \- DebugFixed
+-- \- DebugFixedSmall
+-- \- Default
+-- \- Marlett
+-- \- Trebuchet18
+-- \- Trebuchet24
+-- \- HudHintTextLarge
+-- \- HudHintTextSmall
+-- \- CenterPrintText
+-- \- HudSelectionText
+-- \- CloseCaption_Normal
+-- \- CloseCaption_Bold
+-- \- CloseCaption_BoldItalic
+-- \- ChatFont
+-- \- TargetID
+-- \- TargetIDSmall
+-- \- HL2MPTypeDeath
+-- \- BudgetLabel
+-- \- HudNumbers
+-- \- DermaDefault
+-- \- DermaDefaultBold
+-- \- DermaLarge
 function render_library.setFont(font)
 	if not defined_fonts[font] then SF.throw( "Font does not exist.", 2 ) end
 	SF.instance.data.render.font = font
