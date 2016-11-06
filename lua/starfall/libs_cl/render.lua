@@ -243,7 +243,8 @@ local defaultFont
 
 --- Pushes a matrix onto the matrix stack.
 -- @param m The matrix
-function render_library.pushMatrix(m)
+-- @param world Should the transformation be relative to the screen or world? 
+function render_library.pushMatrix(m, world)
 	SF.CheckType(m,matrix_meta)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
@@ -255,7 +256,7 @@ function render_library.pushMatrix(m)
 	else
 		newmatrix = v_unwrap(m)
 	end
-	if renderdata.renderEnt and renderdata.renderEnt.Transform then
+	if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
 		newmatrix = renderdata.renderEnt.Transform * newmatrix
 	end
 	matrix_stack[id+1] = newmatrix
