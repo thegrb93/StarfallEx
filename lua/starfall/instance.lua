@@ -61,10 +61,12 @@ function SF.Instance:runWithOps(func,...)
 		local oldSysTime = SysTime() - self.cpu_total
 		local function cpuCheck ()
 			self.cpu_total = SysTime() - oldSysTime
-
-			if self:movingCPUAverage() > self.context.cpuTime:getMax() then
+			local usedRatio = self:movingCPUAverage()/self.context.cpuTime:getMax()
+			if usedRatio>1 then
 				debug.sethook( nil )
 				SF.throw( "CPU Quota exceeded.", 0, true )
+			elseif usedRatio > self.cpu_softquota then
+				SF.throw( "CPU Quota warning.", 0 )
 			end
 		end
 		debug.sethook( cpuCheck, "", 500 )
@@ -126,6 +128,7 @@ function SF.Instance:initialize()
 
 	self.cpu_total = 0
 	self.cpu_average = 0
+	self.cpu_softquota = 1
 
 	self:runLibraryHook("initialize")
 	self:prepare("_initialize","_initialize")
