@@ -105,6 +105,7 @@ function ENT:DrawTranslucent ()
 	-- Draw screen here
 	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
 	self.Transform = transform
+	cam.Start({type = "3D", znear = 3.01, zfar = 30000})
 	cam.PushModelMatrix( transform )
 		render.ClearStencil()
 		render.SetStencilEnable( true )
@@ -132,7 +133,8 @@ function ENT:DrawTranslucent ()
 		render.PopFilterMin()
 		
 		render.SetStencilEnable( false )
-	cam.PopModelMatrix( )
+	cam.PopModelMatrix()
+	cam.End()
 end
 
 function ENT:GetResolution()
