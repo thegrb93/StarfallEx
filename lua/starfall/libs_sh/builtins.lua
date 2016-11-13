@@ -486,25 +486,6 @@ function SF.DefaultEnvironment.isValid( object )
 
 end
 
--- ------------------------- Restrictions ------------------------- --
--- Restricts access to builtin type's metatables
-
-local _R = debug.getregistry()
-local function restrict( instance, hook, name, ok, err )
-	_R.Vector.__metatable = "Vector"
-	_R.Angle.__metatable = "Angle"
-	_R.VMatrix.__metatable = "VMatrix"
-end
-
-local function unrestrict( instance, hook, name, ok, err )
-	_R.Vector.__metatable = nil
-	_R.Angle.__metatable = nil
-	_R.VMatrix.__metatable = nil
-end
-
-SF.Libraries.AddHook( "prepare", restrict )
-SF.Libraries.AddHook( "cleanup", unrestrict )
-
 local _KEY = {
 	[ "FIRST" ] = 0,
 	[ "NONE" ] = 0,
