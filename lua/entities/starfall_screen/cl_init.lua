@@ -72,10 +72,6 @@ function ENT:RenderScreen()
 
 			self.link:runScriptHook( "render" )
 
-			if data.render.usingRT then
-				render.PopRenderTarget()
-				data.render.usingRT = false
-			end
 			data.render.isRendering = nil
 		
 		elseif self.link.error then
@@ -105,7 +101,7 @@ function ENT:DrawTranslucent ()
 	-- Draw screen here
 	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
 	self.Transform = transform
-	cam.Start({type = "3D", znear = 3.01, zfar = 30000})
+	cam.Start({type = "3D", znear = 3.001})
 	cam.PushModelMatrix( transform )
 		render.ClearStencil()
 		render.SetStencilEnable( true )
@@ -119,10 +115,10 @@ function ENT:DrawTranslucent ()
 		render.OverrideDepthEnable( true, true )
 		surface.SetDrawColor(0,0,0,255)
 		surface.DrawRect(0,0,512/self.Aspect,512)
+		render.OverrideDepthEnable( false )
 
 		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
 		render.SetStencilTestMask( 1 )
-		render.OverrideDepthEnable( false )
 		
 		render.PushFilterMag( TEXFILTER.ANISOTROPIC )
 		render.PushFilterMin( TEXFILTER.ANISOTROPIC )
