@@ -147,18 +147,11 @@ local function CheckURLDownloads()
 			Panel:SetHTML(
 			[[
 				<html><head><style type="text/css">
-					html
-					{
-						overflow:hidden;
-						margin: -8px -8px;
-					}
 					body {
 						background-image: url(]] .. requestTbl.Url .. [[);
 						background-size: contain;
 						background-position: ]] .. requestTbl.Alignment .. [[;
 						background-repeat: no-repeat;
-						height: 100%;
-						width: 100%;
 					}
 				</style></head><body></body></html>
 			]]
