@@ -23,7 +23,8 @@ do
 end
 
 local insts = {}
-local plyCount = setmetatable({}, {__mode="k"})
+-- Table with player keys that automatically cleans when player leaves.
+local plyCount = SF.EntityTable("playerProps")
 
 SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.props = {

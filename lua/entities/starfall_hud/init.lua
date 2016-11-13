@@ -4,7 +4,7 @@ include('shared.lua')
 
 util.AddNetworkString( "starfall_hud_set_enabled" )
 
-local vehiclelinks = setmetatable({}, {__mode="k"})
+local vehiclelinks = SF.EntityTable("vehicleLinks")
 
 function ENT:Initialize ()
 	self.BaseClass.Initialize( self )

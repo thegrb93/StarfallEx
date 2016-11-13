@@ -31,7 +31,8 @@ SF.Holograms.Metatable = hologram_metamethods
 SF.Holograms.Wrap = wrap
 SF.Holograms.Unwrap = unwrap
 
-local plyCount = setmetatable({}, {__mode="k"})
+-- Table with player keys that automatically cleans when player leaves.
+local plyCount = SF.EntityTable("playerHolos")
 
 SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.holograms = {

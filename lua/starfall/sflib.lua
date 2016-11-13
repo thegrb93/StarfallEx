@@ -288,6 +288,15 @@ function SF.UnwrapObject( object )
 	end
 end
 
+--- Manages data tied to entities so that the data is cleaned when the entity is removed
+function SF.EntityTable( key )
+	return setmetatable({}, 
+	{__newindex = function(t, e, v)
+		rawset(t, e, v)
+		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
+	end})
+end
+
 local wrappedfunctions = setmetatable({},{__mode="kv"})
 local wrappedfunctions2instance = setmetatable({},{__mode="kv"})
 --- Wraps the given starfall function so that it may called directly by GMLua
