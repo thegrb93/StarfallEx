@@ -69,6 +69,7 @@ end
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
+local view_matrix_stack = 0
 
 local globalRTs = {}
 local globalRTcount = 0
@@ -89,17 +90,22 @@ SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	end
 end )
 
-SF.Libraries.AddHook( "cleanup", function ( instance )
-	for i=#matrix_stack,1,-1 do
-		cam.PopModelMatrix()
-		matrix_stack[i] = nil
-	end
-	local data = instance.data.render
-	if data.usingRT then
-		render.SetRenderTarget()
-		cam.End2D()
-		render.SetViewPort(unpack(data.oldViewPort))
-		data.usingRT = false
+SF.Libraries.AddHook( "cleanup", function ( instance, hook )
+	if hook == "render" then
+		for i=#matrix_stack,1,-1 do
+			cam.PopModelMatrix()
+			matrix_stack[i] = nil
+		end
+		for i=1, view_matrix_stack do
+			cam.End()
+		end
+		view_matrix_stack = 0
+		local data = instance.data.render
+		if data.usingRT then
+			render.SetRenderTarget()
+			render.SetViewPort(unpack(data.oldViewPort))
+			data.usingRT = false
+		end
 	end
 end )
 
@@ -265,6 +271,59 @@ function render_library.popMatrix()
 	cam.PopModelMatrix()
 end
 
+
+local viewmatrix_checktypes =
+{
+	x = "number", y = "number", w = "number", h = "number", type = "string",
+	origin = SF.Vectors.Metatable, angles = SF.Angles.Metatable, fov = "number",
+	aspect = "number", zfar = "number", znear = "number", subrect = "boolean",
+	bloomtone = "boolean", offcenter = "table", ortho = "table"
+}
+--- Pushes a perspective matrix onto the view matrix stack.
+-- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
+function render_library.pushViewMatrix(tbl)
+	local renderdata = SF.instance.data.render
+	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if view_matrix_stack == MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
+	
+	if tbl.type ~= "2D" and tbl.type ~= "3D" then SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 ) end
+	local newtbl = {}
+	for k, v in pairs(tbl) do
+		if viewmatrix_checktypes[k] then
+			SF.CheckType( v, viewmatrix_checktypes[k] )
+			newtbl[k] = v
+		else
+			SF.throw( "Invalid key found in view matrix: " .. k, 2 )
+		end
+	end
+	if newtbl.origin then newtbl.origin = SF.Vectors.Unwrap( newtbl.origin ) end
+	if newtbl.angles then newtbl.angles = SF.Angles.Unwrap( newtbl.angles ) end
+	if newtbl.offcenter then
+		SF.CheckType( tbl.offcenter.left, "number" )
+		SF.CheckType( tbl.offcenter.right, "number" )
+		SF.CheckType( tbl.offcenter.bottom, "number" )
+		SF.CheckType( tbl.offcenter.top, "number" )
+	end
+	if newtbl.ortho then
+		SF.CheckType( tbl.ortho.left, "number" )
+		SF.CheckType( tbl.ortho.right, "number" )
+		SF.CheckType( tbl.ortho.bottom, "number" )
+		SF.CheckType( tbl.ortho.top, "number" )
+	end
+	
+	cam.Start(newtbl)
+	view_matrix_stack = view_matrix_stack + 1
+end
+
+--- Pops a view matrix from the matrix stack.
+function render_library.popViewMatrix()
+	local renderdata = SF.instance.data.render
+	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if view_matrix_stack == 0 then SF.throw( "Popped too many matricies", 2 ) end
+	cam.End()
+	view_matrix_stack = view_matrix_stack - 1
+end
+
 --- Sets the draw color
 -- @param clr Color type
 function render_library.setColor( clr )
@@ -397,6 +456,7 @@ function render_library.selectRenderTarget ( name )
 			data.oldViewPort = {0, 0, ScrW(), ScrH()}
 			render.SetViewPort( 0, 0, 1024, 1024 )
 			cam.Start2D()
+			view_matrix_stack = view_matrix_stack + 1
 			render.SetStencilEnable( false )
 		end
 		render.SetRenderTarget( rt )
@@ -404,7 +464,8 @@ function render_library.selectRenderTarget ( name )
 	else
 		if data.usingRT then
 			render.SetRenderTarget()
-			cam.End2D()
+			cam.End()
+			view_matrix_stack = view_matrix_stack - 1
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 			render.SetStencilEnable( true )
