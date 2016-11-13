@@ -51,7 +51,13 @@ function P:check ( principal, target, key )
 		return DENY
 	elseif canPhysgun[ key ] then
 		if target:IsPlayer() then
-			return (hook.Call( "PhysgunPickup", GAMEMODE, principal, target ) ~= false) and ALLOW or DENY
+			if hook.Call( "PhysgunPickup", GAMEMODE, principal, target ) ~= false then
+				-- Some mods expect a release when there's a player pickup involved.
+				hook.Call( "PhysgunDrop", GAMEMODE, principal, target )
+				return ALLOW
+			else
+				return DENY
+			end
 		else
 			if not IsValid( target:CPPIGetOwner() ) then return DENY end
 			if target:CPPICanPhysgun( principal ) then return ALLOW end
