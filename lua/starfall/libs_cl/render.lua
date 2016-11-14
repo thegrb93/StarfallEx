@@ -96,16 +96,17 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
 		end
+		local data = instance.data.render
+		if data.usingRT then
+			render.SetRenderTarget()
+			cam.End2D()
+			render.SetViewPort(unpack(data.oldViewPort))
+			data.usingRT = false
+		end
 		for i=1, view_matrix_stack do
 			cam.End()
 		end
 		view_matrix_stack = 0
-		local data = instance.data.render
-		if data.usingRT then
-			render.SetRenderTarget()
-			render.SetViewPort(unpack(data.oldViewPort))
-			data.usingRT = false
-		end
 	end
 end )
 
@@ -285,8 +286,9 @@ function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if view_matrix_stack == MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
-	
+	if renderdata.usingRT then SF.throw( "Can't start a new context within a 2D rendertarget", 2 ) end
 	if tbl.type ~= "2D" and tbl.type ~= "3D" then SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 ) end
+	
 	local newtbl = {}
 	for k, v in pairs(tbl) do
 		if viewmatrix_checktypes[k] then
@@ -320,6 +322,8 @@ function render_library.popViewMatrix()
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if view_matrix_stack == 0 then SF.throw( "Popped too many matricies", 2 ) end
+	if renderdata.usingRT then SF.throw( "Can't start a new context within a 2D rendertarget", 2 ) end
+	
 	cam.End()
 	view_matrix_stack = view_matrix_stack - 1
 end
@@ -456,7 +460,6 @@ function render_library.selectRenderTarget ( name )
 			data.oldViewPort = {0, 0, ScrW(), ScrH()}
 			render.SetViewPort( 0, 0, 1024, 1024 )
 			cam.Start2D()
-			view_matrix_stack = view_matrix_stack + 1
 			render.SetStencilEnable( false )
 		end
 		render.SetRenderTarget( rt )
@@ -464,8 +467,7 @@ function render_library.selectRenderTarget ( name )
 	else
 		if data.usingRT then
 			render.SetRenderTarget()
-			cam.End()
-			view_matrix_stack = view_matrix_stack - 1
+			cam.End2D()
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 			render.SetStencilEnable( true )
