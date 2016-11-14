@@ -7,18 +7,12 @@ local net = net
 --- Net message library. Used for sending data from the server to the client and back
 local net_library, _ = SF.Libraries.Register("net")
 
-local burst_limit = CreateConVar( "sf_net_burst_limit", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
+local burst_limit = CreateConVar( "sf_net_burstmax", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
 					"The net message burst limit in kB." )
 
-local burst_interval = CreateConVar( "sf_net_burst_interval", "0.1", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-						"The interval of the timer that adds 1kB more available net message." )
+local burst_rate = CreateConVar( "sf_net_burstrate", "5", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
+						"Regen rate of net message burst in kB/sec." )
 
-local function burst_tick()
-	local instance = SF.instance
-
-	instance.data.net.burst 	= math.min( burst_limit:GetFloat()*1000, instance.data.net.burst + math.max( 0, ( ( CurTime() - instance.data.net.last_tick ) / burst_interval:GetFloat() ) * 1000 ) )
-	instance.data.net.last_tick = CurTime()
-end
 
 local function write( instance, type, size, ... )
 	instance.data.net.size = instance.data.net.size + size
@@ -30,9 +24,8 @@ local instances = {}
 SF.Libraries.AddHook( "initialize", function( instance )
 	instance.data.net = {
 		started = false,
-		burst = burst_limit:GetInt()*1000,
+		burst = SF.BurstObject( burst_rate:GetFloat()*1000, burst_limit:GetFloat()*1000 ),
 		size = 0,
-		last_tick = CurTime(),
 		data = {},
 	}
 end)
@@ -55,9 +48,7 @@ function net_library.start( name )
 	if instance.data.net.started then SF.throw( "net message was already started", 2 ) end
 
 	instance.data.net.started = true
-
-	burst_tick()
-	instance.data.net.size = 0
+	instance.data.net.size = 8 -- 8 bytes overhead
 	instance.data.net.data = {}
 
 	write( instance, "String", #name, name )
@@ -70,10 +61,7 @@ function net_library.send ( target )
 	local instance = SF.instance
 	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
 
-	burst_tick()
-	instance.data.net.burst = instance.data.net.burst - instance.data.net.size
-
-	if instance.data.net.burst < -8 then -- 8 bytes overhead
+	if not instance.data.net.burst:use( instance.data.net.size ) then
 		SF.throw( "Net message exceeds limit!", 3 )
 	end
 
@@ -395,8 +383,7 @@ end
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
-	burst_tick()
-	return SF.instance.data.net.burst - SF.instance.data.net.size
+	return SF.instance.data.net.burst:check() - SF.instance.data.net.size
 end
 
 net.Receive( "SF_netmessage", function( len, ply )

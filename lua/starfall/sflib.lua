@@ -297,6 +297,32 @@ function SF.EntityTable( key )
 	end})
 end
 
+--- Returns a class that can keep track of burst
+function SF.BurstObject( rate, max )
+	local burstclass = {
+		use = function(self, amount)
+			self:check()
+			if self.val>= amount then
+				self.val = self.val - amount
+				return true
+			end
+			return false
+		end,
+		check = function(self)
+			self.val = math.min( self.val + (CurTime() - self.lasttick)*self.rate, self.max )
+			self.lasttick = CurTime()
+			return self.val
+		end
+	}
+	local t = {
+		rate = rate, 
+		max = max,
+		val = max,
+		lasttick = 0
+	}
+	return setmetatable(t, {__index=burstclass})
+end
+
 local wrappedfunctions = setmetatable({},{__mode="kv"})
 local wrappedfunctions2instance = setmetatable({},{__mode="kv"})
 --- Wraps the given starfall function so that it may called directly by GMLua
