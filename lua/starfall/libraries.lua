@@ -81,8 +81,3 @@ function SF.Libraries.CallHook(hookname, ...)
 		hook[i](...)
 	end
 end
-
--- Prevent refreshed libraries from re-adding their hooks.
-SF.Libraries.AddHook("postload", function()
-	SF.Libraries.AddHook = function() end
-end)
