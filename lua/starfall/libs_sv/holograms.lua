@@ -31,7 +31,8 @@ SF.Holograms.Metatable = hologram_metamethods
 SF.Holograms.Wrap = wrap
 SF.Holograms.Unwrap = unwrap
 
-local plyCount = setmetatable({}, {__mode="k"})
+-- Table with player keys that automatically cleans when player leaves.
+local plyCount = SF.EntityTable("playerHolos")
 
 SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.holograms = {
@@ -282,14 +283,16 @@ function holograms_library.create ( pos, ang, model, scale )
 		holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata, instance.player )
 		holoent:Spawn()
 
+		if CPPI then
+			holoent:CPPISetOwner( instance.player )
+		end
+		
 		if scale then
 			holoent:SetScale( scale )
 		end
 
 		holodata.holos[ holoent ] = true
 		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
-		
-		hook.Call( "PlayerSpawnedSENT", GAMEMODE, instance.player, holoent )
 		
 		return wrap( holoent )
 	end

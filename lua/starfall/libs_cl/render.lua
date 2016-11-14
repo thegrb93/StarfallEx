@@ -69,6 +69,7 @@ end
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
+local view_matrix_stack = 0
 
 local globalRTs = {}
 local globalRTcount = 0
@@ -89,17 +90,23 @@ SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	end
 end )
 
-SF.Libraries.AddHook( "cleanup", function ( instance )
-	for i=#matrix_stack,1,-1 do
-		cam.PopModelMatrix()
-		matrix_stack[i] = nil
-	end
-	local data = instance.data.render
-	if data.usingRT then
-		render.SetRenderTarget()
-		cam.End2D()
-		render.SetViewPort(unpack(data.oldViewPort))
-		data.usingRT = false
+SF.Libraries.AddHook( "cleanup", function ( instance, hook )
+	if hook == "render" then
+		for i=#matrix_stack,1,-1 do
+			cam.PopModelMatrix()
+			matrix_stack[i] = nil
+		end
+		local data = instance.data.render
+		if data.usingRT then
+			render.SetRenderTarget()
+			cam.End2D()
+			render.SetViewPort(unpack(data.oldViewPort))
+			data.usingRT = false
+		end
+		for i=1, view_matrix_stack do
+			cam.End()
+		end
+		view_matrix_stack = 0
 	end
 end )
 
@@ -110,8 +117,7 @@ SF.Libraries.AddHook("initialize",function(instance)
 end)
 
 SF.Libraries.AddHook( "deinitialize", function ( instance )
-	local data = instance.data.render
-	for k, v in pairs( data.rendertargets ) do
+	for k, v in pairs( instance.data.render.rendertargets ) do
 		globalRTs[ v ][ 2 ] = true -- mark as available
 	end
 end )
@@ -121,29 +127,25 @@ local LoadingURLQueue = {}
 
 local texturecache, texturecachehttp
 
-local function CheckURLDownloads()
-	local numqueued = #LoadingURLQueue
-	local urltable = LoadingURLQueue[numqueued]
 
-	if urltable then
-		if urltable.Panel then
-			if not urltable.Panel:IsLoading() then
+local function CheckURLDownloads()
+	local requestTbl = LoadingURLQueue[1]
+	if requestTbl then
+		if requestTbl.Panel then
+			if not requestTbl.Panel:IsLoading() then
 				timer.Simple(0.2,function()
-					local tex = urltable.Panel:GetHTMLMaterial():GetTexture("$basetexture")
-					tex:Download()
-					urltable.Material:SetTexture("$basetexture", tex)
-					tex:Download()
-					urltable.Panel:Remove()
-					if urltable.cb then urltable.cb() end
+					local tex = requestTbl.Panel:GetHTMLMaterial():GetTexture("$basetexture")
+					requestTbl.Material:SetTexture("$basetexture", tex)
+					requestTbl.Panel:Remove()
+					if requestTbl.cb then requestTbl.cb() end
 				end)
-				LoadingURLQueue[numqueued] = nil
+				table.remove(LoadingURLQueue, 1)
 			else
-				if CurTime() > urltable.Timeout then
-					urltable.Panel:Remove()
-					LoadingURLQueue[numqueued] = nil
+				if CurTime() > requestTbl.Timeout then
+					requestTbl.Panel:Remove()
+					table.remove(LoadingURLQueue, 1)
 				end
 			end
-
 		else
 			local Panel = vgui.Create( "DHTML" )
 			Panel:SetSize( 1024, 1024 )
@@ -152,28 +154,19 @@ local function CheckURLDownloads()
 			Panel:SetHTML(
 			[[
 				<html><head><style type="text/css">
-					html
-					{
-						overflow:hidden;
-						margin: -8px -8px;
-					}
 					body {
-						background-image: url(]] .. urltable.Url .. [[);
+						background-image: url(]] .. requestTbl.Url .. [[);
 						background-size: contain;
-						background-position: ]] .. urltable.Alignment .. [[;
+						background-position: ]] .. requestTbl.Alignment .. [[;
 						background-repeat: no-repeat;
-						height: 100%;
-						width: 100%;
 					}
 				</style></head><body></body></html>
 			]]
 			)
-			urltable.Timeout = CurTime()+20
-			urltable.Panel = Panel
+			requestTbl.Timeout = CurTime()+10
+			requestTbl.Panel = Panel
 		end
-	end
-
-	if #LoadingURLQueue == 0 then
+	else
 		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
@@ -181,133 +174,77 @@ end
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { FCVAR_REPLICATED, FCVAR_ARCHIVE } )
 
 local function LoadURLMaterial( url, alignment, cb )
-	--Count the number of materials
-	local totalMaterials = 0, key
-	while true do
-		key = next(texturecachehttp, key)
-		if not key then break end
-		totalMaterials = totalMaterials + 1
-	end
-
-	local queuesize = #LoadingURLQueue
-	totalMaterials = totalMaterials + queuesize
-
-	if totalMaterials>=cv_max_url_materials:GetInt() then
-		return
-	end
-
+	if table.Count(texturecachehttp) + #LoadingURLQueue >= cv_max_url_materials:GetInt() then return end
+	
 	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()))
-
-	if queuesize == 0 then
-		timer.Create("SF_URLMaterialChecker",1,0,function() CheckURLDownloads() end)
+		
+	if #LoadingURLQueue == 0 then
+		timer.Create("SF_URLMaterialChecker",1,0,CheckURLDownloads)
 	end
-
-	LoadingURLQueue[queuesize + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
+	LoadingURLQueue[#LoadingURLQueue + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
+	
 	return urlmaterial
+	
 end
 
 texturecache = setmetatable({},{__mode = "k"})
 texturecachehttp = setmetatable({},{__mode = "k"})
 
 local validfonts = {
+	akbar = "Akbar",
+	coolvetica = "Coolvetica",
+	roboto = "Roboto",
+	["courier new"] = "Courier New",
+	verdana = "Verdana",
+	arial = "Arial",
+	halflife2 = "HalfLife2",
+	hl2mp = "hl2mp",
+	csd = "csd",
+	tahoma = "Tahoma",
+	trebuchet = "Trebuchet",
+	["trebuchet ms"] = "Trebuchet MS",
+	[ "dejavu sans mono" ] = "DejaVu Sans Mono",
+	[ "lucida console" ] = "Lucida Console",
+	[ "times new roman" ] = "Times New Roman"
+}
+
+local defined_fonts = {
 	DebugFixed = true,
 	DebugFixedSmall = true,
-	DefaultFixedOutline = true,
-	MenuItem = true,
 	Default = true,
-	TabLarge = true,
-	DefaultBold = true,
-	DefaultUnderline = true,
-	DefaultSmall = true,
-	DefaultSmallDropShadow = true,
-	DefaultVerySmall = true,
-	DefaultLarge = true,
-	UiBold = true,
-	MenuLarge = true,
-	ConsoleText = true,
 	Marlett = true,
 	Trebuchet18 = true,
-	Trebuchet19 = true,
-	Trebuchet20 = true,
-	Trebuchet22 = true,
 	Trebuchet24 = true,
-	HUDNumber = true,
-	HUDNumber1 = true,
-	HUDNumber2 = true,
-	HUDNumber3 = true,
-	HUDNumber4 = true,
-	HUDNumber5 = true,
 	HudHintTextLarge = true,
 	HudHintTextSmall = true,
 	CenterPrintText = true,
 	HudSelectionText = true,
-	DefaultFixed = true,
-	DefaultFixedDropShadow = true,
 	CloseCaption_Normal = true,
 	CloseCaption_Bold = true,
 	CloseCaption_BoldItalic = true,
-	TitleFont = true,
-	TitleFont2 = true,
 	ChatFont = true,
 	TargetID = true,
 	TargetIDSmall = true,
 	HL2MPTypeDeath = true,
 	BudgetLabel = true,
-	[ "DejaVu Sans Mono" ] = true
+	HudNumbers = true,
+	DermaDefault = true,
+	DermaDefaultBold = true,
+	DermaLarge = true,
 }
-
-surface.CreateFont("sf_screen_font_Default_16_400_9_0000", {size = 16, weight = 400,
-		antialias=false, additive = false, font = "Default",
-		shadow = false, outline = false, blur = 0})
-
-local defined_fonts = {
-	["sf_screen_font_Default_16_400_9_0000"] = true
-}
-
-local defaultFont = "sf_screen_font_Default_16_400_9_0000"
-
-local poly_methods, poly_metamethods = SF.Typedef("Polygon")
-local wrappoly, unwrappoly = SF.CreateWrapper(poly_metamethods)
-
-local function checkvertex(vert)
-	return {
-		x = SF.CheckType(vert.x or vert[1],"number",1),
-		y = SF.CheckType(vert.y or vert[2],"number",1),
-		u = tonumber(vert.u or vert[3]) or 0,
-		v = tonumber(vert.v or vert[4]) or 0,
-	}
+-- Using an already defined font's name will use its font
+for k, v in pairs(defined_fonts) do
+	validfonts[string.lower(k)] = k
 end
 
-function poly_metamethods:__index(k)
-	SF.CheckType(self,poly_metamethods)
-	SF.CheckType(k,"number")
-	local poly = unwrappoly(self)
-	if not poly then return nil end
-	if k <= 0 or k > #poly then return nil end
-	return table.Copy(poly[k])
-end
-
-function poly_metamethods:__len()
-	SF.CheckType(self,poly_metamethods)
-	local poly = unwrappoly(self)
-	return poly and #poly or nil
-end
-
-function poly_metamethods:__newindex(k,v)
-	SF.CheckType(self,poly_metamethods)
-	SF.CheckType(k,"number")
-	SF.CheckType(v,"table")
-	local poly = unwrappoly(self)
-	if not poly then return end
-	if k <= 0 or k > (#poly)+1 then return SF.throw( "poly index out of bounds: " .. k .. " out of " .. #poly, 2 ) end
-	poly[k] = checkvertex(v)
-end
+local defaultFont
 
 -- ------------------------------------------------------------------ --
 
 --- Pushes a matrix onto the matrix stack.
 -- @param m The matrix
-function render_library.pushMatrix(m)
+-- @param world Should the transformation be relative to the screen or world? 
+function render_library.pushMatrix(m, world)
 	SF.CheckType(m,matrix_meta)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
@@ -319,7 +256,7 @@ function render_library.pushMatrix(m)
 	else
 		newmatrix = v_unwrap(m)
 	end
-	if renderdata.renderEnt and renderdata.renderEnt.Transform then
+	if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
 		newmatrix = renderdata.renderEnt.Transform * newmatrix
 	end
 	matrix_stack[id+1] = newmatrix
@@ -333,6 +270,62 @@ function render_library.popMatrix()
 	if #matrix_stack <= 0 then SF.throw( "Popped too many matricies", 2 ) end
 	matrix_stack[#matrix_stack] = nil
 	cam.PopModelMatrix()
+end
+
+
+local viewmatrix_checktypes =
+{
+	x = "number", y = "number", w = "number", h = "number", type = "string",
+	origin = SF.Vectors.Metatable, angles = SF.Angles.Metatable, fov = "number",
+	aspect = "number", zfar = "number", znear = "number", subrect = "boolean",
+	bloomtone = "boolean", offcenter = "table", ortho = "table"
+}
+--- Pushes a perspective matrix onto the view matrix stack.
+-- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
+function render_library.pushViewMatrix(tbl)
+	local renderdata = SF.instance.data.render
+	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if view_matrix_stack == MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
+	if renderdata.usingRT then SF.throw( "Can't start a new context within a 2D rendertarget", 2 ) end
+	if tbl.type ~= "2D" and tbl.type ~= "3D" then SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 ) end
+	
+	local newtbl = {}
+	for k, v in pairs(tbl) do
+		if viewmatrix_checktypes[k] then
+			SF.CheckType( v, viewmatrix_checktypes[k] )
+			newtbl[k] = v
+		else
+			SF.throw( "Invalid key found in view matrix: " .. k, 2 )
+		end
+	end
+	if newtbl.origin then newtbl.origin = SF.Vectors.Unwrap( newtbl.origin ) end
+	if newtbl.angles then newtbl.angles = SF.Angles.Unwrap( newtbl.angles ) end
+	if newtbl.offcenter then
+		SF.CheckType( tbl.offcenter.left, "number" )
+		SF.CheckType( tbl.offcenter.right, "number" )
+		SF.CheckType( tbl.offcenter.bottom, "number" )
+		SF.CheckType( tbl.offcenter.top, "number" )
+	end
+	if newtbl.ortho then
+		SF.CheckType( tbl.ortho.left, "number" )
+		SF.CheckType( tbl.ortho.right, "number" )
+		SF.CheckType( tbl.ortho.bottom, "number" )
+		SF.CheckType( tbl.ortho.top, "number" )
+	end
+	
+	cam.Start(newtbl)
+	view_matrix_stack = view_matrix_stack + 1
+end
+
+--- Pops a view matrix from the matrix stack.
+function render_library.popViewMatrix()
+	local renderdata = SF.instance.data.render
+	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if view_matrix_stack == 0 then SF.throw( "Popped too many matricies", 2 ) end
+	if renderdata.usingRT then SF.throw( "Can't start a new context within a 2D rendertarget", 2 ) end
+	
+	cam.End()
+	view_matrix_stack = view_matrix_stack - 1
 end
 
 --- Sets the draw color
@@ -444,6 +437,11 @@ function render_library.createRenderTarget ( name )
 		globalRTs[ rtname ] = rt
 	end
 	rt[ 2 ] = false
+	rt[ 3 ] = CreateMaterial( "StarfallCustomModel_"..name..SF.instance.data.entity:EntIndex(), "VertexLitGeneric", {
+		[ "$model" ] = 1,
+	} )
+	rt[3]:SetTexture("$basetexture", rt[1])
+	
 	data.rendertargets[ name ] = rtname
 end
 
@@ -494,6 +492,20 @@ function render_library.setRenderTargetTexture ( name )
 	end
 end
 
+--- Returns the model material name that uses the render target.
+--- Alternatively, just construct the name yourself with "!StarfallCustomModel_"..name..chip():entIndex() 
+-- @param name Render target name
+-- @return Model material name. Send this to the server to set the entity's material.
+function render_library.getRenderTargetMaterial( name )
+	local data = SF.instance.data.render
+	SF.CheckType( name, "string" )
+
+	local rtname = data.rendertargets[ name ]
+	if rtname and globalRTs[ rtname ] then
+		return "!"..tostring(globalRTs[ rtname ][ 3 ])
+	end
+end
+
 --- Sets the texture of a screen entity
 -- @param ent Screen entity
 function render_library.setTextureFromScreen ( ent )
@@ -512,16 +524,55 @@ end
 --- Clears the surface
 -- @param clr Color type to clear with
 function render_library.clear ( clr )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
 	if SF.instance.data.render.usingRT then
 		if clr == nil then
-			if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
 			render.Clear( 0, 0, 0, 255 )
 		else
 			SF.CheckType( clr, SF.Types[ "Color" ] )
-			if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
 			render.Clear( clr.r, clr.g, clr.b, clr.a )
 		end
 	end
+end
+
+--- Draws a rounded rectangle using the current color
+-- @param r The corner radius
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
+-- @param w Width
+-- @param h Height
+function render_library.drawRoundedBox ( r, x, y, w, h )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( r, "number" )
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	draw.RoundedBox( r, x, y, w, h, currentcolor )
+end
+
+--- Draws a rounded rectangle using the current color
+-- @param r The corner radius
+-- @param x Top left corner x coordinate
+-- @param y Top left corner y coordinate
+-- @param w Width
+-- @param h Height
+-- @param tl Boolean Top left corner
+-- @param tr Boolean Top right corner
+-- @param bl Boolean Bottom left corner
+-- @param br Boolean Bottom right corner
+function render_library.drawRoundedBoxEx ( r, x, y, w, h, tl, tr, bl, br )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( r, "number" )
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( w, "number" )
+	SF.CheckType( h, "number" )
+	SF.CheckType( tl, "boolean" )
+	SF.CheckType( tr, "boolean" )
+	SF.CheckType( bl, "boolean" )
+	SF.CheckType( br, "boolean" )
+	draw.RoundedBoxEx( r, x, y, w, h, currentcolor, tl, tr, bl, br )
 end
 
 --- Draws a rectangle using the current color.
@@ -642,52 +693,25 @@ end
 -- @param blur Enable blur?
 -- @usage
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
--- \- DebugFixed
--- \- DebugFixedSmall
--- \- DefaultFixedOutline
--- \- MenuItem
--- \- Default
--- \- TabLarge
--- \- DefaultBold
--- \- DefaultUnderline
--- \- DefaultSmall
--- \- DefaultSmallDropShadow
--- \- DefaultVerySmall
--- \- DefaultLarge
--- \- UiBold
--- \- MenuLarge
--- \- ConsoleText
--- \- Marlett
--- \- Trebuchet18
--- \- Trebuchet19
--- \- Trebuchet20
--- \- Trebuchet22
--- \- Trebuchet24
--- \- HUDNumber
--- \- HUDNumber1
--- \- HUDNumber2
--- \- HUDNumber3
--- \- HUDNumber4
--- \- HUDNumber5
--- \- HudHintTextLarge
--- \- HudHintTextSmall
--- \- CenterPrintText
--- \- HudSelectionText
--- \- DefaultFixed
--- \- DefaultFixedDropShadow
--- \- CloseCaption_Normal
--- \- CloseCaption_Bold
--- \- CloseCaption_BoldItalic
--- \- TitleFont
--- \- TitleFont2
--- \- ChatFont
--- \- TargetID
--- \- TargetIDSmall
--- \- HL2MPTypeDeath
--- \- BudgetLabel
--- \- DejaVu Sans Mono (shipped, monospaced)
+-- \- Akbar
+-- \- Coolvetica
+-- \- Roboto
+-- \- Courier New
+-- \- Verdana
+-- \- Arial
+-- \- HalfLife2
+-- \- hl2mp
+-- \- csd
+-- \- Tahoma
+-- \- Trebuchet
+-- \- Trebuchet MS
+-- \- DejaVu Sans Mono
+-- \- Lucida Console
+-- \- Times New Roman
+
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
-	if not validfonts[font] then SF.throw( "invalid font", 2 ) end
+	font = validfonts[string.lower(font)]
+	if not font then SF.throw( "invalid font", 2 ) end
 
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -712,6 +736,7 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	end
 	return name
 end
+defaultFont = render_library.createFont("Default", 16, 400, false, false, false, false, 0)
 
 --- Gets the size of the specified text. Don't forget to use setFont before calling this function
 -- @param text Text to get the size of
@@ -726,6 +751,29 @@ end
 
 --- Sets the font
 -- @param font The font to use
+-- @usage Use a font created by render.createFont or use one of these already defined fonts:
+-- \- DebugFixed
+-- \- DebugFixedSmall
+-- \- Default
+-- \- Marlett
+-- \- Trebuchet18
+-- \- Trebuchet24
+-- \- HudHintTextLarge
+-- \- HudHintTextSmall
+-- \- CenterPrintText
+-- \- HudSelectionText
+-- \- CloseCaption_Normal
+-- \- CloseCaption_Bold
+-- \- CloseCaption_BoldItalic
+-- \- ChatFont
+-- \- TargetID
+-- \- TargetIDSmall
+-- \- HL2MPTypeDeath
+-- \- BudgetLabel
+-- \- HudNumbers
+-- \- DermaDefault
+-- \- DermaDefaultBold
+-- \- DermaLarge
 function render_library.setFont(font)
 	if not defined_fonts[font] then SF.throw( "Font does not exist.", 2 ) end
 	SF.instance.data.render.font = font
@@ -738,7 +786,7 @@ function render_library.getDefaultFont()
 	return defaultFont
 end
 
---- Draws text.
+--- Draws text with newlines and tabs
 -- @param x X coordinate
 -- @param y Y coordinate
 -- @param text Text to draw
@@ -754,44 +802,48 @@ function render_library.drawText ( x, y, text, alignment )
 
 	local font = SF.instance.data.render.font or defaultFont
 
-	draw.DrawText( text, font, x, y, currentcolor, alignment or TEXT_ALIGN_LEFT )
+	draw.DrawText( text, font, x, y, currentcolor, alignment )
 end
 
---- Compiles a 2D poly. This is needed so that poly don't have to be
--- type-checked each frame. Polys can be indexed by a number, in which
--- a copy of the vertex at that spot is returned. They can also be assigned
--- a new vertex at 1 <= i <= #poly+1. And the length of the poly can be taken.
--- @param verts Array of verticies to convert.
--- @return compiled polygon
-function render_library.createPoly(verts)
-	SF.CheckType(verts,"table")
-	local poly = {}
-	local wrappedpoly = wrappoly(poly)
-	for i=1,#verts do
-		local v = verts[i]
-		SF.CheckType(v,"table")
-		poly[i] = checkvertex(v)
-	end
-	return wrappedpoly
+--- Draws text more easily and quickly but no new lines or tabs.
+-- @param x X coordinate
+-- @param y Y coordinate
+-- @param text Text to draw
+-- @param xalign Text x alignment
+-- @param yalign Text y alignment
+function render_library.drawSimpleText ( x, y, text, xalign, yalign )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	SF.CheckType( text, "string" )
+	if xalign then SF.CheckType( xalign, "number" ) end
+	if yalign then SF.CheckType( yalign, "number" ) end
+
+	local font = SF.instance.data.render.font or defaultFont
+
+	draw.SimpleText( text, font, x, y, currentcolor, xalign, yalign )
 end
 
---- Draws a polygon. Takes a compiled/uncompiled poly to draw.
--- Note that if you do use an uncompiled poly, you will use up ops
--- very quickly!
--- @param poly Compiled poly or array of vertexes
+--- Constructs a markup object for quick styled text drawing.
+-- @param markup The markup string to parse
+-- @param maxsize The max width of the markup
+-- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
+function render_library.parseMarkup( str, maxsize )
+	SF.CheckType( str, "string" )
+	SF.CheckType( maxsize, "number" )
+	local marked = markup.Parse( str, maxsize )
+	local markedindex = marked.__index
+	return setmetatable(marked, {
+		__newindex = function() end,
+		__index = markedindex,
+		__metatable = ""
+	})
+end
+
+--- Draws a polygon.
+-- @param poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
 function render_library.drawPoly(poly)
-	if dgetmeta(poly) ~= poly_metamethods then
-		SF.CheckType(poly,"table")
-		local verts = poly
-		poly = {}
-		for i=1,#verts do
-			local v = verts[i]
-			SF.CheckType(v,"table")
-			poly[i] = checkvertex(v)
-		end
-	else
-		poly = unwrappoly(poly)
-	end
+	SF.CheckType(poly,"table")
 	surface.DrawPoly(poly)
 end
 

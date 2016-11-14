@@ -228,7 +228,7 @@ end
 --- Does a line trace
 -- @param start Start position
 -- @param endpos End position
--- @param filter Entity/array of entities to filter
+-- @param filter Entity/array of entities to filter, or a function callback with an entity arguement
 -- @param mask Trace mask
 -- @return Result of the trace
 function trace_library.trace ( start, endpos, filter, mask )
@@ -238,7 +238,17 @@ function trace_library.trace ( start, endpos, filter, mask )
 
 	local start, endpos = vunwrap( start ), vunwrap( endpos )
 
-	filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+	if type(filter) == "function" then
+		local filterfunc = filter
+		filter = function(ent)
+			local ok, msg, traceback = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
+			if not ok then
+				SF.instance:Error( "Trace filter callback errored with: " .. msg, traceback )
+			end
+		end
+	else
+		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+	end
 	if mask ~= nil then mask = SF.CheckType( mask, "number" ) end
 
 	local trace = {
@@ -261,7 +271,7 @@ end
 -- @param endpos End position
 -- @param minbox Lower box corner
 -- @param maxbox Upper box corner
--- @param filter Entity/array of entities to filter
+-- @param filter Entity/array of entities to filter, or a function callback with an entity arguement
 -- @param mask Trace mask
 -- @return Result of the trace
 function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
@@ -273,7 +283,17 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 
 	local start, endpos, minbox, maxbox = vunwrap( start ), vunwrap( endpos ), vunwrap( minbox ), vunwrap( maxbox )
 
-	filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+	if type(filter) == "function" then
+		local filterfunc = filter
+		filter = function(ent)
+			local ok, msg, traceback = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
+			if not ok then
+				SF.instance:Error( "Trace filter callback errored with: " .. msg, traceback )
+			end
+		end
+	else
+		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+	end
 	if mask ~= nil then mask = SF.CheckType( mask, "number" ) end
 
 	local trace = {

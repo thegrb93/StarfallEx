@@ -80,7 +80,7 @@ function timer_library.create(name, delay, reps, func, simple)
 		end
 	end
 	
-	timer.Create(timername, delay, reps, timercb )
+	timer.Create(timername, math.max(delay, 0.001), reps, timercb )
 	
 	instance.data.timers[timername] = true
 end

@@ -34,16 +34,9 @@ function ENT:DrawHUD()
 	draw.NoTexture()
 	surface.SetDrawColor( 255, 255, 255, 255 )
 	
-	if instance.hooks[ "render" ] then
-		local ok, rt, tb = instance:runScriptHook( "render" )
-		if not ok then
-			self.link:Error( rt, tb )
-		end
-	end
-
-	if data.render.usingRT then
-		render.PopRenderTarget()
-		data.render.usingRT = false
+	local ok, rt, tb = instance:runScriptHook( "render" )
+	if not ok then
+		self.link:Error( rt, tb )
 	end
 	
 	render.PopFilterMag()

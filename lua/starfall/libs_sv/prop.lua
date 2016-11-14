@@ -17,21 +17,17 @@ SF.Props.burstrate = CreateConVar( "sf_props_burstrate", "4", {FCVAR_ARCHIVE,FCV
 	"The rate at which the burst regenerates per second." )
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege( "prop.create", "Create prop", "Allows the user to create props" )
-end
+SF.Permissions.registerPrivilege( "prop.create", "Create prop", "Allows the user to create props" )
 
-local insts = {}
-local plyCount = setmetatable({}, {__mode="k"})
+-- Table with player keys that automatically cleans when player leaves.
+local plyCount = SF.EntityTable("playerProps")
 
 SF.Libraries.AddHook("initialize",function(inst)
 	inst.data.props = {
 		props = {},
-		burst = SF.Props.burstmax:GetInt() or 4
+		burst = SF.BurstObject( SF.Props.burstrate:GetFloat(), SF.Props.burstmax:GetFloat() )
 	}
 
-	insts[inst] = true
 	plyCount[inst.player] = plyCount[inst.player] or 0
 end)
 
@@ -46,7 +42,6 @@ SF.Libraries.AddHook("deinitialize", function(inst)
 	end
 	
 	inst.data.props.props = nil
-	insts[inst]= nil
 end)
 
 local function propOnDestroy(propent, propdata, ply)
@@ -58,20 +53,6 @@ local function propOnDestroy(propent, propdata, ply)
 	end
 end
 
-
---- Updates/Checks burst constraints
--- @class function
--- @param instance Instance table for the burst values related to current SF Instance / Player
--- @param noupdate False if updating the burst should be done.
-local function can_spawn(instance, noupdate)
-	if instance.data.props.burst > 0 then
-		if not noupdate then instance.data.props.burst = instance.data.props.burst - 1 end
-		return true
-	else
-		return false
-	end
-end
-
 --- Checks if the users personal limit of props has been exhausted
 -- @class function
 -- @param i Instance to use, this will relate to the player in question
@@ -80,20 +61,6 @@ local function personal_max_reached( i )
 	if SF.Props.personalquota:GetInt() < 0 then return false end
 	return plyCount[i.player] >= SF.Props.personalquota:GetInt()
 end
-
-local function regenerateBurst()
-	for i, _ in pairs( insts ) do
-		if i.data.props.burst < SF.Props.burstmax:GetInt() or 4 then -- Should allow for dynamic changing of burst rate from the server.
-			i.data.props.burst = i.data.props.burst + 1
-		end
-	end
-end
-
-timer.Create( "SF_Prop_BurstCounter", 1 / math.max( SF.Props.burstrate:GetFloat() or 4, 0.0001 ), 0, regenerateBurst )
-
-cvars.AddChangeCallback( "sf_props_burstrate", function( convar_name, value_old, value_new )
-	timer.Adjust( "SF_Prop_BurstCounter", 1 / math.max( SF.Props.burstrate:GetFloat() or 4, 0.0001 ), 0, regenerateBurst )
-end ) 
 
 --- Creates a prop.
 -- @server
@@ -111,7 +78,8 @@ function props_library.create ( pos, ang, model, frozen )
 	local ang = SF.Angles.Unwrap( ang )
 
 	local instance = SF.instance
-	if not can_spawn( instance ) then return SF.throw( "Can't spawn props that often", 2 )
+	print(instance.data.props.burst:check())
+	if not instance.data.props.burst:use(1) then return SF.throw( "Can't spawn props that often", 2 )
 	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 	if not gamemode.Call( "PlayerSpawnProp", instance.player, model ) then return end
 
@@ -160,7 +128,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 	local ang = SF.Angles.Unwrap( ang )
 
 	local instance = SF.instance
-	if not can_spawn( instance ) then return SF.throw( "Can't spawn props that often", 2 )
+	if not instance.data.props.burst:use(1) then return SF.throw( "Can't spawn props that often", 2 )
 	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 
 	local swep = list.Get( "Weapon" )[ class ]
@@ -228,7 +196,7 @@ function props_library.canSpawn ()
 	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return false end
 	
 	local instance = SF.instance
-	return not personal_max_reached( instance ) and can_spawn( instance, true )
+	return not personal_max_reached( instance ) and instance.data.props.burst:check()>1
 	
 end
 

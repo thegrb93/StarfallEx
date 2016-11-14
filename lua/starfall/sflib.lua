@@ -288,6 +288,41 @@ function SF.UnwrapObject( object )
 	end
 end
 
+--- Manages data tied to entities so that the data is cleaned when the entity is removed
+function SF.EntityTable( key )
+	return setmetatable({}, 
+	{__newindex = function(t, e, v)
+		rawset(t, e, v)
+		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
+	end})
+end
+
+--- Returns a class that can keep track of burst
+function SF.BurstObject( rate, max )
+	local burstclass = {
+		use = function(self, amount)
+			self:check()
+			if self.val>= amount then
+				self.val = self.val - amount
+				return true
+			end
+			return false
+		end,
+		check = function(self)
+			self.val = math.min( self.val + (CurTime() - self.lasttick)*self.rate, self.max )
+			self.lasttick = CurTime()
+			return self.val
+		end
+	}
+	local t = {
+		rate = rate, 
+		max = max,
+		val = max,
+		lasttick = 0
+	}
+	return setmetatable(t, {__index=burstclass})
+end
+
 local wrappedfunctions = setmetatable({},{__mode="kv"})
 local wrappedfunctions2instance = setmetatable({},{__mode="kv"})
 --- Wraps the given starfall function so that it may called directly by GMLua
@@ -661,6 +696,20 @@ end
 
 -- ------------------------------------------------------------------------- --
 
+local function cleanHooks( file )
+	for k, v in pairs(SF.Libraries.hooks) do
+		local i = 1
+		while i <= #v do
+			local hookfile = string.lower(string.sub(string.GetFileFromFilename( debug.getinfo( v[i], "S" ).short_src or "" ), 1, -5))
+			if file == hookfile then
+				table.remove( v, i )
+			else
+				i = i + 1
+			end
+		end
+	end
+end
+
 if SERVER then
 	local l
 	MsgN("-SF - Loading Libraries")
@@ -697,29 +746,33 @@ if SERVER then
 	util.AddNetworkString("sf_reloadlibrary")
 	concommand.Add("sf_reloadlibrary", function(ply, com, arg)
 		if ply:IsValid() and not ply:IsSuperAdmin() then return end
-		if not arg[1] then return end
+		local filename = arg[1]
+		if not filename then return end
+		filename = string.lower( filename )
 		
 		local function sendToClient(name)
 			net.Start("sf_reloadlibrary")
 			local data = util.Compress(file.Read(name,"LUA"))
-			net.WriteString(arg[1])
+			net.WriteString(filename)
 			net.WriteData(data, #data)
 			net.Broadcast()
 		end
 		
-		local sv_filename = "starfall/libs_sv/"..arg[1]..".lua"
-		local sh_filename = "starfall/libs_sh/"..arg[1]..".lua"
-		local cl_filename = "starfall/libs_cl/"..arg[1]..".lua"
+		local sv_filename = "starfall/libs_sv/"..filename..".lua"
+		local sh_filename = "starfall/libs_sh/"..filename..".lua"
+		local cl_filename = "starfall/libs_cl/"..filename..".lua"
+		
+		cleanHooks( filename )
 		
 		local postload
 		if file.Exists( sh_filename, "LUA" ) then
-			print("Reloaded library: " .. arg[1])
+			print("Reloaded library: " .. filename)
 			include(sh_filename)
 			sendToClient(sh_filename)
 			postload = true
 		end
 		if file.Exists( sv_filename, "LUA" ) then
-			print("Reloaded library: " .. arg[1])
+			print("Reloaded library: " .. filename)
 			include(sv_filename)
 			postload = true
 		end
@@ -736,6 +789,7 @@ else
 	net.Receive("sf_reloadlibrary", function(len)
 		local name = net.ReadString()
 		print("Reloaded library: " .. name)
+		cleanHooks( name )
 		local file = util.Decompress(net.ReadData(len/8 - #name - 1))
 		if file then
 			local func = CompileString( file, "starfall/" .. name .. ".lua" )

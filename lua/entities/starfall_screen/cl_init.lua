@@ -72,10 +72,6 @@ function ENT:RenderScreen()
 
 			self.link:runScriptHook( "render" )
 
-			if data.render.usingRT then
-				render.PopRenderTarget()
-				data.render.usingRT = false
-			end
 			data.render.isRendering = nil
 		
 		elseif self.link.error then
@@ -105,6 +101,7 @@ function ENT:DrawTranslucent ()
 	-- Draw screen here
 	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
 	self.Transform = transform
+	cam.Start({type = "3D", znear = 3.001})
 	cam.PushModelMatrix( transform )
 		render.ClearStencil()
 		render.SetStencilEnable( true )
@@ -118,10 +115,10 @@ function ENT:DrawTranslucent ()
 		render.OverrideDepthEnable( true, true )
 		surface.SetDrawColor(0,0,0,255)
 		surface.DrawRect(0,0,512/self.Aspect,512)
+		render.OverrideDepthEnable( false )
 
 		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
 		render.SetStencilTestMask( 1 )
-		render.OverrideDepthEnable( false )
 		
 		render.PushFilterMag( TEXFILTER.ANISOTROPIC )
 		render.PushFilterMin( TEXFILTER.ANISOTROPIC )
@@ -132,7 +129,8 @@ function ENT:DrawTranslucent ()
 		render.PopFilterMin()
 		
 		render.SetStencilEnable( false )
-	cam.PopModelMatrix( )
+	cam.PopModelMatrix()
+	cam.End()
 end
 
 function ENT:GetResolution()
@@ -294,6 +292,42 @@ ENT.Monitor_Offsets = {
 		x2	=	189.8,
 		y1	=	-189.8,
 		y2	=	189.8,
+		z	=	1.7,
+	},
+	["models/hunter/plates/plate16x16.mdl"] = {
+		Name	=	"plate16x16.mdl",
+		RS	=	1.482,
+		RatioX	=	1,
+		offset	=	Vector(0, 0, 2),
+		rot	=	Angle(0, 90, 180),
+		x1	=	-379.6,
+		x2	=	379.6,
+		y1	=	-379.6,
+		y2	=	379.6,
+		z	=	1.7,
+	},
+	["models/hunter/plates/plate24x24.mdl"] = {
+		Name	=	"plate24x24.mdl",
+		RS	=	2.223,
+		RatioX	=	1,
+		offset	=	Vector(0, 0, 2),
+		rot	=	Angle(0, 90, 180),
+		x1	=	-569.4,
+		x2	=	569.4,
+		y1	=	-569.4,
+		y2	=	569.4,
+		z	=	1.7,
+	},
+	["models/hunter/plates/plate32x32.mdl"] = {
+		Name	=	"plate32x32.mdl",
+		RS	=	2.964,
+		RatioX	=	1,
+		offset	=	Vector(0, 0, 2),
+		rot	=	Angle(0, 90, 180),
+		x1	=	-759.2,
+		x2	=	759.2,
+		y1	=	-759.2,
+		y2	=	759.2,
 		z	=	1.7,
 	},
 	["models/kobilica/wiremonitorbig.mdl"] = {

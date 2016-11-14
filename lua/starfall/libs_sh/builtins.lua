@@ -159,6 +159,13 @@ function SF.DefaultEnvironment.quotaMax ()
 	return SF.instance.context.cpuTime.getMax()
 end
 
+--- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
+-- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50% 
+function SF.DefaultEnvironment.setSoftQuota ( quota )
+	SF.CheckType( quota, "number" )
+	self.cpu_softquota = quota
+end
+
 -- The below modules have the Gmod functions removed (the ones that begin with a capital letter),
 -- as requested by Divran
 
@@ -244,6 +251,7 @@ if CLIENT then
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText( txt )
 		if SF.instance.player ~= LocalPlayer() then return end
+		SF.CheckType( txt, "string" )
 		SetClipboardText( txt )
 	end
 	
@@ -477,25 +485,6 @@ function SF.DefaultEnvironment.isValid( object )
 	return object:isValid()
 
 end
-
--- ------------------------- Restrictions ------------------------- --
--- Restricts access to builtin type's metatables
-
-local _R = debug.getregistry()
-local function restrict( instance, hook, name, ok, err )
-	_R.Vector.__metatable = "Vector"
-	_R.Angle.__metatable = "Angle"
-	_R.VMatrix.__metatable = "VMatrix"
-end
-
-local function unrestrict( instance, hook, name, ok, err )
-	_R.Vector.__metatable = nil
-	_R.Angle.__metatable = nil
-	_R.VMatrix.__metatable = nil
-end
-
-SF.Libraries.AddHook( "prepare", restrict )
-SF.Libraries.AddHook( "cleanup", unrestrict )
 
 local _KEY = {
 	[ "FIRST" ] = 0,

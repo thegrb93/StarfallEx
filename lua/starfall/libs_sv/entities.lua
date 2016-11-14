@@ -34,6 +34,7 @@ do
 	P.registerPrivilege( "entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion" )
 	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence" )
 	P.registerPrivilege( "entities.remove", "Remove", "Allows the user to remove entities" )
+	P.registerPrivilege( "entities.ignite", "Ignite", "Allows the user to ignite entities" )
 	P.registerPrivilege( "entities.emitSound", "Emitsound", "Allows the user to play sounds on entities" )
 	P.registerPrivilege( "entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity" )
 	P.registerPrivilege( "entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity" )
@@ -120,6 +121,7 @@ end
 -- @param attachment Optional string attachment name to parent to
 function ents_methods:setParent ( ent, attachment )
 	SF.CheckType( self, ents_metatable )
+	SF.CheckType( ent, ents_metatable )
 
 	local ent = unwrap( ent )
 	local this = unwrap( self )
@@ -490,7 +492,7 @@ local shaderBlacklist = {
 local function invalidMaterial( material )
 	if string.find( string.lower( material ) , "pp[%./\\]+copy" ) then return true end
 	local mat = Material( material )
-	if shaderBlacklist[ mat:GetShader() ] then return true end
+	if mat and shaderBlacklist[ mat:GetShader() ] then return true end
 end
 
 --- Sets an entities' material
@@ -691,6 +693,38 @@ function ents_methods:breakEnt ()
 	ent:Fire( "break", 1, 0 )
 end
 
+--- Ignites an entity
+-- @param length How long the fire lasts
+-- @param radius (optional) How large the fire hitbox is (entity obb is the max)
+function ents_methods:ignite( length, radius )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( length, "number" )
+
+	local ent = unwrap( self )
+
+	if radius then
+		SF.CheckType( radius, "number" )
+		local obbmins, obbmaxs = ent:OBBMins(), ent:OBBMaxs()
+		radius = math.Clamp( radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2 )
+	end
+
+	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.ignite" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	ent:Ignite( length, radius )
+end
+
+--- Extinguishes an entity
+function ents_methods:extinguish()
+	SF.CheckType( self, ents_metatable )
+
+	local ent = unwrap( self )
+	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.ignite" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	ent:Extinguish()
+end
+
 --- Sets the entity frozen state
 -- @param freeze Should the entity be frozen?
 function ents_methods:setFrozen ( freeze )
@@ -720,6 +754,7 @@ end
 -- For more information please refer to GLua function http://wiki.garrysmod.com/page/Entity/SetNotSolid
 -- @param solid Boolean, Should the entity be solid?
 function ents_methods:setSolid ( solid )
+	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
@@ -730,6 +765,7 @@ end
 --- Sets the entity's mass
 -- @param mass number mass
 function ents_methods:setMass ( mass )
+	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 
 	local phys = getPhysObject( ent )
@@ -738,6 +774,21 @@ function ents_methods:setMass ( mass )
 	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
 
 	phys:SetMass( math.Clamp(mass, 1, 50000) )
+end
+
+--- Sets the physical material of the entity
+-- @param mat Material to use
+function ents_methods:setPhysMaterial( mat )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( mat, "string" )
+	local ent = unwrap( self )
+
+	local phys = getPhysObject( ent )
+	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+
+	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
+
+	construct.SetPhysProp( nil, ent, 0, phys, {Material = mat} ) 
 end
 
 --- Sets entity gravity
