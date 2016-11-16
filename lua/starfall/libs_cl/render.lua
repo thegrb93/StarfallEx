@@ -87,7 +87,7 @@ end
 
 SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	if hook == "render" then
-		currentcolor = Color(0,0,0,0)
+		currentcolor = Color(255,255,255,255)
 		render.SetColorMaterial()
 	end
 end )
