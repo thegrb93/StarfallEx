@@ -54,7 +54,8 @@ local dgetmeta = debug.getmetatable
 local matrix_meta = SF.VMatrix.Metatable --debug.getregistry().VMatrix
 
 local v_unwrap = SF.VMatrix.Unwrap
-
+local vunwrap = SF.UnwrapObject
+local aunwrap = SF.Angles.Unwrap
 
 local function sfCreateMaterial( name )
 	return CreateMaterial( name, "UnlitGeneric", {
@@ -87,11 +88,14 @@ end
 SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	if hook == "render" then
 		currentcolor = Color(0,0,0,0)
+    render.SetColorMaterial()
 	end
 end )
 
 SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 	if hook == "render" then
+    render.OverrideDepthEnable(false, false)
+
 		for i=#matrix_stack,1,-1 do
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
@@ -174,16 +178,16 @@ local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "30", { 
 
 local function LoadURLMaterial( url, alignment, cb )
 	if table.Count(texturecachehttp) + #LoadingURLQueue >= cv_max_url_materials:GetInt() then return end
-	
+
 	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()))
-		
+
 	if #LoadingURLQueue == 0 then
 		timer.Create("SF_URLMaterialChecker",1,0,CheckURLDownloads)
 	end
 	LoadingURLQueue[#LoadingURLQueue + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
-	
+
 	return urlmaterial
-	
+
 end
 
 texturecache = setmetatable({},{__mode = "k"})
@@ -242,7 +246,7 @@ local defaultFont
 
 --- Pushes a matrix onto the matrix stack.
 -- @param m The matrix
--- @param world Should the transformation be relative to the screen or world? 
+-- @param world Should the transformation be relative to the screen or world?
 function render_library.pushMatrix(m, world)
 	SF.CheckType(m,matrix_meta)
 	local renderdata = SF.instance.data.render
@@ -293,7 +297,7 @@ function render_library.pushViewMatrix(tbl)
 	else
 		SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 )
 	end
-	
+
 	local newtbl = {}
 	for k, v in pairs(tbl) do
 		if viewmatrix_checktypes[k] then
@@ -317,7 +321,7 @@ function render_library.pushViewMatrix(tbl)
 		SF.CheckType( tbl.ortho.bottom, "number" )
 		SF.CheckType( tbl.ortho.top, "number" )
 	end
-	
+
 	cam.Start(newtbl)
 	view_matrix_stack[#view_matrix_stack+1] = endfunc
 end
@@ -328,7 +332,7 @@ function render_library.popViewMatrix()
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	local i = #view_matrix_stack
 	if i == 0 then SF.throw( "Popped too many matricies", 2 ) end
-	
+
 	cam[view_matrix_stack[i]]()
 	view_matrix_stack[i] = nil
 end
@@ -374,7 +378,7 @@ function render_library.getTextureID ( tx, cb, alignment )
 		else
 			alignment = "center"
 		end
-		
+
 		local instance = SF.instance
 
 		local tbl = {}
@@ -411,13 +415,17 @@ function render_library.setTexture ( id )
 	if id then
 		if texturecache[ id ] then
 			surface.SetMaterial( texturecache[ id ] )
+			render.SetMaterial( texturecache[ id ] )
 		elseif texturecachehttp[ id ] then
 			surface.SetMaterial( texturecachehttp[ id ] )
+			render.SetMaterial( texturecachehttp[ id ] )
 		else
 			draw.NoTexture()
+			render.SetColorMaterial()
 		end
 	else
 		draw.NoTexture()
+		render.SetColorMaterial()
 	end
 end
 
@@ -446,7 +454,7 @@ function render_library.createRenderTarget ( name )
 		[ "$model" ] = 1,
 	} )
 	rt[3]:SetTexture("$basetexture", rt[1])
-	
+
 	data.rendertargets[ name ] = rtname
 end
 
@@ -503,7 +511,7 @@ function render_library.setRenderTargetTexture ( name )
 end
 
 --- Returns the model material name that uses the render target.
---- Alternatively, just construct the name yourself with "!StarfallCustomModel_"..name..chip():entIndex() 
+--- Alternatively, just construct the name yourself with "!StarfallCustomModel_"..name..chip():entIndex()
 -- @param name Render target name
 -- @return Model material name. Send this to the server to set the entity's material.
 function render_library.getRenderTargetMaterial( name )
@@ -856,6 +864,151 @@ function render_library.drawPoly(poly)
 	SF.CheckType(poly,"table")
 	surface.DrawPoly(poly)
 end
+
+--- Enables or disables Depth Buffer
+-- @param enable true to enable
+function render_library.enableDepth ( enable )
+  SF.CheckType( enable, "boolean" )
+  render.OverrideDepthEnable(enable, enable)
+end
+
+--- Draws a sphere
+-- @param pos Position of the sphere
+-- @param radius Radius of the sphere
+-- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
+-- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
+function render_library.draw3DSphere ( pos, radius, longitudeSteps, latitudeSteps )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( pos, SF.Types[ "Vector" ] )
+  SF.CheckType( radius, "number" )
+	SF.CheckType( longitudeSteps, "number" )
+	SF.CheckType( latitudeSteps, "number" )
+  pos = vunwrap( pos )
+  longitudeSteps = math.min( longitudeSteps, 50 )
+  latitudeSteps = math.min( latitudeSteps, 50 )
+	render.DrawSphere( pos, radius, longitudeSteps, latitudeSteps, currentcolor, true )
+end
+
+--- Draws a wireframe sphere
+-- @param pos Position of the sphere
+-- @param radius Radius of the sphere
+-- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
+-- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
+function render_library.draw3DWireframeSphere ( pos, radius, longitudeSteps, latitudeSteps )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( pos, SF.Types[ "Vector" ] )
+  SF.CheckType( radius, "number" )
+	SF.CheckType( longitudeSteps, "number" )
+	SF.CheckType( latitudeSteps, "number" )
+  pos = vunwrap( pos )
+  longitudeSteps = math.min( longitudeSteps, 50 )
+  latitudeSteps = math.min( latitudeSteps, 50 )
+	render.DrawWireframeSphere( pos, radius, longitudeSteps, latitudeSteps, currentcolor, true )
+end
+
+--- Draws a 3D Line
+-- @param startPos Starting position
+-- @param endPos Ending position
+function render_library.draw3DLine ( startPos, endPos )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( startPos, SF.Types[ "Vector" ] )
+  SF.CheckType( endPos, SF.Types[ "Vector" ] )
+  startPos = vunwrap( startPos )
+  endPos = vunwrap( endPos )
+
+	render.DrawLine( startPos, endPos, currentcolor, true )
+end
+
+--- Draws a box in 3D space
+-- @param origin Origin of the box.
+-- @param angle Orientation  of the box
+-- @param mins Start position of the box, relative to origin.
+-- @param maxs End position of the box, relative to origin.
+function render_library.draw3DBox ( origin, angle, mins, maxs )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( origin, SF.Types[ "Vector" ] )
+  SF.CheckType( mins, SF.Types[ "Vector" ] )
+  SF.CheckType( maxs, SF.Types[ "Vector" ] )
+  SF.CheckType( angle, SF.Types[ "Angle" ] )
+  origin = vunwrap( origin )
+  mins = vunwrap( mins )
+  maxs = vunwrap( maxs )
+  angle = vunwrap( angle )
+
+	render.DrawBox( origin, angle, mins, maxs, currentcolor, true )
+end
+
+--- Draws a wireframe box in 3D space
+-- @param origin Origin of the box.
+-- @param angle Orientation  of the box
+-- @param mins Start position of the box, relative to origin.
+-- @param maxs End position of the box, relative to origin.
+function render_library.draw3DWireframeBox ( origin, angle, mins, maxs )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( origin, SF.Types[ "Vector" ] )
+  SF.CheckType( mins, SF.Types[ "Vector" ] )
+  SF.CheckType( maxs, SF.Types[ "Vector" ] )
+  SF.CheckType( angle, SF.Types[ "Angle" ] )
+  origin = vunwrap( origin )
+  mins = vunwrap( mins )
+  maxs = vunwrap( maxs )
+  angle = vunwrap( angle )
+
+	render.DrawWireframeBox( origin, angle, mins, maxs, currentcolor, false )
+end
+
+--- Draws textured beam.
+-- @param startPos Beam start position.
+-- @param endPos Beam end position.
+-- @param width The width of the beam.
+-- @param textureStart The start coordinate of the texture used.
+-- @param textureEnd The end coordinate of the texture used.
+function render_library.draw3DBeam ( startPos, endPos, width, textureStart, textureEnd )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( startPos, SF.Types[ "Vector" ] )
+  SF.CheckType( endPos, SF.Types[ "Vector" ] )
+  SF.CheckType( width, "number" )
+  SF.CheckType( textureStart, "number" )
+  SF.CheckType( textureEnd, "number" )
+
+  startPos = vunwrap( startPos )
+  endPos = vunwrap( endPos )
+
+	render.DrawBeam( startPos, endPos, width, textureStart, textureEnd, currentcolor )
+end
+
+--- Draws 2 connected triangles.
+-- @param vert1 First vertex.
+-- @param vert2 The second vertex.
+-- @param vert3 The third vertex.
+-- @param vert4 The fourth vertex.
+function render_library.draw3DQuad ( vert1, vert2, vert3, vert4 )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( vert1, SF.Types[ "Vector" ] )
+  SF.CheckType( vert2, SF.Types[ "Vector" ] )
+  SF.CheckType( vert3, SF.Types[ "Vector" ] )
+  SF.CheckType( vert4, SF.Types[ "Vector" ] )
+
+  vert1 = vunwrap( vert1 )
+  vert2 = vunwrap( vert2 )
+  vert3 = vunwrap( vert3 )
+  vert4 = vunwrap( vert4 )
+
+	render.DrawQuad( vert1, vert2, vert3, vert4, currentcolor )
+end
+
+--[[
+function render_library.drawModel ( pos, ang, model )
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+  SF.CheckType( pos, SF.Types[ "Vector" ] )
+  SF.CheckType( ang, SF.Types[ "Angle" ] )
+  SF.CheckType( model, "string" )
+  pos = vunwrap( pos )
+  ang = vunwrap( ang )
+	render.Model({["model"] = model, ["pos"] = pos, ["angle"] = ang})
+end
+--]]
+
 
 --- Gets a 2D cursor position where ply is aiming.
 -- @param ply player to get cursor position from
