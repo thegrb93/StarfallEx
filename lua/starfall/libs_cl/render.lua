@@ -69,7 +69,7 @@ end
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
-local view_matrix_stack = 0
+local view_matrix_stack = {}
 
 local globalRTs = {}
 local globalRTcount = 0
@@ -99,14 +99,13 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 		local data = instance.data.render
 		if data.usingRT then
 			render.SetRenderTarget()
-			cam.End2D()
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 		end
-		for i=1, view_matrix_stack do
-			cam.End()
+		for i=#view_matrix_stack,1,-1 do
+			cam[view_matrix_stack[i]]()
+			view_matrix_stack[i] = nil
 		end
-		view_matrix_stack = 0
 	end
 end )
 
@@ -285,9 +284,15 @@ local viewmatrix_checktypes =
 function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if view_matrix_stack == MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
-	if renderdata.usingRT then SF.throw( "Can't start a new context within a 2D rendertarget", 2 ) end
-	if tbl.type ~= "2D" and tbl.type ~= "3D" then SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 ) end
+	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
+	local endfunc
+	if tbl.type == "2D" then
+		endfunc = "End2D"
+	elseif tbl.type == "3D" then
+		endfunc = "End3D"
+	else
+		SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 )
+	end
 	
 	local newtbl = {}
 	for k, v in pairs(tbl) do
@@ -314,18 +319,18 @@ function render_library.pushViewMatrix(tbl)
 	end
 	
 	cam.Start(newtbl)
-	view_matrix_stack = view_matrix_stack + 1
+	view_matrix_stack[#view_matrix_stack+1] = endfunc
 end
 
 --- Pops a view matrix from the matrix stack.
 function render_library.popViewMatrix()
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if view_matrix_stack == 0 then SF.throw( "Popped too many matricies", 2 ) end
-	if renderdata.usingRT then SF.throw( "Can't start a new context within a 2D rendertarget", 2 ) end
+	local i = #view_matrix_stack
+	if i == 0 then SF.throw( "Popped too many matricies", 2 ) end
 	
-	cam.End()
-	view_matrix_stack = view_matrix_stack - 1
+	cam[view_matrix_stack[i]]()
+	view_matrix_stack[i] = nil
 end
 
 --- Sets the draw color
@@ -460,6 +465,7 @@ function render_library.selectRenderTarget ( name )
 			data.oldViewPort = {0, 0, ScrW(), ScrH()}
 			render.SetViewPort( 0, 0, 1024, 1024 )
 			cam.Start2D()
+			view_matrix_stack[#view_matrix_stack+1] = "End2D"
 			render.SetStencilEnable( false )
 		end
 		render.SetRenderTarget( rt )
@@ -467,7 +473,11 @@ function render_library.selectRenderTarget ( name )
 	else
 		if data.usingRT then
 			render.SetRenderTarget()
-			cam.End2D()
+			local i = #view_matrix_stack
+			if i>0 then
+				cam[view_matrix_stack[i]]()
+				view_matrix_stack[i] = nil
+			end
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 			render.SetStencilEnable( true )
