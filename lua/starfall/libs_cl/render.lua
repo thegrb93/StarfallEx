@@ -274,20 +274,18 @@ end
 function render_library.EnableScissorRect( startX, startY, endX, endY )
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if not data.usingRT then SF.throw( "Not using render target.", 2 ) end
 	SF.CheckType( startX, "number" )
 	SF.CheckType( startY, "number" )
 	SF.CheckType( endX, "number" )
 	SF.CheckType( endY, "number" )
-	render.SetScissorRect(x,y,w,h,true)
+	render.SetScissorRect( startX, startY, endX, endY, true )
 end
 
 --- Disables a scissoring rect which limits the drawing area.
 function render_library.DisableScissorRect()
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if not data.usingRT then SF.throw( "Not using render target.", 2 ) end
-	render.SetScissorRect(0,0,0,0,false)
+	render.SetScissorRect( 0 ,0 ,0 , 0, false )
 
 end
 
