@@ -266,12 +266,12 @@ function render_library.pushMatrix(m, world)
 	cam.PushModelMatrix(newmatrix)
 end
 
---- Enables a scissoring rect which limits the drawing area.
+--- Enables a scissoring rect which limits the drawing area. Only works 2D contexts such as HUD or render targets.
 -- @param startX X start coordinate of the scissor rect.
 -- @param startY Y start coordinate of the scissor rect.
 -- @param endX X end coordinate of the scissor rect.
 -- @param endX Y end coordinate of the scissor rect.
-function render_library.EnableScissorRect( startX, startY, endX, endY )
+function render_library.enableScissorRect( startX, startY, endX, endY )
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( startX, "number" )
@@ -282,7 +282,7 @@ function render_library.EnableScissorRect( startX, startY, endX, endY )
 end
 
 --- Disables a scissoring rect which limits the drawing area.
-function render_library.DisableScissorRect()
+function render_library.disableScissorRect()
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	render.SetScissorRect( 0 ,0 ,0 , 0, false )
