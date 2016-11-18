@@ -95,7 +95,7 @@ end )
 SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 	if hook == "render" then
 		render.OverrideDepthEnable(false, false)
-
+		render.SetScissorRect(0,0,0,0,false)
 		for i=#matrix_stack,1,-1 do
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
@@ -264,6 +264,29 @@ function render_library.pushMatrix(m, world)
 	end
 	matrix_stack[id+1] = newmatrix
 	cam.PushModelMatrix(newmatrix)
+end
+
+--- Enables a scissoring rect which limits the drawing area.
+-- @param startX X start coordinate of the scissor rect.
+-- @param startY Y start coordinate of the scissor rect.
+-- @param endX X end coordinate of the scissor rect.
+-- @param endX Y end coordinate of the scissor rect.
+function render_library.EnableScissorRect( startX, startY, endX, endY )
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	SF.CheckType( startX, "number" )
+	SF.CheckType( startY, "number" )
+	SF.CheckType( endX, "number" )
+	SF.CheckType( endY, "number" )
+	render.SetScissorRect( startX, startY, endX, endY, true )
+end
+
+--- Disables a scissoring rect which limits the drawing area.
+function render_library.DisableScissorRect()
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	render.SetScissorRect( 0 ,0 ,0 , 0, false )
+
 end
 
 --- Pops a matrix from the matrix stack.
