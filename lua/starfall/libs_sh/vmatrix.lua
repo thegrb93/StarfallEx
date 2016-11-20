@@ -72,6 +72,25 @@ function vmatrix_methods:getInverse ( )
 
 end
 
+--- Returns forward vector of matrix
+-- @return Translation
+function vmatrix_methods:getForward ()
+	return vwrap( unwrap( self ):GetForward() )
+end
+
+--- Returns right vector of matrix
+-- @return Translation
+function vmatrix_methods:getRight ()
+	return vwrap( unwrap( self ):GetRight() )
+end
+
+--- Returns up vector of matrix
+-- @return Translation
+function vmatrix_methods:getUp ()
+	return vwrap( unwrap( self ):GetUp() )
+end
+
+
 --- Inverts the matrix efficiently for translations and rotations
 -- @return inverted matrix
 function vmatrix_methods:getInverseTR ( )
