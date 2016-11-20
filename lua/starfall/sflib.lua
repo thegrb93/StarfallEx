@@ -20,6 +20,7 @@ if SERVER then
 	AddCSLuaFile( "sfderma.lua" )
 	AddCSLuaFile( "callback.lua" )
 	AddCSLuaFile( "sfhelper.lua" )
+	AddCSLuaFile( "netstream.lua" )
 end
 
 -- Load files
@@ -31,6 +32,7 @@ include( "database.lua" )
 include( "permissions/core.lua" )
 include( "editor.lua" )
 include( "sfhelper.lua" )
+include( "netstream.lua" )
 
 SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, { FCVAR_REPLICATED }, "Window width of the CPU time quota moving average." )
 
@@ -489,16 +491,7 @@ if SERVER then
 	util.AddNetworkString( "starfall_console_print" )
 	util.AddNetworkString( "starfall_openeditor" )
 	
-	local uploaddata = {}
-	-- Packet structure:
-	-- 
-	-- Initialize packet:
-	--   Bit: False to cancel transfer
-	--   String: Main filename
-	-- Payload packets:
-	--   Bit: End transmission. If true, no other data is included
-	--   String: Filename. Multiple packets with the same filename are to be concactenated onto each other in the order they were sent
-	--   String: File data
+	local uploaddata = SF.EntityTable( "sfTransfer" )
 
 	--- Requests a player to send whatever code they have open in his/her editor to
 	-- the server.
@@ -522,10 +515,6 @@ if SERVER then
 		}
 		return true
 	end
-
-	hook.Add("PlayerDisconnected", "SF_requestcode_cleanup", function(ply)
-		uploaddata[ply] = nil
-	end)
 	
 	net.Receive("starfall_upload", function(len, ply)
 		local updata = uploaddata[ply]
@@ -534,29 +523,30 @@ if SERVER then
 			return
 		end
 		
-		if updata.needHeader then
-			if net.ReadBit() == 0 then
-				--print("Recieved cancel packet")
-				updata.callback(nil, nil)
-				uploaddata[ply] = nil
-				return
-			end
-			updata.mainfile = net.ReadString()
-			updata.needHeader = nil
-			--print("Begin recieving, mainfile:", updata.mainfile)
-		else
-			if net.ReadBit() ~= 0 then
-				--print("End recieving data")
-				updata.callback(updata.mainfile, updata.files)
-				uploaddata[ply] = nil
-				return
-			end
+		updata.mainfile = net.ReadString()
+		
+		local I = 0
+		while I < 256 do
+			if net.ReadBit() ~= 0 then break end
 			local filename = net.ReadString()
-			local filedata = net.ReadString()
-			--print("\tRecieved data for:", filename, "len:", #filedata)
-			updata.files[filename] = updata.files[filename] and updata.files[filename]..filedata or filedata
+
+			net.ReadStream( ply, function( data )
+				updata.Completed = updata.Completed + 1
+				updata.files[ filename ] = data
+				if updata.Completed == updata.NumFiles then
+					updata.callback(updata.mainfile, updata.files)
+					uploaddata[ply] = nil
+				end
+			end )
+			I = I + 1
 		end
 
+		updata.Completed = 0
+		updata.NumFiles = I
+		
+		if I == 0 then
+			uploaddata[ply] = nil
+		end
 	end)
 
 	function SF.AddNotify ( ply, msg, notifyType, duration, sound )
@@ -613,36 +603,20 @@ else
 		if ok then
 			--print("Uploading SF code")
 			net.Start("starfall_upload")
-			net.WriteBit(true)
 			net.WriteString(list.mainfile)
-			net.SendToServer()
-			--print("\tHeader sent")
-
-			local fname = next(list.files)
-			while fname do
-				--print("\tSending data for:", fname)
-				local fdata = list.files[fname]
-				local offset = 1
-				repeat
-					net.Start("starfall_upload")
-					net.WriteBit(false)
-					net.WriteString(fname)
-					local data = fdata:sub(offset, offset+60000)
-					net.WriteString(data)
-					net.SendToServer()
-
-					--print("\t\tSent data from", offset, "to", offset + #data)
-					offset = offset + #data + 1
-				until offset > #fdata
-				fname = next(list.files, fname)
+			
+			for name, data in pairs( list.files ) do
+				net.WriteBit( false )
+				net.WriteString( name )
+				net.WriteStream( data )
 			end
 
-			net.Start("starfall_upload")
-			net.WriteBit(true)
+			net.WriteBit( true )
 			net.SendToServer()
 			--print("Done sending")
 		else
 			net.Start("starfall_upload")
+			net.WriteString("")
 			net.WriteBit(false)
 			net.SendToServer()
 			if list then
@@ -754,7 +728,7 @@ if SERVER then
 			net.Start("sf_reloadlibrary")
 			local data = util.Compress(file.Read(name,"LUA"))
 			net.WriteString(filename)
-			net.WriteData(data, #data)
+			net.WriteStream( data )
 			net.Broadcast()
 		end
 		
@@ -788,14 +762,16 @@ else
 
 	net.Receive("sf_reloadlibrary", function(len)
 		local name = net.ReadString()
-		print("Reloaded library: " .. name)
-		cleanHooks( name )
-		local file = util.Decompress(net.ReadData(len/8 - #name - 1))
-		if file then
-			local func = CompileString( file, "starfall/" .. name .. ".lua" )
-			func()
-			SF.Libraries.CallHook("postload")
-		end
+		net.ReadStream( nil, function( data )
+			local file = util.Decompress( data )
+			if file then
+				print("Reloaded library: " .. name)
+				cleanHooks( name )
+				local func = CompileString( file, "starfall/" .. name .. ".lua" )
+				func()
+				SF.Libraries.CallHook("postload")
+			end
+		end )
 	end)
 
 	local l

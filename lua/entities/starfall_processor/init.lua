@@ -30,7 +30,6 @@ function ENT:Use( activator )
 end
 
 util.AddNetworkString( "starfall_processor_download" )
-util.AddNetworkString( "starfall_processor_update" )
 util.AddNetworkString( "starfall_processor_update_links" )
 util.AddNetworkString( "starfall_processor_used" )
 util.AddNetworkString( "starfall_processor_link" )
@@ -40,60 +39,37 @@ local function sendCode ( proc, owner, files, mainfile, recipient )
 	net.WriteEntity( proc )
 	net.WriteEntity( owner )
 	net.WriteString( mainfile )
-	if recipient then net.Send( recipient ) else net.Broadcast() end
+	
+	for name, data in pairs( files ) do
+	
+		net.WriteBit( false )
+		net.WriteString( name )
+		net.WriteStream( data )
 
-	local fname = next( files )
-	while fname do
-		local fdata = files[ fname ]
-		local offset = 1
-		repeat
-			net.Start( "starfall_processor_download" )
-			net.WriteBit( false )
-			net.WriteString( fname )
-			local data = fdata:sub( offset, offset + 60000 )
-			net.WriteString( data )
-			if recipient then net.Send( recipient ) else net.Broadcast() end
-
-			offset = offset + #data + 1
-		until offset > #fdata
-		fname = next( files, fname )
 	end
 
-	net.Start( "starfall_processor_download" )
 	net.WriteBit( true )
+	
 	if recipient then net.Send( recipient ) else net.Broadcast() end
 end
 
-local requests = {}
-
-local function sendCodeRequest(ply, procid)
-	local proc = Entity(procid)
-
-	if not proc.mainfile then
-		if not requests[procid] then requests[procid] = {} end
-		if requests[procid][player] then return end
-		requests[procid][ply] = true
-		return
-
-	elseif proc.mainfile then
-		if requests[procid] then
-			requests[procid][ply] = nil
-		end
-		sendCode(proc, proc.owner, proc.files, proc.mainfile, ply)
-	end
-end
-
-local function retryCodeRequests()
-	for procid,plys in pairs(requests) do
-		for ply,_ in pairs(requests[procid]) do
-			sendCodeRequest(ply, procid)
-		end
-	end
-end
-
+-- Request code from the chip. If the chip doesn't have code yet then wait at most 5 sec for code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
-	sendCodeRequest(ply, proc:EntIndex())
+	if ply:IsValid() and proc:IsValid() then
+		local hookname = "SFCodeRQ"..proc:EntIndex().."_"..ply:EntIndex()
+		local timeout = CurTime()+5
+		hook.Add("Think", hookname, function()
+			if ply:IsValid() and proc:IsValid() and CurTime()<timeout then
+				if proc.mainfile and proc.files then
+					sendCode(proc, proc.owner, proc.files, proc.mainfile, ply)
+					hook.Remove("Think", hookname)
+				end
+			else
+				hook.Remove("Think", hookname)
+			end
+		end)
+	end
 end)
 
 net.Receive("starfall_processor_update_links", function(len, ply)
@@ -111,15 +87,7 @@ function ENT:Compile(files, mainfile)
 	self.mainfile = mainfile
 
 	if update then
-		net.Start("starfall_processor_update")
-			net.WriteEntity(self)
-			for k,v in pairs(files) do
-				net.WriteBit(false)
-				net.WriteString(k)
-				net.WriteString(util.CRC(v))
-			end
-			net.WriteBit(true)
-		net.Broadcast()
+		sendCode(self, self.owner, self.files, self.mainfile)
 	end
 
 	local ppdata = {}
@@ -158,14 +126,8 @@ function ENT:Compile(files, mainfile)
 	self:SetNWInt( "State", self.States.Normal )
 end
 
-local i = 0
-function ENT:Think ()	
-	i = i + 1
-
-	if i % 22 == 0 then
-		retryCodeRequests()
-		i = 0
-	end
+function ENT:Think ()
+	self.BaseClass.Think( self )
 	
 	if self.instance and not self.instance.error then		
 		local bufferAvg = self.instance:movingCPUAverage()

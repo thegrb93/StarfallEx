@@ -14,6 +14,8 @@ local burst_rate = CreateConVar( "sf_net_burstrate", "5", { FCVAR_ARCHIVE, FCVAR
 						"Regen rate of net message burst in kB/sec." )
 
 
+local streams = SF.EntityTable("playerStreams")
+
 local function write( instance, type, size, ... )
 	instance.data.net.size = instance.data.net.size + size
 
@@ -150,6 +152,37 @@ function net_library.readData( n )
 	SF.CheckType( n, "number" )
 	n = math.Clamp( n, 0, 64000 )
 	return net.ReadData( n )
+end
+
+--- Streams a large 20MB string. 
+-- @shared
+-- @param str The string to be written
+function net_library.writeStream( str )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( str, "string" )
+	write( instance, "Stream", 8, str )
+	return true
+end
+
+--- Reads a large string stream from the net message
+-- @shared
+-- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data.
+
+function net_library.readStream( cb )
+	SF.CheckType( cb, "function" )
+	local instance = SF.instance
+	if streams[instance.player] then SF.throw( "The previous stream must finish before reading another.", 2 ) end
+	streams[instance.player] = true
+	
+	net.ReadStream( ( SERVER and instance.player or nil ), function( data )
+		local ok, msg, traceback = instance:runFunction( cb, data )
+		if not ok then
+			instance:Error( msg, traceback )
+		end
+		streams[instance.player] = false
+	end )
 end
 
 --- Writes an integer to the net message

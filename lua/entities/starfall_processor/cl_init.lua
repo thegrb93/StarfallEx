@@ -65,6 +65,8 @@ function ENT:CodeSent ( files, main, owner )
 	if self.instance then self.instance:deinitialize() end
 	self.error = nil
 	self.owner = owner
+	self.files = files
+	self.mainfile = main
 	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
 	
@@ -79,61 +81,36 @@ function ENT:CodeSent ( files, main, owner )
 	if not ok then self:Error( msg, traceback ) end
 end
 
-
-local dlProc = nil
-local dlOwner = nil
-local dlMain = nil
-local dlFiles = nil
-local hashes = {}
-
 net.Receive( "starfall_processor_download", function ( len )
-	if not dlProc then
-		dlProc = net.ReadEntity()
-		dlOwner = net.ReadEntity()
-		dlMain = net.ReadString()
-		dlFiles = {}
-	else
-		if net.ReadBit() ~= 0 then
-			if dlProc:IsValid() then
-				dlProc:CodeSent( dlFiles, dlMain, dlOwner )
-				dlProc.files = dlFiles
-				dlProc.mainfile = dlMain
-			end
-			dlProc, dlFiles, dlMain, dlOwner = nil, nil, nil, nil
-			return
-		end
+
+	local dlFiles = {}
+	local dlNumFiles = {}
+	local dlProc = net.ReadEntity()
+	local dlOwner = net.ReadEntity()
+	local dlMain = net.ReadString()
+	
+	if not dlProc:IsValid() or not dlOwner:IsValid() then return end
+	
+	local I = 0
+	while I < 256 do
+		if net.ReadBit() ~= 0 then break end
+		
 		local filename = net.ReadString()
-		local filedata = net.ReadString()
-		dlFiles[ filename ] = dlFiles[ filename ] and dlFiles[ filename ] .. filedata or filedata
+
+		net.ReadStream( nil, function( data )
+			dlNumFiles.Completed = dlNumFiles.Completed + 1
+			dlFiles[ filename ] = data or ""
+			if dlProc:IsValid() and dlProc.CodeSent and dlNumFiles.Completed == dlNumFiles.NumFiles then
+				dlProc:CodeSent( dlFiles, dlMain, dlOwner )
+			end
+		end )
+		
+		I = I + 1
 	end
+
+	dlNumFiles.Completed = 0
+	dlNumFiles.NumFiles = I
 end )
-
-net.Receive( "starfall_processor_update", function ( len )
-	local proc = net.ReadEntity()
-	if not IsValid( proc ) then return end
-
-	local dirty = false
-	local finish = net.ReadBit()
-
-	while finish == 0 do
-		local file = net.ReadString()
-		local hash = net.ReadString()
-
-		if hash ~= hashes[ file ] then
-			dirty = true
-			hashes[ file ] = hash
-		end
-		finish = net.ReadBit()
-	end
-	if dirty then
-		net.Start( "starfall_processor_download" )
-			net.WriteEntity( proc )
-		net.SendToServer()
-	else
-		proc:CodeSent( proc.files, proc.mainfile, proc.owner )
-	end
-end )
-
 
 net.Receive( "starfall_processor_link", function()
 	local component = net.ReadEntity()
