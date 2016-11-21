@@ -108,7 +108,7 @@ end
 function player_methods:getActiveWeapon ()
 	SF.CheckType( self, player_metamethods )
 	local ent = eunwrap( self )
-	return ent and SF.WrapObject( ent:GetActiveWeapon() )
+	return ent and SF.Weapons.Wrap( ent:GetActiveWeapon() )
 end
 
 --- Returns the player's aim vector
@@ -356,7 +356,7 @@ end
 function player_methods:getWeapon( wep )
 	SF.CheckType( self, player_metamethods )
 	SF.CheckType( wep, "string" )
-	return ewrap( eunwrap( self ):GetWeapon( wep ) )
+	return SF.Weapons.Wrap( eunwrap( self ):GetWeapon( wep ) )
 end
 
 -- Returns the entity that the player is standing on
