@@ -91,12 +91,8 @@ end
 function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 	local ending = nil
 	local endingLevel = nil
-	
-	local str = source
-	while str ~= "" do
-		local line
-		line, str = string.match(str,"^([^\n]*)\n?(.*)$")
-		
+	local lines = string.Explode("\r?\n",source,true)
+	for _, line in ipairs(lines) do		
 		for _,comment in ipairs(FindComments(line)) do
 			if ending then
 				if comment.type == ending then
@@ -117,7 +113,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 				ending = "end"
 				endingLevel = comment.level
 			elseif comment.type == "line" then
-				local directive, args = string.match(line,"--@([^ ]+)%s*(.*)$")
+				local directive, args = string.match(line,"--@(%S+)%s*(%S*)")
 				local func = directives[directive] or SF.Preprocessor.directives[directive]
 				if func then
 					func(args, filename, data)
