@@ -367,6 +367,39 @@ function player_methods:getGroundEntity()
 	return ewrap( eunwrap( self ):GetGroundEntity() )
 end
 
+
+	-- New functions:
+
+--- Returns the player's current weapon
+-- @shared
+-- @return Current weapon
+function player_methods:getActiveWeapon()
+	SF.CheckType(self, player_metamethods)
+	local ent = eunwrap(self)
+	return ent:GetActiveWeapon()
+end
+	
+--- Returns Ammo in primary clip
+-- @server
+-- @param wep Weapon to return the primary ammo of
+-- @return amount of ammo
+function player_methods:getAmmoCount(wep)
+	SF.CheckType(self, player_metamethods)
+	local ent = eunwrap(self)
+	return ent:GetAmmoCount(wep:GetPrimaryAmmoType())
+end
+
+--- Gets the clip size of the active weapon
+-- @shared
+-- @return Clip size
+function player_methods:getMaxClip()
+	SF.CheckType(self, player_metamethods)
+	local ent = eunwrap(self)
+	return ent:GetActiveWeapon():GetMaxClip1()
+end
+
+	-- New functions end
+
 if SERVER then
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
@@ -380,6 +413,83 @@ if SERVER then
 			pl:SetViewEntity( ent )
 		end
 	end
+	
+	
+		-- New functions:
+	
+	--- Sets the player's health
+	-- @server
+	-- @param hp Ammount of health
+	function player_methods:setHealth(hp)
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:SetHealth(hp)
+	end
+	
+	--- Sets the player's armor
+	-- @server
+	-- @param ap Ammount of armor
+	function player_methods:setArmor(ap)
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:SetArmor(ap)
+	end
+	
+	--- Respawns the player
+	-- @server
+	function player_methods:spawn()
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:Spawn()
+	end
+	
+	--- Sets the ammount of primary ammo carried for the weapon
+	-- @server
+	-- @param ammo Ammount of ammo
+	-- @param wep Weapon to set the primary ammo of
+	function player_methods:setAmmo(ammo, wep)
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:SetAmmo(ammo, wep:GetPrimaryAmmoType())
+	end
+	
+	--- Gives the player additional ammo for his current weapon
+	-- @server
+	-- @param ammo Ammount of ammo to give
+	function player_methods:giveAmmo(ammo, wep, hide)
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:GiveAmmo(ammo, wep:GetPrimaryAmmoType(), hide)
+	end
+	
+	--- Gives the player a weapon
+	-- @server
+	-- @param wep Weapon to give
+	function player_methods:give(wep)
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:Give(wep)
+	end
+	
+	--- Strips the given weapon off a player
+	-- @server
+	-- @param ply Player to strip a weapon of
+	-- @param weapon Name of the weapon to strip
+	function player_methods:stripWeapon(wep)
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:StripWeapon(wep)
+	end
+	
+	--- Strips all weapons of a player
+	-- @server
+	function player_methods:stripWeapons()
+		SF.CheckType(self, player_metamethods)
+		local ent = eunwrap(self)
+		ent:StripWeapons()
+	end
+	
+		-- New functions end
 end
 
 --- Returns whether or not the player is pushing the key.
