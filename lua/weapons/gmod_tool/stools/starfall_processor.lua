@@ -4,7 +4,7 @@ TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
--- ------------------------------- Sending / Recieving ------------------------------- --
+-- ------------------------------- Sending / Receiving ------------------------------- --
 include("starfall/sflib.lua")
 
 local MakeSF
@@ -44,11 +44,13 @@ if SERVER then
 	duplicator.RegisterEntityClass("starfall_processor", MakeSF, "Pos", "Ang", "Model", "_inputs", "_outputs")
 else
 	language.Add( "Tool.starfall_processor.name", "Starfall - Processor" )
-	language.Add( "Tool.starfall_processor.desc", "Spawns a starfall processor" )
-	language.Add( "Tool.starfall_processor.0", "Primary: Spawns a processor / uploads code, Secondary: Opens editor" )
+	language.Add( "Tool.starfall_processor.desc", "Spawns a Starfall processor" )
+	language.Add( "Tool.starfall_processor.left", "Spawn a processor / upload code" )
+	language.Add( "Tool.starfall_processor.right", "Open editor" )
 	language.Add( "sboxlimit_starfall_processor", "You've hit the Starfall processor limit!" )
 	language.Add( "undone_Starfall Processor", "Undone Starfall Processor" )
 	language.Add( "Cleanup_starfall_processor", "Starfall Processors" )
+	TOOL.Information = { "left", "right" }
 end
 
 function TOOL:LeftClick( trace )
