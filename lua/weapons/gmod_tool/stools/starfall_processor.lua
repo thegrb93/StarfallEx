@@ -44,7 +44,7 @@ if SERVER then
 	duplicator.RegisterEntityClass("starfall_processor", MakeSF, "Pos", "Ang", "Model", "_inputs", "_outputs")
 else
 	language.Add( "Tool.starfall_processor.name", "Starfall - Processor" )
-	language.Add( "Tool.starfall_processor.desc", "Spawns a Starfall processor" )
+	language.Add( "Tool.starfall_processor.desc", "Spawns a Starfall processor. (Press Shift+F to switch to the component tool)" )
 	language.Add( "Tool.starfall_processor.left", "Spawn a processor / upload code" )
 	language.Add( "Tool.starfall_processor.right", "Open editor" )
 	language.Add( "sboxlimit_starfall_processor", "You've hit the Starfall processor limit!" )
@@ -222,5 +222,27 @@ if CLIENT then
 		panel:AddPanel(openeditor)
 		openeditor:SetText("Open Editor")
 		openeditor.DoClick = SF.Editor.open
+	end
+	
+	local function hookfunc( ply, bind, pressed )
+		if not pressed then return end
+
+		local activeWep = ply:GetActiveWeapon()
+		
+		if bind == "impulse 100" and ply:KeyDown( IN_SPEED ) and IsValid(activeWep) and activeWep:GetClass() == "gmod_tool" then
+			if activeWep.Mode == "starfall_processor" then
+				spawnmenu.ActivateTool("starfall_component")
+				return true
+			elseif activeWep.Mode == "starfall_component" then
+				spawnmenu.ActivateTool("starfall_processor")
+				return true
+			end
+		end
+	end
+	
+	if game.SinglePlayer() then -- wtfgarry (have to have a delay in single player or the hook won't get added)
+		timer.Simple(5,function() hook.Add( "PlayerBindPress", "sf_toolswitch", hookfunc ) end)
+	else
+		hook.Add( "PlayerBindPress", "sf_toolswitch", hookfunc )
 	end
 end

@@ -42,7 +42,7 @@ if SERVER then
 	
 else
 	language.Add( "Tool.starfall_component.name", "Starfall - Component" )
-	language.Add( "Tool.starfall_component.desc", "Spawns a Starfall component" )
+	language.Add( "Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)" )
 	language.Add( "sboxlimit_starfall_components", "You've hit the Starfall Component limit!" )
 	language.Add( "undone_Starfall Screen", "Undone Starfall Screen" )
 	language.Add( "undone_Starfall HUD", "Undone Starfall HUD" )
