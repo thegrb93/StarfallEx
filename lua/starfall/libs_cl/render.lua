@@ -51,11 +51,14 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local matrix_meta = SF.VMatrix.Metatable --debug.getregistry().VMatrix
+local matrix_meta = SF.VMatrix.Metatable
+local vector_meta = SF.Vectors.Metatable
 
-local v_unwrap = SF.VMatrix.Unwrap
-local vunwrap = SF.UnwrapObject
+local m_unwrap = SF.VMatrix.Unwrap
+local v_unwrap = SF.Vectors.Unwrap
 local aunwrap = SF.Angles.Unwrap
+
+local vwrap = SF.Vectors.Wrap
 
 local function sfCreateMaterial( name )
 	return CreateMaterial( name, "UnlitGeneric", {
@@ -255,9 +258,9 @@ function render_library.pushMatrix(m, world)
 	if id + 1 > MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
 	local newmatrix
 	if matrix_stack[id] then
-		newmatrix = matrix_stack[id] * v_unwrap(m)
+		newmatrix = matrix_stack[id] * m_unwrap(m)
 	else
-		newmatrix = v_unwrap(m)
+		newmatrix = m_unwrap(m)
 	end
 	if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
 		newmatrix = renderdata.renderEnt.Transform * newmatrix
@@ -902,11 +905,11 @@ end
 -- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere ( pos, radius, longitudeSteps, latitudeSteps )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( pos, SF.Types[ "Vector" ] )
+	SF.CheckType( pos, vector_meta )
 	SF.CheckType( radius, "number" )
 	SF.CheckType( longitudeSteps, "number" )
 	SF.CheckType( latitudeSteps, "number" )
-	pos = vunwrap( pos )
+	pos = v_unwrap( pos )
 	longitudeSteps = math.min( longitudeSteps, 50 )
 	latitudeSteps = math.min( latitudeSteps, 50 )
 	render.DrawSphere( pos, radius, longitudeSteps, latitudeSteps, currentcolor, true )
@@ -919,11 +922,11 @@ end
 -- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere ( pos, radius, longitudeSteps, latitudeSteps )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( pos, SF.Types[ "Vector" ] )
+	SF.CheckType( pos, vector_meta )
 	SF.CheckType( radius, "number" )
 	SF.CheckType( longitudeSteps, "number" )
 	SF.CheckType( latitudeSteps, "number" )
-	pos = vunwrap( pos )
+	pos = v_unwrap( pos )
 	longitudeSteps = math.min( longitudeSteps, 50 )
 	latitudeSteps = math.min( latitudeSteps, 50 )
 	render.DrawWireframeSphere( pos, radius, longitudeSteps, latitudeSteps, currentcolor, true )
@@ -934,10 +937,10 @@ end
 -- @param endPos Ending position
 function render_library.draw3DLine ( startPos, endPos )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( startPos, SF.Types[ "Vector" ] )
-	SF.CheckType( endPos, SF.Types[ "Vector" ] )
-	startPos = vunwrap( startPos )
-	endPos = vunwrap( endPos )
+	SF.CheckType( startPos, vector_meta )
+	SF.CheckType( endPos, vector_meta )
+	startPos = v_unwrap( startPos )
+	endPos = v_unwrap( endPos )
 
 	render.DrawLine( startPos, endPos, currentcolor, true )
 end
@@ -949,14 +952,14 @@ end
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DBox ( origin, angle, mins, maxs )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( origin, SF.Types[ "Vector" ] )
-	SF.CheckType( mins, SF.Types[ "Vector" ] )
-	SF.CheckType( maxs, SF.Types[ "Vector" ] )
+	SF.CheckType( origin, vector_meta )
+	SF.CheckType( mins, vector_meta )
+	SF.CheckType( maxs, vector_meta )
 	SF.CheckType( angle, SF.Types[ "Angle" ] )
-	origin = vunwrap( origin )
-	mins = vunwrap( mins )
-	maxs = vunwrap( maxs )
-	angle = vunwrap( angle )
+	origin = v_unwrap( origin )
+	mins = v_unwrap( mins )
+	maxs = v_unwrap( maxs )
+	angle = aunwrap( angle )
 
 	render.DrawBox( origin, angle, mins, maxs, currentcolor, true )
 end
@@ -968,14 +971,14 @@ end
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox ( origin, angle, mins, maxs )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( origin, SF.Types[ "Vector" ] )
-	SF.CheckType( mins, SF.Types[ "Vector" ] )
-	SF.CheckType( maxs, SF.Types[ "Vector" ] )
+	SF.CheckType( origin, vector_meta )
+	SF.CheckType( mins, vector_meta )
+	SF.CheckType( maxs, vector_meta )
 	SF.CheckType( angle, SF.Types[ "Angle" ] )
-	origin = vunwrap( origin )
-	mins = vunwrap( mins )
-	maxs = vunwrap( maxs )
-	angle = vunwrap( angle )
+	origin = v_unwrap( origin )
+	mins = v_unwrap( mins )
+	maxs = v_unwrap( maxs )
+	angle = aunwrap( angle )
 
 	render.DrawWireframeBox( origin, angle, mins, maxs, currentcolor, false )
 end
@@ -988,14 +991,14 @@ end
 -- @param textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam ( startPos, endPos, width, textureStart, textureEnd )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( startPos, SF.Types[ "Vector" ] )
-	SF.CheckType( endPos, SF.Types[ "Vector" ] )
+	SF.CheckType( startPos, vector_meta )
+	SF.CheckType( endPos, vector_meta )
 	SF.CheckType( width, "number" )
 	SF.CheckType( textureStart, "number" )
 	SF.CheckType( textureEnd, "number" )
 
-	startPos = vunwrap( startPos )
-	endPos = vunwrap( endPos )
+	startPos = v_unwrap( startPos )
+	endPos = v_unwrap( endPos )
 
 	render.DrawBeam( startPos, endPos, width, textureStart, textureEnd, currentcolor )
 end
@@ -1007,15 +1010,15 @@ end
 -- @param vert4 The fourth vertex.
 function render_library.draw3DQuad ( vert1, vert2, vert3, vert4 )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( vert1, SF.Types[ "Vector" ] )
-	SF.CheckType( vert2, SF.Types[ "Vector" ] )
-	SF.CheckType( vert3, SF.Types[ "Vector" ] )
-	SF.CheckType( vert4, SF.Types[ "Vector" ] )
+	SF.CheckType( vert1, vector_meta )
+	SF.CheckType( vert2, vector_meta )
+	SF.CheckType( vert3, vector_meta )
+	SF.CheckType( vert4, vector_meta )
 
-	vert1 = vunwrap( vert1 )
-	vert2 = vunwrap( vert2 )
-	vert3 = vunwrap( vert3 )
-	vert4 = vunwrap( vert4 )
+	vert1 = v_unwrap( vert1 )
+	vert2 = v_unwrap( vert2 )
+	vert3 = v_unwrap( vert3 )
+	vert4 = v_unwrap( vert4 )
 
 	render.DrawQuad( vert1, vert2, vert3, vert4, currentcolor )
 end
@@ -1023,11 +1026,11 @@ end
 --[[
 function render_library.drawModel ( pos, ang, model )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( pos, SF.Types[ "Vector" ] )
+	SF.CheckType( pos, vector_meta )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )
 	SF.CheckType( model, "string" )
-	pos = vunwrap( pos )
-	ang = vunwrap( ang )
+	pos = v_unwrap( pos )
+	ang = aunwrap( ang )
 	render.Model({["model"] = model, ["pos"] = pos, ["angle"] = ang})
 end
 --]]
@@ -1123,6 +1126,17 @@ end
 -- @return the Y size of the current render context
 function render_library.getResolution()
 	return SF.instance.data.render.renderEnt:GetResolution()
+end
+
+--- Does a trace and returns the color of the textel the trace hits.
+-- @param vec1 The starting vector
+-- @param vec2 The ending vector
+-- @return The color vector. use vector:toColor to convert it to a color.
+function render_library.traceSurfaceColor( vec1, vec2 )
+	SF.CheckType( vec1, vector_meta )
+	SF.CheckType( vec2, vector_meta )
+
+	return vwrap( render.GetSurfaceColor( v_unwrap( vec1 ), v_unwrap( vec2 ) ) )
 end
 
 --- Called when a player uses the screen
