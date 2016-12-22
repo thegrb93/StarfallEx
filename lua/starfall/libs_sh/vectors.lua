@@ -127,36 +127,36 @@ end
 --- Add vector - Modifies self.
 -- @param v Vector to add
 -- @return nil
-function vec_methods.add ( a, v )
+function vec_methods:add ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = a[1] + v[1]
-	a[2] = a[2] + v[2]
-	a[3] = a[3] + v[3]
+	self[1] = self[1] + v[1]
+	self[2] = self[2] + v[2]
+	self[3] = self[3] + v[3]
 end
 
 --- Get the vector's angle.
 -- @return Angle
-function vec_methods.getAngle ( a )
-	return SF.WrapObject( unwrap( a ):Angle() )
+function vec_methods:getAngle ( )
+	return SF.WrapObject( unwrap( self ):Angle() )
 end
 
 --- Returns the Angle between two vectors.
 -- @param v Second Vector
 -- @return Angle
-function vec_methods.getAngleEx ( a, v )
+function vec_methods:getAngleEx ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	return SF.WrapObject( unwrap( a ):AngleEx( unwrap( v ) ) )
+	return SF.WrapObject( unwrap( self ):AngleEx( unwrap( v ) ) )
 end
 
 --- Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.
 -- @param v Second Vector
 -- @return Vector
-function vec_methods.cross ( a, v )
+function vec_methods:cross ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	return wrap( { a[2]*v[3] - a[3]*v[2], a[3]*v[1] - a[1]*v[3], a[1]*v[2] - a[2]*v[1] } )
+	return wrap( { self[2]*v[3] - self[3]*v[2], self[3]*v[1] - self[1]*v[3], self[1]*v[2] - self[2]*v[1] } )
 end
 
 local math_sqrt = math.sqrt
@@ -164,55 +164,55 @@ local math_sqrt = math.sqrt
 --- Returns the pythagorean distance between the vector and the other vector.
 -- @param v Second Vector
 -- @return Number
-function vec_methods.getDistance ( a, v )
+function vec_methods:getDistance ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	return math_sqrt( (v[1]-a[1])^2 + (v[2]-a[2])^2 + (v[3]-a[3])^2 )
+	return math_sqrt( (v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2 )
 end
 
 --- Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an expensive process.
 -- @param v Second Vector
 -- @return Number
-function vec_methods.getDistanceSqr ( a, v )
+function vec_methods:getDistanceSqr ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	return ((v[1]-a[1])^2 + (v[2]-a[2])^2 + (v[3]-a[3])^2)
+	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
 
 --- Dot product is the cosine of the angle between both vectors multiplied by their lengths. A.B = ||A||||B||cosA.
 -- @param v Second Vector
 -- @return Number
-function vec_methods.dot ( a, v )
+function vec_methods:dot ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	return ( a[1]*v[1] + a[2]*v[2] + a[3]*v[3] )
+	return ( self[1]*v[1] + self[2]*v[2] + self[3]*v[3] )
 end
 
 --- Returns a new vector with the same direction by length of 1.
 -- @return Vector Normalised
-function vec_methods.getNormalized ( a )
-	local len = math_sqrt( a[1]^2 + a[2]^2 + a[3]^2 )
+function vec_methods:getNormalized ( )
+	local len = math_sqrt( self[1]^2 + self[2]^2 + self[3]^2 )
 
-	return wrap( { a[1] / len, a[2] / len, a[3] / len } )
+	return wrap( { self[1] / len, self[2] / len, self[3] / len } )
 end
 
 --- Is this vector and v equal within tolerance t.
 -- @param v Second Vector
 -- @param t Tolerance number.
 -- @return bool True/False.
-function vec_methods.isEqualTol ( a, v, t )
+function vec_methods:isEqualTol ( v, t )
 	SF.CheckType( v, vec_metamethods )
 	SF.CheckType( t, "number" )
 
-	return unwrap( a ):IsEqualTol( unwrap( v ), t )
+	return unwrap( self ):IsEqualTol( unwrap( v ), t )
 end
 
 --- Are all fields zero.
 -- @return bool True/False
-function vec_methods.isZero ( a )
-	if a[1] ~= 0 then return false
-	elseif a[2] ~= 0 then return false
-	elseif a[3] ~= 0 then return false
+function vec_methods:isZero ( )
+	if self[1] ~= 0 then return false
+	elseif self[2] ~= 0 then return false
+	elseif self[3] ~= 0 then return false
 	end
 
 	return true
@@ -220,100 +220,124 @@ end
 
 --- Get the vector's Length.
 -- @return number Length.
-function vec_methods.getLength ( a )
-	return math_sqrt( a[1]^2 + a[2]^2 + a[3]^2 )
+function vec_methods:getLength ( )
+	return math_sqrt( self[1]^2 + self[2]^2 + self[3]^2 )
 end
 
 --- Get the vector's length squared ( Saves computation by skipping the square root ).
 -- @return number length squared.
-function vec_methods.getLengthSqr ( a )
-	return ( a[1]^2 + a[2]^2 + a[3]^2 )
+function vec_methods:getLengthSqr ( )
+	return ( self[1]^2 + self[2]^2 + self[3]^2 )
 end
 
 --- Returns the length of the vector in two dimensions, without the Z axis.
 -- @return number length
-function vec_methods.getLength2D ( a )
-	return math_sqrt( a[1]^2 + a[2]^2 )
+function vec_methods:getLength2D ( )
+	return math_sqrt( self[1]^2 + self[2]^2 )
 end
 
 --- Returns the length squared of the vector in two dimensions, without the Z axis. ( Saves computation by skipping the square root )
 -- @return number length squared.
-function vec_methods.getLength2DSqr ( a )
-	return ( a[1]^2 + a[2]^2 )
+function vec_methods:getLength2DSqr ( )
+	return ( self[1]^2 + self[2]^2 )
 end
 
 --- Scalar Multiplication of the vector. Self-Modifies.
 -- @param n Scalar to multiply with.
 -- @return nil
-function vec_methods.mul ( a, n )
+function vec_methods:mul ( n )
 	SF.CheckType( n, "number" )
 
-	a[1] = a[1] * n
-	a[2] = a[2] * n
-	a[3] = a[3] * n
+	self[1] = self[1] * n
+	self[2] = self[2] * n
+	self[3] = self[3] * n
 end
 
 --- "Scalar Division" of the vector. Self-Modifies.
 -- @param n Scalar to divide by.
 -- @return nil
-function vec_methods.div ( a, n )
+function vec_methods:div ( n )
 	SF.CheckType( n, "number" )
 
-	a[1] = a[1] / n
-	a[2] = a[2] / n
-	a[3] = a[3] / n
+	self[1] = self[1] / n
+	self[2] = self[2] / n
+	self[3] = self[3] / n
 end
 
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to multiply with
-function vec_methods.vmul ( a, v )
+function vec_methods:vmul ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = a[1] * v[1]
-	a[2] = a[2] * v[2]
-	a[3] = a[3] * v[3]
+	self[1] = self[1] * v[1]
+	self[2] = self[2] * v[2]
+	self[3] = self[3] * v[3]
 end
 
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to divide by
-function vec_methods.vdiv ( a, v )
+function vec_methods:vdiv ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = a[1] / v[1]
-	a[2] = a[2] / v[2]
-	a[3] = a[3] / v[3]
+	self[1] = self[1] / v[1]
+	self[2] = self[2] / v[2]
+	self[3] = self[3] / v[3]
 end
 
 --- Set's all vector fields to 0.
 -- @return nil
-function vec_methods.setZero ( a )
-	a[1] = 0
-	a[2] = 0
-	a[3] = 0
+function vec_methods:setZero ( )
+	self[1] = 0
+	self[2] = 0
+	self[3] = 0
+end
+
+--- Set's the vector's x coordinate and returns it.
+-- @param x The x coordinate
+-- @return The modified vector
+function vec_methods:setX( x )
+	self[1] = x
+	return self
+end
+
+--- Set's the vector's y coordinate and returns it.
+-- @param y The y coordinate
+-- @return The modified vector
+function vec_methods:setY( y )
+	self[2] = y
+	return self
+end
+
+--- Set's the vector's z coordinate and returns it.
+-- @param z The z coordinate
+-- @return The modified vector
+function vec_methods:setZ( z )
+	self[3] = z
+	return self
 end
 
 --- Normalise the vector, same direction, length 1. Self-Modifies.
 -- @return nil
-function vec_methods.normalize ( a )
-	local len = math_sqrt( a[1]^2 + a[2]^2 + a[3]^2 )
+function vec_methods:normalize ( )
+	local len = math_sqrt( self[1]^2 + self[2]^2 + self[3]^2 )
 
-	a[1] = a[1] / len
-	a[2] = a[2] / len
-	a[3] = a[3] / len
+	self[1] = self[1] / len
+	self[2] = self[2] / len
+	self[3] = self[3] / len
 end
 
---- Rotate the vector by Angle a. Self-Modifies.
--- @param a Angle to rotate by.
+--- Rotate the vector by Angle b. Self-Modifies.
+-- @param b Angle to rotate by.
 -- @return nil.
-function vec_methods.rotate ( a, b )
+function vec_methods:rotate ( b )
 	SF.CheckType( b, SF.Types[ "Angle" ] )
 
-	local vec = unwrap( a )
+	local vec = unwrap( self )
 	vec:Rotate( SF.UnwrapObject( b ) )
 
-	a[1] = vec.x
-	a[2] = vec.y
-	a[3] = vec.z
+	self[1] = vec.x
+	self[2] = vec.y
+	self[3] = vec.z
 end
 
 --- Return rotated vector by an axis
@@ -321,7 +345,7 @@ end
 -- @param degrees Angle to rotate by in degrees or nil if radians.
 -- @param radians Angle to rotate by in radians or nil if degrees.
 -- @return Rotated vector
-function vec_methods.rotateAroundAxis( a, axis, degrees, radians )
+function vec_methods:rotateAroundAxis( axis, degrees, radians )
 	SF.CheckType( axis, vec_metamethods )
 
 	if degrees then
@@ -332,7 +356,7 @@ function vec_methods.rotateAroundAxis( a, axis, degrees, radians )
 	end
 
 	local ca, sa = math.cos(radians), math.sin(radians)
-	local x,y,z,x2,y2,z2 = axis[1], axis[2], axis[3], a[1], a[2], a[3]
+	local x,y,z,x2,y2,z2 = axis[1], axis[2], axis[3], self[1], self[2], self[3]
 	local length = (x*x+y*y+z*z)^0.5
 	x,y,z = x/length, y/length, z/length
 
@@ -344,42 +368,42 @@ end
 --- Copies the values from the second vector to the first vector. Self-Modifies.
 -- @param v Second Vector
 -- @return nil
-function vec_methods.set ( a, v )
+function vec_methods:set ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = v[1]
-	a[2] = v[2]
-	a[3] = v[3]
+	self[1] = v[1]
+	self[2] = v[2]
+	self[3] = v[3]
 end
 
 --- Subtract v from this Vector. Self-Modifies.
 -- @param v Second Vector.
 -- @return nil
-function vec_methods.sub ( a, v )
+function vec_methods:sub ( v )
 	SF.CheckType( v, vec_metamethods )
 
-	a[1] = a[1] - v[1]
-	a[2] = a[2] - v[2]
-	a[3] = a[3] - v[3]
+	self[1] = self[1] - v[1]
+	self[2] = self[2] - v[2]
+	self[3] = self[3] - v[3]
 end
 
 --- Translates the vectors position into 2D user screen coordinates. Self-Modifies.
 -- @return nil
-function vec_methods.toScreen ( a )
-	return unwrap( a ):ToScreen()
+function vec_methods:toScreen ( )
+	return unwrap( self ):ToScreen()
 end
 
 --- Returns whenever the given vector is in a box created by the 2 other vectors.
 -- @param v1 Vector used to define AABox
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
-function vec_methods.withinAABox ( a, v1, v2 )
+function vec_methods.withinAABox ( v1, v2 )
 	SF.CheckType( v1, vec_metamethods )
 	SF.CheckType( v2, vec_metamethods )
 
-	if a[1] < v1[1] or a[1] > v2[1] then return false end
-	if a[2] < v1[2] or a[2] > v2[2] then return false end
-	if a[3] < v1[3] or a[3] > v2[3] then return false end
+	if self[1] < v1[1] or self[1] > v2[1] then return false end
+	if self[2] < v1[2] or self[2] > v2[2] then return false end
+	if self[3] < v1[3] or self[3] > v2[3] then return false end
 
 	return true
 end
