@@ -96,6 +96,10 @@ function ENT:Compile(files, mainfile)
 	local ok, instance = SF.Compiler.Compile( files, context, mainfile, self.owner, { entity = self } )
 	if not ok then self:Error(instance) return end
 	
+	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then
+		self.name = tostring( instance.ppdata.scriptnames[ instance.mainfile ] )
+	end
+
 	instance.runOnError = function(inst,...) self:Error(...) end
 
 	if self.instance then
