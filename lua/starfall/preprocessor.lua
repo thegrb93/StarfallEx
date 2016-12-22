@@ -113,7 +113,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 				ending = "end"
 				endingLevel = comment.level
 			elseif comment.type == "line" then
-				local directive, args = string.match(line,"--@(%S+)%s*(%S*)")
+				local directive, args = string.match(line,"--@(%S+)%s*(.*)")
 				local func = directives[directive] or SF.Preprocessor.directives[directive]
 				if func then
 					func(args, filename, data)
