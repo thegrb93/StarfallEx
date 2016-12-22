@@ -5,7 +5,7 @@ TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
--- ------------------------------- Sending / Recieving ------------------------------- --
+-- ------------------------------- Sending / Receiving ------------------------------- --
 include("starfall/sflib.lua")
 
 TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
@@ -42,13 +42,20 @@ if SERVER then
 	
 else
 	language.Add( "Tool.starfall_component.name", "Starfall - Component" )
-	language.Add( "Tool.starfall_component.desc", "Spawns a starfall component" )
-	language.Add( "Tool.starfall_component.0", "Primary: Spawns a component, Secondary: Link to processor, Reload: Clear the link" )
-	language.Add( "Tool.starfall_component.1", "Now select the processor to link to.")
+	language.Add( "Tool.starfall_component.desc", "Spawns a Starfall component" )
 	language.Add( "sboxlimit_starfall_components", "You've hit the Starfall Component limit!" )
 	language.Add( "undone_Starfall Screen", "Undone Starfall Screen" )
 	language.Add( "undone_Starfall HUD", "Undone Starfall HUD" )
 	language.Add( "Cleanup_starfall_components", "Starfall Components" )
+	TOOL.Information = {
+		{ name = "left", stage = 0, text = "Spawn a component" },
+		{ name = "right_0", stage = 0, text = "Link to processor" },
+		{ name = "reload", stage = 0, text = "Clear the link" },
+		{ name = "right_1", stage = 1, text = "Select the processor to link to" },
+	}
+	for _, info in pairs(TOOL.Information) do
+		language.Add("Tool.starfall_component." .. info.name, info.text)
+	end
 end
 
 function TOOL:LeftClick( trace )
