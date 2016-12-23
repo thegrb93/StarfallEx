@@ -130,6 +130,10 @@ function ENT:Compile(files, mainfile)
 	self:SetNWInt( "State", self.States.Normal )
 end
 
+function ENT:GetGateName()
+	return self.name
+end
+
 function ENT:Think ()
 	self.BaseClass.Think( self )
 	
