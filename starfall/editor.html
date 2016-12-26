@@ -86,6 +86,14 @@
 				}
 			});
 
+			editor.commands.addCommand({
+				name: "ctrloutdent",
+				bindKey: {win: "Ctrl-Tab", mac: "Command-Tab"},
+				exec: function(editor){
+					editor.blockOutdent()
+				}
+			});
+
 			function clearErrorLines() {
 				var markers = editor.session.getMarkers()
 				for(var id in markers){
