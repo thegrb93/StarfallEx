@@ -71,7 +71,7 @@ function bass_library.loadFile ( path, flags, callback )
 	end)
 end
 
---- Loads a sound object from a url
+--- Loads a sound object from a url. Doesn't work on Linux users
 -- @param path url to the sound file.
 -- @param flags that will control the sound
 -- @param callback to run when the sound is loaded
@@ -84,6 +84,18 @@ function bass_library.loadURL ( path, flags, callback )
 
 	local instance = SF.instance
 	
+	-- sound.PlayURL crashes users with Linux as OS
+	-- therefore the callback gets called with error code -1 (unknown), nil sound and an error message
+	if system.IsLinux() then
+		local ok, msg, traceback = instance:runFunction( callback, nil, -1, "bass.loadURL() does not work on linux users" )
+		if not ok then
+			instance:Error( msg, traceback )
+		end
+
+		return
+	end
+
+
 	sound.PlayURL( path, flags, function(snd, er, name)
 		if er then
 			local ok, msg, traceback = instance:runFunction( callback, nil, er, name )
