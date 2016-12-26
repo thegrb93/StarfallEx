@@ -617,7 +617,7 @@ else
 		else
 			net.Start("starfall_upload")
 			net.WriteString("")
-			net.WriteBit(false)
+			net.WriteBit(true)
 			net.SendToServer()
 			if list then
 				SF.AddNotify( LocalPlayer(), list, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )

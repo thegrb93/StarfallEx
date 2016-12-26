@@ -97,7 +97,7 @@ if CLIENT then
 		end
 		if SF.Editor.editor then return end
 
-		SF.Editor.editor = SF.Editor.createEditor()
+		SF.Editor.createEditor()
 		SF.Editor.fileViewer = SF.Editor.createFileViewer()
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
@@ -165,7 +165,9 @@ if CLIENT then
 
 		tabHolder:selectTab( tab )
 
-		SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
+		if SF.Editor.initialized then
+			SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( tab )..")" )
+		end
 	end
 
 	function SF.Editor.addTab ( filename, code )
@@ -187,7 +189,9 @@ if CLIENT then
 			wrap = GetConVarNumber( "sf_editor_wordwrap" )
 		}):JavascriptSafe()
 
-		SF.Editor.runJS( "newEditSession(\"" .. string.JavascriptSafe( code or defaultCode ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
+		if SF.Editor.initialized then
+			SF.Editor.runJS( "newEditSession(\"" .. string.JavascriptSafe( code or defaultCode ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
+		end
 
 		local tab = SF.Editor.getTabHolder():addTab( name )
 		tab.code = code
@@ -380,6 +384,8 @@ if CLIENT then
 		editor:SetTitle( "Starfall Code Editor" )
 		editor:Center()
 
+		SF.Editor.editor = editor
+
 		function editor:OnKeyCodePressed ( keyCode )
 			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
 				SF.Editor.saveTab( SF.Editor.getActiveTab() )
@@ -487,6 +493,8 @@ if CLIENT then
 			SF.Editor.getActiveTab().code = code
 			SF.Editor.doValidation()
 		end)
+		
+		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 			
 		local function FinishedLoadingEditor()
 			local map = createLibraryMap()
@@ -619,18 +627,15 @@ if CLIENT then
 			end
 			
 			SF.Editor.updateSettings( true )
-
-			local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
-			if tabs ~= nil and #tabs ~= 0 then
-				for k, v in pairs( tabs ) do
-					if type( v ) ~= "number" then
-						SF.Editor.addTab( v.filename, v.code )
-					end
-				end
-				SF.Editor.selectTab( tabs.selectedTab or 1 )
-			else
-				SF.Editor.addTab()
+			
+			local tabHolder = SF.Editor.getTabHolder()
+			local wrapsetting = util.TableToJSON({
+				wrap = GetConVarNumber( "sf_editor_wordwrap" )
+			}):JavascriptSafe()
+			for _, tab in pairs(tabHolder.tabs) do
+				SF.Editor.runJS( "newEditSession(\"" .. string.JavascriptSafe( tab.code or defaultCode ) .. "\", JSON.parse(\"" .. wrapsetting .. "\"))" )
 			end
+			SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( SF.Editor.getActiveTab() )..")" )
 			
 			SF.Editor.initialized = true
 		end
@@ -710,7 +715,17 @@ if CLIENT then
 			end 
 		end
 
-		return editor
+		if tabs ~= nil and #tabs ~= 0 then
+			for k, v in pairs( tabs ) do
+				if type( v ) ~= "number" then
+					SF.Editor.addTab( v.filename, v.code )
+				end
+			end
+			SF.Editor.selectTab( tabs.selectedTab or 1 )
+		else
+			SF.Editor.addTab()
+		end
+
 	end
 
 	function SF.Editor.createFileViewer ()
@@ -1293,7 +1308,7 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
 	function SF.Editor.BuildIncludesTable ( maincode, codename )
-		if not SF.Editor.initialized then SF.Editor.init() return false, "Loading Editor" end
+		if not SF.Editor.editor then SF.Editor.init() end
 		local tbl = {}
 		maincode = maincode or SF.Editor.getCode()
 		codename = codename or SF.Editor.getOpenFile() or "main"
