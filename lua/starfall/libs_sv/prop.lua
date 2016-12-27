@@ -78,7 +78,7 @@ function props_library.create ( pos, ang, model, frozen )
 	local ang = SF.Angles.Unwrap( ang )
 
 	local instance = SF.instance
-	print(instance.data.props.burst:check())
+
 	if not instance.data.props.burst:use(1) then return SF.throw( "Can't spawn props that often", 2 )
 	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 	if not gamemode.Call( "PlayerSpawnProp", instance.player, model ) then return end
@@ -133,13 +133,15 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	local swep = list.Get( "Weapon" )[ class ]
 	local sent = list.Get( "SpawnableEntities" )[ class ]
+	local npc = list.Get( "NPC" )[ class ]
+	local vehicle = list.Get( "Vehicles" )[ class ]
 
 	local propdata = instance.data.props
 	local entity
 	local hookcall
-	
+
 	if swep then
-	
+
 		if ( ( !swep.Spawnable && !instance.player:IsAdmin() ) || 
 		      ( swep.AdminOnly && !instance.player:IsAdmin() ) ) then return end
 		if ( !gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
@@ -148,16 +150,92 @@ function props_library.createSent ( pos, ang, class, frozen )
 		entity = ents.Create( swep.ClassName )
 		
 		hookcall = "PlayerSpawnedSWEP"
-	
+
 	elseif sent then
-	
+
 		if ( sent.AdminOnly && !instance.player:IsAdmin() ) then return false end
 		if ( !gamemode.Call( "PlayerSpawnSENT", instance.player, class ) ) then return end
-	
+
 		entity = ents.Create( sent.ClassName )
-	
+
 		hookcall = "PlayerSpawnedSENT"
-	
+
+	elseif npc then
+
+		if ( npc.AdminOnly && !instance.player:IsAdmin() ) then return false end
+		if ( !gamemode.Call( "PlayerSpawnNPC", instance.player, class, "" ) ) then return end
+
+		entity = ents.Create( npc.Class )
+
+		if IsValid( entity ) then
+			if ( npc.Model ) then
+				entity:SetModel( npc.Model )
+			end
+			if ( npc.Material ) then
+				entity:SetMaterial( npc.Material )
+			end
+			local SpawnFlags = bit.bor( SF_NPC_FADE_CORPSE, SF_NPC_ALWAYSTHINK )
+			if ( npc.SpawnFlags ) then SpawnFlags = bit.bor( SpawnFlags, npc.SpawnFlags ) end
+			if ( npc.TotalSpawnFlags ) then SpawnFlags = npc.TotalSpawnFlags end
+			entity:SetKeyValue( "spawnflags", SpawnFlags )
+			entity.SpawnFlags = SpawnFlags
+			if ( npc.KeyValues ) then
+				for k, v in pairs( npc.KeyValues ) do
+					entity:SetKeyValue( k, v )
+				end
+			end
+			if ( npc.Skin ) then
+				entity:SetSkin( npc.Skin )
+			end
+		end
+
+		hookcall = "PlayerSpawnedNPC"
+
+	elseif vehicle then
+
+		if ( !gamemode.Call( "PlayerSpawnVehicle", instance.player, vehicle.Model, vehicle.Class, vehicle ) ) then return end
+
+		entity = ents.Create( vehicle.Class )
+		
+		if IsValid( entity ) then
+			entity:SetModel( vehicle.Model )
+			if ( vehicle.Model == "models/buggy.mdl" ) then 
+				entity:SetKeyValue( "vehiclescript", "scripts/vehicles/jeep_test.txt" )
+			end
+			if ( vehicle.Model == "models/vehicle.mdl" ) then
+				entity:SetKeyValue( "vehiclescript", "scripts/vehicles/jalopy.txt" )
+			end
+			if ( vehicle.KeyValues ) then
+				for k, v in pairs( vehicle.KeyValues ) do
+
+					local kLower = string.lower( k )
+
+					if ( kLower == "vehiclescript" ||
+						 kLower == "limitview"     ||
+						 kLower == "vehiclelocked" ||
+						 kLower == "cargovisible"  ||
+						 kLower == "enablegun" )
+					then
+						entity:SetKeyValue( k, v )
+					end
+
+				end
+			end
+
+			if ( vehicle.Members ) then
+				table.Merge( entity, vehicle.Members )
+				duplicator.StoreEntityModifier( entity, "VehicleMemDupe", vehicle.Members )
+			end
+			
+			if ( entity.SetVehicleClass ) then entity:SetVehicleClass( class ) end
+			entity.VehicleName = class
+			entity.VehicleTable = vehicle
+
+			entity.ClassOverride = vehicle.Class
+		end
+
+		hookcall = "PlayerSpawnedVehicle"
+
 	end
 	
 	if ( IsValid( entity ) ) then
