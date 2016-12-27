@@ -1,10 +1,6 @@
 --- Provides permissions for entities based on CPPI if present
 
-local P = setmetatable( {}, { __index = SF.Permissions.Provider } )
-
-local ALLOW = SF.Permissions.Result.ALLOW
-local DENY = SF.Permissions.Result.DENY
-local NEUTRAL = SF.Permissions.Result.NEUTRAL
+local P = {}
 
 local canTool = {
 	[ "entities.parent" ] = true,
@@ -42,30 +38,24 @@ local canPhysgun = {
 	[ "entities.setFrozen" ] = true
 }
 
-function P:check ( principal, target, key )
-	if not CPPI then return NEUTRAL end
-	
-	if canTool[ key ] then
-		if not IsValid( target:CPPIGetOwner() ) then return DENY end
-		if target:CPPICanTool( principal, "starfall_ent_lib" ) then return ALLOW end
-		return DENY
-	elseif canPhysgun[ key ] then
-		if target:IsPlayer() then
-			if hook.Call( "PhysgunPickup", GAMEMODE, principal, target ) ~= false then
-				-- Some mods expect a release when there's a player pickup involved.
-				hook.Call( "PhysgunDrop", GAMEMODE, principal, target )
-				return ALLOW
+function P.check ( principal, target, key )
+	if CPPI then
+		if canTool[ key ] then
+			return target:CPPICanTool( principal, "starfall_ent_lib" )
+		elseif canPhysgun[ key ] then
+			if target:IsPlayer() then
+				if hook.Call( "PhysgunPickup", GAMEMODE, principal, target ) ~= false then
+					-- Some mods expect a release when there's a player pickup involved.
+					hook.Call( "PhysgunDrop", GAMEMODE, principal, target )
+					return true
+				else
+					return false
+				end
 			else
-				return DENY
+				return target:CPPICanPhysgun( principal )
 			end
-		else
-			if not IsValid( target:CPPIGetOwner() ) then return DENY end
-			if target:CPPICanPhysgun( principal ) then return ALLOW end
 		end
-		return DENY
 	end
-
-	return NEUTRAL
 end
 
 SF.Permissions.registerProvider( P )
