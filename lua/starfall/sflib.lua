@@ -5,8 +5,6 @@
 if SF ~= nil then return end
 SF = {}
 
-jit.off() -- Needed so ops counting will work reliably.
-
 -- Send files to client
 if SERVER then
 	AddCSLuaFile( "sflib.lua" )

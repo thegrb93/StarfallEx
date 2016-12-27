@@ -29,15 +29,7 @@ SF.Instance.__index = SF.Instance
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func,...)
-
-	local args = { ... }
-	local nargs = select( "#", ... )
 	local traceback
-
-	local wrapperfunc = function ()
-		return { func( unpack( args, 1, nargs ) ) }
-	end
-
 	local function xpcall_callback ( err )
 		if type( err ) == "table" then
 			if type( err.message ) == "string" then
@@ -52,28 +44,30 @@ function SF.Instance:runWithOps(func,...)
 		return err
 	end
 
-	local ok, rt
-	if self.instanceStack then
-		--Already measuring cpu time. Just call it
-		ok, rt = xpcall( wrapperfunc, xpcall_callback )
-	else
-		--Start measuring cpu time
-		local oldSysTime = SysTime() - self.cpu_total
-		local function cpuCheck ()
-			self.cpu_total = SysTime() - oldSysTime
-			local usedRatio = self:movingCPUAverage()/self.context.cpuTime:getMax()
-			if usedRatio>1 then
-				debug.sethook( nil )
-				SF.throw( "CPU Quota exceeded.", 0, true )
-			elseif usedRatio > self.cpu_softquota then
-				SF.throw( "CPU Quota warning.", 0 )
-			end
+	local oldSysTime = SysTime() - self.cpu_total
+	local function cpuCheck ()
+		self.cpu_total = SysTime() - oldSysTime
+		local usedRatio = self:movingCPUAverage()/self.context.cpuTime:getMax()
+		if usedRatio>1 then
+			debug.sethook( nil )
+			SF.throw( "CPU Quota exceeded.", 0, true )
+		elseif usedRatio > self.cpu_softquota then
+			SF.throw( "CPU Quota warning.", 0 )
 		end
-		debug.sethook( cpuCheck, "", 500 )
-		ok, rt = xpcall( wrapperfunc, xpcall_callback )
-		debug.sethook( nil )
 	end
-	
+		
+	local ok, rt
+	ok, rt = xpcall( cpuCheck, xpcall_callback )
+	if ok then
+		if self.instanceStack then
+			--This prevents premature debug.sethook( nil )
+			ok, rt = xpcall( func, xpcall_callback, ... )
+		else
+			debug.sethook( cpuCheck, "", 2000 )
+			ok, rt = xpcall( func, xpcall_callback, ... )
+			debug.sethook( nil )
+		end
+	end
 	
 	if ok then
 		return true, rt
