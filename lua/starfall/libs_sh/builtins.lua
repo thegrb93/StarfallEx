@@ -441,6 +441,8 @@ function SF.DefaultEnvironment.try ( func, catch )
 		if err.uncatchable then
 			error( err )
 		end
+	elseif err == "not enough memory" then
+		SF.throw( err, 0, true )
 	end
 	if catch then catch( err ) end
 end
