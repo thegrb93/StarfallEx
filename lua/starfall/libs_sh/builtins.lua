@@ -220,7 +220,7 @@ function SF.DefaultEnvironment.getLibraries()
 end
 
 
-local luaMetaTypes = {
+local luaTypes = {
 	nil,
 	true,
 	0,
@@ -228,13 +228,14 @@ local luaMetaTypes = {
 	coroutine.create(function() end)
 }
 for i=1, 5 do
-	local meta = debug.getmetatable(luaMetaTypes[i])
+	local luaType = luaTypes[i]
+	local meta = debug.getmetatable(luaType)
 	if meta then
 		SF.Libraries.AddHook( "prepare", function()
-			debug.setmetatable( luaMetaTypes[i], nil )
+			debug.setmetatable( luaType, nil )
 		end )
 		SF.Libraries.AddHook( "cleanup", function() 
-			debug.setmetatable( luaMetaTypes[i], meta )
+			debug.setmetatable( luaType, meta )
 		end )
 	end
 end
