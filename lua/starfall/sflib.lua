@@ -529,6 +529,11 @@ if SERVER then
 			local filename = net.ReadString()
 
 			net.ReadStream( ply, function( data )
+				if not data and uploaddata[ply]==updata then
+					SF.AddNotify( ply, "There was a problem uploading your code. Try again in a second.", NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+					uploaddata[ply] = nil
+					return
+				end
 				updata.Completed = updata.Completed + 1
 				updata.files[ filename ] = data
 				if updata.Completed == updata.NumFiles then
