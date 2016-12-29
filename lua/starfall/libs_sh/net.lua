@@ -59,7 +59,9 @@ end
 --- Send a net message from client->server, or server->client.
 --@shared
 --@param target Optional target location to send the net message.
-function net_library.send ( target )
+--@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
+function net_library.send ( target, unreliable )
+	if unreliable then SF.CheckType( unreliable, "boolean" ) end
 	local instance = SF.instance
 	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
 
@@ -69,7 +71,7 @@ function net_library.send ( target )
 
 	local data = instance.data.net.data
 	if #data == 0 then return false end
-	net.Start( "SF_netmessage" )
+	net.Start( "SF_netmessage", unreliable )
 	net.WriteEntity( SF.instance.data.entity )
 	for i = 1, #data do
 		net[ data[ i ][ 1 ] ]( unpack( data[ i ][ 2 ] ) )
