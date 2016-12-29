@@ -124,6 +124,10 @@
 	</li>
 
 	<li>
+		<a href="libraries/mesh.html">mesh</a>
+	</li>
+
+	<li>
 		<a href="libraries/net.html">net</a>
 	</li>
 
@@ -182,6 +186,8 @@
 			<li><a href="classes/Entity.html">Entity</a></li>
 		
 			<li><a href="classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="classes/Mesh.html">Mesh</a></li>
 		
 			<li><a href="classes/Npc.html">Npc</a></li>
 		
@@ -356,6 +362,14 @@
 
 	<li>
 		<a href="hooks.html#net">net</a>
+	</li>
+
+	<li>
+		<a href="hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
+	</li>
+
+	<li>
+		<a href="hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
 	</li>
 
 	<li>
@@ -689,6 +703,18 @@ Called when a button is released </td>
 	<td class="name" nowrap><a href="#net">net</a>&nbsp;(name, len, ply)</td>
 	<td class="summary">
 Called when a net message arrives </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#postdrawopaquerenderables">postdrawopaquerenderables</a>&nbsp;(boolean)</td>
+	<td class="summary">
+Called after opaque entities are drawn.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#predrawopaquerenderables">predrawopaquerenderables</a>&nbsp;(boolean)</td>
+	<td class="summary">
+Called before opaque entities are drawn.</td>
 	</tr>
 
 	<tr>
@@ -1746,6 +1772,52 @@ Called when a net message arrives
 		
 		<li>
 		  <code><em>ply</em></code>: On server, the player that sent the message. Nil on client.
+		</li>
+		
+	</ul>
+	
+
+	
+
+	
+
+	</dd>
+
+	
+	<dt><a name="postdrawopaquerenderables"></a><strong>postdrawopaquerenderables</strong>&nbsp;(boolean)</dt>
+	<dd>
+	
+Called after opaque entities are drawn. (Only works with HUD)
+
+	
+	<h3>Parameters:</h3>
+	<ul>
+		
+		<li>
+		  <code><em>boolean</em></code>: isDrawSkybox  Whether the current draw is drawing the skybox.
+		</li>
+		
+	</ul>
+	
+
+	
+
+	
+
+	</dd>
+
+	
+	<dt><a name="predrawopaquerenderables"></a><strong>predrawopaquerenderables</strong>&nbsp;(boolean)</dt>
+	<dd>
+	
+Called before opaque entities are drawn. (Only works with HUD)
+
+	
+	<h3>Parameters:</h3>
+	<ul>
+		
+		<li>
+		  <code><em>boolean</em></code>: isDrawSkybox  Whether the current draw is drawing the skybox.
 		</li>
 		
 	</ul>

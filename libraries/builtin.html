@@ -122,6 +122,10 @@
 	</li>
 
 	<li>
+		<a href="../libraries/mesh.html">mesh</a>
+	</li>
+
+	<li>
 		<a href="../libraries/net.html">net</a>
 	</li>
 
@@ -180,6 +184,8 @@
 			<li><a href="../classes/Entity.html">Entity</a></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Mesh.html">Mesh</a></li>
 		
 			<li><a href="../classes/Npc.html">Npc</a></li>
 		
@@ -357,6 +363,14 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#readcell">readcell</a>
 	</li>
 
@@ -484,6 +498,13 @@ Returns the entity representing a processor that this script is running on.</td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.concmd">concmd</a>&nbsp;(cmd)</td>
 	<td class="summary">
 Execute a console command </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.debugGetInfo">debugGetInfo</a>&nbsp;(funcOrStackLevel, fields)</td>
+	<td class="summary">
+GLua's getinfo() 
+Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo) </td>
 	</tr>
 
 	<tr>
@@ -1032,6 +1053,45 @@ Execute a console command
 
 
 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.debugGetInfo"></a><strong>SF.DefaultEnvironment.debugGetInfo</strong>&nbsp;(funcOrStackLevel, fields)</dt>
+<dd>
+
+GLua's getinfo() 
+Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo)
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>funcOrStackLevel</em></code>: Function or stack level to get info about. Defaults to stack level 0.
+	</li>
+	
+	<li>
+	  <code><em>fields</em></code>: A string that specifies the information to be retrieved. Defaults to all (flnSu).
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>DebugInfo table</ul>
 
 
 

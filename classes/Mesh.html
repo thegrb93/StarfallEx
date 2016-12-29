@@ -187,7 +187,7 @@
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
 		
-			<li><a href="../classes/Mesh.html">Mesh</a></li>
+			<li><strong>Mesh</strong></li>
 		
 			<li><a href="../classes/Npc.html">Npc</a></li>
 		
@@ -197,7 +197,7 @@
 		
 			<li><a href="../classes/Sound.html">Sound</a></li>
 		
-			<li><strong>VMatrix</strong></li>
+			<li><a href="../classes/VMatrix.html">VMatrix</a></li>
 		
 			<li><a href="../classes/Vector.html">Vector</a></li>
 		
@@ -470,10 +470,10 @@
 
 <div id="content">
 
-<h1>Type <code>VMatrix</code></h1>
+<h1>Type <code>Mesh</code></h1>
 
 <p>
-VMatrix type</p>
+Mesh type</p>
 
 
 
@@ -485,87 +485,15 @@ VMatrix type</p>
 <table class="function_list">
 
 	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getAngles">getAngles</a>&nbsp;()</td>
+		<td class="name" nowrap><a href="#mesh_methods:destroy">destroy</a>&nbsp;()</td>
 		<td class="summary">
-Returns angles </td>
+Frees the mesh from memory </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getForward">getForward</a>&nbsp;()</td>
+		<td class="name" nowrap><a href="#mesh_methods:draw">draw</a>&nbsp;()</td>
 		<td class="summary">
-Returns forward vector of matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getInverse">getInverse</a>&nbsp;()</td>
-		<td class="summary">
-Inverts the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getInverseTR">getInverseTR</a>&nbsp;()</td>
-		<td class="summary">
-Inverts the matrix efficiently for translations and rotations </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getRight">getRight</a>&nbsp;()</td>
-		<td class="summary">
-Returns right vector of matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getScale">getScale</a>&nbsp;()</td>
-		<td class="summary">
-Returns scale </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getTranslation">getTranslation</a>&nbsp;()</td>
-		<td class="summary">
-Returns translation </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:getUp">getUp</a>&nbsp;()</td>
-		<td class="summary">
-Returns up vector of matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:rotate">rotate</a>&nbsp;(ang)</td>
-		<td class="summary">
-Rotate the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:scale">scale</a>&nbsp;(vec)</td>
-		<td class="summary">
-Scale the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:scaleTranslation">scaleTranslation</a>&nbsp;(num)</td>
-		<td class="summary">
-Scales the absolute translation </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:setAngles">setAngles</a>&nbsp;(ang)</td>
-		<td class="summary">
-Sets the angles </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:setTranslation">setTranslation</a>&nbsp;(vec)</td>
-		<td class="summary">
-Sets the translation </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><a href="#vmatrix_methods:translate">translate</a>&nbsp;(vec)</td>
-		<td class="summary">
-Translate the matrix </td>
+Draws the mesh.</td>
 	</tr>
 
 </table>
@@ -581,222 +509,13 @@ Translate the matrix </td>
 
 
 
-<dt><a name="vmatrix_methods:getAngles"></a><strong>vmatrix_methods:getAngles</strong>&nbsp;()</dt>
+<dt><a name="mesh_methods:destroy"></a><strong>mesh_methods:destroy</strong>&nbsp;()</dt>
 <dd>
 
-Returns angles
+Frees the mesh from memory
 
 
 
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Angles</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getForward"></a><strong>vmatrix_methods:getForward</strong>&nbsp;()</dt>
-<dd>
-
-Returns forward vector of matrix
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getInverse"></a><strong>vmatrix_methods:getInverse</strong>&nbsp;()</dt>
-<dd>
-
-Inverts the matrix
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>inverted matrix</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getInverseTR"></a><strong>vmatrix_methods:getInverseTR</strong>&nbsp;()</dt>
-<dd>
-
-Inverts the matrix efficiently for translations and rotations
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>inverted matrix</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getRight"></a><strong>vmatrix_methods:getRight</strong>&nbsp;()</dt>
-<dd>
-
-Returns right vector of matrix
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getScale"></a><strong>vmatrix_methods:getScale</strong>&nbsp;()</dt>
-<dd>
-
-Returns scale
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Scale</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getTranslation"></a><strong>vmatrix_methods:getTranslation</strong>&nbsp;()</dt>
-<dd>
-
-Returns translation
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:getUp"></a><strong>vmatrix_methods:getUp</strong>&nbsp;()</dt>
-<dd>
-
-Returns up vector of matrix
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:rotate"></a><strong>vmatrix_methods:rotate</strong>&nbsp;(ang)</dt>
-<dd>
-
-Rotate the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>ang</em></code>: Angle to rotate by
-	</li>
-	
-</ul>
 
 
 
@@ -812,146 +531,13 @@ Rotate the matrix
 
 
 
-<dt><a name="vmatrix_methods:scale"></a><strong>vmatrix_methods:scale</strong>&nbsp;(vec)</dt>
+<dt><a name="mesh_methods:draw"></a><strong>mesh_methods:draw</strong>&nbsp;()</dt>
 <dd>
 
-Scale the matrix
+Draws the mesh. Must be in a 3D rendering context.
 
 
 
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>vec</em></code>: Vector to scale by
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:scaleTranslation"></a><strong>vmatrix_methods:scaleTranslation</strong>&nbsp;(num)</dt>
-<dd>
-
-Scales the absolute translation
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>num</em></code>: Amount to scale by
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:setAngles"></a><strong>vmatrix_methods:setAngles</strong>&nbsp;(ang)</dt>
-<dd>
-
-Sets the angles
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>ang</em></code>: New angles
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:setTranslation"></a><strong>vmatrix_methods:setTranslation</strong>&nbsp;(vec)</dt>
-<dd>
-
-Sets the translation
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>vec</em></code>: New translation
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="vmatrix_methods:translate"></a><strong>vmatrix_methods:translate</strong>&nbsp;(vec)</dt>
-<dd>
-
-Translate the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>vec</em></code>: Vector to translate by
-	</li>
-	
-</ul>
 
 
 

@@ -123,6 +123,10 @@
 		<a href="../libraries/json.html">json</a>
 	</li>
 
+	<li>
+		<a href="../libraries/mesh.html">mesh</a>
+	</li>
+
 		<li><strong>net</strong></li>
 	
 	<li>
@@ -180,6 +184,8 @@
 			<li><a href="../classes/Entity.html">Entity</a></li>
 		
 			<li><a href="../classes/Hologram.html">Hologram</a></li>
+		
+			<li><a href="../classes/Mesh.html">Mesh</a></li>
 		
 			<li><a href="../classes/Npc.html">Npc</a></li>
 		
@@ -354,6 +360,14 @@
 
 	<li>
 		<a href="../hooks.html#net">net</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
 	</li>
 
 	<li>
@@ -553,7 +567,7 @@ Reads a vector from the net message </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#net_library.send">send</a>&nbsp;(target)</td>
+	<td class="name" nowrap><a href="#net_library.send">send</a>&nbsp;(target, unreliable)</td>
 	<td class="summary">
 Send a net message from client->server, or server->client.</td>
 	</tr>
@@ -1043,7 +1057,7 @@ Reads a vector from the net message
 
 
 
-<dt><a name="net_library.send"></a><strong>net_library.send</strong>&nbsp;(target)</dt>
+<dt><a name="net_library.send"></a><strong>net_library.send</strong>&nbsp;(target, unreliable)</dt>
 <dd>
 
 Send a net message from client->server, or server->client.
@@ -1056,6 +1070,10 @@ Send a net message from client->server, or server->client.
 	
 	<li>
 	  <code><em>target</em></code>: Optional target location to send the net message.
+	</li>
+	
+	<li>
+	  <code><em>unreliable</em></code>: Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 	</li>
 	
 </ul>
