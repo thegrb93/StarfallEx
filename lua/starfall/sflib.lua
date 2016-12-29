@@ -111,25 +111,6 @@ do
 	SF.DefaultEnvironment = env
 end
 
---- A set of all instances that have been created. It has weak keys and values.
--- Instances are put here after initialization.
-SF.allInstances = setmetatable({},{__mode="kv"})
-
---- Calls a script hook on all processors.
-function SF.RunScriptHook(hook,...)
-	for _,instance in pairs(SF.allInstances) do
-		if not instance.error then
-			local ok, err = instance:runScriptHook(hook,...)
-			if not ok then
-				instance.error = true
-				if instance.runOnError then
-					instance:runOnError( err )
-				end
-			end
-		end
-	end
-end
-
 --- Creates a new context. A context is used to define what scripts will have access to.
 -- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table

@@ -121,13 +121,13 @@ end
 
 function PlayerButtonDown(ply, button)
 	if IsFirstTimePredicted() then
-		runInputHook( "inputPressed", button )
+		runInputHook( "inputpressed", button )
 	end
 end
 
 function PlayerButtonUp(ply, button)
 	if IsFirstTimePredicted() then
-		runInputHook( "inputReleased", button )
+		runInputHook( "inputreleased", button )
 	end
 end
 

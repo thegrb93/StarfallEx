@@ -73,7 +73,7 @@ end
 function ENT:OnRemove ()
 	if not self.instance then return end
 
-	self:runScriptHook( "Removed" )
+	self:runScriptHook( "removed" )
 	
 	self.instance:deinitialize()
 	self.instance = nil

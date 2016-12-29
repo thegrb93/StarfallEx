@@ -21,6 +21,10 @@ SF.Instance.__index = SF.Instance
 -- @field mainfile The main file
 -- @field player The "owner" of the instance
 
+--- A set of all instances that have been created. It has weak keys and values.
+-- Instances are put here after initialization.
+SF.allInstances = setmetatable({},{__mode="kv"})
+
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code
@@ -73,7 +77,7 @@ end
 
 --- Internal function - Do not call. Prepares the script to be executed.
 -- This is done automatically by Initialize and runScriptHook.
-function SF.Instance:prepare(hook, name)
+function SF.Instance:prepare(hook)
 	assert(self.initialized, "Instance not initialized!")
 	--Functions calling this one will silently halt.
 	if self.error then return true end
@@ -84,15 +88,15 @@ function SF.Instance:prepare(hook, name)
 		SF.instance = nil
 	end
 	
-	self:runLibraryHook("prepare",hook, name)
+	self:runLibraryHook("prepare",hook)
 	SF.instance = self
 end
 
 --- Internal function - Do not call. Cleans up the script.
 -- This is done automatically by Initialize and runScriptHook.
-function SF.Instance:cleanup(hook, name, ok, errmsg)
+function SF.Instance:cleanup(hook, ok, errmsg)
 	assert(SF.instance == self)
-	self:runLibraryHook("cleanup",hook, name, ok, errmsg)
+	self:runLibraryHook("cleanup",hook, ok, errmsg)
 	
 	if self.instanceStack then
 		SF.instance = self.instanceStack[#self.instanceStack]
@@ -120,19 +124,19 @@ function SF.Instance:initialize()
 	self.cpu_softquota = 1
 
 	self:runLibraryHook("initialize")
-	self:prepare("_initialize","_initialize")
+	self:prepare("_initialize")
 	
 	local func = self.scripts[self.mainfile]
 	local tbl, traceback = self:runWithOps(func)
 	if not tbl[1] then
-		self:cleanup("_initialize", true, tbl[2], traceback)
+		self:cleanup("_initialize", true, traceback)
 		self.error = true
 		return false, tbl[2], traceback
 	end
 	
 	SF.allInstances[self] = self
 	
-	self:cleanup("_initialize","_initialize",false)
+	self:cleanup("_initialize",false)
 	return true
 end
 
@@ -142,9 +146,18 @@ end
 -- @return True if it executed ok, false if not or if there was no hook
 -- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
-	for ok,err,traceback in self:iterScriptHook(hook,...) do
-		if not ok then return false,err,traceback end
+	if not self.hooks[hook] then return true end
+	if self:prepare(hook) then return true end
+	local tbl, traceback
+	for name, func in pairs(self.hooks[hook]) do
+		tbl, traceback = self:runWithOps(func,...)
+		if not tbl[1] then
+			self:cleanup(hook,true,traceback)
+			self.error = true
+			return false, tbl[2], traceback
+		end
 	end
+	self:cleanup(hook,false)
 	return true
 end
 
@@ -155,45 +168,23 @@ end
 -- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
 -- @return The traceback if the instance errored
 function SF.Instance:runScriptHookForResult(hook,...)
-	for ok,tbl,traceback in self:iterScriptHook(hook,...) do
-		if not ok then return false, tbl, traceback
-		elseif tbl and tbl[1] then
-			return true, unpack(tbl)
-		end
-	end
-	return true
-end
-
--- Some small efficiency thing
-local noop = function() end
-
---- Like SF.Instance:iterSciptHook, except that it doesn't unpack the hook results.
--- @param ... Arguments to pass to the hook's registered function.
--- @return An iterator function returning the ok status, then either the table of
--- hook results or the error message and traceback
-function SF.Instance:iterScriptHook(hook,...)
-	local hooks = self.hooks[hook:lower()]
-	if not hooks then return noop end
-	local index = nil
-	local args = {...}
-	return function()
-		if self.error then return end
-		local name, func = next(hooks,index)
-		if not name then return end
-		index = name
-		
-		if self:prepare(hook,name) then return true end
-		
-		local tbl, traceback = self:runWithOps(func,unpack(args))
-		if not tbl[1] then
-			self:cleanup(hook,name,true,tbl[2],traceback)
+	if not self.hooks[hook] then return true end
+	if self:prepare(hook) then return true end
+	local tbl, traceback
+	for name, func in pairs(self.hooks[hook]) do
+		tbl, traceback = self:runWithOps(func,...)
+		if tbl[1] then
+			if tbl[2]~=nil then
+				break
+			end
+		else
+			self:cleanup(hook,true,traceback)
 			self.error = true
 			return false, tbl[2], traceback
 		end
-		
-		self:cleanup(hook,name,false)
-		return true, tbl
 	end
+	self:cleanup(hook,false)
+	return true, unpack(tbl, 2)
 end
 
 --- Runs a library hook. Alias to SF.Libraries.CallHook(hook, self, ...).
@@ -209,16 +200,16 @@ end
 -- @param func Function to run
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func,...)
-	if self:prepare("_runFunction",func) then return true end
+	if self:prepare("_runFunction") then return true end
 	
 	local tbl, traceback = self:runWithOps(func,...)
 	if not tbl[1] then
-		self:cleanup("_runFunction",func,true,tbl[2],traceback)
+		self:cleanup("_runFunction",true,traceback)
 		self.error = true
 		return false, tbl[2], traceback
 	end
 	
-	self:cleanup("_runFunction",func,false)
+	self:cleanup("_runFunction",false)
 	return true, unpack(tbl, 2)
 end
 

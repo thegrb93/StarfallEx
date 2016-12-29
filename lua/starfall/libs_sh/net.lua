@@ -424,9 +424,7 @@ end
 net.Receive( "SF_netmessage", function( len, ply )
 	local ent = net.ReadEntity()
 	if ent:IsValid() and ent.runScriptHook then
-		if ent.instance then
-			ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
-		end
+		ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
 	end
 end)
 

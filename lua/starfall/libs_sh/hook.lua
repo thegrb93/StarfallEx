@@ -122,7 +122,7 @@ SF.Libraries.AddHook( "deinitialize", function ( instance )
 	registered_instances[ instance ] = nil
 end )
 
-SF.Libraries.AddHook( "cleanup", function ( instance, name, func, err )
+SF.Libraries.AddHook( "cleanup", function ( instance, name, err )
 	if name == "_runFunction" and err == true then
 		registered_instances[ instance ] = nil
 		instance.hooks = {}
