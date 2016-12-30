@@ -54,29 +54,19 @@ function bass_library.loadFile ( path, flags, callback )
 	local instance = SF.instance
 
 	if not bassEnabled:GetBool() then
-		local ok, msg, traceback = instance:runFunction( callback, nil, -1, "sf_bass_enabled is 0" )
-		if not ok then
-			instance:Error( msg, traceback )
-		end
-
+		instance:runFunction( callback, nil, -1, "sf_bass_enabled is 0" )
 		return
 	end
 
 	sound.PlayFile( path, flags, function(snd, er, name)
 		if er then
-			local ok, msg, traceback = instance:runFunction( callback, nil, er, name )
-			if not ok then
-				instance:Error( msg, traceback )
-			end
+			instance:runFunction( callback, nil, er, name )
 		else
 			if instance.error then
 				snd:Stop()
 			else
 				instance.data.bass.sounds[ snd ] = true
-				local ok, msg, traceback = instance:runFunction( callback, wrap( snd ), 0, "" )
-				if not ok then
-					instance:Error( msg, traceback )
-				end
+				instance:runFunction( callback, wrap( snd ), 0, "" )
 			end
 		end
 	end)
@@ -96,29 +86,19 @@ function bass_library.loadURL ( path, flags, callback )
 	local instance = SF.instance
 
 	if not bassEnabled:GetBool() then
-		local ok, msg, traceback = instance:runFunction( callback, nil, -1, "sf_bass_enabled is 0" )
-		if not ok then
-			instance:Error( msg, traceback )
-		end
-
+		instance:runFunction( callback, nil, -1, "sf_bass_enabled is 0" )
 		return
 	end
 
 	sound.PlayURL( path, flags, function(snd, er, name)
 		if er then
-			local ok, msg, traceback = instance:runFunction( callback, nil, er, name )
-			if not ok then
-				instance:Error( msg, traceback )
-			end
+			instance:runFunction( callback, nil, er, name )
 		else
 			if instance.error then
 				snd:Stop()
 			else
 				instance.data.bass.sounds[ snd ] = true
-				local ok, msg, traceback = instance:runFunction( callback, wrap( snd ), 0, "" )
-				if not ok then
-					instance:Error( msg, traceback )
-				end
+				instance:runFunction( callback, wrap( snd ), 0, "" )
 			end
 		end
 	end)

@@ -304,31 +304,6 @@ function SF.BurstObject( rate, max )
 	return setmetatable(t, {__index=burstclass})
 end
 
-local wrappedfunctions = setmetatable({},{__mode="kv"})
-local wrappedfunctions2instance = setmetatable({},{__mode="kv"})
---- Wraps the given starfall function so that it may called directly by GMLua
--- @param func The starfall function getting wrapped
--- @param instance The instance the function originated from
--- @return a function That when called will call the wrapped starfall function
-function SF.WrapFunction( func, instance )
-	if wrappedfunctions[func] then return wrappedfunctions[func] end
-	
-	local function returned_func( ... )
-		return SF.Unsanitize( instance:runFunction( func, SF.Sanitize(...) ) )
-	end
-	wrappedfunctions[func] = returned_func
-	wrappedfunctions2instance[returned_func] = instance
-	
-	return returned_func
-end
-
---- Gets the instance a wrapped function is bound to
--- @param func Function
--- @return Instance
-function SF.WrappedFunctionInstance(func)
-	return wrappedfunctions2instance[func]
-end
-
 -- A list of safe data types
 local safe_types = {
 	["number"  ] = true,

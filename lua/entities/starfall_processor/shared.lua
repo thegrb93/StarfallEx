@@ -17,18 +17,14 @@ ENT.States = {
 }
 
 function ENT:runScriptHook ( hook, ... )
-	if self.instance and not self.instance.error then
-		local ok, rt, tb = self.instance:runScriptHook( hook, ... )
-		if not ok then self:Error( rt, tb )
-		else return rt end
+	if self.instance then
+		return self.instance:runScriptHook( hook, ... )
 	end
 end
 
 function ENT:runScriptHookForResult ( hook, ... )
-	if self.instance and not self.instance.error then
-		local ok, rt, tb = self.instance:runScriptHookForResult( hook, ... )
-		if not ok then self:Error( rt, tb )
-		else return rt end
+	if self.instance then
+		return self.instance:runScriptHookForResult( hook, ... )
 	end
 end
 

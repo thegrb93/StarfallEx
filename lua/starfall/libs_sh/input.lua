@@ -24,9 +24,9 @@ if game.SinglePlayer() then
 			local down = net.ReadBool()
 			local key = net.ReadInt(16)
 			if down then
-				PlayerButtonDown(LocalPlayer(), key)
+				hook.Run("PlayerButtonDown", LocalPlayer(), key)
 			else
-				PlayerButtonUp(LocalPlayer(), key)
+				hook.Run("PlayerButtonUp", LocalPlayer(), key)
 			end
 		end )
 	end	
@@ -106,33 +106,15 @@ function input_methods.getCursorPos( )
 	return input.GetCursorPos( )
 end
 
-local function runInputHook( hookname, key )
-	for instance,_ in pairs( SF.allInstances ) do
-		if SF.Permissions.check( instance.player, nil, "input" ) then
-		
-		
-			local ok, err, tr = instance:runScriptHook( hookname, key )
-			if not ok then
-				instance:Error( "Hook 'input' errored with " .. err, tr )
-			end
-		end
+function CheckButtonPerms(instance, ply, button)
+	if IsFirstTimePredicted() and SF.Permissions.check( instance.player, nil, "input" ) then
+		return true, {button}
 	end
+	return false
 end
 
-function PlayerButtonDown(ply, button)
-	if IsFirstTimePredicted() then
-		runInputHook( "inputpressed", button )
-	end
-end
-
-function PlayerButtonUp(ply, button)
-	if IsFirstTimePredicted() then
-		runInputHook( "inputreleased", button )
-	end
-end
-
-hook.Add( "PlayerButtonDown", "SF_PlayerButtonDown", PlayerButtonDown)
-hook.Add( "PlayerButtonUp", "SF_PlayerButtonUp", PlayerButtonUp)
+SF.hookAdd( "PlayerButtonDown", "inputpressed", CheckButtonPerms)
+SF.hookAdd( "PlayerButtonUp", "inputreleased", CheckButtonPerms)
 
 ---- Called when a button is pressed
 --- @name inputPressed
