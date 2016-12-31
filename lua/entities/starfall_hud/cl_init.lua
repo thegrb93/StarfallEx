@@ -34,10 +34,7 @@ function ENT:DrawHUD()
 	draw.NoTexture()
 	surface.SetDrawColor( 255, 255, 255, 255 )
 	
-	local ok, rt, tb = instance:runScriptHook( "render" )
-	if not ok then
-		self.link:Error( rt, tb )
-	end
+	instance:runScriptHook( "render" )
 	
 	render.PopFilterMag()
 	render.PopFilterMin()
@@ -47,8 +44,9 @@ end
 
 function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
 	if IsValid( self.link ) then
-		local rt = self.link:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
-		if rt and type(rt) == "table" then
+		local tbl = self.link:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
+		local ok, rt = tbl[1], tbl[2] 
+		if ok and type(rt) == "table" then
 			return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
 		end
 	end

@@ -179,10 +179,7 @@ function net_library.readStream( cb )
 	streams[instance.player] = true
 	
 	net.ReadStream( ( SERVER and instance.player or nil ), function( data )
-		local ok, msg, traceback = instance:runFunction( cb, data )
-		if not ok then
-			instance:Error( msg, traceback )
-		end
+		instance:runFunction( cb, data )
 		streams[instance.player] = false
 	end )
 end

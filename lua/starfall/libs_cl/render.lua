@@ -410,10 +410,7 @@ function render_library.getTextureID ( tx, cb, alignment )
 		local tbl = {}
 		texturecachehttp[ tbl ] = LoadURLMaterial( tx, alignment, function()
 			if cb then
-				local ok, msg, traceback = instance:runFunction( cb, tbl, tx )
-				if not ok then
-					instance:Error( msg, traceback )
-				end
+				instance:runFunction( cb, tbl, tx )
 			end
 		end)
 		if not texturecachehttp[ tbl ] then return end

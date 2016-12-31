@@ -146,19 +146,19 @@ end
 -- @return True if it executed ok, false if not or if there was no hook
 -- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
-	if not self.hooks[hook] then return true end
-	if self:prepare(hook) then return true end
+	if not self.hooks[hook] then return {} end
+	if self:prepare(hook) then return {} end
 	local tbl, traceback
 	for name, func in pairs(self.hooks[hook]) do
 		tbl, traceback = self:runWithOps(func,...)
 		if not tbl[1] then
 			self:cleanup(hook,true,traceback)
-			self.error = true
-			return false, tbl[2], traceback
+			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[ 2 ], traceback )
+			return tbl
 		end
 	end
 	self:cleanup(hook,false)
-	return true
+	return tbl
 end
 
 --- Runs a script hook until one of them returns a true value. Returns those values.
@@ -168,8 +168,8 @@ end
 -- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
 -- @return The traceback if the instance errored
 function SF.Instance:runScriptHookForResult(hook,...)
-	if not self.hooks[hook] then return true end
-	if self:prepare(hook) then return true end
+	if not self.hooks[hook] then return {} end
+	if self:prepare(hook) then return {} end
 	local tbl, traceback
 	for name, func in pairs(self.hooks[hook]) do
 		tbl, traceback = self:runWithOps(func,...)
@@ -179,12 +179,12 @@ function SF.Instance:runScriptHookForResult(hook,...)
 			end
 		else
 			self:cleanup(hook,true,traceback)
-			self.error = true
-			return false, tbl[2], traceback
+			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[ 2 ], traceback )
+			return tbl
 		end
 	end
 	self:cleanup(hook,false)
-	return true, unpack(tbl, 2)
+	return tbl
 end
 
 --- Runs a library hook. Alias to SF.Libraries.CallHook(hook, self, ...).
@@ -203,14 +203,14 @@ function SF.Instance:runFunction(func,...)
 	if self:prepare("_runFunction") then return true end
 	
 	local tbl, traceback = self:runWithOps(func,...)
-	if not tbl[1] then
+	if tbl[1] then
+		self:cleanup("_runFunction",false)
+	else
 		self:cleanup("_runFunction",true,traceback)
-		self.error = true
-		return false, tbl[2], traceback
+		self:Error( "Callback errored with " .. tbl[ 2 ], traceback )
 	end
 	
-	self:cleanup("_runFunction",false)
-	return true, unpack(tbl, 2)
+	return tbl
 end
 
 --- Deinitializes the instance. After this, the instance should be discarded.

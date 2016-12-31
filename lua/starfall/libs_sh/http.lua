@@ -34,12 +34,8 @@ end
 -- Runs the appropriate callback after a http request
 local function runCallback ( instance, callback, ... )
 	if callback then
-		local args = { ... }
-		if IsValid( instance.data.entity ) and not instance.error then
-			local ok, msg, traceback = instance:runFunction( callback, unpack( args ) )
-			if not ok then
-				instance:Error( "http callback errored with: " .. msg, traceback )
-			end
+		if IsValid( instance.data.entity ) then
+			instance:runFunction( callback, ... )
 		end
 	end
 	instance.data.http.active = instance.data.http.active - 1
