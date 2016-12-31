@@ -58,7 +58,7 @@ function hook_library.add ( hookname, name, func )
 						for instance, _ in pairs( instances ) do
 							local canrun, customargs = customargfunc( instance, ... )
 							if canrun then
-								instance:runScriptHookForResult( hookname, wrapArguments( unpack( customargs ) ) )
+								instance:runScriptHook( hookname, wrapArguments( unpack( customargs ) ) )
 							end
 						end
 					end
@@ -79,7 +79,7 @@ function hook_library.add ( hookname, name, func )
 				else
 					hookfunc = function( ... )
 						for instance, _ in pairs( instances ) do
-							instance:runScriptHookForResult( hookname, wrapArguments( ... ) )
+							instance:runScriptHook( hookname, wrapArguments( ... ) )
 						end
 					end
 				end
