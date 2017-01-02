@@ -154,7 +154,7 @@ function ENT:PreEntityCopy ()
 	if self.EntityMods then self.EntityMods.SFDupeInfo = nil end
 	
 	if self.instance then
-		local info = WireLib.BuildDupeInfo(self)
+		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode( self.files, self.mainfile )
 		duplicator.StoreEntityModifier( self, "SFDupeInfo", info )
 	end
@@ -172,7 +172,9 @@ function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
 		
-		WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup( CreatedEntities ) )
+		if WireLib then
+			WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup( CreatedEntities ) )
+		end
 		self.owner = ply
 	
 		if info.starfall then

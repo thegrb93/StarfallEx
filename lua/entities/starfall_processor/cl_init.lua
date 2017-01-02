@@ -40,9 +40,15 @@ function ENT:GetOverlayText()
 	end
 end
 
-function ENT:DrawTranslucent()
-	self:DrawModel()
-	Wire_Render( self )
+if WireLib then
+	function ENT:DrawTranslucent()
+		self:DrawModel()
+		Wire_Render( self )
+	end
+else
+	function ENT:DrawTranslucent()
+		self:DrawModel()
+	end
 end
 
 function ENT:Think ()

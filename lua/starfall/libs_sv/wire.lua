@@ -2,6 +2,8 @@
 -- Wire library.
 -------------------------------------------------------------------------------
 
+if not WireLib then return end
+
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
 

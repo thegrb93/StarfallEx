@@ -675,7 +675,7 @@ function helper.show()
 	if docs_downloading then return end
 	if not docs_set then
 		docs_downloading = true
-		SF.AddNotify( LocalPlayer(), "Loading starfall helper now...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+		SF.AddNotify( LocalPlayer(), "Loading starfall helper now...", "GENERIC", 5, "DRIP3" )
 		
 		http.Fetch( "http://thegrb93.github.io/StarfallEx/doc.json", 
 		function( body, len, headers, code )
@@ -686,7 +686,7 @@ function helper.show()
 		end, 
 		function( error ) 
 			print("Starfall failed to load documentation, Error: ", error) 
-			SF.AddNotify( LocalPlayer(), "Failed to load the helper...", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 ) 
+			SF.AddNotify( LocalPlayer(), "Failed to load the helper...", "GENERIC", 5, "DRIP3" ) 
 			docs_downloading = false
 		end )
 		

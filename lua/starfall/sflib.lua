@@ -436,6 +436,35 @@ function SF.DeserializeCode(tbl)
 	return sources, tbl.mainfile
 end
 
+local soundsMap = {
+	[ "DRIP1" ] = 0,
+	[ "DRIP2" ] = 1,
+	[ "DRIP3" ] = 2,
+	[ "DRIP4" ] = 3,
+	[ "DRIP5" ] = 4,
+	[ "ERROR1" ] = 5,
+	[ "CONFIRM1" ] = 6,
+	[ "CONFIRM2" ] = 7,
+	[ "CONFIRM3" ] = 8,
+	[ "CONFIRM4" ] = 9,
+	[0] = "ambient/water/drip1.wav",
+	[1] = "ambient/water/drip2.wav",
+	[2] = "ambient/water/drip3.wav",
+	[3] = "ambient/water/drip4.wav",
+	[4] = "ambient/water/drip5.wav",
+	[5] = "buttons/button10.wav",
+	[6] = "buttons/button3.wav",
+	[7] = "buttons/button14.wav",
+	[8] = "buttons/button15.wav",
+	[9] = "buttons/button17.wav"
+}
+local notificationsMap = {
+	["GENERIC"] = 0,
+	["ERROR"] = 1,
+	["UNDO"] = 2,
+	["HINT"] = 3,
+	["CLEANUP"] = 4,
+}
 -- ------------------------------------------------------------------------- --
 
 if SERVER then
@@ -486,7 +515,7 @@ if SERVER then
 
 			net.ReadStream( ply, function( data )
 				if not data and uploaddata[ply]==updata then
-					SF.AddNotify( ply, "There was a problem uploading your code. Try again in a second.", NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+					SF.AddNotify( ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1" )
 					uploaddata[ply] = nil
 					return
 				end
@@ -513,9 +542,9 @@ if SERVER then
 
 		net.Start( "starfall_addnotify" )
 		net.WriteString( msg )
-		net.WriteUInt( notifyType, 8 or 0, 8 )
+		net.WriteUInt( notificationsMap[ notifyType ], 8 )
 		net.WriteFloat( duration )
-		net.WriteUInt( sound, 8 or 0, 8 )
+		net.WriteUInt( soundsMap[ sound ], 8 )
 		if ply then
 			net.Send( ply )
 		else
@@ -579,23 +608,10 @@ else
 			net.WriteBit(true)
 			net.SendToServer()
 			if list then
-				SF.AddNotify( LocalPlayer(), list, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+				SF.AddNotify( LocalPlayer(), list, "ERROR", 7, "ERROR1" )
 			end
 		end
 	end)
-
-	local sounds = {
-		[ NOTIFYSOUND_DRIP1 ] = "ambient/water/drip1.wav",
-		[ NOTIFYSOUND_DRIP2 ] = "ambient/water/drip2.wav",
-		[ NOTIFYSOUND_DRIP3 ] = "ambient/water/drip3.wav",
-		[ NOTIFYSOUND_DRIP4 ] = "ambient/water/drip4.wav",
-		[ NOTIFYSOUND_DRIP5 ] = "ambient/water/drip5.wav",
-		[ NOTIFYSOUND_ERROR1 ] = "buttons/button10.wav",
-		[ NOTIFYSOUND_CONFIRM1 ] = "buttons/button3.wav",
-		[ NOTIFYSOUND_CONFIRM2 ] = "buttons/button14.wav",
-		[ NOTIFYSOUND_CONFIRM3 ] = "buttons/button15.wav",
-		[ NOTIFYSOUND_CONFIRM4 ] = "buttons/button17.wav"
-	}
 
 	function SF.AddNotify ( ply, msg, type, duration, sound )
 		if not IsValid( ply ) then return end
@@ -613,8 +629,8 @@ else
 		
 		GAMEMODE:AddNotify( msg, type, duration )
 
-		if sound and sounds[ sound ] then
-			surface.PlaySound( sounds[ sound ] )
+		if sound and soundsMap[ sound ] then
+			surface.PlaySound( soundsMap[ sound ] )
 		end
 	end
 

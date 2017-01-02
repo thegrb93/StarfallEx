@@ -42,7 +42,6 @@ if CLIENT then
 
 	Github: https://github.com/thegrb93/StarfallEx
 	Reference Page: http://thegrb93.github.io/Starfall/
-	Development Thread: http://www.wiremod.com/forum/developers-showcase/22739-starfall-processor.html
 
 	Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
 ]].."]]"
@@ -115,18 +114,12 @@ if CLIENT then
 		end
 		
 		SF.Editor.editor:open()
-
-		if CanRunConsoleCommand() then
-			RunConsoleCommand( "starfall_event", "editor_open" )
-		end
+		RunConsoleCommand( "starfall_event", "editor_open" )
 	end
 
 	function SF.Editor.close ()
 		SF.Editor.editor:close()
-
-		if CanRunConsoleCommand() then
-			RunConsoleCommand( "starfall_event", "editor_close" )
-		end
+		RunConsoleCommand( "starfall_event", "editor_close" )
 	end
 
 	function SF.Editor.updateCode () -- Incase anyone needs to force update the code
@@ -220,7 +213,7 @@ if CLIENT then
 		local saveFile = "starfall/" .. tab.filename
 		file.Write( saveFile, tab.code )
 		SF.Editor.updateTabName( tab )
-		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+		SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", "GENERIC", 5, "DRIP3" )
 	end
 
 	function SF.Editor.saveTabAs ( tab )
@@ -243,7 +236,7 @@ if CLIENT then
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = "starfall/" .. text .. ".txt"
 					file.Write( saveFile, tab.code )
-					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+					SF.AddNotify( LocalPlayer(), "Starfall code saved as " .. saveFile .. ".", "GENERIC", 5, "DRIP3" )
 					SF.Editor.fileViewer.components[ "browser" ].tree:reloadTree()
 					tab.filename = text .. ".txt"
 					SF.Editor.updateTabName( tab )
@@ -260,7 +253,7 @@ if CLIENT then
 			local err = CompileString( code, "Validation", false )
 
 			if type( err ) ~= "string" then 
-				if forceShow then SF.AddNotify( LocalPlayer(), "Validation successful", NOTIFY_GENERIC, 3, NOTIFYSOUND_DRIP3 ) end
+				if forceShow then SF.AddNotify( LocalPlayer(), "Validation successful", "GENERIC", 3, "DRIP3" ) end
 				SF.Editor.runJS( "editor.session.clearAnnotations(); clearErrorLines()" )
 				return 
 			end
@@ -354,7 +347,7 @@ if CLIENT then
 		local tabIndex = tabHolder:getTabIndex( tab )
 
 		if not fileName or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
-			SF.AddNotify( LocalPlayer(), "Unable to refresh tab as file doesn't exist", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+			SF.AddNotify( LocalPlayer(), "Unable to refresh tab as file doesn't exist", "GENERIC", 5, "DRIP3" )
 			return 
 		end
 
@@ -364,7 +357,7 @@ if CLIENT then
 
 		SF.Editor.updateTabName( tab )
 
-		SF.AddNotify( LocalPlayer(), "Refreshed tab: " .. fileName, NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP3 )
+		SF.AddNotify( LocalPlayer(), "Refreshed tab: " .. fileName, "GENERIC", 5, "DRIP3" )
 	end
 
 	function SF.Editor.updateTabName ( tab )
@@ -952,7 +945,7 @@ if CLIENT then
 
 			icon.DoClick = function ( icon ) 
 				SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" ) 
-				SF.AddNotify( LocalPlayer(), "\"" .. string.gsub( obj.model, "\\", "/" ) .. "\" inserted into editor.", NOTIFY_GENERIC, 5, NOTIFYSOUND_DRIP1 )
+				SF.AddNotify( LocalPlayer(), "\"" .. string.gsub( obj.model, "\\", "/" ) .. "\" inserted into editor.", "GENERIC", 5, "DRIP1" )
 				frame:close()
 			end
 			icon.OpenMenu = function ( icon )
