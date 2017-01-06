@@ -4,7 +4,7 @@ net.Stream.Queues = {}            --This holds a queue for each player, or one q
 net.Stream.Data = {}            --This holds the data to send        
 net.Stream.MaxSendSize = 20000            --This is the maximum size of each stream to send
 net.Stream.Timeout = 30            --How long the data should exist in the store without being used before being destroyed
-net.Stream.MaxServerQueues = 8  --The maximum number of keep-alives to have queued. This should prevent naughty players from flooding the network with keep-alive messages.
+net.Stream.MaxServerQueues = 128  --The maximum number of keep-alives to have queued. This should prevent naughty players from flooding the network with keep-alive messages.
 net.Stream.MaxServerStreams = 3200 --Maximum number of streams the player can send to the server. 64 MB
 
 --Send the data sender a request for data
