@@ -7,6 +7,19 @@
 -- @class hook
 -- @client
 
+--- Called before opaque entities are drawn. (Only works with HUD)
+-- @name predrawopaquerenderables
+-- @class hook
+-- @client
+-- @param boolean isDrawingDepth Whether the current draw is writing depth.
+-- @param boolean isDrawSkybox  Whether the current draw is drawing the skybox.
+
+--- Called after opaque entities are drawn. (Only works with HUD)
+-- @name postdrawopaquerenderables
+-- @class hook
+-- @client
+-- @param boolean isDrawingDepth Whether the current draw is writing depth.
+-- @param boolean isDrawSkybox  Whether the current draw is drawing the skybox.
 
 --- Called when the engine wants to calculate the player's view
 -- @name calcview
