@@ -100,6 +100,7 @@ if CLIENT then
 		SF.Editor.fileViewer = SF.Editor.createFileViewer()
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
+		SF.Editor.permissionsWindow = SF.Editor.createPermissionsWindow()
 
 		SF.Editor.runJS = function ( ... ) 
 			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
@@ -801,6 +802,17 @@ if CLIENT then
 		form.Header:SetVisible( false )
 		form.Paint = function () end
 
+		local buttonPermissions = vgui.Create( "StarfallButton" )
+		buttonPermissions:SetText( "Permissions" )
+		function buttonPermissions:DoClick ()
+			if SF.Editor.permissionsWindow:IsVisible() then
+				SF.Editor.permissionsWindow:close()
+			else
+				SF.Editor.permissionsWindow:open()
+			end
+		end
+		form:AddItem( buttonPermissions )
+
 		local function setDoClick ( panel )
 			function panel:OnChange ()
 				SF.Editor.saveSettings()
@@ -847,6 +859,24 @@ if CLIENT then
 			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = false
 		end
 
+		return frame
+	end
+
+	function SF.Editor.createPermissionsWindow ()
+		local frame = vgui.Create( "StarfallFrame" )
+		frame:SetSize( 200, 400 )
+		frame:SetTitle( "Starfall Permissions" )
+		frame:Center()
+
+		local panel = vgui.Create( "StarfallPanel", frame )
+		panel:Dock( FILL )
+		panel:DockMargin( 0, 5, 0, 0 )
+		frame:AddComponent( "panel", panel )
+
+		local scrollPanel = vgui.Create( "DScrollPanel", panel )
+		scrollPanel:Dock( FILL )
+		scrollPanel:SetPaintBackgroundEnabled( false )
+		
 		return frame
 	end
 
