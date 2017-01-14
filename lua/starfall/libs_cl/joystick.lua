@@ -4,8 +4,12 @@
 local joystick_library, _ = SF.Libraries.Register("joystick")
 
 
-if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") then
-	require("joystick")
+if file.Exists("bin/gmcl_joystick_win32.dll", "LUA") then
+	if util.CRC(file.Read("bin/gmcl_joystick_win32.dll", "LUA"))=="2665158387" then
+		require("joystick")
+	else
+		error("CRC check for gmcl_joystick_win32.dll failed.")
+	end
 end
 
 local next_updates = {}
