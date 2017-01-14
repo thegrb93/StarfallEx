@@ -69,7 +69,12 @@ end
 
 function ENT:CodeSent ( files, main, owner )
 	if not files or not main or not owner then return end
-	if self.instance then self.instance:deinitialize() end
+	if self.instance then
+		self:runScriptHook( "removed" )
+		self.instance:deinitialize()
+		self.instance = nil
+	end
+	
 	self.error = nil
 	self.owner = owner
 	self.files = files

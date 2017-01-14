@@ -225,11 +225,11 @@ function SF.Instance:Error(msg,traceback)
 	
 	if self.runOnError then -- We have a custom error function, use that instead
 		self:runOnError( msg, traceback )
-		return
+	else
+		-- Default behavior
+		self:deinitialize()
 	end
 	
-	-- Default behavior
-	self:deinitialize()
 end
 
 function SF.Instance:movingCPUAverage()

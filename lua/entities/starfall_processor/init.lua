@@ -81,6 +81,12 @@ net.Receive("starfall_processor_update_links", function(len, ply)
 end)
 
 function ENT:Compile(files, mainfile)
+	if self.instance then
+		self:runScriptHook( "removed" )
+		self.instance:deinitialize()
+		self.instance = nil
+	end
+	
 	local update = self.mainfile ~= nil
 	self.error = nil
 	self.files = files
@@ -99,14 +105,8 @@ function ENT:Compile(files, mainfile)
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then
 		self.name = tostring( instance.ppdata.scriptnames[ instance.mainfile ] )
 	end
-
+	
 	instance.runOnError = function(inst,...) self:Error(...) end
-
-	if self.instance then
-		self.instance:deinitialize()
-		self.instance = nil
-	end
-
 	self.instance = instance
 	
 	local ok, msg, traceback = instance:initialize()
@@ -116,7 +116,7 @@ function ENT:Compile(files, mainfile)
 	end
 	
 	if not self.instance then return end
-
+	
 	local clr = self:GetColor()
 	self:SetColor( Color( 255, 255, 255, clr.a ) )
 	
