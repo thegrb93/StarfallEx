@@ -1320,22 +1320,29 @@ if CLIENT then
 		local loaded = {}
 		local ppdata = {}
 
-		local function recursiveLoad ( path )
+		local function recursiveLoad ( path, curdir )
 			if loaded[ path ] then return end
 			loaded[ path ] = true
 			
 			local code
+			local codepath
 			if path == codename and maincode then
 				code = maincode
+				codepath = codename
 			else
-				code = file.Read( "starfall/"..path, "DATA" )
+				codepath = curdir .. path
+				code = file.Read( "starfall/" .. codepath, "DATA" )
+				if not code then
+					codepath = path
+					code = file.Read( "starfall/" .. path, "DATA" )
+				end
 			end
 			if not code then
 				print( "Bad include: " .. path )
 				return
 			end
 			
-			tbl.files[ path ] = code
+			tbl.files[ codepath ] = code
 			SF.Preprocessor.ParseDirectives( path, code, {}, ppdata )
 			
 			if ppdata.includes and ppdata.includes[ path ] then
@@ -1348,11 +1355,11 @@ if CLIENT then
 				end
 				
 				for i = 1, #inc do
-					recursiveLoad( inc[i] )
+					recursiveLoad( inc[i], curdir .. string.GetPathFromFilename( inc[i] ) )
 				end
 			end
 		end
-		local ok, msg = pcall( recursiveLoad, codename )
+		local ok, msg = pcall( recursiveLoad, codename, string.GetPathFromFilename( codename ) )
 
 		local function findCycle ( file, visited, recStack )
 			if not visited[ file ] then
