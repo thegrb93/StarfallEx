@@ -316,11 +316,7 @@ function SF.DefaultEnvironment.require(file)
 		SF.instance.data.reqloaded = loaded
 	end
 	
-	local callingfolder = string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) )
-	if SF.instance.scripts[callingfolder .. file] then
-		file = callingfolder .. file
-	end
-	
+	file = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
 	if loaded[file] then
 		return loaded[file]
 	else

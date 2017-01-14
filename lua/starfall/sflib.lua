@@ -278,6 +278,27 @@ function SF.EntityTable( key )
 	end})
 end
 
+--- Returns a path with all .. accounted for
+function SF.NormalizePath( path )
+	local tbl = string.Explode( "[/\\]+", path, true )
+	if #tbl == 1 then return path end
+	local i = 1
+	while i <= #tbl do
+		if tbl[i] == "." or tbl[i]=="" then
+			table.remove(tbl, i)
+		elseif tbl[i] == ".." then
+			table.remove(tbl, i)
+			if i>1 then
+				table.remove(tbl, i-1)
+			end
+		else
+			i = i + 1
+		end
+	end
+	return table.concat(tbl, "/")
+end
+
+
 --- Returns a class that can keep track of burst
 function SF.BurstObject( rate, max )
 	local burstclass = {

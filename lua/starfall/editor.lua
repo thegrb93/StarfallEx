@@ -1325,17 +1325,20 @@ if CLIENT then
 			loaded[ path ] = true
 			
 			local code
+			local codedir
 			local codepath
 			if path == codename and maincode then
 				code = maincode
-				codepath = codename
+				codedir = curdir
+				codepath = path
 			else
-				codepath = curdir .. path
+				codepath = SF.NormalizePath( curdir .. path )
 				code = file.Read( "starfall/" .. codepath, "DATA" )
 				if not code then
-					codepath = path
-					code = file.Read( "starfall/" .. path, "DATA" )
+					codepath = SF.NormalizePath( path )
+					code = file.Read( "starfall/" .. codepath, "DATA" )
 				end
+				codedir = string.GetPathFromFilename( codepath )
 			end
 			if not code then
 				print( "Bad include: " .. path )
@@ -1343,19 +1346,19 @@ if CLIENT then
 			end
 			
 			tbl.files[ codepath ] = code
-			SF.Preprocessor.ParseDirectives( path, code, {}, ppdata )
+			SF.Preprocessor.ParseDirectives( codepath, code, {}, ppdata )
 			
-			if ppdata.includes and ppdata.includes[ path ] then
-				local inc = ppdata.includes[ path ]
-				if not tbl.includes[ path ] then
-					tbl.includes[ path ] = inc
+			if ppdata.includes and ppdata.includes[ codepath ] then
+				local inc = ppdata.includes[ codepath ]
+				if not tbl.includes[ codepath ] then
+					tbl.includes[ codepath ] = inc
 					tbl.filecount = tbl.filecount + 1
 				else
-					assert( tbl.includes[ path ] == inc )
+					assert( tbl.includes[ codepath ] == inc )
 				end
 				
 				for i = 1, #inc do
-					recursiveLoad( inc[i], curdir .. string.GetPathFromFilename( inc[i] ) )
+					recursiveLoad( inc[i], codedir )
 				end
 			end
 		end
