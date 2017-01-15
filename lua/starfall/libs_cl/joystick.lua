@@ -1,5 +1,5 @@
 
-if file.Exists("bin/gmcl_joystick_win32.dll", "LUA") then
+if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") then
 	if util.CRC(file.Read("bin/gmcl_joystick_win32.dll", "LUA"))=="2665158387" then
 		require("joystick")
 	else
