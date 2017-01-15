@@ -4,9 +4,11 @@ local P = {}
 P.id = "usergroups"
 P.name = "Usergroup Permissions"
 P.settings = {}
+P.settingsdesc = {}
 P.settingsoptions = {"Admin Only", "Anyone", "No one"}
 
 function P.registered ( id, name, description, arg )
+	P.settingsdesc[ id ] = { name, description }
 	if not P.settings[ id ] then
 		P.settings[ id ] = 2
 	end

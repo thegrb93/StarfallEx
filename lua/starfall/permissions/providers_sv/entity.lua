@@ -4,6 +4,7 @@ local P = {}
 P.id = "entities"
 P.name = "Entity Permissions"
 P.settings = {}
+P.settingsdesc = {}
 P.settingsoptions = {"Owner Only", "Can touch", "Anything"}
 
 local canTool = {}
@@ -21,8 +22,11 @@ function P.registered ( id, name, description, arg )
 		addSetting = true
 	end
 	
-	if addSetting and not P.settings[ id ] then
-		P.settings[ id ] = 1
+	if addSetting then
+		P.settingsdesc[ id ] = { name, description }
+		if not P.settings[ id ] then
+			P.settings[ id ] = 1
+		end
 	end
 end
 

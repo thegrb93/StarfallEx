@@ -113,11 +113,13 @@ do
 end
 
 -- Load the permission settings for each provider
-local settings = util.JSONToTable( file.Read( "sf_perms.txt" ) or "" )
-for _, provider in ipairs( P.providers ) do
-	if settings[ provider.id ] then
-		for k, v in pairs(settings[provider.id]) do
-			provider.settings[k] = v
+do
+	local settings = util.JSONToTable( file.Read( "sf_perms.txt" ) or "" ) or {}
+	for _, provider in ipairs( P.providers ) do
+		if settings[ provider.id ] then
+			for k, v in pairs(settings[provider.id]) do
+				provider.settings[k] = v
+			end
 		end
 	end
 end
@@ -132,17 +134,15 @@ local function changePermission( ply, arg )
 				provider.settings[arg[2]] = math.floor( val )
 				P.savePermissions()
 			else
-				ply:PrintMessage( HUD_PRINTCONSOLE, "The setting's value is out of bounds or not a number." )
+				ply:PrintMessage( HUD_PRINTCONSOLE, "The setting's value is out of bounds or not a number.\n" )
 			end
 		else
-			local settings = {}
-			for id, _ in SortedPairs(P.providers) do settings[#settings+1]=id end
-			ply:PrintMessage( HUD_PRINTCONSOLE, "Setting, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of settings.\n" .. table.concat(settings, "\n") )
+			ply:PrintMessage( HUD_PRINTCONSOLE, "Setting, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of settings.\n")
+			for id, _ in SortedPairs(provider.settings) do ply:PrintMessage( HUD_PRINTCONSOLE, id.."\n") end
 		end
 	else
-		local providers = {}
-		for _, p in ipairs(P.providers) do providers[_]=p.id end
-		ply:PrintMessage( HUD_PRINTCONSOLE, "Permission provider, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of providers.\n" .. table.concat(providers, "\n") )
+		ply:PrintMessage( HUD_PRINTCONSOLE, "Permission provider, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of providers.\n" )
+		for _, p in ipairs(P.providers) do ply:PrintMessage( HUD_PRINTCONSOLE, p.id.."\n" ) end
 	end
 end
 
