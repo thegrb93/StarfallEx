@@ -458,26 +458,28 @@ function SF.DeserializeCode(tbl)
 end
 
 local soundsMap = {
-	[ "DRIP1" ] = 0,
-	[ "DRIP2" ] = 1,
-	[ "DRIP3" ] = 2,
-	[ "DRIP4" ] = 3,
-	[ "DRIP5" ] = 4,
-	[ "ERROR1" ] = 5,
-	[ "CONFIRM1" ] = 6,
-	[ "CONFIRM2" ] = 7,
-	[ "CONFIRM3" ] = 8,
-	[ "CONFIRM4" ] = 9,
-	[0] = "ambient/water/drip1.wav",
-	[1] = "ambient/water/drip2.wav",
-	[2] = "ambient/water/drip3.wav",
-	[3] = "ambient/water/drip4.wav",
-	[4] = "ambient/water/drip5.wav",
-	[5] = "buttons/button10.wav",
-	[6] = "buttons/button3.wav",
-	[7] = "buttons/button14.wav",
-	[8] = "buttons/button15.wav",
-	[9] = "buttons/button17.wav"
+	[ "DRIP1" ] = 0, [0] = "DRIP1",
+	[ "DRIP2" ] = 1,	[1] = "DRIP2",
+	[ "DRIP3" ] = 2,	[2] = "DRIP3",
+	[ "DRIP4" ] = 3,	[3] = "DRIP4",
+	[ "DRIP5" ] = 4,	[4] = "DRIP5",
+	[ "ERROR1" ] = 5,	[5] = "ERROR1",
+	[ "CONFIRM1" ] = 6,	[6] = "CONFIRM1",
+	[ "CONFIRM2" ] = 7,	[7] = "CONFIRM2",
+	[ "CONFIRM3" ] = 8,	[8] = "CONFIRM3",
+	[ "CONFIRM4" ] = 9,	[9] = "CONFIRM4",
+}
+local soundsMapSounds = {
+	[ "DRIP1" ] = "ambient/water/drip1.wav",
+	[ "DRIP2" ] = "ambient/water/drip2.wav",
+	[ "DRIP3" ] = "ambient/water/drip3.wav",
+	[ "DRIP4" ] = "ambient/water/drip4.wav",
+	[ "DRIP5" ] = "ambient/water/drip5.wav",
+	[ "ERROR1" ] = "buttons/button10.wav",
+	[ "CONFIRM1" ] = "buttons/button3.wav",
+	[ "CONFIRM2" ] = "buttons/button14.wav",
+	[ "CONFIRM3" ] = "buttons/button15.wav",
+	[ "CONFIRM4" ] = "buttons/button17.wav"
 }
 local notificationsMap = {
 	["GENERIC"] = 0,
@@ -649,14 +651,13 @@ else
 		end
 		
 		GAMEMODE:AddNotify( msg, type, duration )
-
-		if sound and soundsMap[ sound ] then
-			surface.PlaySound( soundsMap[ sound ] )
+		if sound and soundsMapSounds[ sound ] then
+			surface.PlaySound( soundsMapSounds[ sound ] )
 		end
 	end
 
 	net.Receive( "starfall_addnotify", function ()
-		SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), net.ReadUInt( 8 ) )
+		SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), soundsMap[ net.ReadUInt( 8 ) ])
 	end )
 
 	net.Receive( "starfall_console_print", function ()
