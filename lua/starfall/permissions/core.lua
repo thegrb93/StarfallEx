@@ -157,3 +157,59 @@ else
 		changePermission(ply, arg)
 	end)
 end
+
+-- Networking for administrators to get the server's settings
+if SERVER then
+	util.AddNetworkString( "sf_permissionsettings" )
+	net.Receive( "sf_permissionsettings", function( len, ply )
+		if ply:IsSuperAdmin() then
+			net.Start("sf_permissionsettings")
+			
+			net.WriteUInt( #P.providers, 8 )
+			for _, v in ipairs(P.providers) do
+				net.WriteString(v.id)
+				net.WriteString(v.name)
+				net.WriteUInt( table.Count(v.settings), 8)
+				for id, setting in pairs(v.settings) do
+					net.WriteString(id)
+					net.WriteString(v.settingsdesc[id][1])
+					net.WriteString(v.settingsdesc[id][2])
+					net.WriteUInt(setting, 8)
+				end
+			end
+			
+			net.Send(ply)
+		end
+	end)
+else
+	local reqCallback, reqTimeout
+	function P.requestPermissions( callback )
+		if not reqCallback or (reqTimeout and reqTimeout<CurTime()) then
+			reqCallback = callback
+			reqTimeout = CurTime()+2
+			net.Start("sf_permissionsettings")
+			net.SendToServer()
+		end
+	end
+	net.Receive( "sf_permissionsettings", function()
+		if reqCallback then
+			local providers = {}
+			local nproviders = net.ReadUInt(8)
+			for i=1, nproviders do
+				local provider = {
+					id = net.ReadString(),
+					name = net.ReadString(),
+					settings = {}
+				}
+				local nsettings = net.ReadUInt(8)
+				for j=1, nsettings do
+					provider.settings[net.ReadString()] = {net.ReadString(), net.ReadString(), net.ReadUInt(8)}
+				end
+				providers[i] = provider
+			end
+			reqCallback(providers)
+			reqCallback = nil
+			reqTimeout = nil
+		end
+	end)
+end
