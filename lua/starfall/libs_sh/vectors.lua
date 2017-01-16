@@ -397,7 +397,7 @@ end
 -- @param v1 Vector used to define AABox
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
-function vec_methods.withinAABox ( v1, v2 )
+function vec_methods:withinAABox ( v1, v2 )
 	SF.CheckType( v1, vec_metamethods )
 	SF.CheckType( v2, vec_metamethods )
 
