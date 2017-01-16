@@ -430,6 +430,18 @@ function SF.DefaultEnvironment.getfenv ()
 	if fenv ~= _G then return fenv end
 end
 
+--- GLua's getinfo()
+-- Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo)
+-- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
+-- @return DebugInfo table
+function SF.DefaultEnvironment.getdebuginfo ( funcOrStackLevel, fields )
+	SF.CheckType(funcOrStackLevel, "function")
+	SF.CheckType(fields, "string")
+	
+	debug.getinfo( funcOrStackLevel, fields )
+end
+		
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
