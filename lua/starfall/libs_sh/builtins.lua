@@ -435,9 +435,9 @@ end
 -- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
-function SF.DefaultEnvironment.getDebugInfo ( funcOrStackLevel, fields )
+function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	local TfuncOrStackLevel = type(funcOrStackLevel)
-	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function getDebugInfo", 2 ) end
+	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
 	SF.CheckType(fields, "string")
 	
 	return debug.getinfo( funcOrStackLevel, fields )
