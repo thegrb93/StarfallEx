@@ -436,10 +436,11 @@ end
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
 function SF.DefaultEnvironment.getDebugInfo ( funcOrStackLevel, fields )
-	if type(funcOrStackLevel)~="function" and type(funcOrStackLevel)~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. ( type( funcOrStackLevel ) ) .. ") in function getDebugInfo", 2 ) end
+	local TfuncOrStackLevel = type(funcOrStackLevel)
+	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function getDebugInfo", 2 ) end
 	SF.CheckType(fields, "string")
 	
-	debug.getinfo( funcOrStackLevel, fields )
+	return debug.getinfo( funcOrStackLevel, fields )
 end
 		
 --- Try to execute a function and catch possible exceptions
