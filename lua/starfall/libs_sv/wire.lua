@@ -2,6 +2,8 @@
 -- Wire library.
 -------------------------------------------------------------------------------
 
+if not WireLib then return end
+
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
 
@@ -20,13 +22,19 @@ function wire_metamethods.onLoad ( instance )
 	end
 
 	function ent:ReadCell ( address )
-		local ret = tonumber( self:runScriptHookForResult( "readcell", address ) ) or 0
-		return ret
+		local tbl = self:runScriptHookForResult( "readcell", address )
+		if tbl[1] then
+			return tonumber( tbl[2] ) or 0
+		end
+		return 0
 	end
 
 	function ent:WriteCell ( address, data )
-		local ret = self:runScriptHookForResult( "writecell", address, data )
-		return ret==nil or ret==true
+		local tbl = self:runScriptHookForResult( "writecell", address, data )
+		if tbl[1] then
+			return tbl[2]==nil or tbl[2]==true
+		end
+		return false
 	end
 
 end

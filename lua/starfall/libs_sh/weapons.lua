@@ -19,7 +19,7 @@ local function wrap( object )
 	dsetmeta( object, weapon_metamethods )
 	return object
 end
-
+SF.Weapons.Wrap = wrap
 SF.AddObjectWrapper( debug.getregistry().Weapon, weapon_metamethods, wrap )
 SF.AddObjectUnwrapper( weapon_metamethods, SF.Entities.Unwrap )
 

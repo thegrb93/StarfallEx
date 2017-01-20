@@ -24,14 +24,22 @@ end)
 
 
 local function createCoroutine ( func )
+	-- Make sure we're not in a coroutine creation infinite loop
+	local curthread = coroutine.running()
+	local stacklevel
+	if curthread then
+		stacklevel = unwrap( SF.instance.data.coroutines[ curthread ] ).stacklevel + 1
+		if stacklevel == 100 then SF.throw( "Coroutine stack overflow!", 1 ) end
+	else
+		stacklevel = 0
+	end
 	-- Can't use coroutine.create, because of a bug that prevents halting the program when it exceeds quota
-
 	-- Hack to get the coroutine from a wrapped function. Necessary because coroutine.create is not available
 	local wrappedFunc = coroutine.wrap( function() return func( coroutine.yield( coroutine.running() ) ) end ) 
 	
 	local thread = wrappedFunc()
 
-	local wrappedThread = wrap( { thread = thread, func = wrappedFunc } )
+	local wrappedThread = wrap( { thread = thread, func = wrappedFunc, stacklevel = stacklevel } )
 	
 	SF.instance.data.coroutines[ thread ] = wrappedThread
 	

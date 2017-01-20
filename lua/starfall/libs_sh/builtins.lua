@@ -3,25 +3,11 @@
 -- Functions built-in to the default environment
 -------------------------------------------------------------------------------
 
-local dgetmeta = debug.getmetatable
-
 --- Built in values. These don't need to be loaded; they are in the default environment.
 -- @name builtin
 -- @shared
 -- @class library
 -- @libtbl SF.DefaultEnvironment
-
--- ------------------------- Lua Ports ------------------------- --
--- This part is messy because of LuaDoc stuff.
-
-local function pascalToCamel ( t, r )
-	local r = r or {}
-	for k, v in pairs( t ) do
-		k = k:gsub( "^%l", string.lower )
-		r[ k ] = v
-	end
-	return r
-end
 
 --- Returns the entity representing a processor that this script is running on.
 -- @name SF.DefaultEnvironment.chip
@@ -234,6 +220,26 @@ function SF.DefaultEnvironment.getLibraries()
 end
 
 
+local luaTypes = {
+	nil,
+	true,
+	0,
+	function() end,
+	coroutine.create(function() end)
+}
+for i=1, 5 do
+	local luaType = luaTypes[i]
+	local meta = debug.getmetatable(luaType)
+	if meta then
+		SF.Libraries.AddHook( "prepare", function()
+			debug.setmetatable( luaType, nil )
+		end )
+		SF.Libraries.AddHook( "cleanup", function() 
+			debug.setmetatable( luaType, meta )
+		end )
+	end
+end
+
 
 if CLIENT then	
 	--- Sets the chip's display name
@@ -310,13 +316,18 @@ function SF.DefaultEnvironment.require(file)
 		SF.instance.data.reqloaded = loaded
 	end
 	
-	if loaded[file] then
-		return loaded[file]
+	local path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
+	if not SF.instance.scripts[path] then
+		path = SF.NormalizePath( file )
+	end
+	
+	if loaded[path] then
+		return loaded[path]
 	else
-		local func = SF.instance.scripts[file]
-		if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
-		loaded[file] = func() or true
-		return loaded[file]
+		local func = SF.instance.scripts[path]
+		if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
+		loaded[path] = func() or true
+		return loaded[path]
 	end
 end
 
@@ -356,8 +367,12 @@ end
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
     SF.CheckType(file, "string")
-    local func = SF.instance.scripts[file]
-    if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
+	local path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
+	if not SF.instance.scripts[path] then
+		path = SF.NormalizePath( file )
+	end
+    local func = SF.instance.scripts[path]
+    if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
     return func()
 end
 
@@ -423,6 +438,19 @@ function SF.DefaultEnvironment.getfenv ()
 	if fenv ~= _G then return fenv end
 end
 
+--- GLua's getinfo()
+-- Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo)
+-- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
+-- @return DebugInfo table
+function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
+	local TfuncOrStackLevel = type(funcOrStackLevel)
+	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
+	SF.CheckType(fields, "string")
+	
+	return debug.getinfo( funcOrStackLevel, fields )
+end
+		
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
@@ -435,6 +463,8 @@ function SF.DefaultEnvironment.try ( func, catch )
 		if err.uncatchable then
 			error( err )
 		end
+	elseif err == "not enough memory" then
+		SF.throw( err, 0, true )
 	end
 	if catch then catch( err ) end
 end

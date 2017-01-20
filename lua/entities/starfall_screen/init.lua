@@ -22,11 +22,7 @@ function ENT:Use( activator )
 		net.Broadcast()
 	end
 	
-	local instance = self.link.instance
-	if instance and instance.hooks[ "starfallUsed" ] then
-		local ok, rt, tb = instance:runScriptHook( "starfallUsed", SF.Entities.Wrap( activator ) )
-		if not ok then self:Error( rt, tb ) end
-	end
+	self.link:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
 end
 
 function ENT:LinkEnt ( ent, ply )

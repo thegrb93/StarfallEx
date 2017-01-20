@@ -5,7 +5,7 @@ TOOL.Command		= nil
 TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
--- ------------------------------- Sending / Recieving ------------------------------- --
+-- ------------------------------- Sending / Receiving ------------------------------- --
 include("starfall/sflib.lua")
 
 TOOL.ClientConVar[ "Model" ] = "models/hunter/plates/plate2x2.mdl"
@@ -42,18 +42,25 @@ if SERVER then
 	
 else
 	language.Add( "Tool.starfall_component.name", "Starfall - Component" )
-	language.Add( "Tool.starfall_component.desc", "Spawns a starfall component" )
-	language.Add( "Tool.starfall_component.0", "Primary: Spawns a component, Secondary: Link to processor, Reload: Clear the link" )
-	language.Add( "Tool.starfall_component.1", "Now select the processor to link to.")
+	language.Add( "Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)" )
 	language.Add( "sboxlimit_starfall_components", "You've hit the Starfall Component limit!" )
 	language.Add( "undone_Starfall Screen", "Undone Starfall Screen" )
 	language.Add( "undone_Starfall HUD", "Undone Starfall HUD" )
 	language.Add( "Cleanup_starfall_components", "Starfall Components" )
+	TOOL.Information = {
+		{ name = "left", stage = 0, text = "Spawn a component" },
+		{ name = "right_0", stage = 0, text = "Link to processor" },
+		{ name = "reload", stage = 0, text = "Clear the link" },
+		{ name = "right_1", stage = 1, text = "Select the processor to link to" },
+	}
+	for _, info in pairs(TOOL.Information) do
+		language.Add("Tool.starfall_component." .. info.name, info.text)
+	end
 end
 
 function TOOL:LeftClick( trace )
 	if not trace.HitPos then return false end
-	if trace.Entity:IsPlayer() then return false end
+	if trace.Entity:IsPlayer() or trace.Entity:IsNPC() then return false end
 	if CLIENT then return true end
 
 	local ply = self:GetOwner()
@@ -73,11 +80,18 @@ function TOOL:LeftClick( trace )
 		local min = sf:OBBMins()
 		sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
 
-		local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
+		local const
+		local phys = sf:GetPhysicsObject()
+		if trace.Entity:IsValid() then
+			local const = constraint.Weld( sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true )
+			if phys:IsValid() then phys:EnableCollisions( false ) sf.nocollide = true end
+		else
+			if phys:IsValid() then phys:EnableMotion( false ) end
+		end
 
 		undo.Create( "Starfall Screen" )
 			undo.AddEntity( sf )
-			undo.AddEntity( const )
+			if const then undo.AddEntity( const ) end
 			undo.SetPlayer( ply )
 		undo.Finish()
 
@@ -91,7 +105,14 @@ function TOOL:LeftClick( trace )
 		local min = sf:OBBMins()
 		sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
 
-		local const = WireLib.Weld(sf, trace.Entity, trace.PhysicsBone, true)
+		local const
+		local phys = sf:GetPhysicsObject()
+		if trace.Entity:IsValid() then
+			local const = constraint.Weld( sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true )
+			if phys:IsValid() then phys:EnableCollisions( false ) sf.nocollide = true end
+		else
+			if phys:IsValid() then phys:EnableMotion( false ) end
+		end
 
 		undo.Create( "Starfall HUD" )
 			undo.AddEntity( sf )
@@ -126,25 +147,25 @@ function TOOL:RightClick( trace )
 		
 			self.Component:LinkEnt( ent )
 			self:SetStage(0)
-			SF.AddNotify( ply, "Linked to starfall successfully.", NOTIFY_GENERIC , 4, NOTIFYSOUND_DRIP2 )
+			SF.AddNotify( ply, "Linked to starfall successfully.", "GENERIC" , 4, "DRIP2" )
 			return true
 			
 		elseif self.Component:GetClass()=="starfall_hud" and ent:GetClass()=="starfall_processor" then
 		
 			self.Component:LinkEnt( ent )
 			self:SetStage(0)
-			SF.AddNotify( ply, "Linked to starfall successfully.", NOTIFY_GENERIC , 4, NOTIFYSOUND_DRIP2 )
+			SF.AddNotify( ply, "Linked to starfall successfully.", "GENERIC" , 4, "DRIP2" )
 			return true
 			
 		elseif self.Component:GetClass()=="starfall_hud" and ent:IsVehicle() then
 		
 			self.Component:LinkVehicle( ent )
 			self:SetStage(0)
-			SF.AddNotify( ply, "Linked to vehicle successfully.", NOTIFY_GENERIC , 4, NOTIFYSOUND_DRIP2 )
+			SF.AddNotify( ply, "Linked to vehicle successfully.", "GENERIC" , 4, "DRIP2" )
 			return true
 		
 		end
-		SF.AddNotify( ply, "Link Invalid.", NOTIFY_ERROR , 4, NOTIFYSOUND_ERROR1 )
+		SF.AddNotify( ply, "Link Invalid.", "ERROR" , 4, "ERROR1" )
 		return false
 	end
 end
@@ -201,13 +222,21 @@ end
 if CLIENT then		
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl( "Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" } )
-		
-		local validscreens = {}
-		for model, _ in pairs(scripted_ents.GetStored("starfall_screen").t.Monitor_Offsets) do
-			validscreens[model] = true
+				
+		local modelPanel = vgui.Create("DPanelSelect", panel)
+		modelPanel:EnableVerticalScrollbar()
+		modelPanel:SetTall(66 * 2 + 2)
+		for model,v in pairs(scripted_ents.GetStored("starfall_screen").t.Monitor_Offsets) do
+			local icon = vgui.Create("SpawnIcon")
+			icon:SetModel(model)
+			icon.Model = model
+			icon:SetSize(64, 64)
+			icon:SetTooltip(model)
+			modelPanel:AddPanel(icon, {["starfall_component_Model"] = model})
 		end
+		modelPanel:SortByMember("Model", false)
+		panel:AddPanel(modelPanel)
 		
-		local modelpanel = WireDermaExts.ModelSelect( panel, "starfall_component_Model", validscreens, 2 )
 		panel:AddControl("Label", {Text = ""})
 		
 

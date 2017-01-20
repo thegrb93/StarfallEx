@@ -360,15 +360,11 @@ function ents_methods:addCollisionListener ( func )
 
 	local instance = SF.instance
 	ent:AddCallback("PhysicsCollide", function(ent, data)
-		local ok, msg, traceback = instance:runFunction( func, setmetatable({}, {
+		instance:runFunction( func, setmetatable({}, {
 			__index=function(t,k)
 				return SF.WrapObject( data[k] )
 			end
 		}))
-
-		if not ok then
-			instance:Error( msg, traceback )
-		end
 	end)
 end
 

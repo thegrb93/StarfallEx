@@ -74,10 +74,7 @@ function timer_library.create(name, delay, reps, func, simple)
 			end
 		end
 		
-		local ok, msg, traceback = instance:runFunction(func)
-		if not ok then
-			instance:Error( msg, traceback )
-		end
+		instance:runFunction(func)
 	end
 	
 	timer.Create(timername, math.max(delay, 0.001), reps, timercb )

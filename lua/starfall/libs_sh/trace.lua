@@ -241,10 +241,8 @@ function trace_library.trace ( start, endpos, filter, mask )
 	if type(filter) == "function" then
 		local filterfunc = filter
 		filter = function(ent)
-			local ok, msg, traceback = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
-			if not ok then
-				SF.instance:Error( "Trace filter callback errored with: " .. msg, traceback )
-			end
+			local ret = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
+			if ret[1] then return ret[2] end
 		end
 	else
 		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
@@ -286,10 +284,8 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 	if type(filter) == "function" then
 		local filterfunc = filter
 		filter = function(ent)
-			local ok, msg, traceback = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
-			if not ok then
-				SF.instance:Error( "Trace filter callback errored with: " .. msg, traceback )
-			end
+			local ret = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
+			if ret[1] then return ret[2] end
 		end
 	else
 		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )

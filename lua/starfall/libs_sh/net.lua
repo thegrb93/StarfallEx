@@ -14,6 +14,8 @@ local burst_rate = CreateConVar( "sf_net_burstrate", "5", { FCVAR_ARCHIVE, FCVAR
 						"Regen rate of net message burst in kB/sec." )
 
 
+local streams = SF.EntityTable("playerStreams")
+
 local function write( instance, type, size, ... )
 	instance.data.net.size = instance.data.net.size + size
 
@@ -57,7 +59,9 @@ end
 --- Send a net message from client->server, or server->client.
 --@shared
 --@param target Optional target location to send the net message.
-function net_library.send ( target )
+--@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
+function net_library.send ( target, unreliable )
+	if unreliable then SF.CheckType( unreliable, "boolean" ) end
 	local instance = SF.instance
 	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
 
@@ -67,7 +71,7 @@ function net_library.send ( target )
 
 	local data = instance.data.net.data
 	if #data == 0 then return false end
-	net.Start( "SF_netmessage" )
+	net.Start( "SF_netmessage", unreliable )
 	net.WriteEntity( SF.instance.data.entity )
 	for i = 1, #data do
 		net[ data[ i ][ 1 ] ]( unpack( data[ i ][ 2 ] ) )
@@ -150,6 +154,34 @@ function net_library.readData( n )
 	SF.CheckType( n, "number" )
 	n = math.Clamp( n, 0, 64000 )
 	return net.ReadData( n )
+end
+
+--- Streams a large 20MB string. 
+-- @shared
+-- @param str The string to be written
+function net_library.writeStream( str )
+	local instance = SF.instance
+	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+
+	SF.CheckType( str, "string" )
+	write( instance, "Stream", 8, str )
+	return true
+end
+
+--- Reads a large string stream from the net message
+-- @shared
+-- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data.
+
+function net_library.readStream( cb )
+	SF.CheckType( cb, "function" )
+	local instance = SF.instance
+	if streams[instance.player] then SF.throw( "The previous stream must finish before reading another.", 2 ) end
+	streams[instance.player] = true
+	
+	net.ReadStream( ( SERVER and instance.player or nil ), function( data )
+		instance:runFunction( cb, data )
+		streams[instance.player] = false
+	end )
 end
 
 --- Writes an integer to the net message
@@ -389,9 +421,7 @@ end
 net.Receive( "SF_netmessage", function( len, ply )
 	local ent = net.ReadEntity()
 	if ent:IsValid() and ent.runScriptHook then
-		if ent.instance then
-			ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
-		end
+		ent:runScriptHook( "net", net.ReadString(), len, ply and SF.WrapObject( ply ) )
 	end
 end)
 

@@ -17,18 +17,14 @@ ENT.States = {
 }
 
 function ENT:runScriptHook ( hook, ... )
-	if self.instance and not self.instance.error then
-		local ok, rt, tb = self.instance:runScriptHook( hook, ... )
-		if not ok then self:Error( rt, tb )
-		else return rt end
+	if self.instance then
+		return self.instance:runScriptHook( hook, ... )
 	end
 end
 
 function ENT:runScriptHookForResult ( hook, ... )
-	if self.instance and not self.instance.error then
-		local ok, rt, tb = self.instance:runScriptHookForResult( hook, ... )
-		if not ok then self:Error( rt, tb )
-		else return rt end
+	if self.instance then
+		return self.instance:runScriptHookForResult( hook, ... )
 	end
 end
 
@@ -53,7 +49,7 @@ function ENT:Error ( msg, traceback )
 		self:SetDTString( 0, traceback or self.error.message )
 	end
 	
-	SF.AddNotify( self.owner, self.error.message, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+	SF.AddNotify( self.owner, self.error.message, "ERROR", 7, "ERROR1" )
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
@@ -72,9 +68,8 @@ end
 
 function ENT:OnRemove ()
 	if not self.instance then return end
-
-	self:runScriptHook( "Removed" )
 	
+	self:runScriptHook( "removed" )
 	self.instance:deinitialize()
 	self.instance = nil
 end

@@ -32,7 +32,7 @@ local cosh  = math.cosh
 local acos  = math.acos
 local min 	= math.min
 
-local delta = wire_expression2_delta or 0.0000001000000
+local delta = 0.0000001000000
 
 local isValid = IsValid
 

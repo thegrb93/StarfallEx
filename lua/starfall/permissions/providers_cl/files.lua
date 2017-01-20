@@ -1,30 +1,21 @@
 --- Starfall file library permission provider
-
--- start the provider table and set it to inherit from the default provider
 local P = {}
-P.__index = SF.Permissions.Provider
-setmetatable( P, P )
 
--- localize the result set
-local ALLOW = SF.Permissions.Result.ALLOW
-local DENY = SF.Permissions.Result.DENY
-local NEUTRAL = SF.Permissions.Result.NEUTRAL
-
--- define what permission keys we will allow
+-- define what permission keys we will check
 local keys = {
 	[ "file.read" ] = true,
 	[ "file.write" ] = true,
 	[ "file.exists" ] = true
 }
 
-function P:check ( principal, target, key )
-	if type( target ) ~= "string" then return NEUTRAL end
-
+function P.check ( principal, target, key )
 	-- allow if the localplayer is trying to write a file to their computer
-	if keys[ key ] and principal == LocalPlayer() then
-		return ALLOW
-	else
-		return DENY
+	if keys[ key ] then
+		if principal == LocalPlayer() then
+			return true
+		else
+			return false
+		end
 	end
 end
 

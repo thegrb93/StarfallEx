@@ -1,14 +1,6 @@
 --- Default starfall permission provider
 
--- start the provider table and set it to inherit from the default provider
 local P = {}
-P.__index = SF.Permissions.Provider
-setmetatable( P, P )
-
--- localize the result set
-local ALLOW = SF.Permissions.Result.ALLOW
-local DENY = SF.Permissions.Result.DENY
-local NEUTRAL = SF.Permissions.Result.NEUTRAL
 
 local ES = SF.DB.escape;
 
@@ -21,16 +13,7 @@ local function getUsergroupID ( ply )
 	return 0
 end
 
-local function getUsergroupName ( ply )
-	if ply:IsSuperAdmin() then
-		return "superadmin"
-	elseif ply:IsAdmin() then
-		return "admin"
-	end
-	return "user"
-end
-
-function P:check ( principal, target, key )
+function P.check ( principal, target, key )
 	local result = SF.DB.query( [[
 		SELECT grant
 		FROM starfall_perms_grants
@@ -47,16 +30,16 @@ function P:check ( principal, target, key )
 		local grant = row[ 'grant' ]
 
 		if "0" == grant then
-			return NEUTRAL
+			return true
 		elseif "1" == grant then
-			return ALLOW
+			return true
 		elseif "2" == grant then
-			return DENY
+			return false
 		end
-	else
-		return NEUTRAL
 	end
 end
 
 -- register the provider
-SF.Permissions.registerProvider( P )
+-- The database can't be customized anyway so most people won't even be able to use this.
+-- Also querying the database for every check is fucking slow
+-- SF.Permissions.registerProvider( P )

@@ -697,7 +697,7 @@ function PANEL:openMenu ( node )
 					local contents = file.Read( oldFile )
 					file.Delete( node:GetFileName() )
 					file.Write( saveFile, contents )
-					SF.AddNotify( LocalPlayer(), "File renamed as " .. saveFile .. ".", NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.AddNotify( LocalPlayer(), "File renamed as " .. saveFile .. ".", "GENERIC", 7, "DRIP3" )
 					self:reloadTree()
 				end
 			)
@@ -710,7 +710,7 @@ function PANEL:openMenu ( node )
 				"Delete",
 				function ()
 					file.Delete( node:GetFileName() )
-					SF.AddNotify( LocalPlayer(), "File deleted: " .. node:GetFileName(), NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.AddNotify( LocalPlayer(), "File deleted: " .. node:GetFileName(), "GENERIC", 7, "DRIP3" )
 					self:reloadTree()
 				end,
 				"Cancel"
@@ -727,7 +727,7 @@ function PANEL:openMenu ( node )
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = node:GetFolder().."/"..text..".txt"
 					file.Write( saveFile, "" )
-					SF.AddNotify( LocalPlayer(), "New file: " .. saveFile, NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.AddNotify( LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3" )
 					self:reloadTree()
 				end
 			)
@@ -743,7 +743,7 @@ function PANEL:openMenu ( node )
 					text = string.gsub( text, ".", invalid_filename_chars )
 					local saveFile = node:GetFolder().."/"..text
 					file.CreateDir( saveFile )
-					SF.AddNotify( LocalPlayer(), "New folder: " .. saveFile, NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.AddNotify( LocalPlayer(), "New folder: " .. saveFile, "GENERIC", 7, "DRIP3" )
 					self:reloadTree()
 				end
 			)
@@ -773,7 +773,7 @@ function PANEL:openMenu ( node )
 							end
 						end
 					end
-					SF.AddNotify( LocalPlayer(), "Folder deleted: " .. node:GetFolder(), NOTIFY_GENERIC, 7, NOTIFYSOUND_DRIP3 )
+					SF.AddNotify( LocalPlayer(), "Folder deleted: " .. node:GetFolder(), "GENERIC", 7, "DRIP3" )
 					self:reloadTree()
 				end,
 				"Cancel"

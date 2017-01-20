@@ -5,8 +5,6 @@
 if SF ~= nil then return end
 SF = {}
 
-jit.off() -- Needed so ops counting will work reliably.
-
 -- Send files to client
 if SERVER then
 	AddCSLuaFile( "sflib.lua" )
@@ -20,6 +18,7 @@ if SERVER then
 	AddCSLuaFile( "sfderma.lua" )
 	AddCSLuaFile( "callback.lua" )
 	AddCSLuaFile( "sfhelper.lua" )
+	AddCSLuaFile( "netstream.lua" )
 end
 
 -- Load files
@@ -31,6 +30,7 @@ include( "database.lua" )
 include( "permissions/core.lua" )
 include( "editor.lua" )
 include( "sfhelper.lua" )
+include( "netstream.lua" )
 
 SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, { FCVAR_REPLICATED }, "Window width of the CPU time quota moving average." )
 
@@ -109,25 +109,6 @@ do
 	SF.DefaultEnvironmentMT = metatable
 	--- The default environment contents
 	SF.DefaultEnvironment = env
-end
-
---- A set of all instances that have been created. It has weak keys and values.
--- Instances are put here after initialization.
-SF.allInstances = setmetatable({},{__mode="kv"})
-
---- Calls a script hook on all processors.
-function SF.RunScriptHook(hook,...)
-	for _,instance in pairs(SF.allInstances) do
-		if not instance.error then
-			local ok, err = instance:runScriptHook(hook,...)
-			if not ok then
-				instance.error = true
-				if instance.runOnError then
-					instance:runOnError( err )
-				end
-			end
-		end
-	end
 end
 
 --- Creates a new context. A context is used to define what scripts will have access to.
@@ -297,6 +278,27 @@ function SF.EntityTable( key )
 	end})
 end
 
+--- Returns a path with all .. accounted for
+function SF.NormalizePath( path )
+	local tbl = string.Explode( "[/\\]+", path, true )
+	if #tbl == 1 then return path end
+	local i = 1
+	while i <= #tbl do
+		if tbl[i] == "." or tbl[i]=="" then
+			table.remove(tbl, i)
+		elseif tbl[i] == ".." then
+			table.remove(tbl, i)
+			if i>1 then
+				table.remove(tbl, i-1)
+			end
+		else
+			i = i + 1
+		end
+	end
+	return table.concat(tbl, "/")
+end
+
+
 --- Returns a class that can keep track of burst
 function SF.BurstObject( rate, max )
 	local burstclass = {
@@ -321,31 +323,6 @@ function SF.BurstObject( rate, max )
 		lasttick = 0
 	}
 	return setmetatable(t, {__index=burstclass})
-end
-
-local wrappedfunctions = setmetatable({},{__mode="kv"})
-local wrappedfunctions2instance = setmetatable({},{__mode="kv"})
---- Wraps the given starfall function so that it may called directly by GMLua
--- @param func The starfall function getting wrapped
--- @param instance The instance the function originated from
--- @return a function That when called will call the wrapped starfall function
-function SF.WrapFunction( func, instance )
-	if wrappedfunctions[func] then return wrappedfunctions[func] end
-	
-	local function returned_func( ... )
-		return SF.Unsanitize( instance:runFunction( func, SF.Sanitize(...) ) )
-	end
-	wrappedfunctions[func] = returned_func
-	wrappedfunctions2instance[returned_func] = instance
-	
-	return returned_func
-end
-
---- Gets the instance a wrapped function is bound to
--- @param func Function
--- @return Instance
-function SF.WrappedFunctionInstance(func)
-	return wrappedfunctions2instance[func]
 end
 
 -- A list of safe data types
@@ -480,6 +457,37 @@ function SF.DeserializeCode(tbl)
 	return sources, tbl.mainfile
 end
 
+local soundsMap = {
+	[ "DRIP1" ] = 0, [0] = "DRIP1",
+	[ "DRIP2" ] = 1,	[1] = "DRIP2",
+	[ "DRIP3" ] = 2,	[2] = "DRIP3",
+	[ "DRIP4" ] = 3,	[3] = "DRIP4",
+	[ "DRIP5" ] = 4,	[4] = "DRIP5",
+	[ "ERROR1" ] = 5,	[5] = "ERROR1",
+	[ "CONFIRM1" ] = 6,	[6] = "CONFIRM1",
+	[ "CONFIRM2" ] = 7,	[7] = "CONFIRM2",
+	[ "CONFIRM3" ] = 8,	[8] = "CONFIRM3",
+	[ "CONFIRM4" ] = 9,	[9] = "CONFIRM4",
+}
+local soundsMapSounds = {
+	[ "DRIP1" ] = "ambient/water/drip1.wav",
+	[ "DRIP2" ] = "ambient/water/drip2.wav",
+	[ "DRIP3" ] = "ambient/water/drip3.wav",
+	[ "DRIP4" ] = "ambient/water/drip4.wav",
+	[ "DRIP5" ] = "ambient/water/drip5.wav",
+	[ "ERROR1" ] = "buttons/button10.wav",
+	[ "CONFIRM1" ] = "buttons/button3.wav",
+	[ "CONFIRM2" ] = "buttons/button14.wav",
+	[ "CONFIRM3" ] = "buttons/button15.wav",
+	[ "CONFIRM4" ] = "buttons/button17.wav"
+}
+local notificationsMap = {
+	["GENERIC"] = 0,
+	["ERROR"] = 1,
+	["UNDO"] = 2,
+	["HINT"] = 3,
+	["CLEANUP"] = 4,
+}
 -- ------------------------------------------------------------------------- --
 
 if SERVER then
@@ -489,16 +497,7 @@ if SERVER then
 	util.AddNetworkString( "starfall_console_print" )
 	util.AddNetworkString( "starfall_openeditor" )
 	
-	local uploaddata = {}
-	-- Packet structure:
-	-- 
-	-- Initialize packet:
-	--   Bit: False to cancel transfer
-	--   String: Main filename
-	-- Payload packets:
-	--   Bit: End transmission. If true, no other data is included
-	--   String: Filename. Multiple packets with the same filename are to be concactenated onto each other in the order they were sent
-	--   String: File data
+	local uploaddata = SF.EntityTable( "sfTransfer" )
 
 	--- Requests a player to send whatever code they have open in his/her editor to
 	-- the server.
@@ -522,10 +521,6 @@ if SERVER then
 		}
 		return true
 	end
-
-	hook.Add("PlayerDisconnected", "SF_requestcode_cleanup", function(ply)
-		uploaddata[ply] = nil
-	end)
 	
 	net.Receive("starfall_upload", function(len, ply)
 		local updata = uploaddata[ply]
@@ -534,29 +529,35 @@ if SERVER then
 			return
 		end
 		
-		if updata.needHeader then
-			if net.ReadBit() == 0 then
-				--print("Recieved cancel packet")
-				updata.callback(nil, nil)
-				uploaddata[ply] = nil
-				return
-			end
-			updata.mainfile = net.ReadString()
-			updata.needHeader = nil
-			--print("Begin recieving, mainfile:", updata.mainfile)
-		else
-			if net.ReadBit() ~= 0 then
-				--print("End recieving data")
-				updata.callback(updata.mainfile, updata.files)
-				uploaddata[ply] = nil
-				return
-			end
+		updata.mainfile = net.ReadString()
+		
+		local I = 0
+		while I < 256 do
+			if net.ReadBit() ~= 0 then break end
 			local filename = net.ReadString()
-			local filedata = net.ReadString()
-			--print("\tRecieved data for:", filename, "len:", #filedata)
-			updata.files[filename] = updata.files[filename] and updata.files[filename]..filedata or filedata
+
+			net.ReadStream( ply, function( data )
+				if not data and uploaddata[ply]==updata then
+					SF.AddNotify( ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1" )
+					uploaddata[ply] = nil
+					return
+				end
+				updata.Completed = updata.Completed + 1
+				updata.files[ filename ] = data
+				if updata.Completed == updata.NumFiles then
+					updata.callback(updata.mainfile, updata.files)
+					uploaddata[ply] = nil
+				end
+			end )
+			I = I + 1
 		end
 
+		updata.Completed = 0
+		updata.NumFiles = I
+		
+		if I == 0 then
+			uploaddata[ply] = nil
+		end
 	end)
 
 	function SF.AddNotify ( ply, msg, notifyType, duration, sound )
@@ -564,9 +565,9 @@ if SERVER then
 
 		net.Start( "starfall_addnotify" )
 		net.WriteString( msg )
-		net.WriteUInt( notifyType, 8 or 0, 8 )
+		net.WriteUInt( notificationsMap[ notifyType ], 8 )
 		net.WriteFloat( duration )
-		net.WriteUInt( sound, 8 or 0, 8 )
+		net.WriteUInt( soundsMap[ sound ], 8 )
 		if ply then
 			net.Send( ply )
 		else
@@ -613,56 +614,27 @@ else
 		if ok then
 			--print("Uploading SF code")
 			net.Start("starfall_upload")
-			net.WriteBit(true)
 			net.WriteString(list.mainfile)
-			net.SendToServer()
-			--print("\tHeader sent")
-
-			local fname = next(list.files)
-			while fname do
-				--print("\tSending data for:", fname)
-				local fdata = list.files[fname]
-				local offset = 1
-				repeat
-					net.Start("starfall_upload")
-					net.WriteBit(false)
-					net.WriteString(fname)
-					local data = fdata:sub(offset, offset+60000)
-					net.WriteString(data)
-					net.SendToServer()
-
-					--print("\t\tSent data from", offset, "to", offset + #data)
-					offset = offset + #data + 1
-				until offset > #fdata
-				fname = next(list.files, fname)
+			
+			for name, data in pairs( list.files ) do
+				net.WriteBit( false )
+				net.WriteString( name )
+				net.WriteStream( data )
 			end
 
-			net.Start("starfall_upload")
-			net.WriteBit(true)
+			net.WriteBit( true )
 			net.SendToServer()
 			--print("Done sending")
 		else
 			net.Start("starfall_upload")
-			net.WriteBit(false)
+			net.WriteString("")
+			net.WriteBit(true)
 			net.SendToServer()
 			if list then
-				SF.AddNotify( LocalPlayer(), list, NOTIFY_ERROR, 7, NOTIFYSOUND_ERROR1 )
+				SF.AddNotify( LocalPlayer(), list, "ERROR", 7, "ERROR1" )
 			end
 		end
 	end)
-
-	local sounds = {
-		[ NOTIFYSOUND_DRIP1 ] = "ambient/water/drip1.wav",
-		[ NOTIFYSOUND_DRIP2 ] = "ambient/water/drip2.wav",
-		[ NOTIFYSOUND_DRIP3 ] = "ambient/water/drip3.wav",
-		[ NOTIFYSOUND_DRIP4 ] = "ambient/water/drip4.wav",
-		[ NOTIFYSOUND_DRIP5 ] = "ambient/water/drip5.wav",
-		[ NOTIFYSOUND_ERROR1 ] = "buttons/button10.wav",
-		[ NOTIFYSOUND_CONFIRM1 ] = "buttons/button3.wav",
-		[ NOTIFYSOUND_CONFIRM2 ] = "buttons/button14.wav",
-		[ NOTIFYSOUND_CONFIRM3 ] = "buttons/button15.wav",
-		[ NOTIFYSOUND_CONFIRM4 ] = "buttons/button17.wav"
-	}
 
 	function SF.AddNotify ( ply, msg, type, duration, sound )
 		if not IsValid( ply ) then return end
@@ -679,14 +651,13 @@ else
 		end
 		
 		GAMEMODE:AddNotify( msg, type, duration )
-
-		if sound and sounds[ sound ] then
-			surface.PlaySound( sounds[ sound ] )
+		if sound and soundsMapSounds[ sound ] then
+			surface.PlaySound( soundsMapSounds[ sound ] )
 		end
 	end
 
 	net.Receive( "starfall_addnotify", function ()
-		SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), net.ReadUInt( 8 ) )
+		SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), soundsMap[ net.ReadUInt( 8 ) ])
 	end )
 
 	net.Receive( "starfall_console_print", function ()
@@ -754,7 +725,7 @@ if SERVER then
 			net.Start("sf_reloadlibrary")
 			local data = util.Compress(file.Read(name,"LUA"))
 			net.WriteString(filename)
-			net.WriteData(data, #data)
+			net.WriteStream( data )
 			net.Broadcast()
 		end
 		
@@ -788,14 +759,16 @@ else
 
 	net.Receive("sf_reloadlibrary", function(len)
 		local name = net.ReadString()
-		print("Reloaded library: " .. name)
-		cleanHooks( name )
-		local file = util.Decompress(net.ReadData(len/8 - #name - 1))
-		if file then
-			local func = CompileString( file, "starfall/" .. name .. ".lua" )
-			func()
-			SF.Libraries.CallHook("postload")
-		end
+		net.ReadStream( nil, function( data )
+			local file = util.Decompress( data )
+			if file then
+				print("Reloaded library: " .. name)
+				cleanHooks( name )
+				local func = CompileString( file, "starfall/" .. name .. ".lua" )
+				func()
+				SF.Libraries.CallHook("postload")
+			end
+		end )
 	end)
 
 	local l

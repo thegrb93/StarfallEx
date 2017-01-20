@@ -145,3 +145,35 @@ function color_methods:hsvToRGB ()
 	local rgb = HSVToColor( self[1], self[2], self[3] )
 	return wrap( { rgb.r, rgb.g, rgb.b, (rgb.a or 255) } )
 end
+
+--- Set's the color's red channel and returns it.
+-- @param r The red
+-- @return The modified color
+function color_methods:setR( r )
+	self[1] = r
+	return self
+end
+
+--- Set's the color's green and returns it.
+-- @param g The green
+-- @return The modified color
+function color_methods:setG( g )
+	self[2] = g
+	return self
+end
+
+--- Set's the color's blue and returns it.
+-- @param b The blue
+-- @return The modified color
+function color_methods:setB( b )
+	self[3] = b
+	return self
+end
+
+--- Set's the color's alpha and returns it.
+-- @param a The alpha
+-- @return The modified color
+function color_methods:setA( a )
+	self[4] = a
+	return self
+end

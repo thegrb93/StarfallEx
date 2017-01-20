@@ -6,6 +6,8 @@
 -- @shared
 local hook_library, _ = SF.Libraries.Register( "hook" )
 local registered_instances = {}
+local gmod_hooks = {}
+local wrapArguments = SF.Sanitize
 
 --- Sets a hook function
 -- @param hookname Name of the event
@@ -14,17 +16,78 @@ local registered_instances = {}
 function hook_library.add ( hookname, name, func )
 	SF.CheckType( hookname, "string" )
 	SF.CheckType( name, "string" )
-	if func then SF.CheckType( func, "function" ) else return end
+	SF.CheckType( func, "function" )
 
+	hookname = hookname:lower()
 	local inst = SF.instance
-	local hooks = inst.hooks[ hookname:lower() ]
+	local hooks = inst.hooks[ hookname ]
 	if not hooks then
 		hooks = {}
-		inst.hooks[ hookname:lower() ] = hooks
+		inst.hooks[ hookname ] = hooks
 	end
-
 	hooks[ name ] = func
-	registered_instances[ inst ] = true
+
+	local instances = registered_instances[ hookname ]
+	if not instances then
+		instances = {}
+		registered_instances[ hookname ] = instances
+	
+		local gmod_hook = gmod_hooks[ hookname ]
+		if gmod_hook then
+			local realname, customargfunc, customretfunc = unpack( gmod_hook )
+			--- There are 4 varients of hookfunc depending on if there are custom callbacks
+			local hookfunc
+			if customargfunc then
+				if customretfunc then
+					hookfunc = function( ... )
+						local result
+						for instance, _ in pairs( instances ) do
+							local canrun, customargs = customargfunc( instance, ... )
+							if canrun then
+								local tbl = instance:runScriptHookForResult( hookname, wrapArguments( unpack( customargs ) ) )
+								if tbl[1] then
+									local sane = customretfunc( instance, tbl, ... )
+									if sane ~= nil then result = sane end
+								end
+							end
+						end
+						return result
+					end
+				else
+					hookfunc = function( ... )
+						for instance, _ in pairs( instances ) do
+							local canrun, customargs = customargfunc( instance, ... )
+							if canrun then
+								instance:runScriptHook( hookname, wrapArguments( unpack( customargs ) ) )
+							end
+						end
+					end
+				end
+			else
+				if customretfunc then
+					hookfunc = function( ... )
+						local result
+						for instance, _ in pairs( instances ) do
+							local tbl = instance:runScriptHookForResult( hookname, wrapArguments( ... ) )
+							if tbl[1] then
+								local sane = customretfunc( instance, tbl, ... )
+								if sane ~= nil then result = sane end
+							end
+						end
+						return result
+					end
+				else
+					hookfunc = function( ... )
+						for instance, _ in pairs( instances ) do
+							instance:runScriptHook( hookname, wrapArguments( ... ) )
+						end
+					end
+				end
+			end
+			hook.Add( realname, "SF_Hook_"..realname, hookfunc )
+		end
+	end
+	instances[ inst ] = true
 end
 
 --- Run a hook
@@ -37,15 +100,11 @@ function hook_library.run ( hookname, ... )
 	local instance = SF.instance
 	local lower = hookname:lower()
 
-	local ret = { instance:runScriptHookForResult( lower, ... ) }
+	local tbl = instance:runScriptHookForResult( lower, ... )
 
-	local ok = table.remove( ret, 1 )
-	if not ok then
-		instance:Error( "Hook '" .. lower .. "' errored with " .. ret[ 1 ], ret[ 2 ] )
-		return
+	if tbl[1] then
+		return unpack( tbl, 2 )
 	end
-
-	return unpack( ret )
 end
 
 --- Remote hook.
@@ -74,7 +133,7 @@ function hook_library.runRemote ( recipient, ... )
 			[ ent.instance ] = true
 		}
 	else
-		recipients = registered_instances
+		recipients = registered_instances[ "remote" ] or {}
 	end
 
 	local instance = SF.instance
@@ -82,13 +141,10 @@ function hook_library.runRemote ( recipient, ... )
 	local results = {}
 	for k, _ in pairs( recipients ) do
 
-		local result = { k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... ) }
-		local ok = table.remove( result, 1 )
+		local result = k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... )
 
-		if ok and result[1] then
-			results[ #results + 1 ] = result
-		else
-			k:Error( "Hook 'remote' errored with " .. result[ 1 ], result[ 2 ] )
+		if result[1] and result[2]~=nil then
+			results[ #results + 1 ] = { unpack( result, 2 ) }
 		end
 
 	end
@@ -110,88 +166,51 @@ function hook_library.remove ( hookname, name )
 
 		if not next( instance.hooks[ lower ] ) then
 			instance.hooks[ lower ] = nil
+			registered_instances[ lower ][ instance ] = nil
+			if not next( registered_instances[ lower ] ) then
+				registered_instances[ lower ] = nil
+				if gmod_hooks[ lower ] then
+					hook.Remove( gmod_hooks[ lower ][ 1 ], "SF_Hook_" .. gmod_hooks[ lower ][ 1 ] )
+				end
+			end
 		end
-	end
-
-	if not next( instance.hooks ) then
-		registered_instances[ instance ] = nil
 	end
 end
 
 SF.Libraries.AddHook( "deinitialize", function ( instance )
-	registered_instances[ instance ] = nil
-end )
-
-SF.Libraries.AddHook( "cleanup", function ( instance, name, func, err )
-	if name == "_runFunction" and err == true then
-		registered_instances[ instance ] = nil
-		instance.hooks = {}
-	end
-end)
-
-local wrapArguments = SF.Sanitize
-
-local function run ( hookname, customfunc, ... )
-	local result = {}
-	for instance,_ in pairs( registered_instances ) do
-		if not instance.hooks[ hookname ] then continue end
-		local ret = { instance:runScriptHookForResult( hookname, wrapArguments( ... ) ) }
-
-		local ok = ret[1]
-		if ok then
-			if customfunc then
-				local sane = customfunc( instance, {unpack(ret, 2)}, ... )
-				if sane ~= nil then result = { sane } end
+	for k, v in pairs( registered_instances ) do
+		v[ instance ] = nil
+		if not next( v ) then
+			registered_instances[ k ] = nil
+			if gmod_hooks[ k ] then
+				hook.Remove( gmod_hooks[ k ][ 1 ], "SF_Hook_" .. gmod_hooks[ k ][ 1 ] )
 			end
-		else
-			instance:Error( "Hook '" .. hookname .. "' errored with " .. ret[ 2 ], ret[ 3 ] )
 		end
 	end
-	return unpack( result )
-end
+end )
 
-
-local hooks = {}
 --- Add a GMod hook so that SF gets access to it
 -- @shared
 -- @param hookname The hook name. In-SF hookname will be lowercased
--- @param customfunc Optional custom function
-function SF.hookAdd ( hookname, customfunc )
-	hooks[ #hooks + 1 ] = hookname
-	local lower = hookname:lower()
-
-	--Ensure that SF hooks are called after all other hooks.
-	local detour = GAMEMODE[ hookname ]
-	if detour then
-		GAMEMODE[ hookname ] = function ( self, ... )
-			local a, b, c, d, e, f = run( lower, customfunc, ... )
-			if ( a != nil ) then
-				return a, b, c, d, e, f
-			else
-				return detour( self, ... )
-			end
-		end
-	else
-		GAMEMODE[ hookname ] = function ( self, ... )
-			return run( lower, customfunc, ... )
-		end
-	end
+-- @param customargfunc Optional custom function
+-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
+-- @param customretfunc Optional custom function
+-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
+function SF.hookAdd ( hookname, customhookname, customargfunc, customretfunc )
+	gmod_hooks[ customhookname or hookname:lower() ] = {hookname, customargfunc, customretfunc}
 end
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself( instance, args, ply )
 	if instance.player ~= ply then return end
-	if args then return args[1] end
+	return args[2]
 end
 
 --Can only return false on yourself
 local function returnOnlyOnYourselfFalse( instance, args, ply )
 	if instance.player ~= ply then return end
-	if args and args[1]==false then return false end
+	if args[2]==false then return false end
 end
-
-if SFHooksAdded then return end
-SFHooksAdded = true
 
 local add = SF.hookAdd
 
@@ -207,20 +226,19 @@ if SERVER then
 	add( "PlayerSpawn" )
 	add( "PlayerEnteredVehicle" )
 	add( "PlayerLeaveVehicle" )
-	add( "PlayerSay", returnOnlyOnYourself )
+	add( "PlayerSay", nil, nil, returnOnlyOnYourself )
 	add( "PlayerSpray" )
 	add( "PlayerUse" )
 	add( "PlayerSwitchFlashlight" )
-	add( "PlayerCanPickupWeapon", returnOnlyOnYourselfFalse  )
+	add( "PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse  )
 
-	hook.Add("EntityTakeDamage", "SF_EntityTakeDamage", function( target, dmg )
-		local lower = ("EntityTakeDamage"):lower()
-		run( lower, nil, target, dmg:GetAttacker(),
+	add("EntityTakeDamage", function( target, dmg )
+		return true, dmg:GetAttacker(),
 			dmg:GetInflictor(),
 			dmg:GetDamage(),
 			dmg:GetDamageType(),
 			dmg:GetDamagePosition(),
-			dmg:GetDamageForce() )
+			dmg:GetDamageForce()
 	end)
 
 else
@@ -239,7 +257,7 @@ add( "KeyRelease" )
 add( "GravGunPunt" )
 add( "PhysgunPickup" )
 add( "PhysgunDrop" )
-add( "PlayerSwitchWeapon", returnOnlyOnYourselfFalse )
+add( "PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse )
 
 -- Entity hooks
 add( "OnEntityCreated" )
