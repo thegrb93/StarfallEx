@@ -1332,8 +1332,10 @@ if CLIENT then
 				codedir = curdir
 				codepath = path
 			else
-				codepath = SF.NormalizePath( curdir .. path )
-				code = file.Read( "starfall/" .. codepath, "DATA" )
+				if string.sub(path,1,1)~="/" then
+					codepath = SF.NormalizePath( curdir .. path )
+					code = file.Read( "starfall/" .. codepath, "DATA" )
+				end
 				if not code then
 					codepath = SF.NormalizePath( path )
 					code = file.Read( "starfall/" .. codepath, "DATA" )
