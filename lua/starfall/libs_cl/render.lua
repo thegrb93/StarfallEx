@@ -502,8 +502,13 @@ function render_library.selectRenderTarget ( name )
 	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
 	if name then
 		SF.CheckType( name, "string" )
-		local rt = globalRTs[ data.rendertargets[ name ] ][ 1 ]
-		if not rt then SF.Throw( "Invalid Rendertarget", 2 ) end
+
+		local rtname = data.rendertargets[ name ]
+		if not rtname then SF.throw( "Invalid Rendertarget", 2 ) end
+		local rttbl = globalRTs[ rtname ]
+		if not rttbl then SF.throw( "Invalid Rendertarget", 2 ) end
+		local rt = rttbl[ 1 ]
+		if not rt then SF.throw( "Invalid Rendertarget", 2 ) end
 
 		if not data.usingRT then
 			data.oldViewPort = {0, 0, ScrW(), ScrH()}
