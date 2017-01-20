@@ -86,8 +86,8 @@ function hook_library.add ( hookname, name, func )
 			end
 			hook.Add( realname, "SF_Hook_"..realname, hookfunc )
 		end
-		instances[ inst ] = true
 	end
+	instances[ inst ] = true
 end
 
 --- Run a hook
