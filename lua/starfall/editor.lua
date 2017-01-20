@@ -864,18 +864,94 @@ if CLIENT then
 
 	function SF.Editor.createPermissionsWindow ()
 		local frame = vgui.Create( "StarfallFrame" )
-		frame:SetSize( 200, 400 )
+		frame:SetSize( 400, 600 )
 		frame:SetTitle( "Starfall Permissions" )
 		frame:Center()
 
 		local panel = vgui.Create( "StarfallPanel", frame )
 		panel:Dock( FILL )
 		panel:DockMargin( 0, 5, 0, 0 )
-		frame:AddComponent( "panel", panel )
 
 		local scrollPanel = vgui.Create( "DScrollPanel", panel )
 		scrollPanel:Dock( FILL )
 		scrollPanel:SetPaintBackgroundEnabled( false )
+			
+		frame.OnOpen = function()			
+			local clientProviders = {}
+			for i, v in ipairs(SF.Permissions.providers) do
+				local provider = {id = v.id, name = v.name, settings = {}, options = {}}
+				local options = provider.options
+				local settings = provider.settings
+				for i, option in ipairs(v.settingsoptions) do
+					options[i] = option
+				end
+				for id, setting in pairs(v.settings) do
+					settings[id] = {v.settingsdesc[id][1],v.settingsdesc[id][2],setting}
+				end
+				clientProviders[i] = provider
+			end
+			
+			local function createPermissions( providers, server )	
+				for _, p in ipairs( providers ) do
+					local header = vgui.Create( "DLabel", header )
+					header:SetFont( "DermaLarge" )
+					header:SetColor( SF.Editor.colors.meddark )
+					header:SetText( p.name )
+					header:SetSize(0, 40)
+					header:Dock( TOP )
+					scrollPanel:AddItem( header )
+					
+					for id, setting in SortedPairs( p.settings ) do
+						
+						local header = vgui.Create( "StarfallPanel" )
+						header:DockMargin( 0, 5, 0, 0 )
+						header:SetSize( 0, 20 )
+						header:Dock( TOP )
+						
+						local settingtext = vgui.Create( "DLabel", header )
+						settingtext:SetFont( "DermaDefault" )
+						settingtext:SetColor( SF.Editor.colors.meddark )
+						settingtext:SetText( id )
+						settingtext:DockMargin( 5, 0, 0, 0 )
+						settingtext:Dock( FILL )
+						
+						local buttons = {}
+						for i=#p.options, 1, -1 do
+							local button = vgui.Create( "StarfallButton", header )
+							button:SetText( p.options[i] )
+							button:SetTooltip( setting[2] )
+							button:DockMargin( 0, 0, 3, 0 )
+							button:Dock( RIGHT )
+							button.active = setting[3]==i
+							button.DoClick = function(self)
+								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", p.id, id, i)
+								for _, b in ipairs(buttons) do
+									b.active = false
+								end
+								self.active = true
+							end
+							buttons[i]=button
+						end
+						
+						scrollPanel:AddItem( header )
+						
+					end
+				end
+			end
+			
+			if LocalPlayer():IsSuperAdmin() then
+				SF.Permissions.requestPermissions( function(serverProviders)
+					createPermissions( serverProviders, true )
+					createPermissions( clientProviders )
+				end)
+			else
+				createPermissions( clientProviders )
+			end
+		end
+
+		frame.OnClose = function()
+			scrollPanel:Clear()
+		end
 		
 		return frame
 	end

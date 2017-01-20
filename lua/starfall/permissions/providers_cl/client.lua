@@ -12,7 +12,7 @@ function P.registered ( id, name, description, arg )
 	if arg and table.HasValue( arg, "Client" ) then
 		P.settingsdesc[ id ] = { name, description }
 		if not P.settings[ id ] then
-			P.settings[ id ] = 1
+			P.settings[ id ] = 3
 		end
 	end
 

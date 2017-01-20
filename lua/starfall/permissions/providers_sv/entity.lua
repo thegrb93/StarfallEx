@@ -25,7 +25,7 @@ function P.registered ( id, name, description, arg )
 	if addSetting then
 		P.settingsdesc[ id ] = { name, description }
 		if not P.settings[ id ] then
-			P.settings[ id ] = 1
+			P.settings[ id ] = 2
 		end
 	end
 end

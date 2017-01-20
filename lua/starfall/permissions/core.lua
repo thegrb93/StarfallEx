@@ -6,6 +6,7 @@ SF.Permissions = {}
 
 local P = SF.Permissions
 P.providers = {}
+P.filename = SERVER and "sf_perms.txt" or "sf_perms_cl.txt"
 
 --- Adds a provider implementation to the set used by this library.
 -- Providers must implement the {@link SF.Permissions.Provider} interface.
@@ -75,7 +76,7 @@ function P.savePermissions()
 			settings[ provider.id ] = tbl
 		end
 	end
-	file.Write( "sf_perms.txt", util.TableToJSON( settings ) )
+	file.Write( P.filename, util.TableToJSON( settings ) )
 end
 
 -- Find and include all provider files.
@@ -114,7 +115,7 @@ end
 
 -- Load the permission settings for each provider
 do
-	local settings = util.JSONToTable( file.Read( "sf_perms.txt" ) or "" ) or {}
+	local settings = util.JSONToTable( file.Read( P.filename ) or "" ) or {}
 	for _, provider in ipairs( P.providers ) do
 		if settings[ provider.id ] then
 			for k, v in pairs(settings[provider.id]) do
@@ -169,6 +170,10 @@ if SERVER then
 			for _, v in ipairs(P.providers) do
 				net.WriteString(v.id)
 				net.WriteString(v.name)
+				net.WriteUInt( #v.settingsoptions, 8 )
+				for _, option in ipairs(v.settingsoptions) do
+					net.WriteString(option)
+				end
 				net.WriteUInt( table.Count(v.settings), 8)
 				for id, setting in pairs(v.settings) do
 					net.WriteString(id)
@@ -199,8 +204,13 @@ else
 				local provider = {
 					id = net.ReadString(),
 					name = net.ReadString(),
-					settings = {}
+					settings = {},
+					options = {}
 				}
+				local noptions = net.ReadUInt(8)
+				for j=1, noptions do
+					provider.options[j] = net.ReadString()
+				end
 				local nsettings = net.ReadUInt(8)
 				for j=1, nsettings do
 					provider.settings[net.ReadString()] = {net.ReadString(), net.ReadString(), net.ReadUInt(8)}
