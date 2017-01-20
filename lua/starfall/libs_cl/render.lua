@@ -73,6 +73,9 @@ local aunwrap = SF.Angles.Unwrap
 
 local vwrap = SF.Vectors.Wrap
 
+SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {"Client"} )
+SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {"Client"} )
+
 local function sfCreateMaterial( name )
 	return CreateMaterial( name, "UnlitGeneric", {
 				[ "$nolod" ] = 1,
@@ -408,6 +411,9 @@ end
 function render_library.getTextureID ( tx, cb, alignment )
 
 	if tx:sub(1,4)=="http" then
+		local instance = SF.instance
+		SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
+
 		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
 			return string.format( "%%%02X", string.byte( str ) )
 		end )
@@ -423,8 +429,6 @@ function render_library.getTextureID ( tx, cb, alignment )
 		else
 			alignment = "center"
 		end
-
-		local instance = SF.instance
 
 		local tbl = {}
 		texturecachehttp[ tbl ] = LoadURLMaterial( tx, alignment, function()
