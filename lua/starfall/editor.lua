@@ -941,8 +941,10 @@ if CLIENT then
 			
 			if LocalPlayer():IsSuperAdmin() then
 				SF.Permissions.requestPermissions( function(serverProviders)
-					createPermissions( serverProviders, true )
-					createPermissions( clientProviders )
+					if frame:IsVisible() then
+						createPermissions( serverProviders, true )
+						createPermissions( clientProviders )
+					end
 				end)
 			else
 				createPermissions( clientProviders )
