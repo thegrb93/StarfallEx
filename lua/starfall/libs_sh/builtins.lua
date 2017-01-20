@@ -316,14 +316,18 @@ function SF.DefaultEnvironment.require(file)
 		SF.instance.data.reqloaded = loaded
 	end
 	
-	file = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
-	if loaded[file] then
-		return loaded[file]
+	local path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
+	if not SF.instance.scripts[path] then
+		path = SF.NormalizePath( file )
+	end
+	
+	if loaded[path] then
+		return loaded[path]
 	else
-		local func = SF.instance.scripts[file]
-		if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
-		loaded[file] = func() or true
-		return loaded[file]
+		local func = SF.instance.scripts[path]
+		if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
+		loaded[path] = func() or true
+		return loaded[path]
 	end
 end
 
@@ -363,8 +367,12 @@ end
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
     SF.CheckType(file, "string")
-    local func = SF.instance.scripts[file]
-    if not func then SF.throw( "Can't find file '" .. file .. "' (did you forget to --@include it?)", 2 ) end
+	local path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
+	if not SF.instance.scripts[path] then
+		path = SF.NormalizePath( file )
+	end
+    local func = SF.instance.scripts[path]
+    if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
     return func()
 end
 
