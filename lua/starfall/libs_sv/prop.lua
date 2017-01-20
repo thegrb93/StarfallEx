@@ -67,7 +67,7 @@ end
 -- @return The prop object
 function props_library.create ( pos, ang, model, frozen )
 	
-	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player,  nil, "prop.create" )
 
 	SF.CheckType( pos, SF.Types[ "Vector" ] )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )
@@ -117,7 +117,7 @@ end
 -- @return The sent object
 function props_library.createSent ( pos, ang, class, frozen )
 	
-	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player,  nil, "prop.create" )
 
 	SF.CheckType( pos, SF.Types[ "Vector" ] )
 	SF.CheckType( ang, SF.Types[ "Angle" ] )
@@ -271,7 +271,7 @@ end
 -- @return True if user can spawn props, False if not.
 function props_library.canSpawn ()
 
-	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return false end
+	if not SF.Permissions.hasAccess( SF.instance.player,  nil, "prop.create" ) then return false end
 	
 	local instance = SF.instance
 	return not personal_max_reached( instance ) and instance.data.props.burst:check()>1
@@ -283,7 +283,7 @@ end
 -- @return number of props able to be spawned
 function props_library.propsLeft ()
 
-	if not SF.Permissions.check( SF.instance.player,  nil, "prop.create" ) then return 0 end
+	if not SF.Permissions.hasAccess( SF.instance.player,  nil, "prop.create" ) then return 0 end
 	
 	local instance = SF.instance
 	

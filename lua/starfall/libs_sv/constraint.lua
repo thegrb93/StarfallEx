@@ -16,9 +16,7 @@ end)
 local function checkConstraint(e, t)
 	if e then
 		if e:IsValid() then
-			if not SF.Permissions.check( SF.instance.player, e, t ) then
-				SF.throw( "Insufficient permissions", 3 )
-			end
+			SF.Permissions.check( SF.instance.player, e, t )
 		elseif not e:IsWorld() then
 			SF.throw( "Invalid Entity", 3 )
 		end
@@ -30,15 +28,15 @@ end
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "constraints.weld", "Weld", "Allows the user to weld two entities" )
-	P.registerPrivilege( "constraints.axis", "Axis", "Allows the user to axis two entities" )
-	P.registerPrivilege( "constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities" )
-	P.registerPrivilege( "constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities" )
-	P.registerPrivilege( "constraints.slider", "Slider", "Allows the user to slider two entities" )
-	P.registerPrivilege( "constraints.rope", "Rope", "Allows the user to rope two entities" )
-	P.registerPrivilege( "constraints.elastic", "Elastic", "Allows the user to elastic two entities" )
-	P.registerPrivilege( "constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities" )
-	P.registerPrivilege( "constraints.any", "Any", "General constraint functions" )
+	P.registerPrivilege( "constraints.weld", "Weld", "Allows the user to weld two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.axis", "Axis", "Allows the user to axis two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.slider", "Slider", "Allows the user to slider two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.rope", "Rope", "Allows the user to rope two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.elastic", "Elastic", "Allows the user to elastic two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { "CanTool" } )
+	P.registerPrivilege( "constraints.any", "Any", "General constraint functions", { "CanTool" } )
 end
 
 --- Welds two entities
@@ -305,7 +303,7 @@ function constraint_library.setRopeLength(index, e, length)
 	local ent1 = eunwrap( e )
 	
 	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.rope" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent1, "constraints.rope" )
 
 	
 	SF.CheckType( length, "number" )
@@ -327,7 +325,7 @@ function constraint_library.setElasticLength(index, e, length)
 	local ent1 = eunwrap( e )
 	
 	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.elastic" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent1, "constraints.elastic" )
 
 	SF.CheckType( length, "number" )
 	length = math.max( length, 0 )
@@ -347,7 +345,7 @@ function constraint_library.breakAll(e)
 	local ent1 = eunwrap( e )
 	
 	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.any" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent1, "constraints.any" )
 	
 	constraint.RemoveAll(ent1)
 end
@@ -361,7 +359,7 @@ function constraint_library.breakType(e, typename)
 	local ent1 = eunwrap( e )
 	
 	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent1, "constraints.any" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent1, "constraints.any" )
 	
 	constraint.RemoveConstraints(ent1, typename)
 end
@@ -376,7 +374,7 @@ function constraint_library.getTable( ent )
 	ent = eunwrap( ent )
 	
 	if not IsValid( ent ) then SF.throw( "Invalid entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "constraints.any" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "constraints.any" )
 
 	return SF.Sanitize(constraint.GetTable( ent ))
 end

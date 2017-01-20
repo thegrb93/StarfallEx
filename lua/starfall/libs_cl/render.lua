@@ -73,6 +73,9 @@ local aunwrap = SF.Angles.Unwrap
 
 local vwrap = SF.Vectors.Wrap
 
+SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {"Client"} )
+SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {"Client"} )
+
 local function sfCreateMaterial( name )
 	return CreateMaterial( name, "UnlitGeneric", {
 				[ "$nolod" ] = 1,
@@ -101,15 +104,21 @@ local function findAvailableRT ()
 	return nil
 end
 
+local renderhooks = {
+	render = true,
+	predrawopaquerenderables = true,
+	postdrawopaquerenderables = true
+}
+
 SF.Libraries.AddHook( "prepare", function ( instance, hook )
-	if hook == "render" then
+	if renderhooks[hook] then
 		currentcolor = Color(255,255,255,255)
 		render.SetColorMaterial()
 	end
 end )
 
 SF.Libraries.AddHook( "cleanup", function ( instance, hook )
-	if hook == "render" then
+	if renderhooks[hook] then
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0,0,0,0,false)
 		for i=#matrix_stack,1,-1 do
@@ -402,6 +411,9 @@ end
 function render_library.getTextureID ( tx, cb, alignment )
 
 	if tx:sub(1,4)=="http" then
+		local instance = SF.instance
+		SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
+
 		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
 			return string.format( "%%%02X", string.byte( str ) )
 		end )
@@ -417,8 +429,6 @@ function render_library.getTextureID ( tx, cb, alignment )
 		else
 			alignment = "center"
 		end
-
-		local instance = SF.instance
 
 		local tbl = {}
 		texturecachehttp[ tbl ] = LoadURLMaterial( tx, alignment, function()

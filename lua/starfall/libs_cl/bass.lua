@@ -1,7 +1,12 @@
 SF.Bass = {}
 
-local bassEnabled = CreateConVar( "sf_bass_enabled", "1", { FCVAR_ARCHIVE },
-	"Whether or not you can hear bass sounds from starfall chips" )
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege( "bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", {"Client"} )
+	P.registerPrivilege( "bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", {"Client"} )
+end
+
 --- Bass type
 -- @client
 local bass_methods, bass_metamethods = SF.Typedef( "Bass" )
@@ -41,7 +46,7 @@ end )
 -- @param flags that will control the sound
 -- @param callback to run when the sound is loaded
 function bass_library.loadFile ( path, flags, callback )
-	if not SF.Permissions.check( SF.instance.player, { ent, path }, "sound.create" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, { ent, path }, "bass.loadFile" )
 
 	SF.CheckType( path, "string" )
 	SF.CheckType( flags, "string" )
@@ -52,11 +57,6 @@ function bass_library.loadFile ( path, flags, callback )
 	end
 	
 	local instance = SF.instance
-
-	if not bassEnabled:GetBool() then
-		instance:runFunction( callback, nil, -1, "sf_bass_enabled is 0" )
-		return
-	end
 
 	sound.PlayFile( path, flags, function(snd, er, name)
 		if er then
@@ -77,18 +77,13 @@ end
 -- @param flags that will control the sound
 -- @param callback to run when the sound is loaded
 function bass_library.loadURL ( path, flags, callback )
-	if not SF.Permissions.check( SF.instance.player, { ent, path }, "sound.create" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, { ent, path }, "bass.loadURL" )
 
 	SF.CheckType( path, "string" )
 	SF.CheckType( flags, "string" )
 	SF.CheckType( callback, "function" )
 
 	local instance = SF.instance
-
-	if not bassEnabled:GetBool() then
-		instance:runFunction( callback, nil, -1, "sf_bass_enabled is 0" )
-		return
-	end
 
 	sound.PlayURL( path, flags, function(snd, er, name)
 		if er then
@@ -111,7 +106,7 @@ function bass_methods:play ()
 	SF.CheckType( self, bass_metamethods )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 	
 	if IsValid(uw) then
 		uw:Play()
@@ -123,7 +118,7 @@ function bass_methods:stop ( )
 	SF.CheckType( self, bass_metamethods )
 	local uw =  unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 	
 	if IsValid(uw) then
 		uw:Stop()
@@ -137,7 +132,7 @@ function bass_methods:setVolume ( vol )
 	SF.CheckType( vol, "number" )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		uw:SetVolume( math.Clamp( vol, 0, 1 ) )
@@ -151,7 +146,7 @@ function bass_methods:setPitch ( pitch )
 	SF.CheckType( pitch, "number" )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		uw:SetPlaybackRate( math.Clamp( pitch, 0, 3 ) )
@@ -165,7 +160,7 @@ function bass_methods:setPos ( pos )
 	SF.CheckType( pos, SF.Types[ "Vector" ] )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		uw:SetPos( SF.UnwrapObject( pos ) )
@@ -179,7 +174,7 @@ function bass_methods:setFade ( min, max )
 	SF.CheckType( self, bass_metamethods )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		uw:Set3DFadeDistance( math.Clamp(min,50,1000), math.Clamp(max,10000,200000) )
@@ -192,7 +187,7 @@ function bass_methods:setLooping ( loop )
 	SF.CheckType( self, bass_metamethods )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		uw:EnableLooping( loop )
@@ -205,7 +200,7 @@ function bass_methods:getLength ()
 	SF.CheckType( self, bass_metamethods )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		return uw:GetLength()
@@ -219,7 +214,7 @@ function bass_methods:setTime ( time )
 	SF.CheckType( time, "number" )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		uw:SetTime( time )
@@ -232,7 +227,7 @@ function bass_methods:getTime ()
 	SF.CheckType( self, bass_metamethods )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		return uw:GetTime()
@@ -246,7 +241,7 @@ function bass_methods:getFFT ( n )
 	SF.CheckType( self, bass_metamethods )
 	local uw = unwrap( self )
 		
-	if not SF.Permissions.check( SF.instance.player, uw, "sound.modify" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
 
 	if IsValid(uw) then
 		local arr = {}

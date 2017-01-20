@@ -323,7 +323,7 @@ end
 -- @shared
 -- @return table trace data
 function player_methods:getEyeTrace ()
-	if not SF.Permissions.check( SF.instance.player, eunwrap( self ), "trace" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, eunwrap( self ), "trace" )
 	
 	local data = eunwrap( self ):GetEyeTrace()
 	return setmetatable({}, {
