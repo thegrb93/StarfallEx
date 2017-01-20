@@ -101,15 +101,21 @@ local function findAvailableRT ()
 	return nil
 end
 
+local renderhooks = {
+	render = true,
+	predrawopaquerenderables = true,
+	postdrawopaquerenderables = true
+}
+
 SF.Libraries.AddHook( "prepare", function ( instance, hook )
-	if hook == "render" then
+	if renderhooks[hook] then
 		currentcolor = Color(255,255,255,255)
 		render.SetColorMaterial()
 	end
 end )
 
 SF.Libraries.AddHook( "cleanup", function ( instance, hook )
-	if hook == "render" then
+	if renderhooks[hook] then
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0,0,0,0,false)
 		for i=#matrix_stack,1,-1 do
