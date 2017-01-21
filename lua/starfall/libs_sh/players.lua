@@ -367,6 +367,11 @@ function player_methods:getGroundEntity()
 	return ewrap( eunwrap( self ):GetGroundEntity() )
 end
 
+function player_methods:hasGodMode()
+	SF.CheckType( self, player_metamethods )
+	return eunwrap( self ):HasGodMode()
+end
+
 if SERVER then
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
