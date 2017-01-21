@@ -167,6 +167,10 @@ end
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string" )
 filterGmodLua( string, string_methods )
+string_methods["rep"] = function(str, rep, sep)
+	if (#str + (sep and #sep or 0))*rep>10000000 then SF.throw("String is too large!",2) end
+	return string.rep(str,rep,sep)
+end
 string_metatable.__newindex = function () end
 
 --- String library http://wiki.garrysmod.com/page/Category:string
