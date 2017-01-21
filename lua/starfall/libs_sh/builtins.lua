@@ -167,6 +167,10 @@ end
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string" )
 filterGmodLua( string, string_methods )
+string_methods["rep"] = function(str, rep, sep)
+	if (#str + (sep and #sep or 0))*rep>10000000 then SF.throw("String is too large!",2) end
+	return string.rep(str,rep,sep)
+end
 string_metatable.__newindex = function () end
 
 --- String library http://wiki.garrysmod.com/page/Category:string
@@ -316,9 +320,15 @@ function SF.DefaultEnvironment.require(file)
 		SF.instance.data.reqloaded = loaded
 	end
 	
-	local path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
-	if not SF.instance.scripts[path] then
+	
+	local path
+	if string.sub(file,1,1)=="/" then
 		path = SF.NormalizePath( file )
+	else
+		path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
+		if not SF.instance.scripts[path] then
+			path = SF.NormalizePath( file )
+		end
 	end
 	
 	if loaded[path] then
@@ -367,9 +377,14 @@ end
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
     SF.CheckType(file, "string")
-	local path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
-	if not SF.instance.scripts[path] then
+	local path
+	if string.sub(file,1,1)=="/" then
 		path = SF.NormalizePath( file )
+	else
+		path = SF.NormalizePath( string.GetPathFromFilename( string.sub( debug.getinfo( 2, "S" ).source, 5 ) ) .. file )
+		if not SF.instance.scripts[path] then
+			path = SF.NormalizePath( file )
+		end
 	end
     local func = SF.instance.scripts[path]
     if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end

@@ -55,10 +55,11 @@ do
 	P.registerPrivilege( "wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs" )
 	P.registerPrivilege( "wire.output", "Output", "Allows the user to set the value of an output" )
 	P.registerPrivilege( "wire.input", "Input", "Allows the user to read the value of an input" )
+	P.registerPrivilege( "wire.wirelink", "Wirelink", "Allows the user to create a wirelink", {"CanTool"} )
 	P.registerPrivilege( "wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink" )
 	P.registerPrivilege( "wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink" )
-	P.registerPrivilege( "wire.createWire", "Create Wire", "Allows the user to create a wire between two entities" )
-	P.registerPrivilege( "wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities" )
+	P.registerPrivilege( "wire.createWire", "Create Wire", "Allows the user to create a wire between two entities", {"CanTool"} )
+	P.registerPrivilege( "wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities", {"CanTool"} )
 	P.registerPrivilege( "wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity" )
 	P.registerPrivilege( "wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity" )
 end
@@ -233,7 +234,7 @@ end
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. May be modified by the function.
 function wire_library.adjustInputs ( names, types )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" )
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
@@ -260,7 +261,7 @@ end
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. May be modified by the function.
 function wire_library.adjustOutputs ( names, types )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" )
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
@@ -306,7 +307,8 @@ function wire_library.create ( entI, entO, inputname, outputname )
 	if not IsValid( entI ) then SF.throw( "Invalid source" ) end
 	if not IsValid( entO ) then SF.throw( "Invalid target" ) end
 	
-	if not SF.Permissions.check( SF.instance.player, entI, "wire.createWire" ) or not SF.Permissions.check( SF.instance.player, entO, "wire.createWire" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, entI, "wire.createWire" )
+	SF.Permissions.check( SF.instance.player, entO, "wire.createWire" )
 	
 	if not entI.Inputs then SF.throw( "Source has no valid inputs" ) end
 	if not entO.Outputs then SF.throw( "Target has no valid outputs" ) end
@@ -336,7 +338,7 @@ function wire_library.delete ( entI, inputname )
 	
 	if not IsValid( entI ) then SF.throw( "Invalid source" ) end
 	
-	if not SF.Permissions.check( SF.instance.player, entI, "wire.deleteWire" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, entI, "wire.deleteWire" )
 	
 	if not entI.Inputs or not entI.Inputs[ inputname ] then SF.throw( "Entity does not have input: " .. inputname ) end
 	if not entI.Inputs[ inputname ].Src then SF.throw( "Input \"" .. inputname .. "\" is not wired" ) end
@@ -349,7 +351,7 @@ local function parseEntity( ent, io )
 	if ent then
 		SF.CheckType( ent, SF.Types[ "Entity" ] )
 		ent = SF.Entities.Unwrap( ent )
-		if not SF.Permissions.check( SF.instance.player, ent, "wire.get" .. io ) then SF.throw( "Insufficient permissions", 2 ) end
+		SF.Permissions.check( SF.instance.player, ent, "wire.get" .. io )
 	else
 		ent = SF.instance.data.entity or nil
 	end
@@ -387,6 +389,7 @@ function wire_library.getWirelink ( ent )
 	SF.CheckType( ent, SF.Types[ "Entity" ] )
 	ent = SF.Entities.Unwrap( ent )
 	if not ent:IsValid() then return end
+	SF.Permissions.check( SF.instance.player, ent, "wire.wirelink" )
 	
 	if not ent.extended then
 		WireLib.CreateWirelinkOutput( SF.instance.player, ent, {true} )
@@ -399,7 +402,7 @@ end
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
 wirelink_metatable.__index = function(self,k)
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.read" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.read" )
 	SF.CheckType(self,wirelink_metatable)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
@@ -419,7 +422,7 @@ end
 
 --- Writes to an input.
 wirelink_metatable.__newindex = function(self,k,v)
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.write" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "wire.wirelink.write" )
 	SF.CheckType(self,wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
@@ -550,7 +553,7 @@ end
 local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 
 function wire_ports_metamethods:__index ( name )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "wire.input" )
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity
@@ -564,7 +567,7 @@ function wire_ports_metamethods:__index ( name )
 end
 
 function wire_ports_metamethods:__newindex ( name, value )
-	if not SF.Permissions.check( SF.instance.player, nil, "wire.output" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "wire.output" )
 	SF.CheckType(name,"string")
 	local instance = SF.instance
 	local ent = instance.data.entity

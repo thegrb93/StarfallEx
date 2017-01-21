@@ -20,24 +20,24 @@ local vunwrap = SF.UnwrapObject
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "entities.parent", "Parent", "Allows the user to parent an entity to another entity" )
-	P.registerPrivilege( "entities.unparent", "Unparent", "Allows the user to remove the parent of an entity" ) -- TODO: maybe merge with entities.parent?
-	P.registerPrivilege( "entities.applyForce", "Apply force", "Allows the user to apply force to an entity" )
-	P.registerPrivilege( "entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity" )
-	P.registerPrivilege( "entities.setPos", "Set Position", "Allows the user to teleport an entity to another location" )
-	P.registerPrivilege( "entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation" )
-	P.registerPrivilege( "entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity" )
-	P.registerPrivilege( "entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity" )
-	P.registerPrivilege( "entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity" )
-	P.registerPrivilege( "entities.setMass", "Set Mass", "Allows the user to change the mass of an entity" )
-	P.registerPrivilege( "entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity" )
-	P.registerPrivilege( "entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion" )
-	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence" )
-	P.registerPrivilege( "entities.remove", "Remove", "Allows the user to remove entities" )
-	P.registerPrivilege( "entities.ignite", "Ignite", "Allows the user to ignite entities" )
-	P.registerPrivilege( "entities.emitSound", "Emitsound", "Allows the user to play sounds on entities" )
-	P.registerPrivilege( "entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity" )
-	P.registerPrivilege( "entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity" )
+	P.registerPrivilege( "entities.parent", "Parent", "Allows the user to parent an entity to another entity", {"CanTool"} )
+	P.registerPrivilege( "entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", {"CanTool"} )
+	P.registerPrivilege( "entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", {"CanTool"} )
+	P.registerPrivilege( "entities.applyForce", "Apply force", "Allows the user to apply force to an entity", {"CanPhysgun"} )
+	P.registerPrivilege( "entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", {"CanPhysgun"} )
+	P.registerPrivilege( "entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation", {"CanPhysgun"} )
+	P.registerPrivilege( "entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", {"CanPhysgun"} )
+	P.registerPrivilege( "entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", {"CanPhysgun"} )
+	P.registerPrivilege( "entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", {"CanTool"} )
+	P.registerPrivilege( "entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", {"CanTool"} )
+	P.registerPrivilege( "entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", {"CanTool"} )
+	P.registerPrivilege( "entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", {"CanTool"} )
+	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence", {"CanTool"} )
+	P.registerPrivilege( "entities.remove", "Remove", "Allows the user to remove entities", {"CanTool"} )
+	P.registerPrivilege( "entities.ignite", "Ignite", "Allows the user to ignite entities", {"CanTool"} )
+	P.registerPrivilege( "entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", {"CanTool"} )
+	P.registerPrivilege( "entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity", {"CanTool"} )
+	P.registerPrivilege( "entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", {"CanTool"} )
 end
 
 local function fix_nan ( v )
@@ -126,8 +126,9 @@ function ents_methods:setParent ( ent, attachment )
 	local ent = unwrap( ent )
 	local this = unwrap( self )
 
-	if not SF.Permissions.check( SF.instance.player, this, "entities.parent" ) then SF.throw( "Insufficient permissions", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.parent" ) and not ent:IsPlayer() then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, this, "entities.parent" )
+	SF.Permissions.check( SF.instance.player, ent, "entities.parent" )
+	if ent:IsPlayer() then SF.throw( "Insufficient permissions", 2 ) end
 
 	if not parent_check( this, ent ) then SF.throw( "Cannot parent to self", 2 ) end
 
@@ -141,7 +142,7 @@ end
 --- Unparents the entity from another entity
 function ents_methods:unparent ()
 	local this = unwrap( self )
-	if not SF.Permissions.check( SF.instance.player, this, "entities.unparent" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, this, "entities.unparent" )
 	this:SetParent( nil )
 end
 
@@ -151,13 +152,13 @@ function ents_methods:linkComponent ( e )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.canTool" )
 	
 	if e then
 		SF.CheckType( e, ents_metatable )
 		local link = unwrap( e )
 		if not isValid( link ) then SF.throw( "Entity is not valid", 2 ) end
-		if not SF.Permissions.check( SF.instance.player, link, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
+		SF.Permissions.check( SF.instance.player, link, "entities.canTool" )
 		
 		if link:GetClass()=="starfall_processor" and ( ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" ) then
 			ent:LinkEnt( link )
@@ -191,7 +192,7 @@ function ents_methods:emitSound ( snd, lvl, pitch, volume, channel )
 
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.emitSound" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.emitSound" )
 
 	ent:EmitSound(snd, lvl, pitch, volume, channel)
 end
@@ -206,7 +207,7 @@ function ents_methods:applyDamage( amt, attacker, inflictor )
 
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyDamage" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.applyDamage" )
 
 	if attacker then
 		SF.CheckType( attacker, ents_metatable )
@@ -235,7 +236,7 @@ function ents_methods:applyForceCenter ( vec )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" )
 
 	phys:ApplyForceCenter( vec )
 end
@@ -257,7 +258,7 @@ function ents_methods:applyForceOffset ( vec, offset )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" )
 
 	phys:ApplyForceOffset( vec, offset )
 end
@@ -276,7 +277,7 @@ function ents_methods:applyAngForce ( ang )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" )
 
 	-- assign vectors
 	local up = ent:GetUp()
@@ -318,7 +319,7 @@ function ents_methods:applyTorque ( tq, offset )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" )
 
 	local torqueamount = tq:Length()
 
@@ -354,7 +355,7 @@ function ents_methods:addCollisionListener ( func )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( func, "function" )
 	local ent = unwrap( self )
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.canTool" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.canTool" )
 	if ent.SF_CollisionCallback then SF.throw( "The entity is already listening to collisions!", 2 ) end
 	ent.SF_CollisionCallback = true
 
@@ -373,7 +374,7 @@ end
 function ents_methods:setNocollideAll ( nocollide )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" )
 	
 	ent:SetCollisionGroup ( nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE )
 end
@@ -451,7 +452,7 @@ function ents_methods:setColor ( clr, ply )
 
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, ent, 1, clr )
@@ -473,7 +474,7 @@ function ents_methods:setNoDraw ( draw, ply )
 
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, ent, 2, draw and true or false )
@@ -503,7 +504,7 @@ function ents_methods:setMaterial ( material, ply )
 
 	local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, ent, 3, material )
@@ -526,7 +527,7 @@ function ents_methods:setSubMaterial ( index, material, ply )
 
     local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, 4, index, material )
@@ -548,7 +549,7 @@ function ents_methods:setBodygroup ( bodygroup, value, ply )
 
     local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, 5, bodygroup, value )
@@ -568,7 +569,7 @@ function ents_methods:setSkin ( skinIndex, ply )
 
     local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, 6, skinIndex )
@@ -588,7 +589,7 @@ function ents_methods:setRenderMode ( rendermode, ply )
 
     local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, 7, rendermode )
@@ -609,7 +610,7 @@ function ents_methods:setRenderFX ( renderfx, ply )
 
     local ent = unwrap( self )
 	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
 		sendRenderPropertyToClient( ply, 8, renderfx )
@@ -628,7 +629,7 @@ function ents_methods:setPos ( vec )
 	local vec = vunwrap( vec )
 	local ent = unwrap( self )
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setPos" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setPos" )
 
 	SF.setPos( ent, vec )
 end
@@ -642,7 +643,7 @@ function ents_methods:setAngles ( ang )
 
 	local ent = unwrap( self )
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setAngles" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setAngles" )
 
 	SF.setAng( ent, ang )
 end
@@ -661,7 +662,7 @@ function ents_methods:setVelocity ( vel )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setVelocity" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setVelocity" )
 
 	phys:SetVelocity( vel )
 end
@@ -672,7 +673,7 @@ function ents_methods:remove ()
 
 	local ent = unwrap( self )
 	if not ent:IsValid() or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.remove" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.remove" )
 
 	ent:Remove()
 end
@@ -683,7 +684,7 @@ function ents_methods:breakEnt ()
 
 	local ent = unwrap( self )
 	if not isValid( ent ) or ent:IsPlayer() or ent:IsFlagSet( FL_KILLME ) then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.remove" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.remove" )
 
 	ent:AddFlags( FL_KILLME )
 	ent:Fire( "break", 1, 0 )
@@ -705,7 +706,7 @@ function ents_methods:ignite( length, radius )
 	end
 
 	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.ignite" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.ignite" )
 
 	ent:Ignite( length, radius )
 end
@@ -716,7 +717,7 @@ function ents_methods:extinguish()
 
 	local ent = unwrap( self )
 	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.ignite" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.ignite" )
 
 	ent:Extinguish()
 end
@@ -730,7 +731,7 @@ function ents_methods:setFrozen ( freeze )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setFrozen" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setFrozen" )
 
 	phys:EnableMotion( not ( freeze and true or false ) )
 	phys:Wake()
@@ -753,7 +754,7 @@ function ents_methods:setSolid ( solid )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" )
 
 	ent:SetNotSolid( not solid )
 end
@@ -767,7 +768,7 @@ function ents_methods:setMass ( mass )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setMass" )
 
 	phys:SetMass( math.Clamp(mass, 1, 50000) )
 end
@@ -782,7 +783,7 @@ function ents_methods:setPhysMaterial( mat )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setMass" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setMass" )
 
 	construct.SetPhysProp( nil, ent, 0, phys, {Material = mat} ) 
 end
@@ -796,7 +797,7 @@ function ents_methods:enableGravity ( grav )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableGravity" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.enableGravity" )
 
 	phys:EnableGravity( grav and true or false )
 	phys:Wake()
@@ -811,7 +812,7 @@ function ents_methods:enableDrag ( drag )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableDrag" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.enableDrag" )
 
 	phys:EnableDrag( drag and true or false )
 end
@@ -825,7 +826,7 @@ function ents_methods:enableMotion ( move )
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" )
 
 	phys:EnableMotion( move and true or false )
 	phys:Wake()
@@ -842,7 +843,7 @@ function ents_methods:enableSphere ( enabled )
 	if ent:GetClass() ~= "prop_physics" then SF.throw( "This function only works for prop_physics", 2 ) end
 	local phys = getPhysObject( ent )
 	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" )
 	
 	local ismove = phys:IsMoveable()
 	local mass = phys:GetMass()
@@ -905,7 +906,7 @@ function ents_methods:setTrails(startSize, endSize, length, material, color, att
 
 	if string.find(material, '"', 1, true) then SF.throw( "Invalid Material", 2 ) end
 	if not IsValid(ent) then SF.throw( "Invalid Entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	local Data = {
 		Color = SF.Color.Unwrap( color ),
@@ -926,7 +927,7 @@ function ents_methods:removeTrails()
 	local ent = unwrap( self )
 
 	if not IsValid(ent) then SF.throw( "Invalid Entity", 2 ) end
-	if not SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
 end
