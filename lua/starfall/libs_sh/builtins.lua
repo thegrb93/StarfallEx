@@ -463,7 +463,9 @@ function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
 	SF.CheckType(fields, "string")
 	
-	return debug.getinfo( funcOrStackLevel, fields )
+	local ret = debug.getinfo( funcOrStackLevel, fields )
+	ret.func = nil
+	return ret
 end
 		
 --- Try to execute a function and catch possible exceptions
