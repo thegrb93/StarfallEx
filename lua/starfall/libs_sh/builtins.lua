@@ -177,6 +177,10 @@ end
 function string_methods.toColor( str )
 	return SF.WrapObject( string.ToColor( str ) )
 end
+string_metatable.__index = function(s, k)
+	if type(k)=="number" then return string.sub(s, k, k) end
+	return string_methods[k]
+end
 string_metatable.__newindex = function () end
 
 --- String library http://wiki.garrysmod.com/page/Category:string
