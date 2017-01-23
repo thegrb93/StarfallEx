@@ -169,16 +169,19 @@ local string_methods, string_metatable = SF.Typedef("Library: string" )
 filterGmodLua( string, string_methods )
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
-    local rep = (rep < 0 and 0 or math.round(rep))
-    
-    local c = math.floor(rep / rep_chunk)
-    local r = rep%rep_chunk
-    
-    local ret = ""
-    for i = 1, c do
-        ret = ret .. (i>1 and sep or "") .. string.rep( str, rep_chunk, sep )
-    end
-    return ret .. ( (c>0 and r>0) and sep or "" ) .. string.rep(str, r, sep)
+	if rep < 0.5 then return "" end
+	
+	local ret = {}
+	for i = 1, rep / rep_chunk do
+		ret[#ret+1] = string.rep( str, rep_chunk, sep )
+	end
+	
+	local r = rep%rep_chunk
+	if r>0.5 then
+		ret[#ret+1] = string.rep(str, r, sep)
+	end
+	
+	return table.concat(ret, sep)
 end
 
 function string_methods.fromColor( color )
