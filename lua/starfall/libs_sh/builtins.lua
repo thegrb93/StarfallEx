@@ -167,9 +167,15 @@ end
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string" )
 filterGmodLua( string, string_methods )
-string_methods["rep"] = function(str, rep, sep)
+function string_methods.rep(str, rep, sep)
 	if (#str + (sep and #sep or 0))*rep>10000000 then SF.throw("String is too large!",2) end
 	return string.rep(str,rep,sep)
+end
+function string_methods.fromColor( color )
+	return string.FromColor( SF.UnwrapObject( color ) )
+end
+function string_methods.toColor( str )
+	return SF.WrapObject( string.ToColor( str ) )
 end
 string_metatable.__newindex = function () end
 
@@ -181,6 +187,9 @@ SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
 -- Math library
 local math_methods, math_metatable = SF.Typedef("Library: math")
 filterGmodLua(math,math_methods)
+function math_methods.bSplinePoint( tDiff, tPoints, tMax )
+	return SF.WrapObject( math.BSplinePoint( tDiff, SF.Unsanitize( tPoints ), tMax ) )
+end
 math_metatable.__newindex = function() end
 --- The math library. http://wiki.garrysmod.com/page/Category:math
 -- @name SF.DefaultEnvironment.math
@@ -243,6 +252,13 @@ for i=1, 5 do
 		end )
 	end
 end
+local gluastr = debug.getmetatable( "" )
+SF.Libraries.AddHook( "prepare", function()
+	debug.setmetatable( "", string_metatable )
+end )
+SF.Libraries.AddHook( "cleanup", function() 
+	debug.setmetatable( "", gluastr )
+end )
 
 
 if CLIENT then	
