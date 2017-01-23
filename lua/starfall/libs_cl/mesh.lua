@@ -3,7 +3,6 @@ SF.Mesh = {}
 -- Register privileges
 SF.Permissions.registerPrivilege( "mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", {"Client"} )
 
-local maxmeshes = CreateClientConVar("sf_mesh_maxmeshes", "20", true, "How many meshes a player can create.")
 local maxtriangles = CreateClientConVar("sf_mesh_maxtriangles", "50000", true, "How many triangles total can be used for meshes")
 
 --- Mesh type
@@ -53,17 +52,7 @@ SF.Libraries.AddHook("postload", function()
 	}
 end)
 
-local plyMeshCount = {}
 local plyTriangleCount = {}
-
-local function canAddMesh(inst)
-	local id = inst.playerid
-	if plyMeshCount[id] then
-		if plyMeshCount[id]==maxmeshes:GetInt() then
-			SF.throw("The mesh limit has been reached.", 3)
-		end
-	end
-end
 
 local function canAddTriangles(inst, triangles)
 	local id = inst.playerid
@@ -75,13 +64,11 @@ local function canAddTriangles(inst, triangles)
 end
 
 local function destroyMesh(id, mesh, meshdata)
-	plyMeshCount[id] = plyMeshCount[id] - 1
 	plyTriangleCount[id] = plyTriangleCount[id] - meshdata[mesh].ntriangles
 	
 	mesh:Destroy()
 	meshdata[mesh] = nil
 	
-	if plyMeshCount[id]==0 then plyMeshCount[id] = nil end
 	if plyTriangleCount[id]==0 then plyTriangleCount[id] = nil end
 end
 
@@ -107,11 +94,10 @@ function mesh_library.createFromTable ( verteces )
 	SF.CheckType( verteces, "table" )
 	
 	local nvertices = #verteces
-	if nvertices%3~=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
+	if nvertices<3 or nvertices%3~=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
 	local ntriangles = nvertices/3
 	
 	local instance = SF.instance
-	canAddMesh(instance)
 	canAddTriangles(instance, ntriangles)
 	
 	local unwrapped = {}
@@ -127,7 +113,6 @@ function mesh_library.createFromTable ( verteces )
 		unwrapped[i] = vert
 	end
 	
-	plyMeshCount[instance.playerid] = (plyMeshCount[instance.playerid] or 0) + 1
 	plyTriangleCount[instance.playerid] = (plyTriangleCount[instance.playerid] or 0) + ntriangles
 	
 	local mesh = Mesh()
@@ -143,7 +128,6 @@ function mesh_library.createFromObj ( obj )
 	SF.Permissions.check( SF.instance.player, nil, "mesh" )
 	SF.CheckType( obj, "string" )
 	local instance = SF.instance
-	canAddMesh(instance)
 	
 	local pos, norm, uv, face = {},{},{},{}
 	local map = {v=pos, vt=uv, vn=norm, f=face}
@@ -169,6 +153,7 @@ function mesh_library.createFromObj ( obj )
 		end
 	end
 	
+	if #face<3 or #face%3~=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
 	local ntriangles = #face/3
 	canAddTriangles(instance, ntriangles)
 	
@@ -211,23 +196,12 @@ function mesh_library.createFromObj ( obj )
 		vertices[_] = vert
 	end
 	
-	plyMeshCount[instance.playerid] = (plyMeshCount[instance.playerid] or 0) + 1
 	plyTriangleCount[instance.playerid] = (plyTriangleCount[instance.playerid] or 0) + ntriangles
 	
 	local mesh = Mesh()
 	mesh:BuildFromTriangles( vertices )
 	instance.data.meshes[mesh] = {ntriangles = ntriangles}
 	return wrap(mesh)
-end
-
---- Returns how many meshes can be created
--- @return Number of meshes that can be created
-function mesh_library.meshesLeft ()
-	if SF.Permissions.hasAccess( SF.instance.player, nil, "mesh" ) then
-		return maxmeshes:GetInt() - (plyMeshCount[SF.instance.playerid] or 0)
-	else
-		return 0
-	end
 end
 
 --- Returns how many triangles can be created
