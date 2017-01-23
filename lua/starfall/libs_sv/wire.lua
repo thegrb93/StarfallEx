@@ -290,6 +290,12 @@ function wire_library.self()
 	return wlwrap(ent)
 end
 
+--- Returns the server's UUID.
+-- @return UUID as string
+function wire_library.serverUUID()
+	return WireLib.GetServerUUID()
+end
+
 --- Wires two entities together
 -- @param entI Entity with input
 -- @param entO Entity with output
