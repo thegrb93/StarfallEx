@@ -167,10 +167,20 @@ end
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string" )
 filterGmodLua( string, string_methods )
+local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
-	if (#str + (sep and #sep or 0))*rep>10000000 then SF.throw("String is too large!",2) end
-	return string.rep(str,rep,sep)
+    local rep = (rep < 0 and 0 or math.round(rep))
+    
+    local c = math.floor(rep / rep_chunk)
+    local r = rep%rep_chunk
+    
+    local ret = ""
+    for i = 1, c do
+        ret = ret .. (i>1 and sep or "") .. string.rep( str, rep_chunk, sep )
+    end
+    return ret .. ( (c>0 and r>0) and sep or "" ) .. string.rep(str, r, sep)
 end
+
 function string_methods.fromColor( color )
 	return string.FromColor( SF.UnwrapObject( color ) )
 end
