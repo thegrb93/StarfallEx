@@ -8,14 +8,6 @@
 
 SF.Editor = {}
 
-local addon_path = nil
-
-do
-	local tbl = debug.getinfo( 1 )
-	local file = tbl.short_src
-	addon_path = string.TrimRight( string.match( file, ".-/.-/" ), "/" )
-end
-
 if CLIENT then
 
 	include( "sfderma.lua" )
@@ -1566,27 +1558,10 @@ elseif SERVER then
 
 	util.AddNetworkString( "starfall_editor_status" )
 
-	local function getFiles ( dir, dir2 )
-		local files = {}
-		local dir2 = dir2 or ""
-		local f, directories = file.Find( dir .. "/" .. dir2 .. "/*", "GAME" )
-		for k, v in pairs( f ) do
-			files[ #files + 1 ] = dir2 .. "/" .. v
-		end
-		for k, v in pairs( directories ) do
-			table.Add( files, getFiles( dir, dir2 .. "/" .. v ) )
-		end
-		return files
-	end
-
-	for k, v in pairs( getFiles( addon_path, "materials/radon" ) ) do
-		resource.AddFile( v )
-	end
-
 	local starfall_event = {}
 
 	concommand.Add( "starfall_event", function ( ply, command, args )
-		local handler = starfall_event[ args[ 1 ] ]
+		local handler = starfall_event[ args[ 1 ] or "" ]
 		if not handler then return end
 		return handler( ply, args )
 	end )
