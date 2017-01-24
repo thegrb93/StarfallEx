@@ -229,6 +229,7 @@ function mesh_methods:destroy()
 	SF.CheckType( self, mesh_metamethods )
 	local mesh = unwrap( self )
 	local instance = SF.instance
+	if not instance.data.meshes[mesh] then SF.throw("Tried to use invalid mesh.", 2) end
 	destroyMesh(instance.playerid, mesh, instance.data.meshes)
 end
 
