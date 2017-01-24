@@ -25,6 +25,7 @@ function SF.Compiler.Compile(code, context, mainfile, player, data, dontpreproce
 	data = data or {}
 	
 	instance.player = player
+	instance.playerid = player:SteamID()
 	instance.env = setmetatable({},context.env)
 	instance.env._G = instance.env
 	instance.data = data
