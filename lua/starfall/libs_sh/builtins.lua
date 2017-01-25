@@ -152,21 +152,49 @@ function SF.DefaultEnvironment.setSoftQuota ( quota )
 	self.cpu_softquota = quota
 end
 
--- The below modules have the Gmod functions removed (the ones that begin with a capital letter),
--- as requested by Divran
-
--- Filters Gmod Lua files based on Garry's naming convention.
-local function filterGmodLua(lib, original)
-	for name, func in pairs(lib) do
-		if not type(name)=="string" then continue end
-		name = name:gsub("^[A-Z]", string.lower)
-		original[name] = func
-	end
-end
-
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string" )
-filterGmodLua( string, string_methods )
+string_methods.byte=string.byte
+string_methods.char=string.char
+string_methods.comma=string.Comma
+string_methods.dump=string.dump
+string_methods.endsWith=string.EndsWith
+string_methods.explode=string.Explode
+string_methods.find=string.find
+string_methods.format=string.format
+string_methods.formattedTime=string.FormattedTime
+string_methods.getChar=string.GetChar
+string_methods.getExtensionFromFilename=string.GetExtensionFromFilename
+string_methods.getFileFromFilename=string.GetFileFromFilename
+string_methods.getPathFromFilename=string.GetPathFromFilename
+string_methods.gfind=string.gfind
+string_methods.gmatch=string.gmatch
+string_methods.gsub=string.gsub
+string_methods.implode=string.Implode
+string_methods.javascriptSafe=string.JavascriptSafe
+string_methods.left=string.Left
+string_methods.len=string.len
+string_methods.lower=string.lower
+string_methods.match=string.match
+string_methods.niceSize=string.NiceSize
+string_methods.niceTime=string.NiceTime
+string_methods.patternSafe=string.PatternSafe
+string_methods.replace=string.Replace
+string_methods.reverse=string.reverse
+string_methods.right=string.Right
+string_methods.setChar=string.SetChar
+string_methods.split=string.Split
+string_methods.startWith=string.StartWith
+string_methods.stripExtension=string.StripExtension
+string_methods.sub=string.sub
+string_methods.toMinutesSeconds=string.ToMinutesSeconds
+string_methods.toMinutesSecondsMilliseconds=string.ToMinutesSecondsMilliseconds
+string_methods.toTable=string.ToTable
+string_methods.trim=string.Trim
+string_methods.trimLeft=string.TrimLeft
+string_methods.trimRight=string.TrimRight
+string_methods.upper=string.upper
+
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
 	if rep < 0.5 then return "" end
@@ -187,9 +215,11 @@ end
 function string_methods.fromColor( color )
 	return string.FromColor( SF.UnwrapObject( color ) )
 end
+
 function string_methods.toColor( str )
 	return SF.WrapObject( string.ToColor( str ) )
 end
+
 string_metatable.__index = function(s, k)
 	if type(k)=="number" then return string.sub(s, k, k) end
 	return string_methods[k]
@@ -203,7 +233,53 @@ SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
 
 -- Math library
 local math_methods, math_metatable = SF.Typedef("Library: math")
-filterGmodLua(math,math_methods)
+math_methods.abs=math.abs
+math_methods.acos=math.acos
+math_methods.angleDifference=math.AngleDifference
+math_methods.approach=math.Approach
+math_methods.approachAngle=math.ApproachAngle
+math_methods.asin=math.asin
+math_methods.atan=math.atan
+math_methods.atan2=math.atan2
+math_methods.binToInt=math.BinToInt
+math_methods.calcBSplineN=math.calcBSplineN
+math_methods.ceil=math.ceil
+math_methods.clamp=math.Clamp
+math_methods.cos=math.cos
+math_methods.cosh=math.cosh
+math_methods.deg=math.deg
+math_methods.dist=math.Dist
+math_methods.distance=math.Distance
+math_methods.easeInOut=math.EaseInOut
+math_methods.exp=math.exp
+math_methods.floor=math.floor
+math_methods.fmod=math.fmod
+math_methods.frexp=math.frexp
+math_methods.huge=math.huge
+math_methods.intToBin=math.IntToBin
+math_methods.ldexp=math.ldexp
+math_methods.log=math.log
+math_methods.log10=math.log10
+math_methods.max=math.max
+math_methods.min=math.Min
+math_methods.mod=math.mod
+math_methods.modf=math.modf
+math_methods.normalizeAngle=math.NormalizeAngle
+math_methods.pi=math.pi
+math_methods.pow=math.pow
+math_methods.rad=math.rad
+math_methods.rand=math.Rand
+math_methods.random=math.random
+math_methods.randomseed=math.randomseed
+math_methods.remap=math.Remap
+math_methods.round=math.Round
+math_methods.sin=math.sin
+math_methods.sinh=math.sinh
+math_methods.sqrt=math.sqrt
+math_methods.tan=math.tan
+math_methods.tanh=math.tanh
+math_methods.timeFraction=math.TimeFraction
+math_methods.truncate=math.Truncate
 function math_methods.bSplinePoint( tDiff, tPoints, tMax )
 	return SF.WrapObject( math.BSplinePoint( tDiff, SF.Unsanitize( tPoints ), tMax ) )
 end
@@ -214,7 +290,10 @@ math_metatable.__newindex = function() end
 SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 
 local os_methods, os_metatable = SF.Typedef( "Library: os" )
-filterGmodLua( os, os_methods )
+os_methods.clock=os.clock
+os_methods.date=os.date
+os_methods.difftime=os.difftime
+os_methods.time=os.time
 os_metatable.__newindex = function () end
 --- The os library. http://wiki.garrysmod.com/page/Category:os
 -- @name SF.DefaultEnvironment.os
@@ -222,7 +301,46 @@ os_metatable.__newindex = function () end
 SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
 
 local table_methods, table_metatable = SF.Typedef("Library: table")
-filterGmodLua(table,table_methods)
+table_methods.add=table.Add
+table_methods.clearKeys=table.ClearKeys
+table_methods.collapseKeyValue=table.CollapseKeyValue
+table_methods.concat=table.concat
+table_methods.copy=table.Copy
+table_methods.copyFromTo=table.CopyFromTo
+table_methods.count=table.Count
+table_methods.deSanitise=table.DeSanitise
+table_methods.empty=table.Empty
+table_methods.findNext=table.FindNext
+table_methods.findPrev=table.FindPrev
+table_methods.forceInsert=table.ForceInsert
+table_methods.forEach=table.ForEach
+table_methods.foreachi=table.foreachi
+table_methods.getFirstKey=table.GetFirstKey
+table_methods.getFirstValue=table.GetFirstValue
+table_methods.getKeys=table.GetKeys
+table_methods.getLastKey=table.GetLastKey
+table_methods.getLastValue=table.GetLastValue
+table_methods.getn=table.getn
+table_methods.getWinningKey=table.GetWinningKey
+table_methods.hasValue=table.HasValue
+table_methods.inherit=table.Inherit
+table_methods.insert=table.insert
+table_methods.isSequential=table.IsSequential
+table_methods.keyFromValue=table.KeyFromValue
+table_methods.keysFromValue=table.KeysFromValue
+table_methods.lowerKeyNames=table.LowerKeyNames
+table_methods.maxn=table.maxn
+table_methods.merge=table.Merge
+table_methods.random=table.Random
+table_methods.remove=table.remove
+table_methods.removeByValue=table.RemoveByValue
+table_methods.reverse=table.Reverse
+table_methods.sanitise=table.Sanitise
+table_methods.sort=table.sort
+table_methods.sortByKey=table.SortByKey
+table_methods.sortByMember=table.SortByMember
+table_methods.sortDesc=table.SortDesc
+table_methods.toString=table.ToString
 table_metatable.__newindex = function() end
 --- Table library. http://wiki.garrysmod.com/page/Category:table
 -- @name SF.DefaultEnvironment.table
@@ -230,7 +348,18 @@ table_metatable.__newindex = function() end
 SF.DefaultEnvironment.table = setmetatable({},table_metatable)
 
 local bit_methods, bit_metatable = SF.Typedef("Library: bit")
-filterGmodLua(bit,bit_methods)
+bit_methods.arshift=bit.arshift
+bit_methods.band=bit.band
+bit_methods.bnot=bit.bnot
+bit_methods.bor=bit.bor
+bit_methods.bswap=bit.bswap
+bit_methods.bxor=bit.bxor
+bit_methods.lshift=bit.lshift
+bit_methods.rol=bit.rol
+bit_methods.ror=bit.ror
+bit_methods.rshift=bit.rshift
+bit_methods.tobit=bit.tobit
+bit_methods.tohex=bit.tohex
 bit_metatable.__newindex = function() end
 --- Bit library. http://wiki.garrysmod.com/page/Category:bit
 -- @name SF.DefaultEnvironment.bit
