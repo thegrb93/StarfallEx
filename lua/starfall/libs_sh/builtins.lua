@@ -156,17 +156,26 @@ end
 -- as requested by Divran
 
 -- Filters Gmod Lua files based on Garry's naming convention.
-local function filterGmodLua(lib, original)
-	for name, func in pairs(lib) do
-		if not type(name)=="string" then continue end
-		name = name:gsub("^[A-Z]", string.lower)
-		original[name] = func
+local function filterGmodLua(lib, original, whitelist)
+	for k, name in pairs(whitelist) do
+		original[ name:gsub("^[A-Z]", string.lower) ] = lib[name]
 	end
 end
 
 -- String library
 local string_methods, string_metatable = SF.Typedef("Library: string" )
-filterGmodLua( string, string_methods )
+filterGmodLua( string, string_methods, { 
+		"byte", "char", "Comma", "dump", "EndsWith", "Explode", "find", 
+		"format", "FormattedTime", "FromColor", "GetChar", 
+		"GetExtensionFromFilename", "GetFileFromFilename", 
+		"GetPathFromFilename", "gfind", "gmatch", "gsub", "Implode", 
+		"JavascriptSafe", "Left", "len", "lower", "match", "NiceSize", 
+		"NiceTime", "PatternSafe", "rep", "Replace", "reverse", "Right", 
+		"SetChar", "Split", "StartWith", "StripExtension", "sub", 
+		"ToColor", "ToMinutesSeconds", "ToMinutesSecondsMilliseconds", 
+		"ToTable", "Trim", "TrimLeft", "TrimRight", "upper" 
+	} )
+
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
 	if rep < 0.5 then return "" end
@@ -203,7 +212,16 @@ SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
 
 -- Math library
 local math_methods, math_metatable = SF.Typedef("Library: math")
-filterGmodLua(math,math_methods)
+filterGmodLua( math, math_methods, {
+		"abs", "acos", "AngleDifference", "Approach", "ApproachAngle", 
+		"asin", "atan", "atan2", "BinToInt", "BSplinePoint", "calcBSplineN", 
+		"ceil", "Clamp", "cos", "cosh", "deg", "Dist", "Distance", "EaseInOut", 
+		"exp", "floor", "fmod", "frexp", "huge", "IntToBin", "ldexp", "log",
+		"log10", "max", "min", "mod", "modf", "NormalizeAngle", "pi", "pow",
+		"rad", "Rand", "random", "randomseed", "Remap", "Round", "sin", "sinh", 
+		"sqrt", "tan", "tanh", "TimeFraction", "Truncate"
+	} )
+
 function math_methods.bSplinePoint( tDiff, tPoints, tMax )
 	return SF.WrapObject( math.BSplinePoint( tDiff, SF.Unsanitize( tPoints ), tMax ) )
 end
@@ -213,24 +231,39 @@ math_metatable.__newindex = function() end
 -- @class table
 SF.DefaultEnvironment.math = setmetatable({},math_metatable)
 
+-- os library
 local os_methods, os_metatable = SF.Typedef( "Library: os" )
-filterGmodLua( os, os_methods )
+filterGmodLua( os, os_methods, { "clock", "date", "difftime", "time" } )
 os_metatable.__newindex = function () end
 --- The os library. http://wiki.garrysmod.com/page/Category:os
 -- @name SF.DefaultEnvironment.os
 -- @class table
 SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
 
+-- table library
 local table_methods, table_metatable = SF.Typedef("Library: table")
-filterGmodLua(table,table_methods)
+filterGmodLua( table, table_methods, {
+		"Add", "ClearKeys", "CollapseKeyValue", "concat", "Copy", "CopyFromTo",
+		"Count", "DeSanitise", "Empty", "FindNext", "FindPrev", "ForceInsert", 
+		"foreach", "ForEach", "foreachi", "GetFirstKey", "GetFirstValue", "GetKeys",
+		"GetLastKey", "GetLastValue", "getn", "GetWinningKey", "HasValue", "Inherit",
+		"insert", "IsSequential", "KeyFromValue", "KeysFromValue", "LowerKeyNames",
+		"maxn", "Merge", "Random", "remove", "RemoveByValue", "Reverse", "Sanitise",
+		"sort", "SortByKey", "SortByMember", "SortDesc", "ToString"
+	} )
+
 table_metatable.__newindex = function() end
 --- Table library. http://wiki.garrysmod.com/page/Category:table
 -- @name SF.DefaultEnvironment.table
 -- @class table
 SF.DefaultEnvironment.table = setmetatable({},table_metatable)
 
+-- bit library
 local bit_methods, bit_metatable = SF.Typedef("Library: bit")
-filterGmodLua(bit,bit_methods)
+filterGmodLua( bit, bit_methods, {
+		"arshift", "band", "bnot", "bor", "bswap", "bxor", "lshift", "rol", "ror",
+		"rshift", "tobit", "tohex"
+	} )
 bit_metatable.__newindex = function() end
 --- Bit library. http://wiki.garrysmod.com/page/Category:bit
 -- @name SF.DefaultEnvironment.bit
