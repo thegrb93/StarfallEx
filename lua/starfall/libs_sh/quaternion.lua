@@ -41,10 +41,6 @@ local rad2deg = 180/math.pi
 
 --- Quaternion type
 local quat_methods, quat_metamethods = SF.Typedef("Quaternion")
---[[quat_metamethods = {__index = quat_lib}
-quat_lib.__metatable = quat_metamethods
-quat_metamethods.__type = "Quaternion"
-setmetatable(quat_lib, quat_metamethods)]]
 
 --****************************** Helper functions ******************************--
 

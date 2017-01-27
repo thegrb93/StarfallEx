@@ -3,6 +3,8 @@
 -- Functions built-in to the default environment
 -------------------------------------------------------------------------------
 
+SF.DefaultEnvironment = {}
+
 --- Built in values. These don't need to be loaded; they are in the default environment.
 -- @name builtin
 -- @shared
@@ -153,7 +155,7 @@ function SF.DefaultEnvironment.setSoftQuota ( quota )
 end
 
 -- String library
-local string_methods, string_metatable = SF.Typedef("Library: string" )
+local string_methods, string_metatable = SF.Libraries.Register("string" )
 string_methods.byte=string.byte
 string_methods.char=string.char
 string_methods.comma=string.Comma
@@ -194,7 +196,6 @@ string_methods.trim=string.Trim
 string_methods.trimLeft=string.TrimLeft
 string_methods.trimRight=string.TrimRight
 string_methods.upper=string.upper
-
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
 	if rep < 0.5 then return "" end
@@ -211,28 +212,23 @@ function string_methods.rep(str, rep, sep)
 	
 	return table.concat(ret, sep)
 end
-
 function string_methods.fromColor( color )
 	return string.FromColor( SF.UnwrapObject( color ) )
 end
-
 function string_methods.toColor( str )
 	return SF.WrapObject( string.ToColor( str ) )
 end
-
 string_metatable.__index = function(s, k)
 	if type(k)=="number" then return string.sub(s, k, k) end
 	return string_methods[k]
 end
-string_metatable.__newindex = function () end
-
 --- String library http://wiki.garrysmod.com/page/Category:string
 -- @name SF.DefaultEnvironment.string
 -- @class table
-SF.DefaultEnvironment.string = setmetatable( {}, string_metatable )
+SF.DefaultEnvironment.string = nil
 
 -- Math library
-local math_methods, math_metatable = SF.Typedef("Library: math")
+local math_methods, math_metatable = SF.Libraries.Register("math")
 math_methods.abs=math.abs
 math_methods.acos=math.acos
 math_methods.angleDifference=math.AngleDifference
@@ -283,24 +279,22 @@ math_methods.truncate=math.Truncate
 function math_methods.bSplinePoint( tDiff, tPoints, tMax )
 	return SF.WrapObject( math.BSplinePoint( tDiff, SF.Unsanitize( tPoints ), tMax ) )
 end
-math_metatable.__newindex = function() end
 --- The math library. http://wiki.garrysmod.com/page/Category:math
 -- @name SF.DefaultEnvironment.math
 -- @class table
-SF.DefaultEnvironment.math = setmetatable({},math_metatable)
+SF.DefaultEnvironment.math = nil
 
-local os_methods, os_metatable = SF.Typedef( "Library: os" )
+local os_methods, os_metatable = SF.Libraries.Register( "os" )
 os_methods.clock=os.clock
 os_methods.date=os.date
 os_methods.difftime=os.difftime
 os_methods.time=os.time
-os_metatable.__newindex = function () end
 --- The os library. http://wiki.garrysmod.com/page/Category:os
 -- @name SF.DefaultEnvironment.os
 -- @class table
-SF.DefaultEnvironment.os = setmetatable( {}, os_metatable )
+SF.DefaultEnvironment.os = nil
 
-local table_methods, table_metatable = SF.Typedef("Library: table")
+local table_methods, table_metatable = SF.Libraries.Register("table")
 table_methods.add=table.Add
 table_methods.clearKeys=table.ClearKeys
 table_methods.collapseKeyValue=table.CollapseKeyValue
@@ -341,13 +335,12 @@ table_methods.sortByKey=table.SortByKey
 table_methods.sortByMember=table.SortByMember
 table_methods.sortDesc=table.SortDesc
 table_methods.toString=table.ToString
-table_metatable.__newindex = function() end
 --- Table library. http://wiki.garrysmod.com/page/Category:table
 -- @name SF.DefaultEnvironment.table
 -- @class table
-SF.DefaultEnvironment.table = setmetatable({},table_metatable)
+SF.DefaultEnvironment.table = nil
 
-local bit_methods, bit_metatable = SF.Typedef("Library: bit")
+local bit_methods, bit_metatable = SF.Libraries.Register("bit")
 bit_methods.arshift=bit.arshift
 bit_methods.band=bit.band
 bit_methods.bnot=bit.bnot
@@ -360,11 +353,10 @@ bit_methods.ror=bit.ror
 bit_methods.rshift=bit.rshift
 bit_methods.tobit=bit.tobit
 bit_methods.tohex=bit.tohex
-bit_metatable.__newindex = function() end
 --- Bit library. http://wiki.garrysmod.com/page/Category:bit
 -- @name SF.DefaultEnvironment.bit
 -- @class table
-SF.DefaultEnvironment.bit = setmetatable({},bit_metatable)
+SF.DefaultEnvironment.bit = nil
 
 -- ------------------------- Functions ------------------------- --
 
@@ -694,414 +686,3 @@ function SF.DefaultEnvironment.isValid( object )
 	return object:isValid()
 
 end
-
-local _KEY = {
-	[ "FIRST" ] = 0,
-	[ "NONE" ] = 0,
-	[ "0" ] = 1,
-	[ "1" ] = 2,
-	[ "2" ] = 3,
-	[ "3" ] = 4,
-	[ "4" ] = 5,
-	[ "5" ] = 6,
-	[ "6" ] = 7,
-	[ "7" ] = 8,
-	[ "8" ] = 9,
-	[ "9" ] = 10,
-	[ "A" ] = 11,
-	[ "B" ] = 12,
-	[ "C" ] = 13,
-	[ "D" ] = 14,
-	[ "E" ] = 15,
-	[ "F" ] = 16,
-	[ "G" ] = 17,
-	[ "H" ] = 18,
-	[ "I" ] = 19,
-	[ "J" ] = 20,
-	[ "K" ] = 21,
-	[ "L" ] = 22,
-	[ "M" ] = 23,
-	[ "N" ] = 24,
-	[ "O" ] = 25,
-	[ "P" ] = 26,
-	[ "Q" ] = 27,
-	[ "R" ] = 28,
-	[ "S" ] = 29,
-	[ "T" ] = 30,
-	[ "U" ] = 31,
-	[ "V" ] = 32,
-	[ "W" ] = 33,
-	[ "X" ] = 34,
-	[ "Y" ] = 35,
-	[ "Z" ] = 36,
-	[ "KP_INS" ] = 37,
-	[ "PAD_0" ] = 37,
-	[ "KP_END" ] = 38,
-	[ "PAD_1" ] = 38,
-	[ "KP_DOWNARROW " ] = 39,
-	[ "PAD_2" ] = 39,
-	[ "KP_PGDN" ] = 40,
-	[ "PAD_3" ] = 40,
-	[ "KP_LEFTARROW" ] = 41,
-	[ "PAD_4" ] = 41,
-	[ "KP_5 " ] = 42,
-	[ "PAD_5" ] = 42,
-	[ "KP_RIGHTARROW" ] = 43,
-	[ "PAD_6" ] = 43,
-	[ "KP_HOME" ] = 44,
-	[ "PAD_7" ] = 44,
-	[ "KP_UPARROW" ] = 45,
-	[ "PAD_8" ] = 45,
-	[ "KP_PGUP" ] = 46,
-	[ "PAD_9" ] = 46,
-	[ "PAD_DIVIDE" ] = 47,
-	[ "KP_SLASH" ] = 47,
-	[ "KP_MULTIPLY" ] = 48,
-	[ "PAD_MULTIPLY" ] = 48,
-	[ "KP_MINUS" ] = 49,
-	[ "PAD_MINUS" ] = 49,
-	[ "KP_PLUS" ] = 50,
-	[ "PAD_PLUS" ] = 50,
-	[ "KP_ENTER" ] = 51,
-	[ "PAD_ENTER" ] = 51,
-	[ "KP_DEL" ] = 52,
-	[ "PAD_DECIMAL" ] = 52,
-	[ "[" ] = 53,
-	[ "LBRACKET" ] = 53,
-	[ "]" ] = 54,
-	[ "RBRACKET" ] = 54,
-	[ "SEMICOLON" ] = 55,
-	[ "'" ] = 56,
-	[ "APOSTROPHE" ] = 56,
-	[ "`" ] = 57,
-	[ "BACKQUOTE" ] = 57,
-	[ "," ] = 58,
-	[ "COMMA" ] = 58,
-	[ "." ] = 59,
-	[ "PERIOD" ] = 59,
-	[ "/" ] = 60,
-	[ "SLASH" ] = 60,
-	[ "\\" ] = 61,
-	[ "BACKSLASH" ] = 61,
-	[ "-" ] = 62,
-	[ "MINUS" ] = 62,
-	[ "=" ] = 63,
-	[ "EQUAL" ] = 63,
-	[ "ENTER" ] = 64,
-	[ "SPACE" ] = 65,
-	[ "BACKSPACE" ] = 66,
-	[ "TAB" ] = 67,
-	[ "CAPSLOCK" ] = 68,
-	[ "NUMLOCK" ] = 69,
-	[ "ESCAPE" ] = 70,
-	[ "SCROLLLOCK" ] = 71,
-	[ "INS" ] = 72,
-	[ "INSERT" ] = 72,
-	[ "DEL" ] = 73,
-	[ "DELETE" ] = 73,
-	[ "HOME" ] = 74,
-	[ "END" ] = 75,
-	[ "PGUP" ] = 76,
-	[ "PAGEUP" ] = 76,
-	[ "PGDN" ] = 77,
-	[ "PAGEDOWN" ] = 77,
-	[ "PAUSE" ] = 78,
-	[ "BREAK" ] = 78,
-	[ "SHIFT" ] = 79,
-	[ "LSHIFT" ] = 79,
-	[ "RSHIFT" ] = 80,
-	[ "ALT" ] = 81,
-	[ "LALT" ] = 81,
-	[ "RALT" ] = 82,
-	[ "CTRL" ] = 83,
-	[ "LCONTROL" ] = 83,
-	[ "RCTRL" ] = 84,
-	[ "RCONTROL" ] = 84,
-	[ "LWIN" ] = 85,
-	[ "RWIN" ] = 86,
-	[ "APP" ] = 87,
-	[ "UPARROW" ] = 88,
-	[ "UP" ] = 88,
-	[ "LEFTARROW" ] = 89,
-	[ "LEFT" ] = 89,
-	[ "DOWNARROW" ] = 90,
-	[ "DOWN" ] = 90,
-	[ "RIGHTARROW" ] = 91,
-	[ "RIGHT" ] = 91,
-	[ "F1" ] = 92,
-	[ "F2" ] = 93,
-	[ "F3" ] = 94,
-	[ "F4" ] = 95,
-	[ "F5" ] = 96,
-	[ "F6" ] = 97,
-	[ "F7" ] = 98,
-	[ "F8" ] = 99,
-	[ "F9" ] = 100,
-	[ "F10" ] = 101,
-	[ "F11" ] = 102,
-	[ "F12" ] = 103,
-	[ "CAPSLOCKTOGGLE" ] = 104,
-	[ "NUMLOCKTOGGLE" ] = 105,
-	[ "SCROLLLOCKTOGGLE" ] = 106,
-	[ "LAST" ] = 106,
-	[ "COUNT" ] = 106
-}
-
---- ENUMs of keyboard keys for use with input library:
--- FIRST,
--- NONE,
--- 0,
--- 1,
--- 2,
--- 3,
--- 4,
--- 5,
--- 6,
--- 7,
--- 8,
--- 9,
--- A,
--- B,
--- C,
--- D,
--- E,
--- F,
--- G,
--- H,
--- I,
--- J,
--- K,
--- L,
--- M,
--- N,
--- O,
--- P,
--- Q,
--- R,
--- S,
--- T,
--- U,
--- V,
--- W,
--- X,
--- Y,
--- Z,
--- KP_INS,
--- PAD_0,
--- KP_END,
--- PAD_1,
--- KP_DOWNARROW ,
--- PAD_2,
--- KP_PGDN,
--- PAD_3,
--- KP_LEFTARROW,
--- PAD_4,
--- KP_5 ,
--- PAD_5,
--- KP_RIGHTARROW,
--- PAD_6,
--- KP_HOME,
--- PAD_7,
--- KP_UPARROW,
--- PAD_8,
--- KP_PGUP,
--- PAD_9,
--- PAD_DIVIDE,
--- KP_SLASH,
--- KP_MULTIPLY,
--- PAD_MULTIPLY,
--- KP_MINUS,
--- PAD_MINUS,
--- KP_PLUS,
--- PAD_PLUS,
--- KP_ENTER,
--- PAD_ENTER,
--- KP_DEL,
--- PAD_DECIMAL,
--- LBRACKET,
--- RBRACKET,
--- SEMICOLON,
--- APOSTROPHE,
--- BACKQUOTE,
--- COMMA,
--- PERIOD,
--- SLASH,
--- BACKSLASH,
--- MINUS,
--- EQUAL,
--- ENTER,
--- SPACE,
--- BACKSPACE,
--- TAB,
--- CAPSLOCK,
--- NUMLOCK,
--- ESCAPE,
--- SCROLLLOCK,
--- INS,
--- INSERT,
--- DEL,
--- DELETE,
--- HOME,
--- END,
--- PGUP,
--- PAGEUP,
--- PGDN,
--- PAGEDOWN,
--- PAUSE,
--- BREAK,
--- SHIFT,
--- LSHIFT,
--- RSHIFT,
--- ALT,
--- LALT,
--- RALT,
--- CTRL,
--- LCONTROL,
--- RCTRL,
--- RCONTROL,
--- LWIN,
--- RWIN,
--- APP,
--- UPARROW,
--- UP,
--- LEFTARROW,
--- LEFT,
--- DOWNARROW,
--- DOWN,
--- RIGHTARROW,
--- RIGHT,
--- F1,
--- F2,
--- F3,
--- F4,
--- F5,
--- F6,
--- F7,
--- F8,
--- F9,
--- F10,
--- F11,
--- F12,
--- CAPSLOCKTOGGLE,
--- NUMLOCKTOGGLE,
--- SCROLLLOCKTOGGLE,
--- LAST,
--- COUNT
--- @name SF.DefaultEnvironment.KEY
--- @class table
-SF.DefaultEnvironment.KEY = setmetatable( {}, {
-	__index = _KEY,
-	__newindex = function( )
-	end,
-	__metatable = false
-} )
-
-local _MOUSE = {
-	[ "MOUSE1" ] = 107,
-	[ "LEFT" ] = 107,
-	[ "MOUSE2" ] = 108,
-	[ "RIGHT" ] = 108,
-	[ "MOUSE3" ] = 109,
-	[ "MIDDLE" ] = 109,
-	[ "MOUSE4" ] = 110,
-	[ "4" ] = 110,
-	[ "MOUSE5"] = 111,
-	[ "5" ] = 111,
-	[ "MWHEELUP" ] = 112,
-	[ "WHEEL_UP" ] = 112,
-	[ "MWHEELDOWN" ] = 113,
-	[ "WHEEL_DOWN" ] = 113,
-	[ "COUNT" ] = 7,
-	[ "FIRST" ] = 107,
-	[ "LAST" ] = 113
-}
-
---- ENUMs of mouse buttons for use with input library:
--- MOUSE1,
--- LEFT,
--- MOUSE2,
--- RIGHT,
--- MOUSE3,
--- MIDDLE,
--- MOUSE4,
--- 4,
--- MOUSE5,
--- 5,
--- MWHEELUP,
--- WHEEL_UP,
--- MWHEELDOWN,
--- WHEEL_DOWN,
--- COUNT,
--- FIRST,
--- LAST
--- @name SF.DefaultEnvironment.MOUSE
--- @class table
-SF.DefaultEnvironment.MOUSE = setmetatable( {}, {
-	__index = _MOUSE,
-	__newindex = function( )
-	end,
-	__metatable = false
-} )
-
-local _INKEY = {
-	[ "ALT1" ] = IN_ALT1,
-	[ "ALT2" ] = IN_ALT2,
-	[ "ATTACK" ] = IN_ATTACK,
-	[ "ATTACK2" ] = IN_ATTACK2,
-	[ "BACK" ] = IN_BACK,
-	[ "DUCK" ] = IN_DUCK,
-	[ "FORWARD" ] = IN_FORWARD,
-	[ "JUMP" ] = IN_JUMP,
-	[ "LEFT" ] = IN_LEFT,
-	[ "MOVELEFT" ] = IN_MOVELEFT,
-	[ "MOVERIGHT" ] = IN_MOVERIGHT,
-	[ "RELOAD" ] = IN_RELOAD,
-	[ "RIGHT" ] = IN_RIGHT,
-	[ "SCORE" ] = IN_SCORE,
-	[ "SPEED" ] = IN_SPEED,
-	[ "USE" ] = IN_USE,
-	[ "WALK" ] = IN_WALK,
-	[ "ZOOM" ] = IN_ZOOM,
-	[ "GRENADE1" ] = IN_GRENADE1,
-	[ "GRENADE2" ] = IN_GRENADE2,
-	[ "WEAPON1" ] = IN_WEAPON1,
-	[ "WEAPON2" ] = IN_WEAPON2,
-	[ "BULLRUSH" ] = IN_BULLRUSH,
-	[ "CANCEL" ] = IN_CANCEL,
-	[ "RUN" ] = IN_RUN,
-}
-
---- ENUMs of in_keys for use with player:keyDown:
--- ALT1,
--- ALT2,
--- ATTACK,
--- ATTACK2,
--- BACK,
--- DUCK,
--- FORWARD,
--- JUMP,
--- LEFT,
--- MOVELEFT,
--- MOVERIGHT,
--- RELOAD,
--- RIGHT,
--- SCORE,
--- SPEED,
--- USE,
--- WALK,
--- ZOOM,
--- GRENADE1,
--- GRENADE2,
--- WEAPON1,
--- WEAPON2,
--- BULLRUSH,
--- CANCEL,
--- RUN
--- @name SF.DefaultEnvironment.IN_KEY
--- @class table
-SF.DefaultEnvironment.IN_KEY = setmetatable( {}, {
-	__index = _INKEY,
-	__newindex = function( )
-	end,
-	__metatable = false
-} )

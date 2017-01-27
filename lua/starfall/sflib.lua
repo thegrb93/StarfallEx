@@ -95,21 +95,11 @@ function SF.GetTypeDef( name )
 	return SF.Types[name]
 end
 
-do
-	local env, metatable = SF.Typedef("Environment")
-	--- The default environment metatable
-	SF.DefaultEnvironmentMT = metatable
-	--- The default environment contents
-	SF.DefaultEnvironment = env
-end
-
 --- Creates a new context. A context is used to define what scripts will have access to.
--- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
 -- @param cpuTime Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
-function SF.CreateContext ( env, directives, cpuTime )
+function SF.CreateContext ( directives, cpuTime )
 	local context = {}
-	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
 	context.cpuTime = cpuTime or {
 		getBufferN = function () return SF.cpuBufferN:GetInt() or 3 end,

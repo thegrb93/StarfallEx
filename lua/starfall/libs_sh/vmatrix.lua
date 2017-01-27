@@ -23,11 +23,13 @@ SF.VMatrix.Unwrap = unwrap
 
 local dgetmeta = debug.getmetatable
 
---- Returns a new VMatrix
--- @return New VMatrix
-SF.DefaultEnvironment.Matrix = function ()
-	return wrap( Matrix() )
-end
+SF.Libraries.AddHook("postload", function()
+	--- Returns a new VMatrix
+	-- @return New VMatrix
+	SF.DefaultEnvironment.Matrix = function ()
+		return wrap( Matrix() )
+	end
+end)
 
 --- tostring metamethod
 -- @return string representing the matrix.

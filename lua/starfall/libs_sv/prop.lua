@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @shared
-local props_library, props_library_metamethods = SF.Libraries.Register("prop")
+local props_library, _ = SF.Libraries.Register("prop")
 
 local vunwrap = SF.UnwrapObject
 
