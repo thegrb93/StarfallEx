@@ -104,7 +104,7 @@ function input_methods.getCursorPos( )
 end
 
 function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and SF.Permissions.hasAccess( SF.instance.player, nil, "input" ) then
+	if (IsFirstTimePredicted() or game.SinglePlayer()) and SF.Permissions.hasAccess( instance.player, nil, "input" ) then
 		return true, {button}
 	end
 	return false
