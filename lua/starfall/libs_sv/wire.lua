@@ -7,8 +7,7 @@ if not WireLib then return end
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library, wire_metamethods = SF.Libraries.Register( "wire" )
 
-function wire_metamethods.onLoad ( instance )
-	if not WireLib then return end
+SF.Libraries.AddHook( "initialize", function(instance)
 	local ent = instance.data.entity
 	if ent.Inputs == nil then
 		WireLib.CreateInputs( ent, {} )
@@ -36,8 +35,7 @@ function wire_metamethods.onLoad ( instance )
 		end
 		return false
 	end
-
-end
+end )
 
 SF.Wire = {}
 SF.Wire.Library = wire_library

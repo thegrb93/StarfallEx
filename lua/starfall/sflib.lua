@@ -113,8 +113,7 @@ end
 -- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
 -- @param cpuTime Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
--- @param libs Additional (local) libraries for the script to access. Default is an empty table.
-function SF.CreateContext ( env, directives, cpuTime, libs )
+function SF.CreateContext ( env, directives, cpuTime )
 	local context = {}
 	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
@@ -122,7 +121,6 @@ function SF.CreateContext ( env, directives, cpuTime, libs )
 		getBufferN = function () return SF.cpuBufferN:GetInt() or 3 end,
 		getMax = function () return SF.cpuQuota:GetFloat() end
 	}
-	context.libs = libs or {}
 	return context
 end
 

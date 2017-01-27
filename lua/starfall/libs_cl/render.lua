@@ -42,7 +42,7 @@
 -- @field TEXT_ALIGN_TOP
 -- @field TEXT_ALIGN_BOTTOM
 
-local render_library, _ = SF.Libraries.RegisterLocal("render")
+local render_library, _ = SF.Libraries.Register("render")
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
 render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
@@ -132,7 +132,7 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 	end
 end )
 
-SF.Libraries.AddHook( "initialize",function(instance)
+SF.Libraries.AddHook( "initialize", function(instance)
 	instance.data.render.rendertargets = {}
 	instance.data.render.rendertargetcount = 0
 	instance.data.render.textures = {}

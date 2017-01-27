@@ -4,7 +4,7 @@ DEFINE_BASECLASS( "base_gmodentity" )
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-local context = SF.CreateContext( nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"} )
+local context = SF.CreateContext()
 
 function ENT:Initialize()	
 	self.CPUpercent = 0
