@@ -2,7 +2,7 @@
 
 --- JSON library
 -- @shared
-local json_library, _ = SF.Libraries.Register( "json" )
+local json_library = SF.Libraries.Register( "json" )
 local util = util
 
 --- Convert table to JSON string

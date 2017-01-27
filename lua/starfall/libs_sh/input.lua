@@ -35,7 +35,7 @@ if SERVER then return end
 
 ---- Input library.
 --- @client
-local input_methods, _ = SF.Libraries.Register( "input" )
+local input_methods = SF.Libraries.Register( "input" )
 
 SF.Permissions.registerPrivilege( "input", "Input", "Allows the user to see what buttons you're pressing.", {"Client"} )
 

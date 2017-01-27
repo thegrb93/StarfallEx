@@ -5,7 +5,7 @@
 if not WireLib then return end
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library, _ = SF.Libraries.Register( "wire" )
+local wire_library = SF.Libraries.Register( "wire" )
 
 SF.Libraries.AddHook( "initialize", function(instance)
 	local ent = instance.data.entity

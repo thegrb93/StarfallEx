@@ -291,7 +291,7 @@ if CLIENT then
 		
 		for lib, tbl in pairs( SF.Libraries.libraries ) do
 			map[ lib ] = {}
-			for name, val in pairs( tbl[1] ) do
+			for name, val in pairs( tbl ) do
 				table.insert( map[ lib ], name )
 			end
 		end

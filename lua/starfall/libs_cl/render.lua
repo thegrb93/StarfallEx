@@ -42,7 +42,7 @@
 -- @field TEXT_ALIGN_TOP
 -- @field TEXT_ALIGN_BOTTOM
 
-local render_library, _ = SF.Libraries.Register("render")
+local render_library = SF.Libraries.Register("render")
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
 render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER

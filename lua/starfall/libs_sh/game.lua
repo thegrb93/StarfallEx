@@ -4,7 +4,7 @@
 
 --- Game functions
 -- @shared
-local game_lib, _ = SF.Libraries.Register( "game" )
+local game_lib = SF.Libraries.Register( "game" )
 
 --- Returns the map name
 function game_lib.getMap ()

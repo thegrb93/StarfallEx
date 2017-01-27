@@ -6,7 +6,7 @@ local timer = timer
 
 --- Deals with time and timers.
 -- @shared
-local timer_library, _ = SF.Libraries.Register("timer")
+local timer_library = SF.Libraries.Register("timer")
 local max_timers = CreateConVar( "sf_maxtimers", "200", {FCVAR_ARCHIVE,FCVAR_REPLICATED}, "The max number of timers that can be created" )
 
 -- ------------------------- Time ------------------------- --

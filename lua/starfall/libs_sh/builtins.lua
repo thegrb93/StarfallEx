@@ -155,7 +155,7 @@ function SF.DefaultEnvironment.setSoftQuota ( quota )
 end
 
 -- String library
-local string_methods, string_metatable = SF.Libraries.Register("string" )
+local string_methods = SF.Libraries.Register("string" )
 string_methods.byte=string.byte
 string_methods.char=string.char
 string_methods.comma=string.Comma
@@ -218,17 +218,18 @@ end
 function string_methods.toColor( str )
 	return SF.WrapObject( string.ToColor( str ) )
 end
-string_metatable.__index = function(s, k)
+local string_metatable = {__index = function(s, k)
 	if type(k)=="number" then return string.sub(s, k, k) end
 	return string_methods[k]
-end
+end}
+setmetatable(string_methods, string_metatable)
 --- String library http://wiki.garrysmod.com/page/Category:string
 -- @name SF.DefaultEnvironment.string
 -- @class table
 SF.DefaultEnvironment.string = nil
 
 -- Math library
-local math_methods, math_metatable = SF.Libraries.Register("math")
+local math_methods = SF.Libraries.Register("math")
 math_methods.abs=math.abs
 math_methods.acos=math.acos
 math_methods.angleDifference=math.AngleDifference
@@ -284,7 +285,7 @@ end
 -- @class table
 SF.DefaultEnvironment.math = nil
 
-local os_methods, os_metatable = SF.Libraries.Register( "os" )
+local os_methods = SF.Libraries.Register( "os" )
 os_methods.clock=os.clock
 os_methods.date=os.date
 os_methods.difftime=os.difftime
@@ -294,7 +295,7 @@ os_methods.time=os.time
 -- @class table
 SF.DefaultEnvironment.os = nil
 
-local table_methods, table_metatable = SF.Libraries.Register("table")
+local table_methods = SF.Libraries.Register("table")
 table_methods.add=table.Add
 table_methods.clearKeys=table.ClearKeys
 table_methods.collapseKeyValue=table.CollapseKeyValue
@@ -340,7 +341,7 @@ table_methods.toString=table.ToString
 -- @class table
 SF.DefaultEnvironment.table = nil
 
-local bit_methods, bit_metatable = SF.Libraries.Register("bit")
+local bit_methods = SF.Libraries.Register("bit")
 bit_methods.arshift=bit.arshift
 bit_methods.band=bit.band
 bit_methods.bnot=bit.bnot

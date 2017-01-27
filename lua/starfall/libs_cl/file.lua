@@ -4,7 +4,7 @@
 
 --- File functions. Allows modification of files.
 -- @client
-local file_library, _ = SF.Libraries.Register( "file" )
+local file_library = SF.Libraries.Register( "file" )
 
 -- Register privileges
 do

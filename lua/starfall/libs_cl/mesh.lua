@@ -12,7 +12,7 @@ local wrap, unwrap = SF.CreateWrapper( mesh_metamethods, true, false, debug.getr
 
 --- Mesh library.
 -- @client
-local mesh_library, _ = SF.Libraries.Register( "mesh" )
+local mesh_library = SF.Libraries.Register( "mesh" )
 
 SF.Mesh.Wrap = wrap
 SF.Mesh.Unwrap = unwrap

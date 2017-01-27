@@ -11,9 +11,9 @@ SF.Libraries.hooks = {}
 -- This will automatically set __index and __metatable.
 -- @param name The library name
 function SF.Libraries.Register(name)
-	local methods, metamethods = {}, {}
-	SF.Libraries.libraries[ name ] = {methods, metamethods}
-	return methods, metamethods
+	local methods = {}
+	SF.Libraries.libraries[ name ] = methods
+	return methods
 end
 
 --- Builds an environment table
@@ -24,8 +24,19 @@ function SF.Libraries.BuildEnvironment()
 		done[src] = true
 		for k, v in pairs(src) do
 			if type(v)=="table" then
-				local t = setmetatable({}, debug.getmetatable(v))
+				local t = {}
 				deepCopy(v, t, done)
+				
+				-- Copy the metatable
+				local meta = debug.getmetatable(v)
+				if meta then
+					local t2 = {}
+					for o, p in pairs(meta) do
+						t2[o]=p
+					end
+					setmetatable(t, t2)
+				end
+				
 				dst[k] = t
 			else
 				dst[k] = v
@@ -38,8 +49,8 @@ function SF.Libraries.BuildEnvironment()
 	deepCopy(SF.DefaultEnvironment, env, {})
 	
 	for k, v in pairs(SF.Libraries.libraries) do
-		local t = setmetatable({},v[2])
-		deepCopy(v[1], t, {})
+		local t = {}
+		deepCopy(v, t, {})
 		env[k] = t
 	end
 	return env

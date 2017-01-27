@@ -385,7 +385,8 @@ function player_methods:getEyeTrace ()
 	return setmetatable({}, {
 		__index=function(t,k)
 			return vwrap( data[k] )
-		end
+		end,
+		__metatable=""
 	})
 end
 

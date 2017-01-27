@@ -63,7 +63,7 @@
 
 --- vON Library
 -- @shared
-local von, _ = SF.Libraries.Register("von")
+local von = SF.Libraries.Register("von")
 
 local _deserialize, _serialize, _d_meta, _s_meta, d_findVariable, s_anyVariable
 local sub, gsub, find, insert, concat, error, tonumber, tostring, type, next = string.sub, string.gsub, string.find, table.insert, table.concat, error, tonumber, tostring, type, next
