@@ -8,7 +8,6 @@ SF = {}
 -- Send files to client
 if SERVER then
 	AddCSLuaFile( "sflib.lua" )
-	AddCSLuaFile( "compiler.lua" )
 	AddCSLuaFile( "instance.lua" )
 	AddCSLuaFile( "libraries.lua" )
 	AddCSLuaFile( "preprocessor.lua" )
@@ -21,7 +20,6 @@ if SERVER then
 end
 
 -- Load files
-include( "compiler.lua" )
 include( "instance.lua" )
 include( "libraries.lua" )
 include( "preprocessor.lua" )

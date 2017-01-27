@@ -99,7 +99,7 @@ function ENT:Compile(files, mainfile)
 	local ppdata = {}
 	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
 		
-	local ok, instance = SF.Compiler.Compile( files, context, mainfile, self.owner, { entity = self } )
+	local ok, instance = SF.Instance.Compile( files, context, mainfile, self.owner, { entity = self } )
 	if not ok then self:Error(instance) return end
 	
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then

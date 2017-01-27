@@ -79,7 +79,7 @@ function ENT:CodeSent ( files, main, owner )
 	self.owner = owner
 	self.files = files
 	self.mainfile = main
-	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { entity = self, render = {} } )
+	local ok, instance = SF.Instance.Compile( files, context, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
 	
 	if instance.ppdata.scriptnames and instance.mainfile then
