@@ -42,13 +42,11 @@ function SF.Instance.Compile(code, context, mainfile, player, data, dontpreproce
 	
 	local instance = setmetatable({},SF.Instance)
 	
-	data = data or {}
-	
 	instance.player = player
 	instance.playerid = player:SteamID()
 	instance.env = setmetatable({},context.env)
 	instance.env._G = instance.env
-	instance.data = data
+	instance.data = data or {}
 	instance.ppdata = {}
 	instance.ops = 0
 	instance.hooks = {}

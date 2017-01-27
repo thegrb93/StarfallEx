@@ -14,7 +14,6 @@ if SERVER then
 	AddCSLuaFile( "permissions/core.lua" )
 	AddCSLuaFile( "editor.lua" )
 	AddCSLuaFile( "sfderma.lua" )
-	AddCSLuaFile( "callback.lua" )
 	AddCSLuaFile( "sfhelper.lua" )
 	AddCSLuaFile( "netstream.lua" )
 end
@@ -95,9 +94,6 @@ end
 function SF.GetTypeDef( name )
 	return SF.Types[name]
 end
-
--- Include this file after Typedef as this file relies on it.
-include("callback.lua")
 
 do
 	local env, metatable = SF.Typedef("Environment")
