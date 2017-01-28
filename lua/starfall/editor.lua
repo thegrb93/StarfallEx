@@ -284,43 +284,25 @@ if CLIENT then
 
 		local map = {}
 
+		map[ "Environment" ] = {}
+		for name, val in pairs( SF.DefaultEnvironment ) do
+			table.insert( map[ "Environment" ], name )
+		end
+		
+		for lib, tbl in pairs( SF.Libraries.libraries ) do
+			map[ lib ] = {}
+			for name, val in pairs( tbl ) do
+				table.insert( map[ lib ], name )
+			end
+		end
+		
 		for lib, tbl in pairs( SF.Types ) do
-			if ( lib == "Environment" or lib:find( "Library: " ) ) and type( tbl.__index ) == "table" then
-				lib = lib:Replace( "Library: ", "" )
+			if type( tbl.__index ) == "table" then
 				map[ lib ] = {}
 				for name, val in pairs( tbl.__index ) do
 					table.insert( map[ lib ], name )
 				end
 			end
-		end
-
-		map.Angle = {}
-		for name, val in pairs( SF.Angles.Methods ) do
-			table.insert( map.Angle, name )
-		end
-		map.Color = {}
-		for name, val in pairs( SF.Color.Methods ) do
-			table.insert( map.Color, name )
-		end
-		map.Entity = {}
-		for name, val in pairs( SF.Entities.Methods ) do
-			table.insert( map.Entity, name )
-		end
-		map.Player = {}
-		for name, val in pairs( SF.Players.Methods ) do
-			table.insert( map.Player, name )
-		end
-		map.Sound = {}
-		for name, val in pairs( SF.Sounds.Methods ) do
-			table.insert( map.Sound, name )
-		end
-		map.VMatrix = {}
-		for name, val in pairs( SF.VMatrix.Methods ) do
-			table.insert( map.VMatrix, name )
-		end
-		map.Vector = {}
-		for name, val in pairs( SF.Vectors.Methods ) do
-			table.insert( map.Vector, name )
 		end
 
 		return map

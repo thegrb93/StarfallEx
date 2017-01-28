@@ -10,18 +10,50 @@ SF.Libraries.hooks = {}
 --- Creates and registers a global library. The library will be accessible from any Starfall Instance, regardless of context.
 -- This will automatically set __index and __metatable.
 -- @param name The library name
-function SF.Libraries.Register ( name )
-	local methods, metamethods = SF.Typedef( "Library: " .. name )
-	SF.Libraries.libraries[ name ] = metamethods
-	SF.DefaultEnvironment[ name ] = setmetatable( {}, metamethods )
-	return methods, metamethods
+function SF.Libraries.Register(name)
+	local methods = {}
+	SF.Libraries.libraries[ name ] = methods
+	return methods
 end
 
---- Gets a global library by name
--- @param name The name of the library
--- @return A metatable proxy of the library
-function SF.Libraries.Get(name)
-	return SF.Libraries.libraries[name] and setmetatable({},SF.Libraries.libraries[name])
+--- Builds an environment table
+-- @return The environment
+function SF.Libraries.BuildEnvironment()
+	local function deepCopy(src, dst, done)
+		if done[src] then return end
+		done[src] = true
+		for k, v in pairs(src) do
+			if type(v)=="table" then
+				local t = {}
+				deepCopy(v, t, done)
+				
+				-- Copy the metatable
+				local meta = debug.getmetatable(v)
+				if meta then
+					local t2 = {}
+					for o, p in pairs(meta) do
+						t2[o]=p
+					end
+					setmetatable(t, t2)
+				end
+				
+				dst[k] = t
+			else
+				dst[k] = v
+			end
+		end
+		done[src] = nil
+	end
+	
+	local env = {}
+	deepCopy(SF.DefaultEnvironment, env, {})
+	
+	for k, v in pairs(SF.Libraries.libraries) do
+		local t = {}
+		deepCopy(v, t, {})
+		env[k] = t
+	end
+	return env
 end
 
 --- Registers a library hook. These hooks are only available to SF libraries,

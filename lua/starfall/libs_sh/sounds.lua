@@ -7,7 +7,7 @@ local wrap, unwrap = SF.CreateWrapper( sound_metamethods, true, false, debug.get
 
 --- Sounds library.
 -- @shared
-local sound_library, _ = SF.Libraries.Register( "sounds" )
+local sound_library = SF.Libraries.Register( "sounds" )
 
 SF.Sounds.Wrap = wrap
 SF.Sounds.Unwrap = unwrap

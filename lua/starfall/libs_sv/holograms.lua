@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
 -- @shared
-local holograms_library, holograms_library_metamethods = SF.Libraries.Register("holograms")
+local holograms_library = SF.Libraries.Register("holograms")
 
 --- Hologram type
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)

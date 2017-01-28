@@ -44,7 +44,7 @@ function SF.Instance.Compile(code, context, mainfile, player, data, dontpreproce
 	
 	instance.player = player
 	instance.playerid = player:SteamID()
-	instance.env = setmetatable({},context.env)
+	instance.env = SF.Libraries.BuildEnvironment()
 	instance.env._G = instance.env
 	instance.data = data or {}
 	instance.ppdata = {}

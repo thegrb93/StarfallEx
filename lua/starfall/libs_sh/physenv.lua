@@ -4,7 +4,7 @@
 
 --- Physenv functions
 -- @shared
-local physenv_lib, _ = SF.Libraries.Register( "physenv" )
+local physenv_lib = SF.Libraries.Register( "physenv" )
 
 --- Gets the air density.
 -- @return number Air Density

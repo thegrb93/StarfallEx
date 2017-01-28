@@ -2,7 +2,7 @@
 
 --- Coroutine library
 -- @shared
-local coroutine_library, _ = SF.Libraries.Register( "coroutine" )
+local coroutine_library = SF.Libraries.Register( "coroutine" )
 local coroutine = coroutine
 
 local _, thread_metamethods = SF.Typedef( "thread" )

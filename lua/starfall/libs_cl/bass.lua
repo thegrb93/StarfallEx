@@ -14,7 +14,7 @@ local wrap, unwrap = SF.CreateWrapper( bass_metamethods, true, false, debug.getr
 
 --- Bass library.
 -- @client
-local bass_library, _ = SF.Libraries.Register( "bass" )
+local bass_library = SF.Libraries.Register( "bass" )
 
 SF.Bass.Wrap = wrap
 SF.Bass.Unwrap = unwrap

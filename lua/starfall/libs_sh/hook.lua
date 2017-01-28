@@ -4,7 +4,7 @@
 
 --- Deals with hooks
 -- @shared
-local hook_library, _ = SF.Libraries.Register( "hook" )
+local hook_library = SF.Libraries.Register( "hook" )
 local registered_instances = {}
 local gmod_hooks = {}
 local wrapArguments = SF.Sanitize

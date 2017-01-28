@@ -364,7 +364,8 @@ function ents_methods:addCollisionListener ( func )
 		instance:runFunction( func, setmetatable({}, {
 			__index=function(t,k)
 				return SF.WrapObject( data[k] )
-			end
+			end,
+			__metatable=""
 		}))
 	end)
 end

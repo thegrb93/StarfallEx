@@ -27,6 +27,62 @@ SF.Libraries.AddHook("postload", function()
 		return object
 	end )
 	SF.AddObjectUnwrapper( player_metamethods, eunwrap )
+	
+	--- ENUMs of in_keys for use with player:keyDown:
+	-- ALT1,
+	-- ALT2,
+	-- ATTACK,
+	-- ATTACK2,
+	-- BACK,
+	-- DUCK,
+	-- FORWARD,
+	-- JUMP,
+	-- LEFT,
+	-- MOVELEFT,
+	-- MOVERIGHT,
+	-- RELOAD,
+	-- RIGHT,
+	-- SCORE,
+	-- SPEED,
+	-- USE,
+	-- WALK,
+	-- ZOOM,
+	-- GRENADE1,
+	-- GRENADE2,
+	-- WEAPON1,
+	-- WEAPON2,
+	-- BULLRUSH,
+	-- CANCEL,
+	-- RUN
+	-- @name SF.DefaultEnvironment.IN_KEY
+	-- @class table
+	SF.DefaultEnvironment.IN_KEY = {
+		[ "ALT1" ] = IN_ALT1,
+		[ "ALT2" ] = IN_ALT2,
+		[ "ATTACK" ] = IN_ATTACK,
+		[ "ATTACK2" ] = IN_ATTACK2,
+		[ "BACK" ] = IN_BACK,
+		[ "DUCK" ] = IN_DUCK,
+		[ "FORWARD" ] = IN_FORWARD,
+		[ "JUMP" ] = IN_JUMP,
+		[ "LEFT" ] = IN_LEFT,
+		[ "MOVELEFT" ] = IN_MOVELEFT,
+		[ "MOVERIGHT" ] = IN_MOVERIGHT,
+		[ "RELOAD" ] = IN_RELOAD,
+		[ "RIGHT" ] = IN_RIGHT,
+		[ "SCORE" ] = IN_SCORE,
+		[ "SPEED" ] = IN_SPEED,
+		[ "USE" ] = IN_USE,
+		[ "WALK" ] = IN_WALK,
+		[ "ZOOM" ] = IN_ZOOM,
+		[ "GRENADE1" ] = IN_GRENADE1,
+		[ "GRENADE2" ] = IN_GRENADE2,
+		[ "WEAPON1" ] = IN_WEAPON1,
+		[ "WEAPON2" ] = IN_WEAPON2,
+		[ "BULLRUSH" ] = IN_BULLRUSH,
+		[ "CANCEL" ] = IN_CANCEL,
+		[ "RUN" ] = IN_RUN,
+	}
 end)
 
 --- To string
@@ -329,7 +385,8 @@ function player_methods:getEyeTrace ()
 	return setmetatable({}, {
 		__index=function(t,k)
 			return vwrap( data[k] )
-		end
+		end,
+		__metatable=""
 	})
 end
 

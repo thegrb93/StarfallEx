@@ -2,7 +2,7 @@
 
 --- Quaternion library
 -- @shared
-local quat_lib, quat_lib_metamethods = SF.Libraries.Register("quaternion")
+local quat_lib = SF.Libraries.Register("quaternion")
 
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 
@@ -41,10 +41,6 @@ local rad2deg = 180/math.pi
 
 --- Quaternion type
 local quat_methods, quat_metamethods = SF.Typedef("Quaternion")
---[[quat_metamethods = {__index = quat_lib}
-quat_lib.__metatable = quat_metamethods
-quat_metamethods.__type = "Quaternion"
-setmetatable(quat_lib, quat_metamethods)]]
 
 --****************************** Helper functions ******************************--
 
@@ -191,7 +187,7 @@ function quat_lib.New( self, ...)
 	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes](...) or quicknew(0,0,0,0)
 end
 
-quat_lib_metamethods.__call = quat_lib.New
+setmetatable(quat_lib, {__call = quat_lib.New})
 
 
 local function format(value)
