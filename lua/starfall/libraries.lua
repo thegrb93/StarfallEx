@@ -22,26 +22,28 @@ function SF.Libraries.BuildEnvironment()
 	local function deepCopy(src, dst, done)
 		if done[src] then return end
 		done[src] = true
+		
+		-- Copy the values
 		for k, v in pairs(src) do
 			if type(v)=="table" then
 				local t = {}
 				deepCopy(v, t, done)
-				
-				-- Copy the metatable
-				local meta = debug.getmetatable(v)
-				if meta then
-					local t2 = {}
-					for o, p in pairs(meta) do
-						t2[o]=p
-					end
-					setmetatable(t, t2)
-				end
-				
 				dst[k] = t
 			else
 				dst[k] = v
 			end
 		end
+		
+		-- Copy the metatable
+		local meta = debug.getmetatable(src)
+		if meta then
+			local t = {}
+			for k, v in pairs(meta) do
+				t[k]=v
+			end
+			setmetatable(dst, t)
+		end
+		
 		done[src] = nil
 	end
 	
