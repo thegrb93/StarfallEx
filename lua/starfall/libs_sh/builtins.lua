@@ -151,7 +151,7 @@ end
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50% 
 function SF.DefaultEnvironment.setSoftQuota ( quota )
 	SF.CheckType( quota, "number" )
-	self.cpu_softquota = quota
+	SF.instance.cpu_softquota = quota
 end
 
 -- String library
