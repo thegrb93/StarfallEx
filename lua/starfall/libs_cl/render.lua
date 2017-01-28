@@ -68,7 +68,7 @@ local vector_meta, matrix_meta, col_meta, ang_meta
 local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap
 
 SF.Libraries.AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
+	vector_meta = SF.Vectors.Metatable
 	matrix_meta = SF.VMatrix.Metatable
 	col_meta = SF.Color.Metatable
 	ang_meta = SF.Angles.Metatable
