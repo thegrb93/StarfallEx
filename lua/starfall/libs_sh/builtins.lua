@@ -218,11 +218,6 @@ end
 function string_methods.toColor( str )
 	return SF.WrapObject( string.ToColor( str ) )
 end
-local string_metatable = {__index = function(s, k)
-	if type(k)=="number" then return string.sub(s, k, k) end
-	return string_methods[k]
-end}
-setmetatable(string_methods, string_metatable)
 --- String library http://wiki.garrysmod.com/page/Category:string
 -- @name SF.DefaultEnvironment.string
 -- @class table
@@ -393,7 +388,16 @@ for i=1, 5 do
 end
 local gluastr = debug.getmetatable( "" )
 SF.Libraries.AddHook( "prepare", function()
-	debug.setmetatable( "", string_metatable )
+	debug.setmetatable( "", {__index = function(self, key)
+		local val = string_methods[ key ]
+		if ( val ) then
+			return val
+		elseif ( tonumber( key ) ) then
+			return self:sub( key, key )
+		else
+			SF.throw( "attempt to index a string value with bad key ('" .. tostring( key ) .. "' is not part of the string library)", 2 )
+		end
+	end} )
 end )
 SF.Libraries.AddHook( "cleanup", function() 
 	debug.setmetatable( "", gluastr )
