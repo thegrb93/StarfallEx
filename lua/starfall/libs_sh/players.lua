@@ -440,10 +440,11 @@ if SERVER then
 	
 	--- Returns whether or not the player has godmode
 	-- @server
-	-- @return boolean If the player has godmode or not
+	-- @return True if the player has godmode
 	function player_methods:hasGodMode()
 		SF.CheckType( self, player_metamethods )
-		return eunwrap( self ):HasGodMode()
+		local ent = eunwrap( self )
+		return IsValid(ent) and ent:HasGodMode() or false
 	end
 end
 
