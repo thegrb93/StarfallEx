@@ -148,7 +148,7 @@ SF.Libraries.AddHook( "deinitialize", function ( instance )
 		instance.data.render.textures[ k ] = nil
 	end
 	for k, v in pairs( instance.data.render.urltextures ) do
-		instance.data.render.textures[ k ] = nil
+		instance.data.render.urltextures[ k ] = nil
 	end
 	if plyRTcount[ instance.playerid ] then
 		plyRTcount[ instance.playerid ] = plyRTcount[ instance.playerid ] - instance.data.render.rendertargetcount
@@ -537,22 +537,18 @@ function render_library.createRenderTarget ( name )
 
 	local rtname, rt
 	for k, v in pairs( globalRTs ) do
-		if v[ 2 ] then
-			rtname, rt = k, v
-			break
-		end
+		if v[ 2 ] then rtname, rt = k, v break end
 	end
-	if not rt then
+	if rt then
+		rt[2] = false
+	else
 		globalRTcount = globalRTcount + 1
 		rtname = "Starfall_CustomRT_" .. globalRTcount
 		rt = { GetRenderTarget( rtname, 1024, 1024 ), false }
+		rt[3] = CreateMaterial( "StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", {[ "$model" ] = 1} )
+		rt[3]:SetTexture("$basetexture", rt[1])
 		globalRTs[ rtname ] = rt
 	end
-	rt[ 2 ] = false
-	rt[ 3 ] = CreateMaterial( "StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", {
-		[ "$model" ] = 1,
-	} )
-	rt[3]:SetTexture("$basetexture", rt[1])
 
 	data.rendertargets[ name ] = rtname
 end
