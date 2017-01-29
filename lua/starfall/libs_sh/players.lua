@@ -444,7 +444,7 @@ if SERVER then
 	function player_methods:hasGodMode()
 		SF.CheckType( self, player_metamethods )
 		local ent = eunwrap( self )
-		return ent and ent:HasGodMode()
+		return IsValid(ent) and ent:HasGodMode() or false
 	end
 end
 
