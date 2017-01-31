@@ -619,6 +619,7 @@ function render_library.setRenderTargetTexture ( name )
 	if rtname and globalRTs[ rtname ] then
 		RT_Material:SetTexture( "$basetexture", globalRTs[ rtname ][ 1 ] )
 		surface.SetMaterial( RT_Material )
+		render.SetMaterial( RT_Material )
 	else
 		draw.NoTexture()
 	end
