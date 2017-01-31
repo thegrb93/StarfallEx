@@ -20,12 +20,14 @@ function ENT:runScriptHook ( hook, ... )
 	if self.instance then
 		return self.instance:runScriptHook( hook, ... )
 	end
+	return {}
 end
 
 function ENT:runScriptHookForResult ( hook, ... )
 	if self.instance then
 		return self.instance:runScriptHookForResult( hook, ... )
 	end
+	return {}
 end
 
 function ENT:Error ( msg, traceback )
