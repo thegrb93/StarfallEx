@@ -121,7 +121,7 @@ function mesh_library.createFromTable ( verteces )
 	return wrap(mesh)
 end
 
---- Creates a mesh from an obj file
+--- Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.
 -- @param obj The obj file data
 -- @return Mesh object
 function mesh_library.createFromObj ( obj )
@@ -130,12 +130,11 @@ function mesh_library.createFromObj ( obj )
 	local instance = SF.instance
 	
 	local pos, norm, uv, face = {},{},{},{}
-	local map = {v=pos, vt=uv, vn=norm, f=face}
-	local fmap = {
-		v = function(t, f) t[#t+1]=Vector(tonumber(f()),tonumber(f()),tonumber(f())) end,
-		vt = function(t, f) t[#t+1]=tonumber(f()) t[#t+1]=tonumber(f()) end,
-		vn = function(t, f) t[#t+1]=Vector(tonumber(f()),tonumber(f()),tonumber(f())) end,
-		f = function(t, f) local i=#t t[i+3]=f() t[i+2]=f() t[i+1]=f() end
+	local map = {
+		v = function(f) pos[#pos+1]=Vector(tonumber(f()),tonumber(f()),tonumber(f())) end,
+		vt = function(f) uv[#uv+1]=tonumber(f()) uv[#uv+1]=tonumber(f()) end,
+		vn = function(f) norm[#norm+1]=Vector(tonumber(f()),tonumber(f()),tonumber(f())) end,
+		f = function(f) local i=#face face[i+3]=f() face[i+2]=f() face[i+1]=f() end
 	}
 	local ignore = {["#"]=true,["mtllib"]=true,["usemtl"]=true,["o"]=true,["s"]=true}
 	for line in string.gmatch(obj, "[^\r\n]+") do
@@ -145,7 +144,7 @@ function mesh_library.createFromObj ( obj )
 		if tag and not ignore[tag] then
 			local t = map[tag]
 			if t then
-				local ok = pcall(fmap[tag],t,f)
+				local ok = pcall(t,f)
 				if not ok then SF.throw("Failed to parse tag: "..tag..". ("..line..")", 2) end
 			else
 				SF.throw("Unknown tag in obj file: "..tag, 2)
@@ -163,33 +162,21 @@ function mesh_library.createFromObj ( obj )
 		local f = string.gmatch(v, "([^/]*)/?")
 		local posv = tonumber(f())
 		if posv then
-			if pos[posv] then
-				vert.pos = pos[posv]
-			else
-				SF.throw("Invalid face position index: "..tostring(posv), 2)
-			end
+			vert.pos = pos[posv] or SF.throw("Invalid face position index: "..tostring(posv), 2)
 		else
 			SF.throw("Invalid face position index: "..tostring(posv), 2)
 		end
 		local texv = tonumber(f())
 		if texv then
-			local j = (texv-1)*2
-			if uv[j+2] then
-				vert.u = uv[j+1]
-				vert.v = uv[j+2]
-			else
-				SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
-			end
+			local j = texv*2
+			vert.u = uv[j-1] or SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+			vert.v = uv[j] or SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
 		else
 			SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
 		end
 		local normv = tonumber(f())
 		if normv then
-			if norm[normv] then
-				vert.normal = norm[normv]
-			else
-				SF.throw("Invalid face normal index: "..tostring(normv), 2)
-			end
+			vert.normal = norm[normv] or SF.throw("Invalid face normal index: "..tostring(normv), 2)
 		else
 			SF.throw("Invalid face normal index: "..tostring(normv), 2)
 		end
