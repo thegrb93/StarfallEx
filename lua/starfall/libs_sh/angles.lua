@@ -24,7 +24,8 @@ SF.Libraries.AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
 	
 	SF.DefaultEnvironment.Angle = function ( p, y, r )
-		return wrap( { p or 0, y or 0, r or 0 } )
+		p = p or 0
+		return wrap( { p, y or p, r or p } )
 	end
 end)
 
