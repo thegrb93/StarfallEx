@@ -79,7 +79,7 @@ if CLIENT then
 			ent:SetSubMaterial( net.ReadUInt( 16 ), net.ReadString() )
 		end,
 		[5] = function( ent ) --Bodygroup
-			ent:SetBodyGroup( net.ReadUInt( 16 ), net.ReadUInt ( 16 ) )
+			ent:SetBodygroup( net.ReadUInt( 16 ), net.ReadUInt ( 16 ) )
 		end,
 		[6] = function( ent ) --Skin
 			ent:SetSkin( net.ReadUInt( 16 ) )
