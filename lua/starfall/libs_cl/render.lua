@@ -655,14 +655,15 @@ end
 
 --- Clears the surface
 -- @param clr Color type to clear with
-function render_library.clear ( clr )
+-- @param depth Boolean if should clear depth
+function render_library.clear ( clr, depth )
 	if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
 	if SF.instance.data.render.usingRT then
 		if clr == nil then
-			render.Clear( 0, 0, 0, 255 )
+			render.Clear( 0, 0, 0, 255, depth )
 		else
 			SF.CheckType( clr, col_meta )
-			render.Clear( clr.r, clr.g, clr.b, clr.a )
+			render.Clear( clr.r, clr.g, clr.b, clr.a, depth )
 		end
 	end
 end
