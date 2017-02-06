@@ -256,7 +256,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 		instance.player:AddCleanup( "props", entity )
 		gamemode.Call( hookcall, instance.player, entity )
 	
-		local wrapped = SF.Entities.Wrap( entity )
+		local wrapped = SF.WrapObject( entity )
 
 		propdata.props[ wrapped ] = wrapped
 
