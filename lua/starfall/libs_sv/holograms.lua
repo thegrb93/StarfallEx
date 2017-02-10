@@ -26,6 +26,8 @@ SF.Holograms = {}
 SF.Holograms.personalquota = CreateConVar( "sf_holograms_personalquota", "100", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The number of holograms allowed to spawn via Starfall scripts for a single instance" )
 
+SF.Permissions.registerPrivilege( "hologram.create", "Create hologram", "Allows the user to create holograms" )
+
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
 SF.Holograms.Wrap = wrap
@@ -256,6 +258,8 @@ end
 -- @server
 -- @return The hologram object
 function holograms_library.create ( pos, ang, model, scale )
+	local instance = SF.instance
+	SF.Permissions.check( instance.player,  nil, "hologram.create" )
 	SF.CheckType( pos, vec_meta )
 	SF.CheckType( ang, ang_meta )
 	SF.CheckType( model, "string" )
@@ -268,7 +272,6 @@ function holograms_library.create ( pos, ang, model, scale )
 	local pos = vunwrap( pos )
 	local ang = aunwrap( ang )
 
-	local instance = SF.instance
 	local holodata = instance.data.holograms
 	
 	if plyCount[ instance.player ] >= SF.Holograms.personalquota:GetInt() then 
@@ -302,7 +305,7 @@ end
 -- @server
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
-	if not SF.Permissions.check( SF.instance.player,  nil, "hologram.create" ) then return false end
+	if not SF.Permissions.hasAccess( SF.instance.player,  nil, "hologram.create" ) then return false end
 	return plyCount[ SF.instance.player ] < SF.Holograms.personalquota:GetInt()
 end
 
@@ -310,6 +313,6 @@ end
 -- @server
 -- @return number of holograms able to be spawned
 function holograms_library.hologramsLeft ()
-	if not SF.Permissions.check( SF.instance.player,  nil, "hologram.create" ) then return 0 end
+	if not SF.Permissions.hasAccess( SF.instance.player,  nil, "hologram.create" ) then return 0 end
 	return SF.Holograms.personalquota:GetInt() - plyCount[ SF.instance.player ]
 end

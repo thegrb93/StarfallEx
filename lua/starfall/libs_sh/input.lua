@@ -36,8 +36,8 @@ if SERVER then return end
 ---- Input library.
 --- @client
 local input_methods, input_metamethods = SF.Libraries.Register( "input" )
-local buttonPolling = CreateConVar( "sf_input", "0", { FCVAR_ARCHIVE },
-	"Whether others' starfall chips that are not yours are allowed to poll your buttons" )
+
+SF.Permissions.registerPrivilege( "input", "Input", "Allows the user to see what buttons you're pressing.", {"Client"} )
 
 ---- Gets the first key that is bound to the command passed
 --- @param binding The name of the bind
@@ -47,7 +47,7 @@ local buttonPolling = CreateConVar( "sf_input", "0", { FCVAR_ARCHIVE },
 function input_methods.lookupBinding( binding )
 	SF.CheckType( binding, "string" )
 
-	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	local bind = input.LookupBinding( binding )
 	if bind then
@@ -62,7 +62,7 @@ end
 function input_methods.isKeyDown( key )
 	SF.CheckType( key, "number" )
 
-	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	return input.IsKeyDown( key )
 end
@@ -73,7 +73,7 @@ end
 function input_methods.getKeyName( key )
 	SF.CheckType( key, "number" )
 
-	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	return input.GetKeyName( key )
 end
@@ -81,7 +81,7 @@ end
 ---- Gets whether the shift key is down
 --- @return True if the shift key is down
 function input_methods.isShiftDown( )
-	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	return input.IsShiftDown( )
 end
@@ -89,7 +89,7 @@ end
 ---- Gets whether the control key is down
 --- @return True if the control key is down
 function input_methods.isControlDown( )
-	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	return input.IsControlDown( )
 end
@@ -98,13 +98,13 @@ end
 --- @return The x position of the mouse
 --- @return The y position of the mouse
 function input_methods.getCursorPos( )
-	if not SF.Permissions.check( SF.instance.player, nil, "input" ) then SF.throw( "Insufficient permissions", 2 ) end
+	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	return input.GetCursorPos( )
 end
 
 function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and (ply==LocalPlayer() or buttonPolling:GetBool()) then
+	if (IsFirstTimePredicted() or game.SinglePlayer()) and SF.Permissions.hasAccess( SF.instance.player, nil, "input" ) then
 		return true, {button}
 	end
 	return false

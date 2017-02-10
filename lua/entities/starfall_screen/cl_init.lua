@@ -60,26 +60,27 @@ end
 
 function ENT:RenderScreen()
 	if IsValid( self.link ) then
-		if self.link.instance then
-			local instance = self.link.instance
-			local data = instance.data
-			
-			data.render.matricies = 0
-			data.render.renderEnt = self
-			data.render.isRendering = true
-			draw.NoTexture()
-			surface.SetDrawColor( 255, 255, 255, 255 )
+		local instance = self.link.instance
+		if instance then
+			if SF.Permissions.hasAccess( instance.player, nil, "render.screen" ) then
+				local data = instance.data
 
-			self.link:runScriptHook( "render" )
+				data.render.matricies = 0
+				data.render.renderEnt = self
+				data.render.isRendering = true
+				draw.NoTexture()
+				surface.SetDrawColor( 255, 255, 255, 255 )
 
-			data.render.isRendering = nil
-		
+				self.link:runScriptHook( "render" )
+
+				data.render.isRendering = nil
+			end
 		elseif self.link.error then
 			local error = self.link.error
 			surface.SetTexture( 0 )
 			surface.SetDrawColor( 0, 0, 0, 120 )
 			surface.DrawRect( 0, 0, 512, 512 )
-			
+
 			draw.DrawText( "Error occurred in Starfall:", "Starfall_ErrorFont", 32, 16, Color( 0, 255, 255, 255 ) ) -- Cyan
 			draw.DrawText( tostring( error.message ), "Starfall_ErrorFont", 16, 80, Color( 255, 0, 0, 255 ) )
 			if error.source and error.line then
