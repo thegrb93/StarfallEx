@@ -105,7 +105,7 @@ function PANEL:Think ()
 	-- Overwriting default think function, mostly copied from default function
 	local mousex = math.Clamp( gui.MouseX(), 1, ScrW() - 1 )
 	local mousey = math.Clamp( gui.MouseY(), 1, ScrH() - 1 )
-
+	
 	self.Dragged = false
 	self.Resized = false
 
@@ -121,7 +121,7 @@ function PANEL:Think ()
 			x = math.Clamp( x, 0, ScrW() - self:GetWide() )
 			y = math.Clamp( y, 0, ScrH() - self:GetTall() )
 		end
-
+		
 		-- Edge snapping
 		local minChildX = ScrW()
 		local minX = 0
@@ -155,7 +155,7 @@ function PANEL:Think ()
 			x = minX
 		elseif x + self:GetWide() > ScrW() - maxX - 10 and x + self:GetWide() < ScrW() - maxX + 10 then
 			x = ScrW() - maxX - self:GetWide()
-		end
+		end 
 		if y < 10 then
 			y = 0
 		elseif y + self:GetTall() > ScrH() - 10 then
@@ -222,18 +222,18 @@ function PANEL:Think ()
 
 		self:moveLockChildren( dx, dy )
 	end
-
+	
 	if self.Sizing then
-
+		
 		self.Resized = true
 
 		local x = self.Sizing[ 1 ] and mousex - self.Sizing[ 1 ] or self:GetWide()
-		local y = self.Sizing[ 2 ] and mousey - self.Sizing[ 2 ] or self:GetTall()
+		local y = self.Sizing[ 2 ] and mousey - self.Sizing[ 2 ] or self:GetTall()	
 		local px, py = self:GetPos()
-
+		
 		if x < self.m_iMinWidth then x = self.m_iMinWidth elseif x > ScrW() - px and self:GetScreenLock() then x = ScrW() - px end
 		if y < self.m_iMinHeight then y = self.m_iMinHeight elseif y > ScrH() - py and self:GetScreenLock() then y = ScrH() - py end
-
+	
 		for k, v in pairs( self.windows ) do
 			if v == self or not v:IsVisible() then goto skip end
 			local vx, vy = v:GetPos()
@@ -260,18 +260,18 @@ function PANEL:Think ()
 
 		self:SetSize( x, y )
 	end
-
-	if self.Hovered and self.m_bSizable and
+	
+	if self.Hovered and self.m_bSizable and 
 	 	mousex > ( self.x + self:GetWide() - 20 ) and mousey > ( self.y + self:GetTall() - 20 ) then
 
 		self:SetCursor( "sizenwse" )
 	elseif self.Hovered and self.m_bSizable and
 		mousex > ( self.x + self:GetWide() - 5 ) then
-
+		
 		self:SetCursor( "sizewe" )
 	elseif self.Hovered and self.m_bSizable and
 		mousey > ( self.y + self:GetTall() - 5 ) then
-
+		
 		self:SetCursor( "sizens" )
 	elseif self.Hovered and self:GetDraggable() and mousey < ( self.y + 24 ) and not self.locked then
 		self:SetCursor( "sizeall" )
@@ -296,13 +296,13 @@ function PANEL:OnMousePressed ()
 	-- Pretty much copied from default function again
 	if self.m_bSizable then
 		if gui.MouseX() > ( self.x + self:GetWide() - 20 ) and
-			gui.MouseY() > ( self.y + self:GetTall() - 20 ) then
-
+			gui.MouseY() > ( self.y + self:GetTall() - 20 ) then			
+	
 			self.Sizing = { gui.MouseX() - self:GetWide(), gui.MouseY() - self:GetTall() }
 			self:MouseCapture( true )
 			return
 		end
-		if gui.MouseX() > ( self.x + self:GetWide() - 5 ) then
+		if gui.MouseX() > ( self.x + self:GetWide() - 5 ) then	
 			self.Sizing = { gui.MouseX() - self:GetWide(), nil }
 			self:MouseCapture( true )
 			return
@@ -313,7 +313,7 @@ function PANEL:OnMousePressed ()
 			return
 		end
 	end
-
+	
 	if self:GetDraggable() and gui.MouseY() < ( self.y + 24 ) then
 		self.Dragging = { gui.MouseX() - self.x, gui.MouseY() - self.y }
 		self:MouseCapture( true )
@@ -340,7 +340,7 @@ function PANEL:lock ( frame )
 end
 function PANEL:moveLockChildren ( x, y )
 	for k, v in pairs( self.lockChildren ) do
-		if v.locked then
+		if v.locked then 
 			local vx, vy = v:GetPos()
 			v:SetPos( vx + x, vy + y )
 			v:moveLockChildren( x, y )
@@ -378,7 +378,7 @@ function PANEL:close ()
 	self:Close()
 end
 function PANEL:OnOpen ()
-
+	
 end
 function PANEL:OnClose ()
 
@@ -466,12 +466,12 @@ function PANEL:Init ()
 	self.offsetRight:SetIcon( "arrowr" )
 	function self.offsetRight:PerformLayout ()
 		local wide = 0
-		if parent.offsetLeft:IsVisible() then
-			wide = parent.offsetLeft:GetWide() + 2
+		if parent.offsetLeft:IsVisible() then 
+			wide = parent.offsetLeft:GetWide() + 2 
 		end
 		for i = parent.offsetTabs + 1, #parent.tabs do
-			if wide + parent.tabs[ i ]:GetWide() > parent:GetWide() - self:GetWide() - 2 then
-				break
+			if wide + parent.tabs[ i ]:GetWide() > parent:GetWide() - self:GetWide() - 2 then 
+				break 
 			else
 				wide = wide + parent.tabs[ i ]:GetWide() + 2
 			end
@@ -510,7 +510,7 @@ function PANEL:Init ()
 		local n = 1
 		while #self.tabs ~= 1 do
 			v = self.tabs[ n ]
-			if v ~= self.targetTab then
+			if v ~= self.targetTab then 
 				self:removeTab( v )
 			else
 				n = 2
@@ -518,7 +518,7 @@ function PANEL:Init ()
 		end
 		self.targetTab = nil
 	end }
-end
+end 
 PANEL.Paint = function () end
 function PANEL:PerformLayout ()
 	local parent = self:GetParent()
@@ -591,10 +591,10 @@ function PANEL:addTab ( text )
 	return tab
 end
 function PANEL:removeTab ( tab )
-	local tabIndex
+	local tabIndex 
 	if type( tab ) == "number" then
 		tabIndex = tab
-		tab = self.tabs[ tab ]
+		tab = self.tabs[ tab ]  
 	else
 		tabIndex = self:getTabIndex( tab )
 	end
@@ -614,7 +614,7 @@ function PANEL:getTabIndex ( tab )
 end
 function PANEL:selectTab ( tab )
 	if type( tab ) == "number" then
-		tab = self.tabs[ tab ]
+		tab = self.tabs[ tab ]  
 	end
 	if tab == nil then return end
 

@@ -1,6 +1,7 @@
 -------------------------------------------------------------------------------
 --	SF Editor
 --	Originally created by Jazzelhawk
+--	
 --	To do:
 --	Find new icons
 -------------------------------------------------------------------------------
@@ -24,9 +25,9 @@ if CLIENT then
 	SF.Editor.icons.arrowr 		= Material( "radon/arrow_right.png", "noclamp smooth" )
 	SF.Editor.icons.arrowl 		= Material( "radon/arrow_left.png", "noclamp smooth" )
 
-	local defaultCode = [[--@name
---@author
---@shared
+	local defaultCode = [[--@name 
+--@author 
+--@shared 
 
 --[[
 	Starfall Scripting Environment
@@ -93,10 +94,10 @@ if CLIENT then
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
 		SF.Editor.permissionsWindow = SF.Editor.createPermissionsWindow()
 
-		SF.Editor.runJS = function ( ... )
+		SF.Editor.runJS = function ( ... ) 
 			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
 		end
-
+		
 		SF.Editor.updateSettings ()
 	end
 
@@ -104,11 +105,11 @@ if CLIENT then
 		if not SF.Editor.initialized then
 			SF.Editor.init ()
 		end
-
+		
 		SF.Editor.editor:open()
 		RunConsoleCommand( "starfall_event", "editor_open" )
 	end
-
+	
 	function SF.Editor.openFile( fl )
 		if not fl or string.GetExtensionFromFilename( fl ) ~= "txt" then return end
 		if not SF.Editor.initialized then SF.Editor.init() end
@@ -126,7 +127,7 @@ if CLIENT then
 		SF.Editor.addTab( fileName, code )
 		SF.Editor.open()
 	end
-
+	
 	function SF.Editor.close ()
 		SF.Editor.editor:close()
 		RunConsoleCommand( "starfall_event", "editor_close" )
@@ -159,7 +160,7 @@ if CLIENT then
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
 			tab = math.min( tab, #tabHolder.tabs )
-			tab = tabHolder.tabs[ tab ]
+			tab = tabHolder.tabs[ tab ]  
 		end
 		if tab == nil then
 			SF.Editor.selectTab( 1 )
@@ -180,7 +181,7 @@ if CLIENT then
 		if code then
 			local ppdata = {}
 			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
-			if ppdata.scriptnames and ppdata.scriptnames.file ~= "" then
+			if ppdata.scriptnames and ppdata.scriptnames.file ~= "" then 
 				name = ppdata.scriptnames.file
 			end
 		end
@@ -211,7 +212,7 @@ if CLIENT then
 	function SF.Editor.removeTab ( tab )
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
-			tab = tabHolder.tabs[ tab ]
+			tab = tabHolder.tabs[ tab ]  
 		end
 		if tab == nil then return end
 
@@ -262,10 +263,10 @@ if CLIENT then
 
 			local err = CompileString( code, "Validation", false )
 
-			if type( err ) ~= "string" then
+			if type( err ) ~= "string" then 
 				if forceShow then SF.AddNotify( LocalPlayer(), "Validation successful", "GENERIC", 3, "DRIP3" ) end
 				SF.Editor.runJS( "editor.session.clearAnnotations(); clearErrorLines()" )
-				return
+				return 
 			end
 
 			local row = tonumber( err:match( "%d+" ) ) - 1
@@ -281,7 +282,7 @@ if CLIENT then
 				editor.session.addMarker(range, "ace_error", "screenLine");
 
 			]] )
-
+			
 			if not forceShow then return end
 
 			SF.Editor.runJS( "editor.session.unfold({row: " .. row .. ", column: 0})" )
@@ -305,14 +306,14 @@ if CLIENT then
 		for name, val in pairs( SF.DefaultEnvironment ) do
 			table.insert( map[ "Environment" ], name )
 		end
-
+		
 		for lib, tbl in pairs( SF.Libraries.libraries ) do
 			map[ lib ] = {}
 			for name, val in pairs( tbl ) do
 				table.insert( map[ lib ], name )
 			end
 		end
-
+		
 		for lib, tbl in pairs( SF.Types ) do
 			if type( tbl.__index ) == "table" then
 				map[ lib ] = {}
@@ -329,7 +330,7 @@ if CLIENT then
 
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
-			tab = tabHolder.tabs[ tab ]
+			tab = tabHolder.tabs[ tab ]  
 		end
 		if tab == nil then return end
 
@@ -338,9 +339,9 @@ if CLIENT then
 		local fileName = tab.filename
 		local tabIndex = tabHolder:getTabIndex( tab )
 
-		if not fileName or not file.Exists( "starfall/" .. fileName, "DATA" ) then
+		if not fileName or not file.Exists( "starfall/" .. fileName, "DATA" ) then 
 			SF.AddNotify( LocalPlayer(), "Unable to refresh tab as file doesn't exist", "GENERIC", 5, "DRIP3" )
-			return
+			return 
 		end
 
 		local fileData = file.Read( "starfall/" .. fileName, "DATA" )
@@ -355,7 +356,7 @@ if CLIENT then
 	function SF.Editor.updateTabName ( tab )
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
-		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then
+		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then 
 			tab.name = ppdata.scriptnames.tab
 		else
 			tab.name = tab.filename or "generic"
@@ -406,7 +407,7 @@ if CLIENT then
 		end
 		buttonHolder:addButton( "Settings", buttonSettings )
 
-		local buttonHelper = vgui.Create( "StarfallButton", buttonHolder )
+		local buttonHelper = vgui.Create( "StarfallButton", buttonHolder )	
 		buttonHelper:SetText( "SF Helper" )
 		function buttonHelper:DoClick ()
 			if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
@@ -417,7 +418,7 @@ if CLIENT then
 		end
 		buttonHolder:addButton( "Helper", buttonHelper )
 
-		local buttonModels = vgui.Create( "StarfallButton", buttonHolder )
+		local buttonModels = vgui.Create( "StarfallButton", buttonHolder )	
 		buttonModels:SetText( "Model Viewer" )
 		function buttonModels:DoClick ()
 			if SF.Editor.modelViewer:IsVisible() then
@@ -478,9 +479,9 @@ if CLIENT then
 			SF.Editor.getActiveTab().code = code
 			SF.Editor.doValidation()
 		end)
-
+		
 		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
-
+			
 		local function FinishedLoadingEditor()
 			local map = createLibraryMap()
 			html:QueueJavascript( "libraryMap = JSON.parse(\"" .. util.TableToJSON( map ):JavascriptSafe() .. "\")" )
@@ -505,7 +506,7 @@ if CLIENT then
 				end
 
 				if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
-				if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and
+				if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and 
 					( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and
 					not input.IsKeyDown( KEY_LALT ) then
 					if key == KEY_UP and input.IsKeyDown( key ) then
@@ -610,9 +611,9 @@ if CLIENT then
 					end
 				end
 			end
-
+			
 			SF.Editor.updateSettings( true )
-
+			
 			local tabHolder = SF.Editor.getTabHolder()
 			local wrapsetting = util.TableToJSON({
 				wrap = GetConVarNumber( "sf_editor_wordwrap" )
@@ -621,10 +622,10 @@ if CLIENT then
 				SF.Editor.runJS( "newEditSession(\"" .. string.JavascriptSafe( tab.code or defaultCode ) .. "\", JSON.parse(\"" .. wrapsetting .. "\"))" )
 			end
 			SF.Editor.runJS( "selectEditSession("..tabHolder:getTabIndex( SF.Editor.getActiveTab() )..")" )
-
+			
 			SF.Editor.initialized = true
 		end
-
+		
 		local readyTime
 		hook.Add("Think","SF_LoadingEditor",function()
 			if not html:IsLoading() then
@@ -635,7 +636,7 @@ if CLIENT then
 				end
 			end
 		end)
-
+		
 		editor:AddComponent( "htmlPanel", html )
 
 		function editor:OnOpen ()
@@ -659,7 +660,7 @@ if CLIENT then
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "", "SPACER" }
 		tabHolder.menuoptions[ #tabHolder.menuoptions + 1 ] = { "Refresh", function ()
 			if not tabHolder.targetTab then return end
-
+			
 			SF.Editor.refreshTab( tabHolder.targetTab )
 
 			tabHolder.targetTab = nil
@@ -674,7 +675,7 @@ if CLIENT then
 			SF.Editor.selectTab( tabIndex )
 		end
 		editor:AddComponent( "tabHolder", tabHolder )
-
+		
 		function editor:OnClose ()
 			local tabs = {}
 			for k, v in pairs( tabHolder.tabs ) do
@@ -693,11 +694,11 @@ if CLIENT then
 				local ppdata = {}
 				SF.Preprocessor.ParseDirectives( "file", SF.Editor.getCode(), {}, ppdata )
 				if ppdata.models and ppdata.models.file ~= "" then
-					model = ppdata.models.file
+					model = ppdata.models.file 
 				end
 
 				RunConsoleCommand("starfall_processor_ScriptModel", model or "")
-			end
+			end 
 		end
 
 		if tabs ~= nil and #tabs ~= 0 then
@@ -787,7 +788,7 @@ if CLIENT then
 		scrollPanel:Dock( FILL )
 		scrollPanel:SetPaintBackgroundEnabled( false )
 
-		local form = vgui.Create( "DForm", scrollPanel )
+		local form = vgui.Create( "DForm", scrollPanel )	
 		form:Dock( FILL )
 		form:DockPadding( 0, 10, 0, 10 )
 		form.Header:SetVisible( false )
@@ -822,13 +823,13 @@ if CLIENT then
 
 			return wang, label
 		end
-
+		
 		setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
 		local combobox, label = form:ComboBox( "Keybinding", "sf_editor_keybindings" )
 		combobox:AddChoice( "ace" )
 		combobox:AddChoice( "vim" )
 		combobox:AddChoice( "emacs" )
-
+		
 		setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
 		setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
 		setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
@@ -866,8 +867,8 @@ if CLIENT then
 		local scrollPanel = vgui.Create( "DScrollPanel", panel )
 		scrollPanel:Dock( FILL )
 		scrollPanel:SetPaintBackgroundEnabled( false )
-
-		frame.OnOpen = function()
+			
+		frame.OnOpen = function()			
 			local clientProviders = {}
 			for i, v in ipairs(SF.Permissions.providers) do
 				local provider = {id = v.id, name = v.name, settings = {}, options = {}}
@@ -881,8 +882,8 @@ if CLIENT then
 				end
 				clientProviders[i] = provider
 			end
-
-			local function createPermissions( providers, server )
+			
+			local function createPermissions( providers, server )	
 				for _, p in ipairs( providers ) do
 					local header = vgui.Create( "DLabel", header )
 					header:SetFont( "DermaLarge" )
@@ -891,21 +892,21 @@ if CLIENT then
 					header:SetSize(0, 40)
 					header:Dock( TOP )
 					scrollPanel:AddItem( header )
-
+					
 					for id, setting in SortedPairs( p.settings ) do
-
+						
 						local header = vgui.Create( "StarfallPanel" )
 						header:DockMargin( 0, 5, 0, 0 )
 						header:SetSize( 0, 20 )
 						header:Dock( TOP )
-
+						
 						local settingtext = vgui.Create( "DLabel", header )
 						settingtext:SetFont( "DermaDefault" )
 						settingtext:SetColor( SF.Editor.colors.meddark )
 						settingtext:SetText( id )
 						settingtext:DockMargin( 5, 0, 0, 0 )
 						settingtext:Dock( FILL )
-
+						
 						local buttons = {}
 						for i=#p.options, 1, -1 do
 							local button = vgui.Create( "StarfallButton", header )
@@ -923,13 +924,13 @@ if CLIENT then
 							end
 							buttons[i]=button
 						end
-
+						
 						scrollPanel:AddItem( header )
-
+						
 					end
 				end
 			end
-
+			
 			if LocalPlayer():IsSuperAdmin() then
 				SF.Permissions.requestPermissions( function(serverProviders)
 					if frame:IsVisible() then
@@ -945,7 +946,7 @@ if CLIENT then
 		frame.OnClose = function()
 			scrollPanel:Clear()
 		end
-
+		
 		return frame
 	end
 
@@ -978,7 +979,7 @@ if CLIENT then
 			frame.ContentNavBar:Dock( FILL )
 			frame.ContentNavBar:DockMargin( 0, 0, 0, 0 )
 			frame.ContentNavBar.Tree:SetBackgroundColor( Color( 240, 240, 240 ) )
-			frame.ContentNavBar.Tree.OnNodeSelected = function ( self, node )
+			frame.ContentNavBar.Tree.OnNodeSelected = function ( self, node ) 
 				if not IsValid( node.propPanel ) then return end
 
 				if IsValid( frame.PropPanel.selected ) then
@@ -991,7 +992,7 @@ if CLIENT then
 				frame.PropPanel.selected:Dock( FILL )
 				frame.PropPanel.selected:SetVisible( true )
 				frame.PropPanel:InvalidateParent()
-
+				
 				frame.HorizontalDivider:SetRight( frame.PropPanel.selected )
 			end
 
@@ -1006,7 +1007,7 @@ if CLIENT then
 			frame.HorizontalDivider:SetLeftWidth( 175 )
 			frame.HorizontalDivider:SetLeftMin( 175 )
 			frame.HorizontalDivider:SetRightMin( 450 )
-
+			
 			frame.HorizontalDivider:SetLeft( sidebarPanel )
 			frame.HorizontalDivider:SetRight( frame.PropPanel )
 
@@ -1027,27 +1028,27 @@ if CLIENT then
 			local function addModel ( container, obj )
 
 				local icon = vgui.Create( "SpawnIcon", container )
-
+				
 				if ( obj.body ) then
 					obj.body = string.Trim( tostring(obj.body), "B" )
 				end
-
+				
 				if ( obj.wide ) then
 					icon:SetWide( obj.wide )
 				end
-
+				
 				if ( obj.tall ) then
 					icon:SetTall( obj.tall )
 				end
-
+				
 				icon:InvalidateLayout( true )
-
+				
 				icon:SetModel( obj.model, obj.skin or 0, obj.body )
-
+				
 				icon:SetTooltip( string.Replace( string.GetFileFromFilename( obj.model ), ".mdl", "" ) )
 
-				icon.DoClick = function ( icon )
-					SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" )
+				icon.DoClick = function ( icon ) 
+					SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" ) 
 					SF.AddNotify( LocalPlayer(), "\"" .. string.gsub( obj.model, "\\", "/" ) .. "\" inserted into editor.", "GENERIC", 5, "DRIP1" )
 					frame:close()
 				end
@@ -1057,15 +1058,15 @@ if CLIENT then
 					local submenu = menu:AddSubMenu( "Re-Render", function () icon:RebuildSpawnIcon() end )
 						submenu:AddOption( "This Icon", function () icon:RebuildSpawnIcon() end )
 						submenu:AddOption( "All Icons", function () container:RebuildAll() end )
-
+				
 					local ChangeIconSize = function ( w, h )
-
+						
 						icon:SetSize( w, h )
 						icon:InvalidateLayout( true )
 						container:OnModified()
 						container:Layout()
 						icon:SetModel( obj.model, obj.skin or 0, obj.body )
-
+					
 					end
 
 					local submenu = menu:AddSubMenu( "Resize", function () end )
@@ -1092,11 +1093,11 @@ if CLIENT then
 					menu:AddSpacer()
 					menu:AddOption( "Delete", function () icon:Remove() end )
 					menu:Open()
-
+					
 				end
 
 				icon:InvalidateLayout( true )
-
+				
 				if ( IsValid( container ) ) then
 					container:Add( icon )
 				end
@@ -1115,7 +1116,7 @@ if CLIENT then
 
 					viewPanel:Clear( true )
 					viewPanel.currentNode = node
-
+					
 					local path = node:GetFolder()
 					local searchString = path .. "/*.mdl"
 
@@ -1167,7 +1168,7 @@ if CLIENT then
 
 								local label = vgui.Create( "ContentHeader", node.propPanel )
 								label:SetText( object.text )
-
+								
 								node.propPanel:Add( label )
 							end
 						end
@@ -1204,9 +1205,9 @@ if CLIENT then
 				folder = "garrysmod",
 				mounted = true
 			} )
-
+			
 			for _, game in SortedPairsByMemberValue( games, "title" ) do
-
+				
 				if game.mounted then
 					addBrowseContent( viewPanel, gamesNode, game.title, "games/16/" .. ( game.icon or game.folder ) .. ".png", "", game.folder )
 				end
@@ -1289,9 +1290,9 @@ if CLIENT then
 						self:getAllModels( time, folder .. v .. "/", extension, path )
 					end )
 				end
-				timer.Simple( 1, function ()
+				timer.Simple( 1, function () 
 					if searchTime and time ~= searchTime then return end
-					self.load = self.load - 1
+					self.load = self.load - 1 
 				end )
 			end
 
@@ -1326,7 +1327,7 @@ if CLIENT then
 					frame.searchBox.load = nil
 				end
 			end )
-
+			
 			self.initialized = true
 		end
 
@@ -1422,7 +1423,7 @@ if CLIENT then
 		local function recursiveLoad ( path, curdir )
 			if loaded[ path ] then return end
 			loaded[ path ] = true
-
+			
 			local code
 			local codedir
 			local codepath
@@ -1445,10 +1446,10 @@ if CLIENT then
 				print( "Bad include: " .. path )
 				return
 			end
-
+			
 			tbl.files[ codepath ] = code
 			SF.Preprocessor.ParseDirectives( codepath, code, {}, ppdata )
-
+			
 			if ppdata.includes and ppdata.includes[ codepath ] then
 				local inc = ppdata.includes[ codepath ]
 				if not tbl.includes[ codepath ] then
@@ -1457,7 +1458,7 @@ if CLIENT then
 				else
 					assert( tbl.includes[ codepath ] == inc )
 				end
-
+				
 				for i = 1, #inc do
 					recursiveLoad( inc[i], codedir )
 				end
@@ -1481,7 +1482,7 @@ if CLIENT then
 					end
 				end
 			end
-
+			
 			--Remove this file from the recursion stack
 			recStack[ file ] = false
 			return false, nil
@@ -1497,7 +1498,7 @@ if CLIENT then
 				break
 			end
 		end
-
+		
 		if isCyclic then
 			return false, "Loop in includes from: " .. cyclicFile
 		end
