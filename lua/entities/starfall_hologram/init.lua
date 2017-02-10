@@ -33,7 +33,5 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 end
 
 function ENT:CanTool( pl, tr, tool )
-	if tool ~= "starfall_ent_lib" then
-		return false
-	end
+	return tool == "starfall_ent_lib"
 end
