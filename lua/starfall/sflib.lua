@@ -8,20 +8,17 @@ SF = {}
 -- Send files to client
 if SERVER then
 	AddCSLuaFile( "sflib.lua" )
-	AddCSLuaFile( "compiler.lua" )
 	AddCSLuaFile( "instance.lua" )
 	AddCSLuaFile( "libraries.lua" )
 	AddCSLuaFile( "preprocessor.lua" )
 	AddCSLuaFile( "permissions/core.lua" )
 	AddCSLuaFile( "editor.lua" )
 	AddCSLuaFile( "sfderma.lua" )
-	AddCSLuaFile( "callback.lua" )
 	AddCSLuaFile( "sfhelper.lua" )
 	AddCSLuaFile( "netstream.lua" )
 end
 
 -- Load files
-include( "compiler.lua" )
 include( "instance.lua" )
 include( "libraries.lua" )
 include( "preprocessor.lua" )
@@ -98,31 +95,16 @@ function SF.GetTypeDef( name )
 	return SF.Types[name]
 end
 
--- Include this file after Typedef as this file relies on it.
-include("callback.lua")
-
-do
-	local env, metatable = SF.Typedef("Environment")
-	--- The default environment metatable
-	SF.DefaultEnvironmentMT = metatable
-	--- The default environment contents
-	SF.DefaultEnvironment = env
-end
-
 --- Creates a new context. A context is used to define what scripts will have access to.
--- @param env The environment metatable to use for the script. Default is SF.DefaultEnvironmentMT
 -- @param directives Additional Preprocessor directives to use. Default is an empty table
 -- @param cpuTime Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
--- @param libs Additional (local) libraries for the script to access. Default is an empty table.
-function SF.CreateContext ( env, directives, cpuTime, libs )
+function SF.CreateContext ( directives, cpuTime )
 	local context = {}
-	context.env = env or SF.DefaultEnvironmentMT
 	context.directives = directives or {}
 	context.cpuTime = cpuTime or {
 		getBufferN = function () return SF.cpuBufferN:GetInt() or 3 end,
 		getMax = function () return SF.cpuQuota:GetFloat() end
 	}
-	context.libs = libs or {}
 	return context
 end
 

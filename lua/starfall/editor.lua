@@ -8,14 +8,6 @@
 
 SF.Editor = {}
 
-local addon_path = nil
-
-do
-	local tbl = debug.getinfo( 1 )
-	local file = tbl.short_src
-	addon_path = string.TrimRight( string.match( file, ".-/.-/" ), "/" )
-end
-
 if CLIENT then
 
 	include( "sfderma.lua" )
@@ -292,43 +284,25 @@ if CLIENT then
 
 		local map = {}
 
+		map[ "Environment" ] = {}
+		for name, val in pairs( SF.DefaultEnvironment ) do
+			table.insert( map[ "Environment" ], name )
+		end
+		
+		for lib, tbl in pairs( SF.Libraries.libraries ) do
+			map[ lib ] = {}
+			for name, val in pairs( tbl ) do
+				table.insert( map[ lib ], name )
+			end
+		end
+		
 		for lib, tbl in pairs( SF.Types ) do
-			if ( lib == "Environment" or lib:find( "Library: " ) ) and type( tbl.__index ) == "table" then
-				lib = lib:Replace( "Library: ", "" )
+			if type( tbl.__index ) == "table" then
 				map[ lib ] = {}
 				for name, val in pairs( tbl.__index ) do
 					table.insert( map[ lib ], name )
 				end
 			end
-		end
-
-		map.Angle = {}
-		for name, val in pairs( SF.Angles.Methods ) do
-			table.insert( map.Angle, name )
-		end
-		map.Color = {}
-		for name, val in pairs( SF.Color.Methods ) do
-			table.insert( map.Color, name )
-		end
-		map.Entity = {}
-		for name, val in pairs( SF.Entities.Methods ) do
-			table.insert( map.Entity, name )
-		end
-		map.Player = {}
-		for name, val in pairs( SF.Players.Methods ) do
-			table.insert( map.Player, name )
-		end
-		map.Sound = {}
-		for name, val in pairs( SF.Sounds.Methods ) do
-			table.insert( map.Sound, name )
-		end
-		map.VMatrix = {}
-		for name, val in pairs( SF.VMatrix.Methods ) do
-			table.insert( map.VMatrix, name )
-		end
-		map.Vector = {}
-		for name, val in pairs( SF.Vectors.Methods ) do
-			table.insert( map.Vector, name )
 		end
 
 		return map
@@ -1566,27 +1540,10 @@ elseif SERVER then
 
 	util.AddNetworkString( "starfall_editor_status" )
 
-	local function getFiles ( dir, dir2 )
-		local files = {}
-		local dir2 = dir2 or ""
-		local f, directories = file.Find( dir .. "/" .. dir2 .. "/*", "GAME" )
-		for k, v in pairs( f ) do
-			files[ #files + 1 ] = dir2 .. "/" .. v
-		end
-		for k, v in pairs( directories ) do
-			table.Add( files, getFiles( dir, dir2 .. "/" .. v ) )
-		end
-		return files
-	end
-
-	for k, v in pairs( getFiles( addon_path, "materials/radon" ) ) do
-		resource.AddFile( v )
-	end
-
 	local starfall_event = {}
 
 	concommand.Add( "starfall_event", function ( ply, command, args )
-		local handler = starfall_event[ args[ 1 ] ]
+		local handler = starfall_event[ args[ 1 ] or "" ]
 		if not handler then return end
 		return handler( ply, args )
 	end )

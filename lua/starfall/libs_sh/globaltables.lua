@@ -1,7 +1,7 @@
 
 --- Cross-instance tables
 -- @shared
-local gtables_library, gtables_metamethods = SF.Libraries.Register("globaltables")
+local gtables_library = SF.Libraries.Register("globaltables")
 
 SF.GlobalTables = {}
 
@@ -25,11 +25,8 @@ hook.Add("PlayerDisconnected", "SF_GlobalTables_dc", function(ply)
 	SF.GlobalTables.Players[ply] = nil
 end)
 
-local oldindex = gtables_metamethods.__index
-function gtables_metamethods:__index(k)
+setmetatable(gtables_library, {__index = function(k)
 	if k == "player" then
 		return SF.GlobalTables.Players[SF.instance.player]
-	else
-		return oldindex[k]
 	end
-end
+end } )

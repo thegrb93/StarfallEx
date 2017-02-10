@@ -100,7 +100,7 @@ end
 -- @field CONTENTS_TRANSLUCENT
 -- @field CONTENTS_LADDER
 -- @field CONTENTS_HITBOX
-local trace_library, _ = SF.Libraries.Register("trace")
+local trace_library = SF.Libraries.Register("trace")
 
 -- Material Enumeration
 trace_library.MAT_ANTLION = MAT_ANTLION
@@ -260,7 +260,8 @@ function trace_library.trace ( start, endpos, filter, mask )
 	return setmetatable({}, {
 		__index=function(t,k)
 			return SF.WrapObject( data[k] )
-		end
+		end,
+		__metatable = ""
 	})
 end
 
@@ -305,6 +306,7 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 	return setmetatable({}, {
 		__index=function(t,k)
 			return SF.WrapObject( data[k] )
-		end
+		end,
+		__metatable=""
 	})
 end

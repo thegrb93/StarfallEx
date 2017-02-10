@@ -2,7 +2,7 @@
 
 --- Http library. Requests content from urls.
 -- @shared
-local http_library, _ = SF.Libraries.Register( "http" )
+local http_library = SF.Libraries.Register( "http" )
 local http_interval = CreateConVar( "sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made" )
 local http_max_active = CreateConVar( "sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time" )
 

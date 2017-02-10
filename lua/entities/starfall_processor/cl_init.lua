@@ -4,7 +4,7 @@ DEFINE_BASECLASS( "base_gmodentity" )
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-local context = SF.CreateContext( nil, nil, nil, SF.Libraries.CreateLocalTbl{"render"} )
+local context = SF.CreateContext()
 
 function ENT:Initialize()	
 	self.CPUpercent = 0
@@ -79,7 +79,7 @@ function ENT:CodeSent ( files, main, owner )
 	self.owner = owner
 	self.files = files
 	self.mainfile = main
-	local ok, instance = SF.Compiler.Compile( files, context, main, owner, { entity = self, render = {} } )
+	local ok, instance = SF.Instance.Compile( files, context, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
 	
 	if instance.ppdata.scriptnames and instance.mainfile then

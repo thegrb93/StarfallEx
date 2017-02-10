@@ -364,7 +364,8 @@ function ents_methods:addCollisionListener ( func )
 		instance:runFunction( func, setmetatable({}, {
 			__index=function(t,k)
 				return SF.WrapObject( data[k] )
-			end
+			end,
+			__metatable=""
 		}))
 	end)
 end
@@ -530,7 +531,7 @@ function ents_methods:setSubMaterial ( index, material, ply )
 	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
-		sendRenderPropertyToClient( ply, 4, index, material )
+		sendRenderPropertyToClient( ply, ent, 4, index, material )
 	else
 		ent:SetSubMaterial( index, material )
 	end
@@ -552,9 +553,9 @@ function ents_methods:setBodygroup ( bodygroup, value, ply )
 	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
-		sendRenderPropertyToClient( ply, 5, bodygroup, value )
+		sendRenderPropertyToClient( ply, ent, 5, bodygroup, value )
 	else
-		ent:SetBodyGroup( bodygroup, value )
+		ent:SetBodygroup( bodygroup, value )
 	end
 end
 
@@ -572,7 +573,7 @@ function ents_methods:setSkin ( skinIndex, ply )
 	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
-		sendRenderPropertyToClient( ply, 6, skinIndex )
+		sendRenderPropertyToClient( ply, ent, 6, skinIndex )
 	else
 		ent:SetSkin( skinIndex )
 	end
@@ -592,7 +593,7 @@ function ents_methods:setRenderMode ( rendermode, ply )
 	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
-		sendRenderPropertyToClient( ply, 7, rendermode )
+		sendRenderPropertyToClient( ply, ent, 7, rendermode )
 	else
 		ent:SetRenderMode( rendermode )
 		duplicator.StoreEntityModifier( ent, "colour", { RenderMode = rendermode } )
@@ -613,7 +614,7 @@ function ents_methods:setRenderFX ( renderfx, ply )
 	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
 
 	if ply then
-		sendRenderPropertyToClient( ply, 8, renderfx )
+		sendRenderPropertyToClient( ply, ent, 8, renderfx )
 	else
 		ent:SetRenderFX( renderfx )
 		duplicator.StoreEntityModifier( ent, "colour", { RenderFX = renderfx } )

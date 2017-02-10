@@ -25,6 +25,64 @@ SF.Instance.__index = SF.Instance
 -- Instances are put here after initialization.
 SF.allInstances = setmetatable({},{__mode="kv"})
 
+--- Preprocesses and Compiles code and returns an Instance
+-- @param code Either a string of code, or a {path=source} table
+-- @param context The context to use in the resulting Instance
+-- @param mainfile If code is a table, this specifies the first file to parse.
+-- @param player The "owner" of the instance
+-- @param data The table to set instance.data to. Default is a new table.
+-- @param dontpreprocess Set to true to skip preprocessing
+-- @return True if no errors, false if errors occured.
+-- @return The compiled instance, or the error message.
+function SF.Instance.Compile(code, context, mainfile, player, data, dontpreprocess)
+	if type(code) == "string" then
+		mainfile = mainfile or "generic"
+		code = {[mainfile]=code}
+	end
+	
+	local instance = setmetatable({},SF.Instance)
+	
+	instance.player = player
+	instance.playerid = player:SteamID()
+	instance.env = SF.Libraries.BuildEnvironment()
+	instance.env._G = instance.env
+	instance.data = data or {}
+	instance.ppdata = {}
+	instance.ops = 0
+	instance.hooks = {}
+	instance.scripts = {}
+	instance.source = code
+	instance.initialized = false
+	instance.context = context
+	instance.mainfile = mainfile
+	
+	for filename, source in pairs(code) do
+		if not dontpreprocess then
+			SF.Preprocessor.ParseDirectives(filename,source,context.directives,instance.ppdata)
+		end
+		
+		local serverorclient
+		if  instance.ppdata.serverorclient then
+			serverorclient = instance.ppdata.serverorclient[ filename ]
+		end
+		
+		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
+			-- Lua doesn't have empty statements, so an empty file gives a syntax error
+			instance.scripts[filename] = function() end
+		else
+			local func = CompileString(source, "SF:"..filename, false)
+			if type(func) == "string" then
+				return false, func
+			end
+			debug.setfenv(func, instance.env)
+			instance.scripts[filename] = func
+		end
+	end
+	
+	return true, instance
+end
+
+
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code

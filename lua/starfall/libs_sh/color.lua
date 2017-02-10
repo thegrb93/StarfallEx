@@ -25,17 +25,19 @@ SF.Color.Wrap = cwrap
 SF.Color.Unwrap = unwrap
 
 local dgetmeta = debug.getmetatable
---- Creates a table struct that resembles a Color/
--- @name SF.DefaultEnvironment.Color
--- @class function
--- @param r - Red
--- @param g - Green
--- @param b - Blue
--- @param a - Alpha
--- @return New color
-SF.DefaultEnvironment.Color = function ( r, g, b, a )
-	return wrap( { r or 255, g or 255, b or 255, a or 255 } )
-end
+SF.Libraries.AddHook("postload", function()
+	--- Creates a table struct that resembles a Color/
+	-- @name SF.DefaultEnvironment.Color
+	-- @class function
+	-- @param r - Red
+	-- @param g - Green
+	-- @param b - Blue
+	-- @param a - Alpha
+	-- @return New color
+	SF.DefaultEnvironment.Color = function ( r, g, b, a )
+		return wrap( { r or 255, g or 255, b or 255, a or 255 } )
+	end
+end)
 
 -- Lookup table.
 -- Index 1->4 have associative rgba for use in __index. Saves lots of checks

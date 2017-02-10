@@ -24,6 +24,27 @@ SF.Libraries.AddHook("postload", function()
 	aunwrap = SF.Angles.Unwrap
 	cwrap = SF.Color.Wrap
 	cunwrap = SF.Color.Unwrap
+	
+	function SF.DefaultEnvironment.chip ()
+		return ewrap( SF.instance.data.entity )
+	end
+
+	function SF.DefaultEnvironment.owner ()
+		return SF.WrapObject( SF.instance.player )
+	end
+
+	function SF.DefaultEnvironment.entity ( num )
+		SF.CheckType( num, "number" )
+		return SF.WrapObject( Entity( num ) )
+	end
+
+	if SERVER then
+		SF.DefaultEnvironment.player = SF.DefaultEnvironment.owner
+	else
+		function SF.DefaultEnvironment.player ()
+			return SF.WrapObject( LocalPlayer() )
+		end
+	end
 end)
 
 -- ------------------------- Internal functions ------------------------- --
@@ -43,24 +64,7 @@ local getPhysObject = SF.Entities.GetPhysObject
 
 -- ------------------------- Library functions ------------------------- --
 
-function SF.DefaultEnvironment.chip ()
-	local ent = SF.instance.data.entity
-	if ent then 
-		return ewrap( ent )
-	end
-end
-
-function SF.DefaultEnvironment.owner ()
-	return SF.WrapObject( SF.instance.player )
-end
-
-if SERVER then
-	SF.DefaultEnvironment.player = SF.DefaultEnvironment.owner
-else
-	function SF.DefaultEnvironment.player ()
-		return SF.WrapObject( LocalPlayer() )
-	end
-	
+if CLIENT then
 	local renderProperties = {
 		[1] = function( ent ) --Color	
 			ent:SetColor( Color( net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ) ) )
@@ -75,7 +79,7 @@ else
 			ent:SetSubMaterial( net.ReadUInt( 16 ), net.ReadString() )
 		end,
 		[5] = function( ent ) --Bodygroup
-			ent:SetBodyGroup( net.ReadUInt( 16 ), net.ReadUInt ( 16 ) )
+			ent:SetBodygroup( net.ReadUInt( 16 ), net.ReadUInt ( 16 ) )
 		end,
 		[6] = function( ent ) --Skin
 			ent:SetSkin( net.ReadUInt( 16 ) )
@@ -97,12 +101,6 @@ else
 		
 		renderProperties[ property ]( ent )
 	end)
-end
-
-function SF.DefaultEnvironment.entity ( num )
-	SF.CheckType( num, "number" )
-	
-	return SF.WrapObject( Entity( num ) )
 end
 
 -- ------------------------- Methods ------------------------- --

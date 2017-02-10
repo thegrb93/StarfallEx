@@ -7,53 +7,55 @@ SF.Libraries = {}
 SF.Libraries.libraries = {}
 SF.Libraries.hooks = {}
 
---- Place to store local libraries
--- @name SF.Libraries.Local
--- @class table
-SF.Libraries.Local = {}
-
 --- Creates and registers a global library. The library will be accessible from any Starfall Instance, regardless of context.
 -- This will automatically set __index and __metatable.
 -- @param name The library name
-function SF.Libraries.Register ( name )
-	local methods, metamethods = SF.Typedef( "Library: " .. name )
-	SF.Libraries.libraries[ name ] = metamethods
-	SF.DefaultEnvironment[ name ] = setmetatable( {}, metamethods )
-	return methods, metamethods
+function SF.Libraries.Register(name)
+	local methods = {}
+	SF.Libraries.libraries[ name ] = methods
+	return methods
 end
 
---- Creates and registers a local library. The library must be added to the context's
--- local libraries field.
-function SF.Libraries.RegisterLocal(name)
-	local methods, metamethods = SF.Typedef("Library: "..name)
-	SF.Libraries.Local[name] = metamethods
-	return methods, metamethods
-end
-
---- Gets a global library by name
--- @param name The name of the library
--- @return A metatable proxy of the library
-function SF.Libraries.Get(name)
-	return SF.Libraries.libraries[name] and setmetatable({},SF.Libraries.libraries[name])
-end
-
---- Gets a local library by name
--- @param name The name of the library
--- @return The library (not a metatable proxy!)
-function SF.Libraries.GetLocal(name)
-	return SF.Libraries.Local[name]
-end
-
---- Creates a table for use in SF.CreateContext containing all of the
--- local libraries in arr.
--- @param arr Array of local libraries to load
-function SF.Libraries.CreateLocalTbl(arr)
-	local tbl = {}
-	for i=1,#arr do
-		local lib = arr[i]
-		tbl[lib] = SF.Libraries.Local[lib] or SF.throw( string.format( "Requested nonexistant library '%s'", lib ), 2 )
+--- Builds an environment table
+-- @return The environment
+function SF.Libraries.BuildEnvironment()
+	local function deepCopy(src, dst, done)
+		if done[src] then return end
+		done[src] = true
+		
+		-- Copy the values
+		for k, v in pairs(src) do
+			if type(v)=="table" then
+				local t = {}
+				deepCopy(v, t, done)
+				dst[k] = t
+			else
+				dst[k] = v
+			end
+		end
+		
+		-- Copy the metatable
+		local meta = debug.getmetatable(src)
+		if meta then
+			local t = {}
+			for k, v in pairs(meta) do
+				t[k]=v
+			end
+			setmetatable(dst, t)
+		end
+		
+		done[src] = nil
 	end
-	return tbl
+	
+	local env = {}
+	deepCopy(SF.DefaultEnvironment, env, {})
+	
+	for k, v in pairs(SF.Libraries.libraries) do
+		local t = {}
+		deepCopy(v, t, {})
+		env[k] = t
+	end
+	return env
 end
 
 --- Registers a library hook. These hooks are only available to SF libraries,

@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @shared
-local props_library, props_library_metamethods = SF.Libraries.Register("prop")
+local props_library = SF.Libraries.Register("prop")
 
 local vunwrap = SF.UnwrapObject
 
@@ -256,7 +256,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 		instance.player:AddCleanup( "props", entity )
 		gamemode.Call( hookcall, instance.player, entity )
 	
-		local wrapped = SF.Entities.Wrap( entity )
+		local wrapped = SF.WrapObject( entity )
 
 		propdata.props[ wrapped ] = wrapped
 

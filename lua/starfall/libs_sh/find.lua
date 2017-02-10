@@ -4,7 +4,7 @@
 
 --- Find library. Finds entities in various shapes.
 -- @shared
-local find_library, _ = SF.Libraries.Register("find")
+local find_library = SF.Libraries.Register("find")
 
 local vunwrap = SF.UnwrapObject
 

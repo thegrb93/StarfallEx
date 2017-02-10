@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @server
-local constraint_library, constraint_library_metamethods = SF.Libraries.Register("constraint")
+local constraint_library = SF.Libraries.Register("constraint")
 
 local vwrap = SF.WrapObject
 local vunwrap = SF.UnwrapObject

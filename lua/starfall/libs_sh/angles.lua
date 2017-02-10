@@ -19,9 +19,15 @@ end
 SF.AddObjectWrapper( debug.getregistry().Angle, ang_metamethods, awrap )
 SF.AddObjectUnwrapper( ang_metamethods, unwrap )
 
-SF.DefaultEnvironment.Angle = function ( p, y, r )
-	return wrap( { p or 0, y or 0, r or 0 } )
-end
+local vwrap
+SF.Libraries.AddHook("postload", function()
+	vwrap = SF.Vectors.Wrap
+	
+	SF.DefaultEnvironment.Angle = function ( p, y, r )
+		p = p or 0
+		return wrap( { p, y or p, r or p } )
+	end
+end)
 
 SF.Angles.Wrap 	= awrap
 SF.Angles.Unwrap = unwrap
@@ -149,19 +155,19 @@ end
 --- Return the Forward Vector ( direction the angle points ).
 -- @return vector normalised.
 function ang_methods:getForward ( )
-	return SF.WrapObject( unwrap( self ):Forward() )
+	return vwrap( unwrap( self ):Forward() )
 end
 
 --- Return the Right Vector relative to the angle dir.
 -- @return vector normalised.
 function ang_methods:getRight ( )
-	return SF.WrapObject( unwrap( self ):Right() )
+	return vwrap( unwrap( self ):Right() )
 end
 
 --- Return the Up Vector relative to the angle dir.
 -- @return vector normalised.
 function ang_methods:getUp ( )
-	return SF.WrapObject( unwrap( self ):Up() )
+	return vwrap( unwrap( self ):Up() )
 end
 
 --- Return Rotated angle around the specified axis.
