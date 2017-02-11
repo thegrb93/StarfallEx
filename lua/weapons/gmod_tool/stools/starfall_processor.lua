@@ -217,22 +217,7 @@ if CLIENT then
 		local lastClick = 0
 		filebrowser.tree.DoClick = function( self, node )
 			if CurTime() <= lastClick + 0.5 then
-				if not SF.Editor.initialized then SF.Editor.init() return end
-				
-				if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
-				local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
-				local code = file.Read( node:GetFileName(), "DATA" )
-
-				for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
-					if v.filename == fileName and v.code == code then
-						SF.Editor.selectTab( v )
-						SF.Editor.open()
-						return
-					end
-				end
-
-				SF.Editor.addTab( fileName, code )
-				SF.Editor.open()
+				SF.Editor.openFile( node:GetFileName() )
 			end
 			lastClick = CurTime()
 		end

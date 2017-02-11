@@ -109,7 +109,25 @@ if CLIENT then
 		SF.Editor.editor:open()
 		RunConsoleCommand( "starfall_event", "editor_open" )
 	end
+	
+	function SF.Editor.openFile( fl )
+		if not fl or string.GetExtensionFromFilename( fl ) ~= "txt" then return end
+		if not SF.Editor.initialized then SF.Editor.init() end
 
+		local fileName = string.gsub( fl, "starfall/", "", 1 )
+		local code = file.Read( fl, "DATA" )
+
+		for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
+			if v.filename == fileName and v.code == code then
+				SF.Editor.selectTab( v )
+				SF.Editor.open()
+				return
+			end
+		end
+		SF.Editor.addTab( fileName, code )
+		SF.Editor.open()
+	end
+	
 	function SF.Editor.close ()
 		SF.Editor.editor:close()
 		RunConsoleCommand( "starfall_event", "editor_close" )

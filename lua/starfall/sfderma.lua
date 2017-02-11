@@ -681,7 +681,7 @@ function PANEL:openMenu ( node )
 	self.menu = vgui.Create( "DMenu", self:GetParent() )
 	if menu == "file" then
 		self.menu:AddOption( "Open", function ()
-			self:OnNodeSelected( node )
+			SF.Editor.openFile( node:GetFileName() )
 		end )
 		self.menu:AddSpacer()
 		self.menu:AddOption( "Rename", function ()
@@ -853,7 +853,8 @@ function PANEL:Init ()
 			end
 			for k, v in pairs( allFiles ) do
 				if string.find( string.lower( v ), string.lower( search ) ) then
-					node:AddNode( v, "icon16/page_white.png" )
+					local fnode = node:AddNode( v, "icon16/page_white.png" )
+					fnode:SetFileName( dir.."/"..v )
 				end
 			end
 		end
@@ -869,6 +870,7 @@ function PANEL:Init ()
 	self.Update:SetText("Update")
 	self.Update.DoClick = function(button)
 		tree:reloadTree()
+		searchBox:SetValue( "Search..." )
 	end
 end
 function PANEL:getComponents ()
