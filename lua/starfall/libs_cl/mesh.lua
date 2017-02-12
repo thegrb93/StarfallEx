@@ -136,7 +136,7 @@ function mesh_library.createFromObj ( obj )
 		vn = function(f) norm[#norm+1]=Vector(tonumber(f()),tonumber(f()),tonumber(f())) end,
 		f = function(f) local i=#face face[i+3]=f() face[i+2]=f() face[i+1]=f() end
 	}
-	local ignore = {["#"]=true,["mtllib"]=true,["usemtl"]=true,["o"]=true,["s"]=true}
+	local ignore = {["#"]=true,["mtllib"]=true,["usemtl"]=true,["o"]=true,["s"]=true,["g"]=true}
 	for line in string.gmatch(obj, "[^\r\n]+") do
 		local components = {}
 		local f = string.gmatch(line, "%S+")
