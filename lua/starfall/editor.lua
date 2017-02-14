@@ -133,10 +133,6 @@ if CLIENT then
 		RunConsoleCommand( "starfall_event", "editor_close" )
 	end
 
-	function SF.Editor.updateCode () -- Incase anyone needs to force update the code
-		SF.Editor.runJS( "console.log(\"RUNLUA:SF.Editor.getActiveTab().code = \\\"\" + addslashes(editor.getValue()) + \"\\\"\")" )
-	end
-
 	function SF.Editor.getCode ()
 		if SF.Editor.getActiveTab() then
 			return SF.Editor.getActiveTab().code
@@ -479,6 +475,9 @@ if CLIENT then
 			SF.Editor.getActiveTab().code = code
 			SF.Editor.doValidation()
 		end)
+		html:AddFunction( "console", "copyClipboard", function( code )
+			timer.Simple(0, function() SetClipboardText( code ) end)
+		end)
 		
 		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 			
@@ -558,7 +557,7 @@ if CLIENT then
 					elseif key == KEY_SPACE and input.IsKeyDown( key ) then
 						SF.Editor.doValidation( true )
 					elseif key == KEY_C and input.IsKeyDown( key ) then
-						self:QueueJavascript( "console.log(\"RUNLUA:SetClipboardText(\\\"\"+ addslashes(editor.getSelectedText()) +\"\\\")\")" )
+						self:QueueJavascript( "console.copyClipboard(editor.getSelectedText())" )
 					end
 				elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
 					if key == KEY_UP and input.IsKeyDown( key ) then
