@@ -91,7 +91,7 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func,...)
-	local traceback
+
 	local function xpcall_callback ( err )
 		if type( err ) == "table" then
 			if type( err.message ) == "string" then
@@ -101,9 +101,7 @@ function SF.Instance:runWithOps(func,...)
 				err = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. err.message
 			end
 		end
-		err = tostring( err )
-		traceback = debug.traceback( err, 2 )
-		return err
+		return {tostring( err ), debug.traceback( err, 2 )}
 	end
 
 	local oldSysTime = SysTime() - self.cpu_total
@@ -111,26 +109,21 @@ function SF.Instance:runWithOps(func,...)
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage()/self.context.cpuTime:getMax()
 		if usedRatio>1 then
-			debug.sethook( nil )
-			SF.throw( "CPU Quota exceeded.", 0, true )
+			SF.throw( "CPU Quota exceeded.", 2, true )
 		elseif usedRatio > self.cpu_softquota then
-			SF.throw( "CPU Quota warning.", 0 )
+			SF.throw( "CPU Quota warning.", 2 )
 		end
 	end
 	
 	local tbl = {xpcall( cpuCheck, xpcall_callback )}
 	if tbl[1] then
-		if self.instanceStack then
-			--This prevents premature debug.sethook( nil )
-			tbl = {xpcall( func, xpcall_callback, ... )}
-		else
-			debug.sethook( cpuCheck, "", 2000 )
-			tbl = {xpcall( func, xpcall_callback, ... )}
-			debug.sethook( nil )
-		end
+		local prevHook = debug.gethook()
+		debug.sethook( cpuCheck, "", 2000 )
+		tbl = {xpcall( func, xpcall_callback, ... )}
+		debug.sethook( prevHook )
 	end
 	
-	return tbl, traceback
+	return tbl
 end
 
 --- Internal function - Do not call. Prepares the script to be executed.
@@ -185,11 +178,11 @@ function SF.Instance:initialize()
 	self:prepare("_initialize")
 	
 	local func = self.scripts[self.mainfile]
-	local tbl, traceback = self:runWithOps(func)
+	local tbl = self:runWithOps(func)
 	if not tbl[1] then
-		self:cleanup("_initialize", true, traceback)
+		self:cleanup("_initialize", true, tbl[2][2])
 		self.error = true
-		return false, tbl[2], traceback
+		return false, unpack(tbl[2])
 	end
 	
 	SF.allInstances[self] = self
@@ -206,12 +199,12 @@ end
 function SF.Instance:runScriptHook(hook, ...)
 	if not self.hooks[hook] then return {} end
 	if self:prepare(hook) then return {} end
-	local tbl, traceback
+	local tbl
 	for name, func in pairs(self.hooks[hook]) do
-		tbl, traceback = self:runWithOps(func,...)
+		tbl = self:runWithOps(func,...)
 		if not tbl[1] then
-			self:cleanup(hook,true,traceback)
-			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[ 2 ], traceback )
+			self:cleanup(hook,true,tbl[2][2])
+			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[2][1], tbl[2][2] )
 			return tbl
 		end
 	end
@@ -228,16 +221,16 @@ end
 function SF.Instance:runScriptHookForResult(hook,...)
 	if not self.hooks[hook] then return {} end
 	if self:prepare(hook) then return {} end
-	local tbl, traceback
+	local tbl
 	for name, func in pairs(self.hooks[hook]) do
-		tbl, traceback = self:runWithOps(func,...)
+		tbl = self:runWithOps(func,...)
 		if tbl[1] then
 			if tbl[2]~=nil then
 				break
 			end
 		else
-			self:cleanup(hook,true,traceback)
-			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[ 2 ], traceback )
+			self:cleanup(hook,true,tbl[2][2])
+			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[2][1], tbl[2][2] )
 			return tbl
 		end
 	end
@@ -260,12 +253,12 @@ end
 function SF.Instance:runFunction(func,...)
 	if self:prepare("_runFunction") then return true end
 	
-	local tbl, traceback = self:runWithOps(func,...)
+	local tbl = self:runWithOps(func,...)
 	if tbl[1] then
 		self:cleanup("_runFunction",false)
 	else
-		self:cleanup("_runFunction",true,traceback)
-		self:Error( "Callback errored with " .. tbl[ 2 ], traceback )
+		self:cleanup("_runFunction",true,tbl[2][2])
+		self:Error( "Callback errored with " .. tbl[2][1], tbl[2][2] )
 	end
 	
 	return tbl
