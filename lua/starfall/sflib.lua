@@ -37,6 +37,7 @@ end
 
 
 local dgetmeta = debug.getmetatable
+local dsetmeta = debug.setmetatable
 
 --- Throws an error like the throw function in builtins
 -- @param msg Message
@@ -161,24 +162,24 @@ local sf2sensitive_tables = {}
 --		function.
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta)
-	local s2sfmode = ""
-	local sf2smode = ""
-	
-	if weakwrapper == nil or weakwrapper then
-		sf2smode = "k"
-		s2sfmode = "v"
-	end
-	if weaksensitive then
-		sf2smode = sf2smode.."v"
-		s2sfmode = s2sfmode.."k"
-	end 
+function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta) 
 
 	local sensitive2sf, sf2sensitive
 	if shared_meta then
 		sensitive2sf = sensitive2sf_tables[ shared_meta ]
 		sf2sensitive = sf2sensitive_tables[ shared_meta ]
 	else
+		local s2sfmode = ""
+		local sf2smode = ""
+		if weakwrapper == nil or weakwrapper then
+			sf2smode = "k"
+			s2sfmode = "v"
+		end
+		if weaksensitive then
+			sf2smode = sf2smode.."v"
+			s2sfmode = s2sfmode.."k"
+		end
+
 		sensitive2sf = setmetatable({},{__mode=s2sfmode})
 		sf2sensitive = setmetatable({},{__mode=sf2smode})
 		sensitive2sf_tables[ metatable ] = sensitive2sf
@@ -187,11 +188,16 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 	
 	local function wrap(value)
 		if value == nil then return nil end
-		if sensitive2sf[value] then return sensitive2sf[value] end
-		local tbl = setmetatable({},metatable)
-		sensitive2sf[value] = tbl
-		sf2sensitive[tbl] = value
-		return tbl
+		local tbl = sensitive2sf[value]
+		if tbl then
+			dsetmeta(tbl,metatable)
+			return tbl
+		else
+			tbl = setmetatable({},metatable)
+			sensitive2sf[value] = tbl
+			sf2sensitive[tbl] = value
+			return tbl
+		end
 	end
 	
 	local function unwrap(value)
