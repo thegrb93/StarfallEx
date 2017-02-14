@@ -187,11 +187,15 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 	
 	local function wrap(value)
 		if value == nil then return nil end
-		if sensitive2sf[value] then return sensitive2sf[value] end
-		local tbl = setmetatable({},metatable)
-		sensitive2sf[value] = tbl
-		sf2sensitive[tbl] = value
-		return tbl
+		local tbl = sensitive2sf[value]
+		if tbl then
+			return setmetatable(tbl,metatable)
+		else
+			tbl = setmetatable({},metatable)
+			sensitive2sf[value] = tbl
+			sf2sensitive[tbl] = value
+			return tbl
+		end
 	end
 	
 	local function unwrap(value)
