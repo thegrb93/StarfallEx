@@ -17,8 +17,8 @@ SF.Sounds.Metatable = sound_metamethods
 -- Register Privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "sound.create", "Sound", "Allows the user to create sounds", {"Client"} )
-	P.registerPrivilege( "sound.modify", "Sound", "Allows the user to modify created sounds", {"Client"} )
+	P.registerPrivilege( "sound.create", "Sound", "Allows the user to create sounds", {["Client"] = {}} )
+	P.registerPrivilege( "sound.modify", "Sound", "Allows the user to modify created sounds", {["Client"] = {}} )
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised

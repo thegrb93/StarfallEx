@@ -3,8 +3,8 @@ SF.Bass = {}
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", {"Client"} )
-	P.registerPrivilege( "bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", {"Client"} )
+	P.registerPrivilege( "bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", {["Client"] = {}} )
+	P.registerPrivilege( "bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", {["Client"] = {}} )
 end
 
 --- Bass type

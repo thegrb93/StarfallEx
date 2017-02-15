@@ -28,15 +28,15 @@ end
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "constraints.weld", "Weld", "Allows the user to weld two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.axis", "Axis", "Allows the user to axis two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.slider", "Slider", "Allows the user to slider two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.rope", "Rope", "Allows the user to rope two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.elastic", "Elastic", "Allows the user to elastic two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { "CanTool" } )
-	P.registerPrivilege( "constraints.any", "Any", "General constraint functions", { "CanTool" } )
+	P.registerPrivilege( "constraints.weld", "Weld", "Allows the user to weld two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.axis", "Axis", "Allows the user to axis two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.slider", "Slider", "Allows the user to slider two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.rope", "Rope", "Allows the user to rope two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.elastic", "Elastic", "Allows the user to elastic two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { ["CanTool"] = {} } )
+	P.registerPrivilege( "constraints.any", "Any", "General constraint functions", { ["CanTool"] = {} } )
 end
 
 --- Welds two entities

@@ -28,7 +28,7 @@ end)
 
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "npcs.modify", "Modify", "Allows the user to modify npcs", { "CanTool" } )
+	P.registerPrivilege( "npcs.modify", "Modify", "Allows the user to modify npcs", { ["CanTool"] = {} } )
 end
 
 -- ------------------------------------------------------------------------- --

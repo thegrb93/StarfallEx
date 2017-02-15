@@ -9,9 +9,9 @@ local file_library = SF.Libraries.Register( "file" )
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", {"Client"} )
-	P.registerPrivilege( "file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", {"Client"} )
-	P.registerPrivilege( "file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", {"Client"} )
+	P.registerPrivilege( "file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", {["Client"] = {default = 1}} )
+	P.registerPrivilege( "file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", {["Client"] = {default = 1}} )
+	P.registerPrivilege( "file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", {["Client"] = {default = 1}} )
 end
 
 file.CreateDir( "sf_filedata/" )

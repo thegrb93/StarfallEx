@@ -37,7 +37,7 @@ if SERVER then return end
 --- @client
 local input_methods = SF.Libraries.Register( "input" )
 
-SF.Permissions.registerPrivilege( "input", "Input", "Allows the user to see what buttons you're pressing.", {"Client"} )
+SF.Permissions.registerPrivilege( "input", "Input", "Allows the user to see what buttons you're pressing.", {["Client"] = {}} )
 
 ---- Gets the first key that is bound to the command passed
 --- @param binding The name of the bind

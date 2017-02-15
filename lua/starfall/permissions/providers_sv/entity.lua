@@ -13,19 +13,19 @@ local canPhysgun = {}
 function P.registered ( id, name, description, arg )
 	if not arg then return end
 	
-	local addSetting = false
-	if table.HasValue( arg, "CanPhysgun" ) then
+	local addSetting
+	if arg.CanPhysgun then
 		canPhysgun[ id ] = true
-		addSetting = true
-	elseif table.HasValue( arg, "CanTool" ) then
+		addSetting = arg.CanPhysgun
+	elseif arg.CanTool then
 		canTool[ id ] = true
-		addSetting = true
+		addSetting = arg.CanTool
 	end
 	
 	if addSetting then
 		P.settingsdesc[ id ] = { name, description }
 		if not P.settings[ id ] then
-			P.settings[ id ] = 2
+			P.settings[ id ] = addSetting.default or 2
 		end
 	end
 end

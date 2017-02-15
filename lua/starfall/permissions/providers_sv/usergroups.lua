@@ -1,4 +1,4 @@
---- Provides permissions for entities based on CPPI if present
+--- Provides permissions for usergroups
 
 local P = {}
 P.id = "usergroups"

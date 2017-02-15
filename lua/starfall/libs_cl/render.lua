@@ -82,8 +82,8 @@ SF.Libraries.AddHook("postload", function()
 	eunwrap = SF.Entities.Unwrap
 end)
 
-SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {"Client"} )
-SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {"Client"} )
+SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {["Client"] = {}} )
+SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {["Client"] = {}} )
 
 local cv_max_rendertargets = CreateConVar( "sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE } )
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE } )

@@ -1,4 +1,4 @@
---- Provides permissions for entities based on CPPI if present
+--- Provides permissions for clients
 
 local P = {}
 P.id = "client"
@@ -9,10 +9,10 @@ P.settingsoptions = {"Only You", "Friends Only", "Anyone", "No one"}
 
 function P.registered ( id, name, description, arg )
 
-	if arg and table.HasValue( arg, "Client" ) then
+	if arg and arg.Client then
 		P.settingsdesc[ id ] = { name, description }
 		if not P.settings[ id ] then
-			P.settings[ id ] = 3
+			P.settings[ id ] = arg.Client.default or 3
 		end
 	end
 

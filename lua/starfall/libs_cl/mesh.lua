@@ -1,7 +1,7 @@
 SF.Mesh = {}
 
 -- Register privileges
-SF.Permissions.registerPrivilege( "mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", {"Client"} )
+SF.Permissions.registerPrivilege( "mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", {["Client"] = {}} )
 
 local maxtriangles = CreateClientConVar("sf_mesh_maxtriangles", "50000", true, "How many triangles total can be used for meshes")
 
