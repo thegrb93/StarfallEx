@@ -932,4 +932,3 @@ function ents_methods:removeTrails()
 
 	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
 end
-

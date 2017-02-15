@@ -402,6 +402,10 @@ function wire_library.getWirelink ( ent )
 	return wlwrap(ent)
 end
 
+--- Returns an entities wirelink
+-- @return Wirelink of the entity
+SF.Entities.Methods.getWirelink = wire_library.getWirelink
+
 -- ------------------------- Wirelink ------------------------- --
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
