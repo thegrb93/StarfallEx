@@ -355,6 +355,7 @@ function ents_methods:addCollisionListener ( func )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( func, "function" )
 	local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.canTool" )
 	if ent.SF_CollisionCallback then SF.throw( "The entity is already listening to collisions!", 2 ) end
 	ent.SF_CollisionCallback = true
@@ -375,6 +376,7 @@ end
 function ents_methods:setNocollideAll ( nocollide )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" )
 	
 	ent:SetCollisionGroup ( nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE )
@@ -630,6 +632,7 @@ function ents_methods:setPos ( vec )
 	local vec = vunwrap( vec )
 	local ent = unwrap( self )
 
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.setPos" )
 
 	SF.setPos( ent, vec )
@@ -644,6 +647,7 @@ function ents_methods:setAngles ( ang )
 
 	local ent = unwrap( self )
 
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.setAngles" )
 
 	SF.setAng( ent, ang )
@@ -699,15 +703,14 @@ function ents_methods:ignite( length, radius )
 	SF.CheckType( length, "number" )
 
 	local ent = unwrap( self )
+	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.ignite" )
 
 	if radius then
 		SF.CheckType( radius, "number" )
 		local obbmins, obbmaxs = ent:OBBMins(), ent:OBBMaxs()
 		radius = math.Clamp( radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2 )
 	end
-
-	if not isValid( ent ) or ent:IsPlayer() then SF.throw( "Entity is not valid", 2 ) end
-	SF.Permissions.check( SF.instance.player, ent, "entities.ignite" )
 
 	ent:Ignite( length, radius )
 end
@@ -744,7 +747,8 @@ function ents_methods:isFrozen ()
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( self )
-	local phys = ent:GetPhysicsObject()
+	local phys = getPhysObject( ent )
+	if not phys then SF.throw( "Entity has no physics object or is not valid", 2 ) end
 	if phys:IsMoveable() then return false else return true end
 end
 
@@ -755,6 +759,7 @@ function ents_methods:setSolid ( solid )
 	SF.CheckType( self, ents_metatable )
 	local ent = unwrap( self )
 
+	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.setSolid" )
 
 	ent:SetNotSolid( not solid )
