@@ -670,12 +670,18 @@ function SF.DefaultEnvironment.error ( msg )
 	error( msg or "an unspecified error occured", 2 )
 end
 
+
+SF.Permissions.registerPrivilege( "console.command", "Console command", "Allows the starfall to run console commands", {Client = {default = 4}} )
 --- Execute a console command
 -- @param cmd Command to execute
 function SF.DefaultEnvironment.concmd ( cmd )
-	if CLIENT and SF.instance.player ~= LocalPlayer() then return end -- only execute on owner of screen
 	SF.CheckType( cmd, "string" )
-	SF.instance.player:ConCommand( cmd )
+	SF.Permissions.check( SF.instance.player, nil, "console.command" )
+	if CLIENT then
+		LocalPlayer():ConCommand( cmd )
+	else
+		SF.instance.player:ConCommand( cmd )
+	end
 end
 
 --- Returns if the table has an isValid function and isValid returns true.
