@@ -275,6 +275,27 @@ math_methods.truncate=math.Truncate
 function math_methods.bSplinePoint( tDiff, tPoints, tMax )
 	return SF.WrapObject( math.BSplinePoint( tDiff, SF.Unsanitize( tPoints ), tMax ) )
 end
+function math_methods.lerp( percent, from, to )
+	SF.CheckType( percent, "number" )
+	SF.CheckType( from, "number" )
+	SF.CheckType( to, "number" )
+	
+	return Lerp( percent, from, to )
+end
+function math_methods.lerpAngle( percent, from, to )
+	SF.CheckType( percent, "number" )
+	SF.CheckType( from, SF.Types[ "Angle" ] )
+	SF.CheckType( to, SF.Types[ "Angle" ] )
+	
+	return SF.WrapObject( LerpAngle( percent, SF.UnwrapObject( from ), SF.UnwrapObject( to ) ) )
+end
+function math_methods.lerpVector( percent, from, to )
+	SF.CheckType( percent, "number" )
+	SF.CheckType( from, SF.Types[ "Vector" ] )
+	SF.CheckType( to, SF.Types[ "Vector" ] )
+	
+	return SF.WrapObject( LerpVector( percent, SF.UnwrapObject( from ), SF.UnwrapObject( to ) ) )
+end
 --- The math library. http://wiki.garrysmod.com/page/Category:math
 -- @name SF.DefaultEnvironment.math
 -- @class table
