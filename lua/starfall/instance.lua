@@ -117,10 +117,10 @@ function SF.Instance:runWithOps(func,...)
 	
 	local tbl = {xpcall( cpuCheck, xpcall_callback )}
 	if tbl[1] then
-		local prevHook = debug.gethook()
+		local prevHook, mask, count = debug.gethook()
 		debug.sethook( cpuCheck, "", 2000 )
 		tbl = {xpcall( func, xpcall_callback, ... )}
-		debug.sethook( prevHook )
+		debug.sethook( prevHook, mask, count )
 	end
 	
 	return tbl
