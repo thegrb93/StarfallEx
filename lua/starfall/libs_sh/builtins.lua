@@ -646,7 +646,7 @@ end
 function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	local TfuncOrStackLevel = type(funcOrStackLevel)
 	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
-	SF.CheckType(fields, "string")
+	if fields then SF.CheckType(fields, "string") end
 	
 	local ret = debug.getinfo( funcOrStackLevel, fields )
 	ret.func = nil
