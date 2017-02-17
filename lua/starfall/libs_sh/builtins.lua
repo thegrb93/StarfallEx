@@ -645,7 +645,16 @@ function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	ret.func = nil
 	return ret
 end
-		
+
+--- CRC checksum
+-- Generates the CRC checksum of the specified string (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
+-- @param stringToHash The string to calculate the checksum of
+-- @return The unsigned 32 bit checksum as a string
+function SF.DefaultEnvironment.crc ( stringToHash )
+	SF.CheckType( stringToHash, "string" )
+	return util.CRC( stringToHash )
+end
+
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
