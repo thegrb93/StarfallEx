@@ -649,8 +649,10 @@ function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	if fields then SF.CheckType(fields, "string") end
 	
 	local ret = debug.getinfo( funcOrStackLevel, fields )
-	ret.func = nil
-	return ret
+	if ret then
+		ret.func = nil
+		return ret
+	end
 end
 
 --- Try to execute a function and catch possible exceptions
