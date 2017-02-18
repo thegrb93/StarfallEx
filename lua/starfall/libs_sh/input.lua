@@ -103,27 +103,23 @@ function input_methods.getCursorPos( )
 	return input.GetCursorPos( )
 end
 
-local cursor = {}
 ---- Sets the state of the mouse cursor
 --- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor( enabled )
 	SF.CheckType( enabled, "boolean" )
 	SF.Permissions.check( SF.instance.player, nil, "input" )
 		
-	if not SF.instance:isHUDConnected() then
+	if not SF.instance:isHUDActive() then
 		SF.throw( "No HUD component connected", 2 )
-		return
 	end
 	
-	cursor[ SF.instance ] = enabled
 	gui.EnableScreenClicker( enabled )
 end
 
-hook.Add( "starfall_hud_disconnect", "starfall_disable_cursor", function( inst )
-	if cursor[ inst ] then
+SF.Libraries.AddHook( "starfall_hud_disconnected", function( inst )
+	if not inst:isHUDActive() then
 		gui.EnableScreenClicker( false )
 	end
-	cursor[ inst ] = nil
 end )
 
 function CheckButtonPerms(instance, ply, button)

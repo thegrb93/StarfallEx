@@ -21,9 +21,10 @@ function ENT:Draw ()
 end
 
 function ENT:DrawHUD( hookname, ... )
-	if not self.link or not self.link.instance then return end
-	
+	if not IsValid(self.link) then return end
 	local instance = self.link.instance
+	if not instance then return end
+	
 	local data = instance.data
 	
 	render.PushFilterMag( TEXFILTER.ANISOTROPIC )
@@ -43,12 +44,14 @@ end
 
 
 function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
-	if IsValid( self.link ) then
-		local tbl = self.link:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
-		local ok, rt = tbl[1], tbl[2] 
-		if ok and type(rt) == "table" then
-			return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
-		end
+	if not IsValid(self.link) then return end
+	local instance = self.link.instance
+	if not instance then return end
+
+	local tbl = instance:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
+	local ok, rt = tbl[1], tbl[2] 
+	if ok and type(rt) == "table" then
+		return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
 	end
 end
 
@@ -56,7 +59,7 @@ function ENT:GetResolution()
 	return ScrW(), ScrH()
 end
 
-SF.ConnectedHuds = {}
+SF.ActiveHuds = {}
 local hook_pref = "starfall_hud_hook_"
 local ConnectHUD, DisconnectHUD
 
@@ -74,8 +77,13 @@ function ConnectHUD( ent )
 	else
 		LocalPlayer():ChatPrint("Starfall HUD Connected.")
 	end
-	SF.ConnectedHuds[ent] = true
-	hook.Run( "starfall_hud_connect", ent.link.instance )
+	SF.ActiveHuds[ent] = true
+	
+	if not IsValid(ent.link) then return end
+	local instance = ent.link.instance
+	if not instance then return end
+	instance:runScriptHook( "hudconnected", SF.Entities.Wrap( ent ) )
+	SF.Libraries.CallHook( "starfall_hud_connected", instance, ent )
 end
 
 function DisconnectHUD( ent )
@@ -85,15 +93,20 @@ function DisconnectHUD( ent )
 	hook.Remove("PostDrawOpaqueRenderables", hookname)
 	hook.Remove("CalcView", hookname)
 	LocalPlayer():ChatPrint("Starfall HUD Disconnected.")
-	SF.ConnectedHuds[ent] = nil
-	hook.Run( "starfall_hud_disconnect", ent.link.instance )
+	SF.ActiveHuds[ent] = nil
+	
+	if not IsValid(ent.link) then return end
+	local instance = ent.link.instance
+	if not instance then return end
+	instance:runScriptHook( "huddisconnected", SF.Entities.Wrap( ent ) )
+	SF.Libraries.CallHook( "starfall_hud_disconnected", instance, ent )
 end
 
 net.Receive( "starfall_hud_set_enabled" , function()
 	local ent = net.ReadEntity()
 	local enable = net.ReadInt(8)
 	if IsValid(ent) then		
-		if SF.ConnectedHuds[ent] then
+		if SF.ActiveHuds[ent] then
 			if ( enable == -1 or enable == 0 ) then
 				DisconnectHUD(ent)
 			end
@@ -106,7 +119,7 @@ net.Receive( "starfall_hud_set_enabled" , function()
 end)
 
 concommand.Add("sf_hud_unlink",function()
-	for ent, _ in pairs(SF.ConnectedHuds) do
+	for ent, _ in pairs(SF.ActiveHuds) do
 		DisconnectHUD(ent) --Should be valid or something horrible has happened.
 	end
 	LocalPlayer():ChatPrint("Disconnected from all Starfall HUDs.")

@@ -17,21 +17,27 @@ SF.Libraries.AddHook( "initialize", function(instance)
 	end
 
 	function ent:TriggerInput ( key, value )
-		self:runScriptHook( "input", key, SF.Wire.InputConverters[ self.Inputs[ key ].Type ]( value ) )
+		if self.instance then
+			self.instance:runScriptHook( "input", key, SF.Wire.InputConverters[ self.Inputs[ key ].Type ]( value ) )
+		end
 	end
 
 	function ent:ReadCell ( address )
-		local tbl = self:runScriptHookForResult( "readcell", address )
-		if tbl[1] then
-			return tonumber( tbl[2] ) or 0
+		if self.instance then
+			local tbl = self.instance:runScriptHookForResult( "readcell", address )
+			if tbl[1] then
+				return tonumber( tbl[2] ) or 0
+			end
 		end
 		return 0
 	end
 
 	function ent:WriteCell ( address, data )
-		local tbl = self:runScriptHookForResult( "writecell", address, data )
-		if tbl[1] then
-			return tbl[2]==nil or tbl[2]==true
+		if self.instance then
+			local tbl = self.instance:runScriptHookForResult( "writecell", address, data )
+			if tbl[1] then
+				return tbl[2]==nil or tbl[2]==true
+			end
 		end
 		return false
 	end
