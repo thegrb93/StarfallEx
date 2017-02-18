@@ -108,10 +108,18 @@ function SF.Instance:runWithOps(func,...)
 	local function cpuCheck ()
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage()/self.context.cpuTime:getMax()
+		
+		local function safeThrow( msg, nocatch )
+			local source = debug.getinfo(3, "S").short_src
+			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
+				SF.throw( msg, 3, nocatch )
+			end
+		end
+		
 		if usedRatio>1 then
-			SF.throw( "CPU Quota exceeded.", 2, true )
+			safeThrow( "CPU Quota exceeded.", true )
 		elseif usedRatio > self.cpu_softquota then
-			SF.throw( "CPU Quota warning.", 2 )
+			safeThrow( "CPU Quota warning." )
 		end
 	end
 	
@@ -121,7 +129,8 @@ function SF.Instance:runWithOps(func,...)
 	debug.sethook( prevHook, mask, count )
 	
 	if tbl[1] then
-		local tbl2 = {xpcall( cpuCheck, xpcall_callback )}
+		-- Need to put the cpuCheck in a lambda so the debug.getinfo doesn't land inside of xpcall
+		local tbl2 = {xpcall( function() cpuCheck() end, xpcall_callback )}
 		if not tbl2[1] then return tbl2 end
 	end
 	
