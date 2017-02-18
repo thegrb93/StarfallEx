@@ -109,29 +109,21 @@ local cursor = {}
 function input_methods.enableCursor( enabled )
 	SF.CheckType( enabled, "boolean" )
 	SF.Permissions.check( SF.instance.player, nil, "input" )
-	
-	local foundlink
-	for hud, _ in pairs( SF.ConnectedHuds ) do
-		if hud.link == SF.instance.data.entity then
-			foundlink = hud
-			break
-		end
-	end
-	
-	if not foundlink then
+		
+	if not SF.instance:isHUDConnected() then
 		SF.throw( "No HUD component connected", 2 )
 		return
 	end
 	
-	cursor[ foundlink ] = enabled
+	cursor[ SF.instance ] = enabled
 	gui.EnableScreenClicker( enabled )
 end
 
-hook.Add( "starfall_hud_disconnect", "starfall_disable_cursor", function( hud )
-	if cursor[ hud ] then
+hook.Add( "starfall_hud_disconnect", "starfall_disable_cursor", function( inst )
+	if cursor[ inst ] then
 		gui.EnableScreenClicker( false )
 	end
-	cursor[ hud ] = nil
+	cursor[ inst ] = nil
 end )
 
 function CheckButtonPerms(instance, ply, button)

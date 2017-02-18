@@ -273,6 +273,20 @@ function SF.Instance:deinitialize()
 	self.error = true
 end
 
+if CLIENT then
+--- Check if a HUD Component is connected to the SF instance
+-- @return true if a HUD Component is connected
+	function SF.Instance:isHUDConnected()
+		local foundlink
+		for hud, _ in pairs( SF.ConnectedHuds ) do
+			if hud.link == self.data.entity then
+				return true
+			end
+		end
+		return false
+	end
+end
+
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
 function SF.Instance:Error(msg,traceback)
 	

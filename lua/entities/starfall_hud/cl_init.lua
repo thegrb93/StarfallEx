@@ -75,7 +75,7 @@ function ConnectHUD( ent )
 		LocalPlayer():ChatPrint("Starfall HUD Connected.")
 	end
 	SF.ConnectedHuds[ent] = true
-	hook.Run( "starfall_hud_connect", ent )
+	hook.Run( "starfall_hud_connect", ent.link.instance )
 end
 
 function DisconnectHUD( ent )
@@ -86,7 +86,7 @@ function DisconnectHUD( ent )
 	hook.Remove("CalcView", hookname)
 	LocalPlayer():ChatPrint("Starfall HUD Disconnected.")
 	SF.ConnectedHuds[ent] = nil
-	hook.Run( "starfall_hud_disconnect", ent )
+	hook.Run( "starfall_hud_disconnect", ent.link.instance )
 end
 
 net.Receive( "starfall_hud_set_enabled" , function()
