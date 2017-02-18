@@ -116,6 +116,13 @@ SF.DefaultEnvironment.getmetatable = function(tbl)
 	return getmetatable(tbl)
 end
 
+--- Generates the CRC checksum of the specified string. (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
+-- @name SF.DefaultEnvironment.crc
+-- @class function
+-- @param stringToHash The string to calculate the checksum of
+-- @return The unsigned 32 bit checksum as a string
+SF.DefaultEnvironment.crc = util.CRC
+
 --- Constant that denotes whether the code is executed on the client
 -- @name SF.DefaultEnvironment.CLIENT
 -- @class field
@@ -639,13 +646,15 @@ end
 function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	local TfuncOrStackLevel = type(funcOrStackLevel)
 	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
-	SF.CheckType(fields, "string")
+	if fields then SF.CheckType(fields, "string") end
 	
 	local ret = debug.getinfo( funcOrStackLevel, fields )
-	ret.func = nil
-	return ret
+	if ret then
+		ret.func = nil
+		return ret
+	end
 end
-		
+
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
