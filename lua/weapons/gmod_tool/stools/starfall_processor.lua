@@ -62,13 +62,23 @@ function TOOL:LeftClick( trace )
 
 	local ent = trace.Entity
 	local sf
+	
+	local function doWeld()
+		if sf==ent then return end
+		local phys = sf:GetPhysicsObject()
+		if ent:IsValid() then
+			local const = constraint.Weld( sf, ent, 0, trace.PhysicsBone, 0, true, true )
+			if phys:IsValid() then phys:EnableCollisions( false ) sf.nocollide = true end
+			return const
+		else
+			if phys:IsValid() then phys:EnableMotion( false ) end
+		end
+	end
+	
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 		sf.owner = ply
 	else
-	
-		--self:SetStage(0)
-
 		local model = self:GetClientInfo( "Model" )
 		if not (util.IsValidModel( model ) and util.IsValidProp( model )) then return false end
 		if not self:GetSWEP():CheckLimit( "starfall_processor" ) then return false end
@@ -80,22 +90,13 @@ function TOOL:LeftClick( trace )
 
 		local min = sf:OBBMins()
 		sf:SetPos( trace.HitPos - trace.HitNormal * min.z )
-
-		local const
-		local phys = sf:GetPhysicsObject()
-		if ent:IsValid() then
-			local const = constraint.Weld( sf, ent, 0, trace.PhysicsBone, 0, true, true )
-			if phys:IsValid() then phys:EnableCollisions( false ) sf.nocollide = true end
-		else
-			if phys:IsValid() then phys:EnableMotion( false ) end
-		end
+		local const = doWeld()
 
 		undo.Create( "Starfall Processor" )
 			undo.AddEntity( sf )
 			undo.AddEntity( const )
 			undo.SetPlayer( ply )
 		undo.Finish()
-
 	end
 	
 	if not SF.RequestCode(ply, function(mainfile, files)
@@ -105,8 +106,11 @@ function TOOL:LeftClick( trace )
 		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
 			local model = sf.instance.ppdata.models[ sf.instance.mainfile ]
 			if util.IsValidModel( model ) and util.IsValidProp( model ) then
+				constraint.RemoveAll(sf)
+				sf:PhysicsDestroy()
 				sf:SetModel( tostring( sf.instance.ppdata.models[ sf.instance.mainfile ] ) )
 				sf:PhysicsInit( SOLID_VPHYSICS )
+				timer.Simple(0, doWeld) -- Need timer or weld wont work
 			end
 		end
 	end) then
