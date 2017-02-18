@@ -232,13 +232,13 @@ if SERVER then
 	add( "PlayerSwitchFlashlight" )
 	add( "PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse  )
 
-	add("EntityTakeDamage", function( target, dmg )
-		return true, dmg:GetAttacker(),
+	add("EntityTakeDamage", nil, function( instance, target, dmg )
+		return true, {target, dmg:GetAttacker(),
 			dmg:GetInflictor(),
 			dmg:GetDamage(),
 			dmg:GetDamageType(),
 			dmg:GetDamagePosition(),
-			dmg:GetDamageForce()
+			dmg:GetDamageForce()}
 	end)
 
 else
@@ -260,7 +260,12 @@ add( "PhysgunDrop" )
 add( "PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse )
 
 -- Entity hooks
-add( "OnEntityCreated" )
+add( "OnEntityCreated", nil, function(instance, ent)
+	timer.Simple(0, function()
+		instance:runFunction( hook_library.run, "onentitycreated", SF.WrapObject(ent) )
+	end)
+	return false
+end)
 add( "EntityRemoved" )
 add( "PropBreak" )
 
