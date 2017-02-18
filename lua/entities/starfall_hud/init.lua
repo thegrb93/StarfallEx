@@ -20,13 +20,32 @@ function ENT:SetHudEnabled( ply, mode )
 		net.WriteInt( mode, 8 )
 	net.Send( ply )
 	
-	if mode == 1 then
+	local function connect()
+		if IsValid(self.link) then
+			local instance = self.link.instance
+			if instance then
+				instance:runScriptHook( "hudconnected", SF.Entities.Wrap( self ) )
+			end
+		end
 		ply.sfhudenabled = self
-	elseif mode == -1 then
-		if ply.sfhudenabled then ply.sfhudenabled = nil
-		else ply.sfhudenabled = self end
-	else
+	end
+	
+	local function disconnect()
+		if IsValid(self.link) then
+			local instance = self.link.instance
+			if instance then
+				instance:runScriptHook( "huddisconnected", SF.Entities.Wrap( self ) )
+			end
+		end
 		ply.sfhudenabled = nil
+	end
+	
+	if mode == 1 then
+		connect()
+	elseif mode == -1 then
+		if ply.sfhudenabled then disconnect() else connect() end
+	else
+		disconnect()
 	end
 	if not ply.sfhudenabled then
 		ply:SetViewEntity()

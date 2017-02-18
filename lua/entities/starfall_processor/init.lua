@@ -82,7 +82,7 @@ end)
 
 function ENT:Compile(files, mainfile)
 	if self.instance then
-		self:runScriptHook( "removed" )
+		self.instance:runScriptHook( "removed" )
 		self.instance:deinitialize()
 		self.instance = nil
 	end
@@ -126,7 +126,7 @@ function ENT:Compile(files, mainfile)
 		end
 	end
 	
-	self:runScriptHook( "initialize" )
+	self.instance:runScriptHook( "initialize" )
 	self:SetNWInt( "State", self.States.Normal )
 end
 
@@ -143,7 +143,7 @@ function ENT:Think ()
 		self:SetNWFloat( "CPUpercent", math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 ) )
 		self.instance.cpu_total = 0
 		self.instance.cpu_average = bufferAvg
-		self:runScriptHook( "think" )
+		self.instance:runScriptHook( "think" )
 	end
 
 	self:NextThink( CurTime() )
@@ -186,8 +186,8 @@ end
 
 local function dupefinished( TimedPasteData, TimedPasteDataCurrent )
 	for k,v in pairs( TimedPasteData[TimedPasteDataCurrent].CreatedEntities ) do
-		if IsValid(v) and v:GetClass() == "starfall_processor" then
-			v:runScriptHook( "initialize" )
+		if IsValid(v) and v:GetClass() == "starfall_processor" and v.instance then
+			v.instance:runScriptHook( "initialize" )
 		end
 	end
 end

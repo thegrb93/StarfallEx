@@ -16,20 +16,6 @@ ENT.States = {
 	None = 3,
 }
 
-function ENT:runScriptHook ( hook, ... )
-	if self.instance then
-		return self.instance:runScriptHook( hook, ... )
-	end
-	return {}
-end
-
-function ENT:runScriptHookForResult ( hook, ... )
-	if self.instance then
-		return self.instance:runScriptHookForResult( hook, ... )
-	end
-	return {}
-end
-
 function ENT:Error ( msg, traceback )
 	if type( msg ) == "table" then
 		self.error = table.Copy( msg )
@@ -71,7 +57,7 @@ end
 function ENT:OnRemove ()
 	if not self.instance then return end
 	
-	self:runScriptHook( "removed" )
+	self.instance:runScriptHook( "removed" )
 	self.instance:deinitialize()
 	self.instance = nil
 end

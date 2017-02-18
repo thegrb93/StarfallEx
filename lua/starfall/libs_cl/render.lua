@@ -11,21 +11,11 @@
 -- @name hudconnect
 -- @class hook
 -- @client
-hook.Add( "starfall_hud_connect", "hudconnect", function( instance )
-	if instance then
-		instance:runScriptHook( "hudconnect" )
-	end
-end )
 
 --- Called when the player disconnects from a HUD component linked to the Starfall Chip
 -- @name huddisconnect
 -- @class hook
 -- @client
-hook.Add( "starfall_hud_disconnect", "huddisconnect", function( instance )
-	if instance then
-		instance:runScriptHook( "huddisconnect" )
-	end
-end )
 
 --- Called before opaque entities are drawn. (Only works with HUD)
 -- @name predrawopaquerenderables
@@ -1236,8 +1226,8 @@ function render_library.traceSurfaceColor( vec1, vec2 )
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
-function render_library.isHUDConnected()
-	return SF.instance:isHUDConnected()
+function render_library.isHUDActive()
+	return SF.instance:isHUDActive()
 end
 
 --- Called when a player uses the screen

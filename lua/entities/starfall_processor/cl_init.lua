@@ -60,7 +60,7 @@ function ENT:Think ()
 		self.CPUpercent = math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 )
 		self.instance.cpu_total = 0
 		self.instance.cpu_average = bufferAvg
-		self:runScriptHook( "think" )
+		self.instance:runScriptHook( "think" )
 	end
 
 	self:NextThink( CurTime() )
@@ -70,7 +70,7 @@ end
 function ENT:CodeSent ( files, main, owner )
 	if not files or not main or not owner then return end
 	if self.instance then
-		self:runScriptHook( "removed" )
+		self.instance:runScriptHook( "removed" )
 		self.instance:deinitialize()
 		self.instance = nil
 	end

@@ -22,7 +22,9 @@ function ENT:Use( activator )
 		net.Broadcast()
 	end
 	
-	self.link:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
+	if self.link.instance then
+		self.link.instance:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
+	end
 end
 
 function ENT:LinkEnt ( ent, ply )

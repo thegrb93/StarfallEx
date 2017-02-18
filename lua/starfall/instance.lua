@@ -276,9 +276,9 @@ end
 if CLIENT then
 --- Check if a HUD Component is connected to the SF instance
 -- @return true if a HUD Component is connected
-	function SF.Instance:isHUDConnected()
+	function SF.Instance:isHUDActive()
 		local foundlink
-		for hud, _ in pairs( SF.ConnectedHuds ) do
+		for hud, _ in pairs( SF.ActiveHuds ) do
 			if hud.link == self.data.entity then
 				return true
 			end
