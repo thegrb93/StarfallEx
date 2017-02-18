@@ -5,7 +5,7 @@ local holograms_library = SF.Libraries.Register("holograms")
 
 --- Hologram type
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
-local wrap, unwrap = SF.CreateWrapper( hologram_metamethods, true, true, nil, SF.Entities.Metatable )
+local wrap, unwrap = SF.CreateWrapper( hologram_metamethods, true, false, nil, SF.Entities.Metatable )
 
 local ang_meta, vec_meta, ent_meta
 local vunwrap, aunwrap, ewrap, eunwrap
