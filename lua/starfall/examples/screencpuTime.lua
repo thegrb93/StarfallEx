@@ -1,7 +1,6 @@
 --@name cpuTime Example
 --@author INP - Radon + Sparky
-
-if SERVER then return end
+--@client
 
 -- This function helps us check if we can run.
 -- Use a mixture of quotaUsed() and quotaAverage()
