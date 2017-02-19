@@ -998,9 +998,12 @@ function render_library.enableDepth ( enable )
 end
 
 --- Resets the depth buffer
--- @name render_library.clearDepth
--- @class function
-render_library.clearDepth = render.ClearDepth
+function render_library.clearDepth()
+	if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
+	if SF.instance.data.render.usingRT then
+		render.ClearDepth()
+	end
+end
 
 --- Draws a sphere
 -- @param pos Position of the sphere
