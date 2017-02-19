@@ -997,6 +997,11 @@ function render_library.enableDepth ( enable )
 	render.OverrideDepthEnable(enable, enable)
 end
 
+--- Resets the depth buffer
+-- @name render_library.clearDepth
+-- @class function
+render_library.clearDepth = render.ClearDepth
+
 --- Draws a sphere
 -- @param pos Position of the sphere
 -- @param radius Radius of the sphere
