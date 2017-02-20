@@ -470,12 +470,52 @@ local notificationsMap = {
 }
 -- ------------------------------------------------------------------------- --
 
+local function argsToChat( ... )
+	local n = select('#', ...)
+	local input = { ... }
+	local output = {}
+	local color = false
+	for i=1, n do
+		local add
+		if dgetmeta( input[i] ) == SF.Types[ "Color" ] then
+			color = true
+			add = SF.Color.Unwrap( input[i] )
+		else
+			add = tostring(input[i])
+		end
+		output[i] = add
+	end
+	-- Combine the strings with tabs
+	local processed = {}
+	if not color then processed[1] = Color(151,211,255) end
+	local i = 1
+	while i <= n do
+		if type(output[i])=="string" then
+			local j = i + 1
+			while j <= n and type(output[j])=="string" do
+				j = j + 1
+			end
+			if i==j then
+				processed[#processed+1] = output[i]
+			else
+				processed[#processed+1] = table.concat({unpack(output,i,j)},"\t")
+			end
+			i = j + 1
+		else
+			processed[#processed+1] = output[i]
+			i = i + 1
+		end
+	end
+	return processed
+end
+
 if SERVER then
 	util.AddNetworkString("starfall_requpload")
 	util.AddNetworkString("starfall_upload")
 	util.AddNetworkString( "starfall_addnotify" )
 	util.AddNetworkString( "starfall_console_print" )
 	util.AddNetworkString( "starfall_openeditor" )
+	util.AddNetworkString( "starfall_chatprint" )
 	
 	local uploaddata = SF.EntityTable( "sfTransfer" )
 
@@ -560,6 +600,17 @@ if SERVER then
 			net.WriteString( msg )
 		net.Send( ply )
 	end
+	
+	function SF.ChatPrint( ply, ... )
+		local tbl = argsToChat( ... )
+		
+		net.Start("starfall_chatprint")
+		net.WriteUInt(#tbl, 32)
+		for i, v in ipairs(tbl) do
+			net.WriteType(v)
+		end
+		net.Send(ply)
+	end
 else
 	net.Receive("starfall_openeditor",function(len)		
 		SF.Editor.open()
@@ -643,6 +694,19 @@ else
 	net.Receive( "starfall_console_print", function ()
 		print( net.ReadString() )
 	end )
+	
+	net.Receive( "starfall_chatprint", function ()
+		local recv = {}
+		local n = net.ReadUInt( 32 )
+		for i=1, n do
+			recv[i] = net.ReadType()
+		end
+		chat.AddText( unpack( recv ) )
+	end )
+	
+	function SF.ChatPrint( ... )
+		chat.AddText( unpack( argsToChat( ... ) ) )
+	end
 end
 
 -- ------------------------------------------------------------------------- --

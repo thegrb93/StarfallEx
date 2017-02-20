@@ -429,8 +429,43 @@ SF.Libraries.AddHook( "cleanup", function()
 	debug.setmetatable( "", gluastr )
 end )
 
+SF.Permissions.registerPrivilege( "console.command", "Console command", "Allows the starfall to run console commands", {Client = {default = 4}} )
+local function printTableX ( t, indent, alreadyprinted )
+	for k,v in SF.DefaultEnvironment.pairs( t ) do
+		if SF.GetType( v ) == "table" and not alreadyprinted[ v ] then
+			alreadyprinted[ v ] = true
+			SF.instance.player:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. ":" )
+			printTableX( v, indent + 1, alreadyprinted )
+		else
+			SF.instance.player:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. "\t=\t" .. tostring( v ) )
+		end
+	end
+end
 
-if CLIENT then	
+if SERVER then
+	-- Prints a message to the player's chat.
+	-- @shared
+	-- @param ... Values to print
+	function SF.DefaultEnvironment.print(...)
+		SF.ChatPrint( SF.instance.player, ... )
+	end
+	
+	--- Prints a table to player's chat
+	-- @param tbl Table to print
+	function SF.DefaultEnvironment.printTable ( tbl )
+		SF.CheckType( tbl, "table" )
+		printTableX( tbl, 0, { tbl = true } )
+	end
+
+	--- Execute a console command
+	-- @shared
+	-- @param cmd Command to execute
+	function SF.DefaultEnvironment.concmd ( cmd )
+		SF.CheckType( cmd, "string" )
+		SF.Permissions.check( SF.instance.player, nil, "console.command" )
+		SF.instance.player:ConCommand( cmd )
+	end
+else
 	--- Sets the chip's display name
 	-- @client
 	-- @param name Name
@@ -449,7 +484,7 @@ if CLIENT then
 		SF.CheckType( txt, "string" )
 		SetClipboardText( txt )
 	end
-	
+
 	--- Prints a message to your chat, console, or the center of your screen.
 	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
 	-- @param text The message text.
@@ -458,40 +493,26 @@ if CLIENT then
 		SF.CheckType( text, "string" )
 		SF.instance.player:PrintMessage( mtype, text )
 	end
-end
 
-local function printTableX ( target, t, indent, alreadyprinted )
-	for k,v in SF.DefaultEnvironment.pairs( t ) do
-		if SF.GetType( v ) == "table" and not alreadyprinted[ v ] then
-			alreadyprinted[ v ] = true
-			target:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. ":" )
-			printTableX( target, v, indent + 1, alreadyprinted )
-		else
-			target:ChatPrint( string.rep( "\t", indent ) .. tostring( k ) .. "\t=\t" .. tostring( v ) )
+	function SF.DefaultEnvironment.print(...)
+		if SF.instance.player == LocalPlayer() then
+			SF.ChatPrint( ... )
 		end
 	end
+
+	function SF.DefaultEnvironment.printTable ( tbl )
+		SF.CheckType( tbl, "table" )
+		if SF.instance.player == LocalPlayer() then
+			printTableX( tbl, 0, { tbl = true } )
+		end
+	end
+
+	function SF.DefaultEnvironment.concmd ( cmd )
+		SF.CheckType( cmd, "string" )
+		SF.Permissions.check( SF.instance.player, nil, "console.command" )
+		LocalPlayer():ConCommand( cmd )
+	end
 end
-
--- Prints a message to the player's chat.
--- @shared
--- @param ... Values to print
-function SF.DefaultEnvironment.print(...)
-	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
-	local str = ""
-	local tbl = {n=select('#', ...), ...}
-	for i=1,tbl.n do str = str .. tostring(tbl[i]) .. (i == tbl.n and "" or "\t") end
-	( SERVER and SF.instance.player or LocalPlayer() ):ChatPrint(str)
-end
-
---- Prints a table to player's chat
--- @param tbl Table to print
-function SF.DefaultEnvironment.printTable ( tbl )
-	if CLIENT and SF.instance.player ~= LocalPlayer() then return end
-	SF.CheckType( tbl, "table" )
-
-	printTableX( ( SERVER and SF.instance.player or LocalPlayer() ), tbl, 0, { t = true } )
-end
-
 
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
@@ -698,20 +719,6 @@ end
 -- @param msg Exception message
 function SF.DefaultEnvironment.error ( msg )
 	error( msg or "an unspecified error occured", 2 )
-end
-
-
-SF.Permissions.registerPrivilege( "console.command", "Console command", "Allows the starfall to run console commands", {Client = {default = 4}} )
---- Execute a console command
--- @param cmd Command to execute
-function SF.DefaultEnvironment.concmd ( cmd )
-	SF.CheckType( cmd, "string" )
-	SF.Permissions.check( SF.instance.player, nil, "console.command" )
-	if CLIENT then
-		LocalPlayer():ConCommand( cmd )
-	else
-		SF.instance.player:ConCommand( cmd )
-	end
 end
 
 --- Returns if the table has an isValid function and isValid returns true.
