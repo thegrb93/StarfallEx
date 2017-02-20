@@ -101,7 +101,7 @@ function SF.Instance:runWithOps(func,...)
 				err = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. err.message
 			end
 		end
-		return {tostring( err ), debug.traceback( err, 2 )}
+		return {tostring( err ), debug.traceback( "", 2 )}
 	end
 
 	local oldSysTime = SysTime() - self.cpu_total

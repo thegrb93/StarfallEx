@@ -37,7 +37,13 @@ function ENT:Error ( msg, traceback )
 		self:SetDTString( 0, traceback or self.error.message )
 	end
 	
-	SF.AddNotify( self.owner, self.error.message, "ERROR", 7, "ERROR1" )
+	local msg = self.error.message
+	local newline = string.find( msg, "\n" )
+	if newline then
+		msg = string.sub( msg, 1, newline - 1 )
+	end
+	SF.AddNotify( self.owner, msg, "ERROR", 7, "ERROR1" )
+
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil

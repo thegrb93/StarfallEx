@@ -438,28 +438,16 @@ function SF.DeserializeCode(tbl)
 end
 
 local soundsMap = {
-	[ "DRIP1" ] = 0, [0] = "DRIP1",
-	[ "DRIP2" ] = 1,	[1] = "DRIP2",
-	[ "DRIP3" ] = 2,	[2] = "DRIP3",
-	[ "DRIP4" ] = 3,	[3] = "DRIP4",
-	[ "DRIP5" ] = 4,	[4] = "DRIP5",
-	[ "ERROR1" ] = 5,	[5] = "ERROR1",
-	[ "CONFIRM1" ] = 6,	[6] = "CONFIRM1",
-	[ "CONFIRM2" ] = 7,	[7] = "CONFIRM2",
-	[ "CONFIRM3" ] = 8,	[8] = "CONFIRM3",
-	[ "CONFIRM4" ] = 9,	[9] = "CONFIRM4",
-}
-local soundsMapSounds = {
-	[ "DRIP1" ] = "ambient/water/drip1.wav",
-	[ "DRIP2" ] = "ambient/water/drip2.wav",
-	[ "DRIP3" ] = "ambient/water/drip3.wav",
-	[ "DRIP4" ] = "ambient/water/drip4.wav",
-	[ "DRIP5" ] = "ambient/water/drip5.wav",
-	[ "ERROR1" ] = "buttons/button10.wav",
-	[ "CONFIRM1" ] = "buttons/button3.wav",
-	[ "CONFIRM2" ] = "buttons/button14.wav",
-	[ "CONFIRM3" ] = "buttons/button15.wav",
-	[ "CONFIRM4" ] = "buttons/button17.wav"
+	[ "DRIP1" ] = 0, [0] = "ambient/water/drip1.wav",
+	[ "DRIP2" ] = 1,	[1] = "ambient/water/drip2.wav",
+	[ "DRIP3" ] = 2,	[2] = "ambient/water/drip3.wav",
+	[ "DRIP4" ] = 3,	[3] = "ambient/water/drip4.wav",
+	[ "DRIP5" ] = 4,	[4] = "ambient/water/drip5.wav",
+	[ "ERROR1" ] = 5,	[5] = "buttons/button10.wav",
+	[ "CONFIRM1" ] = 6,	[6] = "buttons/button3.wav",
+	[ "CONFIRM2" ] = 7,	[7] = "buttons/button14.wav",
+	[ "CONFIRM3" ] = 8,	[8] = "buttons/button15.wav",
+	[ "CONFIRM4" ] = 9,	[9] = "buttons/button17.wav",
 }
 local notificationsMap = {
 	["GENERIC"] = 0,
@@ -668,27 +656,22 @@ else
 	end)
 
 	function SF.AddNotify ( ply, msg, type, duration, sound )
-		if not IsValid( ply ) then return end
-
-		if ply ~= LocalPlayer() then
-			return
-		end
-
-		print( msg )
-
-		local newline = string.find( msg, "\n" )
-		if newline then
-			msg = string.sub( msg, 1, newline - 1 )
-		end
-		
-		GAMEMODE:AddNotify( msg, type, duration )
-		if sound and soundsMapSounds[ sound ] then
-			surface.PlaySound( soundsMapSounds[ sound ] )
+		if ply == LocalPlayer() then
+			print( msg )
+			GAMEMODE:AddNotify( msg, notificationsMap[ type ], duration )
+			if soundsMap[sound] then
+				surface.PlaySound( soundsMap[ soundsMap[ sound ] ] )
+			end
 		end
 	end
 
 	net.Receive( "starfall_addnotify", function ()
-		SF.AddNotify( LocalPlayer(), net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), soundsMap[ net.ReadUInt( 8 ) ])
+		local msg, type, duration, sound = net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), net.ReadUInt( 8 )
+		print( msg )
+		GAMEMODE:AddNotify( msg, type, duration )
+		if soundsMap[ sound ] then
+			surface.PlaySound( soundsMap[ sound ] )
+		end
 	end )
 
 	net.Receive( "starfall_console_print", function ()
