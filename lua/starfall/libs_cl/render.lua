@@ -158,6 +158,7 @@ SF.Libraries.AddHook( "deinitialize", function ( instance )
 		instance.data.render.textures[ k ] = nil
 	end
 	for k, v in pairs( instance.data.render.urltextures ) do
+		v:SetUndefined( "$basetexture" )
 		instance.data.render.urltextures[ k ] = nil
 	end
 	if plyRTcount[ instance.playerid ] then
@@ -495,6 +496,7 @@ function render_library.destroyTexture( id )
 	if data.urltextures[ id ] then
 		plyURLTexcount[ instance.playerid ] = plyURLTexcount[ instance.playerid ] - 1
 		data.urltexturecount = data.urltexturecount - 1
+		data.urltextures[ id ]:SetUndefined( "$basetexture" )
 		data.urltextures[ id ] = nil
 	elseif data.textures[ id ] then
 		data.textures[ id ] = nil
