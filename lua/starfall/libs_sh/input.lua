@@ -52,7 +52,8 @@ function input_methods.lookupBinding( binding )
 	local bind = input.LookupBinding( binding )
 	if bind then
 		bind = bind:upper( )
-		return input_methods.KEY[ bind ] or input_methods.MOUSE[ bind ], bind
+
+		return SF.DefaultEnvironment.KEY[ bind ] or SF.DefaultEnvironment.MOUSE[ bind ], bind
 	end
 end
 
