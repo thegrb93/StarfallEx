@@ -288,6 +288,8 @@ function holograms_library.create ( pos, ang, model, scale )
 
 		if CPPI then
 			holoent:CPPISetOwner( instance.player )
+		else
+			holoent:HoloSetOwner( instance.player )
 		end
 		
 		if scale then
