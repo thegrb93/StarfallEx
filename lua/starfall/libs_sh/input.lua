@@ -108,7 +108,7 @@ end
 --- @param x X coordinate on the screen
 --- @param y Y coordinate on the screen
 --- @return Aim vector
-function input_methods.ScreenToVector( x, y )
+function input_methods.screenToVector( x, y )
 	SF.Permissions.check( SF.instance.player, nil, "input" )
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
