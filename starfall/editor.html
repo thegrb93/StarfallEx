@@ -82,7 +82,7 @@
 				name: "validation",
 				bindKey: {win: "Ctrl-Space", mac: "Command-Space"},
 				exec: function(editor){
-					console.log("RUNLUA:SF.Editor.doValidation( true )")
+					console.doValidation( true );
 				}
 			});
 
@@ -124,7 +124,7 @@
 				name: "console1",
 				bindKey: {win: "'", mac: "'"},
 				exec: function(editor){
-					console.log("RUNLUA:if system.IsWindows() and tobool( GetConVarNumber( \"sf_editor_fixconsolebug\" ) ) then gui.ActivateGameUI() end")
+					console.fixConsole();
 					editor.insert("'")
 				}
 			});
@@ -132,7 +132,7 @@
 				name: "console2",
 				bindKey: {win: "Shift-@", mac: "Shift-@"},
 				exec: function(editor){
-					console.log("RUNLUA:if system.IsWindows() and tobool( GetConVarNumber( \"sf_editor_fixconsolebug\" ) ) then gui.ActivateGameUI() end");
+					console.fixConsole();
 					editor.insert("@");
 				}
 			});
