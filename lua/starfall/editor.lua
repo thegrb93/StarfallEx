@@ -480,7 +480,12 @@ if CLIENT then
 		html:AddFunction( "console", "copyClipboard", function( code )
 			timer.Simple(0, function() SetClipboardText( code ) end)
 		end)
-		
+
+		html:AddFunction( "console", "doValidation", SF.Editor.doValidation)
+
+		html:AddFunction( "console", "fixConsole",function() if system.IsWindows() and tobool( GetConVarNumber( "sf_editor_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
+
+				
 		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 			
 		local function FinishedLoadingEditor()
