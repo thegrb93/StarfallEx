@@ -479,9 +479,11 @@ if CLIENT then
 		end)
 
 		html:AddFunction( "console", "doValidation", SF.Editor.doValidation)
-
-		html:AddFunction( "console", "fixConsole",function() if system.IsWindows() and tobool( GetConVarNumber( "sf_editor_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
-
+		if system.IsWindows() then
+			html:AddFunction( "console", "fixConsole",function() if tobool( GetConVarNumber( "sf_editor_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
+		else
+			html:AddFunction( "console", "fixConsole",function() end)	--Dummy
+		end
 				
 		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 			
