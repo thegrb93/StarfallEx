@@ -469,9 +469,6 @@ if CLIENT then
 		html:DockMargin( 5, 59, 5, 5 )
 		html:SetKeyboardInputEnabled( true )
 		html:SetMouseInputEnabled( true )
-		if not system.IsLinux() then --Editor isnt running any code on linux through RUNLUA, but it causes errors while pasting from clipboard set outside of editor. (Temporary fix)
-			html:SetAllowLua( true )
-		end
 		html:OpenURL( editorUrl )
 		html:AddFunction( "console", "copyCode", function( code )
 			SF.Editor.getActiveTab().code = code
