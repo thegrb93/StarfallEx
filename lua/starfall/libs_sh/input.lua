@@ -4,7 +4,7 @@ local PlayerButtonDown, PlayerButtonUp
 if game.SinglePlayer() then
 	if SERVER then
 		util.AddNetworkString("sf_relayinput")
-		
+
 		--- These should only get called if the game is singleplayer or listen
 		hook.Add( "PlayerButtonDown", "SF_PlayerButtonDown", function(ply, but)
 			net.Start("sf_relayinput")
@@ -12,7 +12,7 @@ if game.SinglePlayer() then
 			net.WriteInt(but, 16)
 			net.Send(ply)
 		end )
-		
+
 		hook.Add( "PlayerButtonUp", "SF_PlayerButtonUp", function(ply, but)
 			net.Start("sf_relayinput")
 			net.WriteBool(false)
@@ -29,7 +29,7 @@ if game.SinglePlayer() then
 				hook.Run("PlayerButtonUp", LocalPlayer(), key)
 			end
 		end )
-	end	
+	end
 end
 if SERVER then return end
 
@@ -52,7 +52,8 @@ function input_methods.lookupBinding( binding )
 	local bind = input.LookupBinding( binding )
 	if bind then
 		bind = bind:upper( )
-		return input_methods.KEY[ bind ] or input_methods.MOUSE[ bind ], bind
+
+		return SF.DefaultEnvironment.KEY[ bind ] or SF.DefaultEnvironment.MOUSE[ bind ], bind
 	end
 end
 
@@ -103,16 +104,27 @@ function input_methods.getCursorPos( )
 	return input.GetCursorPos( )
 end
 
+----Translates position on player's screen to aim vector
+--- @param x X coordinate on the screen
+--- @param y Y coordinate on the screen
+--- @return Aim vector
+function input_methods.screenToVector( x, y )
+	SF.Permissions.check( SF.instance.player, nil, "input" )
+	SF.CheckType( x, "number" )
+	SF.CheckType( y, "number" )
+	return SF.WrapObject(gui.ScreenToVector( x, y ))
+end
+
 ---- Sets the state of the mouse cursor
 --- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor( enabled )
 	SF.CheckType( enabled, "boolean" )
 	SF.Permissions.check( SF.instance.player, nil, "input" )
-		
+
 	if not SF.instance:isHUDActive() then
 		SF.throw( "No HUD component connected", 2 )
 	end
-	
+
 	gui.EnableScreenClicker( enabled )
 end
 
