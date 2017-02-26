@@ -347,6 +347,14 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#hudconnect">hudconnect</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#huddisconnect">huddisconnect</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -501,6 +509,12 @@ Execute a console command </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.crc">crc</a>&nbsp;(stringToHash)</td>
+	<td class="summary">
+Generates the CRC checksum of the specified string.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.debugGetInfo">debugGetInfo</a>&nbsp;(funcOrStackLevel, fields)</td>
 	<td class="summary">
 GLua's getinfo() 
@@ -594,7 +608,7 @@ Same as owner() on the server.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.printMesssage">printMesssage</a>&nbsp;(mtype, text)</td>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.printMessage">printMessage</a>&nbsp;(mtype, text)</td>
 	<td class="summary">
 Prints a message to your chat, console, or the center of your screen.</td>
 	</tr>
@@ -709,205 +723,6 @@ Same as Lua's unpack </td>
 
 <h2>Tables</h2>
 <table class="table_list">
-
-	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.IN_KEY">IN_KEY</a></td>
-	<td class="summary">
-ENUMs of in_keys for use with player:keyDown: 
-ALT1, 
-ALT2, 
-ATTACK, 
-ATTACK2, 
-BACK, 
-DUCK, 
-FORWARD, 
-JUMP, 
-LEFT, 
-MOVELEFT, 
-MOVERIGHT, 
-RELOAD, 
-RIGHT, 
-SCORE, 
-SPEED, 
-USE, 
-WALK, 
-ZOOM, 
-GRENADE1, 
-GRENADE2, 
-WEAPON1, 
-WEAPON2, 
-BULLRUSH, 
-CANCEL, 
-RUN </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.KEY">KEY</a></td>
-	<td class="summary">
-ENUMs of keyboard keys for use with input library: 
-FIRST, 
-NONE, 
-0, 
-1, 
-2, 
-3, 
-4, 
-5, 
-6, 
-7, 
-8, 
-9, 
-A, 
-B, 
-C, 
-D, 
-E, 
-F, 
-G, 
-H, 
-I, 
-J, 
-K, 
-L, 
-M, 
-N, 
-O, 
-P, 
-Q, 
-R, 
-S, 
-T, 
-U, 
-V, 
-W, 
-X, 
-Y, 
-Z, 
-KP_INS, 
-PAD_0, 
-KP_END, 
-PAD_1, 
-KP_DOWNARROW , 
-PAD_2, 
-KP_PGDN, 
-PAD_3, 
-KP_LEFTARROW, 
-PAD_4, 
-KP_5 , 
-PAD_5, 
-KP_RIGHTARROW, 
-PAD_6, 
-KP_HOME, 
-PAD_7, 
-KP_UPARROW, 
-PAD_8, 
-KP_PGUP, 
-PAD_9, 
-PAD_DIVIDE, 
-KP_SLASH, 
-KP_MULTIPLY, 
-PAD_MULTIPLY, 
-KP_MINUS, 
-PAD_MINUS, 
-KP_PLUS, 
-PAD_PLUS, 
-KP_ENTER, 
-PAD_ENTER, 
-KP_DEL, 
-PAD_DECIMAL, 
-LBRACKET, 
-RBRACKET, 
-SEMICOLON, 
-APOSTROPHE, 
-BACKQUOTE, 
-COMMA, 
-PERIOD, 
-SLASH, 
-BACKSLASH, 
-MINUS, 
-EQUAL, 
-ENTER, 
-SPACE, 
-BACKSPACE, 
-TAB, 
-CAPSLOCK, 
-NUMLOCK, 
-ESCAPE, 
-SCROLLLOCK, 
-INS, 
-INSERT, 
-DEL, 
-DELETE, 
-HOME, 
-END, 
-PGUP, 
-PAGEUP, 
-PGDN, 
-PAGEDOWN, 
-PAUSE, 
-BREAK, 
-SHIFT, 
-LSHIFT, 
-RSHIFT, 
-ALT, 
-LALT, 
-RALT, 
-CTRL, 
-LCONTROL, 
-RCTRL, 
-RCONTROL, 
-LWIN, 
-RWIN, 
-APP, 
-UPARROW, 
-UP, 
-LEFTARROW, 
-LEFT, 
-DOWNARROW, 
-DOWN, 
-RIGHTARROW, 
-RIGHT, 
-F1, 
-F2, 
-F3, 
-F4, 
-F5, 
-F6, 
-F7, 
-F8, 
-F9, 
-F10, 
-F11, 
-F12, 
-CAPSLOCKTOGGLE, 
-NUMLOCKTOGGLE, 
-SCROLLLOCKTOGGLE, 
-LAST, 
-COUNT </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#SF.DefaultEnvironment.MOUSE">MOUSE</a></td>
-	<td class="summary">
-ENUMs of mouse buttons for use with input library: 
-MOUSE1, 
-LEFT, 
-MOUSE2, 
-RIGHT, 
-MOUSE3, 
-MIDDLE, 
-MOUSE4, 
-4, 
-MOUSE5, 
-5, 
-MWHEELUP, 
-WHEEL_UP, 
-MWHEELDOWN, 
-WHEEL_DOWN, 
-COUNT, 
-FIRST, 
-LAST </td>
-	</tr>
 
 	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.bit">bit</a></td>
@@ -1053,6 +868,40 @@ Execute a console command
 
 
 
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.crc"></a><strong>SF.DefaultEnvironment.crc</strong>&nbsp;(stringToHash)</dt>
+<dd>
+
+Generates the CRC checksum of the specified string. (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>stringToHash</em></code>: The string to calculate the checksum of
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The unsigned 32 bit checksum as a string</ul>
 
 
 
@@ -1572,7 +1421,7 @@ Same as owner() on the server. On the client, returns the local player
 
 
 
-<dt><a name="SF.DefaultEnvironment.printMesssage"></a><strong>SF.DefaultEnvironment.printMesssage</strong>&nbsp;(mtype, text)</dt>
+<dt><a name="SF.DefaultEnvironment.printMessage"></a><strong>SF.DefaultEnvironment.printMessage</strong>&nbsp;(mtype, text)</dt>
 <dd>
 
 Prints a message to your chat, console, or the center of your screen.
@@ -2176,214 +2025,6 @@ Same as Lua's unpack
 
 <h2><a name="tables"></a>Tables</h2>
 <dl class="table">
-
-<dt><a name="SF.DefaultEnvironment.IN_KEY"></a><strong>SF.DefaultEnvironment.IN_KEY</strong></dt>
-<dd>
-ENUMs of in_keys for use with player:keyDown: 
-ALT1, 
-ALT2, 
-ATTACK, 
-ATTACK2, 
-BACK, 
-DUCK, 
-FORWARD, 
-JUMP, 
-LEFT, 
-MOVELEFT, 
-MOVERIGHT, 
-RELOAD, 
-RIGHT, 
-SCORE, 
-SPEED, 
-USE, 
-WALK, 
-ZOOM, 
-GRENADE1, 
-GRENADE2, 
-WEAPON1, 
-WEAPON2, 
-BULLRUSH, 
-CANCEL, 
-RUN<br /><br />
-
-
-
-</dd>
-
-
-<dt><a name="SF.DefaultEnvironment.KEY"></a><strong>SF.DefaultEnvironment.KEY</strong></dt>
-<dd>
-ENUMs of keyboard keys for use with input library: 
-FIRST, 
-NONE, 
-0, 
-1, 
-2, 
-3, 
-4, 
-5, 
-6, 
-7, 
-8, 
-9, 
-A, 
-B, 
-C, 
-D, 
-E, 
-F, 
-G, 
-H, 
-I, 
-J, 
-K, 
-L, 
-M, 
-N, 
-O, 
-P, 
-Q, 
-R, 
-S, 
-T, 
-U, 
-V, 
-W, 
-X, 
-Y, 
-Z, 
-KP_INS, 
-PAD_0, 
-KP_END, 
-PAD_1, 
-KP_DOWNARROW , 
-PAD_2, 
-KP_PGDN, 
-PAD_3, 
-KP_LEFTARROW, 
-PAD_4, 
-KP_5 , 
-PAD_5, 
-KP_RIGHTARROW, 
-PAD_6, 
-KP_HOME, 
-PAD_7, 
-KP_UPARROW, 
-PAD_8, 
-KP_PGUP, 
-PAD_9, 
-PAD_DIVIDE, 
-KP_SLASH, 
-KP_MULTIPLY, 
-PAD_MULTIPLY, 
-KP_MINUS, 
-PAD_MINUS, 
-KP_PLUS, 
-PAD_PLUS, 
-KP_ENTER, 
-PAD_ENTER, 
-KP_DEL, 
-PAD_DECIMAL, 
-LBRACKET, 
-RBRACKET, 
-SEMICOLON, 
-APOSTROPHE, 
-BACKQUOTE, 
-COMMA, 
-PERIOD, 
-SLASH, 
-BACKSLASH, 
-MINUS, 
-EQUAL, 
-ENTER, 
-SPACE, 
-BACKSPACE, 
-TAB, 
-CAPSLOCK, 
-NUMLOCK, 
-ESCAPE, 
-SCROLLLOCK, 
-INS, 
-INSERT, 
-DEL, 
-DELETE, 
-HOME, 
-END, 
-PGUP, 
-PAGEUP, 
-PGDN, 
-PAGEDOWN, 
-PAUSE, 
-BREAK, 
-SHIFT, 
-LSHIFT, 
-RSHIFT, 
-ALT, 
-LALT, 
-RALT, 
-CTRL, 
-LCONTROL, 
-RCTRL, 
-RCONTROL, 
-LWIN, 
-RWIN, 
-APP, 
-UPARROW, 
-UP, 
-LEFTARROW, 
-LEFT, 
-DOWNARROW, 
-DOWN, 
-RIGHTARROW, 
-RIGHT, 
-F1, 
-F2, 
-F3, 
-F4, 
-F5, 
-F6, 
-F7, 
-F8, 
-F9, 
-F10, 
-F11, 
-F12, 
-CAPSLOCKTOGGLE, 
-NUMLOCKTOGGLE, 
-SCROLLLOCKTOGGLE, 
-LAST, 
-COUNT<br /><br />
-
-
-
-</dd>
-
-
-<dt><a name="SF.DefaultEnvironment.MOUSE"></a><strong>SF.DefaultEnvironment.MOUSE</strong></dt>
-<dd>
-ENUMs of mouse buttons for use with input library: 
-MOUSE1, 
-LEFT, 
-MOUSE2, 
-RIGHT, 
-MOUSE3, 
-MIDDLE, 
-MOUSE4, 
-4, 
-MOUSE5, 
-5, 
-MWHEELUP, 
-WHEEL_UP, 
-MWHEELDOWN, 
-WHEEL_DOWN, 
-COUNT, 
-FIRST, 
-LAST<br /><br />
-
-
-
-</dd>
-
 
 <dt><a name="SF.DefaultEnvironment.bit"></a><strong>SF.DefaultEnvironment.bit</strong></dt>
 <dd>

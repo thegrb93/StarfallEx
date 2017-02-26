@@ -347,6 +347,14 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#hudconnect">hudconnect</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#huddisconnect">huddisconnect</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -491,9 +499,15 @@ Dumps the current render target and allows the pixels to be accessed by render.r
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.clear">clear</a>&nbsp;(clr)</td>
+	<td class="name" nowrap><a href="#render_library.clear">clear</a>&nbsp;(clr, depth)</td>
 	<td class="summary">
 Clears the surface </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.clearDepth">clearDepth</a>&nbsp;()</td>
+	<td class="summary">
+Resets the depth buffer </td>
 	</tr>
 
 	<tr>
@@ -512,6 +526,18 @@ Creates a new render target to draw onto.</td>
 	<td class="name" nowrap><a href="#render_library.cursorPos">cursorPos</a>&nbsp;(ply)</td>
 	<td class="summary">
 Gets a 2D cursor position where ply is aiming.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.destroyRenderTarget">destroyRenderTarget</a>&nbsp;(name)</td>
+	<td class="summary">
+Releases the rendertarget.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#render_library.destroyTexture">destroyTexture</a>&nbsp;(id)</td>
+	<td class="summary">
+Releases the texture.</td>
 	</tr>
 
 	<tr>
@@ -689,6 +715,12 @@ Looks up a texture by file name.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#render_library.isHUDActive">isHUDActive</a>&nbsp;()</td>
+	<td class="summary">
+Checks if a hud component is connected to the Starfall Chip </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#render_library.parseMarkup">parseMarkup</a>&nbsp;(str, maxsize, markup)</td>
 	<td class="summary">
 Constructs a markup object for quick styled text drawing.</td>
@@ -812,7 +844,7 @@ Dumps the current render target and allows the pixels to be accessed by render.r
 
 
 
-<dt><a name="render_library.clear"></a><strong>render_library.clear</strong>&nbsp;(clr)</dt>
+<dt><a name="render_library.clear"></a><strong>render_library.clear</strong>&nbsp;(clr, depth)</dt>
 <dd>
 
 Clears the surface
@@ -827,7 +859,33 @@ Clears the surface
 	  <code><em>clr</em></code>: Color type to clear with
 	</li>
 	
+	<li>
+	  <code><em>depth</em></code>: Boolean if should clear depth
+	</li>
+	
 </ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.clearDepth"></a><strong>render_library.clearDepth</strong>&nbsp;()</dt>
+<dd>
+
+Resets the depth buffer
+
+
+
 
 
 
@@ -983,6 +1041,68 @@ Gets a 2D cursor position where ply is aiming.
 	<li>y position</li>
 	
 </ol>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.destroyRenderTarget"></a><strong>render_library.destroyRenderTarget</strong>&nbsp;(name)</dt>
+<dd>
+
+Releases the rendertarget. Required if you reach the maximum rendertargets.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>name</em></code>: Rendertarget name
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.destroyTexture"></a><strong>render_library.destroyTexture</strong>&nbsp;(id)</dt>
+<dd>
+
+Releases the texture. Required if you reach the maximum url textures.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>id</em></code>: Texture table. Aquired with render.getTextureID
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -1962,8 +2082,7 @@ Gets the default font
 <dt><a name="render_library.getRenderTargetMaterial"></a><strong>render_library.getRenderTargetMaterial</strong>&nbsp;(name)</dt>
 <dd>
 
-Returns the model material name that uses the render target. 
-Alternatively, just construct the name yourself with "!StarfallCustomModel_"..name..chip():entIndex()
+Returns the model material name that uses the render target.
 
 
 
@@ -2158,6 +2277,28 @@ Make sure to store the texture to use it rather than calling this slow function 
 
 <h3>Return value:</h3>
 <ul>Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="render_library.isHUDActive"></a><strong>render_library.isHUDActive</strong>&nbsp;()</dt>
+<dd>
+
+Checks if a hud component is connected to the Starfall Chip
+
+
+
+
+
+
+
+
 
 
 
@@ -2564,7 +2705,7 @@ Sets the texture
 <ul>
 	
 	<li>
-	  <code><em>id</em></code>: Texture table. Get it with render.getTextureID
+	  <code><em>id</em></code>: Texture table. Aquired with render.getTextureID
 	</li>
 	
 </ul>

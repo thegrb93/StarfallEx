@@ -349,6 +349,14 @@
 	</li>
 
 	<li>
+		<a href="hooks.html#hudconnect">hudconnect</a>
+	</li>
+
+	<li>
+		<a href="hooks.html#huddisconnect">huddisconnect</a>
+	</li>
+
+	<li>
 		<a href="hooks.html#input">input</a>
 	</li>
 
@@ -679,6 +687,18 @@ Called when a player starts driving an entity </td>
 	<td class="name" nowrap><a href="#calcview">calcview</a>&nbsp;(pos, ang, fov, znear, zfar)</td>
 	<td class="summary">
 Called when the engine wants to calculate the player's view </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#hudconnect">hudconnect</a>&nbsp;()</td>
+	<td class="summary">
+Called when the player connects to a HUD component linked to the Starfall Chip </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#huddisconnect">huddisconnect</a>&nbsp;()</td>
+	<td class="summary">
+Called when the player disconnects from a HUD component linked to the Starfall Chip </td>
 	</tr>
 
 	<tr>
@@ -1675,6 +1695,34 @@ Called when the engine wants to calculate the player's view
 	
 	<h3>Return value:</h3>
 	<ul>table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}</ul>
+	
+
+	</dd>
+
+	
+	<dt><a name="hudconnect"></a><strong>hudconnect</strong>&nbsp;()</dt>
+	<dd>
+	
+Called when the player connects to a HUD component linked to the Starfall Chip
+
+	
+
+	
+
+	
+
+	</dd>
+
+	
+	<dt><a name="huddisconnect"></a><strong>huddisconnect</strong>&nbsp;()</dt>
+	<dd>
+	
+Called when the player disconnects from a HUD component linked to the Starfall Chip
+
+	
+
+	
+
 	
 
 	</dd>

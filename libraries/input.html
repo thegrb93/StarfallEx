@@ -347,6 +347,14 @@
 	</li>
 
 	<li>
+		<a href="../hooks.html#hudconnect">hudconnect</a>
+	</li>
+
+	<li>
+		<a href="../hooks.html#huddisconnect">huddisconnect</a>
+	</li>
+
+	<li>
 		<a href="../hooks.html#input">input</a>
 	</li>
 
@@ -483,6 +491,12 @@ Input library.</p>
 <table class="function_list">
 
 	<tr>
+	<td class="name" nowrap><a href="#input_methods.enableCursor">enableCursor</a>&nbsp;(enabled)</td>
+	<td class="summary">
+Sets the state of the mouse cursor </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#input_methods.getCursorPos">getCursorPos</a>&nbsp;()</td>
 	<td class="summary">
 Gets the position of the mouse </td>
@@ -518,6 +532,12 @@ Gets whether the shift key is down </td>
 Gets the first key that is bound to the command passed </td>
 	</tr>
 
+	<tr>
+	<td class="name" nowrap><a href="#input_methods.screenToVector">screenToVector</a>&nbsp;(x, y)</td>
+	<td class="summary">
+Translates position on player's screen to aim vector </td>
+	</tr>
+
 </table>
 
 
@@ -533,6 +553,37 @@ Gets the first key that is bound to the command passed </td>
 
 <h2><a name="functions"></a>Functions</h2>
 <dl class="function">
+
+
+
+<dt><a name="input_methods.enableCursor"></a><strong>input_methods.enableCursor</strong>&nbsp;(enabled)</dt>
+<dd>
+
+Sets the state of the mouse cursor
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>enabled</em></code>: Whether or not the cursor should be enabled
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
 
 
 
@@ -715,6 +766,44 @@ Gets the first key that is bound to the command passed
 	<li>The name of the first key bound</li>
 	
 </ol>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="input_methods.screenToVector"></a><strong>input_methods.screenToVector</strong>&nbsp;(x, y)</dt>
+<dd>
+
+Translates position on player's screen to aim vector
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>x</em></code>: X coordinate on the screen
+	</li>
+	
+	<li>
+	  <code><em>y</em></code>: Y coordinate on the screen
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Aim vector</ul>
 
 
 
