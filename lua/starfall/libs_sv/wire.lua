@@ -569,28 +569,21 @@ local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 function wire_ports_metamethods:__index ( name )
 	SF.Permissions.check( SF.instance.player, nil, "wire.input" )
 	SF.CheckType(name,"string")
-	local instance = SF.instance
-	local ent = instance.data.entity
-	if not ent then SF.throw( "No entity", 2 ) end
 
-	local input = ent.Inputs[name]
-	if not (input and input.Src and input.Src:IsValid()) then
-		return nil
+	local input = SF.instance.data.entity.Inputs[name]
+	if input and input.Src and input.Src:IsValid() then
+		return inputConverters[input.Type](input.Value)
 	end
-	return inputConverters[ent.Inputs[name].Type](ent.Inputs[name].Value)
 end
 
 function wire_ports_metamethods:__newindex ( name, value )
 	SF.Permissions.check( SF.instance.player, nil, "wire.output" )
 	SF.CheckType(name,"string")
-	local instance = SF.instance
-	local ent = instance.data.entity
-	if not ent then SF.throw( "No entity", 2 ) end
 
-	local output = ent.Outputs[name]
-	if not output then return end
-	
-	Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
+	local output = SF.instance.data.entity.Outputs[name]
+	if output then
+		Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
+	end
 end
 
 --- Ports table. Reads from this table will read from the wire input
