@@ -163,45 +163,45 @@ end
 
 -- String library
 local string_methods = SF.Libraries.Register("string" )
-string_methods.byte=string.byte
+string_methods.byte=string.byte string_methods.byte=string.byte
 string_methods.char=string.char
-string_methods.comma=string.Comma
+string_methods.comma=string.Comma string_methods.Comma=string.Comma
 string_methods.dump=string.dump
-string_methods.endsWith=string.EndsWith
-string_methods.explode=string.Explode
+string_methods.endsWith=string.EndsWith string_methods.EndsWith=string.EndsWith
+string_methods.explode=string.Explode string_methods.Explode=string.Explode
 string_methods.find=string.find
 string_methods.format=string.format
-string_methods.formattedTime=string.FormattedTime
-string_methods.getChar=string.GetChar
-string_methods.getExtensionFromFilename=string.GetExtensionFromFilename
-string_methods.getFileFromFilename=string.GetFileFromFilename
-string_methods.getPathFromFilename=string.GetPathFromFilename
+string_methods.formattedTime=string.FormattedTime string_methods.FormattedTime=string.FormattedTime
+string_methods.getChar=string.GetChar string_methods.GetChar=string.GetChar
+string_methods.getExtensionFromFilename=string.GetExtensionFromFilename string_methods.GetExtensionFromFilename=string.GetExtensionFromFilename
+string_methods.getFileFromFilename=string.GetFileFromFilename string_methods.GetFileFromFilename=string.GetFileFromFilename
+string_methods.getPathFromFilename=string.GetPathFromFilename string_methods.GetPathFromFilename=string.GetPathFromFilename
 string_methods.gfind=string.gfind
 string_methods.gmatch=string.gmatch
 string_methods.gsub=string.gsub
-string_methods.implode=string.Implode
-string_methods.javascriptSafe=string.JavascriptSafe
-string_methods.left=string.Left
+string_methods.implode=string.Implode string_methods.Implode=string.Implode
+string_methods.javascriptSafe=string.JavascriptSafe string_methods.JavascriptSafe=string.JavascriptSafe
+string_methods.left=string.Left string_methods.Left=string.Left
 string_methods.len=string.len
 string_methods.lower=string.lower
 string_methods.match=string.match
-string_methods.niceSize=string.NiceSize
-string_methods.niceTime=string.NiceTime
-string_methods.patternSafe=string.PatternSafe
-string_methods.replace=string.Replace
+string_methods.niceSize=string.NiceSize string_methods.NiceSize=string.NiceSize
+string_methods.niceTime=string.NiceTime string_methods.NiceTime=string.NiceTime
+string_methods.patternSafe=string.PatternSafe string_methods.PatternSafe=string.PatternSafe
+string_methods.replace=string.Replace string_methods.Replace=string.Replace
 string_methods.reverse=string.reverse
-string_methods.right=string.Right
-string_methods.setChar=string.SetChar
-string_methods.split=string.Split
-string_methods.startWith=string.StartWith
-string_methods.stripExtension=string.StripExtension
+string_methods.right=string.Right string_methods.Right=string.Right
+string_methods.setChar=string.SetChar string_methods.SetChar=string.SetChar
+string_methods.split=string.Split string_methods.Split=string.Split
+string_methods.startWith=string.StartWith string_methods.StartWith=string.StartWith
+string_methods.stripExtension=string.StripExtension string_methods.StripExtension=string.StripExtension
 string_methods.sub=string.sub
-string_methods.toMinutesSeconds=string.ToMinutesSeconds
-string_methods.toMinutesSecondsMilliseconds=string.ToMinutesSecondsMilliseconds
-string_methods.toTable=string.ToTable
-string_methods.trim=string.Trim
-string_methods.trimLeft=string.TrimLeft
-string_methods.trimRight=string.TrimRight
+string_methods.toMinutesSeconds=string.ToMinutesSeconds string_methods.ToMinutesSeconds=string.ToMinutesSeconds
+string_methods.toMinutesSecondsMilliseconds=string.ToMinutesSecondsMilliseconds string_methods.ToMinutesSecondsMilliseconds=string.ToMinutesSecondsMilliseconds
+string_methods.toTable=string.ToTable string_methods.ToTable=string.ToTable
+string_methods.trim=string.Trim string_methods.Trim=string.Trim
+string_methods.trimLeft=string.TrimLeft string_methods.TrimLeft=string.TrimLeft
+string_methods.trimRight=string.TrimRight string_methods.TrimRight=string.TrimRight
 string_methods.upper=string.upper
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
