@@ -57,6 +57,7 @@ if CPPI then
 		function( principal, target, key )
 			if canPhysgun[ key ] then
 				if target:IsPlayer() then
+					if target==principal then return true end -- PhysgunPickup returns false if principal==target
 					if hook.Run( "PhysgunPickup", principal, target ) ~= false then
 						-- Some mods expect a release when there's a pickup involved.
 						hook.Run( "PhysgunDrop", principal, target )
