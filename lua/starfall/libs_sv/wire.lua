@@ -136,6 +136,7 @@ local function identity(data) return data end
 local inputConverters =
 {
 	NORMAL = identity,
+	NUMBER = identity,
 	STRING = identity,
 	VECTOR = vwrap,
 	ANGLE = vwrap,
