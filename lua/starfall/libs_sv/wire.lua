@@ -581,7 +581,8 @@ function wire_ports_metamethods:__newindex ( name, value )
 	SF.Permissions.check( SF.instance.player, nil, "wire.output" )
 	SF.CheckType(name,"string")
 
-	local output = SF.instance.data.entity.Outputs[name]
+	local ent = SF.instance.data.entity
+	local output = ent.Outputs[name]
 	if output then
 		Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
 	end
