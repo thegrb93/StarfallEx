@@ -795,7 +795,7 @@ function ents_methods:setPhysMaterial( mat )
 end
 
 --- Checks whether entity has physics
--- @param vec The force vector
+-- @return True if entity has physics
 function ents_methods:hasPhysics()
 	SF.CheckType( self, ents_metatable )
 	
