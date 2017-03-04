@@ -794,6 +794,16 @@ function ents_methods:setPhysMaterial( mat )
 	construct.SetPhysProp( nil, ent, 0, phys, {Material = mat} ) 
 end
 
+--- Checks whether entity has physics
+-- @return True if entity has physics
+function ents_methods:isValidPhys()
+	SF.CheckType( self, ents_metatable )
+	
+	local ent = unwrap( self )
+	local phys = getPhysObject( ent )
+	return phys ~= nil
+end
+
 --- Sets entity gravity
 -- @param grav Bool should the entity respect gravity?
 function ents_methods:enableGravity ( grav )
