@@ -796,7 +796,7 @@ end
 
 --- Checks whether entity has physics
 -- @return True if entity has physics
-function ents_methods:hasPhysics()
+function ents_methods:isValidPhys()
 	SF.CheckType( self, ents_metatable )
 	
 	local ent = unwrap( self )
