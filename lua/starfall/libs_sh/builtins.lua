@@ -676,6 +676,55 @@ function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	end
 end
 
+--- Lua's pcall with SF throw implementation
+-- Calls a function and catches an error that can be thrown while the execution of the call.
+-- @param func Function to be executed and of which the errors should be caught of
+-- @param arguments Arguments to call the function with.
+-- @return If the function had no errors occur within it.
+-- @return If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.
+function SF.DefaultEnvironment.pcall ( func, ... )
+	local vret = { pcall( func, ... ) }
+	local ok, err = vret[1], vret[2]
+	
+	if ok then return unpack(vret) end
+	
+	if type( err ) == "table" then
+		if err.uncatchable then
+			error( err )
+		end
+	elseif err == "not enough memory" then
+		SF.throw( err, 0, true )
+	end
+	
+	return false, err
+end
+
+--- Lua's xpcall with SF throw implementation
+-- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function. 
+-- If execution fails, this returns false and the second function is called with the error message.
+-- @param funcThe function to call initially.
+-- @param The function to be called if execution of the first fails; the error message is passed as a string.
+-- @param arguments Arguments to pass to the initial function.
+-- @return Status of the execution; true for success, false for failure.
+-- @return The returns of the first function if execution succeeded, otherwise the first return value of the error callback.
+function SF.DefaultEnvironment.xpcall ( func, callback, ... )
+	local vret = { pcall( func, ... ) }
+	local ok, err = vret[1], vret[2]
+	
+	if ok then return unpack(vret) end
+	
+	if type( err ) == "table" then
+		if err.uncatchable then
+			error( err )
+		end
+	elseif err == "not enough memory" then
+		SF.throw( err, 0, true )
+	end
+	
+	local cret = callback( err )
+	return false, cret
+end
+
 --- Try to execute a function and catch possible exceptions
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
@@ -693,6 +742,7 @@ function SF.DefaultEnvironment.try ( func, catch )
 	end
 	if catch then catch( err ) end
 end
+
 
 --- Throws an exception
 -- @param msg Message
