@@ -79,8 +79,6 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_keybindings", "ace", true, false )
 	CreateClientConVar( "sf_editor_fontsize", 13, true, false )
 
-	local editorUrl = "http://thegrb93.github.io/StarfallEx/starfall/editor.html"
-
 	function SF.Editor.init ()
 
 		if not file.Exists( "starfall", "DATA" ) then
@@ -296,30 +294,31 @@ if CLIENT then
 
 	local function createLibraryMap ()
 
-		local map = {}
+		local libMap, libs = {}, {}
 
-		map[ "Environment" ] = {}
+		libMap[ "Environment" ] = {}
 		for name, val in pairs( SF.DefaultEnvironment ) do
-			table.insert( map[ "Environment" ], name )
+			table.insert( libMap[ "Environment" ], name )
+			table.insert( libs, name )
 		end
 		
 		for lib, tbl in pairs( SF.Libraries.libraries ) do
-			map[ lib ] = {}
+			libMap[ lib ] = {}
 			for name, val in pairs( tbl ) do
-				table.insert( map[ lib ], name )
+				table.insert( libMap[ lib ], name )
+				table.insert( libs, lib.."\\."..name )
 			end
 		end
 		
 		for lib, tbl in pairs( SF.Types ) do
 			if type( tbl.__index ) == "table" then
-				map[ lib ] = {}
 				for name, val in pairs( tbl.__index ) do
-					table.insert( map[ lib ], name )
+					table.insert( libs, "\\:"..name )
 				end
 			end
 		end
 
-		return map
+		return libMap, table.concat( libs, "|" )
 	end
 
 	function SF.Editor.refreshTab ( tab )
@@ -361,13 +360,18 @@ if CLIENT then
 	end
 
 	function SF.Editor.createEditor ()
+	
 		local editor = vgui.Create( "StarfallFrame" )
 		editor:DockPadding( 0, 0, 0, 0 )
 		editor:SetTitle( "Starfall Code Editor" )
 		editor:Center()
-
 		SF.Editor.editor = editor
-
+		
+		local files = file.Find("html/starfalleditor*","GAME")
+		local version
+		if files[1] then version = string.match(files[1], "starfalleditor(%d+)%.html") end
+		if not version then return end
+		
 		function editor:OnKeyCodePressed ( keyCode )
 			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
 				SF.Editor.saveTab( SF.Editor.getActiveTab() )
@@ -469,7 +473,7 @@ if CLIENT then
 		html:DockMargin( 5, 59, 5, 5 )
 		html:SetKeyboardInputEnabled( true )
 		html:SetMouseInputEnabled( true )
-		html:OpenURL( editorUrl )
+		html:OpenURL( "asset://garrysmod/html/starfalleditor"..version..".html" )
 		html:AddFunction( "console", "copyCode", function( code )
 			SF.Editor.getActiveTab().code = code
 			SF.Editor.doValidation()
@@ -488,21 +492,9 @@ if CLIENT then
 		local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 			
 		local function FinishedLoadingEditor()
-			local map = createLibraryMap()
-			html:QueueJavascript( "libraryMap = JSON.parse(\"" .. util.TableToJSON( map ):JavascriptSafe() .. "\")" )
-
-			local libs = {}
-			local functions = {}
-			table.ForEach( map, function ( lib, vals )
-				if lib == "Environment" or lib:GetChar( 1 ):upper() ~= lib:GetChar( 1 ) then
-					table.insert( libs, lib )
-				end
-				table.ForEach( vals, function ( key, val )
-					table.insert( functions, val )
-				end )
-			end )
-
-			html:QueueJavascript( "createStarfallMode(\"" .. table.concat( libs, "|" ) .. "\", \"" .. table.concat( table.Add( table.Copy( functions ), libs ), "|" ) .. "\")" )
+			local libMap, libs = createLibraryMap()
+			html:QueueJavascript( "libraryMap = " .. util.TableToJSON( libMap ) )
+			html:QueueJavascript( "createStarfallMode(\"" .. libs .. "\")" )
 
 			function html:OnKeyCodePressed ( key, notfirst )
 
