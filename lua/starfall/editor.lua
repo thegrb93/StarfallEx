@@ -473,6 +473,9 @@ if CLIENT then
 		local version if files[1] then version = string.match(files[1], "starfalleditor(%d+)%.html") end
 		if version then
 			html:OpenURL( "asset://garrysmod/html/starfalleditor"..version..".html" )
+		else
+			--Files failed to send, use github
+			html:OpenURL( "http://thegrb93.github.io/StarfallEx/starfall/starfalleditor1.html" )
 		end
 		
 		html:AddFunction( "console", "copyCode", function( code )
