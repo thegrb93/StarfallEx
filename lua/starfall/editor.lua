@@ -367,11 +367,6 @@ if CLIENT then
 		editor:Center()
 		SF.Editor.editor = editor
 		
-		local files = file.Find("html/starfalleditor*","GAME")
-		local version
-		if files[1] then version = string.match(files[1], "starfalleditor(%d+)%.html") end
-		if not version then return end
-		
 		function editor:OnKeyCodePressed ( keyCode )
 			if keyCode == KEY_S and ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and not input.IsKeyDown( KEY_LALT ) then
 				SF.Editor.saveTab( SF.Editor.getActiveTab() )
@@ -473,7 +468,13 @@ if CLIENT then
 		html:DockMargin( 5, 59, 5, 5 )
 		html:SetKeyboardInputEnabled( true )
 		html:SetMouseInputEnabled( true )
-		html:OpenURL( "asset://garrysmod/html/starfalleditor"..version..".html" )
+		
+		local files = file.Find("html/starfalleditor*","GAME")
+		local version if files[1] then version = string.match(files[1], "starfalleditor(%d+)%.html") end
+		if version then
+			html:OpenURL( "asset://garrysmod/html/starfalleditor"..version..".html" )
+		end
+		
 		html:AddFunction( "console", "copyCode", function( code )
 			SF.Editor.getActiveTab().code = code
 			SF.Editor.doValidation()
