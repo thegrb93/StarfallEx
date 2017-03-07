@@ -104,6 +104,8 @@ function hook_library.run ( hookname, ... )
 
 	if tbl[1] then
 		return unpack( tbl, 2 )
+	else
+		SF.throw("Hook errored",2)
 	end
 end
 
@@ -143,8 +145,12 @@ function hook_library.runRemote ( recipient, ... )
 
 		local result = k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... )
 
-		if result[1] and result[2]~=nil then
-			results[ #results + 1 ] = { unpack( result, 2 ) }
+		if result[1] then
+			if result[2]~=nil then
+				results[ #results + 1 ] = { unpack( result, 2 ) }
+			end
+		elseif k == instance then
+			SF.throw("Hook errored",2)
 		end
 
 	end
