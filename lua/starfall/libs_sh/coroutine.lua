@@ -78,7 +78,12 @@ end
 -- @param ... optional parameters that will be returned to the main thread
 -- @return Any values passed to the coroutine
 function coroutine_library.yield ( ... )
-	return coroutine.yield( ... )
+	local curthread = coroutine.running()
+	if curthread and SF.instance.data.coroutines[ curthread ] then
+		return coroutine.yield( ... )
+	else
+		SF.throw("attempt to yield across C-call boundary", 2)
+	end
 end
 
 --- Returns the status of the coroutine.
@@ -100,6 +105,11 @@ end
 --- Suspends the coroutine for a number of seconds. Note that the coroutine will not resume automatically, but any attempts to resume the coroutine while it is waiting will not resume the coroutine and act as if the coroutine suspended itself immediately.
 -- @param time Time in seconds to suspend the coroutine
 function coroutine_library.wait ( time )
-	SF.CheckType( time, "number" )
-	coroutine.wait( time )
+	local curthread = coroutine.running()
+	if curthread and SF.instance.data.coroutines[ curthread ] then
+		SF.CheckType( time, "number" )
+		coroutine.wait( time )
+	else
+		SF.throw("attempt to yield across C-call boundary", 2)
+	end
 end
