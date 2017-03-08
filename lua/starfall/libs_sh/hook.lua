@@ -105,7 +105,7 @@ function hook_library.run ( hookname, ... )
 	if tbl[1] then
 		return unpack( tbl, 2 )
 	else
-		SF.throw("Hook errored",2)
+		return
 	end
 end
 
