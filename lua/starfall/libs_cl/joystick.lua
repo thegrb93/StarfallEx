@@ -1,11 +1,6 @@
 
 if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") then
-	if util.CRC(file.Read("bin/gmcl_joystick_win32.dll", "LUA"))=="2665158387" then
-		require("joystick")
-	else
-		ErrorNoHalt("CRC check for gmcl_joystick_win32.dll failed.")
-		return
-	end
+	require("joystick")
 else
 	return
 end
