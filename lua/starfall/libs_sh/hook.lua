@@ -98,14 +98,16 @@ function hook_library.run ( hookname, ... )
 	SF.CheckType( hookname, "string" )
 
 	local instance = SF.instance
-	local lower = hookname:lower()
+	local hook = hookname:lower()
 
-	local tbl = instance:runScriptHookForResult( lower, ... )
-
-	if tbl[1] then
-		return unpack( tbl, 2 )
-	else
-		SF.throw("Hook errored",2)
+	if instance.hooks and instance.hooks[hook] then
+		local tbl
+		for name, func in pairs(instance.hooks[hook]) do
+			tbl = {func(...)}
+			if tbl[1]~=nil then
+				return unpack(tbl)
+			end
+		end
 	end
 end
 
@@ -142,15 +144,15 @@ function hook_library.runRemote ( recipient, ... )
 
 	local results = {}
 	for k, _ in pairs( recipients ) do
-
-		local result = k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... )
-
-		if result[1] then
-			if result[2]~=nil then
-				results[ #results + 1 ] = { unpack( result, 2 ) }
-			end
-		elseif k == instance then
-			SF.throw("Hook errored",2)
+		local result
+		if k==instance then
+			result = {true, hook_library.run( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... )}
+		else
+			result = k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... )
+		end
+		
+		if result[1] and result[2]~=nil then
+			results[ #results + 1 ] = { unpack( result, 2 ) }
 		end
 
 	end
@@ -268,7 +270,7 @@ add( "PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse )
 -- Entity hooks
 add( "OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
-		instance:runFunction( hook_library.run, "onentitycreated", SF.WrapObject(ent) )
+		instance:runScriptHook( "onentitycreated", SF.WrapObject(ent) )
 	end)
 	return false
 end)
