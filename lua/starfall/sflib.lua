@@ -2,7 +2,7 @@
 -- The main Starfall library
 -------------------------------------------------------------------------------
 
-if SF ~= nil then return end
+if SF != nil then return end
 SF = {}
 
 -- Send files to client
@@ -198,7 +198,7 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		return sf2sensitive[value]
 	end
 	
-	if target_metatable ~= nil then
+	if target_metatable != nil then
 		object_wrappers[target_metatable] = wrap
 		metatable.__wrap = wrap
 	end
@@ -232,7 +232,7 @@ end
 -- or returns the wrapped object if it does have a wrapper.
 function SF.WrapObject( object )
 	local metatable = dgetmeta(object)
-	if not metatable and type(object)~="table" then return object end
+	if not metatable and type(object)!="table" then return object end
 	local wrap = object_wrappers[metatable]
 	return wrap and wrap(object)
 end
@@ -379,7 +379,7 @@ end
 -- ------------------------------------------------------------------------- --
 
 local function isnan(n)
-	return n ~= n
+	return n != n
 end
 
 -- Taken from E2Lib
@@ -541,7 +541,7 @@ if SERVER then
 		
 		local I = 0
 		while I < 256 do
-			if net.ReadBit() ~= 0 then break end
+			if net.ReadBit() != 0 then break end
 			local filename = net.ReadString()
 
 			net.ReadStream( ply, function( data )

@@ -84,7 +84,7 @@ function ENT:CodeSent ( files, main, owner )
 	
 	if instance.ppdata.scriptnames and instance.mainfile then
 		local name = instance.ppdata.scriptnames[ instance.mainfile ]
-		if name and name~="" then
+		if name and name!="" then
 			self.name = name
 		end
 	end
@@ -108,7 +108,7 @@ net.Receive( "starfall_processor_download", function ( len )
 	
 	local I = 0
 	while I < 256 do
-		if net.ReadBit() ~= 0 then break end
+		if net.ReadBit() != 0 then break end
 		
 		local filename = net.ReadString()
 

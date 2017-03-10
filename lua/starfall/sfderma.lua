@@ -262,7 +262,7 @@ function PANEL:Think ()
 	end
 	
 	if self.Hovered and self.m_bSizable and 
-	 	mousex > ( self.x + self:GetWide() - 20 ) and mousey > ( self.y + self:GetTall() - 20 ) then
+		mousex > ( self.x + self:GetWide() - 20 ) and mousey > ( self.y + self:GetTall() - 20 ) then
 
 		self:SetCursor( "sizenwse" )
 	elseif self.Hovered and self.m_bSizable and
@@ -400,7 +400,7 @@ function PANEL:SetIcon ( icon )
 	self.icon = SF.Editor.icons[ icon ]
 end
 function PANEL:PerformLayout ()
-	if self:GetText() ~= "" then
+	if self:GetText() != "" then
 		self:SizeToContentsX()
 		self:SetWide( self:GetWide() + 14 )
 	end
@@ -508,9 +508,9 @@ function PANEL:Init ()
 	self.menuoptions[ #self.menuoptions + 1 ] = { "Close Other Tabs", function ()
 		if not self.targetTab then return end
 		local n = 1
-		while #self.tabs ~= 1 do
+		while #self.tabs != 1 do
 			v = self.tabs[ n ]
-			if v ~= self.targetTab then 
+			if v != self.targetTab then 
 				self:removeTab( v )
 			else
 				n = 2

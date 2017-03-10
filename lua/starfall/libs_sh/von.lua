@@ -71,7 +71,7 @@ local sub, gsub, find, insert, concat, error, tonumber, tostring, type, next = s
 
 
 --[[    This section contains localized functions which (de)serialize
-        variables according to the types found.                          ]]
+		variables according to the types found.                          ]]
 
 
 
@@ -201,7 +201,7 @@ function s_anyVariable(data, lastType, isNumeric, isKey, isLast, jobstate)
 	end
 
 	--	Basically, if the type changes.
-	if lastType ~= tp then
+	if lastType != tp then
 		--	Remember the new type. Caching the type is useless.
 		lastType = tp
 
@@ -221,7 +221,7 @@ end
 
 
 --[[    This section contains the tables with the functions necessary
-        for decoding basic Lua data types.                               ]]
+		for decoding basic Lua data types.                               ]]
 
 
 
@@ -447,9 +447,9 @@ _serialize = {
 		--	pairs(data) is slower than next, data as far as my tests tell me.
 		for k, v in next, data do
 			--	Skip the numeric keyz.
-			if type(k) ~= "number" or k < 1 or k > len or (k % 1 ~= 0) then	--	k % 1 == 0 is, as proven by personal benchmarks,
+			if type(k) != "number" or k < 1 or k > len or (k % 1 ~= 0) then	--	k % 1 == 0 is, as proven by personal benchmarks,
 				keyvals[#keyvals + 1] = k									--	the quickest way to check if a number is an integer.
-			end																--	k % 1 ~= 0 is the fastest way to check if a number
+			end																--	k % 1 != 0 is the fastest way to check if a number
 		end																	--	is NOT an integer. > is proven slower.
 
 		keyvalsLen = #keyvals

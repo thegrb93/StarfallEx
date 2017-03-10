@@ -456,7 +456,7 @@ function render_library.getTextureID ( tx, cb, alignment )
 			SF.CheckType( alignment, "string" )
 			local args = string.Split( alignment, " " )
 			local validargs = {["left"]=true,["center"]=true,["right"]=true,["top"]=true,["bottom"]=true}
-			if #args ~= 1 and #args ~= 2 then SF.throw( "Invalid urltexture alignment given." ) end
+			if #args != 1 and #args ~= 2 then SF.throw( "Invalid urltexture alignment given." ) end
 			for i=1, #args do
 				if not validargs[args[i]] then SF.throw( "Invalid urltexture alignment given." ) end
 			end
@@ -1137,7 +1137,7 @@ end
 -- @return y position
 function render_library.cursorPos( ply )
 	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
+	if not screen or screen:GetClass()!="starfall_screen" then return input.GetCursorPos() end
 
 	ply = eunwrap( ply )
 	if not ply then SF.throw("Invalid Player", 2) end

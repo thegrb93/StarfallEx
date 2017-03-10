@@ -28,7 +28,7 @@ function game_lib.getGamemode ()
 	local rtn = {}
 	local t = gmod.GetGamemode()
 	for k, v in pairs( t ) do
-		if type( v ) ~= "function" and type( v ) ~= "table" then
+		if type( v ) != "function" and type( v ) ~= "table" then
 			rtn[ k:gsub( "^%u", string.lower ) ] = v
 		end
 	end

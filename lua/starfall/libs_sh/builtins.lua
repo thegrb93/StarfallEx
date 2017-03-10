@@ -480,7 +480,7 @@ else
 	--- Sets clipboard text. Only works on the owner of the chip.
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText( txt )
-		if SF.instance.player ~= LocalPlayer() then return end
+		if SF.instance.player != LocalPlayer() then return end
 		SF.CheckType( txt, "string" )
 		SetClipboardText( txt )
 	end
@@ -489,7 +489,7 @@ else
 	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
 	-- @param text The message text.
 	function SF.DefaultEnvironment.printMessage( mtype, text )
-		if SF.instance.player ~= LocalPlayer() then return end
+		if SF.instance.player != LocalPlayer() then return end
 		SF.CheckType( text, "string" )
 		SF.instance.player:PrintMessage( mtype, text )
 	end
@@ -553,20 +553,20 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function SF.DefaultEnvironment.requiredir( dir, loadpriority )
-    SF.CheckType( dir, "string")
-    if loadpriority then SF.CheckType( loadpriority, "table" ) end
-    
-    local returns = {}
+	SF.CheckType( dir, "string")
+	if loadpriority then SF.CheckType( loadpriority, "table" ) end
+	
+	local returns = {}
 
-    if loadpriority then
-        for i = 1, #loadpriority do
-            for file, _ in pairs( SF.instance.scripts ) do
-                if string.find( file, dir .. "/" .. loadpriority[ i ] , 1 ) == 1 then
-                    returns[ file ] = SF.DefaultEnvironment.require( file )
-                end
-            end
-        end
-    end
+	if loadpriority then
+		for i = 1, #loadpriority do
+			for file, _ in pairs( SF.instance.scripts ) do
+				if string.find( file, dir .. "/" .. loadpriority[ i ] , 1 ) == 1 then
+					returns[ file ] = SF.DefaultEnvironment.require( file )
+				end
+			end
+		end
+	end
 
 	for file, _ in pairs( SF.instance.scripts ) do
 		if string.find( file, dir, 1 ) == 1 and not returns[ file ] then
@@ -574,7 +574,7 @@ function SF.DefaultEnvironment.requiredir( dir, loadpriority )
 		end
 	end
 
-    return returns
+	return returns
 end
 
 --- Runs an included script, but does not cache the result.
@@ -582,7 +582,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
-    SF.CheckType(file, "string")
+	SF.CheckType(file, "string")
 	local path
 	if string.sub(file,1,1)=="/" then
 		path = SF.NormalizePath( file )
@@ -592,9 +592,9 @@ function SF.DefaultEnvironment.dofile(file)
 			path = SF.NormalizePath( file )
 		end
 	end
-    local func = SF.instance.scripts[path]
-    if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
-    return func()
+	local func = SF.instance.scripts[path]
+	if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
+	return func()
 end
 
 --- Runs an included directory, but does not cache the result.
@@ -602,28 +602,28 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function SF.DefaultEnvironment.dodir( dir, loadpriority )
-    SF.CheckType( dir, "string" )
-    if loadpriority then SF.CheckType( loadpriority, "table" ) end
+	SF.CheckType( dir, "string" )
+	if loadpriority then SF.CheckType( loadpriority, "table" ) end
 
-    local returns = {}
+	local returns = {}
 
-    if loadpriority then
-        for i = 0, #loadpriority do
-            for file, _ in pairs( SF.instance.scripts ) do
-                if string.find( file, dir .. "/" .. loadpriority[ i ] , 1 ) == 1 then
-                    returns[ file ] = SF.DefaultEnvironment.dofile( file )
-                end
-            end
-        end
-    end
+	if loadpriority then
+		for i = 0, #loadpriority do
+			for file, _ in pairs( SF.instance.scripts ) do
+				if string.find( file, dir .. "/" .. loadpriority[ i ] , 1 ) == 1 then
+					returns[ file ] = SF.DefaultEnvironment.dofile( file )
+				end
+			end
+		end
+	end
 
-    for file, _ in pairs( SF.instance.scripts ) do
+	for file, _ in pairs( SF.instance.scripts ) do
 		if string.find( file, dir, 1 ) == 1 then
 			returns[ file ] = SF.DefaultEnvironment.dofile( file )
 		end
-    end
+	end
 
-    return returns
+	return returns
 end
 
 --- GLua's loadstring
@@ -647,7 +647,7 @@ end
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv ( func, tbl )
-	if type( func ) ~= "function" or getfenv( func ) == _G then SF.throw( "Main Thread is protected!", 2 ) end
+	if type( func ) != "function" or getfenv( func ) == _G then SF.throw( "Main Thread is protected!", 2 ) end
 	return setfenv( func, tbl )
 end
 
@@ -656,7 +656,7 @@ end
 -- @return Current environment
 function SF.DefaultEnvironment.getfenv ()
 	local fenv = getfenv(2)
-	if fenv ~= _G then return fenv end
+	if fenv != _G then return fenv end
 end
 
 --- GLua's getinfo()
@@ -666,7 +666,7 @@ end
 -- @return DebugInfo table
 function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	local TfuncOrStackLevel = type(funcOrStackLevel)
-	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
+	if TfuncOrStackLevel!="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
 	if fields then SF.CheckType(fields, "string") end
 	
 	local ret = debug.getinfo( funcOrStackLevel, fields )

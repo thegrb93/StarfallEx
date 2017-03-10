@@ -213,9 +213,9 @@ end
 --- Are all fields zero.
 -- @return bool True/False
 function vec_methods:isZero ( )
-	if self[1] ~= 0 then return false
-	elseif self[2] ~= 0 then return false
-	elseif self[3] ~= 0 then return false
+	if self[1] != 0 then return false
+	elseif self[2] != 0 then return false
+	elseif self[3] != 0 then return false
 	end
 
 	return true

@@ -94,7 +94,7 @@ function mesh_library.createFromTable ( verteces )
 	SF.CheckType( verteces, "table" )
 	
 	local nvertices = #verteces
-	if nvertices<3 or nvertices%3~=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
+	if nvertices<3 or nvertices%3!=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
 	local ntriangles = nvertices/3
 	
 	local instance = SF.instance
@@ -152,7 +152,7 @@ function mesh_library.createFromObj ( obj )
 		end
 	end
 	
-	if #face<3 or #face%3~=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
+	if #face<3 or #face%3!=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
 	local ntriangles = #face/3
 	canAddTriangles(instance, ntriangles)
 	

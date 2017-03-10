@@ -87,7 +87,7 @@ function ENT:Compile(files, mainfile)
 		self.instance = nil
 	end
 	
-	local update = self.mainfile ~= nil
+	local update = self.mainfile != nil
 	self.error = nil
 	self.files = files
 	self.mainfile = mainfile

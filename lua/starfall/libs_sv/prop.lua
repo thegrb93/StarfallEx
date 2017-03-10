@@ -32,7 +32,7 @@ SF.Libraries.AddHook("initialize",function(inst)
 end)
 
 SF.Libraries.AddHook("deinitialize", function(inst)
-	if inst.data.props.clean ~= false then --Return true on nil too
+	if inst.data.props.clean != false then --Return true on nil too
 		for prop, _ in pairs(inst.data.props.props) do
 			local propent = SF.Entities.Unwrap(prop)
 			if IsValid(propent) then
@@ -143,7 +143,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 	if swep then
 
 		if ( ( !swep.Spawnable && !instance.player:IsAdmin() ) || 
-		      ( swep.AdminOnly && !instance.player:IsAdmin() ) ) then return end
+			  ( swep.AdminOnly && !instance.player:IsAdmin() ) ) then return end
 		if ( !gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
 
 

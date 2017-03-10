@@ -84,7 +84,7 @@ function http_library.post ( url, params, callbackSuccess, callbackFail )
 	if params then
 		SF.CheckType( params, "table" )
 		for k,v in pairs( params ) do
-			if type( k ) ~= "string" or type( v ) ~= "string" then
+			if type( k ) != "string" or type( v ) ~= "string" then
 				SF.throw( "Post parameters can only contain string keys and string values", 2 )
 			end
 		end

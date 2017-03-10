@@ -354,7 +354,7 @@ end
 -- @server 
 function constraint_library.breakType(e, typename)
 	SF.CheckType( e, ents_metatable )
-    SF.CheckType( typename, "string" )
+	SF.CheckType( typename, "string" )
 	
 	local ent1 = eunwrap( e )
 	

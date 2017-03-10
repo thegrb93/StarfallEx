@@ -129,9 +129,9 @@ end
 --- Returns if p,y,r are all 0.
 -- @return boolean
 function ang_methods:isZero ( )
-	if self[1] ~= 0 then return false
-	elseif self[2] ~= 0 then return false
-	elseif self[3] ~= 0 then return false
+	if self[1] != 0 then return false
+	elseif self[2] != 0 then return false
+	elseif self[3] != 0 then return false
 	end
 
 	return true
