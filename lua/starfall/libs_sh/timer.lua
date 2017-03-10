@@ -66,7 +66,7 @@ function timer_library.create(name, delay, reps, func, simple)
 	end
 	
 	local function timercb()
-		if reps ~= 0 then
+		if reps != 0 then
 			reps = reps - 1
 			if reps==0 then
 				instance.data.timer_count = instance.data.timer_count - 1

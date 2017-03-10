@@ -109,7 +109,7 @@ if CLIENT then
 	end
 	
 	function SF.Editor.openFile( fl )
-		if not fl or string.GetExtensionFromFilename( fl ) ~= "txt" then return end
+		if not fl or string.GetExtensionFromFilename( fl ) != "txt" then return end
 		if not SF.Editor.initialized then SF.Editor.init() end
 
 		local fileName = string.gsub( fl, "starfall/", "", 1 )
@@ -175,7 +175,7 @@ if CLIENT then
 		if code then
 			local ppdata = {}
 			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
-			if ppdata.scriptnames and ppdata.scriptnames.file ~= "" then 
+			if ppdata.scriptnames and ppdata.scriptnames.file != "" then 
 				name = ppdata.scriptnames.file
 			end
 		end
@@ -257,7 +257,7 @@ if CLIENT then
 
 			local err = CompileString( code, "Validation", false )
 
-			if type( err ) ~= "string" then 
+			if type( err ) != "string" then 
 				if forceShow then SF.AddNotify( LocalPlayer(), "Validation successful", "GENERIC", 3, "DRIP3" ) end
 				SF.Editor.runJS( "editor.session.clearAnnotations(); clearErrorLines()" )
 				return 
@@ -351,7 +351,7 @@ if CLIENT then
 	function SF.Editor.updateTabName ( tab )
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
-		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then 
+		if ppdata.scriptnames and ppdata.scriptnames.tab != "" then 
 			tab.name = ppdata.scriptnames.tab
 		else
 			tab.name = tab.filename or "generic"
@@ -694,7 +694,7 @@ if CLIENT then
 				local model = nil
 				local ppdata = {}
 				SF.Preprocessor.ParseDirectives( "file", SF.Editor.getCode(), {}, ppdata )
-				if ppdata.models and ppdata.models.file ~= "" then
+				if ppdata.models and ppdata.models.file != "" then
 					model = ppdata.models.file 
 				end
 
@@ -702,9 +702,9 @@ if CLIENT then
 			end 
 		end
 
-		if tabs ~= nil and #tabs ~= 0 then
+		if tabs != nil and #tabs ~= 0 then
 			for k, v in pairs( tabs ) do
-				if type( v ) ~= "number" then
+				if type( v ) != "number" then
 					SF.Editor.addTab( v.filename, v.code )
 				end
 			end
@@ -726,7 +726,7 @@ if CLIENT then
 		local searchBox, tree = browser:getComponents()
 		tree:setup( "starfall" )
 		function tree:OnNodeSelected ( node )
-			if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
+			if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
 			local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
 			local code = file.Read( node:GetFileName(), "DATA" )
 
@@ -1152,7 +1152,7 @@ if CLIENT then
 
 			local function fillNavBar ( propTable, parentNode )
 				for k, v in SortedPairs( propTable ) do
-					if v.parentid == parentNode.info.id and ( v.needsapp ~= "" and hasGame( v.needsapp ) or v.needsapp == "" ) then
+					if v.parentid == parentNode.info.id and ( v.needsapp != "" and hasGame( v.needsapp ) or v.needsapp == "" ) then
 						local node = parentNode:AddNode( v.name, v.icon )
 						node:SetExpanded( true )
 						node.info = v
@@ -1165,7 +1165,7 @@ if CLIENT then
 							if object.type == "model" then
 								addModel( node.propPanel, object )
 							elseif object.type == "header" then
-								if not object.text or type( object.text ) ~= "string" then return end
+								if not object.text or type( object.text ) != "string" then return end
 
 								local label = vgui.Create( "ContentHeader", node.propPanel )
 								label:SetText( object.text )
@@ -1269,7 +1269,7 @@ if CLIENT then
 			local searchTime = nil
 
 			function frame.searchBox:getAllModels ( time, folder, extension, path )
-				if searchTime and time ~= searchTime then return end
+				if searchTime and time != searchTime then return end
 				if self.results and self.results >= 256 then return end
 				self.load = self.load + 1
 				local files, folders = file.Find( folder .. "/*", path )
@@ -1286,13 +1286,13 @@ if CLIENT then
 
 				for k, v in pairs( folders ) do
 					timer.Simple( k * 0.02, function()
-						if searchTime and time ~= searchTime then return end
+						if searchTime and time != searchTime then return end
 						if self.results >= 256 then return end
 						self:getAllModels( time, folder .. v .. "/", extension, path )
 					end )
 				end
 				timer.Simple( 1, function () 
-					if searchTime and time ~= searchTime then return end
+					if searchTime and time != searchTime then return end
 					self.load = self.load - 1 
 				end )
 			end
@@ -1433,7 +1433,7 @@ if CLIENT then
 				codedir = curdir
 				codepath = path
 			else
-				if string.sub(path,1,1)~="/" then
+				if string.sub(path,1,1)!="/" then
 					codepath = SF.NormalizePath( curdir .. path )
 					code = file.Read( "starfall/" .. codepath, "DATA" )
 				end
@@ -1524,7 +1524,7 @@ if CLIENT then
 
 	net.Receive( "starfall_editor_status", function ( len )
 		local ply = net.ReadEntity()
-		local status = net.ReadBit() ~= 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
+		local status = net.ReadBit() != 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
 		if not ply:IsValid() or ply == LocalPlayer() then return end
 
 		busy_players[ ply ] = status or nil

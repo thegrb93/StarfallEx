@@ -144,7 +144,7 @@ function SF.Instance:prepare(hook)
 	--Functions calling this one will silently halt.
 	if self.error then return true end
 	
-	if SF.instance ~= nil then
+	if SF.instance != nil then
 		self.instanceStack = self.instanceStack or {}
 		self.instanceStack[#self.instanceStack + 1] = SF.instance
 		SF.instance = nil
@@ -236,7 +236,7 @@ function SF.Instance:runScriptHookForResult(hook,...)
 	for name, func in pairs(self.hooks[hook]) do
 		tbl = self:runWithOps(func,...)
 		if tbl[1] then
-			if tbl[2]~=nil then
+			if tbl[2]!=nil then
 				break
 			end
 		else

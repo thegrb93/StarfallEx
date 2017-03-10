@@ -48,53 +48,53 @@ function ENT:Initialize()
 end
 
 function ENT:setupClip ()
-    -- Setup Clipping
-    local l = #self.clips
-    if l > 0 then
-        render.EnableClipping( true )
-        for _, clip in pairs( self.clips ) do
-            if clip.enabled and clip.normal and clip.origin then
-                local norm = clip.normal
-                local origin = clip.origin
+	-- Setup Clipping
+	local l = #self.clips
+	if l > 0 then
+		render.EnableClipping( true )
+		for _, clip in pairs( self.clips ) do
+			if clip.enabled and clip.normal and clip.origin then
+				local norm = clip.normal
+				local origin = clip.origin
 
-                if clip.islocal then
-                    norm = self:LocalToWorld( norm ) - self:GetPos()
-                    origin = self:LocalToWorld( origin )
-                end
-                render.PushCustomClipPlane( norm, norm:Dot( origin ) )
-            end
-        end
-    end
+				if clip.islocal then
+					norm = self:LocalToWorld( norm ) - self:GetPos()
+					origin = self:LocalToWorld( origin )
+				end
+				render.PushCustomClipPlane( norm, norm:Dot( origin ) )
+			end
+		end
+	end
 end
 
 function ENT:finishClip ()
-    for i = 1, #self.clips do
-        render.PopCustomClipPlane()
-    end
-    render.EnableClipping( false )
+	for i = 1, #self.clips do
+		render.PopCustomClipPlane()
+	end
+	render.EnableClipping( false )
 end
 
 function ENT:setupRenderGroup ()
-    local alpha = self:GetColor().a
+	local alpha = self:GetColor().a
 
-    if alpha == 0 then return end
+	if alpha == 0 then return end
 
-    if alpha ~= 255 then
-        self.RenderGroup = RENDERGROUP_BOTH
-    else
-        self.RenderGroup = RENDERGROUP_OPAQUE
-    end
+	if alpha != 255 then
+		self.RenderGroup = RENDERGROUP_BOTH
+	else
+		self.RenderGroup = RENDERGROUP_OPAQUE
+	end
 end
 
 function ENT:Draw()
-    self:setupRenderGroup()
-    self:setupClip()
+	self:setupRenderGroup()
+	self:setupClip()
 
 	render.SuppressEngineLighting( self:GetNWBool( "suppressEngineLighting" ) )
 	self:DrawModel()
 	render.SuppressEngineLighting( false )
 
-    self:finishClip()
+	self:finishClip()
 end
 
 -- ------------------------ CLIPPING ------------------------ --
@@ -120,18 +120,18 @@ net.Receive( "starfall_hologram_clip", function ()
 		-- Uninitialized
 		msgQueueAdd( "clip", entid, {
 			net.ReadUInt( 16 ),
-			net.ReadBit( ) ~= 0,
+			net.ReadBit( ) != 0,
 			net.ReadVector( ),
 			net.ReadVector( ),
-			net.ReadBit( ) ~= 0
+			net.ReadBit( ) != 0
 		} )
 	else
 		holoent:UpdateClip (
 			net.ReadUInt( 16 ),
-			net.ReadBit( ) ~= 0,
+			net.ReadBit( ) != 0,
 			net.ReadVector( ),
 			net.ReadVector( ),
-			net.ReadBit( ) ~= 0
+			net.ReadBit( ) != 0
 		)
 	end
 end )

@@ -75,7 +75,7 @@ net.Stream.__index = net.Stream
 --Store the data and write the file info so receivers can request it.
 function net.WriteStream( data )
 
-	if type( data ) ~= "string" then
+	if type( data ) != "string" then
 		error( "bad argument #1 to 'WriteStream' (string expected, got " .. type( data ) .. ")", 2 )
 	end
 		
@@ -101,13 +101,13 @@ function net.ReadStream( ply, callback )
 	if CLIENT then 
 		ply = NULL
 	else
-		if type( ply ) ~= "Player" then
+		if type( ply ) != "Player" then
 			error( "bad argument #1 to 'ReadStream' (Player expected, got " .. type( ply ) .. ")", 2 )
 		elseif not ply:IsValid() then
 			error( "bad argument #1 to 'ReadStream' (Tried to use a NULL entity!)", 2 )
 		end
 	end
-	if type( callback ) ~= "function" then
+	if type( callback ) != "function" then
 		error( "bad argument #2 to 'ReadStream' (function expected, got " .. type( callback ) .. ")", 2 )
 	end
 	

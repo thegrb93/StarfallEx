@@ -448,8 +448,8 @@ end
 -- @class function
 -- @return String material
 function ents_methods:getMaterial ()
-    local ent = eunwrap( self )
-    return ent:GetMaterial() or ""
+	local ent = eunwrap( self )
+	return ent:GetMaterial() or ""
 end
 
 --- Gets an entities' submaterial
@@ -457,8 +457,8 @@ end
 -- @class function
 -- @return String material
 function ents_methods:getSubMaterial ( index )
-    local ent = eunwrap( self )
-    return ent:GetSubMaterial( index ) or ""
+	local ent = eunwrap( self )
+	return ent:GetSubMaterial( index ) or ""
 end
 
 --- Gets an entities' material list
@@ -466,16 +466,16 @@ end
 -- @class function
 -- @return Material
 function ents_methods:getMaterials ()
-    local ent = eunwrap( self )
-    return ent:GetMaterials() or {}
+	local ent = eunwrap( self )
+	return ent:GetMaterials() or {}
 end
 
 --- Gets the skin number of the entity
 -- @shared
 -- @return Skin number
 function ents_methods:getSkin ()
-    local ent = eunwrap( self )
-    return ent:GetSkin()
+	local ent = eunwrap( self )
+	return ent:GetSkin()
 end
 
 --- Gets the entity's up vector

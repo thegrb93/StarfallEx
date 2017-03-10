@@ -57,7 +57,7 @@ if CPPI then
 		function( principal, target, key )
 			if canPhysgun[ key ] then
 				if target:IsPlayer() then
-					if hook.Run( "PhysgunPickup", principal, target ) ~= false then
+					if hook.Run( "PhysgunPickup", principal, target ) != false then
 						-- Some mods expect a release when there's a pickup involved.
 						hook.Run( "PhysgunDrop", principal, target )
 						return true
@@ -80,7 +80,7 @@ else
 		end,
 		function( principal, target, key )
 			if canPhysgun[ key ] then
-				if hook.Run( "PhysgunPickup", principal, target ) ~= false then
+				if hook.Run( "PhysgunPickup", principal, target ) != false then
 					-- Some mods expect a release when there's a pickup involved.
 					hook.Run( "PhysgunDrop", principal, target )
 					return true
@@ -88,7 +88,7 @@ else
 					return false
 				end
 			elseif canTool[ key ] then
-				return hook.Run( "CanTool", principal, dumbtrace( target ), "starfall_ent_lib" ) ~= false
+				return hook.Run( "CanTool", principal, dumbtrace( target ), "starfall_ent_lib" ) != false
 			end
 		end,
 		function( ) return true end

@@ -64,7 +64,7 @@ end
 local function qexp(q)
 	local m = sqrt(q[2]*q[2] + q[3]*q[3] + q[4]*q[4])
 	local u
-	if m ~= 0 then
+	if m != 0 then
 		u = { q[2]*sin(m)/m, q[3]*sin(m)/m, q[4]*sin(m)/m }
 	else
 		u = { 0, 0, 0 }
@@ -207,7 +207,7 @@ local function format(value)
 	if abs(value[2]) > 0.0005 then
 		i = tostring(Round(value[2]*1000)/1000)
 
-		if string.sub(i,1,1) ~= "-" and dbginfo ~= "" then i = "+"..i end
+		if string.sub(i,1,1) != "-" and dbginfo ~= "" then i = "+"..i end
 
 		i = i .. "i"
 	end
@@ -217,7 +217,7 @@ local function format(value)
 	if abs(value[3]) > 0.0005 then
 		j = tostring(Round(value[3]*1000)/1000)
 
-		if string.sub(j,1,1) ~= "-" and dbginfo ~= "" then j = "+"..j end
+		if string.sub(j,1,1) != "-" and dbginfo ~= "" then j = "+"..j end
 
 		j = j .. "j"
 	end
@@ -227,7 +227,7 @@ local function format(value)
 	if abs(value[4]) > 0.0005 then
 		k = tostring(Round(value[4]*1000)/1000)
 
-		if string.sub(k,1,1) ~= "-" and dbginfo ~= "" then k = "+"..k end
+		if string.sub(k,1,1) != "-" and dbginfo ~= "" then k = "+"..k end
 
 		k = k .. "k"
 	end

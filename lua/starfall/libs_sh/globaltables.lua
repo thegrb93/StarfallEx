@@ -18,7 +18,7 @@ end)
 SF.Libraries.AddHook("deinitialize", function(inst)
 	local clean = true
 	for _, inst2 in pairs(SF.allInstances) do
-		if inst~=inst2 then
+		if inst!=inst2 then
 			clean = false
 			break
 		end

@@ -47,7 +47,7 @@ function hook_library.add ( hookname, name, func )
 								local tbl = instance:runScriptHookForResult( hookname, wrapArguments( unpack( customargs ) ) )
 								if tbl[1] then
 									local sane = customretfunc( instance, tbl, ... )
-									if sane ~= nil then result = sane end
+									if sane != nil then result = sane end
 								end
 							end
 						end
@@ -71,7 +71,7 @@ function hook_library.add ( hookname, name, func )
 							local tbl = instance:runScriptHookForResult( hookname, wrapArguments( ... ) )
 							if tbl[1] then
 								local sane = customretfunc( instance, tbl, ... )
-								if sane ~= nil then result = sane end
+								if sane != nil then result = sane end
 							end
 						end
 						return result
@@ -104,7 +104,7 @@ function hook_library.run ( hookname, ... )
 		local tbl
 		for name, func in pairs(instance.hooks[hook]) do
 			tbl = {func(...)}
-			if tbl[1]~=nil then
+			if tbl[1]!=nil then
 				return unpack(tbl)
 			end
 		end
@@ -151,7 +151,7 @@ function hook_library.runRemote ( recipient, ... )
 			result = k:runScriptHookForResult( "remote", SF.WrapObject( instance.data.entity ), SF.WrapObject( instance.player ), ... )
 		end
 		
-		if result[1] and result[2]~=nil then
+		if result[1] and result[2]!=nil then
 			results[ #results + 1 ] = { unpack( result, 2 ) }
 		end
 
@@ -210,13 +210,13 @@ end
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself( instance, args, ply )
-	if instance.player ~= ply then return end
+	if instance.player != ply then return end
 	return args[2]
 end
 
 --Can only return false on yourself
 local function returnOnlyOnYourselfFalse( instance, args, ply )
-	if instance.player ~= ply then return end
+	if instance.player != ply then return end
 	if args[2]==false then return false end
 end
 
