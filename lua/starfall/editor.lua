@@ -174,7 +174,7 @@ if CLIENT then
 
 		if code then
 			local ppdata = {}
-			SF.Preprocessor.ParseDirectives( "file", code, {}, ppdata )
+			SF.Preprocessor.ParseDirectives( "file", code, ppdata )
 			if ppdata.scriptnames and ppdata.scriptnames.file ~= "" then 
 				name = ppdata.scriptnames.file
 			end
@@ -350,7 +350,7 @@ if CLIENT then
 
 	function SF.Editor.updateTabName ( tab )
 		local ppdata = {}
-		SF.Preprocessor.ParseDirectives( "tab", tab.code, {}, ppdata )
+		SF.Preprocessor.ParseDirectives( "tab", tab.code, ppdata )
 		if ppdata.scriptnames and ppdata.scriptnames.tab ~= "" then 
 			tab.name = ppdata.scriptnames.tab
 		else
@@ -693,7 +693,7 @@ if CLIENT then
 			if IsValid( activeWep ) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
 				local model = nil
 				local ppdata = {}
-				SF.Preprocessor.ParseDirectives( "file", SF.Editor.getCode(), {}, ppdata )
+				SF.Preprocessor.ParseDirectives( "file", SF.Editor.getCode(), ppdata )
 				if ppdata.models and ppdata.models.file ~= "" then
 					model = ppdata.models.file 
 				end
@@ -1449,7 +1449,7 @@ if CLIENT then
 			end
 			
 			tbl.files[ codepath ] = code
-			SF.Preprocessor.ParseDirectives( codepath, code, {}, ppdata )
+			SF.Preprocessor.ParseDirectives( codepath, code, ppdata )
 			
 			if ppdata.includes and ppdata.includes[ codepath ] then
 				local inc = ppdata.includes[ codepath ]

@@ -6,9 +6,6 @@ include( "shared.lua" )
 include( "starfall/SFLib.lua" )
 assert( SF, "Starfall didn't load correctly!" )
 
-local context = SF.CreateContext()
-
-
 function ENT:Initialize ()
 	self:PhysicsInit( SOLID_VPHYSICS )
 	self:SetMoveType( MOVETYPE_VPHYSICS )
@@ -97,9 +94,9 @@ function ENT:Compile(files, mainfile)
 	end
 
 	local ppdata = {}
-	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], {}, ppdata)
+	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], ppdata)
 		
-	local ok, instance = SF.Instance.Compile( files, context, mainfile, self.owner, { entity = self } )
+	local ok, instance = SF.Instance.Compile( files, mainfile, self.owner, { entity = self } )
 	if not ok then self:Error(instance) return end
 	
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then
@@ -135,19 +132,11 @@ function ENT:GetGateName()
 end
 
 function ENT:Think ()
-	self.BaseClass.Think( self )
-	
-	if self.instance and not self.instance.error then		
-		local bufferAvg = self.instance:movingCPUAverage()
+	if self.instance then
+		local bufferAvg = self.instance.cpu_average
 		self:SetNWInt( "CPUus", math.Round( bufferAvg * 1000000 ) )
-		self:SetNWFloat( "CPUpercent", math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 ) )
-		self.instance.cpu_total = 0
-		self.instance.cpu_average = bufferAvg
-		self.instance:runScriptHook( "think" )
+		self:SetNWFloat( "CPUpercent", math.floor( bufferAvg / SF.cpuQuota:GetFloat() * 100 ) )
 	end
-
-	self:NextThink( CurTime() )
-	return true
 end
 
 function ENT:PreEntityCopy ()

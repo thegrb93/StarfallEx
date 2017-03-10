@@ -27,12 +27,12 @@ include( "editor.lua" )
 include( "sfhelper.lua" )
 include( "netstream.lua" )
 
-SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, { FCVAR_REPLICATED }, "Window width of the CPU time quota moving average." )
-
 if SERVER then
-	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.004, {}, "Max average CPU time for serverside." )
+	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.005, {}, "Max average CPU time for serverside." )
+	SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, {}, "Window width of the CPU time quota moving average." )
 else
 	SF.cpuQuota = CreateClientConVar( "sf_timebuffer", 0.015, false, false )
+	SF.cpuBufferN = CreateClientConVar( "sf_timebuffersize", 100, false, false )
 end
 
 
@@ -93,19 +93,6 @@ end
 
 function SF.GetTypeDef( name )
 	return SF.Types[name]
-end
-
---- Creates a new context. A context is used to define what scripts will have access to.
--- @param directives Additional Preprocessor directives to use. Default is an empty table
--- @param cpuTime Operations quota function. Default is specified by the convar "sf_defaultquota" and returned when calling ops()
-function SF.CreateContext ( directives, cpuTime )
-	local context = {}
-	context.directives = directives or {}
-	context.cpuTime = cpuTime or {
-		getBufferN = function () return SF.cpuBufferN:GetInt() or 3 end,
-		getMax = function () return SF.cpuQuota:GetFloat() end
-	}
-	return context
 end
 
 --- Checks the type of val. Errors if the types don't match
