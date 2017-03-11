@@ -972,10 +972,10 @@ end
 -- @param markup The markup string to parse
 -- @param maxsize The max width of the markup
 -- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
-function render_library.parseMarkup( str, maxsize )
-	SF.CheckType( str, "string" )
+function render_library.parseMarkup( markup, maxsize )
+	SF.CheckType( markup, "string" )
 	SF.CheckType( maxsize, "number" )
-	local marked = markup.Parse( str, maxsize )
+	local marked = markup.Parse( markup, maxsize )
 	local markedindex = marked.__index
 	return setmetatable(marked, {
 		__newindex = function() end,
