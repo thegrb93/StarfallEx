@@ -721,7 +721,7 @@ Checks if a hud component is connected to the Starfall Chip </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><a href="#render_library.parseMarkup">parseMarkup</a>&nbsp;(str, maxsize, markup)</td>
+	<td class="name" nowrap><a href="#render_library.parseMarkup">parseMarkup</a>&nbsp;(markup, maxsize)</td>
 	<td class="summary">
 Constructs a markup object for quick styled text drawing.</td>
 	</tr>
@@ -2309,7 +2309,7 @@ Checks if a hud component is connected to the Starfall Chip
 
 
 
-<dt><a name="render_library.parseMarkup"></a><strong>render_library.parseMarkup</strong>&nbsp;(str, maxsize, markup)</dt>
+<dt><a name="render_library.parseMarkup"></a><strong>render_library.parseMarkup</strong>&nbsp;(markup, maxsize)</dt>
 <dd>
 
 Constructs a markup object for quick styled text drawing.
@@ -2321,15 +2321,11 @@ Constructs a markup object for quick styled text drawing.
 <ul>
 	
 	<li>
-	  <code><em>str</em></code>: 
+	  <code><em>markup</em></code>: The markup string to parse
 	</li>
 	
 	<li>
 	  <code><em>maxsize</em></code>: The max width of the markup
-	</li>
-	
-	<li>
-	  <code><em>markup</em></code>: The markup string to parse
 	</li>
 	
 </ul>

@@ -769,6 +769,12 @@ Checks if an entity is valid.</td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><a href="#ents_methods:isValidPhys">isValidPhys</a>&nbsp;()</td>
+		<td class="summary">
+Checks whether entity has physics </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><a href="#ents_methods:isVehicle">isVehicle</a>&nbsp;()</td>
 		<td class="summary">
 Checks if an entity is a vehicle.</td>
@@ -808,6 +814,24 @@ Converts an angle in entity local space to world space </td>
 		<td class="name" nowrap><a href="#ents_methods:lookupAttachment">lookupAttachment</a>&nbsp;(name)</td>
 		<td class="summary">
 Gets the attachment index via the entity and it's attachment name </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:manipulateBoneAngles">manipulateBoneAngles</a>&nbsp;(bone, ang)</td>
+		<td class="summary">
+Allows manipulation of the owner's bones' angles </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:manipulateBonePosition">manipulateBonePosition</a>&nbsp;(bone, vec)</td>
+		<td class="summary">
+Allows manipulation of the owner's bones' positions </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:manipulateBoneScale">manipulateBoneScale</a>&nbsp;(bone, vec)</td>
+		<td class="summary">
+Allows manipulation of the owner's bones' scale </td>
 	</tr>
 
 	<tr>
@@ -862,6 +886,18 @@ Sets the color of the entity </td>
 		<td class="name" nowrap><a href="#ents_methods:setFrozen">setFrozen</a>&nbsp;(freeze)</td>
 		<td class="summary">
 Sets the entity frozen state </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setHologramMesh">setHologramMesh</a>&nbsp;(mesh)</td>
+		<td class="summary">
+Sets a hologram entity's model to a custom Mesh </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><a href="#ents_methods:setHologramRenderBounds">setHologramRenderBounds</a>&nbsp;(mins, maxs)</td>
+		<td class="summary">
+Sets a hologram entity's renderbounds </td>
 	</tr>
 
 	<tr>
@@ -2264,6 +2300,31 @@ Checks if an entity is valid.
 
 
 
+<dt><a name="ents_methods:isValidPhys"></a><strong>ents_methods:isValidPhys</strong>&nbsp;()</dt>
+<dd>
+
+Checks whether entity has physics
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>True if entity has physics</ul>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="ents_methods:isVehicle"></a><strong>ents_methods:isVehicle</strong>&nbsp;()</dt>
 <dd>
 
@@ -2459,6 +2520,111 @@ Gets the attachment index via the entity and it's attachment name
 
 <h3>Return value:</h3>
 <ul>number of the attachment index, or 0 if it doesn't exist</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:manipulateBoneAngles"></a><strong>ents_methods:manipulateBoneAngles</strong>&nbsp;(bone, ang)</dt>
+<dd>
+
+Allows manipulation of the owner's bones' angles
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>bone</em></code>: The bone ID
+	</li>
+	
+	<li>
+	  <code><em>ang</em></code>: The angle it should be manipulated to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:manipulateBonePosition"></a><strong>ents_methods:manipulateBonePosition</strong>&nbsp;(bone, vec)</dt>
+<dd>
+
+Allows manipulation of the owner's bones' positions
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>bone</em></code>: The bone ID
+	</li>
+	
+	<li>
+	  <code><em>vec</em></code>: The position it should be manipulated to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:manipulateBoneScale"></a><strong>ents_methods:manipulateBoneScale</strong>&nbsp;(bone, vec)</dt>
+<dd>
+
+Allows manipulation of the owner's bones' scale
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>bone</em></code>: The bone ID
+	</li>
+	
+	<li>
+	  <code><em>vec</em></code>: The scale it should be manipulated to
+	</li>
+	
+</ul>
+
+
+
+
+
 
 
 
@@ -2706,6 +2872,72 @@ Sets the entity frozen state
 	
 	<li>
 	  <code><em>freeze</em></code>: Should the entity be frozen?
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:setHologramMesh"></a><strong>ents_methods:setHologramMesh</strong>&nbsp;(mesh)</dt>
+<dd>
+
+Sets a hologram entity's model to a custom Mesh
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mesh</em></code>: The mesh to set it to or nil to set back to normal
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="ents_methods:setHologramRenderBounds"></a><strong>ents_methods:setHologramRenderBounds</strong>&nbsp;(mins, maxs)</dt>
+<dd>
+
+Sets a hologram entity's renderbounds
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mins</em></code>: The lower bounding corner coordinate local to the hologram
+	</li>
+	
+	<li>
+	  <code><em>maxs</em></code>: The upper bounding corner coordinate local to the hologram
 	</li>
 	
 </ul>

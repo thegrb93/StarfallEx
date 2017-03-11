@@ -565,6 +565,12 @@ Same as Lua's getmetatable.</td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.hasPermission">hasPermission</a>&nbsp;(perm)</td>
+	<td class="summary">
+Checks if the chip is capable of performing an action.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.ipairs">ipairs</a>&nbsp;(tbl)</td>
 	<td class="summary">
 Same as Lua's ipairs </td>
@@ -602,6 +608,13 @@ Same as Lua's pairs </td>
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.pcall">pcall</a>&nbsp;(func, ..., arguments)</td>
+	<td class="summary">
+Lua's pcall with SF throw implementation 
+Calls a function and catches an error that can be thrown while the execution of the call.</td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.player">player</a>&nbsp;()</td>
 	<td class="summary">
 Same as owner() on the server.</td>
@@ -629,6 +642,18 @@ Gets the Average CPU Time in the buffer </td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.quotaMax">quotaMax</a>&nbsp;()</td>
 	<td class="summary">
 Gets the CPU Time max.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.quotaTotalAverage">quotaTotalAverage</a>&nbsp;()</td>
+	<td class="summary">
+Returns the total average time for all chips by the player.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.quotaTotalUsed">quotaTotalUsed</a>&nbsp;()</td>
+	<td class="summary">
+Returns the total used time for all chips by the player.</td>
 	</tr>
 
 	<tr>
@@ -715,6 +740,13 @@ Same as Lua's type </td>
 	<td class="name" nowrap><a href="#SF.DefaultEnvironment.unpack">unpack</a>&nbsp;(tbl)</td>
 	<td class="summary">
 Same as Lua's unpack </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><a href="#SF.DefaultEnvironment.xpcall">xpcall</a>&nbsp;(func, callback, ..., funcThe, The, arguments)</td>
+	<td class="summary">
+Lua's xpcall with SF throw implementation 
+Attempts to call the first function.</td>
 	</tr>
 
 </table>
@@ -1174,6 +1206,37 @@ Same as Lua's getmetatable. Doesn't work on most internal metatables
 
 
 
+<dt><a name="SF.DefaultEnvironment.hasPermission"></a><strong>SF.DefaultEnvironment.hasPermission</strong>&nbsp;(perm)</dt>
+<dd>
+
+Checks if the chip is capable of performing an action.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>perm</em></code>: The permission id to check
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="SF.DefaultEnvironment.ipairs"></a><strong>SF.DefaultEnvironment.ipairs</strong>&nbsp;(tbl)</dt>
 <dd>
 
@@ -1396,6 +1459,55 @@ Same as Lua's pairs
 
 
 
+<dt><a name="SF.DefaultEnvironment.pcall"></a><strong>SF.DefaultEnvironment.pcall</strong>&nbsp;(func, ..., arguments)</dt>
+<dd>
+
+Lua's pcall with SF throw implementation 
+Calls a function and catches an error that can be thrown while the execution of the call.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>func</em></code>: Function to be executed and of which the errors should be caught of
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>arguments</em></code>: Arguments to call the function with.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>If the function had no errors occur within it.</li>
+	
+	<li>If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.</li>
+	
+</ol>
+
+
+
+
+
+</dd>
+
+
+
+
 <dt><a name="SF.DefaultEnvironment.player"></a><strong>SF.DefaultEnvironment.player</strong>&nbsp;()</dt>
 <dd>
 
@@ -1528,6 +1640,56 @@ CPU Time is stored in a buffer of N elements, if the average of this exceeds quo
 
 <h3>Return value:</h3>
 <ul>Max SysTime allowed to take for execution of the chip in a Think.</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.quotaTotalAverage"></a><strong>SF.DefaultEnvironment.quotaTotalAverage</strong>&nbsp;()</dt>
+<dd>
+
+Returns the total average time for all chips by the player.
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Total average CPU Time of all your chips.</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.quotaTotalUsed"></a><strong>SF.DefaultEnvironment.quotaTotalUsed</strong>&nbsp;()</dt>
+<dd>
+
+Returns the total used time for all chips by the player.
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Total used CPU time of all your chips.</ul>
 
 
 
@@ -2010,6 +2172,68 @@ Same as Lua's unpack
 
 <h3>Return value:</h3>
 <ul>Elements of tbl</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+<dt><a name="SF.DefaultEnvironment.xpcall"></a><strong>SF.DefaultEnvironment.xpcall</strong>&nbsp;(func, callback, ..., funcThe, The, arguments)</dt>
+<dd>
+
+Lua's xpcall with SF throw implementation 
+Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function. 
+If execution fails, this returns false and the second function is called with the error message.
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>func</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>callback</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>...</em></code>: 
+	</li>
+	
+	<li>
+	  <code><em>funcThe</em></code>: function to call initially.
+	</li>
+	
+	<li>
+	  <code><em>The</em></code>: function to be called if execution of the first fails; the error message is passed as a string.
+	</li>
+	
+	<li>
+	  <code><em>arguments</em></code>: Arguments to pass to the initial function.
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>Status of the execution; true for success, false for failure.</li>
+	
+	<li>The returns of the first function if execution succeeded, otherwise the first return value of the error callback.</li>
+	
+</ol>
 
 
 
