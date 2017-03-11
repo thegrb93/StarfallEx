@@ -147,11 +147,31 @@ function SF.DefaultEnvironment.quotaAverage ()
 	return SF.instance.cpu_average
 end
 
+--- Returns the total used time for all chips by the player.
+-- @return Total used CPU time of all your chips.
+function SF.DefaultEnvironment.quotaTotalUsed ()
+	local total = 0
+	for instance, _ in pairs(SF.playerInstances[SF.instance.player]) do
+		total = total + instance.cpu_total
+	end
+	return total
+end
+
+--- Returns the total average time for all chips by the player.
+-- @return Total average CPU Time of all your chips.
+function SF.DefaultEnvironment.quotaTotalAverage ()
+	local total = 0
+	for instance, _ in pairs(SF.playerInstances[SF.instance.player]) do
+		total = total + instance.cpu_average
+	end
+	return total
+end
+
 --- Gets the CPU Time max.
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
 -- @return Max SysTime allowed to take for execution of the chip in a Think.
 function SF.DefaultEnvironment.quotaMax ()
-	return SF.instance.context.cpuTime.getMax()
+	return SF.cpuQuota:GetFloat()
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.

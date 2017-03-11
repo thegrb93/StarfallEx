@@ -14,7 +14,7 @@ TOOL.ClientConVar[ "ScriptModel" ] = ""
 cleanup.Register( "starfall_processor" )
 
 if SERVER then
-	CreateConVar('sbox_maxstarfall_processor', 10, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
+	CreateConVar('sbox_maxstarfall_processor', 20, {FCVAR_REPLICATED,FCVAR_NOTIFY,FCVAR_ARCHIVE})
 	
 	function MakeSF( pl, Pos, Ang, model, inputs, outputs)
 		if not pl:CheckLimit( "starfall_processor" ) then return false end

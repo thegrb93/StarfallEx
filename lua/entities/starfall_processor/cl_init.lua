@@ -4,8 +4,6 @@ DEFINE_BASECLASS( "base_gmodentity" )
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-local context = SF.CreateContext()
-
 function ENT:Initialize()	
 	self.CPUpercent = 0
 	self.CPUus = 0
@@ -52,19 +50,12 @@ else
 end
 
 function ENT:Think ()
-	BaseClass.Think( self )
-	
-	if self.instance and not self.instance.error then
-		local bufferAvg = self.instance:movingCPUAverage()
+	BaseClass.Think(self)
+	if self.instance then
+		local bufferAvg = self.instance.cpu_average
 		self.CPUus = math.Round( bufferAvg * 1000000 )
-		self.CPUpercent = math.floor( bufferAvg / self.instance.context.cpuTime.getMax() * 100 )
-		self.instance.cpu_total = 0
-		self.instance.cpu_average = bufferAvg
-		self.instance:runScriptHook( "think" )
+		self.CPUpercent = math.floor( bufferAvg / SF.cpuQuota:GetFloat() * 100 )
 	end
-
-	self:NextThink( CurTime() )
-	return true
 end
 
 function ENT:CodeSent ( files, main, owner )
@@ -79,7 +70,7 @@ function ENT:CodeSent ( files, main, owner )
 	self.owner = owner
 	self.files = files
 	self.mainfile = main
-	local ok, instance = SF.Instance.Compile( files, context, main, owner, { entity = self, render = {} } )
+	local ok, instance = SF.Instance.Compile( files, main, owner, { entity = self, render = {} } )
 	if not ok then self:Error( instance ) return end
 	
 	if instance.ppdata.scriptnames and instance.mainfile then

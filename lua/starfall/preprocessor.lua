@@ -86,9 +86,8 @@ end
 --- Parses a source file for directives.
 -- @param filename The file name of the source code
 -- @param source The source code to parse.
--- @param directives A table of additional directives to use.
 -- @param data The data table passed to the directives.
-function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
+function SF.Preprocessor.ParseDirectives(filename, source, data)
 	local ending = nil
 	local endingLevel = nil
 	local lines = string.Explode("\r?\n",source,true)
@@ -114,7 +113,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, directives, data)
 				endingLevel = comment.level
 			elseif comment.type == "line" then
 				local directive, args = string.match(line,"--@(%S+)%s*(.*)")
-				local func = directives[directive] or SF.Preprocessor.directives[directive]
+				local func = SF.Preprocessor.directives[directive]
 				if func then
 					func(args, filename, data)
 				end

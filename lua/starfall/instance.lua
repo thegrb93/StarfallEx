@@ -24,17 +24,17 @@ SF.Instance.__index = SF.Instance
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
 SF.allInstances = setmetatable({},{__mode="kv"})
+SF.playerInstances = {}
 
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
--- @param context The context to use in the resulting Instance
 -- @param mainfile If code is a table, this specifies the first file to parse.
 -- @param player The "owner" of the instance
 -- @param data The table to set instance.data to. Default is a new table.
 -- @param dontpreprocess Set to true to skip preprocessing
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
-function SF.Instance.Compile(code, context, mainfile, player, data, dontpreprocess)
+function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	if type(code) == "string" then
 		mainfile = mainfile or "generic"
 		code = {[mainfile]=code}
@@ -53,12 +53,11 @@ function SF.Instance.Compile(code, context, mainfile, player, data, dontpreproce
 	instance.scripts = {}
 	instance.source = code
 	instance.initialized = false
-	instance.context = context
 	instance.mainfile = mainfile
 	
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
-			SF.Preprocessor.ParseDirectives(filename,source,context.directives,instance.ppdata)
+			SF.Preprocessor.ParseDirectives(filename,source,instance.ppdata)
 		end
 		
 		local serverorclient
@@ -107,7 +106,8 @@ function SF.Instance:runWithOps(func,...)
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck ()
 		self.cpu_total = SysTime() - oldSysTime
-		local usedRatio = self:movingCPUAverage()/self.context.cpuTime:getMax()
+		self:moveCPUAverage()
+		local usedRatio = self.cpu_average/SF.cpuQuota:GetFloat()
 		
 		local function safeThrow( msg, nocatch )
 			local source = debug.getinfo(3, "S").short_src
@@ -197,6 +197,11 @@ function SF.Instance:initialize()
 	end
 	
 	SF.allInstances[self] = self
+	if SF.playerInstances[self.player] then
+		SF.playerInstances[self.player][self] = self
+	else
+		SF.playerInstances[self.player] = {[self]=self}
+	end
 	
 	self:cleanup("_initialize",false)
 	return true
@@ -279,8 +284,37 @@ end
 function SF.Instance:deinitialize()
 	self:runLibraryHook("deinitialize")
 	SF.allInstances[self] = nil
+	SF.playerInstances[self.player][self] = nil
+	if not next(SF.playerInstances[self.player]) then
+		SF.playerInstances[self.player] = nil
+	end
 	self.error = true
 end
+
+hook.Add("Think","SF_Think",function()
+	for pl, insts in pairs(SF.playerInstances) do
+		local cputotal = 0
+		for instance, _ in pairs(insts) do
+			instance:runScriptHook( "think" )
+			cputotal = cputotal + instance.cpu_average
+			
+			instance.cpu_total = 0
+			instance:moveCPUAverage()
+		end
+		
+		if cputotal>SF.cpuQuota:GetFloat() then
+			local max, maxinst = 0, nil
+			for instance, _ in pairs(insts) do
+				if instance.cpu_average>=max then
+					max = instance.cpu_average
+					maxinst = instance
+				end
+			end
+			
+			maxinst:Error( "SF: Player cpu time limit reached!" )
+		end
+	end
+end)
 
 if CLIENT then
 --- Check if a HUD Component is connected to the SF instance
@@ -308,7 +342,7 @@ function SF.Instance:Error(msg,traceback)
 	
 end
 
-function SF.Instance:movingCPUAverage()
-	local n = self.context.cpuTime:getBufferN()
-	return (self.cpu_average * (n - 1) + self.cpu_total) / n
+function SF.Instance:moveCPUAverage()
+	local n = SF.cpuBufferN:GetInt()
+	self.cpu_average = (self.cpu_average * (n - 1) + self.cpu_total) / n
 end
