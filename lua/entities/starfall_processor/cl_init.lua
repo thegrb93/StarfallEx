@@ -21,8 +21,9 @@ end)
 function ENT:GetOverlayText()
 	local state = self:GetNWInt( "State", 1 )
 	local clientstr, serverstr
-	if self.instance and not self.instance.error then
-		clientstr = tostring( self.CPUus ) .. "us. (" .. tostring( self.CPUpercent ) .. "%)"
+	if self.instance then
+		local bufferAvg = self.instance.cpu_average
+		clientstr = tostring( math.Round( bufferAvg * 1000000 ) ) .. "us. (" .. tostring( math.floor( bufferAvg / SF.cpuQuota:GetFloat() * 100 ) ) .. "%)"
 	else
 		clientstr = "Errored"
 	end
@@ -46,15 +47,6 @@ if WireLib then
 else
 	function ENT:DrawTranslucent()
 		self:DrawModel()
-	end
-end
-
-function ENT:Think ()
-	BaseClass.Think(self)
-	if self.instance then
-		local bufferAvg = self.instance.cpu_average
-		self.CPUus = math.Round( bufferAvg * 1000000 )
-		self.CPUpercent = math.floor( bufferAvg / SF.cpuQuota:GetFloat() * 100 )
 	end
 end
 
