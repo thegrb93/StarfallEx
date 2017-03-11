@@ -21,8 +21,8 @@ SF.AddObjectUnwrapper( vec_metamethods, unwrap )
 
 SF.Libraries.AddHook("postload", function()
 	SF.DefaultEnvironment.Vector = function ( x, y, z )
-		x = x or 0		
-		return wrap( { x, y or x, z or x } )
+		x = x or 0
+		return wrap( { x, y or x, z or (y and 0 or x) } )
 	end
 end)
 
