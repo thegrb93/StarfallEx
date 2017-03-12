@@ -613,7 +613,9 @@ function render_library.selectRenderTarget ( name )
 			end
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
-			render.SetStencilEnable( true )
+			if data.useStencil then
+				render.SetStencilEnable( true )
+			end
 		end
 	end
 end

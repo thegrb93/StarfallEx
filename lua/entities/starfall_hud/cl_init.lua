@@ -32,6 +32,7 @@ function ENT:DrawHUD( hookname, ... )
 	
 	data.render.renderEnt = self
 	data.render.isRendering = true
+	data.render.useStencil = false
 	draw.NoTexture()
 	surface.SetDrawColor( 255, 255, 255, 255 )
 	

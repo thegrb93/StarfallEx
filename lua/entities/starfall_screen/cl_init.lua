@@ -70,6 +70,7 @@ function ENT:RenderScreen()
 				data.render.matricies = 0
 				data.render.renderEnt = self
 				data.render.isRendering = true
+				data.render.useStencil = true
 				draw.NoTexture()
 				surface.SetDrawColor( 255, 255, 255, 255 )
 
