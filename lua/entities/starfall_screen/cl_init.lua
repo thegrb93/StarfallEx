@@ -67,7 +67,6 @@ function ENT:RenderScreen()
 			if SF.Permissions.hasAccess( instance.player, nil, "render.screen" ) then
 				local data = instance.data
 
-				data.render.matricies = 0
 				data.render.renderEnt = self
 				data.render.isRendering = true
 				data.render.useStencil = true
