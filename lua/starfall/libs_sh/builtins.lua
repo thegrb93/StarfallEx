@@ -181,6 +181,14 @@ function SF.DefaultEnvironment.setSoftQuota ( quota )
 	SF.instance.cpu_softquota = quota
 end
 
+--- Checks if the chip is capable of performing an action.
+--@param perm The permission id to check
+function SF.DefaultEnvironment.hasPermission( perm )
+	SF.CheckType( perm, "string" )
+	return SF.Permissions.hasAccess( SF.instance.player, nil, perm )
+end
+
+
 -- String library
 local string_methods = SF.Libraries.Register("string" )
 string_methods.byte=string.byte string_methods.byte=string.byte

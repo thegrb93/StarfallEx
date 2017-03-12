@@ -55,6 +55,7 @@ if CPPI then
 			return target:CPPIGetOwner()==principal
 		end,
 		function( principal, target, key )
+			if not IsValid(target) then return false end
 			if canPhysgun[ key ] then
 				if target:IsPlayer() then
 					if hook.Run( "PhysgunPickup", principal, target ) != false then
@@ -79,6 +80,7 @@ else
 			return false
 		end,
 		function( principal, target, key )
+			if not IsValid(target) then return false end
 			if canPhysgun[ key ] then
 				if hook.Run( "PhysgunPickup", principal, target ) != false then
 					-- Some mods expect a release when there's a pickup involved.
