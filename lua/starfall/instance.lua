@@ -106,8 +106,7 @@ function SF.Instance:runWithOps(func,...)
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck ()
 		self.cpu_total = SysTime() - oldSysTime
-		self:moveCPUAverage()
-		local usedRatio = self.cpu_average/SF.cpuQuota:GetFloat()
+		local usedRatio = self:movingCPUAverage()/SF.cpuQuota:GetFloat()
 		
 		local function safeThrow( msg, nocatch )
 			local source = debug.getinfo(3, "S").short_src
@@ -295,11 +294,10 @@ hook.Add("Think","SF_Think",function()
 	for pl, insts in pairs(SF.playerInstances) do
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
+			instance.cpu_average = instance:movingCPUAverage()
+			instance.cpu_total = 0
 			instance:runScriptHook( "think" )
 			cputotal = cputotal + instance.cpu_average
-			
-			instance.cpu_total = 0
-			instance:moveCPUAverage()
 		end
 		
 		if cputotal>SF.cpuQuota:GetFloat() then
@@ -344,7 +342,8 @@ function SF.Instance:Error(msg,traceback)
 	
 end
 
-function SF.Instance:moveCPUAverage()
+-- Don't self modify. The average should only the modified per tick.
+function SF.Instance:movingCPUAverage()
 	local n = SF.cpuBufferN:GetInt()
-	self.cpu_average = (self.cpu_average * (n - 1) + self.cpu_total) / n
+	return (self.cpu_average * (n - 1) + self.cpu_total) / n
 end
