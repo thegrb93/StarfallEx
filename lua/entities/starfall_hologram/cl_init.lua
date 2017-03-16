@@ -174,3 +174,35 @@ hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(ent)
 		ent:SetScale(ent.scale)
 	end
 end)
+
+local function ShowHologramOwners()
+	for _,ent in pairs( ents.FindByClass( "starfall_hologram" ) ) do
+		local name = "No Owner"
+		local steamID = ""
+		local ply
+		if CPPI then	
+			ply = ent:CPPIGetOwner()
+		else
+			ply = ent:HoloGetOwner()
+		end
+		if ply then
+			name = ply:Name()
+			steamID = ply:SteamID()
+		end
+		
+		local vec = ent:GetPos():ToScreen()
+		
+		draw.DrawText( name .. "\n" .. steamID, "DermaDefault", vec.x, vec.y, Color(255,0,0,255), 1 )
+	end
+end
+
+local display_owners = false
+concommand.Add( "sf_holograms_display_owners", function()
+	display_owners = !display_owners
+
+	if display_owners then 
+		hook.Add( "HUDPaint", "sf_holograms_showowners", ShowHologramOwners)
+	else
+		hook.Remove("HUDPaint", "sf_holograms_showowners")
+	end
+end )
