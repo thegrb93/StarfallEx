@@ -179,13 +179,8 @@ local function ShowHologramOwners()
 	for _,ent in pairs( ents.FindByClass( "starfall_hologram" ) ) do
 		local name = "No Owner"
 		local steamID = ""
-		local ply
-		if CPPI then	
-			ply = ent:CPPIGetOwner()
-		else
-			ply = ent:HoloGetOwner()
-		end
-		if ply then
+		local ply = ent:GetHoloOwner()
+		if ply:IsValid() then
 			name = ply:Name()
 			steamID = ply:SteamID()
 		end
