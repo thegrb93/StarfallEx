@@ -54,6 +54,8 @@ SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 
+SF.Permissions.registerPrivilege( "entities.manipulatebone", "ManipulateBone", "Allows the user to manipulate their bones.", {["Client"] = {}} )
+
 
 --- Gets the physics object of the entity
 -- @return The physobj, or nil if the entity isn't valid or isn't vphysics
@@ -91,7 +93,7 @@ if CLIENT then
 			ent:SetRenderFX( net.ReadUInt( 8 ) )
 		end,
 	}
-	
+
 	--Net function that allows the server to set the render properties of entities for specific players
 	net.Receive( "sf_setentityrenderproperty", function()
 		local ent = net.ReadEntity()
@@ -101,6 +103,61 @@ if CLIENT then
 		
 		renderProperties[ property ]( ent )
 	end)
+
+	SF.Libraries.AddHook( "deinitialize", function ( instance )
+		if instance.data.resetbones then
+			local ply = instance.player
+			if ply:IsValid() then
+				for i=0, ply:GetBoneCount()-1 do
+					ply:ManipulateBonePosition(i, Vector())
+					ply:ManipulateBoneScale(i, Vector(1,1,1))
+					ply:ManipulateBoneAngles(i, Angle())
+				end
+			end
+		end
+	end )
+
+	--- Allows manipulation of the owner's bones' positions
+	-- @client
+	-- @param bone The bone ID
+	-- @param vec The position it should be manipulated to
+	function ents_methods:manipulateBonePosition(bone, vec)
+		SF.CheckType(bone, "number")
+		SF.CheckType(vec, vec_meta)
+		SF.Permissions.check(SF.instance.player, nil, "entities.manipulatebone")
+		local ent = eunwrap(self)
+		if ent != SF.instance.player then SF.throw("This method only works on the owner of the starfall.", 2) end
+		SF.instance.data.resetbones = true
+		ent:ManipulateBonePosition(bone, vunwrap(vec))
+	end
+
+	--- Allows manipulation of the owner's bones' scale
+	-- @client
+	-- @param bone The bone ID
+	-- @param vec The scale it should be manipulated to
+	function ents_methods:manipulateBoneScale(bone, vec)
+		SF.CheckType(bone, "number")
+		SF.CheckType(vec, vec_meta)
+		SF.Permissions.check(SF.instance.player, nil, "entities.manipulatebone")
+		local ent = eunwrap(self)
+		if ent != SF.instance.player then SF.throw("This method only works on the owner of the starfall.", 2) end
+		SF.instance.data.resetbones = true
+		ent:ManipulateBoneScale(bone, vunwrap(vec))
+	end
+
+	--- Allows manipulation of the owner's bones' angles
+	-- @client
+	-- @param bone The bone ID
+	-- @param ang The angle it should be manipulated to
+	function ents_methods:manipulateBoneAngles(bone, ang)
+		SF.CheckType(bone, "number")
+		SF.CheckType(ang, ang_meta)
+		SF.Permissions.check(SF.instance.player, nil, "entities.manipulatebone")
+		local ent = eunwrap(self)
+		if ent != SF.instance.player then SF.throw("This method only works on the owner of the starfall.", 2) end
+		SF.instance.data.resetbones = true
+		ent:ManipulateBoneAngles(bone, aunwrap(ang))
+	end
 end
 
 -- ------------------------- Methods ------------------------- --
