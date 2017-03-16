@@ -184,9 +184,16 @@ function SF.Instance:initialize()
 	self.cpu_average = 0
 	self.cpu_softquota = 1
 
+	SF.allInstances[self] = self
+	if SF.playerInstances[self.player] then
+		SF.playerInstances[self.player][self] = self
+	else
+		SF.playerInstances[self.player] = {[self]=self}
+	end
+
 	self:runLibraryHook("initialize")
 	self:prepare("_initialize")
-	
+
 	local func = self.scripts[self.mainfile]
 	local tbl = self:runWithOps(func)
 	if not tbl[1] then
@@ -194,14 +201,7 @@ function SF.Instance:initialize()
 		self.error = true
 		return false, unpack(tbl[2])
 	end
-	
-	SF.allInstances[self] = self
-	if SF.playerInstances[self.player] then
-		SF.playerInstances[self.player][self] = self
-	else
-		SF.playerInstances[self.player] = {[self]=self}
-	end
-	
+
 	self:cleanup("_initialize",false)
 	return true
 end
