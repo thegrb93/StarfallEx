@@ -250,4 +250,28 @@ function bass_methods:getFFT ( n )
 	end
 end
 
+--- Gets if the sound is streamed or not
+-- @return Is online or not
+function bass_methods:isOnline()
+	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
+		
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
+	
+	if IsValid(uw) then
+		return uw:IsOnline()
+	end
+	
+	return false
+end
+
+--- Gets if the sound is valid or not
+-- @return Is valid or not
+function bass_methods:isValid()
+	SF.CheckType( self, bass_metamethods )
+	local uw = unwrap( self )
+	
+	return IsValid(uw)
+end
+
 
