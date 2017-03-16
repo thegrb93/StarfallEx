@@ -1,6 +1,6 @@
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
--- @shared
+-- @server
 local holograms_library = SF.Libraries.Register("holograms")
 
 --- Hologram type
@@ -170,7 +170,7 @@ function hologram_methods:suppressEngineLighting ( suppress )
 
 	local this = unwrap( self )
 	if IsValid( this ) then
-		this:SetNetworkedBool( "suppressEngineLighting", suppress )
+		this:SetSuppressEngineLighting( suppress )
 	end
 end
 
@@ -288,6 +288,7 @@ function holograms_library.create ( pos, ang, model, scale )
 
 		if CPPI then
 			holoent:CPPISetOwner( instance.player )
+			holoent:SetHoloOwner( instance.player )
 		end
 		
 		if scale then

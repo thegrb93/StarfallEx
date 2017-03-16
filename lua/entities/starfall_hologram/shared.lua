@@ -7,10 +7,9 @@ ENT.Author          = "Starfall Organization"
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
 
-function ENT:HoloSetOwner(ply)
-	self:SetNWEntity("Owner", ply)
-end
+function ENT:SetupDataTables()
 
-function ENT:HoloGetOwner()
-	return self:GetNWEntity("Owner")
+	self:NetworkVar( "Entity", 0, "HoloOwner" );
+	self:NetworkVar( "Bool", 0, "SuppressEngineLighting" );
+
 end

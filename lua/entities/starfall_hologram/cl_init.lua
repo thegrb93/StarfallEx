@@ -90,8 +90,7 @@ function ENT:Draw()
 	self:setupRenderGroup()
 	self:setupClip()
 
-	render.SuppressEngineLighting( self:GetNWBool( "suppressEngineLighting" ) )
-	self:DrawModel()
+	render.SuppressEngineLighting( self:GetSuppressEngineLighting() )
 	render.SuppressEngineLighting( false )
 
 	self:finishClip()

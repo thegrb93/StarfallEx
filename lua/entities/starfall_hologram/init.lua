@@ -33,5 +33,5 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 end
 
 function ENT:CanTool( pl, tr, tool )
-	return tool == "starfall_ent_lib"
+	return pl == self:GetHoloOwner() and tool == "starfall_ent_lib"
 end
