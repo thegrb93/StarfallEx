@@ -158,6 +158,40 @@ if CLIENT then
 		SF.instance.data.resetbones = true
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
+
+
+	--- Sets a hologram entity's model to a custom Mesh
+	-- @client
+	-- @param mesh The mesh to set it to or nil to set back to normal
+	function ents_methods:setHologramMesh(mesh)
+		local instance = SF.instance
+		SF.Permissions.check(instance.player, nil, "mesh")
+		local ent = eunwrap(self)
+		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
+		if instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		if mesh then
+			SF.CheckType(mesh, SF.Mesh.Metatable)
+			ent:SetModelScale(0,0)
+			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
+			ent.custom_meta_data = instance.data.meshes
+		else
+			ent:SetModelScale(1,0)
+			ent.custom_mesh = nil
+		end
+	end
+	
+	--- Sets a hologram entity's renderbounds
+	-- @client
+	-- @param mins The lower bounding corner coordinate local to the hologram
+	-- @param maxs The upper bounding corner coordinate local to the hologram
+	function ents_methods:setHologramRenderBounds(mins, maxs)
+		SF.CheckType(mins, vec_meta)
+		SF.CheckType(maxs, vec_meta)
+		local ent = eunwrap(self)
+		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
+	end
 end
 
 -- ------------------------- Methods ------------------------- --

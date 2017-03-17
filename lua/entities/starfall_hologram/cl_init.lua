@@ -91,6 +91,22 @@ function ENT:Draw()
 	self:setupClip()
 
 	render.SuppressEngineLighting( self:GetSuppressEngineLighting() )
+	if self.custom_mesh then
+		if self.custom_meta_data[self.custom_mesh] then
+			cam.PushModelMatrix(self:GetBoneMatrix(0))
+			local mat = Material(self:GetMaterial())
+			if mat then render.SetMaterial(mat) end
+			local col = self:GetColor()
+			render.SetColorModulation(col.r/255, col.g/255, col.b/255)
+			self:DrawModel() --For some reason won't draw without this call
+			self.custom_mesh:Draw()
+			cam.PopModelMatrix()
+		else
+			self.custom_mesh = nil
+		end
+	else
+		self:DrawModel()
+	end
 	render.SuppressEngineLighting( false )
 
 	self:finishClip()
