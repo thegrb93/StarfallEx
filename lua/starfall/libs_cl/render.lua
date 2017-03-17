@@ -971,13 +971,13 @@ function render_library.drawSimpleText ( x, y, text, xalign, yalign )
 end
 
 --- Constructs a markup object for quick styled text drawing.
--- @param markup The markup string to parse
+-- @param str The markup string to parse
 -- @param maxsize The max width of the markup
 -- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
-function render_library.parseMarkup( markup, maxsize )
-	SF.CheckType( markup, "string" )
+function render_library.parseMarkup( str, maxsize )
+	SF.CheckType( str, "string" )
 	SF.CheckType( maxsize, "number" )
-	local marked = markup.Parse( markup, maxsize )
+	local marked = markup.Parse( str, maxsize )
 	local markedindex = marked.__index
 	return setmetatable(marked, {
 		__newindex = function() end,
