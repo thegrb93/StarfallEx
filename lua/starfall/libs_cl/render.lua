@@ -180,7 +180,8 @@ local function sfCreateMaterial( name )
 				[ "$nolod" ] = 1,
 				[ "$ignorez" ] = 1,
 				[ "$vertexcolor" ] = 1,
-				[ "$vertexalpha" ] = 1
+				[ "$vertexalpha" ] = 1,
+				[ "$basetexturetransform"] = "center .5 .5 scale 1.032 1.032 rotate 0 translate 0 0"
 			} )
 end
 local RT_Material = sfCreateMaterial( "SF_RT_Material" )
