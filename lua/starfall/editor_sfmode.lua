@@ -3,7 +3,8 @@ local table_concat = table.concat
 local string_sub = string.sub
 local string_gmatch = string.gmatch
 local string_gsub = string.gsub
-
+local libmap = SF.Editor.LibMap
+PrintTable(libmap)
 local EDITOR = {}
 
 local function istype(tp)
@@ -47,15 +48,14 @@ local colors = {
   ["comment"] = { Color(117, 113, 94), false},
   ["string"] = { Color(230, 219, 116), false},
   ["number"] = { Color(174, 129, 225), false}, -- light red
+	["function"] = { Color(160, 160, 240), false}, -- blue
+	["library"] = { Color(120, 120, 200), false}, -- blue
+	["operator"] = { Color(224, 224, 224), false}, -- white
+	["notfound"] = { Color(255, 255, 255), false}, -- dark red
+	["userfunction"] = { Color(102, 122, 102), false}, -- dark grayish-green
+	["constant"] = { Color(240, 160, 240), false}, -- pink
 
-  ["function"] = { Color(160, 160, 240), false}, -- blue
-  ["notfound"] = { Color(255, 255, 255), false}, -- dark red
   ["variable"] = { Color(160, 240, 160), false}, -- light green
-  ["operator"] = { Color(224, 224, 224), false}, -- white
-  ["ppcommand"] = { Color(240, 96, 240), false}, -- purple
-  ["typename"] = { Color(240, 160, 96), false}, -- orange
-  ["constant"] = { Color(240, 160, 240), false}, -- pink
-  ["userfunction"] = { Color(102, 122, 102), false}, -- dark grayish-green
 }
 
 function EDITOR:GetSyntaxColor(name)
@@ -171,38 +171,6 @@ function EDITOR:SyntaxColorLine(row)
     if self:NextPattern( "%(" ) then -- We found a bracket
       -- Color the bracket
       addToken( "operator", self.tokendata )
-
-      while self.character and self.character ~= ")" and false do -- Loop until the ending bracket
-        self.tokendata = ""
-
-        local spaces = self:SkipPattern( " *" )
-        if spaces then addToken( "comment", spaces ) end
-
-        if self:NextPattern( "%[" ) then -- Found a [
-          -- Color the bracket
-          addToken( "operator", self.tokendata )
-          self.tokendata = ""
-
-          local spaces = self:SkipPattern( " *" )
-          if spaces then addToken( "comment", spaces ) end
-        end
-
-        if self:NextPattern( "%]" ) then
-          addToken( "operator", "]" )
-          self.tokendata = ""
-        end
-
-        if self:NextPattern( ":" ) then -- Check for the colon
-          addToken( "operator", ":" )
-          self.tokendata = ""
-        end
-
-        local spaces = self:SkipPattern( " *" )
-        if spaces then addToken( "comment", spaces ) end
-
-        -- If we found a comma, skip it
-        if self.character == "," then addToken( "operator", "," ) self:NextCharacter() end
-      end
     end
 
     self.tokendata = ""
@@ -238,17 +206,32 @@ function EDITOR:SyntaxColorLine(row)
 
       if keywords[sstr][keyword] then
         tokenname = "keyword"
-      elseif wire_expression2_funclist[sstr] and false then --Gotta convert to SF func list
-        tokenname = "function"
-
-      elseif self.e2fs_functions[sstr] then
+      elseif libmap["Environment"][sstr] then -- We Environment function/constant
+        tokenname = libmap["Environment"][sstr] == "function" and "function" or "constant"
+				print(sstr,tokenname)
+			elseif libmap[sstr] then --We found library
+				addToken("library", self.tokendata)
+				self.tokendata = ""
+				if self:NextPattern( "%." ) then -- We found a dot, looking for library method/constant
+					addToken( "operator", self.tokendata )
+					self.tokendata = ""
+					if self:NextPattern( "^[a-zA-Z][a-zA-Z0-9_]*" ) then
+						local t = libmap[sstr][self.tokendata]
+						if t then -- Valid function, woohoo
+							tokenname = t == "function" and "function" or "constant"
+						end
+					end
+				end
+			elseif self.e2fs_functions[sstr] then
         tokenname = "userfunction"
 
       else
         tokenname = "notfound"
       end
-      addToken(tokenname, self.tokendata)
-      tokenname = "comment"
+			if self.tokendata !="" then
+      	addToken(tokenname, self.tokendata)
+      end
+			tokenname = "comment"
       self.tokendata = spaces
 
     elseif self:NextPattern("%[%[") then -- Multiline strings

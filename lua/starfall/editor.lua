@@ -81,10 +81,62 @@ if CLIENT then
 
 	--WireEditor
 	CreateClientConVar( "sf_editor_usewire", 0, true, false )
+
+	local function createLibraryMap ()
+
+		local libMap, libs = {}, {}
+
+		libMap[ "Environment" ] = {}
+		for name, val in pairs( SF.DefaultEnvironment ) do
+			table.insert( libMap[ "Environment" ], name )
+			table.insert( libs, name )
+		end
+		
+		for lib, tbl in pairs( SF.Libraries.libraries ) do
+			libMap[ lib ] = {}
+			for name, val in pairs( tbl ) do
+				table.insert( libMap[ lib ], name )
+				table.insert( libs, lib.."\\."..name )
+			end
+		end
+		
+		for lib, tbl in pairs( SF.Types ) do
+			if type( tbl.__index ) == "table" then
+				for name, val in pairs( tbl.__index ) do
+					table.insert( libs, "\\:"..name )
+				end
+			end
+		end
+
+		return libMap, table.concat( libs, "|" )
+	end
+
+	local function createWireLibraryMap () -- Hashtable
+
+		local libMap = {}
+
+		libMap[ "Environment" ] = {}
+		for name, val in pairs( SF.DefaultEnvironment ) do
+			libMap[ "Environment" ][name ] = type(val)
+		end
+		
+		for lib, tbl in pairs( SF.Libraries.libraries ) do
+			libMap[ lib ] = {}
+			for name, val in pairs( tbl ) do
+				libMap[ lib ][ name ] = type(val)
+			end
+		end
+		
+		return libMap
+	end
+
 	local function useWireEditor()
 		 return GetConVarNumber("sf_editor_usewire") == 1 and WireTextEditor
 	end
+
 	function SF.Editor.init ()
+		
+		SF.Editor.LibMap = createWireLibraryMap () --needed for wireeditor
 		include("starfall/editor_sfmode.lua")
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
@@ -319,35 +371,6 @@ if CLIENT then
 			timer.Create( "validationTimer", 0.5, 1, valid )
 		end
 
-	end
-
-	local function createLibraryMap ()
-
-		local libMap, libs = {}, {}
-
-		libMap[ "Environment" ] = {}
-		for name, val in pairs( SF.DefaultEnvironment ) do
-			table.insert( libMap[ "Environment" ], name )
-			table.insert( libs, name )
-		end
-		
-		for lib, tbl in pairs( SF.Libraries.libraries ) do
-			libMap[ lib ] = {}
-			for name, val in pairs( tbl ) do
-				table.insert( libMap[ lib ], name )
-				table.insert( libs, lib.."\\."..name )
-			end
-		end
-		
-		for lib, tbl in pairs( SF.Types ) do
-			if type( tbl.__index ) == "table" then
-				for name, val in pairs( tbl.__index ) do
-					table.insert( libs, "\\:"..name )
-				end
-			end
-		end
-
-		return libMap, table.concat( libs, "|" )
 	end
 
 	function SF.Editor.refreshTab ( tab )
