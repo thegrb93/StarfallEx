@@ -17,9 +17,13 @@ local keywords = {
   ["elseif"] = { [true] = true, [false] = true },
   ["while"] = { [true] = true, [false] = true },
   ["for"] = { [true] = true, [false] = true },
-  ["foreach"] = { [true] = true, [false] = true },
   ["function"] = { [true] = true, [false] = true },
 
+	["or"] = { [true] = true, [false] = true },
+	["not"] = { [true] = true, [false] = true },
+	["true"] = { [true] = true, [false] = true },
+	["false"] = { [true] = true, [false] = true },
+	
   -- keywords that cannot be followed by a "(":
   ["else"] = { [true] = true },
   ["break"] = { [true] = true },
