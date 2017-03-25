@@ -47,19 +47,17 @@ local directives = {
 }
 
 local colors = {
-  ["keyword"] = { Color(249, 38, 114), false},
-  ["directive"] = { Color(130, 130, 255), false},
-  ["comment"] = { Color(117, 113, 94), false},
-  ["string"] = { Color(230, 219, 116), false},
-  ["number"] = { Color(174, 129, 225), false}, -- light red
-	["function"] = { Color(160, 160, 240), false}, -- blue
-	["library"] = { Color(120, 120, 200), false}, -- blue
-	["operator"] = { Color(224, 224, 224), false}, -- white
-	["notfound"] = { Color(255, 255, 255), false}, -- dark red
-	["userfunction"] = { Color(102, 122, 102), false}, -- dark grayish-green
-	["constant"] = { Color(240, 160, 240), false}, -- pink
-
-  ["variable"] = { Color(160, 240, 160), false}, -- light green
+  ["keyword"] = { Color(142,192,124), false},
+  ["directive"] = { Color(142, 192, 124), false},
+  ["comment"] = { Color(146, 131, 116), false},
+  ["string"] = { Color(184, 187, 38), false},
+  ["number"] = { Color(211, 134, 155), false},
+  ["function"] = { Color(184, 187, 38), false},
+  ["library"] = { Color(184, 187, 38), false},
+  ["operator"] = { Color(211, 134, 155), false},
+  ["notfound"] = { Color(251, 241, 199), false}, 
+  ["userfunction"] = { Color(251, 241, 199), false},
+  ["constant"] = { Color(211, 134, 155), false},
 }
 
 function EDITOR:GetSyntaxColor(name)
@@ -203,7 +201,7 @@ function EDITOR:SyntaxColorLine(row)
 
       if keywords[sstr][keyword] then
         tokenname = "keyword"
-      elseif libmap["Environment"][sstr] then -- We Environment function/constant
+      elseif libmap["Environment"][sstr] then -- We Environment /constant
 				local val = libmap["Environment"][sstr]
 				if istable(val) then
 					addToken("constant", self.tokendata)
@@ -218,7 +216,20 @@ function EDITOR:SyntaxColorLine(row)
 						tokenname = "notfound"
 					end
 				else
-					tokenname = val == "function" and "function" or "constant"
+					if val == "function" then
+						tokenname = "notfound" -- we wont color if there is no (
+						local pos = self.position -- We are saving that, so we can move tokenizer back
+						local c = self.character
+						local td = self.tokendata
+						if self:NextPattern("%s*%(") then -- we are checking if there is ( after name
+							tokenname = "function"
+							self.position = pos -- We dont want to move tokenizer as we were just checking without parsing
+							self.character = c
+							self.tokendata = td
+						end
+					else
+						tokenname = "constant"
+					end
 				end
 			elseif libmap[sstr] then --We found library
 				addToken("library", self.tokendata)
@@ -238,7 +249,7 @@ function EDITOR:SyntaxColorLine(row)
       else
         tokenname = "notfound"
       end
-			if self.tokendata !="" then
+			if self.tokendata != "" then
       	addToken(tokenname, self.tokendata)
       end
 			tokenname = "comment"
