@@ -25,6 +25,7 @@ local keywords = {
 	["false"] = { [true] = true, [false] = true },
 	
   -- keywords that cannot be followed by a "(":
+	["do"] = { [true] = true, [false] = true },
   ["else"] = { [true] = true },
   ["break"] = { [true] = true },
   ["continue"] = { [true] = true },
