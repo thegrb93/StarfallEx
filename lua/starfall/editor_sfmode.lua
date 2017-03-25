@@ -205,12 +205,13 @@ function EDITOR:SyntaxColorLine(row)
       local char = self.character or ""
       local keyword = char ~= "("
 
+      local spaces = self:SkipPattern(" *") or ""
 
       if keywords[sstr][keyword] then
         tokenname = "keyword"
       elseif libmap["Environment"][sstr] then -- We Environment function/constant
 				local val = libmap["Environment"][sstr]
-				if istable(val) then -- It's enum
+				if istable(val) then
 					addToken("constant", self.tokendata)
 					self.tokendata = ""
 					if self:NextPattern( "%." ) then -- There is dot after enum, color it
@@ -222,21 +223,8 @@ function EDITOR:SyntaxColorLine(row)
 					else
 						tokenname = "notfound"
 					end
-				else --It's function!
-					if val == "function" then -- We gotta make sure its followed by ( if its a function
-						local funcname = self.tokendata
-						local spaces2 = self:SkipPattern( " *" )
-						local bracket = self:SkipPattern("%(")
-						print("|"..(spaces or "").."|")
-						addToken( bracket and "function" or "notfound", funcname ) -- Adding our funcname as function or notfound
-						if spaces2 then addToken( "comment", spaces2 ) end
-						if bracket then addToken( "operator", bracket ) end -- Adding bracket
-						spaces = "" -- We had to reorder a little
-						self.tokendata = "" -- we'll handle it manually in that case
-					else
-						tokenname = "constant"
-					end
-					 -- We handled it already
+				else
+					tokenname = val == "function" and "function" or "constant"
 				end
 			elseif libmap[sstr] then --We found library
 				addToken("library", self.tokendata)
