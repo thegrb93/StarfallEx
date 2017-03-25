@@ -115,11 +115,6 @@ function EDITOR:ResetTokenizer(row)
     end
   end
 
-  for k,v in pairs( self.e2fs_functions ) do
-    if v == row then
-      self.e2fs_functions[k] = nil
-    end
-  end
 end
 
 function EDITOR:SyntaxColorLine(row)
@@ -166,9 +161,6 @@ function EDITOR:SyntaxColorLine(row)
       local spaces, funcname = self.tokendata:match( "(%s*)(%a[a-zA-Z0-9_]*)" )
       addToken( "userfunction", funcname )
 
-      if not wire_expression2_funclist[funcname] then
-        self.e2fs_functions[funcname] = row
-      end
     end
     self.tokendata = ""
 
@@ -240,9 +232,6 @@ function EDITOR:SyntaxColorLine(row)
 						end
 					end
 				end
-			elseif self.e2fs_functions[sstr] then
-        tokenname = "userfunction"
-
       else
         tokenname = "notfound"
       end
