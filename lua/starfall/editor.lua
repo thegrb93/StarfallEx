@@ -117,7 +117,14 @@ if CLIENT then
 
 		libMap[ "Environment" ] = {}
 		for name, val in pairs( SF.DefaultEnvironment ) do
-			libMap[ "Environment" ][name ] = type(val)
+			if istable(val) then
+				libMap[ "Environment" ][ name ] = {}
+				for n,v in pairs(val) do
+					libMap[ "Environment" ][ name ][ n ] = type(v)
+				end
+				continue
+			end
+			libMap[ "Environment" ][ name ] = type(val)
 		end
 		
 		for lib, tbl in pairs( SF.Libraries.libraries ) do
