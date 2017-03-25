@@ -4,7 +4,6 @@ local string_sub = string.sub
 local string_gmatch = string.gmatch
 local string_gsub = string.gsub
 local libmap = SF.Editor.LibMap
-PrintTable(libmap)
 local EDITOR = {}
 
 local function istype(tp)
@@ -207,8 +206,22 @@ function EDITOR:SyntaxColorLine(row)
       if keywords[sstr][keyword] then
         tokenname = "keyword"
       elseif libmap["Environment"][sstr] then -- We Environment function/constant
-        tokenname = libmap["Environment"][sstr] == "function" and "function" or "constant"
-				print(sstr,tokenname)
+				local val = libmap["Environment"][sstr]
+				if istable(val) then
+					addToken("constant", self.tokendata)
+					self.tokendata = ""
+					if self:NextPattern( "%." ) then -- There is dot after enum, color it
+						addToken( "operator", self.tokendata )
+						self.tokendata = ""
+					end
+					if self:NextPattern("^[a-zA-Z][a-zA-Z0-9_]*") then -- Looking for enum key
+						tokenname = val[self.tokendata] and "constant" or "notfound"
+					else
+						tokenname = "notfound"
+					end
+				else
+					tokenname = val == "function" and "function" or "constant"
+				end
 			elseif libmap[sstr] then --We found library
 				addToken("library", self.tokendata)
 				self.tokendata = ""
