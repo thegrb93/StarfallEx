@@ -75,6 +75,7 @@ end
 local cols = {}
 local lastcol
 local function addToken(tokenname, tokendata)
+	if not tokenname then tokenname = "notfound" end
   local color = colors[tokenname]
   if lastcol and color == lastcol[2] then
     lastcol[1] = lastcol[1] .. tokendata
@@ -229,6 +230,8 @@ function EDITOR:SyntaxColorLine(row)
 						local t = libmap[sstr][self.tokendata]
 						if t then -- Valid function, woohoo
 							tokenname = t == "function" and "function" or "constant"
+						else
+							tokenname = "notfound"
 						end
 					end
 				end
