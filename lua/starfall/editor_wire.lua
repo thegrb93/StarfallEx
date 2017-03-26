@@ -770,9 +770,11 @@ function Editor:InitComponents()
       end
     }, "DButton")
 
+	self.C.ButtonHolder = self:addComponent(vgui.Create("DPanel", self), -430-4, 4, 430, 22) -- Upper menu
+	self.C.ButtonHolder.Paint = function() end
   -- addComponent( panel, x, y, w, h )
   -- if x, y, w, h is minus, it will stay relative to right or buttom border
-  self.C.Close = self:addComponent(vgui.Create("DButton", self), -45-4, 0, 45, 22) -- Close button
+  self.C.Close = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Close button
   -- self.C.Inf = self:addComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-26, 0, 24, 22) -- Info button
   -- self.C.ConBut = self:addComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-24-26, 0, 24, 22) -- Control panel open/close
 
@@ -791,11 +793,12 @@ function Editor:InitComponents()
   self.C.CloseTab = vgui.CreateFromTable(DMenuButton, self.C.Menu, "CloseTab") -- Close tab button
   self.C.Reload = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Reload tab button
 
-  self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
+  self.C.SaE = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save & Exit button
+  self.C.SavAs = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save As button
+
+	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
   self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
 
-  self.C.SaE = vgui.Create("StarfallButton", self.C.Menu) -- Save & Exit button
-  self.C.SavAs = vgui.Create("StarfallButton", self.C.Menu) -- Save As button
 
   self.C.Control = self:addComponent(vgui.Create("Panel", self), -350, 52, 342, -32) -- Control Panel
   self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 150) -- Credit box
@@ -826,12 +829,16 @@ function Editor:InitComponents()
   self.C.Val:SetHeight(22)
 
   self.C.SaE:SetSize(80, 20)
+	self.C.SaE:DockMargin(2, 0, 0, 0)	
   self.C.SaE:Dock(RIGHT)
-  self.C.SavAs:SetSize(51, 20)
+  
+	self.C.SavAs:SetSize(51, 20)
+	self.C.SavAs:DockMargin(2, 0, 0, 0)	
   self.C.SavAs:Dock(RIGHT)
 
-  self.C.Close:SetText("r")
-  self.C.Close:SetFont("Marlett")
+  self.C.Close:SetText("Close")
+	self.C.Close:DockMargin(10, 0, 0, 0)
+	self.C.Close:Dock(RIGHT)
   self.C.Close.DoClick = function(btn) self:Close() end
 
   self.C.ConBut:SetImage("icon16/wrench.png")
@@ -1614,8 +1621,9 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 
   self:SetEditorMode(nEditorType)
 
-  local SFHelp = vgui.Create("StarfallButton", self.C.Menu)
+  local SFHelp = vgui.Create("StarfallButton", self.C.ButtonHolder)
   SFHelp:SetSize(58, 20)
+	SFHelp:DockMargin(2, 0, 0, 0)	
   SFHelp:Dock(RIGHT)
   SFHelp:SetText("SFHelper")
   SFHelp.DoClick = function()
@@ -1628,8 +1636,9 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
   self.C.SFHelp = SFHelp
 
   -- Add "Sound Browser" button
-  local SoundBrw = vgui.Create("StarfallButton", self.C.Menu)
+  local SoundBrw = vgui.Create("StarfallButton", self.C.ButtonHolder)
   SoundBrw:SetSize(85, 20)
+	SoundBrw:DockMargin(2, 0, 0, 0)	
   SoundBrw:Dock(RIGHT)
   SoundBrw:SetText("Sound Browser")
   SoundBrw.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
@@ -1637,8 +1646,9 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
   self:OpenOldTabs()
 
   --Add "Model Viewer" button
-  local ModelViewer = vgui.Create("StarfallButton", self.C.Menu)
+  local ModelViewer = vgui.Create("StarfallButton", self.C.ButtonHolder)
   ModelViewer:SetSize(85, 20)
+	ModelViewer:DockMargin(2, 0, 0, 0)	
   ModelViewer:Dock(RIGHT)
   ModelViewer:SetText("Movel Viewer")
   ModelViewer.DoClick = function()
