@@ -111,7 +111,7 @@ local colors_defaults = {}
 local colors_convars = {}
 for k, v in pairs(colors) do
   colors_defaults[k] = Color(v.r, v.g, v.b) -- Copy to save defaults
-  colors_convars[k] = CreateClientConVar("wire_expression2_editor_color_" .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
+  colors_convars[k] = CreateClientConVar("sf_editor_syntaxcolor_" .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
 end
 
 function Editor:LoadSyntaxColors()
@@ -129,7 +129,7 @@ end
 function Editor:SetSyntaxColor(colorname, colr)
   if not colors[colorname] then return end
   colors[colorname] = colr
-  RunConsoleCommand("wire_expression2_editor_color_" .. colorname, colr.r .. "_" .. colr.g .. "_" .. colr.b)
+  RunConsoleCommand("sf_editor_syntaxcolor_" .. colorname, colr.r .. "_" .. colr.g .. "_" .. colr.b)
 
   for i = 1, self:GetNumTabs() do
     self:GetEditor(i):SetSyntaxColor(colorname, colr)
