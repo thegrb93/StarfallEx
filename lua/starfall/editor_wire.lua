@@ -39,10 +39,10 @@ Editor.Fonts["Lucida Console"] = ""
 -- Mac
 Editor.Fonts["Monaco"] = "Mac standard font"
 
-surface.CreateFont("DefaultBold", {
-    font = "defaultbold",
-    size = 12,
-    weight = 700,
+surface.CreateFont("SFEditorDefault", {
+    font = "default",
+    size = 18,
+    weight = 500,
     antialias = true,
     additive = false,
   })
@@ -234,7 +234,7 @@ end
 function Editor:PaintOver()
   local w, h = self:GetSize()
 
-  surface.SetFont("DefaultBold")
+  surface.SetFont("SFEditorDefault")
   surface.SetTextColor(255, 255, 255, 255)
   surface.SetTextPos(10, 6)
   surface.DrawText(self.Title .. self.subTitle)
@@ -888,6 +888,9 @@ function Editor:InitComponents()
   self.C.Browser.OnFileOpen = function(_, filepath, newtab)
     self:Open(filepath, nil, newtab)
   end
+	self.C.Browser.Folders.Paint = function(_, w, h) --Fix for offset
+		draw.RoundedBox( 0, 1, 0, w-2, h, Color(255, 255, 255) ) 
+	end
 
   self.C.Val:SetText(" Click to validate...")
   self.C.Val.UpdateColours = function(button, skin)
