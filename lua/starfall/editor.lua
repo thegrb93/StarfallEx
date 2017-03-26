@@ -144,7 +144,8 @@ if CLIENT then
 	function SF.Editor.init ()
 		
 		SF.Editor.LibMap = createWireLibraryMap () --needed for wireeditor
-		include("starfall/editor_sfmode.lua")
+		include("starfall/editor_wire.lua") -- Editor's frame
+		include("starfall/editor_sfmode.lua") --Editor's mode
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
 		end
@@ -420,7 +421,7 @@ if CLIENT then
 
 	function SF.Editor.createEditor ()
 		if WireTextEditor then
-			local editor = vgui.Create("Expression2EditorFrame") --Should define own frame later
+			local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
 			editor:Setup("Starfall Editor", "starfall", "Starfall")
 			editor:SetEditorMode("Starfall")
 			
