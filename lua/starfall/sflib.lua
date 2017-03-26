@@ -13,6 +13,8 @@ if SERVER then
 	AddCSLuaFile( "preprocessor.lua" )
 	AddCSLuaFile( "permissions/core.lua" )
 	AddCSLuaFile( "editor.lua" )
+	AddCSLuaFile( "editor_sfmode.lua" )
+	AddCSLuaFile( "editor_wire.lua" )
 	AddCSLuaFile( "sfderma.lua" )
 	AddCSLuaFile( "sfhelper.lua" )
 	AddCSLuaFile( "netstream.lua" )

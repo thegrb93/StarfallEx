@@ -79,8 +79,73 @@ if CLIENT then
 	CreateClientConVar( "sf_editor_keybindings", "ace", true, false )
 	CreateClientConVar( "sf_editor_fontsize", 13, true, false )
 
-	function SF.Editor.init ()
+	--WireEditor
+	CreateClientConVar( "sf_editor_usewire", 0, true, false )
 
+	local function createLibraryMap ()
+
+		local libMap, libs = {}, {}
+
+		libMap[ "Environment" ] = {}
+		for name, val in pairs( SF.DefaultEnvironment ) do
+			table.insert( libMap[ "Environment" ], name )
+			table.insert( libs, name )
+		end
+		
+		for lib, tbl in pairs( SF.Libraries.libraries ) do
+			libMap[ lib ] = {}
+			for name, val in pairs( tbl ) do
+				table.insert( libMap[ lib ], name )
+				table.insert( libs, lib.."\\."..name )
+			end
+		end
+		
+		for lib, tbl in pairs( SF.Types ) do
+			if type( tbl.__index ) == "table" then
+				for name, val in pairs( tbl.__index ) do
+					table.insert( libs, "\\:"..name )
+				end
+			end
+		end
+
+		return libMap, table.concat( libs, "|" )
+	end
+
+	local function createWireLibraryMap () -- Hashtable
+
+		local libMap = {}
+
+		libMap[ "Environment" ] = {}
+		for name, val in pairs( SF.DefaultEnvironment ) do
+			if istable(val) then
+				libMap[ "Environment" ][ name ] = {}
+				for n,v in pairs(val) do
+					libMap[ "Environment" ][ name ][ n ] = type(v)
+				end
+				continue
+			end
+			libMap[ "Environment" ][ name ] = type(val)
+		end
+		
+		for lib, tbl in pairs( SF.Libraries.libraries ) do
+			libMap[ lib ] = {}
+			for name, val in pairs( tbl ) do
+				libMap[ lib ][ name ] = type(val)
+			end
+		end
+		
+		return libMap
+	end
+
+	local function useWireEditor()
+		 return GetConVarNumber("sf_editor_usewire") == 1 and WireTextEditor
+	end
+
+	function SF.Editor.init ()
+		
+		SF.Editor.LibMap = createWireLibraryMap () --needed for wireeditor
+		include("starfall/editor_wire.lua") -- Editor's frame
+		include("starfall/editor_sfmode.lua") --Editor's mode
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
 		end
@@ -103,7 +168,10 @@ if CLIENT then
 		if not SF.Editor.initialized then
 			SF.Editor.init ()
 		end
-		
+		if useWireEditor() then
+			SF.Editor.wireEditor:Open()
+			return
+		end
 		SF.Editor.editor:open()
 		RunConsoleCommand( "starfall_event", "editor_open" )
 	end
@@ -114,6 +182,11 @@ if CLIENT then
 
 		local fileName = string.gsub( fl, "starfall/", "", 1 )
 		local code = file.Read( fl, "DATA" )
+
+		if useWireEditor() then
+			SF.Editor.wireEditor:Open(1, code, false)
+			return
+		end
 
 		for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
 			if v.filename == fileName and v.code == code then
@@ -127,11 +200,20 @@ if CLIENT then
 	end
 	
 	function SF.Editor.close ()
+		if useWireEditor() then
+			SF.Editor.wireEditor:Close()
+			return
+		end
 		SF.Editor.editor:close()
 		RunConsoleCommand( "starfall_event", "editor_close" )
 	end
 
 	function SF.Editor.getCode ()
+		
+		if useWireEditor() then
+			return SF.Editor.wireEditor:GetCode() or ""
+		end
+		
 		if SF.Editor.getActiveTab() then
 			return SF.Editor.getActiveTab().code
 		end
@@ -139,6 +221,9 @@ if CLIENT then
 	end
 
 	function SF.Editor.getOpenFile ()
+		if useWireEditor() then
+			return SF.Editor.wireEditor:GetChosenFile()
+		end
 		return SF.Editor.getActiveTab().filename
 	end
 
@@ -151,6 +236,7 @@ if CLIENT then
 	end
 
 	function SF.Editor.selectTab ( tab )
+		if useWireEditor() and SF.Editor.initialized then return end
 		local tabHolder = SF.Editor.getTabHolder()
 		if type( tab ) == "number" then
 			tab = math.min( tab, #tabHolder.tabs )
@@ -181,7 +267,10 @@ if CLIENT then
 		end
 
 		code = code or defaultCode
-
+		if useWireEditor() and SF.Editor.initialized then
+			SF.Editor.wireEditor:Open(1, code, true)
+			return
+		end
 		-- Settings to pass to editor when creating a new session
 		local settings = util.TableToJSON({
 			wrap = GetConVarNumber( "sf_editor_wordwrap" )
@@ -292,35 +381,6 @@ if CLIENT then
 
 	end
 
-	local function createLibraryMap ()
-
-		local libMap, libs = {}, {}
-
-		libMap[ "Environment" ] = {}
-		for name, val in pairs( SF.DefaultEnvironment ) do
-			table.insert( libMap[ "Environment" ], name )
-			table.insert( libs, name )
-		end
-		
-		for lib, tbl in pairs( SF.Libraries.libraries ) do
-			libMap[ lib ] = {}
-			for name, val in pairs( tbl ) do
-				table.insert( libMap[ lib ], name )
-				table.insert( libs, lib.."\\."..name )
-			end
-		end
-		
-		for lib, tbl in pairs( SF.Types ) do
-			if type( tbl.__index ) == "table" then
-				for name, val in pairs( tbl.__index ) do
-					table.insert( libs, "\\:"..name )
-				end
-			end
-		end
-
-		return libMap, table.concat( libs, "|" )
-	end
-
 	function SF.Editor.refreshTab ( tab )
 
 		local tabHolder = SF.Editor.getTabHolder()
@@ -360,7 +420,14 @@ if CLIENT then
 	end
 
 	function SF.Editor.createEditor ()
-	
+		if WireTextEditor then
+			local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
+			editor:Setup("Starfall Editor", "starfall", "Starfall")
+			editor:SetEditorMode("Starfall")
+			
+			if SF.Editor.wireEditor then SF.Editor.wireEditor:Remove() end
+			SF.Editor.wireEditor = editor
+		end
 		local editor = vgui.Create( "StarfallFrame" )
 		editor:DockPadding( 0, 0, 0, 0 )
 		editor:SetTitle( "Starfall Code Editor" )
