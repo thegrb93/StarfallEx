@@ -174,7 +174,7 @@ function Editor:Init()
     additive = false,
   }
   surface.CreateFont("E2SmallFont", fontTable)
-  self.logo = surface.GetTextureID("vgui/e2logo")
+  self.logo = surface.GetTextureID("radon/starfall2")
 
   self:InitComponents()
   self:LoadSyntaxColors()
@@ -239,9 +239,9 @@ function Editor:PaintOver()
   surface.SetTextPos(10, 6)
   surface.DrawText(self.Title .. self.subTitle)
 
-  -- surface.SetTexture(self.logo)
-  -- surface.SetDrawColor( 255, 255, 255, 128 )
-  -- surface.DrawTexturedRect( w-148, h-158, 128, 128)
+--  surface.SetTexture(self.logo)
+--  surface.SetDrawColor( 255, 255, 255, 128 )
+--  surface.DrawTexturedRect( w-148, h-158, 128, 128)
 
   surface.SetDrawColor(255, 255, 255, 255)
   surface.SetTextPos(0, 0)
@@ -516,9 +516,9 @@ function Editor:CreateTab(chosenfile)
   sheet.Tab.Paint = function(button,w,h)
 
     if button.Hovered then
-      draw.RoundedBox( 0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med )
+      draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med )
     else
-      draw.RoundedBox( 0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark )
+      draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark )
     end
   end
   sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
@@ -820,9 +820,13 @@ function Editor:InitComponents()
 
   self.C.Menu:Dock(TOP)
   self.C.TabHolder:Dock(FILL)
-  self.C.Val:Dock(BOTTOM)
+	self.C.TabHolder.tabScroller:DockMargin( 0, 0, 3, 0 ) -- We dont want default offset
+	self.C.TabHolder:SetPadding(0)
+	self.C.Menu.Paint = function(_, w, h)
+		draw.RoundedBox( 0, 0, 0, w, h, Color(234, 234, 234) ) 
+	end
 
-  self.C.TabHolder:SetPadding(1)
+  self.C.Val:Dock(BOTTOM)
 
   self.C.Menu:SetHeight(24)
   self.C.Menu:DockPadding(2,2,2,2)
