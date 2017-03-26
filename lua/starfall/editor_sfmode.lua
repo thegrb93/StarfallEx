@@ -165,12 +165,12 @@ function EDITOR:SyntaxColorLine(row)
 
     if self:NextPattern( "%(" ) then -- We found a bracket
       -- Color the bracket
-      addToken( "operator", self.tokendata )
+      addToken( "notfound", self.tokendata )
     end
 
     self.tokendata = ""
     if self:NextPattern( "%) *{?" ) then -- check for ending bracket (and perhaps an ending {?)
-      addToken( "operator", self.tokendata )
+      addToken( "notfound", self.tokendata )
     end
   end
 
@@ -180,7 +180,7 @@ function EDITOR:SyntaxColorLine(row)
 
     -- eat all spaces
     local spaces = self:SkipPattern(" *")
-    if spaces then addToken("operator", spaces) end
+    if spaces then addToken("comment", spaces) end
     if not self.character then break end
 
     -- eat next token
@@ -337,7 +337,7 @@ function EDITOR:SyntaxColorLine(row)
     else
       self:NextCharacter()
 
-      tokenname = "operator"
+      tokenname = "notfound"
     end
 
     addToken(tokenname, self.tokendata)
