@@ -1657,7 +1657,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
   ModelViewer:SetSize(85, 20)
 	ModelViewer:DockMargin(2, 0, 0, 0)	
   ModelViewer:Dock(RIGHT)
-  ModelViewer:SetText("Movel Viewer")
+  ModelViewer:SetText("Model Viewer")
   ModelViewer.DoClick = function()
     if SF.Editor.modelViewer:IsVisible() then
       SF.Editor.modelViewer:close()
