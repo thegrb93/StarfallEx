@@ -1,7 +1,7 @@
 --[[
 Modified version of Wire Editor, you can find original code and it's licence on link below.
 https://github.com/wiremod/wire
-File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_editor/wire_expression2_editor.lua
+File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_editor/sf_editor.lua
 ]]
 
 local Editor = {}
@@ -20,11 +20,14 @@ else
   defaultFont = "DejaVu Sans Mono"
 end
 
-Editor.FontConVar = CreateClientConVar("wire_expression2_editor_font", defaultFont, true, false)
-Editor.FontSizeConVar = CreateClientConVar("wire_expression2_editor_font_size", 16, true, false)
-Editor.BlockCommentStyleConVar = CreateClientConVar("wire_expression2_editor_block_comment_style", 1, true, false)
-Editor.NewTabOnOpen = CreateClientConVar("wire_expression2_new_tab_on_open", "1", true, false)
-Editor.ops_sync_subscribe = CreateClientConVar("wire_expression_ops_sync_subscribe",0,true,false)
+--ConVars
+Editor.FontConVar = CreateClientConVar("sf_editor_font", defaultFont, true, false)
+Editor.FontSizeConVar = CreateClientConVar("sf_editor_fontsize", 16, true, false)
+Editor.BlockCommentStyleConVar = CreateClientConVar("sf_editor_block_comment_style", 1, true, false)
+Editor.SaveTabsVar = CreateClientConVar("sf_editor_savetabs", "1", true, false)
+Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", true, false)
+Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
+Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 
 Editor.Fonts = {}
 -- Font Description
@@ -188,8 +191,8 @@ function Editor:Init()
   self:InitShutdownHook()
 end
 
-local size = CreateClientConVar("wire_expression2_editor_size", "800_600", true, false)
-local pos = CreateClientConVar("wire_expression2_editor_pos", "-1_-1", true, false)
+local size = CreateClientConVar("sf_editor_size", "800_600", true, false)
+local pos = CreateClientConVar("sf_editor_pos", "-1_-1", true, false)
 
 function Editor:LoadEditorSettings()
 
@@ -223,10 +226,10 @@ function Editor:SaveEditorSettings()
 
   -- Position & Size
   local w, h = self:GetSize()
-  RunConsoleCommand("wire_expression2_editor_size", w .. "_" .. h)
+  RunConsoleCommand("sf_editor_size", w .. "_" .. h)
 
   local x, y = self:GetPos()
-  RunConsoleCommand("wire_expression2_editor_pos", x .. "_" .. y)
+  RunConsoleCommand("sf_editor_pos", x .. "_" .. y)
 end
 function Editor:Paint(w,h)
   draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
@@ -448,7 +451,7 @@ function Editor:SetActiveTab(val)
     self.C.TabHolder:SetActiveTab(val)
     val:GetPanel():RequestFocus()
   end
-  if self.E2 then self:Validate() end
+  self:Validate()
 
   -- Editor subtitle and tab text
   local title, tabtext = getPreferredTitles(self:GetChosenFile(), self:GetCode())
@@ -599,7 +602,7 @@ function Editor:CreateTab(chosenfile)
   editor.OnShortcut = function(_, code)
     if code == KEY_S then
       self:SaveFile(self:GetChosenFile())
-      if self.E2 then self:Validate() end
+      self:Validate()
     else
       local mode = GetConVar("wire_expression2_autocomplete_controlstyle"):GetInt()
       local enabled = GetConVar("wire_expression2_autocomplete"):GetBool()
@@ -642,9 +645,7 @@ end
 function Editor:NewTab()
   local sheet = self:CreateTab("generic")
   self:SetActiveTab(sheet.Tab)
-  if self.E2 then
-    self:NewScript(true)
-  end
+  self:NewScript(true)
 end
 
 function Editor:CloseTab(_tab)
@@ -684,7 +685,6 @@ function Editor:CloseTab(_tab)
   -- There's only one tab open, no need to actually close any tabs
   if self:GetNumTabs() == 1 then
     activetab:SetText("generic")
-    self.C.TabHolder:InvalidateLayout()
     self:NewScript(true)
     return
   end
@@ -803,15 +803,13 @@ function Editor:InitComponents()
   self.C.Control = self:addComponent(vgui.Create("Panel", self), -350, 52, 342, -32) -- Control Panel
   self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 150) -- Credit box
 
-  self:CreateTab("generic")
-
   -- extra component options
 
   self.C.Divider:SetLeft(self.C.Browser)
   self.C.Divider:SetRight(self.C.MainPane)
   self.C.Divider:Dock(FILL)
   self.C.Divider:SetDividerWidth(4)
-  self.C.Divider:SetCookieName("wire_expression2_editor_divider")
+  self.C.Divider:SetCookieName("sf_editor_divider")
   self.C.Divider:SetLeftMin(0)
 
   local DoNothing = function() end
@@ -950,7 +948,9 @@ function Editor:InitComponents()
 
   self:InitControlPanel(self.C.Control) -- making it seperate for better overview
   self.C.Control:SetVisible(false)
-  if self.E2 then self:Validate() end
+	self:NewTab()
+
+  self:Validate()
 end
 
 function Editor:AutoSave()
@@ -1121,12 +1121,12 @@ function Editor:InitControlPanel(frame)
     if value == "Custom..." then
       Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
           self:ChangeFont(value, self.FontSizeConVar:GetInt())
-          RunConsoleCommand("wire_expression2_editor_font", value)
+          RunConsoleCommand("sf_editor_font", value)
         end)
     else
       value = value:gsub(" %b()", "") -- Remove description
       self:ChangeFont(value, self.FontSizeConVar:GetInt())
-      RunConsoleCommand("wire_expression2_editor_font", value)
+      RunConsoleCommand("sf_editor_font", value)
     end
   end
   for k, v in pairs(self.Fonts) do
@@ -1139,7 +1139,7 @@ function Editor:InitControlPanel(frame)
   FontSizeSelect.OnSelect = function(panel, index, value)
     value = value:gsub(" %b()", "")
     self:ChangeFont(self.FontConVar:GetString(), tonumber(value))
-    RunConsoleCommand("wire_expression2_editor_font_size", value)
+    RunConsoleCommand("sf_editor_font_size", value)
   end
   for i = 11, 26 do
     FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
@@ -1212,42 +1212,42 @@ function Editor:InitControlPanel(frame)
 
   local NewTabOnOpen = vgui.Create("DCheckBoxLabel")
   dlist:AddItem(NewTabOnOpen)
-  NewTabOnOpen:SetConVar("wire_expression2_new_tab_on_open")
+  NewTabOnOpen:SetConVar("sf_editor_new_tab_on_open")
   NewTabOnOpen:SetText("New tab on open")
   NewTabOnOpen:SizeToContents()
   NewTabOnOpen:SetTooltip("Enable/disable loaded files opening in a new tab.\nIf disabled, loaded files will be opened in the current tab.")
 
   local SaveTabsOnClose = vgui.Create("DCheckBoxLabel")
   dlist:AddItem(SaveTabsOnClose)
-  SaveTabsOnClose:SetConVar("wire_expression2_editor_savetabs")
+  SaveTabsOnClose:SetConVar("sf_editor_savetabs")
   SaveTabsOnClose:SetText("Save tabs on close")
   SaveTabsOnClose:SizeToContents()
   SaveTabsOnClose:SetTooltip("Save the currently opened tab file paths on shutdown.\nOnly saves tabs whose files are saved.")
 
   local OpenOldTabs = vgui.Create("DCheckBoxLabel")
   dlist:AddItem(OpenOldTabs)
-  OpenOldTabs:SetConVar("wire_expression2_editor_openoldtabs")
+  OpenOldTabs:SetConVar("sf_editor_openoldtabs")
   OpenOldTabs:SetText("Open old tabs on load")
   OpenOldTabs:SizeToContents()
   OpenOldTabs:SetTooltip("Open the tabs from the last session on load.\nOnly tabs whose files were saved before disconnecting from the server are stored.")
 
   local DisplayCaretPos = vgui.Create("DCheckBoxLabel")
   dlist:AddItem(DisplayCaretPos)
-  DisplayCaretPos:SetConVar("wire_expression2_editor_display_caret_pos")
+  DisplayCaretPos:SetConVar("sf_editor_display_caret_pos")
   DisplayCaretPos:SetText("Show Caret Position")
   DisplayCaretPos:SizeToContents()
   DisplayCaretPos:SetTooltip("Shows the position of the caret.")
 
   local HighlightOnDoubleClick = vgui.Create("DCheckBoxLabel")
   dlist:AddItem(HighlightOnDoubleClick)
-  HighlightOnDoubleClick:SetConVar("wire_expression2_editor_highlight_on_double_click")
+  HighlightOnDoubleClick:SetConVar("sf_editor_highlight_on_double_click")
   HighlightOnDoubleClick:SetText("Highlight copies of selected word")
   HighlightOnDoubleClick:SizeToContents()
   HighlightOnDoubleClick:SetTooltip("Find all identical words and highlight them after a double-click.")
 
   local WorldClicker = vgui.Create("DCheckBoxLabel")
   dlist:AddItem(WorldClicker)
-  WorldClicker:SetConVar("wire_expression2_editor_worldclicker")
+  WorldClicker:SetConVar("sf_editor_worldclicker")
   WorldClicker:SetText("Enable Clicking Outside Editor")
   WorldClicker:SizeToContents()
   function WorldClicker.OnChange(pnl, bVal)
@@ -1285,7 +1285,7 @@ Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard
 ]]]=]
 
 function Editor:NewScript(incurrent)
-  if not incurrent and self.NewTabOnOpen:GetBool() then
+  if not incurrent and self.NewTabOnOpenVar:GetBool() then
     self:NewTab()
   else
     self:AutoSave()
@@ -1298,7 +1298,6 @@ function Editor:NewScript(incurrent)
   end
 end
 
-local wire_expression2_editor_savetabs = CreateClientConVar("wire_expression2_editor_savetabs", "1", true, false)
 
 local id = 0
 function Editor:InitShutdownHook()
@@ -1306,12 +1305,12 @@ function Editor:InitShutdownHook()
 
   -- save code when shutting down
   hook.Add("ShutDown", "wire_expression2_ShutDown" .. id, function()
-      -- if wire_expression2_editor == nil then return end
+      -- if sf_editor == nil then return end
       local buffer = self:GetCode()
       if buffer == defaultcode then return end
       file.Write(self.Location .. "/_shutdown_.txt", buffer)
 
-      if wire_expression2_editor_savetabs:GetBool() then
+      if Editor.SaveTabsVar:GetBool() then
         self:SaveTabs()
       end
     end)
@@ -1333,7 +1332,6 @@ function Editor:SaveTabs()
   file.Write(self.Location .. "/_tabs_.txt", strtabs)
 end
 
-local wire_expression2_editor_openoldtabs = CreateClientConVar("wire_expression2_editor_openoldtabs", "1", true, false)
 
 function Editor:OpenOldTabs()
   if not file.Exists(self.Location .. "/_tabs_.txt", "DATA") then return end
@@ -1369,8 +1367,9 @@ function Editor:OpenOldTabs()
 end
 
 function Editor:Validate(gotoerror)
-
-  local err = CompileString( self:GetCode(), "Validation", false )
+	local code = self:GetCode()
+	if #code < 1 then return true end -- We wont validate empty scripts
+  local err = CompileString( code , "Validation", false )
   if type( err ) != "string" then
     self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
     return
@@ -1398,16 +1397,16 @@ function Editor:SubTitle(sub)
   end
 end
 
-local wire_expression2_editor_worldclicker = CreateClientConVar("wire_expression2_editor_worldclicker", "0", true, false)
+
 function Editor:SetV(bool)
   if bool then
     self:MakePopup()
     self:InvalidateLayout(true)
-    if self.E2 then self:Validate() end
+    self:Validate()
   end
   self:SetVisible(bool)
   self:SetKeyBoardInputEnabled(bool)
-  self:GetParent():SetWorldClicker(wire_expression2_editor_worldclicker:GetBool() and bool) -- Enable this on the background so we can update E2's without closing the editor
+  self:GetParent():SetWorldClicker(Editor.WorldClickerVar:GetBool() and bool) -- Enable this on the background so we can update E2's without closing the editor
   if CanRunConsoleCommand() then
     RunConsoleCommand("wire_expression2_event", bool and "editor_open" or "editor_close")
     if not e2_function_data_received and bool then -- Request the E2 functions
@@ -1454,7 +1453,7 @@ end
 function Editor:SetCode(code)
   self:GetCurrentEditor():SetText(code)
   self.savebuffer = self:GetCode()
-  if self.E2 then self:Validate() end
+  self:Validate()
   self:ExtractName()
 end
 
@@ -1475,11 +1474,7 @@ end
 function Editor:Open(Line, code, forcenewtab)
   if self:IsVisible() and not Line and not code then self:Close() end
   self:SetV(true)
-  if self.chip then
-    self.C.SaE:SetText("Upload & Exit")
-  else
-    self.C.SaE:SetText("Save and Exit")
-  end
+  self.C.SaE:SetText("Save and Exit")
   if code then
     if not forcenewtab then
       for i = 1, self:GetNumTabs() do
@@ -1495,7 +1490,7 @@ function Editor:Open(Line, code, forcenewtab)
     end
     local title, tabtext = getPreferredTitles(Line, code)
     local tab
-    if self.NewTabOnOpen:GetBool() or forcenewtab then
+    if self.NewTabOnOpenVar:GetBool() or forcenewtab then
       tab = self:CreateTab(tabtext).Tab
     else
       tab = self:GetActiveTab()
@@ -1514,12 +1509,7 @@ end
 
 function Editor:SaveFile(Line, close, SaveAs)
   self:ExtractName()
-  if close and self.chip then
-    if not self:Validate(true) then return end
-    WireLib.Expression2Upload(self.chip, self:GetCode())
-    self:Close()
-    return
-  end
+
   if not Line or SaveAs or Line == self.Location .. "/" .. ".txt" then
     local str
     if self.C.Browser.File then
@@ -1558,13 +1548,10 @@ function Editor:SaveFile(Line, close, SaveAs)
   timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
   surface.PlaySound("ambient/water/drip3.wav")
 
-  if not self.chip then self:ChosenFile(Line) end
+  self:ChosenFile(Line)
   if close then
-    if self.E2 then
-      GAMEMODE:AddNotify("Expression saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
-    else
-      GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
-    end
+
+    GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
     self:Close()
   end
 end
@@ -1591,10 +1578,9 @@ function Editor:LoadFile(Line, forcenewtab)
         end
       end
     end
-    if not self.chip then
       local title, tabtext = getPreferredTitles(Line, str)
       local tab
-      if self.NewTabOnOpen:GetBool() or forcenewtab then
+      if self.NewTabOnOpenVar:GetBool() or forcenewtab then
         tab = self:CreateTab(tabtext).Tab
       else
         tab = self:GetActiveTab()
@@ -1603,7 +1589,6 @@ function Editor:LoadFile(Line, forcenewtab)
       end
       self:SetActiveTab(tab)
       self:ChosenFile(Line)
-    end
     self:SetCode(str)
   end
 end
@@ -1612,10 +1597,8 @@ function Editor:Close()
   timer.Stop("e2autosave")
   self:AutoSave()
 
-  self:Validate()
   self:ExtractName()
   self:SetV(false)
-  self.chip = false
 
   self:SaveEditorSettings()
 end
@@ -1650,8 +1633,10 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
   SoundBrw:SetText("Sound Browser")
   SoundBrw.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
   self.C.SoundBrw = SoundBrw
-  self:OpenOldTabs()
-
+	if Editor.OpenOldTabsVar:GetBool() then
+  	self:OpenOldTabs()
+	end
+	
   --Add "Model Viewer" button
   local ModelViewer = vgui.Create("StarfallButton", self.C.ButtonHolder)
   ModelViewer:SetSize(85, 20)
@@ -1666,7 +1651,6 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
     end
   end
   self.C.ModelViewer = ModelViewer
-  self:OpenOldTabs()
 
   self:InvalidateLayout()
 end
