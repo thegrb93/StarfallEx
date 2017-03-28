@@ -689,7 +689,7 @@ function Editor:CloseTab(_tab)
 
   -- There's only one tab open, no need to actually close any tabs
   if self:GetNumTabs() == 1 then
-    activetab:SetText("generic")
+    self:GetActiveTab():SetText("generic")
     self:NewScript(true)
     return
   end
@@ -1452,7 +1452,7 @@ function Editor:ExtractName()
 end
 
 function Editor:SetCode(code)
-  self:GetCurrentEditor():SetText(code)
+  self:GetCurrentEditor():setCode(code)
   self.savebuffer = self:GetCode()
   self:Validate()
   self:ExtractName()
@@ -1469,7 +1469,7 @@ function Editor:GetCurrentEditor()
 end
 
 function Editor:GetCode()
-  return self:GetCurrentEditor():GetValue()
+  return self:GetCurrentEditor():getCode()
 end
 
 function Editor:Open(Line, code, forcenewtab)
@@ -1483,7 +1483,7 @@ function Editor:Open(Line, code, forcenewtab)
           self:SetActiveTab(i)
           self:SetCode(code)
           return
-        elseif self:GetEditor(i):GetValue() == code then
+        elseif self:GetEditor(i):getCode() == code then
           self:SetActiveTab(i)
           return
         end
@@ -1573,7 +1573,7 @@ function Editor:LoadFile(Line, forcenewtab)
           self:SetActiveTab(i)
           if forcenewtab ~= nil then self:SetCode(str) end
           return
-        elseif self:GetEditor(i):GetValue() == str then
+        elseif self:GetEditor(i):getCode() == str then
           self:SetActiveTab(i)
           return
         end

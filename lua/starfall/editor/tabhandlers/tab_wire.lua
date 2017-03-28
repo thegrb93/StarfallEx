@@ -79,11 +79,11 @@ end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
 
-local EDITOR = {}
-function EDITOR:GetHandler()
+local PANEL = {}
+function PANEL:GetHandler()
 	return TabHandler
 end
-function EDITOR:Init()
+function PANEL:Init()
 	self:SetCursor("beam")
 
 	self.Rows = {""}
@@ -123,7 +123,7 @@ function EDITOR:Init()
 	}
 end
 
-function EDITOR:SetMode(mode_name)
+function PANEL:SetMode(mode_name)
 	self.CurrentMode = TabHandler.Modes[mode_name or "Default"]
 	if not self.CurrentMode then
 		Msg("Couldn't find text editor mode '".. tostring(mode_name) .. "'")
@@ -131,26 +131,26 @@ function EDITOR:SetMode(mode_name)
 	end
 end
 
-function EDITOR:DoAction(name, ...)
+function PANEL:DoAction(name, ...)
 	if not self.CurrentMode then return end
 	local f = assert(self.CurrentMode, "No current mode set")[name]
 	if not f then f = TabHandler.Modes.Default[name] end
 	if f then return f(self, ...) end
 end
 
-function EDITOR:GetParent()
+function PANEL:GetParent()
 	return self.parentpanel
 end
 
-function EDITOR:RequestFocus()
+function PANEL:RequestFocus()
 	self.TextEntry:RequestFocus()
 end
 
-function EDITOR:OnGetFocus()
+function PANEL:OnGetFocus()
 	self.TextEntry:RequestFocus()
 end
 
-function EDITOR:CursorToCaret()
+function PANEL:CursorToCaret()
 	local x, y = self:CursorPos()
 
 	x = x - (self.LineNumberWidth + 6)
@@ -172,7 +172,7 @@ end
 
 local wire_expression2_editor_highlight_on_double_click = CreateClientConVar( "wire_expression2_editor_highlight_on_double_click", "1", true, false )
 
-function EDITOR:OpenContextMenu()
+function PANEL:OpenContextMenu()
 	self:AC_SetVisible( false )
 	local menu = DermaMenu()
 
@@ -300,7 +300,7 @@ function EDITOR:OpenContextMenu()
 	return menu
 end
 
-function EDITOR:OnMousePressed(code)
+function PANEL:OnMousePressed(code)
 	if code == MOUSE_LEFT then
 		local cursor = self:CursorToCaret()
 		if (CurTime() - self.LastClick) < 1 and self.tmp and cursor[1] == self.Caret[1] and cursor[2] == self.Caret[2] then
@@ -356,7 +356,7 @@ function EDITOR:OnMousePressed(code)
 	end
 end
 
-function EDITOR:OnMouseReleased(code)
+function PANEL:OnMouseReleased(code)
 	if not self.MouseDown then return end
 
 	if code == MOUSE_LEFT then
@@ -366,7 +366,7 @@ function EDITOR:OnMouseReleased(code)
 	end
 end
 
-function EDITOR:SetText(text)
+function PANEL:setCode(text)
 	self.Rows = string_Explode("\n", text)
 	if self.Rows[#self.Rows] ~= "" then
 		self.Rows[#self.Rows + 1] = ""
@@ -383,11 +383,11 @@ function EDITOR:SetText(text)
 	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 end
 
-function EDITOR:GetValue()
+function PANEL:getCode()
 	return string_gsub(table_concat(self.Rows, "\n"), "\r", "")
 end
 
-function EDITOR:HighlightLine( line, r, g, b, a )
+function PANEL:HighlightLine( line, r, g, b, a )
 	if not self.HighlightedLines then self.HighlightedLines = {} end
 	if not r and self.HighlightedLines[line] then
 		self.HighlightedLines[line] = nil
@@ -398,9 +398,9 @@ function EDITOR:HighlightLine( line, r, g, b, a )
 	end
 	return false
 end
-function EDITOR:ClearHighlightedLines() self.HighlightedLines = nil end
+function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
-function EDITOR:PaintLine(row)
+function PANEL:PaintLine(row)
 	if row > #self.Rows then return end
 
 	if not self.PaintRows[row] then
@@ -476,7 +476,7 @@ function EDITOR:PaintLine(row)
 
 end
 
-function EDITOR:PerformLayout()
+function PANEL:PerformLayout()
 	self.ScrollBar:SetSize(16, self:GetTall())
 	self.ScrollBar:SetPos(self:GetWide() - 16, 0)
 
@@ -486,7 +486,7 @@ function EDITOR:PerformLayout()
 	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 end
 
-function EDITOR:HighlightArea( area, r,g,b,a )
+function PANEL:HighlightArea( area, r,g,b,a )
 	if not self.HighlightedAreas then self.HighlightedAreas = {} end
 	if not r then
 		local _start, _stop = area[1], area[2]
@@ -505,9 +505,9 @@ function EDITOR:HighlightArea( area, r,g,b,a )
 	end
 	return false
 end
-function EDITOR:ClearHighlightedAreas() self.HighlightedAreas = nil end
+function PANEL:ClearHighlightedAreas() self.HighlightedAreas = nil end
 
-function EDITOR:PaintTextOverlay()
+function PANEL:PaintTextOverlay()
 
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
 		local width, height = self.FontWidth, self.FontHeight
@@ -542,7 +542,7 @@ function EDITOR:PaintTextOverlay()
 		end
 
 		-- Bracket highlighting by: {Jeremydeath}
-		local WindowText = self:GetValue()
+		local WindowText = self:getCode()
 		local LinePos = table_concat(self.Rows, "\n", 1, self.Caret[1]-1):len()
 		local CaretPos = LinePos+self.Caret[2]+1
 
@@ -633,7 +633,7 @@ end
 
 local wire_expression2_editor_display_caret_pos = CreateClientConVar("wire_expression2_editor_display_caret_pos","0",true,false)
 
-function EDITOR:Paint()
+function PANEL:Paint()
 	self.LineNumberWidth = self.FontWidth * #tostring(self.Scroll[1]+self.Size[1]+1)
 
 	if not input.IsMouseDown(MOUSE_LEFT) then
@@ -664,7 +664,7 @@ function EDITOR:Paint()
 	self:PaintTextOverlay()
 
 	if wire_expression2_editor_display_caret_pos:GetBool() then
-		local str = "Length: " .. #self:GetValue() .. " Lines: " .. #self.Rows .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
+		local str = "Length: " .. #self:getCode() .. " Lines: " .. #self.Rows .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
 		end
@@ -682,7 +682,7 @@ end
 -- Moves the caret to a new position. Optionally also collapses the selection
 -- into a single caret. If maintain_selection is nil, then the selection will
 -- be maintained only if Shift is pressed.
-function EDITOR:SetCaret(caret, maintain_selection)
+function PANEL:SetCaret(caret, maintain_selection)
 	self.Caret = self:CopyPosition(caret)
 
 	self.Caret[1] = math.Clamp(self.Caret[1], 1, #self.Rows)
@@ -700,11 +700,11 @@ function EDITOR:SetCaret(caret, maintain_selection)
 end
 
 
-function EDITOR:CopyPosition(caret)
+function PANEL:CopyPosition(caret)
 	return { caret[1], caret[2] }
 end
 
-function EDITOR:MovePosition(caret, offset)
+function PANEL:MovePosition(caret, offset)
 	local row, col = caret[1], caret[2]
 
 	if offset > 0 then
@@ -745,15 +745,15 @@ function EDITOR:MovePosition(caret, offset)
 end
 
 
-function EDITOR:HasSelection()
+function PANEL:HasSelection()
 	return self.Caret[1] ~= self.Start[1] or self.Caret[2] ~= self.Start[2]
 end
 
-function EDITOR:Selection()
+function PANEL:Selection()
 	return { { self.Caret[1], self.Caret[2] }, { self.Start[1], self.Start[2] } }
 end
 
-function EDITOR:MakeSelection(selection)
+function PANEL:MakeSelection(selection)
 	local start, stop = selection[1], selection[2]
 
 	if start[1] < stop[1] or (start[1] == stop[1] and start[2] < stop[2]) then
@@ -764,7 +764,7 @@ function EDITOR:MakeSelection(selection)
 end
 
 
-function EDITOR:GetArea(selection)
+function PANEL:GetArea(selection)
 	local start, stop = self:MakeSelection(selection)
 
 	if start[1] == stop[1] then
@@ -780,7 +780,7 @@ function EDITOR:GetArea(selection)
 	end
 end
 
-function EDITOR:SetArea(selection, text, isundo, isredo, before, after)
+function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	local start, stop = self:MakeSelection(selection)
 
 	local buffer = self:GetArea(selection)
@@ -868,18 +868,18 @@ function EDITOR:SetArea(selection, text, isundo, isredo, before, after)
 end
 
 
-function EDITOR:GetSelection()
+function PANEL:GetSelection()
 	return self:GetArea(self:Selection())
 end
 
-function EDITOR:SetSelection(text)
+function PANEL:SetSelection(text)
 	self:SetCaret(self:SetArea(self:Selection(), text), false)
 end
 
-function EDITOR:OnTextChanged()
+function PANEL:OnTextChanged()
 end
 
-function EDITOR:_OnLoseFocus()
+function PANEL:_OnLoseFocus()
 	if self.TabFocus then
 		self:RequestFocus()
 		self.TabFocus = nil
@@ -894,7 +894,7 @@ local function unindent(line)
 	return line:match("^ ? ? ? ?(.*)$")
 end
 
-function EDITOR:_OnTextChanged()
+function PANEL:_OnTextChanged()
 	local ctrlv = false
 	local text = self.TextEntry:GetValue()
 	self.TextEntry:SetText("")
@@ -930,7 +930,7 @@ function EDITOR:_OnTextChanged()
 	self:AC_Check()
 end
 
-function EDITOR:OnMouseWheeled(delta)
+function PANEL:OnMouseWheeled(delta)
 	if self.AC_Panel and self.AC_Panel:IsVisible() then
 		local mode = wire_expression2_autocomplete_controlstyle:GetInt()
 		if mode == 2 or mode == 3 then
@@ -951,10 +951,10 @@ function EDITOR:OnMouseWheeled(delta)
 	self.ScrollBar:SetScroll(self.Scroll[1] - 1)
 end
 
-function EDITOR:OnShortcut()
+function PANEL:OnShortcut()
 end
 
-function EDITOR:ScrollCaret()
+function PANEL:ScrollCaret()
 	if self.Caret[1] - self.Scroll[1] < 2 then
 		self.Scroll[1] = self.Caret[1] - 2
 		if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
@@ -985,7 +985,7 @@ local wire_expression2_editor_find_whole_word_only = CreateClientConVar( "wire_e
 local wire_expression2_editor_find_wrap_around = CreateClientConVar( "wire_expression2_editor_find_wrap_around", "0", true, false )
 local wire_expression2_editor_find_dir = CreateClientConVar( "wire_expression2_editor_find_dir", "1", true, false )
 
-function EDITOR:HighlightFoundWord( caretstart, start, stop )
+function PANEL:HighlightFoundWord( caretstart, start, stop )
 	local caretstart = caretstart or self:CopyPosition( self.Start )
 	if istable( start ) then
 		self.Start = self:CopyPosition( start )
@@ -1000,7 +1000,7 @@ function EDITOR:HighlightFoundWord( caretstart, start, stop )
 	self:ScrollCaret()
 end
 
-function EDITOR:Find( str, looped )
+function PANEL:Find( str, looped )
 	if looped and looped >= 2 then return end
 	if str == "" then return end
 	local _str = str
@@ -1012,7 +1012,7 @@ function EDITOR:Find( str, looped )
 	local dir = wire_expression2_editor_find_dir:GetBool()
 
 	-- Check if the match exists anywhere at all
-	local temptext = self:GetValue()
+	local temptext = self:getCode()
 	if ignore_case then
 		temptext = temptext:lower()
 		str = str:lower()
@@ -1108,7 +1108,7 @@ function EDITOR:Find( str, looped )
 	return false
 end
 
-function EDITOR:Replace( str, replacewith )
+function PANEL:Replace( str, replacewith )
 	if str == "" or str == replacewith then return end
 
 	local ignore_case = wire_expression2_editor_find_ignore_case:GetBool()
@@ -1130,7 +1130,7 @@ function EDITOR:Replace( str, replacewith )
 	end
 end
 
-function EDITOR:ReplaceAll( str, replacewith )
+function PANEL:ReplaceAll( str, replacewith )
 	if str == "" then return end
 
 	local whole_word_only = wire_expression2_editor_find_whole_word_only:GetBool()
@@ -1142,7 +1142,7 @@ function EDITOR:ReplaceAll( str, replacewith )
 		replacewith = replacewith:gsub( "%%", "%%%1" )
 	end
 
-	local txt = self:GetValue()
+	local txt = self:getCode()
 
 	if ignore_case then
 		local txt2 = txt -- Store original cased copy
@@ -1183,7 +1183,7 @@ function EDITOR:ReplaceAll( str, replacewith )
 	end
 end
 
-function EDITOR:CountFinds( str )
+function PANEL:CountFinds( str )
 	if str == "" then return 0 end
 
 	local whole_word_only = wire_expression2_editor_find_whole_word_only:GetBool()
@@ -1194,7 +1194,7 @@ function EDITOR:CountFinds( str )
 		str = str:gsub( "[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1" )
 	end
 
-	local txt = self:GetValue()
+	local txt = self:getCode()
 
 	if ignore_case then
 		txt = txt:lower()
@@ -1216,10 +1216,10 @@ function EDITOR:CountFinds( str )
 	end
 end
 
-function EDITOR:FindAllWords( str )
+function PANEL:FindAllWords( str )
 	if str == "" then return end
 
-	local txt = self:GetValue()
+	local txt = self:getCode()
 	-- [^a-zA-Z0-9_] ensures we only find whole words, and the gsub escapes any regex command characters that happen to be in str
 	local pattern = "[^a-zA-Z0-9_]()" .. str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1") .. "()[^a-zA-Z0-9_]"
 
@@ -1231,7 +1231,7 @@ function EDITOR:FindAllWords( str )
 	return ret
 end
 
-function EDITOR:CreateFindWindow()
+function PANEL:CreateFindWindow()
 	self.FindWindow = vgui.Create( "DFrame", self )
 
 	local pnl = self.FindWindow
@@ -1550,7 +1550,7 @@ function EDITOR:CreateFindWindow()
 	end
 end
 
-function EDITOR:OpenFindWindow( mode )
+function PANEL:OpenFindWindow( mode )
 	if not self.FindWindow then self:CreateFindWindow() end
 	self.FindWindow:SetVisible( true )
 	self.FindWindow:MakePopup() -- This will move it above the E2 editor if it is behind it.
@@ -1578,11 +1578,11 @@ function EDITOR:OpenFindWindow( mode )
 	end
 end
 
-function EDITOR:CanUndo()
+function PANEL:CanUndo()
 	return #self.Undo > 0
 end
 
-function EDITOR:DoUndo()
+function PANEL:DoUndo()
 	if #self.Undo > 0 then
 		local undo = self.Undo[#self.Undo]
 		self.Undo[#self.Undo] = nil
@@ -1591,11 +1591,11 @@ function EDITOR:DoUndo()
 	end
 end
 
-function EDITOR:CanRedo()
+function PANEL:CanRedo()
 	return #self.Redo > 0
 end
 
-function EDITOR:DoRedo()
+function PANEL:DoRedo()
 	if #self.Redo > 0 then
 		local redo = self.Redo[#self.Redo]
 		self.Redo[#self.Redo] = nil
@@ -1604,13 +1604,13 @@ function EDITOR:DoRedo()
 	end
 end
 
-function EDITOR:SelectAll()
+function PANEL:SelectAll()
 	self.Caret = {#self.Rows, #(self.Rows[#self.Rows]) + 1}
 	self.Start = {1, 1}
 	self:ScrollCaret()
 end
 
-function EDITOR:Indent(shift)
+function PANEL:Indent(shift)
 	-- TAB with a selection --
 	-- remember scroll position
 	local tab_scroll = self:CopyPosition(self.Scroll)
@@ -1651,7 +1651,7 @@ function EDITOR:Indent(shift)
 end
 
 -- Comment the currently selected area
-function EDITOR:BlockCommentSelection( removecomment )
+function PANEL:BlockCommentSelection( removecomment )
 	if not self:HasSelection() then return end
 
 	local scroll = self:CopyPosition( self.Scroll )
@@ -1669,7 +1669,7 @@ end
 -- CommentSelection
 -- Idea by Jeremydeath
 -- Rewritten by Divran to use block comment
-function EDITOR:CommentSelection( removecomment )
+function PANEL:CommentSelection( removecomment )
 	if not self:HasSelection() then return end
 
 	-- Remember scroll position
@@ -1702,7 +1702,7 @@ function EDITOR:CommentSelection( removecomment )
 	self:ScrollCaret()
 end
 
-function EDITOR:ContextHelp()
+function PANEL:ContextHelp()
 	local word
 	if self:HasSelection() then
 		word = self:GetSelection()
@@ -1733,19 +1733,19 @@ function EDITOR:ContextHelp()
 	self:DoAction("ShowContextHelp", word)
 end
 
-function EDITOR:Copy()
+function PANEL:Copy()
 	if not self:HasSelection() then return end
 	self.clipboard = string_gsub(self:GetSelection(), "\n", "\r\n")
 	return SetClipboardText(self.clipboard)
 end
 
-function EDITOR:Cut()
+function PANEL:Cut()
 	self:Copy()
 	return self:SetSelection("")
 end
 
 -- TODO these two functions have no place in here
-function EDITOR:PreviousTab()
+function PANEL:PreviousTab()
 	local parent = self:GetParent()
 
 	local currentTab = parent:GetActiveTabIndex() - 1
@@ -1754,7 +1754,7 @@ function EDITOR:PreviousTab()
 	parent:SetActiveTabIndex(currentTab)
 end
 
-function EDITOR:NextTab()
+function PANEL:NextTab()
 	local parent = self:GetParent()
 
 	local currentTab = parent:GetActiveTabIndex() + 1
@@ -1764,7 +1764,7 @@ function EDITOR:NextTab()
 	parent:SetActiveTabIndex(currentTab)
 end
 
-function EDITOR:DuplicateLine()
+function PANEL:DuplicateLine()
 	-- Save current selection
 	local old_start = self:CopyPosition( self.Start )
 	local old_end = self:CopyPosition( self.Caret )
@@ -1790,7 +1790,7 @@ function EDITOR:DuplicateLine()
 	self:ScrollCaret()
 end
 
-function EDITOR:_OnKeyCodeTyped(code)
+function PANEL:_OnKeyCodeTyped(code)
 	self.Blink = RealTime()
 
 	local alt = input.IsKeyDown(KEY_LALT) or input.IsKeyDown(KEY_RALT)
@@ -2007,18 +2007,18 @@ end
 -- By Divran
 ---------------------------------------------------------------------------------------------------------
 
-function EDITOR:IsVarLine()
+function PANEL:IsVarLine()
 	local line = self.Rows[self.Caret[1]]
 	local word = line:match( "^@(%w+)" )
 	return (word == "inputs" or word == "outputs" or word == "persist")
 end
 
-function EDITOR:IsDirectiveLine()
+function PANEL:IsDirectiveLine()
 	local line = self.Rows[self.Caret[1]]
 	return line:match( "^@" ) ~= nil
 end
 
-function EDITOR:getWordStart(caret,getword)
+function PANEL:getWordStart(caret,getword)
 	local line = self.Rows[caret[1]]
 
 	for startpos, endpos in line:gmatch( "()[a-zA-Z0-9_]+()" ) do -- "()%w+()"
@@ -2029,7 +2029,7 @@ function EDITOR:getWordStart(caret,getword)
 	return {caret[1],1}
 end
 
-function EDITOR:getWordEnd(caret,getword)
+function PANEL:getWordEnd(caret,getword)
 	local line = self.Rows[caret[1]]
 
 	for startpos, endpos in line:gmatch( "()[a-zA-Z0-9_]+()" ) do -- "()%w+()"
@@ -2045,7 +2045,7 @@ end
 -- Gets the word the cursor is currently at, and the symbol in front
 -----------------------------------------------------------
 
-function EDITOR:AC_GetCurrentWord()
+function PANEL:AC_GetCurrentWord()
 	local startpos, word = self:getWordStart( self.Caret, true )
 	local symbolinfront = self:GetArea( { { startpos[1], startpos[2] - 1}, startpos } )
 	return word, symbolinfront
@@ -2073,7 +2073,7 @@ end
 -- Sets the autocompletion table
 -----------------------------------------------------------
 
-function EDITOR:AC_NewAutoCompletion( tbl )
+function PANEL:AC_NewAutoCompletion( tbl )
 	self.AC_AutoCompletion = tbl
 end
 
@@ -2208,8 +2208,8 @@ end
 -- Saves all variables to a table
 -----------------------------------------------------------
 
-function EDITOR:AC_SaveVariables()
-	local OK, directives,_ = PreProcessor.Execute( self:GetValue() )
+function PANEL:AC_SaveVariables()
+	local OK, directives,_ = PreProcessor.Execute( self:getCode() )
 
 	if not OK or not directives then
 		return
@@ -2322,7 +2322,7 @@ end
 -- Runs the autocompletion
 -----------------------------------------------------------
 
-function EDITOR:AC_Check( notimer )
+function PANEL:AC_Check( notimer )
 
 	if not notimer then
 		timer.Create("E2_AC_Check", 0, 1, function()
@@ -2399,7 +2399,7 @@ end
 -- Replaces the word
 -----------------------------------------------------------
 local wire_expression2_autocomplete_highlight_after_use = CreateClientConVar("wire_expression2_autocomplete_highlight_after_use","1",true,false)
-function EDITOR:AC_Use( suggestion )
+function PANEL:AC_Use( suggestion )
 	if not suggestion then return false end
 	local ret = false
 
@@ -2447,7 +2447,7 @@ end
 -- CreatePanel
 -----------------------------------------------------------
 
-function EDITOR:AC_CreatePanel()
+function PANEL:AC_CreatePanel()
 	-- Create the panel
 	local panel = vgui.Create( "DPanel",self )
 	panel:SetSize( 100, 202 )
@@ -2584,7 +2584,7 @@ local function SimpleWrap( txt, width )
 	return ret
 end
 
-function EDITOR:AC_FillInfoList( suggestion )
+function PANEL:AC_FillInfoList( suggestion )
 	local panel = self.AC_Panel
 
 	if not suggestion or not suggestion.description or not wire_expression2_autocomplete_moreinfo:GetBool() then -- If the suggestion is invalid, the suggestion does not need additional information, or if the user has disabled additional information, abort
@@ -2665,7 +2665,7 @@ end
 -- FillList
 -----------------------------------------------------------
 
-function EDITOR:AC_FillList()
+function PANEL:AC_FillList()
 	local panel = self.AC_Panel
 	panel.list:Clear()
 	panel.Selected = 0
@@ -2734,7 +2734,7 @@ end
 -- SetVisible
 -----------------------------------------------------------
 
-function EDITOR:AC_SetVisible( bool )
+function PANEL:AC_SetVisible( bool )
 	if self.AC_Panel_Visible == bool or not self.AC_Panel then return end
 	self.AC_Panel_Visible = bool
 	self.AC_Panel:SetVisible( bool )
@@ -2745,7 +2745,7 @@ end
 -- Reset
 -----------------------------------------------------------
 
-function EDITOR:AC_Reset()
+function PANEL:AC_Reset()
 	self.AC_HasSuggestions = false
 	self.AC_Suggestions = false
 	self.AC_Directives = nil
@@ -2760,14 +2760,14 @@ function EDITOR:AC_Reset()
 	panel.list:StretchToParent( 1,1,1,1 )
 end
 
-function EDITOR:Think()
+function PANEL:Think()
 	self:DoAction("Think")
 end
 
 ---------------------------------------------------------------------------------------------------------
 
 -- helpers for ctrl-left/right
-function EDITOR:wordLeft(caret)
+function PANEL:wordLeft(caret)
 	local row = self.Rows[caret[1]]
 	if caret[2] == 1 then
 		if caret[1] == 1 then return caret end
@@ -2779,7 +2779,7 @@ function EDITOR:wordLeft(caret)
 	return caret
 end
 
-function EDITOR:wordRight(caret)
+function PANEL:wordRight(caret)
 	local row = self.Rows[caret[1]]
 	if caret[2] > #row then
 		if caret[1] == #self.Rows then return caret end
@@ -2792,7 +2792,7 @@ function EDITOR:wordRight(caret)
 	return caret
 end
 
-function EDITOR:GetTokenAtPosition( caret )
+function PANEL:GetTokenAtPosition( caret )
 	local column = caret[2]
 	local line = self.PaintRows[caret[1]]
 	if line then
@@ -2806,7 +2806,7 @@ end
 
 -- Syntax highlighting --------------------------------------------------------
 
-function EDITOR:ResetTokenizer(row)
+function PANEL:ResetTokenizer(row)
 	self.line = self.Rows[row]
 	self.position = 0
 	self.character = ""
@@ -2815,7 +2815,7 @@ function EDITOR:ResetTokenizer(row)
 	self:DoAction("ResetTokenizer", row)
 end
 
-function EDITOR:NextCharacter()
+function PANEL:NextCharacter()
 	if not self.character then return end
 
 	self.tokendata = self.tokendata .. self.character
@@ -2828,7 +2828,7 @@ function EDITOR:NextCharacter()
 	end
 end
 
-function EDITOR:SkipPattern(pattern)
+function PANEL:SkipPattern(pattern)
 	-- TODO: share code with NextPattern
 	if not self.character then return nil end
 	local startpos,endpos,text = self.line:find(pattern, self.position)
@@ -2849,7 +2849,7 @@ function EDITOR:SkipPattern(pattern)
 	return text
 end
 
-function EDITOR:NextPattern(pattern)
+function PANEL:NextPattern(pattern)
 	if not self.character then return false end
 	local startpos,endpos,text = self.line:find(pattern, self.position)
 
@@ -2869,17 +2869,17 @@ function EDITOR:NextPattern(pattern)
 	return true
 end
 
-function EDITOR:GetSyntaxColor(name)
+function PANEL:GetSyntaxColor(name)
 	return self.Colors[name] or self:DoAction("GetSyntaxColor", name)
 end
 
-function EDITOR:SetSyntaxColors(colors)
+function PANEL:SetSyntaxColors(colors)
 	for name, color in pairs(colors) do
 		self:SetSyntaxColor(name, color)
 	end
 end
 
-function EDITOR:SetSyntaxColor(name, color)
+function PANEL:SetSyntaxColor(name, color)
 	if self.Colors[name] then
 		self.Colors[name] = color
 	else
@@ -2887,10 +2887,10 @@ function EDITOR:SetSyntaxColor(name, color)
 	end
 end
 
-function EDITOR:SyntaxColorLine(row)
+function PANEL:SyntaxColorLine(row)
 	return self:DoAction("SyntaxColorLine", row)
 end
 
 -- register editor panel
-vgui.Register(TabHandler.ControlName, EDITOR, "Panel");
+vgui.Register(TabHandler.ControlName, PANEL, "Panel");
 return TabHandler
