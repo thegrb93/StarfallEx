@@ -120,26 +120,12 @@ for k, v in pairs(colors) do
   colors_convars[k] = CreateClientConVar("sf_editor_syntaxcolor_" .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
 end
 
-function Editor:LoadSyntaxColors()
-  for k, v in pairs(colors_convars) do
-    local r, g, b = v:GetString():match("(%d+)_(%d+)_(%d+)")
-    local def = colors_defaults[k]
-    colors[k] = Color(tonumber(r) or def.r, tonumber(g) or def.g, tonumber(b) or def.b)
-  end
+function Editor:LoadSyntaxColors() --Deprecated
 
-  for i = 1, self:GetNumTabs() do
-    self:GetEditor(i):SetSyntaxColors(colors)
-  end
 end
 
-function Editor:SetSyntaxColor(colorname, colr)
-  if not colors[colorname] then return end
-  colors[colorname] = colr
-  RunConsoleCommand("sf_editor_syntaxcolor_" .. colorname, colr.r .. "_" .. colr.g .. "_" .. colr.b)
+function Editor:SetSyntaxColor(colorname, colr) --Deprecated
 
-  for i = 1, self:GetNumTabs() do
-    self:GetEditor(i):SetSyntaxColor(colorname, colr)
-  end
 end
 
 ------------------------------------------------------------------------
@@ -495,11 +481,7 @@ local function extractNameFromFilePath(str)
   end
 end
 
-function Editor:SetEditorMode(mode_name)
-  self.EditorMode = mode_name
-  for i = 1, self:GetNumTabs() do
-    self:GetEditor(i):SetMode(mode_name)
-  end
+function Editor:SetEditorMode(mode_name) --Deprecated
 end
 
 function Editor:GetEditorMode() return self.EditorMode end
@@ -631,8 +613,6 @@ function Editor:CreateTab(chosenfile)
     end
   end
   editor:RequestFocus()
-
-  editor:SetMode(self:GetEditorMode())
 
   self:OnTabCreated(sheet) -- Call a function that you can override to do custom stuff to each tab.
 
@@ -1372,7 +1352,8 @@ function Editor:OpenOldTabs()
   end
 end
 
-function Editor:Validate(gotoerror)
+function Editor:Validate(gotoerror) --TODO: Use tabholder system
+	if true then return end
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We wont validate empty scripts
   local err = CompileString( code , "Validation", false )

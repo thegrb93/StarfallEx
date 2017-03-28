@@ -14,6 +14,7 @@ AddCSLuaFile( "sfderma.lua" )
 AddCSLuaFile( "sfhelper.lua" )
 
 AddCSLuaFile( "tabhandlers/tab_wire.lua" )
+AddCSLuaFile( "tabhandlers/tab_ace.lua" )
 
 ------------------
 -- Tab Handlers
@@ -23,7 +24,7 @@ if CLIENT then
 
 	SF.Editor.TabHandlers = { }
 	SF.Editor.TabHandlers.wire = include( "tabhandlers/tab_wire.lua" )
-	SF.Editor.TabHandlers.ace = nil -- TODO: Include ace tab editor here
+	SF.Editor.TabHandlers.ace = include( "tabhandlers/tab_ace.lua" )
 	
 	SF.Editor.CurrentTabHandler = CreateClientConVar( "sf_editor_tabhandler", "wire", true, false )
 		
@@ -153,9 +154,6 @@ if CLIENT then
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
 		SF.Editor.permissionsWindow = SF.Editor.createPermissionsWindow()
 
-		SF.Editor.runJS = function ( ... ) 
-			SF.Editor.editor.components.htmlPanel:QueueJavascript( ... )
-		end
 		
 		SF.Editor.updateSettings ()
 	end

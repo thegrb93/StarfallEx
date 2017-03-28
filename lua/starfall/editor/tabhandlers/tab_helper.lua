@@ -42,5 +42,5 @@ end
 --------------
 -- We're done
 --------------
-vgui.Register(TabHandler.ControlName, Editor, "DFrame") -- Registering VGUI element of handler
+vgui.Register(TabHandler.ControlName, PANEL, "DPanel") -- Registering VGUI element of handler
 return TabHandler -- Our file has to return table of handler

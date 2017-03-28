@@ -121,6 +121,7 @@ function PANEL:Init()
 	self.Colors = {
 		dblclickhighlight = Color(0, 100, 0),
 	}
+	self:SetMode("starfall")
 end
 
 function PANEL:SetMode(mode_name)
