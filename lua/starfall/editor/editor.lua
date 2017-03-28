@@ -13,7 +13,7 @@ AddCSLuaFile( "sfframe.lua" )
 AddCSLuaFile( "sfderma.lua" )
 AddCSLuaFile( "sfhelper.lua" )
 
-AddCSLuaFile( "tabeditors/tab_wire.lua" )
+AddCSLuaFile( "tabhandlers/tab_wire.lua" )
 
 ------------------
 -- Tab Handlers
@@ -21,12 +21,12 @@ AddCSLuaFile( "tabeditors/tab_wire.lua" )
 
 if CLIENT then
 
-	SF.Editor.TabEditors = {
-		wire = include( "tabeditors/tab_wire.lua" ),
+	SF.Editor.TabHandlers = {
+		wire = include( "tabhandlers/tab_wire.lua" ),
 		ace = nil, -- TODO: Include ace tab editor here
 	}
 	
-	SF.Editor.CurrentTabEditor = CreateClientConVar( "sf_editor_tabeditor", "wire", true, false )
+	SF.Editor.CurrentTabHandler = CreateClientConVar( "sf_editor_tabhandler", "wire", true, false )
 		
 end
 
