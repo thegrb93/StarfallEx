@@ -515,6 +515,8 @@ end
 function Editor:CreateTab(chosenfile)
   local editor = vgui.Create(getTabHandler().ControlName)
   editor.parentpanel = self
+	local th = getTabHandler()
+	editor.getTabHandler = function() return th end -- add :getTabHandler()
 
   local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
   self:SetEditorFont(editor)

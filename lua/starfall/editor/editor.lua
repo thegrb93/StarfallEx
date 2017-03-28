@@ -21,10 +21,9 @@ AddCSLuaFile( "tabhandlers/tab_wire.lua" )
 
 if CLIENT then
 
-	SF.Editor.TabHandlers = {
-		wire = include( "tabhandlers/tab_wire.lua" ),
-		ace = nil, -- TODO: Include ace tab editor here
-	}
+	SF.Editor.TabHandlers = { }
+	SF.Editor.TabHandlers.wire = include( "tabhandlers/tab_wire.lua" )
+	SF.Editor.TabHandlers.ace = nil -- TODO: Include ace tab editor here
 	
 	SF.Editor.CurrentTabHandler = CreateClientConVar( "sf_editor_tabhandler", "wire", true, false )
 		
@@ -138,36 +137,10 @@ if CLIENT then
 		return libMap, table.concat( libs, "|" )
 	end
 
-	local function createWireLibraryMap () -- Hashtable
-
-		local libMap = {}
-
-		libMap[ "Environment" ] = {}
-		for name, val in pairs( SF.DefaultEnvironment ) do
-			if istable(val) then
-				libMap[ "Environment" ][ name ] = {}
-				for n,v in pairs(val) do
-					libMap[ "Environment" ][ name ][ n ] = type(v)
-				end
-				continue
-			end
-			libMap[ "Environment" ][ name ] = type(val)
-		end
-		
-		for lib, tbl in pairs( SF.Libraries.libraries ) do
-			libMap[ lib ] = {}
-			for name, val in pairs( tbl ) do
-				libMap[ lib ][ name ] = type(val)
-			end
-		end
-		
-		return libMap
-	end
-
-
 	function SF.Editor.init ()
-
-		SF.Editor.LibMap = createWireLibraryMap () --needed for wireeditor
+		for k, v in pairs(SF.Editor.TabHandlers) do
+			if v.init then v:init() end
+		end
 
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
@@ -191,25 +164,25 @@ if CLIENT then
 		if not SF.Editor.initialized then
 			SF.Editor.init ()
 		end
-		SF.Editor.wireEditor:Open()
+		SF.Editor.editor:Open()
 		RunConsoleCommand( "starfall_event", "editor_open" )
 	end
 	
 	function SF.Editor.openFile( fl )
 		if not SF.Editor.initialized then SF.Editor.init() end
-		SF.Editor.wireEditor:Open(fl, nil, false)
+		SF.Editor.editor:Open(fl, nil, false)
 	end
 	
 	function SF.Editor.close ()
-		SF.Editor.wireEditor:Close()
+		SF.Editor.editor:Close()
 	end
 
 	function SF.Editor.getCode ()
-		return SF.Editor.wireEditor:GetCode() or ""
+		return SF.Editor.editor:GetCode() or ""
 	end
 
 	function SF.Editor.getOpenFile ()
-		return SF.Editor.wireEditor:GetChosenFile()
+		return SF.Editor.editor:GetChosenFile()
 	end
 
 	function SF.Editor.createEditor ()
@@ -217,8 +190,8 @@ if CLIENT then
 		editor:Setup("Starfall Editor", "starfall", "Starfall")
 		editor:SetEditorMode("Starfall")
 			
-		if SF.Editor.wireEditor then SF.Editor.wireEditor:Remove() end
-		SF.Editor.wireEditor = editor
+		if SF.Editor.editor then SF.Editor.editor:Remove() end
+		SF.Editor.editor = editor
 	end
 
 	function SF.Editor.createFileViewer ()

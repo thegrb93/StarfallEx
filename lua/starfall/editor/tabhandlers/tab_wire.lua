@@ -39,14 +39,50 @@ local draw_SimpleText = draw.SimpleText
 local draw_WordBox = draw.WordBox
 local draw_RoundedBox = draw.RoundedBox
 
-local TabEditor = { Modes = {}, ControlName = "TabEditor_wire" }
-TabEditor.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
-TabEditor.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+local TabHandler = { 
+	Modes = {},
+	ControlName = "TabHandler_wire"
+}
+TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
+
+local function createWireLibraryMap () -- Hashtable
+
+	local libMap = {}
+
+	libMap[ "Environment" ] = {}
+	for name, val in pairs( SF.DefaultEnvironment ) do
+		if istable(val) then
+			libMap[ "Environment" ][ name ] = {}
+			for n,v in pairs(val) do
+				libMap[ "Environment" ][ name ][ n ] = type(v)
+			end
+			continue
+		end
+		libMap[ "Environment" ][ name ] = type(val)
+	end
+	
+	for lib, tbl in pairs( SF.Libraries.libraries ) do
+		libMap[ lib ] = {}
+		for name, val in pairs( tbl ) do
+			libMap[ lib ][ name ] = type(val)
+		end
+	end
+	
+	return libMap
+end
+
+function TabHandler:init()
+	TabHandler.LibMap = createWireLibraryMap ()
+	
+	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
 
 local EDITOR = {}
-
+function EDITOR:GetHandler()
+	return TabHandler
+end
 function EDITOR:Init()
 	self:SetCursor("beam")
 
@@ -59,7 +95,7 @@ function EDITOR:Init()
 	self.Redo = {}
 	self.PaintRows = {}
 
-	self.CurrentMode = assert(TabEditor.Modes.Default)
+	self.CurrentMode = assert(TabHandler.Modes.Default)
 
 	self.LineNumberWidth = 2
 
@@ -88,17 +124,17 @@ function EDITOR:Init()
 end
 
 function EDITOR:SetMode(mode_name)
-	self.CurrentMode = TabEditor.Modes[mode_name or "Default"]
+	self.CurrentMode = TabHandler.Modes[mode_name or "Default"]
 	if not self.CurrentMode then
 		Msg("Couldn't find text editor mode '".. tostring(mode_name) .. "'")
-		self.CurrentMode = assert(TabEditor.Modes.Default, "Couldn't find default text editor mode")
+		self.CurrentMode = assert(TabHandler.Modes.Default, "Couldn't find default text editor mode")
 	end
 end
 
 function EDITOR:DoAction(name, ...)
 	if not self.CurrentMode then return end
 	local f = assert(self.CurrentMode, "No current mode set")[name]
-	if not f then f = TabEditor.Modes.Default[name] end
+	if not f then f = TabHandler.Modes.Default[name] end
 	if f then return f(self, ...) end
 end
 
@@ -2856,5 +2892,5 @@ function EDITOR:SyntaxColorLine(row)
 end
 
 -- register editor panel
-vgui.Register("TabEditor_wire", EDITOR, "Panel");
-return TabEditor
+vgui.Register(TabHandler.ControlName, EDITOR, "Panel");
+return TabHandler
