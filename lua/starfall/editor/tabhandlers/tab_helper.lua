@@ -32,6 +32,10 @@ function PANEL:setCode()
 	
 end
 
+function PANEL:onTabSwitched() -- When this tab is opened
+	
+end
+
 function PANEL:validate(movecarret) -- Validate request, has to return success,message
 
 end

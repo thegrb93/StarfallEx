@@ -535,6 +535,11 @@ function Editor:CreateTab(chosenfile)
       --self:FixTabFadeTime()
       self:CloseTab(pnl)
       return
+		elseif keycode == MOUSE_LEFT then
+			if editor.onTabSwitched then
+					editor:onTabSwitched()
+			end
+			return
     elseif keycode == MOUSE_RIGHT then
       local menu = DermaMenu()
       menu:AddOption("Close", function()
