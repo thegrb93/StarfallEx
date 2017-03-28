@@ -517,11 +517,6 @@ function Editor:CreateTab(chosenfile)
       --self:FixTabFadeTime()
       self:CloseTab(pnl)
       return
-		elseif keycode == MOUSE_LEFT then
-			if editor.onTabSwitched then
-					editor:onTabSwitched()
-			end
-			return
     elseif keycode == MOUSE_RIGHT then
       local menu = DermaMenu()
       menu:AddOption("Close", function()
@@ -810,6 +805,7 @@ function Editor:InitComponents()
   self.C.Menu:Dock(TOP)
   self.C.TabHolder:Dock(FILL)
 	self.C.TabHolder.tabScroller:DockMargin( 0, 0, 3, 0 ) -- We dont want default offset
+	self.C.TabHolder.tabScroller:SetOverlap(-1)
 	self.C.TabHolder:SetPadding(0)
 	self.C.Menu.Paint = function(_, w, h)
 		draw.RoundedBox( 0, 0, 0, w, h, Color(234, 234, 234) ) 

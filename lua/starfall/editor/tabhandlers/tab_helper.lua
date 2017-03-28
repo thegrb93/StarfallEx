@@ -32,7 +32,7 @@ function PANEL:setCode()
 	
 end
 
-function PANEL:onTabSwitched() -- When this tab is opened
+function PANEL:OnFocusChanged(gained) -- When this tab is opened
 	
 end
 
