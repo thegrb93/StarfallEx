@@ -11,6 +11,7 @@ SF.Editor = {}
 if CLIENT then
 
 	include( "sfderma.lua" )
+	include("sfframe.lua") -- Editor's frame
 
 	-- Colors
 	SF.Editor.colors = {}
@@ -142,10 +143,10 @@ if CLIENT then
 	end
 
 	function SF.Editor.init ()
-		
+
 		SF.Editor.LibMap = createWireLibraryMap () --needed for wireeditor
-		include("starfall/editor_wire.lua") -- Editor's frame
-		include("starfall/editor_sfmode.lua") --Editor's mode
+		include("starfall/editor/syntaxmodes/starfall.lua") --Editor's mode
+
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
 		end
