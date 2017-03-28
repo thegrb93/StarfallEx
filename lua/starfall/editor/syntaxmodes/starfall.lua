@@ -3,7 +3,6 @@ local table_concat = table.concat
 local string_sub = string.sub
 local string_gmatch = string.gmatch
 local string_gsub = string.gsub
-local libmap = SF.Editor.LibMap
 local EDITOR = {}
 
 local function istype(tp)
@@ -273,8 +272,8 @@ function EDITOR:SyntaxColorLine(row)
 
       if keywords[sstr][keyword] then
         tokenname = "keyword"
-      elseif libmap["Environment"][sstr] then -- We Environment /constant
-				local val = libmap["Environment"][sstr]
+      elseif SF.Editor.LibMap["Environment"][sstr] then -- We Environment /constant
+				local val = SF.Editor.LibMap["Environment"][sstr]
 				if istable(val) then
 					addToken("constant", self.tokendata)
 					self.tokendata = ""
@@ -303,14 +302,14 @@ function EDITOR:SyntaxColorLine(row)
 						tokenname = "constant"
 					end
 				end
-			elseif libmap[sstr] then --We found library
+			elseif SF.Editor.LibMap[sstr] then --We found library
 				addToken("library", self.tokendata)
 				self.tokendata = ""
 				if self:NextPattern( "%." ) then -- We found a dot, looking for library method/constant
 					addToken( "operator", self.tokendata )
 					self.tokendata = ""
 					if self:NextPattern( "^[a-zA-Z][a-zA-Z0-9_]*" ) then
-						local t = libmap[sstr][self.tokendata]
+						local t = SF.Editor.LibMap[sstr][self.tokendata]
 						if t then -- Valid function, woohoo
 							tokenname = t == "function" and "function" or "constant"
 						else
@@ -418,4 +417,4 @@ function EDITOR:SyntaxColorLine(row)
   return cols
 end
 
-WireTextEditor.Modes.Starfall = EDITOR
+return EDITOR

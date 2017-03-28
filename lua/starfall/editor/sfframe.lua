@@ -6,6 +6,9 @@ File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_ed
 
 local Editor = {}
 
+local function getTabEditor()
+	return SF.Editor.TabEditors[SF.Editor.CurrentTabEditor]
+end
 -- ----------------------------------------------------------------------
 -- Fonts
 -- ----------------------------------------------------------------------
@@ -510,7 +513,7 @@ function Editor:FixTabFadeTime()
 end
 
 function Editor:CreateTab(chosenfile)
-  local editor = vgui.Create("Expression2Editor")
+  local editor = vgui.Create(SF.Editor.TabEditors[SF.Editor.CurrentTabEditor].ControlName)
   editor.parentpanel = self
 
   local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)

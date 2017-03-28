@@ -7,12 +7,13 @@
 -------------------------------------------------------------------------------
 
 SF.Editor = {}
-
+SF.Editor.TabEditors = {}
+SF.Editor.CurrentTabEditor = "wire" --TODO:Add convar for that
 if CLIENT then
 
 	include( "sfderma.lua" )
 	include("sfframe.lua") -- Editor's frame
-
+	include("tabeditors/tab_wire.lua")
 	-- Colors
 	SF.Editor.colors = {}
 	SF.Editor.colors.dark 		= Color( 36, 41, 53 )
@@ -139,7 +140,6 @@ if CLIENT then
 	function SF.Editor.init ()
 
 		SF.Editor.LibMap = createWireLibraryMap () --needed for wireeditor
-		include("starfall/editor/syntaxmodes/starfall.lua") --Editor's mode
 
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
