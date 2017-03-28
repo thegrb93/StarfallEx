@@ -7,13 +7,41 @@
 -------------------------------------------------------------------------------
 
 SF.Editor = {}
-SF.Editor.TabEditors = {}
-SF.Editor.CurrentTabEditor = "wire" --TODO:Add convar for that
+
+AddCSLuaFile( "syntaxmodes/starfall.lua" )
+AddCSLuaFile( "sfframe.lua" )
+AddCSLuaFile( "sfderma.lua" )
+AddCSLuaFile( "sfhelper.lua" )
+
+AddCSLuaFile( "tabeditors/tab_wire.lua" )
+
+------------------
+-- Tab Handlers
+------------------
+
 if CLIENT then
 
+	SF.Editor.TabEditors = {
+		wire = include( "tabeditors/tab_wire.lua" ),
+		ace = nil, -- TODO: Include ace tab editor here
+	}
+	
+	SF.Editor.CurrentTabEditor = CreateClientConVar( "sf_editor_tabeditor", "wire", true, false )
+		
+end
+
+------------------
+-- Editor 
+--
+-- For interaction with other modules and initialization
+--
+------------------
+
+if CLIENT then
+	include( "sfhelper.lua" )
 	include( "sfderma.lua" )
-	include("sfframe.lua") -- Editor's frame
-	include("tabeditors/tab_wire.lua")
+	include( "sfframe.lua" ) -- Editor's frame
+	
 	-- Colors
 	SF.Editor.colors = {}
 	SF.Editor.colors.dark 		= Color( 36, 41, 53 )

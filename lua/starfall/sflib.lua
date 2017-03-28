@@ -15,11 +15,6 @@ if SERVER then
 	AddCSLuaFile( "netstream.lua" )
 	
 	AddCSLuaFile( "editor/editor.lua" )
-	AddCSLuaFile( "editor/syntaxmodes/starfall.lua" )
-	AddCSLuaFile( "editor/sfframe.lua" )
-	AddCSLuaFile( "editor/sfderma.lua" )
-	AddCSLuaFile( "editor/sfhelper.lua" )
-	AddCSLuaFile( "editor/tabeditors/tab_wire.lua" )
 end
 
 -- Load files
@@ -28,7 +23,6 @@ include( "libraries.lua" )
 include( "preprocessor.lua" )
 include( "permissions/core.lua" )
 include( "editor/editor.lua" )
-include( "editor/sfhelper.lua" )
 include( "netstream.lua" )
 
 if SERVER then

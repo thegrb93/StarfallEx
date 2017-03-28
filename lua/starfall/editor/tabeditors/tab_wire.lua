@@ -43,8 +43,6 @@ local TabEditor = { Modes = {}, ControlName = "TabEditor_wire" }
 TabEditor.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
 TabEditor.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 
-SF.Editor.TabEditors["wire"] = TabEditor
-
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
 
 local EDITOR = {}
@@ -2859,3 +2857,4 @@ end
 
 -- register editor panel
 vgui.Register("TabEditor_wire", EDITOR, "Panel");
+return TabEditor
