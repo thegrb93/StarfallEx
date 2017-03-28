@@ -178,16 +178,16 @@ if CLIENT then
 	end
 	
 	function SF.Editor.openFile( fl )
-		if not fl or string.GetExtensionFromFilename( fl ) != "txt" then return end
 		if not SF.Editor.initialized then SF.Editor.init() end
+		if useWireEditor() then
+			SF.Editor.wireEditor:Open(fl, nil, false)
+			return
+		end
+		
+		if not fl or string.GetExtensionFromFilename( fl ) != "txt" then return end
 
 		local fileName = string.gsub( fl, "starfall/", "", 1 )
 		local code = file.Read( fl, "DATA" )
-
-		if useWireEditor() then
-			SF.Editor.wireEditor:Open(1, code, false)
-			return
-		end
 
 		for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
 			if v.filename == fileName and v.code == code then

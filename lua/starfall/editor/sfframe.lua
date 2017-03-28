@@ -1655,4 +1655,4 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
   self:InvalidateLayout()
 end
 
-vgui.Register("StarfallEditorFrame", Editor, "Expression2EditorFrame")
+vgui.Register("StarfallEditorFrame", Editor, "DFrame")
