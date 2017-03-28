@@ -411,7 +411,7 @@ function PANEL:PaintLine(row)
 	local width, height = self.FontWidth, self.FontHeight
 
 	if row == self.Caret[1] and self.TextEntry:HasFocus() then
-		surface_SetDrawColor(48, 48, 48, 255)
+		surface_SetDrawColor(39, 40, 34, 255)
 		surface_DrawRect(self.LineNumberWidth + 5, (row - self.Scroll[1]) * height, self:GetWide() - (self.LineNumberWidth + 5), height)
 	end
 
