@@ -780,7 +780,8 @@ function Editor:InitComponents()
 
   self.C.Divider = vgui.Create("DHorizontalDivider", self)
 
-  self.C.Browser = vgui.Create("wire_expression2_browser", self.C.Divider) -- Expression browser
+  self.C.Browser = vgui.Create("StarfallFileBrowser", self.C.Divider)
+	self.C.Browser:Dock(NODOCK)
 
   self.C.MainPane = vgui.Create("DPanel", self.C.Divider)
   self.C.Menu = vgui.Create("DPanel", self.C.MainPane)
@@ -880,17 +881,12 @@ function Editor:InitComponents()
   self.C.SavAs:SetText("Save As")
   self.C.SavAs.DoClick = function(button) self:SaveFile(self:GetChosenFile(), false, true) end
 
-  self.C.Browser:AddRightClick(self.C.Browser.filemenu, 4, "Save to", function()
-      Derma_Query("Overwrite this file?", "Save To",
-        "Overwrite", function()
-          self:SaveFile(self.C.Browser.File.FileDir)
-        end,
-      "Cancel")
-    end)
-  self.C.Browser.OnFileOpen = function(_, filepath, newtab)
-    self:Open(filepath, nil, newtab)
-  end
-	self.C.Browser.Folders.Paint = function(_, w, h) --Fix for offset
+	self.C.Browser.tree.OnNodeSelected = function( tree, node )
+		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
+
+		self:Open(node:GetFileName(), nil, false)
+	end
+	self.C.Browser.tree.Paint = function(_, w, h) --Fix for offset
 		draw.RoundedBox( 0, 1, 0, w-2, h, Color(255, 255, 255) ) 
 	end
 
@@ -1607,7 +1603,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
   self.Title = nTitle
   self.Location = nLocation
   self.EditorType = nEditorType
-  self.C.Browser:Setup(nLocation)
+  self.C.Browser.tree:setup(nLocation)
 
   self:SetEditorMode(nEditorType)
 
