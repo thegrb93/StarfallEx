@@ -13,7 +13,7 @@ local PANEL = {} -- It's our VGUI
 ----------------
 
 function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
-	
+
 end
 
 -------------
@@ -21,7 +21,7 @@ end
 -------------
 
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
-	
+
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor
@@ -29,11 +29,11 @@ function PANEL:getCode() -- Return name of hanlder or code if it's editor
 end
 
 function PANEL:setCode()
-	
+
 end
 
 function PANEL:OnFocusChanged(gained) -- When this tab is opened
-	
+
 end
 
 function PANEL:validate(movecarret) -- Validate request, has to return success,message

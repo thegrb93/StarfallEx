@@ -39,7 +39,7 @@ local draw_SimpleText = draw.SimpleText
 local draw_WordBox = draw.WordBox
 local draw_RoundedBox = draw.RoundedBox
 
-local TabHandler = { 
+local TabHandler = {
 	Modes = {},
 	ControlName = "TabHandler_wire"
 }
@@ -60,20 +60,20 @@ local function createWireLibraryMap () -- Hashtable
 		end
 		libMap[ "Environment" ][ name ] = type(val)
 	end
-	
+
 	for lib, tbl in pairs( SF.Libraries.libraries ) do
 		libMap[ lib ] = {}
 		for name, val in pairs( tbl ) do
 			libMap[ lib ][ name ] = type(val)
 		end
 	end
-	
+
 	return libMap
 end
 
 function TabHandler:init()
 	TabHandler.LibMap = createWireLibraryMap ()
-	
+
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 end
 
@@ -176,13 +176,13 @@ function PANEL:OpenContextMenu()
 
 	if self:CanUndo() then
 		menu:AddOption("Undo", function()
-			self:DoUndo()
-		end)
+				self:DoUndo()
+			end)
 	end
 	if self:CanRedo() then
 		menu:AddOption("Redo", function()
-			self:DoRedo()
-		end)
+				self:DoRedo()
+			end)
 	end
 
 	if self:CanUndo() or self:CanRedo() then
@@ -191,67 +191,67 @@ function PANEL:OpenContextMenu()
 
 	if self:HasSelection() then
 		menu:AddOption("Cut", function()
-			if self:HasSelection() then
-				self.clipboard = self:GetSelection()
-				self.clipboard = string_gsub(self.clipboard, "\n", "\r\n")
-				SetClipboardText(self.clipboard)
-				self:SetSelection()
-			end
-		end)
+				if self:HasSelection() then
+					self.clipboard = self:GetSelection()
+					self.clipboard = string_gsub(self.clipboard, "\n", "\r\n")
+					SetClipboardText(self.clipboard)
+					self:SetSelection()
+				end
+			end)
 		menu:AddOption("Copy", function()
-			if self:HasSelection() then
-				self.clipboard = self:GetSelection()
-				self.clipboard = string_gsub(self.clipboard, "\n", "\r\n")
-				SetClipboardText(self.clipboard)
-			end
-		end)
+				if self:HasSelection() then
+					self.clipboard = self:GetSelection()
+					self.clipboard = string_gsub(self.clipboard, "\n", "\r\n")
+					SetClipboardText(self.clipboard)
+				end
+			end)
 	end
 
 	menu:AddOption("Paste", function()
-		if self.clipboard then
-			self:SetSelection(self.clipboard)
-		else
-			self:SetSelection()
-		end
-	end)
+			if self.clipboard then
+				self:SetSelection(self.clipboard)
+			else
+				self:SetSelection()
+			end
+		end)
 
 	if self:HasSelection() then
 		menu:AddOption("Delete", function()
-			self:SetSelection()
-		end)
+				self:SetSelection()
+			end)
 	end
 
 	menu:AddSpacer()
 
 	menu:AddOption("Select all", function()
-		self:SelectAll()
-	end)
+			self:SelectAll()
+		end)
 
 	menu:AddSpacer()
 
 	menu:AddOption("Indent", function()
-		self:Indent(false)
-	end)
+			self:Indent(false)
+		end)
 	menu:AddOption("Outdent", function()
-		self:Indent(true)
-	end)
+			self:Indent(true)
+		end)
 
 	if self:HasSelection() then
 		menu:AddSpacer()
 
 		menu:AddOption("Comment Block", function()
-			self:CommentSelection(false)
-		end)
+				self:CommentSelection(false)
+			end)
 		menu:AddOption("Uncomment Block", function()
-			self:CommentSelection(true)
-		end)
+				self:CommentSelection(true)
+			end)
 
 		menu:AddOption("Comment Selection",function()
-			self:BlockCommentSelection( false )
-		end)
+				self:BlockCommentSelection( false )
+			end)
 		menu:AddOption("Uncomment Selection",function()
-			self:BlockCommentSelection( true )
-		end)
+				self:BlockCommentSelection( true )
+			end)
 	end
 
 	self:DoAction("PopulateMenu", menu)
@@ -259,40 +259,40 @@ function PANEL:OpenContextMenu()
 	menu:AddSpacer()
 
 	menu:AddOption( "Copy with BBCode colors", function()
-		local str = string_format( "[code][font=%s]", self:GetParent().FontConVar:GetString() )
+			local str = string_format( "[code][font=%s]", self:GetParent().FontConVar:GetString() )
 
-		local prev_colors
-		local first_loop = true
+			local prev_colors
+			local first_loop = true
 
-		for i=1,#self.Rows do
-			local colors = self:SyntaxColorLine(i)
+			for i=1,#self.Rows do
+				local colors = self:SyntaxColorLine(i)
 
-			for k,v in pairs( colors ) do
-				local color = v[2][1]
+				for k,v in pairs( colors ) do
+					local color = v[2][1]
 
-				if (prev_colors and prev_colors == color) or string_Trim(v[1]) == "" then
-					str = str .. v[1]
-				else
-					prev_colors = color
-
-					if first_loop then
-						str = str .. string_format( '[color="#%x%x%x"]', color.r - 50, color.g - 50, color.b - 50 ) .. v[1]
-						first_loop = false
+					if (prev_colors and prev_colors == color) or string_Trim(v[1]) == "" then
+						str = str .. v[1]
 					else
-						str = str .. string_format( '[/color][color="#%x%x%x"]', color.r - 50, color.g - 50, color.b - 50 ) .. v[1]
+						prev_colors = color
+
+						if first_loop then
+							str = str .. string_format( '[color="#%x%x%x"]', color.r - 50, color.g - 50, color.b - 50 ) .. v[1]
+							first_loop = false
+						else
+							str = str .. string_format( '[/color][color="#%x%x%x"]', color.r - 50, color.g - 50, color.b - 50 ) .. v[1]
+						end
 					end
 				end
+
+				str = str .. "\r\n"
+
 			end
 
-			str = str .. "\r\n"
+			str = str .. "[/color][/font][/code]"
 
-		end
-
-		str = str .. "[/color][/font][/code]"
-
-		self.clipboard = str
-		SetClipboardText( str )
-	end)
+			self.clipboard = str
+			SetClipboardText( str )
+		end)
 
 	menu:Open()
 	return menu
@@ -322,9 +322,9 @@ function PANEL:OnMousePressed(code)
 
 						-- This checks if it's NOT the word the user just highlighted
 						if caretstart[1] ~= self.Start[1] or caretstart[2] ~= self.Start[2] or
-							caretstop[1] ~= self.Caret[1] or caretstop[2] ~= self.Caret[2] then
-								local c = self:GetSyntaxColor("dblclickhighlight")
-								self:HighlightArea( { caretstart, caretstop }, c.r, c.g, c.b, 100 )
+						caretstop[1] ~= self.Caret[1] or caretstop[2] ~= self.Caret[2] then
+							local c = self:GetSyntaxColor("dblclickhighlight")
+							self:HighlightArea( { caretstart, caretstop }, c.r, c.g, c.b, 100 )
 						end
 					end
 				end
@@ -442,7 +442,6 @@ function PANEL:PaintLine(row)
 		end
 	end
 
-
 	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth + 2, (row - self.Scroll[1]) * height, Color(128, 128, 128, 255), TEXT_ALIGN_RIGHT)
 
 	local offset = -self.Scroll[2] + 1
@@ -470,7 +469,6 @@ function PANEL:PaintLine(row)
 			offset = offset + cell[1]:len()
 		end
 	end
-
 
 end
 
@@ -697,7 +695,6 @@ function PANEL:SetCaret(caret, maintain_selection)
 	self:ScrollCaret()
 end
 
-
 function PANEL:CopyPosition(caret)
 	return { caret[1], caret[2] }
 end
@@ -742,7 +739,6 @@ function PANEL:MovePosition(caret, offset)
 	return {row, col}
 end
 
-
 function PANEL:HasSelection()
 	return self.Caret[1] ~= self.Start[1] or self.Caret[2] ~= self.Start[2]
 end
@@ -760,7 +756,6 @@ function PANEL:MakeSelection(selection)
 		return stop, start
 	end
 end
-
 
 function PANEL:GetArea(selection)
 	local start, stop = self:MakeSelection(selection)
@@ -864,7 +859,6 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 		return stop
 	end
 end
-
 
 function PANEL:GetSelection()
 	return self:GetArea(self:Selection())
@@ -1037,9 +1031,9 @@ function PANEL:Find( str, looped )
 					local wstart = self:getWordStart( { caretstart[1], caretstart[2]+1 } )
 					local wstop = self:getWordEnd( { caretstart[1], caretstart[2]+1 } )
 					if caretstart[1] == wstart[1] and caretstop[1] == wstop[1] and
-						caretstart[2] == wstart[2] and caretstop[2]+1 == wstop[2] then
-							self:HighlightFoundWord( nil, caretstart, caretstop )
-							return true
+					caretstart[2] == wstart[2] and caretstop[2]+1 == wstop[2] then
+						self:HighlightFoundWord( nil, caretstart, caretstop )
+						return true
 					else
 						offset = start+1
 					end
@@ -1081,9 +1075,9 @@ function PANEL:Find( str, looped )
 					local wstart = self:getWordStart( { caretstart[1], caretstart[2]+1 } )
 					local wstop = self:getWordEnd( { caretstart[1], caretstart[2]+1 } )
 					if caretstart[1] == wstart[1] and caretstop[1] == wstop[1] and
-						caretstart[2] == wstart[2] and caretstop[2]+1 == wstop[2] then
-							self:HighlightFoundWord( nil, caretstart, caretstop )
-							return true
+					caretstart[2] == wstart[2] and caretstop[2]+1 == wstop[2] then
+						self:HighlightFoundWord( nil, caretstart, caretstop )
+						return true
 					else
 						offset = start+1
 					end
@@ -1388,7 +1382,6 @@ function PANEL:CreateFindWindow()
 	pnl.FindTab = pnl.TabHolder:AddSheet( "Find", findtab, "icon16/page_white_find.png", false, false )
 	pnl.FindTab.Entry = FindEntry
 
-
 	-- Replace tab
 	local replacetab = vgui.Create( "DPanel" )
 
@@ -1637,7 +1630,7 @@ function PANEL:Indent(shift)
 		self:SetSelection(unindent(tmp))
 	else
 		-- plain TAB with a selection --
-		self:SetSelection("    " .. self:GetSelection():gsub("\n", "\n    "))
+		self:SetSelection(" " .. self:GetSelection():gsub("\n", "\n "))
 	end
 	-- restore selection
 	self.Caret = self:CopyPosition(tab_caret)
@@ -1770,15 +1763,15 @@ function PANEL:DuplicateLine()
 
 	local str = self:GetSelection()
 	if str ~= "" then -- If you have a selection
-	self:SetSelection( str:rep(2) ) -- Repeat it
+		self:SetSelection( str:rep(2) ) -- Repeat it
 	else -- If you don't
-	-- Select the current line
-	self.Start = { self.Start[1], 1 }
-	self.Caret = { self.Start[1], #self.Rows[self.Start[1]]+1 }
-	-- Get the text
-	local str = self:GetSelection()
-	-- Repeat it
-	self:SetSelection( str .. "\n" .. str )
+		-- Select the current line
+		self.Start = { self.Start[1], 1 }
+		self.Caret = { self.Start[1], #self.Rows[self.Start[1]]+1 }
+		-- Get the text
+		local str = self:GetSelection()
+		-- Repeat it
+		self:SetSelection( str .. "\n" .. str )
 	end
 
 	-- Restore selection
@@ -1815,13 +1808,13 @@ function PANEL:_OnKeyCodeTyped(code)
 			self:Cut()
 		elseif code == KEY_C then
 			self:Copy()
-		-- pasting is now handled by the textbox that is used to capture input
-		--[[
+			-- pasting is now handled by the textbox that is used to capture input
+			--[[
 		elseif code == KEY_V then
 			if self.clipboard then
 				self:SetSelection(self.clipboard)
 			end
-		]]
+			]]
 		elseif code == KEY_F then
 			self:OpenFindWindow( "find" )
 		elseif code == KEY_H then
@@ -1849,13 +1842,13 @@ function PANEL:_OnKeyCodeTyped(code)
 			self:SetCaret(self:wordLeft(self.Caret))
 		elseif code == KEY_RIGHT then
 			self:SetCaret(self:wordRight(self.Caret))
-		--[[ -- old code that scrolls on ctrl-left/right:
+			--[[ -- old code that scrolls on ctrl-left/right:
 		elseif code == KEY_LEFT then
 			self.Scroll[2] = self.Scroll[2] - 1
 			if self.Scroll[2] < 1 then self.Scroll[2] = 1 end
 		elseif code == KEY_RIGHT then
 			self.Scroll[2] = self.Scroll[2] + 1
-		]]
+			]]
 		elseif code == KEY_HOME then
 			self:SetCaret({ 1, 1 })
 		elseif code == KEY_END then
@@ -1873,8 +1866,8 @@ function PANEL:_OnKeyCodeTyped(code)
 			end
 			local row = self.Rows[self.Caret[1]]:sub(1,self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len()+1))-1
-			local tabs = string_rep("    ", math_floor(diff / 4))
-			if GetConVarNumber('wire_expression2_autoindent') ~= 0 and (string_match("{" .. row .. "}", "^%b{}.*$") == nil) then tabs = tabs .. "    " end
+			local tabs = string_rep(" ", math_floor(diff / 4))
+			if GetConVarNumber('wire_expression2_autoindent') ~= 0 and (string_match("{" .. row .. "}", "^%b{}.*$") == nil) then tabs = tabs .. " " end
 			self:SetSelection("\n" .. tabs)
 		elseif code == KEY_UP then
 			if self.AC_Panel and self.AC_Panel:IsVisible() then
@@ -2084,9 +2077,9 @@ local tbl = {}
 
 local function GetTableForConstant( str )
 	return { nice_str = function( t ) return t.data[1] end,
-			str = function( t ) return t.data[1] end,
-			replacement = function( t ) return t.data[1] end,
-			data = { str } }
+		str = function( t ) return t.data[1] end,
+		replacement = function( t ) return t.data[1] end,
+		data = { str } }
 end
 
 local function FindConstants( self, word )
@@ -2120,25 +2113,25 @@ end
 
 local function GetTableForFunction()
 	return { nice_str = function( t ) return t.data[2] end,
-			str = function( t ) return t.data[1] end,
-			replacement = function( t, editor )
-				local caret = editor:CopyPosition( editor.Caret )
-				caret[2] = caret[2] - 1
-				local wordend = editor:getWordEnd( caret )
-				local has_bracket = editor:GetArea( { wordend, { wordend[1], wordend[2] + 1 } } ) == "(" -- If there already is a bracket, we don't want to add more of them.
-				local ret = t:str()
-				return ret..(has_bracket and "" or "()"), #ret+1
-			end,
-			others = function( t ) return t.data[3] end,
-			description = function( t )
-				if t.data[4] and E2Helper.Descriptions[t.data[4]] then
-					return E2Helper.Descriptions[t.data[4]]
-				end
-				if t.data[1] and E2Helper.Descriptions[t.data[1]] then
-					return E2Helper.Descriptions[t.data[1]]
-				end
-			end,
-			data = {} }
+		str = function( t ) return t.data[1] end,
+		replacement = function( t, editor )
+			local caret = editor:CopyPosition( editor.Caret )
+			caret[2] = caret[2] - 1
+			local wordend = editor:getWordEnd( caret )
+			local has_bracket = editor:GetArea( { wordend, { wordend[1], wordend[2] + 1 } } ) == "(" -- If there already is a bracket, we don't want to add more of them.
+			local ret = t:str()
+			return ret..(has_bracket and "" or "()"), #ret+1
+		end,
+		others = function( t ) return t.data[3] end,
+		description = function( t )
+			if t.data[4] and E2Helper.Descriptions[t.data[4]] then
+				return E2Helper.Descriptions[t.data[4]]
+			end
+			if t.data[1] and E2Helper.Descriptions[t.data[1]] then
+				return E2Helper.Descriptions[t.data[1]]
+			end
+		end,
+		data = {} }
 end
 
 local function FindFunctions( self, has_colon, word )
@@ -2223,11 +2216,10 @@ end
 
 local function GetTableForVariables( str )
 	return { nice_str = function( t ) return t.data[1] end,
-			str = function( t ) return t.data[1] end,
-			replacement = function( t ) return t.data[1] end,
-			data = { str } }
+		str = function( t ) return t.data[1] end,
+		replacement = function( t ) return t.data[1] end,
+		data = { str } }
 end
-
 
 local function FindVariables( self, word )
 	local len = #word
@@ -2324,8 +2316,8 @@ function PANEL:AC_Check( notimer )
 
 	if not notimer then
 		timer.Create("E2_AC_Check", 0, 1, function()
-			if self.AC_Check then self:AC_Check(true) end
-		end)
+				if self.AC_Check then self:AC_Check(true) end
+			end)
 		return
 	end
 
@@ -2355,10 +2347,10 @@ function PANEL:AC_Check( notimer )
 		local word, _ = self:AC_GetCurrentWord()
 
 		table_sort( suggestions, function( a, b )
-			local diff1 = CheckDifference( word, a.str( a ) )
-			local diff2 = CheckDifference( word, b.str( b ) )
-			return diff1 < diff2
-		end)
+				local diff1 = CheckDifference( word, a.str( a ) )
+				local diff2 = CheckDifference( word, b.str( b ) )
+				return diff1 < diff2
+			end)
 
 		if word == suggestions[1].str( suggestions[1] ) and #suggestions == 1 then -- The word matches the first suggestion exactly, and there are no more suggestions. No need to bother displaying
 			self:AC_SetVisible( false )
@@ -2557,7 +2549,6 @@ function PANEL:AC_CreatePanel()
 	self:AC_SetVisible( false )
 end
 
-
 -----------------------------------------------------------
 -- FillInfoList
 -- Fills the "additional information" box
@@ -2675,7 +2666,6 @@ function PANEL:AC_FillList()
 	for count,suggestion in pairs( self.AC_Suggestions ) do
 		local nice_name = suggestion:nice_str( self )
 		local name = suggestion:str( self )
-
 
 		local txt = vgui.Create("DLabel")
 		txt:SetText( "" )
@@ -2837,7 +2827,6 @@ function PANEL:SkipPattern(pattern)
 
 	--self.tokendata = self.tokendata .. text
 
-
 	self.position = endpos + 1
 	if self.position <= #self.line then
 		self.character = self.line:sub(self.position, self.position)
@@ -2856,7 +2845,6 @@ function PANEL:NextPattern(pattern)
 	if not text then text = buf end
 
 	self.tokendata = self.tokendata .. text
-
 
 	self.position = endpos + 1
 	if self.position <= #self.line then

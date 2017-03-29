@@ -1,9 +1,9 @@
 -------------------------------------------------------------------------------
---	SF Editor
---	Originally created by Jazzelhawk
---	
---	To do:
---	Find new icons
+-- SF Editor
+-- Originally created by Jazzelhawk
+--
+-- To do:
+-- Find new icons
 -------------------------------------------------------------------------------
 
 SF.Editor = {}
@@ -25,13 +25,13 @@ if CLIENT then
 	SF.Editor.TabHandlers = { }
 	SF.Editor.TabHandlers.wire = include( "tabhandlers/tab_wire.lua" )
 	SF.Editor.TabHandlers.ace = include( "tabhandlers/tab_ace.lua" )
-	
+
 	SF.Editor.CurrentTabHandler = CreateClientConVar( "sf_editor_tabhandler", "wire", true, false )
-		
+
 end
 
 ------------------
--- Editor 
+-- Editor
 --
 -- For interaction with other modules and initialization
 --
@@ -41,32 +41,32 @@ if CLIENT then
 	include( "sfhelper.lua" )
 	include( "sfderma.lua" )
 	include( "sfframe.lua" ) -- Editor's frame
-	
+
 	-- Colors
 	SF.Editor.colors = {}
-	SF.Editor.colors.dark 		= Color( 36, 41, 53 )
-	SF.Editor.colors.meddark 	= Color( 48, 57, 92 )
-	SF.Editor.colors.med 		= Color( 78, 122, 199 )
-	SF.Editor.colors.medlight 	= Color( 127, 178, 240 )
-	SF.Editor.colors.light 		= Color( 173, 213, 247 )
+	SF.Editor.colors.dark = Color( 36, 41, 53 )
+	SF.Editor.colors.meddark = Color( 48, 57, 92 )
+	SF.Editor.colors.med = Color( 78, 122, 199 )
+	SF.Editor.colors.medlight = Color( 127, 178, 240 )
+	SF.Editor.colors.light = Color( 173, 213, 247 )
 
 	-- Icons
 	SF.Editor.icons = {}
-	SF.Editor.icons.arrowr 		= Material( "radon/arrow_right.png", "noclamp smooth" )
-	SF.Editor.icons.arrowl 		= Material( "radon/arrow_left.png", "noclamp smooth" )
+	SF.Editor.icons.arrowr = Material( "radon/arrow_right.png", "noclamp smooth" )
+	SF.Editor.icons.arrowl = Material( "radon/arrow_left.png", "noclamp smooth" )
 
-	local defaultCode = [[--@name 
---@author 
---@shared 
+	local defaultCode = [[--@name
+	--@author
+	--@shared
 
---[[
+	--[[
 	Starfall Scripting Environment
 
 	Github: https://github.com/thegrb93/StarfallEx
 	Reference Page: http://thegrb93.github.io/Starfall/
 
 	Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
-]].."]]"
+	]].."]]"
 
 	local invalid_filename_chars = {
 		["*"] = "",
@@ -118,7 +118,7 @@ if CLIENT then
 			table.insert( libMap[ "Environment" ], name )
 			table.insert( libs, name )
 		end
-		
+
 		for lib, tbl in pairs( SF.Libraries.libraries ) do
 			libMap[ lib ] = {}
 			for name, val in pairs( tbl ) do
@@ -126,7 +126,7 @@ if CLIENT then
 				table.insert( libs, lib.."\\."..name )
 			end
 		end
-		
+
 		for lib, tbl in pairs( SF.Types ) do
 			if type( tbl.__index ) == "table" then
 				for name, val in pairs( tbl.__index ) do
@@ -153,7 +153,7 @@ if CLIENT then
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
 		SF.Editor.permissionsWindow = SF.Editor.createPermissionsWindow()
-		
+
 		SF.Editor.updateSettings ()
 		SF.Editor.initialized = true
 	end
@@ -165,12 +165,12 @@ if CLIENT then
 		SF.Editor.editor:Open()
 		RunConsoleCommand( "starfall_event", "editor_open" )
 	end
-	
+
 	function SF.Editor.openFile( fl )
 		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(fl, nil, false)
 	end
-	
+
 	function SF.Editor.close ()
 		SF.Editor.editor:Close()
 	end
@@ -187,7 +187,7 @@ if CLIENT then
 		local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
 		editor:Setup("Starfall Editor", "starfall", "Starfall")
 		editor:SetEditorMode("Starfall")
-			
+
 		if SF.Editor.editor then SF.Editor.editor:Remove() end
 		SF.Editor.editor = editor
 	end
@@ -266,7 +266,7 @@ if CLIENT then
 		scrollPanel:Dock( FILL )
 		scrollPanel:SetPaintBackgroundEnabled( false )
 
-		local form = vgui.Create( "DForm", scrollPanel )	
+		local form = vgui.Create( "DForm", scrollPanel )
 		form:Dock( FILL )
 		form:DockPadding( 0, 10, 0, 10 )
 		form.Header:SetVisible( false )
@@ -301,13 +301,13 @@ if CLIENT then
 
 			return wang, label
 		end
-		
+
 		setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
 		local combobox, label = form:ComboBox( "Keybinding", "sf_editor_keybindings" )
 		combobox:AddChoice( "ace" )
 		combobox:AddChoice( "vim" )
 		combobox:AddChoice( "emacs" )
-		
+
 		setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
 		setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
 		setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
@@ -345,8 +345,8 @@ if CLIENT then
 		local scrollPanel = vgui.Create( "DScrollPanel", panel )
 		scrollPanel:Dock( FILL )
 		scrollPanel:SetPaintBackgroundEnabled( false )
-			
-		frame.OnOpen = function()			
+
+		frame.OnOpen = function()
 			local clientProviders = {}
 			for i, v in ipairs(SF.Permissions.providers) do
 				local provider = {id = v.id, name = v.name, settings = {}, options = {}}
@@ -360,8 +360,8 @@ if CLIENT then
 				end
 				clientProviders[i] = provider
 			end
-			
-			local function createPermissions( providers, server )	
+
+			local function createPermissions( providers, server )
 				for _, p in ipairs( providers ) do
 					local header = vgui.Create( "DLabel", header )
 					header:SetFont( "DermaLarge" )
@@ -370,21 +370,21 @@ if CLIENT then
 					header:SetSize(0, 40)
 					header:Dock( TOP )
 					scrollPanel:AddItem( header )
-					
+
 					for id, setting in SortedPairs( p.settings ) do
-						
+
 						local header = vgui.Create( "StarfallPanel" )
 						header:DockMargin( 0, 5, 0, 0 )
 						header:SetSize( 0, 20 )
 						header:Dock( TOP )
-						
+
 						local settingtext = vgui.Create( "DLabel", header )
 						settingtext:SetFont( "DermaDefault" )
 						settingtext:SetColor( SF.Editor.colors.meddark )
 						settingtext:SetText( id )
 						settingtext:DockMargin( 5, 0, 0, 0 )
 						settingtext:Dock( FILL )
-						
+
 						local buttons = {}
 						for i=#p.options, 1, -1 do
 							local button = vgui.Create( "StarfallButton", header )
@@ -402,20 +402,20 @@ if CLIENT then
 							end
 							buttons[i]=button
 						end
-						
+
 						scrollPanel:AddItem( header )
-						
+
 					end
 				end
 			end
-			
+
 			if LocalPlayer():IsSuperAdmin() then
 				SF.Permissions.requestPermissions( function(serverProviders)
-					if frame:IsVisible() then
-						createPermissions( serverProviders, true )
-						createPermissions( clientProviders )
-					end
-				end)
+						if frame:IsVisible() then
+							createPermissions( serverProviders, true )
+							createPermissions( clientProviders )
+						end
+					end)
 			else
 				createPermissions( clientProviders )
 			end
@@ -424,7 +424,7 @@ if CLIENT then
 		frame.OnClose = function()
 			scrollPanel:Clear()
 		end
-		
+
 		return frame
 	end
 
@@ -451,7 +451,7 @@ if CLIENT then
 			frame.ContentNavBar:Dock( FILL )
 			frame.ContentNavBar:DockMargin( 0, 0, 0, 0 )
 			frame.ContentNavBar.Tree:SetBackgroundColor( Color( 240, 240, 240 ) )
-			frame.ContentNavBar.Tree.OnNodeSelected = function ( self, node ) 
+			frame.ContentNavBar.Tree.OnNodeSelected = function ( self, node )
 				if not IsValid( node.propPanel ) then return end
 
 				if IsValid( frame.PropPanel.selected ) then
@@ -464,7 +464,7 @@ if CLIENT then
 				frame.PropPanel.selected:Dock( FILL )
 				frame.PropPanel.selected:SetVisible( true )
 				frame.PropPanel:InvalidateParent()
-				
+
 				frame.HorizontalDivider:SetRight( frame.PropPanel.selected )
 			end
 
@@ -479,7 +479,7 @@ if CLIENT then
 			frame.HorizontalDivider:SetLeftWidth( 175 )
 			frame.HorizontalDivider:SetLeftMin( 175 )
 			frame.HorizontalDivider:SetRightMin( 450 )
-			
+
 			frame.HorizontalDivider:SetLeft( sidebarPanel )
 			frame.HorizontalDivider:SetRight( frame.PropPanel )
 
@@ -500,27 +500,27 @@ if CLIENT then
 			local function addModel ( container, obj )
 
 				local icon = vgui.Create( "SpawnIcon", container )
-				
+
 				if ( obj.body ) then
 					obj.body = string.Trim( tostring(obj.body), "B" )
 				end
-				
+
 				if ( obj.wide ) then
 					icon:SetWide( obj.wide )
 				end
-				
+
 				if ( obj.tall ) then
 					icon:SetTall( obj.tall )
 				end
-				
+
 				icon:InvalidateLayout( true )
-				
+
 				icon:SetModel( obj.model, obj.skin or 0, obj.body )
-				
+
 				icon:SetTooltip( string.Replace( string.GetFileFromFilename( obj.model ), ".mdl", "" ) )
 
-				icon.DoClick = function ( icon ) 
-					SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" ) 
+				icon.DoClick = function ( icon )
+					SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" )
 					SF.AddNotify( LocalPlayer(), "\"" .. string.gsub( obj.model, "\\", "/" ) .. "\" inserted into editor.", "GENERIC", 5, "DRIP1" )
 					frame:close()
 				end
@@ -528,48 +528,48 @@ if CLIENT then
 
 					local menu = DermaMenu()
 					local submenu = menu:AddSubMenu( "Re-Render", function () icon:RebuildSpawnIcon() end )
-						submenu:AddOption( "This Icon", function () icon:RebuildSpawnIcon() end )
-						submenu:AddOption( "All Icons", function () container:RebuildAll() end )
-				
+					submenu:AddOption( "This Icon", function () icon:RebuildSpawnIcon() end )
+					submenu:AddOption( "All Icons", function () container:RebuildAll() end )
+
 					local ChangeIconSize = function ( w, h )
-						
+
 						icon:SetSize( w, h )
 						icon:InvalidateLayout( true )
 						container:OnModified()
 						container:Layout()
 						icon:SetModel( obj.model, obj.skin or 0, obj.body )
-					
+
 					end
 
 					local submenu = menu:AddSubMenu( "Resize", function () end )
-						submenu:AddOption( "64 x 64 (default)", function () ChangeIconSize( 64, 64 ) end )
-						submenu:AddOption( "64 x 128", function () ChangeIconSize( 64, 128 ) end )
-						submenu:AddOption( "64 x 256", function () ChangeIconSize( 64, 256 ) end )
-						submenu:AddOption( "64 x 512", function () ChangeIconSize( 64, 512 ) end )
-						submenu:AddSpacer()
-						submenu:AddOption( "128 x 64", function () ChangeIconSize( 128, 64 ) end )
-						submenu:AddOption( "128 x 128", function () ChangeIconSize( 128, 128 ) end )
-						submenu:AddOption( "128 x 256", function () ChangeIconSize( 128, 256 ) end )
-						submenu:AddOption( "128 x 512", function () ChangeIconSize( 128, 512 ) end )
-						submenu:AddSpacer()
-						submenu:AddOption( "256 x 64", function () ChangeIconSize( 256, 64 ) end )
-						submenu:AddOption( "256 x 128", function () ChangeIconSize( 256, 128 ) end )
-						submenu:AddOption( "256 x 256", function () ChangeIconSize( 256, 256 ) end )
-						submenu:AddOption( "256 x 512", function () ChangeIconSize( 256, 512 ) end )
-						submenu:AddSpacer()
-						submenu:AddOption( "512 x 64", function () ChangeIconSize( 512, 64 ) end )
-						submenu:AddOption( "512 x 128", function () ChangeIconSize( 512, 128 ) end )
-						submenu:AddOption( "512 x 256", function () ChangeIconSize( 512, 256 ) end )
-						submenu:AddOption( "512 x 512", function () ChangeIconSize( 512, 512 ) end )
+					submenu:AddOption( "64 x 64 (default)", function () ChangeIconSize( 64, 64 ) end )
+					submenu:AddOption( "64 x 128", function () ChangeIconSize( 64, 128 ) end )
+					submenu:AddOption( "64 x 256", function () ChangeIconSize( 64, 256 ) end )
+					submenu:AddOption( "64 x 512", function () ChangeIconSize( 64, 512 ) end )
+					submenu:AddSpacer()
+					submenu:AddOption( "128 x 64", function () ChangeIconSize( 128, 64 ) end )
+					submenu:AddOption( "128 x 128", function () ChangeIconSize( 128, 128 ) end )
+					submenu:AddOption( "128 x 256", function () ChangeIconSize( 128, 256 ) end )
+					submenu:AddOption( "128 x 512", function () ChangeIconSize( 128, 512 ) end )
+					submenu:AddSpacer()
+					submenu:AddOption( "256 x 64", function () ChangeIconSize( 256, 64 ) end )
+					submenu:AddOption( "256 x 128", function () ChangeIconSize( 256, 128 ) end )
+					submenu:AddOption( "256 x 256", function () ChangeIconSize( 256, 256 ) end )
+					submenu:AddOption( "256 x 512", function () ChangeIconSize( 256, 512 ) end )
+					submenu:AddSpacer()
+					submenu:AddOption( "512 x 64", function () ChangeIconSize( 512, 64 ) end )
+					submenu:AddOption( "512 x 128", function () ChangeIconSize( 512, 128 ) end )
+					submenu:AddOption( "512 x 256", function () ChangeIconSize( 512, 256 ) end )
+					submenu:AddOption( "512 x 512", function () ChangeIconSize( 512, 512 ) end )
 
 					menu:AddSpacer()
 					menu:AddOption( "Delete", function () icon:Remove() end )
 					menu:Open()
-					
+
 				end
 
 				icon:InvalidateLayout( true )
-				
+
 				if ( IsValid( container ) ) then
 					container:Add( icon )
 				end
@@ -588,7 +588,7 @@ if CLIENT then
 
 					viewPanel:Clear( true )
 					viewPanel.currentNode = node
-					
+
 					local path = node:GetFolder()
 					local searchString = path .. "/*.mdl"
 
@@ -640,7 +640,7 @@ if CLIENT then
 
 								local label = vgui.Create( "ContentHeader", node.propPanel )
 								label:SetText( object.text )
-								
+
 								node.propPanel:Add( label )
 							end
 						end
@@ -667,19 +667,19 @@ if CLIENT then
 
 			local games = engine.GetGames()
 			table.insert( games, {
-				title = "All",
-				folder = "GAME",
-				icon = "all",
-				mounted = true
-			} )
+					title = "All",
+					folder = "GAME",
+					icon = "all",
+					mounted = true
+				} )
 			table.insert( games, {
-				title = "Garry's Mod",
-				folder = "garrysmod",
-				mounted = true
-			} )
-			
+					title = "Garry's Mod",
+					folder = "garrysmod",
+					mounted = true
+				} )
+
 			for _, game in SortedPairsByMemberValue( games, "title" ) do
-				
+
 				if game.mounted then
 					addBrowseContent( viewPanel, gamesNode, game.title, "games/16/" .. ( game.icon or game.folder ) .. ".png", "", game.folder )
 				end
@@ -757,15 +757,15 @@ if CLIENT then
 
 				for k, v in pairs( folders ) do
 					timer.Simple( k * 0.02, function()
-						if searchTime and time != searchTime then return end
-						if self.results >= 256 then return end
-						self:getAllModels( time, folder .. v .. "/", extension, path )
-					end )
+							if searchTime and time != searchTime then return end
+							if self.results >= 256 then return end
+							self:getAllModels( time, folder .. v .. "/", extension, path )
+						end )
 				end
-				timer.Simple( 1, function () 
-					if searchTime and time != searchTime then return end
-					self.load = self.load - 1 
-				end )
+				timer.Simple( 1, function ()
+						if searchTime and time != searchTime then return end
+						self.load = self.load - 1
+					end )
 			end
 
 			function frame.searchBox:OnEnter ()
@@ -790,32 +790,30 @@ if CLIENT then
 				frame.ContentNavBar.Tree:OnNodeSelected( self )
 			end
 			hook.Add( "Think", "sf_header_update", function ()
-				if frame.searchBox.loading and frame.searchBox.propPanel:IsVisible() then
-					frame.searchBox.loading:SetText( "Loading" .. string.rep( ".", math.floor( CurTime() ) % 4 ) )
-				end
-				if frame.searchBox.load and frame.searchBox.load <= 0 then
-					frame.searchBox.loading:Remove()
-					frame.searchBox.loading = nil
-					frame.searchBox.load = nil
-				end
-			end )
-			
+					if frame.searchBox.loading and frame.searchBox.propPanel:IsVisible() then
+						frame.searchBox.loading:SetText( "Loading" .. string.rep( ".", math.floor( CurTime() ) % 4 ) )
+					end
+					if frame.searchBox.load and frame.searchBox.load <= 0 then
+						frame.searchBox.loading:Remove()
+						frame.searchBox.loading = nil
+						frame.searchBox.load = nil
+					end
+				end )
+
 			self.initialized = true
 		end
 
 		return frame
 	end
 
-
-
 	function SF.Editor.updateSettings ( ace )
 		if ace then
 			local js = SF.Editor.runJS
 			js( [[
 				editSessions.forEach( function( session ) {
-					session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
-				} )
-			]] )
+						session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
+					} )
+				]] )
 			js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ");" )
 			js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ");" )
 			js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ");" )
@@ -852,7 +850,7 @@ if CLIENT then
 		local function recursiveLoad ( path, curdir )
 			if loaded[ path ] then return end
 			loaded[ path ] = true
-			
+
 			local code
 			local codedir
 			local codepath
@@ -875,10 +873,10 @@ if CLIENT then
 				print( "Bad include: " .. path )
 				return
 			end
-			
+
 			tbl.files[ codepath ] = code
 			SF.Preprocessor.ParseDirectives( codepath, code, ppdata )
-			
+
 			if ppdata.includes and ppdata.includes[ codepath ] then
 				local inc = ppdata.includes[ codepath ]
 				if not tbl.includes[ codepath ] then
@@ -887,7 +885,7 @@ if CLIENT then
 				else
 					assert( tbl.includes[ codepath ] == inc )
 				end
-				
+
 				for i = 1, #inc do
 					recursiveLoad( inc[i], codedir )
 				end
@@ -911,7 +909,7 @@ if CLIENT then
 					end
 				end
 			end
-			
+
 			--Remove this file from the recursion stack
 			recStack[ file ] = false
 			return false, nil
@@ -927,7 +925,7 @@ if CLIENT then
 				break
 			end
 		end
-		
+
 		if isCyclic then
 			return false, "Loop in includes from: " .. cyclicFile
 		end
@@ -945,43 +943,43 @@ if CLIENT then
 
 	local busy_players = { }
 	hook.Add( "EntityRemoved", "starfall_busy_animation", function ( ply )
-		busy_players[ ply ] = nil
-	end )
+			busy_players[ ply ] = nil
+		end )
 
 	local emitter = ParticleEmitter( vector_origin )
 
 	net.Receive( "starfall_editor_status", function ( len )
-		local ply = net.ReadEntity()
-		local status = net.ReadBit() != 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
-		if not ply:IsValid() or ply == LocalPlayer() then return end
+			local ply = net.ReadEntity()
+			local status = net.ReadBit() != 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
+			if not ply:IsValid() or ply == LocalPlayer() then return end
 
-		busy_players[ ply ] = status or nil
-	end )
+			busy_players[ ply ] = status or nil
+		end )
 
 	local rolldelta = math.rad( 80 )
 	timer.Create( "starfall_editor_status", 1 / 3, 0, function ()
-		rolldelta = -rolldelta
-		for ply, _ in pairs( busy_players ) do
-			local BoneIndx = ply:LookupBone( "ValveBiped.Bip01_Head1" ) or ply:LookupBone( "ValveBiped.HC_Head_Bone" ) or 0
-			local BonePos, BoneAng = ply:GetBonePosition( BoneIndx )
-			local particle = emitter:Add( "radon/starfall2", BonePos + Vector( math.random( -10, 10 ), math.random( -10, 10 ), 60 + math.random( 0, 10 ) ) )
-			if particle then
-				particle:SetColor( math.random( 30, 50 ), math.random( 40, 150 ), math.random( 180, 220 ) )
-				particle:SetVelocity( Vector( 0, 0, -40 ) )
+			rolldelta = -rolldelta
+			for ply, _ in pairs( busy_players ) do
+				local BoneIndx = ply:LookupBone( "ValveBiped.Bip01_Head1" ) or ply:LookupBone( "ValveBiped.HC_Head_Bone" ) or 0
+				local BonePos, BoneAng = ply:GetBonePosition( BoneIndx )
+				local particle = emitter:Add( "radon/starfall2", BonePos + Vector( math.random( -10, 10 ), math.random( -10, 10 ), 60 + math.random( 0, 10 ) ) )
+				if particle then
+					particle:SetColor( math.random( 30, 50 ), math.random( 40, 150 ), math.random( 180, 220 ) )
+					particle:SetVelocity( Vector( 0, 0, -40 ) )
 
-				particle:SetDieTime( 1.5 )
-				particle:SetLifeTime( 0 )
+					particle:SetDieTime( 1.5 )
+					particle:SetLifeTime( 0 )
 
-				particle:SetStartSize( 10 )
-				particle:SetEndSize( 5 )
+					particle:SetStartSize( 10 )
+					particle:SetEndSize( 5 )
 
-				particle:SetStartAlpha( 255 )
-				particle:SetEndAlpha( 0 )
+					particle:SetStartAlpha( 255 )
+					particle:SetEndAlpha( 0 )
 
-				particle:SetRollDelta( rolldelta )
+					particle:SetRollDelta( rolldelta )
+				end
 			end
-		end
-	end )
+		end )
 
 elseif SERVER then
 
@@ -990,10 +988,10 @@ elseif SERVER then
 	local starfall_event = {}
 
 	concommand.Add( "starfall_event", function ( ply, command, args )
-		local handler = starfall_event[ args[ 1 ] or "" ]
-		if not handler then return end
-		return handler( ply, args )
-	end )
+			local handler = starfall_event[ args[ 1 ] or "" ]
+			if not handler then return end
+			return handler( ply, args )
+		end )
 
 	function starfall_event.editor_open ( ply, args )
 		net.Start( "starfall_editor_status" )
