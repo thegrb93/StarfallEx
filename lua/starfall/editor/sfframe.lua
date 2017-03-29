@@ -429,6 +429,7 @@ function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 
 function Editor:SetActiveTab(val)
   if self:GetActiveTab() == val then
+		self:RequestFocus()
     val:GetPanel():RequestFocus()
     return
   end
@@ -1634,8 +1635,9 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
     end
   end
   self.C.ModelViewer = ModelViewer
-
+	
   self:InvalidateLayout()
+
 end
 
 vgui.Register("StarfallEditorFrame", Editor, "DFrame")

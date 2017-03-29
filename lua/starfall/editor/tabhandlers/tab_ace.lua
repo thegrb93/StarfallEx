@@ -3,7 +3,7 @@
 ----------------------------------------------------
 
 local TabHandler = {
-  ControlName = "sf_helper", -- Its name of vgui panel used by handler, there has to be one
+  ControlName = "sf_tab_ace", -- Its name of vgui panel used by handler, there has to be one
   IsEditor = false, -- If it should be treated as editor of file, like ACE or Wire
 }
 local PANEL = {} -- It's our VGUI
@@ -253,17 +253,21 @@ function PANEL:OnFocusChanged(gained) -- When this tab is opened
 	if gained then
 		selectSession(self)
 	  TabHandler.html:SetParent(self)
+		print("Parenting to",self,IsValid(self))
 	  self:DockPadding(0, 0, 0, 0)
 	  TabHandler.html:DockMargin(0, 0, 0, 0)
 	  TabHandler.html:Dock(FILL)
 	  TabHandler.html:SetVisible(true)
+		TabHandler.html:RequestFocus()
 	end --We dont do anything when lost, because it loses focus even when child is interacted
 end
 
 function PANEL:OnRemove() -- We dont want html to get removed with tab as its shared
 	removeSession(self)
-  TabHandler.html:SetParent(nil)
-	TabHandler.html:SetVisible(true)
+	if TabHandler.html:GetParent() == self then
+		TabHandler.html:SetVisible(false)
+	  TabHandler.html:SetParent(nil)
+	end
 end
 
 function PANEL:validate(movecarret) -- Validate request, has to return success,message
