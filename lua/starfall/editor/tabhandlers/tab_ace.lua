@@ -103,7 +103,6 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
   html:DockMargin( 5, 59, 5, 5 )
   html:SetKeyboardInputEnabled( true )
   html:SetMouseInputEnabled( true )
-
   local files = file.Find("html/starfalleditor*","GAME")
   local version if files[1] then version = string.match(files[1], "starfalleditor(%d+)%.html") end
   if version then
@@ -135,7 +134,9 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
       local function repeatKey ()
         timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () self:OnKeyCodePressed( key, true ) end )
       end
-
+			if input.IsKeyDown(KEY_LCONTROL) then
+				self:OnShortcut(key)
+			end
       if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
       if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and
       ( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and
@@ -283,6 +284,8 @@ function PANEL:OnFocusChanged(gained) -- When this tab is opened
 	if gained then
 		selectSession(self)
 	  TabHandler.html:SetParent(self)
+		TabHandler.html.OnShortcut = function(_, code) self:OnShortcut(code) end -- Catching shortcuts from DHTML
+
 	  self:DockPadding(0, 0, 0, 0)
 	  TabHandler.html:DockMargin(0, 0, 0, 0)
 	  TabHandler.html:Dock(FILL)

@@ -80,9 +80,6 @@ end
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
 
 local PANEL = {}
-function PANEL:GetHandler()
-	return TabHandler
-end
 function PANEL:Init()
 	self:SetCursor("beam")
 

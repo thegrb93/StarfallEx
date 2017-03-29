@@ -589,6 +589,7 @@ function Editor:CreateTab(chosenfile)
   end
   editor.OnShortcut = function(_, code)
     if code == KEY_S then
+			print("SAVING")
       self:SaveFile(self:GetChosenFile())
       self:Validate()
     else
