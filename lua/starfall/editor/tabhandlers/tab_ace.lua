@@ -253,7 +253,6 @@ function PANEL:OnFocusChanged(gained) -- When this tab is opened
 	if gained then
 		selectSession(self)
 	  TabHandler.html:SetParent(self)
-		print("Parenting to",self,IsValid(self))
 	  self:DockPadding(0, 0, 0, 0)
 	  TabHandler.html:DockMargin(0, 0, 0, 0)
 	  TabHandler.html:Dock(FILL)
