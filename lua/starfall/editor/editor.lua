@@ -153,9 +153,9 @@ if CLIENT then
 		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
 		SF.Editor.permissionsWindow = SF.Editor.createPermissionsWindow()
-
 		
 		SF.Editor.updateSettings ()
+		SF.Editor.initialized = true
 	end
 
 	function SF.Editor.open ()

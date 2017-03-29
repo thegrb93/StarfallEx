@@ -18,16 +18,14 @@ local runJS = function ( ... )
 end
 
 local function getSessionID(tab)
-	for k,v in pairs(TabHandler.SessionTabs) do
-		if v == tab then return k end
-	end
+	return table.KeyFromValue( TabHandler.SessionTabs, tab )
 end
 
-local function createSession(tab,code)
+local function createSession(tab)
 	local settings = util.TableToJSON({
 			wrap = GetConVarNumber( "sf_editor_wordwrap" )
 		}):JavascriptSafe()
-		runJS( "newEditSession(\"" .. string.JavascriptSafe( code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
+		runJS( "newEditSession(\"" .. string.JavascriptSafe( tab.code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
 		table.insert(TabHandler.SessionTabs,tab)
 end
 
@@ -93,14 +91,12 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
       timer.Simple(0, function() SetClipboardText( code ) end)
     end)
 
-  html:AddFunction( "console", "doValidation", function() end) --TODO: FIX THAT LATER
+  html:AddFunction( "console", "doValidation", SF.Editor.doValidation) --TODO: FIX THAT LATER
   if system.IsWindows() then
     html:AddFunction( "console", "fixConsole",function() if tobool( GetConVarNumber( "sf_editor_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
   else
     html:AddFunction( "console", "fixConsole",function() end) --Dummy
   end
-
-  local tabs = util.JSONToTable( file.Read( "sf_tabs.txt" ) or "" )
 
   local function FinishedLoadingEditor()
     local libMap, libs = createLibraryMap()
@@ -225,6 +221,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
         if not readyTime then readyTime = CurTime()+0.1 end
         if CurTime() > readyTime then
           hook.Remove("Think","SF_LoadingAce")
+					print("LOADING FINISHED")
           FinishedLoadingEditor()
         end
       end
@@ -242,11 +239,11 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor
-  return "[SFHelper]"
+  return self.code or ""
 end
 
-function PANEL:setCode()
-
+function PANEL:setCode(code)
+	self.code = code
 end
 
 function PANEL:OnFocusChanged(gained) -- When this tab is opened
