@@ -5,6 +5,7 @@
 local TabHandler = {
   ControlName = "sf_tab_ace", -- Its name of vgui panel used by handler, there has to be one
   IsEditor = false, -- If it should be treated as editor of file, like ACE or Wire
+	Loaded = false,
 }
 local PANEL = {} -- It's our VGUI
 
@@ -12,6 +13,8 @@ local PANEL = {} -- It's our VGUI
 -- Handler part
 ----------------
 TabHandler.SessionTabs = {}
+
+local currentSession
 
 local runJS = function ( ... )
   TabHandler.html:QueueJavascript( ... )
@@ -25,18 +28,44 @@ local function createSession(tab)
 	local settings = util.TableToJSON({
 			wrap = GetConVarNumber( "sf_editor_wordwrap" )
 		}):JavascriptSafe()
-		runJS( "newEditSession(\"" .. string.JavascriptSafe( tab.code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
+		if TabHandler.Loaded then
+			runJS( "newEditSession(\"" .. string.JavascriptSafe( tab.code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
+		end
+		
 		table.insert(TabHandler.SessionTabs,tab)
 end
 
 local function removeSession(tab)
+
 	local id = getSessionID(tab)
-	runJS( "removeEditSession("..id..")" )
+	if TabHandler.Loaded then
+		runJS( "removeEditSession("..id..")" )
+	end
 	table.remove(TabHandler.SessionTabs,id)
+
 end
 
 local function selectSession(tab)
-	runJS( "selectEditSession("..getSessionID(tab)..")" )
+	if TabHandler.Loaded then
+		runJS( "selectEditSession("..getSessionID(tab)..")" )
+	end
+	currentSession = tab
+end
+
+local function setSessionValue(tab, text)
+	runJS( "setEditSessionValue("..getSessionID(tab)..",\""..string.JavascriptSafe(text).."\")" )
+end
+
+local function loadSessions()
+	local settings = util.TableToJSON({
+			wrap = GetConVarNumber( "sf_editor_wordwrap" )
+		}):JavascriptSafe()
+	for k,v in pairs(TabHandler.SessionTabs) do
+		runJS( "newEditSession(\"" .. string.JavascriptSafe( v.code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )		
+	end
+	if currentSession then
+		selectSession(currentSession)
+	end
 end
 
 local function createLibraryMap ()
@@ -214,6 +243,8 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
       end
 
     end
+		TabHandler.Loaded = true
+		loadSessions()
   end
   local readyTime
   hook.Add("Think","SF_LoadingAce",function()
@@ -221,7 +252,6 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
         if not readyTime then readyTime = CurTime()+0.1 end
         if CurTime() > readyTime then
           hook.Remove("Think","SF_LoadingAce")
-					print("LOADING FINISHED")
           FinishedLoadingEditor()
         end
       end
@@ -244,6 +274,9 @@ end
 
 function PANEL:setCode(code)
 	self.code = code
+	if TabHandler.Loaded then
+		setSessionValue(self, code)
+	end
 end
 
 function PANEL:OnFocusChanged(gained) -- When this tab is opened

@@ -74,6 +74,11 @@
 				editor.setSession( editSessions[ index - 1 ] );
 			}
 
+			function setEditSessionValue( index, text ) {
+				editSessions[ index - 1 ].setValue( text );
+			}
+
+
 			function removeEditSession( index ) {
 				editSessions.splice( index - 1, 1 );
 			}
