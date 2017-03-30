@@ -150,7 +150,6 @@ function PANEL:Init()
 	self:SetMode("starfall")
 	
 	self.CurrentFont,self.FontWidth,self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
-	print(self.CurrentFont,self.FontWidth,self.FontHeigh)
 end
 
 function PANEL:SetMode(mode_name)
