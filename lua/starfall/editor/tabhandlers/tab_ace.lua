@@ -1,10 +1,10 @@
 ----------------------------------------------------
--- That's not implemented hovewer it shows template
+-- ACE TabHandler
 ----------------------------------------------------
 
 local TabHandler = {
 	ControlName = "sf_tab_ace", -- Its name of vgui panel used by handler, there has to be one
-	IsEditor = false, -- If it should be treated as editor of file, like ACE or Wire
+	IsEditor = true, -- If it should be treated as editor of file, like ACE or Wire
 	Loaded = false,
 }
 local PANEL = {} -- It's our VGUI
@@ -18,6 +18,32 @@ local currentSession
 
 local runJS = function ( ... )
 	TabHandler.html:QueueJavascript( ... )
+end
+
+local function saveSettings()
+	
+end
+
+local function updateSettings()
+
+	runJS( [[
+		editSessions.forEach( function( session ) {
+				session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
+			} )
+		]] )
+	runJS( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ");" )
+	runJS( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ");" )
+	runJS( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ");" )
+	runJS( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ");" )
+	runJS( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ");" )
+	runJS( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
+	runJS( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
+	runJS( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_liveautocompletion" ) .. ");" )
+	runJS( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ");" )
+	runJS( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ");" )
+	runJS( "editor.setKeyboardHandler(\"ace/keyboard/" .. GetConVarString( "sf_editor_keybindings") .. "\");" )
+	runJS( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ");" )
+
 end
 
 local function getSessionID(tab)
@@ -98,6 +124,61 @@ local function createLibraryMap ()
 end
 
 function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+	--Adding settings
+	local sheet = SF.Editor.editor:AddControlPanelTab("Ace", "icon16/cog.png", "ACE options.")
+	local panel = sheet.Panel
+	
+	local scrollPanel = vgui.Create( "DScrollPanel", panel )
+	scrollPanel:Dock( FILL )
+	scrollPanel:SetPaintBackgroundEnabled( false )
+
+	local form = vgui.Create( "DForm", scrollPanel )	
+	form:Dock( FILL )
+	form:DockPadding( 0, 10, 0, 10 )
+	form.Header:SetVisible( false )
+	form.Paint = function () end
+
+	local function setDoClick ( panel )
+		panel:SetDark(false)
+		function panel:OnChange ()
+			saveSettings()
+			timer.Simple( 0.1, function () updateSettings() end )
+		end
+
+		return panel
+	end
+	local function setWang( wang, label )
+		function wang:OnValueChanged()
+			saveSettings()
+			timer.Simple( 0.1, function () updateSettings() end )
+		end
+		wang:GetParent():DockPadding( 10, 1, 10, 1 )
+		wang:Dock( RIGHT )
+		label:SetDark(false)
+		return wang, label
+	end
+	
+	setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
+	local combobox, label = form:ComboBox( "Keybinding", "sf_editor_keybindings" )
+	label:SetDark(false)
+	combobox:AddChoice( "ace" )
+	combobox:AddChoice( "vim" )
+	combobox:AddChoice( "emacs" )
+	
+	setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
+	setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
+	setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
+	setDoClick( form:CheckBox( "Show gutter", "sf_editor_gutter" ) )
+	setDoClick( form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ) )
+	setDoClick( form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ) )
+	setDoClick( form:CheckBox( "Highlight active line", "sf_editor_activeline" ) )
+	setDoClick( form:CheckBox( "Auto completion", "sf_editor_autocompletion" ) )
+	setDoClick( form:CheckBox( "Live Auto completion", "sf_editor_liveautocompletion" ) )
+	setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+	setDoClick( form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
+	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_disablelinefolding" ) )
+	
+	--
 	local html = vgui.Create( "DHTML" )
 	html:Dock( FILL )
 	html:DockMargin( 5, 59, 5, 5 )
@@ -246,6 +327,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 		end
 		TabHandler.Loaded = true
 		loadSessions()
+		updateSettings()
 	end
 	local readyTime
 	hook.Add("Think","SF_LoadingAce",function()

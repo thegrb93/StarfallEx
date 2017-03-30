@@ -139,9 +139,6 @@ if CLIENT then
 	end
 
 	function SF.Editor.init ()
-		for k, v in pairs(SF.Editor.TabHandlers) do
-			if v.init then v:init() end
-		end
 
 		if not file.Exists( "starfall", "DATA" ) then
 			file.CreateDir( "starfall" )
@@ -150,11 +147,12 @@ if CLIENT then
 
 		SF.Editor.createEditor()
 		SF.Editor.fileViewer = SF.Editor.createFileViewer()
-		SF.Editor.settingsWindow = SF.Editor.createSettingsWindow()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
-		SF.Editor.permissionsWindow = SF.Editor.createPermissionsWindow()
 
-		SF.Editor.updateSettings ()
+		for k, v in pairs(SF.Editor.TabHandlers) do
+			if v.init then v:init() end
+		end
+		
 		SF.Editor.initialized = true
 	end
 
@@ -251,102 +249,18 @@ if CLIENT then
 		return fileViewer
 	end
 
-	function SF.Editor.createSettingsWindow ()
-		local frame = vgui.Create( "StarfallFrame" )
-		frame:SetSize( 200, 400 )
-		frame:SetTitle( "Starfall Settings" )
-		frame:Center()
-
-		local panel = vgui.Create( "StarfallPanel", frame )
+	function SF.Editor.createpermissionsPanel ()
+		local panel = vgui.Create( "StarfallPanel" )
 		panel:Dock( FILL )
-		panel:DockMargin( 0, 5, 0, 0 )
-		frame:AddComponent( "panel", panel )
+		panel:DockMargin( 0, 0, 0, 0 )
+		panel.Paint = function () end
 
 		local scrollPanel = vgui.Create( "DScrollPanel", panel )
 		scrollPanel:Dock( FILL )
 		scrollPanel:SetPaintBackgroundEnabled( false )
 
-		local form = vgui.Create( "DForm", scrollPanel )
-		form:Dock( FILL )
-		form:DockPadding( 0, 10, 0, 10 )
-		form.Header:SetVisible( false )
-		form.Paint = function () end
-
-		local buttonPermissions = vgui.Create( "StarfallButton" )
-		buttonPermissions:SetText( "Permissions" )
-		function buttonPermissions:DoClick ()
-			if SF.Editor.permissionsWindow:IsVisible() then
-				SF.Editor.permissionsWindow:close()
-			else
-				SF.Editor.permissionsWindow:open()
-			end
-		end
-		form:AddItem( buttonPermissions )
-
-		local function setDoClick ( panel )
-			function panel:OnChange ()
-				SF.Editor.saveSettings()
-				timer.Simple( 0.1, function () SF.Editor.updateSettings( true ) end )
-			end
-
-			return panel
-		end
-		local function setWang( wang, label )
-			function wang:OnValueChanged()
-				SF.Editor.saveSettings()
-				timer.Simple( 0.1, function () SF.Editor.updateSettings( true ) end )
-			end
-			wang:GetParent():DockPadding( 10, 1, 10, 1 )
-			wang:Dock( RIGHT )
-
-			return wang, label
-		end
-
-		setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
-		local combobox, label = form:ComboBox( "Keybinding", "sf_editor_keybindings" )
-		combobox:AddChoice( "ace" )
-		combobox:AddChoice( "vim" )
-		combobox:AddChoice( "emacs" )
-
-		setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
-		setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
-		setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
-		setDoClick( form:CheckBox( "Show gutter", "sf_editor_gutter" ) )
-		setDoClick( form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ) )
-		setDoClick( form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ) )
-		setDoClick( form:CheckBox( "Highlight active line", "sf_editor_activeline" ) )
-		setDoClick( form:CheckBox( "Auto completion", "sf_editor_autocompletion" ) )
-		setDoClick( form:CheckBox( "Live Auto completion", "sf_editor_liveautocompletion" ) )
-		setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
-		setDoClick( form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
-		setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_disablelinefolding" ) )
-
-		function frame:OnOpen ()
-			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = true
-		end
-
-		function frame:OnClose ()
-			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Settings" ).active = false
-		end
-
-		return frame
-	end
-
-	function SF.Editor.createPermissionsWindow ()
-		local frame = vgui.Create( "StarfallFrame" )
-		frame:SetSize( 400, 600 )
-		frame:SetTitle( "Starfall Permissions" )
-		frame:Center()
-
-		local panel = vgui.Create( "StarfallPanel", frame )
-		panel:Dock( FILL )
-		panel:DockMargin( 0, 5, 0, 0 )
-
-		local scrollPanel = vgui.Create( "DScrollPanel", panel )
-		scrollPanel:Dock( FILL )
-		scrollPanel:SetPaintBackgroundEnabled( false )
-
-		frame.OnOpen = function()
+		panel.Refresh = function()
+			scrollPanel:Clear()
 			local clientProviders = {}
 			for i, v in ipairs(SF.Permissions.providers) do
 				local provider = {id = v.id, name = v.name, settings = {}, options = {}}
@@ -365,7 +279,7 @@ if CLIENT then
 				for _, p in ipairs( providers ) do
 					local header = vgui.Create( "DLabel", header )
 					header:SetFont( "DermaLarge" )
-					header:SetColor( SF.Editor.colors.meddark )
+					header:SetColor( Color(255, 255, 255) )
 					header:SetText( p.name )
 					header:SetSize(0, 40)
 					header:Dock( TOP )
@@ -374,13 +288,15 @@ if CLIENT then
 					for id, setting in SortedPairs( p.settings ) do
 
 						local header = vgui.Create( "StarfallPanel" )
+						header.Paint = function() end
 						header:DockMargin( 0, 5, 0, 0 )
 						header:SetSize( 0, 20 )
 						header:Dock( TOP )
+						header:SetToolTip( id )
 
 						local settingtext = vgui.Create( "DLabel", header )
 						settingtext:SetFont( "DermaDefault" )
-						settingtext:SetColor( SF.Editor.colors.meddark )
+						settingtext:SetColor( Color(255, 255, 255) )
 						settingtext:SetText( id )
 						settingtext:DockMargin( 5, 0, 0, 0 )
 						settingtext:Dock( FILL )
@@ -411,21 +327,15 @@ if CLIENT then
 
 			if LocalPlayer():IsSuperAdmin() then
 				SF.Permissions.requestPermissions( function(serverProviders)
-						if frame:IsVisible() then
-							createPermissions( serverProviders, true )
-							createPermissions( clientProviders )
-						end
+						createPermissions( serverProviders, true )
+						createPermissions( clientProviders )
 					end)
 			else
 				createPermissions( clientProviders )
 			end
 		end
 
-		frame.OnClose = function()
-			scrollPanel:Clear()
-		end
-
-		return frame
+		return panel
 	end
 
 	function SF.Editor.createModelViewer ()
@@ -804,29 +714,6 @@ if CLIENT then
 		end
 
 		return frame
-	end
-
-	function SF.Editor.updateSettings ( ace )
-		if ace then
-			local js = SF.Editor.runJS
-			js( [[
-				editSessions.forEach( function( session ) {
-						session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
-					} )
-				]] )
-			js( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ");" )
-			js( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ");" )
-			js( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ");" )
-			js( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ");" )
-			js( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ");" )
-			js( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
-			js( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
-			js( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_liveautocompletion" ) .. ");" )
-			js( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ");" )
-			js( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ");" )
-			js( "editor.setKeyboardHandler(\"ace/keyboard/" .. GetConVarString( "sf_editor_keybindings") .. "\");" )
-			js( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ");" )
-		end
 	end
 
 	--- (Client) Builds a table for the compiler to use

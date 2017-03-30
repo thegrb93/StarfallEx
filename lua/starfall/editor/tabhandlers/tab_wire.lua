@@ -74,7 +74,7 @@ end
 function TabHandler:init()
 	TabHandler.LibMap = createWireLibraryMap ()
 
-	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+	TabHandler.Modes.starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )

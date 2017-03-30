@@ -496,9 +496,9 @@ function Editor:FixTabFadeTime()
 end
 
 function Editor:CreateTab(chosenfile)
-	local editor = vgui.Create(getTabHandler().ControlName)
-	editor.parentpanel = self
 	local th = getTabHandler()
+	local editor = vgui.Create(th.ControlName)
+	editor.parentpanel = self -- That's going to be Deprecated
 	editor.getTabHandler = function() return th end -- add :getTabHandler()
 
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
@@ -786,8 +786,8 @@ function Editor:InitComponents()
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
 
-	self.C.Control = self:addComponent(vgui.Create("Panel", self), -350, 52, 342, -32) -- Control Panel
-	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 150) -- Credit box
+	self.C.Control = self:addComponent(vgui.Create("Panel", self), -342, 72, 342, -30) -- Control Panel
+	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
 
@@ -830,11 +830,14 @@ function Editor:InitComponents()
 	self.C.Close:Dock(RIGHT)
 	self.C.Close.DoClick = function(btn) self:Close() end
 
-	self.C.ConBut:SetImage("icon16/wrench.png")
+	self.C.ConBut:SetImage("icon16/cog.png")
 	self.C.ConBut:Dock(RIGHT)
 	self.C.ConBut:SetText("")
 	self.C.ConBut.Paint = PaintFlatButton
-	self.C.ConBut.DoClick = function() self.C.Control:SetVisible(not self.C.Control:IsVisible()) end
+	self.C.ConBut.DoClick = function() 
+		self.C.Control.Permissions:Refresh()
+		self.C.Control:SetVisible(not self.C.Control:IsVisible()) 
+	end
 
 	self.C.Inf:SetImage("icon16/information.png")
 	self.C.Inf:Dock(RIGHT)
@@ -924,13 +927,12 @@ function Editor:InitComponents()
 	end
 
 	self.C.Credit:SetTextColor(Color(0, 0, 0, 255))
-	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101") -- Sure why not ;)
+	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for starfall by D.ツ") -- Sure why not ;)
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
 
 	self:InitControlPanel(self.C.Control) -- making it seperate for better overview
 	self.C.Control:SetVisible(false)
-	self:NewTab()
 
 	self:Validate()
 end
@@ -952,19 +954,31 @@ function Editor:AddControlPanelTab(label, icon, tooltip)
 		old(...)
 	end
 
-	ret.Panel:SetBackgroundColor(Color(96, 96, 96, 255))
+	ret.Panel.Paint = function() end
+	ret.Tab.GetTabHeight = function() return 26 end -- Not increasing when active
+	ret.Tab.Paint = function(button,w,h)
+
+		if button.Hovered then
+			draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med )
+		else
+			draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark )
+		end
+	end
+
 
 	return ret
 end
 
 function Editor:InitControlPanel(frame)
 	local C = self.C.Control
-
 	-- Add a property sheet to hold the tabs
 	local tabholder = vgui.Create("DPropertySheet", frame)
 	tabholder:SetPos(2, 4)
 	frame.TabHolder = tabholder
-
+	
+	tabholder.tabScroller:DockMargin( 0, 0, 3, 0 )
+	tabholder.tabScroller:SetOverlap(-1)	
+	
 	-- They need to be resized one at a time... dirty fix incoming (If you know of a nicer way to do this, don't hesitate to fix it.)
 	local function callNext(t, n)
 		local obj = t[n]
@@ -1010,9 +1024,14 @@ function Editor:InitControlPanel(frame)
 	-- Our first object to auto resize is the tabholder. This sets it to position 2,4 and with a width and height offset of w-4, h-8.
 	frame:AddResizeObject(tabholder, 2, 4)
 
-	-- ------------------------------------------- EDITOR TAB
-	local sheet = self:AddControlPanelTab("Editor", "icon16/wrench.png", "Options for the editor itself.")
 
+	frame.Paint = function(_, w, h)
+		draw.RoundedBox( 0, 0, 30, w, h, SF.Editor.colors.meddark )
+		draw.RoundedBox( 0, 2, 32, w, h, Color(32, 32, 32) )
+	end
+	tabholder.Paint = function() end
+	-- ------------------------------------------- EDITOR TAB
+	local sheet = self:AddControlPanelTab("Editor", "icon16/cog.png", "Options for the editor itself.")
 	-- WINDOW BORDER COLORS
 
 	local dlist = vgui.Create("DPanelList", sheet.Panel)
@@ -1020,177 +1039,6 @@ function Editor:InitControlPanel(frame)
 	frame:AddResizeObject(dlist, 4, 4)
 	dlist:EnableVerticalScrollbar(true)
 
-	-- Color Mixer PANEL - Houses label, combobox, mixer, reset button & reset all button.
-	local mixPanel = vgui.Create( "panel" )
-	mixPanel:SetTall( 240 )
-	dlist:AddItem( mixPanel )
-
-	do
-		-- Label
-		local label = vgui.Create( "DLabel", mixPanel )
-		label:Dock( TOP )
-		label:SetText( "Syntax Colors" )
-		label:SizeToContents()
-
-		-- Dropdown box of convars to change ( affects editor colors )
-		local box = vgui.Create( "DComboBox", mixPanel )
-		box:Dock( TOP )
-		box:SetValue( "Color feature" )
-		local active = nil
-
-		-- Mixer
-		local mixer = vgui.Create( "DColorMixer", mixPanel )
-		mixer:Dock( FILL )
-		mixer:SetPalette( true )
-		mixer:SetAlphaBar( true )
-		mixer:SetWangs( true )
-		mixer.ValueChanged = function ( _, clr )
-			self:SetSyntaxColor( active, clr )
-		end
-
-		for k, _ in pairs( colors_convars ) do
-			box:AddChoice( k )
-		end
-
-		box.OnSelect = function ( self, index, value, data )
-			-- DComboBox doesn't have a method for getting active value ( to my knowledge )
-			-- Therefore, cache it, we're in a local scope so we're fine.
-			active = value
-			mixer:SetColor( colors[ active ] or Color( 255, 255, 255 ) )
-		end
-
-		-- Reset ALL button
-		local rAll = vgui.Create( "DButton", mixPanel )
-		rAll:Dock( BOTTOM )
-		rAll:SetText( "Reset ALL to Default" )
-
-		rAll.DoClick = function ()
-			for k, v in pairs( colors_defaults ) do
-				self:SetSyntaxColor( k, v )
-			end
-			mixer:SetColor( colors_defaults[ active ] )
-		end
-
-		-- Reset to default button
-		local reset = vgui.Create( "DButton", mixPanel )
-		reset:Dock( BOTTOM )
-		reset:SetText( "Set to Default" )
-
-		reset.DoClick = function ()
-			self:SetSyntaxColor( active, colors_defaults[ active ] )
-			mixer:SetColor( colors_defaults[ active ] )
-		end
-
-		-- Select a convar to be displayed automatically
-		box:ChooseOptionID( 1 )
-	end
-
-	--- - FONTS
-
-	local FontLabel = vgui.Create("DLabel")
-	dlist:AddItem(FontLabel)
-	FontLabel:SetText("Font: Font Size:")
-	FontLabel:SizeToContents()
-	FontLabel:SetPos(10, 0)
-
-	local temp = vgui.Create("Panel")
-	temp:SetTall(25)
-	dlist:AddItem(temp)
-
-	local FontSelect = vgui.Create("DComboBox", temp)
-	-- dlist:AddItem( FontSelect )
-	FontSelect.OnSelect = function(panel, index, value)
-		if value == "Custom..." then
-			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
-					self:ChangeFont(value, self.FontSizeConVar:GetInt())
-					RunConsoleCommand("sf_editor_font", value)
-				end)
-		else
-			value = value:gsub(" %b()", "") -- Remove description
-			self:ChangeFont(value, self.FontSizeConVar:GetInt())
-			RunConsoleCommand("sf_editor_font", value)
-		end
-	end
-	for k, v in pairs(self.Fonts) do
-		FontSelect:AddChoice(k .. (v ~= "" and " (" .. v .. ")" or ""))
-	end
-	FontSelect:AddChoice("Custom...")
-	FontSelect:SetSize(240 - 50 - 4, 20)
-
-	local FontSizeSelect = vgui.Create("DComboBox", temp)
-	FontSizeSelect.OnSelect = function(panel, index, value)
-		value = value:gsub(" %b()", "")
-		self:ChangeFont(self.FontConVar:GetString(), tonumber(value))
-		RunConsoleCommand("sf_editor_font_size", value)
-	end
-	for i = 11, 26 do
-		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
-	end
-	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
-	FontSizeSelect:SetSize(50, 20)
-
-	local label = vgui.Create("DLabel")
-	dlist:AddItem(label)
-	label:SetText("Auto completion options")
-	label:SizeToContents()
-
-	local AutoComplete = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(AutoComplete)
-	AutoComplete:SetConVar("wire_expression2_autocomplete")
-	AutoComplete:SetText("Auto Completion")
-	AutoComplete:SizeToContents()
-	AutoComplete:SetTooltip("Enable/disable auto completion in the E2 editor.")
-
-	local AutoCompleteExtra = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(AutoCompleteExtra)
-	AutoCompleteExtra:SetConVar("wire_expression2_autocomplete_moreinfo")
-	AutoCompleteExtra:SetText("More Info (for AC)")
-	AutoCompleteExtra:SizeToContents()
-	AutoCompleteExtra:SetTooltip("Enable/disable additional information for auto completion.")
-
-	local label = vgui.Create("DLabel")
-	dlist:AddItem(label)
-	label:SetText("Auto completion control style")
-	label:SizeToContents()
-
-	local AutoCompleteControlOptions = vgui.Create("DComboBox")
-	dlist:AddItem(AutoCompleteControlOptions)
-
-	local modes = {}
-	modes["Default"] = { 0, "Current mode:\nTab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort." }
-	modes["Visual C# Style"] = { 1, "Current mode:\nCtrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b." }
-	modes["Scroller"] = { 2, "Current mode:\nMouse scroller to choose item;\nMiddle mouse to use." }
-	modes["Scroller w/ Enter"] = { 3, "Current mode:\nMouse scroller to choose item;\nEnter to use." }
-	modes["Eclipse Style"] = { 4, "Current mode:\nEnter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort." }
-	-- modes["Qt Creator Style"] = { 6, "Current mode:\nCtrl+Space to enter auto completion menu;\nSpace to abort; Enter to use top match." } <-- probably wrong. I'll check about adding Qt style later.
-
-	for k, v in pairs(modes) do
-		AutoCompleteControlOptions:AddChoice(k)
-	end
-
-	modes[0] = modes["Default"][2]
-	modes[1] = modes["Visual C# Style"][2]
-	modes[2] = modes["Scroller"][2]
-	modes[3] = modes["Scroller w/ Enter"][2]
-	modes[4] = modes["Eclipse Style"][2]
-	AutoCompleteControlOptions:SetToolTip(modes[GetConVar("wire_expression2_autocomplete_controlstyle"):GetInt()])
-
-	AutoCompleteControlOptions.OnSelect = function(panel, index, value)
-		panel:SetToolTip(modes[value][2])
-		RunConsoleCommand("wire_expression2_autocomplete_controlstyle", modes[value][1])
-	end
-
-	local HighightOnUse = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(HighightOnUse)
-	HighightOnUse:SetConVar("wire_expression2_autocomplete_highlight_after_use")
-	HighightOnUse:SetText("Highlight word after AC use.")
-	HighightOnUse:SizeToContents()
-	HighightOnUse:SetTooltip("Enable/Disable highlighting of the entire word after using auto completion.\nIn E2, this is only for variables/constants, not functions.")
-
-	local label = vgui.Create("DLabel")
-	dlist:AddItem(label)
-	label:SetText("Other options")
-	label:SizeToContents()
 
 	local NewTabOnOpen = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(NewTabOnOpen)
@@ -1213,20 +1061,6 @@ function Editor:InitControlPanel(frame)
 	OpenOldTabs:SizeToContents()
 	OpenOldTabs:SetTooltip("Open the tabs from the last session on load.\nOnly tabs whose files were saved before disconnecting from the server are stored.")
 
-	local DisplayCaretPos = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(DisplayCaretPos)
-	DisplayCaretPos:SetConVar("sf_editor_display_caret_pos")
-	DisplayCaretPos:SetText("Show Caret Position")
-	DisplayCaretPos:SizeToContents()
-	DisplayCaretPos:SetTooltip("Shows the position of the caret.")
-
-	local HighlightOnDoubleClick = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(HighlightOnDoubleClick)
-	HighlightOnDoubleClick:SetConVar("sf_editor_highlight_on_double_click")
-	HighlightOnDoubleClick:SetText("Highlight copies of selected word")
-	HighlightOnDoubleClick:SizeToContents()
-	HighlightOnDoubleClick:SetTooltip("Find all identical words and highlight them after a double-click.")
-
 	local WorldClicker = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(WorldClicker)
 	WorldClicker:SetConVar("sf_editor_worldclicker")
@@ -1235,6 +1069,16 @@ function Editor:InitControlPanel(frame)
 	function WorldClicker.OnChange(pnl, bVal)
 		self:GetParent():SetWorldClicker(bVal)
 	end
+
+	------Permissions panel
+	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
+	local perms = SF.Editor.createpermissionsPanel ()
+	perms:SetParent(sheet.Panel)
+	sheet.Panel:DockPadding(0, 0, 0, 0)
+	perms:DockMargin(0, 0, 0, 0)
+	perms:Dock(FILL)
+	perms:Refresh()
+	self.C.Control.Permissions = perms
 end
 
 -- used with color-circles
@@ -1589,7 +1433,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	self.EditorType = nEditorType
 	self.C.Browser.tree:setup(nLocation)
 
-	self:SetEditorMode(nEditorType)
+--	self:SetEditorMode(nEditorType)
 
 	local SFHelp = vgui.Create("StarfallButton", self.C.ButtonHolder)
 	SFHelp:SetSize(58, 20)
@@ -1613,10 +1457,12 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SoundBrw:SetText("Sound Browser")
 	SoundBrw.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
 	self.C.SoundBrw = SoundBrw
-	if Editor.OpenOldTabsVar:GetBool() then
-		self:OpenOldTabs()
-	end
-
+	timer.Simple(0,function() --Waiting for tabhandlers to load
+		self:NewTab()
+		if Editor.OpenOldTabsVar:GetBool() then
+			self:OpenOldTabs()
+		end
+	end)
 	--Add "Model Viewer" button
 	local ModelViewer = vgui.Create("StarfallButton", self.C.ButtonHolder)
 	ModelViewer:SetSize(85, 20)
