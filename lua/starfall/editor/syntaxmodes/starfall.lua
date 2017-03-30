@@ -4,7 +4,6 @@ local string_gmatch = string.gmatch
 local string_gsub = string.gsub
 local libmap = SF.Editor.TabHandlers.wire.LibMap
 local EDITOR = {}
-print("LOADED")
 local function istype(tp)
 	return false
 end
