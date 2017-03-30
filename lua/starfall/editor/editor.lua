@@ -78,17 +78,6 @@ if CLIENT then
 		['"'] = "",
 	}
 
-	CreateClientConVar( "sf_editor_width", 1100, true, false )
-	CreateClientConVar( "sf_editor_height", 760, true, false )
-	CreateClientConVar( "sf_editor_posx", ScrW() / 2 - 1100 / 2, true, false )
-	CreateClientConVar( "sf_editor_posy", ScrH() / 2 - 760 / 2, true, false )
-
-	CreateClientConVar( "sf_fileviewer_width", 263, true, false )
-	CreateClientConVar( "sf_fileviewer_height", 760, true, false )
-	CreateClientConVar( "sf_fileviewer_posx", ScrW() / 2 - 1100 / 2 - 263, true, false )
-	CreateClientConVar( "sf_fileviewer_posy", ScrH() / 2 - 760 / 2, true, false )
-	CreateClientConVar( "sf_fileviewer_locked", 1, true, false )
-
 	CreateClientConVar( "sf_modelviewer_width", 930, true, false )
 	CreateClientConVar( "sf_modelviewer_height", 615, true, false )
 	CreateClientConVar( "sf_modelviewer_posx", ScrW() / 2 - 930 / 2, true, false )
@@ -146,7 +135,6 @@ if CLIENT then
 		if SF.Editor.editor then return end
 
 		SF.Editor.createEditor()
-		SF.Editor.fileViewer = SF.Editor.createFileViewer()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
 
 		for k, v in pairs(SF.Editor.TabHandlers) do
@@ -188,65 +176,6 @@ if CLIENT then
 
 		if SF.Editor.editor then SF.Editor.editor:Remove() end
 		SF.Editor.editor = editor
-	end
-
-	function SF.Editor.createFileViewer ()
-		local fileViewer = vgui.Create( "StarfallFrame" )
-		fileViewer:SetSize( 200, 600 )
-		fileViewer:SetTitle( "Starfall File Viewer" )
-		fileViewer:Center()
-
-		local browser = vgui.Create( "StarfallFileBrowser", fileViewer )
-
-		local searchBox, tree = browser:getComponents()
-		tree:setup( "starfall" )
-		function tree:OnNodeSelected ( node )
-			if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
-			local fileName = string.gsub( node:GetFileName(), "starfall/", "", 1 )
-			local code = file.Read( node:GetFileName(), "DATA" )
-
-			for k, v in pairs( SF.Editor.getTabHolder().tabs ) do
-				if v.filename == fileName and v.code == code then
-					SF.Editor.selectTab( v )
-					return
-				end
-			end
-
-			SF.Editor.addTab( fileName, code )
-		end
-
-		fileViewer:AddComponent( "browser", browser )
-
-		local buttonHolder = fileViewer.components[ "buttonHolder" ]
-
-		local buttonLock = buttonHolder:getButton( "Lock" )
-		buttonLock._DoClick = buttonLock.DoClick
-		buttonLock.DoClick = function ( self )
-			self:_DoClick()
-			SF.Editor.saveSettings()
-		end
-
-		local buttonRefresh = vgui.Create( "StarfallButton", buttonHolder )
-		buttonRefresh:SetText( "Refresh" )
-		buttonRefresh:SetHoverColor( Color( 7, 70, 0 ) )
-		buttonRefresh:SetColor( Color( 26, 104, 17 ) )
-		buttonRefresh:SetLabelColor( Color( 103, 155, 153 ) )
-		function buttonRefresh:DoClick ()
-			tree:reloadTree()
-			searchBox:SetValue( "Search..." )
-		end
-		buttonHolder:addButton( "Refresh", buttonRefresh )
-
-		function fileViewer:OnOpen ()
-			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Files" ).active = true
-		end
-
-		function fileViewer:OnClose ()
-			SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Files" ).active = false
-			SF.Editor.saveSettings()
-		end
-
-		return fileViewer
 	end
 
 	function SF.Editor.createpermissionsPanel ()
