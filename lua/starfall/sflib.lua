@@ -594,18 +594,7 @@ else
 			if SF.Editor.initialized then
 				if IsValid(gate) and gate.files then
 					for name, code in pairs(gate.files) do
-						local found = false
-						for _, tab in pairs(SF.Editor.getTabHolder().tabs) do
-							if tab.filename == name and tab.code == code then
-								found = tab
-								break
-							end
-						end
-						if found then
-							SF.Editor.selectTab( found )
-						else
-							SF.Editor.addTab( name, code )
-						end
+						SF.Editor.openWithCode(code)
 					end
 				end
 				hook.Remove("Think","WaitForEditor")
