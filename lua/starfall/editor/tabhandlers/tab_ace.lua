@@ -28,21 +28,21 @@ local function updateSettings()
 
 	runJS( [[
 		editSessions.forEach( function( session ) {
-				session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_wordwrap" ) .. [[ )
+				session.setUseWrapMode( ]] .. GetConVarNumber( "sf_editor_ace_wordwrap" ) .. [[ )
 			} )
 		]] )
-	runJS( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_widgets" ) .. ");" )
-	runJS( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_linenumbers" ) .. ");" )
-	runJS( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_gutter" ) .. ");" )
-	runJS( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_invisiblecharacters" ) .. ");" )
-	runJS( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_indentguides" ) .. ");" )
-	runJS( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
-	runJS( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_activeline" ) .. ");" )
-	runJS( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_liveautocompletion" ) .. ");" )
-	runJS( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_autocompletion" ) .. ");" )
-	runJS( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_disablelinefolding" ) .. ");" )
-	runJS( "editor.setKeyboardHandler(\"ace/keyboard/" .. GetConVarString( "sf_editor_keybindings") .. "\");" )
-	runJS( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_fontsize" ) .. ");" )
+	runJS( "editor.setOption(\"showFoldWidgets\", " .. GetConVarNumber( "sf_editor_ace_widgets" ) .. ");" )
+	runJS( "editor.setOption(\"showLineNumbers\", " .. GetConVarNumber( "sf_editor_ace_linenumbers" ) .. ");" )
+	runJS( "editor.setOption(\"showGutter\", " .. GetConVarNumber( "sf_editor_ace_gutter" ) .. ");" )
+	runJS( "editor.setOption(\"showInvisibles\", " .. GetConVarNumber( "sf_editor_ace_invisiblecharacters" ) .. ");" )
+	runJS( "editor.setOption(\"displayIndentGuides\", " .. GetConVarNumber( "sf_editor_ace_indentguides" ) .. ");" )
+	runJS( "editor.setOption(\"highlightActiveLine\", " .. GetConVarNumber( "sf_editor_ace_activeline" ) .. ");" )
+	runJS( "editor.setOption(\"highlightGutterLine\", " .. GetConVarNumber( "sf_editor_ace_activeline" ) .. ");" )
+	runJS( "editor.setOption(\"enableLiveAutocompletion\", " .. GetConVarNumber( "sf_editor_ace_liveautocompletion" ) .. ");" )
+	runJS( "editor.setOption(\"enableBasicAutocompletion\", " .. GetConVarNumber( "sf_editor_ace_autocompletion" ) .. ");" )
+	runJS( "setFoldKeybinds( " .. GetConVarNumber( "sf_editor_ace_disablelinefolding" ) .. ");" )
+	runJS( "editor.setKeyboardHandler(\"ace/keyboard/" .. GetConVarString( "sf_editor_ace_keybindings") .. "\");" )
+	runJS( "editor.setFontSize(" .. GetConVarNumber( "sf_editor_ace_fontsize" ) .. ");" )
 
 end
 
@@ -52,7 +52,7 @@ end
 
 local function createSession(tab)
 	local settings = util.TableToJSON({
-			wrap = GetConVarNumber( "sf_editor_wordwrap" )
+			wrap = GetConVarNumber( "sf_editor_ace_wordwrap" )
 		}):JavascriptSafe()
 	if TabHandler.Loaded then
 		runJS( "newEditSession(\"" .. string.JavascriptSafe( tab.code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
@@ -84,7 +84,7 @@ end
 
 local function loadSessions()
 	local settings = util.TableToJSON({
-			wrap = GetConVarNumber( "sf_editor_wordwrap" )
+			wrap = GetConVarNumber( "sf_editor_ace_wordwrap" )
 		}):JavascriptSafe()
 	for k,v in pairs(TabHandler.SessionTabs) do
 		runJS( "newEditSession(\"" .. string.JavascriptSafe( v.code or "" ) .. "\", JSON.parse(\"" .. settings .. "\"))" )
@@ -158,25 +158,25 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 		return wang, label
 	end
 	
-	setWang( form:NumberWang( "Font size", "sf_editor_fontsize", 5, 40 ) )
-	local combobox, label = form:ComboBox( "Keybinding", "sf_editor_keybindings" )
+	setWang( form:NumberWang( "Font size", "sf_editor_ace_fontsize", 5, 40 ) )
+	local combobox, label = form:ComboBox( "Keybinding", "sf_editor_ace_keybindings" )
 	label:SetDark(false)
 	combobox:AddChoice( "ace" )
 	combobox:AddChoice( "vim" )
 	combobox:AddChoice( "emacs" )
 	
-	setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_wordwrap" ) )
-	setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_widgets" ) )
-	setDoClick( form:CheckBox( "Show line numbers", "sf_editor_linenumbers" ) )
-	setDoClick( form:CheckBox( "Show gutter", "sf_editor_gutter" ) )
-	setDoClick( form:CheckBox( "Show invisible characters", "sf_editor_invisiblecharacters" ) )
-	setDoClick( form:CheckBox( "Show indenting guides", "sf_editor_indentguides" ) )
-	setDoClick( form:CheckBox( "Highlight active line", "sf_editor_activeline" ) )
-	setDoClick( form:CheckBox( "Auto completion", "sf_editor_autocompletion" ) )
-	setDoClick( form:CheckBox( "Live Auto completion", "sf_editor_liveautocompletion" ) )
-	setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
-	setDoClick( form:CheckBox( "Fix console bug", "sf_editor_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
-	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_disablelinefolding" ) )
+	setDoClick( form:CheckBox( "Enable word wrap", "sf_editor_ace_wordwrap" ) )
+	setDoClick( form:CheckBox( "Show fold widgets", "sf_editor_ace_widgets" ) )
+	setDoClick( form:CheckBox( "Show line numbers", "sf_editor_ace_linenumbers" ) )
+	setDoClick( form:CheckBox( "Show gutter", "sf_editor_ace_gutter" ) )
+	setDoClick( form:CheckBox( "Show invisible characters", "sf_editor_ace_invisiblecharacters" ) )
+	setDoClick( form:CheckBox( "Show indenting guides", "sf_editor_ace_indentguides" ) )
+	setDoClick( form:CheckBox( "Highlight active line", "sf_editor_ace_activeline" ) )
+	setDoClick( form:CheckBox( "Auto completion", "sf_editor_ace_autocompletion" ) )
+	setDoClick( form:CheckBox( "Live Auto completion", "sf_editor_ace_liveautocompletion" ) )
+	setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_ace_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
+	setDoClick( form:CheckBox( "Fix console bug", "sf_editor_ace_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
+	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_ace_disablelinefolding" ) )
 	
 	--
 	local html = vgui.Create( "DHTML" )
@@ -202,7 +202,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 
 	html:AddFunction( "console", "doValidation", SF.Editor.doValidation) --TODO: FIX THAT LATER
 	if system.IsWindows() then
-		html:AddFunction( "console", "fixConsole",function() if tobool( GetConVarNumber( "sf_editor_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
+		html:AddFunction( "console", "fixConsole",function() if tobool( GetConVarNumber( "sf_editor_ace_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
 	else
 		html:AddFunction( "console", "fixConsole",function() end) --Dummy
 	end
@@ -218,7 +218,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 			if input.IsKeyDown(KEY_LCONTROL) then
 				self:OnShortcut(key)
 			end
-			if GetConVarNumber( "sf_editor_fixkeys" ) == 0 then return end
+			if GetConVarNumber( "sf_editor_ace_fixkeys" ) == 0 then return end
 			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and
 			( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and
 			not input.IsKeyDown( KEY_LALT ) then
@@ -384,9 +384,6 @@ function PANEL:OnRemove() -- We dont want html to get removed with tab as its sh
 	end
 end
 
-function PANEL:validate(movecarret) -- Validate request, has to return success,message
-
-end
 --------------
 -- We're done
 --------------

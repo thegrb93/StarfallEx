@@ -44,9 +44,34 @@ local TabHandler = {
 	ControlName = "TabHandler_wire"
 }
 TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
+---------------------
+-- Fonts
+---------------------
+TabHandler.Fonts = {} --Font descriptions for settings
+TabHandler.Fonts["Courier New"] = "Windows standard font"
+TabHandler.Fonts["DejaVu Sans Mono"] = "Default font on Linux"
+TabHandler.Fonts["Consolas"] = ""
+TabHandler.Fonts["Fixedsys"] = ""
+TabHandler.Fonts["Lucida Console"] = ""
+TabHandler.Fonts["Monaco"] = "Mac standard font"
+
+local defaultFont
+
+if system.IsWindows() then
+	defaultFont = "Courier New"
+elseif system.IsOSX() then
+	defaultFont = "Monaco"
+else
+	defaultFont = "DejaVu Sans Mono"
+end
+
+TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_font", defaultFont, true, false)
+TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
+TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
+---------------------
 
 local function createWireLibraryMap () -- Hashtable
-
+	
 	local libMap = {}
 
 	libMap[ "Environment" ] = {}
@@ -80,6 +105,10 @@ end
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
 
 local PANEL = {}
+function PANEL:onValidate(s, r, m, goto)
+	if s or not goto then return end
+	self:SetCaret({ r, 0 })
+end
 function PANEL:Init()
 	self:SetCursor("beam")
 
@@ -119,6 +148,9 @@ function PANEL:Init()
 		dblclickhighlight = Color(0, 100, 0),
 	}
 	self:SetMode("starfall")
+	
+	self.CurrentFont,self.FontWidth,self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
+	print(self.CurrentFont,self.FontWidth,self.FontHeigh)
 end
 
 function PANEL:SetMode(mode_name)
@@ -259,7 +291,7 @@ function PANEL:OpenContextMenu()
 	menu:AddSpacer()
 
 	menu:AddOption( "Copy with BBCode colors", function()
-			local str = string_format( "[code][font=%s]", self:GetParent().FontConVar:GetString() )
+			local str = string_format( "[code][font=%s]", TabHandler.FontConVar )
 
 			local prev_colors
 			local first_loop = true

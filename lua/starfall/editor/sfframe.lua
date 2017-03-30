@@ -11,39 +11,13 @@ local function getTabHandler()
 end
 -- ----------------------------------------------------------------------
 -- Fonts
+-- they are shared for all tabhandlers
 -- ----------------------------------------------------------------------
-
-local defaultFont
-
-if system.IsWindows() then
-	defaultFont = "Courier New"
-elseif system.IsOSX() then
-	defaultFont = "Monaco"
-else
-	defaultFont = "DejaVu Sans Mono"
-end
-
 --ConVars
-Editor.FontConVar = CreateClientConVar("sf_editor_font", defaultFont, true, false)
-Editor.FontSizeConVar = CreateClientConVar("sf_editor_fontsize", 16, true, false)
-Editor.BlockCommentStyleConVar = CreateClientConVar("sf_editor_block_comment_style", 1, true, false)
 Editor.SaveTabsVar = CreateClientConVar("sf_editor_savetabs", "1", true, false)
 Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", true, false)
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
-
-Editor.Fonts = {}
--- Font Description
-
--- Windows
-Editor.Fonts["Courier New"] = "Windows standard font"
-Editor.Fonts["DejaVu Sans Mono"] = "Default font on Linux"
-Editor.Fonts["Consolas"] = ""
-Editor.Fonts["Fixedsys"] = ""
-Editor.Fonts["Lucida Console"] = ""
-
--- Mac
-Editor.Fonts["Monaco"] = "Mac standard font"
 
 surface.CreateFont("SFEditorDefault", {
 		font = "default",
@@ -55,78 +29,39 @@ surface.CreateFont("SFEditorDefault", {
 
 Editor.CreatedFonts = {}
 
-function Editor:SetEditorFont(editor)
-	if not self.CurrentFont then
-		self:ChangeFont(self.FontConVar:GetString(), self.FontSizeConVar:GetInt())
-		return
-	end
-
-	editor.CurrentFont = self.CurrentFont
-	editor.FontWidth = self.FontWidth
-	editor.FontHeight = self.FontHeight
-end
-
-function Editor:ChangeFont(FontName, Size)
+function Editor:GetFont(FontName, Size)
 	if not FontName or FontName == "" or not Size then return end
+	local name = "sf_" .. FontName .. "_" .. Size
 
 	-- If font is not already created, create it.
-	if not self.CreatedFonts[FontName .. "_" .. Size] then
+	if not self.CreatedFonts[name] then
 		local fontTable =
 		{
 			font = FontName,
 			size = Size,
 			weight = 400,
-			antialias = false,
+			antialias = true,
 			additive = false,
 		}
-		surface.CreateFont("Expression2_" .. FontName .. "_" .. Size, fontTable)
+		local fontTableBold =
+		{
+			font = FontName,
+			size = Size,
+			weight = 600,
+			antialias = true,
+			additive = false,
+		}
+		surface.CreateFont(name, fontTable)
 		fontTable.weight = 700
-		surface.CreateFont("Expression2_" .. FontName .. "_" .. Size .. "_Bold", fontTable)
-		self.CreatedFonts[FontName .. "_" .. Size] = true
+		surface.CreateFont(name, fontTableBold)
+		self.CreatedFonts[name] = true
 	end
 
-	self.CurrentFont = "Expression2_" .. FontName .. "_" .. Size
-	surface.SetFont(self.CurrentFont)
-	self.FontWidth, self.FontHeight = surface.GetTextSize(" ")
-
-	for i = 1, self:GetNumTabs() do
-		self:SetEditorFont(self:GetEditor(i))
-	end
+	surface.SetFont(name)
+	local width, height = surface.GetTextSize(" ")
+	return name, width, height
 end
 
-------------------------------------------------------------------------
--- Colors
-------------------------------------------------------------------------
-
-local colors = {
-	["keyword"] = Color(142,192,124),
-	["directive"] = Color(142, 192, 124),
-	["comment"] = Color(146, 131, 116),
-	["string"] = Color(184, 187, 38),
-	["number"] = Color(211, 134, 155),
-	["function"] = Color(184, 187, 38),
-	["library"] = Color(184, 187, 38),
-	["operator"] = Color(211, 134, 155),
-	["notfound"] = Color(251, 241, 199),
-	["userfunction"] = Color(251, 241, 199),
-	["constant"] = Color(211, 134, 155),
-}
-
-local colors_defaults = {}
-
-local colors_convars = {}
-for k, v in pairs(colors) do
-	colors_defaults[k] = Color(v.r, v.g, v.b) -- Copy to save defaults
-	colors_convars[k] = CreateClientConVar("sf_editor_syntaxcolor_" .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
-end
-
-function Editor:LoadSyntaxColors() --Deprecated
-
-end
-
-function Editor:SetSyntaxColor(colorname, colr) --Deprecated
-
-end
 
 ------------------------------------------------------------------------
 
@@ -169,7 +104,6 @@ function Editor:Init()
 	self.logo = surface.GetTextureID("radon/starfall2")
 
 	self:InitComponents()
-	self:LoadSyntaxColors()
 
 	-- This turns off the engine drawing
 	self:SetPaintBackgroundEnabled(false)
@@ -482,11 +416,6 @@ local function extractNameFromFilePath(str)
 	end
 end
 
-function Editor:SetEditorMode(mode_name) --Deprecated
-end
-
-function Editor:GetEditorMode() return self.EditorMode end
-
 local old
 function Editor:FixTabFadeTime()
 	if old ~= nil then return end -- It's already being fixed
@@ -502,7 +431,6 @@ function Editor:CreateTab(chosenfile)
 	editor.getTabHandler = function() return th end -- add :getTabHandler()
 
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
-	self:SetEditorFont(editor)
 	editor.chosenfile = chosenfile
 	sheet.Tab.Paint = function(button,w,h)
 
@@ -583,7 +511,7 @@ function Editor:CreateTab(chosenfile)
 	end
 
 	editor.OnTextChanged = function(panel)
-		timer.Create("e2autosave", 5, 1, function()
+		timer.Create("sfautosave", 5, 1, function()
 				self:AutoSave()
 			end)
 	end
@@ -934,7 +862,6 @@ function Editor:InitComponents()
 	self:InitControlPanel(self.C.Control) -- making it seperate for better overview
 	self.C.Control:SetVisible(false)
 
-	self:Validate()
 end
 
 function Editor:AutoSave()
@@ -1190,24 +1117,30 @@ function Editor:OpenOldTabs()
 	end
 end
 
-function Editor:Validate(gotoerror) --TODO: Use tabholder system
-	if true then return end
+function Editor:Validate(gotoerror)
+	if not self:GetCurrentEditor():getTabHandler().IsEditor then --Dont validate for non-editors
+		self:SetValidatorStatus("")
+		return
+	end
+
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We wont validate empty scripts
 	local err = CompileString( code , "Validation", false )
-	if type( err ) != "string" then
+	local success = type( err ) != "string"
+	local row,message
+	if success then
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
-		return
+	else
+		row = tonumber( err:match( "%d+" ) ) - 1 or 0
+		message = err:match( ": .+$" ):sub( 3 ) or "Unknown"
+		message = "Line "..row..":"..message
+		self.C.Val:SetBGColor(110, 0, 20, 255)
+		self.C.Val:SetText(" " .. message)
 	end
-	local row = tonumber( err:match( "%d+" ) ) - 1 or 0
-	local message = err:match( ": .+$" ):sub( 3 ) or "Unknown"
-	message = "Line "..row..":"..message
-	if gotoerror then
-		if row then self:GetCurrentEditor():SetCaret({ tonumber(row), 0 }) end
-	end
-	self.C.Val:SetBGColor(110, 0, 20, 255)
-	self.C.Val:SetText(" " .. message)
 
+	if self:GetCurrentEditor().onValidate then
+		self:GetCurrentEditor():onValidate(success, row, message,gotoerror)
+	end
 	return true
 end
 
@@ -1226,7 +1159,6 @@ function Editor:SetV(bool)
 	if bool then
 		self:MakePopup()
 		self:InvalidateLayout(true)
-		self:Validate()
 	end
 	self:SetVisible(bool)
 	self:SetKeyBoardInputEnabled(bool)
@@ -1418,7 +1350,7 @@ function Editor:LoadFile(Line, forcenewtab)
 end
 
 function Editor:Close()
-	timer.Stop("e2autosave")
+	timer.Stop("sfautosave")
 	self:AutoSave()
 
 	self:ExtractName()
@@ -1432,8 +1364,6 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	self.Location = nLocation
 	self.EditorType = nEditorType
 	self.C.Browser.tree:setup(nLocation)
-
---	self:SetEditorMode(nEditorType)
 
 	local SFHelp = vgui.Create("StarfallButton", self.C.ButtonHolder)
 	SFHelp:SetSize(58, 20)
