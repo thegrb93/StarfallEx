@@ -801,7 +801,16 @@ if CLIENT then
 				end
 			end
 		end )
-
+	concommand.Add( "sf_editor_reload", function()
+		if not SF.Editor.initialized then return end
+		SF.Editor.initialized = false
+		SF.Editor.editor:Remove()
+		SF.Editor.editor = nil
+		SF.Editor.modelViewer:Remove()
+		SF.Editor.modelViewer = nil
+		SF.Editor.open ()
+		print("Editor reloaded")
+	end )
 elseif SERVER then
 
 	util.AddNetworkString( "starfall_editor_status" )
