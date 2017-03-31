@@ -48,13 +48,6 @@ function helper.create()
 		self:_PerformLayout2( ... )
 		helper.resize( )
 	end
-	function helper.Frame:OnOpen ()
-		SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Helper" ).active = true
-	end
-	function helper.Frame:OnClose ()
-		SF.Editor.editor.components[ "buttonHolder" ]:getButton( "Helper" ).active = false
-		saveSettings()
-	end
 
 	helper.ScrollPanel = vgui.Create( "DScrollPanel", helper.Frame )
 	helper.ScrollPanel:SetPos( 5, 30 )

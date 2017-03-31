@@ -12,12 +12,9 @@ if SERVER then
 	AddCSLuaFile( "libraries.lua" )
 	AddCSLuaFile( "preprocessor.lua" )
 	AddCSLuaFile( "permissions/core.lua" )
-	AddCSLuaFile( "editor.lua" )
-	AddCSLuaFile( "editor_sfmode.lua" )
-	AddCSLuaFile( "editor_wire.lua" )
-	AddCSLuaFile( "sfderma.lua" )
-	AddCSLuaFile( "sfhelper.lua" )
 	AddCSLuaFile( "netstream.lua" )
+	
+	AddCSLuaFile( "editor/editor.lua" )
 end
 
 -- Load files
@@ -25,8 +22,7 @@ include( "instance.lua" )
 include( "libraries.lua" )
 include( "preprocessor.lua" )
 include( "permissions/core.lua" )
-include( "editor.lua" )
-include( "sfhelper.lua" )
+include( "editor/editor.lua" )
 include( "netstream.lua" )
 
 if SERVER then
@@ -598,18 +594,7 @@ else
 			if SF.Editor.initialized then
 				if IsValid(gate) and gate.files then
 					for name, code in pairs(gate.files) do
-						local found = false
-						for _, tab in pairs(SF.Editor.getTabHolder().tabs) do
-							if tab.filename == name and tab.code == code then
-								found = tab
-								break
-							end
-						end
-						if found then
-							SF.Editor.selectTab( found )
-						else
-							SF.Editor.addTab( name, code )
-						end
+						SF.Editor.openWithCode(code)
 					end
 				end
 				hook.Remove("Think","WaitForEditor")
