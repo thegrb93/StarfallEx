@@ -84,23 +84,32 @@ local colors = {
 	["userfunction"] = Color(251, 241, 199),
 	["constant"] = Color(211, 134, 155),
 }
+local defcolors = table.Copy(colors)
 local color_convar_prefix = "sf_editor_wire_color_"
 local colorConvars = {}
 
 for k, v in pairs(colors) do
 	colorConvars[k] = CreateClientConVar( color_convar_prefix .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
 end
-
+local function generateColorsCommandline()
+	local out = ""
+	for k, v in pairs(colorConvars) do
+		out = out..color_convar_prefix..k.." \""..v:GetString().."\";"
+	end
+	out = out.."sf_editor_reload"
+	return out
+end
 function TabHandler:LoadSyntaxColors()
-	print("Syntax colors loaded")
 	for k, v in pairs(colorConvars) do
 		local r, g, b = v:GetString():match("(%d+)_(%d+)_(%d+)")
-		colors[k] = Color(tonumber(r), tonumber(g), tonumber(b))
+		colors[k] = Color(tonumber(r) or 255, tonumber(g) or 0, tonumber(b) or 0)
+		for _,mode in pairs(TabHandler.Modes) do
+			if mode.SetSyntaxColor then
+				mode:SetSyntaxColor(k, colors[k])
+			end
+		end	
 	end
-
-	for k,v in pairs(TabHandler.Tabs) do
-		v:SetSyntaxColors(colors)
-	end
+	
 end
 
 function TabHandler:SetSyntaxColor(colorname, colr)
@@ -108,8 +117,10 @@ function TabHandler:SetSyntaxColor(colorname, colr)
 	colors[colorname] = colr
 	RunConsoleCommand(color_convar_prefix .. colorname, colr.r .. "_" .. colr.g .. "_" .. colr.b)
 
-	for k,v in pairs(TabHandler.Tabs) do
-		v:SetSyntaxColor(colors)
+	for _,mode in pairs(TabHandler.Modes) do
+		if mode.SetSyntaxColor then
+			mode:SetSyntaxColor(colorname, colors[colorname])
+		end
 	end
 end
 ---------------------
@@ -145,6 +156,133 @@ function TabHandler:init()
 
 	TabHandler.Modes.starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	self:LoadSyntaxColors()
+	
+	-- ------------------------------------------- Wire TAB
+	local sheet = SF.Editor.editor:AddControlPanelTab("Wire", "icon16/wrench.png", "Options for wire tabs.")
+
+	-- WINDOW BORDER COLORS
+
+	local dlist = vgui.Create("DPanelList", sheet.Panel)
+	dlist.Paint = function() end
+	dlist:EnableVerticalScrollbar(true)
+
+	-- Color Mixer PANEL - Houses label, combobox, mixer, reset button & reset all button.
+	local mixPanel = vgui.Create( "panel" )
+	mixPanel:SetTall( 240 )
+	dlist:AddItem( mixPanel )
+	SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
+	do
+		-- Label
+		local label = vgui.Create( "DLabel", mixPanel )
+		label:Dock( TOP )
+		label:SetText( "Syntax Colors" )
+		label:SizeToContents()
+
+		-- Dropdown box of convars to change ( affects editor colors )
+		local box = vgui.Create( "DComboBox", mixPanel )
+		box:Dock( TOP )
+		box:SetValue( "Color feature" )
+		local active = nil
+
+		-- Mixer
+		local mixer = vgui.Create( "DColorMixer", mixPanel )
+		mixer:Dock( FILL )
+		mixer:SetPalette( true )
+		mixer:SetAlphaBar( true )
+		mixer:SetWangs( true )
+		mixer.ValueChanged = function ( _, clr )
+			self:SetSyntaxColor( active, clr )
+		end
+
+		for k, _ in pairs( colorConvars ) do
+			box:AddChoice( k )
+		end
+
+		box.OnSelect = function ( self, index, value, data )
+			-- DComboBox doesn't have a method for getting active value ( to my knowledge )
+			-- Therefore, cache it, we're in a local scope so we're fine.
+			active = value
+			mixer:SetColor( colors[ active ] or Color( 255, 255, 255 ) )
+		end
+
+		-- Reset ALL button
+		local rAll = vgui.Create( "DButton", mixPanel )
+		rAll:Dock( BOTTOM )
+		rAll:SetText( "Reset ALL to Default" )
+
+		rAll.DoClick = function ()
+			for k, v in pairs( defcolors ) do
+				self:SetSyntaxColor( k, v )
+			end
+			mixer:SetColor( defcolors[ active ] )
+		end
+
+		-- Reset to default button
+		local reset = vgui.Create( "DButton", mixPanel )
+		reset:Dock( BOTTOM )
+		reset:SetText( "Set to Default" )
+
+		reset.DoClick = function ()
+			self:SetSyntaxColor( active, defcolors[ active ] )
+			mixer:SetColor( defcolors[ active ] )
+		end
+
+		local outCustom = vgui.Create( "DButton", mixPanel )
+		outCustom:Dock( BOTTOM )
+		outCustom:SetText( "Output syntax commandline" )
+
+		outCustom.DoClick = function ()
+			Derma_StringRequest( "Commandline", "Paste it to console to restore syntax to current one", generateColorsCommandline(), function()end ) 
+		end
+
+		-- Select a convar to be displayed automatically
+		box:ChooseOptionID( 1 )
+	end
+
+	--- - FONTS
+
+	local FontLabel = vgui.Create("DLabel")
+	dlist:AddItem(FontLabel)
+	FontLabel:SetText("Font:                                   Font Size:")
+	FontLabel:SizeToContents()
+	FontLabel:SetPos(10, 0)
+
+	local temp = vgui.Create("Panel")
+	temp:SetTall(25)
+	dlist:AddItem(temp)
+
+	local FontSelect = vgui.Create("DComboBox", temp)
+	-- dlist:AddItem( FontSelect )
+	FontSelect.OnSelect = function(panel, index, value)
+		if value == "Custom..." then
+			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
+				self:ChangeFont(value, self.FontSizeConVar:GetInt())
+				RunConsoleCommand("wire_expression2_editor_font", value)
+			end)
+		else
+			value = value:gsub(" %b()", "") -- Remove description
+			self:ChangeFont(value, self.FontSizeConVar:GetInt())
+			RunConsoleCommand("wire_expression2_editor_font", value)
+		end
+	end
+	for k, v in pairs(self.Fonts) do
+		FontSelect:AddChoice(k .. (v ~= "" and " (" .. v .. ")" or ""))
+	end
+	FontSelect:AddChoice("Custom...")
+	FontSelect:SetSize(240 - 50 - 4, 20)
+
+	local FontSizeSelect = vgui.Create("DComboBox", temp)
+	FontSizeSelect.OnSelect = function(panel, index, value)
+		value = value:gsub(" %b()", "")
+		self:ChangeFont(self.FontConVar:GetString(), tonumber(value))
+		RunConsoleCommand("wire_expression2_editor_font_size", value)
+	end
+	for i = 11, 26 do
+		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
+	end
+	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
+	FontSizeSelect:SetSize(50, 20)	
+	
 end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
@@ -189,9 +327,6 @@ function PANEL:Init()
 
 	self.e2fs_functions = {}
 
-	self.Colors = {
-		dblclickhighlight = Color(0, 100, 0),
-	}
 	self:SetMode("starfall")
 	
 	self.CurrentFont,self.FontWidth,self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
@@ -2937,21 +3072,7 @@ function PANEL:NextPattern(pattern)
 end
 
 function PANEL:GetSyntaxColor(name)
-	return self.Colors[name] or self:DoAction("GetSyntaxColor", name)
-end
-
-function PANEL:SetSyntaxColors(colors)
-	for name, color in pairs(colors) do
-		self:SetSyntaxColor(name, color)
-	end
-end
-
-function PANEL:SetSyntaxColor(name, color)
-	if self.Colors[name] then
-		self.Colors[name] = color
-	else
-		return self:DoAction("SetSyntaxColor", name, color)
-	end
+	return self:DoAction("GetSyntaxColor", name)
 end
 
 function PANEL:SyntaxColorLine(row)
