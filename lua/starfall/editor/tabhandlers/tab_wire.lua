@@ -54,7 +54,7 @@ TabHandler.Fonts["Consolas"] = ""
 TabHandler.Fonts["Fixedsys"] = ""
 TabHandler.Fonts["Lucida Console"] = ""
 TabHandler.Fonts["Monaco"] = "Mac standard font"
-
+TabHandler.Tabs = {}
 local defaultFont
 
 if system.IsWindows() then
@@ -68,6 +68,50 @@ end
 TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_font", defaultFont, true, false)
 TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
+---------------------
+-- Colors
+---------------------
+local colors = {
+	["keyword"] = Color(142,192,124),
+	["directive"] = Color(142, 192, 124),
+	["comment"] = Color(146, 131, 116),
+	["string"] = Color(184, 187, 38),
+	["number"] = Color(211, 134, 155),
+	["function"] = Color(184, 187, 38),
+	["library"] = Color(184, 187, 38),
+	["operator"] = Color(211, 134, 155),
+	["notfound"] = Color(251, 241, 199),
+	["userfunction"] = Color(251, 241, 199),
+	["constant"] = Color(211, 134, 155),
+}
+local color_convar_prefix = "sf_editor_wire_color_"
+local colorConvars = {}
+
+for k, v in pairs(colors) do
+	colorConvars[k] = CreateClientConVar( color_convar_prefix .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
+end
+
+function TabHandler:LoadSyntaxColors()
+	print("Syntax colors loaded")
+	for k, v in pairs(colorConvars) do
+		local r, g, b = v:GetString():match("(%d+)_(%d+)_(%d+)")
+		colors[k] = Color(tonumber(r), tonumber(g), tonumber(b))
+	end
+
+	for k,v in pairs(TabHandler.Tabs) do
+		v:SetSyntaxColors(colors)
+	end
+end
+
+function TabHandler:SetSyntaxColor(colorname, colr)
+	if not colors[colorname] then return end
+	colors[colorname] = colr
+	RunConsoleCommand(color_convar_prefix .. colorname, colr.r .. "_" .. colr.g .. "_" .. colr.b)
+
+	for k,v in pairs(TabHandler.Tabs) do
+		v:SetSyntaxColor(colors)
+	end
+end
 ---------------------
 
 local function createWireLibraryMap () -- Hashtable
@@ -100,6 +144,7 @@ function TabHandler:init()
 	TabHandler.LibMap = createWireLibraryMap ()
 
 	TabHandler.Modes.starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+	self:LoadSyntaxColors()
 end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
@@ -150,6 +195,11 @@ function PANEL:Init()
 	self:SetMode("starfall")
 	
 	self.CurrentFont,self.FontWidth,self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
+	table.insert(TabHandler.Tabs, self)
+end
+
+function PANEL:OnRemove()
+	table.RemoveByValue(TabHandler.Tabs, self) 	
 end
 
 function PANEL:SetMode(mode_name)
