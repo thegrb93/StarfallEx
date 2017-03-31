@@ -218,6 +218,11 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 			if input.IsKeyDown(KEY_LCONTROL) then
 				self:OnShortcut(key)
 			end
+			
+			if key == 57 and tobool( GetConVarNumber( "sf_editor_ace_fixconsolebug" ) ) then --Additional fix for some layouts
+				gui.ActivateGameUI()
+			end
+			
 			if GetConVarNumber( "sf_editor_ace_fixkeys" ) == 0 then return end
 			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and
 			( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and
