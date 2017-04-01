@@ -43,7 +43,7 @@
 <table class="hook_list">
 <?lua for _, hookname in ipairs(doc.hooks) do?>
 	<tr>
-		<td class="name"><a href="<?lua=docletsfhtml.hook_link(hookname, doc)?>"><?lua=hookname?></a></td>
+		<td class="name"><span class="realm_<?lua=doc.hooks[hookname].realm?>">&nbsp;</span><a href="<?lua=docletsfhtml.hook_link(hookname, doc)?>"><?lua=hookname?></a></td>
 		<td class="summary"><?lua=doc.hooks[hookname].summary?></td>
 	</tr>
 <?lua end?>
