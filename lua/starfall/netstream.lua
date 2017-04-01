@@ -79,7 +79,7 @@ function net.WriteStream( data )
 		error( "bad argument #1 to 'WriteStream' (string expected, got " .. type( data ) .. ")", 2 )
 	end
 		
-	local compressed = util.Compress( data )
+	local compressed = util.Compress( data ) or ""
 	local identifier = 1
 	
 	while net.Stream.Data[ identifier ] do
