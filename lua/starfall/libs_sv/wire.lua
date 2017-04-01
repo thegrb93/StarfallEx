@@ -136,7 +136,6 @@ local function identity(data) return data end
 local inputConverters =
 {
 	NORMAL = identity,
-	NUMBER = identity,
 	STRING = identity,
 	VECTOR = vwrap,
 	ANGLE = vwrap,
@@ -165,10 +164,6 @@ local inputConverters =
 local outputConverters =
 {
 	NORMAL = function(data)
-		SF.CheckType(data,"number",1)
-		return data
-	end,
-	NUMBER = function(data)
 		SF.CheckType(data,"number",1)
 		return data
 	end,
@@ -234,10 +229,21 @@ end
 
 -- ------------------------- Basic Wire Functions ------------------------- --
 
+local sfTypeToWireTypeTable = {
+	N = "NORMAL",
+	S = "STRING",
+	V = "VECTOR",
+	A = "ANGLE",
+	XWL = "WIRELINK",
+	E = "ENTITY",
+	T = "TABLE",
+	NUMBER = "NORMAL"
+}
+
 --- Creates/Modifies wire inputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters.
 -- @param names An array of input names. May be modified by the function.
--- @param types An array of input types. May be modified by the function.
+-- @param types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs ( names, types )
 	SF.Permissions.check( SF.instance.player, nil, "wire.setInputs" )
 	SF.CheckType(names,"table")
@@ -252,6 +258,7 @@ function wire_library.adjustInputs ( names, types )
 		if type(newname) != "string" then SF.throw( "Non-string input name: " .. newname, 2 ) end
 		if type(newtype) != "string" then SF.throw( "Non-string input type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
+		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match( "^[%u][%a%d]*$" ) then SF.throw( "Invalid input name: " .. newname, 2 ) end
 		if not inputConverters[ newtype ] then SF.throw( "Invalid/unsupported input type: " .. newtype, 2 ) end
 		names[i] = newname
@@ -264,7 +271,7 @@ end
 --- Creates/Modifies wire outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters.
 -- @param names An array of output names. May be modified by the function.
--- @param types An array of output types. May be modified by the function.
+-- @param types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs ( names, types )
 	SF.Permissions.check( SF.instance.player, nil, "wire.setOutputs" )
 	SF.CheckType(names,"table")
@@ -279,6 +286,7 @@ function wire_library.adjustOutputs ( names, types )
 		if type(newname) != "string" then SF.throw( "Non-string output name: " .. newname, 2 ) end
 		if type(newtype) != "string" then SF.throw( "Non-string output type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
+		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d]*$") then SF.throw( "Invalid output name: " .. newname, 2 ) end
 		if not outputConverters[newtype] then SF.throw( "Invalid/unsupported output type: " .. newtype, 2 ) end
 		names[i] = newname
