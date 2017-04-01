@@ -13,7 +13,6 @@ local PANEL = {} -- It's our VGUI
 -- Handler part
 ----------------
 TabHandler.SessionTabs = {}
-
 local currentSession
 
 local runJS = function ( ... )
@@ -194,7 +193,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	end
 
 	html:AddFunction( "console", "copyCode", function( code )
-			self.code = code
+			currentSession.code = code
 		end)
 	html:AddFunction( "console", "copyClipboard", function( code )
 			timer.Simple(0, function() SetClipboardText( code ) end)

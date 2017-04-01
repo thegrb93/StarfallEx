@@ -157,9 +157,9 @@ if CLIENT then
 		SF.Editor.editor:Open(fl, nil, false)
 	end
 	
-	function SF.Editor.openWithCode(code)
+	function SF.Editor.openWithCode(name,code)
 		if not SF.Editor.initialized then SF.Editor.init() end
-		SF.Editor.editor:Open(nil, code, false)
+		SF.Editor.editor:Open(name, code, false)
 
 	end
 
