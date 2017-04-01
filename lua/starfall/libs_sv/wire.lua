@@ -136,7 +136,6 @@ local function identity(data) return data end
 local inputConverters =
 {
 	NORMAL = identity,
-	NUMBER = identity,
 	STRING = identity,
 	VECTOR = vwrap,
 	ANGLE = vwrap,
@@ -165,10 +164,6 @@ local inputConverters =
 local outputConverters =
 {
 	NORMAL = function(data)
-		SF.CheckType(data,"number",1)
-		return data
-	end,
-	NUMBER = function(data)
 		SF.CheckType(data,"number",1)
 		return data
 	end,
@@ -263,7 +258,7 @@ function wire_library.adjustInputs ( names, types )
 		if type(newname) != "string" then SF.throw( "Non-string input name: " .. newname, 2 ) end
 		if type(newtype) != "string" then SF.throw( "Non-string input type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
-		newtype = sfTypeToWireTypeTable[upper] and sfTypeToWireTypeTable[upper] or upper
+		newtype = sfTypeToWireTypeTable[newtype] and sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match( "^[%u][%a%d]*$" ) then SF.throw( "Invalid input name: " .. newname, 2 ) end
 		if not inputConverters[ newtype ] then SF.throw( "Invalid/unsupported input type: " .. newtype, 2 ) end
 		names[i] = newname
@@ -291,7 +286,7 @@ function wire_library.adjustOutputs ( names, types )
 		if type(newname) != "string" then SF.throw( "Non-string output name: " .. newname, 2 ) end
 		if type(newtype) != "string" then SF.throw( "Non-string output type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
-		newtype = sfTypeToWireTypeTable[upper] and sfTypeToWireTypeTable[upper] or upper
+		newtype = sfTypeToWireTypeTable[newtype] and sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d]*$") then SF.throw( "Invalid output name: " .. newname, 2 ) end
 		if not outputConverters[newtype] then SF.throw( "Invalid/unsupported output type: " .. newtype, 2 ) end
 		names[i] = newname
