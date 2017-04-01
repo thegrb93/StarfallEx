@@ -125,6 +125,18 @@ function bass_methods:stop ( )
 	end
 end
 
+--- Pauses the sound.
+function bass_methods:pause ( )
+	SF.CheckType( self, bass_metamethods )
+	local uw =  unwrap( self )
+		
+	SF.Permissions.check( SF.instance.player, uw, "sound.modify" )
+	
+	if IsValid(uw) then
+		uw:Pause()
+	end
+end
+
 --- Sets the volume of the sound.
 -- @param vol Volume to set to, between 0 and 1.
 function bass_methods:setVolume ( vol )
@@ -273,5 +285,3 @@ function bass_methods:isValid()
 	
 	return IsValid(uw)
 end
-
-
