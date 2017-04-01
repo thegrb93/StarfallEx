@@ -41,7 +41,8 @@ local draw_RoundedBox = draw.RoundedBox
 
 local TabHandler = {
 	Modes = {},
-	ControlName = "TabHandler_wire"
+	ControlName = "TabHandler_wire",
+	IsEditor = true,
 }
 TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
 ---------------------
@@ -156,6 +157,9 @@ function TabHandler:init()
 
 	TabHandler.Modes.starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	self:LoadSyntaxColors()
+end
+
+function TabHandler:registerSettings()
 	
 	-- ------------------------------------------- Wire TAB
 	local sheet = SF.Editor.editor:AddControlPanelTab("Wire", "icon16/wrench.png", "Options for wire tabs.")

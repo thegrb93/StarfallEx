@@ -122,7 +122,8 @@ local function createLibraryMap ()
 	return libMap, table.concat( libs, "|" )
 end
 
-function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+function TabHandler:registerSettings()	
+
 	--Adding settings
 	local sheet = SF.Editor.editor:AddControlPanelTab("Ace", "icon16/cog.png", "ACE options.")
 	local panel = sheet.Panel
@@ -175,9 +176,13 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	setDoClick( form:CheckBox( "Live Auto completion", "sf_editor_ace_liveautocompletion" ) )
 	setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_ace_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
 	setDoClick( form:CheckBox( "Fix console bug", "sf_editor_ace_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
-	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_ace_disablelinefolding" ) )
-	
+	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_ace_disablelinefolding" ) )	
 	--
+	
+end
+
+function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+
 	local html = vgui.Create( "DHTML" )
 	html:Dock( FILL )
 	html:DockMargin( 5, 59, 5, 5 )
@@ -338,13 +343,23 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 			if not html:IsLoading() then
 				if not readyTime then readyTime = CurTime()+0.1 end
 				if CurTime() > readyTime then
-					hook.Remove("Think","SF_LoadingAce")
+					hook.Remove("Think", "SF_LoadingAce")
 					FinishedLoadingEditor()
 				end
 			end
 		end)
 	TabHandler.html = html
 	TabHandler.html:SetVisible(false)
+end
+
+function TabHandler:cleanup() -- It's caled when editor is marked for disposal
+	print("Cleanup called!")
+	TabHandler.html:Remove()
+	TabHandler.html = nil -- Getting rid of old dhtml
+	TabHandler.SessionTabs = {} -- Clearing tabs
+	TabHandler.Loaded = false -- Well, it wont be loaded anymore
+	currentSession = nil
+	hook.Remove("Think", "SF_LoadingAce") -- Just in case it didnt even fully load yet
 end
 -------------
 -- VGUI part

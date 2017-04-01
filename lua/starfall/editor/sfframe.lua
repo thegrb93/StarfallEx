@@ -859,7 +859,6 @@ function Editor:InitComponents()
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
 
-	self:InitControlPanel(self.C.Control) -- making it seperate for better overview
 	self.C.Control:SetVisible(false)
 
 end
@@ -896,8 +895,8 @@ function Editor:AddControlPanelTab(label, icon, tooltip)
 	return ret
 end
 
-function Editor:InitControlPanel(frame)
-	local C = self.C.Control
+function Editor:InitControlPanel()
+	local frame = self.C.Control
 	-- Add a property sheet to hold the tabs
 	local tabholder = vgui.Create("DPropertySheet", frame)
 	tabholder:SetPos(2, 4)
@@ -960,12 +959,36 @@ function Editor:InitControlPanel(frame)
 	-- ------------------------------------------- EDITOR TAB
 	local sheet = self:AddControlPanelTab("Editor", "icon16/cog.png", "Options for the editor itself.")
 	-- WINDOW BORDER COLORS
-
+	local label
 	local dlist = vgui.Create("DPanelList", sheet.Panel)
 	dlist.Paint = function() end
 	frame:AddResizeObject(dlist, 4, 4)
 	dlist:EnableVerticalScrollbar(true)
 
+	label = vgui.Create("DLabel")
+	dlist:AddItem(label)
+	label:SetText("Current Editor:")
+	label:SizeToContents()
+	
+	local box = vgui.Create( "DComboBox" )
+	dlist:AddItem(box)
+	box:SetValue( SF.Editor.CurrentTabHandler:GetString() )
+	box.OnSelect = function ( self, index, value, data )
+		RunConsoleCommand("sf_editor_tabhandler", value)
+		RunConsoleCommand("sf_editor_reload")
+	end
+
+	label = vgui.Create("DLabel")
+	dlist:AddItem(label)
+	label:SetText("\nOther settings:")
+	label:SizeToContents()
+
+
+	for k, v in pairs( SF.Editor.TabHandlers ) do
+		if v.IsEditor then
+			box:AddChoice( k )
+		end
+	end
 
 	local NewTabOnOpen = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(NewTabOnOpen)
@@ -1163,12 +1186,6 @@ function Editor:SetV(bool)
 	self:SetVisible(bool)
 	self:SetKeyBoardInputEnabled(bool)
 	self:GetParent():SetWorldClicker(Editor.WorldClickerVar:GetBool() and bool) -- Enable this on the background so we can update E2's without closing the editor
-	if CanRunConsoleCommand() then
-		RunConsoleCommand("wire_expression2_event", bool and "editor_open" or "editor_close")
-		if not e2_function_data_received and bool then -- Request the E2 functions
-			RunConsoleCommand("wire_expression2_sendfunctions")
-		end
-	end
 end
 
 function Editor:GetChosenFile()
@@ -1360,6 +1377,9 @@ function Editor:Close()
 end
 
 function Editor:Setup(nTitle, nLocation, nEditorType)
+	
+	self:InitControlPanel() -- We're initializing it there, so tabhandlers are already registered
+	
 	self.Title = nTitle
 	self.Location = nLocation
 	self.EditorType = nEditorType
