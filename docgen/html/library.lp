@@ -53,7 +53,7 @@
 <?lua for _, func_name in ipairs(module_doc.functions) do
   local func_data = module_doc.functions[func_name]?>
 	<tr>
-	<td class="name" nowrap><?lua=func_data.deprecated and "<del>" or ""?><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_data.name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(module_doc.functions[func_name].param, ", ")?>)<?lua=func_data.deprecated and "</del>" or ""?></td>
+	<td class="name" nowrap><span class="realm_<?lua=func_data.realm?>">&nbsp;</span><?lua=func_data.deprecated and "<del>" or ""?><?lua=func_data.private and "local " or ""?><a href="#<?lua=func_data.name?>"><?lua=func_name?></a>&nbsp;(<?lua=table.concat(module_doc.functions[func_name].param, ", ")?>)<?lua=func_data.deprecated and "</del>" or ""?></td>
 	<td class="summary"><?lua=module_doc.functions[func_name].summary?></td>
 	</tr>
 <?lua end?>

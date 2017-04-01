@@ -8,7 +8,7 @@ else
 end
 ?>
 
-<dt><?lua=func.deprecated and "<del>" or ""?><?lua=func.private and "local " or ""?><a name="<?lua=func.name?>"></a><strong><?lua=func.name?></strong>&nbsp;(<?lua=table.concat(func.param, ", ")?>)<?lua=func.deprecated and "</del>" or ""?></dt>
+<dt><span class="realm_<?lua=func.realm?>">&nbsp;</span><?lua=func.deprecated and "<del>" or ""?><?lua=func.private and "local " or ""?><a name="<?lua=func.name?>"></a><strong><?lua=func.name?></strong>&nbsp;(<?lua=table.concat(func.param, ", ")?>)<?lua=func.deprecated and "</del>" or ""?></dt>
 <dd>
 <?lua=func.description or ""?>
 
