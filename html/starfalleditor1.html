@@ -124,24 +124,6 @@
 				}
 			}
 
-			//fixes console showing up when pressing ' or @ button
-			editor.commands.addCommand({
-				name: "console1",
-				bindKey: {win: "'", mac: "'"},
-				exec: function(editor){
-					console.fixConsole();
-					editor.insert("'")
-				}
-			});
-			editor.commands.addCommand({
-				name: "console2",
-				bindKey: {win: "Shift-@", mac: "Shift-@"},
-				exec: function(editor){
-					console.fixConsole();
-					editor.insert("@");
-				}
-			});
-
 			function createStarfallMode( functionsStr ) {
 				ace.define("ace/mode/starfall_highlight_rules",["require","exports","module","ace/lib/oop","ace/mode/text_highlight_rules"], function(require, exports, module) {
 					"use strict";
