@@ -594,7 +594,7 @@ else
 			if SF.Editor.initialized then
 				if IsValid(gate) and gate.files then
 					for name, code in pairs(gate.files) do
-						SF.Editor.openWithCode(code)
+						SF.Editor.openWithCode(name, code)
 					end
 				end
 				hook.Remove("Think","WaitForEditor")
