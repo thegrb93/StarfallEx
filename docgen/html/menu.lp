@@ -75,7 +75,7 @@ end?>
 	<li><strong><?lua=hookname?></strong></li>
 	<?lua else?>
 	<li>
-		<a href="<?lua=docletsfhtml.hook_link( hookname, doc, from )?>#<?lua=hookname?>"><?lua=hookname?></a>
+		<span class="realm_<?lua=doc.hooks[hookname].realm?>">&nbsp;</span><a href="<?lua=docletsfhtml.hook_link( hookname, doc, from )?>#<?lua=hookname?>"><?lua=hookname?></a>
 	</li>
 <?lua 	end
 end?>
