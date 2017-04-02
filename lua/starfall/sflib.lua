@@ -468,12 +468,12 @@ local function argsToChat( ... )
 			while j <= n and type(output[j])=="string" do
 				j = j + 1
 			end
-			if i==j then
+			if i==(j-1) then
 				processed[#processed+1] = output[i]
 			else
 				processed[#processed+1] = table.concat({unpack(output,i,j)},"\t")
 			end
-			i = j + 1
+			i = j
 		else
 			processed[#processed+1] = output[i]
 			i = i + 1
