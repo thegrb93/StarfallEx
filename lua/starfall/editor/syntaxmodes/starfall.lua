@@ -42,6 +42,7 @@ local directives = {
 	["@author"] = 0,
 	["@include"] = 0,
 	["@shared"] = 1, -- directive yellow, types orange, rest normal
+	["@model"] = 0,
 }
 
 local colors = {

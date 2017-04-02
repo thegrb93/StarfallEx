@@ -1374,6 +1374,19 @@ function Editor:Close()
 	self:SetV(false)
 
 	self:SaveEditorSettings()
+	local activeWep = LocalPlayer():GetActiveWeapon()
+	if IsValid( activeWep ) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
+		print(self:GetCode())
+		local model = nil
+		local ppdata = {}
+		SF.Preprocessor.ParseDirectives( "file", self:GetCode(), ppdata )
+		PrintTable(ppdata)
+		if ppdata.models and ppdata.models.file != "" then
+			model = ppdata.models.file 
+		end
+
+		RunConsoleCommand("starfall_processor_ScriptModel", model or "")
+	end 
 end
 
 function Editor:Setup(nTitle, nLocation, nEditorType)
