@@ -119,7 +119,8 @@ do
 	for _, provider in ipairs( P.providers ) do
 		if settings[ provider.id ] then
 			for k, v in pairs(settings[provider.id]) do
-				provider.settings[k] = v
+				-- Make sure the setting exists
+				if provider.settings[k] then provider.settings[k] = v end
 			end
 		end
 	end
