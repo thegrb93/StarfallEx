@@ -54,7 +54,6 @@ SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 
-SF.Permissions.registerPrivilege( "entities.manipulatebone", "ManipulateBone", "Allows the user to manipulate their bones.", {["Client"] = {}} )
 
 
 --- Gets the physics object of the entity
@@ -104,19 +103,6 @@ if CLIENT then
 		renderProperties[ property ]( ent )
 	end)
 
-	SF.Libraries.AddHook( "deinitialize", function ( instance )
-		if instance.data.resetbones then
-			local ply = instance.player
-			if ply:IsValid() then
-				for i=0, ply:GetBoneCount()-1 do
-					ply:ManipulateBonePosition(i, Vector())
-					ply:ManipulateBoneScale(i, Vector(1,1,1))
-					ply:ManipulateBoneAngles(i, Angle())
-				end
-			end
-		end
-	end )
-
 	--- Allows manipulation of the owner's bones' positions
 	-- @client
 	-- @param bone The bone ID
@@ -124,10 +110,9 @@ if CLIENT then
 	function ents_methods:manipulateBonePosition(bone, vec)
 		SF.CheckType(bone, "number")
 		SF.CheckType(vec, vec_meta)
-		SF.Permissions.check(SF.instance.player, nil, "entities.manipulatebone")
 		local ent = eunwrap(self)
-		if ent != SF.instance.player then SF.throw("This method only works on the owner of the starfall.", 2) end
-		SF.instance.data.resetbones = true
+		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
@@ -138,10 +123,9 @@ if CLIENT then
 	function ents_methods:manipulateBoneScale(bone, vec)
 		SF.CheckType(bone, "number")
 		SF.CheckType(vec, vec_meta)
-		SF.Permissions.check(SF.instance.player, nil, "entities.manipulatebone")
 		local ent = eunwrap(self)
-		if ent != SF.instance.player then SF.throw("This method only works on the owner of the starfall.", 2) end
-		SF.instance.data.resetbones = true
+		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
@@ -152,10 +136,9 @@ if CLIENT then
 	function ents_methods:manipulateBoneAngles(bone, ang)
 		SF.CheckType(bone, "number")
 		SF.CheckType(ang, ang_meta)
-		SF.Permissions.check(SF.instance.player, nil, "entities.manipulatebone")
 		local ent = eunwrap(self)
-		if ent != SF.instance.player then SF.throw("This method only works on the owner of the starfall.", 2) end
-		SF.instance.data.resetbones = true
+		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
