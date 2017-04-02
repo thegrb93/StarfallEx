@@ -136,10 +136,6 @@ if CLIENT then
 
 		SF.Editor.createEditor()
 		SF.Editor.modelViewer = SF.Editor.createModelViewer()
-
-		for k, v in pairs(SF.Editor.TabHandlers) do
-			if v.init then v:init() end
-		end
 		
 		SF.Editor.initialized = true
 	end
@@ -177,10 +173,20 @@ if CLIENT then
 
 	function SF.Editor.createEditor ()
 		local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
-		editor:Setup("Starfall Editor", "starfall", "Starfall")
 
 		if SF.Editor.editor then SF.Editor.editor:Remove() end
 		SF.Editor.editor = editor
+
+		for k, v in pairs(SF.Editor.TabHandlers) do
+			if v.init then v:init() end
+		end
+
+		editor:Setup("Starfall Editor", "starfall", "Starfall")
+
+		for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
+			if v.registerSettings and (not v.IsEditor or ( v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k ) ) then v:registerSettings() end
+		end
+
 	end
 
 	function SF.Editor.createpermissionsPanel ()
@@ -803,6 +809,9 @@ if CLIENT then
 		end )
 	concommand.Add( "sf_editor_reload", function()
 		if not SF.Editor.initialized then return end
+		for k, v in pairs(SF.Editor.TabHandlers) do
+			if v.cleanup then v:cleanup() end
+		end
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()
 		SF.Editor.editor = nil

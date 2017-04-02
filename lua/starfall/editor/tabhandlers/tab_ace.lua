@@ -121,8 +121,128 @@ local function createLibraryMap ()
 
 	return libMap, table.concat( libs, "|" )
 end
+local function fixConsole(key)
+	if key == 57 then -- EN-US
+		gui.ActivateGameUI()
+	end
+	--TODO: Add @ for some layouts
+end
 
-function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+local function fixKeys(key, notfirst)
+	
+	local function repeatKey ()
+		timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () TabHandler.html:OnKeyCodePressed( key, true ) end )
+	end
+		
+	if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and
+	( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and
+	not input.IsKeyDown( KEY_LALT ) then
+		if key == KEY_UP and input.IsKeyDown( key ) then
+			runJS( "editor.modifyNumber(1)" )
+			repeatKey()
+		elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+			runJS( "editor.modifyNumber(-1)" )
+			repeatKey()
+		elseif key == KEY_LEFT and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectWordLeft()" )
+			repeatKey()
+		elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectWordRight()" )
+			repeatKey()
+		end
+	elseif input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) then
+		if key == KEY_LEFT and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectLeft()" )
+			repeatKey()
+		elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectRight()" )
+			repeatKey()
+		elseif key == KEY_UP and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectUp()" )
+			repeatKey()
+		elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectDown()" )
+			repeatKey()
+		elseif key == KEY_HOME and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectLineStart()" )
+			repeatKey()
+		elseif key == KEY_END and input.IsKeyDown( key ) then
+			runJS( "editor.selection.selectLineEnd()" )
+			repeatKey()
+		end
+	elseif input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) and not input.IsKeyDown( KEY_LALT ) then
+		if key == KEY_LEFT and input.IsKeyDown( key ) then
+			runJS( "editor.navigateWordLeft()" )
+			repeatKey()
+		elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+			runJS( "editor.navigateWordRight()" )
+			repeatKey()
+		elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+			runJS( "editor.removeWordLeft()" )
+			repeatKey()
+		elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+			runJS( "editor.removeWordRight()" )
+			repeatKey()
+		elseif key == KEY_SPACE and input.IsKeyDown( key ) then
+			SF.Editor.doValidation( true )
+		elseif key == KEY_C and input.IsKeyDown( key ) then
+			runJS( "console.copyClipboard(editor.getSelectedText())" )
+		end
+	elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
+		if key == KEY_UP and input.IsKeyDown( key ) then
+			runJS( "editor.moveLinesUp()" )
+			repeatKey()
+		elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+			runJS( "editor.moveLinesDown()" )
+			repeatKey()
+		end
+	else
+		if key == KEY_LEFT and input.IsKeyDown( key ) then
+			runJS( "editor.navigateLeft(1)" )
+			repeatKey()
+		elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
+			runJS( "editor.navigateRight(1)" )
+			repeatKey()
+		elseif key == KEY_UP and input.IsKeyDown( key ) then
+			runJS( "editor.navigateUp(1)" )
+			repeatKey()
+		elseif key == KEY_DOWN and input.IsKeyDown( key ) then
+			runJS( "editor.navigateDown(1)" )
+			repeatKey()
+		elseif key == KEY_HOME and input.IsKeyDown( key ) then
+			runJS( "editor.navigateLineStart()" )
+			repeatKey()
+		elseif key == KEY_END and input.IsKeyDown( key ) then
+			runJS( "editor.navigateLineEnd()" )
+			repeatKey()
+		elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
+			runJS( "editor.navigateFileStart()" )
+			repeatKey()
+		elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
+			runJS( "editor.navigateFileEnd()" )
+			repeatKey()
+		elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
+			runJS( "editor.remove('left')" )
+			repeatKey()
+		elseif key == KEY_DELETE and input.IsKeyDown( key ) then
+			runJS( "editor.remove('right')" )
+			repeatKey()
+		elseif key == KEY_ENTER and input.IsKeyDown( key ) then
+			runJS( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
+			repeatKey()
+		elseif key == KEY_INSERT and input.IsKeyDown( key ) then
+			runJS( "editor.toggleOverwrite()" )
+			repeatKey()
+		elseif key == KEY_TAB and input.IsKeyDown( key ) then
+			runJS( "editor.indent()" )
+			repeatKey()
+		end
+	end
+
+end
+
+function TabHandler:registerSettings()	
+
 	--Adding settings
 	local sheet = SF.Editor.editor:AddControlPanelTab("Ace", "icon16/cog.png", "ACE options.")
 	local panel = sheet.Panel
@@ -175,9 +295,13 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	setDoClick( form:CheckBox( "Live Auto completion", "sf_editor_ace_liveautocompletion" ) )
 	setDoClick( form:CheckBox( "Fix keys not working on Linux", "sf_editor_ace_fixkeys" ) ):SetTooltip( "Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc..." )
 	setDoClick( form:CheckBox( "Fix console bug", "sf_editor_ace_fixconsolebug" ) ):SetTooltip( "Fix console opening when pressing ' or @ (UK Keyboad layout)" )
-	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_ace_disablelinefolding" ) )
-	
+	setDoClick( form:CheckBox( "Disable line folding keybinds", "sf_editor_ace_disablelinefolding" ) )	
 	--
+	
+end
+
+function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+
 	local html = vgui.Create( "DHTML" )
 	html:Dock( FILL )
 	html:DockMargin( 5, 59, 5, 5 )
@@ -199,135 +323,25 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 			timer.Simple(0, function() SetClipboardText( code ) end)
 		end)
 
-	html:AddFunction( "console", "doValidation", SF.Editor.doValidation) --TODO: FIX THAT LATER
-	if system.IsWindows() then
-		html:AddFunction( "console", "fixConsole",function() if tobool( GetConVarNumber( "sf_editor_ace_fixconsolebug" ) ) then gui.ActivateGameUI() end end)
-	else
-		html:AddFunction( "console", "fixConsole",function() end) --Dummy
-	end
+	html:AddFunction( "console", "doValidation", SF.Editor.doValidation)
 
 	local function FinishedLoadingEditor()
 		local libMap, libs = createLibraryMap()
 		html:QueueJavascript( "libraryMap = " .. util.TableToJSON( libMap ) )
 		html:QueueJavascript( "createStarfallMode(\"" .. libs .. "\")" )
 		function html:OnKeyCodePressed ( key, notfirst )
-			local function repeatKey ()
-				timer.Create( "repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () self:OnKeyCodePressed( key, true ) end )
-			end
+
 			if input.IsKeyDown(KEY_LCONTROL) then
 				self:OnShortcut(key)
 			end
 			
-			if key == 57 and tobool( GetConVarNumber( "sf_editor_ace_fixconsolebug" ) ) then --Additional fix for some layouts
-				gui.ActivateGameUI()
+			if tobool( GetConVarNumber( "sf_editor_ace_fixconsolebug" ) ) then --Additional fix for some layouts
+				fixConsole(key)
 			end
 			
-			if GetConVarNumber( "sf_editor_ace_fixkeys" ) == 0 then return end
-			if ( input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) ) and
-			( input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) ) and
-			not input.IsKeyDown( KEY_LALT ) then
-				if key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.modifyNumber(1)" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.modifyNumber(-1)" )
-					repeatKey()
-				elseif key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectWordLeft()" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectWordRight()" )
-					repeatKey()
-				end
-			elseif input.IsKeyDown( KEY_LSHIFT ) or input.IsKeyDown( KEY_RSHIFT ) then
-				if key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectLeft()" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectRight()" )
-					repeatKey()
-				elseif key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectUp()" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectDown()" )
-					repeatKey()
-				elseif key == KEY_HOME and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectLineStart()" )
-					repeatKey()
-				elseif key == KEY_END and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.selection.selectLineEnd()" )
-					repeatKey()
-				end
-			elseif input.IsKeyDown( KEY_LCONTROL ) or input.IsKeyDown( KEY_RCONTROL ) and not input.IsKeyDown( KEY_LALT ) then
-				if key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateWordLeft()" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateWordRight()" )
-					repeatKey()
-				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.removeWordLeft()" )
-					repeatKey()
-				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.removeWordRight()" )
-					repeatKey()
-				elseif key == KEY_SPACE and input.IsKeyDown( key ) then
-					SF.Editor.doValidation( true )
-				elseif key == KEY_C and input.IsKeyDown( key ) then
-					self:QueueJavascript( "console.copyClipboard(editor.getSelectedText())" )
-				end
-			elseif input.IsKeyDown( KEY_LALT ) or input.IsKeyDown( KEY_RALT ) then
-				if key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.moveLinesUp()" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.moveLinesDown()" )
-					repeatKey()
-				end
-			else
-				if key == KEY_LEFT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateLeft(1)" )
-					repeatKey()
-				elseif key == KEY_RIGHT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateRight(1)" )
-					repeatKey()
-				elseif key == KEY_UP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateUp(1)" )
-					repeatKey()
-				elseif key == KEY_DOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateDown(1)" )
-					repeatKey()
-				elseif key == KEY_HOME and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateLineStart()" )
-					repeatKey()
-				elseif key == KEY_END and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateLineEnd()" )
-					repeatKey()
-				elseif key == KEY_PAGEUP and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateFileStart()" )
-					repeatKey()
-				elseif key == KEY_PAGEDOWN and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.navigateFileEnd()" )
-					repeatKey()
-				elseif key == KEY_BACKSPACE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.remove('left')" )
-					repeatKey()
-				elseif key == KEY_DELETE and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.remove('right')" )
-					repeatKey()
-				elseif key == KEY_ENTER and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.splitLine(); editor.navigateDown(1); editor.navigateLineStart()" )
-					repeatKey()
-				elseif key == KEY_INSERT and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.toggleOverwrite()" )
-					repeatKey()
-				elseif key == KEY_TAB and input.IsKeyDown( key ) then
-					self:QueueJavascript( "editor.indent()" )
-					repeatKey()
-				end
+			if tobool(GetConVarNumber( "sf_editor_ace_fixkeys" )) then 
+				fixKeys( key, notfirst )
 			end
-
 		end
 		TabHandler.Loaded = true
 		loadSessions()
@@ -338,13 +352,23 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 			if not html:IsLoading() then
 				if not readyTime then readyTime = CurTime()+0.1 end
 				if CurTime() > readyTime then
-					hook.Remove("Think","SF_LoadingAce")
+					hook.Remove("Think", "SF_LoadingAce")
 					FinishedLoadingEditor()
 				end
 			end
 		end)
 	TabHandler.html = html
 	TabHandler.html:SetVisible(false)
+end
+
+function TabHandler:cleanup() -- It's caled when editor is marked for disposal
+	print("Cleanup called!")
+	TabHandler.html:Remove()
+	TabHandler.html = nil -- Getting rid of old dhtml
+	TabHandler.SessionTabs = {} -- Clearing tabs
+	TabHandler.Loaded = false -- Well, it wont be loaded anymore
+	currentSession = nil
+	hook.Remove("Think", "SF_LoadingAce") -- Just in case it didnt even fully load yet
 end
 -------------
 -- VGUI part
