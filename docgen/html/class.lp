@@ -53,7 +53,7 @@
 <?lua for _, method_name in ipairs( class_doc.methods ) do
   local method_data = class_doc.methods[ method_name ]?>
 	<tr>
-		<td class="name" nowrap><?lua=method_data.deprecated and "<del>" or ""?><?lua=method_data.private and "local " or ""?><a href="#<?lua=method_data.name?>"><?lua=method_name?></a>&nbsp;(<?lua=table.concat( class_doc.methods[ method_name ].param, ", " )?>)<?lua=method_data.deprecated and "</del>" or ""?></td>
+		<td class="name" nowrap><span class="realm_<?lua=method_data.realm?>">&nbsp;</span><?lua=method_data.deprecated and "<del>" or ""?><?lua=method_data.private and "local " or ""?><a href="#<?lua=method_data.name?>"><?lua=method_name?></a>&nbsp;(<?lua=table.concat( class_doc.methods[ method_name ].param, ", " )?>)<?lua=method_data.deprecated and "</del>" or ""?></td>
 		<td class="summary"><?lua=class_doc.methods[ method_name ].summary?></td>
 	</tr>
 <?lua end?>

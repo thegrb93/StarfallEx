@@ -397,6 +397,8 @@ function parse_file (filepath, doc)
 		--functions = class_iterator(blocks, "function"),
 		--tables = class_iterator(blocks, "table"),
 	}
+
+	local realm = filepath:sub(6, 7)
 	
 	local first = doc.files[filepath].doc[1]
 	if first then
@@ -412,6 +414,7 @@ function parse_file (filepath, doc)
 	for f in class_iterator(blocks, "function")() do
 		table.insert(doc.files[filepath].functions, f.name)
 		doc.files[filepath].functions[f.name] = f
+		f.realm = realm
 	end
 	
 	-- make tables table
@@ -433,6 +436,7 @@ function parse_file (filepath, doc)
 	for t in class_iterator(blocks, "hook")() do
 		table.insert(doc.hooks, t.name)
 		doc.hooks[t.name] = t
+		t.realm = realm
 	end
 
 	for t in class_iterator( blocks, "directive" )() do

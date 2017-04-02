@@ -34,7 +34,7 @@
 <?lua for _, hook_name in ipairs(hook_doc.hooks) do
 	local hook_data = hook_doc.hooks[hook_name]?>
 	<tr>
-	<td class="name" nowrap><a href="#<?lua=hook_data.name?>"><?lua=hook_name?></a>&nbsp;(<?lua=table.concat(hook_data.param, ", ")?>)</td>
+	<td class="name" nowrap><span class="realm_<?lua=hook_data.realm?>">&nbsp;</span><a href="#<?lua=hook_data.name?>"><?lua=hook_name?></a>&nbsp;(<?lua=table.concat(hook_data.param, ", ")?>)</td>
 	<td class="summary"><?lua=hook_data.summary?></td>
 	</tr>
 <?lua end?>
@@ -46,7 +46,7 @@
 <dl class="hook">
 <?lua for _, hook_name in ipairs(hook_doc.hooks) do?>
 	<?lua local hook = hook_doc.hooks[hook_name] ?>
-	<dt><a name="<?lua=hook.name?>"></a><strong><?lua=hook.name?></strong>&nbsp;(<?lua=table.concat(hook.param, ", ")?>)</dt>
+	<dt><a name="<?lua=hook.name?>"></a><span class="realm_<?lua=hook.realm?>">&nbsp;</span><strong><?lua=hook.name?></strong>&nbsp;(<?lua=table.concat(hook.param, ", ")?>)</dt>
 	<dd>
 	<?lua=hook.description or ""?>
 
