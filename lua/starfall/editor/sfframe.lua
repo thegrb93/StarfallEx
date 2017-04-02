@@ -1092,30 +1092,20 @@ function Editor:InitShutdownHook()
 end
 
 function Editor:SaveTabs()
-	local strtabs = ""
 	local tabs = {}
 	for i=1, self:GetNumTabs() do
-		local chosenfile = self:GetEditor(i).chosenfile
-		if chosenfile and chosenfile ~= "" and not tabs[chosenfile] then
-			strtabs = strtabs .. chosenfile .. ";"
-			tabs[chosenfile] = true -- Prevent duplicates
-		end
+		table.insert(tabs,{
+			filename = self:GetEditor(i).chosenfile,
+			code = self:GetEditor(i):getCode(),
+		})
 	end
-
-	strtabs = strtabs:sub(1, -2)
-
-	file.Write(self.Location .. "/_tabs_.txt", strtabs)
+	file.Write("sf_tabs.txt", util.TableToJSON(tabs))
 end
 
 function Editor:OpenOldTabs()
-	if not file.Exists(self.Location .. "/_tabs_.txt", "DATA") then return end
+	if not file.Exists("sf_tabs.txt", "DATA") then return end
 
-	-- Read file
-	local tabs = file.Read(self.Location .. "/_tabs_.txt")
-	if not tabs or tabs == "" then return end
-
-	-- Explode around ;
-	tabs = string.Explode(";", tabs)
+	local tabs = util.JSONToTable(file.Read("sf_tabs.txt") or "")
 	if not tabs or #tabs == 0 then return end
 
 	-- Temporarily remove fade time
@@ -1123,20 +1113,18 @@ function Editor:OpenOldTabs()
 
 	local is_first = true
 	for k, v in pairs(tabs) do
-		if v and v ~= "" then
-			if (file.Exists(v, "DATA")) then
-				-- Open it in a new tab
-				self:LoadFile(v, true)
-
-				-- If this is the first loop, close the initial tab.
-				if (is_first) then
-					timer.Simple(0, function()
-							self:CloseTab(1)
-						end)
-					is_first = false
-				end
-			end
+		if is_first then -- Remove initial tab
+			timer.Simple(0,function() self:CloseTab(1) end)
+			is_first = false
 		end
+		if not istable(v) then return end
+		self:NewTab()
+		self:ChosenFile(v.filename)
+		local title,tabtext = getPreferredTitles(v.filename or "Generic", v.code)
+		self:GetActiveTab():SetText(tabtext)
+		self.C.TabHolder:InvalidateLayout()
+		
+		self:SetCode(v.code)
 	end
 end
 
@@ -1211,14 +1199,11 @@ function Editor:FindOpenFile(FilePath)
 end
 
 function Editor:ExtractName()
-	if not self.E2 then self.savefilefn = "filename" return end
 	local code = self:GetCode()
 	local name = extractNameFromCode(code)
 	if name and name ~= "" then
-		Expression2SetName(name)
 		self.savefilefn = name
 	else
-		Expression2SetName(nil)
 		self.savefilefn = "filename"
 	end
 end
@@ -1369,6 +1354,7 @@ end
 function Editor:Close()
 	timer.Stop("sfautosave")
 	self:AutoSave()
+	self:SaveTabs()
 
 	self:ExtractName()
 	self:SetV(false)
@@ -1376,11 +1362,9 @@ function Editor:Close()
 	self:SaveEditorSettings()
 	local activeWep = LocalPlayer():GetActiveWeapon()
 	if IsValid( activeWep ) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
-		print(self:GetCode())
 		local model = nil
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( "file", self:GetCode(), ppdata )
-		PrintTable(ppdata)
 		if ppdata.models and ppdata.models.file != "" then
 			model = ppdata.models.file 
 		end
