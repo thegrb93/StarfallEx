@@ -69,27 +69,27 @@ return function(t, name, indent)
       cart = cart .. indent .. field
 
       if type(value) ~= "table" then
-         cart = cart .. " = " .. basicSerialize(value) .. ";\n"
+         cart = cart .. " = " .. basicSerialize(value) .. ";"
       else
          if saved[value] then
-            cart = cart .. " = {}; -- " .. saved[value] 
-                        .. " (self reference)\n"
-            autoref = autoref ..  name .. " = " .. saved[value] .. ";\n"
+            cart = cart .. "={};--[[" .. saved[value] 
+                        .. "(self reference)]]"
+            autoref = autoref ..  name .. " = " .. saved[value] .. ";"
          else
             saved[value] = name
             --if tablecount(value) == 0 then
             if isemptytable(value) then
-               cart = cart .. " = {};\n"
+               cart = cart .. " = {};"
             else
-               cart = cart .. " = {\n"
+               cart = cart .. " = {"
                for k, v in pairs(value) do
                   k = basicSerialize(k)
                   local fname = string.format("%s[%s]", name, k)
                   field = string.format("[%s]", k)
                   -- three spaces between levels
-                  addtocart(v, fname, indent .. "   ", saved, field)
+                  addtocart(v, fname, indent, saved, field)
                end
-               cart = cart .. indent .. "};\n"
+               cart = cart .. indent .. "};"
             end
          end
       end
