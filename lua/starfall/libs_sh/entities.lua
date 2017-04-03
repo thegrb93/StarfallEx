@@ -409,8 +409,18 @@ end
 
 --- Returns the angular velocity of the entity
 -- @shared
--- @return The angular velocity
+-- @return The angular velocity as a vector
 function ents_methods:getAngleVelocity ()
+	SF.CheckType( self, ents_metamethods )
+	local phys = getPhysObject( eunwrap( self ) )
+	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	return vwrap( phys:GetAngleVelocity() )
+end
+
+--- Returns the angular velocity of the entity
+-- @shared
+-- @return The angular velocity as an angle
+function ents_methods:getAngleVelocityAngle ()
 	SF.CheckType( self, ents_metamethods )
 	local phys = getPhysObject( eunwrap( self ) )
 	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
