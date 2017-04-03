@@ -363,7 +363,6 @@ function EDITOR:SyntaxColorLine(row)
 			end
 
 			if tokenname == "" then -- If no ending " was found...
-				--self.multilinestring = true
 				tokenname = "string"
 			else
 				self:NextCharacter()
@@ -376,6 +375,11 @@ function EDITOR:SyntaxColorLine(row)
 					break
 				end
 				if self.character == "\\" then self:NextCharacter() end
+				self:NextCharacter()
+			end
+			if tokenname == "" then -- If no ending " was found...
+				tokenname = "string"
+			else
 				self:NextCharacter()
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
