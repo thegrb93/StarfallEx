@@ -73,17 +73,17 @@ TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_co
 -- Colors
 ---------------------
 local colors = {
-	["keyword"] = Color(142,192,124),
-	["directive"] = Color(142, 192, 124),
-	["comment"] = Color(146, 131, 116),
-	["string"] = Color(184, 187, 38),
-	["number"] = Color(211, 134, 155),
-	["function"] = Color(184, 187, 38),
-	["library"] = Color(184, 187, 38),
-	["operator"] = Color(211, 134, 155),
-	["notfound"] = Color(251, 241, 199),
-	["userfunction"] = Color(251, 241, 199),
-	["constant"] = Color(211, 134, 155),
+	["keyword"] = Color(249, 38, 114), 
+	["directive"] = Color(230, 219, 116),
+	["comment"] = Color(117, 113, 94),
+	["string"] = Color(230, 219, 116),
+	["number"] = Color(174, 129 ,255), 
+	["function"] = Color(137, 189, 255),
+	["library"] = Color(137, 189, 255), 
+	["operator"] = Color(230, 230, 230),
+	["notfound"] = Color(230, 230, 230),
+	["userfunction"] = Color(166, 226, 42),
+	["constant"] = Color(174, 129 ,255),
 }
 local defcolors = table.Copy(colors)
 local color_convar_prefix = "sf_editor_wire_color_"
@@ -260,13 +260,13 @@ function TabHandler:registerSettings()
 	FontSelect.OnSelect = function(panel, index, value)
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
-				self:ChangeFont(value, self.FontSizeConVar:GetInt())
-				RunConsoleCommand("wire_expression2_editor_font", value)
+				RunConsoleCommand("sf_editor_wire_font", value)
+				RunConsoleCommand("sf_editor_reload")
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
-			self:ChangeFont(value, self.FontSizeConVar:GetInt())
-			RunConsoleCommand("wire_expression2_editor_font", value)
+			RunConsoleCommand("sf_editor_wire_font", value)
+			RunConsoleCommand("sf_editor_reload")
 		end
 	end
 	for k, v in pairs(self.Fonts) do

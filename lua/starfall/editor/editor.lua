@@ -11,6 +11,7 @@ SF.Editor = {}
 AddCSLuaFile( "syntaxmodes/starfall.lua" )
 AddCSLuaFile( "sfframe.lua" )
 AddCSLuaFile( "sfderma.lua" )
+AddCSLuaFile( "docs.lua" )
 AddCSLuaFile( "sfhelper.lua" )
 
 AddCSLuaFile( "tabhandlers/tab_wire.lua" )
@@ -38,6 +39,7 @@ end
 ------------------
 
 if CLIENT then
+	include( "docs.lua" )
 	include( "sfhelper.lua" )
 	include( "sfderma.lua" )
 	include( "sfframe.lua" ) -- Editor's frame
