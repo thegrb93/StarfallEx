@@ -161,6 +161,7 @@ if CLIENT then
 
 	function SF.Editor.close ()
 		SF.Editor.editor:Close()
+		RunConsoleCommand( "starfall_event", "editor_close" )
 	end
 
 	function SF.Editor.getCode ()
