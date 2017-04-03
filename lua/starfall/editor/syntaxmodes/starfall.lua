@@ -64,7 +64,10 @@ local colors = {
 }
 
 function EDITOR:GetSyntaxColor(name)
-	return colors[name][1]
+	if colors[name] then
+		return colors[name][1]
+	end
+	return colors["notfound"][1]
 end
 
 function EDITOR:SetSyntaxColor( colorname, colr )
