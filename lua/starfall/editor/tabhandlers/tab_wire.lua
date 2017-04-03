@@ -58,7 +58,7 @@ TabHandler.Fonts["Monaco"] = "Mac standard font"
 TabHandler.Tabs = {}
 local defaultFont = "DejaVu Sans Mono" -- We ship that with starfall, linux has it by default
 
-TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_font", defaultFont, true, false)
+TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_fontname", defaultFont, true, false)
 TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
 ---------------------
@@ -252,12 +252,12 @@ function TabHandler:registerSettings()
 	FontSelect.OnSelect = function(panel, index, value)
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
-				RunConsoleCommand("sf_editor_wire_font", value)
+				RunConsoleCommand("sf_editor_wire_fontname", value)
 				RunConsoleCommand("sf_editor_reload")
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
-			RunConsoleCommand("sf_editor_wire_font", value)
+			RunConsoleCommand("sf_editor_wire_fontname", value)
 			RunConsoleCommand("sf_editor_reload")
 		end
 	end
