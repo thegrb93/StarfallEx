@@ -49,22 +49,14 @@ TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { se
 -- Fonts
 ---------------------
 TabHandler.Fonts = {} --Font descriptions for settings
-TabHandler.Fonts["Courier New"] = "Windows standard font"
+TabHandler.Fonts["Courier New"] = "Font used in expression2 editor"
 TabHandler.Fonts["DejaVu Sans Mono"] = "Default font on Linux"
 TabHandler.Fonts["Consolas"] = ""
 TabHandler.Fonts["Fixedsys"] = ""
 TabHandler.Fonts["Lucida Console"] = ""
 TabHandler.Fonts["Monaco"] = "Mac standard font"
 TabHandler.Tabs = {}
-local defaultFont
-
-if system.IsWindows() then
-	defaultFont = "Courier New"
-elseif system.IsOSX() then
-	defaultFont = "Monaco"
-else
-	defaultFont = "DejaVu Sans Mono"
-end
+local defaultFont = "DejaVu Sans Mono" -- We ship that with starfall, linux has it by default
 
 TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_font", defaultFont, true, false)
 TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
