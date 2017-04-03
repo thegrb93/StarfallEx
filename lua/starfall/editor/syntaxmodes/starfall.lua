@@ -17,12 +17,15 @@ local keywords = {
 	["for"] = { [true] = true, [false] = true },
 	["function"] = { [true] = true, [false] = true },
 
+	["repeat"] = { [true] = true, [false] = true },
+	["until"] = { [true] = true, [false] = true },
+	["and"] = { [true] = true, [false] = true },
 	["or"] = { [true] = true, [false] = true },
 	["not"] = { [true] = true, [false] = true },
-	["true"] = { [true] = true, [false] = true },
-	["false"] = { [true] = true, [false] = true },
 
 	-- keywords that cannot be followed by a "(":
+	["true"] = { [true] = true },
+	["false"] = { [true] = true },
 	["do"] = { [true] = true, [false] = true },
 	["else"] = { [true] = true },
 	["break"] = { [true] = true },
@@ -32,6 +35,7 @@ local keywords = {
 	["in"] = { [true] = true },
 	["return"] = { [true] = true },
 	["local"] = { [true] = true },
+	["nil"] = { [true] = true },
 }
 
 -- fallback for nonexistant entries:
