@@ -49,41 +49,33 @@ TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { se
 -- Fonts
 ---------------------
 TabHandler.Fonts = {} --Font descriptions for settings
-TabHandler.Fonts["Courier New"] = "Windows standard font"
+TabHandler.Fonts["Courier New"] = "Font used in expression2 editor"
 TabHandler.Fonts["DejaVu Sans Mono"] = "Default font on Linux"
 TabHandler.Fonts["Consolas"] = ""
 TabHandler.Fonts["Fixedsys"] = ""
 TabHandler.Fonts["Lucida Console"] = ""
 TabHandler.Fonts["Monaco"] = "Mac standard font"
 TabHandler.Tabs = {}
-local defaultFont
+local defaultFont = "DejaVu Sans Mono" -- We ship that with starfall, linux has it by default
 
-if system.IsWindows() then
-	defaultFont = "Courier New"
-elseif system.IsOSX() then
-	defaultFont = "Monaco"
-else
-	defaultFont = "DejaVu Sans Mono"
-end
-
-TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_font", defaultFont, true, false)
+TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_fontname", defaultFont, true, false)
 TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
 ---------------------
 -- Colors
 ---------------------
 local colors = {
-	["keyword"] = Color(142,192,124),
-	["directive"] = Color(142, 192, 124),
-	["comment"] = Color(146, 131, 116),
-	["string"] = Color(184, 187, 38),
-	["number"] = Color(211, 134, 155),
-	["function"] = Color(184, 187, 38),
-	["library"] = Color(184, 187, 38),
-	["operator"] = Color(211, 134, 155),
-	["notfound"] = Color(251, 241, 199),
-	["userfunction"] = Color(251, 241, 199),
-	["constant"] = Color(211, 134, 155),
+	["keyword"] = Color(249, 38, 114), 
+	["directive"] = Color(230, 219, 116),
+	["comment"] = Color(117, 113, 94),
+	["string"] = Color(230, 219, 116),
+	["number"] = Color(174, 129 ,255), 
+	["function"] = Color(137, 189, 255),
+	["library"] = Color(137, 189, 255), 
+	["operator"] = Color(230, 230, 230),
+	["notfound"] = Color(230, 230, 230),
+	["userfunction"] = Color(166, 226, 42),
+	["constant"] = Color(174, 129 ,255),
 }
 local defcolors = table.Copy(colors)
 local color_convar_prefix = "sf_editor_wire_color_"
@@ -260,13 +252,13 @@ function TabHandler:registerSettings()
 	FontSelect.OnSelect = function(panel, index, value)
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
-				self:ChangeFont(value, self.FontSizeConVar:GetInt())
-				RunConsoleCommand("wire_expression2_editor_font", value)
+				RunConsoleCommand("sf_editor_wire_fontname", value)
+				RunConsoleCommand("sf_editor_reload")
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
-			self:ChangeFont(value, self.FontSizeConVar:GetInt())
-			RunConsoleCommand("wire_expression2_editor_font", value)
+			RunConsoleCommand("sf_editor_wire_fontname", value)
+			RunConsoleCommand("sf_editor_reload")
 		end
 	end
 	for k, v in pairs(self.Fonts) do

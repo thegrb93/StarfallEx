@@ -313,7 +313,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 		html:OpenURL( "asset://garrysmod/html/starfalleditor"..version..".html" )
 	else
 		--Files failed to send, use github
-		html:OpenURL( "http://thegrb93.github.io/StarfallEx/starfall/starfalleditor1.html" )
+		html:OpenURL( "http://thegrb93.github.io/StarfallEx/starfall/starfalleditor2.html" )
 	end
 
 	html:AddFunction( "console", "copyCode", function( code )

@@ -7,10 +7,7 @@
 --- search page
 
 SF.Helper = {}
-SF.Docs = {}
 local helper = SF.Helper
-local docs_set = false
-local docs_downloading = false
 local settings_set = false
 
 if CLIENT then
@@ -180,7 +177,7 @@ function helper.create()
 		return height
 	end )
 	
-	createList( "Examples", function( List )
+	--[[createList( "Examples", function( List )
 		local height = 16
 		for name, code in pairs(SF.Docs.examples) do
 			local Line = List:AddLine( name )
@@ -193,7 +190,7 @@ function helper.create()
 		end
 
 		return height
-	end )
+	end )]] --TODO: Decide what to do with examples as they are big
 
 	function helper.clearViews()
 		for _, View in pairs( helper.Views ) do
@@ -665,27 +662,6 @@ function helper.create()
 end
 
 function helper.show()
-	if docs_downloading then return end
-	if not docs_set then
-		docs_downloading = true
-		SF.AddNotify( LocalPlayer(), "Loading starfall helper now...", "GENERIC", 5, "DRIP3" )
-		
-		http.Fetch( "http://thegrb93.github.io/StarfallEx/doc.json", 
-		function( body, len, headers, code )
-			SF.Docs = util.JSONToTable( body )
-			docs_set = true
-			docs_downloading = false
-			helper.show()
-		end, 
-		function( error ) 
-			print("Starfall failed to load documentation, Error: ", error) 
-			SF.AddNotify( LocalPlayer(), "Failed to load the helper...", "GENERIC", 5, "DRIP3" ) 
-			docs_downloading = false
-		end )
-		
-		return
-	end
-
 	if not helper.Frame then helper.create() end
 	helper.Frame:open()
 end
