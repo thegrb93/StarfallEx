@@ -178,7 +178,7 @@
 	<h1>Types</h1>
 	<ul>
 		
-				<li><strong>Angle</strong></li>
+				<li><a href="../classes/Angle.html">Angle</a></li>
 			
 				<li><a href="../classes/Bass.html">Bass</a></li>
 			
@@ -194,7 +194,7 @@
 			
 				<li><a href="../classes/Npc.html">Npc</a></li>
 			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
+				<li><strong>PhysObj</strong></li>
 			
 				<li><a href="../classes/Player.html">Player</a></li>
 			
@@ -521,10 +521,10 @@
 
 <div id="content">
 
-<h1>Type <code>Angle</code></h1>
+<h1>Type <code>PhysObj</code></h1>
 
 <p>
-Angle Type</p>
+PhysObj Type</p>
 
 
 
@@ -536,75 +536,147 @@ Angle Type</p>
 <table class="function_list">
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:getForward">getForward</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:applyForceCenter">applyForceCenter</a>&nbsp;(force)</td>
 		<td class="summary">
-Return the Forward Vector ( direction the angle points ).</td>
+Applys a force to the center of the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:getNormalized">getNormalized</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:applyForceOffset">applyForceOffset</a>&nbsp;(force, position)</td>
 		<td class="summary">
-Returnes a normalized angle </td>
+Applys an offset force to a physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:getRight">getRight</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:applyTorque">applyTorque</a>&nbsp;(torque)</td>
 		<td class="summary">
-Return the Right Vector relative to the angle dir.</td>
+Applys a torque to a physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:getUp">getUp</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getAngleVelocity">getAngleVelocity</a>&nbsp;()</td>
 		<td class="summary">
-Return the Up Vector relative to the angle dir.</td>
+Gets the angular velocity of the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:isZero">isZero</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getAngles">getAngles</a>&nbsp;()</td>
 		<td class="summary">
-Returns if p,y,r are all 0.</td>
+Gets the angles of the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:normalize">normalize</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getEntity">getEntity</a>&nbsp;()</td>
 		<td class="summary">
-Normalise angles eg (0,181,1) -> (0,-179,1).</td>
+Gets the entity attached to the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:rotateAroundAxis">rotateAroundAxis</a>&nbsp;(v, deg, rad)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getInertia">getInertia</a>&nbsp;()</td>
 		<td class="summary">
-Return Rotated angle around the specified axis.</td>
+Gets the inertia of the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:set">set</a>&nbsp;(b)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getMass">getMass</a>&nbsp;()</td>
 		<td class="summary">
-Copies p,y,r from angle to another.</td>
+Gets the mass of the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:setP">setP</a>&nbsp;(p)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getMassCenter">getMassCenter</a>&nbsp;()</td>
 		<td class="summary">
-Set's the angle's pitch and returns it.</td>
+Gets the center of mass of the physics object in the local reference frame.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:setR">setR</a>&nbsp;(r)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getMaterial">getMaterial</a>&nbsp;()</td>
 		<td class="summary">
-Set's the angle's roll and returns it.</td>
+Gets the material of the physics object </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:setY">setY</a>&nbsp;(y)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getMesh">getMesh</a>&nbsp;()</td>
 		<td class="summary">
-Set's the angle's yaw and returns it.</td>
+Returns a table of MeshVertex structures where each 3 vertices represent a triangle.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ang_methods:setZero">setZero</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getMeshConvexes">getMeshConvexes</a>&nbsp;()</td>
 		<td class="summary">
-Sets p,y,r to 0.</td>
+Returns a structured table, the physics mesh of the physics object.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getPos">getPos</a>&nbsp;()</td>
+		<td class="summary">
+Gets the position of the physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getVelocity">getVelocity</a>&nbsp;()</td>
+		<td class="summary">
+Gets the velocity of the physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:isValid">isValid</a>&nbsp;()</td>
+		<td class="summary">
+Checks if the physics object is valid </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:localToWorld">localToWorld</a>&nbsp;(vec)</td>
+		<td class="summary">
+Returns a vector in the reference frame of the world from the local frame of the physicsobject </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:localToWorldVector">localToWorldVector</a>&nbsp;(vec)</td>
+		<td class="summary">
+Returns a normal vector in the reference frame of the world from the local frame of the physicsobject </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:setInertia">setInertia</a>&nbsp;(inertia)</td>
+		<td class="summary">
+Sets the inertia of a physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:setMass">setMass</a>&nbsp;(mass)</td>
+		<td class="summary">
+Sets the mass of a physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:setMaterial">setMaterial</a>&nbsp;(material)</td>
+		<td class="summary">
+Sets the physical material of a physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:setPos">setPos</a>&nbsp;(pos)</td>
+		<td class="summary">
+Sets the position of the physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:setVelocity">setVelocity</a>&nbsp;(vel)</td>
+		<td class="summary">
+Sets the velocity of the physics object </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:worldToLocal">worldToLocal</a>&nbsp;(vec)</td>
+		<td class="summary">
+Returns a vector in the local reference frame of the physicsobject from the world frame </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:worldToLocalVector">worldToLocalVector</a>&nbsp;(vec)</td>
+		<td class="summary">
+Returns a normal vector in the local reference frame of the physicsobject from the world frame </td>
 	</tr>
 
 </table>
@@ -621,166 +693,10 @@ Sets p,y,r to 0.</td>
 
 
 
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:getForward"></a><strong>Angle:getForward</strong>&nbsp;()</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:applyForceCenter"></a><strong>PhysObj:applyForceCenter</strong>&nbsp;(force)</dt>
 <dd>
 
-Return the Forward Vector ( direction the angle points ).
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>vector normalised.</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:getNormalized"></a><strong>Angle:getNormalized</strong>&nbsp;()</dt>
-<dd>
-
-Returnes a normalized angle
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Normalized angle table</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:getRight"></a><strong>Angle:getRight</strong>&nbsp;()</dt>
-<dd>
-
-Return the Right Vector relative to the angle dir.
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>vector normalised.</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:getUp"></a><strong>Angle:getUp</strong>&nbsp;()</dt>
-<dd>
-
-Return the Up Vector relative to the angle dir.
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>vector normalised.</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:isZero"></a><strong>Angle:isZero</strong>&nbsp;()</dt>
-<dd>
-
-Returns if p,y,r are all 0.
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>boolean</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:normalize"></a><strong>Angle:normalize</strong>&nbsp;()</dt>
-<dd>
-
-Normalise angles eg (0,181,1) -> (0,-179,1).
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>nil</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:rotateAroundAxis"></a><strong>Angle:rotateAroundAxis</strong>&nbsp;(v, deg, rad)</dt>
-<dd>
-
-Return Rotated angle around the specified axis.
+Applys a force to the center of the physics object
 
 
 
@@ -789,15 +705,419 @@ Return Rotated angle around the specified axis.
 <ul>
 	
 	<li>
-	  <code><em>v</em></code>: Vector axis
+	  <code><em>force</em></code>: The force vector to apply
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:applyForceOffset"></a><strong>PhysObj:applyForceOffset</strong>&nbsp;(force, position)</dt>
+<dd>
+
+Applys an offset force to a physics object
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>force</em></code>: The force vector to apply
 	</li>
 	
 	<li>
-	  <code><em>deg</em></code>: Number of degrees or nil if radians.
+	  <code><em>position</em></code>: The position in world coordinates
 	</li>
 	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:applyTorque"></a><strong>PhysObj:applyTorque</strong>&nbsp;(torque)</dt>
+<dd>
+
+Applys a torque to a physics object
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
 	<li>
-	  <code><em>rad</em></code>: Number of radians or nil if degrees.
+	  <code><em>torque</em></code>: The local torque vector to apply
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getAngleVelocity"></a><strong>PhysObj:getAngleVelocity</strong>&nbsp;()</dt>
+<dd>
+
+Gets the angular velocity of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Vector angular velocity of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getAngles"></a><strong>PhysObj:getAngles</strong>&nbsp;()</dt>
+<dd>
+
+Gets the angles of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Angle angles of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getEntity"></a><strong>PhysObj:getEntity</strong>&nbsp;()</dt>
+<dd>
+
+Gets the entity attached to the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The entity attached to the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getInertia"></a><strong>PhysObj:getInertia</strong>&nbsp;()</dt>
+<dd>
+
+Gets the inertia of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Vector Inertia of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getMass"></a><strong>PhysObj:getMass</strong>&nbsp;()</dt>
+<dd>
+
+Gets the mass of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>mass of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getMassCenter"></a><strong>PhysObj:getMassCenter</strong>&nbsp;()</dt>
+<dd>
+
+Gets the center of mass of the physics object in the local reference frame.
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Center of mass vector in the physobject's local reference frame.</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getMaterial"></a><strong>PhysObj:getMaterial</strong>&nbsp;()</dt>
+<dd>
+
+Gets the material of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The physics material of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getMesh"></a><strong>PhysObj:getMesh</strong>&nbsp;()</dt>
+<dd>
+
+Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>table of MeshVertex structures</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getMeshConvexes"></a><strong>PhysObj:getMeshConvexes</strong>&nbsp;()</dt>
+<dd>
+
+Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>table of MeshVertex structures</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getPos"></a><strong>PhysObj:getPos</strong>&nbsp;()</dt>
+<dd>
+
+Gets the position of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Vector position of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:getVelocity"></a><strong>PhysObj:getVelocity</strong>&nbsp;()</dt>
+<dd>
+
+Gets the velocity of the physics object
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Vector velocity of the physics object</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:isValid"></a><strong>PhysObj:isValid</strong>&nbsp;()</dt>
+<dd>
+
+Checks if the physics object is valid
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>boolean if the physics object is valid</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:localToWorld"></a><strong>PhysObj:localToWorld</strong>&nbsp;(vec)</dt>
+<dd>
+
+Returns a vector in the reference frame of the world from the local frame of the physicsobject
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>vec</em></code>: The vector to transform
 	</li>
 	
 </ul>
@@ -808,7 +1128,7 @@ Return Rotated angle around the specified axis.
 
 
 <h3>Return value:</h3>
-<ul>The modified angle</ul>
+<ul>The transformed vector</ul>
 
 
 
@@ -820,10 +1140,10 @@ Return Rotated angle around the specified axis.
 
 
 
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:set"></a><strong>Angle:set</strong>&nbsp;(b)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:localToWorldVector"></a><strong>PhysObj:localToWorldVector</strong>&nbsp;(vec)</dt>
 <dd>
 
-Copies p,y,r from angle to another.
+Returns a normal vector in the reference frame of the world from the local frame of the physicsobject
 
 
 
@@ -832,7 +1152,7 @@ Copies p,y,r from angle to another.
 <ul>
 	
 	<li>
-	  <code><em>b</em></code>: Angle to copy from.
+	  <code><em>vec</em></code>: The normal vector to transform
 	</li>
 	
 </ul>
@@ -843,7 +1163,7 @@ Copies p,y,r from angle to another.
 
 
 <h3>Return value:</h3>
-<ul>nil</ul>
+<ul>The transformed vector</ul>
 
 
 
@@ -855,10 +1175,10 @@ Copies p,y,r from angle to another.
 
 
 
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:setP"></a><strong>Angle:setP</strong>&nbsp;(p)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:setInertia"></a><strong>PhysObj:setInertia</strong>&nbsp;(inertia)</dt>
 <dd>
 
-Set's the angle's pitch and returns it.
+Sets the inertia of a physics object
 
 
 
@@ -867,7 +1187,167 @@ Set's the angle's pitch and returns it.
 <ul>
 	
 	<li>
-	  <code><em>p</em></code>: The pitch
+	  <code><em>inertia</em></code>: The inertia vector to set it to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:setMass"></a><strong>PhysObj:setMass</strong>&nbsp;(mass)</dt>
+<dd>
+
+Sets the mass of a physics object
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>mass</em></code>: The mass to set it to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:setMaterial"></a><strong>PhysObj:setMaterial</strong>&nbsp;(material)</dt>
+<dd>
+
+Sets the physical material of a physics object
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>material</em></code>: The physical material to set it to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:setPos"></a><strong>PhysObj:setPos</strong>&nbsp;(pos)</dt>
+<dd>
+
+Sets the position of the physics object
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>pos</em></code>: The position vector to set it to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:setVelocity"></a><strong>PhysObj:setVelocity</strong>&nbsp;(vel)</dt>
+<dd>
+
+Sets the velocity of the physics object
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>vel</em></code>: The velocity vector to set it to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:worldToLocal"></a><strong>PhysObj:worldToLocal</strong>&nbsp;(vec)</dt>
+<dd>
+
+Returns a vector in the local reference frame of the physicsobject from the world frame
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>vec</em></code>: The vector to transform
 	</li>
 	
 </ul>
@@ -878,7 +1358,7 @@ Set's the angle's pitch and returns it.
 
 
 <h3>Return value:</h3>
-<ul>The modified angle</ul>
+<ul>The transformed vector</ul>
 
 
 
@@ -890,10 +1370,10 @@ Set's the angle's pitch and returns it.
 
 
 
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:setR"></a><strong>Angle:setR</strong>&nbsp;(r)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:worldToLocalVector"></a><strong>PhysObj:worldToLocalVector</strong>&nbsp;(vec)</dt>
 <dd>
 
-Set's the angle's roll and returns it.
+Returns a normal vector in the local reference frame of the physicsobject from the world frame
 
 
 
@@ -902,7 +1382,7 @@ Set's the angle's roll and returns it.
 <ul>
 	
 	<li>
-	  <code><em>r</em></code>: The roll
+	  <code><em>vec</em></code>: The normal vector to transform
 	</li>
 	
 </ul>
@@ -913,68 +1393,7 @@ Set's the angle's roll and returns it.
 
 
 <h3>Return value:</h3>
-<ul>The modified angle</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:setY"></a><strong>Angle:setY</strong>&nbsp;(y)</dt>
-<dd>
-
-Set's the angle's yaw and returns it.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>y</em></code>: The yaw
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The modified angle</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Angle:setZero"></a><strong>Angle:setZero</strong>&nbsp;()</dt>
-<dd>
-
-Sets p,y,r to 0. This is faster than doing it manually.
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>nil</ul>
+<ul>The transformed vector</ul>
 
 
 
