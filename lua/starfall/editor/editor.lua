@@ -811,6 +811,7 @@ if CLIENT then
 		end )
 	concommand.Add( "sf_editor_reload", function()
 		if not SF.Editor.initialized then return end
+		SF.Editor.editor:Close()
 		for k, v in pairs(SF.Editor.TabHandlers) do
 			if v.cleanup then v:cleanup() end
 		end
