@@ -102,6 +102,16 @@ function vmatrix_methods:getInverseTR ( )
 
 end
 
+--- Sets the scale
+-- @param vec New scale
+function vmatrix_methods:setScale ( vec )
+	SF.CheckType( vec, vec_meta )
+	local vec = vunwrap( vec )
+
+	local v = unwrap( self )
+	v:SetScale( vec )
+end
+
 --- Scale the matrix
 -- @param vec Vector to scale by
 function vmatrix_methods:scale ( vec )
