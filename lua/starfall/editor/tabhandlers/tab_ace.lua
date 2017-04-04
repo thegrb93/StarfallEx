@@ -103,19 +103,24 @@ local function createLibraryMap ()
 		table.insert( libs, name )
 	end
 
-	for lib, tbl in pairs( SF.Libraries.libraries ) do
+	--Gathering data from docs
+	for lib, tbl in pairs( SF.Docs.classes ) do
+		if not isstring(lib) then continue end -- We gotta skip numberics
 		libMap[ lib ] = {}
-		for name, val in pairs( tbl ) do
-			table.insert( libMap[ lib ], name )
-			table.insert( libs, lib.."\\."..name )
+		for name, val in pairs( tbl.methods ) do
+			if not isstring(name) then continue end -- We gotta skip numberics
+			table.insert( libs, "\\:"..name )
 		end
 	end
 
-	for lib, tbl in pairs( SF.Types ) do
-		if type( tbl.__index ) == "table" then
-			for name, val in pairs( tbl.__index ) do
-				table.insert( libs, "\\:"..name )
-			end
+	--Gathering data from docs
+	for lib, tbl in pairs( SF.Docs.libraries ) do
+		if not isstring(lib) then continue end -- We gotta skip numberics
+		libMap[ lib ] = {}
+		for name, val in pairs( tbl.functions ) do
+			if not isstring(name) then continue end -- We gotta skip numberics
+			table.insert( libMap[ lib ], name )
+			table.insert( libs, lib.."\\."..name )
 		end
 	end
 

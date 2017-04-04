@@ -134,13 +134,22 @@ local function createWireLibraryMap () -- Hashtable
 		libMap[ "Environment" ][ name ] = type(val)
 	end
 
-	for lib, tbl in pairs( SF.Libraries.libraries ) do
+	for lib, tbl in pairs( SF.Libraries.libraries ) do --Constants/enums aren't present in docs ATM
 		libMap[ lib ] = {}
 		for name, val in pairs( tbl ) do
 			libMap[ lib ][ name ] = type(val)
 		end
 	end
-
+	--Gathering data from docs
+	for lib, tbl in pairs( SF.Docs.libraries ) do
+		if not isstring(lib) then continue end -- We gotta skip numberics
+		libMap[ lib ] = {}
+		for name, val in pairs( tbl.functions ) do
+			if not isstring(name) then continue end -- We gotta skip numberics
+			libMap[ lib ][ name ] = val.class
+		end
+	end
+	
 	return libMap
 end
 
