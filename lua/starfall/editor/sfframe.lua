@@ -1352,6 +1352,7 @@ function Editor:LoadFile(Line, forcenewtab)
 end
 
 function Editor:Close()
+	RunConsoleCommand( "starfall_event", "editor_close" )
 	timer.Stop("sfautosave")
 	self:AutoSave()
 	self:SaveTabs()
