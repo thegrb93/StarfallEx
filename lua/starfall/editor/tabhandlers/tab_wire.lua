@@ -270,8 +270,8 @@ function TabHandler:registerSettings()
 	local FontSizeSelect = vgui.Create("DComboBox", temp)
 	FontSizeSelect.OnSelect = function(panel, index, value)
 		value = value:gsub(" %b()", "")
-		self:ChangeFont(self.FontConVar:GetString(), tonumber(value))
-		RunConsoleCommand("wire_expression2_editor_font_size", value)
+		RunConsoleCommand("sf_editor_wire_fontsize", value)
+		RunConsoleCommand("sf_editor_reload")
 	end
 	for i = 11, 26 do
 		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))

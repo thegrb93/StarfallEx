@@ -512,7 +512,7 @@ function Editor:CreateTab(chosenfile)
 
 	editor.OnTextChanged = function(panel)
 		timer.Create("sfautosave", 5, 1, function()
-				self:AutoSave()
+				self:SaveTabs()
 			end)
 	end
 	editor.OnShortcut = function(_, code)
@@ -594,7 +594,7 @@ function Editor:CloseTab(_tab)
 		end
 	end
 
-	self:AutoSave()
+	self:SaveTabs()
 
 	-- There's only one tab open, no need to actually close any tabs
 	if self:GetNumTabs() == 1 then
@@ -863,13 +863,6 @@ function Editor:InitComponents()
 
 end
 
-function Editor:AutoSave()
-	local buffer = self:GetCode()
-	if self.savebuffer == buffer or buffer == defaultCode or buffer == "" then return end
-	self.savebuffer = buffer
-	file.Write(self.Location .. "/_autosave_.txt", buffer)
-end
-
 function Editor:AddControlPanelTab(label, icon, tooltip)
 	local frame = self.C.Control
 	local panel = vgui.Create("DPanel")
@@ -1064,7 +1057,7 @@ function Editor:NewScript(incurrent)
 	if not incurrent and self.NewTabOnOpenVar:GetBool() then
 		self:NewTab()
 	else
-		self:AutoSave()
+		self:SaveTabs()
 		self:ChosenFile()
 		-- Set title
 		self:GetActiveTab():SetText("generic")
@@ -1092,6 +1085,7 @@ function Editor:InitShutdownHook()
 end
 
 function Editor:SaveTabs()
+	if not self.TabsLoaded then return end
 	local tabs = {}
 	for i=1, self:GetNumTabs() do
 		table.insert(tabs,{
@@ -1126,6 +1120,8 @@ function Editor:OpenOldTabs()
 		
 		self:SetCode(v.code)
 	end
+	self.TabsLoaded = true
+
 end
 
 function Editor:Validate(gotoerror)
@@ -1323,7 +1319,7 @@ function Editor:LoadFile(Line, forcenewtab)
 	else
 		local str = f:Read(f:Size()) or ""
 		f:Close()
-		self:AutoSave()
+		self:SaveTabs()
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
 				if self:GetEditor(i).chosenfile == Line then
@@ -1354,7 +1350,6 @@ end
 function Editor:Close()
 	RunConsoleCommand( "starfall_event", "editor_close" )
 	timer.Stop("sfautosave")
-	self:AutoSave()
 	self:SaveTabs()
 
 	self:ExtractName()
