@@ -230,7 +230,7 @@ end
 -- @param endpos End position
 -- @param filter Entity/array of entities to filter, or a function callback with an entity arguement
 -- @param mask Trace mask
--- @return Result of the trace
+-- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace ( start, endpos, filter, mask )
 	SF.Permissions.check( SF.instance.player, nil, "trace" )
 	SF.CheckType( start, SF.Types[ "Vector" ] )
@@ -272,7 +272,7 @@ end
 -- @param maxbox Upper box corner
 -- @param filter Entity/array of entities to filter, or a function callback with an entity arguement
 -- @param mask Trace mask
--- @return Result of the trace
+-- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 	SF.Permissions.check( SF.instance.player, nil, "trace" )
 	SF.CheckType( start, SF.Types[ "Vector" ] )

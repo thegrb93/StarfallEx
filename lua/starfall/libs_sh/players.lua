@@ -377,7 +377,7 @@ end
 
 --- Returns a table with information of what the player is looking at
 -- @shared
--- @return table trace data
+-- @return table trace data https://wiki.garrysmod.com/page/Structures/TraceResult
 function player_methods:getEyeTrace ()
 	SF.Permissions.check( SF.instance.player, eunwrap( self ), "trace" )
 	
@@ -488,7 +488,7 @@ end
 ---IN_KEY.BULLRUSH
 ---IN_KEY.CANCEL
 ---IN_KEY.RUN
--- @return table trace data
+-- @return True or false
 function player_methods:keyDown ( key )
 	SF.CheckType( self, player_metamethods )
 	SF.CheckType( key, "number" )
