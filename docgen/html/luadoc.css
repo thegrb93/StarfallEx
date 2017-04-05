@@ -340,4 +340,8 @@ dl.table h3 {padding: 0; margin: 0; font-size: medium;}
 	background: linear-gradient(45deg, rgba(255,136,0,1) 50%, rgba(0,136,255,1) 51%); /* w3c */
 }
 
+input {
+	width: 100%;
+}
+
 #TODO: make module_list, file_list, function_list, table_list inherit from a list

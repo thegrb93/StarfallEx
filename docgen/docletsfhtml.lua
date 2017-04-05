@@ -342,8 +342,14 @@ function start (doc)
 	f:close()
 
 	-- copy extra files
+
 	local f = lfs.open(options.output_dir.."luadoc.css", "w")
 	io.output(f)
 	include("luadoc.css")
+	f:close()
+
+	local f = lfs.open(options.output_dir.."search.js", "w")
+	io.output(f)
+	include("search.js")
 	f:close()
 end
