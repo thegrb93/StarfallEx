@@ -1822,6 +1822,16 @@ function PANEL:SelectAll()
 	self:ScrollCaret()
 end
 
+function PANEL:pasteCode(code)
+	local tab_scroll = self:CopyPosition(self.Scroll)
+	local tab_start, tab_caret = self:MakeSelection(self:Selection())
+	self:SetSelection(code)
+
+	self.Scroll = self:CopyPosition(tab_scroll)
+	-- trigger scroll bar update (TODO: find a better way)
+	self:ScrollCaret()
+end
+
 function PANEL:Indent(shift)
 	-- TAB with a selection --
 	-- remember scroll position

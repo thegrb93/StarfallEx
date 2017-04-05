@@ -1211,6 +1211,12 @@ function Editor:SetCode(code)
 	self:ExtractName()
 end
 
+function Editor:PasteCode(code)
+	local editor = self:GetCurrentEditor()
+	if not editor:getTabHandler().IsEditor or not editor.pasteCode then return end
+	editor:pasteCode(code)
+end
+
 function Editor:GetEditor(n)
 	if self.C.TabHolder.Items[n] then
 		return self.C.TabHolder.Items[n].Panel

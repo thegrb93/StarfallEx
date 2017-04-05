@@ -160,6 +160,10 @@ if CLIENT then
 		SF.Editor.editor:Open(name, code, false)
 
 	end
+	
+	function SF.Editor.pasteCode(code)
+		SF.Editor.editor:PasteCode(code)
+	end
 
 	function SF.Editor.close ()
 		SF.Editor.editor:Close()
@@ -372,7 +376,7 @@ if CLIENT then
 				icon:SetTooltip( string.Replace( string.GetFileFromFilename( obj.model ), ".mdl", "" ) )
 
 				icon.DoClick = function ( icon )
-					SF.Editor.runJS( "editor.insert(\"" .. string.gsub( obj.model, "\\", "/" ):JavascriptSafe() .. "\")" )
+					SF.Editor.pasteCode("\"" .. string.gsub( obj.model, "\\", "/" ) .. "\"" )
 					SF.AddNotify( LocalPlayer(), "\"" .. string.gsub( obj.model, "\\", "/" ) .. "\" inserted into editor.", "GENERIC", 5, "DRIP1" )
 					frame:close()
 				end
