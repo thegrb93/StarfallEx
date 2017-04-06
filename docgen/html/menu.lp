@@ -16,7 +16,8 @@ else
 end
 ?>
 
-<script type="text/javascript" src="<?lua= docletsfhtml.link('search.js')?>"></script>
+<script type="text/javascript">fromPath="<?lua=docletsfhtml.link('', from)?>"</script>
+<script type="text/javascript" src="<?lua=docletsfhtml.link('search.js', from)?>"></script>
 
 <h1>LuaDoc</h1>
 <ul>

@@ -9,7 +9,7 @@ window.onload = function () {
 				onkeyup()
 			}
 		};
-		xhttp.open("GET", "doc.json", true);
+		xhttp.open("GET", fromPath+"doc.json", true);
 		xhttp.send();
 	}
 
@@ -64,7 +64,7 @@ window.onload = function () {
 
 					functionsHtml +=
 						'<li><span class="realm_' + realm +
-						'">&nbsp;</span><a href="/StarfallEx/libraries/' + library + '.html#' + funcTable.name + '">' +
+						'">&nbsp;</span><a href="' + fromPath + 'libraries/' + library + '.html#' + funcTable.name + '">' +
 						(library == "builtin" ? "" : library + '.') + name + '</a></li>';
 				}
 			}
@@ -92,7 +92,7 @@ window.onload = function () {
 
 					methodsHtml +=
 						'<li><span class="realm_' + realm +
-						'">&nbsp;</span><a href="/StarfallEx/classes/' + className + '.html#' + funcTable.name + '">' +
+						'">&nbsp;</span><a href="' + fromPath + 'classes/' + className + '.html#' + funcTable.name + '">' +
 						className + ':' + name + '</a></li>';
 				}
 			}
@@ -113,7 +113,7 @@ window.onload = function () {
 
 				hooksHtml +=
 					'<li><span class="realm_' + realm +
-					'">&nbsp;</span><a href="/StarfallEx/hooks.html#' + hookTable.name + '">' + name + '</a></li>';
+					'">&nbsp;</span><a href="' + fromPath + 'hooks.html#' + hookTable.name + '">' + name + '</a></li>';
 			}
 		}
 
