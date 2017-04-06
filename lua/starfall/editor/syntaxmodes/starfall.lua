@@ -89,6 +89,21 @@ local function addToken(tokenname, tokendata)
 	end
 end
 
+local function addColorToken(bgcolor, tokendata)
+	local h,s,v = ColorToHSV( bgcolor ) --We're finding high-contrast color
+	h = (h + 180)%360
+	s = 1 - s
+	v = 1 - v
+	 
+	local textcolor = HSVToColor( h, s, v ) 
+	if lastcol and color == lastcol[2] then
+		lastcol[1] = lastcol[1] .. tokendata
+	else
+		cols[#cols + 1] = { tokendata, {textcolor, false, bgcolor}, "color" }
+		lastcol = cols[#cols]
+	end
+end
+
 function EDITOR:BlockCommentSelection(removecomment)
 	local sel_start, sel_caret = self:MakeSelection( self:Selection() )
 	local mode = self:GetParent().BlockCommentStyleConVar:GetInt()
@@ -193,8 +208,9 @@ function EDITOR:ResetTokenizer(row)
 	end
 
 end
-
+local pigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", "1", true, false)
 function EDITOR:SyntaxColorLine(row)
+	local usePigments = pigmentsConVar:GetBool()
 	cols,lastcol = {}, nil
 
 	self:ResetTokenizer(row)
@@ -262,8 +278,15 @@ function EDITOR:SyntaxColorLine(row)
 		if not self.character then break end
 
 		-- eat next token
-
-		if self:NextPattern("^0[xb][0-9A-F]+") then
+		if usePigments and self:NextPattern("^Color%s*%(%s*[0-9]+%s*,%s*[0-9]+%s*,%s*[0-9]+%s*%)") then -- Color(r,g,b)
+			local r,g,b = self.tokendata:match("Color%s*%(%s*([0-9]+)%s*,%s*([0-9]+)%s*,%s*([0-9]+)%s*%)")
+			addColorToken(Color(tonumber(r),tonumber(g),tonumber(b)), self.tokendata)
+			tokenname = "" -- It's custom token
+		elseif usePigments and self:NextPattern("^Color%s*%(%s*[0-9]+%s*,%s*[0-9]+%s*,%s*[0-9]+%s*,%s*[0-9]+%s*%)") then -- Color(r,g,b,a)
+			local r,g,b,a = self.tokendata:match("^Color%s*%(%s*([0-9]+)%s*,%s*([0-9]+)%s*,%s*([0-9]+)%s*,%s*([0-9]+)%s*%)")
+			addColorToken(Color(tonumber(r),tonumber(g),tonumber(b),tonumber(a)), self.tokendata)
+			tokenname = "" -- It's custom token
+		elseif self:NextPattern("^0[xb][0-9A-F]+") then
 			tokenname = "number"
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
@@ -363,6 +386,7 @@ function EDITOR:SyntaxColorLine(row)
 			end
 
 			if tokenname == "" then -- If no ending " was found...
+				--self.multilinestring = true
 				tokenname = "string"
 			else
 				self:NextCharacter()
@@ -375,11 +399,6 @@ function EDITOR:SyntaxColorLine(row)
 					break
 				end
 				if self.character == "\\" then self:NextCharacter() end
-				self:NextCharacter()
-			end
-			if tokenname == "" then -- If no ending " was found...
-				tokenname = "string"
-			else
 				self:NextCharacter()
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
@@ -421,8 +440,9 @@ function EDITOR:SyntaxColorLine(row)
 
 			tokenname = "notfound"
 		end
-
-		addToken(tokenname, self.tokendata)
+		if tokenname != "" then
+			addToken(tokenname, self.tokendata)
+		end
 	end
 
 	return cols

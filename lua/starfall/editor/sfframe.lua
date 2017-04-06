@@ -43,17 +43,9 @@ function Editor:GetFont(FontName, Size)
 			antialias = true,
 			additive = false,
 		}
-		local fontTableBold =
-		{
-			font = FontName,
-			size = Size,
-			weight = 600,
-			antialias = true,
-			additive = false,
-		}
 		surface.CreateFont(name, fontTable)
-		fontTable.weight = 700
-		surface.CreateFont(name, fontTableBold)
+		fontTable.weight = 800
+		surface.CreateFont(name.."_Bold", fontTable)
 		self.CreatedFonts[name] = true
 	end
 

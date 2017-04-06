@@ -288,6 +288,17 @@ function TabHandler:registerSettings()
 	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
 	FontSizeSelect:SetSize(50, 20)	
 	
+	local usePigments = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(usePigments)
+	usePigments:SetConVar("sf_editor_wire_pigments")
+	usePigments:SetText("Enable pigments")
+	usePigments:SizeToContents()
+	usePigments:SetTooltip("Enable/disable custom coloring of Color(r,g,b)")
+	usePigments.OnChange = function(_, val)
+		RunConsoleCommand("sf_editor_wire_pigments",tostring(val)) -- We gotta update convar manually because OnChange is overwritten 
+		SF.Editor.editor:GetCurrentEditor().PaintRows = {} -- Re-color syntax
+	end
+	
 end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar( "wire_expression2_autocomplete_controlstyle", "0", true, false )
@@ -671,7 +682,6 @@ function PANEL:PaintLine(row)
 			if cell[1]:len() > -offset then
 				local line = cell[1]:sub(1-offset)
 				offset = line:len()
-
 				if cell[2][2] then
 					draw_SimpleText(line .. " ", self.CurrentFont .. "_Bold", self.LineNumberWidth+ 6, (row - self.Scroll[1]) * height, cell[2][1])
 				else
@@ -681,13 +691,19 @@ function PANEL:PaintLine(row)
 				offset = offset + cell[1]:len()
 			end
 		else
+			local length = cell[1]:len()
+			if cell[2][3] then --has background
+				surface_SetDrawColor( cell[2][3] )
+				surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width*length, height)
+			end
 			if cell[2][2] then
+
 				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Bold", offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
 			else
 				draw_SimpleText(cell[1] .. " ", self.CurrentFont, offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
 			end
 
-			offset = offset + cell[1]:len()
+			offset = offset + length
 		end
 	end
 
