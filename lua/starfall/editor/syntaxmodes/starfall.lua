@@ -401,6 +401,11 @@ function EDITOR:SyntaxColorLine(row)
 				if self.character == "\\" then self:NextCharacter() end
 				self:NextCharacter()
 			end
+			if tokenname == "" then -- If no ending " was found...
+				tokenname = "string"
+			else
+				self:NextCharacter()
+			end
 		elseif self:NextPattern("%-%-") then -- Comments
 
 			if self.character == "[" and self:NextPattern("%[%[") then -- Check if there is a [[ directly after the --
