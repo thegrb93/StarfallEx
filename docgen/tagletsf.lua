@@ -308,7 +308,8 @@ local function parse_comment ( block, first_line, libs, classes )
 	block.summary = parse_summary(block.description)
 	assert(block.summary)
 	--assert(string.sub(block.description, 1, 1) ~= " ", string.format("`%s'", block.description))
-	
+	--We do not want to save the code.
+	block.code = nil
 	return block
 end
 
