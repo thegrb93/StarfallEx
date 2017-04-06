@@ -9,7 +9,7 @@ window.onload = function () {
 				onkeyup()
 			}
 		};
-		xhttp.open("GET", "/StarfallEx/doc.json", true);
+		xhttp.open("GET", "doc.json", true);
 		xhttp.send();
 	}
 
