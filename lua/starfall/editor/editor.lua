@@ -173,8 +173,12 @@ if CLIENT then
 		return SF.Editor.editor:GetCode() or ""
 	end
 
-	function SF.Editor.getOpenFile ()
-		return SF.Editor.editor:GetChosenFile()
+	function SF.Editor.getOpenFile (includeMainDirectory)
+		local path = SF.Editor.editor:GetChosenFile()
+		if not includeMainDirectory and path then
+			maindir,path = path:match("(starfall/)(.+)")
+		end
+		return path
 	end
 
 	function SF.Editor.createEditor ()
@@ -695,6 +699,7 @@ if CLIENT then
 				if string.sub(path,1,1)!="/" then
 					codepath = SF.NormalizePath( curdir .. path )
 					code = file.Read( "starfall/" .. codepath, "DATA" )
+					
 				end
 				if not code then
 					codepath = SF.NormalizePath( path )
