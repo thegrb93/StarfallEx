@@ -12,8 +12,13 @@ resource.AddFile( "models/spacecode/sfchip_small.mdl" )
 resource.AddFile( "resource/fonts/DejaVuSansMono.ttf" )
 
 local files = file.Find("html/starfalleditor*","GAME")
-if files[1] then
-	local version = string.match(files[1], "starfalleditor(%d+)%.html")
+if files[1] then 
+	local version = tonumber(string.match(files[1], "starfalleditor(%d+)%.html") or "0")
+	for k,file in pairs(files) do -- Looking for oldest
+		local ver = tonumber(string.match(file, "starfalleditor(%d+)%.html") or "0")
+	
+		if ver > version then version = ver end
+	end
 	if version then
 		resource.AddSingleFile("html/starfalleditor"..version..".html")
 		resource.AddSingleFile("html/ace"..version.."/ace.js")

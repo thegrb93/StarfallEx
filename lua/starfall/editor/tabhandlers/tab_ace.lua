@@ -313,7 +313,18 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	html:SetKeyboardInputEnabled( true )
 	html:SetMouseInputEnabled( true )
 	local files = file.Find("html/starfalleditor*","GAME")
-	local version if files[1] then version = string.match(files[1], "starfalleditor(%d+)%.html") end
+	local version 
+	if files[1] then 
+		version = tonumber(string.match(files[1], "starfalleditor(%d+)%.html") or "0")
+		PrintTable(files)
+		for k,file in pairs(files) do -- Looking for oldest
+			local ver = tonumber(string.match(file, "starfalleditor(%d+)%.html") or "0")
+			
+			if ver > version then version = ver end
+		end
+	end
+	
+	SF.AceVersion = version
 	if version then
 		html:OpenURL( "asset://garrysmod/html/starfalleditor"..version..".html" )
 	else
@@ -389,8 +400,7 @@ function PANEL:getCode() -- Return name of hanlder or code if it's editor
 end
 
 function PANEL:pasteCode(code)
-	if not TabHandler.Loaded then return end
-	runJS( "editor.insert(\"" .. code:JavascriptSafe() .. "\")" )
+	runJS( "editor.insert(\"" .. string.gsub( code, "\\", "/" ):JavascriptSafe() .. "\")" )
 end
 
 function PANEL:setCode(code)

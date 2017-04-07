@@ -28,25 +28,34 @@ surface.CreateFont("SFEditorDefault", {
 	})
 
 Editor.CreatedFonts = {}
+function createFont(name,FontName,Size)
+	print("creating font"..name)
+	local fontTable =
+	{
+		font = FontName,
+		size = Size,
+		weight = 400,
+		antialias = true,
+		additive = false,
+		italic = false,
+	}
+	surface.CreateFont(name, fontTable)
+	fontTable.weight = 800
+	surface.CreateFont(name.."_Bold", fontTable)
+	fontTable.weight = 400
+	fontTable.italic = true
+	surface.CreateFont(name.."_Italic", fontTable)
 
+end
 function Editor:GetFont(FontName, Size)
 	if not FontName or FontName == "" or not Size then return end
 	local name = "sf_" .. FontName .. "_" .. Size
 
 	-- If font is not already created, create it.
 	if not self.CreatedFonts[name] then
-		local fontTable =
-		{
-			font = FontName,
-			size = Size,
-			weight = 400,
-			antialias = true,
-			additive = false,
-		}
-		surface.CreateFont(name, fontTable)
-		fontTable.weight = 800
-		surface.CreateFont(name.."_Bold", fontTable)
 		self.CreatedFonts[name] = true
+		createFont(name, FontName, Size)
+		timer.Simple(0,function() createFont(name, FontName, Size) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
 	end
 
 	surface.SetFont(name)
