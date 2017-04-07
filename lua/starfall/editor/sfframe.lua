@@ -1108,12 +1108,12 @@ function Editor:OpenOldTabs()
 
 	local is_first = true
 	for k, v in pairs(tabs) do
+		if not istable(v) then continue end
 		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
 			timer.Simple(0,function() self:CloseTab(1) end)
 			is_first = false
 		end
-		if not istable(v) then continue end
 		self:NewTab()
 		self:ChosenFile(v.filename)
 		local title,tabtext = getPreferredTitles(v.filename or "Generic", v.code)
