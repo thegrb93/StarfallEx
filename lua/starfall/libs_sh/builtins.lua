@@ -677,8 +677,9 @@ end
 -- Works like loadstring, except that it executes by default in the main environment
 -- @param str String to execute
 -- @return Function of str
-function SF.DefaultEnvironment.loadstring ( str )
-	local func = CompileString( str, "SF: " .. tostring( SF.instance.env ), false )
+function SF.DefaultEnvironment.loadstring ( str, name )
+	name = "SF: " .. (name or tostring( SF.instance.env ))
+	local func = CompileString( str, name, false )
 	
 	-- CompileString returns an error as a string, better check before setfenv
 	if type( func ) == "function" then
