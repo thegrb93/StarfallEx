@@ -1089,6 +1089,7 @@ function Editor:SaveTabs()
 end
 
 function Editor:OpenOldTabs()
+	self.TabsLoaded = true
 	if not file.Exists("sf_tabs.txt", "DATA") then return end
 
 	local tabs = util.JSONToTable(file.Read("sf_tabs.txt") or "")
@@ -1103,7 +1104,7 @@ function Editor:OpenOldTabs()
 			timer.Simple(0,function() self:CloseTab(1) end)
 			is_first = false
 		end
-		if not istable(v) then return end
+		if not istable(v) then continue end
 		self:NewTab()
 		self:ChosenFile(v.filename)
 		local title,tabtext = getPreferredTitles(v.filename or "Generic", v.code)
@@ -1112,7 +1113,6 @@ function Editor:OpenOldTabs()
 		
 		self:SetCode(v.code)
 	end
-	self.TabsLoaded = true
 
 end
 
