@@ -400,7 +400,8 @@ function PANEL:getCode() -- Return name of hanlder or code if it's editor
 end
 
 function PANEL:pasteCode(code)
-	runJS( "editor.insert(\"" .. string.gsub( code, "\\", "/" ):JavascriptSafe() .. "\")" )
+	if not TabHandler.Loaded then return end
+	runJS( "editor.insert(\"" .. code:JavascriptSafe() .. "\")" )
 end
 
 function PANEL:setCode(code)
