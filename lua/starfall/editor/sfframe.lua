@@ -29,7 +29,6 @@ surface.CreateFont("SFEditorDefault", {
 
 Editor.CreatedFonts = {}
 function createFont(name,FontName,Size)
-	print("creating font"..name)
 	local fontTable =
 	{
 		font = FontName,
@@ -1089,10 +1088,11 @@ function Editor:SaveTabs()
 	if not self.TabsLoaded then return end
 	local tabs = {}
 	for i=1, self:GetNumTabs() do
-		table.insert(tabs,{
-			filename = self:GetEditor(i).chosenfile,
-			code = self:GetEditor(i):getCode(),
-		})
+		tabs[i] = {}
+		local filename = self:GetEditor(i).chosenfile
+		if filename then filename =  filename:sub(#self.Location + 2) end
+		tabs[i].filename = filename
+		tabs[i].code = self:GetEditor(i):getCode()
 	end
 	file.Write("sf_tabs.txt", util.TableToJSON(tabs))
 end
@@ -1108,6 +1108,7 @@ function Editor:OpenOldTabs()
 
 	local is_first = true
 	for k, v in pairs(tabs) do
+		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
 			timer.Simple(0,function() self:CloseTab(1) end)
 			is_first = false

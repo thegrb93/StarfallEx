@@ -316,7 +316,6 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	local version 
 	if files[1] then 
 		version = tonumber(string.match(files[1], "starfalleditor(%d+)%.html") or "0")
-		PrintTable(files)
 		for k,file in pairs(files) do -- Looking for oldest
 			local ver = tonumber(string.match(file, "starfalleditor(%d+)%.html") or "0")
 			
