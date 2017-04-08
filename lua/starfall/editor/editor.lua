@@ -137,8 +137,9 @@ if CLIENT then
 		if SF.Editor.editor then return end
 
 		SF.Editor.createEditor()
-		SF.Editor.modelViewer = SF.Editor.createModelViewer()
-		
+		if not SF.Editor.modelViewer then
+			SF.Editor.modelViewer = SF.Editor.createModelViewer()
+		end
 		SF.Editor.initialized = true
 	end
 
@@ -827,8 +828,6 @@ if CLIENT then
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()
 		SF.Editor.editor = nil
-		SF.Editor.modelViewer:Remove()
-		SF.Editor.modelViewer = nil
 		SF.Editor.open ()
 		print("Editor reloaded")
 	end )
