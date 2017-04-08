@@ -1894,7 +1894,7 @@ function PANEL:Indent(shift)
 		self:SetSelection(unindent(tmp))
 	else
 		-- plain TAB with a selection --
-		self:SetSelection(" " .. self:GetSelection():gsub("\n", "\n "))
+		self:SetSelection("    " .. self:GetSelection():gsub("\n", "\n    "))
 	end
 	-- restore selection
 	self.Caret = self:CopyPosition(tab_caret)
