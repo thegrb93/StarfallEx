@@ -45,7 +45,10 @@ local directives = {
 	["@name"] = 0, -- all yellow
 	["@author"] = 0,
 	["@include"] = 0,
+	["@includedir"] = 0,
 	["@shared"] = 1, -- directive yellow, types orange, rest normal
+	["@client"] = 0,
+	["@server"] = 0,
 	["@model"] = 0,
 }
 
