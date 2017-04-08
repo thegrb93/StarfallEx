@@ -61,6 +61,7 @@ local defaultFont = "DejaVu Sans Mono" -- We ship that with starfall, linux has 
 TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_fontname", defaultFont, true, false)
 TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
+TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, true, false)
 ---------------------
 -- Colors
 ---------------------
@@ -275,6 +276,7 @@ function TabHandler:registerSettings()
 	end
 	FontSelect:AddChoice("Custom...")
 	FontSelect:SetSize(240 - 50 - 4, 20)
+	FontSelect:SetValue(TabHandler.FontConVar:GetString())
 
 	local FontSizeSelect = vgui.Create("DComboBox", temp)
 	FontSizeSelect.OnSelect = function(panel, index, value)
@@ -287,16 +289,26 @@ function TabHandler:registerSettings()
 	end
 	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
 	FontSizeSelect:SetSize(50, 20)	
+	FontSizeSelect:SetValue(TabHandler.FontSizeConVar:GetString())
+	local label = vgui.Create("DLabel")
+	dlist:AddItem(label)
+	label:SetText("Pigments:")
+	label:SizeToContents()
+	label:SetPos(10, 0)	
 	
-	local usePigments = vgui.Create("DCheckBoxLabel")
+	local usePigments = vgui.Create("DComboBox")
 	dlist:AddItem(usePigments)
-	usePigments:SetConVar("sf_editor_wire_pigments")
-	usePigments:SetText("Enable pigments")
-	usePigments:SizeToContents()
+	usePigments:SetSortItems(false)
+	usePigments:AddChoice("Disabled")
+	usePigments:AddChoice("Stripe under Color()")	
+	usePigments:AddChoice("Background of Color()")	
+	usePigments:ChooseOptionID(TabHandler.PigmentsConVar:GetInt()+1)
 	usePigments:SetTooltip("Enable/disable custom coloring of Color(r,g,b)")
-	usePigments.OnChange = function(_, val)
-		RunConsoleCommand("sf_editor_wire_pigments",tostring(val)) -- We gotta update convar manually because OnChange is overwritten 
-		SF.Editor.editor:GetCurrentEditor().PaintRows = {} -- Re-color syntax
+	usePigments.OnSelect = function(_, val)
+		RunConsoleCommand("sf_editor_wire_pigments",val-1)
+		timer.Simple(0,function()
+			SF.Editor.editor:GetCurrentEditor().PaintRows = {} -- Re-color syntax
+		end)
 	end
 	
 end
@@ -631,6 +643,7 @@ end
 function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
 function PANEL:PaintLine(row)
+	local usePigments = TabHandler.PigmentsConVar:GetInt()
 	if row > #self.Rows then return end
 
 	if not self.PaintRows[row] then
@@ -694,7 +707,11 @@ function PANEL:PaintLine(row)
 			local length = cell[1]:len()
 			if cell[2][3] then --has background
 				surface_SetDrawColor( cell[2][3] )
-				surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width*length, height)
+				if usePigments == 1 and cell[3] == "color" then
+					surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height+height-2, width*length, 2)
+				else
+					surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width*length, height)
+				end
 			end
 			if cell[2][2] then
 

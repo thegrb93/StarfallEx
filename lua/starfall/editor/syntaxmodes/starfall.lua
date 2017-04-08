@@ -42,11 +42,11 @@ local keywords = {
 setmetatable(keywords, { __index=function(tbl,index) return {} end })
 
 local directives = {
-	["@name"] = 0, -- all yellow
+	["@name"] = 0,
 	["@author"] = 0,
 	["@include"] = 0,
 	["@includedir"] = 0,
-	["@shared"] = 1, -- directive yellow, types orange, rest normal
+	["@shared"] = 0,
 	["@client"] = 0,
 	["@server"] = 0,
 	["@model"] = 0,
@@ -93,12 +93,17 @@ local function addToken(tokenname, tokendata)
 end
 
 local function addColorToken(bgcolor, tokendata)
-	local h,s,v = ColorToHSV( bgcolor ) --We're finding high-contrast color
-	h = (h + 180)%360
-	s = 1 - s
-	v = 1 - v
-	 
-	local textcolor = HSVToColor( h, s, v ) 
+	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt()
+	local textcolor
+	if usePigments == 2 then
+		local h,s,v = ColorToHSV( bgcolor ) --We're finding high-contrast color
+		h = (h + 180)%360
+		s = 1 - s
+		v = 1 - v	 
+		textcolor = HSVToColor( h, s, v ) 
+	elseif usePigments == 1 then
+		textcolor = colors["notfound"][1]
+	end
 	if lastcol and color == lastcol[2] then
 		lastcol[1] = lastcol[1] .. tokendata
 	else
@@ -211,9 +216,8 @@ function EDITOR:ResetTokenizer(row)
 	end
 
 end
-local pigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", "1", true, false)
 function EDITOR:SyntaxColorLine(row)
-	local usePigments = pigmentsConVar:GetBool()
+	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
 	cols,lastcol = {}, nil
 
 	self:ResetTokenizer(row)
