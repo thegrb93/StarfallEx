@@ -453,7 +453,7 @@ end
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
 -- @param tx Texture file path, or a http url
--- @param cb Optional callback for when a url texture finishes loading. param1 - The texture url, param2 - The texture table
+-- @param cb Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url
 -- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
 function render_library.getTextureID ( tx, cb, alignment )
