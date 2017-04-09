@@ -23,16 +23,15 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 	
-	if SERVER then
-		if self.mainfile != nil then
-			self:SendCode(owner, files, mainfile)
-		end
-	end
-	
+	local update = self.mainfile != nil
 	self.error = nil
 	self.files = files
 	self.mainfile = mainfile
 	self.owner = owner
+	
+	if SERVER and update then
+		self:SendCode()
+	end
 	
 	local ok, instance = SF.Instance.Compile( files, mainfile, owner, { entity = self } )
 	if not ok then self:Error(instance) return end

@@ -31,13 +31,13 @@ util.AddNetworkString( "starfall_processor_update_links" )
 util.AddNetworkString( "starfall_processor_used" )
 util.AddNetworkString( "starfall_processor_link" )
 
-function ENT:SendCode ( owner, files, mainfile, recipient )
+function ENT:SendCode ( recipient )
 	net.Start( "starfall_processor_download" )
 	net.WriteEntity( self )
-	net.WriteEntity( owner )
-	net.WriteString( mainfile )
+	net.WriteEntity( self.owner )
+	net.WriteString( self.mainfile )
 	
-	for name, data in pairs( files ) do
+	for name, data in pairs( self.files ) do
 	
 		net.WriteBit( false )
 		net.WriteString( name )
@@ -59,7 +59,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 		hook.Add("Think", hookname, function()
 			if ply:IsValid() and proc:IsValid() and CurTime()<timeout then
 				if proc.mainfile and proc.files then
-					proc:SendCode(proc.owner, proc.files, proc.mainfile, ply)
+					proc:SendCode(ply)
 					hook.Remove("Think", hookname)
 				end
 			else
@@ -114,11 +114,10 @@ function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
 		if WireLib then
 			WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup( CreatedEntities ) )
 		end
-		self.owner = ply
 	
 		if info.starfall then
 			local code, main = SF.DeserializeCode( info.starfall )
-			self:Compile( code, main )
+			self:Compile( ply, code, main )
 		end
 	end
 end
