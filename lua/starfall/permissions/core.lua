@@ -114,7 +114,7 @@ do
 end
 
 -- Load the permission settings for each provider
-do
+SF.Libraries.AddHook("postload", function()
 	local settings = util.JSONToTable( file.Read( P.filename ) or "" ) or {}
 	for _, provider in ipairs( P.providers ) do
 		if settings[ provider.id ] then
@@ -124,7 +124,7 @@ do
 			end
 		end
 	end
-end
+end)
 
 local function changePermission( ply, arg )
 	local provider
