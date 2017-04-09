@@ -36,13 +36,17 @@ end
 
 local dgetmeta = debug.getmetatable
 
-SF.Errormeta = {__tostring=function(t) return t.message end, __metatable="Error"}
+SF.Errormeta = {
+	__tostring=function(t) return t.message end,
+	__metatable="SFError"
+}
 --- Builds an error type to that contains line numbers, file name, and traceback
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
 function SF.MakeError ( msg, level, uncatchable )
-	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
+	level = 1 + ( level or 1 )
+	local info = debug.getinfo( level, "Sl" )
 	local filename = info.short_src:match( "^SF:(.*)$" ) or info.short_src
 	return setmetatable( {
 		uncatchable = false,
@@ -50,7 +54,7 @@ function SF.MakeError ( msg, level, uncatchable )
 		line = info.currentline,
 		message = tostring( msg ),
 		uncatchable = uncatchable,
-		traceback = debug.traceback( "", 2 )
+		traceback = debug.traceback( "", level )
 	}, SF.Errormeta )
 end
 

@@ -11,20 +11,21 @@ surface.CreateFont( "Starfall_ErrorFont", {
 } )
 
 net.Receive( "starfall_processor_used", function ( len )
-	local screen = net.ReadEntity()
+	local chip = net.ReadEntity()
 	local activator = net.ReadEntity()
-	if not IsValid( screen ) then return end
+	if not IsValid( chip ) then return end
+	if chip.link then chip = chip.link end
 	
-	if IsValid( screen.link ) then
+	if IsValid( chip ) then
 	
-		if screen.link.instance then
-			screen.link.instance:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
+		if chip.instance then
+			chip.instance:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
 		end
 		
 		-- Error message copying
 		if activator == LocalPlayer() then
-			if screen.link.error and screen.link.error.message then
-				SetClipboardText( string.format( "%q", screen.link.error.message ) )
+			if chip.error and chip.error.message then
+				SetClipboardText( string.format( "%q", chip.error.message ) )
 			elseif screen:GetDTString( 0 ) then
 				SetClipboardText( screen:GetDTString( 0 ) )
 			end

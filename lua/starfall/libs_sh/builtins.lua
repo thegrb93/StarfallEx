@@ -678,7 +678,7 @@ end
 -- @param str String to execute
 -- @return Function of str
 function SF.DefaultEnvironment.loadstring ( str, name )
-	name = "SF: " .. (name or tostring( SF.instance.env ))
+	name = "SF:" .. (name or tostring( SF.instance.env ))
 	local func = CompileString( str, name, false )
 	
 	-- CompileString returns an error as a string, better check before setfenv
@@ -741,7 +741,7 @@ function SF.DefaultEnvironment.pcall ( func, ... )
 			error( err )
 		end
 	elseif err == "not enough memory" then
-		SF.Throw( err, 0, true )
+		SF.Throw( err, 2, true )
 	end
 	
 	return false, err
@@ -766,7 +766,7 @@ function SF.DefaultEnvironment.xpcall ( func, callback, ... )
 			error( err )
 		end
 	elseif err == "not enough memory" then
-		SF.Throw( err, 0, true )
+		SF.Throw( err, 2, true )
 	end
 	
 	local cret = callback( err )
@@ -786,31 +786,18 @@ function SF.DefaultEnvironment.try ( func, catch )
 			error( err )
 		end
 	elseif err == "not enough memory" then
-		SF.Throw( err, 0, true )
+		SF.Throw( err, 2, true )
 	end
 	if catch then catch( err ) end
 end
 
 
 --- Throws an exception
--- @param msg Message
--- @param level Which level in the stacktrace to blame. Defaults to one of invalid
+-- @param msg Message string
+-- @param level Which level in the stacktrace to blame. Defaults to 1
 -- @param uncatchable Makes this exception uncatchable
 function SF.DefaultEnvironment.throw ( msg, level, uncatchable )
-	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
-	local filename = info.short_src:match( "^SF:(.*)$" )
-	if not filename then
-		info = debug.getinfo( 2, "Sl" )
-		filename = info.short_src:match( "^SF:(.*)$" )
-	end
-	local err = {
-		uncatchable = false,
-		file = filename,
-		line = info.currentline,
-		message = msg,
-		uncatchable = uncatchable
-	}
-	error( err )
+	SF.Throw ( msg, 1 + ( level or 1 ), uncatchable )
 end
 
 --- Throws a raw exception.

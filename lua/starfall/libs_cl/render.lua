@@ -143,6 +143,7 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 end )
 
 SF.Libraries.AddHook( "initialize", function(instance)
+	instance.data.render = {}
 	instance.data.render.rendertargets = {}
 	instance.data.render.rendertargetcount = 0
 	instance.data.render.textures = {}

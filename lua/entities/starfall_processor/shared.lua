@@ -16,28 +16,65 @@ ENT.States = {
 	None = 3,
 }
 
-function ENT:Error ( msg, traceback )
-	if type( msg ) == "table" then
-		self.error = table.Copy( msg )
-		self.error.message = type( self.error.message )=="string" and self.error.message or tostring( msg )
-	else
-		self.error = {}
-		self.error.source, self.error.line, self.error.message = string.match( tostring( msg ), "%[@?SF:(%a+):(%d+)](.+)$" )
-
-		if not self.error.source or not self.error.line or not self.error.message then
-			self.error.source, self.error.line, self.error.message = nil, nil, msg
-		else
-			self.error.message = string.TrimLeft( self.error.message )
+function ENT:Compile(owner, files, mainfile)
+	if self.instance then
+		self.instance:runScriptHook( "removed" )
+		self.instance:deinitialize()
+		self.instance = nil
+	end
+	
+	if SERVER then
+		if self.mainfile != nil then
+			self:SendCode(owner, files, mainfile)
 		end
 	end
+	
+	self.error = nil
+	self.files = files
+	self.mainfile = mainfile
+	self.owner = owner
+	
+	local ok, instance = SF.Instance.Compile( files, mainfile, owner, { entity = self } )
+	if not ok then self:Error(instance) return end
+	
+	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then
+		self.name = tostring( instance.ppdata.scriptnames[ instance.mainfile ] )
+	end
+	
+	instance.runOnError = function(inst,...) self:Error(...) end
+	self.instance = instance
+	
+	local ok, msg, traceback = instance:initialize()
+	if not ok then return end
+	
+	if SERVER then
+		local clr = self:GetColor()
+		self:SetColor( Color( 255, 255, 255, clr.a ) )
+		
+		if self.Inputs then
+			for k, v in pairs(self.Inputs) do
+				self:TriggerInput( k, v.Value )
+			end
+		end
+		
+		self:SetNWInt( "State", self.States.Normal )
+	end
+	
+	self.instance:runScriptHook( "initialize" )
+end
+
+function ENT:Error ( err )
+	self.error = err
+	
+	local msg = err.message
+	local traceback = err.traceback
 	
 	if SERVER then
 		self:SetNWInt( "State", self.States.Error )
 		self:SetColor( Color( 255, 0, 0, 255 ) )
-		self:SetDTString( 0, traceback or self.error.message )
+		self:SetDTString( 0, traceback or msg )
 	end
 	
-	local msg = self.error.message
 	local newline = string.find( msg, "\n" )
 	if newline then
 		msg = string.sub( msg, 1, newline - 1 )
@@ -49,15 +86,11 @@ function ENT:Error ( msg, traceback )
 		self.instance = nil
 	end
 
-	if traceback then
-		if SERVER then
-			SF.Print( self.owner, traceback )
-		else
-			print( traceback )
-		end
+	if SERVER then
+		SF.Print( self.owner, traceback )
+	else
+		print( traceback )
 	end
-
-	return self.error.message
 end
 
 function ENT:OnRemove ()
