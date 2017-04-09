@@ -92,8 +92,8 @@ end
 function SF.Instance:runWithOps(func,...)
 
 	local function xpcall_callback ( err )
-		if getmetatable( err )~=SF.Errormeta then
-			return SF.MakeError( err, 2 )
+		if debug.getmetatable( err )~=SF.Errormeta then
+			return SF.MakeError( err, 1 )
 		end
 		return err
 	end
@@ -268,7 +268,7 @@ function SF.Instance:runFunction(func,...)
 	if tbl[1] then
 		self:cleanup("_runFunction",false)
 	else
-		tbl[2].message = "Callback errored with " .. tbl[2].message
+		tbl[2].message = "Callback errored with: " .. tbl[2].message
 		self:cleanup("_runFunction",true,tbl[2])
 		self:Error(tbl[2])
 	end

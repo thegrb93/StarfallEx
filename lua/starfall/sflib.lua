@@ -44,15 +44,15 @@ SF.Errormeta = {
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
-function SF.MakeError ( msg, level, uncatchable )
+-- @param prependinfo The error message needs file and line number info
+function SF.MakeError ( msg, level, uncatchable, prependinfo )
 	level = 1 + ( level or 1 )
 	local info = debug.getinfo( level, "Sl" )
-	local filename = info.short_src:match( "^SF:(.*)$" ) or info.short_src
 	return setmetatable( {
 		uncatchable = false,
-		file = filename,
+		file = info.short_src,
 		line = info.currentline,
-		message = tostring( msg ),
+		message = prependinfo and (info.short_src..":"..info.currentline..": "..tostring( msg )) or tostring( msg ),
 		uncatchable = uncatchable,
 		traceback = debug.traceback( "", level )
 	}, SF.Errormeta )
@@ -63,7 +63,8 @@ end
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
 function SF.Throw ( msg, level, uncatchable )
-	error( SF.MakeError( msg, 1 + ( level or 1 ), uncatchable ) )
+	local level = 1 + ( level or 1 )
+	error( SF.MakeError( msg, level, uncatchable, true ), level )
 end
 
 SF.Types = {}
