@@ -520,7 +520,7 @@ else
 		SF.CheckType( name, "string" )
 		local e = SF.instance.data.entity
 		if IsValid( e ) then
-			e.name = name
+			e.name = string.sub(name, 1, 256)
 		end
 	end
 	
