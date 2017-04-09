@@ -122,7 +122,7 @@ function input_methods.enableCursor( enabled )
 	SF.Permissions.check( SF.instance.player, nil, "input" )
 
 	if not SF.instance:isHUDActive() then
-		SF.throw( "No HUD component connected", 2 )
+		SF.Throw( "No HUD component connected", 2 )
 	end
 
 	gui.EnableScreenClicker( enabled )

@@ -30,9 +30,9 @@ function file_library.open ( path, mode )
 	SF.Permissions.check( SF.instance.player, path, "file.open" )
 	SF.CheckType( path, "string" )
 	SF.CheckType( mode, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	local f = file.Open( "sf_filedata/" .. path, mode, "DATA" )
-	if f then return wrap(f) else SF.throw( "Failed to open file", 2 ) return end
+	if f then return wrap(f) else SF.Throw( "Failed to open file", 2 ) return end
 end
 
 --- Reads a file from path
@@ -41,9 +41,9 @@ end
 function file_library.read ( path )
 	SF.Permissions.check( SF.instance.player, path, "file.read" )
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	local contents = file.Read( "sf_filedata/" .. path, "DATA" )
-	if contents then return contents else SF.throw( "file not found", 2 ) return end
+	if contents then return contents else SF.Throw( "file not found", 2 ) return end
 end
 
 --- Writes to a file
@@ -53,10 +53,10 @@ function file_library.write ( path, data )
 	SF.Permissions.check( SF.instance.player, path, "file.write" )
 	SF.CheckType( path, "string" )
 	SF.CheckType( data, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	
 	local f = file.Open( "sf_filedata/" .. path, "wb", "DATA" )
-	if not f then SF.throw( "Couldn't open file for writing.", 2 ) return end
+	if not f then SF.Throw( "Couldn't open file for writing.", 2 ) return end
 	f:Write( data )
 	f:Close()
 end
@@ -68,10 +68,10 @@ function file_library.append ( path, data )
 	SF.Permissions.check( SF.instance.player, path, "file.write" )
 	SF.CheckType( path, "string" )
 	SF.CheckType( data, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	
 	local f = file.Open( "sf_filedata/" .. path, "ab", "DATA" )
-	if not f then SF.throw( "Couldn't open file for writing.", 2 ) return end
+	if not f then SF.Throw( "Couldn't open file for writing.", 2 ) return end
 	f:Write( data )
 	f:Close()
 end
@@ -82,7 +82,7 @@ end
 function file_library.exists ( path )
 	SF.Permissions.check( SF.instance.player, path, "file.exists" )
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	return file.Exists( "sf_filedata/" .. path, "DATA" )
 end
 
@@ -92,8 +92,8 @@ end
 function file_library.delete ( path )
 	SF.Permissions.check( SF.instance.player, path, "file.write" )
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
-	if not file.Exists( "sf_filedata/" .. path, "DATA" ) then SF.throw( "file not found", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
+	if not file.Exists( "sf_filedata/" .. path, "DATA" ) then SF.Throw( "file not found", 2 ) return end
 	file.Delete( path )
 	return true
 end
@@ -103,7 +103,7 @@ end
 function file_library.createDir ( path )
 	SF.Permissions.check( SF.instance.player, path, "file.write" )
 	SF.CheckType( path, "string" )
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	file.CreateDir( "sf_filedata/" .. path )
 end
 
@@ -116,7 +116,7 @@ function file_library.find ( path, sorting )
 	SF.Permissions.check( SF.instance.player, path, "file.exists" )
 	SF.CheckType( path, "string" )
 	if sorting then SF.CheckType( sorting, "string" ) end
-	if path:find( "..", 1, true ) then SF.throw( "path contains '..'", 2 ) return end
+	if path:find( "..", 1, true ) then SF.Throw( "path contains '..'", 2 ) return end
 	return file.Find( "sf_filedata/" .. path, "DATA", sorting )
 end
 

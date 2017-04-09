@@ -49,12 +49,12 @@ function sound_library.create ( ent, path )
 	SF.CheckType( path, "string" )
 
 	if path:match( '["?]' ) then
-		SF.throw( "Invalid sound path: " .. path, 2 )
+		SF.Throw( "Invalid sound path: " .. path, 2 )
 	end
 
 	local e = SF.UnwrapObject( ent )
 	if not ( e or e:IsValid() ) then
-		SF.throw( "Invalid Entity", 2 )
+		SF.Throw( "Invalid Entity", 2 )
 	end
 
 	local s = wrap( CreateSound( e, path ) )

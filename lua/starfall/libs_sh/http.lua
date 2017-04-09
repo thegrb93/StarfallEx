@@ -24,7 +24,7 @@ end )
 local function httpRequestReady ( instance )
 	local httpData = instance.data.http
 	if CurTime() - httpData.lastRequest < http_interval:GetFloat() or httpData.active >= http_max_active:GetInt() then
-		SF.throw( "You can't run a new http request yet", 2 )
+		SF.Throw( "You can't run a new http request yet", 2 )
 	end
 	return true
 end
@@ -85,7 +85,7 @@ function http_library.post ( url, params, callbackSuccess, callbackFail )
 		SF.CheckType( params, "table" )
 		for k,v in pairs( params ) do
 			if type( k ) != "string" or type( v ) ~= "string" then
-				SF.throw( "Post parameters can only contain string keys and string values", 2 )
+				SF.Throw( "Post parameters can only contain string keys and string values", 2 )
 			end
 		end
 	end

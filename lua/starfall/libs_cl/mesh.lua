@@ -58,7 +58,7 @@ local function canAddTriangles(inst, triangles)
 	local id = inst.playerid
 	if plyTriangleCount[id] then
 		if plyTriangleCount[id]+triangles>maxtriangles:GetInt() then
-			SF.throw("The triangle limit has been reached.", 3)
+			SF.Throw("The triangle limit has been reached.", 3)
 		end
 	end
 end
@@ -94,7 +94,7 @@ function mesh_library.createFromTable ( verteces )
 	SF.CheckType( verteces, "table" )
 	
 	local nvertices = #verteces
-	if nvertices<3 or nvertices%3!=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
+	if nvertices<3 or nvertices%3!=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
 	local ntriangles = nvertices/3
 	
 	local instance = SF.instance
@@ -107,7 +107,7 @@ function mesh_library.createFromTable ( verteces )
 			if vertexCheck[k] and (dgetmeta(v)==vertexCheck[k] or type(v)==vertexCheck[k]) then
 				vert[k] = vertexUnwrap[k](v)
 			else
-				SF.throw("Invalid vertex keyvalue: "..tostring(k).." "..tostring(v), 2)
+				SF.Throw("Invalid vertex keyvalue: "..tostring(k).." "..tostring(v), 2)
 			end
 		end
 		unwrapped[i] = vert
@@ -145,14 +145,14 @@ function mesh_library.createFromObj ( obj )
 			local t = map[tag]
 			if t then
 				local ok = pcall(t,f)
-				if not ok then SF.throw("Failed to parse tag: "..tag..". ("..line..")", 2) end
+				if not ok then SF.Throw("Failed to parse tag: "..tag..". ("..line..")", 2) end
 			else
-				SF.throw("Unknown tag in obj file: "..tag, 2)
+				SF.Throw("Unknown tag in obj file: "..tag, 2)
 			end
 		end
 	end
 	
-	if #face<3 or #face%3!=0 then SF.throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
+	if #face<3 or #face%3!=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.",2) end
 	local ntriangles = #face/3
 	canAddTriangles(instance, ntriangles)
 	
@@ -162,23 +162,23 @@ function mesh_library.createFromObj ( obj )
 		local f = string.gmatch(v, "([^/]*)/?")
 		local posv = tonumber(f())
 		if posv then
-			vert.pos = pos[posv] or SF.throw("Invalid face position index: "..tostring(posv), 2)
+			vert.pos = pos[posv] or SF.Throw("Invalid face position index: "..tostring(posv), 2)
 		else
-			SF.throw("Invalid face position index: "..tostring(posv), 2)
+			SF.Throw("Invalid face position index: "..tostring(posv), 2)
 		end
 		local texv = tonumber(f())
 		if texv then
 			local j = texv*2
-			vert.u = uv[j-1] or SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
-			vert.v = uv[j] or SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+			vert.u = uv[j-1] or SF.Throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+			vert.v = uv[j] or SF.Throw("Invalid face texture coordinate index: "..tostring(texv), 2)
 		else
-			SF.throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+			SF.Throw("Invalid face texture coordinate index: "..tostring(texv), 2)
 		end
 		local normv = tonumber(f())
 		if normv then
-			vert.normal = norm[normv] or SF.throw("Invalid face normal index: "..tostring(normv), 2)
+			vert.normal = norm[normv] or SF.Throw("Invalid face normal index: "..tostring(normv), 2)
 		else
-			SF.throw("Invalid face normal index: "..tostring(normv), 2)
+			SF.Throw("Invalid face normal index: "..tostring(normv), 2)
 		end
 		vertices[_] = vert
 	end
@@ -206,8 +206,8 @@ function mesh_methods:draw()
 	SF.CheckType( self, mesh_metamethods )
 	local mesh = unwrap( self )
 	local data = SF.instance.data
-	if not data.meshes[mesh] then SF.throw("Tried to use invalid mesh.", 2) end
-	if not data.render.isRendering then SF.throw("Not in rendering hook.", 2) end
+	if not data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
+	if not data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh:Draw()
 end
 
@@ -216,7 +216,7 @@ function mesh_methods:destroy()
 	SF.CheckType( self, mesh_metamethods )
 	local mesh = unwrap( self )
 	local instance = SF.instance
-	if not instance.data.meshes[mesh] then SF.throw("Tried to use invalid mesh.", 2) end
+	if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
 	destroyMesh(instance.playerid, mesh, instance.data.meshes)
 end
 

@@ -36,21 +36,30 @@ end
 
 local dgetmeta = debug.getmetatable
 
+SF.Errormeta = {__tostring=function(t) return t.message end, __metatable="Error"}
+--- Builds an error type to that contains line numbers, file name, and traceback
+-- @param msg Message
+-- @param level Which level in the stacktrace to blame
+-- @param uncatchable Makes this exception uncatchable
+function SF.MakeError ( msg, level, uncatchable )
+	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
+	local filename = info.short_src:match( "^SF:(.*)$" ) or info.short_src
+	return setmetatable( {
+		uncatchable = false,
+		file = filename,
+		line = info.currentline,
+		message = tostring( msg ),
+		uncatchable = uncatchable,
+		traceback = debug.traceback( "", 2 )
+	}, SF.Errormeta )
+end
+
 --- Throws an error like the throw function in builtins
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
-function SF.throw ( msg, level, uncatchable )
-	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
-	local filename = info.short_src:match( "^SF:(.*)$" ) or info.short_src
-	local err = {
-		uncatchable = false,
-		file = filename,
-		line = info.currentline,
-		message = msg,
-		uncatchable = uncatchable
-	}
-	error( err )
+function SF.Throw ( msg, level, uncatchable )
+	error( SF.MakeError( msg, 1 + ( level or 1 ), uncatchable ) )
 end
 
 SF.Types = {}
@@ -118,7 +127,7 @@ function SF.CheckType(val, typ, level, default)
 		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
-		SF.throw( "Type mismatch (Expected " .. typname .. ", got " .. ( type( mt ) == "string" and mt or type( val ) ) .. ") in function " .. funcname, level )
+		SF.Throw( "Type mismatch (Expected " .. typname .. ", got " .. ( type( mt ) == "string" and mt or type( val ) ) .. ") in function " .. funcname, level )
 	end
 end
 

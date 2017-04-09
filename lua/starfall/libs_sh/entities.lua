@@ -111,8 +111,8 @@ if CLIENT then
 		SF.CheckType(bone, "number")
 		SF.CheckType(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
@@ -124,8 +124,8 @@ if CLIENT then
 		SF.CheckType(bone, "number")
 		SF.CheckType(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
@@ -137,8 +137,8 @@ if CLIENT then
 		SF.CheckType(bone, "number")
 		SF.CheckType(ang, ang_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
@@ -150,8 +150,8 @@ if CLIENT then
 		local instance = SF.instance
 		SF.Permissions.check(instance.player, nil, "mesh")
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
-		if instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if instance.player != ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		if mesh then
 			SF.CheckType(mesh, SF.Mesh.Metatable)
 			ent:SetModelScale(0,0)
@@ -171,8 +171,8 @@ if CLIENT then
 		SF.CheckType(mins, vec_meta)
 		SF.CheckType(maxs, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player != ent:GetHoloOwner() then SF.throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player != ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
 end
@@ -347,7 +347,7 @@ function ents_methods:getMassCenter ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	return vwrap( phys:GetMassCenter() )
 end
 
@@ -358,7 +358,7 @@ function ents_methods:getMassCenterW ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	return vwrap( ent:LocalToWorld( phys:GetMassCenter() ) )
 end
 
@@ -379,7 +379,7 @@ function ents_methods:getMass ()
 	
 	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	
 	return phys:GetMass()
 end
@@ -392,7 +392,7 @@ function ents_methods:getInertia ()
 	
 	local ent = eunwrap( self )
 	local phys = getPhysObject( ent )
-	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	
 	return vwrap( phys:GetInertia() )
 end
@@ -403,7 +403,7 @@ end
 function ents_methods:getVelocity ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = eunwrap( self )
-	if not isValid( ent ) then SF.throw( "Entity is not valid", 2 ) end
+	if not isValid( ent ) then SF.Throw( "Entity is not valid", 2 ) end
 	return vwrap( ent:GetVelocity() )
 end
 
@@ -413,7 +413,7 @@ end
 function ents_methods:getAngleVelocity ()
 	SF.CheckType( self, ents_metamethods )
 	local phys = getPhysObject( eunwrap( self ) )
-	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	return vwrap( phys:GetAngleVelocity() )
 end
 
@@ -423,7 +423,7 @@ end
 function ents_methods:getAngleVelocityAngle ()
 	SF.CheckType( self, ents_metamethods )
 	local phys = getPhysObject( eunwrap( self ) )
-	if not phys or not phys:IsValid() then SF.throw( "Entity has no physics object or is not valid", 2 ) end
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	local vec = phys:GetAngleVelocity()
 	return awrap( Angle(vec.y, vec.z, vec.x) )
 end

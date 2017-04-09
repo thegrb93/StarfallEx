@@ -55,7 +55,7 @@ function timer_library.create(name, delay, reps, func, simple)
 	SF.CheckType(func,"function")
 	
 	local instance = SF.instance
-	if instance.data.timer_count > max_timers:GetInt() then SF.throw( "Max timers exceeded!", 2 ) end
+	if instance.data.timer_count > max_timers:GetInt() then SF.Throw( "Max timers exceeded!", 2 ) end
 	instance.data.timer_count = instance.data.timer_count + 1
 	
 	local timername

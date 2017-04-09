@@ -442,8 +442,8 @@ if SERVER then
 	function player_methods:setViewEntity ( e )
 		local pl = eunwrap( self )
 		local ent = eunwrap( e )
-		if not IsValid(pl) then SF.throw("Invalid Player", 2) end
-		if not IsValid(ent) then SF.throw("Invalid Entity", 2) end
+		if not IsValid(pl) then SF.Throw("Invalid Player", 2) end
+		if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
 
 		if IsValid(pl.sfhudenabled) and pl.sfhudenabled.link == SF.instance.data.entity then
 			pl:SetViewEntity( ent )

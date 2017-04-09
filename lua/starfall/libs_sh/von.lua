@@ -83,7 +83,7 @@ function d_findVariable(s, i, len, lastType, jobstate)
 	while true do
 		--	Stop at the end. Throw an error. This function MUST NOT meet the end!
 		if i > len then
-			SF.throw( "vON: Reached end of string, cannot form proper variable.", 3 )
+			SF.Throw( "vON: Reached end of string, cannot form proper variable.", 3 )
 		end
 
 		--	Cache the character. Nobody wants to look for the same character ten times.
@@ -179,7 +179,7 @@ function d_findVariable(s, i, len, lastType, jobstate)
 
 		--	This will occur if the very first character in the vON code is wrong.
 		else
-			SF.throw( "vON: Malformed data... Can't find a proper type definition. Char#" .. i .. ":" .. c, 3 )
+			SF.Throw( "vON: Malformed data... Can't find a proper type definition. Char#" .. i .. ":" .. c, 3 )
 		end
 
 		--	Move the pointer one step forward.
@@ -210,7 +210,7 @@ function s_anyVariable(data, lastType, isNumeric, isKey, isLast, jobstate)
 			--	The second argument, which is true now, means that the data type was just changed.
 			return _serialize[lastType](data, true, isNumeric, isKey, isLast, false, jobstate), lastType
 		else
-			SF.throw("vON: No serializer defined for type \"" .. lastType .. "\"!", 3)
+			SF.Throw("vON: No serializer defined for type \"" .. lastType .. "\"!", 3)
 		end
 	end
 
@@ -240,17 +240,17 @@ _deserialize = {
 
 				if id then
 					if jobstate[1][id] and not jobstate[2] then
-						SF.throw("vON: There already is a table of reference #" .. id .. "! Missing an option maybe?", 3)
+						SF.Throw("vON: There already is a table of reference #" .. id .. "! Missing an option maybe?", 3)
 					end
 
 					jobstate[1][id] = ret
 
 					i = e + 1
 				else
-					SF.throw("vON: Malformed table! Reference ID starting at char #" .. i .. " doesn't contain a number!", 3)
+					SF.Throw("vON: Malformed table! Reference ID starting at char #" .. i .. " doesn't contain a number!", 3)
 				end
 			else
-				SF.throw("vON: Malformed table! Cannot find end of reference ID start at char #" .. i .. "!", 3)
+				SF.Throw("vON: Malformed table! Cannot find end of reference ID start at char #" .. i .. "!", 3)
 			end
 		end
 
@@ -264,7 +264,7 @@ _deserialize = {
 
 				--	Otherwise, the data has to be damaged.
 				else
-					SF.throw( "vON: Reached end of string, incomplete table definition.", 2 )
+					SF.Throw( "vON: Reached end of string, incomplete table definition.", 2 )
 				end
 			end
 
@@ -312,7 +312,7 @@ _deserialize = {
 				--	But, if there's a key read already...
 				elseif key then
 					--	Then this is malformed.
-					SF.throw( "vON: Malformed table... Two keys declared successively? Char#" .. i .. ":" .. c, 2 )
+					SF.Throw( "vON: Malformed table... Two keys declared successively? Char#" .. i .. ":" .. c, 2 )
 
 				--	Otherwise the key will be read.
 				else
@@ -338,15 +338,15 @@ _deserialize = {
 			local n = tonumber(sub(s, i, a - 1))
 
 			if n then
-				return jobstate[1][n] or SF.throw("vON: Table reference does not point to a (yet) known table!", 3), a - 1
+				return jobstate[1][n] or SF.Throw("vON: Table reference does not point to a (yet) known table!", 3), a - 1
 			else
-				SF.throw("vON: Table reference definition does not contain a valid number!", 3)
+				SF.Throw("vON: Table reference definition does not contain a valid number!", 3)
 			end
 		end
 
 		--	Using %D breaks identification of negative numbers. :(
 
-		SF.throw("vON: Number definition started... Found no end.", 3)
+		SF.Throw("vON: Number definition started... Found no end.", 3)
 	end,
 
 
@@ -360,10 +360,10 @@ _deserialize = {
 		a = find(s, "[;:}~]", i)
 
 		if a then
-			return tonumber(sub(s, i, a - 1)) or SF.throw("vON: Number definition does not contain a valid number!", 3), a - 1
+			return tonumber(sub(s, i, a - 1)) or SF.Throw("vON: Number definition does not contain a valid number!", 3), a - 1
 		end
 
-		SF.throw( "vON: Number definition started... Found no end.", 3 )
+		SF.Throw( "vON: Number definition started... Found no end.", 3 )
 	end,
 
 
@@ -383,7 +383,7 @@ _deserialize = {
 		end
 
 		--	Any other supposely "boolean" is just a sign of malformed data.
-		SF.throw( "vON: Invalid value on boolean type... Char#" .. i .. ": " .. c, 3 )
+		SF.Throw( "vON: Invalid value on boolean type... Char#" .. i .. ": " .. c, 3 )
 	end,
 
 
@@ -403,7 +403,7 @@ _deserialize = {
 					return res .. sub(s, i, a - 2), a
 				end
 			else
-				SF.throw("vON: Old string definition started... Found no end.", 3)
+				SF.Throw("vON: Old string definition started... Found no end.", 3)
 			end
 		end
 	end,
@@ -424,7 +424,7 @@ _deserialize = {
 					return res .. sub(s, i, a - 1), a
 				end
 			else
-				SF.throw("vON: String definition started... Found no end.", 3)
+				SF.Throw("vON: String definition started... Found no end.", 3)
 			end
 		end
 	end,
@@ -461,7 +461,7 @@ _serialize = {
 
 		if jobstate[1] and jobstate[1][data] then
 			if jobstate[2][data] then
-				SF.throw("vON: Table #" .. jobstate[1][data] .. " written twice..?", 2)
+				SF.Throw("vON: Table #" .. jobstate[1][data] .. " written twice..?", 2)
 			end
 
 			result[#result + 1] = "#"
@@ -606,7 +606,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 				return SF.WrapObject(Entity(tonumber(sub(s, i, a - 1)))), a - 1
 			end
 
-			SF.throw("vON: Entity ID definition started... Found no end.", 3)
+			SF.Throw("vON: Entity ID definition started... Found no end.", 3)
 		end,
 
 
@@ -639,7 +639,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 				return SF.Vectors.Wrap(Vector(x, y, z)), a - 1
 			end
 
-			SF.throw("vON: Vector definition started... Found no end.",3)
+			SF.Throw("vON: Vector definition started... Found no end.",3)
 		end,
 
 
@@ -672,7 +672,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 				return SF.Angles.Wrap(Angle(p, y, r)), a - 1
 			end
 
-			SF.throw("vON: Angle definition started... Found no end.",3)
+			SF.Throw("vON: Angle definition started... Found no end.",3)
 		end,
 	}
 
@@ -785,7 +785,7 @@ _d_meta = {
 		if type(str) == "string" then
 			return _d_table(str, nil, #str, true, {{}, allowIdRewriting})
 		end
-		SF.throw( "vON: You must deserialize a string, not a " .. type( str ), 2 )
+		SF.Throw( "vON: You must deserialize a string, not a " .. type( str ), 2 )
 	end,
 	__newindex = function() end,
 	__metatable = false
@@ -803,7 +803,7 @@ _s_meta = {
 
 			return _s_table(data, nil, nil, nil, nil, true, {false})
 		end
-		SF.throw( "vON: You must serialize a table, not a " .. type( data ), 2 )
+		SF.Throw( "vON: You must serialize a table, not a " .. type( data ), 2 )
 	end,
 	__newindex = function() end,
 	__metatable = false

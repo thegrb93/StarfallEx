@@ -79,8 +79,8 @@ function props_library.create ( pos, ang, model, frozen )
 
 	local instance = SF.instance
 
-	if not instance.data.props.burst:use(1) then return SF.throw( "Can't spawn props that often", 2 )
-	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
+	if not instance.data.props.burst:use(1) then return SF.Throw( "Can't spawn props that often", 2 )
+	elseif personal_max_reached( instance ) then return SF.Throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 	if not gamemode.Call( "PlayerSpawnProp", instance.player, model ) then return end
 
 	local propdata = instance.data.props
@@ -128,8 +128,8 @@ function props_library.createSent ( pos, ang, class, frozen )
 	local ang = SF.Angles.Unwrap( ang )
 
 	local instance = SF.instance
-	if not instance.data.props.burst:use(1) then return SF.throw( "Can't spawn props that often", 2 )
-	elseif personal_max_reached( instance ) then return SF.throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
+	if not instance.data.props.burst:use(1) then return SF.Throw( "Can't spawn props that often", 2 )
+	elseif personal_max_reached( instance ) then return SF.Throw( "Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2 ) end
 
 	local swep = list.Get( "Weapon" )[ class ]
 	local sent = list.Get( "SpawnableEntities" )[ class ]
