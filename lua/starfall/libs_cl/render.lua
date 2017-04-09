@@ -561,6 +561,7 @@ function render_library.createRenderTarget ( name )
 
 	local instance = SF.instance
 	local data = instance.data.render
+	if data.rendertargets[ name ] then SF.Throw( "A rendertarget with this name already exists!", 2 ) end
 
 	if plyRTcount[ instance.playerid ] then
 		if plyRTcount[ instance.playerid ] >= cv_max_rendertargets:GetInt() then
