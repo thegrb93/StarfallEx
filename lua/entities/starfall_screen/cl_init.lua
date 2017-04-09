@@ -26,8 +26,8 @@ net.Receive( "starfall_processor_used", function ( len )
 		if activator == LocalPlayer() then
 			if chip.error and chip.error.message then
 				SetClipboardText( string.format( "%q", chip.error.message ) )
-			elseif screen:GetDTString( 0 ) then
-				SetClipboardText( screen:GetDTString( 0 ) )
+			elseif chip:GetDTString( 0 ) then
+				SetClipboardText( chip:GetDTString( 0 ) )
 			end
 		end
 	end
