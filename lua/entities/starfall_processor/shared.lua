@@ -40,8 +40,10 @@ function ENT:Compile(owner, files, mainfile)
 		self.name = tostring( instance.ppdata.scriptnames[ instance.mainfile ] )
 	end
 	
-	instance.runOnError = function(inst,...) self:Error(...) end
 	self.instance = instance
+	instance.runOnError = function(inst,...) self:Error(...) end
+	instance.data.userdata = self.starfalluserdata
+	self.starfalluserdata = nil
 	
 	local ok, msg, traceback = instance:initialize()
 	if not ok then return end

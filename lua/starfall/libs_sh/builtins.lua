@@ -512,6 +512,22 @@ if SERVER then
 		SF.Permissions.check( SF.instance.player, nil, "console.command" )
 		SF.instance.player:ConCommand( cmd )
 	end
+	
+	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB
+	-- @server
+	-- @param str String data
+	function SF.DefaultEnvironment.setUserdata( str )
+		SF.CheckType( str, "string" )
+		if #str>1048576 then SF.Throw( "The userdata limit is 1MiB", 2 ) end
+		SF.instance.data.userdata = str
+	end
+	
+	--- Gets the chip's userdata that the duplicator tool loads
+	-- @server
+	-- @return String data
+	function SF.DefaultEnvironment.getUserdata()
+		return SF.instance.data.userdata or ""
+	end
 else
 	--- Sets the chip's display name
 	-- @client
