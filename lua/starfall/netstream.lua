@@ -57,7 +57,8 @@ end
 --Pop the queue and start the next task
 function net.Stream:Remove()
 	
-	pcall( self.callback, self.returndata )
+	local ok, err = xpcall( self.callback, debug.traceback, self.returndata )
+	if not ok then ErrorNoHalt( err ) end
 	
 	timer.Remove( "StreamDlTimeout" .. self.identifier )
 	table.remove( self.queue, 1 )
