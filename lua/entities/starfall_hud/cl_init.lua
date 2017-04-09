@@ -31,16 +31,12 @@ function ENT:DrawHUD( hookname, ... )
 	render.PushFilterMin( TEXFILTER.ANISOTROPIC )
 	
 	data.render.renderEnt = self
-	data.render.isRendering = true
 	data.render.useStencil = false
-	draw.NoTexture()
-	surface.SetDrawColor( 255, 255, 255, 255 )
 	
 	instance:runScriptHook( hookname, ... )
 	
 	render.PopFilterMag()
 	render.PopFilterMin()
-	data.render.isRendering = nil
 end
 
 

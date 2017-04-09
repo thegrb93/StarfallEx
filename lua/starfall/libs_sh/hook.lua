@@ -253,6 +253,7 @@ else
 	-- Client hooks
 	add( "StartChat" )
 	add( "FinishChat" )
+	add( "HUDPaint", "renderoffscreen" )
 end
 
 -- Shared hooks
