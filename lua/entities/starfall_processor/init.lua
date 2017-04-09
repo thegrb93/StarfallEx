@@ -92,10 +92,7 @@ function ENT:Compile(files, mainfile)
 	if update then
 		sendCode(self, self.owner, self.files, self.mainfile)
 	end
-
-	local ppdata = {}
-	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], ppdata)
-		
+	
 	local ok, instance = SF.Instance.Compile( files, mainfile, self.owner, { entity = self } )
 	if not ok then self:Error(instance) return end
 	
