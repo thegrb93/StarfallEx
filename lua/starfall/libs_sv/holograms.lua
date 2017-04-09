@@ -129,7 +129,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 	SF.CheckType(weight, "number")
 	flexid = math.floor(flexid)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
-		SF.throw( "Invalid flex: "..flexid, 2 )
+		SF.Throw( "Invalid flex: "..flexid, 2 )
 	end
 	local holoent = unwrap(self)
 	if IsValid(holoent) then
@@ -153,7 +153,7 @@ end
 -- @param model string model path
 function hologram_methods:setModel ( model )
 	SF.CheckType( model, "string" )
-	if not util.IsValidModel( model ) then SF.throw( "Model is invalid", 2 ) end
+	if not util.IsValidModel( model ) then SF.Throw( "Model is invalid", 2 ) end
 
 	local this = unwrap( self )
 	if IsValid( this ) then
@@ -263,7 +263,7 @@ function holograms_library.create ( pos, ang, model, scale )
 	SF.CheckType( pos, vec_meta )
 	SF.CheckType( ang, ang_meta )
 	SF.CheckType( model, "string" )
-	if not util.IsValidModel( model ) then SF.throw( "Model is invalid", 2 ) end
+	if not util.IsValidModel( model ) then SF.Throw( "Model is invalid", 2 ) end
 	if scale then
 		SF.CheckType( scale, vec_meta )
 		scale = vunwrap( scale )
@@ -275,7 +275,7 @@ function holograms_library.create ( pos, ang, model, scale )
 	local holodata = instance.data.holograms
 	
 	if plyCount[ instance.player ] >= SF.Holograms.personalquota:GetInt() then 
-		SF.throw( "Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2 ) 
+		SF.Throw( "Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2 ) 
 	end
 
 	local holoent = ents.Create( "starfall_hologram" )

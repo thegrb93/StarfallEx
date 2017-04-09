@@ -26,8 +26,6 @@ if SERVER then
 		sf:SetPos( Pos )
 		sf:SetModel( model )
 		sf:Spawn()
-
-		sf.owner = pl
 		
 		if WireLib and inputs and inputs[1] and inputs[2] then
 			sf.Inputs = WireLib.AdjustSpecialInputs(sf, inputs[1], inputs[2])
@@ -77,7 +75,6 @@ function TOOL:LeftClick( trace )
 	
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
-		sf.owner = ply
 	else
 		local model = self:GetClientInfo( "Model" )
 		if not (util.IsValidModel( model ) and util.IsValidProp( model )) then return false end
@@ -102,7 +99,7 @@ function TOOL:LeftClick( trace )
 	if not SF.RequestCode(ply, function(mainfile, files)
 		if not mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
-		sf:Compile(files, mainfile)
+		sf:Compile(ply, files, mainfile)
 		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
 			local model = sf.instance.ppdata.models[ sf.instance.mainfile ]
 			if util.IsValidModel( model ) and util.IsValidProp( model ) then

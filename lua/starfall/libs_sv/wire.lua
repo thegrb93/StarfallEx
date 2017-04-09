@@ -249,18 +249,18 @@ function wire_library.adjustInputs ( names, types )
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
-	if not ent then SF.throw( "No entity to create inputs on", 2 ) end
+	if not ent then SF.Throw( "No entity to create inputs on", 2 ) end
 	
-	if #names != #types then SF.throw( "Table lengths not equal", 2 ) end
+	if #names != #types then SF.Throw( "Table lengths not equal", 2 ) end
 	for i=1,#names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) != "string" then SF.throw( "Non-string input name: " .. newname, 2 ) end
-		if type(newtype) != "string" then SF.throw( "Non-string input type: " .. newtype, 2 ) end
+		if type(newname) != "string" then SF.Throw( "Non-string input name: " .. newname, 2 ) end
+		if type(newtype) != "string" then SF.Throw( "Non-string input type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match( "^[%u][%a%d]*$" ) then SF.throw( "Invalid input name: " .. newname, 2 ) end
-		if not inputConverters[ newtype ] then SF.throw( "Invalid/unsupported input type: " .. newtype, 2 ) end
+		if not newname:match( "^[%u][%a%d]*$" ) then SF.Throw( "Invalid input name: " .. newname, 2 ) end
+		if not inputConverters[ newtype ] then SF.Throw( "Invalid/unsupported input type: " .. newtype, 2 ) end
 		names[i] = newname
 		types[i] = newtype
 	end
@@ -277,18 +277,18 @@ function wire_library.adjustOutputs ( names, types )
 	SF.CheckType(names,"table")
 	SF.CheckType(types,"table")
 	local ent = SF.instance.data.entity
-	if not ent then SF.throw( "No entity to create outputs on", 2 ) end
+	if not ent then SF.Throw( "No entity to create outputs on", 2 ) end
 	
-	if #names != #types then SF.throw( "Table lengths not equal", 2 ) end
+	if #names != #types then SF.Throw( "Table lengths not equal", 2 ) end
 	for i=1,#names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) != "string" then SF.throw( "Non-string output name: " .. newname, 2 ) end
-		if type(newtype) != "string" then SF.throw( "Non-string output type: " .. newtype, 2 ) end
+		if type(newname) != "string" then SF.Throw( "Non-string output name: " .. newname, 2 ) end
+		if type(newtype) != "string" then SF.Throw( "Non-string output type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
-		if not newname:match("^[%u][%a%d]*$") then SF.throw( "Invalid output name: " .. newname, 2 ) end
-		if not outputConverters[newtype] then SF.throw( "Invalid/unsupported output type: " .. newtype, 2 ) end
+		if not newname:match("^[%u][%a%d]*$") then SF.Throw( "Invalid output name: " .. newname, 2 ) end
+		if not outputConverters[newtype] then SF.Throw( "Invalid/unsupported output type: " .. newtype, 2 ) end
 		names[i] = newname
 		types[i] = newtype
 	end
@@ -299,7 +299,7 @@ end
 --- Returns the wirelink representing this entity.
 function wire_library.self()
 	local ent = SF.instance.data.entity
-	if not ent then SF.throw( "No entity", 2 ) end
+	if not ent then SF.Throw( "No entity", 2 ) end
 	return wlwrap(ent)
 end
 
@@ -323,23 +323,23 @@ function wire_library.create ( entI, entO, inputname, outputname )
 	local entI = SF.Entities.Unwrap( entI )
 	local entO = SF.Entities.Unwrap( entO )
 	
-	if not IsValid( entI ) then SF.throw( "Invalid source" ) end
-	if not IsValid( entO ) then SF.throw( "Invalid target" ) end
+	if not IsValid( entI ) then SF.Throw( "Invalid source" ) end
+	if not IsValid( entO ) then SF.Throw( "Invalid target" ) end
 	
 	SF.Permissions.check( SF.instance.player, entI, "wire.createWire" )
 	SF.Permissions.check( SF.instance.player, entO, "wire.createWire" )
 	
-	if not entI.Inputs then SF.throw( "Source has no valid inputs" ) end
-	if not entO.Outputs then SF.throw( "Target has no valid outputs" ) end
+	if not entI.Inputs then SF.Throw( "Source has no valid inputs" ) end
+	if not entO.Outputs then SF.Throw( "Target has no valid outputs" ) end
 	
-	if inputname == "" then SF.throw( "Invalid input name" ) end
-	if outputname == "" then SF.throw( "Invalid output name" ) end
+	if inputname == "" then SF.Throw( "Invalid input name" ) end
+	if outputname == "" then SF.Throw( "Invalid output name" ) end
 	
-	if not entI.Inputs[ inputname ] then SF.throw( "Invalid source input: " .. inputname ) end
-	if not entO.Outputs[ outputname ] then SF.throw( "Invalid source output: " .. outputname ) end
+	if not entI.Inputs[ inputname ] then SF.Throw( "Invalid source input: " .. inputname ) end
+	if not entO.Outputs[ outputname ] then SF.Throw( "Invalid source output: " .. outputname ) end
 	if entI.Inputs[ inputname ].Src then
 		local CheckInput = entI.Inputs[ inputname ]
-		if CheckInput.SrcId == outputname and CheckInput.Src == entO then SF.throw( "Source \"" .. inputname .. "\" is already wired to target \"" .. outputname .. "\"" ) end
+		if CheckInput.SrcId == outputname and CheckInput.Src == entO then SF.Throw( "Source \"" .. inputname .. "\" is already wired to target \"" .. outputname .. "\"" ) end
 	end
 		
 	WireLib.Link_Start( SF.instance.player:UniqueID(), entI, entI:WorldToLocal( entI:GetPos() ), inputname, "cable/rope", Vector( 255, 255, 255 ), 0 )
@@ -355,12 +355,12 @@ function wire_library.delete ( entI, inputname )
 	
 	local entI = SF.Entities.Unwrap( entI )
 	
-	if not IsValid( entI ) then SF.throw( "Invalid source" ) end
+	if not IsValid( entI ) then SF.Throw( "Invalid source" ) end
 	
 	SF.Permissions.check( SF.instance.player, entI, "wire.deleteWire" )
 	
-	if not entI.Inputs or not entI.Inputs[ inputname ] then SF.throw( "Entity does not have input: " .. inputname ) end
-	if not entI.Inputs[ inputname ].Src then SF.throw( "Input \"" .. inputname .. "\" is not wired" ) end
+	if not entI.Inputs or not entI.Inputs[ inputname ] then SF.Throw( "Entity does not have input: " .. inputname ) end
+	if not entI.Inputs[ inputname ].Src then SF.Throw( "Input \"" .. inputname .. "\" is not wired" ) end
 	
 	WireLib.Link_Clear( entI, inputname )
 end
@@ -375,7 +375,7 @@ local function parseEntity( ent, io )
 		ent = SF.instance.data.entity or nil
 	end
 	
-	if not IsValid( ent ) then SF.throw( "Invalid source" ) end
+	if not IsValid( ent ) then SF.Throw( "Invalid source" ) end
 
 	local ret = {}
 	for k, v in pairs( ent[ io ] ) do

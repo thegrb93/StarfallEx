@@ -168,6 +168,6 @@ function vmatrix_metamethods.__mul ( lhs, rhs )
 	elseif rhsmeta == vec_meta then
 		return vwrap( unwrap( lhs ) * vunwrap( rhs ) )
 	else
-		SF.throw("Matrix must be multiplied with another matrix or vector on right hand side",2)
+		SF.Throw("Matrix must be multiplied with another matrix or vector on right hand side",2)
 	end
 end

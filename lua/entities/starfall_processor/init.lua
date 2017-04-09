@@ -31,13 +31,13 @@ util.AddNetworkString( "starfall_processor_update_links" )
 util.AddNetworkString( "starfall_processor_used" )
 util.AddNetworkString( "starfall_processor_link" )
 
-local function sendCode ( proc, owner, files, mainfile, recipient )
+function ENT:SendCode ( recipient )
 	net.Start( "starfall_processor_download" )
-	net.WriteEntity( proc )
-	net.WriteEntity( owner )
-	net.WriteString( mainfile )
+	net.WriteEntity( self )
+	net.WriteEntity( self.owner )
+	net.WriteString( self.mainfile )
 	
-	for name, data in pairs( files ) do
+	for name, data in pairs( self.files ) do
 	
 		net.WriteBit( false )
 		net.WriteString( name )
@@ -59,7 +59,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 		hook.Add("Think", hookname, function()
 			if ply:IsValid() and proc:IsValid() and CurTime()<timeout then
 				if proc.mainfile and proc.files then
-					sendCode(proc, proc.owner, proc.files, proc.mainfile, ply)
+					proc:SendCode(ply)
 					hook.Remove("Think", hookname)
 				end
 			else
@@ -76,56 +76,6 @@ net.Receive("starfall_processor_update_links", function(len, ply)
 		linked:LinkEnt( linked.link, ply )
 	end
 end)
-
-function ENT:Compile(files, mainfile)
-	if self.instance then
-		self.instance:runScriptHook( "removed" )
-		self.instance:deinitialize()
-		self.instance = nil
-	end
-	
-	local update = self.mainfile != nil
-	self.error = nil
-	self.files = files
-	self.mainfile = mainfile
-
-	if update then
-		sendCode(self, self.owner, self.files, self.mainfile)
-	end
-
-	local ppdata = {}
-	SF.Preprocessor.ParseDirectives(mainfile, files[mainfile], ppdata)
-		
-	local ok, instance = SF.Instance.Compile( files, mainfile, self.owner, { entity = self } )
-	if not ok then self:Error(instance) return end
-	
-	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[ instance.mainfile ] then
-		self.name = tostring( instance.ppdata.scriptnames[ instance.mainfile ] )
-	end
-	
-	instance.runOnError = function(inst,...) self:Error(...) end
-	self.instance = instance
-	
-	local ok, msg, traceback = instance:initialize()
-	if not ok then
-		self:Error( msg, traceback )
-		return
-	end
-	
-	if not self.instance then return end
-	
-	local clr = self:GetColor()
-	self:SetColor( Color( 255, 255, 255, clr.a ) )
-	
-	if self.Inputs then
-		for k, v in pairs(self.Inputs) do
-			self:TriggerInput( k, v.Value )
-		end
-	end
-	
-	self.instance:runScriptHook( "initialize" )
-	self:SetNWInt( "State", self.States.Normal )
-end
 
 function ENT:GetGateName()
 	return self.name
@@ -164,11 +114,10 @@ function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
 		if WireLib then
 			WireLib.ApplyDupeInfo( ply, ent, info, EntityLookup( CreatedEntities ) )
 		end
-		self.owner = ply
 	
 		if info.starfall then
 			local code, main = SF.DeserializeCode( info.starfall )
-			self:Compile( code, main )
+			self:Compile( ply, code, main )
 		end
 	end
 end

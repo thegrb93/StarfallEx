@@ -43,7 +43,7 @@ end
 function npc_methods:addRelationship(str)
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:AddRelationship(str)
 end
@@ -69,9 +69,9 @@ function npc_methods:addEntityRelationship(ent, disp, priority)
 	local npc = unwrap(self)
 	local target = unwrap(ent)
 	local relation = dispositions[disp]
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
-	if not target:IsValid() then SF.throw( "Target is invalid", 2 ) end
-	if not relation then SF.throw( "Invalid relationship specified" ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
+	if not target:IsValid() then SF.Throw( "Target is invalid", 2 ) end
+	if not relation then SF.Throw( "Invalid relationship specified" ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:AddEntityRelationship(target, relation, priority)
 end
@@ -84,8 +84,8 @@ function npc_methods:getRelationship(ent)
 	SF.CheckType( ent, ents_metatable )
 	local npc = unwrap(self)
 	local target = unwrap(ent)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
-	if not target:IsValid() then SF.throw( "Target is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
+	if not target:IsValid() then SF.Throw( "Target is invalid", 2 ) end
 	return dispositions[npc:Disposition()]
 end
 
@@ -96,8 +96,8 @@ function npc_methods:setEnemy(ent)
 	SF.CheckType( ent, ents_metatable )
 	local npc = unwrap(self)
 	local target = unwrap(ent)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
-	if not target:IsValid() then SF.throw( "Target is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
+	if not target:IsValid() then SF.Throw( "Target is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:SetTarget(target)
 end
@@ -107,7 +107,7 @@ end
 function npc_methods:getEnemy()
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	return vwrap(npc:GetEnemy())
 end
 
@@ -115,7 +115,7 @@ end
 function npc_methods:stop()
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:SetSchedule( SCHED_NONE )
 end
@@ -124,7 +124,7 @@ end
 function npc_methods:attackMelee()
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:SetSchedule( SCHED_MELEE_ATTACK1 )
 end
@@ -133,7 +133,7 @@ end
 function npc_methods:attackRange()
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:SetSchedule( SCHED_RANGE_ATTACK1 )
 end
@@ -143,7 +143,7 @@ end
 function npc_methods:goWalk(vec)
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:SetLastPosition( vunwrap(vec) )
 	npc:SetSchedule( SCHED_FORCED_GO )
@@ -154,7 +154,7 @@ end
 function npc_methods:goRun(vec)
 	SF.CheckType( self, npc_metatable )
 	local npc = unwrap(self)
-	if not npc:IsValid() then SF.throw( "NPC is invalid", 2 ) end
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	SF.Permissions.check( SF.instance.player, npc, "npcs.modify" )
 	npc:SetLastPosition( vunwrap(vec) )
 	npc:SetSchedule( SCHED_FORCED_GO_RUN )

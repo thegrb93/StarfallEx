@@ -47,7 +47,7 @@ end
 function net_library.start( name )
 	SF.CheckType( name, "string" )
 	local instance = SF.instance
-	if instance.data.net.started then SF.throw( "net message was already started", 2 ) end
+	if instance.data.net.started then SF.Throw( "net message was already started", 2 ) end
 
 	instance.data.net.started = true
 	instance.data.net.size = 8 -- 8 bytes overhead
@@ -63,10 +63,10 @@ end
 function net_library.send ( target, unreliable )
 	if unreliable then SF.CheckType( unreliable, "boolean" ) end
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	if not instance.data.net.burst:use( instance.data.net.size ) then
-		SF.throw( "Net message exceeds limit!", 3 )
+		SF.Throw( "Net message exceeds limit!", 3 )
 	end
 
 	local data = instance.data.net.data
@@ -92,7 +92,7 @@ function net_library.send ( target, unreliable )
 				sendfunc, newtarget = net.Send, nt
 			else
 				sendfunc, newtarget = net.Send, SF.Entities.Unwrap( target )
-				if not IsValid( newtarget ) or not newtarget:IsPlayer() then SF.throw( "Invalid player", 2 ) end
+				if not IsValid( newtarget ) or not newtarget:IsPlayer() then SF.Throw( "Invalid player", 2 ) end
 			end
 		else
 			sendfunc = net.Broadcast
@@ -113,7 +113,7 @@ end
 
 function net_library.writeString( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "string" )
 
@@ -136,7 +136,7 @@ end
 
 function net_library.writeData( t, n )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "string" )
 	SF.CheckType( n, "number" )
@@ -161,7 +161,7 @@ end
 -- @param str The string to be written
 function net_library.writeStream( str )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( str, "string" )
 	write( instance, "Stream", 8, str )
@@ -175,7 +175,7 @@ end
 function net_library.readStream( cb )
 	SF.CheckType( cb, "function" )
 	local instance = SF.instance
-	if streams[instance.player] then SF.throw( "The previous stream must finish before reading another.", 2 ) end
+	if streams[instance.player] then SF.Throw( "The previous stream must finish before reading another.", 2 ) end
 	streams[instance.player] = true
 	
 	net.ReadStream( ( SERVER and instance.player or nil ), function( data )
@@ -191,7 +191,7 @@ end
 
 function net_library.writeInt( t, n )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "number" )
 	SF.CheckType( n, "number" )
@@ -217,7 +217,7 @@ end
 
 function net_library.writeUInt( t, n )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "number" )
 	SF.CheckType( n, "number" )
@@ -242,7 +242,7 @@ end
 
 function net_library.writeBit( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "boolean" )
 
@@ -264,7 +264,7 @@ end
 
 function net_library.writeDouble( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "number" )
 
@@ -286,7 +286,7 @@ end
 
 function net_library.writeFloat( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, "number" )
 
@@ -308,7 +308,7 @@ end
 
 function net_library.writeAngle( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, SF.Types["Angle"] )
 
@@ -330,7 +330,7 @@ end
 
 function net_library.writeVector( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, SF.Types["Vector"] )
 
@@ -352,7 +352,7 @@ end
 
 function net_library.writeMatrix( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, SF.Types["VMatrix"] )
 
@@ -374,7 +374,7 @@ end
 
 function net_library.writeColor( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, SF.Types["Color"] )
 
@@ -396,7 +396,7 @@ end
 
 function net_library.writeEntity( t )
 	local instance = SF.instance
-	if not instance.data.net.started then SF.throw( "net message not started", 2 ) end
+	if not instance.data.net.started then SF.Throw( "net message not started", 2 ) end
 
 	SF.CheckType( t, SF.Types["Entity"] )
 

@@ -18,10 +18,10 @@ local function checkConstraint(e, t)
 		if e:IsValid() then
 			SF.Permissions.check( SF.instance.player, e, t )
 		elseif not e:IsWorld() then
-			SF.throw( "Invalid Entity", 3 )
+			SF.Throw( "Invalid Entity", 3 )
 		end
 	else
-		SF.throw( "Invalid Entity", 3 )
+		SF.Throw( "Invalid Entity", 3 )
 	end
 end
 
@@ -302,7 +302,7 @@ function constraint_library.setRopeLength(index, e, length)
 	SF.CheckType( e, ents_metatable )
 	local ent1 = eunwrap( e )
 	
-	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
+	if not IsValid( ent1 ) then SF.Throw( "Invalid entity", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent1, "constraints.rope" )
 
 	
@@ -324,7 +324,7 @@ function constraint_library.setElasticLength(index, e, length)
 	SF.CheckType( e, ents_metatable )
 	local ent1 = eunwrap( e )
 	
-	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
+	if not IsValid( ent1 ) then SF.Throw( "Invalid entity", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent1, "constraints.elastic" )
 
 	SF.CheckType( length, "number" )
@@ -344,7 +344,7 @@ function constraint_library.breakAll(e)
 	SF.CheckType( e, ents_metatable )
 	local ent1 = eunwrap( e )
 	
-	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
+	if not IsValid( ent1 ) then SF.Throw( "Invalid entity", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent1, "constraints.any" )
 	
 	constraint.RemoveAll(ent1)
@@ -358,7 +358,7 @@ function constraint_library.breakType(e, typename)
 	
 	local ent1 = eunwrap( e )
 	
-	if not IsValid( ent1 ) then SF.throw( "Invalid entity", 2 ) end
+	if not IsValid( ent1 ) then SF.Throw( "Invalid entity", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent1, "constraints.any" )
 	
 	constraint.RemoveConstraints(ent1, typename)
@@ -373,7 +373,7 @@ function constraint_library.getTable( ent )
 
 	ent = eunwrap( ent )
 	
-	if not IsValid( ent ) then SF.throw( "Invalid entity", 2 ) end
+	if not IsValid( ent ) then SF.Throw( "Invalid entity", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "constraints.any" )
 
 	return SF.Sanitize(constraint.GetTable( ent ))

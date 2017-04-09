@@ -38,10 +38,10 @@ function P.check ( principal, target, key )
 			local check = provider.checks[ setting ]
 			if check then
 				if not check( principal, target, key ) then
-					SF.throw( "Insufficient permissions: " .. key, 3 )
+					SF.Throw( "Insufficient permissions: " .. key, 3 )
 				end
 			else
-				SF.throw( "'" .. provider.id .. "' bad setting for permission " .. key .. ": " .. setting, 3 )
+				SF.Throw( "'" .. provider.id .. "' bad setting for permission " .. key .. ": " .. setting, 3 )
 			end
 		end
 	end
@@ -57,7 +57,7 @@ function P.hasAccess ( principal, target, key )
 			if check then
 				if not check( principal, target, key ) then return false end
 			else
-				SF.throw( "'" .. provider.id .. "' bad setting for permission " .. key .. ": " .. setting, 3 )
+				SF.Throw( "'" .. provider.id .. "' bad setting for permission " .. key .. ": " .. setting, 3 )
 			end
 		end
 	end

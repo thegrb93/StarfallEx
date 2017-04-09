@@ -29,7 +29,7 @@ local function createCoroutine ( func )
 	local stacklevel
 	if curthread then
 		stacklevel = unwrap( SF.instance.data.coroutines[ curthread ] ).stacklevel + 1
-		if stacklevel == 100 then SF.throw( "Coroutine stack overflow!", 1 ) end
+		if stacklevel == 100 then SF.Throw( "Coroutine stack overflow!", 1 ) end
 	else
 		stacklevel = 0
 	end
@@ -82,7 +82,7 @@ function coroutine_library.yield ( ... )
 	if curthread and SF.instance.data.coroutines[ curthread ] then
 		return coroutine.yield( ... )
 	else
-		SF.throw("attempt to yield across C-call boundary", 2)
+		SF.Throw("attempt to yield across C-call boundary", 2)
 	end
 end
 
@@ -110,6 +110,6 @@ function coroutine_library.wait ( time )
 		SF.CheckType( time, "number" )
 		coroutine.wait( time )
 	else
-		SF.throw("attempt to yield across C-call boundary", 2)
+		SF.Throw("attempt to yield across C-call boundary", 2)
 	end
 end

@@ -91,7 +91,7 @@ SF.DefaultEnvironment.next = next
 -- @class function
 -- @param condition
 -- @param msg
-SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then SF.throw( msg or "assertion failed!", 2 ) end end
+SF.DefaultEnvironment.assert = function ( condition, msg ) if not condition then SF.Throw( msg or "assertion failed!", 2 ) end end
 
 --- Same as Lua's unpack
 -- @name SF.DefaultEnvironment.unpack
@@ -468,7 +468,7 @@ SF.Libraries.AddHook( "prepare", function()
 		elseif ( tonumber( key ) ) then
 			return self:sub( key, key )
 		else
-			SF.throw( "attempt to index a string value with bad key ('" .. tostring( key ) .. "' is not part of the string library)", 2 )
+			SF.Throw( "attempt to index a string value with bad key ('" .. tostring( key ) .. "' is not part of the string library)", 2 )
 		end
 	end} )
 end )
@@ -588,7 +588,7 @@ function SF.DefaultEnvironment.require(file)
 		return loaded[path]
 	else
 		local func = SF.instance.scripts[path]
-		if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
+		if not func then SF.Throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
 		loaded[path] = func() or true
 		return loaded[path]
 	end
@@ -640,7 +640,7 @@ function SF.DefaultEnvironment.dofile(file)
 		end
 	end
 	local func = SF.instance.scripts[path]
-	if not func then SF.throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
+	if not func then SF.Throw( "Can't find file '" .. path .. "' (did you forget to --@include it?)", 2 ) end
 	return func()
 end
 
@@ -677,8 +677,9 @@ end
 -- Works like loadstring, except that it executes by default in the main environment
 -- @param str String to execute
 -- @return Function of str
-function SF.DefaultEnvironment.loadstring ( str )
-	local func = CompileString( str, "SF: " .. tostring( SF.instance.env ), false )
+function SF.DefaultEnvironment.loadstring ( str, name )
+	name = "SF:" .. (name or tostring( SF.instance.env ))
+	local func = CompileString( str, name, false )
 	
 	-- CompileString returns an error as a string, better check before setfenv
 	if type( func ) == "function" then
@@ -694,7 +695,7 @@ end
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv ( func, tbl )
-	if type( func ) != "function" or getfenv( func ) == _G then SF.throw( "Main Thread is protected!", 2 ) end
+	if type( func ) != "function" or getfenv( func ) == _G then SF.Throw( "Main Thread is protected!", 2 ) end
 	return setfenv( func, tbl )
 end
 
@@ -713,7 +714,7 @@ end
 -- @return DebugInfo table
 function SF.DefaultEnvironment.debugGetInfo ( funcOrStackLevel, fields )
 	local TfuncOrStackLevel = type(funcOrStackLevel)
-	if TfuncOrStackLevel!="function" and TfuncOrStackLevel~="number" then SF.throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
+	if TfuncOrStackLevel!="function" and TfuncOrStackLevel~="number" then SF.Throw( "Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2 ) end
 	if fields then SF.CheckType(fields, "string") end
 	
 	local ret = debug.getinfo( funcOrStackLevel, fields )
@@ -740,7 +741,7 @@ function SF.DefaultEnvironment.pcall ( func, ... )
 			error( err )
 		end
 	elseif err == "not enough memory" then
-		SF.throw( err, 0, true )
+		SF.Throw( err, 2, true )
 	end
 	
 	return false, err
@@ -765,7 +766,7 @@ function SF.DefaultEnvironment.xpcall ( func, callback, ... )
 			error( err )
 		end
 	elseif err == "not enough memory" then
-		SF.throw( err, 0, true )
+		SF.Throw( err, 2, true )
 	end
 	
 	local cret = callback( err )
@@ -785,31 +786,18 @@ function SF.DefaultEnvironment.try ( func, catch )
 			error( err )
 		end
 	elseif err == "not enough memory" then
-		SF.throw( err, 0, true )
+		SF.Throw( err, 2, true )
 	end
 	if catch then catch( err ) end
 end
 
 
 --- Throws an exception
--- @param msg Message
--- @param level Which level in the stacktrace to blame. Defaults to one of invalid
+-- @param msg Message string
+-- @param level Which level in the stacktrace to blame. Defaults to 1
 -- @param uncatchable Makes this exception uncatchable
 function SF.DefaultEnvironment.throw ( msg, level, uncatchable )
-	local info = debug.getinfo( 1 + ( level or 1 ), "Sl" )
-	local filename = info.short_src:match( "^SF:(.*)$" )
-	if not filename then
-		info = debug.getinfo( 2, "Sl" )
-		filename = info.short_src:match( "^SF:(.*)$" )
-	end
-	local err = {
-		uncatchable = false,
-		file = filename,
-		line = info.currentline,
-		message = msg,
-		uncatchable = uncatchable
-	}
-	error( err )
+	SF.Throw ( msg, 1 + ( level or 1 ), uncatchable )
 end
 
 --- Throws a raw exception.

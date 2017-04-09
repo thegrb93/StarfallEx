@@ -143,6 +143,7 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 end )
 
 SF.Libraries.AddHook( "initialize", function(instance)
+	instance.data.render = {}
 	instance.data.render.rendertargets = {}
 	instance.data.render.rendertargetcount = 0
 	instance.data.render.textures = {}
@@ -297,9 +298,9 @@ local defaultFont
 function render_library.pushMatrix(m, world)
 	SF.CheckType(m,matrix_meta)
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	local id = #matrix_stack
-	if id + 1 > MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
+	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw( "Pushed too many matricies", 2 ) end
 	local newmatrix
 	if matrix_stack[id] then
 		newmatrix = matrix_stack[id] * munwrap(m)
@@ -320,7 +321,7 @@ end
 -- @param endX Y end coordinate of the scissor rect.
 function render_library.enableScissorRect( startX, startY, endX, endY )
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( startX, "number" )
 	SF.CheckType( startY, "number" )
 	SF.CheckType( endX, "number" )
@@ -331,7 +332,7 @@ end
 --- Disables a scissoring rect which limits the drawing area.
 function render_library.disableScissorRect()
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	render.SetScissorRect( 0 ,0 ,0 , 0, false )
 
 end
@@ -339,8 +340,8 @@ end
 --- Pops a matrix from the matrix stack.
 function render_library.popMatrix()
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if #matrix_stack <= 0 then SF.throw( "Popped too many matricies", 2 ) end
+	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+	if #matrix_stack <= 0 then SF.Throw( "Popped too many matricies", 2 ) end
 	matrix_stack[#matrix_stack] = nil
 	cam.PopModelMatrix()
 end
@@ -357,15 +358,15 @@ local viewmatrix_checktypes =
 -- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
-	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.throw( "Pushed too many matricies", 2 ) end
+	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw( "Pushed too many matricies", 2 ) end
 	local endfunc
 	if tbl.type == "2D" then
 		endfunc = "End2D"
 	elseif tbl.type == "3D" then
 		endfunc = "End3D"
 	else
-		SF.throw( "Camera type must be \"3D\" or \"2D\"", 2 )
+		SF.Throw( "Camera type must be \"3D\" or \"2D\"", 2 )
 	end
 
 	local newtbl = {}
@@ -374,7 +375,7 @@ function render_library.pushViewMatrix(tbl)
 			SF.CheckType( v, viewmatrix_checktypes[k] )
 			newtbl[k] = v
 		else
-			SF.throw( "Invalid key found in view matrix: " .. k, 2 )
+			SF.Throw( "Invalid key found in view matrix: " .. k, 2 )
 		end
 	end
 	if newtbl.origin then newtbl.origin = vunwrap( newtbl.origin ) end
@@ -399,9 +400,9 @@ end
 --- Pops a view matrix from the matrix stack.
 function render_library.popViewMatrix()
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	local i = #view_matrix_stack
-	if i == 0 then SF.throw( "Popped too many matricies", 2 ) end
+	if i == 0 then SF.Throw( "Popped too many matricies", 2 ) end
 
 	cam[view_matrix_stack[i]]()
 	view_matrix_stack[i] = nil
@@ -440,7 +441,7 @@ function render_library.getTextureID ( tx, cb, alignment )
 		
 		if plyURLTexcount[ instance.playerid ] then
 			if plyURLTexcount[ instance.playerid ] >= cv_max_url_materials:GetInt() then
-				SF.throw( "URL Texture limit reached", 2 )
+				SF.Throw( "URL Texture limit reached", 2 )
 			else
 				plyURLTexcount[ instance.playerid ] = plyURLTexcount[ instance.playerid ] + 1
 			end
@@ -457,9 +458,9 @@ function render_library.getTextureID ( tx, cb, alignment )
 			SF.CheckType( alignment, "string" )
 			local args = string.Split( alignment, " " )
 			local validargs = {["left"]=true,["center"]=true,["right"]=true,["top"]=true,["bottom"]=true}
-			if #args != 1 and #args ~= 2 then SF.throw( "Invalid urltexture alignment given." ) end
+			if #args != 1 and #args ~= 2 then SF.Throw( "Invalid urltexture alignment given." ) end
 			for i=1, #args do
-				if not validargs[args[i]] then SF.throw( "Invalid urltexture alignment given." ) end
+				if not validargs[args[i]] then SF.Throw( "Invalid urltexture alignment given." ) end
 			end
 		else
 			alignment = "center"
@@ -501,7 +502,7 @@ function render_library.destroyTexture( id )
 	elseif data.textures[ id ] then
 		data.textures[ id ] = nil
 	else
-		SF.throw("Cannot destroy an invalid texture.", 2)
+		SF.Throw("Cannot destroy an invalid texture.", 2)
 	end
 end
 
@@ -509,7 +510,7 @@ end
 -- @param id Texture table. Aquired with render.getTextureID
 function render_library.setTexture ( id )
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	if id then
 		if data.textures[ id ] then
 			surface.SetMaterial( data.textures[ id ] )
@@ -538,7 +539,7 @@ function render_library.createRenderTarget ( name )
 
 	if plyRTcount[ instance.playerid ] then
 		if plyRTcount[ instance.playerid ] >= cv_max_rendertargets:GetInt() then
-			SF.throw( "Rendertarget limit reached", 2 )
+			SF.Throw( "Rendertarget limit reached", 2 )
 		else
 			plyRTcount[ instance.playerid ] = plyRTcount[ instance.playerid ] + 1
 		end
@@ -575,7 +576,7 @@ function render_library.destroyRenderTarget( name )
 		globalRTs[ rtname ][ 2 ] = true
 		data.rendertargets[ name ] = nil
 	else
-		SF.throw("Cannot destroy an invalid rendertarget.", 2)
+		SF.Throw("Cannot destroy an invalid rendertarget.", 2)
 	end
 end
 
@@ -584,16 +585,16 @@ end
 -- @param name Name of the render target to use
 function render_library.selectRenderTarget ( name )
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	if name then
 		SF.CheckType( name, "string" )
 
 		local rtname = data.rendertargets[ name ]
-		if not rtname then SF.throw( "Invalid Rendertarget", 2 ) end
+		if not rtname then SF.Throw( "Invalid Rendertarget", 2 ) end
 		local rttbl = globalRTs[ rtname ]
-		if not rttbl then SF.throw( "Invalid Rendertarget", 2 ) end
+		if not rttbl then SF.Throw( "Invalid Rendertarget", 2 ) end
 		local rt = rttbl[ 1 ]
-		if not rt then SF.throw( "Invalid Rendertarget", 2 ) end
+		if not rt then SF.Throw( "Invalid Rendertarget", 2 ) end
 
 		if not data.usingRT then
 			data.oldViewPort = {0, 0, ScrW(), ScrH()}
@@ -626,7 +627,7 @@ end
 -- @param name Name of the render target to use
 function render_library.setRenderTargetTexture ( name )
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( name, "string" )
 
 	local rtname = data.rendertargets[ name ]
@@ -655,7 +656,7 @@ end
 --- Sets the texture of a screen entity
 -- @param ent Screen entity
 function render_library.setTextureFromScreen ( ent )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 
 	ent = eunwrap( ent )
 	if IsValid( ent ) and ent.GPU and ent.GPU.RT then
@@ -671,7 +672,7 @@ end
 -- @param clr Color type to clear with
 -- @param depth Boolean if should clear depth
 function render_library.clear ( clr, depth )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in a rendering hook.", 2 ) end
 	if SF.instance.data.render.usingRT then
 		if clr == nil then
 			render.Clear( 0, 0, 0, 255, depth )
@@ -689,7 +690,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRoundedBox ( r, x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( r, "number" )
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
@@ -709,7 +710,7 @@ end
 -- @param bl Boolean Bottom left corner
 -- @param br Boolean Bottom right corner
 function render_library.drawRoundedBoxEx ( r, x, y, w, h, tl, tr, bl, br )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( r, "number" )
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
@@ -728,7 +729,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRect ( x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( w, "number" )
@@ -742,7 +743,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRectOutline ( x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( w, "number" )
@@ -755,7 +756,7 @@ end
 -- @param y Center y coordinate
 -- @param r Radius
 function render_library.drawCircle ( x, y, r )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( r, "number" )
@@ -768,7 +769,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRect ( x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( w, "number" )
@@ -786,7 +787,7 @@ end
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
 function render_library.drawTexturedRectUV ( x, y, w, h, startU, startV, endU, endV )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( w, "number" )
@@ -805,7 +806,7 @@ end
 -- @param h Height
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotated ( x, y, w, h, rot )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( w, "number" )
@@ -821,7 +822,7 @@ end
 -- @param x2 X end coordinate
 -- @param y2 Y end coordinate
 function render_library.drawLine ( x1, y1, x2, y2 )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x1, "number" )
 	SF.CheckType( y1, "number" )
 	SF.CheckType( x2, "number" )
@@ -858,7 +859,7 @@ end
 
 function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
 	font = validfonts[string.lower(font)]
-	if not font then SF.throw( "invalid font", 2 ) end
+	if not font then SF.Throw( "invalid font", 2 ) end
 
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -922,7 +923,7 @@ end
 -- \- DermaDefaultBold
 -- \- DermaLarge
 function render_library.setFont(font)
-	if not defined_fonts[font] then SF.throw( "Font does not exist.", 2 ) end
+	if not defined_fonts[font] then SF.Throw( "Font does not exist.", 2 ) end
 	SF.instance.data.render.font = font
 	--surface.SetFont(font)
 end
@@ -939,7 +940,7 @@ end
 -- @param text Text to draw
 -- @param alignment Text alignment
 function render_library.drawText ( x, y, text, alignment )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( text, "string" )
@@ -959,7 +960,7 @@ end
 -- @param xalign Text x alignment
 -- @param yalign Text y alignment
 function render_library.drawSimpleText ( x, y, text, xalign, yalign )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( x, "number" )
 	SF.CheckType( y, "number" )
 	SF.CheckType( text, "string" )
@@ -1003,7 +1004,7 @@ end
 
 --- Resets the depth buffer
 function render_library.clearDepth()
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in a rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in a rendering hook.", 2 ) end
 	if SF.instance.data.render.usingRT then
 		render.ClearDepth()
 	end
@@ -1015,7 +1016,7 @@ end
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere ( pos, radius, longitudeSteps, latitudeSteps )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( pos, vector_meta )
 	SF.CheckType( radius, "number" )
 	SF.CheckType( longitudeSteps, "number" )
@@ -1032,7 +1033,7 @@ end
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere ( pos, radius, longitudeSteps, latitudeSteps )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( pos, vector_meta )
 	SF.CheckType( radius, "number" )
 	SF.CheckType( longitudeSteps, "number" )
@@ -1047,7 +1048,7 @@ end
 -- @param startPos Starting position
 -- @param endPos Ending position
 function render_library.draw3DLine ( startPos, endPos )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( startPos, vector_meta )
 	SF.CheckType( endPos, vector_meta )
 	startPos = vunwrap( startPos )
@@ -1062,7 +1063,7 @@ end
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DBox ( origin, angle, mins, maxs )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( origin, vector_meta )
 	SF.CheckType( mins, vector_meta )
 	SF.CheckType( maxs, vector_meta )
@@ -1081,7 +1082,7 @@ end
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox ( origin, angle, mins, maxs )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( origin, vector_meta )
 	SF.CheckType( mins, vector_meta )
 	SF.CheckType( maxs, vector_meta )
@@ -1101,7 +1102,7 @@ end
 -- @param textureStart The start coordinate of the texture used.
 -- @param textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam ( startPos, endPos, width, textureStart, textureEnd )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( startPos, vector_meta )
 	SF.CheckType( endPos, vector_meta )
 	SF.CheckType( width, "number" )
@@ -1120,7 +1121,7 @@ end
 -- @param vert3 The third vertex.
 -- @param vert4 The fourth vertex.
 function render_library.draw3DQuad ( vert1, vert2, vert3, vert4 )
-	if not SF.instance.data.render.isRendering then SF.throw( "Not in rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
 	SF.CheckType( vert1, vector_meta )
 	SF.CheckType( vert2, vector_meta )
 	SF.CheckType( vert3, vector_meta )
@@ -1143,7 +1144,7 @@ function render_library.cursorPos( ply )
 	if not screen or screen:GetClass()!="starfall_screen" then return input.GetCursorPos() end
 
 	ply = eunwrap( ply )
-	if not ply then SF.throw("Invalid Player", 2) end
+	if not ply then SF.Throw("Invalid Player", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
@@ -1194,7 +1195,7 @@ end
 function render_library.capturePixels ()
 	local data = SF.instance.data.render
 	if not data.isRendering then
-		SF.throw( "Not in rendering hook.", 2 )
+		SF.Throw( "Not in rendering hook.", 2 )
 	end
 	if SF.instance.data.render.usingRT then
 		render.CapturePixels()
@@ -1208,7 +1209,7 @@ end
 function render_library.readPixel ( x, y )
 	local data = SF.instance.data.render
 	if not data.isRendering then
-		SF.throw( "Not in rendering hook.", 2 )
+		SF.Throw( "Not in rendering hook.", 2 )
 	end
 
 	SF.CheckType( x, "number" )

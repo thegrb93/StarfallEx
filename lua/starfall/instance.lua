@@ -71,7 +71,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		else
 			local func = CompileString(source, "SF:"..filename, false)
 			if type(func) == "string" then
-				return false, func
+				return false, {message = func, traceback = ""}
 			end
 			debug.setfenv(func, instance.env)
 			instance.scripts[filename] = func
@@ -92,15 +92,10 @@ end
 function SF.Instance:runWithOps(func,...)
 
 	local function xpcall_callback ( err )
-		if type( err ) == "table" then
-			if type( err.message ) == "string" then
-				local line= err.line
-				local file = err.file
-
-				err = ( file and ( file .. ":" ) or "" ) .. ( line and ( line .. ": " ) or "" ) .. err.message
-			end
+		if getmetatable( err )~=SF.Errormeta then
+			return SF.MakeError( err, 2 )
 		end
-		return {tostring( err ), debug.traceback( "", 2 )}
+		return err
 	end
 
 	local oldSysTime = SysTime() - self.cpu_total
@@ -111,7 +106,7 @@ function SF.Instance:runWithOps(func,...)
 		local function safeThrow( msg, nocatch )
 			local source = debug.getinfo(3, "S").short_src
 			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
-				SF.throw( msg, 3, nocatch )
+				SF.Throw( msg, 3, nocatch )
 			end
 		end
 		
@@ -155,9 +150,9 @@ end
 
 --- Internal function - Do not call. Cleans up the script.
 -- This is done automatically by Initialize and runScriptHook.
-function SF.Instance:cleanup(hook, ok, errmsg)
+function SF.Instance:cleanup(hook, ok, err)
 	assert(SF.instance == self)
-	self:runLibraryHook("cleanup",hook, ok, errmsg)
+	self:runLibraryHook("cleanup",hook, ok, err)
 	
 	if self.instanceStack then
 		SF.instance = self.instanceStack[#self.instanceStack]
@@ -167,7 +162,6 @@ function SF.Instance:cleanup(hook, ok, errmsg)
 	else
 		SF.instance = nil
 	end
-	
 end
 
 --- Runs the scripts inside of the instance. This should be called once after
@@ -197,9 +191,9 @@ function SF.Instance:initialize()
 	local func = self.scripts[self.mainfile]
 	local tbl = self:runWithOps(func)
 	if not tbl[1] then
-		self:cleanup("_initialize", true, tbl[2][2])
-		self.error = true
-		return false, unpack(tbl[2])
+		self:cleanup("_initialize", true, tbl[2])
+		self:Error(tbl[2])
+		return false, tbl[2]
 	end
 
 	self:cleanup("_initialize",false)
@@ -218,8 +212,9 @@ function SF.Instance:runScriptHook(hook, ...)
 	for name, func in pairs(self.hooks[hook]) do
 		tbl = self:runWithOps(func,...)
 		if not tbl[1] then
-			self:cleanup(hook,true,tbl[2][2])
-			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[2][1], tbl[2][2] )
+			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
+			self:cleanup(hook,true,tbl[2])
+			self:Error(tbl[2])
 			return tbl
 		end
 	end
@@ -244,8 +239,9 @@ function SF.Instance:runScriptHookForResult(hook,...)
 				break
 			end
 		else
-			self:cleanup(hook,true,tbl[2][2])
-			self:Error( "Hook '" .. hook .. "' errored with " .. tbl[2][1], tbl[2][2] )
+			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
+			self:cleanup(hook,true,tbl[2])
+			self:Error(tbl[2])
 			return tbl
 		end
 	end
@@ -272,8 +268,9 @@ function SF.Instance:runFunction(func,...)
 	if tbl[1] then
 		self:cleanup("_runFunction",false)
 	else
-		self:cleanup("_runFunction",true,tbl[2][2])
-		self:Error( "Callback errored with " .. tbl[2][1], tbl[2][2] )
+		tbl[2].message = "Callback errored with " .. tbl[2].message
+		self:cleanup("_runFunction",true,tbl[2])
+		self:Error(tbl[2])
 	end
 	
 	return tbl
@@ -331,10 +328,10 @@ if CLIENT then
 end
 
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
-function SF.Instance:Error(msg,traceback)
+function SF.Instance:Error( err )
 	
 	if self.runOnError then -- We have a custom error function, use that instead
-		self:runOnError( msg, traceback )
+		self:runOnError( err )
 	else
 		-- Default behavior
 		self:deinitialize()

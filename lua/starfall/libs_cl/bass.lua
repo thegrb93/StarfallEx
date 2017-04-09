@@ -53,7 +53,7 @@ function bass_library.loadFile ( path, flags, callback )
 	SF.CheckType( callback, "function" )
 
 	if path:match( '["?]' ) then
-		SF.throw( "Invalid sound path: " .. path, 2 )
+		SF.Throw( "Invalid sound path: " .. path, 2 )
 	end
 	
 	local instance = SF.instance
