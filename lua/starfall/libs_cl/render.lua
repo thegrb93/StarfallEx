@@ -7,6 +7,11 @@
 -- @class hook
 -- @client
 
+--- Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets.
+-- @name renderoffscreen
+-- @class hook
+-- @client
+
 --- Called when the player connects to a HUD component linked to the Starfall Chip
 -- @name hudconnect
 -- @class hook
@@ -110,6 +115,7 @@ local plyURLTexcount = {}
 
 local renderhooks = {
 	render = true,
+	renderoffscreen = true,
 	predrawopaquerenderables = true,
 	postdrawopaquerenderables = true
 }
@@ -118,6 +124,23 @@ SF.Libraries.AddHook( "prepare", function ( instance, hook )
 	if renderhooks[hook] then
 		currentcolor = Color(255,255,255,255)
 		render.SetColorMaterial()
+		draw.NoTexture()
+		surface.SetDrawColor( 255, 255, 255, 255 )
+		
+		local data = instance.data.render
+		data.isRendering = true
+		
+		if hook=="renderoffscreen" then
+			data.needRT = true
+			instance:runFunction(function()
+				if not data.rendertargets[ "dummyrt" ] then
+					render_library.createRenderTarget ( "dummyrt" )
+				end
+				render_library.selectRenderTarget ( "dummyrt" )
+			end)
+		else
+			data.needRT = false
+		end
 	end
 end )
 
@@ -139,6 +162,8 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 			cam[view_matrix_stack[i]]()
 			view_matrix_stack[i] = nil
 		end
+		data.isRendering = false
+		data.needRT = false
 	end
 end )
 
@@ -605,7 +630,7 @@ function render_library.selectRenderTarget ( name )
 		render.SetRenderTarget( rt )
 		data.usingRT = true
 	else
-		if data.usingRT then
+		if data.usingRT and not data.needRT then
 			render.SetRenderTarget()
 			local i = #view_matrix_stack
 			if i>0 then

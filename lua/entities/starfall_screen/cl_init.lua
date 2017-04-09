@@ -68,14 +68,9 @@ function ENT:RenderScreen()
 				local data = instance.data
 
 				data.render.renderEnt = self
-				data.render.isRendering = true
 				data.render.useStencil = true
-				draw.NoTexture()
-				surface.SetDrawColor( 255, 255, 255, 255 )
 
 				instance:runScriptHook( "render" )
-
-				data.render.isRendering = nil
 			end
 		elseif self.link.error then
 			local error = self.link.error
