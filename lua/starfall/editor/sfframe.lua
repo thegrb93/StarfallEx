@@ -1364,12 +1364,12 @@ function Editor:LoadFile(Line, forcenewtab)
 			tab = self:CreateTab(tabtext).Tab
 		else
 			tab = self:GetActiveTab()
-			self:UpdateTabText(tab)
-			self.C.TabHolder:InvalidateLayout()
 		end
 		self:SetActiveTab(tab)
 		self:ChosenFile(Line)
 		self:SetCode(str)
+		self:UpdateTabText(tab)
+		self.C.TabHolder:InvalidateLayout()
 	end
 end
 
