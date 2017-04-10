@@ -277,6 +277,8 @@ function TabHandler:registerSettings()
 	FontSelect:AddChoice("Custom...")
 	FontSelect:SetSize(240 - 50 - 4, 20)
 	FontSelect:SetValue(TabHandler.FontConVar:GetString())
+	FontSelect:SetFontInternal(SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), 16))
+
 
 	local FontSizeSelect = vgui.Create("DComboBox", temp)
 	FontSizeSelect.OnSelect = function(panel, index, value)
