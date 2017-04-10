@@ -366,6 +366,21 @@ function Editor:GetActiveTab() return self.C.TabHolder:GetActiveTab() end
 
 function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 
+function Editor:UpdateTabText(tab)
+	-- Editor subtitle and tab text
+	local ed = tab.editor
+	local title, tabtext = getPreferredTitles(ed.chosenfile, ed:getCode())
+
+	tab:SetToolTip(ed.chosenfile)
+	tabtext = tabtext or "Generic"
+	if ed:getCode() != ed.savedCode then
+		tabtext = tabtext.." *"
+	end
+	if tab:GetText() ~= tabtext then
+		tab:SetText(tabtext)
+		self.C.TabHolder.tabScroller:InvalidateLayout()
+	end
+end
 function Editor:SetActiveTab(val)
 	if self:GetActiveTab() == val then
 		self:RequestFocus()
@@ -383,15 +398,10 @@ function Editor:SetActiveTab(val)
 	self:Validate()
 
 	-- Editor subtitle and tab text
-	local title, tabtext = getPreferredTitles(self:GetChosenFile(), self:GetCode())
+	local title = getPreferredTitles(self:GetChosenFile(), self:GetCode())
 
 	if title then self:SubTitle("Editing: " .. title) else self:SubTitle() end
-	if tabtext then
-		if self:GetActiveTab():GetText() ~= tabtext then
-			self:GetActiveTab():SetText(tabtext)
-			self.C.TabHolder.tabScroller:InvalidateLayout()
-		end
-	end
+	self:UpdateTabText(self:GetActiveTab())
 end
 
 function Editor:GetActiveTabIndex()
@@ -437,6 +447,7 @@ function Editor:CreateTab(chosenfile)
 
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
 	editor.chosenfile = chosenfile
+	sheet.Tab.editor = editor -- For easy access
 	sheet.Tab.Paint = function(button,w,h)
 
 		if button.Hovered then
@@ -516,6 +527,7 @@ function Editor:CreateTab(chosenfile)
 	end
 
 	editor.OnTextChanged = function(panel)
+		self:UpdateTabText(self:GetActiveTab())
 		timer.Create("sfautosave", 5, 1, function()
 				self:SaveTabs()
 			end)
@@ -1119,11 +1131,10 @@ function Editor:OpenOldTabs()
 		end
 		self:NewTab()
 		self:ChosenFile(v.filename)
-		local title,tabtext = getPreferredTitles(v.filename or "Generic", v.code)
-		self:GetActiveTab():SetText(tabtext)
+		self:SetCode(v.code)
+		self:UpdateTabText(self:GetActiveTab())
 		self.C.TabHolder:InvalidateLayout()
 		
-		self:SetCode(v.code)
 	end
 	self.TabsLoaded = true
 
@@ -1183,6 +1194,8 @@ end
 
 function Editor:ChosenFile(Line)
 	self:GetCurrentEditor().chosenfile = Line
+	self:GetCurrentEditor().savedCode = Line and file.Read( Line ) or nil
+
 	if Line then
 		self:SubTitle("Editing: " .. Line)
 	else
@@ -1258,7 +1271,7 @@ function Editor:Open(Line, code, forcenewtab)
 			tab = self:CreateTab(tabtext).Tab
 		else
 			tab = self:GetActiveTab()
-			tab:SetText(tabtext)
+			self:UpdateTabText(tab)
 			self.C.TabHolder:InvalidateLayout()
 		end
 		self:SetActiveTab(tab)
@@ -1313,6 +1326,7 @@ function Editor:SaveFile(Line, close, SaveAs)
 	surface.PlaySound("ambient/water/drip3.wav")
 
 	self:ChosenFile(Line)
+	self:UpdateTabText(self:GetActiveTab())
 	if close then
 
 		GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
@@ -1348,7 +1362,7 @@ function Editor:LoadFile(Line, forcenewtab)
 			tab = self:CreateTab(tabtext).Tab
 		else
 			tab = self:GetActiveTab()
-			tab:SetText(tabtext)
+			self:UpdateTabText(tab)
 			self.C.TabHolder:InvalidateLayout()
 		end
 		self:SetActiveTab(tab)
