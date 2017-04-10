@@ -714,8 +714,6 @@ function Editor:InitComponents()
 	self.C.CloseTab = vgui.CreateFromTable(DMenuButton, self.C.Menu, "CloseTab") -- Close tab button
 	self.C.Reload = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Reload tab button
 
-	self.C.SaE = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save & Exit button
-
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
 
@@ -753,10 +751,6 @@ function Editor:InitComponents()
 	self.C.Menu:SetHeight(24)
 	self.C.Menu:DockPadding(2,2,2,2)
 	self.C.Val:SetHeight(22)
-
-	self.C.SaE:SetSize(80, 20)
-	self.C.SaE:DockMargin(2, 0, 0, 0)
-	self.C.SaE:Dock(RIGHT)
 
 	self.C.Close:SetText("Close")
 	self.C.Close:DockMargin(10, 0, 0, 0)
@@ -802,9 +796,6 @@ function Editor:InitComponents()
 	self.C.Reload.DoClick = function(button)
 		self:LoadFile(self:GetChosenFile(), false)
 	end
-
-	self.C.SaE:SetText("Save and Exit")
-	self.C.SaE.DoClick = function(button) self:SaveFile(self:GetChosenFile(), true) end
 
 	self.C.Browser.tree.OnNodeSelected = function( tree, node )
 		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
@@ -1248,7 +1239,6 @@ end
 function Editor:Open(Line, code, forcenewtab)
 	if self:IsVisible() and not Line and not code then self:Close() end
 	self:SetV(true)
-	self.C.SaE:SetText("Save and Exit")
 	if code then
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
