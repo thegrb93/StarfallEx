@@ -25,7 +25,7 @@ cvars.AddChangeCallback( "sf_editor_layout", function()
 end ) 
 
 surface.CreateFont("SFEditorDefault", {
-		font = "default",
+		font = "Roboto",
 		size = 18,
 		weight = 500,
 		antialias = true,
@@ -709,12 +709,12 @@ function Editor:InitComponents()
 
 	self.C.Btoggle = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Toggle Browser being shown
 	self.C.Sav = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Save button
+	self.C.SavAs = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Save button
 	self.C.NewTab = vgui.CreateFromTable(DMenuButton, self.C.Menu, "NewTab") -- New tab button
 	self.C.CloseTab = vgui.CreateFromTable(DMenuButton, self.C.Menu, "CloseTab") -- Close tab button
 	self.C.Reload = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Reload tab button
 
 	self.C.SaE = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save & Exit button
-	self.C.SavAs = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save As button
 
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
@@ -723,7 +723,6 @@ function Editor:InitComponents()
 	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
-	print("VAR:",Editor.LayoutVar:GetInt())
 	if Editor.LayoutVar:GetInt() == 1 then -- Browser on right
 		self.C.Divider:SetRight(self.C.Browser)
 		self.C.Divider:SetLeft(self.C.MainPane)
@@ -759,10 +758,6 @@ function Editor:InitComponents()
 	self.C.SaE:DockMargin(2, 0, 0, 0)
 	self.C.SaE:Dock(RIGHT)
 
-	self.C.SavAs:SetSize(51, 20)
-	self.C.SavAs:DockMargin(2, 0, 0, 0)
-	self.C.SavAs:Dock(RIGHT)
-
 	self.C.Close:SetText("Close")
 	self.C.Close:DockMargin(10, 0, 0, 0)
 	self.C.Close:Dock(RIGHT)
@@ -788,12 +783,18 @@ function Editor:InitComponents()
 	self.C.Sav.DoClick = function(button) self:SaveFile(self:GetChosenFile()) end
 	self.C.Sav:SetToolTip( "Save" )
 
+	self.C.SavAs:SetImage("icon16/disk_multiple.png")
+	self.C.SavAs:SetToolTip("Save As")
+	self.C.SavAs.DoClick = function(button) self:SaveFile(self:GetChosenFile(), false, true) end
+
 	self.C.NewTab:SetImage("icon16/page_white_add.png")
 	self.C.NewTab.DoClick = function(button) self:NewTab() end
 	self.C.NewTab:SetToolTip( "New tab" )
 
 	self.C.CloseTab:SetImage("icon16/page_white_delete.png")
-	self.C.CloseTab.DoClick = function(button) self:CloseTab() end
+	self.C.CloseTab.DoClick = function(button) 
+		Derma_Query("Do you want to close current tab?","Are you sure?","Close",function() self:CloseTab() end,"Cancel",function() end)
+	end
 	self.C.CloseTab:SetToolTip( "Close tab" )
 
 	self.C.Reload:SetImage("icon16/page_refresh.png")
@@ -804,9 +805,6 @@ function Editor:InitComponents()
 
 	self.C.SaE:SetText("Save and Exit")
 	self.C.SaE.DoClick = function(button) self:SaveFile(self:GetChosenFile(), true) end
-
-	self.C.SavAs:SetText("Save As")
-	self.C.SavAs.DoClick = function(button) self:SaveFile(self:GetChosenFile(), false, true) end
 
 	self.C.Browser.tree.OnNodeSelected = function( tree, node )
 		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
