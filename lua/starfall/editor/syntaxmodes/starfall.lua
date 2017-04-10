@@ -307,6 +307,7 @@ function EDITOR:SyntaxColorLine(row)
 				addColorToken("number", col, b)
 				addColorToken("notfound", col, bracket2)
 				tokenname = "" -- It's custom token
+				self.tokendata = ""
 			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
 				local fname,bracket1,r,comma1,g,comma2,b,comma3,a,bracket2 = self.tokendata:match(rgbapatternG)
 				local col = Color(tonumber(r),tonumber(g),tonumber(b),tonumber(a))
@@ -321,6 +322,7 @@ function EDITOR:SyntaxColorLine(row)
 				addColorToken("number", col, a)
 				addColorToken("notfound", col, bracket2)
 				tokenname = "" -- It's custom token
+				self.tokendata = ""
 			end
 		end
 		
