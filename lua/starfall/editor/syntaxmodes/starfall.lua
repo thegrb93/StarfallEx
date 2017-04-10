@@ -42,11 +42,11 @@ local keywords = {
 setmetatable(keywords, { __index=function(tbl,index) return {} end })
 
 local directives = {
-	["@name"] = 0, -- all yellow
+	["@name"] = 0,
 	["@author"] = 0,
 	["@include"] = 0,
 	["@includedir"] = 0,
-	["@shared"] = 1, -- directive yellow, types orange, rest normal
+	["@shared"] = 0,
 	["@client"] = 0,
 	["@server"] = 0,
 	["@model"] = 0,
@@ -93,12 +93,17 @@ local function addToken(tokenname, tokendata)
 end
 
 local function addColorToken(bgcolor, tokendata)
-	local h,s,v = ColorToHSV( bgcolor ) --We're finding high-contrast color
-	h = (h + 180)%360
-	s = 1 - s
-	v = 1 - v
-	 
-	local textcolor = HSVToColor( h, s, v ) 
+	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt()
+	local textcolor
+	if usePigments == 2 then
+		local h,s,v = ColorToHSV( bgcolor ) --We're finding high-contrast color
+		h = (h + 180)%360
+		s = 1 - s
+		v = 1 - v	 
+		textcolor = HSVToColor( h, s, v ) 
+	elseif usePigments == 1 then
+		textcolor = colors["notfound"][1]
+	end
 	if lastcol and color == lastcol[2] then
 		lastcol[1] = lastcol[1] .. tokendata
 	else
@@ -189,31 +194,27 @@ function EDITOR:ResetTokenizer(row)
 
 		local str = string_gsub( table_concat( self.Rows, "\n", 1, self.Scroll[1]-1 ), "\r", "" )
 
-		for before, char, after in string_gmatch( str, '()([%-%[%]"\n])()' ) do
-			local before = string_sub( str, before-1, before-1 )
-			local after = string_sub( str, after, after )
+		for bef, char, af in string_gmatch( str, '()([%[%]"\n])()' ) do
+			local before = string_sub( str, bef-1, bef-1 )
+			local bbefore = string_sub( str, bef-2, bef-2 )
+			local after = string_sub( str, af, af )
 			if not self.blockcomment and not self.multilinestring and not singlelinecomment then
-				if before != "\\" and char == "[" and after =="[" then
-					self.multilinestring = true
-				elseif before != "\\" and char == "[" and after == "[" then
+				if before == "-" and bbefore == "-" and char == "[" and after == "[" then
 					self.blockcomment = true
-				elseif after=="-" and char == "-" then
-					singlelinecomment = true
+				elseif before != "\\" and before != "-" and char == "[" and after =="[" then
+					self.multilinestring = true
 				end
 			elseif self.multilinestring and before != "\\" and char == ']' and after == "]" then
 				self.multilinestring = nil
 			elseif self.blockcomment and before != '\\' and char == "]" and after == "]" then
 				self.blockcomment = nil
-			elseif singlelinecomment and char == "\n" then
-				singlelinecomment = false
 			end
 		end
 	end
 
 end
-local pigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", "1", true, false)
 function EDITOR:SyntaxColorLine(row)
-	local usePigments = pigmentsConVar:GetBool()
+	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
 	cols,lastcol = {}, nil
 
 	self:ResetTokenizer(row)
