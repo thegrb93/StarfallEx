@@ -13,6 +13,8 @@ AddCSLuaFile( "sfframe.lua" )
 AddCSLuaFile( "sfderma.lua" )
 AddCSLuaFile( "docs.lua" )
 AddCSLuaFile( "sfhelper.lua" )
+AddCSLuaFile( "themes.lua" )
+AddCSLuaFile( "xml.lua" )
 
 AddCSLuaFile( "tabhandlers/tab_wire.lua" )
 AddCSLuaFile( "tabhandlers/tab_ace.lua" )
@@ -43,6 +45,7 @@ if CLIENT then
 	include( "sfhelper.lua" )
 	include( "sfderma.lua" )
 	include( "sfframe.lua" ) -- Editor's frame
+	include( "themes.lua" )
 
 	-- Colors
 	SF.Editor.colors = {}
@@ -819,7 +822,7 @@ if CLIENT then
 				end
 			end
 		end )
-	concommand.Add( "sf_editor_reload", function()
+	concommand.Add( "sf_editor_restart", function()
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
 		for k, v in pairs(SF.Editor.TabHandlers) do
@@ -831,6 +834,9 @@ if CLIENT then
 		SF.Editor.open ()
 		print("Editor reloaded")
 	end )
+	concommand.Add("sf_editor_reload", function()
+		include("starfall/editor/editor.lua")
+	end)
 elseif SERVER then
 
 	util.AddNetworkString( "starfall_editor_status" )

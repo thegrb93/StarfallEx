@@ -1013,7 +1013,7 @@ function Editor:InitControlPanel()
 		self:GetParent():SetWorldClicker(bVal)
 	end
 
-	------Permissions panel
+	------ Permissions panel
 	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
 	local perms = SF.Editor.createpermissionsPanel ()
 	perms:SetParent(sheet.Panel)
@@ -1022,6 +1022,165 @@ function Editor:InitControlPanel()
 	perms:Dock(FILL)
 	perms:Refresh()
 	self.C.Control.Permissions = perms
+
+	------ Themes panel
+	sheet = self:AddControlPanelTab("Themes", "icon16/page_white_paintbrush.png", "Theme settings.")
+	local themesPanel = self:CreateThemesPanel()
+	themesPanel:SetParent(sheet.Panel)
+	sheet.Panel:DockPadding(0, 0, 0, 0)
+	themesPanel:DockMargin(4, 4, 4, 4)
+	themesPanel:Dock(FILL)
+	themesPanel:Refresh()
+	self.C.Control.Themes = themesPanel
+end
+
+function Editor:CreateThemesPanel()
+	-- Main panel list
+	
+	local panel = vgui.Create("DPanelList")
+	panel:Dock(FILL)
+	panel:DockMargin(4, 8, 4, 4)
+	panel.Paint = function() end
+
+	-- Themes label
+
+	local label = vgui.Create("DLabel")
+	panel:AddItem(label)
+	label:DockMargin(0, 0, 0, 0)
+	label:SetText("Starfall editor supports TextMate themes. " .. 
+		"You can add them either from an URL, or just by pasting the contents of  tmTheme file.") -- Two spaces, because GMod ignores one there for some reason
+	label:SetWrap(true)
+
+	-- Theme list
+
+	local themeList = vgui.Create("DListView")
+	panel:AddItem(themeList)
+	themeList:SetMultiSelect(false)
+	themeList:AddColumn("Theme")
+	themeList:SetHeight(300)
+
+	function themeList:Populate()
+		themeList:Clear()
+		
+		local curTheme = SF.Editor.Themes.ThemeConVar:GetString()
+
+		for k, v in pairs(SF.Editor.Themes.Themes) do
+			local rowPanel = themeList:AddLine(v.Name)
+			rowPanel.theme = k
+
+			if k == curTheme then
+				themeList:SelectItem(rowPanel)
+			end
+		end
+
+		function themeList:OnRowSelected(index, rowPanel) 
+			SF.Editor.Themes.SwitchTheme(rowPanel.theme)
+		end
+	end
+
+	themeList:Populate()
+
+	-- Button dock panel
+
+	local btnPanel = vgui.Create("EditablePanel")
+	panel:AddItem(btnPanel)
+	btnPanel:SetHeight(24)
+	
+	-- Add button
+
+	local addBtn = btnPanel:Add("StarfallButton")
+	addBtn:SetText("Add")
+	addBtn:Dock(LEFT)
+	addBtn:DockMargin(0, 2, 2, 2)
+	function addBtn:DoClick()
+		local menu = DermaMenu()
+
+		menu:AddOption("From URL", function()
+			Derma_StringRequest("Load theme from URL", "Paste the URL to a TextMate theme to the text box",
+				"", function(text)
+				http.Fetch(text, function(body)
+					local parsed, strId, error = SF.Editor.Themes.ParseTextMate(body)
+
+					if not parsed then
+						Derma_Message("A problem occured during parsing the XML file: " .. error, "SF Themes", "Close")
+						return
+					end
+
+					print("Added theme with id " .. strId) -- DEBUG
+
+					SF.Editor.Themes.AddTheme(strId, parsed)
+
+					themeList:Populate()
+				end, function(err)
+					Derma_Message("Downloading the theme failed! Error: " .. err, "SF Themes", "Close")
+				end)
+			end)
+		end)
+
+		menu:AddOption("From text", function()
+			local window = Derma_StringRequest("Load theme from text", "Paste the contents of a TextMate theme file below",
+				"", function(text)
+				local parsed, strId, error = SF.Editor.Themes.ParseTextMate(text)
+
+				if not parsed then
+					Derma_Message("A problem occured during parsing the XML file: " .. error, "SF Themes", "Close")
+					return
+				end
+
+				print("Added theme with id " .. strId) -- DEBUG
+
+				SF.Editor.Themes.AddTheme(strId, parsed)
+
+				themeList:Populate()
+			end)
+
+			-- Enable text entry multiline and resize with a hacky method,
+			-- because why design a new derma panel just for this?
+			for k1, v1 in pairs(window:GetChildren()) do
+				for k2, v2 in pairs(v1:GetChildren()) do
+					if v2:GetName() == "DTextEntry" then
+						v2:SetMultiline(true)
+						v2:SetHeight(30)
+						break
+					end
+				end
+			end
+		end)
+
+		menu:Open()
+	end
+
+	-- Remove button
+
+	local removeBtn = btnPanel:Add("StarfallButton")
+	removeBtn:SetText("Remove")
+	removeBtn:Dock(FILL)
+	removeBtn:DockMargin(0, 2, 2, 2)
+	function removeBtn:DoClick()
+		local lineId = themeList:GetSelectedLine()
+
+		if not lineId then
+			return
+		end
+		
+		local rowPanel = themeList:GetLine(lineId)
+		
+		if rowPanel.theme == "default" then
+			Derma_Message("You can't remove the default theme!", "SF Themes", "Close")
+			return
+		end
+
+		SF.Editor.Themes.RemoveTheme(rowPanel.theme)
+
+		themeList:Populate()
+	end
+
+	function btnPanel:PerformLayout()
+		label:SizeToContents()
+		addBtn:SetWidth(btnPanel:GetWide() / 2)
+	end
+
+	return panel
 end
 
 -- used with color-circles
