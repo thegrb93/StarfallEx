@@ -43,6 +43,7 @@ local TabHandler = {
 	Modes = {},
 	ControlName = "TabHandler_wire",
 	IsEditor = true,
+	Description = "Wire-based editor"
 }
 TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
 ---------------------
