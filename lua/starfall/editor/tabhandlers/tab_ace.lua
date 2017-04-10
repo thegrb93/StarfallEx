@@ -6,6 +6,7 @@ local TabHandler = {
 	ControlName = "sf_tab_ace", -- Its name of vgui panel used by handler, there has to be one
 	IsEditor = true, -- If it should be treated as editor of file, like ACE or Wire
 	Loaded = false,
+	Description = "Legacy editor",
 }
 local PANEL = {} -- It's our VGUI
 
