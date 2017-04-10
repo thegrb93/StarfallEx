@@ -297,29 +297,67 @@ function EDITOR:SyntaxColorLine(row)
 		if usePigments then
 			if self:NextPattern(rgbpattern) then -- Color(r,g,b)
 				local fname,bracket1,r,comma1,g,comma2,b,bracket2 = self.tokendata:match(rgbpatternG)
-				local col = Color(tonumber(r),tonumber(g),tonumber(b))
+				local cr, cg, cb = tonumber(r), tonumber(g), tonumber(b)
+				local col
+				if cr and cg and cb then
+					col = Color(cr, cg, cb)
+				else
+					col = Color(0, 0, 0, 0) -- Transparent because its invalid
+				end				
 				addColorToken("function", col, fname)
 				addColorToken("notfound", col, bracket1)
-				addColorToken("number", col, r)
+				if cr then
+					addColorToken("number", col, r)
+				else
+					addColorToken("notfound", col, r)
+				end
 				addColorToken("notfound", col, comma1)
-				addColorToken("number", col, g)
+				if cg then
+					addColorToken("number", col, g)
+				else
+					addColorToken("notfound", col, g)
+				end
 				addColorToken("notfound", col, comma2)
-				addColorToken("number", col, b)
+				if cb then
+					addColorToken("number", col, b)
+				else
+					addColorToken("notfound", col, b)
+				end
 				addColorToken("notfound", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
 			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
 				local fname,bracket1,r,comma1,g,comma2,b,comma3,a,bracket2 = self.tokendata:match(rgbapatternG)
-				local col = Color(tonumber(r),tonumber(g),tonumber(b),tonumber(a))
+				local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
+				local col
+				if cr and cg and cb and ca then
+					col = Color(cr, cg, cb, ca)
+				else
+					col = Color(0, 0, 0, 0) -- Transparent because its invalid
+				end				
 				addColorToken("function", col, fname)
 				addColorToken("notfound", col, bracket1)
-				addColorToken("number", col, r)
+				if cr then
+					addColorToken("number", col, r)
+				else
+					addColorToken("notfound", col, r)
+				end
 				addColorToken("notfound", col, comma1)
-				addColorToken("number", col, g)
+				if cg then
+					addColorToken("number", col, g)
+				else
+					addColorToken("notfound", col, g)
+				end
 				addColorToken("notfound", col, comma2)
-				addColorToken("number", col, b)
+				if cb then
+					addColorToken("number", col, b)
+				else
+					addColorToken("notfound", col, b)
+				end
 				addColorToken("notfound", col, comma3)
-				addColorToken("number", col, a)
+				if ca then
+					addColorToken("number", col, a)
+				end
 				addColorToken("notfound", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
