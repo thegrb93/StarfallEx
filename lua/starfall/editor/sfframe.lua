@@ -1087,6 +1087,7 @@ end
 function Editor:SaveTabs()
 	if not self.TabsLoaded then return end
 	local tabs = {}
+	tabs.selectedTab = self:GetActiveTabIndex()
 	for i=1, self:GetNumTabs() do
 		tabs[i] = {}
 		local filename = self:GetEditor(i).chosenfile
@@ -1111,7 +1112,10 @@ function Editor:OpenOldTabs()
 		if not istable(v) then continue end
 		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
-			timer.Simple(0,function() self:CloseTab(1) end)
+			timer.Simple(0,function() 
+				self:CloseTab(1)
+				self:SetActiveTabIndex(tabs.selectedTab or 1)		
+			end)
 			is_first = false
 		end
 		self:NewTab()
