@@ -978,21 +978,23 @@ function Editor:InitControlPanel()
 	dlist:AddItem(box)
 	box:SetValue( SF.Editor.CurrentTabHandler:GetString() )
 	box.OnSelect = function ( self, index, value, data )
-		RunConsoleCommand("sf_editor_tabhandler", value)
+		value = value:gsub(" %b()", "") -- Remove description
+		RunConsoleCommand("sf_editor_tabeditor", value)
 		RunConsoleCommand("sf_editor_reload")
 	end
+
+	for k, v in pairs( SF.Editor.TabHandlers ) do
+		if v.IsEditor then
+			local description = v.Description and " ( "..v.Description.." )" or "Addon"
+			box:AddChoice( k..description )
+		end
+	end
+
 
 	label = vgui.Create("DLabel")
 	dlist:AddItem(label)
 	label:SetText("\nOther settings:")
 	label:SizeToContents()
-
-
-	for k, v in pairs( SF.Editor.TabHandlers ) do
-		if v.IsEditor then
-			box:AddChoice( k )
-		end
-	end
 
 	local NewTabOnOpen = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(NewTabOnOpen)
