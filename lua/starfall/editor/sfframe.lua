@@ -18,6 +18,11 @@ Editor.SaveTabsVar = CreateClientConVar("sf_editor_savetabs", "1", true, false)
 Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", true, false)
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
+Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
+
+cvars.AddChangeCallback( "sf_editor_layout", function()
+	RunConsoleCommand("sf_editor_reload")
+end ) 
 
 surface.CreateFont("SFEditorDefault", {
 		font = "default",
@@ -718,9 +723,14 @@ function Editor:InitComponents()
 	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
-
-	self.C.Divider:SetLeft(self.C.Browser)
-	self.C.Divider:SetRight(self.C.MainPane)
+	print("VAR:",Editor.LayoutVar:GetInt())
+	if Editor.LayoutVar:GetInt() == 1 then -- Browser on right
+		self.C.Divider:SetRight(self.C.Browser)
+		self.C.Divider:SetLeft(self.C.MainPane)
+	else --Browser on left(Default)
+		self.C.Divider:SetLeft(self.C.Browser)
+		self.C.Divider:SetRight(self.C.MainPane)		
+	end
 	self.C.Divider:Dock(FILL)
 	self.C.Divider:SetDividerWidth(4)
 	self.C.Divider:SetCookieName("sf_editor_divider")
