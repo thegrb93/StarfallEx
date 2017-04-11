@@ -174,7 +174,7 @@ local function parseTextMate(text)
 
 	-- Token settings
 	local map = {
-		["Keyword"] = { "keyword" },
+		["Keyword"] = { "keyword", "storageType" },
 		["Built-in constant"] = { "constant", "directive" },
 		["Constants"] = { "constant", "directive" },
 		["Function name"] = { "function", "userfunction" },
@@ -183,6 +183,7 @@ local function parseTextMate(text)
 		["Comment"] = {"comment"},
 		["Class name"] = {"library"},
 		["Operators"] = {"operator"},
+		["Storage type"] = { "storageType" },
 	}
 	
     for k, v in pairs(parsed.settings) do
@@ -249,6 +250,7 @@ SF.Editor.Themes.AddTheme("default", {
 	
 	--{foreground color, background color, fontStyle}
     ["keyword"] = { Color(249, 38, 114), nil, 0}, 
+	["storageType"] = { Color(249, 38, 114), nil, 0}, 
 	["directive"] =	{ Color(230, 219, 116), nil, 0},
 	["comment"] = { Color(117, 113, 94), nil, 1},
 	["string"] = { Color(230, 219, 116), nil, 0},

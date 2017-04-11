@@ -9,13 +9,16 @@ local function istype(tp)
 end
 
 -- keywords[name][nextchar!="("]
+local storageTypes = {
+	["function"] = { [true] = true, [false] = true },
+	["local"] = { [true] = true },	
+}
 local keywords = {
 	-- keywords that can be followed by a "(":
 	["if"] = { [true] = true, [false] = true },
 	["elseif"] = { [true] = true, [false] = true },
 	["while"] = { [true] = true, [false] = true },
 	["for"] = { [true] = true, [false] = true },
-	["function"] = { [true] = true, [false] = true },
 
 	["repeat"] = { [true] = true, [false] = true },
 	["until"] = { [true] = true, [false] = true },
@@ -34,12 +37,12 @@ local keywords = {
 	["end"] = { [true] = true },
 	["in"] = { [true] = true },
 	["return"] = { [true] = true },
-	["local"] = { [true] = true },
 	["nil"] = { [true] = true },
 }
 
 -- fallback for nonexistant entries:
 setmetatable(keywords, { __index=function(tbl,index) return {} end })
+setmetatable(storageTypes, { __index=function(tbl,index) return {} end })
 
 local directives = {
 	["@name"] = 0,
@@ -250,7 +253,7 @@ function EDITOR:SyntaxColorLine(row)
 
 	local found = self:SkipPattern( "( *function)" )
 	if found then
-		addToken( "keyword", found ) -- Add "function"
+		addToken( "storageType", found ) -- Add "function"
 		self.tokendata = "" -- Reset tokendata
 
 		local spaces = self:SkipPattern( " *" )
@@ -373,8 +376,10 @@ function EDITOR:SyntaxColorLine(row)
 			-- is this a keyword or a function?
 			local char = self.character or ""
 			local keyword = char ~= "("
-
-			if keywords[sstr][keyword] then
+			
+			if storageTypes[sstr][keyword] then
+				tokenname = "storageType"
+			elseif keywords[sstr][keyword] then
 				tokenname = "keyword"
 			elseif libmap["Environment"][sstr] then -- We Environment /constant
 				local val = libmap["Environment"][sstr]
