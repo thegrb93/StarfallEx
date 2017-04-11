@@ -11,7 +11,7 @@ SF.Editor.Themes.CurrentTheme = nil -- Theme table
 SF.Editor.Themes.ThemeConVar = CreateClientConVar("sf_editor_theme", "default", true, false)
 
 local themeformat_version = 1 --Change that if previous themes arent compatibile anymore
-
+SF.Editor.Themes.Version = themeformat_version
 function SF.Editor.Themes.Load()
     if not file.Exists("sf_themes.txt", "DATA") then
 		SF.Editor.Themes.SwitchTheme("default")
@@ -32,11 +32,6 @@ function SF.Editor.Themes.Load()
 
 		return
 	end
-	if result.Version != themeformat_version then
-		print("Seems like this starfall version doesnt support your saved themes! Theme changed to default, please reimport your themes!")
-
-		SF.Editor.Themes.SwitchTheme("default")
-	end
 	
 	result.default = SF.Editor.Themes.Themes.default -- Default theme wont be loaded
 	SF.Editor.Themes.Themes = result
@@ -52,11 +47,11 @@ function SF.Editor.Themes.Load()
 end
 
 function SF.Editor.Themes.Save()
-	SF.Editor.Themes.Version = themeformat_version
 	file.Write("sf_themes.txt", util.TableToJSON(SF.Editor.Themes.Themes))
 end
 
 function SF.Editor.Themes.AddTheme(name, tbl)
+	tbl.Version = themeformat_version
     SF.Editor.Themes.Themes[name] = tbl
 
 	if name ~= "default" then
@@ -80,13 +75,18 @@ function SF.Editor.Themes.RemoveTheme(name)
 end
 
 function SF.Editor.Themes.SwitchTheme(name)
+
     local theme = SF.Editor.Themes.Themes[name]
 
     if not theme then
        print("No such theme " .. name)
        return
     end
-
+	if theme.Version != themeformat_version then
+		SF.Editor.Themes.SwitchTheme("default")
+		print("Theme "..name.." isnt compatibile with this starfall version, you have to reimport it!")
+		return
+	end
     SF.Editor.Themes.CurrentTheme = theme
 	SF.Editor.Themes.ThemeConVar:SetString(name)
 
