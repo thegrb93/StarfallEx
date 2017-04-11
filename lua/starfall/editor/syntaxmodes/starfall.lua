@@ -52,30 +52,14 @@ local directives = {
 	["@model"] = 0,
 }
 
-local colors = {
-	["keyword"] = { Color(142,192,124), false},
-	["directive"] = { Color(142, 192, 124), false},
-	["comment"] = { Color(146, 131, 116), false},
-	["string"] = { Color(184, 187, 38), false},
-	["number"] = { Color(211, 134, 155), false},
-	["function"] = { Color(184, 187, 38), false},
-	["library"] = { Color(184, 187, 38), false},
-	["operator"] = { Color(211, 134, 155), false},
-	["notfound"] = { Color(251, 241, 199), false},
-	["userfunction"] = { Color(251, 241, 199), false},
-	["constant"] = { Color(211, 134, 155), false},
-}
+local colors = { }
 
-function EDITOR:GetSyntaxColor(name)
-	if colors[name] then
-		return colors[name][1]
+function EDITOR:LoadSyntaxColors()
+	colors = { }
+
+	for k, v in pairs(SF.Editor.Themes.CurrentTheme) do
+		colors[k] = { v, false }
 	end
-	return colors["notfound"][1]
-end
-
-function EDITOR:SetSyntaxColor( colorname, colr )
-	if not colors[colorname] then return end
-	colors[colorname][1] = colr
 end
 
 -- cols[n] = { tokendata, color }

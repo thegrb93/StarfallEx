@@ -66,58 +66,17 @@ TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, tru
 ---------------------
 -- Colors
 ---------------------
-local colors = {
-	["keyword"] = Color(249, 38, 114), 
-	["directive"] = Color(230, 219, 116),
-	["comment"] = Color(117, 113, 94),
-	["string"] = Color(230, 219, 116),
-	["number"] = Color(174, 129 ,255), 
-	["function"] = Color(137, 189, 255),
-	["library"] = Color(137, 189, 255), 
-	["operator"] = Color(230, 230, 230),
-	["notfound"] = Color(230, 230, 230),
-	["userfunction"] = Color(166, 226, 42),
-	["constant"] = Color(174, 129 ,255),
-}
-local defcolors = table.Copy(colors)
-local color_convar_prefix = "sf_editor_wire_color_"
-local colorConvars = {}
 
-for k, v in pairs(colors) do
-	colorConvars[k] = CreateClientConVar( color_convar_prefix .. k, v.r .. "_" .. v.g .. "_" .. v.b, true, false)
-end
-local function generateColorsCommandline()
-	local out = ""
-	for k, v in pairs(colorConvars) do
-		out = out..color_convar_prefix..k.." \""..v:GetString().."\";"
-	end
-	out = out.."sf_editor_reload"
-	return out
-end
+local colors = { }
+
 function TabHandler:LoadSyntaxColors()
-	for k, v in pairs(colorConvars) do
-		local r, g, b = v:GetString():match("(%d+)_(%d+)_(%d+)")
-		colors[k] = Color(tonumber(r) or 255, tonumber(g) or 0, tonumber(b) or 0)
-		for _,mode in pairs(TabHandler.Modes) do
-			if mode.SetSyntaxColor then
-				mode:SetSyntaxColor(k, colors[k])
-			end
-		end	
-	end
-	
+	colors = SF.Editor.Themes.CurrentTheme
 end
 
-function TabHandler:SetSyntaxColor(colorname, colr)
-	if not colors[colorname] then return end
-	colors[colorname] = colr
-	RunConsoleCommand(color_convar_prefix .. colorname, colr.r .. "_" .. colr.g .. "_" .. colr.b)
-
-	for _,mode in pairs(TabHandler.Modes) do
-		if mode.SetSyntaxColor then
-			mode:SetSyntaxColor(colorname, colors[colorname])
-		end
-	end
+function TabHandler:GetSyntaxColor(name)
+	return colors[name]
 end
+
 ---------------------
 
 local function createWireLibraryMap () -- Hashtable
@@ -172,79 +131,7 @@ function TabHandler:registerSettings()
 	local dlist = vgui.Create("DPanelList", sheet.Panel)
 	dlist.Paint = function() end
 	dlist:EnableVerticalScrollbar(true)
-
-	-- Color Mixer PANEL - Houses label, combobox, mixer, reset button & reset all button.
-	local mixPanel = vgui.Create( "panel" )
-	mixPanel:SetTall( 240 )
-	dlist:AddItem( mixPanel )
-	SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
-	do
-		-- Label
-		local label = vgui.Create( "DLabel", mixPanel )
-		label:Dock( TOP )
-		label:SetText( "Syntax Colors" )
-		label:SizeToContents()
-
-		-- Dropdown box of convars to change ( affects editor colors )
-		local box = vgui.Create( "DComboBox", mixPanel )
-		box:Dock( TOP )
-		box:SetValue( "Color feature" )
-		local active = nil
-
-		-- Mixer
-		local mixer = vgui.Create( "DColorMixer", mixPanel )
-		mixer:Dock( FILL )
-		mixer:SetPalette( true )
-		mixer:SetAlphaBar( true )
-		mixer:SetWangs( true )
-		mixer.ValueChanged = function ( _, clr )
-			self:SetSyntaxColor( active, clr )
-		end
-
-		for k, _ in pairs( colorConvars ) do
-			box:AddChoice( k )
-		end
-
-		box.OnSelect = function ( self, index, value, data )
-			-- DComboBox doesn't have a method for getting active value ( to my knowledge )
-			-- Therefore, cache it, we're in a local scope so we're fine.
-			active = value
-			mixer:SetColor( colors[ active ] or Color( 255, 255, 255 ) )
-		end
-
-		-- Reset ALL button
-		local rAll = vgui.Create( "DButton", mixPanel )
-		rAll:Dock( BOTTOM )
-		rAll:SetText( "Reset ALL to Default" )
-
-		rAll.DoClick = function ()
-			for k, v in pairs( defcolors ) do
-				self:SetSyntaxColor( k, v )
-			end
-			mixer:SetColor( defcolors[ active ] )
-		end
-
-		-- Reset to default button
-		local reset = vgui.Create( "DButton", mixPanel )
-		reset:Dock( BOTTOM )
-		reset:SetText( "Set to Default" )
-
-		reset.DoClick = function ()
-			self:SetSyntaxColor( active, defcolors[ active ] )
-			mixer:SetColor( defcolors[ active ] )
-		end
-
-		local outCustom = vgui.Create( "DButton", mixPanel )
-		outCustom:Dock( BOTTOM )
-		outCustom:SetText( "Output syntax commandline" )
-
-		outCustom.DoClick = function ()
-			Derma_StringRequest( "Commandline", "Paste it to console to restore syntax to current one", generateColorsCommandline(), function()end ) 
-		end
-
-		-- Select a convar to be displayed automatically
-		box:ChooseOptionID( 1 )
-	end
+SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
 
 	--- - FONTS
 
@@ -326,6 +213,8 @@ end
 function PANEL:Init()
 	self:SetCursor("beam")
 
+	self.TabHandler = TabHandler
+
 	self.Rows = {""}
 	self.Caret = {1, 1}
 	self.Start = {1, 1}
@@ -359,6 +248,7 @@ function PANEL:Init()
 	self.e2fs_functions = {}
 
 	self:SetMode("starfall")
+	self.CurrentMode:LoadSyntaxColors()
 	
 	self.CurrentFont,self.FontWidth,self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
 	table.insert(TabHandler.Tabs, self)
@@ -570,7 +460,7 @@ function PANEL:OnMousePressed(code)
 						-- This checks if it's NOT the word the user just highlighted
 						if caretstart[1] ~= self.Start[1] or caretstart[2] ~= self.Start[2] or
 						caretstop[1] ~= self.Caret[1] or caretstop[2] ~= self.Caret[2] then
-							local c = self:GetSyntaxColor("dblclickhighlight")
+							local c = colors.word_highlight
 							self:HighlightArea( { caretstart, caretstop }, c.r, c.g, c.b, 100 )
 						end
 					end
@@ -656,7 +546,7 @@ function PANEL:PaintLine(row)
 	local width, height = self.FontWidth, self.FontHeight
 
 	if row == self.Caret[1] and self.TextEntry:HasFocus() then
-		surface_SetDrawColor(39, 40, 34, 255)
+		surface_SetDrawColor(colors.line_highlight)
 		surface_DrawRect(self.LineNumberWidth + 5, (row - self.Scroll[1]) * height, self:GetWide() - (self.LineNumberWidth + 5), height)
 	end
 
@@ -671,7 +561,7 @@ function PANEL:PaintLine(row)
 		local line, char = start[1], start[2]
 		local endline, endchar = stop[1], stop[2]
 
-		surface_SetDrawColor(0, 0, 160, 255)
+		surface_SetDrawColor(colors.selection)
 		local length = self.Rows[row]:len() - self.Scroll[2] + 1
 
 		char = char - self.Scroll[2]
@@ -690,7 +580,7 @@ function PANEL:PaintLine(row)
 		end
 	end
 
-	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth + 2, (row - self.Scroll[1]) * height, Color(128, 128, 128, 255), TEXT_ALIGN_RIGHT)
+	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth + 2, (row - self.Scroll[1]) * height, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
 	local offset = -self.Scroll[2] + 1
 	for i,cell in ipairs(self.PaintRows[row]) do
@@ -775,9 +665,9 @@ function PANEL:PaintTextOverlay()
 
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
 		local width, height = self.FontWidth, self.FontHeight
-
+		
 		if (RealTime() - self.Blink) % 0.8 < 0.4 then
-			surface_SetDrawColor(240, 240, 240, 255)
+			surface_SetDrawColor(colors.caret)
 			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, (self.Caret[1] - self.Scroll[1]) * height, 1, height)
 		end
 
@@ -912,10 +802,13 @@ function PANEL:Paint()
 		self.Caret = self:CursorToCaret()
 	end
 
-	surface_SetDrawColor(0, 0, 0, 255)
+	surface_SetDrawColor(colors.gutter_background)
 	surface_DrawRect(0, 0, self.LineNumberWidth + 4, self:GetTall())
 
-	surface_SetDrawColor(32, 32, 32, 255)
+	surface_SetDrawColor(colors.gutter_divider)
+	surface_DrawRect(self.LineNumberWidth + 4, 0, 1, self:GetTall())
+
+	surface_SetDrawColor(colors.background)
 	surface_DrawRect(self.LineNumberWidth + 5, 0, self:GetWide() - (self.LineNumberWidth + 5), self:GetTall())
 
 	self.Scroll[1] = math_floor(self.ScrollBar:GetScroll() + 1)
