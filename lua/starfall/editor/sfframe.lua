@@ -1071,6 +1071,7 @@ function Editor:CreateThemesPanel()
 	panel:AddItem(themeList)
 	themeList:SetMultiSelect(false)
 	themeList:AddColumn("Theme")
+	themeList:AddColumn("")
 	themeList:SetHeight(300)
 
 	function themeList:Populate()
@@ -1079,7 +1080,7 @@ function Editor:CreateThemesPanel()
 		local curTheme = SF.Editor.Themes.ThemeConVar:GetString()
 
 		for k, v in pairs(SF.Editor.Themes.Themes) do
-			local rowPanel = themeList:AddLine(v.Name)
+			local rowPanel = themeList:AddLine(v.Name,v.Version == SF.Editor.Themes.Version and "" or "Not compatible!")
 			rowPanel.theme = k
 
 			if k == curTheme then
