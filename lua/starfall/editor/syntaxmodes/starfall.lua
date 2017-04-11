@@ -73,7 +73,7 @@ local cols = {}
 local lastcol
 local function addToken(tokenname, tokendata)
 	if not tokenname then tokenname = "notfound" end
-	local color = colors[tokenname]
+	local color = colors[tokenname] or colors["notfound"]
 	if lastcol and color == lastcol[2] then
 		lastcol[1] = lastcol[1] .. tokendata
 	else
@@ -257,7 +257,7 @@ function EDITOR:SyntaxColorLine(row)
 		self.tokendata = "" -- Reset tokendata
 
 		local spaces = self:SkipPattern( " *" )
-		if spaces then addToken( "comment", spaces ) end
+		if spaces then addToken( "whitespace", spaces ) end
 
 		if self:NextPattern( "%s*[a-zA-Z][a-zA-Z0-9_]*" ) then -- function THIS()
 
@@ -284,7 +284,7 @@ function EDITOR:SyntaxColorLine(row)
 
 		-- eat all spaces
 		local spaces = self:SkipPattern(" *")
-		if spaces then addToken("comment", spaces) end
+		if spaces then addToken("whitespace", spaces) end
 		if not self.character then break end
 
 		-- eat next token
@@ -366,7 +366,7 @@ function EDITOR:SyntaxColorLine(row)
 			addToken("operator",self.tokendata:sub(1,1)) -- Adding : as operator
 			self.tokendata = self.tokendata:sub(2)  -- Operator was handled, so remove it from tokendata
 			if libmap["Methods"][self.tokendata] then
-				tokenname = "function"
+				tokenname = "method"
 			else
 				tokenname = "notfound"
 			end
