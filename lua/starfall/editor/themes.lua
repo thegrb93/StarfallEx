@@ -161,8 +161,8 @@ local function parseTextMate(text)
     tbl.line_highlight = parseColor(parsed.settings[1].settings.lineHighlight)
     tbl.caret = parseColor(parsed.settings[1].settings.caret)
     tbl.selection = parseColor(parsed.settings[1].settings.selection)
-    tbl.notfound = parseColor(parsed.settings[1].settings.foreground)
-    tbl.operator = parseColor(parsed.settings[1].settings.foreground)
+    tbl.notfound = { parseColor(parsed.settings[1].settings.foreground), nil, 0 }
+    tbl.operator = { parseColor(parsed.settings[1].settings.foreground), nil, 0 }
 
 	-- Gutter settings
 
