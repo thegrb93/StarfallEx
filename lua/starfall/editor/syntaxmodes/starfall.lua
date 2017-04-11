@@ -51,6 +51,9 @@ local directives = {
 	["@server"] = 0,
 	["@model"] = 0,
 }
+--Color scheme:
+--{foreground color, background color, fontStyle}
+--Style can be: 0 - normal  1 - italic 2 - bold
 
 local colors = { }
 
@@ -58,7 +61,7 @@ function EDITOR:LoadSyntaxColors()
 	colors = { }
 
 	for k, v in pairs(SF.Editor.Themes.CurrentTheme) do
-		colors[k] = { v, false }
+		colors[k] = v
 	end
 end
 
@@ -91,7 +94,7 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 	if lastcol and color == lastcol[2] then
 		lastcol[1] = lastcol[1] .. tokendata
 	else
-		cols[#cols + 1] = { tokendata, {textcolor, false, bgcolor}, "color" }
+		cols[#cols + 1] = { tokendata, {textcolor, bgcolor, 0}, "color" }
 		lastcol = cols[#cols]
 	end
 end
@@ -357,7 +360,9 @@ function EDITOR:SyntaxColorLine(row)
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
 		elseif self:NextPattern("^%:[a-zA-Z][a-zA-Z0-9_]*") then -- Methods
-			if libmap["Methods"][self.tokendata:sub(2)] then -- we gotta skip : and check  if it's correct method
+			addToken("operator",self.tokendata:sub(1,1)) -- Adding : as operator
+			self.tokendata = self.tokendata:sub(2)  -- Operator was handled, so remove it from tokendata
+			if libmap["Methods"][self.tokendata] then
 				tokenname = "function"
 			else
 				tokenname = "notfound"

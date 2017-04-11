@@ -10,6 +10,8 @@ SF.Editor.Themes.Themes = { }
 SF.Editor.Themes.CurrentTheme = nil -- Theme table
 SF.Editor.Themes.ThemeConVar = CreateClientConVar("sf_editor_theme", "default", true, false)
 
+local themeformat_version = 1 --Change that if previous themes arent compatibile anymore
+
 function SF.Editor.Themes.Load()
     if not file.Exists("sf_themes.txt", "DATA") then
 		SF.Editor.Themes.SwitchTheme("default")
@@ -22,7 +24,7 @@ function SF.Editor.Themes.Load()
 	local result = util.JSONToTable(contents)
 
 	if not result then
-		print("StarfallEx: A problem occured during parsing sf_themes.txt, the file will be renamed to sf_themes_old.txt")
+		print("A problem occured during parsing sf_themes.txt, the file will be renamed to sf_themes_old.txt")
 		file.Write("sf_themes_old.txt", contents)		
 		file.Delete("sf_themes.txt")
 
@@ -30,7 +32,13 @@ function SF.Editor.Themes.Load()
 
 		return
 	end
+	if result.Version != themeformat_version then
+		print("Seems like this starfall version doesnt support your saved themes! Theme changed to default, please reimport your themes!")
 
+		SF.Editor.Themes.SwitchTheme("default")
+	end
+	
+	result.default = SF.Editor.Themes.Themes.default -- Default theme wont be loaded
 	SF.Editor.Themes.Themes = result
 
 	-- Switch the theme, if invalid - switch to default
@@ -44,6 +52,7 @@ function SF.Editor.Themes.Load()
 end
 
 function SF.Editor.Themes.Save()
+	SF.Editor.Themes.Version = themeformat_version
 	file.Write("sf_themes.txt", util.TableToJSON(SF.Editor.Themes.Themes))
 end
 
@@ -140,6 +149,7 @@ local function parseTextMate(text)
     tbl.Name = parsed.name or "No name"
 
     local function parseColor(hex)
+		if not hex then return end -- In case there is no color just return nil
         return Color(
 			tonumber("0x" .. hex:sub(2, 3)),
             tonumber("0x" .. hex:sub(4, 5)),
@@ -163,21 +173,33 @@ local function parseTextMate(text)
 	end
 
 	-- Token settings
+	local map = {
+		["Keyword"] = { "keyword" },
+		["Built-in constant"] = { "constant", "directive" },
+		["Constants"] = { "constant", "directive" },
+		["Function name"] = { "function", "userfunction" },
+		["String"] = { "string" },
+		["Number"] = { "number" },
+		["Comment"] = {"comment"},
+		["Class name"] = {"library"},
+		["Operators"] = {"operator"},
+	}
 	
     for k, v in pairs(parsed.settings) do
-        if v.name == "Keyword" then tbl.keyword = parseColor(v.settings.foreground)
-        elseif v.name == "Built-in constant" or v.name == "Constants" then
-            tbl.directive = parseColor(v.settings.foreground)
-            tbl.constant = parseColor(v.settings.foreground)
-        elseif v.name == "Function name" then
-            tbl["function"] = parseColor(v.settings.foreground)
-            tbl.userfunction = parseColor(v.settings.foreground)
-        elseif v.name == "String" then tbl.string = parseColor(v.settings.foreground)
-        elseif v.name == "Number" then tbl.number = parseColor(v.settings.foreground)
-        elseif v.name == "Comment" then tbl.comment = parseColor(v.settings.foreground)
-        elseif v.name == "Class name" then tbl.library = parseColor(v.settings.foreground)
-        elseif v.name == "Operators" then tbl.operator = parseColor(v.settings.foreground)
-        end
+		local foreground, background, fontStyle = parseColor(v.settings.foreground), parseColor(v.settings.background), v.settings.fontStyle
+		fontStyle = fontStyle or "normal"
+		
+		if fontStyle:lower() == "italic" then fontStyle = 1
+		elseif fontStyle:lower() == "bold" then fontStyle = 1
+		else fontStyle = 0 end
+
+		if map [v.name] then
+			for k,v in pairs(map[v.name]) do
+				tbl[v] = {foreground, background, fontStyle}
+			end
+		else
+			print("[TextMate Import] Ignored setting:",v.name)
+		end
     end
 
 	tbl.operator = tbl.operator or tbl.keyword
@@ -224,18 +246,19 @@ SF.Editor.Themes.AddTheme("default", {
     ["selection"] = Color(0, 0, 160),
 
 	["word_highlight"] = Color(30, 150, 30),
-
-    ["keyword"] = Color(249, 38, 114), 
-	["directive"] = Color(230, 219, 116),
-	["comment"] = Color(117, 113, 94),
-	["string"] = Color(230, 219, 116),
-	["number"] = Color(174, 129 ,255), 
-	["function"] = Color(137, 189, 255),
-	["library"] = Color(137, 189, 255), 
-	["operator"] = Color(230, 230, 230),
-	["notfound"] = Color(230, 230, 230),
-	["userfunction"] = Color(166, 226, 42),
-	["constant"] = Color(174, 129 ,255),
+	
+	--{foreground color, background color, fontStyle}
+    ["keyword"] = { Color(249, 38, 114), nil, 0}, 
+	["directive"] =	{ Color(230, 219, 116), nil, 0},
+	["comment"] = { Color(117, 113, 94), nil, 1},
+	["string"] = { Color(230, 219, 116), nil, 0},
+	["number"] = { Color(174, 129 ,255), nil, 0}, 
+	["function"] = { Color(137, 189, 255), nil, 0},
+	["library"] = { Color(137, 189, 255), nil, 0}, 
+	["operator"] = { Color(230, 230, 230), nil, 0},
+	["notfound"] = { Color(230, 230, 230), nil, 0},
+	["userfunction"] = { Color(166, 226, 42), nil, 0},
+	["constant"] = { Color(174, 129 ,255), nil, 0},
 })
 
 SF.Editor.Themes.Load()
