@@ -307,7 +307,7 @@ hook.Add("Think","SF_Think",function()
 			end
 			
 			if maxinst then
-				maxinst:Error( "SF: Player cpu time limit reached!" )
+				maxinst:Error( SF.MakeError( "SF: Player cpu time limit reached!", 1 ) )
 			end
 		end
 	end
