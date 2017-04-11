@@ -82,7 +82,15 @@ end
 local function createWireLibraryMap () -- Hashtable
 	
 	local libMap = {}
-
+	libMap[ "Methods" ] = {}
+	for lib, tbl in pairs( SF.Docs.classes ) do
+		if not isstring(lib) then continue end -- We gotta skip numberics
+		for name, val in pairs( tbl.methods ) do
+			if not isstring(name) then continue end -- We gotta skip numberics
+			libMap["Methods"][name] = true
+		end
+	end
+	
 	libMap[ "Environment" ] = {}
 	for name, val in pairs( SF.DefaultEnvironment ) do
 		if istable(val) then

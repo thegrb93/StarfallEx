@@ -356,7 +356,12 @@ function EDITOR:SyntaxColorLine(row)
 			tokenname = "number"
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
-
+		elseif self:NextPattern("^%:[a-zA-Z][a-zA-Z0-9_]*") then -- Methods
+			if libmap["Methods"][self.tokendata:sub(2)] then -- we gotta skip : and check  if it's correct method
+				tokenname = "function"
+			else
+				tokenname = "notfound"
+			end
 		elseif self:NextPattern("^[a-zA-Z][a-zA-Z0-9_]*") then
 			local sstr = self.tokendata
 
