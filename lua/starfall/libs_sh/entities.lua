@@ -103,7 +103,7 @@ if CLIENT then
 		renderProperties[ property ]( ent )
 	end)
 
-	--- Allows manipulation of the owner's bones' positions
+	--- Allows manipulation of a hologram's bones' positions
 	-- @client
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
@@ -116,7 +116,7 @@ if CLIENT then
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
-	--- Allows manipulation of the owner's bones' scale
+	--- Allows manipulation of a hologram's bones' scale
 	-- @client
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
@@ -129,7 +129,7 @@ if CLIENT then
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
-	--- Allows manipulation of the owner's bones' angles
+	--- Allows manipulation of a hologram's bones' angles
 	-- @client
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
