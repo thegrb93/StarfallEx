@@ -82,7 +82,15 @@ end
 local function createWireLibraryMap () -- Hashtable
 	
 	local libMap = {}
-
+	libMap[ "Methods" ] = {}
+	for lib, tbl in pairs( SF.Docs.classes ) do
+		if not isstring(lib) then continue end -- We gotta skip numberics
+		for name, val in pairs( tbl.methods ) do
+			if not isstring(name) then continue end -- We gotta skip numberics
+			libMap["Methods"][name] = true
+		end
+	end
+	
 	libMap[ "Environment" ] = {}
 	for name, val in pairs( SF.DefaultEnvironment ) do
 		if istable(val) then
@@ -151,12 +159,12 @@ SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
 				RunConsoleCommand("sf_editor_wire_fontname", value)
-				RunConsoleCommand("sf_editor_reload")
+				RunConsoleCommand("sf_editor_restart")
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
 			RunConsoleCommand("sf_editor_wire_fontname", value)
-			RunConsoleCommand("sf_editor_reload")
+			RunConsoleCommand("sf_editor_restart")
 		end
 	end
 	for k, v in pairs(self.Fonts) do
@@ -172,7 +180,7 @@ SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
 	FontSizeSelect.OnSelect = function(panel, index, value)
 		value = value:gsub(" %b()", "")
 		RunConsoleCommand("sf_editor_wire_fontsize", value)
-		RunConsoleCommand("sf_editor_reload")
+		RunConsoleCommand("sf_editor_restart")
 	end
 	for i = 11, 26 do
 		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
@@ -590,8 +598,8 @@ function PANEL:PaintLine(row)
 				local line = cell[1]:sub(1-offset)
 				offset = line:len()
 
-				if cell[2][3] then --has background
-					surface_SetDrawColor( cell[2][3] )
+				if cell[2][2] then --has background
+					surface_SetDrawColor( cell[2][2] )
 					if usePigments == 1 and cell[3] == "color" then
 						surface_DrawRect(self.LineNumberWidth+ 6, (row - self.Scroll[1]) * height+height-2, width*offset, 2)
 					else
@@ -609,17 +617,18 @@ function PANEL:PaintLine(row)
 			end
 		else
 			local length = cell[1]:len()
-			if cell[2][3] then --has background
-				surface_SetDrawColor( cell[2][3] )
+			if cell[2][2] then --has background
+				surface_SetDrawColor( cell[2][2] )
 				if usePigments == 1 and cell[3] == "color" then
 					surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height+height-2, width*length, 2)
 				else
 					surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width*length, height)
 				end
 			end
-			if cell[2][2] then
-
+			if cell[2][3] == 2 then
 				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Bold", offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
+			elseif cell[2][3] == 1 then
+				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Italic", offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
 			else
 				draw_SimpleText(cell[1] .. " ", self.CurrentFont, offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
 			end

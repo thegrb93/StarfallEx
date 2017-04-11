@@ -21,7 +21,7 @@ Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true,
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 
 cvars.AddChangeCallback( "sf_editor_layout", function()
-	RunConsoleCommand("sf_editor_reload")
+	RunConsoleCommand("sf_editor_restart")
 end ) 
 
 surface.CreateFont("SFEditorDefault", {
@@ -980,7 +980,7 @@ function Editor:InitControlPanel()
 	box.OnSelect = function ( self, index, value, data )
 		value = value:gsub(" %b()", "") -- Remove description
 		RunConsoleCommand("sf_editor_tabeditor", value)
-		RunConsoleCommand("sf_editor_reload")
+		RunConsoleCommand("sf_editor_restart")
 	end
 
 	for k, v in pairs( SF.Editor.TabHandlers ) do
@@ -1060,8 +1060,9 @@ function Editor:CreateThemesPanel()
 	local label = vgui.Create("DLabel")
 	panel:AddItem(label)
 	label:DockMargin(0, 0, 0, 0)
-	label:SetText("Starfall editor supports TextMate themes. " .. 
-		"You can add them either from an URL, or just by pasting the contents of  tmTheme file.") -- Two spaces, because GMod ignores one there for some reason
+	label:SetText("Starfall editor supports TextMate themes.\n" .. 
+		"You can import them by pressing \"Add\" button.\n" ..
+		"Note: Those work only in wire tab editor!")
 	label:SetWrap(true)
 
 	-- Theme list
@@ -1070,6 +1071,7 @@ function Editor:CreateThemesPanel()
 	panel:AddItem(themeList)
 	themeList:SetMultiSelect(false)
 	themeList:AddColumn("Theme")
+	themeList:AddColumn("")
 	themeList:SetHeight(300)
 
 	function themeList:Populate()
@@ -1078,7 +1080,7 @@ function Editor:CreateThemesPanel()
 		local curTheme = SF.Editor.Themes.ThemeConVar:GetString()
 
 		for k, v in pairs(SF.Editor.Themes.Themes) do
-			local rowPanel = themeList:AddLine(v.Name)
+			local rowPanel = themeList:AddLine(v.Name,v.Version == SF.Editor.Themes.Version and "" or "Not compatible!")
 			rowPanel.theme = k
 
 			if k == curTheme then
