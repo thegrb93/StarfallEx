@@ -1060,8 +1060,9 @@ function Editor:CreateThemesPanel()
 	local label = vgui.Create("DLabel")
 	panel:AddItem(label)
 	label:DockMargin(0, 0, 0, 0)
-	label:SetText("Starfall editor supports TextMate themes. " .. 
-		"You can add them either from an URL, or just by pasting the contents of  tmTheme file.") -- Two spaces, because GMod ignores one there for some reason
+	label:SetText("Starfall editor supports TextMate themes.\n" .. 
+		"You can import them by pressing \"Add\" button.\n" ..
+		"Note: Those work only in wire tab editor!")
 	label:SetWrap(true)
 
 	-- Theme list
