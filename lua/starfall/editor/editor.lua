@@ -27,7 +27,7 @@ if CLIENT then
 	SF.Editor.TabHandlers.wire = include( "tabhandlers/tab_wire.lua" )
 	SF.Editor.TabHandlers.ace = include( "tabhandlers/tab_ace.lua" )
 
-	SF.Editor.CurrentTabHandler = CreateClientConVar( "sf_editor_tabeditor", "wire", true, false )
+	SF.Editor.CurrentTabHandler = CreateClientConVar( "sf_editor_tabeditor", "ace", true, false )
 
 end
 
