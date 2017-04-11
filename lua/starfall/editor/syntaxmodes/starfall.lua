@@ -207,6 +207,10 @@ local rgbpattern = "^Color%s*%(%s*"..numbpattern..spacedcomma..numbpattern..spac
 local rgbpatternG = "^(Color%s*)(%(%s*)"..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG.."(%s*%))"
 local rgbapattern = "^Color%s*%(%s*"..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern.."%s*%)"
 local rgbapatternG = "^(Color%s*)(%(%s*)"..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG.."(%s*%))"
+local setrgbapattern = "^setRGBA%s*%(%s*"..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern.."%s*%)"
+local setrgbapatternG = "^(setRGBA%s*)(%(%s*)"..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG.."(%s*%))"
+
+
 --End of monsterous code
 
 function EDITOR:SyntaxColorLine(row)
@@ -360,8 +364,6 @@ function EDITOR:SyntaxColorLine(row)
 			local char = self.character or ""
 			local keyword = char ~= "("
 
-			local spaces = self:SkipPattern(" *") or ""
-
 			if keywords[sstr][keyword] then
 				tokenname = "keyword"
 			elseif libmap["Environment"][sstr] then -- We Environment /constant
@@ -397,10 +399,46 @@ function EDITOR:SyntaxColorLine(row)
 			elseif libmap[sstr] then --We found library
 				addToken("library", self.tokendata)
 				self.tokendata = ""
-				if self:NextPattern( "%." ) then -- We found a dot, looking for library method/constant
+				if self:NextPattern( "^%." ) then -- We found a dot, looking for library method/constant
 					addToken( "operator", self.tokendata )
 					self.tokendata = ""
-					if self:NextPattern( "^[a-zA-Z][a-zA-Z0-9_]*" ) then
+					if sstr=="render" and usePigments and self:NextPattern(setrgbapattern) then -- setRGBA(r,g,b)
+						local fname,bracket1,r,comma1,g,comma2,b,comma3,a,bracket2 = self.tokendata:match(setrgbapatternG)
+						local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
+						local col
+						if cr and cg and cb and ca then
+							col = Color(cr, cg, cb, ca)
+						else
+							col = Color(0, 0, 0, 0) -- Transparent because its invalid
+						end				
+						addColorToken("function", col, fname)
+						addColorToken("notfound", col, bracket1)
+						if cr then
+							addColorToken("number", col, r)
+						else
+							addColorToken("notfound", col, r)
+						end
+						addColorToken("notfound", col, comma1)
+						if cg then
+							addColorToken("number", col, g)
+						else
+							addColorToken("notfound", col, g)
+						end
+						addColorToken("notfound", col, comma2)
+						if cb then
+							addColorToken("number", col, b)
+						else
+							addColorToken("notfound", col, b)
+						end
+						addColorToken("notfound", col, comma3)
+						if ca then
+							addColorToken("number", col, a)
+						end
+						addColorToken("notfound", col, bracket2)
+						tokenname = "" -- It's custom token
+						self.tokendata = ""
+						
+					elseif self:NextPattern( "^[a-zA-Z][a-zA-Z0-9_]*" ) then
 						local t = libmap[sstr][self.tokendata]
 						if t then -- Valid function, woohoo
 							tokenname = t == "function" and "function" or "constant"
@@ -414,9 +452,8 @@ function EDITOR:SyntaxColorLine(row)
 			end
 			if self.tokendata != "" then
 				addToken(tokenname, self.tokendata)
+				self.tokendata = ""
 			end
-			tokenname = "comment"
-			self.tokendata = spaces
 
 		elseif self:NextPattern("%[%[") then -- Multiline strings
 			self:NextCharacter()
