@@ -43,6 +43,7 @@ local TabHandler = {
 	Modes = {},
 	ControlName = "TabHandler_wire",
 	IsEditor = true,
+	Description = "Wire-based editor"
 }
 TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
 ---------------------
@@ -277,6 +278,8 @@ function TabHandler:registerSettings()
 	FontSelect:AddChoice("Custom...")
 	FontSelect:SetSize(240 - 50 - 4, 20)
 	FontSelect:SetValue(TabHandler.FontConVar:GetString())
+	FontSelect:SetFontInternal(SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), 16))
+
 
 	local FontSizeSelect = vgui.Create("DComboBox", temp)
 	FontSizeSelect.OnSelect = function(panel, index, value)
@@ -691,17 +694,28 @@ function PANEL:PaintLine(row)
 
 	local offset = -self.Scroll[2] + 1
 	for i,cell in ipairs(self.PaintRows[row]) do
-		if offset < 0 then
-			if cell[1]:len() > -offset then
+		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
+			local length = cell[1]:len()
+			if length > -offset then
 				local line = cell[1]:sub(1-offset)
 				offset = line:len()
+
+				if cell[2][3] then --has background
+					surface_SetDrawColor( cell[2][3] )
+					if usePigments == 1 and cell[3] == "color" then
+						surface_DrawRect(self.LineNumberWidth+ 6, (row - self.Scroll[1]) * height+height-2, width*offset, 2)
+					else
+						surface_DrawRect(self.LineNumberWidth+ 6, (row - self.Scroll[1]) * height, width*offset, height)
+					end
+				end
+
 				if cell[2][2] then
 					draw_SimpleText(line .. " ", self.CurrentFont .. "_Bold", self.LineNumberWidth+ 6, (row - self.Scroll[1]) * height, cell[2][1])
 				else
 					draw_SimpleText(line .. " ", self.CurrentFont, self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
 				end
 			else
-				offset = offset + cell[1]:len()
+				offset = offset + length
 			end
 		else
 			local length = cell[1]:len()
@@ -1159,7 +1173,7 @@ function PANEL:_OnTextChanged()
 	if text == "" then return end
 	if not ctrlv then
 		if text == "\n" or text == "`" then return end
-		if text == "}" and GetConVarNumber('wire_expression2_autoindent') ~= 0 then
+		if text == "}" and GetConVarNumber('sf_editor_wire_autoindent') ~= 0 then
 			self:SetSelection(text)
 			local row = self.Rows[self.Caret[1]]
 			if string_match("{" .. row, "^%b{}.*$") then
@@ -2124,14 +2138,9 @@ function PANEL:_OnKeyCodeTyped(code)
 	else
 
 		if code == KEY_ENTER then
-			local mode = wire_expression2_autocomplete_controlstyle:GetInt()
-			if mode == 4 and self.AC_HasSuggestions and self.AC_Suggestions[1] and self.AC_Panel and self.AC_Panel:IsVisible() then
-				if self:AC_Use( self.AC_Suggestions[1] ) then return end
-			end
 			local row = self.Rows[self.Caret[1]]:sub(1,self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len()+1))-1
-			local tabs = string_rep(" ", math_floor(diff / 4))
-			if GetConVarNumber('wire_expression2_autoindent') ~= 0 and (string_match("{" .. row .. "}", "^%b{}.*$") == nil) then tabs = tabs .. " " end
+			local tabs = string_rep("    ", math_floor(diff / 4))
 			self:SetSelection("\n" .. tabs)
 		elseif code == KEY_UP then
 			if self.AC_Panel and self.AC_Panel:IsVisible() then

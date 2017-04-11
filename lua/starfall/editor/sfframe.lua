@@ -18,9 +18,14 @@ Editor.SaveTabsVar = CreateClientConVar("sf_editor_savetabs", "1", true, false)
 Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", true, false)
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
+Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
+
+cvars.AddChangeCallback( "sf_editor_layout", function()
+	RunConsoleCommand("sf_editor_reload")
+end ) 
 
 surface.CreateFont("SFEditorDefault", {
-		font = "default",
+		font = "Roboto",
 		size = 18,
 		weight = 500,
 		antialias = true,
@@ -361,6 +366,21 @@ function Editor:GetActiveTab() return self.C.TabHolder:GetActiveTab() end
 
 function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 
+function Editor:UpdateTabText(tab)
+	-- Editor subtitle and tab text
+	local ed = tab.editor
+	local title, tabtext = getPreferredTitles(ed.chosenfile, ed:getCode())
+
+	tab:SetToolTip(ed.chosenfile)
+	tabtext = tabtext or "Generic"
+	if ed:getCode() != ed.savedCode then
+		tabtext = tabtext.." *"
+	end
+	if tab:GetText() ~= tabtext then
+		tab:SetText(tabtext)
+		self.C.TabHolder.tabScroller:InvalidateLayout()
+	end
+end
 function Editor:SetActiveTab(val)
 	if self:GetActiveTab() == val then
 		self:RequestFocus()
@@ -378,15 +398,10 @@ function Editor:SetActiveTab(val)
 	self:Validate()
 
 	-- Editor subtitle and tab text
-	local title, tabtext = getPreferredTitles(self:GetChosenFile(), self:GetCode())
+	local title = getPreferredTitles(self:GetChosenFile(), self:GetCode())
 
 	if title then self:SubTitle("Editing: " .. title) else self:SubTitle() end
-	if tabtext then
-		if self:GetActiveTab():GetText() ~= tabtext then
-			self:GetActiveTab():SetText(tabtext)
-			self.C.TabHolder.tabScroller:InvalidateLayout()
-		end
-	end
+	self:UpdateTabText(self:GetActiveTab())
 end
 
 function Editor:GetActiveTabIndex()
@@ -432,6 +447,7 @@ function Editor:CreateTab(chosenfile)
 
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
 	editor.chosenfile = chosenfile
+	sheet.Tab.editor = editor -- For easy access
 	sheet.Tab.Paint = function(button,w,h)
 
 		if button.Hovered then
@@ -511,6 +527,7 @@ function Editor:CreateTab(chosenfile)
 	end
 
 	editor.OnTextChanged = function(panel)
+		self:UpdateTabText(self:GetActiveTab())
 		timer.Create("sfautosave", 5, 1, function()
 				self:SaveTabs()
 			end)
@@ -704,12 +721,10 @@ function Editor:InitComponents()
 
 	self.C.Btoggle = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Toggle Browser being shown
 	self.C.Sav = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Save button
+	self.C.SavAs = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Save button
 	self.C.NewTab = vgui.CreateFromTable(DMenuButton, self.C.Menu, "NewTab") -- New tab button
 	self.C.CloseTab = vgui.CreateFromTable(DMenuButton, self.C.Menu, "CloseTab") -- Close tab button
 	self.C.Reload = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Reload tab button
-
-	self.C.SaE = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save & Exit button
-	self.C.SavAs = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Save As button
 
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
@@ -718,9 +733,13 @@ function Editor:InitComponents()
 	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
-
-	self.C.Divider:SetLeft(self.C.Browser)
-	self.C.Divider:SetRight(self.C.MainPane)
+	if Editor.LayoutVar:GetInt() == 1 then -- Browser on right
+		self.C.Divider:SetRight(self.C.Browser)
+		self.C.Divider:SetLeft(self.C.MainPane)
+	else --Browser on left(Default)
+		self.C.Divider:SetLeft(self.C.Browser)
+		self.C.Divider:SetRight(self.C.MainPane)		
+	end
 	self.C.Divider:Dock(FILL)
 	self.C.Divider:SetDividerWidth(4)
 	self.C.Divider:SetCookieName("sf_editor_divider")
@@ -744,14 +763,6 @@ function Editor:InitComponents()
 	self.C.Menu:SetHeight(24)
 	self.C.Menu:DockPadding(2,2,2,2)
 	self.C.Val:SetHeight(22)
-
-	self.C.SaE:SetSize(80, 20)
-	self.C.SaE:DockMargin(2, 0, 0, 0)
-	self.C.SaE:Dock(RIGHT)
-
-	self.C.SavAs:SetSize(51, 20)
-	self.C.SavAs:DockMargin(2, 0, 0, 0)
-	self.C.SavAs:Dock(RIGHT)
 
 	self.C.Close:SetText("Close")
 	self.C.Close:DockMargin(10, 0, 0, 0)
@@ -778,12 +789,18 @@ function Editor:InitComponents()
 	self.C.Sav.DoClick = function(button) self:SaveFile(self:GetChosenFile()) end
 	self.C.Sav:SetToolTip( "Save" )
 
+	self.C.SavAs:SetImage("icon16/disk_multiple.png")
+	self.C.SavAs:SetToolTip("Save As")
+	self.C.SavAs.DoClick = function(button) self:SaveFile(self:GetChosenFile(), false, true) end
+
 	self.C.NewTab:SetImage("icon16/page_white_add.png")
 	self.C.NewTab.DoClick = function(button) self:NewTab() end
 	self.C.NewTab:SetToolTip( "New tab" )
 
 	self.C.CloseTab:SetImage("icon16/page_white_delete.png")
-	self.C.CloseTab.DoClick = function(button) self:CloseTab() end
+	self.C.CloseTab.DoClick = function(button) 
+		Derma_Query("Do you want to close current tab?","Are you sure?","Close",function() self:CloseTab() end,"Cancel",function() end)
+	end
 	self.C.CloseTab:SetToolTip( "Close tab" )
 
 	self.C.Reload:SetImage("icon16/page_refresh.png")
@@ -791,12 +808,6 @@ function Editor:InitComponents()
 	self.C.Reload.DoClick = function(button)
 		self:LoadFile(self:GetChosenFile(), false)
 	end
-
-	self.C.SaE:SetText("Save and Exit")
-	self.C.SaE.DoClick = function(button) self:SaveFile(self:GetChosenFile(), true) end
-
-	self.C.SavAs:SetText("Save As")
-	self.C.SavAs.DoClick = function(button) self:SaveFile(self:GetChosenFile(), false, true) end
 
 	self.C.Browser.tree.OnNodeSelected = function( tree, node )
 		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
@@ -967,21 +978,23 @@ function Editor:InitControlPanel()
 	dlist:AddItem(box)
 	box:SetValue( SF.Editor.CurrentTabHandler:GetString() )
 	box.OnSelect = function ( self, index, value, data )
-		RunConsoleCommand("sf_editor_tabhandler", value)
+		value = value:gsub(" %b()", "") -- Remove description
+		RunConsoleCommand("sf_editor_tabeditor", value)
 		RunConsoleCommand("sf_editor_reload")
 	end
+
+	for k, v in pairs( SF.Editor.TabHandlers ) do
+		if v.IsEditor then
+			local description = v.Description and " ( "..v.Description.." )" or "Addon"
+			box:AddChoice( k..description )
+		end
+	end
+
 
 	label = vgui.Create("DLabel")
 	dlist:AddItem(label)
 	label:SetText("\nOther settings:")
 	label:SizeToContents()
-
-
-	for k, v in pairs( SF.Editor.TabHandlers ) do
-		if v.IsEditor then
-			box:AddChoice( k )
-		end
-	end
 
 	local NewTabOnOpen = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(NewTabOnOpen)
@@ -1087,6 +1100,7 @@ end
 function Editor:SaveTabs()
 	if not self.TabsLoaded then return end
 	local tabs = {}
+	tabs.selectedTab = self:GetActiveTabIndex()
 	for i=1, self:GetNumTabs() do
 		tabs[i] = {}
 		local filename = self:GetEditor(i).chosenfile
@@ -1111,16 +1125,18 @@ function Editor:OpenOldTabs()
 		if not istable(v) then continue end
 		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
-			timer.Simple(0,function() self:CloseTab(1) end)
+			timer.Simple(0,function() 
+				self:CloseTab(1)
+				self:SetActiveTabIndex(tabs.selectedTab or 1)		
+			end)
 			is_first = false
 		end
 		self:NewTab()
 		self:ChosenFile(v.filename)
-		local title,tabtext = getPreferredTitles(v.filename or "Generic", v.code)
-		self:GetActiveTab():SetText(tabtext)
+		self:SetCode(v.code)
+		self:UpdateTabText(self:GetActiveTab())
 		self.C.TabHolder:InvalidateLayout()
 		
-		self:SetCode(v.code)
 	end
 	self.TabsLoaded = true
 
@@ -1180,6 +1196,8 @@ end
 
 function Editor:ChosenFile(Line)
 	self:GetCurrentEditor().chosenfile = Line
+	self:GetCurrentEditor().savedCode = Line and file.Read( Line ) or nil
+
 	if Line then
 		self:SubTitle("Editing: " .. Line)
 	else
@@ -1236,7 +1254,6 @@ end
 function Editor:Open(Line, code, forcenewtab)
 	if self:IsVisible() and not Line and not code then self:Close() end
 	self:SetV(true)
-	self.C.SaE:SetText("Save and Exit")
 	if code then
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
@@ -1256,7 +1273,7 @@ function Editor:Open(Line, code, forcenewtab)
 			tab = self:CreateTab(tabtext).Tab
 		else
 			tab = self:GetActiveTab()
-			tab:SetText(tabtext)
+			self:UpdateTabText(tab)
 			self.C.TabHolder:InvalidateLayout()
 		end
 		self:SetActiveTab(tab)
@@ -1311,6 +1328,7 @@ function Editor:SaveFile(Line, close, SaveAs)
 	surface.PlaySound("ambient/water/drip3.wav")
 
 	self:ChosenFile(Line)
+	self:UpdateTabText(self:GetActiveTab())
 	if close then
 
 		GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
@@ -1346,12 +1364,12 @@ function Editor:LoadFile(Line, forcenewtab)
 			tab = self:CreateTab(tabtext).Tab
 		else
 			tab = self:GetActiveTab()
-			tab:SetText(tabtext)
-			self.C.TabHolder:InvalidateLayout()
 		end
 		self:SetActiveTab(tab)
 		self:ChosenFile(Line)
 		self:SetCode(str)
+		self:UpdateTabText(tab)
+		self.C.TabHolder:InvalidateLayout()
 	end
 end
 

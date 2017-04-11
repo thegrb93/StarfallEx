@@ -92,7 +92,7 @@ local function addToken(tokenname, tokendata)
 	end
 end
 
-local function addColorToken(bgcolor, tokendata)
+local function addColorToken(tokenname, bgcolor, tokendata)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt()
 	local textcolor
 	if usePigments == 2 then
@@ -102,7 +102,7 @@ local function addColorToken(bgcolor, tokendata)
 		v = 1 - v	 
 		textcolor = HSVToColor( h, s, v ) 
 	elseif usePigments == 1 then
-		textcolor = colors["notfound"][1]
+		textcolor = colors[tokenname][1]
 	end
 	if lastcol and color == lastcol[2] then
 		lastcol[1] = lastcol[1] .. tokendata
@@ -213,6 +213,18 @@ function EDITOR:ResetTokenizer(row)
 	end
 
 end
+
+--That code sucks, if you can do any better then DO IT
+local numbpattern = "0?[xb]?%x+"
+local numbpatternG = "("..numbpattern..")"
+local spacedcomma = "%s*,%s*"
+local spacedcommaG = "("..spacedcomma..")"
+local rgbpattern = "^Color%s*%(%s*"..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern.."%s*%)"
+local rgbpatternG = "^(Color%s*)(%(%s*)"..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG.."(%s*%))"
+local rgbapattern = "^Color%s*%(%s*"..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern..spacedcomma..numbpattern.."%s*%)"
+local rgbapatternG = "^(Color%s*)(%(%s*)"..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG..spacedcommaG..numbpatternG.."(%s*%))"
+--End of monsterous code
+
 function EDITOR:SyntaxColorLine(row)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
 	cols,lastcol = {}, nil
@@ -282,15 +294,77 @@ function EDITOR:SyntaxColorLine(row)
 		if not self.character then break end
 
 		-- eat next token
-		if usePigments and self:NextPattern("^Color%s*%(%s*[0-9]+%s*,%s*[0-9]+%s*,%s*[0-9]+%s*%)") then -- Color(r,g,b)
-			local r,g,b = self.tokendata:match("Color%s*%(%s*([0-9]+)%s*,%s*([0-9]+)%s*,%s*([0-9]+)%s*%)")
-			addColorToken(Color(tonumber(r),tonumber(g),tonumber(b)), self.tokendata)
-			tokenname = "" -- It's custom token
-		elseif usePigments and self:NextPattern("^Color%s*%(%s*[0-9]+%s*,%s*[0-9]+%s*,%s*[0-9]+%s*,%s*[0-9]+%s*%)") then -- Color(r,g,b,a)
-			local r,g,b,a = self.tokendata:match("^Color%s*%(%s*([0-9]+)%s*,%s*([0-9]+)%s*,%s*([0-9]+)%s*,%s*([0-9]+)%s*%)")
-			addColorToken(Color(tonumber(r),tonumber(g),tonumber(b),tonumber(a)), self.tokendata)
-			tokenname = "" -- It's custom token
-		elseif self:NextPattern("^0[xb][0-9A-F]+") then
+		if usePigments then
+			if self:NextPattern(rgbpattern) then -- Color(r,g,b)
+				local fname,bracket1,r,comma1,g,comma2,b,bracket2 = self.tokendata:match(rgbpatternG)
+				local cr, cg, cb = tonumber(r), tonumber(g), tonumber(b)
+				local col
+				if cr and cg and cb then
+					col = Color(cr, cg, cb)
+				else
+					col = Color(0, 0, 0, 0) -- Transparent because its invalid
+				end				
+				addColorToken("function", col, fname)
+				addColorToken("notfound", col, bracket1)
+				if cr then
+					addColorToken("number", col, r)
+				else
+					addColorToken("notfound", col, r)
+				end
+				addColorToken("notfound", col, comma1)
+				if cg then
+					addColorToken("number", col, g)
+				else
+					addColorToken("notfound", col, g)
+				end
+				addColorToken("notfound", col, comma2)
+				if cb then
+					addColorToken("number", col, b)
+				else
+					addColorToken("notfound", col, b)
+				end
+				addColorToken("notfound", col, bracket2)
+				tokenname = "" -- It's custom token
+				self.tokendata = ""
+			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
+				local fname,bracket1,r,comma1,g,comma2,b,comma3,a,bracket2 = self.tokendata:match(rgbapatternG)
+				local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
+				local col
+				if cr and cg and cb and ca then
+					col = Color(cr, cg, cb, ca)
+				else
+					col = Color(0, 0, 0, 0) -- Transparent because its invalid
+				end				
+				addColorToken("function", col, fname)
+				addColorToken("notfound", col, bracket1)
+				if cr then
+					addColorToken("number", col, r)
+				else
+					addColorToken("notfound", col, r)
+				end
+				addColorToken("notfound", col, comma1)
+				if cg then
+					addColorToken("number", col, g)
+				else
+					addColorToken("notfound", col, g)
+				end
+				addColorToken("notfound", col, comma2)
+				if cb then
+					addColorToken("number", col, b)
+				else
+					addColorToken("notfound", col, b)
+				end
+				addColorToken("notfound", col, comma3)
+				if ca then
+					addColorToken("number", col, a)
+				end
+				addColorToken("notfound", col, bracket2)
+				tokenname = "" -- It's custom token
+				self.tokendata = ""
+			end
+		end
+		
+		if self:NextPattern("^0[xb][0-9A-F]+") then
 			tokenname = "number"
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
