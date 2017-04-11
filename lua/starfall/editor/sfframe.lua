@@ -21,7 +21,7 @@ Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true,
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 
 cvars.AddChangeCallback( "sf_editor_layout", function()
-	RunConsoleCommand("sf_editor_reload")
+	RunConsoleCommand("sf_editor_restart")
 end ) 
 
 surface.CreateFont("SFEditorDefault", {
@@ -980,7 +980,7 @@ function Editor:InitControlPanel()
 	box.OnSelect = function ( self, index, value, data )
 		value = value:gsub(" %b()", "") -- Remove description
 		RunConsoleCommand("sf_editor_tabeditor", value)
-		RunConsoleCommand("sf_editor_reload")
+		RunConsoleCommand("sf_editor_restart")
 	end
 
 	for k, v in pairs( SF.Editor.TabHandlers ) do

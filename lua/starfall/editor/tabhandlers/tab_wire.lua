@@ -159,12 +159,12 @@ SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
 				RunConsoleCommand("sf_editor_wire_fontname", value)
-				RunConsoleCommand("sf_editor_reload")
+				RunConsoleCommand("sf_editor_restart")
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
 			RunConsoleCommand("sf_editor_wire_fontname", value)
-			RunConsoleCommand("sf_editor_reload")
+			RunConsoleCommand("sf_editor_restart")
 		end
 	end
 	for k, v in pairs(self.Fonts) do
@@ -180,7 +180,7 @@ SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
 	FontSizeSelect.OnSelect = function(panel, index, value)
 		value = value:gsub(" %b()", "")
 		RunConsoleCommand("sf_editor_wire_fontsize", value)
-		RunConsoleCommand("sf_editor_reload")
+		RunConsoleCommand("sf_editor_restart")
 	end
 	for i = 11, 26 do
 		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
