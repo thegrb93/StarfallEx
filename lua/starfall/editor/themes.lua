@@ -252,13 +252,13 @@ SF.Editor.Themes.AddTheme("default", {
 	["directive"] =	{ Color(230, 219, 116), nil, 0},
 	["comment"] = { Color(117, 113, 94), nil, 1},
 	["string"] = { Color(230, 219, 116), nil, 0},
-	["number"] = { Color(174, 129 ,255), nil, 0}, 
+	["number"] = { Color(174, 129, 255), nil, 0}, 
 	["function"] = { Color(137, 189, 255), nil, 0},
 	["library"] = { Color(137, 189, 255), nil, 0}, 
 	["operator"] = { Color(230, 230, 230), nil, 0},
 	["notfound"] = { Color(230, 230, 230), nil, 0},
 	["userfunction"] = { Color(166, 226, 42), nil, 0},
-	["constant"] = { Color(174, 129 ,255), nil, 0},
+	["constant"] = { Color(174, 129, 255), nil, 0},
 })
 
 SF.Editor.Themes.Load()
