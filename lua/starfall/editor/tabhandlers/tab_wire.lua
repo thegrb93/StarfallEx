@@ -51,11 +51,12 @@ TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { se
 ---------------------
 TabHandler.Fonts = {} --Font descriptions for settings
 TabHandler.Fonts["Courier New"] = "Font used in expression2 editor"
-TabHandler.Fonts["DejaVu Sans Mono"] = "Default font on Linux"
+TabHandler.Fonts["DejaVu Sans Mono"] = "Default SF Editor font"
 TabHandler.Fonts["Consolas"] = ""
 TabHandler.Fonts["Fixedsys"] = ""
 TabHandler.Fonts["Lucida Console"] = ""
 TabHandler.Fonts["Monaco"] = "Mac standard font"
+TabHandler.Fonts["Roboto Mono"] = "Custom Font shipped with starfall"
 TabHandler.Tabs = {}
 local defaultFont = "DejaVu Sans Mono" -- We ship that with starfall, linux has it by default
 
@@ -130,7 +131,7 @@ function TabHandler:init()
 end
 
 function TabHandler:registerSettings()
-	
+	local label
 	-- ------------------------------------------- Wire TAB
 	local sheet = SF.Editor.editor:AddControlPanelTab("Wire", "icon16/wrench.png", "Options for wire tabs.")
 
@@ -139,8 +140,7 @@ function TabHandler:registerSettings()
 	local dlist = vgui.Create("DPanelList", sheet.Panel)
 	dlist.Paint = function() end
 	dlist:EnableVerticalScrollbar(true)
-SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
-
+	dlist:Dock(FILL)
 	--- - FONTS
 
 	local FontLabel = vgui.Create("DLabel")
@@ -188,7 +188,17 @@ SF.Editor.editor.C.Control:AddResizeObject(dlist, 4, 4)
 	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
 	FontSizeSelect:SetSize(50, 20)	
 	FontSizeSelect:SetValue(TabHandler.FontSizeConVar:GetString())
-	local label = vgui.Create("DLabel")
+
+	if system.IsLinux() then
+		label = vgui.Create("DLabel")
+		dlist:AddItem(label)
+		label:SetWrap(true)
+		label:SetText("Warning: You are running linux, you should make sure font is installed in your system or you wont be able to see it!")
+		label:SetSize(50,40)
+		label:SetPos(10, 0)
+	end
+	
+	label = vgui.Create("DLabel")
 	dlist:AddItem(label)
 	label:SetText("Pigments:")
 	label:SizeToContents()
