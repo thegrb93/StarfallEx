@@ -301,16 +301,61 @@ function ents_methods:getPos ()
 	return vwrap( ent:GetPos() )
 end
 
---- Returns the matrix of the entity
+--- Returns the matrix of the entity's bone
 -- @shared
--- @param bone Bone of the entity (def 0)
+-- @param bone Bone index. (def 0)
 -- @return The matrix
-function ents_methods:getMatrix (bone)
+function ents_methods:getBoneMatrix(bone)
 	SF.CheckType( self, ents_metamethods )
 	bone = SF.CheckType( bone, "number", 0, 0 )
 	
 	local ent = eunwrap( self )
 	return owrap( ent:GetBoneMatrix(bone) )
+end
+ents_methods.getMatrix = ents_methods.getBoneMatrix
+
+--- Returns the number of an entity's bones
+-- @shared
+-- @return Number of bones
+function ents_methods:getBoneCount()
+	SF.CheckType( self, ents_metamethods )	
+	local ent = eunwrap( self )
+	return ent:GetBoneCount()
+end
+
+--- Returns the name of an entity's bone
+-- @shared
+-- @param bone Bone index. (def 0)
+-- @return Name of the bone
+function ents_methods:getBoneName(bone)
+	SF.CheckType( self, ents_metamethods )
+	bone = SF.CheckType( bone, "number", 0, 0 )
+	local ent = eunwrap( self )
+	return ent:GetBoneName(bone)
+end
+
+--- Returns the parent index of an entity's bone
+-- @shared
+-- @param bone Bone index. (def 0)
+-- @return Parent index of the bone
+function ents_methods:getBoneParent(bone)
+	SF.CheckType( self, ents_metamethods )
+	bone = SF.CheckType( bone, "number", 0, 0 )
+	local ent = eunwrap( self )
+	return ent:GetBoneParent(bone)
+end
+
+--- Returns the bone's position and angle in world coordinates
+-- @shared
+-- @param bone Bone index. (def 0)
+-- @return Position of the bone
+-- @return Angle of the bone
+function ents_methods:getBonePosition(bone)
+	SF.CheckType( self, ents_metamethods )
+	bone = SF.CheckType( bone, "number", 0, 0 )
+	local ent = eunwrap( self )
+	local pos, ang = ent:GetBonePosition(bone)
+	return vwrap(pos), awrap(ang)
 end
 
 --- Returns the x, y, z size of the entity's outer bounding box (local to the entity)
