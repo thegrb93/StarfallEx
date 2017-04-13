@@ -26,8 +26,8 @@ local dgetmeta = debug.getmetatable
 SF.Libraries.AddHook("postload", function()
 	--- Returns a new VMatrix
 	-- @return New VMatrix
-	SF.DefaultEnvironment.Matrix = function ()
-		return wrap( Matrix() )
+	SF.DefaultEnvironment.Matrix = function (t)
+		return wrap( Matrix(t) )
 	end
 end)
 
