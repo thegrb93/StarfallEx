@@ -44,23 +44,25 @@ SF.Libraries.AddHook("initialize",function(inst)
 	plyCount[inst.player] = plyCount[inst.player] or 0
 end)
 
+local function hologramOnDestroy(holoent, holodata, ply)
+	holodata[holoent] = nil
+	if plyCount[ply] then
+		plyCount[ply] = plyCount[ply] - 1
+	end
+end
+
 SF.Libraries.AddHook("deinitialize", function(inst)
 	local holos = inst.data.holograms.holos
 	local holo = next(holos)
 	while holo do
 		if IsValid(holo) then
+			holo:RemoveCallOnRemove("starfall_hologram_delete")
+			hologramOnDestroy(holo, holos, inst.player)
 			holo:Remove()
 		end
 		holo = next(holos, holo)
 	end
 end)
-
-local function hologramOnDestroy(holoent, holodata, ply)
-	holodata.holos[holoent] = nil
-	if plyCount[ply] then
-		plyCount[ply] = plyCount[ply] - 1
-	end
-end
 
 --- Sets the hologram linear velocity
 -- @param vel New velocity
@@ -272,7 +274,7 @@ function holograms_library.create ( pos, ang, model, scale )
 	local pos = vunwrap( pos )
 	local ang = aunwrap( ang )
 
-	local holodata = instance.data.holograms
+	local holodata = instance.data.holograms.holos
 	
 	if plyCount[ instance.player ] >= SF.Holograms.personalquota:GetInt() then 
 		SF.Throw( "Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2 ) 
@@ -295,7 +297,7 @@ function holograms_library.create ( pos, ang, model, scale )
 			holoent:SetScale( scale )
 		end
 
-		holodata.holos[ holoent ] = true
+		holodata[ holoent ] = true
 		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
 		
 		return wrap( holoent )
