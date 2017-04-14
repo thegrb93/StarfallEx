@@ -27,6 +27,7 @@ SF.Libraries.AddHook("postload", function()
 end)
 
 SF.Vectors.Wrap = vwrap
+SF.Vectors.WrapTable = wrap
 SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods

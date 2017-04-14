@@ -30,6 +30,7 @@ SF.Libraries.AddHook("postload", function()
 end)
 
 SF.Angles.Wrap 	= awrap
+SF.Angles.WrapTable	= wrap
 SF.Angles.Unwrap = unwrap
 SF.Angles.Methods = ang_methods
 SF.Angles.Metatable = ang_metamethods

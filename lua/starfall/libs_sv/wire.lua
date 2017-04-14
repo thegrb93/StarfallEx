@@ -50,7 +50,9 @@ SF.Wire.Library = wire_library
 -- @server
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local vwrap, vunwrap = SF.Vectors.WrapTable, SF.UnwrapObject
+local wrap, unwrap = SF.WrapObject, SF.UnwrapObject
+local awrap, aunwrap = SF.Angles.WrapTable, SF.UnwrapObject
 
 -- Register privileges
 do
@@ -137,10 +139,14 @@ local inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = vwrap,
-	ANGLE = vwrap,
+	VECTOR = function(value) 
+		return vwrap( { value[1], value[2], value[3] } ) 
+	end,
+	ANGLE = function(value) 
+		return awrap( { value[1], value[2], value[3] } ) 
+	end,
 	WIRELINK = wlwrap,
-	ENTITY = vwrap,
+	ENTITY = wrap,
 
 	TABLE = function(tbl)
 		if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
@@ -173,15 +179,15 @@ local outputConverters =
 	end,
 	VECTOR = function ( data )
 		SF.CheckType( data, SF.Types[ "Vector" ], 1 )
-		return vunwrap( data )
+		return { data[1], data[2], data[3] }
 	end,
 	ANGLE = function ( data )
 		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
-		return vunwrap( data )
+		return { data[1], data[2], data[3] }
 	end,
 	ENTITY = function ( data )
 		SF.CheckType( data, SF.Types[ "Entity" ] )
-		return vunwrap( data )
+		return unwrap( data )
 	end,
 
 	TABLE = function(data)
