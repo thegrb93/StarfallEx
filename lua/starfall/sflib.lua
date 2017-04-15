@@ -30,6 +30,8 @@ if SERVER then
 	SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, FCVAR_ARCHIVE, "Window width of the CPU time quota moving average." )
 else
 	SF.cpuQuota = CreateClientConVar( "sf_timebuffer", 0.015, true, false )
+	SF.cpuOwnerQuota = CreateClientConVar( "sf_timebuffer_owner", 0.015, true, false )
+
 	SF.cpuBufferN = CreateClientConVar( "sf_timebuffersize", 100, true, false )
 end
 

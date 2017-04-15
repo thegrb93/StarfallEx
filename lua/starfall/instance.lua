@@ -54,6 +54,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.source = code
 	instance.initialized = false
 	instance.mainfile = mainfile
+	instance.cpuQuota = ( SERVER or LocalPlayer() != instance.player ) and SF.cpuQuota or SF.cpuOwnerQuota
 	
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
@@ -101,7 +102,7 @@ function SF.Instance:runWithOps(func,...)
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck ()
 		self.cpu_total = SysTime() - oldSysTime
-		local usedRatio = self:movingCPUAverage()/SF.cpuQuota:GetFloat()
+		local usedRatio = self:movingCPUAverage()/self.cpuQuota:GetFloat()
 		
 		local function safeThrow( msg, nocatch )
 			local source = debug.getinfo(3, "S").short_src
@@ -289,6 +290,7 @@ end
 
 hook.Add("Think","SF_Think",function()
 	for pl, insts in pairs(SF.playerInstances) do
+		local plquota = ( SERVER or LocalPlayer() != pl ) and SF.cpuQuota or SF.cpuOwnerQuota
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
 			instance.cpu_average = instance:movingCPUAverage()
@@ -297,7 +299,7 @@ hook.Add("Think","SF_Think",function()
 			cputotal = cputotal + instance.cpu_average
 		end
 		
-		if cputotal>SF.cpuQuota:GetFloat() then
+		if cputotal>plquota:GetFloat() then
 			local max, maxinst = 0, nil
 			for instance, _ in pairs(insts) do
 				if instance.cpu_average>=max then
