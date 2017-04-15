@@ -98,6 +98,7 @@ SF.Libraries.AddHook("postload", function()
 end)
 
 SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {["Client"] = {}} )
+SF.Permissions.registerPrivilege( "render.offscreen", "Render Screen", "Allows the user to render without a screen", {["Client"] = {}} )
 SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {["Client"] = {}} )
 
 local cv_max_rendertargets = CreateConVar( "sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE } )
