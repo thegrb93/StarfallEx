@@ -70,7 +70,6 @@ net.Receive("starfall_processor_download", function(len, ply)
 end)
 
 net.Receive("starfall_processor_update_links", function(len, ply)
-	local ply = net.ReadEntity()
 	local linked = net.ReadEntity()
 	if IsValid( linked.link ) then
 		linked:LinkEnt( linked.link, ply )

@@ -7,7 +7,6 @@ function ENT:Initialize ()
 	self.BaseClass.Initialize( self )
 	
 	net.Start( "starfall_processor_update_links" )
-		net.WriteEntity( LocalPlayer() )
 		net.WriteEntity( self )
 	net.SendToServer()
 end
