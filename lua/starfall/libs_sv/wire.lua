@@ -51,7 +51,7 @@ SF.Wire.Library = wire_library
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 local vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
-local ewrap, eunwrap = SF.Entities.Wrap, SF.Entities.Unwrap
+local ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
 
 -- Register privileges
 do
