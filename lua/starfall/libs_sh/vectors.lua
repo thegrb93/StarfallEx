@@ -13,7 +13,7 @@ local function unwrap( obj )
 end
 
 local function vwrap( vec )
-	return wrap( { vec.x, vec.y, vec.z } )
+	return wrap( { vec[1], vec[2], vec[3] } )
 end
 
 SF.AddObjectWrapper( debug.getregistry().Vector, vec_metamethods, vwrap )

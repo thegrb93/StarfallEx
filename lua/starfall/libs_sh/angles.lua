@@ -13,7 +13,7 @@ local function unwrap( obj )
 end
 
 local function awrap( ang )
-	return wrap( { ang.pitch, ang.yaw, ang.roll } )
+	return wrap( { ang[1], ang[2], ang[3] } )
 end
 
 SF.AddObjectWrapper( debug.getregistry().Angle, ang_metamethods, awrap )

@@ -50,7 +50,8 @@ SF.Wire.Library = wire_library
 -- @server
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
+local ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
 
 -- Register privileges
 do
@@ -137,10 +138,14 @@ local inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = vwrap,
-	ANGLE = vwrap,
+	VECTOR = function(value) 
+		return vwrap( value ) 
+	end,
+	ANGLE = function(value) 
+		return awrap( value ) 
+	end,
 	WIRELINK = wlwrap,
-	ENTITY = vwrap,
+	ENTITY = ewrap,
 
 	TABLE = function(tbl)
 		if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
@@ -173,15 +178,15 @@ local outputConverters =
 	end,
 	VECTOR = function ( data )
 		SF.CheckType( data, SF.Types[ "Vector" ], 1 )
-		return vunwrap( data )
+		return { data[1], data[2], data[3] }
 	end,
 	ANGLE = function ( data )
 		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
-		return vunwrap( data )
+		return { p=data[1], y=data[2], r=data[3] }
 	end,
 	ENTITY = function ( data )
 		SF.CheckType( data, SF.Types[ "Entity" ] )
-		return vunwrap( data )
+		return eunwrap( data )
 	end,
 
 	TABLE = function(data)
@@ -320,8 +325,8 @@ function wire_library.create ( entI, entO, inputname, outputname )
 	SF.CheckType( inputname, "string" )
 	SF.CheckType( outputname, "string" )
 		
-	local entI = SF.Entities.Unwrap( entI )
-	local entO = SF.Entities.Unwrap( entO )
+	local entI = eunwrap( entI )
+	local entO = eunwrap( entO )
 	
 	if not IsValid( entI ) then SF.Throw( "Invalid source" ) end
 	if not IsValid( entO ) then SF.Throw( "Invalid target" ) end
@@ -353,7 +358,7 @@ function wire_library.delete ( entI, inputname )
 	SF.CheckType( entI, SF.Types[ "Entity" ] )
 	SF.CheckType( inputname, "string" )
 	
-	local entI = SF.Entities.Unwrap( entI )
+	local entI = eunwrap( entI )
 	
 	if not IsValid( entI ) then SF.Throw( "Invalid source" ) end
 	
@@ -369,7 +374,7 @@ local function parseEntity( ent, io )
 	
 	if ent then
 		SF.CheckType( ent, SF.Types[ "Entity" ] )
-		ent = SF.Entities.Unwrap( ent )
+		ent = eunwrap( ent )
 		SF.Permissions.check( SF.instance.player, ent, "wire.get" .. io )
 	else
 		ent = SF.instance.data.entity or nil
@@ -406,7 +411,7 @@ end
 -- @return Wirelink of the entity
 function wire_library.getWirelink ( ent )
 	SF.CheckType( ent, SF.Types[ "Entity" ] )
-	ent = SF.Entities.Unwrap( ent )
+	ent = eunwrap( ent )
 	if not ent:IsValid() then return end
 	SF.Permissions.check( SF.instance.player, ent, "wire.wirelink" )
 	
@@ -487,7 +492,7 @@ end
 --- Returns the entity that the wirelink represents
 function wirelink_methods:entity()
 	SF.CheckType(self,wirelink_metatable)
-	return SF.Entities.Wrap(wlunwrap(self))
+	return ewrap(wlunwrap(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
@@ -554,7 +559,7 @@ function wirelink_methods:getWiredTo(name)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then
-		return SF.Entities.Wrap( input.Src )
+		return ewrap( input.Src )
 	end
 end
 
