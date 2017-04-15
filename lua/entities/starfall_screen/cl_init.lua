@@ -74,16 +74,15 @@ function ENT:RenderScreen()
 			end
 		elseif self.link.error then
 			local error = self.link.error
-			surface.SetTexture( 0 )
-			surface.SetDrawColor( 0, 0, 0, 120 )
-			surface.DrawRect( 0, 0, 512, 512 )
-
-			draw.DrawText( "Error occurred in Starfall:", "Starfall_ErrorFont", 32, 16, Color( 0, 255, 255, 255 ) ) -- Cyan
-			draw.DrawText( tostring( error.message ), "Starfall_ErrorFont", 16, 80, Color( 255, 0, 0, 255 ) )
-			if error.source and error.line then
-				draw.DrawText( "Line: " .. tostring( error.line), "Starfall_ErrorFont", 16, 512 - 16 * 7, Color( 255, 255, 255, 255 ) )
-				draw.DrawText( "Source: " .. error.source, "Starfall_ErrorFont", 16, 512 - 16 * 5, Color( 255, 255, 255, 255 ) )
+			if not error.markup then
+				local msg = error.message
+				local location = (error.file and error.line) and ("File: " .. error.file .. "\nLine: " .. error.line) or ""
+				error.markup = markup.Parse( "<font=Starfall_ErrorFont><colour=0, 255, 255, 255>Error occurred in Starfall:\n</colour><color=255, 0, 0, 255>"..msg.."\n</color><color=255, 255, 255, 255>"..location.."</color></font>", 512 )
 			end
+			surface.SetTexture( 0 )
+			surface.SetDrawColor( 0, 0, 0, 255 )
+			surface.DrawRect( 0, 0, 512, 512 )
+			error.markup:Draw(0,0,0,3)
 		end
 	end
 end
