@@ -13,7 +13,7 @@ local function unwrap( obj )
 end
 
 local function vwrap( vec )
-	return wrap( { vec.x, vec.y, vec.z } )
+	return wrap( { vec[1], vec[2], vec[3] } )
 end
 
 SF.AddObjectWrapper( debug.getregistry().Vector, vec_metamethods, vwrap )
@@ -27,7 +27,6 @@ SF.Libraries.AddHook("postload", function()
 end)
 
 SF.Vectors.Wrap = vwrap
-SF.Vectors.WrapTable = wrap
 SF.Vectors.Unwrap = unwrap
 SF.Vectors.Methods = vec_methods
 SF.Vectors.Metatable = vec_metamethods

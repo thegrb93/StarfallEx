@@ -13,7 +13,7 @@ local function unwrap( obj )
 end
 
 local function awrap( ang )
-	return wrap( { ang.pitch, ang.yaw, ang.roll } )
+	return wrap( { ang[1], ang[2], ang[3] } )
 end
 
 SF.AddObjectWrapper( debug.getregistry().Angle, ang_metamethods, awrap )
@@ -30,7 +30,6 @@ SF.Libraries.AddHook("postload", function()
 end)
 
 SF.Angles.Wrap 	= awrap
-SF.Angles.WrapTable	= wrap
 SF.Angles.Unwrap = unwrap
 SF.Angles.Methods = ang_methods
 SF.Angles.Metatable = ang_metamethods
