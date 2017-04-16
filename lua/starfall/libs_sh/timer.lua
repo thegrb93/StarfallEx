@@ -99,7 +99,7 @@ function timer_library.remove(name)
 	if instance.data.timers[timername] then
 		instance.data.timer_count = instance.data.timer_count - 1
 		instance.data.timers[timername] = nil
-		timer.Stop(timername)
+		timer.Remove(timername)
 	end
 end
 
