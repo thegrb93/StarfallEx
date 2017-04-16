@@ -89,7 +89,7 @@ function timer_library.simple(delay, func)
 	timer_library.create("", delay, 1, func, true)
 end
 
---- Removes a timer
+--- Stops and removes the timer. 
 -- @param name The timer name
 function timer_library.remove(name)
 	SF.CheckType(name,"string")
@@ -108,31 +108,24 @@ end
 -- @return bool if the timer exists
 function timer_library.exists(name)
 	SF.CheckType(name,"string")
-	local instance = SF.instance
-	
-	return timer.Exists(mangle_timer_name(instance,name))
+	return timer.Exists(mangle_timer_name(SF.instance,name))
 end
 
 --- Stops a timer
 -- @param name The timer name
+-- @return false if the timer didn't exist or was already stopped, true otherwise.
 function timer_library.stop(name)
 	SF.CheckType(name,"string")
-	local instance = SF.instance
-	
-	local timername = mangle_timer_name(instance,name)
-	if instance.data.timers[timername] then
-		instance.data.timer_count = instance.data.timer_count - 1
-		instance.data.timers[timername] = nil
-		timer.Stop(timername)
-	end
+	return timer.Stop(mangle_timer_name(SF.instance,name))
 end
 
 --- Starts a timer
 -- @param name The timer name
+-- @return true if the timer exists, false if it doesn't.
 function timer_library.start(name)
 	SF.CheckType(name,"string")
 	
-	timer.Start(mangle_timer_name(SF.instance,name))
+	return timer.Start(mangle_timer_name(SF.instance,name))
 end
 
 --- Adjusts a timer
@@ -140,29 +133,59 @@ end
 -- @param delay The time, in seconds, to set the timer to.
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
 -- @param func The function to call when the tiemr is fired
+-- @return true if succeeded
 function timer_library.adjust(name, delay, reps, func)
 	SF.CheckType(name,"string")
 	SF.CheckType(delay,"number")
 	reps = SF.CheckType(reps,"number",0,1)
 	if func then SF.CheckType(func,"function") end
 	
-	timer.Adjust(mangle_timer_name(SF.instance,name), delay, reps, func)
+	return timer.Adjust(mangle_timer_name(SF.instance,name), delay, reps, func)
 end
 
 --- Pauses a timer
 -- @param name The timer name
+-- @return false if the timer didn't exist or was already paused, true otherwise.
 function timer_library.pause(name)
 	SF.CheckType(name,"string")
 	
-	timer.Pause(mangle_timer_name(SF.instance,name))
+	return timer.Pause(mangle_timer_name(SF.instance,name))
 end
 
 --- Unpauses a timer
 -- @param name The timer name
+-- @return false if the timer didn't exist or was already running, true otherwise.
 function timer_library.unpause(name)
 	SF.CheckType(name,"string")
 	
-	timer.UnPause(mangle_timer_name(SF.instance,name))
+	return timer.UnPause(mangle_timer_name(SF.instance,name))
+end
+
+--- Runs either timer.pause or timer.unpause based on the timer's current status. 
+-- @param name The timer name
+-- @return status of the timer.
+function timer_library.toggle(name)
+	SF.CheckType(name,"string")
+	
+	return timer.Toggle(mangle_timer_name(SF.instance,name))
+end
+
+--- Returns amount of time left (in seconds) before the timer executes its function. 
+-- @param The timer name
+-- @return The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
+function timer_library.timeleft(name)
+	SF.CheckType(name,"string")
+	
+	return timer.TimeLeft(mangle_timer_name(SF.instance,name))
+end
+
+--- Returns amount of repetitions/executions left before the timer destroys itself. 
+-- @param The timer name
+-- @return The amount of executions left. Nil if timer doesnt exist
+function timer_library.repsleft(name)
+	SF.CheckType(name,"string")
+	
+	return timer.RepsLeft(mangle_timer_name(SF.instance,name))
 end
 
 --- Returns number of available timers
