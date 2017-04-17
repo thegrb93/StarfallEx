@@ -23,7 +23,7 @@ P.checks = {
 		return LocalPlayer()==principal
 	end,
 	function( principal, target, key )
-		return LocalPlayer()==principal or principal:GetFriendStatus()=="friend"
+		return LocalPlayer()==principal or (IsValid(principal) and principal:GetFriendStatus()=="friend")
 	end,
 	function() return true end,
 	function() return false end
