@@ -202,14 +202,18 @@ SF.Libraries.AddHook( "deinitialize", function ( instance )
 	end
 end )
 
-local function sfCreateMaterial( name )
-	return CreateMaterial( name, "UnlitGeneric", {
+local function sfCreateMaterial( name,skip_hack )
+	local tbl = {
 				[ "$nolod" ] = 1,
 				[ "$ignorez" ] = 1,
 				[ "$vertexcolor" ] = 1,
 				[ "$vertexalpha" ] = 1,
-				[ "$basetexturetransform"] = "center .5 .5 scale 1.032 1.032 rotate 0 translate 0 0"
-			} )
+				[ "$basetexturetransform" ] = "center .5 .5 scale 1.032 1.032 rotate 0 translate 0 0"
+			}
+	if skip_hack then
+		tbl["$basetexturetransform"] = nil
+	end
+	return CreateMaterial( name, "UnlitGeneric", tbl )
 end
 local RT_Material = sfCreateMaterial( "SF_RT_Material" )
 ---URL Textures
@@ -256,8 +260,8 @@ local function CheckURLDownloads()
 		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
-local function LoadURLMaterial( url, alignment, cb )
-	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()))
+local function LoadURLMaterial( url, alignment, cb, skip_hack )
+	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()), skip_hack)
 
 	if #LoadingURLQueue == 0 then
 		timer.Create("SF_URLMaterialChecker",1,0,CheckURLDownloads)
@@ -456,9 +460,9 @@ end
 -- @param tx Texture file path, or a http url
 -- @param cb Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url
 -- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
+-- @param skip_hack Turns off texture hack so you can use UVs on 3D objects
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
-function render_library.getTextureID ( tx, cb, alignment )
-
+function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 	local instance = SF.instance
 	local data = instance.data.render
 		
@@ -497,14 +501,14 @@ function render_library.getTextureID ( tx, cb, alignment )
 			if cb then
 				instance:runFunction( cb, tbl, tx )
 			end
-		end)
+		end, skip_hack)
 		return tbl
 	else
 		local id = surface.GetTextureID( tx )
 		if id then
 			local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
 			if not mat then return end
-			local cacheentry = sfCreateMaterial( "SF_TEXTURE_" .. id )
+			local cacheentry = sfCreateMaterial( "SF_TEXTURE_" .. id, skip_hack )
 			cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
 
 			local tbl = {}
