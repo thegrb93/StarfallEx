@@ -257,6 +257,7 @@ SF.Editor.Themes.AddTheme("default", {
 	["string"] = { Color(230, 219, 116), nil, 0},
 	["number"] = { Color(174, 129, 255), nil, 0}, 
 	["function"] = { Color(137, 189, 255), nil, 0},
+	["method"] = { Color(137, 189, 255), nil, 0},
 	["library"] = { Color(137, 189, 255), nil, 0}, 
 	["operator"] = { Color(230, 230, 230), nil, 0},
 	["notfound"] = { Color(230, 230, 230), nil, 0},
