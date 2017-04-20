@@ -16,14 +16,10 @@ SF.Libraries.AddHook("initialize",function(inst)
 end)
 
 SF.Libraries.AddHook("deinitialize", function(inst)
-	local clean = true
-	for _, inst2 in pairs(SF.allInstances) do
-		if inst!=inst2 then
-			clean = false
-			break
-		end
+	if table.Count(SF.allInstances)<2 then
+		SF.GlobalTables.Global = {}
 	end
-	if clean then
+	if table.Count(SF.playerInstances[inst.player])<2 then
 		SF.GlobalTables.Players[inst.player] = nil
 	end
 end)
