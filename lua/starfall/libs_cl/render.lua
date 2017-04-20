@@ -1041,6 +1041,18 @@ function render_library.clearDepth()
 	end
 end
 
+--- Draws a sprite in 3d space.
+-- @param pos  Position of the sprite.
+-- @param width Width of the sprite.
+-- @param height Height of the sprite.
+function render_library.draw3DSprite(pos, width, height)
+	SF.CheckType( pos, vector_meta )
+	SF.CheckType( width, "number" )
+	SF.CheckType( height, "number" )
+	pos = vunwrap( pos )
+	render.DrawSprite( pos, width, height )
+end
+
 --- Draws a sphere
 -- @param pos Position of the sphere
 -- @param radius Radius of the sphere
