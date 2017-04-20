@@ -100,6 +100,7 @@ end)
 SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {["Client"] = {}} )
 SF.Permissions.registerPrivilege( "render.offscreen", "Render Screen", "Allows the user to render without a screen", {["Client"] = {}} )
 SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {["Client"] = {}} )
+SF.Permissions.registerPrivilege( "render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", {["Client"] = {}} )
 
 local cv_max_rendertargets = CreateConVar( "sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE } )
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE } )
@@ -463,12 +464,28 @@ end
 -- @param skip_hack Turns off texture hack so you can use UVs on 3D objects
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
 function render_library.getTextureID ( tx, cb, alignment, skip_hack )
+	SF.CheckType( tx, "string" )
+		
 	local instance = SF.instance
 	local data = instance.data.render
-		
-	if tx:sub(1,4)=="http" then
-		SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
-		
+	local prefix = tx:sub(1,4)	
+	if #tx > 500000 then
+		SF.Throw( "Texture URL/Data too long!", 2 )
+	end
+	if prefix=="http" or prefix == "data" then
+		if prefix == "http" then
+			SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
+			tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
+				return string.format( "%%%02X", string.byte( str ) )
+			end )
+		else
+			--I wanst really sure how to prevent injecting JS without disrupting data structure, if you know better way then do it! 
+			print(tx)
+			if string.find(tx,"[)\"'\\<>]") then -- Those are characters that arent needed for correct data format, but could be used to inject JS
+				SF.Throw( "Illegal characters found", 2 )
+			end
+			SF.Permissions.check( instance.player, nil, "render.datamaterial" )
+		end
 		if plyURLTexcount[ instance.playerid ] then
 			if plyURLTexcount[ instance.playerid ] >= cv_max_url_materials:GetInt() then
 				SF.Throw( "URL Texture limit reached", 2 )
@@ -479,10 +496,6 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 			plyURLTexcount[ instance.playerid ] = 1
 		end
 		data.urltexturecount = data.urltexturecount + 1
-
-		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
-			return string.format( "%%%02X", string.byte( str ) )
-		end )
 
 		if alignment then
 			SF.CheckType( alignment, "string" )
