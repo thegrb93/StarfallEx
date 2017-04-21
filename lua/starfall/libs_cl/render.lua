@@ -482,7 +482,7 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 			SF.Permissions.check( instance.player, nil, "render.datamaterial" )
 			--I wanst really sure how to prevent injecting JS without disrupting data structure, if you know better way then do it! 
 			if string.find(tx,"[)\"'\\<>]") then -- Those are characters that arent needed for correct data format, but could be used to inject JS
-				SF.Throw( "Illegal characters found", 2 )
+				SF.Throw( "Texture data contains illegal characters.", 2 )
 			end
 		end
 		if plyURLTexcount[ instance.playerid ] then
