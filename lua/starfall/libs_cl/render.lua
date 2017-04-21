@@ -884,6 +884,7 @@ end
 -- @param shadow Enable drop shadow?
 -- @param outline Enable outline?
 -- @param blur Enable blur?
+-- @param extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
 -- @usage
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- Akbar
@@ -903,7 +904,7 @@ end
 -- \- Lucida Console
 -- \- Times New Roman
 
-function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur)
+function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur,extended)
 	font = validfonts[string.lower(font)]
 	if not font then SF.Throw( "invalid font", 2 ) end
 
@@ -914,18 +915,21 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 	additive = additive and true or false
 	shadow = shadow and true or false
 	outline = outline and true or false
+	extended = extended and true or false
 
-	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d",
+	local name = string.format("sf_screen_font_%s_%d_%d_%d_%d%d%d%d%d",
 		font, size, weight, blur,
 		antialias and 1 or 0,
 		additive and 1 or 0,
 		shadow and 1 or 0,
-		outline and 1 or 0)
+		outline and 1 or 0,
+		extended and 1 or 0)
 
 	if not defined_fonts[name] then
 		surface.CreateFont(name, {size = size, weight = weight,
 			antialias=antialias, additive = additive, font = font,
-			shadow = shadow, outline = outline, blur = blur})
+			shadow = shadow, outline = outline, blur = blur,
+			extended = extended})
 		defined_fonts[name] = true
 	end
 	return name
