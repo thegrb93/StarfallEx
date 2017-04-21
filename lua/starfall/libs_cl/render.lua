@@ -1200,14 +1200,15 @@ function render_library.draw3DQuad ( vert1, vert2, vert3, vert4 )
 end
 
 --- Gets a 2D cursor position where ply is aiming.
--- @param ply player to get cursor position from
+-- @param ply player to get cursor position from(optional)
 -- @return x position
 -- @return y position
 function render_library.cursorPos( ply )
 	local screen = SF.instance.data.render.renderEnt
 	if not screen or screen:GetClass()!="starfall_screen" then return input.GetCursorPos() end
 
-	ply = eunwrap( ply )
+	ply = ply and eunwrap( ply ) or LocalPlayer()
+
 	if not ply then SF.Throw("Invalid Player", 2) end
 
 	local Normal, Pos
