@@ -100,9 +100,11 @@ end)
 SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {["Client"] = {}} )
 SF.Permissions.registerPrivilege( "render.offscreen", "Render Screen", "Allows the user to render without a screen", {["Client"] = {}} )
 SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {["Client"] = {}} )
+SF.Permissions.registerPrivilege( "render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", {["Client"] = {}} )
 
 local cv_max_rendertargets = CreateConVar( "sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE } )
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE } )
+local cv_max_data_material_size = CreateConVar( "sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE } )
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
@@ -457,18 +459,33 @@ end
 
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
--- @param tx Texture file path, or a http url
+-- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
 -- @param cb Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url
 -- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
 -- @param skip_hack Turns off texture hack so you can use UVs on 3D objects
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
 function render_library.getTextureID ( tx, cb, alignment, skip_hack )
+	SF.CheckType( tx, "string" )
+		
 	local instance = SF.instance
 	local data = instance.data.render
-		
-	if tx:sub(1,4)=="http" then
-		SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
-		
+	local prefix = tx:sub(1,4)	
+	if #tx > cv_max_data_material_size:GetInt() then
+		SF.Throw( "Texture URL/Data too long!", 2 )
+	end
+	if prefix=="http" or prefix == "data" then
+		if prefix == "http" then
+			SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
+			tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
+				return string.format( "%%%02X", string.byte( str ) )
+			end )
+		else
+			SF.Permissions.check( instance.player, nil, "render.datamaterial" )
+			tx = string.match(tx,"data:image/%w+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
+			if not tx then --It's not valid
+				SF.Throw( "Texture data isnt proper base64 encoded image.", 2 )
+			end
+		end
 		if plyURLTexcount[ instance.playerid ] then
 			if plyURLTexcount[ instance.playerid ] >= cv_max_url_materials:GetInt() then
 				SF.Throw( "URL Texture limit reached", 2 )
@@ -479,10 +496,6 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 			plyURLTexcount[ instance.playerid ] = 1
 		end
 		data.urltexturecount = data.urltexturecount + 1
-
-		tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
-			return string.format( "%%%02X", string.byte( str ) )
-		end )
 
 		if alignment then
 			SF.CheckType( alignment, "string" )
