@@ -459,7 +459,7 @@ end
 
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
--- @param tx Texture file path, or a http url
+-- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
 -- @param cb Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url
 -- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
 -- @param skip_hack Turns off texture hack so you can use UVs on 3D objects
