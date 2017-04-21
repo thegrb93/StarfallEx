@@ -104,6 +104,7 @@ SF.Permissions.registerPrivilege( "render.datamaterial", "Render Data Materials"
 
 local cv_max_rendertargets = CreateConVar( "sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE } )
 local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE } )
+local cv_max_data_material_size = CreateConVar( "sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE } )
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
@@ -469,7 +470,7 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 	local instance = SF.instance
 	local data = instance.data.render
 	local prefix = tx:sub(1,4)	
-	if #tx > 500000 then
+	if #tx > cv_max_data_material_size:GetInt() then
 		SF.Throw( "Texture URL/Data too long!", 2 )
 	end
 	if prefix=="http" or prefix == "data" then
@@ -480,9 +481,9 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 			end )
 		else
 			SF.Permissions.check( instance.player, nil, "render.datamaterial" )
-			--I wanst really sure how to prevent injecting JS without disrupting data structure, if you know better way then do it! 
-			if string.find(tx,"[)\"'\\<>]") then -- Those are characters that arent needed for correct data format, but could be used to inject JS
-				SF.Throw( "Texture data contains illegal characters.", 2 )
+			tx = string.match(tx,"data:image/%w+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
+			if not tx then --It's not valid
+				SF.Throw( "Texture data isnt proper base64 encoded image.", 2 )
 			end
 		end
 		if plyURLTexcount[ instance.playerid ] then
