@@ -277,6 +277,7 @@ local validfonts = {
 	akbar = "Akbar",
 	coolvetica = "Coolvetica",
 	roboto = "Roboto",
+	["fontawesome"] = "FontAwesome",
 	["courier new"] = "Courier New",
 	verdana = "Verdana",
 	arial = "Arial",
@@ -888,6 +889,7 @@ end
 -- \- Akbar
 -- \- Coolvetica
 -- \- Roboto
+-- \- FontAwesome
 -- \- Courier New
 -- \- Verdana
 -- \- Arial
