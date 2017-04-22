@@ -1208,8 +1208,8 @@ function render_library.cursorPos( ply )
 	if not screen or screen:GetClass()!="starfall_screen" then return input.GetCursorPos() end
 
 	ply = ply and eunwrap( ply ) or LocalPlayer()
-
-	if not ply then SF.Throw("Invalid Player", 2) end
+	
+	if not IsValid( ply ) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
