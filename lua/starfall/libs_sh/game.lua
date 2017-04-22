@@ -12,9 +12,8 @@ function game_lib.getMap ()
 end
 
 --- Returns The hostname
--- @deprecated Possibly add ConVar retrieval for users in future. Could implement with SF Script.
 function game_lib.getHostname ()
-	return GetConVar( "hostname" ):GetString()
+	return GetHostName()
 end
 
 --- Returns true if the server is on a LAN
