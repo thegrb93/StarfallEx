@@ -747,7 +747,7 @@ Returns true if the server is on a LAN";["param"] = {};};["isSinglePlayer"] = {[
 Returns whether or not the current game is single player ";["private"] = false;["library"] = "game";["description"] = "\
 Returns whether or not the current game is single player";["param"] = {};};["isDedicated"] = {["class"] = "function";["realm"] = "sh";["name"] = "game_lib.isDedicated";["summary"] = "\
 Returns whether or not the server is a dedicated server ";["private"] = false;["library"] = "game";["description"] = "\
-Returns whether or not the server is a dedicated server";["param"] = {};};["getHostname"] = {["deprecated"] = "Possibly add ConVar retrieval for users in future. Could implement with SF Script.";["class"] = "function";["realm"] = "sh";["name"] = "game_lib.getHostname";["summary"] = "\
+Returns whether or not the server is a dedicated server";["param"] = {};};["getHostname"] = {["class"] = "function";["realm"] = "sh";["name"] = "game_lib.getHostname";["summary"] = "\
 Returns The hostname ";["private"] = false;["library"] = "game";["description"] = "\
 Returns The hostname";["param"] = {};};};["class"] = "library";["summary"] = "\
 Game functions ";["fields"] = {};["name"] = "game";["client"] = true;["description"] = "\
