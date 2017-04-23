@@ -483,7 +483,7 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 			end )
 		else
 			SF.Permissions.check( instance.player, nil, "render.datamaterial" )
-			tx = string.match(tx,"data:image/%w+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
+			tx = string.match(tx,"data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
 			if not tx then --It's not valid
 				SF.Throw( "Texture data isnt proper base64 encoded image.", 2 )
 			end
