@@ -628,3 +628,24 @@ end
 function ents_methods:getForward ()
 	return vwrap( eunwrap( self ):GetForward() )
 end
+
+local function ent1or2 ( ent, con, num )
+	if not con then return nil end
+	if num then
+		con = con[ num ]
+		if not con then return nil end
+	end
+	if con.Ent1 == ent then return con.Ent2 end
+	return con.Ent1
+end
+		
+--- Gets what the entity is welded to
+-- @return The entity that is welded to the subject
+function ents_methods:getWeldedTo ()
+	local this = unwrap( self )
+	
+	if not isValid( this ) then return nil end
+	if not constraint.HasConstraints( this ) then return nil end
+	
+	return wrap( ent1or2( this, constraint.FindConstraint( this, "Weld" ) ) )
+end
