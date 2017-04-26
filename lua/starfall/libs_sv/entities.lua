@@ -31,6 +31,7 @@ do
 	P.registerPrivilege( "entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", {["CanPhysgun"] = {}} )
 	P.registerPrivilege( "entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", {["CanTool"] = {}} )
 	P.registerPrivilege( "entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", {["CanTool"] = {}} )
+	P.registerPrivilege( "entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", {["CanTool"] = {}} )
 	P.registerPrivilege( "entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", {["CanTool"] = {}} )
 	P.registerPrivilege( "entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", {["CanTool"] = {}} )
 	P.registerPrivilege( "entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence", {["CanTool"] = {}} )
@@ -778,6 +779,26 @@ function ents_methods:setMass ( mass )
 	SF.Permissions.check( SF.instance.player, ent, "entities.setMass" )
 
 	phys:SetMass( math.Clamp(mass, 1, 50000) )
+end
+
+--- Sets the entity's inertia
+-- @param vec Inertia tensor
+function ents_methods:setInertia ( vec )
+	SF.CheckType( self, ents_metatable )
+	SF.CheckType( vec, SF.Types[ "Vector" ] )
+
+	local ent = unwrap( self )
+	SF.Permissions.check( SF.instance.player, ent, "entities.setInertia" )
+	local phys = getPhysObject( ent )
+	if not phys then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
+	
+	local vec = vunwrap( vec )
+	if not check( vec ) then SF.Throw( "infinite vector", 2) end
+	vec[1] = math.Clamp(vec[1], 1, 100000)
+	vec[2] = math.Clamp(vec[2], 1, 100000)
+	vec[3] = math.Clamp(vec[3], 1, 100000)
+
+	phys:SetInertia( vec )
 end
 
 --- Sets the physical material of the entity
