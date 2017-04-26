@@ -38,12 +38,13 @@ SF.Libraries.AddHook("postload", function()
 		return SF.WrapObject( Entity( num ) )
 	end
 
-	if SERVER then
-		SF.DefaultEnvironment.player = SF.DefaultEnvironment.owner
-	else
-		function SF.DefaultEnvironment.player ()
-			return SF.WrapObject( LocalPlayer() )
+	function SF.DefaultEnvironment.player (num)
+		if num then
+			SF.CheckType( num, "number" )
+			return SF.WrapObject( Player( num ) )
 		end
+		
+		return SERVER and SF.DefaultEnvironment.owner() or SF.WrapObject( LocalPlayer() )
 	end
 end)
 

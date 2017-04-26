@@ -26,7 +26,7 @@ SF.DefaultEnvironment.owner = nil
 --- Same as owner() on the server. On the client, returns the local player
 -- @name SF.DefaultEnvironment.player
 -- @class function
--- @return Either the owner (server) or the local player (client)
+-- @return Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
 SF.DefaultEnvironment.player = nil
 
 --- Returns the entity with index 'num'
