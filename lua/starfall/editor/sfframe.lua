@@ -1587,12 +1587,11 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SoundBrw:SetText("Sound Browser")
 	SoundBrw.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
 	self.C.SoundBrw = SoundBrw
-	timer.Simple(0,function() --Waiting for tabhandlers to load
-		self:NewTab()
-		if Editor.OpenOldTabsVar:GetBool() then
-			self:OpenOldTabs()
-		end
-	end)
+	
+	self:NewTab()
+	if Editor.OpenOldTabsVar:GetBool() then
+		self:OpenOldTabs()
+	end
 	--Add "Model Viewer" button
 	local ModelViewer = vgui.Create("StarfallButton", self.C.ButtonHolder)
 	ModelViewer:SetSize(85, 20)
