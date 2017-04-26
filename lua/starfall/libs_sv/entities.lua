@@ -15,6 +15,7 @@ local ents_metatable = SF.Entities.Metatable
 --@name Entity
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
+local vwrap = SF.WrapObject
 local vunwrap = SF.UnwrapObject
 
 -- Register privileges
@@ -902,7 +903,7 @@ function ents_methods:isWeldedTo ()
 	local this = unwrap( self )
 	if not constraint.HasConstraints( this ) then return nil end
 
-	return wrap( ent1or2( this, constraint.FindConstraint( this, "Weld" ) ) )
+	return vwrap( ent1or2( this, constraint.FindConstraint( this, "Weld" ) ) )
 end
 
 
