@@ -2,12 +2,28 @@
 -- Render library
 -------------------------------------------------------------------------------
 
---- Called when a frame is requested to be drawn.
+--- Called when a frame is requested to be drawn on screen. (2D/3D Context)
 -- @name render
 -- @class hook
 -- @client
 
---- Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets.
+--- Called when a frame is requested to be drawn on hud. (2D Context)
+-- @name drawhud
+-- @class hook
+-- @client
+
+
+---Called before drawing HUD (2D Context)
+-- @name predrawhud
+-- @class hook
+-- @client
+
+---Called after drawing HUD (2D Context)
+-- @name postdrawhud
+-- @class hook
+-- @client
+
+--- Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)
 -- @name renderoffscreen
 -- @class hook
 -- @client
@@ -22,14 +38,14 @@
 -- @class hook
 -- @client
 
---- Called before opaque entities are drawn. (Only works with HUD)
+--- Called before opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name predrawopaquerenderables
 -- @class hook
 -- @client
 -- @param boolean isDrawingDepth Whether the current draw is writing depth.
 -- @param boolean isDrawSkybox  Whether the current draw is drawing the skybox.
 
---- Called after opaque entities are drawn. (Only works with HUD)
+--- Called after opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name postdrawopaquerenderables
 -- @class hook
 -- @client
@@ -120,7 +136,10 @@ local renderhooks = {
 	render = true,
 	renderoffscreen = true,
 	predrawopaquerenderables = true,
-	postdrawopaquerenderables = true
+	postdrawopaquerenderables = true,
+	predrawhud = true,
+	drawhud = true,
+	postdrawhud = true,
 }
 
 SF.Libraries.AddHook( "prepare", function ( instance, hook )
