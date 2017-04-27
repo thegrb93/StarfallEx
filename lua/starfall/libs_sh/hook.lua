@@ -253,7 +253,7 @@ else
 	-- Client hooks
 	add( "StartChat" )
 	add( "FinishChat" )
-	add( "HUDPaint", "renderoffscreen", function( instance )
+	add( "PostDrawHUD", "renderoffscreen", function( instance )
 		return SF.Permissions.hasAccess( instance.player, nil, "render.offscreen" ), {}
 	end)
 end
