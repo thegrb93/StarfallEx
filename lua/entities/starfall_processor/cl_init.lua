@@ -23,7 +23,7 @@ function ENT:GetOverlayText()
 	local clientstr, serverstr
 	if self.instance then
 		local bufferAvg = self.instance.cpu_average
-		clientstr = tostring( math.Round( bufferAvg * 1000000 ) ) .. "us. (" .. tostring( math.floor( bufferAvg / self.instance.cpuQuota:GetFloat() * 100 ) ) .. "%)"
+		clientstr = tostring( math.Round( bufferAvg * 1000000 ) ) .. "us. (" .. tostring( math.floor( bufferAvg / self.instance.cpuQuota * 100 ) ) .. "%)"
 	else
 		clientstr = "Errored"
 	end

@@ -171,7 +171,7 @@ end
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
 -- @return Max SysTime allowed to take for execution of the chip in a Think.
 function SF.DefaultEnvironment.quotaMax ()
-	return SF.instance.cpuQuota:GetFloat()
+	return SF.instance.cpuQuota
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
