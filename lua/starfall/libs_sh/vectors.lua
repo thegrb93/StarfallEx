@@ -397,8 +397,8 @@ function vec_methods:sub ( v )
 	self[3] = self[3] - v[3]
 end
 
---- Translates the vectors position into 2D user screen coordinates. Self-Modifies.
--- @return nil
+--- Translates the vectors position into 2D user screen coordinates.
+-- @return A table {x=screenx,y=screeny,visible=visible}
 function vec_methods:toScreen ( )
 	return unwrap( self ):ToScreen()
 end
