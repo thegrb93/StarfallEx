@@ -429,7 +429,6 @@ end
 -- @return The amount of ammo player has in reserve.
 function player_methods:getAmmoCount( type )
 	SF.CheckType( self, player_metamethods )
-	SF.CheckType( type, "string" )
 	
 	local ent = eunwrap( self )
 	return ent:GetAmmoCount( type )
