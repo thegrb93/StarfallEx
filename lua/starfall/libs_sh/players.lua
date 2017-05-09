@@ -426,12 +426,17 @@ end
 
 -- Gets the amount of ammo the player has.
 -- @shared
+-- @param id The string or number id of the ammo
 -- @return The amount of ammo player has in reserve.
-function player_methods:getAmmoCount( type )
+function player_methods:getAmmoCount( id )
 	SF.CheckType( self, player_metamethods )
+	local tid = type(id)
+	if tid~="number" and tid~="string" then
+		SF.Throw( "Type mismatch (Expected number or string, got " .. tid .. ") in function getAmmoCount", 2 )
+	end
 	
 	local ent = eunwrap( self )
-	return ent:GetAmmoCount( type )
+	return ent:GetAmmoCount( id )
 end
 
 if SERVER then
