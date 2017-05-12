@@ -327,7 +327,6 @@ local safe_types = {
 -- any possiblitiy of leakage. Functions will always be replaced with
 -- nil as there is no way to verify that they are safe.
 function SF.Sanitize( ... )
-	-- Sanitize ALL the things.
 	local return_list = {}
 	local args = { ... }
 	
