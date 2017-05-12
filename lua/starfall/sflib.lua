@@ -310,11 +310,6 @@ end
 local safe_types = {
 	["number"  ] = true,
 	["string"  ] = true,
-	["Vector"  ] = false,
-	["Color"   ] = false,
-	["Angle"   ] = false,
-	["Entity"  ] = false,
-	["VMatrix" ] = false,
 	["boolean" ] = true,
 	["nil"     ] = true,
 }
