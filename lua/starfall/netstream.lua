@@ -115,6 +115,7 @@ function net.ReadStream( ply, callback )
 	local queue = net.Stream.Queues[ ply ]
 	
 	local numstreams = net.ReadUInt( 32 )
+	if numstreams == nil then return end
 	local identifier = net.ReadUInt( 32 )
 	--print("Got info", numstreams, identifier)
 	

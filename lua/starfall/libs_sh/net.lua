@@ -418,6 +418,13 @@ function net_library.getBytesLeft()
 	return SF.instance.data.net.burst:check() - SF.instance.data.net.size
 end
 
+--- Returns whether or not the library is currently reading data from a stream
+-- @return Boolean
+function net_library.isStreaming()
+	-- Can also be nil
+	return streams[SF.instance.player] == true
+end
+
 net.Receive( "SF_netmessage", function( len, ply )
 	local ent = net.ReadEntity()
 	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
