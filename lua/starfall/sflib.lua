@@ -225,6 +225,14 @@ function SF.AddObjectUnwrapper( object_meta, unwrapper )
 	object_meta.__unwrap = unwrapper
 end
 
+-- A list of safe data types
+local safe_types = {
+	["number"  ] = true,
+	["string"  ] = true,
+	["boolean" ] = true,
+	["nil"     ] = true,
+}
+
 --- Wraps the given object so that it is safe to pass into starfall
 -- It will wrap it as long as we have the metatable of the object that is
 -- getting wrapped.
@@ -233,9 +241,16 @@ end
 -- or returns the wrapped object if it does have a wrapper.
 function SF.WrapObject( object )
 	local metatable = dgetmeta(object)
-	if not metatable and type(object)!="table" then return object end
-	local wrap = object_wrappers[metatable]
-	return wrap and wrap(object)
+	if metatable then
+		local wrap = object_wrappers[metatable]
+		if wrap then
+			return wrap(object)
+		end
+	end
+	-- Do not elseif here because strings do have a metatable.
+	if safe_types[type(object)] then
+		return object
+	end
 end
 
 --- Takes a wrapped starfall object and returns the unwrapped version
@@ -305,14 +320,6 @@ function SF.BurstObject( rate, max )
 	}
 	return setmetatable(t, {__index=burstclass})
 end
-
--- A list of safe data types
-local safe_types = {
-	["number"  ] = true,
-	["string"  ] = true,
-	["boolean" ] = true,
-	["nil"     ] = true,
-}
 
 --- Sanitizes and returns its argument list.
 -- Basic types are returned unchanged. Non-object tables will be
