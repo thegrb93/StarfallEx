@@ -29,12 +29,12 @@
 -- @client
 
 --- Called when the player connects to a HUD component linked to the Starfall Chip
--- @name hudconnect
+-- @name hudconnected
 -- @class hook
 -- @client
 
 --- Called when the player disconnects from a HUD component linked to the Starfall Chip
--- @name huddisconnect
+-- @name huddisconnected
 -- @class hook
 -- @client
 
