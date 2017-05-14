@@ -733,7 +733,7 @@ function render_library.setTextureFromScreen ( ent )
 
 end
 
---- Clears the surface
+--- Clears the active render target
 -- @param clr Color type to clear with
 -- @param depth Boolean if should clear depth
 function render_library.clear ( clr, depth )
