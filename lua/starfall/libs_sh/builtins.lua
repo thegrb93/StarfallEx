@@ -818,8 +818,9 @@ end
 
 --- Throws a raw exception.
 -- @param msg Exception message
-function SF.DefaultEnvironment.error ( msg )
-	error( msg or "an unspecified error occured", 2 )
+-- @param level Which level in the stacktrace to blame. Defaults to 1
+function SF.DefaultEnvironment.error ( msg, level )
+	error( msg or "an unspecified error occured", 1 + ( level or 1 ) )
 end
 
 --- Returns if the table has an isValid function and isValid returns true.
