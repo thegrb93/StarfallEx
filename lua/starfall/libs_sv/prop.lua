@@ -99,6 +99,13 @@ function props_library.create ( pos, ang, model, frozen )
 		end
 	end
 	
+	if propdata.undo then
+		undo.Create( "Prop" )
+			undo.SetPlayer( instance.player )
+			undo.AddEntity( propent )
+		undo.Finish( "Prop (" .. tostring( model ) .. ")" )
+	end
+	
 	instance.player:AddCleanup( "props", propent )
 	
 	gamemode.Call( "PlayerSpawnedProp", instance.player, model, propent )
@@ -253,6 +260,13 @@ function props_library.createSent ( pos, ang, class, frozen )
 			phys:EnableMotion(not frozen)
 		end
 		
+		if propdata.undo then
+			undo.Create( "SF" )
+				undo.SetPlayer( instance.player )
+				undo.AddEntity( entity )
+			undo.Finish( "SF (" .. class .. ")" )
+		end
+		
 		instance.player:AddCleanup( "props", entity )
 		gamemode.Call( hookcall, instance.player, entity )
 	
@@ -307,3 +321,8 @@ function props_library.setPropClean( on )
 	SF.instance.data.props.clean = on
 end
 
+--- Sets whether the props should be undo-able
+-- @param on Boolean whether the props should be undo-able
+function props_library.setPropUndo( on )
+	SF.instance.data.props.undo = on
+end
