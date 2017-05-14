@@ -29,6 +29,7 @@ end)
 do
 	local P = SF.Permissions
 	P.registerPrivilege( "npcs.modify", "Modify", "Allows the user to modify npcs", { ["CanTool"] = {} } )
+	P.registerPrivilege( "npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { ["CanTool"] = {} } )
 end
 
 -- ------------------------------------------------------------------------- --
@@ -87,6 +88,25 @@ function npc_methods:getRelationship(ent)
 	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
 	if not target:IsValid() then SF.Throw( "Target is invalid", 2 ) end
 	return dispositions[npc:Disposition()]
+end
+
+--- Gives the npc a weapon
+-- @param wep The classname of the weapon
+function npc_methods:giveWeapon(wep)
+	SF.CheckType( self, npc_metatable )
+	SF.CheckType( wep, "string" )
+	
+	local npc = unwrap(self)
+	if not npc:IsValid() then SF.Throw( "NPC is invalid", 2 ) end
+	SF.Permissions.check( SF.instance.player, npc, "npcs.giveweapon" )
+
+	local weapon = npc:GetActiveWeapon()
+	if (weapon:IsValid()) then
+		if (weapon:GetClass() == "weapon_" .. wep) then return end
+		weapon:Remove()
+	end
+
+	npc:Give( "ai_weapon_" .. wep )
 end
 
 --- Tell the npc to fight this
