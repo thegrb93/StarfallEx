@@ -275,6 +275,14 @@ function ents_methods:isNPC ()
 	return eunwrap( self ):IsNPC()
 end
 
+--- Checks if the entity ONGROUND flag is set
+-- @shared
+-- @return Boolean if it's flag is set or not
+function ents_methods:isOnGround ()
+	SF.CheckType( self, ents_metamethods )
+	return eunwrap( self ):IsOnGround()
+end
+
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity
