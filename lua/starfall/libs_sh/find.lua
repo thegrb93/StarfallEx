@@ -20,10 +20,17 @@ local function convert(results, func)
 	
 	local t = {}
 	local count = 1
-	for i=1,#results do
-		local e = wrap(results[i])
-		if not func or func(e) then
-			t[count] = e
+	if func then
+		for i=1,#results do
+			local e = wrap(results[i])
+			if func(e) then
+				t[count] = e
+				count = count + 1
+			end
+		end
+	else
+		for i=1,#results do
+			t[count] = wrap(results[i])
 			count = count + 1
 		end
 	end
