@@ -178,11 +178,11 @@ local outputConverters =
 	end,
 	VECTOR = function ( data )
 		SF.CheckType( data, SF.Types[ "Vector" ], 1 )
-		return { data[1], data[2], data[3] }
+		return Vector( data[1], data[2], data[3] )
 	end,
 	ANGLE = function ( data )
 		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
-		return { p=data[1], y=data[2], r=data[3] }
+		return Angle( data[1], data[2], data[3] )
 	end,
 	ENTITY = function ( data )
 		SF.CheckType( data, SF.Types[ "Entity" ] )
