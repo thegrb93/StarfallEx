@@ -108,6 +108,9 @@ function hologram_methods:setClip ( index, enabled, origin, normal, islocal )
 
 	local holo = unwrap( self )
 	if holo then
+		if enabled and not holo.clips[index] and table.Count(holo.clips)==8 then
+			SF.Throw( "The maximum hologram clips is 8", 2 )
+		end
 		holo:UpdateClip( index, enabled, origin, normal, islocal )
 	end
 end

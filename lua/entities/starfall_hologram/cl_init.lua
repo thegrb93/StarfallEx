@@ -27,7 +27,7 @@ local function msgQueueProcess ( ent )
 		for i = 1 , #names do
 			local name = names[ i ]
 			if name == "scale" then
-				ent:SetScale( data[ i ] )
+				ent:SetHoloScale( data[ i ] )
 			elseif name == "clip" then
 				ent:UpdateClip( unpack( data[ i ] ) )
 			end
@@ -42,7 +42,6 @@ end
 
 function ENT:Initialize()
 	self.clips = {}
-	self.scale = Vector(1,1,1)
 	self.initialised = true
 	msgQueueProcess(self)
 end
@@ -158,11 +157,17 @@ end )
 
 --- Sets the hologram scale
 -- @param scale Vector scale
-function ENT:SetScale ( scale )
+function ENT:SetHoloScale ( scale )
+	if scale == vector_origin then return end
+	if scale == Vector(1, 1, 1) then
+		self.scale_matrix = Matrix()
+		self:DisableMatrix( "RenderMultiply" )
+	else
+		self.scale_matrix = Matrix()
+		self.scale_matrix:Scale( scale )
+		self:EnableMatrix( "RenderMultiply", self.scale_matrix )
+	end
 	self.scale = scale
-	self.scale_matrix = Matrix()
-	self.scale_matrix:Scale( scale )
-	self:EnableMatrix( "RenderMultiply", self.scale_matrix )
 
 	local propmax = self:OBBMaxs()
 	local propmin = self:OBBMins()
@@ -182,15 +187,21 @@ net.Receive("starfall_hologram_scale", function ()
 	local holoent = Entity( entid )
 	if ( not IsValid ( holoent ) ) or ( not holoent.initialised ) then
 		-- Uninitialized
-		msgQueueAdd( "scale", entid, Vector(net.ReadDouble(), net.ReadDouble(), net.ReadDouble()) )
+		msgQueueAdd( "scale", entid, Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()) )
 	else
-		holoent:SetScale( Vector( net.ReadDouble(), net.ReadDouble(), net.ReadDouble() ) )
+		holoent:SetHoloScale( Vector( net.ReadFloat(), net.ReadFloat(), net.ReadFloat() ) )
 	end
 end )
 
 hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(ent)
-	if ent.scale and ent.SetScale then
-		ent:SetScale(ent.scale)
+	if ent.SetHoloScale then
+		if ent.scale then
+			ent:SetHoloScale(ent.scale)
+		else
+			net.Start("starfall_hologram_init")
+			net.WriteEntity(ent)
+			net.SendToServer()
+		end
 	end
 end)
 
