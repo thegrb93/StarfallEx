@@ -51,6 +51,7 @@ SF.Wire.Library = wire_library
 local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable,true,true)
 local vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
+local vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
 local ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
 
 -- Register privileges
@@ -178,11 +179,11 @@ local outputConverters =
 	end,
 	VECTOR = function ( data )
 		SF.CheckType( data, SF.Types[ "Vector" ], 1 )
-		return Vector( data[1], data[2], data[3] )
+		return vunwrap( data )
 	end,
 	ANGLE = function ( data )
 		SF.CheckType( data, SF.Types[ "Angle" ], 1 )
-		return Angle( data[1], data[2], data[3] )
+		return aunwrap( data )
 	end,
 	ENTITY = function ( data )
 		SF.CheckType( data, SF.Types[ "Entity" ] )
