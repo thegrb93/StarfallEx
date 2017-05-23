@@ -92,6 +92,8 @@ function props_library.create ( pos, ang, model, frozen )
 	propent:SetModel( model )
 	propent:Spawn()
 	
+	if not propent:GetModel() then propent:Remove() return end
+	
 	for I = 0,  propent:GetPhysicsObjectCount() - 1 do
 		local obj = propent:GetPhysicsObjectNum( I )
 		if obj:IsValid() then
