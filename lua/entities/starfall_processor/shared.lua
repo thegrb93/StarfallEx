@@ -51,17 +51,19 @@ function ENT:Compile(owner, files, mainfile)
 	if SERVER then
 		local clr = self:GetColor()
 		self:SetColor( Color( 255, 255, 255, clr.a ) )
+		self:SetNWInt( "State", self.States.Normal )
 		
 		if self.Inputs then
 			for k, v in pairs(self.Inputs) do
 				self:TriggerInput( k, v.Value )
 			end
 		end
-		
-		self:SetNWInt( "State", self.States.Normal )
 	end
 	
-	self.instance:runScriptHook( "initialize" )
+	--TriggerInput can cause self.instance to become nil
+	if self.instance then
+		self.instance:runScriptHook( "initialize" )
+	end
 end
 
 function ENT:Error ( err )
@@ -99,6 +101,7 @@ function ENT:OnRemove ()
 	if not self.instance then return end
 	
 	self.instance:runScriptHook( "removed" )
+	--removed hook can cause instance to become nil
 	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
