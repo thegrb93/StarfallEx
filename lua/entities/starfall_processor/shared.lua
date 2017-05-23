@@ -98,8 +98,8 @@ end
 function ENT:OnRemove ()
 	if not self.instance then return end
 	
-	local tbl = self.instance:runScriptHook( "removed" )
-	if tbl[1] then
+	self.instance:runScriptHook( "removed" )
+	if self.instance then
 		self.instance:deinitialize()
 		self.instance = nil
 	end
