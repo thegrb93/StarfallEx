@@ -67,41 +67,99 @@ local getPhysObject = SF.Entities.GetPhysObject
 -- ------------------------- Library functions ------------------------- --
 
 if CLIENT then
-	local renderProperties = {
-		[1] = function( ent ) --Color	
-			ent:SetColor( Color( net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ) ) )
+	local entsWithProperties = setmetatable({},{__mode="k"})
+	local getRenderProperties = {
+		[1] = function( tbl ) --Color
+			tbl[1] = Color( net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ) )
 		end,
-		[2] = function( ent ) --Nodraw
-			ent:SetNoDraw( net.ReadBit() == 1 )
+		[2] = function( tbl ) --Nodraw
+			tbl[2] = ( net.ReadBit() == 1 )
 		end,
-		[3] = function( ent ) --Material
-			ent:SetMaterial( net.ReadString() )
+		[3] = function( tbl ) --Material
+			tbl[3] = net.ReadString()
 		end,
-		[4] = function( ent ) --Submaterial
-			ent:SetSubMaterial( net.ReadUInt( 16 ), net.ReadString() )
+		[4] = function( tbl ) --Submaterial
+			local index, material = net.ReadUInt( 16 ), net.ReadString()
+			if tbl[4] then
+				tbl[4][index] = material
+			else
+				tbl[4] = {[index] = material}
+			end
 		end,
-		[5] = function( ent ) --Bodygroup
-			ent:SetBodygroup( net.ReadUInt( 16 ), net.ReadUInt ( 16 ) )
+		[5] = function( tbl ) --Bodygroup
+			local group, value = net.ReadUInt( 16 ), net.ReadUInt ( 16 )
+			if tbl[5] then
+				tbl[5][group] = value
+			else
+				tbl[5] = {[group] = value}
+			end
 		end,
-		[6] = function( ent ) --Skin
-			ent:SetSkin( net.ReadUInt( 16 ) )
+		[6] = function( tbl ) --Skin.ReadUInt( 16 )
+			tbl[6] = net.ReadUInt( 16 )
 		end,
-		[7] = function( ent ) --Rendermode
-			ent:SetRenderMode( net.ReadUInt( 8 ) )
+		[7] = function( tbl ) --Rendermode
+			tbl[7] = net.ReadUInt( 8 )
 		end,
-		[8] = function( ent ) --Renderfx
-			ent:SetRenderFX( net.ReadUInt( 8 ) )
+		[8] = function( tbl ) --Renderfx
+			tbl[8] = net.ReadUInt( 8 )
 		end,
 	}
+	local applyRenderProperties = {
+		[1] = function( ent, data ) --Color
+			ent:SetColor( data )
+		end,
+		[2] = function( ent, data ) --Nodraw
+			ent:SetNoDraw( data )
+		end,
+		[3] = function( ent, data ) --Material
+			ent:SetMaterial( data )
+		end,
+		[4] = function( ent, data ) --Submaterial
+			for index, material in pairs(data) do
+				ent:SetSubMaterial( index, material )
+			end
+		end,
+		[5] = function( ent, data ) --Bodygroup
+			for group, value in pairs(data) do
+				ent:SetBodygroup( group, value )
+			end
+		end,
+		[6] = function( ent, data ) --Skin
+			ent:SetSkin( data )
+		end,
+		[7] = function( ent, data ) --Rendermode
+			ent:SetRenderMode( data )
+		end,
+		[8] = function( ent, data ) --Renderfx
+			ent:SetRenderFX( data )
+		end,
+	}
+
+	-- For some reason clientside properties get cleared when re-entering PAS and the clearing timing doesn't seem consistent, but this seems to work.
+	hook.Add("NotifyShouldTransmit","starfall_renderproperty_reset",function(ent, transmit)
+		if transmit and entsWithProperties[ent] then
+			timer.Simple(0.1, function()
+				for k, v in pairs(entsWithProperties[ent]) do
+					applyRenderProperties[k](ent, v)
+				end
+			end)
+		end
+	end)
 
 	--Net function that allows the server to set the render properties of entities for specific players
 	net.Receive( "sf_setentityrenderproperty", function()
 		local ent = net.ReadEntity()
 		if not ent:IsValid() then return end
 		local property = net.ReadUInt( 4 )
-		if not renderProperties[ property ] then return end
+		if not getRenderProperties[ property ] then return end
 		
-		renderProperties[ property ]( ent )
+		local tbl = entsWithProperties[ ent ]
+		if not tbl then
+			tbl = {}
+			entsWithProperties[ ent ] = tbl
+		end
+		getRenderProperties[ property ]( tbl )
+		applyRenderProperties[ property ]( ent, tbl[ property ] )
 	end)
 
 	--- Allows manipulation of a hologram's bones' positions
