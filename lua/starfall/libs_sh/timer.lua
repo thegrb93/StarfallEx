@@ -47,7 +47,7 @@ end
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
--- @param func The function to call when the tiemr is fired
+-- @param func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func, simple)
 	SF.CheckType(name,"string")
 	SF.CheckType(delay,"number")
