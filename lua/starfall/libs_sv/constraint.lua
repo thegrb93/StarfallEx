@@ -1,5 +1,5 @@
 
---- Library for creating and manipulating physics-less models AKA "Props".
+--- Library for creating and manipulating constraints.
 -- @server
 local constraint_library = SF.Libraries.Register("constraint")
 
