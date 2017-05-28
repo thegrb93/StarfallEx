@@ -94,7 +94,7 @@ if CLIENT then
 				tbl[5] = {[group] = value}
 			end
 		end,
-		[6] = function( tbl ) --Skin.ReadUInt( 16 )
+		[6] = function( tbl ) --Skin
 			tbl[6] = net.ReadUInt( 16 )
 		end,
 		[7] = function( tbl ) --Rendermode
