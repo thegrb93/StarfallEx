@@ -1,10 +1,12 @@
-SF.Docs = {["hooks"] = {[1] = "EndEntityDriving";[2] = "EntityRemoved";[3] = "EntityTakeDamage";[4] = "FinishChat";[5] = "GravGunOnDropped";[6] = "GravGunOnPickedUp";[7] = "GravGunPunt";[8] = "Initialize";[9] = "KeyPress";[10] = "KeyRelease";[11] = "OnEntityCreated";[12] = "OnPhysgunFreeze";[13] = "OnPhysgunReload";[14] = "PhysgunDrop";[15] = "PhysgunPickup";[16] = "PlayerCanPickupWeapon";[17] = "PlayerDeath";[18] = "PlayerDisconnected";[19] = "PlayerEnteredVehicle";[20] = "PlayerHurt";[21] = "PlayerInitialSpawn";[22] = "PlayerLeaveVehicle";[23] = "PlayerNoClip";[24] = "PlayerSay";[25] = "PlayerSpawn";[26] = "PlayerSpray";[27] = "PlayerSwitchFlashlight";[28] = "PlayerSwitchWeapon";[29] = "PlayerUse";[30] = "PropBreak";[31] = "Removed";[32] = "StartChat";[33] = "StartEntityDriving";[34] = "calcview";[35] = "drawhud";[36] = "hudconnect";[37] = "huddisconnect";[38] = "input";[39] = "inputPressed";[40] = "inputReleased";[41] = "net";[42] = "postdrawhud";[43] = "postdrawopaquerenderables";[44] = "predrawhud";[45] = "predrawopaquerenderables";[46] = "readcell";[47] = "remote";[48] = "render";[49] = "renderoffscreen";[50] = "starfallUsed";[51] = "think";[52] = "tick";[53] = "writecell";["render"] = {["description"] = "\
+SF.Docs = {["hooks"] = {[1] = "EndEntityDriving";[2] = "EntityRemoved";[3] = "EntityTakeDamage";[4] = "FinishChat";[5] = "GravGunOnDropped";[6] = "GravGunOnPickedUp";[7] = "GravGunPunt";[8] = "Initialize";[9] = "KeyPress";[10] = "KeyRelease";[11] = "OnEntityCreated";[12] = "OnPhysgunFreeze";[13] = "OnPhysgunReload";[14] = "PhysgunDrop";[15] = "PhysgunPickup";[16] = "PlayerCanPickupWeapon";[17] = "PlayerDeath";[18] = "PlayerDisconnected";[19] = "PlayerEnteredVehicle";[20] = "PlayerHurt";[21] = "PlayerInitialSpawn";[22] = "PlayerLeaveVehicle";[23] = "PlayerNoClip";[24] = "PlayerSay";[25] = "PlayerSpawn";[26] = "PlayerSpray";[27] = "PlayerSwitchFlashlight";[28] = "PlayerSwitchWeapon";[29] = "PlayerUse";[30] = "PropBreak";[31] = "Removed";[32] = "StartChat";[33] = "StartEntityDriving";[34] = "calcview";[35] = "drawhud";[36] = "hudconnected";[37] = "huddisconnected";[38] = "input";[39] = "inputPressed";[40] = "inputReleased";[41] = "net";[42] = "postdrawhud";[43] = "postdrawopaquerenderables";[44] = "predrawhud";[45] = "predrawopaquerenderables";[46] = "readcell";[47] = "remote";[48] = "render";[49] = "renderoffscreen";[50] = "starfallUsed";[51] = "think";[52] = "tick";[53] = "writecell";["render"] = {["description"] = "\
 Called when a frame is requested to be drawn on screen. (2D/3D Context)";["class"] = "hook";["classForced"] = true;["name"] = "render";["realm"] = "cl";["summary"] = "\
 Called when a frame is requested to be drawn on screen.";["client"] = true;["param"] = {};};["PhysgunPickup"] = {["description"] = "\
 Called when an entity gets picked up by a physgun";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "PhysgunPickup";["summary"] = "\
-Called when an entity gets picked up by a physgun ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player picking up the entity";["ent"] = "Entity being picked up";};};["PlayerSay"] = {["ret"] = "New text. \"\" to stop from displaying. Nil to keep original.";["description"] = "\
-Called when a player sends a chat message";["class"] = "hook";["classForced"] = true;["name"] = "PlayerSay";["realm"] = "sh";["summary"] = "\
-Called when a player sends a chat message ";["server"] = true;["param"] = {[1] = "ply";[2] = "text";[3] = "teamChat";["text"] = "Content of the message";["ply"] = "Player that sent the message";["teamChat"] = "True if team chat";};};["PlayerCanPickupWeapon"] = {["description"] = "\
+Called when an entity gets picked up by a physgun ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player picking up the entity";["ent"] = "Entity being picked up";};};["hudconnected"] = {["description"] = "\
+Called when the player connects to a HUD component linked to the Starfall Chip";["class"] = "hook";["classForced"] = true;["name"] = "hudconnected";["realm"] = "cl";["summary"] = "\
+Called when the player connects to a HUD component linked to the Starfall Chip ";["client"] = true;["param"] = {};};["GravGunOnPickedUp"] = {["description"] = "\
+Called when an entity is being picked up by a gravity gun";["class"] = "hook";["classForced"] = true;["name"] = "GravGunOnPickedUp";["realm"] = "sh";["summary"] = "\
+Called when an entity is being picked up by a gravity gun ";["server"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player picking up an object";["ent"] = "Entity being picked up";};};["PlayerCanPickupWeapon"] = {["description"] = "\
 Called when a wants to pick up a weapon";["class"] = "hook";["classForced"] = true;["name"] = "PlayerCanPickupWeapon";["realm"] = "sh";["summary"] = "\
 Called when a wants to pick up a weapon ";["server"] = true;["param"] = {[1] = "ply";[2] = "wep";["ply"] = "Player";["wep"] = "Weapon";};};["calcview"] = {["ret"] = "table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}";["description"] = "\
 Called when the engine wants to calculate the player's view";["class"] = "hook";["classForced"] = true;["name"] = "calcview";["realm"] = "cl";["summary"] = "\
@@ -27,38 +29,38 @@ Called when an entity is being frozen";["class"] = "hook";["classForced"] = true
 Called when an entity is being frozen ";["server"] = true;["param"] = {[1] = "physgun";[2] = "physobj";[3] = "ent";[4] = "ply";["physgun"] = "Entity of the physgun";["physobj"] = "PhysObj of the entity";["ent"] = "Entity being frozen";["ply"] = "Player freezing the entity";};};["remote"] = {["description"] = "\
 Remote hook. \
 This hook can be called from other instances";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "remote";["summary"] = "\
-Remote hook.";["server"] = true;["client"] = true;["param"] = {[1] = "sender";[2] = "owner";[3] = "...";["owner"] = "The owner of the sender";["..."] = "The payload that was supplied when calling the hook";["sender"] = "The entity that caused the hook to run";};};["PlayerDisconnected"] = {["description"] = "\
-Called when a player disconnects";["class"] = "hook";["classForced"] = true;["name"] = "PlayerDisconnected";["realm"] = "sh";["summary"] = "\
-Called when a player disconnects ";["server"] = true;["param"] = {[1] = "ply";["ply"] = "Player that disconnected";};};["PlayerSwitchWeapon"] = {["description"] = "\
+Remote hook.";["server"] = true;["client"] = true;["param"] = {[1] = "sender";[2] = "owner";[3] = "...";["owner"] = "The owner of the sender";["..."] = "The payload that was supplied when calling the hook";["sender"] = "The entity that caused the hook to run";};};["huddisconnected"] = {["description"] = "\
+Called when the player disconnects from a HUD component linked to the Starfall Chip";["class"] = "hook";["classForced"] = true;["name"] = "huddisconnected";["realm"] = "cl";["summary"] = "\
+Called when the player disconnects from a HUD component linked to the Starfall Chip ";["client"] = true;["param"] = {};};["PlayerSwitchWeapon"] = {["description"] = "\
 Called when a player switches their weapon";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "PlayerSwitchWeapon";["summary"] = "\
 Called when a player switches their weapon ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "oldwep";[3] = "newweapon";["oldwep"] = "Old weapon";["ply"] = "Player droppig the entity";["newweapon"] = "New weapon";};};["OnPhysgunReload"] = {["description"] = "\
 Called when a player reloads his physgun";["class"] = "hook";["classForced"] = true;["name"] = "OnPhysgunReload";["realm"] = "sh";["summary"] = "\
 Called when a player reloads his physgun ";["server"] = true;["param"] = {[1] = "physgun";[2] = "ply";["physgun"] = "Entity of the physgun";["ply"] = "Player reloading the physgun";};};["PlayerSwitchFlashlight"] = {["description"] = "\
 Called when a players turns their flashlight on or off";["class"] = "hook";["classForced"] = true;["name"] = "PlayerSwitchFlashlight";["realm"] = "sh";["summary"] = "\
-Called when a players turns their flashlight on or off ";["server"] = true;["param"] = {[1] = "ply";[2] = "state";["state"] = "New flashlight state. True if on.";["ply"] = "Player switching flashlight";};};["huddisconnect"] = {["description"] = "\
-Called when the player disconnects from a HUD component linked to the Starfall Chip";["class"] = "hook";["classForced"] = true;["name"] = "huddisconnect";["realm"] = "cl";["summary"] = "\
-Called when the player disconnects from a HUD component linked to the Starfall Chip ";["client"] = true;["param"] = {};};["GravGunPunt"] = {["description"] = "\
-Called when a player punts with the gravity gun";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "GravGunPunt";["summary"] = "\
-Called when a player punts with the gravity gun ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player punting the gravgun";["ent"] = "Entity being punted";};};["PlayerUse"] = {["description"] = "\
+Called when a players turns their flashlight on or off ";["server"] = true;["param"] = {[1] = "ply";[2] = "state";["state"] = "New flashlight state. True if on.";["ply"] = "Player switching flashlight";};};["PlayerUse"] = {["description"] = "\
 Called when a player holds their use key and looks at an entity. \
 Will continuously run.";["class"] = "hook";["classForced"] = true;["name"] = "PlayerUse";["realm"] = "sh";["summary"] = "\
-Called when a player holds their use key and looks at an entity.";["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player using the entity";["ent"] = "Entity being used";};["server"] = true;};["writecell"] = {["classForced"] = true;["description"] = "\
-Called when a high speed device writes to a wired SF chip";["realm"] = "sv";["name"] = "writecell";["class"] = "hook";["summary"] = "\
-Called when a high speed device writes to a wired SF chip ";["param"] = {[1] = "address";[2] = "data";["data"] = "The data being written";["address"] = "The address written to";};};["EndEntityDriving"] = {["description"] = "\
+Called when a player holds their use key and looks at an entity.";["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player using the entity";["ent"] = "Entity being used";};["server"] = true;};["GravGunPunt"] = {["description"] = "\
+Called when a player punts with the gravity gun";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "GravGunPunt";["summary"] = "\
+Called when a player punts with the gravity gun ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player punting the gravgun";["ent"] = "Entity being punted";};};["readcell"] = {["ret"] = "The value read";["description"] = "\
+Called when a high speed device reads from a wired SF chip";["class"] = "hook";["classForced"] = true;["name"] = "readcell";["realm"] = "sv";["summary"] = "\
+Called when a high speed device reads from a wired SF chip ";["server"] = true;["param"] = {[1] = "address";["address"] = "The address requested";};};["EndEntityDriving"] = {["description"] = "\
 Called when a player stops driving an entity";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "EndEntityDriving";["summary"] = "\
 Called when a player stops driving an entity ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";[2] = "ply";["ent"] = "Entity that had been driven";["ply"] = "Player that drove the entity";};};["OnEntityCreated"] = {["description"] = "\
 Called when an entity gets created";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "OnEntityCreated";["summary"] = "\
-Called when an entity gets created ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";["ent"] = "New entity";};};["readcell"] = {["ret"] = "The value read";["description"] = "\
-Called when a high speed device reads from a wired SF chip";["class"] = "hook";["classForced"] = true;["name"] = "readcell";["realm"] = "sv";["summary"] = "\
-Called when a high speed device reads from a wired SF chip ";["server"] = true;["param"] = {[1] = "address";["address"] = "The address requested";};};["StartChat"] = {["description"] = "\
+Called when an entity gets created ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";["ent"] = "New entity";};};["writecell"] = {["classForced"] = true;["description"] = "\
+Called when a high speed device writes to a wired SF chip";["realm"] = "sv";["name"] = "writecell";["class"] = "hook";["summary"] = "\
+Called when a high speed device writes to a wired SF chip ";["param"] = {[1] = "address";[2] = "data";["data"] = "The data being written";["address"] = "The address written to";};};["StartChat"] = {["description"] = "\
 Called when the local player opens their chat window.";["class"] = "hook";["classForced"] = true;["name"] = "StartChat";["realm"] = "sh";["summary"] = "\
 Called when the local player opens their chat window.";["client"] = true;["param"] = {};};["GravGunOnDropped"] = {["description"] = "\
 Called when an entity is being dropped by a gravity gun";["class"] = "hook";["classForced"] = true;["name"] = "GravGunOnDropped";["realm"] = "sh";["summary"] = "\
-Called when an entity is being dropped by a gravity gun ";["server"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player dropping the object";["ent"] = "Entity being dropped";};};["net"] = {["classForced"] = true;["description"] = "\
-Called when a net message arrives";["realm"] = "sh";["name"] = "net";["class"] = "hook";["summary"] = "\
-Called when a net message arrives ";["param"] = {[1] = "name";[2] = "len";[3] = "ply";["len"] = "Length of the arriving net message in bytes";["name"] = "Name of the arriving net message";["ply"] = "On server, the player that sent the message. Nil on client.";};};["PlayerHurt"] = {["description"] = "\
+Called when an entity is being dropped by a gravity gun ";["server"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player dropping the object";["ent"] = "Entity being dropped";};};["renderoffscreen"] = {["description"] = "\
+Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)";["class"] = "hook";["classForced"] = true;["name"] = "renderoffscreen";["realm"] = "cl";["summary"] = "\
+Called when a frame is requested to be drawn.";["client"] = true;["param"] = {};};["PlayerHurt"] = {["description"] = "\
 Called when a player gets hurt";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "PlayerHurt";["summary"] = "\
-Called when a player gets hurt ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "attacker";[3] = "newHealth";[4] = "damageTaken";["newHealth"] = "New health of the player";["damageTaken"] = "Amount of damage the player has taken";["ply"] = "Player being hurt";["attacker"] = "Entity causing damage to the player";};};["inputReleased"] = {["classForced"] = true;["name"] = "inputReleased";["realm"] = "sh";["description"] = "\
+Called when a player gets hurt ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "attacker";[3] = "newHealth";[4] = "damageTaken";["newHealth"] = "New health of the player";["damageTaken"] = "Amount of damage the player has taken";["ply"] = "Player being hurt";["attacker"] = "Entity causing damage to the player";};};["net"] = {["classForced"] = true;["description"] = "\
+Called when a net message arrives";["realm"] = "sh";["name"] = "net";["class"] = "hook";["summary"] = "\
+Called when a net message arrives ";["param"] = {[1] = "name";[2] = "len";[3] = "ply";["len"] = "Length of the arriving net message in bytes";["name"] = "Name of the arriving net message";["ply"] = "On server, the player that sent the message. Nil on client.";};};["inputReleased"] = {["classForced"] = true;["name"] = "inputReleased";["realm"] = "sh";["description"] = "\
 Called when a button is released";["class"] = "hook";["summary"] = "\
 Called when a button is released ";["param"] = {[1] = "button";["button"] = "Number of the button";};};["inputPressed"] = {["classForced"] = true;["description"] = "\
 Called when a button is pressed";["realm"] = "sh";["name"] = "inputPressed";["class"] = "hook";["summary"] = "\
@@ -68,35 +70,33 @@ Called after the starfall chip is placed/reloaded with the toolgun or duplicated
 Called when the starfall chip is removed";["class"] = "hook";["classForced"] = true;["name"] = "Removed";["realm"] = "sh";["summary"] = "\
 Called when the starfall chip is removed ";["server"] = true;["param"] = {};};["tick"] = {["description"] = "\
 Tick hook. Called each game tick on both the server and client.";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "tick";["summary"] = "\
-Tick hook.";["server"] = true;["client"] = true;["param"] = {};};["think"] = {["description"] = "\
-Think hook. Called each frame on the client and each game tick on the server.";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "think";["summary"] = "\
-Think hook.";["server"] = true;["client"] = true;["param"] = {};};["PropBreak"] = {["description"] = "\
+Tick hook.";["server"] = true;["client"] = true;["param"] = {};};["PropBreak"] = {["description"] = "\
 Called when an entity is broken";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "PropBreak";["summary"] = "\
 Called when an entity is broken ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player who broke it";["ent"] = "Entity broken";};};["PlayerNoClip"] = {["description"] = "\
 Called when a player toggles noclip";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "PlayerNoClip";["summary"] = "\
-Called when a player toggles noclip ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "newState";["newState"] = "New noclip state. True if on.";["ply"] = "Player toggling noclip";};};["StartEntityDriving"] = {["description"] = "\
-Called when a player starts driving an entity";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "StartEntityDriving";["summary"] = "\
-Called when a player starts driving an entity ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";[2] = "ply";["ent"] = "Entity being driven";["ply"] = "Player that is driving the entity";};};["predrawopaquerenderables"] = {["description"] = "\
+Called when a player toggles noclip ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "newState";["newState"] = "New noclip state. True if on.";["ply"] = "Player toggling noclip";};};["think"] = {["description"] = "\
+Think hook. Called each frame on the client and each game tick on the server.";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "think";["summary"] = "\
+Think hook.";["server"] = true;["client"] = true;["param"] = {};};["predrawopaquerenderables"] = {["description"] = "\
 Called before opaque entities are drawn. (Only works with HUD) (3D context)";["class"] = "hook";["classForced"] = true;["name"] = "predrawopaquerenderables";["realm"] = "cl";["summary"] = "\
-Called before opaque entities are drawn.";["client"] = true;["param"] = {[1] = "boolean";["boolean"] = "isDrawSkybox  Whether the current draw is drawing the skybox.";};};["EntityRemoved"] = {["description"] = "\
+Called before opaque entities are drawn.";["client"] = true;["param"] = {[1] = "boolean";["boolean"] = "isDrawSkybox  Whether the current draw is drawing the skybox.";};};["StartEntityDriving"] = {["description"] = "\
+Called when a player starts driving an entity";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "StartEntityDriving";["summary"] = "\
+Called when a player starts driving an entity ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";[2] = "ply";["ent"] = "Entity being driven";["ply"] = "Player that is driving the entity";};};["EntityRemoved"] = {["description"] = "\
 Called when an entity is removed";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "EntityRemoved";["summary"] = "\
-Called when an entity is removed ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";["ent"] = "Entity being removed";};};["hudconnect"] = {["description"] = "\
-Called when the player connects to a HUD component linked to the Starfall Chip";["class"] = "hook";["classForced"] = true;["name"] = "hudconnect";["realm"] = "cl";["summary"] = "\
-Called when the player connects to a HUD component linked to the Starfall Chip ";["client"] = true;["param"] = {};};["postdrawhud"] = {["description"] = "\
+Called when an entity is removed ";["server"] = true;["client"] = true;["param"] = {[1] = "ent";["ent"] = "Entity being removed";};};["postdrawhud"] = {["description"] = "\
 Called after drawing HUD (2D Context)";["class"] = "hook";["classForced"] = true;["name"] = "postdrawhud";["realm"] = "cl";["summary"] = "\
 Called after drawing HUD (2D Context) ";["client"] = true;["param"] = {};};["predrawhud"] = {["description"] = "\
 Called before drawing HUD (2D Context)";["class"] = "hook";["classForced"] = true;["name"] = "predrawhud";["realm"] = "cl";["summary"] = "\
-Called before drawing HUD (2D Context) ";["client"] = true;["param"] = {};};["renderoffscreen"] = {["description"] = "\
-Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)";["class"] = "hook";["classForced"] = true;["name"] = "renderoffscreen";["realm"] = "cl";["summary"] = "\
-Called when a frame is requested to be drawn.";["client"] = true;["param"] = {};};["PlayerEnteredVehicle"] = {["description"] = "\
+Called before drawing HUD (2D Context) ";["client"] = true;["param"] = {};};["PlayerLeaveVehicle"] = {["description"] = "\
+Called when a players leaves a vehicle";["class"] = "hook";["classForced"] = true;["name"] = "PlayerLeaveVehicle";["realm"] = "sh";["summary"] = "\
+Called when a players leaves a vehicle ";["server"] = true;["param"] = {[1] = "ply";[2] = "vehicle";["vehicle"] = "Vehicle that was left";["ply"] = "Player who left a vehicle";};};["PlayerSay"] = {["ret"] = "New text. \"\" to stop from displaying. Nil to keep original.";["description"] = "\
+Called when a player sends a chat message";["class"] = "hook";["classForced"] = true;["name"] = "PlayerSay";["realm"] = "sh";["summary"] = "\
+Called when a player sends a chat message ";["server"] = true;["param"] = {[1] = "ply";[2] = "text";[3] = "teamChat";["text"] = "Content of the message";["ply"] = "Player that sent the message";["teamChat"] = "True if team chat";};};["PlayerEnteredVehicle"] = {["description"] = "\
 Called when a players enters a vehicle";["class"] = "hook";["classForced"] = true;["name"] = "PlayerEnteredVehicle";["realm"] = "sh";["summary"] = "\
-Called when a players enters a vehicle ";["server"] = true;["param"] = {[1] = "ply";[2] = "vehicle";[3] = "num";["vehicle"] = "Vehicle that was entered";["ply"] = "Player who entered a vehicle";["num"] = "Role";};};["drawhud"] = {["description"] = "\
-Called when a frame is requested to be drawn on hud. (2D Context)";["class"] = "hook";["classForced"] = true;["name"] = "drawhud";["realm"] = "cl";["summary"] = "\
-Called when a frame is requested to be drawn on hud.";["client"] = true;["param"] = {};};["postdrawopaquerenderables"] = {["description"] = "\
+Called when a players enters a vehicle ";["server"] = true;["param"] = {[1] = "ply";[2] = "vehicle";[3] = "num";["vehicle"] = "Vehicle that was entered";["ply"] = "Player who entered a vehicle";["num"] = "Role";};};["postdrawopaquerenderables"] = {["description"] = "\
 Called after opaque entities are drawn. (Only works with HUD) (3D context)";["class"] = "hook";["classForced"] = true;["name"] = "postdrawopaquerenderables";["realm"] = "cl";["summary"] = "\
-Called after opaque entities are drawn.";["client"] = true;["param"] = {[1] = "boolean";["boolean"] = "isDrawSkybox  Whether the current draw is drawing the skybox.";};};["GravGunOnPickedUp"] = {["description"] = "\
-Called when an entity is being picked up by a gravity gun";["class"] = "hook";["classForced"] = true;["name"] = "GravGunOnPickedUp";["realm"] = "sh";["summary"] = "\
-Called when an entity is being picked up by a gravity gun ";["server"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player picking up an object";["ent"] = "Entity being picked up";};};["PhysgunDrop"] = {["description"] = "\
+Called after opaque entities are drawn.";["client"] = true;["param"] = {[1] = "boolean";["boolean"] = "isDrawSkybox  Whether the current draw is drawing the skybox.";};};["drawhud"] = {["description"] = "\
+Called when a frame is requested to be drawn on hud. (2D Context)";["class"] = "hook";["classForced"] = true;["name"] = "drawhud";["realm"] = "cl";["summary"] = "\
+Called when a frame is requested to be drawn on hud.";["client"] = true;["param"] = {};};["PhysgunDrop"] = {["description"] = "\
 Called when an entity being held by a physgun gets dropped";["class"] = "hook";["classForced"] = true;["realm"] = "sh";["name"] = "PhysgunDrop";["summary"] = "\
 Called when an entity being held by a physgun gets dropped ";["server"] = true;["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ply"] = "Player droppig the entity";["ent"] = "Entity being dropped";};};["input"] = {["classForced"] = true;["description"] = "\
 Called when an input on a wired SF chip is written to";["realm"] = "sv";["name"] = "input";["class"] = "hook";["summary"] = "\
@@ -104,9 +104,9 @@ Called when an input on a wired SF chip is written to ";["param"] = {[1] = "inpu
 Called when a player uses the screen";["realm"] = "cl";["name"] = "starfallUsed";["class"] = "hook";["summary"] = "\
 Called when a player uses the screen ";["param"] = {[1] = "activator";["activator"] = "Player using the screen";};};["PlayerDeath"] = {["description"] = "\
 Called when a player dies";["class"] = "hook";["classForced"] = true;["name"] = "PlayerDeath";["realm"] = "sh";["summary"] = "\
-Called when a player dies ";["server"] = true;["param"] = {[1] = "ply";[2] = "inflictor";[3] = "attacker";["inflictor"] = "Entity used to kill the player";["ply"] = "Player who died";["attacker"] = "Entity that killed the player";};};["PlayerLeaveVehicle"] = {["description"] = "\
-Called when a players leaves a vehicle";["class"] = "hook";["classForced"] = true;["name"] = "PlayerLeaveVehicle";["realm"] = "sh";["summary"] = "\
-Called when a players leaves a vehicle ";["server"] = true;["param"] = {[1] = "ply";[2] = "vehicle";["vehicle"] = "Vehicle that was left";["ply"] = "Player who left a vehicle";};};};["libraries"] = {[1] = "bass";[2] = "builtin";[3] = "constraint";[4] = "coroutine";[5] = "fastlz";[6] = "file";[7] = "find";[8] = "game";[9] = "holograms";[10] = "hook";[11] = "http";[12] = "input";[13] = "joystick";[14] = "json";[15] = "mesh";[16] = "net";[17] = "physenv";[18] = "prop";[19] = "quaternion";[20] = "render";[21] = "sounds";[22] = "team";[23] = "timer";[24] = "trace";[25] = "von";[26] = "wire";["render"] = {["functions"] = {[1] = "capturePixels";[2] = "clear";[3] = "clearDepth";[4] = "createFont";[5] = "createRenderTarget";[6] = "cursorPos";[7] = "destroyRenderTarget";[8] = "destroyTexture";[9] = "disableScissorRect";[10] = "draw3DBeam";[11] = "draw3DBox";[12] = "draw3DLine";[13] = "draw3DQuad";[14] = "draw3DSphere";[15] = "draw3DSprite";[16] = "draw3DWireframeBox";[17] = "draw3DWireframeSphere";[18] = "drawCircle";[19] = "drawLine";[20] = "drawPoly";[21] = "drawRect";[22] = "drawRectOutline";[23] = "drawRoundedBox";[24] = "drawRoundedBoxEx";[25] = "drawSimpleText";[26] = "drawText";[27] = "drawTexturedRect";[28] = "drawTexturedRectRotated";[29] = "drawTexturedRectUV";[30] = "enableDepth";[31] = "enableScissorRect";[32] = "getDefaultFont";[33] = "getRenderTargetMaterial";[34] = "getResolution";[35] = "getScreenEntity";[36] = "getScreenInfo";[37] = "getTextSize";[38] = "getTextureID";[39] = "isHUDActive";[40] = "parseMarkup";[41] = "popMatrix";[42] = "popViewMatrix";[43] = "pushMatrix";[44] = "pushViewMatrix";[45] = "readPixel";[46] = "selectRenderTarget";[47] = "setColor";[48] = "setFont";[49] = "setRGBA";[50] = "setRenderTargetTexture";[51] = "setTexture";[52] = "setTextureFromScreen";[53] = "traceSurfaceColor";["drawTexturedRectUV"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.drawTexturedRectUV";["summary"] = "\
+Called when a player dies ";["server"] = true;["param"] = {[1] = "ply";[2] = "inflictor";[3] = "attacker";["inflictor"] = "Entity used to kill the player";["ply"] = "Player who died";["attacker"] = "Entity that killed the player";};};["PlayerDisconnected"] = {["description"] = "\
+Called when a player disconnects";["class"] = "hook";["classForced"] = true;["name"] = "PlayerDisconnected";["realm"] = "sh";["summary"] = "\
+Called when a player disconnects ";["server"] = true;["param"] = {[1] = "ply";["ply"] = "Player that disconnected";};};};["libraries"] = {[1] = "bass";[2] = "builtin";[3] = "constraint";[4] = "coroutine";[5] = "fastlz";[6] = "file";[7] = "find";[8] = "game";[9] = "holograms";[10] = "hook";[11] = "http";[12] = "input";[13] = "joystick";[14] = "json";[15] = "mesh";[16] = "net";[17] = "physenv";[18] = "prop";[19] = "quaternion";[20] = "render";[21] = "sounds";[22] = "team";[23] = "timer";[24] = "trace";[25] = "von";[26] = "wire";["render"] = {["functions"] = {[1] = "capturePixels";[2] = "clear";[3] = "clearDepth";[4] = "createFont";[5] = "createRenderTarget";[6] = "cursorPos";[7] = "destroyRenderTarget";[8] = "destroyTexture";[9] = "disableScissorRect";[10] = "draw3DBeam";[11] = "draw3DBox";[12] = "draw3DLine";[13] = "draw3DQuad";[14] = "draw3DSphere";[15] = "draw3DSprite";[16] = "draw3DWireframeBox";[17] = "draw3DWireframeSphere";[18] = "drawCircle";[19] = "drawLine";[20] = "drawPoly";[21] = "drawRect";[22] = "drawRectOutline";[23] = "drawRoundedBox";[24] = "drawRoundedBoxEx";[25] = "drawSimpleText";[26] = "drawText";[27] = "drawTexturedRect";[28] = "drawTexturedRectRotated";[29] = "drawTexturedRectUV";[30] = "enableDepth";[31] = "enableScissorRect";[32] = "getDefaultFont";[33] = "getRenderTargetMaterial";[34] = "getResolution";[35] = "getScreenEntity";[36] = "getScreenInfo";[37] = "getTextSize";[38] = "getTextureID";[39] = "isHUDActive";[40] = "parseMarkup";[41] = "popMatrix";[42] = "popViewMatrix";[43] = "pushMatrix";[44] = "pushViewMatrix";[45] = "readPixel";[46] = "selectRenderTarget";[47] = "setColor";[48] = "setFont";[49] = "setRGBA";[50] = "setRenderTargetTexture";[51] = "setTexture";[52] = "setTextureFromScreen";[53] = "traceSurfaceColor";["drawTexturedRectUV"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.drawTexturedRectUV";["summary"] = "\
 Draws a textured rectangle with UV coordinates ";["private"] = false;["library"] = "render";["description"] = "\
 Draws a textured rectangle with UV coordinates";["param"] = {[1] = "x";[2] = "y";[3] = "w";[4] = "h";[5] = "startU";[6] = "startV";[7] = "endU";[8] = "endV";["startV"] = "Texture mapping at rectangle origin";["x"] = "Top left corner x coordinate";["endV"] = "Texture mapping at rectangle end";["startU"] = "Texture mapping at rectangle origin";["y"] = "Top left corner y coordinate";["w"] = "Width";["h"] = "Height";};};["popViewMatrix"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.popViewMatrix";["summary"] = "\
 Pops a view matrix from the matrix stack.";["private"] = false;["library"] = "render";["description"] = "\
@@ -201,8 +201,8 @@ Returns the model material name that uses the render target.";["private"] = fals
 Returns the model material name that uses the render target.";["param"] = {[1] = "name";["name"] = "Render target name";};};["draw3DSprite"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.draw3DSprite";["summary"] = "\
 Draws a sprite in 3d space.";["private"] = false;["library"] = "render";["description"] = "\
 Draws a sprite in 3d space.";["param"] = {[1] = "pos";[2] = "width";[3] = "height";["height"] = "Height of the sprite.";["width"] = "Width of the sprite.";["pos"] = "Position of the sprite.";};};["clear"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.clear";["summary"] = "\
-Clears the surface ";["private"] = false;["library"] = "render";["description"] = "\
-Clears the surface";["param"] = {[1] = "clr";[2] = "depth";["depth"] = "Boolean if should clear depth";["clr"] = "Color type to clear with";};};["clearDepth"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.clearDepth";["summary"] = "\
+Clears the active render target ";["private"] = false;["library"] = "render";["description"] = "\
+Clears the active render target";["param"] = {[1] = "clr";[2] = "depth";["depth"] = "Boolean if should clear depth";["clr"] = "Color type to clear with";};};["clearDepth"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.clearDepth";["summary"] = "\
 Resets the depth buffer ";["private"] = false;["library"] = "render";["description"] = "\
 Resets the depth buffer";["param"] = {};};["drawLine"] = {["class"] = "function";["realm"] = "cl";["name"] = "render_library.drawLine";["summary"] = "\
 Draws a line ";["private"] = false;["library"] = "render";["description"] = "\
@@ -310,19 +310,21 @@ Convert table to JSON string";["param"] = {[1] = "tbl";["tbl"] = "Table to encod
 Convert JSON string to table ";["private"] = false;["library"] = "json";["description"] = "\
 Convert JSON string to table";["param"] = {[1] = "s";["s"] = "String to decode";};};};["class"] = "library";["summary"] = "\
 JSON library ";["fields"] = {};["name"] = "json";["client"] = true;["description"] = "\
-JSON library";["libtbl"] = "json_library";["tables"] = {};["server"] = true;};["prop"] = {["functions"] = {[1] = "canSpawn";[2] = "create";[3] = "createSent";[4] = "propsLeft";[5] = "setPropClean";[6] = "spawnRate";["canSpawn"] = {["ret"] = "True if user can spawn props, False if not.";["class"] = "function";["realm"] = "sv";["summary"] = "\
+JSON library";["libtbl"] = "json_library";["tables"] = {};["server"] = true;};["prop"] = {["functions"] = {[1] = "canSpawn";[2] = "create";[3] = "createSent";[4] = "propsLeft";[5] = "setPropClean";[6] = "setPropUndo";[7] = "spawnRate";["setPropUndo"] = {["class"] = "function";["realm"] = "sv";["name"] = "props_library.setPropUndo";["summary"] = "\
+Sets whether the props should be undo-able ";["private"] = false;["library"] = "prop";["description"] = "\
+Sets whether the props should be undo-able";["param"] = {[1] = "on";["on"] = "Boolean whether the props should be undo-able";};};["canSpawn"] = {["ret"] = "True if user can spawn props, False if not.";["class"] = "function";["realm"] = "sv";["summary"] = "\
 Checks if a user can spawn anymore props.";["name"] = "props_library.canSpawn";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
 Checks if a user can spawn anymore props.";["param"] = {};};["createSent"] = {["ret"] = "The sent object";["class"] = "function";["realm"] = "sv";["summary"] = "\
 Creates a sent.";["name"] = "props_library.createSent";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
-Creates a sent.";["param"] = {[1] = "pos";[2] = "ang";[3] = "class";[4] = "frozen";};};["propsLeft"] = {["ret"] = "number of props able to be spawned";["class"] = "function";["realm"] = "sv";["summary"] = "\
-Checks how many props can be spawned ";["name"] = "props_library.propsLeft";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
-Checks how many props can be spawned";["param"] = {};};["setPropClean"] = {["class"] = "function";["realm"] = "sv";["name"] = "props_library.setPropClean";["summary"] = "\
-Sets whether the chip should remove created props when the chip is removed ";["private"] = false;["library"] = "prop";["description"] = "\
-Sets whether the chip should remove created props when the chip is removed";["param"] = {[1] = "on";["on"] = "Boolean whether the props should be cleaned or not";};};["create"] = {["ret"] = "The prop object";["class"] = "function";["realm"] = "sv";["summary"] = "\
-Creates a prop.";["name"] = "props_library.create";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
-Creates a prop.";["param"] = {[1] = "pos";[2] = "ang";[3] = "model";[4] = "frozen";};};["spawnRate"] = {["ret"] = "Number of props per second the user can spawn";["class"] = "function";["realm"] = "sv";["summary"] = "\
+Creates a sent.";["param"] = {[1] = "pos";[2] = "ang";[3] = "class";[4] = "frozen";};};["spawnRate"] = {["ret"] = "Number of props per second the user can spawn";["class"] = "function";["realm"] = "sv";["summary"] = "\
 Returns how many props per second the user can spawn ";["name"] = "props_library.spawnRate";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
-Returns how many props per second the user can spawn";["param"] = {};};};["class"] = "library";["summary"] = "\
+Returns how many props per second the user can spawn";["param"] = {};};["propsLeft"] = {["ret"] = "number of props able to be spawned";["class"] = "function";["realm"] = "sv";["summary"] = "\
+Checks how many props can be spawned ";["name"] = "props_library.propsLeft";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
+Checks how many props can be spawned";["param"] = {};};["create"] = {["ret"] = "The prop object";["class"] = "function";["realm"] = "sv";["summary"] = "\
+Creates a prop.";["name"] = "props_library.create";["library"] = "prop";["private"] = false;["server"] = true;["description"] = "\
+Creates a prop.";["param"] = {[1] = "pos";[2] = "ang";[3] = "model";[4] = "frozen";};};["setPropClean"] = {["class"] = "function";["realm"] = "sv";["name"] = "props_library.setPropClean";["summary"] = "\
+Sets whether the chip should remove created props when the chip is removed ";["private"] = false;["library"] = "prop";["description"] = "\
+Sets whether the chip should remove created props when the chip is removed";["param"] = {[1] = "on";["on"] = "Boolean whether the props should be cleaned or not";};};};["class"] = "library";["summary"] = "\
 Library for creating and manipulating physics-less models AKA \"Props\".";["fields"] = {};["name"] = "prop";["client"] = true;["description"] = "\
 Library for creating and manipulating physics-less models AKA \"Props\".";["libtbl"] = "props_library";["tables"] = {};["server"] = true;};["sounds"] = {["functions"] = {[1] = "create";["create"] = {["ret"] = "Sound Object";["class"] = "function";["realm"] = "sh";["name"] = "sound_library.create";["summary"] = "\
 Creates a sound and attaches it to an entity ";["private"] = false;["library"] = "sounds";["description"] = "\
@@ -439,7 +441,7 @@ Returns whether or not the server is a dedicated server";["param"] = {};};["getH
 Returns The hostname ";["private"] = false;["library"] = "game";["description"] = "\
 Returns The hostname";["param"] = {};};};["class"] = "library";["summary"] = "\
 Game functions ";["fields"] = {};["name"] = "game";["client"] = true;["description"] = "\
-Game functions";["libtbl"] = "game_lib";["tables"] = {};["server"] = true;};["net"] = {["functions"] = {[1] = "getBytesLeft";[2] = "readAngle";[3] = "readBit";[4] = "readColor";[5] = "readData";[6] = "readDouble";[7] = "readEntity";[8] = "readFloat";[9] = "readInt";[10] = "readMatrix";[11] = "readStream";[12] = "readString";[13] = "readUInt";[14] = "readVector";[15] = "send";[16] = "start";[17] = "writeAngle";[18] = "writeBit";[19] = "writeColor";[20] = "writeData";[21] = "writeDouble";[22] = "writeEntity";[23] = "writeFloat";[24] = "writeInt";[25] = "writeMatrix";[26] = "writeStream";[27] = "writeString";[28] = "writeUInt";[29] = "writeVector";["writeVector"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Game functions";["libtbl"] = "game_lib";["tables"] = {};["server"] = true;};["net"] = {["functions"] = {[1] = "getBytesLeft";[2] = "isStreaming";[3] = "readAngle";[4] = "readBit";[5] = "readColor";[6] = "readData";[7] = "readDouble";[8] = "readEntity";[9] = "readFloat";[10] = "readInt";[11] = "readMatrix";[12] = "readStream";[13] = "readString";[14] = "readUInt";[15] = "readVector";[16] = "send";[17] = "start";[18] = "writeAngle";[19] = "writeBit";[20] = "writeColor";[21] = "writeData";[22] = "writeDouble";[23] = "writeEntity";[24] = "writeFloat";[25] = "writeInt";[26] = "writeMatrix";[27] = "writeStream";[28] = "writeString";[29] = "writeUInt";[30] = "writeVector";["writeVector"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
 Writes an vector to the net message ";["library"] = "net";["name"] = "net_library.writeVector";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Writes an vector to the net message";["param"] = {[1] = "t";["t"] = "The vector to be written";};};["readColor"] = {["ret"] = "The color that was read";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Reads a color from the net message ";["library"] = "net";["name"] = "net_library.readColor";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
@@ -457,7 +459,9 @@ Reads a float from the net message";["param"] = {};};["writeBit"] = {["class"] =
 Writes a bit to the net message ";["library"] = "net";["name"] = "net_library.writeBit";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Writes a bit to the net message";["param"] = {[1] = "t";["t"] = "The bit to be written. (boolean)";};};["writeMatrix"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
 Writes an matrix to the net message ";["library"] = "net";["name"] = "net_library.writeMatrix";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Writes an matrix to the net message";["param"] = {[1] = "t";["t"] = "The matrix to be written";};};["readUInt"] = {["ret"] = "The unsigned integer that was read";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Writes an matrix to the net message";["param"] = {[1] = "t";["t"] = "The matrix to be written";};};["isStreaming"] = {["ret"] = "Boolean";["class"] = "function";["realm"] = "sh";["name"] = "net_library.isStreaming";["summary"] = "\
+Returns whether or not the library is currently reading data from a stream ";["private"] = false;["library"] = "net";["description"] = "\
+Returns whether or not the library is currently reading data from a stream";["param"] = {};};["readUInt"] = {["ret"] = "The unsigned integer that was read";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Reads an unsigned integer from the net message ";["library"] = "net";["name"] = "net_library.readUInt";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Reads an unsigned integer from the net message";["param"] = {[1] = "n";["n"] = "The amount of bits to read";};};["readBit"] = {["ret"] = "The bit that was read. (0 for false, 1 for true)";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Reads a bit from the net message ";["library"] = "net";["name"] = "net_library.readBit";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
@@ -632,7 +636,7 @@ Returns the total used time for all chips by the player.";["param"] = {};};["set
 Same as Lua's setmetatable. Doesn't work on most internal metatables";["class"] = "function";["classForced"] = true;["name"] = "SF.DefaultEnvironment.setmetatable";["realm"] = "sh";["summary"] = "\
 Same as Lua's setmetatable.";["library"] = "builtin";["param"] = {[1] = "tbl";[2] = "meta";["meta"] = "The metatable to use";["tbl"] = "The table to set the metatable of";};};["error"] = {["class"] = "function";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.error";["summary"] = "\
 Throws a raw exception.";["private"] = false;["library"] = "builtin";["description"] = "\
-Throws a raw exception.";["param"] = {[1] = "msg";["msg"] = "Exception message";};};["setSoftQuota"] = {["class"] = "function";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setSoftQuota";["summary"] = "\
+Throws a raw exception.";["param"] = {[1] = "msg";[2] = "level";["level"] = "Which level in the stacktrace to blame. Defaults to 1";["msg"] = "Exception message";};};["setSoftQuota"] = {["class"] = "function";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setSoftQuota";["summary"] = "\
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["private"] = false;["library"] = "builtin";["description"] = "\
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["param"] = {[1] = "quota";["quota"] = "The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%";};};};["libtbl"] = "SF.DefaultEnvironment";["client"] = true;["server"] = true;};["timer"] = {["functions"] = {[1] = "adjust";[2] = "create";[3] = "curtime";[4] = "exists";[5] = "frametime";[6] = "getTimersLeft";[7] = "pause";[8] = "realtime";[9] = "remove";[10] = "repsleft";[11] = "simple";[12] = "start";[13] = "stop";[14] = "systime";[15] = "timeleft";[16] = "toggle";[17] = "unpause";["getTimersLeft"] = {["ret"] = "Number of available timers";["class"] = "function";["realm"] = "sh";["name"] = "timer_library.getTimersLeft";["summary"] = "\
 Returns number of available timers ";["private"] = false;["library"] = "timer";["description"] = "\
@@ -652,7 +656,7 @@ Runs either timer.pause or timer.unpause based on the timer's current status.";[
 Creates a simple timer, has no name, can't be stopped, paused, or destroyed.";["private"] = false;["library"] = "timer";["description"] = "\
 Creates a simple timer, has no name, can't be stopped, paused, or destroyed.";["param"] = {[1] = "delay";[2] = "func";["delay"] = "the time, in second, to set the timer to";["func"] = "the function to call when the timer is fired";};};["create"] = {["class"] = "function";["realm"] = "sh";["name"] = "timer_library.create";["summary"] = "\
 Creates (and starts) a timer ";["private"] = false;["library"] = "timer";["description"] = "\
-Creates (and starts) a timer";["param"] = {[1] = "name";[2] = "delay";[3] = "reps";[4] = "func";[5] = "simple";["name"] = "The timer name";["func"] = "The function to call when the tiemr is fired";["delay"] = "The time, in seconds, to set the timer to.";["reps"] = "The repititions of the tiemr. 0 = infinte, nil = 1";};};["timeleft"] = {["ret"] = "The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist";["class"] = "function";["realm"] = "sh";["name"] = "timer_library.timeleft";["summary"] = "\
+Creates (and starts) a timer";["param"] = {[1] = "name";[2] = "delay";[3] = "reps";[4] = "func";[5] = "simple";["name"] = "The timer name";["func"] = "The function to call when the timer is fired";["delay"] = "The time, in seconds, to set the timer to.";["reps"] = "The repititions of the tiemr. 0 = infinte, nil = 1";};};["timeleft"] = {["ret"] = "The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist";["class"] = "function";["realm"] = "sh";["name"] = "timer_library.timeleft";["summary"] = "\
 Returns amount of time left (in seconds) before the timer executes its function.";["private"] = false;["library"] = "timer";["description"] = "\
 Returns amount of time left (in seconds) before the timer executes its function.";["param"] = {[1] = "name";[2] = "The";["The"] = "timer name";};};["repsleft"] = {["ret"] = "The amount of executions left. Nil if timer doesnt exist";["class"] = "function";["realm"] = "sh";["name"] = "timer_library.repsleft";["summary"] = "\
 Returns amount of repetitions/executions left before the timer destroys itself.";["private"] = false;["library"] = "timer";["description"] = "\
@@ -786,8 +790,8 @@ Ballsocket two entities ";["name"] = "constraint_library.ballsocket";["library"]
 Ballsocket two entities";["param"] = {[1] = "e1";[2] = "e2";[3] = "bone1";[4] = "bone2";[5] = "v1";[6] = "force_lim";[7] = "torque_lim";[8] = "nocollide";};};["slider"] = {["class"] = "function";["realm"] = "sv";["summary"] = "\
 Sliders two entities ";["name"] = "constraint_library.slider";["library"] = "constraint";["private"] = false;["server"] = true;["description"] = "\
 Sliders two entities";["param"] = {[1] = "e1";[2] = "e2";[3] = "bone1";[4] = "bone2";[5] = "v1";[6] = "v2";[7] = "width";};};};["class"] = "library";["summary"] = "\
-Library for creating and manipulating physics-less models AKA \"Props\".";["fields"] = {};["name"] = "constraint";["description"] = "\
-Library for creating and manipulating physics-less models AKA \"Props\".";["libtbl"] = "constraint_library";["tables"] = {};["server"] = true;};["http"] = {["functions"] = {[1] = "canRequest";[2] = "get";[3] = "post";["post"] = {["class"] = "function";["realm"] = "sh";["name"] = "http_library.post";["summary"] = "\
+Library for creating and manipulating constraints.";["fields"] = {};["name"] = "constraint";["description"] = "\
+Library for creating and manipulating constraints.";["libtbl"] = "constraint_library";["tables"] = {};["server"] = true;};["http"] = {["functions"] = {[1] = "canRequest";[2] = "get";[3] = "post";["post"] = {["class"] = "function";["realm"] = "sh";["name"] = "http_library.post";["summary"] = "\
 Runs a new http POST request ";["private"] = false;["library"] = "http";["description"] = "\
 Runs a new http POST request";["param"] = {[1] = "url";[2] = "params";[3] = "callbackSuccess";[4] = "callbackFail";["callbackFail"] = "the function to be called on request fail, taking the failing reason as an argument";["callbackSuccess"] = "the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)";["url"] = "http target url";["params"] = "POST parameters to be sent";};};["canRequest"] = {["class"] = "function";["realm"] = "sh";["name"] = "http_library.canRequest";["summary"] = "\
 Checks if a new http request can be started ";["private"] = false;["library"] = "http";["description"] = "\
@@ -795,7 +799,7 @@ Checks if a new http request can be started";["param"] = {};};["get"] = {["class
 Runs a new http GET request ";["private"] = false;["library"] = "http";["description"] = "\
 Runs a new http GET request";["param"] = {[1] = "url";[2] = "callbackSuccess";[3] = "callbackFail";["url"] = "http target url";["callbackSuccess"] = "the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)";["callbackFail"] = "the function to be called on request fail, taking the failing reason as an argument";};};};["class"] = "library";["summary"] = "\
 Http library.";["fields"] = {};["name"] = "http";["client"] = true;["description"] = "\
-Http library. Requests content from urls.";["libtbl"] = "http_library";["tables"] = {};["server"] = true;};};["classes"] = {[1] = "Angle";[2] = "Bass";[3] = "Color";[4] = "Entity";[5] = "File";[6] = "Hologram";[7] = "Mesh";[8] = "Npc";[9] = "Player";[10] = "Quaternion";[11] = "Sound";[12] = "VMatrix";[13] = "Vector";[14] = "Vehicle";[15] = "Weapon";[16] = "Wirelink";["Quaternion"] = {["typtbl"] = "quat_methods";["fields"] = {};["name"] = "Quaternion";["summary"] = "\
+Http library. Requests content from urls.";["libtbl"] = "http_library";["tables"] = {};["server"] = true;};};["classes"] = {[1] = "Angle";[2] = "Bass";[3] = "Color";[4] = "Entity";[5] = "File";[6] = "Hologram";[7] = "Mesh";[8] = "Npc";[9] = "PhysObj";[10] = "Player";[11] = "Quaternion";[12] = "Sound";[13] = "VMatrix";[14] = "Vector";[15] = "Vehicle";[16] = "Weapon";[17] = "Wirelink";["Quaternion"] = {["typtbl"] = "quat_methods";["fields"] = {};["name"] = "Quaternion";["summary"] = "\
 Quaternion type ";["description"] = "\
 Quaternion type";["class"] = "class";["methods"] = {[1] = "conj";[2] = "forward";[3] = "i";[4] = "j";[5] = "k";[6] = "r";[7] = "real";[8] = "right";[9] = "up";["conj"] = {["class"] = "function";["realm"] = "sh";["name"] = "quat_methods:conj";["summary"] = "\
 Returns the conj of self ";["private"] = false;["classlib"] = "Quaternion";["description"] = "\
@@ -815,7 +819,51 @@ Returns the j component of the quaternion";["param"] = {};};["forward"] = {["cla
 Returns vector pointing forward for <this> ";["private"] = false;["classlib"] = "Quaternion";["description"] = "\
 Returns vector pointing forward for <this>";["param"] = {};};["up"] = {["class"] = "function";["realm"] = "sh";["name"] = "quat_methods:up";["summary"] = "\
 Returns vector pointing up for <this> ";["private"] = false;["classlib"] = "Quaternion";["description"] = "\
-Returns vector pointing up for <this>";["param"] = {};};};};["Hologram"] = {["typtbl"] = "hologram_methods";["fields"] = {};["name"] = "Hologram";["summary"] = "\
+Returns vector pointing up for <this>";["param"] = {};};};};["PhysObj"] = {["typtbl"] = "physobj_methods";["summary"] = "\
+PhysObj Type ";["fields"] = {};["name"] = "PhysObj";["server"] = true;["description"] = "\
+PhysObj Type";["client"] = true;["class"] = "class";["methods"] = {[1] = "applyForceCenter";[2] = "applyForceOffset";[3] = "getAngleVelocity";[4] = "getAngles";[5] = "getEntity";[6] = "getInertia";[7] = "getMass";[8] = "getMassCenter";[9] = "getMaterial";[10] = "getMesh";[11] = "getMeshConvexes";[12] = "getPos";[13] = "getVelocity";[14] = "isValid";[15] = "setInertia";[16] = "setMass";[17] = "setMaterial";[18] = "setPos";[19] = "setVelocity";[20] = "worldToLocal";[21] = "worldToLocal";[22] = "worldToLocalVector";[23] = "worldToLocalVector";["setMaterial"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Sets the physical material of a physics object ";["name"] = "physobj_methods:setMaterial";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Sets the physical material of a physics object";["param"] = {[1] = "material";["material"] = "The physical material to set it to";};};["getMass"] = {["ret"] = "mass of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the mass of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getMass";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the mass of the physics object";["param"] = {};};["worldToLocalVector"] = {["ret"] = "The transformed vector";["class"] = "function";["realm"] = "sh";["name"] = "physobj_methods:worldToLocalVector";["summary"] = "\
+Returns a normal vector in the reference frame of the world from the local frame of the physicsobject ";["private"] = false;["classlib"] = "PhysObj";["description"] = "\
+Returns a normal vector in the reference frame of the world from the local frame of the physicsobject";["param"] = {[1] = "vec";["vec"] = "The normal vector to transform";};};["setPos"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Sets the position of the physics object ";["name"] = "physobj_methods:setPos";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Sets the position of the physics object";["param"] = {[1] = "pos";["pos"] = "The position vector to set it to";};};["getMeshConvexes"] = {["ret"] = "table of MeshVertex structures";["class"] = "function";["realm"] = "sh";["name"] = "physobj_methods:getMeshConvexes";["summary"] = "\
+Returns a structured table, the physics mesh of the physics object.";["private"] = false;["classlib"] = "PhysObj";["description"] = "\
+Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex";["param"] = {};};["getInertia"] = {["ret"] = "Vector Inertia of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the inertia of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getInertia";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the inertia of the physics object";["param"] = {};};["isValid"] = {["ret"] = "boolean if the physics object is valid";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Checks if the physics object is valid ";["classlib"] = "PhysObj";["name"] = "physobj_methods:isValid";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Checks if the physics object is valid";["param"] = {};};["getMaterial"] = {["ret"] = "The physics material of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the material of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getMaterial";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the material of the physics object";["param"] = {};};["setInertia"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Sets the inertia of a physics object ";["name"] = "physobj_methods:setInertia";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Sets the inertia of a physics object";["param"] = {[1] = "inertia";["inertia"] = "The inertia vector to set it to";};};["worldToLocal"] = {["ret"] = "The transformed vector";["class"] = "function";["realm"] = "sh";["name"] = "physobj_methods:worldToLocal";["summary"] = "\
+Returns a vector in the reference frame of the world from the local frame of the physicsobject ";["private"] = false;["classlib"] = "PhysObj";["description"] = "\
+Returns a vector in the reference frame of the world from the local frame of the physicsobject";["param"] = {[1] = "vec";["vec"] = "The vector to transform";};};["getPos"] = {["ret"] = "Vector position of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the position of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getPos";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the position of the physics object";["param"] = {};};["applyForceOffset"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Applys an offset force to a physics object ";["name"] = "physobj_methods:applyForceOffset";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Applys an offset force to a physics object";["param"] = {[1] = "force";[2] = "position";["force"] = "The force vector to apply";["position"] = "The position in world coordinates";};};["getMassCenter"] = {["ret"] = "Center of mass vector in the physobject's local reference frame.";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the center of mass of the physics object in the local reference frame.";["classlib"] = "PhysObj";["name"] = "physobj_methods:getMassCenter";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the center of mass of the physics object in the local reference frame.";["param"] = {};};["getAngleVelocity"] = {["ret"] = "Vector angular velocity of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the angular velocity of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getAngleVelocity";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the angular velocity of the physics object";["param"] = {};};["applyForceCenter"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Applys a force to the center of the physics object ";["name"] = "physobj_methods:applyForceCenter";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Applys a force to the center of the physics object";["param"] = {[1] = "force";["force"] = "The force vector to apply";};};["setVelocity"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Sets the velocity of the physics object ";["name"] = "physobj_methods:setVelocity";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Sets the velocity of the physics object";["param"] = {[1] = "vel";["vel"] = "The velocity vector to set it to";};};["setMass"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Sets the mass of a physics object ";["name"] = "physobj_methods:setMass";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["description"] = "\
+Sets the mass of a physics object";["param"] = {[1] = "mass";["mass"] = "The mass to set it to";};};["getMesh"] = {["ret"] = "table of MeshVertex structures";["class"] = "function";["realm"] = "sh";["name"] = "physobj_methods:getMesh";["summary"] = "\
+Returns a table of MeshVertex structures where each 3 vertices represent a triangle.";["private"] = false;["classlib"] = "PhysObj";["description"] = "\
+Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.garrysmod.com/page/Structures/MeshVertex";["param"] = {};};["getVelocity"] = {["ret"] = "Vector velocity of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the velocity of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getVelocity";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the velocity of the physics object";["param"] = {};};["getAngles"] = {["ret"] = "Angle angles of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the angles of the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the angles of the physics object";["param"] = {};};["getEntity"] = {["ret"] = "The entity attached to the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the entity attached to the physics object ";["classlib"] = "PhysObj";["name"] = "physobj_methods:getEntity";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the entity attached to the physics object";["param"] = {};};};};["Hologram"] = {["typtbl"] = "hologram_methods";["fields"] = {};["name"] = "Hologram";["summary"] = "\
 Hologram type ";["description"] = "\
 Hologram type";["class"] = "class";["methods"] = {[1] = "getAnimationLength";[2] = "getAnimationNumber";[3] = "getFlexes";[4] = "getPose";[5] = "setAngVel";[6] = "setAnimation";[7] = "setClip";[8] = "setFlexScale";[9] = "setFlexWeight";[10] = "setModel";[11] = "setPose";[12] = "setScale";[13] = "setVel";[14] = "suppressEngineLighting";["setScale"] = {["class"] = "function";["realm"] = "sv";["name"] = "hologram_methods:setScale";["summary"] = "\
 Sets the hologram scale ";["private"] = false;["classlib"] = "Hologram";["description"] = "\
@@ -846,39 +894,57 @@ Suppress Engine Lighting of a hologram. Disabled by default.";["param"] = {[1] =
 Sets the model of a hologram ";["name"] = "hologram_methods:setModel";["classlib"] = "Hologram";["private"] = false;["server"] = true;["description"] = "\
 Sets the model of a hologram";["param"] = {[1] = "model";["model"] = "string model path";};};["setClip"] = {["class"] = "function";["realm"] = "sv";["name"] = "hologram_methods:setClip";["summary"] = "\
 Updates a clip plane ";["private"] = false;["classlib"] = "Hologram";["description"] = "\
-Updates a clip plane";["param"] = {[1] = "index";[2] = "enabled";[3] = "origin";[4] = "normal";[5] = "islocal";};};};};["Color"] = {["typtbl"] = "color_methods";["summary"] = "\
-Color type ";["fields"] = {};["name"] = "Color";["server"] = true;["description"] = "\
-Color type";["client"] = true;["class"] = "class";["methods"] = {[1] = "hsvToRGB";[2] = "rgbToHSV";[3] = "setA";[4] = "setB";[5] = "setG";[6] = "setR";["setA"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setA";["summary"] = "\
-Set's the color's alpha and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
-Set's the color's alpha and returns it.";["param"] = {[1] = "a";["a"] = "The alpha";};};["setR"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setR";["summary"] = "\
-Set's the color's red channel and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
-Set's the color's red channel and returns it.";["param"] = {[1] = "r";["r"] = "The red";};};["rgbToHSV"] = {["ret"] = "A triplet of numbers representing HSV.";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Converts the color from RGB to HSV.";["classlib"] = "Color";["name"] = "color_methods:rgbToHSV";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Converts the color from RGB to HSV.";["param"] = {};};["setG"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setG";["summary"] = "\
-Set's the color's green and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
-Set's the color's green and returns it.";["param"] = {[1] = "g";["g"] = "The green";};};["hsvToRGB"] = {["ret"] = "A triplet of numbers representing HSV.";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Converts the color from HSV to RGB.";["classlib"] = "Color";["name"] = "color_methods:hsvToRGB";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Converts the color from HSV to RGB.";["param"] = {};};["setB"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setB";["summary"] = "\
-Set's the color's blue and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
-Set's the color's blue and returns it.";["param"] = {[1] = "b";["b"] = "The blue";};};};};["Npc"] = {["typtbl"] = "npc_methods";["fields"] = {};["name"] = "Npc";["summary"] = "\
+Updates a clip plane";["param"] = {[1] = "index";[2] = "enabled";[3] = "origin";[4] = "normal";[5] = "islocal";};};};};["Bass"] = {["typtbl"] = "bass_methods";["fields"] = {};["name"] = "Bass";["summary"] = "\
+Bass type ";["description"] = "\
+Bass type";["client"] = true;["class"] = "class";["methods"] = {[1] = "getFFT";[2] = "getLength";[3] = "getTime";[4] = "isOnline";[5] = "isValid";[6] = "pause";[7] = "play";[8] = "setFade";[9] = "setLooping";[10] = "setPitch";[11] = "setPos";[12] = "setTime";[13] = "setVolume";[14] = "stop";["isValid"] = {["ret"] = "Is valid or not";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:isValid";["summary"] = "\
+Gets if the sound is valid or not ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Gets if the sound is valid or not";["param"] = {};};["setLooping"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setLooping";["summary"] = "\
+Sets if the sound should loop or not.";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Sets if the sound should loop or not.";["param"] = {[1] = "loop";["loop"] = "Boolean if the sound should loop or not.";};};["isOnline"] = {["ret"] = "Is online or not";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:isOnline";["summary"] = "\
+Gets if the sound is streamed or not ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Gets if the sound is streamed or not";["param"] = {};};["setFade"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setFade";["summary"] = "\
+Sets the fade distance of the sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Sets the fade distance of the sound";["param"] = {[1] = "min";[2] = "max";["max"] = "The channel's volume stops decreasing when the listener is beyond this distance.";["min"] = "The channel's volume is at maximum when the listener is within this distance";};};["getFFT"] = {["ret"] = "FFT table of the sound";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:getFFT";["summary"] = "\
+Gets the FFT of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Gets the FFT of a sound";["param"] = {[1] = "n";["n"] = "Sample size of the hamming window. Must be power of 2";};};["getTime"] = {["ret"] = "Current time in seconds of the sound";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:getTime";["summary"] = "\
+Gets the current time of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Gets the current time of a sound";["param"] = {};};["setTime"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setTime";["summary"] = "\
+Sets the current time of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Sets the current time of a sound";["param"] = {[1] = "time";["time"] = "Time to set a sound in seconds";};};["setPos"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setPos";["summary"] = "\
+Sets the position of the sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Sets the position of the sound";["param"] = {[1] = "pos";["pos"] = "Where to position the sound";};};["stop"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:stop";["summary"] = "\
+Stops playing the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Stops playing the sound.";["param"] = {};};["getLength"] = {["ret"] = "Length in seconds of the sound";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:getLength";["summary"] = "\
+Gets the length of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Gets the length of a sound";["param"] = {};};["setPitch"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setPitch";["summary"] = "\
+Sets the pitch of the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Sets the pitch of the sound.";["param"] = {[1] = "pitch";["pitch"] = "Pitch to set to, between 0 and 3.";};};["setVolume"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setVolume";["summary"] = "\
+Sets the volume of the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Sets the volume of the sound.";["param"] = {[1] = "vol";["vol"] = "Volume to set to, between 0 and 1.";};};["play"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:play";["summary"] = "\
+Starts to play the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Starts to play the sound.";["param"] = {};};["pause"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:pause";["summary"] = "\
+Pauses the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
+Pauses the sound.";["param"] = {};};};};["Npc"] = {["typtbl"] = "npc_methods";["fields"] = {};["name"] = "Npc";["summary"] = "\
 Npc type ";["description"] = "\
-Npc type";["class"] = "class";["methods"] = {[1] = "addEntityRelationship";[2] = "addRelationship";[3] = "attackMelee";[4] = "attackRange";[5] = "getEnemy";[6] = "getRelationship";[7] = "goRun";[8] = "goWalk";[9] = "setEnemy";[10] = "stop";["goWalk"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:goWalk";["summary"] = "\
+Npc type";["class"] = "class";["methods"] = {[1] = "addEntityRelationship";[2] = "addRelationship";[3] = "attackMelee";[4] = "attackRange";[5] = "getEnemy";[6] = "getRelationship";[7] = "giveWeapon";[8] = "goRun";[9] = "goWalk";[10] = "setEnemy";[11] = "stop";["goWalk"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:goWalk";["summary"] = "\
 Makes the npc walk to a destination ";["private"] = false;["classlib"] = "Npc";["description"] = "\
 Makes the npc walk to a destination";["param"] = {[1] = "vec";["vec"] = "The position of the destination";};};["addEntityRelationship"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:addEntityRelationship";["summary"] = "\
 Adds a relationship to the npc with an entity ";["private"] = false;["classlib"] = "Npc";["description"] = "\
-Adds a relationship to the npc with an entity";["param"] = {[1] = "ent";[2] = "disp";[3] = "priority";["priority"] = "number how strong the relationship is. Higher number is stronger";["disp"] = "String of the relationship. (hate fear like neutral)";["ent"] = "The target entity";};};["attackRange"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:attackRange";["summary"] = "\
+Adds a relationship to the npc with an entity";["param"] = {[1] = "ent";[2] = "disp";[3] = "priority";["priority"] = "number how strong the relationship is. Higher number is stronger";["disp"] = "String of the relationship. (hate fear like neutral)";["ent"] = "The target entity";};};["attackMelee"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:attackMelee";["summary"] = "\
+Makes the npc do a melee attack ";["private"] = false;["classlib"] = "Npc";["description"] = "\
+Makes the npc do a melee attack";["param"] = {};};["attackRange"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:attackRange";["summary"] = "\
 Makes the npc do a ranged attack ";["private"] = false;["classlib"] = "Npc";["description"] = "\
 Makes the npc do a ranged attack";["param"] = {};};["getRelationship"] = {["ret"] = "string relationship of the npc with the target";["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:getRelationship";["summary"] = "\
 Gets the npc's relationship to the target ";["private"] = false;["classlib"] = "Npc";["description"] = "\
 Gets the npc's relationship to the target";["param"] = {[1] = "ent";["ent"] = "Target entity";};};["stop"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:stop";["summary"] = "\
 Stops the npc ";["private"] = false;["classlib"] = "Npc";["description"] = "\
-Stops the npc";["param"] = {};};["getEnemy"] = {["ret"] = "Entity the npc is fighting";["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:getEnemy";["summary"] = "\
-Gets what the npc is fighting ";["private"] = false;["classlib"] = "Npc";["description"] = "\
-Gets what the npc is fighting";["param"] = {};};["goRun"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:goRun";["summary"] = "\
+Stops the npc";["param"] = {};};["giveWeapon"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:giveWeapon";["summary"] = "\
+Gives the npc a weapon ";["private"] = false;["classlib"] = "Npc";["description"] = "\
+Gives the npc a weapon";["param"] = {[1] = "wep";["wep"] = "The classname of the weapon";};};["goRun"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:goRun";["summary"] = "\
 Makes the npc run to a destination ";["private"] = false;["classlib"] = "Npc";["description"] = "\
-Makes the npc run to a destination";["param"] = {[1] = "vec";["vec"] = "The position of the destination";};};["attackMelee"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:attackMelee";["summary"] = "\
-Makes the npc do a melee attack ";["private"] = false;["classlib"] = "Npc";["description"] = "\
-Makes the npc do a melee attack";["param"] = {};};["addRelationship"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:addRelationship";["summary"] = "\
+Makes the npc run to a destination";["param"] = {[1] = "vec";["vec"] = "The position of the destination";};};["getEnemy"] = {["ret"] = "Entity the npc is fighting";["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:getEnemy";["summary"] = "\
+Gets what the npc is fighting ";["private"] = false;["classlib"] = "Npc";["description"] = "\
+Gets what the npc is fighting";["param"] = {};};["addRelationship"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:addRelationship";["summary"] = "\
 Adds a relationship to the npc ";["private"] = false;["classlib"] = "Npc";["description"] = "\
 Adds a relationship to the npc";["param"] = {[1] = "str";["str"] = "The relationship string. http://wiki.garrysmod.com/page/NPC/AddRelationship";};};["setEnemy"] = {["class"] = "function";["realm"] = "sv";["name"] = "npc_methods:setEnemy";["summary"] = "\
 Tell the npc to fight this ";["private"] = false;["classlib"] = "Npc";["description"] = "\
@@ -944,19 +1010,21 @@ Returns the squared distance of 2 vectors, this is faster Vector:getDistance as 
 Add vector - Modifies self.";["private"] = false;["classlib"] = "Vector";["description"] = "\
 Add vector - Modifies self.";["param"] = {[1] = "v";["v"] = "Vector to add";};};};};["Entity"] = {["typtbl"] = "ents_methods";["summary"] = "\
 Entity type ";["fields"] = {};["name"] = "Entity";["server"] = true;["description"] = "\
-Entity type";["client"] = true;["class"] = "class";["methods"] = {[1] = "addCollisionListener";[2] = "applyAngForce";[3] = "applyDamage";[4] = "applyForceCenter";[5] = "applyForceOffset";[6] = "applyTorque";[7] = "breakEnt";[8] = "emitSound";[9] = "enableDrag";[10] = "enableGravity";[11] = "enableMotion";[12] = "enableSphere";[13] = "entIndex";[14] = "extinguish";[15] = "getAngleVelocity";[16] = "getAngleVelocityAngle";[17] = "getAngles";[18] = "getAttachment";[19] = "getAttachmentParent";[20] = "getBoneCount";[21] = "getBoneMatrix";[22] = "getBoneName";[23] = "getBoneParent";[24] = "getBonePosition";[25] = "getClass";[26] = "getColor";[27] = "getEyeAngles";[28] = "getEyePos";[29] = "getForward";[30] = "getHealth";[31] = "getInertia";[32] = "getMass";[33] = "getMassCenter";[34] = "getMassCenterW";[35] = "getMaterial";[36] = "getMaterials";[37] = "getMaxHealth";[38] = "getModel";[39] = "getOwner";[40] = "getParent";[41] = "getPos";[42] = "getRight";[43] = "getSkin";[44] = "getSubMaterial";[45] = "getUp";[46] = "getVelocity";[47] = "ignite";[48] = "isFrozen";[49] = "isNPC";[50] = "isPlayer";[51] = "isValid";[52] = "isValidPhys";[53] = "isVehicle";[54] = "isWeapon";[55] = "isWeldedTo";[56] = "linkComponent";[57] = "localToWorld";[58] = "localToWorldAngles";[59] = "lookupAttachment";[60] = "manipulateBoneAngles";[61] = "manipulateBonePosition";[62] = "manipulateBoneScale";[63] = "obbCenter";[64] = "obbCenterW";[65] = "obbSize";[66] = "remove";[67] = "removeTrails";[68] = "setAngles";[69] = "setBodygroup";[70] = "setColor";[71] = "setFrozen";[72] = "setHologramMesh";[73] = "setHologramRenderBounds";[74] = "setInertia";[75] = "setMass";[76] = "setMaterial";[77] = "setNoDraw";[78] = "setNocollideAll";[79] = "setParent";[80] = "setPhysMaterial";[81] = "setPos";[82] = "setRenderFX";[83] = "setRenderMode";[84] = "setSkin";[85] = "setSolid";[86] = "setSubMaterial";[87] = "setTrails";[88] = "setVelocity";[89] = "unparent";[90] = "worldToLocal";[91] = "worldToLocalAngles";["getRight"] = {["ret"] = "Vector right";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Entity type";["client"] = true;["class"] = "class";["methods"] = {[1] = "addCollisionListener";[2] = "applyAngForce";[3] = "applyDamage";[4] = "applyForceCenter";[5] = "applyForceOffset";[6] = "applyTorque";[7] = "breakEnt";[8] = "emitSound";[9] = "enableDrag";[10] = "enableGravity";[11] = "enableMotion";[12] = "enableSphere";[13] = "entIndex";[14] = "extinguish";[15] = "getAngleVelocity";[16] = "getAngleVelocityAngle";[17] = "getAngles";[18] = "getAttachment";[19] = "getAttachmentParent";[20] = "getBoneCount";[21] = "getBoneMatrix";[22] = "getBoneName";[23] = "getBoneParent";[24] = "getBonePosition";[25] = "getClass";[26] = "getColor";[27] = "getEyeAngles";[28] = "getEyePos";[29] = "getForward";[30] = "getHealth";[31] = "getInertia";[32] = "getMass";[33] = "getMassCenter";[34] = "getMassCenterW";[35] = "getMaterial";[36] = "getMaterials";[37] = "getMaxHealth";[38] = "getModel";[39] = "getOwner";[40] = "getParent";[41] = "getPhysicsObject";[42] = "getPhysicsObjectCount";[43] = "getPhysicsObjectNum";[44] = "getPos";[45] = "getRight";[46] = "getSkin";[47] = "getSubMaterial";[48] = "getUp";[49] = "getVelocity";[50] = "ignite";[51] = "isFrozen";[52] = "isNPC";[53] = "isOnGround";[54] = "isPlayer";[55] = "isValid";[56] = "isValidPhys";[57] = "isVehicle";[58] = "isWeapon";[59] = "isWeldedTo";[60] = "linkComponent";[61] = "localToWorld";[62] = "localToWorldAngles";[63] = "lookupAttachment";[64] = "lookupBone";[65] = "manipulateBoneAngles";[66] = "manipulateBonePosition";[67] = "manipulateBoneScale";[68] = "obbCenter";[69] = "obbCenterW";[70] = "obbSize";[71] = "remove";[72] = "removeTrails";[73] = "setAngles";[74] = "setBodygroup";[75] = "setColor";[76] = "setFrozen";[77] = "setHologramMesh";[78] = "setHologramRenderBounds";[79] = "setInertia";[80] = "setMass";[81] = "setMaterial";[82] = "setNoDraw";[83] = "setNocollideAll";[84] = "setParent";[85] = "setPhysMaterial";[86] = "setPos";[87] = "setRenderFX";[88] = "setRenderMode";[89] = "setSkin";[90] = "setSolid";[91] = "setSubMaterial";[92] = "setTrails";[93] = "setVelocity";[94] = "translateBoneToPhysBone";[95] = "translatePhysBoneToBone";[96] = "unparent";[97] = "worldToLocal";[98] = "worldToLocalAngles";["getRight"] = {["ret"] = "Vector right";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the entity's right vector ";["classlib"] = "Entity";["name"] = "ents_methods:getRight";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Gets the entity's right vector";["param"] = {};};["applyTorque"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyTorque";["summary"] = "\
 Applies torque ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Applies torque";["param"] = {[1] = "tq";[2] = "offset";["offset"] = "Optional offset position";["tq"] = "The torque vector";};};["setSubMaterial"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
+Applies torque";["param"] = {[1] = "tq";[2] = "offset";["offset"] = "Optional offset position";["tq"] = "The torque vector";};};["getPhysicsObjectCount"] = {["ret"] = "The number of physics objects on the entity";["class"] = "function";["realm"] = "sh";["name"] = "ents_methods:getPhysicsObjectCount";["summary"] = "\
+Gets the number of physicsobjects of an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Gets the number of physicsobjects of an entity";["param"] = {};};["setSubMaterial"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
 Sets an entities' submaterial ";["name"] = "ents_methods:setSubMaterial";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
 Sets an entities' submaterial";["param"] = {[1] = "index";[2] = "material";[3] = "ply";["material"] = ", string, New material name.";["index"] = ", number, submaterial index.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["setNocollideAll"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setNocollideAll";["summary"] = "\
 Set's the entity to collide with nothing but the world ";["private"] = false;["classlib"] = "Entity";["description"] = "\
 Set's the entity to collide with nothing but the world";["param"] = {[1] = "nocollide";["nocollide"] = "Whether to collide with nothing except world or not.";};};["setPos"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setPos";["summary"] = "\
 Sets the entitiy's position ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entitiy's position";["param"] = {[1] = "vec";["vec"] = "New position";};};["unparent"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:unparent";["summary"] = "\
-Unparents the entity from another entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Unparents the entity from another entity";["param"] = {};};["applyForceCenter"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyForceCenter";["summary"] = "\
+Sets the entitiy's position";["param"] = {[1] = "vec";["vec"] = "New position";};};["translatePhysBoneToBone"] = {["ret"] = "The ragdoll bone id";["class"] = "function";["realm"] = "sh";["name"] = "ents_methods:translatePhysBoneToBone";["summary"] = "\
+Converts a physobject id to the corresponding ragdoll bone id ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Converts a physobject id to the corresponding ragdoll bone id";["param"] = {[1] = "boneid";["boneid"] = "The physobject id";};};["applyForceCenter"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyForceCenter";["summary"] = "\
 Applies linear force to the entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
 Applies linear force to the entity";["param"] = {[1] = "vec";["vec"] = "The force vector";};};["isValid"] = {["ret"] = "True if valid, false if not";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Checks if an entity is valid.";["classlib"] = "Entity";["name"] = "ents_methods:isValid";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
@@ -1007,53 +1075,65 @@ Checks if an entity is a weapon.";["param"] = {};};["setRenderFX"] = {["class"] 
 Sets the renderfx of the entity ";["name"] = "ents_methods:setRenderFX";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
 Sets the renderfx of the entity";["param"] = {[1] = "renderfx";[2] = "ply";["renderfx"] = "Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["getAngleVelocityAngle"] = {["ret"] = "The angular velocity as an angle";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the angular velocity of the entity ";["classlib"] = "Entity";["name"] = "ents_methods:getAngleVelocityAngle";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the angular velocity of the entity";["param"] = {};};["getBoneParent"] = {["ret"] = "Parent index of the bone";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Returns the parent index of an entity's bone ";["classlib"] = "Entity";["name"] = "ents_methods:getBoneParent";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the parent index of an entity's bone";["param"] = {[1] = "bone";["bone"] = "Bone index. (def 0)";};};["breakEnt"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:breakEnt";["summary"] = "\
+Returns the angular velocity of the entity";["param"] = {};};["breakEnt"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:breakEnt";["summary"] = "\
 Invokes the entity's breaking animation and removes it.";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Invokes the entity's breaking animation and removes it.";["param"] = {};};["localToWorld"] = {["ret"] = "data as world space vector";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Converts a vector in entity local space to world space ";["classlib"] = "Entity";["name"] = "ents_methods:localToWorld";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Converts a vector in entity local space to world space";["param"] = {[1] = "data";["data"] = "Local space vector";};};["getAttachment"] = {["ret"] = "vector position, and angle orientation";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Gets the position and angle of an attachment ";["classlib"] = "Entity";["name"] = "ents_methods:getAttachment";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets the position and angle of an attachment";["param"] = {[1] = "index";["index"] = "The index of the attachment";};};["applyForceOffset"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyForceOffset";["summary"] = "\
-Applies linear force to the entity with an offset ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Applies linear force to the entity with an offset";["param"] = {[1] = "vec";[2] = "offset";["offset"] = "An optional offset position";["vec"] = "The force vector";};};["remove"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:remove";["summary"] = "\
-Removes an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Removes an entity";["param"] = {};};["obbSize"] = {["ret"] = "The outer bounding box size";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Invokes the entity's breaking animation and removes it.";["param"] = {};};["obbSize"] = {["ret"] = "The outer bounding box size";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the x, y, z size of the entity's outer bounding box (local to the entity) ";["classlib"] = "Entity";["name"] = "ents_methods:obbSize";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the x, y, z size of the entity's outer bounding box (local to the entity)";["param"] = {};};["ignite"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:ignite";["summary"] = "\
+Returns the x, y, z size of the entity's outer bounding box (local to the entity)";["param"] = {};};["getBoneParent"] = {["ret"] = "Parent index of the bone";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the parent index of an entity's bone ";["classlib"] = "Entity";["name"] = "ents_methods:getBoneParent";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Returns the parent index of an entity's bone";["param"] = {[1] = "bone";["bone"] = "Bone index. (def 0)";};};["ignite"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:ignite";["summary"] = "\
 Ignites an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
 Ignites an entity";["param"] = {[1] = "length";[2] = "radius";["radius"] = "(optional) How large the fire hitbox is (entity obb is the max)";["length"] = "How long the fire lasts";};};["emitSound"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:emitSound";["summary"] = "\
 Plays a sound on the entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Plays a sound on the entity";["param"] = {[1] = "snd";[2] = "lvl";[3] = "pitch";[4] = "volume";[5] = "channel";["pitch"] = "pitchPercent=100";["snd"] = "string Sound path";["lvl"] = "number soundLevel=75";["channel"] = "channel=CHAN_AUTO";["volume"] = "volume=1";};};["lookupAttachment"] = {["ret"] = "number of the attachment index, or 0 if it doesn't exist";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Plays a sound on the entity";["param"] = {[1] = "snd";[2] = "lvl";[3] = "pitch";[4] = "volume";[5] = "channel";["pitch"] = "pitchPercent=100";["snd"] = "string Sound path";["lvl"] = "number soundLevel=75";["channel"] = "channel=CHAN_AUTO";["volume"] = "volume=1";};};["getHealth"] = {["ret"] = "Health of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the health of an entity ";["classlib"] = "Entity";["name"] = "ents_methods:getHealth";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the health of an entity";["param"] = {};};["isFrozen"] = {["ret"] = "True if entity is frozen";["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:isFrozen";["summary"] = "\
+Checks the entities frozen state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Checks the entities frozen state";["param"] = {};};["getUp"] = {["ret"] = "Vector up";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the entity's up vector ";["classlib"] = "Entity";["name"] = "ents_methods:getUp";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the entity's up vector";["param"] = {};};["localToWorldAngles"] = {["ret"] = "data as world space angle";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Converts an angle in entity local space to world space ";["classlib"] = "Entity";["name"] = "ents_methods:localToWorldAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Converts an angle in entity local space to world space";["param"] = {[1] = "data";["data"] = "Local space angle";};};["getAngles"] = {["ret"] = "The angle";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the angle of the entity ";["classlib"] = "Entity";["name"] = "ents_methods:getAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Returns the angle of the entity";["param"] = {};};["applyForceOffset"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyForceOffset";["summary"] = "\
+Applies linear force to the entity with an offset ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Applies linear force to the entity with an offset";["param"] = {[1] = "vec";[2] = "offset";["offset"] = "An optional offset position";["vec"] = "The force vector";};};["remove"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:remove";["summary"] = "\
+Removes an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Removes an entity";["param"] = {};};["setBodygroup"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
+Sets an entities' bodygroup ";["name"] = "ents_methods:setBodygroup";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
+Sets an entities' bodygroup";["param"] = {[1] = "bodygroup";[2] = "value";[3] = "ply";["bodygroup"] = "Number, The ID of the bodygroup you're setting.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";["value"] = "Number, The value you're setting the bodygroup to.";};};["unparent"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:unparent";["summary"] = "\
+Unparents the entity from another entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Unparents the entity from another entity";["param"] = {};};["applyDamage"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyDamage";["summary"] = "\
+Applies damage to an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Applies damage to an entity";["param"] = {[1] = "amt";[2] = "attacker";[3] = "inflictor";["inflictor"] = "damage inflictor";["attacker"] = "damage attacker";["amt"] = "damage amount";};};["lookupAttachment"] = {["ret"] = "number of the attachment index, or 0 if it doesn't exist";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the attachment index via the entity and it's attachment name ";["classlib"] = "Entity";["name"] = "ents_methods:lookupAttachment";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Gets the attachment index via the entity and it's attachment name";["param"] = {[1] = "name";["name"] = "";};};["getBoneMatrix"] = {["ret"] = "The matrix";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the matrix of the entity's bone ";["classlib"] = "Entity";["name"] = "ents_methods:getBoneMatrix";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Returns the matrix of the entity's bone";["param"] = {[1] = "bone";["bone"] = "Bone index. (def 0)";};};["setTrails"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setTrails";["summary"] = "\
 Adds a trail to the entity with the specified attributes.";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Adds a trail to the entity with the specified attributes.";["param"] = {[1] = "startSize";[2] = "endSize";[3] = "length";[4] = "material";[5] = "color";[6] = "attachmentID";[7] = "additive";["startSize"] = "The start size of the trail";["attachmentID"] = "Optional attachmentid the trail should attach to";["length"] = "The length size of the trail";["color"] = "The color of the trail";["material"] = "The material of the trail";["endSize"] = "The end size of the trail";["additive"] = "If the trail's rendering is additive";};};["getHealth"] = {["ret"] = "Health of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Gets the health of an entity ";["classlib"] = "Entity";["name"] = "ents_methods:getHealth";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets the health of an entity";["param"] = {};};["setVelocity"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setVelocity";["summary"] = "\
-Sets the entity's linear velocity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entity's linear velocity";["param"] = {[1] = "vel";["vel"] = "New velocity";};};["isNPC"] = {["ret"] = "True if npc, false if not";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Checks if an entity is an npc.";["classlib"] = "Entity";["name"] = "ents_methods:isNPC";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Checks if an entity is an npc.";["param"] = {};};["isFrozen"] = {["ret"] = "True if entity is frozen";["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:isFrozen";["summary"] = "\
-Checks the entities frozen state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Checks the entities frozen state";["param"] = {};};["setNoDraw"] = {["class"] = "function";["realm"] = "sv";["summary"] = "\
-Sets the whether an entity should be drawn or not ";["name"] = "ents_methods:setNoDraw";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
-Sets the whether an entity should be drawn or not";["param"] = {[1] = "draw";[2] = "ply";["draw"] = "Whether to draw the entity or not.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["setBodygroup"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
-Sets an entities' bodygroup ";["name"] = "ents_methods:setBodygroup";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
-Sets an entities' bodygroup";["param"] = {[1] = "bodygroup";[2] = "value";[3] = "ply";["bodygroup"] = "Number, The ID of the bodygroup you're setting.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";["value"] = "Number, The value you're setting the bodygroup to.";};};["setSkin"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
-Sets the skin of the entity ";["name"] = "ents_methods:setSkin";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
-Sets the skin of the entity";["param"] = {[1] = "skinIndex";[2] = "ply";["skinIndex"] = "Number, Index of the skin to use.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["getEyeAngles"] = {["ret"] = "Angles of the entity's eyes";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Adds a trail to the entity with the specified attributes.";["param"] = {[1] = "startSize";[2] = "endSize";[3] = "length";[4] = "material";[5] = "color";[6] = "attachmentID";[7] = "additive";["startSize"] = "The start size of the trail";["attachmentID"] = "Optional attachmentid the trail should attach to";["length"] = "The length size of the trail";["color"] = "The color of the trail";["material"] = "The material of the trail";["endSize"] = "The end size of the trail";["additive"] = "If the trail's rendering is additive";};};["getAttachment"] = {["ret"] = "vector position, and angle orientation";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the position and angle of an attachment ";["classlib"] = "Entity";["name"] = "ents_methods:getAttachment";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the position and angle of an attachment";["param"] = {[1] = "index";["index"] = "The index of the attachment";};};["isOnGround"] = {["ret"] = "Boolean if it's flag is set or not";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Checks if the entity ONGROUND flag is set ";["classlib"] = "Entity";["name"] = "ents_methods:isOnGround";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Checks if the entity ONGROUND flag is set";["param"] = {};};["isValidPhys"] = {["ret"] = "True if entity has physics";["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:isValidPhys";["summary"] = "\
+Checks whether entity has physics ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Checks whether entity has physics";["param"] = {};};["enableGravity"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableGravity";["summary"] = "\
+Sets entity gravity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets entity gravity";["param"] = {[1] = "grav";["grav"] = "Bool should the entity respect gravity?";};};["getPhysicsObjectNum"] = {["ret"] = "The physics object of the entity";["class"] = "function";["realm"] = "sh";["name"] = "ents_methods:getPhysicsObjectNum";["summary"] = "\
+Gets a physics objects of an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Gets a physics objects of an entity";["param"] = {[1] = "id";["id"] = "The physics object id (starts at 0)";};};["enableDrag"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableDrag";["summary"] = "\
+Sets the entity drag state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets the entity drag state";["param"] = {[1] = "drag";["drag"] = "Bool should the entity have air resistence?";};};["enableMotion"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableMotion";["summary"] = "\
+Sets the entity movement state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets the entity movement state";["param"] = {[1] = "move";["move"] = "Bool should the entity move?";};};["getEyeAngles"] = {["ret"] = "Angles of the entity's eyes";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the entitiy's eye angles ";["classlib"] = "Entity";["name"] = "ents_methods:getEyeAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets the entitiy's eye angles";["param"] = {};};["applyDamage"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyDamage";["summary"] = "\
-Applies damage to an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Applies damage to an entity";["param"] = {[1] = "amt";[2] = "attacker";[3] = "inflictor";["inflictor"] = "damage inflictor";["attacker"] = "damage attacker";["amt"] = "damage amount";};};["getMaterials"] = {["ret"] = "Material";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the entitiy's eye angles";["param"] = {};};["enableSphere"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableSphere";["summary"] = "\
+Sets the physics of an entity to be a sphere ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets the physics of an entity to be a sphere";["param"] = {[1] = "enabled";["enabled"] = "Bool should the entity be spherical?";};};["getMaterials"] = {["ret"] = "Material";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets an entities' material list ";["classForced"] = true;["classlib"] = "Entity";["name"] = "ents_methods:getMaterials";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets an entities' material list";["param"] = {};};["localToWorldAngles"] = {["ret"] = "data as world space angle";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Converts an angle in entity local space to world space ";["classlib"] = "Entity";["name"] = "ents_methods:localToWorldAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Converts an angle in entity local space to world space";["param"] = {[1] = "data";["data"] = "Local space angle";};};["getForward"] = {["ret"] = "Vector forward";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets an entities' material list";["param"] = {};};["applyAngForce"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyAngForce";["summary"] = "\
+Applies angular force to the entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Applies angular force to the entity";["param"] = {[1] = "ang";["ang"] = "The force angle";};};["getForward"] = {["ret"] = "Vector forward";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the entity's forward vector ";["classlib"] = "Entity";["name"] = "ents_methods:getForward";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Gets the entity's forward vector";["param"] = {};};["worldToLocalAngles"] = {["ret"] = "data as local space angle";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Converts an angle in world space to entity local space ";["classlib"] = "Entity";["name"] = "ents_methods:worldToLocalAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
@@ -1063,15 +1143,15 @@ Returns the velocity of the entity";["param"] = {};};["manipulateBoneAngles"] = 
 Allows manipulation of a hologram's bones' angles ";["name"] = "ents_methods:manipulateBoneAngles";["classlib"] = "Entity";["private"] = false;["client"] = true;["description"] = "\
 Allows manipulation of a hologram's bones' angles";["param"] = {[1] = "bone";[2] = "ang";["ang"] = "The angle it should be manipulated to";["bone"] = "The bone ID";};};["setColor"] = {["class"] = "function";["realm"] = "sv";["summary"] = "\
 Sets the color of the entity ";["name"] = "ents_methods:setColor";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
-Sets the color of the entity";["param"] = {[1] = "clr";[2] = "ply";["clr"] = "New color";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["obbCenterW"] = {["ret"] = "The position vector of the outer bounding box center";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Returns the world position of the entity's outer bounding box ";["classlib"] = "Entity";["name"] = "ents_methods:obbCenterW";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the world position of the entity's outer bounding box";["param"] = {};};["getSubMaterial"] = {["ret"] = "String material";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Gets an entities' submaterial ";["classForced"] = true;["classlib"] = "Entity";["name"] = "ents_methods:getSubMaterial";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets an entities' submaterial";["param"] = {[1] = "index";};};["enableGravity"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableGravity";["summary"] = "\
-Sets entity gravity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets entity gravity";["param"] = {[1] = "grav";["grav"] = "Bool should the entity respect gravity?";};};["getUp"] = {["ret"] = "Vector up";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Gets the entity's up vector ";["classlib"] = "Entity";["name"] = "ents_methods:getUp";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets the entity's up vector";["param"] = {};};["setHologramRenderBounds"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Sets the color of the entity";["param"] = {[1] = "clr";[2] = "ply";["clr"] = "New color";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["isNPC"] = {["ret"] = "True if npc, false if not";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Checks if an entity is an npc.";["classlib"] = "Entity";["name"] = "ents_methods:isNPC";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Checks if an entity is an npc.";["param"] = {};};["isWeldedTo"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:isWeldedTo";["summary"] = "\
+Gets what the entity is welded to ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Gets what the entity is welded to";["param"] = {};};["setFrozen"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setFrozen";["summary"] = "\
+Sets the entity frozen state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets the entity frozen state";["param"] = {[1] = "freeze";["freeze"] = "Should the entity be frozen?";};};["isVehicle"] = {["ret"] = "True if vehicle, false if not";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Checks if an entity is a vehicle.";["classlib"] = "Entity";["name"] = "ents_methods:isVehicle";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Checks if an entity is a vehicle.";["param"] = {};};["setHologramRenderBounds"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
 Sets a hologram entity's renderbounds ";["name"] = "ents_methods:setHologramRenderBounds";["classlib"] = "Entity";["private"] = false;["client"] = true;["description"] = "\
 Sets a hologram entity's renderbounds";["param"] = {[1] = "mins";[2] = "maxs";["maxs"] = "The upper bounding corner coordinate local to the hologram";["mins"] = "The lower bounding corner coordinate local to the hologram";};};["manipulateBoneScale"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
 Allows manipulation of a hologram's bones' scale ";["name"] = "ents_methods:manipulateBoneScale";["classlib"] = "Entity";["private"] = false;["client"] = true;["description"] = "\
@@ -1081,79 +1161,61 @@ Sets an entities' material";["param"] = {[1] = "material";[2] = "ply";["material
 Returns the mass of the entity ";["classlib"] = "Entity";["name"] = "ents_methods:getMass";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Returns the mass of the entity";["param"] = {};};["getMaxHealth"] = {["ret"] = "Max Health of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the max health of an entity ";["classlib"] = "Entity";["name"] = "ents_methods:getMaxHealth";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets the max health of an entity";["param"] = {};};["enableDrag"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableDrag";["summary"] = "\
-Sets the entity drag state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entity drag state";["param"] = {[1] = "drag";["drag"] = "Bool should the entity have air resistence?";};};["enableMotion"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableMotion";["summary"] = "\
-Sets the entity movement state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entity movement state";["param"] = {[1] = "move";["move"] = "Bool should the entity move?";};};["enableSphere"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:enableSphere";["summary"] = "\
-Sets the physics of an entity to be a sphere ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the physics of an entity to be a sphere";["param"] = {[1] = "enabled";["enabled"] = "Bool should the entity be spherical?";};};["isWeldedTo"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:isWeldedTo";["summary"] = "\
-Gets what the entity is welded to ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Gets what the entity is welded to";["param"] = {};};["setFrozen"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setFrozen";["summary"] = "\
-Sets the entity frozen state ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entity frozen state";["param"] = {[1] = "freeze";["freeze"] = "Should the entity be frozen?";};};["applyAngForce"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:applyAngForce";["summary"] = "\
-Applies angular force to the entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Applies angular force to the entity";["param"] = {[1] = "ang";["ang"] = "The force angle";};};["extinguish"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:extinguish";["summary"] = "\
+Gets the max health of an entity";["param"] = {};};["extinguish"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:extinguish";["summary"] = "\
 Extinguishes an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
 Extinguishes an entity";["param"] = {};};["setAngles"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setAngles";["summary"] = "\
 Sets the entity's angles ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entity's angles";["param"] = {[1] = "ang";["ang"] = "New angles";};};["setPhysMaterial"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setPhysMaterial";["summary"] = "\
+Sets the entity's angles";["param"] = {[1] = "ang";["ang"] = "New angles";};};["translateBoneToPhysBone"] = {["ret"] = "The physobj id";["class"] = "function";["realm"] = "sh";["name"] = "ents_methods:translateBoneToPhysBone";["summary"] = "\
+Converts a ragdoll bone id to the corresponding physobject id ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Converts a ragdoll bone id to the corresponding physobject id";["param"] = {[1] = "boneid";["boneid"] = "The ragdoll boneid";};};["setSkin"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
+Sets the skin of the entity ";["name"] = "ents_methods:setSkin";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
+Sets the skin of the entity";["param"] = {[1] = "skinIndex";[2] = "ply";["skinIndex"] = "Number, Index of the skin to use.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["addCollisionListener"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:addCollisionListener";["summary"] = "\
+Allows detecting collisions on an entity.";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.";["param"] = {[1] = "func";["func"] = "The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData";};};["setNoDraw"] = {["class"] = "function";["realm"] = "sv";["summary"] = "\
+Sets the whether an entity should be drawn or not ";["name"] = "ents_methods:setNoDraw";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
+Sets the whether an entity should be drawn or not";["param"] = {[1] = "draw";[2] = "ply";["draw"] = "Whether to draw the entity or not.";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";};};["setVelocity"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setVelocity";["summary"] = "\
+Sets the entity's linear velocity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets the entity's linear velocity";["param"] = {[1] = "vel";["vel"] = "New velocity";};};["localToWorld"] = {["ret"] = "data as world space vector";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Converts a vector in entity local space to world space ";["classlib"] = "Entity";["name"] = "ents_methods:localToWorld";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Converts a vector in entity local space to world space";["param"] = {[1] = "data";["data"] = "Local space vector";};};["setPhysMaterial"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setPhysMaterial";["summary"] = "\
 Sets the physical material of the entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
 Sets the physical material of the entity";["param"] = {[1] = "mat";["mat"] = "Material to use";};};["getMaterial"] = {["ret"] = "String material";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets an entities' material ";["classForced"] = true;["classlib"] = "Entity";["name"] = "ents_methods:getMaterial";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets an entities' material";["param"] = {};};["getAngles"] = {["ret"] = "The angle";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Returns the angle of the entity ";["classlib"] = "Entity";["name"] = "ents_methods:getAngles";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the angle of the entity";["param"] = {};};["isValidPhys"] = {["ret"] = "True if entity has physics";["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:isValidPhys";["summary"] = "\
-Checks whether entity has physics ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Checks whether entity has physics";["param"] = {};};["getPos"] = {["ret"] = "The position vector";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets an entities' material";["param"] = {};};["getSubMaterial"] = {["ret"] = "String material";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets an entities' submaterial ";["classForced"] = true;["classlib"] = "Entity";["name"] = "ents_methods:getSubMaterial";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets an entities' submaterial";["param"] = {[1] = "index";};};["lookupBone"] = {["ret"] = "The bone index";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the ragdoll bone index given a bone name ";["classlib"] = "Entity";["name"] = "ents_methods:lookupBone";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Returns the ragdoll bone index given a bone name";["param"] = {[1] = "name";["name"] = "The bone's string name";};};["getPos"] = {["ret"] = "The position vector";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the position of the entity ";["classlib"] = "Entity";["name"] = "ents_methods:getPos";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Returns the position of the entity";["param"] = {};};["removeTrails"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:removeTrails";["summary"] = "\
 Removes trails from the entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
 Removes trails from the entity";["param"] = {};};["getMassCenter"] = {["ret"] = "The position vector of the mass center";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the local position of the entity's mass center ";["classlib"] = "Entity";["name"] = "ents_methods:getMassCenter";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the local position of the entity's mass center";["param"] = {};};["addCollisionListener"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:addCollisionListener";["summary"] = "\
-Allows detecting collisions on an entity.";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.";["param"] = {[1] = "func";["func"] = "The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData";};};["setParent"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setParent";["summary"] = "\
-Parents the entity to another entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Parents the entity to another entity";["param"] = {[1] = "ent";[2] = "attachment";["attachment"] = "Optional string attachment name to parent to";["ent"] = "Entity to parent to";};};["isVehicle"] = {["ret"] = "True if vehicle, false if not";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Checks if an entity is a vehicle.";["classlib"] = "Entity";["name"] = "ents_methods:isVehicle";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Checks if an entity is a vehicle.";["param"] = {};};["setMass"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setMass";["summary"] = "\
-Sets the entity's mass ";["private"] = false;["classlib"] = "Entity";["description"] = "\
-Sets the entity's mass";["param"] = {[1] = "mass";["mass"] = "number mass";};};["getParent"] = {["ret"] = "Entity's parent or nil";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Gets the parent of an entity ";["classlib"] = "Entity";["name"] = "ents_methods:getParent";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Gets the parent of an entity";["param"] = {};};["worldToLocal"] = {["ret"] = "data as local space vector";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the local position of the entity's mass center";["param"] = {};};["worldToLocal"] = {["ret"] = "data as local space vector";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Converts a vector in world space to entity local space ";["classlib"] = "Entity";["name"] = "ents_methods:worldToLocal";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Converts a vector in world space to entity local space";["param"] = {[1] = "data";["data"] = "World space vector";};};["setRenderMode"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
-Sets the rende mode of the entity ";["name"] = "ents_methods:setRenderMode";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
-Sets the rende mode of the entity";["param"] = {[1] = "rendermode";[2] = "ply";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";["rendermode"] = "Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE";};};["getMassCenterW"] = {["ret"] = "The position vector of the mass center";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Converts a vector in world space to entity local space";["param"] = {[1] = "data";["data"] = "World space vector";};};["setParent"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setParent";["summary"] = "\
+Parents the entity to another entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Parents the entity to another entity";["param"] = {[1] = "ent";[2] = "attachment";["attachment"] = "Optional string attachment name to parent to";["ent"] = "Entity to parent to";};};["obbCenterW"] = {["ret"] = "The position vector of the outer bounding box center";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the world position of the entity's outer bounding box ";["classlib"] = "Entity";["name"] = "ents_methods:obbCenterW";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Returns the world position of the entity's outer bounding box";["param"] = {};};["setMass"] = {["class"] = "function";["realm"] = "sv";["name"] = "ents_methods:setMass";["summary"] = "\
+Sets the entity's mass ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Sets the entity's mass";["param"] = {[1] = "mass";["mass"] = "number mass";};};["getMassCenterW"] = {["ret"] = "The position vector of the mass center";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the world position of the entity's mass center ";["classlib"] = "Entity";["name"] = "ents_methods:getMassCenterW";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the world position of the entity's mass center";["param"] = {};};};};["Angle"] = {["typtbl"] = "ang_methods";["summary"] = "\
-Angle Type ";["fields"] = {};["name"] = "Angle";["server"] = true;["description"] = "\
-Angle Type";["client"] = true;["class"] = "class";["methods"] = {[1] = "getForward";[2] = "getNormalized";[3] = "getRight";[4] = "getUp";[5] = "isZero";[6] = "normalize";[7] = "rotateAroundAxis";[8] = "set";[9] = "setP";[10] = "setR";[11] = "setY";[12] = "setZero";["getRight"] = {["ret"] = "vector normalised.";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getRight";["summary"] = "\
-Return the Right Vector relative to the angle dir.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Return the Right Vector relative to the angle dir.";["param"] = {};};["getUp"] = {["ret"] = "vector normalised.";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getUp";["summary"] = "\
-Return the Up Vector relative to the angle dir.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Return the Up Vector relative to the angle dir.";["param"] = {};};["isZero"] = {["ret"] = "boolean";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:isZero";["summary"] = "\
-Returns if p,y,r are all 0.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Returns if p,y,r are all 0.";["param"] = {};};["getNormalized"] = {["ret"] = "Normalized angle table";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getNormalized";["summary"] = "\
-Returnes a normalized angle ";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Returnes a normalized angle";["param"] = {};};["setP"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setP";["summary"] = "\
-Set's the angle's pitch and returns it.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Set's the angle's pitch and returns it.";["param"] = {[1] = "p";["p"] = "The pitch";};};["setR"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setR";["summary"] = "\
-Set's the angle's roll and returns it.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Set's the angle's roll and returns it.";["param"] = {[1] = "r";["r"] = "The roll";};};["normalize"] = {["ret"] = "nil";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:normalize";["summary"] = "\
-Normalise angles eg (0,181,1) -> (0,-179,1).";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Normalise angles eg (0,181,1) -> (0,-179,1).";["param"] = {};};["getForward"] = {["ret"] = "vector normalised.";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getForward";["summary"] = "\
-Return the Forward Vector ( direction the angle points ).";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Return the Forward Vector ( direction the angle points ).";["param"] = {};};["setY"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setY";["summary"] = "\
-Set's the angle's yaw and returns it.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Set's the angle's yaw and returns it.";["param"] = {[1] = "y";["y"] = "The yaw";};};["setZero"] = {["ret"] = "nil";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setZero";["summary"] = "\
-Sets p,y,r to 0.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Sets p,y,r to 0. This is faster than doing it manually.";["param"] = {};};["set"] = {["ret"] = "nil";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:set";["summary"] = "\
-Copies p,y,r from angle to another.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Copies p,y,r from angle to another.";["param"] = {[1] = "b";["b"] = "Angle to copy from.";};};["rotateAroundAxis"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:rotateAroundAxis";["summary"] = "\
-Return Rotated angle around the specified axis.";["private"] = false;["classlib"] = "Angle";["description"] = "\
-Return Rotated angle around the specified axis.";["param"] = {[1] = "v";[2] = "deg";[3] = "rad";["rad"] = "Number of radians or nil if degrees.";["deg"] = "Number of degrees or nil if radians.";["v"] = "Vector axis";};};};};["Mesh"] = {["typtbl"] = "mesh_methods";["fields"] = {};["name"] = "Mesh";["summary"] = "\
+Returns the world position of the entity's mass center";["param"] = {};};["getParent"] = {["ret"] = "Entity's parent or nil";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Gets the parent of an entity ";["classlib"] = "Entity";["name"] = "ents_methods:getParent";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Gets the parent of an entity";["param"] = {};};["setRenderMode"] = {["class"] = "function";["realm"] = "sv";["classForced"] = true;["summary"] = "\
+Sets the rende mode of the entity ";["name"] = "ents_methods:setRenderMode";["classlib"] = "Entity";["private"] = false;["server"] = true;["description"] = "\
+Sets the rende mode of the entity";["param"] = {[1] = "rendermode";[2] = "ply";["ply"] = "Optional player arguement to set only for that player. Can also be table of players.";["rendermode"] = "Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE";};};["getPhysicsObject"] = {["ret"] = "The main physics object of the entity";["class"] = "function";["realm"] = "sh";["name"] = "ents_methods:getPhysicsObject";["summary"] = "\
+Gets the main physics objects of an entity ";["private"] = false;["classlib"] = "Entity";["description"] = "\
+Gets the main physics objects of an entity";["param"] = {};};};};["Vehicle"] = {["typtbl"] = "vehicle_methods";["fields"] = {};["name"] = "Vehicle";["summary"] = "\
+Vehicle type ";["description"] = "\
+Vehicle type";["class"] = "class";["methods"] = {[1] = "ejectDriver";[2] = "getDriver";[3] = "getPassenger";["getDriver"] = {["ret"] = "Driver of vehicle";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the driver of the vehicle ";["name"] = "vehicle_methods:getDriver";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["description"] = "\
+Returns the driver of the vehicle";["param"] = {};};["getPassenger"] = {["ret"] = "amount of ammo";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns a passenger of a vehicle ";["name"] = "vehicle_methods:getPassenger";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["description"] = "\
+Returns a passenger of a vehicle";["param"] = {[1] = "n";["n"] = "The index of the passenger to get";};};["ejectDriver"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
+Ejects the driver of the vehicle ";["name"] = "vehicle_methods:ejectDriver";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["description"] = "\
+Ejects the driver of the vehicle";["param"] = {};};};};["Mesh"] = {["typtbl"] = "mesh_methods";["fields"] = {};["name"] = "Mesh";["summary"] = "\
 Mesh type ";["description"] = "\
 Mesh type";["client"] = true;["class"] = "class";["methods"] = {[1] = "destroy";[2] = "draw";["destroy"] = {["class"] = "function";["realm"] = "cl";["name"] = "mesh_methods:destroy";["summary"] = "\
 Frees the mesh from memory ";["private"] = false;["classlib"] = "Mesh";["description"] = "\
@@ -1286,15 +1348,7 @@ Returns the amount of deaths of the player";["param"] = {};};["hasGodMode"] = {[
 Returns whether or not the player has godmode ";["name"] = "player_methods:hasGodMode";["classlib"] = "Player";["private"] = false;["server"] = true;["description"] = "\
 Returns whether or not the player has godmode";["param"] = {};};["getActiveWeapon"] = {["ret"] = "The weapon";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the name of the player's active weapon ";["classlib"] = "Player";["name"] = "player_methods:getActiveWeapon";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
-Returns the name of the player's active weapon";["param"] = {};};};};["Vehicle"] = {["typtbl"] = "vehicle_methods";["fields"] = {};["name"] = "Vehicle";["summary"] = "\
-Vehicle type ";["description"] = "\
-Vehicle type";["class"] = "class";["methods"] = {[1] = "ejectDriver";[2] = "getDriver";[3] = "getPassenger";["getDriver"] = {["ret"] = "Driver of vehicle";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Returns the driver of the vehicle ";["name"] = "vehicle_methods:getDriver";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["description"] = "\
-Returns the driver of the vehicle";["param"] = {};};["getPassenger"] = {["ret"] = "amount of ammo";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Returns a passenger of a vehicle ";["name"] = "vehicle_methods:getPassenger";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["description"] = "\
-Returns a passenger of a vehicle";["param"] = {[1] = "n";["n"] = "The index of the passenger to get";};};["ejectDriver"] = {["class"] = "function";["realm"] = "sh";["summary"] = "\
-Ejects the driver of the vehicle ";["name"] = "vehicle_methods:ejectDriver";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["description"] = "\
-Ejects the driver of the vehicle";["param"] = {};};};};["VMatrix"] = {["typtbl"] = "vmatrix_methods";["fields"] = {};["name"] = "VMatrix";["summary"] = "\
+Returns the name of the player's active weapon";["param"] = {};};};};["VMatrix"] = {["typtbl"] = "vmatrix_methods";["fields"] = {};["name"] = "VMatrix";["summary"] = "\
 VMatrix type ";["description"] = "\
 VMatrix type";["class"] = "class";["methods"] = {[1] = "getAngles";[2] = "getForward";[3] = "getInverse";[4] = "getInverseTR";[5] = "getRight";[6] = "getScale";[7] = "getTranslation";[8] = "getUp";[9] = "rotate";[10] = "scale";[11] = "scaleTranslation";[12] = "setAngles";[13] = "setScale";[14] = "setTranslation";[15] = "translate";["getRight"] = {["ret"] = "Translation";["class"] = "function";["realm"] = "sh";["name"] = "vmatrix_methods:getRight";["summary"] = "\
 Returns right vector of matrix ";["private"] = false;["classlib"] = "VMatrix";["description"] = "\
@@ -1326,37 +1380,47 @@ Rotate the matrix";["param"] = {[1] = "ang";["ang"] = "Angle to rotate by";};};[
 Inverts the matrix efficiently for translations and rotations ";["private"] = false;["classlib"] = "VMatrix";["description"] = "\
 Inverts the matrix efficiently for translations and rotations";["param"] = {};};["scaleTranslation"] = {["class"] = "function";["realm"] = "sh";["name"] = "vmatrix_methods:scaleTranslation";["summary"] = "\
 Scales the absolute translation ";["private"] = false;["classlib"] = "VMatrix";["description"] = "\
-Scales the absolute translation";["param"] = {[1] = "num";["num"] = "Amount to scale by";};};};};["Bass"] = {["typtbl"] = "bass_methods";["fields"] = {};["name"] = "Bass";["summary"] = "\
-Bass type ";["description"] = "\
-Bass type";["client"] = true;["class"] = "class";["methods"] = {[1] = "getFFT";[2] = "getLength";[3] = "getTime";[4] = "isOnline";[5] = "isValid";[6] = "pause";[7] = "play";[8] = "setFade";[9] = "setLooping";[10] = "setPitch";[11] = "setPos";[12] = "setTime";[13] = "setVolume";[14] = "stop";["isValid"] = {["ret"] = "Is valid or not";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:isValid";["summary"] = "\
-Gets if the sound is valid or not ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Gets if the sound is valid or not";["param"] = {};};["setLooping"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setLooping";["summary"] = "\
-Sets if the sound should loop or not.";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Sets if the sound should loop or not.";["param"] = {[1] = "loop";["loop"] = "Boolean if the sound should loop or not.";};};["isOnline"] = {["ret"] = "Is online or not";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:isOnline";["summary"] = "\
-Gets if the sound is streamed or not ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Gets if the sound is streamed or not";["param"] = {};};["setFade"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setFade";["summary"] = "\
-Sets the fade distance of the sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Sets the fade distance of the sound";["param"] = {[1] = "min";[2] = "max";["max"] = "The channel's volume stops decreasing when the listener is beyond this distance.";["min"] = "The channel's volume is at maximum when the listener is within this distance";};};["getFFT"] = {["ret"] = "FFT table of the sound";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:getFFT";["summary"] = "\
-Gets the FFT of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Gets the FFT of a sound";["param"] = {[1] = "n";["n"] = "Sample size of the hamming window. Must be power of 2";};};["getTime"] = {["ret"] = "Current time in seconds of the sound";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:getTime";["summary"] = "\
-Gets the current time of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Gets the current time of a sound";["param"] = {};};["setTime"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setTime";["summary"] = "\
-Sets the current time of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Sets the current time of a sound";["param"] = {[1] = "time";["time"] = "Time to set a sound in seconds";};};["setPos"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setPos";["summary"] = "\
-Sets the position of the sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Sets the position of the sound";["param"] = {[1] = "pos";["pos"] = "Where to position the sound";};};["stop"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:stop";["summary"] = "\
-Stops playing the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Stops playing the sound.";["param"] = {};};["getLength"] = {["ret"] = "Length in seconds of the sound";["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:getLength";["summary"] = "\
-Gets the length of a sound ";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Gets the length of a sound";["param"] = {};};["setPitch"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setPitch";["summary"] = "\
-Sets the pitch of the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Sets the pitch of the sound.";["param"] = {[1] = "pitch";["pitch"] = "Pitch to set to, between 0 and 3.";};};["setVolume"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:setVolume";["summary"] = "\
-Sets the volume of the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Sets the volume of the sound.";["param"] = {[1] = "vol";["vol"] = "Volume to set to, between 0 and 1.";};};["play"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:play";["summary"] = "\
-Starts to play the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Starts to play the sound.";["param"] = {};};["pause"] = {["class"] = "function";["realm"] = "cl";["name"] = "bass_methods:pause";["summary"] = "\
-Pauses the sound.";["private"] = false;["classlib"] = "Bass";["description"] = "\
-Pauses the sound.";["param"] = {};};};};["File"] = {["typtbl"] = "file_methods";["fields"] = {};["name"] = "File";["summary"] = "\
+Scales the absolute translation";["param"] = {[1] = "num";["num"] = "Amount to scale by";};};};};["Color"] = {["typtbl"] = "color_methods";["summary"] = "\
+Color type ";["fields"] = {};["name"] = "Color";["server"] = true;["description"] = "\
+Color type";["client"] = true;["class"] = "class";["methods"] = {[1] = "hsvToRGB";[2] = "rgbToHSV";[3] = "setA";[4] = "setB";[5] = "setG";[6] = "setR";["setA"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setA";["summary"] = "\
+Set's the color's alpha and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
+Set's the color's alpha and returns it.";["param"] = {[1] = "a";["a"] = "The alpha";};};["setR"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setR";["summary"] = "\
+Set's the color's red channel and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
+Set's the color's red channel and returns it.";["param"] = {[1] = "r";["r"] = "The red";};};["rgbToHSV"] = {["ret"] = "A triplet of numbers representing HSV.";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Converts the color from RGB to HSV.";["classlib"] = "Color";["name"] = "color_methods:rgbToHSV";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Converts the color from RGB to HSV.";["param"] = {};};["setG"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setG";["summary"] = "\
+Set's the color's green and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
+Set's the color's green and returns it.";["param"] = {[1] = "g";["g"] = "The green";};};["hsvToRGB"] = {["ret"] = "A triplet of numbers representing HSV.";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Converts the color from HSV to RGB.";["classlib"] = "Color";["name"] = "color_methods:hsvToRGB";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
+Converts the color from HSV to RGB.";["param"] = {};};["setB"] = {["ret"] = "The modified color";["class"] = "function";["realm"] = "sh";["name"] = "color_methods:setB";["summary"] = "\
+Set's the color's blue and returns it.";["private"] = false;["classlib"] = "Color";["description"] = "\
+Set's the color's blue and returns it.";["param"] = {[1] = "b";["b"] = "The blue";};};};};["Angle"] = {["typtbl"] = "ang_methods";["summary"] = "\
+Angle Type ";["fields"] = {};["name"] = "Angle";["server"] = true;["description"] = "\
+Angle Type";["client"] = true;["class"] = "class";["methods"] = {[1] = "getForward";[2] = "getNormalized";[3] = "getRight";[4] = "getUp";[5] = "isZero";[6] = "normalize";[7] = "rotateAroundAxis";[8] = "set";[9] = "setP";[10] = "setR";[11] = "setY";[12] = "setZero";["getRight"] = {["ret"] = "vector normalised.";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getRight";["summary"] = "\
+Return the Right Vector relative to the angle dir.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Return the Right Vector relative to the angle dir.";["param"] = {};};["getUp"] = {["ret"] = "vector normalised.";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getUp";["summary"] = "\
+Return the Up Vector relative to the angle dir.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Return the Up Vector relative to the angle dir.";["param"] = {};};["isZero"] = {["ret"] = "boolean";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:isZero";["summary"] = "\
+Returns if p,y,r are all 0.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Returns if p,y,r are all 0.";["param"] = {};};["getNormalized"] = {["ret"] = "Normalized angle table";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getNormalized";["summary"] = "\
+Returnes a normalized angle ";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Returnes a normalized angle";["param"] = {};};["setP"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setP";["summary"] = "\
+Set's the angle's pitch and returns it.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Set's the angle's pitch and returns it.";["param"] = {[1] = "p";["p"] = "The pitch";};};["setR"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setR";["summary"] = "\
+Set's the angle's roll and returns it.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Set's the angle's roll and returns it.";["param"] = {[1] = "r";["r"] = "The roll";};};["normalize"] = {["ret"] = "nil";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:normalize";["summary"] = "\
+Normalise angles eg (0,181,1) -> (0,-179,1).";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Normalise angles eg (0,181,1) -> (0,-179,1).";["param"] = {};};["getForward"] = {["ret"] = "vector normalised.";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:getForward";["summary"] = "\
+Return the Forward Vector ( direction the angle points ).";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Return the Forward Vector ( direction the angle points ).";["param"] = {};};["setY"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setY";["summary"] = "\
+Set's the angle's yaw and returns it.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Set's the angle's yaw and returns it.";["param"] = {[1] = "y";["y"] = "The yaw";};};["setZero"] = {["ret"] = "nil";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:setZero";["summary"] = "\
+Sets p,y,r to 0.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Sets p,y,r to 0. This is faster than doing it manually.";["param"] = {};};["set"] = {["ret"] = "nil";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:set";["summary"] = "\
+Copies p,y,r from angle to another.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Copies p,y,r from angle to another.";["param"] = {[1] = "b";["b"] = "Angle to copy from.";};};["rotateAroundAxis"] = {["ret"] = "The modified angle";["class"] = "function";["realm"] = "sh";["name"] = "ang_methods:rotateAroundAxis";["summary"] = "\
+Return Rotated angle around the specified axis.";["private"] = false;["classlib"] = "Angle";["description"] = "\
+Return Rotated angle around the specified axis.";["param"] = {[1] = "v";[2] = "deg";[3] = "rad";["rad"] = "Number of radians or nil if degrees.";["deg"] = "Number of degrees or nil if radians.";["v"] = "Vector axis";};};};};["File"] = {["typtbl"] = "file_methods";["fields"] = {};["name"] = "File";["summary"] = "\
 File type ";["description"] = "\
 File type";["client"] = true;["class"] = "class";["methods"] = {[1] = "close";[2] = "flush";[3] = "read";[4] = "readBool";[5] = "readByte";[6] = "readDouble";[7] = "readFloat";[8] = "readLine";[9] = "readLong";[10] = "readShort";[11] = "seek";[12] = "size";[13] = "skip";[14] = "tell";[15] = "write";[16] = "writeBool";[17] = "writeByte";[18] = "writeDouble";[19] = "writeFloat";[20] = "writeLong";[21] = "writeShort";["readDouble"] = {["ret"] = "The data";["class"] = "function";["realm"] = "cl";["name"] = "file_methods:readDouble";["summary"] = "\
 Reads a double and advances the file position ";["private"] = false;["classlib"] = "File";["description"] = "\
