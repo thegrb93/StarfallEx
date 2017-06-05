@@ -750,3 +750,23 @@ end
 function ents_methods:getForward ()
 	return vwrap( eunwrap( self ):GetForward() )
 end
+
+--- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+-- @return table of MeshVertex structures
+function ents_methods:getMesh ()
+	SF.CheckType( self, ents_metamethods )
+	local phys = getPhysObject( eunwrap( self ) )
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
+	local mesh = phys:GetMesh()
+	return SF.Sanitize(mesh)
+end
+
+--- Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+-- @return table of MeshVertex structures
+function ents_methods:getMeshConvexes ()
+	SF.CheckType( self, ents_metamethods )
+	local phys = getPhysObject( eunwrap( self ) )
+	if not phys or not phys:IsValid() then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
+	local mesh = phys:GetMeshConvexes()
+	return SF.Sanitize(mesh)
+end
