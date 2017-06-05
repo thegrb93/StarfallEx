@@ -11,7 +11,7 @@ local ents_methods, ents_metamethods = SF.Typedef( "Entity" )
 local ewrap, eunwrap = SF.CreateWrapper( ents_metamethods, true, true, debug.getregistry().Entity )
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
 local ang_meta, vec_meta
-local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap
+local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
 local isValid = IsValid
 
 SF.Libraries.AddHook("postload", function()
@@ -24,6 +24,8 @@ SF.Libraries.AddHook("postload", function()
 	aunwrap = SF.Angles.Unwrap
 	cwrap = SF.Color.Wrap
 	cunwrap = SF.Color.Unwrap
+	pwrap = SF.PhysObjs.Wrap
+	punwrap = SF.PhysObjs.Unwrap
 	
 	function SF.DefaultEnvironment.chip ()
 		return ewrap( SF.instance.data.entity )
@@ -251,7 +253,7 @@ end
 -- @return Entity's parent or nil
 function ents_methods:getParent()
 	local ent = eunwrap(self)
-	return ent and ewrap(ent:GetParent())
+	return ewrap(ent:GetParent())
 end
 
 --- Gets the attachment index the entity is parented to
@@ -259,7 +261,7 @@ end
 -- @return number index of the attachment the entity is parented to or 0
 function ents_methods:getAttachmentParent()
 	local ent = eunwrap(self)
-	return ent and ent:GetParentAttachment() or 0
+	return ent:GetParentAttachment()
 end
 
 --- Gets the attachment index via the entity and it's attachment name
@@ -268,7 +270,7 @@ end
 -- @return number of the attachment index, or 0 if it doesn't exist
 function ents_methods:lookupAttachment(name)
 	local ent = eunwrap(self)
-	return ent and ent:LookupAttachment(name) or 0
+	return ent:LookupAttachment(name)
 end
 
 --- Gets the position and angle of an attachment
@@ -283,6 +285,50 @@ function ents_methods:getAttachment(index)
 			return vwrap(t.Pos), awrap(t.Ang)
 		end
 	end
+end
+
+--- Converts a ragdoll bone id to the corresponding physobject id
+-- @param boneid The ragdoll boneid
+-- @return The physobj id
+function ents_methods:translateBoneToPhysBone( boneid )
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw( "Entity is not valid.", 2 ) end
+	return ent:TranslateBoneToPhysBone( boneid )
+end
+
+--- Converts a physobject id to the corresponding ragdoll bone id
+-- @param boneid The physobject id
+-- @return The ragdoll bone id
+function ents_methods:translatePhysBoneToBone( boneid )
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw( "Entity is not valid.", 2 ) end
+	return ent:TranslatePhysBoneToBone( boneid )
+end
+
+--- Gets the number of physicsobjects of an entity
+-- @return The number of physics objects on the entity
+function ents_methods:getPhysicsObjectCount()
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw( "Entity is not valid.", 2 ) end
+	return ent:GetPhysicsObjectCount()
+end
+
+--- Gets the main physics objects of an entity
+-- @return The main physics object of the entity
+function ents_methods:getPhysicsObject()
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw( "Entity is not valid.", 2 ) end
+	return pwrap( ent:GetPhysicsObject() )
+end
+
+--- Gets a physics objects of an entity
+-- @param id The physics object id (starts at 0)
+-- @return The physics object of the entity
+function ents_methods:getPhysicsObjectNum( id )
+	SF.CheckType( id, "number" )
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw( "Entity is not valid.", 2 ) end
+	return pwrap( ent:GetPhysicsObjectNum( id ) )
 end
 
 --- Gets the color of an entity
@@ -366,6 +412,15 @@ function ents_methods:getPos ()
 	SF.CheckType( self, ents_metamethods )
 	local ent = eunwrap( self )
 	return vwrap( ent:GetPos() )
+end
+
+--- Returns the ragdoll bone index given a bone name
+-- @shared
+-- @param name The bone's string name
+-- @return The bone index
+function ents_methods:lookupBone( name )
+	SF.CheckType( name, "string" )
+	return eunwrap( self ):LookupBone( name )
 end
 
 --- Returns the matrix of the entity's bone
