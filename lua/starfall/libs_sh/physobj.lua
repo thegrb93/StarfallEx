@@ -7,7 +7,7 @@ SF.PhysObjs = {}
 --- PhysObj Type
 -- @shared
 local physobj_methods, physobj_metatable = SF.Typedef("PhysObj")
-local wrap, unwrap = SF.CreateWrapper( physobj_metatable, true, true )
+local wrap, unwrap = SF.CreateWrapper( physobj_metatable, true, false )
 
 local vwrap = SF.WrapObject
 
