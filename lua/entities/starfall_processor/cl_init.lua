@@ -10,8 +10,22 @@ function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 end
 
+function ENT:OnRemove ()
+	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
+	timer.Simple(0, function()
+		if not self:IsValid() and self.instance then
+			self.instance:runScriptHook( "removed" )
+			--removed hook can cause instance to become nil
+			if self.instance then
+				self.instance:deinitialize()
+				self.instance = nil
+			end
+		end
+	end)
+end
+
 hook.Add("NetworkEntityCreated","starfall_chip_reset",function(ent)
-	if ent:GetClass()=="starfall_processor" then
+	if ent:GetClass()=="starfall_processor" and not ent.instance then
 		net.Start( "starfall_processor_download" )
 		net.WriteEntity( ent )
 		net.SendToServer()

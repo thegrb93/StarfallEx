@@ -50,6 +50,17 @@ function ENT:SendCode ( recipient )
 	if recipient then net.Send( recipient ) else net.Broadcast() end
 end
 
+function ENT:OnRemove ()
+	if not self.instance then return end
+	
+	self.instance:runScriptHook( "removed" )
+	--removed hook can cause instance to become nil
+	if self.instance then
+		self.instance:deinitialize()
+		self.instance = nil
+	end
+end
+
 -- Request code from the chip. If the chip doesn't have code yet then wait at most 5 sec for code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
