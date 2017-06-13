@@ -101,3 +101,11 @@ function http_library.post ( url, params, callbackSuccess, callbackFail )
 		runCallback( instance, callbackFail, err )
 	end )
 end
+
+--- Converts data into base64 format or nil if the string is 0 length
+--@param data The data to convert
+--@return The converted data
+function http_library.base64Encode( data )
+	SF.CheckType( data, "string" )
+	return util.Base64Encode( data )
+end
