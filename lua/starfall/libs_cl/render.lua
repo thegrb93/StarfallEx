@@ -490,12 +490,12 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 		
 	local instance = SF.instance
 	local data = instance.data.render
-	local prefix = tx:sub(1,4)	
+	local prefix = tx:sub(1,5)	
 	if #tx > cv_max_data_material_size:GetInt() then
 		SF.Throw( "Texture URL/Data too long!", 2 )
 	end
-	if prefix=="http" or prefix == "data" then
-		if prefix == "http" then
+	if prefix=="http:" or prefix == "data:" then
+		if prefix == "http:" then
 			SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
 			tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
 				return string.format( "%%%02X", string.byte( str ) )
