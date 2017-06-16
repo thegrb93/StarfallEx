@@ -11,17 +11,19 @@ function ENT:Initialize()
 end
 
 function ENT:OnRemove ()
+	if self.instance then
+		self.instance:runScriptHook( "removed" )
+	end
+	
 	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
-	timer.Simple(0, function()
-		if not self:IsValid() and self.instance then
-			self.instance:runScriptHook( "removed" )
-			--removed hook can cause instance to become nil
-			if self.instance then
-				self.instance:deinitialize()
-				self.instance = nil
+	local instance = self.instance
+	if instance then
+		timer.Simple(0, function()
+			if not self:IsValid() then
+				instance:deinitialize()
 			end
-		end
-	end)
+		end)
+	end
 end
 
 hook.Add("NetworkEntityCreated","starfall_chip_reset",function(ent)
