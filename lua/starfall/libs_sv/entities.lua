@@ -309,13 +309,12 @@ function ents_methods:applyAngForce ( ang )
 end
 
 --- Applies torque
--- @param tq The torque vector
--- @param offset Optional offset position
-function ents_methods:applyTorque ( tq, offset )
+-- @param torque The torque vector
+function ents_methods:applyTorque ( torque )
 	SF.CheckType( self, ents_metatable )
-	SF.CheckType( tq, SF.Types[ "Vector" ] )
+	SF.CheckType( torque, SF.Types[ "Vector" ] )
 
-	local tq = vunwrap( tq )
+	local torque = vunwrap( torque )
 
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
@@ -323,29 +322,19 @@ function ents_methods:applyTorque ( tq, offset )
 
 	SF.Permissions.check( SF.instance.player, ent, "entities.applyForce" )
 
-	local torqueamount = tq:Length()
-
-	if offset then
-		SF.CheckType( offset, SF.Types[ "Vector" ] )
-		offset = vunwrap( offset )
-	else
-		offset = phys:GetPos()
-	end
+	local torqueamount = torque:Length()
 	-- Convert torque from local to world axis
-	tq = phys:LocalToWorld( tq ) - offset
+	torque = phys:LocalToWorldVector( torque ) / torqueamount
 
 	-- Find two vectors perpendicular to the torque axis
 	local off
-	if abs( tq.x ) > torqueamount * 0.1 or abs( tq.z ) > torqueamount * 0.1 then
-		off = Vector( -tq.z, 0, tq.x )
+	if abs( torque.x ) > 0.1 or abs( torque.z ) > 0.1 then
+		off = Vector( -torque.z, 0, torque.x ):GetNormalized()
 	else
-		off = Vector( -tq.y, tq.x, 0 )
+		off = Vector( -torque.y, torque.x, 0 ):GetNormalized()
 	end
-	off = off:GetNormal() * torqueamount * 0.5
-
-	local dir = ( tq:Cross( off ) ):GetNormal()
-
-	if not check( dir ) or not check( off ) then SF.Throw( "infinite vector", 2) end
+	local dir = torque:Cross( off )
+	off = off * torqueamount * 0.5
 
 	phys:ApplyForceOffset( dir, off )
 	phys:ApplyForceOffset( dir * -1, off * -1 )
