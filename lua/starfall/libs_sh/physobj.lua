@@ -215,6 +215,35 @@ if SERVER then
 		phys:ApplyForceOffset( force, position )
 	end
 	
+	--- Applys a torque to a physics object
+	-- @server
+	-- @param torque The local torque vector to apply
+	function physobj_methods:applyTorque( torque )
+		SF.CheckType( torque, vec_meta )
+		torque = vunwrap( torque )
+		if not check( torque ) then SF.Throw( "infinite torque vector", 2) end
+		
+		local phys = unwrap( self )
+		SF.Permissions.check( SF.instance.player, phys:GetEntity(), "entities.applyForce" )
+		
+		local torqueamount = torque:Length()
+		-- Convert torque from local to world axis
+		torque = phys:LocalToWorldVector( torque ) / torqueamount
+
+		-- Find two vectors perpendicular to the torque axis
+		local off
+		if math.abs( torque.x ) > 0.1 or math.abs( torque.z ) > 0.1 then
+			off = Vector( -torque.z, 0, torque.x ):GetNormalized()
+		else
+			off = Vector( -torque.y, torque.x, 0 ):GetNormalized()
+		end
+		local dir = torque:Cross( off )
+		off = off * torqueamount * 0.5
+
+		phys:ApplyForceOffset( dir, off )
+		phys:ApplyForceOffset( dir * -1, off * -1 )
+	end
+	
 	--- Sets the mass of a physics object
 	-- @server
 	-- @param mass The mass to set it to
