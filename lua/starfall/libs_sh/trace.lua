@@ -228,13 +228,15 @@ end
 --- Does a line trace
 -- @param start Start position
 -- @param endpos End position
--- @param filter Entity/array of entities to filter, or a function callback with an entity arguement
+-- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param mask Trace mask
+-- @param colgroup The collision group of the trace
+-- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
-function trace_library.trace ( start, endpos, filter, mask )
+function trace_library.trace ( start, endpos, filter, mask, colgroup, ignworld )
 	SF.Permissions.check( SF.instance.player, nil, "trace" )
-	SF.CheckType( start, SF.Types[ "Vector" ] )
-	SF.CheckType( endpos, SF.Types[ "Vector" ] )
+	SF.CheckType( start, SF.Types.Vector )
+	SF.CheckType( endpos, SF.Types.Vector )
 
 	local start, endpos = vunwrap( start ), vunwrap( endpos )
 
@@ -247,13 +249,17 @@ function trace_library.trace ( start, endpos, filter, mask )
 	else
 		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
 	end
-	if mask != nil then mask = SF.CheckType( mask, "number" ) end
+	if mask != nil then SF.CheckType( mask, "number" ) end
+	if colgroup != nil then SF.CheckType( colgroup, "number" ) end
+	if ignworld != nil then SF.CheckType( ignworld, "boolean" ) end
 
 	local trace = {
 		start = start,
 		endpos = endpos,
 		filter = filter,
-		mask = mask
+		mask = mask,
+		collisiongroup = colgroup,
+		ignoreworld = ignworld,
 	}
 	
 	local data = util.TraceLine( trace )
@@ -270,15 +276,17 @@ end
 -- @param endpos End position
 -- @param minbox Lower box corner
 -- @param maxbox Upper box corner
--- @param filter Entity/array of entities to filter, or a function callback with an entity arguement
+-- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
 -- @param mask Trace mask
+-- @param colgroup The collision group of the trace
+-- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
-function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
+function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld )
 	SF.Permissions.check( SF.instance.player, nil, "trace" )
-	SF.CheckType( start, SF.Types[ "Vector" ] )
-	SF.CheckType( endpos, SF.Types[ "Vector" ] )
-	SF.CheckType( minbox, SF.Types[ "Vector" ] )
-	SF.CheckType( maxbox, SF.Types[ "Vector" ] )
+	SF.CheckType( start, SF.Types.Vector )
+	SF.CheckType( endpos, SF.Types.Vector )
+	SF.CheckType( minbox, SF.Types.Vector )
+	SF.CheckType( maxbox, SF.Types.Vector )
 
 	local start, endpos, minbox, maxbox = vunwrap( start ), vunwrap( endpos ), vunwrap( minbox ), vunwrap( maxbox )
 
@@ -292,12 +300,16 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask )
 		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
 	end
 	if mask != nil then mask = SF.CheckType( mask, "number" ) end
+	if colgroup != nil then SF.CheckType( colgroup, "number" ) end
+	if ignworld != nil then SF.CheckType( ignworld, "boolean" ) end
 
 	local trace = {
 		start = start,
 		endpos = endpos,
 		filter = filter,
 		mask = mask,
+		collisiongroup = colgroup,
+		ignoreworld = ignworld,
 		mins = minbox,
 		maxs = maxbox
 	}
