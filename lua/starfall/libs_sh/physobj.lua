@@ -135,7 +135,7 @@ end
 --- Returns a normal vector in the reference frame of the world from the local frame of the physicsobject
 -- @param vec The normal vector to transform
 -- @return The transformed vector
-function physobj_methods:worldToLocalVector( vec )
+function physobj_methods:localToWorldVector( vec )
 	SF.CheckType( vec, vec_meta )
 	return vwrap( unwrap( self ):LocalToWorldVector( vunwrap( vec ) ) )
 end
