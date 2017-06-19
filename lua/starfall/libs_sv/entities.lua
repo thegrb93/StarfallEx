@@ -404,6 +404,9 @@ local renderProperties = {
 	end,
 	[8] = function( fx ) --Renderfx
 		net.WriteUInt( fx, 8 )
+	end,
+	[9] = function( draw ) --DrawShadow
+		net.WriteBit( draw )
 	end
 }
 
@@ -439,7 +442,7 @@ end
 --- Sets the color of the entity
 -- @server
 -- @param clr New color
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setColor ( clr, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( clr, SF.Types[ "Color" ] )
@@ -462,7 +465,7 @@ end
 --- Sets the whether an entity should be drawn or not
 -- @server
 -- @param draw Whether to draw the entity or not.
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setNoDraw ( draw, ply )
 	SF.CheckType( self, ents_metatable )
 
@@ -490,7 +493,7 @@ end
 -- @server
 -- @class function
 -- @param material, string, New material name.
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setMaterial ( material, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( material, "string" )
@@ -513,7 +516,7 @@ end
 -- @class function
 -- @param index, number, submaterial index.
 -- @param material, string, New material name.
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setSubMaterial ( index, material, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( material, "string" )
@@ -535,7 +538,7 @@ end
 -- @class function
 -- @param bodygroup Number, The ID of the bodygroup you're setting.
 -- @param value Number, The value you're setting the bodygroup to.
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setBodygroup ( bodygroup, value, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( bodygroup, "number" )
@@ -556,7 +559,7 @@ end
 -- @server
 -- @class function
 -- @param skinIndex Number, Index of the skin to use.
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setSkin ( skinIndex, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( skinIndex, "number" )
@@ -576,7 +579,7 @@ end
 -- @server
 -- @class function
 -- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setRenderMode ( rendermode, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( rendermode, "number" )
@@ -597,7 +600,7 @@ end
 -- @server
 -- @class function
 -- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
--- @param ply Optional player arguement to set only for that player. Can also be table of players.
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setRenderFX ( renderfx, ply )
 	SF.CheckType( self, ents_metatable )
 	SF.CheckType( renderfx, "number" )
@@ -611,6 +614,22 @@ function ents_methods:setRenderFX ( renderfx, ply )
 	else
 		ent:SetRenderFX( renderfx )
 		duplicator.StoreEntityModifier( ent, "colour", { RenderFX = renderfx } )
+	end
+end
+
+--- Sets whether an entity's shadow should be drawn
+-- @param ply Optional player argument to set only for that player. Can also be table of players.
+function ents_methods:setDrawShadow ( draw, ply )
+	SF.CheckType( self, ents_metatable )
+
+	local ent = unwrap( self )
+	if not isValid( ent ) then SF.Throw( "Entity is not valid", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.setRenderPropery" )
+
+	if ply then
+		sendRenderPropertyToClient( ply, ent, 9, draw and true or false )
+	else
+		ent:DrawShadow( draw and true or false )
 	end
 end
 
