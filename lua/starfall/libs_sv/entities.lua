@@ -619,7 +619,7 @@ end
 
 --- Sets whether an entity's shadow should be drawn
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
-function ents_methods:drawShadow ( draw, ply )
+function ents_methods:setDrawShadow ( draw, ply )
 	SF.CheckType( self, ents_metatable )
 
 	local ent = unwrap( self )
