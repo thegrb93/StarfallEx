@@ -75,7 +75,7 @@ if CLIENT then
 			tbl[1] = Color( net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ), net.ReadUInt( 8 ) )
 		end,
 		[2] = function( tbl ) --Nodraw
-			tbl[2] = ( net.ReadBit() == 1 )
+			tbl[2] = net.ReadBool()
 		end,
 		[3] = function( tbl ) --Material
 			tbl[3] = net.ReadString()
@@ -105,6 +105,9 @@ if CLIENT then
 		[8] = function( tbl ) --Renderfx
 			tbl[8] = net.ReadUInt( 8 )
 		end,
+		[9] = function( tbl ) --DrawShadow
+			tbl[9] = net.ReadBool()
+		end
 	}
 	local applyRenderProperties = {
 		[1] = function( ent, data ) --Color
@@ -135,6 +138,9 @@ if CLIENT then
 		[8] = function( ent, data ) --Renderfx
 			ent:SetRenderFX( data )
 		end,
+		[9] = function( ent, data ) --DrawShadow
+			ent:DrawShadow( data )
+		end
 	}
 
 	-- For some reason clientside properties get cleared when re-entering PAS and the clearing timing doesn't seem consistent, but this seems to work.
