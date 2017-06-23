@@ -8,7 +8,8 @@ else
 end
 ?>
 
-<dt><span class="realm_<?lua=func.realm?>">&nbsp;</span><?lua=func.deprecated and "<del>" or ""?><?lua=func.private and "local " or ""?><a name="<?lua=func.name?>"></a><strong><?lua=func.name?></strong>&nbsp;(<?lua=table.concat(func.param, ", ")?>)<?lua=func.deprecated and "</del>" or ""?></dt>
+<?lua local fname if func.classlib then fname = func.classlib..":"..func.fname elseif func.library then fname = func.library.."."..func.fname else fname = func.name end?>
+<dt><span class="realm_<?lua=func.realm?>">&nbsp;</span><?lua=func.deprecated and "<del>" or ""?><?lua=func.private and "local " or ""?><a name="<?lua=fname?>"></a><strong><?lua=fname?></strong>&nbsp;(<?lua=table.concat(func.param, ", ")?>)<?lua=func.deprecated and "</del>" or ""?></dt>
 <dd>
 <?lua=func.description or ""?>
 

@@ -89,17 +89,14 @@ local function check_library ( line )
 	line = util.trim( line )
 
 	-- Global library
-	local tblref, name = line:match( "^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(%s*\"([^\"]+)\".-%)$" )
-	return name, tblref
+	return line:match( "^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(%s*\"([^\"]+)\".-%)$" )
 end
 
 --- Checks if the line contains a class creation
 local function check_class ( line )
 	line = util.trim(line)
 
-	local tblref, name = line:match( "^%s*local%s+([%w_]+).-=%s*SF.Typedef%(%s*[\"']([^\"']+)[\"'].-%)$" )
-
-	return name, tblref
+	return line:match( "^%s*local%s+([%w_]+).-=%s*SF.Typedef%(%s*[\"']([^\"']+)[\"'].-%)$" )
 end
 
 -------------------------------------------------------------------------------
@@ -177,8 +174,8 @@ local function parse_comment ( block, first_line, libs, classes )
 	-- parse first line of code
 	if code ~= nil then
 		local func_info = check_function( code )
-		local libname, libtbl = check_library( code )
-		local typname, typtbl = check_class( code )
+		local libtbl, libname = check_library( code )
+		local typtbl, typname = check_class( code )
 
 		if func_info then
 			block.class = "function"
@@ -250,12 +247,14 @@ local function parse_comment ( block, first_line, libs, classes )
 		if block.library then
 			local lib = libs[block.library]
 			assert(lib, "no such library: "..block.library)
+			block.fname = fname
 			block.library = lib.name
 			table.insert(lib.functions,fname)
 			lib.functions[fname] = block
 		elseif block.classlib then
 			local class = classes[ block.classlib ]
 			assert( class, "no such class: " .. block.classlib )
+			block.fname = fname
 			block.classlib = class.name
 			table.insert( class.methods, fname )
 			class.methods[ fname ] = block
