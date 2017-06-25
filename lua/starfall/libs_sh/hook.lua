@@ -253,6 +253,7 @@ else
 	-- Client hooks
 	add( "StartChat" )
 	add( "FinishChat" )
+	add( "OnPlayerChat", "playerchat" )
 	add( "PostDrawHUD", "renderoffscreen", function( instance )
 		return SF.Permissions.hasAccess( instance.player, nil, "render.offscreen" ), {}
 	end)
@@ -524,5 +525,10 @@ add( "Tick" )
 
 --- Called when the local player closes their chat window.
 -- @name FinishChat
+-- @class hook
+-- @client
+
+--- Called when a player's chat message is printed to the chat window
+-- @name PlayerChat
 -- @class hook
 -- @client
