@@ -144,15 +144,34 @@ end
 SF.hookAdd( "PlayerButtonDown", "inputpressed", CheckButtonPerms)
 SF.hookAdd( "PlayerButtonUp", "inputreleased", CheckButtonPerms)
 
----- Called when a button is pressed
---- @name inputPressed
---- @class hook
---- @param button Number of the button
 
----- Called when a button is released
---- @name inputReleased
---- @class hook
---- @param button Number of the button
+SF.hookAdd( "StartCommand", "mousemoved", function(instance, ply, cmd)
+	if SF.Permissions.hasAccess( instance.player, nil, "input" ) then
+		local x, y = cmd:GetMouseX(), cmd:GetMouseY()
+		if x~=0 or y~=0 then
+			return true, {x, y}
+		end
+		return false
+	end
+	return false
+end )
+
+--- Called when a button is pressed
+-- @name inputPressed
+-- @class hook
+-- @param button Number of the button
+
+--- Called when a button is released
+-- @name inputReleased
+-- @class hook
+-- @param button Number of the button
+
+--- Called when the mouse is moved
+-- @name mousemoved
+-- @class hook
+-- @param x X coordinate moved
+-- @param y Y coordinate moved
+
 
 SF.Libraries.AddHook("postload", function()
 	local _KEY = {
