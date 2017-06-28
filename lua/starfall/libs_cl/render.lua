@@ -184,6 +184,14 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 			cam[view_matrix_stack[i]]()
 			view_matrix_stack[i] = nil
 		end
+		if data.changedFilterMag then
+			data.changedFilterMag = false
+			render.PopFilterMag()
+		end
+		if data.changedFilterMin then
+			data.changedFilterMin = false
+			render.PopFilterMin()
+		end
 		data.isRendering = false
 		data.needRT = false
 	end
@@ -731,6 +739,28 @@ function render_library.setTextureFromScreen ( ent )
 		draw.NoTexture()
 	end
 
+end
+
+--- Sets the texture filtering function when viewing a close texture
+-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+function render_library.setFilterMag(val)
+	SF.CheckType( val, "number" )
+	if SF.instance.data.render.changedFilterMag then
+		render.PopFilterMag()
+	end
+	SF.instance.data.render.changedFilterMag = true
+	render.PushFilterMag( val )
+end
+
+--- Sets the texture filtering function when viewing a far texture
+-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+function render_library.setFilterMin(val)
+	SF.CheckType( val, "number" )
+	if SF.instance.data.render.changedFilterMin then
+		render.PopFilterMin()
+	end
+	SF.instance.data.render.changedFilterMin = true
+	render.PushFilterMin( val )
 end
 
 --- Clears the active render target
