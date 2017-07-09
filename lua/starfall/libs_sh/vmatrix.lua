@@ -55,6 +55,14 @@ function vmatrix_methods:getTranslation ()
 	return vwrap( unwrap( self ):GetTranslation() )
 end
 
+--- Returns a specific field in the matrix
+-- @param n Row from 1 to 4
+-- @param n Column from 1 to 4
+-- @return Value of the specified field
+function vmatrix_methods:getField( row, column )
+	return unwrap( self ):GetField( row, column )
+end
+
 --- Rotate the matrix
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate ( ang )
@@ -148,6 +156,17 @@ function vmatrix_methods:setTranslation ( vec )
 
 	local v = unwrap( self )
 	v:SetTranslation( vec )
+end
+
+--- Sets a specific field in the matrix
+-- @param n Row from 1 to 4
+-- @param n Column from 1 to 4
+-- @param n Value to set
+function vmatrix_methods:setField( row, column, value )
+	SF.CheckType( vec, vec_meta )
+
+	local v = unwrap( self )
+	v:SetField( row, column, value )
 end
 
 --- Translate the matrix
