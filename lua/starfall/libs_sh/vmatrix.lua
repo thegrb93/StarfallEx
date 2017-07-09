@@ -163,8 +163,6 @@ end
 -- @param n Column from 1 to 4
 -- @param n Value to set
 function vmatrix_methods:setField( row, column, value )
-	SF.CheckType( vec, vec_meta )
-
 	local v = unwrap( self )
 	v:SetField( row, column, value )
 end
