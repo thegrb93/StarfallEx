@@ -227,8 +227,9 @@ if SERVER then
 		SF.Permissions.check( SF.instance.player, phys:GetEntity(), "entities.applyForce" )
 		
 		local torqueamount = torque:Length()
+		if torqueamount < 1.192093e-07 then return end
 		-- Convert torque from local to world axis
-		torque = phys:LocalToWorldVector( torque ) / torqueamount
+		torque = phys:LocalToWorldVector( torque / torqueamount )
 
 		-- Find two vectors perpendicular to the torque axis
 		local off
