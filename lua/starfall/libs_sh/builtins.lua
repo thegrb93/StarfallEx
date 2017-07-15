@@ -36,6 +36,14 @@ SF.DefaultEnvironment.player = nil
 -- @return entity
 SF.DefaultEnvironment.entity = nil
 
+--- Same as Lua's select
+-- @name SF.DefaultEnvironment.select
+-- @class function
+-- @param parameter
+-- @param vararg
+-- @return Returns a number or vararg, depending on the select method.
+SF.DefaultEnvironment.select = select
+
 --- Same as Lua's tostring
 -- @name SF.DefaultEnvironment.tostring
 -- @class function
