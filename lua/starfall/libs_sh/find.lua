@@ -22,7 +22,7 @@ local function convert(results, func)
 	if func then
 		for i=1,#results do
 			local e = wrap(results[i])
-			if func(e) then
+			if e and func(e) then
 				t[#t+1] = e
 			end
 		end
