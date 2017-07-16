@@ -19,19 +19,16 @@ local function convert(results, func)
 	local wrap = SF.WrapObject
 	
 	local t = {}
-	local count = 1
 	if func then
 		for i=1,#results do
 			local e = wrap(results[i])
 			if func(e) then
-				t[count] = e
-				count = count + 1
+				t[#t+1] = e
 			end
 		end
 	else
 		for i=1,#results do
-			t[count] = wrap(results[i])
-			count = count + 1
+			t[#t+1] = wrap(results[i])
 		end
 	end
 	return t
