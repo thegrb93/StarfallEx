@@ -698,117 +698,136 @@ local function cleanHooks( file )
 	end
 end
 
-if SERVER then
-	local l
+do
+	
 	MsgN("-SF - Loading Libraries")
-
-	MsgN("- Loading shared libraries")
-	l = file.Find("starfall/libs_sh/*.lua", "LUA")
-	for _,filename in pairs(l) do
-		print("-  Loading "..filename)
-		include("starfall/libs_sh/"..filename)
-		AddCSLuaFile("starfall/libs_sh/"..filename)
+	
+	local be_verbose = _G.SF_VERBOSE_INIT ~= false
+	local print=function(...)
+		if not be_verbose then return end
+		return print(...)
 	end
-	MsgN("- End loading shared libraries")
-	
-	MsgN("- Loading SF server-side libraries")
-	l = file.Find("starfall/libs_sv/*.lua", "LUA")
-	for _,filename in pairs(l) do
-		print("-  Loading "..filename)
-		include("starfall/libs_sv/"..filename)
+	local MsgN=function(...)
+		if not be_verbose then return end
+		return MsgN(...)
 	end
-	MsgN("- End loading server-side libraries")
+	
+	if SERVER then
+		local l
+		
+		MsgN("- Loading shared libraries")
+		l = file.Find("starfall/libs_sh/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Loading "..filename)
+			include("starfall/libs_sh/"..filename)
+			AddCSLuaFile("starfall/libs_sh/"..filename)
+		end
+		MsgN("- End loading shared libraries")
 
-	
-	MsgN("- Adding client-side libraries to send list")
-	l = file.Find("starfall/libs_cl/*.lua", "LUA")
-	for _,filename in pairs(l) do
-		print("-  Adding "..filename)
-		AddCSLuaFile("starfall/libs_cl/"..filename)
-	end
-	MsgN("- End loading client-side libraries")
-	
-	MsgN("-End Loading SF Libraries")
-	
-	-- Command to reload the libraries
-	util.AddNetworkString("sf_reloadlibrary")
-	concommand.Add("sf_reloadlibrary", function(ply, com, arg)
-		if ply:IsValid() and not ply:IsSuperAdmin() then return end
-		local filename = arg[1]
-		if not filename then return end
-		filename = string.lower( filename )
-		
-		local function sendToClient(name)
-			net.Start("sf_reloadlibrary")
-			local data = util.Compress(file.Read(name,"LUA"))
-			net.WriteString(filename)
-			net.WriteStream( data )
-			net.Broadcast()
+		MsgN("- Loading SF server-side libraries")
+		l = file.Find("starfall/libs_sv/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Loading "..filename)
+			include("starfall/libs_sv/"..filename)
 		end
-		
-		local sv_filename = "starfall/libs_sv/"..filename..".lua"
-		local sh_filename = "starfall/libs_sh/"..filename..".lua"
-		local cl_filename = "starfall/libs_cl/"..filename..".lua"
-		
-		cleanHooks( filename )
-		
-		local postload
-		if file.Exists( sh_filename, "LUA" ) then
-			print("Reloaded library: " .. filename)
-			include(sh_filename)
-			sendToClient(sh_filename)
-			postload = true
-		end
-		if file.Exists( sv_filename, "LUA" ) then
-			print("Reloaded library: " .. filename)
-			include(sv_filename)
-			postload = true
-		end
-		if file.Exists( cl_filename, "LUA" ) then
-			sendToClient(cl_filename)
-		end
-		if postload then
-			SF.Libraries.CallHook("postload")
-		end
-	end)
-	
-else
+		MsgN("- End loading server-side libraries")
 
-	net.Receive("sf_reloadlibrary", function(len)
-		local name = net.ReadString()
-		net.ReadStream( nil, function( data )
-			local file = util.Decompress( data )
-			if file then
-				print("Reloaded library: " .. name)
-				cleanHooks( name )
-				local func = CompileString( file, "starfall/" .. name .. ".lua" )
-				func()
+
+		MsgN("- Adding client-side libraries to send list")
+		l = file.Find("starfall/libs_cl/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Adding "..filename)
+			AddCSLuaFile("starfall/libs_cl/"..filename)
+		end
+		MsgN("- End loading client-side libraries")
+
+		MsgN("-End Loading SF Libraries")
+		
+		be_verbose = true
+		
+		-- Command to reload the libraries
+		util.AddNetworkString("sf_reloadlibrary")
+		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
+			if ply:IsValid() and not ply:IsSuperAdmin() then return end
+			local filename = arg[1]
+			if not filename then return end
+			filename = string.lower( filename )
+
+			local function sendToClient(name)
+				net.Start("sf_reloadlibrary")
+				local data = util.Compress(file.Read(name,"LUA"))
+				net.WriteString(filename)
+				net.WriteStream( data )
+				net.Broadcast()
+			end
+
+			local sv_filename = "starfall/libs_sv/"..filename..".lua"
+			local sh_filename = "starfall/libs_sh/"..filename..".lua"
+			local cl_filename = "starfall/libs_cl/"..filename..".lua"
+
+			cleanHooks( filename )
+
+			local postload
+			if file.Exists( sh_filename, "LUA" ) then
+				print("Reloaded library: " .. filename)
+				include(sh_filename)
+				sendToClient(sh_filename)
+				postload = true
+			end
+			if file.Exists( sv_filename, "LUA" ) then
+				print("Reloaded library: " .. filename)
+				include(sv_filename)
+				postload = true
+			end
+			if file.Exists( cl_filename, "LUA" ) then
+				sendToClient(cl_filename)
+			end
+			if postload then
 				SF.Libraries.CallHook("postload")
 			end
-		end )
-	end)
+		end)
 
-	local l
-	MsgN("-SF - Loading Libraries")
+	else
 
-	MsgN("- Loading shared libraries")
-	l = file.Find("starfall/libs_sh/*.lua", "LUA")
-	for _,filename in pairs(l) do
-		print("-  Loading "..filename)
-		include("starfall/libs_sh/"..filename)
+		net.Receive("sf_reloadlibrary", function(len)
+			local name = net.ReadString()
+			net.ReadStream( nil, function( data )
+				local file = util.Decompress( data )
+				if file then
+					print("Reloaded library: " .. name)
+					cleanHooks( name )
+					local func = CompileString( file, "starfall/" .. name .. ".lua" )
+					func()
+					SF.Libraries.CallHook("postload")
+				end
+			end )
+		end)
+
+		local l
+		MsgN("-SF - Loading Libraries")
+
+		MsgN("- Loading shared libraries")
+		l = file.Find("starfall/libs_sh/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Loading "..filename)
+			include("starfall/libs_sh/"..filename)
+		end
+		MsgN("- End loading shared libraries")
+
+		MsgN("- Loading client-side libraries")
+		l = file.Find("starfall/libs_cl/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Loading "..filename)
+			include("starfall/libs_cl/"..filename)
+		end
+		MsgN("- End loading client-side libraries")
+
+
+		MsgN("-End Loading SF Libraries")
+		
+		be_verbose = true
+		
 	end
-	MsgN("- End loading shared libraries")
-	
-	MsgN("- Loading client-side libraries")
-	l = file.Find("starfall/libs_cl/*.lua", "LUA")
-	for _,filename in pairs(l) do
-		print("-  Loading "..filename)
-		include("starfall/libs_cl/"..filename)
-	end
-	MsgN("- End loading client-side libraries")
-
-	
-	MsgN("-End Loading SF Libraries")
 end
 
 SF.Libraries.CallHook("postload")
