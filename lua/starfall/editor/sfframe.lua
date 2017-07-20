@@ -1445,6 +1445,7 @@ function Editor:Open(Line, code, forcenewtab)
 		return
 	end
 	if Line then self:LoadFile(Line, forcenewtab) return end
+	hook.Run("StarfallEditorOpen")
 end
 
 function Editor:SaveFile(Line, close, SaveAs)
@@ -1554,6 +1555,7 @@ function Editor:Close()
 
 		RunConsoleCommand("starfall_processor_ScriptModel", model or "")
 	end 
+	hook.Run("StarfallEditorClose")
 end
 
 function Editor:Setup(nTitle, nLocation, nEditorType)
