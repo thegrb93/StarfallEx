@@ -702,19 +702,16 @@ do
 	
 	MsgN("-SF - Loading Libraries")
 	
-	local be_verbose = _G.SF_VERBOSE_INIT ~= false
 	local print=function(...)
-		if not be_verbose then return end
-		return print(...)
+		if SF_VERBOSE_INIT ~= false then return print(...) end
 	end
 	local MsgN=function(...)
-		if not be_verbose then return end
-		return MsgN(...)
+		if SF_VERBOSE_INIT ~= false then return MsgN(...) end
 	end
 	
 	if SERVER then
 		local l
-		
+
 		MsgN("- Loading shared libraries")
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
 		for _,filename in pairs(l) do
@@ -742,8 +739,34 @@ do
 		MsgN("- End loading client-side libraries")
 
 		MsgN("-End Loading SF Libraries")
-		
-		be_verbose = true
+
+	else
+		local l
+
+		MsgN("- Loading shared libraries")
+		l = file.Find("starfall/libs_sh/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Loading "..filename)
+			include("starfall/libs_sh/"..filename)
+		end
+		MsgN("- End loading shared libraries")
+
+		MsgN("- Loading client-side libraries")
+		l = file.Find("starfall/libs_cl/*.lua", "LUA")
+		for _,filename in pairs(l) do
+			print("-  Loading "..filename)
+			include("starfall/libs_cl/"..filename)
+		end
+		MsgN("- End loading client-side libraries")
+
+
+		MsgN("-End Loading SF Libraries")
+
+	end
+end
+
+do
+	if SERVER then
 		
 		-- Command to reload the libraries
 		util.AddNetworkString("sf_reloadlibrary")
@@ -786,7 +809,7 @@ do
 				SF.Libraries.CallHook("postload")
 			end
 		end)
-
+		
 	else
 
 		net.Receive("sf_reloadlibrary", function(len)
@@ -802,30 +825,6 @@ do
 				end
 			end )
 		end)
-
-		local l
-		MsgN("-SF - Loading Libraries")
-
-		MsgN("- Loading shared libraries")
-		l = file.Find("starfall/libs_sh/*.lua", "LUA")
-		for _,filename in pairs(l) do
-			print("-  Loading "..filename)
-			include("starfall/libs_sh/"..filename)
-		end
-		MsgN("- End loading shared libraries")
-
-		MsgN("- Loading client-side libraries")
-		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _,filename in pairs(l) do
-			print("-  Loading "..filename)
-			include("starfall/libs_cl/"..filename)
-		end
-		MsgN("- End loading client-side libraries")
-
-
-		MsgN("-End Loading SF Libraries")
-		
-		be_verbose = true
 		
 	end
 end
