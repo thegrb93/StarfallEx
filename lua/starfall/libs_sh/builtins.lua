@@ -583,6 +583,24 @@ else
 		SF.Permissions.check( SF.instance.player, nil, "console.command" )
 		LocalPlayer():ConCommand( cmd )
 	end
+	
+	--- Returns the local player's camera angles
+	-- @return The local player's camera angles
+	function SF.DefaultEnvironment.eyeAngles ()
+		return SF.WrapObject( EyeAngles() )
+	end
+	
+	--- Returns the local player's camera position
+	-- @return The local player's camera position
+	function SF.DefaultEnvironment.eyePos()
+		return SF.WrapObject( EyePos() )
+	end
+	
+	--- Returns the local player's camera forward vector
+	-- @return The local player's camera forward vector
+	function SF.DefaultEnvironment.eyeVector()
+		return SF.WrapObject( EyeVector() )
+	end
 end
 
 --- Runs an included script and caches the result.
