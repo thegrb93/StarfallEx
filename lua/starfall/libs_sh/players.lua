@@ -442,12 +442,15 @@ end
 if SERVER then
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
-	-- @param e Entity to set the player's view entity to
-	function player_methods:setViewEntity ( e )
+	-- @param ent Entity to set the player's view entity to, or nothing to reset it
+	function player_methods:setViewEntity ( ent )
 		local pl = eunwrap( self )
-		local ent = eunwrap( e )
 		if not IsValid(pl) then SF.Throw("Invalid Player", 2) end
-		if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
+		
+		if ent~=nil then
+			ent = eunwrap( ent )
+			if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
+		end
 
 		if IsValid(pl.sfhudenabled) and pl.sfhudenabled.link == SF.instance.data.entity then
 			pl:SetViewEntity( ent )
