@@ -350,10 +350,9 @@ function ents_methods:addCollisionListener ( func )
 	if not isValid( ent ) then SF.Throw( "Entity is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.canTool" )
 	if ent.SF_CollisionCallback then SF.Throw( "The entity is already listening to collisions!", 2 ) end
-	ent.SF_CollisionCallback = true
 
 	local instance = SF.instance
-	ent:AddCallback("PhysicsCollide", function(ent, data)
+	ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data)
 		instance:runFunction( func, setmetatable({}, {
 			__index=function(t,k)
 				return SF.WrapObject( data[k] )
@@ -361,6 +360,17 @@ function ents_methods:addCollisionListener ( func )
 			__metatable=""
 		}))
 	end)
+end
+
+--- Removes a collision listening hook from the entity so that a new one can be added
+function ents_methods:removeCollisionListener ()
+	SF.CheckType( self, ents_metatable )
+	local ent = unwrap( self )
+	if not isValid( ent ) then SF.Throw( "Entity is not valid", 2 ) end
+	SF.Permissions.check( SF.instance.player, ent, "entities.canTool" )
+	if not ent.SF_CollisionCallback then SF.Throw( "The entity isn't listening to collisions!", 2 ) end
+	ent:RemoveCallback( "PhysicsCollide", ent.SF_CollisionCallback )
+	ent.SF_CollisionCallback = nil
 end
 
 --- Set's the entity to collide with nothing but the world
