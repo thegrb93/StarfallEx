@@ -239,6 +239,15 @@ string_methods.trim=string.Trim string_methods.Trim=string.Trim
 string_methods.trimLeft=string.TrimLeft string_methods.TrimLeft=string.TrimLeft
 string_methods.trimRight=string.TrimRight string_methods.TrimRight=string.TrimRight
 string_methods.upper=string.upper
+
+--UTF8 part
+string_methods.utf8char=utf8.char
+string_methods.utf8codepoint=utf8.codepoint
+string_methods.utf8codes=utf8.codes
+string_methods.utf8force=utf8.force
+string_methods.utf8len=utf8.len
+string_methods.utf8offset=utf8.offset
+
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
 	if rep < 0.5 then return "" end
