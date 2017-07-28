@@ -129,7 +129,7 @@ local function directive_include(args, filename, data)
 	if not data.includes[filename] then data.includes[filename] = {} end
 	
 	local incl = data.includes[filename]
-	incl[#incl+1] = args
+	incl[#incl+1] = string.Trim(args)
 end
 SF.Preprocessor.SetGlobalDirective("include",directive_include)
 
@@ -138,7 +138,7 @@ local function directive_includedir( args, filename, data )
 	if not data.includes[filename] then data.includes[filename] = {} end
 
 	local incl = data.includes[filename]
-
+	args = string.Trim(args)
 	local files = file.Find( "starfall/" ..args.. "/*", "DATA" )
 	if files then
 		for _, v in pairs( files ) do
