@@ -49,6 +49,10 @@ SF.Errormeta = {
 function SF.MakeError ( msg, level, uncatchable, prependinfo )
 	level = 1 + ( level or 1 )
 	local info = debug.getinfo( level, "Sl" )
+	if not info then
+		info = {short_src = "", currentline = 0}
+		prependinfo = false
+	end
 	return setmetatable( {
 		uncatchable = false,
 		file = info.short_src,
