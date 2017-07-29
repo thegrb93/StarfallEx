@@ -278,5 +278,9 @@ if SERVER then
 		local phys = unwrap( self )
 		SF.Permissions.check( SF.instance.player, phys:GetEntity(), "entities.setMass" )
 		phys:SetMaterial( material )
+		if not phys:IsMoveable() then
+			phys:EnableMotion( true )
+			phys:EnableMotion( false )
+		end
 	end
 end
