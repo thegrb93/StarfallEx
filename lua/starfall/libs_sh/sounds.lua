@@ -14,6 +14,12 @@ SF.Sounds.Unwrap = unwrap
 SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
 
+SF.Sounds.burstmax = CreateConVar( "sf_sounds_burstmax", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )" )
+	
+SF.Sounds.burstrate = CreateConVar( "sf_sounds_burstrate", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+	"The rate at which the burst regenerates per second." )
+
 -- Register Privileges
 do
 	local P = SF.Permissions
@@ -24,7 +30,8 @@ end
 -- Register functions to be called when the chip is initialised and deinitialised
 SF.Libraries.AddHook( "initialize", function ( inst )
 	inst.data.sounds = {
-		sounds = {}
+		sounds = {},
+		burst = SF.BurstObject( SF.Sounds.burstrate:GetFloat(), SF.Sounds.burstmax:GetFloat() )
 	}
 end )
 
@@ -44,6 +51,7 @@ end )
 -- @return Sound Object
 function sound_library.create ( ent, path )
 	SF.Permissions.check( SF.instance.player, { ent, path }, "sound.create" )
+	if not SF.instance.data.sounds.burst:use(1) then SF.Throw( "Can't create sounds that often", 2 ) end
 
 	SF.CheckType( ent, SF.Types[ "Entity" ] )
 	SF.CheckType( path, "string" )
