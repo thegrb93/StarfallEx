@@ -95,7 +95,7 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local vector_meta, matrix_meta, col_meta, ang_meta
+local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta
 local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap
 
 SF.Libraries.AddHook("postload", function()
@@ -103,6 +103,7 @@ SF.Libraries.AddHook("postload", function()
 	matrix_meta = SF.VMatrix.Metatable
 	col_meta = SF.Color.Metatable
 	ang_meta = SF.Angles.Metatable
+	ent_meta = SF.Entities.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	cwrap = SF.Color.Wrap
@@ -468,6 +469,36 @@ function render_library.popViewMatrix()
 	cam[view_matrix_stack[i]]()
 	view_matrix_stack[i] = nil
 end
+
+--- Sets the draw color
+-- @param col Color of background
+-- @screen (Optional) entity of screen
+function render_library.setBackgroundColor( col, screen )
+	local renderdata = SF.instance.data.render
+
+	SF.CheckType( col, col_meta )
+	
+	if screen then
+		SF.CheckType( screen, ent_meta )
+		screen = eunwrap(screen)
+		if screen.link != SF.instance.data.entity then
+			SF.Throw( "Entity has to be linked!", 2 )
+		end
+	else
+		if renderdata.isRendering then
+			screen = renderdata.renderEnt
+		end
+	end
+	
+	if not screen then
+		SF.Throw( "Invalid rendering entity.", 2 )
+	end
+	
+	if screen.SetBackgroundColor then --Fail silently on HUD etc
+		screen:SetBackgroundColor(col.r, col.g, col.b, col.a)
+	end
+end
+
 
 --- Sets the draw color
 -- @param clr Color type

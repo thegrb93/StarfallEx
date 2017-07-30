@@ -91,6 +91,10 @@ function ENT:Draw ()
 	self:DrawModel()
 end
 
+function ENT:SetBackgroundColor(r, g, b, a)
+	self.BackgroundColor = Color(r, g, b, a)
+end
+
 function ENT:DrawTranslucent ()
 	self:DrawModel()
 	
@@ -102,20 +106,30 @@ function ENT:DrawTranslucent ()
 	cam.PushModelMatrix( transform )
 		render.ClearStencil()
 		render.SetStencilEnable( true )
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-		render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-		render.SetStencilPassOperation( STENCILOPERATION_REPLACE )
-		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_ALWAYS )
 		render.SetStencilWriteMask( 1 )
+		render.SetStencilTestMask( 1 )
 		render.SetStencilReferenceValue( 1 )
 
 		render.OverrideDepthEnable( true, true )
-		surface.SetDrawColor(0,0,0,255)
-		surface.DrawRect(0,0,512/self.Aspect,512)
+		
+		render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
+		render.SetStencilPassOperation( STENCILOPERATION_ZERO )
+		render.SetStencilZFailOperation( STENCILOPERATION_ZERO )
+		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
+		render.SetStencilReferenceValue( 1 )
+		surface.SetDrawColor(Color(0,0,0,255))
+		surface.DrawRect(0,0,512/self.Aspect,512) -- Mask, not visible
+		
+		render.SetStencilFailOperation( STENCILOPERATION_ZERO )
+		render.SetStencilPassOperation( STENCILOPERATION_REPLACE )
+		render.SetStencilZFailOperation( STENCILOPERATION_ZERO )
+		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
+		render.SetStencilReferenceValue( 1 )	
+		surface.SetDrawColor(self.BackgroundColor or Color(0,0,0,255))
+		surface.DrawRect(0,0,512/self.Aspect,512) --Background
 		render.OverrideDepthEnable( false )
 
 		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-		render.SetStencilTestMask( 1 )
 		
 		render.PushFilterMag( TEXFILTER.ANISOTROPIC )
 		render.PushFilterMin( TEXFILTER.ANISOTROPIC )
