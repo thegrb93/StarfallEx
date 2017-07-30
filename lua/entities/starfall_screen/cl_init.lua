@@ -113,10 +113,10 @@ function ENT:DrawTranslucent ()
 		render.OverrideDepthEnable( true, true )
 		
 		render.SetStencilFailOperation( STENCILOPERATION_REPLACE )
-	    render.SetStencilPassOperation( STENCILOPERATION_ZERO )
-	    render.SetStencilZFailOperation( STENCILOPERATION_ZERO )
-	    render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
-	    render.SetStencilReferenceValue( 1 )
+		render.SetStencilPassOperation( STENCILOPERATION_ZERO )
+		render.SetStencilZFailOperation( STENCILOPERATION_ZERO )
+		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_NEVER )
+		render.SetStencilReferenceValue( 1 )
 		surface.SetDrawColor(Color(0,0,0,255))
 		surface.DrawRect(0,0,512/self.Aspect,512) -- Mask, not visible
 		
