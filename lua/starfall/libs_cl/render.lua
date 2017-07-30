@@ -476,9 +476,7 @@ end
 function render_library.setBackgroundColor( col, screen )
 	local renderdata = SF.instance.data.render
 
-	if col then
-		SF.CheckType( col, col_meta )
-	end
+	SF.CheckType( col, col_meta )
 	
 	if screen then
 		SF.CheckType( screen, ent_meta )
