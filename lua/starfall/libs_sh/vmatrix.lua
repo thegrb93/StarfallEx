@@ -56,8 +56,8 @@ function vmatrix_methods:getTranslation ()
 end
 
 --- Returns a specific field in the matrix
--- @param n Row from 1 to 4
--- @param n Column from 1 to 4
+-- @param row A number from 1 to 4
+-- @param column A number from 1 to 4
 -- @return Value of the specified field
 function vmatrix_methods:getField( row, column )
 	return unwrap( self ):GetField( row, column )
@@ -159,9 +159,9 @@ function vmatrix_methods:setTranslation ( vec )
 end
 
 --- Sets a specific field in the matrix
--- @param n Row from 1 to 4
--- @param n Column from 1 to 4
--- @param n Value to set
+-- @param row A number from 1 to 4
+-- @param column A number from 1 to 4
+-- @param value Value to set
 function vmatrix_methods:setField( row, column, value )
 	local v = unwrap( self )
 	v:SetField( row, column, value )
