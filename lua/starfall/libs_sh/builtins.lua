@@ -191,9 +191,10 @@ end
 
 --- Checks if the chip is capable of performing an action.
 --@param perm The permission id to check
-function SF.DefaultEnvironment.hasPermission( perm )
+--@param obj Optional object to pass to the permission system.
+function SF.DefaultEnvironment.hasPermission( perm, obj )
 	SF.CheckType( perm, "string" )
-	return SF.Permissions.hasAccess( SF.instance.player, nil, perm )
+	return SF.Permissions.hasAccess( SF.instance.player, SF.UnwrapObject( obj ), perm )
 end
 
 
