@@ -41,7 +41,12 @@ function ENT:Compile(owner, files, mainfile)
 	end
 	
 	self.instance = instance
-	instance.runOnError = function(inst,...) self:Error(...) end
+	instance.runOnError = function(inst,...)
+		-- Have to make sure it's valid because the chip can be deleted before deinitialization and trigger errors
+		if self:IsValid() then
+			self:Error(...)
+		end
+	end
 	instance.data.userdata = self.starfalluserdata
 	self.starfalluserdata = nil
 	
