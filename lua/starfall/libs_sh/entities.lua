@@ -420,6 +420,15 @@ function ents_methods:getPos ()
 	return vwrap( ent:GetPos() )
 end
 
+--- Returns how submerged the entity is in water
+-- @shared
+-- @return The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
+function ents_methods:getWaterLevel()
+	SF.CheckType( self, ents_metamethods )
+	local ent = eunwrap( self )
+	return ent:WaterLevel()
+end
+
 --- Returns the ragdoll bone index given a bone name
 -- @shared
 -- @param name The bone's string name
