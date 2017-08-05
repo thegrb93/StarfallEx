@@ -97,6 +97,7 @@ end
 local function createLibraryMap ()
 
 	local libMap, libs = {}, {}
+	local libsLookup = {}
 
 	libMap[ "Environment" ] = {}
 	for name, val in pairs( SF.DefaultEnvironment ) do
@@ -114,14 +115,42 @@ local function createLibraryMap ()
 		end
 	end
 
+	for lib, tbl in pairs( SF.Libraries.libraries ) do --Constants/enums aren't present in docs ATM
+		table.insert( libs, lib ) -- Highlight library name
+		libsLookup[ lib ] = true
+		libMap[ lib ] = {}
+
+		for name, val in pairs( tbl ) do
+			local fullname = lib .. "\\." .. name
+
+			if libsLookup[ fullname ] then continue end
+			libsLookup[ fullname ] = true
+
+			table.insert( libMap[ lib ], name )
+			table.insert( libs, fullname )
+		end
+	end
+
 	--Gathering data from docs
 	for lib, tbl in pairs( SF.Docs.libraries ) do
 		if not isstring(lib) then continue end -- We gotta skip numberics
+
+		if not libsLookup[ lib ] then
+			table.insert( libs, lib )
+			libsLookup[ lib ] = true
+		end
+
 		libMap[ lib ] = {}
+
 		for name, val in pairs( tbl.functions ) do
 			if not isstring(name) then continue end -- We gotta skip numberics
+
+			local fullname = lib .. "\\." .. name
+			if libsLookup[ fullname ] then continue end
+			libsLookup[ fullname ] = true
+
 			table.insert( libMap[ lib ], name )
-			table.insert( libs, lib.."\\."..name )
+			table.insert( libs, fullname )
 		end
 	end
 
