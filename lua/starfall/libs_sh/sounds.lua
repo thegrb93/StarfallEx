@@ -14,10 +14,10 @@ SF.Sounds.Unwrap = unwrap
 SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
 
-SF.Sounds.burstmax = CreateConVar( "sf_sounds_burstmax", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+SF.Sounds.burstmax = CreateConVar( "sf_sounds_burstmax", "20", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )" )
 	
-SF.Sounds.burstrate = CreateConVar( "sf_sounds_burstrate", "4", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
+SF.Sounds.burstrate = CreateConVar( "sf_sounds_burstrate", "10", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
 	"The rate at which the burst regenerates per second." )
 
 -- Register Privileges
@@ -70,6 +70,13 @@ function sound_library.create ( ent, path )
 	i[ s ] = s
 
 	return i[ s ]
+end
+
+
+--- Returns if a sound is able to be created
+-- @return If it is possible to make a sound
+function sound_library.canCreate()
+	return SF.instance.data.sounds.burst:check()>1
 end
 
 --------------------------------------------------
