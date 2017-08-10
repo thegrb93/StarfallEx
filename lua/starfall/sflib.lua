@@ -686,21 +686,7 @@ else
 	end
 end
 
--- ------------------------------------------------------------------------- --
-
-local function cleanHooks( file )
-	for k, v in pairs(SF.Libraries.hooks) do
-		local i = 1
-		while i <= #v do
-			local hookfile = string.lower(string.sub(string.GetFileFromFilename( debug.getinfo( v[i], "S" ).short_src or "" ), 1, -5))
-			if file == hookfile then
-				table.remove( v, i )
-			else
-				i = i + 1
-			end
-		end
-	end
-end
+-----------------------------------------------------------------------------
 
 do
 	
@@ -770,6 +756,20 @@ do
 end
 
 do
+	local function cleanHooks( path )
+		for k, v in pairs(SF.Libraries.hooks) do
+			local i = 1
+			while i <= #v do
+				local hookfile = debug.getinfo( v[i], "S" ).short_src
+				if string.find(hookfile, path, 1, true) then
+					table.remove( v, i )
+				else
+					i = i + 1
+				end
+			end
+		end
+	end
+
 	if SERVER then
 		
 		-- Command to reload the libraries
@@ -780,11 +780,11 @@ do
 			if not filename then return end
 			filename = string.lower( filename )
 
-			local function sendToClient(name)
+			local function sendToClient(path)
 				net.Start("sf_reloadlibrary")
-				local data = util.Compress(file.Read(name,"LUA"))
-				net.WriteString(filename)
-				net.WriteStream( data )
+				local data = util.Compress(file.Read(path,"LUA"))
+				net.WriteString(path)
+				net.WriteStream(data)
 				net.Broadcast()
 			end
 
@@ -816,14 +816,24 @@ do
 		
 	else
 
+		local function getRootPath(path)
+			local _, addons = file.Find( 'addons/*', 'GAME' )
+			for k, v in pairs(addons) do
+				local rootpath = "addons/"..v.."/lua/"..path
+				if file.Exists( rootpath, "GAME" ) then
+					return rootpath
+				end
+			end
+		end
+		
 		net.Receive("sf_reloadlibrary", function(len)
-			local name = net.ReadString()
+			local path = net.ReadString()
 			net.ReadStream( nil, function( data )
 				local file = util.Decompress( data )
 				if file then
-					print("Reloaded library: " .. name)
-					cleanHooks( name )
-					local func = CompileString( file, "starfall/" .. name .. ".lua" )
+					print("Reloaded library: " .. string.StripExtension(string.GetFileFromFilename( path )))
+					cleanHooks( path )
+					local func = CompileString( file, getRootPath(path) or path )
 					func()
 					SF.Libraries.CallHook("postload")
 				end
