@@ -90,12 +90,10 @@ function SF.Typedef(name, supermeta)
 	metamethods.__metatable = name
 	metamethods.__index = methods
 	metamethods.__methods = methods
-	
-	metamethods.__supertypes = {[metamethods] = true}
-	
+		
 	if supermeta then
 		setmetatable(methods, {__index=supermeta.__index})
-		metamethods.__supertypes[supermeta] = true
+		metamethods.__supertypes = {[supermeta] = true}
 		if supermeta.__supertypes then
 			for k,_ in pairs(supermeta.__supertypes) do
 				metamethods.__supertypes[k] = true
@@ -183,10 +181,16 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		sensitive2sf = sensitive2sf_tables[ shared_meta ]
 		sf2sensitive = sf2sensitive_tables[ shared_meta ]
 	else
-		sensitive2sf = setmetatable({},{__mode=s2sfmode})
-		sf2sensitive = setmetatable({},{__mode=sf2smode})
-		sensitive2sf_tables[ metatable ] = sensitive2sf
-		sf2sensitive_tables[ metatable ] = sf2sensitive
+		-- Check if the wrapper already exists for this metatable and recycle it or shared wrappers won't work.
+		if sensitive2sf_tables[ metatable ] then
+			sensitive2sf = sensitive2sf_tables[ metatable ]
+			sf2sensitive = sf2sensitive_tables[ metatable ]
+		else
+			sensitive2sf = setmetatable({},{__mode=s2sfmode})
+			sf2sensitive = setmetatable({},{__mode=sf2smode})
+			sensitive2sf_tables[ metatable ] = sensitive2sf
+			sf2sensitive_tables[ metatable ] = sf2sensitive
+		end
 	end
 	
 	local function wrap(value)
