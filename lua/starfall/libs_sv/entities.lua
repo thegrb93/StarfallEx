@@ -108,16 +108,6 @@ local function check ( v )
 			-math.huge < v[3] and v[3] < math.huge
 end
 
-local function parent_check ( child, parent )
-	while isValid( parent ) do
-		if child == parent then
-			return false
-		end
-		parent = parent:GetParent()
-	end
-	return true
-end
-
 --- Parents the entity to another entity
 -- @param ent Entity to parent to
 -- @param attachment Optional string attachment name to parent to
@@ -129,10 +119,11 @@ function ents_methods:setParent ( ent, attachment )
 	local this = unwrap( self )
 
 	SF.Permissions.check( SF.instance.player, this, "entities.parent" )
-	SF.Permissions.check( SF.instance.player, ent, "entities.parent" )
-	if ent:IsPlayer() then SF.Throw( "Insufficient permissions", 2 ) end
-
-	if not parent_check( this, ent ) then SF.Throw( "Cannot parent to self", 2 ) end
+	if ent:IsPlayer() and this:GetClass()~="starfall_hologram" then
+		SF.Throw( "Insufficient permissions", 2 )
+	else
+		SF.Permissions.check( SF.instance.player, ent, "entities.parent" )
+	end
 
 	this:SetParent( ent )
 	if attachment then
