@@ -119,8 +119,10 @@ function ents_methods:setParent ( ent, attachment )
 	local this = unwrap( self )
 
 	SF.Permissions.check( SF.instance.player, this, "entities.parent" )
-	if ent:IsPlayer() and this:GetClass()~="starfall_hologram" then
-		SF.Throw( "Insufficient permissions", 2 )
+	if ent:IsPlayer() then
+		if this:GetClass()~="starfall_hologram" then
+			SF.Throw( "Insufficient permissions", 2 )
+		end
 	else
 		SF.Permissions.check( SF.instance.player, ent, "entities.parent" )
 	end
