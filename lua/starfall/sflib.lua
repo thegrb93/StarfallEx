@@ -819,17 +819,7 @@ do
 		end)
 		
 	else
-
-		local function getRootPath(path)
-			local _, addons = file.Find( 'addons/*', 'GAME' )
-			for k, v in pairs(addons) do
-				local rootpath = "addons/"..v.."/lua/"..path
-				if file.Exists( rootpath, "GAME" ) then
-					return rootpath
-				end
-			end
-		end
-		
+		local root_path = SF.NormalizePath(string.GetPathFromFilename(debug.getinfo(1, "S").short_src).."../")
 		net.Receive("sf_reloadlibrary", function(len)
 			local path = net.ReadString()
 			net.ReadStream( nil, function( data )
@@ -837,7 +827,7 @@ do
 				if file then
 					print("Reloaded library: " .. string.StripExtension(string.GetFileFromFilename( path )))
 					cleanHooks( path )
-					local func = CompileString( file, getRootPath(path) or path )
+					local func = CompileString( file, root_path .. path )
 					func()
 					SF.Libraries.CallHook("postload")
 				end
