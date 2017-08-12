@@ -151,7 +151,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	if swep then
 
-		if ( ( not swep.Spawnable && not instance.player:IsAdmin() ) ||
+		if ( ( not swep.Spawnable && not instance.player:IsAdmin() ) or
 			  ( swep.AdminOnly && not instance.player:IsAdmin() ) ) then return end
 		if ( not gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
 
@@ -219,10 +219,10 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 					local kLower = string.lower( k )
 
-					if ( kLower == "vehiclescript" ||
-						 kLower == "limitview"     ||
-						 kLower == "vehiclelocked" ||
-						 kLower == "cargovisible"  ||
+					if ( kLower == "vehiclescript" or
+						 kLower == "limitview"     or
+						 kLower == "vehiclelocked" or
+						 kLower == "cargovisible"  or
 						 kLower == "enablegun" )
 					then
 						entity:SetKeyValue( k, v )
