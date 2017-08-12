@@ -864,8 +864,8 @@ end
 --@return If it is valid
 function SF.DefaultEnvironment.isValid( object )
 
-	if ( !object ) then return false end
-	if ( !object.isValid ) then return false end
+	if ( not object ) then return false end
+	if ( not object.isValid ) then return false end
 
 	return object:isValid()
 

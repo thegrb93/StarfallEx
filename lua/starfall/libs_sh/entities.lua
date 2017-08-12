@@ -178,7 +178,7 @@ if CLIENT then
 		SF.CheckType(bone, "number")
 		SF.CheckType(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
@@ -191,7 +191,7 @@ if CLIENT then
 		SF.CheckType(bone, "number")
 		SF.CheckType(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
@@ -204,7 +204,7 @@ if CLIENT then
 		SF.CheckType(bone, "number")
 		SF.CheckType(ang, ang_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
@@ -217,7 +217,7 @@ if CLIENT then
 		local instance = SF.instance
 		SF.Permissions.check(instance.player, nil, "mesh")
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		if mesh then
 			SF.CheckType(mesh, SF.Mesh.Metatable)
@@ -238,7 +238,7 @@ if CLIENT then
 		SF.CheckType(mins, vec_meta)
 		SF.CheckType(maxs, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or !ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
