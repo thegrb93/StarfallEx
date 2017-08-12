@@ -29,7 +29,7 @@ function Class(name, superclass)
 	local ret = {}
 	setmetatable(ret, {
 		__index = function(self, key)
-			if key != "constructor" and superclass then
+			if key ~= "constructor" and superclass then
 				return superclass[key]
 			end
 			return nil

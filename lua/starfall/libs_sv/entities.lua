@@ -280,21 +280,21 @@ function ents_methods:applyAngForce ( ang )
 	local forward = ent:GetForward()
 
 	-- apply pitch force
-	if ang.p != 0 then
+	if ang.p ~= 0 then
 		local pitch = up * ( ang.p * 0.5 )
 		phys:ApplyForceOffset( forward, pitch )
 		phys:ApplyForceOffset( forward * -1, pitch * -1 )
 	end
 
 	-- apply yaw force
-	if ang.y != 0 then
+	if ang.y ~= 0 then
 		local yaw = forward * ( ang.y * 0.5 )
 		phys:ApplyForceOffset( left, yaw )
 		phys:ApplyForceOffset( left * -1, yaw * -1 )
 	end
 
 	-- apply roll force
-	if ang.r != 0 then
+	if ang.r ~= 0 then
 		local roll = left * ( ang.r * 0.5 )
 		phys:ApplyForceOffset( up, roll )
 		phys:ApplyForceOffset( up * -1, roll * -1 )
@@ -835,7 +835,7 @@ function ents_methods:isValidPhys()
 	
 	local ent = unwrap( self )
 	local phys = getPhysObject( ent )
-	return phys != nil
+	return phys ~= nil
 end
 
 --- Sets entity gravity
@@ -890,7 +890,7 @@ function ents_methods:enableSphere ( enabled )
 
 	local ent = unwrap( self )
 	
-	if ent:GetClass() != "prop_physics" then SF.Throw( "This function only works for prop_physics", 2 ) end
+	if ent:GetClass() ~= "prop_physics" then SF.Throw( "This function only works for prop_physics", 2 ) end
 	local phys = getPhysObject( ent )
 	if not phys then SF.Throw( "Entity has no physics object or is not valid", 2 ) end
 	SF.Permissions.check( SF.instance.player, ent, "entities.enableMotion" )
@@ -906,7 +906,7 @@ function ents_methods:enableSphere ( enabled )
 			ent:SetCollisionBounds( Vector( -radius, -radius, -radius ) , Vector( radius, radius, radius ) )
 		end
 	else
-		if ent:GetMoveType() != MOVETYPE_VPHYSICS then
+		if ent:GetMoveType() ~= MOVETYPE_VPHYSICS then
 			ent:PhysicsInit( SOLID_VPHYSICS )
 			ent:SetMoveType( MOVETYPE_VPHYSICS )
 			ent:SetSolid( SOLID_VPHYSICS )

@@ -191,12 +191,12 @@ function EDITOR:ResetTokenizer(row)
 			if not self.blockcomment and not self.multilinestring and not singlelinecomment then
 				if before == "-" and bbefore == "-" and char == "[" and after == "[" then
 					self.blockcomment = true
-				elseif before != "\\" and before != "-" and char == "[" and after =="[" then
+				elseif before ~= "\\" and before ~= "-" and char == "[" and after =="[" then
 					self.multilinestring = true
 				end
-			elseif self.multilinestring and before != "\\" and char == ']' and after == "]" then
+			elseif self.multilinestring and before ~= "\\" and char == ']' and after == "]" then
 				self.multilinestring = nil
-			elseif self.blockcomment and before != '\\' and char == "]" and after == "]" then
+			elseif self.blockcomment and before ~= '\\' and char == "]" and after == "]" then
 				self.blockcomment = nil
 			end
 		end
@@ -465,7 +465,7 @@ function EDITOR:SyntaxColorLine(row)
 			else
 				tokenname = "notfound"
 			end
-			if self.tokendata != "" then
+			if self.tokendata ~= "" then
 				addToken(tokenname, self.tokendata)
 				self.tokendata = ""
 			end
@@ -559,7 +559,7 @@ function EDITOR:SyntaxColorLine(row)
 
 			tokenname = "notfound"
 		end
-		if tokenname != "" then
+		if tokenname ~= "" then
 			addToken(tokenname, self.tokendata)
 		end
 	end

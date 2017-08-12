@@ -249,9 +249,9 @@ function trace_library.trace ( start, endpos, filter, mask, colgroup, ignworld )
 	else
 		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
 	end
-	if mask != nil then SF.CheckType( mask, "number" ) end
-	if colgroup != nil then SF.CheckType( colgroup, "number" ) end
-	if ignworld != nil then SF.CheckType( ignworld, "boolean" ) end
+	if mask ~= nil then SF.CheckType( mask, "number" ) end
+	if colgroup ~= nil then SF.CheckType( colgroup, "number" ) end
+	if ignworld ~= nil then SF.CheckType( ignworld, "boolean" ) end
 
 	local trace = {
 		start = start,
@@ -299,9 +299,9 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask, 
 	else
 		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
 	end
-	if mask != nil then mask = SF.CheckType( mask, "number" ) end
-	if colgroup != nil then SF.CheckType( colgroup, "number" ) end
-	if ignworld != nil then SF.CheckType( ignworld, "boolean" ) end
+	if mask ~= nil then mask = SF.CheckType( mask, "number" ) end
+	if colgroup ~= nil then SF.CheckType( colgroup, "number" ) end
+	if ignworld ~= nil then SF.CheckType( ignworld, "boolean" ) end
 
 	local trace = {
 		start = start,

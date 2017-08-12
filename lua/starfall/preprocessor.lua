@@ -65,7 +65,7 @@ local function FindComments( line )
 					pos = found + 1
 				end
 			elseif char == "\"" then
-				if line:sub(found-1,found-1) == "\\" and line:sub(found-2,found-1) != "\\\\" then
+				if line:sub(found-1,found-1) == "\\" and line:sub(found-2,found-1) ~= "\\\\" then
 					-- Escaped character
 					pos = found+1
 				else

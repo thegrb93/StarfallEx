@@ -481,7 +481,7 @@ function render_library.setBackgroundColor( col, screen )
 	if screen then
 		SF.CheckType( screen, ent_meta )
 		screen = eunwrap(screen)
-		if screen.link != SF.instance.data.entity then
+		if screen.link ~= SF.instance.data.entity then
 			SF.Throw( "Entity has to be linked!", 2 )
 		end
 	else
@@ -561,7 +561,7 @@ function render_library.getTextureID ( tx, cb, alignment, skip_hack )
 			SF.CheckType( alignment, "string" )
 			local args = string.Split( alignment, " " )
 			local validargs = {["left"]=true,["center"]=true,["right"]=true,["top"]=true,["bottom"]=true}
-			if #args != 1 and #args ~= 2 then SF.Throw( "Invalid urltexture alignment given." ) end
+			if #args ~= 1 and #args ~= 2 then SF.Throw( "Invalid urltexture alignment given." ) end
 			for i=1, #args do
 				if not validargs[args[i]] then SF.Throw( "Invalid urltexture alignment given." ) end
 			end
@@ -1285,7 +1285,7 @@ end
 -- @return y position
 function render_library.cursorPos( ply )
 	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()!="starfall_screen" then return input.GetCursorPos() end
+	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
 
 	ply = ply and eunwrap( ply ) or LocalPlayer()
 	

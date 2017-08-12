@@ -54,7 +54,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.source = code
 	instance.initialized = false
 	instance.mainfile = mainfile
-	instance.cpuQuota = ( SERVER or LocalPlayer() != instance.player ) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+	instance.cpuQuota = ( SERVER or LocalPlayer() ~= instance.player ) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1/SF.cpuBufferN:GetInt()
 	
 	for filename, source in pairs(code) do
@@ -140,7 +140,7 @@ function SF.Instance:prepare(hook)
 	--Functions calling this one will silently halt.
 	if self.error then return true end
 	
-	if SF.instance != nil then
+	if SF.instance ~= nil then
 		self.instanceStack = self.instanceStack or {}
 		self.instanceStack[#self.instanceStack + 1] = SF.instance
 		SF.instance = nil
@@ -237,7 +237,7 @@ function SF.Instance:runScriptHookForResult(hook,...)
 	for name, func in pairs(self.hooks[hook]) do
 		tbl = self:runWithOps(func,...)
 		if tbl[1] then
-			if tbl[2]!=nil then
+			if tbl[2]~=nil then
 				break
 			end
 		else
@@ -291,7 +291,7 @@ end
 
 hook.Add("Think","SF_Think",function()
 	for pl, insts in pairs(SF.playerInstances) do
-		local plquota = ( SERVER or LocalPlayer() != pl ) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		local plquota = ( SERVER or LocalPlayer() ~= pl ) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
 			instance.cpu_average = instance:movingCPUAverage()

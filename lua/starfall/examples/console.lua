@@ -28,7 +28,7 @@ if SERVER then
 	local function cout(str, color)
 		for I=1, #str do
 			if str[I] == "\n" then
-				while ConsolePos % 60 != 0 do
+				while ConsolePos % 60 ~= 0 do
 					Console[ConsolePos] = 0
 					ConsolePos = ConsolePos + 2
 				end

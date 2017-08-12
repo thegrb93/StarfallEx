@@ -31,7 +31,7 @@ local erato = coroutine.create( function ( n )
 		end
 
 		for i = 2, sqrtlmt do
-			if t[ i ] != 0 then
+			if t[ i ] ~= 0 then
 				-- Because we're in a for loop, best make sure we check to yield.
 				yieldCheck()
 				for j = i * i, n, i do
@@ -46,7 +46,7 @@ local erato = coroutine.create( function ( n )
 		for i = 2, n do
 			-- Because we're in a for loop, best make sure we check to yield.
 			yieldCheck()
-			if t[ i ] != 0 then
+			if t[ i ] ~= 0 then
 				table.insert( primes, i )
 			end
 		end
@@ -59,7 +59,7 @@ end )
 
 hook.add( "think", "primeNumbers", function ()
 	-- If the coroutine isn't running and hasn't died, then we need to start it or resume it.
-	if coroutine.status( erato ) != "running" and coroutine.status( erato ) ~= "dead" then
+	if coroutine.status( erato ) ~= "running" and coroutine.status( erato ) ~= "dead" then
 		-- Make sure we're sufficiently below quota to resume
 		if checkQ( 0.1 ) then
 			-- r will be nil until the final yield which gives us our primes.
