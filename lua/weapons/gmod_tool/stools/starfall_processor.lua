@@ -158,7 +158,7 @@ function TOOL:Think()
 	local ent = self.GhostEntity
 	
 	if not IsValid(ent) then return end
-	if ( trace.Entity && trace.Entity:GetClass() == "starfall_processor" or trace.Entity:IsPlayer() ) then
+	if ( trace.Entity and trace.Entity:GetClass() == "starfall_processor" or trace.Entity:IsPlayer() ) then
 
 		ent:SetNoDraw( true )
 		return

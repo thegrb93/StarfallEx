@@ -151,8 +151,8 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	if swep then
 
-		if ( ( not swep.Spawnable && not instance.player:IsAdmin() ) or
-			  ( swep.AdminOnly && not instance.player:IsAdmin() ) ) then return end
+		if ( ( not swep.Spawnable and not instance.player:IsAdmin() ) or
+			  ( swep.AdminOnly and not instance.player:IsAdmin() ) ) then return end
 		if ( not gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
 
 
@@ -162,7 +162,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	elseif sent then
 
-		if ( sent.AdminOnly && not instance.player:IsAdmin() ) then return false end
+		if ( sent.AdminOnly and not instance.player:IsAdmin() ) then return false end
 		if ( not gamemode.Call( "PlayerSpawnSENT", instance.player, class ) ) then return end
 
 		entity = ents.Create( sent.ClassName )
@@ -171,7 +171,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	elseif npc then
 
-		if ( npc.AdminOnly && not instance.player:IsAdmin() ) then return false end
+		if ( npc.AdminOnly and not instance.player:IsAdmin() ) then return false end
 		if ( not gamemode.Call( "PlayerSpawnNPC", instance.player, class, "" ) ) then return end
 
 		entity = ents.Create( npc.Class )
