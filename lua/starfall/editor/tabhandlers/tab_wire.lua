@@ -1665,7 +1665,6 @@ function PANEL:CreateFindWindow()
 	local GoToEntry = vgui.Create("DTextEntry", gototab)
 	GoToEntry:SetPos(57, 4)
 	GoToEntry:SetSize(173, 20)
-	GoToEntry:SetText("")
 	GoToEntry:SetNumeric(true)
 
 	-- Goto Button
@@ -1717,6 +1716,7 @@ function PANEL:CreateFindWindow()
 	pnl.GoToLineTab.Tab.OnMousePressed = function(...)
 		pnl:SetHeight(86)
 		pnl.TabHolder:StretchToParent(1, 23, 1, 1)
+		pnl.GoToLineTab.Entry:SetText(self.Caret[1])
 		old(...)
 	end
 end
@@ -1743,7 +1743,11 @@ function PANEL:OpenFindWindow(mode)
 		self.FindWindow.TabHolder:StretchToParent(1, 23, 1, 1)
 	elseif mode == "go to line" then
 		self.FindWindow.TabHolder:SetActiveTab(self.FindWindow.GoToLineTab.Tab)
+		local caretPos = self.Caret[1]
+		self.FindWindow.GoToLineTab.Entry:SetText(caretPos)
 		self.FindWindow.GoToLineTab.Entry:RequestFocus()
+		self.FindWindow.GoToLineTab.Entry:SelectAllText()
+		self.FindWindow.GoToLineTab.Entry:SetCaretPos(tostring(caretPos):len())
 		self.FindWindow:SetHeight(83)
 		self.FindWindow.TabHolder:StretchToParent(1, 23, 1, 1)
 	end
