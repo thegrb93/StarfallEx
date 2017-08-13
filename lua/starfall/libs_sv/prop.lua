@@ -32,7 +32,7 @@ SF.Libraries.AddHook("initialize",function(inst)
 end)
 
 SF.Libraries.AddHook("deinitialize", function(inst)
-	if inst.data.props.clean != false then --Return true on nil too
+	if inst.data.props.clean ~= false then --Return true on nil too
 		for prop, _ in pairs(inst.data.props.props) do
 			local propent = SF.Entities.Unwrap(prop)
 			if IsValid(propent) then
@@ -151,9 +151,9 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	if swep then
 
-		if ( ( !swep.Spawnable && !instance.player:IsAdmin() ) || 
-			  ( swep.AdminOnly && !instance.player:IsAdmin() ) ) then return end
-		if ( !gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
+		if ( ( not swep.Spawnable and not instance.player:IsAdmin() ) or
+			  ( swep.AdminOnly and not instance.player:IsAdmin() ) ) then return end
+		if ( not gamemode.Call( "PlayerSpawnSWEP", instance.player, class, swep ) ) then return end
 
 
 		entity = ents.Create( swep.ClassName )
@@ -162,8 +162,8 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	elseif sent then
 
-		if ( sent.AdminOnly && !instance.player:IsAdmin() ) then return false end
-		if ( !gamemode.Call( "PlayerSpawnSENT", instance.player, class ) ) then return end
+		if ( sent.AdminOnly and not instance.player:IsAdmin() ) then return false end
+		if ( not gamemode.Call( "PlayerSpawnSENT", instance.player, class ) ) then return end
 
 		entity = ents.Create( sent.ClassName )
 
@@ -171,8 +171,8 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	elseif npc then
 
-		if ( npc.AdminOnly && !instance.player:IsAdmin() ) then return false end
-		if ( !gamemode.Call( "PlayerSpawnNPC", instance.player, class, "" ) ) then return end
+		if ( npc.AdminOnly and not instance.player:IsAdmin() ) then return false end
+		if ( not gamemode.Call( "PlayerSpawnNPC", instance.player, class, "" ) ) then return end
 
 		entity = ents.Create( npc.Class )
 
@@ -202,7 +202,7 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 	elseif vehicle then
 
-		if ( !gamemode.Call( "PlayerSpawnVehicle", instance.player, vehicle.Model, vehicle.Class, vehicle ) ) then return end
+		if ( not gamemode.Call( "PlayerSpawnVehicle", instance.player, vehicle.Model, vehicle.Class, vehicle ) ) then return end
 
 		entity = ents.Create( vehicle.Class )
 		
@@ -219,10 +219,10 @@ function props_library.createSent ( pos, ang, class, frozen )
 
 					local kLower = string.lower( k )
 
-					if ( kLower == "vehiclescript" ||
-						 kLower == "limitview"     ||
-						 kLower == "vehiclelocked" ||
-						 kLower == "cargovisible"  ||
+					if ( kLower == "vehiclescript" or
+						 kLower == "limitview"     or
+						 kLower == "vehiclelocked" or
+						 kLower == "cargovisible"  or
 						 kLower == "enablegun" )
 					then
 						entity:SetKeyValue( k, v )

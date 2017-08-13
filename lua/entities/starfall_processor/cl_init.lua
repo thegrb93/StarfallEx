@@ -79,7 +79,7 @@ net.Receive( "starfall_processor_download", function ( len )
 	
 	local I = 0
 	while I < 256 do
-		if net.ReadBit() != 0 then break end
+		if net.ReadBit() ~= 0 then break end
 		
 		local filename = net.ReadString()
 

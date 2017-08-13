@@ -373,7 +373,7 @@ function Editor:UpdateTabText(tab)
 
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
-	if ed:getCode() != ed.savedCode then
+	if ed:getCode() ~= ed.savedCode then
 		tabtext = tabtext.." *"
 	end
 	if tab:GetText() ~= tabtext then
@@ -810,7 +810,7 @@ function Editor:InitComponents()
 	end
 
 	self.C.Browser.tree.OnNodeSelected = function( tree, node )
-		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) != "txt" then return end
+		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
 
 		self:Open(node:GetFileName(), nil, false)
 	end
@@ -1312,7 +1312,7 @@ function Editor:Validate(gotoerror)
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We wont validate empty scripts
 	local err = CompileString( code , "Validation", false )
-	local success = type( err ) != "string"
+	local success = type( err ) ~= "string"
 	local row,message
 	if success then
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
@@ -1549,7 +1549,7 @@ function Editor:Close()
 		local model = nil
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives( "file", self:GetCode(), ppdata )
-		if ppdata.models and ppdata.models.file != "" then
+		if ppdata.models and ppdata.models.file ~= "" then
 			model = ppdata.models.file 
 		end
 

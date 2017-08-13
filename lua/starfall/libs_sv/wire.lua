@@ -257,12 +257,12 @@ function wire_library.adjustInputs ( names, types )
 	local ent = SF.instance.data.entity
 	if not ent then SF.Throw( "No entity to create inputs on", 2 ) end
 	
-	if #names != #types then SF.Throw( "Table lengths not equal", 2 ) end
+	if #names ~= #types then SF.Throw( "Table lengths not equal", 2 ) end
 	for i=1,#names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) != "string" then SF.Throw( "Non-string input name: " .. newname, 2 ) end
-		if type(newtype) != "string" then SF.Throw( "Non-string input type: " .. newtype, 2 ) end
+		if type(newname) ~= "string" then SF.Throw( "Non-string input name: " .. newname, 2 ) end
+		if type(newtype) ~= "string" then SF.Throw( "Non-string input type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match( "^[%u][%a%d_]*$" ) then SF.Throw( "Invalid input name: " .. newname, 2 ) end
@@ -285,12 +285,12 @@ function wire_library.adjustOutputs ( names, types )
 	local ent = SF.instance.data.entity
 	if not ent then SF.Throw( "No entity to create outputs on", 2 ) end
 	
-	if #names != #types then SF.Throw( "Table lengths not equal", 2 ) end
+	if #names ~= #types then SF.Throw( "Table lengths not equal", 2 ) end
 	for i=1,#names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) != "string" then SF.Throw( "Non-string output name: " .. newname, 2 ) end
-		if type(newtype) != "string" then SF.Throw( "Non-string output type: " .. newtype, 2 ) end
+		if type(newname) ~= "string" then SF.Throw( "Non-string output name: " .. newname, 2 ) end
+		if type(newtype) ~= "string" then SF.Throw( "Non-string output type: " .. newtype, 2 ) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d_]*$") then SF.Throw( "Invalid output name: " .. newname, 2 ) end
@@ -385,7 +385,7 @@ local function parseEntity( ent, io )
 
 	local ret = {}
 	for k, v in pairs( ent[ io ] ) do
-		if k != "" then
+		if k ~= "" then
 			table.insert( ret, k )
 		end
 	end	

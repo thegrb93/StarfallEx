@@ -14,7 +14,7 @@ if SERVER then
 	end)
 else
 	hook.add("net","songs",function(name, len, pl)
-		if name!="playSong" then return end
+		if name~="playSong" then return end
 		
 		if song then song:stop() end
 		bass.loadURL(net.readString(),"3d noblock",function(snd, err, errtxt)

@@ -78,7 +78,7 @@ function ENT:setupRenderGroup ()
 
 	if alpha == 0 then return end
 
-	if alpha != 255 then
+	if alpha ~= 255 then
 		self.RenderGroup = RENDERGROUP_BOTH
 	else
 		self.RenderGroup = RENDERGROUP_OPAQUE
@@ -137,18 +137,18 @@ net.Receive( "starfall_hologram_clip", function ()
 		-- Uninitialized
 		msgQueueAdd( "clip", entid, {
 			net.ReadUInt( 16 ),
-			net.ReadBit( ) != 0,
+			net.ReadBit( ) ~= 0,
 			net.ReadVector( ),
 			net.ReadVector( ),
-			net.ReadBit( ) != 0
+			net.ReadBit( ) ~= 0
 		} )
 	else
 		holoent:UpdateClip (
 			net.ReadUInt( 16 ),
-			net.ReadBit( ) != 0,
+			net.ReadBit( ) ~= 0,
 			net.ReadVector( ),
 			net.ReadVector( ),
-			net.ReadBit( ) != 0
+			net.ReadBit( ) ~= 0
 		)
 	end
 end )
@@ -223,7 +223,7 @@ end
 
 local display_owners = false
 concommand.Add( "sf_holograms_display_owners", function()
-	display_owners = !display_owners
+	display_owners = not display_owners
 
 	if display_owners then 
 		hook.Add( "HUDPaint", "sf_holograms_showowners", ShowHologramOwners)

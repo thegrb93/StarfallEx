@@ -149,16 +149,16 @@ function TOOL:Think()
 	if model=="" then
 		model = self:GetClientInfo( "Model" )
 	end
-	if ( !IsValid( self.GhostEntity ) || self.GhostEntity:GetModel() != model ) then
+	if ( not IsValid( self.GhostEntity ) or self.GhostEntity:GetModel() ~= model ) then
 		self:MakeGhostEntity( model, Vector( 0, 0, 0 ), Angle( 0, 0, 0 ) )
 	end
 
 	local trace = util.TraceLine( util.GetPlayerTrace( self:GetOwner() ) )
-	if ( !trace.Hit ) then return end
+	if ( not trace.Hit ) then return end
 	local ent = self.GhostEntity
 	
 	if not IsValid(ent) then return end
-	if ( trace.Entity && trace.Entity:GetClass() == "starfall_processor" || trace.Entity:IsPlayer() ) then
+	if ( trace.Entity and trace.Entity:GetClass() == "starfall_processor" or trace.Entity:IsPlayer() ) then
 
 		ent:SetNoDraw( true )
 		return
