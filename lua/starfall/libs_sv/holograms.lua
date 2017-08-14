@@ -5,7 +5,7 @@ local holograms_library = SF.Libraries.Register("holograms")
 
 --- Hologram type
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
-local wrap, unwrap = SF.CreateWrapper( hologram_metamethods, true, false, nil, SF.Entities.Metatable )
+local wrap, unwrap = SF.CreateWrapper(hologram_metamethods, true, false, nil, SF.Entities.Metatable)
 
 local ang_meta, vec_meta, ent_meta
 local vunwrap, aunwrap, ewrap, eunwrap
@@ -23,10 +23,10 @@ end)
 
 SF.Holograms = {}
 
-SF.Holograms.personalquota = CreateConVar( "sf_holograms_personalquota", "100", {FCVAR_ARCHIVE,FCVAR_REPLICATED},
-	"The number of holograms allowed to spawn via Starfall scripts for a single instance" )
+SF.Holograms.personalquota = CreateConVar("sf_holograms_personalquota", "100", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
+	"The number of holograms allowed to spawn via Starfall scripts for a single instance")
 
-SF.Permissions.registerPrivilege( "hologram.create", "Create hologram", "Allows the user to create holograms" )
+SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms")
 
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
@@ -36,7 +36,7 @@ SF.Holograms.Unwrap = unwrap
 -- Table with player keys that automatically cleans when player leaves.
 local plyCount = SF.EntityTable("playerHolos")
 
-SF.Libraries.AddHook("initialize",function(inst)
+SF.Libraries.AddHook("initialize", function(inst)
 	inst.data.holograms = {
 		holos = {},
 		count = 0
@@ -66,52 +66,52 @@ end)
 
 --- Sets the hologram linear velocity
 -- @param vel New velocity
-function hologram_methods:setVel ( vel )
-	SF.CheckType( self, hologram_metamethods )
-	SF.CheckType( vel, vec_meta )
-	local vel = vunwrap( vel )
-	local holo = unwrap( self )
-	if holo then holo:SetLocalVelocity( vel ) end
+function hologram_methods:setVel (vel)
+	SF.CheckType(self, hologram_metamethods)
+	SF.CheckType(vel, vec_meta)
+	local vel = vunwrap(vel)
+	local holo = unwrap(self)
+	if holo then holo:SetLocalVelocity(vel) end
 end
 
 --- Sets the hologram's angular velocity.
 -- @param angvel *Vector* angular velocity.
-function hologram_methods:setAngVel ( angvel )
-	SF.CheckType( self, hologram_metamethods )
-	SF.CheckType( angvel, ang_meta )
-	local holo = unwrap( self )
-	if holo then holo:SetLocalAngularVelocity( aunwrap( angvel ) ) end
+function hologram_methods:setAngVel (angvel)
+	SF.CheckType(self, hologram_metamethods)
+	SF.CheckType(angvel, ang_meta)
+	local holo = unwrap(self)
+	if holo then holo:SetLocalAngularVelocity(aunwrap(angvel)) end
 end
 
 --- Sets the hologram scale
 -- @param scale Vector new scale
-function hologram_methods:setScale ( scale )
-	SF.CheckType( self, hologram_metamethods )
-	SF.CheckType( scale, vec_meta )
-	local scale = vunwrap( scale )
-	local holo = unwrap( self )
+function hologram_methods:setScale (scale)
+	SF.CheckType(self, hologram_metamethods)
+	SF.CheckType(scale, vec_meta)
+	local scale = vunwrap(scale)
+	local holo = unwrap(self)
 	if holo then
-		holo:SetScale( scale )
+		holo:SetScale(scale)
 	end
 end
 
 --- Updates a clip plane
-function hologram_methods:setClip ( index, enabled, origin, normal, islocal )
+function hologram_methods:setClip (index, enabled, origin, normal, islocal)
 	SF.CheckType(self, hologram_metamethods)
 	SF.CheckType(index, "number")
 	SF.CheckType(enabled, "boolean")
-	SF.CheckType(origin, vec_meta )
-	SF.CheckType(normal, vec_meta )
+	SF.CheckType(origin, vec_meta)
+	SF.CheckType(normal, vec_meta)
 	SF.CheckType(islocal, "boolean")
 
-	local origin, normal = vunwrap( origin ), vunwrap( normal )
+	local origin, normal = vunwrap(origin), vunwrap(normal)
 
-	local holo = unwrap( self )
+	local holo = unwrap(self)
 	if holo then
 		if enabled and not holo.clips[index] and table.Count(holo.clips)==8 then
-			SF.Throw( "The maximum hologram clips is 8", 2 )
+			SF.Throw("The maximum hologram clips is 8", 2)
 		end
-		holo:UpdateClip( index, enabled, origin, normal, islocal )
+		holo:UpdateClip(index, enabled, origin, normal, islocal)
 	end
 end
 
@@ -121,7 +121,7 @@ function hologram_methods:getFlexes()
 	SF.CheckType(self, hologram_metamethods)
 	local holoent = unwrap(self)
 	local flexes = {}
-	for i=0,holoent:GetFlexNum()-1 do
+	for i = 0, holoent:GetFlexNum()-1 do
 		flexes[holoent:GetFlexName(i)] = i
 	end
 	return flexes
@@ -134,7 +134,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 	SF.CheckType(weight, "number")
 	flexid = math.floor(flexid)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
-		SF.Throw( "Invalid flex: "..flexid, 2 )
+		SF.Throw("Invalid flex: "..flexid, 2)
 	end
 	local holoent = unwrap(self)
 	if IsValid(holoent) then
@@ -156,13 +156,13 @@ end
 -- @server
 -- @class function
 -- @param model string model path
-function hologram_methods:setModel ( model )
-	SF.CheckType( model, "string" )
-	if not util.IsValidModel( model ) then SF.Throw( "Model is invalid", 2 ) end
+function hologram_methods:setModel (model)
+	SF.CheckType(model, "string")
+	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
-	local this = unwrap( self )
-	if IsValid( this ) then
-		this:SetModel( model )
+	local this = unwrap(self)
+	if IsValid(this) then
+		this:SetModel(model)
 	end
 end
 
@@ -170,12 +170,12 @@ end
 -- @server
 -- @class function
 -- @param suppress Boolean to represent if shading should be set or not.
-function hologram_methods:suppressEngineLighting ( suppress )
-	SF.CheckType( suppress, "boolean" )
+function hologram_methods:suppressEngineLighting (suppress)
+	SF.CheckType(suppress, "boolean")
 
-	local this = unwrap( self )
-	if IsValid( this ) then
-		this:SetSuppressEngineLighting( suppress )
+	local this = unwrap(self)
+	if IsValid(this) then
+		this:SetSuppressEngineLighting(suppress)
 	end
 end
 
@@ -186,8 +186,8 @@ end
 -- @param frame The starting frame number
 -- @param rate Frame speed. (1 is normal)
 function hologram_methods:setAnimation(animation, frame, rate)
-	local Holo = unwrap( self )
-	if not IsValid( Holo ) then return end
+	local Holo = unwrap(self)
+	if not IsValid(Holo) then return end
 
 	if type(animation)=="string" then
 		animation = Holo:LookupSequence(animation)
@@ -204,7 +204,7 @@ function hologram_methods:setAnimation(animation, frame, rate)
 		local OldThink = Holo.Think
 		function Holo:Think()
 			OldThink(self)
-			self:NextThink( CurTime() )
+			self:NextThink(CurTime())
 			return true
 		end
 	end
@@ -217,9 +217,9 @@ end
 -- @server
 -- @class function
 -- @return Length of current animation in seconds
-function hologram_methods:getAnimationLength( )
-	local Holo = unwrap( self )
-	if not IsValid( Holo ) then return -1 end
+function hologram_methods:getAnimationLength()
+	local Holo = unwrap(self)
+	if not IsValid(Holo) then return -1 end
 	
 	return Holo:SequenceDuration()
 end
@@ -228,9 +228,9 @@ end
 -- @server
 -- @param animation Name of the animation
 -- @return Animation index
-function hologram_methods:getAnimationNumber( animation )
-	local Holo = unwrap( self )
-	if not IsValid( Holo ) then return 0 end
+function hologram_methods:getAnimationNumber(animation)
+	local Holo = unwrap(self)
+	if not IsValid(Holo) then return 0 end
 	
 	return Holo:LookupSequence(animation) or 0
 end
@@ -240,11 +240,11 @@ end
 -- @class function
 -- @param pose Name of the pose parameter
 -- @param value Value to set it to.
-function hologram_methods:setPose( pose, value )
-	local Holo = unwrap( self )
-	if not IsValid( Holo ) then return end
+function hologram_methods:setPose(pose, value)
+	local Holo = unwrap(self)
+	if not IsValid(Holo) then return end
 	
-	Holo:SetPoseParameter( pose, value )
+	Holo:SetPoseParameter(pose, value)
 end
 
 --- Get the pose value of an animation
@@ -252,58 +252,58 @@ end
 -- @class function
 -- @param pose Pose parameter name
 -- @return Value of the pose parameter
-function hologram_methods:getPose( pose )
-	local Holo = unwrap( self )
-	if not IsValid( Holo ) then return end
+function hologram_methods:getPose(pose)
+	local Holo = unwrap(self)
+	if not IsValid(Holo) then return end
 	
-	return Holo:GetPoseParameter( pose )
+	return Holo:GetPoseParameter(pose)
 end
 
 --- Creates a hologram.
 -- @server
 -- @return The hologram object
-function holograms_library.create ( pos, ang, model, scale )
+function holograms_library.create (pos, ang, model, scale)
 	local instance = SF.instance
-	SF.Permissions.check( instance.player,  nil, "hologram.create" )
-	SF.CheckType( pos, vec_meta )
-	SF.CheckType( ang, ang_meta )
-	SF.CheckType( model, "string" )
-	if not util.IsValidModel( model ) then SF.Throw( "Model is invalid", 2 ) end
+	SF.Permissions.check(instance.player,  nil, "hologram.create")
+	SF.CheckType(pos, vec_meta)
+	SF.CheckType(ang, ang_meta)
+	SF.CheckType(model, "string")
+	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 	if scale then
-		SF.CheckType( scale, vec_meta )
-		scale = vunwrap( scale )
+		SF.CheckType(scale, vec_meta)
+		scale = vunwrap(scale)
 	end
 
-	local pos = vunwrap( pos )
-	local ang = aunwrap( ang )
+	local pos = vunwrap(pos)
+	local ang = aunwrap(ang)
 
 	local holodata = instance.data.holograms.holos
 	
-	if plyCount[ instance.player ] >= SF.Holograms.personalquota:GetInt() then 
-		SF.Throw( "Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2 ) 
+	if plyCount[instance.player] >= SF.Holograms.personalquota:GetInt() then 
+		SF.Throw("Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2) 
 	end
 
-	local holoent = ents.Create( "starfall_hologram" )
+	local holoent = ents.Create("starfall_hologram")
 	if holoent and holoent:IsValid() then
-		SF.setPos( holoent, pos )
-		SF.setAng( holoent, ang )
-		holoent:SetModel( model )
-		holoent:CallOnRemove( "starfall_hologram_delete", hologramOnDestroy, holodata, instance.player )
+		SF.setPos(holoent, pos)
+		SF.setAng(holoent, ang)
+		holoent:SetModel(model)
+		holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, instance.player)
 		holoent:Spawn()
 
 		if CPPI then
-			holoent:CPPISetOwner( instance.player )
-			holoent:SetHoloOwner( instance.player )
+			holoent:CPPISetOwner(instance.player)
+			holoent:SetHoloOwner(instance.player)
 		end
 		
 		if scale then
-			holoent:SetScale( scale )
+			holoent:SetScale(scale)
 		end
 
-		holodata[ holoent ] = true
-		plyCount[ instance.player ] = plyCount[ instance.player ] + 1
+		holodata[holoent] = true
+		plyCount[instance.player] = plyCount[instance.player] + 1
 		
-		return wrap( holoent )
+		return wrap(holoent)
 	end
 end
 
@@ -311,14 +311,14 @@ end
 -- @server
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
-	if not SF.Permissions.hasAccess( SF.instance.player,  nil, "hologram.create" ) then return false end
-	return plyCount[ SF.instance.player ] < SF.Holograms.personalquota:GetInt()
+	if not SF.Permissions.hasAccess(SF.instance.player,  nil, "hologram.create") then return false end
+	return plyCount[SF.instance.player] < SF.Holograms.personalquota:GetInt()
 end
 
 --- Checks how many holograms can be spawned
 -- @server
 -- @return number of holograms able to be spawned
 function holograms_library.hologramsLeft ()
-	if not SF.Permissions.hasAccess( SF.instance.player,  nil, "hologram.create" ) then return 0 end
-	return SF.Holograms.personalquota:GetInt() - plyCount[ SF.instance.player ]
+	if not SF.Permissions.hasAccess(SF.instance.player,  nil, "hologram.create") then return 0 end
+	return SF.Holograms.personalquota:GetInt() - plyCount[SF.instance.player]
 end

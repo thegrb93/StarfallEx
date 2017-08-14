@@ -4,7 +4,7 @@
 
 --- Game functions
 -- @shared
-local game_lib = SF.Libraries.Register( "game" )
+local game_lib = SF.Libraries.Register("game")
 
 --- Returns the map name
 function game_lib.getMap ()
@@ -19,19 +19,19 @@ end
 --- Returns true if the server is on a LAN
 -- @deprecated Possibly add ConVar retrieval for users in future. Could implement with SF Script.
 function game_lib.isLan ()
-	return GetConVar( "sv_lan" ):GetBool()
+	return GetConVar("sv_lan"):GetBool()
 end
 
 --- Returns the gamemode as a String
 function game_lib.getGamemode ()
 	local rtn = {}
 	local t = gmod.GetGamemode()
-	for k, v in pairs( t ) do
-		if type( v ) ~= "function" and type( v ) ~= "table" then
-			rtn[ k:gsub( "^%u", string.lower ) ] = v
+	for k, v in pairs(t) do
+		if type(v) ~= "function" and type(v) ~= "table" then
+			rtn[k:gsub("^%u", string.lower)] = v
 		end
 	end
-	return SF.Sanitize( rtn )
+	return SF.Sanitize(rtn)
 end
 
 --- Returns whether or not the current game is single player

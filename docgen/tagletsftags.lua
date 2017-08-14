@@ -20,10 +20,10 @@ local function author (tag, block, text)
 	table.insert (block[tag], text)
 end
 
-local function check_class( line )
-	line = util.trim( line )
+local function check_class(line)
+	line = util.trim(line)
 
-	local tblref = line:match( "^%s*local%s+([%w_]+).-=" )
+	local tblref = line:match("^%s*local%s+([%w_]+).-=")
 
 	return tblref
 end
@@ -37,7 +37,7 @@ local function class (tag, block, text)
 	if text == "hook" then block.param = block.param or {} end
 	if text == "directive" then block.param = block.param or {} end
 	if text == "class" then
-		block.typtbl = check_class( block.code[ 1 ] )
+		block.typtbl = check_class(block.code[1])
 	end
 	block.classForced = true
 end
@@ -69,9 +69,9 @@ end
 
 -------------------------------------------------------------------------------
 
-local function field ( tag, block, text )
+local function field (tag, block, text)
 	if block.class ~= "table" and block.class ~= "library" and block.class ~= "class" then
-		luadoc.logger:warn( "documenting `field' for block that is not a table, library or class" )
+		luadoc.logger:warn("documenting `field' for block that is not a table, library or class")
 	end
 	block[tag] = block[tag] or {}
 
@@ -176,7 +176,7 @@ end
 
 -------------------------------------------------------------------------------
 
-local function deprecated ( tag, block, text )
+local function deprecated (tag, block, text)
 	block[tag] = text
 end
 
@@ -189,33 +189,33 @@ local function shared(tag, block, text)
 	block.server = true
 end
 
-local function bug( tag, block, text )
-	block[ tag ] = text
+local function bug(tag, block, text)
+	block[tag] = text
 end
 
 -------------------------------------------------------------------------------
 
 local handlers = {}
-handlers[ "author" ] = author
-handlers[ "class" ] = class
-handlers[ "copyright" ] = copyright
-handlers[ "description" ] = description
-handlers[ "field" ] = field
-handlers[ "name" ] = name
-handlers[ "param" ] = param
-handlers[ "release" ] = release
-handlers[ "return" ] = ret
-handlers[ "see" ] = see
-handlers[ "usage" ] = usage
-handlers[ "deprecated" ] = deprecated
-handlers[ "library" ] = library
-handlers[ "libtbl" ] = libtbl
-handlers[ "entity" ] = entity
-handlers[ "client" ] = side
-handlers[ "server" ] = side
-handlers[ "shared" ] = shared
-handlers[ "include" ] = include
-handlers[ "bug" ] = bug
+handlers["author"] = author
+handlers["class"] = class
+handlers["copyright"] = copyright
+handlers["description"] = description
+handlers["field"] = field
+handlers["name"] = name
+handlers["param"] = param
+handlers["release"] = release
+handlers["return"] = ret
+handlers["see"] = see
+handlers["usage"] = usage
+handlers["deprecated"] = deprecated
+handlers["library"] = library
+handlers["libtbl"] = libtbl
+handlers["entity"] = entity
+handlers["client"] = side
+handlers["server"] = side
+handlers["shared"] = shared
+handlers["include"] = include
+handlers["bug"] = bug
 
 -------------------------------------------------------------------------------
 

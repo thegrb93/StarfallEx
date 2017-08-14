@@ -41,8 +41,8 @@ local keywords = {
 }
 
 -- fallback for nonexistant entries:
-setmetatable(keywords, { __index=function(tbl,index) return {} end })
-setmetatable(storageTypes, { __index=function(tbl,index) return {} end })
+setmetatable(keywords, { __index = function(tbl, index) return {} end })
+setmetatable(storageTypes, { __index = function(tbl, index) return {} end })
 
 local directives = {
 	["@name"] = 0,
@@ -86,48 +86,48 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt()
 	local textcolor
 	if usePigments == 2 then
-		local h,s,v = ColorToHSV( bgcolor ) --We're finding high-contrast color
+		local h, s, v = ColorToHSV(bgcolor) --We're finding high-contrast color
 		h = (h + 180)%360
 		s = 1 - s
 		v = 1 - v	 
-		textcolor = HSVToColor( h, s, v ) 
+		textcolor = HSVToColor(h, s, v) 
 	elseif usePigments == 1 then
 		textcolor = colors[tokenname][1]
 	end
 	if lastcol and color == lastcol[2] then
 		lastcol[1] = lastcol[1] .. tokendata
 	else
-		cols[#cols + 1] = { tokendata, {textcolor, bgcolor, 0}, "color" }
+		cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
 		lastcol = cols[#cols]
 	end
 end
 
 function EDITOR:BlockCommentSelection(removecomment)
-	local sel_start, sel_caret = self:MakeSelection( self:Selection() )
+	local sel_start, sel_caret = self:MakeSelection(self:Selection())
 	local mode = self:GetParent().BlockCommentStyleConVar:GetInt()
 
 	if mode == 0 then -- New (alt 1)
 		local str = self:GetSelection()
 		if removecomment then
-			if str:find( "^%-%-%[%[\n" ) and str:find( "\n%]%]$" ) then
-				self:SetSelection( str:gsub( "^%-%-%[%[\n(.+)\n%]%]$", "%1" ) )
+			if str:find("^%-%-%[%[\n") and str:find("\n%]%]$") then
+				self:SetSelection(str:gsub("^%-%-%[%[\n(.+)\n%]%]$", "%1"))
 				sel_caret[1] = sel_caret[1] - 2
 			end
 		else
-			self:SetSelection( "--[[\n" .. str .. "\n]]" )
+			self:SetSelection("--[[\n" .. str .. "\n]]")
 			sel_caret[1] = sel_caret[1] + 1
 			sel_caret[2] = 3
 		end
 	elseif mode == 1 then -- New (alt 2)
 		local str = self:GetSelection()
 		if removecomment then
-			if str:find( "^%-%-%[%[" ) and str:find( "%]%]$" ) then
-				self:SetSelection( str:gsub( "^%-%-%[%[(.+)%]%]$", "%1" ) )
+			if str:find("^%-%-%[%[") and str:find("%]%]$") then
+				self:SetSelection(str:gsub("^%-%-%[%[(.+)%]%]$", "%1"))
 
 				sel_caret[2] = sel_caret[2] - 4
 			end
 		else
-			self:SetSelection( "--[[" .. self:GetSelection() .. "]]" )
+			self:SetSelection("--[[" .. self:GetSelection() .. "]]")
 		end
 	elseif mode == 2 then -- Old
 		local comment_char = "--"
@@ -142,7 +142,7 @@ function EDITOR:BlockCommentSelection(removecomment)
 			self:SetSelection(comment_char .. self:GetSelection():gsub("\n", "\n"..comment_char))
 		end
 	else
-		ErrorNoHalt( "Invalid block comment style" )
+		ErrorNoHalt("Invalid block comment style")
 	end
 
 	return { sel_start, sel_caret }
@@ -150,11 +150,11 @@ end
 
 function EDITOR:CommentSelection(removecomment)
 
-	local sel_start, sel_caret = self:MakeSelection( self:Selection() )
+	local sel_start, sel_caret = self:MakeSelection(self:Selection())
 	local str = self:GetSelection()
 	if removecomment then
-		if str:find( "^%-%-%[%[\n" ) and str:find( "\n%]%]$" ) then
-			self:SetSelection( str:gsub( "^%-%-%[%[\n(.+)\n%]%]$", "%1" ) )
+		if str:find("^%-%-%[%[\n") and str:find("\n%]%]$") then
+			self:SetSelection(str:gsub("^%-%-%[%[\n(.+)\n%]%]$", "%1"))
 
 			if sel_caret[1] == sel_start[1] then
 				sel_caret[2] = sel_caret[2] - 4
@@ -163,7 +163,7 @@ function EDITOR:CommentSelection(removecomment)
 			end
 		end
 	else
-		self:SetSelection( "--[[\n" .. str .."\n]]" )
+		self:SetSelection("--[[\n" .. str .."\n]]")
 
 		if sel_caret[1] == sel_start[1] then
 			sel_caret[2] = sel_caret[2] + 4
@@ -182,12 +182,12 @@ function EDITOR:ResetTokenizer(row)
 		self.multilinestring = nil
 		local singlelinecomment = false
 
-		local str = string_gsub( table_concat( self.Rows, "\n", 1, self.Scroll[1]-1 ), "\r", "" )
+		local str = string_gsub(table_concat(self.Rows, "\n", 1, self.Scroll[1]-1), "\r", "")
 
-		for bef, char, af in string_gmatch( str, '()([%[%]"\n])()' ) do
-			local before = string_sub( str, bef-1, bef-1 )
-			local bbefore = string_sub( str, bef-2, bef-2 )
-			local after = string_sub( str, af, af )
+		for bef, char, af in string_gmatch(str, '()([%[%]"\n])()') do
+			local before = string_sub(str, bef-1, bef-1)
+			local bbefore = string_sub(str, bef-2, bef-2)
+			local after = string_sub(str, af, af)
 			if not self.blockcomment and not self.multilinestring and not singlelinecomment then
 				if before == "-" and bbefore == "-" and char == "[" and after == "[" then
 					self.blockcomment = true
@@ -221,7 +221,7 @@ local setrgbapatternG = "^(setRGBA%s*)(%(%s*)"..numbpatternG..spacedcommaG..numb
 
 function EDITOR:SyntaxColorLine(row)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
-	cols,lastcol = {}, nil
+	cols, lastcol = {}, nil
 
 	self:ResetTokenizer(row)
 	self:NextCharacter()
@@ -251,30 +251,30 @@ function EDITOR:SyntaxColorLine(row)
 		addToken("string", self.tokendata)
 	end
 
-	local found = self:SkipPattern( "( *function)" )
+	local found = self:SkipPattern("( *function)")
 	if found then
-		addToken( "storageType", found ) -- Add "function"
+		addToken("storageType", found) -- Add "function"
 		self.tokendata = "" -- Reset tokendata
 
-		local spaces = self:SkipPattern( " *" )
-		if spaces then addToken( "whitespace", spaces ) end
+		local spaces = self:SkipPattern(" *")
+		if spaces then addToken("whitespace", spaces) end
 
-		if self:NextPattern( "%s*[a-zA-Z][a-zA-Z0-9_]*" ) then -- function THIS()
+		if self:NextPattern("%s*[a-zA-Z][a-zA-Z0-9_]*") then -- function THIS()
 
-			local spaces, funcname = self.tokendata:match( "(%s*)(%a[a-zA-Z0-9_]*)" )
-			addToken( "userfunction", funcname )
+			local spaces, funcname = self.tokendata:match("(%s*)(%a[a-zA-Z0-9_]*)")
+			addToken("userfunction", funcname)
 
 		end
 		self.tokendata = ""
 
-		if self:NextPattern( "%(" ) then -- We found a bracket
+		if self:NextPattern("%(") then -- We found a bracket
 			-- Color the bracket
-			addToken( "notfound", self.tokendata )
+			addToken("notfound", self.tokendata)
 		end
 
 		self.tokendata = ""
-		if self:NextPattern( "%) *{?" ) then -- check for ending bracket (and perhaps an ending {?)
-			addToken( "notfound", self.tokendata )
+		if self:NextPattern("%) *{?") then -- check for ending bracket (and perhaps an ending {?)
+			addToken("notfound", self.tokendata)
 		end
 	end
 
@@ -290,7 +290,7 @@ function EDITOR:SyntaxColorLine(row)
 		-- eat next token
 		if usePigments then
 			if self:NextPattern(rgbpattern) then -- Color(r,g,b)
-				local fname,bracket1,r,comma1,g,comma2,b,bracket2 = self.tokendata:match(rgbpatternG)
+				local fname, bracket1, r, comma1, g, comma2, b, bracket2 = self.tokendata:match(rgbpatternG)
 				local cr, cg, cb = tonumber(r), tonumber(g), tonumber(b)
 				local col
 				if cr and cg and cb then
@@ -321,7 +321,7 @@ function EDITOR:SyntaxColorLine(row)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
 			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
-				local fname,bracket1,r,comma1,g,comma2,b,comma3,a,bracket2 = self.tokendata:match(rgbapatternG)
+				local fname, bracket1, r, comma1, g, comma2, b, comma3, a, bracket2 = self.tokendata:match(rgbapatternG)
 				local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
 				local col
 				if cr and cg and cb and ca then
@@ -363,7 +363,7 @@ function EDITOR:SyntaxColorLine(row)
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
 		elseif self:NextPattern("^%:[a-zA-Z][a-zA-Z0-9_]*") then -- Methods
-			addToken("operator",self.tokendata:sub(1,1)) -- Adding : as operator
+			addToken("operator", self.tokendata:sub(1, 1)) -- Adding : as operator
 			self.tokendata = self.tokendata:sub(2)  -- Operator was handled, so remove it from tokendata
 			if libmap["Methods"][self.tokendata] then
 				tokenname = "method"
@@ -386,8 +386,8 @@ function EDITOR:SyntaxColorLine(row)
 				if istable(val) then
 					addToken("constant", self.tokendata)
 					self.tokendata = ""
-					if self:NextPattern( "%." ) then -- There is dot after enum, color it
-						addToken( "operator", self.tokendata )
+					if self:NextPattern("%.") then -- There is dot after enum, color it
+						addToken("operator", self.tokendata)
 						self.tokendata = ""
 					end
 					if self:NextPattern("^[a-zA-Z][a-zA-Z0-9_]*") then -- Looking for enum key
@@ -414,11 +414,11 @@ function EDITOR:SyntaxColorLine(row)
 			elseif libmap[sstr] then --We found library
 				addToken("library", self.tokendata)
 				self.tokendata = ""
-				if self:NextPattern( "^%." ) then -- We found a dot, looking for library method/constant
-					addToken( "operator", self.tokendata )
+				if self:NextPattern("^%.") then -- We found a dot, looking for library method/constant
+					addToken("operator", self.tokendata)
 					self.tokendata = ""
 					if sstr=="render" and usePigments and self:NextPattern(setrgbapattern) then -- setRGBA(r,g,b)
-						local fname,bracket1,r,comma1,g,comma2,b,comma3,a,bracket2 = self.tokendata:match(setrgbapatternG)
+						local fname, bracket1, r, comma1, g, comma2, b, comma3, a, bracket2 = self.tokendata:match(setrgbapatternG)
 						local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
 						local col
 						if cr and cg and cb and ca then
@@ -453,7 +453,7 @@ function EDITOR:SyntaxColorLine(row)
 						tokenname = "" -- It's custom token
 						self.tokendata = ""
 						
-					elseif self:NextPattern( "^[a-zA-Z][a-zA-Z0-9_]*" ) then
+					elseif self:NextPattern("^[a-zA-Z][a-zA-Z0-9_]*") then
 						local t = libmap[sstr][self.tokendata]
 						if t then -- Valid function, woohoo
 							tokenname = t == "function" and "function" or "constant"
@@ -546,7 +546,7 @@ function EDITOR:SyntaxColorLine(row)
 				tokenname = "comment"
 				self:NextPattern("[^@]*") -- Skip everything BEFORE @
 				addToken(tokenname, self.tokendata)
-				self.tokendata ="" -- we dont need that anymore as we already added it
+				self.tokendata = "" -- we dont need that anymore as we already added it
 
 				self:NextPattern("[%S]*") -- Find first word
 				if directives[self.tokendata] then --Directive

@@ -14,14 +14,14 @@ SF.Weapons.Metatable = weapon_metamethods
 --- Custom wrapper/unwrapper is necessary for weapon objects
 -- wrapper
 local dsetmeta = debug.setmetatable
-local function wrap( object )
-	object = SF.Entities.Wrap( object )
-	dsetmeta( object, weapon_metamethods )
+local function wrap(object)
+	object = SF.Entities.Wrap(object)
+	dsetmeta(object, weapon_metamethods)
 	return object
 end
 SF.Weapons.Wrap = wrap
-SF.AddObjectWrapper( debug.getregistry().Weapon, weapon_metamethods, wrap )
-SF.AddObjectUnwrapper( weapon_metamethods, SF.Entities.Unwrap )
+SF.AddObjectWrapper(debug.getregistry().Weapon, weapon_metamethods, wrap)
+SF.AddObjectUnwrapper(weapon_metamethods, SF.Entities.Unwrap)
 
 --- To string
 -- @shared
@@ -37,8 +37,8 @@ end
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip1 ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:Clip1()
 end
 
@@ -46,8 +46,8 @@ end
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip2 ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:Clip2()
 end
 
@@ -55,8 +55,8 @@ end
 -- @shared
 -- @return number Current activity
 function weapon_methods:getActivity ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:GetActivity()
 end
 
@@ -64,8 +64,8 @@ end
 -- @shared
 -- @return string Holdtype
 function weapon_methods:getHoldType ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:GetHoldType()
 end
 
@@ -73,8 +73,8 @@ end
 -- @shared
 -- @return The time, relative to CurTime
 function weapon_methods:getNextPrimaryFire ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:GetNextPrimaryFire()
 end
 
@@ -82,8 +82,8 @@ end
 -- @shared
 -- @return The time, relative to CurTime
 function weapon_methods:getNextSecondaryFire ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:GetNextSecondaryFire()
 end
 
@@ -91,8 +91,8 @@ end
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getPrimaryAmmoType ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:GetPrimaryAmmoType()
 end
 
@@ -100,8 +100,8 @@ end
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getSecondaryAmmoType ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:GetSecondaryAmmoType()
 end
 
@@ -109,8 +109,8 @@ end
 -- @shared
 -- @return Whether the weapon is visble or not
 function weapon_methods:isWeaponVisible ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:IsWeaponVisible()
 end
 
@@ -118,8 +118,8 @@ end
 -- @shared
 -- @return Time the weapon was last shot
 function weapon_methods:lastShootTime ()
-	SF.CheckType( self, weapon_metamethods )
-	local ent = SF.Entities.Unwrap( self )
+	SF.CheckType(self, weapon_metamethods)
+	local ent = SF.Entities.Unwrap(self)
 	return ent:LastShootTime()
 end
 
@@ -128,8 +128,8 @@ if CLIENT then
 	-- @client
 	-- @return string Display name of weapon
 	function weapon_methods:getPrintName ()
-		SF.CheckType( self, weapon_metamethods )
-		local ent = SF.Entities.Unwrap( self )
+		SF.CheckType(self, weapon_metamethods)
+		local ent = SF.Entities.Unwrap(self)
 		return ent:GetPrintName()
 	end
 	
@@ -137,8 +137,8 @@ if CLIENT then
 	-- @client
 	-- @return whether or not the weapon is carried by the local player
 	function weapon_methods:isCarriedByLocalPlayer ()
-		SF.CheckType( self, weapon_metamethods )
-		local ent = SF.Entities.Unwrap( self )
+		SF.CheckType(self, weapon_metamethods)
+		local ent = SF.Entities.Unwrap(self)
 		return ent:IsCarriedByLocalPlayer()
 	end
 end

@@ -1,17 +1,17 @@
-include( "shared.lua" )
+include("shared.lua")
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
 
 function ENT:Initialize ()
-	self.BaseClass.Initialize( self )
+	self.BaseClass.Initialize(self)
 	
-	net.Start( "starfall_processor_update_links" )
-		net.WriteEntity( self )
+	net.Start("starfall_processor_update_links")
+		net.WriteEntity(self)
 	net.SendToServer()
 end
 
-function ENT:LinkEnt ( ent )
+function ENT:LinkEnt (ent)
 	self.link = ent
 end
 
@@ -19,20 +19,20 @@ function ENT:Draw ()
 	self:DrawModel()
 end
 
-function ENT:DrawHUD( hookname, ... )
+function ENT:DrawHUD(hookname, ...)
 	if not IsValid(self.link) then return end
 	local instance = self.link.instance
 	if not instance then return end
 	
 	local data = instance.data
 	
-	render.PushFilterMag( TEXFILTER.ANISOTROPIC )
-	render.PushFilterMin( TEXFILTER.ANISOTROPIC )
+	render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+	render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 	
 	data.render.renderEnt = self
 	data.render.useStencil = false
 	
-	instance:runScriptHook( hookname, ... )
+	instance:runScriptHook(hookname, ...)
 	
 	render.PopFilterMag()
 	render.PopFilterMin()
@@ -44,10 +44,10 @@ function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
 	local instance = self.link.instance
 	if not instance then return end
 
-	local tbl = instance:runScriptHookForResult( "calcview", SF.WrapObject( pos ),  SF.WrapObject( ang ), fov, znear, zfar )
+	local tbl = instance:runScriptHookForResult("calcview", SF.WrapObject(pos),  SF.WrapObject(ang), fov, znear, zfar)
 	local ok, rt = tbl[1], tbl[2] 
 	if ok and type(rt) == "table" then
-		return {origin = SF.UnwrapObject( rt.origin ), angles = SF.UnwrapObject( rt.angles ), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer}
+		return { origin = SF.UnwrapObject(rt.origin), angles = SF.UnwrapObject(rt.angles), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer }
 	end
 end
 
@@ -60,9 +60,9 @@ local hook_pref = "starfall_hud_hook_"
 local ConnectHUD, DisconnectHUD
 
 local Hint_FirstPrint = true
-function ConnectHUD( ent )
+function ConnectHUD(ent)
 	local hookname = hook_pref..ent:EntIndex()
-	ent:CallOnRemove( "sf_hud_unlink_on_remove", DisconnectHUD ) 
+	ent:CallOnRemove("sf_hud_unlink_on_remove", DisconnectHUD) 
 	hook.Add("HUDPaint", hookname, function() ent:DrawHUD("drawhud") end)
 	hook.Add("PreDrawOpaqueRenderables", hookname, function(...) ent:DrawHUD("predrawopaquerenderables", ...) end)
 	hook.Add("PostDrawOpaqueRenderables", hookname, function(...) ent:DrawHUD("postdrawopaquerenderables", ...) end)
@@ -80,11 +80,11 @@ function ConnectHUD( ent )
 	if not IsValid(ent.link) then return end
 	local instance = ent.link.instance
 	if not instance then return end
-	instance:runScriptHook( "hudconnected", SF.Entities.Wrap( ent ) )
-	SF.Libraries.CallHook( "starfall_hud_connected", instance, ent )
+	instance:runScriptHook("hudconnected", SF.Entities.Wrap(ent))
+	SF.Libraries.CallHook("starfall_hud_connected", instance, ent)
 end
 
-function DisconnectHUD( ent )
+function DisconnectHUD(ent)
 	local hookname = hook_pref..ent:EntIndex()
 	hook.Remove("HUDPaint", hookname)
 	hook.Remove("PreDrawOpaqueRenderables", hookname)
@@ -98,27 +98,27 @@ function DisconnectHUD( ent )
 	if not IsValid(ent.link) then return end
 	local instance = ent.link.instance
 	if not instance then return end
-	instance:runScriptHook( "huddisconnected", SF.Entities.Wrap( ent ) )
-	SF.Libraries.CallHook( "starfall_hud_disconnected", instance, ent )
+	instance:runScriptHook("huddisconnected", SF.Entities.Wrap(ent))
+	SF.Libraries.CallHook("starfall_hud_disconnected", instance, ent)
 end
 
-net.Receive( "starfall_hud_set_enabled" , function()
+net.Receive("starfall_hud_set_enabled" , function()
 	local ent = net.ReadEntity()
 	local enable = net.ReadInt(8)
 	if IsValid(ent) then		
 		if SF.ActiveHuds[ent] then
-			if ( enable == -1 or enable == 0 ) then
+			if (enable == -1 or enable == 0) then
 				DisconnectHUD(ent)
 			end
 		else
-			if ( enable == -1 or enable == 1 ) then
+			if (enable == -1 or enable == 1) then
 				ConnectHUD(ent)
 			end
 		end
 	end
 end)
 
-concommand.Add("sf_hud_unlink",function()
+concommand.Add("sf_hud_unlink", function()
 	for ent, _ in pairs(SF.ActiveHuds) do
 		DisconnectHUD(ent) --Should be valid or something horrible has happened.
 	end

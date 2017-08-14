@@ -109,20 +109,20 @@ function encode (v)
     -- Consider arrays separately
     local bArray, maxCount = isArray(v)
     if bArray then
-      for i = 1,maxCount do
+      for i = 1, maxCount do
         table.insert(rval, encode(v[i]))
       end
     else	-- An object, not an array
-      for i,j in base.pairs(v) do
+      for i, j in base.pairs(v) do
         if isEncodable(i) and isEncodable(j) then
           table.insert(rval, '"' .. encodeString(i) .. '":' .. encode(j))
         end
       end
     end
     if bArray then
-      return '[' .. table.concat(rval,',') ..']'
+      return '[' .. table.concat(rval, ',') ..']'
     else
-      return '{' .. table.concat(rval,',') .. '}'
+      return '{' .. table.concat(rval, ',') .. '}'
     end
   end
   
@@ -131,7 +131,7 @@ function encode (v)
     return 'null'
   end
   
-  base.assert(false,'encode attempt to encode unsupported type ' .. vtype .. ':' .. base.tostring(v))
+  base.assert(false, 'encode attempt to encode unsupported type ' .. vtype .. ':' .. base.tostring(v))
 end
 
 
@@ -158,9 +158,9 @@ end
 -- This just involves back-quoting inverted commas, back-quotes and newlines, I think ;-)
 -- @param s The string to return as a JSON encoded (i.e. backquoted string)
 -- @return The string appropriately escaped.
-local qrep = {["\\"]="\\\\", ['"']='\\"',['\r']='\\r',['\n']='\\n',['\t']='\\t'}
+local qrep = { ["\\"] = "\\\\", ['"'] = '\\"', ['\r'] = '\\r', ['\n'] = '\\n', ['\t'] = '\\t' }
 function encodeString(s)
-  return tostring(s):gsub('["\\\r\n\t]',qrep)
+  return tostring(s):gsub('["\\\r\n\t]', qrep)
 end
 
 --- Decodes a given JSON string back to a Lua string
@@ -185,10 +185,10 @@ function isArray(t)
   -- Next we count all the elements, ensuring that any non-indexed elements are not-encodable 
   -- (with the possible exception of 'n')
   local maxIndex = 0
-  for k,v in base.pairs(t) do
+  for k, v in base.pairs(t) do
     if (base.type(k)=='number' and math.floor(k)==k and 1<=k) then	-- k,v is an indexed pair
       if (not isEncodable(v)) then return false end	-- All array elements must be encodable
-      maxIndex = math.max(maxIndex,k)
+      maxIndex = math.max(maxIndex, k)
     else
       if (k=='n') then
         if v ~= table.getn(t) then return false end  -- False if n does not hold the number of elements
@@ -234,7 +234,7 @@ do
 			return struct
 		end
 		function struct:to(chars)
-			for i=1,#chars do 
+			for i = 1, #chars do 
 				tt[chars:byte(i)] = value
 			end
 			return struct
@@ -255,7 +255,7 @@ do
 		c_f,
 		c_a,
 		c_s,
-		c_slash = ("\\elrufas/"):byte(1,9)
+		c_slash = ("\\elrufas/"):byte(1, 9)
 	
 	-- token tables - tt_doublequote_string = strDoubleQuot, tt_singlequote_string = strSingleQuot
 	local 
@@ -272,13 +272,13 @@ do
 		tt_comment_start,
 		tt_comment_middle,
 		tt_ignore --< tt_ignore is special - marked tokens will be tt_ignored
-			= {},{},{},{},{},{},{},{},{},{},{},{},{}
+			= {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 	
 	-- strings to be used in certain token tables
 	local strchars = "" -- all valid string characters (all except newlines)
 	local allchars = "" -- all characters that are valid in comments
 	--local escapechar = {}
-	for i=0,0xff do 
+	for i = 0, 0xff do 
 		local c = string.char(i)
 		if c~="\n" and c~="\r" then strchars = strchars .. c end
 		allchars = allchars .. c
@@ -374,10 +374,10 @@ do
 		-- in case of error, report the location using line numbers
 		local function location () 
 			local n = ("\n"):byte()
-			local line,lpos = 1,0
-			for i=1,pos do 
+			local line, lpos = 1, 0
+			for i = 1, pos do 
 				if js_string:byte(i) == n then
-					line,lpos = line + 1,1
+					line, lpos = line + 1, 1
 				else
 					lpos = lpos + 1
 				end
@@ -398,7 +398,7 @@ do
 				if not t then 
 					error("Unexpected character at "..location()..": "..
 						string.char(b).." ("..b..") when reading "..tok.name.."\nContext: \n"..
-						js_string:sub(math.max(1,pos-30),pos+30).."\n"..(" "):rep(pos+math.min(-1,30-pos)).."^")
+						js_string:sub(math.max(1, pos-30), pos + 30).."\n"..(" "):rep(pos + math.min(-1, 30-pos)).."^")
 				end
 				pos = pos + 1
 				if t~=tt_ignore then return t end
@@ -444,7 +444,7 @@ do
 				if not tt_numeric[b] then break end
 				pos = pos + 1
 			end
-			return tonumber(js_string:sub(start-1,pos-1))
+			return tonumber(js_string:sub(start-1, pos-1))
 		end
 		
 		-- read_bool and read_null are both making an assumption that I have not tested:
@@ -452,11 +452,11 @@ do
 		-- making manual comparision of the byte values
 		local function read_bool () 
 			pos = pos + 3
-			local a,b,c,d = js_string:byte(pos-3,pos)
+			local a, b, c, d = js_string:byte(pos-3, pos)
 			if a == c_r and b == c_u and c == c_e then return true end
 			pos = pos + 1
 			if a ~= c_a or b ~= c_l or c ~= c_s or d ~= c_e then 
-				error("Invalid boolean: "..js_string:sub(math.max(1,pos-5),pos+5)) 
+				error("Invalid boolean: "..js_string:sub(math.max(1, pos-5), pos + 5)) 
 			end
 			return false
 		end
@@ -464,16 +464,16 @@ do
 		-- same as read_bool: only last 
 		local function read_null ()
 			pos = pos + 3
-			local u,l1,l2 = js_string:byte(pos-3,pos-1)
+			local u, l1, l2 = js_string:byte(pos-3, pos-1)
 			if u == c_u and l1 == c_l and l2 == c_l then return nil end
-			error("Invalid value (expected null):"..js_string:sub(pos-4,pos-1)..
-				" ("..js_string:byte(pos-1).."="..js_string:sub(pos-1,pos-1).." / "..c_l..")")
+			error("Invalid value (expected null):"..js_string:sub(pos-4, pos-1)..
+				" ("..js_string:byte(pos-1).."="..js_string:sub(pos-1, pos-1).." / "..c_l..")")
 		end
 		
-		local read_object_value,read_object_key,read_array,read_value,read_comment
+		local read_object_value, read_object_key, read_array, read_value, read_comment
 	
 		-- read a value depending on what token was returned, might require info what was used (in case of comments)
-		function read_value (t,fromt)
+		function read_value (t, fromt)
 			if t == tt_object_key         then return read_object_key({}) end
 			if t == tt_array_seperator    then return read_array({}) end
 			if t == tt_singlequote_string or 
@@ -482,7 +482,7 @@ do
 			if t == tt_boolean            then return read_bool() end	
 			if t == tt_null               then return read_null() end
 			if t == tt_comment_start      then return read_value(read_comment(fromt)) end
-			error("unexpected termination - "..js_string:sub(math.max(1,pos-10),pos+10))
+			error("unexpected termination - "..js_string:sub(math.max(1, pos-10), pos + 10))
 		end
 		
 		-- read comments until something noncomment like surfaces, using the token reader which was 
@@ -502,7 +502,7 @@ do
 		end
 		
 		-- read arrays, empty array expected as o arg
-		function read_array (o,i)
+		function read_array (o, i)
 			--if not i then status "arr open" end
 			i = i or 1
 			-- loop until ...
@@ -527,7 +527,7 @@ do
 		-- object value reading
 		function read_object_value (o)
 			local t = next_token(tt_object_value)
-			return read_value(t,tt_object_value)
+			return read_value(t, tt_object_value)
 		end
 		
 		-- object key reading, might also terminate the object

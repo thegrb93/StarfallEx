@@ -15,63 +15,63 @@ function SF.Preprocessor.SetGlobalDirective(directive, func)
 	SF.Preprocessor.directives[directive] = func
 end
 
-local function FindComments( line )
+local function FindComments(line)
 	local ret, count, pos, found = {}, 0, 1
 	repeat
-		found = line:find( '["%-%[%]]', pos )
+		found = line:find('["%-%[%]]', pos)
 		if (found) then -- We found something
 			local oldpos = pos
 			
-			local char = line:sub(found,found)
+			local char = line:sub(found, found)
 			if char == "-" then
-				if line:sub(found,found+1) == "--" then
+				if line:sub(found, found + 1) == "--" then
 					-- Comment beginning
-					if line:sub(found,found+3) == "--[[" then
+					if line:sub(found, found + 3) == "--[[" then
 						-- Block Comment beginning
 						count = count + 1
-						ret[count] = {type = "start", pos = found}
+						ret[count] = { type = "start", pos = found }
 						pos = found + 4
 					else
 						-- Line comment beginning
 						count = count + 1
-						ret[count] = {type = "line", pos = found}
+						ret[count] = { type = "line", pos = found }
 						pos = found + 2
 					end
 				else
 					pos = found + 1
 				end
 			elseif char == "[" then
-				local level = line:sub(found+1):match("^(=*)")
+				local level = line:sub(found + 1):match("^(=*)")
 				if level then level = string.len(level) else level = 0 end
 				
-				if line:sub(found+level+1, found+level+1) == "[" then
+				if line:sub(found + level + 1, found + level + 1) == "[" then
 					-- Block string start
 					count = count + 1
-					ret[count] = {type = "stringblock", pos = found, level = level}
+					ret[count] = { type = "stringblock", pos = found, level = level }
 					pos = found + level + 2
 				else
 					pos = found + 1
 				end
 			elseif char == "]" then
-				local level = line:sub(found+1):match("^(=*)")
+				local level = line:sub(found + 1):match("^(=*)")
 				if level then level = string.len(level) else level = 0 end
 				
-				if line:sub(found+level+1,found+level+1) == "]" then
+				if line:sub(found + level + 1, found + level + 1) == "]" then
 					-- Ending
 					count = count + 1
-					ret[count] = {type = "end", pos = found, level = level}
+					ret[count] = { type = "end", pos = found, level = level }
 					pos = found + level + 2
 				else
 					pos = found + 1
 				end
 			elseif char == "\"" then
-				if line:sub(found-1,found-1) == "\\" and line:sub(found-2,found-1) ~= "\\\\" then
+				if line:sub(found-1, found-1) == "\\" and line:sub(found-2, found-1) ~= "\\\\" then
 					-- Escaped character
-					pos = found+1
+					pos = found + 1
 				else
 					-- String
 					count = count + 1
-					ret[count] = {type = "string", pos = found}
+					ret[count] = { type = "string", pos = found }
 					pos = found + 1
 				end
 			end
@@ -90,9 +90,9 @@ end
 function SF.Preprocessor.ParseDirectives(filename, source, data)
 	local ending = nil
 	local endingLevel = nil
-	local lines = string.Explode("\r?\n",source,true)
+	local lines = string.Explode("\r?\n", source, true)
 	for _, line in ipairs(lines) do		
-		for _,comment in ipairs(FindComments(line)) do
+		for _, comment in ipairs(FindComments(line)) do
 			if ending then
 				if comment.type == ending then
 					if endingLevel then
@@ -112,7 +112,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 				ending = "end"
 				endingLevel = comment.level
 			elseif comment.type == "line" then
-				local directive, args = string.match(line,"--@(%S+)%s*(.*)")
+				local directive, args = string.match(line, "--@(%S+)%s*(.*)")
 				local func = SF.Preprocessor.directives[directive]
 				if func then
 					func(args, filename, data)
@@ -129,51 +129,51 @@ local function directive_include(args, filename, data)
 	if not data.includes[filename] then data.includes[filename] = {} end
 	
 	local incl = data.includes[filename]
-	incl[#incl+1] = string.Trim(args)
+	incl[#incl + 1] = string.Trim(args)
 end
-SF.Preprocessor.SetGlobalDirective("include",directive_include)
+SF.Preprocessor.SetGlobalDirective("include", directive_include)
 
-local function directive_includedir( args, filename, data )
+local function directive_includedir(args, filename, data)
 	if not data.includes then data.includes = {} end
 	if not data.includes[filename] then data.includes[filename] = {} end
 
 	local incl = data.includes[filename]
 	args = string.Trim(args)
-	local files = file.Find( "starfall/" ..args.. "/*", "DATA" )
+	local files = file.Find("starfall/" ..args.. "/*", "DATA")
 	if files then
-		for _, v in pairs( files ) do
-			incl[ #incl+1 ] = args .. "/" .. v
+		for _, v in pairs(files) do
+			incl[#incl + 1] = args .. "/" .. v
 		end
 	end
 end
-SF.Preprocessor.SetGlobalDirective( "includedir", directive_includedir )
+SF.Preprocessor.SetGlobalDirective("includedir", directive_includedir)
 
 local function directive_name(args, filename, data)
 	if not data.scriptnames then data.scriptnames = {} end
 	data.scriptnames[filename] = args
 end
-SF.Preprocessor.SetGlobalDirective("name",directive_name)
+SF.Preprocessor.SetGlobalDirective("name", directive_name)
 
 local function directive_sharedscreen(args, filename, data)
 	if not data.sharedscreen then data.sharedscreen = true end
 	
 end
-SF.Preprocessor.SetGlobalDirective("sharedscreen",directive_sharedscreen)
+SF.Preprocessor.SetGlobalDirective("sharedscreen", directive_sharedscreen)
 
-local function directive_model( args, filename, data )
+local function directive_model(args, filename, data)
 	if not data.models then data.models = {} end
-	data.models[ filename ] = args
+	data.models[filename] = args
 end
-SF.Preprocessor.SetGlobalDirective( "model", directive_model )
+SF.Preprocessor.SetGlobalDirective("model", directive_model)
 
-SF.Preprocessor.SetGlobalDirective( "server", function( args, filename, data )
+SF.Preprocessor.SetGlobalDirective("server", function(args, filename, data)
 	if not data.serverorclient then data.serverorclient = {} end
-	data.serverorclient[ filename ] = "server"
+	data.serverorclient[filename] = "server"
 end)
 
-SF.Preprocessor.SetGlobalDirective( "client", function( args, filename, data )
+SF.Preprocessor.SetGlobalDirective("client", function(args, filename, data)
 	if not data.serverorclient then data.serverorclient = {} end
-	data.serverorclient[ filename ] = "client"
+	data.serverorclient[filename] = "client"
 end)
 
 --- Mark a file to be included in the upload.

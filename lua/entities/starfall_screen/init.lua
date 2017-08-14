@@ -4,30 +4,30 @@ include('shared.lua')
 
 
 function ENT:Initialize ()
-	self.BaseClass.Initialize( self )
-	self:PhysicsInit( SOLID_VPHYSICS )
-	self:SetMoveType( MOVETYPE_VPHYSICS )
-	self:SetSolid( SOLID_VPHYSICS )
-	self:SetUseType( SIMPLE_USE )
+	self.BaseClass.Initialize(self)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+	self:SetSolid(SOLID_VPHYSICS)
+	self:SetUseType(SIMPLE_USE)
 end
 
 -- Sends a net message to all clients about the use.
-function ENT:Use( activator )
+function ENT:Use(activator)
 	if not self.link then return end
 	
 	if activator:IsPlayer() then
-		net.Start( "starfall_processor_used" )
-			net.WriteEntity( self )
-			net.WriteEntity( activator )
+		net.Start("starfall_processor_used")
+			net.WriteEntity(self)
+			net.WriteEntity(activator)
 		net.Broadcast()
 	end
 	
 	if self.link.instance then
-		self.link.instance:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
+		self.link.instance:runScriptHook("starfallused", SF.Entities.Wrap(activator))
 	end
 end
 
-function ENT:LinkEnt ( ent, ply )
+function ENT:LinkEnt (ent, ply)
 	self.link = ent
 	net.Start("starfall_processor_link")
 		net.WriteEntity(self)
@@ -38,17 +38,17 @@ end
 function ENT:PreEntityCopy ()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	if IsValid(self.link) then
-		duplicator.StoreEntityModifier( self, "SFLink", { link = self.link:EntIndex() } )
+		duplicator.StoreEntityModifier(self, "SFLink", { link = self.link:EntIndex() })
 	end
 end
 
-function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
+function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFLink then
 		local info = ent.EntityMods.SFLink
 		if info.link then
-			local e = CreatedEntities[ info.link ]
-			if IsValid( e ) then
-				self:LinkEnt( e )
+			local e = CreatedEntities[info.link]
+			if IsValid(e) then
+				self:LinkEnt(e)
 			end
 		end
 	end

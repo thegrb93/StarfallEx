@@ -2,29 +2,29 @@ AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 
-util.AddNetworkString( "starfall_hud_set_enabled" )
+util.AddNetworkString("starfall_hud_set_enabled")
 
 local vehiclelinks = SF.EntityTable("vehicleLinks")
 
 function ENT:Initialize ()
-	self.BaseClass.Initialize( self )
-	self:PhysicsInit( SOLID_VPHYSICS )
-	self:SetMoveType( MOVETYPE_VPHYSICS )
-	self:SetSolid( SOLID_VPHYSICS )
-	self:SetUseType( SIMPLE_USE )
+	self.BaseClass.Initialize(self)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
+	self:SetSolid(SOLID_VPHYSICS)
+	self:SetUseType(SIMPLE_USE)
 end
 
-function ENT:SetHudEnabled( ply, mode )
-	net.Start( "starfall_hud_set_enabled" )
-		net.WriteEntity( self )
-		net.WriteInt( mode, 8 )
-	net.Send( ply )
+function ENT:SetHudEnabled(ply, mode)
+	net.Start("starfall_hud_set_enabled")
+		net.WriteEntity(self)
+		net.WriteInt(mode, 8)
+	net.Send(ply)
 	
 	local function connect()
 		if IsValid(self.link) then
 			local instance = self.link.instance
 			if instance then
-				instance:runScriptHook( "hudconnected", SF.Entities.Wrap( self ) )
+				instance:runScriptHook("hudconnected", SF.Entities.Wrap(self))
 			end
 		end
 		ply.sfhudenabled = self
@@ -34,7 +34,7 @@ function ENT:SetHudEnabled( ply, mode )
 		if IsValid(self.link) then
 			local instance = self.link.instance
 			if instance then
-				instance:runScriptHook( "huddisconnected", SF.Entities.Wrap( self ) )
+				instance:runScriptHook("huddisconnected", SF.Entities.Wrap(self))
 			end
 		end
 		ply.sfhudenabled = nil
@@ -53,17 +53,17 @@ function ENT:SetHudEnabled( ply, mode )
 end
 
 function ENT:OnRemove()
-	net.Start( "starfall_hud_set_enabled" )
-		net.WriteEntity( self )
-		net.WriteInt( 0, 8 )
+	net.Start("starfall_hud_set_enabled")
+		net.WriteEntity(self)
+		net.WriteInt(0, 8)
 	net.Broadcast()
 end
 
-function ENT:Use( ply )
-	self:SetHudEnabled( ply, -1 )
+function ENT:Use(ply)
+	self:SetHudEnabled(ply, -1)
 end
 
-function ENT:LinkEnt ( ent, ply )
+function ENT:LinkEnt (ent, ply)
 	self.link = ent
 	net.Start("starfall_processor_link")
 		net.WriteEntity(self)
@@ -71,12 +71,12 @@ function ENT:LinkEnt ( ent, ply )
 	if ply then net.Send(ply) else net.Broadcast() end
 end
 
-function ENT:LinkVehicle( ent )
+function ENT:LinkVehicle(ent)
 	if ent then
 		vehiclelinks[ent] = self
 	else
 		--Clear links
-		for k,v in pairs( vehiclelinks ) do
+		for k, v in pairs(vehiclelinks) do
 			if self == v then
 				vehiclelinks[k] = nil
 			end
@@ -84,22 +84,22 @@ function ENT:LinkVehicle( ent )
 	end
 end
 
-hook.Add("PlayerEnteredVehicle","Starfall_HUD_PlayerEnteredVehicle",function( ply, vehicle )
-	for k,v in pairs( vehiclelinks ) do
+hook.Add("PlayerEnteredVehicle", "Starfall_HUD_PlayerEnteredVehicle", function(ply, vehicle)
+	for k, v in pairs(vehiclelinks) do
 		if vehicle == k and v:IsValid() then
 			vehicle:CallOnRemove("remove_sf_hud"..v:EntIndex(), function()
-				if not IsValid( v ) then return end
-				v:SetHudEnabled( ply, 0 )
+				if not IsValid(v) then return end
+				v:SetHudEnabled(ply, 0)
 			end)
-			v:SetHudEnabled( ply, 1 )
+			v:SetHudEnabled(ply, 1)
 		end
 	end
 end)
 
-hook.Add("PlayerLeaveVehicle","Starfall_HUD_PlayerLeaveVehicle",function( ply, vehicle )
-	for k,v in pairs( vehiclelinks ) do
+hook.Add("PlayerLeaveVehicle", "Starfall_HUD_PlayerLeaveVehicle", function(ply, vehicle)
+	for k, v in pairs(vehiclelinks) do
 		if vehicle == k and v:IsValid() then
-			v:SetHudEnabled( ply, 0 )
+			v:SetHudEnabled(ply, 0)
 		end
 	end
 end)
@@ -111,7 +111,7 @@ function ENT:PreEntityCopy ()
 		info.link = self.link:EntIndex()
 	end
 	local linkedvehicles = {}
-	for k, v in pairs( vehiclelinks ) do
+	for k, v in pairs(vehiclelinks) do
 		if v == self and k:IsValid() then
 			linkedvehicles[#linkedvehicles + 1] = k:EntIndex()
 		end
@@ -120,25 +120,25 @@ function ENT:PreEntityCopy ()
 		info.linkedvehicles = linkedvehicles
 	end
 	if info.link or info.linkedvehicles then
-		duplicator.StoreEntityModifier( self, "SFLink", info )
+		duplicator.StoreEntityModifier(self, "SFLink", info)
 	end
 end
 
-function ENT:PostEntityPaste ( ply, ent, CreatedEntities )
+function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFLink then
 		local info = ent.EntityMods.SFLink
 		if info.link then
-			local e = CreatedEntities[ info.link ]
-			if IsValid( e ) then
-				self:LinkEnt( e )
+			local e = CreatedEntities[info.link]
+			if IsValid(e) then
+				self:LinkEnt(e)
 			end
 		end
 		
 		if info.linkedvehicles then
 			for k, v in pairs(info.linkedvehicles) do
-				local e = CreatedEntities[ v ]
-				if IsValid( e ) then
-					self:LinkVehicle( e )
+				local e = CreatedEntities[v]
+				if IsValid(e) then
+					self:LinkVehicle(e)
 				end
 			end
 		end

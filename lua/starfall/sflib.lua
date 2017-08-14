@@ -7,69 +7,69 @@ SF = {}
 
 -- Send files to client
 if SERVER then
-	AddCSLuaFile( "sflib.lua" )
-	AddCSLuaFile( "instance.lua" )
-	AddCSLuaFile( "libraries.lua" )
-	AddCSLuaFile( "preprocessor.lua" )
-	AddCSLuaFile( "permissions/core.lua" )
-	AddCSLuaFile( "netstream.lua" )
+	AddCSLuaFile("sflib.lua")
+	AddCSLuaFile("instance.lua")
+	AddCSLuaFile("libraries.lua")
+	AddCSLuaFile("preprocessor.lua")
+	AddCSLuaFile("permissions/core.lua")
+	AddCSLuaFile("netstream.lua")
 	
-	AddCSLuaFile( "editor/editor.lua" )
+	AddCSLuaFile("editor/editor.lua")
 end
 
 -- Load files
-include( "instance.lua" )
-include( "libraries.lua" )
-include( "preprocessor.lua" )
-include( "permissions/core.lua" )
-include( "editor/editor.lua" )
-include( "netstream.lua" )
+include("instance.lua")
+include("libraries.lua")
+include("preprocessor.lua")
+include("permissions/core.lua")
+include("editor/editor.lua")
+include("netstream.lua")
 
 if SERVER then
-	SF.cpuQuota = CreateConVar( "sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach." )
-	SF.cpuBufferN = CreateConVar( "sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average." )
+	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
+	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 else
-	SF.cpuQuota = CreateClientConVar( "sf_timebuffer_cl", 0.006, true, false, "The max average the CPU time can reach." )
-	SF.cpuOwnerQuota = CreateClientConVar( "sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips." )
-	SF.cpuBufferN = CreateClientConVar( "sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average." )
+	SF.cpuQuota = CreateClientConVar("sf_timebuffer_cl", 0.006, true, false, "The max average the CPU time can reach.")
+	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
+	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
 end
 
 
 local dgetmeta = debug.getmetatable
 
 SF.Errormeta = {
-	__tostring=function(t) return t.message end,
-	__metatable="SFError"
+	__tostring = function(t) return t.message end,
+	__metatable = "SFError"
 }
 --- Builds an error type to that contains line numbers, file name, and traceback
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
 -- @param prependinfo The error message needs file and line number info
-function SF.MakeError ( msg, level, uncatchable, prependinfo )
-	level = 1 + ( level or 1 )
-	local info = debug.getinfo( level, "Sl" )
+function SF.MakeError (msg, level, uncatchable, prependinfo)
+	level = 1 + (level or 1)
+	local info = debug.getinfo(level, "Sl")
 	if not info then
-		info = {short_src = "", currentline = 0}
+		info = { short_src = "", currentline = 0 }
 		prependinfo = false
 	end
-	return setmetatable( {
+	return setmetatable({
 		uncatchable = false,
 		file = info.short_src,
 		line = info.currentline,
-		message = prependinfo and (info.short_src..":"..info.currentline..": "..tostring( msg )) or tostring( msg ),
+		message = prependinfo and (info.short_src..":"..info.currentline..": "..tostring(msg)) or tostring(msg),
 		uncatchable = uncatchable,
-		traceback = debug.traceback( "", level )
-	}, SF.Errormeta )
+		traceback = debug.traceback("", level)
+	}, SF.Errormeta)
 end
 
 --- Throws an error like the throw function in builtins
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
-function SF.Throw ( msg, level, uncatchable )
-	local level = 1 + ( level or 1 )
-	error( SF.MakeError( msg, level, uncatchable, true ), level )
+function SF.Throw (msg, level, uncatchable)
+	local level = 1 + (level or 1)
+	error(SF.MakeError(msg, level, uncatchable, true), level)
 end
 
 SF.Types = {}
@@ -92,21 +92,21 @@ function SF.Typedef(name, supermeta)
 	metamethods.__methods = methods
 		
 	if supermeta then
-		setmetatable(methods, {__index=supermeta.__index})
-		metamethods.__supertypes = {[supermeta] = true}
+		setmetatable(methods, { __index = supermeta.__index })
+		metamethods.__supertypes = { [supermeta] = true }
 		if supermeta.__supertypes then
-			for k,_ in pairs(supermeta.__supertypes) do
+			for k, _ in pairs(supermeta.__supertypes) do
 				metamethods.__supertypes[k] = true
 			end
 		end
 	end
 
 	SF.Types[name] = metamethods
-	typemetatables[ metamethods ] = true
+	typemetatables[metamethods] = true
 	return methods, metamethods
 end
 
-function SF.GetTypeDef( name )
+function SF.GetTypeDef(name)
 	return SF.Types[name]
 end
 
@@ -135,13 +135,13 @@ function SF.CheckType(val, typ, level, default)
 		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
-		SF.Throw( "Type mismatch (Expected " .. typname .. ", got " .. ( type( mt ) == "string" and mt or type( val ) ) .. ") in function " .. funcname, level )
+		SF.Throw("Type mismatch (Expected " .. typname .. ", got " .. (type(mt) == "string" and mt or type(val)) .. ") in function " .. funcname, level)
 	end
 end
 
 --- Gets the type of val.
 -- @param val The value to be checked.
-function SF.GetType( val )
+function SF.GetType(val)
 	local mt = dgetmeta(val)
 	return (mt and mt.__metatable and type(mt.__metatable) == "string") and mt.__metatable or type(val)
 end
@@ -178,25 +178,25 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 
 	local sensitive2sf, sf2sensitive
 	if shared_meta then
-		sensitive2sf = sensitive2sf_tables[ shared_meta ]
-		sf2sensitive = sf2sensitive_tables[ shared_meta ]
+		sensitive2sf = sensitive2sf_tables[shared_meta]
+		sf2sensitive = sf2sensitive_tables[shared_meta]
 	else
 		-- Check if the wrapper already exists for this metatable and recycle it or shared wrappers won't work.
-		if sensitive2sf_tables[ metatable ] then
-			sensitive2sf = sensitive2sf_tables[ metatable ]
-			sf2sensitive = sf2sensitive_tables[ metatable ]
+		if sensitive2sf_tables[metatable] then
+			sensitive2sf = sensitive2sf_tables[metatable]
+			sf2sensitive = sf2sensitive_tables[metatable]
 		else
-			sensitive2sf = setmetatable({},{__mode=s2sfmode})
-			sf2sensitive = setmetatable({},{__mode=sf2smode})
-			sensitive2sf_tables[ metatable ] = sensitive2sf
-			sf2sensitive_tables[ metatable ] = sf2sensitive
+			sensitive2sf = setmetatable({}, { __mode = s2sfmode })
+			sf2sensitive = setmetatable({}, { __mode = sf2smode })
+			sensitive2sf_tables[metatable] = sensitive2sf
+			sf2sensitive_tables[metatable] = sf2sensitive
 		end
 	end
 	
 	local function wrap(value)
 		if value == nil then return nil end
 		if sensitive2sf[value] then return sensitive2sf[value] end
-		local tbl = setmetatable({},metatable)
+		local tbl = setmetatable({}, metatable)
 		sensitive2sf[value] = tbl
 		sf2sensitive[tbl] = value
 		return tbl
@@ -220,7 +220,7 @@ end
 -- @param object_meta metatable of object
 -- @param sf_object_meta starfall metatable of object
 -- @param wrapper function that wraps object
-function SF.AddObjectWrapper( object_meta, sf_object_meta, wrapper )
+function SF.AddObjectWrapper(object_meta, sf_object_meta, wrapper)
 	sf_object_meta.__wrap = wrapper
 	object_wrappers[object_meta] = wrapper
 end
@@ -228,16 +228,16 @@ end
 --- Helper function for adding custom unwrappers
 -- @param object_meta metatable of object
 -- @param unwrapper function that unwraps object
-function SF.AddObjectUnwrapper( object_meta, unwrapper )
+function SF.AddObjectUnwrapper(object_meta, unwrapper)
 	object_meta.__unwrap = unwrapper
 end
 
 -- A list of safe data types
 local safe_types = {
-	["number"  ] = true,
-	["string"  ] = true,
-	["boolean" ] = true,
-	["nil"     ] = true,
+	["number"] = true,
+	["string"] = true,
+	["boolean"] = true,
+	["nil"] = true,
 }
 
 --- Wraps the given object so that it is safe to pass into starfall
@@ -246,7 +246,7 @@ local safe_types = {
 -- @param object the object needing to get wrapped as it's passed into starfall
 -- @return returns nil if the object doesn't have a known wrapper,
 -- or returns the wrapped object if it does have a wrapper.
-function SF.WrapObject( object )
+function SF.WrapObject(object)
 	local metatable = dgetmeta(object)
 	if metatable then
 		local wrap = object_wrappers[metatable]
@@ -264,26 +264,26 @@ end
 -- @param object the wrapped starfall object, should work on any starfall
 -- wrapped object.
 -- @return the unwrapped starfall object
-function SF.UnwrapObject( object )
+function SF.UnwrapObject(object)
 	local metatable = dgetmeta(object)
 	
 	if metatable and metatable.__unwrap then
-		return metatable.__unwrap( object )
+		return metatable.__unwrap(object)
 	end
 end
 
 --- Manages data tied to entities so that the data is cleaned when the entity is removed
-function SF.EntityTable( key )
+function SF.EntityTable(key)
 	return setmetatable({}, 
-	{__newindex = function(t, e, v)
+	{ __newindex = function(t, e, v)
 		rawset(t, e, v)
 		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
-	end})
+	end })
 end
 
 --- Returns a path with all .. accounted for
-function SF.NormalizePath( path )
-	local tbl = string.Explode( "[/\\]+", path, true )
+function SF.NormalizePath(path)
+	local tbl = string.Explode("[/\\]+", path, true)
 	if #tbl == 1 then return path end
 	local i = 1
 	while i <= #tbl do
@@ -303,7 +303,7 @@ end
 
 
 --- Returns a class that can keep track of burst
-function SF.BurstObject( rate, max )
+function SF.BurstObject(rate, max)
 	local burstclass = {
 		use = function(self, amount)
 			self:check()
@@ -314,7 +314,7 @@ function SF.BurstObject( rate, max )
 			return false
 		end,
 		check = function(self)
-			self.val = math.min( self.val + (CurTime() - self.lasttick)*self.rate, self.max )
+			self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
 			self.lasttick = CurTime()
 			return self.val
 		end
@@ -325,7 +325,7 @@ function SF.BurstObject( rate, max )
 		val = max,
 		lasttick = 0
 	}
-	return setmetatable(t, {__index=burstclass})
+	return setmetatable(t, { __index = burstclass })
 end
 
 --- Sanitizes and returns its argument list.
@@ -335,46 +335,46 @@ end
 -- not available objects will be replaced with nil, so as to prevent
 -- any possiblitiy of leakage. Functions will always be replaced with
 -- nil as there is no way to verify that they are safe.
-function SF.Sanitize( ... )
+function SF.Sanitize(...)
 	local return_list = {}
 	local args = { ... }
 	
-	for key, value in pairs( args ) do
-		local typmeta = getmetatable( value )
-		local typ = type( typmeta ) == "string" and typmeta or type( value )
-		if safe_types[ typ ] then
-			return_list[ key ] = value
-		elseif SF.WrapObject( value ) then
-			return_list[ key ] = SF.WrapObject( value )
+	for key, value in pairs(args) do
+		local typmeta = getmetatable(value)
+		local typ = type(typmeta) == "string" and typmeta or type(value)
+		if safe_types[typ] then
+			return_list[key] = value
+		elseif SF.WrapObject(value) then
+			return_list[key] = SF.WrapObject(value)
 		elseif typ == "table" then
 			local tbl = {}
-			for k,v in pairs( value ) do
-				tbl[ SF.Sanitize( k ) ] = SF.Sanitize( v )
+			for k, v in pairs(value) do
+				tbl[SF.Sanitize(k)] = SF.Sanitize(v)
 			end
-			return_list[ key ] = tbl
+			return_list[key] = tbl
 		else 
-			return_list[ key ] = nil
+			return_list[key] = nil
 		end
 	end
 	
-	return unpack( return_list )
+	return unpack(return_list)
 end
 
 --- Takes output from starfall and does it's best to make the output
 -- fully usable outside of starfall environment
-function SF.Unsanitize( ... )
+function SF.Unsanitize(...)
 	local return_list = {}
 	
-	local args = {...}
+	local args = { ... }
 	
-	for key, value in pairs( args ) do
+	for key, value in pairs(args) do
 		local typ = type(value)
 		if typ == "table" and SF.UnwrapObject(value) then
 			return_list[key] = SF.UnwrapObject(value)
 		elseif typ == "table" then
 			return_list[key] = {}
 
-			for k,v in pairs(value) do
+			for k, v in pairs(value) do
 				return_list[key][SF.Unsanitize(k)] = SF.Unsanitize(v)
 			end
 		else
@@ -382,7 +382,7 @@ function SF.Unsanitize( ... )
 		end
 	end
 
-	return unpack( return_list )
+	return unpack(return_list)
 end
 
 -- ------------------------------------------------------------------------- --
@@ -419,13 +419,13 @@ end
 -- ------------------------------------------------------------------------- --
 
 local serialize_replace_regex = "[\"\n]"
-local serialize_replace_tbl = { [ "\n" ] = string.char( 5 ), [ '"' ] = string.char( 4 ) }
+local serialize_replace_tbl = { ["\n"] = string.char(5), ['"'] = string.char(4) }
 
 --- Serializes an instance's code in a format compatible with the duplicator library
 -- @param sources The table of filename = source entries. Ususally instance.source
 -- @param mainfile The main filename. Usually instance.mainfile
 function SF.SerializeCode(sources, mainfile)
-	local rt = {source = {}}
+	local rt = { source = {} }
 	for filename, source in pairs(sources) do
 		rt.source[filename] = string.gsub(source, serialize_replace_regex, serialize_replace_tbl)
 	end
@@ -433,8 +433,8 @@ function SF.SerializeCode(sources, mainfile)
 	return rt
 end
 
-local deserialize_replace_regex = "[" .. string.char( 5 ) .. string.char( 4 ) .. "]"
-local deserialize_replace_tbl = { [ string.char( 5 )[ 1 ] ] = "\n", [ string.char( 4 )[ 1 ] ] = '"' }
+local deserialize_replace_regex = "[" .. string.char(5) .. string.char(4) .. "]"
+local deserialize_replace_tbl = { [string.char(5)[1]] = "\n", [string.char(4)[1]] = '"' }
 --- Deserializes an instance's code.
 -- @return The table of filename = source entries
 -- @return The main filename
@@ -447,16 +447,16 @@ function SF.DeserializeCode(tbl)
 end
 
 local soundsMap = {
-	[ "DRIP1" ] = 0, [0] = "ambient/water/drip1.wav",
-	[ "DRIP2" ] = 1,	[1] = "ambient/water/drip2.wav",
-	[ "DRIP3" ] = 2,	[2] = "ambient/water/drip3.wav",
-	[ "DRIP4" ] = 3,	[3] = "ambient/water/drip4.wav",
-	[ "DRIP5" ] = 4,	[4] = "ambient/water/drip5.wav",
-	[ "ERROR1" ] = 5,	[5] = "buttons/button10.wav",
-	[ "CONFIRM1" ] = 6,	[6] = "buttons/button3.wav",
-	[ "CONFIRM2" ] = 7,	[7] = "buttons/button14.wav",
-	[ "CONFIRM3" ] = 8,	[8] = "buttons/button15.wav",
-	[ "CONFIRM4" ] = 9,	[9] = "buttons/button17.wav",
+	["DRIP1"] = 0, [0] = "ambient/water/drip1.wav",
+	["DRIP2"] = 1,	[1] = "ambient/water/drip2.wav",
+	["DRIP3"] = 2,	[2] = "ambient/water/drip3.wav",
+	["DRIP4"] = 3,	[3] = "ambient/water/drip4.wav",
+	["DRIP5"] = 4,	[4] = "ambient/water/drip5.wav",
+	["ERROR1"] = 5,	[5] = "buttons/button10.wav",
+	["CONFIRM1"] = 6,	[6] = "buttons/button3.wav",
+	["CONFIRM2"] = 7,	[7] = "buttons/button14.wav",
+	["CONFIRM3"] = 8,	[8] = "buttons/button15.wav",
+	["CONFIRM4"] = 9,	[9] = "buttons/button17.wav",
 }
 local notificationsMap = {
 	["GENERIC"] = 0,
@@ -467,16 +467,16 @@ local notificationsMap = {
 }
 -- ------------------------------------------------------------------------- --
 
-local function argsToChat( ... )
+local function argsToChat(...)
 	local n = select('#', ...)
 	local input = { ... }
 	local output = {}
 	local color = false
-	for i=1, n do
+	for i = 1, n do
 		local add
-		if dgetmeta( input[i] ) == SF.Types[ "Color" ] then
+		if dgetmeta(input[i]) == SF.Types["Color"] then
 			color = true
-			add = SF.Color.Unwrap( input[i] )
+			add = SF.Color.Unwrap(input[i])
 		else
 			add = tostring(input[i])
 		end
@@ -484,7 +484,7 @@ local function argsToChat( ... )
 	end
 	-- Combine the strings with tabs
 	local processed = {}
-	if not color then processed[1] = Color(151,211,255) end
+	if not color then processed[1] = Color(151, 211, 255) end
 	local i = 1
 	while i <= n do
 		if type(output[i])=="string" then
@@ -493,13 +493,13 @@ local function argsToChat( ... )
 				j = j + 1
 			end
 			if i==(j-1) then
-				processed[#processed+1] = output[i]
+				processed[#processed + 1] = output[i]
 			else
-				processed[#processed+1] = table.concat({unpack(output,i,j)},"\t")
+				processed[#processed + 1] = table.concat({ unpack(output, i, j) }, "\t")
 			end
 			i = j
 		else
-			processed[#processed+1] = output[i]
+			processed[#processed + 1] = output[i]
 			i = i + 1
 		end
 	end
@@ -509,12 +509,12 @@ end
 if SERVER then
 	util.AddNetworkString("starfall_requpload")
 	util.AddNetworkString("starfall_upload")
-	util.AddNetworkString( "starfall_addnotify" )
-	util.AddNetworkString( "starfall_console_print" )
-	util.AddNetworkString( "starfall_openeditor" )
-	util.AddNetworkString( "starfall_chatprint" )
+	util.AddNetworkString("starfall_addnotify")
+	util.AddNetworkString("starfall_console_print")
+	util.AddNetworkString("starfall_openeditor")
+	util.AddNetworkString("starfall_chatprint")
 	
-	local uploaddata = SF.EntityTable( "sfTransfer" )
+	local uploaddata = SF.EntityTable("sfTransfer")
 
 	--- Requests a player to send whatever code they have open in his/her editor to
 	-- the server.
@@ -530,9 +530,9 @@ if SERVER then
 		net.Send(ply)
 
 		uploaddata[ply] = {
-			files={},
+			files = {},
 			mainfile = nil,
-			needHeader=true,
+			needHeader = true,
 			callback = callback,
 			timeout = CurTime() + 1
 		}
@@ -553,19 +553,19 @@ if SERVER then
 			if net.ReadBit() ~= 0 then break end
 			local filename = net.ReadString()
 
-			net.ReadStream( ply, function( data )
+			net.ReadStream(ply, function(data)
 				if not data and uploaddata[ply]==updata then
-					SF.AddNotify( ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1" )
+					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
 					uploaddata[ply] = nil
 					return
 				end
 				updata.Completed = updata.Completed + 1
-				updata.files[ filename ] = data
+				updata.files[filename] = data
 				if updata.Completed == updata.NumFiles then
 					updata.callback(updata.mainfile, updata.files)
 					uploaddata[ply] = nil
 				end
-			end )
+			end)
 			I = I + 1
 		end
 
@@ -577,29 +577,29 @@ if SERVER then
 		end
 	end)
 
-	function SF.AddNotify ( ply, msg, notifyType, duration, sound )
-		if not IsValid( ply ) then return end
+	function SF.AddNotify (ply, msg, notifyType, duration, sound)
+		if not IsValid(ply) then return end
 
-		net.Start( "starfall_addnotify" )
-		net.WriteString( msg )
-		net.WriteUInt( notificationsMap[ notifyType ], 8 )
-		net.WriteFloat( duration )
-		net.WriteUInt( soundsMap[ sound ], 8 )
+		net.Start("starfall_addnotify")
+		net.WriteString(msg)
+		net.WriteUInt(notificationsMap[notifyType], 8)
+		net.WriteFloat(duration)
+		net.WriteUInt(soundsMap[sound], 8)
 		if ply then
-			net.Send( ply )
+			net.Send(ply)
 		else
 			net.Broadcast()
 		end
 	end
 
-	function SF.Print ( ply, msg )
-		net.Start( "starfall_console_print" )
-			net.WriteString( msg )
-		net.Send( ply )
+	function SF.Print (ply, msg)
+		net.Start("starfall_console_print")
+			net.WriteString(msg)
+		net.Send(ply)
 	end
 	
-	function SF.ChatPrint( ply, ... )
-		local tbl = argsToChat( ... )
+	function SF.ChatPrint(ply, ...)
+		local tbl = argsToChat(...)
 		
 		net.Start("starfall_chatprint")
 		net.WriteUInt(#tbl, 32)
@@ -609,19 +609,19 @@ if SERVER then
 		net.Send(ply)
 	end
 else
-	net.Receive("starfall_openeditor",function(len)		
+	net.Receive("starfall_openeditor", function(len)		
 		SF.Editor.open()
 		
 		local gate = net.ReadEntity()
 		
-		hook.Add("Think","WaitForEditor",function()
+		hook.Add("Think", "WaitForEditor", function()
 			if SF.Editor.initialized then
 				if IsValid(gate) and gate.files then
 					for name, code in pairs(gate.files) do
 						SF.Editor.openWithCode(name, code)
 					end
 				end
-				hook.Remove("Think","WaitForEditor")
+				hook.Remove("Think", "WaitForEditor")
 			end
 		end)
 	end)
@@ -633,13 +633,13 @@ else
 			net.Start("starfall_upload")
 			net.WriteString(list.mainfile)
 			
-			for name, data in pairs( list.files ) do
-				net.WriteBit( false )
-				net.WriteString( name )
-				net.WriteStream( data )
+			for name, data in pairs(list.files) do
+				net.WriteBit(false)
+				net.WriteString(name)
+				net.WriteStream(data)
 			end
 
-			net.WriteBit( true )
+			net.WriteBit(true)
 			net.SendToServer()
 			--print("Done sending")
 		else
@@ -648,45 +648,45 @@ else
 			net.WriteBit(true)
 			net.SendToServer()
 			if list then
-				SF.AddNotify( LocalPlayer(), list, "ERROR", 7, "ERROR1" )
+				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
 			end
 		end
 	end)
 
-	function SF.AddNotify ( ply, msg, type, duration, sound )
+	function SF.AddNotify (ply, msg, type, duration, sound)
 		if ply == LocalPlayer() then
-			print( msg )
-			GAMEMODE:AddNotify( msg, notificationsMap[ type ], duration )
+			print(msg)
+			GAMEMODE:AddNotify(msg, notificationsMap[type], duration)
 			if soundsMap[sound] then
-				surface.PlaySound( soundsMap[ soundsMap[ sound ] ] )
+				surface.PlaySound(soundsMap[soundsMap[sound]])
 			end
 		end
 	end
 
-	net.Receive( "starfall_addnotify", function ()
-		local msg, type, duration, sound = net.ReadString(), net.ReadUInt( 8 ), net.ReadFloat(), net.ReadUInt( 8 )
-		print( msg )
-		GAMEMODE:AddNotify( msg, type, duration )
-		if soundsMap[ sound ] then
-			surface.PlaySound( soundsMap[ sound ] )
+	net.Receive("starfall_addnotify", function ()
+		local msg, type, duration, sound = net.ReadString(), net.ReadUInt(8), net.ReadFloat(), net.ReadUInt(8)
+		print(msg)
+		GAMEMODE:AddNotify(msg, type, duration)
+		if soundsMap[sound] then
+			surface.PlaySound(soundsMap[sound])
 		end
-	end )
+	end)
 
-	net.Receive( "starfall_console_print", function ()
-		print( net.ReadString() )
-	end )
+	net.Receive("starfall_console_print", function ()
+		print(net.ReadString())
+	end)
 	
-	net.Receive( "starfall_chatprint", function ()
+	net.Receive("starfall_chatprint", function ()
 		local recv = {}
-		local n = net.ReadUInt( 32 )
-		for i=1, n do
+		local n = net.ReadUInt(32)
+		for i = 1, n do
 			recv[i] = net.ReadType()
 		end
-		chat.AddText( unpack( recv ) )
-	end )
+		chat.AddText(unpack(recv))
+	end)
 	
-	function SF.ChatPrint( ... )
-		chat.AddText( unpack( argsToChat( ... ) ) )
+	function SF.ChatPrint(...)
+		chat.AddText(unpack(argsToChat(...)))
 	end
 end
 
@@ -696,10 +696,10 @@ do
 	
 	MsgN("-SF - Loading Libraries")
 	
-	local print=function(...)
+	local print = function(...)
 		if SF_VERBOSE_INIT ~= false then return print(...) end
 	end
-	local MsgN=function(...)
+	local MsgN = function(...)
 		if SF_VERBOSE_INIT ~= false then return MsgN(...) end
 	end
 	
@@ -708,7 +708,7 @@ do
 
 		MsgN("- Loading shared libraries")
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
-		for _,filename in pairs(l) do
+		for _, filename in pairs(l) do
 			print("-  Loading "..filename)
 			include("starfall/libs_sh/"..filename)
 			AddCSLuaFile("starfall/libs_sh/"..filename)
@@ -717,7 +717,7 @@ do
 
 		MsgN("- Loading SF server-side libraries")
 		l = file.Find("starfall/libs_sv/*.lua", "LUA")
-		for _,filename in pairs(l) do
+		for _, filename in pairs(l) do
 			print("-  Loading "..filename)
 			include("starfall/libs_sv/"..filename)
 		end
@@ -726,7 +726,7 @@ do
 
 		MsgN("- Adding client-side libraries to send list")
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _,filename in pairs(l) do
+		for _, filename in pairs(l) do
 			print("-  Adding "..filename)
 			AddCSLuaFile("starfall/libs_cl/"..filename)
 		end
@@ -739,7 +739,7 @@ do
 
 		MsgN("- Loading shared libraries")
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
-		for _,filename in pairs(l) do
+		for _, filename in pairs(l) do
 			print("-  Loading "..filename)
 			include("starfall/libs_sh/"..filename)
 		end
@@ -747,7 +747,7 @@ do
 
 		MsgN("- Loading client-side libraries")
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _,filename in pairs(l) do
+		for _, filename in pairs(l) do
 			print("-  Loading "..filename)
 			include("starfall/libs_cl/"..filename)
 		end
@@ -760,13 +760,13 @@ do
 end
 
 do
-	local function cleanHooks( path )
+	local function cleanHooks(path)
 		for k, v in pairs(SF.Libraries.hooks) do
 			local i = 1
 			while i <= #v do
-				local hookfile = debug.getinfo( v[i], "S" ).short_src
+				local hookfile = debug.getinfo(v[i], "S").short_src
 				if string.find(hookfile, path, 1, true) then
-					table.remove( v, i )
+					table.remove(v, i)
 				else
 					i = i + 1
 				end
@@ -782,11 +782,11 @@ do
 			if ply:IsValid() and not ply:IsSuperAdmin() then return end
 			local filename = arg[1]
 			if not filename then return end
-			filename = string.lower( filename )
+			filename = string.lower(filename)
 
 			local function sendToClient(path)
 				net.Start("sf_reloadlibrary")
-				local data = util.Compress(file.Read(path,"LUA"))
+				local data = util.Compress(file.Read(path, "LUA"))
 				net.WriteString(path)
 				net.WriteStream(data)
 				net.Broadcast()
@@ -796,21 +796,21 @@ do
 			local sh_filename = "starfall/libs_sh/"..filename..".lua"
 			local cl_filename = "starfall/libs_cl/"..filename..".lua"
 
-			cleanHooks( filename )
+			cleanHooks(filename)
 
 			local postload
-			if file.Exists( sh_filename, "LUA" ) then
+			if file.Exists(sh_filename, "LUA") then
 				print("Reloaded library: " .. filename)
 				include(sh_filename)
 				sendToClient(sh_filename)
 				postload = true
 			end
-			if file.Exists( sv_filename, "LUA" ) then
+			if file.Exists(sv_filename, "LUA") then
 				print("Reloaded library: " .. filename)
 				include(sv_filename)
 				postload = true
 			end
-			if file.Exists( cl_filename, "LUA" ) then
+			if file.Exists(cl_filename, "LUA") then
 				sendToClient(cl_filename)
 			end
 			if postload then
@@ -822,16 +822,16 @@ do
 		local root_path = SF.NormalizePath(string.GetPathFromFilename(debug.getinfo(1, "S").short_src).."../")
 		net.Receive("sf_reloadlibrary", function(len)
 			local path = net.ReadString()
-			net.ReadStream( nil, function( data )
-				local file = util.Decompress( data )
+			net.ReadStream(nil, function(data)
+				local file = util.Decompress(data)
 				if file then
-					print("Reloaded library: " .. string.StripExtension(string.GetFileFromFilename( path )))
-					cleanHooks( path )
-					local func = CompileString( file, root_path .. path )
+					print("Reloaded library: " .. string.StripExtension(string.GetFileFromFilename(path)))
+					cleanHooks(path)
+					local func = CompileString(file, root_path .. path)
 					func()
 					SF.Libraries.CallHook("postload")
 				end
-			end )
+			end)
 		end)
 		
 	end

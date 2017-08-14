@@ -87,17 +87,17 @@ function module_link (modulename, doc, from)
 	return href
 end
 
-function class_link ( typename, doc, from )
-	assert( typename )
-	assert( doc )
+function class_link (typename, doc, from)
+	assert(typename)
+	assert(doc)
 	from = from or ""
 
-	if doc.classes[ typename ] == nil then
+	if doc.classes[typename] == nil then
 		return
 	end
 
 	local href = "classes/" .. typename .. ".html"
-	string.gsub( from, "/", function () href = "../" .. href end )
+	string.gsub(from, "/", function () href = "../" .. href end)
 	return href
 end
 
@@ -116,27 +116,27 @@ function hook_link(hookname, doc, from)
 	return href
 end
 
-function directive_link ( dirname, doc, from )
-	assert( dirname )
-	assert( doc )
+function directive_link (dirname, doc, from)
+	assert(dirname)
+	assert(doc)
 	from = from or ""
 
-	if doc.directives[ dirname ] == nil then return end
+	if doc.directives[dirname] == nil then return end
 
 	local href = "directives.html"
-	string.gsub( from, "/", function () href = "../" .. href end )
+	string.gsub(from, "/", function () href = "../" .. href end)
 	return href
 end
 
-function example_link ( dirname, doc, from )
-	assert( dirname )
-	assert( doc )
+function example_link (dirname, doc, from)
+	assert(dirname)
+	assert(doc)
 	from = from or ""
 
-	if doc.examples[ dirname ] == nil then return end
+	if doc.examples[dirname] == nil then return end
 
 	local href = "examples/" .. dirname .. ".html"
-	string.gsub( from, "/", function () href = "../" .. href end )
+	string.gsub(from, "/", function () href = "../" .. href end)
 	return href
 end
 
@@ -242,12 +242,12 @@ end
 -------------------------------------------------------------------------------
 -- Assembly the output filename for a module.
 -- TODO: change the name of this function
-function out_class ( typename )
-	return string.format( "%sclasses/%s.html", options.output_dir, typename )
+function out_class (typename)
+	return string.format("%sclasses/%s.html", options.output_dir, typename)
 end
 
-function out_example ( typename )
-	return string.format( "%sexamples/%s.html", options.output_dir, typename )
+function out_example (typename)
+	return string.format("%sexamples/%s.html", options.output_dir, typename)
 end
 
 -----------------------------------------------------------------
@@ -293,35 +293,35 @@ function start (doc)
 			local f = lfs.open(filename, "w")
 			assert(f, string.format("could not open `%s' for writing", filename))
 			io.output(f)
-			include("file.lp", { doc = doc, file_doc = file_doc} )
+			include("file.lp", { doc = doc, file_doc = file_doc })
 			f:close()
 		end
 	end
 	
 	-- Process classes
-	for _, classname in ipairs( doc.classes ) do
-		local class_doc = doc.classes[ classname ]
+	for _, classname in ipairs(doc.classes) do
+		local class_doc = doc.classes[classname]
 		-- assembly the filename
-		local filename = out_class( classname )
-		logger:info( string.format( "generating file `%s'", filename ) )
+		local filename = out_class(classname)
+		logger:info(string.format("generating file `%s'", filename))
 
-		local f = lfs.open( filename, "w" )
-		assert( f, string.format( "could not open `%s' for writing", filename ) )
-		io.output( f )
-		include( "class.lp", { doc = doc, class_doc = class_doc } )
+		local f = lfs.open(filename, "w")
+		assert(f, string.format("could not open `%s' for writing", filename))
+		io.output(f)
+		include("class.lp", { doc = doc, class_doc = class_doc })
 		f:close()
 	end
 	
 	-- Process examples
-	for name, example in pairs( doc.examples ) do
+	for name, example in pairs(doc.examples) do
 		-- assembly the filename
-		local filename = out_example( name )
-		logger:info( string.format( "generating file `%s'", filename ) )
+		local filename = out_example(name)
+		logger:info(string.format("generating file `%s'", filename))
 
-		local f = lfs.open( filename, "w" )
-		assert( f, string.format( "could not open `%s' for writing", filename ) )
-		io.output( f )
-		include( "examples.lp", { doc = doc, example_doc = {name = name, code=example, path=filename}} )
+		local f = lfs.open(filename, "w")
+		assert(f, string.format("could not open `%s' for writing", filename))
+		io.output(f)
+		include("examples.lp", { doc = doc, example_doc = { name = name, code = example, path = filename } })
 		f:close()
 	end
 
@@ -330,15 +330,15 @@ function start (doc)
 	local f = lfs.open(filename, "w")
 	assert(f, string.format("could not open `%s' for writing", filename))
 	io.output(f)
-	include("hooks.lp", {doc=doc, hook_doc=doc})
+	include("hooks.lp", { doc = doc, hook_doc = doc })
 	f:close()
 	
 	local filename = options.output_dir .. "directives.html"
-	logger:info( "generating file `%s'", filename )
-	local f = lfs.open( filename, "w" )
-	assert( f, string.format( "could not open `%s' for writing", filename ) )
-	io.output( f )
-	include( "directives.lp", { doc = doc, dir_doc = doc } )
+	logger:info("generating file `%s'", filename)
+	local f = lfs.open(filename, "w")
+	assert(f, string.format("could not open `%s' for writing", filename))
+	io.output(f)
+	include("directives.lp", { doc = doc, dir_doc = doc })
 	f:close()
 
 	-- copy extra files

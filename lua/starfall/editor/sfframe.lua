@@ -20,9 +20,9 @@ Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, f
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 
-cvars.AddChangeCallback( "sf_editor_layout", function()
+cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
-end ) 
+end) 
 
 surface.CreateFont("SFEditorDefault", {
 		font = "Roboto",
@@ -33,7 +33,7 @@ surface.CreateFont("SFEditorDefault", {
 	})
 
 Editor.CreatedFonts = {}
-function createFont(name,FontName,Size)
+function createFont(name, FontName, Size)
 	local fontTable =
 	{
 		font = FontName,
@@ -59,7 +59,7 @@ function Editor:GetFont(FontName, Size)
 	if not self.CreatedFonts[name] then
 		self.CreatedFonts[name] = true
 		createFont(name, FontName, Size)
-		timer.Simple(0,function() createFont(name, FontName, Size) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
+		timer.Simple(0, function() createFont(name, FontName, Size) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
 	end
 
 	surface.SetFont(name)
@@ -159,8 +159,8 @@ function Editor:SaveEditorSettings()
 	local x, y = self:GetPos()
 	RunConsoleCommand("sf_editor_pos", x .. "_" .. y)
 end
-function Editor:Paint(w,h)
-	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
+function Editor:Paint(w, h)
+	draw.RoundedBox(0, 0, 0, w, h, SF.Editor.colors.dark)
 end
 function Editor:PaintOver()
 	local w, h = self:GetSize()
@@ -448,12 +448,12 @@ function Editor:CreateTab(chosenfile)
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
 	editor.chosenfile = chosenfile
 	sheet.Tab.editor = editor -- For easy access
-	sheet.Tab.Paint = function(button,w,h)
+	sheet.Tab.Paint = function(button, w, h)
 
 		if button.Hovered then
-			draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med )
+			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med)
 		else
-			draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark )
+			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
 		end
 	end
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
@@ -751,17 +751,17 @@ function Editor:InitComponents()
 
 	self.C.Menu:Dock(TOP)
 	self.C.TabHolder:Dock(FILL)
-	self.C.TabHolder.tabScroller:DockMargin( 0, 0, 3, 0 ) -- We dont want default offset
+	self.C.TabHolder.tabScroller:DockMargin(0, 0, 3, 0) -- We dont want default offset
 	self.C.TabHolder.tabScroller:SetOverlap(-1)
 	self.C.TabHolder:SetPadding(0)
 	self.C.Menu.Paint = function(_, w, h)
-		draw.RoundedBox( 0, 0, 0, w, h, Color(234, 234, 234) )
+		draw.RoundedBox(0, 0, 0, w, h, Color(234, 234, 234))
 	end
 
 	self.C.Val:Dock(BOTTOM)
 
 	self.C.Menu:SetHeight(24)
-	self.C.Menu:DockPadding(2,2,2,2)
+	self.C.Menu:DockPadding(2, 2, 2, 2)
 	self.C.Val:SetHeight(22)
 
 	self.C.Close:SetText("Close")
@@ -787,7 +787,7 @@ function Editor:InitComponents()
 
 	self.C.Sav:SetImage("icon16/disk.png")
 	self.C.Sav.DoClick = function(button) self:SaveFile(self:GetChosenFile()) end
-	self.C.Sav:SetToolTip( "Save" )
+	self.C.Sav:SetToolTip("Save")
 
 	self.C.SavAs:SetImage("icon16/disk_multiple.png")
 	self.C.SavAs:SetToolTip("Save As")
@@ -795,27 +795,27 @@ function Editor:InitComponents()
 
 	self.C.NewTab:SetImage("icon16/page_white_add.png")
 	self.C.NewTab.DoClick = function(button) self:NewTab() end
-	self.C.NewTab:SetToolTip( "New tab" )
+	self.C.NewTab:SetToolTip("New tab")
 
 	self.C.CloseTab:SetImage("icon16/page_white_delete.png")
 	self.C.CloseTab.DoClick = function(button) 
-		Derma_Query("Do you want to close current tab?","Are you sure?","Close",function() self:CloseTab() end,"Cancel",function() end)
+		Derma_Query("Do you want to close current tab?", "Are you sure?", "Close", function() self:CloseTab() end, "Cancel", function() end)
 	end
-	self.C.CloseTab:SetToolTip( "Close tab" )
+	self.C.CloseTab:SetToolTip("Close tab")
 
 	self.C.Reload:SetImage("icon16/page_refresh.png")
-	self.C.Reload:SetToolTip( "Refresh file" )
+	self.C.Reload:SetToolTip("Refresh file")
 	self.C.Reload.DoClick = function(button)
 		self:LoadFile(self:GetChosenFile(), false)
 	end
 
-	self.C.Browser.tree.OnNodeSelected = function( tree, node )
-		if not node:GetFileName() or string.GetExtensionFromFilename( node:GetFileName() ) ~= "txt" then return end
+	self.C.Browser.tree.OnNodeSelected = function(tree, node)
+		if not node:GetFileName() or string.GetExtensionFromFilename(node:GetFileName()) ~= "txt" then return end
 
 		self:Open(node:GetFileName(), nil, false)
 	end
 	self.C.Browser.tree.Paint = function(_, w, h) --Fix for offset
-		draw.RoundedBox( 0, 1, 0, w-2, h, Color(255, 255, 255) )
+		draw.RoundedBox(0, 1, 0, w-2, h, Color(255, 255, 255))
 	end
 
 	self.C.Val:SetText(" Click to validate...")
@@ -880,18 +880,18 @@ function Editor:AddControlPanelTab(label, icon, tooltip)
 	local ret = frame.TabHolder:AddSheet(label, panel, icon, false, false, tooltip)
 	local old = ret.Tab.OnMousePressed
 	function ret.Tab.OnMousePressed(...)
-		timer.Simple(0.1,function() frame:ResizeAll() end) -- timers solve everything
+		timer.Simple(0.1, function() frame:ResizeAll() end) -- timers solve everything
 		old(...)
 	end
 
 	ret.Panel.Paint = function() end
 	ret.Tab.GetTabHeight = function() return 26 end -- Not increasing when active
-	ret.Tab.Paint = function(button,w,h)
+	ret.Tab.Paint = function(button, w, h)
 
 		if button.Hovered then
-			draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med )
+			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med)
 		else
-			draw.RoundedBox( 0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark )
+			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
 		end
 	end
 
@@ -906,7 +906,7 @@ function Editor:InitControlPanel()
 	tabholder:SetPos(2, 4)
 	frame.TabHolder = tabholder
 	
-	tabholder.tabScroller:DockMargin( 0, 0, 3, 0 )
+	tabholder.tabScroller:DockMargin(0, 0, 3, 0)
 	tabholder.tabScroller:SetOverlap(-1)	
 	
 	-- They need to be resized one at a time... dirty fix incoming (If you know of a nicer way to do this, don't hesitate to fix it.)
@@ -956,8 +956,8 @@ function Editor:InitControlPanel()
 
 
 	frame.Paint = function(_, w, h)
-		draw.RoundedBox( 0, 0, 30, w, h, SF.Editor.colors.meddark )
-		draw.RoundedBox( 0, 2, 32, w, h, Color(32, 32, 32) )
+		draw.RoundedBox(0, 0, 30, w, h, SF.Editor.colors.meddark)
+		draw.RoundedBox(0, 2, 32, w, h, Color(32, 32, 32))
 	end
 	tabholder.Paint = function() end
 	-- ------------------------------------------- EDITOR TAB
@@ -974,19 +974,19 @@ function Editor:InitControlPanel()
 	label:SetText("Current Editor:")
 	label:SizeToContents()
 	
-	local box = vgui.Create( "DComboBox" )
+	local box = vgui.Create("DComboBox")
 	dlist:AddItem(box)
-	box:SetValue( SF.Editor.CurrentTabHandler:GetString() )
-	box.OnSelect = function ( self, index, value, data )
+	box:SetValue(SF.Editor.CurrentTabHandler:GetString())
+	box.OnSelect = function (self, index, value, data)
 		value = value:gsub(" %b()", "") -- Remove description
 		RunConsoleCommand("sf_editor_tabeditor", value)
 		RunConsoleCommand("sf_editor_restart")
 	end
 
-	for k, v in pairs( SF.Editor.TabHandlers ) do
+	for k, v in pairs(SF.Editor.TabHandlers) do
 		if v.IsEditor then
 			local description = v.Description and " ( "..v.Description.." )" or "Addon"
-			box:AddChoice( k..description )
+			box:AddChoice(k..description)
 		end
 	end
 
@@ -1080,7 +1080,7 @@ function Editor:CreateThemesPanel()
 		local curTheme = SF.Editor.Themes.ThemeConVar:GetString()
 
 		for k, v in pairs(SF.Editor.Themes.Themes) do
-			local rowPanel = themeList:AddLine(v.Name,v.Version == SF.Editor.Themes.Version and "" or "Not compatible!")
+			local rowPanel = themeList:AddLine(v.Name, v.Version == SF.Editor.Themes.Version and "" or "Not compatible!")
 			rowPanel.theme = k
 
 			if k == curTheme then
@@ -1262,7 +1262,7 @@ function Editor:SaveTabs()
 	if not self.TabsLoaded then return end
 	local tabs = {}
 	tabs.selectedTab = self:GetActiveTabIndex()
-	for i=1, self:GetNumTabs() do
+	for i = 1, self:GetNumTabs() do
 		tabs[i] = {}
 		local filename = self:GetEditor(i).chosenfile
 		if filename then filename =  filename:sub(#self.Location + 2) end
@@ -1286,7 +1286,7 @@ function Editor:OpenOldTabs()
 		if not istable(v) then continue end
 		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
-			timer.Simple(0,function() 
+			timer.Simple(0, function() 
 				self:CloseTab(1)
 				self:SetActiveTabIndex(tabs.selectedTab or 1)		
 			end)
@@ -1311,21 +1311,21 @@ function Editor:Validate(gotoerror)
 
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We wont validate empty scripts
-	local err = CompileString( code , "Validation", false )
-	local success = type( err ) ~= "string"
-	local row,message
+	local err = CompileString(code , "Validation", false)
+	local success = type(err) ~= "string"
+	local row, message
 	if success then
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
 	else
-		row = tonumber( err:match( "%d+" ) ) - 1 or 0
-		message = err:match( ": .+$" ):sub( 3 ) or "Unknown"
+		row = tonumber(err:match("%d+")) - 1 or 0
+		message = err:match(": .+$"):sub(3) or "Unknown"
 		message = "Line "..row..":"..message
 		self.C.Val:SetBGColor(110, 0, 20, 255)
 		self.C.Val:SetText(" " .. message)
 	end
 
 	if self:GetCurrentEditor().onValidate then
-		self:GetCurrentEditor():onValidate(success, row, message,gotoerror)
+		self:GetCurrentEditor():onValidate(success, row, message, gotoerror)
 	end
 	return true
 end
@@ -1357,7 +1357,7 @@ end
 
 function Editor:ChosenFile(Line)
 	self:GetCurrentEditor().chosenfile = Line
-	self:GetCurrentEditor().savedCode = Line and file.Read( Line ) or nil
+	self:GetCurrentEditor().savedCode = Line and file.Read(Line) or nil
 
 	if Line then
 		self:SubTitle("Editing: " .. Line)
@@ -1536,7 +1536,7 @@ function Editor:LoadFile(Line, forcenewtab)
 end
 
 function Editor:Close()
-	RunConsoleCommand( "starfall_event", "editor_close" )
+	RunConsoleCommand("starfall_event", "editor_close")
 	timer.Stop("sfautosave")
 	self:SaveTabs()
 
@@ -1545,10 +1545,10 @@ function Editor:Close()
 
 	self:SaveEditorSettings()
 	local activeWep = LocalPlayer():GetActiveWeapon()
-	if IsValid( activeWep ) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
+	if IsValid(activeWep) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
 		local model = nil
 		local ppdata = {}
-		SF.Preprocessor.ParseDirectives( "file", self:GetCode(), ppdata )
+		SF.Preprocessor.ParseDirectives("file", self:GetCode(), ppdata)
 		if ppdata.models and ppdata.models.file ~= "" then
 			model = ppdata.models.file 
 		end

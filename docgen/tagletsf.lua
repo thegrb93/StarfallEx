@@ -85,18 +85,18 @@ end
 -- @param line string with line text
 -- @return the library name or nil if not found
 -- @return the table name used to store the library
-local function check_library ( line )
-	line = util.trim( line )
+local function check_library (line)
+	line = util.trim(line)
 
 	-- Global library
-	return line:match( "^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(%s*\"([^\"]+)\".-%)$" )
+	return line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(%s*\"([^\"]+)\".-%)$")
 end
 
 --- Checks if the line contains a class creation
-local function check_class ( line )
+local function check_class (line)
 	line = util.trim(line)
 
-	return line:match( "^%s*local%s+([%w_]+).-=%s*SF.Typedef%(%s*[\"']([^\"']+)[\"'].-%)$" )
+	return line:match("^%s*local%s+([%w_]+).-=%s*SF.Typedef%(%s*[\"']([^\"']+)[\"'].-%)$")
 end
 
 -------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ end
 -- @param block block with comment field
 -- @return block parameter
 
-local function parse_comment ( block, first_line, libs, classes )
+local function parse_comment (block, first_line, libs, classes)
 
 	-- get the first non-empty line of code
 	local code = table.foreachi(block.code, function(_, line)
@@ -173,9 +173,9 @@ local function parse_comment ( block, first_line, libs, classes )
 	
 	-- parse first line of code
 	if code ~= nil then
-		local func_info = check_function( code )
-		local libtbl, libname = check_library( code )
-		local typtbl, typname = check_class( code )
+		local func_info = check_function(code)
+		local libtbl, libname = check_library(code)
+		local typtbl, typname = check_class(code)
 
 		if func_info then
 			block.class = "function"
@@ -210,7 +210,7 @@ local function parse_comment ( block, first_line, libs, classes )
 	table.foreachi(block.comment, function (_, line)
 		line = util.trim_comment(line)
 		
-		local r, _, tag, text = string.find( line, "^@([_%w%.]+)%s*(.*)" )
+		local r, _, tag, text = string.find(line, "^@([_%w%.]+)%s*(.*)")
 		if r ~= nil then
 			-- found new tag, add previous one, and start a new one
 			-- TODO: what to do with invalid tags? issue an error? or log a warning?
@@ -219,8 +219,8 @@ local function parse_comment ( block, first_line, libs, classes )
 			currenttag = tag
 			currenttext = text
 		else
-			line = line:gsub( "^\\", "" )
-			currenttext = util.concat( currenttext, "\n" .. line )
+			line = line:gsub("^\\", "")
+			currenttext = util.concat(currenttext, "\n" .. line)
 			assert(string.sub(currenttext, 1, 1) ~= " ", string.format("`%s', `%s'", currenttext, line))
 		end
 	end)
@@ -238,9 +238,9 @@ local function parse_comment ( block, first_line, libs, classes )
 		local libtbl, fname = block.name:match("(.*)[%.:]([^%.:]+)$")
 		
 		if libtbl and not block.library then
-			if libs[ libtbl ] then
+			if libs[libtbl] then
 				block.library = libtbl
-			elseif classes[ libtbl ] then
+			elseif classes[libtbl] then
 				block.classlib = libtbl
 			end
 		end
@@ -249,15 +249,15 @@ local function parse_comment ( block, first_line, libs, classes )
 			assert(lib, "no such library: "..block.library)
 			block.fname = fname
 			block.library = lib.name
-			table.insert(lib.functions,fname)
+			table.insert(lib.functions, fname)
 			lib.functions[fname] = block
 		elseif block.classlib then
-			local class = classes[ block.classlib ]
-			assert( class, "no such class: " .. block.classlib )
+			local class = classes[block.classlib]
+			assert(class, "no such class: " .. block.classlib)
 			block.fname = fname
 			block.classlib = class.name
-			table.insert( class.methods, fname )
-			class.methods[ fname ] = block
+			table.insert(class.methods, fname)
+			class.methods[fname] = block
 		end
 	elseif block.class == "table" then
 		local libtbl, tname = block.name:match("(.*)%.([^%.]+)$")
@@ -269,36 +269,36 @@ local function parse_comment ( block, first_line, libs, classes )
 			local lib = libs[block.library]
 			assert(lib, "no such library: "..block.library)
 			block.library = lib.name
-			table.insert(lib.tables,tname)
+			table.insert(lib.tables, tname)
 			lib.tables[tname] = block
 		end
 	elseif block.class == "field" then
 		local libtbl, fname = block.name:match("(.*)[%.:]([^%.:]+)$")
 		
 		if libtbl and not block.library then
-			if libs[ libtbl ] then
+			if libs[libtbl] then
 				block.library = libtbl
-			elseif classes[ libtbl ] then
+			elseif classes[libtbl] then
 				block.classlib = libtbl
 			end
 		end
 		if block.library then
-			local lib = libs[ block.library ]
-			assert( lib, "no such library: " .. block.library )
+			local lib = libs[block.library]
+			assert(lib, "no such library: " .. block.library)
 			block.library = lib.name
-			table.insert( lib.fields, fname )
-			lib.fields[ fname ] = block
+			table.insert(lib.fields, fname)
+			lib.fields[fname] = block
 		elseif block.classlib then
-			local class = classes[ block.library ]
-			assert( class, "no such class: " .. block.classlib )
+			local class = classes[block.library]
+			assert(class, "no such class: " .. block.classlib)
 			block.classlib = class.name
-			table.insert( class.fields, fname )
-			class.fields[ fname ] = block
+			table.insert(class.fields, fname)
+			class.fields[fname] = block
 		end
 	elseif block.class == "class" then
-		assert( block.name, "Unnamed class" )
-		assert( block.typtbl, "No type table for " .. block.name )
-		classes[ block.typtbl ] = block
+		assert(block.name, "Unnamed class")
+		assert(block.typtbl, "No type table for " .. block.name)
+		classes[block.typtbl] = block
 		block.fields = block.fields or {}
 		block.methods = block.methods or {}
 	end
@@ -323,7 +323,7 @@ end
 -- @return block parsed
 -- @return modulename if found
 
-local function parse_block ( f, line, libs, classes, first )
+local function parse_block (f, line, libs, classes, first)
 	local block = {
 		comment = {},
 		code = {},
@@ -336,7 +336,7 @@ local function parse_block ( f, line, libs, classes, first )
 			line, block.code, modulename = parse_code(f, line, modulename)
 			
 			-- parse information in block comment
-			block = parse_comment( block, first, libs, classes )
+			block = parse_comment(block, first, libs, classes)
 
 			return line, block, modulename
 		else
@@ -373,7 +373,7 @@ function parse_file (filepath, doc)
 		if string.find(line, "^[\t ]*%-%-%-") then
 			-- reached a luadoc block
 			local block
-			line, block, modulename = parse_block( f, line, libs, classes, first )
+			line, block, modulename = parse_block(f, line, libs, classes, first)
 			table.insert(blocks, block)
 		else
 			-- look for a module definition
@@ -430,7 +430,7 @@ function parse_file (filepath, doc)
 	for t in class_iterator(blocks, "library")() do
 		table.insert(doc.files[filepath].libraries, t.name)
 		doc.files[filepath].libraries[t.name] = t
-		table.insert(doc.libraries,t.name)
+		table.insert(doc.libraries, t.name)
 		doc.libraries[t.name] = t
 	end
 	
@@ -440,29 +440,29 @@ function parse_file (filepath, doc)
 		t.realm = realm
 	end
 
-	for t in class_iterator( blocks, "directive" )() do
-		table.insert( doc.directives, t.name )
-		doc.directives[ t.name ] = t
+	for t in class_iterator(blocks, "directive")() do
+		table.insert(doc.directives, t.name)
+		doc.directives[t.name] = t
 	end
 
-	local function union ( tbl1, tbl2 )
-		for k, v in pairs( tbl2 ) do
-			if type( k ) == "number" then
-				table.insert( tbl1, v )
+	local function union (tbl1, tbl2)
+		for k, v in pairs(tbl2) do
+			if type(k) == "number" then
+				table.insert(tbl1, v)
 			else
-				tbl1[ k ] = v
+				tbl1[k] = v
 			end
 		end
 	end
 
-	for t in class_iterator( blocks, "class" )() do
-		if not doc.classes[ t.name ] then
-			table.insert( doc.classes, t.name )
-			doc.classes[ t.name ] = t
+	for t in class_iterator(blocks, "class")() do
+		if not doc.classes[t.name] then
+			table.insert(doc.classes, t.name)
+			doc.classes[t.name] = t
 		else
-			local class = doc.classes[ t.name ]
-			union( class.fields, t.fields )
-			union( class.methods, t.methods )
+			local class = doc.classes[t.name]
+			union(class.fields, t.fields)
+			union(class.methods, t.methods)
 		end
 	end
 
@@ -530,7 +530,7 @@ local function recsort (tab)
 			table.sort(doc.functions)
 		end
 		if doc.methods then
-			table.sort( doc.methods )
+			table.sort(doc.methods)
 		end
 		if doc.tables then
 			table.sort(doc.tables)
@@ -552,12 +552,12 @@ function start (files, doc)
 		classes = {},
 		examples = {}
 	}
-	assert( doc.files, "undefined `files' field" )
-	assert( doc.libraries, "undefined `libraries' field" )
-	assert( doc.hooks, "undefined `hooks' field" )
-	assert( doc.directives, "undefined `directives' field" )
-	assert( doc.classes, "undefined `classes' field" )
-	assert( doc.examples, "undefined `examples' field" )
+	assert(doc.files, "undefined `files' field")
+	assert(doc.libraries, "undefined `libraries' field")
+	assert(doc.hooks, "undefined `hooks' field")
+	assert(doc.directives, "undefined `directives' field")
+	assert(doc.classes, "undefined `classes' field")
+	assert(doc.examples, "undefined `examples' field")
 	
 	table.foreachi(files, function (_, path)
 		local mode, err = lfs.attributes(path, "mode")
@@ -573,12 +573,12 @@ function start (files, doc)
 	end)
 	
 	-- order arrays alphabetically
-	recsort( doc.files )
-	recsort( doc.libraries )
-	recsort( doc.hooks )
-	recsort( doc.directives )
-	recsort( doc.classes )
-	recsort( doc.examples )
+	recsort(doc.files)
+	recsort(doc.libraries)
+	recsort(doc.hooks)
+	recsort(doc.directives)
+	recsort(doc.classes)
+	recsort(doc.examples)
 
 	return doc
 end

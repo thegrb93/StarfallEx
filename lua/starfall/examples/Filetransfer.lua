@@ -66,9 +66,9 @@ local function sendData(index, ply)
 	local function timetosend()
 		local data = filetransfer.uploadcache[index]
 		if not data then return end
-		local senddata = string.sub(data, part*packetsize+1, math.min(part*packetsize+packetsize, #data))
+		local senddata = string.sub(data, part * packetsize + 1, math.min(part * packetsize + packetsize, #data))
 			
-		if net.getBytesLeft()<#senddata+100 then
+		if net.getBytesLeft()<#senddata + 100 then
 			timer.simple(0.1, timetosend)
 			return
 		end
@@ -85,7 +85,7 @@ local function gotData(index, ply)
 	local item = filetransfer.downloadqueue[1]
 	if not item then return end
 	
-	item.pieces[#item.pieces+1] = net.readData(packetsize)
+	item.pieces[#item.pieces + 1] = net.readData(packetsize)
 	
 	if #item.pieces == item.numpieces then
 		local data = fastlz.decompress(table.concat(item.pieces))
@@ -105,10 +105,10 @@ function filetransfer.write(data)
 	end
 	filetransfer.uploadcache[index] = compressed
 	
-	timer.create("ftcachetimeout"..index,10,1,function() filetransfer.uploadcache[index] = nil end)
+	timer.create("ftcachetimeout"..index, 10, 1, function() filetransfer.uploadcache[index] = nil end)
 	
 	net.writeUInt(index, 16)
-	net.writeUInt(math.ceil(#compressed/packetsize),16)
+	net.writeUInt(math.ceil(#compressed / packetsize), 16)
 end
 
 function filetransfer.read(callback, ply)
@@ -123,18 +123,18 @@ function filetransfer.read(callback, ply)
 	}
 	
 	local queuelen = #filetransfer.downloadqueue
-	filetransfer.downloadqueue[queuelen+1] = item
+	filetransfer.downloadqueue[queuelen + 1] = item
 	if queuelen == 0 then
 		processQueue()
 	end
 	timer.create("ftkeepalive"..index, 3, 0, function()
 		net.start("ftkeepalive")
-		net.writeUInt(index,16)
+		net.writeUInt(index, 16)
 		duelSend(ply)
 	end)
 end
 
-hook.add("net","filetransfer",function(name,len,ply)
+hook.add("net", "filetransfer", function(name, len, ply)
 	
 	local index = net.readUInt(16)
 	if CLIENT then ply = nil end
@@ -142,9 +142,9 @@ hook.add("net","filetransfer",function(name,len,ply)
 	if name == "ftrecvdata" then
 		gotData(index, ply)
 	elseif name == "ftkeepalive" then
-		timer.adjust("ftcachetimeout"..index,10,1)
+		timer.adjust("ftcachetimeout"..index, 10, 1)
 	elseif name == "ftreqdata" then
-		timer.adjust("ftcachetimeout"..index,10,1)
+		timer.adjust("ftcachetimeout"..index, 10, 1)
 		sendData(index, ply)
 	end
 	

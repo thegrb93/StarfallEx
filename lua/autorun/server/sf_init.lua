@@ -1,22 +1,22 @@
-AddCSLuaFile( "autorun/client/sf_models.lua" )
+AddCSLuaFile("autorun/client/sf_models.lua")
 
-resource.AddFile( "materials/models/spacecode/glass.vmt" )
-resource.AddFile( "materials/models/spacecode/sfchip.vmt" )
-resource.AddFile( "materials/models/spacecode/sfpcb.vmt" )
-resource.AddFile( "materials/radon/starfall2.vmt" )
-resource.AddFile( "materials/radon/arrow_left.png" )
-resource.AddFile( "materials/radon/arrow_right.png" )
-resource.AddFile( "models/spacecode/sfchip.mdl" )
-resource.AddFile( "models/spacecode/sfchip_medium.mdl" )
-resource.AddFile( "models/spacecode/sfchip_small.mdl" )
-resource.AddFile( "resource/fonts/DejaVuSansMono.ttf" )
-resource.AddFile( "resource/fonts/RobotoMono.ttf" )
-resource.AddFile( "resource/fonts/FontAwesome.ttf" )
+resource.AddFile("materials/models/spacecode/glass.vmt")
+resource.AddFile("materials/models/spacecode/sfchip.vmt")
+resource.AddFile("materials/models/spacecode/sfpcb.vmt")
+resource.AddFile("materials/radon/starfall2.vmt")
+resource.AddFile("materials/radon/arrow_left.png")
+resource.AddFile("materials/radon/arrow_right.png")
+resource.AddFile("models/spacecode/sfchip.mdl")
+resource.AddFile("models/spacecode/sfchip_medium.mdl")
+resource.AddFile("models/spacecode/sfchip_small.mdl")
+resource.AddFile("resource/fonts/DejaVuSansMono.ttf")
+resource.AddFile("resource/fonts/RobotoMono.ttf")
+resource.AddFile("resource/fonts/FontAwesome.ttf")
 
-local files = file.Find("html/starfalleditor*","GAME")
+local files = file.Find("html/starfalleditor*", "GAME")
 if files[1] then 
 	local version = tonumber(string.match(files[1], "starfalleditor(%d+)%.html") or "0")
-	for k,file in pairs(files) do -- Looking for oldest
+	for k, file in pairs(files) do -- Looking for oldest
 		local ver = tonumber(string.match(file, "starfalleditor(%d+)%.html") or "0")
 	
 		if ver > version then version = ver end
