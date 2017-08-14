@@ -114,14 +114,14 @@ SF.Libraries.AddHook("postload", function()
 	eunwrap = SF.Entities.Unwrap
 end)
 
-SF.Permissions.registerPrivilege( "render.screen", "Render Screen", "Allows the user to render to a starfall screen", {["Client"] = {}} )
-SF.Permissions.registerPrivilege( "render.offscreen", "Render Screen", "Allows the user to render without a screen", {["Client"] = {}} )
-SF.Permissions.registerPrivilege( "render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", {["Client"] = {}} )
-SF.Permissions.registerPrivilege( "render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", {["Client"] = {}} )
+SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { ["Client"] = {} })
+SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { ["Client"] = {} })
+SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { ["Client"] = {} })
+SF.Permissions.registerPrivilege("render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", { ["Client"] = {} })
 
-local cv_max_rendertargets = CreateConVar( "sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE } )
-local cv_max_url_materials = CreateConVar( "sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE } )
-local cv_max_data_material_size = CreateConVar( "sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE } )
+local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
+local cv_max_url_materials = CreateConVar("sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE })
+local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
@@ -143,12 +143,12 @@ local renderhooks = {
 	postdrawhud = true,
 }
 
-SF.Libraries.AddHook( "prepare", function ( instance, hook )
+SF.Libraries.AddHook("prepare", function (instance, hook)
 	if renderhooks[hook] then
-		currentcolor = Color(255,255,255,255)
+		currentcolor = Color(255, 255, 255, 255)
 		render.SetColorMaterial()
 		draw.NoTexture()
-		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.SetDrawColor(255, 255, 255, 255)
 		
 		local data = instance.data.render
 		data.isRendering = true
@@ -156,22 +156,22 @@ SF.Libraries.AddHook( "prepare", function ( instance, hook )
 		if hook=="renderoffscreen" then
 			data.needRT = true
 			instance:runFunction(function()
-				if not data.rendertargets[ "dummyrt" ] then
-					render_library.createRenderTarget ( "dummyrt" )
+				if not data.rendertargets["dummyrt"] then
+					render_library.createRenderTarget ("dummyrt")
 				end
-				render_library.selectRenderTarget ( "dummyrt" )
+				render_library.selectRenderTarget ("dummyrt")
 			end)
 		else
 			data.needRT = false
 		end
 	end
-end )
+end)
 
-SF.Libraries.AddHook( "cleanup", function ( instance, hook )
+SF.Libraries.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
 		render.OverrideDepthEnable(false, false)
-		render.SetScissorRect(0,0,0,0,false)
-		for i=#matrix_stack,1,-1 do
+		render.SetScissorRect(0, 0, 0, 0, false)
+		for i = #matrix_stack, 1, -1 do
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
 		end
@@ -181,7 +181,7 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 		end
-		for i=#view_matrix_stack,1,-1 do
+		for i = #view_matrix_stack, 1, -1 do
 			cam[view_matrix_stack[i]]()
 			view_matrix_stack[i] = nil
 		end
@@ -196,56 +196,56 @@ SF.Libraries.AddHook( "cleanup", function ( instance, hook )
 		data.isRendering = false
 		data.needRT = false
 	end
-end )
+end)
 
-SF.Libraries.AddHook( "initialize", function(instance)
+SF.Libraries.AddHook("initialize", function(instance)
 	instance.data.render = {}
 	instance.data.render.rendertargets = {}
 	instance.data.render.rendertargetcount = 0
 	instance.data.render.textures = {}
 	instance.data.render.urltextures = {}
 	instance.data.render.urltexturecount = 0
-end )
+end)
 
-SF.Libraries.AddHook( "deinitialize", function ( instance )
-	for k, v in pairs( instance.data.render.rendertargets ) do
-		globalRTs[ v ][ 2 ] = true -- mark as available
+SF.Libraries.AddHook("deinitialize", function (instance)
+	for k, v in pairs(instance.data.render.rendertargets) do
+		globalRTs[v][2] = true -- mark as available
 	end
-	for k, v in pairs( instance.data.render.textures ) do
-		instance.data.render.textures[ k ] = nil
+	for k, v in pairs(instance.data.render.textures) do
+		instance.data.render.textures[k] = nil
 	end
-	for k, v in pairs( instance.data.render.urltextures ) do
-		v:SetUndefined( "$basetexture" )
-		instance.data.render.urltextures[ k ] = nil
+	for k, v in pairs(instance.data.render.urltextures) do
+		v:SetUndefined("$basetexture")
+		instance.data.render.urltextures[k] = nil
 	end
-	if plyRTcount[ instance.playerid ] then
-		plyRTcount[ instance.playerid ] = plyRTcount[ instance.playerid ] - instance.data.render.rendertargetcount
-		if plyRTcount[ instance.playerid ] == 0 then
-			plyRTcount[ instance.playerid ] = nil
+	if plyRTcount[instance.playerid] then
+		plyRTcount[instance.playerid] = plyRTcount[instance.playerid] - instance.data.render.rendertargetcount
+		if plyRTcount[instance.playerid] == 0 then
+			plyRTcount[instance.playerid] = nil
 		end
 	end
-	if plyURLTexcount[ instance.playerid ] then
-		plyURLTexcount[ instance.playerid ] = plyURLTexcount[ instance.playerid ] - instance.data.render.urltexturecount
-		if plyURLTexcount[ instance.playerid ] == 0 then
-			plyURLTexcount[ instance.playerid ] = nil
+	if plyURLTexcount[instance.playerid] then
+		plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] - instance.data.render.urltexturecount
+		if plyURLTexcount[instance.playerid] == 0 then
+			plyURLTexcount[instance.playerid] = nil
 		end
 	end
-end )
+end)
 
-local function sfCreateMaterial( name,skip_hack )
+local function sfCreateMaterial(name, skip_hack)
 	local tbl = {
-				[ "$nolod" ] = 1,
-				[ "$ignorez" ] = 1,
-				[ "$vertexcolor" ] = 1,
-				[ "$vertexalpha" ] = 1,
-				[ "$basetexturetransform" ] = "center .5 .5 scale 1.032 1.032 rotate 0 translate 0 0"
+				["$nolod"] = 1,
+				["$ignorez"] = 1,
+				["$vertexcolor"] = 1,
+				["$vertexalpha"] = 1,
+				["$basetexturetransform"] = "center .5 .5 scale 1.032 1.032 rotate 0 translate 0 0"
 			}
 	if skip_hack then
 		tbl["$basetexturetransform"] = nil
 	end
-	return CreateMaterial( name, "UnlitGeneric", tbl )
+	return CreateMaterial(name, "UnlitGeneric", tbl)
 end
-local RT_Material = sfCreateMaterial( "SF_RT_Material" )
+local RT_Material = sfCreateMaterial("SF_RT_Material")
 ---URL Textures
 local LoadingURLQueue = {}
 local function CheckURLDownloads()
@@ -253,7 +253,7 @@ local function CheckURLDownloads()
 	if requestTbl then
 		if requestTbl.Panel then
 			if not requestTbl.Panel:IsLoading() then
-				timer.Simple(0.2,function()
+				timer.Simple(0.2, function()
 					local tex = requestTbl.Panel:GetHTMLMaterial():GetTexture("$basetexture")
 					requestTbl.Material:SetTexture("$basetexture", tex)
 					requestTbl.Panel:Remove()
@@ -267,12 +267,11 @@ local function CheckURLDownloads()
 				end
 			end
 		else
-			local Panel = vgui.Create( "DHTML" )
-			Panel:SetSize( 1024, 1024 )
-			Panel:SetAlpha( 0 )
-			Panel:SetMouseInputEnabled( false )
-			Panel:SetHTML(
-			[[
+			local Panel = vgui.Create("DHTML")
+			Panel:SetSize(1024, 1024)
+			Panel:SetAlpha(0)
+			Panel:SetMouseInputEnabled(false)
+			Panel:SetHTML([[
 				<html><head><style type="text/css">
 					body {
 						background-image: url(]] .. requestTbl.Url .. [[);
@@ -281,22 +280,21 @@ local function CheckURLDownloads()
 						background-repeat: no-repeat;
 					}
 				</style></head><body></body></html>
-			]]
-			)
-			requestTbl.Timeout = CurTime()+10
+			]])
+			requestTbl.Timeout = CurTime() + 10
 			requestTbl.Panel = Panel
 		end
 	else
 		timer.Destroy("SF_URLMaterialChecker")
 	end
 end
-local function LoadURLMaterial( url, alignment, cb, skip_hack )
+local function LoadURLMaterial(url, alignment, cb, skip_hack)
 	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()), skip_hack)
 
 	if #LoadingURLQueue == 0 then
-		timer.Create("SF_URLMaterialChecker",1,0,CheckURLDownloads)
+		timer.Create("SF_URLMaterialChecker", 1, 0, CheckURLDownloads)
 	end
-	LoadingURLQueue[#LoadingURLQueue + 1] = {Material = urlmaterial, Url = url, Alignment = alignment, cb = cb}
+	LoadingURLQueue[#LoadingURLQueue + 1] = { Material = urlmaterial, Url = url, Alignment = alignment, cb = cb }
 
 	return urlmaterial
 end
@@ -316,9 +314,9 @@ local validfonts = {
 	tahoma = "Tahoma",
 	trebuchet = "Trebuchet",
 	["trebuchet ms"] = "Trebuchet MS",
-	[ "dejavu sans mono" ] = "DejaVu Sans Mono",
-	[ "lucida console" ] = "Lucida Console",
-	[ "times new roman" ] = "Times New Roman"
+	["dejavu sans mono"] = "DejaVu Sans Mono",
+	["lucida console"] = "Lucida Console",
+	["times new roman"] = "Times New Roman"
 }
 
 local defined_fonts = {
@@ -358,11 +356,11 @@ local defaultFont
 -- @param m The matrix
 -- @param world Should the transformation be relative to the screen or world?
 function render_library.pushMatrix(m, world)
-	SF.CheckType(m,matrix_meta)
+	SF.CheckType(m, matrix_meta)
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local id = #matrix_stack
-	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw( "Pushed too many matricies", 2 ) end
+	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matricies", 2) end
 	local newmatrix
 	if matrix_stack[id] then
 		newmatrix = matrix_stack[id] * munwrap(m)
@@ -372,7 +370,7 @@ function render_library.pushMatrix(m, world)
 	if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
 		newmatrix = renderdata.renderEnt.Transform * newmatrix
 	end
-	matrix_stack[id+1] = newmatrix
+	matrix_stack[id + 1] = newmatrix
 	cam.PushModelMatrix(newmatrix)
 end
 
@@ -381,29 +379,29 @@ end
 -- @param startY Y start coordinate of the scissor rect.
 -- @param endX X end coordinate of the scissor rect.
 -- @param endX Y end coordinate of the scissor rect.
-function render_library.enableScissorRect( startX, startY, endX, endY )
+function render_library.enableScissorRect(startX, startY, endX, endY)
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( startX, "number" )
-	SF.CheckType( startY, "number" )
-	SF.CheckType( endX, "number" )
-	SF.CheckType( endY, "number" )
-	render.SetScissorRect( startX, startY, endX, endY, true )
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(startX, "number")
+	SF.CheckType(startY, "number")
+	SF.CheckType(endX, "number")
+	SF.CheckType(endY, "number")
+	render.SetScissorRect(startX, startY, endX, endY, true)
 end
 
 --- Disables a scissoring rect which limits the drawing area.
 function render_library.disableScissorRect()
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	render.SetScissorRect( 0 ,0 ,0 , 0, false )
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	render.SetScissorRect(0 , 0 , 0 , 0, false)
 
 end
 
 --- Pops a matrix from the matrix stack.
 function render_library.popMatrix()
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	if #matrix_stack <= 0 then SF.Throw( "Popped too many matricies", 2 ) end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if #matrix_stack <= 0 then SF.Throw("Popped too many matricies", 2) end
 	matrix_stack[#matrix_stack] = nil
 	cam.PopModelMatrix()
 end
@@ -420,51 +418,51 @@ local viewmatrix_checktypes =
 -- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw( "Pushed too many matricies", 2 ) end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matricies", 2) end
 	local endfunc
 	if tbl.type == "2D" then
 		endfunc = "End2D"
 	elseif tbl.type == "3D" then
 		endfunc = "End3D"
 	else
-		SF.Throw( "Camera type must be \"3D\" or \"2D\"", 2 )
+		SF.Throw("Camera type must be \"3D\" or \"2D\"", 2)
 	end
 
 	local newtbl = {}
 	for k, v in pairs(tbl) do
 		if viewmatrix_checktypes[k] then
-			SF.CheckType( v, viewmatrix_checktypes[k] )
+			SF.CheckType(v, viewmatrix_checktypes[k])
 			newtbl[k] = v
 		else
-			SF.Throw( "Invalid key found in view matrix: " .. k, 2 )
+			SF.Throw("Invalid key found in view matrix: " .. k, 2)
 		end
 	end
-	if newtbl.origin then newtbl.origin = vunwrap( newtbl.origin ) end
-	if newtbl.angles then newtbl.angles = aunwrap( newtbl.angles ) end
+	if newtbl.origin then newtbl.origin = vunwrap(newtbl.origin) end
+	if newtbl.angles then newtbl.angles = aunwrap(newtbl.angles) end
 	if newtbl.offcenter then
-		SF.CheckType( tbl.offcenter.left, "number" )
-		SF.CheckType( tbl.offcenter.right, "number" )
-		SF.CheckType( tbl.offcenter.bottom, "number" )
-		SF.CheckType( tbl.offcenter.top, "number" )
+		SF.CheckType(tbl.offcenter.left, "number")
+		SF.CheckType(tbl.offcenter.right, "number")
+		SF.CheckType(tbl.offcenter.bottom, "number")
+		SF.CheckType(tbl.offcenter.top, "number")
 	end
 	if newtbl.ortho then
-		SF.CheckType( tbl.ortho.left, "number" )
-		SF.CheckType( tbl.ortho.right, "number" )
-		SF.CheckType( tbl.ortho.bottom, "number" )
-		SF.CheckType( tbl.ortho.top, "number" )
+		SF.CheckType(tbl.ortho.left, "number")
+		SF.CheckType(tbl.ortho.right, "number")
+		SF.CheckType(tbl.ortho.bottom, "number")
+		SF.CheckType(tbl.ortho.top, "number")
 	end
 
 	cam.Start(newtbl)
-	view_matrix_stack[#view_matrix_stack+1] = endfunc
+	view_matrix_stack[#view_matrix_stack + 1] = endfunc
 end
 
 --- Pops a view matrix from the matrix stack.
 function render_library.popViewMatrix()
 	local renderdata = SF.instance.data.render
-	if not renderdata.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local i = #view_matrix_stack
-	if i == 0 then SF.Throw( "Popped too many matricies", 2 ) end
+	if i == 0 then SF.Throw("Popped too many matricies", 2) end
 
 	cam[view_matrix_stack[i]]()
 	view_matrix_stack[i] = nil
@@ -473,16 +471,16 @@ end
 --- Sets the draw color
 -- @param col Color of background
 -- @screen (Optional) entity of screen
-function render_library.setBackgroundColor( col, screen )
+function render_library.setBackgroundColor(col, screen)
 	local renderdata = SF.instance.data.render
 
-	SF.CheckType( col, col_meta )
+	SF.CheckType(col, col_meta)
 	
 	if screen then
-		SF.CheckType( screen, ent_meta )
+		SF.CheckType(screen, ent_meta)
 		screen = eunwrap(screen)
 		if screen.link ~= SF.instance.data.entity then
-			SF.Throw( "Entity has to be linked!", 2 )
+			SF.Throw("Entity has to be linked!", 2)
 		end
 	else
 		if renderdata.isRendering then
@@ -491,7 +489,7 @@ function render_library.setBackgroundColor( col, screen )
 	end
 	
 	if not screen then
-		SF.Throw( "Invalid rendering entity.", 2 )
+		SF.Throw("Invalid rendering entity.", 2)
 	end
 	
 	if screen.SetBackgroundColor then --Fail silently on HUD etc
@@ -502,19 +500,19 @@ end
 
 --- Sets the draw color
 -- @param clr Color type
-function render_library.setColor( clr )
-	SF.CheckType( clr, col_meta )
+function render_library.setColor(clr)
+	SF.CheckType(clr, col_meta)
 	currentcolor = clr
-	surface.SetDrawColor( clr )
-	surface.SetTextColor( clr )
+	surface.SetDrawColor(clr)
+	surface.SetTextColor(clr)
 end
 
 --- Sets the draw color by RGBA values
-function render_library.setRGBA( r, g, b, a )
-	SF.CheckType( r, "number" ) SF.CheckType( g, "number" ) SF.CheckType( b, "number" ) SF.CheckType( a, "number" )
-	currentcolor = Color( r, g, b, a )
-	surface.SetDrawColor( r, g, b, a )
-	surface.SetTextColor( r, g, b, a )
+function render_library.setRGBA(r, g, b, a)
+	SF.CheckType(r, "number") SF.CheckType(g, "number") SF.CheckType(b, "number") SF.CheckType(a, "number")
+	currentcolor = Color(r, g, b, a)
+	surface.SetDrawColor(r, g, b, a)
+	surface.SetTextColor(r, g, b, a)
 end
 
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
@@ -524,68 +522,68 @@ end
 -- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
 -- @param skip_hack Turns off texture hack so you can use UVs on 3D objects
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
-function render_library.getTextureID ( tx, cb, alignment, skip_hack )
-	SF.CheckType( tx, "string" )
+function render_library.getTextureID (tx, cb, alignment, skip_hack)
+	SF.CheckType(tx, "string")
 		
 	local instance = SF.instance
 	local data = instance.data.render
 	if #tx > cv_max_data_material_size:GetInt() then
-		SF.Throw( "Texture URL/Data too long!", 2 )
+		SF.Throw("Texture URL/Data too long!", 2)
 	end
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
 		if prefix=="http" or prefix=="https" then
-			SF.Permissions.check( instance.player, nil, "render.urlmaterial" )
-			tx = string.gsub( tx, "[^%w _~%.%-/:]", function( str )
-				return string.format( "%%%02X", string.byte( str ) )
-			end )
+			SF.Permissions.check(instance.player, nil, "render.urlmaterial")
+			tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
+				return string.format("%%%02X", string.byte(str))
+			end)
 		else
-			SF.Permissions.check( instance.player, nil, "render.datamaterial" )
-			tx = string.match(tx,"data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
+			SF.Permissions.check(instance.player, nil, "render.datamaterial")
+			tx = string.match(tx, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
 			if not tx then --It's not valid
-				SF.Throw( "Texture data isnt proper base64 encoded image.", 2 )
+				SF.Throw("Texture data isnt proper base64 encoded image.", 2)
 			end
 		end
-		if plyURLTexcount[ instance.playerid ] then
-			if plyURLTexcount[ instance.playerid ] >= cv_max_url_materials:GetInt() then
-				SF.Throw( "URL Texture limit reached", 2 )
+		if plyURLTexcount[instance.playerid] then
+			if plyURLTexcount[instance.playerid] >= cv_max_url_materials:GetInt() then
+				SF.Throw("URL Texture limit reached", 2)
 			else
-				plyURLTexcount[ instance.playerid ] = plyURLTexcount[ instance.playerid ] + 1
+				plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] + 1
 			end
 		else
-			plyURLTexcount[ instance.playerid ] = 1
+			plyURLTexcount[instance.playerid] = 1
 		end
 		data.urltexturecount = data.urltexturecount + 1
 
 		if alignment then
-			SF.CheckType( alignment, "string" )
-			local args = string.Split( alignment, " " )
-			local validargs = {["left"]=true,["center"]=true,["right"]=true,["top"]=true,["bottom"]=true}
-			if #args ~= 1 and #args ~= 2 then SF.Throw( "Invalid urltexture alignment given." ) end
-			for i=1, #args do
-				if not validargs[args[i]] then SF.Throw( "Invalid urltexture alignment given." ) end
+			SF.CheckType(alignment, "string")
+			local args = string.Split(alignment, " ")
+			local validargs = { ["left"] = true, ["center"] = true, ["right"] = true, ["top"] = true, ["bottom"] = true }
+			if #args ~= 1 and #args ~= 2 then SF.Throw("Invalid urltexture alignment given.") end
+			for i = 1, #args do
+				if not validargs[args[i]] then SF.Throw("Invalid urltexture alignment given.") end
 			end
 		else
 			alignment = "center"
 		end
 
 		local tbl = {}
-		data.urltextures[ tbl ] = LoadURLMaterial( tx, alignment, function()
+		data.urltextures[tbl] = LoadURLMaterial(tx, alignment, function()
 			if cb then
-				instance:runFunction( cb, tbl, tx )
+				instance:runFunction(cb, tbl, tx)
 			end
 		end, skip_hack)
 		return tbl
 	else
-		local id = surface.GetTextureID( tx )
+		local id = surface.GetTextureID(tx)
 		if id then
-			local mat = Material( tx ) -- Hacky way to get ITexture, if there is a better way - do it!
+			local mat = Material(tx) -- Hacky way to get ITexture, if there is a better way - do it!
 			if not mat then return end
-			local cacheentry = sfCreateMaterial( "SF_TEXTURE_" .. id, skip_hack )
-			cacheentry:SetTexture( "$basetexture", mat:GetTexture( "$basetexture" ) )
+			local cacheentry = sfCreateMaterial("SF_TEXTURE_" .. id, skip_hack)
+			cacheentry:SetTexture("$basetexture", mat:GetTexture("$basetexture"))
 
 			local tbl = {}
-			data.textures[ tbl ] = cacheentry
+			data.textures[tbl] = cacheentry
 			return tbl
 		end
 	end
@@ -594,16 +592,16 @@ end
 
 --- Releases the texture. Required if you reach the maximum url textures.
 -- @param id Texture table. Aquired with render.getTextureID
-function render_library.destroyTexture( id )
+function render_library.destroyTexture(id)
 	local instance = SF.instance
 	local data = instance.data.render
-	if data.urltextures[ id ] then
-		plyURLTexcount[ instance.playerid ] = plyURLTexcount[ instance.playerid ] - 1
+	if data.urltextures[id] then
+		plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] - 1
 		data.urltexturecount = data.urltexturecount - 1
-		data.urltextures[ id ]:SetUndefined( "$basetexture" )
-		data.urltextures[ id ] = nil
-	elseif data.textures[ id ] then
-		data.textures[ id ] = nil
+		data.urltextures[id]:SetUndefined("$basetexture")
+		data.urltextures[id] = nil
+	elseif data.textures[id] then
+		data.textures[id] = nil
 	else
 		SF.Throw("Cannot destroy an invalid texture.", 2)
 	end
@@ -611,16 +609,16 @@ end
 
 --- Sets the texture
 -- @param id Texture table. Aquired with render.getTextureID
-function render_library.setTexture ( id )
+function render_library.setTexture (id)
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if id then
-		if data.textures[ id ] then
-			surface.SetMaterial( data.textures[ id ] )
-			render.SetMaterial( data.textures[ id ] )
-		elseif data.urltextures[ id ] then
-			surface.SetMaterial( data.urltextures[ id ] )
-			render.SetMaterial( data.urltextures[ id ] )
+		if data.textures[id] then
+			surface.SetMaterial(data.textures[id])
+			render.SetMaterial(data.textures[id])
+		elseif data.urltextures[id] then
+			surface.SetMaterial(data.urltextures[id])
+			render.SetMaterial(data.urltextures[id])
 		else
 			draw.NoTexture()
 			render.SetColorMaterial()
@@ -634,51 +632,51 @@ end
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
 -- @param name The name of the render target
-function render_library.createRenderTarget ( name )
-	SF.CheckType( name, "string" )
+function render_library.createRenderTarget (name)
+	SF.CheckType(name, "string")
 
 	local instance = SF.instance
 	local data = instance.data.render
-	if data.rendertargets[ name ] then SF.Throw( "A rendertarget with this name already exists!", 2 ) end
+	if data.rendertargets[name] then SF.Throw("A rendertarget with this name already exists!", 2) end
 
-	if plyRTcount[ instance.playerid ] then
-		if plyRTcount[ instance.playerid ] >= cv_max_rendertargets:GetInt() then
-			SF.Throw( "Rendertarget limit reached", 2 )
+	if plyRTcount[instance.playerid] then
+		if plyRTcount[instance.playerid] >= cv_max_rendertargets:GetInt() then
+			SF.Throw("Rendertarget limit reached", 2)
 		else
-			plyRTcount[ instance.playerid ] = plyRTcount[ instance.playerid ] + 1
+			plyRTcount[instance.playerid] = plyRTcount[instance.playerid] + 1
 		end
 	else
-		plyRTcount[ instance.playerid ] = 1
+		plyRTcount[instance.playerid] = 1
 	end
 	data.rendertargetcount = data.rendertargetcount + 1
 
 	local rtname, rt
-	for k, v in pairs( globalRTs ) do
-		if v[ 2 ] then rtname, rt = k, v break end
+	for k, v in pairs(globalRTs) do
+		if v[2] then rtname, rt = k, v break end
 	end
 	if rt then
 		rt[2] = false
 	else
 		globalRTcount = globalRTcount + 1
 		rtname = "Starfall_CustomRT_" .. globalRTcount
-		rt = { GetRenderTarget( rtname, 1024, 1024 ), false }
-		rt[3] = CreateMaterial( "StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", {[ "$model" ] = 1} )
+		rt = { GetRenderTarget(rtname, 1024, 1024), false }
+		rt[3] = CreateMaterial("StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", { ["$model"] = 1 })
 		rt[3]:SetTexture("$basetexture", rt[1])
-		globalRTs[ rtname ] = rt
+		globalRTs[rtname] = rt
 	end
 
-	data.rendertargets[ name ] = rtname
+	data.rendertargets[name] = rtname
 end
 
 --- Releases the rendertarget. Required if you reach the maximum rendertargets.
 -- @param name Rendertarget name
-function render_library.destroyRenderTarget( name )
+function render_library.destroyRenderTarget(name)
 	local instance = SF.instance
 	local data = instance.data.render
-	local rtname = data.rendertargets[ name ]
+	local rtname = data.rendertargets[name]
 	if rtname then
-		globalRTs[ rtname ][ 2 ] = true
-		data.rendertargets[ name ] = nil
+		globalRTs[rtname][2] = true
+		data.rendertargets[name] = nil
 	else
 		SF.Throw("Cannot destroy an invalid rendertarget.", 2)
 	end
@@ -687,27 +685,27 @@ end
 --- Selects the render target to draw on.
 -- Nil for the visible RT.
 -- @param name Name of the render target to use
-function render_library.selectRenderTarget ( name )
+function render_library.selectRenderTarget (name)
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name then
-		SF.CheckType( name, "string" )
+		SF.CheckType(name, "string")
 
-		local rtname = data.rendertargets[ name ]
-		if not rtname then SF.Throw( "Invalid Rendertarget", 2 ) end
-		local rttbl = globalRTs[ rtname ]
-		if not rttbl then SF.Throw( "Invalid Rendertarget", 2 ) end
-		local rt = rttbl[ 1 ]
-		if not rt then SF.Throw( "Invalid Rendertarget", 2 ) end
+		local rtname = data.rendertargets[name]
+		if not rtname then SF.Throw("Invalid Rendertarget", 2) end
+		local rttbl = globalRTs[rtname]
+		if not rttbl then SF.Throw("Invalid Rendertarget", 2) end
+		local rt = rttbl[1]
+		if not rt then SF.Throw("Invalid Rendertarget", 2) end
 
 		if not data.usingRT then
-			data.oldViewPort = {0, 0, ScrW(), ScrH()}
-			render.SetViewPort( 0, 0, 1024, 1024 )
+			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
+			render.SetViewPort(0, 0, 1024, 1024)
 			cam.Start2D()
-			view_matrix_stack[#view_matrix_stack+1] = "End2D"
-			render.SetStencilEnable( false )
+			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
+			render.SetStencilEnable(false)
 		end
-		render.SetRenderTarget( rt )
+		render.SetRenderTarget(rt)
 		data.usingRT = true
 	else
 		if data.usingRT and not data.needRT then
@@ -720,7 +718,7 @@ function render_library.selectRenderTarget ( name )
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 			if data.useStencil then
-				render.SetStencilEnable( true )
+				render.SetStencilEnable(true)
 			end
 		end
 	end
@@ -729,16 +727,16 @@ end
 --- Sets the active texture to the render target with the specified name.
 -- Nil to reset.
 -- @param name Name of the render target to use
-function render_library.setRenderTargetTexture ( name )
+function render_library.setRenderTargetTexture (name)
 	local data = SF.instance.data.render
-	if not data.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( name, "string" )
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(name, "string")
 
-	local rtname = data.rendertargets[ name ]
-	if rtname and globalRTs[ rtname ] then
-		RT_Material:SetTexture( "$basetexture", globalRTs[ rtname ][ 1 ] )
-		surface.SetMaterial( RT_Material )
-		render.SetMaterial( RT_Material )
+	local rtname = data.rendertargets[name]
+	if rtname and globalRTs[rtname] then
+		RT_Material:SetTexture("$basetexture", globalRTs[rtname][1])
+		surface.SetMaterial(RT_Material)
+		render.SetMaterial(RT_Material)
 	else
 		draw.NoTexture()
 	end
@@ -747,25 +745,25 @@ end
 --- Returns the model material name that uses the render target.
 -- @param name Render target name
 -- @return Model material name. Send this to the server to set the entity's material.
-function render_library.getRenderTargetMaterial( name )
+function render_library.getRenderTargetMaterial(name)
 	local data = SF.instance.data.render
-	SF.CheckType( name, "string" )
+	SF.CheckType(name, "string")
 
-	local rtname = data.rendertargets[ name ]
-	if rtname and globalRTs[ rtname ] then
-		return "!"..globalRTs[ rtname ][ 3 ]:GetName()
+	local rtname = data.rendertargets[name]
+	if rtname and globalRTs[rtname] then
+		return "!"..globalRTs[rtname][3]:GetName()
 	end
 end
 
 --- Sets the texture of a screen entity
 -- @param ent Screen entity
-function render_library.setTextureFromScreen ( ent )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
+function render_library.setTextureFromScreen (ent)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	ent = eunwrap( ent )
-	if IsValid( ent ) and ent.GPU and ent.GPU.RT then
+	ent = eunwrap(ent)
+	if IsValid(ent) and ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
-		surface.SetMaterial( RT_Material )
+		surface.SetMaterial(RT_Material)
 	else
 		draw.NoTexture()
 	end
@@ -775,36 +773,36 @@ end
 --- Sets the texture filtering function when viewing a close texture
 -- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 function render_library.setFilterMag(val)
-	SF.CheckType( val, "number" )
+	SF.CheckType(val, "number")
 	if SF.instance.data.render.changedFilterMag then
 		render.PopFilterMag()
 	end
 	SF.instance.data.render.changedFilterMag = true
-	render.PushFilterMag( val )
+	render.PushFilterMag(val)
 end
 
 --- Sets the texture filtering function when viewing a far texture
 -- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 function render_library.setFilterMin(val)
-	SF.CheckType( val, "number" )
+	SF.CheckType(val, "number")
 	if SF.instance.data.render.changedFilterMin then
 		render.PopFilterMin()
 	end
 	SF.instance.data.render.changedFilterMin = true
-	render.PushFilterMin( val )
+	render.PushFilterMin(val)
 end
 
 --- Clears the active render target
 -- @param clr Color type to clear with
 -- @param depth Boolean if should clear depth
-function render_library.clear ( clr, depth )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in a rendering hook.", 2 ) end
+function render_library.clear (clr, depth)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if SF.instance.data.render.usingRT then
 		if clr == nil then
-			render.Clear( 0, 0, 0, 255, depth )
+			render.Clear(0, 0, 0, 255, depth)
 		else
-			SF.CheckType( clr, col_meta )
-			render.Clear( clr.r, clr.g, clr.b, clr.a, depth )
+			SF.CheckType(clr, col_meta)
+			render.Clear(clr.r, clr.g, clr.b, clr.a, depth)
 		end
 	end
 end
@@ -815,14 +813,14 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRoundedBox ( r, x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( r, "number" )
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	draw.RoundedBox( r, x, y, w, h, currentcolor )
+function render_library.drawRoundedBox (r, x, y, w, h)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(r, "number")
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	draw.RoundedBox(r, x, y, w, h, currentcolor)
 end
 
 --- Draws a rounded rectangle using the current color
@@ -835,18 +833,18 @@ end
 -- @param tr Boolean Top right corner
 -- @param bl Boolean Bottom left corner
 -- @param br Boolean Bottom right corner
-function render_library.drawRoundedBoxEx ( r, x, y, w, h, tl, tr, bl, br )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( r, "number" )
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	SF.CheckType( tl, "boolean" )
-	SF.CheckType( tr, "boolean" )
-	SF.CheckType( bl, "boolean" )
-	SF.CheckType( br, "boolean" )
-	draw.RoundedBoxEx( r, x, y, w, h, currentcolor, tl, tr, bl, br )
+function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(r, "number")
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	SF.CheckType(tl, "boolean")
+	SF.CheckType(tr, "boolean")
+	SF.CheckType(bl, "boolean")
+	SF.CheckType(br, "boolean")
+	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
 --- Draws a rectangle using the current color.
@@ -854,13 +852,13 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRect ( x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	surface.DrawRect( x, y, w, h )
+function render_library.drawRect (x, y, w, h)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	surface.DrawRect(x, y, w, h)
 end
 
 --- Draws a rectangle outline using the current color.
@@ -868,25 +866,25 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRectOutline ( x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	surface.DrawOutlinedRect( x, y, w, h )
+function render_library.drawRectOutline (x, y, w, h)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	surface.DrawOutlinedRect(x, y, w, h)
 end
 
 --- Draws a circle outline
 -- @param x Center x coordinate
 -- @param y Center y coordinate
 -- @param r Radius
-function render_library.drawCircle ( x, y, r )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( r, "number" )
-	surface.DrawCircle( x, y, r, currentcolor )
+function render_library.drawCircle (x, y, r)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(r, "number")
+	surface.DrawCircle(x, y, r, currentcolor)
 end
 
 --- Draws a textured rectangle.
@@ -894,13 +892,13 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawTexturedRect ( x, y, w, h )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	surface.DrawTexturedRect ( x, y, w, h )
+function render_library.drawTexturedRect (x, y, w, h)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	surface.DrawTexturedRect (x, y, w, h)
 end
 
 --- Draws a textured rectangle with UV coordinates
@@ -912,17 +910,17 @@ end
 -- @param startV Texture mapping at rectangle origin
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
-function render_library.drawTexturedRectUV ( x, y, w, h, startU, startV, endU, endV )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	SF.CheckType( startU, "number" )
-	SF.CheckType( startV, "number" )
-	SF.CheckType( endU, "number" )
-	SF.CheckType( endV, "number" )
-	surface.DrawTexturedRectUV( x, y, w, h, startU, startV, endU, endV )
+function render_library.drawTexturedRectUV (x, y, w, h, startU, startV, endU, endV)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	SF.CheckType(startU, "number")
+	SF.CheckType(startV, "number")
+	SF.CheckType(endU, "number")
+	SF.CheckType(endV, "number")
+	surface.DrawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 end
 
 --- Draws a rotated, textured rectangle.
@@ -931,15 +929,15 @@ end
 -- @param w Width
 -- @param h Height
 -- @param rot Rotation in degrees
-function render_library.drawTexturedRectRotated ( x, y, w, h, rot )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( w, "number" )
-	SF.CheckType( h, "number" )
-	SF.CheckType( rot, "number" )
+function render_library.drawTexturedRectRotated (x, y, w, h, rot)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(w, "number")
+	SF.CheckType(h, "number")
+	SF.CheckType(rot, "number")
 
-	surface.DrawTexturedRectRotated( x, y, w, h, rot )
+	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
 
 --- Draws a line
@@ -947,13 +945,13 @@ end
 -- @param y1 Y start coordinate
 -- @param x2 X end coordinate
 -- @param y2 Y end coordinate
-function render_library.drawLine ( x1, y1, x2, y2 )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x1, "number" )
-	SF.CheckType( y1, "number" )
-	SF.CheckType( x2, "number" )
-	SF.CheckType( y2, "number" )
-	surface.DrawLine( x1, y1, x2, y2 )
+function render_library.drawLine (x1, y1, x2, y2)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x1, "number")
+	SF.CheckType(y1, "number")
+	SF.CheckType(x2, "number")
+	SF.CheckType(y2, "number")
+	surface.DrawLine(x1, y1, x2, y2)
 end
 
 --- Creates a font. Does not require rendering hook
@@ -986,9 +984,9 @@ end
 -- \- Lucida Console
 -- \- Times New Roman
 
-function render_library.createFont(font,size,weight,antialias,additive,shadow,outline,blur,extended)
+function render_library.createFont(font, size, weight, antialias, additive, shadow, outline, blur, extended)
 	font = validfonts[string.lower(font)]
-	if not font then SF.Throw( "invalid font", 2 ) end
+	if not font then SF.Throw("invalid font", 2) end
 
 	size = tonumber(size) or 16
 	weight = tonumber(weight) or 400
@@ -1008,10 +1006,10 @@ function render_library.createFont(font,size,weight,antialias,additive,shadow,ou
 		extended and 1 or 0)
 
 	if not defined_fonts[name] then
-		surface.CreateFont(name, {size = size, weight = weight,
-			antialias=antialias, additive = additive, font = font,
+		surface.CreateFont(name, { size = size, weight = weight,
+			antialias = antialias, additive = additive, font = font,
 			shadow = shadow, outline = outline, blur = blur,
-			extended = extended})
+			extended = extended })
 		defined_fonts[name] = true
 	end
 	return name
@@ -1022,11 +1020,11 @@ defaultFont = render_library.createFont("Default", 16, 400, false, false, false,
 -- @param text Text to get the size of
 -- @return width of the text
 -- @return height of the text
-function render_library.getTextSize( text )
-	SF.CheckType(text,"string")
+function render_library.getTextSize(text)
+	SF.CheckType(text, "string")
 
 	surface.SetFont(SF.instance.data.render.font or defaultFont)
-	return surface.GetTextSize( text )
+	return surface.GetTextSize(text)
 end
 
 --- Sets the font
@@ -1055,7 +1053,7 @@ end
 -- \- DermaDefaultBold
 -- \- DermaLarge
 function render_library.setFont(font)
-	if not defined_fonts[font] then SF.Throw( "Font does not exist.", 2 ) end
+	if not defined_fonts[font] then SF.Throw("Font does not exist.", 2) end
 	SF.instance.data.render.font = font
 	--surface.SetFont(font)
 end
@@ -1071,18 +1069,18 @@ end
 -- @param y Y coordinate
 -- @param text Text to draw
 -- @param alignment Text alignment
-function render_library.drawText ( x, y, text, alignment )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( text, "string" )
+function render_library.drawText (x, y, text, alignment)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(text, "string")
 	if alignment then
-		SF.CheckType( alignment, "number" )
+		SF.CheckType(alignment, "number")
 	end
 
 	local font = SF.instance.data.render.font or defaultFont
 
-	draw.DrawText( text, font, x, y, currentcolor, alignment )
+	draw.DrawText(text, font, x, y, currentcolor, alignment)
 end
 
 --- Draws text more easily and quickly but no new lines or tabs.
@@ -1091,27 +1089,27 @@ end
 -- @param text Text to draw
 -- @param xalign Text x alignment
 -- @param yalign Text y alignment
-function render_library.drawSimpleText ( x, y, text, xalign, yalign )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
-	SF.CheckType( text, "string" )
-	if xalign then SF.CheckType( xalign, "number" ) end
-	if yalign then SF.CheckType( yalign, "number" ) end
+function render_library.drawSimpleText (x, y, text, xalign, yalign)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
+	SF.CheckType(text, "string")
+	if xalign then SF.CheckType(xalign, "number") end
+	if yalign then SF.CheckType(yalign, "number") end
 
 	local font = SF.instance.data.render.font or defaultFont
 
-	draw.SimpleText( text, font, x, y, currentcolor, xalign, yalign )
+	draw.SimpleText(text, font, x, y, currentcolor, xalign, yalign)
 end
 
 --- Constructs a markup object for quick styled text drawing.
 -- @param str The markup string to parse
 -- @param maxsize The max width of the markup
 -- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
-function render_library.parseMarkup( str, maxsize )
-	SF.CheckType( str, "string" )
-	SF.CheckType( maxsize, "number" )
-	local marked = markup.Parse( str, maxsize )
+function render_library.parseMarkup(str, maxsize)
+	SF.CheckType(str, "string")
+	SF.CheckType(maxsize, "number")
+	local marked = markup.Parse(str, maxsize)
 	local markedindex = marked.__index
 	return setmetatable(marked, {
 		__newindex = function() end,
@@ -1123,20 +1121,20 @@ end
 --- Draws a polygon.
 -- @param poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
 function render_library.drawPoly(poly)
-	SF.CheckType(poly,"table")
+	SF.CheckType(poly, "table")
 	surface.DrawPoly(poly)
 end
 
 --- Enables or disables Depth Buffer
 -- @param enable true to enable
-function render_library.enableDepth ( enable )
-	SF.CheckType( enable, "boolean" )
+function render_library.enableDepth (enable)
+	SF.CheckType(enable, "boolean")
 	render.OverrideDepthEnable(enable, enable)
 end
 
 --- Resets the depth buffer
 function render_library.clearDepth()
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in a rendering hook.", 2 ) end
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if SF.instance.data.render.usingRT then
 		render.ClearDepth()
 	end
@@ -1147,11 +1145,11 @@ end
 -- @param width Width of the sprite.
 -- @param height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
-	SF.CheckType( pos, vector_meta )
-	SF.CheckType( width, "number" )
-	SF.CheckType( height, "number" )
-	pos = vunwrap( pos )
-	render.DrawSprite( pos, width, height )
+	SF.CheckType(pos, vector_meta)
+	SF.CheckType(width, "number")
+	SF.CheckType(height, "number")
+	pos = vunwrap(pos)
+	render.DrawSprite(pos, width, height)
 end
 
 --- Draws a sphere
@@ -1159,16 +1157,16 @@ end
 -- @param radius Radius of the sphere
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
-function render_library.draw3DSphere ( pos, radius, longitudeSteps, latitudeSteps )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( pos, vector_meta )
-	SF.CheckType( radius, "number" )
-	SF.CheckType( longitudeSteps, "number" )
-	SF.CheckType( latitudeSteps, "number" )
-	pos = vunwrap( pos )
-	longitudeSteps = math.min( longitudeSteps, 50 )
-	latitudeSteps = math.min( latitudeSteps, 50 )
-	render.DrawSphere( pos, radius, longitudeSteps, latitudeSteps, currentcolor, true )
+function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(pos, vector_meta)
+	SF.CheckType(radius, "number")
+	SF.CheckType(longitudeSteps, "number")
+	SF.CheckType(latitudeSteps, "number")
+	pos = vunwrap(pos)
+	longitudeSteps = math.min(longitudeSteps, 50)
+	latitudeSteps = math.min(latitudeSteps, 50)
+	render.DrawSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, true)
 end
 
 --- Draws a wireframe sphere
@@ -1176,29 +1174,29 @@ end
 -- @param radius Radius of the sphere
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
-function render_library.draw3DWireframeSphere ( pos, radius, longitudeSteps, latitudeSteps )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( pos, vector_meta )
-	SF.CheckType( radius, "number" )
-	SF.CheckType( longitudeSteps, "number" )
-	SF.CheckType( latitudeSteps, "number" )
-	pos = vunwrap( pos )
-	longitudeSteps = math.min( longitudeSteps, 50 )
-	latitudeSteps = math.min( latitudeSteps, 50 )
-	render.DrawWireframeSphere( pos, radius, longitudeSteps, latitudeSteps, currentcolor, true )
+function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, latitudeSteps)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(pos, vector_meta)
+	SF.CheckType(radius, "number")
+	SF.CheckType(longitudeSteps, "number")
+	SF.CheckType(latitudeSteps, "number")
+	pos = vunwrap(pos)
+	longitudeSteps = math.min(longitudeSteps, 50)
+	latitudeSteps = math.min(latitudeSteps, 50)
+	render.DrawWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, true)
 end
 
 --- Draws a 3D Line
 -- @param startPos Starting position
 -- @param endPos Ending position
-function render_library.draw3DLine ( startPos, endPos )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( startPos, vector_meta )
-	SF.CheckType( endPos, vector_meta )
-	startPos = vunwrap( startPos )
-	endPos = vunwrap( endPos )
+function render_library.draw3DLine (startPos, endPos)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(startPos, vector_meta)
+	SF.CheckType(endPos, vector_meta)
+	startPos = vunwrap(startPos)
+	endPos = vunwrap(endPos)
 
-	render.DrawLine( startPos, endPos, currentcolor, true )
+	render.DrawLine(startPos, endPos, currentcolor, true)
 end
 
 --- Draws a box in 3D space
@@ -1206,18 +1204,18 @@ end
 -- @param angle Orientation  of the box
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
-function render_library.draw3DBox ( origin, angle, mins, maxs )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( origin, vector_meta )
-	SF.CheckType( mins, vector_meta )
-	SF.CheckType( maxs, vector_meta )
-	SF.CheckType( angle, ang_meta )
-	origin = vunwrap( origin )
-	mins = vunwrap( mins )
-	maxs = vunwrap( maxs )
-	angle = aunwrap( angle )
+function render_library.draw3DBox (origin, angle, mins, maxs)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(origin, vector_meta)
+	SF.CheckType(mins, vector_meta)
+	SF.CheckType(maxs, vector_meta)
+	SF.CheckType(angle, ang_meta)
+	origin = vunwrap(origin)
+	mins = vunwrap(mins)
+	maxs = vunwrap(maxs)
+	angle = aunwrap(angle)
 
-	render.DrawBox( origin, angle, mins, maxs, currentcolor, true )
+	render.DrawBox(origin, angle, mins, maxs, currentcolor, true)
 end
 
 --- Draws a wireframe box in 3D space
@@ -1225,18 +1223,18 @@ end
 -- @param angle Orientation  of the box
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
-function render_library.draw3DWireframeBox ( origin, angle, mins, maxs )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( origin, vector_meta )
-	SF.CheckType( mins, vector_meta )
-	SF.CheckType( maxs, vector_meta )
-	SF.CheckType( angle, ang_meta )
-	origin = vunwrap( origin )
-	mins = vunwrap( mins )
-	maxs = vunwrap( maxs )
-	angle = aunwrap( angle )
+function render_library.draw3DWireframeBox (origin, angle, mins, maxs)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(origin, vector_meta)
+	SF.CheckType(mins, vector_meta)
+	SF.CheckType(maxs, vector_meta)
+	SF.CheckType(angle, ang_meta)
+	origin = vunwrap(origin)
+	mins = vunwrap(mins)
+	maxs = vunwrap(maxs)
+	angle = aunwrap(angle)
 
-	render.DrawWireframeBox( origin, angle, mins, maxs, currentcolor, false )
+	render.DrawWireframeBox(origin, angle, mins, maxs, currentcolor, false)
 end
 
 --- Draws textured beam.
@@ -1245,18 +1243,18 @@ end
 -- @param width The width of the beam.
 -- @param textureStart The start coordinate of the texture used.
 -- @param textureEnd The end coordinate of the texture used.
-function render_library.draw3DBeam ( startPos, endPos, width, textureStart, textureEnd )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( startPos, vector_meta )
-	SF.CheckType( endPos, vector_meta )
-	SF.CheckType( width, "number" )
-	SF.CheckType( textureStart, "number" )
-	SF.CheckType( textureEnd, "number" )
+function render_library.draw3DBeam (startPos, endPos, width, textureStart, textureEnd)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(startPos, vector_meta)
+	SF.CheckType(endPos, vector_meta)
+	SF.CheckType(width, "number")
+	SF.CheckType(textureStart, "number")
+	SF.CheckType(textureEnd, "number")
 
-	startPos = vunwrap( startPos )
-	endPos = vunwrap( endPos )
+	startPos = vunwrap(startPos)
+	endPos = vunwrap(endPos)
 
-	render.DrawBeam( startPos, endPos, width, textureStart, textureEnd, currentcolor )
+	render.DrawBeam(startPos, endPos, width, textureStart, textureEnd, currentcolor)
 end
 
 --- Draws 2 connected triangles.
@@ -1264,37 +1262,37 @@ end
 -- @param vert2 The second vertex.
 -- @param vert3 The third vertex.
 -- @param vert4 The fourth vertex.
-function render_library.draw3DQuad ( vert1, vert2, vert3, vert4 )
-	if not SF.instance.data.render.isRendering then SF.Throw( "Not in rendering hook.", 2 ) end
-	SF.CheckType( vert1, vector_meta )
-	SF.CheckType( vert2, vector_meta )
-	SF.CheckType( vert3, vector_meta )
-	SF.CheckType( vert4, vector_meta )
+function render_library.draw3DQuad (vert1, vert2, vert3, vert4)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	SF.CheckType(vert1, vector_meta)
+	SF.CheckType(vert2, vector_meta)
+	SF.CheckType(vert3, vector_meta)
+	SF.CheckType(vert4, vector_meta)
 
-	vert1 = vunwrap( vert1 )
-	vert2 = vunwrap( vert2 )
-	vert3 = vunwrap( vert3 )
-	vert4 = vunwrap( vert4 )
+	vert1 = vunwrap(vert1)
+	vert2 = vunwrap(vert2)
+	vert3 = vunwrap(vert3)
+	vert4 = vunwrap(vert4)
 
-	render.DrawQuad( vert1, vert2, vert3, vert4, currentcolor )
+	render.DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
 end
 
 --- Gets a 2D cursor position where ply is aiming.
 -- @param ply player to get cursor position from(optional)
 -- @return x position
 -- @return y position
-function render_library.cursorPos( ply )
+function render_library.cursorPos(ply)
 	local screen = SF.instance.data.render.renderEnt
 	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
 
-	ply = ply and eunwrap( ply ) or LocalPlayer()
+	ply = ply and eunwrap(ply) or LocalPlayer()
 	
-	if not IsValid( ply ) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
+	if not IsValid(ply) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
 
-	Pos = screen:LocalToWorld( screen.Origin )
+	Pos = screen:LocalToWorld(screen.Origin)
 
 	Normal = -screen.Transform:GetUp():GetNormalized()
 
@@ -1308,10 +1306,10 @@ function render_library.cursorPos( ply )
 
 	local B = Normal:Dot(Pos-Start) / A
 	if (B >= 0) then
-		local w = 512/screen.Aspect
-		local HitPos = WorldToLocal( Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles() )
-		local x = HitPos.x/screen.Scale
-		local y = HitPos.y/screen.Scale
+		local w = 512 / screen.Aspect
+		local HitPos = WorldToLocal(Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles())
+		local x = HitPos.x / screen.Scale
+		local y = HitPos.y / screen.Scale
 		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen
 		return x, y
 	end
@@ -1323,24 +1321,24 @@ end
 -- Note: this does a table copy so move it out of your draw hook
 -- @param e The screen to get info from.
 -- @return A table describing the screen.
-function render_library.getScreenInfo( e )
-	local screen = eunwrap( e )
+function render_library.getScreenInfo(e)
+	local screen = eunwrap(e)
 	if screen then
-		return SF.Sanitize( screen.ScreenInfo )
+		return SF.Sanitize(screen.ScreenInfo)
 	end
 end
 
 --- Returns the entity currently being rendered to
 -- @return Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
-	return ewrap( SF.instance.data.render.renderEnt )
+	return ewrap(SF.instance.data.render.renderEnt)
 end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
 function render_library.capturePixels ()
 	local data = SF.instance.data.render
 	if not data.isRendering then
-		SF.Throw( "Not in rendering hook.", 2 )
+		SF.Throw("Not in rendering hook.", 2)
 	end
 	if SF.instance.data.render.usingRT then
 		render.CapturePixels()
@@ -1351,17 +1349,17 @@ end
 -- @param x Pixel x-coordinate.
 -- @param y Pixel y-coordinate.
 -- @return Color object with ( r, g, b, 255 ) from the specified pixel.
-function render_library.readPixel ( x, y )
+function render_library.readPixel (x, y)
 	local data = SF.instance.data.render
 	if not data.isRendering then
-		SF.Throw( "Not in rendering hook.", 2 )
+		SF.Throw("Not in rendering hook.", 2)
 	end
 
-	SF.CheckType( x, "number" )
-	SF.CheckType( y, "number" )
+	SF.CheckType(x, "number")
+	SF.CheckType(y, "number")
 
-	local r, g, b = render.ReadPixel( x, y )
-	return cwrap( Color( r, g, b, 255 ) )
+	local r, g, b = render.ReadPixel(x, y)
+	return cwrap(Color(r, g, b, 255))
 end
 
 --- Returns the render context's width and height
@@ -1376,11 +1374,11 @@ end
 -- @param vec1 The starting vector
 -- @param vec2 The ending vector
 -- @return The color vector. use vector:toColor to convert it to a color.
-function render_library.traceSurfaceColor( vec1, vec2 )
-	SF.CheckType( vec1, vector_meta )
-	SF.CheckType( vec2, vector_meta )
+function render_library.traceSurfaceColor(vec1, vec2)
+	SF.CheckType(vec1, vector_meta)
+	SF.CheckType(vec2, vector_meta)
 
-	return vwrap( render.GetSurfaceColor( vunwrap( vec1 ), vunwrap( vec2 ) ) )
+	return vwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)))
 end
 
 --- Checks if a hud component is connected to the Starfall Chip

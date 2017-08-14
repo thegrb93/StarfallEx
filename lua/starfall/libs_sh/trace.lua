@@ -193,7 +193,7 @@ trace_library.CONTENTS_HITBOX = CONTENTS_HITBOX
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "trace", "Trace", "Allows the user to start traces" )
+	P.registerPrivilege("trace", "Trace", "Allows the user to start traces")
 end
 
 -- Local functions
@@ -205,16 +205,16 @@ local function postload()
 	wrap = SF.Entities.Wrap
 	unwrap = SF.Entities.Unwrap
 end
-SF.Libraries.AddHook("postload",postload)
+SF.Libraries.AddHook("postload", postload)
 
 local function convertFilter(filter)
 	local unwrapped = unwrap(filter)
 	if unwrapped then
-		return {unwrapped}
+		return { unwrapped }
 	else
 		local l = {}
 		local count = 1
-		for i=1,#filter do
+		for i = 1, #filter do
 			local unwrapped = unwrap(filter[i])
 			if unwrapped then
 				l[count] = unwrapped
@@ -233,25 +233,25 @@ end
 -- @param colgroup The collision group of the trace
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
-function trace_library.trace ( start, endpos, filter, mask, colgroup, ignworld )
-	SF.Permissions.check( SF.instance.player, nil, "trace" )
-	SF.CheckType( start, SF.Types.Vector )
-	SF.CheckType( endpos, SF.Types.Vector )
+function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
+	SF.Permissions.check(SF.instance.player, nil, "trace")
+	SF.CheckType(start, SF.Types.Vector)
+	SF.CheckType(endpos, SF.Types.Vector)
 
-	local start, endpos = vunwrap( start ), vunwrap( endpos )
+	local start, endpos = vunwrap(start), vunwrap(endpos)
 
 	if type(filter) == "function" then
 		local filterfunc = filter
 		filter = function(ent)
-			local ret = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
+			local ret = SF.instance:runFunction(filterfunc, SF.WrapObject(ent))
 			if ret[1] then return ret[2] end
 		end
 	else
-		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+		filter = convertFilter(SF.CheckType(filter, "table", 0, {}))
 	end
-	if mask ~= nil then SF.CheckType( mask, "number" ) end
-	if colgroup ~= nil then SF.CheckType( colgroup, "number" ) end
-	if ignworld ~= nil then SF.CheckType( ignworld, "boolean" ) end
+	if mask ~= nil then SF.CheckType(mask, "number") end
+	if colgroup ~= nil then SF.CheckType(colgroup, "number") end
+	if ignworld ~= nil then SF.CheckType(ignworld, "boolean") end
 
 	local trace = {
 		start = start,
@@ -262,10 +262,10 @@ function trace_library.trace ( start, endpos, filter, mask, colgroup, ignworld )
 		ignoreworld = ignworld,
 	}
 	
-	local data = util.TraceLine( trace )
+	local data = util.TraceLine(trace)
 	return setmetatable({}, {
-		__index=function(t,k)
-			return SF.WrapObject( data[k] )
+		__index = function(t, k)
+			return SF.WrapObject(data[k])
 		end,
 		__metatable = ""
 	})
@@ -281,27 +281,27 @@ end
 -- @param colgroup The collision group of the trace
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
-function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld )
-	SF.Permissions.check( SF.instance.player, nil, "trace" )
-	SF.CheckType( start, SF.Types.Vector )
-	SF.CheckType( endpos, SF.Types.Vector )
-	SF.CheckType( minbox, SF.Types.Vector )
-	SF.CheckType( maxbox, SF.Types.Vector )
+function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
+	SF.Permissions.check(SF.instance.player, nil, "trace")
+	SF.CheckType(start, SF.Types.Vector)
+	SF.CheckType(endpos, SF.Types.Vector)
+	SF.CheckType(minbox, SF.Types.Vector)
+	SF.CheckType(maxbox, SF.Types.Vector)
 
-	local start, endpos, minbox, maxbox = vunwrap( start ), vunwrap( endpos ), vunwrap( minbox ), vunwrap( maxbox )
+	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 
 	if type(filter) == "function" then
 		local filterfunc = filter
 		filter = function(ent)
-			local ret = SF.instance:runFunction( filterfunc, SF.WrapObject( ent ) )
+			local ret = SF.instance:runFunction(filterfunc, SF.WrapObject(ent))
 			if ret[1] then return ret[2] end
 		end
 	else
-		filter = convertFilter( SF.CheckType( filter, "table", 0, {} ) )
+		filter = convertFilter(SF.CheckType(filter, "table", 0, {}))
 	end
-	if mask ~= nil then mask = SF.CheckType( mask, "number" ) end
-	if colgroup ~= nil then SF.CheckType( colgroup, "number" ) end
-	if ignworld ~= nil then SF.CheckType( ignworld, "boolean" ) end
+	if mask ~= nil then mask = SF.CheckType(mask, "number") end
+	if colgroup ~= nil then SF.CheckType(colgroup, "number") end
+	if ignworld ~= nil then SF.CheckType(ignworld, "boolean") end
 
 	local trace = {
 		start = start,
@@ -314,11 +314,11 @@ function trace_library.traceHull ( start, endpos, minbox, maxbox, filter, mask, 
 		maxs = maxbox
 	}
 	
-	local data = util.TraceHull( trace )
+	local data = util.TraceHull(trace)
 	return setmetatable({}, {
-		__index=function(t,k)
-			return SF.WrapObject( data[k] )
+		__index = function(t, k)
+			return SF.WrapObject(data[k])
 		end,
-		__metatable=""
+		__metatable = ""
 	})
 end

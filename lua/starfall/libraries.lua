@@ -12,7 +12,7 @@ SF.Libraries.hooks = {}
 -- @param name The library name
 function SF.Libraries.Register(name)
 	local methods = {}
-	SF.Libraries.libraries[ name ] = methods
+	SF.Libraries.libraries[name] = methods
 	return methods
 end
 
@@ -39,7 +39,7 @@ function SF.Libraries.BuildEnvironment()
 		if meta then
 			local t = {}
 			for k, v in pairs(meta) do
-				t[k]=v
+				t[k] = v
 			end
 			setmetatable(dst, t)
 		end
@@ -69,7 +69,7 @@ function SF.Libraries.AddHook(hookname, func)
 		SF.Libraries.hooks[hookname] = hook
 	end
 	
-	hook[#hook+1] = func
+	hook[#hook + 1] = func
 end
 
 --- Calls a library hook.
@@ -79,7 +79,7 @@ function SF.Libraries.CallHook(hookname, ...)
 	local hook = SF.Libraries.hooks[hookname]
 	if not hook then return end
 	
-	for i=1,#hook do
+	for i = 1, #hook do
 		hook[i](...)
 	end
 end

@@ -3,9 +3,9 @@
 
 if SERVER then
 	
-	wire.adjustInputs({"Keyboard","Console"},{"Wirelink","Wirelink"})
+	wire.adjustInputs({ "Keyboard", "Console" }, { "Wirelink", "Wirelink" })
 	
-	hook.add("input","getwirelinks",function(name, val)
+	hook.add("input", "getwirelinks", function(name, val)
 		if name == "Console" then
 			Console = val
 		elseif name == "Keyboard" then
@@ -26,7 +26,7 @@ if SERVER then
 		updateCursor()
 	end
 	local function cout(str, color)
-		for I=1, #str do
+		for I = 1, #str do
 			if str[I] == "\n" then
 				while ConsolePos % 60 ~= 0 do
 					Console[ConsolePos] = 0
@@ -34,7 +34,7 @@ if SERVER then
 				end
 			else
 				Console[ConsolePos] = str:byte(I)
-				Console[ConsolePos+1] = color or 999
+				Console[ConsolePos + 1] = color or 999
 				ConsolePos = ConsolePos + 2
 			end
 		end
@@ -47,7 +47,7 @@ if SERVER then
 	end
 	local function getcin()
 		local chars = {}
-		for I=cinstart, ConsolePos-2, 2 do
+		for I = cinstart, ConsolePos-2, 2 do
 			chars[#chars + 1] = string.char(Console[I])
 		end
 		return table.concat(chars)
@@ -90,7 +90,7 @@ if SERVER then
 					else
 						--print(Keyboard[1])
 						Console[ConsolePos] = Keyboard[1]
-						Console[ConsolePos+1] = 999
+						Console[ConsolePos + 1] = 999
 						
 						ConsolePos = ConsolePos + 2
 						updateCursor()
@@ -101,7 +101,7 @@ if SERVER then
 			end
 		end
 	end
-	hook.add("Think","Mainloop",main_loop)
+	hook.add("Think", "Mainloop", main_loop)
 
 	function main()
 		cout("Type hello: ")
@@ -109,9 +109,9 @@ if SERVER then
 			if str == "hello" then
 				cout("Hi!\n")
 			else
-				cout("WRONG!!!\n",800999)
+				cout("WRONG!!!\n", 800999)
 			end
-			timer.simple(0,main)
+			timer.simple(0, main)
 		end)
 	end
 end

@@ -1,4 +1,4 @@
 --@name Hello World
 --@author INP
 
-print( "Hello World!" )
+print("Hello World!")

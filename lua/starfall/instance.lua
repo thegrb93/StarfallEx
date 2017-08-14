@@ -23,7 +23,7 @@ SF.Instance.__index = SF.Instance
 
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
-SF.allInstances = setmetatable({},{__mode="kv"})
+SF.allInstances = setmetatable({}, { __mode = "kv" })
 SF.playerInstances = {}
 
 --- Preprocesses and Compiles code and returns an Instance
@@ -37,10 +37,10 @@ SF.playerInstances = {}
 function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	if type(code) == "string" then
 		mainfile = mainfile or "generic"
-		code = {[mainfile]=code}
+		code = { [mainfile] = code }
 	end
 	
-	local instance = setmetatable({},SF.Instance)
+	local instance = setmetatable({}, SF.Instance)
 	
 	instance.player = player
 	instance.playerid = player:SteamID()
@@ -54,17 +54,17 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.source = code
 	instance.initialized = false
 	instance.mainfile = mainfile
-	instance.cpuQuota = ( SERVER or LocalPlayer() ~= instance.player ) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
-	instance.cpuQuotaRatio = 1/SF.cpuBufferN:GetInt()
+	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
 	
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
-			SF.Preprocessor.ParseDirectives(filename,source,instance.ppdata)
+			SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
 		end
 		
 		local serverorclient
 		if  instance.ppdata.serverorclient then
-			serverorclient = instance.ppdata.serverorclient[ filename ]
+			serverorclient = instance.ppdata.serverorclient[filename]
 		end
 		
 		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
@@ -73,7 +73,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		else
 			local func = CompileString(source, "SF:"..filename, false)
 			if type(func) == "string" then
-				return false, {message = func, traceback = ""}
+				return false, { message = func, traceback = "" }
 			end
 			debug.setfenv(func, instance.env)
 			instance.scripts[filename] = func
@@ -91,11 +91,11 @@ end
 -- @param ... Arguments to func
 -- @return True if ok
 -- @return A table of values that the hook returned
-function SF.Instance:runWithOps(func,...)
+function SF.Instance:runWithOps(func, ...)
 
-	local function xpcall_callback ( err )
-		if debug.getmetatable( err )~=SF.Errormeta then
-			return SF.MakeError( err, 1 )
+	local function xpcall_callback (err)
+		if debug.getmetatable(err)~=SF.Errormeta then
+			return SF.MakeError(err, 1)
 		end
 		return err
 	end
@@ -103,30 +103,30 @@ function SF.Instance:runWithOps(func,...)
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck ()
 		self.cpu_total = SysTime() - oldSysTime
-		local usedRatio = self:movingCPUAverage()/self.cpuQuota
+		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 		
-		local function safeThrow( msg, nocatch )
+		local function safeThrow(msg, nocatch)
 			local source = debug.getinfo(3, "S").short_src
 			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
-				SF.Throw( msg, 3, nocatch )
+				SF.Throw(msg, 3, nocatch)
 			end
 		end
 		
 		if usedRatio>1 then
-			safeThrow( "CPU Quota exceeded.", true )
+			safeThrow("CPU Quota exceeded.", true)
 		elseif usedRatio > self.cpu_softquota then
-			safeThrow( "CPU Quota warning." )
+			safeThrow("CPU Quota warning.")
 		end
 	end
 	
 	local prevHook, mask, count = debug.gethook()
-	debug.sethook( cpuCheck, "", 2000 )
-	local tbl = {xpcall( func, xpcall_callback, ... )}
-	debug.sethook( prevHook, mask, count )
+	debug.sethook(cpuCheck, "", 2000)
+	local tbl = { xpcall(func, xpcall_callback, ...) }
+	debug.sethook(prevHook, mask, count)
 	
 	if tbl[1] then
 		-- Need to put the cpuCheck in a lambda so the debug.getinfo doesn't land inside of xpcall
-		local tbl2 = {xpcall( function() cpuCheck() end, xpcall_callback )}
+		local tbl2 = { xpcall(function() cpuCheck() end, xpcall_callback) }
 		if not tbl2[1] then return tbl2 end
 	end
 	
@@ -146,7 +146,7 @@ function SF.Instance:prepare(hook)
 		SF.instance = nil
 	end
 	
-	self:runLibraryHook("prepare",hook)
+	self:runLibraryHook("prepare", hook)
 	SF.instance = self
 end
 
@@ -154,7 +154,7 @@ end
 -- This is done automatically by Initialize and runScriptHook.
 function SF.Instance:cleanup(hook, ok, err)
 	assert(SF.instance == self)
-	self:runLibraryHook("cleanup",hook, ok, err)
+	self:runLibraryHook("cleanup", hook, ok, err)
 	
 	if self.instanceStack then
 		SF.instance = self.instanceStack[#self.instanceStack]
@@ -184,7 +184,7 @@ function SF.Instance:initialize()
 	if SF.playerInstances[self.player] then
 		SF.playerInstances[self.player][self] = self
 	else
-		SF.playerInstances[self.player] = {[self]=self}
+		SF.playerInstances[self.player] = { [self] = self }
 	end
 
 	self:runLibraryHook("initialize")
@@ -198,7 +198,7 @@ function SF.Instance:initialize()
 		return false, tbl[2]
 	end
 
-	self:cleanup("_initialize",false)
+	self:cleanup("_initialize", false)
 	return true
 end
 
@@ -212,15 +212,15 @@ function SF.Instance:runScriptHook(hook, ...)
 	if self:prepare(hook) then return {} end
 	local tbl
 	for name, func in pairs(self.hooks[hook]) do
-		tbl = self:runWithOps(func,...)
+		tbl = self:runWithOps(func, ...)
 		if not tbl[1] then
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:cleanup(hook,true,tbl[2])
+			self:cleanup(hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:cleanup(hook,false)
+	self:cleanup(hook, false)
 	return tbl
 end
 
@@ -230,24 +230,24 @@ end
 -- @return True if it executed ok, false if not or if there was no hook
 -- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
 -- @return The traceback if the instance errored
-function SF.Instance:runScriptHookForResult(hook,...)
+function SF.Instance:runScriptHookForResult(hook, ...)
 	if not self.hooks[hook] then return {} end
 	if self:prepare(hook) then return {} end
 	local tbl
 	for name, func in pairs(self.hooks[hook]) do
-		tbl = self:runWithOps(func,...)
+		tbl = self:runWithOps(func, ...)
 		if tbl[1] then
 			if tbl[2]~=nil then
 				break
 			end
 		else
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
-			self:cleanup(hook,true,tbl[2])
+			self:cleanup(hook, true, tbl[2])
 			self:Error(tbl[2])
 			return tbl
 		end
 	end
-	self:cleanup(hook,false)
+	self:cleanup(hook, false)
 	return tbl
 end
 
@@ -255,7 +255,7 @@ end
 -- @param hook Hook to run.
 -- @param ... Additional arguments.
 function SF.Instance:runLibraryHook(hook, ...)
-	return SF.Libraries.CallHook(hook,self,...)
+	return SF.Libraries.CallHook(hook, self, ...)
 end
 
 --- Runs an arbitrary function under the SF instance. This can be used
@@ -263,15 +263,15 @@ end
 -- make sense (ex timers).
 -- @param func Function to run
 -- @param ... Arguments to pass to func
-function SF.Instance:runFunction(func,...)
+function SF.Instance:runFunction(func, ...)
 	if self:prepare("_runFunction") then return true end
 	
-	local tbl = self:runWithOps(func,...)
+	local tbl = self:runWithOps(func, ...)
 	if tbl[1] then
-		self:cleanup("_runFunction",false)
+		self:cleanup("_runFunction", false)
 	else
 		tbl[2].message = "Callback errored with: " .. tbl[2].message
-		self:cleanup("_runFunction",true,tbl[2])
+		self:cleanup("_runFunction", true, tbl[2])
 		self:Error(tbl[2])
 	end
 	
@@ -289,14 +289,14 @@ function SF.Instance:deinitialize()
 	self.error = true
 end
 
-hook.Add("Think","SF_Think",function()
+hook.Add("Think", "SF_Think", function()
 	for pl, insts in pairs(SF.playerInstances) do
-		local plquota = ( SERVER or LocalPlayer() ~= pl ) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		local plquota = (SERVER or LocalPlayer() ~= pl) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
 			instance.cpu_average = instance:movingCPUAverage()
 			instance.cpu_total = 0
-			instance:runScriptHook( "think" )
+			instance:runScriptHook("think")
 			cputotal = cputotal + instance.cpu_average
 		end
 		
@@ -310,7 +310,7 @@ hook.Add("Think","SF_Think",function()
 			end
 			
 			if maxinst then
-				maxinst:Error( SF.MakeError( "SF: Player cpu time limit reached!", 1 ) )
+				maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
 			end
 		end
 	end
@@ -321,7 +321,7 @@ if CLIENT then
 -- @return true if a HUD Component is connected
 	function SF.Instance:isHUDActive()
 		local foundlink
-		for hud, _ in pairs( SF.ActiveHuds ) do
+		for hud, _ in pairs(SF.ActiveHuds) do
 			if hud.link == self.data.entity then
 				return true
 			end
@@ -331,10 +331,10 @@ if CLIENT then
 end
 
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
-function SF.Instance:Error( err )
+function SF.Instance:Error(err)
 	
 	if self.runOnError then -- We have a custom error function, use that instead
-		self:runOnError( err )
+		self:runOnError(err)
 	else
 		-- Default behavior
 		self:deinitialize()
@@ -344,5 +344,5 @@ end
 
 -- Don't self modify. The average should only the modified per tick.
 function SF.Instance:movingCPUAverage()
-	return self.cpu_average + ( self.cpu_total - self.cpu_average ) * self.cpuQuotaRatio
+	return self.cpu_average + (self.cpu_total - self.cpu_average) * self.cpuQuotaRatio
 end

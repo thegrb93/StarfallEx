@@ -83,7 +83,7 @@ function d_findVariable(s, i, len, lastType, jobstate)
 	while true do
 		--	Stop at the end. Throw an error. This function MUST NOT meet the end!
 		if i > len then
-			SF.Throw( "vON: Reached end of string, cannot form proper variable.", 3 )
+			SF.Throw("vON: Reached end of string, cannot form proper variable.", 3)
 		end
 
 		--	Cache the character. Nobody wants to look for the same character ten times.
@@ -179,7 +179,7 @@ function d_findVariable(s, i, len, lastType, jobstate)
 
 		--	This will occur if the very first character in the vON code is wrong.
 		else
-			SF.Throw( "vON: Malformed data... Can't find a proper type definition. Char#" .. i .. ":" .. c, 3 )
+			SF.Throw("vON: Malformed data... Can't find a proper type definition. Char#" .. i .. ":" .. c, 3)
 		end
 
 		--	Move the pointer one step forward.
@@ -191,7 +191,7 @@ end
 --	Yeah, ton of parameters.
 function s_anyVariable(data, lastType, isNumeric, isKey, isLast, jobstate)
 	
-	local unwrap = SF.UnwrapObject( data )
+	local unwrap = SF.UnwrapObject(data)
 	if unwrap then data = unwrap end
 
 	local tp = type(data)
@@ -264,7 +264,7 @@ _deserialize = {
 
 				--	Otherwise, the data has to be damaged.
 				else
-					SF.Throw( "vON: Reached end of string, incomplete table definition.", 2 )
+					SF.Throw("vON: Reached end of string, incomplete table definition.", 2)
 				end
 			end
 
@@ -312,7 +312,7 @@ _deserialize = {
 				--	But, if there's a key read already...
 				elseif key then
 					--	Then this is malformed.
-					SF.Throw( "vON: Malformed table... Two keys declared successively? Char#" .. i .. ":" .. c, 2 )
+					SF.Throw("vON: Malformed table... Two keys declared successively? Char#" .. i .. ":" .. c, 2)
 
 				--	Otherwise the key will be read.
 				else
@@ -363,14 +363,14 @@ _deserialize = {
 			return tonumber(sub(s, i, a - 1)) or SF.Throw("vON: Number definition does not contain a valid number!", 3), a - 1
 		end
 
-		SF.Throw( "vON: Number definition started... Found no end.", 3 )
+		SF.Throw("vON: Number definition started... Found no end.", 3)
 	end,
 
 
 --	A boolean is A SINGLE CHARACTER, either 1 for true or 0 for false.
 --	Any other attempt at boolean declaration will result in a failure.
 	["boolean"] = function(s, i, len, unnecessaryEnd, jobstate)
-		local c = sub(s,i,i)
+		local c = sub(s, i, i)
 		--	Only one character is needed.
 
 		--	If it's 1, then it's true
@@ -383,7 +383,7 @@ _deserialize = {
 		end
 
 		--	Any other supposely "boolean" is just a sign of malformed data.
-		SF.Throw( "vON: Invalid value on boolean type... Char#" .. i .. ": " .. c, 3 )
+		SF.Throw("vON: Invalid value on boolean type... Char#" .. i .. ": " .. c, 3)
 	end,
 
 
@@ -639,7 +639,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 				return SF.Vectors.Wrap(Vector(x, y, z)), a - 1
 			end
 
-			SF.Throw("vON: Vector definition started... Found no end.",3)
+			SF.Throw("vON: Vector definition started... Found no end.", 3)
 		end,
 
 
@@ -672,7 +672,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 				return SF.Angles.Wrap(Angle(p, y, r)), a - 1
 			end
 
-			SF.Throw("vON: Angle definition started... Found no end.",3)
+			SF.Throw("vON: Angle definition started... Found no end.", 3)
 		end,
 	}
 
@@ -783,9 +783,9 @@ local _d_table = _deserialize.table
 _d_meta = {
 	__call = function(self, str, allowIdRewriting)
 		if type(str) == "string" then
-			return _d_table(str, nil, #str, true, {{}, allowIdRewriting})
+			return _d_table(str, nil, #str, true, { {}, allowIdRewriting })
 		end
-		SF.Throw( "vON: You must deserialize a string, not a " .. type( str ), 2 )
+		SF.Throw("vON: You must deserialize a string, not a " .. type(str), 2)
 	end,
 	__newindex = function() end,
 	__metatable = false
@@ -794,16 +794,16 @@ _s_meta = {
 	__call = function(self, data, checkRecursion)
 		if type(data) == "table" then
 			if checkRecursion then
-				local assoc, checked = {}, {ID = 1}
+				local assoc, checked = {}, { ID = 1 }
 
 				checkTableForRecursion(data, checked, assoc)
 
-				return _s_table(data, nil, nil, nil, nil, true, {assoc, {}})
+				return _s_table(data, nil, nil, nil, nil, true, { assoc, {} })
 			end
 
-			return _s_table(data, nil, nil, nil, nil, true, {false})
+			return _s_table(data, nil, nil, nil, nil, true, { false })
 		end
-		SF.Throw( "vON: You must serialize a table, not a " .. type( data ), 2 )
+		SF.Throw("vON: You must serialize a table, not a " .. type(data), 2)
 	end,
 	__newindex = function() end,
 	__metatable = false
@@ -815,7 +815,7 @@ _s_meta = {
 -- @name von.deserialize
 -- @param str String to deserialize
 -- @return Table
-von.deserialize = setmetatable({},_d_meta)
+von.deserialize = setmetatable({}, _d_meta)
 
 --- Serialize a table
 -- @shared
@@ -823,4 +823,4 @@ von.deserialize = setmetatable({},_d_meta)
 -- @name von.serialize
 -- @param tbl Table to serialize
 -- @return String
-von.serialize = setmetatable({},_s_meta)
+von.serialize = setmetatable({}, _s_meta)

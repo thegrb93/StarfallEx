@@ -11,24 +11,24 @@ local vunwrap = SF.UnwrapObject
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege( "find", "Find", "Allows the user to access the find library" )
+	P.registerPrivilege("find", "Find", "Allows the user to access the find library")
 end
 
 local function convert(results, func)
-	if func then SF.CheckType(func,"function") end
+	if func then SF.CheckType(func, "function") end
 	local wrap = SF.WrapObject
 	
 	local t = {}
 	if func then
-		for i=1,#results do
+		for i = 1, #results do
 			local e = wrap(results[i])
 			if e and func(e) then
-				t[#t+1] = e
+				t[#t + 1] = e
 			end
 		end
 	else
-		for i=1,#results do
-			t[#t+1] = wrap(results[i])
+		for i = 1, #results do
+			t[#t + 1] = wrap(results[i])
 		end
 	end
 	return t
@@ -39,14 +39,14 @@ end
 -- @param max Top corner
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inBox ( min, max, filter )
-	SF.Permissions.check( SF.instance.player, nil, "find" )
-	SF.CheckType( min, SF.Types[ "Vector" ] )
-	SF.CheckType( max, SF.Types[ "Vector" ] )
+function find_library.inBox (min, max, filter)
+	SF.Permissions.check(SF.instance.player, nil, "find")
+	SF.CheckType(min, SF.Types["Vector"])
+	SF.CheckType(max, SF.Types["Vector"])
 
-	local min, max = vunwrap( min ), vunwrap( max )
+	local min, max = vunwrap(min), vunwrap(max)
 
-	return convert( ents.FindInBox( min, max ), filter )
+	return convert(ents.FindInBox(min, max), filter)
 end
 
 --- Finds entities in a sphere
@@ -54,14 +54,14 @@ end
 -- @param radius Sphere radius
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inSphere ( center, radius, filter )
-	SF.Permissions.check( SF.instance.player, nil, "find" )
-	SF.CheckType( center, SF.Types[ "Vector" ] )
-	SF.CheckType( radius, "number" )
+function find_library.inSphere (center, radius, filter)
+	SF.Permissions.check(SF.instance.player, nil, "find")
+	SF.CheckType(center, SF.Types["Vector"])
+	SF.CheckType(radius, "number")
 
-	local center = vunwrap( center )
+	local center = vunwrap(center)
 	
-	return convert( ents.FindInSphere( center, radius ), filter )
+	return convert(ents.FindInSphere(center, radius), filter)
 end
 
 --- Finds entities in a cone
@@ -71,16 +71,16 @@ end
 -- @param radius The angle of the cone
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inCone ( pos, dir, distance, radius, filter )
-	SF.Permissions.check( SF.instance.player, nil, "find" )
-	SF.CheckType( pos, SF.Types[ "Vector" ] )
-	SF.CheckType( dir, SF.Types[ "Vector" ] )
-	SF.CheckType( distance, "number" )
-	SF.CheckType( radius, "number" )
+function find_library.inCone (pos, dir, distance, radius, filter)
+	SF.Permissions.check(SF.instance.player, nil, "find")
+	SF.CheckType(pos, SF.Types["Vector"])
+	SF.CheckType(dir, SF.Types["Vector"])
+	SF.CheckType(distance, "number")
+	SF.CheckType(radius, "number")
 
-	local pos, dir = vunwrap( pos ), vunwrap( dir )
+	local pos, dir = vunwrap(pos), vunwrap(dir)
 	
-	return convert( ents.FindInCone( pos, dir, distance, radius ), filter )
+	return convert(ents.FindInCone(pos, dir, distance, radius), filter)
 end
 
 --- Finds entities by class name
@@ -88,8 +88,8 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byClass(class, filter)
-	SF.Permissions.check( SF.instance.player, nil, "find" )
-	SF.CheckType(class,"string")
+	SF.Permissions.check(SF.instance.player, nil, "find")
+	SF.CheckType(class, "string")
 		
 	return convert(ents.FindByClass(class), filter)
 end
@@ -99,8 +99,8 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byModel(model, filter)
-	SF.Permissions.check( SF.instance.player, nil, "find" )
-	SF.CheckType(model,"string")
+	SF.Permissions.check(SF.instance.player, nil, "find")
+	SF.CheckType(model, "string")
 		
 	return convert(ents.FindByModel(model), filter)
 end
@@ -109,7 +109,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.allPlayers(filter)
-	SF.Permissions.check( SF.instance.player, nil, "find" )
+	SF.Permissions.check(SF.instance.player, nil, "find")
 	
 	return convert(player.GetAll(), filter)
 end
@@ -118,7 +118,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.all(filter)
-	SF.Permissions.check( SF.instance.player, nil, "find" )
+	SF.Permissions.check(SF.instance.player, nil, "find")
 	
 	return convert(ents.GetAll(), filter)
 end

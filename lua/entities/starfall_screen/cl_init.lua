@@ -1,52 +1,52 @@
-include( "shared.lua" )
+include("shared.lua")
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
 local render = render
 
-surface.CreateFont( "Starfall_ErrorFont", {
+surface.CreateFont("Starfall_ErrorFont", {
 	font = "arial",
 	size = 26,
 	weight = 200
-} )
+})
 
-net.Receive( "starfall_processor_used", function ( len )
+net.Receive("starfall_processor_used", function (len)
 	local chip = net.ReadEntity()
 	local activator = net.ReadEntity()
-	if not IsValid( chip ) then return end
+	if not IsValid(chip) then return end
 	if chip.link then chip = chip.link end
 	
-	if IsValid( chip ) then
+	if IsValid(chip) then
 	
 		if chip.instance then
-			chip.instance:runScriptHook( "starfallused", SF.Entities.Wrap( activator ) )
+			chip.instance:runScriptHook("starfallused", SF.Entities.Wrap(activator))
 		end
 		
 		-- Error message copying
 		if activator == LocalPlayer() then
 			if chip.error and chip.error.message then
-				SetClipboardText( string.format( "%q", chip.error.message ) )
-			elseif chip:GetDTString( 0 ) then
-				SetClipboardText( chip:GetDTString( 0 ) )
+				SetClipboardText(string.format("%q", chip.error.message))
+			elseif chip:GetDTString(0) then
+				SetClipboardText(chip:GetDTString(0))
 			end
 		end
 	end
-end )
+end)
 
 function ENT:Initialize ()
-	self.BaseClass.Initialize( self )
+	self.BaseClass.Initialize(self)
 	
-	net.Start( "starfall_processor_update_links" )
-		net.WriteEntity( self )
+	net.Start("starfall_processor_update_links")
+		net.WriteEntity(self)
 	net.SendToServer()
 	
-	local info = self.Monitor_Offsets[ self:GetModel() ]
+	local info = self.Monitor_Offsets[self:GetModel()]
 	if info then
 		local rotation, translation, translation2, scale = Matrix(), Matrix(), Matrix(), Matrix()
 		rotation:SetAngles(info.rot)
 		translation:SetTranslation(info.offset)
-		translation2:SetTranslation(Vector(-256/info.RatioX,-256,0))
-		scale:SetScale(Vector(info.RS,info.RS,info.RS))
+		translation2:SetTranslation(Vector(-256 / info.RatioX, -256, 0))
+		scale:SetScale(Vector(info.RS, info.RS, info.RS))
 		
 		self.ScreenMatrix = translation * rotation * scale * translation2
 		self.ScreenInfo = info
@@ -56,33 +56,33 @@ function ENT:Initialize ()
 	end
 end
 
-function ENT:LinkEnt ( ent )
+function ENT:LinkEnt (ent)
 	self.link = ent
 end
 
 function ENT:RenderScreen()
-	if IsValid( self.link ) then
+	if IsValid(self.link) then
 		local instance = self.link.instance
 		if instance then
-			if SF.Permissions.hasAccess( instance.player, nil, "render.screen" ) then
+			if SF.Permissions.hasAccess(instance.player, nil, "render.screen") then
 				local data = instance.data
 
 				data.render.renderEnt = self
 				data.render.useStencil = true
 
-				instance:runScriptHook( "render" )
+				instance:runScriptHook("render")
 			end
 		elseif self.link.error then
 			local error = self.link.error
 			if not error.markup then
 				local msg = error.message
 				local location = (error.file and error.line) and ("File: " .. error.file .. "\nLine: " .. error.line) or ""
-				error.markup = markup.Parse( "<font=Starfall_ErrorFont><colour=0, 255, 255, 255>Error occurred in Starfall:\n</colour><color=255, 0, 0, 255>"..msg.."\n</color><color=255, 255, 255, 255>"..location.."</color></font>", 512 )
+				error.markup = markup.Parse("<font=Starfall_ErrorFont><colour=0, 255, 255, 255>Error occurred in Starfall:\n</colour><color=255, 0, 0, 255>"..msg.."\n</color><color=255, 255, 255, 255>"..location.."</color></font>", 512)
 			end
-			surface.SetTexture( 0 )
-			surface.SetDrawColor( 0, 0, 0, 255 )
-			surface.DrawRect( 0, 0, 512, 512 )
-			error.markup:Draw(0,0,0,3)
+			surface.SetTexture(0)
+			surface.SetDrawColor(0, 0, 0, 255)
+			surface.DrawRect(0, 0, 512, 512)
+			error.markup:Draw(0, 0, 0, 3)
 		end
 	end
 end
@@ -92,7 +92,7 @@ function ENT:Draw ()
 end
 
 function ENT:SetBackgroundColor(r, g, b, a)
-	self.BackgroundColor = Color(r, g, b, math.max(a,1))
+	self.BackgroundColor = Color(r, g, b, math.max(a, 1))
 end
 
 function ENT:DrawTranslucent ()
@@ -102,40 +102,40 @@ function ENT:DrawTranslucent ()
 	-- Draw screen here
 	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
 	self.Transform = transform
-	cam.Start({type = "3D", znear = 3.001})
-	cam.PushModelMatrix( transform )
+	cam.Start({ type = "3D", znear = 3.001 })
+	cam.PushModelMatrix(transform)
 		render.ClearStencil()
-		render.SetStencilEnable( true )
-		render.SetStencilFailOperation( STENCILOPERATION_KEEP )
-		render.SetStencilZFailOperation( STENCILOPERATION_KEEP )
-		render.SetStencilPassOperation( STENCILOPERATION_REPLACE )
-		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_ALWAYS )
-		render.SetStencilWriteMask( 1 )
-		render.SetStencilReferenceValue( 1 )
+		render.SetStencilEnable(true)
+		render.SetStencilFailOperation(STENCILOPERATION_KEEP)
+		render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
+		render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
+		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_ALWAYS)
+		render.SetStencilWriteMask(1)
+		render.SetStencilReferenceValue(1)
 
-		render.OverrideDepthEnable( true, true )
-		surface.SetDrawColor(self.BackgroundColor or Color(0,0,0,255))
-		surface.DrawRect(0,0,512/self.Aspect,512)
-		render.OverrideDepthEnable( false )
+		render.OverrideDepthEnable(true, true)
+		surface.SetDrawColor(self.BackgroundColor or Color(0, 0, 0, 255))
+		surface.DrawRect(0, 0, 512 / self.Aspect, 512)
+		render.OverrideDepthEnable(false)
 
-		render.SetStencilCompareFunction( STENCILCOMPARISONFUNCTION_EQUAL )
-		render.SetStencilTestMask( 1 )
+		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
+		render.SetStencilTestMask(1)
 
-		render.PushFilterMag( TEXFILTER.ANISOTROPIC )
-		render.PushFilterMin( TEXFILTER.ANISOTROPIC )
+		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
+		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
 		self:RenderScreen()
 
 		render.PopFilterMag()
 		render.PopFilterMin()
 
-		render.SetStencilEnable( false )
+		render.SetStencilEnable(false)
 	cam.PopModelMatrix()
 	cam.End()
 end
 
 function ENT:GetResolution()
-	return 512/self.Aspect, 512
+	return 512 / self.Aspect, 512
 end
 
 ENT.Monitor_Offsets = {
