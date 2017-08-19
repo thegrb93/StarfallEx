@@ -99,7 +99,7 @@ SF.DefaultEnvironment.next = next
 -- @class function
 -- @param condition
 -- @param msg
-SF.DefaultEnvironment.assert = function (condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) end end
+SF.DefaultEnvironment.assert = function (condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) else return condition end end
 
 --- Same as Lua's unpack
 -- @name SF.DefaultEnvironment.unpack
