@@ -75,8 +75,9 @@ function ENT:RenderScreen()
 		elseif self.link.error then
 			local error = self.link.error
 			if not error.markup then
-				local msg = error.message
+				local msg = error.message or ""
 				local location = (error.file and error.line) and ("File: " .. error.file .. "\nLine: " .. error.line) or ""
+				msg = msg:sub(1,512)
 				error.markup = markup.Parse("<font=Starfall_ErrorFont><colour=0, 255, 255, 255>Error occurred in Starfall:\n</colour><color=255, 0, 0, 255>"..msg.."\n</color><color=255, 255, 255, 255>"..location.."</color></font>", 512)
 			end
 			surface.SetTexture(0)
