@@ -11,17 +11,17 @@ local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_RE
 
 -- ------------------------- Time ------------------------- --
 
---- Same as GLua's CurTime()
+--- Returns the uptime of the server in seconds (to at least 4 decimal places)
 function timer_library.curtime()
 	return CurTime()
 end
 
---- Same as GLua's RealTime()
+--- Returns the uptime of the game/server in seconds (to at least 4 decimal places)
 function timer_library.realtime()
 	return RealTime()
 end
 
---- Same as GLua's SysTime()
+--- Returns a highly accurate time in seconds since the start up, ideal for benchmarking.
 function timer_library.systime()
 	return SysTime()
 end

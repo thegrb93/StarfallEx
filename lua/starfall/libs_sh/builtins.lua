@@ -36,7 +36,7 @@ SF.DefaultEnvironment.player = nil
 -- @return entity
 SF.DefaultEnvironment.entity = nil
 
---- Same as Lua's select
+--- Used to select single values from a vararg or get the count of values in it.
 -- @name SF.DefaultEnvironment.select
 -- @class function
 -- @param parameter
@@ -44,20 +44,21 @@ SF.DefaultEnvironment.entity = nil
 -- @return Returns a number or vararg, depending on the select method.
 SF.DefaultEnvironment.select = select
 
---- Same as Lua's tostring
+--- Attempts to convert the value to a string.
 -- @name SF.DefaultEnvironment.tostring
 -- @class function
 -- @param obj
 -- @return obj as string
 SF.DefaultEnvironment.tostring = tostring
---- Same as Lua's tonumber
+
+--- Attempts to convert the value to a number.
 -- @name SF.DefaultEnvironment.tonumber
 -- @class function
 -- @param obj
 -- @return obj as number
 SF.DefaultEnvironment.tonumber = tonumber
 
---- Same as Lua's ipairs
+--- Returns an iterator function for a for loop, to return ordered key-value pairs from a table.
 -- @name SF.DefaultEnvironment.ipairs
 -- @class function
 -- @param tbl Table to iterate over
@@ -66,7 +67,7 @@ SF.DefaultEnvironment.tonumber = tonumber
 -- @return 0 as current index
 SF.DefaultEnvironment.ipairs = ipairs
 
---- Same as Lua's pairs
+--- Returns an iterator function for a for loop that will return the values of the specified table in an arbitrary order.
 -- @name SF.DefaultEnvironment.pairs
 -- @class function
 -- @param tbl Table to iterate over
@@ -75,7 +76,7 @@ SF.DefaultEnvironment.ipairs = ipairs
 -- @return nil as current index
 SF.DefaultEnvironment.pairs = pairs
 
---- Same as Lua's type
+--- Returns a string representing the name of the type of the passed object.
 -- @name SF.DefaultEnvironment.type
 -- @class function
 -- @param obj Object to get type of
@@ -85,7 +86,7 @@ SF.DefaultEnvironment.type = function(obj)
 	return type(tp) == "string" and tp or type(obj)
 end
 
---- Same as Lua's next
+--- Returns the next key and value pair in a table.
 -- @name SF.DefaultEnvironment.next
 -- @class function
 -- @param tbl Table to get the next key-value pair of
@@ -94,21 +95,21 @@ end
 -- @return Value or nil
 SF.DefaultEnvironment.next = next
 
---- Same as Lua's assert.
+--- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
 -- @name SF.DefaultEnvironment.assert
 -- @class function
 -- @param condition
 -- @param msg
 SF.DefaultEnvironment.assert = function (condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) else return condition end end
 
---- Same as Lua's unpack
+--- This function takes a numeric indexed table and return all the members as a vararg.
 -- @name SF.DefaultEnvironment.unpack
 -- @class function
 -- @param tbl
 -- @return Elements of tbl
 SF.DefaultEnvironment.unpack = unpack
 
---- Same as Lua's setmetatable. Doesn't work on most internal metatables
+--- Sets, changes or removes a table's metatable. Doesn't work on most internal metatables
 -- @name SF.DefaultEnvironment.setmetatable
 -- @class function
 -- @param tbl The table to set the metatable of
@@ -116,7 +117,7 @@ SF.DefaultEnvironment.unpack = unpack
 -- @return tbl with metatable set to meta
 SF.DefaultEnvironment.setmetatable = setmetatable
 
---- Same as Lua's getmetatable. Doesn't work on most internal metatables
+--- Returns the metatable of an object. Doesn't work on most internal metatables
 -- @param tbl Table to get metatable of
 -- @return The metatable of tbl
 SF.DefaultEnvironment.getmetatable = function(tbl)

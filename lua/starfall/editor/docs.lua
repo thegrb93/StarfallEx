@@ -545,12 +545,12 @@ Returns the entity representing a processor that this script is running on.";["c
 Returns the entity representing a processor that this script is running on.";["fname"] = "chip";["library"] = "builtin";["param"] = {}; };["hasPermission"] = { ["class"] = "function";["fname"] = "hasPermission";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.hasPermission";["summary"] = "\
 Checks if the chip is capable of performing an action.";["private"] = false;["library"] = "builtin";["description"] = "\
 Checks if the chip is capable of performing an action.";["param"] = { [1] = "perm";["perm"] = "The permission id to check"; }; };["tostring"] = { ["ret"] = "obj as string";["description"] = "\
-Same as Lua's tostring";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.tostring";["summary"] = "\
-Same as Lua's tostring ";["fname"] = "tostring";["library"] = "builtin";["param"] = { [1] = "obj";["obj"] = ""; }; };["setClipboardText"] = { ["class"] = "function";["fname"] = "setClipboardText";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setClipboardText";["summary"] = "\
+Attempts to convert the value to a string.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.tostring";["summary"] = "\
+Attempts to convert the value to a string.";["fname"] = "tostring";["library"] = "builtin";["param"] = { [1] = "obj";["obj"] = ""; }; };["setClipboardText"] = { ["class"] = "function";["fname"] = "setClipboardText";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setClipboardText";["summary"] = "\
 Sets clipboard text.";["private"] = false;["library"] = "builtin";["description"] = "\
 Sets clipboard text. Only works on the owner of the chip.";["param"] = { [1] = "txt";["txt"] = "Text to set to the clipboard"; }; };["unpack"] = { ["ret"] = "Elements of tbl";["description"] = "\
-Same as Lua's unpack";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.unpack";["summary"] = "\
-Same as Lua's unpack ";["fname"] = "unpack";["library"] = "builtin";["param"] = { [1] = "tbl";["tbl"] = ""; }; };["printMessage"] = { ["class"] = "function";["fname"] = "printMessage";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.printMessage";["summary"] = "\
+This function takes a numeric indexed table and return all the members as a vararg.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.unpack";["summary"] = "\
+This function takes a numeric indexed table and return all the members as a vararg.";["fname"] = "unpack";["library"] = "builtin";["param"] = { [1] = "tbl";["tbl"] = ""; }; };["printMessage"] = { ["class"] = "function";["fname"] = "printMessage";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.printMessage";["summary"] = "\
 Prints a message to your chat, console, or the center of your screen.";["private"] = false;["library"] = "builtin";["description"] = "\
 Prints a message to your chat, console, or the center of your screen.";["param"] = { [1] = "mtype";[2] = "text";["text"] = "The message text.";["mtype"] = "How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD"; }; };["quotaUsed"] = { ["ret"] = "Current quota used this Think";["class"] = "function";["fname"] = "quotaUsed";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.quotaUsed";["summary"] = "\
 Returns the current count for this Think's CPU Time.";["private"] = false;["library"] = "builtin";["description"] = "\
@@ -559,16 +559,16 @@ This value increases as more executions are done, may not be exactly as you want
 If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.";["param"] = {}; };["isValid"] = { ["ret"] = "If it is valid";["class"] = "function";["fname"] = "isValid";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.isValid";["summary"] = "\
 Returns if the table has an isValid function and isValid returns true.";["private"] = false;["library"] = "builtin";["description"] = "\
 Returns if the table has an isValid function and isValid returns true.";["param"] = { [1] = "object";["object"] = "Table to check"; }; };["pairs"] = { ["ret"] = { [1] = "Iterator function";[2] = "Table tbl";[3] = "nil as current index"; };["description"] = "\
-Same as Lua's pairs";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.pairs";["summary"] = "\
-Same as Lua's pairs ";["fname"] = "pairs";["library"] = "builtin";["param"] = { [1] = "tbl";["tbl"] = "Table to iterate over"; }; };["next"] = { ["ret"] = { [1] = "Key or nil";[2] = "Value or nil"; };["description"] = "\
-Same as Lua's next";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.next";["summary"] = "\
-Same as Lua's next ";["fname"] = "next";["library"] = "builtin";["param"] = { [1] = "tbl";[2] = "k";["tbl"] = "Table to get the next key-value pair of";["k"] = "Previous key (can be nil)"; }; };["assert"] = { ["class"] = "function";["realm"] = "sh";["classForced"] = true;["summary"] = "\
-Same as Lua's assert.";["name"] = "SF.DefaultEnvironment.assert";["fname"] = "assert";["private"] = false;["library"] = "builtin";["description"] = "\
-Same as Lua's assert.";["param"] = { [1] = "condition";[2] = "msg";["msg"] = "";["condition"] = ""; }; };["eyePos"] = { ["ret"] = "The local player's camera position";["class"] = "function";["fname"] = "eyePos";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.eyePos";["summary"] = "\
+Returns an iterator function for a for loop that will return the values of the specified table in an arbitrary order.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.pairs";["summary"] = "\
+Returns an iterator function for a for loop that will return the values of the specified table in an arbitrary order.";["fname"] = "pairs";["library"] = "builtin";["param"] = { [1] = "tbl";["tbl"] = "Table to iterate over"; }; };["next"] = { ["ret"] = { [1] = "Key or nil";[2] = "Value or nil"; };["description"] = "\
+Returns the next key and value pair in a table.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.next";["summary"] = "\
+Returns the next key and value pair in a table.";["fname"] = "next";["library"] = "builtin";["param"] = { [1] = "tbl";[2] = "k";["tbl"] = "Table to get the next key-value pair of";["k"] = "Previous key (can be nil)"; }; };["assert"] = { ["class"] = "function";["realm"] = "sh";["classForced"] = true;["summary"] = "\
+If the result of the first argument is false or nil, an error is thrown with the second argument as the message.";["name"] = "SF.DefaultEnvironment.assert";["fname"] = "assert";["private"] = false;["library"] = "builtin";["description"] = "\
+If the result of the first argument is false or nil, an error is thrown with the second argument as the message.";["param"] = { [1] = "condition";[2] = "msg";["msg"] = "";["condition"] = ""; }; };["eyePos"] = { ["ret"] = "The local player's camera position";["class"] = "function";["fname"] = "eyePos";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.eyePos";["summary"] = "\
 Returns the local player's camera position ";["private"] = false;["library"] = "builtin";["description"] = "\
 Returns the local player's camera position";["param"] = {}; };["ipairs"] = { ["ret"] = { [1] = "Iterator function";[2] = "Table tbl";[3] = "0 as current index"; };["description"] = "\
-Same as Lua's ipairs";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.ipairs";["summary"] = "\
-Same as Lua's ipairs ";["fname"] = "ipairs";["library"] = "builtin";["param"] = { [1] = "tbl";["tbl"] = "Table to iterate over"; }; };["player"] = { ["ret"] = "Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)";["description"] = "\
+Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.ipairs";["summary"] = "\
+Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";["fname"] = "ipairs";["library"] = "builtin";["param"] = { [1] = "tbl";["tbl"] = "Table to iterate over"; }; };["player"] = { ["ret"] = "Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)";["description"] = "\
 Same as owner() on the server. On the client, returns the local player";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.player";["summary"] = "\
 Same as owner() on the server.";["fname"] = "player";["library"] = "builtin";["param"] = {}; };["quotaTotalAverage"] = { ["ret"] = "Total average CPU Time of all your chips.";["class"] = "function";["fname"] = "quotaTotalAverage";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.quotaTotalAverage";["summary"] = "\
 Returns the total average time for all chips by the player.";["private"] = false;["library"] = "builtin";["description"] = "\
@@ -578,8 +578,8 @@ Throws an exception";["param"] = { [1] = "msg";[2] = "level";[3] = "uncatchable"
 Gets the CPU Time max.";["private"] = false;["library"] = "builtin";["description"] = "\
 Gets the CPU Time max. \
 CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.";["param"] = {}; };["getmetatable"] = { ["ret"] = "The metatable of tbl";["class"] = "function";["fname"] = "getmetatable";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.getmetatable";["summary"] = "\
-Same as Lua's getmetatable.";["private"] = false;["library"] = "builtin";["description"] = "\
-Same as Lua's getmetatable. Doesn't work on most internal metatables";["param"] = { [1] = "tbl";["tbl"] = "Table to get metatable of"; }; };["concmd"] = { ["class"] = "function";["realm"] = "sh";["summary"] = "\
+Returns the metatable of an object.";["private"] = false;["library"] = "builtin";["description"] = "\
+Returns the metatable of an object. Doesn't work on most internal metatables";["param"] = { [1] = "tbl";["tbl"] = "Table to get metatable of"; }; };["concmd"] = { ["class"] = "function";["realm"] = "sh";["summary"] = "\
 Execute a console command ";["fname"] = "concmd";["library"] = "builtin";["name"] = "SF.DefaultEnvironment.concmd";["server"] = true;["private"] = false;["client"] = true;["description"] = "\
 Execute a console command";["param"] = { [1] = "cmd";["cmd"] = "Command to execute"; }; };["getLibraries"] = { ["ret"] = "Table containing the names of each available library";["class"] = "function";["fname"] = "getLibraries";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.getLibraries";["summary"] = "\
 Gets a list of all libraries ";["private"] = false;["library"] = "builtin";["description"] = "\
@@ -611,8 +611,8 @@ Prints a table to player's chat ";["private"] = false;["library"] = "builtin";["
 Prints a table to player's chat";["param"] = { [1] = "tbl";["tbl"] = "Table to print"; }; };["entity"] = { ["ret"] = "entity";["description"] = "\
 Returns the entity with index 'num'";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.entity";["summary"] = "\
 Returns the entity with index 'num' ";["fname"] = "entity";["library"] = "builtin";["param"] = { [1] = "num";["num"] = "Entity index"; }; };["tonumber"] = { ["ret"] = "obj as number";["description"] = "\
-Same as Lua's tonumber";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.tonumber";["summary"] = "\
-Same as Lua's tonumber ";["fname"] = "tonumber";["library"] = "builtin";["param"] = { [1] = "obj";["obj"] = ""; }; };["pcall"] = { ["ret"] = { [1] = "If the function had no errors occur within it.";[2] = "If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in."; };["class"] = "function";["fname"] = "pcall";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.pcall";["summary"] = "\
+Attempts to convert the value to a number.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.tonumber";["summary"] = "\
+Attempts to convert the value to a number.";["fname"] = "tonumber";["library"] = "builtin";["param"] = { [1] = "obj";["obj"] = ""; }; };["pcall"] = { ["ret"] = { [1] = "If the function had no errors occur within it.";[2] = "If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in."; };["class"] = "function";["fname"] = "pcall";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.pcall";["summary"] = "\
 Lua's pcall with SF throw implementation \
 Calls a function and catches an error that can be thrown while the execution of the call.";["private"] = false;["library"] = "builtin";["description"] = "\
 Lua's pcall with SF throw implementation \
@@ -622,16 +622,16 @@ Runs an included script and caches the result. \
 Works pretty much like standard Lua require()";["param"] = { [1] = "file";["file"] = "The file to include. Make sure to --@include it"; }; };["eyeVector"] = { ["ret"] = "The local player's camera forward vector";["class"] = "function";["fname"] = "eyeVector";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.eyeVector";["summary"] = "\
 Returns the local player's camera forward vector ";["private"] = false;["library"] = "builtin";["description"] = "\
 Returns the local player's camera forward vector";["param"] = {}; };["type"] = { ["ret"] = "The name of the object's type.";["class"] = "function";["realm"] = "sh";["classForced"] = true;["summary"] = "\
-Same as Lua's type ";["name"] = "SF.DefaultEnvironment.type";["fname"] = "type";["private"] = false;["library"] = "builtin";["description"] = "\
-Same as Lua's type";["param"] = { [1] = "obj";["obj"] = "Object to get type of"; }; };["try"] = { ["class"] = "function";["fname"] = "try";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.try";["summary"] = "\
+Returns a string representing the name of the type of the passed object.";["name"] = "SF.DefaultEnvironment.type";["fname"] = "type";["private"] = false;["library"] = "builtin";["description"] = "\
+Returns a string representing the name of the type of the passed object.";["param"] = { [1] = "obj";["obj"] = "Object to get type of"; }; };["try"] = { ["class"] = "function";["fname"] = "try";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.try";["summary"] = "\
 Try to execute a function and catch possible exceptions \
 Similar to xpcall, but a bit more in-depth ";["private"] = false;["library"] = "builtin";["description"] = "\
 Try to execute a function and catch possible exceptions \
 Similar to xpcall, but a bit more in-depth";["param"] = { [1] = "func";[2] = "catch";["catch"] = "Optional function to execute in case func fails";["func"] = "Function to execute"; }; };["getUserdata"] = { ["ret"] = "String data";["class"] = "function";["realm"] = "sh";["fname"] = "getUserdata";["summary"] = "\
 Gets the chip's userdata that the duplicator tool loads ";["name"] = "SF.DefaultEnvironment.getUserdata";["library"] = "builtin";["private"] = false;["server"] = true;["description"] = "\
 Gets the chip's userdata that the duplicator tool loads";["param"] = {}; };["select"] = { ["ret"] = "Returns a number or vararg, depending on the select method.";["description"] = "\
-Same as Lua's select";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.select";["summary"] = "\
-Same as Lua's select ";["fname"] = "select";["library"] = "builtin";["param"] = { [1] = "parameter";[2] = "vararg";["parameter"] = "";["vararg"] = ""; }; };["owner"] = { ["ret"] = "Owner entity";["description"] = "\
+Used to select single values from a vararg or get the count of values in it.";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.select";["summary"] = "\
+Used to select single values from a vararg or get the count of values in it.";["fname"] = "select";["library"] = "builtin";["param"] = { [1] = "parameter";[2] = "vararg";["parameter"] = "";["vararg"] = ""; }; };["owner"] = { ["ret"] = "Owner entity";["description"] = "\
 Returns whoever created the chip";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.owner";["summary"] = "\
 Returns whoever created the chip ";["fname"] = "owner";["library"] = "builtin";["param"] = {}; };["setUserdata"] = { ["class"] = "function";["realm"] = "sh";["fname"] = "setUserdata";["summary"] = "\
 Sets the chip's userdata that the duplicator tool saves.";["name"] = "SF.DefaultEnvironment.setUserdata";["library"] = "builtin";["private"] = false;["server"] = true;["description"] = "\
@@ -651,8 +651,8 @@ Runs an included script, but does not cache the result. \
 Pretty much like standard Lua dofile()";["param"] = { [1] = "file";["file"] = "The file to include. Make sure to --@include it"; }; };["quotaTotalUsed"] = { ["ret"] = "Total used CPU time of all your chips.";["class"] = "function";["fname"] = "quotaTotalUsed";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.quotaTotalUsed";["summary"] = "\
 Returns the total used time for all chips by the player.";["private"] = false;["library"] = "builtin";["description"] = "\
 Returns the total used time for all chips by the player.";["param"] = {}; };["setmetatable"] = { ["ret"] = "tbl with metatable set to meta";["description"] = "\
-Same as Lua's setmetatable. Doesn't work on most internal metatables";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setmetatable";["summary"] = "\
-Same as Lua's setmetatable.";["fname"] = "setmetatable";["library"] = "builtin";["param"] = { [1] = "tbl";[2] = "meta";["meta"] = "The metatable to use";["tbl"] = "The table to set the metatable of"; }; };["error"] = { ["class"] = "function";["fname"] = "error";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.error";["summary"] = "\
+Sets, changes or removes a table's metatable. Doesn't work on most internal metatables";["class"] = "function";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setmetatable";["summary"] = "\
+Sets, changes or removes a table's metatable.";["fname"] = "setmetatable";["library"] = "builtin";["param"] = { [1] = "tbl";[2] = "meta";["meta"] = "The metatable to use";["tbl"] = "The table to set the metatable of"; }; };["error"] = { ["class"] = "function";["fname"] = "error";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.error";["summary"] = "\
 Throws a raw exception.";["private"] = false;["library"] = "builtin";["description"] = "\
 Throws a raw exception.";["param"] = { [1] = "msg";[2] = "level";["level"] = "Which level in the stacktrace to blame. Defaults to 1";["msg"] = "Exception message"; }; };["setSoftQuota"] = { ["class"] = "function";["fname"] = "setSoftQuota";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setSoftQuota";["summary"] = "\
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["private"] = false;["library"] = "builtin";["description"] = "\
@@ -661,8 +661,8 @@ Returns number of available timers ";["private"] = false;["library"] = "timer";[
 Returns number of available timers";["param"] = {}; };["frametime"] = { ["class"] = "function";["fname"] = "frametime";["realm"] = "sh";["name"] = "timer_library.frametime";["summary"] = "\
 Returns time between frames on client and ticks on server.";["private"] = false;["library"] = "timer";["description"] = "\
 Returns time between frames on client and ticks on server. Same thing as G.FrameTime in GLua";["param"] = {}; };["systime"] = { ["class"] = "function";["fname"] = "systime";["realm"] = "sh";["name"] = "timer_library.systime";["summary"] = "\
-Same as GLua's SysTime() ";["private"] = false;["library"] = "timer";["description"] = "\
-Same as GLua's SysTime()";["param"] = {}; };["adjust"] = { ["ret"] = "true if succeeded";["class"] = "function";["fname"] = "adjust";["realm"] = "sh";["name"] = "timer_library.adjust";["summary"] = "\
+Returns a highly accurate time in seconds since the start up, ideal for benchmarking.";["private"] = false;["library"] = "timer";["description"] = "\
+Returns a highly accurate time in seconds since the start up, ideal for benchmarking.";["param"] = {}; };["adjust"] = { ["ret"] = "true if succeeded";["class"] = "function";["fname"] = "adjust";["realm"] = "sh";["name"] = "timer_library.adjust";["summary"] = "\
 Adjusts a timer ";["private"] = false;["library"] = "timer";["description"] = "\
 Adjusts a timer";["param"] = { [1] = "name";[2] = "delay";[3] = "reps";[4] = "func";["name"] = "The timer name";["func"] = "The function to call when the tiemr is fired";["delay"] = "The time, in seconds, to set the timer to.";["reps"] = "The repititions of the tiemr. 0 = infinte, nil = 1"; }; };["remove"] = { ["class"] = "function";["fname"] = "remove";["realm"] = "sh";["name"] = "timer_library.remove";["summary"] = "\
 Stops and removes the timer.";["private"] = false;["library"] = "timer";["description"] = "\
@@ -683,10 +683,10 @@ Checks if a timer exists ";["private"] = false;["library"] = "timer";["descripti
 Checks if a timer exists";["param"] = { [1] = "name";["name"] = "The timer name"; }; };["stop"] = { ["ret"] = "false if the timer didn't exist or was already stopped, true otherwise.";["class"] = "function";["fname"] = "stop";["realm"] = "sh";["name"] = "timer_library.stop";["summary"] = "\
 Stops a timer ";["private"] = false;["library"] = "timer";["description"] = "\
 Stops a timer";["param"] = { [1] = "name";["name"] = "The timer name"; }; };["realtime"] = { ["class"] = "function";["fname"] = "realtime";["realm"] = "sh";["name"] = "timer_library.realtime";["summary"] = "\
-Same as GLua's RealTime() ";["private"] = false;["library"] = "timer";["description"] = "\
-Same as GLua's RealTime()";["param"] = {}; };["curtime"] = { ["class"] = "function";["fname"] = "curtime";["realm"] = "sh";["name"] = "timer_library.curtime";["summary"] = "\
-Same as GLua's CurTime() ";["private"] = false;["library"] = "timer";["description"] = "\
-Same as GLua's CurTime()";["param"] = {}; };["pause"] = { ["ret"] = "false if the timer didn't exist or was already paused, true otherwise.";["class"] = "function";["fname"] = "pause";["realm"] = "sh";["name"] = "timer_library.pause";["summary"] = "\
+Returns the uptime of the game/server in seconds (to at least 4 decimal places)";["private"] = false;["library"] = "timer";["description"] = "\
+Returns the uptime of the game/server in seconds (to at least 4 decimal places)";["param"] = {}; };["curtime"] = { ["class"] = "function";["fname"] = "curtime";["realm"] = "sh";["name"] = "timer_library.curtime";["summary"] = "\
+Returns the uptime of the server in seconds (to at least 4 decimal places)";["private"] = false;["library"] = "timer";["description"] = "\
+Returns the uptime of the server in seconds (to at least 4 decimal places)";["param"] = {}; };["pause"] = { ["ret"] = "false if the timer didn't exist or was already paused, true otherwise.";["class"] = "function";["fname"] = "pause";["realm"] = "sh";["name"] = "timer_library.pause";["summary"] = "\
 Pauses a timer ";["private"] = false;["library"] = "timer";["description"] = "\
 Pauses a timer";["param"] = { [1] = "name";["name"] = "The timer name"; }; };["start"] = { ["ret"] = "true if the timer exists, false if it doesn't.";["class"] = "function";["fname"] = "start";["realm"] = "sh";["name"] = "timer_library.start";["summary"] = "\
 Starts a timer ";["private"] = false;["library"] = "timer";["description"] = "\
