@@ -15,13 +15,13 @@ net.Receive("starfall_processor_used", function (len)
 	local activator = net.ReadEntity()
 	if not IsValid(chip) then return end
 	if chip.link then chip = chip.link end
-	
+
 	if IsValid(chip) then
-	
+
 		if chip.instance then
 			chip.instance:runScriptHook("starfallused", SF.Entities.Wrap(activator))
 		end
-		
+
 		-- Error message copying
 		if activator == LocalPlayer() then
 			if chip.error and chip.error.message then
@@ -35,11 +35,11 @@ end)
 
 function ENT:Initialize ()
 	self.BaseClass.Initialize(self)
-	
+
 	net.Start("starfall_processor_update_links")
 		net.WriteEntity(self)
 	net.SendToServer()
-	
+
 	local info = self.Monitor_Offsets[self:GetModel()]
 	if info then
 		local rotation, translation, translation2, scale = Matrix(), Matrix(), Matrix(), Matrix()
@@ -47,7 +47,7 @@ function ENT:Initialize ()
 		translation:SetTranslation(info.offset)
 		translation2:SetTranslation(Vector(-256 / info.RatioX, -256, 0))
 		scale:SetScale(Vector(info.RS, info.RS, info.RS))
-		
+
 		self.ScreenMatrix = translation * rotation * scale * translation2
 		self.ScreenInfo = info
 		self.Aspect = info.RatioX
@@ -98,7 +98,7 @@ end
 
 function ENT:DrawTranslucent ()
 	self:DrawModel()
-	
+
 	if halo.RenderedEntity() == self or not self.ScreenInfo then return end
 	-- Draw screen here
 	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
