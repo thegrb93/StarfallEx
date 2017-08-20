@@ -117,11 +117,81 @@ function props_library.create (pos, ang, model, frozen)
 
 	propdata.props[prop] = prop
 	plyCount[instance.player] = plyCount[instance.player] + 1
-	
+
 	return prop
 end
 
+local allowed_components = {
+	["starfall_screen"] = true,
+	["starfall_hud"] = true,
+}
+--- Creates starfall component.\n Allowed components:\n starfall_hud\n starfall_screen
+-- @param pos Position of created component
+-- @param ang Angle of created component
+-- @param class Class of created component
+-- @param model Model of created component
+-- @param frozen True to spawn frozen
+-- @server
+-- @return Component entity
+function props_library.createComponent (pos, ang, class, model, frozen)
+	SF.Permissions.check(SF.instance.player,  nil, "prop.create")
+	SF.CheckType(pos, SF.Types["Vector"])
+	SF.CheckType(ang, SF.Types["Angle"])
+	SF.CheckType(class, "string")
+
+	if not allowed_components[class] then return SF.Throw("Wrong class!", 1) end
+
+	local pos = vunwrap(pos)
+	local ang = SF.Angles.Unwrap(ang)
+
+	local instance = SF.instance
+	local propdata = instance.data.props
+
+	if not instance.player:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
+	if not instance.data.props.burst:use(1) then return SF.Throw("Can't spawn props that often", 2) end
+	if personal_max_reached(instance) then return SF.Throw("Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2) end
+	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then return end
+
+	local comp = ents.Create(class)
+
+	comp:CallOnRemove("starfall_prop_delete", propOnDestroy, propdata, instance.player)
+
+	comp:SetAngles(ang)
+	comp:SetPos(pos)
+	comp:SetModel(model)
+	comp:Spawn()
+
+	for I = 0,  comp:GetPhysicsObjectCount() - 1 do
+		local obj = comp:GetPhysicsObjectNum(I)
+		if obj:IsValid() then
+			obj:EnableMotion(not frozen)
+		end
+	end
+
+	if propdata.undo then
+		undo.Create(class)
+			undo.SetPlayer(instance.player)
+			undo.AddEntity(comp)
+		undo.Finish("Prop (" .. tostring(model) .. ")")
+	end
+
+	instance.player:AddCount("starfall_components", comp)
+	instance.player:AddCleanup("starfall_components", comp)
+
+	local prop = SF.Entities.Wrap(comp)
+
+	propdata.props[prop] = prop
+	plyCount[instance.player] = plyCount[instance.player] + 1
+
+	return prop
+
+end
+
 --- Creates a sent.
+-- @param pos Position of created sent
+-- @param ang Angle of created sent
+-- @param class Class of created sent
+-- @param frozen True to spawn frozen
 -- @server
 -- @return The sent object
 function props_library.createSent (pos, ang, class, frozen)
