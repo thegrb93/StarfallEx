@@ -41,6 +41,23 @@ function ENT:Initialize ()
 	net.SendToServer()
 
 	local info = self.Monitor_Offsets[self:GetModel()]
+	if not info then
+		local mins = self:OBBMins()
+		local maxs = self:OBBMaxs()
+		local size = maxs-mins
+		info = 	{
+				Name	=	"",
+				RS	= (size.y-1)/512,
+				RatioX	= size.y/size.x,
+				offset	=	self:OBBCenter()+Vector(0,0,maxs.z-0.24),
+				rot	=	Angle(0, 0, 180),
+				x1	=	0,
+				x2	=	0,
+				y1	=	0,
+				y2	=	0,
+				z	=	0,
+			}
+	end
 	if info then
 		local rotation, translation, translation2, scale = Matrix(), Matrix(), Matrix(), Matrix()
 		rotation:SetAngles(info.rot)
