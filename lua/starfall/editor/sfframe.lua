@@ -1247,11 +1247,6 @@ function Editor:InitShutdownHook()
 
 	-- save code when shutting down
 	hook.Add("ShutDown", "wire_expression2_ShutDown" .. id, function()
-			-- if sf_editor == nil then return end
-			local buffer = self:GetCode()
-			if buffer == defaultcode then return end
-			file.Write(self.Location .. "/_shutdown_.txt", buffer)
-
 			if Editor.SaveTabsVar:GetBool() then
 				self:SaveTabs()
 			end
