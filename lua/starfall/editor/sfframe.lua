@@ -22,7 +22,7 @@ Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 
 cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
-end) 
+end)
 
 surface.CreateFont("SFEditorDefault", {
 		font = "Roboto",
@@ -738,7 +738,7 @@ function Editor:InitComponents()
 		self.C.Divider:SetLeft(self.C.MainPane)
 	else --Browser on left(Default)
 		self.C.Divider:SetLeft(self.C.Browser)
-		self.C.Divider:SetRight(self.C.MainPane)		
+		self.C.Divider:SetRight(self.C.MainPane)
 	end
 	self.C.Divider:Dock(FILL)
 	self.C.Divider:SetDividerWidth(4)
@@ -773,9 +773,9 @@ function Editor:InitComponents()
 	self.C.ConBut:Dock(RIGHT)
 	self.C.ConBut:SetText("")
 	self.C.ConBut.Paint = PaintFlatButton
-	self.C.ConBut.DoClick = function() 
+	self.C.ConBut.DoClick = function()
 		self.C.Control.Permissions:Refresh()
-		self.C.Control:SetVisible(not self.C.Control:IsVisible()) 
+		self.C.Control:SetVisible(not self.C.Control:IsVisible())
 	end
 
 	self.C.Inf:SetImage("icon16/information.png")
@@ -798,7 +798,7 @@ function Editor:InitComponents()
 	self.C.NewTab:SetToolTip("New tab")
 
 	self.C.CloseTab:SetImage("icon16/page_white_delete.png")
-	self.C.CloseTab.DoClick = function(button) 
+	self.C.CloseTab.DoClick = function(button)
 		Derma_Query("Do you want to close current tab?", "Are you sure?", "Close", function() self:CloseTab() end, "Cancel", function() end)
 	end
 	self.C.CloseTab:SetToolTip("Close tab")
@@ -905,10 +905,10 @@ function Editor:InitControlPanel()
 	local tabholder = vgui.Create("DPropertySheet", frame)
 	tabholder:SetPos(2, 4)
 	frame.TabHolder = tabholder
-	
+
 	tabholder.tabScroller:DockMargin(0, 0, 3, 0)
-	tabholder.tabScroller:SetOverlap(-1)	
-	
+	tabholder.tabScroller:SetOverlap(-1)
+
 	-- They need to be resized one at a time... dirty fix incoming (If you know of a nicer way to do this, don't hesitate to fix it.)
 	local function callNext(t, n)
 		local obj = t[n]
@@ -973,7 +973,7 @@ function Editor:InitControlPanel()
 	dlist:AddItem(label)
 	label:SetText("Current Editor:")
 	label:SizeToContents()
-	
+
 	local box = vgui.Create("DComboBox")
 	dlist:AddItem(box)
 	box:SetValue(SF.Editor.CurrentTabHandler:GetString())
@@ -1049,7 +1049,7 @@ end
 
 function Editor:CreateThemesPanel()
 	-- Main panel list
-	
+
 	local panel = vgui.Create("DPanelList")
 	panel:Dock(FILL)
 	panel:DockMargin(4, 8, 4, 4)
@@ -1060,7 +1060,7 @@ function Editor:CreateThemesPanel()
 	local label = vgui.Create("DLabel")
 	panel:AddItem(label)
 	label:DockMargin(0, 0, 0, 0)
-	label:SetText("Starfall editor supports TextMate themes.\n" .. 
+	label:SetText("Starfall editor supports TextMate themes.\n" ..
 		"You can import them by pressing \"Add\" button.\n" ..
 		"Note: Those work only in wire tab editor!")
 	label:SetWrap(true)
@@ -1076,7 +1076,7 @@ function Editor:CreateThemesPanel()
 
 	function themeList:Populate()
 		themeList:Clear()
-		
+
 		local curTheme = SF.Editor.Themes.ThemeConVar:GetString()
 
 		for k, v in pairs(SF.Editor.Themes.Themes) do
@@ -1088,7 +1088,7 @@ function Editor:CreateThemesPanel()
 			end
 		end
 
-		function themeList:OnRowSelected(index, rowPanel) 
+		function themeList:OnRowSelected(index, rowPanel)
 			SF.Editor.Themes.SwitchTheme(rowPanel.theme)
 		end
 	end
@@ -1100,7 +1100,7 @@ function Editor:CreateThemesPanel()
 	local btnPanel = vgui.Create("EditablePanel")
 	panel:AddItem(btnPanel)
 	btnPanel:SetHeight(24)
-	
+
 	-- Add button
 
 	local addBtn = btnPanel:Add("StarfallButton")
@@ -1177,9 +1177,9 @@ function Editor:CreateThemesPanel()
 		if not lineId then
 			return
 		end
-		
+
 		local rowPanel = themeList:GetLine(lineId)
-		
+
 		if rowPanel.theme == "default" then
 			Derma_Message("You can't remove the default theme!", "SF Themes", "Close")
 			return
@@ -1281,9 +1281,9 @@ function Editor:OpenOldTabs()
 		if not istable(v) then continue end
 		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
-			timer.Simple(0, function() 
+			timer.Simple(0, function()
 				self:CloseTab(1)
-				self:SetActiveTabIndex(tabs.selectedTab or 1)		
+				self:SetActiveTabIndex(tabs.selectedTab or 1)
 			end)
 			is_first = false
 		end
@@ -1292,7 +1292,7 @@ function Editor:OpenOldTabs()
 		self:SetCode(v.code)
 		self:UpdateTabText(self:GetActiveTab())
 		self.C.TabHolder:InvalidateLayout()
-		
+
 	end
 	self.TabsLoaded = true
 
@@ -1545,18 +1545,18 @@ function Editor:Close()
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives("file", self:GetCode(), ppdata)
 		if ppdata.models and ppdata.models.file ~= "" then
-			model = ppdata.models.file 
+			model = ppdata.models.file
 		end
 
 		RunConsoleCommand("starfall_processor_ScriptModel", model or "")
-	end 
+	end
 	hook.Run("StarfallEditorClose")
 end
 
 function Editor:Setup(nTitle, nLocation, nEditorType)
-	
+
 	self:InitControlPanel() -- We're initializing it there, so tabhandlers are already registered
-	
+
 	self.Title = nTitle
 	self.Location = nLocation
 	self.EditorType = nEditorType
@@ -1584,7 +1584,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SoundBrw:SetText("Sound Browser")
 	SoundBrw.DoClick = function() RunConsoleCommand("wire_sound_browser_open") end
 	self.C.SoundBrw = SoundBrw
-	
+
 	self:NewTab()
 	if Editor.OpenOldTabsVar:GetBool() then
 		self:OpenOldTabs()
