@@ -47,7 +47,7 @@ function createFont(name, FontName, Size)
 	fontTable.weight = 800
 	surface.CreateFont(name.."_Bold", fontTable)
 	fontTable.weight = 400
-	fontTable.italic = true
+	fontTable.italic = false--true
 	surface.CreateFont(name.."_Italic", fontTable)
 
 end
