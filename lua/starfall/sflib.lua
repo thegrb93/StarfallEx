@@ -53,11 +53,12 @@ function SF.MakeError (msg, level, uncatchable, prependinfo)
 		info = { short_src = "", currentline = 0 }
 		prependinfo = false
 	end
+	if type(msg) ~= "string" then msg = "(error object is not a string)" end
 	return setmetatable({
 		uncatchable = false,
 		file = info.short_src,
 		line = info.currentline,
-		message = prependinfo and (info.short_src..":"..info.currentline..": "..tostring(msg)) or tostring(msg),
+		message = prependinfo and (info.short_src..":"..info.currentline..": "..msg) or msg,
 		uncatchable = uncatchable,
 		traceback = debug.traceback("", level)
 	}, SF.Errormeta)
