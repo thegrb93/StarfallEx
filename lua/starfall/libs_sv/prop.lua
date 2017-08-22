@@ -139,7 +139,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	SF.CheckType(ang, SF.Types["Angle"])
 	SF.CheckType(class, "string")
 
-	if not allowed_components[class] then return SF.Throw("Wrong class!", 1) end
+	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
 	local pos = vunwrap(pos)
 	local ang = SF.Angles.Unwrap(ang)
