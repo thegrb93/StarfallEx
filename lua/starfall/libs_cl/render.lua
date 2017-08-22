@@ -358,6 +358,11 @@ local defaultFont
 function render_library.pushMatrix(m, world)
 	SF.CheckType(m, matrix_meta)
 	local renderdata = SF.instance.data.render
+
+	if world == nil then
+		world = renderdata.usingRT
+	end
+
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local id = #matrix_stack
 	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matricies", 2) end
@@ -475,7 +480,7 @@ function render_library.setBackgroundColor(col, screen)
 	local renderdata = SF.instance.data.render
 
 	SF.CheckType(col, col_meta)
-	
+
 	if screen then
 		SF.CheckType(screen, ent_meta)
 		screen = eunwrap(screen)
