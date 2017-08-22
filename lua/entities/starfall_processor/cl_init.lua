@@ -4,7 +4,7 @@ DEFINE_BASECLASS("base_gmodentity")
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-function ENT:Initialize()	
+function ENT:Initialize()
 	self.CPUpercent = 0
 	self.CPUus = 0
 	self.name = "Generic ( No-Name )"
@@ -31,7 +31,7 @@ function ENT:OnRemove ()
 	if self.instance then
 		self.instance:runScriptHook("removed")
 	end
-	
+
 	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
 	local instance = self.instance
 	if instance then
@@ -93,14 +93,14 @@ net.Receive("starfall_processor_download", function (len)
 	local dlProc = net.ReadEntity()
 	local dlOwner = net.ReadEntity()
 	local dlMain = net.ReadString()
-	
+
 	if not dlProc:IsValid() or not dlOwner:IsValid() then return end
 	dlProc.owner = dlOwner
-	
+
 	local I = 0
 	while I < 256 do
 		if net.ReadBit() ~= 0 then break end
-		
+
 		local filename = net.ReadString()
 
 		net.ReadStream(nil, function(data)
@@ -111,7 +111,7 @@ net.Receive("starfall_processor_download", function (len)
 				dlProc.restarting = false
 			end
 		end)
-		
+
 		I = I + 1
 	end
 
