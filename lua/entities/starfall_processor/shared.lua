@@ -9,6 +9,7 @@ ENT.Instructions    = ""
 
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
+ENT.Starfall  = true
 
 ENT.States = {
 	Normal = 1,
@@ -101,3 +102,33 @@ function ENT:Error (err)
 		print(traceback)
 	end
 end
+
+local function MenuOpen( ContextMenu, Option, Entity, Trace )
+	local SubMenu = Option:AddSubMenu( )
+
+	SubMenu:AddOption( "Restart Clientside",
+		function( )
+			Entity:Restart()
+		end )
+		
+	SubMenu:AddOption( "Terminate Clientside",
+			function( )
+				Entity:Terminate()
+			end )
+end
+
+properties.Add( "starfall", {
+	MenuLabel = "StarfallEx",
+	Order = 999,
+	MenuIcon = "icon16/wrench.png", -- We should create an icon
+
+	Filter = function( self, ent, ply )
+		if ( !IsValid( ent ) ) then return false end
+		if ( !gamemode.Call( "CanProperty", ply, "starfall", ent ) ) then return false end
+
+		return ent.Starfall ~= nil
+	end,
+	MenuOpen = MenuOpen,
+	Action = function( self, ent )
+	end,
+} )
