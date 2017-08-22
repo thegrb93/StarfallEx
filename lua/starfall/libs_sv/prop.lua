@@ -164,7 +164,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	local mdl = comp:GetModel()
 	if not mdl or mdl == "models/error.mdl" then
 		comp:Remove()
-		return SF.Throw("Wrong model!", 1)
+		return SF.Throw("Invalid model!", 1)
 	end
 
 	for I = 0,  comp:GetPhysicsObjectCount() - 1 do
