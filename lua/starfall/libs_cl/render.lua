@@ -149,10 +149,10 @@ SF.Libraries.AddHook("prepare", function (instance, hook)
 		render.SetColorMaterial()
 		draw.NoTexture()
 		surface.SetDrawColor(255, 255, 255, 255)
-		
+
 		local data = instance.data.render
 		data.isRendering = true
-		
+
 		if hook=="renderoffscreen" then
 			data.needRT = true
 			instance:runFunction(function()
@@ -492,11 +492,11 @@ function render_library.setBackgroundColor(col, screen)
 			screen = renderdata.renderEnt
 		end
 	end
-	
+
 	if not screen then
 		SF.Throw("Invalid rendering entity.", 2)
 	end
-	
+
 	if screen.SetBackgroundColor then --Fail silently on HUD etc
 		screen:SetBackgroundColor(col.r, col.g, col.b, col.a)
 	end
@@ -529,7 +529,7 @@ end
 -- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
 function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	SF.CheckType(tx, "string")
-		
+
 	local instance = SF.instance
 	local data = instance.data.render
 	if #tx > cv_max_data_material_size:GetInt() then
@@ -1291,7 +1291,7 @@ function render_library.cursorPos(ply)
 	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
 
 	ply = ply and eunwrap(ply) or LocalPlayer()
-	
+
 	if not IsValid(ply) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
 
 	local Normal, Pos
