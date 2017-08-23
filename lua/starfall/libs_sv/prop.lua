@@ -155,9 +155,9 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	local comp = ents.Create(class)
 
 	comp:CallOnRemove("starfall_prop_delete", propOnDestroy, propdata, instance.player)
-
-	comp:SetAngles(ang)
-	comp:SetPos(pos)
+	
+	SF.setPos(comp, pos)
+	SF.setAng(comp, ang)
 	comp:SetModel(model)
 	comp:Spawn()
 
