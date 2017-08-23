@@ -58,7 +58,7 @@ function bass_library.loadFile (path, flags, callback)
 	
 	local instance = SF.instance
 
-	sound.PlayFile(path, flags, function(snd, er, name)
+	sound.PlayFile(path, flags.." 3d", function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
 		else
@@ -85,7 +85,7 @@ function bass_library.loadURL (path, flags, callback)
 
 	local instance = SF.instance
 
-	sound.PlayURL(path, flags, function(snd, er, name)
+	sound.PlayURL(path, flags.." 3d", function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
 		else
