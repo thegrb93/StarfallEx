@@ -352,6 +352,110 @@ local defaultFont
 
 -- ------------------------------------------------------------------ --
 
+function render_library.setStencilEnable(enable)
+	enable = (enable == true) -- Make sure it's a boolean
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	render.SetStencilEnable(enable)
+end
+
+function render_library.clearStencil()
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	render.ClearStencil()
+end
+
+function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
+	SF.CheckType(r, "number")
+	SF.CheckType(g, "number")
+	SF.CheckType(b, "number")
+	SF.CheckType(a, "number")
+	SF.CheckType(depth, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.ClearBuffersObeyStencil(r, g, b, a, depth)
+end
+
+function render_library.clearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
+	SF.CheckType(originX, "number")
+	SF.CheckType(originY, "number")
+	SF.CheckType(endX, "number")
+	SF.CheckType(endY, "number")
+	SF.CheckType(stencilValue, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.ClearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
+end
+
+function render_library.setStencilCompareFunction(compareFunction)
+	SF.CheckType(compareFunction, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilCompareFunction(compareFunction )
+end
+
+function render_library.setStencilFailOperation(operation)
+	SF.CheckType(operation, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilFailOperation(operation)
+end
+
+function render_library.setStencilPassOperation(operation)
+	SF.CheckType(operation, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilPassOperation(operation)
+end
+
+function render_library.setStencilZFailOperation(operation)
+	SF.CheckType(operation, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilZFailOperation(operation)
+end
+
+function render_library.setStencilReferenceValue(referenceValue)
+	SF.CheckType(referenceValue, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilReferenceValue(referenceValue)
+end
+
+function render_library.setStencilTestMask(mask)
+	SF.CheckType(mask, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilTestMask(mask)
+end
+
+function render_library.setStencilWriteMask(mask)
+	SF.CheckType(mask, "number")
+
+	local renderdata = SF.instance.data.render
+	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+
+	render.SetStencilWriteMask(mask)
+end
+
+-- ------------------------------------------------------------------ --
+
 --- Pushes a matrix onto the matrix stack.
 -- @param m The matrix
 -- @param world Should the transformation be relative to the screen or world?
@@ -722,8 +826,16 @@ function render_library.selectRenderTarget (name)
 			end
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
-			if data.useStencil then
+			if data.useStencil then -- Revert ALL stencil settings from screen
 				render.SetStencilEnable(true)
+				render.SetStencilFailOperation(STENCILOPERATION_KEEP)
+				render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
+				render.SetStencilPassOperation(STENCILOPERATION_REPLACE)
+				render.SetStencilWriteMask(1)
+				render.SetStencilReferenceValue(1)
+				render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
+				render.SetStencilTestMask(1)
+
 			end
 		end
 	end
