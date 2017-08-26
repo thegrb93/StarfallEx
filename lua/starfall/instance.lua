@@ -341,14 +341,13 @@ end
 
 --- Errors the instance. Should only be called from the tips of the call tree (aka from places such as the hook library, timer library, the entity's think function, etc)
 function SF.Instance:Error(err)
-	
+	if self.error then return end
 	if self.runOnError then -- We have a custom error function, use that instead
 		self:runOnError(err)
 	else
 		-- Default behavior
 		self:deinitialize()
 	end
-	
 end
 
 -- Don't self modify. The average should only the modified per tick.

@@ -784,10 +784,11 @@ end
 -- @return If the function had no errors occur within it.
 -- @return If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.
 function SF.DefaultEnvironment.pcall (func, ...)
-	local vret = { pcall(func, ...) }
-	local ok, err = vret[1], vret[2]
+	local vret = SF.instance:runFunction(pcall, func, ...)
+	local ok0, ok, err = vret[1], vret[2], vret[3]
 	
-	if ok then return unpack(vret) end
+	if not ok0 then SF.Throw(ok, 2, true) end
+	if ok then return unpack(vret, 2) end
 	
 	if type(err) == "table" then
 		if err.uncatchable then
@@ -809,10 +810,11 @@ end
 -- @return Status of the execution; true for success, false for failure.
 -- @return The returns of the first function if execution succeeded, otherwise the first return value of the error callback.
 function SF.DefaultEnvironment.xpcall (func, callback, ...)
-	local vret = { pcall(func, ...) }
-	local ok, err = vret[1], vret[2]
+	local vret = SF.instance:runFunction(xpcall, func, callback, ...)
+	local ok0, ok, err = vret[1], vret[2], vret[3]
 	
-	if ok then return unpack(vret) end
+	if not ok0 then SF.Throw(ok, 2, true) end
+	if ok then return unpack(vret, 2) end
 	
 	if type(err) == "table" then
 		if err.uncatchable then
@@ -831,7 +833,10 @@ end
 -- @param func Function to execute
 -- @param catch Optional function to execute in case func fails
 function SF.DefaultEnvironment.try (func, catch)
-	local ok, err = pcall(func)
+	local vret = SF.instance:runFunction(pcall, func)
+	local ok0, ok, err = vret[1], vret[2], vret[3]
+	
+	if not ok0 then SF.Throw(ok, 2, true) end
 	if ok then return end
 
 	if type(err) == "table" then
