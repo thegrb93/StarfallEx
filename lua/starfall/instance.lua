@@ -109,6 +109,8 @@ function SF.Instance:runWithOps(func, ...)
 			local source = debug.getinfo(3, "S").short_src
 			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
 				SF.Throw(msg, 3, nocatch)
+			else
+				debug.sethook(cpuCheck, "", 1)
 			end
 		end
 		
