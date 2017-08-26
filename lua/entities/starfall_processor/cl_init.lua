@@ -4,17 +4,34 @@ DEFINE_BASECLASS("base_gmodentity")
 
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-function ENT:Initialize()	
+function ENT:Initialize()
 	self.CPUpercent = 0
 	self.CPUus = 0
 	self.name = "Generic ( No-Name )"
+end
+
+function ENT:Terminate()
+	self.instance:deinitialize()
+	self.CPUpercent = 0
+	self.CPUus = 0
+	self.instance = nil
+end
+
+function ENT:Restart()
+	self:Terminate()
+	self.restarting = true
+	timer.Simple(0,function()
+		net.Start("starfall_processor_download")
+			net.WriteEntity(self)
+		net.SendToServer()
+	end)
 end
 
 function ENT:OnRemove ()
 	if self.instance then
 		self.instance:runScriptHook("removed")
 	end
-	
+
 	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
 	local instance = self.instance
 	if instance then
@@ -41,7 +58,10 @@ function ENT:GetOverlayText()
 		local bufferAvg = self.instance.cpu_average
 		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / self.instance.cpuQuota * 100)) .. "%)"
 	else
-		clientstr = "Errored"
+		clientstr = "Errored / Terminated"
+	end
+	if self.restarting then
+			clientstr = "Restarting.."
 	end
 	if state == 1 then
 		serverstr = tostring(self:GetNWInt("CPUus", 0)) .. "us. (" .. tostring(self:GetNWFloat("CPUpercent", 0)) .. "%)"
@@ -73,14 +93,14 @@ net.Receive("starfall_processor_download", function (len)
 	local dlProc = net.ReadEntity()
 	local dlOwner = net.ReadEntity()
 	local dlMain = net.ReadString()
-	
+
 	if not dlProc:IsValid() or not dlOwner:IsValid() then return end
 	dlProc.owner = dlOwner
-	
+
 	local I = 0
 	while I < 256 do
 		if net.ReadBit() ~= 0 then break end
-		
+
 		local filename = net.ReadString()
 
 		net.ReadStream(nil, function(data)
@@ -88,9 +108,10 @@ net.Receive("starfall_processor_download", function (len)
 			dlFiles[filename] = data or ""
 			if dlProc:IsValid() and dlNumFiles.Completed == dlNumFiles.NumFiles then
 				dlProc:Compile(dlOwner, dlFiles, dlMain)
+				dlProc.restarting = false
 			end
 		end)
-		
+
 		I = I + 1
 	end
 
