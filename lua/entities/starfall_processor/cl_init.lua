@@ -11,10 +11,12 @@ function ENT:Initialize()
 end
 
 function ENT:Terminate()
-	self.instance:deinitialize()
+	if self.instance then
+		self.instance:deinitialize()
+		self.instance = nil
+	end
 	self.CPUpercent = 0
 	self.CPUus = 0
-	self.instance = nil
 end
 
 function ENT:Restart()
