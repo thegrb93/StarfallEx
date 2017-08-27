@@ -58,7 +58,7 @@ function bass_library.loadFile (path, flags, callback)
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 	
-	if not string.lower(flags):match(' [3?]d ') then
+	if not string.lower(flags):find('3d') then
 		SF.Permissions.check(SF.instance.player, uw, "bass.play2d")
 	end
 	
@@ -93,7 +93,7 @@ function bass_library.loadURL (path, flags, callback)
 	local instance = SF.instance
 	
 	
-	if  not string.lower(flags):match(' [3?]d ') then
+	if  not string.lower(flags):find('3d') then
 		SF.Permissions.check(SF.instance.player, uw, "bass.play2d")
 	end
 
