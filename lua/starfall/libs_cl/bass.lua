@@ -5,6 +5,8 @@ do
 	local P = SF.Permissions
 	P.registerPrivilege("bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = {} })
 	P.registerPrivilege("bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = {} })
+	P.registerPrivilege("bass.play2d", "Play sounds in a 2D context (Usually global)", "Allows users to create stereo sounds which play in a 2d space (Usually globally) .", { ["Client"] = {} })
+	
 end
 
 --- Bass type
@@ -56,9 +58,14 @@ function bass_library.loadFile (path, flags, callback)
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 	
+	if not string.lower(flags):match(' [3?]d ') then
+		SF.Permissions.check(SF.instance.player, uw, "bass.play2d")
+	end
+	
 	local instance = SF.instance
-
-	sound.PlayFile(path, flags.." 3d", function(snd, er, name)
+	
+	
+	sound.PlayFile(path, flags , function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
 		else
@@ -84,8 +91,13 @@ function bass_library.loadURL (path, flags, callback)
 	SF.CheckType(callback, "function")
 
 	local instance = SF.instance
+	
+	
+	if  not string.lower(flags):match(' [3?]d ') then
+		SF.Permissions.check(SF.instance.player, uw, "bass.play2d")
+	end
 
-	sound.PlayURL(path, flags.." 3d", function(snd, er, name)
+	sound.PlayURL(path, flags, function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
 		else
