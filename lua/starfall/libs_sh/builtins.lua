@@ -121,7 +121,7 @@ SF.DefaultEnvironment.setmetatable = setmetatable
 -- @param tbl Table to get metatable of
 -- @return The metatable of tbl
 SF.DefaultEnvironment.getmetatable = function(tbl)
-	SF.CheckLuaType(tbl, "table")
+	SF.CheckLuaType(tbl, TYPE_TABLE)
 	return getmetatable(tbl)
 end
 
@@ -186,7 +186,7 @@ end
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50% 
 function SF.DefaultEnvironment.setSoftQuota (quota)
-	SF.CheckLuaType(quota, "number")
+	SF.CheckLuaType(quota, TYPE_NUMBER)
 	SF.instance.cpu_softquota = quota
 end
 
@@ -194,7 +194,7 @@ end
 --@param perm The permission id to check
 --@param obj Optional object to pass to the permission system.
 function SF.DefaultEnvironment.hasPermission(perm, obj)
-	SF.CheckLuaType(perm, "string")
+	SF.CheckLuaType(perm, TYPE_STRING)
 	return SF.Permissions.hasAccess(SF.instance.player, SF.UnwrapObject(obj), perm)
 end
 
@@ -330,21 +330,21 @@ function math_methods.bSplinePoint(tDiff, tPoints, tMax)
 	return SF.WrapObject(math.BSplinePoint(tDiff, SF.Unsanitize(tPoints), tMax))
 end
 function math_methods.lerp(percent, from, to)
-	SF.CheckLuaType(percent, "number")
-	SF.CheckLuaType(from, "number")
-	SF.CheckLuaType(to, "number")
+	SF.CheckLuaType(percent, TYPE_NUMBER)
+	SF.CheckLuaType(from, TYPE_NUMBER)
+	SF.CheckLuaType(to, TYPE_NUMBER)
 	
 	return Lerp(percent, from, to)
 end
 function math_methods.lerpAngle(percent, from, to)
-	SF.CheckLuaType(percent, "number")
+	SF.CheckLuaType(percent, TYPE_NUMBER)
 	SF.CheckType(from, SF.Types["Angle"])
 	SF.CheckType(to, SF.Types["Angle"])
 	
 	return SF.WrapObject(LerpAngle(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
 end
 function math_methods.lerpVector(percent, from, to)
-	SF.CheckLuaType(percent, "number")
+	SF.CheckLuaType(percent, TYPE_NUMBER)
 	SF.CheckType(from, SF.Types["Vector"])
 	SF.CheckType(to, SF.Types["Vector"])
 	
@@ -444,7 +444,7 @@ end
 --@param key The index of the table
 --@param value The value to set the index equal to
 function SF.DefaultEnvironment.rawset(table, key, value)
-    SF.CheckLuaType(table, "table")
+    SF.CheckLuaType(table, TYPE_TABLE)
 
     rawset(table, key, value)
 end
@@ -454,7 +454,7 @@ end
 --@param key The index of the table
 --@return The value of the index
 function SF.DefaultEnvironment.rawget(table, key, value)
-    SF.CheckLuaType(table, "table")
+    SF.CheckLuaType(table, TYPE_TABLE)
 
     return rawget(table, key)
 end
@@ -519,7 +519,7 @@ if SERVER then
 	--- Prints a table to player's chat
 	-- @param tbl Table to print
 	function SF.DefaultEnvironment.printTable (tbl)
-		SF.CheckLuaType(tbl, "table")
+		SF.CheckLuaType(tbl, TYPE_TABLE)
 		printTableX(tbl, 0, { tbl = true })
 	end
 
@@ -527,7 +527,7 @@ if SERVER then
 	-- @shared
 	-- @param cmd Command to execute
 	function SF.DefaultEnvironment.concmd (cmd)
-		SF.CheckLuaType(cmd, "string")
+		SF.CheckLuaType(cmd, TYPE_STRING)
 		SF.Permissions.check(SF.instance.player, nil, "console.command")
 		SF.instance.player:ConCommand(cmd)
 	end
@@ -536,7 +536,7 @@ if SERVER then
 	-- @server
 	-- @param str String data
 	function SF.DefaultEnvironment.setUserdata(str)
-		SF.CheckLuaType(str, "string")
+		SF.CheckLuaType(str, TYPE_STRING)
 		if #str>1048576 then SF.Throw("The userdata limit is 1MiB", 2) end
 		SF.instance.data.userdata = str
 	end
@@ -552,7 +552,7 @@ else
 	-- @client
 	-- @param name Name
 	function SF.DefaultEnvironment.setName(name)
-		SF.CheckLuaType(name, "string")
+		SF.CheckLuaType(name, TYPE_STRING)
 		local e = SF.instance.data.entity
 		if IsValid(e) then
 			e.name = string.sub(name, 1, 256)
@@ -563,7 +563,7 @@ else
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText(txt)
 		if SF.instance.player ~= LocalPlayer() then return end
-		SF.CheckLuaType(txt, "string")
+		SF.CheckLuaType(txt, TYPE_STRING)
 		SetClipboardText(txt)
 	end
 
@@ -572,7 +572,7 @@ else
 	-- @param text The message text.
 	function SF.DefaultEnvironment.printMessage(mtype, text)
 		if SF.instance.player ~= LocalPlayer() then return end
-		SF.CheckLuaType(text, "string")
+		SF.CheckLuaType(text, TYPE_STRING)
 		SF.instance.player:PrintMessage(mtype, text)
 	end
 
@@ -583,14 +583,14 @@ else
 	end
 
 	function SF.DefaultEnvironment.printTable (tbl)
-		SF.CheckLuaType(tbl, "table")
+		SF.CheckLuaType(tbl, TYPE_TABLE)
 		if SF.instance.player == LocalPlayer() then
 			printTableX(tbl, 0, { tbl = true })
 		end
 	end
 
 	function SF.DefaultEnvironment.concmd (cmd)
-		SF.CheckLuaType(cmd, "string")
+		SF.CheckLuaType(cmd, TYPE_STRING)
 		SF.Permissions.check(SF.instance.player, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
 	end
@@ -619,7 +619,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function SF.DefaultEnvironment.require(file)
-	SF.CheckLuaType(file, "string")
+	SF.CheckLuaType(file, TYPE_STRING)
 	local loaded = SF.instance.data.reqloaded
 	if not loaded then
 		loaded = {}
@@ -653,8 +653,8 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function SF.DefaultEnvironment.requiredir(dir, loadpriority)
-	SF.CheckLuaType(dir, "string")
-	if loadpriority then SF.CheckLuaType(loadpriority, "table") end
+	SF.CheckLuaType(dir, TYPE_STRING)
+	if loadpriority then SF.CheckLuaType(loadpriority, TYPE_TABLE) end
 	
 	local returns = {}
 
@@ -682,7 +682,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
-	SF.CheckLuaType(file, "string")
+	SF.CheckLuaType(file, TYPE_STRING)
 	local path
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
@@ -702,8 +702,8 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function SF.DefaultEnvironment.dodir(dir, loadpriority)
-	SF.CheckLuaType(dir, "string")
-	if loadpriority then SF.CheckLuaType(loadpriority, "table") end
+	SF.CheckLuaType(dir, TYPE_STRING)
+	if loadpriority then SF.CheckLuaType(loadpriority, TYPE_TABLE) end
 
 	local returns = {}
 
@@ -768,7 +768,7 @@ end
 function SF.DefaultEnvironment.debugGetInfo (funcOrStackLevel, fields)
 	local TfuncOrStackLevel = type(funcOrStackLevel)
 	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.Throw("Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2) end
-	if fields then SF.CheckLuaType(fields, "string") end
+	if fields then SF.CheckLuaType(fields, TYPE_STRING) end
 	
 	local ret = debug.getinfo(funcOrStackLevel, fields)
 	if ret then

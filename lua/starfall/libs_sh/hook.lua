@@ -14,9 +14,9 @@ local wrapArguments = SF.Sanitize
 -- @param name Unique identifier
 -- @param func Function to run
 function hook_library.add (hookname, name, func)
-	SF.CheckLuaType(hookname, "string")
-	SF.CheckLuaType(name, "string")
-	SF.CheckLuaType(func, "function")
+	SF.CheckLuaType(hookname, TYPE_STRING)
+	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(func, TYPE_FUNCTION)
 
 	hookname = hookname:lower()
 	local inst = SF.instance
@@ -95,7 +95,7 @@ end
 -- @param hookname The hook name
 -- @param ... arguments
 function hook_library.run (hookname, ...)
-	SF.CheckLuaType(hookname, "string")
+	SF.CheckLuaType(hookname, TYPE_STRING)
 
 	local instance = SF.instance
 	local hook = hookname:lower()
@@ -164,8 +164,8 @@ end
 -- @param hookname The hook name
 -- @param name The unique name for this hook
 function hook_library.remove (hookname, name)
-	SF.CheckLuaType(hookname, "string")
-	SF.CheckLuaType(name, "string")
+	SF.CheckLuaType(hookname, TYPE_STRING)
+	SF.CheckLuaType(name, TYPE_STRING)
 	local instance = SF.instance
 
 	local lower = hookname:lower()

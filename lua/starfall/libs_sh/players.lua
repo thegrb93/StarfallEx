@@ -412,7 +412,7 @@ end
 -- @return weapon
 function player_methods:getWeapon(wep)
 	SF.CheckType(self, player_metamethods)
-	SF.CheckLuaType(wep, "string")
+	SF.CheckLuaType(wep, TYPE_STRING)
 	return SF.Weapons.Wrap(eunwrap(self):GetWeapon(wep))
 end
 
@@ -498,7 +498,7 @@ end
 -- @return True or false
 function player_methods:keyDown (key)
 	SF.CheckType(self, player_metamethods)
-	SF.CheckLuaType(key, "number")
+	SF.CheckLuaType(key, TYPE_NUMBER)
 	
 	local ent = eunwrap(self)
 	if not IsValid(ent) then return false end

@@ -139,19 +139,29 @@ end
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
 -- @param default A value to return if val is nil.
 function SF.CheckLuaType(val, typ, level, default)
-	local valtype = type(val)
+	local valtype = TypeID(val)
 	if valtype==typ then 
 		return val
 	elseif val == nil and default then
 		return default
 	else
 		-- Failed, throw error
-		assert(type(typ) == "string")
+		assert(type(typ) == "number")
+		local typeLookup = {
+			[TYPE_BOOL] = "boolean",
+			[TYPE_FUNCTION] = "function",
+			[TYPE_NIL] = "nil",
+			[TYPE_NUMBER] = "number",
+			[TYPE_STRING] = "string",
+			[TYPE_TABLE] = "table",
+			[TYPE_THREAD] = "thread",
+			[TYPE_USERDATA] = "userdata"
+		}
 
 		level = (level or 0) + 3
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
-		SF.Throw("Type mismatch (Expected " .. typ .. ", got " .. (type(mt) == "string" and mt or valtype) .. ") in function " .. funcname, level)
+		SF.Throw("Type mismatch (Expected " .. typeLookup[typ] .. ", got " .. (type(mt) == "string" and mt or typeLookup[valtype]) .. ") in function " .. funcname, level)
 	end
 end
 

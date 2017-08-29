@@ -9,7 +9,7 @@ local util = util
 --@param tbl Table to encode
 --@return JSON encoded string representation of the table
 function json_library.encode (tbl)
-	SF.CheckLuaType(tbl, "table")
+	SF.CheckLuaType(tbl, TYPE_TABLE)
 	return util.TableToJSON(SF.Unsanitize(tbl))
 end
 
@@ -17,6 +17,6 @@ end
 -- @param s String to decode
 -- @return Table representing the JSON object
 function json_library.decode (s)
-	SF.CheckLuaType(s, "string")
+	SF.CheckLuaType(s, TYPE_STRING)
 	return SF.Sanitize(util.JSONToTable(s))
 end

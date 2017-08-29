@@ -71,7 +71,7 @@ function props_library.create (pos, ang, model, frozen)
 
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckLuaType(model, "string")
+	SF.CheckLuaType(model, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)
@@ -137,7 +137,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	SF.Permissions.check(SF.instance.player,  nil, "prop.create")
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckLuaType(class, "string")
+	SF.CheckLuaType(class, TYPE_STRING)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
@@ -206,7 +206,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckLuaType(class, "string")
+	SF.CheckLuaType(class, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)

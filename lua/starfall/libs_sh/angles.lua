@@ -78,7 +78,7 @@ end
 -- @param n Number to multiply by.
 -- @return resultant angle.
 function ang_metamethods.__mul (a, n)
-	SF.CheckLuaType(n, "number")
+	SF.CheckLuaType(n, TYPE_NUMBER)
 
 	return wrap({ a[1] * n, a[2] * n, a[3] * n })
 end
@@ -88,7 +88,7 @@ end
 -- @return resultant angle.
 function ang_metamethods.__div (a, n)
 	SF.CheckType(a, ang_metamethods)
-	SF.CheckLuaType(n, "number")
+	SF.CheckLuaType(n, TYPE_NUMBER)
 
 	return wrap({ a[1] / n, a[2] / n, a[3] / n })
 end
@@ -179,10 +179,10 @@ function ang_methods:rotateAroundAxis (v, deg, rad)
 	SF.CheckType(v, SF.Types["Vector"])
 
 	if rad then
-		SF.CheckLuaType(rad, "number")
+		SF.CheckLuaType(rad, TYPE_NUMBER)
 		deg = math.deg(rad)
 	else
-		SF.CheckLuaType(deg, "number")
+		SF.CheckLuaType(deg, TYPE_NUMBER)
 	end
 
 	local ret = Angle()

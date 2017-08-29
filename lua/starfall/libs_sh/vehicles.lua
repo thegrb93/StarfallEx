@@ -64,7 +64,7 @@ if SERVER then
 	-- @return amount of ammo
 	function vehicle_methods:getPassenger (n)
 		SF.CheckType(self, vehicle_metamethods)
-		SF.CheckLuaType(n, "number")
+		SF.CheckLuaType(n, TYPE_NUMBER)
 		local ent = SF.Entities.Unwrap(self)
 		return SF.WrapObject(ent:GetPassenger(n))
 	end

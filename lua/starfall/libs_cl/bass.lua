@@ -55,9 +55,9 @@ end
 function bass_library.loadFile (path, flags, callback)
 	SF.Permissions.check(SF.instance.player, nil, "bass.loadFile")
 
-	SF.CheckLuaType(path, "string")
-	SF.CheckLuaType(flags, "string")
-	SF.CheckLuaType(callback, "function")
+	SF.CheckLuaType(path, TYPE_STRING)
+	SF.CheckLuaType(flags, TYPE_STRING)
+	SF.CheckLuaType(callback, TYPE_FUNCTION)
 
 	if path:match('["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
@@ -91,9 +91,9 @@ end
 function bass_library.loadURL (path, flags, callback)
 	SF.Permissions.check(SF.instance.player, nil, "bass.loadURL")
 
-	SF.CheckLuaType(path, "string")
-	SF.CheckLuaType(flags, "string")
-	SF.CheckLuaType(callback, "function")
+	SF.CheckLuaType(path, TYPE_STRING)
+	SF.CheckLuaType(flags, TYPE_STRING)
+	SF.CheckLuaType(callback, TYPE_FUNCTION)
 
 	local instance = SF.instance
 
@@ -158,7 +158,7 @@ end
 -- @param vol Volume to set to, between 0 and 1.
 function bass_methods:setVolume (vol)
 	SF.CheckType(self, bass_metamethods)
-	SF.CheckLuaType(vol, "number")
+	SF.CheckLuaType(vol, TYPE_NUMBER)
 	local uw = unwrap(self)
 
 	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
@@ -172,7 +172,7 @@ end
 -- @param pitch Pitch to set to, between 0 and 3.
 function bass_methods:setPitch (pitch)
 	SF.CheckType(self, bass_metamethods)
-	SF.CheckLuaType(pitch, "number")
+	SF.CheckLuaType(pitch, TYPE_NUMBER)
 	local uw = unwrap(self)
 
 	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
@@ -240,7 +240,7 @@ end
 -- @param time Time to set a sound in seconds
 function bass_methods:setTime (time)
 	SF.CheckType(self, bass_metamethods)
-	SF.CheckLuaType(time, "number")
+	SF.CheckLuaType(time, TYPE_NUMBER)
 	local uw = unwrap(self)
 
 	SF.Permissions.check(SF.instance.player, nil, "sound.modify")

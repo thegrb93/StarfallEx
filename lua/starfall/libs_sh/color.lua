@@ -112,11 +112,11 @@ end
 -- @return Scaled color.
 function color_metatable.__mul (a, b)
 	if dgetmeta(a) == color_metatable then
-		SF.CheckLuaType(b, "number")
+		SF.CheckLuaType(b, TYPE_NUMBER)
 
 		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
 	else
-		SF.CheckLuaType(a, "number")
+		SF.CheckLuaType(a, TYPE_NUMBER)
 
 		return wrap({ clamp(b[1] * a), clamp(b[2] * a), clamp(b[3] * a), clamp(b[4] * a) })
 	end
@@ -127,7 +127,7 @@ end
 -- @return Scaled color.
 function color_metatable.__div (a, b)
 	SF.CheckType(a, color_metatable)
-	SF.CheckLuaType(b, "number")
+	SF.CheckLuaType(b, TYPE_NUMBER)
 
 	return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
 end
