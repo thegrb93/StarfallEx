@@ -124,19 +124,12 @@ function SF.CheckType(val, typ, level, default)
 		return default
 	else
 		-- Failed, throw error
+		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
+
 		level = (level or 0) + 3
-		
-		local typname
-		if type(typ) == "table" then
-			assert(typ.__metatable and type(typ.__metatable) == "string")
-			typname = typ.__metatable
-		else
-			typname = "table"
-		end
-		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
-		SF.Throw("Type mismatch (Expected " .. typname .. ", got " .. (type(mt) == "string" and mt or type(val)) .. ") in function " .. funcname, level)
+		SF.Throw("Type mismatch (Expected " .. typ.__metatable .. ", got " .. (type(mt) == "string" and mt or type(val)) .. ") in function " .. funcname, level)
 	end
 end
 
@@ -153,8 +146,9 @@ function SF.CheckLuaType(val, typ, level, default)
 		return default
 	else
 		-- Failed, throw error
+		assert(type(typ) == "string")
+
 		level = (level or 0) + 3
-		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
 		SF.Throw("Type mismatch (Expected " .. typ .. ", got " .. (type(mt) == "string" and mt or valtype) .. ") in function " .. funcname, level)
