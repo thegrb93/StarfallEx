@@ -76,10 +76,10 @@ function vec_metamethods.__mul (a, b)
 			return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 		end
 
-		SF.CheckType(b, "number")
+		SF.CheckLuaType(b, "number")
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	else
-		SF.CheckType(a, "number")
+		SF.CheckLuaType(a, "number")
 		return wrap({ b[1] * a, b[2] * a, b[3] * a })
 	end
 end
@@ -92,11 +92,11 @@ function vec_metamethods.__div (a, b)
 		if dgetmeta(b) == vec_metamethods then
 			return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
 		else
-			SF.CheckType(b, "number")
+			SF.CheckLuaType(b, "number")
 			return wrap({ a[1] / b, a[2] / b, a[3] / b })
 		end
 	else
-		SF.CheckType(a, "number")
+		SF.CheckLuaType(a, "number")
 		return wrap({ a / b[1], a / b[2], a / b[3] })
 	end
 end
@@ -212,7 +212,7 @@ end
 -- @return bool True/False.
 function vec_methods:isEqualTol (v, t)
 	SF.CheckType(v, vec_metamethods)
-	SF.CheckType(t, "number")
+	SF.CheckLuaType(t, "number")
 
 	return unwrap(self):IsEqualTol(unwrap(v), t)
 end
@@ -256,7 +256,7 @@ end
 -- @param n Scalar to multiply with.
 -- @return nil
 function vec_methods:mul (n)
-	SF.CheckType(n, "number")
+	SF.CheckLuaType(n, "number")
 
 	self[1] = self[1] * n
 	self[2] = self[2] * n
@@ -267,7 +267,7 @@ end
 -- @param n Scalar to divide by.
 -- @return nil
 function vec_methods:div (n)
-	SF.CheckType(n, "number")
+	SF.CheckLuaType(n, "number")
 
 	self[1] = self[1] / n
 	self[2] = self[2] / n
@@ -359,10 +359,10 @@ function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	SF.CheckType(axis, vec_metamethods)
 
 	if degrees then
-		SF.CheckType(degrees, "number")
+		SF.CheckLuaType(degrees, "number")
 		radians = math.rad(degrees)
 	else
-		SF.CheckType(radians, "number")
+		SF.CheckLuaType(radians, "number")
 	end
 
 	local ca, sa = math.cos(radians), math.sin(radians)

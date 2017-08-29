@@ -98,11 +98,11 @@ end
 --- Updates a clip plane
 function hologram_methods:setClip (index, enabled, origin, normal, islocal)
 	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(index, "number")
-	SF.CheckType(enabled, "boolean")
+	SF.CheckLuaType(index, "number")
+	SF.CheckLuaType(enabled, "boolean")
 	SF.CheckType(origin, vec_meta)
 	SF.CheckType(normal, vec_meta)
-	SF.CheckType(islocal, "boolean")
+	SF.CheckLuaType(islocal, "boolean")
 
 	local origin, normal = vunwrap(origin), vunwrap(normal)
 
@@ -130,8 +130,8 @@ end
 --- Sets the weight (value) of a flex.
 function hologram_methods:setFlexWeight(flexid, weight)
 	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(flexid, "number")
-	SF.CheckType(weight, "number")
+	SF.CheckLuaType(flexid, "number")
+	SF.CheckLuaType(weight, "number")
 	flexid = math.floor(flexid)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
 		SF.Throw("Invalid flex: "..flexid, 2)
@@ -145,7 +145,7 @@ end
 --- Sets the scale of all flexes of a hologram
 function hologram_methods:setFlexScale(scale)
 	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(scale, "number")
+	SF.CheckLuaType(scale, "number")
 	local holoent = unwrap(self)
 	if IsValid(holoent) then
 		holoent:SetFlexScale(scale)
@@ -157,7 +157,7 @@ end
 -- @class function
 -- @param model string model path
 function hologram_methods:setModel (model)
-	SF.CheckType(model, "string")
+	SF.CheckLuaType(model, "string")
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
 	local this = unwrap(self)
@@ -171,7 +171,7 @@ end
 -- @class function
 -- @param suppress Boolean to represent if shading should be set or not.
 function hologram_methods:suppressEngineLighting (suppress)
-	SF.CheckType(suppress, "boolean")
+	SF.CheckLuaType(suppress, "boolean")
 
 	local this = unwrap(self)
 	if IsValid(this) then
@@ -267,7 +267,7 @@ function holograms_library.create (pos, ang, model, scale)
 	SF.Permissions.check(instance.player,  nil, "hologram.create")
 	SF.CheckType(pos, vec_meta)
 	SF.CheckType(ang, ang_meta)
-	SF.CheckType(model, "string")
+	SF.CheckLuaType(model, "string")
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 	if scale then
 		SF.CheckType(scale, vec_meta)

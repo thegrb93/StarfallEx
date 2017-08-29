@@ -15,7 +15,7 @@ do
 end
 
 local function convert(results, func)
-	if func then SF.CheckType(func, "function") end
+	if func then SF.CheckLuaType(func, "function") end
 	local wrap = SF.WrapObject
 	
 	local t = {}
@@ -57,7 +57,7 @@ end
 function find_library.inSphere (center, radius, filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
 	SF.CheckType(center, SF.Types["Vector"])
-	SF.CheckType(radius, "number")
+	SF.CheckLuaType(radius, "number")
 
 	local center = vunwrap(center)
 	
@@ -75,8 +75,8 @@ function find_library.inCone (pos, dir, distance, radius, filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(dir, SF.Types["Vector"])
-	SF.CheckType(distance, "number")
-	SF.CheckType(radius, "number")
+	SF.CheckLuaType(distance, "number")
+	SF.CheckLuaType(radius, "number")
 
 	local pos, dir = vunwrap(pos), vunwrap(dir)
 	
@@ -89,7 +89,7 @@ end
 -- @return An array of found entities
 function find_library.byClass(class, filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
-	SF.CheckType(class, "string")
+	SF.CheckLuaType(class, "string")
 		
 	return convert(ents.FindByClass(class), filter)
 end
@@ -100,7 +100,7 @@ end
 -- @return An array of found entities
 function find_library.byModel(model, filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
-	SF.CheckType(model, "string")
+	SF.CheckLuaType(model, "string")
 		
 	return convert(ents.FindByModel(model), filter)
 end

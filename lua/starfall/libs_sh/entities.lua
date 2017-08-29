@@ -36,13 +36,13 @@ SF.Libraries.AddHook("postload", function()
 	end
 
 	function SF.DefaultEnvironment.entity (num)
-		SF.CheckType(num, "number")
+		SF.CheckLuaType(num, "number")
 		return SF.WrapObject(Entity(num))
 	end
 
 	function SF.DefaultEnvironment.player (num)
 		if num then
-			SF.CheckType(num, "number")
+			SF.CheckLuaType(num, "number")
 			return SF.WrapObject(Player(num))
 		end
 		
@@ -175,7 +175,7 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
 	function ents_methods:manipulateBonePosition(bone, vec)
-		SF.CheckType(bone, "number")
+		SF.CheckLuaType(bone, "number")
 		SF.CheckType(vec, vec_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
@@ -188,7 +188,7 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
 	function ents_methods:manipulateBoneScale(bone, vec)
-		SF.CheckType(bone, "number")
+		SF.CheckLuaType(bone, "number")
 		SF.CheckType(vec, vec_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
@@ -201,7 +201,7 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
 	function ents_methods:manipulateBoneAngles(bone, ang)
-		SF.CheckType(bone, "number")
+		SF.CheckLuaType(bone, "number")
 		SF.CheckType(ang, ang_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
@@ -331,7 +331,7 @@ end
 -- @param id The physics object id (starts at 0)
 -- @return The physics object of the entity
 function ents_methods:getPhysicsObjectNum(id)
-	SF.CheckType(id, "number")
+	SF.CheckLuaType(id, "number")
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObjectNum(id))
@@ -434,7 +434,7 @@ end
 -- @param name The bone's string name
 -- @return The bone index
 function ents_methods:lookupBone(name)
-	SF.CheckType(name, "string")
+	SF.CheckLuaType(name, "string")
 	return eunwrap(self):LookupBone(name)
 end
 
@@ -444,7 +444,7 @@ end
 -- @return The matrix
 function ents_methods:getBoneMatrix(bone)
 	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckType(bone, "number", 0, 0)
+	bone = SF.CheckLuaType(bone, "number", 0, 0)
 	
 	local ent = eunwrap(self)
 	return owrap(ent:GetBoneMatrix(bone))
@@ -466,7 +466,7 @@ end
 -- @return Name of the bone
 function ents_methods:getBoneName(bone)
 	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckType(bone, "number", 0, 0)
+	bone = SF.CheckLuaType(bone, "number", 0, 0)
 	local ent = eunwrap(self)
 	return ent:GetBoneName(bone)
 end
@@ -477,7 +477,7 @@ end
 -- @return Parent index of the bone
 function ents_methods:getBoneParent(bone)
 	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckType(bone, "number", 0, 0)
+	bone = SF.CheckLuaType(bone, "number", 0, 0)
 	local ent = eunwrap(self)
 	return ent:GetBoneParent(bone)
 end
@@ -489,7 +489,7 @@ end
 -- @return Angle of the bone
 function ents_methods:getBonePosition(bone)
 	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckType(bone, "number", 0, 0)
+	bone = SF.CheckLuaType(bone, "number", 0, 0)
 	local ent = eunwrap(self)
 	local pos, ang = ent:GetBonePosition(bone)
 	return vwrap(pos), awrap(ang)

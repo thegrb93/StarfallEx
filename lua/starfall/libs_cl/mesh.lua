@@ -91,7 +91,7 @@ end)
 -- @return Mesh object
 function mesh_library.createFromTable (verteces)
 	SF.Permissions.check(SF.instance.player, nil, "mesh")
-	SF.CheckType(verteces, "table")
+	SF.CheckLuaType(verteces, "table")
 	
 	local nvertices = #verteces
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
@@ -126,7 +126,7 @@ end
 -- @return Mesh object
 function mesh_library.createFromObj (obj)
 	SF.Permissions.check(SF.instance.player, nil, "mesh")
-	SF.CheckType(obj, "string")
+	SF.CheckLuaType(obj, "string")
 	local instance = SF.instance
 	
 	local pos, norm, uv, face = {}, {}, {}, {}

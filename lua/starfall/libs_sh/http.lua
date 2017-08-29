@@ -55,9 +55,9 @@ function http_library.get (url, callbackSuccess, callbackFail)
 	
 	httpRequestReady(instance)
 	
-	SF.CheckType(url, "string")
-	SF.CheckType(callbackSuccess, "function")
-	if callbackFail then SF.CheckType(callbackFail, "function") end
+	SF.CheckLuaType(url, "string")
+	SF.CheckLuaType(callbackSuccess, "function")
+	if callbackFail then SF.CheckLuaType(callbackFail, "function") end
 	
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
@@ -79,10 +79,10 @@ function http_library.post (url, params, callbackSuccess, callbackFail)
 	
 	httpRequestReady(instance)
 	
-	SF.CheckType(url, "string")
+	SF.CheckLuaType(url, "string")
 	
 	if params then
-		SF.CheckType(params, "table")
+		SF.CheckLuaType(params, "table")
 		for k, v in pairs(params) do
 			if type(k) ~= "string" or type(v) ~= "string" then
 				SF.Throw("Post parameters can only contain string keys and string values", 2)
@@ -90,8 +90,8 @@ function http_library.post (url, params, callbackSuccess, callbackFail)
 		end
 	end
 	
-	SF.CheckType(callbackSuccess, "function")	
-	if callbackFail then SF.CheckType(callbackFail, "function") end
+	SF.CheckLuaType(callbackSuccess, "function")	
+	if callbackFail then SF.CheckLuaType(callbackFail, "function") end
 	
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
@@ -106,6 +106,6 @@ end
 --@param data The data to convert
 --@return The converted data
 function http_library.base64Encode(data)
-	SF.CheckType(data, "string")
+	SF.CheckLuaType(data, "string")
 	return util.Base64Encode(data)
 end

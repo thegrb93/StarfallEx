@@ -129,7 +129,7 @@ function ents_methods:setParent (ent, attachment)
 
 	this:SetParent(ent)
 	if attachment then
-		SF.CheckType(attachment, "string")
+		SF.CheckLuaType(attachment, "string")
 		this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 	end
 end
@@ -183,7 +183,7 @@ end
 -- @param channel channel=CHAN_AUTO
 function ents_methods:emitSound (snd, lvl, pitch, volume, channel)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(snd, "string")
+	SF.CheckLuaType(snd, "string")
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -198,7 +198,7 @@ end
 -- @param inflictor damage inflictor
 function ents_methods:applyDamage(amt, attacker, inflictor)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(amt, "number")
+	SF.CheckLuaType(amt, "number")
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -338,7 +338,7 @@ end
 -- @param func The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
 function ents_methods:addCollisionListener (func)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(func, "function")
+	SF.CheckLuaType(func, "function")
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	SF.Permissions.check(SF.instance.player, ent, "entities.canTool")
@@ -500,7 +500,7 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setMaterial (material, ply)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(material, "string")
+	SF.CheckLuaType(material, "string")
 	if invalidMaterial(material) then SF.Throw("This material has been blacklisted", 2) end
 
 	local ent = unwrap(self)
@@ -523,7 +523,7 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setSubMaterial (index, material, ply)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(material, "string")
+	SF.CheckLuaType(material, "string")
 	if invalidMaterial(material) then SF.Throw("This material has been blacklisted", 2) end
 
 	local ent = unwrap(self)
@@ -545,8 +545,8 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setBodygroup (bodygroup, value, ply)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(bodygroup, "number")
-	SF.CheckType(value, "number")
+	SF.CheckLuaType(bodygroup, "number")
+	SF.CheckLuaType(value, "number")
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -566,7 +566,7 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setSkin (skinIndex, ply)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(skinIndex, "number")
+	SF.CheckLuaType(skinIndex, "number")
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -586,7 +586,7 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setRenderMode (rendermode, ply)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(rendermode, "number")
+	SF.CheckLuaType(rendermode, "number")
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -607,7 +607,7 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setRenderFX (renderfx, ply)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(renderfx, "number")
+	SF.CheckLuaType(renderfx, "number")
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -714,14 +714,14 @@ end
 -- @param radius (optional) How large the fire hitbox is (entity obb is the max)
 function ents_methods:ignite(length, radius)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(length, "number")
+	SF.CheckLuaType(length, "number")
 
 	local ent = unwrap(self)
 	if not isValid(ent) or ent:IsPlayer() then SF.Throw("Entity is not valid", 2) end
 	SF.Permissions.check(SF.instance.player, ent, "entities.ignite")
 
 	if radius then
-		SF.CheckType(radius, "number")
+		SF.CheckLuaType(radius, "number")
 		local obbmins, obbmaxs = ent:OBBMins(), ent:OBBMaxs()
 		radius = math.Clamp(radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2)
 	end
@@ -817,7 +817,7 @@ end
 -- @param mat Material to use
 function ents_methods:setPhysMaterial(mat)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(mat, "string")
+	SF.CheckLuaType(mat, "string")
 	local ent = unwrap(self)
 
 	local phys = getPhysObject(ent)
@@ -950,7 +950,7 @@ end
 -- @param additive If the trail's rendering is additive
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
 	SF.CheckType(self, ents_metatable)
-	SF.CheckType(material, "string")
+	SF.CheckLuaType(material, "string")
 	
 	local ent = unwrap(self)
 

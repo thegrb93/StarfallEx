@@ -247,11 +247,11 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 			if ret[1] then return ret[2] end
 		end
 	else
-		filter = convertFilter(SF.CheckType(filter, "table", 0, {}))
+		filter = convertFilter(SF.CheckLuaType(filter, "table", 0, {}))
 	end
-	if mask ~= nil then SF.CheckType(mask, "number") end
-	if colgroup ~= nil then SF.CheckType(colgroup, "number") end
-	if ignworld ~= nil then SF.CheckType(ignworld, "boolean") end
+	if mask ~= nil then SF.CheckLuaType(mask, "number") end
+	if colgroup ~= nil then SF.CheckLuaType(colgroup, "number") end
+	if ignworld ~= nil then SF.CheckLuaType(ignworld, "boolean") end
 
 	local trace = {
 		start = start,
@@ -297,11 +297,11 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 			if ret[1] then return ret[2] end
 		end
 	else
-		filter = convertFilter(SF.CheckType(filter, "table", 0, {}))
+		filter = convertFilter(SF.CheckLuaType(filter, "table", 0, {}))
 	end
-	if mask ~= nil then mask = SF.CheckType(mask, "number") end
-	if colgroup ~= nil then SF.CheckType(colgroup, "number") end
-	if ignworld ~= nil then SF.CheckType(ignworld, "boolean") end
+	if mask ~= nil then mask = SF.CheckLuaType(mask, "number") end
+	if colgroup ~= nil then SF.CheckLuaType(colgroup, "number") end
+	if ignworld ~= nil then SF.CheckLuaType(ignworld, "boolean") end
 
 	local trace = {
 		start = start,

@@ -133,7 +133,7 @@ end
 --- Scales the absolute translation
 -- @param num Amount to scale by
 function vmatrix_methods:scaleTranslation (num)
-	SF.CheckType(num, "number")
+	SF.CheckLuaType(num, "number")
 
 	local v = unwrap(self)
 	v:ScaleTranslation(num)

@@ -274,7 +274,7 @@ if SERVER then
 	-- @server
 	-- @param material The physical material to set it to
 	function physobj_methods:setMaterial(material)
-		SF.CheckType(material, "string")
+		SF.CheckLuaType(material, "string")
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setMass")
 		phys:SetMaterial(material)

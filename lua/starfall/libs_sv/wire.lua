@@ -170,11 +170,11 @@ local inputConverters =
 local outputConverters =
 {
 	NORMAL = function(data)
-		SF.CheckType(data, "number", 1)
+		SF.CheckLuaType(data, "number", 1)
 		return data
 	end,
 	STRING = function(data)
-		SF.CheckType(data, "string", 1)
+		SF.CheckLuaType(data, "string", 1)
 		return data
 	end,
 	VECTOR = function (data)
@@ -191,7 +191,7 @@ local outputConverters =
 	end,
 
 	TABLE = function(data)
-		SF.CheckType(data, "table", 1)
+		SF.CheckLuaType(data, "table", 1)
 
 		local tbl = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
 
@@ -252,8 +252,8 @@ local sfTypeToWireTypeTable = {
 -- @param types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs (names, types)
 	SF.Permissions.check(SF.instance.player, nil, "wire.setInputs")
-	SF.CheckType(names, "table")
-	SF.CheckType(types, "table")
+	SF.CheckLuaType(names, "table")
+	SF.CheckLuaType(types, "table")
 	local ent = SF.instance.data.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
 	
@@ -280,8 +280,8 @@ end
 -- @param types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs (names, types)
 	SF.Permissions.check(SF.instance.player, nil, "wire.setOutputs")
-	SF.CheckType(names, "table")
-	SF.CheckType(types, "table")
+	SF.CheckLuaType(names, "table")
+	SF.CheckLuaType(types, "table")
 	local ent = SF.instance.data.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
 	
@@ -323,8 +323,8 @@ end
 function wire_library.create (entI, entO, inputname, outputname)
 	SF.CheckType(entI, SF.Types["Entity"])
 	SF.CheckType(entO, SF.Types["Entity"])
-	SF.CheckType(inputname, "string")
-	SF.CheckType(outputname, "string")
+	SF.CheckLuaType(inputname, "string")
+	SF.CheckLuaType(outputname, "string")
 		
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
@@ -357,7 +357,7 @@ end
 -- @param inputname Input to be un-wired
 function wire_library.delete (entI, inputname)
 	SF.CheckType(entI, SF.Types["Entity"])
-	SF.CheckType(inputname, "string")
+	SF.CheckLuaType(inputname, "string")
 	
 	local entI = eunwrap(entI)
 	
@@ -456,7 +456,7 @@ wirelink_metatable.__newindex = function(self, k, v)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if type(k) == "number" then
-		SF.CheckType(v, "number")
+		SF.CheckLuaType(v, "number")
 		if not wl.WriteCell then return
 		else wl:WriteCell(k, v) end
 	else
@@ -542,7 +542,7 @@ end
 -- @param name Name of the input to check
 function wirelink_methods:isWired(name)
 	SF.CheckType(self, wirelink_metatable)
-	SF.CheckType(name, "string")
+	SF.CheckLuaType(name, "string")
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
@@ -555,7 +555,7 @@ end
 -- @return The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
 	SF.CheckType(self, wirelink_metatable)
-	SF.CheckType(name, "string")
+	SF.CheckLuaType(name, "string")
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
@@ -569,7 +569,7 @@ end
 -- @return String name of the output that the input is wired to.
 function wirelink_methods:getWiredToName(name)
 	SF.CheckType(self, wirelink_metatable)
-	SF.CheckType(name, "string")
+	SF.CheckLuaType(name, "string")
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
@@ -583,7 +583,7 @@ local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
 
 function wire_ports_metamethods:__index (name)
 	SF.Permissions.check(SF.instance.player, nil, "wire.input")
-	SF.CheckType(name, "string")
+	SF.CheckLuaType(name, "string")
 
 	local input = SF.instance.data.entity.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then
@@ -593,7 +593,7 @@ end
 
 function wire_ports_metamethods:__newindex (name, value)
 	SF.Permissions.check(SF.instance.player, nil, "wire.output")
-	SF.CheckType(name, "string")
+	SF.CheckLuaType(name, "string")
 
 	local ent = SF.instance.data.entity
 	local output = ent.Outputs[name]

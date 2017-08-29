@@ -111,14 +111,14 @@ function SF.GetTypeDef(name)
 	return SF.Types[name]
 end
 
---- Checks the type of val. Errors if the types don't match
+--- Checks the starfall type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
 -- @param default A value to return if val is nil.
 function SF.CheckType(val, typ, level, default)
 	local meta = dgetmeta(val)
-	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) or type(val) == typ then 
+	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) then 
 		return val
 	elseif val == nil and default then
 		return default
@@ -131,12 +131,33 @@ function SF.CheckType(val, typ, level, default)
 			assert(typ.__metatable and type(typ.__metatable) == "string")
 			typname = typ.__metatable
 		else
-			typname = typ
+			typname = "table"
 		end
 		
 		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 		local mt = getmetatable(val)
 		SF.Throw("Type mismatch (Expected " .. typname .. ", got " .. (type(mt) == "string" and mt or type(val)) .. ") in function " .. funcname, level)
+	end
+end
+
+--- Checks the lua type of val. Errors if the types don't match
+-- @param val The value to be checked.
+-- @param typ A string type or metatable.
+-- @param level Level at which to error at. 3 is added to this value. Default is 0.
+-- @param default A value to return if val is nil.
+function SF.CheckLuaType(val, typ, level, default)
+	local valtype = type(val)
+	if valtype==typ then 
+		return val
+	elseif val == nil and default then
+		return default
+	else
+		-- Failed, throw error
+		level = (level or 0) + 3
+		
+		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
+		local mt = getmetatable(val)
+		SF.Throw("Type mismatch (Expected " .. typ .. ", got " .. (type(mt) == "string" and mt or valtype) .. ") in function " .. funcname, level)
 	end
 end
 

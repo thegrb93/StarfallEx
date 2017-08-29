@@ -54,7 +54,7 @@ function sound_library.create (ent, path)
 	if not SF.instance.data.sounds.burst:use(1) then SF.Throw("Can't create sounds that often", 2) end
 
 	SF.CheckType(ent, SF.Types["Entity"])
-	SF.CheckType(path, "string")
+	SF.CheckLuaType(path, "string")
 
 	if path:match('["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
@@ -93,7 +93,7 @@ end
 function sound_methods:stop (fade)
 	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
 	if fade then
-		SF.CheckType(fade, "number")
+		SF.CheckLuaType(fade, "number")
 		unwrap(self):FadeOut(math.max(fade, 0))
 	else
 		unwrap(self):Stop()
@@ -105,10 +105,10 @@ end
 -- @param fade Time in seconds to transition to this new volume.
 function sound_methods:setVolume (vol, fade)
 	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
-	SF.CheckType(vol, "number")
+	SF.CheckLuaType(vol, "number")
 
 	if fade then
-		SF.CheckType(fade, "number")
+		SF.CheckLuaType(fade, "number")
 		fade = math.abs(fade, 0)
 	else	
 		fade = 0
@@ -123,10 +123,10 @@ end
 -- @param fade Time in seconds to transition to this new pitch.
 function sound_methods:setPitch (pitch, fade)
 	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
-	SF.CheckType(pitch, "number")
+	SF.CheckLuaType(pitch, "number")
 	
 	if fade then
-		SF.CheckType(fade, "number")
+		SF.CheckLuaType(fade, "number")
 		fade = math.max(fade, 0)
 	else	
 		fade = 0
@@ -145,6 +145,6 @@ end
 -- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel (level)
 	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
-	SF.CheckType(level, "number")
+	SF.CheckLuaType(level, "number")
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end

@@ -45,7 +45,7 @@ SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what 
 --- @return The name of the first key bound
 
 function input_methods.lookupBinding(binding)
-	SF.CheckType(binding, "string")
+	SF.CheckLuaType(binding, "string")
 
 	SF.Permissions.check(SF.instance.player, nil, "input")
 
@@ -61,7 +61,7 @@ end
 --- @param key The key id, see input
 --- @return True if the key is down
 function input_methods.isKeyDown(key)
-	SF.CheckType(key, "number")
+	SF.CheckLuaType(key, "number")
 
 	SF.Permissions.check(SF.instance.player, nil, "input")
 
@@ -72,7 +72,7 @@ end
 --- @param key The key id, see input
 --- @return The name of the key
 function input_methods.getKeyName(key)
-	SF.CheckType(key, "number")
+	SF.CheckLuaType(key, "number")
 
 	SF.Permissions.check(SF.instance.player, nil, "input")
 
@@ -110,15 +110,15 @@ end
 --- @return Aim vector
 function input_methods.screenToVector(x, y)
 	SF.Permissions.check(SF.instance.player, nil, "input")
-	SF.CheckType(x, "number")
-	SF.CheckType(y, "number")
+	SF.CheckLuaType(x, "number")
+	SF.CheckLuaType(y, "number")
 	return SF.WrapObject(gui.ScreenToVector(x, y))
 end
 
 ---- Sets the state of the mouse cursor
 --- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor(enabled)
-	SF.CheckType(enabled, "boolean")
+	SF.CheckLuaType(enabled, "boolean")
 	SF.Permissions.check(SF.instance.player, nil, "input")
 
 	if not SF.instance:isHUDActive() then
