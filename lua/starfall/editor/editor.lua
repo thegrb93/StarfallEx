@@ -158,13 +158,13 @@ if CLIENT then
 		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(fl, nil, false)
 	end
-	
+
 	function SF.Editor.openWithCode(name, code)
 		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(name, code, false)
 
 	end
-	
+
 	function SF.Editor.pasteCode(code)
 		SF.Editor.editor:PasteCode(code)
 	end
@@ -202,9 +202,18 @@ if CLIENT then
 		end
 
 	end
-
-	function SF.Editor.createpermissionsPanel ()
-		local panel = vgui.Create("StarfallPanel")
+	function SF.Editor.openPermissionsPopup()
+		local frame = vgui.Create("StarfallFrame")
+		frame:SetSize(600, 900)
+		frame:Center()
+		frame:SetTitle("Permissions")
+		frame:open()
+		local permsPanel = SF.Editor.createpermissionsPanel (frame)
+		permsPanel:Dock(FILL)
+		permsPanel:Refresh()
+	end
+	function SF.Editor.createpermissionsPanel (parent)
+		local panel = vgui.Create("StarfallPanel",parent)
 		panel:Dock(FILL)
 		panel:DockMargin(0, 0, 0, 0)
 		panel.Paint = function () end
@@ -703,7 +712,7 @@ if CLIENT then
 				if string.sub(path, 1, 1)~="/" then
 					codepath = SF.NormalizePath(curdir .. path)
 					code = file.Read("starfall/" .. codepath, "DATA")
-					
+
 				end
 				if not code then
 					codepath = SF.NormalizePath(path)

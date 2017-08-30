@@ -110,11 +110,15 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 		function( )
 			Entity:Restart()
 		end )
-		
+
 	SubMenu:AddOption( "Terminate Clientside",
-			function( )
-				Entity:Terminate()
-			end )
+		function( )
+			Entity:Terminate()
+		end )
+	SubMenu:AddOption( "Open Global Permissions",
+		function( )
+			SF.Editor.openPermissionsPopup()
+		end )
 end
 
 properties.Add( "starfall", {
