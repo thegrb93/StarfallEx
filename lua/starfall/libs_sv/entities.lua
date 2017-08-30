@@ -38,7 +38,7 @@ do
 	P.registerPrivilege("entities.remove", "Remove", "Allows the user to remove entities", { ["CanTool"] = {} })
 	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { ["CanTool"] = {} })
 	P.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { ["CanTool"] = {} })
-	P.registerPrivilege("entities.setRenderPropery", "RenderProperty", "Allows the user to change the rendering of an entity", { ["CanTool"] = {} })
+	P.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { ["CanTool"] = {} })
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { ["CanTool"] = {} })
 end
 
@@ -453,7 +453,7 @@ function ents_methods:setColor (clr, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 1, clr)
@@ -475,7 +475,7 @@ function ents_methods:setNoDraw (draw, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 2, draw and true or false)
@@ -505,7 +505,7 @@ function ents_methods:setMaterial (material, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 3, material)
@@ -528,7 +528,7 @@ function ents_methods:setSubMaterial (index, material, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 4, index, material)
@@ -550,7 +550,7 @@ function ents_methods:setBodygroup (bodygroup, value, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 5, bodygroup, value)
@@ -570,7 +570,7 @@ function ents_methods:setSkin (skinIndex, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 6, skinIndex)
@@ -590,7 +590,7 @@ function ents_methods:setRenderMode (rendermode, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 7, rendermode)
@@ -611,7 +611,7 @@ function ents_methods:setRenderFX (renderfx, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 8, renderfx)
@@ -628,7 +628,7 @@ function ents_methods:setDrawShadow (draw, ply)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 9, draw and true or false)
@@ -956,7 +956,7 @@ function ents_methods:setTrails(startSize, endSize, length, material, color, att
 
 	if string.find(material, '"', 1, true) then SF.Throw("Invalid Material", 2) end
 	if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	local Data = {
 		Color = SF.Color.Unwrap(color),
@@ -977,7 +977,7 @@ function ents_methods:removeTrails()
 	local ent = unwrap(self)
 
 	if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
-	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderPropery")
+	SF.Permissions.check(SF.instance.player, ent, "entities.setRenderProperty")
 
 	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
 end
