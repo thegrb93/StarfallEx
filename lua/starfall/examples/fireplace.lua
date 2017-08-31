@@ -1,6 +1,6 @@
 --@name Fireplace
 --@author INP - Radon
---@include lib/class.txt
+--@include libs/class.txt
 
 if SERVER then return end
 
@@ -11,7 +11,7 @@ if SERVER then return end
 -- Latest version of Class Lib: https://gist.github.com/Xandaros/ea8756e4c4ba00218855
 
 -- It makes a global called Class()
-require("lib/class.txt")
+require("libs/class.txt")
 
 -- We'll call Particle as our constructor
 local Particle = Class()
@@ -53,7 +53,7 @@ end
 -- draw method so that each pixel can be drawn by itself.
 function Particle:draw ()
 	render.setColor(self.color)
-	render.drawRect(self.x + 256, self.y + 480, self.scale, self.scale)
+	render.drawRect(self.x + 512, self.y + 780, self.scale, self.scale)
 end
 
 -- Little table to store some information about the display.
@@ -65,13 +65,18 @@ game.particles = {}
 local t = timer.systime()
 local t2 = timer.systime()
 
-hook.add("render", "", function ()
+render.createRenderTarget("fireplace")
 
+hook.add("render", "", function ()
+ render.setRenderTargetTexture("fireplace")
+ render.drawTexturedRect(0,0,512,512)
+
+ render.selectRenderTarget("fireplace")
 	if timer.systime() > t then
 		for i = 1, math.random(4, 10) do
 
 			-- Make a new particle using our constructor.
-			local nP = Particle(math.random(-256, 256),
+			local nP = Particle(math.random(-512, 512),
 				math.random(-64, 32),
 				math.random(40, 80),
 				math.random() * 5 - 2,
@@ -89,7 +94,7 @@ hook.add("render", "", function ()
 
 	if timer.systime() > t2 then
 
-		game.relVel = entities.self():worldToLocal(entities.self():getPos() + entities.self():getVelocity())
+		game.relVel = chip():worldToLocal(chip():getPos() + chip():getVelocity())
 
 		-- Clear the board before rendering anything new
 		render.clear(Color(5, 5, 16))
@@ -111,4 +116,5 @@ hook.add("render", "", function ()
 		-- Increase our timer for our next draw time.
 		t2 = timer.systime() + (1 / 120)
 	end
+ render.selectRenderTarget()
 end)
