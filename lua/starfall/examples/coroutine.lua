@@ -5,7 +5,7 @@ if not SERVER then return end
 
 -- Some functions for checking our quota usage.
 local function checkQ (n)
-	return quotaUsed() < quotaMax() * n
+	return math.max(quotaUsed(),quotaAverage()) < quotaMax() * n
 end
 
 -- Check if we should yield
@@ -61,7 +61,7 @@ hook.add("think", "primeNumbers", function ()
 	-- If the coroutine isn't running and hasn't died, then we need to start it or resume it.
 	if coroutine.status(erato) ~= "running" and coroutine.status(erato) ~= "dead" then
 		-- Make sure we're sufficiently below quota to resume
-		if checkQ(0.1) then
+		if checkQ(0.8) then
 			-- r will be nil until the final yield which gives us our primes.
 			-- This will start / resume the coroutine.
 			local r = coroutine.resume(erato, 5000000)
