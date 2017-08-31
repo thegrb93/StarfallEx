@@ -24,7 +24,7 @@ else
 				snd:setLooping(true)
 				snd:setVolume(2)
 				hook.add("think", "snd", function()
-					snd:setPos(entities.self():getPos())
+					snd:setPos(chip():getPos())
 				end)
 			else
 				print(errtxt)
