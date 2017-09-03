@@ -646,9 +646,11 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	if prefix=="http" or prefix=="https" or prefix == "data" then
 		if prefix=="http" or prefix=="https" then
 			SF.Permissions.check(instance.player, nil, "render.urlmaterial")
+			if #tx>2000 then SF.Throw("URL is too long!", 2) end
 			tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
 				return string.format("%%%02X", string.byte(str))
 			end)
+			SF.HTTPNotify(instance.player, tx)
 		else
 			SF.Permissions.check(instance.player, nil, "render.datamaterial")
 			tx = string.match(tx, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway

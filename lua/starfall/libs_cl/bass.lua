@@ -63,12 +63,10 @@ function bass_library.loadFile (path, flags, callback)
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 
-	if not3D(flags) then
-		SF.Permissions.check(SF.instance.player, nil, "bass.play2D")
-	end
-
 	local instance = SF.instance
-
+	if not3D(flags) then
+		SF.Permissions.check(instance.player, nil, "bass.play2D")
+	end
 
 	sound.PlayFile(path, flags, function(snd, er, name)
 		if er then
@@ -96,11 +94,12 @@ function bass_library.loadURL (path, flags, callback)
 	SF.CheckLuaType(callback, TYPE_FUNCTION)
 
 	local instance = SF.instance
-
-
+	if #path > 2000 then SF.Throw("URL is too long!", 2) end
 	if not3D(flags) then
-		SF.Permissions.check(SF.instance.player, nil, "bass.play2D")
+		SF.Permissions.check(instance.player, nil, "bass.play2D")
 	end
+
+	SF.HTTPNotify(instance.player, path)
 
 	sound.PlayURL(path, flags, function(snd, er, name)
 		if er then

@@ -58,6 +58,7 @@ function http_library.get (url, callbackSuccess, callbackFail)
 	SF.CheckLuaType(url, TYPE_STRING)
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
@@ -92,6 +93,7 @@ function http_library.post (url, params, callbackSuccess, callbackFail)
 	
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)	
 	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	if CLIENT then SF.HTTPNotify(instance.player, url) end
 	
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1

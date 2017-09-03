@@ -698,6 +698,10 @@ else
 		end
 	end)
 
+	function SF.HTTPNotify(ply, url)
+		MsgC(Color(255, 255, 0), "SF HTTP: " .. ply:Nick() .. " [" .. ply:SteamID() .. "]: requested url ", Color(255,255,255), url, "\n")
+	end
+
 	net.Receive("starfall_console_print", function ()
 		print(net.ReadString())
 	end)
