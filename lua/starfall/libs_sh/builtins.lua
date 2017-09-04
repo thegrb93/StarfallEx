@@ -220,7 +220,6 @@ string_methods.gsub = string.gsub
 string_methods.implode = string.Implode string_methods.Implode = string.Implode
 local function javascriptSafe(str)
 	SF.CheckLuaType(str, TYPE_STRING)
-
 	return string.JavascriptSafe(str)
 end
 string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
@@ -230,7 +229,11 @@ string_methods.lower = string.lower
 string_methods.match = string.match
 string_methods.niceSize = string.NiceSize string_methods.NiceSize = string.NiceSize
 string_methods.niceTime = string.NiceTime string_methods.NiceTime = string.NiceTime
-string_methods.patternSafe = string.PatternSafe string_methods.PatternSafe = string.PatternSafe
+local function patternSafe(str)
+	SF.CheckLuaType(str, TYPE_STRING)
+	return string.PatternSafe(str)
+end
+string_methods.patternSafe = patternSafe string_methods.PatternSafe = patternSafe
 string_methods.replace = string.Replace string_methods.Replace = string.Replace
 string_methods.reverse = string.reverse
 string_methods.right = string.Right string_methods.Right = string.Right
