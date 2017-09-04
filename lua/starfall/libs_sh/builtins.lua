@@ -656,12 +656,19 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	SF.CheckLuaType(dir, TYPE_STRING)
 	if loadpriority then SF.CheckLuaType(loadpriority, TYPE_TABLE) end
 	
+	local path
+	if string.sub(dir, 1, 1)=="/" then
+		path = SF.NormalizePath(dir)
+	else
+		path = SF.NormalizePath(string.GetPathFromFilename(string.sub(debug.getinfo(2, "S").source, 5)) .. dir)
+	end
+
 	local returns = {}
 
 	if loadpriority then
 		for i = 1, #loadpriority do
 			for file, _ in pairs(SF.instance.scripts) do
-				if string.find(file, dir .. "/" .. loadpriority[i] , 1) == 1 then
+				if string.find(file, path .. "/" .. loadpriority[i] , 1) == 1 then
 					returns[file] = SF.DefaultEnvironment.require(file)
 				end
 			end
@@ -669,7 +676,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	end
 
 	for file, _ in pairs(SF.instance.scripts) do
-		if string.find(file, dir, 1) == 1 and not returns[file] then
+		if string.find(file, path, 1) == 1 and not returns[file] then
 			returns[file] = SF.DefaultEnvironment.require(file)
 		end
 	end
