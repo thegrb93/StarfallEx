@@ -139,7 +139,8 @@ local function directive_includedir(args, filename, data)
 
 	local incl = data.includes[filename]
 	args = string.Trim(args)
-	local files = file.Find("starfall/" ..args.. "/*", "DATA")
+	local path = string.GetPathFromFilename(filename)
+	local files = file.Find("starfall/"..path..args.. "/*", "DATA")
 	if files then
 		for _, v in pairs(files) do
 			incl[#incl + 1] = args .. "/" .. v
