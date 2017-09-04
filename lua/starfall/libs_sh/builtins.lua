@@ -218,7 +218,12 @@ string_methods.gfind = string.gfind
 string_methods.gmatch = string.gmatch
 string_methods.gsub = string.gsub
 string_methods.implode = string.Implode string_methods.Implode = string.Implode
-string_methods.javascriptSafe = string.JavascriptSafe string_methods.JavascriptSafe = string.JavascriptSafe
+local function javascriptSafe(str)
+	SF.CheckLuaType(str, TYPE_STRING)
+
+	return string.JavascriptSafe(str)
+end
+string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
 string_methods.left = string.Left string_methods.Left = string.Left
 string_methods.len = string.len
 string_methods.lower = string.lower
