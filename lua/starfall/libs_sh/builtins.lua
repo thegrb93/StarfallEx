@@ -661,6 +661,16 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		path = SF.NormalizePath(dir)
 	else
 		path = SF.NormalizePath(string.GetPathFromFilename(string.sub(debug.getinfo(2, "S").source, 5)) .. dir)
+		local success
+		for file, _ in pairs(SF.instance.scripts) do
+			if string.find(file, path, 1) == 1 then
+				success = true
+				break
+			end
+		end
+		if not success then
+			path = SF.NormalizePath(dir)
+		end
 	end
 
 	local returns = {}
