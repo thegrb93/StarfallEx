@@ -109,6 +109,11 @@ net.Receive("starfall_processor_download", function (len)
 			dlNumFiles.Completed = dlNumFiles.Completed + 1
 			dlFiles[filename] = data or ""
 			if dlProc:IsValid() and dlNumFiles.Completed == dlNumFiles.NumFiles then
+				local maxQuota = (dlProc.owner ~= LocalPlayer()) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+				if maxQuota <= 0 then
+					dlProc:Terminate()
+					return
+				end
 				dlProc:Compile(dlOwner, dlFiles, dlMain)
 				dlProc.restarting = false
 			end
