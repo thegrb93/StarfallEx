@@ -192,7 +192,7 @@ if CLIENT then
 		
 		local modelPanel = vgui.Create("DPanelSelect", panel)
 		modelPanel:EnableVerticalScrollbar()
-		modelPanel:SetTall(66 * 2 + 2)
+		modelPanel:SetTall(66 * 5 + 2)
 		for model, v in pairs(gateModels) do
 			local icon = vgui.Create("SpawnIcon")
 			icon:SetModel(model)
