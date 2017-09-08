@@ -473,10 +473,6 @@
 		</li>
 	
 		<li>
-			<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
-		</li>
-	
-		<li>
 			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 		</li>
 	
@@ -552,7 +548,7 @@ function Class(name, superclass)
 	local ret = {}
 	setmetatable(ret, {
 		__index = function(self, key)
-			if key != "constructor" and superclass then
+			if key ~= "constructor" and superclass then
 				return superclass[key]
 			end
 			return nil

@@ -473,10 +473,6 @@
 		</li>
 	
 		<li>
-			<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
-		</li>
-	
-		<li>
 			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 		</li>
 	
@@ -534,43 +530,49 @@ Library for creating and manipulating physics-less models AKA "Props".</p>
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.canSpawn">canSpawn</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.canSpawn">canSpawn</a>&nbsp;()</td>
 	<td class="summary">
 Checks if a user can spawn anymore props.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.create">create</a>&nbsp;(pos, ang, model, frozen)</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.create">create</a>&nbsp;(pos, ang, model, frozen)</td>
 	<td class="summary">
 Creates a prop.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.createSent">createSent</a>&nbsp;(pos, ang, class, frozen)</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.createComponent">createComponent</a>&nbsp;(pos, ang, class, model, frozen)</td>
+	<td class="summary">
+Creates starfall component.\n Allowed components:\n starfall_hud\n starfall_screen </td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.createSent">createSent</a>&nbsp;(pos, ang, class, frozen)</td>
 	<td class="summary">
 Creates a sent.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.propsLeft">propsLeft</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.propsLeft">propsLeft</a>&nbsp;()</td>
 	<td class="summary">
 Checks how many props can be spawned </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.setPropClean">setPropClean</a>&nbsp;(on)</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.setPropClean">setPropClean</a>&nbsp;(on)</td>
 	<td class="summary">
 Sets whether the chip should remove created props when the chip is removed </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.setPropUndo">setPropUndo</a>&nbsp;(on)</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.setPropUndo">setPropUndo</a>&nbsp;(on)</td>
 	<td class="summary">
 Sets whether the props should be undo-able </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#props_library.spawnRate">spawnRate</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#prop.spawnRate">spawnRate</a>&nbsp;()</td>
 	<td class="summary">
 Returns how many props per second the user can spawn </td>
 	</tr>
@@ -667,6 +669,57 @@ Creates a prop.
 
 
 
+<dt><span class="realm_sv">&nbsp;</span><a name="prop.createComponent"></a><strong>prop.createComponent</strong>&nbsp;(pos, ang, class, model, frozen)</dt>
+<dd>
+
+Creates starfall component.\n Allowed components:\n starfall_hud\n starfall_screen
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>pos</em></code>: Position of created component
+	</li>
+	
+	<li>
+	  <code><em>ang</em></code>: Angle of created component
+	</li>
+	
+	<li>
+	  <code><em>class</em></code>: Class of created component
+	</li>
+	
+	<li>
+	  <code><em>model</em></code>: Model of created component
+	</li>
+	
+	<li>
+	  <code><em>frozen</em></code>: True to spawn frozen
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Component entity</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
 <dt><span class="realm_sv">&nbsp;</span><a name="prop.createSent"></a><strong>prop.createSent</strong>&nbsp;(pos, ang, class, frozen)</dt>
 <dd>
 
@@ -679,19 +732,19 @@ Creates a sent.
 <ul>
 	
 	<li>
-	  <code><em>pos</em></code>: 
+	  <code><em>pos</em></code>: Position of created sent
 	</li>
 	
 	<li>
-	  <code><em>ang</em></code>: 
+	  <code><em>ang</em></code>: Angle of created sent
 	</li>
 	
 	<li>
-	  <code><em>class</em></code>: 
+	  <code><em>class</em></code>: Class of created sent
 	</li>
 	
 	<li>
-	  <code><em>frozen</em></code>: 
+	  <code><em>frozen</em></code>: True to spawn frozen
 	</li>
 	
 </ul>

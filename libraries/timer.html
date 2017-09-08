@@ -473,10 +473,6 @@
 		</li>
 	
 		<li>
-			<a href="../examples/Filetransfer.lua.html">Filetransfer.lua</a>
-		</li>
-	
-		<li>
 			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
 		</li>
 	
@@ -534,103 +530,103 @@ Deals with time and timers.</p>
 <table class="function_list">
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.adjust">adjust</a>&nbsp;(name, delay, reps, func)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.adjust">adjust</a>&nbsp;(name, delay, reps, func)</td>
 	<td class="summary">
 Adjusts a timer </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.create">create</a>&nbsp;(name, delay, reps, func, simple)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.create">create</a>&nbsp;(name, delay, reps, func, simple)</td>
 	<td class="summary">
 Creates (and starts) a timer </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.curtime">curtime</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.curtime">curtime</a>&nbsp;()</td>
 	<td class="summary">
-Same as GLua's CurTime() </td>
+Returns the uptime of the server in seconds (to at least 4 decimal places) </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.exists">exists</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.exists">exists</a>&nbsp;(name)</td>
 	<td class="summary">
 Checks if a timer exists </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.frametime">frametime</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.frametime">frametime</a>&nbsp;()</td>
 	<td class="summary">
 Returns time between frames on client and ticks on server.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.getTimersLeft">getTimersLeft</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.getTimersLeft">getTimersLeft</a>&nbsp;()</td>
 	<td class="summary">
 Returns number of available timers </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.pause">pause</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.pause">pause</a>&nbsp;(name)</td>
 	<td class="summary">
 Pauses a timer </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.realtime">realtime</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.realtime">realtime</a>&nbsp;()</td>
 	<td class="summary">
-Same as GLua's RealTime() </td>
+Returns the uptime of the game/server in seconds (to at least 4 decimal places) </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.remove">remove</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.remove">remove</a>&nbsp;(name)</td>
 	<td class="summary">
 Stops and removes the timer.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.repsleft">repsleft</a>&nbsp;(name, The)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.repsleft">repsleft</a>&nbsp;(name, The)</td>
 	<td class="summary">
 Returns amount of repetitions/executions left before the timer destroys itself.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.simple">simple</a>&nbsp;(delay, func)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.simple">simple</a>&nbsp;(delay, func)</td>
 	<td class="summary">
 Creates a simple timer, has no name, can't be stopped, paused, or destroyed.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.start">start</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.start">start</a>&nbsp;(name)</td>
 	<td class="summary">
 Starts a timer </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.stop">stop</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.stop">stop</a>&nbsp;(name)</td>
 	<td class="summary">
 Stops a timer </td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.systime">systime</a>&nbsp;()</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.systime">systime</a>&nbsp;()</td>
 	<td class="summary">
-Same as GLua's SysTime() </td>
+Returns a highly accurate time in seconds since the start up, ideal for benchmarking.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.timeleft">timeleft</a>&nbsp;(name, The)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.timeleft">timeleft</a>&nbsp;(name, The)</td>
 	<td class="summary">
 Returns amount of time left (in seconds) before the timer executes its function.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.toggle">toggle</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.toggle">toggle</a>&nbsp;(name)</td>
 	<td class="summary">
 Runs either timer.pause or timer.unpause based on the timer's current status.</td>
 	</tr>
 
 	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer_library.unpause">unpause</a>&nbsp;(name)</td>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#timer.unpause">unpause</a>&nbsp;(name)</td>
 	<td class="summary">
 Unpauses a timer </td>
 	</tr>
@@ -752,7 +748,7 @@ Creates (and starts) a timer
 <dt><span class="realm_sh">&nbsp;</span><a name="timer.curtime"></a><strong>timer.curtime</strong>&nbsp;()</dt>
 <dd>
 
-Same as GLua's CurTime()
+Returns the uptime of the server in seconds (to at least 4 decimal places)
 
 
 
@@ -894,7 +890,7 @@ Pauses a timer
 <dt><span class="realm_sh">&nbsp;</span><a name="timer.realtime"></a><strong>timer.realtime</strong>&nbsp;()</dt>
 <dd>
 
-Same as GLua's RealTime()
+Returns the uptime of the game/server in seconds (to at least 4 decimal places)
 
 
 
@@ -1094,7 +1090,7 @@ Stops a timer
 <dt><span class="realm_sh">&nbsp;</span><a name="timer.systime"></a><strong>timer.systime</strong>&nbsp;()</dt>
 <dd>
 
-Same as GLua's SysTime()
+Returns a highly accurate time in seconds since the start up, ideal for benchmarking.
 
 
 
