@@ -80,6 +80,9 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		end
 	end
 	
+	if CLIENT and instance.cpuQuota <= 0 then
+		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
+	end
 	return true, instance
 end
 
