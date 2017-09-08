@@ -56,6 +56,9 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.mainfile = mainfile
 	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
+	if CLIENT and instance.cpuQuota <= 0 then
+		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
+	end
 	
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
@@ -80,9 +83,6 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		end
 	end
 	
-	if CLIENT and instance.cpuQuota <= 0 then
-		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
-	end
 	return true, instance
 end
 
