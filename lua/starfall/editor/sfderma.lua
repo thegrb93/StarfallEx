@@ -1,11 +1,28 @@
 -- Starfall Derma
--- This is for easily creating derma ui in the style of the Starfall Editor
--- Any derma added should not have anything to do with SF.Editor table apart from design elements e.g. colours, icons
 
 -- Starfall Frame
 PANEL = {}
 
 PANEL.windows = {}
+
+--[[ Loading SF Examples ]]
+local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
+http.Fetch( examples_url,
+	function( body, len, headers, code )
+			if code == 200 then -- OK code
+				local data = util.JSONToTable( body )
+				SF.Docs["Examples"] = {}
+				for k,v in pairs(data) do
+					SF.Docs["Examples"][v.name] = v.download_url
+				end
+			end
+	end,
+	function( error )
+		SF.Docs["Examples"] = {}
+		print("[SF] Examples failed to load:"..tostring(error))
+	end
+ )
+--[[ End of SF Examples ]]
 
 function PANEL:Init ()
 	self.windows[#self.windows + 1] = self
@@ -662,6 +679,21 @@ function PANEL:Think ()
 				function PANEL:setup (folder)
 					self.folder = folder
 					self.Root = self.RootNode:AddFolder(folder, folder, "DATA", true)
+					--[[Waiting for examples, 10 tries each 1 second]]
+
+					timer.Create("sf_filetree_waitforexamples",1, 10, function()
+
+						if SF.Docs["Examples"] then
+							self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
+							for k,v in pairs(SF.Docs["Examples"]) do
+								local node = self.Examples:AddNode(k,"icon16/page_white.png")
+								node.FileURL = v
+							end
+							timer.Remove("sf_filetree_waitforexamples")
+						end
+
+					end)
+
 					self.Root:SetExpanded(true)
 				end
 				function PANEL:reloadTree ()
@@ -682,6 +714,9 @@ function PANEL:Think ()
 					if menu == "file" then
 						self.menu:AddOption("Open", function ()
 								SF.Editor.openFile(node:GetFileName())
+							end)
+						self.menu:AddOption("Open in new tab", function ()
+								SF.Editor.openFile(node:GetFileName(), true)
 							end)
 						self.menu:AddSpacer()
 						self.menu:AddOption("Rename", function ()

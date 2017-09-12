@@ -81,7 +81,7 @@ end
 ---------------------
 
 local function createWireLibraryMap () -- Hashtable
-	
+
 	local libMap = {}
 	libMap["Methods"] = {}
 	for lib, tbl in pairs(SF.Docs.classes) do
@@ -91,7 +91,7 @@ local function createWireLibraryMap () -- Hashtable
 			libMap["Methods"][name] = true
 		end
 	end
-	
+
 	libMap["Environment"] = {}
 	for name, val in pairs(SF.DefaultEnvironment) do
 		if istable(val) then
@@ -119,7 +119,7 @@ local function createWireLibraryMap () -- Hashtable
 			libMap[lib][name] = val.class
 		end
 	end
-	
+
 	return libMap
 end
 
@@ -186,7 +186,7 @@ function TabHandler:registerSettings()
 		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
 	end
 	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
-	FontSizeSelect:SetSize(50, 20)	
+	FontSizeSelect:SetSize(50, 20)
 	FontSizeSelect:SetValue(TabHandler.FontSizeConVar:GetString())
 
 	if system.IsLinux() then
@@ -197,19 +197,19 @@ function TabHandler:registerSettings()
 		label:SetSize(50, 40)
 		label:SetPos(10, 0)
 	end
-	
+
 	label = vgui.Create("DLabel")
 	dlist:AddItem(label)
 	label:SetText("Pigments:")
 	label:SizeToContents()
-	label:SetPos(10, 0)	
-	
+	label:SetPos(10, 0)
+
 	local usePigments = vgui.Create("DComboBox")
 	dlist:AddItem(usePigments)
 	usePigments:SetSortItems(false)
 	usePigments:AddChoice("Disabled")
-	usePigments:AddChoice("Stripe under Color()")	
-	usePigments:AddChoice("Background of Color()")	
+	usePigments:AddChoice("Stripe under Color()")
+	usePigments:AddChoice("Background of Color()")
 	usePigments:ChooseOptionID(TabHandler.PigmentsConVar:GetInt() + 1)
 	usePigments:SetTooltip("Enable/disable custom coloring of Color(r,g,b)")
 	usePigments.OnSelect = function(_, val)
@@ -218,7 +218,7 @@ function TabHandler:registerSettings()
 			SF.Editor.editor:GetCurrentEditor().PaintRows = {} -- Re-color syntax
 		end)
 	end
-	
+
 end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar("wire_expression2_autocomplete_controlstyle", "0", true, false)
@@ -267,13 +267,13 @@ function PANEL:Init()
 
 	self:SetMode("starfall")
 	self.CurrentMode:LoadSyntaxColors()
-	
+
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
 	table.insert(TabHandler.Tabs, self)
 end
 
 function PANEL:OnRemove()
-	table.RemoveByValue(TabHandler.Tabs, self) 	
+	table.RemoveByValue(TabHandler.Tabs, self)
 end
 
 function PANEL:SetMode(mode_name)
@@ -684,7 +684,7 @@ function PANEL:PaintTextOverlay()
 
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
 		local width, height = self.FontWidth, self.FontHeight
-		
+
 		if (RealTime() - self.Blink) % 0.8 < 0.4 then
 			surface_SetDrawColor(colors.caret)
 			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, (self.Caret[1] - self.Scroll[1]) * height, 1, height)
@@ -1099,7 +1099,8 @@ function PANEL:_OnTextChanged()
 	end
 
 	self:SetSelection(text)
-	self:AC_Check()
+	SF.Editor.editor:Validate(false)
+
 end
 
 function PANEL:OnMouseWheeled(delta)
@@ -2178,6 +2179,7 @@ function PANEL:_OnKeyCodeTyped(code)
 	if control then
 		self:OnShortcut(code)
 	end
+	SF.Editor.editor:Validate(false)
 
 	self:AC_Check()
 end
