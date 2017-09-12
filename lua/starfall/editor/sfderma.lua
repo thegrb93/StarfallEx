@@ -698,6 +698,7 @@ function PANEL:Think ()
 				end
 				function PANEL:reloadTree ()
 					self.Root:Remove()
+					self.Examples:Remove()
 					self:setup(self.folder)
 				end
 				function PANEL:DoRightClick (node)
