@@ -98,7 +98,7 @@ function helper.create()
 		end
 	end
 
-	createList("SF Helper", function(List) 
+	createList("SF Helper", function(List)
 		List:AddLine("Index")
 		List:AddLine("About")
 		List:SelectFirstItem()
@@ -134,7 +134,7 @@ function helper.create()
 			helper.updateDocView(Line, 1)
 		end
 	end)
-	
+
 	createList("Types", function(List)
 		for _, typename in ipairs(SF.Docs.classes) do
 			List:AddLine(typename)
@@ -145,7 +145,7 @@ function helper.create()
 			helper.updateDocView(Line, 2)
 		end
 	end)
-	
+
 	createList("Hooks", function(List)
 		for _, hookname in ipairs(SF.Docs.hooks) do
 			List:AddLine(hookname)
@@ -157,7 +157,7 @@ function helper.create()
 			helper.DocView.HooksList:SelectItem(helper.DocView.HooksList:GetLine(LineID))
 		end
 	end)
-	
+
 	--[[createList( "Examples", function( List )
 		for name, code in pairs(SF.Docs.examples) do
 			local Line = List:AddLine( name )
@@ -287,14 +287,14 @@ function helper.create()
 		else
 			view.Description.Enabled = false
 		end
-		
+
 		if doc.example then
 			view.exampleCode:SetText(doc.example)
 			view.exampleCode:SetVisible(true)
 		else
 			view.exampleCode:SetVisible(false)
 		end
-			
+
 		if doc.deprecated then
 			view.Deprecated:SetVisible(true)
 			view.Deprecated.Enabled = true
@@ -347,7 +347,7 @@ function helper.create()
 	helper.DocView.Deprecated:SetWrap(true)
 	helper.DocView.Deprecated:SetAutoStretchVertical(true)
 	helper.DocView.Deprecated.m_colText = Color(210, 0, 0)
-	
+
 	helper.DocView.exampleCode = vgui.Create("DTextEntry", helper.DocView.Panel)
 	helper.DocView.exampleCode:SetMultiline(true)
 	helper.DocView.exampleCode:SetEditable(true)
@@ -374,7 +374,7 @@ function helper.create()
 		helper.LabelLists[#helper.LabelLists + 1] = { label = label, list = list, func = func, name = string.lower(name) }
 
 		function list:OnRowSelected(LineID, Line)
-			for _, labellist in pairs(helper.LabelLists) do 
+			for _, labellist in pairs(helper.LabelLists) do
 				if labellist.list ~= list then
 					labellist.list:ClearSelection()
 				end
@@ -447,7 +447,7 @@ function helper.create()
 		local infopanel = helper.DocView.InfoPanel
 		helper.DocView.Info:GetVBar():SetScroll(0)
 
-		directive = nil or directive 
+		directive = nil or directive
 
 		if not directive then
 			infopanel.funcName:SetText(formatText(func.name .. "( " .. table.concat(func.param, ", ") .. " )"))
@@ -459,10 +459,10 @@ function helper.create()
 		infopanel.description:SetText(formatText(func.description or "", true))
 		infopanel.description.Enabled = true
 
-		if func.deprecated then 
-			infopanel.deprecated:SetText("Deprecated: " .. formatText(func.deprecated)) 
+		if func.deprecated then
+			infopanel.deprecated:SetText("Deprecated: " .. formatText(func.deprecated))
 			infopanel.deprecated.Enabled = true
-		else 
+		else
 			infopanel.deprecated.Enabled = false
 		end
 
@@ -511,11 +511,11 @@ function helper.create()
 			infopanel.usageBlock.Enabled = false
 		end
 
-		for _, label in pairs(infopanel.labels) do		
+		for _, label in pairs(infopanel.labels) do
 			label:SizeToContents()
 			label:SetWrap(true)
-			label:SetAutoStretchVertical(true)	
-		end	
+			label:SetAutoStretchVertical(true)
+		end
 		timer.Create("update", 0.1, 1, helper.resize)
 	end
 
@@ -623,7 +623,7 @@ end
 
 function helper.show()
 	if not helper.Frame then helper.create() end
-	helper.Frame:open()
+	helper.Frame:Open()
 end
 
 local lastw, lasth = 0, 0
@@ -666,7 +666,7 @@ function helper.resize()
 		helper.DocView.exampleCode:SetPos(25, runningHeight)
 		runningHeight = runningHeight + helper.DocView.exampleCode:GetTall() + 10
 	end
-	for _, labellist in pairs(helper.LabelLists) do 
+	for _, labellist in pairs(helper.LabelLists) do
 		labellist.list:SetWide(w2 - 50)
 		if labellist.label.Enabled then
 			labellist.label:SetPos(10, runningHeight)

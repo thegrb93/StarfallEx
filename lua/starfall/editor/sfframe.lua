@@ -24,14 +24,6 @@ cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
 end)
 
-surface.CreateFont("SFEditorDefault", {
-		font = "Roboto",
-		size = 18,
-		weight = 500,
-		antialias = true,
-		additive = false,
-	})
-
 Editor.CreatedFonts = {}
 function createFont(name, FontName, Size)
 	local fontTable =
@@ -165,7 +157,7 @@ end
 function Editor:PaintOver()
 	local w, h = self:GetSize()
 
-	surface.SetFont("SFEditorDefault")
+	surface.SetFont("SFTitle")
 	surface.SetTextColor(255, 255, 255, 255)
 	surface.SetTextPos(10, 6)
 	surface.DrawText(self.Title .. self.subTitle)
@@ -1583,7 +1575,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
 		if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
-			SF.Helper.Frame:close()
+			SF.Helper.Frame:Close()
 		else
 			SF.Helper.show()
 		end
