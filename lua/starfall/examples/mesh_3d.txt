@@ -1,6 +1,6 @@
 --@name Simple textured mesh
 --@author Sparky
---@shared 
+--@shared
 
 if SERVER then
 
@@ -14,7 +14,7 @@ if SERVER then
         net.writeEntity(holo)
         net.send(pl)
     end)
-    
+
 else
 
     local texture, objdata, mymesh, holo
@@ -49,7 +49,7 @@ else
         render.popMatrix()
         render.popViewMatrix()
         render.selectRenderTarget()
-        
+
         render.enableDepth(false)
         render.setRenderTargetTexture("mesh")
         render.drawTexturedRect(0,0,512,512)
@@ -57,7 +57,7 @@ else
 
     local function init()
         if not texture or not objdata then return end
-        
+
         render.createRenderTarget("mesh")
         render.createRenderTarget("material")
         hook.add("renderoffscreen","setup",function()
@@ -66,7 +66,7 @@ else
             render.clear()
             render.drawTexturedRectUV(0,0,1024,1024,0,1,1,0)
             render.selectRenderTarget()
-            
+
             local start = mesh.trianglesLeft()
             mymesh = mesh.createFromObj(objdata)
             print("Used "..(start-mesh.trianglesLeft()).." triangles.")

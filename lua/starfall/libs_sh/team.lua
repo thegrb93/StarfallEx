@@ -18,7 +18,7 @@ end
 -- @param ind Index of the team
 -- @return Color of the team
 function team_library.getColor(ind)
-	return cwrap(team.GetColor(ind)) 
+	return cwrap(team.GetColor(ind))
 end
 
 --- Returns the table of players on a team
@@ -82,4 +82,3 @@ team_library.getNumFrags = team.TotalFrags
 -- @param ind Index of the team
 -- @return boolean
 team_library.exists = team.Valid
-

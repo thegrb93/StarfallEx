@@ -150,7 +150,7 @@ end
 --- Converts an Entity to a Quaternion format for generation
 argTypesToQuat["Entity"] = function(ent)
 	ent = SF.UnwrapObject(ent)
-	
+
 	if not isValid(ent) then
 		return quicknew(0, 0, 0, 0)
 	end
@@ -176,12 +176,12 @@ argTypesToQuat["Weapon"] = argTypesToQuat["Entity"]
 -- See argTypesToQuat table for examples of acceptable inputs.
 function quat_lib.New(self, ...)
 	local args = { ... }
-	
+
 	local argtypes = ""
 	for i = 1, min(#args, 4) do
 		argtypes = argtypes .. SF.GetType(args[i])
 	end
-	
+
 	return argTypesToQuat[argtypes] and argTypesToQuat[argtypes](...) or quicknew(0, 0, 0, 0)
 end
 

@@ -23,7 +23,7 @@
 	If you disagree with the above, don't use the code.
 
 -----------------------------------------------------------------------------------------------------------------------------
-	
+
 	Thanks to the following people for their contribution:
 		-	Divran						Suggested improvements for making the code quicker.
 										Suggested an excellent new way of deserializing strings.
@@ -34,7 +34,7 @@
 		-	People who contributed on the GitHub repository by reporting bugs, posting fixes, etc.
 
 -----------------------------------------------------------------------------------------------------------------------------
-	
+
 	The vanilla types supported in this release of vON are:
 		-	table
 		-	number
@@ -56,7 +56,7 @@
 	These are the types one would normally serialize.
 
 -----------------------------------------------------------------------------------------------------------------------------
-	
+
 	New in this version:
 		-	Fixed addition of extra entity types. I messed up really badly.
 --]]
@@ -190,7 +190,7 @@ end
 --	This is kept away from the table for speed.
 --	Yeah, ton of parameters.
 function s_anyVariable(data, lastType, isNumeric, isKey, isLast, jobstate)
-	
+
 	local unwrap = SF.UnwrapObject(data)
 	if unwrap then data = unwrap end
 
@@ -442,7 +442,7 @@ _serialize = {
 
 		local result, keyvals, len, keyvalsLen, keyvalsProgress, val, lastType, newIndent, indentString = {}, {}, #data, 0, 0
 		--	Locals, locals, locals, locals, locals, locals, locals, locals, locals and locals.
-		
+
 		--	First thing to be done is separate the numeric and key:value components of the given table in two tables.
 		--	pairs(data) is slower than next, data as far as my tests tell me.
 		for k, v in next, data do
@@ -493,7 +493,7 @@ _serialize = {
 				result[#result + 1] = val..":"
 
 				val, lastType = s_anyVariable(data[keyvals[_i]], lastType, false, false, keyvalsProgress == keyvalsLen and not first, jobstate)
-				
+
 				result[#result + 1] = val
 			end
 		end
@@ -768,7 +768,7 @@ local function checkTableForRecursion(tab, checked, assoc)
 		if type(k) == "table" and not checked[k] then
 			checkTableForRecursion(k, checked, assoc)
 		end
-		
+
 		if type(v) == "table" and not checked[v] then
 			checkTableForRecursion(v, checked, assoc)
 		end

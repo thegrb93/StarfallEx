@@ -10,7 +10,7 @@ SF.Libraries.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
-	
+
 	ang_meta = SF.Angles.Metatable
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap

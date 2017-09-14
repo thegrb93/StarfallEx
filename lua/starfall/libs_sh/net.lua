@@ -156,7 +156,7 @@ function net_library.readData(n)
 	return net.ReadData(n)
 end
 
---- Streams a large 20MB string. 
+--- Streams a large 20MB string.
 -- @shared
 -- @param str The string to be written
 function net_library.writeStream(str)
@@ -177,7 +177,7 @@ function net_library.readStream(cb)
 	local instance = SF.instance
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
 	streams[instance.player] = true
-	
+
 	net.ReadStream((SERVER and instance.player or nil), function(data)
 		instance:runFunction(cb, data)
 		streams[instance.player] = false

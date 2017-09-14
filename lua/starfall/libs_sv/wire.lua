@@ -122,7 +122,7 @@ local function convertToExpression2(value)
 		local value = SF.Unsanitize(value)
 		typ = type(value)
 
-		if typ == "table" then 
+		if typ == "table" then
 			-- It is still table, do recursive convert
 			return SF.Wire.OutputConverters.TABLE(value), "t"
 
@@ -139,11 +139,11 @@ local inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = function(value) 
-		return vwrap(value) 
+	VECTOR = function(value)
+		return vwrap(value)
 	end,
-	ANGLE = function(value) 
-		return awrap(value) 
+	ANGLE = function(value)
+		return awrap(value)
 	end,
 	WIRELINK = wlwrap,
 	ENTITY = ewrap,
@@ -256,7 +256,7 @@ function wire_library.adjustInputs (names, types)
 	SF.CheckLuaType(types, TYPE_TABLE)
 	local ent = SF.instance.data.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
-	
+
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
 	for i = 1, #names do
 		local newname = names[i]
@@ -284,7 +284,7 @@ function wire_library.adjustOutputs (names, types)
 	SF.CheckLuaType(types, TYPE_TABLE)
 	local ent = SF.instance.data.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
-	
+
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
 	for i = 1, #names do
 		local newname = names[i]
@@ -298,7 +298,7 @@ function wire_library.adjustOutputs (names, types)
 		names[i] = newname
 		types[i] = newtype
 	end
-	ent._outputs = { names, types }	
+	ent._outputs = { names, types }
 	WireLib.AdjustSpecialOutputs(ent, names, types)
 end
 
@@ -325,29 +325,29 @@ function wire_library.create (entI, entO, inputname, outputname)
 	SF.CheckType(entO, SF.Types["Entity"])
 	SF.CheckLuaType(inputname, TYPE_STRING)
 	SF.CheckLuaType(outputname, TYPE_STRING)
-		
+
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
-	
+
 	if not IsValid(entI) then SF.Throw("Invalid source") end
 	if not IsValid(entO) then SF.Throw("Invalid target") end
-	
+
 	SF.Permissions.check(SF.instance.player, entI, "wire.createWire")
 	SF.Permissions.check(SF.instance.player, entO, "wire.createWire")
-	
+
 	if not entI.Inputs then SF.Throw("Source has no valid inputs") end
 	if not entO.Outputs then SF.Throw("Target has no valid outputs") end
-	
+
 	if inputname == "" then SF.Throw("Invalid input name") end
 	if outputname == "" then SF.Throw("Invalid output name") end
-	
+
 	if not entI.Inputs[inputname] then SF.Throw("Invalid source input: " .. inputname) end
 	if not entO.Outputs[outputname] then SF.Throw("Invalid source output: " .. outputname) end
 	if entI.Inputs[inputname].Src then
 		local CheckInput = entI.Inputs[inputname]
 		if CheckInput.SrcId == outputname and CheckInput.Src == entO then SF.Throw("Source \"" .. inputname .. "\" is already wired to target \"" .. outputname .. "\"") end
 	end
-		
+
 	WireLib.Link_Start(SF.instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, "cable/rope", Vector(255, 255, 255), 0)
 	WireLib.Link_End(SF.instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, SF.instance.player)
 end
@@ -358,21 +358,21 @@ end
 function wire_library.delete (entI, inputname)
 	SF.CheckType(entI, SF.Types["Entity"])
 	SF.CheckLuaType(inputname, TYPE_STRING)
-	
+
 	local entI = eunwrap(entI)
-	
+
 	if not IsValid(entI) then SF.Throw("Invalid source") end
-	
+
 	SF.Permissions.check(SF.instance.player, entI, "wire.deleteWire")
-	
+
 	if not entI.Inputs or not entI.Inputs[inputname] then SF.Throw("Entity does not have input: " .. inputname) end
 	if not entI.Inputs[inputname].Src then SF.Throw("Input \"" .. inputname .. "\" is not wired") end
-	
+
 	WireLib.Link_Clear(entI, inputname)
 end
 
 local function parseEntity(ent, io)
-	
+
 	if ent then
 		SF.CheckType(ent, SF.Types["Entity"])
 		ent = eunwrap(ent)
@@ -380,7 +380,7 @@ local function parseEntity(ent, io)
 	else
 		ent = SF.instance.data.entity or nil
 	end
-	
+
 	if not IsValid(ent) then SF.Throw("Invalid source") end
 
 	local ret = {}
@@ -388,7 +388,7 @@ local function parseEntity(ent, io)
 		if k ~= "" then
 			table.insert(ret, k)
 		end
-	end	
+	end
 
 	return ret
 end
@@ -415,11 +415,11 @@ function wire_library.getWirelink (ent)
 	ent = eunwrap(ent)
 	if not ent:IsValid() then return end
 	SF.Permissions.check(SF.instance.player, ent, "wire.wirelink")
-	
+
 	if not ent.extended then
 		WireLib.CreateWirelinkOutput(SF.instance.player, ent, { true })
 	end
-	
+
 	return wlwrap(ent)
 end
 
@@ -438,7 +438,7 @@ wirelink_metatable.__index = function(self, k)
 	else
 		local wl = wlunwrap(self)
 		if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
-		
+
 		if type(k) == "number" then
 			return wl.ReadCell and wl:ReadCell(k) or nil
 		else
@@ -503,17 +503,17 @@ function wirelink_methods:inputs()
 	if not wl then return nil end
 	local Inputs = wl.Inputs
 	if not Inputs then return {} end
-	
+
 	local inputNames = {}
 	for _, port in pairs(Inputs) do
 		inputNames[#inputNames + 1] = port.Name
 	end
-	
+
 	local function portsSorter(a, b)
 		return Inputs[a].Num < Inputs[b].Num
 	end
 	table.sort(inputNames, portsSorter)
-	
+
 	return inputNames
 end
 
@@ -524,17 +524,17 @@ function wirelink_methods:outputs()
 	if not wl then return nil end
 	local Outputs = wl.Outputs
 	if not Outputs then return {} end
-	
+
 	local outputNames = {}
 	for _, port in pairs(Outputs) do
 		outputNames[#outputNames + 1] = port.Name
 	end
-	
+
 	local function portsSorter(a, b)
 		return Outputs[a].Num < Outputs[b].Num
 	end
 	table.sort(outputNames, portsSorter)
-	
+
 	return outputNames
 end
 

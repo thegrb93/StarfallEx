@@ -21,18 +21,18 @@ end
 local rt = render.createRenderTarget("Background")
 -- Standard render hook, see hooks.
 hook.add("render", "", function ()
-	render.setColor(Color(255, 255, 255))    
+	render.setColor(Color(255, 255, 255))
 	-- Print some stats to the screen
 	render.drawText(10, 10, "Quota Used: " .. round(quotaUsed() * 1000000) .. "us")
 	render.drawText(10, 30, "Quota Avg: " .. round(quotaAverage() * 1000000) .. "us")
 	render.drawText(10, 50, "Quota Max: " .. round(quotaMax() * 1000000) .. "us")
 	render.drawText(10, 70, "Percent: " .. round(quotaAverage() / quotaMax() * 100, 2) .. "%")
-	
+
 	-- Set the rendertarget to our background so that we can make a bluring effect
 	render.selectRenderTarget("Background")
 	render.setColor(Color(0, 0, 0, 50))
 	render.drawRect(0, 0, 1024, 1024)
-	
+
 	-- While our quota is less than 2 percent.
 	-- This will result in higher FPS, thus more render calls.
 	-- You'd think this would affect the rendering of the cube, it doesn't.
@@ -44,7 +44,7 @@ hook.add("render", "", function ()
 		render.drawRect(math.sin(timer.curtime() * 2) * 380 + (512 - 100), 512 / 2, 200, 400)
 	end
 	render.selectRenderTarget(nil)
-	
+
 	-- Draw the resulting rendertarget
 	render.setRenderTargetTexture("Background")
 	render.setColor(Color(255, 255, 255))

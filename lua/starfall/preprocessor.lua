@@ -21,7 +21,7 @@ local function FindComments(line)
 		found = line:find('["%-%[%]]', pos)
 		if (found) then -- We found something
 			local oldpos = pos
-			
+
 			local char = line:sub(found, found)
 			if char == "-" then
 				if line:sub(found, found + 1) == "--" then
@@ -43,7 +43,7 @@ local function FindComments(line)
 			elseif char == "[" then
 				local level = line:sub(found + 1):match("^(=*)")
 				if level then level = string.len(level) else level = 0 end
-				
+
 				if line:sub(found + level + 1, found + level + 1) == "[" then
 					-- Block string start
 					count = count + 1
@@ -55,7 +55,7 @@ local function FindComments(line)
 			elseif char == "]" then
 				local level = line:sub(found + 1):match("^(=*)")
 				if level then level = string.len(level) else level = 0 end
-				
+
 				if line:sub(found + level + 1, found + level + 1) == "]" then
 					-- Ending
 					count = count + 1
@@ -75,7 +75,7 @@ local function FindComments(line)
 					pos = found + 1
 				end
 			end
-			
+
 			if oldpos == pos then error("Regex found something, but nothing handled it") end
 		end
 	until not found
@@ -91,7 +91,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 	local ending = nil
 	local endingLevel = nil
 	local lines = string.Explode("\r?\n", source, true)
-	for _, line in ipairs(lines) do		
+	for _, line in ipairs(lines) do
 		for _, comment in ipairs(FindComments(line)) do
 			if ending then
 				if comment.type == ending then
@@ -119,7 +119,7 @@ function SF.Preprocessor.ParseDirectives(filename, source, data)
 				end
 			end
 		end
-		
+
 		if ending == "newline" then ending = nil end
 	end
 end
@@ -127,7 +127,7 @@ end
 local function directive_include(args, filename, data)
 	if not data.includes then data.includes = {} end
 	if not data.includes[filename] then data.includes[filename] = {} end
-	
+
 	local incl = data.includes[filename]
 	incl[#incl + 1] = string.Trim(args)
 end
@@ -157,7 +157,7 @@ SF.Preprocessor.SetGlobalDirective("name", directive_name)
 
 local function directive_sharedscreen(args, filename, data)
 	if not data.sharedscreen then data.sharedscreen = true end
-	
+
 end
 SF.Preprocessor.SetGlobalDirective("sharedscreen", directive_sharedscreen)
 
@@ -184,7 +184,7 @@ end)
 -- @param path Path to the file
 -- @usage
 -- \--@include lib/someLibrary.txt
--- 
+--
 -- require( "lib/someLibrary.txt" )
 -- -- CODE
 

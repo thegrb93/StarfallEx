@@ -2,9 +2,9 @@
 --@author Sparky
 
 if SERVER then
-	
+
 	wire.adjustInputs({ "Keyboard", "Console" }, { "Wirelink", "Wirelink" })
-	
+
 	hook.add("input", "getwirelinks", function(name, val)
 		if name == "Console" then
 			Console = val
@@ -12,10 +12,10 @@ if SERVER then
 			Keyboard = val
 		end
 	end)
-	
+
 	local ConsolePos = 0
 	local ConsoleInit = false
-	
+
 	local function updateCursor()
 		Console[2045] = ConsolePos
 		Console[2046] = 1
@@ -52,7 +52,7 @@ if SERVER then
 		end
 		return table.concat(chars)
 	end
-	
+
 	key_funcs = {
 		[127] = function()
 			Console[ConsolePos] = 0
@@ -60,7 +60,7 @@ if SERVER then
 			ConsolePos = math.max(ConsolePos - 2, cinstart)
 		end,
 		[9] = function() end,
-		[13] = function() 
+		[13] = function()
 			if cincb then
 				local str = getcin()
 				cout("\n")
@@ -74,7 +74,7 @@ if SERVER then
 		[159] = function() end,
 	}
 	key_funcs[142] = key_funcs[13]
-	
+
 	local function main_loop()
 		if not Keyboard or not Console then
 			Initialized = false
@@ -91,12 +91,12 @@ if SERVER then
 						--print(Keyboard[1])
 						Console[ConsolePos] = Keyboard[1]
 						Console[ConsolePos + 1] = 999
-						
+
 						ConsolePos = ConsolePos + 2
 						updateCursor()
 					end
 				end
-			
+
 				Keyboard[0] = 0
 			end
 		end

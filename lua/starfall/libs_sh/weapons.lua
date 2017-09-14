@@ -51,7 +51,7 @@ function weapon_methods:clip2 ()
 	return ent:Clip2()
 end
 
---- Returns the sequence enumeration number that the weapon is playing. Must be used on a view model. 
+--- Returns the sequence enumeration number that the weapon is playing. Must be used on a view model.
 -- @shared
 -- @return number Current activity
 function weapon_methods:getActivity ()
@@ -60,7 +60,7 @@ function weapon_methods:getActivity ()
 	return ent:GetActivity()
 end
 
---- Returns the hold type of the weapon. 
+--- Returns the hold type of the weapon.
 -- @shared
 -- @return string Holdtype
 function weapon_methods:getHoldType ()
@@ -87,7 +87,7 @@ function weapon_methods:getNextSecondaryFire ()
 	return ent:GetNextSecondaryFire()
 end
 
---- Gets the primary ammo type of the given weapon. 
+--- Gets the primary ammo type of the given weapon.
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getPrimaryAmmoType ()
@@ -96,7 +96,7 @@ function weapon_methods:getPrimaryAmmoType ()
 	return ent:GetPrimaryAmmoType()
 end
 
---- Gets the secondary ammo type of the given weapon. 
+--- Gets the secondary ammo type of the given weapon.
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getSecondaryAmmoType ()
@@ -132,8 +132,8 @@ if CLIENT then
 		local ent = SF.Entities.Unwrap(self)
 		return ent:GetPrintName()
 	end
-	
-	--- Returns if the weapon is carried by the local player. 
+
+	--- Returns if the weapon is carried by the local player.
 	-- @client
 	-- @return whether or not the weapon is carried by the local player
 	function weapon_methods:isCarriedByLocalPlayer ()

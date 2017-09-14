@@ -31,7 +31,7 @@ function hook_library.add (hookname, name, func)
 	if not instances then
 		instances = {}
 		registered_instances[hookname] = instances
-	
+
 		local gmod_hook = gmod_hooks[hookname]
 		if gmod_hook then
 			local realname, customargfunc, customretfunc = unpack(gmod_hook)
@@ -150,7 +150,7 @@ function hook_library.runRemote (recipient, ...)
 		else
 			result = k:runScriptHookForResult("remote", SF.WrapObject(instance.data.entity), SF.WrapObject(instance.player), ...)
 		end
-		
+
 		if result[1] and result[2]~=nil then
 			results[#results + 1] = { unpack(result, 2) }
 		end

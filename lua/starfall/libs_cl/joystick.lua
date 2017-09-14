@@ -83,4 +83,3 @@ function joystick_library.numButtons(enum)
 	refresh(enum)
 	return joystick.count(enum, 3)
 end
-

@@ -12,7 +12,7 @@ local canPhysgun = {}
 
 function P.registered (id, name, description, arg)
 	if not arg then return end
-	
+
 	local addSetting
 	if arg.CanPhysgun then
 		canPhysgun[id] = true
@@ -21,7 +21,7 @@ function P.registered (id, name, description, arg)
 		canTool[id] = true
 		addSetting = arg.CanTool
 	end
-	
+
 	if addSetting then
 		P.settingsdesc[id] = { name, description }
 		if not P.settings[id] then

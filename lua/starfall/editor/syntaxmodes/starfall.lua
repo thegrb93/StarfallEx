@@ -11,7 +11,7 @@ end
 -- keywords[name][nextchar!="("]
 local storageTypes = {
 	["function"] = { [true] = true, [false] = true },
-	["local"] = { [true] = true },	
+	["local"] = { [true] = true },
 }
 local keywords = {
 	-- keywords that can be followed by a "(":
@@ -89,8 +89,8 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 		local h, s, v = ColorToHSV(bgcolor) --We're finding high-contrast color
 		h = (h + 180)%360
 		s = 1 - s
-		v = 1 - v	 
-		textcolor = HSVToColor(h, s, v) 
+		v = 1 - v
+		textcolor = HSVToColor(h, s, v)
 	elseif usePigments == 1 then
 		textcolor = colors[tokenname][1]
 	end
@@ -297,7 +297,7 @@ function EDITOR:SyntaxColorLine(row)
 					col = Color(cr, cg, cb)
 				else
 					col = Color(0, 0, 0, 0) -- Transparent because its invalid
-				end				
+				end
 				addColorToken("function", col, fname)
 				addColorToken("notfound", col, bracket1)
 				if cr then
@@ -328,7 +328,7 @@ function EDITOR:SyntaxColorLine(row)
 					col = Color(cr, cg, cb, ca)
 				else
 					col = Color(0, 0, 0, 0) -- Transparent because its invalid
-				end				
+				end
 				addColorToken("function", col, fname)
 				addColorToken("notfound", col, bracket1)
 				if cr then
@@ -357,7 +357,7 @@ function EDITOR:SyntaxColorLine(row)
 				self.tokendata = ""
 			end
 		end
-		
+
 		if self:NextPattern("^0[xb][0-9A-F]+") then
 			tokenname = "number"
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
@@ -376,7 +376,7 @@ function EDITOR:SyntaxColorLine(row)
 			-- is this a keyword or a function?
 			local char = self.character or ""
 			local keyword = char ~= "("
-			
+
 			if storageTypes[sstr][keyword] then
 				tokenname = "storageType"
 			elseif keywords[sstr][keyword] then
@@ -425,7 +425,7 @@ function EDITOR:SyntaxColorLine(row)
 							col = Color(cr, cg, cb, ca)
 						else
 							col = Color(0, 0, 0, 0) -- Transparent because its invalid
-						end				
+						end
 						addColorToken("function", col, fname)
 						addColorToken("notfound", col, bracket1)
 						if cr then
@@ -452,7 +452,7 @@ function EDITOR:SyntaxColorLine(row)
 						addColorToken("notfound", col, bracket2)
 						tokenname = "" -- It's custom token
 						self.tokendata = ""
-						
+
 					elseif self:NextPattern("^[a-zA-Z][a-zA-Z0-9_]*") then
 						local t = libmap[sstr][self.tokendata]
 						if t then -- Valid function, woohoo

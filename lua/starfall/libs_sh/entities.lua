@@ -26,7 +26,7 @@ SF.Libraries.AddHook("postload", function()
 	cunwrap = SF.Color.Unwrap
 	pwrap = SF.PhysObjs.Wrap
 	punwrap = SF.PhysObjs.Unwrap
-	
+
 	function SF.DefaultEnvironment.chip ()
 		return ewrap(SF.instance.data.entity)
 	end
@@ -45,7 +45,7 @@ SF.Libraries.AddHook("postload", function()
 			SF.CheckLuaType(num, TYPE_NUMBER)
 			return SF.WrapObject(Player(num))
 		end
-		
+
 		return SERVER and SF.DefaultEnvironment.owner() or SF.WrapObject(LocalPlayer())
 	end
 end)
@@ -160,7 +160,7 @@ if CLIENT then
 		if not ent:IsValid() then return end
 		local property = net.ReadUInt(4)
 		if not getRenderProperties[property] then return end
-		
+
 		local tbl = entsWithProperties[ent]
 		if not tbl then
 			tbl = {}
@@ -229,7 +229,7 @@ if CLIENT then
 			ent.custom_mesh = nil
 		end
 	end
-	
+
 	--- Sets a hologram entity's renderbounds
 	-- @client
 	-- @param mins The lower bounding corner coordinate local to the hologram
@@ -445,7 +445,7 @@ end
 function ents_methods:getBoneMatrix(bone)
 	SF.CheckType(self, ents_metamethods)
 	bone = SF.CheckLuaType(bone, TYPE_NUMBER, 0, 0)
-	
+
 	local ent = eunwrap(self)
 	return owrap(ent:GetBoneMatrix(bone))
 end
@@ -455,7 +455,7 @@ ents_methods.getMatrix = ents_methods.getBoneMatrix
 -- @shared
 -- @return Number of bones
 function ents_methods:getBoneCount()
-	SF.CheckType(self, ents_metamethods)	
+	SF.CheckType(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:GetBoneCount()
 end
@@ -558,11 +558,11 @@ end
 -- @return The numerical mass
 function ents_methods:getMass ()
 	SF.CheckType(self, ents_metamethods)
-	
+
 	local ent = eunwrap(self)
 	local phys = getPhysObject(ent)
 	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
-	
+
 	return phys:GetMass()
 end
 
@@ -571,11 +571,11 @@ end
 -- @return The principle moments of inertia as a vector
 function ents_methods:getInertia ()
 	SF.CheckType(self, ents_metamethods)
-	
+
 	local ent = eunwrap(self)
 	local phys = getPhysObject(ent)
 	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
-	
+
 	return vwrap(phys:GetInertia())
 end
 
@@ -618,7 +618,7 @@ function ents_methods:localToWorld(data)
 	SF.CheckType(self, ents_metamethods)
 	SF.CheckType(data, vec_meta)
 	local ent = eunwrap(self)
-	
+
 	return vwrap(ent:LocalToWorld(vunwrap(data)))
 end
 
@@ -631,7 +631,7 @@ function ents_methods:localToWorldAngles (data)
 	SF.CheckType(data, ang_meta)
 	local ent = eunwrap(self)
 	local data = aunwrap(data)
-	
+
 	return awrap(ent:LocalToWorldAngles(data))
 end
 
@@ -643,7 +643,7 @@ function ents_methods:worldToLocal (data)
 	SF.CheckType(self, ents_metamethods)
 	SF.CheckType(data, vec_meta)
 	local ent = eunwrap(self)
-	
+
 	return vwrap(ent:WorldToLocal(vunwrap(data)))
 end
 
@@ -656,7 +656,7 @@ function ents_methods:worldToLocalAngles (data)
 	SF.CheckType(data, ang_meta)
 	local ent = eunwrap(self)
 	local data = aunwrap(data)
-	
+
 	return awrap(ent:WorldToLocalAngles(data))
 end
 

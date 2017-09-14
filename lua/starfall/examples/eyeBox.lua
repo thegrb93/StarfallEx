@@ -1,6 +1,6 @@
 --@name eyebox
 --@author thegrb93
---@shared 
+--@shared
 
 if SERVER then
     hook.add("net","",function(name,len,ply)
@@ -14,7 +14,7 @@ else
     net.start("")
     net.writeString(render.getRenderTargetMaterial("rt"))
     net.send()
-    
+
     local function getEyes()
         local playerpos = ent:worldToLocal(player():getShootPos())
         local rightdiff = Vector(-7.373, -7.957, 19.722) - playerpos
@@ -27,28 +27,28 @@ else
         if len2>20 then x2 = x2*20/len2 y2 = y2*20/len2 end
         return x1, y1, x2, y2
     end
-    
+
     local function doRender()
         render.selectRenderTarget("rt")
         render.setTexture(box)
         render.drawTexturedRect(0,0,1024,1024)
-    
+
         render.setRenderTargetTexture("circle")
         render.setColor(Color(0,0,0))
         render.drawTexturedRect(705,595,110,110)
         render.drawTexturedRect(855,595,110,110)
-        
+
         render.setColor(Color(255,255,255))
         render.drawTexturedRect(710,600,100,100)
         render.drawTexturedRect(860,600,100,100)
-        
+
         local x1, y1, x2, y2 = getEyes()
         render.setColor(Color(0,0,0))
         render.drawTexturedRect(730+x1,620+y1,60,60)
         render.drawTexturedRect(880+x2,620+y2,60,60)
         render.selectRenderTarget()
     end
-    
+
     local function initRender()
         ent = find.inSphere(chip():getPos(), 50, function(e) return e and e:getClass()=="prop_physics" end)[1]
         if not ent then return end
@@ -61,7 +61,7 @@ else
         render.clear(Color(0,0,0,0))
         render.drawPoly(poly)
         render.selectRenderTarget()
-        
+
         hook.remove("render","init")
         hook.add("render","go",doRender)
     end
