@@ -9,9 +9,17 @@ include("xml.lua")
 SF.Editor.Themes.Themes = { }
 SF.Editor.Themes.CurrentTheme = nil -- Theme table
 SF.Editor.Themes.ThemeConVar = CreateClientConVar("sf_editor_theme", "default", true, false)
+SF.Editor.Themes.DebugOutput = false
 
 local themeformat_version = 1 --Change that if previous themes arent compatibile anymore
 SF.Editor.Themes.Version = themeformat_version
+
+local function debugPrint(...)
+	local args = {...}
+	args[1] = "[TextMate Debug]"..args[1]
+	return print(string.format(...))
+end
+
 function SF.Editor.Themes.Load()
     if not file.Exists("sf_themes.txt", "DATA") then
 		SF.Editor.Themes.SwitchTheme("default")
@@ -175,8 +183,10 @@ local function parseTextMate(text)
 	local map = {
 		["Keyword"] = { "keyword", "storageType" },
 		["Built-in constant"] = { "constant", "directive" },
+		["Constant"] = { "constant", "directive" },
 		["Constants"] = { "constant", "directive" },
 		["Function name"] = { "function", "userfunction", "method" },
+		["Funtion"] = { "function", "userfunction", "method" },
 		["Library function"] = { "function", "userfunction", "method" },
 		["String"] = { "string" },
 		["Number"] = { "number" },
@@ -186,6 +196,13 @@ local function parseTextMate(text)
 		["Storage type"] = { "storageType" },
 	}
 
+	local newmap = {}
+	for k,v in pairs(map) do -- It's not "normalized" in source for readability
+		k = k:gsub("%s",""):lower()
+		newmap[k] = v
+	end
+	map = newmap
+	
     for k, v in pairs(parsed.settings) do
 		local foreground, background, fontStyle = parseColor(v.settings.foreground), parseColor(v.settings.background), v.settings.fontStyle
 		fontStyle = fontStyle or "normal"
@@ -193,13 +210,17 @@ local function parseTextMate(text)
 		if fontStyle:lower() == "italic" then fontStyle = 1
 		elseif fontStyle:lower() == "bold" then fontStyle = 1
 		else fontStyle = 0 end
-
-		if map [v.name] then
-			for k, v in pairs(map[v.name]) do
-				tbl[v] = { foreground, background, fontStyle }
+		if not v.name then continue end
+		local names = string.Explode(",",v.name:gsub("%s",""):lower())
+		for _,name in pairs(names) do
+			if map [name] then
+				debugPrint("Parsing %q as %s", name, table.concat(map[name], ","))
+				for k, v in pairs(map[name]) do
+					tbl[v] = { foreground, background, fontStyle }
+				end
+			else
+				debugPrint("[TextMate Import] Ignored setting:%q", name)
 			end
-		else
-			print("[TextMate Import] Ignored setting:", v.name)
 		end
     end
 
