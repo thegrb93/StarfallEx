@@ -15,6 +15,7 @@ local themeformat_version = 1 --Change that if previous themes arent compatibile
 SF.Editor.Themes.Version = themeformat_version
 
 local function debugPrint(...)
+	if not SF.Editor.Themes.DebugOutput then return end
 	local args = {...}
 	args[1] = "[TextMate Debug]"..args[1]
 	return print(string.format(...))
