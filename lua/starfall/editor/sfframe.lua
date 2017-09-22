@@ -1034,6 +1034,20 @@ function Editor:InitControlPanel()
 		self:GetParent():SetWorldClicker(bVal)
 	end
 
+	local ShowExamples = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(ShowExamples)
+	ShowExamples:SetConVar("sf_editor_showexamples")
+	ShowExamples:SetText("Show examples in file tree")
+	ShowExamples:SizeToContents()
+	ShowExamples:SetTooltip("Shows examples loaded from github in file tree.")
+
+	local ShowExamples = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(ShowExamples)
+	ShowExamples:SetConVar("sf_editor_showfiledata")
+	ShowExamples:SetText("Show files from sf_filedata in file tree (UNSTABLE)")
+	ShowExamples:SizeToContents()
+	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
+
 	------ Permissions panel
 	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
 	local perms = SF.Editor.createpermissionsPanel ()
@@ -1266,7 +1280,14 @@ function Editor:SaveTabs()
 	for i = 1, self:GetNumTabs() do
 		tabs[i] = {}
 		local filename = self:GetEditor(i).chosenfile
-		if filename then filename =  filename:sub(#self.Location + 2) end
+		local filedatapath = "sf_filedata/"
+		if filename then 
+			if filename:sub(1, #filedatapath) == filedatapath then -- Temporary fix before we update sf_tabs.txt format
+				filename = nil
+			else
+				filename =  filename:sub(#self.Location + 2)
+			end
+		end
 		tabs[i].filename = filename
 		tabs[i].code = self:GetEditor(i):getCode()
 	end

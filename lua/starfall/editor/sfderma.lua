@@ -5,23 +5,31 @@ PANEL = {}
 
 PANEL.windows = {}
 
+SF.Editor.ShowExamplesVar = CreateClientConVar("sf_editor_showexamples", "1", true, false)
+SF.Editor.ShowDataFilesVar = CreateClientConVar("sf_editor_showdatafiles", "0", true, false)
+
+
 --[[ Loading SF Examples ]]
-local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
-http.Fetch( examples_url,
-	function( body, len, headers, code )
-			if code == 200 then -- OK code
-				local data = util.JSONToTable( body )
-				SF.Docs["Examples"] = {}
-				for k,v in pairs(data) do
-					SF.Docs["Examples"][v.name] = v.download_url
+
+if SF.Editor.ShowExamplesVar:GetBool() then
+
+	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
+	http.Fetch( examples_url,
+		function( body, len, headers, code )
+				if code == 200 then -- OK code
+					local data = util.JSONToTable( body )
+					SF.Docs["Examples"] = {}
+					for k,v in pairs(data) do
+						SF.Docs["Examples"][v.name] = v.download_url
+					end
 				end
-			end
-	end,
-	function( error )
-		SF.Docs["Examples"] = {}
-		print("[SF] Examples failed to load:"..tostring(error))
-	end
- )
+		end,
+		function( error )
+			SF.Docs["Examples"] = {}
+			print("[SF] Examples failed to load:"..tostring(error))
+		end
+	)
+end
 --[[ End of SF Examples ]]
 
 --[[ Fonts ]]
@@ -390,25 +398,34 @@ function PANEL:setup (folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddFolder(folder, folder, "DATA", true)
 	--[[Waiting for examples, 10 tries each 1 second]]
+	if SF.Editor.ShowDataFilesVar:GetBool() then
+		self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
+		self.DataFiles:MakeFolder("sf_filedata","DATA",true)
+	end
+	if SF.Editor.ShowExamplesVar:GetBool() then
+		timer.Create("sf_filetree_waitforexamples",1, 10, function()
 
-	timer.Create("sf_filetree_waitforexamples",1, 10, function()
-
-		if SF.Docs["Examples"] then
-			self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
-			for k,v in pairs(SF.Docs["Examples"]) do
-				local node = self.Examples:AddNode(k,"icon16/page_white.png")
-				node.FileURL = v
+			if SF.Docs["Examples"] then
+				self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
+				for k,v in pairs(SF.Docs["Examples"]) do
+					local node = self.Examples:AddNode(k,"icon16/page_white.png")
+					node.FileURL = v
+				end
+				timer.Remove("sf_filetree_waitforexamples")
 			end
-			timer.Remove("sf_filetree_waitforexamples")
-		end
 
-	end)
-
+		end)
+	end
 	self.Root:SetExpanded(true)
 end
 function PANEL:reloadTree ()
 	self.Root:Remove()
-	self.Examples:Remove()
+	if self.Examples then
+		self.Examples:Remove()
+	end
+	if self.DataFiles then
+		self.DataFiles:Remove()
+	end
 	self:setup(self.folder)
 end
 function PANEL:DoRightClick (node)
@@ -594,6 +611,9 @@ function PANEL:Init ()
 			end
 		end
 		addFiles(self:GetValue():PatternSafe(), "starfall", tree.Root)
+		if tree.DataFiles then
+			addFiles(self:GetValue():PatternSafe(), "sf_filedata", tree.DataFiles)
+		end
 		tree.Root:SetExpanded(true)
 	end
 	self.searchBox = searchBox
