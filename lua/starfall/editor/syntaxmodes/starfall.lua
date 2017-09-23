@@ -251,7 +251,7 @@ function EDITOR:SyntaxColorLine(row)
 		addToken("string", self.tokendata)
 	end
 
-	local found = self:SkipPattern("( *function)")
+	local found = self:SkipPattern("(%s*function)")
 	if found then
 		addToken("storageType", found) -- Add "function"
 		self.tokendata = "" -- Reset tokendata
@@ -260,6 +260,33 @@ function EDITOR:SyntaxColorLine(row)
 		if spaces then addToken("whitespace", spaces) end
 
 		if self:NextPattern("%s*[a-zA-Z][a-zA-Z0-9_]*") then -- function THIS()
+
+			local spaces, funcname = self.tokendata:match("(%s*)(%a[a-zA-Z0-9_]*)")
+			addToken("userfunction", funcname)
+
+		end
+		self.tokendata = ""
+
+		if self:NextPattern("%(") then -- We found a bracket
+			-- Color the bracket
+			addToken("notfound", self.tokendata)
+		end
+
+		self.tokendata = ""
+		if self:NextPattern("%) *{?") then -- check for ending bracket (and perhaps an ending {?)
+			addToken("notfound", self.tokendata)
+		end
+	end
+
+	found = self:SkipPattern("(%s*local%s*function)")  -- local function
+	if found then
+		addToken("storageType", found) -- Add "function"
+		self.tokendata = "" -- Reset tokendata
+
+		local spaces = self:SkipPattern(" *")
+		if spaces then addToken("whitespace", spaces) end
+
+		if self:NextPattern("%s*[a-zA-Z][a-zA-Z0-9_]*") then -- local function THIS()
 
 			local spaces, funcname = self.tokendata:match("(%s*)(%a[a-zA-Z0-9_]*)")
 			addToken("userfunction", funcname)
