@@ -141,6 +141,8 @@ if CLIENT then
 
 		SF.Editor.createEditor()
 		SF.Editor.initialized = true
+
+		SF.Libraries.CallHook("editorinit")
 	end
 
 	function SF.Editor.open ()
