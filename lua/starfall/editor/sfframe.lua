@@ -512,6 +512,8 @@ function Editor:CreateTab(chosenfile)
 					SetClipboardText(str)
 				end)
 			menu:Open()
+			menu:AddSpacer()
+			th:registerTabMenu(menu, editor)
 			return
 		end
 

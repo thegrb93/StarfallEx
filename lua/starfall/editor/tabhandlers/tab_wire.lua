@@ -45,7 +45,7 @@ local TabHandler = {
 	IsEditor = true,
 	Description = "Wire-based editor"
 }
-TabHandler.Modes.Default = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
+TabHandler.Modes.Text = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
 ---------------------
 -- Fonts
 ---------------------
@@ -126,8 +126,19 @@ end
 function TabHandler:init()
 	TabHandler.LibMap = createWireLibraryMap ()
 
-	TabHandler.Modes.starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	self:LoadSyntaxColors()
+end
+
+function TabHandler:registerTabMenu(menu, editor)
+	local coloring = menu:AddSubMenu("Coloring")
+	for k,v in pairs(TabHandler.Modes) do
+		local mode = v
+		coloring:AddOption(k, function() 
+			editor.CurrentMode = mode 
+			editor.PaintRows = {}
+		end)
+	end
 end
 
 function TabHandler:registerSettings()
@@ -242,7 +253,7 @@ function PANEL:Init()
 	self.Redo = {}
 	self.PaintRows = {}
 
-	self.CurrentMode = assert(TabHandler.Modes.Default)
+	self.CurrentMode = assert(TabHandler.Modes.Text)
 
 	self.LineNumberWidth = 2
 
@@ -265,7 +276,7 @@ function PANEL:Init()
 
 	self.e2fs_functions = {}
 
-	self:SetMode("starfall")
+	self:SetMode("Starfall")
 	self.CurrentMode:LoadSyntaxColors()
 
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
@@ -277,17 +288,17 @@ function PANEL:OnRemove()
 end
 
 function PANEL:SetMode(mode_name)
-	self.CurrentMode = TabHandler.Modes[mode_name or "Default"]
+	self.CurrentMode = TabHandler.Modes[mode_name or "Text"]
 	if not self.CurrentMode then
 		Msg("Couldn't find text editor mode '".. tostring(mode_name) .. "'")
-		self.CurrentMode = assert(TabHandler.Modes.Default, "Couldn't find default text editor mode")
+		self.CurrentMode = assert(TabHandler.Modes.Text, "Couldn't find default text editor mode")
 	end
 end
 
 function PANEL:DoAction(name, ...)
 	if not self.CurrentMode then return end
 	local f = assert(self.CurrentMode, "No current mode set")[name]
-	if not f then f = TabHandler.Modes.Default[name] end
+	if not f then f = TabHandler.Modes.Text[name] end
 	if f then return f(self, ...) end
 end
 
