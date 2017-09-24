@@ -4,7 +4,7 @@ SF.Bass = {}
 do
 	local P = SF.Permissions
 	P.registerPrivilege("bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = {} })
-	P.registerPrivilege("bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = {} })
+	P.registerPrivilege("bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = { default = 1 } })
 	P.registerPrivilege("bass.play2D", "Play sounds in a 2D context (Usually global)", "Allows users to create stereo sounds which play in a 2d space (Usually globally) .", { ["Client"] = { default = 1 } })
 
 end
