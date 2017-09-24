@@ -206,7 +206,7 @@ if CLIENT then
 		frame:SetSize(600, 900)
 		frame:Center()
 		frame:SetTitle("Permissions")
-		frame:open()
+		frame:Open()
 		local permsPanel = SF.Editor.createpermissionsPanel (frame)
 		permsPanel:Dock(FILL)
 		permsPanel:Refresh()
