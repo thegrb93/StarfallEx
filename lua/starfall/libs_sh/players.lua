@@ -20,14 +20,14 @@ SF.Libraries.AddHook("postload", function()
 	ewrap = SF.Entities.Wrap
 	eunwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable
-	
+
 	SF.AddObjectWrapper(debug.getregistry().Player, player_metamethods, function(object)
 		object = ewrap(object)
 		dsetmeta(object, player_metamethods)
 		return object
 	end)
 	SF.AddObjectUnwrapper(player_metamethods, eunwrap)
-	
+
 	--- ENUMs of in_keys for use with player:keyDown:
 	-- ALT1,
 	-- ALT2,
@@ -380,7 +380,7 @@ end
 -- @return table trace data https://wiki.garrysmod.com/page/Structures/TraceResult
 function player_methods:getEyeTrace ()
 	SF.Permissions.check(SF.instance.player, eunwrap(self), "trace")
-	
+
 	local data = eunwrap(self):GetEyeTrace()
 	return setmetatable({}, {
 		__index = function(t, k)
@@ -434,7 +434,7 @@ function player_methods:getAmmoCount(id)
 	if tid~="number" and tid~="string" then
 		SF.Throw("Type mismatch (Expected number or string, got " .. tid .. ") in function getAmmoCount", 2)
 	end
-	
+
 	local ent = eunwrap(self)
 	return ent:GetAmmoCount(id)
 end
@@ -446,7 +446,7 @@ if SERVER then
 	function player_methods:setViewEntity (ent)
 		local pl = eunwrap(self)
 		if not IsValid(pl) then SF.Throw("Invalid Player", 2) end
-		
+
 		if ent~=nil then
 			ent = eunwrap(ent)
 			if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
@@ -456,7 +456,7 @@ if SERVER then
 			pl:SetViewEntity(ent)
 		end
 	end
-	
+
 	--- Returns whether or not the player has godmode
 	-- @server
 	-- @return True if the player has godmode
@@ -499,10 +499,10 @@ end
 function player_methods:keyDown (key)
 	SF.CheckType(self, player_metamethods)
 	SF.CheckLuaType(key, TYPE_NUMBER)
-	
+
 	local ent = eunwrap(self)
 	if not IsValid(ent) then return false end
-	
+
 	return ent:KeyDown(key)
 end
 
@@ -514,7 +514,7 @@ if CLIENT then
 		local ent = eunwrap(self)
 		return ent and ent:GetFriendStatus()
 	end
-	
+
 	--- Returns whether the local player has muted the player
 	-- @return True if the player was muted
 	function player_methods:isMuted()

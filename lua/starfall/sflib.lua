@@ -13,7 +13,7 @@ if SERVER then
 	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions/core.lua")
 	AddCSLuaFile("netstream.lua")
-	
+
 	AddCSLuaFile("editor/editor.lua")
 end
 
@@ -34,6 +34,29 @@ else
 	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
 end
 
+if SERVER then
+	SF.Version = "StarfallEx"
+	local files, directories = file.Find( "addons/*", "GAME" )
+	local sf_dir = nil
+	for k,v in pairs(directories) do
+		if file.Exists("addons/"..v.."/lua/starfall", "GAME") then
+			sf_dir = "addons/"..v.."/"
+			break
+		end
+	end
+	if sf_dir then
+		local head = file.Read(sf_dir..".git/HEAD","GAME") -- Where head points to
+		if head then
+			head = head:sub(6,-2) -- skipping ref: and new line
+			local lastCommit = file.Read( sf_dir..".git/"..head, "GAME")
+
+			if lastCommit then
+				SF.Version = SF.Version .. "_" .. lastCommit:sub(1,7) -- We need only first 7 to be safely unique
+			end
+		end
+	end
+
+end
 
 local dgetmeta = debug.getmetatable
 
@@ -91,7 +114,7 @@ function SF.Typedef(name, supermeta)
 	metamethods.__metatable = name
 	metamethods.__index = methods
 	metamethods.__methods = methods
-		
+
 	if supermeta then
 		setmetatable(methods, { __index = supermeta.__index })
 		metamethods.__supertypes = { [supermeta] = true }
@@ -118,7 +141,7 @@ end
 -- @param default A value to return if val is nil.
 function SF.CheckType(val, typ, level, default)
 	local meta = dgetmeta(val)
-	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) then 
+	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) then
 		return val
 	elseif val == nil and default then
 		return default
@@ -140,7 +163,7 @@ end
 -- @param default A value to return if val is nil.
 function SF.CheckLuaType(val, typ, level, default)
 	local valtype = TypeID(val)
-	if valtype==typ then 
+	if valtype==typ then
 		return val
 	elseif val == nil and default then
 		return default
@@ -192,7 +215,7 @@ local sf2sensitive_tables = {}
 function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta)
 	local s2sfmode = ""
 	local sf2smode = ""
-	
+
 	if weakwrapper == nil or weakwrapper then
 		sf2smode = "k"
 		s2sfmode = "v"
@@ -200,7 +223,7 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 	if weaksensitive then
 		sf2smode = sf2smode.."v"
 		s2sfmode = s2sfmode.."k"
-	end 
+	end
 
 	local sensitive2sf, sf2sensitive
 	if shared_meta then
@@ -218,7 +241,7 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 			sf2sensitive_tables[metatable] = sf2sensitive
 		end
 	end
-	
+
 	local function wrap(value)
 		if value == nil then return nil end
 		if sensitive2sf[value] then return sensitive2sf[value] end
@@ -227,18 +250,18 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		sf2sensitive[tbl] = value
 		return tbl
 	end
-	
+
 	local function unwrap(value)
 		return sf2sensitive[value]
 	end
-	
+
 	if target_metatable ~= nil then
 		object_wrappers[target_metatable] = wrap
 		metatable.__wrap = wrap
 	end
-	
+
 	metatable.__unwrap = unwrap
-	
+
 	return wrap, unwrap
 end
 
@@ -292,7 +315,7 @@ end
 -- @return the unwrapped starfall object
 function SF.UnwrapObject(object)
 	local metatable = dgetmeta(object)
-	
+
 	if metatable and metatable.__unwrap then
 		return metatable.__unwrap(object)
 	end
@@ -300,7 +323,7 @@ end
 
 --- Manages data tied to entities so that the data is cleaned when the entity is removed
 function SF.EntityTable(key)
-	return setmetatable({}, 
+	return setmetatable({},
 	{ __newindex = function(t, e, v)
 		rawset(t, e, v)
 		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
@@ -346,7 +369,7 @@ function SF.BurstObject(rate, max)
 		end
 	}
 	local t = {
-		rate = rate, 
+		rate = rate,
 		max = max,
 		val = max,
 		lasttick = 0
@@ -364,7 +387,7 @@ end
 function SF.Sanitize(...)
 	local return_list = {}
 	local args = { ... }
-	
+
 	for key, value in pairs(args) do
 		local typmeta = getmetatable(value)
 		local typ = type(typmeta) == "string" and typmeta or type(value)
@@ -378,11 +401,11 @@ function SF.Sanitize(...)
 				tbl[SF.Sanitize(k)] = SF.Sanitize(v)
 			end
 			return_list[key] = tbl
-		else 
+		else
 			return_list[key] = nil
 		end
 	end
-	
+
 	return unpack(return_list)
 end
 
@@ -390,9 +413,9 @@ end
 -- fully usable outside of starfall environment
 function SF.Unsanitize(...)
 	local return_list = {}
-	
+
 	local args = { ... }
-	
+
 	for key, value in pairs(args) do
 		local typ = type(value)
 		if typ == "table" and SF.UnwrapObject(value) then
@@ -539,7 +562,7 @@ if SERVER then
 	util.AddNetworkString("starfall_console_print")
 	util.AddNetworkString("starfall_openeditor")
 	util.AddNetworkString("starfall_chatprint")
-	
+
 	local uploaddata = SF.EntityTable("sfTransfer")
 
 	--- Requests a player to send whatever code they have open in his/her editor to
@@ -551,7 +574,7 @@ if SERVER then
 	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
 	function SF.RequestCode(ply, callback)
 		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
-		
+
 		net.Start("starfall_requpload")
 		net.Send(ply)
 
@@ -564,16 +587,16 @@ if SERVER then
 		}
 		return true
 	end
-	
+
 	net.Receive("starfall_upload", function(len, ply)
 		local updata = uploaddata[ply]
 		if not updata then
 			ErrorNoHalt("SF: Player "..ply:GetName().." tried to upload code without being requested (expect this message multiple times)\n")
 			return
 		end
-		
+
 		updata.mainfile = net.ReadString()
-		
+
 		local I = 0
 		while I < 256 do
 			if net.ReadBit() ~= 0 then break end
@@ -597,7 +620,7 @@ if SERVER then
 
 		updata.Completed = 0
 		updata.NumFiles = I
-		
+
 		if I == 0 then
 			uploaddata[ply] = nil
 		end
@@ -623,10 +646,10 @@ if SERVER then
 			net.WriteString(msg)
 		net.Send(ply)
 	end
-	
+
 	function SF.ChatPrint(ply, ...)
 		local tbl = argsToChat(...)
-		
+
 		net.Start("starfall_chatprint")
 		net.WriteUInt(#tbl, 32)
 		for i, v in ipairs(tbl) do
@@ -635,11 +658,11 @@ if SERVER then
 		net.Send(ply)
 	end
 else
-	net.Receive("starfall_openeditor", function(len)		
+	net.Receive("starfall_openeditor", function(len)
 		SF.Editor.open()
-		
+
 		local gate = net.ReadEntity()
-		
+
 		hook.Add("Think", "WaitForEditor", function()
 			if SF.Editor.initialized then
 				if IsValid(gate) and gate.files then
@@ -651,14 +674,14 @@ else
 			end
 		end)
 	end)
-	
+
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
 		if ok then
 			--print("Uploading SF code")
 			net.Start("starfall_upload")
 			net.WriteString(list.mainfile)
-			
+
 			for name, data in pairs(list.files) do
 				net.WriteBit(false)
 				net.WriteString(name)
@@ -705,7 +728,7 @@ else
 	net.Receive("starfall_console_print", function ()
 		print(net.ReadString())
 	end)
-	
+
 	net.Receive("starfall_chatprint", function ()
 		local recv = {}
 		local n = net.ReadUInt(32)
@@ -714,7 +737,7 @@ else
 		end
 		chat.AddText(unpack(recv))
 	end)
-	
+
 	function SF.ChatPrint(...)
 		chat.AddText(unpack(argsToChat(...)))
 	end
@@ -723,16 +746,16 @@ end
 -----------------------------------------------------------------------------
 
 do
-	
+
 	MsgN("-SF - Loading Libraries")
-	
+
 	local print = function(...)
 		if SF_VERBOSE_INIT ~= false then return print(...) end
 	end
 	local MsgN = function(...)
 		if SF_VERBOSE_INIT ~= false then return MsgN(...) end
 	end
-	
+
 	if SERVER then
 		local l
 
@@ -805,7 +828,7 @@ do
 	end
 
 	if SERVER then
-		
+
 		-- Command to reload the libraries
 		util.AddNetworkString("sf_reloadlibrary")
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
@@ -847,7 +870,7 @@ do
 				SF.Libraries.CallHook("postload")
 			end
 		end)
-		
+
 	else
 		local root_path = SF.NormalizePath(string.GetPathFromFilename(debug.getinfo(1, "S").short_src).."../")
 		net.Receive("sf_reloadlibrary", function(len)
@@ -863,7 +886,7 @@ do
 				end
 			end)
 		end)
-		
+
 	end
 end
 

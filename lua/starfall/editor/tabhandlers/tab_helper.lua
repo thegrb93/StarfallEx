@@ -17,11 +17,11 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 end
 
 function TabHandler:registerSettings() -- Setting panels should be registered there
-	
+
 end
 
 function TabHandler:cleanup() -- Called when editor is reloaded/removed
-	
+
 end
 
 

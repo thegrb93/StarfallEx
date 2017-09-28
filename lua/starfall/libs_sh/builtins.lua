@@ -184,7 +184,7 @@ function SF.DefaultEnvironment.quotaMax ()
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
--- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50% 
+-- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function SF.DefaultEnvironment.setSoftQuota (quota)
 	SF.CheckLuaType(quota, TYPE_NUMBER)
 	SF.instance.cpu_softquota = quota
@@ -261,17 +261,17 @@ string_methods.utf8offset = utf8.offset
 local rep_chunk = 1000000
 function string_methods.rep(str, rep, sep)
 	if rep < 0.5 then return "" end
-	
+
 	local ret = {}
 	for i = 1, rep / rep_chunk do
 		ret[#ret + 1] = string.rep(str, rep_chunk, sep)
 	end
-	
+
 	local r = rep%rep_chunk
 	if r>0.5 then
 		ret[#ret + 1] = string.rep(str, r, sep)
 	end
-	
+
 	return table.concat(ret, sep)
 end
 function string_methods.fromColor(color)
@@ -341,21 +341,21 @@ function math_methods.lerp(percent, from, to)
 	SF.CheckLuaType(percent, TYPE_NUMBER)
 	SF.CheckLuaType(from, TYPE_NUMBER)
 	SF.CheckLuaType(to, TYPE_NUMBER)
-	
+
 	return Lerp(percent, from, to)
 end
 function math_methods.lerpAngle(percent, from, to)
 	SF.CheckLuaType(percent, TYPE_NUMBER)
 	SF.CheckType(from, SF.Types["Angle"])
 	SF.CheckType(to, SF.Types["Angle"])
-	
+
 	return SF.WrapObject(LerpAngle(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
 end
 function math_methods.lerpVector(percent, from, to)
 	SF.CheckLuaType(percent, TYPE_NUMBER)
 	SF.CheckType(from, SF.Types["Vector"])
 	SF.CheckType(to, SF.Types["Vector"])
-	
+
 	return SF.WrapObject(LerpVector(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
 end
 --- The math library. http://wiki.garrysmod.com/page/Category:math
@@ -481,7 +481,7 @@ for i = 1, 5 do
 		SF.Libraries.AddHook("prepare", function()
 			debug.setmetatable(luaType, nil)
 		end)
-		SF.Libraries.AddHook("cleanup", function() 
+		SF.Libraries.AddHook("cleanup", function()
 			debug.setmetatable(luaType, meta)
 		end)
 	end
@@ -499,7 +499,7 @@ SF.Libraries.AddHook("prepare", function()
 		end
 	end })
 end)
-SF.Libraries.AddHook("cleanup", function() 
+SF.Libraries.AddHook("cleanup", function()
 	debug.setmetatable("", gluastr)
 end)
 
@@ -523,7 +523,7 @@ if SERVER then
 	function SF.DefaultEnvironment.print(...)
 		SF.ChatPrint(SF.instance.player, ...)
 	end
-	
+
 	--- Prints a table to player's chat
 	-- @param tbl Table to print
 	function SF.DefaultEnvironment.printTable (tbl)
@@ -539,7 +539,7 @@ if SERVER then
 		SF.Permissions.check(SF.instance.player, nil, "console.command")
 		SF.instance.player:ConCommand(cmd)
 	end
-	
+
 	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB
 	-- @server
 	-- @param str String data
@@ -548,7 +548,7 @@ if SERVER then
 		if #str>1048576 then SF.Throw("The userdata limit is 1MiB", 2) end
 		SF.instance.data.userdata = str
 	end
-	
+
 	--- Gets the chip's userdata that the duplicator tool loads
 	-- @server
 	-- @return String data
@@ -566,7 +566,7 @@ else
 			e.name = string.sub(name, 1, 256)
 		end
 	end
-	
+
 	--- Sets clipboard text. Only works on the owner of the chip.
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText(txt)
@@ -602,19 +602,19 @@ else
 		SF.Permissions.check(SF.instance.player, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
 	end
-	
+
 	--- Returns the local player's camera angles
 	-- @return The local player's camera angles
 	function SF.DefaultEnvironment.eyeAngles ()
 		return SF.WrapObject(EyeAngles())
 	end
-	
+
 	--- Returns the local player's camera position
 	-- @return The local player's camera position
 	function SF.DefaultEnvironment.eyePos()
 		return SF.WrapObject(EyePos())
 	end
-	
+
 	--- Returns the local player's camera forward vector
 	-- @return The local player's camera forward vector
 	function SF.DefaultEnvironment.eyeVector()
@@ -633,8 +633,8 @@ function SF.DefaultEnvironment.require(file)
 		loaded = {}
 		SF.instance.data.reqloaded = loaded
 	end
-	
-	
+
+
 	local path
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
@@ -644,7 +644,7 @@ function SF.DefaultEnvironment.require(file)
 			path = SF.NormalizePath(file)
 		end
 	end
-	
+
 	if loaded[path] then
 		return loaded[path]
 	else
@@ -663,7 +663,7 @@ end
 function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	SF.CheckLuaType(dir, TYPE_STRING)
 	if loadpriority then SF.CheckLuaType(loadpriority, TYPE_TABLE) end
-	
+
 	local path
 	if string.sub(dir, 1, 1)=="/" then
 		path = SF.NormalizePath(dir)
@@ -748,12 +748,12 @@ end
 function SF.DefaultEnvironment.loadstring (str, name)
 	name = "SF:" .. (name or tostring(SF.instance.env))
 	local func = CompileString(str, name, false)
-	
+
 	-- CompileString returns an error as a string, better check before setfenv
 	if type(func) == "function" then
 		return setfenv(func, SF.instance.env)
 	end
-	
+
 	return func
 end
 
@@ -784,7 +784,7 @@ function SF.DefaultEnvironment.debugGetInfo (funcOrStackLevel, fields)
 	local TfuncOrStackLevel = type(funcOrStackLevel)
 	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.Throw("Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2) end
 	if fields then SF.CheckLuaType(fields, TYPE_STRING) end
-	
+
 	local ret = debug.getinfo(funcOrStackLevel, fields)
 	if ret then
 		ret.func = nil
@@ -806,9 +806,9 @@ local uncatchable = {
 function SF.DefaultEnvironment.pcall (func, ...)
 	local vret = { pcall(func, ...) }
 	local ok, err = vret[1], vret[2]
-	
+
 	if ok then return unpack(vret) end
-	
+
 	if type(err) == "table" then
 		if err.uncatchable then
 			error(err)
@@ -816,12 +816,12 @@ function SF.DefaultEnvironment.pcall (func, ...)
 	elseif uncatchable[err] then
 		SF.Throw(err, 2, true)
 	end
-	
+
 	return false, err
 end
 
 --- Lua's xpcall with SF throw implementation
--- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function. 
+-- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function.
 -- If execution fails, this returns false and the second function is called with the error message.
 -- @param funcThe function to call initially.
 -- @param The function to be called if execution of the first fails; the error message is passed as a string.
@@ -831,9 +831,9 @@ end
 function SF.DefaultEnvironment.xpcall (func, callback, ...)
 	local vret = { pcall(func, ...) }
 	local ok, err = vret[1], vret[2]
-	
+
 	if ok then return unpack(vret) end
-	
+
 	if type(err) == "table" then
 		if err.uncatchable then
 			error(err)
@@ -841,7 +841,7 @@ function SF.DefaultEnvironment.xpcall (func, callback, ...)
 	elseif uncatchable[err] then
 		SF.Throw(err, 2, true)
 	end
-	
+
 	local cret = callback(err)
 	return false, cret
 end

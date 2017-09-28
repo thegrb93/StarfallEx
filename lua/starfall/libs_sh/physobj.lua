@@ -160,43 +160,43 @@ if SERVER then
 	-- @param pos The position vector to set it to
 	function physobj_methods:setPos(pos)
 		SF.CheckType(pos, vec_meta)
-		
+
 		local vec = vunwrap(pos)
 		if not check(vec) then SF.Throw("infinite vector", 2) end
-		
+
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setPos")
 		phys:SetPos(vec)
 	end
-	
+
 	--- Sets the velocity of the physics object
 	-- @server
 	-- @param vel The velocity vector to set it to
 	function physobj_methods:setVelocity(vel)
 		SF.CheckType(vel, vec_meta)
-		
+
 		local vec = vunwrap(vel)
 		if not check(vec) then SF.Throw("infinite vector", 2) end
-		
+
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setVelocity")
 		phys:SetVelocity(vec)
 	end
-	
+
 	--- Applys a force to the center of the physics object
 	-- @server
 	-- @param force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
 		SF.CheckType(force, vec_meta)
-		
+
 		force = vunwrap(force)
 		if not check(force) then SF.Throw("infinite vector", 2) end
-		
+
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceCenter(force)
 	end
-	
+
 	--- Applys an offset force to a physics object
 	-- @server
 	-- @param force The force vector to apply
@@ -204,17 +204,17 @@ if SERVER then
 	function physobj_methods:applyForceOffset(force, position)
 		SF.CheckType(force, vec_meta)
 		SF.CheckType(position, vec_meta)
-		
+
 		force = vunwrap(force)
 		if not check(force) then SF.Throw("infinite force vector", 2) end
 		position = vunwrap(position)
 		if not check(position) then SF.Throw("infinite position vector", 2) end
-		
+
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceOffset(force, position)
 	end
-	
+
 	--- Applys a torque to a physics object
 	-- @server
 	-- @param torque The local torque vector to apply
@@ -222,10 +222,10 @@ if SERVER then
 		SF.CheckType(torque, vec_meta)
 		torque = vunwrap(torque)
 		if not check(torque) then SF.Throw("infinite torque vector", 2) end
-		
+
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.applyForce")
-		
+
 		local torqueamount = torque:Length()
 		if torqueamount < 1.192093e-07 then return end
 		-- Convert torque from local to world axis
@@ -244,7 +244,7 @@ if SERVER then
 		phys:ApplyForceOffset(dir, off)
 		phys:ApplyForceOffset(dir * -1, off * -1)
 	end
-	
+
 	--- Sets the mass of a physics object
 	-- @server
 	-- @param mass The mass to set it to
@@ -253,14 +253,14 @@ if SERVER then
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setMass")
 		phys:SetMass(math.Clamp(mass, 1, 50000))
 	end
-	
+
 	--- Sets the inertia of a physics object
 	-- @server
 	-- @param inertia The inertia vector to set it to
 	function physobj_methods:setInertia(inertia)
 		local phys = unwrap(self)
 		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setInertia")
-	
+
 		local vec = vunwrap(inertia)
 		if not check(vec) then SF.Throw("infinite vector", 2) end
 		vec[1] = math.Clamp(vec[1], 1, 100000)
@@ -269,7 +269,7 @@ if SERVER then
 
 		phys:SetInertia(vec)
 	end
-	
+
 	--- Sets the physical material of a physics object
 	-- @server
 	-- @param material The physical material to set it to

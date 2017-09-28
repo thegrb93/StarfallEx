@@ -45,7 +45,7 @@ if SERVER then
 		if not IsValid(ent) then return end
 		return SF.WrapObject(ent:GetDriver())
 	end
-	
+
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver ()

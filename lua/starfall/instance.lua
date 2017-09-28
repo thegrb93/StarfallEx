@@ -39,9 +39,9 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
 	end
-	
+
 	local instance = setmetatable({}, SF.Instance)
-	
+
 	instance.player = player
 	instance.playerid = player:SteamID()
 	instance.env = SF.Libraries.BuildEnvironment()
@@ -59,17 +59,17 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	if CLIENT and instance.cpuQuota <= 0 then
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
 	end
-	
+
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
 			SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
 		end
-		
+
 		local serverorclient
 		if  instance.ppdata.serverorclient then
 			serverorclient = instance.ppdata.serverorclient[filename]
 		end
-		
+
 		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
 			-- Lua doesn't have empty statements, so an empty file gives a syntax error
 			instance.scripts[filename] = function() end
@@ -82,7 +82,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 			instance.scripts[filename] = func
 		end
 	end
-	
+
 	return true, instance
 end
 
@@ -107,26 +107,26 @@ function SF.Instance:runWithOps(func, ...)
 	local function cpuCheck ()
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
-		
+
 		local function safeThrow(msg, nocatch)
 			local source = debug.getinfo(3, "S").short_src
 			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
 				SF.Throw(msg, 3, nocatch)
 			end
 		end
-		
+
 		if usedRatio>1 then
 			safeThrow("CPU Quota exceeded.", true)
 		elseif usedRatio > self.cpu_softquota then
 			safeThrow("CPU Quota warning.")
 		end
 	end
-	
+
 	local prevHook, mask, count = debug.gethook()
 	debug.sethook(cpuCheck, "", 2000)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
 	debug.sethook(prevHook, mask, count)
-	
+
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
 		self.cpu_total = SysTime() - oldSysTime
@@ -137,7 +137,7 @@ function SF.Instance:runWithOps(func, ...)
 			return {false, SF.MakeError("CPU Quota warning.", 1, false, true)}
 		end
 	end
-	
+
 	return tbl
 end
 
@@ -147,7 +147,7 @@ function SF.Instance:prepare(hook)
 	assert(self.initialized, "Instance not initialized!")
 	--Functions calling this one will silently halt.
 	if self.error then return true end
-	
+
 	if SF.instance ~= nil then
 		if self.instanceStack then
 			self.instanceStack[#self.instanceStack + 1] = SF.instance
@@ -155,7 +155,7 @@ function SF.Instance:prepare(hook)
 			self.instanceStack = {SF.instance}
 		end
 	end
-	
+
 	SF.instance = self
 	self:runLibraryHook("prepare", hook)
 end
@@ -165,7 +165,7 @@ end
 function SF.Instance:cleanup(hook, ok, err)
 	assert(SF.instance == self)
 	self:runLibraryHook("cleanup", hook, ok, err)
-	
+
 	if self.instanceStack then
 		SF.instance = self.instanceStack[#self.instanceStack]
 		if #self.instanceStack == 1 then self.instanceStack = nil
@@ -275,7 +275,7 @@ end
 -- @param ... Arguments to pass to func
 function SF.Instance:runFunction(func, ...)
 	if self:prepare("_runFunction") then return {} end
-	
+
 	local tbl = self:runWithOps(func, ...)
 	if tbl[1] then
 		self:cleanup("_runFunction", false)
@@ -284,7 +284,7 @@ function SF.Instance:runFunction(func, ...)
 		self:cleanup("_runFunction", true, tbl[2])
 		self:Error(tbl[2])
 	end
-	
+
 	return tbl
 end
 
@@ -309,7 +309,7 @@ hook.Add("Think", "SF_Think", function()
 			instance:runScriptHook("think")
 			cputotal = cputotal + instance.cpu_average
 		end
-		
+
 		if cputotal>plquota then
 			local max, maxinst = 0, nil
 			for instance, _ in pairs(insts) do
@@ -318,7 +318,7 @@ hook.Add("Think", "SF_Think", function()
 					maxinst = instance
 				end
 			end
-			
+
 			if maxinst then
 				maxinst:Error(SF.MakeError("SF: Player cpu time limit reached!", 1))
 			end

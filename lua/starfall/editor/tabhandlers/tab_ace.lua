@@ -21,7 +21,7 @@ local runJS = function (...)
 end
 
 local function saveSettings()
-	
+
 end
 
 local function updateSettings()
@@ -164,11 +164,11 @@ local function fixConsole(key)
 end
 
 local function fixKeys(key, notfirst)
-	
+
 	local function repeatKey ()
 		timer.Create("repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () TabHandler.html:OnKeyCodePressed(key, true) end)
 	end
-		
+
 	if (input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)) and
 	(input.IsKeyDown(KEY_LCONTROL) or input.IsKeyDown(KEY_RCONTROL)) and
 	not input.IsKeyDown(KEY_LALT) then
@@ -276,17 +276,17 @@ local function fixKeys(key, notfirst)
 
 end
 
-function TabHandler:registerSettings()	
+function TabHandler:registerSettings()
 
 	--Adding settings
 	local sheet = SF.Editor.editor:AddControlPanelTab("Ace", "icon16/cog.png", "ACE options.")
 	local panel = sheet.Panel
-	
+
 	local scrollPanel = vgui.Create("DScrollPanel", panel)
 	scrollPanel:Dock(FILL)
 	scrollPanel:SetPaintBackgroundEnabled(false)
 
-	local form = vgui.Create("DForm", scrollPanel)	
+	local form = vgui.Create("DForm", scrollPanel)
 	form:Dock(FILL)
 	form:DockPadding(0, 10, 0, 10)
 	form.Header:SetVisible(false)
@@ -311,14 +311,14 @@ function TabHandler:registerSettings()
 		label:SetDark(false)
 		return wang, label
 	end
-	
+
 	setWang(form:NumberWang("Font size", "sf_editor_ace_fontsize", 5, 40))
 	local combobox, label = form:ComboBox("Keybinding", "sf_editor_ace_keybindings")
 	label:SetDark(false)
 	combobox:AddChoice("ace")
 	combobox:AddChoice("vim")
 	combobox:AddChoice("emacs")
-	
+
 	setDoClick(form:CheckBox("Enable word wrap", "sf_editor_ace_wordwrap"))
 	setDoClick(form:CheckBox("Show fold widgets", "sf_editor_ace_widgets"))
 	setDoClick(form:CheckBox("Show line numbers", "sf_editor_ace_linenumbers"))
@@ -330,9 +330,9 @@ function TabHandler:registerSettings()
 	setDoClick(form:CheckBox("Live Auto completion", "sf_editor_ace_liveautocompletion"))
 	setDoClick(form:CheckBox("Fix keys not working on Linux", "sf_editor_ace_fixkeys")):SetTooltip("Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc...")
 	setDoClick(form:CheckBox("Fix console bug", "sf_editor_ace_fixconsolebug")):SetTooltip("Fix console opening when pressing ' or @ (UK Keyboad layout)")
-	setDoClick(form:CheckBox("Disable line folding keybinds", "sf_editor_ace_disablelinefolding"))	
+	setDoClick(form:CheckBox("Disable line folding keybinds", "sf_editor_ace_disablelinefolding"))
 	--
-	
+
 end
 
 function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
@@ -343,16 +343,16 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
 	local files = file.Find("html/starfalleditor*", "GAME")
-	local version 
-	if files[1] then 
+	local version
+	if files[1] then
 		version = tonumber(string.match(files[1], "starfalleditor(%d+)%.html") or "0")
 		for k, file in pairs(files) do -- Looking for oldest
 			local ver = tonumber(string.match(file, "starfalleditor(%d+)%.html") or "0")
-			
+
 			if ver > version then version = ver end
 		end
 	end
-	
+
 	SF.AceVersion = version
 	if version then
 		html:OpenURL("asset://garrysmod/html/starfalleditor"..version..".html")
@@ -380,12 +380,12 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 			if input.IsKeyDown(KEY_LCONTROL) then
 				self:OnShortcut(key)
 			end
-			
+
 			if tobool(GetConVarNumber("sf_editor_ace_fixconsolebug")) then --Additional fix for some layouts
 				fixConsole(key)
 			end
-			
-			if tobool(GetConVarNumber("sf_editor_ace_fixkeys")) then 
+
+			if tobool(GetConVarNumber("sf_editor_ace_fixkeys")) then
 				fixKeys(key, notfirst)
 			end
 		end

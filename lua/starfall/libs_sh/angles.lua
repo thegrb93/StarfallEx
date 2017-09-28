@@ -22,7 +22,7 @@ SF.AddObjectUnwrapper(ang_metamethods, unwrap)
 local vwrap
 SF.Libraries.AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
-	
+
 	SF.DefaultEnvironment.Angle = function (p, y, r)
 		p = p or 0
 		return wrap({ p, y or p, r or p })

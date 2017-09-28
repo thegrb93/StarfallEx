@@ -24,14 +24,6 @@ cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
 end)
 
-surface.CreateFont("SFEditorDefault", {
-		font = "Roboto",
-		size = 18,
-		weight = 500,
-		antialias = true,
-		additive = false,
-	})
-
 Editor.CreatedFonts = {}
 function createFont(name, FontName, Size)
 	local fontTable =
@@ -165,7 +157,7 @@ end
 function Editor:PaintOver()
 	local w, h = self:GetSize()
 
-	surface.SetFont("SFEditorDefault")
+	surface.SetFont("SFTitle")
 	surface.SetTextColor(255, 255, 255, 255)
 	surface.SetTextPos(10, 6)
 	surface.DrawText(self.Title .. self.subTitle)
@@ -373,7 +365,7 @@ function Editor:UpdateTabText(tab)
 
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
-	if ed:getCode() ~= ed.savedCode then
+	if not ed:isSaved() then
 		tabtext = tabtext.." *"
 	end
 	if tab:GetText() ~= tabtext then
@@ -444,7 +436,7 @@ function Editor:CreateTab(chosenfile)
 	local editor = vgui.Create(th.ControlName)
 	editor.parentpanel = self -- That's going to be Deprecated
 	editor.getTabHandler = function() return th end -- add :getTabHandler()
-
+	editor.isSaved = function(self) return self:getCode() == self.savedCode or self:getCode() == defaultCode or self:getCode() == "" end
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
 	editor.chosenfile = chosenfile
 	sheet.Tab.editor = editor -- For easy access
@@ -520,6 +512,8 @@ function Editor:CreateTab(chosenfile)
 					SetClipboardText(str)
 				end)
 			menu:Open()
+			menu:AddSpacer()
+			th:registerTabMenu(menu, editor)
 			return
 		end
 
@@ -574,12 +568,12 @@ function Editor:GetNextAvailableTab()
 end
 
 function Editor:NewTab()
-	local sheet = self:CreateTab("generic")
+	local sheet = self:CreateTab("Generic")
 	self:SetActiveTab(sheet.Tab)
 	self:NewScript(true)
 end
 
-function Editor:CloseTab(_tab)
+function Editor:CloseTab(_tab,dontask)
 	local activetab, sheetindex
 	if _tab then
 		if isnumber(_tab) then
@@ -610,12 +604,18 @@ function Editor:CloseTab(_tab)
 			end
 		end
 	end
+	local ed = activetab:GetPanel()
+	if not ed:isSaved() and not dontask and not ed.IsOnline then
+		local question = string.format("Do you want to close %q ?", activetab:GetText())
+		Derma_Query(question, "Are you sure?", "Close", function() self:CloseTab(_tab, true) end, "Cancel", function() end)
+		return
+	end
 
 	self:SaveTabs()
 
 	-- There's only one tab open, no need to actually close any tabs
 	if self:GetNumTabs() == 1 then
-		self:GetActiveTab():SetText("generic")
+		self:GetActiveTab():SetText("Generic")
 		self:NewScript(true)
 		return
 	end
@@ -639,7 +639,7 @@ function Editor:CloseTab(_tab)
 					self:SetActiveTab(othertab)
 					self:SetLastTab()
 				else -- Reset the current tab (backup)
-					self:GetActiveTab():SetText("generic")
+					self:GetActiveTab():SetText("Generic")
 					self.C.TabHolder:InvalidateLayout()
 					self:NewScript(true)
 					return
@@ -653,7 +653,7 @@ function Editor:CloseTab(_tab)
 			if othertab and othertab:IsValid() then -- If that other tab is valid, use it
 				self:SetActiveTab(othertab)
 			else -- Reset the current tab (backup)
-				self:GetActiveTab():SetText("generic")
+				self:GetActiveTab():SetText("Generic")
 				self.C.TabHolder:InvalidateLayout()
 				self:NewScript(true)
 				return
@@ -799,7 +799,7 @@ function Editor:InitComponents()
 
 	self.C.CloseTab:SetImage("icon16/page_white_delete.png")
 	self.C.CloseTab.DoClick = function(button)
-		Derma_Query("Do you want to close current tab?", "Are you sure?", "Close", function() self:CloseTab() end, "Cancel", function() end)
+		self:CloseTab()
 	end
 	self.C.CloseTab:SetToolTip("Close tab")
 
@@ -810,8 +810,18 @@ function Editor:InitComponents()
 	end
 
 	self.C.Browser.tree.OnNodeSelected = function(tree, node)
-		if not node:GetFileName() or string.GetExtensionFromFilename(node:GetFileName()) ~= "txt" then return end
-
+		if node.FileURL then
+			SF.AddNotify(LocalPlayer(), "Downloading example..", "GENERIC" , 4, "DRIP2")
+			http.Fetch( node.FileURL,
+				function( body, len, headers, code )
+					self:Open(node:GetText(), body, false)
+					self:GetActiveTab():GetPanel().IsOnline = true
+				end,
+				function(err)
+						SF.AddNotify(LocalPlayer(), "There was a problem in downloading example.", "ERROR", 7, "ERROR1")
+				end)
+		end
+		if not node:GetFileName() or not (string.GetExtensionFromFilename(node:GetFileName()) == "txt" or string.GetExtensionFromFilename(node:GetFileName()) == "lua") then return end
 		self:Open(node:GetFileName(), nil, false)
 	end
 	self.C.Browser.tree.Paint = function(_, w, h) --Fix for offset
@@ -1026,6 +1036,20 @@ function Editor:InitControlPanel()
 		self:GetParent():SetWorldClicker(bVal)
 	end
 
+	local ShowExamples = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(ShowExamples)
+	ShowExamples:SetConVar("sf_editor_showexamples")
+	ShowExamples:SetText("Show examples in file tree")
+	ShowExamples:SizeToContents()
+	ShowExamples:SetTooltip("Shows examples loaded from github in file tree.")
+
+	local ShowExamples = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(ShowExamples)
+	ShowExamples:SetConVar("sf_editor_showfiledata")
+	ShowExamples:SetText("Show files from sf_filedata in file tree (UNSTABLE)")
+	ShowExamples:SizeToContents()
+	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
+
 	------ Permissions panel
 	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
 	local perms = SF.Editor.createpermissionsPanel ()
@@ -1234,19 +1258,17 @@ function Editor:NewScript(incurrent)
 		self:SaveTabs()
 		self:ChosenFile()
 		-- Set title
-		self:GetActiveTab():SetText("generic")
+		self:GetActiveTab():SetText("Generic")
 		self.C.TabHolder:InvalidateLayout()
 
 		self:SetCode(defaultCode)
+		self:GetCurrentEditor().savedCode = self:GetCurrentEditor():getCode() -- It may return different line endings etc
 	end
 end
 
-local id = 0
 function Editor:InitShutdownHook()
-	id = id + 1
-
 	-- save code when shutting down
-	hook.Add("ShutDown", "wire_expression2_ShutDown" .. id, function()
+	hook.Add("ShutDown", "sf_editor_shutdown", function()
 			if Editor.SaveTabsVar:GetBool() then
 				self:SaveTabs()
 			end
@@ -1260,7 +1282,14 @@ function Editor:SaveTabs()
 	for i = 1, self:GetNumTabs() do
 		tabs[i] = {}
 		local filename = self:GetEditor(i).chosenfile
-		if filename then filename =  filename:sub(#self.Location + 2) end
+		local filedatapath = "sf_filedata/"
+		if filename then 
+			if filename:sub(1, #filedatapath) == filedatapath then -- Temporary fix before we update sf_tabs.txt format
+				filename = nil
+			else
+				filename =  filename:sub(#self.Location + 2)
+			end
+		end
 		tabs[i].filename = filename
 		tabs[i].code = self:GetEditor(i):getCode()
 	end
@@ -1282,7 +1311,7 @@ function Editor:OpenOldTabs()
 		if v.filename then v.filename = "starfall/"..v.filename end
 		if is_first then -- Remove initial tab
 			timer.Simple(0, function()
-				self:CloseTab(1)
+				self:CloseTab(1, true)
 				self:SetActiveTabIndex(tabs.selectedTab or 1)
 			end)
 			is_first = false
@@ -1312,7 +1341,7 @@ function Editor:Validate(gotoerror)
 	if success then
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
 	else
-		row = tonumber(err:match("%d+")) - 1 or 0
+		row = tonumber(err:match("%d+")) or 0
 		message = err:match(": .+$"):sub(3) or "Unknown"
 		message = "Line "..row..":"..message
 		self.C.Val:SetBGColor(110, 0, 20, 255)
@@ -1569,7 +1598,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
 		if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
-			SF.Helper.Frame:close()
+			SF.Helper.Frame:Close()
 		else
 			SF.Helper.show()
 		end
@@ -1596,11 +1625,7 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	ModelViewer:Dock(RIGHT)
 	ModelViewer:SetText("Model Viewer")
 	ModelViewer.DoClick = function()
-		if SF.Editor.modelViewer:IsVisible() then
-			SF.Editor.modelViewer:close()
-		else
-			SF.Editor.modelViewer:open()
-		end
+		 hook.Run( 'StartSearch' ) -- https://github.com/Facepunch/garrysmod/blob/784cd57576d85712fa13a7cea3a9523b4df966b0/garrysmod/gamemodes/sandbox/gamemode/init.lua#L111
 	end
 	self.C.ModelViewer = ModelViewer
 

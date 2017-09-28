@@ -53,18 +53,18 @@ function timer_library.create(name, delay, reps, func, simple)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
 	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
 	SF.CheckLuaType(func, TYPE_FUNCTION)
-	
+
 	local instance = SF.instance
 	if instance.data.timer_count > max_timers:GetInt() then SF.Throw("Max timers exceeded!", 2) end
 	instance.data.timer_count = instance.data.timer_count + 1
-	
+
 	local timername
 	if simple then
 		timername = mangle_simpletimer_name(instance)
 	else
 		timername = mangle_timer_name(instance, name)
 	end
-	
+
 	local function timercb()
 		if reps ~= 0 then
 			reps = reps - 1
@@ -73,12 +73,12 @@ function timer_library.create(name, delay, reps, func, simple)
 				instance.data.timers[timername] = nil
 			end
 		end
-		
+
 		instance:runFunction(func)
 	end
-	
+
 	timer.Create(timername, math.max(delay, 0.001), reps, timercb)
-	
+
 	instance.data.timers[timername] = true
 end
 
@@ -89,12 +89,12 @@ function timer_library.simple(delay, func)
 	timer_library.create("", delay, 1, func, true)
 end
 
---- Stops and removes the timer. 
+--- Stops and removes the timer.
 -- @param name The timer name
 function timer_library.remove(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 	local instance = SF.instance
-	
+
 	local timername = mangle_timer_name(instance, name)
 	if instance.data.timers[timername] then
 		instance.data.timer_count = instance.data.timer_count - 1
@@ -124,7 +124,7 @@ end
 -- @return true if the timer exists, false if it doesn't.
 function timer_library.start(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	
+
 	return timer.Start(mangle_timer_name(SF.instance, name))
 end
 
@@ -139,7 +139,7 @@ function timer_library.adjust(name, delay, reps, func)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
 	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
 	if func then SF.CheckLuaType(func, TYPE_FUNCTION) end
-	
+
 	return timer.Adjust(mangle_timer_name(SF.instance, name), delay, reps, func)
 end
 
@@ -148,7 +148,7 @@ end
 -- @return false if the timer didn't exist or was already paused, true otherwise.
 function timer_library.pause(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	
+
 	return timer.Pause(mangle_timer_name(SF.instance, name))
 end
 
@@ -157,34 +157,34 @@ end
 -- @return false if the timer didn't exist or was already running, true otherwise.
 function timer_library.unpause(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	
+
 	return timer.UnPause(mangle_timer_name(SF.instance, name))
 end
 
---- Runs either timer.pause or timer.unpause based on the timer's current status. 
+--- Runs either timer.pause or timer.unpause based on the timer's current status.
 -- @param name The timer name
 -- @return status of the timer.
 function timer_library.toggle(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	
+
 	return timer.Toggle(mangle_timer_name(SF.instance, name))
 end
 
---- Returns amount of time left (in seconds) before the timer executes its function. 
+--- Returns amount of time left (in seconds) before the timer executes its function.
 -- @param The timer name
 -- @return The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
 function timer_library.timeleft(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	
+
 	return timer.TimeLeft(mangle_timer_name(SF.instance, name))
 end
 
---- Returns amount of repetitions/executions left before the timer destroys itself. 
+--- Returns amount of repetitions/executions left before the timer destroys itself.
 -- @param The timer name
 -- @return The amount of executions left. Nil if timer doesnt exist
 function timer_library.repsleft(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	
+
 	return timer.RepsLeft(mangle_timer_name(SF.instance, name))
 end
 

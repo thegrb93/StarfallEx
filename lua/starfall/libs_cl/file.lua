@@ -51,7 +51,7 @@ function file_library.write (path, data)
 	SF.Permissions.check(SF.instance.player, path, "file.write")
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(data, TYPE_STRING)
-	
+
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), "wb", "DATA")
 	if not f then SF.Throw("Couldn't open file for writing.", 2) return end
 	f:Write(data)
@@ -65,7 +65,7 @@ function file_library.append (path, data)
 	SF.Permissions.check(SF.instance.player, path, "file.write")
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(data, TYPE_STRING)
-	
+
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), "ab", "DATA")
 	if not f then SF.Throw("Couldn't open file for writing.", 2) return end
 	f:Write(data)
@@ -268,5 +268,3 @@ function file_methods:writeShort(x)
 	SF.CheckLuaType(x, TYPE_NUMBER)
 	unwrap(self):WriteShort(x)
 end
-
-

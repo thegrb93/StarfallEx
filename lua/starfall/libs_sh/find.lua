@@ -17,7 +17,7 @@ end
 local function convert(results, func)
 	if func then SF.CheckLuaType(func, TYPE_FUNCTION) end
 	local wrap = SF.WrapObject
-	
+
 	local t = {}
 	if func then
 		for i = 1, #results do
@@ -60,7 +60,7 @@ function find_library.inSphere (center, radius, filter)
 	SF.CheckLuaType(radius, TYPE_NUMBER)
 
 	local center = vunwrap(center)
-	
+
 	return convert(ents.FindInSphere(center, radius), filter)
 end
 
@@ -79,7 +79,7 @@ function find_library.inCone (pos, dir, distance, radius, filter)
 	SF.CheckLuaType(radius, TYPE_NUMBER)
 
 	local pos, dir = vunwrap(pos), vunwrap(dir)
-	
+
 	return convert(ents.FindInCone(pos, dir, distance, radius), filter)
 end
 
@@ -90,7 +90,7 @@ end
 function find_library.byClass(class, filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
 	SF.CheckLuaType(class, TYPE_STRING)
-		
+
 	return convert(ents.FindByClass(class), filter)
 end
 
@@ -101,7 +101,7 @@ end
 function find_library.byModel(model, filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
 	SF.CheckLuaType(model, TYPE_STRING)
-		
+
 	return convert(ents.FindByModel(model), filter)
 end
 
@@ -110,7 +110,7 @@ end
 -- @return An array of found entities
 function find_library.allPlayers(filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
-	
+
 	return convert(player.GetAll(), filter)
 end
 
@@ -119,6 +119,6 @@ end
 -- @return An array of found entities
 function find_library.all(filter)
 	SF.Permissions.check(SF.instance.player, nil, "find")
-	
+
 	return convert(ents.GetAll(), filter)
 end

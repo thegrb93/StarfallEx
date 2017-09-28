@@ -22,7 +22,7 @@ function SF.Libraries.BuildEnvironment()
 	local function deepCopy(src, dst, done)
 		if done[src] then return end
 		done[src] = true
-		
+
 		-- Copy the values
 		for k, v in pairs(src) do
 			if type(v)=="table" then
@@ -33,7 +33,7 @@ function SF.Libraries.BuildEnvironment()
 				dst[k] = v
 			end
 		end
-		
+
 		-- Copy the metatable
 		local meta = debug.getmetatable(src)
 		if meta then
@@ -43,13 +43,13 @@ function SF.Libraries.BuildEnvironment()
 			end
 			setmetatable(dst, t)
 		end
-		
+
 		done[src] = nil
 	end
-	
+
 	local env = {}
 	deepCopy(SF.DefaultEnvironment, env, {})
-	
+
 	for k, v in pairs(SF.Libraries.libraries) do
 		local t = {}
 		deepCopy(v, t, {})
@@ -68,7 +68,7 @@ function SF.Libraries.AddHook(hookname, func)
 		hook = {}
 		SF.Libraries.hooks[hookname] = hook
 	end
-	
+
 	hook[#hook + 1] = func
 end
 
@@ -78,7 +78,7 @@ end
 function SF.Libraries.CallHook(hookname, ...)
 	local hook = SF.Libraries.hooks[hookname]
 	if not hook then return end
-	
+
 	for i = 1, #hook do
 		hook[i](...)
 	end

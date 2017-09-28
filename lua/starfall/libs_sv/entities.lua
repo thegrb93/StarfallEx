@@ -148,13 +148,13 @@ function ents_methods:linkComponent (e)
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	SF.Permissions.check(SF.instance.player, ent, "entities.canTool")
-	
+
 	if e then
 		SF.CheckType(e, ents_metatable)
 		local link = unwrap(e)
 		if not isValid(link) then SF.Throw("Entity is not valid", 2) end
 		SF.Permissions.check(SF.instance.player, link, "entities.canTool")
-		
+
 		if link:GetClass()=="starfall_processor" and (ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud") then
 			ent:LinkEnt(link)
 		elseif link:IsVehicle() and ent:GetClass()=="starfall_hud" then
@@ -263,12 +263,12 @@ end
 function ents_methods:applyAngForce (ang)
 	SF.CheckType(self, ents_metatable)
 	SF.CheckType(ang, SF.Types["Angle"])
-	
+
 	local ang = SF.UnwrapObject(ang)
 	local ent = unwrap(self)
-	
+
 	if not check(ang) then SF.Throw("infinite angle", 2) end
-	
+
 	local phys = getPhysObject(ent)
 	if not phys then SF.Throw("Entity has no physics object or is not valid", 2) end
 
@@ -373,7 +373,7 @@ function ents_methods:setNocollideAll (nocollide)
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	SF.Permissions.check(SF.instance.player, ent, "entities.setSolid")
-	
+
 	ent:SetCollisionGroup (nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE)
 end
 
@@ -416,7 +416,7 @@ local renderProperties = {
 
 local function sendRenderPropertyToClient(ply, ent, func, ...)
 	local meta = debug.getmetatable(ply)
-	if meta == SF.Types["Player"] then 
+	if meta == SF.Types["Player"] then
 		ply = unwrap(ply)
 		if not (IsValid(ply) and ply:IsPlayer()) then
 			SF.Throw("Tried to use invalid player", 3)
@@ -435,7 +435,7 @@ local function sendRenderPropertyToClient(ply, ent, func, ...)
 	else
 		SF.Throw("Expected player or table of players.", 3)
 	end
-	
+
 	net.Start("sf_setentityrenderproperty")
 	net.WriteEntity(ent)
 	net.WriteUInt(func, 4)
@@ -675,7 +675,7 @@ function ents_methods:setVelocity (vel)
 
 	local vel = vunwrap(vel)
 	local ent = unwrap(self)
-	
+
 	if not check(vel) then SF.Throw("infinite vector", 2) end
 
 	local phys = getPhysObject(ent)
@@ -803,7 +803,7 @@ function ents_methods:setInertia (vec)
 	SF.Permissions.check(SF.instance.player, ent, "entities.setInertia")
 	local phys = getPhysObject(ent)
 	if not phys then SF.Throw("Entity has no physics object or is not valid", 2) end
-	
+
 	local vec = vunwrap(vec)
 	if not check(vec) then SF.Throw("infinite vector", 2) end
 	vec[1] = math.Clamp(vec[1], 1, 100000)
@@ -825,14 +825,14 @@ function ents_methods:setPhysMaterial(mat)
 
 	SF.Permissions.check(SF.instance.player, ent, "entities.setMass")
 
-	construct.SetPhysProp(nil, ent, 0, phys, { Material = mat }) 
+	construct.SetPhysProp(nil, ent, 0, phys, { Material = mat })
 end
 
 --- Checks whether entity has physics
 -- @return True if entity has physics
 function ents_methods:isValidPhys()
 	SF.CheckType(self, ents_metatable)
-	
+
 	local ent = unwrap(self)
 	local phys = getPhysObject(ent)
 	return phys ~= nil
@@ -889,19 +889,19 @@ function ents_methods:enableSphere (enabled)
 	SF.CheckType(self, ents_metatable)
 
 	local ent = unwrap(self)
-	
+
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("This function only works for prop_physics", 2) end
 	local phys = getPhysObject(ent)
 	if not phys then SF.Throw("Entity has no physics object or is not valid", 2) end
 	SF.Permissions.check(SF.instance.player, ent, "entities.enableMotion")
-	
+
 	local ismove = phys:IsMoveable()
 	local mass = phys:GetMass()
-	
+
 	if enabled then
 		if ent:GetMoveType() == MOVETYPE_VPHYSICS then
 			local OBB = ent:OBBMaxs() - ent:OBBMins()
-			local radius = math.max(OBB.x, OBB.y, OBB.z) / 2 
+			local radius = math.max(OBB.x, OBB.y, OBB.z) / 2
 			ent:PhysicsInitSphere(radius, phys:GetMaterial())
 			ent:SetCollisionBounds(Vector(-radius, -radius, -radius) , Vector(radius, radius, radius))
 		end
@@ -912,7 +912,7 @@ function ents_methods:enableSphere (enabled)
 			ent:SetSolid(SOLID_VPHYSICS)
 		end
 	end
-	
+
 	-- New physobject after applying spherical collisions
 	local phys = ent:GetPhysicsObject()
 	phys:SetMass(mass)
@@ -951,7 +951,7 @@ end
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
 	SF.CheckType(self, ents_metatable)
 	SF.CheckLuaType(material, TYPE_STRING)
-	
+
 	local ent = unwrap(self)
 
 	if string.find(material, '"', 1, true) then SF.Throw("Invalid Material", 2) end

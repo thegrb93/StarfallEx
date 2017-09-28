@@ -192,15 +192,15 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	if type(animation)=="string" then
 		animation = Holo:LookupSequence(animation)
 	end
-	
+
 	frame = frame or 0
 	rate = rate or 1
-	
+
 	if not Holo.Animated then
 		-- This must be run once on entities that will be animated
 		Holo.Animated = true
 		Holo.AutomaticFrameAdvance = true
-		
+
 		local OldThink = Holo.Think
 		function Holo:Think()
 			OldThink(self)
@@ -220,7 +220,7 @@ end
 function hologram_methods:getAnimationLength()
 	local Holo = unwrap(self)
 	if not IsValid(Holo) then return -1 end
-	
+
 	return Holo:SequenceDuration()
 end
 
@@ -231,7 +231,7 @@ end
 function hologram_methods:getAnimationNumber(animation)
 	local Holo = unwrap(self)
 	if not IsValid(Holo) then return 0 end
-	
+
 	return Holo:LookupSequence(animation) or 0
 end
 
@@ -243,7 +243,7 @@ end
 function hologram_methods:setPose(pose, value)
 	local Holo = unwrap(self)
 	if not IsValid(Holo) then return end
-	
+
 	Holo:SetPoseParameter(pose, value)
 end
 
@@ -255,7 +255,7 @@ end
 function hologram_methods:getPose(pose)
 	local Holo = unwrap(self)
 	if not IsValid(Holo) then return end
-	
+
 	return Holo:GetPoseParameter(pose)
 end
 
@@ -278,9 +278,9 @@ function holograms_library.create (pos, ang, model, scale)
 	local ang = aunwrap(ang)
 
 	local holodata = instance.data.holograms.holos
-	
-	if plyCount[instance.player] >= SF.Holograms.personalquota:GetInt() then 
-		SF.Throw("Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2) 
+
+	if plyCount[instance.player] >= SF.Holograms.personalquota:GetInt() then
+		SF.Throw("Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2)
 	end
 
 	local holoent = ents.Create("starfall_hologram")
@@ -295,14 +295,14 @@ function holograms_library.create (pos, ang, model, scale)
 			holoent:CPPISetOwner(instance.player)
 			holoent:SetHoloOwner(instance.player)
 		end
-		
+
 		if scale then
 			holoent:SetScale(scale)
 		end
 
 		holodata[holoent] = true
 		plyCount[instance.player] = plyCount[instance.player] + 1
-		
+
 		return wrap(holoent)
 	end
 end

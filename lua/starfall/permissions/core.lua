@@ -61,7 +61,7 @@ function P.hasAccess (principal, target, key)
 			end
 		end
 	end
-	
+
 	return true
 end
 
@@ -166,7 +166,7 @@ if SERVER then
 	net.Receive("sf_permissionsettings", function(len, ply)
 		if ply:IsSuperAdmin() then
 			net.Start("sf_permissionsettings")
-			
+
 			net.WriteUInt(#P.providers, 8)
 			for _, v in ipairs(P.providers) do
 				net.WriteString(v.id)
@@ -183,7 +183,7 @@ if SERVER then
 					net.WriteUInt(setting, 8)
 				end
 			end
-			
+
 			net.Send(ply)
 		end
 	end)

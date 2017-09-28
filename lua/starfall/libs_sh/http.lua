@@ -52,17 +52,17 @@ end
 function http_library.get (url, callbackSuccess, callbackFail)
 	local instance = SF.instance
 	SF.Permissions.check(SF.instance.player, nil, "http.get")
-	
+
 	httpRequestReady(instance)
-	
+
 	SF.CheckLuaType(url, TYPE_STRING)
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
-	
+
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
-	http.Fetch(url, function (body, len, headers, code) 
+	http.Fetch(url, function (body, len, headers, code)
 		runCallback(instance, callbackSuccess, body, len, headers, code)
 	end, function (err)
 		runCallback(instance, callbackFail, err)
@@ -77,11 +77,11 @@ end
 function http_library.post (url, params, callbackSuccess, callbackFail)
 	local instance = SF.instance
 	SF.Permissions.check(SF.instance.player, nil, "http.post")
-	
+
 	httpRequestReady(instance)
-	
+
 	SF.CheckLuaType(url, TYPE_STRING)
-	
+
 	if params then
 		SF.CheckLuaType(params, TYPE_TABLE)
 		for k, v in pairs(params) do
@@ -90,11 +90,11 @@ function http_library.post (url, params, callbackSuccess, callbackFail)
 			end
 		end
 	end
-	
-	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)	
+
+	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
-	
+
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
 	http.Post(url, params, function (body, len, headers, code)

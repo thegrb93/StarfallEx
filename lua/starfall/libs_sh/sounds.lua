@@ -16,7 +16,7 @@ SF.Sounds.Metatable = sound_metamethods
 
 SF.Sounds.burstmax = CreateConVar("sf_sounds_burstmax", "20", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
 	"The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
-	
+
 SF.Sounds.burstrate = CreateConVar("sf_sounds_burstrate", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
 	"The rate at which the burst regenerates per second.")
 
@@ -110,7 +110,7 @@ function sound_methods:setVolume (vol, fade)
 	if fade then
 		SF.CheckLuaType(fade, TYPE_NUMBER)
 		fade = math.abs(fade, 0)
-	else	
+	else
 		fade = 0
 	end
 
@@ -124,11 +124,11 @@ end
 function sound_methods:setPitch (pitch, fade)
 	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
 	SF.CheckLuaType(pitch, TYPE_NUMBER)
-	
+
 	if fade then
 		SF.CheckLuaType(fade, TYPE_NUMBER)
 		fade = math.max(fade, 0)
-	else	
+	else
 		fade = 0
 	end
 
@@ -138,7 +138,7 @@ end
 
 --- Returns whether the sound is being played.
 function sound_methods:isPlaying ()
-	return unwrap(self):IsPlaying()	
+	return unwrap(self):IsPlaying()
 end
 
 --- Sets the sound level in dB.

@@ -9,9 +9,18 @@ include("xml.lua")
 SF.Editor.Themes.Themes = { }
 SF.Editor.Themes.CurrentTheme = nil -- Theme table
 SF.Editor.Themes.ThemeConVar = CreateClientConVar("sf_editor_theme", "default", true, false)
+SF.Editor.Themes.DebugOutput = false
 
 local themeformat_version = 1 --Change that if previous themes arent compatibile anymore
 SF.Editor.Themes.Version = themeformat_version
+
+local function debugPrint(...)
+	if not SF.Editor.Themes.DebugOutput then return end
+	local args = {...}
+	args[1] = "[TextMate Debug]"..args[1]
+	return print(string.format(...))
+end
+
 function SF.Editor.Themes.Load()
     if not file.Exists("sf_themes.txt", "DATA") then
 		SF.Editor.Themes.SwitchTheme("default")
@@ -25,14 +34,14 @@ function SF.Editor.Themes.Load()
 
 	if not result then
 		print("A problem occured during parsing sf_themes.txt, the file will be renamed to sf_themes_old.txt")
-		file.Write("sf_themes_old.txt", contents)		
+		file.Write("sf_themes_old.txt", contents)
 		file.Delete("sf_themes.txt")
 
 		SF.Editor.Themes.SwitchTheme("default")
 
 		return
 	end
-	
+
 	result.default = SF.Editor.Themes.Themes.default -- Default theme wont be loaded
 	SF.Editor.Themes.Themes = result
 
@@ -114,7 +123,7 @@ local function parseTextMate(text)
     local plist = xml._handler.root.children[1]
 
     -- Parse dict
-    
+
     function parseDict(dict)
         if not dict.children then return { } end
 
@@ -175,8 +184,10 @@ local function parseTextMate(text)
 	local map = {
 		["Keyword"] = { "keyword", "storageType" },
 		["Built-in constant"] = { "constant", "directive" },
+		["Constant"] = { "constant", "directive" },
 		["Constants"] = { "constant", "directive" },
 		["Function name"] = { "function", "userfunction", "method" },
+		["Funtion"] = { "function", "userfunction", "method" },
 		["Library function"] = { "function", "userfunction", "method" },
 		["String"] = { "string" },
 		["Number"] = { "number" },
@@ -185,28 +196,39 @@ local function parseTextMate(text)
 		["Operators"] = { "operator" },
 		["Storage type"] = { "storageType" },
 	}
+
+	local newmap = {}
+	for k,v in pairs(map) do -- It's not "normalized" in source for readability
+		k = k:gsub("%s",""):lower()
+		newmap[k] = v
+	end
+	map = newmap
 	
     for k, v in pairs(parsed.settings) do
 		local foreground, background, fontStyle = parseColor(v.settings.foreground), parseColor(v.settings.background), v.settings.fontStyle
 		fontStyle = fontStyle or "normal"
-		
+
 		if fontStyle:lower() == "italic" then fontStyle = 1
 		elseif fontStyle:lower() == "bold" then fontStyle = 1
 		else fontStyle = 0 end
-
-		if map [v.name] then
-			for k, v in pairs(map[v.name]) do
-				tbl[v] = { foreground, background, fontStyle }
+		if not v.name then continue end
+		local names = string.Explode(",",v.name:gsub("%s",""):lower())
+		for _,name in pairs(names) do
+			if map [name] then
+				debugPrint("Parsing %q as %s", name, table.concat(map[name], ","))
+				for k, v in pairs(map[name]) do
+					tbl[v] = { foreground, background, fontStyle }
+				end
+			else
+				debugPrint("[TextMate Import] Ignored setting:%q", name)
 			end
-		else
-			print("[TextMate Import] Ignored setting:", v.name)
 		end
     end
 
 	tbl.operator = tbl.operator or tbl.keyword
 
 	-- Copy values from default theme to avoid problems with nil values
-	
+
 	for k, v in pairs(SF.Editor.Themes.Themes.default) do
 		if not tbl[k] then
 			tbl[k] = v
@@ -235,7 +257,7 @@ end
 
 SF.Editor.Themes.AddTheme("default", {
     Name = "Default Theme",
-    
+
 	["background"] = Color(32, 32, 32),
     ["line_highlight"] = Color(39, 40, 34),
 
@@ -247,17 +269,17 @@ SF.Editor.Themes.AddTheme("default", {
     ["selection"] = Color(0, 0, 160),
 
 	["word_highlight"] = Color(30, 150, 30),
-	
+
 	--{foreground color, background color, fontStyle}
-    ["keyword"] = { Color(249, 38, 114), nil, 0 }, 
-	["storageType"] = { Color(249, 38, 114), nil, 0 }, 
+    ["keyword"] = { Color(249, 38, 114), nil, 0 },
+	["storageType"] = { Color(249, 38, 114), nil, 0 },
 	["directive"] =	{ Color(230, 219, 116), nil, 0 },
 	["comment"] = { Color(117, 113, 94), nil, 1 },
 	["string"] = { Color(230, 219, 116), nil, 0 },
-	["number"] = { Color(174, 129, 255), nil, 0 }, 
+	["number"] = { Color(174, 129, 255), nil, 0 },
 	["function"] = { Color(137, 189, 255), nil, 0 },
 	["method"] = { Color(137, 189, 255), nil, 0 },
-	["library"] = { Color(137, 189, 255), nil, 0 }, 
+	["library"] = { Color(137, 189, 255), nil, 0 },
 	["operator"] = { Color(230, 230, 230), nil, 0 },
 	["notfound"] = { Color(230, 230, 230), nil, 0 },
 	["userfunction"] = { Color(166, 226, 42), nil, 0 },

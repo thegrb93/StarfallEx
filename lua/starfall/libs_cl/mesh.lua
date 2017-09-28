@@ -65,10 +65,10 @@ end
 
 local function destroyMesh(id, mesh, meshdata)
 	plyTriangleCount[id] = plyTriangleCount[id] - meshdata[mesh].ntriangles
-	
+
 	mesh:Destroy()
 	meshdata[mesh] = nil
-	
+
 	if plyTriangleCount[id]==0 then plyTriangleCount[id] = nil end
 end
 
@@ -92,14 +92,14 @@ end)
 function mesh_library.createFromTable (verteces)
 	SF.Permissions.check(SF.instance.player, nil, "mesh")
 	SF.CheckLuaType(verteces, TYPE_TABLE)
-	
+
 	local nvertices = #verteces
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
 	local ntriangles = nvertices / 3
-	
+
 	local instance = SF.instance
 	canAddTriangles(instance, ntriangles)
-	
+
 	local unwrapped = {}
 	for i, vertex in ipairs(verteces) do
 		local vert = {}
@@ -112,9 +112,9 @@ function mesh_library.createFromTable (verteces)
 		end
 		unwrapped[i] = vert
 	end
-	
+
 	plyTriangleCount[instance.playerid] = (plyTriangleCount[instance.playerid] or 0) + ntriangles
-	
+
 	local mesh = Mesh()
 	mesh:BuildFromTriangles(unwrapped)
 	instance.data.meshes[mesh] = { ntriangles = ntriangles }
@@ -128,7 +128,7 @@ function mesh_library.createFromObj (obj)
 	SF.Permissions.check(SF.instance.player, nil, "mesh")
 	SF.CheckLuaType(obj, TYPE_STRING)
 	local instance = SF.instance
-	
+
 	local pos, norm, uv, face = {}, {}, {}, {}
 	local map = {
 		v = function(f) pos[#pos + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
@@ -151,11 +151,11 @@ function mesh_library.createFromObj (obj)
 			end
 		end
 	end
-	
+
 	if #face<3 or #face%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
 	local ntriangles = #face / 3
 	canAddTriangles(instance, ntriangles)
-	
+
 	local vertices = {}
 	for _, v in ipairs(face) do
 		local vert = {}
@@ -182,9 +182,9 @@ function mesh_library.createFromObj (obj)
 		end
 		vertices[_] = vert
 	end
-	
+
 	plyTriangleCount[instance.playerid] = (plyTriangleCount[instance.playerid] or 0) + ntriangles
-	
+
 	local mesh = Mesh()
 	mesh:BuildFromTriangles(vertices)
 	instance.data.meshes[mesh] = { ntriangles = ntriangles }
@@ -219,5 +219,3 @@ function mesh_methods:destroy()
 	if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
 	destroyMesh(instance.playerid, mesh, instance.data.meshes)
 end
-
-

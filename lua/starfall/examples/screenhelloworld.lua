@@ -9,4 +9,3 @@ hook.add("render", "helloworld_render", function ()
 	render.setFont(font) -- "Activate" font
 	render.drawText(20, 20, "Hello World!") -- Draw text at 20, 20
 end)
-

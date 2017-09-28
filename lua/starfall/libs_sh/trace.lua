@@ -261,7 +261,7 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 		collisiongroup = colgroup,
 		ignoreworld = ignworld,
 	}
-	
+
 	local data = util.TraceLine(trace)
 	return setmetatable({}, {
 		__index = function(t, k)
@@ -313,7 +313,7 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 		mins = minbox,
 		maxs = maxbox
 	}
-	
+
 	local data = util.TraceHull(trace)
 	return setmetatable({}, {
 		__index = function(t, k)

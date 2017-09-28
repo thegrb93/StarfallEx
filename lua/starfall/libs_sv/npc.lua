@@ -17,7 +17,7 @@ SF.Libraries.AddHook("postload", function()
 	wrap = SF.Entities.Wrap
 	unwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable
-	
+
 	SF.AddObjectWrapper(debug.getregistry().NPC, npc_metatable, function(object)
 		object = wrap(object)
 		dsetmeta(object, npc_metatable)
@@ -95,7 +95,7 @@ end
 function npc_methods:giveWeapon(wep)
 	SF.CheckType(self, npc_metatable)
 	SF.CheckLuaType(wep, TYPE_STRING)
-	
+
 	local npc = unwrap(self)
 	if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 	SF.Permissions.check(SF.instance.player, npc, "npcs.giveweapon")
@@ -179,4 +179,3 @@ function npc_methods:goRun(vec)
 	npc:SetLastPosition(vunwrap(vec))
 	npc:SetSchedule(SCHED_FORCED_GO_RUN)
 end
-
