@@ -177,6 +177,59 @@ function vmatrix_methods:translate (vec)
 	v:Translate(vec)
 end
 
+--- Gets the rotation axis and angle of rotation of the rotation matrix
+-- @return The axis of rotation
+-- @return The angle of rotation
+function vmatrix_methods:getAxisAngle()
+	local epsilon = 0.001
+	
+	local m = unwrap(self):ToTable()
+	local m00, m01, m02 = unpack(m[1])
+	local m10, m11, m12 = unpack(m[2])
+	local m20, m21, m22 = unpack(m[3])
+	
+	if math.abs(m01-m10)< epsilon and math.abs(m02-m20)< epsilon and math.abs(m12-m21)< epsilon then
+		// singularity found
+		if math.abs(m01+m10) < epsilon and math.abs(m02+m20) < epsilon and math.abs(m12+m21) < epsilon and math.abs(m00+m11+m22-3) < epsilon then
+			return vwrap(Vector(1,0,0)), 0
+		end
+		// otherwise this singularity is angle = math.pi
+		local xx = (m00+1)/2
+		local yy = (m11+1)/2
+		local zz = (m22+1)/2
+		local xy = (m01+m10)/4
+		local xz = (m02+m20)/4
+		local yz = (m12+m21)/4
+		if xx > yy and xx > zz then
+			if xx < epsilon then
+				return vwrap(Vector(0, 0.7071, 0.7071)), math.pi
+			else
+				local x = math.sqrt(xx)
+				return vwrap(Vector(x, xy/x, xz/x)), math.pi
+			end
+		elseif yy > zz then
+			if yy < epsilon then
+				return vwrap(Vector(0.7071, 0, 0.7071)), math.pi
+			else
+				local y = math.sqrt(yy)
+				return vwrap(Vector(y, xy/y, yz/y)), math.pi
+			end
+		else
+			if zz < epsilon then
+				return vwrap(Vector(0.7071, 0.7071, 0)), math.pi
+			else
+				local z = math.sqrt(zz)
+				return vwrap(Vector(z, xz/z, yz/z)), math.pi
+			end
+		end
+	end
+	
+	local axis = Vector(m21 - m12, m02 - m20, m10 - m01)
+	local s = axis:Length()
+	if math.abs(s) < epsilon then s=1 end
+	return vwrap(axis/s), math.acos(( m00 + m11 + m22 - 1)/2)
+end
+
 function vmatrix_metamethods.__mul (lhs, rhs)
 	SF.CheckType(lhs, vmatrix_metamethods)
 	local rhsmeta = dgetmeta(rhs)
