@@ -181,7 +181,7 @@ end
 -- @return The axis of rotation
 -- @return The angle of rotation
 function vmatrix_methods:getAxisAngle()
-	local epsilon = 0.001
+	local epsilon = 0.00001
 	
 	local m = unwrap(self):ToTable()
 	local m00, m01, m02 = unpack(m[1])
