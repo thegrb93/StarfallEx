@@ -513,6 +513,9 @@ function Editor:CreateTab(chosenfile)
 				end)
 			menu:Open()
 			menu:AddSpacer()
+			if th.registerTabMenu then
+				th:registerTabMenu(menu, editor)
+			end
 			th:registerTabMenu(menu, editor)
 			return
 		end
