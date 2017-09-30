@@ -24,7 +24,7 @@ end)
 SF.Holograms = {}
 
 SF.Holograms.personalquota = CreateConVar("sf_holograms_personalquota", "100", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-	"The number of holograms allowed to spawn via Starfall scripts for a single instance")
+	"The number of holograms allowed to spawn via Starfall scripts for a single player")
 
 SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms")
 
