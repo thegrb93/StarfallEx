@@ -516,7 +516,6 @@ function Editor:CreateTab(chosenfile)
 			if th.registerTabMenu then
 				th:registerTabMenu(menu, editor)
 			end
-			th:registerTabMenu(menu, editor)
 			return
 		end
 
