@@ -324,7 +324,6 @@ math_methods.pow = math.pow
 math_methods.rad = math.rad
 math_methods.rand = math.Rand
 math_methods.random = math.random
-math_methods.randomseed = math.randomseed
 math_methods.remap = math.Remap
 math_methods.round = math.Round
 math_methods.sin = math.sin
