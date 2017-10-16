@@ -902,13 +902,12 @@ function SF.DefaultEnvironment.worldToLocal(pos, ang, newSystemOrigin, newSystem
 	SF.CheckType(newSystemOrigin, SF.Types["Vector"])
 	SF.CheckType(newSystemAngles, SF.Types["Angle"])
 
-	local pos, ang, newSystemOrigin, newSystemAngles =
+	local localPos, localAngles = WorldToLocal(
 		SF.UnwrapObject(pos),
 		SF.UnwrapObject(ang),
 		SF.UnwrapObject(newSystemOrigin),
 		SF.UnwrapObject(newSystemAngles)
-
-	local localPos, localAngles = WorldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
+	)
 
 	return SF.WrapObject(localPos), SF.WrapObject(localAngles)
 end
@@ -924,13 +923,12 @@ function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, origi
 	SF.CheckType(originPos, SF.Types["Vector"])
 	SF.CheckType(originAngle, SF.Types["Angle"])
 
-	local localPos, localAng, originPos, originAngle =
+	local worldPos, worldAngles = LocalToWorld(
 		SF.UnwrapObject(localPos),
 		SF.UnwrapObject(localAng),
 		SF.UnwrapObject(originPos),
 		SF.UnwrapObject(originAngle)
-
-	local worldPos, worldAngles = LocalToWorld(localPos, localAng, originPos, originAngle)
+	)
 
 	return SF.WrapObject(worldPos), SF.WrapObject(worldAngles)
 end
