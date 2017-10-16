@@ -277,7 +277,7 @@ local function transposeMatrix(mat, destination)
 	destination:SetField(4, 1, mat_tbl[1][4])
 	destination:SetField(4, 2, mat_tbl[2][4])
 	destination:SetField(4, 3, mat_tbl[3][4])
-	--destination:SetField(4, 4, mat_tbl[4][4])
+	destination:SetField(4, 4, mat_tbl[4][4])
 end
 
 --- Returns the transposed matrix
