@@ -67,9 +67,7 @@ end
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
 	SF.CheckType(ang, ang_meta)
-
-	local m = unwrap(self)
-	m:Rotate(aunwrap(ang))
+	unwrap(self):Rotate(aunwrap(ang))
 end
 
 --- Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
@@ -106,75 +104,56 @@ end
 -- @param vec New scale
 function vmatrix_methods:setScale(vec)
 	SF.CheckType(vec, vec_meta)
-	local vec = vunwrap(vec)
-
-	local m = unwrap(self)
-	m:SetScale(vec)
+	unwrap(self):SetScale(vunwrap(vec))
 end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
 function vmatrix_methods:scale(vec)
 	SF.CheckType(vec, vec_meta)
-	local vec = vunwrap(vec)
-
-	local m = unwrap(self)
-	m:Scale(vec)
+	unwrap(self):Scale(vunwrap(vec))
 end
 
 --- Scales the absolute translation
 -- @param num Amount to scale by
 function vmatrix_methods:scaleTranslation(num)
 	SF.CheckLuaType(num, TYPE_NUMBER)
-
-	local m = unwrap(self)
-	m:ScaleTranslation(num)
+	unwrap(self):ScaleTranslation(num)
 end
 
 --- Sets the angles
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
 	SF.CheckType(ang, ang_meta)
-
-	local m = unwrap(self)
-	m:SetAngles(SF.UnwrapObject(ang))
+	unwrap(self):SetAngles(SF.UnwrapObject(ang))
 end
 
 --- Sets the translation
 -- @param vec New translation
 function vmatrix_methods:setTranslation(vec)
 	SF.CheckType(vec, vec_meta)
-	local vec = vunwrap(vec)
-
-	local m = unwrap(self)
-	m:SetTranslation(vec)
+	unwrap(self):SetTranslation(vunwrap(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
 -- @param forward The forward vector
 function vmatrix_methods:setForward(forward)
 	SF.CheckType(forward, vec_meta)
-	
-	local m = unwrap(self)
-	m:SetForward(vunwrap(forward))
+	unwrap(self):SetForward(vunwrap(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
 -- @param right The right vector
 function vmatrix_methods:setRight(right)
 	SF.CheckType(right, vec_meta)
-	
-	local m = unwrap(self)
-	m:SetRight(vunwrap(right))
+	unwrap(self):SetRight(vunwrap(right))
 end
 
 --- Sets the up direction of the matrix. Third column
 -- @param up The up vector
 function vmatrix_methods:setUp(up)
 	SF.CheckType(up, vec_meta)
-	
-	local m = unwrap(self)
-	m:SetUp(vunwrap(up))
+	unwrap(self):SetUp(vunwrap(up))
 end
 
 --- Sets a specific field in the matrix
@@ -182,67 +161,55 @@ end
 -- @param column A number from 1 to 4
 -- @param value Value to set
 function vmatrix_methods:setField(row, column, value)
-	local m = unwrap(self)
-	m:SetField(row, column, value)
+	unwrap(self):SetField(row, column, value)
 end
 
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)
 	SF.CheckType(src, vmatrix_metamethods)
-
-	local m = unwrap(self)
-	m:Set(unwrap(src))
+	unwrap(self):Set(unwrap(src))
 end
 
 --- Initializes the matrix as Identity matrix
 function vmatrix_methods:setIdentity()
-	local m = unwrap(self)
-	m:Identity()
+	unwrap(self):Identity()
 end
 
 --- Returns whether the matrix is equal to Identity matrix or not
 -- @return bool True/False
 function vmatrix_methods:isIdentity()
-	local m = unwrap(self)
-	return m:IsIdentity()
+	return unwrap(self):IsIdentity()
 end
 
 --- Returns whether the matrix is a rotation matrix or not. Checks if the forward, right and up vectors are orthogonal and normalized.
 -- @return bool True/False
 function vmatrix_methods:isRotationMatrix()
-	local m = unwrap(self)
-	return m:IsRotationMatrix()
+	return unwrap(self):IsRotationMatrix()
 end
 
 --- Inverts the matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
 -- @return bool Whether the matrix was inverted or not
 function vmatrix_methods:invert()
-	local m = unwrap(self)
-	return m:Invert()
+	return unwrap(self):Invert()
 end
 
 --- Inverts the matrix efficiently for translations and rotations
 function vmatrix_methods:invertTR()
-	local m = unwrap(self)
-	m:InvertTR()
+	unwrap(self):InvertTR()
 end
 
 --- Translate the matrix
 -- @param vec Vector to translate by
 function vmatrix_methods:translate(vec)
 	SF.CheckType(vec, vec_meta)
-	local vec = vunwrap(vec)
-
-	local m = unwrap(self)
-	m:Translate(vec)
+	unwrap(self):Translate(vunwrap(vec))
 end
 
 --- Converts the matrix to a 4x4 table
 -- @return The 4x4 table
 function vmatrix_methods:toTable()
-	local m = unwrap(self)
-	return m:ToTable()
+	return unwrap(self):ToTable()
 end
 
 --- Gets the rotation axis and angle of rotation of the rotation matrix
@@ -303,7 +270,7 @@ local function transposeMatrix(mat, destination)
 	local mat_tbl = mat:ToTable()
 
 	destination:SetForward( Vector(unpack(mat_tbl[1])) )
-	destination:SetRight(-Vector(unpack(mat_tbl[2])) ) -- SetRight negates the vector
+	destination:SetRight( -Vector(unpack(mat_tbl[2])) ) -- SetRight negates the vector
 	destination:SetUp( Vector(unpack(mat_tbl[3])) )
 	destination:SetTranslation( Vector(unpack(mat_tbl[4])) )
 
@@ -316,10 +283,8 @@ end
 --- Returns the transposed matrix
 -- @return Transposed matrix
 function vmatrix_methods:getTransposed()
-	local m = unwrap(self)
-
 	local result = Matrix()
-	transposeMatrix(m, result)
+	transposeMatrix(unwrap(self), result)
 
 	return wrap(result)
 end
