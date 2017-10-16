@@ -33,25 +33,25 @@ end)
 
 --- tostring metamethod
 -- @return string representing the matrix.
-function vmatrix_metamethods:__tostring ()
+function vmatrix_metamethods:__tostring()
 	return unwrap(self):__tostring()
 end
 
 --- Returns angles
 -- @return Angles
-function vmatrix_methods:getAngles ()
+function vmatrix_methods:getAngles()
 	return awrap(unwrap(self):GetAngles())
 end
 
 --- Returns scale
 -- @return Scale
-function vmatrix_methods:getScale ()
+function vmatrix_methods:getScale()
 	return vwrap(unwrap(self):GetScale())
 end
 
 --- Returns translation
 -- @return Translation
-function vmatrix_methods:getTranslation ()
+function vmatrix_methods:getTranslation()
 	return vwrap(unwrap(self):GetTranslation())
 end
 
@@ -65,97 +65,116 @@ end
 
 --- Rotate the matrix
 -- @param ang Angle to rotate by
-function vmatrix_methods:rotate (ang)
+function vmatrix_methods:rotate(ang)
 	SF.CheckType(ang, ang_meta)
 
-	local v = unwrap(self)
-	v:Rotate(aunwrap(ang))
-
+	local m = unwrap(self)
+	m:Rotate(aunwrap(ang))
 end
 
---- Inverts the matrix
--- @return inverted matrix
-function vmatrix_methods:getInverse ()
-
-	local v = unwrap(self)
-	return wrap(v:GetInverse())
-
+--- Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
+-- @return Inverted matrix
+function vmatrix_methods:getInverse()
+	return wrap(unwrap(self):GetInverse())
 end
 
---- Returns forward vector of matrix
+--- Returns an inverted matrix. Efficiently for translations and rotations
+-- @return Inverted matrix
+function vmatrix_methods:getInverseTR()
+	return wrap(unwrap(self):GetInverseTR())
+end
+
+--- Returns forward vector of matrix. First matrix column
 -- @return Translation
-function vmatrix_methods:getForward ()
+function vmatrix_methods:getForward()
 	return vwrap(unwrap(self):GetForward())
 end
 
---- Returns right vector of matrix
+--- Returns right vector of matrix. Negated second matrix column
 -- @return Translation
-function vmatrix_methods:getRight ()
+function vmatrix_methods:getRight()
 	return vwrap(unwrap(self):GetRight())
 end
 
---- Returns up vector of matrix
+--- Returns up vector of matrix. Third matrix column
 -- @return Translation
-function vmatrix_methods:getUp ()
+function vmatrix_methods:getUp()
 	return vwrap(unwrap(self):GetUp())
-end
-
-
---- Inverts the matrix efficiently for translations and rotations
--- @return inverted matrix
-function vmatrix_methods:getInverseTR ()
-
-	local v = unwrap(self)
-	return wrap(v:GetInverseTR())
-
 end
 
 --- Sets the scale
 -- @param vec New scale
-function vmatrix_methods:setScale (vec)
+function vmatrix_methods:setScale(vec)
 	SF.CheckType(vec, vec_meta)
 	local vec = vunwrap(vec)
 
-	local v = unwrap(self)
-	v:SetScale(vec)
+	local m = unwrap(self)
+	m:SetScale(vec)
 end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
-function vmatrix_methods:scale (vec)
+function vmatrix_methods:scale(vec)
 	SF.CheckType(vec, vec_meta)
 	local vec = vunwrap(vec)
 
-	local v = unwrap(self)
-	v:Scale(vec)
+	local m = unwrap(self)
+	m:Scale(vec)
 end
 
 --- Scales the absolute translation
 -- @param num Amount to scale by
-function vmatrix_methods:scaleTranslation (num)
+function vmatrix_methods:scaleTranslation(num)
 	SF.CheckLuaType(num, TYPE_NUMBER)
 
-	local v = unwrap(self)
-	v:ScaleTranslation(num)
+	local m = unwrap(self)
+	m:ScaleTranslation(num)
 end
 
 --- Sets the angles
 -- @param ang New angles
-function vmatrix_methods:setAngles (ang)
+function vmatrix_methods:setAngles(ang)
 	SF.CheckType(ang, ang_meta)
 
-	local v = unwrap(self)
-	v:SetAngles(SF.UnwrapObject(ang))
+	local m = unwrap(self)
+	m:SetAngles(SF.UnwrapObject(ang))
 end
 
 --- Sets the translation
 -- @param vec New translation
-function vmatrix_methods:setTranslation (vec)
+function vmatrix_methods:setTranslation(vec)
 	SF.CheckType(vec, vec_meta)
 	local vec = vunwrap(vec)
 
-	local v = unwrap(self)
-	v:SetTranslation(vec)
+	local m = unwrap(self)
+	m:SetTranslation(vec)
+end
+
+--- Sets the forward direction of the matrix. First column
+-- @param forward The forward vector
+function vmatrix_methods:setForward(forward)
+	SF.CheckType(forward, vec_meta)
+	
+	local m = unwrap(self)
+	m:SetForward(vunwrap(forward))
+end
+
+--- Sets the right direction of the matrix. Negated second column
+-- @param right The right vector
+function vmatrix_methods:setRight(right)
+	SF.CheckType(right, vec_meta)
+	
+	local m = unwrap(self)
+	m:SetRight(vunwrap(right))
+end
+
+--- Sets the up direction of the matrix. Third column
+-- @param up The up vector
+function vmatrix_methods:setUp(up)
+	SF.CheckType(up, vec_meta)
+	
+	local m = unwrap(self)
+	m:SetUp(vunwrap(up))
 end
 
 --- Sets a specific field in the matrix
@@ -163,18 +182,67 @@ end
 -- @param column A number from 1 to 4
 -- @param value Value to set
 function vmatrix_methods:setField(row, column, value)
-	local v = unwrap(self)
-	v:SetField(row, column, value)
+	local m = unwrap(self)
+	m:SetField(row, column, value)
+end
+
+--- Copies the values from the second matrix to the first matrix. Self-Modifies
+-- @param src Second matrix
+function vmatrix_methods:set(src)
+	SF.CheckType(src, vmatrix_metamethods)
+
+	local m = unwrap(self)
+	m:Set(unwrap(src))
+end
+
+--- Initializes the matrix as Identity matrix
+function vmatrix_methods:setIdentity()
+	local m = unwrap(self)
+	m:Identity()
+end
+
+--- Returns whether the matrix is equal to Identity matrix or not
+-- @return bool True/False
+function vmatrix_methods:isIdentity()
+	local m = unwrap(self)
+	return m:IsIdentity()
+end
+
+--- Returns whether the matrix is a rotation matrix or not. Checks if the forward, right and up vectors are orthogonal and normalized.
+-- @return bool True/False
+function vmatrix_methods:isRotationMatrix()
+	local m = unwrap(self)
+	return m:IsRotationMatrix()
+end
+
+--- Inverts the matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
+-- @return bool Whether the matrix was inverted or not
+function vmatrix_methods:invert()
+	local m = unwrap(self)
+	return m:Invert()
+end
+
+--- Inverts the matrix efficiently for translations and rotations
+function vmatrix_methods:invertTR()
+	local m = unwrap(self)
+	m:InvertTR()
 end
 
 --- Translate the matrix
 -- @param vec Vector to translate by
-function vmatrix_methods:translate (vec)
+function vmatrix_methods:translate(vec)
 	SF.CheckType(vec, vec_meta)
 	local vec = vunwrap(vec)
 
-	local v = unwrap(self)
-	v:Translate(vec)
+	local m = unwrap(self)
+	m:Translate(vec)
+end
+
+--- Converts the matrix to a 4x4 table
+-- @return The 4x4 table
+function vmatrix_methods:toTable()
+	local m = unwrap(self)
+	return m:ToTable()
 end
 
 --- Gets the rotation axis and angle of rotation of the rotation matrix
@@ -230,7 +298,53 @@ function vmatrix_methods:getAxisAngle()
 	return vwrap(axis/s), math.acos(( m00 + m11 + m22 - 1)/2)
 end
 
-function vmatrix_metamethods.__mul (lhs, rhs)
+
+local function transposeMatrix(mat, destination)
+	local mat_tbl = mat:ToTable()
+
+	destination:SetForward		( Vector(unpack(mat_tbl[1])) )
+	destination:SetRight		(-Vector(unpack(mat_tbl[2])) ) -- SetRight negates the vector
+	destination:SetUp			( Vector(unpack(mat_tbl[3])) )
+	destination:SetTranslation	( Vector(unpack(mat_tbl[4])) )
+
+	destination:SetField(4, 1, mat_tbl[1][4])
+	destination:SetField(4, 2, mat_tbl[2][4])
+	destination:SetField(4, 3, mat_tbl[3][4])
+	destination:SetField(4, 4, mat_tbl[4][4])
+end
+
+--- Returns the transposed matrix
+-- @return Transposed matrix
+function vmatrix_methods:getTransposed()
+	local m = unwrap(self)
+
+	local result = Matrix()
+	transposeMatrix(m, result)
+
+	return wrap(result)
+end
+
+--- Transposes the matrix
+function vmatrix_methods:transpose()
+	local m = unwrap(self)
+	transposeMatrix(m, m)
+end
+
+function vmatrix_metamethods.__add(lhs, rhs)
+	SF.CheckType(lhs, vmatrix_metamethods)
+	SF.CheckType(rhs, vmatrix_metamethods)
+
+	return wrap(unwrap(lhs) + unwrap(rhs))
+end
+
+function vmatrix_metamethods.__sub(lhs, rhs)
+	SF.CheckType(lhs, vmatrix_metamethods)
+	SF.CheckType(rhs, vmatrix_metamethods)
+
+	return wrap(unwrap(lhs) - unwrap(rhs))
+end
+
+function vmatrix_metamethods.__mul(lhs, rhs)
 	SF.CheckType(lhs, vmatrix_metamethods)
 	local rhsmeta = dgetmeta(rhs)
 	if rhsmeta == vmatrix_metamethods then

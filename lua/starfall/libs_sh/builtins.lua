@@ -890,3 +890,47 @@ function SF.DefaultEnvironment.isValid(object)
 	return object:isValid()
 
 end
+
+--- Translates the specified position and angle into the specified coordinate system
+-- @param pos The position that should be translated from the current to the new system
+-- @param ang The angles that should be translated from the current to the new system
+-- @param newSystemOrigin The origin of the system to translate to
+-- @param newSystemAngles The angles of the system to translate to
+function SF.DefaultEnvironment.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
+	SF.CheckType(pos, SF.Types["Vector"])
+	SF.CheckType(ang, SF.Types["Angle"])
+	SF.CheckType(newSystemOrigin, SF.Types["Vector"])
+	SF.CheckType(newSystemAngles, SF.Types["Angle"])
+
+	local pos, ang, newSystemOrigin, newSystemAngles =
+		SF.UnwrapObject(pos),
+		SF.UnwrapObject(ang),
+		SF.UnwrapObject(newSystemOrigin),
+		SF.UnwrapObject(newSystemAngles)
+
+	local localPos, localAngles = WorldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
+
+	return SF.WrapObject(localPos), SF.WrapObject(localAngles)
+end
+
+--- Translates the specified position and angle from the specified local coordinate system
+-- @param localPos The position vector that should be translated to world coordinates
+-- @param localAng The angle that should be converted to a world angle
+-- @param originPos The origin point of the source coordinate system, in world coordinates
+-- @param originAngle The angles of the source coordinate system, as a world angle
+function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, originAngle)
+	SF.CheckType(localPos, SF.Types["Vector"])
+	SF.CheckType(localAng, SF.Types["Angle"])
+	SF.CheckType(originPos, SF.Types["Vector"])
+	SF.CheckType(originAngle, SF.Types["Angle"])
+
+	local localPos, localAng, originPos, originAngle =
+		SF.UnwrapObject(localPos),
+		SF.UnwrapObject(localAng),
+		SF.UnwrapObject(originPos),
+		SF.UnwrapObject(originAngle)
+
+	local worldPos, worldAngles = LocalToWorld(localPos, localAng, originPos, originAngle)
+
+	return SF.WrapObject(worldPos), SF.WrapObject(worldAngles)
+end
