@@ -302,10 +302,10 @@ end
 local function transposeMatrix(mat, destination)
 	local mat_tbl = mat:ToTable()
 
-	destination:SetForward		( Vector(unpack(mat_tbl[1])) )
-	destination:SetRight		(-Vector(unpack(mat_tbl[2])) ) -- SetRight negates the vector
-	destination:SetUp			( Vector(unpack(mat_tbl[3])) )
-	destination:SetTranslation	( Vector(unpack(mat_tbl[4])) )
+	destination:SetForward( Vector(unpack(mat_tbl[1])) )
+	destination:SetRight(-Vector(unpack(mat_tbl[2])) ) -- SetRight negates the vector
+	destination:SetUp( Vector(unpack(mat_tbl[3])) )
+	destination:SetTranslation( Vector(unpack(mat_tbl[4])) )
 
 	destination:SetField(4, 1, mat_tbl[1][4])
 	destination:SetField(4, 2, mat_tbl[2][4])
