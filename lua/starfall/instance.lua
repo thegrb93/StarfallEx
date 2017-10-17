@@ -86,6 +86,13 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	return true, instance
 end
 
+--- Overridable hook for pcall-based hook systems
+-- Gets called when inside a starfall context
+-- @param running Are we executing a starfall context?
+function SF.OnRunningOps(running)
+	-- override me
+end
+SF.runningOps = false
 
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
@@ -123,10 +130,15 @@ function SF.Instance:runWithOps(func, ...)
 	end
 
 	local prevHook, mask, count = debug.gethook()
+	local prev = SF.runningOps
+	SF.runningOps = true
+	SF.OnRunningOps(true)
 	debug.sethook(cpuCheck, "", 2000)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
 	debug.sethook(prevHook, mask, count)
-
+	SF.runningOps = prev
+	SF.OnRunningOps(prev)
+	
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
 		self.cpu_total = SysTime() - oldSysTime
@@ -300,6 +312,14 @@ function SF.Instance:deinitialize()
 end
 
 hook.Add("Think", "SF_Think", function()
+	
+	-- Check and attempt recovery from potential failures
+	if SF.runningOps then
+		SF.runningOps = false
+		SF.OnRunningOps(false)
+		ErrorNoHalt("[Starfall] ERROR: This should not happen, bad addons?\n")
+	end
+
 	for pl, insts in pairs(SF.playerInstances) do
 		local plquota = (SERVER or LocalPlayer() ~= pl) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 		local cputotal = 0
