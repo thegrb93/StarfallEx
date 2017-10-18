@@ -896,6 +896,8 @@ end
 -- @param ang The angles that should be translated from the current to the new system
 -- @param newSystemOrigin The origin of the system to translate to
 -- @param newSystemAngles The angles of the system to translate to
+-- @return localPos
+-- @return localAngles
 function SF.DefaultEnvironment.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
@@ -917,6 +919,8 @@ end
 -- @param localAng The angle that should be converted to a world angle
 -- @param originPos The origin point of the source coordinate system, in world coordinates
 -- @param originAngle The angles of the source coordinate system, as a world angle
+-- @return worldPos
+-- @return worldAngles
 function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, originAngle)
 	SF.CheckType(localPos, SF.Types["Vector"])
 	SF.CheckType(localAng, SF.Types["Angle"])
