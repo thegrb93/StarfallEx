@@ -934,13 +934,8 @@ end
 -- @param mode Cull mode. 0 for counter clock wise, 1 for clock wise
 function render_library.setCullMode(mode)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	SF.CheckLuaType(mode, TYPE_NUMBER)
 
-	if mode >= 0 and mode <= 1 then
-		render.CullMode(mode)
-	else
-		render.CullMode(MATERIAL_CULLMODE_CCW)
-	end
+	render.CullMode(mode == 1 and 1 or 0)
 end
 
 --- Clears the active render target
