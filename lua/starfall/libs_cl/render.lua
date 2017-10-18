@@ -128,11 +128,10 @@ local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 local view_matrix_stack = {}
 
+local globalRTs = {}
+local globalRTcount = 0
 local plyRTcount = {}
 local plyURLTexcount = {}
-local globalRTcount = 0
-local globalRTs = {}
-for i = 0, 10 do globalRTs[2^i] = {} end -- from 1 to 1024
 
 local renderhooks = {
 	render = true,
@@ -211,7 +210,7 @@ end)
 
 SF.Libraries.AddHook("deinitialize", function (instance)
 	for k, v in pairs(instance.data.render.rendertargets) do
-		globalRTs[v.size][v.rtname][2] = true -- mark as available
+		globalRTs[v][2] = true -- mark as available
 	end
 	for k, v in pairs(instance.data.render.textures) do
 		instance.data.render.textures[k] = nil
@@ -746,24 +745,10 @@ function render_library.setTexture (id)
 end
 
 --- Creates a new render target to draw onto.
--- Default dimensions is 1024x1024
+-- The dimensions will always be 1024x1024
 -- @param name The name of the render target
--- @param size Optional rendertarget size, up to 1024. Must be a power of 2
-function render_library.createRenderTarget (name, size)
+function render_library.createRenderTarget (name)
 	SF.CheckLuaType(name, TYPE_STRING)
-
-	if size == nil then
-		size = 1024
-	else
-		SF.CheckLuaType(size, TYPE_NUMBER)
-
-		if size >= 1 then
-			local nearestPower = math.Round(math.log(math.min(size, 1024), 2))
-			size = 2^nearestPower
-		else
-			SF.Throw("Invalid rendertarget size.", 2)
-		end
-	end
 
 	local instance = SF.instance
 	local data = instance.data.render
@@ -781,21 +766,21 @@ function render_library.createRenderTarget (name, size)
 	data.rendertargetcount = data.rendertargetcount + 1
 
 	local rtname, rt
-	for k, v in pairs(globalRTs[size]) do
+	for k, v in pairs(globalRTs) do
 		if v[2] then rtname, rt = k, v break end
 	end
 	if rt then
 		rt[2] = false
 	else
 		globalRTcount = globalRTcount + 1
-		rtname = "Starfall_CustomRT_" .. globalRTcount .. "_" .. size
-		rt = { GetRenderTarget(rtname, size, size), false }
+		rtname = "Starfall_CustomRT_" .. globalRTcount
+		rt = { GetRenderTarget(rtname, 1024, 1024), false }
 		rt[3] = CreateMaterial("StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", { ["$model"] = 1 })
 		rt[3]:SetTexture("$basetexture", rt[1])
-		globalRTs[size][rtname] = rt
+		globalRTs[rtname] = rt
 	end
 
-	data.rendertargets[name] = {rtname = rtname, size = size}
+	data.rendertargets[name] = rtname
 end
 
 --- Releases the rendertarget. Required if you reach the maximum rendertargets.
@@ -803,9 +788,9 @@ end
 function render_library.destroyRenderTarget(name)
 	local instance = SF.instance
 	local data = instance.data.render
-	local rtinfo = data.rendertargets[name]
-	if rtinfo then
-		globalRTs[rtinfo.size][rtinfo.rtname][2] = true
+	local rtname = data.rendertargets[name]
+	if rtname then
+		globalRTs[rtname][2] = true
 		data.rendertargets[name] = nil
 	else
 		SF.Throw("Cannot destroy an invalid rendertarget.", 2)
@@ -821,16 +806,16 @@ function render_library.selectRenderTarget (name)
 	if name then
 		SF.CheckLuaType(name, TYPE_STRING)
 
-		local rtinfo = data.rendertargets[name]
-		if not rtinfo then SF.Throw("Invalid Rendertarget", 2) end
-		local rttbl = globalRTs[rtinfo.size][rtinfo.rtname]
+		local rtname = data.rendertargets[name]
+		if not rtname then SF.Throw("Invalid Rendertarget", 2) end
+		local rttbl = globalRTs[rtname]
 		if not rttbl then SF.Throw("Invalid Rendertarget", 2) end
 		local rt = rttbl[1]
 		if not rt then SF.Throw("Invalid Rendertarget", 2) end
 
 		if not data.usingRT then
 			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
-			render.SetViewPort(0, 0, rtinfo.size, rtinfo.size)
+			render.SetViewPort(0, 0, 1024, 1024)
 			cam.Start2D()
 			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
 			render.SetStencilEnable(false)
@@ -870,9 +855,9 @@ function render_library.setRenderTargetTexture (name)
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	local rtinfo = data.rendertargets[name]
-	if rtinfo and globalRTs[rtinfo.size][rtinfo.rtname] then
-		RT_Material:SetTexture("$basetexture", globalRTs[rtinfo.size][rtinfo.rtname][1])
+	local rtname = data.rendertargets[name]
+	if rtname and globalRTs[rtname] then
+		RT_Material:SetTexture("$basetexture", globalRTs[rtname][1])
 		surface.SetMaterial(RT_Material)
 		render.SetMaterial(RT_Material)
 	else
@@ -887,9 +872,9 @@ function render_library.getRenderTargetMaterial(name)
 	local data = SF.instance.data.render
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	local rtinfo = data.rendertargets[name]
-	if rtinfo and globalRTs[rtinfo.size][rtinfo.rtname] then
-		return "!"..globalRTs[rtinfo.size][rtinfo.rtname][3]:GetName()
+	local rtname = data.rendertargets[name]
+	if rtname and globalRTs[rtname] then
+		return "!"..globalRTs[rtname][3]:GetName()
 	end
 end
 
