@@ -171,6 +171,7 @@ SF.Libraries.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0, 0, 0, 0, false)
+		render.CullMode(MATERIAL_CULLMODE_CCW)
 		for i = #matrix_stack, 1, -1 do
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
@@ -912,6 +913,14 @@ function render_library.setFilterMin(val)
 	end
 	SF.instance.data.render.changedFilterMin = true
 	render.PushFilterMin(val)
+end
+
+--- Changes the cull mode
+-- @param mode Cull mode. 0 for counter clock wise, 1 for clock wise
+function render_library.setCullMode(mode)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+
+	render.CullMode(mode == 1 and 1 or 0)
 end
 
 --- Clears the active render target
