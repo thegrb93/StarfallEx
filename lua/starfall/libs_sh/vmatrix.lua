@@ -262,7 +262,7 @@ function vmatrix_methods:getAxisAngle()
 	local axis = Vector(m21 - m12, m02 - m20, m10 - m01)
 	local s = axis:Length()
 	if math.abs(s) < epsilon then s=1 end
-	return vwrap(axis/s), math.acos(( m00 + m11 + m22 - 1)/2)
+	return vwrap(axis/s), math.acos(math.max(math.min(( m00 + m11 + m22 - 1)/2, 1), -1))
 end
 
 
