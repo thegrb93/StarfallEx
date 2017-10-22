@@ -263,7 +263,7 @@ function particle_methods:setUpVector(id,value)
 	SF.CheckType(value, TYPE_VECTOR)
 	
 	if IsValid(uw) then 
-		uw:SetControlPointRightVector(id,value)
+		uw:SetControlPointUpVector(id,value)
 	end 
 	
 end
