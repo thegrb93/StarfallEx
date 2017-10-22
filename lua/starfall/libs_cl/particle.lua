@@ -12,6 +12,8 @@ end
 
 local TYPE_ENTITY,TYPE_VECTOR  
 local unwrap_entity 
+local IsValid = IsValid 
+
 
 SF.Libraries.AddHook("postload", function()
 	TYPE_ENTITY = SF.Entities.Metatable
@@ -62,6 +64,12 @@ local function badParticle(flags) -- implemented for future use in case anything
 	return false 
 end
 
+local function checkValid(emitter)
+	if not IsValid(emitter) then 
+		SF.Throw("Particle emitter is no longer valid.", 2)
+	end 
+end 
+
 --- Attaches a particle to an entity.
 -- @param entity to attach to 
 -- @param string particle name 
@@ -87,6 +95,9 @@ function particle_library.attach (entity, particle, pattach, options)
 
 	local PEffect = entity:CreateParticleEffect(particle,pattach,options)
 	
+	if not IsValid(PEffect) then 
+		SF.Throw("Invalid particle system.", 2)
+	end 
 	
 	instance.data.particle.particles[PEffect] = true
 	
@@ -110,9 +121,10 @@ function particle_methods:startEmission()
 	SF.CheckType(self, particle_metamethods)
 	local uw = unwrap(self)
 	
-	if IsValid(uw) then 
-		uw:StartEmission()
-	end 
+	checkValid(uw)
+	
+	uw:StartEmission()
+	
 	
 end
 
@@ -122,9 +134,10 @@ function particle_methods:stopEmission()
 	SF.CheckType(self, particle_metamethods)
 	local uw = unwrap(self)
 	
-	if IsValid(uw) then 
-		uw:StopEmission()
-	end 
+	checkValid(uw)
+	
+	uw:StopEmission()
+	
 	
 end
 
@@ -148,9 +161,10 @@ function particle_methods:restart()
 	SF.CheckType(self, particle_metamethods)
 	local uw = unwrap(self)
 	
-	if IsValid(uw) then 
-		uw:Restart()
-	end 
+	checkValid(uw)
+	
+	uw:Restart()
+	
 	
 end
 
@@ -177,9 +191,10 @@ function particle_methods:setSortOrigin(origin)
 	local uw = unwrap(self)
 	SF.CheckType(origin, TYPE_VECTOR)
 	
-	if IsValid(uw) then 
-		uw:SetSortOrgin(origin)
-	end 
+	checkValid(uw)
+	
+	uw:SetSortOrgin(origin)
+	
 	
 end
 
@@ -194,9 +209,10 @@ function particle_methods:setControlPoint(id,value)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	SF.CheckType(value, TYPE_VECTOR)
 	
-	if IsValid(uw) then 
-		uw:SetControlPoint(id,value)
-	end 
+	checkValid(uw)
+	
+	uw:SetControlPoint(id,value)
+	
 	
 end
 
@@ -212,9 +228,10 @@ function particle_methods:setControlPointEntity(id,entity)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	SF.CheckType(entity, TYPE_ENTITY)
 	
-	if IsValid(uw) then 
-		uw:SetControlPointEntity(id,entity)
-	end 
+	checkValid(uw)
+	
+	uw:SetControlPointEntity(id,entity)
+	
 	
 end
 
@@ -229,9 +246,10 @@ function particle_methods:setForwardVector(id,value)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	SF.CheckType(value, TYPE_VECTOR)
 	
-	if IsValid(uw) then 
-		uw:SetControlPointForwardVector(id,value)
-	end 
+	checkValid(uw)
+	
+	uw:SetControlPointForwardVector(id,value)
+	
 	
 end
 
@@ -245,9 +263,10 @@ function particle_methods:setRightVector(id,value)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	SF.CheckType(value, TYPE_VECTOR)
 	
-	if IsValid(uw) then 
-		uw:SetControlPointRightVector(id,value)
-	end 
+	checkValid(uw)
+	
+	uw:SetControlPointRightVector(id,value)
+	
 	
 end
 
@@ -262,10 +281,10 @@ function particle_methods:setUpVector(id,value)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	SF.CheckType(value, TYPE_VECTOR)
 	
-	if IsValid(uw) then 
-		uw:SetControlPointUpVector(id,value)
-	end 
-	
+	checkValid(uw)
+
+	uw:SetControlPointUpVector(id,value)
+
 end
 
 
@@ -279,8 +298,8 @@ function particle_methods:setControlPointParent(id,value)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	SF.CheckLuaType(value, TYPE_NUMBER)
 	
-	if IsValid(uw) then 
-		uw:SetControlPointParent(id,value)
-	end 
+	checkValid(uw)
 	
+	uw:SetControlPointParent(id,value)
+		
 end
