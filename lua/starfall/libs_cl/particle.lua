@@ -10,16 +10,21 @@ do
 	
 end
 
-local TYPE_ENTITY = SF.Entities.Metatable
-local TYPE_VECTOR = SF.Types["Vector"]
+local TYPE_ENTITY,TYPE_VECTOR  
+local unwrap_entity 
 
-local unwrap_entity = SF.Entities.Unwrap
+SF.Libraries.AddHook("postload", function()
+	TYPE_ENTITY = SF.Entities.Metatable
+	TYPE_VECTOR = SF.Types["Vector"]
+	
+	unwrap_entity = SF.Entities.Unwrap
+end)
 
 
 --- Particle type
 -- @client
 local particle_methods, particle_metamethods = SF.Typedef("Particle")
-local wrap, unwrap = SF.CreateWrapper(particle_metamethods, true, false, debug.getregistry().CNewParticleEffect)
+local wrap, unwrap = SF.CreateWrapper(particle_metamethods, false, false, debug.getregistry().CNewParticleEffect)
 
 --- Particle library.
 -- @client
@@ -100,22 +105,6 @@ function particle_methods:isValid()
 
 end
 
-
---- Gets if the particle is valid or not.
--- @return Is valid or not
-function particle_methods:startEmission()
-	SF.CheckType(self, particle_metamethods)
-	local uw = unwrap(self)
-	
-	if IsValid(uw) then 
-		uw:StartEmission()
-	end 
-	
-	return IsValid(uw)
-	
-end
-
-
 --- Starts emission of the particle.
 function particle_methods:startEmission()
 	SF.CheckType(self, particle_metamethods)
@@ -140,6 +129,7 @@ function particle_methods:stopEmission()
 end
 
 --[[
+
 fix it god damn it
 --- Stops emission of the particle and destroys the object.
 function particle_methods:destroy()
