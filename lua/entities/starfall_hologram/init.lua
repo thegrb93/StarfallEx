@@ -14,6 +14,7 @@ function ENT:Initialize()
 	
 	self.scale = Vector()
 	self.clips = {}
+	self.lastClipUpdate = {}
 end
 
 function ENT:SetScale (scale)
@@ -25,13 +26,13 @@ function ENT:SetScale (scale)
 end
 
 function ENT:UpdateClip(index, enabled, origin, normal, islocal)
-	if self.lastClipUpdate == CurTime() then return end
-	self.lastClipUpdate = CurTime()
-	
+	if self.lastClipUpdate[index] == CurTime() then return end	
 	if enabled then
 		self.clips[index] = { origin = origin, normal = normal, islocal = islocal }
+		self.lastClipUpdate[index] = CurTime()
 	else
 		self.clips[index] = nil
+		self.lastClipUpdate[index] = nil
 	end
 	self:SendClip(index)	
 end
