@@ -371,7 +371,6 @@ function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	SF.CheckLuaType(g, TYPE_NUMBER)
 	SF.CheckLuaType(b, TYPE_NUMBER)
 	SF.CheckLuaType(a, TYPE_NUMBER)
-	SF.CheckLuaType(depth, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
 	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
