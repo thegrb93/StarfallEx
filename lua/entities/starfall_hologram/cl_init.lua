@@ -93,15 +93,17 @@ function ENT:Draw()
 	if self.rendered_once and self.custom_mesh then
 		if self.custom_meta_data[self.custom_mesh] then
 			local m = self:GetBoneMatrix(0)
-			if self.scale_matrix then m = m * self.scale_matrix end
-			cam.PushModelMatrix(m)
-			local mat = Material(self:GetMaterial())
-			if mat then render.SetMaterial(mat) end
-			local col = self:GetColor()
-			render.SetColorModulation(col.r / 255, col.g / 255, col.b / 255)
-			self:DrawModel() --For some reason won't draw without this call
-			self.custom_mesh:Draw()
-			cam.PopModelMatrix()
+			if m then
+				if self.scale_matrix then m = m * self.scale_matrix end
+				cam.PushModelMatrix(m)
+				local mat = Material(self:GetMaterial())
+				if mat then render.SetMaterial(mat) end
+				local col = self:GetColor()
+				render.SetColorModulation(col.r / 255, col.g / 255, col.b / 255)
+				self:DrawModel() --For some reason won't draw without this call
+				self.custom_mesh:Draw()
+				cam.PopModelMatrix()
+			end
 		else
 			self.custom_mesh = nil
 		end
