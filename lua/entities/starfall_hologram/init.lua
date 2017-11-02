@@ -30,11 +30,12 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 	if enabled then
 		self.clips[index] = { origin = origin, normal = normal, islocal = islocal }
 		self.lastClipUpdate[index] = CurTime()
-	else
+		self:SendClip(index)	
+	elseif self.clips[index] then
 		self.clips[index] = nil
 		self.lastClipUpdate[index] = nil
+		self:SendClip(index)	
 	end
-	self:SendClip(index)	
 end
 
 function ENT:SendScale(ply)
