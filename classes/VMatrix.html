@@ -451,7 +451,7 @@
 		</li>
 	
 		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
+			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
 		</li>
 	
 		<li>
@@ -468,6 +468,10 @@
 	
 		<li>
 			<a href="../examples/sync.lua.html">sync.lua</a>
+		</li>
+	
+		<li>
+			<a href="../examples/include.lua.html">include.lua</a>
 		</li>
 	
 		<li>
@@ -538,6 +542,12 @@ Returns angles </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getAxisAngle">getAxisAngle</a>&nbsp;()</td>
+		<td class="summary">
+Gets the rotation axis and angle of rotation of the rotation matrix </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getField">getField</a>&nbsp;(row, column)</td>
 		<td class="summary">
 Returns a specific field in the matrix </td>
@@ -546,25 +556,25 @@ Returns a specific field in the matrix </td>
 	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getForward">getForward</a>&nbsp;()</td>
 		<td class="summary">
-Returns forward vector of matrix </td>
+Returns forward vector of matrix.</td>
 	</tr>
 
 	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getInverse">getInverse</a>&nbsp;()</td>
 		<td class="summary">
-Inverts the matrix </td>
+Returns an inverted matrix.</td>
 	</tr>
 
 	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getInverseTR">getInverseTR</a>&nbsp;()</td>
 		<td class="summary">
-Inverts the matrix efficiently for translations and rotations </td>
+Returns an inverted matrix.</td>
 	</tr>
 
 	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getRight">getRight</a>&nbsp;()</td>
 		<td class="summary">
-Returns right vector of matrix </td>
+Returns right vector of matrix.</td>
 	</tr>
 
 	<tr>
@@ -580,9 +590,39 @@ Returns translation </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getTransposed">getTransposed</a>&nbsp;()</td>
+		<td class="summary">
+Returns the transposed matrix </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getUp">getUp</a>&nbsp;()</td>
 		<td class="summary">
-Returns up vector of matrix </td>
+Returns up vector of matrix.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:invert">invert</a>&nbsp;()</td>
+		<td class="summary">
+Inverts the matrix.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:invertTR">invertTR</a>&nbsp;()</td>
+		<td class="summary">
+Inverts the matrix efficiently for translations and rotations </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:isIdentity">isIdentity</a>&nbsp;()</td>
+		<td class="summary">
+Returns whether the matrix is equal to Identity matrix or not </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:isRotationMatrix">isRotationMatrix</a>&nbsp;()</td>
+		<td class="summary">
+Returns whether the matrix is a rotation matrix or not.</td>
 	</tr>
 
 	<tr>
@@ -604,6 +644,12 @@ Scales the absolute translation </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:set">set</a>&nbsp;(src)</td>
+		<td class="summary">
+Copies the values from the second matrix to the first matrix.</td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setAngles">setAngles</a>&nbsp;(ang)</td>
 		<td class="summary">
 Sets the angles </td>
@@ -613,6 +659,24 @@ Sets the angles </td>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setField">setField</a>&nbsp;(row, column, value)</td>
 		<td class="summary">
 Sets a specific field in the matrix </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setForward">setForward</a>&nbsp;(forward)</td>
+		<td class="summary">
+Sets the forward direction of the matrix.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setIdentity">setIdentity</a>&nbsp;()</td>
+		<td class="summary">
+Initializes the matrix as Identity matrix </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setRight">setRight</a>&nbsp;(right)</td>
+		<td class="summary">
+Sets the right direction of the matrix.</td>
 	</tr>
 
 	<tr>
@@ -628,9 +692,27 @@ Sets the translation </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setUp">setUp</a>&nbsp;(up)</td>
+		<td class="summary">
+Sets the up direction of the matrix.</td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:toTable">toTable</a>&nbsp;()</td>
+		<td class="summary">
+Converts the matrix to a 4x4 table </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:translate">translate</a>&nbsp;(vec)</td>
 		<td class="summary">
 Translate the matrix </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:transpose">transpose</a>&nbsp;()</td>
+		<td class="summary">
+Transposes the matrix </td>
 	</tr>
 
 </table>
@@ -662,6 +744,38 @@ Returns angles
 
 <h3>Return value:</h3>
 <ul>Angles</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getAxisAngle"></a><strong>VMatrix:getAxisAngle</strong>&nbsp;()</dt>
+<dd>
+
+Gets the rotation axis and angle of rotation of the rotation matrix
+
+
+
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>The axis of rotation</li>
+	
+	<li>The angle of rotation</li>
+	
+</ol>
 
 
 
@@ -715,7 +829,7 @@ Returns a specific field in the matrix
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getForward"></a><strong>VMatrix:getForward</strong>&nbsp;()</dt>
 <dd>
 
-Returns forward vector of matrix
+Returns forward vector of matrix. First matrix column
 
 
 
@@ -741,7 +855,7 @@ Returns forward vector of matrix
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getInverse"></a><strong>VMatrix:getInverse</strong>&nbsp;()</dt>
 <dd>
 
-Inverts the matrix
+Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
 
 
 
@@ -752,7 +866,7 @@ Inverts the matrix
 
 
 <h3>Return value:</h3>
-<ul>inverted matrix</ul>
+<ul>Inverted matrix</ul>
 
 
 
@@ -767,7 +881,7 @@ Inverts the matrix
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getInverseTR"></a><strong>VMatrix:getInverseTR</strong>&nbsp;()</dt>
 <dd>
 
-Inverts the matrix efficiently for translations and rotations
+Returns an inverted matrix. Efficiently for translations and rotations
 
 
 
@@ -778,7 +892,7 @@ Inverts the matrix efficiently for translations and rotations
 
 
 <h3>Return value:</h3>
-<ul>inverted matrix</ul>
+<ul>Inverted matrix</ul>
 
 
 
@@ -793,7 +907,7 @@ Inverts the matrix efficiently for translations and rotations
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getRight"></a><strong>VMatrix:getRight</strong>&nbsp;()</dt>
 <dd>
 
-Returns right vector of matrix
+Returns right vector of matrix. Negated second matrix column
 
 
 
@@ -868,10 +982,36 @@ Returns translation
 
 
 
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getTransposed"></a><strong>VMatrix:getTransposed</strong>&nbsp;()</dt>
+<dd>
+
+Returns the transposed matrix
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>Transposed matrix</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getUp"></a><strong>VMatrix:getUp</strong>&nbsp;()</dt>
 <dd>
 
-Returns up vector of matrix
+Returns up vector of matrix. Third matrix column
 
 
 
@@ -883,6 +1023,107 @@ Returns up vector of matrix
 
 <h3>Return value:</h3>
 <ul>Translation</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:invert"></a><strong>VMatrix:invert</strong>&nbsp;()</dt>
+<dd>
+
+Inverts the matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>bool Whether the matrix was inverted or not</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:invertTR"></a><strong>VMatrix:invertTR</strong>&nbsp;()</dt>
+<dd>
+
+Inverts the matrix efficiently for translations and rotations
+
+
+
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:isIdentity"></a><strong>VMatrix:isIdentity</strong>&nbsp;()</dt>
+<dd>
+
+Returns whether the matrix is equal to Identity matrix or not
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>bool True/False</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:isRotationMatrix"></a><strong>VMatrix:isRotationMatrix</strong>&nbsp;()</dt>
+<dd>
+
+Returns whether the matrix is a rotation matrix or not. Checks if the forward, right and up vectors are orthogonal and normalized.
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>bool True/False</ul>
 
 
 
@@ -990,6 +1231,38 @@ Scales the absolute translation
 
 
 
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:set"></a><strong>VMatrix:set</strong>&nbsp;(src)</dt>
+<dd>
+
+Copies the values from the second matrix to the first matrix. Self-Modifies
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>src</em></code>: Second matrix
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setAngles"></a><strong>VMatrix:setAngles</strong>&nbsp;(ang)</dt>
 <dd>
 
@@ -1043,6 +1316,93 @@ Sets a specific field in the matrix
 	
 	<li>
 	  <code><em>value</em></code>: Value to set
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setForward"></a><strong>VMatrix:setForward</strong>&nbsp;(forward)</dt>
+<dd>
+
+Sets the forward direction of the matrix. First column
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>forward</em></code>: The forward vector
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setIdentity"></a><strong>VMatrix:setIdentity</strong>&nbsp;()</dt>
+<dd>
+
+Initializes the matrix as Identity matrix
+
+
+
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setRight"></a><strong>VMatrix:setRight</strong>&nbsp;(right)</dt>
+<dd>
+
+Sets the right direction of the matrix. Negated second column
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>right</em></code>: The right vector
 	</li>
 	
 </ul>
@@ -1126,6 +1486,64 @@ Sets the translation
 
 
 
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setUp"></a><strong>VMatrix:setUp</strong>&nbsp;(up)</dt>
+<dd>
+
+Sets the up direction of the matrix. Third column
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>up</em></code>: The up vector
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:toTable"></a><strong>VMatrix:toTable</strong>&nbsp;()</dt>
+<dd>
+
+Converts the matrix to a 4x4 table
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>The 4x4 table</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
 <dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:translate"></a><strong>VMatrix:translate</strong>&nbsp;(vec)</dt>
 <dd>
 
@@ -1142,6 +1560,29 @@ Translate the matrix
 	</li>
 	
 </ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:transpose"></a><strong>VMatrix:transpose</strong>&nbsp;()</dt>
+<dd>
+
+Transposes the matrix
+
+
+
 
 
 

@@ -449,7 +449,7 @@
 		</li>
 	
 		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
+			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
 		</li>
 	
 		<li>
@@ -466,6 +466,10 @@
 	
 		<li>
 			<a href="../examples/sync.lua.html">sync.lua</a>
+		</li>
+	
+		<li>
+			<a href="../examples/include.lua.html">include.lua</a>
 		</li>
 	
 		<li>
@@ -653,6 +657,12 @@ Works like loadstring, except that it executes by default in the main environmen
 	</tr>
 
 	<tr>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#builtin.localToWorld">localToWorld</a>&nbsp;(localPos, localAng, originPos, originAngle)</td>
+	<td class="summary">
+Translates the specified position and angle from the specified local coordinate system </td>
+	</tr>
+
+	<tr>
 	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#builtin.next">next</a>&nbsp;(tbl, k)</td>
 	<td class="summary">
 Returns the next key and value pair in a table.</td>
@@ -827,6 +837,12 @@ Returns a string representing the name of the type of the passed object.</td>
 	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#builtin.unpack">unpack</a>&nbsp;(tbl)</td>
 	<td class="summary">
 This function takes a numeric indexed table and return all the members as a vararg.</td>
+	</tr>
+
+	<tr>
+	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#builtin.worldToLocal">worldToLocal</a>&nbsp;(pos, ang, newSystemOrigin, newSystemAngles)</td>
+	<td class="summary">
+Translates the specified position and angle into the specified coordinate system </td>
 	</tr>
 
 	<tr>
@@ -1557,6 +1573,59 @@ Works like loadstring, except that it executes by default in the main environmen
 
 <h3>Return value:</h3>
 <ul>Function of str</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="builtin.localToWorld"></a><strong>builtin.localToWorld</strong>&nbsp;(localPos, localAng, originPos, originAngle)</dt>
+<dd>
+
+Translates the specified position and angle from the specified local coordinate system
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>localPos</em></code>: The position vector that should be translated to world coordinates
+	</li>
+	
+	<li>
+	  <code><em>localAng</em></code>: The angle that should be converted to a world angle
+	</li>
+	
+	<li>
+	  <code><em>originPos</em></code>: The origin point of the source coordinate system, in world coordinates
+	</li>
+	
+	<li>
+	  <code><em>originAngle</em></code>: The angles of the source coordinate system, as a world angle
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>worldPos</li>
+	
+	<li>worldAngles</li>
+	
+</ol>
 
 
 
@@ -2570,6 +2639,59 @@ This function takes a numeric indexed table and return all the members as a vara
 
 <h3>Return value:</h3>
 <ul>Elements of tbl</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="builtin.worldToLocal"></a><strong>builtin.worldToLocal</strong>&nbsp;(pos, ang, newSystemOrigin, newSystemAngles)</dt>
+<dd>
+
+Translates the specified position and angle into the specified coordinate system
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>pos</em></code>: The position that should be translated from the current to the new system
+	</li>
+	
+	<li>
+	  <code><em>ang</em></code>: The angles that should be translated from the current to the new system
+	</li>
+	
+	<li>
+	  <code><em>newSystemOrigin</em></code>: The origin of the system to translate to
+	</li>
+	
+	<li>
+	  <code><em>newSystemAngles</em></code>: The angles of the system to translate to
+	</li>
+	
+</ul>
+
+
+
+
+
+
+<h3>Return values:</h3>
+<ol>
+	
+	<li>localPos</li>
+	
+	<li>localAngles</li>
+	
+</ol>
 
 
 
