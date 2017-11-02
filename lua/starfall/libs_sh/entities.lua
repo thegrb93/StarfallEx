@@ -242,6 +242,22 @@ if CLIENT then
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
+
+	--- Sets a hologram entity's rendermatrix
+	-- @client
+	-- @param mat VMatrix to use
+	function ents_methods:setHologramRenderMatrix(mat)
+		SF.CheckType(mat, SF.VMatrix.Metatable)
+		local ent = eunwrap(self)
+		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
+		local matrix = SF.VMatrix.Unwrap(mat)
+		if matrix:IsIdentity() then
+			ent:DisableMatrix("RenderMultiply")
+		else
+			ent:EnableMatrix("RenderMultiply", matrix)
+		end
+	end
 end
 
 -- ------------------------- Methods ------------------------- --
