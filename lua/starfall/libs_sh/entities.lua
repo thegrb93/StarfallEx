@@ -171,7 +171,7 @@ if CLIENT then
 	end)
 
 	--- Allows manipulation of a hologram's bones' positions
-	-- @client
+	-- @shared
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
 	function ents_methods:manipulateBonePosition(bone, vec)
@@ -184,7 +184,7 @@ if CLIENT then
 	end
 
 	--- Allows manipulation of a hologram's bones' scale
-	-- @client
+	-- @shared
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
 	function ents_methods:manipulateBoneScale(bone, vec)
@@ -197,7 +197,7 @@ if CLIENT then
 	end
 
 	--- Allows manipulation of a hologram's bones' angles
-	-- @client
+	-- @shared
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
 	function ents_methods:manipulateBoneAngles(bone, ang)
