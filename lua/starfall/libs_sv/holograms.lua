@@ -133,10 +133,10 @@ function hologram_methods:setFlexWeight(flexid, weight)
 	SF.CheckLuaType(flexid, TYPE_NUMBER)
 	SF.CheckLuaType(weight, TYPE_NUMBER)
 	flexid = math.floor(flexid)
+	local holoent = unwrap(self)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
-	local holoent = unwrap(self)
 	if IsValid(holoent) then
 		holoent:SetFlexWeight(self, weight)
 	end
