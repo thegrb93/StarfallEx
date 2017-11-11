@@ -269,6 +269,32 @@ if SERVER then
 
 		phys:SetInertia(vec)
 	end
+	
+	--- Sets bone gravity
+	-- @param grav Bool should the bone respect gravity?
+	function physobj_methods:enableGravity (grav)
+		local phys = unwrap(self)
+		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.enableGravity")
+		phys:EnableGravity(grav and true or false)
+		phys:Wake()
+	end
+
+	--- Sets the bone drag state
+	-- @param drag Bool should the bone have air resistence?
+	function physobj_methods:enableDrag (drag)
+		local phys = unwrap(self)
+		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.enableDrag")
+		phys:EnableDrag(drag and true or false)
+	end
+
+	--- Sets the bone movement state
+	-- @param move Bool should the bone move?
+	function physobj_methods:enableMotion (move)
+		local phys = unwrap(self)
+		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.enableMotion")
+		phys:EnableMotion(move and true or false)
+		phys:Wake()
+	end
 
 	--- Sets the physical material of a physics object
 	-- @server
