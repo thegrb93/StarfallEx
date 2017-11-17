@@ -209,7 +209,8 @@ end
 function player_methods:getName ()
 	SF.CheckType(self, player_metamethods)
 	local ent = eunwrap(self)
-	return ent and ent:GetName()
+	if not IsValid(ent) then SF.Throw("Invalid Entity!", 2) end
+	return ent:GetName()
 end
 
 --- Returns the player's running speed
