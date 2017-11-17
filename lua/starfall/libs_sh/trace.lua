@@ -35,8 +35,10 @@ end
 -- @field MAT_COMPUTER
 -- @field MAT_SLOSH
 -- @field MAT_TILE
+-- @field MAT_GRASS
 -- @field MAT_VENT
 -- @field MAT_WOOD
+-- @field MAT_DEFAULT
 -- @field MAT_GLASS
 -- @field HITGROUP_GENERIC
 -- @field HITGROUP_HEAD
@@ -118,8 +120,10 @@ trace_library.MAT_FOLIAGE = MAT_FOLIAGE
 trace_library.MAT_COMPUTER = MAT_COMPUTER
 trace_library.MAT_SLOSH = MAT_SLOSH
 trace_library.MAT_TILE = MAT_TILE
+trace_library.MAT_GRASS = MAT_GRASS
 trace_library.MAT_VENT = MAT_VENT
 trace_library.MAT_WOOD = MAT_WOOD
+trace_library.MAT_DEFAULT = MAT_DEFAULT
 trace_library.MAT_GLASS = MAT_GLASS
 
 -- Hithroup Enumeration
