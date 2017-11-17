@@ -828,6 +828,18 @@ function ents_methods:setPhysMaterial(mat)
 	construct.SetPhysProp(nil, ent, 0, phys, { Material = mat })
 end
 
+--- Get the physical material of the entity
+-- @return the physical material
+function ents_methods:getPhysMaterial()
+	SF.CheckType(self, ents_metatable)
+	local ent = unwrap(self)
+
+	local phys = getPhysObject(ent)
+	if not phys then SF.Throw("Entity has no physics object or is not valid", 2) end
+	
+	return phys:GetMaterial()
+end
+
 --- Checks whether entity has physics
 -- @return True if entity has physics
 function ents_methods:isValidPhys()
