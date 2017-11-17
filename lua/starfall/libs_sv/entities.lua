@@ -837,8 +837,6 @@ function ents_methods:getPhysMaterial()
 	local phys = getPhysObject(ent)
 	if not phys then SF.Throw("Entity has no physics object or is not valid", 2) end
 	
-	SF.Permissions.check(SF.instance.player, ent, "entities.setMass")
-	
 	return phys:GetMaterial()
 end
 
