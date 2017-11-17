@@ -22,6 +22,20 @@ end
 
 file.CreateDir("sf_filedata/")
 
+-- Register functions to be called when the chip is initialised and deinitialised
+SF.Libraries.AddHook("initialize", function (inst)
+	inst.data.files = {}
+end)
+
+SF.Libraries.AddHook("deinitialize", function (inst)
+	local files = inst.data.files
+	local file = next(files)
+	while file do
+		file:Close()
+		file = next(files)
+	end
+end)
+
 --- Opens and returns a file
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @param mode The file mode to use. See lua manual for explaination
@@ -31,7 +45,12 @@ function file_library.open (path, mode)
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(mode, TYPE_STRING)
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), mode, "DATA")
-	if f then return wrap(f) else SF.Throw("Failed to open file", 2) return end
+	if f then
+		SF.instance.data.files[f] = true
+		return wrap(f)
+	else
+		SF.Throw("Failed to open file", 2)
+	end
 end
 
 --- Reads a file from path
@@ -122,7 +141,9 @@ end
 --- Flushes and closes the file. The file must be opened again to use a new file object.
 function file_methods:close()
 	SF.CheckType(self, file_metamethods)
-	unwrap(self):Close()
+	local f = unwrap(self)
+	SF.instance.data.files[f] = nil
+	f:Close()
 end
 
 --- Sets the file position
