@@ -385,7 +385,7 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		end
 
-		if self:NextPattern("^0[xb][0-9A-F]+") then
+		if self:NextPattern("^0[xb][a-fA-F0-9]+") then
 			tokenname = "number"
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
