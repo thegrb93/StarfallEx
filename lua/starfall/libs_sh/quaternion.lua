@@ -284,7 +284,7 @@ quat_metamethods.__add = function(lhs, rhs)
 		return quicknew(lhs + rhs[1], rhs[2], rhs[3], rhs[4])
 	end
 
-	Error("Tried to add a " .. ltype .. " to a " .. rtype .. "not ")
+	SF.Throw("Tried to add a " .. ltype .. " to a " .. rtype, 2)
 end
 
 
@@ -302,7 +302,7 @@ quat_metamethods.__sub = function(lhs, rhs)
 		return quicknew(lhs - rhs[1], -rhs[2], -rhs[3], -rhs[4])
 	end
 
-	Error("Tried to subtract a " .. ltype .. " from a " .. rtype .. "not ")
+	SF.Throw("Tried to subtract a " .. ltype .. " from a " .. rtype, 2)
 end
 
 
@@ -341,7 +341,7 @@ quat_metamethods.__mul = function(lhs, rhs)
 		end
 	end
 
-	Error("Tried to multiply a " .. ltype .. " with a " .. rtype .. "not \n")
+	SF.Throw("Tried to multiply a " .. ltype .. " with a " .. rtype, 2)
 end
 
 
@@ -379,7 +379,7 @@ quat_metamethods.__div = function(lhs, rhs)
 		end
 	end
 
-	error("Tried to divide a " .. ltype .. " with a " .. rtype)
+	SF.Throw("Tried to divide a " .. ltype .. " with a " .. rtype, 2)
 end
 
 
@@ -401,7 +401,7 @@ quat_metamethods.__pow = function(lhs, rhs)
 		return qexp({ l[1] * rhs, l[2] * rhs, l[3] * rhs, l[4] * rhs })
 	end
 
-	Error("Tried to exponentiate a " .. ltype .. " with a " .. rtype .. "not ")
+	SF.Throw("Tried to exponentiate a " .. ltype .. " with a " .. rtype, 2)
 end
 
 
@@ -424,7 +424,7 @@ quat_metamethods.__eq = function(lhs, rhs)
 		end
 	end
 
-	Error("Tried to compare a " .. ltype .. " with a " .. rtype .. "not ")
+	SF.Throw("Tried to compare a " .. ltype .. " with a " .. rtype, 2)
 end
 
 --- Returns absolute value of <q>
