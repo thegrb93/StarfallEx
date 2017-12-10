@@ -114,10 +114,10 @@ SF.Libraries.AddHook("postload", function()
 	eunwrap = SF.Entities.Unwrap
 end)
 
-SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { ["Client"] = {} })
-SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { ["Client"] = {} })
-SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { ["Client"] = {} })
-SF.Permissions.registerPrivilege("render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", { ["Client"] = {} })
+SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
+SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
+SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { client = {} })
+SF.Permissions.registerPrivilege("render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_url_materials = CreateConVar("sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE })
@@ -645,14 +645,14 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
 		if prefix=="http" or prefix=="https" then
-			SF.Permissions.check(instance.player, nil, "render.urlmaterial")
+			SF.Permissions.check(instance, nil, "render.urlmaterial")
 			if #tx>2000 then SF.Throw("URL is too long!", 2) end
 			tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
 				return string.format("%%%02X", string.byte(str))
 			end)
 			SF.HTTPNotify(instance.player, tx)
 		else
-			SF.Permissions.check(instance.player, nil, "render.datamaterial")
+			SF.Permissions.check(instance, nil, "render.datamaterial")
 			tx = string.match(tx, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
 			if not tx then --It's not valid
 				SF.Throw("Texture data isnt proper base64 encoded image.", 2)

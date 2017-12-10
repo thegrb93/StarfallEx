@@ -5,14 +5,16 @@
 SF.Permissions = {}
 
 local P = SF.Permissions
+P.privileges = {}
 P.providers = {}
-P.filename = SERVER and "sf_perms.txt" or "sf_perms_cl.txt"
+P.permissionchecks = {}
+P.filename = SERVER and "sf_perms2_sv.txt" or "sf_perms2_cl.txt"
 
 --- Adds a provider implementation to the set used by this library.
 -- Providers must implement the {@link SF.Permissions.Provider} interface.
 -- @param provider the provider to be registered
 function P.registerProvider (provider)
-	P.providers[#P.providers + 1] = provider
+	P.providers[provider.id] = provider
 end
 
 --- Registers a privilege
@@ -20,64 +22,84 @@ end
 -- @param name Human readable name of the privilege
 -- @param description a short description of the privilege
 function P.registerPrivilege (id, name, description, arg)
-	for _, provider in ipairs(P.providers) do
-		provider.registered(id, name, description, arg)
+	arg = arg or {}
+	--All privileges should get usergroup
+	if not arg.usergroup then
+		arg.usergroups = {}
 	end
+	
+	P.privileges[id] = {name, description, arg}
 end
 
 --- Checks whether a player may perform an action.
--- @param principal the player performing the action to be authorized
+-- @param instance The instance checking permission
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
--- @return boolean whether the action is permitted
-function P.check (principal, target, key)
-
-	for _, provider in ipairs(P.providers) do
-		local setting = provider.settings[key]
-		if setting then
-			local check = provider.checks[setting]
-			if check then
-				if not check(principal, target, key) then
-					SF.Throw("Insufficient permissions: " .. key, 3)
-				end
-			else
-				SF.Throw("'" .. provider.id .. "' bad setting for permission " .. key .. ": " .. setting, 3)
-			end
-		end
+function P.check (instance, target, key)
+	if P.permissionchecks[key](instance, target) then
+		SF.Throw("Insufficient permissions: " .. key, 3)
 	end
-
 end
 
-function P.hasAccess (principal, target, key)
-
-	for _, provider in ipairs(P.providers) do
-		local setting = provider.settings[key]
-		if setting then
-			local check = provider.checks[setting]
-			if check then
-				if not check(principal, target, key) then return false end
-			else
-				SF.Throw("'" .. provider.id .. "' bad setting for permission " .. key .. ": " .. setting, 3)
-			end
-		end
-	end
-
-	return true
+function P.hasAccess (instance, target, key)
+	return not P.permissionchecks[key](instance, target)
 end
 
 function P.savePermissions()
 	local settings = {}
-	for _, provider in ipairs(P.providers) do
-		if next(provider.settings) then
-			local tbl = {}
-			for k, v in pairs(provider.settings) do
-				tbl[k] = v
-			end
-			settings[provider.id] = tbl
+	for k, privilege in pairs(P.privileges) do
+		settings[k] = {}
+		for provider, v in pairs(privilege[3]) do
+			settings[k][provider] = v.setting
 		end
 	end
 	file.Write(P.filename, util.TableToJSON(settings))
 end
+
+function P.buildPermissionCheck(privilegeid)
+	local privilege = P.privileges[privilegeid]	
+	local checks = {}
+	for providerid, v in pairs(privilege[3]) do
+		if P.providers[providerid] then
+			checks[#checks+1] = P.providers[providerid].checks[v.setting]
+		end
+	end
+	P.permissionchecks[privilegeid] = function(instance, target)
+		for k, v in ipairs(checks) do
+			if not v(instance, target) then return true end
+		end
+		return false
+	end
+end
+
+-- Load the permission settings for each provider
+SF.Libraries.AddHook("postload", function()
+	local settings = util.JSONToTable(file.Read(P.filename) or "") or {}
+	for privilegeid, privilege in pairs(P.privileges) do
+		if settings[privilegeid] then
+			for permissionid, permission in pairs(privilege[3]) do
+				if P.providers[permissionid] then
+					if settings[privilegeid][permissionid] then
+						permission.setting = settings[privilegeid][permissionid]
+					else
+						permission.setting = permission.default or P.providers[permissionid].defaultsetting
+					end
+				else
+					privilege[3][permissionid] = nil
+				end
+			end
+		else
+			for permissionid, permission in pairs(privilege[3]) do
+				if P.providers[permissionid] then
+					permission.setting = permission.default or P.providers[permissionid].defaultsetting
+				else
+					privilege[3][permissionid] = nil
+				end
+			end
+		end
+		P.buildPermissionCheck(privilegeid)
+	end
+end)
 
 -- Find and include all provider files.
 do
@@ -113,38 +135,29 @@ do
 	end
 end
 
--- Load the permission settings for each provider
-SF.Libraries.AddHook("postload", function()
-	local settings = util.JSONToTable(file.Read(P.filename) or "") or {}
-	for _, provider in ipairs(P.providers) do
-		if settings[provider.id] then
-			for k, v in pairs(settings[provider.id]) do
-				-- Make sure the setting exists
-				if provider.settings[k] then provider.settings[k] = v end
-			end
-		end
-	end
-end)
-
 local function changePermission(ply, arg)
-	local provider
-	for _, p in ipairs(P.providers) do if p.id == arg[1] then provider = p break end end
-	if provider then
-		if arg[2] and provider.settings[arg[2]] then
-			local val = tonumber(arg[3])
-			if val and val>=1 and val<=#provider.settingsoptions then
-				provider.settings[arg[2]] = math.floor(val)
-				P.savePermissions()
+	if arg[1] then
+		local privilege = P.privileges[arg[1]]
+		if privilege then
+			if arg[2] and privilege[3][arg[2]] then
+				local val = tonumber(arg[3])
+				if val and val>=1 and val<=#P.providers[arg[2]].settingsoptions then
+					privilege[3][arg[2]].setting = math.floor(val)
+					P.savePermissions()
+					P.buildPermissionCheck(arg[1])
+				else
+					ply:PrintMessage(HUD_PRINTCONSOLE, "The setting's value is out of bounds or not a number.\n")
+				end
 			else
-				ply:PrintMessage(HUD_PRINTCONSOLE, "The setting's value is out of bounds or not a number.\n")
+				ply:PrintMessage(HUD_PRINTCONSOLE, "Permission, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of permissions.\n")
+				for id, _ in pairs(privilege[3]) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
 			end
 		else
-			ply:PrintMessage(HUD_PRINTCONSOLE, "Setting, " .. tostring(arg[2]) .. ", couldn't be found.\nHere's a list of settings.\n")
-			for id, _ in SortedPairs(provider.settings) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
+			ply:PrintMessage(HUD_PRINTCONSOLE, "Privilege, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of privileges.\n")
+			for id, _ in SortedPairs(P.privileges) do ply:PrintMessage(HUD_PRINTCONSOLE, id.."\n") end
 		end
 	else
-		ply:PrintMessage(HUD_PRINTCONSOLE, "Permission provider, " .. tostring(arg[1]) .. ", couldn't be found.\nHere's a list of providers.\n")
-		for _, p in ipairs(P.providers) do ply:PrintMessage(HUD_PRINTCONSOLE, p.id.."\n") end
+		ply:PrintMessage(HUD_PRINTCONSOLE, "Usage: sf_permission <privilege> <permission> <value>.\n")
 	end
 end
 
@@ -167,20 +180,28 @@ if SERVER then
 		if ply:IsSuperAdmin() then
 			net.Start("sf_permissionsettings")
 
-			net.WriteUInt(#P.providers, 8)
-			for _, v in ipairs(P.providers) do
-				net.WriteString(v.id)
+			net.WriteUInt(table.Count(P.providers), 8)
+			for id, v in pairs(P.providers) do
+			
+				local privileges = {}
+				for privilegeid, privilege in pairs(P.privileges) do
+					if privilege[3][id] then
+						privileges[privilegeid] = privilege
+					end
+				end
+				
+				net.WriteString(id)
 				net.WriteString(v.name)
 				net.WriteUInt(#v.settingsoptions, 8)
-				for _, option in ipairs(v.settingsoptions) do
+				for _, option in pairs(v.settingsoptions) do
 					net.WriteString(option)
 				end
-				net.WriteUInt(table.Count(v.settings), 8)
-				for id, setting in pairs(v.settings) do
-					net.WriteString(id)
-					net.WriteString(v.settingsdesc[id][1])
-					net.WriteString(v.settingsdesc[id][2])
-					net.WriteUInt(setting, 8)
+				net.WriteUInt(table.Count(privileges), 8)
+				for privid, setting in pairs(privileges) do
+					net.WriteString(privid)
+					net.WriteString(setting[1])
+					net.WriteString(setting[2])
+					net.WriteUInt(setting[3][id].setting, 8)
 				end
 			end
 

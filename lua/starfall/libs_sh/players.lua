@@ -380,7 +380,7 @@ end
 -- @shared
 -- @return table trace data https://wiki.garrysmod.com/page/Structures/TraceResult
 function player_methods:getEyeTrace ()
-	SF.Permissions.check(SF.instance.player, eunwrap(self), "trace")
+	SF.Permissions.check(SF.instance, eunwrap(self), "trace")
 
 	local data = eunwrap(self):GetEyeTrace()
 	return setmetatable({}, {

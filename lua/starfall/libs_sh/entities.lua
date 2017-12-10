@@ -215,7 +215,7 @@ if CLIENT then
 	-- @param mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setHologramMesh(mesh)
 		local instance = SF.instance
-		SF.Permissions.check(instance.player, nil, "mesh")
+		SF.Permissions.check(instance, nil, "mesh")
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end

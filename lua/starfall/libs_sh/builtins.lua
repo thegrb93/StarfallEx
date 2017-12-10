@@ -195,7 +195,7 @@ end
 --@param obj Optional object to pass to the permission system.
 function SF.DefaultEnvironment.hasPermission(perm, obj)
 	SF.CheckLuaType(perm, TYPE_STRING)
-	return SF.Permissions.hasAccess(SF.instance.player, SF.UnwrapObject(obj), perm)
+	return SF.Permissions.hasAccess(SF.instance, SF.UnwrapObject(obj), perm)
 end
 
 
@@ -502,7 +502,7 @@ SF.Libraries.AddHook("cleanup", function()
 	debug.setmetatable("", gluastr)
 end)
 
-SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { Client = { default = 4 } })
+SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
 local function printTableX (t, indent, alreadyprinted)
 	for k, v in SF.DefaultEnvironment.pairs(t) do
 		if SF.GetType(v) == "table" and not alreadyprinted[v] then
@@ -535,7 +535,7 @@ if SERVER then
 	-- @param cmd Command to execute
 	function SF.DefaultEnvironment.concmd (cmd)
 		SF.CheckLuaType(cmd, TYPE_STRING)
-		SF.Permissions.check(SF.instance.player, nil, "console.command")
+		SF.Permissions.check(SF.instance, nil, "console.command")
 		SF.instance.player:ConCommand(cmd)
 	end
 
@@ -598,7 +598,7 @@ else
 
 	function SF.DefaultEnvironment.concmd (cmd)
 		SF.CheckLuaType(cmd, TYPE_STRING)
-		SF.Permissions.check(SF.instance.player, nil, "console.command")
+		SF.Permissions.check(SF.instance, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
 	end
 

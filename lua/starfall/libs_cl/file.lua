@@ -14,10 +14,10 @@ local wrap, unwrap = SF.CreateWrapper(file_metamethods, true, false)
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege("file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", { ["Client"] = { default = 1 } })
-	P.registerPrivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { ["Client"] = { default = 1 } })
-	P.registerPrivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { ["Client"] = { default = 1 } })
-	P.registerPrivilege("file.open", "Get a file object", "Allows the user to use a file object", { ["Client"] = { default = 1 } })
+	P.registerPrivilege("file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", { client = { default = 1 } })
+	P.registerPrivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
+	P.registerPrivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
+	P.registerPrivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
 end
 
 file.CreateDir("sf_filedata/")
@@ -41,7 +41,7 @@ end)
 -- @param mode The file mode to use. See lua manual for explaination
 -- @return File object or nil if it failed
 function file_library.open (path, mode)
-	SF.Permissions.check(SF.instance.player, path, "file.open")
+	SF.Permissions.check(SF.instance, path, "file.open")
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(mode, TYPE_STRING)
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), mode, "DATA")
@@ -57,7 +57,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return Contents, or nil if error
 function file_library.read (path)
-	SF.Permissions.check(SF.instance.player, path, "file.read")
+	SF.Permissions.check(SF.instance, path, "file.read")
 	SF.CheckLuaType(path, TYPE_STRING)
 	local contents = file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 	if contents then return contents else SF.Throw("file not found", 2) return end
@@ -67,7 +67,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return True if OK, nil if error
 function file_library.write (path, data)
-	SF.Permissions.check(SF.instance.player, path, "file.write")
+	SF.Permissions.check(SF.instance, path, "file.write")
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(data, TYPE_STRING)
 
@@ -81,7 +81,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @param data String that will be appended to the file.
 function file_library.append (path, data)
-	SF.Permissions.check(SF.instance.player, path, "file.write")
+	SF.Permissions.check(SF.instance, path, "file.write")
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(data, TYPE_STRING)
 
@@ -95,7 +95,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return True if exists, false if not, nil if error
 function file_library.exists (path)
-	SF.Permissions.check(SF.instance.player, path, "file.exists")
+	SF.Permissions.check(SF.instance, path, "file.exists")
 	SF.CheckLuaType(path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
@@ -104,7 +104,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 -- @return True if successful, nil if error
 function file_library.delete (path)
-	SF.Permissions.check(SF.instance.player, path, "file.write")
+	SF.Permissions.check(SF.instance, path, "file.write")
 	SF.CheckLuaType(path, TYPE_STRING)
 	path = "sf_filedata/" .. SF.NormalizePath(path)
 	if not file.Exists(path, "DATA") then SF.Throw("file not found", 2) return end
@@ -115,7 +115,7 @@ end
 --- Creates a directory
 -- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
 function file_library.createDir (path)
-	SF.Permissions.check(SF.instance.player, path, "file.write")
+	SF.Permissions.check(SF.instance, path, "file.write")
 	SF.CheckLuaType(path, TYPE_STRING)
 	file.CreateDir("sf_filedata/" .. SF.NormalizePath(path))
 end
@@ -126,7 +126,7 @@ end
 -- @return Table of file names
 -- @return Table of directory names
 function file_library.find (path, sorting)
-	SF.Permissions.check(SF.instance.player, path, "file.exists")
+	SF.Permissions.check(SF.instance, path, "file.exists")
 	SF.CheckLuaType(path, TYPE_STRING)
 	if sorting then SF.CheckLuaType(sorting, TYPE_STRING) end
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)

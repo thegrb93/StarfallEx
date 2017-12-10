@@ -238,7 +238,7 @@ end
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
-	SF.Permissions.check(SF.instance.player, nil, "trace")
+	SF.Permissions.check(SF.instance, nil, "trace")
 	SF.CheckType(start, SF.Types.Vector)
 	SF.CheckType(endpos, SF.Types.Vector)
 
@@ -286,7 +286,7 @@ end
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
-	SF.Permissions.check(SF.instance.player, nil, "trace")
+	SF.Permissions.check(SF.instance, nil, "trace")
 	SF.CheckType(start, SF.Types.Vector)
 	SF.CheckType(endpos, SF.Types.Vector)
 	SF.CheckType(minbox, SF.Types.Vector)

@@ -1,7 +1,7 @@
 SF.Mesh = {}
 
 -- Register privileges
-SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { ["Client"] = {} })
+SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
 
 local maxtriangles = CreateClientConVar("sf_mesh_maxtriangles", "50000", true, "How many triangles total can be used for meshes")
 
@@ -90,7 +90,7 @@ end)
 -- @param verteces Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex
 -- @return Mesh object
 function mesh_library.createFromTable (verteces)
-	SF.Permissions.check(SF.instance.player, nil, "mesh")
+	SF.Permissions.check(SF.instance, nil, "mesh")
 	SF.CheckLuaType(verteces, TYPE_TABLE)
 
 	local nvertices = #verteces
@@ -125,7 +125,7 @@ end
 -- @param obj The obj file data
 -- @return Mesh object
 function mesh_library.createFromObj (obj)
-	SF.Permissions.check(SF.instance.player, nil, "mesh")
+	SF.Permissions.check(SF.instance, nil, "mesh")
 	SF.CheckLuaType(obj, TYPE_STRING)
 	local instance = SF.instance
 
@@ -194,7 +194,7 @@ end
 --- Returns how many triangles can be created
 -- @return Number of triangles that can be created
 function mesh_library.trianglesLeft ()
-	if SF.Permissions.hasAccess(SF.instance.player, nil, "mesh") then
+	if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
 		return maxtriangles:GetInt() - (plyTriangleCount[SF.instance.playerid] or 0)
 	else
 		return 0

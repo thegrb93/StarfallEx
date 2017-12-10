@@ -67,7 +67,7 @@ end
 -- @return The prop object
 function props_library.create (pos, ang, model, frozen)
 
-	SF.Permissions.check(SF.instance.player,  nil, "prop.create")
+	SF.Permissions.check(SF.instance,  nil, "prop.create")
 
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
@@ -134,7 +134,7 @@ local allowed_components = {
 -- @server
 -- @return Component entity
 function props_library.createComponent (pos, ang, class, model, frozen)
-	SF.Permissions.check(SF.instance.player,  nil, "prop.create")
+	SF.Permissions.check(SF.instance,  nil, "prop.create")
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
 	SF.CheckLuaType(class, TYPE_STRING)
@@ -202,7 +202,7 @@ end
 -- @return The sent object
 function props_library.createSent (pos, ang, class, frozen)
 
-	SF.Permissions.check(SF.instance.player,  nil, "prop.create")
+	SF.Permissions.check(SF.instance,  nil, "prop.create")
 
 	SF.CheckType(pos, SF.Types["Vector"])
 	SF.CheckType(ang, SF.Types["Angle"])
@@ -363,7 +363,7 @@ end
 -- @return True if user can spawn props, False if not.
 function props_library.canSpawn ()
 
-	if not SF.Permissions.hasAccess(SF.instance.player,  nil, "prop.create") then return false end
+	if not SF.Permissions.hasAccess(SF.instance,  nil, "prop.create") then return false end
 
 	local instance = SF.instance
 	return not personal_max_reached(instance) and instance.data.props.burst:check()>1
@@ -375,7 +375,7 @@ end
 -- @return number of props able to be spawned
 function props_library.propsLeft ()
 
-	if not SF.Permissions.hasAccess(SF.instance.player,  nil, "prop.create") then return 0 end
+	if not SF.Permissions.hasAccess(SF.instance,  nil, "prop.create") then return 0 end
 
 	local instance = SF.instance
 

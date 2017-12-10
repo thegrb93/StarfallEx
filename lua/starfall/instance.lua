@@ -133,9 +133,9 @@ function SF.Instance:runWithOps(func, ...)
 	local prev = SF.runningOps
 	SF.runningOps = true
 	SF.OnRunningOps(true)
-	debug.sethook(cpuCheck, "", 2000)
+	--debug.sethook(cpuCheck, "", 2000)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
-	debug.sethook(prevHook, mask, count)
+	--debug.sethook(prevHook, mask, count)
 	SF.runningOps = prev
 	SF.OnRunningOps(prev)
 	

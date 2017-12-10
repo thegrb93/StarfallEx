@@ -225,14 +225,16 @@ if CLIENT then
 			scrollPanel:Clear()
 			local clientProviders = {}
 			for i, v in ipairs(SF.Permissions.providers) do
-				local provider = { id = v.id, name = v.name, settings = {}, options = {} }
+				local provider = { id = v.id, name = v.name, privileges = {}, options = {} }
 				local options = provider.options
-				local settings = provider.settings
+				local privileges = provider.privileges
 				for i, option in ipairs(v.settingsoptions) do
 					options[i] = option
 				end
-				for id, setting in pairs(v.settings) do
-					settings[id] = { v.settingsdesc[id][1], v.settingsdesc[id][2], setting }
+				for id, privilege in pairs(SF.Permissions.privileges) do
+					if privilege[3][i] then
+						privileges[id] = { privilege[1], privilege[2], privilege[3].setting }
+					end
 				end
 				clientProviders[i] = provider
 			end
@@ -272,7 +274,7 @@ if CLIENT then
 							button:Dock(RIGHT)
 							button.active = setting[3]==i
 							button.DoClick = function(self)
-								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", p.id, id, i)
+								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
 								for _, b in ipairs(buttons) do
 									b.active = false
 								end
