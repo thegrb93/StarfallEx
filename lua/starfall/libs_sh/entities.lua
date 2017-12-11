@@ -67,7 +67,7 @@ function ents_methods:getOwner ()
 	SF.CheckType(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	
+
 	if SF.Permissions.getOwner then
 		return ewrap(SF.Permissions.getOwner(ent))
 	end

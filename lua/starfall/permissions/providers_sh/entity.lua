@@ -6,25 +6,22 @@ P.name = "Entity Permissions"
 P.settingsoptions = { "Owner Only", "Can Tool", "Can Physgun", "Anything" }
 P.defaultsetting = 1
 
-local function dumbtrace(ent)
-	local pos = ent:GetPos()
-	return {
-		FractionLeftSolid = 0,
-		HitNonWorld       = true,
-		Fraction          = 0,
-		Entity            = ent,
-		HitPos            = pos,
-		HitNormal         = Vector(0, 0, 0),
-		HitBox            = 0,
-		Normal            = Vector(1, 0, 0),
-		Hit               = true,
-		HitGroup          = 0,
-		MatType           = 0,
-		StartPos          = pos,
-		PhysicsBone       = 0,
-		WorldToLocal      = Vector(0, 0, 0),
-	}
-end
+local dumbtrace = {
+	FractionLeftSolid = 0,
+	HitNonWorld       = true,
+	Fraction          = 0,
+	Entity            = NULL,
+	HitPos            = Vector(0, 0, 0),
+	HitNormal         = Vector(0, 0, 0),
+	HitBox            = 0,
+	Normal            = Vector(1, 0, 0),
+	Hit               = true,
+	HitGroup          = 0,
+	MatType           = 0,
+	StartPos          = Vector(0, 0, 0),
+	PhysicsBone       = 0,
+	WorldToLocal      = Vector(0, 0, 0),
+}
 
 P.checks = {
 	function(instance, target)
@@ -32,7 +29,9 @@ P.checks = {
 	end,
 	function(instance, target)
 		if not IsValid(target) or CLIENT then return false end
-		return hook.Run("CanTool", instance.player, dumbtrace(target), "starfall_ent_lib") ~= false
+		local pos = target:GetPos()
+		dumbtrace.Entity = target		
+		return hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false
 	end,
 	function(instance, target)
 		if not IsValid(target) or CLIENT then return false end
@@ -47,21 +46,16 @@ P.checks = {
 	function() return true end
 }
 
-P.props = setmetatable({},{__mode="k"})
-
-function SF.Permissions.getOwner(ent)
-	return P.props[ent]
-end
-
 if SERVER then
-	util.AddNetworkString("SFPPTransmit")
-	
+	P.props = setmetatable({},{__mode="k"})
+
+	function SF.Permissions.getOwner(ent)
+		return P.props[ent] or NULL
+	end
+
 	local function PropOwn(ply,ent)
 		P.props[ent] = ply
-		net.Start("SFPPTransmit")
-		net.WriteEntity(ply)
-		net.WriteEntity(ent)
-		net.Broadcast()
+		ent:SetNWEntity("SFPP", ply)
 	end
 
 	if(cleanup) then
@@ -99,12 +93,16 @@ else
 		net.Start("SFPPTransmit")
 		net.WriteEntity(ent)
 		net.SendToServer()
-	end)]]
+	end)
 	
 	net.Receive("SFPPTransmit", function()
 		local ply, ent = net.ReadEntity(), net.ReadEntity()
 		P.props[ent] = ply
-	end)
+	end)]]
+	
+	function SF.Permissions.getOwner(ent)
+		return ent:GetNWEntity("SFPP")
+	end
 end
 
 SF.Permissions.registerProvider(P)
