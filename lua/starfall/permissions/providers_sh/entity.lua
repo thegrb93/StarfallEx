@@ -49,6 +49,10 @@ P.checks = {
 
 P.props = setmetatable({},{__mode="k"})
 
+function SF.Permissions.getOwner(ent)
+	return P.props[ent]
+end
+
 if SERVER then
 	util.AddNetworkString("SFPPTransmit")
 	

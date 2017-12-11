@@ -14,6 +14,8 @@ local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
 local isValid = IsValid
 
+SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
+
 SF.Libraries.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
@@ -57,119 +59,25 @@ SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 
+-- ------------------------- Methods ------------------------- --
 
-
---- Gets the physics object of the entity
--- @return The physobj, or nil if the entity isn't valid or isn't vphysics
-function SF.Entities.GetPhysObject (ent)
-	return (isValid(ent) and ent:GetMoveType() == MOVETYPE_VPHYSICS and ent:GetPhysicsObject()) or nil
+--- Gets the owner of the entity
+-- @return Owner
+function ents_methods:getOwner ()
+	SF.CheckType(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	
+	if ent:IsPlayer() then
+		return self
+	elseif SF.Permissions.getOwner then
+		return ewrap(SF.Permissions.getOwner(ent))
+	else
+		return nil
+	end
 end
-local getPhysObject = SF.Entities.GetPhysObject
-
--- ------------------------- Library functions ------------------------- --
 
 if CLIENT then
-	local entsWithProperties = setmetatable({}, { __mode = "k" })
-	local getRenderProperties = {
-		[1] = function(tbl) --Color
-			tbl[1] = Color(net.ReadUInt(8), net.ReadUInt(8), net.ReadUInt(8), net.ReadUInt(8))
-		end,
-		[2] = function(tbl) --Nodraw
-			tbl[2] = net.ReadBool()
-		end,
-		[3] = function(tbl) --Material
-			tbl[3] = net.ReadString()
-		end,
-		[4] = function(tbl) --Submaterial
-			local index, material = net.ReadUInt(16), net.ReadString()
-			if tbl[4] then
-				tbl[4][index] = material
-			else
-				tbl[4] = { [index] = material }
-			end
-		end,
-		[5] = function(tbl) --Bodygroup
-			local group, value = net.ReadUInt(16), net.ReadUInt (16)
-			if tbl[5] then
-				tbl[5][group] = value
-			else
-				tbl[5] = { [group] = value }
-			end
-		end,
-		[6] = function(tbl) --Skin
-			tbl[6] = net.ReadUInt(16)
-		end,
-		[7] = function(tbl) --Rendermode
-			tbl[7] = net.ReadUInt(8)
-		end,
-		[8] = function(tbl) --Renderfx
-			tbl[8] = net.ReadUInt(8)
-		end,
-		[9] = function(tbl) --DrawShadow
-			tbl[9] = net.ReadBool()
-		end
-	}
-	local applyRenderProperties = {
-		[1] = function(ent, data) --Color
-			ent:SetColor(data)
-		end,
-		[2] = function(ent, data) --Nodraw
-			ent:SetNoDraw(data)
-		end,
-		[3] = function(ent, data) --Material
-			ent:SetMaterial(data)
-		end,
-		[4] = function(ent, data) --Submaterial
-			for index, material in pairs(data) do
-				ent:SetSubMaterial(index, material)
-			end
-		end,
-		[5] = function(ent, data) --Bodygroup
-			for group, value in pairs(data) do
-				ent:SetBodygroup(group, value)
-			end
-		end,
-		[6] = function(ent, data) --Skin
-			ent:SetSkin(data)
-		end,
-		[7] = function(ent, data) --Rendermode
-			ent:SetRenderMode(data)
-		end,
-		[8] = function(ent, data) --Renderfx
-			ent:SetRenderFX(data)
-		end,
-		[9] = function(ent, data) --DrawShadow
-			ent:DrawShadow(data)
-		end
-	}
-
-	-- For some reason clientside properties get cleared when re-entering PAS and the clearing timing doesn't seem consistent, but this seems to work.
-	hook.Add("NotifyShouldTransmit", "starfall_renderproperty_reset", function(ent, transmit)
-		if transmit and entsWithProperties[ent] then
-			timer.Simple(0.1, function()
-				for k, v in pairs(entsWithProperties[ent]) do
-					applyRenderProperties[k](ent, v)
-				end
-			end)
-		end
-	end)
-
-	--Net function that allows the server to set the render properties of entities for specific players
-	net.Receive("sf_setentityrenderproperty", function()
-		local ent = net.ReadEntity()
-		if not ent:IsValid() then return end
-		local property = net.ReadUInt(4)
-		if not getRenderProperties[property] then return end
-
-		local tbl = entsWithProperties[ent]
-		if not tbl then
-			tbl = {}
-			entsWithProperties[ent] = tbl
-		end
-		getRenderProperties[property](tbl)
-		applyRenderProperties[property](ent, tbl[property])
-	end)
-
 	--- Allows manipulation of a hologram's bones' positions
 	-- @client
 	-- @param bone The bone ID
@@ -260,7 +168,146 @@ if CLIENT then
 	end
 end
 
--- ------------------------- Methods ------------------------- --
+--- Sets the color of the entity
+-- @shared
+-- @param clr New color
+function ents_methods:setColor (clr)
+	print(self, type(self), debug.getmetatable(self).__metatable)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckType(clr, SF.Types["Color"])
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
+	ent:SetColor(clr)
+	ent:SetRenderMode(rendermode)
+	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = clr, RenderMode = rendermode }) end
+
+end
+
+--- Sets the whether an entity should be drawn or not
+-- @shared
+-- @param draw Whether to draw the entity or not.
+function ents_methods:setNoDraw (draw)
+	SF.CheckType(self, ents_metamethods)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetNoDraw(draw and true or false)
+end
+
+local shaderBlacklist = {
+	["LightmappedGeneric"] = true,
+}
+local function invalidMaterial(material)
+	if string.find(string.lower(material) , "pp[%./\\]+copy") then return true end
+	local mat = Material(material)
+	if mat and shaderBlacklist[mat:GetShader()] then return true end
+end
+
+--- Sets the material of the entity
+-- @shared
+-- @param material, string, New material name.
+function ents_methods:setMaterial (material)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckLuaType(material, TYPE_STRING)
+	if invalidMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetMaterial(material)
+	if SERVER then duplicator.StoreEntityModifier(ent, "material", { MaterialOverride = material }) end
+end
+
+--- Sets the submaterial of the entity
+-- @shared
+-- @param index, number, submaterial index.
+-- @param material, string, New material name.
+function ents_methods:setSubMaterial (index, material)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckLuaType(material, TYPE_STRING)
+	if invalidMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetSubMaterial(index, material)
+	if SERVER then
+		local mod = "SubMaterialOverride_"..index
+		ent.EntityMods = ent.EntityMods or {}
+		ent.EntityMods[mod] = ent.EntityMods[mod] or {}
+		ent.EntityMods[mod] = material
+	end
+end
+
+--- Sets the bodygroup of the entity
+-- @shared
+-- @param bodygroup Number, The ID of the bodygroup you're setting.
+-- @param value Number, The value you're setting the bodygroup to.
+function ents_methods:setBodygroup (bodygroup, value)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckLuaType(bodygroup, TYPE_NUMBER)
+	SF.CheckLuaType(value, TYPE_NUMBER)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetBodygroup(bodygroup, value)
+end
+
+--- Sets the skin of the entity
+-- @shared
+-- @param skinIndex Number, Index of the skin to use.
+function ents_methods:setSkin (skinIndex)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckLuaType(skinIndex, TYPE_NUMBER)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetSkin(skinIndex)
+end
+
+--- Sets the render mode of the entity
+-- @shared
+-- @class function
+-- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
+function ents_methods:setRenderMode (rendermode)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckLuaType(rendermode, TYPE_NUMBER)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetRenderMode(rendermode)
+	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderMode = rendermode }) end
+end
+
+--- Sets the renderfx of the entity
+-- @shared
+-- @class function
+-- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
+function ents_methods:setRenderFX (renderfx)
+	SF.CheckType(self, ents_metamethods)
+	SF.CheckLuaType(renderfx, TYPE_NUMBER)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetRenderFX(renderfx)
+	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
+end
 
 --- To string
 -- @shared
@@ -544,8 +591,9 @@ end
 function ents_methods:getMassCenter ()
 	SF.CheckType(self, ents_metamethods)
 	local ent = eunwrap(self)
-	local phys = getPhysObject(ent)
-	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetMassCenter())
 end
 
@@ -555,8 +603,9 @@ end
 function ents_methods:getMassCenterW ()
 	SF.CheckType(self, ents_metamethods)
 	local ent = eunwrap(self)
-	local phys = getPhysObject(ent)
-	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(ent:LocalToWorld(phys:GetMassCenter()))
 end
 
@@ -576,8 +625,9 @@ function ents_methods:getMass ()
 	SF.CheckType(self, ents_metamethods)
 
 	local ent = eunwrap(self)
-	local phys = getPhysObject(ent)
-	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
 
 	return phys:GetMass()
 end
@@ -589,8 +639,9 @@ function ents_methods:getInertia ()
 	SF.CheckType(self, ents_metamethods)
 
 	local ent = eunwrap(self)
-	local phys = getPhysObject(ent)
-	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
 
 	return vwrap(phys:GetInertia())
 end
@@ -610,8 +661,10 @@ end
 -- @return The angular velocity as a vector
 function ents_methods:getAngleVelocity ()
 	SF.CheckType(self, ents_metamethods)
-	local phys = getPhysObject(eunwrap(self))
-	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetAngleVelocity())
 end
 
@@ -620,8 +673,10 @@ end
 -- @return The angular velocity as an angle
 function ents_methods:getAngleVelocityAngle ()
 	SF.CheckType(self, ents_metamethods)
-	local phys = getPhysObject(eunwrap(self))
-	if not phys or not phys:IsValid() then SF.Throw("Entity has no physics object or is not valid", 2) end
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
 	local vec = phys:GetAngleVelocity()
 	return awrap(Angle(vec.y, vec.z, vec.x))
 end
