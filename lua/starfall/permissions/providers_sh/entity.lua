@@ -25,6 +25,7 @@ local dumbtrace = {
 
 P.checks = {
 	function(instance, target)
+		if instance.player:IsSuperAdmin() then return true end
 		return P.props[target]==instance.player
 	end,
 	function(instance, target)
