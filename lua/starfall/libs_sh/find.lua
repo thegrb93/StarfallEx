@@ -28,7 +28,10 @@ local function convert(results, func)
 		end
 	else
 		for i = 1, #results do
-			t[#t + 1] = wrap(results[i])
+			local e = wrap(results[i])
+			if e then
+				t[#t + 1] = e
+			end
 		end
 	end
 	return t

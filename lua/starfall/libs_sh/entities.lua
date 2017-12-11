@@ -68,12 +68,8 @@ function ents_methods:getOwner ()
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	
-	if ent:IsPlayer() then
-		return self
-	elseif SF.Permissions.getOwner then
+	if SF.Permissions.getOwner then
 		return ewrap(SF.Permissions.getOwner(ent))
-	else
-		return nil
 	end
 end
 

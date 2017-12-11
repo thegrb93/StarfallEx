@@ -61,7 +61,6 @@ if SERVER then
 		net.Start("SFPPTransmit")
 		net.WriteEntity(ply)
 		net.WriteEntity(ent)
-		net.WriteString("transmit")
 		net.Broadcast()
 	end
 
@@ -86,27 +85,25 @@ if SERVER then
 	hook.Add("PlayerSpawnedVehicle", "SFPP.PlayerSpawnedVehicle", PropOwn)
 	hook.Add("PlayerSpawnedSWEP", "SFPP.PlayerSpawnedSWEP", PropOwn)
 	
-	net.Receive("SFPPTransmit", function(len, pl)
+	--[[net.Receive("SFPPTransmit", function(len, pl)
 		local e = net.ReadEntity()
 		if P.props[e] then
 			net.Start("SFPPTransmit")
 			net.WriteEntity(P.props[e])
 			net.WriteEntity(e)
-			net.WriteString("retransmit")
 			net.Send(pl)
 		end
-	end)
+	end)]]
 else
-	hook.Add("NetworkEntityCreated", "SFPP.RequestOwner", function(ent)
+	--[[hook.Add("NetworkEntityCreated", "SFPP.RequestOwner", function(ent)
 		net.Start("SFPPTransmit")
 		net.WriteEntity(ent)
 		net.SendToServer()
-	end)
+	end)]]
 	
 	net.Receive("SFPPTransmit", function()
 		local ply, ent = net.ReadEntity(), net.ReadEntity()
 		P.props[ent] = ply
-		print(ply, ent, net.ReadString())
 	end)
 end
 
