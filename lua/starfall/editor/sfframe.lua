@@ -1047,7 +1047,7 @@ function Editor:InitControlPanel()
 
 	local ShowExamples = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(ShowExamples)
-	ShowExamples:SetConVar("sf_editor_showfiledata")
+	ShowExamples:SetConVar("sf_editor_showdatafiles")
 	ShowExamples:SetText("Show files from sf_filedata in file tree (UNSTABLE)")
 	ShowExamples:SizeToContents()
 	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
