@@ -1,0 +1,24 @@
+language: c
+sudo: false
+compiler: gcc
+os:
+- linux
+env:
+  matrix:
+  - LUA=lua-5.1.5          LUAROCKS=2.2.2
+branches:
+  only:
+  - master
+notifications:
+  email: false
+install:
+- ". ./install.sh"
+- luarocks install luadoc
+script:
+- cd docgen
+- lua -v build_all.lua
+- cd ..
+- ". ./deploy.sh"
+before_install:
+- openssl aes-256-cbc -K $encrypted_57d82ea07af5_key -iv $encrypted_57d82ea07af5_iv
+  -in deploy_key.enc -out deploy_key -d
