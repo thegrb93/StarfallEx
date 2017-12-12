@@ -374,7 +374,7 @@ end
 -- @return The number of physics objects on the entity
 function ents_methods:getPhysicsObjectCount()
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not isValid(ent) and ent ~= game.GetWorld() then SF.Throw("Entity is not valid.", 2) end
 	return ent:GetPhysicsObjectCount()
 end
 
@@ -382,7 +382,7 @@ end
 -- @return The main physics object of the entity
 function ents_methods:getPhysicsObject()
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not isValid(ent) and ent ~= game.GetWorld() then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObject())
 end
 
@@ -392,7 +392,7 @@ end
 function ents_methods:getPhysicsObjectNum(id)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not isValid(ent) and ent ~= game.GetWorld() then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObjectNum(id))
 end
 
