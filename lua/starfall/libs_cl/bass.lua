@@ -3,9 +3,9 @@ SF.Bass = {}
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege("bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = {} })
-	P.registerPrivilege("bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", { ["Client"] = {} })
-	P.registerPrivilege("bass.play2D", "Play sounds in a 2D context (Usually global)", "Allows users to create stereo sounds which play in a 2d space (Usually globally) .", { ["Client"] = { default = 1 } })
+	P.registerPrivilege("bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", { client = {} })
+	P.registerPrivilege("bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", { client = {} })
+	P.registerPrivilege("bass.play2D", "Play sounds in a 2D context (Usually global)", "Allows users to create stereo sounds which play in a 2d space (Usually globally) .", { client = { default = 1 } })
 
 end
 
@@ -53,7 +53,7 @@ end
 -- @param flags that will control the sound
 -- @param callback to run when the sound is loaded
 function bass_library.loadFile (path, flags, callback)
-	SF.Permissions.check(SF.instance.player, nil, "bass.loadFile")
+	SF.Permissions.check(SF.instance, nil, "bass.loadFile")
 
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(flags, TYPE_STRING)
@@ -65,7 +65,7 @@ function bass_library.loadFile (path, flags, callback)
 
 	local instance = SF.instance
 	if not3D(flags) then
-		SF.Permissions.check(instance.player, nil, "bass.play2D")
+		SF.Permissions.check(instance, nil, "bass.play2D")
 	end
 
 	sound.PlayFile(path, flags, function(snd, er, name)
@@ -87,7 +87,7 @@ end
 -- @param flags that will control the sound
 -- @param callback to run when the sound is loaded
 function bass_library.loadURL (path, flags, callback)
-	SF.Permissions.check(SF.instance.player, nil, "bass.loadURL")
+	SF.Permissions.check(SF.instance, nil, "bass.loadURL")
 
 	SF.CheckLuaType(path, TYPE_STRING)
 	SF.CheckLuaType(flags, TYPE_STRING)
@@ -96,7 +96,7 @@ function bass_library.loadURL (path, flags, callback)
 	local instance = SF.instance
 	if #path > 2000 then SF.Throw("URL is too long!", 2) end
 	if not3D(flags) then
-		SF.Permissions.check(instance.player, nil, "bass.play2D")
+		SF.Permissions.check(instance, nil, "bass.play2D")
 	end
 
 	SF.HTTPNotify(instance.player, path)
@@ -122,7 +122,7 @@ function bass_methods:play ()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Play()
@@ -134,7 +134,7 @@ function bass_methods:stop ()
 	SF.CheckType(self, bass_metamethods)
 	local uw =  unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Stop()
@@ -146,7 +146,7 @@ function bass_methods:pause ()
 	SF.CheckType(self, bass_metamethods)
 	local uw =  unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Pause()
@@ -160,7 +160,7 @@ function bass_methods:setVolume (vol)
 	SF.CheckLuaType(vol, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetVolume(math.Clamp(vol, 0, 1))
@@ -174,7 +174,7 @@ function bass_methods:setPitch (pitch)
 	SF.CheckLuaType(pitch, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetPlaybackRate(math.Clamp(pitch, 0, 3))
@@ -188,7 +188,7 @@ function bass_methods:setPos (pos)
 	SF.CheckType(pos, SF.Types["Vector"])
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetPos(SF.UnwrapObject(pos))
@@ -202,7 +202,7 @@ function bass_methods:setFade (min, max)
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 10000, 200000))
@@ -215,7 +215,7 @@ function bass_methods:setLooping (loop)
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:EnableLooping(loop)
@@ -228,7 +228,7 @@ function bass_methods:getLength ()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		return uw:GetLength()
@@ -242,7 +242,7 @@ function bass_methods:setTime (time)
 	SF.CheckLuaType(time, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetTime(time)
@@ -255,7 +255,7 @@ function bass_methods:getTime ()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		return uw:GetTime()
@@ -269,7 +269,7 @@ function bass_methods:getFFT (n)
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		local arr = {}
@@ -284,7 +284,7 @@ function bass_methods:isOnline()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance.player, nil, "sound.modify")
+	SF.Permissions.check(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		return uw:IsOnline()

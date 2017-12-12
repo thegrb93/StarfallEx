@@ -224,17 +224,21 @@ if CLIENT then
 		panel.Refresh = function()
 			scrollPanel:Clear()
 			local clientProviders = {}
-			for i, v in ipairs(SF.Permissions.providers) do
+			for i, v in pairs(SF.Permissions.providers) do
 				local provider = { id = v.id, name = v.name, settings = {}, options = {} }
 				local options = provider.options
 				local settings = provider.settings
 				for i, option in ipairs(v.settingsoptions) do
 					options[i] = option
 				end
-				for id, setting in pairs(v.settings) do
-					settings[id] = { v.settingsdesc[id][1], v.settingsdesc[id][2], setting }
+				for id, privilege in pairs(SF.Permissions.privileges) do
+					if privilege[3][i] then
+						settings[id] = { privilege[1], privilege[2], privilege[3].setting }
+					end
 				end
-				clientProviders[i] = provider
+				if next(settings) then
+					clientProviders[#clientProviders+1] = provider
+				end
 			end
 
 			local function createPermissions(providers, server)
@@ -272,7 +276,7 @@ if CLIENT then
 							button:Dock(RIGHT)
 							button.active = setting[3]==i
 							button.DoClick = function(self)
-								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", p.id, id, i)
+								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
 								for _, b in ipairs(buttons) do
 									b.active = false
 								end
@@ -289,9 +293,9 @@ if CLIENT then
 
 			if LocalPlayer():IsSuperAdmin() then
 				SF.Permissions.requestPermissions(function(serverProviders)
-						createPermissions(serverProviders, true)
-						createPermissions(clientProviders)
-					end)
+					createPermissions(serverProviders, true)
+					createPermissions(clientProviders)
+				end)
 			else
 				createPermissions(clientProviders)
 			end

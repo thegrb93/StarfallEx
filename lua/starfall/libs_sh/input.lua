@@ -37,7 +37,7 @@ if SERVER then return end
 --- @client
 local input_methods = SF.Libraries.Register("input")
 
-SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { ["Client"] = {} })
+SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 
 ---- Gets the first key that is bound to the command passed
 --- @param binding The name of the bind
@@ -47,7 +47,7 @@ SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what 
 function input_methods.lookupBinding(binding)
 	SF.CheckLuaType(binding, TYPE_STRING)
 
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	local bind = input.LookupBinding(binding)
 	if bind then
@@ -63,7 +63,7 @@ end
 function input_methods.isKeyDown(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.IsKeyDown(key)
 end
@@ -74,7 +74,7 @@ end
 function input_methods.getKeyName(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.GetKeyName(key)
 end
@@ -82,7 +82,7 @@ end
 ---- Gets whether the shift key is down
 --- @return True if the shift key is down
 function input_methods.isShiftDown()
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.IsShiftDown()
 end
@@ -90,7 +90,7 @@ end
 ---- Gets whether the control key is down
 --- @return True if the control key is down
 function input_methods.isControlDown()
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.IsControlDown()
 end
@@ -99,7 +99,7 @@ end
 --- @return The x position of the mouse
 --- @return The y position of the mouse
 function input_methods.getCursorPos()
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.GetCursorPos()
 end
@@ -109,7 +109,7 @@ end
 --- @param y Y coordinate on the screen
 --- @return Aim vector
 function input_methods.screenToVector(x, y)
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 	SF.CheckLuaType(x, TYPE_NUMBER)
 	SF.CheckLuaType(y, TYPE_NUMBER)
 	return SF.WrapObject(gui.ScreenToVector(x, y))
@@ -119,7 +119,7 @@ end
 --- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
-	SF.Permissions.check(SF.instance.player, nil, "input")
+	SF.Permissions.check(SF.instance, nil, "input")
 
 	if not SF.instance:isHUDActive() then
 		SF.Throw("No HUD component connected", 2)
@@ -135,7 +135,7 @@ SF.Libraries.AddHook("starfall_hud_disconnected", function(inst)
 end)
 
 function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and SF.Permissions.hasAccess(instance.player, nil, "input") then
+	if (IsFirstTimePredicted() or game.SinglePlayer()) and SF.Permissions.hasAccess(instance, nil, "input") then
 		return true, { button }
 	end
 	return false
@@ -146,7 +146,7 @@ SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
 
 
 SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
-	if SF.Permissions.hasAccess(instance.player, nil, "input") then
+	if SF.Permissions.hasAccess(instance, nil, "input") then
 		local x, y = cmd:GetMouseX(), cmd:GetMouseY()
 		if x~=0 or y~=0 then
 			return true, { x, y }

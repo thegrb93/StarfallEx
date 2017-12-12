@@ -81,7 +81,7 @@ function ENT:RenderScreen()
 	if IsValid(self.link) then
 		local instance = self.link.instance
 		if instance then
-			if SF.Permissions.hasAccess(instance.player, nil, "render.screen") then
+			if SF.Permissions.hasAccess(instance, nil, "render.screen") then
 				local data = instance.data
 
 				data.render.renderEnt = self

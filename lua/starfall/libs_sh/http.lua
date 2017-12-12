@@ -7,8 +7,8 @@ local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, F
 local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
 
 
-SF.Permissions.registerPrivilege("http.get", "HTTP Get method", "Allows the user to request html data", { Client = { default = 1 }, Usergroup = { default = 3 } })
-SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the user to post html data", { Client = { default = 1 }, Usergroup = { default = 3 } })
+SF.Permissions.registerPrivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, usergroups = { default = 3 } })
+SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, usergroups = { default = 3 } })
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
@@ -51,7 +51,7 @@ end
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 function http_library.get (url, callbackSuccess, callbackFail)
 	local instance = SF.instance
-	SF.Permissions.check(SF.instance.player, nil, "http.get")
+	SF.Permissions.check(SF.instance, nil, "http.get")
 
 	httpRequestReady(instance)
 
@@ -76,7 +76,7 @@ end
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 function http_library.post (url, params, callbackSuccess, callbackFail)
 	local instance = SF.instance
-	SF.Permissions.check(SF.instance.player, nil, "http.post")
+	SF.Permissions.check(SF.instance, nil, "http.post")
 
 	httpRequestReady(instance)
 

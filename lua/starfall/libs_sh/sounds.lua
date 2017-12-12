@@ -23,8 +23,8 @@ SF.Sounds.burstrate = CreateConVar("sf_sounds_burstrate", "10", { FCVAR_ARCHIVE,
 -- Register Privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { ["Client"] = {} })
-	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { ["Client"] = {} })
+	P.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
+	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
@@ -50,7 +50,7 @@ end)
 -- @param path Filepath to the sound file.
 -- @return Sound Object
 function sound_library.create (ent, path)
-	SF.Permissions.check(SF.instance.player, { ent, path }, "sound.create")
+	SF.Permissions.check(SF.instance, { ent, path }, "sound.create")
 	if not SF.instance.data.sounds.burst:use(1) then SF.Throw("Can't create sounds that often", 2) end
 
 	SF.CheckType(ent, SF.Types["Entity"])
@@ -83,7 +83,7 @@ end
 
 --- Starts to play the sound.
 function sound_methods:play ()
-	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
+	SF.Permissions.check(SF.instance, unwrap(self), "sound.modify")
 	SF.CheckType(self, sound_metamethods)
 	unwrap(self):Play()
 end
@@ -91,7 +91,7 @@ end
 --- Stops the sound from being played.
 -- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
 function sound_methods:stop (fade)
-	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
+	SF.Permissions.check(SF.instance, unwrap(self), "sound.modify")
 	if fade then
 		SF.CheckLuaType(fade, TYPE_NUMBER)
 		unwrap(self):FadeOut(math.max(fade, 0))
@@ -104,7 +104,7 @@ end
 -- @param vol Volume to set to, between 0 and 1.
 -- @param fade Time in seconds to transition to this new volume.
 function sound_methods:setVolume (vol, fade)
-	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
+	SF.Permissions.check(SF.instance, unwrap(self), "sound.modify")
 	SF.CheckLuaType(vol, TYPE_NUMBER)
 
 	if fade then
@@ -122,7 +122,7 @@ end
 -- @param pitch Pitch to set to, between 0 and 255.
 -- @param fade Time in seconds to transition to this new pitch.
 function sound_methods:setPitch (pitch, fade)
-	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
+	SF.Permissions.check(SF.instance, unwrap(self), "sound.modify")
 	SF.CheckLuaType(pitch, TYPE_NUMBER)
 
 	if fade then
@@ -144,7 +144,7 @@ end
 --- Sets the sound level in dB.
 -- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel (level)
-	SF.Permissions.check(SF.instance.player, unwrap(self), "sound.modify")
+	SF.Permissions.check(SF.instance, unwrap(self), "sound.modify")
 	SF.CheckLuaType(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end

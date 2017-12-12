@@ -165,7 +165,7 @@ if SERVER then
 		if not check(vec) then SF.Throw("infinite vector", 2) end
 
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setPos")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.setPos")
 		phys:SetPos(vec)
 	end
 
@@ -179,7 +179,7 @@ if SERVER then
 		if not check(vec) then SF.Throw("infinite vector", 2) end
 
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setVelocity")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.setVelocity")
 		phys:SetVelocity(vec)
 	end
 
@@ -193,7 +193,7 @@ if SERVER then
 		if not check(force) then SF.Throw("infinite vector", 2) end
 
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.applyForce")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceCenter(force)
 	end
 
@@ -211,7 +211,7 @@ if SERVER then
 		if not check(position) then SF.Throw("infinite position vector", 2) end
 
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.applyForce")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceOffset(force, position)
 	end
 
@@ -224,7 +224,7 @@ if SERVER then
 		if not check(torque) then SF.Throw("infinite torque vector", 2) end
 
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.applyForce")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.applyForce")
 
 		local torqueamount = torque:Length()
 		if torqueamount < 1.192093e-07 then return end
@@ -250,7 +250,7 @@ if SERVER then
 	-- @param mass The mass to set it to
 	function physobj_methods:setMass(mass)
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setMass")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.setMass")
 		phys:SetMass(math.Clamp(mass, 1, 50000))
 	end
 
@@ -259,7 +259,7 @@ if SERVER then
 	-- @param inertia The inertia vector to set it to
 	function physobj_methods:setInertia(inertia)
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setInertia")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.setInertia")
 
 		local vec = vunwrap(inertia)
 		if not check(vec) then SF.Throw("infinite vector", 2) end
@@ -274,7 +274,7 @@ if SERVER then
 	-- @param grav Bool should the bone respect gravity?
 	function physobj_methods:enableGravity (grav)
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.enableGravity")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.enableGravity")
 		phys:EnableGravity(grav and true or false)
 		phys:Wake()
 	end
@@ -283,7 +283,7 @@ if SERVER then
 	-- @param drag Bool should the bone have air resistence?
 	function physobj_methods:enableDrag (drag)
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.enableDrag")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.enableDrag")
 		phys:EnableDrag(drag and true or false)
 	end
 
@@ -291,7 +291,7 @@ if SERVER then
 	-- @param move Bool should the bone move?
 	function physobj_methods:enableMotion (move)
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.enableMotion")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.enableMotion")
 		phys:EnableMotion(move and true or false)
 		phys:Wake()
 	end
@@ -302,7 +302,7 @@ if SERVER then
 	function physobj_methods:setMaterial(material)
 		SF.CheckLuaType(material, TYPE_STRING)
 		local phys = unwrap(self)
-		SF.Permissions.check(SF.instance.player, phys:GetEntity(), "entities.setMass")
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.setMass")
 		phys:SetMaterial(material)
 		if not phys:IsMoveable() then
 			phys:EnableMotion(true)

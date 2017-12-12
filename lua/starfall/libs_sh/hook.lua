@@ -255,7 +255,7 @@ else
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
 	add("PostDrawHUD", "renderoffscreen", function(instance)
-		return SF.Permissions.hasAccess(instance.player, nil, "render.offscreen"), {}
+		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
 	end)
 end
 
