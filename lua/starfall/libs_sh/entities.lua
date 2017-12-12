@@ -382,7 +382,7 @@ end
 -- @return The main physics object of the entity
 function ents_methods:getPhysicsObject()
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not (isValid(ent) or ent:IsWorld()) then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObject())
 end
 
