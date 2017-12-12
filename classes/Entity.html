@@ -133,6 +133,10 @@
 		</li>
 	
 		<li>
+			<a href="../libraries/particle.html">particle</a>
+		</li>
+	
+		<li>
 			<a href="../libraries/physenv.html">physenv</a>
 		</li>
 	
@@ -193,6 +197,8 @@
 				<li><a href="../classes/Mesh.html">Mesh</a></li>
 			
 				<li><a href="../classes/Npc.html">Npc</a></li>
+			
+				<li><a href="../classes/Particle.html">Particle</a></li>
 			
 				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
 			
@@ -764,7 +770,7 @@ Gets the model of an entity </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:getOwner">getOwner</a>&nbsp;()</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:getOwner">getOwner</a>&nbsp;()</td>
 		<td class="summary">
 Gets the owner of the entity </td>
 	</tr>
@@ -773,6 +779,12 @@ Gets the owner of the entity </td>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:getParent">getParent</a>&nbsp;()</td>
 		<td class="summary">
 Gets the parent of an entity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:getPhysMaterial">getPhysMaterial</a>&nbsp;()</td>
+		<td class="summary">
+Get the physical material of the entity </td>
 	</tr>
 
 	<tr>
@@ -986,13 +998,13 @@ Sets the entity's angles </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setBodygroup">setBodygroup</a>&nbsp;(bodygroup, value, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setBodygroup">setBodygroup</a>&nbsp;(bodygroup, value)</td>
 		<td class="summary">
-Sets an entities' bodygroup </td>
+Sets the bodygroup of the entity </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setColor">setColor</a>&nbsp;(clr, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setColor">setColor</a>&nbsp;(clr)</td>
 		<td class="summary">
 Sets the color of the entity </td>
 	</tr>
@@ -1040,13 +1052,13 @@ Sets the entity's mass </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setMaterial">setMaterial</a>&nbsp;(material, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setMaterial">setMaterial</a>&nbsp;(material)</td>
 		<td class="summary">
-Sets an entities' material </td>
+Sets the material of the entity </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setNoDraw">setNoDraw</a>&nbsp;(draw, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setNoDraw">setNoDraw</a>&nbsp;(draw)</td>
 		<td class="summary">
 Sets the whether an entity should be drawn or not </td>
 	</tr>
@@ -1076,19 +1088,19 @@ Sets the entitiy's position </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setRenderFX">setRenderFX</a>&nbsp;(renderfx, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setRenderFX">setRenderFX</a>&nbsp;(renderfx)</td>
 		<td class="summary">
 Sets the renderfx of the entity </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setRenderMode">setRenderMode</a>&nbsp;(rendermode, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setRenderMode">setRenderMode</a>&nbsp;(rendermode)</td>
 		<td class="summary">
-Sets the rende mode of the entity </td>
+Sets the render mode of the entity </td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setSkin">setSkin</a>&nbsp;(skinIndex, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setSkin">setSkin</a>&nbsp;(skinIndex)</td>
 		<td class="summary">
 Sets the skin of the entity </td>
 	</tr>
@@ -1100,9 +1112,9 @@ Sets the entity to be Solid or not.</td>
 	</tr>
 
 	<tr>
-		<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#ents_methods:setSubMaterial">setSubMaterial</a>&nbsp;(index, material, ply)</td>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#ents_methods:setSubMaterial">setSubMaterial</a>&nbsp;(index, material)</td>
 		<td class="summary">
-Sets an entities' submaterial </td>
+Sets the submaterial of the entity </td>
 	</tr>
 
 	<tr>
@@ -2294,7 +2306,7 @@ Gets the model of an entity
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:getOwner"></a><strong>Entity:getOwner</strong>&nbsp;()</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:getOwner"></a><strong>Entity:getOwner</strong>&nbsp;()</dt>
 <dd>
 
 Gets the owner of the entity
@@ -2335,6 +2347,32 @@ Gets the parent of an entity
 
 <h3>Return value:</h3>
 <ul>Entity's parent or nil</ul>
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sv">&nbsp;</span><a name="Entity:getPhysMaterial"></a><strong>Entity:getPhysMaterial</strong>&nbsp;()</dt>
+<dd>
+
+Get the physical material of the entity
+
+
+
+
+
+
+
+
+
+<h3>Return value:</h3>
+<ul>the physical material</ul>
 
 
 
@@ -3350,10 +3388,10 @@ Sets the entity's angles
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setBodygroup"></a><strong>Entity:setBodygroup</strong>&nbsp;(bodygroup, value, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setBodygroup"></a><strong>Entity:setBodygroup</strong>&nbsp;(bodygroup, value)</dt>
 <dd>
 
-Sets an entities' bodygroup
+Sets the bodygroup of the entity
 
 
 
@@ -3367,10 +3405,6 @@ Sets an entities' bodygroup
 	
 	<li>
 	  <code><em>value</em></code>: Number, The value you're setting the bodygroup to.
-	</li>
-	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -3390,7 +3424,7 @@ Sets an entities' bodygroup
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setColor"></a><strong>Entity:setColor</strong>&nbsp;(clr, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setColor"></a><strong>Entity:setColor</strong>&nbsp;(clr)</dt>
 <dd>
 
 Sets the color of the entity
@@ -3403,10 +3437,6 @@ Sets the color of the entity
 	
 	<li>
 	  <code><em>clr</em></code>: New color
-	</li>
-	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -3658,10 +3688,10 @@ Sets the entity's mass
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setMaterial"></a><strong>Entity:setMaterial</strong>&nbsp;(material, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setMaterial"></a><strong>Entity:setMaterial</strong>&nbsp;(material)</dt>
 <dd>
 
-Sets an entities' material
+Sets the material of the entity
 
 
 
@@ -3671,10 +3701,6 @@ Sets an entities' material
 	
 	<li>
 	  <code><em>material</em></code>: , string, New material name.
-	</li>
-	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -3694,7 +3720,7 @@ Sets an entities' material
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setNoDraw"></a><strong>Entity:setNoDraw</strong>&nbsp;(draw, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setNoDraw"></a><strong>Entity:setNoDraw</strong>&nbsp;(draw)</dt>
 <dd>
 
 Sets the whether an entity should be drawn or not
@@ -3707,10 +3733,6 @@ Sets the whether an entity should be drawn or not
 	
 	<li>
 	  <code><em>draw</em></code>: Whether to draw the entity or not.
-	</li>
-	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -3862,7 +3884,7 @@ Sets the entitiy's position
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setRenderFX"></a><strong>Entity:setRenderFX</strong>&nbsp;(renderfx, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setRenderFX"></a><strong>Entity:setRenderFX</strong>&nbsp;(renderfx)</dt>
 <dd>
 
 Sets the renderfx of the entity
@@ -3877,10 +3899,6 @@ Sets the renderfx of the entity
 	  <code><em>renderfx</em></code>: Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
 	</li>
 	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
-	</li>
-	
 </ul>
 
 
@@ -3898,10 +3916,10 @@ Sets the renderfx of the entity
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setRenderMode"></a><strong>Entity:setRenderMode</strong>&nbsp;(rendermode, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setRenderMode"></a><strong>Entity:setRenderMode</strong>&nbsp;(rendermode)</dt>
 <dd>
 
-Sets the rende mode of the entity
+Sets the render mode of the entity
 
 
 
@@ -3913,10 +3931,6 @@ Sets the rende mode of the entity
 	  <code><em>rendermode</em></code>: Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
 	</li>
 	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
-	</li>
-	
 </ul>
 
 
@@ -3934,7 +3948,7 @@ Sets the rende mode of the entity
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setSkin"></a><strong>Entity:setSkin</strong>&nbsp;(skinIndex, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setSkin"></a><strong>Entity:setSkin</strong>&nbsp;(skinIndex)</dt>
 <dd>
 
 Sets the skin of the entity
@@ -3947,10 +3961,6 @@ Sets the skin of the entity
 	
 	<li>
 	  <code><em>skinIndex</em></code>: Number, Index of the skin to use.
-	</li>
-	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>
@@ -4003,10 +4013,10 @@ For more information please refer to GLua function http://wiki.garrysmod.com/pag
 
 
 
-<dt><span class="realm_sv">&nbsp;</span><a name="Entity:setSubMaterial"></a><strong>Entity:setSubMaterial</strong>&nbsp;(index, material, ply)</dt>
+<dt><span class="realm_sh">&nbsp;</span><a name="Entity:setSubMaterial"></a><strong>Entity:setSubMaterial</strong>&nbsp;(index, material)</dt>
 <dd>
 
-Sets an entities' submaterial
+Sets the submaterial of the entity
 
 
 
@@ -4020,10 +4030,6 @@ Sets an entities' submaterial
 	
 	<li>
 	  <code><em>material</em></code>: , string, New material name.
-	</li>
-	
-	<li>
-	  <code><em>ply</em></code>: Optional player argument to set only for that player. Can also be table of players.
 	</li>
 	
 </ul>

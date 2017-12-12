@@ -133,6 +133,10 @@
 		</li>
 	
 		<li>
+			<a href="../libraries/particle.html">particle</a>
+		</li>
+	
+		<li>
 			<a href="../libraries/physenv.html">physenv</a>
 		</li>
 	
@@ -193,6 +197,8 @@
 				<li><a href="../classes/Mesh.html">Mesh</a></li>
 			
 				<li><a href="../classes/Npc.html">Npc</a></li>
+			
+				<li><a href="../classes/Particle.html">Particle</a></li>
 			
 				<li><strong>PhysObj</strong></li>
 			
@@ -554,6 +560,24 @@ Applys a torque to a physics object </td>
 	</tr>
 
 	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:enableDrag">enableDrag</a>&nbsp;(drag)</td>
+		<td class="summary">
+Sets the bone drag state </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:enableGravity">enableGravity</a>&nbsp;(grav)</td>
+		<td class="summary">
+Sets bone gravity </td>
+	</tr>
+
+	<tr>
+		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:enableMotion">enableMotion</a>&nbsp;(move)</td>
+		<td class="summary">
+Sets the bone movement state </td>
+	</tr>
+
+	<tr>
 		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#physobj_methods:getAngleVelocity">getAngleVelocity</a>&nbsp;()</td>
 		<td class="summary">
 Gets the angular velocity of the physics object </td>
@@ -774,6 +798,102 @@ Applys a torque to a physics object
 	
 	<li>
 	  <code><em>torque</em></code>: The local torque vector to apply
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:enableDrag"></a><strong>PhysObj:enableDrag</strong>&nbsp;(drag)</dt>
+<dd>
+
+Sets the bone drag state
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>drag</em></code>: Bool should the bone have air resistence?
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:enableGravity"></a><strong>PhysObj:enableGravity</strong>&nbsp;(grav)</dt>
+<dd>
+
+Sets bone gravity
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>grav</em></code>: Bool should the bone respect gravity?
+	</li>
+	
+</ul>
+
+
+
+
+
+
+
+
+
+
+</dd>
+
+
+
+
+
+<dt><span class="realm_sh">&nbsp;</span><a name="PhysObj:enableMotion"></a><strong>PhysObj:enableMotion</strong>&nbsp;(move)</dt>
+<dd>
+
+Sets the bone movement state
+
+
+
+
+<h3>Parameters:</h3>
+<ul>
+	
+	<li>
+	  <code><em>move</em></code>: Bool should the bone move?
 	</li>
 	
 </ul>
