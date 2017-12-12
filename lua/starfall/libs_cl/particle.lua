@@ -6,7 +6,7 @@ do
 
 	local P = SF.Permissions
 	--------------------------
-	P.registerPrivilege("particle.attach", "Allow users to create particle", { ["Client"] = {} })
+	P.registerPrivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
 	
 end
 
@@ -77,7 +77,7 @@ end
 -- @param table options 
 -- @return Particle type. 
 function particle_library.attach (entity, particle, pattach, options)
-	SF.Permissions.check(SF.instance.player, nil, "particle.attach")
+	SF.Permissions.check(SF.instance.player, entity, "particle.attach")
 
 	SF.CheckType(entity, TYPE_ENTITY)
 	SF.CheckLuaType(particle, TYPE_STRING)
