@@ -202,7 +202,7 @@ if CLIENT then
 	--- Setups permission override request
 	--@param perms Table of permission names to override
 	--@param desc Description attached to request
-	--@param showOnUse If true request will popup when user uses screen or chip
+	--@param showOnUse If true request will popup when user uses chip
 	--@client
 	function SF.DefaultEnvironment.setupPermissionRequest(perms, desc, showOnUse)
 		SF.CheckLuaType(desc, TYPE_STRING)

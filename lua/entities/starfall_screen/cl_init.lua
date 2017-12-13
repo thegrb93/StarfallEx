@@ -10,7 +10,7 @@ surface.CreateFont("Starfall_ErrorFont", {
 	weight = 200
 })
 
-net.Receive("starfall_processor_used", function (len)
+net.Receive("starfall_processor_used", function (len) --This should probbably be in starfall_chip instead of starfall_screen file
 	local chip = net.ReadEntity()
 	local activator = net.ReadEntity()
 	if not IsValid(chip) then return end
@@ -24,6 +24,12 @@ net.Receive("starfall_processor_used", function (len)
 
 		-- Error message copying
 		if activator == LocalPlayer() then
+			if chip.instance and chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse then
+				local pnl = vgui.Create("SFChipPermissions")
+				if pnl then
+					pnl:OpenForChip(chip)
+				end
+			end
 			if chip.error and chip.error.message then
 				SetClipboardText(string.format("%q", chip.error.message))
 			elseif chip:GetDTString(0) then
