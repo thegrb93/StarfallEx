@@ -17,6 +17,8 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]
     exit 0
 fi
 
+openssl aes-256-cbc -K $encrypted_0bb1b763922b_key -iv $encrypted_0bb1b763922b_iv -in deploy_key.enc -out deploy_key -d
+
 # Save some useful information
 REPO=`git config remote.origin.url`
 SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}

@@ -19,5 +19,3 @@ script:
 - lua -v build_all.lua
 - cd ..
 - ". ./deploy.sh"
-before_install:
-- openssl aes-256-cbc -K $encrypted_0bb1b763922b_key -iv $encrypted_0bb1b763922b_iv -in deploy_key.enc -out deploy_key -d
