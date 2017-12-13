@@ -198,6 +198,41 @@ function SF.DefaultEnvironment.hasPermission(perm, obj)
 	return SF.Permissions.hasAccess(SF.instance, SF.UnwrapObject(obj), perm)
 end
 
+if CLIENT then
+	--- Setups permission override request
+	--@param perms Table of permission names to override
+	--@param desc Description attached to request
+	--@param showOnUse If true request will popup when user uses screen or chip
+	--@client
+	function SF.DefaultEnvironment.setupPermissionRequest(perms, desc, showOnUse)
+		SF.CheckLuaType(desc, TYPE_STRING)
+		SF.CheckLuaType(perms, TYPE_TABLE)
+		showOnUse = showOnUse == true
+		local c = #perms
+		local overrides = {}
+		if #desc > 1000 then
+			SF.throw("Description too long!")
+		end
+		local P = SF.Permissions
+		for I = 1, c do
+			local v = perms[I]
+			if type(v) == "string" then
+				if not P.privileges[v] then
+					SF.Throw("Invalid permission name: "..v)
+				end
+				if not P.privileges[v][3].client then
+					SF.Throw("Permission isn't requestable: "..v)
+				end
+				overrides[v] = true
+			end
+		end
+		SF.instance.permissionRequest = {}
+		SF.instance.permissionRequest.overrides = overrides
+		SF.instance.permissionRequest.description = desc
+		SF.instance.permissionRequest.showOnUse = showOnUse
+
+	end
+end
 
 -- String library
 local string_methods = SF.Libraries.Register("string")

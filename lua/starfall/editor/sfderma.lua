@@ -34,6 +34,26 @@ end
 
 --[[ Fonts ]]
 
+surface.CreateFont( "SF_PermissionsWarning", {
+	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
+	size = 16,
+} )
+
+surface.CreateFont( "SF_PermissionName", {
+	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
+	size = 20,
+} )
+
+surface.CreateFont( "SF_PermissionDesc", {
+	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
+	size = 18,
+} )
+
+surface.CreateFont( "SF_PermissionsTitle", {
+	font = "roboto", -- Use the font-name which is shown to you by your operating system Font Viewer, not the file name
+	size = 20,
+} )
+
 surface.CreateFont("SFTitle", {
 		font = "Roboto",
 		size = 18,
@@ -634,3 +654,203 @@ end
 
 derma.DefineControl("StarfallFileBrowser", "", PANEL, "DPanel")
 -- End File Browser
+
+--[[ Permissions ]]
+
+PANEL = {}
+
+local function createpermissionsPanel (parent)
+	local chip = parent.chip
+	local panel = vgui.Create( "DPanel",parent )
+	panel:Dock( FILL )
+	panel:DockMargin( 0, 0, 0, 0 )
+	panel.Paint = function () end
+
+
+
+	local scrollPanel = vgui.Create( "DScrollPanel", panel )
+	scrollPanel:Dock( FILL )
+	scrollPanel:SetPaintBackgroundEnabled( false )
+	scrollPanel:Clear()
+
+	for id,_ in pairs(chip.instance.permissionRequest.overrides) do
+		local permission = SF.Permissions.privileges[id]
+
+
+		local description = permission[2]
+		local name = permission[1]
+
+		local header = vgui.Create( "StarfallPanel" )
+		header.Paint = function(s,w,h)
+			draw.RoundedBox( 0, 0, h-1, w, 1, SF.Editor.colors.meddark )
+		end
+		header:DockMargin( 0, 5, 0, 0 )
+		header:SetSize( 0, 50 )
+		header:Dock( TOP )
+		header:SetToolTip( id )
+
+		local title = vgui.Create( "Panel",header )
+		title:SetSize(16,16)
+		title:Dock(TOP)
+
+		local settingtext = vgui.Create( "DLabel", title )
+		settingtext:SetFont( "SF_PermissionName" )
+		settingtext:SetColor( Color(255, 255, 255) )
+		settingtext:SetText( string.format("%s - %s",name,description) )
+		settingtext:SetContentAlignment(4)
+		settingtext:DockMargin( 5, 0, 0, 0 )
+		settingtext:Dock( FILL )
+		settingtext:SizeToContents()
+		settingtext:SetIsToggle(true)
+
+		local check = vgui.Create("DCheckBox",title)
+		check:SetSize(16,16)
+		check.Paint = function() end
+		check:Dock(LEFT)
+		check:SetValue(parent.acceptedPermissions[id] == true)
+
+		local checkImg = vgui.Create("DImage",check)
+		checkImg:Dock(FILL)
+		checkImg:SetImage("icon16/cross.png")
+		checkImg:SetImage(parent.acceptedPermissions[id] == true and "icon16/tick.png"or "icon16/cross.png")
+		function check:OnChange(val)
+			checkImg:SetImage(val and "icon16/tick.png"or "icon16/cross.png")
+			parent.acceptedPermissions[id] = val and true or nil
+		end
+
+		local desc = vgui.Create( "DLabel", header )
+		desc:SetFont( "SF_PermissionDesc" )
+		desc:SetColor( Color(255, 255, 255) )
+		desc:SetText( description )
+		desc:DockMargin( 30, 0, 0, 0 )
+		desc:SetContentAlignment(4)
+		desc:Dock( FILL )
+		scrollPanel:AddItem( header )
+	end
+	return panel
+end
+
+function PANEL:OpenForChip(chip)
+	self.chip = chip
+	self.description:SetText(chip.instance.permissionRequest.description)
+	self.avatar:SetPlayer(chip.owner,128)
+	self:MakePopup()
+	self:Center()
+	self.acceptedPermissions = {}
+	if chip.instance.permissionOverrides then -- It had permissions set before
+		for k,v in pairs(chip.instance.permissionOverrides) do
+			self.acceptedPermissions[k] = v
+		end
+	end
+
+	local permissions = createpermissionsPanel(self)
+	permissions:SetParent(self)
+	permissions:Dock(FILL)
+	permissions:Refresh()
+	permissions:DockMargin( 5, 0, 0, 0 )
+
+end
+
+function PANEL:Init ()
+	self:ShowCloseButton(false)
+	self:SetSize(600,900)
+	self:SetTitle("Permission Override")
+	self:DockPadding(5,5,5,5)
+	self.lblTitle:SetFont("SF_PermissionsTitle")
+	self.lblTitle:Dock(TOP)
+	self.lblTitle:DockMargin(2,2,2,2)
+	self.lblTitle:DockPadding(0,0,0,0)
+	self.lblTitle:SizeToContents()
+	self.lblTitle:SetContentAlignment(5)
+
+	local plyPanel = vgui.Create("DPanel",self)
+	plyPanel.Paint = function(s,w,h)
+		draw.RoundedBox( 0, 0, 0, w, h, Color(255,255,255) )
+	end
+	plyPanel:SetSize(0,128)
+	plyPanel:Dock(TOP)
+	plyPanel:DockMargin(0,0,0,10)
+
+	local avatar = vgui.Create("AvatarImage",plyPanel)
+	avatar:SetSize(128,128)
+	avatar:Dock(LEFT)
+	avatar:SetPlayer(LocalPlayer(),128)
+	self.avatar = avatar
+
+	local nick = vgui.Create( "DLabel", plyPanel )
+	nick:Dock(TOP)
+	nick:DockMargin(2,5,2,5)
+	nick:SetDark(true)
+	nick:SetContentAlignment( 5 )
+	nick:SetFont("DermaLarge")
+	nick:SetText( LocalPlayer():GetName() )
+	self.nick = nick
+
+	local text = vgui.Create( "DLabel", plyPanel )
+	text:Dock(TOP)
+	text:DockMargin(2,5,2,5)
+	text:SetDark(true)
+	text:SetAutoStretchVertical(true)
+	text:SetFont("SF_PermissionsWarning")
+	text:SetWrap(true)
+	text:SetContentAlignment( 5 )
+
+	text:SetText( "Requests additional permissions for single chip.\n If you grant them chip will ignore your global settings while checking permissions listed below." )
+
+	local warning = vgui.Create( "DLabel", plyPanel )
+	warning:Dock(FILL)
+	warning:DockMargin(2,5,2,5)
+	warning:SetDark(true)
+	warning:SetContentAlignment( 5 )
+	warning:SetFont("SF_PermissionsWarning")
+	warning:SetTextColor(Color(255,130,10))
+	warning:SetAutoStretchVertical(true)
+	warning:SetWrap(true)
+	warning:SetText( "Allowing additional permission for strangers may be dangerous!" )
+
+	local buttons = vgui.Create("Panel",self)
+	buttons:SetSize(0,40)
+	buttons:Dock(BOTTOM)
+
+	local accept = vgui.Create("StarfallButton",buttons)
+	accept.PerformLayout = function() end
+	accept:SetText("Grant Permissions")
+	accept:SetFont("SF_PermissionDesc")
+	accept:SetSize(self:GetWide()/2-7,40)
+	accept:Dock(LEFT)
+	accept.DoClick = function()
+		self.chip.instance.permissionOverrides = self.acceptedPermissions
+		self:Close()
+	end
+
+	local cancel = vgui.Create("StarfallButton",buttons)
+	cancel.PerformLayout = function() end
+	cancel:SetText("Cancel")
+	cancel:SetSize(self:GetWide()/2-7,40)
+	cancel:SetFont("SF_PermissionDesc")
+	cancel:Dock(RIGHT)
+	cancel.DoClick = function()
+		self:Close()
+	end
+
+	local description = vgui.Create( "DPanel", self )
+	function description:SetText(text)
+		self.text = markup.Parse( "<font=SF_PermissionDesc>"..text.."</font>", self:GetWide() -10 )
+	end
+	function description:PaintOver(w,h)
+		if self.text then
+			self.text:Draw(5,5)
+		end
+	end
+	description:SetSize(0,128)
+	description:SetBackgroundColor(SF.Editor.colors.meddark)
+	description:Dock(BOTTOM)
+	description:DockMargin(0,0,0,10)
+	self:InvalidateLayout( true )
+	description:SetText("_SetText_")
+	self.description = description
+end
+function PANEL:Paint( w, h )
+	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
+end
+vgui.Register( "SFChipPermissions", PANEL, "DFrame" )
