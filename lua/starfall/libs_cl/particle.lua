@@ -37,6 +37,18 @@ SF.Particle.Unwrap = unwrap
 SF.Particle.Methods = particle_methods
 SF.Particle.Metatable = particle_metamethods
 
+-- Add PATTACH enum
+SF.Libraries.AddHook("postload", function()
+	local _PATTACH = {
+		["ABSORIGIN"] = PATTACH_ABSORIGIN,
+		["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
+		["CUSTOMORIGIN"] =  PATTACH_CUSTOMORIGIN,
+		["POINT"] = PATTACH_POINT,
+		["POINT_FOLLOW"] = PATTACH_POINT_FOLLOW,
+		["WORLDORIGIN"] =  PATTACH_WORLDORIGIN,
+	}
+	SF.DefaultEnvironment.PATTACH = _PATTACH
+end)
 
 -- Create the storage for the metamethods
 SF.Libraries.AddHook("initialize", function (inst)
@@ -70,11 +82,12 @@ local function checkValid(emitter)
 	end
 end
 
+
 --- Attaches a particle to an entity.
--- @param entity to attach to
--- @param particle name
--- @param PATTACH_ enum
--- @param options (table)
+-- @param entity Entity to attach to
+-- @param particle Name of the particle
+-- @param pattach PATTACH enum
+-- @param options Table of options
 -- @return Particle type.
 function particle_library.attach (entity, particle, pattach, options)
 	SF.Permissions.check(SF.instance.player, entity, "particle.attach")
