@@ -199,6 +199,12 @@ function SF.DefaultEnvironment.hasPermission(perm, obj)
 end
 
 if CLIENT then
+
+	--- Called when local client changed instance permissions
+	-- @name permissionrequest
+	-- @class hook
+	-- @client
+
 	--- Setups permission override request
 	--@param perms Table of permission names to override
 	--@param desc Description attached to request

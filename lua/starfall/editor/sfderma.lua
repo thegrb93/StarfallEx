@@ -820,6 +820,7 @@ function PANEL:Init ()
 	accept:Dock(LEFT)
 	accept.DoClick = function()
 		self.chip.instance.permissionOverrides = self.acceptedPermissions
+		self.chip.instance:runScriptHook("permissionrequest")
 		self:Close()
 	end
 
