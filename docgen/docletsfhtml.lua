@@ -1,12 +1,12 @@
 
 local assert, getfenv, ipairs, loadstring, pairs, setfenv, tostring, tonumber, type = assert, getfenv, ipairs, loadstring, pairs, setfenv, tostring, tonumber, type
-local io = require"io"
+local io = require "io"
 local lfs = require "lfs"
 local lp = require "luadoc.lp"
-local luadoc = require"luadoc"
+local luadoc = require "luadoc"
 local package = package
-local string = require"string"
-local table = require"table"
+local string = require "string"
+local table = require "table"
 
 module "docletsfhtml"
 
@@ -18,22 +18,37 @@ module "docletsfhtml"
 --	or nil in case the file is not found.
 
 local function search (path, name)
-  for c in string.gfind(path, "[^;]+") do
-    c = string.gsub(c, "%?", name)
-    local f = io.open(c)
-    if f then   -- file exist?
-      f:close()
-      return c
+	for c in string.gfind(path, "[^;]+") do
+		c = string.gsub(c, "%?", name)
+		local f = io.open(c)
+		if f then   -- file exist?
+			f:close()
+			return c
+		end
+	end
+	return nil    -- file not found
+end
+
+-------------------------------------------------------------------------------
+-- Calls iterator function on every file in directory.
+-- @param path String with the path to directory.
+-- @param iterator Function that is called on every file, with file name and full path as arguments.
+
+local function dirfiles (path, ff)
+    for file in lfs.dir(path) do
+        local f = path .. '/' .. file
+        local attr = lfs.attributes (f)
+        if attr.mode == "file" then
+        	ff(file, f)
+        end
     end
-  end
-  return nil    -- file not found
 end
 
 -------------------------------------------------------------------------------
 -- Include the result of a lp template into the current stream.
 
 function include (template, env)
-	local templatepath = "./html/"..template
+	local templatepath = "./html/" .. template
 	
 	env = env or {}
 	env.table = table
@@ -111,7 +126,7 @@ function hook_link(hookname, doc, from)
 		return
 	end
 	
-	local href = "hooks.html"
+	local href = "hooks.html#" .. hookname
 	string.gsub(from, "/", function () href = "../" .. href end)
 	return href
 end
@@ -123,19 +138,19 @@ function directive_link (dirname, doc, from)
 
 	if doc.directives[dirname] == nil then return end
 
-	local href = "directives.html"
+	local href = "directives.html#" .. dirname
 	string.gsub(from, "/", function () href = "../" .. href end)
 	return href
 end
 
-function example_link (dirname, doc, from)
-	assert(dirname)
+function example_link (name, doc, from)
+	assert(name)
 	assert(doc)
 	from = from or ""
 
-	if doc.examples[dirname] == nil then return end
+	if doc.examples[name] == nil then return end
 
-	local href = "examples/" .. dirname .. ".html"
+	local href = "examples/" .. name .. ".html"
 	string.gsub(from, "/", function () href = "../" .. href end)
 	return href
 end
@@ -257,7 +272,7 @@ end
 function start (doc)
 	-- Generate index file
 	if (#doc.files > 0 or #doc.libraries > 0) and (not options.noindexpage) then
-		local filename = options.output_dir.."index.html"
+		local filename = options.output_dir .. "index.html"
 		logger:info(string.format("generating file `%s'", filename))
 		local f = lfs.open(filename, "w")
 		assert(f, string.format("could not open `%s' for writing", filename))
@@ -325,7 +340,7 @@ function start (doc)
 		f:close()
 	end
 
-	local filename = options.output_dir.."hooks.html"
+	local filename = options.output_dir .. "hooks.html"
 	logger:info("generating file `%s'", filename)
 	local f = lfs.open(filename, "w")
 	assert(f, string.format("could not open `%s' for writing", filename))
@@ -341,15 +356,26 @@ function start (doc)
 	include("directives.lp", { doc = doc, dir_doc = doc })
 	f:close()
 
-	-- copy extra files
+	-- Copy assets
 
-	local f = lfs.open(options.output_dir.."luadoc.css", "w")
-	io.output(f)
-	include("luadoc.css")
-	f:close()
+	dirfiles(options.output_dir .. "assets", function(fname, fpath)
+		local f = lfs.open(fpath, "w")
+		io.output(f)
+		include("assets/" .. fname)
+		f:close()
+	end)
 
-	local f = lfs.open(options.output_dir.."search.js", "w")
-	io.output(f)
-	include("search.js")
-	f:close()
+	dirfiles(options.output_dir .. "assets/js", function(fname, fpath)
+		local f = lfs.open(fpath, "w")
+		io.output(f)
+		include("assets/js/" .. fname)
+		f:close()
+	end)
+
+	dirfiles(options.output_dir .. "assets/images", function(fname, fpath)
+		local f = lfs.open(fpath, "w")
+		io.output(f)
+		include("assets/images/" .. fname)
+		f:close()
+	end)
 end
