@@ -1,6 +1,4 @@
 <?lua
-local string = require "string"
-
 local fname = func.name
 if func.classlib then
 	fname = func.classlib .. ":" .. func.fname
@@ -20,7 +18,7 @@ end
 		<h3>Parameters</h3>
 		<ul>
 			<?lua for p = 1, #func.param do?>
-			<li><tt><?lua=func.param[p]?></tt><?lua if string.len(func.param[func.param[p]]) > 1 then?> ― <?lua=func.param[func.param[p]]?><?lua end?></li><?lua end?>
+			<li><tt><?lua=func.param[p]?></tt><?lua if func.param[func.param[p]] then?> ― <?lua=func.param[func.param[p]]?><?lua end?></li><?lua end?>
 		</ul>
 	</section><?lua end?>
 	<?lua if func.usage then?>
