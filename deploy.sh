@@ -4,6 +4,9 @@ set -e # Exit with nonzero exit code if anything fails
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
+git config user.name "$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
+git config user.email "$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
+
 
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
@@ -36,8 +39,6 @@ echo "Moving doc files"
 cp -rf doc/* out/
 
 cd out
-git config user.name "Travis CI"
-git config user.email "$COMMIT_AUTHOR_EMAIL"
 
 # If there are no changes to docs then just skip
 if git diff --quiet; then
