@@ -18,9 +18,10 @@ end
 		<h3>Parameters</h3>
 		<ul>
 			<?lua for p = 1, #func.param do?>
-			<li><tt><?lua=func.param[p]?></tt><?lua if func.param[func.param[p]] then?> ― <?lua=func.param[func.param[p]]?><?lua end?></li><?lua end?>
+			<li><tt><?lua=func.param[p]?></tt><?lua if #func.param[func.param[p]] > 1 then?> ― <?lua=func.param[func.param[p]]?><?lua end?></li><?lua end?>
 		</ul>
 	</section><?lua end?>
+	<?lua func.usage then?>
 	<section class="usage">
 		<h3>Usage</h3>
 		<?lua if type(func.usage) == "string" then?>
@@ -30,18 +31,18 @@ end
 			<?lua for _, usage in ipairs(func.usage) do?>
 			<li><pre class="example"><?lua=usage?></pre></li><?lua end?>
 		</ul><?lua end?>
-	</section>
+	</section><?lua end?>
+	<?lua func.ret then?>
 	<section class="return">
+		<h3>Returns</h3>
 		<?lua if type(func.ret) == "string" then?>
-		<h3>Return value:</h3>
 		<p><?lua=func.ret?></p>
 		<?lua elseif type(func.ret) == "table" then?>
-		<h3>Return values:</h3>
 		<ol>
 			<?lua for _, ret in ipairs(func.ret) do?>
 			<li><?lua=ret?></li><?lua end?>
 		</ol><?lua end?>
-	</section>
+	</section><?lua end?>
 	<?lua if func.bug then?>
 	<section class="known_bug">
 		<h3>Known bug</h3>

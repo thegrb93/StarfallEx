@@ -74,7 +74,7 @@ end
 					<ul>
 						<?lua 
 						for _, name in ipairs(doc.examples) do
-							local link = example_doc and example_doc.name == name?>
+							local link = not example_doc or example_doc.name ~= name?>
 						<li><?lua if link then?><a href="<?lua=docletsfhtml.example_link(name, doc, from)?>"><?lua end?><?lua=name?><?lua if link then?></a><?lua end?></li><?lua end?>
 					</ul>
 				</section>
