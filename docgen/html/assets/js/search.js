@@ -1,40 +1,37 @@
-window.onload = function () {
-	var jsonDoc = null;
+window.addEventListener('load', function () {
+	var searchTable = null;
 
 	function downloadJson() {
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
-				jsonDoc = JSON.parse(this.responseText);
-				onkeyup()
+				searchTable = JSON.parse(this.responseText);
+				search()
 			}
 		};
-		xhttp.open("GET", fromPath+"doc.json", true);
+		xhttp.open("GET", fromPath + "doc.json", true);
 		xhttp.send();
 	}
 
 	downloadJson();
 
-	var searchBox = document.getElementById("search");
-	searchBox.onkeyup = onkeyup;
+	var searchBox = document.getElementById("search_field");
+	searchBox.oninput = search;
 
-	var defaultIndex = document.getElementById("default_index");
-	var searchResultsDiv = document.getElementById("search_results");
+	var commonIndex = document.getElementById("common_index");
+	var searchIndex = document.getElementById("search_index");
 
-	function onkeyup() {
-		if (jsonDoc == null)
-			return;
-
+	function search() {
+		if (searchTable == null) return;
 		if (searchBox.value.length == 0) {
-			defaultIndex.style.display = "block";
-			searchResultsDiv.style.display = "none";
-			return;
+			commonIndex.style.display = "block";
+			searchIndex.style.display = "none";
 		}
-
-		defaultIndex.style.display = "none";
-		searchResultsDiv.style.display = "block";
-
-		update(searchBox.value);
+		else {
+			commonIndex.style.display = "none";
+			searchIndex.style.display = "block";
+			update(searchBox.value);
+		}
 	}
 
 	var searchFunctionsUl = document.getElementById("search_functions");
@@ -48,12 +45,9 @@ window.onload = function () {
 
 		var functionsHtml = "";
 
-		for (var library in jsonDoc.libraries) {
-			var libTable = jsonDoc.libraries[library];
-
-			if (libTable.functions)
-				var entireLib = libTable.name.toLowerCase().indexOf(phrase) != -1;
-
+		for (var library in searchTable.libraries) {
+			var libTable = searchTable.libraries[library];
+			if (libTable.functions) var entireLib = libTable.name.toLowerCase().indexOf(phrase) != -1;
 			for (var funcId in libTable.functions) {
 				if (typeof libTable.functions[funcId] == "string" &&
 					(entireLib || libTable.functions[funcId].toLowerCase().indexOf(phrase) != -1)) {
@@ -76,8 +70,8 @@ window.onload = function () {
 
 		var methodsHtml = "";
 
-		for (var className in jsonDoc.classes) {
-			var classTable = jsonDoc.classes[className];
+		for (var className in searchTable.classes) {
+			var classTable = searchTable.classes[className];
 
 			if (classTable.methods)
 				var entireClass = classTable.name.toLowerCase().indexOf(phrase) != -1;
@@ -104,11 +98,11 @@ window.onload = function () {
 
 		var hooksHtml = "";
 
-		for (var hookId in jsonDoc.hooks) {
-			if (typeof jsonDoc.hooks[hookId] == "string" && jsonDoc.hooks[hookId].toLowerCase().indexOf(phrase) != -1) {
-				var name = jsonDoc.hooks[hookId];
+		for (var hookId in searchTable.hooks) {
+			if (typeof searchTable.hooks[hookId] == "string" && searchTable.hooks[hookId].toLowerCase().indexOf(phrase) != -1) {
+				var name = searchTable.hooks[hookId];
 
-				var hookTable = jsonDoc.hooks[name];
+				var hookTable = searchTable.hooks[name];
 				var realm = hookTable.realm;
 
 				hooksHtml +=
@@ -119,4 +113,4 @@ window.onload = function () {
 
 		searchHooksUl.innerHTML = hooksHtml;
 	}
-}
+});
