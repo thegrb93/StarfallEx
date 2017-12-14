@@ -205,9 +205,24 @@ Dumps the current render target and allows the pixels to be accessed by render.r
 Clears the active render target </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.clearBuffersObeyStencil">clearBuffersObeyStencil</a>( r, g, b, a, depth )</td>
+			<td class="summary">
+Clears the current rendertarget for obeying the current stencil buffer conditions.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.clearDepth">clearDepth</a>(  )</td>
 			<td class="summary">
 Resets the depth buffer </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.clearStencil">clearStencil</a>(  )</td>
+			<td class="summary">
+Resets all values in the stencil buffer to zero.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.clearStencilBufferRectangle">clearStencilBufferRectangle</a>( originX, originY, endX, endY, stencilValue )</td>
+			<td class="summary">
+Sets the stencil value in a specified rect.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.createFont">createFont</a>( font, size, weight, antialias, additive, shadow, outline, blur, extended )</td>
@@ -465,6 +480,46 @@ Sets the draw color by RGBA values </td>
 Sets the active texture to the render target with the specified name.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilCompareFunction">setStencilCompareFunction</a>( compareFunction )</td>
+			<td class="summary">
+Sets the compare function of the stencil.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilEnable">setStencilEnable</a>( enable )</td>
+			<td class="summary">
+Sets whether stencil tests are carried out for each rendered pixel.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilFailOperation">setStencilFailOperation</a>( operation )</td>
+			<td class="summary">
+Sets the operation to be performed on the stencil buffer values if the compare function was not successful.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilPassOperation">setStencilPassOperation</a>( operation )</td>
+			<td class="summary">
+Sets the operation to be performed on the stencil buffer values if the compare function was successful.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilReferenceValue">setStencilReferenceValue</a>( referenceValue )</td>
+			<td class="summary">
+Sets the reference value which will be used for all stencil operations.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilTestMask">setStencilTestMask</a>( mask )</td>
+			<td class="summary">
+Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilWriteMask">setStencilWriteMask</a>( mask )</td>
+			<td class="summary">
+Sets the unsigned 8-bit write bitflag mask to be used for any writes to the stencil buffer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setStencilZFailOperation">setStencilZFailOperation</a>( operation )</td>
+			<td class="summary">
+Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.setTexture">setTexture</a>( id )</td>
 			<td class="summary">
 Sets the texture </td>
@@ -531,12 +586,85 @@ Clears the active render target</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.clearBuffersObeyStencil"></a><strong>render.clearBuffersObeyStencil</strong>( r, g, b, a, depth )</dt>
+<dd>
+	<p>
+Clears the current rendertarget for obeying the current stencil buffer conditions.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>r</tt> ― Value of the red channel to clear the current rt with.</li>
+			<li><tt>g</tt> ― Value of the green channel to clear the current rt with.</li>
+			<li><tt>b</tt> ― Value of the blue channel to clear the current rt with.</li>
+			<li><tt>a</tt></li>
+			<li><tt>depth</tt> ― Clear the depth buffer.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.clearDepth"></a><strong>render.clearDepth</strong>(  )</dt>
 <dd>
 	<p>
 Resets the depth buffer</p>
 	
 	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.clearStencil"></a><strong>render.clearStencil</strong>(  )</dt>
+<dd>
+	<p>
+Resets all values in the stencil buffer to zero.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.clearStencilBufferRectangle"></a><strong>render.clearStencilBufferRectangle</strong>( originX, originY, endX, endY, stencilValue )</dt>
+<dd>
+	<p>
+Sets the stencil value in a specified rect.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>originX</tt> ― X origin of the rectangle.</li>
+			<li><tt>originY</tt> ― Y origin of the rectangle.</li>
+			<li><tt>endX</tt> ― The end X coordinate of the rectangle.</li>
+			<li><tt>endY</tt> ― The end Y coordinate of the rectangle.</li>
+			<li><tt>stencilValue</tt> ― Value to set cleared stencil buffer to.</li>
+		</ul>
+	</section>
 	<section class="usage">
 		<h3>Usage</h3>
 		
@@ -1885,6 +2013,198 @@ Nil to reset.</p>
 		<ul>
 			
 			<li><tt>name</tt> ― Name of the render target to use</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilCompareFunction"></a><strong>render.setStencilCompareFunction</strong>( compareFunction )</dt>
+<dd>
+	<p>
+Sets the compare function of the stencil. More: http://wiki.garrysmod.com/page/render/SetStencilCompareFunction</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>compareFunction</tt> ― </li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilEnable"></a><strong>render.setStencilEnable</strong>( enable )</dt>
+<dd>
+	<p>
+Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>enable</tt> ― true to enable, false to disable</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilFailOperation"></a><strong>render.setStencilFailOperation</strong>( operation )</dt>
+<dd>
+	<p>
+Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.garrysmod.com/page/render/SetStencilFailOperation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>operation</tt> ― </li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilPassOperation"></a><strong>render.setStencilPassOperation</strong>( operation )</dt>
+<dd>
+	<p>
+Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.garrysmod.com/page/render/SetStencilPassOperation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>operation</tt> ― </li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilReferenceValue"></a><strong>render.setStencilReferenceValue</strong>( referenceValue )</dt>
+<dd>
+	<p>
+Sets the reference value which will be used for all stencil operations. This is an unsigned integer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>referenceValue</tt> ― Reference value.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilTestMask"></a><strong>render.setStencilTestMask</strong>( mask )</dt>
+<dd>
+	<p>
+Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mask</tt> ― The mask bitflag.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilWriteMask"></a><strong>render.setStencilWriteMask</strong>( mask )</dt>
+<dd>
+	<p>
+Sets the unsigned 8-bit write bitflag mask to be used for any writes to the stencil buffer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mask</tt> ― The mask bitflag.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setStencilZFailOperation"></a><strong>render.setStencilZFailOperation</strong>( operation )</dt>
+<dd>
+	<p>
+Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.garrysmod.com/page/render/SetStencilZFailOperation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>operation</tt> ― </li>
 		</ul>
 	</section>
 	<section class="usage">
