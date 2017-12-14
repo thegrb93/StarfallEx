@@ -35,13 +35,11 @@ end
 -- @param iterator Function that is called on every file, with file name and full path as arguments.
 
 local function dirfiles (path, ff)
-    for file in lfs.dir(path) do
-        local f = path .. '/' .. file
-        local attr = lfs.attributes (f)
-        if attr.mode == "file" then
-        	ff(file, f)
-        end
-    end
+	for file in lfs.dir(path) do
+		local f = path .. '/' .. file
+		local attr = lfs.attributes (f)
+		if attr.mode == "file" then ff(file, f) end
+	end
 end
 
 -------------------------------------------------------------------------------
@@ -358,20 +356,21 @@ function start (doc)
 
 	-- Copy assets
 
+	lfs.mkdir(options.output_dir .. "assets")
 	dirfiles(options.output_dir .. "assets", function(fname, fpath)
 		local f = lfs.open(fpath, "w")
 		io.output(f)
 		include("assets/" .. fname)
 		f:close()
 	end)
-
+	lfs.mkdir(options.output_dir .. "assets/js")
 	dirfiles(options.output_dir .. "assets/js", function(fname, fpath)
 		local f = lfs.open(fpath, "w")
 		io.output(f)
 		include("assets/js/" .. fname)
 		f:close()
 	end)
-
+	lfs.mkdir(options.output_dir .. "assets/images")
 	dirfiles(options.output_dir .. "assets/images", function(fname, fpath)
 		local f = lfs.open(fpath, "w")
 		io.output(f)
