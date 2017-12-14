@@ -43,7 +43,7 @@ end
 					<ul>
 						<?lua 
 						for _, name in ipairs(doc.libraries) do
-							local link = module_doc and module_doc.name == name?>
+							local link = not module_doc or module_doc.name ~= name?>
 						<li><?lua if link then?><a href="<?lua=docletsfhtml.module_link(name, doc, from)?>"><?lua end?><?lua if doc.libraries[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.libraries[name].deprecated then?></del><?lua end?><?lua if link then?></a><?lua end?></li><?lua end?>
 					</ul>
 				</section>
@@ -51,7 +51,7 @@ end
 					<h1>Types</h1>
 					<ul>
 						<?lua for _, name in ipairs(doc.classes) do
-							local link = class_doc and class_doc.name == name?>
+							local link = not class_doc or class_doc.name ~= name?>
 						<li><?lua if link then?><a href="<?lua=docletsfhtml.class_link(name, doc, from)?>"><?lua end?><?lua if doc.classes[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.classes[name].deprecated then?></del><?lua end?><?lua if link then?></a><?lua end?></li><?lua end?>
 					</ul>
 				</section>
