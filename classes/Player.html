@@ -1,534 +1,186 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath="../"</script>
-<script type="text/javascript" src="../search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><strong>Index</strong></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="../directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="../libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/mesh.html">mesh</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/net.html">net</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/quaternion.html">quaternion</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/render.html">render</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="../classes/Angle.html">Angle</a></li>
-			
-				<li><a href="../classes/Bass.html">Bass</a></li>
-			
-				<li><a href="../classes/Color.html">Color</a></li>
-			
-				<li><a href="../classes/Entity.html">Entity</a></li>
-			
-				<li><a href="../classes/File.html">File</a></li>
-			
-				<li><a href="../classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="../classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="../classes/Npc.html">Npc</a></li>
-			
-				<li><a href="../classes/Particle.html">Particle</a></li>
-			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><strong>Player</strong></li>
-			
-				<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="../classes/Sound.html">Sound</a></li>
-			
-				<li><a href="../classes/VMatrix.html">VMatrix</a></li>
-			
-				<li><a href="../classes/Vector.html">Vector</a></li>
-			
-				<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="../classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Type <code>Player</code></h1>
-
+	<head>
+		<title>Player :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li>net</li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li>render</li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li>Bass</li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li>File</li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li><a href="../classes/Player.html">Player</a></li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li>VMatrix</li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+<h1><tt>Player</tt> type</h1>
 <p>
 Player type</p>
 
@@ -536,1284 +188,1002 @@ Player type</p>
 
 
 
-
-
-<h2>Methods</h2>
-<table class="function_list">
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getActiveWeapon">getActiveWeapon</a>&nbsp;()</td>
-		<td class="summary">
+<section class="methods">
+	<h2>Methods</h2>
+	<table class="list">
+		
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getActiveWeapon">getActiveWeapon</a>(  )</td>
+			<td class="summary">
 Returns the name of the player's active weapon </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getAimVector">getAimVector</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getAimVector">getAimVector</a>(  )</td>
+			<td class="summary">
 Returns the player's aim vector </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getArmor">getArmor</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getArmor">getArmor</a>(  )</td>
+			<td class="summary">
 Returns the players armor </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getDeaths">getDeaths</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getDeaths">getDeaths</a>(  )</td>
+			<td class="summary">
 Returns the amount of deaths of the player </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getEyeTrace">getEyeTrace</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getEyeTrace">getEyeTrace</a>(  )</td>
+			<td class="summary">
 Returns a table with information of what the player is looking at </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getFOV">getFOV</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getFOV">getFOV</a>(  )</td>
+			<td class="summary">
 Returns the player's field of view </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getFrags">getFrags</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getFrags">getFrags</a>(  )</td>
+			<td class="summary">
 Returns the amount of kills of the player </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getFriendStatus">getFriendStatus</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getFriendStatus">getFriendStatus</a>(  )</td>
+			<td class="summary">
 Returns the relationship of the player to the local client </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getJumpPower">getJumpPower</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getJumpPower">getJumpPower</a>(  )</td>
+			<td class="summary">
 Returns the player's jump power </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getMaxSpeed">getMaxSpeed</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getMaxSpeed">getMaxSpeed</a>(  )</td>
+			<td class="summary">
 Returns the player's maximum speed </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getName">getName</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getName">getName</a>(  )</td>
+			<td class="summary">
 Returns the player's name </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getPing">getPing</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getPing">getPing</a>(  )</td>
+			<td class="summary">
 Returns the player's current ping </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getRunSpeed">getRunSpeed</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getRunSpeed">getRunSpeed</a>(  )</td>
+			<td class="summary">
 Returns the player's running speed </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getShootPos">getShootPos</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getShootPos">getShootPos</a>(  )</td>
+			<td class="summary">
 Returns the player's shoot position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getSteamID">getSteamID</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getSteamID">getSteamID</a>(  )</td>
+			<td class="summary">
 Returns the player's steam ID </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getSteamID64">getSteamID64</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getSteamID64">getSteamID64</a>(  )</td>
+			<td class="summary">
 Returns the player's community ID </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getTeam">getTeam</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getTeam">getTeam</a>(  )</td>
+			<td class="summary">
 Returns the player's current team </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getTeamName">getTeamName</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getTeamName">getTeamName</a>(  )</td>
+			<td class="summary">
 Returns the name of the player's current team </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getUniqueID">getUniqueID</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getUniqueID">getUniqueID</a>(  )</td>
+			<td class="summary">
 Returns the player's unique ID </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getUserID">getUserID</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getUserID">getUserID</a>(  )</td>
+			<td class="summary">
 Returns the player's user ID </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getViewEntity">getViewEntity</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getViewEntity">getViewEntity</a>(  )</td>
+			<td class="summary">
 Returns the player's current view entity </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getWeapon">getWeapon</a>&nbsp;(wep)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getWeapon">getWeapon</a>( wep )</td>
+			<td class="summary">
 Returns the specified weapon or nil if the player doesn't have it </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:getWeapons">getWeapons</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:getWeapons">getWeapons</a>(  )</td>
+			<td class="summary">
 Returns a table of weapons the player is carrying </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:hasGodMode">hasGodMode</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:hasGodMode">hasGodMode</a>(  )</td>
+			<td class="summary">
 Returns whether or not the player has godmode </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:inVehicle">inVehicle</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:inVehicle">inVehicle</a>(  )</td>
+			<td class="summary">
 Returns whether the player is in a vehicle </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isAdmin">isAdmin</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isAdmin">isAdmin</a>(  )</td>
+			<td class="summary">
 Returns whether the player is an admin </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isAlive">isAlive</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isAlive">isAlive</a>(  )</td>
+			<td class="summary">
 Returns whether the player is alive </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isBot">isBot</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isBot">isBot</a>(  )</td>
+			<td class="summary">
 Returns whether the player is a bot </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isConnected">isConnected</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isConnected">isConnected</a>(  )</td>
+			<td class="summary">
 Returns whether the player is connected </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isCrouching">isCrouching</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isCrouching">isCrouching</a>(  )</td>
+			<td class="summary">
 Returns whether the player is crouching </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isFlashlightOn">isFlashlightOn</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isFlashlightOn">isFlashlightOn</a>(  )</td>
+			<td class="summary">
 Returns whether the player's flashlight is on </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isFrozen">isFrozen</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isFrozen">isFrozen</a>(  )</td>
+			<td class="summary">
 Returns whether the player is frozen </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isMuted">isMuted</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isMuted">isMuted</a>(  )</td>
+			<td class="summary">
 Returns whether the local player has muted the player </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isNPC">isNPC</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isNPC">isNPC</a>(  )</td>
+			<td class="summary">
 Returns whether the player is an NPC </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isNoclipped">isNoclipped</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isNoclipped">isNoclipped</a>(  )</td>
+			<td class="summary">
 Returns true if the player is noclipped </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isPlayer">isPlayer</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isPlayer">isPlayer</a>(  )</td>
+			<td class="summary">
 Returns whether the player is a player </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isSuperAdmin">isSuperAdmin</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isSuperAdmin">isSuperAdmin</a>(  )</td>
+			<td class="summary">
 Returns whether the player is a super admin </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:isUserGroup">isUserGroup</a>&nbsp;(group)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:isUserGroup">isUserGroup</a>( group )</td>
+			<td class="summary">
 Returns whether the player belongs to a usergroup </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:keyDown">keyDown</a>&nbsp;(key)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:keyDown">keyDown</a>( key )</td>
+			<td class="summary">
 Returns whether or not the player is pushing the key.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#player_methods:setViewEntity">setViewEntity</a>&nbsp;(ent)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#player_methods:setViewEntity">setViewEntity</a>( ent )</td>
+			<td class="summary">
 Sets the view entity of the player.</td>
-	</tr>
-
-</table>
-
-
-
-<br/>
-<br/>
-
-
-<h2><a name="methods"></a>Methods</h2>
-<dl class="function">
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getActiveWeapon"></a><strong>Player:getActiveWeapon</strong>&nbsp;()</dt>
+		</tr>
+	</table>
+</section>
+<section class="methods_def">
+	<h2><a name="methods_def"></a>Methods definition</h2>
+	<dl>
+		
+		
+<dt><span class="realm_sh"></span><a name="Player:getActiveWeapon"></a><strong>Player:getActiveWeapon</strong>(  )</dt>
 <dd>
-
-Returns the name of the player's active weapon
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The weapon</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getAimVector"></a><strong>Player:getAimVector</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's aim vector
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Aim vector</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getArmor"></a><strong>Player:getArmor</strong>&nbsp;()</dt>
-<dd>
-
-Returns the players armor
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Armor</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getDeaths"></a><strong>Player:getDeaths</strong>&nbsp;()</dt>
-<dd>
-
-Returns the amount of deaths of the player
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Amount of deaths</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getEyeTrace"></a><strong>Player:getEyeTrace</strong>&nbsp;()</dt>
-<dd>
-
-Returns a table with information of what the player is looking at
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>table trace data https://wiki.garrysmod.com/page/Structures/TraceResult</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getFOV"></a><strong>Player:getFOV</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's field of view
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Field of view</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getFrags"></a><strong>Player:getFrags</strong>&nbsp;()</dt>
-<dd>
-
-Returns the amount of kills of the player
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Amount of kills</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getFriendStatus"></a><strong>Player:getFriendStatus</strong>&nbsp;()</dt>
-<dd>
-
-Returns the relationship of the player to the local client
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>One of: "friend", "blocked", "none", "requested"</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getJumpPower"></a><strong>Player:getJumpPower</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's jump power
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Jump power</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getMaxSpeed"></a><strong>Player:getMaxSpeed</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's maximum speed
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Maximum speed</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getName"></a><strong>Player:getName</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's name
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Name</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getPing"></a><strong>Player:getPing</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's current ping
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>ping</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getRunSpeed"></a><strong>Player:getRunSpeed</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's running speed
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Running speed</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getShootPos"></a><strong>Player:getShootPos</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's shoot position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Shoot position</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getSteamID"></a><strong>Player:getSteamID</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's steam ID
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>steam ID</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getSteamID64"></a><strong>Player:getSteamID64</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's community ID
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>community ID</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getTeam"></a><strong>Player:getTeam</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's current team
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>team</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getTeamName"></a><strong>Player:getTeamName</strong>&nbsp;()</dt>
-<dd>
-
-Returns the name of the player's current team
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>team name</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getUniqueID"></a><strong>Player:getUniqueID</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's unique ID
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>unique ID</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getUserID"></a><strong>Player:getUserID</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's user ID
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>user ID</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getViewEntity"></a><strong>Player:getViewEntity</strong>&nbsp;()</dt>
-<dd>
-
-Returns the player's current view entity
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Player's current view entity</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getWeapon"></a><strong>Player:getWeapon</strong>&nbsp;(wep)</dt>
-<dd>
-
-Returns the specified weapon or nil if the player doesn't have it
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns the name of the player's active weapon</p>
 	
-	<li>
-	  <code><em>wep</em></code>: String weapon class
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>weapon</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:getWeapons"></a><strong>Player:getWeapons</strong>&nbsp;()</dt>
-<dd>
-
-Returns a table of weapons the player is carrying
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Table of weapons</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:hasGodMode"></a><strong>Player:hasGodMode</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether or not the player has godmode
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the player has godmode</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:inVehicle"></a><strong>Player:inVehicle</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is in a vehicle
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player in vehicle</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isAdmin"></a><strong>Player:isAdmin</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is an admin
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is admin</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isAlive"></a><strong>Player:isAlive</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is alive
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player alive</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isBot"></a><strong>Player:isBot</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is a bot
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is a bot</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isConnected"></a><strong>Player:isConnected</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is connected
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is connected</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isCrouching"></a><strong>Player:isCrouching</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is crouching
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player crouching</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isFlashlightOn"></a><strong>Player:isFlashlightOn</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player's flashlight is on
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player has flashlight on</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isFrozen"></a><strong>Player:isFrozen</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is frozen
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is frozen</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isMuted"></a><strong>Player:isMuted</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the local player has muted the player
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if the player was muted</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isNPC"></a><strong>Player:isNPC</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is an NPC
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is an NPC</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isNoclipped"></a><strong>Player:isNoclipped</strong>&nbsp;()</dt>
-<dd>
-
-Returns true if the player is noclipped
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>true if the player is noclipped</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isPlayer"></a><strong>Player:isPlayer</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is a player
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is player</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isSuperAdmin"></a><strong>Player:isSuperAdmin</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the player is a super admin
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player is super admin</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:isUserGroup"></a><strong>Player:isUserGroup</strong>&nbsp;(group)</dt>
-<dd>
-
-Returns whether the player belongs to a usergroup
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The weapon</p>
+		
+	</section>
 	
-	<li>
-	  <code><em>group</em></code>: Group to check against
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True if player belongs to group</ul>
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:keyDown"></a><strong>Player:keyDown</strong>&nbsp;(key)</dt>
+		
+<dt><span class="realm_sh"></span><a name="Player:getAimVector"></a><strong>Player:getAimVector</strong>(  )</dt>
 <dd>
-
-Returns whether or not the player is pushing the key.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns the player's aim vector</p>
 	
-	<li>
-	  <code><em>key</em></code>: Key to check. 
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Aim vector</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getArmor"></a><strong>Player:getArmor</strong>(  )</dt>
+<dd>
+	<p>
+Returns the players armor</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Armor</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getDeaths"></a><strong>Player:getDeaths</strong>(  )</dt>
+<dd>
+	<p>
+Returns the amount of deaths of the player</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Amount of deaths</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getEyeTrace"></a><strong>Player:getEyeTrace</strong>(  )</dt>
+<dd>
+	<p>
+Returns a table with information of what the player is looking at</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>table trace data https://wiki.garrysmod.com/page/Structures/TraceResult</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getFOV"></a><strong>Player:getFOV</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's field of view</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Field of view</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getFrags"></a><strong>Player:getFrags</strong>(  )</dt>
+<dd>
+	<p>
+Returns the amount of kills of the player</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Amount of kills</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getFriendStatus"></a><strong>Player:getFriendStatus</strong>(  )</dt>
+<dd>
+	<p>
+Returns the relationship of the player to the local client</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>One of: "friend", "blocked", "none", "requested"</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getJumpPower"></a><strong>Player:getJumpPower</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's jump power</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Jump power</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getMaxSpeed"></a><strong>Player:getMaxSpeed</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's maximum speed</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Maximum speed</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getName"></a><strong>Player:getName</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's name</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Name</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getPing"></a><strong>Player:getPing</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's current ping</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>ping</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getRunSpeed"></a><strong>Player:getRunSpeed</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's running speed</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Running speed</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getShootPos"></a><strong>Player:getShootPos</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's shoot position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Shoot position</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getSteamID"></a><strong>Player:getSteamID</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's steam ID</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>steam ID</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getSteamID64"></a><strong>Player:getSteamID64</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's community ID</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>community ID</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getTeam"></a><strong>Player:getTeam</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's current team</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>team</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getTeamName"></a><strong>Player:getTeamName</strong>(  )</dt>
+<dd>
+	<p>
+Returns the name of the player's current team</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>team name</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getUniqueID"></a><strong>Player:getUniqueID</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's unique ID</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>unique ID</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getUserID"></a><strong>Player:getUserID</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's user ID</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>user ID</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getViewEntity"></a><strong>Player:getViewEntity</strong>(  )</dt>
+<dd>
+	<p>
+Returns the player's current view entity</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Player's current view entity</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getWeapon"></a><strong>Player:getWeapon</strong>( wep )</dt>
+<dd>
+	<p>
+Returns the specified weapon or nil if the player doesn't have it</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>wep</tt> ― String weapon class</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>weapon</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getWeapons"></a><strong>Player:getWeapons</strong>(  )</dt>
+<dd>
+	<p>
+Returns a table of weapons the player is carrying</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Table of weapons</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:hasGodMode"></a><strong>Player:hasGodMode</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether or not the player has godmode</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if the player has godmode</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:inVehicle"></a><strong>Player:inVehicle</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is in a vehicle</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player in vehicle</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isAdmin"></a><strong>Player:isAdmin</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is an admin</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is admin</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isAlive"></a><strong>Player:isAlive</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is alive</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player alive</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isBot"></a><strong>Player:isBot</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is a bot</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is a bot</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isConnected"></a><strong>Player:isConnected</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is connected</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is connected</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isCrouching"></a><strong>Player:isCrouching</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is crouching</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player crouching</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isFlashlightOn"></a><strong>Player:isFlashlightOn</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player's flashlight is on</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player has flashlight on</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isFrozen"></a><strong>Player:isFrozen</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is frozen</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is frozen</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isMuted"></a><strong>Player:isMuted</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the local player has muted the player</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if the player was muted</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isNPC"></a><strong>Player:isNPC</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is an NPC</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is an NPC</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isNoclipped"></a><strong>Player:isNoclipped</strong>(  )</dt>
+<dd>
+	<p>
+Returns true if the player is noclipped</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>true if the player is noclipped</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isPlayer"></a><strong>Player:isPlayer</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is a player</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is player</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isSuperAdmin"></a><strong>Player:isSuperAdmin</strong>(  )</dt>
+<dd>
+	<p>
+Returns whether the player is a super admin</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player is super admin</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isUserGroup"></a><strong>Player:isUserGroup</strong>( group )</dt>
+<dd>
+	<p>
+Returns whether the player belongs to a usergroup</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>group</tt> ― Group to check against</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True if player belongs to group</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:keyDown"></a><strong>Player:keyDown</strong>( key )</dt>
+<dd>
+	<p>
+Returns whether or not the player is pushing the key.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― Key to check. 
 IN_KEY.ALT1 
 IN_KEY.ALT2 
 IN_KEY.ATTACK 
@@ -1838,70 +1208,56 @@ IN_KEY.WEAPON1
 IN_KEY.WEAPON2 
 IN_KEY.BULLRUSH 
 IN_KEY.CANCEL 
-IN_KEY.RUN
-	</li>
+IN_KEY.RUN</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>True or false</p>
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>True or false</ul>
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="Player:setViewEntity"></a><strong>Player:setViewEntity</strong>&nbsp;(ent)</dt>
+		
+<dt><span class="realm_sh"></span><a name="Player:setViewEntity"></a><strong>Player:setViewEntity</strong>( ent )</dt>
 <dd>
-
-Sets the view entity of the player. Only works if they are linked to a hud.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the view entity of the player. Only works if they are linked to a hud.</p>
 	
-	<li>
-	  <code><em>ent</em></code>: Entity to set the player's view entity to, or nothing to reset it
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ent</tt> ― Entity to set the player's view entity to, or nothing to reset it</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-</dl>
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+	</dl>
+</section>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>

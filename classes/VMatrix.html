@@ -1,534 +1,186 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath="../"</script>
-<script type="text/javascript" src="../search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><strong>Index</strong></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="../directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="../libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/mesh.html">mesh</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/net.html">net</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/quaternion.html">quaternion</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/render.html">render</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="../classes/Angle.html">Angle</a></li>
-			
-				<li><a href="../classes/Bass.html">Bass</a></li>
-			
-				<li><a href="../classes/Color.html">Color</a></li>
-			
-				<li><a href="../classes/Entity.html">Entity</a></li>
-			
-				<li><a href="../classes/File.html">File</a></li>
-			
-				<li><a href="../classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="../classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="../classes/Npc.html">Npc</a></li>
-			
-				<li><a href="../classes/Particle.html">Particle</a></li>
-			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><a href="../classes/Player.html">Player</a></li>
-			
-				<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="../classes/Sound.html">Sound</a></li>
-			
-				<li><strong>VMatrix</strong></li>
-			
-				<li><a href="../classes/Vector.html">Vector</a></li>
-			
-				<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="../classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Type <code>VMatrix</code></h1>
-
+	<head>
+		<title>VMatrix :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li>net</li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li>render</li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li>Bass</li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li>File</li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li>Player</li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li><a href="../classes/VMatrix.html">VMatrix</a></li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+<h1><tt>VMatrix</tt> type</h1>
 <p>
 VMatrix type</p>
 
@@ -536,1084 +188,828 @@ VMatrix type</p>
 
 
 
-
-
-<h2>Methods</h2>
-<table class="function_list">
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getAngles">getAngles</a>&nbsp;()</td>
-		<td class="summary">
+<section class="methods">
+	<h2>Methods</h2>
+	<table class="list">
+		
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getAngles">getAngles</a>(  )</td>
+			<td class="summary">
 Returns angles </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getAxisAngle">getAxisAngle</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getAxisAngle">getAxisAngle</a>(  )</td>
+			<td class="summary">
 Gets the rotation axis and angle of rotation of the rotation matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getField">getField</a>&nbsp;(row, column)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getField">getField</a>( row, column )</td>
+			<td class="summary">
 Returns a specific field in the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getForward">getForward</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getForward">getForward</a>(  )</td>
+			<td class="summary">
 Returns forward vector of matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getInverse">getInverse</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getInverse">getInverse</a>(  )</td>
+			<td class="summary">
 Returns an inverted matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getInverseTR">getInverseTR</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getInverseTR">getInverseTR</a>(  )</td>
+			<td class="summary">
 Returns an inverted matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getRight">getRight</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getRight">getRight</a>(  )</td>
+			<td class="summary">
 Returns right vector of matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getScale">getScale</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getScale">getScale</a>(  )</td>
+			<td class="summary">
 Returns scale </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getTranslation">getTranslation</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getTranslation">getTranslation</a>(  )</td>
+			<td class="summary">
 Returns translation </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getTransposed">getTransposed</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getTransposed">getTransposed</a>(  )</td>
+			<td class="summary">
 Returns the transposed matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:getUp">getUp</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:getUp">getUp</a>(  )</td>
+			<td class="summary">
 Returns up vector of matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:invert">invert</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:invert">invert</a>(  )</td>
+			<td class="summary">
 Inverts the matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:invertTR">invertTR</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:invertTR">invertTR</a>(  )</td>
+			<td class="summary">
 Inverts the matrix efficiently for translations and rotations </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:isIdentity">isIdentity</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:isIdentity">isIdentity</a>(  )</td>
+			<td class="summary">
 Returns whether the matrix is equal to Identity matrix or not </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:isRotationMatrix">isRotationMatrix</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:isRotationMatrix">isRotationMatrix</a>(  )</td>
+			<td class="summary">
 Returns whether the matrix is a rotation matrix or not.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:rotate">rotate</a>&nbsp;(ang)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:rotate">rotate</a>( ang )</td>
+			<td class="summary">
 Rotate the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:scale">scale</a>&nbsp;(vec)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:scale">scale</a>( vec )</td>
+			<td class="summary">
 Scale the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:scaleTranslation">scaleTranslation</a>&nbsp;(num)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:scaleTranslation">scaleTranslation</a>( num )</td>
+			<td class="summary">
 Scales the absolute translation </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:set">set</a>&nbsp;(src)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:set">set</a>( src )</td>
+			<td class="summary">
 Copies the values from the second matrix to the first matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setAngles">setAngles</a>&nbsp;(ang)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setAngles">setAngles</a>( ang )</td>
+			<td class="summary">
 Sets the angles </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setField">setField</a>&nbsp;(row, column, value)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setField">setField</a>( row, column, value )</td>
+			<td class="summary">
 Sets a specific field in the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setForward">setForward</a>&nbsp;(forward)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setForward">setForward</a>( forward )</td>
+			<td class="summary">
 Sets the forward direction of the matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setIdentity">setIdentity</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setIdentity">setIdentity</a>(  )</td>
+			<td class="summary">
 Initializes the matrix as Identity matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setRight">setRight</a>&nbsp;(right)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setRight">setRight</a>( right )</td>
+			<td class="summary">
 Sets the right direction of the matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setScale">setScale</a>&nbsp;(vec)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setScale">setScale</a>( vec )</td>
+			<td class="summary">
 Sets the scale </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setTranslation">setTranslation</a>&nbsp;(vec)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setTranslation">setTranslation</a>( vec )</td>
+			<td class="summary">
 Sets the translation </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:setUp">setUp</a>&nbsp;(up)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:setUp">setUp</a>( up )</td>
+			<td class="summary">
 Sets the up direction of the matrix.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:toTable">toTable</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:toTable">toTable</a>(  )</td>
+			<td class="summary">
 Converts the matrix to a 4x4 table </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:translate">translate</a>&nbsp;(vec)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:translate">translate</a>( vec )</td>
+			<td class="summary">
 Translate the matrix </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#vmatrix_methods:transpose">transpose</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#vmatrix_methods:transpose">transpose</a>(  )</td>
+			<td class="summary">
 Transposes the matrix </td>
-	</tr>
-
-</table>
-
-
-
-<br/>
-<br/>
-
-
-<h2><a name="methods"></a>Methods</h2>
-<dl class="function">
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getAngles"></a><strong>VMatrix:getAngles</strong>&nbsp;()</dt>
+		</tr>
+	</table>
+</section>
+<section class="methods_def">
+	<h2><a name="methods_def"></a>Methods definition</h2>
+	<dl>
+		
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getAngles"></a><strong>VMatrix:getAngles</strong>(  )</dt>
 <dd>
-
-Returns angles
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Angles</ul>
-
-
-
-
-
+	<p>
+Returns angles</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Angles</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getAxisAngle"></a><strong>VMatrix:getAxisAngle</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getAxisAngle"></a><strong>VMatrix:getAxisAngle</strong>(  )</dt>
 <dd>
-
-Gets the rotation axis and angle of rotation of the rotation matrix
-
-
-
-
-
-
-
-
-
-<h3>Return values:</h3>
-<ol>
+	<p>
+Gets the rotation axis and angle of rotation of the rotation matrix</p>
 	
-	<li>The axis of rotation</li>
 	
-	<li>The angle of rotation</li>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return values:</h3>
+		<ol>
+			
+			<li>The axis of rotation</li>
+			<li>The angle of rotation</li>
+		</ol>
+	</section>
 	
-</ol>
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getField"></a><strong>VMatrix:getField</strong>&nbsp;(row, column)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getField"></a><strong>VMatrix:getField</strong>( row, column )</dt>
 <dd>
-
-Returns a specific field in the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns a specific field in the matrix</p>
 	
-	<li>
-	  <code><em>row</em></code>: A number from 1 to 4
-	</li>
 	
-	<li>
-	  <code><em>column</em></code>: A number from 1 to 4
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>row</tt> ― A number from 1 to 4</li>
+			<li><tt>column</tt> ― A number from 1 to 4</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Value of the specified field</p>
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Value of the specified field</ul>
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getForward"></a><strong>VMatrix:getForward</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getForward"></a><strong>VMatrix:getForward</strong>(  )</dt>
 <dd>
-
-Returns forward vector of matrix. First matrix column
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getInverse"></a><strong>VMatrix:getInverse</strong>&nbsp;()</dt>
-<dd>
-
-Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Inverted matrix</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getInverseTR"></a><strong>VMatrix:getInverseTR</strong>&nbsp;()</dt>
-<dd>
-
-Returns an inverted matrix. Efficiently for translations and rotations
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Inverted matrix</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getRight"></a><strong>VMatrix:getRight</strong>&nbsp;()</dt>
-<dd>
-
-Returns right vector of matrix. Negated second matrix column
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getScale"></a><strong>VMatrix:getScale</strong>&nbsp;()</dt>
-<dd>
-
-Returns scale
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Scale</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getTranslation"></a><strong>VMatrix:getTranslation</strong>&nbsp;()</dt>
-<dd>
-
-Returns translation
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getTransposed"></a><strong>VMatrix:getTransposed</strong>&nbsp;()</dt>
-<dd>
-
-Returns the transposed matrix
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Transposed matrix</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:getUp"></a><strong>VMatrix:getUp</strong>&nbsp;()</dt>
-<dd>
-
-Returns up vector of matrix. Third matrix column
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Translation</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:invert"></a><strong>VMatrix:invert</strong>&nbsp;()</dt>
-<dd>
-
-Inverts the matrix. Inverting the matrix will fail if its determinant is 0 or close to 0
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>bool Whether the matrix was inverted or not</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:invertTR"></a><strong>VMatrix:invertTR</strong>&nbsp;()</dt>
-<dd>
-
-Inverts the matrix efficiently for translations and rotations
-
-
-
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:isIdentity"></a><strong>VMatrix:isIdentity</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the matrix is equal to Identity matrix or not
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>bool True/False</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:isRotationMatrix"></a><strong>VMatrix:isRotationMatrix</strong>&nbsp;()</dt>
-<dd>
-
-Returns whether the matrix is a rotation matrix or not. Checks if the forward, right and up vectors are orthogonal and normalized.
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>bool True/False</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:rotate"></a><strong>VMatrix:rotate</strong>&nbsp;(ang)</dt>
-<dd>
-
-Rotate the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns forward vector of matrix. First matrix column</p>
 	
-	<li>
-	  <code><em>ang</em></code>: Angle to rotate by
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Translation</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:scale"></a><strong>VMatrix:scale</strong>&nbsp;(vec)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getInverse"></a><strong>VMatrix:getInverse</strong>(  )</dt>
 <dd>
-
-Scale the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns an inverted matrix. Inverting the matrix will fail if its determinant is 0 or close to 0</p>
 	
-	<li>
-	  <code><em>vec</em></code>: Vector to scale by
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Inverted matrix</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:scaleTranslation"></a><strong>VMatrix:scaleTranslation</strong>&nbsp;(num)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getInverseTR"></a><strong>VMatrix:getInverseTR</strong>(  )</dt>
 <dd>
-
-Scales the absolute translation
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns an inverted matrix. Efficiently for translations and rotations</p>
 	
-	<li>
-	  <code><em>num</em></code>: Amount to scale by
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Inverted matrix</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:set"></a><strong>VMatrix:set</strong>&nbsp;(src)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getRight"></a><strong>VMatrix:getRight</strong>(  )</dt>
 <dd>
-
-Copies the values from the second matrix to the first matrix. Self-Modifies
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns right vector of matrix. Negated second matrix column</p>
 	
-	<li>
-	  <code><em>src</em></code>: Second matrix
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Translation</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setAngles"></a><strong>VMatrix:setAngles</strong>&nbsp;(ang)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getScale"></a><strong>VMatrix:getScale</strong>(  )</dt>
 <dd>
-
-Sets the angles
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns scale</p>
 	
-	<li>
-	  <code><em>ang</em></code>: New angles
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Scale</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setField"></a><strong>VMatrix:setField</strong>&nbsp;(row, column, value)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getTranslation"></a><strong>VMatrix:getTranslation</strong>(  )</dt>
 <dd>
-
-Sets a specific field in the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns translation</p>
 	
-	<li>
-	  <code><em>row</em></code>: A number from 1 to 4
-	</li>
 	
-	<li>
-	  <code><em>column</em></code>: A number from 1 to 4
-	</li>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Translation</p>
+		
+	</section>
 	
-	<li>
-	  <code><em>value</em></code>: Value to set
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setForward"></a><strong>VMatrix:setForward</strong>&nbsp;(forward)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getTransposed"></a><strong>VMatrix:getTransposed</strong>(  )</dt>
 <dd>
-
-Sets the forward direction of the matrix. First column
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns the transposed matrix</p>
 	
-	<li>
-	  <code><em>forward</em></code>: The forward vector
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Transposed matrix</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setIdentity"></a><strong>VMatrix:setIdentity</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:getUp"></a><strong>VMatrix:getUp</strong>(  )</dt>
 <dd>
-
-Initializes the matrix as Identity matrix
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Returns up vector of matrix. Third matrix column</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Translation</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setRight"></a><strong>VMatrix:setRight</strong>&nbsp;(right)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:invert"></a><strong>VMatrix:invert</strong>(  )</dt>
 <dd>
-
-Sets the right direction of the matrix. Negated second column
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Inverts the matrix. Inverting the matrix will fail if its determinant is 0 or close to 0</p>
 	
-	<li>
-	  <code><em>right</em></code>: The right vector
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>bool Whether the matrix was inverted or not</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setScale"></a><strong>VMatrix:setScale</strong>&nbsp;(vec)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:invertTR"></a><strong>VMatrix:invertTR</strong>(  )</dt>
 <dd>
-
-Sets the scale
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Inverts the matrix efficiently for translations and rotations</p>
 	
-	<li>
-	  <code><em>vec</em></code>: New scale
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setTranslation"></a><strong>VMatrix:setTranslation</strong>&nbsp;(vec)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:isIdentity"></a><strong>VMatrix:isIdentity</strong>(  )</dt>
 <dd>
-
-Sets the translation
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns whether the matrix is equal to Identity matrix or not</p>
 	
-	<li>
-	  <code><em>vec</em></code>: New translation
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>bool True/False</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:setUp"></a><strong>VMatrix:setUp</strong>&nbsp;(up)</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:isRotationMatrix"></a><strong>VMatrix:isRotationMatrix</strong>(  )</dt>
 <dd>
-
-Sets the up direction of the matrix. Third column
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns whether the matrix is a rotation matrix or not. Checks if the forward, right and up vectors are orthogonal and normalized.</p>
 	
-	<li>
-	  <code><em>up</em></code>: The up vector
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>bool True/False</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:toTable"></a><strong>VMatrix:toTable</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:rotate"></a><strong>VMatrix:rotate</strong>( ang )</dt>
 <dd>
-
-Converts the matrix to a 4x4 table
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The 4x4 table</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:translate"></a><strong>VMatrix:translate</strong>&nbsp;(vec)</dt>
-<dd>
-
-Translate the matrix
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Rotate the matrix</p>
 	
-	<li>
-	  <code><em>vec</em></code>: Vector to translate by
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ang</tt> ― Angle to rotate by</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="VMatrix:transpose"></a><strong>VMatrix:transpose</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:scale"></a><strong>VMatrix:scale</strong>( vec )</dt>
 <dd>
-
-Transposes the matrix
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Scale the matrix</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vec</tt> ― Vector to scale by</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-</dl>
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:scaleTranslation"></a><strong>VMatrix:scaleTranslation</strong>( num )</dt>
+<dd>
+	<p>
+Scales the absolute translation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>num</tt> ― Amount to scale by</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:set"></a><strong>VMatrix:set</strong>( src )</dt>
+<dd>
+	<p>
+Copies the values from the second matrix to the first matrix. Self-Modifies</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>src</tt> ― Second matrix</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setAngles"></a><strong>VMatrix:setAngles</strong>( ang )</dt>
+<dd>
+	<p>
+Sets the angles</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ang</tt> ― New angles</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setField"></a><strong>VMatrix:setField</strong>( row, column, value )</dt>
+<dd>
+	<p>
+Sets a specific field in the matrix</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>row</tt> ― A number from 1 to 4</li>
+			<li><tt>column</tt> ― A number from 1 to 4</li>
+			<li><tt>value</tt> ― Value to set</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setForward"></a><strong>VMatrix:setForward</strong>( forward )</dt>
+<dd>
+	<p>
+Sets the forward direction of the matrix. First column</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>forward</tt> ― The forward vector</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setIdentity"></a><strong>VMatrix:setIdentity</strong>(  )</dt>
+<dd>
+	<p>
+Initializes the matrix as Identity matrix</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setRight"></a><strong>VMatrix:setRight</strong>( right )</dt>
+<dd>
+	<p>
+Sets the right direction of the matrix. Negated second column</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>right</tt> ― The right vector</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setScale"></a><strong>VMatrix:setScale</strong>( vec )</dt>
+<dd>
+	<p>
+Sets the scale</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vec</tt> ― New scale</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setTranslation"></a><strong>VMatrix:setTranslation</strong>( vec )</dt>
+<dd>
+	<p>
+Sets the translation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vec</tt> ― New translation</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:setUp"></a><strong>VMatrix:setUp</strong>( up )</dt>
+<dd>
+	<p>
+Sets the up direction of the matrix. Third column</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>up</tt> ― The up vector</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:toTable"></a><strong>VMatrix:toTable</strong>(  )</dt>
+<dd>
+	<p>
+Converts the matrix to a 4x4 table</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The 4x4 table</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:translate"></a><strong>VMatrix:translate</strong>( vec )</dt>
+<dd>
+	<p>
+Translate the matrix</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vec</tt> ― Vector to translate by</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="VMatrix:transpose"></a><strong>VMatrix:transpose</strong>(  )</dt>
+<dd>
+	<p>
+Transposes the matrix</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+	</dl>
+</section>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>

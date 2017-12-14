@@ -1,2224 +1,1638 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath=""</script>
-<script type="text/javascript" src="search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><strong>Index</strong></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="libraries/mesh.html">mesh</a>
-		</li>
-	
-		<li>
-			<a href="libraries/net.html">net</a>
-		</li>
-	
-		<li>
-			<a href="libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="libraries/quaternion.html">quaternion</a>
-		</li>
-	
-		<li>
-			<a href="libraries/render.html">render</a>
-		</li>
-	
-		<li>
-			<a href="libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="classes/Angle.html">Angle</a></li>
-			
-				<li><a href="classes/Bass.html">Bass</a></li>
-			
-				<li><a href="classes/Color.html">Color</a></li>
-			
-				<li><a href="classes/Entity.html">Entity</a></li>
-			
-				<li><a href="classes/File.html">File</a></li>
-			
-				<li><a href="classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="classes/Npc.html">Npc</a></li>
-			
-				<li><a href="classes/Particle.html">Particle</a></li>
-			
-				<li><a href="classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><a href="classes/Player.html">Player</a></li>
-			
-				<li><a href="classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="classes/Sound.html">Sound</a></li>
-			
-				<li><a href="classes/VMatrix.html">VMatrix</a></li>
-			
-				<li><a href="classes/Vector.html">Vector</a></li>
-			
-				<li><a href="classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
+	<head>
+		<title>Hooks :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="assets/stylesheet.css" type="text/css">
+		<script> fromPath = ""; </script>
+		<script src="assets/js/common.js"></script>
+		<script src="assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li>net</li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li>render</li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li>Bass</li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li>File</li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li>Player</li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li>VMatrix</li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="directives.html#client">--@client</a></li>
+						<li><a href="directives.html#include">--@include</a></li>
+						<li><a href="directives.html#includedir">--@includedir</a></li>
+						<li><a href="directives.html#model">--@model</a></li>
+						<li><a href="directives.html#name">--@name</a></li>
+						<li><a href="directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
 <h1>Hooks</h1>
-
-<p>List of hooks available to SF scripts</p>
-
-<h2>List</h2>
-<table class="hook_list">
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#EndEntityDriving">EndEntityDriving</a>&nbsp;(ent, ply)</td>
-	<td class="summary">
+<p>List of hooks available to Starfall scripts.</p>
+<section class="hooks">
+	<h2>List</h2>
+	<table class="list">
+		
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#EndEntityDriving">EndEntityDriving</a>( ent, ply)</td>
+			<td class="summary">
 Called when a player stops driving an entity </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#EntityRemoved">EntityRemoved</a>&nbsp;(ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#EntityRemoved">EntityRemoved</a>( ent)</td>
+			<td class="summary">
 Called when an entity is removed </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#EntityTakeDamage">EntityTakeDamage</a>&nbsp;(target, attacker, inflictor, amount, type, position, force)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#EntityTakeDamage">EntityTakeDamage</a>( target, attacker, inflictor, amount, type, position, force)</td>
+			<td class="summary">
 Called when an entity is damaged </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#FinishChat">FinishChat</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#FinishChat">FinishChat</a>( )</td>
+			<td class="summary">
 Called when the local player closes their chat window.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#GravGunOnDropped">GravGunOnDropped</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#GravGunOnDropped">GravGunOnDropped</a>( ply, ent)</td>
+			<td class="summary">
 Called when an entity is being dropped by a gravity gun </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#GravGunOnPickedUp">GravGunOnPickedUp</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#GravGunOnPickedUp">GravGunOnPickedUp</a>( ply, ent)</td>
+			<td class="summary">
 Called when an entity is being picked up by a gravity gun </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#GravGunPunt">GravGunPunt</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#GravGunPunt">GravGunPunt</a>( ply, ent)</td>
+			<td class="summary">
 Called when a player punts with the gravity gun </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#Initialize">Initialize</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Initialize">Initialize</a>( )</td>
+			<td class="summary">
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#KeyPress">KeyPress</a>&nbsp;(ply, key)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#KeyPress">KeyPress</a>( ply, key)</td>
+			<td class="summary">
 Called when a player presses a key </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#KeyRelease">KeyRelease</a>&nbsp;(ply, key)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#KeyRelease">KeyRelease</a>( ply, key)</td>
+			<td class="summary">
 Called when a player releases a key </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#OnEntityCreated">OnEntityCreated</a>&nbsp;(ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#OnEntityCreated">OnEntityCreated</a>( ent)</td>
+			<td class="summary">
 Called when an entity gets created </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#OnPhysgunFreeze">OnPhysgunFreeze</a>&nbsp;(physgun, physobj, ent, ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#OnPhysgunFreeze">OnPhysgunFreeze</a>( physgun, physobj, ent, ply)</td>
+			<td class="summary">
 Called when an entity is being frozen </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#OnPhysgunReload">OnPhysgunReload</a>&nbsp;(physgun, ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#OnPhysgunReload">OnPhysgunReload</a>( physgun, ply)</td>
+			<td class="summary">
 Called when a player reloads his physgun </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PhysgunDrop">PhysgunDrop</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysgunDrop">PhysgunDrop</a>( ply, ent)</td>
+			<td class="summary">
 Called when an entity being held by a physgun gets dropped </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PhysgunPickup">PhysgunPickup</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysgunPickup">PhysgunPickup</a>( ply, ent)</td>
+			<td class="summary">
 Called when an entity gets picked up by a physgun </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>&nbsp;(ply, wep)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>( ply, wep)</td>
+			<td class="summary">
 Called when a wants to pick up a weapon </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerChat">PlayerChat</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerChat">PlayerChat</a>( )</td>
+			<td class="summary">
 Called when a player's chat message is printed to the chat window </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerDeath">PlayerDeath</a>&nbsp;(ply, inflictor, attacker)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerDeath">PlayerDeath</a>( ply, inflictor, attacker)</td>
+			<td class="summary">
 Called when a player dies </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerDisconnected">PlayerDisconnected</a>&nbsp;(ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerDisconnected">PlayerDisconnected</a>( ply)</td>
+			<td class="summary">
 Called when a player disconnects </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerEnteredVehicle">PlayerEnteredVehicle</a>&nbsp;(ply, vehicle, num)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerEnteredVehicle">PlayerEnteredVehicle</a>( ply, vehicle, num)</td>
+			<td class="summary">
 Called when a players enters a vehicle </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerHurt">PlayerHurt</a>&nbsp;(ply, attacker, newHealth, damageTaken)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerHurt">PlayerHurt</a>( ply, attacker, newHealth, damageTaken)</td>
+			<td class="summary">
 Called when a player gets hurt </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerInitialSpawn">PlayerInitialSpawn</a>&nbsp;(ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerInitialSpawn">PlayerInitialSpawn</a>( ply)</td>
+			<td class="summary">
 Called when a player spawns for the first time </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerLeaveVehicle">PlayerLeaveVehicle</a>&nbsp;(ply, vehicle)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerLeaveVehicle">PlayerLeaveVehicle</a>( ply, vehicle)</td>
+			<td class="summary">
 Called when a players leaves a vehicle </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerNoClip">PlayerNoClip</a>&nbsp;(ply, newState)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerNoClip">PlayerNoClip</a>( ply, newState)</td>
+			<td class="summary">
 Called when a player toggles noclip </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerSay">PlayerSay</a>&nbsp;(ply, text, teamChat)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerSay">PlayerSay</a>( ply, text, teamChat)</td>
+			<td class="summary">
 Called when a player sends a chat message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerSpawn">PlayerSpawn</a>&nbsp;(ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerSpawn">PlayerSpawn</a>( ply)</td>
+			<td class="summary">
 Called when a player spawns </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerSpray">PlayerSpray</a>&nbsp;(ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerSpray">PlayerSpray</a>( ply)</td>
+			<td class="summary">
 Called when a players sprays his logo </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>&nbsp;(ply, state)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>( ply, state)</td>
+			<td class="summary">
 Called when a players turns their flashlight on or off </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerSwitchWeapon">PlayerSwitchWeapon</a>&nbsp;(ply, oldwep, newweapon)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerSwitchWeapon">PlayerSwitchWeapon</a>( ply, oldwep, newweapon)</td>
+			<td class="summary">
 Called when a player switches their weapon </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PlayerUse">PlayerUse</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerUse">PlayerUse</a>( ply, ent)</td>
+			<td class="summary">
 Called when a player holds their use key and looks at an entity.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#PropBreak">PropBreak</a>&nbsp;(ply, ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PropBreak">PropBreak</a>( ply, ent)</td>
+			<td class="summary">
 Called when an entity is broken </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#Removed">Removed</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Removed">Removed</a>( )</td>
+			<td class="summary">
 Called when the starfall chip is removed </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#StartChat">StartChat</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StartChat">StartChat</a>( )</td>
+			<td class="summary">
 Called when the local player opens their chat window.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#StartEntityDriving">StartEntityDriving</a>&nbsp;(ent, ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StartEntityDriving">StartEntityDriving</a>( ent, ply)</td>
+			<td class="summary">
 Called when a player starts driving an entity </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#calcview">calcview</a>&nbsp;(pos, ang, fov, znear, zfar)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#calcview">calcview</a>( pos, ang, fov, znear, zfar)</td>
+			<td class="summary">
 Called when the engine wants to calculate the player's view </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#drawhud">drawhud</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#drawhud">drawhud</a>( )</td>
+			<td class="summary">
 Called when a frame is requested to be drawn on hud.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#hudconnected">hudconnected</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#hudconnected">hudconnected</a>( )</td>
+			<td class="summary">
 Called when the player connects to a HUD component linked to the Starfall Chip </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#huddisconnected">huddisconnected</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#huddisconnected">huddisconnected</a>( )</td>
+			<td class="summary">
 Called when the player disconnects from a HUD component linked to the Starfall Chip </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#input">input</a>&nbsp;(input, value)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#input">input</a>( input, value)</td>
+			<td class="summary">
 Called when an input on a wired SF chip is written to </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#inputPressed">inputPressed</a>&nbsp;(button)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#inputPressed">inputPressed</a>( button)</td>
+			<td class="summary">
 Called when a button is pressed </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#inputReleased">inputReleased</a>&nbsp;(button)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#inputReleased">inputReleased</a>( button)</td>
+			<td class="summary">
 Called when a button is released </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#mousemoved">mousemoved</a>&nbsp;(x, y)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#mousemoved">mousemoved</a>( x, y)</td>
+			<td class="summary">
 Called when the mouse is moved </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net">net</a>&nbsp;(name, len, ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net">net</a>( name, len, ply)</td>
+			<td class="summary">
 Called when a net message arrives </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#postdrawhud">postdrawhud</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#postdrawhud">postdrawhud</a>( )</td>
+			<td class="summary">
 Called after drawing HUD (2D Context) </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#postdrawopaquerenderables">postdrawopaquerenderables</a>&nbsp;(boolean)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#postdrawopaquerenderables">postdrawopaquerenderables</a>( boolean)</td>
+			<td class="summary">
 Called after opaque entities are drawn.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#predrawhud">predrawhud</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#predrawhud">predrawhud</a>( )</td>
+			<td class="summary">
 Called before drawing HUD (2D Context) </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#predrawopaquerenderables">predrawopaquerenderables</a>&nbsp;(boolean)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#predrawopaquerenderables">predrawopaquerenderables</a>( boolean)</td>
+			<td class="summary">
 Called before opaque entities are drawn.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#readcell">readcell</a>&nbsp;(address)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#readcell">readcell</a>( address)</td>
+			<td class="summary">
 Called when a high speed device reads from a wired SF chip </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#remote">remote</a>&nbsp;(sender, owner, ...)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#remote">remote</a>( sender, owner, ...)</td>
+			<td class="summary">
 Remote hook.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render">render</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render">render</a>( )</td>
+			<td class="summary">
 Called when a frame is requested to be drawn on screen.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#renderoffscreen">renderoffscreen</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#renderoffscreen">renderoffscreen</a>( )</td>
+			<td class="summary">
 Called when a frame is requested to be drawn.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#starfallUsed">starfallUsed</a>&nbsp;(activator)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#starfallUsed">starfallUsed</a>( activator)</td>
+			<td class="summary">
 Called when a player uses the screen </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#think">think</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#think">think</a>( )</td>
+			<td class="summary">
 Think hook.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#tick">tick</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#tick">tick</a>( )</td>
+			<td class="summary">
 Tick hook.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sv">&nbsp;</span><a href="#writecell">writecell</a>&nbsp;(address, data)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#writecell">writecell</a>( address, data)</td>
+			<td class="summary">
 Called when a high speed device writes to a wired SF chip </td>
-	</tr>
-
-</table>
-
-<br/>
-<br/>
-
-<dl class="hook">
-
+		</tr>
+	</table>
+</section>
+<dl class="hooks">
 	
-	<dt><a name="EndEntityDriving"></a><span class="realm_sh">&nbsp;</span><strong>EndEntityDriving</strong>&nbsp;(ent, ply)</dt>
+	<dt><a name="EndEntityDriving"></a><span class="realm_sh"></span><strong>EndEntityDriving</strong>( ent, ply )</dt>
 	<dd>
-	
-Called when a player stops driving an entity
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player stops driving an entity</p>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity that had been driven
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ent</tt> ― Entity that had been driven
+				</li>
+				
+				<li>
+					<tt>ply</tt> ― Player that drove the entity
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ply</em></code>: Player that drove the entity
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="EntityRemoved"></a><span class="realm_sh">&nbsp;</span><strong>EntityRemoved</strong>&nbsp;(ent)</dt>
+	<dt><a name="EntityRemoved"></a><span class="realm_sh"></span><strong>EntityRemoved</strong>( ent )</dt>
 	<dd>
-	
-Called when an entity is removed
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity is removed</p>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being removed
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ent</tt> ― Entity being removed
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="EntityTakeDamage"></a><span class="realm_sh">&nbsp;</span><strong>EntityTakeDamage</strong>&nbsp;(target, attacker, inflictor, amount, type, position, force)</dt>
+	<dt><a name="EntityTakeDamage"></a><span class="realm_sh"></span><strong>EntityTakeDamage</strong>( target, attacker, inflictor, amount, type, position, force )</dt>
 	<dd>
-	
-Called when an entity is damaged
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity is damaged</p>
 		
-		<li>
-		  <code><em>target</em></code>: Entity that is hurt
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>target</tt> ― Entity that is hurt
+				</li>
+				
+				<li>
+					<tt>attacker</tt> ― Entity that attacked
+				</li>
+				
+				<li>
+					<tt>inflictor</tt> ― Entity that inflicted the damage
+				</li>
+				
+				<li>
+					<tt>amount</tt> ― How much damage
+				</li>
+				
+				<li>
+					<tt>type</tt> ― Type of the damage
+				</li>
+				
+				<li>
+					<tt>position</tt> ― Position of the damage
+				</li>
+				
+				<li>
+					<tt>force</tt> ― Force of the damage
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>attacker</em></code>: Entity that attacked
-		</li>
-		
-		<li>
-		  <code><em>inflictor</em></code>: Entity that inflicted the damage
-		</li>
-		
-		<li>
-		  <code><em>amount</em></code>: How much damage
-		</li>
-		
-		<li>
-		  <code><em>type</em></code>: Type of the damage
-		</li>
-		
-		<li>
-		  <code><em>position</em></code>: Position of the damage
-		</li>
-		
-		<li>
-		  <code><em>force</em></code>: Force of the damage
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="FinishChat"></a><span class="realm_sh">&nbsp;</span><strong>FinishChat</strong>&nbsp;()</dt>
+	<dt><a name="FinishChat"></a><span class="realm_sh"></span><strong>FinishChat</strong>(  )</dt>
 	<dd>
-	
-Called when the local player closes their chat window.
-
-	
-
-	
-
-	
-
+		<p>
+Called when the local player closes their chat window.</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="GravGunOnDropped"></a><span class="realm_sh">&nbsp;</span><strong>GravGunOnDropped</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="GravGunOnDropped"></a><span class="realm_sh"></span><strong>GravGunOnDropped</strong>( ply, ent )</dt>
 	<dd>
-	
-Called when an entity is being dropped by a gravity gun
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity is being dropped by a gravity gun</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player dropping the object
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player dropping the object
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being dropped
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being dropped
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="GravGunOnPickedUp"></a><span class="realm_sh">&nbsp;</span><strong>GravGunOnPickedUp</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="GravGunOnPickedUp"></a><span class="realm_sh"></span><strong>GravGunOnPickedUp</strong>( ply, ent )</dt>
 	<dd>
-	
-Called when an entity is being picked up by a gravity gun
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity is being picked up by a gravity gun</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player picking up an object
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player picking up an object
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being picked up
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being picked up
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="GravGunPunt"></a><span class="realm_sh">&nbsp;</span><strong>GravGunPunt</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="GravGunPunt"></a><span class="realm_sh"></span><strong>GravGunPunt</strong>( ply, ent )</dt>
 	<dd>
-	
-Called when a player punts with the gravity gun
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player punts with the gravity gun</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player punting the gravgun
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player punting the gravgun
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being punted
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being punted
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="Initialize"></a><span class="realm_sh">&nbsp;</span><strong>Initialize</strong>&nbsp;()</dt>
+	<dt><a name="Initialize"></a><span class="realm_sh"></span><strong>Initialize</strong>(  )</dt>
 	<dd>
-	
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.
-
-	
-
-	
-
-	
-
+		<p>
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="KeyPress"></a><span class="realm_sh">&nbsp;</span><strong>KeyPress</strong>&nbsp;(ply, key)</dt>
+	<dt><a name="KeyPress"></a><span class="realm_sh"></span><strong>KeyPress</strong>( ply, key )</dt>
 	<dd>
-	
-Called when a player presses a key
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player presses a key</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player pressing the key
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player pressing the key
+				</li>
+				
+				<li>
+					<tt>key</tt> ― The key being pressed
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>key</em></code>: The key being pressed
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="KeyRelease"></a><span class="realm_sh">&nbsp;</span><strong>KeyRelease</strong>&nbsp;(ply, key)</dt>
+	<dt><a name="KeyRelease"></a><span class="realm_sh"></span><strong>KeyRelease</strong>( ply, key )</dt>
 	<dd>
-	
-Called when a player releases a key
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player releases a key</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player releasing the key
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player releasing the key
+				</li>
+				
+				<li>
+					<tt>key</tt> ― The key being released
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>key</em></code>: The key being released
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="OnEntityCreated"></a><span class="realm_sh">&nbsp;</span><strong>OnEntityCreated</strong>&nbsp;(ent)</dt>
+	<dt><a name="OnEntityCreated"></a><span class="realm_sh"></span><strong>OnEntityCreated</strong>( ent )</dt>
 	<dd>
-	
-Called when an entity gets created
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity gets created</p>
 		
-		<li>
-		  <code><em>ent</em></code>: New entity
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ent</tt> ― New entity
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="OnPhysgunFreeze"></a><span class="realm_sh">&nbsp;</span><strong>OnPhysgunFreeze</strong>&nbsp;(physgun, physobj, ent, ply)</dt>
+	<dt><a name="OnPhysgunFreeze"></a><span class="realm_sh"></span><strong>OnPhysgunFreeze</strong>( physgun, physobj, ent, ply )</dt>
 	<dd>
-	
-Called when an entity is being frozen
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity is being frozen</p>
 		
-		<li>
-		  <code><em>physgun</em></code>: Entity of the physgun
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>physgun</tt> ― Entity of the physgun
+				</li>
+				
+				<li>
+					<tt>physobj</tt> ― PhysObj of the entity
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being frozen
+				</li>
+				
+				<li>
+					<tt>ply</tt> ― Player freezing the entity
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>physobj</em></code>: PhysObj of the entity
-		</li>
-		
-		<li>
-		  <code><em>ent</em></code>: Entity being frozen
-		</li>
-		
-		<li>
-		  <code><em>ply</em></code>: Player freezing the entity
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="OnPhysgunReload"></a><span class="realm_sh">&nbsp;</span><strong>OnPhysgunReload</strong>&nbsp;(physgun, ply)</dt>
+	<dt><a name="OnPhysgunReload"></a><span class="realm_sh"></span><strong>OnPhysgunReload</strong>( physgun, ply )</dt>
 	<dd>
-	
-Called when a player reloads his physgun
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player reloads his physgun</p>
 		
-		<li>
-		  <code><em>physgun</em></code>: Entity of the physgun
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>physgun</tt> ― Entity of the physgun
+				</li>
+				
+				<li>
+					<tt>ply</tt> ― Player reloading the physgun
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ply</em></code>: Player reloading the physgun
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PhysgunDrop"></a><span class="realm_sh">&nbsp;</span><strong>PhysgunDrop</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="PhysgunDrop"></a><span class="realm_sh"></span><strong>PhysgunDrop</strong>( ply, ent )</dt>
 	<dd>
-	
-Called when an entity being held by a physgun gets dropped
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity being held by a physgun gets dropped</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player droppig the entity
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player droppig the entity
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being dropped
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being dropped
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PhysgunPickup"></a><span class="realm_sh">&nbsp;</span><strong>PhysgunPickup</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="PhysgunPickup"></a><span class="realm_sh"></span><strong>PhysgunPickup</strong>( ply, ent )</dt>
 	<dd>
-	
-Called when an entity gets picked up by a physgun
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity gets picked up by a physgun</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player picking up the entity
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player picking up the entity
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being picked up
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being picked up
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerCanPickupWeapon"></a><span class="realm_sh">&nbsp;</span><strong>PlayerCanPickupWeapon</strong>&nbsp;(ply, wep)</dt>
+	<dt><a name="PlayerCanPickupWeapon"></a><span class="realm_sh"></span><strong>PlayerCanPickupWeapon</strong>( ply, wep )</dt>
 	<dd>
-	
-Called when a wants to pick up a weapon
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a wants to pick up a weapon</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player
+				</li>
+				
+				<li>
+					<tt>wep</tt> ― Weapon
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>wep</em></code>: Weapon
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerChat"></a><span class="realm_sh">&nbsp;</span><strong>PlayerChat</strong>&nbsp;()</dt>
+	<dt><a name="PlayerChat"></a><span class="realm_sh"></span><strong>PlayerChat</strong>(  )</dt>
 	<dd>
-	
-Called when a player's chat message is printed to the chat window
-
-	
-
-	
-
-	
-
+		<p>
+Called when a player's chat message is printed to the chat window</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerDeath"></a><span class="realm_sh">&nbsp;</span><strong>PlayerDeath</strong>&nbsp;(ply, inflictor, attacker)</dt>
+	<dt><a name="PlayerDeath"></a><span class="realm_sh"></span><strong>PlayerDeath</strong>( ply, inflictor, attacker )</dt>
 	<dd>
-	
-Called when a player dies
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player dies</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player who died
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player who died
+				</li>
+				
+				<li>
+					<tt>inflictor</tt> ― Entity used to kill the player
+				</li>
+				
+				<li>
+					<tt>attacker</tt> ― Entity that killed the player
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>inflictor</em></code>: Entity used to kill the player
-		</li>
-		
-		<li>
-		  <code><em>attacker</em></code>: Entity that killed the player
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerDisconnected"></a><span class="realm_sh">&nbsp;</span><strong>PlayerDisconnected</strong>&nbsp;(ply)</dt>
+	<dt><a name="PlayerDisconnected"></a><span class="realm_sh"></span><strong>PlayerDisconnected</strong>( ply )</dt>
 	<dd>
-	
-Called when a player disconnects
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player disconnects</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player that disconnected
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player that disconnected
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerEnteredVehicle"></a><span class="realm_sh">&nbsp;</span><strong>PlayerEnteredVehicle</strong>&nbsp;(ply, vehicle, num)</dt>
+	<dt><a name="PlayerEnteredVehicle"></a><span class="realm_sh"></span><strong>PlayerEnteredVehicle</strong>( ply, vehicle, num )</dt>
 	<dd>
-	
-Called when a players enters a vehicle
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a players enters a vehicle</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player who entered a vehicle
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player who entered a vehicle
+				</li>
+				
+				<li>
+					<tt>vehicle</tt> ― Vehicle that was entered
+				</li>
+				
+				<li>
+					<tt>num</tt> ― Role
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>vehicle</em></code>: Vehicle that was entered
-		</li>
-		
-		<li>
-		  <code><em>num</em></code>: Role
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerHurt"></a><span class="realm_sh">&nbsp;</span><strong>PlayerHurt</strong>&nbsp;(ply, attacker, newHealth, damageTaken)</dt>
+	<dt><a name="PlayerHurt"></a><span class="realm_sh"></span><strong>PlayerHurt</strong>( ply, attacker, newHealth, damageTaken )</dt>
 	<dd>
-	
-Called when a player gets hurt
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player gets hurt</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player being hurt
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player being hurt
+				</li>
+				
+				<li>
+					<tt>attacker</tt> ― Entity causing damage to the player
+				</li>
+				
+				<li>
+					<tt>newHealth</tt> ― New health of the player
+				</li>
+				
+				<li>
+					<tt>damageTaken</tt> ― Amount of damage the player has taken
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>attacker</em></code>: Entity causing damage to the player
-		</li>
-		
-		<li>
-		  <code><em>newHealth</em></code>: New health of the player
-		</li>
-		
-		<li>
-		  <code><em>damageTaken</em></code>: Amount of damage the player has taken
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerInitialSpawn"></a><span class="realm_sh">&nbsp;</span><strong>PlayerInitialSpawn</strong>&nbsp;(ply)</dt>
+	<dt><a name="PlayerInitialSpawn"></a><span class="realm_sh"></span><strong>PlayerInitialSpawn</strong>( ply )</dt>
 	<dd>
-	
-Called when a player spawns for the first time
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player spawns for the first time</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player who spawned
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player who spawned
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerLeaveVehicle"></a><span class="realm_sh">&nbsp;</span><strong>PlayerLeaveVehicle</strong>&nbsp;(ply, vehicle)</dt>
+	<dt><a name="PlayerLeaveVehicle"></a><span class="realm_sh"></span><strong>PlayerLeaveVehicle</strong>( ply, vehicle )</dt>
 	<dd>
-	
-Called when a players leaves a vehicle
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a players leaves a vehicle</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player who left a vehicle
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player who left a vehicle
+				</li>
+				
+				<li>
+					<tt>vehicle</tt> ― Vehicle that was left
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>vehicle</em></code>: Vehicle that was left
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerNoClip"></a><span class="realm_sh">&nbsp;</span><strong>PlayerNoClip</strong>&nbsp;(ply, newState)</dt>
+	<dt><a name="PlayerNoClip"></a><span class="realm_sh"></span><strong>PlayerNoClip</strong>( ply, newState )</dt>
 	<dd>
-	
-Called when a player toggles noclip
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player toggles noclip</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player toggling noclip
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player toggling noclip
+				</li>
+				
+				<li>
+					<tt>newState</tt> ― New noclip state. True if on.
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>newState</em></code>: New noclip state. True if on.
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerSay"></a><span class="realm_sh">&nbsp;</span><strong>PlayerSay</strong>&nbsp;(ply, text, teamChat)</dt>
+	<dt><a name="PlayerSay"></a><span class="realm_sh"></span><strong>PlayerSay</strong>( ply, text, teamChat )</dt>
 	<dd>
-	
-Called when a player sends a chat message
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player sends a chat message</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player that sent the message
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player that sent the message
+				</li>
+				
+				<li>
+					<tt>text</tt> ― Content of the message
+				</li>
+				
+				<li>
+					<tt>teamChat</tt> ― True if team chat
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>text</em></code>: Content of the message
-		</li>
-		
-		<li>
-		  <code><em>teamChat</em></code>: True if team chat
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-	<h3>Return value:</h3>
-	<ul>New text. "" to stop from displaying. Nil to keep original.</ul>
-	
-
+		<section class="return">
+			
+			<h3>Return value:</h3>
+			<p>New text. "" to stop from displaying. Nil to keep original.</p>
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerSpawn"></a><span class="realm_sh">&nbsp;</span><strong>PlayerSpawn</strong>&nbsp;(ply)</dt>
+	<dt><a name="PlayerSpawn"></a><span class="realm_sh"></span><strong>PlayerSpawn</strong>( ply )</dt>
 	<dd>
-	
-Called when a player spawns
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player spawns</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player who spawned
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player who spawned
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerSpray"></a><span class="realm_sh">&nbsp;</span><strong>PlayerSpray</strong>&nbsp;(ply)</dt>
+	<dt><a name="PlayerSpray"></a><span class="realm_sh"></span><strong>PlayerSpray</strong>( ply )</dt>
 	<dd>
-	
-Called when a players sprays his logo
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a players sprays his logo</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player that sprayed
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player that sprayed
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerSwitchFlashlight"></a><span class="realm_sh">&nbsp;</span><strong>PlayerSwitchFlashlight</strong>&nbsp;(ply, state)</dt>
+	<dt><a name="PlayerSwitchFlashlight"></a><span class="realm_sh"></span><strong>PlayerSwitchFlashlight</strong>( ply, state )</dt>
 	<dd>
-	
-Called when a players turns their flashlight on or off
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a players turns their flashlight on or off</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player switching flashlight
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player switching flashlight
+				</li>
+				
+				<li>
+					<tt>state</tt> ― New flashlight state. True if on.
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>state</em></code>: New flashlight state. True if on.
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerSwitchWeapon"></a><span class="realm_sh">&nbsp;</span><strong>PlayerSwitchWeapon</strong>&nbsp;(ply, oldwep, newweapon)</dt>
+	<dt><a name="PlayerSwitchWeapon"></a><span class="realm_sh"></span><strong>PlayerSwitchWeapon</strong>( ply, oldwep, newweapon )</dt>
 	<dd>
-	
-Called when a player switches their weapon
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player switches their weapon</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player droppig the entity
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player droppig the entity
+				</li>
+				
+				<li>
+					<tt>oldwep</tt> ― Old weapon
+				</li>
+				
+				<li>
+					<tt>newweapon</tt> ― New weapon
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>oldwep</em></code>: Old weapon
-		</li>
-		
-		<li>
-		  <code><em>newweapon</em></code>: New weapon
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PlayerUse"></a><span class="realm_sh">&nbsp;</span><strong>PlayerUse</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="PlayerUse"></a><span class="realm_sh"></span><strong>PlayerUse</strong>( ply, ent )</dt>
 	<dd>
-	
+		<p>
 Called when a player holds their use key and looks at an entity. 
-Will continuously run.
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+Will continuously run.</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player using the entity
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player using the entity
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity being used
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being used
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="PropBreak"></a><span class="realm_sh">&nbsp;</span><strong>PropBreak</strong>&nbsp;(ply, ent)</dt>
+	<dt><a name="PropBreak"></a><span class="realm_sh"></span><strong>PropBreak</strong>( ply, ent )</dt>
 	<dd>
-	
-Called when an entity is broken
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an entity is broken</p>
 		
-		<li>
-		  <code><em>ply</em></code>: Player who broke it
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player who broke it
+				</li>
+				
+				<li>
+					<tt>ent</tt> ― Entity broken
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity broken
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="Removed"></a><span class="realm_sh">&nbsp;</span><strong>Removed</strong>&nbsp;()</dt>
+	<dt><a name="Removed"></a><span class="realm_sh"></span><strong>Removed</strong>(  )</dt>
 	<dd>
-	
-Called when the starfall chip is removed
-
-	
-
-	
-
-	
-
+		<p>
+Called when the starfall chip is removed</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="StartChat"></a><span class="realm_sh">&nbsp;</span><strong>StartChat</strong>&nbsp;()</dt>
+	<dt><a name="StartChat"></a><span class="realm_sh"></span><strong>StartChat</strong>(  )</dt>
 	<dd>
-	
-Called when the local player opens their chat window.
-
-	
-
-	
-
-	
-
+		<p>
+Called when the local player opens their chat window.</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="StartEntityDriving"></a><span class="realm_sh">&nbsp;</span><strong>StartEntityDriving</strong>&nbsp;(ent, ply)</dt>
+	<dt><a name="StartEntityDriving"></a><span class="realm_sh"></span><strong>StartEntityDriving</strong>( ent, ply )</dt>
 	<dd>
-	
-Called when a player starts driving an entity
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a player starts driving an entity</p>
 		
-		<li>
-		  <code><em>ent</em></code>: Entity being driven
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ent</tt> ― Entity being driven
+				</li>
+				
+				<li>
+					<tt>ply</tt> ― Player that is driving the entity
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ply</em></code>: Player that is driving the entity
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="calcview"></a><span class="realm_cl">&nbsp;</span><strong>calcview</strong>&nbsp;(pos, ang, fov, znear, zfar)</dt>
+	<dt><a name="calcview"></a><span class="realm_cl"></span><strong>calcview</strong>( pos, ang, fov, znear, zfar )</dt>
 	<dd>
-	
-Called when the engine wants to calculate the player's view
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when the engine wants to calculate the player's view</p>
 		
-		<li>
-		  <code><em>pos</em></code>: Current position of the camera
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>pos</tt> ― Current position of the camera
+				</li>
+				
+				<li>
+					<tt>ang</tt> ― Current angles of the camera
+				</li>
+				
+				<li>
+					<tt>fov</tt> ― Current fov of the camera
+				</li>
+				
+				<li>
+					<tt>znear</tt> ― Current near plane of the camera
+				</li>
+				
+				<li>
+					<tt>zfar</tt> ― Current far plane of the camera
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>ang</em></code>: Current angles of the camera
-		</li>
-		
-		<li>
-		  <code><em>fov</em></code>: Current fov of the camera
-		</li>
-		
-		<li>
-		  <code><em>znear</em></code>: Current near plane of the camera
-		</li>
-		
-		<li>
-		  <code><em>zfar</em></code>: Current far plane of the camera
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-	<h3>Return value:</h3>
-	<ul>table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}</ul>
-	
-
+		<section class="return">
+			
+			<h3>Return value:</h3>
+			<p>table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}</p>
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="drawhud"></a><span class="realm_cl">&nbsp;</span><strong>drawhud</strong>&nbsp;()</dt>
+	<dt><a name="drawhud"></a><span class="realm_cl"></span><strong>drawhud</strong>(  )</dt>
 	<dd>
-	
-Called when a frame is requested to be drawn on hud. (2D Context)
-
-	
-
-	
-
-	
-
+		<p>
+Called when a frame is requested to be drawn on hud. (2D Context)</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="hudconnected"></a><span class="realm_cl">&nbsp;</span><strong>hudconnected</strong>&nbsp;()</dt>
+	<dt><a name="hudconnected"></a><span class="realm_cl"></span><strong>hudconnected</strong>(  )</dt>
 	<dd>
-	
-Called when the player connects to a HUD component linked to the Starfall Chip
-
-	
-
-	
-
-	
-
+		<p>
+Called when the player connects to a HUD component linked to the Starfall Chip</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="huddisconnected"></a><span class="realm_cl">&nbsp;</span><strong>huddisconnected</strong>&nbsp;()</dt>
+	<dt><a name="huddisconnected"></a><span class="realm_cl"></span><strong>huddisconnected</strong>(  )</dt>
 	<dd>
-	
-Called when the player disconnects from a HUD component linked to the Starfall Chip
-
-	
-
-	
-
-	
-
+		<p>
+Called when the player disconnects from a HUD component linked to the Starfall Chip</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="input"></a><span class="realm_sv">&nbsp;</span><strong>input</strong>&nbsp;(input, value)</dt>
+	<dt><a name="input"></a><span class="realm_sv"></span><strong>input</strong>( input, value )</dt>
 	<dd>
-	
-Called when an input on a wired SF chip is written to
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when an input on a wired SF chip is written to</p>
 		
-		<li>
-		  <code><em>input</em></code>: The input name
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>input</tt> ― The input name
+				</li>
+				
+				<li>
+					<tt>value</tt> ― The value of the input
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>value</em></code>: The value of the input
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="inputPressed"></a><span class="realm_sh">&nbsp;</span><strong>inputPressed</strong>&nbsp;(button)</dt>
+	<dt><a name="inputPressed"></a><span class="realm_sh"></span><strong>inputPressed</strong>( button )</dt>
 	<dd>
-	
-Called when a button is pressed
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a button is pressed</p>
 		
-		<li>
-		  <code><em>button</em></code>: Number of the button
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>button</tt> ― Number of the button
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="inputReleased"></a><span class="realm_sh">&nbsp;</span><strong>inputReleased</strong>&nbsp;(button)</dt>
+	<dt><a name="inputReleased"></a><span class="realm_sh"></span><strong>inputReleased</strong>( button )</dt>
 	<dd>
-	
-Called when a button is released
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a button is released</p>
 		
-		<li>
-		  <code><em>button</em></code>: Number of the button
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>button</tt> ― Number of the button
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="mousemoved"></a><span class="realm_sh">&nbsp;</span><strong>mousemoved</strong>&nbsp;(x, y)</dt>
+	<dt><a name="mousemoved"></a><span class="realm_sh"></span><strong>mousemoved</strong>( x, y )</dt>
 	<dd>
-	
-Called when the mouse is moved
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when the mouse is moved</p>
 		
-		<li>
-		  <code><em>x</em></code>: X coordinate moved
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>x</tt> ― X coordinate moved
+				</li>
+				
+				<li>
+					<tt>y</tt> ― Y coordinate moved
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>y</em></code>: Y coordinate moved
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="net"></a><span class="realm_sh">&nbsp;</span><strong>net</strong>&nbsp;(name, len, ply)</dt>
+	<dt><a name="net"></a><span class="realm_sh"></span><strong>net</strong>( name, len, ply )</dt>
 	<dd>
-	
-Called when a net message arrives
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a net message arrives</p>
 		
-		<li>
-		  <code><em>name</em></code>: Name of the arriving net message
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>name</tt> ― Name of the arriving net message
+				</li>
+				
+				<li>
+					<tt>len</tt> ― Length of the arriving net message in bytes
+				</li>
+				
+				<li>
+					<tt>ply</tt> ― On server, the player that sent the message. Nil on client.
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>len</em></code>: Length of the arriving net message in bytes
-		</li>
-		
-		<li>
-		  <code><em>ply</em></code>: On server, the player that sent the message. Nil on client.
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="postdrawhud"></a><span class="realm_cl">&nbsp;</span><strong>postdrawhud</strong>&nbsp;()</dt>
+	<dt><a name="postdrawhud"></a><span class="realm_cl"></span><strong>postdrawhud</strong>(  )</dt>
 	<dd>
-	
-Called after drawing HUD (2D Context)
-
-	
-
-	
-
-	
-
+		<p>
+Called after drawing HUD (2D Context)</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="postdrawopaquerenderables"></a><span class="realm_cl">&nbsp;</span><strong>postdrawopaquerenderables</strong>&nbsp;(boolean)</dt>
+	<dt><a name="postdrawopaquerenderables"></a><span class="realm_cl"></span><strong>postdrawopaquerenderables</strong>( boolean )</dt>
 	<dd>
-	
-Called after opaque entities are drawn. (Only works with HUD) (3D context)
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called after opaque entities are drawn. (Only works with HUD) (3D context)</p>
 		
-		<li>
-		  <code><em>boolean</em></code>: isDrawSkybox  Whether the current draw is drawing the skybox.
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>boolean</tt> ― isDrawSkybox  Whether the current draw is drawing the skybox.
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="predrawhud"></a><span class="realm_cl">&nbsp;</span><strong>predrawhud</strong>&nbsp;()</dt>
+	<dt><a name="predrawhud"></a><span class="realm_cl"></span><strong>predrawhud</strong>(  )</dt>
 	<dd>
-	
-Called before drawing HUD (2D Context)
-
-	
-
-	
-
-	
-
+		<p>
+Called before drawing HUD (2D Context)</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="predrawopaquerenderables"></a><span class="realm_cl">&nbsp;</span><strong>predrawopaquerenderables</strong>&nbsp;(boolean)</dt>
+	<dt><a name="predrawopaquerenderables"></a><span class="realm_cl"></span><strong>predrawopaquerenderables</strong>( boolean )</dt>
 	<dd>
-	
-Called before opaque entities are drawn. (Only works with HUD) (3D context)
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called before opaque entities are drawn. (Only works with HUD) (3D context)</p>
 		
-		<li>
-		  <code><em>boolean</em></code>: isDrawSkybox  Whether the current draw is drawing the skybox.
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>boolean</tt> ― isDrawSkybox  Whether the current draw is drawing the skybox.
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="readcell"></a><span class="realm_sv">&nbsp;</span><strong>readcell</strong>&nbsp;(address)</dt>
+	<dt><a name="readcell"></a><span class="realm_sv"></span><strong>readcell</strong>( address )</dt>
 	<dd>
-	
-Called when a high speed device reads from a wired SF chip
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a high speed device reads from a wired SF chip</p>
 		
-		<li>
-		  <code><em>address</em></code>: The address requested
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>address</tt> ― The address requested
+				</li>
+				
+			</ul>
+		</section>
 		
-	</ul>
-	
-
-	
-
-	
-	<h3>Return value:</h3>
-	<ul>The value read</ul>
-	
-
+		<section class="return">
+			
+			<h3>Return value:</h3>
+			<p>The value read</p>
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="remote"></a><span class="realm_sh">&nbsp;</span><strong>remote</strong>&nbsp;(sender, owner, ...)</dt>
+	<dt><a name="remote"></a><span class="realm_sh"></span><strong>remote</strong>( sender, owner, ... )</dt>
 	<dd>
-	
+		<p>
 Remote hook. 
-This hook can be called from other instances
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+This hook can be called from other instances</p>
 		
-		<li>
-		  <code><em>sender</em></code>: The entity that caused the hook to run
-		</li>
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>sender</tt> ― The entity that caused the hook to run
+				</li>
+				
+				<li>
+					<tt>owner</tt> ― The owner of the sender
+				</li>
+				
+				<li>
+					<tt>...</tt> ― The payload that was supplied when calling the hook
+				</li>
+				
+			</ul>
+		</section>
 		
-		<li>
-		  <code><em>owner</em></code>: The owner of the sender
-		</li>
-		
-		<li>
-		  <code><em>...</em></code>: The payload that was supplied when calling the hook
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="render"></a><span class="realm_cl">&nbsp;</span><strong>render</strong>&nbsp;()</dt>
+	<dt><a name="render"></a><span class="realm_cl"></span><strong>render</strong>(  )</dt>
 	<dd>
-	
-Called when a frame is requested to be drawn on screen. (2D/3D Context)
-
-	
-
-	
-
-	
-
-	</dd>
-
-	
-	<dt><a name="renderoffscreen"></a><span class="realm_cl">&nbsp;</span><strong>renderoffscreen</strong>&nbsp;()</dt>
-	<dd>
-	
-Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)
-
-	
-
-	
-
-	
-
-	</dd>
-
-	
-	<dt><a name="starfallUsed"></a><span class="realm_cl">&nbsp;</span><strong>starfallUsed</strong>&nbsp;(activator)</dt>
-	<dd>
-	
-Called when a player uses the screen
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Called when a frame is requested to be drawn on screen. (2D/3D Context)</p>
 		
-		<li>
-		  <code><em>activator</em></code>: Player using the screen
-		</li>
 		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="think"></a><span class="realm_sh">&nbsp;</span><strong>think</strong>&nbsp;()</dt>
+	<dt><a name="renderoffscreen"></a><span class="realm_cl"></span><strong>renderoffscreen</strong>(  )</dt>
 	<dd>
-	
-Think hook. Called each frame on the client and each game tick on the server.
-
-	
-
-	
-
-	
-
+		<p>
+Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)</p>
+		
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="tick"></a><span class="realm_sh">&nbsp;</span><strong>tick</strong>&nbsp;()</dt>
+	<dt><a name="starfallUsed"></a><span class="realm_cl"></span><strong>starfallUsed</strong>( activator )</dt>
 	<dd>
-	
-Tick hook. Called each game tick on both the server and client.
-
-	
-
-	
-
-	
-
+		<p>
+Called when a player uses the screen</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>activator</tt> ― Player using the screen
+				</li>
+				
+			</ul>
+		</section>
+		
+		<section class="return">
+			
+		</section>
 	</dd>
-
-	
-	<dt><a name="writecell"></a><span class="realm_sv">&nbsp;</span><strong>writecell</strong>&nbsp;(address, data)</dt>
+	<dt><a name="think"></a><span class="realm_sh"></span><strong>think</strong>(  )</dt>
 	<dd>
-	
-Called when a high speed device writes to a wired SF chip
-
-	
-	<h3>Parameters:</h3>
-	<ul>
+		<p>
+Think hook. Called each frame on the client and each game tick on the server.</p>
 		
-		<li>
-		  <code><em>address</em></code>: The address written to
-		</li>
 		
-		<li>
-		  <code><em>data</em></code>: The data being written
-		</li>
-		
-	</ul>
-	
-
-	
-
-	
-
+		<section class="return">
+			
+		</section>
 	</dd>
-
+	<dt><a name="tick"></a><span class="realm_sh"></span><strong>tick</strong>(  )</dt>
+	<dd>
+		<p>
+Tick hook. Called each game tick on both the server and client.</p>
+		
+		
+		<section class="return">
+			
+		</section>
+	</dd>
+	<dt><a name="writecell"></a><span class="realm_sv"></span><strong>writecell</strong>( address, data )</dt>
+	<dd>
+		<p>
+Called when a high speed device writes to a wired SF chip</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>address</tt> ― The address written to
+				</li>
+				
+				<li>
+					<tt>data</tt> ― The data being written
+				</li>
+				
+			</ul>
+		</section>
+		
+		<section class="return">
+			
+		</section>
+	</dd>
 </dl>
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>

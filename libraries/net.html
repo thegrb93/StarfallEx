@@ -1,532 +1,186 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath="../"</script>
-<script type="text/javascript" src="../search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><a href="../index.html">Index</a></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="../directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="../libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/mesh.html">mesh</a>
-		</li>
-	
-			<li><strong>net</strong></li>
-		
-		<li>
-			<a href="../libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/quaternion.html">quaternion</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/render.html">render</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="../classes/Angle.html">Angle</a></li>
-			
-				<li><a href="../classes/Bass.html">Bass</a></li>
-			
-				<li><a href="../classes/Color.html">Color</a></li>
-			
-				<li><a href="../classes/Entity.html">Entity</a></li>
-			
-				<li><a href="../classes/File.html">File</a></li>
-			
-				<li><a href="../classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="../classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="../classes/Npc.html">Npc</a></li>
-			
-				<li><a href="../classes/Particle.html">Particle</a></li>
-			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><a href="../classes/Player.html">Player</a></li>
-			
-				<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="../classes/Sound.html">Sound</a></li>
-			
-				<li><a href="../classes/VMatrix.html">VMatrix</a></li>
-			
-				<li><a href="../classes/Vector.html">Vector</a></li>
-			
-				<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="../classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Library <code>net</code></h1>
-
+	<head>
+		<title>Library net :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li><a href="../libraries/net.html">net</a></li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li>render</li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li>Bass</li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li>File</li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li>Player</li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li>VMatrix</li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+<h1>Library <tt>net</tt></h1>
 <p>
 Net message library. Used for sending data from the server to the client and back</p>
 
@@ -534,1141 +188,869 @@ Net message library. Used for sending data from the server to the client and bac
 
 
 
-
-
-<h2>Functions</h2>
-<table class="function_list">
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.getBytesLeft">getBytesLeft</a>&nbsp;()</td>
-	<td class="summary">
+<section class="functions">
+	<h2>Functions</h2>
+	<table class="list">
+	
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.getBytesLeft">getBytesLeft</a>(  )</td>
+			<td class="summary">
 Returns available bandwidth in bytes </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.isStreaming">isStreaming</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.isStreaming">isStreaming</a>(  )</td>
+			<td class="summary">
 Returns whether or not the library is currently reading data from a stream </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readAngle">readAngle</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readAngle">readAngle</a>(  )</td>
+			<td class="summary">
 Reads an angle from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readBit">readBit</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readBit">readBit</a>(  )</td>
+			<td class="summary">
 Reads a bit from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readColor">readColor</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readColor">readColor</a>(  )</td>
+			<td class="summary">
 Reads a color from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readData">readData</a>&nbsp;(n)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readData">readData</a>( n )</td>
+			<td class="summary">
 Reads a string from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readDouble">readDouble</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readDouble">readDouble</a>(  )</td>
+			<td class="summary">
 Reads a double from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readEntity">readEntity</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readEntity">readEntity</a>(  )</td>
+			<td class="summary">
 Reads a entity from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readFloat">readFloat</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readFloat">readFloat</a>(  )</td>
+			<td class="summary">
 Reads a float from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readInt">readInt</a>&nbsp;(n)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readInt">readInt</a>( n )</td>
+			<td class="summary">
 Reads an integer from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readMatrix">readMatrix</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readMatrix">readMatrix</a>(  )</td>
+			<td class="summary">
 Reads a matrix from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readStream">readStream</a>&nbsp;(cb)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readStream">readStream</a>( cb )</td>
+			<td class="summary">
 Reads a large string stream from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readString">readString</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readString">readString</a>(  )</td>
+			<td class="summary">
 Reads a string from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readUInt">readUInt</a>&nbsp;(n)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readUInt">readUInt</a>( n )</td>
+			<td class="summary">
 Reads an unsigned integer from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.readVector">readVector</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readVector">readVector</a>(  )</td>
+			<td class="summary">
 Reads a vector from the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.send">send</a>&nbsp;(target, unreliable)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.send">send</a>( target, unreliable )</td>
+			<td class="summary">
 Send a net message from client->server, or server->client.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.start">start</a>&nbsp;(name)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.start">start</a>( name )</td>
+			<td class="summary">
 Starts the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeAngle">writeAngle</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeAngle">writeAngle</a>( t )</td>
+			<td class="summary">
 Writes an angle to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeBit">writeBit</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeBit">writeBit</a>( t )</td>
+			<td class="summary">
 Writes a bit to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeColor">writeColor</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeColor">writeColor</a>( t )</td>
+			<td class="summary">
 Writes an color to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeData">writeData</a>&nbsp;(t, n)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeData">writeData</a>( t, n )</td>
+			<td class="summary">
 Writes string containing null characters to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeDouble">writeDouble</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeDouble">writeDouble</a>( t )</td>
+			<td class="summary">
 Writes a double to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeEntity">writeEntity</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeEntity">writeEntity</a>( t )</td>
+			<td class="summary">
 Writes an entity to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeFloat">writeFloat</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeFloat">writeFloat</a>( t )</td>
+			<td class="summary">
 Writes a float to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeInt">writeInt</a>&nbsp;(t, n)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeInt">writeInt</a>( t, n )</td>
+			<td class="summary">
 Writes an integer to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeMatrix">writeMatrix</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeMatrix">writeMatrix</a>( t )</td>
+			<td class="summary">
 Writes an matrix to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeStream">writeStream</a>&nbsp;(str)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeStream">writeStream</a>( str )</td>
+			<td class="summary">
 Streams a large 20MB string.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeString">writeString</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeString">writeString</a>( t )</td>
+			<td class="summary">
 Writes a string to the net message.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeUInt">writeUInt</a>&nbsp;(t, n)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeUInt">writeUInt</a>( t, n )</td>
+			<td class="summary">
 Writes an unsigned integer to the net message </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_sh">&nbsp;</span><a href="#net.writeVector">writeVector</a>&nbsp;(t)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeVector">writeVector</a>( t )</td>
+			<td class="summary">
 Writes an vector to the net message </td>
-	</tr>
-
-</table>
-
-
+		</tr>
+	</table>
+</section>
 
 
 
-
-
-<br/>
-<br/>
-
-
-
-<h2><a name="functions"></a>Functions</h2>
-<dl class="function">
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.getBytesLeft"></a><strong>net.getBytesLeft</strong>&nbsp;()</dt>
+<section class="functions_def">
+	<h2><a name="functions_def">Functions definition</a></h2>
+	<dl>
+		
+		
+<dt><span class="realm_sh"></span><a name="net.getBytesLeft"></a><strong>net.getBytesLeft</strong>(  )</dt>
 <dd>
-
-Returns available bandwidth in bytes
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>number of bytes that can be sent</ul>
-
-
-
-
-
+	<p>
+Returns available bandwidth in bytes</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>number of bytes that can be sent</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.isStreaming"></a><strong>net.isStreaming</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.isStreaming"></a><strong>net.isStreaming</strong>(  )</dt>
 <dd>
-
-Returns whether or not the library is currently reading data from a stream
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Boolean</ul>
-
-
-
-
-
+	<p>
+Returns whether or not the library is currently reading data from a stream</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Boolean</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readAngle"></a><strong>net.readAngle</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readAngle"></a><strong>net.readAngle</strong>(  )</dt>
 <dd>
-
-Reads an angle from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The angle that was read</ul>
-
-
-
-
-
+	<p>
+Reads an angle from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The angle that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readBit"></a><strong>net.readBit</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readBit"></a><strong>net.readBit</strong>(  )</dt>
 <dd>
-
-Reads a bit from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The bit that was read. (0 for false, 1 for true)</ul>
-
-
-
-
-
+	<p>
+Reads a bit from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The bit that was read. (0 for false, 1 for true)</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readColor"></a><strong>net.readColor</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readColor"></a><strong>net.readColor</strong>(  )</dt>
 <dd>
-
-Reads a color from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The color that was read</ul>
-
-
-
-
-
+	<p>
+Reads a color from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The color that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readData"></a><strong>net.readData</strong>&nbsp;(n)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readData"></a><strong>net.readData</strong>( n )</dt>
 <dd>
-
-Reads a string from the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Reads a string from the net message</p>
 	
-	<li>
-	  <code><em>n</em></code>: How many characters are in the data
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The string that was read</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― How many characters are in the data</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The string that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readDouble"></a><strong>net.readDouble</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readDouble"></a><strong>net.readDouble</strong>(  )</dt>
 <dd>
-
-Reads a double from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The double that was read</ul>
-
-
-
-
-
+	<p>
+Reads a double from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The double that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readEntity"></a><strong>net.readEntity</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readEntity"></a><strong>net.readEntity</strong>(  )</dt>
 <dd>
-
-Reads a entity from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The entity that was read</ul>
-
-
-
-
-
+	<p>
+Reads a entity from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The entity that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readFloat"></a><strong>net.readFloat</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readFloat"></a><strong>net.readFloat</strong>(  )</dt>
 <dd>
-
-Reads a float from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The float that was read</ul>
-
-
-
-
-
+	<p>
+Reads a float from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The float that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readInt"></a><strong>net.readInt</strong>&nbsp;(n)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readInt"></a><strong>net.readInt</strong>( n )</dt>
 <dd>
-
-Reads an integer from the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Reads an integer from the net message</p>
 	
-	<li>
-	  <code><em>n</em></code>: The amount of bits to read
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The integer that was read</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― The amount of bits to read</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The integer that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readMatrix"></a><strong>net.readMatrix</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readMatrix"></a><strong>net.readMatrix</strong>(  )</dt>
 <dd>
-
-Reads a matrix from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The matrix that was read</ul>
-
-
-
-
-
+	<p>
+Reads a matrix from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The matrix that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readStream"></a><strong>net.readStream</strong>&nbsp;(cb)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readStream"></a><strong>net.readStream</strong>( cb )</dt>
 <dd>
-
-Reads a large string stream from the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Reads a large string stream from the net message</p>
 	
-	<li>
-	  <code><em>cb</em></code>: Callback to run when the stream is finished. The first parameter in the callback is the data.
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>cb</tt> ― Callback to run when the stream is finished. The first parameter in the callback is the data.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readString"></a><strong>net.readString</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readString"></a><strong>net.readString</strong>(  )</dt>
 <dd>
-
-Reads a string from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The string that was read</ul>
-
-
-
-
-
+	<p>
+Reads a string from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The string that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readUInt"></a><strong>net.readUInt</strong>&nbsp;(n)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readUInt"></a><strong>net.readUInt</strong>( n )</dt>
 <dd>
-
-Reads an unsigned integer from the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Reads an unsigned integer from the net message</p>
 	
-	<li>
-	  <code><em>n</em></code>: The amount of bits to read
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The unsigned integer that was read</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― The amount of bits to read</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The unsigned integer that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.readVector"></a><strong>net.readVector</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.readVector"></a><strong>net.readVector</strong>(  )</dt>
 <dd>
-
-Reads a vector from the net message
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The vector that was read</ul>
-
-
-
-
-
+	<p>
+Reads a vector from the net message</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The vector that was read</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.send"></a><strong>net.send</strong>&nbsp;(target, unreliable)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.send"></a><strong>net.send</strong>( target, unreliable )</dt>
 <dd>
-
-Send a net message from client->server, or server->client.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Send a net message from client->server, or server->client.</p>
 	
-	<li>
-	  <code><em>target</em></code>: Optional target location to send the net message.
-	</li>
 	
-	<li>
-	  <code><em>unreliable</em></code>: Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>target</tt> ― Optional target location to send the net message.</li>
+			<li><tt>unreliable</tt> ― Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.start"></a><strong>net.start</strong>&nbsp;(name)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.start"></a><strong>net.start</strong>( name )</dt>
 <dd>
-
-Starts the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Starts the net message</p>
 	
-	<li>
-	  <code><em>name</em></code>: The message name
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― The message name</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeAngle"></a><strong>net.writeAngle</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeAngle"></a><strong>net.writeAngle</strong>( t )</dt>
 <dd>
-
-Writes an angle to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an angle to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The angle to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The angle to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeBit"></a><strong>net.writeBit</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeBit"></a><strong>net.writeBit</strong>( t )</dt>
 <dd>
-
-Writes a bit to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a bit to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The bit to be written. (boolean)
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The bit to be written. (boolean)</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeColor"></a><strong>net.writeColor</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeColor"></a><strong>net.writeColor</strong>( t )</dt>
 <dd>
-
-Writes an color to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an color to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The color to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The color to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeData"></a><strong>net.writeData</strong>&nbsp;(t, n)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeData"></a><strong>net.writeData</strong>( t, n )</dt>
 <dd>
-
-Writes string containing null characters to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes string containing null characters to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The string to be written
-	</li>
 	
-	<li>
-	  <code><em>n</em></code>: How much of the string to write
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The string to be written</li>
+			<li><tt>n</tt> ― How much of the string to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeDouble"></a><strong>net.writeDouble</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeDouble"></a><strong>net.writeDouble</strong>( t )</dt>
 <dd>
-
-Writes a double to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a double to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The double to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The double to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeEntity"></a><strong>net.writeEntity</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeEntity"></a><strong>net.writeEntity</strong>( t )</dt>
 <dd>
-
-Writes an entity to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an entity to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The entity to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The entity to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeFloat"></a><strong>net.writeFloat</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeFloat"></a><strong>net.writeFloat</strong>( t )</dt>
 <dd>
-
-Writes a float to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a float to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The float to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The float to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeInt"></a><strong>net.writeInt</strong>&nbsp;(t, n)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeInt"></a><strong>net.writeInt</strong>( t, n )</dt>
 <dd>
-
-Writes an integer to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an integer to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The integer to be written
-	</li>
 	
-	<li>
-	  <code><em>n</em></code>: The amount of bits the integer consists of
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The integer to be written</li>
+			<li><tt>n</tt> ― The amount of bits the integer consists of</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeMatrix"></a><strong>net.writeMatrix</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeMatrix"></a><strong>net.writeMatrix</strong>( t )</dt>
 <dd>
-
-Writes an matrix to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an matrix to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The matrix to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The matrix to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeStream"></a><strong>net.writeStream</strong>&nbsp;(str)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeStream"></a><strong>net.writeStream</strong>( str )</dt>
 <dd>
-
-Streams a large 20MB string.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Streams a large 20MB string.</p>
 	
-	<li>
-	  <code><em>str</em></code>: The string to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>str</tt> ― The string to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeString"></a><strong>net.writeString</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeString"></a><strong>net.writeString</strong>( t )</dt>
 <dd>
-
-Writes a string to the net message. Null characters will terminate the string.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a string to the net message. Null characters will terminate the string.</p>
 	
-	<li>
-	  <code><em>t</em></code>: The string to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The string to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeUInt"></a><strong>net.writeUInt</strong>&nbsp;(t, n)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeUInt"></a><strong>net.writeUInt</strong>( t, n )</dt>
 <dd>
-
-Writes an unsigned integer to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an unsigned integer to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The integer to be written
-	</li>
 	
-	<li>
-	  <code><em>n</em></code>: The amount of bits the integer consists of. Should not be greater than 32
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The integer to be written</li>
+			<li><tt>n</tt> ― The amount of bits the integer consists of. Should not be greater than 32</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_sh">&nbsp;</span><a name="net.writeVector"></a><strong>net.writeVector</strong>&nbsp;(t)</dt>
+		
+<dt><span class="realm_sh"></span><a name="net.writeVector"></a><strong>net.writeVector</strong>( t )</dt>
 <dd>
-
-Writes an vector to the net message
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes an vector to the net message</p>
 	
-	<li>
-	  <code><em>t</em></code>: The vector to be written
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The vector to be written</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
+	</dl>
+</section>
 
-
-</dl>
-
-
-
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>

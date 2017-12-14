@@ -1,534 +1,186 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath="../"</script>
-<script type="text/javascript" src="../search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><strong>Index</strong></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="../directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="../libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/mesh.html">mesh</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/net.html">net</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/quaternion.html">quaternion</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/render.html">render</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="../classes/Angle.html">Angle</a></li>
-			
-				<li><a href="../classes/Bass.html">Bass</a></li>
-			
-				<li><a href="../classes/Color.html">Color</a></li>
-			
-				<li><a href="../classes/Entity.html">Entity</a></li>
-			
-				<li><strong>File</strong></li>
-			
-				<li><a href="../classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="../classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="../classes/Npc.html">Npc</a></li>
-			
-				<li><a href="../classes/Particle.html">Particle</a></li>
-			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><a href="../classes/Player.html">Player</a></li>
-			
-				<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="../classes/Sound.html">Sound</a></li>
-			
-				<li><a href="../classes/VMatrix.html">VMatrix</a></li>
-			
-				<li><a href="../classes/Vector.html">Vector</a></li>
-			
-				<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="../classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Type <code>File</code></h1>
-
+	<head>
+		<title>File :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li>net</li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li>render</li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li>Bass</li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li><a href="../classes/File.html">File</a></li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li>Player</li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li>VMatrix</li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+<h1><tt>File</tt> type</h1>
 <p>
 File type</p>
 
@@ -536,766 +188,591 @@ File type</p>
 
 
 
-
-
-<h2>Methods</h2>
-<table class="function_list">
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:close">close</a>&nbsp;()</td>
-		<td class="summary">
+<section class="methods">
+	<h2>Methods</h2>
+	<table class="list">
+		
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:close">close</a>(  )</td>
+			<td class="summary">
 Flushes and closes the file.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:flush">flush</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:flush">flush</a>(  )</td>
+			<td class="summary">
 Wait until all changes to the file are complete </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:read">read</a>&nbsp;(n)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:read">read</a>( n )</td>
+			<td class="summary">
 Reads a certain length of the file's bytes </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readBool">readBool</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readBool">readBool</a>(  )</td>
+			<td class="summary">
 Reads a boolean and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readByte">readByte</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readByte">readByte</a>(  )</td>
+			<td class="summary">
 Reads a byte and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readDouble">readDouble</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readDouble">readDouble</a>(  )</td>
+			<td class="summary">
 Reads a double and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readFloat">readFloat</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readFloat">readFloat</a>(  )</td>
+			<td class="summary">
 Reads a float and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readLine">readLine</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readLine">readLine</a>(  )</td>
+			<td class="summary">
 Reads a line and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readLong">readLong</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readLong">readLong</a>(  )</td>
+			<td class="summary">
 Reads a long and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:readShort">readShort</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:readShort">readShort</a>(  )</td>
+			<td class="summary">
 Reads a short and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:seek">seek</a>&nbsp;(n)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:seek">seek</a>( n )</td>
+			<td class="summary">
 Sets the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:size">size</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:size">size</a>(  )</td>
+			<td class="summary">
 Returns the file's size in bytes </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:skip">skip</a>&nbsp;(n)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:skip">skip</a>( n )</td>
+			<td class="summary">
 Moves the file position relative to its current position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:tell">tell</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:tell">tell</a>(  )</td>
+			<td class="summary">
 Returns the current file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:write">write</a>&nbsp;(str)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:write">write</a>( str )</td>
+			<td class="summary">
 Writes a string to the file and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:writeBool">writeBool</a>&nbsp;(x)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:writeBool">writeBool</a>( x )</td>
+			<td class="summary">
 Writes a boolean and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:writeByte">writeByte</a>&nbsp;(x)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:writeByte">writeByte</a>( x )</td>
+			<td class="summary">
 Writes a byte and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:writeDouble">writeDouble</a>&nbsp;(x)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:writeDouble">writeDouble</a>( x )</td>
+			<td class="summary">
 Writes a double and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:writeFloat">writeFloat</a>&nbsp;(x)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:writeFloat">writeFloat</a>( x )</td>
+			<td class="summary">
 Writes a float and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:writeLong">writeLong</a>&nbsp;(x)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:writeLong">writeLong</a>( x )</td>
+			<td class="summary">
 Writes a long and advances the file position </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#file_methods:writeShort">writeShort</a>&nbsp;(x)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file_methods:writeShort">writeShort</a>( x )</td>
+			<td class="summary">
 Writes a short and advances the file position </td>
-	</tr>
-
-</table>
-
-
-
-<br/>
-<br/>
-
-
-<h2><a name="methods"></a>Methods</h2>
-<dl class="function">
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:close"></a><strong>File:close</strong>&nbsp;()</dt>
+		</tr>
+	</table>
+</section>
+<section class="methods_def">
+	<h2><a name="methods_def"></a>Methods definition</h2>
+	<dl>
+		
+		
+<dt><span class="realm_cl"></span><a name="File:close"></a><strong>File:close</strong>(  )</dt>
 <dd>
-
-Flushes and closes the file. The file must be opened again to use a new file object.
-
-
-
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:flush"></a><strong>File:flush</strong>&nbsp;()</dt>
-<dd>
-
-Wait until all changes to the file are complete
-
-
-
-
-
-
-
-
-
-
-
-
-
-</dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:read"></a><strong>File:read</strong>&nbsp;(n)</dt>
-<dd>
-
-Reads a certain length of the file's bytes
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Flushes and closes the file. The file must be opened again to use a new file object.</p>
 	
-	<li>
-	  <code><em>n</em></code>: The length to read
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readBool"></a><strong>File:readBool</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:flush"></a><strong>File:flush</strong>(  )</dt>
 <dd>
-
-Reads a boolean and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Wait until all changes to the file are complete</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readByte"></a><strong>File:readByte</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:read"></a><strong>File:read</strong>( n )</dt>
 <dd>
-
-Reads a byte and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Reads a certain length of the file's bytes</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― The length to read</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readDouble"></a><strong>File:readDouble</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readBool"></a><strong>File:readBool</strong>(  )</dt>
 <dd>
-
-Reads a double and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Reads a boolean and advances the file position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readFloat"></a><strong>File:readFloat</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readByte"></a><strong>File:readByte</strong>(  )</dt>
 <dd>
-
-Reads a float and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Reads a byte and advances the file position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readLine"></a><strong>File:readLine</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readDouble"></a><strong>File:readDouble</strong>(  )</dt>
 <dd>
-
-Reads a line and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Reads a double and advances the file position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readLong"></a><strong>File:readLong</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readFloat"></a><strong>File:readFloat</strong>(  )</dt>
 <dd>
-
-Reads a long and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Reads a float and advances the file position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:readShort"></a><strong>File:readShort</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readLine"></a><strong>File:readLine</strong>(  )</dt>
 <dd>
-
-Reads a short and advances the file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The data</ul>
-
-
-
-
-
+	<p>
+Reads a line and advances the file position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:seek"></a><strong>File:seek</strong>&nbsp;(n)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readLong"></a><strong>File:readLong</strong>(  )</dt>
 <dd>
-
-Sets the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Reads a long and advances the file position</p>
 	
-	<li>
-	  <code><em>n</em></code>: The position to set it to
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:size"></a><strong>File:size</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:readShort"></a><strong>File:readShort</strong>(  )</dt>
 <dd>
-
-Returns the file's size in bytes
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The file's size</ul>
-
-
-
-
-
+	<p>
+Reads a short and advances the file position</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The data</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:skip"></a><strong>File:skip</strong>&nbsp;(n)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:seek"></a><strong>File:seek</strong>( n )</dt>
 <dd>
-
-Moves the file position relative to its current position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the file position</p>
 	
-	<li>
-	  <code><em>n</em></code>: How much to move the position
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The resulting position</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― The position to set it to</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:tell"></a><strong>File:tell</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:size"></a><strong>File:size</strong>(  )</dt>
 <dd>
-
-Returns the current file position
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The current file position</ul>
-
-
-
-
-
+	<p>
+Returns the file's size in bytes</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The file's size</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:write"></a><strong>File:write</strong>&nbsp;(str)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:skip"></a><strong>File:skip</strong>( n )</dt>
 <dd>
-
-Writes a string to the file and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Moves the file position relative to its current position</p>
 	
-	<li>
-	  <code><em>str</em></code>: The data to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― How much to move the position</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The resulting position</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:writeBool"></a><strong>File:writeBool</strong>&nbsp;(x)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:tell"></a><strong>File:tell</strong>(  )</dt>
 <dd>
-
-Writes a boolean and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns the current file position</p>
 	
-	<li>
-	  <code><em>x</em></code>: The boolean to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The current file position</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:writeByte"></a><strong>File:writeByte</strong>&nbsp;(x)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:write"></a><strong>File:write</strong>( str )</dt>
 <dd>
-
-Writes a byte and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a string to the file and advances the file position</p>
 	
-	<li>
-	  <code><em>x</em></code>: The byte to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>str</tt> ― The data to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:writeDouble"></a><strong>File:writeDouble</strong>&nbsp;(x)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:writeBool"></a><strong>File:writeBool</strong>( x )</dt>
 <dd>
-
-Writes a double and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a boolean and advances the file position</p>
 	
-	<li>
-	  <code><em>x</em></code>: The double to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The boolean to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:writeFloat"></a><strong>File:writeFloat</strong>&nbsp;(x)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:writeByte"></a><strong>File:writeByte</strong>( x )</dt>
 <dd>
-
-Writes a float and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a byte and advances the file position</p>
 	
-	<li>
-	  <code><em>x</em></code>: The float to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The byte to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:writeLong"></a><strong>File:writeLong</strong>&nbsp;(x)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:writeDouble"></a><strong>File:writeDouble</strong>( x )</dt>
 <dd>
-
-Writes a long and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a double and advances the file position</p>
 	
-	<li>
-	  <code><em>x</em></code>: The long to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The double to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="File:writeShort"></a><strong>File:writeShort</strong>&nbsp;(x)</dt>
+		
+<dt><span class="realm_cl"></span><a name="File:writeFloat"></a><strong>File:writeFloat</strong>( x )</dt>
 <dd>
-
-Writes a short and advances the file position
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Writes a float and advances the file position</p>
 	
-	<li>
-	  <code><em>x</em></code>: The short to write
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The float to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-</dl>
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+		
+<dt><span class="realm_cl"></span><a name="File:writeLong"></a><strong>File:writeLong</strong>( x )</dt>
+<dd>
+	<p>
+Writes a long and advances the file position</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The long to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="File:writeShort"></a><strong>File:writeShort</strong>( x )</dt>
+<dd>
+	<p>
+Writes a short and advances the file position</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The short to write</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
+</dd>
+	</dl>
+</section>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>

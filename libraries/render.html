@@ -1,532 +1,186 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath="../"</script>
-<script type="text/javascript" src="../search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><a href="../index.html">Index</a></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="../directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="../libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/mesh.html">mesh</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/net.html">net</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/quaternion.html">quaternion</a>
-		</li>
-	
-			<li><strong>render</strong></li>
-		
-		<li>
-			<a href="../libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="../classes/Angle.html">Angle</a></li>
-			
-				<li><a href="../classes/Bass.html">Bass</a></li>
-			
-				<li><a href="../classes/Color.html">Color</a></li>
-			
-				<li><a href="../classes/Entity.html">Entity</a></li>
-			
-				<li><a href="../classes/File.html">File</a></li>
-			
-				<li><a href="../classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="../classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="../classes/Npc.html">Npc</a></li>
-			
-				<li><a href="../classes/Particle.html">Particle</a></li>
-			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><a href="../classes/Player.html">Player</a></li>
-			
-				<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="../classes/Sound.html">Sound</a></li>
-			
-				<li><a href="../classes/VMatrix.html">VMatrix</a></li>
-			
-				<li><a href="../classes/Vector.html">Vector</a></li>
-			
-				<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="../classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Library <code>render</code></h1>
-
+	<head>
+		<title>Library render :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li>net</li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li><a href="../libraries/render.html">render</a></li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li>Bass</li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li>File</li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li>Player</li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li>VMatrix</li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+<h1>Library <tt>render</tt></h1>
 <p>
 Render library. Screens are 512x512 units. Most functions require 
 that you be in the rendering hook to call, otherwise an error is 
@@ -536,508 +190,389 @@ thrown. +x is right, +y is down</p>
 
 
 
-
-
-<h2>Functions</h2>
-<table class="function_list">
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.capturePixels">capturePixels</a>&nbsp;()</td>
-	<td class="summary">
+<section class="functions">
+	<h2>Functions</h2>
+	<table class="list">
+	
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.capturePixels">capturePixels</a>(  )</td>
+			<td class="summary">
 Dumps the current render target and allows the pixels to be accessed by render.readPixel.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.clear">clear</a>&nbsp;(clr, depth)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.clear">clear</a>( clr, depth )</td>
+			<td class="summary">
 Clears the active render target </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.clearDepth">clearDepth</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.clearDepth">clearDepth</a>(  )</td>
+			<td class="summary">
 Resets the depth buffer </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.createFont">createFont</a>&nbsp;(font, size, weight, antialias, additive, shadow, outline, blur, extended)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.createFont">createFont</a>( font, size, weight, antialias, additive, shadow, outline, blur, extended )</td>
+			<td class="summary">
 Creates a font.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.createRenderTarget">createRenderTarget</a>&nbsp;(name)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.createRenderTarget">createRenderTarget</a>( name )</td>
+			<td class="summary">
 Creates a new render target to draw onto.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.cursorPos">cursorPos</a>&nbsp;(ply)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.cursorPos">cursorPos</a>( ply )</td>
+			<td class="summary">
 Gets a 2D cursor position where ply is aiming.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.destroyRenderTarget">destroyRenderTarget</a>&nbsp;(name)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.destroyRenderTarget">destroyRenderTarget</a>( name )</td>
+			<td class="summary">
 Releases the rendertarget.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.destroyTexture">destroyTexture</a>&nbsp;(id)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.destroyTexture">destroyTexture</a>( id )</td>
+			<td class="summary">
 Releases the texture.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.disableScissorRect">disableScissorRect</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.disableScissorRect">disableScissorRect</a>(  )</td>
+			<td class="summary">
 Disables a scissoring rect which limits the drawing area.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DBeam">draw3DBeam</a>&nbsp;(startPos, endPos, width, textureStart, textureEnd)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DBeam">draw3DBeam</a>( startPos, endPos, width, textureStart, textureEnd )</td>
+			<td class="summary">
 Draws textured beam.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DBox">draw3DBox</a>&nbsp;(origin, angle, mins, maxs)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DBox">draw3DBox</a>( origin, angle, mins, maxs )</td>
+			<td class="summary">
 Draws a box in 3D space </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DLine">draw3DLine</a>&nbsp;(startPos, endPos)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DLine">draw3DLine</a>( startPos, endPos )</td>
+			<td class="summary">
 Draws a 3D Line </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DQuad">draw3DQuad</a>&nbsp;(vert1, vert2, vert3, vert4)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DQuad">draw3DQuad</a>( vert1, vert2, vert3, vert4 )</td>
+			<td class="summary">
 Draws 2 connected triangles.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DSphere">draw3DSphere</a>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DSphere">draw3DSphere</a>( pos, radius, longitudeSteps, latitudeSteps )</td>
+			<td class="summary">
 Draws a sphere </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DSprite">draw3DSprite</a>&nbsp;(pos, width, height)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DSprite">draw3DSprite</a>( pos, width, height )</td>
+			<td class="summary">
 Draws a sprite in 3d space.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DWireframeBox">draw3DWireframeBox</a>&nbsp;(origin, angle, mins, maxs)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DWireframeBox">draw3DWireframeBox</a>( origin, angle, mins, maxs )</td>
+			<td class="summary">
 Draws a wireframe box in 3D space </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.draw3DWireframeSphere">draw3DWireframeSphere</a>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DWireframeSphere">draw3DWireframeSphere</a>( pos, radius, longitudeSteps, latitudeSteps )</td>
+			<td class="summary">
 Draws a wireframe sphere </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawCircle">drawCircle</a>&nbsp;(x, y, r)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawCircle">drawCircle</a>( x, y, r )</td>
+			<td class="summary">
 Draws a circle outline </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawLine">drawLine</a>&nbsp;(x1, y1, x2, y2)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawLine">drawLine</a>( x1, y1, x2, y2 )</td>
+			<td class="summary">
 Draws a line </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawPoly">drawPoly</a>&nbsp;(poly)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawPoly">drawPoly</a>( poly )</td>
+			<td class="summary">
 Draws a polygon.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawRect">drawRect</a>&nbsp;(x, y, w, h)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawRect">drawRect</a>( x, y, w, h )</td>
+			<td class="summary">
 Draws a rectangle using the current color.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawRectOutline">drawRectOutline</a>&nbsp;(x, y, w, h)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawRectOutline">drawRectOutline</a>( x, y, w, h )</td>
+			<td class="summary">
 Draws a rectangle outline using the current color.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawRoundedBox">drawRoundedBox</a>&nbsp;(r, x, y, w, h)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawRoundedBox">drawRoundedBox</a>( r, x, y, w, h )</td>
+			<td class="summary">
 Draws a rounded rectangle using the current color </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawRoundedBoxEx">drawRoundedBoxEx</a>&nbsp;(r, x, y, w, h, tl, tr, bl, br)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawRoundedBoxEx">drawRoundedBoxEx</a>( r, x, y, w, h, tl, tr, bl, br )</td>
+			<td class="summary">
 Draws a rounded rectangle using the current color </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawSimpleText">drawSimpleText</a>&nbsp;(x, y, text, xalign, yalign)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawSimpleText">drawSimpleText</a>( x, y, text, xalign, yalign )</td>
+			<td class="summary">
 Draws text more easily and quickly but no new lines or tabs.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawText">drawText</a>&nbsp;(x, y, text, alignment)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawText">drawText</a>( x, y, text, alignment )</td>
+			<td class="summary">
 Draws text with newlines and tabs </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawTexturedRect">drawTexturedRect</a>&nbsp;(x, y, w, h)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRect">drawTexturedRect</a>( x, y, w, h )</td>
+			<td class="summary">
 Draws a textured rectangle.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawTexturedRectRotated">drawTexturedRectRotated</a>&nbsp;(x, y, w, h, rot)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectRotated">drawTexturedRectRotated</a>( x, y, w, h, rot )</td>
+			<td class="summary">
 Draws a rotated, textured rectangle.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.drawTexturedRectUV">drawTexturedRectUV</a>&nbsp;(x, y, w, h, startU, startV, endU, endV)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectUV">drawTexturedRectUV</a>( x, y, w, h, startU, startV, endU, endV )</td>
+			<td class="summary">
 Draws a textured rectangle with UV coordinates </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.enableDepth">enableDepth</a>&nbsp;(enable)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.enableDepth">enableDepth</a>( enable )</td>
+			<td class="summary">
 Enables or disables Depth Buffer </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.enableScissorRect">enableScissorRect</a>&nbsp;(startX, startY, endX, endY)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.enableScissorRect">enableScissorRect</a>( startX, startY, endX, endY )</td>
+			<td class="summary">
 Enables a scissoring rect which limits the drawing area.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getDefaultFont">getDefaultFont</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getDefaultFont">getDefaultFont</a>(  )</td>
+			<td class="summary">
 Gets the default font </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getRenderTargetMaterial">getRenderTargetMaterial</a>&nbsp;(name)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getRenderTargetMaterial">getRenderTargetMaterial</a>( name )</td>
+			<td class="summary">
 Returns the model material name that uses the render target.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getResolution">getResolution</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getResolution">getResolution</a>(  )</td>
+			<td class="summary">
 Returns the render context's width and height </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getScreenEntity">getScreenEntity</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getScreenEntity">getScreenEntity</a>(  )</td>
+			<td class="summary">
 Returns the entity currently being rendered to </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getScreenInfo">getScreenInfo</a>&nbsp;(e)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getScreenInfo">getScreenInfo</a>( e )</td>
+			<td class="summary">
 Returns information about the screen, such as world offsets, dimentions, and rotation.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getTextSize">getTextSize</a>&nbsp;(text)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getTextSize">getTextSize</a>( text )</td>
+			<td class="summary">
 Gets the size of the specified text.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.getTextureID">getTextureID</a>&nbsp;(tx, cb, alignment, skip_hack)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getTextureID">getTextureID</a>( tx, cb, alignment, skip_hack )</td>
+			<td class="summary">
 Looks up a texture by file name.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.isHUDActive">isHUDActive</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.isHUDActive">isHUDActive</a>(  )</td>
+			<td class="summary">
 Checks if a hud component is connected to the Starfall Chip </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.parseMarkup">parseMarkup</a>&nbsp;(str, maxsize)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.parseMarkup">parseMarkup</a>( str, maxsize )</td>
+			<td class="summary">
 Constructs a markup object for quick styled text drawing.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.popMatrix">popMatrix</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.popMatrix">popMatrix</a>(  )</td>
+			<td class="summary">
 Pops a matrix from the matrix stack.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.popViewMatrix">popViewMatrix</a>&nbsp;()</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.popViewMatrix">popViewMatrix</a>(  )</td>
+			<td class="summary">
 Pops a view matrix from the matrix stack.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.pushMatrix">pushMatrix</a>&nbsp;(m, world)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.pushMatrix">pushMatrix</a>( m, world )</td>
+			<td class="summary">
 Pushes a matrix onto the matrix stack.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.pushViewMatrix">pushViewMatrix</a>&nbsp;(tbl)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.pushViewMatrix">pushViewMatrix</a>( tbl )</td>
+			<td class="summary">
 Pushes a perspective matrix onto the view matrix stack.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.readPixel">readPixel</a>&nbsp;(x, y)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.readPixel">readPixel</a>( x, y )</td>
+			<td class="summary">
 Reads the color of the specified pixel.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.selectRenderTarget">selectRenderTarget</a>&nbsp;(name)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.selectRenderTarget">selectRenderTarget</a>( name )</td>
+			<td class="summary">
 Selects the render target to draw on.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setBackgroundColor">setBackgroundColor</a>&nbsp;(col, screen)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setBackgroundColor">setBackgroundColor</a>( col, screen )</td>
+			<td class="summary">
 Sets the draw color </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setColor">setColor</a>&nbsp;(clr)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setColor">setColor</a>( clr )</td>
+			<td class="summary">
 Sets the draw color </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setCullMode">setCullMode</a>&nbsp;(mode)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setCullMode">setCullMode</a>( mode )</td>
+			<td class="summary">
 Changes the cull mode </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setFilterMag">setFilterMag</a>&nbsp;(val)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setFilterMag">setFilterMag</a>( val )</td>
+			<td class="summary">
 Sets the texture filtering function when viewing a close texture </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setFilterMin">setFilterMin</a>&nbsp;(val)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setFilterMin">setFilterMin</a>( val )</td>
+			<td class="summary">
 Sets the texture filtering function when viewing a far texture </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setFont">setFont</a>&nbsp;(font)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setFont">setFont</a>( font )</td>
+			<td class="summary">
 Sets the font </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setRGBA">setRGBA</a>&nbsp;(r, g, b, a)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setRGBA">setRGBA</a>( r, g, b, a )</td>
+			<td class="summary">
 Sets the draw color by RGBA values </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setRenderTargetTexture">setRenderTargetTexture</a>&nbsp;(name)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setRenderTargetTexture">setRenderTargetTexture</a>( name )</td>
+			<td class="summary">
 Sets the active texture to the render target with the specified name.</td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setTexture">setTexture</a>&nbsp;(id)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setTexture">setTexture</a>( id )</td>
+			<td class="summary">
 Sets the texture </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.setTextureFromScreen">setTextureFromScreen</a>&nbsp;(ent)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setTextureFromScreen">setTextureFromScreen</a>( ent )</td>
+			<td class="summary">
 Sets the texture of a screen entity </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#render.traceSurfaceColor">traceSurfaceColor</a>&nbsp;(vec1, vec2)</td>
-	<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.traceSurfaceColor">traceSurfaceColor</a>( vec1, vec2 )</td>
+			<td class="summary">
 Does a trace and returns the color of the textel the trace hits.</td>
-	</tr>
-
-</table>
-
-
+		</tr>
+	</table>
+</section>
 
 
 
-
-
-<br/>
-<br/>
-
-
-
-<h2><a name="functions"></a>Functions</h2>
-<dl class="function">
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.capturePixels"></a><strong>render.capturePixels</strong>&nbsp;()</dt>
+<section class="functions_def">
+	<h2><a name="functions_def">Functions definition</a></h2>
+	<dl>
+		
+		
+<dt><span class="realm_cl"></span><a name="render.capturePixels"></a><strong>render.capturePixels</strong>(  )</dt>
 <dd>
-
-Dumps the current render target and allows the pixels to be accessed by render.readPixel.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Dumps the current render target and allows the pixels to be accessed by render.readPixel.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.clear"></a><strong>render.clear</strong>&nbsp;(clr, depth)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.clear"></a><strong>render.clear</strong>( clr, depth )</dt>
 <dd>
-
-Clears the active render target
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Clears the active render target</p>
 	
-	<li>
-	  <code><em>clr</em></code>: Color type to clear with
-	</li>
 	
-	<li>
-	  <code><em>depth</em></code>: Boolean if should clear depth
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>clr</tt> ― Color type to clear with</li>
+			<li><tt>depth</tt> ― Boolean if should clear depth</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.clearDepth"></a><strong>render.clearDepth</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.clearDepth"></a><strong>render.clearDepth</strong>(  )</dt>
 <dd>
-
-Resets the depth buffer
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Resets the depth buffer</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.createFont"></a><strong>render.createFont</strong>&nbsp;(font, size, weight, antialias, additive, shadow, outline, blur, extended)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.createFont"></a><strong>render.createFont</strong>( font, size, weight, antialias, additive, shadow, outline, blur, extended )</dt>
 <dd>
-
-Creates a font. Does not require rendering hook
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Creates a font. Does not require rendering hook</p>
 	
-	<li>
-	  <code><em>font</em></code>: Base font to use
-	</li>
 	
-	<li>
-	  <code><em>size</em></code>: Font size
-	</li>
-	
-	<li>
-	  <code><em>weight</em></code>: Font weight (default: 400)
-	</li>
-	
-	<li>
-	  <code><em>antialias</em></code>: Antialias font?
-	</li>
-	
-	<li>
-	  <code><em>additive</em></code>: If true, adds brightness to pixels behind it rather than drawing over them.
-	</li>
-	
-	<li>
-	  <code><em>shadow</em></code>: Enable drop shadow?
-	</li>
-	
-	<li>
-	  <code><em>outline</em></code>: Enable outline?
-	</li>
-	
-	<li>
-	  <code><em>blur</em></code>: Enable blur?
-	</li>
-	
-	<li>
-	  <code><em>extended</em></code>: Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
-	</li>
-	
-</ul>
-
-
-
-
-<h3>Usage:</h3>
-<ul><pre class=example>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>font</tt> ― Base font to use</li>
+			<li><tt>size</tt> ― Font size</li>
+			<li><tt>weight</tt> ― Font weight (default: 400)</li>
+			<li><tt>antialias</tt> ― Antialias font?</li>
+			<li><tt>additive</tt> ― If true, adds brightness to pixels behind it rather than drawing over them.</li>
+			<li><tt>shadow</tt> ― Enable drop shadow?</li>
+			<li><tt>outline</tt> ― Enable outline?</li>
+			<li><tt>blur</tt> ― Enable blur?</li>
+			<li><tt>extended</tt> ― Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+		<p><pre class="example">
 Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall): 
 - Akbar 
 - Coolvetica 
@@ -1055,1839 +590,1231 @@ Base font can be one of (keep in mind that these may not exist on all clients if
 - Trebuchet MS 
 - DejaVu Sans Mono 
 - Lucida Console 
-- Times New Roman</pre></ul>
-
-
-
-
-
-
-
+- Times New Roman</pre></p>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.createRenderTarget"></a><strong>render.createRenderTarget</strong>&nbsp;(name)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.createRenderTarget"></a><strong>render.createRenderTarget</strong>( name )</dt>
 <dd>
-
+	<p>
 Creates a new render target to draw onto. 
-The dimensions will always be 1024x1024
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+The dimensions will always be 1024x1024</p>
 	
-	<li>
-	  <code><em>name</em></code>: The name of the render target
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― The name of the render target</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.cursorPos"></a><strong>render.cursorPos</strong>&nbsp;(ply)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.cursorPos"></a><strong>render.cursorPos</strong>( ply )</dt>
 <dd>
-
-Gets a 2D cursor position where ply is aiming.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Gets a 2D cursor position where ply is aiming.</p>
 	
-	<li>
-	  <code><em>ply</em></code>: player to get cursor position from(optional)
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return values:</h3>
-<ol>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ply</tt> ― player to get cursor position from(optional)</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return values:</h3>
+		<ol>
+			
+			<li>x position</li>
+			<li>y position</li>
+		</ol>
+	</section>
 	
-	<li>x position</li>
 	
-	<li>y position</li>
-	
-</ol>
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.destroyRenderTarget"></a><strong>render.destroyRenderTarget</strong>&nbsp;(name)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.destroyRenderTarget"></a><strong>render.destroyRenderTarget</strong>( name )</dt>
 <dd>
-
-Releases the rendertarget. Required if you reach the maximum rendertargets.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Releases the rendertarget. Required if you reach the maximum rendertargets.</p>
 	
-	<li>
-	  <code><em>name</em></code>: Rendertarget name
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― Rendertarget name</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.destroyTexture"></a><strong>render.destroyTexture</strong>&nbsp;(id)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.destroyTexture"></a><strong>render.destroyTexture</strong>( id )</dt>
 <dd>
-
-Releases the texture. Required if you reach the maximum url textures.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Releases the texture. Required if you reach the maximum url textures.</p>
 	
-	<li>
-	  <code><em>id</em></code>: Texture table. Aquired with render.getTextureID
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― Texture table. Aquired with render.getTextureID</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.disableScissorRect"></a><strong>render.disableScissorRect</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.disableScissorRect"></a><strong>render.disableScissorRect</strong>(  )</dt>
 <dd>
-
-Disables a scissoring rect which limits the drawing area.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Disables a scissoring rect which limits the drawing area.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DBeam"></a><strong>render.draw3DBeam</strong>&nbsp;(startPos, endPos, width, textureStart, textureEnd)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DBeam"></a><strong>render.draw3DBeam</strong>( startPos, endPos, width, textureStart, textureEnd )</dt>
 <dd>
-
-Draws textured beam.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws textured beam.</p>
 	
-	<li>
-	  <code><em>startPos</em></code>: Beam start position.
-	</li>
 	
-	<li>
-	  <code><em>endPos</em></code>: Beam end position.
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>startPos</tt> ― Beam start position.</li>
+			<li><tt>endPos</tt> ― Beam end position.</li>
+			<li><tt>width</tt> ― The width of the beam.</li>
+			<li><tt>textureStart</tt> ― The start coordinate of the texture used.</li>
+			<li><tt>textureEnd</tt> ― The end coordinate of the texture used.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>width</em></code>: The width of the beam.
-	</li>
 	
-	<li>
-	  <code><em>textureStart</em></code>: The start coordinate of the texture used.
-	</li>
-	
-	<li>
-	  <code><em>textureEnd</em></code>: The end coordinate of the texture used.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DBox"></a><strong>render.draw3DBox</strong>&nbsp;(origin, angle, mins, maxs)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DBox"></a><strong>render.draw3DBox</strong>( origin, angle, mins, maxs )</dt>
 <dd>
-
-Draws a box in 3D space
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a box in 3D space</p>
 	
-	<li>
-	  <code><em>origin</em></code>: Origin of the box.
-	</li>
 	
-	<li>
-	  <code><em>angle</em></code>: Orientation  of the box
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>origin</tt> ― Origin of the box.</li>
+			<li><tt>angle</tt> ― Orientation  of the box</li>
+			<li><tt>mins</tt> ― Start position of the box, relative to origin.</li>
+			<li><tt>maxs</tt> ― End position of the box, relative to origin.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>mins</em></code>: Start position of the box, relative to origin.
-	</li>
 	
-	<li>
-	  <code><em>maxs</em></code>: End position of the box, relative to origin.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DLine"></a><strong>render.draw3DLine</strong>&nbsp;(startPos, endPos)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DLine"></a><strong>render.draw3DLine</strong>( startPos, endPos )</dt>
 <dd>
-
-Draws a 3D Line
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a 3D Line</p>
 	
-	<li>
-	  <code><em>startPos</em></code>: Starting position
-	</li>
 	
-	<li>
-	  <code><em>endPos</em></code>: Ending position
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>startPos</tt> ― Starting position</li>
+			<li><tt>endPos</tt> ― Ending position</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DQuad"></a><strong>render.draw3DQuad</strong>&nbsp;(vert1, vert2, vert3, vert4)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DQuad"></a><strong>render.draw3DQuad</strong>( vert1, vert2, vert3, vert4 )</dt>
 <dd>
-
-Draws 2 connected triangles.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws 2 connected triangles.</p>
 	
-	<li>
-	  <code><em>vert1</em></code>: First vertex.
-	</li>
 	
-	<li>
-	  <code><em>vert2</em></code>: The second vertex.
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vert1</tt> ― First vertex.</li>
+			<li><tt>vert2</tt> ― The second vertex.</li>
+			<li><tt>vert3</tt> ― The third vertex.</li>
+			<li><tt>vert4</tt> ― The fourth vertex.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>vert3</em></code>: The third vertex.
-	</li>
 	
-	<li>
-	  <code><em>vert4</em></code>: The fourth vertex.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DSphere"></a><strong>render.draw3DSphere</strong>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DSphere"></a><strong>render.draw3DSphere</strong>( pos, radius, longitudeSteps, latitudeSteps )</dt>
 <dd>
-
-Draws a sphere
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a sphere</p>
 	
-	<li>
-	  <code><em>pos</em></code>: Position of the sphere
-	</li>
 	
-	<li>
-	  <code><em>radius</em></code>: Radius of the sphere
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pos</tt> ― Position of the sphere</li>
+			<li><tt>radius</tt> ― Radius of the sphere</li>
+			<li><tt>longitudeSteps</tt> ― The amount of longitude steps. The larger this number is, the smoother the sphere is</li>
+			<li><tt>latitudeSteps</tt> ― The amount of latitude steps. The larger this number is, the smoother the sphere is</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>longitudeSteps</em></code>: The amount of longitude steps. The larger this number is, the smoother the sphere is
-	</li>
 	
-	<li>
-	  <code><em>latitudeSteps</em></code>: The amount of latitude steps. The larger this number is, the smoother the sphere is
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DSprite"></a><strong>render.draw3DSprite</strong>&nbsp;(pos, width, height)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DSprite"></a><strong>render.draw3DSprite</strong>( pos, width, height )</dt>
 <dd>
-
-Draws a sprite in 3d space.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a sprite in 3d space.</p>
 	
-	<li>
-	  <code><em>pos</em></code>: Position of the sprite.
-	</li>
 	
-	<li>
-	  <code><em>width</em></code>: Width of the sprite.
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pos</tt> ― Position of the sprite.</li>
+			<li><tt>width</tt> ― Width of the sprite.</li>
+			<li><tt>height</tt> ― Height of the sprite.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>height</em></code>: Height of the sprite.
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DWireframeBox"></a><strong>render.draw3DWireframeBox</strong>&nbsp;(origin, angle, mins, maxs)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DWireframeBox"></a><strong>render.draw3DWireframeBox</strong>( origin, angle, mins, maxs )</dt>
 <dd>
-
-Draws a wireframe box in 3D space
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a wireframe box in 3D space</p>
 	
-	<li>
-	  <code><em>origin</em></code>: Origin of the box.
-	</li>
 	
-	<li>
-	  <code><em>angle</em></code>: Orientation  of the box
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>origin</tt> ― Origin of the box.</li>
+			<li><tt>angle</tt> ― Orientation  of the box</li>
+			<li><tt>mins</tt> ― Start position of the box, relative to origin.</li>
+			<li><tt>maxs</tt> ― End position of the box, relative to origin.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>mins</em></code>: Start position of the box, relative to origin.
-	</li>
 	
-	<li>
-	  <code><em>maxs</em></code>: End position of the box, relative to origin.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.draw3DWireframeSphere"></a><strong>render.draw3DWireframeSphere</strong>&nbsp;(pos, radius, longitudeSteps, latitudeSteps)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DWireframeSphere"></a><strong>render.draw3DWireframeSphere</strong>( pos, radius, longitudeSteps, latitudeSteps )</dt>
 <dd>
-
-Draws a wireframe sphere
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a wireframe sphere</p>
 	
-	<li>
-	  <code><em>pos</em></code>: Position of the sphere
-	</li>
 	
-	<li>
-	  <code><em>radius</em></code>: Radius of the sphere
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pos</tt> ― Position of the sphere</li>
+			<li><tt>radius</tt> ― Radius of the sphere</li>
+			<li><tt>longitudeSteps</tt> ― The amount of longitude steps. The larger this number is, the smoother the sphere is</li>
+			<li><tt>latitudeSteps</tt> ― The amount of latitude steps. The larger this number is, the smoother the sphere is</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>longitudeSteps</em></code>: The amount of longitude steps. The larger this number is, the smoother the sphere is
-	</li>
 	
-	<li>
-	  <code><em>latitudeSteps</em></code>: The amount of latitude steps. The larger this number is, the smoother the sphere is
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawCircle"></a><strong>render.drawCircle</strong>&nbsp;(x, y, r)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawCircle"></a><strong>render.drawCircle</strong>( x, y, r )</dt>
 <dd>
-
-Draws a circle outline
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a circle outline</p>
 	
-	<li>
-	  <code><em>x</em></code>: Center x coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Center y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Center x coordinate</li>
+			<li><tt>y</tt> ― Center y coordinate</li>
+			<li><tt>r</tt> ― Radius</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>r</em></code>: Radius
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawLine"></a><strong>render.drawLine</strong>&nbsp;(x1, y1, x2, y2)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawLine"></a><strong>render.drawLine</strong>( x1, y1, x2, y2 )</dt>
 <dd>
-
-Draws a line
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a line</p>
 	
-	<li>
-	  <code><em>x1</em></code>: X start coordinate
-	</li>
 	
-	<li>
-	  <code><em>y1</em></code>: Y start coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x1</tt> ― X start coordinate</li>
+			<li><tt>y1</tt> ― Y start coordinate</li>
+			<li><tt>x2</tt> ― X end coordinate</li>
+			<li><tt>y2</tt> ― Y end coordinate</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>x2</em></code>: X end coordinate
-	</li>
 	
-	<li>
-	  <code><em>y2</em></code>: Y end coordinate
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawPoly"></a><strong>render.drawPoly</strong>&nbsp;(poly)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawPoly"></a><strong>render.drawPoly</strong>( poly )</dt>
 <dd>
-
-Draws a polygon.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a polygon.</p>
 	
-	<li>
-	  <code><em>poly</em></code>: Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>poly</tt> ― Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawRect"></a><strong>render.drawRect</strong>&nbsp;(x, y, w, h)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawRect"></a><strong>render.drawRect</strong>( x, y, w, h )</dt>
 <dd>
-
-Draws a rectangle using the current color.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a rectangle using the current color.</p>
 	
-	<li>
-	  <code><em>x</em></code>: Top left corner x coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Top left corner y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x coordinate</li>
+			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
 	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawRectOutline"></a><strong>render.drawRectOutline</strong>&nbsp;(x, y, w, h)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawRectOutline"></a><strong>render.drawRectOutline</strong>( x, y, w, h )</dt>
 <dd>
-
-Draws a rectangle outline using the current color.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a rectangle outline using the current color.</p>
 	
-	<li>
-	  <code><em>x</em></code>: Top left corner x coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Top left corner y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x coordinate</li>
+			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
 	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawRoundedBox"></a><strong>render.drawRoundedBox</strong>&nbsp;(r, x, y, w, h)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawRoundedBox"></a><strong>render.drawRoundedBox</strong>( r, x, y, w, h )</dt>
 <dd>
-
-Draws a rounded rectangle using the current color
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a rounded rectangle using the current color</p>
 	
-	<li>
-	  <code><em>r</em></code>: The corner radius
-	</li>
 	
-	<li>
-	  <code><em>x</em></code>: Top left corner x coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>r</tt> ― The corner radius</li>
+			<li><tt>x</tt> ― Top left corner x coordinate</li>
+			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>y</em></code>: Top left corner y coordinate
-	</li>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
-	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawRoundedBoxEx"></a><strong>render.drawRoundedBoxEx</strong>&nbsp;(r, x, y, w, h, tl, tr, bl, br)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawRoundedBoxEx"></a><strong>render.drawRoundedBoxEx</strong>( r, x, y, w, h, tl, tr, bl, br )</dt>
 <dd>
-
-Draws a rounded rectangle using the current color
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a rounded rectangle using the current color</p>
 	
-	<li>
-	  <code><em>r</em></code>: The corner radius
-	</li>
 	
-	<li>
-	  <code><em>x</em></code>: Top left corner x coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>r</tt> ― The corner radius</li>
+			<li><tt>x</tt> ― Top left corner x coordinate</li>
+			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+			<li><tt>tl</tt> ― Boolean Top left corner</li>
+			<li><tt>tr</tt> ― Boolean Top right corner</li>
+			<li><tt>bl</tt> ― Boolean Bottom left corner</li>
+			<li><tt>br</tt> ― Boolean Bottom right corner</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>y</em></code>: Top left corner y coordinate
-	</li>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
-	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-	<li>
-	  <code><em>tl</em></code>: Boolean Top left corner
-	</li>
-	
-	<li>
-	  <code><em>tr</em></code>: Boolean Top right corner
-	</li>
-	
-	<li>
-	  <code><em>bl</em></code>: Boolean Bottom left corner
-	</li>
-	
-	<li>
-	  <code><em>br</em></code>: Boolean Bottom right corner
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawSimpleText"></a><strong>render.drawSimpleText</strong>&nbsp;(x, y, text, xalign, yalign)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawSimpleText"></a><strong>render.drawSimpleText</strong>( x, y, text, xalign, yalign )</dt>
 <dd>
-
-Draws text more easily and quickly but no new lines or tabs.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws text more easily and quickly but no new lines or tabs.</p>
 	
-	<li>
-	  <code><em>x</em></code>: X coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― X coordinate</li>
+			<li><tt>y</tt> ― Y coordinate</li>
+			<li><tt>text</tt> ― Text to draw</li>
+			<li><tt>xalign</tt> ― Text x alignment</li>
+			<li><tt>yalign</tt> ― Text y alignment</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>text</em></code>: Text to draw
-	</li>
 	
-	<li>
-	  <code><em>xalign</em></code>: Text x alignment
-	</li>
-	
-	<li>
-	  <code><em>yalign</em></code>: Text y alignment
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawText"></a><strong>render.drawText</strong>&nbsp;(x, y, text, alignment)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawText"></a><strong>render.drawText</strong>( x, y, text, alignment )</dt>
 <dd>
-
-Draws text with newlines and tabs
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws text with newlines and tabs</p>
 	
-	<li>
-	  <code><em>x</em></code>: X coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― X coordinate</li>
+			<li><tt>y</tt> ― Y coordinate</li>
+			<li><tt>text</tt> ― Text to draw</li>
+			<li><tt>alignment</tt> ― Text alignment</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>text</em></code>: Text to draw
-	</li>
 	
-	<li>
-	  <code><em>alignment</em></code>: Text alignment
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawTexturedRect"></a><strong>render.drawTexturedRect</strong>&nbsp;(x, y, w, h)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawTexturedRect"></a><strong>render.drawTexturedRect</strong>( x, y, w, h )</dt>
 <dd>
-
-Draws a textured rectangle.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a textured rectangle.</p>
 	
-	<li>
-	  <code><em>x</em></code>: Top left corner x coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Top left corner y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x coordinate</li>
+			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
 	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawTexturedRectRotated"></a><strong>render.drawTexturedRectRotated</strong>&nbsp;(x, y, w, h, rot)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawTexturedRectRotated"></a><strong>render.drawTexturedRectRotated</strong>( x, y, w, h, rot )</dt>
 <dd>
-
-Draws a rotated, textured rectangle.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a rotated, textured rectangle.</p>
 	
-	<li>
-	  <code><em>x</em></code>: X coordinate of center of rect
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Y coordinate of center of rect
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― X coordinate of center of rect</li>
+			<li><tt>y</tt> ― Y coordinate of center of rect</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+			<li><tt>rot</tt> ― Rotation in degrees</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
 	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-	<li>
-	  <code><em>rot</em></code>: Rotation in degrees
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.drawTexturedRectUV"></a><strong>render.drawTexturedRectUV</strong>&nbsp;(x, y, w, h, startU, startV, endU, endV)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.drawTexturedRectUV"></a><strong>render.drawTexturedRectUV</strong>( x, y, w, h, startU, startV, endU, endV )</dt>
 <dd>
-
-Draws a textured rectangle with UV coordinates
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Draws a textured rectangle with UV coordinates</p>
 	
-	<li>
-	  <code><em>x</em></code>: Top left corner x coordinate
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Top left corner y coordinate
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x coordinate</li>
+			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+			<li><tt>startU</tt> ― Texture mapping at rectangle origin</li>
+			<li><tt>startV</tt> ― Texture mapping at rectangle origin</li>
+			<li><tt>endU</tt></li>
+			<li><tt>endV</tt> ― Texture mapping at rectangle end</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>w</em></code>: Width
-	</li>
 	
-	<li>
-	  <code><em>h</em></code>: Height
-	</li>
-	
-	<li>
-	  <code><em>startU</em></code>: Texture mapping at rectangle origin
-	</li>
-	
-	<li>
-	  <code><em>startV</em></code>: Texture mapping at rectangle origin
-	</li>
-	
-	<li>
-	  <code><em>endU</em></code>: 
-	</li>
-	
-	<li>
-	  <code><em>endV</em></code>: Texture mapping at rectangle end
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.enableDepth"></a><strong>render.enableDepth</strong>&nbsp;(enable)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.enableDepth"></a><strong>render.enableDepth</strong>( enable )</dt>
 <dd>
-
-Enables or disables Depth Buffer
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Enables or disables Depth Buffer</p>
 	
-	<li>
-	  <code><em>enable</em></code>: true to enable
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>enable</tt> ― true to enable</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.enableScissorRect"></a><strong>render.enableScissorRect</strong>&nbsp;(startX, startY, endX, endY)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.enableScissorRect"></a><strong>render.enableScissorRect</strong>( startX, startY, endX, endY )</dt>
 <dd>
-
-Enables a scissoring rect which limits the drawing area. Only works 2D contexts such as HUD or render targets.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Enables a scissoring rect which limits the drawing area. Only works 2D contexts such as HUD or render targets.</p>
 	
-	<li>
-	  <code><em>startX</em></code>: X start coordinate of the scissor rect.
-	</li>
 	
-	<li>
-	  <code><em>startY</em></code>: Y start coordinate of the scissor rect.
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>startX</tt> ― X start coordinate of the scissor rect.</li>
+			<li><tt>startY</tt> ― Y start coordinate of the scissor rect.</li>
+			<li><tt>endX</tt> ― Y end coordinate of the scissor rect.</li>
+			<li><tt>endY</tt></li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>endX</em></code>: Y end coordinate of the scissor rect.
-	</li>
 	
-	<li>
-	  <code><em>endY</em></code>: 
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getDefaultFont"></a><strong>render.getDefaultFont</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getDefaultFont"></a><strong>render.getDefaultFont</strong>(  )</dt>
 <dd>
-
-Gets the default font
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Default font</ul>
-
-
-
-
-
+	<p>
+Gets the default font</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Default font</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getRenderTargetMaterial"></a><strong>render.getRenderTargetMaterial</strong>&nbsp;(name)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getRenderTargetMaterial"></a><strong>render.getRenderTargetMaterial</strong>( name )</dt>
 <dd>
-
-Returns the model material name that uses the render target.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns the model material name that uses the render target.</p>
 	
-	<li>
-	  <code><em>name</em></code>: Render target name
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Model material name. Send this to the server to set the entity's material.</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― Render target name</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Model material name. Send this to the server to set the entity's material.</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getResolution"></a><strong>render.getResolution</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getResolution"></a><strong>render.getResolution</strong>(  )</dt>
 <dd>
-
-Returns the render context's width and height
-
-
-
-
-
-
-
-
-
-<h3>Return values:</h3>
-<ol>
+	<p>
+Returns the render context's width and height</p>
 	
-	<li>the X size of the current render context</li>
 	
-	<li>the Y size of the current render context</li>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return values:</h3>
+		<ol>
+			
+			<li>the X size of the current render context</li>
+			<li>the Y size of the current render context</li>
+		</ol>
+	</section>
 	
-</ol>
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getScreenEntity"></a><strong>render.getScreenEntity</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getScreenEntity"></a><strong>render.getScreenEntity</strong>(  )</dt>
 <dd>
-
-Returns the entity currently being rendered to
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Entity of the screen or hud being rendered</ul>
-
-
-
-
-
+	<p>
+Returns the entity currently being rendered to</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Entity of the screen or hud being rendered</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getScreenInfo"></a><strong>render.getScreenInfo</strong>&nbsp;(e)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getScreenInfo"></a><strong>render.getScreenInfo</strong>( e )</dt>
 <dd>
-
+	<p>
 Returns information about the screen, such as world offsets, dimentions, and rotation. 
-Note: this does a table copy so move it out of your draw hook
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+Note: this does a table copy so move it out of your draw hook</p>
 	
-	<li>
-	  <code><em>e</em></code>: The screen to get info from.
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>A table describing the screen.</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>e</tt> ― The screen to get info from.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>A table describing the screen.</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getTextSize"></a><strong>render.getTextSize</strong>&nbsp;(text)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getTextSize"></a><strong>render.getTextSize</strong>( text )</dt>
 <dd>
-
-Gets the size of the specified text. Don't forget to use setFont before calling this function
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Gets the size of the specified text. Don't forget to use setFont before calling this function</p>
 	
-	<li>
-	  <code><em>text</em></code>: Text to get the size of
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return values:</h3>
-<ol>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>text</tt> ― Text to get the size of</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return values:</h3>
+		<ol>
+			
+			<li>width of the text</li>
+			<li>height of the text</li>
+		</ol>
+	</section>
 	
-	<li>width of the text</li>
 	
-	<li>height of the text</li>
-	
-</ol>
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>&nbsp;(tx, cb, alignment, skip_hack)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>( tx, cb, alignment, skip_hack )</dt>
 <dd>
-
+	<p>
 Looks up a texture by file name. Use with render.setTexture to draw with it. 
-Make sure to store the texture to use it rather than calling this slow function repeatedly.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+Make sure to store the texture to use it rather than calling this slow function repeatedly.</p>
 	
-	<li>
-	  <code><em>tx</em></code>: Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
-	</li>
 	
-	<li>
-	  <code><em>cb</em></code>: Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
+			<li><tt>cb</tt> ― Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url</li>
+			<li><tt>alignment</tt> ― Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp</li>
+			<li><tt>skip_hack</tt> ― Turns off texture hack so you can use UVs on 3D objects</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.</p>
+		
+	</section>
 	
-	<li>
-	  <code><em>alignment</em></code>: Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
-	</li>
 	
-	<li>
-	  <code><em>skip_hack</em></code>: Turns off texture hack so you can use UVs on 3D objects
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.</ul>
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.isHUDActive"></a><strong>render.isHUDActive</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.isHUDActive"></a><strong>render.isHUDActive</strong>(  )</dt>
 <dd>
-
-Checks if a hud component is connected to the Starfall Chip
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Checks if a hud component is connected to the Starfall Chip</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.parseMarkup"></a><strong>render.parseMarkup</strong>&nbsp;(str, maxsize)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.parseMarkup"></a><strong>render.parseMarkup</strong>( str, maxsize )</dt>
 <dd>
-
-Constructs a markup object for quick styled text drawing.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Constructs a markup object for quick styled text drawing.</p>
 	
-	<li>
-	  <code><em>str</em></code>: The markup string to parse
-	</li>
 	
-	<li>
-	  <code><em>maxsize</em></code>: The max width of the markup
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>str</tt> ― The markup string to parse</li>
+			<li><tt>maxsize</tt> ― The max width of the markup</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject</p>
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject</ul>
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.popMatrix"></a><strong>render.popMatrix</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.popMatrix"></a><strong>render.popMatrix</strong>(  )</dt>
 <dd>
-
-Pops a matrix from the matrix stack.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Pops a matrix from the matrix stack.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.popViewMatrix"></a><strong>render.popViewMatrix</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.popViewMatrix"></a><strong>render.popViewMatrix</strong>(  )</dt>
 <dd>
-
-Pops a view matrix from the matrix stack.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Pops a view matrix from the matrix stack.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.pushMatrix"></a><strong>render.pushMatrix</strong>&nbsp;(m, world)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.pushMatrix"></a><strong>render.pushMatrix</strong>( m, world )</dt>
 <dd>
-
-Pushes a matrix onto the matrix stack.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Pushes a matrix onto the matrix stack.</p>
 	
-	<li>
-	  <code><em>m</em></code>: The matrix
-	</li>
 	
-	<li>
-	  <code><em>world</em></code>: Should the transformation be relative to the screen or world?
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>m</tt> ― The matrix</li>
+			<li><tt>world</tt> ― Should the transformation be relative to the screen or world?</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.pushViewMatrix"></a><strong>render.pushViewMatrix</strong>&nbsp;(tbl)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.pushViewMatrix"></a><strong>render.pushViewMatrix</strong>( tbl )</dt>
 <dd>
-
-Pushes a perspective matrix onto the view matrix stack.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Pushes a perspective matrix onto the view matrix stack.</p>
 	
-	<li>
-	  <code><em>tbl</em></code>: The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>tbl</tt> ― The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.readPixel"></a><strong>render.readPixel</strong>&nbsp;(x, y)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.readPixel"></a><strong>render.readPixel</strong>( x, y )</dt>
 <dd>
-
-Reads the color of the specified pixel.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Reads the color of the specified pixel.</p>
 	
-	<li>
-	  <code><em>x</em></code>: Pixel x-coordinate.
-	</li>
 	
-	<li>
-	  <code><em>y</em></code>: Pixel y-coordinate.
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Pixel x-coordinate.</li>
+			<li><tt>y</tt> ― Pixel y-coordinate.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Color object with ( r, g, b, 255 ) from the specified pixel.</p>
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Color object with ( r, g, b, 255 ) from the specified pixel.</ul>
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.selectRenderTarget"></a><strong>render.selectRenderTarget</strong>&nbsp;(name)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.selectRenderTarget"></a><strong>render.selectRenderTarget</strong>( name )</dt>
 <dd>
-
+	<p>
 Selects the render target to draw on. 
-Nil for the visible RT.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+Nil for the visible RT.</p>
 	
-	<li>
-	  <code><em>name</em></code>: Name of the render target to use
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― Name of the render target to use</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setBackgroundColor"></a><strong>render.setBackgroundColor</strong>&nbsp;(col, screen)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setBackgroundColor"></a><strong>render.setBackgroundColor</strong>( col, screen )</dt>
 <dd>
-
-Sets the draw color
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the draw color</p>
 	
-	<li>
-	  <code><em>col</em></code>: Color of background
-	</li>
 	
-	<li>
-	  <code><em>screen</em></code>: 
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>col</tt> ― Color of background</li>
+			<li><tt>screen</tt></li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setColor"></a><strong>render.setColor</strong>&nbsp;(clr)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setColor"></a><strong>render.setColor</strong>( clr )</dt>
 <dd>
-
-Sets the draw color
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the draw color</p>
 	
-	<li>
-	  <code><em>clr</em></code>: Color type
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>clr</tt> ― Color type</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setCullMode"></a><strong>render.setCullMode</strong>&nbsp;(mode)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setCullMode"></a><strong>render.setCullMode</strong>( mode )</dt>
 <dd>
-
-Changes the cull mode
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Changes the cull mode</p>
 	
-	<li>
-	  <code><em>mode</em></code>: Cull mode. 0 for counter clock wise, 1 for clock wise
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mode</tt> ― Cull mode. 0 for counter clock wise, 1 for clock wise</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setFilterMag"></a><strong>render.setFilterMag</strong>&nbsp;(val)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setFilterMag"></a><strong>render.setFilterMag</strong>( val )</dt>
 <dd>
-
-Sets the texture filtering function when viewing a close texture
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the texture filtering function when viewing a close texture</p>
 	
-	<li>
-	  <code><em>val</em></code>: The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setFilterMin"></a><strong>render.setFilterMin</strong>&nbsp;(val)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setFilterMin"></a><strong>render.setFilterMin</strong>( val )</dt>
 <dd>
-
-Sets the texture filtering function when viewing a far texture
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the texture filtering function when viewing a far texture</p>
 	
-	<li>
-	  <code><em>val</em></code>: The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setFont"></a><strong>render.setFont</strong>&nbsp;(font)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setFont"></a><strong>render.setFont</strong>( font )</dt>
 <dd>
-
-Sets the font
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the font</p>
 	
-	<li>
-	  <code><em>font</em></code>: The font to use
-	</li>
 	
-</ul>
-
-
-
-
-<h3>Usage:</h3>
-<ul><pre class=example>Use a font created by render.createFont or use one of these already defined fonts: 
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>font</tt> ― The font to use</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+		<p><pre class="example">Use a font created by render.createFont or use one of these already defined fonts: 
 - DebugFixed 
 - DebugFixedSmall 
 - Default 
@@ -2909,212 +1836,154 @@ Sets the font
 - HudNumbers 
 - DermaDefault 
 - DermaDefaultBold 
-- DermaLarge</pre></ul>
-
-
-
-
-
-
-
+- DermaLarge</pre></p>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setRGBA"></a><strong>render.setRGBA</strong>&nbsp;(r, g, b, a)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setRGBA"></a><strong>render.setRGBA</strong>( r, g, b, a )</dt>
 <dd>
-
-Sets the draw color by RGBA values
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the draw color by RGBA values</p>
 	
-	<li>
-	  <code><em>r</em></code>: 
-	</li>
 	
-	<li>
-	  <code><em>g</em></code>: 
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>r</tt></li>
+			<li><tt>g</tt></li>
+			<li><tt>b</tt></li>
+			<li><tt>a</tt></li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-	<li>
-	  <code><em>b</em></code>: 
-	</li>
 	
-	<li>
-	  <code><em>a</em></code>: 
-	</li>
-	
-</ul>
-
-
-
-
-
-
-
-
-
-
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setRenderTargetTexture"></a><strong>render.setRenderTargetTexture</strong>&nbsp;(name)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setRenderTargetTexture"></a><strong>render.setRenderTargetTexture</strong>( name )</dt>
 <dd>
-
+	<p>
 Sets the active texture to the render target with the specified name. 
-Nil to reset.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+Nil to reset.</p>
 	
-	<li>
-	  <code><em>name</em></code>: Name of the render target to use
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― Name of the render target to use</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setTexture"></a><strong>render.setTexture</strong>&nbsp;(id)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setTexture"></a><strong>render.setTexture</strong>( id )</dt>
 <dd>
-
-Sets the texture
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the texture</p>
 	
-	<li>
-	  <code><em>id</em></code>: Texture table. Aquired with render.getTextureID
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― Texture table. Aquired with render.getTextureID</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.setTextureFromScreen"></a><strong>render.setTextureFromScreen</strong>&nbsp;(ent)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.setTextureFromScreen"></a><strong>render.setTextureFromScreen</strong>( ent )</dt>
 <dd>
-
-Sets the texture of a screen entity
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the texture of a screen entity</p>
 	
-	<li>
-	  <code><em>ent</em></code>: Screen entity
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ent</tt> ― Screen entity</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="render.traceSurfaceColor"></a><strong>render.traceSurfaceColor</strong>&nbsp;(vec1, vec2)</dt>
+		
+<dt><span class="realm_cl"></span><a name="render.traceSurfaceColor"></a><strong>render.traceSurfaceColor</strong>( vec1, vec2 )</dt>
 <dd>
-
-Does a trace and returns the color of the textel the trace hits.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Does a trace and returns the color of the textel the trace hits.</p>
 	
-	<li>
-	  <code><em>vec1</em></code>: The starting vector
-	</li>
 	
-	<li>
-	  <code><em>vec2</em></code>: The ending vector
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vec1</tt> ― The starting vector</li>
+			<li><tt>vec2</tt> ― The ending vector</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>The color vector. use vector:toColor to convert it to a color.</p>
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>The color vector. use vector:toColor to convert it to a color.</ul>
-
-
-
-
-
+	
 </dd>
+	</dl>
+</section>
 
-
-</dl>
-
-
-
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>

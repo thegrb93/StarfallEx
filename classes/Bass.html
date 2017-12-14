@@ -1,534 +1,186 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<script type="text/javascript">fromPath="../"</script>
-<script type="text/javascript" src="../search.js"></script>
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><strong>Index</strong></li>
-	
-</ul>
-
-<h1><input placeholder="Search" id="search"></h1>
-
-<div id="default_index">
-	<h1>Preprocessor directives</h1>
-	<ul>
-	
-		<li>
-			<a href="../directives.html#client">--@client</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#include">--@include</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#includedir">--@includedir</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#model">--@model</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#name">--@name</a>
-		</li>
-	
-		<li>
-			<a href="../directives.html#server">--@server</a>
-		</li>
-	
-	</ul>
-
-	<!-- Module list -->
-	
-	<h1>Libraries</h1>
-	<ul>
-	
-		<li>
-			<a href="../libraries/bass.html">bass</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/builtin.html">builtin</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/constraint.html">constraint</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/coroutine.html">coroutine</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/fastlz.html">fastlz</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/file.html">file</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/find.html">find</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/game.html">game</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/holograms.html">holograms</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/hook.html">hook</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/http.html">http</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/input.html">input</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/joystick.html">joystick</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/json.html">json</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/mesh.html">mesh</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/net.html">net</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/particle.html">particle</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/physenv.html">physenv</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/prop.html">prop</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/quaternion.html">quaternion</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/render.html">render</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/sounds.html">sounds</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/team.html">team</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/timer.html">timer</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/trace.html">trace</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/von.html">von</a>
-		</li>
-	
-		<li>
-			<a href="../libraries/wire.html">wire</a>
-		</li>
-	
-	</ul>
-	
-
-	<h1>Types</h1>
-	<ul>
-		
-				<li><a href="../classes/Angle.html">Angle</a></li>
-			
-				<li><strong>Bass</strong></li>
-			
-				<li><a href="../classes/Color.html">Color</a></li>
-			
-				<li><a href="../classes/Entity.html">Entity</a></li>
-			
-				<li><a href="../classes/File.html">File</a></li>
-			
-				<li><a href="../classes/Hologram.html">Hologram</a></li>
-			
-				<li><a href="../classes/Mesh.html">Mesh</a></li>
-			
-				<li><a href="../classes/Npc.html">Npc</a></li>
-			
-				<li><a href="../classes/Particle.html">Particle</a></li>
-			
-				<li><a href="../classes/PhysObj.html">PhysObj</a></li>
-			
-				<li><a href="../classes/Player.html">Player</a></li>
-			
-				<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-			
-				<li><a href="../classes/Sound.html">Sound</a></li>
-			
-				<li><a href="../classes/VMatrix.html">VMatrix</a></li>
-			
-				<li><a href="../classes/Vector.html">Vector</a></li>
-			
-				<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-			
-				<li><a href="../classes/Weapon.html">Weapon</a></li>
-			
-				<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-			
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#FinishChat">FinishChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Initialize">Initialize</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyPress">KeyPress</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#KeyRelease">KeyRelease</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerChat">PlayerChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSay">PlayerSay</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PlayerUse">PlayerUse</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#PropBreak">PropBreak</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#Removed">Removed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartChat">StartChat</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#calcview">calcview</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#drawhud">drawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#hudconnected">hudconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#huddisconnected">huddisconnected</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#input">input</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputPressed">inputPressed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#inputReleased">inputReleased</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#mousemoved">mousemoved</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#net">net</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawhud">postdrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawhud">predrawhud</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#readcell">readcell</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#remote">remote</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#render">render</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#renderoffscreen">renderoffscreen</a>
-		</li>
-	
-		<li>
-			<span class="realm_cl">&nbsp;</span><a href="../hooks.html#starfallUsed">starfallUsed</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#think">think</a>
-		</li>
-	
-		<li>
-			<span class="realm_sh">&nbsp;</span><a href="../hooks.html#tick">tick</a>
-		</li>
-	
-		<li>
-			<span class="realm_sv">&nbsp;</span><a href="../hooks.html#writecell">writecell</a>
-		</li>
-	
-	</ul>
-
-	<h1>Examples</h1>
-	<ul>
-	
-		<li>
-			<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/eyeBox.lua.html">eyeBox.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/console.lua.html">console.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/class.lua.html">class.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/sync.lua.html">sync.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/include.lua.html">include.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/music_player.lua.html">music_player.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/included.lua.html">included.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-		</li>
-	
-		<li>
-			<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-		</li>
-	
-	</ul>
-
-	<!-- File list -->
-	
-</div>
-
-<div id="search_results" style="display:none;">
-	<h1>Functions</h1>
-	<ul id="search_functions">
-		
-	</ul>
-
-	<h1>Methods</h1>
-	<ul id="search_methods">
-		
-	</ul>
-
-	<h1>Hooks</h1>
-	<ul id="search_hooks">
-		
-	</ul>
-</div>
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Type <code>Bass</code></h1>
-
+	<head>
+		<title>Bass :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li>bass</li>
+						<li>builtin</li>
+						<li>constraint</li>
+						<li>coroutine</li>
+						<li>fastlz</li>
+						<li>file</li>
+						<li>find</li>
+						<li>game</li>
+						<li>holograms</li>
+						<li>hook</li>
+						<li>http</li>
+						<li>input</li>
+						<li>joystick</li>
+						<li>json</li>
+						<li>mesh</li>
+						<li>net</li>
+						<li>particle</li>
+						<li>physenv</li>
+						<li>prop</li>
+						<li>quaternion</li>
+						<li>render</li>
+						<li>sounds</li>
+						<li>team</li>
+						<li>timer</li>
+						<li>trace</li>
+						<li>von</li>
+						<li>wire</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li>Angle</li>
+						<li><a href="../classes/Bass.html">Bass</a></li>
+						<li>Color</li>
+						<li>Entity</li>
+						<li>File</li>
+						<li>Hologram</li>
+						<li>Mesh</li>
+						<li>Npc</li>
+						<li>Particle</li>
+						<li>PhysObj</li>
+						<li>Player</li>
+						<li>Quaternion</li>
+						<li>Sound</li>
+						<li>VMatrix</li>
+						<li>Vector</li>
+						<li>Vehicle</li>
+						<li>Weapon</li>
+						<li>Wirelink</li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Examples</h1>
+					<ul>
+						
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+<h1><tt>Bass</tt> type</h1>
 <p>
 Bass type</p>
 
@@ -536,522 +188,399 @@ Bass type</p>
 
 
 
-
-
-<h2>Methods</h2>
-<table class="function_list">
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:getFFT">getFFT</a>&nbsp;(n)</td>
-		<td class="summary">
+<section class="methods">
+	<h2>Methods</h2>
+	<table class="list">
+		
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:getFFT">getFFT</a>( n )</td>
+			<td class="summary">
 Gets the FFT of a sound </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:getLength">getLength</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:getLength">getLength</a>(  )</td>
+			<td class="summary">
 Gets the length of a sound </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:getTime">getTime</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:getTime">getTime</a>(  )</td>
+			<td class="summary">
 Gets the current time of a sound </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:isOnline">isOnline</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:isOnline">isOnline</a>(  )</td>
+			<td class="summary">
 Gets if the sound is streamed or not </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:isValid">isValid</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:isValid">isValid</a>(  )</td>
+			<td class="summary">
 Gets if the sound is valid or not </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:pause">pause</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:pause">pause</a>(  )</td>
+			<td class="summary">
 Pauses the sound.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:play">play</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:play">play</a>(  )</td>
+			<td class="summary">
 Starts to play the sound.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:setFade">setFade</a>&nbsp;(min, max)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setFade">setFade</a>( min, max )</td>
+			<td class="summary">
 Sets the fade distance of the sound </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:setLooping">setLooping</a>&nbsp;(loop)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setLooping">setLooping</a>( loop )</td>
+			<td class="summary">
 Sets if the sound should loop or not.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:setPitch">setPitch</a>&nbsp;(pitch)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setPitch">setPitch</a>( pitch )</td>
+			<td class="summary">
 Sets the pitch of the sound.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:setPos">setPos</a>&nbsp;(pos)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setPos">setPos</a>( pos )</td>
+			<td class="summary">
 Sets the position of the sound </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:setTime">setTime</a>&nbsp;(time)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setTime">setTime</a>( time )</td>
+			<td class="summary">
 Sets the current time of a sound </td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:setVolume">setVolume</a>&nbsp;(vol)</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setVolume">setVolume</a>( vol )</td>
+			<td class="summary">
 Sets the volume of the sound.</td>
-	</tr>
-
-	<tr>
-		<td class="name" nowrap><span class="realm_cl">&nbsp;</span><a href="#bass_methods:stop">stop</a>&nbsp;()</td>
-		<td class="summary">
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:stop">stop</a>(  )</td>
+			<td class="summary">
 Stops playing the sound.</td>
-	</tr>
-
-</table>
-
-
-
-<br/>
-<br/>
-
-
-<h2><a name="methods"></a>Methods</h2>
-<dl class="function">
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:getFFT"></a><strong>Bass:getFFT</strong>&nbsp;(n)</dt>
+		</tr>
+	</table>
+</section>
+<section class="methods_def">
+	<h2><a name="methods_def"></a>Methods definition</h2>
+	<dl>
+		
+		
+<dt><span class="realm_cl"></span><a name="Bass:getFFT"></a><strong>Bass:getFFT</strong>( n )</dt>
 <dd>
-
-Gets the FFT of a sound
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Gets the FFT of a sound</p>
 	
-	<li>
-	  <code><em>n</em></code>: Sample size of the hamming window. Must be power of 2
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>FFT table of the sound</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt> ― Sample size of the hamming window. Must be power of 2</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>FFT table of the sound</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:getLength"></a><strong>Bass:getLength</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:getLength"></a><strong>Bass:getLength</strong>(  )</dt>
 <dd>
-
-Gets the length of a sound
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Length in seconds of the sound</ul>
-
-
-
-
-
+	<p>
+Gets the length of a sound</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Length in seconds of the sound</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:getTime"></a><strong>Bass:getTime</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:getTime"></a><strong>Bass:getTime</strong>(  )</dt>
 <dd>
-
-Gets the current time of a sound
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Current time in seconds of the sound</ul>
-
-
-
-
-
+	<p>
+Gets the current time of a sound</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Current time in seconds of the sound</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:isOnline"></a><strong>Bass:isOnline</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:isOnline"></a><strong>Bass:isOnline</strong>(  )</dt>
 <dd>
-
-Gets if the sound is streamed or not
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Is online or not</ul>
-
-
-
-
-
+	<p>
+Gets if the sound is streamed or not</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Is online or not</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:isValid"></a><strong>Bass:isValid</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:isValid"></a><strong>Bass:isValid</strong>(  )</dt>
 <dd>
-
-Gets if the sound is valid or not
-
-
-
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Is valid or not</ul>
-
-
-
-
-
+	<p>
+Gets if the sound is valid or not</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+		<h3>Return value:</h3>
+		<p>Is valid or not</p>
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:pause"></a><strong>Bass:pause</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:pause"></a><strong>Bass:pause</strong>(  )</dt>
 <dd>
-
-Pauses the sound.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Pauses the sound.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:play"></a><strong>Bass:play</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:play"></a><strong>Bass:play</strong>(  )</dt>
 <dd>
-
-Starts to play the sound.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Starts to play the sound.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:setFade"></a><strong>Bass:setFade</strong>&nbsp;(min, max)</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:setFade"></a><strong>Bass:setFade</strong>( min, max )</dt>
 <dd>
-
-Sets the fade distance of the sound
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the fade distance of the sound</p>
 	
-	<li>
-	  <code><em>min</em></code>: The channel's volume is at maximum when the listener is within this distance
-	</li>
 	
-	<li>
-	  <code><em>max</em></code>: The channel's volume stops decreasing when the listener is beyond this distance.
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>min</tt> ― The channel's volume is at maximum when the listener is within this distance</li>
+			<li><tt>max</tt> ― The channel's volume stops decreasing when the listener is beyond this distance.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:setLooping"></a><strong>Bass:setLooping</strong>&nbsp;(loop)</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:setLooping"></a><strong>Bass:setLooping</strong>( loop )</dt>
 <dd>
-
-Sets if the sound should loop or not.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets if the sound should loop or not.</p>
 	
-	<li>
-	  <code><em>loop</em></code>: Boolean if the sound should loop or not.
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>loop</tt> ― Boolean if the sound should loop or not.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:setPitch"></a><strong>Bass:setPitch</strong>&nbsp;(pitch)</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:setPitch"></a><strong>Bass:setPitch</strong>( pitch )</dt>
 <dd>
-
-Sets the pitch of the sound.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the pitch of the sound.</p>
 	
-	<li>
-	  <code><em>pitch</em></code>: Pitch to set to, between 0 and 3.
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pitch</tt> ― Pitch to set to, between 0 and 3.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:setPos"></a><strong>Bass:setPos</strong>&nbsp;(pos)</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:setPos"></a><strong>Bass:setPos</strong>( pos )</dt>
 <dd>
-
-Sets the position of the sound
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the position of the sound</p>
 	
-	<li>
-	  <code><em>pos</em></code>: Where to position the sound
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pos</tt> ― Where to position the sound</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:setTime"></a><strong>Bass:setTime</strong>&nbsp;(time)</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:setTime"></a><strong>Bass:setTime</strong>( time )</dt>
 <dd>
-
-Sets the current time of a sound
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the current time of a sound</p>
 	
-	<li>
-	  <code><em>time</em></code>: Time to set a sound in seconds
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>time</tt> ― Time to set a sound in seconds</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:setVolume"></a><strong>Bass:setVolume</strong>&nbsp;(vol)</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:setVolume"></a><strong>Bass:setVolume</strong>( vol )</dt>
 <dd>
-
-Sets the volume of the sound.
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Sets the volume of the sound.</p>
 	
-	<li>
-	  <code><em>vol</em></code>: Volume to set to, between 0 and 1.
-	</li>
 	
-</ul>
-
-
-
-
-
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vol</tt> ― Volume to set to, between 0 and 1.</li>
+		</ul>
+	</section>
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-
-
-
-<dt><span class="realm_cl">&nbsp;</span><a name="Bass:stop"></a><strong>Bass:stop</strong>&nbsp;()</dt>
+		
+<dt><span class="realm_cl"></span><a name="Bass:stop"></a><strong>Bass:stop</strong>(  )</dt>
 <dd>
-
-Stops playing the sound.
-
-
-
-
-
-
-
-
-
-
-
-
-
+	<p>
+Stops playing the sound.</p>
+	
+	
+	<section class="usage">
+		<h3>Usage</h3>
+		
+	</section>
+	<section class="return">
+		
+	</section>
+	
+	
 </dd>
-
-
-</dl>
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+	</dl>
+</section>
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+			</p>
+		</footer>
+	</body>
 </html>
