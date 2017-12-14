@@ -11,9 +11,6 @@ elseif hook_doc then
 elseif class_doc then
 	from = "classes/.." .. class_doc.name
 	pageTitle = class_doc.name .. pageTitleSign
-elseif dir_doc then
-	from = "directives/.." .. dir_doc.name
-	pageTitle = "--@" .. dir_doc.name .. pageTitleSign
 elseif example_doc then
 	from = "examples/.." .. example_doc.name
 	pageTitle = example_doc.name .. pageTitleSign
