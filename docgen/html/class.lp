@@ -1,7 +1,7 @@
 <?lua=docletsfhtml.include("_before_main.lp", { doc = doc, class_doc = class_doc })?>
 <h1><tt><?lua=class_doc.name?></tt> type</h1>
 <p><?lua=class_doc.description?></p>
-<?lua if class_doc.deprecated?>
+<?lua if class_doc.deprecated then?>
 <blockquote class="deprecation">
 	This type has been deprecated and will be removed in the future<?lua=class_doc.deprecated and " for the following reason: ".. class_doc.deprecated or ""?>.
 </blockquote><?lua end?>
