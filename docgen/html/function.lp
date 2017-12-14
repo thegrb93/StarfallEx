@@ -32,7 +32,7 @@ end
 			<li><pre class="example"><?lua=usage?></pre></li><?lua end?>
 		</ul><?lua end?>
 	</section><?lua end?>
-	<?lua func.ret then?>
+	<?lua if func.ret then?>
 	<section class="return">
 		<h3>Returns</h3>
 		<?lua if type(func.ret) == "string" then?>
