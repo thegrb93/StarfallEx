@@ -21,7 +21,7 @@ end
 			<li><tt><?lua=func.param[p]?></tt><?lua if #func.param[func.param[p]] > 1 then?> ― <?lua=func.param[func.param[p]]?><?lua end?></li><?lua end?>
 		</ul>
 	</section><?lua end?>
-	<?lua func.usage then?>
+	<?lua if func.usage then?>
 	<section class="usage">
 		<h3>Usage</h3>
 		<?lua if type(func.usage) == "string" then?>
