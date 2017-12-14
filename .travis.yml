@@ -17,6 +17,7 @@ install:
 script:
 - cd docgen
 - lua -v build_all.lua
+
 after_success:
 - cd ..
 - ". ./deploy.sh"
