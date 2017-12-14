@@ -1,4 +1,6 @@
 <?lua
+local string = require "string"
+
 local fname = func.name
 if func.classlib then
 	fname = func.classlib .. ":" .. func.fname
