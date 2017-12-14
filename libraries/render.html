@@ -550,13 +550,8 @@ Does a trace and returns the color of the textel the trace hits.</td>
 Dumps the current render target and allows the pixels to be accessed by render.readPixel.</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -575,13 +570,8 @@ Clears the active render target</p>
 			<li><tt>depth</tt> ― Boolean if should clear depth</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -603,13 +593,8 @@ Clears the current rendertarget for obeying the current stencil buffer condition
 			<li><tt>depth</tt> ― Clear the depth buffer.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -620,13 +605,8 @@ Clears the current rendertarget for obeying the current stencil buffer condition
 Resets the depth buffer</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -637,13 +617,8 @@ Resets the depth buffer</p>
 Resets all values in the stencil buffer to zero.</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -665,13 +640,8 @@ Sets the stencil value in a specified rect.</p>
 			<li><tt>stencilValue</tt> ― Value to set cleared stencil buffer to.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -697,6 +667,7 @@ Creates a font. Does not require rendering hook</p>
 			<li><tt>extended</tt> ― Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome</li>
 		</ul>
 	</section>
+	
 	<section class="usage">
 		<h3>Usage</h3>
 		
@@ -721,9 +692,7 @@ Base font can be one of (keep in mind that these may not exist on all clients if
 - Times New Roman</pre></p>
 		
 	</section>
-	<section class="return">
-		
-	</section>
+	
 	
 	
 </dd>
@@ -742,13 +711,8 @@ The dimensions will always be 1024x1024</p>
 			<li><tt>name</tt> ― The name of the render target</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -766,13 +730,11 @@ Gets a 2D cursor position where ply is aiming.</p>
 			<li><tt>ply</tt> ― player to get cursor position from(optional)</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return values:</h3>
 		<ol>
 			
 			<li>x position</li>
@@ -796,13 +758,8 @@ Releases the rendertarget. Required if you reach the maximum rendertargets.</p>
 			<li><tt>name</tt> ― Rendertarget name</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -820,13 +777,8 @@ Releases the texture. Required if you reach the maximum url textures.</p>
 			<li><tt>id</tt> ― Texture table. Aquired with render.getTextureID</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -837,13 +789,8 @@ Releases the texture. Required if you reach the maximum url textures.</p>
 Disables a scissoring rect which limits the drawing area.</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -865,13 +812,8 @@ Draws textured beam.</p>
 			<li><tt>textureEnd</tt> ― The end coordinate of the texture used.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -892,13 +834,8 @@ Draws a box in 3D space</p>
 			<li><tt>maxs</tt> ― End position of the box, relative to origin.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -917,13 +854,8 @@ Draws a 3D Line</p>
 			<li><tt>endPos</tt> ― Ending position</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -944,13 +876,8 @@ Draws 2 connected triangles.</p>
 			<li><tt>vert4</tt> ― The fourth vertex.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -971,13 +898,8 @@ Draws a sphere</p>
 			<li><tt>latitudeSteps</tt> ― The amount of latitude steps. The larger this number is, the smoother the sphere is</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -997,13 +919,8 @@ Draws a sprite in 3d space.</p>
 			<li><tt>height</tt> ― Height of the sprite.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1024,13 +941,8 @@ Draws a wireframe box in 3D space</p>
 			<li><tt>maxs</tt> ― End position of the box, relative to origin.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1051,13 +963,8 @@ Draws a wireframe sphere</p>
 			<li><tt>latitudeSteps</tt> ― The amount of latitude steps. The larger this number is, the smoother the sphere is</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1077,13 +984,8 @@ Draws a circle outline</p>
 			<li><tt>r</tt> ― Radius</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1104,13 +1006,8 @@ Draws a line</p>
 			<li><tt>y2</tt> ― Y end coordinate</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1128,13 +1025,8 @@ Draws a polygon.</p>
 			<li><tt>poly</tt> ― Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1155,13 +1047,8 @@ Draws a rectangle using the current color.</p>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1182,13 +1069,8 @@ Draws a rectangle outline using the current color.</p>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1210,13 +1092,8 @@ Draws a rounded rectangle using the current color</p>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1242,13 +1119,8 @@ Draws a rounded rectangle using the current color</p>
 			<li><tt>br</tt> ― Boolean Bottom right corner</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1270,13 +1142,8 @@ Draws text more easily and quickly but no new lines or tabs.</p>
 			<li><tt>yalign</tt> ― Text y alignment</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1297,13 +1164,8 @@ Draws text with newlines and tabs</p>
 			<li><tt>alignment</tt> ― Text alignment</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1324,13 +1186,8 @@ Draws a textured rectangle.</p>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1352,13 +1209,8 @@ Draws a rotated, textured rectangle.</p>
 			<li><tt>rot</tt> ― Rotation in degrees</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1383,13 +1235,8 @@ Draws a textured rectangle with UV coordinates</p>
 			<li><tt>endV</tt> ― Texture mapping at rectangle end</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1407,13 +1254,8 @@ Enables or disables Depth Buffer</p>
 			<li><tt>enable</tt> ― true to enable</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1434,13 +1276,8 @@ Enables a scissoring rect which limits the drawing area. Only works 2D contexts 
 			<li><tt>endY</tt></li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1451,13 +1288,11 @@ Enables a scissoring rect which limits the drawing area. Only works 2D contexts 
 Gets the default font</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>Default font</p>
 		
 	</section>
@@ -1478,13 +1313,11 @@ Returns the model material name that uses the render target.</p>
 			<li><tt>name</tt> ― Render target name</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>Model material name. Send this to the server to set the entity's material.</p>
 		
 	</section>
@@ -1498,13 +1331,11 @@ Returns the model material name that uses the render target.</p>
 Returns the render context's width and height</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return values:</h3>
 		<ol>
 			
 			<li>the X size of the current render context</li>
@@ -1521,13 +1352,11 @@ Returns the render context's width and height</p>
 Returns the entity currently being rendered to</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>Entity of the screen or hud being rendered</p>
 		
 	</section>
@@ -1549,13 +1378,11 @@ Note: this does a table copy so move it out of your draw hook</p>
 			<li><tt>e</tt> ― The screen to get info from.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>A table describing the screen.</p>
 		
 	</section>
@@ -1576,13 +1403,11 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 			<li><tt>text</tt> ― Text to get the size of</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return values:</h3>
 		<ol>
 			
 			<li>width of the text</li>
@@ -1610,13 +1435,11 @@ Make sure to store the texture to use it rather than calling this slow function 
 			<li><tt>skip_hack</tt> ― Turns off texture hack so you can use UVs on 3D objects</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.</p>
 		
 	</section>
@@ -1630,13 +1453,8 @@ Make sure to store the texture to use it rather than calling this slow function 
 Checks if a hud component is connected to the Starfall Chip</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1655,13 +1473,11 @@ Constructs a markup object for quick styled text drawing.</p>
 			<li><tt>maxsize</tt> ― The max width of the markup</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject</p>
 		
 	</section>
@@ -1675,13 +1491,8 @@ Constructs a markup object for quick styled text drawing.</p>
 Pops a matrix from the matrix stack.</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1692,13 +1503,8 @@ Pops a matrix from the matrix stack.</p>
 Pops a view matrix from the matrix stack.</p>
 	
 	
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1717,13 +1523,8 @@ Pushes a matrix onto the matrix stack.</p>
 			<li><tt>world</tt> ― Should the transformation be relative to the screen or world?</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1741,13 +1542,8 @@ Pushes a perspective matrix onto the view matrix stack.</p>
 			<li><tt>tbl</tt> ― The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1766,13 +1562,11 @@ Reads the color of the specified pixel.</p>
 			<li><tt>y</tt> ― Pixel y-coordinate.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>Color object with ( r, g, b, 255 ) from the specified pixel.</p>
 		
 	</section>
@@ -1794,13 +1588,8 @@ Nil for the visible RT.</p>
 			<li><tt>name</tt> ― Name of the render target to use</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1819,13 +1608,8 @@ Sets the draw color</p>
 			<li><tt>screen</tt></li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1843,13 +1627,8 @@ Sets the draw color</p>
 			<li><tt>clr</tt> ― Color type</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1867,13 +1646,8 @@ Changes the cull mode</p>
 			<li><tt>mode</tt> ― Cull mode. 0 for counter clock wise, 1 for clock wise</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1891,13 +1665,8 @@ Sets the texture filtering function when viewing a close texture</p>
 			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1915,13 +1684,8 @@ Sets the texture filtering function when viewing a far texture</p>
 			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -1939,6 +1703,7 @@ Sets the font</p>
 			<li><tt>font</tt> ― The font to use</li>
 		</ul>
 	</section>
+	
 	<section class="usage">
 		<h3>Usage</h3>
 		
@@ -1967,9 +1732,7 @@ Sets the font</p>
 - DermaLarge</pre></p>
 		
 	</section>
-	<section class="return">
-		
-	</section>
+	
 	
 	
 </dd>
@@ -1990,13 +1753,8 @@ Sets the draw color by RGBA values</p>
 			<li><tt>a</tt></li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2015,13 +1773,8 @@ Nil to reset.</p>
 			<li><tt>name</tt> ― Name of the render target to use</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2039,13 +1792,8 @@ Sets the compare function of the stencil. More: http://wiki.garrysmod.com/page/r
 			<li><tt>compareFunction</tt> ― </li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2063,13 +1811,8 @@ Sets whether stencil tests are carried out for each rendered pixel. Only pixels 
 			<li><tt>enable</tt> ― true to enable, false to disable</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2087,13 +1830,8 @@ Sets the operation to be performed on the stencil buffer values if the compare f
 			<li><tt>operation</tt> ― </li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2111,13 +1849,8 @@ Sets the operation to be performed on the stencil buffer values if the compare f
 			<li><tt>operation</tt> ― </li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2135,13 +1868,8 @@ Sets the reference value which will be used for all stencil operations. This is 
 			<li><tt>referenceValue</tt> ― Reference value.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2159,13 +1887,8 @@ Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.</p
 			<li><tt>mask</tt> ― The mask bitflag.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2183,13 +1906,8 @@ Sets the unsigned 8-bit write bitflag mask to be used for any writes to the sten
 			<li><tt>mask</tt> ― The mask bitflag.</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2207,13 +1925,8 @@ Sets the operation to be performed on the stencil buffer values if the stencil t
 			<li><tt>operation</tt> ― </li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2231,13 +1944,8 @@ Sets the texture</p>
 			<li><tt>id</tt> ― Texture table. Aquired with render.getTextureID</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2255,13 +1963,8 @@ Sets the texture of a screen entity</p>
 			<li><tt>ent</tt> ― Screen entity</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
-	<section class="return">
-		
-	</section>
+	
+	
 	
 	
 </dd>
@@ -2280,13 +1983,11 @@ Does a trace and returns the color of the textel the trace hits.</p>
 			<li><tt>vec2</tt> ― The ending vector</li>
 		</ul>
 	</section>
-	<section class="usage">
-		<h3>Usage</h3>
-		
-	</section>
+	
+	
 	<section class="return">
+		<h3>Returns</h3>
 		
-		<h3>Return value:</h3>
 		<p>The color vector. use vector:toColor to convert it to a color.</p>
 		
 	</section>
