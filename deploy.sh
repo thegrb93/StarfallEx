@@ -1,12 +1,6 @@
 #!/bin/bash
 set -e # Exit with nonzero exit code if anything fails
 
-echo "Adding key"
-eval `ssh-agent -s`
-chmod 600 deploy_key
-ssh-add deploy_key
-echo "Added"
-
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
@@ -16,6 +10,14 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]
     echo "Skipping deploy;"
     exit 0
 fi
+
+echo "Decrypting key"
+openssl aes-256-cbc -K $encrypted_0bb1b763922b_key -iv $encrypted_0bb1b763922b_iv -in deploy_key.enc -out deploy_key -d
+echo "Adding key"
+eval `ssh-agent -s`
+chmod 600 deploy_key
+ssh-add deploy_key
+echo "Added"
 
 # Save some useful information
 REPO=`git config remote.origin.url`
