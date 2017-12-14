@@ -12,8 +12,11 @@ branches:
 notifications:
   email: false
 install:
-- ./install.sh
+- ". ./install.sh"
 - luarocks install luadoc
 script:
 - cd docgen
-- lua -v build_all.lua && cd .. && ./deploy.sh
+- lua -v build_all.lua
+after_success:
+- cd ..
+- ". ./deploy.sh"
