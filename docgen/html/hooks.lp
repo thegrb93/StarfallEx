@@ -25,8 +25,7 @@
 				<?lua for p = 1, #hook.param do?>
 				<li>
 					<tt><?lua=hook.param[p]?></tt><?lua if hook.param[hook.param[p]] then?> ― <?lua=hook.param[hook.param[p]]?><?lua end?>
-				</li>
-				<?lua end?>
+				</li><?lua end?>
 			</ul>
 		</section><?lua end?>
 		<?lua if hook.usage then?>
@@ -40,17 +39,17 @@
 				<li><pre class="example"><?lua=usage?></pre></li><?lua end?>
 			</ul><?lua end?>
 		</section><?lua end?>
+		<?lua if hook.ret then?>
 		<section class="return">
+			<h3>Return inside callback</h3>
 			<?lua if type(hook.ret) == "string" then?>
-			<h3>Return value:</h3>
 			<p><?lua=hook.ret?></p>
 			<?lua elseif type(hook.ret) == "table" then?>
-			<h3>Return values:</h3>
 			<ol>
 				<?lua for _, ret in ipairs(hook.ret) do?>
 				<li><?lua=ret?></li><?lua end?>
 			</ol><?lua end?>
-		</section>
+		</section><?lua end?>
 	</dd><?lua end?>
 </dl>
 <?lua=docletsfhtml.include("_after_main.lp", { doc = doc })?>
