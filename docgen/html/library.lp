@@ -1,7 +1,7 @@
 <?lua=docletsfhtml.include("_before_main.lp", { doc = doc, module_doc = module_doc })?>
 <h1>Library <tt><?lua=module_doc.name?></tt></h1>
 <p><?lua=module_doc.description?></p>
-<?lua if module_doc.deprecated?>
+<?lua if module_doc.deprecated then?>
 <blockquote class="deprecation">
 	This library has been deprecated and will be removed in the future<?lua=module_doc.deprecated and " for the following reason: ".. module_doc.deprecated or ""?>.
 </blockquote><?lua end?>

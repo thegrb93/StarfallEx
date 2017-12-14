@@ -11,9 +11,6 @@ elseif hook_doc then
 elseif class_doc then
 	from = "classes/.." .. class_doc.name
 	pageTitle = class_doc.name .. pageTitleSign
-elseif dir_doc then
-	from = "directives/.." .. dir_doc.name
-	pageTitle = "--@" .. dir_doc.name .. pageTitleSign
 elseif example_doc then
 	from = "examples/.." .. example_doc.name
 	pageTitle = example_doc.name .. pageTitleSign
@@ -55,7 +52,7 @@ end
 					<ul>
 						<?lua for _, name in ipairs(doc.classes) do
 							local link = class_doc and class_doc.name == name?>
-						<li><?lua if link then?><a href="<?lua=docletsfhtml.class_link(name, doc, from)?>"><?lua end?><?lua if doc.libraries[name].deprecated then?><del><?lua end?><?lua=modulename?><?lua if doc.libraries[name].deprecated then?></del><?lua end?><?lua if link then?></a><?lua end?></li><?lua end?>
+						<li><?lua if link then?><a href="<?lua=docletsfhtml.class_link(name, doc, from)?>"><?lua end?><?lua if doc.classes[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.classes[name].deprecated then?></del><?lua end?><?lua if link then?></a><?lua end?></li><?lua end?>
 					</ul>
 				</section>
 				<section>
