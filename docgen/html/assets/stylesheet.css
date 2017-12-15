@@ -226,6 +226,7 @@ table.list td.name {
 	background-color: #f0f0f0;
 }
 table.list td.summary {
+	width: 60%;
 	max-width: 70%;
 }
 
