@@ -4,7 +4,7 @@ body {
 	padding-left: 300px;
 	line-height: 150%;
 	letter-spacing: .2px;
-    font-family: Arial, sans-serif;
+	font-family: Arial, sans-serif;
 	background-image: url(images/bg.png);
 	background-attachment: fixed;
 	background-color: #fff;
@@ -20,7 +20,14 @@ h1, h2, h3, h4 {
 }
 
 code, pre, tt {
-    font-family: "Lucida Console", "Courier New", monospace;
+	font-family: "Andale Mono", "Lucida Console", "Courier New", monospace;
+}
+*:not(h1) > tt {
+	padding: 1pt 4pt;
+	border: 1px solid #ccc;
+	border-radius: 4pt;
+	box-shadow: 0 2pt 2pt -2pt;
+	background-color: #ddd;
 }
 
 a {
@@ -50,27 +57,21 @@ blockquote {
 	margin-left: 3em;
 }
 
-p.name {
-    font-family: "Andale Mono", monospace; 
-    padding-top: 1em;
-    margin-left: 0em; 
-}
-
 pre.example {
-    background-color: #f5f5f5;
-    border: 1px solid #bbb;
-    padding: 1em;
-    font-size: smaller;
+	background-color: #f5f5f5;
+	border: 1px solid #bbb;
+	padding: 1em;
+	font-size: smaller;
 }
 
 table {
 	border-collapse: collapse;
-    margin-left: auto;
-    margin-right: auto;
+	margin-left: auto;
+	margin-right: auto;
 }
 td, th {
-    border: 1px solid #ccc;
-    padding: .5em;
+	border: 1px solid #ccc;
+	padding: .5em;
 }
 
 .realm_cl, .realm_sv, .realm_sh {
@@ -156,17 +157,19 @@ nav a {
 	flex-grow: 1;
 	padding: .2em;
 	border-radius: .5em;
+	background-color: #fff;
 }
 nav a:link {
+	background-color: transparent;
 	color: inherit;
 }
-nav a:hover {
+nav a:link:hover {
 	background-color: #000;
 	color: #0ff;
 }
 
 #search {
-	padding: 1em;
+	padding: 0 1em .5em;
 }
 #search_field {
 	width: 100%;

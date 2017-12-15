@@ -59,7 +59,7 @@
 					<ul>
 						
 						<li><a href="../classes/Angle.html">Angle</a></li>
-						<li>Bass</li>
+						<li><a>Bass</a></li>
 						<li><a href="../classes/Color.html">Color</a></li>
 						<li><a href="../classes/Entity.html">Entity</a></li>
 						<li><a href="../classes/File.html">File</a></li>
@@ -183,7 +183,7 @@
 		<main>
 <h1><tt>Bass</tt> type</h1>
 <p>
-Bass type</p>
+For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.</p>
 
 
 
@@ -194,72 +194,72 @@ Bass type</p>
 	<table class="list">
 		
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:getFFT">getFFT</a>( n )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:getFFT">getFFT</a>( n )</td>
 			<td class="summary">
-Gets the FFT of a sound </td>
+Perform fast Fourier transform algorithm to compute the DFT of the sound channel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:getLength">getLength</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:getLength">getLength</a>(  )</td>
 			<td class="summary">
-Gets the length of a sound </td>
+Gets the length of a sound channel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:getTime">getTime</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:getTime">getTime</a>(  )</td>
 			<td class="summary">
-Gets the current time of a sound </td>
+Gets the current playback time of the sound channel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:isOnline">isOnline</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:isOnline">isOnline</a>(  )</td>
 			<td class="summary">
-Gets if the sound is streamed or not </td>
+Gets whether the sound channel is streamed online.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:isValid">isValid</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:isValid">isValid</a>(  )</td>
 			<td class="summary">
-Gets if the sound is valid or not </td>
+Gets whether the bass is valid.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:pause">pause</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:pause">pause</a>(  )</td>
 			<td class="summary">
 Pauses the sound.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:play">play</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:play">play</a>(  )</td>
 			<td class="summary">
 Starts to play the sound.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setFade">setFade</a>( min, max )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:setFade">setFade</a>( min, max )</td>
 			<td class="summary">
-Sets the fade distance of the sound </td>
+Sets the fade distance of the sound in 3D space.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setLooping">setLooping</a>( loop )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:setLooping">setLooping</a>( loop )</td>
 			<td class="summary">
-Sets if the sound should loop or not.</td>
+Sets whether the sound channel should loop.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setPitch">setPitch</a>( pitch )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:setPitch">setPitch</a>( pitch )</td>
 			<td class="summary">
-Sets the pitch of the sound.</td>
+Sets the pitch of the sound channel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setPos">setPos</a>( pos )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:setPos">setPos</a>( pos )</td>
 			<td class="summary">
-Sets the position of the sound </td>
+Sets the position of the sound in 3D space.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setTime">setTime</a>( time )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:setTime">setTime</a>( time )</td>
 			<td class="summary">
-Sets the current time of a sound </td>
+Sets the current playback time of the sound channel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:setVolume">setVolume</a>( vol )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:setVolume">setVolume</a>( vol )</td>
 			<td class="summary">
-Sets the volume of the sound.</td>
+Sets the volume of the sound channel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#bass_methods:stop">stop</a>(  )</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:stop">stop</a>(  )</td>
 			<td class="summary">
 Stops playing the sound.</td>
 		</tr>
@@ -273,14 +273,14 @@ Stops playing the sound.</td>
 <dt><span class="realm_cl"></span><a name="Bass:getFFT"></a><strong>Bass:getFFT</strong>( n )</dt>
 <dd>
 	<p>
-Gets the FFT of a sound</p>
+Perform fast Fourier transform algorithm to compute the DFT of the sound channel.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>n</tt> ― Sample size of the hamming window. Must be power of 2</li>
+			<li><tt>n</tt> ― Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.</li>
 		</ul>
 	</section>
 	
@@ -288,7 +288,7 @@ Gets the FFT of a sound</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>FFT table of the sound</p>
+		<p>Table containing DFT magnitudes, each between 0 and 1.</p>
 		
 	</section>
 	
@@ -298,7 +298,7 @@ Gets the FFT of a sound</p>
 <dt><span class="realm_cl"></span><a name="Bass:getLength"></a><strong>Bass:getLength</strong>(  )</dt>
 <dd>
 	<p>
-Gets the length of a sound</p>
+Gets the length of a sound channel.</p>
 	
 	
 	
@@ -306,7 +306,7 @@ Gets the length of a sound</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Length in seconds of the sound</p>
+		<p>Sound channel length in seconds.</p>
 		
 	</section>
 	
@@ -316,7 +316,7 @@ Gets the length of a sound</p>
 <dt><span class="realm_cl"></span><a name="Bass:getTime"></a><strong>Bass:getTime</strong>(  )</dt>
 <dd>
 	<p>
-Gets the current time of a sound</p>
+Gets the current playback time of the sound channel.</p>
 	
 	
 	
@@ -324,7 +324,7 @@ Gets the current time of a sound</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Current time in seconds of the sound</p>
+		<p>Sound channel playback time in seconds.</p>
 		
 	</section>
 	
@@ -334,7 +334,7 @@ Gets the current time of a sound</p>
 <dt><span class="realm_cl"></span><a name="Bass:isOnline"></a><strong>Bass:isOnline</strong>(  )</dt>
 <dd>
 	<p>
-Gets if the sound is streamed or not</p>
+Gets whether the sound channel is streamed online.</p>
 	
 	
 	
@@ -342,7 +342,7 @@ Gets if the sound is streamed or not</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Is online or not</p>
+		<p>Boolean of whether the sound channel is streamed online.</p>
 		
 	</section>
 	
@@ -352,7 +352,7 @@ Gets if the sound is streamed or not</p>
 <dt><span class="realm_cl"></span><a name="Bass:isValid"></a><strong>Bass:isValid</strong>(  )</dt>
 <dd>
 	<p>
-Gets if the sound is valid or not</p>
+Gets whether the bass is valid.</p>
 	
 	
 	
@@ -360,7 +360,7 @@ Gets if the sound is valid or not</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Is valid or not</p>
+		<p>Boolean of whether the bass is valid.</p>
 		
 	</section>
 	
@@ -394,7 +394,7 @@ Starts to play the sound.</p>
 <dt><span class="realm_cl"></span><a name="Bass:setFade"></a><strong>Bass:setFade</strong>( min, max )</dt>
 <dd>
 	<p>
-Sets the fade distance of the sound</p>
+Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.</p>
 	
 	
 	<section class="parameters">
@@ -414,14 +414,14 @@ Sets the fade distance of the sound</p>
 <dt><span class="realm_cl"></span><a name="Bass:setLooping"></a><strong>Bass:setLooping</strong>( loop )</dt>
 <dd>
 	<p>
-Sets if the sound should loop or not.</p>
+Sets whether the sound channel should loop.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>loop</tt> ― Boolean if the sound should loop or not.</li>
+			<li><tt>loop</tt> ― Boolean of whether the sound channel should loop.</li>
 		</ul>
 	</section>
 	
@@ -433,7 +433,7 @@ Sets if the sound should loop or not.</p>
 <dt><span class="realm_cl"></span><a name="Bass:setPitch"></a><strong>Bass:setPitch</strong>( pitch )</dt>
 <dd>
 	<p>
-Sets the pitch of the sound.</p>
+Sets the pitch of the sound channel.</p>
 	
 	
 	<section class="parameters">
@@ -452,14 +452,14 @@ Sets the pitch of the sound.</p>
 <dt><span class="realm_cl"></span><a name="Bass:setPos"></a><strong>Bass:setPos</strong>( pos )</dt>
 <dd>
 	<p>
-Sets the position of the sound</p>
+Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>pos</tt> ― Where to position the sound</li>
+			<li><tt>pos</tt> ― Where to position the sound.</li>
 		</ul>
 	</section>
 	
@@ -471,14 +471,14 @@ Sets the position of the sound</p>
 <dt><span class="realm_cl"></span><a name="Bass:setTime"></a><strong>Bass:setTime</strong>( time )</dt>
 <dd>
 	<p>
-Sets the current time of a sound</p>
+Sets the current playback time of the sound channel.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>time</tt> ― Time to set a sound in seconds</li>
+			<li><tt>time</tt> ― Sound channel playback time in seconds.</li>
 		</ul>
 	</section>
 	
@@ -490,7 +490,7 @@ Sets the current time of a sound</p>
 <dt><span class="realm_cl"></span><a name="Bass:setVolume"></a><strong>Bass:setVolume</strong>( vol )</dt>
 <dd>
 	<p>
-Sets the volume of the sound.</p>
+Sets the volume of the sound channel.</p>
 	
 	
 	<section class="parameters">
@@ -526,6 +526,7 @@ Stops playing the sound.</p>
 			</p>
 			<p>
 				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+				<a href="https://discord.gg/QTPgtk2" target="_blank">Discord</a>
 			</p>
 		</footer>
 	</body>

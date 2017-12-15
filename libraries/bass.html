@@ -25,7 +25,7 @@
 					<h1>Libraries</h1>
 					<ul>
 						
-						<li>bass</li>
+						<li><a>bass</a></li>
 						<li><a href="../libraries/builtin.html">builtin</a></li>
 						<li><a href="../libraries/constraint.html">constraint</a></li>
 						<li><a href="../libraries/coroutine.html">coroutine</a></li>
@@ -183,7 +183,7 @@
 		<main>
 <h1>Library <tt>bass</tt></h1>
 <p>
-Bass library.</p>
+`bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.</p>
 
 
 
@@ -196,12 +196,12 @@ Bass library.</p>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#bass.loadFile">loadFile</a>( path, flags, callback )</td>
 			<td class="summary">
-Loads a sound object from a file </td>
+Loads a sound channel from a file.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#bass.loadURL">loadURL</a>( path, flags, callback )</td>
 			<td class="summary">
-Loads a sound object from a url </td>
+Loads a sound channel from an URL.</td>
 		</tr>
 	</table>
 </section>
@@ -209,23 +209,23 @@ Loads a sound object from a url </td>
 
 
 <section class="functions_def">
-	<h2><a name="functions_def">Functions definition</a></h2>
+	<h2><a name="functions_def"></a>Functions definition</h2>
 	<dl>
 		
 		
 <dt><span class="realm_cl"></span><a name="bass.loadFile"></a><strong>bass.loadFile</strong>( path, flags, callback )</dt>
 <dd>
 	<p>
-Loads a sound object from a file</p>
+Loads a sound channel from a file.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>path</tt> ― Filepath to the sound file.</li>
-			<li><tt>flags</tt> ― that will control the sound</li>
-			<li><tt>callback</tt> ― to run when the sound is loaded</li>
+			<li><tt>path</tt> ― File path to play from.</li>
+			<li><tt>flags</tt> ― Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).</li>
+			<li><tt>callback</tt> ― Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.</li>
 		</ul>
 	</section>
 	
@@ -237,16 +237,16 @@ Loads a sound object from a file</p>
 <dt><span class="realm_cl"></span><a name="bass.loadURL"></a><strong>bass.loadURL</strong>( path, flags, callback )</dt>
 <dd>
 	<p>
-Loads a sound object from a url</p>
+Loads a sound channel from an URL.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>path</tt> ― url to the sound file.</li>
-			<li><tt>flags</tt> ― that will control the sound</li>
-			<li><tt>callback</tt> ― to run when the sound is loaded</li>
+			<li><tt>path</tt> ― URL path to play from.</li>
+			<li><tt>flags</tt> ― Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).</li>
+			<li><tt>callback</tt> ― Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.</li>
 		</ul>
 	</section>
 	
@@ -264,6 +264,7 @@ Loads a sound object from a url</p>
 			</p>
 			<p>
 				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+				<a href="https://discord.gg/QTPgtk2" target="_blank">Discord</a>
 			</p>
 		</footer>
 	</body>
