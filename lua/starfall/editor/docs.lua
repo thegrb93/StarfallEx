@@ -335,12 +335,12 @@ Returns the rotation vector - rotation axis where magnitude is the angle of rota
 Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff) ";["private"] = false;["library"] = "quaternion";["param"] = {[1] = "q";};};};["tables"] = {};["class"] = "library";["description"] = "\
 Quaternion library";["summary"] = "\
 Quaternion library ";["fields"] = {};["name"] = "quaternion";["client"] = true;["libtbl"] = "quat_lib";["server"] = true;};["bass"] = {["functions"] = {[1] = "loadFile";[2] = "loadURL";["loadFile"] = {["class"] = "function";["description"] = "\
-Loads a sound object from a file";["fname"] = "loadFile";["realm"] = "cl";["name"] = "bass_library.loadFile";["summary"] = "\
-Loads a sound object from a file ";["private"] = false;["library"] = "bass";["param"] = {[1] = "path";[2] = "flags";[3] = "callback";["flags"] = "that will control the sound";["path"] = "Filepath to the sound file.";["callback"] = "to run when the sound is loaded";};};["loadURL"] = {["class"] = "function";["description"] = "\
-Loads a sound object from a url";["fname"] = "loadURL";["realm"] = "cl";["name"] = "bass_library.loadURL";["summary"] = "\
-Loads a sound object from a url ";["private"] = false;["library"] = "bass";["param"] = {[1] = "path";[2] = "flags";[3] = "callback";["flags"] = "that will control the sound";["path"] = "url to the sound file.";["callback"] = "to run when the sound is loaded";};};};["tables"] = {};["class"] = "library";["description"] = "\
-Bass library.";["summary"] = "\
-Bass library.";["fields"] = {};["name"] = "bass";["client"] = true;["libtbl"] = "bass_library";};["json"] = {["functions"] = {[1] = "decode";[2] = "encode";["encode"] = {["ret"] = "JSON encoded string representation of the table";["class"] = "function";["description"] = "\
+Loads a sound channel from a file.";["fname"] = "loadFile";["realm"] = "cl";["name"] = "bass_library.loadFile";["summary"] = "\
+Loads a sound channel from a file.";["private"] = false;["library"] = "bass";["param"] = {[1] = "path";[2] = "flags";[3] = "callback";["flags"] = "Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).";["path"] = "File path to play from.";["callback"] = "Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.";};};["loadURL"] = {["class"] = "function";["description"] = "\
+Loads a sound channel from an URL.";["fname"] = "loadURL";["realm"] = "cl";["name"] = "bass_library.loadURL";["summary"] = "\
+Loads a sound channel from an URL.";["private"] = false;["library"] = "bass";["param"] = {[1] = "path";[2] = "flags";[3] = "callback";["flags"] = "Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).";["path"] = "URL path to play from.";["callback"] = "Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.";};};};["tables"] = {};["class"] = "library";["description"] = "\
+`bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's \"2D\" context.";["summary"] = "\
+`bass` library is intended to be used only on client side.";["fields"] = {};["name"] = "bass";["client"] = true;["libtbl"] = "bass_library";};["json"] = {["functions"] = {[1] = "decode";[2] = "encode";["encode"] = {["ret"] = "JSON encoded string representation of the table";["class"] = "function";["description"] = "\
 Convert table to JSON string";["fname"] = "encode";["realm"] = "sh";["name"] = "json_library.encode";["summary"] = "\
 Convert table to JSON string ";["private"] = false;["library"] = "json";["param"] = {[1] = "tbl";["tbl"] = "Table to encode";};};["decode"] = {["ret"] = "Table representing the JSON object";["class"] = "function";["description"] = "\
 Convert JSON string to table";["fname"] = "decode";["realm"] = "sh";["name"] = "json_library.decode";["summary"] = "\
@@ -967,32 +967,32 @@ Suppress Engine Lighting of a hologram. Disabled by default.";["class"] = "funct
 Suppress Engine Lighting of a hologram.";["classForced"] = true;["fname"] = "suppressEngineLighting";["name"] = "hologram_methods:suppressEngineLighting";["classlib"] = "Hologram";["private"] = false;["server"] = true;["param"] = {[1] = "suppress";["suppress"] = "Boolean to represent if shading should be set or not.";};};["setClip"] = {["class"] = "function";["description"] = "\
 Updates a clip plane";["fname"] = "setClip";["realm"] = "sv";["name"] = "hologram_methods:setClip";["summary"] = "\
 Updates a clip plane ";["private"] = false;["classlib"] = "Hologram";["param"] = {[1] = "index";[2] = "enabled";[3] = "origin";[4] = "normal";[5] = "islocal";};};};};["Bass"] = {["typtbl"] = "bass_methods";["class"] = "class";["description"] = "\
-Bass type";["fields"] = {};["name"] = "Bass";["summary"] = "\
-Bass type ";["client"] = true;["methods"] = {[1] = "getFFT";[2] = "getLength";[3] = "getTime";[4] = "isOnline";[5] = "isValid";[6] = "pause";[7] = "play";[8] = "setFade";[9] = "setLooping";[10] = "setPitch";[11] = "setPos";[12] = "setTime";[13] = "setVolume";[14] = "stop";["isValid"] = {["ret"] = "Is valid or not";["class"] = "function";["description"] = "\
-Gets if the sound is valid or not";["fname"] = "isValid";["realm"] = "cl";["name"] = "bass_methods:isValid";["summary"] = "\
-Gets if the sound is valid or not ";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setLooping"] = {["class"] = "function";["description"] = "\
-Sets if the sound should loop or not.";["fname"] = "setLooping";["realm"] = "cl";["name"] = "bass_methods:setLooping";["summary"] = "\
-Sets if the sound should loop or not.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "loop";["loop"] = "Boolean if the sound should loop or not.";};};["isOnline"] = {["ret"] = "Is online or not";["class"] = "function";["description"] = "\
-Gets if the sound is streamed or not";["fname"] = "isOnline";["realm"] = "cl";["name"] = "bass_methods:isOnline";["summary"] = "\
-Gets if the sound is streamed or not ";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setFade"] = {["class"] = "function";["description"] = "\
-Sets the fade distance of the sound";["fname"] = "setFade";["realm"] = "cl";["name"] = "bass_methods:setFade";["summary"] = "\
-Sets the fade distance of the sound ";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "min";[2] = "max";["min"] = "The channel's volume is at maximum when the listener is within this distance";["max"] = "The channel's volume stops decreasing when the listener is beyond this distance.";};};["getFFT"] = {["ret"] = "FFT table of the sound";["class"] = "function";["description"] = "\
-Gets the FFT of a sound";["fname"] = "getFFT";["realm"] = "cl";["name"] = "bass_methods:getFFT";["summary"] = "\
-Gets the FFT of a sound ";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "n";["n"] = "Sample size of the hamming window. Must be power of 2";};};["setPitch"] = {["class"] = "function";["description"] = "\
-Sets the pitch of the sound.";["fname"] = "setPitch";["realm"] = "cl";["name"] = "bass_methods:setPitch";["summary"] = "\
-Sets the pitch of the sound.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "pitch";["pitch"] = "Pitch to set to, between 0 and 3.";};};["getTime"] = {["ret"] = "Current time in seconds of the sound";["class"] = "function";["description"] = "\
-Gets the current time of a sound";["fname"] = "getTime";["realm"] = "cl";["name"] = "bass_methods:getTime";["summary"] = "\
-Gets the current time of a sound ";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setTime"] = {["class"] = "function";["description"] = "\
-Sets the current time of a sound";["fname"] = "setTime";["realm"] = "cl";["name"] = "bass_methods:setTime";["summary"] = "\
-Sets the current time of a sound ";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "time";["time"] = "Time to set a sound in seconds";};};["getLength"] = {["ret"] = "Length in seconds of the sound";["class"] = "function";["description"] = "\
-Gets the length of a sound";["fname"] = "getLength";["realm"] = "cl";["name"] = "bass_methods:getLength";["summary"] = "\
-Gets the length of a sound ";["private"] = false;["classlib"] = "Bass";["param"] = {};};["stop"] = {["class"] = "function";["description"] = "\
+For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.";["fields"] = {};["name"] = "Bass";["summary"] = "\
+For playing music there is `Bass` type.";["client"] = true;["methods"] = {[1] = "getFFT";[2] = "getLength";[3] = "getTime";[4] = "isOnline";[5] = "isValid";[6] = "pause";[7] = "play";[8] = "setFade";[9] = "setLooping";[10] = "setPitch";[11] = "setPos";[12] = "setTime";[13] = "setVolume";[14] = "stop";["isValid"] = {["ret"] = "Boolean of whether the bass is valid.";["class"] = "function";["description"] = "\
+Gets whether the bass is valid.";["fname"] = "isValid";["realm"] = "cl";["name"] = "bass_methods:isValid";["summary"] = "\
+Gets whether the bass is valid.";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setLooping"] = {["class"] = "function";["description"] = "\
+Sets whether the sound channel should loop.";["fname"] = "setLooping";["realm"] = "cl";["name"] = "bass_methods:setLooping";["summary"] = "\
+Sets whether the sound channel should loop.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "loop";["loop"] = "Boolean of whether the sound channel should loop.";};};["isOnline"] = {["ret"] = "Boolean of whether the sound channel is streamed online.";["class"] = "function";["description"] = "\
+Gets whether the sound channel is streamed online.";["fname"] = "isOnline";["realm"] = "cl";["name"] = "bass_methods:isOnline";["summary"] = "\
+Gets whether the sound channel is streamed online.";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setFade"] = {["class"] = "function";["description"] = "\
+Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.";["fname"] = "setFade";["realm"] = "cl";["name"] = "bass_methods:setFade";["summary"] = "\
+Sets the fade distance of the sound in 3D space.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "min";[2] = "max";["min"] = "The channel's volume is at maximum when the listener is within this distance";["max"] = "The channel's volume stops decreasing when the listener is beyond this distance.";};};["getFFT"] = {["ret"] = "Table containing DFT magnitudes, each between 0 and 1.";["class"] = "function";["description"] = "\
+Perform fast Fourier transform algorithm to compute the DFT of the sound channel.";["fname"] = "getFFT";["realm"] = "cl";["name"] = "bass_methods:getFFT";["summary"] = "\
+Perform fast Fourier transform algorithm to compute the DFT of the sound channel.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "n";["n"] = "Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.";};};["setPitch"] = {["class"] = "function";["description"] = "\
+Sets the pitch of the sound channel.";["fname"] = "setPitch";["realm"] = "cl";["name"] = "bass_methods:setPitch";["summary"] = "\
+Sets the pitch of the sound channel.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "pitch";["pitch"] = "Pitch to set to, between 0 and 3.";};};["getTime"] = {["ret"] = "Sound channel playback time in seconds.";["class"] = "function";["description"] = "\
+Gets the current playback time of the sound channel.";["fname"] = "getTime";["realm"] = "cl";["name"] = "bass_methods:getTime";["summary"] = "\
+Gets the current playback time of the sound channel.";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setTime"] = {["class"] = "function";["description"] = "\
+Sets the current playback time of the sound channel.";["fname"] = "setTime";["realm"] = "cl";["name"] = "bass_methods:setTime";["summary"] = "\
+Sets the current playback time of the sound channel.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "time";["time"] = "Sound channel playback time in seconds.";};};["getLength"] = {["ret"] = "Sound channel length in seconds.";["class"] = "function";["description"] = "\
+Gets the length of a sound channel.";["fname"] = "getLength";["realm"] = "cl";["name"] = "bass_methods:getLength";["summary"] = "\
+Gets the length of a sound channel.";["private"] = false;["classlib"] = "Bass";["param"] = {};};["stop"] = {["class"] = "function";["description"] = "\
 Stops playing the sound.";["fname"] = "stop";["realm"] = "cl";["name"] = "bass_methods:stop";["summary"] = "\
 Stops playing the sound.";["private"] = false;["classlib"] = "Bass";["param"] = {};};["setPos"] = {["class"] = "function";["description"] = "\
-Sets the position of the sound";["fname"] = "setPos";["realm"] = "cl";["name"] = "bass_methods:setPos";["summary"] = "\
-Sets the position of the sound ";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "pos";["pos"] = "Where to position the sound";};};["setVolume"] = {["class"] = "function";["description"] = "\
-Sets the volume of the sound.";["fname"] = "setVolume";["realm"] = "cl";["name"] = "bass_methods:setVolume";["summary"] = "\
-Sets the volume of the sound.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "vol";["vol"] = "Volume to set to, between 0 and 1.";};};["pause"] = {["class"] = "function";["description"] = "\
+Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.";["fname"] = "setPos";["realm"] = "cl";["name"] = "bass_methods:setPos";["summary"] = "\
+Sets the position of the sound in 3D space.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "pos";["pos"] = "Where to position the sound.";};};["setVolume"] = {["class"] = "function";["description"] = "\
+Sets the volume of the sound channel.";["fname"] = "setVolume";["realm"] = "cl";["name"] = "bass_methods:setVolume";["summary"] = "\
+Sets the volume of the sound channel.";["private"] = false;["classlib"] = "Bass";["param"] = {[1] = "vol";["vol"] = "Volume to set to, between 0 and 1.";};};["pause"] = {["class"] = "function";["description"] = "\
 Pauses the sound.";["fname"] = "pause";["realm"] = "cl";["name"] = "bass_methods:pause";["summary"] = "\
 Pauses the sound.";["private"] = false;["classlib"] = "Bass";["param"] = {};};["play"] = {["class"] = "function";["description"] = "\
 Starts to play the sound.";["fname"] = "play";["realm"] = "cl";["name"] = "bass_methods:play";["summary"] = "\
