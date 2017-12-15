@@ -263,7 +263,7 @@ function bass_methods:getTime ()
 end
 
 --- Perform fast Fourier transform algorithm to compute the DFT of the sound channel.
--- @param n Number of consecutive audio samples. Must be in 0-8 range, depending on this argument you will get 256*2^n samples.
+-- @param n Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.
 -- @return Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT (n)
 	SF.CheckType(self, bass_metamethods)
