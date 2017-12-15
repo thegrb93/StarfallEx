@@ -34,14 +34,8 @@ a {
 	font-weight: bold;
 	text-decoration: none;
 }
-a:link {
-	color: #05c;
-}
 a:visited {
 	color: #058;
-}
-a:hover {
-	text-decoration: underline;
 }
 
 input {
@@ -157,15 +151,16 @@ nav a {
 	flex-grow: 1;
 	padding: .2em;
 	border-radius: .5em;
-	background-color: #fff;
-}
-nav a:link {
 	background-color: transparent;
 	color: inherit;
 }
-nav a:link:hover {
+nav a:link:hover, nav a:visited:hover {
 	background-color: #000;
 	color: #0ff;
+}
+nav a:not(:link) {
+	background-color: #fff;
+	color: #058;
 }
 
 #search {
@@ -184,6 +179,13 @@ nav a:link:hover {
 
 main {
 	padding: 2em;
+}
+
+main a:link {
+	color: #05c;
+}
+main a:hover {
+	text-decoration: underline;
 }
 
 main > h1 {
