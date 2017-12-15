@@ -24,7 +24,7 @@
 		<?lua for _, name in ipairs( class_doc.methods ) do
 			local data = class_doc.methods[name]?>
 		<tr>
-			<td class="name"><span class="realm_<?lua=data.realm?>"></span><?lua if data.deprecated then?><del><?lua end?><?lua=data.private and "local " or ""?><a href="#<?lua=class_doc.methods[name].classlib?>:<?lua=class_doc.methods[name].fname?>"><?lua=name?></a>( <?lua=table.concat( class_doc.methods[name].param, ", " )?> )<?lua if data.deprecated then?></del><?lua end?></td>
+			<td class="name"><span class="realm_<?lua=data.realm?>"></span><?lua if data.deprecated then?><del><?lua end?><?lua=data.private and "local " or ""?><a href="#<?lua=class_doc.methods[name].classlib?>:<?lua=class_doc.methods[name].fname?>"><?lua=name?></a>( <?lua=table.concat( class_doc.methods[name].param, ", " )?>&nbsp;)<?lua if data.deprecated then?></del><?lua end?></td>
 			<td class="summary"><?lua=class_doc.methods[name].summary?></td>
 		</tr><?lua end?>
 	</table>

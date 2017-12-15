@@ -7,7 +7,7 @@
 		<?lua for _, name in ipairs(hook_doc.hooks) do
 			local data = hook_doc.hooks[name]?>
 		<tr>
-			<td class="name"><span class="realm_<?lua=data.realm?>"></span><a href="#<?lua=data.name?>"><?lua=name?></a>( <?lua=table.concat(data.param, ", " )?>)</td>
+			<td class="name"><span class="realm_<?lua=data.realm?>"></span><a href="#<?lua=data.name?>"><?lua=name?></a>( <?lua=table.concat(data.param, ", " )?>&nbsp;)</td>
 			<td class="summary"><?lua=data.summary?></td>
 		</tr><?lua end?>
 	</table>
@@ -15,7 +15,7 @@
 <dl class="hooks">
 	<?lua for _, name in ipairs(hook_doc.hooks) do
 		local hook = hook_doc.hooks[name]?>
-	<dt><a name="<?lua=hook.name?>"></a><span class="realm_<?lua=hook.realm?>"></span><strong><?lua=hook.name?></strong>( <?lua=table.concat(hook.param, ", ")?> )</dt>
+	<dt><a name="<?lua=hook.name?>"></a><span class="realm_<?lua=hook.realm?>"></span><strong><?lua=hook.name?></strong>( <?lua=table.concat(hook.param, ", ")?>&nbsp;)</dt>
 	<dd>
 		<p><?lua=hook.description or ""?></p>
 		<?lua if type(hook.param) == "table" and #hook.param > 0 then?>

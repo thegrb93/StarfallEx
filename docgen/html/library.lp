@@ -24,7 +24,7 @@
 	<?lua for _, name in ipairs(module_doc.functions) do
 		local data = module_doc.functions[name]?>
 		<tr>
-			<td class="name"><span class="realm_<?lua=data.realm?>"></span><?lua if data.deprecated then?><del><?lua end?><?lua=data.private and "local " or ""?><a href="#<?lua=data.classlib and data.classlib .. ":" .. data.fname or data.library and data.library .. "." .. data.fname or data.name?>"><?lua=name?></a>( <?lua=table.concat(module_doc.functions[name].param, ", ")?> )<?lua if data.deprecated then?></del><?lua end?></td>
+			<td class="name"><span class="realm_<?lua=data.realm?>"></span><?lua if data.deprecated then?><del><?lua end?><?lua=data.private and "local " or ""?><a href="#<?lua=data.classlib and data.classlib .. ":" .. data.fname or data.library and data.library .. "." .. data.fname or data.name?>"><?lua=name?></a>( <?lua=table.concat(module_doc.functions[name].param, ", ")?>&nbsp;)<?lua if data.deprecated then?></del><?lua end?></td>
 			<td class="summary"><?lua=module_doc.functions[name].summary?></td>
 		</tr><?lua end?>
 	</table>
