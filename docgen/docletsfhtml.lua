@@ -41,10 +41,12 @@ local function copyhtmldirfiles (dir)
 		local f = htmldir .. '/' .. fname
 		local attr = lfs.attributes(f)
 		if attr.mode == 'file' then
-			local file = lfs.open(outdir .. '/' .. fname, 'w')
-			io.output(file)
-			include(dir .. '/' .. fname)
-			file:close()
+			local srcfile = io.open(f, 'r')
+			local content = srcfile:read('*a')
+			srcfile:close()
+			local destfile = io.open(outdir .. '/' .. fname, 'w')
+			destfile:write(content)
+			destfile:close()
 		end
 	end
 end
