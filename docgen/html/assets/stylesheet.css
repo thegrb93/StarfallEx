@@ -155,7 +155,7 @@ nav a {
 	background-color: transparent;
 	color: inherit;
 }
-nav a:link:hover, nav a:visited:hover {
+nav a[href]:hover {
 	background-color: #000;
 	color: #0ff;
 }
