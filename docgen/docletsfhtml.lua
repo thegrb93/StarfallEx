@@ -30,15 +30,21 @@ local function search (path, name)
 end
 
 -------------------------------------------------------------------------------
--- Calls iterator function on every file in directory.
--- @param path String with the path to directory.
--- @param iterator Function that is called on every file, with file name and full path as arguments.
+-- Copies all files placed straight in directory under `html` in output.
+-- @param dir String with directory path inside `html`.
 
-local function dirfiles (path, ff)
-	for file in lfs.dir(path) do
-		local f = path .. '/' .. file
+local function copyhtmldirfiles (dir)
+	local htmldir = 'html/' .. dir
+	local outdir = options.output_dir .. dir
+	lfs.mkdir(outdir)
+	for fname in lfs.dir(htmldir) do
+		local f = htmldir .. '/' .. fname
 		local attr = lfs.attributes (f)
-		if attr.mode == "file" then ff(file, f) end
+		if attr.mode ~= "file" then continue end
+		local file = lfs.open(outdir .. "/" .. fname, "w")
+		io.output(file)
+		include(htmldir .. "/" .. fname)
+		file:close()
 	end
 end
 
@@ -355,26 +361,7 @@ function start (doc)
 	f:close()
 
 	-- Copy assets
-
-	lfs.mkdir(options.output_dir .. "assets")
-	dirfiles("assets", function(fname, fpath)
-		local f = lfs.open(fpath, "w")
-		io.output(f)
-		include("assets/" .. fname)
-		f:close()
-	end)
-	lfs.mkdir(options.output_dir .. "assets/js")
-	dirfiles("assets/js", function(fname, fpath)
-		local f = lfs.open(fpath, "w")
-		io.output(f)
-		include("assets/js/" .. fname)
-		f:close()
-	end)
-	lfs.mkdir(options.output_dir .. "assets/images")
-	dirfiles("assets/images", function(fname, fpath)
-		local f = lfs.open(fpath, "w")
-		io.output(f)
-		include("assets/images/" .. fname)
-		f:close()
-	end)
+	copyhtmldirfiles("assets")
+	copyhtmldirfiles("assets/js")
+	copyhtmldirfiles("assets/images")
 end
