@@ -125,6 +125,7 @@
 						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#permissionrequest">permissionrequest</a></li>
 						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
 						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
 						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
@@ -416,6 +417,11 @@ Works like setfenv, but is restricted on functions </td>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.setmetatable">setmetatable</a>( tbl, meta )</td>
 			<td class="summary">
 Sets, changes or removes a table's metatable.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.setupPermissionRequest">setupPermissionRequest</a>( perms, desc, showOnUse )</td>
+			<td class="summary">
+Setups permission override request </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.throw">throw</a>( msg, level, uncatchable )</td>
@@ -1497,6 +1503,27 @@ Sets, changes or removes a table's metatable. Doesn't work on most internal meta
 		<p>tbl with metatable set to meta</p>
 		
 	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="builtin.setupPermissionRequest"></a><strong>builtin.setupPermissionRequest</strong>( perms, desc, showOnUse )</dt>
+<dd>
+	<p>
+Setups permission override request</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>perms</tt> ― Table of permission names to override</li>
+			<li><tt>desc</tt> ― Description attached to request</li>
+			<li><tt>showOnUse</tt> ― If true request will popup when user uses chip</li>
+		</ul>
+	</section>
+	
+	
 	
 	
 </dd>
