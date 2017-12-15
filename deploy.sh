@@ -11,8 +11,9 @@ git config user.email "$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
     echo "This is a pull request, creating preview doc archive."
-	tar -czvf doc-preview.tar.gz doc/
-	curl --upload-file doc-preview.tar.gz "https://transfer.sh/sf-doc-${SHA}.tar.gz"
+	tar -cf doc-preview.tar doc/
+	echo "Uploading to transfer.sh"
+	curl --upload-file doc-preview.tar "https://transfer.sh/sf-doc-${SHA}.tar"
     exit 0
 fi
 
