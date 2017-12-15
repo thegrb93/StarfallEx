@@ -55,7 +55,7 @@
 </section><?lua end?>
 <?lua if #module_doc.functions > 0 then?>
 <section class="functions_def">
-	<h2><a name="functions_def">Functions definition</a></h2>
+	<h2><a name="functions_def"></a>Functions definition</h2>
 	<dl>
 		<?lua for _, name in ipairs(module_doc.functions) do?>
 		<?lua=docletsfhtml.include("function.lp", { doc = doc, module_doc = module_doc, func = module_doc.functions[name] })?><?lua end?>

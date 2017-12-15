@@ -44,7 +44,7 @@ end
 						<?lua 
 						for _, name in ipairs(doc.libraries) do
 							local link = not module_doc or module_doc.name ~= name?>
-						<li><?lua if link then?><a href="<?lua=docletsfhtml.module_link(name, doc, from)?>"><?lua end?><?lua if doc.libraries[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.libraries[name].deprecated then?></del><?lua end?><?lua if link then?></a><?lua end?></li><?lua end?>
+						<li><a<?lua if link then?> href="<?lua=docletsfhtml.module_link(name, doc, from)?>"<?lua end?>><?lua if doc.libraries[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.libraries[name].deprecated then?></del><?lua end?></a></li><?lua end?>
 					</ul>
 				</section>
 				<section>
@@ -52,7 +52,7 @@ end
 					<ul>
 						<?lua for _, name in ipairs(doc.classes) do
 							local link = not class_doc or class_doc.name ~= name?>
-						<li><?lua if link then?><a href="<?lua=docletsfhtml.class_link(name, doc, from)?>"><?lua end?><?lua if doc.classes[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.classes[name].deprecated then?></del><?lua end?><?lua if link then?></a><?lua end?></li><?lua end?>
+						<li><a<?lua if link then?> href="<?lua=docletsfhtml.class_link(name, doc, from)?>"<?lua end?>><?lua if doc.classes[name].deprecated then?><del><?lua end?><?lua=name?><?lua if doc.classes[name].deprecated then?></del><?lua end?></a></li><?lua end?>
 					</ul>
 				</section>
 				<section>
@@ -75,7 +75,7 @@ end
 						<?lua 
 						for _, name in ipairs(doc.examples) do
 							local link = not example_doc or example_doc.name ~= name?>
-						<li><?lua if link then?><a href="<?lua=docletsfhtml.example_link(name, doc, from)?>"><?lua end?><?lua=name?><?lua if link then?></a><?lua end?></li><?lua end?>
+						<li><a<?lua if link then?> href="<?lua=docletsfhtml.example_link(name, doc, from)?>"<?lua end?>><?lua=name?></a></li><?lua end?>
 					</ul>
 				</section>
 			</section>
