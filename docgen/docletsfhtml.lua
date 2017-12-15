@@ -35,7 +35,7 @@ end
 
 local function copyhtmldirfiles (dir)
 	local htmldir = 'html/' .. dir
-	local outdir = options.output_dir .. dir
+	local outdir = options.output_dir .. "/" .. dir
 	lfs.mkdir(outdir)
 	for fname in lfs.dir(htmldir) do
 		local f = htmldir .. '/' .. fname
