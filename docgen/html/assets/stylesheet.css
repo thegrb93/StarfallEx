@@ -225,5 +225,13 @@ dt {
 }
 
 footer {
-	margin: 3em 2em 1em;
+	margin: 1em 2em;
+	border-top: 1px solid #058;
+	color: #058;
+}
+
+footer a {
+	padding: .5em 1em;
+	border: 1px dotted #058;
+	border-radius: 1em;
 }
