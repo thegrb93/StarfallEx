@@ -149,6 +149,7 @@ nav li
 nav a {
 	display: inline-block;
 	flex-grow: 1;
+	position: relative;
 	padding: .2em;
 	border-radius: .5em;
 	background-color: transparent;
@@ -158,9 +159,15 @@ nav a:link:hover, nav a:visited:hover {
 	background-color: #000;
 	color: #0ff;
 }
-nav a:not(:link) {
-	background-color: #fff;
-	color: #058;
+nav a:not([href]) {
+	background-color: #058;
+	color: #fff;
+}
+nav a:not([href]):after {
+	content: '»';
+	position: absolute;
+	right: 0;
+	padding: 0 .5em;
 }
 
 #search {
@@ -215,8 +222,11 @@ table.list {
 	width: 100%;
 }
 table.list td.name {
-	max-width: 300px;
+	max-width: 30%;
 	background-color: #f0f0f0;
+}
+table.list td.summary {
+	max-width: 70%;
 }
 
 dt {
