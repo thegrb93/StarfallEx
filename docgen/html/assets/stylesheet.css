@@ -164,7 +164,7 @@ nav a:not([href]) {
 	color: #fff;
 }
 nav a:not([href]):after {
-	content: '»';
+	content: '>';
 	position: absolute;
 	right: 0;
 	padding: 0 .5em;
