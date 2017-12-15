@@ -14,14 +14,14 @@ function processMarkup(element) {
 	html = html.replace(urlPattern, function (match, p1, p2) {
 		return p1 + '<a href="' + match.substring(p1.length) + '">' + match.substring(p1.length + p2.length) + '</a>';
 	});
-	
+
 	element.innerHTML = html;
 }
 
 window.addEventListener('load', function () {
 
 	// Perform markup replacements in main text
-	var blocks = document.querySelector('main').querySelectorAll('p, li');
+	var blocks = document.querySelector('main').querySelectorAll('p, li, td');
 	for (var i = 0; i < blocks.length; i++) {
 		processMarkup(blocks[i]);
 	}
