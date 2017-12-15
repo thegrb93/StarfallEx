@@ -36,17 +36,14 @@ end
 local function copyhtmldirfiles (dir)
 	local htmldir = './html/' .. dir
 	local outdir = options.output_dir .. dir
-	logger:info(string.format("copyhtmldirfiles: htmldir = %s", htmldir))
-	logger:info(string.format("copyhtmldirfiles: outdir = %s", outdir))
 	lfs.mkdir(outdir)
 	for fname in lfs.dir(htmldir) do
 		local f = htmldir .. '/' .. fname
-		logger:info(string.format("copyhtmldirfiles: f = %s", f))
 		local attr = lfs.attributes(f)
-		if attr.mode == "file" then
-			local file = lfs.open(outdir .. "/" .. fname, "w")
+		if attr.mode == 'file' then
+			local file = lfs.open(outdir .. '/' .. fname, 'w')
 			io.output(file)
-			include(f)
+			include(dir .. '/' .. fname)
 			file:close()
 		end
 	end
