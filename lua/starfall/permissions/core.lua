@@ -27,7 +27,7 @@ function P.registerPrivilege (id, name, description, arg)
 	if not arg.usergroup then
 		arg.usergroups = {}
 	end
-	
+
 	P.privileges[id] = {name, description, arg}
 end
 
@@ -36,13 +36,16 @@ end
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
 function P.check (instance, target, key)
+	if instance.permissionOverrides and instance.permissionOverrides[key] then
+		return
+	end
 	if P.permissionchecks[key](instance, target) then
 		SF.Throw("Insufficient permissions: " .. key, 3)
 	end
 end
 
 function P.hasAccess (instance, target, key)
-	return not P.permissionchecks[key](instance, target)
+	return (instance.permissionOverrides and instance.permissionOverrides[key]) or not P.permissionchecks[key](instance, target)
 end
 
 function P.savePermissions()
@@ -182,14 +185,14 @@ if SERVER then
 
 			net.WriteUInt(table.Count(P.providers), 8)
 			for id, v in pairs(P.providers) do
-			
+
 				local privileges = {}
 				for privilegeid, privilege in pairs(P.privileges) do
 					if privilege[3][id] then
 						privileges[privilegeid] = privilege
 					end
 				end
-				
+
 				net.WriteString(id)
 				net.WriteString(v.name)
 				net.WriteUInt(#v.settingsoptions, 8)
