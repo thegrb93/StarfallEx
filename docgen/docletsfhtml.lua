@@ -34,16 +34,16 @@ end
 -- @param dir String with directory path inside `html`.
 
 local function copyhtmldirfiles (dir)
-	local htmldir = 'html/' .. dir
+	local htmldir = './html/' .. dir
 	local outdir = options.output_dir .. dir
 	lfs.mkdir(outdir)
 	for fname in lfs.dir(htmldir) do
 		local f = htmldir .. '/' .. fname
-		local attr = lfs.attributes (f)
+		local attr = lfs.attributes(f)
 		if attr.mode ~= "file" then continue end
 		local file = lfs.open(outdir .. "/" .. fname, "w")
 		io.output(file)
-		include(htmldir .. "/" .. fname)
+		include(f)
 		file:close()
 	end
 end
