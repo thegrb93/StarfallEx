@@ -13,8 +13,8 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]
     echo "This is a pull request, creating preview doc archive."
 	tar -cf doc-preview.tar doc/
 	echo "Uploading to transfer.sh"
-	echo Link: $(curl -s --upload-file doc-preview.tar "https://transfer.sh/sf-doc-${SHA}.tar")
-	echo "Deploy finished"
+	curl -s --upload-file doc-preview.tar "https://transfer.sh/sf-doc-${SHA}.tar" > preview-link.txt
+	echo "Deploy finished, link: $(<preview-link.txt)"
     exit 0
 fi
 
