@@ -61,12 +61,12 @@ function ENT:OnRemove ()
 	end
 end
 
--- Request code from the chip. If the chip doesn't have code yet then wait at most 5 sec for code.
+-- Request code from the chip. If the chip doesn't have code yet then wait at most 60 sec for code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		local hookname = "SFCodeRQ"..proc:EntIndex().."_"..ply:EntIndex()
-		local timeout = CurTime() + 5
+		local timeout = CurTime() + 60
 		hook.Add("Think", hookname, function()
 			if ply:IsValid() and proc:IsValid() and CurTime()<timeout then
 				if proc.mainfile and proc.files then
