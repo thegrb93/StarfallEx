@@ -246,7 +246,7 @@ if CLIENT then
 					local header = vgui.Create("DLabel", header)
 					header:SetFont("DermaLarge")
 					header:SetColor(Color(255, 255, 255))
-					header:SetText(p.name)
+					header:SetText((server and "[Server] " or "[Client] ")..p.name)
 					header:SetSize(0, 40)
 					header:Dock(TOP)
 					scrollPanel:AddItem(header)
