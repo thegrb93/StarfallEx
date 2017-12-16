@@ -194,87 +194,87 @@ Deals with time and timers.</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.adjust">adjust</a>( name, delay, reps, func )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.adjust">adjust</a>( name, delay, reps, func&nbsp;)</td>
 			<td class="summary">
 Adjusts a timer </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.create">create</a>( name, delay, reps, func, simple )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.create">create</a>( name, delay, reps, func, simple&nbsp;)</td>
 			<td class="summary">
 Creates (and starts) a timer </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.curtime">curtime</a>(  )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.curtime">curtime</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the uptime of the server in seconds (to at least 4 decimal places) </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.exists">exists</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.exists">exists</a>( name&nbsp;)</td>
 			<td class="summary">
 Checks if a timer exists </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.frametime">frametime</a>(  )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.frametime">frametime</a>( &nbsp;)</td>
 			<td class="summary">
 Returns time between frames on client and ticks on server.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.getTimersLeft">getTimersLeft</a>(  )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.getTimersLeft">getTimersLeft</a>( &nbsp;)</td>
 			<td class="summary">
 Returns number of available timers </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.pause">pause</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.pause">pause</a>( name&nbsp;)</td>
 			<td class="summary">
 Pauses a timer </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.realtime">realtime</a>(  )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.realtime">realtime</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the uptime of the game/server in seconds (to at least 4 decimal places) </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.remove">remove</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.remove">remove</a>( name&nbsp;)</td>
 			<td class="summary">
 Stops and removes the timer.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.repsleft">repsleft</a>( name, The )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.repsleft">repsleft</a>( name, The&nbsp;)</td>
 			<td class="summary">
 Returns amount of repetitions/executions left before the timer destroys itself.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.simple">simple</a>( delay, func )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.simple">simple</a>( delay, func&nbsp;)</td>
 			<td class="summary">
 Creates a simple timer, has no name, can't be stopped, paused, or destroyed.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.start">start</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.start">start</a>( name&nbsp;)</td>
 			<td class="summary">
 Starts a timer </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.stop">stop</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.stop">stop</a>( name&nbsp;)</td>
 			<td class="summary">
 Stops a timer </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.systime">systime</a>(  )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.systime">systime</a>( &nbsp;)</td>
 			<td class="summary">
 Returns a highly accurate time in seconds since the start up, ideal for benchmarking.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.timeleft">timeleft</a>( name, The )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.timeleft">timeleft</a>( name, The&nbsp;)</td>
 			<td class="summary">
 Returns amount of time left (in seconds) before the timer executes its function.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.toggle">toggle</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.toggle">toggle</a>( name&nbsp;)</td>
 			<td class="summary">
 Runs either timer.pause or timer.unpause based on the timer's current status.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#timer.unpause">unpause</a>( name )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#timer.unpause">unpause</a>( name&nbsp;)</td>
 			<td class="summary">
 Unpauses a timer </td>
 		</tr>
@@ -288,7 +288,7 @@ Unpauses a timer </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="timer.adjust"></a><strong>timer.adjust</strong>( name, delay, reps, func )</dt>
+<dt><span class="realm_sh"></span><a name="timer.adjust"></a><strong>timer.adjust</strong>( name, delay, reps, func&nbsp;)</dt>
 <dd>
 	<p>
 Adjusts a timer</p>
@@ -316,7 +316,7 @@ Adjusts a timer</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.create"></a><strong>timer.create</strong>( name, delay, reps, func, simple )</dt>
+<dt><span class="realm_sh"></span><a name="timer.create"></a><strong>timer.create</strong>( name, delay, reps, func, simple&nbsp;)</dt>
 <dd>
 	<p>
 Creates (and starts) a timer</p>
@@ -339,7 +339,7 @@ Creates (and starts) a timer</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.curtime"></a><strong>timer.curtime</strong>(  )</dt>
+<dt><span class="realm_sh"></span><a name="timer.curtime"></a><strong>timer.curtime</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns the uptime of the server in seconds (to at least 4 decimal places)</p>
@@ -351,7 +351,7 @@ Returns the uptime of the server in seconds (to at least 4 decimal places)</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.exists"></a><strong>timer.exists</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.exists"></a><strong>timer.exists</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Checks if a timer exists</p>
@@ -376,7 +376,7 @@ Checks if a timer exists</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.frametime"></a><strong>timer.frametime</strong>(  )</dt>
+<dt><span class="realm_sh"></span><a name="timer.frametime"></a><strong>timer.frametime</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns time between frames on client and ticks on server. Same thing as G.FrameTime in GLua</p>
@@ -388,7 +388,7 @@ Returns time between frames on client and ticks on server. Same thing as G.Frame
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.getTimersLeft"></a><strong>timer.getTimersLeft</strong>(  )</dt>
+<dt><span class="realm_sh"></span><a name="timer.getTimersLeft"></a><strong>timer.getTimersLeft</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns number of available timers</p>
@@ -406,7 +406,7 @@ Returns number of available timers</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.pause"></a><strong>timer.pause</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.pause"></a><strong>timer.pause</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Pauses a timer</p>
@@ -431,7 +431,7 @@ Pauses a timer</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.realtime"></a><strong>timer.realtime</strong>(  )</dt>
+<dt><span class="realm_sh"></span><a name="timer.realtime"></a><strong>timer.realtime</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns the uptime of the game/server in seconds (to at least 4 decimal places)</p>
@@ -443,7 +443,7 @@ Returns the uptime of the game/server in seconds (to at least 4 decimal places)<
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.remove"></a><strong>timer.remove</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.remove"></a><strong>timer.remove</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Stops and removes the timer.</p>
@@ -462,7 +462,7 @@ Stops and removes the timer.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.repsleft"></a><strong>timer.repsleft</strong>( name, The )</dt>
+<dt><span class="realm_sh"></span><a name="timer.repsleft"></a><strong>timer.repsleft</strong>( name, The&nbsp;)</dt>
 <dd>
 	<p>
 Returns amount of repetitions/executions left before the timer destroys itself.</p>
@@ -488,7 +488,7 @@ Returns amount of repetitions/executions left before the timer destroys itself.<
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.simple"></a><strong>timer.simple</strong>( delay, func )</dt>
+<dt><span class="realm_sh"></span><a name="timer.simple"></a><strong>timer.simple</strong>( delay, func&nbsp;)</dt>
 <dd>
 	<p>
 Creates a simple timer, has no name, can't be stopped, paused, or destroyed.</p>
@@ -508,7 +508,7 @@ Creates a simple timer, has no name, can't be stopped, paused, or destroyed.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.start"></a><strong>timer.start</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.start"></a><strong>timer.start</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Starts a timer</p>
@@ -533,7 +533,7 @@ Starts a timer</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.stop"></a><strong>timer.stop</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.stop"></a><strong>timer.stop</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Stops a timer</p>
@@ -558,7 +558,7 @@ Stops a timer</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.systime"></a><strong>timer.systime</strong>(  )</dt>
+<dt><span class="realm_sh"></span><a name="timer.systime"></a><strong>timer.systime</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns a highly accurate time in seconds since the start up, ideal for benchmarking.</p>
@@ -570,7 +570,7 @@ Returns a highly accurate time in seconds since the start up, ideal for benchmar
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.timeleft"></a><strong>timer.timeleft</strong>( name, The )</dt>
+<dt><span class="realm_sh"></span><a name="timer.timeleft"></a><strong>timer.timeleft</strong>( name, The&nbsp;)</dt>
 <dd>
 	<p>
 Returns amount of time left (in seconds) before the timer executes its function.</p>
@@ -596,7 +596,7 @@ Returns amount of time left (in seconds) before the timer executes its function.
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.toggle"></a><strong>timer.toggle</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.toggle"></a><strong>timer.toggle</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Runs either timer.pause or timer.unpause based on the timer's current status.</p>
@@ -621,7 +621,7 @@ Runs either timer.pause or timer.unpause based on the timer's current status.</p
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="timer.unpause"></a><strong>timer.unpause</strong>( name )</dt>
+<dt><span class="realm_sh"></span><a name="timer.unpause"></a><strong>timer.unpause</strong>( name&nbsp;)</dt>
 <dd>
 	<p>
 Unpauses a timer</p>

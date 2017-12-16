@@ -194,37 +194,37 @@ Coroutine library</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.create">create</a>( func )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.create">create</a>( func&nbsp;)</td>
 			<td class="summary">
 Creates a new coroutine.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.resume">resume</a>( thread, ... )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.resume">resume</a>( thread, ...&nbsp;)</td>
 			<td class="summary">
 Resumes a suspended coroutine.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.running">running</a>(  )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.running">running</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the coroutine that is currently running.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.status">status</a>( thread )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.status">status</a>( thread&nbsp;)</td>
 			<td class="summary">
 Returns the status of the coroutine.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.wait">wait</a>( time )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.wait">wait</a>( time&nbsp;)</td>
 			<td class="summary">
 Suspends the coroutine for a number of seconds.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.wrap">wrap</a>( func )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.wrap">wrap</a>( func&nbsp;)</td>
 			<td class="summary">
 Creates a new coroutine.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#coroutine.yield">yield</a>( ... )</td>
+			<td class="name"><span class="realm_sh"></span><a href="#coroutine.yield">yield</a>( ...&nbsp;)</td>
 			<td class="summary">
 Suspends the currently running coroutine.</td>
 		</tr>
@@ -238,7 +238,7 @@ Suspends the currently running coroutine.</td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="coroutine.create"></a><strong>coroutine.create</strong>( func )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.create"></a><strong>coroutine.create</strong>( func&nbsp;)</dt>
 <dd>
 	<p>
 Creates a new coroutine.</p>
@@ -263,7 +263,7 @@ Creates a new coroutine.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="coroutine.resume"></a><strong>coroutine.resume</strong>( thread, ... )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.resume"></a><strong>coroutine.resume</strong>( thread, ...&nbsp;)</dt>
 <dd>
 	<p>
 Resumes a suspended coroutine. Note that, in contrast to Lua's native coroutine.resume function, it will not run in protected mode and can throw an error.</p>
@@ -289,7 +289,7 @@ Resumes a suspended coroutine. Note that, in contrast to Lua's native coroutine.
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="coroutine.running"></a><strong>coroutine.running</strong>(  )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.running"></a><strong>coroutine.running</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns the coroutine that is currently running.</p>
@@ -307,7 +307,7 @@ Returns the coroutine that is currently running.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="coroutine.status"></a><strong>coroutine.status</strong>( thread )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.status"></a><strong>coroutine.status</strong>( thread&nbsp;)</dt>
 <dd>
 	<p>
 Returns the status of the coroutine.</p>
@@ -332,7 +332,7 @@ Returns the status of the coroutine.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="coroutine.wait"></a><strong>coroutine.wait</strong>( time )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.wait"></a><strong>coroutine.wait</strong>( time&nbsp;)</dt>
 <dd>
 	<p>
 Suspends the coroutine for a number of seconds. Note that the coroutine will not resume automatically, but any attempts to resume the coroutine while it is waiting will not resume the coroutine and act as if the coroutine suspended itself immediately.</p>
@@ -351,7 +351,7 @@ Suspends the coroutine for a number of seconds. Note that the coroutine will not
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="coroutine.wrap"></a><strong>coroutine.wrap</strong>( func )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.wrap"></a><strong>coroutine.wrap</strong>( func&nbsp;)</dt>
 <dd>
 	<p>
 Creates a new coroutine.</p>
@@ -376,7 +376,7 @@ Creates a new coroutine.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="coroutine.yield"></a><strong>coroutine.yield</strong>( ... )</dt>
+<dt><span class="realm_sh"></span><a name="coroutine.yield"></a><strong>coroutine.yield</strong>( ...&nbsp;)</dt>
 <dd>
 	<p>
 Suspends the currently running coroutine. May not be called outside a coroutine.</p>
