@@ -274,7 +274,11 @@ if CLIENT then
 							button:SetTooltip(setting[2])
 							button:DockMargin(0, 0, 3, 0)
 							button:Dock(RIGHT)
-							button.active = setting[3]==i
+							if server then
+								button.active = setting[3]==i
+							else
+								button.active = SF.Permissions.privileges[id][3][p.id].setting == i
+							end
 							button.DoClick = function(self)
 								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
 								for _, b in ipairs(buttons) do
