@@ -6,7 +6,7 @@ elseif func.library then
 	fname = func.library .. "." .. func.fname
 end
 ?>
-<dt><span class="realm_<?lua=func.realm?>"></span><?lua if func.deprecated then?><del><?lua end?><?lua=func.private and "local " or ""?><a name="<?lua=fname?>"></a><strong><?lua=fname?></strong>( <?lua=table.concat(func.param, ", ")?> )<?lua if func.deprecated then?></del><?lua end?></dt>
+<dt><span class="realm_<?lua=func.realm?>"></span><?lua if func.deprecated then?><del><?lua end?><?lua=func.private and "local " or ""?><a name="<?lua=fname?>"></a><strong><?lua=fname?></strong>( <?lua=table.concat(func.param, ", ")?>&nbsp;)<?lua if func.deprecated then?></del><?lua end?></dt>
 <dd>
 	<p><?lua=func.description or ""?></p>
 	<?lua if func.deprecated then?>

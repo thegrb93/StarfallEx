@@ -34,18 +34,12 @@ a {
 	font-weight: bold;
 	text-decoration: none;
 }
-a:link {
-	color: #05c;
-}
 a:visited {
 	color: #058;
 }
-a:hover {
-	text-decoration: underline;
-}
 
 input {
-	font-size: inherit;
+	font-size: 10pt;
 	font-family: inherit;
 }
 
@@ -155,21 +149,29 @@ nav li
 nav a {
 	display: inline-block;
 	flex-grow: 1;
+	position: relative;
 	padding: .2em;
 	border-radius: .5em;
-	background-color: #fff;
-}
-nav a:link {
 	background-color: transparent;
 	color: inherit;
 }
-nav a:link:hover {
+nav a[href]:hover {
 	background-color: #000;
 	color: #0ff;
 }
+nav a:not([href]) {
+	background-color: #058;
+	color: #fff;
+}
+nav a:not([href]):after {
+	content: '>';
+	position: absolute;
+	right: 0;
+	padding: 0 .5em;
+}
 
 #search {
-	padding: 0 1em .5em;
+	padding: 0 .5em .5em;
 }
 #search_field {
 	width: 100%;
@@ -184,6 +186,13 @@ nav a:link:hover {
 
 main {
 	padding: 2em;
+}
+
+main a:link {
+	color: #05c;
+}
+main a:hover {
+	text-decoration: underline;
 }
 
 main > h1 {
@@ -213,8 +222,12 @@ table.list {
 	width: 100%;
 }
 table.list td.name {
-	max-width: 300px;
+	max-width: 30%;
 	background-color: #f0f0f0;
+}
+table.list td.summary {
+	width: 60%;
+	max-width: 70%;
 }
 
 dt {
@@ -223,5 +236,13 @@ dt {
 }
 
 footer {
-	margin: 3em 2em 1em;
+	margin: 1em 2em;
+	border-top: 1px solid #058;
+	color: #058;
+}
+
+footer a {
+	padding: .5em 1em;
+	border: 1px dotted #058;
+	border-radius: 1em;
 }
