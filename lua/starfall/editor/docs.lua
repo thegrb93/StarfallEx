@@ -69,8 +69,8 @@ Called when a button is pressed";["name"] = "inputPressed";["realm"] = "sh";["su
 Called when a button is pressed ";["class"] = "hook";["param"] = {[1] = "button";["button"] = "Number of the button";};};["PlayerChat"] = {["description"] = "\
 Called when a player's chat message is printed to the chat window";["class"] = "hook";["summary"] = "\
 Called when a player's chat message is printed to the chat window ";["classForced"] = true;["name"] = "PlayerChat";["realm"] = "sh";["client"] = true;["param"] = {};};["Initialize"] = {["description"] = "\
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["class"] = "hook";["summary"] = "\
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["classForced"] = true;["name"] = "Initialize";["realm"] = "sh";["server"] = true;["param"] = {};};["Removed"] = {["description"] = "\
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["class"] = "hook";["classForced"] = true;["summary"] = "\
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["name"] = "Initialize";["realm"] = "sh";["server"] = true;["param"] = {};};["Removed"] = {["description"] = "\
 Called when the starfall chip is removed";["class"] = "hook";["summary"] = "\
 Called when the starfall chip is removed ";["classForced"] = true;["name"] = "Removed";["realm"] = "sh";["server"] = true;["param"] = {};};["tick"] = {["description"] = "\
 Tick hook. Called each game tick on both the server and client.";["class"] = "hook";["server"] = true;["classForced"] = true;["realm"] = "sh";["name"] = "tick";["summary"] = "\
@@ -487,7 +487,9 @@ Serialize a table ";["classForced"] = true;["fname"] = "serialize";["name"] = "v
 Deserialize a string";["server"] = true;["class"] = "function";["realm"] = "sh";["summary"] = "\
 Deserialize a string ";["classForced"] = true;["fname"] = "deserialize";["name"] = "von.deserialize";["library"] = "von";["client"] = true;["param"] = {[1] = "str";["str"] = "String to deserialize";};};};["tables"] = {};["class"] = "library";["description"] = "\
 vON Library";["summary"] = "\
-vON Library ";["fields"] = {};["name"] = "von";["client"] = true;["libtbl"] = "von";["server"] = true;};["net"] = {["functions"] = {[1] = "getBytesLeft";[2] = "isStreaming";[3] = "readAngle";[4] = "readBit";[5] = "readColor";[6] = "readData";[7] = "readDouble";[8] = "readEntity";[9] = "readFloat";[10] = "readInt";[11] = "readMatrix";[12] = "readStream";[13] = "readString";[14] = "readUInt";[15] = "readVector";[16] = "send";[17] = "start";[18] = "writeAngle";[19] = "writeBit";[20] = "writeColor";[21] = "writeData";[22] = "writeDouble";[23] = "writeEntity";[24] = "writeFloat";[25] = "writeInt";[26] = "writeMatrix";[27] = "writeStream";[28] = "writeString";[29] = "writeUInt";[30] = "writeVector";["writeVector"] = {["description"] = "\
+vON Library ";["fields"] = {};["name"] = "von";["client"] = true;["libtbl"] = "von";["server"] = true;};["net"] = {["functions"] = {[1] = "getBytesLeft";[2] = "isStreaming";[3] = "readAngle";[4] = "readBit";[5] = "readColor";[6] = "readData";[7] = "readDouble";[8] = "readEntity";[9] = "readFloat";[10] = "readInt";[11] = "readMatrix";[12] = "readStream";[13] = "readString";[14] = "readUInt";[15] = "readVector";[16] = "receive";[17] = "send";[18] = "start";[19] = "writeAngle";[20] = "writeBit";[21] = "writeColor";[22] = "writeData";[23] = "writeDouble";[24] = "writeEntity";[25] = "writeFloat";[26] = "writeInt";[27] = "writeMatrix";[28] = "writeStream";[29] = "writeString";[30] = "writeUInt";[31] = "writeVector";["receive"] = {["description"] = "\
+Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Like glua net.Receive, adds a callback that is called when a net message with the matching name is received.";["fname"] = "receive";["library"] = "net";["name"] = "net_library.receive";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "name";[2] = "func";["func"] = "The callback or nil to remove callback. (len - length of the net message, ply - player that sent it or nil if clientside)";["name"] = "The name of the net message";};};["writeVector"] = {["description"] = "\
 Writes an vector to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Writes an vector to the net message ";["fname"] = "writeVector";["library"] = "net";["name"] = "net_library.writeVector";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The vector to be written";};};["readColor"] = {["ret"] = "The color that was read";["description"] = "\
 Reads a color from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
@@ -497,9 +499,9 @@ Reads a double from the net message ";["fname"] = "readDouble";["library"] = "ne
 Reads a entity from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Reads a entity from the net message ";["fname"] = "readEntity";["library"] = "net";["name"] = "net_library.readEntity";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["writeAngle"] = {["description"] = "\
 Writes an angle to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Writes an angle to the net message ";["fname"] = "writeAngle";["library"] = "net";["name"] = "net_library.writeAngle";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The angle to be written";};};["readAngle"] = {["ret"] = "The angle that was read";["description"] = "\
-Reads an angle from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Reads an angle from the net message ";["fname"] = "readAngle";["library"] = "net";["name"] = "net_library.readAngle";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["readFloat"] = {["ret"] = "The float that was read";["description"] = "\
+Writes an angle to the net message ";["fname"] = "writeAngle";["library"] = "net";["name"] = "net_library.writeAngle";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The angle to be written";};};["writeStream"] = {["description"] = "\
+Streams a large 20MB string.";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Streams a large 20MB string.";["fname"] = "writeStream";["library"] = "net";["name"] = "net_library.writeStream";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "str";["str"] = "The string to be written";};};["readFloat"] = {["ret"] = "The float that was read";["description"] = "\
 Reads a float from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Reads a float from the net message ";["fname"] = "readFloat";["library"] = "net";["name"] = "net_library.readFloat";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["writeBit"] = {["description"] = "\
 Writes a bit to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
@@ -511,25 +513,25 @@ Send a net message from client->server, or server->client.";["fname"] = "send";[
 Reads an unsigned integer from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Reads an unsigned integer from the net message ";["fname"] = "readUInt";["library"] = "net";["name"] = "net_library.readUInt";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "n";["n"] = "The amount of bits to read";};};["readBit"] = {["ret"] = "The bit that was read. (0 for false, 1 for true)";["description"] = "\
 Reads a bit from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Reads a bit from the net message ";["fname"] = "readBit";["library"] = "net";["name"] = "net_library.readBit";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["writeStream"] = {["description"] = "\
-Streams a large 20MB string.";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Streams a large 20MB string.";["fname"] = "writeStream";["library"] = "net";["name"] = "net_library.writeStream";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "str";["str"] = "The string to be written";};};["writeMatrix"] = {["description"] = "\
-Writes an matrix to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Writes an matrix to the net message ";["fname"] = "writeMatrix";["library"] = "net";["name"] = "net_library.writeMatrix";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The matrix to be written";};};["isStreaming"] = {["ret"] = "Boolean";["class"] = "function";["description"] = "\
-Returns whether or not the library is currently reading data from a stream";["fname"] = "isStreaming";["realm"] = "sh";["name"] = "net_library.isStreaming";["summary"] = "\
-Returns whether or not the library is currently reading data from a stream ";["private"] = false;["library"] = "net";["param"] = {};};["readString"] = {["ret"] = "The string that was read";["description"] = "\
-Reads a string from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Reads a string from the net message ";["fname"] = "readString";["library"] = "net";["name"] = "net_library.readString";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getBytesLeft"] = {["ret"] = "number of bytes that can be sent";["class"] = "function";["description"] = "\
-Returns available bandwidth in bytes";["fname"] = "getBytesLeft";["realm"] = "sh";["name"] = "net_library.getBytesLeft";["summary"] = "\
-Returns available bandwidth in bytes ";["private"] = false;["library"] = "net";["param"] = {};};["readInt"] = {["ret"] = "The integer that was read";["description"] = "\
-Reads an integer from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Reads an integer from the net message ";["fname"] = "readInt";["library"] = "net";["name"] = "net_library.readInt";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "n";["n"] = "The amount of bits to read";};};["writeInt"] = {["description"] = "\
-Writes an integer to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Writes an integer to the net message ";["fname"] = "writeInt";["library"] = "net";["name"] = "net_library.writeInt";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";[2] = "n";["t"] = "The integer to be written";["n"] = "The amount of bits the integer consists of";};};["readVector"] = {["ret"] = "The vector that was read";["description"] = "\
-Reads a vector from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Reads a vector from the net message ";["fname"] = "readVector";["library"] = "net";["name"] = "net_library.readVector";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["writeEntity"] = {["description"] = "\
+Reads a bit from the net message ";["fname"] = "readBit";["library"] = "net";["name"] = "net_library.readBit";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["writeEntity"] = {["description"] = "\
 Writes an entity to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
-Writes an entity to the net message ";["fname"] = "writeEntity";["library"] = "net";["name"] = "net_library.writeEntity";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The entity to be written";};};["writeString"] = {["description"] = "\
+Writes an entity to the net message ";["fname"] = "writeEntity";["library"] = "net";["name"] = "net_library.writeEntity";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The entity to be written";};};["writeMatrix"] = {["description"] = "\
+Writes an matrix to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Writes an matrix to the net message ";["fname"] = "writeMatrix";["library"] = "net";["name"] = "net_library.writeMatrix";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The matrix to be written";};};["readAngle"] = {["ret"] = "The angle that was read";["description"] = "\
+Reads an angle from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Reads an angle from the net message ";["fname"] = "readAngle";["library"] = "net";["name"] = "net_library.readAngle";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["readString"] = {["ret"] = "The string that was read";["description"] = "\
+Reads a string from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Reads a string from the net message ";["fname"] = "readString";["library"] = "net";["name"] = "net_library.readString";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["isStreaming"] = {["ret"] = "Boolean";["class"] = "function";["description"] = "\
+Returns whether or not the library is currently reading data from a stream";["fname"] = "isStreaming";["realm"] = "sh";["name"] = "net_library.isStreaming";["summary"] = "\
+Returns whether or not the library is currently reading data from a stream ";["private"] = false;["library"] = "net";["param"] = {};};["readInt"] = {["ret"] = "The integer that was read";["description"] = "\
+Reads an integer from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Reads an integer from the net message ";["fname"] = "readInt";["library"] = "net";["name"] = "net_library.readInt";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "n";["n"] = "The amount of bits to read";};};["getBytesLeft"] = {["ret"] = "number of bytes that can be sent";["class"] = "function";["description"] = "\
+Returns available bandwidth in bytes";["fname"] = "getBytesLeft";["realm"] = "sh";["name"] = "net_library.getBytesLeft";["summary"] = "\
+Returns available bandwidth in bytes ";["private"] = false;["library"] = "net";["param"] = {};};["readVector"] = {["ret"] = "The vector that was read";["description"] = "\
+Reads a vector from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Reads a vector from the net message ";["fname"] = "readVector";["library"] = "net";["name"] = "net_library.readVector";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["writeInt"] = {["description"] = "\
+Writes an integer to the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
+Writes an integer to the net message ";["fname"] = "writeInt";["library"] = "net";["name"] = "net_library.writeInt";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";[2] = "n";["t"] = "The integer to be written";["n"] = "The amount of bits the integer consists of";};};["writeString"] = {["description"] = "\
 Writes a string to the net message. Null characters will terminate the string.";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Writes a string to the net message.";["fname"] = "writeString";["library"] = "net";["name"] = "net_library.writeString";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "t";["t"] = "The string to be written";};};["readStream"] = {["description"] = "\
 Reads a large string stream from the net message";["class"] = "function";["realm"] = "sh";["summary"] = "\
