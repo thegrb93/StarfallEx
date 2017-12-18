@@ -269,6 +269,11 @@ Reads an unsigned integer from the net message </td>
 Reads a vector from the net message </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.receive">receive</a>( name, func&nbsp;)</td>
+			<td class="summary">
+Like glua net.Receive, adds a callback that is called when a net message with the matching name is received.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.send">send</a>( target, unreliable&nbsp;)</td>
 			<td class="summary">
 Send a net message from client->server, or server->client.</td>
@@ -641,6 +646,26 @@ Reads a vector from the net message</p>
 		<p>The vector that was read</p>
 		
 	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.receive"></a><strong>net.receive</strong>( name, func&nbsp;)</dt>
+<dd>
+	<p>
+Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― The name of the net message</li>
+			<li><tt>func</tt> ― The callback or nil to remove callback. (len - length of the net message, ply - player that sent it or nil if clientside)</li>
+		</ul>
+	</section>
+	
+	
 	
 	
 </dd>
