@@ -21,7 +21,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]
 		echo "Uploading to transfer.sh"
 		curl -s --upload-file doc-preview.tar "https://transfer.sh/sf-doc-${SHA}.tar" > preview-link.txt
 		echo "Deploy finished, link: $(<preview-link.txt)"
-	end
+	fi
     exit 0
 fi
 
