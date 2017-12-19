@@ -659,197 +659,444 @@ derma.DefineControl("StarfallFileBrowser", "", PANEL, "DPanel")
 
 PANEL = {}
 
-local function createpermissionsPanel (parent)
+local function createpermissionsPanel ( parent )
 	local chip = parent.chip
-	local panel = vgui.Create( "DPanel",parent )
+	local panel = vgui.Create( 'DPanel', parent )
 	panel:Dock( FILL )
 	panel:DockMargin( 0, 0, 0, 0 )
 	panel.Paint = function () end
+	panel.index = { [ 1 ] = {}, [ 2 ] = {} } -- Locate any permission panel by area and id with ease
 
+	local permStates = {
+		{
+			iconMat = Material( 'icon16/joystick_add.png' ),
+			color = Color( 0, 0, 0, 0 ),
+			stillText = 'Awaiting your decision.\nLeft click to mark for granting.'
+		},
+		{
+			iconMat = Material( 'icon16/tick.png' ),
+			color = SF.Editor.colors.med,
+			changedText = 'Override is marked for granting.\nYou need to apply it to make the change take effect.',
+			stillText = 'Already granted override.\nLeft or right click to mark for revocation.'
+		},
+		{
+			iconMat = Material( 'icon16/stop.png' ),
+			color = Color( 50, 0, 0 ),
+			changedText = 'Marked for revocation.\nLeft click to undo.'
+		}
+	}
 
+	local listedPerms = {
+		chip.instance.permissionRequest.overrides,
+		parent.overrides
+	}
+	for area, set in ipairs( listedPerms ) do
+		local scrollPanel = vgui.Create( 'DScrollPanel', panel )
+		scrollPanel:Dock( FILL )
+		scrollPanel:SetPaintBackgroundEnabled( false )
+		scrollPanel:Clear()
+		for id, _ in SortedPairs( set ) do
+			local permission = SF.Permissions.privileges[ id ]
 
-	local scrollPanel = vgui.Create( "DScrollPanel", panel )
-	scrollPanel:Dock( FILL )
-	scrollPanel:SetPaintBackgroundEnabled( false )
-	scrollPanel:Clear()
+			local name = permission[ 1 ]
+			local description = permission[ 2 ]
 
-	for id,_ in pairs(chip.instance.permissionRequest.overrides) do
-		local permission = SF.Permissions.privileges[id]
+			local perm = vgui.Create( 'DLabel' )
+			perm:Dock( TOP )
+			perm:DockMargin( 0, 5, 0, 5 )
+			perm:DockPadding( 5, 5, 5, 5 )
+			perm:SetTall( 50 )
+			perm:SetIsToggle( true )
+			perm:SetCursor( 'hand' )
+			perm:SetText( '' )
+			perm.Paint = function ( s, w, h )
+				draw.RoundedBox( 0, 0, 0, w, h, permStates[ perm.state ].color )
+				if perm.state ~= perm.initialState then
+					draw.RoundedBox( 0, 0, 0, 26, h, SF.Editor.colors.medlight )
+				end
+				draw.RoundedBox( 0, 0, h - 1, w, 1, SF.Editor.colors.meddark )
+			end
+			perm.update = function ()
+				if area == 2 then perm.state = perm:GetToggle() and 2 or 3
+				else perm.state = perm:GetToggle() and 2 or 1 end
+				if perm.initialState then
+					local hint
+					if perm.state ~= perm.initialState then hint = permStates[ perm.state ].changedText or ''
+					else hint = permStates[ perm.state ].stillText or '' end
+					perm:SetToolTip( id .. '\n' .. description .. '\n\n' .. hint )
+					ChangeTooltip( perm )
+				end
+			end
+			function perm:OnToggled()
+				parent.overrides[ id ] = perm:GetToggle() and true or nil
+				perm.update()
+				parent.update()
+			end
+			perm:SetToggle( parent.overrides[ id ] ~= nil )
+			perm.update()
+			perm.initialState = perm.state
+			perm.update()
+			if area == 1 and perm.state == 2 then
+				perm:SetIsToggle( false )
+				perm.DoRightClick = function ()
+					local mirror = panel.index[ 2 ][ id ]
+					parent.area = 2
+					parent.update()
+					local x, y = mirror:GetPos()
+					panel:GetChild( 1 ):GetVBar():AnimateTo( y + mirror:GetTall() / 2 - panel:GetTall() / 2, 0.5 )
+				end
+			elseif area == 2 then
+				perm.DoRightClick = function ()
+					perm:Toggle()
+					perm:OnToggled()
+				end
+			end
 
+			local title = vgui.Create( 'DLabel', perm )
+			title:Dock( TOP )
+			title:SetContentAlignment( 4 )
+			title:SetTextInset( 26, 0 )
+			title:SetFont( 'SF_PermissionName' )
+			title:SetText( name )
+			title:SetBright( true )
+			title.Paint = function ()
+				surface.SetDrawColor( 200, 200, 255 )
+				surface.SetMaterial( permStates[ perm.state ].iconMat )
+				surface.DrawTexturedRect( 0, 0, 16, 16 )
+			end
 
-		local description = permission[2]
-		local name = permission[1]
+			local desc = vgui.Create( 'DLabel', perm )
+			desc:Dock( BOTTOM )
+			desc:DockMargin( 31, 0, 0, 0 )
+			desc:SetContentAlignment( 1 )
+			desc:SetFont( 'SF_PermissionDesc' )
+			desc:SetColor( SF.Editor.colors.light )
+			desc:SetText( description )
 
-		local header = vgui.Create( "StarfallPanel" )
-		header.Paint = function(s,w,h)
-			draw.RoundedBox( 0, 0, h-1, w, 1, SF.Editor.colors.meddark )
+			scrollPanel:AddItem( perm )
+			panel.index[ area ][ id ] = perm
+			local prev = table.maxn( panel.index[ area ] ) or 0
+			panel.index[ area ][ prev + 1 ] = perm
 		end
-		header:DockMargin( 0, 5, 0, 0 )
-		header:SetSize( 0, 50 )
-		header:Dock( TOP )
-		header:SetToolTip( id )
-
-		local title = vgui.Create( "Panel",header )
-		title:SetSize(16,16)
-		title:Dock(TOP)
-
-		local settingtext = vgui.Create( "DLabel", title )
-		settingtext:SetFont( "SF_PermissionName" )
-		settingtext:SetColor( Color(255, 255, 255) )
-		settingtext:SetText( string.format("%s - %s",name,description) )
-		settingtext:SetContentAlignment(4)
-		settingtext:DockMargin( 5, 0, 0, 0 )
-		settingtext:Dock( FILL )
-		settingtext:SizeToContents()
-		settingtext:SetIsToggle(true)
-
-		local check = vgui.Create("DCheckBox",title)
-		check:SetSize(16,16)
-		check.Paint = function() end
-		check:Dock(LEFT)
-		check:SetValue(parent.acceptedPermissions[id] == true)
-
-		local checkImg = vgui.Create("DImage",check)
-		checkImg:Dock(FILL)
-		checkImg:SetImage("icon16/cross.png")
-		checkImg:SetImage(parent.acceptedPermissions[id] == true and "icon16/tick.png"or "icon16/cross.png")
-		function check:OnChange(val)
-			checkImg:SetImage(val and "icon16/tick.png"or "icon16/cross.png")
-			parent.acceptedPermissions[id] = val and true or nil
-		end
-
-		local desc = vgui.Create( "DLabel", header )
-		desc:SetFont( "SF_PermissionDesc" )
-		desc:SetColor( Color(255, 255, 255) )
-		desc:SetText( description )
-		desc:DockMargin( 30, 0, 0, 0 )
-		desc:SetContentAlignment(4)
-		desc:Dock( FILL )
-		scrollPanel:AddItem( header )
+		if area ~= parent.area then scrollPanel:SetVisible( false ) end
 	end
 	return panel
 end
 
-function PANEL:OpenForChip(chip)
+function PANEL:OpenForChip( chip )
 	self.chip = chip
-	self.description:SetText(chip.instance.permissionRequest.description)
-	self.avatar:SetPlayer(chip.owner,128)
+	self.entIcon:SetModel( chip:GetModel(), chip:GetSkin() )
+	self.entIcon:SetTooltip( tostring( chip ) )
+	self.entName:SetText( chip.name )
+	local desc = chip.instance.permissionRequest.description
+	self.description:SetText( #desc > 0 and desc or 'Please press "Grant" couple times. Then press "Apply Permissions", so this way we can provide you with interesting features.' )
+	self.description:SetTooltip( string.format( 'Description provided by owner.\nName: %s\nSteamID: %s', chip.owner:GetName(), chip.owner:SteamID() ) )
+	self.ownerAvatar:SetPlayer( chip.owner, self.ownerPanel:GetTall() )
 	self:MakePopup()
+	self:ParentToHUD()
 	self:Center()
-	self.acceptedPermissions = {}
-	if chip.instance.permissionOverrides then -- It had permissions set before
-		for k,v in pairs(chip.instance.permissionOverrides) do
-			self.acceptedPermissions[k] = v
-		end
+
+	self.overrides = {}
+	if chip.instance.permissionOverrides then
+		self.overrides = table.Copy( chip.instance.permissionOverrides )
 	end
 
-	local permissions = createpermissionsPanel(self)
-	permissions:SetParent(self)
-	permissions:Dock(FILL)
-	permissions:Refresh()
-	permissions:DockMargin( 5, 0, 0, 0 )
+	local permissions = createpermissionsPanel( self )
+	permissions:SetParent( self )
+	permissions:Dock( FILL )
+	self.permissionsPanel = permissions
+
+	self.satisfied = SF.Permissions.permissionRequestSatisfied( chip.instance )
+	self.area = self.satisfied and 2 or 1
+	self.update()
+	self.changeOverrides = function ()
+		if chip and chip.instance then
+			chip.instance.permissionOverrides = self.overrides
+			chip.instance:runScriptHook( 'permissionrequest' )
+		end
+	end
 
 end
 
 function PANEL:Init ()
-	self:ShowCloseButton(false)
-	self:SetSize(600,900)
-	self:SetTitle("Permission Override")
-	self:DockPadding(5,5,5,5)
-	self.lblTitle:SetFont("SF_PermissionsTitle")
-	self.lblTitle:Dock(TOP)
-	self.lblTitle:DockMargin(2,2,2,2)
-	self.lblTitle:DockPadding(0,0,0,0)
+	self:ShowCloseButton( false )
+	self:DockPadding( 5, 5, 5, 5 )
+	self:SetSize( 640, 400 )
+	self:SetTitle( 'Overriding Permissions' )
+	self.lblTitle:Dock( TOP )
+	self.lblTitle:DockMargin( 2, 2, 2, 2 )
+	self.lblTitle:DockPadding( 0, 0, 0, 0 )
+	self.lblTitle:SetFont( 'SF_PermissionsTitle' )
 	self.lblTitle:SizeToContents()
-	self.lblTitle:SetContentAlignment(5)
+	self.lblTitle:SetContentAlignment( 5 )
 
-	local plyPanel = vgui.Create("DPanel",self)
-	plyPanel.Paint = function(s,w,h)
-		draw.RoundedBox( 0, 0, 0, w, h, Color(255,255,255) )
-	end
-	plyPanel:SetSize(0,128)
-	plyPanel:Dock(TOP)
-	plyPanel:DockMargin(0,0,0,10)
-
-	local avatar = vgui.Create("AvatarImage",plyPanel)
-	avatar:SetSize(128,128)
-	avatar:Dock(LEFT)
-	avatar:SetPlayer(LocalPlayer(),128)
-	self.avatar = avatar
-
-	local nick = vgui.Create( "DLabel", plyPanel )
-	nick:Dock(TOP)
-	nick:DockMargin(2,5,2,5)
-	nick:SetDark(true)
-	nick:SetContentAlignment( 5 )
-	nick:SetFont("DermaLarge")
-	nick:SetText( LocalPlayer():GetName() )
-	self.nick = nick
-
-	local text = vgui.Create( "DLabel", plyPanel )
-	text:Dock(TOP)
-	text:DockMargin(2,5,2,5)
-	text:SetDark(true)
-	text:SetAutoStretchVertical(true)
-	text:SetFont("SF_PermissionsWarning")
-	text:SetWrap(true)
-	text:SetContentAlignment( 5 )
-
-	text:SetText( "Requests additional permissions for single chip.\n If you grant them chip will ignore your global settings while checking permissions listed below." )
-
-	local warning = vgui.Create( "DLabel", plyPanel )
-	warning:Dock(FILL)
-	warning:DockMargin(2,5,2,5)
-	warning:SetDark(true)
-	warning:SetContentAlignment( 5 )
-	warning:SetFont("SF_PermissionsWarning")
-	warning:SetTextColor(Color(255,130,10))
-	warning:SetAutoStretchVertical(true)
-	warning:SetWrap(true)
-	warning:SetText( "Allowing additional permission for strangers may be dangerous!" )
-
-	local buttons = vgui.Create("Panel",self)
-	buttons:SetSize(0,40)
-	buttons:Dock(BOTTOM)
-
-	local accept = vgui.Create("StarfallButton",buttons)
-	accept.PerformLayout = function() end
-	accept:SetText("Grant Permissions")
-	accept:SetFont("SF_PermissionDesc")
-	accept:SetSize(self:GetWide()/2-7,40)
-	accept:Dock(LEFT)
-	accept.DoClick = function()
-		self.chip.instance.permissionOverrides = self.acceptedPermissions
-		self.chip.instance:runScriptHook("permissionrequest")
-		self:Close()
+	local entity = vgui.Create( 'DPanel', self )
+	entity:Dock( TOP )
+	entity:DockMargin( 0, 5, 0, 5 )
+	entity:DockPadding( 5, 5, 5, 5 )
+	entity:SetTall( 128 )
+	entity.Paint = function( s, w, h )
+		draw.RoundedBox( 0, 0, 0, w, h, Color( 255, 255, 255 ) )
 	end
 
-	local cancel = vgui.Create("StarfallButton",buttons)
-	cancel.PerformLayout = function() end
-	cancel:SetText("Cancel")
-	cancel:SetSize(self:GetWide()/2-7,40)
-	cancel:SetFont("SF_PermissionDesc")
-	cancel:Dock(RIGHT)
-	cancel.DoClick = function()
-		self:Close()
+	local icon = vgui.Create( 'SpawnIcon', entity )
+	icon:Dock( LEFT )
+	icon:DockMargin( 0, 0, 5, 0 )
+	icon:SetSize( 118, 118 )
+	self.entIcon = icon
+
+	local name = vgui.Create( 'DLabel', entity )
+	name:Dock( TOP )
+	name:SetTall( 32 )
+	name:SetFont( 'DermaLarge' )
+	name:SetDark( true )
+	self.entName = name
+
+	local notice = vgui.Create( 'DLabel', entity )
+	notice:Dock( FILL )
+	notice:SetFont( 'SF_PermissionsWarning' )
+	notice:SetWrap( true )
+	notice:SetDark( true )
+	notice.prefixes = { 'requests additional permissions.', 'may still require some permissions.' }
+	notice.update = function ()
+		notice:SetText( notice.prefixes[ self.area ] .. ' They might be useful to touch advanced technologies. There is place for any influence rendered by their features.' )
 	end
 
-	local description = vgui.Create( "DPanel", self )
-	function description:SetText(text)
-		self.text = markup.Parse( "<font=SF_PermissionDesc>"..text.."</font>", self:GetWide() -10 )
+	local pane = vgui.Create( 'Panel', entity )
+	pane:Dock( BOTTOM )
+	pane:SetTall( 40 )
+
+	local warning = vgui.Create( 'DLabel', pane )
+	warning:Dock( FILL )
+	warning:SetAutoStretchVertical( true )
+	warning:SetContentAlignment( 4 )
+	warning:SetFont( 'SF_PermissionsWarning' )
+	warning:SetWrap( true )
+	warning:SetDark( true )
+	warning:SetTextColor( Color( 200, 50, 0 ) )
+	warning:SetText( 'State of permissions listed below will override global settings. Grant overrides only if you trust the owner.' )
+
+	local showOverrides = vgui.Create( 'StarfallButton', pane )
+	showOverrides:Dock( RIGHT )
+	showOverrides:DockMargin( 5, 0, 0, 0 )
+	showOverrides:SetWide( 150 )
+	showOverrides:SetFont( 'SF_PermissionDesc' )
+	showOverrides:SetColor( SF.Editor.colors.medlight )
+	showOverrides:SetHoverColor( SF.Editor.colors.light )
+	showOverrides:SetTextColor( SF.Editor.colors.meddark )
+	showOverrides.PerformLayout = function () end
+	showOverrides:SetText( 'Entity Overrides' )
+	showOverrides:SetTooltip( 'You have some overrides already granted to the entity.\nPress to show only them.' )
+	showOverrides.update = function ()
+		showOverrides:SetVisible( self.area == 1 and self.chip.instance.permissionOverrides and table.Count( self.chip.instance.permissionOverrides ) > 0 )
 	end
-	function description:PaintOver(w,h)
-		if self.text then
-			self.text:Draw(5,5)
+	showOverrides.DoClick = function ()
+		self.area = 2
+		self.update()
+	end
+
+	local buttons = vgui.Create( 'Panel', self )
+	buttons:Dock( BOTTOM )
+	buttons:DockMargin( 0, 5, 0, 0 )
+	buttons:SetSize( 0, 40 )
+
+	local grant = vgui.Create( 'StarfallButton', buttons )
+	grant:Dock( LEFT )
+	grant:SetWide( self:GetWide() / 2 - 7.5 )
+	grant:SetFont( 'SF_PermissionDesc' )
+	grant.states = {
+		{
+			label = 'Grant',
+			hint = 'By pressing this button you mark all overrides visible on your screen for granting.'
+		},
+		{
+			label = 'Apply Permissions',
+			hint = 'Requested overrides are marked for granting. Now you can apply them!',
+			color = Color( 50, 200, 50 ),
+			hoverColor = Color( 100, 255, 100 ),
+			textColor = SF.Editor.colors.dark
+		},
+		{
+			label = 'Stay',
+			hint = 'Nothing will change.'
+		},
+		{
+			label = 'Revoke Selected',
+			hint = 'You have selected overrides for revocation.\nBy pressing this button you revoke them.',
+			color = Color( 100, 50, 0 ),
+			hoverColor = Color( 150, 100, 0 ),
+			textColor = Color( 255, 255, 255 )
+		}
+	}
+	grant.PerformLayout = function () end
+	grant.update = function ()
+		if self.area == 1 then
+			grant.state = 2
+			for id, _ in pairs( self.chip.instance.permissionRequest.overrides ) do
+				if not self.overrides[ id ] then
+					grant.state = 1
+					break
+				end
+			end
+		else
+			grant.state = 3
+			if self.chip.instance.permissionOverrides then
+				for id, _ in pairs( self.chip.instance.permissionOverrides ) do
+					if not self.overrides[ id ] then
+						grant.state = 4
+						break
+					end
+				end
+			end
+		end
+		grant:SetText( grant.states[ grant.state ].label )
+		grant:SetTooltip( grant.states[ grant.state ].hint )
+		ChangeTooltip( grant )
+		grant:SetColor( grant.states[ grant.state ].color or SF.Editor.colors.meddark )
+		grant:SetHoverColor( grant.states[ grant.state ].hoverColor or SF.Editor.colors.med )
+		grant:SetTextColor( grant.states[ grant.state ].textColor or SF.Editor.colors.light )
+	end
+	grant.DoClick = function ()
+		if grant.state == 1 then
+			local scrollPanel = self.permissionsPanel:GetChild( 0 )
+			local VBar = scrollPanel:GetVBar()
+			for i = 1, 2 do
+				for id, perm in ipairs( self.permissionsPanel.index[ 1 ] ) do
+					local x, y = perm:GetPos()
+					if i == 1 then
+						local h = perm:GetTall()
+						if VBar:GetScroll() < y + h * 0.2 and VBar:GetScroll() + scrollPanel:GetTall() > y + 0.8 * h then
+							if not perm:GetToggle() then
+								perm:SetToggle( true )
+								perm:OnToggled()
+							end
+						end
+					elseif not perm:GetToggle() then
+						VBar:AnimateTo( y, 0.5 )
+						break
+					end
+				end
+			end
+		else
+			if grant.state ~= 3 then self.changeOverrides() end
+			self:Close()
 		end
 	end
-	description:SetSize(0,128)
-	description:SetBackgroundColor(SF.Editor.colors.meddark)
-	description:Dock(BOTTOM)
-	description:DockMargin(0,0,0,10)
-	self:InvalidateLayout( true )
-	description:SetText("_SetText_")
+
+	local decline = vgui.Create( 'StarfallButton', buttons )
+	decline:Dock( RIGHT )
+	decline:SetWide( self:GetWide() / 2 - 7.5 )
+	decline:SetFont( 'SF_PermissionDesc' )
+	decline.states = {
+		{
+			label = 'Decline',
+			hint = 'You can confidently decline.\nNothing will change.'
+		},
+		{
+			label = 'Revoke All Overrides',
+			hint = 'By pressing this button you revoke all overrides per entity.',
+			color = Color( 100, 50, 0 ),
+			hoverColor = Color( 150, 100, 0 ),
+			textColor = Color( 255, 255, 255 )
+		}
+	}
+	decline.PerformLayout = function () end
+	decline.update = function ()
+		decline.state = self.area
+		decline:SetText( decline.states[ decline.state ].label )
+		decline:SetTooltip( decline.states[ decline.state ].hint )
+		decline:SetColor( decline.states[ decline.state ].color or SF.Editor.colors.meddark )
+		decline:SetHoverColor( decline.states[ decline.state ].hoverColor or SF.Editor.colors.med )
+		decline:SetTextColor( decline.states[ decline.state ].textColor or SF.Editor.colors.light )
+	end
+	decline.DoClick = function ()
+		if decline.state == 2 then
+			self.overrides = {}
+			self.changeOverrides()
+		end
+		self:Close()
+	end
+
+	local owner = vgui.Create( 'Panel', self )
+	owner:Dock( BOTTOM )
+	owner:DockMargin( 0, 5, 0, 0 )
+	owner:SetSize( self:GetWide(), 118 )
+	owner.update = function ()
+		owner:SetVisible( self.area == 1 )
+	end
+	self.ownerPanel = owner
+
+	local avatar = vgui.Create( 'AvatarImage', owner )
+	avatar:Dock( LEFT )
+	avatar:SetWide( owner:GetTall() )
+	self.ownerAvatar = avatar
+
+	local description = vgui.Create( 'DPanel', owner )
+	description:Dock( LEFT )
+	description:DockMargin( 5, 0, 0, 0 )
+	description:SetWide( owner:GetWide() - avatar:GetWide() - 5 )
+	description:SetBackgroundColor( SF.Editor.colors.meddark )
+	local descMarkup
+	local descWideMax = description:GetWide()
+	function description:SetText( str )
+		descMarkup = markup.Parse( '<font=SF_PermissionDesc>' .. str .. '</font>', descWideMax - 10 )
+		self:SetWide( math.min( descMarkup:GetWidth() + 10, descWideMax ) )
+		local tall = math.min( descMarkup:GetHeight(), 108 ) + 10
+		self:GetParent():SetTall( tall )
+		avatar:SetWide( tall )
+	end
+	function description:PaintOver( w, h )
+		if descMarkup then
+			descMarkup:Draw( 5, 5 )
+		end
+	end
 	self.description = description
+
+	self:InvalidateLayout( true )
+
+	self.update = function ()
+		showOverrides.update()
+		notice.update()
+		owner.update()
+		grant.update()
+		decline.update()
+		for n = 0, 3 do
+			local scrollPanel = self.permissionsPanel:GetChild( n % 2 )
+			if n < 2 then scrollPanel:SetVisible( self.area == n + 1 )
+			else scrollPanel:GetCanvas():InvalidateLayout( true ) end
+		end
+		self:InvalidateLayout( true )
+	end
+end
+function PANEL:PerformLayout()
+	if not self.tallAnimation and self.permissionsPanel then
+		-- handle tall change when it's not animated
+		local tall = self:GetTall() - self.permissionsPanel:GetTall()
+		if not self.reservedTall then
+			self:SetTall( tall )
+		end
+		self.reservedTall = tall
+	end
+end
+function PANEL:Think()
+	if not self.area then return end
+	local scrollPanel = self.permissionsPanel:GetChild( self.area - 1 )
+	local VBar = scrollPanel:GetVBar()
+	local dest = self.reservedTall + math.Clamp( scrollPanel:GetCanvas():GetTall(), 0, ScrH() - self.reservedTall )
+	if self:GetTall() != dest then
+		self.tallAnimation = true
+		VBar:SetAlpha( 0 )
+		local step = Lerp( 0.6, 0, dest - self:GetTall() )
+		if self:GetTall() < dest then
+			self:SetTall( self:GetTall() + math.ceil( step ) )
+		else
+			self:SetTall( self:GetTall() + math.floor( step ) )
+		end
+		self:Center()
+	else
+		self.tallAnimation = false
+		VBar:SetAlpha( VBar:GetAlpha() + math.ceil( Lerp( 0.1, 0, 255 - VBar:GetAlpha() ) ) )
+	end
 end
 function PANEL:Paint( w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
