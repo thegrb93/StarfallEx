@@ -133,7 +133,7 @@ properties.Add( "starfall", {
 	Filter = function( self, ent, ply )
 		if not IsValid( ent ) then return false end
 		if not gamemode.Call( "CanProperty", ply, "starfall", ent ) then return false end
-		return ent.Starfall or ent.link and ent.link.GetClass() == 'starfall_screen'
+		return ent.Starfall or ent.link and ent.link.Starfall
 	end,
 	MenuOpen = MenuOpen,
 	Action = function ( self, ent ) end
