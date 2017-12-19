@@ -731,7 +731,7 @@ function Editor:InitComponents()
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
 
-	self.C.Control = self:addComponent(vgui.Create("Panel", self), -342, 72, 342, -30) -- Control Panel
+	self.C.Control = self:addComponent(vgui.Create("Panel", self), -462, 72, 462, -30) -- Control Panel
 	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
