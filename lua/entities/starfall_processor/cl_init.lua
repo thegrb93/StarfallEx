@@ -128,3 +128,23 @@ net.Receive("starfall_processor_link", function()
 		component:LinkEnt(proc)
 	end
 end)
+
+net.Receive( 'starfall_processor_used', function ( len )
+	local chip = net.ReadEntity()
+	local activator = net.ReadEntity()
+	if not IsValid( chip ) then return end
+	if chip.link then chip = chip.link end
+
+	if IsValid( chip ) then
+
+		if not chip.instance then return end
+		chip.instance:runScriptHook( 'starfallused', SF.Entities.Wrap( activator ) )
+
+		if activator == LocalPlayer() then
+			if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then
+				local pnl = vgui.Create( 'SFChipPermissions' )
+				if pnl then pnl:OpenForChip( chip ) end
+			end
+		end
+	end
+end )
