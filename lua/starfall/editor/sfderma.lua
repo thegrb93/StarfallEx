@@ -787,9 +787,9 @@ function PANEL:OpenForChip( chip )
 	self.chip = chip
 	self.entIcon:SetModel( chip:GetModel(), chip:GetSkin() )
 	local rad = chip:GetModelRadius()
-	self.entIcon:SetCamPos( Vector( rad * math.sqrt( 2 ), rad * math.sqrt( 2 ), rad * 2 ) )
+	self.entIcon:SetCamPos( Vector( rad * 1.4, rad * 1.4, rad * 2 ) )
 	self.entIcon:SetLookAng( Angle( 135, 45, 180 ) )
-	self.entIcon:SetTooltip( tostring( chip ) )
+	self.entIcon:SetTooltip( tostring( chip ) .. '\nOwner: ' .. chip.owner:GetName() )
 	self.entName:SetText( #chip.name > 0 and chip.name or 'Starfall Processor' )
 	local desc = chip.instance.permissionRequest.description
 	self.description:SetText( #desc > 0 and desc or 'Please press "Grant" couple times. Then press "Apply Permissions", so this way we can provide you with interesting features.' )
@@ -798,7 +798,6 @@ function PANEL:OpenForChip( chip )
 	self:MakePopup()
 	self:ParentToHUD()
 	self:Center()
-	--self:MoveBy( 200, 0, 1 )
 
 	self.overrides = {}
 	if chip.instance.permissionOverrides then
