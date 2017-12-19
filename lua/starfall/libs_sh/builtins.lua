@@ -220,15 +220,15 @@ if CLIENT then
 		local privileges = SF.Permissions.privileges
 		local overrides = {}
 		for I = 1, c do
-			local v = perms[ I ]
-			if type( v ) == "string" then
-				if not privileges[ v ] then
-					SF.Throw( "Invalid permission name: " .. v )
+			local v = perms[I]
+			if type(v) == "string" then
+				if not privileges[v] then
+					SF.Throw("Invalid permission name: "..v)
 				end
-				if not privileges[ v ][ 3 ].client then
-					SF.Throw( "Permission isn't requestable: " .. v )
+				if not privileges[v][3].client then
+					SF.Throw("Permission isn't requestable: "..v)
 				end
-				overrides[ v ] = true
+				overrides[v] = true
 			end
 		end
 		SF.instance.permissionRequest = {}
