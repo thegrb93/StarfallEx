@@ -789,11 +789,11 @@ function PANEL:OpenForChip( chip )
 	local rad = chip:GetModelRadius()
 	self.entIcon:SetCamPos( Vector( rad * 1.4, rad * 1.4, rad * 2 ) )
 	self.entIcon:SetLookAng( Angle( 135, 45, 180 ) )
-	self.entIcon:SetTooltip( tostring( chip ) .. '\nOwner: ' .. chip.owner:GetName() )
+	self.entIcon:SetTooltip( 'Entity ID: ' .. chip:EntIndex() .. '\n\nOwner:\n' .. chip.owner:GetName() .. ' [ ' .. chip.owner:SteamID() .. ' ]' )
 	self.entName:SetText( #chip.name > 0 and chip.name or 'Starfall Processor' )
 	local desc = chip.instance.permissionRequest.description
-	self.description:SetText( #desc > 0 and desc or 'Please press "Grant" couple times. Then press "Apply Permissions", so this way we can provide you with interesting features.' )
-	self.description:SetTooltip( string.format( 'Description provided by owner.\nName: %s\nSteamID: %s', chip.owner:GetName(), chip.owner:SteamID() ) )
+	self.description:SetText( #desc > 0 and desc or 'Please press "Grant" a couple of times. Then press "Apply Permissions", so this way we can provide you with interesting features.' )
+	self.description:SetTooltip( 'Description attached to permission request from\n' .. chip.owner:GetName() .. ' [ ' .. chip.owner:SteamID() .. ' ]' )
 	self.ownerAvatar:SetPlayer( chip.owner, self.ownerPanel:GetTall() )
 	self:MakePopup()
 	self:ParentToHUD()
@@ -862,7 +862,7 @@ function PANEL:Init ()
 	notice:SetFont( 'SF_PermissionsWarning' )
 	notice:SetWrap( true )
 	notice:SetDark( true )
-	notice.prefixes = { 'requests additional permissions.', 'may still require some permissions.' }
+	notice.prefixes = { 'requires additional permissions.', 'may still require some permissions.' }
 	notice.update = function ()
 		notice:SetText( notice.prefixes[ self.area ] .. ' They might be useful to touch advanced technologies. There is place for any influence rendered by their features.' )
 	end
@@ -956,7 +956,6 @@ function PANEL:Init ()
 		end
 		grant:SetText( grant.states[ grant.state ].label )
 		grant:SetTooltip( grant.states[ grant.state ].hint )
-		ChangeTooltip( grant )
 		grant:SetColor( grant.states[ grant.state ].color or SF.Editor.colors.meddark )
 		grant:SetHoverColor( grant.states[ grant.state ].hoverColor or SF.Editor.colors.med )
 		grant:SetTextColor( grant.states[ grant.state ].textColor or SF.Editor.colors.light )
@@ -986,6 +985,7 @@ function PANEL:Init ()
 			if grant.state ~= 3 then self.changeOverrides() end
 			self:Close()
 		end
+		ChangeTooltip()
 	end
 
 	local decline = vgui.Create( 'StarfallButton', buttons )
