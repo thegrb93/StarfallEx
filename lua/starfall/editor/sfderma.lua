@@ -962,14 +962,14 @@ function PANEL:Init ()
 	end
 	grant.DoClick = function ()
 		if grant.state == 1 then
-			local scrollPanel = self.permissionsPanel:GetChild( 0 )
-			local VBar = scrollPanel:GetVBar()
+			local sp1 = self.permissionsPanel:GetChild( 0 )
+			local VBar = sp1:GetVBar()
 			for i = 1, 2 do
 				for id, perm in ipairs( self.permissionsPanel.index[ 1 ] ) do
 					local x, y = perm:GetPos()
 					if i == 1 then
 						local h = perm:GetTall()
-						if VBar:GetScroll() < y + h * 0.2 and VBar:GetScroll() + scrollPanel:GetTall() > y + 0.8 * h then
+						if VBar:GetScroll() < y + h * 0.2 and VBar:GetScroll() + sp1:GetTall() > y + 0.8 * h then
 							if not perm:GetToggle() then
 								perm:SetToggle( true )
 								perm:OnToggled()
@@ -1065,11 +1065,12 @@ function PANEL:Init ()
 		owner.update()
 		grant.update()
 		decline.update()
-		for n = 0, 3 do
-			local scrollPanel = self.permissionsPanel:GetChild( n % 2 )
-			if n < 2 then scrollPanel:SetVisible( self.area == n + 1 )
-			else scrollPanel:GetCanvas():InvalidateLayout( true ) end
-		end
+		local sp1 = self.permissionsPanel:GetChild( 0 )
+		local sp2 = self.permissionsPanel:GetChild( 0 )
+		sp1:SetVisible( self.area == 1 )
+		sp2:SetVisible( self.area == 2 )
+		sp1:GetCanvas():InvalidateLayout( true )
+		sp2:GetCanvas():InvalidateLayout( true )
 		self:InvalidateLayout( true )
 	end
 end
@@ -1077,9 +1078,7 @@ function PANEL:PerformLayout()
 	if not self.tallAnimation and self.permissionsPanel then
 		-- handle tall change when it's not animated
 		local tall = self:GetTall() - self.permissionsPanel:GetTall()
-		if not self.reservedTall then
-			self:SetTall( tall )
-		end
+		if not self.reservedTall then self:SetTall( tall ) end
 		self.reservedTall = tall
 	end
 end
