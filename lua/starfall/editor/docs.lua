@@ -69,8 +69,8 @@ Called when a button is pressed";["name"] = "inputPressed";["realm"] = "sh";["su
 Called when a button is pressed ";["class"] = "hook";["param"] = {[1] = "button";["button"] = "Number of the button";};};["PlayerChat"] = {["description"] = "\
 Called when a player's chat message is printed to the chat window";["class"] = "hook";["summary"] = "\
 Called when a player's chat message is printed to the chat window ";["classForced"] = true;["name"] = "PlayerChat";["realm"] = "sh";["client"] = true;["param"] = {};};["Initialize"] = {["description"] = "\
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["class"] = "hook";["classForced"] = true;["summary"] = "\
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["name"] = "Initialize";["realm"] = "sh";["server"] = true;["param"] = {};};["Removed"] = {["description"] = "\
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["class"] = "hook";["summary"] = "\
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["classForced"] = true;["name"] = "Initialize";["realm"] = "sh";["server"] = true;["param"] = {};};["Removed"] = {["description"] = "\
 Called when the starfall chip is removed";["class"] = "hook";["summary"] = "\
 Called when the starfall chip is removed ";["classForced"] = true;["name"] = "Removed";["realm"] = "sh";["server"] = true;["param"] = {};};["tick"] = {["description"] = "\
 Tick hook. Called each game tick on both the server and client.";["class"] = "hook";["server"] = true;["classForced"] = true;["realm"] = "sh";["name"] = "tick";["summary"] = "\
