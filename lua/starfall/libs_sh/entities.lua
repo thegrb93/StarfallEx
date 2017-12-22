@@ -168,7 +168,6 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor (clr)
-	print(self, type(self), debug.getmetatable(self).__metatable)
 	SF.CheckType(self, ents_metamethods)
 	SF.CheckType(clr, SF.Types["Color"])
 
