@@ -119,7 +119,7 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 		function( )
 			SF.Editor.openPermissionsPopup()
 		end )
-	if Entity.instance.permissionRequest then
+	if Entity.instance and Entity.instance.permissionRequest then
 		SubMenu:AddOption( "Open Chip Permissions",
 			function( )
 				local pnl = vgui.Create("SFChipPermissions")
