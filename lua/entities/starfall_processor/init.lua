@@ -1,10 +1,6 @@
-
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
-
-include("starfall/SFLib.lua")
-assert(SF, "Starfall didn't load correctly!")
 
 function ENT:Initialize ()
 	self:PhysicsInit(SOLID_VPHYSICS)

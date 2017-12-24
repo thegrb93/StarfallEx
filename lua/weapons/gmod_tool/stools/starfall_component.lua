@@ -6,7 +6,6 @@ TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
 -- ------------------------------- Sending / Receiving ------------------------------- --
-include("starfall/sflib.lua")
 
 TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
 TOOL.ClientConVar["Type"] = 1

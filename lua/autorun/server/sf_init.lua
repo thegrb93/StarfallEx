@@ -50,3 +50,5 @@ if files[1] then
 		resource.AddSingleFile("html/ace"..version.."/worker-lua.js")
 	end
 end
+
+include("starfall/SFLib.lua")
