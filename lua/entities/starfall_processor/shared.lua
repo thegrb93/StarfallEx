@@ -30,8 +30,13 @@ function ENT:Compile(owner, files, mainfile)
 	self.mainfile = mainfile
 	self.owner = owner
 
-	if SERVER and update then
-		self:SendCode()
+	if SERVER then
+		if update then
+			self:SendCode()
+		elseif self.SendQueue then
+			self:SendCode(self.SendQueue)
+			self.SendQueue = nil
+		end
 	end
 
 	local ok, instance = SF.Instance.Compile(files, mainfile, owner, { entity = self })
