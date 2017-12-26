@@ -203,7 +203,7 @@ if CLIENT then
 	end
 	function SF.Editor.openPermissionsPopup()
 		local frame = vgui.Create("StarfallFrame")
-		frame:SetSize(600, ScrH())
+		frame:SetSize(600, math.min(900, ScrH()))
 		frame:Center()
 		frame:SetTitle("Permissions")
 		frame:Open()
