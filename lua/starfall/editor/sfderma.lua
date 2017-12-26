@@ -753,7 +753,7 @@ end
 
 function PANEL:Init ()
 	self:ShowCloseButton(false)
-	self:SetSize(600,900)
+	self:SetSize(600,ScrH())
 	self:SetTitle("Permission Override")
 	self:DockPadding(5,5,5,5)
 	self.lblTitle:SetFont("SF_PermissionsTitle")
