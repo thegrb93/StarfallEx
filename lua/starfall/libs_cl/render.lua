@@ -802,12 +802,11 @@ function render_library.createRenderTarget (name)
 		globalRTcount = globalRTcount + 1
 		rtname = "Starfall_CustomRT_" .. globalRTcount
 		rt = { GetRenderTarget(rtname, 1024, 1024), false }
-		render.ClearRenderTarget(rt[1], Color(0, 0, 0, 0))
 		rt[3] = CreateMaterial("StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", { ["$model"] = 1 })
 		rt[3]:SetTexture("$basetexture", rt[1])
 		globalRTs[rtname] = rt
 	end
-
+	render.ClearRenderTarget(rt[1], Color(0, 0, 0, 0))
 	data.rendertargets[name] = rtname
 end
 
