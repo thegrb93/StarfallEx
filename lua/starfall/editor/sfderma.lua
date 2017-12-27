@@ -693,7 +693,7 @@ local function createpermissionsPanel ( parent )
 	for area, set in ipairs( listedPerms ) do
 		local scrollPanel = vgui.Create( 'DScrollPanel', panel )
 		scrollPanel:Dock( FILL )
-		scrollPanel:SetPaintBackgroundEnabled( false )
+		--scrollPanel.Paint = function () end
 		scrollPanel:Clear()
 		for id, _ in SortedPairs( set ) do
 			local permission = SF.Permissions.privileges[ id ]
@@ -778,12 +778,11 @@ local function createpermissionsPanel ( parent )
 			local prev = table.maxn( panel.index[ area ] ) or 0
 			panel.index[ area ][ prev + 1 ] = perm
 		end
-		if area ~= parent.area then scrollPanel:SetVisible( false ) end
 	end
 	return panel
 end
 
-function PANEL:OpenForChip( chip )
+function PANEL:OpenForChip( chip, showOverrides )
 	self.chip = chip
 	self.entIcon:SetModel( chip:GetModel(), chip:GetSkin() )
 	local rad = chip:GetModelRadius()
@@ -803,14 +802,14 @@ function PANEL:OpenForChip( chip )
 	if chip.instance.permissionOverrides then
 		self.overrides = table.Copy( chip.instance.permissionOverrides )
 	end
+	self.satisfied = SF.Permissions.permissionRequestSatisfied( chip.instance )
+	self.area = ( showOverrides or self.satisfied ) and 2 or 1
 
 	local permissions = createpermissionsPanel( self )
 	permissions:SetParent( self )
 	permissions:Dock( FILL )
 	self.permissionsPanel = permissions
 
-	self.satisfied = SF.Permissions.permissionRequestSatisfied( chip.instance )
-	self.area = self.satisfied and 2 or 1
 	self.update()
 	self.changeOverrides = function ()
 		if chip and chip.instance then
@@ -1066,7 +1065,7 @@ function PANEL:Init ()
 		grant.update()
 		decline.update()
 		local sp1 = self.permissionsPanel:GetChild( 0 )
-		local sp2 = self.permissionsPanel:GetChild( 0 )
+		local sp2 = self.permissionsPanel:GetChild( 1 )
 		sp1:SetVisible( self.area == 1 )
 		sp2:SetVisible( self.area == 2 )
 		sp1:GetCanvas():InvalidateLayout( true )
