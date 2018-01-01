@@ -49,7 +49,8 @@ end
 -- @param url http target url
 -- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
-function http_library.get (url, callbackSuccess, callbackFail)
+-- @param headers GET headers to be sent
+function http_library.get (url, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
 	SF.Permissions.check(SF.instance, nil, "http.get")
 
@@ -58,6 +59,14 @@ function http_library.get (url, callbackSuccess, callbackFail)
 	SF.CheckLuaType(url, TYPE_STRING)
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	if headers~=nil then
+		SF.CheckLuaType(headers, TYPE_TABLE)
+		for k, v in pairs(headers) do
+			if type(k) ~= "string" or type(v) ~= "string" then
+				SF.Throw("Headers can only contain string keys and string values", 2)
+			end
+		end
+	end
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 
 	instance.data.http.lastRequest = CurTime()
@@ -66,7 +75,8 @@ function http_library.get (url, callbackSuccess, callbackFail)
 		runCallback(instance, callbackSuccess, body, len, headers, code)
 	end, function (err)
 		runCallback(instance, callbackFail, err)
-	end)
+	end,
+	headers)
 end
 
 --- Runs a new http POST request
@@ -74,7 +84,8 @@ end
 -- @param params POST parameters to be sent
 -- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
-function http_library.post (url, params, callbackSuccess, callbackFail)
+-- @param headers POST headers to be sent
+function http_library.post (url, params, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
 	SF.Permissions.check(SF.instance, nil, "http.post")
 
@@ -82,11 +93,19 @@ function http_library.post (url, params, callbackSuccess, callbackFail)
 
 	SF.CheckLuaType(url, TYPE_STRING)
 
-	if params then
+	if params~=nil then
 		SF.CheckLuaType(params, TYPE_TABLE)
 		for k, v in pairs(params) do
 			if type(k) ~= "string" or type(v) ~= "string" then
 				SF.Throw("Post parameters can only contain string keys and string values", 2)
+			end
+		end
+	end
+	if headers~=nil then
+		SF.CheckLuaType(headers, TYPE_TABLE)
+		for k, v in pairs(headers) do
+			if type(k) ~= "string" or type(v) ~= "string" then
+				SF.Throw("Headers can only contain string keys and string values", 2)
 			end
 		end
 	end
@@ -101,7 +120,8 @@ function http_library.post (url, params, callbackSuccess, callbackFail)
 		runCallback(instance, callbackSuccess, body, len, headers, code)
 	end, function (err)
 		runCallback(instance, callbackFail, err)
-	end)
+	end,
+	headers)
 end
 
 --- Converts data into base64 format or nil if the string is 0 length
