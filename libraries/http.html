@@ -204,12 +204,12 @@ Converts data into base64 format or nil if the string is 0 length </td>
 Checks if a new http request can be started </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#http.get">get</a>( url, callbackSuccess, callbackFail&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#http.get">get</a>( url, callbackSuccess, callbackFail, headers&nbsp;)</td>
 			<td class="summary">
 Runs a new http GET request </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#http.post">post</a>( url, params, callbackSuccess, callbackFail&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#http.post">post</a>( url, params, callbackSuccess, callbackFail, headers&nbsp;)</td>
 			<td class="summary">
 Runs a new http POST request </td>
 		</tr>
@@ -260,7 +260,7 @@ Checks if a new http request can be started</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="http.get"></a><strong>http.get</strong>( url, callbackSuccess, callbackFail&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="http.get"></a><strong>http.get</strong>( url, callbackSuccess, callbackFail, headers&nbsp;)</dt>
 <dd>
 	<p>
 Runs a new http GET request</p>
@@ -273,6 +273,7 @@ Runs a new http GET request</p>
 			<li><tt>url</tt> ― http target url</li>
 			<li><tt>callbackSuccess</tt> ― the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)</li>
 			<li><tt>callbackFail</tt> ― the function to be called on request fail, taking the failing reason as an argument</li>
+			<li><tt>headers</tt> ― GET headers to be sent</li>
 		</ul>
 	</section>
 	
@@ -281,7 +282,7 @@ Runs a new http GET request</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="http.post"></a><strong>http.post</strong>( url, params, callbackSuccess, callbackFail&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="http.post"></a><strong>http.post</strong>( url, params, callbackSuccess, callbackFail, headers&nbsp;)</dt>
 <dd>
 	<p>
 Runs a new http POST request</p>
@@ -295,6 +296,7 @@ Runs a new http POST request</p>
 			<li><tt>params</tt> ― POST parameters to be sent</li>
 			<li><tt>callbackSuccess</tt> ― the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)</li>
 			<li><tt>callbackFail</tt> ― the function to be called on request fail, taking the failing reason as an argument</li>
+			<li><tt>headers</tt> ― POST headers to be sent</li>
 		</ul>
 	</section>
 	
