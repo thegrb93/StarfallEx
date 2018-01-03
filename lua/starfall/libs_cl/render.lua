@@ -806,7 +806,7 @@ function render_library.createRenderTarget (name)
 		rt[3]:SetTexture("$basetexture", rt[1])
 		globalRTs[rtname] = rt
 	end
-	render.ClearRenderTarget(rt[1], Color(0, 0, 0, 0))
+	render.ClearRenderTarget(rt[1], Color(0, 0, 0))
 	data.rendertargets[name] = rtname
 end
 
