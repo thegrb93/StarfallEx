@@ -17,6 +17,21 @@ function P.registerProvider (provider)
 	P.providers[provider.id] = provider
 end
 
+--- Adds a provider which will be used on specified permissions. (Meant for outside addons)
+-- Providers must implement the {@link SF.Permissions.Provider} interface.
+-- @param provider the provider to be registered
+-- @param privileges table of privs this provider will be added to
+-- @param exclusive if true, this provider will replace all existing providers for the privilege. (Addons loaded later may add aditional providers)
+function P.registerCustomProvider (provider, privileges, exclusive)
+	P.providers[provider.id] = provider
+	for k,v in pairs(privileges) do
+		if exclusive then
+			P.privileges[v][3] = {}
+		end
+		P.privileges[v][3][provider.id] = {default = provider.defaultsetting}
+	end
+end
+
 --- Registers a privilege
 -- @param id unique identifier of the privilege being registered
 -- @param name Human readable name of the privilege

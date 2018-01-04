@@ -5,7 +5,6 @@ TOOL.ConfigName		= ""
 TOOL.Tab			= "Wire"
 
 -- ------------------------------- Sending / Receiving ------------------------------- --
-include("starfall/sflib.lua")
 
 local MakeSF
 

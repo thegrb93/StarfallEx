@@ -29,6 +29,7 @@ SF.Libraries.AddHook("initialize", function(instance)
 		burst = SF.BurstObject(burst_rate:GetFloat() * 1000, burst_limit:GetFloat() * 1000),
 		size = 0,
 		data = {},
+		receives = {}
 	}
 end)
 
@@ -412,6 +413,16 @@ function net_library.readEntity()
 	return SF.WrapObject(net.ReadEntity())
 end
 
+--- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.
+-- @shared
+-- @param name The name of the net message
+-- @param func The callback or nil to remove callback. (len - length of the net message, ply - player that sent it or nil if clientside)
+function net_library.receive(name, func)
+	SF.CheckLuaType(name, TYPE_STRING)
+	if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) end
+	SF.instance.data.net.receives[name] = func
+end
+
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
@@ -428,7 +439,15 @@ end
 net.Receive("SF_netmessage", function(len, ply)
 	local ent = net.ReadEntity()
 	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
-		ent.instance:runScriptHook("net", net.ReadString(), len, ply and SF.WrapObject(ply))
+		local name = net.ReadString()
+		if ply then ply = SF.WrapObject(ply) end
+		
+		local recv = ent.instance.data.net.receives[name]
+		if recv then
+			ent.instance:runFunction(recv, len, ply)
+		else
+			ent.instance:runScriptHook("net", name, len, ply)
+		end
 	end
 end)
 

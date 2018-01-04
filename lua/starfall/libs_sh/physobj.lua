@@ -309,4 +309,12 @@ if SERVER then
 			phys:EnableMotion(false)
 		end
 	end
+
+	--- Makes a sleeping physobj wakeup
+	-- @server
+	function physobj_methods:wake()
+		local phys = unwrap(self)
+		SF.Permissions.check(SF.instance, phys:GetEntity(), "entities.applyForce")
+		phys:Wake()
+	end
 end

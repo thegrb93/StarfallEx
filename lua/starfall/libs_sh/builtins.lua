@@ -412,7 +412,10 @@ SF.DefaultEnvironment.math = nil
 
 local os_methods = SF.Libraries.Register("os")
 os_methods.clock = os.clock
-os_methods.date = os.date
+os_methods.date = function(format, time)
+	if string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
+	return os.date(format, time)
+end
 os_methods.difftime = os.difftime
 os_methods.time = os.time
 --- The os library. http://wiki.garrysmod.com/page/Category:os

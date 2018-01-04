@@ -3,18 +3,18 @@ SF.Bass = {}
 -- Register privileges
 do
 	local P = SF.Permissions
-	P.registerPrivilege("bass.loadFile", "Play sound files with bass", "Allows users to create sound objects that use the bass library.", { client = {} })
-	P.registerPrivilege("bass.loadURL", "Play web sound files with bass", "Allows users to create sound objects that use the bass library.", { client = {} })
-	P.registerPrivilege("bass.play2D", "Play sounds in a 2D context (Usually global)", "Allows users to create stereo sounds which play in a 2d space (Usually globally) .", { client = { default = 1 } })
+	P.registerPrivilege("bass.loadFile", "Play local sound files with `bass`.", "Allows users to create sound channels by file path.", { client = {} })
+	P.registerPrivilege("bass.loadURL", "Play remote sound files with `bass`.", "Allows users to create sound channels by URL.", { client = {} })
+	P.registerPrivilege("bass.play2D", "Play sounds in global game context with `bass`.", "Allows users to create sound channels which play in global game context (without `3d` flag).", { client = { default = 1 } })
 
 end
 
---- Bass type
+--- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
 local bass_methods, bass_metamethods = SF.Typedef("Bass")
 local wrap, unwrap = SF.CreateWrapper(bass_metamethods, true, false, debug.getregistry().IGModAudioChannel)
 
---- Bass library.
+--- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @client
 local bass_library = SF.Libraries.Register("bass")
 
@@ -48,10 +48,10 @@ local function not3D(flags)
 	return true
 end
 
---- Loads a sound object from a file
--- @param path Filepath to the sound file.
--- @param flags that will control the sound
--- @param callback to run when the sound is loaded
+--- Loads a sound channel from a file.
+-- @param path File path to play from.
+-- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
+-- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadFile (path, flags, callback)
 	SF.Permissions.check(SF.instance, nil, "bass.loadFile")
 
@@ -82,10 +82,10 @@ function bass_library.loadFile (path, flags, callback)
 	end)
 end
 
---- Loads a sound object from a url
--- @param path url to the sound file.
--- @param flags that will control the sound
--- @param callback to run when the sound is loaded
+--- Loads a sound channel from an URL.
+-- @param path URL path to play from.
+-- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
+-- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadURL (path, flags, callback)
 	SF.Permissions.check(SF.instance, nil, "bass.loadURL")
 
@@ -153,7 +153,7 @@ function bass_methods:pause ()
 	end
 end
 
---- Sets the volume of the sound.
+--- Sets the volume of the sound channel.
 -- @param vol Volume to set to, between 0 and 1.
 function bass_methods:setVolume (vol)
 	SF.CheckType(self, bass_metamethods)
@@ -167,7 +167,7 @@ function bass_methods:setVolume (vol)
 	end
 end
 
---- Sets the pitch of the sound.
+--- Sets the pitch of the sound channel.
 -- @param pitch Pitch to set to, between 0 and 3.
 function bass_methods:setPitch (pitch)
 	SF.CheckType(self, bass_metamethods)
@@ -181,8 +181,8 @@ function bass_methods:setPitch (pitch)
 	end
 end
 
---- Sets the position of the sound
--- @param pos Where to position the sound
+--- Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.
+-- @param pos Where to position the sound.
 function bass_methods:setPos (pos)
 	SF.CheckType(self, bass_metamethods)
 	SF.CheckType(pos, SF.Types["Vector"])
@@ -195,7 +195,7 @@ function bass_methods:setPos (pos)
 	end
 end
 
---- Sets the fade distance of the sound
+--- Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.
 -- @param min The channel's volume is at maximum when the listener is within this distance
 -- @param max The channel's volume stops decreasing when the listener is beyond this distance.
 function bass_methods:setFade (min, max)
@@ -209,8 +209,8 @@ function bass_methods:setFade (min, max)
 	end
 end
 
---- Sets if the sound should loop or not.
--- @param loop Boolean if the sound should loop or not.
+--- Sets whether the sound channel should loop.
+-- @param loop Boolean of whether the sound channel should loop.
 function bass_methods:setLooping (loop)
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
@@ -222,8 +222,8 @@ function bass_methods:setLooping (loop)
 	end
 end
 
---- Gets the length of a sound
--- @return Length in seconds of the sound
+--- Gets the length of a sound channel.
+-- @return Sound channel length in seconds.
 function bass_methods:getLength ()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
@@ -235,8 +235,8 @@ function bass_methods:getLength ()
 	end
 end
 
---- Sets the current time of a sound
--- @param time Time to set a sound in seconds
+--- Sets the current playback time of the sound channel.
+-- @param time Sound channel playback time in seconds.
 function bass_methods:setTime (time)
 	SF.CheckType(self, bass_metamethods)
 	SF.CheckLuaType(time, TYPE_NUMBER)
@@ -249,8 +249,8 @@ function bass_methods:setTime (time)
 	end
 end
 
---- Gets the current time of a sound
--- @return Current time in seconds of the sound
+--- Gets the current playback time of the sound channel.
+-- @return Sound channel playback time in seconds.
 function bass_methods:getTime ()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
@@ -262,9 +262,9 @@ function bass_methods:getTime ()
 	end
 end
 
---- Gets the FFT of a sound
--- @param n Sample size of the hamming window. Must be power of 2
--- @return FFT table of the sound
+--- Perform fast Fourier transform algorithm to compute the DFT of the sound channel.
+-- @param n Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.
+-- @return Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT (n)
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
@@ -278,8 +278,8 @@ function bass_methods:getFFT (n)
 	end
 end
 
---- Gets if the sound is streamed or not
--- @return Is online or not
+--- Gets whether the sound channel is streamed online.
+-- @return Boolean of whether the sound channel is streamed online.
 function bass_methods:isOnline()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)
@@ -293,8 +293,8 @@ function bass_methods:isOnline()
 	return false
 end
 
---- Gets if the sound is valid or not
--- @return Is valid or not
+--- Gets whether the bass is valid.
+-- @return Boolean of whether the bass is valid.
 function bass_methods:isValid()
 	SF.CheckType(self, bass_metamethods)
 	local uw = unwrap(self)

@@ -353,6 +353,8 @@ local defaultFont
 
 -- ------------------------------------------------------------------ --
 
+--- Sets whether stencil tests are carried out for each rendered pixel. Only pixels passing the stencil test are written to the render target.
+-- @param enable true to enable, false to disable
 function render_library.setStencilEnable(enable)
 	enable = (enable == true) -- Make sure it's a boolean
 	local renderdata = SF.instance.data.render
@@ -360,12 +362,18 @@ function render_library.setStencilEnable(enable)
 	render.SetStencilEnable(enable)
 end
 
+--- Resets all values in the stencil buffer to zero.
 function render_library.clearStencil()
 	local renderdata = SF.instance.data.render
 	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
 	render.ClearStencil()
 end
 
+--- Clears the current rendertarget for obeying the current stencil buffer conditions.
+-- @param r Value of the red channel to clear the current rt with.
+-- @param g Value of the green channel to clear the current rt with.
+-- @param b Value of the blue channel to clear the current rt with.
+-- @param depth Clear the depth buffer.
 function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	SF.CheckLuaType(r, TYPE_NUMBER)
 	SF.CheckLuaType(g, TYPE_NUMBER)
@@ -378,6 +386,12 @@ function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	render.ClearBuffersObeyStencil(r, g, b, a, depth)
 end
 
+--- Sets the stencil value in a specified rect.
+-- @param originX X origin of the rectangle.
+-- @param originY Y origin of the rectangle.
+-- @param endX The end X coordinate of the rectangle.
+-- @param endY The end Y coordinate of the rectangle.
+-- @param stencilValue Value to set cleared stencil buffer to.
 function render_library.clearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
 	SF.CheckLuaType(originX, TYPE_NUMBER)
 	SF.CheckLuaType(originY, TYPE_NUMBER)
@@ -391,6 +405,8 @@ function render_library.clearStencilBufferRectangle(originX, originY, endX, endY
 	render.ClearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
 end
 
+--- Sets the compare function of the stencil. More: http://wiki.garrysmod.com/page/render/SetStencilCompareFunction
+-- @param compareFunction
 function render_library.setStencilCompareFunction(compareFunction)
 	SF.CheckLuaType(compareFunction, TYPE_NUMBER)
 
@@ -400,6 +416,8 @@ function render_library.setStencilCompareFunction(compareFunction)
 	render.SetStencilCompareFunction(compareFunction )
 end
 
+--- Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.garrysmod.com/page/render/SetStencilFailOperation
+-- @param operation
 function render_library.setStencilFailOperation(operation)
 	SF.CheckLuaType(operation, TYPE_NUMBER)
 
@@ -409,6 +427,8 @@ function render_library.setStencilFailOperation(operation)
 	render.SetStencilFailOperation(operation)
 end
 
+--- Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.garrysmod.com/page/render/SetStencilPassOperation
+-- @param operation
 function render_library.setStencilPassOperation(operation)
 	SF.CheckLuaType(operation, TYPE_NUMBER)
 
@@ -418,6 +438,8 @@ function render_library.setStencilPassOperation(operation)
 	render.SetStencilPassOperation(operation)
 end
 
+--- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.garrysmod.com/page/render/SetStencilZFailOperation
+-- @param operation
 function render_library.setStencilZFailOperation(operation)
 	SF.CheckLuaType(operation, TYPE_NUMBER)
 
@@ -427,6 +449,8 @@ function render_library.setStencilZFailOperation(operation)
 	render.SetStencilZFailOperation(operation)
 end
 
+--- Sets the reference value which will be used for all stencil operations. This is an unsigned integer.
+-- @param referenceValue Reference value.
 function render_library.setStencilReferenceValue(referenceValue)
 	SF.CheckLuaType(referenceValue, TYPE_NUMBER)
 
@@ -436,6 +460,8 @@ function render_library.setStencilReferenceValue(referenceValue)
 	render.SetStencilReferenceValue(referenceValue)
 end
 
+--- Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.
+-- @param mask The mask bitflag.
 function render_library.setStencilTestMask(mask)
 	SF.CheckLuaType(mask, TYPE_NUMBER)
 
@@ -445,6 +471,8 @@ function render_library.setStencilTestMask(mask)
 	render.SetStencilTestMask(mask)
 end
 
+--- Sets the unsigned 8-bit write bitflag mask to be used for any writes to the stencil buffer.
+-- @param mask The mask bitflag.
 function render_library.setStencilWriteMask(mask)
 	SF.CheckLuaType(mask, TYPE_NUMBER)
 
@@ -778,7 +806,7 @@ function render_library.createRenderTarget (name)
 		rt[3]:SetTexture("$basetexture", rt[1])
 		globalRTs[rtname] = rt
 	end
-
+	render.ClearRenderTarget(rt[1], Color(0, 0, 0))
 	data.rendertargets[name] = rtname
 end
 

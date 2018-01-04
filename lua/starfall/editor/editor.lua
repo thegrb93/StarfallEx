@@ -203,7 +203,7 @@ if CLIENT then
 	end
 	function SF.Editor.openPermissionsPopup()
 		local frame = vgui.Create("StarfallFrame")
-		frame:SetSize(600, 900)
+		frame:SetSize(600, math.min(900, ScrH()))
 		frame:Center()
 		frame:SetTitle("Permissions")
 		frame:Open()
@@ -246,7 +246,7 @@ if CLIENT then
 					local header = vgui.Create("DLabel", header)
 					header:SetFont("DermaLarge")
 					header:SetColor(Color(255, 255, 255))
-					header:SetText(p.name)
+					header:SetText((server and "[Server] " or "[Client] ")..p.name)
 					header:SetSize(0, 40)
 					header:Dock(TOP)
 					scrollPanel:AddItem(header)
@@ -274,7 +274,11 @@ if CLIENT then
 							button:SetTooltip(setting[2])
 							button:DockMargin(0, 0, 3, 0)
 							button:Dock(RIGHT)
-							button.active = setting[3]==i
+							if server then
+								button.active = setting[3]==i
+							else
+								button.active = SF.Permissions.privileges[id][3][p.id].setting == i
+							end
 							button.DoClick = function(self)
 								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
 								for _, b in ipairs(buttons) do

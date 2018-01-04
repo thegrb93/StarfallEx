@@ -138,7 +138,7 @@ function hologram_methods:setFlexWeight(flexid, weight)
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
 	if IsValid(holoent) then
-		holoent:SetFlexWeight(self, weight)
+		holoent:SetFlexWeight(flexid, weight)
 	end
 end
 

@@ -1,10 +1,6 @@
-
 AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
-
-include("starfall/SFLib.lua")
-assert(SF, "Starfall didn't load correctly!")
 
 function ENT:Initialize ()
 	self:PhysicsInit(SOLID_VPHYSICS)
@@ -61,22 +57,16 @@ function ENT:OnRemove ()
 	end
 end
 
--- Request code from the chip. If the chip doesn't have code yet then wait at most 5 sec for code.
+-- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
-		local hookname = "SFCodeRQ"..proc:EntIndex().."_"..ply:EntIndex()
-		local timeout = CurTime() + 5
-		hook.Add("Think", hookname, function()
-			if ply:IsValid() and proc:IsValid() and CurTime()<timeout then
-				if proc.mainfile and proc.files then
-					proc:SendCode(ply)
-					hook.Remove("Think", hookname)
-				end
-			else
-				hook.Remove("Think", hookname)
-			end
-		end)
+		if proc.mainfile and proc.files then
+			proc:SendCode(ply)
+		else
+			proc.SendQueue = proc.SendQueue or {}
+			proc.SendQueue[#proc.SendQueue + 1] = ply
+		end
 	end
 end)
 
