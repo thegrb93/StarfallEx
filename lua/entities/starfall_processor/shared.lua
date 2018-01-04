@@ -117,7 +117,8 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 		SF.Editor.openPermissionsPopup()
 	end)
 	if ent.instance then
-		if ent.instance.permissionRequest and table.Count(ent.instance.permissionRequest.overrides) or table.Count(ent.instance.permissionOverrides) then
+		if ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
+				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0 then
 			SubMenu:AddOption("Overriding Permissions", function ()
 				local pnl = vgui.Create("SFChipPermissions")
 				if pnl then pnl:OpenForChip(ent) end
