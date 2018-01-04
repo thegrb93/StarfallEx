@@ -9,9 +9,9 @@ ENT.Instructions    = ""
 
 ENT.Spawnable       = false
 ENT.AdminSpawnable  = false
-ENT.Starfall  = true
 
-ENT.States = {
+ENT.Starfall        = true
+ENT.States          = {
 	Normal = 1,
 	Error = 2,
 	None = 3,
@@ -77,7 +77,7 @@ function ENT:Compile(owner, files, mainfile)
 	end
 end
 
-function ENT:Error (err)
+function ENT:Error(err)
 	self.error = err
 
 	local msg = err.message
@@ -109,30 +109,26 @@ function ENT:Error (err)
 end
 
 local function MenuOpen( ContextMenu, Option, Entity, Trace )
-	local SubMenu = Option:AddSubMenu( )
-
-	SubMenu:AddOption( "Restart Clientside",
-		function( )
-			Entity:Restart()
-		end )
-
-	SubMenu:AddOption( "Terminate Clientside",
-		function( )
-			Entity:Terminate()
-		end )
-	SubMenu:AddOption( "Open Global Permissions",
-		function( )
-			SF.Editor.openPermissionsPopup()
-		end )
-	if Entity.instance and Entity.instance.permissionRequest then
-		SubMenu:AddOption( "Open Chip Permissions",
-			function( )
+	local ent = Entity
+	if Entity:GetClass() == 'starfall_screen' then ent = ent.link end
+	local SubMenu = Option:AddSubMenu()
+	SubMenu:AddOption("Restart Clientside", function ()
+		ent:Restart()
+	end)
+	SubMenu:AddOption("Terminate Clientside", function ()
+		ent:Terminate()
+	end)
+	SubMenu:AddOption("Open Global Permissions", function ()
+		SF.Editor.openPermissionsPopup()
+	end)
+	if ent.instance then
+		if ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
+				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0 then
+			SubMenu:AddOption("Overriding Permissions", function ()
 				local pnl = vgui.Create("SFChipPermissions")
-				if pnl then
-					pnl:OpenForChip(Entity)
-				end
-			end )
-
+				if pnl then pnl:OpenForChip(ent) end
+			end)
+		end
 	end
 end
 
@@ -140,14 +136,11 @@ properties.Add( "starfall", {
 	MenuLabel = "StarfallEx",
 	Order = 999,
 	MenuIcon = "icon16/wrench.png", -- We should create an icon
-
 	Filter = function( self, ent, ply )
-		if ( !IsValid( ent ) ) then return false end
-		if ( !gamemode.Call( "CanProperty", ply, "starfall", ent ) ) then return false end
-
-		return ent.Starfall ~= nil
+		if not IsValid( ent ) then return false end
+		if not gamemode.Call( "CanProperty", ply, "starfall", ent ) then return false end
+		return ent.Starfall or ent.link and ent.link.Starfall
 	end,
 	MenuOpen = MenuOpen,
-	Action = function( self, ent )
-	end,
+	Action = function ( self, ent ) end
 } )

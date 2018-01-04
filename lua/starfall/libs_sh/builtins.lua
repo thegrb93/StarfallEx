@@ -205,28 +205,27 @@ if CLIENT then
 	-- @class hook
 	-- @client
 
-	--- Setups permission override request
-	--@param perms Table of permission names to override
-	--@param desc Description attached to request
-	--@param showOnUse If true request will popup when user uses chip
+	--- Setups request for overriding permissions.
+	--@param perms Table of overridable permissions' names.
+	--@param desc Description attached to request.
+	--@param showOnUse Whether request will popup when player uses chip or linked screen.
 	--@client
-	function SF.DefaultEnvironment.setupPermissionRequest(perms, desc, showOnUse)
-		SF.CheckLuaType(desc, TYPE_STRING)
-		SF.CheckLuaType(perms, TYPE_TABLE)
-		showOnUse = showOnUse == true
+	function SF.DefaultEnvironment.setupPermissionRequest( perms, desc, showOnUse )
+		SF.CheckLuaType( desc, TYPE_STRING )
+		SF.CheckLuaType( perms, TYPE_TABLE )
 		local c = #perms
-		local overrides = {}
-		if #desc > 1000 then
-			SF.throw("Description too long!")
+		if #desc > 400 then
+			SF.Throw( "Description too long." )
 		end
-		local P = SF.Permissions
+		local privileges = SF.Permissions.privileges
+		local overrides = {}
 		for I = 1, c do
 			local v = perms[I]
 			if type(v) == "string" then
-				if not P.privileges[v] then
+				if not privileges[v] then
 					SF.Throw("Invalid permission name: "..v)
 				end
-				if not P.privileges[v][3].client then
+				if not privileges[v][3].client then
 					SF.Throw("Permission isn't requestable: "..v)
 				end
 				overrides[v] = true
@@ -234,10 +233,18 @@ if CLIENT then
 		end
 		SF.instance.permissionRequest = {}
 		SF.instance.permissionRequest.overrides = overrides
-		SF.instance.permissionRequest.description = desc
-		SF.instance.permissionRequest.showOnUse = showOnUse
+		SF.instance.permissionRequest.description = string.gsub( desc, '%s+$', '' )
+		SF.instance.permissionRequest.showOnUse = showOnUse == true
 
 	end
+
+	--- Is permission request fully satisfied.
+	--@return Boolean of whether the client gave all permissions specified in last request or not.
+	--@client
+	function SF.DefaultEnvironment.permissionRequestSatisfied()
+		return SF.Permissions.permissionsRequestSatisfied( SF.instance )
+	end
+
 end
 
 -- String library

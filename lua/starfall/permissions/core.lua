@@ -236,6 +236,17 @@ else
 			net.SendToServer()
 		end
 	end
+	function P.permissionRequestSatisfied( instance )
+		if not instance.permissionRequest then
+			SF.Throw( 'There is no permission request' )
+		end
+		if instance.permissionOverrides then
+			for id, _ in pairs( instance.permissionRequest.overrides ) do
+				if not instance.permissionOverrides[ id ] then return false end
+			end
+			return true
+		else return table.Count( instance.permissionRequest.overrides ) == 0 end
+	end
 	net.Receive("sf_permissionsettings", function()
 		if reqCallback then
 			local providers = {}
