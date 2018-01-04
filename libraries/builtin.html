@@ -323,6 +323,11 @@ Lua's pcall with SF throw implementation
 Calls a function and catches an error that can be thrown while the execution of the call.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.permissionRequestSatisfied">permissionRequestSatisfied</a>( &nbsp;)</td>
+			<td class="summary">
+Is permission request fully satisfied.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.player">player</a>( &nbsp;)</td>
 			<td class="summary">
 Same as owner() on the server.</td>
@@ -421,7 +426,7 @@ Sets, changes or removes a table's metatable.</td>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.setupPermissionRequest">setupPermissionRequest</a>( perms, desc, showOnUse&nbsp;)</td>
 			<td class="summary">
-Setups permission override request </td>
+Setups request for overriding permissions.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.throw">throw</a>( msg, level, uncatchable&nbsp;)</td>
@@ -1101,6 +1106,24 @@ Calls a function and catches an error that can be thrown while the execution of 
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="builtin.permissionRequestSatisfied"></a><strong>builtin.permissionRequestSatisfied</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Is permission request fully satisfied.</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Boolean of whether the client gave all permissions specified in last request or not.</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="builtin.player"></a><strong>builtin.player</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1510,16 +1533,16 @@ Sets, changes or removes a table's metatable. Doesn't work on most internal meta
 <dt><span class="realm_sh"></span><a name="builtin.setupPermissionRequest"></a><strong>builtin.setupPermissionRequest</strong>( perms, desc, showOnUse&nbsp;)</dt>
 <dd>
 	<p>
-Setups permission override request</p>
+Setups request for overriding permissions.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>perms</tt> ― Table of permission names to override</li>
-			<li><tt>desc</tt> ― Description attached to request</li>
-			<li><tt>showOnUse</tt> ― If true request will popup when user uses chip</li>
+			<li><tt>perms</tt> ― Table of overridable permissions' names.</li>
+			<li><tt>desc</tt> ― Description attached to request.</li>
+			<li><tt>showOnUse</tt> ― Whether request will popup when player uses chip or linked screen.</li>
 		</ul>
 	</section>
 	
