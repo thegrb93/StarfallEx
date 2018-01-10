@@ -894,7 +894,7 @@ end
 
 --- Returns the model material name that uses the render target.
 -- @param name Render target name
--- @return Model material name. Send this to the server to set the entity's material.
+-- @return Model material name. use ent:setMaterial in clientside to set the entity's material to this
 function render_library.getRenderTargetMaterial(name)
 	local data = SF.instance.data.render
 	SF.CheckLuaType(name, TYPE_STRING)
