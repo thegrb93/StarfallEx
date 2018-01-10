@@ -23,29 +23,55 @@ local dumbtrace = {
 	WorldToLocal      = Vector(0, 0, 0),
 }
 
-P.checks = {
-	function(instance, target)
-		if instance.player:IsSuperAdmin() then return true end
-		return P.props[target]==instance.player
-	end,
-	function(instance, target)
-		if not IsValid(target) or CLIENT then return false end
-		local pos = target:GetPos()
-		dumbtrace.Entity = target		
-		return hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false
-	end,
-	function(instance, target)
-		if not IsValid(target) or CLIENT then return false end
-		if hook.Run("PhysgunPickup", instance.player, target) ~= false then
-			-- Some mods expect a release when there's a pickup involved.
-			hook.Run("PhysgunDrop", instance.player, target)
-			return true
-		else
-			return false
-		end
-	end,
-	function() return true end
-}
+if SERVER then
+	P.checks = {
+		function(instance, target)
+			if IsValid(target) then
+				if instance.player:IsSuperAdmin() then return true end
+				return P.props[target]==instance.player
+			else
+				return false
+			end
+		end,
+		function(instance, target)
+			if IsValid(target) then
+				local pos = target:GetPos()
+				dumbtrace.Entity = target		
+				return hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false
+			else
+				return false
+			end
+		end,
+		function(instance, target)
+			if IsValid(target) then
+				if hook.Run("PhysgunPickup", instance.player, target) ~= false then
+					-- Some mods expect a release when there's a pickup involved.
+					hook.Run("PhysgunDrop", instance.player, target)
+					return true
+				else
+					return false
+				end
+			else
+				return false
+			end
+		end,
+		function() return true end
+	}
+else
+	P.checks = {
+		function(instance, target)
+			if IsValid(target) then
+				if instance.player:IsSuperAdmin() then return true end
+				return target:GetNWEntity("SFPP")==instance.player
+			else
+				return false
+			end
+		end,
+		function() return false end,
+		function() return false end,
+		function() return true end
+	}
+end
 
 if SERVER then
 	P.props = setmetatable({},{__mode="k"})
