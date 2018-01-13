@@ -7,6 +7,9 @@
 local find_library = SF.Libraries.Register("find")
 
 local vunwrap = SF.UnwrapObject
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 -- Register privileges
 do
@@ -15,7 +18,7 @@ do
 end
 
 local function convert(results, func)
-	if func then SF.CheckLuaType(func, TYPE_FUNCTION) end
+	if func then checkluatype (func, TYPE_FUNCTION) end
 	local wrap = SF.WrapObject
 
 	local t = {}
@@ -43,9 +46,9 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inBox (min, max, filter)
-	SF.Permissions.check(SF.instance, nil, "find")
-	SF.CheckType(min, SF.Types["Vector"])
-	SF.CheckType(max, SF.Types["Vector"])
+	checkpermission(SF.instance, nil, "find")
+	checktype(min, SF.Types["Vector"])
+	checktype(max, SF.Types["Vector"])
 
 	local min, max = vunwrap(min), vunwrap(max)
 
@@ -58,9 +61,9 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inSphere (center, radius, filter)
-	SF.Permissions.check(SF.instance, nil, "find")
-	SF.CheckType(center, SF.Types["Vector"])
-	SF.CheckLuaType(radius, TYPE_NUMBER)
+	checkpermission(SF.instance, nil, "find")
+	checktype(center, SF.Types["Vector"])
+	checkluatype (radius, TYPE_NUMBER)
 
 	local center = vunwrap(center)
 
@@ -75,11 +78,11 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inCone (pos, dir, distance, radius, filter)
-	SF.Permissions.check(SF.instance, nil, "find")
-	SF.CheckType(pos, SF.Types["Vector"])
-	SF.CheckType(dir, SF.Types["Vector"])
-	SF.CheckLuaType(distance, TYPE_NUMBER)
-	SF.CheckLuaType(radius, TYPE_NUMBER)
+	checkpermission(SF.instance, nil, "find")
+	checktype(pos, SF.Types["Vector"])
+	checktype(dir, SF.Types["Vector"])
+	checkluatype (distance, TYPE_NUMBER)
+	checkluatype (radius, TYPE_NUMBER)
 
 	local pos, dir = vunwrap(pos), vunwrap(dir)
 
@@ -91,8 +94,8 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byClass(class, filter)
-	SF.Permissions.check(SF.instance, nil, "find")
-	SF.CheckLuaType(class, TYPE_STRING)
+	checkpermission(SF.instance, nil, "find")
+	checkluatype (class, TYPE_STRING)
 
 	return convert(ents.FindByClass(class), filter)
 end
@@ -102,8 +105,8 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.byModel(model, filter)
-	SF.Permissions.check(SF.instance, nil, "find")
-	SF.CheckLuaType(model, TYPE_STRING)
+	checkpermission(SF.instance, nil, "find")
+	checkluatype (model, TYPE_STRING)
 
 	return convert(ents.FindByModel(model), filter)
 end
@@ -112,7 +115,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.allPlayers(filter)
-	SF.Permissions.check(SF.instance, nil, "find")
+	checkpermission(SF.instance, nil, "find")
 
 	return convert(player.GetAll(), filter)
 end
@@ -121,7 +124,7 @@ end
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.all(filter)
-	SF.Permissions.check(SF.instance, nil, "find")
+	checkpermission(SF.instance, nil, "find")
 
 	return convert(ents.GetAll(), filter)
 end

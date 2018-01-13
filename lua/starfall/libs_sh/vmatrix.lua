@@ -5,6 +5,9 @@ SF.VMatrix = {}
 local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix")
 local wrap, unwrap = SF.CreateWrapper(vmatrix_metamethods, true, false, debug.getregistry().VMatrix)
 local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 SF.Libraries.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
@@ -66,7 +69,7 @@ end
 --- Rotate the matrix
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
-	SF.CheckType(ang, ang_meta)
+	checktype(ang, ang_meta)
 	unwrap(self):Rotate(aunwrap(ang))
 end
 
@@ -103,56 +106,56 @@ end
 --- Sets the scale
 -- @param vec New scale
 function vmatrix_methods:setScale(vec)
-	SF.CheckType(vec, vec_meta)
+	checktype(vec, vec_meta)
 	unwrap(self):SetScale(vunwrap(vec))
 end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
 function vmatrix_methods:scale(vec)
-	SF.CheckType(vec, vec_meta)
+	checktype(vec, vec_meta)
 	unwrap(self):Scale(vunwrap(vec))
 end
 
 --- Scales the absolute translation
 -- @param num Amount to scale by
 function vmatrix_methods:scaleTranslation(num)
-	SF.CheckLuaType(num, TYPE_NUMBER)
+	checkluatype (num, TYPE_NUMBER)
 	unwrap(self):ScaleTranslation(num)
 end
 
 --- Sets the angles
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
-	SF.CheckType(ang, ang_meta)
+	checktype(ang, ang_meta)
 	unwrap(self):SetAngles(SF.UnwrapObject(ang))
 end
 
 --- Sets the translation
 -- @param vec New translation
 function vmatrix_methods:setTranslation(vec)
-	SF.CheckType(vec, vec_meta)
+	checktype(vec, vec_meta)
 	unwrap(self):SetTranslation(vunwrap(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
 -- @param forward The forward vector
 function vmatrix_methods:setForward(forward)
-	SF.CheckType(forward, vec_meta)
+	checktype(forward, vec_meta)
 	unwrap(self):SetForward(vunwrap(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
 -- @param right The right vector
 function vmatrix_methods:setRight(right)
-	SF.CheckType(right, vec_meta)
+	checktype(right, vec_meta)
 	unwrap(self):SetRight(vunwrap(right))
 end
 
 --- Sets the up direction of the matrix. Third column
 -- @param up The up vector
 function vmatrix_methods:setUp(up)
-	SF.CheckType(up, vec_meta)
+	checktype(up, vec_meta)
 	unwrap(self):SetUp(vunwrap(up))
 end
 
@@ -167,7 +170,7 @@ end
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)
-	SF.CheckType(src, vmatrix_metamethods)
+	checktype(src, vmatrix_metamethods)
 	unwrap(self):Set(unwrap(src))
 end
 
@@ -202,7 +205,7 @@ end
 --- Translate the matrix
 -- @param vec Vector to translate by
 function vmatrix_methods:translate(vec)
-	SF.CheckType(vec, vec_meta)
+	checktype(vec, vec_meta)
 	unwrap(self):Translate(vunwrap(vec))
 end
 
@@ -296,21 +299,21 @@ function vmatrix_methods:transpose()
 end
 
 function vmatrix_metamethods.__add(lhs, rhs)
-	SF.CheckType(lhs, vmatrix_metamethods)
-	SF.CheckType(rhs, vmatrix_metamethods)
+	checktype(lhs, vmatrix_metamethods)
+	checktype(rhs, vmatrix_metamethods)
 
 	return wrap(unwrap(lhs) + unwrap(rhs))
 end
 
 function vmatrix_metamethods.__sub(lhs, rhs)
-	SF.CheckType(lhs, vmatrix_metamethods)
-	SF.CheckType(rhs, vmatrix_metamethods)
+	checktype(lhs, vmatrix_metamethods)
+	checktype(rhs, vmatrix_metamethods)
 
 	return wrap(unwrap(lhs) - unwrap(rhs))
 end
 
 function vmatrix_metamethods.__mul(lhs, rhs)
-	SF.CheckType(lhs, vmatrix_metamethods)
+	checktype(lhs, vmatrix_metamethods)
 	local rhsmeta = dgetmeta(rhs)
 	if rhsmeta == vmatrix_metamethods then
 		return wrap(unwrap(lhs) * unwrap(rhs))

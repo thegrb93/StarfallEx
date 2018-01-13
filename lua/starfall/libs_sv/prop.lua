@@ -4,6 +4,9 @@
 local props_library = SF.Libraries.Register("prop")
 
 local vunwrap = SF.UnwrapObject
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 SF.Props = {}
 
@@ -67,11 +70,11 @@ end
 -- @return The prop object
 function props_library.create (pos, ang, model, frozen)
 
-	SF.Permissions.check(SF.instance,  nil, "prop.create")
+	checkpermission(SF.instance,  nil, "prop.create")
 
-	SF.CheckType(pos, SF.Types["Vector"])
-	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckLuaType(model, TYPE_STRING)
+	checktype(pos, SF.Types["Vector"])
+	checktype(ang, SF.Types["Angle"])
+	checkluatype(model, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)
@@ -134,10 +137,10 @@ local allowed_components = {
 -- @server
 -- @return Component entity
 function props_library.createComponent (pos, ang, class, model, frozen)
-	SF.Permissions.check(SF.instance,  nil, "prop.create")
-	SF.CheckType(pos, SF.Types["Vector"])
-	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckLuaType(class, TYPE_STRING)
+	checkpermission(SF.instance,  nil, "prop.create")
+	checktype(pos, SF.Types["Vector"])
+	checktype(ang, SF.Types["Angle"])
+	checkluatype(class, TYPE_STRING)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
@@ -202,11 +205,11 @@ end
 -- @return The sent object
 function props_library.createSent (pos, ang, class, frozen)
 
-	SF.Permissions.check(SF.instance,  nil, "prop.create")
+	checkpermission(SF.instance,  nil, "prop.create")
 
-	SF.CheckType(pos, SF.Types["Vector"])
-	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckLuaType(class, TYPE_STRING)
+	checktype(pos, SF.Types["Vector"])
+	checktype(ang, SF.Types["Angle"])
+	checkluatype(class, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)

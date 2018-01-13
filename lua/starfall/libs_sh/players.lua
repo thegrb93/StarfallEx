@@ -7,6 +7,9 @@ SF.Players = {}
 local player_methods, player_metamethods = SF.Typedef("Player", SF.Entities.Metatable)
 
 local vwrap = SF.WrapObject
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 SF.Players.Methods = player_methods
 SF.Players.Metatable = player_metamethods
@@ -99,7 +102,7 @@ end
 -- @shared
 -- @return True if player alive
 function player_methods:isAlive ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Alive()
 end
@@ -108,7 +111,7 @@ end
 -- @shared
 -- @return Armor
 function player_methods:getArmor ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Armor()
 end
@@ -117,7 +120,7 @@ end
 -- @shared
 -- @return True if player crouching
 function player_methods:isCrouching ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Crouching()
 end
@@ -126,7 +129,7 @@ end
 -- @shared
 -- @return Amount of deaths
 function player_methods:getDeaths ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Deaths()
 end
@@ -135,7 +138,7 @@ end
 -- @shared
 -- @return True if player has flashlight on
 function player_methods:isFlashlightOn()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:FlashlightIsOn()
 end
@@ -144,7 +147,7 @@ end
 -- @shared
 -- @return true if the player is noclipped
 function player_methods:isNoclipped()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:GetMoveType() == MOVETYPE_NOCLIP
 end
@@ -153,7 +156,7 @@ end
 -- @shared
 -- @return Amount of kills
 function player_methods:getFrags ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Frags()
 end
@@ -162,7 +165,7 @@ end
 -- @shared
 -- @return The weapon
 function player_methods:getActiveWeapon ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and SF.Weapons.Wrap(ent:GetActiveWeapon())
 end
@@ -171,7 +174,7 @@ end
 -- @shared
 -- @return Aim vector
 function player_methods:getAimVector ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and vwrap(ent:GetAimVector())
 end
@@ -180,7 +183,7 @@ end
 -- @shared
 -- @return Field of view
 function player_methods:getFOV ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:GetFOV()
 end
@@ -189,7 +192,7 @@ end
 -- @shared
 -- @return Jump power
 function player_methods:getJumpPower ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:GetJumpPower()
 end
@@ -198,7 +201,7 @@ end
 -- @shared
 -- @return Maximum speed
 function player_methods:getMaxSpeed ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:GetMaxSpeed()
 end
@@ -207,7 +210,7 @@ end
 -- @shared
 -- @return Name
 function player_methods:getName ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	if not IsValid(ent) then SF.Throw("Invalid Entity!", 2) end
 	return ent:GetName()
@@ -217,7 +220,7 @@ end
 -- @shared
 -- @return Running speed
 function player_methods:getRunSpeed ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:GetRunSpeed()
 end
@@ -226,7 +229,7 @@ end
 -- @shared
 -- @return Shoot position
 function player_methods:getShootPos ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and vwrap(ent:GetShootPos())
 end
@@ -235,7 +238,7 @@ end
 -- @shared
 -- @return True if player in vehicle
 function player_methods:inVehicle()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:InVehicle()
 end
@@ -244,7 +247,7 @@ end
 -- @shared
 -- @return True if player is admin
 function player_methods:isAdmin()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsAdmin()
 end
@@ -253,7 +256,7 @@ end
 -- @shared
 -- @return True if player is a bot
 function player_methods:isBot()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsBot()
 end
@@ -262,7 +265,7 @@ end
 -- @shared
 -- @return True if player is connected
 function player_methods:isConnected()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsConnected()
 end
@@ -271,7 +274,7 @@ end
 -- @shared
 -- @return True if player is frozen
 function player_methods:isFrozen()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsFrozen()
 end
@@ -280,7 +283,7 @@ end
 -- @shared
 -- @return True if player is an NPC
 function player_methods:isNPC()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsNPC()
 end
@@ -289,7 +292,7 @@ end
 -- @shared
 -- @return True if player is player
 function player_methods:isPlayer()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsPlayer()
 end
@@ -298,7 +301,7 @@ end
 -- @shared
 -- @return True if player is super admin
 function player_methods:isSuperAdmin()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsSuperAdmin()
 end
@@ -308,7 +311,7 @@ end
 -- @param group Group to check against
 -- @return True if player belongs to group
 function player_methods:isUserGroup(group)
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:IsUserGroup(group)
 end
@@ -317,7 +320,7 @@ end
 -- @shared
 -- @return ping
 function player_methods:getPing ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Ping()
 end
@@ -326,7 +329,7 @@ end
 -- @shared
 -- @return steam ID
 function player_methods:getSteamID ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:SteamID()
 end
@@ -335,7 +338,7 @@ end
 -- @shared
 -- @return community ID
 function player_methods:getSteamID64 ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:SteamID64()
 end
@@ -344,7 +347,7 @@ end
 -- @shared
 -- @return team
 function player_methods:getTeam ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:Team()
 end
@@ -353,7 +356,7 @@ end
 -- @shared
 -- @return team name
 function player_methods:getTeamName ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and team.GetName(ent:Team())
 end
@@ -362,7 +365,7 @@ end
 -- @shared
 -- @return unique ID
 function player_methods:getUniqueID ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:UniqueID()
 end
@@ -371,7 +374,7 @@ end
 -- @shared
 -- @return user ID
 function player_methods:getUserID ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	return ent and ent:UserID()
 end
@@ -380,7 +383,7 @@ end
 -- @shared
 -- @return table trace data https://wiki.garrysmod.com/page/Structures/TraceResult
 function player_methods:getEyeTrace ()
-	SF.Permissions.check(SF.instance, eunwrap(self), "trace")
+	checkpermission(SF.instance, eunwrap(self), "trace")
 
 	local data = eunwrap(self):GetEyeTrace()
 	return setmetatable({}, {
@@ -395,7 +398,7 @@ end
 -- @shared
 -- @return Player's current view entity
 function player_methods:getViewEntity ()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	return ewrap(eunwrap(self):GetViewEntity())
 end
 
@@ -403,7 +406,7 @@ end
 -- @shared
 -- @return Table of weapons
 function player_methods:getWeapons()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	return SF.Sanitize(eunwrap(self):GetWeapons())
 end
 
@@ -412,8 +415,8 @@ end
 -- @param wep String weapon class
 -- @return weapon
 function player_methods:getWeapon(wep)
-	SF.CheckType(self, player_metamethods)
-	SF.CheckLuaType(wep, TYPE_STRING)
+	checktype(self, player_metamethods)
+	checkluatype (wep, TYPE_STRING)
 	return SF.Weapons.Wrap(eunwrap(self):GetWeapon(wep))
 end
 
@@ -421,7 +424,7 @@ end
 -- @shared
 -- @return Ground entity
 function player_methods:getGroundEntity()
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	return ewrap(eunwrap(self):GetGroundEntity())
 end
 
@@ -430,7 +433,7 @@ end
 -- @param id The string or number id of the ammo
 -- @return The amount of ammo player has in reserve.
 function player_methods:getAmmoCount(id)
-	SF.CheckType(self, player_metamethods)
+	checktype(self, player_metamethods)
 	local tid = type(id)
 	if tid~="number" and tid~="string" then
 		SF.Throw("Type mismatch (Expected number or string, got " .. tid .. ") in function getAmmoCount", 2)
@@ -462,7 +465,7 @@ if SERVER then
 	-- @server
 	-- @return True if the player has godmode
 	function player_methods:hasGodMode()
-		SF.CheckType(self, player_metamethods)
+		checktype(self, player_metamethods)
 		local ent = eunwrap(self)
 		return IsValid(ent) and ent:HasGodMode() or false
 	end
@@ -498,8 +501,8 @@ end
 ---IN_KEY.RUN
 -- @return True or false
 function player_methods:keyDown (key)
-	SF.CheckType(self, player_metamethods)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	checktype(self, player_metamethods)
+	checkluatype (key, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
 	if not IsValid(ent) then return false end
@@ -511,7 +514,7 @@ if CLIENT then
 	--- Returns the relationship of the player to the local client
 	-- @return One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
-		SF.CheckType(self, player_metamethods)
+		checktype(self, player_metamethods)
 		local ent = eunwrap(self)
 		return ent and ent:GetFriendStatus()
 	end
@@ -519,7 +522,7 @@ if CLIENT then
 	--- Returns whether the local player has muted the player
 	-- @return True if the player was muted
 	function player_methods:isMuted()
-		SF.CheckType(self, player_metamethods)
+		checktype(self, player_metamethods)
 		local ent = eunwrap(self)
 		return ent and ent:IsMuted()
 	end

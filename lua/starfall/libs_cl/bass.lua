@@ -13,6 +13,9 @@ end
 -- @client
 local bass_methods, bass_metamethods = SF.Typedef("Bass")
 local wrap, unwrap = SF.CreateWrapper(bass_metamethods, true, false, debug.getregistry().IGModAudioChannel)
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @client
@@ -53,11 +56,11 @@ end
 -- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadFile (path, flags, callback)
-	SF.Permissions.check(SF.instance, nil, "bass.loadFile")
+	checkpermission(SF.instance, nil, "bass.loadFile")
 
-	SF.CheckLuaType(path, TYPE_STRING)
-	SF.CheckLuaType(flags, TYPE_STRING)
-	SF.CheckLuaType(callback, TYPE_FUNCTION)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(flags, TYPE_STRING)
+	checkluatype(callback, TYPE_FUNCTION)
 
 	if path:match('["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
@@ -65,7 +68,7 @@ function bass_library.loadFile (path, flags, callback)
 
 	local instance = SF.instance
 	if not3D(flags) then
-		SF.Permissions.check(instance, nil, "bass.play2D")
+		checkpermission(instance, nil, "bass.play2D")
 	end
 
 	sound.PlayFile(path, flags, function(snd, er, name)
@@ -87,16 +90,16 @@ end
 -- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadURL (path, flags, callback)
-	SF.Permissions.check(SF.instance, nil, "bass.loadURL")
+	checkpermission(SF.instance, nil, "bass.loadURL")
 
-	SF.CheckLuaType(path, TYPE_STRING)
-	SF.CheckLuaType(flags, TYPE_STRING)
-	SF.CheckLuaType(callback, TYPE_FUNCTION)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(flags, TYPE_STRING)
+	checkluatype(callback, TYPE_FUNCTION)
 
 	local instance = SF.instance
 	if #path > 2000 then SF.Throw("URL is too long!", 2) end
 	if not3D(flags) then
-		SF.Permissions.check(instance, nil, "bass.play2D")
+		checkpermission(instance, nil, "bass.play2D")
 	end
 
 	SF.HTTPNotify(instance.player, path)
@@ -119,10 +122,10 @@ end
 
 --- Starts to play the sound.
 function bass_methods:play ()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Play()
@@ -131,10 +134,10 @@ end
 
 --- Stops playing the sound.
 function bass_methods:stop ()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw =  unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Stop()
@@ -143,10 +146,10 @@ end
 
 --- Pauses the sound.
 function bass_methods:pause ()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw =  unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Pause()
@@ -156,11 +159,11 @@ end
 --- Sets the volume of the sound channel.
 -- @param vol Volume to set to, between 0 and 1.
 function bass_methods:setVolume (vol)
-	SF.CheckType(self, bass_metamethods)
-	SF.CheckLuaType(vol, TYPE_NUMBER)
+	checktype(self, bass_metamethods)
+	checkluatype(vol, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetVolume(math.Clamp(vol, 0, 1))
@@ -170,11 +173,11 @@ end
 --- Sets the pitch of the sound channel.
 -- @param pitch Pitch to set to, between 0 and 3.
 function bass_methods:setPitch (pitch)
-	SF.CheckType(self, bass_metamethods)
-	SF.CheckLuaType(pitch, TYPE_NUMBER)
+	checktype(self, bass_metamethods)
+	checkluatype(pitch, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetPlaybackRate(math.Clamp(pitch, 0, 3))
@@ -184,11 +187,11 @@ end
 --- Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.
 -- @param pos Where to position the sound.
 function bass_methods:setPos (pos)
-	SF.CheckType(self, bass_metamethods)
-	SF.CheckType(pos, SF.Types["Vector"])
+	checktype(self, bass_metamethods)
+	checktype(pos, SF.Types["Vector"])
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetPos(SF.UnwrapObject(pos))
@@ -199,10 +202,10 @@ end
 -- @param min The channel's volume is at maximum when the listener is within this distance
 -- @param max The channel's volume stops decreasing when the listener is beyond this distance.
 function bass_methods:setFade (min, max)
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 10000, 200000))
@@ -212,10 +215,10 @@ end
 --- Sets whether the sound channel should loop.
 -- @param loop Boolean of whether the sound channel should loop.
 function bass_methods:setLooping (loop)
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:EnableLooping(loop)
@@ -225,10 +228,10 @@ end
 --- Gets the length of a sound channel.
 -- @return Sound channel length in seconds.
 function bass_methods:getLength ()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		return uw:GetLength()
@@ -238,11 +241,11 @@ end
 --- Sets the current playback time of the sound channel.
 -- @param time Sound channel playback time in seconds.
 function bass_methods:setTime (time)
-	SF.CheckType(self, bass_metamethods)
-	SF.CheckLuaType(time, TYPE_NUMBER)
+	checktype(self, bass_metamethods)
+	checkluatype(time, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		uw:SetTime(time)
@@ -252,10 +255,10 @@ end
 --- Gets the current playback time of the sound channel.
 -- @return Sound channel playback time in seconds.
 function bass_methods:getTime ()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		return uw:GetTime()
@@ -266,10 +269,10 @@ end
 -- @param n Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.
 -- @return Table containing DFT magnitudes, each between 0 and 1.
 function bass_methods:getFFT (n)
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		local arr = {}
@@ -281,10 +284,10 @@ end
 --- Gets whether the sound channel is streamed online.
 -- @return Boolean of whether the sound channel is streamed online.
 function bass_methods:isOnline()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	SF.Permissions.check(SF.instance, nil, "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
 		return uw:IsOnline()
@@ -296,7 +299,7 @@ end
 --- Gets whether the bass is valid.
 -- @return Boolean of whether the bass is valid.
 function bass_methods:isValid()
-	SF.CheckType(self, bass_metamethods)
+	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
 	return IsValid(uw)

@@ -1,3 +1,7 @@
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+
 -------------------------------------------------------------------------------
 -- Builtins.
 -- Functions built-in to the default environment
@@ -121,7 +125,7 @@ SF.DefaultEnvironment.setmetatable = setmetatable
 -- @param tbl Table to get metatable of
 -- @return The metatable of tbl
 SF.DefaultEnvironment.getmetatable = function(tbl)
-	SF.CheckLuaType(tbl, TYPE_TABLE)
+	checkluatype (tbl, TYPE_TABLE)
 	return getmetatable(tbl)
 end
 
@@ -186,7 +190,7 @@ end
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function SF.DefaultEnvironment.setSoftQuota (quota)
-	SF.CheckLuaType(quota, TYPE_NUMBER)
+	checkluatype (quota, TYPE_NUMBER)
 	SF.instance.cpu_softquota = quota
 end
 
@@ -194,7 +198,7 @@ end
 --@param perm The permission id to check
 --@param obj Optional object to pass to the permission system.
 function SF.DefaultEnvironment.hasPermission(perm, obj)
-	SF.CheckLuaType(perm, TYPE_STRING)
+	checkluatype (perm, TYPE_STRING)
 	return SF.Permissions.hasAccess(SF.instance, SF.UnwrapObject(obj), perm)
 end
 
@@ -211,8 +215,8 @@ if CLIENT then
 	--@param showOnUse Whether request will popup when player uses chip or linked screen.
 	--@client
 	function SF.DefaultEnvironment.setupPermissionRequest( perms, desc, showOnUse )
-		SF.CheckLuaType( desc, TYPE_STRING )
-		SF.CheckLuaType( perms, TYPE_TABLE )
+		checkluatype ( desc, TYPE_STRING )
+		checkluatype ( perms, TYPE_TABLE )
 		local c = #perms
 		if #desc > 400 then
 			SF.Throw( "Description too long." )
@@ -267,7 +271,7 @@ string_methods.gmatch = string.gmatch
 string_methods.gsub = string.gsub
 string_methods.implode = string.Implode string_methods.Implode = string.Implode
 local function javascriptSafe(str)
-	SF.CheckLuaType(str, TYPE_STRING)
+	checkluatype (str, TYPE_STRING)
 	return string.JavascriptSafe(str)
 end
 string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
@@ -278,7 +282,7 @@ string_methods.match = string.match
 string_methods.niceSize = string.NiceSize string_methods.NiceSize = string.NiceSize
 string_methods.niceTime = string.NiceTime string_methods.NiceTime = string.NiceTime
 local function patternSafe(str)
-	SF.CheckLuaType(str, TYPE_STRING)
+	checkluatype (str, TYPE_STRING)
 	return string.PatternSafe(str)
 end
 string_methods.patternSafe = patternSafe string_methods.PatternSafe = patternSafe
@@ -385,23 +389,23 @@ function math_methods.bSplinePoint(tDiff, tPoints, tMax)
 	return SF.WrapObject(math.BSplinePoint(tDiff, SF.Unsanitize(tPoints), tMax))
 end
 function math_methods.lerp(percent, from, to)
-	SF.CheckLuaType(percent, TYPE_NUMBER)
-	SF.CheckLuaType(from, TYPE_NUMBER)
-	SF.CheckLuaType(to, TYPE_NUMBER)
+	checkluatype (percent, TYPE_NUMBER)
+	checkluatype (from, TYPE_NUMBER)
+	checkluatype (to, TYPE_NUMBER)
 
 	return Lerp(percent, from, to)
 end
 function math_methods.lerpAngle(percent, from, to)
-	SF.CheckLuaType(percent, TYPE_NUMBER)
-	SF.CheckType(from, SF.Types["Angle"])
-	SF.CheckType(to, SF.Types["Angle"])
+	checkluatype (percent, TYPE_NUMBER)
+	checktype(from, SF.Types["Angle"])
+	checktype(to, SF.Types["Angle"])
 
 	return SF.WrapObject(LerpAngle(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
 end
 function math_methods.lerpVector(percent, from, to)
-	SF.CheckLuaType(percent, TYPE_NUMBER)
-	SF.CheckType(from, SF.Types["Vector"])
-	SF.CheckType(to, SF.Types["Vector"])
+	checkluatype (percent, TYPE_NUMBER)
+	checktype(from, SF.Types["Vector"])
+	checktype(to, SF.Types["Vector"])
 
 	return SF.WrapObject(LerpVector(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
 end
@@ -502,7 +506,7 @@ end
 --@param key The index of the table
 --@param value The value to set the index equal to
 function SF.DefaultEnvironment.rawset(table, key, value)
-    SF.CheckLuaType(table, TYPE_TABLE)
+    checkluatype (table, TYPE_TABLE)
 
     rawset(table, key, value)
 end
@@ -512,7 +516,7 @@ end
 --@param key The index of the table
 --@return The value of the index
 function SF.DefaultEnvironment.rawget(table, key, value)
-    SF.CheckLuaType(table, TYPE_TABLE)
+    checkluatype (table, TYPE_TABLE)
 
     return rawget(table, key)
 end
@@ -577,7 +581,7 @@ if SERVER then
 	--- Prints a table to player's chat
 	-- @param tbl Table to print
 	function SF.DefaultEnvironment.printTable (tbl)
-		SF.CheckLuaType(tbl, TYPE_TABLE)
+		checkluatype (tbl, TYPE_TABLE)
 		printTableX(tbl, 0, { tbl = true })
 	end
 
@@ -585,8 +589,8 @@ if SERVER then
 	-- @shared
 	-- @param cmd Command to execute
 	function SF.DefaultEnvironment.concmd (cmd)
-		SF.CheckLuaType(cmd, TYPE_STRING)
-		SF.Permissions.check(SF.instance, nil, "console.command")
+		checkluatype (cmd, TYPE_STRING)
+		checkpermission(SF.instance, nil, "console.command")
 		SF.instance.player:ConCommand(cmd)
 	end
 
@@ -594,7 +598,7 @@ if SERVER then
 	-- @server
 	-- @param str String data
 	function SF.DefaultEnvironment.setUserdata(str)
-		SF.CheckLuaType(str, TYPE_STRING)
+		checkluatype (str, TYPE_STRING)
 		if #str>1048576 then SF.Throw("The userdata limit is 1MiB", 2) end
 		SF.instance.data.userdata = str
 	end
@@ -610,7 +614,7 @@ else
 	-- @client
 	-- @param name Name
 	function SF.DefaultEnvironment.setName(name)
-		SF.CheckLuaType(name, TYPE_STRING)
+		checkluatype (name, TYPE_STRING)
 		local e = SF.instance.data.entity
 		if IsValid(e) then
 			e.name = string.sub(name, 1, 256)
@@ -621,7 +625,7 @@ else
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText(txt)
 		if SF.instance.player ~= LocalPlayer() then return end
-		SF.CheckLuaType(txt, TYPE_STRING)
+		checkluatype (txt, TYPE_STRING)
 		SetClipboardText(txt)
 	end
 
@@ -630,7 +634,7 @@ else
 	-- @param text The message text.
 	function SF.DefaultEnvironment.printMessage(mtype, text)
 		if SF.instance.player ~= LocalPlayer() then return end
-		SF.CheckLuaType(text, TYPE_STRING)
+		checkluatype (text, TYPE_STRING)
 		SF.instance.player:PrintMessage(mtype, text)
 	end
 
@@ -641,15 +645,15 @@ else
 	end
 
 	function SF.DefaultEnvironment.printTable (tbl)
-		SF.CheckLuaType(tbl, TYPE_TABLE)
+		checkluatype (tbl, TYPE_TABLE)
 		if SF.instance.player == LocalPlayer() then
 			printTableX(tbl, 0, { tbl = true })
 		end
 	end
 
 	function SF.DefaultEnvironment.concmd (cmd)
-		SF.CheckLuaType(cmd, TYPE_STRING)
-		SF.Permissions.check(SF.instance, nil, "console.command")
+		checkluatype (cmd, TYPE_STRING)
+		checkpermission(SF.instance, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
 	end
 
@@ -677,7 +681,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function SF.DefaultEnvironment.require(file)
-	SF.CheckLuaType(file, TYPE_STRING)
+	checkluatype (file, TYPE_STRING)
 	local loaded = SF.instance.data.reqloaded
 	if not loaded then
 		loaded = {}
@@ -711,8 +715,8 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function SF.DefaultEnvironment.requiredir(dir, loadpriority)
-	SF.CheckLuaType(dir, TYPE_STRING)
-	if loadpriority then SF.CheckLuaType(loadpriority, TYPE_TABLE) end
+	checkluatype (dir, TYPE_STRING)
+	if loadpriority then checkluatype (loadpriority, TYPE_TABLE) end
 
 	local path
 	if string.sub(dir, 1, 1)=="/" then
@@ -747,7 +751,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function SF.DefaultEnvironment.dofile(file)
-	SF.CheckLuaType(file, TYPE_STRING)
+	checkluatype (file, TYPE_STRING)
 	local path
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
@@ -767,8 +771,8 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function SF.DefaultEnvironment.dodir(dir, loadpriority)
-	SF.CheckLuaType(dir, TYPE_STRING)
-	if loadpriority then SF.CheckLuaType(loadpriority, TYPE_TABLE) end
+	checkluatype (dir, TYPE_STRING)
+	if loadpriority then checkluatype (loadpriority, TYPE_TABLE) end
 
 	local returns = {}
 
@@ -833,7 +837,7 @@ end
 function SF.DefaultEnvironment.debugGetInfo (funcOrStackLevel, fields)
 	local TfuncOrStackLevel = type(funcOrStackLevel)
 	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.Throw("Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2) end
-	if fields then SF.CheckLuaType(fields, TYPE_STRING) end
+	if fields then checkluatype (fields, TYPE_STRING) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
 	if ret then
@@ -950,10 +954,10 @@ end
 -- @return localPos
 -- @return localAngles
 function SF.DefaultEnvironment.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
-	SF.CheckType(pos, SF.Types["Vector"])
-	SF.CheckType(ang, SF.Types["Angle"])
-	SF.CheckType(newSystemOrigin, SF.Types["Vector"])
-	SF.CheckType(newSystemAngles, SF.Types["Angle"])
+	checktype(pos, SF.Types["Vector"])
+	checktype(ang, SF.Types["Angle"])
+	checktype(newSystemOrigin, SF.Types["Vector"])
+	checktype(newSystemAngles, SF.Types["Angle"])
 
 	local localPos, localAngles = WorldToLocal(
 		SF.UnwrapObject(pos),
@@ -973,10 +977,10 @@ end
 -- @return worldPos
 -- @return worldAngles
 function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, originAngle)
-	SF.CheckType(localPos, SF.Types["Vector"])
-	SF.CheckType(localAng, SF.Types["Angle"])
-	SF.CheckType(originPos, SF.Types["Vector"])
-	SF.CheckType(originAngle, SF.Types["Angle"])
+	checktype(localPos, SF.Types["Vector"])
+	checktype(localAng, SF.Types["Angle"])
+	checktype(originPos, SF.Types["Vector"])
+	checktype(originAngle, SF.Types["Angle"])
 
 	local worldPos, worldAngles = LocalToWorld(
 		SF.UnwrapObject(localPos),

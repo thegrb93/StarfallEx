@@ -13,6 +13,9 @@ local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
 local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
 local isValid = IsValid
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
@@ -38,13 +41,13 @@ SF.Libraries.AddHook("postload", function()
 	end
 
 	function SF.DefaultEnvironment.entity (num)
-		SF.CheckLuaType(num, TYPE_NUMBER)
+		checkluatype (num, TYPE_NUMBER)
 		return SF.WrapObject(Entity(num))
 	end
 
 	function SF.DefaultEnvironment.player (num)
 		if num then
-			SF.CheckLuaType(num, TYPE_NUMBER)
+			checkluatype (num, TYPE_NUMBER)
 			return SF.WrapObject(Player(num))
 		end
 
@@ -64,7 +67,7 @@ SF.Entities.Metatable = ents_metamethods
 --- Gets the owner of the entity
 -- @return Owner
 function ents_methods:getOwner ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 
@@ -79,8 +82,8 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
 	function ents_methods:manipulateBonePosition(bone, vec)
-		SF.CheckLuaType(bone, TYPE_NUMBER)
-		SF.CheckType(vec, vec_meta)
+		checkluatype (bone, TYPE_NUMBER)
+		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
@@ -92,8 +95,8 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
 	function ents_methods:manipulateBoneScale(bone, vec)
-		SF.CheckLuaType(bone, TYPE_NUMBER)
-		SF.CheckType(vec, vec_meta)
+		checkluatype (bone, TYPE_NUMBER)
+		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
@@ -105,8 +108,8 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
 	function ents_methods:manipulateBoneAngles(bone, ang)
-		SF.CheckLuaType(bone, TYPE_NUMBER)
-		SF.CheckType(ang, ang_meta)
+		checkluatype (bone, TYPE_NUMBER)
+		checktype(ang, ang_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
@@ -119,12 +122,12 @@ if CLIENT then
 	-- @param mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setHologramMesh(mesh)
 		local instance = SF.instance
-		SF.Permissions.check(instance, nil, "mesh")
+		checkpermission(instance, nil, "mesh")
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
 		if mesh then
-			SF.CheckType(mesh, SF.Mesh.Metatable)
+			checktype(mesh, SF.Mesh.Metatable)
 			ent:SetModelScale(0, 0)
 			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
 			ent.custom_meta_data = instance.data.meshes
@@ -139,8 +142,8 @@ if CLIENT then
 	-- @param mins The lower bounding corner coordinate local to the hologram
 	-- @param maxs The upper bounding corner coordinate local to the hologram
 	function ents_methods:setHologramRenderBounds(mins, maxs)
-		SF.CheckType(mins, vec_meta)
-		SF.CheckType(maxs, vec_meta)
+		checktype(mins, vec_meta)
+		checktype(maxs, vec_meta)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
@@ -151,7 +154,7 @@ if CLIENT then
 	-- @client
 	-- @param mat VMatrix to use
 	function ents_methods:setHologramRenderMatrix(mat)
-		SF.CheckType(mat, SF.VMatrix.Metatable)
+		checktype(mat, SF.VMatrix.Metatable)
 		local ent = eunwrap(self)
 		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
 		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
@@ -168,12 +171,12 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor (clr)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckType(clr, SF.Types["Color"])
+	checktype(self, ents_metamethods)
+	checktype(clr, SF.Types["Color"])
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
 	ent:SetColor(clr)
@@ -186,11 +189,11 @@ end
 -- @shared
 -- @param draw Whether to draw the entity or not.
 function ents_methods:setNoDraw (draw)
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetNoDraw(draw and true or false)
 end
@@ -208,13 +211,13 @@ end
 -- @shared
 -- @param material, string, New material name.
 function ents_methods:setMaterial (material)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckLuaType(material, TYPE_STRING)
+	checktype(self, ents_metamethods)
+	checkluatype (material, TYPE_STRING)
 	if invalidMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetMaterial(material)
 	if SERVER then duplicator.StoreEntityModifier(ent, "material", { MaterialOverride = material }) end
@@ -225,13 +228,13 @@ end
 -- @param index, number, submaterial index.
 -- @param material, string, New material name.
 function ents_methods:setSubMaterial (index, material)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckLuaType(material, TYPE_STRING)
+	checktype(self, ents_metamethods)
+	checkluatype (material, TYPE_STRING)
 	if invalidMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSubMaterial(index, material)
 	if SERVER then
@@ -247,13 +250,13 @@ end
 -- @param bodygroup Number, The ID of the bodygroup you're setting.
 -- @param value Number, The value you're setting the bodygroup to.
 function ents_methods:setBodygroup (bodygroup, value)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckLuaType(bodygroup, TYPE_NUMBER)
-	SF.CheckLuaType(value, TYPE_NUMBER)
+	checktype(self, ents_metamethods)
+	checkluatype (bodygroup, TYPE_NUMBER)
+	checkluatype (value, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetBodygroup(bodygroup, value)
 end
@@ -262,12 +265,12 @@ end
 -- @shared
 -- @param skinIndex Number, Index of the skin to use.
 function ents_methods:setSkin (skinIndex)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckLuaType(skinIndex, TYPE_NUMBER)
+	checktype(self, ents_metamethods)
+	checkluatype (skinIndex, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSkin(skinIndex)
 end
@@ -277,12 +280,12 @@ end
 -- @class function
 -- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
 function ents_methods:setRenderMode (rendermode)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckLuaType(rendermode, TYPE_NUMBER)
+	checktype(self, ents_metamethods)
+	checkluatype (rendermode, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetRenderMode(rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderMode = rendermode }) end
@@ -293,12 +296,12 @@ end
 -- @class function
 -- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
 function ents_methods:setRenderFX (renderfx)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckLuaType(renderfx, TYPE_NUMBER)
+	checktype(self, ents_metamethods)
+	checkluatype (renderfx, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	SF.Permissions.check(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetRenderFX(renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
@@ -389,7 +392,7 @@ end
 -- @param id The physics object id (starts at 0)
 -- @return The physics object of the entity
 function ents_methods:getPhysicsObjectNum(id)
-	SF.CheckLuaType(id, TYPE_NUMBER)
+	checkluatype (id, TYPE_NUMBER)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObjectNum(id))
@@ -407,7 +410,7 @@ end
 -- @shared
 -- @return True if valid, false if not
 function ents_methods:isValid ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	return isValid(eunwrap(self))
 end
 
@@ -415,7 +418,7 @@ end
 -- @shared
 -- @return True if player, false if not
 function ents_methods:isPlayer ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	return eunwrap(self):IsPlayer()
 end
 
@@ -423,7 +426,7 @@ end
 -- @shared
 -- @return True if weapon, false if not
 function ents_methods:isWeapon ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	return eunwrap(self):IsWeapon()
 end
 
@@ -431,7 +434,7 @@ end
 -- @shared
 -- @return True if vehicle, false if not
 function ents_methods:isVehicle ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	return eunwrap(self):IsVehicle()
 end
 
@@ -439,7 +442,7 @@ end
 -- @shared
 -- @return True if npc, false if not
 function ents_methods:isNPC ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	return eunwrap(self):IsNPC()
 end
 
@@ -447,7 +450,7 @@ end
 -- @shared
 -- @return Boolean if it's flag is set or not
 function ents_methods:isOnGround ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	return eunwrap(self):IsOnGround()
 end
 
@@ -455,7 +458,7 @@ end
 -- @shared
 -- @return The numerical index of the entity
 function ents_methods:entIndex ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:EntIndex()
 end
@@ -464,7 +467,7 @@ end
 -- @shared
 -- @return The string class name
 function ents_methods:getClass ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:GetClass()
 end
@@ -473,7 +476,7 @@ end
 -- @shared
 -- @return The position vector
 function ents_methods:getPos ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return vwrap(ent:GetPos())
 end
@@ -482,7 +485,7 @@ end
 -- @shared
 -- @return The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
 function ents_methods:getWaterLevel()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:WaterLevel()
 end
@@ -492,7 +495,7 @@ end
 -- @param name The bone's string name
 -- @return The bone index
 function ents_methods:lookupBone(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype (name, TYPE_STRING)
 	return eunwrap(self):LookupBone(name)
 end
 
@@ -501,8 +504,8 @@ end
 -- @param bone Bone index. (def 0)
 -- @return The matrix
 function ents_methods:getBoneMatrix(bone)
-	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckLuaType(bone, TYPE_NUMBER, 0, 0)
+	checktype(self, ents_metamethods)
+	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
 
 	local ent = eunwrap(self)
 	return owrap(ent:GetBoneMatrix(bone))
@@ -513,7 +516,7 @@ ents_methods.getMatrix = ents_methods.getBoneMatrix
 -- @shared
 -- @return Number of bones
 function ents_methods:getBoneCount()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:GetBoneCount()
 end
@@ -523,8 +526,8 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Name of the bone
 function ents_methods:getBoneName(bone)
-	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckLuaType(bone, TYPE_NUMBER, 0, 0)
+	checktype(self, ents_metamethods)
+	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
 	local ent = eunwrap(self)
 	return ent:GetBoneName(bone)
 end
@@ -534,8 +537,8 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Parent index of the bone
 function ents_methods:getBoneParent(bone)
-	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckLuaType(bone, TYPE_NUMBER, 0, 0)
+	checktype(self, ents_metamethods)
+	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
 	local ent = eunwrap(self)
 	return ent:GetBoneParent(bone)
 end
@@ -546,8 +549,8 @@ end
 -- @return Position of the bone
 -- @return Angle of the bone
 function ents_methods:getBonePosition(bone)
-	SF.CheckType(self, ents_metamethods)
-	bone = SF.CheckLuaType(bone, TYPE_NUMBER, 0, 0)
+	checktype(self, ents_metamethods)
+	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
 	local ent = eunwrap(self)
 	local pos, ang = ent:GetBonePosition(bone)
 	return vwrap(pos), awrap(ang)
@@ -557,7 +560,7 @@ end
 -- @shared
 -- @return The outer bounding box size
 function ents_methods:obbSize ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return vwrap(ent:OBBMaxs() - ent:OBBMins())
 end
@@ -566,7 +569,7 @@ end
 -- @shared
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenter ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return vwrap(ent:OBBCenter())
 end
@@ -575,7 +578,7 @@ end
 -- @shared
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenterW ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return vwrap(ent:LocalToWorld(ent:OBBCenter()))
 end
@@ -584,7 +587,7 @@ end
 -- @shared
 -- @return The position vector of the mass center
 function ents_methods:getMassCenter ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -596,7 +599,7 @@ end
 -- @shared
 -- @return The position vector of the mass center
 function ents_methods:getMassCenterW ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -608,7 +611,7 @@ end
 -- @shared
 -- @return The angle
 function ents_methods:getAngles ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return awrap(ent:GetAngles())
 end
@@ -617,7 +620,7 @@ end
 -- @shared
 -- @return The numerical mass
 function ents_methods:getMass ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -631,7 +634,7 @@ end
 -- @shared
 -- @return The principle moments of inertia as a vector
 function ents_methods:getInertia ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -645,7 +648,7 @@ end
 -- @shared
 -- @return The velocity vector
 function ents_methods:getVelocity ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	return vwrap(ent:GetVelocity())
@@ -655,7 +658,7 @@ end
 -- @shared
 -- @return The angular velocity as a vector
 function ents_methods:getAngleVelocity ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -667,7 +670,7 @@ end
 -- @shared
 -- @return The angular velocity as an angle
 function ents_methods:getAngleVelocityAngle ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -681,8 +684,8 @@ end
 -- @param data Local space vector
 -- @return data as world space vector
 function ents_methods:localToWorld(data)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckType(data, vec_meta)
+	checktype(self, ents_metamethods)
+	checktype(data, vec_meta)
 	local ent = eunwrap(self)
 
 	return vwrap(ent:LocalToWorld(vunwrap(data)))
@@ -693,8 +696,8 @@ end
 -- @param data Local space angle
 -- @return data as world space angle
 function ents_methods:localToWorldAngles (data)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckType(data, ang_meta)
+	checktype(self, ents_metamethods)
+	checktype(data, ang_meta)
 	local ent = eunwrap(self)
 	local data = aunwrap(data)
 
@@ -706,8 +709,8 @@ end
 -- @param data World space vector
 -- @return data as local space vector
 function ents_methods:worldToLocal (data)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckType(data, vec_meta)
+	checktype(self, ents_metamethods)
+	checktype(data, vec_meta)
 	local ent = eunwrap(self)
 
 	return vwrap(ent:WorldToLocal(vunwrap(data)))
@@ -718,8 +721,8 @@ end
 -- @param data World space angle
 -- @return data as local space angle
 function ents_methods:worldToLocalAngles (data)
-	SF.CheckType(self, ents_metamethods)
-	SF.CheckType(data, ang_meta)
+	checktype(self, ents_metamethods)
+	checktype(data, ang_meta)
 	local ent = eunwrap(self)
 	local data = aunwrap(data)
 
@@ -730,7 +733,7 @@ end
 -- @shared
 -- @return Model of the entity
 function ents_methods:getModel ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:GetModel()
 end
@@ -739,7 +742,7 @@ end
 -- @shared
 -- @return Max Health of the entity
 function ents_methods:getMaxHealth ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:GetMaxHealth()
 end
@@ -748,7 +751,7 @@ end
 -- @shared
 -- @return Health of the entity
 function ents_methods:getHealth ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return ent:Health()
 end
@@ -757,7 +760,7 @@ end
 -- @shared
 -- @return Angles of the entity's eyes
 function ents_methods:getEyeAngles ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	return awrap(ent:EyeAngles())
 end
@@ -767,7 +770,7 @@ end
 -- @return Eye position of the entity
 -- @return In case of a ragdoll, the position of the second eye
 function ents_methods:getEyePos ()
-	SF.CheckType(self, ents_metamethods)
+	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	local pos1, pos2 = ent:EyePos()
 	if pos2 then

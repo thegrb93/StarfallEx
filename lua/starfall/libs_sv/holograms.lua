@@ -7,6 +7,10 @@ local holograms_library = SF.Libraries.Register("holograms")
 local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
 local wrap, unwrap = SF.CreateWrapper(hologram_metamethods, true, false, nil, SF.Entities.Metatable)
 
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+
 local ang_meta, vec_meta, ent_meta
 local vunwrap, aunwrap, ewrap, eunwrap
 
@@ -67,8 +71,8 @@ end)
 --- Sets the hologram linear velocity
 -- @param vel New velocity
 function hologram_methods:setVel (vel)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(vel, vec_meta)
+	checktype(self, hologram_metamethods)
+	checktype(vel, vec_meta)
 	local vel = vunwrap(vel)
 	local holo = unwrap(self)
 	if holo then holo:SetLocalVelocity(vel) end
@@ -77,8 +81,8 @@ end
 --- Sets the hologram's angular velocity.
 -- @param angvel *Vector* angular velocity.
 function hologram_methods:setAngVel (angvel)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(angvel, ang_meta)
+	checktype(self, hologram_metamethods)
+	checktype(angvel, ang_meta)
 	local holo = unwrap(self)
 	if holo then holo:SetLocalAngularVelocity(aunwrap(angvel)) end
 end
@@ -86,8 +90,8 @@ end
 --- Sets the hologram scale
 -- @param scale Vector new scale
 function hologram_methods:setScale (scale)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckType(scale, vec_meta)
+	checktype(self, hologram_metamethods)
+	checktype(scale, vec_meta)
 	local scale = vunwrap(scale)
 	local holo = unwrap(self)
 	if holo then
@@ -97,12 +101,12 @@ end
 
 --- Updates a clip plane
 function hologram_methods:setClip (index, enabled, origin, normal, islocal)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckLuaType(index, TYPE_NUMBER)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
-	SF.CheckType(origin, vec_meta)
-	SF.CheckType(normal, vec_meta)
-	SF.CheckLuaType(islocal, TYPE_BOOL)
+	checktype(self, hologram_metamethods)
+	checkluatype(index, TYPE_NUMBER)
+	checkluatype(enabled, TYPE_BOOL)
+	checktype(origin, vec_meta)
+	checktype(normal, vec_meta)
+	checkluatype(islocal, TYPE_BOOL)
 
 	local origin, normal = vunwrap(origin), vunwrap(normal)
 
@@ -118,7 +122,7 @@ end
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
 -- These IDs become invalid when the hologram's model changes.
 function hologram_methods:getFlexes()
-	SF.CheckType(self, hologram_metamethods)
+	checktype(self, hologram_metamethods)
 	local holoent = unwrap(self)
 	local flexes = {}
 	for i = 0, holoent:GetFlexNum()-1 do
@@ -129,9 +133,9 @@ end
 
 --- Sets the weight (value) of a flex.
 function hologram_methods:setFlexWeight(flexid, weight)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckLuaType(flexid, TYPE_NUMBER)
-	SF.CheckLuaType(weight, TYPE_NUMBER)
+	checktype(self, hologram_metamethods)
+	checkluatype(flexid, TYPE_NUMBER)
+	checkluatype(weight, TYPE_NUMBER)
 	flexid = math.floor(flexid)
 	local holoent = unwrap(self)
 	if flexid < 0 or flexid >= holoent:GetFlexNum() then
@@ -144,8 +148,8 @@ end
 
 --- Sets the scale of all flexes of a hologram
 function hologram_methods:setFlexScale(scale)
-	SF.CheckType(self, hologram_metamethods)
-	SF.CheckLuaType(scale, TYPE_NUMBER)
+	checktype(self, hologram_metamethods)
+	checkluatype(scale, TYPE_NUMBER)
 	local holoent = unwrap(self)
 	if IsValid(holoent) then
 		holoent:SetFlexScale(scale)
@@ -157,7 +161,7 @@ end
 -- @class function
 -- @param model string model path
 function hologram_methods:setModel (model)
-	SF.CheckLuaType(model, TYPE_STRING)
+	checkluatype(model, TYPE_STRING)
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
 	local this = unwrap(self)
@@ -171,7 +175,7 @@ end
 -- @class function
 -- @param suppress Boolean to represent if shading should be set or not.
 function hologram_methods:suppressEngineLighting (suppress)
-	SF.CheckLuaType(suppress, TYPE_BOOL)
+	checkluatype(suppress, TYPE_BOOL)
 
 	local this = unwrap(self)
 	if IsValid(this) then
@@ -264,13 +268,13 @@ end
 -- @return The hologram object
 function holograms_library.create (pos, ang, model, scale)
 	local instance = SF.instance
-	SF.Permissions.check(instance,  nil, "hologram.create")
-	SF.CheckType(pos, vec_meta)
-	SF.CheckType(ang, ang_meta)
-	SF.CheckLuaType(model, TYPE_STRING)
+	checkpermission(instance,  nil, "hologram.create")
+	checktype(pos, vec_meta)
+	checktype(ang, ang_meta)
+	checkluatype(model, TYPE_STRING)
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 	if scale then
-		SF.CheckType(scale, vec_meta)
+		checktype(scale, vec_meta)
 		scale = vunwrap(scale)
 	end
 

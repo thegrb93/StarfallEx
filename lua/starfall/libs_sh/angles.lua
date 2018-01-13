@@ -3,6 +3,9 @@ SF.Angles = {}
 --- Angle Type
 -- @shared
 local ang_methods, ang_metamethods = SF.Typedef("Angle")
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 local function wrap(tbl)
 	return setmetatable(tbl, ang_metamethods)
@@ -78,7 +81,7 @@ end
 -- @param n Number to multiply by.
 -- @return resultant angle.
 function ang_metamethods.__mul (a, n)
-	SF.CheckLuaType(n, TYPE_NUMBER)
+	checkluatype (n, TYPE_NUMBER)
 
 	return wrap({ a[1] * n, a[2] * n, a[3] * n })
 end
@@ -87,8 +90,8 @@ end
 -- @param n Number to divided by.
 -- @return resultant angle.
 function ang_metamethods.__div (a, n)
-	SF.CheckType(a, ang_metamethods)
-	SF.CheckLuaType(n, TYPE_NUMBER)
+	checktype(a, ang_metamethods)
+	checkluatype (n, TYPE_NUMBER)
 
 	return wrap({ a[1] / n, a[2] / n, a[3] / n })
 end
@@ -110,8 +113,8 @@ end
 -- @param a Angle to add.
 -- @return resultant angle.
 function ang_metamethods.__add (a, b)
-	SF.CheckType(a, ang_metamethods)
-	SF.CheckType(b, ang_metamethods)
+	checktype(a, ang_metamethods)
+	checktype(b, ang_metamethods)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -120,8 +123,8 @@ end
 -- @param a Angle to subtract.
 -- @return resultant angle.
 function ang_metamethods.__sub (a, b)
-	SF.CheckType(a, ang_metamethods)
-	SF.CheckType(b, ang_metamethods)
+	checktype(a, ang_metamethods)
+	checktype(b, ang_metamethods)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
@@ -148,7 +151,7 @@ end
 --- Returnes a normalized angle
 -- @return Normalized angle table
 function ang_methods:getNormalized ()
-	SF.CheckType(self, ang_metamethods)
+	checktype(self, ang_metamethods)
 	return wrap(normalizedAngTable(self))
 end
 
@@ -176,13 +179,13 @@ end
 -- @param rad Number of radians or nil if degrees.
 -- @return The modified angle
 function ang_methods:rotateAroundAxis (v, deg, rad)
-	SF.CheckType(v, SF.Types["Vector"])
+	checktype(v, SF.Types["Vector"])
 
 	if rad then
-		SF.CheckLuaType(rad, TYPE_NUMBER)
+		checkluatype (rad, TYPE_NUMBER)
 		deg = math.deg(rad)
 	else
-		SF.CheckLuaType(deg, TYPE_NUMBER)
+		checkluatype (deg, TYPE_NUMBER)
 	end
 
 	local ret = Angle()
@@ -197,7 +200,7 @@ end
 -- @param b Angle to copy from.
 -- @return nil
 function ang_methods:set (b)
-	SF.CheckType(b, ang_metamethods)
+	checktype(b, ang_metamethods)
 
 	self[1] = (b[1] or 0)
 	self[2] = (b[2] or 0)

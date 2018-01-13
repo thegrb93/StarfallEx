@@ -8,15 +8,18 @@ local hook_library = SF.Libraries.Register("hook")
 local registered_instances = {}
 local gmod_hooks = {}
 local wrapArguments = SF.Sanitize
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 --- Sets a hook function
 -- @param hookname Name of the event
 -- @param name Unique identifier
 -- @param func Function to run
 function hook_library.add (hookname, name, func)
-	SF.CheckLuaType(hookname, TYPE_STRING)
-	SF.CheckLuaType(name, TYPE_STRING)
-	SF.CheckLuaType(func, TYPE_FUNCTION)
+	checkluatype (hookname, TYPE_STRING)
+	checkluatype (name, TYPE_STRING)
+	checkluatype (func, TYPE_FUNCTION)
 
 	hookname = hookname:lower()
 	local inst = SF.instance
@@ -95,7 +98,7 @@ end
 -- @param hookname The hook name
 -- @param ... arguments
 function hook_library.run (hookname, ...)
-	SF.CheckLuaType(hookname, TYPE_STRING)
+	checkluatype (hookname, TYPE_STRING)
 
 	local instance = SF.instance
 	local hook = hookname:lower()
@@ -127,7 +130,7 @@ end
 -- @param ... Payload. These parameters will be used to call the hook functions
 -- @return tbl A list of the resultset of each called hook
 function hook_library.runRemote (recipient, ...)
-	if recipient then SF.CheckType(recipient, SF.Entities.Metatable) end
+	if recipient then checktype(recipient, SF.Entities.Metatable) end
 
 	local recipients
 	if recipient then
@@ -164,8 +167,8 @@ end
 -- @param hookname The hook name
 -- @param name The unique name for this hook
 function hook_library.remove (hookname, name)
-	SF.CheckLuaType(hookname, TYPE_STRING)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype (hookname, TYPE_STRING)
+	checkluatype (name, TYPE_STRING)
 	local instance = SF.instance
 
 	local lower = hookname:lower()

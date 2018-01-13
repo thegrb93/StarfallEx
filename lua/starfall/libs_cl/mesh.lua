@@ -9,6 +9,9 @@ local maxtriangles = CreateClientConVar("sf_mesh_maxtriangles", "50000", true, "
 -- @client
 local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
 local wrap, unwrap = SF.CreateWrapper(mesh_metamethods, true, false, debug.getregistry().IMesh)
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 --- Mesh library.
 -- @client
@@ -90,8 +93,8 @@ end)
 -- @param verteces Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex
 -- @return Mesh object
 function mesh_library.createFromTable (verteces)
-	SF.Permissions.check(SF.instance, nil, "mesh")
-	SF.CheckLuaType(verteces, TYPE_TABLE)
+	checkpermission (SF.instance, nil, "mesh")
+	checkluatype (verteces, TYPE_TABLE)
 
 	local nvertices = #verteces
 	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
@@ -125,8 +128,8 @@ end
 -- @param obj The obj file data
 -- @return Mesh object
 function mesh_library.createFromObj (obj)
-	SF.Permissions.check(SF.instance, nil, "mesh")
-	SF.CheckLuaType(obj, TYPE_STRING)
+	checkpermission (SF.instance, nil, "mesh")
+	checkluatype (obj, TYPE_STRING)
 	local instance = SF.instance
 
 	local pos, norm, uv, face = {}, {}, {}, {}
@@ -203,7 +206,7 @@ end
 
 --- Draws the mesh. Must be in a 3D rendering context.
 function mesh_methods:draw()
-	SF.CheckType(self, mesh_metamethods)
+	checktype(self, mesh_metamethods)
 	local mesh = unwrap(self)
 	local data = SF.instance.data
 	if not data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
@@ -213,7 +216,7 @@ end
 
 --- Frees the mesh from memory
 function mesh_methods:destroy()
-	SF.CheckType(self, mesh_metamethods)
+	checktype(self, mesh_metamethods)
 	local mesh = unwrap(self)
 	local instance = SF.instance
 	if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end

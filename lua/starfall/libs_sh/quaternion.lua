@@ -5,6 +5,9 @@
 local quat_lib = SF.Libraries.Register("quaternion")
 
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 --[[
 -- Quaternion Support
@@ -268,8 +271,8 @@ end
 
 quat_metamethods.__add = function(lhs, rhs)
 
-	SF.CheckType(lhs, quat_metamethods)
-	SF.CheckType(rhs, quat_metamethods)
+	checktype(lhs, quat_metamethods)
+	checktype(rhs, quat_metamethods)
 
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -346,8 +349,8 @@ end
 
 
 quat_metamethods.__div = function(lhs, rhs)
-	SF.CheckType(lhs, quat_metamethods)
-	SF.CheckType(rhs, quat_metamethods)
+	checktype(lhs, quat_metamethods)
+	checktype(rhs, quat_metamethods)
 
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -384,8 +387,8 @@ end
 
 
 quat_metamethods.__pow = function(lhs, rhs)
-	SF.CheckType(lhs, quat_metamethods)
-	SF.CheckType(rhs, quat_metamethods)
+	checktype(lhs, quat_metamethods)
+	checktype(rhs, quat_metamethods)
 
 
 	local ltype = SF.GetType(lhs)
@@ -628,7 +631,7 @@ end
 
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff)
 function quat_lib.rotationVector(q)
-	SF.CheckType(q, quat_metamethods)
+	checktype(q, quat_metamethods)
 	local l2 = q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 	local m2 = math.max(q[2] * q[2] + q[3] * q[3] + q[4] * q[4], 0)
 
