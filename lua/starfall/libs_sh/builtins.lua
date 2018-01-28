@@ -586,6 +586,7 @@ if SERVER then
 	-- @param cmd Command to execute
 	function SF.DefaultEnvironment.concmd (cmd)
 		SF.CheckLuaType(cmd, TYPE_STRING)
+		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
 		SF.Permissions.check(SF.instance, nil, "console.command")
 		SF.instance.player:ConCommand(cmd)
 	end
