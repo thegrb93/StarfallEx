@@ -374,7 +374,6 @@ function constraint_library.getTable(ent)
 	ent = eunwrap(ent)
 
 	if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
-	SF.Permissions.check(SF.instance, ent, "constraints.any")
 
 	return SF.Sanitize(constraint.GetTable(ent))
 end
