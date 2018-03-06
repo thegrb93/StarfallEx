@@ -1,3 +1,4 @@
+#Script source: https://github.com/siffiejoe/lua-travis
 # target directory for Lua/LuaRocks/...
 D="$HOME/programs"
 
