@@ -641,7 +641,7 @@ Returns the local player's camera position";["fname"] = "eyePos";["realm"] = "sh
 Returns the local player's camera position ";["private"] = false;["library"] = "builtin";["param"] = {};};["ipairs"] = {["ret"] = {[1] = "Iterator function";[2] = "Table tbl";[3] = "0 as current index";};["description"] = "\
 Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";["class"] = "function";["fname"] = "ipairs";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.ipairs";["summary"] = "\
 Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";["library"] = "builtin";["param"] = {[1] = "tbl";["tbl"] = "Table to iterate over";};};["getUserdata"] = {["ret"] = "String data";["description"] = "\
-Gets the chip's userdata that the duplicator tool loads";["class"] = "function";["realm"] = "sh";["fname"] = "getUserdata";["summary"] = "\
+Gets the chip's userdata that the duplicator tool loads";["class"] = "function";["realm"] = "sv";["fname"] = "getUserdata";["summary"] = "\
 Gets the chip's userdata that the duplicator tool loads ";["name"] = "SF.DefaultEnvironment.getUserdata";["library"] = "builtin";["private"] = false;["server"] = true;["param"] = {};};["player"] = {["ret"] = "Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)";["description"] = "\
 Same as owner() on the server. On the client, returns the local player";["class"] = "function";["fname"] = "player";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.player";["summary"] = "\
 Same as owner() on the server.";["library"] = "builtin";["param"] = {};};["quotaTotalAverage"] = {["ret"] = "Total average CPU Time of all your chips.";["class"] = "function";["description"] = "\
@@ -698,7 +698,7 @@ Lua's pcall with SF throw implementation \
 Calls a function and catches an error that can be thrown while the execution of the call.";["private"] = false;["library"] = "builtin";["param"] = {[1] = "func";[2] = "...";[3] = "arguments";["arguments"] = "Arguments to call the function with.";["func"] = "Function to be executed and of which the errors should be caught of";};};["eyeAngles"] = {["ret"] = "The local player's camera angles";["class"] = "function";["description"] = "\
 Returns the local player's camera angles";["fname"] = "eyeAngles";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.eyeAngles";["summary"] = "\
 Returns the local player's camera angles ";["private"] = false;["library"] = "builtin";["param"] = {};};["permissionRequestSatisfied"] = {["ret"] = "Boolean of whether the client gave all permissions specified in last request or not.";["description"] = "\
-Is permission request fully satisfied.";["class"] = "function";["realm"] = "sh";["fname"] = "permissionRequestSatisfied";["summary"] = "\
+Is permission request fully satisfied.";["class"] = "function";["realm"] = "cl";["fname"] = "permissionRequestSatisfied";["summary"] = "\
 Is permission request fully satisfied.";["name"] = "SF.DefaultEnvironment.permissionRequestSatisfied";["library"] = "builtin";["private"] = false;["client"] = true;["param"] = {};};["type"] = {["ret"] = "The name of the object's type.";["description"] = "\
 Returns a string representing the name of the type of the passed object.";["class"] = "function";["realm"] = "sh";["classForced"] = true;["summary"] = "\
 Returns a string representing the name of the type of the passed object.";["name"] = "SF.DefaultEnvironment.type";["fname"] = "type";["private"] = false;["library"] = "builtin";["param"] = {[1] = "obj";["obj"] = "Object to get type of";};};["try"] = {["class"] = "function";["description"] = "\
@@ -706,13 +706,13 @@ Try to execute a function and catch possible exceptions \
 Similar to xpcall, but a bit more in-depth";["fname"] = "try";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.try";["summary"] = "\
 Try to execute a function and catch possible exceptions \
 Similar to xpcall, but a bit more in-depth ";["private"] = false;["library"] = "builtin";["param"] = {[1] = "func";[2] = "catch";["catch"] = "Optional function to execute in case func fails";["func"] = "Function to execute";};};["setUserdata"] = {["description"] = "\
-Sets the chip's userdata that the duplicator tool saves. max 1MiB";["class"] = "function";["realm"] = "sh";["fname"] = "setUserdata";["summary"] = "\
+Sets the chip's userdata that the duplicator tool saves. max 1MiB";["class"] = "function";["realm"] = "sv";["fname"] = "setUserdata";["summary"] = "\
 Sets the chip's userdata that the duplicator tool saves.";["name"] = "SF.DefaultEnvironment.setUserdata";["library"] = "builtin";["private"] = false;["server"] = true;["param"] = {[1] = "str";["str"] = "String data";};};["select"] = {["ret"] = "Returns a number or vararg, depending on the select method.";["description"] = "\
 Used to select single values from a vararg or get the count of values in it.";["class"] = "function";["fname"] = "select";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.select";["summary"] = "\
 Used to select single values from a vararg or get the count of values in it.";["library"] = "builtin";["param"] = {[1] = "parameter";[2] = "vararg";["vararg"] = "";["parameter"] = "";};};["owner"] = {["ret"] = "Owner entity";["description"] = "\
 Returns whoever created the chip";["class"] = "function";["fname"] = "owner";["classForced"] = true;["realm"] = "sh";["name"] = "SF.DefaultEnvironment.owner";["summary"] = "\
 Returns whoever created the chip ";["library"] = "builtin";["param"] = {};};["setupPermissionRequest"] = {["description"] = "\
-Setups request for overriding permissions.";["class"] = "function";["realm"] = "sh";["fname"] = "setupPermissionRequest";["summary"] = "\
+Setups request for overriding permissions.";["class"] = "function";["realm"] = "cl";["fname"] = "setupPermissionRequest";["summary"] = "\
 Setups request for overriding permissions.";["name"] = "SF.DefaultEnvironment.setupPermissionRequest";["library"] = "builtin";["private"] = false;["client"] = true;["param"] = {[1] = "perms";[2] = "desc";[3] = "showOnUse";["perms"] = "Table of overridable permissions' names.";["showOnUse"] = "Whether request will popup when player uses chip or linked screen.";["desc"] = "Description attached to request.";};};["quotaAverage"] = {["ret"] = "Average CPU Time of the buffer.";["class"] = "function";["description"] = "\
 Gets the Average CPU Time in the buffer";["fname"] = "quotaAverage";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.quotaAverage";["summary"] = "\
 Gets the Average CPU Time in the buffer ";["private"] = false;["library"] = "builtin";["param"] = {};};["loadstring"] = {["ret"] = "Function of str";["class"] = "function";["description"] = "\
@@ -722,7 +722,7 @@ GLua's loadstring \
 Works like loadstring, except that it executes by default in the main environment ";["private"] = false;["library"] = "builtin";["param"] = {[1] = "str";[2] = "name";["str"] = "String to execute";};};["rawget"] = {["ret"] = "The value of the index";["class"] = "function";["description"] = "\
 Gets the value of a table index without invoking a metamethod";["fname"] = "rawget";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.rawget";["summary"] = "\
 Gets the value of a table index without invoking a metamethod ";["private"] = false;["library"] = "builtin";["param"] = {[1] = "table";[2] = "key";[3] = "value";["key"] = "The index of the table";["table"] = "The table to get the value from";};};["setName"] = {["description"] = "\
-Sets the chip's display name";["class"] = "function";["realm"] = "sh";["fname"] = "setName";["summary"] = "\
+Sets the chip's display name";["class"] = "function";["realm"] = "cl";["fname"] = "setName";["summary"] = "\
 Sets the chip's display name ";["name"] = "SF.DefaultEnvironment.setName";["library"] = "builtin";["private"] = false;["client"] = true;["param"] = {[1] = "name";["name"] = "Name";};};["dofile"] = {["ret"] = "Return value of the script";["class"] = "function";["description"] = "\
 Runs an included script, but does not cache the result. \
 Pretty much like standard Lua dofile()";["fname"] = "dofile";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.dofile";["summary"] = "\
@@ -892,9 +892,9 @@ Gets the angles of the physics object";["class"] = "function";["realm"] = "sh";[
 Gets the angles of the physics object ";["fname"] = "getAngles";["classlib"] = "PhysObj";["name"] = "physobj_methods:getAngles";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getMesh"] = {["ret"] = "table of MeshVertex structures";["class"] = "function";["description"] = "\
 Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.garrysmod.com/page/Structures/MeshVertex";["fname"] = "getMesh";["realm"] = "sh";["name"] = "physobj_methods:getMesh";["summary"] = "\
 Returns a table of MeshVertex structures where each 3 vertices represent a triangle.";["private"] = false;["classlib"] = "PhysObj";["param"] = {};};["applyTorque"] = {["description"] = "\
-Applys a torque to a physics object";["class"] = "function";["realm"] = "sh";["fname"] = "applyTorque";["summary"] = "\
+Applys a torque to a physics object";["class"] = "function";["realm"] = "sv";["fname"] = "applyTorque";["summary"] = "\
 Applys a torque to a physics object ";["name"] = "physobj_methods:applyTorque";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "torque";["torque"] = "The local torque vector to apply";};};["wake"] = {["description"] = "\
-Makes a sleeping physobj wakeup";["class"] = "function";["realm"] = "sh";["fname"] = "wake";["summary"] = "\
+Makes a sleeping physobj wakeup";["class"] = "function";["realm"] = "sv";["fname"] = "wake";["summary"] = "\
 Makes a sleeping physobj wakeup ";["name"] = "physobj_methods:wake";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {};};["localToWorld"] = {["ret"] = "The transformed vector";["class"] = "function";["description"] = "\
 Returns a vector in the reference frame of the world from the local frame of the physicsobject";["fname"] = "localToWorld";["realm"] = "sh";["name"] = "physobj_methods:localToWorld";["summary"] = "\
 Returns a vector in the reference frame of the world from the local frame of the physicsobject ";["private"] = false;["classlib"] = "PhysObj";["param"] = {[1] = "vec";["vec"] = "The vector to transform";};};["getMass"] = {["ret"] = "mass of the physics object";["description"] = "\
@@ -902,11 +902,11 @@ Gets the mass of the physics object";["class"] = "function";["realm"] = "sh";["s
 Gets the mass of the physics object ";["fname"] = "getMass";["classlib"] = "PhysObj";["name"] = "physobj_methods:getMass";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["worldToLocalVector"] = {["ret"] = "The transformed vector";["class"] = "function";["description"] = "\
 Returns a normal vector in the local reference frame of the physicsobject from the world frame";["fname"] = "worldToLocalVector";["realm"] = "sh";["name"] = "physobj_methods:worldToLocalVector";["summary"] = "\
 Returns a normal vector in the local reference frame of the physicsobject from the world frame ";["private"] = false;["classlib"] = "PhysObj";["param"] = {[1] = "vec";["vec"] = "The normal vector to transform";};};["setPos"] = {["description"] = "\
-Sets the position of the physics object";["class"] = "function";["realm"] = "sh";["fname"] = "setPos";["summary"] = "\
+Sets the position of the physics object";["class"] = "function";["realm"] = "sv";["fname"] = "setPos";["summary"] = "\
 Sets the position of the physics object ";["name"] = "physobj_methods:setPos";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "pos";["pos"] = "The position vector to set it to";};};["getMeshConvexes"] = {["ret"] = "table of MeshVertex structures";["class"] = "function";["description"] = "\
 Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex";["fname"] = "getMeshConvexes";["realm"] = "sh";["name"] = "physobj_methods:getMeshConvexes";["summary"] = "\
 Returns a structured table, the physics mesh of the physics object.";["private"] = false;["classlib"] = "PhysObj";["param"] = {};};["setMaterial"] = {["description"] = "\
-Sets the physical material of a physics object";["class"] = "function";["realm"] = "sh";["fname"] = "setMaterial";["summary"] = "\
+Sets the physical material of a physics object";["class"] = "function";["realm"] = "sv";["fname"] = "setMaterial";["summary"] = "\
 Sets the physical material of a physics object ";["name"] = "physobj_methods:setMaterial";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "material";["material"] = "The physical material to set it to";};};["enableMotion"] = {["class"] = "function";["description"] = "\
 Sets the bone movement state";["fname"] = "enableMotion";["realm"] = "sh";["name"] = "physobj_methods:enableMotion";["summary"] = "\
 Sets the bone movement state ";["private"] = false;["classlib"] = "PhysObj";["param"] = {[1] = "move";["move"] = "Bool should the bone move?";};};["enableDrag"] = {["class"] = "function";["description"] = "\
@@ -916,7 +916,7 @@ Gets the inertia of the physics object";["class"] = "function";["realm"] = "sh";
 Gets the inertia of the physics object ";["fname"] = "getInertia";["classlib"] = "PhysObj";["name"] = "physobj_methods:getInertia";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["enableGravity"] = {["class"] = "function";["description"] = "\
 Sets bone gravity";["fname"] = "enableGravity";["realm"] = "sh";["name"] = "physobj_methods:enableGravity";["summary"] = "\
 Sets bone gravity ";["private"] = false;["classlib"] = "PhysObj";["param"] = {[1] = "grav";["grav"] = "Bool should the bone respect gravity?";};};["setInertia"] = {["description"] = "\
-Sets the inertia of a physics object";["class"] = "function";["realm"] = "sh";["fname"] = "setInertia";["summary"] = "\
+Sets the inertia of a physics object";["class"] = "function";["realm"] = "sv";["fname"] = "setInertia";["summary"] = "\
 Sets the inertia of a physics object ";["name"] = "physobj_methods:setInertia";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "inertia";["inertia"] = "The inertia vector to set it to";};};["isValid"] = {["ret"] = "boolean if the physics object is valid";["description"] = "\
 Checks if the physics object is valid";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Checks if the physics object is valid ";["fname"] = "isValid";["classlib"] = "PhysObj";["name"] = "physobj_methods:isValid";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getMaterial"] = {["ret"] = "The physics material of the physics object";["description"] = "\
@@ -924,21 +924,21 @@ Gets the material of the physics object";["class"] = "function";["realm"] = "sh"
 Gets the material of the physics object ";["fname"] = "getMaterial";["classlib"] = "PhysObj";["name"] = "physobj_methods:getMaterial";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["localToWorldVector"] = {["ret"] = "The transformed vector";["class"] = "function";["description"] = "\
 Returns a normal vector in the reference frame of the world from the local frame of the physicsobject";["fname"] = "localToWorldVector";["realm"] = "sh";["name"] = "physobj_methods:localToWorldVector";["summary"] = "\
 Returns a normal vector in the reference frame of the world from the local frame of the physicsobject ";["private"] = false;["classlib"] = "PhysObj";["param"] = {[1] = "vec";["vec"] = "The normal vector to transform";};};["applyForceOffset"] = {["description"] = "\
-Applys an offset force to a physics object";["class"] = "function";["realm"] = "sh";["fname"] = "applyForceOffset";["summary"] = "\
+Applys an offset force to a physics object";["class"] = "function";["realm"] = "sv";["fname"] = "applyForceOffset";["summary"] = "\
 Applys an offset force to a physics object ";["name"] = "physobj_methods:applyForceOffset";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "force";[2] = "position";["force"] = "The force vector to apply";["position"] = "The position in world coordinates";};};["getPos"] = {["ret"] = "Vector position of the physics object";["description"] = "\
 Gets the position of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the position of the physics object ";["fname"] = "getPos";["classlib"] = "PhysObj";["name"] = "physobj_methods:getPos";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["applyForceCenter"] = {["description"] = "\
-Applys a force to the center of the physics object";["class"] = "function";["realm"] = "sh";["fname"] = "applyForceCenter";["summary"] = "\
+Applys a force to the center of the physics object";["class"] = "function";["realm"] = "sv";["fname"] = "applyForceCenter";["summary"] = "\
 Applys a force to the center of the physics object ";["name"] = "physobj_methods:applyForceCenter";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "force";["force"] = "The force vector to apply";};};["getMassCenter"] = {["ret"] = "Center of mass vector in the physobject's local reference frame.";["description"] = "\
 Gets the center of mass of the physics object in the local reference frame.";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the center of mass of the physics object in the local reference frame.";["fname"] = "getMassCenter";["classlib"] = "PhysObj";["name"] = "physobj_methods:getMassCenter";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getAngleVelocity"] = {["ret"] = "Vector angular velocity of the physics object";["description"] = "\
 Gets the angular velocity of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the angular velocity of the physics object ";["fname"] = "getAngleVelocity";["classlib"] = "PhysObj";["name"] = "physobj_methods:getAngleVelocity";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["setVelocity"] = {["description"] = "\
-Sets the velocity of the physics object";["class"] = "function";["realm"] = "sh";["fname"] = "setVelocity";["summary"] = "\
+Sets the velocity of the physics object";["class"] = "function";["realm"] = "sv";["fname"] = "setVelocity";["summary"] = "\
 Sets the velocity of the physics object ";["name"] = "physobj_methods:setVelocity";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "vel";["vel"] = "The velocity vector to set it to";};};["worldToLocal"] = {["ret"] = "The transformed vector";["class"] = "function";["description"] = "\
 Returns a vector in the local reference frame of the physicsobject from the world frame";["fname"] = "worldToLocal";["realm"] = "sh";["name"] = "physobj_methods:worldToLocal";["summary"] = "\
 Returns a vector in the local reference frame of the physicsobject from the world frame ";["private"] = false;["classlib"] = "PhysObj";["param"] = {[1] = "vec";["vec"] = "The vector to transform";};};["setMass"] = {["description"] = "\
-Sets the mass of a physics object";["class"] = "function";["realm"] = "sh";["fname"] = "setMass";["summary"] = "\
+Sets the mass of a physics object";["class"] = "function";["realm"] = "sv";["fname"] = "setMass";["summary"] = "\
 Sets the mass of a physics object ";["name"] = "physobj_methods:setMass";["classlib"] = "PhysObj";["private"] = false;["server"] = true;["param"] = {[1] = "mass";["mass"] = "The mass to set it to";};};["getVelocity"] = {["ret"] = "Vector velocity of the physics object";["description"] = "\
 Gets the velocity of the physics object";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the velocity of the physics object ";["fname"] = "getVelocity";["classlib"] = "PhysObj";["name"] = "physobj_methods:getVelocity";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getEntity"] = {["ret"] = "The entity attached to the physics object";["description"] = "\
@@ -1109,9 +1109,9 @@ Applies linear force to the entity";["fname"] = "applyForceCenter";["realm"] = "
 Applies linear force to the entity ";["private"] = false;["classlib"] = "Entity";["param"] = {[1] = "vec";["vec"] = "The force vector";};};["isValid"] = {["ret"] = "True if valid, false if not";["description"] = "\
 Checks if an entity is valid.";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Checks if an entity is valid.";["fname"] = "isValid";["classlib"] = "Entity";["name"] = "ents_methods:isValid";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["setHologramRenderMatrix"] = {["description"] = "\
-Sets a hologram entity's rendermatrix";["class"] = "function";["realm"] = "sh";["fname"] = "setHologramRenderMatrix";["summary"] = "\
+Sets a hologram entity's rendermatrix";["class"] = "function";["realm"] = "cl";["fname"] = "setHologramRenderMatrix";["summary"] = "\
 Sets a hologram entity's rendermatrix ";["name"] = "ents_methods:setHologramRenderMatrix";["classlib"] = "Entity";["private"] = false;["client"] = true;["param"] = {[1] = "mat";["mat"] = "VMatrix to use";};};["manipulateBonePosition"] = {["description"] = "\
-Allows manipulation of a hologram's bones' positions";["class"] = "function";["realm"] = "sh";["fname"] = "manipulateBonePosition";["summary"] = "\
+Allows manipulation of a hologram's bones' positions";["class"] = "function";["realm"] = "cl";["fname"] = "manipulateBonePosition";["summary"] = "\
 Allows manipulation of a hologram's bones' positions ";["name"] = "ents_methods:manipulateBonePosition";["classlib"] = "Entity";["private"] = false;["client"] = true;["param"] = {[1] = "bone";[2] = "vec";["vec"] = "The position it should be manipulated to";["bone"] = "The bone ID";};};["setSkin"] = {["description"] = "\
 Sets the skin of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Sets the skin of the entity ";["fname"] = "setSkin";["classlib"] = "Entity";["name"] = "ents_methods:setSkin";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "skinIndex";["skinIndex"] = "Number, Index of the skin to use.";};};["getAngleVelocity"] = {["ret"] = "The angular velocity as a vector";["description"] = "\
@@ -1144,7 +1144,7 @@ Gets the color of an entity";["class"] = "function";["realm"] = "sh";["summary"]
 Gets the color of an entity ";["fname"] = "getColor";["classlib"] = "Entity";["name"] = "ents_methods:getColor";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["entIndex"] = {["ret"] = "The numerical index of the entity";["description"] = "\
 Returns the EntIndex of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the EntIndex of the entity ";["fname"] = "entIndex";["classlib"] = "Entity";["name"] = "ents_methods:entIndex";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["setHologramMesh"] = {["description"] = "\
-Sets a hologram entity's model to a custom Mesh";["class"] = "function";["realm"] = "sh";["fname"] = "setHologramMesh";["summary"] = "\
+Sets a hologram entity's model to a custom Mesh";["class"] = "function";["realm"] = "cl";["fname"] = "setHologramMesh";["summary"] = "\
 Sets a hologram entity's model to a custom Mesh ";["name"] = "ents_methods:setHologramMesh";["classlib"] = "Entity";["private"] = false;["client"] = true;["param"] = {[1] = "mesh";["mesh"] = "The mesh to set it to or nil to set back to normal";};};["getInertia"] = {["ret"] = "The principle moments of inertia as a vector";["description"] = "\
 Returns the principle moments of inertia of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the principle moments of inertia of the entity ";["fname"] = "getInertia";["classlib"] = "Entity";["name"] = "ents_methods:getInertia";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["isPlayer"] = {["ret"] = "True if player, false if not";["description"] = "\
@@ -1230,7 +1230,7 @@ Converts an angle in world space to entity local space";["class"] = "function";[
 Converts an angle in world space to entity local space ";["fname"] = "worldToLocalAngles";["classlib"] = "Entity";["name"] = "ents_methods:worldToLocalAngles";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "data";["data"] = "World space angle";};};["getVelocity"] = {["ret"] = "The velocity vector";["description"] = "\
 Returns the velocity of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the velocity of the entity ";["fname"] = "getVelocity";["classlib"] = "Entity";["name"] = "ents_methods:getVelocity";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["manipulateBoneAngles"] = {["description"] = "\
-Allows manipulation of a hologram's bones' angles";["class"] = "function";["realm"] = "sh";["fname"] = "manipulateBoneAngles";["summary"] = "\
+Allows manipulation of a hologram's bones' angles";["class"] = "function";["realm"] = "cl";["fname"] = "manipulateBoneAngles";["summary"] = "\
 Allows manipulation of a hologram's bones' angles ";["name"] = "ents_methods:manipulateBoneAngles";["classlib"] = "Entity";["private"] = false;["client"] = true;["param"] = {[1] = "bone";[2] = "ang";["ang"] = "The angle it should be manipulated to";["bone"] = "The bone ID";};};["setColor"] = {["description"] = "\
 Sets the color of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Sets the color of the entity ";["fname"] = "setColor";["classlib"] = "Entity";["name"] = "ents_methods:setColor";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "clr";["clr"] = "New color";};};["isNPC"] = {["ret"] = "True if npc, false if not";["description"] = "\
@@ -1242,9 +1242,9 @@ Sets the entity movement state";["fname"] = "enableMotion";["realm"] = "sv";["na
 Sets the entity movement state ";["private"] = false;["classlib"] = "Entity";["param"] = {[1] = "move";["move"] = "Bool should the entity move?";};};["setBodygroup"] = {["description"] = "\
 Sets the bodygroup of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Sets the bodygroup of the entity ";["fname"] = "setBodygroup";["classlib"] = "Entity";["name"] = "ents_methods:setBodygroup";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "bodygroup";[2] = "value";["bodygroup"] = "Number, The ID of the bodygroup you're setting.";["value"] = "Number, The value you're setting the bodygroup to.";};};["setHologramRenderBounds"] = {["description"] = "\
-Sets a hologram entity's renderbounds";["class"] = "function";["realm"] = "sh";["fname"] = "setHologramRenderBounds";["summary"] = "\
+Sets a hologram entity's renderbounds";["class"] = "function";["realm"] = "cl";["fname"] = "setHologramRenderBounds";["summary"] = "\
 Sets a hologram entity's renderbounds ";["name"] = "ents_methods:setHologramRenderBounds";["classlib"] = "Entity";["private"] = false;["client"] = true;["param"] = {[1] = "mins";[2] = "maxs";["maxs"] = "The upper bounding corner coordinate local to the hologram";["mins"] = "The lower bounding corner coordinate local to the hologram";};};["manipulateBoneScale"] = {["description"] = "\
-Allows manipulation of a hologram's bones' scale";["class"] = "function";["realm"] = "sh";["fname"] = "manipulateBoneScale";["summary"] = "\
+Allows manipulation of a hologram's bones' scale";["class"] = "function";["realm"] = "cl";["fname"] = "manipulateBoneScale";["summary"] = "\
 Allows manipulation of a hologram's bones' scale ";["name"] = "ents_methods:manipulateBoneScale";["classlib"] = "Entity";["private"] = false;["client"] = true;["param"] = {[1] = "bone";[2] = "vec";["vec"] = "The scale it should be manipulated to";["bone"] = "The bone ID";};};["setMaterial"] = {["description"] = "\
 Sets the material of the entity";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Sets the material of the entity ";["fname"] = "setMaterial";["classlib"] = "Entity";["name"] = "ents_methods:setMaterial";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "material";["material"] = ", string, New material name.";};};["getMass"] = {["ret"] = "The numerical mass";["description"] = "\
@@ -1300,11 +1300,11 @@ Gets the main physics objects of an entity";["fname"] = "getPhysicsObject";["rea
 Gets the main physics objects of an entity ";["private"] = false;["classlib"] = "Entity";["param"] = {};};};};["Vehicle"] = {["typtbl"] = "vehicle_methods";["class"] = "class";["fields"] = {};["name"] = "Vehicle";["summary"] = "\
 Vehicle type ";["description"] = "\
 Vehicle type";["methods"] = {[1] = "ejectDriver";[2] = "getDriver";[3] = "getPassenger";["getDriver"] = {["ret"] = "Driver of vehicle";["description"] = "\
-Returns the driver of the vehicle";["class"] = "function";["realm"] = "sh";["fname"] = "getDriver";["summary"] = "\
+Returns the driver of the vehicle";["class"] = "function";["realm"] = "sv";["fname"] = "getDriver";["summary"] = "\
 Returns the driver of the vehicle ";["name"] = "vehicle_methods:getDriver";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["param"] = {};};["ejectDriver"] = {["description"] = "\
-Ejects the driver of the vehicle";["class"] = "function";["realm"] = "sh";["fname"] = "ejectDriver";["summary"] = "\
+Ejects the driver of the vehicle";["class"] = "function";["realm"] = "sv";["fname"] = "ejectDriver";["summary"] = "\
 Ejects the driver of the vehicle ";["name"] = "vehicle_methods:ejectDriver";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["param"] = {};};["getPassenger"] = {["ret"] = "amount of ammo";["description"] = "\
-Returns a passenger of a vehicle";["class"] = "function";["realm"] = "sh";["fname"] = "getPassenger";["summary"] = "\
+Returns a passenger of a vehicle";["class"] = "function";["realm"] = "sv";["fname"] = "getPassenger";["summary"] = "\
 Returns a passenger of a vehicle ";["name"] = "vehicle_methods:getPassenger";["classlib"] = "Vehicle";["private"] = false;["server"] = true;["param"] = {[1] = "n";["n"] = "The index of the passenger to get";};};};};["Mesh"] = {["typtbl"] = "mesh_methods";["class"] = "class";["description"] = "\
 Mesh type";["fields"] = {};["name"] = "Mesh";["summary"] = "\
 Mesh type ";["client"] = true;["methods"] = {[1] = "destroy";[2] = "draw";["draw"] = {["class"] = "function";["description"] = "\
@@ -1442,7 +1442,7 @@ Returns whether the player belongs to a usergroup";["class"] = "function";["real
 Returns whether the player belongs to a usergroup ";["fname"] = "isUserGroup";["classlib"] = "Player";["name"] = "player_methods:isUserGroup";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "group";["group"] = "Group to check against";};};["isBot"] = {["ret"] = "True if player is a bot";["description"] = "\
 Returns whether the player is a bot";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns whether the player is a bot ";["fname"] = "isBot";["classlib"] = "Player";["name"] = "player_methods:isBot";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["setViewEntity"] = {["description"] = "\
-Sets the view entity of the player. Only works if they are linked to a hud.";["class"] = "function";["realm"] = "sh";["fname"] = "setViewEntity";["summary"] = "\
+Sets the view entity of the player. Only works if they are linked to a hud.";["class"] = "function";["realm"] = "sv";["fname"] = "setViewEntity";["summary"] = "\
 Sets the view entity of the player.";["name"] = "player_methods:setViewEntity";["classlib"] = "Player";["private"] = false;["server"] = true;["param"] = {[1] = "ent";["ent"] = "Entity to set the player's view entity to, or nothing to reset it";};};["isNoclipped"] = {["ret"] = "true if the player is noclipped";["description"] = "\
 Returns true if the player is noclipped";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns true if the player is noclipped ";["fname"] = "isNoclipped";["classlib"] = "Player";["name"] = "player_methods:isNoclipped";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getJumpPower"] = {["ret"] = "Jump power";["description"] = "\
@@ -1539,7 +1539,7 @@ Returns whether the player is crouching";["class"] = "function";["realm"] = "sh"
 Returns whether the player is crouching ";["fname"] = "isCrouching";["classlib"] = "Player";["name"] = "player_methods:isCrouching";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getDeaths"] = {["ret"] = "Amount of deaths";["description"] = "\
 Returns the amount of deaths of the player";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the amount of deaths of the player ";["fname"] = "getDeaths";["classlib"] = "Player";["name"] = "player_methods:getDeaths";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["hasGodMode"] = {["ret"] = "True if the player has godmode";["description"] = "\
-Returns whether or not the player has godmode";["class"] = "function";["realm"] = "sh";["fname"] = "hasGodMode";["summary"] = "\
+Returns whether or not the player has godmode";["class"] = "function";["realm"] = "sv";["fname"] = "hasGodMode";["summary"] = "\
 Returns whether or not the player has godmode ";["name"] = "player_methods:hasGodMode";["classlib"] = "Player";["private"] = false;["server"] = true;["param"] = {};};["getActiveWeapon"] = {["ret"] = "The weapon";["description"] = "\
 Returns the name of the player's active weapon";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the name of the player's active weapon ";["fname"] = "getActiveWeapon";["classlib"] = "Player";["name"] = "player_methods:getActiveWeapon";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};};};["Angle"] = {["typtbl"] = "ang_methods";["class"] = "class";["description"] = "\
@@ -1637,7 +1637,7 @@ Gets the primary ammo type of the given weapon.";["class"] = "function";["realm"
 Gets the primary ammo type of the given weapon.";["fname"] = "getPrimaryAmmoType";["classlib"] = "Weapon";["name"] = "weapon_methods:getPrimaryAmmoType";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["clip2"] = {["ret"] = "amount of ammo";["description"] = "\
 Returns Ammo in secondary clip";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns Ammo in secondary clip ";["fname"] = "clip2";["classlib"] = "Weapon";["name"] = "weapon_methods:clip2";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["isCarriedByLocalPlayer"] = {["ret"] = "whether or not the weapon is carried by the local player";["description"] = "\
-Returns if the weapon is carried by the local player.";["class"] = "function";["realm"] = "sh";["fname"] = "isCarriedByLocalPlayer";["summary"] = "\
+Returns if the weapon is carried by the local player.";["class"] = "function";["realm"] = "cl";["fname"] = "isCarriedByLocalPlayer";["summary"] = "\
 Returns if the weapon is carried by the local player.";["name"] = "weapon_methods:isCarriedByLocalPlayer";["classlib"] = "Weapon";["private"] = false;["client"] = true;["param"] = {};};["getSecondaryAmmoType"] = {["ret"] = "Ammo number type";["description"] = "\
 Gets the secondary ammo type of the given weapon.";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the secondary ammo type of the given weapon.";["fname"] = "getSecondaryAmmoType";["classlib"] = "Weapon";["name"] = "weapon_methods:getSecondaryAmmoType";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["clip1"] = {["ret"] = "amount of ammo";["description"] = "\
@@ -1645,7 +1645,7 @@ Returns Ammo in primary clip";["class"] = "function";["realm"] = "sh";["summary"
 Returns Ammo in primary clip ";["fname"] = "clip1";["classlib"] = "Weapon";["name"] = "weapon_methods:clip1";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getActivity"] = {["ret"] = "number Current activity";["description"] = "\
 Returns the sequence enumeration number that the weapon is playing. Must be used on a view model.";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Returns the sequence enumeration number that the weapon is playing.";["fname"] = "getActivity";["classlib"] = "Weapon";["name"] = "weapon_methods:getActivity";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getPrintName"] = {["ret"] = "string Display name of weapon";["description"] = "\
-Gets Display name of weapon";["class"] = "function";["realm"] = "sh";["fname"] = "getPrintName";["summary"] = "\
+Gets Display name of weapon";["class"] = "function";["realm"] = "cl";["fname"] = "getPrintName";["summary"] = "\
 Gets Display name of weapon ";["name"] = "weapon_methods:getPrintName";["classlib"] = "Weapon";["private"] = false;["client"] = true;["param"] = {};};["getNextSecondaryFire"] = {["ret"] = "The time, relative to CurTime";["description"] = "\
 Gets the next time the weapon can secondary fire.";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Gets the next time the weapon can secondary fire.";["fname"] = "getNextSecondaryFire";["classlib"] = "Weapon";["name"] = "weapon_methods:getNextSecondaryFire";["server"] = true;["private"] = false;["client"] = true;["param"] = {};};["getHoldType"] = {["ret"] = "string Holdtype";["description"] = "\
