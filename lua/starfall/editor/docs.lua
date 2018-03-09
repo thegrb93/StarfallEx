@@ -68,7 +68,7 @@ Called when a player gets hurt ";["client"] = true;["param"] = {[1] = "ply";[2] 
 Called when a button is pressed";["name"] = "inputPressed";["realm"] = "sh";["summary"] = "\
 Called when a button is pressed ";["class"] = "hook";["param"] = {[1] = "button";["button"] = "Number of the button";};};["PlayerChat"] = {["description"] = "\
 Called when a player's chat message is printed to the chat window";["class"] = "hook";["summary"] = "\
-Called when a player's chat message is printed to the chat window ";["classForced"] = true;["name"] = "PlayerChat";["realm"] = "sh";["client"] = true;["param"] = {};};["Initialize"] = {["description"] = "\
+Called when a player's chat message is printed to the chat window ";["classForced"] = true;["name"] = "PlayerChat";["realm"] = "sh";["client"] = true;["param"] = {[1] = "ply";[2] = "text";[3] = "team";[4] = "isdead";["isdead"] = "Whether the message was send from a dead player";["text"] = "The message";["ply"] = "Player that said the message";["team"] = "Whether the message was team only";};};["Initialize"] = {["description"] = "\
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["class"] = "hook";["summary"] = "\
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["classForced"] = true;["name"] = "Initialize";["realm"] = "sh";["server"] = true;["param"] = {};};["Removed"] = {["description"] = "\
 Called when the starfall chip is removed";["class"] = "hook";["summary"] = "\
