@@ -415,7 +415,15 @@ function parse_file (filepath, doc)
 	for f in class_iterator(blocks, "function")() do
 		table.insert(doc.files[filepath].functions, f.name)
 		doc.files[filepath].functions[f.name] = f
-		f.realm = realm
+		if f.client and f.server then
+			f.realm = "sh"
+		elseif f.client then
+			f.realm = "cl"
+		elseif f.server then
+			f.realm = "sv"
+		else
+			f.realm = realm
+		end
 	end
 	
 	-- make tables table
