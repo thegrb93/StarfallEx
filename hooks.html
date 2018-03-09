@@ -268,7 +268,7 @@ Called when an entity gets picked up by a physgun </td>
 Called when a wants to pick up a weapon </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#PlayerChat">PlayerChat</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#PlayerChat">PlayerChat</a>( ply, text, team, isdead&nbsp;)</td>
 			<td class="summary">
 Called when a player's chat message is printed to the chat window </td>
 		</tr>
@@ -782,11 +782,29 @@ Called when a wants to pick up a weapon</p>
 		
 		
 	</dd>
-	<dt><a name="PlayerChat"></a><span class="realm_sh"></span><strong>PlayerChat</strong>( &nbsp;)</dt>
+	<dt><a name="PlayerChat"></a><span class="realm_sh"></span><strong>PlayerChat</strong>( ply, text, team, isdead&nbsp;)</dt>
 	<dd>
 		<p>
 Called when a player's chat message is printed to the chat window</p>
 		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ply</tt> ― Player that said the message
+				</li>
+				<li>
+					<tt>text</tt> ― The message
+				</li>
+				<li>
+					<tt>team</tt> ― Whether the message was team only
+				</li>
+				<li>
+					<tt>isdead</tt> ― Whether the message was send from a dead player
+				</li>
+			</ul>
+		</section>
 		
 		
 	</dd>
