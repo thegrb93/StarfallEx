@@ -1,33 +1,44 @@
-----------------------------------------------------
--- That's not implemented hovewer it shows template
-----------------------------------------------------
-
 local TabHandler = {
 	ControlName = "sf_helper", -- Its name of vgui panel used by handler, there has to be one
 	IsEditor = false, -- If it should be treated as editor of file, like ACE or Wire
  }
 local PANEL = {} -- It's our VGUI
 
-----------------
--- Handler part
-----------------
+-------------------------------
+-- Handler part (Tab Handler)
+-------------------------------
 
 function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
-
+	self.helpers = {}
 end
 
 function TabHandler:registerSettings() -- Setting panels should be registered there
 
 end
 
-function TabHandler:cleanup() -- Called when editor is reloaded/removed
+function TabHandler:registerTabMenu(menu, content)
+	menu:AddOption("Undock",function()
+		helper = vgui.Create("StarfallFrame")
+		helper:SetSize(930, 615)
+		helper:Center()
+		helper:SetTitle("SF Helper")
+		content.html:SetParent(helper)
+		helper:Open()
+		table.insert(self.helpers,helper)
+		content:CloseTab()
+	end)
+end
 
+function TabHandler:cleanup() -- Called when editor is reloaded/removed
+	for k,v in pairs(helpers) do
+		v:Remove()
+	end
 end
 
 
--------------
--- VGUI part
--------------
+-----------------------
+-- VGUI part (content)
+-----------------------
 
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
 	local html = vgui.Create("DHTML", self)
@@ -45,6 +56,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 		html:RunJavascript( "sf.updateTitle( document.title );" )
 		self:UpdateTitle(self.title)
 	end
+	self.html = html
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor

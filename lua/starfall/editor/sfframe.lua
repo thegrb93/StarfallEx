@@ -451,7 +451,9 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	content.UpdateTitle = function(_, text)
 		return self:UpdateTabText(sheet.Tab, text)
 	end
-
+	content.CloseTab = function(_, text)
+		return self:CloseTab(sheet.Tab, true)
+	end
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
 
 		if keycode == MOUSE_MIDDLE then
