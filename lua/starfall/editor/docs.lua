@@ -49,8 +49,8 @@ Will continuously run.";["class"] = "hook";["summary"] = "\
 Called when a player holds their use key and looks at an entity.";["classForced"] = true;["name"] = "PlayerUse";["realm"] = "sh";["param"] = {[1] = "ply";[2] = "ent";["ent"] = "Entity being used";["ply"] = "Player using the entity";};["server"] = true;};["GravGunPunt"] = {["description"] = "\
 Called when a player punts with the gravity gun";["class"] = "hook";["server"] = true;["classForced"] = true;["realm"] = "sh";["name"] = "GravGunPunt";["summary"] = "\
 Called when a player punts with the gravity gun ";["client"] = true;["param"] = {[1] = "ply";[2] = "ent";["ent"] = "Entity being punted";["ply"] = "Player punting the gravgun";};};["readcell"] = {["ret"] = "The value read";["description"] = "\
-Called when a high speed device reads from a wired SF chip";["class"] = "hook";["classForced"] = true;["summary"] = "\
-Called when a high speed device reads from a wired SF chip ";["name"] = "readcell";["realm"] = "sv";["server"] = true;["param"] = {[1] = "address";["address"] = "The address requested";};};["EndEntityDriving"] = {["description"] = "\
+Called when a high speed device reads from a wired SF chip";["class"] = "hook";["summary"] = "\
+Called when a high speed device reads from a wired SF chip ";["classForced"] = true;["name"] = "readcell";["realm"] = "sv";["server"] = true;["param"] = {[1] = "address";["address"] = "The address requested";};};["EndEntityDriving"] = {["description"] = "\
 Called when a player stops driving an entity";["class"] = "hook";["server"] = true;["classForced"] = true;["realm"] = "sh";["name"] = "EndEntityDriving";["summary"] = "\
 Called when a player stops driving an entity ";["client"] = true;["param"] = {[1] = "ent";[2] = "ply";["ply"] = "Player that drove the entity";["ent"] = "Entity that had been driven";};};["OnEntityCreated"] = {["description"] = "\
 Called when an entity gets created";["class"] = "hook";["server"] = true;["classForced"] = true;["realm"] = "sh";["name"] = "OnEntityCreated";["summary"] = "\
@@ -394,8 +394,8 @@ Creates/Modifies wire inputs. All wire ports must begin with an uppercase \
 letter and contain only alphabetical characters.";["fname"] = "adjustInputs";["realm"] = "sv";["name"] = "wire_library.adjustInputs";["summary"] = "\
 Creates/Modifies wire inputs.";["private"] = false;["library"] = "wire";["param"] = {[1] = "names";[2] = "types";["types"] = "An array of input types. Can be shortcuts. May be modified by the function.";["names"] = "An array of input names. May be modified by the function.";};};};["class"] = "library";["tables"] = {[1] = "ports";["ports"] = {["description"] = "\
 Ports table. Reads from this table will read from the wire input \
-of the same name. Writes will write to the wire output of the same name.";["class"] = "table";["classForced"] = true;["name"] = "wire_library.ports";["summary"] = "\
-Ports table.";["library"] = "wire";["param"] = {};};};["description"] = "\
+of the same name. Writes will write to the wire output of the same name.";["class"] = "table";["classForced"] = true;["summary"] = "\
+Ports table.";["name"] = "wire_library.ports";["library"] = "wire";["param"] = {};};};["description"] = "\
 Wire library. Handles wire inputs/outputs, wirelinks, etc.";["fields"] = {};["name"] = "wire";["summary"] = "\
 Wire library.";["libtbl"] = "wire_library";};["team"] = {["tables"] = {};["functions"] = {[1] = "bestAutoJoinTeam";[2] = "exists";[3] = "getAllTeams";[4] = "getColor";[5] = "getJoinable";[6] = "getName";[7] = "getNumDeaths";[8] = "getNumFrags";[9] = "getNumPlayers";[10] = "getPlayers";[11] = "getScore";["bestAutoJoinTeam"] = {["ret"] = "index of the best team to join";["description"] = "\
 Returns team with least players";["class"] = "function";["fname"] = "bestAutoJoinTeam";["classForced"] = true;["realm"] = "sh";["name"] = "team_library.bestAutoJoinTeam";["summary"] = "\
@@ -734,7 +734,7 @@ Translates the specified position and angle into the specified coordinate system
 Throws a raw exception.";["fname"] = "error";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.error";["summary"] = "\
 Throws a raw exception.";["private"] = false;["library"] = "builtin";["param"] = {[1] = "msg";[2] = "level";["msg"] = "Exception message";["level"] = "Which level in the stacktrace to blame. Defaults to 1";};};["setSoftQuota"] = {["class"] = "function";["description"] = "\
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["fname"] = "setSoftQuota";["realm"] = "sh";["name"] = "SF.DefaultEnvironment.setSoftQuota";["summary"] = "\
-Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["private"] = false;["library"] = "builtin";["param"] = {[1] = "quota";["quota"] = "The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%";};};};["client"] = true;["server"] = true;};["physenv"] = {["tables"] = {};["functions"] = {[1] = "getAirDensity";[2] = "getGravity";[3] = "getPerformanceSettings";["getAirDensity"] = {["ret"] = "number Air Density";["class"] = "function";["description"] = "\
+Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["private"] = false;["library"] = "builtin";["param"] = {[1] = "quota";["quota"] = "The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%";};};};["client"] = true;["server"] = true;};["physenv"] = {["functions"] = {[1] = "getAirDensity";[2] = "getGravity";[3] = "getPerformanceSettings";["getAirDensity"] = {["ret"] = "number Air Density";["class"] = "function";["description"] = "\
 Gets the air density.";["fname"] = "getAirDensity";["realm"] = "sh";["name"] = "physenv_lib.getAirDensity";["summary"] = "\
 Gets the air density.";["private"] = false;["library"] = "physenv";["param"] = {};};["getPerformanceSettings"] = {["ret"] = "table Performance Settings Table.";["class"] = "function";["description"] = "\
 Gets the performance settings.</br> \
@@ -742,9 +742,9 @@ See <a href=\"http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettin
 Gets the performance settings.</br> \
 See <a href=\"http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettings\">PhysEnvPerformance Settings Table Structure</a> for table structure.";["private"] = false;["library"] = "physenv";["param"] = {};};["getGravity"] = {["ret"] = "Vector Gravity Vector ( eg Vector(0,0,-600) )";["class"] = "function";["description"] = "\
 Gets the gravity vector";["fname"] = "getGravity";["realm"] = "sh";["name"] = "physenv_lib.getGravity";["summary"] = "\
-Gets the gravity vector ";["private"] = false;["library"] = "physenv";["param"] = {};};};["description"] = "\
-Physenv functions";["class"] = "library";["summary"] = "\
-Physenv functions ";["fields"] = {};["name"] = "physenv";["client"] = true;["libtbl"] = "physenv_lib";["server"] = true;};["hook"] = {["tables"] = {};["functions"] = {[1] = "add";[2] = "remove";[3] = "run";[4] = "runRemote";["remove"] = {["description"] = "\
+Gets the gravity vector ";["private"] = false;["library"] = "physenv";["param"] = {};};};["tables"] = {};["class"] = "library";["description"] = "\
+Physenv functions";["summary"] = "\
+Physenv functions ";["fields"] = {};["name"] = "physenv";["client"] = true;["libtbl"] = "physenv_lib";["server"] = true;};["hook"] = {["functions"] = {[1] = "add";[2] = "remove";[3] = "run";[4] = "runRemote";["remove"] = {["description"] = "\
 Remove a hook";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Remove a hook ";["fname"] = "remove";["library"] = "hook";["name"] = "hook_library.remove";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "hookname";[2] = "name";["name"] = "The unique name for this hook";["hookname"] = "The hook name";};};["runRemote"] = {["ret"] = "tbl A list of the resultset of each called hook";["description"] = "\
 Run a hook remotely. \
@@ -753,9 +753,9 @@ Run a hook remotely.";["fname"] = "runRemote";["library"] = "hook";["name"] = "h
 Run a hook";["class"] = "function";["realm"] = "sh";["summary"] = "\
 Run a hook ";["fname"] = "run";["library"] = "hook";["name"] = "hook_library.run";["server"] = true;["private"] = false;["client"] = true;["param"] = {[1] = "hookname";[2] = "...";["..."] = "arguments";["hookname"] = "The hook name";};};["add"] = {["class"] = "function";["description"] = "\
 Sets a hook function";["fname"] = "add";["realm"] = "sh";["name"] = "hook_library.add";["summary"] = "\
-Sets a hook function ";["private"] = false;["library"] = "hook";["param"] = {[1] = "hookname";[2] = "name";[3] = "func";["func"] = "Function to run";["name"] = "Unique identifier";["hookname"] = "Name of the event";};};};["description"] = "\
-Deals with hooks";["class"] = "library";["summary"] = "\
-Deals with hooks ";["fields"] = {};["name"] = "hook";["client"] = true;["libtbl"] = "hook_library";["server"] = true;};["find"] = {["tables"] = {};["functions"] = {[1] = "all";[2] = "allPlayers";[3] = "byClass";[4] = "byModel";[5] = "inBox";[6] = "inCone";[7] = "inSphere";["inBox"] = {["ret"] = "An array of found entities";["class"] = "function";["description"] = "\
+Sets a hook function ";["private"] = false;["library"] = "hook";["param"] = {[1] = "hookname";[2] = "name";[3] = "func";["func"] = "Function to run";["name"] = "Unique identifier";["hookname"] = "Name of the event";};};};["tables"] = {};["class"] = "library";["description"] = "\
+Deals with hooks";["summary"] = "\
+Deals with hooks ";["fields"] = {};["name"] = "hook";["client"] = true;["libtbl"] = "hook_library";["server"] = true;};["find"] = {["functions"] = {[1] = "all";[2] = "allPlayers";[3] = "byClass";[4] = "byModel";[5] = "inBox";[6] = "inCone";[7] = "inSphere";["inBox"] = {["ret"] = "An array of found entities";["class"] = "function";["description"] = "\
 Finds entities in a box";["fname"] = "inBox";["realm"] = "sh";["name"] = "find_library.inBox";["summary"] = "\
 Finds entities in a box ";["private"] = false;["library"] = "find";["param"] = {[1] = "min";[2] = "max";[3] = "filter";["min"] = "Bottom corner";["max"] = "Top corner";["filter"] = "Optional function to filter results";};};["inSphere"] = {["ret"] = "An array of found entities";["class"] = "function";["description"] = "\
 Finds entities in a sphere";["fname"] = "inSphere";["realm"] = "sh";["name"] = "find_library.inSphere";["summary"] = "\
@@ -769,8 +769,8 @@ Finds all entitites ";["private"] = false;["library"] = "find";["param"] = {[1] 
 Finds entities by model";["fname"] = "byModel";["realm"] = "sh";["name"] = "find_library.byModel";["summary"] = "\
 Finds entities by model ";["private"] = false;["library"] = "find";["param"] = {[1] = "model";[2] = "filter";["filter"] = "Optional function to filter results";["model"] = "The model file";};};["inCone"] = {["ret"] = "An array of found entities";["class"] = "function";["description"] = "\
 Finds entities in a cone";["fname"] = "inCone";["realm"] = "sh";["name"] = "find_library.inCone";["summary"] = "\
-Finds entities in a cone ";["private"] = false;["library"] = "find";["param"] = {[1] = "pos";[2] = "dir";[3] = "distance";[4] = "radius";[5] = "filter";["filter"] = "Optional function to filter results";["radius"] = "The angle of the cone";["dir"] = "The direction to project the cone";["distance"] = "The length to project the cone";["pos"] = "The cone vertex position";};};};["description"] = "\
-Find library. Finds entities in various shapes.";["class"] = "library";["summary"] = "\
+Finds entities in a cone ";["private"] = false;["library"] = "find";["param"] = {[1] = "pos";[2] = "dir";[3] = "distance";[4] = "radius";[5] = "filter";["filter"] = "Optional function to filter results";["radius"] = "The angle of the cone";["dir"] = "The direction to project the cone";["distance"] = "The length to project the cone";["pos"] = "The cone vertex position";};};};["tables"] = {};["class"] = "library";["description"] = "\
+Find library. Finds entities in various shapes.";["summary"] = "\
 Find library.";["fields"] = {};["name"] = "find";["client"] = true;["libtbl"] = "find_library";["server"] = true;};["coroutine"] = {["tables"] = {};["functions"] = {[1] = "create";[2] = "resume";[3] = "running";[4] = "status";[5] = "wait";[6] = "wrap";[7] = "yield";["resume"] = {["ret"] = "Any values the coroutine is returning to the main thread";["class"] = "function";["description"] = "\
 Resumes a suspended coroutine. Note that, in contrast to Lua's native coroutine.resume function, it will not run in protected mode and can throw an error.";["fname"] = "resume";["realm"] = "sh";["name"] = "coroutine_library.resume";["summary"] = "\
 Resumes a suspended coroutine.";["private"] = false;["library"] = "coroutine";["param"] = {[1] = "thread";[2] = "...";["..."] = "optional parameters that will be passed to the coroutine";["thread"] = "coroutine to resume";};};["yield"] = {["ret"] = "Any values passed to the coroutine";["class"] = "function";["description"] = "\
@@ -807,7 +807,7 @@ Gets whether the shift key is down ";["private"] = false;["library"] = "input";[
 Gets whether a key is down";["fname"] = "isKeyDown";["realm"] = "sh";["name"] = "input_methods.isKeyDown";["summary"] = "\
 Gets whether a key is down ";["private"] = false;["library"] = "input";["param"] = {[1] = "key";["key"] = "The key id, see input";};};["isControlDown"] = {["ret"] = "True if the control key is down";["class"] = "function";["description"] = "\
 Gets whether the control key is down";["fname"] = "isControlDown";["realm"] = "sh";["name"] = "input_methods.isControlDown";["summary"] = "\
-Gets whether the control key is down ";["private"] = false;["library"] = "input";["param"] = {};};};["tables"] = {};["class"] = "library";["description"] = "\
+Gets whether the control key is down ";["private"] = false;["library"] = "input";["param"] = {};};};["class"] = "library";["tables"] = {};["description"] = "\
 Input library.";["summary"] = "\
 Input library.";["fields"] = {};["name"] = "input";["client"] = true;["libtbl"] = "input_methods";};["file"] = {["functions"] = {[1] = "append";[2] = "createDir";[3] = "delete";[4] = "exists";[5] = "find";[6] = "open";[7] = "read";[8] = "write";["delete"] = {["ret"] = "True if successful, nil if error";["class"] = "function";["description"] = "\
 Deletes a file";["fname"] = "delete";["realm"] = "cl";["name"] = "file_library.delete";["summary"] = "\
@@ -853,9 +853,9 @@ Sets the length of a rope attached to the entity ";["name"] = "constraint_librar
 Ballsocket two entities";["class"] = "function";["realm"] = "sv";["fname"] = "ballsocket";["summary"] = "\
 Ballsocket two entities ";["name"] = "constraint_library.ballsocket";["library"] = "constraint";["private"] = false;["server"] = true;["param"] = {[1] = "e1";[2] = "e2";[3] = "bone1";[4] = "bone2";[5] = "v1";[6] = "force_lim";[7] = "torque_lim";[8] = "nocollide";};};["slider"] = {["description"] = "\
 Sliders two entities";["class"] = "function";["realm"] = "sv";["fname"] = "slider";["summary"] = "\
-Sliders two entities ";["name"] = "constraint_library.slider";["library"] = "constraint";["private"] = false;["server"] = true;["param"] = {[1] = "e1";[2] = "e2";[3] = "bone1";[4] = "bone2";[5] = "v1";[6] = "v2";[7] = "width";};};};["tables"] = {};["class"] = "library";["description"] = "\
+Sliders two entities ";["name"] = "constraint_library.slider";["library"] = "constraint";["private"] = false;["server"] = true;["param"] = {[1] = "e1";[2] = "e2";[3] = "bone1";[4] = "bone2";[5] = "v1";[6] = "v2";[7] = "width";};};};["class"] = "library";["tables"] = {};["description"] = "\
 Library for creating and manipulating constraints.";["summary"] = "\
-Library for creating and manipulating constraints.";["fields"] = {};["name"] = "constraint";["libtbl"] = "constraint_library";["server"] = true;};["http"] = {["tables"] = {};["functions"] = {[1] = "base64Encode";[2] = "canRequest";[3] = "get";[4] = "post";["post"] = {["class"] = "function";["description"] = "\
+Library for creating and manipulating constraints.";["fields"] = {};["name"] = "constraint";["libtbl"] = "constraint_library";["server"] = true;};["http"] = {["functions"] = {[1] = "base64Encode";[2] = "canRequest";[3] = "get";[4] = "post";["post"] = {["class"] = "function";["description"] = "\
 Runs a new http POST request";["fname"] = "post";["realm"] = "sh";["name"] = "http_library.post";["summary"] = "\
 Runs a new http POST request ";["private"] = false;["library"] = "http";["param"] = {[1] = "url";[2] = "params";[3] = "callbackSuccess";[4] = "callbackFail";[5] = "headers";["url"] = "http target url";["headers"] = "POST headers to be sent";["callbackFail"] = "the function to be called on request fail, taking the failing reason as an argument";["callbackSuccess"] = "the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)";["params"] = "POST parameters to be sent";};};["base64Encode"] = {["ret"] = "The converted data";["class"] = "function";["description"] = "\
 Converts data into base64 format or nil if the string is 0 length";["fname"] = "base64Encode";["realm"] = "sh";["name"] = "http_library.base64Encode";["summary"] = "\
@@ -863,8 +863,8 @@ Converts data into base64 format or nil if the string is 0 length ";["private"] 
 Checks if a new http request can be started";["fname"] = "canRequest";["realm"] = "sh";["name"] = "http_library.canRequest";["summary"] = "\
 Checks if a new http request can be started ";["private"] = false;["library"] = "http";["param"] = {};};["get"] = {["class"] = "function";["description"] = "\
 Runs a new http GET request";["fname"] = "get";["realm"] = "sh";["name"] = "http_library.get";["summary"] = "\
-Runs a new http GET request ";["private"] = false;["library"] = "http";["param"] = {[1] = "url";[2] = "callbackSuccess";[3] = "callbackFail";[4] = "headers";["url"] = "http target url";["callbackFail"] = "the function to be called on request fail, taking the failing reason as an argument";["callbackSuccess"] = "the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)";["headers"] = "GET headers to be sent";};};};["description"] = "\
-Http library. Requests content from urls.";["class"] = "library";["summary"] = "\
+Runs a new http GET request ";["private"] = false;["library"] = "http";["param"] = {[1] = "url";[2] = "callbackSuccess";[3] = "callbackFail";[4] = "headers";["url"] = "http target url";["callbackFail"] = "the function to be called on request fail, taking the failing reason as an argument";["callbackSuccess"] = "the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)";["headers"] = "GET headers to be sent";};};};["tables"] = {};["class"] = "library";["description"] = "\
+Http library. Requests content from urls.";["summary"] = "\
 Http library.";["fields"] = {};["name"] = "http";["client"] = true;["libtbl"] = "http_library";["server"] = true;};};["classes"] = {[1] = "Angle";[2] = "Bass";[3] = "Color";[4] = "Entity";[5] = "File";[6] = "Hologram";[7] = "Mesh";[8] = "Npc";[9] = "Particle";[10] = "PhysObj";[11] = "Player";[12] = "Quaternion";[13] = "Sound";[14] = "VMatrix";[15] = "Vector";[16] = "Vehicle";[17] = "Weapon";[18] = "Wirelink";["Quaternion"] = {["typtbl"] = "quat_methods";["class"] = "class";["fields"] = {};["name"] = "Quaternion";["summary"] = "\
 Quaternion type ";["description"] = "\
 Quaternion type";["methods"] = {[1] = "conj";[2] = "forward";[3] = "i";[4] = "j";[5] = "k";[6] = "r";[7] = "real";[8] = "right";[9] = "up";["conj"] = {["class"] = "function";["description"] = "\
