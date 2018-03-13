@@ -15,22 +15,37 @@ function TabHandler:registerSettings() -- Setting panels should be registered th
 
 end
 
+local function htmlSetup(old, new)
+	if old then
+		if IsValid(new.html) then
+			new.html:Remove()
+		end
+		new.html = old.html
+	end
+	local html = new.html
+
+
+	html:SetParent(new)
+	html:AddFunction( "sf", "updateTitle", function( str )
+		new._title = str
+	end )
+	html.OnDocumentReady = function(_, url )
+		new.url = url
+		html:RunJavascript( "sf.updateTitle( document.title );" )
+		new:UpdateTitle(new._title)
+	end
+
+end
+
 function TabHandler:registerTabMenu(menu, content)
 	menu:AddOption("Undock",function()
 		local helper = vgui.Create("StarfallFrame")
 		helper:SetSize(1280, 615)
 		helper:Center()
 		helper:SetTitle("SF Helper")
-		content.html:SetParent(helper)
-		helper.html = content.html
+		helper.UpdateTitle = helper.SetTitle
+		htmlSetup(content,helper)
 
-		helper.html:AddFunction( "sf", "updateTitle", function( str )
-			helper:SetTitle(str)
-		end )
-		helper.html.OnDocumentReady = function(_, url )
-			helper.url = url
-			helper.html:RunJavascript( "sf.updateTitle( document.title );" )
-		end
 		local _mpressed = helper.OnMousePressed
 		helper.OnMousePressed = function(pnl, keycode, ...)
 			if keycode == MOUSE_RIGHT then
@@ -40,17 +55,7 @@ function TabHandler:registerTabMenu(menu, content)
 					local sheet = editor:CreateTab("","helper")
 					local content = sheet.Tab.content
 					editor:SetActiveTab(sheet.Tab)
-					content.html:Remove()
-					content.html = helper.html
-					content.html:SetParent(content)
-					content.html:AddFunction( "sf", "updateTitle", function( str )
-						content.title = str
-					end )
-					content.html.OnDocumentReady = function(self, url )
-						content.url = url
-						html:RunJavascript( "sf.updateTitle( document.title );" )
-						content:UpdateTitle(content.title)
-					end
+					htmlSetup(helper, content)
 					helper:Remove()
 				end)
 				menu:AddOption("Close",function() helper:Remove() end)
@@ -81,15 +86,8 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
 	html:OpenURL("http://thegrb93.github.io/StarfallEx/libraries/bass.html")
-	html:AddFunction( "sf", "updateTitle", function( str )
-		self.title = str
-	end )
-	html.OnDocumentReady = function(_, url )
-		self.url = url
-		html:RunJavascript( "sf.updateTitle( document.title );" )
-		self:UpdateTitle(self.title)
-	end
 	self.html = html
+	htmlSetup(nil, self)
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor
