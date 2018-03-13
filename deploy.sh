@@ -6,8 +6,7 @@ TARGET_BRANCH="gh-pages"
 
 git config user.name "$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
 git config user.email "$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
-git config –local core.autocrlf false
-git config -local core.eol crlf
+
 # Save some useful information
 REPO=`git config remote.origin.url`
 SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
