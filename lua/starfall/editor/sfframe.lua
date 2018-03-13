@@ -1319,7 +1319,7 @@ function Editor:OpenOldTabs()
 	if not file.Exists("sf_tabs.txt", "DATA") then 	self.TabsLoaded = true; return end
 
 	local tabs = util.JSONToTable(file.Read("sf_tabs.txt") or "")
-	if not tabs or #tabs == 0 then TabsLoaded = true; return end
+	if not tabs or #tabs == 0 then self.TabsLoaded = true; return end
 
 	-- Temporarily remove fade time
 	self:FixTabFadeTime()
