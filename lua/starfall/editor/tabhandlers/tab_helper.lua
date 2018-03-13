@@ -30,6 +30,7 @@ local function htmlSetup(old, new)
 		new._title = str or "  "
 	end )
 	html.OnDocumentReady = function(_, url )
+		if not IsValid(new) then return end
 		new.url = url
 		html:RunJavascript( "sf.updateTitle( document.title );" )
 		timer.Simple(0,function() -- Wait for title
@@ -38,6 +39,7 @@ local function htmlSetup(old, new)
 	end
 	html:RunJavascript( "sf.updateTitle( document.title );" )
 	timer.Simple(0,function() -- Wait for title
+		if not IsValid(new) then return end
 		new:UpdateTitle(new._title  or "SF Helper")
 	end)
 end
