@@ -17,7 +17,7 @@ end
 
 function TabHandler:registerTabMenu(menu, content)
 	menu:AddOption("Undock",function()
-		helper = vgui.Create("StarfallFrame")
+		local helper = vgui.Create("StarfallFrame")
 		helper:SetSize(1280, 615)
 		helper:Center()
 		helper:SetTitle("SF Helper")
