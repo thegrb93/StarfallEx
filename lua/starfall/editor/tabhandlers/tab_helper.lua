@@ -43,11 +43,12 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html.OnDocumentReady = function(_, url )
 		self.url = url
 		html:RunJavascript( "sf.updateTitle( document.title );" )
+		self:UpdateTitle(self.title)
 	end
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor
-	return "@name "..self.title
+	return "@name "..(self.title or "StarfallEx Reference")
 end
 
 function PANEL:setCode()

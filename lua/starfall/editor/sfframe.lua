@@ -358,11 +358,11 @@ function Editor:GetActiveTab() return self.C.TabHolder:GetActiveTab() end
 
 function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 
-function Editor:UpdateTabText(tab)
+function Editor:UpdateTabText(tab, title)
 	-- Editor subtitle and tab text
 	local ed = tab.content
-	local title, tabtext = getPreferredTitles(ed.chosenfile, ed:getCode())
-
+	local title, text = getPreferredTitles(ed.chosenfile, ed:getCode())
+	tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
 	if not ed:isSaved() then
@@ -448,6 +448,10 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
 		end
 	end
+	content.UpdateTitle = function(_, text)
+		return self:UpdateTabText(sheet.Tab, text)
+	end
+
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
 
 		if keycode == MOUSE_MIDDLE then
@@ -1600,7 +1604,8 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 		else
 			SF.Helper.show()
 		end]]
-		self:CreateTab("", "helper")
+		local sheet = self:CreateTab("", "helper")
+		self:SetActiveTab(sheet.Tab)
 	end
 	self.C.SFHelp = SFHelp
 
