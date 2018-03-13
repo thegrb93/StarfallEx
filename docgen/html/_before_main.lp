@@ -69,15 +69,6 @@ end
 						<li><a href="<?lua=docletsfhtml.directive_link(name, doc, from)?>">--@<?lua=name?></a></li><?lua end?>
 					</ul>
 				</section>
-				<section>
-					<h1>Examples</h1>
-					<ul>
-						<?lua 
-						for _, name in ipairs(doc.examples) do
-							local link = not example_doc or example_doc.name ~= name?>
-						<li><a<?lua if link then?> href="<?lua=docletsfhtml.example_link(name, doc, from)?>"<?lua end?>><?lua=name?></a></li><?lua end?>
-					</ul>
-				</section>
 			</section>
 			<section id="search_index" style="display: none;">
 				<section>
