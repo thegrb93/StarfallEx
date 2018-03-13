@@ -95,8 +95,8 @@ Called before drawing HUD (2D Context)";["class"] = "hook";["summary"] = "\
 Called before drawing HUD (2D Context) ";["classForced"] = true;["name"] = "predrawhud";["realm"] = "cl";["client"] = true;["param"] = {};};["PlayerEnteredVehicle"] = {["description"] = "\
 Called when a players enters a vehicle";["class"] = "hook";["summary"] = "\
 Called when a players enters a vehicle ";["classForced"] = true;["name"] = "PlayerEnteredVehicle";["realm"] = "sh";["server"] = true;["param"] = {[1] = "ply";[2] = "vehicle";[3] = "num";["num"] = "Role";["ply"] = "Player who entered a vehicle";["vehicle"] = "Vehicle that was entered";};};["PlayerSay"] = {["ret"] = "New text. \"\" to stop from displaying. Nil to keep original.";["description"] = "\
-Called when a player sends a chat message";["class"] = "hook";["classForced"] = true;["summary"] = "\
-Called when a player sends a chat message ";["name"] = "PlayerSay";["realm"] = "sh";["server"] = true;["param"] = {[1] = "ply";[2] = "text";[3] = "teamChat";["text"] = "Content of the message";["ply"] = "Player that sent the message";["teamChat"] = "True if team chat";};};["drawhud"] = {["description"] = "\
+Called when a player sends a chat message";["class"] = "hook";["summary"] = "\
+Called when a player sends a chat message ";["classForced"] = true;["name"] = "PlayerSay";["realm"] = "sh";["server"] = true;["param"] = {[1] = "ply";[2] = "text";[3] = "teamChat";["text"] = "Content of the message";["ply"] = "Player that sent the message";["teamChat"] = "True if team chat";};};["drawhud"] = {["description"] = "\
 Called when a frame is requested to be drawn on hud. (2D Context)";["class"] = "hook";["summary"] = "\
 Called when a frame is requested to be drawn on hud.";["classForced"] = true;["name"] = "drawhud";["realm"] = "cl";["client"] = true;["param"] = {};};["postdrawopaquerenderables"] = {["description"] = "\
 Called after opaque entities are drawn. (Only works with HUD) (3D context)";["class"] = "hook";["summary"] = "\
