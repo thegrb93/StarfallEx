@@ -18,6 +18,7 @@ AddCSLuaFile("xml.lua")
 
 AddCSLuaFile("tabhandlers/tab_wire.lua")
 AddCSLuaFile("tabhandlers/tab_ace.lua")
+AddCSLuaFile("tabhandlers/tab_helper.lua")
 
 ------------------
 -- Tab Handlers
@@ -28,7 +29,8 @@ if CLIENT then
 	SF.Editor.TabHandlers = { }
 	SF.Editor.TabHandlers.wire = include("tabhandlers/tab_wire.lua")
 	SF.Editor.TabHandlers.ace = include("tabhandlers/tab_ace.lua")
-
+	SF.Editor.TabHandlers.helper = include("tabhandlers/tab_helper.lua")
+	
 	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tabeditor", "ace", true, false)
 
 end

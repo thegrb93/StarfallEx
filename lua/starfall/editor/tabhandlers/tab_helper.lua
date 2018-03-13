@@ -30,11 +30,24 @@ end
 -------------
 
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
-
+	local html = vgui.Create("DHTML", self)
+	html:Dock(FILL)
+	html:DockMargin(0, 0, 0, 0)
+	html:DockPadding(0, 0, 0, 0)
+	html:SetKeyboardInputEnabled(true)
+	html:SetMouseInputEnabled(true)
+	html:OpenURL("http://thegrb93.github.io/StarfallEx/libraries/bass.html")
+	html:AddFunction( "sf", "updateTitle", function( str )
+		self.title = str
+	end )
+	html.OnDocumentReady = function(_, url )
+		self.url = url
+		html:RunJavascript( "sf.updateTitle( document.title );" )
+	end
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor
-	return "[SFHelper]"
+	return "@name "..self.title
 end
 
 function PANEL:setCode()
