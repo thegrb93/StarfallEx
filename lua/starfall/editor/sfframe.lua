@@ -19,6 +19,8 @@ Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", tr
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
+Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
+Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
 cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
@@ -361,7 +363,7 @@ function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 function Editor:UpdateTabText(tab, title)
 	-- Editor subtitle and tab text
 	local ed = tab.content
-	local title, text = getPreferredTitles(ed.chosenfile, ed:getCode())
+	local _, text = getPreferredTitles(ed.chosenfile, ed:getCode())
 	tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
@@ -1046,6 +1048,19 @@ function Editor:InitControlPanel()
 	ShowExamples:SizeToContents()
 	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
 
+	local LegacyHelper = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(LegacyHelper)
+	LegacyHelper:SetConVar("sf_helper_legacy")
+	LegacyHelper:SetText("Use legacy helper")
+	LegacyHelper:SizeToContents()
+
+	local UndockHelper = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(UndockHelper)
+	UndockHelper:SetConVar("sf_helper_startundocked")
+	UndockHelper:SetText("Undock helper on open")
+	UndockHelper:SizeToContents()
+
+
 	------ Permissions panel
 	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
 	local perms = SF.Editor.createpermissionsPanel ()
@@ -1601,13 +1616,19 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
---[[		if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
-			SF.Helper.Frame:Close()
+		if Editor.UseLegacyHelper:GetBool() then
+			if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
+				SF.Helper.Frame:Close()
+			else
+				SF.Helper.show()
+			end
 		else
-			SF.Helper.show()
-		end]]
-		local sheet = self:CreateTab("", "helper")
-		self:SetActiveTab(sheet.Tab)
+			local sheet = self:CreateTab("", "helper")
+			self:SetActiveTab(sheet.Tab)
+			if Editor.StartHelperUndocked:GetBool() then
+				sheet.Tab.content:Undock()
+			end
+		end
 	end
 	self.C.SFHelp = SFHelp
 

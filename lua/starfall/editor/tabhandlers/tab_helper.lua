@@ -27,47 +27,26 @@ local function htmlSetup(old, new)
 
 	html:SetParent(new)
 	html:AddFunction( "sf", "updateTitle", function( str )
-		new._title = str
+		new._title = str or "  "
 	end )
 	html.OnDocumentReady = function(_, url )
 		new.url = url
 		html:RunJavascript( "sf.updateTitle( document.title );" )
-		new:UpdateTitle(new._title)
+		timer.Simple(0,function() -- Wait for title
+			new:UpdateTitle(new._title or "SF Helper")
+		end)
 	end
-
+	html:RunJavascript( "sf.updateTitle( document.title );" )
+	timer.Simple(0,function() -- Wait for title
+		new:UpdateTitle(new._title  or "SF Helper")
+	end)
 end
 
 function TabHandler:registerTabMenu(menu, content)
 	menu:AddOption("Undock",function()
-		local helper = vgui.Create("StarfallFrame")
-		helper:SetSize(1280, 615)
-		helper:Center()
-		helper:SetTitle("SF Helper")
-		helper.UpdateTitle = helper.SetTitle
-		htmlSetup(content,helper)
-
-		local _mpressed = helper.OnMousePressed
-		helper.OnMousePressed = function(pnl, keycode, ...)
-			if keycode == MOUSE_RIGHT then
-				local menu = DermaMenu()
-				menu:AddOption("Dock",function()
-					local editor = SF.Editor.editor
-					local sheet = editor:CreateTab("","helper")
-					local content = sheet.Tab.content
-					editor:SetActiveTab(sheet.Tab)
-					htmlSetup(helper, content)
-					helper:Remove()
-				end)
-				menu:AddOption("Close",function() helper:Remove() end)
-				menu:Open()
-			end
-			_mpressed(pnl, keycode, ...)
-		end
 
 
-
-		content:CloseTab()
-		helper:Open()
+		content:Undock()
 	end)
 end
 
@@ -88,6 +67,35 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:OpenURL("http://thegrb93.github.io/StarfallEx/libraries/bass.html")
 	self.html = html
 	htmlSetup(nil, self)
+end
+
+function PANEL:Undock()
+	local helper = vgui.Create("StarfallFrame")
+	helper:SetSize(1280, 615)
+	helper:Center()
+	helper:SetTitle("SF Helper")
+	helper.UpdateTitle = helper.SetTitle
+	htmlSetup(self,helper)
+
+	local _mpressed = helper.OnMousePressed
+	helper.OnMousePressed = function(pnl, keycode, ...)
+		if keycode == MOUSE_RIGHT then
+			local menu = DermaMenu()
+			menu:AddOption("Dock",function()
+				local editor = SF.Editor.editor
+				local sheet = editor:CreateTab("","helper")
+				local content = sheet.Tab.content
+				editor:SetActiveTab(sheet.Tab)
+				htmlSetup(helper, content)
+				helper:Remove()
+			end)
+			menu:AddOption("Close",function() helper:Remove() end)
+			menu:Open()
+		end
+		_mpressed(pnl, keycode, ...)
+	end
+	helper:Open()
+	self:CloseTab()
 end
 
 function PANEL:getCode() -- Return name of hanlder or code if it's editor
