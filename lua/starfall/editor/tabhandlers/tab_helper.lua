@@ -9,7 +9,6 @@ local PANEL = {} -- It's our VGUI
 -------------------------------
 
 function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
-	self.helpers = {}
 end
 
 function TabHandler:registerSettings() -- Setting panels should be registered there
@@ -19,27 +18,61 @@ end
 function TabHandler:registerTabMenu(menu, content)
 	menu:AddOption("Undock",function()
 		helper = vgui.Create("StarfallFrame")
-		helper:SetSize(930, 615)
+		helper:SetSize(1280, 615)
 		helper:Center()
 		helper:SetTitle("SF Helper")
 		content.html:SetParent(helper)
-		helper:Open()
-		table.insert(self.helpers,helper)
+		helper.html = content.html
+
+		helper.html:AddFunction( "sf", "updateTitle", function( str )
+			helper:SetTitle(str)
+		end )
+		helper.html.OnDocumentReady = function(_, url )
+			helper.url = url
+			helper.html:RunJavascript( "sf.updateTitle( document.title );" )
+		end
+		local _mpressed = helper.OnMousePressed
+		helper.OnMousePressed = function(pnl, keycode, ...)
+			if keycode == MOUSE_RIGHT then
+				local menu = DermaMenu()
+				menu:AddOption("Dock",function()
+					local editor = SF.Editor.editor
+					local sheet = editor:CreateTab("","helper")
+					local content = sheet.Tab.content
+					editor:SetActiveTab(sheet.Tab)
+					content.html:Remove()
+					content.html = helper.html
+					content.html:SetParent(content)
+					content.html:AddFunction( "sf", "updateTitle", function( str )
+						content.title = str
+					end )
+					content.html.OnDocumentReady = function(self, url )
+						content.url = url
+						html:RunJavascript( "sf.updateTitle( document.title );" )
+						content:UpdateTitle(content.title)
+					end
+					helper:Remove()
+				end)
+				menu:AddOption("Close",function() helper:Remove() end)
+				menu:Open()
+			end
+			_mpressed(pnl, keycode, ...)
+		end
+
+
+
 		content:CloseTab()
+		helper:Open()
 	end)
 end
 
 function TabHandler:cleanup() -- Called when editor is reloaded/removed
-	for k,v in pairs(helpers) do
-		v:Remove()
-	end
 end
 
 
 -----------------------
 -- VGUI part (content)
 -----------------------
-
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
 	local html = vgui.Create("DHTML", self)
 	html:Dock(FILL)

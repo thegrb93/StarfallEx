@@ -84,7 +84,7 @@ function PANEL:Init ()
 	self.TitleBar:DockMargin(0, 0, 0, 2)
 	self.TitleBar:SetCursor("sizeall")
 	self.TitleBar.Paint = self.PaintTitle
-	self.TitleBar.OnMousePressed = function(...) self:OnMousePressed(...) end
+	self.TitleBar.OnMousePressed = function(_,...) self:OnMousePressed(...) end
 
 	self.CloseButton = vgui.Create("StarfallButton", self.TitleBar)
 	self.CloseButton:SetText("Close")
