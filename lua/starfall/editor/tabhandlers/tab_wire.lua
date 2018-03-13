@@ -130,13 +130,13 @@ function TabHandler:init()
 	self:LoadSyntaxColors()
 end
 
-function TabHandler:registerTabMenu(menu, editor)
+function TabHandler:registerTabMenu(menu, content)
 	local coloring = menu:AddSubMenu("Coloring")
 	for k,v in pairs(TabHandler.Modes) do
 		local mode = v
 		coloring:AddOption(k, function() 
-			editor.CurrentMode = mode 
-			editor.PaintRows = {}
+			content.CurrentMode = mode 
+			content.PaintRows = {}
 		end)
 	end
 end
