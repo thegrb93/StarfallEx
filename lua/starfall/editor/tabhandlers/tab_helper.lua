@@ -26,22 +26,16 @@ local function htmlSetup(old, new)
 
 
 	html:SetParent(new)
-	html:AddFunction( "sf", "updateTitle", function( str )
-		new._title = str or "  "
-	end )
+	html.OnChangeTitle = function(_,title)
+		if not IsValid(new) then return end
+		new:UpdateTitle(title or "SF Helper")
+	end
+
 	html.OnDocumentReady = function(_, url )
 		if not IsValid(new) then return end
+		_.loaded = true
 		new.url = url
-		html:RunJavascript( "sf.updateTitle( document.title );" )
-		timer.Simple(0,function() -- Wait for title
-			new:UpdateTitle(new._title or "SF Helper")
-		end)
 	end
-	html:RunJavascript( "sf.updateTitle( document.title );" )
-	timer.Simple(0,function() -- Wait for title
-		if not IsValid(new) then return end
-		new:UpdateTitle(new._title  or "SF Helper")
-	end)
 end
 
 function TabHandler:registerTabMenu(menu, content)
@@ -66,7 +60,12 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:OpenURL("http://thegrb93.github.io/StarfallEx/libraries/bass.html")
+	html:OpenURL("http://thegrb93.github.io/StarfallEx/")
+	timer.Simple(3,function()
+		if not html.loaded then
+			SF.AddNotify(LocalPlayer(), "Your connection seems to be slow or offline, you may try using legacy helper(available from settings).", "GENERIC" , 10, "DRIP2")
+		end
+	end)
 	self.html = html
 	htmlSetup(nil, self)
 end
