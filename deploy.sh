@@ -6,7 +6,8 @@ TARGET_BRANCH="gh-pages"
 
 git config user.name "$(git log -1 $TRAVIS_COMMIT --pretty="%aN")"
 git config user.email "$(git log -1 $TRAVIS_COMMIT --pretty="%cE")"
-
+git config –local core.autocrlf false
+git config -local core.eol crlf
 # Save some useful information
 REPO=`git config remote.origin.url`
 SSH_REPO=${REPO/https:\/\/github.com\//git@github.com:}
@@ -47,7 +48,7 @@ cp -rf doc/* out/
 cd out
 
 # If there are no changes to docs then just skip
-if git diff --quiet; then
+if git diff --quiet --ignore-space-at-eol -b -w --ignore-blank-lines; then
     echo "No changes to the output on this push; Skipping."
 else
 	echo "Commiting"
@@ -85,7 +86,7 @@ fi
 
 #Add only docs.lua
 git add "lua/starfall/editor/docs.lua"
-if git diff --quiet --staged; then #checking if there is a diff for staged changes (so only doc)
+if git diff --quiet --staged --ignore-space-at-eol -b -w --ignore-blank-lines; then #checking if there is a diff for staged changes (so only doc)
     echo "No changes to docs.lua, skipping."
 else
 	echo "Commiting.."
