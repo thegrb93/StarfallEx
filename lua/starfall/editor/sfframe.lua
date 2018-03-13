@@ -1268,15 +1268,19 @@ end
 function Editor:SaveTabs()
 	if not self.TabsLoaded then return end
 	local tabs = {}
-	tabs.selectedTab = self:GetActiveTabIndex()
+	local activeTab = self:GetActiveTabIndex()
+	tabs.selectedTab = activeTab
 	for i = 1, self:GetNumTabs() do
 		if not self:GetTabContent(i):getTabHandler().IsEditor then
+			if tabs.selectedTab == i then
+				tabs.selectedTab = 1
+			end
 			continue
 		end
 		tabs[i] = {}
 		local filename = self:GetTabContent(i).chosenfile
 		local filedatapath = "sf_filedata/"
-		if filename then 
+		if filename then
 			if filename:sub(1, #filedatapath) == filedatapath then -- Temporary fix before we update sf_tabs.txt format
 				filename = nil
 			else
@@ -1286,6 +1290,7 @@ function Editor:SaveTabs()
 		tabs[i].filename = filename
 		tabs[i].code = self:GetTabContent(i):getCode()
 	end
+
 	file.Write("sf_tabs.txt", util.TableToJSON(tabs))
 end
 
