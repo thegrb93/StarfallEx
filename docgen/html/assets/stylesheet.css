@@ -108,7 +108,7 @@ nav {
 	top: 0;
 	overflow-y: scroll;
 	width: 300px;
-	height: 100vh;
+	height: 100%;
 	background-image: url(images/nav_bg.png);
 	background-size: cover;
 	background-color: #000510;
