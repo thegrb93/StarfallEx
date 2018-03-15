@@ -211,7 +211,7 @@ if CLIENT then
 
 		local filebrowser = vgui.Create("StarfallFileBrowser")
 		panel:AddPanel(filebrowser)
-		filebrowser.tree:setup("starfall")
+		filebrowser.tree:Setup("starfall")
 		filebrowser:SetSize(235, 400)
 		
 		local lastClick = 0

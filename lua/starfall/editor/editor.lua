@@ -196,13 +196,13 @@ if CLIENT then
 		SF.Editor.editor = editor
 
 		for k, v in pairs(SF.Editor.TabHandlers) do
-			if v.init then v:init() end
+			if v.Init then v:Init() end
 		end
 
 		editor:Setup("Starfall Editor", "starfall", "Starfall")
 
 		for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
-			if v.registerSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then v:registerSettings() end
+			if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then v:RegisterSettings() end
 		end
 
 	end
@@ -470,7 +470,7 @@ if CLIENT then
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
 		for k, v in pairs(SF.Editor.TabHandlers) do
-			if v.cleanup then v:cleanup() end
+			if v.Cleanup then v:Cleanup() end
 		end
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()

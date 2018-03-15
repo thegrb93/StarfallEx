@@ -123,14 +123,14 @@ local function createWireLibraryMap () -- Hashtable
 	return libMap
 end
 
-function TabHandler:init()
+function TabHandler:Init()
 	TabHandler.LibMap = createWireLibraryMap ()
 
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	self:LoadSyntaxColors()
 end
 
-function TabHandler:registerTabMenu(menu, content)
+function TabHandler:RegisterTabMenu(menu, content)
 	local coloring = menu:AddSubMenu("Coloring")
 	for k,v in pairs(TabHandler.Modes) do
 		local mode = v
@@ -141,7 +141,7 @@ function TabHandler:registerTabMenu(menu, content)
 	end
 end
 
-function TabHandler:registerSettings()
+function TabHandler:RegisterSettings()
 	local label
 	-- ------------------------------------------- Wire TAB
 	local sheet = SF.Editor.editor:AddControlPanelTab("Wire", "icon16/wrench.png", "Options for wire tabs.")
@@ -235,7 +235,7 @@ end
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar("wire_expression2_autocomplete_controlstyle", "0", true, false)
 
 local PANEL = {}
-function PANEL:onValidate(s, r, m, goto)
+function PANEL:OnValidate(s, r, m, goto)
 	if s or not goto then return end
 	self:SetCaret({ r, 0 })
 end
@@ -337,7 +337,6 @@ end
 local wire_expression2_editor_highlight_on_double_click = CreateClientConVar("wire_expression2_editor_highlight_on_double_click", "1", true, false)
 
 function PANEL:OpenContextMenu()
-	self:AC_SetVisible(false)
 	local menu = DermaMenu()
 
 	if self:CanUndo() then
@@ -514,7 +513,6 @@ function PANEL:OnMousePressed(code)
 		if not input.IsKeyDown(KEY_LSHIFT) and not input.IsKeyDown(KEY_RSHIFT) then
 			self.Start = self:CopyPosition(cursor)
 		end
-		self:AC_Check()
 	elseif code == MOUSE_RIGHT then
 		self:OpenContextMenu()
 	end
@@ -530,7 +528,7 @@ function PANEL:OnMouseReleased(code)
 	end
 end
 
-function PANEL:setCode(text)
+function PANEL:SetCode(text)
 	self.Rows = string_Explode("\n", text)
 	if self.Rows[#self.Rows] ~= "" then
 		self.Rows[#self.Rows + 1] = ""
@@ -542,12 +540,11 @@ function PANEL:setCode(text)
 	self.Undo = {}
 	self.Redo = {}
 	self.PaintRows = {}
-	self:AC_Reset()
 
 	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 end
 
-function PANEL:getCode()
+function PANEL:GetCode()
 	return string_gsub(table_concat(self.Rows, "\n"), "\r", "")
 end
 
@@ -726,7 +723,7 @@ function PANEL:PaintTextOverlay()
 		end
 
 		-- Bracket highlighting by: {Jeremydeath}
-		local WindowText = self:getCode()
+		local WindowText = self:GetCode()
 		local LinePos = table_concat(self.Rows, "\n", 1, self.Caret[1]-1):len()
 		local CaretPos = LinePos + self.Caret[2] + 1
 
@@ -815,7 +812,7 @@ function PANEL:PaintTextOverlay()
 	end
 end
 
-local wire_expression2_editor_display_caret_pos = CreateClientConVar("wire_expression2_editor_display_caret_pos", "0", true, false)
+local display_caret_pos = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 
 function PANEL:Paint()
 	self.LineNumberWidth = self.FontWidth * #tostring(self.Scroll[1] + self.Size[1] + 1)
@@ -850,8 +847,8 @@ function PANEL:Paint()
 	-- Paint the overlay of the text (bracket highlighting and carret postition)
 	self:PaintTextOverlay()
 
-	if wire_expression2_editor_display_caret_pos:GetBool() then
-		local str = "Length: " .. #self:getCode() .. " Lines: " .. #self.Rows .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
+	if display_caret_pos:GetBool() then
+		local str = "Length: " .. #self:GetCode() .. " Lines: " .. #self.Rows .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
 		end
@@ -1115,20 +1112,6 @@ function PANEL:_OnTextChanged()
 end
 
 function PANEL:OnMouseWheeled(delta)
-	if self.AC_Panel and self.AC_Panel:IsVisible() then
-		local mode = wire_expression2_autocomplete_controlstyle:GetInt()
-		if mode == 2 or mode == 3 then
-			self.AC_Panel.Selected = self.AC_Panel.Selected - delta
-			if self.AC_Panel.Selected > #self.AC_Suggestions then self.AC_Panel.Selected = 1 end
-			if self.AC_Panel.Selected < 1 then self.AC_Panel.Selected = #self.AC_Suggestions end
-			self:AC_FillInfoList(self.AC_Suggestions[self.AC_Panel.Selected])
-			self.AC_Panel:RequestFocus()
-			return
-		else
-			self:AC_SetVisible(false)
-		end
-	end
-
 	self.Scroll[1] = self.Scroll[1] - 4 * delta
 	if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
 	if self.Scroll[1] > #self.Rows then self.Scroll[1] = #self.Rows end
@@ -1196,7 +1179,7 @@ function PANEL:Find(str, looped)
 	local dir = wire_expression2_editor_find_dir:GetBool()
 
 	-- Check if the match exists anywhere at all
-	local temptext = self:getCode()
+	local temptext = self:GetCode()
 	if ignore_case then
 		temptext = temptext:lower()
 		str = str:lower()
@@ -1326,7 +1309,7 @@ function PANEL:ReplaceAll(str, replacewith)
 		replacewith = replacewith:gsub("%%", "%%%1")
 	end
 
-	local txt = self:getCode()
+	local txt = self:GetCode()
 
 	if ignore_case then
 		local txt2 = txt -- Store original cased copy
@@ -1378,7 +1361,7 @@ function PANEL:CountFinds(str)
 		str = str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1")
 	end
 
-	local txt = self:getCode()
+	local txt = self:GetCode()
 
 	if ignore_case then
 		txt = txt:lower()
@@ -1403,7 +1386,7 @@ end
 function PANEL:FindAllWords(str)
 	if str == "" then return end
 
-	local txt = self:getCode()
+	local txt = self:GetCode()
 	-- [^a-zA-Z0-9_] ensures we only find whole words, and the gsub escapes any regex command characters that happen to be in str
 	local pattern = "[^a-zA-Z0-9_]()" .. str:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1") .. "()[^a-zA-Z0-9_]"
 
@@ -1797,7 +1780,7 @@ function PANEL:SelectAll()
 	self:ScrollCaret()
 end
 
-function PANEL:pasteCode(code)
+function PANEL:PasteCode(code)
 	local tab_scroll = self:CopyPosition(self.Scroll)
 	local tab_start, tab_caret = self:MakeSelection(self:Selection())
 	self:SetSelection(code)
@@ -2074,25 +2057,9 @@ function PANEL:_OnKeyCodeTyped(code)
 			local tabs = string_rep("    ", math_floor(diff / 4))
 			self:SetSelection("\n" .. tabs)
 		elseif code == KEY_UP then
-			if self.AC_Panel and self.AC_Panel:IsVisible() then
-				local mode = wire_expression2_autocomplete_controlstyle:GetInt()
-				if mode == 1 then
-					self.AC_Panel:RequestFocus()
-					return
-				end
-			end
-
 			self.Caret[1] = self.Caret[1] - 1
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
-			if self.AC_Panel and self.AC_Panel:IsVisible() then
-				local mode = wire_expression2_autocomplete_controlstyle:GetInt()
-				if mode == 1 then
-					self.AC_Panel:RequestFocus()
-					return
-				end
-			end
-
 			self.Caret[1] = self.Caret[1] + 1
 			self:SetCaret(self.Caret)
 		elseif code == KEY_LEFT then
@@ -2157,15 +2124,6 @@ function PANEL:_OnKeyCodeTyped(code)
 		end
 	end
 
-	if code == KEY_TAB and self.AC_Panel and self.AC_Panel:IsVisible() then
-		local mode = wire_expression2_autocomplete_controlstyle:GetInt()
-		if mode == 0 or mode == 4 then
-			self.AC_Panel:RequestFocus()
-			if mode == 4 and self.AC_Panel.Selected == 0 then self.AC_Panel.Selected = 1 end
-			return true
-		end
-	end
-
 	if code == KEY_TAB or (control and (code == KEY_I or code == KEY_O)) then
 		if code == KEY_O then shift = not shift end
 		if code == KEY_TAB and control then shift = not shift end
@@ -2198,771 +2156,10 @@ function PANEL:_OnKeyCodeTyped(code)
 	end
 	SF.Editor.editor:Validate(false)
 
-	self:AC_Check()
 
 	return handled
 end
 
----------------------------------------------------------------------------------------------------------
--- Auto Completion
--- By Divran
----------------------------------------------------------------------------------------------------------
-
-function PANEL:IsVarLine()
-	local line = self.Rows[self.Caret[1]]
-	local word = line:match("^@(%w+)")
-	return (word == "inputs" or word == "outputs" or word == "persist")
-end
-
-function PANEL:IsDirectiveLine()
-	local line = self.Rows[self.Caret[1]]
-	return line:match("^@") ~= nil
-end
-
-function PANEL:getWordStart(caret, getword)
-	local line = self.Rows[caret[1]]
-
-	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
-		if startpos <= caret[2] and endpos >= caret[2] then
-			return { caret[1], startpos }, getword and line:sub(startpos, endpos-1) or nil
-		end
-	end
-	return { caret[1], 1 }
-end
-
-function PANEL:getWordEnd(caret, getword)
-	local line = self.Rows[caret[1]]
-
-	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
-		if startpos <= caret[2] and endpos >= caret[2] then
-			return { caret[1], endpos }, getword and line:sub(startpos, endpos-1) or nil
-		end
-	end
-	return { caret[1], #line + 1 }
-end
-
------------------------------------------------------------
--- GetCurrentWord
--- Gets the word the cursor is currently at, and the symbol in front
------------------------------------------------------------
-
-function PANEL:AC_GetCurrentWord()
-	local startpos, word = self:getWordStart(self.Caret, true)
-	local symbolinfront = self:GetArea({ { startpos[1], startpos[2] - 1 }, startpos })
-	return word, symbolinfront
-end
-
--- Thank you http://lua-users.org/lists/lua-l/2009-07/msg00461.html
--- Returns the minimum number of character changes required to make one of the words equal the other
--- Used to sort the suggestions in order of relevance
-local function CheckDifference(word1, word2)
-	local d, sn, tn = {}, #word1, #word2
-	local byte, min = string_byte, math_min
-	for i = 0, sn do d[i * tn] = i end
-	for j = 0, tn do d[j] = j end
-	for i = 1, sn do
-		local si = byte(word1, i)
-		for j = 1, tn do
-			d[i * tn + j] = min(d[(i-1) * tn + j] + 1, d[i * tn + j-1] + 1, d[(i-1) * tn + j-1] + (si == byte(word2, j) and 0 or 1))
-		end
-	end
-	return d[#d]
-end
-
------------------------------------------------------------
--- NewAutoCompletion
--- Sets the autocompletion table
------------------------------------------------------------
-
-function PANEL:AC_NewAutoCompletion(tbl)
-	self.AC_AutoCompletion = tbl
-end
-
-local tbl = {}
-
------------------------------------------------------------
--- FindConstants
--- Adds all matching constants to the suggestions table
------------------------------------------------------------
-
-local function GetTableForConstant(str)
-	return { nice_str = function(t) return t.data[1] end,
-		str = function(t) return t.data[1] end,
-		replacement = function(t) return t.data[1] end,
-		data = { str } }
-end
-
-local function FindConstants(self, word)
-	local len = #word
-	local wordu = word:upper()
-	local count = 0
-
-	local suggestions = {}
-
-	for name, value in pairs(wire_expression2_constants) do
-		if name:sub(1, len) == wordu then
-			count = count + 1
-			suggestions[count] = GetTableForConstant(name)
-		end
-	end
-
-	return suggestions
-end
-
-tbl[1] = function(self)
-	local word, symbolinfront = self:AC_GetCurrentWord()
-	if word and word ~= "" and word:sub(1, 1) == "_" then
-		return FindConstants(self, word)
-	end
-end
-
---------------------
--- FindFunctions
--- Adds all matching functions to the suggestions table
---------------------
-
-local function GetTableForFunction()
-	return { nice_str = function(t) return t.data[2] end,
-		str = function(t) return t.data[1] end,
-		replacement = function(t, editor)
-			local caret = editor:CopyPosition(editor.Caret)
-			caret[2] = caret[2] - 1
-			local wordend = editor:getWordEnd(caret)
-			local has_bracket = editor:GetArea({ wordend, { wordend[1], wordend[2] + 1 } }) == "(" -- If there already is a bracket, we don't want to add more of them.
-			local ret = t:str()
-			return ret..(has_bracket and "" or "()"), #ret + 1
-		end,
-		others = function(t) return t.data[3] end,
-		description = function(t)
-			if t.data[4] and E2Helper.Descriptions[t.data[4]] then
-				return E2Helper.Descriptions[t.data[4]]
-			end
-			if t.data[1] and E2Helper.Descriptions[t.data[1]] then
-				return E2Helper.Descriptions[t.data[1]]
-			end
-		end,
-		data = {} }
-end
-
-local function FindFunctions(self, has_colon, word)
-	-- Filter out magic characters
-	word = word:gsub("[%-%^%$%(%)%%%.%[%]%*%+%?]", "%%%1")
-
-	local len = #word
-	local wordl = word:lower()
-	local count = 0
-	local suggested = {}
-	local suggestions = {}
-
-	for func_id, _ in pairs(wire_expression2_funcs) do
-		if wordl == func_id:lower():sub(1, len) then -- Check if the beginning of the word matches
-			local name, types = func_id:match("(.+)(%b())") -- Get the function name and types
-			local first_type, colon, other_types = types:match("%((%w*)(:?)(.*)%)") -- Sort the function types
-			if (colon == ":") == has_colon then -- If they both have colons (or not)
-				first_type = first_type:upper()
-				other_types = other_types:upper()
-				if not suggested[name] then -- If it hasn't already been suggested
-					count = count + 1
-					suggested[name] = count
-
-					-- Add to suggestions
-					if colon == ":" then
-						local t = GetTableForFunction()
-						t.data = { name, first_type .. ":" .. name .. "(" .. other_types .. ")", {}, func_id }
-						suggestions[count] = t
-					else
-						local t = GetTableForFunction()
-						t.data = { name, name .. "(" .. first_type .. ")", {}, func_id }
-						suggestions[count] = t
-					end
-				else -- If it has already been suggested
-					-- Get previous data
-					local others = suggestions[suggested[name]]:others(self)
-					local i = #others + 1
-
-					-- Add it to the end of the list
-					if colon == ":" then
-						local t = GetTableForFunction()
-						t.data = { name, first_type .. ":" .. name .. "(" .. other_types .. ")", nil, func_id }
-						others[i] = t
-					else
-						local t = GetTableForFunction()
-						t.data = { name, name .. "(" .. first_type .. ")", nil, func_id }
-						others[i] = t
-					end
-				end
-			end
-		end
-	end
-	return suggestions
-end
-
-tbl[2] = function(self)
-	local word, symbolinfront = self:AC_GetCurrentWord()
-	if word and word ~= "" and word:sub(1, 1):upper() ~= word:sub(1, 1) then
-		return FindFunctions(self, (symbolinfront == ":"), word)
-	end
-end
-
------------------------------------------------------------
--- SaveVariables
--- Saves all variables to a table
------------------------------------------------------------
-
-function PANEL:AC_SaveVariables()
-	local OK, directives, _ = PreProcessor.Execute(self:getCode())
-
-	if not OK or not directives then
-		return
-	end
-
-	self.AC_Directives = directives
-end
-
------------------------------------------------------------
--- FindVariables
--- Adds all matching variables to the suggestions table
------------------------------------------------------------
-
-local function GetTableForVariables(str)
-	return { nice_str = function(t) return t.data[1] end,
-		str = function(t) return t.data[1] end,
-		replacement = function(t) return t.data[1] end,
-		data = { str } }
-end
-
-local function FindVariables(self, word)
-	local len = #word
-	local wordl = word:lower()
-	local count = 0
-
-	local suggested = {}
-	local suggestions = {}
-
-	local directives = self.AC_Directives
-	if not directives then self:AC_SaveVariables() end -- If directives is nil, attempt to find
-	directives = self.AC_Directives
-	if not directives then -- If finding failed, abort
-		self:AC_SetVisible(false)
-		return
-	end
-
-	for k, v in pairs(directives["inputs"][1]) do
-		if v:lower():sub(1, len) == wordl then
-			if not suggested[v] then
-				suggested[v] = true
-				count = count + 1
-				suggestions[count] = GetTableForVariables(v)
-			end
-		end
-	end
-
-	for k, v in pairs(directives["outputs"][1]) do
-		if v:lower():sub(1, len) == wordl then
-			if not suggested[v] then
-				suggested[v] = true
-				count = count + 1
-				suggestions[count] = GetTableForVariables(v)
-			end
-		end
-	end
-
-	for k, v in pairs(directives["persist"][1]) do
-		if v:lower():sub(1, len) == wordl then
-			if not suggested[v] then
-				suggested[v] = true
-				count = count + 1
-				suggestions[count] = GetTableForVariables(v)
-			end
-		end
-	end
-
-	return suggestions
-end
-
-tbl[3] = function(self)
-	local word, symbolinfront = self:AC_GetCurrentWord()
-	if word and word ~= "" and word:sub(1, 1):upper() == word:sub(1, 1) then
-		return FindVariables(self, word)
-	end
-end
-
-local wire_expression2_autocomplete = CreateClientConVar("wire_expression2_autocomplete", "1", true, false)
-tbl.RunOnCheck = function(self)
-	-- Only autocomplete if it's the E2 editor, if it's enabled
-	if not self:GetParent().E2 or not wire_expression2_autocomplete:GetBool() then
-		self:AC_SetVisible(false)
-		return false
-	end
-
-	local caret = self:CopyPosition(self.Caret)
-	caret[2] = caret[2] - 1
-	local tokenname = self:GetTokenAtPosition(caret)
-	if tokenname and (tokenname == "string" or tokenname == "comment") then
-		self:AC_SetVisible(false)
-		return false
-	end
-
-	if self:IsVarLine() and not self.AC_WasVarLine then -- If the user IS editing a var line, and they WEREN'T editing a var line before this..
-		self.AC_WasVarLine = true
-	elseif not self:IsVarLine() and self.AC_WasVarLine then -- If the user ISN'T editing a var line, and they WERE editing a var line before this..
-		self.AC_WasVarLine = nil
-		self:AC_SaveVariables()
-	end
-	if self:IsDirectiveLine() then -- In case you're wondering, DirectiveLine ~= VarLine (A directive line is any line starting with @, a var line is @inputs, @outputs, and @persists)
-		self:AC_SetVisible(false)
-		return false
-	end
-
-	return true
-end
-
------------------------------------------------------------
--- Check
--- Runs the autocompletion
------------------------------------------------------------
-
-function PANEL:AC_Check(notimer)
-
-	if not notimer then
-		timer.Create("E2_AC_Check", 0, 1, function()
-				if self.AC_Check then self:AC_Check(true) end
-			end)
-		return
-	end
-
-	if not self.AC_AutoCompletion then self:AC_NewAutoCompletion(tbl) end -- Default to E2 autocompletion
-	if not self.AC_Panel then self:AC_CreatePanel() end
-	if self.AC_AutoCompletion.RunOnCheck then
-		local ret = self.AC_AutoCompletion.RunOnCheck(self)
-		if ret == false then
-			return
-		end
-	end
-
-	self.AC_Suggestions = {}
-	self.AC_HasSuggestions = false
-
-	local suggestions = {}
-	for i = 1, #self.AC_AutoCompletion do
-		local _suggestions = self.AC_AutoCompletion[i](self)
-		if _suggestions ~= nil and #_suggestions > 0 then
-			suggestions = _suggestions
-			break
-		end
-	end
-
-	if #suggestions > 0 then
-
-		local word, _ = self:AC_GetCurrentWord()
-
-		table_sort(suggestions, function(a, b)
-				local diff1 = CheckDifference(word, a.str(a))
-				local diff2 = CheckDifference(word, b.str(b))
-				return diff1 < diff2
-			end)
-
-		if word == suggestions[1].str(suggestions[1]) and #suggestions == 1 then -- The word matches the first suggestion exactly, and there are no more suggestions. No need to bother displaying
-			self:AC_SetVisible(false)
-			return
-		end
-
-		for i = 1, 10 do
-			self.AC_Suggestions[i] = suggestions[i]
-		end
-		self.AC_HasSuggestions = true
-
-		-- Show the panel
-		local panel = self.AC_Panel
-		self:AC_SetVisible(true)
-
-		-- Calculate its position
-		local caret = self:CopyPosition(self.Caret)
-		caret[2] = caret[2] - 1
-		local wordstart = self:getWordStart(caret)
-
-		local x = self.FontWidth * (wordstart[2] - self.Scroll[2] + 1) + 22
-		local y = self.FontHeight * (wordstart[1] - self.Scroll[1] + 1) + 2
-
-		panel:SetPos(x, y)
-
-		-- Fill the list
-		self:AC_FillList()
-		return
-	end
-
-	self:AC_SetVisible(false)
-end
-
------------------------------------------------------------
--- Use
--- Replaces the word
------------------------------------------------------------
-local wire_expression2_autocomplete_highlight_after_use = CreateClientConVar("wire_expression2_autocomplete_highlight_after_use", "1", true, false)
-function PANEL:AC_Use(suggestion)
-	if not suggestion then return false end
-	local ret = false
-
-	-- Get word position
-	local wordstart = self:getWordStart(self.Caret)
-	local wordend = self:getWordEnd(self.Caret)
-
-	-- Get replacement
-	local replacement, caretoffset = suggestion:replacement(self)
-
-	-- Check if anything needs changing
-	local selection = self:GetArea({ wordstart, wordend })
-	if selection == replacement then -- There's no point in doing anything.
-		return false
-	end
-
-	-- Overwrite selection
-	if replacement and replacement ~= "" then
-		self:SetArea({ wordstart, wordend }, replacement)
-
-		-- Move caret
-		if caretoffset then
-			self.Start = { wordstart[1], wordstart[2] + caretoffset }
-			self.Caret = { wordstart[1], wordstart[2] + caretoffset }
-		else
-			if wire_expression2_autocomplete_highlight_after_use:GetBool() then
-				self.Start = wordstart
-				self.Caret = { wordstart[1], wordstart[2] + #replacement }
-			else
-				self.Start = { wordstart[1], wordstart[2] + #replacement }
-				self.Caret = { wordstart[1], wordstart[2] + #replacement }
-			end
-		end
-		ret = true
-	end
-
-	self:ScrollCaret()
-
-	self:RequestFocus()
-	self.AC_HasSuggestion = false
-	return ret
-end
-
------------------------------------------------------------
--- CreatePanel
------------------------------------------------------------
-
-function PANEL:AC_CreatePanel()
-	-- Create the panel
-	local panel = vgui.Create("DPanel", self)
-	panel:SetSize(100, 202)
-	panel.Selected = {}
-	panel.Paint = function(pnl)
-		surface_SetDrawColor(0, 0, 0, 230)
-		surface_DrawRect(0, 0, pnl:GetWide(), pnl:GetTall())
-	end
-
-	-- Override think, to make it listen for key presses
-	panel.Think = function(pnl, code)
-		if not self.AC_HasSuggestions or not self.AC_Panel_Visible then return end
-
-		local mode = wire_expression2_autocomplete_controlstyle:GetInt()
-		if mode == 0 then -- Default style - Tab/CTRL+Tab to choose item;\nEnter/Space to use;\nArrow keys to abort.
-
-			if input.IsKeyDown(KEY_ENTER) or input.IsKeyDown(KEY_SPACE) then -- Use
-				self:AC_SetVisible(false)
-				self:AC_Use(self.AC_Suggestions[pnl.Selected])
-			elseif input.IsKeyDown(KEY_TAB) and not pnl.AlreadySelected then -- Select
-				if input.IsKeyDown(KEY_LCONTROL) then -- If control is held down
-					pnl.Selected = pnl.Selected - 1 -- Scroll up
-					if pnl.Selected < 1 then pnl.Selected = #self.AC_Suggestions end
-				else -- If control isn't held down
-					pnl.Selected = pnl.Selected + 1 -- Scroll down
-					if pnl.Selected > #self.AC_Suggestions then pnl.Selected = 1 end
-				end
-				self:AC_FillInfoList(self.AC_Suggestions[pnl.Selected]) -- Fill the info list
-				pnl:RequestFocus()
-				pnl.AlreadySelected = true -- To keep it from scrolling a thousand times a second
-			elseif pnl.AlreadySelected and not input.IsKeyDown(KEY_TAB) then
-				pnl.AlreadySelected = nil
-			elseif input.IsKeyDown(KEY_UP) or input.IsKeyDown(KEY_DOWN) or input.IsKeyDown(KEY_LEFT) or input.IsKeyDown(KEY_RIGHT) then
-				self:AC_SetVisible(false)
-			end
-
-		elseif mode == 1 then -- Visual C# Style - Ctrl+Space to use the top match;\nArrow keys to choose item;\nTab/Enter/Space to use;\nCode validation hotkey (ctrl+space) moved to ctrl+b.
-
-			if input.IsKeyDown(KEY_TAB) or input.IsKeyDown(KEY_ENTER) or input.IsKeyDown(KEY_SPACE) then -- Use
-				self:AC_SetVisible(false)
-				self:AC_Use(self.AC_Suggestions[pnl.Selected])
-			elseif input.IsKeyDown(KEY_DOWN) and not pnl.AlreadySelected then -- Select
-				pnl.Selected = pnl.Selected + 1 -- Scroll down
-				if pnl.Selected > #self.AC_Suggestions then pnl.Selected = 1 end
-				self:AC_FillInfoList(self.AC_Suggestions[pnl.Selected]) -- Fill the info list
-				pnl.AlreadySelected = true -- To keep it from scrolling a thousand times a second
-			elseif input.IsKeyDown(KEY_UP) and not pnl.AlreadySelected then -- Select
-				pnl.Selected = pnl.Selected - 1 -- Scroll up
-				if pnl.Selected < 1 then pnl.Selected = #self.AC_Suggestions end
-				self:AC_FillInfoList(self.AC_Suggestions[pnl.Selected]) -- Fill the info list
-				pnl.AlreadySelected = true -- To keep it from scrolling a thousand times a second
-			elseif pnl.AlreadySelected and not input.IsKeyDown(KEY_UP) and not input.IsKeyDown(KEY_DOWN) then
-				pnl.AlreadySelected = nil
-			end
-
-		elseif mode == 2 then -- Scroller style - Mouse scroller to choose item;\nMiddle mouse to use.
-
-			if input.IsMouseDown(MOUSE_MIDDLE) then
-				self:AC_SetVisible(false)
-				self:AC_Use(self.AC_Suggestions[pnl.Selected])
-			end
-
-		elseif mode == 3 then -- Scroller Style w/ Enter - Mouse scroller to choose item;\nEnter to use.
-
-			if input.IsKeyDown(KEY_ENTER) then
-				self:AC_SetVisible(false)
-				self:AC_Use(self.AC_Suggestions[pnl.Selected])
-			end
-
-		elseif mode == 4 then -- Eclipse Style - Enter to use top match;\nTab to enter auto completion menu;\nArrow keys to choose item;\nEnter to use;\nSpace to abort.
-
-			if input.IsKeyDown(KEY_ENTER) then -- Use
-				self:AC_SetVisible(false)
-				self:AC_Use(self.AC_Suggestions[pnl.Selected])
-			elseif input.IsKeyDown(KEY_SPACE) then
-				self:AC_SetVisible(false)
-			elseif input.IsKeyDown(KEY_DOWN) and not pnl.AlreadySelected then -- Select
-				pnl.Selected = pnl.Selected + 1 -- Scroll down
-				if pnl.Selected > #self.AC_Suggestions then pnl.Selected = 1 end
-				self:AC_FillInfoList(self.AC_Suggestions[pnl.Selected]) -- Fill the info list
-				pnl.AlreadySelected = true -- To keep it from scrolling a thousand times a second
-			elseif input.IsKeyDown(KEY_UP) and not pnl.AlreadySelected then -- Select
-				pnl.Selected = pnl.Selected - 1 -- Scroll up
-				if pnl.Selected < 1 then pnl.Selected = #self.AC_Suggestions end
-				self:AC_FillInfoList(self.AC_Suggestions[pnl.Selected]) -- Fill the info list
-				pnl.AlreadySelected = true -- To keep it from scrolling a thousand times a second
-			elseif pnl.AlreadySelected and not input.IsKeyDown(KEY_UP) and not input.IsKeyDown(KEY_DOWN) then
-				pnl.AlreadySelected = nil
-			end
-
-		end
-	end
-
-	-- Create list
-	local list = vgui.Create("DPanelList", panel)
-	list:StretchToParent(1, 1, 1, 1)
-	list.Paint = function() end
-
-	-- Create info list
-	local infolist = vgui.Create("DPanelList", panel)
-	infolist:SetPos(1000, 1000)
-	infolist:SetSize(100, 200)
-	infolist:EnableVerticalScrollbar(true)
-	infolist.Paint = function() end
-
-	self.AC_Panel = panel
-	panel.list = list
-	panel.infolist = infolist
-	self:AC_SetVisible(false)
-end
-
------------------------------------------------------------
--- FillInfoList
--- Fills the "additional information" box
------------------------------------------------------------
-
-local wire_expression2_autocomplete_moreinfo = CreateClientConVar("wire_expression2_autocomplete_moreinfo", "1", true, false)
-
-local function SimpleWrap(txt, width)
-	local ret = ""
-
-	local prev_end, prev_newline = 0, 0
-	for cur_end in txt:gmatch("[^ \n]+()") do
-		local w, _ = surface_GetTextSize(txt:sub(prev_newline, cur_end))
-		if w > width then
-			ret = ret .. txt:sub(prev_newline, prev_end) .. "\n"
-			prev_newline = prev_end + 1
-		end
-		prev_end = cur_end
-	end
-	ret = ret .. txt:sub(prev_newline)
-
-	return ret
-end
-
-function PANEL:AC_FillInfoList(suggestion)
-	local panel = self.AC_Panel
-
-	if not suggestion or not suggestion.description or not wire_expression2_autocomplete_moreinfo:GetBool() then -- If the suggestion is invalid, the suggestion does not need additional information, or if the user has disabled additional information, abort
-		panel:SetSize(panel.curw, panel.curh)
-		panel.infolist:SetPos(1000, 1000)
-		return
-	end
-
-	local infolist = panel.infolist
-	infolist:Clear()
-
-	local desc_label = vgui.Create("DLabel")
-	infolist:AddItem(desc_label)
-
-	local desc = suggestion:description(self)
-
-	local maxw = 164
-	local maxh = 0
-
-	local others
-	if suggestion.others then others = suggestion:others(self) end
-
-	if desc and desc ~= "" then
-		desc = "Description:\n" .. desc
-	end
-
-	if #others > 0 then -- If there are other functions with the same name...
-		desc = (desc or "") .. ((desc and desc ~= "") and "\n" or "") .. "Others with the same name:"
-
-		-- Loop through the "others" table to add all of them
-		surface_SetFont("E2SmallFont")
-		for k, v in pairs(others) do
-			local nice_name = v:nice_str(self)
-
-			local namew, nameh = surface_GetTextSize(nice_name)
-
-			local label = vgui.Create("DLabel")
-			label:SetText("")
-			label.Paint = function(pnl)
-				local w, h = pnl:GetSize()
-				draw_RoundedBox(1, 1, 1, w-2, h-2, Color(65, 105, 225, 255))
-				surface_SetFont("E2SmallFont")
-				surface_SetTextPos(6, h / 2-nameh / 2)
-				surface_SetTextColor(255, 255, 255, 255)
-				surface_DrawText(nice_name)
-			end
-
-			infolist:AddItem(label)
-
-			if namew + 15 > maxw then maxw = namew + 15 end
-			maxh = maxh + 20
-		end
-	end
-
-	if not desc or desc == "" then
-		panel:SetSize(panel.curw, panel.curh)
-		infolist:SetPos(1000, 1000)
-		return
-	end
-
-	-- Wrap the text, set it, and calculate size
-	desc = SimpleWrap(desc, maxw)
-	desc_label:SetText(desc)
-	desc_label:SizeToContents()
-	local textw, texth = surface_GetTextSize(desc)
-
-	-- If it's bigger than the size of the panel, change it
-	if panel.curh < texth + 4 then panel:SetTall(texth + 6) else panel:SetTall(panel.curh) end
-	if maxh + texth > panel:GetTall() then maxw = maxw + 25 end
-
-	-- Set other positions/sizes/etc
-	panel:SetWide(panel.curw + maxw)
-	infolist:SetPos(panel.curw, 1)
-	infolist:SetSize(maxw - 1, panel:GetTall() - 2)
-end
-
------------------------------------------------------------
--- FillList
------------------------------------------------------------
-
-function PANEL:AC_FillList()
-	local panel = self.AC_Panel
-	panel.list:Clear()
-	panel.Selected = 0
-	local maxw = 15
-
-	surface.SetFont("E2SmallFont")
-
-	-- Add all suggestions to the list
-	for count, suggestion in pairs(self.AC_Suggestions) do
-		local nice_name = suggestion:nice_str(self)
-		local name = suggestion:str(self)
-
-		local txt = vgui.Create("DLabel")
-		txt:SetText("")
-		txt.count = count
-		txt.suggestion = suggestion
-
-		-- Override paint to give it the "E2 theme" and to make it highlight when selected
-		txt.Paint = function(pnl, w, h)
-			draw_RoundedBox(1, 1, 1, w-2, h-2, Color(65, 105, 225, 255))
-			if panel.Selected == pnl.count then
-				draw_RoundedBox(0, 2, 2, w - 4 , h - 4, Color(0, 0, 0, 192))
-			end
-			-- I honestly dont have a fucking clue.
-			-- h2, was being cleaned up instantly for no reason.
-			surface.SetFont("E2SmallFont")
-			local _, h2 = surface.GetTextSize(nice_name)
-
-			surface.SetTextPos(6, (h / 2) - (h2 / 2))
-			surface.SetTextColor(255, 255, 255, 255)
-			surface.DrawText(nice_name)
-		end
-
-		-- Enable mouse presses
-		txt.OnMousePressed = function(pnl, code)
-			if code == MOUSE_LEFT then
-				self:AC_SetVisible(false)
-				self:AC_Use(pnl.suggestion)
-			end
-		end
-
-		-- Enable mouse hovering
-		txt.OnCursorEntered = function(pnl)
-			panel.Selected = pnl.count
-			self:AC_FillInfoList(pnl.suggestion)
-		end
-
-		panel.list:AddItem(txt)
-
-		-- get the width of the widest suggestion
-		local w, _ = surface_GetTextSize(nice_name)
-		w = w + 15
-		if w > maxw then maxw = w end
-	end
-
-	-- Size and positions etc
-	panel:SetSize(maxw, #self.AC_Suggestions * 20 + 2)
-	panel.curw = maxw
-	panel.curh = #self.AC_Suggestions * 20 + 2
-	panel.list:StretchToParent(1, 1, 1, 1)
-	panel.infolist:SetPos(1000, 1000)
-end
-
------------------------------------------------------------
--- SetVisible
------------------------------------------------------------
-
-function PANEL:AC_SetVisible(bool)
-	if self.AC_Panel_Visible == bool or not self.AC_Panel then return end
-	self.AC_Panel_Visible = bool
-	self.AC_Panel:SetVisible(bool)
-	self.AC_Panel.infolist:SetPos(1000, 1000)
-end
-
------------------------------------------------------------
--- Reset
------------------------------------------------------------
-
-function PANEL:AC_Reset()
-	self.AC_HasSuggestions = false
-	self.AC_Suggestions = false
-	self.AC_Directives = nil
-	local panel = self.AC_Panel
-	if not panel then return end
-	self:AC_SetVisible(false)
-	panel.list:Clear()
-	panel.infolist:Clear()
-	panel:SetSize(100, 202)
-	panel.infolist:SetPos(1000, 1000)
-	panel.infolist:SetSize(100, 200)
-	panel.list:StretchToParent(1, 1, 1, 1)
-end
-
-function PANEL:Think()
-	self:DoAction("Think")
-end
-
----------------------------------------------------------------------------------------------------------
 
 -- helpers for ctrl-left/right
 function PANEL:wordLeft(caret)

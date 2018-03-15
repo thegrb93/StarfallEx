@@ -276,7 +276,7 @@ local function fixKeys(key, notfirst)
 
 end
 
-function TabHandler:registerSettings()
+function TabHandler:RegisterSettings()
 
 	--Adding settings
 	local sheet = SF.Editor.editor:AddControlPanelTab("Ace", "icon16/cog.png", "ACE options.")
@@ -335,7 +335,7 @@ function TabHandler:registerSettings()
 
 end
 
-function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+function TabHandler:Init() -- It's caled when editor is initalized, you can create library map there etc
 
 	local html = vgui.Create("DHTML")
 	html:Dock(FILL)
@@ -407,7 +407,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	TabHandler.html:SetVisible(false)
 end
 
-function TabHandler:cleanup() -- It's caled when editor is marked for disposal
+function TabHandler:Cleanup() -- It's caled when editor is marked for disposal
 	print("Cleanup called!")
 	TabHandler.html:Remove()
 	TabHandler.html = nil -- Getting rid of old dhtml
@@ -425,16 +425,16 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	self:SetBackgroundColor(Color(39, 40, 34))
 end
 
-function PANEL:getCode() -- Return name of hanlder or code if it's editor
+function PANEL:GetCode() -- Return name of hanlder or code if it's editor
 	return self.code or ""
 end
 
-function PANEL:pasteCode(code)
+function PANEL:PasteCode(code)
 	if not TabHandler.Loaded then return end
 	runJS("editor.insert(\"" .. code:JavascriptSafe() .. "\")")
 end
 
-function PANEL:setCode(code)
+function PANEL:SetCode(code)
 	self.code = code
 	if TabHandler.Loaded then
 		setSessionValue(self, code)
