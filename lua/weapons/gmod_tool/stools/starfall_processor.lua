@@ -180,7 +180,7 @@ if CLIENT then
 	local lastclick = CurTime()
 	
 	local function GotoDocs(button)
-		gui.OpenURL(GetConVar("sf_editor_helperurl"):GetString())
+		gui.OpenURL(SF.Editor.HelperURL:GetString())
 	end
 	
 	function TOOL.BuildCPanel(panel)
