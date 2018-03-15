@@ -15,7 +15,7 @@ SHA=`git rev-parse --verify HEAD`
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
     echo "This is a pull request, won't deply to gh-pages"
-	if git log -1 | grep -q "[preview]"; then
+	if git log -1 -n 1 | grep -q "[preview]"; then
 		echo "Preview requested."
 		tar -cf doc-preview.tar doc/
 		echo "Uploading to transfer.sh"
