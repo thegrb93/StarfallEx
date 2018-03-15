@@ -60,7 +60,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:OpenURL("http://thegrb93.github.io/StarfallEx/")
+	html:OpenURL(GetConVar("sf_editor_helperurl"):GetString())
 	timer.Simple(3,function()
 		if not html.loaded then
 			SF.AddNotify(LocalPlayer(), "Your connection seems to be slow or offline, you may try using legacy helper(available from settings).", "GENERIC" , 10, "DRIP2")

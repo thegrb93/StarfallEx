@@ -180,7 +180,7 @@ if CLIENT then
 	local lastclick = CurTime()
 	
 	local function GotoDocs(button)
-		gui.OpenURL("http://thegrb93.github.io/StarfallEx/")
+		gui.OpenURL(GetConVar("sf_editor_helperurl"):GetString())
 	end
 	
 	function TOOL.BuildCPanel(panel)
