@@ -387,13 +387,16 @@ function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 function Editor:UpdateTabText(tab, title)
 	-- Editor subtitle and tab text
 	local ed = tab.content
-	local _, text = getPreferredTitles(ed.chosenfile, ed:GetCode())
+	local _, text = getPreferredTitles(ed.chosenfile, ed.GetCode and ed:GetCode() or "")
+
+	title = title or ed.DefaultTitle
 	tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
 	if not ed:IsSaved() then
 		tabtext = tabtext.." *"
 	end
+
 	if tab:GetText() ~= tabtext then
 		tab:SetText(tabtext)
 		self.C.TabHolder.tabScroller:InvalidateLayout()
@@ -466,6 +469,7 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), content)
 	content.chosenfile = chosenfile
 	sheet.Tab.content = content -- For easy access
+
 	sheet.Tab.Paint = function(button, w, h)
 
 		if button.Hovered then
@@ -473,7 +477,12 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 		else
 			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
 		end
+
 	end
+	--sheet.Tab.UpdateColours = function() end
+	sheet.Tab.GetTabHeight = function() return 20 end
+
+	content.DefaultTitle = th.DefaultTitle
 	content.UpdateTitle = function(_, text)
 		return self:UpdateTabText(sheet.Tab, text)
 	end
@@ -740,6 +749,7 @@ function Editor:InitComponents()
 	self.C.Menu = vgui.Create("DPanel", self.C.MainPane)
 	self.C.Val = vgui.Create("Button", self.C.MainPane) -- Validation line
 	self.C.TabHolder = vgui.Create("DPropertySheet", self.C.MainPane)
+	self.C.TabHolder.Paint = DoNothing
 
 	self.C.Btoggle = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Toggle Browser being shown
 	self.C.Sav = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Save button
@@ -779,6 +789,8 @@ function Editor:InitComponents()
 	self.C.Menu.Paint = function(_, w, h)
 		draw.RoundedBox(0, 0, 0, w, h, Color(234, 234, 234))
 	end
+	self.C.TabHolder.tabScroller:SetPaintBackgroundEnabled(false)
+	self.C.TabHolder:SetPaintBackgroundEnabled(false)
 
 	self.C.Val:Dock(BOTTOM)
 
@@ -796,8 +808,11 @@ function Editor:InitComponents()
 	self.C.ConBut:SetText("")
 	self.C.ConBut.Paint = PaintFlatButton
 	self.C.ConBut.DoClick = function()
-		self.C.Control.Permissions:Refresh()
-		self.C.Control:SetVisible(not self.C.Control:IsVisible())
+		--[[
+			self.C.Control.Permissions:Refresh()
+			self.C.Control:SetVisible(not self.C.Control:IsVisible())
+		]]
+		self:OpenTabOnlyOnce("settings")
 	end
 
 	self.C.Inf:SetImage("icon16/information.png")
@@ -906,99 +921,22 @@ function Editor:InitComponents()
 
 end
 
-function Editor:AddControlPanelTab(label, icon, tooltip)
-	local frame = self.C.Control
-	local panel = vgui.Create("DPanel")
-	local ret = frame.TabHolder:AddSheet(label, panel, icon, false, false, tooltip)
-	local old = ret.Tab.OnMousePressed
-	function ret.Tab.OnMousePressed(...)
-		timer.Simple(0.1, function() frame:ResizeAll() end) -- timers solve everything
-		old(...)
+function Editor:GetSettings()
+
+	local categories = {}
+	local function AddCategory(panel, name, icon, description)
+		if not name then return end
+		categories[name] = {
+			panel = panel,
+			icon = icon,
+			description = description
+		}
 	end
-
-	ret.Panel.Paint = function() end
-	ret.Tab.GetTabHeight = function() return 26 end -- Not increasing when active
-	ret.Tab.Paint = function(button, w, h)
-
-		if button.Hovered then
-			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med)
-		else
-			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
-		end
-	end
-
-
-	return ret
-end
-
-function Editor:InitControlPanel()
-	local frame = self.C.Control
-	-- Add a property sheet to hold the tabs
-	local tabholder = vgui.Create("DPropertySheet", frame)
-	tabholder:SetPos(2, 4)
-	frame.TabHolder = tabholder
-
-	tabholder.tabScroller:DockMargin(0, 0, 3, 0)
-	tabholder.tabScroller:SetOverlap(-1)
-
-	-- They need to be resized one at a time... dirty fix incoming (If you know of a nicer way to do this, don't hesitate to fix it.)
-	local function callNext(t, n)
-		local obj = t[n]
-		local pnl = obj[1]
-		if pnl and pnl:IsValid() then
-			local x, y = obj[2], obj[3]
-			pnl:SetPos(x, y)
-			local w, h = pnl:GetParent():GetSize()
-			local wofs, hofs = w - x * 2, h - y * 2
-			pnl:SetSize(wofs, hofs)
-		end
-		n = n + 1
-		if n <= #t then
-			timer.Simple(0, function() callNext(t, n) end)
-		end
-	end
-
-	function frame:ResizeAll()
-		timer.Simple(0, function()
-				callNext(self.ResizeObjects, 1)
-			end)
-	end
-
-	-- Resize them at the right times
-	local old = frame.SetSize
-	function frame:SetSize(...)
-		self:ResizeAll()
-		old(self, ...)
-	end
-
-	local old = frame.SetVisible
-	function frame:SetVisible(...)
-		self:ResizeAll()
-		old(self, ...)
-	end
-
-	-- Function to add more objects to resize automatically
-	frame.ResizeObjects = {}
-	function frame:AddResizeObject(...)
-		self.ResizeObjects[#self.ResizeObjects + 1] = { ... }
-	end
-
-	-- Our first object to auto resize is the tabholder. This sets it to position 2,4 and with a width and height offset of w-4, h-8.
-	frame:AddResizeObject(tabholder, 2, 4)
-
-
-	frame.Paint = function(_, w, h)
-		draw.RoundedBox(0, 0, 30, w, h, SF.Editor.colors.meddark)
-		draw.RoundedBox(0, 2, 32, w, h, Color(32, 32, 32))
-	end
-	tabholder.Paint = function() end
 	-- ------------------------------------------- EDITOR TAB
-	local sheet = self:AddControlPanelTab("Editor", "icon16/cog.png", "Options for the editor itself.")
 	-- WINDOW BORDER COLORS
 	local label
-	local dlist = vgui.Create("DPanelList", sheet.Panel)
+	local dlist = vgui.Create("DPanelList")
 	dlist.Paint = function() end
-	frame:AddResizeObject(dlist, 4, 4)
 	dlist:EnableVerticalScrollbar(true)
 
 	label = vgui.Create("DLabel")
@@ -1085,25 +1023,29 @@ function Editor:InitControlPanel()
 	UndockHelper:SizeToContents()
 
 
+	AddCategory(dlist, "Editor", "icon16/application_side_tree.png", "Options for the editor itself.")
+
 	------ Permissions panel
-	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
 	local perms = SF.Editor.createpermissionsPanel ()
-	perms:SetParent(sheet.Panel)
-	sheet.Panel:DockPadding(0, 0, 0, 0)
-	perms:DockMargin(0, 0, 0, 0)
-	perms:Dock(FILL)
 	perms:Refresh()
-	self.C.Control.Permissions = perms
+
+	AddCategory(perms, "Permissions", "icon16/tick.png", "Permission settings.")
 
 	------ Themes panel
-	sheet = self:AddControlPanelTab("Themes", "icon16/page_white_paintbrush.png", "Theme settings.")
 	local themesPanel = self:CreateThemesPanel()
-	themesPanel:SetParent(sheet.Panel)
-	sheet.Panel:DockPadding(0, 0, 0, 0)
-	themesPanel:DockMargin(4, 4, 4, 4)
-	themesPanel:Dock(FILL)
 	themesPanel:Refresh()
-	self.C.Control.Themes = themesPanel
+
+
+	AddCategory(themesPanel, "Themes", "icon16/page_white_paintbrush.png", "Theme settings.")
+
+	----- Tab settings
+	for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
+		if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then 
+			AddCategory(v:RegisterSettings())
+		end
+	end
+
+	return categories
 end
 
 function Editor:CreateThemesPanel()
@@ -1120,8 +1062,7 @@ function Editor:CreateThemesPanel()
 	panel:AddItem(label)
 	label:DockMargin(0, 0, 0, 0)
 	label:SetText("Starfall editor supports TextMate themes.\n" ..
-		"You can import them by pressing \"Add\" button.\n" ..
-		"Note: Those work only in wire tab editor!")
+		"You can import them by pressing \"Add\" button.\n")
 	label:SetWrap(true)
 
 	-- Theme list
@@ -1433,6 +1374,33 @@ function Editor:ChosenFile(Line)
 	end
 end
 
+function Editor:OnThemeChange(theme)
+	for i = 1, self:GetNumTabs() do
+		local ed = self:GetTabContent(i)
+		if ed.OnThemeChange then
+			ed:OnThemeChange(theme)
+		end
+	end
+end
+
+--Opens tab with specified tabhandler, if it already exists sets it to active instead
+function Editor:OpenTabOnlyOnce(name)
+	local tab = nil
+	for i = 1, self:GetNumTabs() do
+		local ed = self:GetTabContent(i)
+		if ed:GetTabHandler() == GetTabHandler(name) then
+			tab = i
+		end
+	end
+	if tab then
+		self:SetActiveTabIndex(tab)
+	else
+		local sheet = self:CreateTab("", name)
+		self:SetActiveTab(sheet.Tab)
+	end
+	return self:GetActiveTab()
+end
+
 function Editor:FindOpenFile(FilePath)
 	for i = 1, self:GetNumTabs() do
 		local ed = self:GetTabContent(i)
@@ -1476,7 +1444,11 @@ function Editor:GetCurrentTabContent()
 end
 
 function Editor:GetCode()
-	return self:GetCurrentTabContent():GetCode()
+	if self:GetCurrentTabContent().GetCode then
+		return self:GetCurrentTabContent():GetCode() or ""
+	else
+		return ""
+	end
 end
 
 function Editor:Open(Line, code, forcenewtab)
@@ -1626,8 +1598,6 @@ function Editor:Close()
 end
 
 function Editor:Setup(nTitle, nLocation, nEditorType)
-
-	self:InitControlPanel() -- We're initializing it there, so tabhandlers are already registered
 
 	self.Title = nTitle
 	self.Location = nLocation

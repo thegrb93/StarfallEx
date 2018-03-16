@@ -98,17 +98,8 @@ function SF.Editor.Themes.SwitchTheme(name)
 	end
     SF.Editor.Themes.CurrentTheme = theme
 	SF.Editor.Themes.ThemeConVar:SetString(name)
-
 	if SF.Editor.editor then
-		for k, v in pairs(SF.Editor.editor.C.TabHolder.Items) do
-			if v.Panel.TabHandler.LoadSyntaxColors then
-				v.Panel.TabHandler:LoadSyntaxColors()
-				v.Panel.PaintRows = nil
-			end
-			if v.Panel.CurrentMode.LoadSyntaxColors then
-				v.Panel.CurrentMode:LoadSyntaxColors()
-			end
-		end
+		SF.Editor.editor:OnThemeChange(theme)
 	end
 end
 
@@ -203,7 +194,7 @@ local function parseTextMate(text)
 		newmap[k] = v
 	end
 	map = newmap
-	
+
     for k, v in pairs(parsed.settings) do
 		local foreground, background, fontStyle = parseColor(v.settings.foreground), parseColor(v.settings.background), v.settings.fontStyle
 		fontStyle = fontStyle or "normal"
@@ -258,15 +249,15 @@ end
 SF.Editor.Themes.AddTheme("default", {
     Name = "Default Theme",
 
-	["background"] = Color(32, 32, 32),
+	["background"] = Color(39,40,34),
     ["line_highlight"] = Color(39, 40, 34),
 
-	["gutter_foreground"] = Color(128, 128, 128),
-	["gutter_background"] = Color(0, 0, 0),
-	["gutter_divider"] = Color(80, 80, 80),
+	["gutter_foreground"] = Color(143,144,138),
+	["gutter_background"] = Color(47,49,41),
+	["gutter_divider"] = Color(47,49,41),
 
     ["caret"] = Color(240, 240, 240),
-    ["selection"] = Color(0, 0, 160),
+    ["selection"] = Color(73, 72, 62),
 
 	["word_highlight"] = Color(30, 150, 30),
 
@@ -280,7 +271,7 @@ SF.Editor.Themes.AddTheme("default", {
 	["function"] = { Color(137, 189, 255), nil, 0 },
 	["method"] = { Color(137, 189, 255), nil, 0 },
 	["library"] = { Color(137, 189, 255), nil, 0 },
-	["operator"] = { Color(230, 230, 230), nil, 0 },
+	["operator"] = { Color(249, 38, 114), nil, 0 },
 	["notfound"] = { Color(230, 230, 230), nil, 0 },
 	["userfunction"] = { Color(166, 226, 42), nil, 0 },
 	["constant"] = { Color(174, 129, 255), nil, 0 },

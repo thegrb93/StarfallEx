@@ -147,42 +147,51 @@ vgui.Register("StarfallFrame", PANEL, "DFrame")
 -- Starfall Button
 PANEL = {}
 
+local icon_cache = {
+
+}
+
 function PANEL:Init ()
-self:SetText("")
-self:SetSize(22, 22)
+	self:SetText("")
+	self:SetSize(22, 22)
 end
 function PANEL:SetIcon (icon)
-self.icon = SF.Editor.icons[icon]
+	if icon_cache[icon] then
+		icon = icon_cache[icon]
+	else
+		icon = Material(icon, "noclamp smooth")
+	end
+	self.icon = icon
 end
 function PANEL:PerformLayout ()
-if self:GetText() ~= "" then
-self:SizeToContentsX()
-self:SetWide(self:GetWide() + 14)
-end
+	if self:GetText() ~= "" then
+		self:SizeToContentsX()
+		self:SetWide(self:GetWide() + 14)
+	end
 end
 PANEL.Paint = function (button, w, h)
-if button.Hovered or button.active then
-draw.RoundedBox(0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med)
-else
-draw.RoundedBox(0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark)
-end
-if button.icon then
-surface.SetDrawColor(SF.Editor.colors.medlight)
-surface.SetMaterial(button.icon)
-surface.DrawTexturedRect(2, 2, w - 4, h - 4)
-end
+	if button.Hovered or button.active then
+		draw.RoundedBox(0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med)
+	else
+		draw.RoundedBox(0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark)
+	end
+	if button.icon then
+		surface.SetDrawColor(Color(255,255,255,255))
+		surface.SetMaterial(button.icon)
+		surface.DrawTexturedRect(6, h/2 - 8, 16, 16)
+	end
 end
 function PANEL:UpdateColours (skin)
-return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
+	return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
 end
 function PANEL:SetHoverColor (col)
-self.backgroundHoverCol = col
+	self.backgroundHoverCol = col
 end
 function PANEL:SetColor (col)
-self.backgroundCol = col
+	self.backgroundCol = col
 end
 function PANEL:SetLabelColor (col)
-self.labelCol = col
+	self.labelCol = col
 end
 function PANEL:DoClick ()
 

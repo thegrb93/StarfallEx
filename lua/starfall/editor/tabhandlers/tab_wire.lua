@@ -64,6 +64,7 @@ TabHandler.FontConVar = CreateClientConVar("sf_editor_wire_fontname", defaultFon
 TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, true, false)
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
 TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, true, false)
+TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightencolors", 0, true, false) --off by default
 ---------------------
 -- Colors
 ---------------------
@@ -71,7 +72,21 @@ TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, tru
 local colors = { }
 
 function TabHandler:LoadSyntaxColors()
-	colors = SF.Editor.Themes.CurrentTheme
+	colors = {}
+	for k,v in pairs(SF.Editor.Themes.CurrentTheme) do
+		if type(v) != "table" then continue end
+		if not v["r"] then
+			local mult = TabHandler.EnlightenColorsConVar:GetBool() and 1 or 1.2 -- For some reason gmod seems to render text darker than html
+			colors[k] = {
+				Color(v[1].r*mult,v[1].g*mult,v[1].b*mult,v[1]["a"] or 255),
+				v[2] and Color(v[2].r*mult,v[2].g*mult,v[2].b*mult,v[2]["a"] or 255) or nil,
+				v[3]
+			}
+		else
+			colors[k] = Color(v.r,v.g,v.b,v["a"])
+		end
+
+	end
 end
 
 function TabHandler:GetSyntaxColor(name)
@@ -127,6 +142,8 @@ function TabHandler:Init()
 	TabHandler.LibMap = createWireLibraryMap ()
 
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
+	colors = SF.Editor.Themes.CurrentTheme
+	self.PaintRows = {}
 	self:LoadSyntaxColors()
 end
 
@@ -134,8 +151,8 @@ function TabHandler:RegisterTabMenu(menu, content)
 	local coloring = menu:AddSubMenu("Coloring")
 	for k,v in pairs(TabHandler.Modes) do
 		local mode = v
-		coloring:AddOption(k, function() 
-			content.CurrentMode = mode 
+		coloring:AddOption(k, function()
+			content.CurrentMode = mode
 			content.PaintRows = {}
 		end)
 	end
@@ -143,12 +160,7 @@ end
 
 function TabHandler:RegisterSettings()
 	local label
-	-- ------------------------------------------- Wire TAB
-	local sheet = SF.Editor.editor:AddControlPanelTab("Wire", "icon16/wrench.png", "Options for wire tabs.")
-
-	-- WINDOW BORDER COLORS
-
-	local dlist = vgui.Create("DPanelList", sheet.Panel)
+	local dlist = vgui.Create("DPanelList")
 	dlist.Paint = function() end
 	dlist:EnableVerticalScrollbar(true)
 	dlist:Dock(FILL)
@@ -226,10 +238,10 @@ function TabHandler:RegisterSettings()
 	usePigments.OnSelect = function(_, val)
 		RunConsoleCommand("sf_editor_wire_pigments", val-1)
 		timer.Simple(0, function()
-			SF.Editor.editor:GetCurrentEditor().PaintRows = {} -- Re-color syntax
+			SF.Editor.editor:GetCurrentTabContent().PaintRows = {} -- Re-color syntax
 		end)
 	end
-
+	return dlist, "Wire", "icon16/pencil.png", "Options for wire tabs."
 end
 
 local wire_expression2_autocomplete_controlstyle = CreateClientConVar("wire_expression2_autocomplete_controlstyle", "0", true, false)
@@ -281,6 +293,12 @@ function PANEL:Init()
 
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
 	table.insert(TabHandler.Tabs, self)
+end
+
+function PANEL:OnThemeChange()
+	colors = SF.Editor.Themes.CurrentTheme
+	self.PaintedRows = {}
+	self.CurrentMode:LoadSyntaxColors()
 end
 
 function PANEL:OnRemove()
@@ -606,7 +624,7 @@ function PANEL:PaintLine(row)
 		end
 	end
 
-	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth + 2, (row - self.Scroll[1]) * height, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
+	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, (row - self.Scroll[1]) * height, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
 	local offset = -self.Scroll[2] + 1
 	for i, cell in ipairs(self.PaintRows[row]) do
@@ -707,7 +725,12 @@ function PANEL:PaintTextOverlay()
 				local start, stop = self:MakeSelection(area)
 
 				if start[1] == stop[1] then -- On the same line
-					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height, (stop[2]-start[2]) * width, height)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + 1, (stop[2]-start[2]) * width, 1)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + height - 2, (stop[2]-start[2]) * width, 1)
+
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width + (stop[2]-start[2]) * width - 1, (start[1]-self.Scroll[1]) * height + 1, 1, height-2)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + 1, 1, height-2)
+					
 				elseif start[1] < stop[1] then -- Ends below start
 					for i = start[1], stop[1] do
 						if i == start[1] then
@@ -815,7 +838,7 @@ end
 local display_caret_pos = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 
 function PANEL:Paint()
-	self.LineNumberWidth = self.FontWidth * #tostring(self.Scroll[1] + self.Size[1] + 1)
+	self.LineNumberWidth = self.FontWidth * math.max(#tostring(self.Scroll[1] + self.Size[1] + 1),3) + 20
 
 	if not input.IsMouseDown(MOUSE_LEFT) then
 		self:OnMouseReleased(MOUSE_LEFT)
@@ -2243,6 +2266,39 @@ function PANEL:SkipPattern(pattern)
 	return text
 end
 
+function PANEL:IsVarLine()
+	local line = self.Rows[self.Caret[1]]
+	local word = line:match("^@(%w+)")
+	return (word == "inputs" or word == "outputs" or word == "persist")
+end
+
+function PANEL:IsDirectiveLine()
+	local line = self.Rows[self.Caret[1]]
+	return line:match("^@") ~= nil
+end
+
+function PANEL:getWordStart(caret, getword)
+	local line = self.Rows[caret[1]]
+
+	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
+		if startpos <= caret[2] and endpos >= caret[2] then
+			return { caret[1], startpos }, getword and line:sub(startpos, endpos-1) or nil
+		end
+	end
+	return { caret[1], 1 }
+end
+
+function PANEL:getWordEnd(caret, getword)
+	local line = self.Rows[caret[1]]
+
+	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
+		if startpos <= caret[2] and endpos >= caret[2] then
+			return { caret[1], endpos }, getword and line:sub(startpos, endpos-1) or nil
+		end
+	end
+	return { caret[1], #line + 1 }
+end
+
 function PANEL:NextPattern(pattern)
 	if not self.character then return false end
 	local startpos, endpos, text = self.line:find(pattern, self.position)
@@ -2270,6 +2326,9 @@ function PANEL:SyntaxColorLine(row)
 	return self:DoAction("SyntaxColorLine", row)
 end
 
+function PANEL:Think()
+	self:DoAction("Think")
+end
 -- register editor panel
 vgui.Register(TabHandler.ControlName, PANEL, "Panel");
 return TabHandler

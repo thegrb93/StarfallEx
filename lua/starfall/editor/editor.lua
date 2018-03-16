@@ -201,11 +201,6 @@ if CLIENT then
 		end
 
 		editor:Setup("Starfall Editor", "starfall", "Starfall")
-
-		for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
-			if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then v:RegisterSettings() end
-		end
-
 	end
 	function SF.Editor.openPermissionsPopup()
 		local frame = vgui.Create("StarfallFrame")

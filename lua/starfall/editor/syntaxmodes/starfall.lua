@@ -581,6 +581,10 @@ function EDITOR:SyntaxColorLine(row)
 				end
 				self:NextPattern(".*") -- Rest of comment/directive
 			end
+		elseif self:NextPattern("[%+%-%/%*%^%%%#]") then
+			tokenname = "operator"
+		elseif self:NextPattern("%.%.") then -- .. string concat
+			tokenname = "operator"
 		else
 			self:NextCharacter()
 
