@@ -630,10 +630,14 @@ function PANEL:PaintLine(row, drawpos)
 		local newrow = row+1
 		--Let's find end of string/comment
 		while colored.unfinished do
-			colored = self:SyntaxColorLine(newrow, self.PaintRows[newrow-1] or {})
-			self.PaintRows[newrow] = colored
+			if newrow - row < 50 then
+				colored = self:SyntaxColorLine(newrow, self.PaintRows[newrow-1] or {})
+				self.PaintRows[newrow] = colored
+			else -- If string/comment is above 50 lines long invalidate rest of cache so it gets rebuilt later instead of doing it now
+				self.PaintRows[newrow] = false
+			end
 			newrow = newrow + 1
-			if newrow > lines then break end
+			if newrow > lines then break end -- End of file
 		end
 		--[[surface_SetDrawColor(Color(255,0,0))
 		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)]]
