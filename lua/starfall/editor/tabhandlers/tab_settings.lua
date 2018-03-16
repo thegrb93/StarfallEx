@@ -43,6 +43,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	leftMenu:DockPadding(5,5,5,5)
 	leftMenu:SetPaintBackground( true )
 	leftMenu:SetBackgroundColor( theme.line_highlight )
+	self.leftMenu = leftMenu
 
 	--Tab Panel
 	local tabPanel = vgui.Create("DListLayout",self)
@@ -85,6 +86,8 @@ end
 function PANEL:OnThemeChange(theme)
 	self:SetPaintBackground( true )
 	self:SetBackgroundColor( theme.background )
+	self.leftMenu:SetPaintBackground( true )
+	self.leftMenu:SetBackgroundColor( theme.line_highlight )
 end
 
 function PANEL:OnFocusChanged(gained) -- When this tab is opened
