@@ -264,6 +264,9 @@ function PANEL:Init()
 	self.Undo = {}
 	self.Redo = {}
 	self.PaintRows = {}
+	self.HiddenRows = {}
+	self.RowOffset = {}
+	self.RealLine = {}
 
 	self.CurrentMode = assert(TabHandler.Modes.Text)
 
@@ -302,11 +305,30 @@ function PANEL:Init()
 
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
 	table.insert(TabHandler.Tabs, self)
+
+end
+
+function PANEL:HideRow(row)
+	self.HiddenRows[row] = true
+	local off = 0
+	for I = row, #self.Rows do
+		if self.HiddenRows[I] then
+			off = off + 1
+		end
+		self.RowOffset[I] = off
+	end
+end
+
+function PANEL:ShowRow(row)
+	self.HiddenRows[row] = false
+end
+
+function PANEL:GetRowOffset(row)
+	return self.RowOffset[row] or 0
 end
 
 function PANEL:OnThemeChange()
 	colors = SF.Editor.Themes.CurrentTheme
-	self.PaintedRows = {}
 	self.CurrentMode:LoadSyntaxColors()
 end
 
@@ -351,9 +373,9 @@ function PANEL:CursorToCaret()
 	local line = math_floor(y / self.FontHeight)
 	local char = math_floor(x / self.FontWidth + 0.5)
 
-	line = line + self.Scroll[1]
-	char = char + self.Scroll[2]
+	line = self.RealLine[line]
 
+	char = char + self.Scroll[2]
 	if line > #self.Rows then line = #self.Rows end
 	local length = #self.Rows[line]
 	if char > length + 1 then char = length + 1 end
@@ -380,7 +402,13 @@ function PANEL:OpenContextMenu()
 	if self:CanUndo() or self:CanRedo() then
 		menu:AddSpacer()
 	end
+	--[[
+		menu:AddOption("",function()
+			local y = self.Caret[1]
+			self:HideRow(y)
+		end)
 
+	]]
 	if self:HasSelection() then
 		menu:AddOption("Cut", function()
 				if self:HasSelection() then
@@ -588,25 +616,39 @@ function PANEL:HighlightLine(line, r, g, b, a)
 end
 function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
-function PANEL:PaintLine(row)
+function PANEL:PaintLine(row, drawpos)
+	local lines = #self.Rows
 	local usePigments = TabHandler.PigmentsConVar:GetInt()
-	if row > #self.Rows then return end
+	if row > lines then return end
+	local width, height = self.FontWidth, self.FontHeight
+	local startX, startY = self.LineNumberWidth + 5, drawpos*height
 
 	if not self.PaintRows[row] then
-		self.PaintRows[row] = self:SyntaxColorLine(row)
+		local colored = self:SyntaxColorLine(row, self.PaintRows[row-1] or {})
+		self.PaintRows[row] = colored
+
+		local newrow = row+1
+		--Let's find end of string/comment
+		while colored.unfinished do
+			colored = self:SyntaxColorLine(newrow, self.PaintRows[newrow-1] or {})
+			self.PaintRows[newrow] = colored
+			newrow = newrow + 1
+			if newrow > lines then break end
+		end
+		--[[surface_SetDrawColor(Color(255,0,0))
+		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)]]
 	end
 
-	local width, height = self.FontWidth, self.FontHeight
 
 	if row == self.Caret[1] and self.TextEntry:HasFocus() then
 		surface_SetDrawColor(colors.line_highlight)
-		surface_DrawRect(self.LineNumberWidth + 5, (row - self.Scroll[1]) * height, self:GetWide() - (self.LineNumberWidth + 5), height)
+		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
 	end
 
 	if self.HighlightedLines and self.HighlightedLines[row] then
 		local color = self.HighlightedLines[row]
 		surface_SetDrawColor(color[1], color[2], color[3], color[4])
-		surface_DrawRect(self.LineNumberWidth + 5, (row - self.Scroll[1]) * height, self:GetWide() - (self.LineNumberWidth + 5), height)
+		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
 	end
 
 	if self:HasSelection() then
@@ -623,20 +665,21 @@ function PANEL:PaintLine(row)
 		if endchar < 0 then endchar = 0 end
 
 		if row == line and line == endline then
-			surface_DrawRect(char * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width * (endchar - char), height)
+			surface_DrawRect(char * width + startX, startY, width * (endchar - char), height)
 		elseif row == line then
-			surface_DrawRect(char * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width * (length - char + 1), height)
+			surface_DrawRect(char * width + startX, startY, width * (length - char + 1), height)
 		elseif row == endline then
-			surface_DrawRect(self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width * endchar, height)
+			surface_DrawRect(startX, startY, width * endchar, height)
 		elseif row > line and row < endline then
-			surface_DrawRect(self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width * (length + 1), height)
+			surface_DrawRect(startX, startY, width * (length + 1), height)
 		end
 	end
 
-	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, (row - self.Scroll[1]) * height, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
+	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
 	local offset = -self.Scroll[2] + 1
 	for i, cell in ipairs(self.PaintRows[row]) do
+		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
 			local length = cell[1]:len()
 			if length > -offset then
@@ -646,16 +689,16 @@ function PANEL:PaintLine(row)
 				if cell[2][2] then --has background
 					surface_SetDrawColor(cell[2][2])
 					if usePigments == 1 and cell[3] == "color" then
-						surface_DrawRect(self.LineNumberWidth + 6, (row - self.Scroll[1]) * height + height-2, width * offset, 2)
+						surface_DrawRect(startX, startY + height-2, width * offset, 2)
 					else
-						surface_DrawRect(self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width * offset, height)
+						surface_DrawRect(startX, startY, width * offset, height)
 					end
 				end
 
 				if cell[2][2] then
-					draw_SimpleText(line .. " ", self.CurrentFont .. "_Bold", self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
+					draw_SimpleText(line .. " ", self.CurrentFont .. "_Bold", startX, startY, cell[2][1])
 				else
-					draw_SimpleText(line .. " ", self.CurrentFont, self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
+					draw_SimpleText(line .. " ", self.CurrentFont, startX, startY, cell[2][1])
 				end
 			else
 				offset = offset + length
@@ -665,23 +708,25 @@ function PANEL:PaintLine(row)
 			if cell[2][2] then --has background
 				surface_SetDrawColor(cell[2][2])
 				if usePigments == 1 and cell[3] == "color" then
-					surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height + height-2, width * length, 2)
+					surface_DrawRect(startX + offset * width, startY + height-2, width * length, 2)
 				else
-					surface_DrawRect(offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, width * length, height)
+					surface_DrawRect(startX + offset * width, startY, width * length, height)
 				end
 			end
 			if cell[2][3] == 2 then
-				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Bold", offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
+				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Bold", offset * width + startX, startY, cell[2][1])
 			elseif cell[2][3] == 1 then
-				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Italic", offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
+				draw_SimpleText(cell[1] .. " ", self.CurrentFont .. "_Italic", offset * width + startX, startY, cell[2][1])
 			else
-				draw_SimpleText(cell[1] .. " ", self.CurrentFont, offset * width + self.LineNumberWidth + 6, (row - self.Scroll[1]) * height, cell[2][1])
+				draw_SimpleText(cell[1] .. " ", self.CurrentFont, offset * width + startX, startY, cell[2][1])
 			end
 
 			offset = offset + length
 		end
 	end
-
+	if self.HiddenRows[row+1] then
+		draw_SimpleText("<...>", self.CurrentFont, offset * width + startX, startY, Color(64,64,64))
+	end
 end
 
 function PANEL:PerformLayout()
@@ -722,7 +767,9 @@ function PANEL:PaintTextOverlay()
 
 		if (RealTime() - self.Blink) % 0.8 < 0.4 then
 			surface_SetDrawColor(colors.caret)
-			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, (self.Caret[1] - self.Scroll[1]) * height, 1, height)
+			local y = self.Caret[1]
+			y = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
+			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, y, 1, height)
 		end
 
 		-- Area highlighting
@@ -739,7 +786,7 @@ function PANEL:PaintTextOverlay()
 
 					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width + (stop[2]-start[2]) * width - 1, (start[1]-self.Scroll[1]) * height + 1, 1, height-2)
 					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + 1, 1, height-2)
-					
+
 				elseif start[1] < stop[1] then -- Ends below start
 					for i = start[1], stop[1] do
 						if i == start[1] then
@@ -872,9 +919,22 @@ function PANEL:Paint()
 
 	self.Scroll[1] = math_floor(self.ScrollBar:GetScroll() + 1)
 
-	for i = self.Scroll[1], self.Scroll[1] + self.Size[1] + 1 do
-		self:PaintLine(i)
+	local i = self.Scroll[1]
+	local drawn = 0
+	local offset = 0
+	while drawn < self.Size[1] + 4 do
+		if self.HiddenRows[i] then
+			i = i + 1
+			offset = offset + 1
+			continue
+		end
+		self.RealLine[drawn] = i
+		self.RowOffset[i] = offset
+		self:PaintLine(i,drawn)
+		drawn = drawn + 1
+		i = i+1
 	end
+
 
 	-- Paint the overlay of the text (bracket highlighting and carret postition)
 	self:PaintTextOverlay()
@@ -992,7 +1052,15 @@ function PANEL:GetArea(selection)
 		return text .. "\n" .. string_sub(self.Rows[stop[1]], 1, stop[2] - 1)
 	end
 end
-
+function PANEL:RecacheLine(line)
+	local rows = #self.Rows
+	while self.PaintRows[line] and self.PaintRows[line]["unfinished"] do
+		self.PaintRows[line] = false
+		line = line + 1
+		if line > rows then return end
+	end
+	self.PaintRows[line] = false
+end
 function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	local start, stop = self:MakeSelection(selection)
 
@@ -1001,25 +1069,22 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	if start[1] ~= stop[1] or start[2] ~= stop[2] then
 		-- clear selection
 		self.Rows[start[1]] = string_sub(self.Rows[start[1]], 1, start[2] - 1) .. string_sub(self.Rows[stop[1]], stop[2])
-		self.PaintRows[start[1]] = false
+		self:RecacheLine(start[1])
 
 		for i = start[1] + 1, stop[1] do
 			table_remove(self.Rows, start[1] + 1)
 			table_remove(self.PaintRows, start[1] + 1)
-			self.PaintRows = {} -- TODO: fix for cache errors
 		end
 
 		-- add empty row at end of file (TODO!)
 		if self.Rows[#self.Rows] ~= "" then
 			self.Rows[#self.Rows + 1] = ""
-			self.PaintRows[#self.Rows + 1] = false
+			self:RecacheLine(#self.Rows + 1)
 		end
 	end
 
 	if not text or text == "" then
 		self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
-
-		self.PaintRows = {}
 
 		self:OnTextChanged()
 
@@ -1041,29 +1106,26 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 
 	local remainder = string_sub(self.Rows[start[1]], start[2])
 	self.Rows[start[1]] = string_sub(self.Rows[start[1]], 1, start[2] - 1) .. rows[1]
-	self.PaintRows[start[1]] = false
+	self:RecacheLine(start[1])
 
 	for i = 2, #rows do
 		table_insert(self.Rows, start[1] + i - 1, rows[i])
 		table_insert(self.PaintRows, start[1] + i - 1, false)
-		self.PaintRows = {} -- TODO: fix for cache errors
 	end
 
 	local stop = { start[1] + #rows - 1, #(self.Rows[start[1] + #rows - 1]) + 1 }
 
 	self.Rows[stop[1]] = self.Rows[stop[1]] .. remainder
-	self.PaintRows[stop[1]] = false
+	self:RecacheLine(stop[1])
 
 	-- add empty row at end of file (TODO!)
 	if self.Rows[#self.Rows] ~= "" then
 		self.Rows[#self.Rows + 1] = ""
-		self.PaintRows[#self.Rows + 1] = false
-		self.PaintRows = {} -- TODO: fix for cache errors
+		self:RecacheLine(#self.Rows + 1)
 	end
 
 	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 
-	self.PaintRows = {}
 
 	self:OnTextChanged()
 
@@ -2090,9 +2152,15 @@ function PANEL:_OnKeyCodeTyped(code)
 			self:SetSelection("\n" .. tabs)
 		elseif code == KEY_UP then
 			self.Caret[1] = self.Caret[1] - 1
+			while self.HiddenRows[self.Caret[1]] do
+				self.Caret[1] = self.Caret[1] - 1
+			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
 			self.Caret[1] = self.Caret[1] + 1
+			while self.HiddenRows[self.Caret[1]] do
+				self.Caret[1] = self.Caret[1] + 1
+			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_LEFT then
 			if self:HasSelection() and not shift then
@@ -2331,8 +2399,17 @@ function PANEL:GetSyntaxColor(name)
 	return self:DoAction("GetSyntaxColor", name)
 end
 
-function PANEL:SyntaxColorLine(row)
-	return self:DoAction("SyntaxColorLine", row)
+function PANEL:SyntaxColorLine(line, prev)
+	prev = prev or {}
+	if #self.Rows[line] > 2048 then -- Too long to parse
+		local cols = TabHandler.Modes.Text.SyntaxColorLine(self, line, prev)
+		for k,v in pairs(prev) do -- Pass along unfinished etc
+			if isnumber(k) then continue end
+			cols[k] = v
+		end
+		return cols
+	end
+	return self:DoAction("SyntaxColorLine", line, prev)
 end
 
 function PANEL:Think()

@@ -436,6 +436,7 @@ function Editor:GetActiveTabIndex()
 end
 
 function Editor:SetActiveTabIndex(index)
+	if not self.C.TabHolder.Items[index] then return end
 	local tab = self.C.TabHolder.Items[index].Tab
 
 	if not tab then return end

@@ -219,7 +219,9 @@ local setrgbapatternG = "^(setRGBA%s*)(%(%s*)"..numbpatternG..spacedcommaG..numb
 
 --End of monsterous code
 
-function EDITOR:SyntaxColorLine(row)
+function EDITOR:SyntaxColorLine(row, prevrow)
+	self.multilinestring = prevrow["multilinestring"]
+	self.blockcomment = prevrow["blockcomment"]
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
 	cols, lastcol = {}, nil
 
@@ -595,6 +597,11 @@ function EDITOR:SyntaxColorLine(row)
 		end
 	end
 
+	--So other rows can know that one contians unfinished blockcomment, multiline string etc
+	cols.multilinestring = self.multilinestring
+	cols.blockcomment = self.blockcomment
+
+	cols.unfinished = self.multilinestring or self.blockcomment
 	return cols
 end
 
