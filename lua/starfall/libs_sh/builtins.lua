@@ -242,7 +242,7 @@ if CLIENT then
 	--@return Boolean of whether the client gave all permissions specified in last request or not.
 	--@client
 	function SF.DefaultEnvironment.permissionRequestSatisfied()
-		return SF.Permissions.permissionsRequestSatisfied( SF.instance )
+		return SF.Permissions.permissionRequestSatisfied( SF.instance )
 	end
 
 end
