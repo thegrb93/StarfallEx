@@ -27,6 +27,60 @@
         name is the name of the table (optional)
         indent is a first indentation (optional).
 --]]
+---
+
+--http://lua-users.org/wiki/SortedIteration
+
+--We dont need it smart, just behaving always in the same way
+local function alphabetic_sort(op1,op2)
+    return tostring(op1) < tostring(op2)
+end
+
+
+local function __genOrderedIndex( t )
+    local orderedIndex = {}
+    for key in pairs(t) do
+        table.insert( orderedIndex, key )
+    end
+    table.sort( orderedIndex, alphabetic_sort )
+    return orderedIndex
+end
+
+local function orderedNext(t, state)
+    -- Equivalent of the next function, but returns the keys in the alphabetic
+    -- order. We use a temporary ordered key table that is stored in the
+    -- table being iterated.
+
+    local key = nil
+    --print("orderedNext: state = "..tostring(state) )
+    if state == nil then
+        -- the first time, generate the index
+        t.__orderedIndex = __genOrderedIndex( t )
+        key = t.__orderedIndex[1]
+    else
+        -- fetch the next value
+        for i = 1,table.getn(t.__orderedIndex) do
+            if t.__orderedIndex[i] == state then
+                key = t.__orderedIndex[i+1]
+            end
+        end
+    end
+
+    if key then
+        return key, t[key]
+    end
+
+    -- no more value to return, cleanup
+    t.__orderedIndex = nil
+    return
+end
+
+local function orderedPairs(t)
+    -- Equivalent of the pairs() function on tables. Allows to iterate
+    -- in order
+    return orderedNext, t, nil
+end
+
 return function(t, name, indent)
     local cart      -- a container
     local autoref  -- for self references
@@ -71,7 +125,7 @@ return function(t, name, indent)
                     cart = cart .. "={};"
                 else
                     cart = cart .. "={"
-                    for k, v in pairs(value) do
+                    for k, v in orderedPairs(value) do
                         k = basicSerialize(k)
                         local fname = string.format("%s[%s]", name, k)
                         field = string.format("[%s]", k)
