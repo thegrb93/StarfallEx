@@ -273,6 +273,15 @@ function PANEL:Init()
 
 	self.ScrollBar = vgui.Create("DVScrollBar", self)
 	self.ScrollBar:SetUp(1, 1)
+	self.ScrollBar.Paint = function(_, w, h)
+		surface_SetDrawColor(colors.gutter_background)
+		surface_DrawRect(0, 0, w, h)
+	end
+	self.ScrollBar.btnGrip.Paint = function(_, w, h)
+		surface_SetDrawColor(colors.gutter_foreground)
+		draw.RoundedBox(4, 0, 0, w, h, Color(234, 234, 234))
+	end
+	self.ScrollBar:SetHideButtons( true )
 
 	self.TextEntry = vgui.Create("TextEntry", self)
 	self.TextEntry:SetMultiline(true)
