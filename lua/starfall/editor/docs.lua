@@ -49,8 +49,8 @@ Will continuously run.";["class"]="hook";["summary"]="\
 Called when a player holds their use key and looks at an entity.";["classForced"]=true;["name"]="PlayerUse";["realm"]="sh";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being used";["ply"]="Player using the entity";};["server"]=true;};["GravGunPunt"]={["description"]="\
 Called when a player punts with the gravity gun";["class"]="hook";["server"]=true;["classForced"]=true;["realm"]="sh";["name"]="GravGunPunt";["summary"]="\
 Called when a player punts with the gravity gun ";["client"]=true;["param"]={[1]="ply";[2]="ent";["ent"]="Entity being punted";["ply"]="Player punting the gravgun";};};["readcell"]={["ret"]="The value read";["description"]="\
-Called when a high speed device reads from a wired SF chip";["class"]="hook";["summary"]="\
-Called when a high speed device reads from a wired SF chip ";["classForced"]=true;["name"]="readcell";["realm"]="sv";["server"]=true;["param"]={[1]="address";["address"]="The address requested";};};["EndEntityDriving"]={["description"]="\
+Called when a high speed device reads from a wired SF chip";["class"]="hook";["classForced"]=true;["summary"]="\
+Called when a high speed device reads from a wired SF chip ";["name"]="readcell";["realm"]="sv";["server"]=true;["param"]={[1]="address";["address"]="The address requested";};};["EndEntityDriving"]={["description"]="\
 Called when a player stops driving an entity";["class"]="hook";["server"]=true;["classForced"]=true;["realm"]="sh";["name"]="EndEntityDriving";["summary"]="\
 Called when a player stops driving an entity ";["client"]=true;["param"]={[1]="ent";[2]="ply";["ply"]="Player that drove the entity";["ent"]="Entity that had been driven";};};["OnEntityCreated"]={["description"]="\
 Called when an entity gets created";["class"]="hook";["server"]=true;["classForced"]=true;["realm"]="sh";["name"]="OnEntityCreated";["summary"]="\
@@ -1654,35 +1654,35 @@ Returns the hold type of the weapon.";["fname"]="getHoldType";["classlib"]="Weap
 Returns whether the weapon is visible";["class"]="function";["realm"]="sh";["summary"]="\
 Returns whether the weapon is visible ";["fname"]="isWeaponVisible";["classlib"]="Weapon";["name"]="weapon_methods:isWeaponVisible";["server"]=true;["private"]=false;["client"]=true;["param"]={};};};};};["directives"]={[1]="client";[2]="include";[3]="includedir";[4]="model";[5]="name";[6]="server";["include"]={["description"]="\
 Mark a file to be included in the upload. \
-This is required to use the file in require() and dofile()";["class"]="directive";["classForced"]=true;["name"]="include";["summary"]="\
-Mark a file to be included in the upload.";["usage"]="\
+This is required to use the file in require() and dofile()";["class"]="directive";["classForced"]=true;["summary"]="\
+Mark a file to be included in the upload.";["name"]="include";["usage"]="\
 --@include lib/someLibrary.txt \
  \
 require( \"lib/someLibrary.txt\" ) \
 -- CODE";["param"]={[1]="path";["path"]="Path to the file";};};["name"]={["description"]="\
 Set the name of the script. \
-This will become the name of the tab and will show on the overlay of the processor";["class"]="directive";["classForced"]=true;["name"]="name";["summary"]="\
-Set the name of the script.";["usage"]="\
+This will become the name of the tab and will show on the overlay of the processor";["class"]="directive";["classForced"]=true;["summary"]="\
+Set the name of the script.";["name"]="name";["usage"]="\
 --@name Awesome script \
 -- CODE";["param"]={[1]="name";["name"]="Name of the script";};};["model"]={["description"]="\
 Set the model of the processor entity. \
-This does not set the model of the screen entity";["class"]="directive";["classForced"]=true;["name"]="model";["summary"]="\
-Set the model of the processor entity.";["usage"]="\
+This does not set the model of the screen entity";["class"]="directive";["classForced"]=true;["summary"]="\
+Set the model of the processor entity.";["name"]="model";["usage"]="\
 --@model models/props_junk/watermelon01.mdl \
 -- CODE";["param"]={[1]="model";["model"]="String of the model";};};["includedir"]={["description"]="\
 Mark a directory to be included in the upload. \
-This is optional to include all files in the directory in require() and dofile()";["class"]="directive";["classForced"]=true;["name"]="includedir";["summary"]="\
-Mark a directory to be included in the upload.";["usage"]="\
+This is optional to include all files in the directory in require() and dofile()";["class"]="directive";["classForced"]=true;["summary"]="\
+Mark a directory to be included in the upload.";["name"]="includedir";["usage"]="\
 --@includedir lib \
  \
 require( \"lib/someLibraryInLib.txt\" ) \
 require( \"lib/someOtherLibraryInLib.txt\" ) \
 -- CODE";["param"]={[1]="path";["path"]="Path to the directory";};};["client"]={["description"]="\
-Set the processor to only run on the client. Shared is default";["class"]="directive";["classForced"]=true;["name"]="client";["summary"]="\
-Set the processor to only run on the client.";["usage"]="\
+Set the processor to only run on the client. Shared is default";["class"]="directive";["classForced"]=true;["summary"]="\
+Set the processor to only run on the client.";["name"]="client";["usage"]="\
 --@client \
 -- CODE";["param"]={};};["server"]={["description"]="\
-Set the processor to only run on the server. Shared is default";["class"]="directive";["classForced"]=true;["name"]="server";["summary"]="\
-Set the processor to only run on the server.";["usage"]="\
+Set the processor to only run on the server. Shared is default";["class"]="directive";["classForced"]=true;["summary"]="\
+Set the processor to only run on the server.";["name"]="server";["usage"]="\
 --@server \
 -- CODE";["param"]={};};};};
