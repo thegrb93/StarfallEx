@@ -16,23 +16,25 @@ AddCSLuaFile("sfhelper.lua")
 AddCSLuaFile("themes.lua")
 AddCSLuaFile("xml.lua")
 
-AddCSLuaFile("tabhandlers/tab_wire.lua")
-AddCSLuaFile("tabhandlers/tab_ace.lua")
-AddCSLuaFile("tabhandlers/tab_helper.lua")
 
-------------------
+-----------------
 -- Tab Handlers
 ------------------
 
 if CLIENT then
-
 	SF.Editor.TabHandlers = { }
-	SF.Editor.TabHandlers.wire = include("tabhandlers/tab_wire.lua")
-	SF.Editor.TabHandlers.ace = include("tabhandlers/tab_ace.lua")
-	SF.Editor.TabHandlers.helper = include("tabhandlers/tab_helper.lua")
-
 	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tabeditor", "ace", true, false)
+end
 
+MsgN("- Loading Editor TabHandlers")
+l = file.Find("starfall/editor/tabhandlers/tab_*.lua", "LUA")
+for _, name in pairs(l) do
+	name = name:sub(5,-5)
+	print("-  Loading "..name)
+	AddCSLuaFile("starfall/editor/tabhandlers/tab_"..name..".lua")
+	if CLIENT then
+		SF.Editor.TabHandlers[name] = include("starfall/editor/tabhandlers/tab_"..name..".lua")
+	end
 end
 
 SF.Editor.HelperURL = CreateConVar("sf_editor_helperurl", "http://thegrb93.github.io/StarfallEx/", {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "URL for website used by SF Helper, change to allow custom documentation.")
