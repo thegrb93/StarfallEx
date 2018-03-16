@@ -255,24 +255,31 @@ if CLIENT then
 					for id, setting in SortedPairs(p.settings) do
 
 						local header = vgui.Create("StarfallPanel")
-						header.Paint = function() end
 						header:DockMargin(0, 5, 0, 0)
 						header:SetSize(0, 20)
 						header:Dock(TOP)
 						header:SetToolTip(id)
+						header:SetBackgroundColor(Color(0,0,0,20))
 
 						local settingtext = vgui.Create("DLabel", header)
 						settingtext:SetFont("DermaDefault")
 						settingtext:SetColor(Color(255, 255, 255))
 						settingtext:SetText(id)
 						settingtext:DockMargin(5, 0, 0, 0)
-						settingtext:Dock(FILL)
+						settingtext:Dock(LEFT)
+						settingtext:SizeToContents()
+
+						local description = vgui.Create("DLabel", header)
+						description:SetFont("DermaDefault")
+						description:SetColor(Color(128, 128, 128))
+						description:SetText(" - "..setting[2])
+						description:DockMargin(5, 0, 0, 0)
+						description:Dock(FILL)
 
 						local buttons = {}
 						for i = #p.options, 1, -1 do
 							local button = vgui.Create("StarfallButton", header)
 							button:SetText(p.options[i])
-							button:SetTooltip(setting[2])
 							button:DockMargin(0, 0, 3, 0)
 							button:Dock(RIGHT)
 							if server then
