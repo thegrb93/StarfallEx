@@ -761,7 +761,6 @@ function Editor:InitComponents()
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
 
-	self.C.Control = self:AddComponent(vgui.Create("Panel", self), -462, 72, 462, -30) -- Control Panel
 	self.C.Credit = self:AddComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
@@ -808,10 +807,6 @@ function Editor:InitComponents()
 	self.C.ConBut:SetText("")
 	self.C.ConBut.Paint = PaintFlatButton
 	self.C.ConBut.DoClick = function()
-		--[[
-			self.C.Control.Permissions:Refresh()
-			self.C.Control:SetVisible(not self.C.Control:IsVisible())
-		]]
 		self:OpenTabOnlyOnce("settings")
 	end
 
@@ -916,8 +911,6 @@ function Editor:InitComponents()
 	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for starfall by D.ツ") -- Sure why not ;)
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
-
-	self.C.Control:SetVisible(false)
 
 end
 
@@ -1553,7 +1546,7 @@ function Editor:LoadFile(Line, forcenewtab)
 					self:SetActiveTab(i)
 					if forcenewtab ~= nil then self:SetCode(str) end
 					return
-				elseif self:GetTabContent(i):GetCode() == str then
+				elseif self:GetTabContent(i).GetCode and self:GetTabContent(i):GetCode() == str then
 					self:SetActiveTab(i)
 					return
 				end
