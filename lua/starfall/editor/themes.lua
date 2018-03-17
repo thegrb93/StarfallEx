@@ -96,6 +96,12 @@ function SF.Editor.Themes.SwitchTheme(name)
 		print("Theme "..name.." isnt compatibile with this starfall version, you have to reimport it!")
 		return
 	end
+	for k, v in pairs(SF.Editor.Themes.Themes.default) do
+		if not theme[k] then
+			theme[k] = v
+		end
+	end
+
     SF.Editor.Themes.CurrentTheme = theme
 	SF.Editor.Themes.ThemeConVar:SetString(name)
 	if SF.Editor.editor then
@@ -220,12 +226,6 @@ local function parseTextMate(text)
 
 	-- Copy values from default theme to avoid problems with nil values
 
-	for k, v in pairs(SF.Editor.Themes.Themes.default) do
-		if not tbl[k] then
-			tbl[k] = v
-		end
-	end
-
 	local strId = tbl.Name:Trim():Replace(" ", ""):lower()
 
     return tbl, strId
@@ -262,7 +262,7 @@ SF.Editor.Themes.AddTheme("default", {
 	["word_highlight"] = Color(30, 150, 30),
 
 	--{foreground color, background color, fontStyle}
-    ["keyword"] = { Color(249, 38, 114), Color(255,0,0,20), 0 },
+    ["keyword"] = { Color(249, 38, 114), nil, 0 },
 	["storageType"] = { Color(249, 38, 114), nil, 0 },
 	["directive"] =	{ Color(230, 219, 116), nil, 0 },
 	["comment"] = { Color(117, 113, 94), nil, 1 },

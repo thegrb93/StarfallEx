@@ -81,11 +81,12 @@ local function addToken(tokenname, tokendata)
 
 	local color = colors[tokenname] or colors["notfound"]
 
-	if lasttoken and tokenname == lasttoken[3] and not unconnectable[tokenname] then
-		lasttoken[1] = lasttoken[1] .. tokendata
+	if lasttoken and tokenname == lasttoken and not unconnectable[tokenname] then
+		local newdata = cols[#cols][1] .. tokendata
+		cols[#cols][1] = newdata
 	else
 		cols[#cols + 1] = { tokendata, color, tokenname }
-		tokenname = cols[#cols]
+		lasttoken = tokenname
 	end
 end
 
@@ -101,12 +102,8 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 	elseif usePigments == 1 then
 		textcolor = colors[tokenname][1]
 	end
-	if lastcol and color == lastcol[2] then
-		lastcol[1] = lastcol[1] .. tokendata
-	else
-		cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
-		lastcol = cols[#cols]
-	end
+	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
+	lastcol = cols[#cols]
 end
 
 function EDITOR:BlockCommentSelection(removecomment)
@@ -186,7 +183,7 @@ function EDITOR:ResetTokenizer(row)
 	if p then p = p[2] end
 	self.multilinestring = p and p["multilinestring"] or false
 	self.blockcomment = p and p["blockcomment"] or false
-
+	lasttoken = nil
 end
 
 --That code sucks, if you can do any better then DO IT
