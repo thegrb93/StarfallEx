@@ -72,6 +72,7 @@ end
 local cols = {}
 local lastcol
 local function addToken(tokenname, tokendata)
+	if not tokendata or #tokendata < 0 then error("EMPTY TOKEN") end
 	if not tokenname then tokenname = "notfound" end
 	local color = colors[tokenname] or colors["notfound"]
 	if lastcol and color == lastcol[2] then
@@ -228,8 +229,10 @@ function EDITOR:SyntaxColorLine(row)
 
 		addToken("string", self.tokendata)
 	end
+	local spaces = self:SkipPattern(" *")
+	if spaces then addToken("whitespace", spaces) end
 
-	local found = self:SkipPattern("(%s*function)")
+	local found = self:SkipPattern("(function)")
 	if found then
 		addToken("storageType", found) -- Add "function"
 		self.tokendata = "" -- Reset tokendata
@@ -251,14 +254,22 @@ function EDITOR:SyntaxColorLine(row)
 		end
 
 		self.tokendata = ""
-		if self:NextPattern("%) *{?") then -- check for ending bracket (and perhaps an ending {?)
+		if self:NextPattern("%) *") then -- check for ending bracket
 			addToken("notfound", self.tokendata)
 		end
+		cols.foldable = true
 	end
+	local spaces = self:SkipPattern(" *")
+	if spaces then addToken("whitespace", spaces) end
 
-	found = self:SkipPattern("(%s*local%s*function)")  -- local function
+	found = self:NextPattern("local%s*function")  -- local function		
 	if found then
-		addToken("storageType", found) -- Add "function"
+		local l, spaces, f = self.tokendata:match("(local)(%s*)(function)")
+
+		addToken("keyword", l)
+		if spaces and #spaces>0 then addToken("whitespace", spaces) end
+		addToken("storageType", f) -- Add "function"
+
 		self.tokendata = "" -- Reset tokendata
 
 		local spaces = self:SkipPattern(" *")
@@ -278,11 +289,11 @@ function EDITOR:SyntaxColorLine(row)
 		end
 
 		self.tokendata = ""
-		if self:NextPattern("%) *{?") then -- check for ending bracket (and perhaps an ending {?)
+		if self:NextPattern("%)") then
 			addToken("notfound", self.tokendata)
 		end
+		cols.foldable = true
 	end
-
 	while self.character do
 		local tokenname = ""
 		self.tokendata = ""
@@ -563,6 +574,8 @@ function EDITOR:SyntaxColorLine(row)
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat
 			tokenname = "operator"
+		elseif self:NextPattern("[%{%}]") then -- .. {}
+			tokenname = "bracket"
 		else
 			self:NextCharacter()
 

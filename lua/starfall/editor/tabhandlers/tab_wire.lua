@@ -300,6 +300,7 @@ function PANEL:Init()
 	self.CurrentMode:LoadSyntaxColors()
 
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
+	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7)
 	table.insert(TabHandler.Tabs, self)
 
 end
@@ -343,6 +344,8 @@ end
 
 function PANEL:ShowRow(row)
 	self.Rows[row][3] = false
+	self.Rows[row].hides = nil
+	self.Rows[row].hiddenby = nil
 end
 
 function PANEL:GetRowOffset(row)
@@ -410,6 +413,118 @@ local wire_expression2_editor_highlight_on_double_click = CreateClientConVar("wi
 function PANEL:OpenContextMenu()
 	local menu = DermaMenu()
 
+	local y = self.Caret[1]
+	local lines = #self.Rows
+	local row = self.Rows[y]
+	row[2]  = self:SyntaxColorLine(y)
+	local cols = row[2]
+	local sum = 0
+	--[[Hiding then/do -> end]]
+	local adds = {
+		["then"] = true,
+		["function"] = true,
+		["do"] = true
+	}
+	local removes = {
+		["end"] = true,
+		["else"] = true,
+		["elseif"] = true,
+	}
+	for k,v in ipairs(cols) do
+		if adds[v[1]] then
+			sum = sum + 1
+		end
+		if v[1] == "end" then
+			sum = sum - 1
+		end
+		cols.test = sum
+	end
+	if sum > 0 and not row.hides then
+		cols.foldable = true
+		menu:AddOption("hide",function()
+			local line = y
+			local sum = 0 -- Change scope
+			while line < lines do
+				self.Rows[line][2]  = self:SyntaxColorLine(line)
+				cols = self.Rows[line][2]
+				for k,v in ipairs(cols) do
+					if adds[v[1]] then
+						sum = sum + 1
+					else
+					end
+					if removes[v[1]] then
+						sum = sum - 1
+					end
+					cols.test = sum
+				end
+				if sum <= 0 then
+					row.hides = 0
+					for I = y + 1, line-1 do
+						self:HideRow(I)
+						self.Rows[line].hiddenby = I-y
+						row.hides = row.hides + 1
+					end
+					break
+				end
+				line = line + 1
+			end
+		end)
+	end
+	--[[Hiding { -> }]]
+	sum = 0
+	for k,v in ipairs(cols) do
+		if v[1] == "{" then
+			sum = sum + 1
+		end
+		if v[1] == "end" then
+			sum = sum - 1
+		end
+		cols.test = sum
+	end
+	if sum > 0 and not row.hides then
+		cols.foldable = true
+		local sum = sum -- Change scope
+		menu:AddOption("hide",function()
+			local line = y
+			local sum = 0
+
+			while line < lines do
+				self.Rows[line][2]  = self:SyntaxColorLine(line)
+				cols = self.Rows[line][2]
+				for k,v in ipairs(cols) do
+					if v[1] == "{" then
+						sum = sum + 1
+					end
+					if v[1] == "}" then
+						sum = sum - 1
+					end
+					cols.test = sum
+				end
+				if sum <= 0 then
+					row.hides = 0
+					for I = y + 1, line-1 do
+						self:HideRow(I)
+						self.Rows[line].hiddenby = I-y
+						row.hides = row.hides + 1
+					end
+					break
+				end
+				line = line + 1
+			end
+		end)
+	end
+
+	if row.hides then
+		cols.foldable = true
+		menu:AddOption("show",function()
+			for I = y + 1, y + row.hides do
+				self:ShowRow(I)
+			end
+			row.hides = nil
+		end)
+	end	
+	menu:AddSpacer()
+
 	if self:CanUndo() then
 		menu:AddOption("Undo", function()
 				self:DoUndo()
@@ -424,11 +539,6 @@ function PANEL:OpenContextMenu()
 	if self:CanUndo() or self:CanRedo() then
 		menu:AddSpacer()
 	end
-		menu:AddOption("hide",function()
-			local y = self.Caret[1]
-			self:HideRow(y)
-		end)
-
 
 	if self:HasSelection() then
 		menu:AddOption("Cut", function()
@@ -715,7 +825,10 @@ function PANEL:PaintLine(row, drawpos)
 	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
 	local offset = -self.Scroll[2] + 1
-	for i, cell in ipairs(self:GetRowCache(row)) do
+	local cells = self:GetRowCache(row)
+	local rowdata = self.Rows[row]
+
+	for i, cell in ipairs(cells) do
 		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
 			local length = cell[1]:len()
@@ -762,7 +875,14 @@ function PANEL:PaintLine(row, drawpos)
 		end
 	end
 	if row < lines and self.Rows[row+1][3] then
-		draw_SimpleText("<...>", self.CurrentFont, offset * width + startX, startY,colors.word_highlight)
+		draw_SimpleText("<"..rowdata.hides.." lines hidden..>", self.CurrentFontSmall, offset * width + startX + 5, startY + self.FontSmallHeight*0.5,colors.word_highlight)
+	end
+	if cells.foldable then
+		surface_SetDrawColor(Color(0,222,0,20))
+		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
+	end
+	if cells.test then
+		draw_SimpleText(tostring(cells.test), self.CurrentFont, startX, startY, Color(32,32,255))
 	end
 end
 
@@ -2377,12 +2497,6 @@ function PANEL:SkipPattern(pattern)
 		self.character = nil
 	end
 	return text
-end
-
-function PANEL:IsVarLine()
-	local line = self:GetRowText(caret[1])
-	local word = line:match("^@(%w+)")
-	return (word == "inputs" or word == "outputs" or word == "persist")
 end
 
 function PANEL:IsDirectiveLine()
