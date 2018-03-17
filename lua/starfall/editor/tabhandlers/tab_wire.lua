@@ -143,7 +143,6 @@ function TabHandler:Init()
 
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	colors = SF.Editor.Themes.CurrentTheme
-	self.PaintRows = {}
 	self:LoadSyntaxColors()
 end
 
@@ -153,7 +152,6 @@ function TabHandler:RegisterTabMenu(menu, content)
 		local mode = v
 		coloring:AddOption(k, function()
 			content.CurrentMode = mode
-			content.PaintRows = {}
 		end)
 	end
 end
@@ -238,7 +236,7 @@ function TabHandler:RegisterSettings()
 	usePigments.OnSelect = function(_, val)
 		RunConsoleCommand("sf_editor_wire_pigments", val-1)
 		timer.Simple(0, function()
-			SF.Editor.editor:GetCurrentTabContent().PaintRows = {} -- Re-color syntax
+			 -- Re-color syntax
 		end)
 	end
 	return dlist, "Wire", "icon16/pencil.png", "Options for wire tabs."
@@ -256,15 +254,13 @@ function PANEL:Init()
 
 	self.TabHandler = TabHandler
 
-	self.Rows = { "" }
+	self.Rows = { {"",false,false} }
 	self.Caret = { 1, 1 }
 	self.Start = { 1, 1 }
 	self.Scroll = { 1, 1 }
 	self.Size = { 1, 1 }
 	self.Undo = {}
 	self.Redo = {}
-	self.PaintRows = {}
-	self.HiddenRows = {}
 	self.RowOffset = {}
 	self.RealLine = {}
 
@@ -308,19 +304,45 @@ function PANEL:Init()
 
 end
 
-function PANEL:HideRow(row)
-	self.HiddenRows[row] = true
-	local off = 0
-	for I = row, #self.Rows do
-		if self.HiddenRows[I] then
-			off = off + 1
-		end
-		self.RowOffset[I] = off
+function PANEL:GetRowText(line)
+	if line > #self.Rows then
+		return ""
 	end
+	return self.Rows[line][1]
+end
+function PANEL:GetRowCache(line)
+	return self.Rows[line][2]
+end
+
+function PANEL:SetRowText(line, text)
+	if line > #self.Rows then
+		table.insert(self.Rows, {
+			text, --Text
+			false, --Cache
+			false, --Hidden
+		})
+		return
+	end
+	self.Rows[line][1] = text
+	self:RecacheLine(line)
+end
+
+function PANEL:InsertRowAt(line, text)
+	table.insert(self.Rows,line, {
+		text, --Text
+		false, --Cache
+		false, --Hidden
+	})
+	return
+end
+
+function PANEL:HideRow(row)
+	self.Rows[row][3] = true
+	local off = 0
 end
 
 function PANEL:ShowRow(row)
-	self.HiddenRows[row] = false
+	self.Rows[row][3] = false
 end
 
 function PANEL:GetRowOffset(row)
@@ -365,7 +387,7 @@ end
 
 function PANEL:CursorToCaret()
 	local x, y = self:CursorPos()
-
+	local lines = #self.Rows
 	x = x - (self.LineNumberWidth + 6)
 	if x < 0 then x = 0 end
 	if y < 0 then y = 0 end
@@ -376,8 +398,8 @@ function PANEL:CursorToCaret()
 	line = self.RealLine[line]
 
 	char = char + self.Scroll[2]
-	if line > #self.Rows then line = #self.Rows end
-	local length = #self.Rows[line]
+	if line > lines then line = lines end
+	local length = #self:GetRowText(line)
 	if char > length + 1 then char = length + 1 end
 
 	return { line, char }
@@ -402,13 +424,12 @@ function PANEL:OpenContextMenu()
 	if self:CanUndo() or self:CanRedo() then
 		menu:AddSpacer()
 	end
-	--[[
-		menu:AddOption("",function()
+		menu:AddOption("hide",function()
 			local y = self.Caret[1]
 			self:HideRow(y)
 		end)
 
-	]]
+
 	if self:HasSelection() then
 		menu:AddOption("Cut", function()
 				if self:HasSelection() then
@@ -584,9 +605,13 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
-	self.Rows = string_Explode("\n", text)
-	if self.Rows[#self.Rows] ~= "" then
-		self.Rows[#self.Rows + 1] = ""
+	local rows = string_Explode("\n", text)
+	for k,v in ipairs(rows) do
+		self:SetRowText(k,v)
+	end
+	local lines = #self.Rows
+	if self:GetRowText(lines) ~= "" then
+		self:InsertRowAt(lines+1,"")
 	end
 
 	self.Caret = { 1, 1 }
@@ -594,13 +619,17 @@ function PANEL:SetCode(text)
 	self.Scroll = { 1, 1 }
 	self.Undo = {}
 	self.Redo = {}
-	self.PaintRows = {}
 
-	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
+	self.ScrollBar:SetUp(self.Size[1], lines - 1)
 end
 
 function PANEL:GetCode()
-	return string_gsub(table_concat(self.Rows, "\n"), "\r", "")
+	local lines = #self.Rows
+	local code = ""
+	for I=1,lines do
+		code = code .. self:GetRowText(I) .. "\n"
+	end
+	return string_gsub(code, "\r", "")
 end
 
 function PANEL:HighlightLine(line, r, g, b, a)
@@ -618,29 +647,33 @@ function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
 function PANEL:PaintLine(row, drawpos)
 	local lines = #self.Rows
+	local lineLen = #self:GetRowText(row)
+
 	local usePigments = TabHandler.PigmentsConVar:GetInt()
 	if row > lines then return end
 	local width, height = self.FontWidth, self.FontHeight
 	local startX, startY = self.LineNumberWidth + 5, drawpos*height
 
-	if not self.PaintRows[row] then
-		local colored = self:SyntaxColorLine(row, self.PaintRows[row-1] or {})
-		self.PaintRows[row] = colored
+	if not self:GetRowCache(row) then
+
+		local colored = self:SyntaxColorLine(row, self.Rows[row-1] and self.Rows[row-1][2] or {})
+		self.Rows[row][2] = colored
 
 		local newrow = row+1
 		--Let's find end of string/comment
 		while colored.unfinished do
+			print("ITER"..newrow)
 			if newrow - row < 50 then
-				colored = self:SyntaxColorLine(newrow, self.PaintRows[newrow-1] or {})
-				self.PaintRows[newrow] = colored
+				colored = self:SyntaxColorLine(newrow, self.Rows[row-1] and self.Rows[row-1][2] or {})
+				self.Rows[newrow][2] = colored
 			else -- If string/comment is above 50 lines long invalidate rest of cache so it gets rebuilt later instead of doing it now
-				self.PaintRows[newrow] = false
+				self.Rows[newrow][2] = false
 			end
 			newrow = newrow + 1
 			if newrow > lines then break end -- End of file
 		end
-		--[[surface_SetDrawColor(Color(255,0,0))
-		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)]]
+		surface_SetDrawColor(Color(255,0,0))
+		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
 	end
 
 
@@ -661,7 +694,7 @@ function PANEL:PaintLine(row, drawpos)
 		local endline, endchar = stop[1], stop[2]
 
 		surface_SetDrawColor(colors.selection)
-		local length = self.Rows[row]:len() - self.Scroll[2] + 1
+		local length = lineLen - self.Scroll[2] + 1
 
 		char = char - self.Scroll[2]
 		endchar = endchar - self.Scroll[2]
@@ -682,7 +715,7 @@ function PANEL:PaintLine(row, drawpos)
 	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
 	local offset = -self.Scroll[2] + 1
-	for i, cell in ipairs(self.PaintRows[row]) do
+	for i, cell in ipairs(self:GetRowCache(row)) do
 		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
 			local length = cell[1]:len()
@@ -728,8 +761,8 @@ function PANEL:PaintLine(row, drawpos)
 			offset = offset + length
 		end
 	end
-	if self.HiddenRows[row+1] then
-		draw_SimpleText("<...>", self.CurrentFont, offset * width + startX, startY, Color(64,64,64))
+	if row < lines and self.Rows[row+1][3] then
+		draw_SimpleText("<...>", self.CurrentFont, offset * width + startX, startY,colors.word_highlight)
 	end
 end
 
@@ -775,7 +808,7 @@ function PANEL:PaintTextOverlay()
 			y = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
 			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, y, 1, height)
 		end
-
+		--[=[
 		-- Area highlighting
 		if self.HighlightedAreas then
 			local xofs = self.LineNumberWidth + 6
@@ -803,8 +836,9 @@ function PANEL:PaintTextOverlay()
 					end
 				end
 			end
-		end
+		end]=]
 
+		--[=[
 		-- Bracket highlighting by: {Jeremydeath}
 		local WindowText = self:GetCode()
 		local LinePos = table_concat(self.Rows, "\n", 1, self.Caret[1]-1):len()
@@ -891,7 +925,7 @@ function PANEL:PaintTextOverlay()
 					end
 				end
 			end
-		end
+		end]=]
 	end
 end
 
@@ -902,10 +936,6 @@ function PANEL:Paint()
 
 	if not input.IsMouseDown(MOUSE_LEFT) then
 		self:OnMouseReleased(MOUSE_LEFT)
-	end
-
-	if not self.PaintRows then
-		self.PaintRows = {}
 	end
 
 	if self.MouseDown then
@@ -926,8 +956,10 @@ function PANEL:Paint()
 	local i = self.Scroll[1]
 	local drawn = 0
 	local offset = 0
+	local lines =  #self.Rows
 	while drawn < self.Size[1] + 4 do
-		if self.HiddenRows[i] then
+		if i > lines then break end
+		if self.Rows[i][3] then
 			i = i + 1
 			offset = offset + 1
 			continue
@@ -944,7 +976,7 @@ function PANEL:Paint()
 	self:PaintTextOverlay()
 
 	if display_caret_pos:GetBool() then
-		local str = "Length: " .. #self:GetCode() .. " Lines: " .. #self.Rows .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
+		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
 		end
@@ -966,7 +998,7 @@ function PANEL:SetCaret(caret, maintain_selection)
 	self.Caret = self:CopyPosition(caret)
 
 	self.Caret[1] = math.Clamp(self.Caret[1], 1, #self.Rows)
-	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self.Rows[self.Caret[1]] + 1)
+	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self:GetRowText(self.Caret[1]) + 1)
 
 	if maintain_selection == nil then
 		maintain_selection = input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)
@@ -989,7 +1021,7 @@ function PANEL:MovePosition(caret, offset)
 	if offset > 0 then
 		local numRows = #self.Rows
 		while true do
-			local length = #(self.Rows[row]) - col + 2
+			local length = #(self:GetRowText(row)) - col + 2
 			if offset < length then
 				col = col + offset
 				break
@@ -1015,7 +1047,7 @@ function PANEL:MovePosition(caret, offset)
 			else
 				offset = offset - col
 				row = row - 1
-				col = #(self.Rows[row]) + 1
+				col = #(self:GetRowText(row)) + 1
 			end
 		end
 	end
@@ -1045,25 +1077,26 @@ function PANEL:GetArea(selection)
 	local start, stop = self:MakeSelection(selection)
 
 	if start[1] == stop[1] then
-		return string_sub(self.Rows[start[1]], start[2], stop[2] - 1)
+		return string_sub(self:GetRowText(start[1]), start[2], stop[2] - 1)
 	else
-		local text = string_sub(self.Rows[start[1]], start[2])
+		local text = string_sub(self:GetRowText(start[1]), start[2])
 
 		for i = start[1] + 1, stop[1]-1 do
-			text = text .. "\n" .. self.Rows[i]
+			text = text .. "\n" .. self:GetRowText(i)
 		end
 
-		return text .. "\n" .. string_sub(self.Rows[stop[1]], 1, stop[2] - 1)
+		return text .. "\n" .. string_sub(self:GetRowText(stop[1]), 1, stop[2] - 1)
 	end
 end
 function PANEL:RecacheLine(line)
 	local rows = #self.Rows
-	while self.PaintRows[line] and self.PaintRows[line]["unfinished"] do
-		self.PaintRows[line] = false
+	if line > rows then return end
+	while self.Rows[line][2] and self.Rows[line][2]["unfinished"] do
+		self.Rows[line][2] = false
 		line = line + 1
 		if line > rows then return end
 	end
-	self.PaintRows[line] = false
+	self.Rows[line][2] = false
 end
 function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	local start, stop = self:MakeSelection(selection)
@@ -1072,18 +1105,16 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 
 	if start[1] ~= stop[1] or start[2] ~= stop[2] then
 		-- clear selection
-		self.Rows[start[1]] = string_sub(self.Rows[start[1]], 1, start[2] - 1) .. string_sub(self.Rows[stop[1]], stop[2])
+		self:SetRowText(start[1], string_sub(self:GetRowText(start[1]), 1, start[2] - 1) .. string_sub(self:GetRowText(stop[1]), stop[2]))
 		self:RecacheLine(start[1])
 
 		for i = start[1] + 1, stop[1] do
 			table_remove(self.Rows, start[1] + 1)
-			table_remove(self.PaintRows, start[1] + 1)
 		end
 
-		-- add empty row at end of file (TODO!)
-		if self.Rows[#self.Rows] ~= "" then
-			self.Rows[#self.Rows + 1] = ""
-			self:RecacheLine(#self.Rows + 1)
+		local lines = #self.Rows
+		if self:GetRowText(lines) ~= "" then
+			self:InsertRowAt(lines+1,"")
 		end
 	end
 
@@ -1108,24 +1139,23 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	-- insert text
 	local rows = string_Explode("\n", text)
 
-	local remainder = string_sub(self.Rows[start[1]], start[2])
-	self.Rows[start[1]] = string_sub(self.Rows[start[1]], 1, start[2] - 1) .. rows[1]
+	local remainder = string_sub(self:GetRowText(start[1]), start[2])
+	self:SetRowText(start[1], string_sub(self:GetRowText(start[1]), 1, start[2] - 1) .. rows[1])
 	self:RecacheLine(start[1])
 
 	for i = 2, #rows do
-		table_insert(self.Rows, start[1] + i - 1, rows[i])
-		table_insert(self.PaintRows, start[1] + i - 1, false)
+		self:InsertRowAt(start[1] + i - 1, rows[i])
+
 	end
 
-	local stop = { start[1] + #rows - 1, #(self.Rows[start[1] + #rows - 1]) + 1 }
+	local stop = { start[1] + #rows - 1, #(self:GetRowText(start[1] + #rows - 1)) + 1 }
 
-	self.Rows[stop[1]] = self.Rows[stop[1]] .. remainder
+	self:SetRowText(stop[1],self:GetRowText(stop[1]) .. remainder)
 	self:RecacheLine(stop[1])
 
-	-- add empty row at end of file (TODO!)
-	if self.Rows[#self.Rows] ~= "" then
-		self.Rows[#self.Rows + 1] = ""
-		self:RecacheLine(#self.Rows + 1)
+	local lines = #self.Rows
+	if self:GetRowText(lines) ~= "" then
+		self:InsertRowAt(lines+1,"")
 	end
 
 	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
@@ -1193,10 +1223,10 @@ function PANEL:_OnTextChanged()
 		if text == "\n" or text == "`" then return end
 		if text == "}" and GetConVarNumber('sf_editor_wire_autoindent') ~= 0 then
 			self:SetSelection(text)
-			local row = self.Rows[self.Caret[1]]
+			local row = self:GetRowText(self.Caret[1])
 			if string_match("{" .. row, "^%b{}.*$") then
 				local newrow = unindent(row)
-				self.Rows[self.Caret[1]] = newrow
+				self:SetRowText(self.Caret[1], newrow)
 				self.Caret[2] = self.Caret[2] + newrow:len()-row:len()
 				self.Start[2] = self.Caret[2]
 			end
@@ -1266,6 +1296,8 @@ function PANEL:HighlightFoundWord(caretstart, start, stop)
 end
 
 function PANEL:Find(str, looped)
+	do return --TODO: Fix it
+	end
 	if looped and looped >= 2 then return end
 	if str == "" then return end
 	local _str = str
@@ -1771,7 +1803,7 @@ function PANEL:CreateFindWindow()
 		local val = tonumber(GoToEntry:GetValue())
 		if val then
 			val = math_Clamp(val, 1, #self.Rows)
-			self:SetCaret({ val, #self.Rows[val] + 1 }, false)
+			self:SetCaret({ val, #self:GetRowText(val) + 1 }, false)
 		end
 		GoToEntry:SetText(tostring(val))
 		self.FindWindow:Close()
@@ -1873,7 +1905,7 @@ function PANEL:DoRedo()
 end
 
 function PANEL:SelectAll()
-	self.Caret = { #self.Rows, #(self.Rows[#self.Rows]) + 1 }
+	self.Caret = { #self.Rows, #(self:GetRowText(#self.Rows)) + 1 }
 	self.Start = { 1, 1 }
 	self:ScrollCaret()
 end
@@ -1986,7 +2018,7 @@ function PANEL:ContextHelp()
 		word = self:GetSelection()
 	else
 		local row, col = unpack(self.Caret)
-		local line = self.Rows[row]
+		local line = self:GetRowText(row)
 		if not line:sub(col, col):match("^[a-zA-Z0-9_]$") then
 			col = col - 1
 		end
@@ -2150,19 +2182,19 @@ function PANEL:_OnKeyCodeTyped(code)
 	else
 
 		if code == KEY_ENTER then
-			local row = self.Rows[self.Caret[1]]:sub(1, self.Caret[2]-1)
+			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 			local tabs = string_rep("    ", math_floor(diff / 4))
 			self:SetSelection("\n" .. tabs)
 		elseif code == KEY_UP then
 			self.Caret[1] = self.Caret[1] - 1
-			while self.HiddenRows[self.Caret[1]] do
+			while self.Rows[self.Caret[1]][3] do
 				self.Caret[1] = self.Caret[1] - 1
 			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
 			self.Caret[1] = self.Caret[1] + 1
-			while self.HiddenRows[self.Caret[1]] do
+			while self.Rows[self.Caret[1]][3] do
 				self.Caret[1] = self.Caret[1] + 1
 			end
 			self:SetCaret(self.Caret)
@@ -2293,7 +2325,7 @@ end
 
 function PANEL:GetTokenAtPosition(caret)
 	local column = caret[2]
-	local line = self.PaintRows[caret[1]]
+	local line = self.Rows[caret[1]][2]
 	if line then
 		local startindex = 1
 		for index, data in pairs(line) do
@@ -2306,7 +2338,7 @@ end
 -- Syntax highlighting --------------------------------------------------------
 
 function PANEL:ResetTokenizer(row)
-	self.line = self.Rows[row]
+	self.line = self:GetRowText(row)
 	self.position = 0
 	self.character = ""
 	self.tokendata = ""
@@ -2348,18 +2380,18 @@ function PANEL:SkipPattern(pattern)
 end
 
 function PANEL:IsVarLine()
-	local line = self.Rows[self.Caret[1]]
+	local line = self:GetRowText(caret[1])
 	local word = line:match("^@(%w+)")
 	return (word == "inputs" or word == "outputs" or word == "persist")
 end
 
 function PANEL:IsDirectiveLine()
-	local line = self.Rows[self.Caret[1]]
+	local line = self:GetRowText(caret[1])
 	return line:match("^@") ~= nil
 end
 
 function PANEL:getWordStart(caret, getword)
-	local line = self.Rows[caret[1]]
+	local line = self:GetRowText(caret[1])
 
 	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
 		if startpos <= caret[2] and endpos >= caret[2] then
@@ -2370,7 +2402,7 @@ function PANEL:getWordStart(caret, getword)
 end
 
 function PANEL:getWordEnd(caret, getword)
-	local line = self.Rows[caret[1]]
+	local line = self:GetRowText(caret[1])
 
 	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
 		if startpos <= caret[2] and endpos >= caret[2] then

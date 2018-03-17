@@ -175,32 +175,10 @@ function EDITOR:CommentSelection(removecomment)
 end
 
 function EDITOR:ResetTokenizer(row)
-	if row == self.Scroll[1] then
-
-		-- This code checks if the visible code is inside a string or a block comment
-		self.blockcomment = nil
-		self.multilinestring = nil
-		local singlelinecomment = false
-
-		local str = string_gsub(table_concat(self.Rows, "\n", 1, self.Scroll[1]-1), "\r", "")
-
-		for bef, char, af in string_gmatch(str, '()([%[%]"\n])()') do
-			local before = string_sub(str, bef-1, bef-1)
-			local bbefore = string_sub(str, bef-2, bef-2)
-			local after = string_sub(str, af, af)
-			if not self.blockcomment and not self.multilinestring and not singlelinecomment then
-				if before == "-" and bbefore == "-" and char == "[" and after == "[" then
-					self.blockcomment = true
-				elseif before ~= "\\" and before ~= "-" and char == "[" and after =="[" then
-					self.multilinestring = true
-				end
-			elseif self.multilinestring and before ~= "\\" and char == ']' and after == "]" then
-				self.multilinestring = nil
-			elseif self.blockcomment and before ~= '\\' and char == "]" and after == "]" then
-				self.blockcomment = nil
-			end
-		end
-	end
+	local p = self.Rows[row-1]
+	if p then p = p[2] end
+	self.multilinestring = p and p["multilinestring"] or false
+	self.blockcomment = p and p["blockcomment"] or false
 
 end
 
@@ -219,9 +197,7 @@ local setrgbapatternG = "^(setRGBA%s*)(%(%s*)"..numbpatternG..spacedcommaG..numb
 
 --End of monsterous code
 
-function EDITOR:SyntaxColorLine(row, prevrow)
-	self.multilinestring = prevrow["multilinestring"]
-	self.blockcomment = prevrow["blockcomment"]
+function EDITOR:SyntaxColorLine(row)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
 	cols, lastcol = {}, nil
 
