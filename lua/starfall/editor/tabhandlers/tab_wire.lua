@@ -1370,7 +1370,7 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	end
 
 	if not text or text == "" then
-		self:UnfoldHidden(start[1]+1)
+		self:UnfoldHidden(start[1])
 		self:OnTextChanged()
 
 		if isredo then
