@@ -324,7 +324,16 @@ function PANEL:SetRowText(line, text)
 		})
 		return
 	end
-	self.Rows[line][1] = text
+	local row = self.Rows[line]
+	if row[3] then
+		local start = line - row.hiddenBy
+		local hides = self.Rows[start].hides
+		self.Rows[start].hides = nil
+		for I = start + 1, start + hides do
+			self:ShowRow(I)
+		end
+	end
+	row[1] = text
 	self:RecacheLine(line)
 end
 
@@ -334,6 +343,16 @@ function PANEL:InsertRowAt(line, text)
 		false, --Cache
 		false, --Hidden
 	})
+	if line > 1 and line < #self.Rows then
+		if self.Rows[line+1][3] and self.Rows[line-1][3] then -- pasted INSIDE hidden area, show it
+			local start = line - row.hiddenBy
+			local hides = self.Rows[start].hides
+			self.Rows[start].hides = nil
+			for I = start + 1, start + hides do
+				self:ShowRow(I)
+			end
+		end
+	end
 	return
 end
 
@@ -345,7 +364,7 @@ end
 function PANEL:ShowRow(row)
 	self.Rows[row][3] = false
 	self.Rows[row].hides = nil
-	self.Rows[row].hiddenby = nil
+	self.Rows[row].hiddenBy = nil
 end
 
 function PANEL:GetRowOffset(row)
@@ -461,7 +480,7 @@ function PANEL:OpenContextMenu()
 					row.hides = 0
 					for I = y + 1, line-1 do
 						self:HideRow(I)
-						self.Rows[line].hiddenby = I-y
+						self.Rows[I].hiddenBy = I-y
 						row.hides = row.hides + 1
 					end
 					break
@@ -504,7 +523,7 @@ function PANEL:OpenContextMenu()
 					row.hides = 0
 					for I = y + 1, line-1 do
 						self:HideRow(I)
-						self.Rows[line].hiddenby = I-y
+						self.Rows[I].hiddenBy = I-y
 						row.hides = row.hides + 1
 					end
 					break
