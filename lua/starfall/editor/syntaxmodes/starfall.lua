@@ -108,7 +108,7 @@ end
 
 function EDITOR:BlockCommentSelection(removecomment)
 	local sel_start, sel_caret = self:MakeSelection(self:Selection())
-	local mode = self:GetParent().BlockCommentStyleConVar:GetInt()
+	local mode = SF.Editor.TabHandlers.wire.BlockCommentStyleConVar:GetInt()
 
 	if mode == 0 then -- New (alt 1)
 		local str = self:GetSelection()

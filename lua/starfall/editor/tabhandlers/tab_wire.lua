@@ -65,6 +65,8 @@ TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, tr
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
 TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, true, false)
 TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightencolors", 0, true, false) --off by default
+TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
+
 ---------------------
 -- Colors
 ---------------------
@@ -389,6 +391,9 @@ function PANEL:InsertRowAt(line, text)
 end
 
 function PANEL:HideRow(row)
+	if self.Caret[1] == row then
+		self.Caret[1] = self.Caret[1] + 1
+	end
 	if not self.Rows[row][3] then
 		self.Rows[row][3] = true
 		self.VisibleRows = self.VisibleRows - 1
@@ -454,18 +459,17 @@ function PANEL:CursorToCaret()
 
 	local line = math_floor(y / self.FontHeight)
 	local char = math_floor(x / self.FontWidth + 0.5)
+	if line > self.VisibleRows then line = self.VisibleRows - 1 end
 
-	line = self.RealLine[line]
+	line = self.RealLine[line] or lines
 
 	char = char + self.Scroll[2]
-	if line > lines then line = lines end
 	local length = #self:GetRowText(line)
 	if char > length + 1 then char = length + 1 end
 
 	return { line, char }
 end
 
-local wire_expression2_editor_highlight_on_double_click = CreateClientConVar("wire_expression2_editor_highlight_on_double_click", "1", true, false)
 function PANEL:ToggleFold(y)
 	local lines = #self.Rows
 	local row = self.Rows[y]
@@ -706,6 +710,7 @@ function PANEL:OnMousePressed(code)
 			if x < 0 then x = 0 end
 			if y < 0 then y = 0 end
 			local line = math_floor(y / self.FontHeight)
+			if line > #self.Rows or line > self.VisibleRows - 1 then return end
 			line = self.RealLine[line] or line
 
 			self:ToggleFold(line)
@@ -717,7 +722,7 @@ function PANEL:OnMousePressed(code)
 			self.Caret = self:getWordEnd(self.Caret)
 			self.tmp = false
 
-			if wire_expression2_editor_highlight_on_double_click:GetBool() then
+			if TabHandler.HighlightOnDoubleClickConVar:GetBool() then
 				self.HighlightedAreasByDoubleClick = {}
 				local all_finds = self:FindAllWords(self:GetSelection())
 				if all_finds then
@@ -1040,6 +1045,7 @@ function PANEL:PaintTextOverlay()
 				local area, r, g, b, a = data[1], data[2], data[3], data[4], data[5]
 				surface_SetDrawColor(r, g, b, a)
 				local start, stop = self:MakeSelection(area)
+				if self.Rows[start[1]][3] or self.Rows[start[1]][3] then continue end -- Row is hidden
 				start[1] = start[1] - self:GetRowOffset(start[1])
 				stop[1] = stop[1] - self:GetRowOffset(stop[1])
 				if start[1] == stop[1] then -- On the same line
@@ -1142,10 +1148,10 @@ function PANEL:PaintTextOverlay()
 			end
 			y2 = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
 			if x and y then
-
-				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
-				surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y+self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
-
+				if not self.Rows[y][3] then
+					surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
+					surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y+self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
+				end
 				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
 				surface_DrawRect((cBracketPos-self.Scroll[2] +1) * width + self.LineNumberWidth + self.FontWidth - 1, (self.Caret[1]+self:GetRowOffset(y) -self.Scroll[1]) * height + 1, bracketLength*width-2, height-2)
 
@@ -1224,7 +1230,7 @@ function PANEL:Paint()
 	self:PaintTextOverlay()
 
 	if display_caret_pos:GetBool() then
-		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2].."Scroll:"..self.Scroll[1]
+		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2].." Visible Rows:"..self.VisibleRows
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
 		end
@@ -1245,7 +1251,7 @@ end
 function PANEL:SetCaret(caret, maintain_selection)
 	self.Caret = self:CopyPosition(caret)
 
-	self.Caret[1] = math.Clamp(self.Caret[1], 1, #self.Rows)
+	self.Caret[1] = math.Clamp(self.Caret[1], 1, self.VisibleRows)
 	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self:GetRowText(self.Caret[1]) + 1)
 
 	if maintain_selection == nil then
