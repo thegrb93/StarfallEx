@@ -70,16 +70,22 @@ end
 
 -- cols[n] = { tokendata, color }
 local cols = {}
-local lastcol
+local lasttoken
+local unconnectable = {--Each token of this type shouldnt be connected because editor goes through them
+	["bracket"] = true,
+	["keyword"] = true,
+}
 local function addToken(tokenname, tokendata)
 	if not tokendata or #tokendata < 0 then error("EMPTY TOKEN") end
 	if not tokenname then tokenname = "notfound" end
+
 	local color = colors[tokenname] or colors["notfound"]
-	if lastcol and color == lastcol[2] then
-		lastcol[1] = lastcol[1] .. tokendata
+
+	if lasttoken and tokenname == lasttoken[3] and not unconnectable[tokenname] then
+		lasttoken[1] = lasttoken[1] .. tokendata
 	else
 		cols[#cols + 1] = { tokendata, color, tokenname }
-		lastcol = cols[#cols]
+		tokenname = cols[#cols]
 	end
 end
 
@@ -250,7 +256,7 @@ function EDITOR:SyntaxColorLine(row)
 
 		if self:NextPattern("%(") then -- We found a bracket
 			-- Color the bracket
-			addToken("notfound", self.tokendata)
+			addToken("bracket", self.tokendata)
 		end
 
 		self.tokendata = ""
@@ -262,7 +268,7 @@ function EDITOR:SyntaxColorLine(row)
 	local spaces = self:SkipPattern(" *")
 	if spaces then addToken("whitespace", spaces) end
 
-	found = self:NextPattern("local%s*function")  -- local function		
+	found = self:NextPattern("local%s*function")  -- local function
 	if found then
 		local l, spaces, f = self.tokendata:match("(local)(%s*)(function)")
 
@@ -285,12 +291,12 @@ function EDITOR:SyntaxColorLine(row)
 
 		if self:NextPattern("%(") then -- We found a bracket
 			-- Color the bracket
-			addToken("notfound", self.tokendata)
+			addToken("bracket", self.tokendata)
 		end
 
 		self.tokendata = ""
 		if self:NextPattern("%)") then
-			addToken("notfound", self.tokendata)
+			addToken("bracket", self.tokendata)
 		end
 		cols.foldable = true
 	end
@@ -315,7 +321,7 @@ function EDITOR:SyntaxColorLine(row)
 					col = Color(0, 0, 0, 0) -- Transparent because its invalid
 				end
 				addColorToken("function", col, fname)
-				addColorToken("notfound", col, bracket1)
+				addColorToken("bracket", col, bracket1)
 				if cr then
 					addColorToken("number", col, r)
 				else
@@ -333,7 +339,7 @@ function EDITOR:SyntaxColorLine(row)
 				else
 					addColorToken("notfound", col, b)
 				end
-				addColorToken("notfound", col, bracket2)
+				addColorToken("bracket", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
 			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
@@ -346,7 +352,7 @@ function EDITOR:SyntaxColorLine(row)
 					col = Color(0, 0, 0, 0) -- Transparent because its invalid
 				end
 				addColorToken("function", col, fname)
-				addColorToken("notfound", col, bracket1)
+				addColorToken("bracket", col, bracket1)
 				if cr then
 					addColorToken("number", col, r)
 				else
@@ -368,7 +374,7 @@ function EDITOR:SyntaxColorLine(row)
 				if ca then
 					addColorToken("number", col, a)
 				end
-				addColorToken("notfound", col, bracket2)
+				addColorToken("bracket", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
 			end
@@ -443,7 +449,7 @@ function EDITOR:SyntaxColorLine(row)
 							col = Color(0, 0, 0, 0) -- Transparent because its invalid
 						end
 						addColorToken("function", col, fname)
-						addColorToken("notfound", col, bracket1)
+						addColorToken("bracket", col, bracket1)
 						if cr then
 							addColorToken("number", col, r)
 						else
@@ -465,7 +471,7 @@ function EDITOR:SyntaxColorLine(row)
 						if ca then
 							addColorToken("number", col, a)
 						end
-						addColorToken("notfound", col, bracket2)
+						addColorToken("bracket", col, bracket2)
 						tokenname = "" -- It's custom token
 						self.tokendata = ""
 
@@ -574,7 +580,7 @@ function EDITOR:SyntaxColorLine(row)
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat
 			tokenname = "operator"
-		elseif self:NextPattern("[%{%}]") then -- .. {}
+		elseif self:NextPattern("[%{%}%]%[%)%(]") then -- {}()[]
 			tokenname = "bracket"
 		else
 			self:NextCharacter()
