@@ -250,6 +250,7 @@ function PANEL:OnValidate(s, r, m, goto)
 	self:SetCaret({ r, 0 })
 end
 
+
 function PANEL:Init()
 	self:SetCursor("beam")
 
@@ -264,6 +265,8 @@ function PANEL:Init()
 	self.Redo = {}
 	self.RowOffset = {}
 	self.RealLine = {}
+	self.GlobalOffset = {}
+	self.VisibleRows = 0
 
 	self.CurrentMode = assert(TabHandler.Modes.Text)
 
@@ -272,7 +275,27 @@ function PANEL:Init()
 	self.Blink = RealTime()
 
 	self.ScrollBar = vgui.Create("DVScrollBar", self)
+
+
 	self.ScrollBar:SetUp(1, 1)
+	self.ScrollBar.SetScrollFix = function(bar,scroll,diff)
+		diff = diff or 0
+		local vis = 0
+		local prev_vis = 0
+		for k,v in ipairs(self.Rows) do
+
+			if k == scroll then
+				if v[3] then
+					return bar:SetScroll(vis+diff)
+				end
+				return bar:SetScroll(vis)
+			end
+			if not v[3] then
+				vis = vis + 1
+			end
+			prev_vis = k
+		end
+	end
 	self.ScrollBar.Paint = function(_, w, h)
 		surface_SetDrawColor(colors.gutter_background)
 		surface_DrawRect(0, 0, w, h)
@@ -341,6 +364,7 @@ function PANEL:SetRowText(line, text)
 			false, --Cache
 			false, --Hidden
 		})
+		self.VisibleRows = self.VisibleRows + 1
 		return
 	end
 	self:UnfoldHidden(line)
@@ -350,7 +374,7 @@ end
 
 function PANEL:InsertRowAt(line, text)
 	if line > 2 and line < #self.Rows then
-		if self.Rows[line+1][3] or self.Rows[line].hides or self.Rows[line-1].hides or self.Rows[line][3] then -- pasted INSIDE hidden area, show it
+		if self.Rows[line-1].hides or self.Rows[line][3] then -- pasted INSIDE hidden area, show it
 			self:UnfoldHidden(line)
 		end
 	end
@@ -359,15 +383,23 @@ function PANEL:InsertRowAt(line, text)
 		false, --Cache
 		false, --Hidden
 	})
+	self.VisibleRows = self.VisibleRows + 1
 
 	return
 end
 
 function PANEL:HideRow(row)
-	self.Rows[row][3] = true
+	if not self.Rows[row][3] then
+		self.Rows[row][3] = true
+		self.VisibleRows = self.VisibleRows - 1
+	end
 end
 
 function PANEL:ShowRow(row)
+	if not self.Rows[row][3] then
+		return
+	end
+	self.VisibleRows = self.VisibleRows + 1
 	self.Rows[row][3] = false
 	self.Rows[row].hides = nil
 	self.Rows[row].hiddenBy = nil
@@ -743,6 +775,8 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
+	self.Rows = {}
+	self.VisibleRows = 0
 	local rows = string_Explode("\n", text)
 	for k,v in ipairs(rows) do
 		self:SetRowText(k,v)
@@ -755,8 +789,7 @@ function PANEL:SetCode(text)
 	self.Scroll = { 1, 1 }
 	self.Undo = {}
 	self.Redo = {}
-
-	self.ScrollBar:SetUp(self.Size[1], lines - 1)
+	self.ScrollBar:SetUp(self.Size[1], self.VisibleRows -1)
 end
 
 function PANEL:GetCode()
@@ -951,7 +984,7 @@ function PANEL:PerformLayout()
 	self.Size[1] = math_floor(self:GetTall() / self.FontHeight) - 1
 	self.Size[2] = math_floor((self:GetWide() - (self.LineNumberWidth + 6) - 16) / self.FontWidth) - 1
 
-	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
+	self.ScrollBar:SetUp(self.Size[1], self.VisibleRows -1)
 end
 
 function PANEL:HighlightArea(area, r, g, b, a)
@@ -1120,9 +1153,8 @@ function PANEL:PaintTextOverlay()
 		end
 	end
 end
-
+local prevScroll = 1
 local display_caret_pos = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
-
 function PANEL:Paint()
 	self.LineNumberWidth = self.FontWidth * math.max(#tostring(self.Scroll[1] + self.Size[1] + 1),3) + 20
 
@@ -1144,6 +1176,17 @@ function PANEL:Paint()
 	surface_DrawRect(self.LineNumberWidth + 5, 0, self:GetWide() - (self.LineNumberWidth + 5), self:GetTall())
 
 	self.Scroll[1] = math_floor(self.ScrollBar:GetScroll() + 1)
+	local cScroll = 0
+	for k,v in ipairs(self.Rows) do
+		if not v[3] then
+			cScroll = cScroll + 1
+		end
+		if self.Scroll[1] == cScroll then
+			self.Scroll[1] = k
+			break
+		end
+	end
+	local scrollDir =self.Scroll[1] - prevScroll
 	--self.Scroll[1] = self:GetRowOffset(self.Scroll[1])
 	local i = self.Scroll[1]
 	local drawn = 0
@@ -1156,19 +1199,32 @@ function PANEL:Paint()
 			offset = offset + 1
 			continue
 		end
+		--[=[
+		if drawn == 0 and offset > 0 then
+			if scrollDir > 0 then
+				self.Scroll[1] = self.Scroll[1]+offset
+			else
+				self.Scroll[1] = self.Scroll[1]-offset
+				while self.Rows[self.Scroll[1]][3] do
+					self.Scroll[1] = self.Scroll[1] - 1
+				end
+			end
+			self.ScrollBar:SetScroll(self.Scroll[1] - 1)
+		end]=]
 		self.RealLine[drawn] = i
 		self.RowOffset[i] = offset
 		self:PaintLine(i,drawn)
 		drawn = drawn + 1
 		i = i+1
 	end
+	prevScroll = self.Scroll[1]
 
 
 	-- Paint the overlay of the text (bracket highlighting and carret postition)
 	self:PaintTextOverlay()
 
 	if display_caret_pos:GetBool() then
-		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
+		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2].."Scroll:"..self.Scroll[1]
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
 		end
@@ -1301,13 +1357,13 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 		for i = start[1] + 1, stop[1] do
 			self:UnfoldHidden(i)
 			table_remove(self.Rows, start[1] + 1)
+			self.VisibleRows = self.VisibleRows - 1
 		end
 
 		local lines = #self.Rows
 	end
 
 	if not text or text == "" then
-		self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 		self:UnfoldHidden(start[1]+1)
 		self:OnTextChanged()
 
@@ -1342,7 +1398,6 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	self:RecacheLine(stop[1])
 
 
-	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 
 
 	self:OnTextChanged()
@@ -1424,25 +1479,30 @@ function PANEL:_OnTextChanged()
 end
 
 function PANEL:OnMouseWheeled(delta)
-	self.Scroll[1] = self.Scroll[1] - 4 * delta
-	if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
-	if self.Scroll[1] > #self.Rows then self.Scroll[1] = #self.Rows end
-	self.ScrollBar:SetScroll(self.Scroll[1] - 1)
+	self.ScrollBar:OnMouseWheeled(delta/self.VisibleRows * 4)
 end
 
 function PANEL:OnShortcut()
 end
 
 function PANEL:ScrollCaret()
-	if self.Caret[1] - self.Scroll[1] < 2 then
-		self.Scroll[1] = self.Caret[1] - 2
-		if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
+	local visCaret = self.Caret[1] - self:GetRowOffset(self.Caret[1])
+	if visCaret - self.Scroll[1] < 3 then
+		local line = self.Caret[1]-3
+		while line > 1 and (self.Rows[line][3] or visCaret-line < 3)  do
+			line = line - 1
+		end
+		self.ScrollBar:SetScrollFix(math.max(line,1))
+	end
+	if visCaret - self.Scroll[1] > self.Size[1] - 2 then
+		local line = self.Scroll[1]
+		local lines = #self.Rows
+		while line <= lines and (self.Rows[line][3] or visCaret - line > self.Size[1] - 2) do
+			line = line + 1
+		end
+		self.ScrollBar:SetScrollFix(math.max(line,1))
 	end
 
-	if self.Caret[1] - self.Scroll[1] > self.Size[1] - 2 then
-		self.Scroll[1] = self.Caret[1] - self.Size[1] + 2
-		if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
-	end
 
 	if self.Caret[2] - self.Scroll[2] < 4 then
 		self.Scroll[2] = self.Caret[2] - 4
@@ -1453,7 +1513,8 @@ function PANEL:ScrollCaret()
 		self.Scroll[2] = self.Caret[2] - 1 - self.Size[2] + 4
 		if self.Scroll[2] < 1 then self.Scroll[2] = 1 end
 	end
-	self.ScrollBar:SetScroll(self.Scroll[1] - 1)
+
+
 end
 
 -- Initialize find settings
@@ -2676,7 +2737,7 @@ function PANEL:Think()
 		local line = math_floor(y / self.FontHeight)
 		line = lines[self.RealLine[line]] or lines[line]
 
-		if line[2] and line[2].foldable then
+		if line and line[2] and line[2].foldable then
 			if self.cur != "pointer" then
 				self:SetCursor("hand")
 				self.cur = "pointer"
