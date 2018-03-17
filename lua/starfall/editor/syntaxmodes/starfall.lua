@@ -70,15 +70,23 @@ end
 
 -- cols[n] = { tokendata, color }
 local cols = {}
-local lastcol
+local lasttoken
+local unconnectable = {--Each token of this type shouldnt be connected because editor goes through them
+	["bracket"] = true,
+	["keyword"] = true,
+}
 local function addToken(tokenname, tokendata)
+	if not tokendata or #tokendata < 0 then error("EMPTY TOKEN") end
 	if not tokenname then tokenname = "notfound" end
+
 	local color = colors[tokenname] or colors["notfound"]
-	if lastcol and color == lastcol[2] then
-		lastcol[1] = lastcol[1] .. tokendata
+
+	if lasttoken and tokenname == lasttoken and not unconnectable[tokenname] then
+		local newdata = cols[#cols][1] .. tokendata
+		cols[#cols][1] = newdata
 	else
 		cols[#cols + 1] = { tokendata, color, tokenname }
-		lastcol = cols[#cols]
+		lasttoken = tokenname
 	end
 end
 
@@ -94,17 +102,13 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 	elseif usePigments == 1 then
 		textcolor = colors[tokenname][1]
 	end
-	if lastcol and color == lastcol[2] then
-		lastcol[1] = lastcol[1] .. tokendata
-	else
-		cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
-		lastcol = cols[#cols]
-	end
+	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
+	lastcol = cols[#cols]
 end
 
 function EDITOR:BlockCommentSelection(removecomment)
 	local sel_start, sel_caret = self:MakeSelection(self:Selection())
-	local mode = self:GetParent().BlockCommentStyleConVar:GetInt()
+	local mode = SF.Editor.TabHandlers.wire.BlockCommentStyleConVar:GetInt()
 
 	if mode == 0 then -- New (alt 1)
 		local str = self:GetSelection()
@@ -175,33 +179,11 @@ function EDITOR:CommentSelection(removecomment)
 end
 
 function EDITOR:ResetTokenizer(row)
-	if row == self.Scroll[1] then
-
-		-- This code checks if the visible code is inside a string or a block comment
-		self.blockcomment = nil
-		self.multilinestring = nil
-		local singlelinecomment = false
-
-		local str = string_gsub(table_concat(self.Rows, "\n", 1, self.Scroll[1]-1), "\r", "")
-
-		for bef, char, af in string_gmatch(str, '()([%[%]"\n])()') do
-			local before = string_sub(str, bef-1, bef-1)
-			local bbefore = string_sub(str, bef-2, bef-2)
-			local after = string_sub(str, af, af)
-			if not self.blockcomment and not self.multilinestring and not singlelinecomment then
-				if before == "-" and bbefore == "-" and char == "[" and after == "[" then
-					self.blockcomment = true
-				elseif before ~= "\\" and before ~= "-" and char == "[" and after =="[" then
-					self.multilinestring = true
-				end
-			elseif self.multilinestring and before ~= "\\" and char == ']' and after == "]" then
-				self.multilinestring = nil
-			elseif self.blockcomment and before ~= '\\' and char == "]" and after == "]" then
-				self.blockcomment = nil
-			end
-		end
-	end
-
+	local p = self.Rows[row-1]
+	if p then p = p[2] end
+	self.multilinestring = p and p["multilinestring"] or false
+	self.blockcomment = p and p["blockcomment"] or false
+	lasttoken = nil
 end
 
 --That code sucks, if you can do any better then DO IT
@@ -219,9 +201,7 @@ local setrgbapatternG = "^(setRGBA%s*)(%(%s*)"..numbpatternG..spacedcommaG..numb
 
 --End of monsterous code
 
-function EDITOR:SyntaxColorLine(row, prevrow)
-	self.multilinestring = prevrow["multilinestring"]
-	self.blockcomment = prevrow["blockcomment"]
+function EDITOR:SyntaxColorLine(row)
 	local usePigments = SF.Editor.TabHandlers.wire.PigmentsConVar:GetInt() > 0
 	cols, lastcol = {}, nil
 
@@ -252,8 +232,10 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 
 		addToken("string", self.tokendata)
 	end
+	local spaces = self:SkipPattern(" *")
+	if spaces then addToken("whitespace", spaces) end
 
-	local found = self:SkipPattern("(%s*function)")
+	local found = self:SkipPattern("(function)")
 	if found then
 		addToken("storageType", found) -- Add "function"
 		self.tokendata = "" -- Reset tokendata
@@ -271,18 +253,26 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 
 		if self:NextPattern("%(") then -- We found a bracket
 			-- Color the bracket
-			addToken("notfound", self.tokendata)
+			addToken("bracket", self.tokendata)
 		end
 
 		self.tokendata = ""
-		if self:NextPattern("%) *{?") then -- check for ending bracket (and perhaps an ending {?)
+		if self:NextPattern("%) *") then -- check for ending bracket
 			addToken("notfound", self.tokendata)
 		end
+		cols.foldable = true
 	end
+	local spaces = self:SkipPattern(" *")
+	if spaces then addToken("whitespace", spaces) end
 
-	found = self:SkipPattern("(%s*local%s*function)")  -- local function
+	found = self:NextPattern("local%s*function")  -- local function
 	if found then
-		addToken("storageType", found) -- Add "function"
+		local l, spaces, f = self.tokendata:match("(local)(%s*)(function)")
+
+		addToken("keyword", l)
+		if spaces and #spaces>0 then addToken("whitespace", spaces) end
+		addToken("storageType", f) -- Add "function"
+
 		self.tokendata = "" -- Reset tokendata
 
 		local spaces = self:SkipPattern(" *")
@@ -298,15 +288,15 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 
 		if self:NextPattern("%(") then -- We found a bracket
 			-- Color the bracket
-			addToken("notfound", self.tokendata)
+			addToken("bracket", self.tokendata)
 		end
 
 		self.tokendata = ""
-		if self:NextPattern("%) *{?") then -- check for ending bracket (and perhaps an ending {?)
-			addToken("notfound", self.tokendata)
+		if self:NextPattern("%)") then
+			addToken("bracket", self.tokendata)
 		end
+		cols.foldable = true
 	end
-
 	while self.character do
 		local tokenname = ""
 		self.tokendata = ""
@@ -328,7 +318,7 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 					col = Color(0, 0, 0, 0) -- Transparent because its invalid
 				end
 				addColorToken("function", col, fname)
-				addColorToken("notfound", col, bracket1)
+				addColorToken("bracket", col, bracket1)
 				if cr then
 					addColorToken("number", col, r)
 				else
@@ -346,7 +336,7 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 				else
 					addColorToken("notfound", col, b)
 				end
-				addColorToken("notfound", col, bracket2)
+				addColorToken("bracket", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
 			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
@@ -359,7 +349,7 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 					col = Color(0, 0, 0, 0) -- Transparent because its invalid
 				end
 				addColorToken("function", col, fname)
-				addColorToken("notfound", col, bracket1)
+				addColorToken("bracket", col, bracket1)
 				if cr then
 					addColorToken("number", col, r)
 				else
@@ -381,7 +371,7 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 				if ca then
 					addColorToken("number", col, a)
 				end
-				addColorToken("notfound", col, bracket2)
+				addColorToken("bracket", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
 			end
@@ -456,7 +446,7 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 							col = Color(0, 0, 0, 0) -- Transparent because its invalid
 						end
 						addColorToken("function", col, fname)
-						addColorToken("notfound", col, bracket1)
+						addColorToken("bracket", col, bracket1)
 						if cr then
 							addColorToken("number", col, r)
 						else
@@ -478,7 +468,7 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 						if ca then
 							addColorToken("number", col, a)
 						end
-						addColorToken("notfound", col, bracket2)
+						addColorToken("bracket", col, bracket2)
 						tokenname = "" -- It's custom token
 						self.tokendata = ""
 
@@ -587,6 +577,8 @@ function EDITOR:SyntaxColorLine(row, prevrow)
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat
 			tokenname = "operator"
+		elseif self:NextPattern("[%{%}%]%[%)%(]") then -- {}()[]
+			tokenname = "bracket"
 		else
 			self:NextCharacter()
 

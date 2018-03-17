@@ -65,6 +65,8 @@ TabHandler.FontSizeConVar = CreateClientConVar("sf_editor_wire_fontsize", 16, tr
 TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_comment_style", 1, true, false)
 TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, true, false)
 TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightencolors", 0, true, false) --off by default
+TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
+
 ---------------------
 -- Colors
 ---------------------
@@ -143,7 +145,6 @@ function TabHandler:Init()
 
 	TabHandler.Modes.Starfall = include("starfall/editor/syntaxmodes/starfall.lua")
 	colors = SF.Editor.Themes.CurrentTheme
-	self.PaintRows = {}
 	self:LoadSyntaxColors()
 end
 
@@ -153,7 +154,6 @@ function TabHandler:RegisterTabMenu(menu, content)
 		local mode = v
 		coloring:AddOption(k, function()
 			content.CurrentMode = mode
-			content.PaintRows = {}
 		end)
 	end
 end
@@ -238,7 +238,7 @@ function TabHandler:RegisterSettings()
 	usePigments.OnSelect = function(_, val)
 		RunConsoleCommand("sf_editor_wire_pigments", val-1)
 		timer.Simple(0, function()
-			SF.Editor.editor:GetCurrentTabContent().PaintRows = {} -- Re-color syntax
+			 -- Re-color syntax
 		end)
 	end
 	return dlist, "Wire", "icon16/pencil.png", "Options for wire tabs."
@@ -251,22 +251,24 @@ function PANEL:OnValidate(s, r, m, goto)
 	if s or not goto then return end
 	self:SetCaret({ r, 0 })
 end
+
+
 function PANEL:Init()
 	self:SetCursor("beam")
 
 	self.TabHandler = TabHandler
 
-	self.Rows = { "" }
+	self.Rows = { {"",false,false} }
 	self.Caret = { 1, 1 }
 	self.Start = { 1, 1 }
 	self.Scroll = { 1, 1 }
 	self.Size = { 1, 1 }
 	self.Undo = {}
 	self.Redo = {}
-	self.PaintRows = {}
-	self.HiddenRows = {}
 	self.RowOffset = {}
 	self.RealLine = {}
+	self.GlobalOffset = {}
+	self.VisibleRows = 0
 
 	self.CurrentMode = assert(TabHandler.Modes.Text)
 
@@ -275,7 +277,27 @@ function PANEL:Init()
 	self.Blink = RealTime()
 
 	self.ScrollBar = vgui.Create("DVScrollBar", self)
+
+
 	self.ScrollBar:SetUp(1, 1)
+	self.ScrollBar.SetScrollFix = function(bar,scroll,diff)
+		diff = diff or 0
+		local vis = 0
+		local prev_vis = 0
+		for k,v in ipairs(self.Rows) do
+
+			if k == scroll then
+				if v[3] then
+					return bar:SetScroll(vis+diff)
+				end
+				return bar:SetScroll(vis)
+			end
+			if not v[3] then
+				vis = vis + 1
+			end
+			prev_vis = k
+		end
+	end
 	self.ScrollBar.Paint = function(_, w, h)
 		surface_SetDrawColor(colors.gutter_background)
 		surface_DrawRect(0, 0, w, h)
@@ -304,23 +326,88 @@ function PANEL:Init()
 	self.CurrentMode:LoadSyntaxColors()
 
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
+	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7)
 	table.insert(TabHandler.Tabs, self)
 
 end
 
-function PANEL:HideRow(row)
-	self.HiddenRows[row] = true
-	local off = 0
-	for I = row, #self.Rows do
-		if self.HiddenRows[I] then
-			off = off + 1
+function PANEL:GetRowText(line)
+	if line > #self.Rows then
+		return ""
+	end
+	return self.Rows[line][1]
+end
+function PANEL:GetRowCache(line)
+	return self.Rows[line][2]
+end
+function PANEL:UnfoldHidden(line)
+	row = self.Rows[line]
+	if not row then return end
+	if row[3] then
+		local start = line - row.hiddenBy
+		local hides = self.Rows[start].hides
+		self.Rows[start].hides = nil
+		for I = start + 1, start + hides do
+			self:ShowRow(I)
 		end
-		self.RowOffset[I] = off
+	elseif row.hides then
+		local start = line
+		local hides = row.hides
+		row.hides = nil
+		for I = start + 1, start + hides do
+			self:ShowRow(I)
+		end
+	end
+end
+function PANEL:SetRowText(line, text)
+	if line > #self.Rows then
+		table.insert(self.Rows, {
+			text, --Text
+			false, --Cache
+			false, --Hidden
+		})
+		self.VisibleRows = self.VisibleRows + 1
+		return
+	end
+	self:UnfoldHidden(line)
+	row[1] = text
+	self:RecacheLine(line)
+end
+
+function PANEL:InsertRowAt(line, text)
+	if line > 2 and line < #self.Rows then
+		if self.Rows[line-1].hides or self.Rows[line][3] then -- pasted INSIDE hidden area, show it
+			self:UnfoldHidden(line)
+		end
+	end
+	table.insert(self.Rows,line, {
+		text, --Text
+		false, --Cache
+		false, --Hidden
+	})
+	self.VisibleRows = self.VisibleRows + 1
+
+	return
+end
+
+function PANEL:HideRow(row)
+	if self.Caret[1] == row then
+		self.Caret[1] = self.Caret[1] + 1
+	end
+	if not self.Rows[row][3] then
+		self.Rows[row][3] = true
+		self.VisibleRows = self.VisibleRows - 1
 	end
 end
 
 function PANEL:ShowRow(row)
-	self.HiddenRows[row] = false
+	if not self.Rows[row][3] then
+		return
+	end
+	self.VisibleRows = self.VisibleRows + 1
+	self.Rows[row][3] = false
+	self.Rows[row].hides = nil
+	self.Rows[row].hiddenBy = nil
 end
 
 function PANEL:GetRowOffset(row)
@@ -365,28 +452,132 @@ end
 
 function PANEL:CursorToCaret()
 	local x, y = self:CursorPos()
-
+	local lines = #self.Rows
 	x = x - (self.LineNumberWidth + 6)
 	if x < 0 then x = 0 end
 	if y < 0 then y = 0 end
 
 	local line = math_floor(y / self.FontHeight)
 	local char = math_floor(x / self.FontWidth + 0.5)
+	if line > self.VisibleRows then line = self.VisibleRows - 1 end
 
-	line = self.RealLine[line]
+	line = self.RealLine[line] or lines
 
 	char = char + self.Scroll[2]
-	if line > #self.Rows then line = #self.Rows end
-	local length = #self.Rows[line]
+	local length = #self:GetRowText(line)
 	if char > length + 1 then char = length + 1 end
 
 	return { line, char }
 end
 
-local wire_expression2_editor_highlight_on_double_click = CreateClientConVar("wire_expression2_editor_highlight_on_double_click", "1", true, false)
+function PANEL:ToggleFold(y)
+	local lines = #self.Rows
+	local row = self.Rows[y]
+	row[2]  = self:SyntaxColorLine(y)
+	local cols = row[2]
+	local sum = 0
+	if not cols.foldable then return end
+	--[[Hiding then/do -> end]]
+	local adds = {
+		["then"] = true,
+		["function"] = true,
+		["do"] = true
+	}
+	local removes = {
+		["end"] = true,
+		["else"] = true,
+		["elseif"] = true,
+	}
+	for k,v in ipairs(cols) do
+		if adds[v[1]] then
+			sum = sum + 1
+		end
+		if v[1] == "end" then
+			sum = sum - 1
+		end
+		cols.test = sum
+	end
+	if sum > 0 and not row.hides then
+		local line = y
+		local sum = 0 -- Change scope
+		while line < lines do
+			self.Rows[line][2]  = self:SyntaxColorLine(line)
+			cols = self.Rows[line][2]
+			for k,v in ipairs(cols) do
+				if adds[v[1]] then
+					sum = sum + 1
+				else
+				end
+				if removes[v[1]] then
+					sum = sum - 1
+				end
+				cols.test = sum
+			end
+			if sum <= 0 then
+				row.hides = 0
+				for I = y + 1, line do
+					self:HideRow(I)
+					self.Rows[I].hiddenBy = I-y
+					row.hides = row.hides + 1
+				end
+				return
+			end
+			line = line + 1
+		end
+	end
+	--[[Hiding { -> }]]
+	sum = 0
+	for k,v in ipairs(cols) do
+		if v[1] == "{" then
+			sum = sum + 1
+		end
+		if v[1] == "}" then
+			sum = sum - 1
+		end
+		cols.test = sum
+	end
+	if sum > 0 and not row.hides then
+		local sum = sum -- Change scope
+		local line = y
+		local sum = 0
 
+		while line < lines do
+			self.Rows[line][2]  = self:SyntaxColorLine(line)
+			cols = self.Rows[line][2]
+			for k,v in ipairs(cols) do
+				if v[1] == "{" then
+					sum = sum + 1
+				end
+				if v[1] == "}" then
+					sum = sum - 1
+				end
+				cols.test = sum
+			end
+			if sum <= 0 then
+				row.hides = 0
+				for I = y + 1, line do
+					self:HideRow(I)
+					self.Rows[I].hiddenBy = I-y
+					row.hides = row.hides + 1
+				end
+				return
+			end
+			line = line + 1
+		end
+	end
+
+	if row.hides then
+		cols.foldable = true
+		for I = y + 1, y + row.hides do
+			self:ShowRow(I)
+		end
+		row.hides = nil
+	end
+end
 function PANEL:OpenContextMenu()
 	local menu = DermaMenu()
+
+	menu:AddSpacer()
 
 	if self:CanUndo() then
 		menu:AddOption("Undo", function()
@@ -402,13 +593,7 @@ function PANEL:OpenContextMenu()
 	if self:CanUndo() or self:CanRedo() then
 		menu:AddSpacer()
 	end
-	--[[
-		menu:AddOption("",function()
-			local y = self.Caret[1]
-			self:HideRow(y)
-		end)
 
-	]]
 	if self:HasSelection() then
 		menu:AddOption("Cut", function()
 				if self:HasSelection() then
@@ -487,7 +672,7 @@ function PANEL:OpenContextMenu()
 			for i = 1, #self.Rows do
 				local colors = self:SyntaxColorLine(i)
 
-				for k, v in pairs(colors) do
+				for k, v in ipairs(colors) do
 					local color = v[2][1]
 
 					if (prev_colors and prev_colors == color) or string_Trim(v[1]) == "" then
@@ -520,13 +705,24 @@ end
 
 function PANEL:OnMousePressed(code)
 	if code == MOUSE_LEFT then
+		local x,y = self:CursorPos()
+		if x > self.LineNumberWidth - 10 and x < self.LineNumberWidth then
+			if x < 0 then x = 0 end
+			if y < 0 then y = 0 end
+			local line = math_floor(y / self.FontHeight)
+			if line > #self.Rows or line > self.VisibleRows - 1 then return end
+			line = self.RealLine[line] or line
+
+			self:ToggleFold(line)
+			return
+		end
 		local cursor = self:CursorToCaret()
 		if (CurTime() - self.LastClick) < 1 and self.tmp and cursor[1] == self.Caret[1] and cursor[2] == self.Caret[2] then
 			self.Start = self:getWordStart(self.Caret)
 			self.Caret = self:getWordEnd(self.Caret)
 			self.tmp = false
 
-			if wire_expression2_editor_highlight_on_double_click:GetBool() then
+			if TabHandler.HighlightOnDoubleClickConVar:GetBool() then
 				self.HighlightedAreasByDoubleClick = {}
 				local all_finds = self:FindAllWords(self:GetSelection())
 				if all_finds then
@@ -584,23 +780,45 @@ function PANEL:OnMouseReleased(code)
 end
 
 function PANEL:SetCode(text)
-	self.Rows = string_Explode("\n", text)
-	if self.Rows[#self.Rows] ~= "" then
-		self.Rows[#self.Rows + 1] = ""
+	self.Rows = {}
+	self.VisibleRows = 0
+	local rows = string_Explode("\n", text)
+	for k,v in ipairs(rows) do
+		self:SetRowText(k,v)
 	end
+	local lines = #self.Rows
+
 
 	self.Caret = { 1, 1 }
 	self.Start = { 1, 1 }
 	self.Scroll = { 1, 1 }
 	self.Undo = {}
 	self.Redo = {}
-	self.PaintRows = {}
-
-	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
+	self.ScrollBar:SetUp(self.Size[1], self.VisibleRows -1)
 end
 
 function PANEL:GetCode()
-	return string_gsub(table_concat(self.Rows, "\n"), "\r", "")
+	local lines = #self.Rows
+	local code = ""
+	for I=1,lines do
+		code = code .. self:GetRowText(I)
+		if I<lines then
+			code = code .. "\n"
+		end
+	end
+	return string_gsub(code, "\r", "")
+end
+
+function PANEL:GetLinesAsText(startingat, endingat)
+	local lines = endingat or #self.Rows
+	local code = ""
+	for I=startingat,lines do
+		code = code .. self:GetRowText(I)
+		if I<lines then
+			code = code .. "\n"
+		end
+	end
+	return string_gsub(code, "\r", "")
 end
 
 function PANEL:HighlightLine(line, r, g, b, a)
@@ -616,25 +834,30 @@ function PANEL:HighlightLine(line, r, g, b, a)
 end
 function PANEL:ClearHighlightedLines() self.HighlightedLines = nil end
 
-function PANEL:PaintLine(row, drawpos)
+function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 	local lines = #self.Rows
+	local lineLen = #self:GetRowText(row)
+
 	local usePigments = TabHandler.PigmentsConVar:GetInt()
 	if row > lines then return end
 	local width, height = self.FontWidth, self.FontHeight
 	local startX, startY = self.LineNumberWidth + 5, drawpos*height
+	local offset = leftOffset or -self.Scroll[2] + 1
+	local rowdata = self.Rows[row]
 
-	if not self.PaintRows[row] then
-		local colored = self:SyntaxColorLine(row, self.PaintRows[row-1] or {})
-		self.PaintRows[row] = colored
+	if not self:GetRowCache(row) then
+
+		local colored = self:SyntaxColorLine(row)
+		self.Rows[row][2] = colored
 
 		local newrow = row+1
 		--Let's find end of string/comment
 		while colored.unfinished do
 			if newrow - row < 50 then
-				colored = self:SyntaxColorLine(newrow, self.PaintRows[newrow-1] or {})
-				self.PaintRows[newrow] = colored
+				colored = self:SyntaxColorLine(newrow)
+				self.Rows[newrow][2] = colored
 			else -- If string/comment is above 50 lines long invalidate rest of cache so it gets rebuilt later instead of doing it now
-				self.PaintRows[newrow] = false
+				self.Rows[newrow][2] = false
 			end
 			newrow = newrow + 1
 			if newrow > lines then break end -- End of file
@@ -642,47 +865,59 @@ function PANEL:PaintLine(row, drawpos)
 		--[[surface_SetDrawColor(Color(255,0,0))
 		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)]]
 	end
+	local cells = self:GetRowCache(row)
 
+	if not drawonlytext then
 
-	if row == self.Caret[1] and self.TextEntry:HasFocus() then
-		surface_SetDrawColor(colors.line_highlight)
-		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
-	end
-
-	if self.HighlightedLines and self.HighlightedLines[row] then
-		local color = self.HighlightedLines[row]
-		surface_SetDrawColor(color[1], color[2], color[3], color[4])
-		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
-	end
-
-	if self:HasSelection() then
-		local start, stop = self:MakeSelection(self:Selection())
-		local line, char = start[1], start[2]
-		local endline, endchar = stop[1], stop[2]
-
-		surface_SetDrawColor(colors.selection)
-		local length = self.Rows[row]:len() - self.Scroll[2] + 1
-
-		char = char - self.Scroll[2]
-		endchar = endchar - self.Scroll[2]
-		if char < 0 then char = 0 end
-		if endchar < 0 then endchar = 0 end
-
-		if row == line and line == endline then
-			surface_DrawRect(char * width + startX, startY, width * (endchar - char), height)
-		elseif row == line then
-			surface_DrawRect(char * width + startX, startY, width * (length - char + 1), height)
-		elseif row == endline then
-			surface_DrawRect(startX, startY, width * endchar, height)
-		elseif row > line and row < endline then
-			surface_DrawRect(startX, startY, width * (length + 1), height)
+		if row == self.Caret[1] and self.TextEntry:HasFocus() then
+			surface_SetDrawColor(colors.line_highlight)
+			surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
 		end
+
+		if self.HighlightedLines and self.HighlightedLines[row] then
+			local color = self.HighlightedLines[row]
+			surface_SetDrawColor(color[1], color[2], color[3], color[4])
+			surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
+		end
+
+		if self:HasSelection() then
+			local start, stop = self:MakeSelection(self:Selection())
+			local line, char = start[1], start[2]
+			local endline, endchar = stop[1], stop[2]
+
+			surface_SetDrawColor(colors.selection)
+			local length = lineLen - self.Scroll[2] + 1
+
+			char = char - self.Scroll[2]
+			endchar = endchar - self.Scroll[2]
+			if char < 0 then char = 0 end
+			if endchar < 0 then endchar = 0 end
+
+			if row == line and line == endline then
+				surface_DrawRect(char * width + startX, startY, width * (endchar - char), height)
+			elseif row == line then
+				surface_DrawRect(char * width + startX, startY, width * (length - char + 1), height)
+			elseif row == endline then
+				surface_DrawRect(startX, startY, width * endchar, height)
+			elseif row > line and row < endline then
+				surface_DrawRect(startX, startY, width * (length + 1), height)
+			end
+		end
+
+		draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
+
+		if cells.foldable then
+			if rowdata.hides then
+				draw_SimpleText("▶", self.CurrentFontSmall, self.LineNumberWidth - 3, startY + height/2, colors.gutter_foreground, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER )
+			else
+				draw_SimpleText("▼", self.CurrentFontSmall, self.LineNumberWidth - 3, startY + height/2, colors.gutter_foreground, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER )
+			end
+		end
+
 	end
 
-	draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
-	local offset = -self.Scroll[2] + 1
-	for i, cell in ipairs(self.PaintRows[row]) do
+	for i, cell in ipairs(cells) do
 		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
 			local length = cell[1]:len()
@@ -728,9 +963,23 @@ function PANEL:PaintLine(row, drawpos)
 			offset = offset + length
 		end
 	end
-	if self.HiddenRows[row+1] then
-		draw_SimpleText("<...>", self.CurrentFont, offset * width + startX, startY, Color(64,64,64))
+	if not drawonlytext then
+		if row < lines and self.Rows[row+1][3] then
+			local text = "<"..rowdata.hides.." lines hidden..>"
+			local nextlineoff = offset + #text
+			draw_SimpleText("<"..rowdata.hides.." lines hidden..>", self.CurrentFontSmall, offset * width + startX + (nextlineoff-offset)*width/2, startY + height/2 ,colors.word_highlight, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			if self.RealLine[drawpos+1] then
+				self:PaintLine(self.RealLine[drawpos+1]-1, drawpos, nextlineoff, true)
+			end
+		end
 	end
+--[[	if cells.foldable then
+		surface_SetDrawColor(Color(0,222,0,20))
+		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
+	end
+	if cells.test then
+		draw_SimpleText(tostring(cells.test), self.CurrentFont, startX, startY, Color(32,32,255))
+	end]]
 end
 
 function PANEL:PerformLayout()
@@ -740,7 +989,7 @@ function PANEL:PerformLayout()
 	self.Size[1] = math_floor(self:GetTall() / self.FontHeight) - 1
 	self.Size[2] = math_floor((self:GetWide() - (self.LineNumberWidth + 6) - 16) / self.FontWidth) - 1
 
-	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
+	self.ScrollBar:SetUp(self.Size[1], self.VisibleRows -1)
 end
 
 function PANEL:HighlightArea(area, r, g, b, a)
@@ -764,9 +1013,24 @@ function PANEL:HighlightArea(area, r, g, b, a)
 end
 function PANEL:ClearHighlightedAreas() self.HighlightedAreas = nil end
 
+
+local BracketPairs = {
+	["{"] = {Removes = {["}"]=true}, Adds = {["{"]=true}},
+	["["] = {Removes = {["]"]=true}, Adds = {["["]=true}},
+	["("] = {Removes = {[")"]=true}, Adds = {["("]=true}},
+	["then"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["function"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
+}
+local BracketPairs2 = {
+	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
+	["]"] = {Adds = {["]"]=true}, Removes = {["["]=true}},
+	[")"] = {Adds = {[")"]=true}, Removes = {["("]=true}},
+	["end"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+}
 function PANEL:PaintTextOverlay()
 
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
+		local lines = #self.Rows
 		local width, height = self.FontWidth, self.FontHeight
 
 		if (RealTime() - self.Blink) % 0.8 < 0.4 then
@@ -775,15 +1039,15 @@ function PANEL:PaintTextOverlay()
 			y = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
 			surface_DrawRect((self.Caret[2] - self.Scroll[2]) * width + self.LineNumberWidth + 6, y, 1, height)
 		end
-
-		-- Area highlighting
 		if self.HighlightedAreas then
 			local xofs = self.LineNumberWidth + 6
 			for key, data in pairs(self.HighlightedAreas) do
 				local area, r, g, b, a = data[1], data[2], data[3], data[4], data[5]
 				surface_SetDrawColor(r, g, b, a)
 				local start, stop = self:MakeSelection(area)
-
+				if self.Rows[start[1]][3] or self.Rows[start[1]][3] then continue end -- Row is hidden
+				start[1] = start[1] - self:GetRowOffset(start[1])
+				stop[1] = stop[1] - self:GetRowOffset(stop[1])
 				if start[1] == stop[1] then -- On the same line
 					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + 1, (stop[2]-start[2]) * width, 1)
 					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + height - 2, (stop[2]-start[2]) * width, 1)
@@ -805,107 +1069,103 @@ function PANEL:PaintTextOverlay()
 			end
 		end
 
-		-- Bracket highlighting by: {Jeremydeath}
-		local WindowText = self:GetCode()
-		local LinePos = table_concat(self.Rows, "\n", 1, self.Caret[1]-1):len()
-		local CaretPos = LinePos + self.Caret[2] + 1
-
-		local BracketPairs = {
-			["{"] = "}",
-			["}"] = "{",
-			["["] = "]",
-			["]"] = "[",
-			["("] = ")",
-			[")"] = "("
-		}
-
-		local CaretChars = WindowText:sub(CaretPos-1, CaretPos)
-		local BrackSt, BrackEnd = CaretChars:find("[%(%){}%[%]]")
-
-		local Bracket = false
-		if BrackSt and BrackSt ~= 0 then
-			Bracket = CaretChars:sub(BrackSt or 0, BrackEnd or 0)
+		local bracket,bracketindex = self:GetTokenAtPosition(self.Caret)
+		if bracket then
+			bracket = bracket[1]
 		end
-		if Bracket and BracketPairs[Bracket] then
-			local End = 0
-			local EndX = 1
-			local EndLine = 1
-			local StartX = 1
 
-			if Bracket == "(" or Bracket == "[" or Bracket == "{" then
-				BrackSt, End = WindowText:find("%b"..Bracket..BracketPairs[Bracket], CaretPos-1)
-
-				if BrackSt and End then
-					local OffsetSt = 1
-
-					local BracketLines = string_Explode("\n", WindowText:sub(BrackSt, End))
-
-					EndLine = self.Caret[1] + #BracketLines-1
-
-					EndX = End-LinePos-2
-					if #BracketLines>1 then
-						EndX = BracketLines[#BracketLines]:len()-1
+		if bracket and BracketPairs[bracket] or BracketPairs2[bracket] then
+			local sum = 0
+			local startPos = bracketindex
+			local line = self.Caret[1]
+			local x, y
+			local cBracketPos = 0
+			local bracketLength = #bracket
+			local tokens = self:GetRowCache(line)
+			if BracketPairs[bracket] then
+				local lookup = BracketPairs
+				while line < lines and not y do
+					tokens = self:GetRowCache(line)
+					if not tokens then break end
+					x = 0
+					for I = 1, #tokens do
+						if I < startPos then
+							x = x + #tokens[I][1]
+							cBracketPos = x
+							continue
+						end
+						if lookup[bracket].Adds[tokens[I][1]] then
+							sum = sum + 1
+						elseif lookup[bracket].Removes[tokens[I][1]] then
+							sum = sum - 1
+						end
+						if sum < 0 then return end
+						if sum == 0 then
+							y = line
+							x = x + 1
+							length = #tokens[I][1]
+							break
+						end
+						x = x + #tokens[I][1]
 					end
-
-					if Bracket == "{" then
-						OffsetSt = 0
-					end
-
-					if (CaretPos - BrackSt) >= 0 and (CaretPos - BrackSt) <= 1 then
-						local width, height = self.FontWidth, self.FontHeight
-						local StartX = BrackSt - LinePos - 2
-						surface_SetDrawColor(255, 0, 0, 50)
-						surface_DrawRect((StartX-(self.Scroll[2]-1)) * width + self.LineNumberWidth + self.FontWidth + OffsetSt - 1, (self.Caret[1] - self.Scroll[1]) * height + 1, width-2, height-2)
-						surface_DrawRect((EndX-(self.Scroll[2]-1)) * width + self.LineNumberWidth + 6, (EndLine - self.Scroll[1]) * height + 1, width-2, height-2)
-					end
+					startPos = 1
+					line = line + 1
 				end
-			elseif Bracket == ")" or Bracket == "]" or Bracket == "}" then
-				BrackSt, End = WindowText:reverse():find("%b"..Bracket..BracketPairs[Bracket], -CaretPos)
-				if BrackSt and End then
-					local len = WindowText:len()
-					End = len-End + 1
-					BrackSt = len-BrackSt + 1
-					local BracketLines = string_Explode("\n", WindowText:sub(End, BrackSt))
-
-					EndLine = self.Caret[1]-#BracketLines + 1
-
-					local OffsetSt = -1
-
-					EndX = End-LinePos-2
-					if #BracketLines>1 then
-						local PrevText = WindowText:sub(1, End):reverse()
-
-						EndX = (PrevText:find("\n", 1, true) or 2)-2
+			else--Reverse search
+				local lookup = BracketPairs2
+				startPos = bracketindex
+				line = self.Caret[1]
+				tokens = self:GetRowCache(line)
+				while line > 0 and not y do
+					x = 0
+					for I = #tokens, 1, -1 do
+						if I > startPos then
+							x = x + #tokens[I][1]
+							cBracketPos = x
+							continue
+						end
+						if lookup[bracket].Adds[tokens[I][1]] then
+							sum = sum + 1
+						elseif lookup[bracket].Removes[tokens[I][1]] then
+							sum = sum - 1
+						end
+						if sum == 0 then
+							y = line
+							x = #self:GetRowText(line) - x - length + 1
+							cBracketPos = #self:GetRowText(self.Caret[1]) - cBracketPos - bracketLength
+							length = #tokens[I][1]
+							break
+						end
+						x = x + #tokens[I][1]
 					end
 
-					if Bracket ~= "}" then
-						OffsetSt = 0
-					end
-
-					if (CaretPos - BrackSt) >= 0 and (CaretPos - BrackSt) <= 1 then
-						local width, height = self.FontWidth, self.FontHeight
-						local StartX = BrackSt - LinePos - 2
-						surface_SetDrawColor(255, 0, 0, 50)
-						surface_DrawRect((StartX-(self.Scroll[2]-1)) * width + self.LineNumberWidth + self.FontWidth - 2, (self.Caret[1] - self.Scroll[1]) * height + 1, width-2, height-2)
-						surface_DrawRect((EndX-(self.Scroll[2]-1)) * width + self.LineNumberWidth + 8 + OffsetSt, (EndLine - self.Scroll[1]) * height + 1, width-2, height-2)
-					end
+					line = line - 1
+					if line < 1 then break end
+					tokens = self:GetRowCache(line)
+					if not tokens then break end
+					startPos = #tokens
 				end
+			end
+			y2 = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
+			if x and y then
+				if not self.Rows[y][3] then
+					surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
+					surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y+self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
+				end
+				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
+				surface_DrawRect((cBracketPos-self.Scroll[2] +1) * width + self.LineNumberWidth + self.FontWidth - 1, (self.Caret[1]+self:GetRowOffset(y) -self.Scroll[1]) * height + 1, bracketLength*width-2, height-2)
+
 			end
 		end
 	end
 end
-
+local prevScroll = 1
 local display_caret_pos = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
-
 function PANEL:Paint()
 	self.LineNumberWidth = self.FontWidth * math.max(#tostring(self.Scroll[1] + self.Size[1] + 1),3) + 20
 
 	if not input.IsMouseDown(MOUSE_LEFT) then
 		self:OnMouseReleased(MOUSE_LEFT)
-	end
-
-	if not self.PaintRows then
-		self.PaintRows = {}
 	end
 
 	if self.MouseDown then
@@ -922,29 +1182,55 @@ function PANEL:Paint()
 	surface_DrawRect(self.LineNumberWidth + 5, 0, self:GetWide() - (self.LineNumberWidth + 5), self:GetTall())
 
 	self.Scroll[1] = math_floor(self.ScrollBar:GetScroll() + 1)
-
+	local cScroll = 0
+	for k,v in ipairs(self.Rows) do
+		if not v[3] then
+			cScroll = cScroll + 1
+		end
+		if self.Scroll[1] == cScroll then
+			self.Scroll[1] = k
+			break
+		end
+	end
+	local scrollDir =self.Scroll[1] - prevScroll
+	--self.Scroll[1] = self:GetRowOffset(self.Scroll[1])
 	local i = self.Scroll[1]
 	local drawn = 0
 	local offset = 0
+	local lines =  #self.Rows
 	while drawn < self.Size[1] + 4 do
-		if self.HiddenRows[i] then
+		if i > lines then break end
+		if self.Rows[i][3] then
 			i = i + 1
 			offset = offset + 1
 			continue
 		end
+		--[=[
+		if drawn == 0 and offset > 0 then
+			if scrollDir > 0 then
+				self.Scroll[1] = self.Scroll[1]+offset
+			else
+				self.Scroll[1] = self.Scroll[1]-offset
+				while self.Rows[self.Scroll[1]][3] do
+					self.Scroll[1] = self.Scroll[1] - 1
+				end
+			end
+			self.ScrollBar:SetScroll(self.Scroll[1] - 1)
+		end]=]
 		self.RealLine[drawn] = i
 		self.RowOffset[i] = offset
 		self:PaintLine(i,drawn)
 		drawn = drawn + 1
 		i = i+1
 	end
+	prevScroll = self.Scroll[1]
 
 
 	-- Paint the overlay of the text (bracket highlighting and carret postition)
 	self:PaintTextOverlay()
 
 	if display_caret_pos:GetBool() then
-		local str = "Length: " .. #self:GetCode() .. " Lines: " .. #self.Rows .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2]
+		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2].." Visible Rows:"..self.VisibleRows
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
 		end
@@ -965,8 +1251,8 @@ end
 function PANEL:SetCaret(caret, maintain_selection)
 	self.Caret = self:CopyPosition(caret)
 
-	self.Caret[1] = math.Clamp(self.Caret[1], 1, #self.Rows)
-	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self.Rows[self.Caret[1]] + 1)
+	self.Caret[1] = math.Clamp(self.Caret[1], 1, self.VisibleRows)
+	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self:GetRowText(self.Caret[1]) + 1)
 
 	if maintain_selection == nil then
 		maintain_selection = input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)
@@ -989,7 +1275,7 @@ function PANEL:MovePosition(caret, offset)
 	if offset > 0 then
 		local numRows = #self.Rows
 		while true do
-			local length = #(self.Rows[row]) - col + 2
+			local length = #(self:GetRowText(row)) - col + 2
 			if offset < length then
 				col = col + offset
 				break
@@ -1015,7 +1301,7 @@ function PANEL:MovePosition(caret, offset)
 			else
 				offset = offset - col
 				row = row - 1
-				col = #(self.Rows[row]) + 1
+				col = #(self:GetRowText(row)) + 1
 			end
 		end
 	end
@@ -1045,51 +1331,46 @@ function PANEL:GetArea(selection)
 	local start, stop = self:MakeSelection(selection)
 
 	if start[1] == stop[1] then
-		return string_sub(self.Rows[start[1]], start[2], stop[2] - 1)
+		return string_sub(self:GetRowText(start[1]), start[2], stop[2] - 1)
 	else
-		local text = string_sub(self.Rows[start[1]], start[2])
+		local text = string_sub(self:GetRowText(start[1]), start[2])
 
 		for i = start[1] + 1, stop[1]-1 do
-			text = text .. "\n" .. self.Rows[i]
+			text = text .. "\n" .. self:GetRowText(i)
 		end
 
-		return text .. "\n" .. string_sub(self.Rows[stop[1]], 1, stop[2] - 1)
+		return text .. "\n" .. string_sub(self:GetRowText(stop[1]), 1, stop[2] - 1)
 	end
 end
 function PANEL:RecacheLine(line)
 	local rows = #self.Rows
-	while self.PaintRows[line] and self.PaintRows[line]["unfinished"] do
-		self.PaintRows[line] = false
+	if line > rows then return end
+	while self.Rows[line][2] and self.Rows[line][2]["unfinished"] do
+		self.Rows[line][2] = false
 		line = line + 1
 		if line > rows then return end
 	end
-	self.PaintRows[line] = false
+	self.Rows[line][2] = false
 end
 function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	local start, stop = self:MakeSelection(selection)
 
 	local buffer = self:GetArea(selection)
-
 	if start[1] ~= stop[1] or start[2] ~= stop[2] then
-		-- clear selection
-		self.Rows[start[1]] = string_sub(self.Rows[start[1]], 1, start[2] - 1) .. string_sub(self.Rows[stop[1]], stop[2])
+		self:SetRowText(start[1], string_sub(self:GetRowText(start[1]), 1, start[2] - 1) .. string_sub(self:GetRowText(stop[1]), stop[2]))
 		self:RecacheLine(start[1])
 
 		for i = start[1] + 1, stop[1] do
+			self:UnfoldHidden(i)
 			table_remove(self.Rows, start[1] + 1)
-			table_remove(self.PaintRows, start[1] + 1)
+			self.VisibleRows = self.VisibleRows - 1
 		end
 
-		-- add empty row at end of file (TODO!)
-		if self.Rows[#self.Rows] ~= "" then
-			self.Rows[#self.Rows + 1] = ""
-			self:RecacheLine(#self.Rows + 1)
-		end
+		local lines = #self.Rows
 	end
 
 	if not text or text == "" then
-		self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
-
+		self:UnfoldHidden(start[1])
 		self:OnTextChanged()
 
 		if isredo then
@@ -1108,27 +1389,21 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	-- insert text
 	local rows = string_Explode("\n", text)
 
-	local remainder = string_sub(self.Rows[start[1]], start[2])
-	self.Rows[start[1]] = string_sub(self.Rows[start[1]], 1, start[2] - 1) .. rows[1]
+	local remainder = string_sub(self:GetRowText(start[1]), start[2])
+	self:SetRowText(start[1], string_sub(self:GetRowText(start[1]), 1, start[2] - 1) .. rows[1])
 	self:RecacheLine(start[1])
 
 	for i = 2, #rows do
-		table_insert(self.Rows, start[1] + i - 1, rows[i])
-		table_insert(self.PaintRows, start[1] + i - 1, false)
+		self:InsertRowAt(start[1] + i - 1, rows[i])
+
 	end
 
-	local stop = { start[1] + #rows - 1, #(self.Rows[start[1] + #rows - 1]) + 1 }
+	local stop = { start[1] + #rows - 1, #(self:GetRowText(start[1] + #rows - 1)) + 1 }
 
-	self.Rows[stop[1]] = self.Rows[stop[1]] .. remainder
+	self:SetRowText(stop[1],self:GetRowText(stop[1]) .. remainder)
 	self:RecacheLine(stop[1])
 
-	-- add empty row at end of file (TODO!)
-	if self.Rows[#self.Rows] ~= "" then
-		self.Rows[#self.Rows + 1] = ""
-		self:RecacheLine(#self.Rows + 1)
-	end
 
-	self.ScrollBar:SetUp(self.Size[1], #self.Rows - 1)
 
 
 	self:OnTextChanged()
@@ -1193,10 +1468,10 @@ function PANEL:_OnTextChanged()
 		if text == "\n" or text == "`" then return end
 		if text == "}" and GetConVarNumber('sf_editor_wire_autoindent') ~= 0 then
 			self:SetSelection(text)
-			local row = self.Rows[self.Caret[1]]
+			local row = self:GetRowText(self.Caret[1])
 			if string_match("{" .. row, "^%b{}.*$") then
 				local newrow = unindent(row)
-				self.Rows[self.Caret[1]] = newrow
+				self:SetRowText(self.Caret[1], newrow)
 				self.Caret[2] = self.Caret[2] + newrow:len()-row:len()
 				self.Start[2] = self.Caret[2]
 			end
@@ -1210,25 +1485,30 @@ function PANEL:_OnTextChanged()
 end
 
 function PANEL:OnMouseWheeled(delta)
-	self.Scroll[1] = self.Scroll[1] - 4 * delta
-	if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
-	if self.Scroll[1] > #self.Rows then self.Scroll[1] = #self.Rows end
-	self.ScrollBar:SetScroll(self.Scroll[1] - 1)
+	self.ScrollBar:OnMouseWheeled(delta/self.VisibleRows * 4)
 end
 
 function PANEL:OnShortcut()
 end
 
 function PANEL:ScrollCaret()
-	if self.Caret[1] - self.Scroll[1] < 2 then
-		self.Scroll[1] = self.Caret[1] - 2
-		if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
+	local visCaret = self.Caret[1] - self:GetRowOffset(self.Caret[1])
+	if visCaret - self.Scroll[1] < 3 then
+		local line = self.Caret[1]-3
+		while line > 1 and (self.Rows[line][3] or visCaret-line < 3)  do
+			line = line - 1
+		end
+		self.ScrollBar:SetScrollFix(math.max(line,1))
+	end
+	if visCaret - self.Scroll[1] > self.Size[1] - 2 then
+		local line = self.Scroll[1]
+		local lines = #self.Rows
+		while line <= lines and (self.Rows[line][3] or visCaret - line > self.Size[1] - 2) do
+			line = line + 1
+		end
+		self.ScrollBar:SetScrollFix(math.max(line,1))
 	end
 
-	if self.Caret[1] - self.Scroll[1] > self.Size[1] - 2 then
-		self.Scroll[1] = self.Caret[1] - self.Size[1] + 2
-		if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
-	end
 
 	if self.Caret[2] - self.Scroll[2] < 4 then
 		self.Scroll[2] = self.Caret[2] - 4
@@ -1240,7 +1520,7 @@ function PANEL:ScrollCaret()
 		if self.Scroll[2] < 1 then self.Scroll[2] = 1 end
 	end
 
-	self.ScrollBar:SetScroll(self.Scroll[1] - 1)
+
 end
 
 -- Initialize find settings
@@ -1262,6 +1542,7 @@ function PANEL:HighlightFoundWord(caretstart, start, stop)
 	elseif isnumber(stop) then
 		self.Caret = self:MovePosition(caretstart, stop + 1)
 	end
+	self:UnfoldHidden(self.Caret[1])
 	self:ScrollCaret()
 end
 
@@ -1286,16 +1567,15 @@ function PANEL:Find(str, looped)
 	if not _start or not _stop then return false end
 
 	if dir then -- Down
-		local line = self.Rows[self.Start[1]]
+		local line = self:GetRowText(self.Start[1])
 		local text = line:sub(self.Start[2]) .. "\n"
-		text = text .. table_concat(self.Rows, "\n", self.Start[1] + 1)
+		text = text .. self:GetLinesAsText(self.Start[1] + 1)
 		if ignore_case then text = text:lower() end
 
 		local offset = 2
 		for loop = 1, 100 do
 			local start, stop = text:find(str, offset, not use_patterns)
 			if start and stop then
-
 				if whole_word_only then
 					local caretstart = self:MovePosition(self.Start, start)
 					caretstart = { caretstart[1], caretstart[2]-1 }
@@ -1326,8 +1606,8 @@ function PANEL:Find(str, looped)
 			self:Find(_str, (looped or 0) + 1)
 		end
 	else -- Up
-		local text = table_concat(self.Rows, "\n", 1, self.Start[1]-1)
-		local line = self.Rows[self.Start[1]]
+		local text = self:GetLinesAsText(self.Start[1]-1)
+		local line = self:GetRowText(self.Start[1])
 		text = text .. "\n" .. line:sub(1, self.Start[2]-1)
 
 		str = string_reverse(str)
@@ -1771,7 +2051,7 @@ function PANEL:CreateFindWindow()
 		local val = tonumber(GoToEntry:GetValue())
 		if val then
 			val = math_Clamp(val, 1, #self.Rows)
-			self:SetCaret({ val, #self.Rows[val] + 1 }, false)
+			self:SetCaret({ val, #self:GetRowText(val) + 1 }, false)
 		end
 		GoToEntry:SetText(tostring(val))
 		self.FindWindow:Close()
@@ -1873,7 +2153,7 @@ function PANEL:DoRedo()
 end
 
 function PANEL:SelectAll()
-	self.Caret = { #self.Rows, #(self.Rows[#self.Rows]) + 1 }
+	self.Caret = { #self.Rows, #(self:GetRowText(#self.Rows)) + 1 }
 	self.Start = { 1, 1 }
 	self:ScrollCaret()
 end
@@ -1986,7 +2266,7 @@ function PANEL:ContextHelp()
 		word = self:GetSelection()
 	else
 		local row, col = unpack(self.Caret)
-		local line = self.Rows[row]
+		local line = self:GetRowText(row)
 		if not line:sub(col, col):match("^[a-zA-Z0-9_]$") then
 			col = col - 1
 		end
@@ -2150,19 +2430,21 @@ function PANEL:_OnKeyCodeTyped(code)
 	else
 
 		if code == KEY_ENTER then
-			local row = self.Rows[self.Caret[1]]:sub(1, self.Caret[2]-1)
+			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 			local tabs = string_rep("    ", math_floor(diff / 4))
 			self:SetSelection("\n" .. tabs)
 		elseif code == KEY_UP then
+			if self.Caret[1] <= 1 then return end
 			self.Caret[1] = self.Caret[1] - 1
-			while self.HiddenRows[self.Caret[1]] do
+			while self.Rows[self.Caret[1]][3] do
 				self.Caret[1] = self.Caret[1] - 1
 			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
+			if self.Caret[1] >= #self.Rows then return end
 			self.Caret[1] = self.Caret[1] + 1
-			while self.HiddenRows[self.Caret[1]] do
+			while self.Rows[self.Caret[1]][3] do
 				self.Caret[1] = self.Caret[1] + 1
 			end
 			self:SetCaret(self.Caret)
@@ -2293,12 +2575,14 @@ end
 
 function PANEL:GetTokenAtPosition(caret)
 	local column = caret[2]
-	local line = self.PaintRows[caret[1]]
+	local line = self.Rows[caret[1]]
+	if not line then return nil end
+	line = line[2]
 	if line then
 		local startindex = 1
-		for index, data in pairs(line) do
+		for index, data in ipairs(line) do
 			startindex = startindex + #data[1]
-			if startindex >= column then return data[3] end
+			if startindex >= column then return data,index end
 		end
 	end
 end
@@ -2306,7 +2590,7 @@ end
 -- Syntax highlighting --------------------------------------------------------
 
 function PANEL:ResetTokenizer(row)
-	self.line = self.Rows[row]
+	self.line = self:GetRowText(row)
 	self.position = 0
 	self.character = ""
 	self.tokendata = ""
@@ -2347,19 +2631,13 @@ function PANEL:SkipPattern(pattern)
 	return text
 end
 
-function PANEL:IsVarLine()
-	local line = self.Rows[self.Caret[1]]
-	local word = line:match("^@(%w+)")
-	return (word == "inputs" or word == "outputs" or word == "persist")
-end
-
 function PANEL:IsDirectiveLine()
-	local line = self.Rows[self.Caret[1]]
+	local line = self:GetRowText(caret[1])
 	return line:match("^@") ~= nil
 end
 
 function PANEL:getWordStart(caret, getword)
-	local line = self.Rows[caret[1]]
+	local line = self:GetRowText(caret[1])
 
 	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
 		if startpos <= caret[2] and endpos >= caret[2] then
@@ -2370,7 +2648,7 @@ function PANEL:getWordStart(caret, getword)
 end
 
 function PANEL:getWordEnd(caret, getword)
-	local line = self.Rows[caret[1]]
+	local line = self:GetRowText(caret[1])
 
 	for startpos, endpos in line:gmatch("()[a-zA-Z0-9_]+()") do -- "()%w+()"
 		if startpos <= caret[2] and endpos >= caret[2] then
@@ -2403,20 +2681,80 @@ function PANEL:GetSyntaxColor(name)
 	return self:DoAction("GetSyntaxColor", name)
 end
 
-function PANEL:SyntaxColorLine(line, prev)
+function PANEL:SyntaxColorLine(line)
 	prev = prev or {}
 	if #self.Rows[line] > 2048 then -- Too long to parse
-		local cols = TabHandler.Modes.Text.SyntaxColorLine(self, line, prev)
+		local cols = TabHandler.Modes.Text.SyntaxColorLine(self, line)
 		for k,v in pairs(prev) do -- Pass along unfinished etc
 			if isnumber(k) then continue end
 			cols[k] = v
 		end
 		return cols
 	end
-	return self:DoAction("SyntaxColorLine", line, prev)
+	local cols = self:DoAction("SyntaxColorLine", line)
+
+	local sum = 0
+	--[[Hiding then/do -> end]]
+	local adds = {
+		["then"] = true,
+		["function"] = true,
+		["do"] = true
+	}
+	local removes = {
+		["end"] = true,
+		["else"] = true,
+		["elseif"] = true,
+	}
+	for k,v in ipairs(cols) do
+		if adds[v[1]] then
+			sum = sum + 1
+		end
+		if v[1] == "end" then
+			sum = sum - 1
+		end
+		cols.test = sum
+	end
+	if sum > 0 then
+		cols.foldable = true
+	else
+		sum = 0
+		for k,v in ipairs(cols) do
+			if v[1] == "{" then
+				sum = sum + 1
+			end
+			if v[1] == "}" then
+				sum = sum - 1
+			end
+			cols.test = sum
+		end
+		cols.foldable = sum > 0 or nil
+	end
+	return cols
 end
 
 function PANEL:Think()
+	if not self.LineNumberWidth then return end
+	local x,y = self:CursorPos()
+	local right_cursor = false
+	if x > self.LineNumberWidth - 10 and x < self.LineNumberWidth then
+		local lines = self.Rows
+		if x < 0 then x = 0 end
+		if y < 0 then y = 0 end
+		local line = math_floor(y / self.FontHeight)
+		line = lines[self.RealLine[line]] or lines[line]
+
+		if line and line[2] and line[2].foldable then
+			if self.cur != "pointer" then
+				self:SetCursor("hand")
+				self.cur = "pointer"
+			end
+			right_cursor = true
+		end
+	end
+	if self.cur == "pointer" and not right_cursor then
+		self:SetCursor("beam")
+		self.cur = "beam"
+	end
 	self:DoAction("Think")
 end
 -- register editor panel
