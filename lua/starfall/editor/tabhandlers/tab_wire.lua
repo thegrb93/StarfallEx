@@ -634,7 +634,7 @@ function PANEL:OpenContextMenu()
 			for i = 1, #self.Rows do
 				local colors = self:SyntaxColorLine(i)
 
-				for k, v in pairs(colors) do
+				for k, v in ipairs(colors) do
 					local color = v[2][1]
 
 					if (prev_colors and prev_colors == color) or string_Trim(v[1]) == "" then
