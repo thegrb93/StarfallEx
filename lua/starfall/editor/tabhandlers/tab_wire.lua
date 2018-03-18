@@ -345,7 +345,7 @@ function PANEL:Init()
 	self.CurrentMode:LoadSyntaxColors()
 
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
-	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7)
+	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), math_floor(TabHandler.FontSizeConVar:GetInt()*0.9))
 	table.insert(TabHandler.Tabs, self)
 
 end
@@ -990,9 +990,9 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 	end
 	if not drawonlytext then
 		if row < lines and self.Rows[row+1][3] then
-			local text = "<"..rowdata.hides.." lines hidden..>"
+			local text = "< "..rowdata.hides.." "..(rowdata.hides > 1 and "lines" or "line").." hidden.. >"
 			local nextlineoff = offset + #text
-			draw_SimpleText("<"..rowdata.hides.." lines hidden..>", self.CurrentFontSmall, offset * width + startX + (nextlineoff-offset)*width/2, startY + height/2 ,colors.word_highlight, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+			draw_SimpleText(text, self.CurrentFontSmall, offset * width + startX + (nextlineoff-offset)*width/2, startY + height/2 ,colors.word_highlight, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			if self.RealLine[drawpos+1] then
 				self:PaintLine(self.RealLine[drawpos+1]-1, drawpos, nextlineoff, true)
 			end
