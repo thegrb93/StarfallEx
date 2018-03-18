@@ -408,8 +408,7 @@ function PANEL:InsertRowAt(line, text)
 		false, --Hidden
 	})
 	self.VisibleRows = self.VisibleRows + 1
-
-	return
+	self:InvalidateLayout()
 end
 
 function PANEL:HideRow(row)
