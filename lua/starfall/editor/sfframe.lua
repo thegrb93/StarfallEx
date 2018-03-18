@@ -943,7 +943,7 @@ function Editor:GetSettings()
 	box:SetValue(SF.Editor.CurrentTabHandler:GetString())
 	box.OnSelect = function (self, index, value, data)
 		value = value:gsub(" %b()", "") -- Remove description
-		RunConsoleCommand("sf_editor_tabeditor", value)
+		RunConsoleCommand("sf_editor_tab_editor", value)
 		RunConsoleCommand("sf_editor_restart")
 	end
 
