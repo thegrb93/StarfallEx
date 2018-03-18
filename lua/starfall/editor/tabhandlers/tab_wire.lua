@@ -69,6 +69,7 @@ TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_hig
 TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
 TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollspeed", 4, true, false)
+TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
 
 ---------------------
 -- Colors
@@ -173,6 +174,7 @@ function TabHandler:RegisterSettings()
 		_old(form,left,right)
 		if left then
 			if left.SetDark then left:SetDark(false) end
+			left:SetWide(160)
 		end
 		if right then
 			if right.SetDark then right:SetDark(false) end
@@ -248,6 +250,7 @@ function TabHandler:RegisterSettings()
 		RunConsoleCommand("sf_editor_wire_pigments", val-1)
 		FakeThemeChange()
 	end
+	local linesHiddenFormat = form:TextEntry( "Format of hidden lines text", "sf_editor_wire_lines_hidden_format" )
 
 	local commentStyle = form:ComboBox( "Comment Style", "sf_editor_wire_block_comment_style" )
 	commentStyle:AddChoice("Block (New Line)", 0)
@@ -990,7 +993,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 	end
 	if not drawonlytext then
 		if row < lines and self.Rows[row+1][3] then
-			local text = "< "..rowdata.hides.." "..(rowdata.hides > 1 and "lines" or "line").." hidden.. >"
+			local text = string.format(TabHandler.LinesHiddenFormatConVar:GetString(),rowdata.hides)
 			local nextlineoff = offset + #text
 			draw_SimpleText(text, self.CurrentFontSmall, offset * width + startX + (nextlineoff-offset)*width/2, startY + height/2 ,colors.word_highlight, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 			if self.RealLine[drawpos+1] then
