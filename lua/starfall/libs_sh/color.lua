@@ -3,6 +3,9 @@ SF.Color = {}
 --- Color type
 --@shared
 local color_methods, color_metatable = SF.Typedef("Color", {})
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 local function wrap(tbl)
 	return setmetatable(tbl, color_metatable)
@@ -89,8 +92,8 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 -- @param rhs Right side of equation
 -- @return Added color.
 function color_metatable.__add (a, b)
-	SF.CheckType(a, color_metatable)
-	SF.CheckType(b, color_metatable)
+	checktype(a, color_metatable)
+	checktype(b, color_metatable)
 
 	return wrap({ clamp(a[1] + b[1]), clamp(a[2] + b[2]), clamp(a[3] + b[3]), clamp(a[4] + b[4]) })
 end
@@ -100,8 +103,8 @@ end
 -- @param rhs Right side of equation
 -- @return Subtracted color.
 function color_metatable.__sub (a, b)
-	SF.CheckType(a, color_metatable)
-	SF.CheckType(b, color_metatable)
+	checktype(a, color_metatable)
+	checktype(b, color_metatable)
 
 	return wrap({ clamp(a[1]-b[1]), clamp(a[2]-b[2]), clamp(a[3]-b[3]), clamp(a[4]-b[4]) })
 end
@@ -112,11 +115,11 @@ end
 -- @return Scaled color.
 function color_metatable.__mul (a, b)
 	if dgetmeta(a) == color_metatable then
-		SF.CheckLuaType(b, TYPE_NUMBER)
+		checkluatype (b, TYPE_NUMBER)
 
 		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
 	else
-		SF.CheckLuaType(a, TYPE_NUMBER)
+		checkluatype (a, TYPE_NUMBER)
 
 		return wrap({ clamp(b[1] * a), clamp(b[2] * a), clamp(b[3] * a), clamp(b[4] * a) })
 	end
@@ -126,8 +129,8 @@ end
 -- @param rhs Right side of equation
 -- @return Scaled color.
 function color_metatable.__div (a, b)
-	SF.CheckType(a, color_metatable)
-	SF.CheckLuaType(b, TYPE_NUMBER)
+	checktype(a, color_metatable)
+	checkluatype (b, TYPE_NUMBER)
 
 	return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
 end

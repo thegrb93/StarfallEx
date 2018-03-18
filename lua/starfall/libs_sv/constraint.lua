@@ -6,6 +6,9 @@ local constraint_library = SF.Libraries.Register("constraint")
 local vwrap = SF.WrapObject
 local vunwrap = SF.UnwrapObject
 local ewrap, eunwrap, ents_metatable
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 SF.Libraries.AddHook("postload", function()
 	ewrap = SF.Entities.Wrap
@@ -16,7 +19,7 @@ end)
 local function checkConstraint(e, t)
 	if e then
 		if e:IsValid() then
-			SF.Permissions.check(SF.instance, e, t)
+			checkpermission(SF.instance, e, t)
 		elseif not e:IsWorld() then
 			SF.Throw("Invalid Entity", 3)
 		end
@@ -48,8 +51,8 @@ end
 -- @param nocollide Bool whether or not to nocollide the two entities
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -62,9 +65,9 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	force_lim = force_lim or 0
 	nocollide = nocollide and true or false
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(force_lim, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(force_lim, TYPE_NUMBER)
 
 	constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
 end
@@ -72,10 +75,10 @@ end
 --- Axis two entities
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
-	SF.CheckType(v1, SF.Types["Vector"])
-	SF.CheckType(v2, SF.Types["Vector"])
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
+	checktype(v1, SF.Types["Vector"])
+	checktype(v2, SF.Types["Vector"])
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -93,11 +96,11 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	friction = friction or 0
 	nocollide = nocollide and 1 or 0
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(force_lim, TYPE_NUMBER)
-	SF.CheckLuaType(torque_lim, TYPE_NUMBER)
-	SF.CheckLuaType(friction, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(force_lim, TYPE_NUMBER)
+	checkluatype(torque_lim, TYPE_NUMBER)
+	checkluatype(friction, TYPE_NUMBER)
 
 	constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
 end
@@ -105,9 +108,9 @@ end
 --- Ballsocket two entities
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
-	SF.CheckType(v1, SF.Types["Vector"])
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
+	checktype(v1, SF.Types["Vector"])
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -122,10 +125,10 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	torque_lim = torque_lim or 0
 	nocollide = nocollide and 1 or 0
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(force_lim, TYPE_NUMBER)
-	SF.CheckLuaType(torque_lim, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(force_lim, TYPE_NUMBER)
+	checkluatype(torque_lim, TYPE_NUMBER)
 
 	constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
 end
@@ -133,13 +136,13 @@ end
 --- Advanced Ballsocket two entities
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
-	SF.CheckType(v1, SF.Types["Vector"])
-	SF.CheckType(v2, SF.Types["Vector"])
-	SF.CheckType(minv, SF.Types["Vector"])
-	SF.CheckType(maxv, SF.Types["Vector"])
-	SF.CheckType(frictionv, SF.Types["Vector"])
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
+	checktype(v1, SF.Types["Vector"])
+	checktype(v2, SF.Types["Vector"])
+	checktype(minv, SF.Types["Vector"])
+	checktype(maxv, SF.Types["Vector"])
+	checktype(frictionv, SF.Types["Vector"])
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -159,10 +162,10 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	rotateonly = rotateonly and 1 or 0
 	nocollide = nocollide and 1 or 0
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(force_lim, TYPE_NUMBER)
-	SF.CheckLuaType(torque_lim, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(force_lim, TYPE_NUMBER)
+	checkluatype(torque_lim, TYPE_NUMBER)
 
 	constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
 end
@@ -170,10 +173,10 @@ end
 --- Elastic two entities
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
-	SF.CheckType(v1, SF.Types["Vector"])
-	SF.CheckType(v2, SF.Types["Vector"])
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
+	checktype(v1, SF.Types["Vector"])
+	checktype(v2, SF.Types["Vector"])
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -191,12 +194,12 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	width = width or 0
 	strech = strech and true or false
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(const, TYPE_NUMBER)
-	SF.CheckLuaType(damp, TYPE_NUMBER)
-	SF.CheckLuaType(rdamp, TYPE_NUMBER)
-	SF.CheckLuaType(width, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(const, TYPE_NUMBER)
+	checkluatype(damp, TYPE_NUMBER)
+	checkluatype(rdamp, TYPE_NUMBER)
+	checkluatype(width, TYPE_NUMBER)
 
 	e1.Elastics = e1.Elastics or {}
 	e2.Elastics = e2.Elastics or {}
@@ -210,10 +213,10 @@ end
 --- Ropes two entities
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
-	SF.CheckType(v1, SF.Types["Vector"])
-	SF.CheckType(v2, SF.Types["Vector"])
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
+	checktype(v1, SF.Types["Vector"])
+	checktype(v2, SF.Types["Vector"])
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -232,12 +235,12 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	width = width or 0
 	rigid = rigid and true or false
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(length, TYPE_NUMBER)
-	SF.CheckLuaType(addlength, TYPE_NUMBER)
-	SF.CheckLuaType(force_lim, TYPE_NUMBER)
-	SF.CheckLuaType(width, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(length, TYPE_NUMBER)
+	checkluatype(addlength, TYPE_NUMBER)
+	checkluatype(force_lim, TYPE_NUMBER)
+	checkluatype(width, TYPE_NUMBER)
 
 	e1.Ropes = e1.Ropes or {}
 	e2.Ropes = e2.Ropes or {}
@@ -251,10 +254,10 @@ end
 --- Sliders two entities
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
-	SF.CheckType(v1, SF.Types["Vector"])
-	SF.CheckType(v2, SF.Types["Vector"])
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
+	checktype(v1, SF.Types["Vector"])
+	checktype(v2, SF.Types["Vector"])
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -268,9 +271,9 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	bone2 = bone2 or 0
 	width = width or 0
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
-	SF.CheckLuaType(width, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(width, TYPE_NUMBER)
 
 	constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp(width, 0, 50), "cable/cable2")
 end
@@ -278,8 +281,8 @@ end
 --- Nocollides two entities
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
-	SF.CheckType(e1, ents_metatable)
-	SF.CheckType(e2, ents_metatable)
+	checktype(e1, ents_metatable)
+	checktype(e2, ents_metatable)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -290,8 +293,8 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
 
-	SF.CheckLuaType(bone1, TYPE_NUMBER)
-	SF.CheckLuaType(bone2, TYPE_NUMBER)
+	checkluatype(bone1, TYPE_NUMBER)
+	checkluatype(bone2, TYPE_NUMBER)
 
 	constraint.NoCollide(ent1, ent2, bone1, bone2)
 end
@@ -299,14 +302,14 @@ end
 --- Sets the length of a rope attached to the entity
 -- @server
 function constraint_library.setRopeLength(index, e, length)
-	SF.CheckType(e, ents_metatable)
+	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
 	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
-	SF.Permissions.check(SF.instance, ent1, "constraints.rope")
+	checkpermission(SF.instance, ent1, "constraints.rope")
 
 
-	SF.CheckLuaType(length, TYPE_NUMBER)
+	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
 
 
@@ -321,13 +324,13 @@ end
 --- Sets the length of an elastic attached to the entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
-	SF.CheckType(e, ents_metatable)
+	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
 	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
-	SF.Permissions.check(SF.instance, ent1, "constraints.elastic")
+	checkpermission(SF.instance, ent1, "constraints.elastic")
 
-	SF.CheckLuaType(length, TYPE_NUMBER)
+	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
 
 	if e.Elastics then
@@ -341,11 +344,11 @@ end
 --- Breaks all constraints on an entity
 -- @server
 function constraint_library.breakAll(e)
-	SF.CheckType(e, ents_metatable)
+	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
 	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
-	SF.Permissions.check(SF.instance, ent1, "constraints.any")
+	checkpermission(SF.instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
 end
@@ -353,13 +356,13 @@ end
 --- Breaks all constraints of a certain type on an entity
 -- @server
 function constraint_library.breakType(e, typename)
-	SF.CheckType(e, ents_metatable)
-	SF.CheckLuaType(typename, TYPE_STRING)
+	checktype(e, ents_metatable)
+	checkluatype(typename, TYPE_STRING)
 
 	local ent1 = eunwrap(e)
 
 	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
-	SF.Permissions.check(SF.instance, ent1, "constraints.any")
+	checkpermission(SF.instance, ent1, "constraints.any")
 
 	constraint.RemoveConstraints(ent1, typename)
 end
@@ -369,7 +372,7 @@ end
 -- @param ent The entity
 -- @return Table of entity constraints
 function constraint_library.getTable(ent)
-	SF.CheckType(ent, ents_metatable)
+	checktype(ent, ents_metatable)
 
 	ent = eunwrap(ent)
 

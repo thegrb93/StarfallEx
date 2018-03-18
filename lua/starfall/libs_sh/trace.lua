@@ -5,7 +5,9 @@
 local dgetmeta = debug.getmetatable
 
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
-
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 --[[
 -- Here's a neat little script to convert enumerations wiki.gmod.com-style
 -- into something usable in code
@@ -238,9 +240,9 @@ end
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
-	SF.Permissions.check(SF.instance, nil, "trace")
-	SF.CheckType(start, SF.Types.Vector)
-	SF.CheckType(endpos, SF.Types.Vector)
+	checkpermission(SF.instance, nil, "trace")
+	checktype(start, SF.Types.Vector)
+	checktype(endpos, SF.Types.Vector)
 
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 
@@ -251,11 +253,11 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 			if ret[1] then return ret[2] end
 		end
 	else
-		filter = convertFilter(SF.CheckLuaType(filter, TYPE_TABLE, 0, {}))
+		filter = convertFilter(checkluatype (filter, TYPE_TABLE, 0, {}))
 	end
-	if mask ~= nil then SF.CheckLuaType(mask, TYPE_NUMBER) end
-	if colgroup ~= nil then SF.CheckLuaType(colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then SF.CheckLuaType(ignworld, TYPE_BOOL) end
+	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
+	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
+	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 
 	local trace = {
 		start = start,
@@ -286,11 +288,11 @@ end
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
-	SF.Permissions.check(SF.instance, nil, "trace")
-	SF.CheckType(start, SF.Types.Vector)
-	SF.CheckType(endpos, SF.Types.Vector)
-	SF.CheckType(minbox, SF.Types.Vector)
-	SF.CheckType(maxbox, SF.Types.Vector)
+	checkpermission(SF.instance, nil, "trace")
+	checktype(start, SF.Types.Vector)
+	checktype(endpos, SF.Types.Vector)
+	checktype(minbox, SF.Types.Vector)
+	checktype(maxbox, SF.Types.Vector)
 
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 
@@ -301,11 +303,11 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 			if ret[1] then return ret[2] end
 		end
 	else
-		filter = convertFilter(SF.CheckLuaType(filter, TYPE_TABLE, 0, {}))
+		filter = convertFilter(checkluatype (filter, TYPE_TABLE, 0, {}))
 	end
-	if mask ~= nil then mask = SF.CheckLuaType(mask, TYPE_NUMBER) end
-	if colgroup ~= nil then SF.CheckLuaType(colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then SF.CheckLuaType(ignworld, TYPE_BOOL) end
+	if mask ~= nil then mask = checkluatype (mask, TYPE_NUMBER) end
+	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
+	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 
 	local trace = {
 		start = start,

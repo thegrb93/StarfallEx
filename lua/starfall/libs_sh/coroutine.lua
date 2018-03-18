@@ -4,6 +4,9 @@
 -- @shared
 local coroutine_library = SF.Libraries.Register("coroutine")
 local coroutine = coroutine
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 local _, thread_metamethods = SF.Typedef("thread")
 local wrap, unwrap = SF.CreateWrapper(thread_metamethods, true, false)
@@ -50,7 +53,7 @@ end
 -- @param func Function of the coroutine
 -- @return coroutine
 function coroutine_library.create (func)
-	SF.CheckLuaType(func, TYPE_FUNCTION)
+	checkluatype (func, TYPE_FUNCTION)
 	local wrappedFunc, wrappedThread = createCoroutine(func)
 	return wrappedThread
 end
@@ -59,7 +62,7 @@ end
 -- @param func Function of the coroutine
 -- @return A function that, when called, resumes the created coroutine. Any parameters to that function will be passed to the coroutine.
 function coroutine_library.wrap (func)
-	SF.CheckLuaType(func, TYPE_FUNCTION)
+	checkluatype (func, TYPE_FUNCTION)
 	local wrappedFunc, wrappedThread = createCoroutine(func)
 	return wrappedFunc
 end
@@ -69,7 +72,7 @@ end
 -- @param ... optional parameters that will be passed to the coroutine
 -- @return Any values the coroutine is returning to the main thread
 function coroutine_library.resume (thread, ...)
-	SF.CheckType(thread, thread_metamethods)
+	checktype(thread, thread_metamethods)
 	local func = unwrap(thread).func
 	return func(...)
 end
@@ -90,7 +93,7 @@ end
 -- @param thread The coroutine
 -- @return Either "suspended", "running", "normal" or "dead"
 function coroutine_library.status (thread)
-	SF.CheckType(thread, thread_metamethods)
+	checktype(thread, thread_metamethods)
 	local thread = unwrap(thread).thread
 	return coroutine.status(thread)
 end
@@ -107,7 +110,7 @@ end
 function coroutine_library.wait (time)
 	local curthread = coroutine.running()
 	if curthread and SF.instance.data.coroutines[curthread] then
-		SF.CheckLuaType(time, TYPE_NUMBER)
+		checkluatype (time, TYPE_NUMBER)
 		coroutine.wait(time)
 	else
 		SF.Throw("attempt to yield across C-call boundary", 2)
