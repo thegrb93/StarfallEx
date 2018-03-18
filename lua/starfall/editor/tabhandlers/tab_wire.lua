@@ -518,11 +518,17 @@ function PANEL:ToggleFold(y)
 		["elseif"] = true,
 	}
 	for k,v in ipairs(cols) do
-		if adds[v[1]] then
+		local text = v[1]
+		::redo::
+		if adds[text] then
 			sum = sum + 1
 		end
-		if removes[v[1]] and (sum > 0 or v[1] == "end") then
+		if removes[text] and (sum > 0 or text == "end") then
 			sum = sum - 1
+		end
+		if text == "else" then
+			text = "then"
+			goto redo
 		end
 		cols.test = sum
 	end
@@ -530,19 +536,20 @@ function PANEL:ToggleFold(y)
 		local line = y + 1
 		local sum = sum -- Change scope
 		while line < lines do
-			print(line)
 			self.Rows[line][2]  = self:SyntaxColorLine(line)
 			cols = self.Rows[line][2]
 			for k,v in ipairs(cols) do
-				if adds[v[1]] then
+				local text = v[1]
+				::redo::
+				if adds[text] then
 					sum = sum + 1
 				else
 				end
-				if removes[v[1]] then
+				if removes[text] then
 					sum = sum - 1
 				end
 				cols.test = sum
-				local fullcollapse = v[1] == "end"
+				local fullcollapse =text == "end"
 				if sum <= 0 then
 					row.hides = 0
 					for I = y + 1, fullcollapse and line or line -1 do
@@ -552,6 +559,10 @@ function PANEL:ToggleFold(y)
 						row.fullcollapse = fullcollapse
 					end
 					return
+				end
+				if text == "else" then
+					text = "then"
+					goto redo
 				end
 			end
 
@@ -1060,12 +1071,15 @@ local BracketPairs = {
 	["("] = {Removes = {[")"]=true}, Adds = {["("]=true}},
 	["then"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
 	["function"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["else"] = {Adds = {["function"]=true,["then"]=true, ["else"]=true}, Removes = {["end"]=true,["elseif"]=true}},
 }
 local BracketPairs2 = {
 	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
 	["]"] = {Adds = {["]"]=true}, Removes = {["["]=true}},
 	[")"] = {Adds = {[")"]=true}, Removes = {["("]=true}},
 	["end"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["elseif"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+
 }
 function PANEL:PaintTextOverlay()
 
@@ -1130,24 +1144,25 @@ function PANEL:PaintTextOverlay()
 					if not tokens then break end
 					x = 0
 					for I = 1, #tokens do
+						local text = tokens[I][1]
 						if I < startPos then
-							x = x + #tokens[I][1]
+							x = x + #text
 							cBracketPos = x
 							continue
 						end
-						if lookup[bracket].Adds[tokens[I][1]] then
+						if lookup[bracket].Adds[text] then
 							sum = sum + 1
-						elseif lookup[bracket].Removes[tokens[I][1]] then
+						elseif lookup[bracket].Removes[text] then
 							sum = sum - 1
 						end
 						if sum < 0 then return end
 						if sum == 0 then
 							y = line
 							x = x + 1
-							length = #tokens[I][1]
+							length = #text
 							break
 						end
-						x = x + #tokens[I][1]
+						x = x + #text
 					end
 					startPos = 1
 					line = line + 1
@@ -1160,26 +1175,29 @@ function PANEL:PaintTextOverlay()
 				while line > 0 and not y do
 					x = 0
 					for I = #tokens, 1, -1 do
+						local text = tokens[I][1]
 						if I > startPos then
-							x = x + #tokens[I][1]
+							x = x + #text
 							cBracketPos = x
 							continue
 						end
-						if lookup[bracket].Adds[tokens[I][1]] then
+						if text == "else" then
+							text = "then"
+						end
+						if lookup[bracket].Adds[text] then
 							sum = sum + 1
-						elseif lookup[bracket].Removes[tokens[I][1]] then
+						elseif lookup[bracket].Removes[text] then
 							sum = sum - 1
 						end
 						if sum == 0 then
 							y = line
-							length = #tokens[I][1]
+							length = #text
 							x = #self:GetRowText(line) - x - length + 1
 							cBracketPos = #self:GetRowText(self.Caret[1]) - cBracketPos - bracketLength
 							break
 						end
-						x = x + #tokens[I][1]
+						x = x + #text
 					end
-
 					line = line - 1
 					if line < 1 then break end
 					tokens = self:GetRowCache(line)
@@ -2756,12 +2774,18 @@ function PANEL:SyntaxColorLine(line)
 		["else"] = true,
 		["elseif"] = true,
 	}
-	for k,v in ipairs(cols) do
-		if adds[v[1]] then
+	for k,v in ipairs(cols) do 
+		local text = v[1]
+		::redo::
+		if adds[text] then
 			sum = sum + 1
 		end
-		if removes[v[1]] and (sum > 0 or v[1] == "end") then
+		if removes[text] and (sum > 0 or text == "end") then
 			sum = sum - 1
+		end
+		if text == "else" then
+			text = "then"
+			goto redo
 		end
 		cols.test = sum
 	end
