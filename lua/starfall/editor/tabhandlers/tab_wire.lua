@@ -944,8 +944,12 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 
 	end
 
-
+	local nonwhitespace = false
 	for i, cell in ipairs(cells) do
+		if cell[3] == "whitespace" and not nonwhitespace and drawonlytext then -- Skip whitespaces at beginning if its text only
+			continue
+		end
+		nonwhitespace = true
 		if offset > self.Size[2] then return end
 		if offset < 0 then -- When there is part of line horizontally begining before our scrolled area
 			local length = cell[1]:len()
