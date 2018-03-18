@@ -1191,10 +1191,10 @@ function PANEL:PaintTextOverlay()
 			if x and y then
 				if not self.Rows[y][3] then
 					surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
-					surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y+self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
+					surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y - self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
 				end
 				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
-				surface_DrawRect((cBracketPos-self.Scroll[2] +1) * width + self.LineNumberWidth + self.FontWidth - 1, (self.Caret[1]+self:GetRowOffset(self.Caret[1]) -self.Scroll[1]) * height + 1, bracketLength*width-2, height-2)
+				surface_DrawRect((cBracketPos-self.Scroll[2] +1) * width + self.LineNumberWidth + self.FontWidth - 1, (self.Caret[1] - self:GetRowOffset(self.Caret[1]) -self.Scroll[1]) * height + 1, bracketLength*width-2, height-2)
 
 			end
 		end
