@@ -19,7 +19,7 @@ function ENT:SetHudEnabled(ply, mode)
 		net.WriteEntity(self)
 		net.WriteInt(mode, 8)
 	net.Send(ply)
-	
+
 	local function connect()
 		if IsValid(self.link) then
 			local instance = self.link.instance
@@ -29,7 +29,7 @@ function ENT:SetHudEnabled(ply, mode)
 		end
 		ply.sfhudenabled = self
 	end
-	
+
 	local function disconnect()
 		if IsValid(self.link) then
 			local instance = self.link.instance
@@ -39,7 +39,7 @@ function ENT:SetHudEnabled(ply, mode)
 		end
 		ply.sfhudenabled = nil
 	end
-	
+
 	if mode == 1 then
 		connect()
 	elseif mode == -1 then
@@ -142,7 +142,7 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 				self:LinkEnt(e)
 			end
 		end
-		
+
 		if info.linkedvehicles then
 			for k, v in pairs(info.linkedvehicles) do
 				local e = CreatedEntities[v]
