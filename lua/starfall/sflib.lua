@@ -40,12 +40,13 @@ function SF.CheckUrl(url)
 		return string.format("%%%02X", string.byte(str))
 	end)
 
-	local prefix, site, data = string.match(url,"^(%w-):%/%/([%w%-%_%.]+)%/?(.+)")
+	local prefix, site, data = string.match(url,"^(%w-):%/%/([^/]*)%/?(.+)")
+	if not prefix or not site then return false end
 	site = site.."/"
-
+	local url_without_prefix = site.."/"..(data or "")
 	for k,v in pairs(SF.UrlWhitelist) do
 		if v[1] == TYPE_BLACKLISTPATTERN then
-			if string.match(site, v[2]) then
+			if string.match(url_without_prefix, v[2]) then
 				return false
 			end
 		elseif v[1] == TYPE_BLACKLIST then
@@ -56,7 +57,7 @@ function SF.CheckUrl(url)
 	end
 	for k,v in pairs(SF.UrlWhitelist) do
 		if v[1] == TYPE_PATTERN then
-			if string.match(site, v[2]) then
+			if string.match(url_without_prefix, v[2]) then
 				return true
 			end
 		elseif v[1] == TYPE_SIMPLE then

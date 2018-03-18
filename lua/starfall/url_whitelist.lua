@@ -23,7 +23,6 @@ end
 ---  https://www.dropbox.com/s/abcd123/efg123.txt?dl=0
 ---  https://dl.dropboxusercontent.com/content_link/abc123/file?dl=1
 
-simple [[www.dropbox.com/s/]]
 simple [[https://dl.dropboxusercontent.com/]]
 simple [[dl.dropbox.com/]] --Sometimes redirects to usercontent link
 
@@ -117,7 +116,7 @@ simple [[a.pomf.cat/]]
 -- TinyPic
 --- Examples:
 ---  http://i68.tinypic.com/24b3was.gif
-pattern [[i(.+)%.tinypic%.com/]]
+pattern [[i(.+)%.tinypic%.com/(.+)]]
 
 
 -- paste.ee
