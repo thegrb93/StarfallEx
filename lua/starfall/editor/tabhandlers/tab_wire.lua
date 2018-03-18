@@ -420,6 +420,7 @@ function PANEL:HideRow(row)
 		self.Rows[row][3] = true
 		self.VisibleRows = self.VisibleRows - 1
 	end
+	self:InvalidateLayout()
 end
 
 function PANEL:ShowRow(row)
@@ -430,6 +431,7 @@ function PANEL:ShowRow(row)
 	self.Rows[row][3] = false
 	self.Rows[row].hides = nil
 	self.Rows[row].hiddenBy = nil
+	self:InvalidateLayout()
 end
 
 function PANEL:GetRowOffset(row)
