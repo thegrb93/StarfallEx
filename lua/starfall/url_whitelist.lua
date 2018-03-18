@@ -119,7 +119,7 @@ simple [[a.pomf.cat/]]
 -- TinyPic
 --- Examples:
 ---  http://i68.tinypic.com/24b3was.gif
-pattern [[i(.+)%.tinypic%.com/(.+)]]
+pattern [[i([%w-_]+)%.tinypic%.com/(.+)]]
 
 
 -- paste.ee
@@ -146,5 +146,13 @@ simple [[puu.sh/]]
 simple [[images.akamai.steamusercontent.com/]]
 simple [[steamcdn-a.akamaihd.net/]]
 blacklist [[steamcommunity.com/linkfilter/]]
+
+-- Discord
+--- Examples:
+---  https://cdn.discordapp.com/attachments/269175189382758400/421572398689550338/unknown.png
+---  https://images-ext-2.discordapp.net/external/UVPTeOLUWSiDXGwwtZ68cofxU1uaA2vMb2ZCjRY8XXU/https/i.imgur.com/j0QGfKN.jpg?width=1202&height=677
+
+pattern [[cdn[%w-_]*.discordapp%.com/(.+)]]
+pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 
 return list
