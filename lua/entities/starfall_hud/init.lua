@@ -61,10 +61,10 @@ end
 
 function ENT:Use(ply)
 	self:SetHudEnabled(ply, -1)
-	
+
 	if not self.link then return end
-	
-	if ply:IsPlayer() then
+
+	if ply:IsPlayer() and ply.sfhudenabled then
 		net.Start("starfall_processor_used")
 			net.WriteEntity(self)
 			net.WriteEntity(ply)
