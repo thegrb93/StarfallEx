@@ -35,7 +35,7 @@ function SF.CheckUrl(url)
 	local TYPE_PATTERN=2
 	local TYPE_BLACKLIST=3
 	local TYPE_BLACKLISTPATTERN=4
-
+	if not url then return end
 	url = string.gsub(url, "[^%w _~%.%-/:]", function(str)
 		return string.format("%%%02X", string.byte(str))
 	end)
