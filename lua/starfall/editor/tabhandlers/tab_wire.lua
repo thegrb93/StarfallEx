@@ -496,7 +496,6 @@ function PANEL:CursorToCaret()
 	char = char + self.Scroll[2]
 	local length = #self:GetRowText(line)
 	if char > length + 1 then char = length + 1 end
-
 	return { line, char }
 end
 
@@ -522,15 +521,16 @@ function PANEL:ToggleFold(y)
 		if adds[v[1]] then
 			sum = sum + 1
 		end
-		if v[1] == "end" then
+		if removes[v[1]] and (sum > 0 or v[1] == "end") then
 			sum = sum - 1
 		end
 		cols.test = sum
 	end
 	if sum > 0 and not row.hides then
-		local line = y
-		local sum = 0 -- Change scope
+		local line = y + 1
+		local sum = sum -- Change scope
 		while line < lines do
+			print(line)
 			self.Rows[line][2]  = self:SyntaxColorLine(line)
 			cols = self.Rows[line][2]
 			for k,v in ipairs(cols) do
@@ -542,16 +542,19 @@ function PANEL:ToggleFold(y)
 					sum = sum - 1
 				end
 				cols.test = sum
-			end
-			if sum <= 0 then
-				row.hides = 0
-				for I = y + 1, line do
-					self:HideRow(I)
-					self.Rows[I].hiddenBy = I-y
-					row.hides = row.hides + 1
+				local fullcollapse = v[1] == "end"
+				if sum <= 0 then
+					row.hides = 0
+					for I = y + 1, fullcollapse and line or line -1 do
+						self:HideRow(I)
+						self.Rows[I].hiddenBy = I-y
+						row.hides = row.hides + 1
+						row.fullcollapse = fullcollapse
+					end
+					return
 				end
-				return
 			end
+
 			line = line + 1
 		end
 	end
@@ -883,6 +886,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 		local newrow = row+1
 		--Let's find end of string/comment
 		while colored.unfinished do
+			if newrow > lines then break end -- End of file
 			if newrow - row < 50 then
 				colored = self:SyntaxColorLine(newrow)
 				self.Rows[newrow][2] = colored
@@ -890,7 +894,6 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 				self.Rows[newrow][2] = false
 			end
 			newrow = newrow + 1
-			if newrow > lines then break end -- End of file
 		end
 		--[[surface_SetDrawColor(Color(255,0,0))
 		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)]]
@@ -936,6 +939,8 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 
 		draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
+		draw_SimpleText(tostring(cells.test or ""), self.CurrentFont, self.LineNumberWidth + 5, startY, colors.word_highlight, TEXT_ALIGN_LEFT)
+
 		if cells.foldable then
 			if rowdata.hides then
 				draw_SimpleText("▶", self.CurrentFontSmall, self.LineNumberWidth - 3, startY + height/2, colors.gutter_foreground, TEXT_ALIGN_CENTER,TEXT_ALIGN_CENTER )
@@ -945,6 +950,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 		end
 
 	end
+
 
 	local nonwhitespace = false
 	for i, cell in ipairs(cells) do
@@ -1002,7 +1008,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 			local text = string.format(TabHandler.LinesHiddenFormatConVar:GetString(),rowdata.hides)
 			local nextlineoff = offset + #text
 			draw_SimpleText(text, self.CurrentFontSmall, offset * width + startX + (nextlineoff-offset)*width/2, startY + height/2 ,colors.word_highlight, TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
-			if self.RealLine[drawpos+1] then
+			if self.RealLine[drawpos+1] and rowdata.fullcollapse then
 				self:PaintLine(self.RealLine[drawpos+1]-1, drawpos, nextlineoff, true)
 			end
 		end
@@ -1205,6 +1211,9 @@ function PANEL:Paint()
 	if self.MouseDown then
 		self.Caret = self:CursorToCaret()
 	end
+	if self.Caret[1] - self:GetRowOffset(self.Caret[1]) > self.VisibleRows then
+		self.Caret[1] = #self.Rows
+	end
 
 	surface_SetDrawColor(colors.gutter_background)
 	surface_DrawRect(0, 0, self.LineNumberWidth + 4, self:GetTall())
@@ -1310,15 +1319,15 @@ function PANEL:MovePosition(caret, offset)
 		local numRows = #self.Rows
 		while true do
 			local length = #(self:GetRowText(row)) - col + 2
-			if self.Rows[row][3] then
+			if row == numRows then
+				col = col + length - 1
+				break
+			elseif self.Rows[row][3] then
 				offset = offset - length
 				row = row + 1
 				col = 1
 			elseif offset < length then
 				col = col + offset
-				break
-			elseif row == numRows then
-				col = col + length - 1
 				break
 			else
 				offset = offset - length
@@ -2751,7 +2760,7 @@ function PANEL:SyntaxColorLine(line)
 		if adds[v[1]] then
 			sum = sum + 1
 		end
-		if v[1] == "end" then
+		if removes[v[1]] and (sum > 0 or v[1] == "end") then
 			sum = sum - 1
 		end
 		cols.test = sum
@@ -2767,7 +2776,7 @@ function PANEL:SyntaxColorLine(line)
 			if v[1] == "}" then
 				sum = sum - 1
 			end
-			cols.test = sum
+			--cols.test = sum
 		end
 		cols.foldable = sum > 0 or nil
 	end
