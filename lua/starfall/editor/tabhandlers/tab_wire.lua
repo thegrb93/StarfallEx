@@ -66,6 +66,8 @@ TabHandler.BlockCommentStyleConVar = CreateClientConVar("sf_editor_wire_block_co
 TabHandler.PigmentsConVar = CreateClientConVar("sf_editor_wire_pigments", 1, true, false)
 TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightencolors", 0, true, false) --off by default
 TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
+TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
+TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
 
 ---------------------
 -- Colors
@@ -159,76 +161,79 @@ function TabHandler:RegisterTabMenu(menu, content)
 end
 
 function TabHandler:RegisterSettings()
-	local label
-	local dlist = vgui.Create("DPanelList")
-	dlist.Paint = function() end
-	dlist:EnableVerticalScrollbar(true)
-	dlist:Dock(FILL)
+
+	local form = vgui.Create("DForm")
+	form:Dock(FILL)
+	form.Header:SetVisible(false)
+	form.Paint = function () end
+	local _old = form.AddItem
+	form.PerformLayout = function() end
+	form.AddItem = function(form, left, right)
+		_old(form,left,right)
+		if left then
+			if left.SetDark then left:SetDark(false) end
+		end
+		if right then
+			if right.SetDark then right:SetDark(false) end
+		end
+		form.Items[#form.Items]:SetSizeY(false)
+		form.Items[#form.Items]:SetSize(120,30)
+		return left,right
+	end
+	local function FakeThemeChange()
+		local editor = SF.Editor.editor
+		for i = 1, editor:GetNumTabs() do
+			local tab = editor:GetTabContent(i)
+			if not tab then continue end
+			if tab.OnThemeChange then tab:OnThemeChange(SF.Editor.Themes.CurrentTheme) end
+		end
+	end
+
 	--- - FONTS
+	if system.IsLinux() then
+		label = vgui.Create("DLabel")
+		label:SetWrap(true)
+		label:SetText("Warning: You are running linux, you should make sure font is installed in your system or you wont be able to see it!")
+		label:SetPos(10, 0)
+		form:AddItem(label)
+	end
 
-	local FontLabel = vgui.Create("DLabel")
-	dlist:AddItem(FontLabel)
-	FontLabel:SetText("Font:                                   Font Size:")
-	FontLabel:SizeToContents()
-	FontLabel:SetPos(10, 0)
-
-	local temp = vgui.Create("Panel")
-	temp:SetTall(25)
-	dlist:AddItem(temp)
-
-	local FontSelect = vgui.Create("DComboBox", temp)
+	local FontSelect = form:ComboBox( "Font")
 	-- dlist:AddItem( FontSelect )
 	FontSelect.OnSelect = function(panel, index, value)
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
 				RunConsoleCommand("sf_editor_wire_fontname", value)
-				RunConsoleCommand("sf_editor_restart")
+				FakeThemeChange()
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
 			RunConsoleCommand("sf_editor_wire_fontname", value)
-			RunConsoleCommand("sf_editor_restart")
+			FakeThemeChange()
 		end
 	end
 	for k, v in pairs(self.Fonts) do
 		FontSelect:AddChoice(k .. (v ~= "" and " (" .. v .. ")" or ""))
 	end
 	FontSelect:AddChoice("Custom...")
-	FontSelect:SetSize(240 - 50 - 4, 20)
 	FontSelect:SetValue(TabHandler.FontConVar:GetString())
 	FontSelect:SetFontInternal(SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), 16))
 
 
-	local FontSizeSelect = vgui.Create("DComboBox", temp)
+
+	local FontSizeSelect =  form:ComboBox( "Font Size")
 	FontSizeSelect.OnSelect = function(panel, index, value)
 		value = value:gsub(" %b()", "")
 		RunConsoleCommand("sf_editor_wire_fontsize", value)
-		RunConsoleCommand("sf_editor_restart")
+		FakeThemeChange()
 	end
 	for i = 11, 26 do
 		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
 	end
-	FontSizeSelect:SetPos(FontSelect:GetWide() + 4, 0)
-	FontSizeSelect:SetSize(50, 20)
 	FontSizeSelect:SetValue(TabHandler.FontSizeConVar:GetString())
 
-	if system.IsLinux() then
-		label = vgui.Create("DLabel")
-		dlist:AddItem(label)
-		label:SetWrap(true)
-		label:SetText("Warning: You are running linux, you should make sure font is installed in your system or you wont be able to see it!")
-		label:SetSize(50, 40)
-		label:SetPos(10, 0)
-	end
 
-	label = vgui.Create("DLabel")
-	dlist:AddItem(label)
-	label:SetText("Pigments:")
-	label:SizeToContents()
-	label:SetPos(10, 0)
-
-	local usePigments = vgui.Create("DComboBox")
-	dlist:AddItem(usePigments)
+	local usePigments = form:ComboBox( "Pigments", nil )
 	usePigments:SetSortItems(false)
 	usePigments:AddChoice("Disabled")
 	usePigments:AddChoice("Stripe under Color()")
@@ -237,14 +242,22 @@ function TabHandler:RegisterSettings()
 	usePigments:SetTooltip("Enable/disable custom coloring of Color(r,g,b)")
 	usePigments.OnSelect = function(_, val)
 		RunConsoleCommand("sf_editor_wire_pigments", val-1)
-		timer.Simple(0, function()
-			 -- Re-color syntax
-		end)
+		FakeThemeChange()
 	end
-	return dlist, "Wire", "icon16/pencil.png", "Options for wire tabs."
-end
 
-local wire_expression2_autocomplete_controlstyle = CreateClientConVar("wire_expression2_autocomplete_controlstyle", "0", true, false)
+	local commentStyle = form:ComboBox( "Comment Style", "sf_editor_wire_block_comment_style" )
+	commentStyle:AddChoice("Block (New Line)", 0)
+	commentStyle:AddChoice("Block", 1)
+	commentStyle:AddChoice("Each Line", 1)
+	local autoIndent = form:CheckBox( "Auto indent", "sf_editor_wire_auto_indent" )
+
+
+	local enlightenColors = form:CheckBox( "Use brighter colors", "sf_editor_wire_enlightencolors" )
+	local displayCaret = form:CheckBox( "Display caret position", "sf_editor_wire_display_caret_pos" )
+
+
+	return form, "Wire", "icon16/pencil.png", "Options for wire tabs."
+end
 
 local PANEL = {}
 function PANEL:OnValidate(s, r, m, goto)
@@ -417,6 +430,12 @@ end
 function PANEL:OnThemeChange()
 	colors = SF.Editor.Themes.CurrentTheme
 	self.CurrentMode:LoadSyntaxColors()
+	for k,v in ipairs(self.Rows) do
+		v[3] = false
+	end
+	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
+	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7)
+
 end
 
 function PANEL:OnRemove()
@@ -1160,7 +1179,6 @@ function PANEL:PaintTextOverlay()
 	end
 end
 local prevScroll = 1
-local display_caret_pos = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 function PANEL:Paint()
 	self.LineNumberWidth = self.FontWidth * math.max(#tostring(self.Scroll[1] + self.Size[1] + 1),3) + 20
 
@@ -1229,7 +1247,7 @@ function PANEL:Paint()
 	-- Paint the overlay of the text (bracket highlighting and carret postition)
 	self:PaintTextOverlay()
 
-	if display_caret_pos:GetBool() then
+	if TabHandler.DisplayCaretPosConVar:GetBool() then
 		local str = "Length: " .. #self:GetCode() .. " Lines: " ..lines .. " Ln: " .. self.Caret[1] .. " Col: " .. self.Caret[2].." Visible Rows:"..self.VisibleRows
 		if self:HasSelection() then
 			str = str .. " Sel: " .. #self:GetSelection()
@@ -1466,7 +1484,7 @@ function PANEL:_OnTextChanged()
 	if text == "" then return end
 	if not ctrlv then
 		if text == "\n" or text == "`" then return end
-		if text == "}" and GetConVarNumber('sf_editor_wire_autoindent') ~= 0 then
+		if text == "}" and TabHandler.AutoIndentConVar then
 			self:SetSelection(text)
 			local row = self:GetRowText(self.Caret[1])
 			if string_match("{" .. row, "^%b{}.*$") then

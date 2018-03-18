@@ -134,11 +134,10 @@ function EDITOR:BlockCommentSelection(removecomment)
 			self:SetSelection("--[[" .. self:GetSelection() .. "]]")
 		end
 	elseif mode == 2 then -- Old
-		local comment_char = "--"
+		local comment_char = "%-%-"
 		if removecomment then
 			-- shift-TAB with a selection --
 			local tmp = string_gsub("\n"..self:GetSelection(), "\n"..comment_char, "\n")
-
 			-- makes sure that the first line is outdented
 			self:SetSelection(tmp:sub(2))
 		else
