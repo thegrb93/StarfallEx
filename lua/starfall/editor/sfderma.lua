@@ -84,7 +84,7 @@ function PANEL:Init ()
 	self.TitleBar:DockMargin(0, 0, 0, 2)
 	self.TitleBar:SetCursor("sizeall")
 	self.TitleBar.Paint = self.PaintTitle
-	self.TitleBar.OnMousePressed = function(...) self:OnMousePressed(...) end
+	self.TitleBar.OnMousePressed = function(_,...) self:OnMousePressed(...) end
 
 	self.CloseButton = vgui.Create("StarfallButton", self.TitleBar)
 	self.CloseButton:SetText("Close")
@@ -147,42 +147,51 @@ vgui.Register("StarfallFrame", PANEL, "DFrame")
 -- Starfall Button
 PANEL = {}
 
+local icon_cache = {
+
+}
+
 function PANEL:Init ()
-self:SetText("")
-self:SetSize(22, 22)
+	self:SetText("")
+	self:SetSize(22, 22)
 end
 function PANEL:SetIcon (icon)
-self.icon = SF.Editor.icons[icon]
+	if icon_cache[icon] then
+		icon = icon_cache[icon]
+	else
+		icon = Material(icon, "noclamp smooth")
+	end
+	self.icon = icon
 end
 function PANEL:PerformLayout ()
-if self:GetText() ~= "" then
-self:SizeToContentsX()
-self:SetWide(self:GetWide() + 14)
-end
+	if self:GetText() ~= "" then
+		self:SizeToContentsX()
+		self:SetWide(self:GetWide() + 14)
+	end
 end
 PANEL.Paint = function (button, w, h)
-if button.Hovered or button.active then
-draw.RoundedBox(0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med)
-else
-draw.RoundedBox(0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark)
-end
-if button.icon then
-surface.SetDrawColor(SF.Editor.colors.medlight)
-surface.SetMaterial(button.icon)
-surface.DrawTexturedRect(2, 2, w - 4, h - 4)
-end
+	if button.Hovered or button.active then
+		draw.RoundedBox(0, 0, 0, w, h, button.backgroundHoverCol or SF.Editor.colors.med)
+	else
+		draw.RoundedBox(0, 0, 0, w, h, button.backgroundCol or SF.Editor.colors.meddark)
+	end
+	if button.icon then
+		surface.SetDrawColor(Color(255,255,255,255))
+		surface.SetMaterial(button.icon)
+		surface.DrawTexturedRect(6, h/2 - 8, 16, 16)
+	end
 end
 function PANEL:UpdateColours (skin)
-return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
+	return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
 end
 function PANEL:SetHoverColor (col)
-self.backgroundHoverCol = col
+	self.backgroundHoverCol = col
 end
 function PANEL:SetColor (col)
-self.backgroundCol = col
+	self.backgroundCol = col
 end
 function PANEL:SetLabelColor (col)
-self.labelCol = col
+	self.labelCol = col
 end
 function PANEL:DoClick ()
 
@@ -196,207 +205,16 @@ vgui.Register("StarfallButton", PANEL, "DButton")
 
 -- Starfall Panel
 PANEL = {}
-PANEL.Paint = function (panel, w, h)
-draw.RoundedBox(0, 0, 0, w, h, SF.Editor.colors.light)
+
+function PANEL:SetBackgroundColor(col)
+	self.backgroundCol = col
+end
+
+function PANEL:Paint(w, h)
+	draw.RoundedBox(0, 0, 0, w, h, self.backgroundCol or SF.Editor.colors.light)
 end
 vgui.Register("StarfallPanel", PANEL, "DPanel")
 -- End Starfall Panel
-
---------------------------------------------------------------
---------------------------------------------------------------
-
--- Tab Holder
-PANEL = {}
-
-function PANEL:Init ()
-self:SetTall(22)
-self.offsetTabs = 0
-self.tabs = {}
-
-local parent = self
-
-self.offsetRight = vgui.Create("StarfallButton", self)
-self.offsetRight:SetVisible(false)
-self.offsetRight:SetSize(22, 22)
-self.offsetRight:SetIcon("arrowr")
-function self.offsetRight:PerformLayout ()
-local wide = 0
-if parent.offsetLeft:IsVisible() then
-	wide = parent.offsetLeft:GetWide() + 2
-end
-for i = parent.offsetTabs + 1, #parent.tabs do
-	if wide + parent.tabs[i]:GetWide() > parent:GetWide() - self:GetWide() - 2 then
-		break
-	else
-		wide = wide + parent.tabs[i]:GetWide() + 2
-	end
-end
-self:SetPos(wide, 0)
-end
-function self.offsetRight:DoClick ()
-parent.offsetTabs = parent.offsetTabs + 1
-if parent.offsetTabs > #parent.tabs - 1 then
-	parent.offsetTabs = #parent.tabs - 1
-end
-parent:InvalidateLayout()
-end
-
-self.offsetLeft = vgui.Create("StarfallButton", self)
-self.offsetLeft:SetVisible(false)
-self.offsetLeft:SetSize(22, 22)
-self.offsetLeft:SetIcon("arrowl")
-function self.offsetLeft:DoClick ()
-parent.offsetTabs = parent.offsetTabs - 1
-if parent.offsetTabs < 0 then
-	parent.offsetTabs = 0
-end
-parent:InvalidateLayout()
-end
-
-self.menuoptions = {}
-
-self.menuoptions[#self.menuoptions + 1] = { "Close", function ()
-	if not self.targetTab then return end
-	self:removeTab(self.targetTab)
-	self.targetTab = nil
-	end }
-self.menuoptions[#self.menuoptions + 1] = { "Close Other Tabs", function ()
-		if not self.targetTab then return end
-		local n = 1
-		while #self.tabs ~= 1 do
-			v = self.tabs[n]
-			if v ~= self.targetTab then
-				self:removeTab(v)
-			else
-				n = 2
-			end
-		end
-		self.targetTab = nil
-		end }
-end
-PANEL.Paint = function () end
-function PANEL:PerformLayout ()
-	local parent = self:GetParent()
-	self:SetWide(parent:GetWide() - 10)
-	self.offsetRight:PerformLayout()
-	self.offsetLeft:PerformLayout()
-
-	local offset = 0
-	if self.offsetLeft:IsVisible() then
-		offset = self.offsetLeft:GetWide() + 2
-	end
-	for i = 1, self.offsetTabs do
-		offset = offset - self.tabs[i]:GetWide() - 2
-	end
-	local bool = false
-	for k, v in pairs(self.tabs) do
-		v:SetPos(offset, 0)
-		if offset < 0 then
-			v:SetVisible(false)
-		elseif offset + v:GetWide() > self:GetWide() - self.offsetRight:GetWide() - 2 then
-			v:SetVisible(false)
-			bool = true
-		else
-			v:SetVisible(true)
-		end
-		offset = offset + v:GetWide() + 2
-	end
-
-	if bool then
-		self.offsetRight:SetVisible(true)
-	else
-		self.offsetRight:SetVisible(false)
-	end
-	if self.offsetTabs > 0 then
-		self.offsetLeft:SetVisible(true)
-	else
-		self.offsetLeft:SetVisible(false)
-	end
-end
-function PANEL:addTab (text)
-	local panel = self
-	local tab = vgui.Create("StarfallButton", self)
-	tab:SetText(text)
-	tab.isTab = true
-
-	function tab:DoClick ()
-		panel:selectTab(self)
-	end
-
-	function tab:DoRightClick ()
-		panel.targetTab = self
-		local menu = vgui.Create("DMenu", panel:GetParent())
-		for k, v in pairs(panel.menuoptions) do
-			local option, func = v[1], v[2]
-			if func == "SPACER" then
-				menu:AddSpacer()
-			else
-				menu:AddOption(option, func)
-			end
-		end
-		menu:Open()
-	end
-
-	function tab:DoMiddleClick ()
-		panel:removeTab(self)
-	end
-
-	self.tabs[#self.tabs + 1] = tab
-
-	return tab
-end
-function PANEL:removeTab (tab)
-	local tabIndex
-	if type(tab) == "number" then
-		tabIndex = tab
-		tab = self.tabs[tab]
-	else
-		tabIndex = self:getTabIndex(tab)
-	end
-
-	table.remove(self.tabs, tabIndex)
-	tab:Remove()
-
-	self:OnRemoveTab(tabIndex)
-end
-function PANEL:getActiveTab ()
-	for k, v in pairs(self.tabs) do
-		if v.active then return v end
-	end
-end
-function PANEL:getTabIndex (tab)
-	return table.KeyFromValue(self.tabs, tab)
-end
-function PANEL:selectTab (tab)
-	if type(tab) == "number" then
-		tab = self.tabs[tab]
-	end
-	if tab == nil then return end
-
-	if self:getActiveTab() == tab then return end
-
-	for k, v in pairs(self.tabs) do
-		v.active = false
-	end
-	tab.active = true
-
-	if self:getTabIndex(tab) <= self.offsetTabs then
-		self.offsetTabs = self:getTabIndex(tab) - 1
-	elseif not tab:IsVisible() then
-		while not tab:IsVisible() do
-			self.offsetTabs = self.offsetTabs + 1
-			self:PerformLayout()
-		end
-	end
-end
-function PANEL:OnRemoveTab (tabIndex)
-
-end
-vgui.Register("StarfallTabHolder", PANEL, "DPanel")
--- End Tab Holder
-
---------------------------------------------------------------
---------------------------------------------------------------
 
 -- File Tree
 local invalid_filename_chars = {
@@ -414,7 +232,7 @@ PANEL = {}
 function PANEL:Init ()
 
 end
-function PANEL:setup (folder)
+function PANEL:Setup (folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddFolder(folder, folder, "DATA", true)
 	--[[Waiting for examples, 10 tries each 1 second]]
@@ -438,7 +256,7 @@ function PANEL:setup (folder)
 	end
 	self.Root:SetExpanded(true)
 end
-function PANEL:reloadTree ()
+function PANEL:ReloadTree ()
 	self.Root:Remove()
 	if self.Examples then
 		self.Examples:Remove()
@@ -446,7 +264,7 @@ function PANEL:reloadTree ()
 	if self.DataFiles then
 		self.DataFiles:Remove()
 	end
-	self:setup(self.folder)
+	self:Setup(self.folder)
 end
 function PANEL:DoRightClick (node)
 	self:openMenu(node)
@@ -648,7 +466,7 @@ function PANEL:Init ()
 		searchBox:SetValue("Search...")
 	end
 end
-function PANEL:getComponents ()
+function PANEL:GetComponents ()
 	return self.searchBox, self.tree
 end
 
@@ -659,7 +477,7 @@ derma.DefineControl("StarfallFileBrowser", "", PANEL, "DPanel")
 
 PANEL = {}
 
-local function createpermissionsPanel ( parent )
+local function CreatePermissionsPanel ( parent )
 	local chip = parent.chip
 	local panel = vgui.Create( 'DPanel', parent )
 	panel:Dock( FILL )
@@ -805,7 +623,7 @@ function PANEL:OpenForChip( chip, showOverrides )
 	self.satisfied = SF.Permissions.permissionRequestSatisfied( chip.instance )
 	self.area = ( showOverrides or self.satisfied ) and 2 or 1
 
-	local permissions = createpermissionsPanel( self )
+	local permissions = CreatePermissionsPanel( self )
 	permissions:SetParent( self )
 	permissions:Dock( FILL )
 	self.permissionsPanel = permissions

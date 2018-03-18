@@ -15,7 +15,7 @@ SHA=`git rev-parse --verify HEAD`
 # Pull requests and commits to other branches shouldn't try to deploy, just build to verify
 if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
     echo "This is a pull request, won't deply to gh-pages"
-	if git log -1 | grep -q "[preview]"; then
+	if echo $TRAVIS_COMMIT_MESSAGE | grep -q "\[preview\]"; then
 		echo "Preview requested."
 		tar -cf doc-preview.tar doc/
 		echo "Uploading to transfer.sh"
@@ -47,7 +47,7 @@ cp -rf doc/* out/
 cd out
 
 # If there are no changes to docs then just skip
-if git diff --quiet; then
+if git diff --quiet --ignore-space-at-eol -b -w --ignore-blank-lines; then
     echo "No changes to the output on this push; Skipping."
 else
 	echo "Commiting"
@@ -85,7 +85,7 @@ fi
 
 #Add only docs.lua
 git add "lua/starfall/editor/docs.lua"
-if git diff --quiet --staged; then #checking if there is a diff for staged changes (so only doc)
+if git diff --quiet --staged --ignore-space-at-eol -b -w --ignore-blank-lines; then #checking if there is a diff for staged changes (so only doc)
     echo "No changes to docs.lua, skipping."
 else
 	echo "Commiting.."

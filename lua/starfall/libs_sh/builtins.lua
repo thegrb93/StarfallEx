@@ -246,7 +246,7 @@ if CLIENT then
 	--@return Boolean of whether the client gave all permissions specified in last request or not.
 	--@client
 	function SF.DefaultEnvironment.permissionRequestSatisfied()
-		return SF.Permissions.permissionsRequestSatisfied( SF.instance )
+		return SF.Permissions.permissionRequestSatisfied( SF.instance )
 	end
 
 end
@@ -417,7 +417,7 @@ SF.DefaultEnvironment.math = nil
 local os_methods = SF.Libraries.Register("os")
 os_methods.clock = os.clock
 os_methods.date = function(format, time)
-	if string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
+	if format~=nil and string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
 	return os.date(format, time)
 end
 os_methods.difftime = os.difftime
@@ -590,6 +590,7 @@ if SERVER then
 	-- @param cmd Command to execute
 	function SF.DefaultEnvironment.concmd (cmd)
 		checkluatype (cmd, TYPE_STRING)
+		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
 		checkpermission(SF.instance, nil, "console.command")
 		SF.instance.player:ConCommand(cmd)
 	end

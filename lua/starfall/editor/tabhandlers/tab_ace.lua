@@ -14,6 +14,8 @@ local PANEL = {} -- It's our VGUI
 -- Handler part
 ----------------
 TabHandler.SessionTabs = {}
+TabHandler.DisableThemeSupport = CreateClientConVar("sf_editor_ace_disablethemesupport", "0", true, false)
+
 local currentSession
 
 local runJS = function (...)
@@ -276,13 +278,10 @@ local function fixKeys(key, notfirst)
 
 end
 
-function TabHandler:registerSettings()
+function TabHandler:RegisterSettings()
 
 	--Adding settings
-	local sheet = SF.Editor.editor:AddControlPanelTab("Ace", "icon16/cog.png", "ACE options.")
-	local panel = sheet.Panel
-
-	local scrollPanel = vgui.Create("DScrollPanel", panel)
+	local scrollPanel = vgui.Create("DScrollPanel")
 	scrollPanel:Dock(FILL)
 	scrollPanel:SetPaintBackgroundEnabled(false)
 
@@ -331,11 +330,13 @@ function TabHandler:registerSettings()
 	setDoClick(form:CheckBox("Fix keys not working on Linux", "sf_editor_ace_fixkeys")):SetTooltip("Some keys don't work with the editor on Linux\nEg. Enter, Tab, Backspace, Arrow keys etc...")
 	setDoClick(form:CheckBox("Fix console bug", "sf_editor_ace_fixconsolebug")):SetTooltip("Fix console opening when pressing ' or @ (UK Keyboad layout)")
 	setDoClick(form:CheckBox("Disable line folding keybinds", "sf_editor_ace_disablelinefolding"))
+	setDoClick(form:CheckBox("Disable theme support", "sf_editor_ace_disablethemesupport"))
 	--
+	return scrollPanel, "Ace", "icon16/cog.png", "ACE options."
 
 end
 
-function TabHandler:init() -- It's caled when editor is initalized, you can create library map there etc
+function TabHandler:Init() -- It's caled when editor is initalized, you can create library map there etc
 
 	local html = vgui.Create("DHTML")
 	html:Dock(FILL)
@@ -407,7 +408,7 @@ function TabHandler:init() -- It's caled when editor is initalized, you can crea
 	TabHandler.html:SetVisible(false)
 end
 
-function TabHandler:cleanup() -- It's caled when editor is marked for disposal
+function TabHandler:Cleanup() -- It's caled when editor is marked for disposal
 	print("Cleanup called!")
 	TabHandler.html:Remove()
 	TabHandler.html = nil -- Getting rid of old dhtml
@@ -423,22 +424,94 @@ end
 function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate for each tab
 	createSession(self)
 	self:SetBackgroundColor(Color(39, 40, 34))
+	self:OnThemeChange(SF.Editor.Themes.CurrentTheme)
 end
 
-function PANEL:getCode() -- Return name of hanlder or code if it's editor
+function PANEL:GetCode() -- Return name of hanlder or code if it's editor
 	return self.code or ""
 end
 
-function PANEL:pasteCode(code)
+function PANEL:PasteCode(code)
 	if not TabHandler.Loaded then return end
 	runJS("editor.insert(\"" .. code:JavascriptSafe() .. "\")")
 end
 
-function PANEL:setCode(code)
+function PANEL:SetCode(code)
 	self.code = code
 	if TabHandler.Loaded then
 		setSessionValue(self, code)
 	end
+end
+local function ColorToHex( color )
+	return bit.tohex( color.r, 2 ) .. bit.tohex( color.g, 2 ) .. bit.tohex( color.b, 2 )
+end
+local function GetAceCSS(theme)
+	theme = theme or SF.Editor.Themes.CurrentTheme
+	local name = theme.Name:gsub("%W","")
+	local css =  [[
+		.ace-custom .ace_gutter {background: %gutter_background%;color: %gutter_foreground%}
+		.ace-custom .ace_print-margin {width: 1px;background: %gutter_divider%}
+		.ace-custom {background-color: %background%;color: %notfound%}
+		.ace-custom .ace_cursor {color: %caret%}
+		.ace-custom .ace_marker-layer .ace_selection {background: %selection%}
+		.ace-custom.ace_multiselect .ace_selection.ace_start {box-shadow: 0 0 3px 0px %selection%;}
+		.ace-custom .ace_marker-layer .ace_step {background: rgb(102, 82, 0)}
+		.ace-custom .ace_marker-layer .ace_bracket {margin: -1px 0 0 -1px;border: 1px solid %notfound%}
+		.ace-custom .ace_marker-layer .ace_active-line {background: %line_highlight%}
+		.ace-custom .ace_gutter-active-line {background-color: %gutter_background%}
+		.ace-custom .ace_marker-layer .ace_selected-word {border: 1px solid %word_highlight%}
+		.ace-custom .ace_invisible {color: #52524d}
+		.ace-custom .ace_entity.ace_name.ace_tag,.ace-custom .ace_keyword,.ace-custom .ace_meta.ace_tag,.ace-custom .ace_storage {color: %keyword%}
+		.ace-custom .ace_punctuation,.ace-custom .ace_punctuation.ace_tag {color: %notfound%}
+		.ace-custom .ace_constant.ace_character,.ace-custom .ace_constant.ace_language,.ace-custom .ace_constant.ace_numeric,.ace-custom .ace_constant.ace_other {color: %constant%}
+		.ace-custom .ace_invalid {color: #F8F8F0;background-color: %notfound%}
+		.ace-custom .ace_invalid.ace_deprecated {color: #F8F8F0;background-color: %notfound%}
+		.ace-custom .ace_support.ace_constant,.ace-custom .ace_support.ace_function {color: %function%}
+		.ace-custom .ace_fold {background-color: #A6E22E;border-color: #F8F8F2}
+		.ace-custom .ace_storage.ace_type,.ace-custom .ace_support.ace_class,.ace-custom .ace_support.ace_type {font-style: italic;color: %library%}
+		.ace-custom .ace_entity.ace_name.ace_function,.ace-custom .ace_entity.ace_other,.ace-custom .ace_entity.ace_other.ace_attribute-name,.ace-custom .ace_variable {color: %method%}
+		.ace-custom .ace_variable.ace_parameter {font-style: italic;color: %method%}
+		.ace-custom .ace_string {color: %string%}
+		.ace-custom .ace_comment {color: %comment%}
+		.ace-custom .ace_indent-guide {background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAACCAYAAACZgbYnAAAAEklEQVQImWPQ0FD0ZXBzd/wPAAjVAoxeSgNeAAAAAElFTkSuQmCC) right repeat-y}
+	]]
+	css = string.Replace(css,"ace-custom","ace-"..(name))
+	css = string.Replace(css,"\n","")
+	for k,v in pairs(theme) do
+		if type(v) == "table" and v["r"] == nil then 
+			v = v[1]
+		end
+		if type(v) != "table" then continue end
+		css = string.Replace(css,"%"..k.."%","#"..ColorToHex(v))
+	end
+	return css
+end
+
+function PANEL:OnThemeChange(theme)
+	if TabHandler.DisableThemeSupport:GetBool() then return end
+	local name = theme.Name:gsub("%W","")
+	local css = GetAceCSS(theme)
+	TabHandler.html:AddFunction( "console", "luaprint", function( str )
+		MsgC( color_green, str )
+	end )
+	local js = [[
+		try{
+			ace.define("ace/theme/]]..name..[[",["require","exports","module","ace/lib/dom"],
+				function(e,t,n){
+					t.isDark=!0;
+					t.cssClass="ace-]]..name..[[";
+					t.cssText="]]..css..[[";
+					var r=e("../lib/dom");
+					r.importCssString(t.cssText,t.cssClass)});
+		}
+		catch(e) {console.luaprint(e.toString()); }
+	]]
+	TabHandler.html:RunJavascript(js)
+	TabHandler.html:RunJavascript([[
+		try{
+			editor.setTheme("ace/theme/]]..name..[[");
+		}catch(e) {console.luaprint(e.toString()); }
+	]])
 end
 
 function PANEL:OnFocusChanged(gained) -- When this tab is opened

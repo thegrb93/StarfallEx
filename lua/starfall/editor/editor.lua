@@ -16,22 +16,28 @@ AddCSLuaFile("sfhelper.lua")
 AddCSLuaFile("themes.lua")
 AddCSLuaFile("xml.lua")
 
-AddCSLuaFile("tabhandlers/tab_wire.lua")
-AddCSLuaFile("tabhandlers/tab_ace.lua")
 
-------------------
+-----------------
 -- Tab Handlers
 ------------------
 
 if CLIENT then
-
 	SF.Editor.TabHandlers = { }
-	SF.Editor.TabHandlers.wire = include("tabhandlers/tab_wire.lua")
-	SF.Editor.TabHandlers.ace = include("tabhandlers/tab_ace.lua")
-
 	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tabeditor", "ace", true, false)
-
 end
+
+MsgN("- Loading Editor TabHandlers")
+l = file.Find("starfall/editor/tabhandlers/tab_*.lua", "LUA")
+for _, name in pairs(l) do
+	name = name:sub(5,-5)
+	print("-  Loading "..name)
+	AddCSLuaFile("starfall/editor/tabhandlers/tab_"..name..".lua")
+	if CLIENT then
+		SF.Editor.TabHandlers[name] = include("starfall/editor/tabhandlers/tab_"..name..".lua")
+	end
+end
+
+SF.Editor.HelperURL = CreateConVar("sf_editor_helperurl", "http://thegrb93.github.io/StarfallEx/", {FCVAR_ARCHIVE, FCVAR_REPLICATED}, "URL for website used by SF Helper, change to allow custom documentation.")
 
 ------------------
 -- Editor
@@ -191,15 +197,10 @@ if CLIENT then
 		SF.Editor.editor = editor
 
 		for k, v in pairs(SF.Editor.TabHandlers) do
-			if v.init then v:init() end
+			if v.Init then v:Init() end
 		end
 
 		editor:Setup("Starfall Editor", "starfall", "Starfall")
-
-		for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
-			if v.registerSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then v:registerSettings() end
-		end
-
 	end
 	function SF.Editor.openPermissionsPopup()
 		local frame = vgui.Create("StarfallFrame")
@@ -254,24 +255,31 @@ if CLIENT then
 					for id, setting in SortedPairs(p.settings) do
 
 						local header = vgui.Create("StarfallPanel")
-						header.Paint = function() end
 						header:DockMargin(0, 5, 0, 0)
 						header:SetSize(0, 20)
 						header:Dock(TOP)
 						header:SetToolTip(id)
+						header:SetBackgroundColor(Color(0,0,0,20))
 
 						local settingtext = vgui.Create("DLabel", header)
 						settingtext:SetFont("DermaDefault")
 						settingtext:SetColor(Color(255, 255, 255))
 						settingtext:SetText(id)
 						settingtext:DockMargin(5, 0, 0, 0)
-						settingtext:Dock(FILL)
+						settingtext:Dock(LEFT)
+						settingtext:SizeToContents()
+
+						local description = vgui.Create("DLabel", header)
+						description:SetFont("DermaDefault")
+						description:SetColor(Color(128, 128, 128))
+						description:SetText(" - "..setting[2])
+						description:DockMargin(5, 0, 0, 0)
+						description:Dock(FILL)
 
 						local buttons = {}
 						for i = #p.options, 1, -1 do
 							local button = vgui.Create("StarfallButton", header)
 							button:SetText(p.options[i])
-							button:SetTooltip(setting[2])
 							button:DockMargin(0, 0, 3, 0)
 							button:Dock(RIGHT)
 							if server then
@@ -465,7 +473,7 @@ if CLIENT then
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
 		for k, v in pairs(SF.Editor.TabHandlers) do
-			if v.cleanup then v:cleanup() end
+			if v.Cleanup then v:Cleanup() end
 		end
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()

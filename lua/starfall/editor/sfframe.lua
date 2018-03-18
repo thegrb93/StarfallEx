@@ -4,10 +4,34 @@ https://github.com/wiremod/wire
 File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_editor/sf_editor.lua
 ]]
 
+--Part of WireLib
+local function Derma_StringRequestNoBlur(...)
+	local f = math.max
+
+	function math.max(...)
+		local ret = f(...)
+
+		for i = 1,20 do
+			local name, value = debug.getlocal(2, i)
+			if name == "Window" then
+				value:SetBackgroundBlur( false )
+				break
+			end
+		end
+
+		return ret
+	end
+	local ok, ret = xpcall(Derma_StringRequest, debug.traceback, ...)
+	math.max = f
+
+	if not ok then error(ret, 0) end
+	return ret
+end
+
 local Editor = {}
 
-local function getTabHandler()
-	return SF.Editor.TabHandlers[SF.Editor.CurrentTabHandler:GetString()]
+local function GetTabHandler(name)
+	return SF.Editor.TabHandlers[name or SF.Editor.CurrentTabHandler:GetString()]
 end
 -- ----------------------------------------------------------------------
 -- Fonts
@@ -19,6 +43,8 @@ Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", tr
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
+Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
+Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
 cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
@@ -195,10 +221,10 @@ function Editor:OnMousePressed(mousecode)
 		self.p_w, self.p_h = self:GetSize()
 		self.p_mx = gui.MouseX()
 		self.p_my = gui.MouseY()
-		self.p_mode = self:getMode()
+		self.p_mode = self:GetMode()
 		if self.p_mode == "drag" then
 			if self.GuiClick > CurTime() - 0.2 then
-				self:fullscreen()
+				self:Fullscreen()
 				self.pressed = false
 				self.GuiClick = 0
 			else
@@ -252,7 +278,7 @@ function Editor:Think()
 	end
 	if not self.pressed then
 		local cursor = "arrow"
-		local mode = self:getMode()
+		local mode = self:GetMode()
 		if (mode == "sizeBR") then cursor = "sizenwse"
 		elseif (mode == "sizeR") then cursor = "sizewe"
 		elseif (mode == "sizeB") then cursor = "sizens"
@@ -283,7 +309,7 @@ end
 
 -- special functions
 
-function Editor:fullscreen()
+function Editor:Fullscreen()
 	if self.fs then
 		self:SetPos(self.preX, self.preY)
 		self:SetSize(self.preW, self.preH)
@@ -297,7 +323,7 @@ function Editor:fullscreen()
 	end
 end
 
-function Editor:getMode()
+function Editor:GetMode()
 	local x, y = self:GetPos()
 	local w, h = self:GetSize()
 	local ix = gui.MouseX() - x
@@ -317,7 +343,7 @@ function Editor:getMode()
 	end
 end
 
-function Editor:addComponent(panel, x, y, w, h)
+function Editor:AddComponent(panel, x, y, w, h)
 	assert(not panel.Bounds)
 	panel.Bounds = { x = x, y = y, w = w, h = h }
 	self.Components[#self.Components + 1] = panel
@@ -358,16 +384,19 @@ function Editor:GetActiveTab() return self.C.TabHolder:GetActiveTab() end
 
 function Editor:GetNumTabs() return #self.C.TabHolder.Items end
 
-function Editor:UpdateTabText(tab)
+function Editor:UpdateTabText(tab, title)
 	-- Editor subtitle and tab text
-	local ed = tab.editor
-	local title, tabtext = getPreferredTitles(ed.chosenfile, ed:getCode())
+	local ed = tab.content
+	local _, text = getPreferredTitles(ed.chosenfile, ed.GetCode and ed:GetCode() or "")
 
+	title = title or ed.DefaultTitle
+	tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
-	if not ed:isSaved() then
+	if not ed:IsSaved() then
 		tabtext = tabtext.." *"
 	end
+
 	if tab:GetText() ~= tabtext then
 		tab:SetText(tabtext)
 		self.C.TabHolder.tabScroller:InvalidateLayout()
@@ -382,7 +411,7 @@ function Editor:SetActiveTab(val)
 	self:SetLastTab(self:GetActiveTab())
 	if isnumber(val) then
 		self.C.TabHolder:SetActiveTab(self.C.TabHolder.Items[val].Tab)
-		self:GetCurrentEditor():RequestFocus()
+		self:GetCurrentTabContent():RequestFocus()
 	elseif val and val:IsValid() then
 		self.C.TabHolder:SetActiveTab(val)
 		val:GetPanel():RequestFocus()
@@ -407,6 +436,7 @@ function Editor:GetActiveTabIndex()
 end
 
 function Editor:SetActiveTabIndex(index)
+	if not self.C.TabHolder.Items[index] then return end
 	local tab = self.C.TabHolder.Items[index].Tab
 
 	if not tab then return end
@@ -431,15 +461,16 @@ function Editor:FixTabFadeTime()
 	timer.Simple(old, function() self.C.TabHolder:SetFadeTime(old) old = nil end)
 end
 
-function Editor:CreateTab(chosenfile)
-	local th = getTabHandler()
-	local editor = vgui.Create(th.ControlName)
-	editor.parentpanel = self -- That's going to be Deprecated
-	editor.getTabHandler = function() return th end -- add :getTabHandler()
-	editor.isSaved = function(self) return self:getCode() == self.savedCode or self:getCode() == defaultCode or self:getCode() == "" end
-	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), editor)
-	editor.chosenfile = chosenfile
-	sheet.Tab.editor = editor -- For easy access
+function Editor:CreateTab(chosenfile, forcedTabHandler)
+	local th = GetTabHandler(forcedTabHandler)
+	local content = vgui.Create(th.ControlName)
+	content.parentpanel = self -- That's going to be Deprecated
+	content.GetTabHandler = function() return th end -- add :GetTabHandler()
+	content.IsSaved = function(self) return (not th.IsEditor) or self:GetCode() == self.savedCode or self:GetCode() == defaultCode or self:GetCode() == "" end
+	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), content)
+	content.chosenfile = chosenfile
+	sheet.Tab.content = content -- For easy access
+
 	sheet.Tab.Paint = function(button, w, h)
 
 		if button.Hovered then
@@ -447,6 +478,17 @@ function Editor:CreateTab(chosenfile)
 		else
 			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
 		end
+
+	end
+	--sheet.Tab.UpdateColours = function() end
+	sheet.Tab.GetTabHeight = function() return 20 end
+
+	content.DefaultTitle = th.DefaultTitle
+	content.UpdateTitle = function(_, text)
+		return self:UpdateTabText(sheet.Tab, text)
+	end
+	content.CloseTab = function(_, text)
+		return self:CloseTab(sheet.Tab, true)
 	end
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
 
@@ -469,87 +511,75 @@ function Editor:CreateTab(chosenfile)
 						end
 					end
 				end)
-			menu:AddSpacer()
-			menu:AddOption("Save", function()
-					self:FixTabFadeTime()
-					local old = self:GetLastTab()
-					self:SetActiveTab(pnl)
-					self:SaveFile(self:GetChosenFile(), true)
-					self:SetActiveTab(self:GetLastTab())
-					self:SetLastTab(old)
-				end)
-			menu:AddOption("Save As", function()
-					self:FixTabFadeTime()
-					local old = self:GetLastTab()
-					self:SetActiveTab(pnl)
-					self:SaveFile(self:GetChosenFile(), false, true)
-					self:SetActiveTab(self:GetLastTab())
-					self:SetLastTab(old)
-				end)
-			menu:AddOption("Reload", function()
-					self:FixTabFadeTime()
-					local old = self:GetLastTab()
-					self:SetActiveTab(pnl)
-					self:LoadFile(editor.chosenfile, false)
-					self:SetActiveTab(self:GetLastTab())
-					self:SetLastTab(old)
-				end)
-			menu:AddSpacer()
-			menu:AddOption("Copy file path to clipboard", function()
-					if editor.chosenfile and editor.chosenfile ~= "" then
-						SetClipboardText(editor.chosenfile)
-					end
-				end)
-			menu:AddOption("Copy all file paths to clipboard", function()
-					local str = ""
-					for i = 1, self:GetNumTabs() do
-						local chosenfile = self:GetEditor(i).chosenfile
-						if chosenfile and chosenfile ~= "" then
-							str = str .. chosenfile .. ";"
+			if th.IsEditor then
+				menu:AddSpacer()
+				menu:AddOption("Save", function()
+						self:FixTabFadeTime()
+						local old = self:GetLastTab()
+						self:SetActiveTab(pnl)
+						self:SaveFile(self:GetChosenFile(), true)
+						self:SetActiveTab(self:GetLastTab())
+						self:SetLastTab(old)
+					end)
+				menu:AddOption("Save As", function()
+						self:FixTabFadeTime()
+						local old = self:GetLastTab()
+						self:SetActiveTab(pnl)
+						self:SaveFile(self:GetChosenFile(), false, true)
+						self:SetActiveTab(self:GetLastTab())
+						self:SetLastTab(old)
+					end)
+				menu:AddOption("Reload", function()
+						self:FixTabFadeTime()
+						local old = self:GetLastTab()
+						self:SetActiveTab(pnl)
+						self:LoadFile(content.chosenfile, false)
+						self:SetActiveTab(self:GetLastTab())
+						self:SetLastTab(old)
+					end)
+				menu:AddSpacer()
+				menu:AddOption("Copy file path to clipboard", function()
+						if content.chosenfile and content.chosenfile ~= "" then
+							SetClipboardText(content.chosenfile)
 						end
-					end
-					str = str:sub(1, -2)
-					SetClipboardText(str)
-				end)
+					end)
+				menu:AddOption("Copy all file paths to clipboard", function()
+						local str = ""
+						for i = 1, self:GetNumTabs() do
+							local chosenfile = self:GetTabContent(i).chosenfile
+							if chosenfile and chosenfile ~= "" then
+								str = str .. chosenfile .. ";"
+							end
+						end
+						str = str:sub(1, -2)
+						SetClipboardText(str)
+					end)
+			end
 			menu:Open()
 			menu:AddSpacer()
-			if th.registerTabMenu then
-				th:registerTabMenu(menu, editor)
+			if th.RegisterTabMenu then
+				th:RegisterTabMenu(menu, content)
 			end
 			return
 		end
 
 		self:SetActiveTab(pnl)
 	end
-
-	editor.OnTextChanged = function(panel)
-		self:UpdateTabText(self:GetActiveTab())
-		timer.Create("sfautosave", 5, 1, function()
-				self:SaveTabs()
-			end)
-	end
-	editor.OnShortcut = function(_, code)
-		if code == KEY_S then
-			self:SaveFile(self:GetChosenFile())
-			self:Validate()
-		else
-			local mode = GetConVar("wire_expression2_autocomplete_controlstyle"):GetInt()
-			local enabled = GetConVar("wire_expression2_autocomplete"):GetBool()
-			if mode == 1 and enabled then
-				if code == KEY_B then
-					self:Validate(true)
-				elseif code == KEY_SPACE then
-					local ed = self:GetCurrentEditor()
-					if (ed.AC_Panel and ed.AC_Panel:IsVisible()) then
-						ed:AC_Use(ed.AC_Suggestions[1])
-					end
-				end
-			elseif code == KEY_SPACE then
-				self:Validate(true)
+	if content.GetTabHandler().IsEditor then
+		content.OnTextChanged = function(panel)
+			self:UpdateTabText(self:GetActiveTab())
+			timer.Create("sfautosave", 5, 1, function()
+					self:SaveTabs()
+				end)
+		end
+		content.OnShortcut = function(_, code)
+			if code == KEY_S then
+				self:SaveFile(self:GetChosenFile())
+				self:Validate()
 			end
 		end
 	end
-	editor:RequestFocus()
+	content:RequestFocus()
 
 	self:OnTabCreated(sheet) -- Call a function that you can override to do custom stuff to each tab.
 
@@ -607,7 +637,7 @@ function Editor:CloseTab(_tab,dontask)
 		end
 	end
 	local ed = activetab:GetPanel()
-	if not ed:isSaved() and not dontask and not ed.IsOnline then
+	if not ed:IsSaved() and not dontask and not ed.IsOnline then
 		local question = string.format("Do you want to close %q ?", activetab:GetText())
 		Derma_Query(question, "Are you sure?", "Close", function() self:CloseTab(_tab, true) end, "Cancel", function() end)
 		return
@@ -703,13 +733,13 @@ function Editor:InitComponents()
 			end
 		}, "DButton")
 
-	self.C.ButtonHolder = self:addComponent(vgui.Create("DPanel", self), -430-4, 4, 430, 22) -- Upper menu
+	self.C.ButtonHolder = self:AddComponent(vgui.Create("DPanel", self), -430-4, 4, 430, 22) -- Upper menu
 	self.C.ButtonHolder.Paint = function() end
-	-- addComponent( panel, x, y, w, h )
+	-- AddComponent( panel, x, y, w, h )
 	-- if x, y, w, h is minus, it will stay relative to right or buttom border
 	self.C.Close = vgui.Create("StarfallButton", self.C.ButtonHolder) -- Close button
-	-- self.C.Inf = self:addComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-26, 0, 24, 22) -- Info button
-	-- self.C.ConBut = self:addComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-24-26, 0, 24, 22) -- Control panel open/close
+	-- self.C.Inf = self:AddComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-26, 0, 24, 22) -- Info button
+	-- self.C.ConBut = self:AddComponent(vgui.CreateFromTable(DMenuButton, self), -45-4-24-26, 0, 24, 22) -- Control panel open/close
 
 	self.C.Divider = vgui.Create("DHorizontalDivider", self)
 
@@ -720,6 +750,7 @@ function Editor:InitComponents()
 	self.C.Menu = vgui.Create("DPanel", self.C.MainPane)
 	self.C.Val = vgui.Create("Button", self.C.MainPane) -- Validation line
 	self.C.TabHolder = vgui.Create("DPropertySheet", self.C.MainPane)
+	self.C.TabHolder.Paint = DoNothing
 
 	self.C.Btoggle = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Toggle Browser being shown
 	self.C.Sav = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Save button
@@ -731,8 +762,7 @@ function Editor:InitComponents()
 	self.C.Inf = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Info button
 	self.C.ConBut = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Control panel button
 
-	self.C.Control = self:addComponent(vgui.Create("Panel", self), -462, 72, 462, -30) -- Control Panel
-	self.C.Credit = self:addComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
+	self.C.Credit = self:AddComponent(vgui.Create("DTextEntry", self), -160, 52, 150, 200) -- Credit box
 
 	-- extra component options
 	if Editor.LayoutVar:GetInt() == 1 then -- Browser on right
@@ -759,6 +789,8 @@ function Editor:InitComponents()
 	self.C.Menu.Paint = function(_, w, h)
 		draw.RoundedBox(0, 0, 0, w, h, Color(234, 234, 234))
 	end
+	self.C.TabHolder.tabScroller:SetPaintBackgroundEnabled(false)
+	self.C.TabHolder:SetPaintBackgroundEnabled(false)
 
 	self.C.Val:Dock(BOTTOM)
 
@@ -776,8 +808,7 @@ function Editor:InitComponents()
 	self.C.ConBut:SetText("")
 	self.C.ConBut.Paint = PaintFlatButton
 	self.C.ConBut.DoClick = function()
-		self.C.Control.Permissions:Refresh()
-		self.C.Control:SetVisible(not self.C.Control:IsVisible())
+		self:OpenTabOnlyOnce("settings")
 	end
 
 	self.C.Inf:SetImage("icon16/information.png")
@@ -882,103 +913,24 @@ function Editor:InitComponents()
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
 
-	self.C.Control:SetVisible(false)
-
 end
 
-function Editor:AddControlPanelTab(label, icon, tooltip)
-	local frame = self.C.Control
-	local panel = vgui.Create("DPanel")
-	local ret = frame.TabHolder:AddSheet(label, panel, icon, false, false, tooltip)
-	local old = ret.Tab.OnMousePressed
-	function ret.Tab.OnMousePressed(...)
-		timer.Simple(0.1, function() frame:ResizeAll() end) -- timers solve everything
-		old(...)
+function Editor:GetSettings()
+
+	local categories = {}
+	local function AddCategory(panel, name, icon, description)
+		if not name then return end
+		categories[name] = {
+			panel = panel,
+			icon = icon,
+			description = description
+		}
 	end
-
-	ret.Panel.Paint = function() end
-	ret.Tab.GetTabHeight = function() return 26 end -- Not increasing when active
-	ret.Tab.Paint = function(button, w, h)
-
-		if button.Hovered then
-			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundHoverCol or SF.Editor.colors.med)
-		else
-			draw.RoundedBox(0, 0, 0, w-1, h, button.backgroundCol or SF.Editor.colors.meddark)
-		end
-	end
-
-
-	return ret
-end
-
-function Editor:InitControlPanel()
-	local frame = self.C.Control
-	-- Add a property sheet to hold the tabs
-	local tabholder = vgui.Create("DPropertySheet", frame)
-	tabholder:SetPos(2, 4)
-	frame.TabHolder = tabholder
-
-	tabholder.tabScroller:DockMargin(0, 0, 3, 0)
-	tabholder.tabScroller:SetOverlap(-1)
-
-	-- They need to be resized one at a time... dirty fix incoming (If you know of a nicer way to do this, don't hesitate to fix it.)
-	local function callNext(t, n)
-		local obj = t[n]
-		local pnl = obj[1]
-		if pnl and pnl:IsValid() then
-			local x, y = obj[2], obj[3]
-			pnl:SetPos(x, y)
-			local w, h = pnl:GetParent():GetSize()
-			local wofs, hofs = w - x * 2, h - y * 2
-			pnl:SetSize(wofs, hofs)
-		end
-		n = n + 1
-		if n <= #t then
-			timer.Simple(0, function() callNext(t, n) end)
-		end
-	end
-
-	function frame:ResizeAll()
-		timer.Simple(0, function()
-				callNext(self.ResizeObjects, 1)
-			end)
-	end
-
-	-- Resize them at the right times
-	local old = frame.SetSize
-	function frame:SetSize(...)
-		self:ResizeAll()
-		old(self, ...)
-	end
-
-	local old = frame.SetVisible
-	function frame:SetVisible(...)
-		self:ResizeAll()
-		old(self, ...)
-	end
-
-	-- Function to add more objects to resize automatically
-	frame.ResizeObjects = {}
-	function frame:AddResizeObject(...)
-		self.ResizeObjects[#self.ResizeObjects + 1] = { ... }
-	end
-
-	-- Our first object to auto resize is the tabholder. This sets it to position 2,4 and with a width and height offset of w-4, h-8.
-	frame:AddResizeObject(tabholder, 2, 4)
-
-
-	frame.Paint = function(_, w, h)
-		draw.RoundedBox(0, 0, 30, w, h, SF.Editor.colors.meddark)
-		draw.RoundedBox(0, 2, 32, w, h, Color(32, 32, 32))
-	end
-	tabholder.Paint = function() end
 	-- ------------------------------------------- EDITOR TAB
-	local sheet = self:AddControlPanelTab("Editor", "icon16/cog.png", "Options for the editor itself.")
 	-- WINDOW BORDER COLORS
 	local label
-	local dlist = vgui.Create("DPanelList", sheet.Panel)
+	local dlist = vgui.Create("DPanelList")
 	dlist.Paint = function() end
-	frame:AddResizeObject(dlist, 4, 4)
 	dlist:EnableVerticalScrollbar(true)
 
 	label = vgui.Create("DLabel")
@@ -1052,25 +1004,42 @@ function Editor:InitControlPanel()
 	ShowExamples:SizeToContents()
 	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
 
+	local LegacyHelper = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(LegacyHelper)
+	LegacyHelper:SetConVar("sf_helper_legacy")
+	LegacyHelper:SetText("Use legacy helper")
+	LegacyHelper:SizeToContents()
+
+	local UndockHelper = vgui.Create("DCheckBoxLabel")
+	dlist:AddItem(UndockHelper)
+	UndockHelper:SetConVar("sf_helper_startundocked")
+	UndockHelper:SetText("Undock helper on open")
+	UndockHelper:SizeToContents()
+
+
+	AddCategory(dlist, "Editor", "icon16/application_side_tree.png", "Options for the editor itself.")
+
 	------ Permissions panel
-	sheet = self:AddControlPanelTab("Permissions", "icon16/cog.png", "Permissions settings.")
 	local perms = SF.Editor.createpermissionsPanel ()
-	perms:SetParent(sheet.Panel)
-	sheet.Panel:DockPadding(0, 0, 0, 0)
-	perms:DockMargin(0, 0, 0, 0)
-	perms:Dock(FILL)
 	perms:Refresh()
-	self.C.Control.Permissions = perms
+
+	AddCategory(perms, "Permissions", "icon16/tick.png", "Permission settings.")
 
 	------ Themes panel
-	sheet = self:AddControlPanelTab("Themes", "icon16/page_white_paintbrush.png", "Theme settings.")
 	local themesPanel = self:CreateThemesPanel()
-	themesPanel:SetParent(sheet.Panel)
-	sheet.Panel:DockPadding(0, 0, 0, 0)
-	themesPanel:DockMargin(4, 4, 4, 4)
-	themesPanel:Dock(FILL)
 	themesPanel:Refresh()
-	self.C.Control.Themes = themesPanel
+
+
+	AddCategory(themesPanel, "Themes", "icon16/page_white_paintbrush.png", "Theme settings.")
+
+	----- Tab settings
+	for k, v in pairs(SF.Editor.TabHandlers) do -- We let TabHandlers register their settings but only if they are current editor or arent editor at all
+		if v.RegisterSettings and (not v.IsEditor or (v.IsEditor and SF.Editor.CurrentTabHandler:GetString() == k)) then 
+			AddCategory(v:RegisterSettings())
+		end
+	end
+
+	return categories
 end
 
 function Editor:CreateThemesPanel()
@@ -1087,8 +1056,7 @@ function Editor:CreateThemesPanel()
 	panel:AddItem(label)
 	label:DockMargin(0, 0, 0, 0)
 	label:SetText("Starfall editor supports TextMate themes.\n" ..
-		"You can import them by pressing \"Add\" button.\n" ..
-		"Note: Those work only in wire tab editor!")
+		"You can import them by pressing \"Add\" button.\n")
 	label:SetWrap(true)
 
 	-- Theme list
@@ -1264,7 +1232,7 @@ function Editor:NewScript(incurrent)
 		self.C.TabHolder:InvalidateLayout()
 
 		self:SetCode(defaultCode)
-		self:GetCurrentEditor().savedCode = self:GetCurrentEditor():getCode() -- It may return different line endings etc
+		self:GetCurrentTabContent().savedCode = self:GetCurrentTabContent():GetCode() -- It may return different line endings etc
 	end
 end
 
@@ -1280,12 +1248,19 @@ end
 function Editor:SaveTabs()
 	if not self.TabsLoaded then return end
 	local tabs = {}
-	tabs.selectedTab = self:GetActiveTabIndex()
+	local activeTab = self:GetActiveTabIndex()
+	tabs.selectedTab = activeTab
 	for i = 1, self:GetNumTabs() do
+		if not self:GetTabContent(i):GetTabHandler().IsEditor then
+			if tabs.selectedTab == i then
+				tabs.selectedTab = 1
+			end
+			continue
+		end
 		tabs[i] = {}
-		local filename = self:GetEditor(i).chosenfile
+		local filename = self:GetTabContent(i).chosenfile
 		local filedatapath = "sf_filedata/"
-		if filename then 
+		if filename then
 			if filename:sub(1, #filedatapath) == filedatapath then -- Temporary fix before we update sf_tabs.txt format
 				filename = nil
 			else
@@ -1293,8 +1268,9 @@ function Editor:SaveTabs()
 			end
 		end
 		tabs[i].filename = filename
-		tabs[i].code = self:GetEditor(i):getCode()
+		tabs[i].code = self:GetTabContent(i):GetCode()
 	end
+
 	file.Write("sf_tabs.txt", util.TableToJSON(tabs))
 end
 
@@ -1302,7 +1278,7 @@ function Editor:OpenOldTabs()
 	if not file.Exists("sf_tabs.txt", "DATA") then 	self.TabsLoaded = true; return end
 
 	local tabs = util.JSONToTable(file.Read("sf_tabs.txt") or "")
-	if not tabs or #tabs == 0 then TabsLoaded = true; return end
+	if not tabs or #tabs == 0 then self.TabsLoaded = true; return end
 
 	-- Temporarily remove fade time
 	self:FixTabFadeTime()
@@ -1330,7 +1306,7 @@ function Editor:OpenOldTabs()
 end
 
 function Editor:Validate(gotoerror)
-	if not self:GetCurrentEditor():getTabHandler().IsEditor then --Dont validate for non-editors
+	if not self:GetCurrentTabContent():GetTabHandler().IsEditor then --Dont validate for non-editors
 		self:SetValidatorStatus("")
 		return
 	end
@@ -1350,8 +1326,8 @@ function Editor:Validate(gotoerror)
 		self.C.Val:SetText(" " .. message)
 	end
 
-	if self:GetCurrentEditor().onValidate then
-		self:GetCurrentEditor():onValidate(success, row, message, gotoerror)
+	if self:GetCurrentTabContent().OnValidate then
+		self:GetCurrentTabContent():OnValidate(success, row, message, gotoerror)
 	end
 	return true
 end
@@ -1378,12 +1354,12 @@ function Editor:SetV(bool)
 end
 
 function Editor:GetChosenFile()
-	return self:GetCurrentEditor().chosenfile
+	return self:GetCurrentTabContent().chosenfile
 end
 
 function Editor:ChosenFile(Line)
-	self:GetCurrentEditor().chosenfile = Line
-	self:GetCurrentEditor().savedCode = Line and file.Read(Line) or nil
+	self:GetCurrentTabContent().chosenfile = Line
+	self:GetCurrentTabContent().savedCode = Line and file.Read(Line) or nil
 
 	if Line then
 		self:SubTitle("Editing: " .. Line)
@@ -1392,9 +1368,36 @@ function Editor:ChosenFile(Line)
 	end
 end
 
+function Editor:OnThemeChange(theme)
+	for i = 1, self:GetNumTabs() do
+		local ed = self:GetTabContent(i)
+		if ed.OnThemeChange then
+			ed:OnThemeChange(theme)
+		end
+	end
+end
+
+--Opens tab with specified tabhandler, if it already exists sets it to active instead
+function Editor:OpenTabOnlyOnce(name)
+	local tab = nil
+	for i = 1, self:GetNumTabs() do
+		local ed = self:GetTabContent(i)
+		if ed:GetTabHandler() == GetTabHandler(name) then
+			tab = i
+		end
+	end
+	if tab then
+		self:SetActiveTabIndex(tab)
+	else
+		local sheet = self:CreateTab("", name)
+		self:SetActiveTab(sheet.Tab)
+	end
+	return self:GetActiveTab()
+end
+
 function Editor:FindOpenFile(FilePath)
 	for i = 1, self:GetNumTabs() do
-		local ed = self:GetEditor(i)
+		local ed = self:GetTabContent(i)
 		if ed.chosenfile == FilePath then
 			return ed
 		end
@@ -1412,30 +1415,34 @@ function Editor:ExtractName()
 end
 
 function Editor:SetCode(code)
-	self:GetCurrentEditor():setCode(code)
+	self:GetCurrentTabContent():SetCode(code)
 	self.savebuffer = self:GetCode()
 	self:Validate()
 	self:ExtractName()
 end
 
 function Editor:PasteCode(code)
-	local editor = self:GetCurrentEditor()
-	if not editor:getTabHandler().IsEditor or not editor.pasteCode then return end
-	editor:pasteCode(code)
+	local content = self:GetCurrentTabContent()
+	if not content:GetTabHandler().IsEditor or not content.PasteCode then return end
+	content:PasteCode(code)
 end
 
-function Editor:GetEditor(n)
+function Editor:GetTabContent(n)
 	if self.C.TabHolder.Items[n] then
 		return self.C.TabHolder.Items[n].Panel
 	end
 end
 
-function Editor:GetCurrentEditor()
+function Editor:GetCurrentTabContent()
 	return self:GetActiveTab():GetPanel()
 end
 
 function Editor:GetCode()
-	return self:GetCurrentEditor():getCode()
+	if self:GetCurrentTabContent().GetCode then
+		return self:GetCurrentTabContent():GetCode() or ""
+	else
+		return ""
+	end
 end
 
 function Editor:Open(Line, code, forcenewtab)
@@ -1444,11 +1451,11 @@ function Editor:Open(Line, code, forcenewtab)
 	if code then
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
-				if self:GetEditor(i).chosenfile == Line then
+				if self:GetTabContent(i).chosenfile == Line then
 					self:SetActiveTab(i)
 					self:SetCode(code)
 					return
-				elseif self:GetEditor(i):getCode() == code then
+				elseif self:GetTabContent(i):GetCode() == code then
 					self:SetActiveTab(i)
 					return
 				end
@@ -1536,11 +1543,11 @@ function Editor:LoadFile(Line, forcenewtab)
 		self:SaveTabs()
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
-				if self:GetEditor(i).chosenfile == Line then
+				if self:GetTabContent(i).chosenfile == Line then
 					self:SetActiveTab(i)
 					if forcenewtab ~= nil then self:SetCode(str) end
 					return
-				elseif self:GetEditor(i):getCode() == str then
+				elseif self:GetTabContent(i).GetCode and self:GetTabContent(i):GetCode() == str then
 					self:SetActiveTab(i)
 					return
 				end
@@ -1586,12 +1593,10 @@ end
 
 function Editor:Setup(nTitle, nLocation, nEditorType)
 
-	self:InitControlPanel() -- We're initializing it there, so tabhandlers are already registered
-
 	self.Title = nTitle
 	self.Location = nLocation
 	self.EditorType = nEditorType
-	self.C.Browser.tree:setup(nLocation)
+	self.C.Browser.tree:Setup(nLocation)
 
 	local SFHelp = vgui.Create("StarfallButton", self.C.ButtonHolder)
 	SFHelp:SetSize(58, 20)
@@ -1599,10 +1604,18 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
-		if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
-			SF.Helper.Frame:Close()
+		if Editor.UseLegacyHelper:GetBool() then
+			if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
+				SF.Helper.Frame:Close()
+			else
+				SF.Helper.show()
+			end
 		else
-			SF.Helper.show()
+			local sheet = self:CreateTab("", "helper")
+			self:SetActiveTab(sheet.Tab)
+			if Editor.StartHelperUndocked:GetBool() then
+				sheet.Tab.content:Undock()
+			end
 		end
 	end
 	self.C.SFHelp = SFHelp

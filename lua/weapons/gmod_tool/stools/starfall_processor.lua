@@ -180,7 +180,7 @@ if CLIENT then
 	local lastclick = CurTime()
 	
 	local function GotoDocs(button)
-		gui.OpenURL("http://thegrb93.github.io/StarfallEx/")
+		gui.OpenURL(SF.Editor.HelperURL:GetString())
 	end
 	
 	function TOOL.BuildCPanel(panel)
@@ -211,7 +211,7 @@ if CLIENT then
 
 		local filebrowser = vgui.Create("StarfallFileBrowser")
 		panel:AddPanel(filebrowser)
-		filebrowser.tree:setup("starfall")
+		filebrowser.tree:Setup("starfall")
 		filebrowser:SetSize(235, 400)
 		
 		local lastClick = 0

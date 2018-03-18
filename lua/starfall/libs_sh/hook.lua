@@ -535,3 +535,7 @@ add("Tick")
 -- @name PlayerChat
 -- @class hook
 -- @client
+-- @param ply Player that said the message
+-- @param text The message
+-- @param team Whether the message was team only
+-- @param isdead Whether the message was send from a dead player

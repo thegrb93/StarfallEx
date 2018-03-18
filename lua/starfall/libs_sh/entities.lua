@@ -201,8 +201,13 @@ end
 local shaderBlacklist = {
 	["LightmappedGeneric"] = true,
 }
+local materialBlacklist = {
+	["pp/copy"] = true,
+	["effects/ar2_altfire1"] = true,
+}
 local function invalidMaterial(material)
-	if string.find(string.lower(material) , "pp[%./\\]+copy") then return true end
+	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
+	if materialBlacklist[material] then return true end
 	local mat = Material(material)
 	if mat and shaderBlacklist[mat:GetShader()] then return true end
 end
