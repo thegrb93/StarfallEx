@@ -248,7 +248,8 @@ function TabHandler:RegisterSettings()
 	local commentStyle = form:ComboBox( "Comment Style", "sf_editor_wire_block_comment_style" )
 	commentStyle:AddChoice("Block (New Line)", 0)
 	commentStyle:AddChoice("Block", 1)
-	commentStyle:AddChoice("Each Line", 1)
+	commentStyle:AddChoice("Each Line", 2)
+
 	local autoIndent = form:CheckBox( "Auto indent", "sf_editor_wire_auto_indent" )
 
 
