@@ -939,7 +939,7 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 
 		draw_SimpleText(tostring(row), self.CurrentFont, self.LineNumberWidth - 10, startY, colors.gutter_foreground, TEXT_ALIGN_RIGHT)
 
-		draw_SimpleText(tostring(cells.test or ""), self.CurrentFont, self.LineNumberWidth + 5, startY, colors.word_highlight, TEXT_ALIGN_LEFT)
+		--draw_SimpleText(tostring(cells.test or ""), self.CurrentFont, self.LineNumberWidth + 5, startY, colors.word_highlight, TEXT_ALIGN_LEFT)
 
 		if cells.foldable then
 			if rowdata.hides then
