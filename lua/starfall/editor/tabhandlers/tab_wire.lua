@@ -1270,7 +1270,7 @@ end
 function PANEL:SetCaret(caret, maintain_selection)
 	self.Caret = self:CopyPosition(caret)
 
-	self.Caret[1] = math.Clamp(self.Caret[1], 1, self.VisibleRows)
+	self.Caret[1] = math.Clamp(self.Caret[1], 1, #self.Rows)
 	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self:GetRowText(self.Caret[1]) + 1)
 
 	if maintain_selection == nil then
