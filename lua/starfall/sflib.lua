@@ -13,6 +13,7 @@ if SERVER then
 	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions/core.lua")
 	AddCSLuaFile("netstream.lua")
+	AddCSLuaFile("url_whitelist.lua")
 
 	AddCSLuaFile("editor/editor.lua")
 end
@@ -24,6 +25,48 @@ include("preprocessor.lua")
 include("permissions/core.lua")
 include("editor/editor.lua")
 include("netstream.lua")
+SF.UrlWhitelist = include("url_whitelist.lua")
+
+--- Checks if url is safe to access
+-- @param url Url you want to check
+-- @returns true if allowed false otherwise
+function SF.CheckUrl(url)
+	local TYPE_SIMPLE=1
+	local TYPE_PATTERN=2
+	local TYPE_BLACKLIST=3
+	local TYPE_BLACKLISTPATTERN=4
+
+	url = string.gsub(url, "[^%w _~%.%-/:]", function(str)
+		return string.format("%%%02X", string.byte(str))
+	end)
+
+	local prefix, site, data = string.match(url,"^(%w-):%/%/([%w%-%_%.]+)%/?(.+)")
+	site = site.."/"
+
+	for k,v in pairs(SF.UrlWhitelist) do
+		if v[1] == TYPE_BLACKLISTPATTERN then
+			if string.match(site, v[2]) then
+				return false
+			end
+		elseif v[1] == TYPE_BLACKLIST then
+			if site==v[2] then
+				return false
+			end
+		end
+	end
+	for k,v in pairs(SF.UrlWhitelist) do
+		if v[1] == TYPE_PATTERN then
+			if string.match(site, v[2]) then
+				return true
+			end
+		elseif v[1] == TYPE_SIMPLE then
+			if site==v[2] then
+				return true
+			end
+		end
+	end
+	return false
+end
 
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")

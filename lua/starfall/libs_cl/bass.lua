@@ -102,6 +102,11 @@ function bass_library.loadURL (path, flags, callback)
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
+	if not SF.CheckUrl(path) then
+		instance:runFunction(callback, nil, "URL not allowed!", "URL not allowed!")
+		return
+	end
+
 	SF.HTTPNotify(instance.player, path)
 
 	sound.PlayURL(path, flags, function(snd, er, name)
