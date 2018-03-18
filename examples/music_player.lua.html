@@ -185,7 +185,7 @@
 
 if SERVER then
 	hook.add("PlayerSay", "Hey", function(ply, txt)
-		if ply==entities.owner() and txt:sub(1, 6)=="!song " then
+		if ply==owner() and txt:sub(1, 6)=="!song " then
 			net.start("playSong")
 			net.writeString(txt:sub(7))
 			net.send()
