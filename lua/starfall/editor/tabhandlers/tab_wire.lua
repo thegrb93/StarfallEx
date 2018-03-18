@@ -68,6 +68,7 @@ TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightenc
 TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
 TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
+TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollspeed", 4, true, false)
 
 ---------------------
 -- Colors
@@ -175,9 +176,12 @@ function TabHandler:RegisterSettings()
 		end
 		if right then
 			if right.SetDark then right:SetDark(false) end
+			if right.OnSelect then -- Combo
+				form.Items[#form.Items]:SetSizeY(false)
+				form.Items[#form.Items]:SetSize(120,30)
+			end
 		end
-		form.Items[#form.Items]:SetSizeY(false)
-		form.Items[#form.Items]:SetSize(120,30)
+
 		return left,right
 	end
 	local function FakeThemeChange()
@@ -255,8 +259,9 @@ function TabHandler:RegisterSettings()
 
 	local enlightenColors = form:CheckBox( "Use brighter colors", "sf_editor_wire_enlightencolors" )
 	local displayCaret = form:CheckBox( "Display caret position", "sf_editor_wire_display_caret_pos" )
-
-
+	local scrollSpeed = form:NumSlider("Scroll Speed","sf_editor_wire_scrollspeed", 1, 100, 2)
+	scrollSpeed:SetPaintBackgroundEnabled( true )
+	scrollSpeed.TextArea.m_colText = Color(255,255,255)
 	return form, "Wire", "icon16/pencil.png", "Options for wire tabs."
 end
 
@@ -1102,6 +1107,7 @@ function PANEL:PaintTextOverlay()
 			local cBracketPos = 0
 			local bracketLength = #bracket
 			local tokens = self:GetRowCache(line)
+			local length = 0
 			if BracketPairs[bracket] then
 				local lookup = BracketPairs
 				while line < lines and not y do
@@ -1151,9 +1157,9 @@ function PANEL:PaintTextOverlay()
 						end
 						if sum == 0 then
 							y = line
+							length = #tokens[I][1]
 							x = #self:GetRowText(line) - x - length + 1
 							cBracketPos = #self:GetRowText(self.Caret[1]) - cBracketPos - bracketLength
-							length = #tokens[I][1]
 							break
 						end
 						x = x + #tokens[I][1]
@@ -1512,7 +1518,7 @@ function PANEL:_OnTextChanged()
 end
 
 function PANEL:OnMouseWheeled(delta)
-	self.ScrollBar:OnMouseWheeled(delta/self.VisibleRows * 4)
+	self.ScrollBar:OnMouseWheeled(delta/self.VisibleRows * TabHandler.ScrollSpeedConVar:GetFloat())
 end
 
 function PANEL:OnShortcut()
