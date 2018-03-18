@@ -1065,24 +1065,24 @@ function PANEL:PaintTextOverlay()
 				local area, r, g, b, a = data[1], data[2], data[3], data[4], data[5]
 				surface_SetDrawColor(r, g, b, a)
 				local start, stop = self:MakeSelection(area)
-				if self.Rows[start[1]][3] or self.Rows[start[1]][3] then continue end -- Row is hidden
-				start[1] = start[1] - self:GetRowOffset(start[1])
-				stop[1] = stop[1] - self:GetRowOffset(stop[1])
+				if self.Rows[start[1]][3] or self.Rows[stop[1]][3] then continue end -- Row is hidden
+				local startY = start[1] - self:GetRowOffset(start[1]) - self.Scroll[1]
+				local stopY = stop[1] - self:GetRowOffset(stop[1]) - self.Scroll[1]
 				if start[1] == stop[1] then -- On the same line
-					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + 1, (stop[2]-start[2]) * width, 1)
-					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + height - 2, (stop[2]-start[2]) * width, 1)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (startY * height) + 1, (stop[2]-start[2]) * width, 1)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (startY * height) + height - 2, (stop[2]-start[2]) * width, 1)
 
-					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width + (stop[2]-start[2]) * width - 1, (start[1]-self.Scroll[1]) * height + 1, 1, height-2)
-					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (start[1]-self.Scroll[1]) * height + 1, 1, height-2)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width + (stop[2]-start[2]) * width - 1, startY * height + 1, 1, height-2)
+					surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (startY * height) + 1, 1, height-2)
 
 				elseif start[1] < stop[1] then -- Ends below start
 					for i = start[1], stop[1] do
 						if i == start[1] then
-							surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (i-self.Scroll[1]) * height, (#self.Rows[start[1]]-start[2]) * width, height)
+							surface_DrawRect(xofs + (start[2]-self.Scroll[2]) * width, (self:GetRowOffset(i)-self.Scroll[1]) * height, (#self.Rows[start[1]]-start[2]) * width, height)
 						elseif i == stop[1] then
-							surface_DrawRect(xofs + (self.Scroll[2]-1) * width, (i-self.Scroll[1]) * height, (#self.Rows[stop[1]]-stop[2]) * width, height)
+							surface_DrawRect(xofs + (self.Scroll[2]-1) * width, (self:GetRowOffset(i)-self.Scroll[1]) * height, (#self.Rows[stop[1]]-stop[2]) * width, height)
 						else
-							surface_DrawRect(xofs + (self.Scroll[2]-1) * width, (i-self.Scroll[1]) * height, #self.Rows[i] * width, height)
+							surface_DrawRect(xofs + (self.Scroll[2]-1) * width, (self:GetRowOffset(i)-self.Scroll[1]) * height, #self.Rows[i] * width, height)
 						end
 					end
 				end
