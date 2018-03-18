@@ -1295,7 +1295,11 @@ function PANEL:MovePosition(caret, offset)
 		local numRows = #self.Rows
 		while true do
 			local length = #(self:GetRowText(row)) - col + 2
-			if offset < length then
+			if self.Rows[row][3] then
+				offset = offset - length
+				row = row + 1
+				col = 1
+			elseif offset < length then
 				col = col + offset
 				break
 			elseif row == numRows then
@@ -1311,7 +1315,11 @@ function PANEL:MovePosition(caret, offset)
 		offset = -offset
 
 		while true do
-			if offset < col then
+			if self.Rows[row][3] then
+				offset = offset - col
+				row = row - 1
+				col = #(self:GetRowText(row)) + 1
+			elseif offset < col then
 				col = col - offset
 				break
 			elseif row == 1 then
