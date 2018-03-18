@@ -43,7 +43,7 @@ function SF.CheckUrl(url)
 	local prefix, site, data = string.match(url,"^(%w-):%/%/([^/]*)%/?(.+)")
 	if not prefix or not site then return false end
 	site = site.."/"
-	local url_without_prefix = site.."/"..(data or "")
+	local url_without_prefix = site..(data or "")
 	for k,v in pairs(SF.UrlWhitelist) do
 		if v[1] == TYPE_BLACKLISTPATTERN then
 			if string.match(url_without_prefix, v[2]) then
