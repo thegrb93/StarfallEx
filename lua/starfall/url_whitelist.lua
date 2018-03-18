@@ -5,9 +5,10 @@ local list = {}
 local TYPE_SIMPLE=1
 local TYPE_PATTERN=2
 local TYPE_BLACKLIST=3
+local TYPE_BLACKLISTPATTERN=4
 
 local function pattern(pattern)
-  list[#list+1]={TYPE_PATTERN,pattern}
+  list[#list+1]={TYPE_PATTERN,"^"..pattern}
 end
 local function simple(txt)
   list[#list+1]={TYPE_SIMPLE,txt}
@@ -15,7 +16,9 @@ end
 local function blacklist(txt)
   list[#list+1]={TYPE_BLACKLIST,txt}
 end
-
+local function blacklistpattern(pattern)
+    list[#list+1]={TYPE_BLACKLISTPATTERN,"^"..pattern}
+end
 
 -- Dropbox
 --- Examples:
