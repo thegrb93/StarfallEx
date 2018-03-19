@@ -68,7 +68,7 @@ TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightenc
 TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
 TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
-TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollspeed", 4, true, false)
+TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollmultiplier", 1, true, false)
 TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
 TabHandler.AutoValidateConVar = CreateClientConVar("sf_editor_wire_autovalidate", "1", true, false)
 ---------------------
@@ -263,7 +263,7 @@ function TabHandler:RegisterSettings()
 
 	local enlightenColors = form:CheckBox( "Use brighter colors", "sf_editor_wire_enlightencolors" )
 	local displayCaret = form:CheckBox( "Display caret position", "sf_editor_wire_display_caret_pos" )
-	local scrollSpeed = form:NumSlider("Scroll Speed","sf_editor_wire_scrollspeed", 1, 100, 2)
+	local scrollSpeed = form:NumSlider("Scroll Speed","sf_editor_wire_scrollmultiplier", 0.01, 4, 4)
 	scrollSpeed:SetPaintBackgroundEnabled( true )
 	scrollSpeed.TextArea.m_colText = Color(255,255,255)
 	return form, "Wire", "icon16/pencil.png", "Options for wire tabs."
@@ -1556,7 +1556,7 @@ function PANEL:_OnTextChanged()
 end
 
 function PANEL:OnMouseWheeled(delta)
-	self.ScrollBar:OnMouseWheeled(delta/self.VisibleRows * TabHandler.ScrollSpeedConVar:GetFloat())
+	self.ScrollBar:OnMouseWheeled(delta/self.Size[1] * TabHandler.ScrollSpeedConVar:GetFloat())
 end
 
 function PANEL:OnShortcut()
