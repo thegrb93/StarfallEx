@@ -441,7 +441,7 @@ function PANEL:OnThemeChange()
 	colors = SF.Editor.Themes.CurrentTheme
 	self.CurrentMode:LoadSyntaxColors()
 	for k,v in ipairs(self.Rows) do
-		v[3] = false
+		v[2] = false
 	end
 	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
 	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7)

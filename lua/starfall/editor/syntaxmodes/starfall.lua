@@ -101,6 +101,8 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 		textcolor = HSVToColor(h, s, v)
 	elseif usePigments == 1 then
 		textcolor = colors[tokenname][1]
+	else
+		addToken(tokenname, tokendata)
 	end
 	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
 	lastcol = cols[#cols]
