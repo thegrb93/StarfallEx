@@ -70,7 +70,7 @@ TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_ca
 TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
 TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollspeed", 4, true, false)
 TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
-
+TabHandler.AutoValidateConVar = CreateClientConVar("sf_editor_wire_autovalidate", "1", true, false)
 ---------------------
 -- Colors
 ---------------------
@@ -259,6 +259,7 @@ function TabHandler:RegisterSettings()
 
 	local autoIndent = form:CheckBox( "Auto indent", "sf_editor_wire_auto_indent" )
 
+	local autoValidate = form:CheckBox( "Automatically validate", "sf_editor_wire_autovalidate" )
 
 	local enlightenColors = form:CheckBox( "Use brighter colors", "sf_editor_wire_enlightencolors" )
 	local displayCaret = form:CheckBox( "Display caret position", "sf_editor_wire_display_caret_pos" )
@@ -1549,8 +1550,9 @@ function PANEL:_OnTextChanged()
 	end
 
 	self:SetSelection(text)
-	SF.Editor.editor:Validate(false)
-
+	if TabHandler.AutoValidateConVar:GetBool() then
+		SF.Editor.editor:Validate(false)
+	end
 end
 
 function PANEL:OnMouseWheeled(delta)
@@ -2609,8 +2611,9 @@ function PANEL:_OnKeyCodeTyped(code)
 	if control and not handled then
 		handled = self:OnShortcut(code)
 	end
-	SF.Editor.editor:Validate(false)
-
+	if TabHandler.AutoValidateConVar:GetBool() then
+		SF.Editor.editor:Validate(false)
+	end
 
 	return handled
 end
