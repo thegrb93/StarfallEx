@@ -490,8 +490,9 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	content.CloseTab = function(_, text)
 		return self:CloseTab(sheet.Tab, true)
 	end
+	local _old = sheet.Tab.OnMousePressed
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
-
+		_old(pnl, keycode, ...)
 		if keycode == MOUSE_MIDDLE then
 			--self:FixTabFadeTime()
 			self:CloseTab(pnl)
@@ -560,7 +561,6 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 			if th.RegisterTabMenu then
 				th:RegisterTabMenu(menu, content)
 			end
-			return
 		end
 
 		self:SetActiveTab(pnl)
@@ -750,6 +750,9 @@ function Editor:InitComponents()
 	self.C.Menu = vgui.Create("DPanel", self.C.MainPane)
 	self.C.Val = vgui.Create("Button", self.C.MainPane) -- Validation line
 	self.C.TabHolder = vgui.Create("DPropertySheet", self.C.MainPane)
+	self.C.TabHolder.tabScroller:MakeDroppable( "sf_tab" )
+	self.C.TabHolder.tabScroller:SetUseLiveDrag( true )
+
 	self.C.TabHolder.Paint = DoNothing
 
 	self.C.Btoggle = vgui.CreateFromTable(DMenuButton, self.C.Menu) -- Toggle Browser being shown
