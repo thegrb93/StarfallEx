@@ -46,6 +46,21 @@ Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
+local defaultCode = [=[--@name
+--@author
+--@shared
+
+--[[
+Starfall Scripting Environment
+
+Github: https://github.com/thegrb93/StarfallEx
+Reference Page: http://thegrb93.github.io/Starfall/
+
+Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
+]]]=]
+defaultCode = string.gsub(defaultCode, "\r", "")
+
+
 cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
 end)
@@ -1210,19 +1225,6 @@ function Editor:TranslateValues(panel, x, y)
 	panel:SetFrameColor()
 	return x, y
 end
-
-local defaultCode = [=[--@name
---@author
---@shared
-
---[[
-Starfall Scripting Environment
-
-Github: https://github.com/thegrb93/StarfallEx
-Reference Page: http://thegrb93.github.io/Starfall/
-
-Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
-]]]=]
 
 function Editor:NewScript(incurrent)
 	if not incurrent and self.NewTabOnOpenVar:GetBool() then

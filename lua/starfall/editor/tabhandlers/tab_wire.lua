@@ -825,6 +825,7 @@ end
 function PANEL:SetCode(text)
 	self.Rows = {}
 	self.VisibleRows = 0
+	text = string_gsub(text, "\r", "")
 	local rows = string_Explode("\n", text)
 	for k,v in ipairs(rows) do
 		self:SetRowText(k,v)
