@@ -449,7 +449,7 @@ function SF.StringRestrictor(allowbydefault)
 					return  true
 				end
 			end
-			return allowbydefault
+			return self.default
 		end,
 		addWhitelistEntry = function(self, value)
 			table.insert(self.whitelist, value)
