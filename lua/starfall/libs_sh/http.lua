@@ -7,8 +7,8 @@ local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, F
 local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
 
 
-SF.Permissions.registerPrivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, usergroups = { default = 3 }, whitelist = { default = 2 } })
-SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, usergroups = { default = 3 }, whitelist = { default = 2 } })
+SF.Permissions.registerPrivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, usergroups = { default = 3 }, urlwhitelist = { default = 2 } })
+SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, usergroups = { default = 3 }, urlwhitelist = { default = 2 } })
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0

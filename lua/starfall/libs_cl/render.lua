@@ -119,7 +119,7 @@ end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
-SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { client = {}, whitelist = {} })
+SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { client = {}, urlwhitelist = {} })
 SF.Permissions.registerPrivilege("render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })

@@ -1,23 +1,24 @@
--- Source and license: https://github.com/Metastruct/gurl/
+-- Defaults taken from: https://github.com/Metastruct/gurl/
+--This file returns default StringRestrictor for URLs
 
-local list = {}
+local restrictor = SF.StringRestrictor(false)
 
-local TYPE_SIMPLE=1
-local TYPE_PATTERN=2
-local TYPE_BLACKLIST=3
-local TYPE_BLACKLISTPATTERN=4
-
-local function pattern(pattern)
-  list[#list+1]={TYPE_PATTERN,"^"..pattern}
+local function pattern(txt)
+	txt = "^"..txt
+	restrictor:addWhitelistEntry(txt)
 end
 local function simple(txt)
-  list[#list+1]={TYPE_SIMPLE,txt}
+	txt = "^"..string.PatternSafe(txt).."/.*"
+	print(txt)
+	restrictor:addWhitelistEntry(txt)
 end
 local function blacklist(txt)
-  list[#list+1]={TYPE_BLACKLIST,txt}
+	txt = "^"..string.PatternSafe(txt)..".*"
+	restrictor:addBlacklistEntry(txt)
 end
-local function blacklistpattern(pattern)
-    list[#list+1]={TYPE_BLACKLISTPATTERN,"^"..pattern}
+local function blacklistpattern(txt)
+	txt = "^"..txt
+	restrictor:addBlacklistEntry(txt)
 end
 
 -- Dropbox
@@ -26,8 +27,8 @@ end
 ---  https://www.dropbox.com/s/abcd123/efg123.txt?dl=0
 ---  https://dl.dropboxusercontent.com/content_link/abc123/file?dl=1
 
-simple [[https://dl.dropboxusercontent.com/]]
-simple [[dl.dropbox.com/]] --Sometimes redirects to usercontent link
+simple [[https://dl.dropboxusercontent.com]]
+simple [[dl.dropbox.com]] --Sometimes redirects to usercontent link
 
 -- OneDrive
 --- Examples:
@@ -45,7 +46,7 @@ simple [[docs.google.com/uc]]
 --- Examples:
 ---  http://i.imgur.com/abcd123.xxx
 
-simple [[i.imgur.com/]]
+simple [[i.imgur.com]]
 
 
 -- Google
@@ -72,7 +73,7 @@ simple [[i.imgur.com/]]
 --- Examples:
 ---  http://pastebin.com/abcdef
 
-simple [[pastebin.com/]]
+simple [[pastebin.com]]
 
 -- Twitter?
 --- Examples:
@@ -95,8 +96,8 @@ simple [[pastebin.com/]]
 ---  https://gist.githubusercontent.com/LUModder/f2b1c0c9bf98224f9679/raw/5644006aae8f0a8b930ac312324f46dd43839189/sh_sbdc.lua
 ---  https://raw.githubusercontent.com/LUModder/FWP/master/weapon_template.txt
 
-simple [[raw.githubusercontent.com/]]
-simple [[gist.githubusercontent.com/]]
+simple [[raw.githubusercontent.com]]
+simple [[gist.githubusercontent.com]]
 
 -- bitbucket
 --- Examples:
@@ -111,10 +112,10 @@ simple [[gist.githubusercontent.com/]]
 ---  http://b.1339.cf/fppyhby.txt
 ---  http://a.pomf.cat/jefjtb.txt
 
-simple [[my.mixtape.moe/]]
-simple [[a.1339.cf/]]
-simple [[b.1339.cf/]]
-simple [[a.pomf.cat/]]
+simple [[my.mixtape.moe]]
+simple [[a.1339.cf]]
+simple [[b.1339.cf]]
+simple [[a.pomf.cat]]
 
 -- TinyPic
 --- Examples:
@@ -125,27 +126,27 @@ pattern [[i([%w-_]+)%.tinypic%.com/(.+)]]
 -- paste.ee
 --- Examples:
 ---  https://paste.ee/r/J3jle
-simple [[paste.ee/]]
+simple [[paste.ee]]
 
 
 -- hastebin
 --- Examples:
 ---  http://hastebin.com/icuvacogig.txt
 
-simple [[hastebin.com/]]
+simple [[hastebin.com]]
 
 -- puush
 --- Examples:
 ---  http://puu.sh/asd/qwe.obj
-simple [[puu.sh/]]
+simple [[puu.sh]]
 
 -- Steam
 --- Examples:
 ---  http://images.akamai.steamusercontent.com/ugc/367407720941694853/74457889F41A19BD66800C71663E9077FA440664/
 ---  https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/4000/dca12980667e32ab072d79f5dbe91884056a03a2.jpg
-simple [[images.akamai.steamusercontent.com/]]
-simple [[steamcdn-a.akamaihd.net/]]
-blacklist [[steamcommunity.com/linkfilter/]]
+simple [[images.akamai.steamusercontent.com]]
+simple [[steamcdn-a.akamaihd.net]]
+blacklist [[steamcommunity.com/linkfilter]]
 
 -- Discord
 --- Examples:
@@ -155,4 +156,4 @@ blacklist [[steamcommunity.com/linkfilter/]]
 pattern [[cdn[%w-_]*.discordapp%.com/(.+)]]
 pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 
-return list
+return restrictor
