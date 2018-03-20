@@ -1423,6 +1423,7 @@ function PANEL:RecacheLine(line)
 	self.Rows[line][2] = false
 end
 function PANEL:SetArea(selection, text, isundo, isredo, before, after)
+	text = string_gsub(text, "\r", "")
 	local start, stop = self:MakeSelection(selection)
 
 	local buffer = self:GetArea(selection)
