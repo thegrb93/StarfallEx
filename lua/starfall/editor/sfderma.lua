@@ -298,7 +298,7 @@ function PANEL:openMenu (node)
 						file.Delete(node:GetFileName())
 						file.Write(saveFile, contents)
 						SF.AddNotify(LocalPlayer(), "File renamed as " .. saveFile .. ".", "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end)
 			end)
 		self.menu:AddSpacer()
@@ -309,7 +309,7 @@ function PANEL:openMenu (node)
 					function ()
 						file.Delete(node:GetFileName())
 						SF.AddNotify(LocalPlayer(), "File deleted: " .. node:GetFileName(), "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end,
 					"Cancel")
 			end)
@@ -324,7 +324,7 @@ function PANEL:openMenu (node)
 						local saveFile = node:GetFolder().."/"..text..".txt"
 						file.Write(saveFile, "")
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end)
 			end)
 		self.menu:AddSpacer()
@@ -338,7 +338,7 @@ function PANEL:openMenu (node)
 						local saveFile = node:GetFolder().."/"..text
 						file.CreateDir(saveFile)
 						SF.AddNotify(LocalPlayer(), "New folder: " .. saveFile, "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end)
 			end)
 		self.menu:AddSpacer()
@@ -366,7 +366,7 @@ function PANEL:openMenu (node)
 							end
 						end
 						SF.AddNotify(LocalPlayer(), "Folder deleted: " .. node:GetFolder(), "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end,
 					"Cancel")
 			end)
@@ -417,7 +417,7 @@ function PANEL:Init ()
 	function searchBox:OnChange ()
 
 		if self:GetValue() == "" then
-			tree:reloadTree()
+			tree:ReloadTree()
 			return
 		end
 
@@ -462,7 +462,7 @@ function PANEL:Init ()
 	self.Update:DockMargin(0, 0, 0, 0)
 	self.Update:SetText("Update")
 	self.Update.DoClick = function(button)
-		tree:reloadTree()
+		tree:ReloadTree()
 		searchBox:SetValue("Search...")
 	end
 end

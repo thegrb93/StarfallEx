@@ -581,12 +581,6 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 		self:SetActiveTab(pnl)
 	end
 	if content.GetTabHandler().IsEditor then
-		content.OnTextChanged = function(panel)
-			self:UpdateTabText(self:GetActiveTab())
-			timer.Create("sfautosave", 5, 1, function()
-					self:SaveTabs()
-				end)
-		end
 		content.OnShortcut = function(_, code)
 			if code == KEY_S then
 				self:SaveFile(self:GetChosenFile())
@@ -1451,6 +1445,9 @@ function Editor:GetCode()
 end
 
 function Editor:Open(Line, code, forcenewtab)
+	timer.Create("sfautosave", 5, 0, function()
+		self:SaveTabs()
+	end)
 	if self:IsVisible() and not Line and not code then self:Close() end
 	self:SetV(true)
 	if code then
