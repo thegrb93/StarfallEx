@@ -56,7 +56,9 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 		end
 		categories[cat].panel:SetVisible(true)
 	end
-	for name, data in pairs(categories) do
+
+	for name, data in SortedPairs(categories) do
+		local data = categories[name] -- SortedPairs uses copy of the table
 		local button = vgui.Create("StarfallButton")
 		button.PerformLayout = EMPTY_FUNC
 		button:SetSize(200,40)

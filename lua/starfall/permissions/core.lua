@@ -17,6 +17,20 @@ function P.registerProvider (provider)
 	P.providers[provider.id] = provider
 end
 
+--- Refreshes cache of settings in provider
+function P.refreshSettingsCache ()
+	for i, provider in pairs(P.providers) do
+		local settings = {}
+
+		for id, privilege in pairs(P.privileges) do
+			if privilege[3][i] then -- Check if this current provider manages privilege
+				settings[id] = { privilege[1], privilege[2], privilege[3][i].setting } -- Name, Description, Current Setting
+			end
+		end
+		provider.settings = settings
+	end
+end
+
 --- Adds a provider which will be used on specified permissions. (Meant for outside addons)
 -- Providers must implement the {@link SF.Permissions.Provider} interface.
 -- @param provider the provider to be registered
@@ -196,17 +210,11 @@ if SERVER then
 	util.AddNetworkString("sf_permissionsettings")
 	net.Receive("sf_permissionsettings", function(len, ply)
 		if ply:IsSuperAdmin() then
+			P.refreshSettingsCache () -- Refresh cache first
 			net.Start("sf_permissionsettings")
 
 			net.WriteUInt(table.Count(P.providers), 8)
 			for id, v in pairs(P.providers) do
-
-				local privileges = {}
-				for privilegeid, privilege in pairs(P.privileges) do
-					if privilege[3][id] then
-						privileges[privilegeid] = privilege
-					end
-				end
 
 				net.WriteString(id)
 				net.WriteString(v.name)
@@ -214,12 +222,12 @@ if SERVER then
 				for _, option in pairs(v.settingsoptions) do
 					net.WriteString(option)
 				end
-				net.WriteUInt(table.Count(privileges), 8)
-				for privid, setting in pairs(privileges) do
+				net.WriteUInt(table.Count(v.settings), 8)
+				for privid, setting in pairs(v.settings) do
 					net.WriteString(privid)
 					net.WriteString(setting[1])
 					net.WriteString(setting[2])
-					net.WriteUInt(setting[3][id].setting, 8)
+					net.WriteUInt(setting[3], 8)
 				end
 			end
 
@@ -256,17 +264,17 @@ else
 					id = net.ReadString(),
 					name = net.ReadString(),
 					settings = {},
-					options = {}
+					settingsoptions = {}
 				}
 				local noptions = net.ReadUInt(8)
 				for j = 1, noptions do
-					provider.options[j] = net.ReadString()
+					provider.settingsoptions[j] = net.ReadString()
 				end
 				local nsettings = net.ReadUInt(8)
 				for j = 1, nsettings do
 					provider.settings[net.ReadString()] = { net.ReadString(), net.ReadString(), net.ReadUInt(8) }
 				end
-				providers[i] = provider
+				providers[provider.id] = provider
 			end
 			reqCallback(providers)
 			reqCallback = nil

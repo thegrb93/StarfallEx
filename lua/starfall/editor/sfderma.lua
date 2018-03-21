@@ -8,7 +8,6 @@ PANEL.windows = {}
 SF.Editor.ShowExamplesVar = CreateClientConVar("sf_editor_showexamples", "1", true, false)
 SF.Editor.ShowDataFilesVar = CreateClientConVar("sf_editor_showdatafiles", "0", true, false)
 
-
 --[[ Loading SF Examples ]]
 
 if SF.Editor.ShowExamplesVar:GetBool() then
@@ -923,3 +922,82 @@ function PANEL:Paint( w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
 end
 vgui.Register( "SFChipPermissions", PANEL, "DFrame" )
+
+-- End Instance Permissions
+
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+-- Starfall Permissions (Global)
+
+PANEL  = {}
+function PANEL:AddProviders(providers, server)
+	for _, p in pairs(providers) do
+		local header = vgui.Create("DLabel", header)
+		header:SetFont("DermaLarge")
+		header:SetColor(Color(255, 255, 255))
+		header:SetText((server and "[Server] " or "[Client] ")..p.name)
+		header:SetSize(0, 40)
+		header:Dock(TOP)
+		self.scrollPanel:AddItem(header)
+
+		for id, setting in SortedPairs(p.settings) do
+
+			local header = vgui.Create("StarfallPanel")
+			header:DockMargin(0, 5, 0, 0)
+			header:SetSize(0, 20)
+			header:Dock(TOP)
+			header:SetToolTip(id)
+			header:SetBackgroundColor(Color(0,0,0,20))
+
+			local settingtext = vgui.Create("DLabel", header)
+			settingtext:SetFont("DermaDefault")
+			settingtext:SetColor(Color(255, 255, 255))
+			settingtext:SetText(id)
+			settingtext:DockMargin(5, 0, 0, 0)
+			settingtext:Dock(LEFT)
+			settingtext:SizeToContents()
+
+			local description = vgui.Create("DLabel", header)
+			description:SetFont("DermaDefault")
+			description:SetColor(Color(128, 128, 128))
+			description:SetText(" - "..setting[2])
+			description:DockMargin(5, 0, 0, 0)
+			description:Dock(FILL)
+
+			local buttons = {}
+			for i,option in pairs(p.settingsoptions) do
+				local button = vgui.Create("StarfallButton", header)
+				button:SetText(option)
+				button:DockMargin(0, 0, 3, 0)
+				button:Dock(RIGHT)
+				button.active = setting[3]==i
+
+				button.DoClick = function(self)
+					RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
+					for _, b in ipairs(buttons) do
+						b.active = false
+					end
+					self.active = true
+				end
+				buttons[i] = button
+			end
+
+			self.scrollPanel:AddItem(header)
+
+		end
+	end
+end
+function PANEL:Clear()
+	self.scrollPanel:Clear()
+end
+function PANEL:Init()
+
+	self.scrollPanel = vgui.Create("DScrollPanel", self)
+	self.scrollPanel:Dock(FILL)
+	self.scrollPanel:SetPaintBackgroundEnabled(false)
+end
+function PANEL:Paint(w,h)
+
+end
+vgui.Register( "StarfallPermissions", PANEL, "DPanel" )

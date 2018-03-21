@@ -1037,12 +1037,15 @@ function Editor:GetSettings()
 
 	AddCategory(dlist, "Editor", "icon16/application_side_tree.png", "Options for the editor itself.")
 
-	------ Permissions panel
-	local perms = SF.Editor.createpermissionsPanel ()
-	perms:Refresh()
+	------ Client Permissions panel
+	local perms = SF.Editor.createGlobalPermissionsPanel(true, false)
+	AddCategory(perms, "Permissions [Client]", "icon16/tick.png", "Permission settings.")
 
-	AddCategory(perms, "Permissions", "icon16/tick.png", "Permission settings.")
-
+	------ Server Permissions panel
+	if LocalPlayer():IsSuperAdmin() then
+		local perms = SF.Editor.createGlobalPermissionsPanel(false, true)
+		AddCategory(perms, "Permissions [Server]", "icon16/tick.png", "Permission settings.")
+	end
 	------ Themes panel
 	local themesPanel = self:CreateThemesPanel()
 	themesPanel:Refresh()
