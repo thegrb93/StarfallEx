@@ -1438,7 +1438,6 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 
 	if not text or text == "" then
 		self:UnfoldHidden(start[1])
-		self:OnTextChanged()
 
 		if isredo then
 			self.Undo[#self.Undo + 1] = { { self:CopyPosition(start), self:CopyPosition(start) }, buffer, after, before }
@@ -1472,7 +1471,6 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 
 
 
-	self:OnTextChanged()
 
 	if isredo then
 		self.Undo[#self.Undo + 1] = { { self:CopyPosition(start), self:CopyPosition(stop) }, buffer, after, before }
