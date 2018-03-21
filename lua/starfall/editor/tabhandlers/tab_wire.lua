@@ -1230,9 +1230,7 @@ function PANEL:Paint()
 	if self.MouseDown then
 		self.Caret = self:CursorToCaret()
 	end
-	if self.Caret[1] - self:GetRowOffset(self.Caret[1]) > self.VisibleRows then
-		self.Caret[1] = #self.Rows
-	end
+
 
 	surface_SetDrawColor(colors.gutter_background)
 	surface_DrawRect(0, 0, self.LineNumberWidth + 4, self:GetTall())
@@ -1254,7 +1252,6 @@ function PANEL:Paint()
 			break
 		end
 	end
-	local scrollDir =self.Scroll[1] - prevScroll
 	--self.Scroll[1] = self:GetRowOffset(self.Scroll[1])
 	local i = self.Scroll[1]
 	local drawn = 0
@@ -1267,25 +1264,14 @@ function PANEL:Paint()
 			offset = offset + 1
 			continue
 		end
-		--[=[
-		if drawn == 0 and offset > 0 then
-			if scrollDir > 0 then
-				self.Scroll[1] = self.Scroll[1]+offset
-			else
-				self.Scroll[1] = self.Scroll[1]-offset
-				while self.Rows[self.Scroll[1]][3] do
-					self.Scroll[1] = self.Scroll[1] - 1
-				end
-			end
-			self.ScrollBar:SetScroll(self.Scroll[1] - 1)
-		end]=]
+
 		self.RealLine[drawn] = i
 		self.RowOffset[i] = offset
 		self:PaintLine(i,drawn)
 		drawn = drawn + 1
 		i = i+1
 	end
-	prevScroll = self.Scroll[1]
+
 
 
 	-- Paint the overlay of the text (bracket highlighting and carret postition)
