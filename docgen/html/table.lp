@@ -1,12 +1,12 @@
 <?lua
-local fname = tab.name
+local tname = tab.name
 if tab.classlib then
-	fname = tab.classlib .. ":" .. tab.tname
+	tname = tab.classlib .. ":" .. tab.tname
 elseif tab.library then
-	fname = tab.library .. "." .. tab.tname
+	tname = tab.library .. "." .. tab.tname
 end
 ?>
-<dt><a name="<?lua=fname?>"></a><?lua=tname?></dt>
+<dt><a name="<?lua=tname?>"></a><?lua=tname?></dt>
 <dd>
 	<p><?lua=tab.description?></p>
 	<?lua if type(tab.field) == "table" and #tab.field > 0 then?>
