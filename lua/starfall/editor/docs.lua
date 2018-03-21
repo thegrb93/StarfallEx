@@ -1075,15 +1075,15 @@ Lua's xpcall with SF throw implementation \
 Attempts to call the first function.";};};["libtbl"]="SF.DefaultEnvironment";["name"]="builtin";["server"]=true;["summary"]="\
 Built in values.";["tables"]={[1]="bit";[2]="math";[3]="os";[4]="string";[5]="table";["bit"]={["class"]="table";["classForced"]=true;["description"]="\
 Bit library. http://wiki.garrysmod.com/page/Category:bit";["library"]="builtin";["name"]="SF.DefaultEnvironment.bit";["param"]={};["summary"]="\
-Bit library.";};["math"]={["class"]="table";["classForced"]=true;["description"]="\
+Bit library.";["tname"]="bit";};["math"]={["class"]="table";["classForced"]=true;["description"]="\
 The math library. http://wiki.garrysmod.com/page/Category:math";["library"]="builtin";["name"]="SF.DefaultEnvironment.math";["param"]={};["summary"]="\
-The math library.";};["os"]={["class"]="table";["classForced"]=true;["description"]="\
+The math library.";["tname"]="math";};["os"]={["class"]="table";["classForced"]=true;["description"]="\
 The os library. http://wiki.garrysmod.com/page/Category:os";["library"]="builtin";["name"]="SF.DefaultEnvironment.os";["param"]={};["summary"]="\
-The os library.";};["string"]={["class"]="table";["classForced"]=true;["description"]="\
+The os library.";["tname"]="os";};["string"]={["class"]="table";["classForced"]=true;["description"]="\
 String library http://wiki.garrysmod.com/page/Category:string";["library"]="builtin";["name"]="SF.DefaultEnvironment.string";["param"]={};["summary"]="\
-String library http://wiki.garrysmod.com/page/Category:string ";};["table"]={["class"]="table";["classForced"]=true;["description"]="\
+String library http://wiki.garrysmod.com/page/Category:string ";["tname"]="string";};["table"]={["class"]="table";["classForced"]=true;["description"]="\
 Table library. http://wiki.garrysmod.com/page/Category:table";["library"]="builtin";["name"]="SF.DefaultEnvironment.table";["param"]={};["summary"]="\
-Table library.";};};};["constraint"]={["class"]="library";["description"]="\
+Table library.";["tname"]="table";};};};["constraint"]={["class"]="library";["description"]="\
 Library for creating and manipulating constraints.";["fields"]={};["functions"]={[1]="axis";[10]="setElasticLength";[11]="setRopeLength";[12]="slider";[13]="weld";[2]="ballsocket";[3]="ballsocketadv";[4]="breakAll";[5]="breakType";[6]="elastic";[7]="getTable";[8]="nocollide";[9]="rope";["axis"]={["class"]="function";["description"]="\
 Axis two entities";["fname"]="axis";["library"]="constraint";["name"]="constraint_library.axis";["param"]={[1]="e1";[10]="nocollide";[11]="laxis";[2]="e2";[3]="bone1";[4]="bone2";[5]="v1";[6]="v2";[7]="force_lim";[8]="torque_lim";[9]="friction";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Axis two entities ";};["ballsocket"]={["class"]="function";["description"]="\
@@ -1685,4 +1685,4 @@ Returns the server's UUID.";};};["libtbl"]="wire_library";["name"]="wire";["summ
 Wire library.";["tables"]={[1]="ports";["ports"]={["class"]="table";["classForced"]=true;["description"]="\
 Ports table. Reads from this table will read from the wire input \
 of the same name. Writes will write to the wire output of the same name.";["library"]="wire";["name"]="wire_library.ports";["param"]={};["summary"]="\
-Ports table.";};};};};};
+Ports table.";["tname"]="ports";};};};};};
