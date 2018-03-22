@@ -1,15 +1,16 @@
--- Defaults taken from: https://github.com/Metastruct/gurl/
 --This file returns default StringRestrictor for URLs
 
+-------------
+-- Helpers --
+-------------
 local restrictor = SF.StringRestrictor(false)
 
 local function pattern(txt)
-	txt = "^"..txt
+	txt = "^"..txt.."$"
 	restrictor:addWhitelistEntry(txt)
 end
 local function simple(txt)
 	txt = "^"..string.PatternSafe(txt).."/.*"
-	print(txt)
 	restrictor:addWhitelistEntry(txt)
 end
 local function blacklist(txt)
@@ -17,9 +18,13 @@ local function blacklist(txt)
 	restrictor:addBlacklistEntry(txt)
 end
 local function blacklistpattern(txt)
-	txt = "^"..txt
+	txt = "^"..txt.."$"
 	restrictor:addBlacklistEntry(txt)
 end
+
+-----------------------------------------
+-- https://github.com/Metastruct/gurl/ --
+-----------------------------------------
 
 -- Dropbox
 --- Examples:
@@ -48,48 +53,11 @@ simple [[docs.google.com/uc]]
 
 simple [[i.imgur.com]]
 
-
--- Google
---- Examples:
----
-
-
--- box.com
---- Examples:
----
-
-
--- ImageShack
---- Examples:
----
-
-
--- Flickr
---- Examples:
----
-
-
 -- pastebin
 --- Examples:
 ---  http://pastebin.com/abcdef
 
 simple [[pastebin.com]]
-
--- Twitter?
---- Examples:
----
-
-
--- Copy
---- Examples:
----
-
-
--- S3
---- UNSAFE?: Can hoster see the IP?
---- Examples:
----
-
 
 -- github / gist
 --- Examples:
@@ -98,11 +66,6 @@ simple [[pastebin.com]]
 
 simple [[raw.githubusercontent.com]]
 simple [[gist.githubusercontent.com]]
-
--- bitbucket
---- Examples:
----
-
 
 -- pomf
 -- note: there are a lot of forks of pomf so there are tons of sites. I only listed the mainly used ones. --Flex
@@ -122,12 +85,10 @@ simple [[a.pomf.cat]]
 ---  http://i68.tinypic.com/24b3was.gif
 pattern [[i([%w-_]+)%.tinypic%.com/(.+)]]
 
-
 -- paste.ee
 --- Examples:
 ---  https://paste.ee/r/J3jle
 simple [[paste.ee]]
-
 
 -- hastebin
 --- Examples:
@@ -148,6 +109,23 @@ simple [[images.akamai.steamusercontent.com]]
 simple [[steamcdn-a.akamaihd.net]]
 blacklist [[steamcommunity.com/linkfilter]]
 
+
+-----------------
+-- End of GURL --
+-----------------
+
+--  Note:
+-- 	If you want to pullrequest additional rules add them below with name example and patterns
+
+--  Note 2:
+--  Patterns have ^ and $ forced, so don't add them and make sure your pattern matches whole url
+--  "Simple" entries musn't contain slash at the end but all subdomains have to be added as separate entries
+
+--  Note 3:
+--  Sites that you wish to add musn't allow tracking user in any way
+--  Those have to be trusted and have considerable userbase
+--  Don't pullrequest your own domains
+
 -- Discord
 --- Examples:
 ---  https://cdn.discordapp.com/attachments/269175189382758400/421572398689550338/unknown.png
@@ -155,5 +133,16 @@ blacklist [[steamcommunity.com/linkfilter]]
 
 pattern [[cdn[%w-_]*.discordapp%.com/(.+)]]
 pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
+
+-- Reddit
+--- Examples:
+---  https://i.redd.it/u46wumt13an01.jpg
+---  https://i.redditmedia.com/RowF7of6hQJAdnJPfgsA-o7ioo_uUzhwX96bPmnLo0I.jpg?w=320&s=116b72a949b6e4b8ac6c42487ffb9ad2
+
+simple [[i.redditmedia.com]]
+simple [[i.redd.it]]
+
+
+---------------------
 
 return restrictor
