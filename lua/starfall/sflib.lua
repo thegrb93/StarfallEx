@@ -351,33 +351,6 @@ function SF.NormalizePath(path)
 	return table.concat(tbl, "/")
 end
 
-
---- Returns a class that can keep track of burst
-function SF.BurstObject(rate, max)
-	local burstclass = {
-		use = function(self, amount)
-			self:check()
-			if self.val>= amount then
-				self.val = self.val - amount
-				return true
-			end
-			return false
-		end,
-		check = function(self)
-			self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
-			self.lasttick = CurTime()
-			return self.val
-		end
-	}
-	local t = {
-		rate = rate,
-		max = max,
-		val = max,
-		lasttick = 0
-	}
-	return setmetatable(t, { __index = burstclass })
-end
-
 --- Sanitizes and returns its argument list.
 -- Basic types are returned unchanged. Non-object tables will be
 -- recursed into and their keys and values will be sanitized. Object
@@ -435,36 +408,66 @@ function SF.Unsanitize(...)
 	return unpack(return_list)
 end
 
+--- Returns a class that can keep track of burst
+SF.BurstObject = {
+	use = function(self, amount)
+		self:check()
+		if self.val>= amount then
+			self.val = self.val - amount
+			return true
+		end
+		return false
+	end,
+	check = function(self)
+		self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
+		self.lasttick = CurTime()
+		return self.val
+	end,
+	__call = function(p, rate, max)
+		local t = {
+			rate = rate,
+			max = max,
+			val = max,
+			lasttick = 0
+		}
+		return setmetatable(t, p)
+	end
+}
+SF.BurstObject.__index = SF.BurstObject
+setmetatable(SF.BurstObject, SF.BurstObject)
+
 --- Returns a class that can whitelist/blacklist strings
-function SF.StringRestrictor(allowbydefault)
-	local class = {
-		check = function(self, value)
-			for k,v in pairs(self.blacklist) do
-				if string.match(value, v) then
-					return false
-				end
+SF.StringRestrictor = {
+	check = function(self, value)
+		for k,v in pairs(self.blacklist) do
+			if string.match(value, v) then
+				return false
 			end
-			for k,v in pairs(self.whitelist) do
-				if string.match(value, v) then
-					return  true
-				end
+		end
+		for k,v in pairs(self.whitelist) do
+			if string.match(value, v) then
+				return  true
 			end
-			return self.default
-		end,
-		addWhitelistEntry = function(self, value)
-			table.insert(self.whitelist, value)
-		end,
-		addBlacklistEntry = function(self, value)
-			table.insert(self.blacklist, value)
-		end,
-	}
-	local t = {
-		whitelist = {}, -- patterns
-		blacklist = {}, -- patterns
-		default = allowbydefault or false,
-	}
-	return setmetatable(t, { __index = class })
+		end
+		return self.default
+	end,
+	addWhitelistEntry = function(self, value)
+		table.insert(self.whitelist, value)
+	end,
+	addBlacklistEntry = function(self, value)
+		table.insert(self.blacklist, value)
+	end,
+	__call = function(p, allowbydefault)
+		local t = {
+			whitelist = {}, -- patterns
+			blacklist = {}, -- patterns
+			default = allowbydefault or false,
+		}
+		return setmetatable(t, p)
+	end
 end
+SF.StringRestrictor.__index = SF.StringRestrictor
+setmetatable(SF.StringRestrictor, SF.StringRestrictor)
 
 -- ------------------------------------------------------------------------- --
 
