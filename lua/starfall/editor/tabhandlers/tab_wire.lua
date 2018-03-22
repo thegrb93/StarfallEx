@@ -71,6 +71,7 @@ TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "
 TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollmultiplier", 1, true, false)
 TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
 TabHandler.AutoValidateConVar = CreateClientConVar("sf_editor_wire_validateontextchange", "0", true, false)
+TabHandler.CacheDebug = CreateClientConVar("sf_editor_wire_cachedebug", "0", true, false)
 ---------------------
 -- Colors
 ---------------------
@@ -912,8 +913,10 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 			end
 			newrow = newrow + 1
 		end
-		surface_SetDrawColor(Color(255,0,0))
-		surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
+		if TabHandler.CacheDebug:GetBool() then
+			surface_SetDrawColor(Color(255,0,0))
+			surface_DrawRect(startX, startY, self:GetWide() - (self.LineNumberWidth + 5), height)
+		end
 	end
 	local cells = self:GetRowCache(row)
 
