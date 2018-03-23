@@ -221,7 +221,7 @@ function EDITOR:SyntaxColorLine(row)
 	local highlightmode = nil
 
 	if self.blockcomment then -- Closing block comments
-		if self:NextPattern(".-%]%]") then
+		if self:NextPattern(".-%]"..string.rep('=',self.blockcomment).."%]") then
 			self.blockcomment = nil
 		else
 			self:NextPattern(".*")
@@ -230,7 +230,7 @@ function EDITOR:SyntaxColorLine(row)
 		addToken("comment", self.tokendata)
 	elseif self.multilinestring then
 		while self.character do -- Find the ending ]]
-			if self:NextPattern(".-%]%]") then
+			if self:NextPattern(".-%]"..string.rep('=',self.multilinestring).."%]") then
 				self.multilinestring = nil
 				self:NextCharacter()
 				break
@@ -498,10 +498,11 @@ function EDITOR:SyntaxColorLine(row)
 				self.tokendata = ""
 			end
 
-		elseif self:NextPattern("%[%[") then -- Multiline strings
+		elseif self:NextPattern("%[=*%[") then -- Multiline strings
+			local reps = #self.tokendata:match("%[(=*)%[")
 			self:NextCharacter()
 			while self.character do -- Find the ending ]] if it isnt really multline(who does that?! Shame on you!)
-				if self:NextPattern("%]%]") then
+				if self:NextPattern("%]"..string.rep("=",reps).."%]") then
 					tokenname = "string"
 					break
 				end
@@ -510,7 +511,7 @@ function EDITOR:SyntaxColorLine(row)
 			end
 
 			if tokenname == "" then -- If no ending ]] was found...
-				self.multilinestring = true
+				self.multilinestring = reps
 				tokenname = "string"
 			else
 				self:NextCharacter()
@@ -550,26 +551,26 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
 
-			if self.character == "[" and self:NextPattern("%[%[") then -- Check if there is a [[ directly after the --
-				while self.character do -- Find the ending ]
-					if self.character == "]" then
-						self:NextCharacter()
-						if self.character == "]" then -- Check if ] is double
-							tokenname = "comment"
-							break
-						end
+			if self:NextPattern("%[=*%[") then -- Multiline strings
+				local reps = #self.tokendata:match("%[(=*)%[")
+				self:NextCharacter()
+				while self.character do -- Find the ending ]] if it isnt really multline(who does that?! Shame on you!)
+					if self:NextPattern("%]"..string.rep("=",reps).."%]") then
+						tokenname = "string"
+						break
 					end
 					if self.character == "\\" then self:NextCharacter() end
 					self:NextCharacter()
 				end
+
 				if tokenname == "" then -- If no ending ]] was found...
-					self.blockcomment = true
-					tokenname = "comment"
+					self.blockcomment = reps
+					tokenname = "string"
 				else
 					self:NextCharacter()
 				end
+				--"string"
 			end
-
 			if tokenname == "" then
 				tokenname = "comment"
 				self:NextPattern("[^@]*") -- Skip everything BEFORE @
