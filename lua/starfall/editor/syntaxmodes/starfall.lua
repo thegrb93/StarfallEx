@@ -551,12 +551,12 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
 
-			if self:NextPattern("%[=*%[") then -- Multiline strings
+			if self:NextPattern("%[=*%[") then -- Block comment
 				local reps = #self.tokendata:match("%[(=*)%[")
 				self:NextCharacter()
-				while self.character do -- Find the ending ]] if it isnt really multline(who does that?! Shame on you!)
+				while self.character do
 					if self:NextPattern("%]"..string.rep("=",reps).."%]") then
-						tokenname = "string"
+						tokenname = "comment"
 						break
 					end
 					if self.character == "\\" then self:NextCharacter() end
@@ -565,7 +565,7 @@ function EDITOR:SyntaxColorLine(row)
 
 				if tokenname == "" then -- If no ending ]] was found...
 					self.blockcomment = reps
-					tokenname = "string"
+					tokenname = "comment"
 				else
 					self:NextCharacter()
 				end
