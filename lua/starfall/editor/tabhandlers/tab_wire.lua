@@ -1074,22 +1074,6 @@ end
 function PANEL:ClearHighlightedAreas() self.HighlightedAreas = nil end
 
 
-local BracketPairs = {
-	["{"] = {Removes = {["}"]=true}, Adds = {["{"]=true}},
-	["["] = {Removes = {["]"]=true}, Adds = {["["]=true}},
-	["("] = {Removes = {[")"]=true}, Adds = {["("]=true}},
-	["then"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["function"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["else"] = {Adds = {["function"]=true,["then"]=true, ["else"]=true}, Removes = {["end"]=true,["elseif"]=true}},
-}
-local BracketPairs2 = {
-	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
-	["]"] = {Adds = {["]"]=true}, Removes = {["["]=true}},
-	[")"] = {Adds = {[")"]=true}, Removes = {["("]=true}},
-	["end"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
-	["elseif"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
-
-}
 function PANEL:PaintTextOverlay()
 
 	if self.TextEntry:HasFocus() and self.Caret[2] - self.Scroll[2] >= 0 then
@@ -1137,101 +1121,8 @@ function PANEL:PaintTextOverlay()
 				end
 			end
 		end
-
-		local bracket,bracketindex = self:GetTokenAtPosition(self.Caret)
-		if bracket then
-			bracket = bracket[1]
-		end
-
-		if bracket and BracketPairs[bracket] or BracketPairs2[bracket] then
-			local sum = 0
-			local startPos = bracketindex
-			local line = self.Caret[1]
-			local x, y
-			local cBracketPos = 0
-			local bracketLength = #bracket
-			local tokens = self:GetRowCache(line)
-			local length = 0
-			if BracketPairs[bracket] then
-				local lookup = BracketPairs
-				while line < lines and not y do
-					tokens = self:GetRowCache(line)
-					if not tokens then break end
-					x = 0
-					for I = 1, #tokens do
-						local text = tokens[I][1]
-						if I < startPos then
-							x = x + #text
-							cBracketPos = x
-							continue
-						end
-						if lookup[bracket].Adds[text] then
-							sum = sum + 1
-						elseif lookup[bracket].Removes[text] then
-							sum = sum - 1
-						end
-						if sum < 0 then return end
-						if sum == 0 then
-							y = line
-							x = x + 1
-							length = #text
-							break
-						end
-						x = x + #text
-					end
-					startPos = 1
-					line = line + 1
-				end
-			else--Reverse search
-				local lookup = BracketPairs2
-				startPos = bracketindex
-				line = self.Caret[1]
-				tokens = self:GetRowCache(line)
-				while line > 0 and not y do
-					x = 0
-					for I = #tokens, 1, -1 do
-						local text = tokens[I][1]
-						if I > startPos then
-							x = x + #text
-							cBracketPos = x
-							continue
-						end
-						if text == "else" then
-							text = "then"
-						end
-						if lookup[bracket].Adds[text] then
-							sum = sum + 1
-						elseif lookup[bracket].Removes[text] then
-							sum = sum - 1
-						end
-						if sum == 0 then
-							y = line
-							length = #text
-							x = #self:GetRowText(line) - x - length + 1
-							cBracketPos = #self:GetRowText(self.Caret[1]) - cBracketPos - bracketLength
-							break
-						end
-						x = x + #text
-					end
-					line = line - 1
-					if line < 1 then break end
-					tokens = self:GetRowCache(line)
-					if not tokens then break end
-					startPos = #tokens
-				end
-			end
-			y2 = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
-			if x and y then
-				if not self.Rows[y][3] then
-					surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
-					surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y - self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
-				end
-				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
-				surface_DrawRect((cBracketPos-self.Scroll[2] +1) * width + self.LineNumberWidth + self.FontWidth - 1, (self.Caret[1] - self:GetRowOffset(self.Caret[1]) -self.Scroll[1]) * height + 1, bracketLength*width-2, height-2)
-
-			end
-		end
 	end
+	self:DoAction("PaintTextOverlay")
 end
 local prevScroll = 1
 function PANEL:Paint()
