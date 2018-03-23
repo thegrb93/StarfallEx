@@ -408,7 +408,7 @@ function Editor:UpdateTabText(tab, title)
 	tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
-	if not ed:IsSaved() then
+	if not ed:IsSaved() and tabtext:sub(-1) != "*" then
 		tabtext = tabtext.." *"
 	end
 
@@ -581,6 +581,9 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 		self:SetActiveTab(pnl)
 	end
 	if content.GetTabHandler().IsEditor then
+		content.OnTextChanged = function()
+			self:UpdateTabText(sheet.Tab)
+		end
 		content.OnShortcut = function(_, code)
 			if code == KEY_S then
 				self:SaveFile(self:GetChosenFile())

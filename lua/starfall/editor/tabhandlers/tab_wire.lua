@@ -1249,7 +1249,7 @@ function PANEL:MovePosition(caret, offset)
 	elseif offset < 0 then
 		offset = -offset
 
-		while true and row > 1 do
+		while true and row >= 1 do
 			if self.Rows[row][3] then
 				offset = offset - col
 				row = row - 1
@@ -1362,10 +1362,6 @@ function PANEL:SetArea(selection, text, isundo, isredo, before, after)
 	self:SetRowText(stop[1],self:GetRowText(stop[1]) .. remainder)
 	self:RecacheLine(stop[1])
 
-
-
-
-
 	if isredo then
 		self.Undo[#self.Undo + 1] = { { self:CopyPosition(start), self:CopyPosition(stop) }, buffer, after, before }
 		return before
@@ -1433,8 +1429,8 @@ function PANEL:_OnTextChanged()
 			return
 		end
 	end
-
 	self:SetSelection(text)
+	if self.OnTextChanged then self:OnTextChanged() end
 end
 
 function PANEL:OnMouseWheeled(delta)
@@ -2089,6 +2085,7 @@ function PANEL:DoUndo()
 		self.Undo[#self.Undo] = nil
 
 		self:SetCaret(self:SetArea(undo[1], undo[2], true, false, undo[3], undo[4]), false)
+		if self.OnTextChanged then self:OnTextChanged() end
 	end
 end
 
@@ -2102,6 +2099,7 @@ function PANEL:DoRedo()
 		self.Redo[#self.Redo] = nil
 
 		self:SetCaret(self:SetArea(redo[1], redo[2], false, true, redo[3], redo[4]), false)
+		if self.OnTextChanged then self:OnTextChanged() end
 	end
 end
 
@@ -2387,6 +2385,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			local diff = (row:find("%S") or (row:len() + 1))-1
 			local tabs = string_rep("    ", math_floor(diff / 4))
 			self:SetSelection("\n" .. tabs)
+			if self.OnTextChanged then self:OnTextChanged() end
 		elseif code == KEY_UP then
 			if self.Caret[1] <= 1 then return end
 			self.Caret[1] = self.Caret[1] - 1
@@ -2444,6 +2443,7 @@ function PANEL:_OnKeyCodeTyped(code)
 					delta = -4
 				end
 				self:SetCaret(self:SetArea({ self.Caret, self:MovePosition(self.Caret, delta) }))
+				if self.OnTextChanged then self:OnTextChanged() end
 			end
 		elseif code == KEY_DELETE then
 			if self:HasSelection() then
@@ -2455,6 +2455,7 @@ function PANEL:_OnKeyCodeTyped(code)
 					delta = 4
 				end
 				self:SetCaret(self:SetArea({ self.Caret, self:MovePosition(self.Caret, delta) }))
+				if self.OnTextChanged then self:OnTextChanged() end
 			end
 		elseif code == KEY_F1 then
 			self:ContextHelp()
