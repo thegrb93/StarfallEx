@@ -58,7 +58,7 @@ window.addEventListener('load', function () {
 
 					functionsHtml +=
 						'<li><span class="realm_' + realm +
-						'">&nbsp;</span><a href="' + fromPath + 'libraries/' + library + '.html#' + funcTable.name + '">' +
+						'">&nbsp;</span><a href="' + fromPath + 'libraries/' + library + '.html#' + library + '.' + (funcTable.fname||funcTable.name) + '">' +
 						(library == "builtin" ? "" : library + '.') + name + '</a></li>';
 				}
 			}
