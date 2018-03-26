@@ -1521,8 +1521,8 @@ Reads the color of the specified pixel.";};["selectRenderTarget"]={["class"]="fu
 Selects the render target to draw on. \
 Nil for the visible RT.";["fname"]="selectRenderTarget";["library"]="render";["name"]="render_library.selectRenderTarget";["param"]={[1]="name";["name"]="Name of the render target to use";};["private"]=false;["realm"]="cl";["summary"]="\
 Selects the render target to draw on.";};["setBackgroundColor"]={["class"]="function";["description"]="\
-Sets the draw color";["fname"]="setBackgroundColor";["library"]="render";["name"]="render_library.setBackgroundColor";["param"]={[1]="col";[2]="screen";["col"]="Color of background";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets the draw color ";};["setColor"]={["class"]="function";["description"]="\
+Sets background color of screen";["fname"]="setBackgroundColor";["library"]="render";["name"]="render_library.setBackgroundColor";["param"]={[1]="col";[2]="screen";["col"]="Color of background";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets background color of screen ";};["setColor"]={["class"]="function";["description"]="\
 Sets the draw color";["fname"]="setColor";["library"]="render";["name"]="render_library.setColor";["param"]={[1]="clr";["clr"]="Color type";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the draw color ";};["setCullMode"]={["class"]="function";["description"]="\
 Changes the cull mode";["fname"]="setCullMode";["library"]="render";["name"]="render_library.setCullMode";["param"]={[1]="mode";["mode"]="Cull mode. 0 for counter clock wise, 1 for clock wise";};["private"]=false;["realm"]="cl";["summary"]="\
