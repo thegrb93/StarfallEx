@@ -199,7 +199,7 @@ Creates/Modifies wire inputs.</td>
 Creates/Modifies wire outputs.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#wire.create">create</a>( entI, entO, inputname, outputname&nbsp;)</td>
+			<td class="name"><span class="realm_sv"></span><a href="#wire.create">create</a>( entI, entO, inputname, outputname, width, color, material&nbsp;)</td>
 			<td class="summary">
 Wires two entities together </td>
 		</tr>
@@ -296,7 +296,7 @@ letter and contain only alphabetical characters.</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="wire.create"></a><strong>wire.create</strong>( entI, entO, inputname, outputname&nbsp;)</dt>
+<dt><span class="realm_sv"></span><a name="wire.create"></a><strong>wire.create</strong>( entI, entO, inputname, outputname, width, color, material&nbsp;)</dt>
 <dd>
 	<p>
 Wires two entities together</p>
@@ -310,6 +310,9 @@ Wires two entities together</p>
 			<li><tt>entO</tt> ― Entity with output</li>
 			<li><tt>inputname</tt> ― Input to be wired</li>
 			<li><tt>outputname</tt> ― Output to be wired</li>
+			<li><tt>width</tt> ― Width of the wire(optional)</li>
+			<li><tt>color</tt> ― Color of the wire(optional)</li>
+			<li><tt>material</tt> ― Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2</li>
 		</ul>
 	</section>
 	
