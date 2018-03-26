@@ -56,7 +56,7 @@ local ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-
+local COLOR_WHITE = Color(255, 255, 255)
 -- Register privileges
 do
 	local P = SF.Permissions
@@ -333,13 +333,12 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 	
-	local width = width or 0
-	checkluatype(width, TYPE_NUMBER, 0, 0)
+	width = checkluatype(width, TYPE_NUMBER, 0, 0)
 	width = math.Clamp(width, 0, 5)
 	
-	checktype(color, SF.Types['Color'], 0, SF.Color.Wrap(Color(255, 255, 255)))
+	color = checktype(color, SF.Types['Color'], 0,  COLOR_WHITE)
 
-	local material = ValidWireMat[material] and material or "cable/rope"
+	material = ValidWireMat[material] and material or "cable/rope"
 	
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
