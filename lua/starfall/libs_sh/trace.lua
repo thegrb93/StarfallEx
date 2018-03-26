@@ -305,7 +305,7 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 	else
 		filter = convertFilter(checkluatype (filter, TYPE_TABLE, 0, {}))
 	end
-	if mask ~= nil then mask = checkluatype (mask, TYPE_NUMBER) end
+	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 

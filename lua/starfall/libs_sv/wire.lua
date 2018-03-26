@@ -332,14 +332,16 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	checktype(entO, SF.Types["Entity"])
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
-	
-	width = checkluatype(width, TYPE_NUMBER, 0, 0)
+
+	with = width or 0
+	checkluatype(width, TYPE_NUMBER, 0)
 	width = math.Clamp(width, 0, 5)
-	
-	color = checktype(color, SF.Types['Color'], 0,  COLOR_WHITE)
+
+	color = color or COLOR_WHITE
+	checktype(color, SF.Types['Color'])
 
 	material = ValidWireMat[material] and material or "cable/rope"
-	
+
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
 

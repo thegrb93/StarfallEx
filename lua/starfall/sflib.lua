@@ -138,13 +138,10 @@ end
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
--- @param default A value to return if val is nil.
-function SF.CheckType(val, typ, level, default)
+function SF.CheckType(val, typ, level)
 	local meta = dgetmeta(val)
 	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) then
 		return val
-	elseif val == nil and default then
-		return default
 	else
 		-- Failed, throw error
 		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
@@ -160,13 +157,10 @@ end
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
--- @param default A value to return if val is nil.
-function SF.CheckLuaType(val, typ, level, default)
+function SF.CheckLuaType(val, typ, level)
 	local valtype = TypeID(val)
 	if valtype == typ then
 		return val
-	elseif val == nil and default then
-		return default
 	else
 		-- Failed, throw error
 		assert(type(typ) == "number")
