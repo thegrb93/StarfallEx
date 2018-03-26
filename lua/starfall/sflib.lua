@@ -167,8 +167,9 @@ function SF.CheckLuaType(val, typ, level, default)
 	if val == nil and default != nil then
 		return default
 	end
+
 	local valtype = TypeID(val)
-	if valtype==typ then
+	if valtype == typ then
 		return val
 	else
 		-- Failed, throw error
