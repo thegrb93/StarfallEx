@@ -2421,7 +2421,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			self.Scroll[1] = self.Scroll[1] + math_ceil(self.Size[1] / 2)
 			self:SetCaret(self.Caret)
 		elseif code == KEY_HOME then
-			local row = self.Rows[self.Caret[1]]
+			local row = self.Rows[self.Caret[1]][1]
 			local first_char = row:find("%S") or row:len() + 1
 			if self.Caret[2] == first_char then
 				self.Caret[2] = 1
@@ -2430,7 +2430,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_END then
-			local length = #(self.Rows[self.Caret[1]])
+			local length = #(self.Rows[self.Caret[1]][1])
 			self.Caret[2] = length + 1
 			self:SetCaret(self.Caret)
 		elseif code == KEY_BACKSPACE then
