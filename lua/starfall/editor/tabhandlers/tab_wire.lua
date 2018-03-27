@@ -45,7 +45,7 @@ local TabHandler = {
 	IsEditor = true,
 	Description = "Wire-based editor"
 }
-TabHandler.Modes.Text = { SyntaxColorLine = function(self, row) return { { self.Rows[row], { Color(255, 255, 255, 255), false } } } end }
+TabHandler.Modes.Text = { SyntaxColorLine = function(self, row) return { { self.Rows[row][1], { Color(255, 255, 255, 255), false } } } end }
 ---------------------
 -- Fonts
 ---------------------
@@ -159,6 +159,7 @@ function TabHandler:RegisterTabMenu(menu, content)
 		local mode = v
 		coloring:AddOption(k, function()
 			content.CurrentMode = mode
+			content:OnThemeChange(SF.Editor.Themes.CurrentTheme) -- It recaches everything
 		end)
 	end
 end
@@ -456,7 +457,7 @@ end
 
 function PANEL:OnThemeChange()
 	colors = SF.Editor.Themes.CurrentTheme
-	self.CurrentMode:LoadSyntaxColors()
+	self:DoAction("LoadSyntaxColors")
 	for k,v in ipairs(self.Rows) do
 		v[2] = false
 	end
