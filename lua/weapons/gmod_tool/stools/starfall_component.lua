@@ -8,6 +8,7 @@ TOOL.Tab			= "Wire"
 -- ------------------------------- Sending / Receiving ------------------------------- --
 
 TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
+TOOL.ClientConVar["ModelHUD"] = "models/bull/dynamicbutton.mdl"
 TOOL.ClientConVar["Type"] = 1
 cleanup.Register("starfall_components")
 
@@ -36,7 +37,7 @@ if SERVER then
 	end, "Pos", "Ang", "Model")
 	
 	duplicator.RegisterEntityClass("starfall_hud", function(...)
-		return MakeComponent("starfall_hud", select(1, ...), select(2, ...), select(3, ...), "models/bull/dynamicbutton.mdl") 
+		return MakeComponent("starfall_hud", ...) 
 	end, "Pos", "Ang", "Model")
 	
 else
@@ -97,8 +98,8 @@ function TOOL:LeftClick(trace)
 		return true
 		
 	elseif component_type == "2" then
-
-		local sf = MakeComponent("starfall_hud", ply, Vector(), Ang, "models/bull/dynamicbutton.mdl")
+		local model = self:GetClientInfo("ModelHUD")
+		local sf = MakeComponent("starfall_hud", ply, Vector(), Ang, model)
 		if not sf then return false end
 
 		local min = sf:OBBMins()
