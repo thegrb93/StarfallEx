@@ -2498,29 +2498,29 @@ function PANEL:_OnKeyCodeTyped(code)
 	return handled
 end
 
-
+local wordPatternGroup = "%w@_"
 -- helpers for ctrl-left/right
 function PANEL:wordLeft(caret)
-	local row = self.Rows[caret[1]]
+	local row = self:GetRowText(caret[1])
 	if caret[2] == 1 then
 		if caret[1] == 1 then return caret end
-		caret = { caret[1]-1, #self.Rows[caret[1]-1] }
-		row = self.Rows[caret[1]]
+		caret = { caret[1]-1, #self:GetRowText(caret[1]-1) }
+		row = self:GetRowText(caret[1])
 	end
-	local pos = row:sub(1, caret[2]-1):match("[^%w@]()[%w@]+[^%w@]*$")
+	local pos = row:sub(1, caret[2]-1):match("[^"..wordPatternGroup.."]()["..wordPatternGroup.."]+[^"..wordPatternGroup.."]*$")
 	caret[2] = pos or 1
 	return caret
 end
 
 function PANEL:wordRight(caret)
-	local row = self.Rows[caret[1]]
+	local row = self:GetRowText(caret[1])
 	if caret[2] > #row then
 		if caret[1] == #self.Rows then return caret end
 		caret = { caret[1] + 1, 1 }
-		row = self.Rows[caret[1]]
+		row = self:GetRowText(caret[1])
 		if row:sub(1, 1) ~= " " then return caret end
 	end
-	local pos = row:match("[^%w@]()[%w@]", caret[2])
+	local pos = row:match("[^"..wordPatternGroup.."]()["..wordPatternGroup.."]", caret[2])
 	caret[2] = pos or (#row + 1)
 	return caret
 end
