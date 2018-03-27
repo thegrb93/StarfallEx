@@ -1204,6 +1204,16 @@ function Editor:CreateThemesPanel()
 		addBtn:SetWidth(btnPanel:GetWide() / 2)
 	end
 
+	local label = vgui.Create("DLabel")
+	panel:AddItem(label)
+	label:DockMargin(0, 0, 0, 0)
+	label:SetFont("SFTitle")
+	label:SetColor(Color(255,32,32))
+	label:SetText("If your theme doenst work or looks different than it should you can report it by clicking on this text.")
+	label:SetWrap(true)
+	label.DoClick = function()
+		gui.OpenURL( "https://github.com/thegrb93/StarfallEx/issues/307" )
+	end
 	return panel
 end
 
