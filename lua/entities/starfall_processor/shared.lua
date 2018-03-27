@@ -110,9 +110,9 @@ end
 
 local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	local ent = Entity
-	if Entity:GetClass() == 'starfall_screen' or Entity:GetClass() == "starfall_hud" then 
+	if Entity:GetClass() == 'starfall_screen' or Entity:GetClass() == "starfall_hud" then
 		if not ent.link then return end
-		ent = ent.link 
+		ent = ent.link
 	end
 	local SubMenu = Option:AddSubMenu()
 	SubMenu:AddOption("Restart Clientside", function ()

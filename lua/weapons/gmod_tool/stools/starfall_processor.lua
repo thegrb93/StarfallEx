@@ -14,7 +14,7 @@ cleanup.Register("starfall_processor")
 
 if SERVER then
 	CreateConVar('sbox_maxstarfall_processor', 20, { FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_ARCHIVE })
-	
+
 	function MakeSF(pl, Pos, Ang, model, inputs, outputs)
 		if not pl:CheckLimit("starfall_processor") then return false end
 
@@ -25,14 +25,14 @@ if SERVER then
 		sf:SetPos(Pos)
 		sf:SetModel(model)
 		sf:Spawn()
-		
+
 		if WireLib and inputs and inputs[1] and inputs[2] then
 			sf.Inputs = WireLib.AdjustSpecialInputs(sf, inputs[1], inputs[2])
 		end
 		if WireLib and outputs and outputs[1] and outputs[2] then
 			sf.Outputs = WireLib.AdjustSpecialOutputs(sf, outputs[1], outputs[2])
 		end
-		
+
 		pl:AddCount("starfall_processor", sf)
 		pl:AddCleanup("starfall_processor", sf)
 
@@ -59,7 +59,7 @@ function TOOL:LeftClick(trace)
 
 	local ent = trace.Entity
 	local sf
-	
+
 	local function doWeld()
 		if sf==ent then return end
 		local phys = sf:GetPhysicsObject()
@@ -71,7 +71,7 @@ function TOOL:LeftClick(trace)
 			if phys:IsValid() then phys:EnableMotion(false) end
 		end
 	end
-	
+
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 	else
@@ -94,7 +94,7 @@ function TOOL:LeftClick(trace)
 			undo.SetPlayer(ply)
 		undo.Finish()
 	end
-	
+
 	if not SF.RequestCode(ply, function(mainfile, files)
 		if not mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
@@ -117,11 +117,11 @@ function TOOL:LeftClick(trace)
 end
 
 function TOOL:RightClick(trace)
-	if SERVER then 
-	
+	if SERVER then
+
 		local ply = self:GetOwner()
 		local ent = trace.Entity
-		
+
 		net.Start("starfall_openeditor")
 		if IsValid(ent) and ent:GetClass() == "starfall_processor" then
 			net.WriteEntity(ent)
@@ -129,9 +129,9 @@ function TOOL:RightClick(trace)
 			net.WriteEntity(nil)
 		end
 		net.Send(ply)
-		
+
 	end
-	
+
 	return false
 end
 
@@ -155,7 +155,7 @@ function TOOL:Think()
 	local trace = util.TraceLine(util.GetPlayerTrace(self:GetOwner()))
 	if (not trace.Hit) then return end
 	local ent = self.GhostEntity
-	
+
 	if not IsValid(ent) then return end
 	if (trace.Entity and trace.Entity:GetClass() == "starfall_processor" or trace.Entity:IsPlayer()) then
 
@@ -178,17 +178,17 @@ end
 if CLIENT then
 
 	local lastclick = CurTime()
-	
+
 	local function GotoDocs(button)
 		gui.OpenURL(SF.Editor.HelperURL:GetString())
 	end
-	
+
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_processor.name", Description = "#Tool.starfall_processor.desc" })
-		
+
 		local gateModels = list.Get("Starfall_gate_Models")
 		table.Merge(gateModels, list.Get("Wire_gate_Models"))
-		
+
 		local modelPanel = vgui.Create("DPanelSelect", panel)
 		modelPanel:EnableVerticalScrollbar()
 		modelPanel:SetTall(66 * 5 + 2)
@@ -203,7 +203,7 @@ if CLIENT then
 		modelPanel:SortByMember("Model", false)
 		panel:AddPanel(modelPanel)
 		panel:AddControl("Label", { Text = "" })
-		
+
 		local docbutton = vgui.Create("DButton" , panel)
 		panel:AddPanel(docbutton)
 		docbutton:SetText("Starfall Documentation")
@@ -213,7 +213,7 @@ if CLIENT then
 		panel:AddPanel(filebrowser)
 		filebrowser.tree:Setup("starfall")
 		filebrowser:SetSize(235, 400)
-		
+
 		local lastClick = 0
 		filebrowser.tree.DoClick = function(self, node)
 			if CurTime() <= lastClick + 0.5 then
@@ -221,18 +221,18 @@ if CLIENT then
 			end
 			lastClick = CurTime()
 		end
-		
+
 		local openeditor = vgui.Create("DButton", panel)
 		panel:AddPanel(openeditor)
 		openeditor:SetText("Open Editor")
 		openeditor.DoClick = SF.Editor.open
 	end
-	
+
 	local function hookfunc(ply, bind, pressed)
 		if not pressed then return end
 
 		local activeWep = ply:GetActiveWeapon()
-		
+
 		if bind == "impulse 100" and ply:KeyDown(IN_SPEED) and IsValid(activeWep) and activeWep:GetClass() == "gmod_tool" then
 			if activeWep.Mode == "starfall_processor" then
 				spawnmenu.ActivateTool("starfall_component")
@@ -243,7 +243,7 @@ if CLIENT then
 			end
 		end
 	end
-	
+
 	if game.SinglePlayer() then -- wtfgarry (have to have a delay in single player or the hook won't get added)
 		timer.Simple(5, function() hook.Add("PlayerBindPress", "sf_toolswitch", hookfunc) end)
 	else
