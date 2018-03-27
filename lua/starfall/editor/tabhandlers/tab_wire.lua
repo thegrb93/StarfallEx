@@ -101,7 +101,7 @@ function TabHandler:GetSyntaxColor(name)
 end
 
 ---------------------
-local libswithmethods = { -- those aren't present in docs
+local libsworkingastypes = { -- those aren't present in docs
 	["string"] = true,
 	["table"] = true,
 }
@@ -133,7 +133,7 @@ local function createWireLibraryMap () -- Hashtable
 		libMap[lib] = {}
 		for name, val in pairs(tbl) do
 			libMap[lib][name] = type(val)
-			if libswithmethods[lib] then
+			if libsworkingastypes[lib] then
 				libMap["Methods"][name] = true
 			end
 		end
