@@ -507,7 +507,6 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	end
 	local _old = sheet.Tab.OnMousePressed
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
-		_old(pnl, keycode, ...)
 		if keycode == MOUSE_MIDDLE then
 			--self:FixTabFadeTime()
 			self:CloseTab(pnl)
@@ -576,7 +575,9 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 			if th.RegisterTabMenu then
 				th:RegisterTabMenu(menu, content)
 			end
+			return
 		end
+		_old(pnl, keycode, ...)
 
 		self:SetActiveTab(pnl)
 	end
