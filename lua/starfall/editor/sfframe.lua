@@ -28,6 +28,29 @@ local function Derma_StringRequestNoBlur(...)
 	return ret
 end
 
+local function Derma_QueryNoBlur(...)
+	local f = math.max
+
+	function math.max(...)
+		local ret = f(...)
+
+		for i = 1,20 do
+			local name, value = debug.getlocal(2, i)
+			if name == "Window" then
+				value:SetBackgroundBlur( false )
+				break
+			end
+		end
+
+		return ret
+	end
+	local ok, ret = xpcall(Derma_Query, debug.traceback, ...)
+	math.max = f
+
+	if not ok then error(ret, 0) end
+	return ret
+end
+
 local Editor = {}
 
 local function GetTabHandler(name)
@@ -652,7 +675,7 @@ function Editor:CloseTab(_tab,dontask)
 	local ed = activetab:GetPanel()
 	if not ed:IsSaved() and not dontask and not ed.IsOnline then
 		local question = string.format("Do you want to close %q ?", activetab:GetText())
-		Derma_Query(question, "Are you sure?", "Close", function() self:CloseTab(activetab, true) end, "Cancel", function() end)
+		Derma_QueryNoBlur(question, "Are you sure?", "Close", function() self:CloseTab(activetab, true) end, "Cancel", function() end)
 		return
 	end
 
@@ -1121,7 +1144,7 @@ function Editor:CreateThemesPanel()
 		local menu = DermaMenu()
 
 		menu:AddOption("From URL", function()
-			Derma_StringRequest("Load theme from URL", "Paste the URL to a TextMate theme to the text box",
+			Derma_StringRequestNoBlur("Load theme from URL", "Paste the URL to a TextMate theme to the text box",
 				"", function(text)
 				http.Fetch(text, function(body)
 					local parsed, strId, error = SF.Editor.Themes.ParseTextMate(body)
@@ -1143,7 +1166,7 @@ function Editor:CreateThemesPanel()
 		end)
 
 		menu:AddOption("From text", function()
-			local window = Derma_StringRequest("Load theme from text", "Paste the contents of a TextMate theme file below",
+			local window = Derma_StringRequestNoBlur("Load theme from text", "Paste the contents of a TextMate theme file below",
 				"", function(text)
 				local parsed, strId, error = SF.Editor.Themes.ParseTextMate(text)
 
