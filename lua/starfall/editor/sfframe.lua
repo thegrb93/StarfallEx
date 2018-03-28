@@ -674,8 +674,8 @@ function Editor:CloseTab(_tab,dontask)
 	end
 	local ed = activetab:GetPanel()
 	if not ed:IsSaved() and not dontask and not ed.IsOnline then
-		local question = string.format("Do you want to close %q ?", activetab:GetText())
-		Derma_QueryNoBlur(question, "Are you sure?", "Close", function() self:CloseTab(activetab, true) end, "Cancel", function() end)
+		local question = string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText())
+		SF.Editor.Query("Are you sure?", question, "Close", function() self:CloseTab(activetab, true) end, "Cancel", function() end)
 		return
 	end
 

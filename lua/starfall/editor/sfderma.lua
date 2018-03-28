@@ -102,6 +102,9 @@ end
 
 function PANEL:SetTitle(text)
 	self.Title = text
+	surface.SetFont("SFTitle")
+	self.TitleWidth = surface.GetTextSize(self.Title)
+
 end
 
 function PANEL:GetTitle()
@@ -109,7 +112,6 @@ function PANEL:GetTitle()
 end
 
 function PANEL:PaintTitle(w,h)
-	surface.SetFont("SFTitle")
 	surface.SetTextColor(255, 255, 255, 255)
 	surface.SetTextPos(0, 6)
 	surface.DrawText(self:GetParent().Title)
@@ -154,6 +156,7 @@ local icon_cache = {
 function PANEL:Init ()
 	self:SetText("")
 	self:SetSize(22, 22)
+	self.autoSize = true
 end
 function PANEL:SetIcon (icon)
 	if icon_cache[icon] then
@@ -163,8 +166,11 @@ function PANEL:SetIcon (icon)
 	end
 	self.icon = icon
 end
+function PANEL:SetAutoSize(val)
+	self.autoSize = val
+end
 function PANEL:PerformLayout ()
-	if self:GetText() ~= "" then
+	if self:GetText() ~= "" and self.autoSize then
 		self:SizeToContentsX()
 		self:SetWide(self:GetWide() + 14)
 	end
@@ -923,3 +929,51 @@ function PANEL:Paint( w, h )
 	draw.RoundedBox( 0, 0, 0, w, h, SF.Editor.colors.dark )
 end
 vgui.Register( "SFChipPermissions", PANEL, "DFrame" )
+
+SF.Editor.Query = function(...)
+	local title = select(1, ...)
+	local text = select(2, ...)
+	local buttons = {select(3, ...)}
+
+	local m = markup.Parse(text)
+	local w,h = m:Size()
+	local frame = vgui.Create("StarfallFrame")
+	frame.CloseButton:Remove()
+	frame:SetTitle(title)
+
+	w = math.max(w, frame.TitleWidth - 90)
+	w = w + 100
+	h = h + 90
+
+
+	frame:SetSize(w, h)
+	local _oldPaint = frame.Paint
+	frame.Paint = function(self, w, h, ...)
+		_oldPaint(self, w, h, ...)
+		m:Draw(w/2, 40, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	end
+
+	local buttonContainer = vgui.Create("DPanel", frame)
+	buttonContainer:SetTall(30)
+	buttonContainer:Dock(BOTTOM)
+	buttonContainer:SetPaintBackground(false)
+	local bcount = #buttons/2
+	for I = 1, #buttons, 2 do
+		local button = vgui.Create("StarfallButton",buttonContainer)
+		button:SetText(buttons[I])
+		button:SetAutoSize(false)
+		button.DoClick = function() 
+			buttons[I+1]()
+			frame:Close()
+		end
+		if I > 1 then
+			button:DockMargin(5, 0, 0, 0)
+		end
+		button:SetSize(w/bcount - 5*(bcount-1), 30)
+		button:Dock(LEFT)
+	end
+	frame:SetSizable(false)
+	frame:MakePopup()
+	frame:Center()
+	frame:Open()
+end
