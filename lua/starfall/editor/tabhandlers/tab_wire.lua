@@ -36,8 +36,12 @@ local surface_SetTextPos = surface.SetTextPos
 local surface_SetTextColor = surface.SetTextColor
 local surface_DrawText = surface.DrawText
 local draw_SimpleText = draw.SimpleText
+local surface_DrawTexturedRect = surface.DrawTexturedRect
+local surface_DrawTexturedRectUV = surface.DrawTexturedRectUV
+local surface_SetMaterial = surface.SetMaterial
 local draw_WordBox = draw.WordBox
 local draw_RoundedBox = draw.RoundedBox
+local matGrid = Material( "gui/alpha_grid.png", "nocull noclamp" )
 
 local TabHandler = {
 	Modes = {},
@@ -644,6 +648,7 @@ end
 function PANEL:OpenContextMenu()
 	local menu = DermaMenu()
 
+	self:DoAction("PopulateContextMenu", menu)
 	menu:AddSpacer()
 
 	if self:CanUndo() then
@@ -993,10 +998,19 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 				offset = line:len()
 
 				if cell[2][2] then --has background
-					surface_SetDrawColor(cell[2][2])
-					if usePigments == 1 and cell[3] == "color" then
+					if usePigments == 1 and cell[3]:sub(1, 5) == "color" then
+						surface_SetMaterial( matGrid )
+						surface_SetDrawColor(Color(255, 255, 255))
+						surface_DrawTexturedRectUV(startX, startY + height-2, width * offset, 2, 0, 0, width * offset / 2, 1)
+						surface_SetDrawColor(cell[2][2])
 						surface_DrawRect(startX, startY + height-2, width * offset, 2)
 					else
+						if cell[3]:sub(1, 5) == "color" then
+							surface_SetMaterial( matGrid )
+							surface_SetDrawColor(Color(255, 255, 255))
+							surface_DrawTexturedRectUV(startX, startY, width * offset, height, 0, 0, width * offset, height)
+						end
+						surface_SetDrawColor(cell[2][2])
 						surface_DrawRect(startX, startY, width * offset, height)
 					end
 				end
@@ -1012,10 +1026,19 @@ function PANEL:PaintLine(row, drawpos, leftOffset, drawonlytext)
 		else
 			local length = cell[1]:len()
 			if cell[2][2] then --has background
-				surface_SetDrawColor(cell[2][2])
-				if usePigments == 1 and cell[3] == "color" then
+				if usePigments == 1 and cell[3]:sub(1, 5) == "color" then
+					surface_SetMaterial( matGrid )
+					surface_SetDrawColor(Color(255, 255, 255))
+					surface_DrawTexturedRectUV(startX + offset * width, startY + height-2, width * length, 2, 0, 0, width * length / 2, 1)
+					surface_SetDrawColor(cell[2][2])
 					surface_DrawRect(startX + offset * width, startY + height-2, width * length, 2)
 				else
+					if cell[3]:sub(1, 5) == "color" then
+						surface_SetMaterial( matGrid )
+						surface_SetDrawColor(Color(255, 255, 255))
+						surface_DrawTexturedRectUV(startX + offset * width, startY, width * length, height,0 ,0, width * length / height, 1)
+					end
+					surface_SetDrawColor(cell[2][2])
 					surface_DrawRect(startX + offset * width, startY, width * length, height)
 				end
 			end
@@ -2565,6 +2588,19 @@ function PANEL:NextCharacter()
 	self.position = self.position + 1
 
 	if self.position <= self.line:len() then
+		self.character = self.line:sub(self.position, self.position)
+	else
+		self.character = nil
+	end
+end
+
+function PANEL:PrevCharacter()
+	if not self.character then return end
+
+	self.tokendata = self.tokendata:sub(1, #self.tokendata - 1)
+	self.position = self.position - 1
+
+	if self.position >= 1 then
 		self.character = self.line:sub(self.position, self.position)
 	else
 		self.character = nil

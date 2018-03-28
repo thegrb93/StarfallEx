@@ -977,3 +977,38 @@ SF.Editor.Query = function(...)
 	frame:Center()
 	frame:Open()
 end
+PANEL = {}
+
+function PANEL:Init()
+	local mixer = vgui.Create( "DColorMixer", self )
+	mixer:Dock( FILL )
+	mixer:SetPalette( true )
+	mixer:SetAlphaBar( true )
+	mixer:SetWangs( true )
+	mixer:SetCookieName("starfallcolorpicker")
+	mixer:SetColor( Color( 30, 30, 30 ) )
+	self.mixer = mixer
+	self:SetSize(400,300)
+	self:Center()
+	local confirm = vgui.Create("DColorButton", self)
+	mixer.ValueChanged = function(_, color)
+		confirm:SetColor(color)
+	end
+	confirm:Dock(BOTTOM)
+	confirm:DockMargin(2, 10, 2, 2)
+	confirm:SetTall(30)
+	confirm.DoClick = function()
+		if self.OnColorPicked then
+			self:OnColorPicked(self:GetColor())
+		end
+		self:Close()
+	end
+	self.confirm = confirm
+end
+function PANEL:SetColor(...)
+	return self.mixer:SetColor(...)
+end
+function PANEL:GetColor(...)
+	return self.mixer:GetColor(...)
+end
+vgui.Register( "StarfallColorPicker", PANEL, "StarfallFrame" )

@@ -112,7 +112,7 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 	else
 		addToken(tokenname, tokendata)
 	end
-	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
+	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color."..tokenname }
 	lastcol = cols[#cols]
 end
 
@@ -348,7 +348,7 @@ function EDITOR:SyntaxColorLine(row)
 				addColorToken("bracket", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
-			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
+			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b,a)
 				local fname, bracket1, r, comma1, g, comma2, b, comma3, a, bracket2 = self.tokendata:match(rgbapatternG)
 				local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
 				local col
@@ -623,6 +623,81 @@ local BracketPairs2 = {
 	["elseif"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
 
 }
+function EDITOR:PopulateContextMenu(menu)
+	local caret = self.Caret
+	local token = self:GetTokenAtPosition(caret)
+	if not token then return end
+	token = token[3]:Split(".") -- It can have subtoken after dot
+
+	local subtoken = token[2]
+	token = token[1]
+	self:ResetTokenizer(caret[1])
+	self.position = caret[2] - 1
+	self:NextCharacter()
+
+	if token == "color" then
+		local startpos,endpos
+		if subtoken == "number" or subtoken == "notfound" or subtoken == "bracket" then
+			while self.character do
+				if self.character == "(" then
+					startpos = self.position + 1
+					break
+				end
+				self:PrevCharacter()
+			end
+			while self.character do
+				if self.character == ")" then
+					endpos = self.position - 1
+					break
+				end
+				self:NextCharacter()
+			end
+		end
+		if subtoken == "function" then
+			while self.character do
+				if self.character == "(" then
+					startpos = self.position + 1
+					break
+				end
+				self:NextCharacter()
+			end
+			while self.character do
+				if self.character == ")" then
+					endpos = self.position - 1
+					break
+				end
+				self:NextCharacter()
+			end
+		end
+		if startpos and endpos then
+			local colorstr = self.line:sub(startpos,endpos)
+			local r,g,b,a = colorstr:match(numbpatternG..spacedcomma..numbpatternG..spacedcomma..numbpatternG..spacedcomma..numbpatternG) --rgba
+			if not r then
+				r,g,b = colorstr:match(numbpatternG..spacedcomma..numbpatternG..spacedcomma..numbpatternG) -- rgb
+			end
+			r, g, b = tonumber(r), tonumber(g), tonumber(b)
+			if a then
+				a = tonumber(a)
+			end
+
+			menu:AddOption("Colorpicker",function()
+				local ColorPicker = vgui.Create("StarfallColorPicker")
+				ColorPicker:SetColor(Color(r, g, b, a or 255))
+				ColorPicker.OnColorPicked = function(_, color)
+					self.Start = {caret[1], startpos}
+					self.Caret = {caret[1], endpos + 1}
+					if a or color.a != 255 then
+						self:SetSelection(string.format("%d, %d, %d, %d", color.r, color.g, color.b, color.a))
+					else
+						self:SetSelection(string.format("%d, %d, %d", color.r, color.g, color.b))
+					end
+				end
+				ColorPicker:Open()
+			end)
+		end
+	end
+
+end
 function EDITOR:PaintTextOverlay()
 	local bracket,bracketindex = self:GetTokenAtPosition(self.Caret)
 	local width, height = self.FontWidth, self.FontHeight
