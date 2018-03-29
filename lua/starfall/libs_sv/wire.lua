@@ -333,10 +333,12 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 
-	with = width or 0
-	checkluatype(width, TYPE_NUMBER, 0)
-	width = math.Clamp(width, 0, 5)
-
+	if width == nil then
+		width = 0
+	else
+		checkluatype (width, TYPE_NUMBER)
+		width = math.Clamp(width, 0, 5)
+	end
 	if color ~= nil then
 		checktype(color, SF.Types['Color'])
 	else
