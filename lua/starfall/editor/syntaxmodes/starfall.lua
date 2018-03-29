@@ -624,7 +624,8 @@ local BracketPairs2 = {
 
 }
 function EDITOR:PopulateContextMenu(menu)
-	local caret = self.Caret
+	local caret = self:CursorToCaret()
+	if not caret then return end
 	local token = self:GetTokenAtPosition(caret)
 	if not token then return end
 	token = token[3]:Split(".") -- It can have subtoken after dot
@@ -671,10 +672,7 @@ function EDITOR:PopulateContextMenu(menu)
 		end
 		if startpos and endpos then
 			local colorstr = self.line:sub(startpos,endpos)
-			local r,g,b,a = colorstr:match(numbpatternG..spacedcomma..numbpatternG..spacedcomma..numbpatternG..spacedcomma..numbpatternG) --rgba
-			if not r then
-				r,g,b = colorstr:match(numbpatternG..spacedcomma..numbpatternG..spacedcomma..numbpatternG) -- rgb
-			end
+			local r,g,b,a = unpack(colorstr:Split(","))
 			r, g, b = tonumber(r), tonumber(g), tonumber(b)
 			if a then
 				a = tonumber(a)
