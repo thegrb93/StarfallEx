@@ -691,10 +691,10 @@ else
 	net.Receive("starfall_requpload", function(len)
 		local sf = net.ReadEntity()
 		local ok, list = SF.Editor.BuildIncludesTable()
-		local newlySpawnedSF = not sf:IsValid()
+		local sfJustSpawned = not sf:IsValid()
 		local updatedFiles = {}
 
-		if (sf and sf.intance) or not newlySpawnedSF then
+		if not sfJustSpawned and sf.instance then
 			sf.files = sf.files or {}
 
 			for filename, code in pairs(list.files) do
