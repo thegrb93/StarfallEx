@@ -101,7 +101,12 @@ net.Receive("starfall_processor_download", function (len)
 
 	local I = 0
 	while I < 256 do
-		if net.ReadBit() ~= 0 then break end
+		if net.ReadBit() ~= 0 then
+			if I == 0 then
+				dlProc:Compile(dlOwner, dlProc.files, dlMain)
+			end
+			break
+		end
 
 		local filename = net.ReadString()
 

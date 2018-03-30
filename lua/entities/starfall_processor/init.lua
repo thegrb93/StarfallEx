@@ -7,7 +7,7 @@ function ENT:Initialize ()
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
-	
+
 	self:SetNWInt("State", self.States.None)
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
 end
@@ -27,28 +27,34 @@ util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
-function ENT:SendCode (recipient)
+function ENT:SendCode (recipient, allFiles)
 	net.Start("starfall_processor_download")
 	net.WriteEntity(self)
 	net.WriteEntity(self.owner)
 	net.WriteString(self.mainfile)
-	
-	for name, data in pairs(self.files) do
-	
-		net.WriteBit(false)
-		net.WriteString(name)
-		net.WriteStream(data)
 
+	if not allFiles then
+		for i, name in ipairs(self.newlyUploadedFiles) do
+			net.WriteBit(false)
+			net.WriteString(name)
+			net.WriteStream(self.files[name])
+		end
+	else
+		for name, code in pairs(self.files) do
+			net.WriteBit(false)
+			net.WriteString(name)
+			net.WriteStream(code)
+		end
 	end
 
 	net.WriteBit(true)
-	
+
 	if recipient then net.Send(recipient) else net.Broadcast() end
 end
 
 function ENT:OnRemove ()
 	if not self.instance then return end
-	
+
 	self.instance:runScriptHook("removed")
 	--removed hook can cause instance to become nil
 	if self.instance then
@@ -62,7 +68,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			proc:SendCode(ply)
+			proc:SendCode(ply, true)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
@@ -91,7 +97,7 @@ end
 
 function ENT:PreEntityCopy ()
 	if self.EntityMods then self.EntityMods.SFDupeInfo = nil end
-	
+
 	if self.instance then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode(self.files, self.mainfile)
@@ -111,11 +117,11 @@ end
 function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
-		
+
 		if WireLib then
 			WireLib.ApplyDupeInfo(ply, ent, info, EntityLookup(CreatedEntities))
 		end
-	
+
 		if info.starfall then
 			local code, main = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata

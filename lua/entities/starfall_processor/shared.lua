@@ -24,6 +24,16 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
+	self.files = self.files or {}
+	self.newlyUploadedFiles = {}
+
+	-- Determine which files have changed and is to be sent to other players
+	for filename, code in pairs(files) do
+		if util.CRC(code) ~= util.CRC(self.files[filename] or "_DOES_NOT_EXIST_") then
+			table.insert(self.newlyUploadedFiles, filename)
+		end
+	end
+
 	local update = self.mainfile ~= nil
 	self.error = nil
 	self.files = files

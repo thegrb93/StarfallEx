@@ -572,10 +572,11 @@ if SERVER then
 	-- @param callback Called when all of the code is recieved. Arguments are either the main filename and a table
 	-- of filename->code pairs, or nil if the client couldn't handle the request (due to bad includes, etc)
 	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
-	function SF.RequestCode(ply, callback)
+	function SF.RequestCode(ply, sfEntity, callback)
 		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
 
 		net.Start("starfall_requpload")
+		net.WriteEntity(sfEntity)
 		net.Send(ply)
 
 		uploaddata[ply] = {
@@ -596,10 +597,17 @@ if SERVER then
 		end
 
 		updata.mainfile = net.ReadString()
+		local sf = net.ReadEntity()
+		sf.files = sf.files or {}
 
 		local I = 0
 		while I < 256 do
-			if net.ReadBit() ~= 0 then break end
+			if net.ReadBit() ~= 0 then
+				if I == 0 then
+					updata.callback(updata.mainfile, sf.files)
+				end
+				break
+			end
 			local filename = net.ReadString()
 
 			net.ReadStream(ply, function(data)
@@ -610,8 +618,9 @@ if SERVER then
 				end
 				updata.Completed = updata.Completed + 1
 				updata.files[filename] = data
+				sf.files[filename] = data
 				if updata.Completed == updata.NumFiles then
-					updata.callback(updata.mainfile, updata.files)
+					updata.callback(updata.mainfile, sf.files)
 					uploaddata[ply] = nil
 				end
 			end)
@@ -676,16 +685,37 @@ else
 	end)
 
 	net.Receive("starfall_requpload", function(len)
+		local sf = net.ReadEntity()
 		local ok, list = SF.Editor.BuildIncludesTable()
+		local newlySpawnedSF = not sf:IsValid()
+		local updatedFiles = {}
+
+		if not newlySpawnedSF then
+			sf.files = sf.files or {}
+
+			for filename, code in pairs(list.files) do
+				if util.CRC(code) ~= util.CRC(sf.files[filename] or "_DOES_NOT_EXIST_") then
+					table.insert(updatedFiles, filename)
+				end
+
+				sf.files[filename] = code
+			end
+		else
+			for filename, code in pairs(list.files) do
+				table.insert(updatedFiles, filename)
+			end
+		end
+
 		if ok then
 			--print("Uploading SF code")
 			net.Start("starfall_upload")
 			net.WriteString(list.mainfile)
+			net.WriteEntity(sf)
 
-			for name, data in pairs(list.files) do
+			for i, filename in ipairs(updatedFiles) do
 				net.WriteBit(false)
-				net.WriteString(name)
-				net.WriteStream(data)
+				net.WriteString(filename)
+				net.WriteStream(list.files[filename])
 			end
 
 			net.WriteBit(true)
