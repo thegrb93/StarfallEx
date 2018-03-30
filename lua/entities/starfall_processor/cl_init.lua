@@ -114,7 +114,7 @@ net.Receive("starfall_processor_download", function (len)
 		net.ReadStream(nil, function(data)
 			dlNumFiles.Completed = dlNumFiles.Completed + 1
 			dlFiles[filename] = data or ""
-			dlProc.files[filename] = data or ""
+			if dlProc:IsValid() then dlProc.files[filename] = data or "" end
 			if dlProc:IsValid() and dlOwner:IsValid() and dlNumFiles.Completed == dlNumFiles.NumFiles then
 				dlProc:Compile(dlOwner, dlProc.files, dlMain)
 				dlProc.restarting = false
