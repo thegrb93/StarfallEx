@@ -34,7 +34,7 @@ function ENT:SendCode (recipient, allFiles)
 	net.WriteString(self.mainfile)
 
 	if not allFiles then
-		for i, name in ipairs(self.newlyUploadedFiles) do
+		for i, name in ipairs(self.filesToSend) do
 			net.WriteBit(false)
 			net.WriteString(name)
 			net.WriteStream(self.files[name])

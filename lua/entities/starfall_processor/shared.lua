@@ -25,12 +25,12 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	self.files = self.files or {}
-	self.newlyUploadedFiles = {}
+	self.filesToSend = {}
 
 	-- Determine which files have changed and is to be sent to other players
 	for filename, code in pairs(files) do
 		if util.CRC(code) ~= util.CRC(self.files[filename] or "_DOES_NOT_EXIST_") then
-			table.insert(self.newlyUploadedFiles, filename)
+			table.insert(self.filesToSend, filename)
 		end
 	end
 
