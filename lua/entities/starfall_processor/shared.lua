@@ -24,13 +24,14 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
-	self.files = self.files or {}
-	self.filesToSend = {}
+	local filesToSend = {}
+	if SERVER then
+		self.files = self.files or {}
 
-	-- Determine which files have changed and is to be sent to other players
-	for filename, code in pairs(files) do
-		if code ~= (self.files[filename] or "_DOES_NOT_EXIST_") then
-			table.insert(self.filesToSend, filename)
+		for filename, code in pairs(files) do
+			if code ~= (self.files[filename] or "_DOES_NOT_EXIST_") then
+				table.insert(filesToSend, filename)
+			end
 		end
 	end
 
@@ -42,7 +43,7 @@ function ENT:Compile(owner, files, mainfile)
 
 	if SERVER then
 		if update then
-			self:SendCode()
+			self:SendCode(nil, filesToSend)
 		elseif self.SendQueue then
 			self:SendCode(self.SendQueue)
 			self.SendQueue = nil

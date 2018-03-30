@@ -598,7 +598,10 @@ if SERVER then
 
 		updata.mainfile = net.ReadString()
 		local sf = net.ReadEntity()
-		sf.files = sf.files or {}
+
+		if sf:IsValid() then
+			sf.files = sf.files or {}
+		end
 
 		local I = 0
 		while I < 256 do
@@ -618,9 +621,10 @@ if SERVER then
 				end
 				updata.Completed = updata.Completed + 1
 				updata.files[filename] = data
-				sf.files[filename] = data
+
+				if sf:IsValid() then sf.files[filename] = data end
 				if updata.Completed == updata.NumFiles then
-					updata.callback(updata.mainfile, sf.files)
+					updata.callback(updata.mainfile, sf:IsValid() and sf.files or updata.files)
 					uploaddata[ply] = nil
 				end
 			end)
@@ -690,7 +694,7 @@ else
 		local newlySpawnedSF = not sf:IsValid()
 		local updatedFiles = {}
 
-		if not newlySpawnedSF then
+		if (sf and sf.intance) or not newlySpawnedSF then
 			sf.files = sf.files or {}
 
 			for filename, code in pairs(list.files) do
@@ -724,6 +728,7 @@ else
 		else
 			net.Start("starfall_upload")
 			net.WriteString("")
+			net.WriteEntity(sf)
 			net.WriteBit(true)
 			net.SendToServer()
 			if list then

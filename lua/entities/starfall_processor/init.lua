@@ -27,23 +27,23 @@ util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
-function ENT:SendCode (recipient, allFiles)
+function ENT:SendCode (recipient, filesToSend)
 	net.Start("starfall_processor_download")
 	net.WriteEntity(self)
 	net.WriteEntity(self.owner)
 	net.WriteString(self.mainfile)
 
-	if not allFiles then
-		for i, name in ipairs(self.filesToSend) do
-			net.WriteBit(false)
-			net.WriteString(name)
-			net.WriteStream(self.files[name])
-		end
-	else
+	if not filesToSend then
 		for name, code in pairs(self.files) do
 			net.WriteBit(false)
 			net.WriteString(name)
 			net.WriteStream(code)
+		end
+	else
+		for i, name in ipairs(filesToSend) do
+			net.WriteBit(false)
+			net.WriteString(name)
+			net.WriteStream(self.files[name])
 		end
 	end
 
@@ -68,7 +68,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			proc:SendCode(ply, true)
+			proc:SendCode(ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
