@@ -29,7 +29,7 @@ function ENT:Compile(owner, files, mainfile)
 
 	-- Determine which files have changed and is to be sent to other players
 	for filename, code in pairs(files) do
-		if util.CRC(code) ~= util.CRC(self.files[filename] or "_DOES_NOT_EXIST_") then
+		if code ~= (self.files[filename] or "_DOES_NOT_EXIST_") then
 			table.insert(self.filesToSend, filename)
 		end
 	end

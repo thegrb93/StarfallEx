@@ -694,7 +694,7 @@ else
 			sf.files = sf.files or {}
 
 			for filename, code in pairs(list.files) do
-				if util.CRC(code) ~= util.CRC(sf.files[filename] or "_DOES_NOT_EXIST_") then
+				if code ~= (sf.files[filename] or "_DOES_NOT_EXIST_") then
 					table.insert(updatedFiles, filename)
 				end
 
