@@ -953,6 +953,12 @@ function SF.DefaultEnvironment.isValid(object)
 
 end
 
+--- Returns if this is the first time this hook was predicted.
+--@return Boolean
+function SF.DefaultEnvironment.isFirstTimePredicted()
+	return IsFirstTimePredicted()
+end
+
 --- Translates the specified position and angle into the specified coordinate system
 -- @param pos The position that should be translated from the current to the new system
 -- @param ang The angles that should be translated from the current to the new system
