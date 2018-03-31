@@ -596,12 +596,19 @@ if SERVER then
 			return
 		end
 
+		local function combine(a, b)
+			local out = {}
+			for key, value in pairs(a) do
+				out[key] = value
+			end
+			for key, value in pairs(b) do
+				out[key] = value
+			end
+			return out
+		end
+
 		updata.mainfile = net.ReadString()
 		local sf = net.ReadEntity()
-
-		if sf:IsValid() then
-			sf.files = sf.files or {}
-		end
 
 		local I = 0
 		while I < 256 do
@@ -622,9 +629,9 @@ if SERVER then
 				updata.Completed = updata.Completed + 1
 				updata.files[filename] = data
 
-				if sf:IsValid() then sf.files[filename] = data end
 				if updata.Completed == updata.NumFiles then
-					updata.callback(updata.mainfile, sf:IsValid() and sf.files or updata.files)
+					local filesToCompile = (sf:IsValid() and sf.instance) and combine(sf.files or {}, updata.files) or updata.files
+					updata.callback(updata.mainfile, filesToCompile)
 					uploaddata[ply] = nil
 				end
 			end)
@@ -701,8 +708,6 @@ else
 				if code ~= (sf.files[filename] or "_DOES_NOT_EXIST_") then
 					table.insert(updatedFiles, filename)
 				end
-
-				sf.files[filename] = code
 			end
 		else
 			for filename, code in pairs(list.files) do
