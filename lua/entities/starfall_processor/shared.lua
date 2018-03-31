@@ -24,6 +24,14 @@ function ENT:Compile(owner, files, mainfile, filesToSend)
 		self.instance = nil
 	end
 
+	-- Remove unused files
+	for filename, code in pairs(files) do
+		if filename[1] == "-" then
+			files[filename] = nil
+			files[filename:sub(2)] = nil
+		end
+	end
+
 	local update = self.mainfile ~= nil
 	self.error = nil
 	self.files = files
@@ -39,7 +47,7 @@ function ENT:Compile(owner, files, mainfile, filesToSend)
 		end
 	end
 
-	local ok, instance = SF.Instance.Compile(files, mainfile, owner, { entity = self })
+	local ok, instance = SF.Instance.Compile(self.files, mainfile, owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then

@@ -43,7 +43,7 @@ function ENT:SendCode (recipient, filesToSend)
 		for i, name in ipairs(filesToSend) do
 			net.WriteBit(false)
 			net.WriteString(name)
-			net.WriteStream(self.files[name])
+			net.WriteStream(self.files[name] or ".")
 		end
 	end
 

@@ -689,6 +689,15 @@ else
 		local ok, list = SF.Editor.BuildIncludesTable()
 		local sfJustSpawned = not sf:IsValid()
 		local updatedFiles = {}
+		local removedFiles = {}
+
+		local function hasKey(t, key)
+			for k, value in pairs(t) do
+				if k == key then return true end
+			end
+
+			return false
+		end
 
 		if not sfJustSpawned and sf.instance then
 			sf.files = sf.files or {}
@@ -698,10 +707,14 @@ else
 					table.insert(updatedFiles, filename)
 				end
 			end
-		else
-			for filename, code in pairs(list.files) do
-				table.insert(updatedFiles, filename)
+
+			for filename, code in pairs(sf.files) do
+				if not hasKey(list.files, filename) then
+					table.insert(removedFiles, "-" .. filename)
+				end
 			end
+		else
+			updatedFiles = table.GetKeys(list.files)
 		end
 
 		if ok then
@@ -710,10 +723,10 @@ else
 			net.WriteString(list.mainfile)
 			net.WriteEntity(sf)
 
-			for i, filename in ipairs(updatedFiles) do
+			for i, filename in ipairs(table.Add(updatedFiles, removedFiles)) do
 				net.WriteBit(false)
 				net.WriteString(filename)
-				net.WriteStream(list.files[filename])
+				net.WriteStream(list.files[filename] or ".")
 			end
 
 			net.WriteBit(true)
