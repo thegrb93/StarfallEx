@@ -17,22 +17,11 @@ ENT.States          = {
 	None = 3,
 }
 
-function ENT:Compile(owner, files, mainfile)
+function ENT:Compile(owner, files, mainfile, filesToSend)
 	if self.instance then
 		self.instance:runScriptHook("removed")
 		self.instance:deinitialize()
 		self.instance = nil
-	end
-
-	local filesToSend = {}
-	if SERVER then
-		self.files = self.files or {}
-
-		for filename, code in pairs(files) do
-			if code ~= (self.files[filename] or "_DOES_NOT_EXIST_") then
-				table.insert(filesToSend, filename)
-			end
-		end
 	end
 
 	local update = self.mainfile ~= nil

@@ -596,17 +596,6 @@ if SERVER then
 			return
 		end
 
-		local function combine(a, b)
-			local out = {}
-			for key, value in pairs(a) do
-				out[key] = value
-			end
-			for key, value in pairs(b) do
-				out[key] = value
-			end
-			return out
-		end
-
 		updata.mainfile = net.ReadString()
 		local sf = net.ReadEntity()
 
@@ -614,7 +603,7 @@ if SERVER then
 		while I < 256 do
 			if net.ReadBit() ~= 0 then
 				if I == 0 then
-					updata.callback(updata.mainfile, sf.files)
+					updata.callback(updata.mainfile, sf.files, {})
 				end
 				break
 			end
@@ -630,8 +619,8 @@ if SERVER then
 				updata.files[filename] = data
 
 				if updata.Completed == updata.NumFiles then
-					local filesToCompile = (sf:IsValid() and sf.instance) and combine(sf.files or {}, updata.files) or updata.files
-					updata.callback(updata.mainfile, filesToCompile)
+					local filesToCompile = (sf:IsValid() and sf.instance) and table.Merge(sf.files or {}, updata.files) or updata.files
+					updata.callback(updata.mainfile, filesToCompile, table.GetKeys(updata.files))
 					uploaddata[ply] = nil
 				end
 			end)
