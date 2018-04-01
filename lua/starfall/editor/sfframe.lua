@@ -89,13 +89,13 @@ cvars.AddChangeCallback("sf_editor_layout", function()
 end)
 
 Editor.CreatedFonts = {}
-function createFont(name, FontName, Size, Antialiasing)
+local function createFont(name, fontName, size, antialiasing)
 	local fontTable =
 	{
-		font = FontName,
-		size = Size,
+		font = fontName,
+		size = size,
 		weight = 400,
-		antialias = Antialiasing,
+		antialias = antialiasing,
 		additive = false,
 		italic = false,
 	}
