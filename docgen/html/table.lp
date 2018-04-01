@@ -1,4 +1,12 @@
-<dt><a name="<?lua=tab.name?>"></a><?lua=tab.name?></dt>
+<?lua
+	local tname = tab.name
+	if tab.classlib then
+		tname = tab.classlib .. ":" .. tab.tname
+	elseif tab.library then
+		tname = tab.library .. "." .. tab.tname
+	end
+?>
+<dt><a name="<?lua=tname?>"></a><?lua=tname?></dt>
 <dd>
 	<p><?lua=tab.description?></p>
 	<?lua if type(tab.field) == "table" and #tab.field > 0 then?>

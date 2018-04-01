@@ -146,6 +146,12 @@ SF.DefaultEnvironment.CLIENT = CLIENT
 -- @class field
 SF.DefaultEnvironment.SERVER = SERVER
 
+--- Returns if this is the first time this hook was predicted.
+-- @name SF.DefaultEnvironment.isFirstTimePredicted
+-- @class function
+-- @return Boolean
+SF.DefaultEnvironment.isFirstTimePredicted = IsFirstTimePredicted
+
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.

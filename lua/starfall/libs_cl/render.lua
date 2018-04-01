@@ -100,6 +100,7 @@ local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local COLOR_WHITE = Color(255, 255, 255)
 
 SF.Libraries.AddHook("postload", function()
 	vector_meta = SF.Vectors.Metatable
@@ -148,7 +149,7 @@ local renderhooks = {
 
 SF.Libraries.AddHook("prepare", function (instance, hook)
 	if renderhooks[hook] then
-		currentcolor = Color(255, 255, 255, 255)
+		currentcolor = COLOR_WHITE
 		render.SetColorMaterial()
 		draw.NoTexture()
 		surface.SetDrawColor(255, 255, 255, 255)
@@ -611,7 +612,7 @@ function render_library.popViewMatrix()
 	view_matrix_stack[i] = nil
 end
 
---- Sets the draw color
+--- Sets background color of screen
 -- @param col Color of background
 -- @screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)

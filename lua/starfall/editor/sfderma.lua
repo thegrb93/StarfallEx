@@ -101,6 +101,9 @@ end
 
 function PANEL:SetTitle(text)
 	self.Title = text
+	surface.SetFont("SFTitle")
+	self.TitleWidth = surface.GetTextSize(self.Title)
+
 end
 
 function PANEL:GetTitle()
@@ -108,7 +111,6 @@ function PANEL:GetTitle()
 end
 
 function PANEL:PaintTitle(w,h)
-	surface.SetFont("SFTitle")
 	surface.SetTextColor(255, 255, 255, 255)
 	surface.SetTextPos(0, 6)
 	surface.DrawText(self:GetParent().Title)
@@ -153,6 +155,7 @@ local icon_cache = {
 function PANEL:Init ()
 	self:SetText("")
 	self:SetSize(22, 22)
+	self.autoSize = true
 end
 function PANEL:SetIcon (icon)
 	if icon_cache[icon] then
@@ -162,8 +165,11 @@ function PANEL:SetIcon (icon)
 	end
 	self.icon = icon
 end
+function PANEL:SetAutoSize(val)
+	self.autoSize = val
+end
 function PANEL:PerformLayout ()
-	if self:GetText() ~= "" then
+	if self:GetText() ~= "" and self.autoSize then
 		self:SizeToContentsX()
 		self:SetWide(self:GetWide() + 14)
 	end
@@ -297,7 +303,7 @@ function PANEL:openMenu (node)
 						file.Delete(node:GetFileName())
 						file.Write(saveFile, contents)
 						SF.AddNotify(LocalPlayer(), "File renamed as " .. saveFile .. ".", "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end)
 			end)
 		self.menu:AddSpacer()
@@ -308,7 +314,7 @@ function PANEL:openMenu (node)
 					function ()
 						file.Delete(node:GetFileName())
 						SF.AddNotify(LocalPlayer(), "File deleted: " .. node:GetFileName(), "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end,
 					"Cancel")
 			end)
@@ -323,7 +329,7 @@ function PANEL:openMenu (node)
 						local saveFile = node:GetFolder().."/"..text..".txt"
 						file.Write(saveFile, "")
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end)
 			end)
 		self.menu:AddSpacer()
@@ -337,7 +343,7 @@ function PANEL:openMenu (node)
 						local saveFile = node:GetFolder().."/"..text
 						file.CreateDir(saveFile)
 						SF.AddNotify(LocalPlayer(), "New folder: " .. saveFile, "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end)
 			end)
 		self.menu:AddSpacer()
@@ -365,7 +371,7 @@ function PANEL:openMenu (node)
 							end
 						end
 						SF.AddNotify(LocalPlayer(), "Folder deleted: " .. node:GetFolder(), "GENERIC", 7, "DRIP3")
-						self:reloadTree()
+						self:ReloadTree()
 					end,
 					"Cancel")
 			end)
@@ -416,7 +422,7 @@ function PANEL:Init ()
 	function searchBox:OnChange ()
 
 		if self:GetValue() == "" then
-			tree:reloadTree()
+			tree:ReloadTree()
 			return
 		end
 
@@ -461,7 +467,7 @@ function PANEL:Init ()
 	self.Update:DockMargin(0, 0, 0, 0)
 	self.Update:SetText("Update")
 	self.Update.DoClick = function(button)
-		tree:reloadTree()
+		tree:ReloadTree()
 		searchBox:SetValue("Search...")
 	end
 end
@@ -923,6 +929,7 @@ function PANEL:Paint( w, h )
 end
 vgui.Register( "SFChipPermissions", PANEL, "DFrame" )
 
+
 -- End Instance Permissions
 
 --------------------------------------------------------------
@@ -1001,3 +1008,86 @@ function PANEL:Paint(w,h)
 
 end
 vgui.Register( "StarfallPermissions", PANEL, "DPanel" )
+
+SF.Editor.Query = function(...)
+	local title = select(1, ...)
+	local text = select(2, ...)
+	local buttons = {select(3, ...)}
+
+	local m = markup.Parse(text)
+	local w,h = m:Size()
+	local frame = vgui.Create("StarfallFrame")
+	frame.CloseButton:Remove()
+	frame:SetTitle(title)
+
+	w = math.max(w, frame.TitleWidth - 90)
+	w = w + 100
+	h = h + 90
+
+
+	frame:SetSize(w, h)
+	local _oldPaint = frame.Paint
+	frame.Paint = function(self, w, h, ...)
+		_oldPaint(self, w, h, ...)
+		m:Draw(w/2, 40, TEXT_ALIGN_CENTER, TEXT_ALIGN_TOP)
+	end
+
+	local buttonContainer = vgui.Create("DPanel", frame)
+	buttonContainer:SetTall(30)
+	buttonContainer:Dock(BOTTOM)
+	buttonContainer:SetPaintBackground(false)
+	local bcount = #buttons/2
+	for I = 1, #buttons, 2 do
+		local button = vgui.Create("StarfallButton",buttonContainer)
+		button:SetText(buttons[I])
+		button:SetAutoSize(false)
+		button.DoClick = function() 
+			buttons[I+1]()
+			frame:Close()
+		end
+		if I > 1 then
+			button:DockMargin(5, 0, 0, 0)
+		end
+		button:SetSize(w/bcount - 5*(bcount-1), 30)
+		button:Dock(LEFT)
+	end
+	frame:SetSizable(false)
+	frame:MakePopup()
+	frame:Center()
+	frame:Open()
+end
+PANEL = {}
+
+function PANEL:Init()
+	local mixer = vgui.Create( "DColorMixer", self )
+	mixer:Dock( FILL )
+	mixer:SetPalette( true )
+	mixer:SetAlphaBar( true )
+	mixer:SetWangs( true )
+	mixer:SetCookieName("starfallcolorpicker")
+	mixer:SetColor( Color( 30, 30, 30 ) )
+	self.mixer = mixer
+	self:SetSize(400,300)
+	self:Center()
+	local confirm = vgui.Create("DColorButton", self)
+	mixer.ValueChanged = function(_, color)
+		confirm:SetColor(color)
+	end
+	confirm:Dock(BOTTOM)
+	confirm:DockMargin(2, 10, 2, 2)
+	confirm:SetTall(30)
+	confirm.DoClick = function()
+		if self.OnColorPicked then
+			self:OnColorPicked(self:GetColor())
+		end
+		self:Close()
+	end
+	self.confirm = confirm
+end
+function PANEL:SetColor(...)
+	return self.mixer:SetColor(...)
+end
+function PANEL:GetColor(...)
+	return self.mixer:GetColor(...)
+end
+vgui.Register( "StarfallColorPicker", PANEL, "StarfallFrame" )

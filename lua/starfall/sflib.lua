@@ -163,7 +163,7 @@ end
 -- @param default A value to return if val is nil.
 function SF.CheckLuaType(val, typ, level, default)
 	local valtype = TypeID(val)
-	if valtype==typ then
+	if valtype == typ then
 		return val
 	elseif val == nil and default then
 		return default

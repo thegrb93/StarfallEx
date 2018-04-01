@@ -943,7 +943,7 @@ Built in values. These don't need to be loaded; they are in the default environm
 Constant that denotes whether the code is executed on the client";["library"]="builtin";["name"]="SF.DefaultEnvironment.CLIENT";["param"]={};["summary"]="\
 Constant that denotes whether the code is executed on the client ";};["SERVER"]={["class"]="field";["classForced"]=true;["description"]="\
 Constant that denotes whether the code is executed on the server";["library"]="builtin";["name"]="SF.DefaultEnvironment.SERVER";["param"]={};["summary"]="\
-Constant that denotes whether the code is executed on the server ";};};["functions"]={[1]="assert";[10]="eyeAngles";[11]="eyePos";[12]="eyeVector";[13]="getLibraries";[14]="getUserdata";[15]="getfenv";[16]="getmetatable";[17]="hasPermission";[18]="ipairs";[19]="isValid";[2]="chip";[20]="loadstring";[21]="localToWorld";[22]="next";[23]="owner";[24]="pairs";[25]="pcall";[26]="permissionRequestSatisfied";[27]="player";[28]="printMessage";[29]="printTable";[3]="concmd";[30]="quotaAverage";[31]="quotaMax";[32]="quotaTotalAverage";[33]="quotaTotalUsed";[34]="quotaUsed";[35]="rawget";[36]="rawset";[37]="require";[38]="requiredir";[39]="select";[4]="crc";[40]="setClipboardText";[41]="setName";[42]="setSoftQuota";[43]="setUserdata";[44]="setfenv";[45]="setmetatable";[46]="setupPermissionRequest";[47]="throw";[48]="tonumber";[49]="tostring";[5]="debugGetInfo";[50]="try";[51]="type";[52]="unpack";[53]="worldToLocal";[54]="xpcall";[6]="dodir";[7]="dofile";[8]="entity";[9]="error";["assert"]={["class"]="function";["classForced"]=true;["description"]="\
+Constant that denotes whether the code is executed on the server ";};};["functions"]={[1]="assert";[10]="eyeAngles";[11]="eyePos";[12]="eyeVector";[13]="getLibraries";[14]="getUserdata";[15]="getfenv";[16]="getmetatable";[17]="hasPermission";[18]="ipairs";[19]="isFirstTimePredicted";[2]="chip";[20]="isValid";[21]="loadstring";[22]="localToWorld";[23]="next";[24]="owner";[25]="pairs";[26]="pcall";[27]="permissionRequestSatisfied";[28]="player";[29]="printMessage";[3]="concmd";[30]="printTable";[31]="quotaAverage";[32]="quotaMax";[33]="quotaTotalAverage";[34]="quotaTotalUsed";[35]="quotaUsed";[36]="rawget";[37]="rawset";[38]="require";[39]="requiredir";[4]="crc";[40]="select";[41]="setClipboardText";[42]="setName";[43]="setSoftQuota";[44]="setUserdata";[45]="setfenv";[46]="setmetatable";[47]="setupPermissionRequest";[48]="throw";[49]="tonumber";[5]="debugGetInfo";[50]="tostring";[51]="try";[52]="type";[53]="unpack";[54]="worldToLocal";[55]="xpcall";[6]="dodir";[7]="dofile";[8]="entity";[9]="error";["assert"]={["class"]="function";["classForced"]=true;["description"]="\
 If the result of the first argument is false or nil, an error is thrown with the second argument as the message.";["fname"]="assert";["library"]="builtin";["name"]="SF.DefaultEnvironment.assert";["param"]={[1]="condition";[2]="msg";["condition"]="";["msg"]="";};["private"]=false;["realm"]="sh";["summary"]="\
 If the result of the first argument is false or nil, an error is thrown with the second argument as the message.";};["chip"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns the entity representing a processor that this script is running on.";["fname"]="chip";["library"]="builtin";["name"]="SF.DefaultEnvironment.chip";["param"]={};["realm"]="sh";["ret"]="Starfall entity";["summary"]="\
@@ -984,7 +984,9 @@ Returns the metatable of an object.";};["hasPermission"]={["class"]="function";[
 Checks if the chip is capable of performing an action.";["fname"]="hasPermission";["library"]="builtin";["name"]="SF.DefaultEnvironment.hasPermission";["param"]={[1]="perm";[2]="obj";["obj"]="Optional object to pass to the permission system.";["perm"]="The permission id to check";};["private"]=false;["realm"]="sh";["summary"]="\
 Checks if the chip is capable of performing an action.";};["ipairs"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";["fname"]="ipairs";["library"]="builtin";["name"]="SF.DefaultEnvironment.ipairs";["param"]={[1]="tbl";["tbl"]="Table to iterate over";};["realm"]="sh";["ret"]={[1]="Iterator function";[2]="Table tbl";[3]="0 as current index";};["summary"]="\
-Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";};["isValid"]={["class"]="function";["description"]="\
+Returns an iterator function for a for loop, to return ordered key-value pairs from a table.";};["isFirstTimePredicted"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns if this is the first time this hook was predicted.";["fname"]="isFirstTimePredicted";["library"]="builtin";["name"]="SF.DefaultEnvironment.isFirstTimePredicted";["param"]={};["realm"]="sh";["ret"]="Boolean";["summary"]="\
+Returns if this is the first time this hook was predicted.";};["isValid"]={["class"]="function";["description"]="\
 Returns if the table has an isValid function and isValid returns true.";["fname"]="isValid";["library"]="builtin";["name"]="SF.DefaultEnvironment.isValid";["param"]={[1]="object";["object"]="Table to check";};["private"]=false;["realm"]="sh";["ret"]="If it is valid";["summary"]="\
 Returns if the table has an isValid function and isValid returns true.";};["loadstring"]={["class"]="function";["description"]="\
 GLua's loadstring \
@@ -1075,15 +1077,15 @@ Lua's xpcall with SF throw implementation \
 Attempts to call the first function.";};};["libtbl"]="SF.DefaultEnvironment";["name"]="builtin";["server"]=true;["summary"]="\
 Built in values.";["tables"]={[1]="bit";[2]="math";[3]="os";[4]="string";[5]="table";["bit"]={["class"]="table";["classForced"]=true;["description"]="\
 Bit library. http://wiki.garrysmod.com/page/Category:bit";["library"]="builtin";["name"]="SF.DefaultEnvironment.bit";["param"]={};["summary"]="\
-Bit library.";};["math"]={["class"]="table";["classForced"]=true;["description"]="\
+Bit library.";["tname"]="bit";};["math"]={["class"]="table";["classForced"]=true;["description"]="\
 The math library. http://wiki.garrysmod.com/page/Category:math";["library"]="builtin";["name"]="SF.DefaultEnvironment.math";["param"]={};["summary"]="\
-The math library.";};["os"]={["class"]="table";["classForced"]=true;["description"]="\
+The math library.";["tname"]="math";};["os"]={["class"]="table";["classForced"]=true;["description"]="\
 The os library. http://wiki.garrysmod.com/page/Category:os";["library"]="builtin";["name"]="SF.DefaultEnvironment.os";["param"]={};["summary"]="\
-The os library.";};["string"]={["class"]="table";["classForced"]=true;["description"]="\
+The os library.";["tname"]="os";};["string"]={["class"]="table";["classForced"]=true;["description"]="\
 String library http://wiki.garrysmod.com/page/Category:string";["library"]="builtin";["name"]="SF.DefaultEnvironment.string";["param"]={};["summary"]="\
-String library http://wiki.garrysmod.com/page/Category:string ";};["table"]={["class"]="table";["classForced"]=true;["description"]="\
+String library http://wiki.garrysmod.com/page/Category:string ";["tname"]="string";};["table"]={["class"]="table";["classForced"]=true;["description"]="\
 Table library. http://wiki.garrysmod.com/page/Category:table";["library"]="builtin";["name"]="SF.DefaultEnvironment.table";["param"]={};["summary"]="\
-Table library.";};};};["constraint"]={["class"]="library";["description"]="\
+Table library.";["tname"]="table";};};};["constraint"]={["class"]="library";["description"]="\
 Library for creating and manipulating constraints.";["fields"]={};["functions"]={[1]="axis";[10]="setElasticLength";[11]="setRopeLength";[12]="slider";[13]="weld";[2]="ballsocket";[3]="ballsocketadv";[4]="breakAll";[5]="breakType";[6]="elastic";[7]="getTable";[8]="nocollide";[9]="rope";["axis"]={["class"]="function";["description"]="\
 Axis two entities";["fname"]="axis";["library"]="constraint";["name"]="constraint_library.axis";["param"]={[1]="e1";[10]="nocollide";[11]="laxis";[2]="e2";[3]="bone1";[4]="bone2";[5]="v1";[6]="v2";[7]="force_lim";[8]="torque_lim";[9]="friction";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Axis two entities ";};["ballsocket"]={["class"]="function";["description"]="\
@@ -1521,8 +1523,8 @@ Reads the color of the specified pixel.";};["selectRenderTarget"]={["class"]="fu
 Selects the render target to draw on. \
 Nil for the visible RT.";["fname"]="selectRenderTarget";["library"]="render";["name"]="render_library.selectRenderTarget";["param"]={[1]="name";["name"]="Name of the render target to use";};["private"]=false;["realm"]="cl";["summary"]="\
 Selects the render target to draw on.";};["setBackgroundColor"]={["class"]="function";["description"]="\
-Sets the draw color";["fname"]="setBackgroundColor";["library"]="render";["name"]="render_library.setBackgroundColor";["param"]={[1]="col";[2]="screen";["col"]="Color of background";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets the draw color ";};["setColor"]={["class"]="function";["description"]="\
+Sets background color of screen";["fname"]="setBackgroundColor";["library"]="render";["name"]="render_library.setBackgroundColor";["param"]={[1]="col";[2]="screen";["col"]="Color of background";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets background color of screen ";};["setColor"]={["class"]="function";["description"]="\
 Sets the draw color";["fname"]="setColor";["library"]="render";["name"]="render_library.setColor";["param"]={[1]="clr";["clr"]="Color type";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the draw color ";};["setCullMode"]={["class"]="function";["description"]="\
 Changes the cull mode";["fname"]="setCullMode";["library"]="render";["name"]="render_library.setCullMode";["param"]={[1]="mode";["mode"]="Cull mode. 0 for counter clock wise, 1 for clock wise";};["private"]=false;["realm"]="cl";["summary"]="\
@@ -1668,7 +1670,7 @@ Creates/Modifies wire inputs.";};["adjustOutputs"]={["class"]="function";["descr
 Creates/Modifies wire outputs. All wire ports must begin with an uppercase \
 letter and contain only alphabetical characters.";["fname"]="adjustOutputs";["library"]="wire";["name"]="wire_library.adjustOutputs";["param"]={[1]="names";[2]="types";["names"]="An array of output names. May be modified by the function.";["types"]="An array of output types. Can be shortcuts. May be modified by the function.";};["private"]=false;["realm"]="sv";["summary"]="\
 Creates/Modifies wire outputs.";};["create"]={["class"]="function";["description"]="\
-Wires two entities together";["fname"]="create";["library"]="wire";["name"]="wire_library.create";["param"]={[1]="entI";[2]="entO";[3]="inputname";[4]="outputname";["entI"]="Entity with input";["entO"]="Entity with output";["inputname"]="Input to be wired";["outputname"]="Output to be wired";};["private"]=false;["realm"]="sv";["summary"]="\
+Wires two entities together";["fname"]="create";["library"]="wire";["name"]="wire_library.create";["param"]={[1]="entI";[2]="entO";[3]="inputname";[4]="outputname";[5]="width";[6]="color";[7]="material";["color"]="Color of the wire(optional)";["entI"]="Entity with input";["entO"]="Entity with output";["inputname"]="Input to be wired";["material"]="Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2";["outputname"]="Output to be wired";["width"]="Width of the wire(optional)";};["private"]=false;["realm"]="sv";["summary"]="\
 Wires two entities together ";};["delete"]={["class"]="function";["description"]="\
 Unwires an entity's input";["fname"]="delete";["library"]="wire";["name"]="wire_library.delete";["param"]={[1]="entI";[2]="inputname";["entI"]="Entity with input";["inputname"]="Input to be un-wired";};["private"]=false;["realm"]="sv";["summary"]="\
 Unwires an entity's input ";};["getInputs"]={["class"]="function";["description"]="\
@@ -1685,4 +1687,4 @@ Returns the server's UUID.";};};["libtbl"]="wire_library";["name"]="wire";["summ
 Wire library.";["tables"]={[1]="ports";["ports"]={["class"]="table";["classForced"]=true;["description"]="\
 Ports table. Reads from this table will read from the wire input \
 of the same name. Writes will write to the wire output of the same name.";["library"]="wire";["name"]="wire_library.ports";["param"]={};["summary"]="\
-Ports table.";};};};};};
+Ports table.";["tname"]="ports";};};};};};

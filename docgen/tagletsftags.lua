@@ -29,7 +29,7 @@ local function check_class(line)
 end
 
 -------------------------------------------------------------------------------
--- Set the class of a comment block. Classes can be "module", "function", 
+-- Set the class of a comment block. Classes can be "module", "function",
 -- "table". The first two classes are automatic, extracted from the source code
 
 local function class (tag, block, text)
@@ -77,7 +77,7 @@ local function field (tag, block, text)
 
 	local _, _, name, desc = string.find(text, "^([_%w%.]+)%s*(.*)")
 	assert(name, "field name not defined")
-	
+
 	table.insert(block[tag], name)
 	block[tag][name] = desc
 end
@@ -90,7 +90,7 @@ local function name (tag, block, text)
 	if block[tag] and block[tag] ~= text then
 		luadoc.logger:error(string.format("block name conflict: `%s' -> `%s'", block[tag], text))
 	end
-	
+
 	block[tag] = text
 end
 
@@ -103,19 +103,19 @@ end
 local function param (tag, block, text)
 	block[tag] = block[tag] or {}
 	local i
-	
+
 	local _, _, name, desc = string.find(text, "^([_%w%.]+)%s*(.*)")
 	if not name then
 		luadoc.logger:warn("parameter `name' not defined [["..text.."]]: skipping")
 		return
 	end
-	
+
 	i = table.foreachi(block[tag], function (i, v)
 		if v == name then
 			return i
 		end
 	end)
-	
+
 	if i == nil then
 		if not block.classForced then
 			luadoc.logger:warn(string.format("documenting undefined parameter `%s'", name))
@@ -150,12 +150,12 @@ end
 local function see (tag, block, text)
 	-- see is always an array
 	block[tag] = block[tag] or {}
-	
+
 	-- remove trailing "."
 	text = string.gsub(text, "(.*)%.$", "%1")
-	
-	local s = util.split("%s*,%s*", text)			
-	
+
+	local s = util.split("%s*,%s*", text)
+
 	table.foreachi(s, function (_, v)
 		table.insert(block[tag], v)
 	end)

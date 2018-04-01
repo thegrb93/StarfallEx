@@ -36,7 +36,7 @@
 		<?lua for _, name in ipairs(module_doc.tables) do
 			local data = module_doc.tables[name]?>
 		<tr>
-		<td class="name"><a href="#<?lua=data.name?>"><?lua=name?></a></td>
+		<td class="name"><a href="#<?lua=data.classlib and data.classlib .. ":" .. data.tname or data.library and data.library .. "." .. data.tname or data.name?>"><?lua=name?></a></td>
 		<td class="summary"><?lua=module_doc.tables[name].summary?></td>
 		</tr><?lua end?>
 	</table>

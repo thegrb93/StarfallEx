@@ -3,6 +3,14 @@ local string_sub = string.sub
 local string_gmatch = string.gmatch
 local string_gsub = string.gsub
 local libmap = SF.Editor.TabHandlers.wire.LibMap
+local surface_SetDrawColor = surface.SetDrawColor
+local surface_DrawRect = surface.DrawRect
+local surface_SetFont = surface.SetFont
+local surface_GetTextSize = surface.GetTextSize
+local surface_PlaySound = surface.PlaySound
+local surface_SetTextPos = surface.SetTextPos
+local surface_SetTextColor = surface.SetTextColor
+local surface_DrawText = surface.DrawText
 local EDITOR = {}
 local function istype(tp)
 	return false
@@ -104,7 +112,7 @@ local function addColorToken(tokenname, bgcolor, tokendata)
 	else
 		addToken(tokenname, tokendata)
 	end
-	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color" }
+	cols[#cols + 1] = { tokendata, { textcolor, bgcolor, 0 }, "color."..tokenname }
 	lastcol = cols[#cols]
 end
 
@@ -213,7 +221,7 @@ function EDITOR:SyntaxColorLine(row)
 	local highlightmode = nil
 
 	if self.blockcomment then -- Closing block comments
-		if self:NextPattern(".-%]%]") then
+		if self:NextPattern(".-%]"..string.rep('=',self.blockcomment).."%]") then
 			self.blockcomment = nil
 		else
 			self:NextPattern(".*")
@@ -222,7 +230,7 @@ function EDITOR:SyntaxColorLine(row)
 		addToken("comment", self.tokendata)
 	elseif self.multilinestring then
 		while self.character do -- Find the ending ]]
-			if self:NextPattern(".-%]%]") then
+			if self:NextPattern(".-%]"..string.rep('=',self.multilinestring).."%]") then
 				self.multilinestring = nil
 				self:NextCharacter()
 				break
@@ -340,7 +348,7 @@ function EDITOR:SyntaxColorLine(row)
 				addColorToken("bracket", col, bracket2)
 				tokenname = "" -- It's custom token
 				self.tokendata = ""
-			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b)
+			elseif self:NextPattern(rgbapattern) then -- Color(r,g,b,a)
 				local fname, bracket1, r, comma1, g, comma2, b, comma3, a, bracket2 = self.tokendata:match(rgbapatternG)
 				local cr, cg, cb, ca = tonumber(r), tonumber(g), tonumber(b), tonumber(a)
 				local col
@@ -490,10 +498,11 @@ function EDITOR:SyntaxColorLine(row)
 				self.tokendata = ""
 			end
 
-		elseif self:NextPattern("%[%[") then -- Multiline strings
+		elseif self:NextPattern("%[=*%[") then -- Multiline strings
+			local reps = #self.tokendata:match("%[(=*)%[")
 			self:NextCharacter()
 			while self.character do -- Find the ending ]] if it isnt really multline(who does that?! Shame on you!)
-				if self:NextPattern("%]%]") then
+				if self:NextPattern("%]"..string.rep("=",reps).."%]") then
 					tokenname = "string"
 					break
 				end
@@ -502,7 +511,7 @@ function EDITOR:SyntaxColorLine(row)
 			end
 
 			if tokenname == "" then -- If no ending ]] was found...
-				self.multilinestring = true
+				self.multilinestring = reps
 				tokenname = "string"
 			else
 				self:NextCharacter()
@@ -542,26 +551,26 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
 
-			if self.character == "[" and self:NextPattern("%[%[") then -- Check if there is a [[ directly after the --
-				while self.character do -- Find the ending ]
-					if self.character == "]" then
-						self:NextCharacter()
-						if self.character == "]" then -- Check if ] is double
-							tokenname = "comment"
-							break
-						end
+			if self:NextPattern("%[=*%[") then -- Block comment
+				local reps = #self.tokendata:match("%[(=*)%[")
+				self:NextCharacter()
+				while self.character do
+					if self:NextPattern("%]"..string.rep("=",reps).."%]") then
+						tokenname = "comment"
+						break
 					end
 					if self.character == "\\" then self:NextCharacter() end
 					self:NextCharacter()
 				end
+
 				if tokenname == "" then -- If no ending ]] was found...
-					self.blockcomment = true
+					self.blockcomment = reps
 					tokenname = "comment"
 				else
 					self:NextCharacter()
 				end
+				--"string"
 			end
-
 			if tokenname == "" then
 				tokenname = "comment"
 				self:NextPattern("[^@]*") -- Skip everything BEFORE @
@@ -598,4 +607,190 @@ function EDITOR:SyntaxColorLine(row)
 	return cols
 end
 
+local BracketPairs = {
+	["{"] = {Removes = {["}"]=true}, Adds = {["{"]=true}},
+	["["] = {Removes = {["]"]=true}, Adds = {["["]=true}},
+	["("] = {Removes = {[")"]=true}, Adds = {["("]=true}},
+	["then"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["function"] = {Adds = {["function"]=true,["then"]=true}, Removes = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["else"] = {Adds = {["function"]=true,["then"]=true, ["else"]=true}, Removes = {["end"]=true,["elseif"]=true}},
+}
+local BracketPairs2 = {
+	["}"] = {Adds = {["}"]=true}, Removes = {["{"]=true}},
+	["]"] = {Adds = {["]"]=true}, Removes = {["["]=true}},
+	[")"] = {Adds = {[")"]=true}, Removes = {["("]=true}},
+	["end"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+	["elseif"] = {Removes = {["function"]=true,["then"]=true}, Adds = {["end"]=true, ["else"]=true,["elseif"]=true}},
+
+}
+function EDITOR:PopulateContextMenu(menu)
+	local caret = self:CursorToCaret()
+	if not caret then return end
+	local token = self:GetTokenAtPosition(caret)
+	if not token then return end
+	token = token[3]:Split(".") -- It can have subtoken after dot
+
+	local subtoken = token[2]
+	token = token[1]
+	self:ResetTokenizer(caret[1])
+	self.position = caret[2] - 1
+	self:NextCharacter()
+
+	if token == "color" then
+		local startpos,endpos
+		if subtoken == "number" or subtoken == "notfound" or subtoken == "bracket" then
+			while self.character do
+				if self.character == "(" then
+					startpos = self.position + 1
+					break
+				end
+				self:PrevCharacter()
+			end
+			while self.character do
+				if self.character == ")" then
+					endpos = self.position - 1
+					break
+				end
+				self:NextCharacter()
+			end
+		end
+		if subtoken == "function" then
+			while self.character do
+				if self.character == "(" then
+					startpos = self.position + 1
+					break
+				end
+				self:NextCharacter()
+			end
+			while self.character do
+				if self.character == ")" then
+					endpos = self.position - 1
+					break
+				end
+				self:NextCharacter()
+			end
+		end
+		if startpos and endpos then
+			local colorstr = self.line:sub(startpos,endpos)
+			local r,g,b,a = unpack(colorstr:Split(","))
+			r, g, b = tonumber(r), tonumber(g), tonumber(b)
+			if a then
+				a = tonumber(a)
+			end
+
+			menu:AddOption("Colorpicker",function()
+				local ColorPicker = vgui.Create("StarfallColorPicker")
+				ColorPicker:SetColor(Color(r, g, b, a or 255))
+				ColorPicker.OnColorPicked = function(_, color)
+					self.Start = {caret[1], startpos}
+					self.Caret = {caret[1], endpos + 1}
+					if a or color.a != 255 then
+						self:SetSelection(string.format("%d, %d, %d, %d", color.r, color.g, color.b, color.a))
+					else
+						self:SetSelection(string.format("%d, %d, %d", color.r, color.g, color.b))
+					end
+				end
+				ColorPicker:Open()
+			end)
+		end
+	end
+
+end
+function EDITOR:PaintTextOverlay()
+	local bracket,bracketindex = self:GetTokenAtPosition(self.Caret)
+	local width, height = self.FontWidth, self.FontHeight
+	local lines = #self.RowTexts
+	if bracket then
+		bracket = bracket[1]
+	end
+	if bracket and BracketPairs[bracket] or BracketPairs2[bracket] then
+		local sum = 0
+		local startPos = bracketindex
+		local line = self.Caret[1]
+		local x, y
+		local cBracketPos = 0
+		local bracketLength = #bracket
+		local tokens = self:GetRowCache(line)
+		local length = 0
+		if BracketPairs[bracket] then
+			local lookup = BracketPairs
+			while line < lines and not y do
+				tokens = self:GetRowCache(line)
+				if not tokens then break end
+				x = 0
+				for I = 1, #tokens do
+					local text = tokens[I][1]
+					if I < startPos then
+						x = x + #text
+						cBracketPos = x
+						continue
+					end
+					if lookup[bracket].Adds[text] then
+						sum = sum + 1
+					elseif lookup[bracket].Removes[text] then
+						sum = sum - 1
+					end
+					if sum < 0 then return end
+					if sum == 0 then
+						y = line
+						x = x + 1
+						length = #text
+						break
+					end
+					x = x + #text
+				end
+				startPos = 1
+				line = line + 1
+			end
+		else--Reverse search
+			local lookup = BracketPairs2
+			startPos = bracketindex
+			line = self.Caret[1]
+			tokens = self:GetRowCache(line)
+			while line > 0 and not y do
+				x = 0
+				for I = #tokens, 1, -1 do
+					local text = tokens[I][1]
+					if I > startPos then
+						x = x + #text
+						cBracketPos = x
+						continue
+					end
+					if text == "else" then
+						text = "then"
+					end
+					if lookup[bracket].Adds[text] then
+						sum = sum + 1
+					elseif lookup[bracket].Removes[text] then
+						sum = sum - 1
+					end
+					if sum == 0 then
+						y = line
+						length = #text
+						x = #self:GetRowText(line) - x - length + 1
+						cBracketPos = #self:GetRowText(self.Caret[1]) - cBracketPos - bracketLength
+						break
+					end
+					x = x + #text
+				end
+				line = line - 1
+				if line < 1 then break end
+				tokens = self:GetRowCache(line)
+				if not tokens then break end
+				startPos = #tokens
+			end
+		end
+		y2 = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
+		if x and y then
+			if not self.Rows[y][3] then
+				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
+				surface_DrawRect((x-self.Scroll[2]) * width + self.LineNumberWidth + self.FontWidth - 1, (y - self:GetRowOffset(y) -self.Scroll[1]) * height + 1, length*width-2, height-2)
+			end
+			surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)
+			surface_DrawRect((cBracketPos-self.Scroll[2] +1) * width + self.LineNumberWidth + self.FontWidth - 1, (self.Caret[1] - self:GetRowOffset(self.Caret[1]) -self.Scroll[1]) * height + 1, bracketLength*width-2, height-2)
+
+		end
+	end
+
+end
 return EDITOR

@@ -28,6 +28,29 @@ local function Derma_StringRequestNoBlur(...)
 	return ret
 end
 
+local function Derma_QueryNoBlur(...)
+	local f = math.max
+
+	function math.max(...)
+		local ret = f(...)
+
+		for i = 1,20 do
+			local name, value = debug.getlocal(2, i)
+			if name == "Window" then
+				value:SetBackgroundBlur( false )
+				break
+			end
+		end
+
+		return ret
+	end
+	local ok, ret = xpcall(Derma_Query, debug.traceback, ...)
+	math.max = f
+
+	if not ok then error(ret, 0) end
+	return ret
+end
+
 local Editor = {}
 
 local function GetTabHandler(name)
@@ -66,13 +89,13 @@ cvars.AddChangeCallback("sf_editor_layout", function()
 end)
 
 Editor.CreatedFonts = {}
-function createFont(name, FontName, Size)
+local function createFont(name, fontName, size, antialiasing)
 	local fontTable =
 	{
-		font = FontName,
-		size = Size,
+		font = fontName,
+		size = size,
 		weight = 400,
-		antialias = true,
+		antialias = antialiasing,
 		additive = false,
 		italic = false,
 	}
@@ -84,15 +107,15 @@ function createFont(name, FontName, Size)
 	surface.CreateFont(name.."_Italic", fontTable)
 
 end
-function Editor:GetFont(FontName, Size)
-	if not FontName or FontName == "" or not Size then return end
-	local name = "sf_" .. FontName .. "_" .. Size
+function Editor:GetFont(fontName, size, antialiasing)
+	if not fontName or fontName == "" or not size then return end
+	local name = "sf_" .. fontName .. "_" .. size .. "_" .. (antialiasing and 1 or 0)
 
 	-- If font is not already created, create it.
 	if not self.CreatedFonts[name] then
 		self.CreatedFonts[name] = true
-		createFont(name, FontName, Size)
-		timer.Simple(0, function() createFont(name, FontName, Size) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
+		createFont(name, fontName, size, antialiasing)
+		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
 	end
 
 	surface.SetFont(name)
@@ -408,7 +431,7 @@ function Editor:UpdateTabText(tab, title)
 	tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
-	if not ed:IsSaved() then
+	if not ed:IsSaved() and tabtext:sub(-1) != "*" then
 		tabtext = tabtext.." *"
 	end
 
@@ -507,7 +530,6 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	end
 	local _old = sheet.Tab.OnMousePressed
 	sheet.Tab.OnMousePressed = function(pnl, keycode, ...)
-		_old(pnl, keycode, ...)
 		if keycode == MOUSE_MIDDLE then
 			--self:FixTabFadeTime()
 			self:CloseTab(pnl)
@@ -576,16 +598,15 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 			if th.RegisterTabMenu then
 				th:RegisterTabMenu(menu, content)
 			end
+			return
 		end
+		_old(pnl, keycode, ...)
 
 		self:SetActiveTab(pnl)
 	end
 	if content.GetTabHandler().IsEditor then
-		content.OnTextChanged = function(panel)
-			self:UpdateTabText(self:GetActiveTab())
-			timer.Create("sfautosave", 5, 1, function()
-					self:SaveTabs()
-				end)
+		content.OnTextChanged = function()
+			self:UpdateTabText(sheet.Tab)
 		end
 		content.OnShortcut = function(_, code)
 			if code == KEY_S then
@@ -653,8 +674,8 @@ function Editor:CloseTab(_tab,dontask)
 	end
 	local ed = activetab:GetPanel()
 	if not ed:IsSaved() and not dontask and not ed.IsOnline then
-		local question = string.format("Do you want to close %q ?", activetab:GetText())
-		Derma_Query(question, "Are you sure?", "Close", function() self:CloseTab(_tab, true) end, "Cancel", function() end)
+		local question = string.format("Do you want to close <color=255,30,30>%q</color> ?", activetab:GetText())
+		SF.Editor.Query("Are you sure?", question, "Close", function() self:CloseTab(activetab, true) end, "Cancel", function() end)
 		return
 	end
 
@@ -1126,7 +1147,7 @@ function Editor:CreateThemesPanel()
 		local menu = DermaMenu()
 
 		menu:AddOption("From URL", function()
-			Derma_StringRequest("Load theme from URL", "Paste the URL to a TextMate theme to the text box",
+			Derma_StringRequestNoBlur("Load theme from URL", "Paste the URL to a TextMate theme to the text box",
 				"", function(text)
 				http.Fetch(text, function(body)
 					local parsed, strId, error = SF.Editor.Themes.ParseTextMate(body)
@@ -1148,7 +1169,7 @@ function Editor:CreateThemesPanel()
 		end)
 
 		menu:AddOption("From text", function()
-			local window = Derma_StringRequest("Load theme from text", "Paste the contents of a TextMate theme file below",
+			local window = Derma_StringRequestNoBlur("Load theme from text", "Paste the contents of a TextMate theme file below",
 				"", function(text)
 				local parsed, strId, error = SF.Editor.Themes.ParseTextMate(text)
 
@@ -1210,6 +1231,16 @@ function Editor:CreateThemesPanel()
 		addBtn:SetWidth(btnPanel:GetWide() / 2)
 	end
 
+	local label = vgui.Create("DLabel")
+	panel:AddItem(label)
+	label:DockMargin(0, 0, 0, 0)
+	label:SetFont("SFTitle")
+	label:SetColor(Color(255,32,32))
+	label:SetText("If your theme doenst work or looks different than it should you can report it by clicking on this text.")
+	label:SetWrap(true)
+	label.DoClick = function()
+		gui.OpenURL( "https://github.com/thegrb93/StarfallEx/issues/307" )
+	end
 	return panel
 end
 
@@ -1454,6 +1485,9 @@ function Editor:GetCode()
 end
 
 function Editor:Open(Line, code, forcenewtab)
+	timer.Create("sfautosave", 5, 0, function()
+		self:SaveTabs()
+	end)
 	if self:IsVisible() and not Line and not code then self:Close() end
 	self:SetV(true)
 	if code then

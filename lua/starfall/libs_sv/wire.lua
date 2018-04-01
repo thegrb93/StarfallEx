@@ -56,7 +56,7 @@ local ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-
+local COLOR_WHITE = Color(255, 255, 255)
 -- Register privileges
 do
 	local P = SF.Permissions
@@ -318,17 +318,28 @@ function wire_library.serverUUID()
 	return WireLib.GetServerUUID()
 end
 
+local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/xbeam"] = true, ["cable/redlaser"] = true, ["cable/blue_elec"] = true, ["cable/physbeam"] = true, ["cable/hydra"] = true, ["arrowire/arrowire"] = true, ["arrowire/arrowire2"] = true }
 --- Wires two entities together
 -- @param entI Entity with input
 -- @param entO Entity with output
 -- @param inputname Input to be wired
 -- @param outputname Output to be wired
-function wire_library.create (entI, entO, inputname, outputname)
+-- @param width Width of the wire(optional)
+-- @param color Color of the wire(optional)
+-- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
+function wire_library.create (entI, entO, inputname, outputname, width, color, material)
 	checktype(entI, SF.Types["Entity"])
 	checktype(entO, SF.Types["Entity"])
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
+	
+	width = checkluatype(width, TYPE_NUMBER, 0, 0)
+	width = math.Clamp(width, 0, 5)
+	
+	color = checktype(color, SF.Types['Color'], 0,  COLOR_WHITE)
 
+	material = ValidWireMat[material] and material or "cable/rope"
+	
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
 
@@ -351,7 +362,7 @@ function wire_library.create (entI, entO, inputname, outputname)
 		if CheckInput.SrcId == outputname and CheckInput.Src == entO then SF.Throw("Source \"" .. inputname .. "\" is already wired to target \"" .. outputname .. "\"") end
 	end
 
-	WireLib.Link_Start(SF.instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, "cable/rope", Vector(255, 255, 255), 0)
+	WireLib.Link_Start(SF.instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
 	WireLib.Link_End(SF.instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, SF.instance.player)
 end
 
