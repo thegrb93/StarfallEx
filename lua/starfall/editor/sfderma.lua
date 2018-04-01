@@ -1068,3 +1068,87 @@ function PANEL:GetColor(...)
 	return self.mixer:GetColor(...)
 end
 vgui.Register( "StarfallColorPicker", PANEL, "StarfallFrame" )
+
+
+PANEL = {}
+
+function PANEL:Init()
+	local preview = vgui.Create( "DPanel", self )
+	preview:Dock(TOP)
+	preview:SetTall(100)
+	preview.Paint = function()
+		draw.SimpleText( "This is font preview", self.Font)
+	end
+	self.preview = preview
+
+
+	local form = vgui.Create("DForm", self)
+	form:Dock(FILL)
+	form.Header:SetVisible(false)
+	form.Paint = function () end
+	form.PerformLayout = function() end
+	local _old = form.AddItem
+	form.AddItem = function(form, left, right)
+		_old(form,left,right)
+		if left then
+			if left.SetDark then left:SetDark(false) end
+		end
+		if right then
+			if right.SetDark then right:SetDark(false) end
+		end
+
+		return left,right
+	end
+
+	self.FontData = {
+		font = "Arial",
+		extended = false,
+		size = 13,
+		weight = 500,
+		blursize = 0,
+		scanlines = 0,
+		antialias = true,
+		underline = false,
+		italic = false,
+		strikeout = false,
+		symbol = false,
+		rotary = false,
+		shadow = false,
+		additive = false,
+		outline = false,
+	}
+
+	local function setupItem(item, name)
+		item:SetValue(self.FontData[name])
+		item.OnChange = function(_, val)
+			if val != nil then
+				self.FontData[name] = val
+			else
+				self.FontData[name] = item:GetValue()
+			end
+		end
+	end
+
+	setupItem(form:TextEntry("Font Name:"), "font")
+	setupItem(form:NumberWang("Size:", nil, 1, 100), "size")
+	setupItem(form:NumberWang("Weight:", nil, 0, 1000), "weight")
+	setupItem(form:NumberWang("Blur size:", nil, 0, 100, 2), "blursize")
+	setupItem(form:NumberWang("Scanlines:", nil, 0, 100, 2), "scanlines")
+	setupItem(form:CheckBox("Extended:"), "extended")
+	setupItem(form:CheckBox("antialias:"), "antialias")
+	setupItem(form:CheckBox("underline:"), "underline")
+	setupItem(form:CheckBox("italic:"), "italic")
+	setupItem(form:CheckBox("strikeout:"), "strikeout")
+	setupItem(form:CheckBox("symbol:"), "symbol")
+	setupItem(form:CheckBox("rotary:"), "rotary")
+	setupItem(form:CheckBox("shadow:"), "shadow")
+	setupItem(form:CheckBox("additive:"), "additive")
+	setupItem(form:CheckBox("outline:"), "outline")
+	form:Button("Preview").DoClick = function()
+		self.Font = SF.Editor.getFont(self.FontData)
+	end
+	self:SetSize(300,500)
+	self:Center()
+end
+
+vgui.Register( "StarfallFontPicker", PANEL, "StarfallFrame" )

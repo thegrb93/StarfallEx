@@ -359,6 +359,31 @@ if CLIENT then
 		end
 	end
 
+	local fontCache = {}
+	function SF.Editor.getFont(tab)
+		local font = tab.font or "Arial"
+		local extended = tab.extended and 1 or 0
+		local size = tab.size or 13
+		local weight = tab.weight or 500
+		local blursize = tab.blursize or 0
+		local scanlines = tab.scanlines or 0
+		local antialias = (tab.antialias != false) and 1 or 0
+		local underline = tab.underline and 1 or 0
+		local italic = tab.italic and 1 or 0
+		local strikeout = tab.strikeout and 1 or 0
+		local symbol = tab.symbol and 1 or 0
+		local rotary = tab.rotary and 1 or 0
+		local shadow = tab.shadow and 1 or 0
+		local additive = tab.additive and 1 or 0
+		local outline = tab.outline and 1 or 0
+		local fontname = string.format("sf_%s_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f_%f", font, extended, size, weight, blursize, scanlines, antialias, underline, italic, strikeout, symbol, rotary, shadow, additive, outline)
+		if not fontCache[fontname] then
+			surface.CreateFont( fontname, tab )
+			fontCache[fontname] = true
+		end
+		return fontname
+	end
+
 	-- CLIENT ANIMATION
 
 	local busy_players = SF.EntityTable("starfall_busy_animation")
