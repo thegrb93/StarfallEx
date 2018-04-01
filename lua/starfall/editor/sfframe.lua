@@ -89,13 +89,13 @@ cvars.AddChangeCallback("sf_editor_layout", function()
 end)
 
 Editor.CreatedFonts = {}
-function createFont(name, FontName, Size)
+function createFont(name, FontName, Size, Antialiasing)
 	local fontTable =
 	{
 		font = FontName,
 		size = Size,
 		weight = 400,
-		antialias = true,
+		antialias = Antialiasing,
 		additive = false,
 		italic = false,
 	}
@@ -107,15 +107,15 @@ function createFont(name, FontName, Size)
 	surface.CreateFont(name.."_Italic", fontTable)
 
 end
-function Editor:GetFont(FontName, Size)
+function Editor:GetFont(FontName, Size, Antialiasing)
 	if not FontName or FontName == "" or not Size then return end
-	local name = "sf_" .. FontName .. "_" .. Size
+	local name = "sf_" .. FontName .. "_" .. Size .. "_" .. (Antialiasing and 1 or 0)
 
 	-- If font is not already created, create it.
 	if not self.CreatedFonts[name] then
 		self.CreatedFonts[name] = true
-		createFont(name, FontName, Size)
-		timer.Simple(0, function() createFont(name, FontName, Size) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
+		createFont(name, FontName, Size, Antialiasing)
+		timer.Simple(0, function() createFont(name, FontName, Size, Antialiasing) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
 	end
 
 	surface.SetFont(name)
