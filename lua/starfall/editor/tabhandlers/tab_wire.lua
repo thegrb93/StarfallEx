@@ -72,6 +72,7 @@ TabHandler.EnlightenColorsConVar = CreateClientConVar("sf_editor_wire_enlightenc
 TabHandler.HighlightOnDoubleClickConVar = CreateClientConVar("sf_editor_wire_highlight_on_double_click", "1", true, false)
 TabHandler.DisplayCaretPosConVar = CreateClientConVar("sf_editor_wire_display_caret_pos", "0", true, false)
 TabHandler.AutoIndentConVar = CreateClientConVar("sf_editor_wire_auto_indent", "1", true, false)
+TabHandler.EnableAntialiasing = CreateClientConVar("sf_editor_wire_enable_antialiasing", "1", true, false)
 TabHandler.ScrollSpeedConVar = CreateClientConVar("sf_editor_wire_scrollmultiplier", 1, true, false)
 TabHandler.LinesHiddenFormatConVar = CreateClientConVar("sf_editor_wire_lines_hidden_format", "< %d lines hidden >", true, false)
 TabHandler.AutoValidateConVar = CreateClientConVar("sf_editor_wire_validateontextchange", "0", true, false)
@@ -235,7 +236,7 @@ function TabHandler:RegisterSettings()
 	end
 	FontSelect:AddChoice("Custom...")
 	FontSelect:SetValue(TabHandler.FontConVar:GetString())
-	FontSelect:SetFontInternal(SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), 16))
+	FontSelect:SetFontInternal(SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), 16, TabHandler.EnableAntialiasing:GetBool()))
 
 
 
@@ -275,6 +276,9 @@ function TabHandler:RegisterSettings()
 
 	local enlightenColors = form:CheckBox( "Use brighter colors", "sf_editor_wire_enlightencolors" )
 	local displayCaret = form:CheckBox( "Display caret position", "sf_editor_wire_display_caret_pos" )
+
+	local enableAntialiasing = form:CheckBox( "Enable font antialiasing", "sf_editor_wire_enable_antialiasing" )
+
 	local scrollSpeed = form:NumSlider("Scroll Speed","sf_editor_wire_scrollmultiplier", 0.01, 4, 4)
 	scrollSpeed:SetPaintBackgroundEnabled( true )
 	scrollSpeed.TextArea.m_colText = Color(255,255,255)
@@ -361,8 +365,8 @@ function PANEL:Init()
 	self:SetMode("Starfall")
 	self.CurrentMode:LoadSyntaxColors()
 
-	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
-	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), math_floor(TabHandler.FontSizeConVar:GetInt()*0.9))
+	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt(), TabHandler.EnableAntialiasing:GetBool())
+	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), math_floor(TabHandler.FontSizeConVar:GetInt()*0.9), TabHandler.EnableAntialiasing:GetBool())
 	table.insert(TabHandler.Tabs, self)
 
 end
@@ -471,8 +475,8 @@ function PANEL:OnThemeChange()
 	for k,v in ipairs(self.Rows) do
 		v[2] = false
 	end
-	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt())
-	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7)
+	self.CurrentFont, self.FontWidth, self.FontHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt(), TabHandler.EnableAntialiasing:GetBool())
+	self.CurrentFontSmall, self.FontSmallWidth, self.FontSmallHeight = SF.Editor.editor:GetFont(TabHandler.FontConVar:GetString(), TabHandler.FontSizeConVar:GetInt()*0.7, TabHandler.EnableAntialiasing:GetBool())
 
 end
 
