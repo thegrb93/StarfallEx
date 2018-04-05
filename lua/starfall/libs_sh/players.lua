@@ -250,7 +250,7 @@ function player_methods:getVehicle()
 	checktype(self, player_metamethods)
 	local ent = eunwrap(self)
 	if not IsValid(ent) then return end
-	return ewrap(ent:GetDriver())
+	return ewrap(ent:GetVehicle())
 end
 
 --- Returns whether the player is an admin
