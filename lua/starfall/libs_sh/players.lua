@@ -243,6 +243,16 @@ function player_methods:inVehicle()
 	return ent and ent:InVehicle()
 end
 
+--- Returns the vehicle the player is driving
+-- @shared
+-- @return Vehicle if player in vehicle or nil
+function player_methods:getVehicle()
+	checktype(self, player_metamethods)
+	local ent = eunwrap(self)
+	if not IsValid(ent) then return end
+	return ewrap(ent:GetDriver())
+end
+
 --- Returns whether the player is an admin
 -- @shared
 -- @return True if player is admin
