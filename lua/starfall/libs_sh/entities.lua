@@ -510,7 +510,7 @@ end
 -- @return The matrix
 function ents_methods:getBoneMatrix(bone)
 	checktype(self, ents_metamethods)
-	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
+	if bone == nil then bone = 0 else checkluatype (bone, TYPE_NUMBER) end
 
 	local ent = eunwrap(self)
 	return owrap(ent:GetBoneMatrix(bone))
@@ -532,7 +532,7 @@ end
 -- @return Name of the bone
 function ents_methods:getBoneName(bone)
 	checktype(self, ents_metamethods)
-	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
+	if bone == nil then bone = 0 else checkluatype (bone, TYPE_NUMBER) end
 	local ent = eunwrap(self)
 	return ent:GetBoneName(bone)
 end
@@ -543,7 +543,7 @@ end
 -- @return Parent index of the bone
 function ents_methods:getBoneParent(bone)
 	checktype(self, ents_metamethods)
-	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
+	if bone == nil then bone = 0 else checkluatype (bone, TYPE_NUMBER) end
 	local ent = eunwrap(self)
 	return ent:GetBoneParent(bone)
 end
@@ -555,7 +555,7 @@ end
 -- @return Angle of the bone
 function ents_methods:getBonePosition(bone)
 	checktype(self, ents_metamethods)
-	bone = checkluatype (bone, TYPE_NUMBER, 0, 0)
+	if bone == nil then bone = 0 else checkluatype (bone, TYPE_NUMBER) end
 	local ent = eunwrap(self)
 	local pos, ang = ent:GetBonePosition(bone)
 	return vwrap(pos), awrap(ang)
