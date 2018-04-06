@@ -13,6 +13,23 @@ local PANEL = {} -- It's our VGUI
 ----------------
 -- Handler part
 ----------------
+
+CreateClientConVar("sf_editor_ace_wordwrap", 1, true, false)
+CreateClientConVar("sf_editor_ace_widgets", 1, true, false)
+CreateClientConVar("sf_editor_ace_linenumbers", 1, true, false)
+CreateClientConVar("sf_editor_ace_gutter", 1, true, false)
+CreateClientConVar("sf_editor_ace_invisiblecharacters", 0, true, false)
+CreateClientConVar("sf_editor_ace_indentguides", 1, true, false)
+CreateClientConVar("sf_editor_ace_activeline", 1, true, false)
+CreateClientConVar("sf_editor_ace_autocompletion", 1, true, false)
+CreateClientConVar("sf_editor_ace_liveautocompletion", 0, true, false)
+CreateClientConVar("sf_editor_ace_fixkeys", system.IsLinux() and 1 or 0, true, false) --maybe osx too? need someone to check
+CreateClientConVar("sf_editor_ace_fixconsolebug", 0, true, false)
+CreateClientConVar("sf_editor_ace_disablelinefolding", 0, true, false)
+CreateClientConVar("sf_editor_ace_keybindings", "ace", true, false)
+CreateClientConVar("sf_editor_ace_fontsize", 13, true, false)
+
+
 TabHandler.SessionTabs = {}
 TabHandler.DisableThemeSupport = CreateClientConVar("sf_editor_ace_disablethemesupport", "0", true, false)
 

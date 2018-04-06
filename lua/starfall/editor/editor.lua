@@ -1,5 +1,5 @@
 -------------------------------------------------------------------------------
--- SF Editor
+-- SF Editor Interface
 -- Originally created by Jazzelhawk
 --
 -- To do:
@@ -61,24 +61,6 @@ if CLIENT then
 	SF.Editor.colors.medlight = Color(127, 178, 240)
 	SF.Editor.colors.light = Color(173, 213, 247)
 
-	-- Icons
-	SF.Editor.icons = {}
-	SF.Editor.icons.arrowr = Material("radon/arrow_right.png", "noclamp smooth")
-	SF.Editor.icons.arrowl = Material("radon/arrow_left.png", "noclamp smooth")
-
-	local defaultCode = [[--@name
-	--@author
-	--@shared
-
-	--[[
-	Starfall Scripting Environment
-
-	Github: https://github.com/thegrb93/StarfallEx
-	Reference Page: http://thegrb93.github.io/Starfall/
-
-	Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
-	]].."]]"
-
 	local invalid_filename_chars = {
 		["*"] = "",
 		["?"] = "",
@@ -89,25 +71,6 @@ if CLIENT then
 		['"'] = "",
 	}
 
-	CreateClientConVar("sf_modelviewer_width", 930, true, false)
-	CreateClientConVar("sf_modelviewer_height", 615, true, false)
-	CreateClientConVar("sf_modelviewer_posx", ScrW() / 2 - 930 / 2, true, false)
-	CreateClientConVar("sf_modelviewer_posy", ScrH() / 2 - 615 / 2, true, false)
-
-	CreateClientConVar("sf_editor_ace_wordwrap", 1, true, false)
-	CreateClientConVar("sf_editor_ace_widgets", 1, true, false)
-	CreateClientConVar("sf_editor_ace_linenumbers", 1, true, false)
-	CreateClientConVar("sf_editor_ace_gutter", 1, true, false)
-	CreateClientConVar("sf_editor_ace_invisiblecharacters", 0, true, false)
-	CreateClientConVar("sf_editor_ace_indentguides", 1, true, false)
-	CreateClientConVar("sf_editor_ace_activeline", 1, true, false)
-	CreateClientConVar("sf_editor_ace_autocompletion", 1, true, false)
-	CreateClientConVar("sf_editor_ace_liveautocompletion", 0, true, false)
-	CreateClientConVar("sf_editor_ace_fixkeys", system.IsLinux() and 1 or 0, true, false) --maybe osx too? need someone to check
-	CreateClientConVar("sf_editor_ace_fixconsolebug", 0, true, false)
-	CreateClientConVar("sf_editor_ace_disablelinefolding", 0, true, false)
-	CreateClientConVar("sf_editor_ace_keybindings", "ace", true, false)
-	CreateClientConVar("sf_editor_ace_fontsize", 13, true, false)
 
 	local function createLibraryMap ()
 
@@ -202,118 +165,41 @@ if CLIENT then
 
 		editor:Setup("Starfall Editor", "starfall", "Starfall")
 	end
+
+	function SF.Editor.createGlobalPermissionsPanel(client, server)
+		if server != false then -- default to true
+			server = true
+		end
+		if client != false then -- defualt to true
+			client = true
+		end
+		local permsPanel = vgui.Create("StarfallPermissions")
+
+		SF.Permissions.refreshSettingsCache () -- Refresh cache first
+		local clientProviders = SF.Permissions.providers
+
+		if LocalPlayer():IsSuperAdmin() and server then
+			SF.Permissions.requestPermissions(function(serverProviders)
+				permsPanel:AddProviders(serverProviders, true)
+				if client then
+					permsPanel:AddProviders(clientProviders)
+				end
+			end)
+		elseif client then
+			permsPanel:AddProviders(clientProviders)
+		end
+		permsPanel:Dock(FILL)
+		return permsPanel
+	end
 	function SF.Editor.openPermissionsPopup()
 		local frame = vgui.Create("StarfallFrame")
 		frame:SetSize(600, math.min(900, ScrH()))
 		frame:Center()
 		frame:SetTitle("Permissions")
 		frame:Open()
-		local permsPanel = SF.Editor.createpermissionsPanel (frame)
+		local permsPanel = SF.Editor.createGlobalPermissionsPanel()
+		permsPanel:SetParent(frame)
 		permsPanel:Dock(FILL)
-		permsPanel:Refresh()
-	end
-	function SF.Editor.createpermissionsPanel (parent)
-		local panel = vgui.Create("StarfallPanel",parent)
-		panel:Dock(FILL)
-		panel:DockMargin(0, 0, 0, 0)
-		panel.Paint = function () end
-
-		local scrollPanel = vgui.Create("DScrollPanel", panel)
-		scrollPanel:Dock(FILL)
-		scrollPanel:SetPaintBackgroundEnabled(false)
-
-		panel.Refresh = function()
-			scrollPanel:Clear()
-			local clientProviders = {}
-			for i, v in pairs(SF.Permissions.providers) do
-				local provider = { id = v.id, name = v.name, settings = {}, options = {} }
-				local options = provider.options
-				local settings = provider.settings
-				for i, option in ipairs(v.settingsoptions) do
-					options[i] = option
-				end
-				for id, privilege in pairs(SF.Permissions.privileges) do
-					if privilege[3][i] then
-						settings[id] = { privilege[1], privilege[2], privilege[3].setting }
-					end
-				end
-				if next(settings) then
-					clientProviders[#clientProviders+1] = provider
-				end
-			end
-
-			local function createPermissions(providers, server)
-				for _, p in ipairs(providers) do
-					local header = vgui.Create("DLabel", header)
-					header:SetFont("DermaLarge")
-					header:SetColor(Color(255, 255, 255))
-					header:SetText((server and "[Server] " or "[Client] ")..p.name)
-					header:SetSize(0, 40)
-					header:Dock(TOP)
-					scrollPanel:AddItem(header)
-
-					for id, setting in SortedPairs(p.settings) do
-
-						local header = vgui.Create("StarfallPanel")
-						header:DockMargin(0, 5, 0, 0)
-						header:SetSize(0, 20)
-						header:Dock(TOP)
-						header:SetToolTip(id)
-						header:SetBackgroundColor(Color(0,0,0,20))
-
-						local settingtext = vgui.Create("DLabel", header)
-						settingtext:SetFont("DermaDefault")
-						settingtext:SetColor(Color(255, 255, 255))
-						settingtext:SetText(id)
-						settingtext:DockMargin(5, 0, 0, 0)
-						settingtext:Dock(LEFT)
-						settingtext:SizeToContents()
-
-						local description = vgui.Create("DLabel", header)
-						description:SetFont("DermaDefault")
-						description:SetColor(Color(128, 128, 128))
-						description:SetText(" - "..setting[2])
-						description:DockMargin(5, 0, 0, 0)
-						description:Dock(FILL)
-
-						local buttons = {}
-						for i = #p.options, 1, -1 do
-							local button = vgui.Create("StarfallButton", header)
-							button:SetText(p.options[i])
-							button:DockMargin(0, 0, 3, 0)
-							button:Dock(RIGHT)
-							if server then
-								button.active = setting[3]==i
-							else
-								button.active = SF.Permissions.privileges[id][3][p.id].setting == i
-							end
-							button.DoClick = function(self)
-								RunConsoleCommand(server and "sf_permission" or "sf_permission_cl", id, p.id, i)
-								for _, b in ipairs(buttons) do
-									b.active = false
-								end
-								self.active = true
-							end
-							buttons[i] = button
-						end
-
-						scrollPanel:AddItem(header)
-
-					end
-				end
-			end
-
-			if LocalPlayer():IsSuperAdmin() then
-				SF.Permissions.requestPermissions(function(serverProviders)
-					createPermissions(serverProviders, true)
-					createPermissions(clientProviders)
-				end)
-			else
-				createPermissions(clientProviders)
-			end
-		end
-
-		return panel
 	end
 
 
