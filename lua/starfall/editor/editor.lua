@@ -23,7 +23,7 @@ AddCSLuaFile("xml.lua")
 
 if CLIENT then
 	SF.Editor.TabHandlers = { }
-	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tabeditor", "ace", true, false)
+	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tab_editor", "wire", true, false)
 end
 
 MsgN("- Loading Editor TabHandlers")
