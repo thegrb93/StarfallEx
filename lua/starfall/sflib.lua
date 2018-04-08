@@ -689,23 +689,24 @@ else
 
 			if sf:IsValid() and sf.instance then
 				for filename, code in pairs(list.files) do
-					if sf.files[filename] == code then
-						list.files[filename] = nil
+					if sf.files[filename] ~= code then
+						updatedFiles[filename] = code
 					end
 				end
-
 				for filename, code in pairs(sf.files) do
 					if not list.files[filename] then
-						list.files[filename] = "-removed-"
+						updatedFiles[filename] = "-removed-"
 					end
 				end
+			else
+				updatedFiles = list.files
 			end
 
 			--print("Uploading SF code")
 			net.Start("starfall_upload")
 			net.WriteString(list.mainfile)
 
-			for filename, code in pairs(list.files) do
+			for filename, code in pairs(updatedFiles) do
 				net.WriteBit(false)
 				net.WriteString(filename)
 				net.WriteStream(code)
