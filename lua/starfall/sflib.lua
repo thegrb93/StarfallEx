@@ -140,7 +140,7 @@ end
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
 function SF.CheckType(val, typ, level)
 	local meta = dgetmeta(val)
-	if meta and typemetatables[meta] and (meta == typ or (meta.__supertypes and meta.__supertypes[typ])) then
+	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) then
 		return val
 	else
 		-- Failed, throw error
