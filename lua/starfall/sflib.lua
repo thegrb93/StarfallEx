@@ -626,7 +626,7 @@ if SERVER then
 		updata.NumFiles = I
 
 		if I == 0 then
-			updata.callback(updata.mainfile, sf.files, {})
+			updata.callback(updata.mainfile, updata.files)
 			uploaddata[ply] = nil
 		end
 	end)
