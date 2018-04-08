@@ -27,24 +27,18 @@ util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
-function ENT:SendCode (recipient, filesToSend)
+function ENT:SendCode (recipient)
 	net.Start("starfall_processor_download")
 	net.WriteEntity(self)
 	net.WriteEntity(self.owner)
 	net.WriteString(self.mainfile)
 
-	if not filesToSend then
-		for name, code in pairs(self.files) do
-			net.WriteBit(false)
-			net.WriteString(name)
-			net.WriteStream(code)
-		end
-	else
-		for i, name in ipairs(filesToSend) do
-			net.WriteBit(false)
-			net.WriteString(name)
-			net.WriteStream(self.files[name] or ".")
-		end
+	for name, data in pairs(self.files) do
+
+		net.WriteBit(false)
+		net.WriteString(name)
+		net.WriteStream(data)
+
 	end
 
 	net.WriteBit(true)

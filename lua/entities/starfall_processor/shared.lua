@@ -17,7 +17,7 @@ ENT.States          = {
 	None = 3,
 }
 
-function ENT:Compile(owner, files, mainfile, filesToSend)
+function ENT:Compile(owner, files, mainfile)
 	if self.instance then
 		self.instance:runScriptHook("removed")
 		self.instance:deinitialize()
@@ -25,29 +25,30 @@ function ENT:Compile(owner, files, mainfile, filesToSend)
 	end
 
 	-- Remove unused files
+	self.files = self.files or {}
 	for filename, code in pairs(files) do
-		if filename[1] == "-" then
-			files[filename] = nil
-			files[filename:sub(2)] = nil
+		if code == "-removed-" then
+			self.files[filename] = nil
+		else
+			self.files[filename] = code
 		end
 	end
 
 	local update = self.mainfile ~= nil
 	self.error = nil
-	self.files = files
 	self.mainfile = mainfile
 	self.owner = owner
 
 	if SERVER then
 		if update then
-			self:SendCode(nil, filesToSend)
+			self:SendCode()
 		elseif self.SendQueue then
 			self:SendCode(self.SendQueue)
 			self.SendQueue = nil
 		end
 	end
 
-	local ok, instance = SF.Instance.Compile(self.files, mainfile, owner, { entity = self })
+	local ok, instance = SF.Instance.Compile(files, mainfile, owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then

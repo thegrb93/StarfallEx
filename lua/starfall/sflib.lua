@@ -584,7 +584,8 @@ if SERVER then
 			mainfile = nil,
 			needHeader = true,
 			callback = callback,
-			timeout = CurTime() + 1
+			timeout = CurTime() + 1,
+			entity = sfEntity
 		}
 		return true
 	end
@@ -597,16 +598,11 @@ if SERVER then
 		end
 
 		updata.mainfile = net.ReadString()
-		local sf = net.ReadEntity()
+		local sf = updata.entity
 
 		local I = 0
 		while I < 256 do
-			if net.ReadBit() ~= 0 then
-				if I == 0 then
-					updata.callback(updata.mainfile, sf.files, {})
-				end
-				break
-			end
+			if net.ReadBit() ~= 0 then break end
 			local filename = net.ReadString()
 
 			net.ReadStream(ply, function(data)
@@ -619,8 +615,7 @@ if SERVER then
 				updata.files[filename] = data
 
 				if updata.Completed == updata.NumFiles then
-					local filesToCompile = (sf:IsValid() and sf.instance) and table.Merge(sf.files or {}, updata.files) or updata.files
-					updata.callback(updata.mainfile, filesToCompile, table.GetKeys(updata.files))
+					updata.callback(updata.mainfile, updata.files)
 					uploaddata[ply] = nil
 				end
 			end)
@@ -631,6 +626,7 @@ if SERVER then
 		updata.NumFiles = I
 
 		if I == 0 then
+			updata.callback(updata.mainfile, sf.files, {})
 			uploaddata[ply] = nil
 		end
 	end)
@@ -685,48 +681,34 @@ else
 	end)
 
 	net.Receive("starfall_requpload", function(len)
-		local sf = net.ReadEntity()
 		local ok, list = SF.Editor.BuildIncludesTable()
-		local sfJustSpawned = not sf:IsValid()
-		local updatedFiles = {}
-		local removedFiles = {}
-
-		local function hasKey(t, key)
-			for k, value in pairs(t) do
-				if k == key then return true end
-			end
-
-			return false
-		end
-
-		if not sfJustSpawned and sf.instance then
-			sf.files = sf.files or {}
-
-			for filename, code in pairs(list.files) do
-				if code ~= (sf.files[filename] or "_DOES_NOT_EXIST_") then
-					table.insert(updatedFiles, filename)
-				end
-			end
-
-			for filename, code in pairs(sf.files) do
-				if not hasKey(list.files, filename) then
-					table.insert(removedFiles, "-" .. filename)
-				end
-			end
-		else
-			updatedFiles = table.GetKeys(list.files)
-		end
+		local sf = net.ReadEntity()
 
 		if ok then
+			local updatedFiles = {}
+
+			if sf:IsValid() and sf.instance then
+				for filename, code in pairs(list.files) do
+					if sf.files[filename] == code then
+						list.files[filename] = nil
+					end
+				end
+
+				for filename, code in pairs(sf.files) do
+					if not list.files[filename] then
+						list.files[filename] = "-removed-"
+					end
+				end
+			end
+
 			--print("Uploading SF code")
 			net.Start("starfall_upload")
 			net.WriteString(list.mainfile)
-			net.WriteEntity(sf)
 
-			for i, filename in ipairs(table.Add(updatedFiles, removedFiles)) do
+			for filename, code in pairs(list.files) do
 				net.WriteBit(false)
 				net.WriteString(filename)
-				net.WriteStream(list.files[filename] or ".")
+				net.WriteStream(code)
 			end
 
 			net.WriteBit(true)
@@ -735,7 +717,6 @@ else
 		else
 			net.Start("starfall_upload")
 			net.WriteString("")
-			net.WriteEntity(sf)
 			net.WriteBit(true)
 			net.SendToServer()
 			if list then
