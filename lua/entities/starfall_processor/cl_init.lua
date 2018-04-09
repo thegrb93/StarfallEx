@@ -53,6 +53,24 @@ hook.Add("NetworkEntityCreated", "starfall_chip_reset", function(ent)
 	end
 end)
 
+do
+	net.Start("starfall_reqcache")
+	net.SendToServer()
+	print("requesting cache")
+
+	net.Receive("starfall_getcache", function()
+		while net.ReadBit() == 0 do
+			local ply = net.ReadEntity()
+			local filename = net.ReadString()
+
+			net.ReadStream(nil, function(code)
+				ply.sf_cache = ply.sf_cache or {}
+				ply.sf_cache[filename] = code
+			end)
+		end
+	end)
+end
+
 function ENT:GetOverlayText()
 	local state = self:GetNWInt("State", 1)
 	local clientstr, serverstr

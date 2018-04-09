@@ -24,18 +24,29 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
+	local useCache = false
 	local update = self.mainfile ~= nil
 	self.error = nil
 	self.mainfile = mainfile
 	self.files = self.files or {}
 	self.owner = owner
+	owner.sf_cache = owner.sf_cache or {}
 
 	for filename, code in pairs(files) do
 		if code == "-removed-" then
 			self.files[filename] = nil
+		elseif code == "-cache-" then
+			self.files[filename] = nil
+			useCache = true
 		else
 			self.files[filename] = code
 		end
+
+		owner.sf_cache[filename] = self.files[filename]
+	end
+
+	if useCache then
+		self.files = table.Merge(owner.sf_cache, self.files)
 	end
 
 	if SERVER then

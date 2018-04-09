@@ -22,6 +22,7 @@ function ENT:Use(activator)
 	end
 end
 
+util.AddNetworkString("starfall_getcache")
 util.AddNetworkString("starfall_processor_download")
 util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
@@ -132,3 +133,50 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	end
 end
 hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
+
+-- Send cached files on player to new players
+do
+	local function getCacheOfAllPlayers()
+		local cache = {}
+
+		for i, ply in ipairs(player.getAll()) do
+			if ply.sf_cache and #ply.sf_cache then
+				cache[ply] = ply.sf_cache
+			end
+		end
+
+		return cache
+	end
+
+	local function mockGetCacheOfAllPlayers()
+		return {
+			[Entity(0)] = {
+				["test.txt"] = "return 69",
+				["include.txt"] = "return 'sorry'",
+			},
+
+			-- [Entity(1)] = {
+			-- 	["asd.txt"] = "return 69",
+			-- 	["blah.txt"] = "return 'sorry'",
+			-- }
+		}
+	end
+
+	net.Receive("starfall_reqcache", function(len, from)
+		local caches = mockGetCacheOfAllPlayers()
+		net.Start("starfall_getcache")
+		print("cache requested")
+
+		for ply, cache in pairs(caches) do
+			for filename, code in pairs(cache) do
+				net.WriteBit(false)
+				net.WriteEntity(ply)
+				net.WriteString(filename)
+				net.WriteStream(code)
+			end
+		end
+
+		net.WriteBit(true)
+		net.Send(from)
+	end)
+end

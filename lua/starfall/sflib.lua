@@ -550,6 +550,7 @@ local function argsToChat(...)
 end
 
 if SERVER then
+	util.AddNetworkString("starfall_reqcache")
 	util.AddNetworkString("starfall_requpload")
 	util.AddNetworkString("starfall_upload")
 	util.AddNetworkString("starfall_addnotify")
@@ -677,6 +678,35 @@ else
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
 		local sf = net.ReadEntity()
+		local cache = LocalPlayer().sf_cache
+
+		local function shouldUseCache()
+			if not cache then return false end
+
+			for filename, code in pairs(list.files) do
+				if cache[filename] then return true end
+			end
+
+			return false
+		end
+
+		local function getCacheDiff()
+			local diff = {}
+
+			for filename, code in pairs(list.files) do
+				if not cache[filename] or cache[filename] ~= code then
+					diff[filename] = code
+				end
+			end
+
+			for filename, code in pairs(cache) do
+				if not list.files[filename] then
+					diff[filename] = "-removed-"
+				end
+			end
+
+			return diff
+		end
 
 		if ok then
 			local updatedFiles = {}
@@ -693,7 +723,12 @@ else
 					end
 				end
 			else
-				updatedFiles = list.files
+				if shouldUseCache() then
+					updatedFiles = getCacheDiff()
+					updatedFiles["*use-cache*"] = "-cache-"
+				else
+					updatedFiles = list.files
+				end
 			end
 
 			--print("Uploading SF code")
