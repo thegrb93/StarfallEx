@@ -24,8 +24,12 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
-	-- Remove unused files
+	local update = self.mainfile ~= nil
+	self.error = nil
+	self.mainfile = mainfile
 	self.files = self.files or {}
+	self.owner = owner
+
 	for filename, code in pairs(files) do
 		if code == "-removed-" then
 			self.files[filename] = nil
@@ -34,21 +38,16 @@ function ENT:Compile(owner, files, mainfile)
 		end
 	end
 
-	local update = self.mainfile ~= nil
-	self.error = nil
-	self.mainfile = mainfile
-	self.owner = owner
-
 	if SERVER then
 		if update then
-			self:SendCode()
+			self:SendCode(files)
 		elseif self.SendQueue then
-			self:SendCode(self.SendQueue)
+			self:SendCode(files, self.SendQueue)
 			self.SendQueue = nil
 		end
 	end
 
-	local ok, instance = SF.Instance.Compile(files, mainfile, owner, { entity = self })
+	local ok, instance = SF.Instance.Compile(self.files, mainfile, owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then

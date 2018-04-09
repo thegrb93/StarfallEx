@@ -27,13 +27,13 @@ util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
-function ENT:SendCode (recipient)
+function ENT:SendCode (updatefiles, recipient)
 	net.Start("starfall_processor_download")
 	net.WriteEntity(self)
 	net.WriteEntity(self.owner)
 	net.WriteString(self.mainfile)
 
-	for name, data in pairs(self.files) do
+	for name, data in pairs(updatefiles) do
 
 		net.WriteBit(false)
 		net.WriteString(name)
