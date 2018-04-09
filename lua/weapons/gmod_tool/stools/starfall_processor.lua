@@ -95,7 +95,7 @@ function TOOL:LeftClick(trace)
 		undo.Finish()
 	end
 
-	if not SF.RequestCode(ply, function(mainfile, files)
+	if not SF.RequestCode(ply, sf, function(mainfile, files)
 		if not mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
 		sf:Compile(ply, files, mainfile)

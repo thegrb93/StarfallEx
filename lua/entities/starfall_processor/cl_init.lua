@@ -117,6 +117,11 @@ net.Receive("starfall_processor_download", function (len)
 		I = I + 1
 	end
 
+	if I == 0 then
+		dlProc:Compile(dlOwner, dlFiles, dlMain)
+		dlProc.restarting = false
+	end
+
 	dlNumFiles.Completed = 0
 	dlNumFiles.NumFiles = I
 end)
