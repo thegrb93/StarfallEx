@@ -690,6 +690,18 @@ else
 			return false
 		end
 
+		local function getFilesToRemoveOnCache()
+			local diff = {}
+
+			for filename, code in pairs(cache) do
+				if not list.files[filename] then
+					diff[filename] = "-removed-"
+				end
+			end
+
+			return diff
+		end
+
 		local function getCacheDiff()
 			local diff = {}
 
@@ -699,12 +711,7 @@ else
 				end
 			end
 
-			for filename, code in pairs(cache) do
-				if not list.files[filename] then
-					diff[filename] = "-removed-"
-				end
-			end
-
+			diff = table.Merge(diff, getFilesToRemoveOnCache())
 			return diff
 		end
 
@@ -722,6 +729,7 @@ else
 						updatedFiles[filename] = "-removed-"
 					end
 				end
+				updatedFiles = table.Merge(updatedFiles, getFilesToRemoveOnCache())
 			else
 				if shouldUseCache() then
 					updatedFiles = getCacheDiff()
