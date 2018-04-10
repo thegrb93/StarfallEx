@@ -86,7 +86,7 @@ function ENT:Compile(owner, files, mainfile)
 	if useCache then
 		self.files = table.Merge(owner.sf_cache, self.files)
 
-		if CLIENT and not #table.GetKeys(owner.sf_cache) then
+		if CLIENT and #table.GetKeys(owner.sf_cache) == 0 then
 			getCacheOfPlayer(owner, function(cache)
 				owner.sf_cache_first = false
 				owner.sf_cache = cache
