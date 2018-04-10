@@ -73,18 +73,16 @@ function ENT:Compile(owner, files, mainfile)
 			self.files[filename] = nil
 		elseif filename == "*use-cache*" then
 			self.files[filename] = nil
-			self.owner.sf_cache_ver = code
 			self.cache_ver = code
 			useCache = true
 		else
 			self.files[filename] = code
 		end
-
-		owner.sf_cache[filename] = self.files[filename]
 	end
 
 	if useCache then
-		self.files = table.Merge(owner.sf_cache, self.files)
+		owner.sf_cache = self.files
+		owner.sf_cache_ver = self.cache_ver
 
 		if CLIENT and #table.GetKeys(owner.sf_cache) == 0 then
 			getCacheOfPlayer(owner, function(cache)
