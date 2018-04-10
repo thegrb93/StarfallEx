@@ -63,13 +63,13 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
+			local filesToSend = table.Copy(proc.files)
+
 			if proc.cache_ver == proc.owner.sf_cache_ver then
-				local filesToSend = table.Copy(proc.owner.sf_cache)
 				filesToSend["*use-cache*"] = proc.cache_ver
-				proc:SendCode(filesToSend, ply)
-			else
-				proc:SendCode(proc.files, ply)
 			end
+
+			proc:SendCode(filesToSend, ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
