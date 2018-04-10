@@ -52,15 +52,6 @@ local function getCacheOfPlayer(ply, callback)
 	net.SendToServer()
 end
 
--- if CLIENT then
--- 	getCacheOfPlayer(Entity(1), function(cache)
--- 		print("here we are")
--- 	end)
--- end
--- if CLIENT then
--- 	PrintMessage(HUD_PRINTTALK, LocalPlayer():GetName() .. " Received files ------ ")
--- end
-
 function ENT:Compile(owner, files, mainfile)
 	if self.instance then
 		self.instance:runScriptHook("removed")
