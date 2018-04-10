@@ -83,8 +83,12 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	if useCache then
-		owner.sf_cache = self.files
+		if #table.GetKeys(self.files) == 0 then
+			self.files = owner.sf_cache
+		end
+
 		owner.sf_cache_ver = self.cache_ver
+		owner.sf_cache = self.files
 
 		if CLIENT and #table.GetKeys(owner.sf_cache) == 0 then
 			getCacheOfPlayer(owner, function(cache)
