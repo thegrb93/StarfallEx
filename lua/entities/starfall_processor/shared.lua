@@ -78,6 +78,8 @@ function ENT:Compile(owner, files, mainfile)
 		else
 			self.files[filename] = code
 		end
+
+		owner.sf_cache[filename] = self.files[filename]
 	end
 
 	if useCache then
