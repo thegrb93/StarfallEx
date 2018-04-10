@@ -44,11 +44,13 @@ net.Receive("starfall_getcache", function()
 	end
 end)
 
-local function getCacheOfPlayer(ply, callback)
+local function getCacheOfPlayer(ply, excludeFiles, callback)
 	getcachedata[ply] = callback
+	excludeFiles = excludeFiles or {}
 
 	net.Start("starfall_reqcache")
 	net.WriteEntity(ply)
+	net.WriteString(table.concat(table.GetKeys(excludeFiles), ","))
 	net.SendToServer()
 end
 
@@ -75,6 +77,9 @@ function ENT:Compile(owner, files, mainfile)
 			self.files[filename] = nil
 			self.cache_ver = code
 			useCache = true
+		elseif filename == "*latest-cache*" then
+			self.files[filename] = nil
+			owner.sf_cache_first = false
 		else
 			self.files[filename] = code
 		end
@@ -83,22 +88,16 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	if useCache then
-		if #table.GetKeys(self.files) == 0 then
-			self.files = owner.sf_cache
-		end
-
+		self.files = table.Merge(self.files, owner.sf_cache)
+		owner.sf_cache = table.Copy(self.files)
 		owner.sf_cache_ver = self.cache_ver
-		owner.sf_cache = self.files
 
-		if CLIENT and #table.GetKeys(owner.sf_cache) == 0 then
-			getCacheOfPlayer(owner, function(cache)
+		if CLIENT and owner.sf_cache_first then
+			getCacheOfPlayer(owner, self.files, function(cache)
 				owner.sf_cache_first = false
 				owner.sf_cache = cache
-
-				self:Compile(owner, cache, mainfile)
 			end)
 
-			net.SendToServer()
 			return
 		end
 	end
