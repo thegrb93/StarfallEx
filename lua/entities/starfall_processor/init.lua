@@ -63,7 +63,13 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			proc:SendCode(ply)
+			if proc.cache_ver == proc.owner.sf_cache_ver then
+				local filesToSend = table.Copy(proc.owner.sf_cache)
+				filesToSend["*use-cache*"] = proc.cache_ver
+				proc:SendCode(filesToSend, ply)
+			else
+				proc:SendCode(proc.files, ply)
+			end
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
@@ -136,47 +142,19 @@ hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
 
 -- Send cached files on player to new players
 do
-	local function getCacheOfAllPlayers()
-		local cache = {}
-
-		for i, ply in ipairs(player.getAll()) do
-			if ply.sf_cache and #ply.sf_cache then
-				cache[ply] = ply.sf_cache
-			end
-		end
-
-		return cache
-	end
-
-	local function mockGetCacheOfAllPlayers()
-		return {
-			[Entity(0)] = {
-				["test.txt"] = "return 69",
-				["include.txt"] = "return 'sorry'",
-			},
-
-			-- [Entity(1)] = {
-			-- 	["asd.txt"] = "return 69",
-			-- 	["blah.txt"] = "return 'sorry'",
-			-- }
-		}
-	end
-
 	net.Receive("starfall_reqcache", function(len, from)
-		local caches = mockGetCacheOfAllPlayers()
-		net.Start("starfall_getcache")
-		print("cache requested")
+		local ply = net.ReadEntity()
 
-		for ply, cache in pairs(caches) do
-			for filename, code in pairs(cache) do
-				net.WriteBit(false)
-				net.WriteEntity(ply)
-				net.WriteString(filename)
-				net.WriteStream(code)
-			end
+		net.Start("starfall_getcache")
+		net.WriteEntity(ply)
+
+		for filename, code in pairs(ply.sf_cache or {}) do
+			net.WriteBit(true)
+			net.WriteString(filename)
+			net.WriteStream(code)
 		end
 
-		net.WriteBit(true)
+		net.WriteBit(false)
 		net.Send(from)
 	end)
 end

@@ -17,6 +17,50 @@ ENT.States          = {
 	None = 3,
 }
 
+local getcachedata = {}
+
+net.Receive("starfall_getcache", function()
+	local cache = {}
+	local filecount = 0
+	local ply = net.ReadEntity()
+
+	if not getcachedata[ply] then return end
+
+	while net.ReadBit() == 1 and filecount < 256 do
+		local filename = net.ReadString()
+		filecount = filecount + 1
+
+		net.ReadStream(nil, function(code)
+			cache[filename] = code
+
+			if #table.GetKeys(cache) == filecount then
+				if ply:IsValid() and getcachedata[ply] then
+					getcachedata[ply](cache)
+				end
+
+				getcachedata[ply] = nil
+			end
+		end)
+	end
+end)
+
+local function getCacheOfPlayer(ply, callback)
+	getcachedata[ply] = callback
+
+	net.Start("starfall_reqcache")
+	net.WriteEntity(ply)
+	net.SendToServer()
+end
+
+-- if CLIENT then
+-- 	getCacheOfPlayer(Entity(1), function(cache)
+-- 		print("here we are")
+-- 	end)
+-- end
+-- if CLIENT then
+-- 	PrintMessage(HUD_PRINTTALK, LocalPlayer():GetName() .. " Received files ------ ")
+-- end
+
 function ENT:Compile(owner, files, mainfile)
 	if self.instance then
 		self.instance:runScriptHook("removed")
@@ -31,12 +75,15 @@ function ENT:Compile(owner, files, mainfile)
 	self.files = self.files or {}
 	self.owner = owner
 	owner.sf_cache = owner.sf_cache or {}
+	owner.sf_cache_first = owner.sf_cache_first == nil and true
 
 	for filename, code in pairs(files) do
 		if code == "-removed-" then
 			self.files[filename] = nil
-		elseif code == "-cache-" then
+		elseif filename == "*use-cache*" then
 			self.files[filename] = nil
+			self.owner.sf_cache_ver = code
+			self.cache_ver = code
 			useCache = true
 		else
 			self.files[filename] = code
@@ -47,6 +94,21 @@ function ENT:Compile(owner, files, mainfile)
 
 	if useCache then
 		self.files = table.Merge(owner.sf_cache, self.files)
+
+		if CLIENT and owner.sf_cache_first then
+			getCacheOfPlayer(owner, function(cache)
+				owner.sf_cache_first = false
+				owner.sf_cache = cache
+
+				print("receieved: ")
+				PrintTable(table.GetKeys(cache))
+
+				self:Compile(owner, cache, mainfile)
+			end)
+
+			net.SendToServer()
+			return
+		end
 	end
 
 	if SERVER then

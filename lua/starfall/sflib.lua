@@ -725,7 +725,7 @@ else
 			else
 				if shouldUseCache() then
 					updatedFiles = getCacheDiff()
-					updatedFiles["*use-cache*"] = "-cache-"
+					updatedFiles["*use-cache*"] = tostring(math.random()):sub(-6)
 				else
 					updatedFiles = list.files
 				end
