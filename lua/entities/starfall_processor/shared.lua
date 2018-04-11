@@ -96,6 +96,7 @@ function ENT:Compile(owner, files, mainfile)
 			getCacheOfPlayer(owner, self.files, function(cache)
 				owner.sf_cache_first = false
 				owner.sf_cache = cache
+				self:Compile(owner, cache, mainfile)
 			end)
 
 			return
