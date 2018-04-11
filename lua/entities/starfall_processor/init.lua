@@ -62,7 +62,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			proc:SendCode(ply)
+			proc:SendCode(proc.files, ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
