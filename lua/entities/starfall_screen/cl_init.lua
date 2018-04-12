@@ -35,19 +35,21 @@ function ENT:Initialize ()
 				z	=	0,
 			}
 	end
-	if info then
-		local rotation, translation, translation2, scale = Matrix(), Matrix(), Matrix(), Matrix()
-		rotation:SetAngles(info.rot)
-		translation:SetTranslation(info.offset)
-		translation2:SetTranslation(Vector(-256 / info.RatioX, -256, 0))
-		scale:SetScale(Vector(info.RS, info.RS, info.RS))
 
-		self.ScreenMatrix = translation * rotation * scale * translation2
-		self.ScreenInfo = info
-		self.Aspect = info.RatioX
-		self.Scale = info.RS
-		self.Origin = info.offset
-	end
+	local rotation, translation, translation2, scale = Matrix(), Matrix(), Matrix(), Matrix()
+	rotation:SetAngles(info.rot)
+	translation:SetTranslation(info.offset)
+	translation2:SetTranslation(Vector(-256 / info.RatioX, -256, 0))
+	scale:SetScale(Vector(info.RS, info.RS, info.RS))
+
+	self.ScreenMatrix = translation * rotation * scale * translation2
+	self.ScreenInfo = info
+	self.Aspect = info.RatioX
+	self.Scale = info.RS
+	self.Origin = info.offset
+
+	local w, h = 512 / self.Aspect, 512
+	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
 end
 
 function ENT:LinkEnt (ent)
@@ -87,17 +89,16 @@ function ENT:Draw ()
 end
 
 function ENT:SetBackgroundColor(r, g, b, a)
-	self.BackgroundColor = Color(r, g, b, math.max(a, 1))
+	self.ScreenQuad[5] = Color(r, g, b, math.max(a, 1))
 end
 
 function ENT:DrawTranslucent ()
 	self:DrawModel()
 
-	if halo.RenderedEntity() == self or not self.ScreenInfo then return end
+	if halo.RenderedEntity() == self then return end
 	-- Draw screen here
 	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
 	self.Transform = transform
-	cam.Start({ type = "3D", znear = 3.001 })
 	cam.PushModelMatrix(transform)
 		render.ClearStencil()
 		render.SetStencilEnable(true)
@@ -108,10 +109,10 @@ function ENT:DrawTranslucent ()
 		render.SetStencilWriteMask(1)
 		render.SetStencilReferenceValue(1)
 
-		render.OverrideDepthEnable(true, true)
-		surface.SetDrawColor(self.BackgroundColor or Color(0, 0, 0, 255))
-		surface.DrawRect(0, 0, 512 / self.Aspect, 512)
-		render.OverrideDepthEnable(false)
+		cam.Start({ type = "3D", znear = 3.001 })
+			render.SetColorMaterial()
+			render.DrawQuad(unpack(self.ScreenQuad))
+		cam.End()
 
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 		render.SetStencilTestMask(1)
@@ -126,7 +127,6 @@ function ENT:DrawTranslucent ()
 
 		render.SetStencilEnable(false)
 	cam.PopModelMatrix()
-	cam.End()
 end
 
 function ENT:GetResolution()

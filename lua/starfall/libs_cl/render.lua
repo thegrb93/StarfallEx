@@ -918,6 +918,7 @@ function render_library.setTextureFromScreen (ent)
 	if IsValid(ent) and ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
 		surface.SetMaterial(RT_Material)
+		render.SetMaterial(RT_Material)
 	else
 		draw.NoTexture()
 	end
@@ -1009,6 +1010,19 @@ function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
+local qv1, qv2, qv3, qv4 = Vector(0,0,0), Vector(0,0,0), Vector(0,0,0), Vector(0,0,0)
+local function getQuad(x, y, w, h, ...)
+	local x2, y2 = x+w, y+h
+	qv1.x = x
+	qv1.y = y
+	qv2.x = x2
+	qv2.y = y
+	qv3.x = x2
+	qv3.y = y2
+	qv4.x = x
+	qv4.y = y2
+	return qv1, qv2, qv3, qv4, ...
+end
 --- Draws a rectangle using the current color.
 -- @param x Top left corner x coordinate
 -- @param y Top left corner y coordinate
@@ -1020,7 +1034,8 @@ function render_library.drawRect (x, y, w, h)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (w, TYPE_NUMBER)
 	checkluatype (h, TYPE_NUMBER)
-	surface.DrawRect(x, y, w, h)
+	render.SetColorMaterial()
+	render.DrawQuad(getQuad(x, y, w, h, currentcolor))
 end
 
 --- Draws a rectangle outline using the current color.
@@ -1034,7 +1049,10 @@ function render_library.drawRectOutline (x, y, w, h)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (w, TYPE_NUMBER)
 	checkluatype (h, TYPE_NUMBER)
-	surface.DrawOutlinedRect(x, y, w, h)
+	render.DrawQuad(getQuad(x, y, w, 1, currentcolor))
+	render.DrawQuad(getQuad(x, y+h-1, w, 1, currentcolor))
+	render.DrawQuad(getQuad(x, y, 1, h, currentcolor))
+	render.DrawQuad(getQuad(x+w-1, y, 1, h, currentcolor))
 end
 
 --- Draws a circle outline
@@ -1060,7 +1078,7 @@ function render_library.drawTexturedRect (x, y, w, h)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (w, TYPE_NUMBER)
 	checkluatype (h, TYPE_NUMBER)
-	surface.DrawTexturedRect (x, y, w, h)
+	render.DrawQuad(getQuad(x, y, w, h, currentcolor))
 end
 
 --- Draws a textured rectangle with UV coordinates
