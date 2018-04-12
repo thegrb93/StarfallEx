@@ -86,7 +86,7 @@ function ENT:Compile(owner, files, mainfile)
 
 	if useCache then
 		self.files = table.Merge(self.files, owner.sf_cache)
-		owner.sf_cache = table.Copy(self.files)
+		owner.sf_cache = self.files
 
 		if CLIENT then
 			local cacheIsUpToDate = getCodeBaseCRC(self.files) == newCRC
