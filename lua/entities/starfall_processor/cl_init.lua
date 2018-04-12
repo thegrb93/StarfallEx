@@ -23,9 +23,9 @@ function ENT:Restart()
 	self:Terminate()
 	self.restarting = true
 	timer.Simple(0,function()
-		net.Start("starfall_processor_download")
-			net.WriteEntity(self)
-		net.SendToServer()
+		getFilesFromChip(self, function(files, mainfile, owner)
+			self:Compile(owner, files, mainfile)
+		end)
 	end)
 end
 
@@ -109,6 +109,7 @@ net.Receive("starfall_processor_download", function (len)
 			dlNumFiles.Completed = dlNumFiles.Completed + 1
 			dlFiles[filename] = data or ""
 			if dlProc:IsValid() and dlOwner:IsValid() and dlNumFiles.Completed == dlNumFiles.NumFiles then
+				dlOwner.sf_latest_chip = dlProc
 				dlProc:Compile(dlOwner, dlFiles, dlMain)
 				dlProc.restarting = false
 			end

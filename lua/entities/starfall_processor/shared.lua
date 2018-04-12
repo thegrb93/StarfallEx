@@ -34,8 +34,8 @@ net.Receive("starfall_getcache", function()
 			cache[filename] = code
 
 			if #table.GetKeys(cache) == filecount then
-				if ply:IsValid() and getcachedata[chip] then
-					getcachedata[chip](cache)
+				if chip:IsValid() and getcachedata[chip] then
+					getcachedata[chip](cache, chip.mainfile, chip.owner)
 				end
 
 				getcachedata[chip] = nil
@@ -44,7 +44,7 @@ net.Receive("starfall_getcache", function()
 	end
 end)
 
-local function getFilesFromChip(chip, callback)
+function getFilesFromChip(chip, callback)
 	getcachedata[chip] = callback
 	excludeFiles = excludeFiles or {}
 
@@ -60,7 +60,9 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
-	local useCache, newCRC = false, nil
+	PrintTable(table.GetKeys(files))
+
+	local useCache, newChecksum = false, nil
 	local update = self.mainfile ~= nil
 
 	self.error = nil
@@ -75,7 +77,7 @@ function ENT:Compile(owner, files, mainfile)
 			self.files[filename] = nil
 		elseif filename == "*use-cache*" then
 			self.files[filename] = nil
-			newCRC = code
+			newChecksum = code
 			useCache = true
 		else
 			self.files[filename] = code
@@ -86,15 +88,25 @@ function ENT:Compile(owner, files, mainfile)
 
 	if useCache then
 		self.files = table.Merge(self.files, owner.sf_cache)
-		owner.sf_cache = table.Copy(self.files)
+
+		if SERVER then
+			owner.sf_cache = table.Copy(self.files)
+		end
 
 		if CLIENT then
-			local cacheIsUpToDate = getCodeBaseCRC(self.files) == newCRC
+			if owner.sf_latest_chip == self then
+				owner.sf_cache_id = newChecksum
+				owner.sf_cache = table.Copy(self.files)
+			end
+
+			local cacheIsUpToDate = owner.sf_cache_id == newChecksum
+
 			if not cacheIsUpToDate then
 				self.files = nil
 				owner.sf_cache = nil
 
 				getFilesFromChip(self, function(cache)
+					owner.sf_cache_id = newChecksum
 					self:Compile(owner, cache, mainfile)
 				end)
 				return
@@ -210,15 +222,14 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	end
 end
 
-function getCodeBaseCRC(files)
-	local filenames = table.SortByKey(files)
-	local allcode = table.concat(filenames, "")
+function getCodebaseChecksum(files)
+	local checksum = 0
 
-	for i, filename in ipairs(filenames) do
-		allcode = allcode .. files[filename]
+	for filename, code in pairs(files) do
+		checksum = checksum + file.Time("starfall/" .. filename, "DATA") / 10000000
 	end
 
-	return util.CRC(allcode)
+	return tostring(checksum)
 end
 
 properties.Add( "starfall", {

@@ -681,8 +681,6 @@ else
 		local cache = LocalPlayer().sf_cache or {}
 
 		local function shouldUseCache()
-			if not cache then return false end
-
 			for filename, code in pairs(list.files) do
 				if cache[filename] then return true end
 			end
@@ -733,7 +731,7 @@ else
 			else
 				if shouldUseCache() then
 					updatedFiles = getCacheDiff()
-					updatedFiles["*use-cache*"] = getCodeBaseCRC(list.files)
+					updatedFiles["*use-cache*"] = getCodebaseChecksum(list.files)
 				else
 					updatedFiles = table.Copy(list.files)
 					updatedFiles = table.Merge(updatedFiles, getFilesToRemoveOnCache())
