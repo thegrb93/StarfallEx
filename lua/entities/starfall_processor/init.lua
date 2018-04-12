@@ -64,9 +64,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
 			if proc.owner.sf_latest_chip == proc then
-				local filesToSend = table.Clone(proc.owner.sf_latest_upload)
-				filesToSend["*latest-chip*"] = "."
-				proc:SendCode(filesToSend, ply)
+				proc:SendCode(proc.owner.sf_latest_upload, ply)
 			else
 				proc:SendCode(proc.files, ply)
 			end
