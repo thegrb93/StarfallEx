@@ -22,9 +22,9 @@ local getcachedata = {}
 net.Receive("starfall_getcache", function()
 	local cache = {}
 	local filecount = 0
-	local ply = net.ReadEntity()
+	local chip = net.ReadEntity()
 
-	if not getcachedata[ply] then return end
+	if not getcachedata[chip] then return end
 
 	while net.ReadBit() == 1 and filecount < 256 do
 		local filename = net.ReadString()
@@ -34,23 +34,22 @@ net.Receive("starfall_getcache", function()
 			cache[filename] = code
 
 			if #table.GetKeys(cache) == filecount then
-				if ply:IsValid() and getcachedata[ply] then
-					getcachedata[ply](cache)
+				if ply:IsValid() and getcachedata[chip] then
+					getcachedata[chip](cache)
 				end
 
-				getcachedata[ply] = nil
+				getcachedata[chip] = nil
 			end
 		end)
 	end
 end)
 
-local function getCacheOfPlayer(ply, excludeFiles, callback)
-	getcachedata[ply] = callback
+local function getFilesFromChip(chip, callback)
+	getcachedata[chip] = callback
 	excludeFiles = excludeFiles or {}
 
 	net.Start("starfall_reqcache")
-	net.WriteEntity(ply)
-	net.WriteString(table.concat(table.GetKeys(excludeFiles), ","))
+	net.WriteEntity(chip)
 	net.SendToServer()
 end
 
@@ -61,25 +60,23 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
-	local useCache = false
+	local useCache, newCRC = false, nil
 	local update = self.mainfile ~= nil
+
 	self.error = nil
 	self.mainfile = mainfile
 	self.files = self.files or {}
 	self.owner = owner
+
 	owner.sf_cache = owner.sf_cache or {}
-	owner.sf_cache_first = owner.sf_cache_first == nil and true
 
 	for filename, code in pairs(files) do
 		if code == "-removed-" then
 			self.files[filename] = nil
 		elseif filename == "*use-cache*" then
 			self.files[filename] = nil
-			self.cache_ver = code
+			newCRC = code
 			useCache = true
-		elseif filename == "*latest-cache*" then
-			self.files[filename] = nil
-			owner.sf_cache_first = false
 		else
 			self.files[filename] = code
 		end
@@ -90,20 +87,25 @@ function ENT:Compile(owner, files, mainfile)
 	if useCache then
 		self.files = table.Merge(self.files, owner.sf_cache)
 		owner.sf_cache = table.Copy(self.files)
-		owner.sf_cache_ver = self.cache_ver
 
-		if CLIENT and owner.sf_cache_first then
-			getCacheOfPlayer(owner, self.files, function(cache)
-				owner.sf_cache_first = false
-				owner.sf_cache = cache
-				self:Compile(owner, cache, mainfile)
-			end)
+		if CLIENT then
+			local cacheIsUpToDate = getCodeBaseCRC(self.files) == newCRC
+			if not cacheIsUpToDate then
+				self.files = nil
+				owner.sf_cache = nil
 
-			return
+				getFilesFromChip(self, function(cache)
+					self:Compile(owner, cache, mainfile)
+				end)
+				return
+			end
 		end
 	end
 
 	if SERVER then
+		owner.sf_latest_chip = self
+		owner.sf_latest_upload = files
+
 		if update then
 			self:SendCode(files)
 		elseif self.SendQueue then
@@ -206,6 +208,17 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 			end)
 		end
 	end
+end
+
+function getCodeBaseCRC(files)
+	local filenames = table.SortByKey(files)
+	local allcode = table.concat(filenames, "")
+
+	for i, filename in ipairs(filenames) do
+		allcode = allcode .. files[filename]
+	end
+
+	return util.CRC(allcode)
 end
 
 properties.Add( "starfall", {

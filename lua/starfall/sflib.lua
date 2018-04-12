@@ -678,7 +678,7 @@ else
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
 		local sf = net.ReadEntity()
-		local cache = LocalPlayer().sf_cache
+		local cache = LocalPlayer().sf_cache or {}
 
 		local function shouldUseCache()
 			if not cache then return false end
@@ -733,9 +733,10 @@ else
 			else
 				if shouldUseCache() then
 					updatedFiles = getCacheDiff()
-					updatedFiles["*use-cache*"] = tostring(math.random()):sub(-6)
+					updatedFiles["*use-cache*"] = getCodeBaseCRC(list.files)
 				else
-					updatedFiles = list.files
+					updatedFiles = table.Copy(list.files)
+					updatedFiles = table.Merge(updatedFiles, getFilesToRemoveOnCache())
 				end
 			end
 

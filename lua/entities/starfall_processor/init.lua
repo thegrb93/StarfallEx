@@ -63,14 +63,11 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			local filesToSend = table.Copy(proc.files)
-
-			if proc.cache_ver == proc.owner.sf_cache_ver then
-				filesToSend["*use-cache*"] = proc.cache_ver
-				filesToSend["*latest-cache*"] = "."
+			if proc.owner.sf_latest_chip == proc then
+				proc:SendCode(proc.owner.sf_latest_upload)
+			else
+				proc:SendCode(proc.files, ply)
 			end
-
-			proc:SendCode(filesToSend, ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
@@ -143,14 +140,13 @@ hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
 
 -- Send cached files on player to new players
 net.Receive("starfall_reqcache", function(len, from)
-	local ply = net.ReadEntity()
-	local excludeFiles = string.Explode(",", net.ReadString())
+	local chip = net.ReadEntity()
 
 	net.Start("starfall_getcache")
-	net.WriteEntity(ply)
+	net.WriteEntity(chip)
 
-	for filename, code in pairs(ply.sf_cache or {}) do
-		if not table.HasValue(excludeFiles, filename) then
+	if chip:IsValid() and chip.instance then
+		for filename, code in pairs(chip.files or {}) do
 			net.WriteBit(true)
 			net.WriteString(filename)
 			net.WriteStream(code)
