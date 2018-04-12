@@ -29,22 +29,32 @@ util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
 function ENT:SendCode (updatefiles, recipient)
-	net.Start("starfall_processor_download")
-	net.WriteEntity(self)
-	net.WriteEntity(self.owner)
-	net.WriteString(self.mainfile)
+	if type(recipient) == "Player" then recipient = { recipient } end
 
-	for name, data in pairs(updatefiles) do
+	for i, ply in ipairs(recipient or player.GetAll()) do
+		ply.sf_latest_files = ply.sf_latest_files or setmetatable({}, {__mode = "k"})
 
-		net.WriteBit(false)
-		net.WriteString(name)
-		net.WriteStream(data)
+		net.Start("starfall_processor_download")
+		net.WriteEntity(self)
+		net.WriteEntity(self.owner)
+		net.WriteString(self.mainfile)
 
+		if self.skipCache[ply] then
+			updatefiles = self.files
+			ply.sf_latest_files[self.owner] = updatefiles
+		else
+			ply.sf_latest_files[self.owner] = table.Merge(ply.sf_latest_files[self.owner] or {}, updatefiles)
+		end
+
+		for name, data in pairs(updatefiles) do
+			net.WriteBit(false)
+			net.WriteString(name)
+			net.WriteStream(data)
+		end
+
+		net.WriteBit(true)
+		net.Send(ply)
 	end
-
-	net.WriteBit(true)
-
-	if recipient then net.Send(recipient) else net.Broadcast() end
 end
 
 function ENT:OnRemove ()

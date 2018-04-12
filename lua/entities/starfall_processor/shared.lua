@@ -60,9 +60,13 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
-	PrintTable(table.GetKeys(files))
+	if SERVER then
+		self.skipCache = self.skipCache or setmetatable({}, {__mode = "k"})
+	end
 
-	local useCache, newChecksum = false, nil
+	-- PrintTable(table.GetKeys(files))
+
+	local useCache, skipCache, newChecksum = false, false, nil
 	local update = self.mainfile ~= nil
 
 	self.error = nil
@@ -89,11 +93,32 @@ function ENT:Compile(owner, files, mainfile)
 	if useCache then
 		self.files = table.Merge(self.files, owner.sf_cache)
 
-		if SERVER then
+		if SERVER then -- Validate cache serverside
+			for i, ply in ipairs(player.GetAll()) do
+				self.skipCache[ply] = false
+
+				if not ply.sf_latest_files[owner] then
+					self.skipCache[ply] = true
+				else
+					local cache = ply.sf_latest_files[owner]
+
+					if not cache then
+						self.skipCache[ply] = true
+					else
+						for filename, code in pairs(self.files) do
+							if cache[filename] ~= code then
+								self.skipCache[ply] = true
+								break
+							end
+						end
+					end
+				end
+			end
+
 			owner.sf_cache = table.Copy(self.files)
 		end
 
-		if CLIENT then
+		if CLIENT then -- Validate cache clientside
 			if owner.sf_latest_chip == self then
 				owner.sf_cache_id = newChecksum
 				owner.sf_cache = table.Copy(self.files)
@@ -111,6 +136,10 @@ function ENT:Compile(owner, files, mainfile)
 				end)
 				return
 			end
+		end
+	elseif SERVER then
+		for i, ply in ipairs(player.GetAll()) do
+			self.skipCache[ply] = true
 		end
 	end
 
