@@ -119,6 +119,8 @@ function ENT:Compile(owner, files, mainfile)
 		end
 
 		self.files = table.Merge(self.files, owner.sf_cache)
+	else
+		owner.sf_cache = table.Copy(self.files)
 	end
 
 	if SERVER then
