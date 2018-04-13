@@ -22,6 +22,7 @@ function ENT:Use(activator)
 	end
 end
 
+util.AddNetworkString("starfall_cache_invalid")
 util.AddNetworkString("starfall_getcache")
 util.AddNetworkString("starfall_processor_download")
 util.AddNetworkString("starfall_processor_update_links")
@@ -41,33 +42,19 @@ local function sanitizeFiles(files)
 end
 
 function ENT:SendCode (updatefiles, recipient)
-	if type(recipient) == "Player" then recipient = { recipient } end
+	net.Start("starfall_processor_download")
+	net.WriteEntity(self)
+	net.WriteEntity(self.owner)
+	net.WriteString(self.mainfile)
 
-	for i, ply in ipairs(recipient or player.GetAll()) do
-		ply.sf_latest_files = ply.sf_latest_files or setmetatable({}, {__mode = "k"})
-
-		net.Start("starfall_processor_download")
-		net.WriteEntity(self)
-		net.WriteEntity(self.owner)
-		net.WriteString(self.mainfile)
-
-		if self.skipCache[ply] then
-			updatefiles = self.files
-			ply.sf_latest_files[self.owner] = updatefiles
-		else
-			ply.sf_latest_files[self.owner] = table.Merge(ply.sf_latest_files[self.owner] or {}, updatefiles)
-			sanitizeFiles(ply.sf_latest_files[self.owner])
-		end
-
-		for name, data in pairs(updatefiles) do
-			net.WriteBit(false)
-			net.WriteString(name)
-			net.WriteStream(data)
-		end
-
-		net.WriteBit(true)
-		net.Send(ply)
+	for name, data in pairs(updatefiles) do
+		net.WriteBit(false)
+		net.WriteString(name)
+		net.WriteStream(data)
 	end
+
+	net.WriteBit(true)
+	if recipient then net.Send(recipient) else net.Broadcast() end
 end
 
 function ENT:OnRemove ()

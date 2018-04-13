@@ -62,12 +62,6 @@ function ENT:Compile(owner, files, mainfile)
 		self.instance = nil
 	end
 
-	if SERVER then
-		self.skipCache = self.skipCache or setmetatable({}, {__mode = "k"})
-	end
-
-	-- PrintTable(table.GetKeys(files))
-
 	local useCache, skipCache, newChecksum = false, false, nil
 	local update = self.mainfile ~= nil
 
@@ -93,56 +87,38 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	if useCache then
-		self.files = table.Merge(self.files, owner.sf_cache)
-
-		if SERVER then -- Validate cache serverside
-			for i, ply in ipairs(player.GetAll()) do
-				self.skipCache[ply] = false
-
-				if not ply.sf_latest_files[owner] then
-					self.skipCache[ply] = true
-				else
-					local cache = ply.sf_latest_files[owner]
-
-					if not cache then
-						self.skipCache[ply] = true
-					else
-						for filename, code in pairs(self.files) do
-							if cache[filename] ~= code then
-								self.skipCache[ply] = true
-								break
-							end
-						end
-					end
-				end
-			end
-
-			owner.sf_cache = table.Copy(self.files)
+		if owner.sf_latest_chip == self then
+			owner.sf_cache_id = newChecksum
 		end
 
-		if CLIENT then -- Validate cache clientside
-			if owner.sf_latest_chip == self then
-				owner.sf_cache_id = newChecksum
-				owner.sf_cache = table.Copy(self.files)
+		local cacheIsUpToDate = owner.sf_cache_id == newChecksum
+
+		for filename, code in pairs(self.files) do
+			if code ~= owner.sf_cache[filename] then
+				cacheIsUpToDate = false
+				break
 			end
+		end
 
-			local cacheIsUpToDate = owner.sf_cache_id == newChecksum
+		if not cacheIsUpToDate then
+			self.files = nil
+			owner.sf_cache = nil
 
-			if not cacheIsUpToDate then
-				self.files = nil
-				owner.sf_cache = nil
-
+			if CLIENT then
 				getFilesFromChip(self, function(cache)
 					owner.sf_cache_id = newChecksum
 					self:Compile(owner, cache, mainfile)
 				end)
-				return
+			else
+				net.Start("starfall_cache_invalid")
+				net.Send(owner)
+				SF.AddNotify(owner, "Cache was invalid, upload chip again to retry", "ERROR", 4, "DRIP3")
 			end
+
+			return
 		end
-	elseif SERVER then
-		for i, ply in ipairs(player.GetAll()) do
-			self.skipCache[ply] = true
-		end
+
+		self.files = table.Merge(self.files, owner.sf_cache)
 	end
 
 	if SERVER then
@@ -254,13 +230,7 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 end
 
 function getCodebaseChecksum(files)
-	local checksum = 0
-
-	for filename, code in pairs(files) do
-		checksum = checksum + file.Time("starfall/" .. filename, "DATA") / 10000000
-	end
-
-	return tostring(checksum)
+	return tostring(math.random()):sub(-6)
 end
 
 properties.Add( "starfall", {

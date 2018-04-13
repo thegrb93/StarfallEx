@@ -594,6 +594,7 @@ if SERVER then
 
 		updata.mainfile = net.ReadString()
 		local sf = updata.entity
+		ply.sf_latest_chip = sf
 
 		local I = 0
 		while I < 256 do

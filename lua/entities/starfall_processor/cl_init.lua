@@ -104,12 +104,12 @@ net.Receive("starfall_processor_download", function (len)
 		if net.ReadBit() ~= 0 then break end
 
 		local filename = net.ReadString()
+		dlOwner.sf_latest_chip = dlProc
 
 		net.ReadStream(nil, function(data)
 			dlNumFiles.Completed = dlNumFiles.Completed + 1
 			dlFiles[filename] = data or ""
 			if dlProc:IsValid() and dlOwner:IsValid() and dlNumFiles.Completed == dlNumFiles.NumFiles then
-				dlOwner.sf_latest_chip = dlProc
 				dlProc:Compile(dlOwner, dlFiles, dlMain)
 				dlProc.restarting = false
 			end
@@ -154,3 +154,7 @@ net.Receive( 'starfall_processor_used', function ( len )
 		end
 	end
 end )
+
+net.Receive("starfall_cache_invalid", function()
+	LocalPlayer().sf_cache = {}
+end)
