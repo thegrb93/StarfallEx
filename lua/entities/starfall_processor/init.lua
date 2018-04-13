@@ -154,6 +154,8 @@ net.Receive("starfall_reqcache", function(len, from)
 
 	net.Start("starfall_getcache")
 	net.WriteEntity(chip)
+	net.WriteEntity(chip.owner)
+	net.WriteString(chip.mainfile)
 
 	if chip:IsValid() and chip.instance then
 		for filename, code in pairs(chip.files or {}) do

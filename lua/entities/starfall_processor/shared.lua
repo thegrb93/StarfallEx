@@ -17,35 +17,37 @@ ENT.States          = {
 	None = 3,
 }
 
-local getcachedata = {}
+local getfiledata = {}
 
 net.Receive("starfall_getcache", function()
-	local cache = {}
+	local files = {}
 	local filecount = 0
 	local chip = net.ReadEntity()
+	local owner = net.ReadEntity()
+	local mainfile = net.ReadString()
 
-	if not getcachedata[chip] then return end
+	if not getfiledata[chip] then return end
 
 	while net.ReadBit() == 1 and filecount < 256 do
 		local filename = net.ReadString()
 		filecount = filecount + 1
 
 		net.ReadStream(nil, function(code)
-			cache[filename] = code
+			files[filename] = code
 
-			if #table.GetKeys(cache) == filecount then
-				if chip:IsValid() and getcachedata[chip] then
-					getcachedata[chip](cache, chip.mainfile, chip.owner)
+			if table.Count(files) == filecount then
+				if chip:IsValid() and getfiledata[chip] then
+					getfiledata[chip](files, mainfile, owner)
 				end
 
-				getcachedata[chip] = nil
+				getfiledata[chip] = nil
 			end
 		end)
 	end
 end)
 
 function getFilesFromChip(chip, callback)
-	getcachedata[chip] = callback
+	getfiledata[chip] = callback
 	excludeFiles = excludeFiles or {}
 
 	net.Start("starfall_reqcache")
