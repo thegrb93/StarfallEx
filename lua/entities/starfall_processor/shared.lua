@@ -124,7 +124,6 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	if SERVER then
-		owner.sf_latest_chip = self
 		owner.sf_latest_upload = files
 
 		if update then
