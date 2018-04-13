@@ -28,6 +28,18 @@ util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
+local function sanitizeFiles(files)
+	for filename, code in pairs(files) do
+		if code == "-remove-" then
+			files[filename] = nil
+		elseif filename == "*use-cache*" then
+			files[filename] = nil
+		end
+	end
+
+	return files
+end
+
 function ENT:SendCode (updatefiles, recipient)
 	if type(recipient) == "Player" then recipient = { recipient } end
 
@@ -44,6 +56,7 @@ function ENT:SendCode (updatefiles, recipient)
 			ply.sf_latest_files[self.owner] = updatefiles
 		else
 			ply.sf_latest_files[self.owner] = table.Merge(ply.sf_latest_files[self.owner] or {}, updatefiles)
+			sanitizeFiles(ply.sf_latest_files[self.owner])
 		end
 
 		for name, data in pairs(updatefiles) do
