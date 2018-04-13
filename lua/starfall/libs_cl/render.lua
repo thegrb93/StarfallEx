@@ -1117,7 +1117,13 @@ function render_library.drawTexturedRectRotated (x, y, w, h, rot)
 	checkluatype (h, TYPE_NUMBER)
 	checkluatype (rot, TYPE_NUMBER)
 
-	surface.DrawTexturedRectRotated(x, y, w, h, rot)
+	local m = Matrix()
+	m:SetTranslation(Vector(x, y, 0))
+	m:SetAngles(Angle(0,-rot,0))
+
+	render_library.pushMatrix(SF.VMatrix.Wrap(m))
+	render.DrawQuad(getQuad(w/-2, h/-2, w, h, currentcolor))
+	render_library.popMatrix()
 end
 
 --- Draws a line
