@@ -87,7 +87,13 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	if useCache then
-		if owner.sf_latest_chip == self then
+		local forceFail = false
+
+		if CLIENT and not owner.sf_cache_id then
+			forceFail = true
+		end
+
+		if owner.sf_latest_chip == self and not forceFail then
 			owner.sf_cache_id = newChecksum
 		end
 
@@ -100,7 +106,7 @@ function ENT:Compile(owner, files, mainfile)
 			end
 		end
 
-		if not cacheIsUpToDate then
+		if not cacheIsUpToDate or forceFail then
 			self.files = nil
 			owner.sf_cache = nil
 
