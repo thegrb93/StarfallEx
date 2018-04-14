@@ -75,6 +75,7 @@ function ENT:Compile(owner, files, mainfile)
 	for filename, code in pairs(files) do
 		if code == "-removed-" then
 			self.files[filename] = nil
+			owner.sf_cache[filename] = nil
 		elseif filename == "*use-cache*" then
 			self.files[filename] = nil
 			newChecksum = code
@@ -82,31 +83,16 @@ function ENT:Compile(owner, files, mainfile)
 		else
 			self.files[filename] = code
 		end
-
-		owner.sf_cache[filename] = self.files[filename]
 	end
 
 	if useCache then
-		local forceFail = false
-
-		if CLIENT and not owner.sf_cache_id then
-			forceFail = true
-		end
-
 		if owner.sf_latest_chip == self and not forceFail then
 			owner.sf_cache_id = newChecksum
 		end
 
-		local cacheIsUpToDate = owner.sf_cache_id == newChecksum
+		local cacheIsUpToDate = (owner.sf_cache_id == newChecksum) or (table.Count(owner.sf_cache) > 0)
 
-		for filename, code in pairs(self.files) do
-			if code ~= owner.sf_cache[filename] then
-				cacheIsUpToDate = false
-				break
-			end
-		end
-
-		if not cacheIsUpToDate or forceFail then
+		if not cacheIsUpToDate then
 			self.files = nil
 			owner.sf_cache = nil
 
@@ -124,6 +110,7 @@ function ENT:Compile(owner, files, mainfile)
 			return
 		end
 
+		owner.sf_cache = table.Merge(owner.sf_cache, self.files)
 		self.files = table.Merge(self.files, owner.sf_cache)
 	else
 		owner.sf_cache = table.Copy(self.files)
