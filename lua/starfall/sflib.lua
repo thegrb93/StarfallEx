@@ -728,7 +728,6 @@ else
 						updatedFiles[filename] = "-removed-"
 					end
 				end
-				updatedFiles = table.Merge(updatedFiles, getFilesToRemoveOnCache())
 			else
 				if shouldUseCache() then
 					updatedFiles = getCacheDiff()

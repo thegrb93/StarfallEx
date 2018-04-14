@@ -56,10 +56,13 @@ function getFilesFromChip(chip, callback)
 end
 
 function ENT:Compile(owner, files, mainfile)
+	local isNewChip = true
+
 	if self.instance then
 		self.instance:runScriptHook("removed")
 		self.instance:deinitialize()
 		self.instance = nil
+		isNewChip = false
 	end
 
 	local useCache, skipCache, newChecksum = false, false, nil
@@ -112,7 +115,7 @@ function ENT:Compile(owner, files, mainfile)
 
 		owner.sf_cache = table.Merge(owner.sf_cache, self.files)
 		self.files = table.Merge(self.files, owner.sf_cache)
-	else
+	elseif not isNewChip then
 		owner.sf_cache = table.Copy(self.files)
 	end
 
