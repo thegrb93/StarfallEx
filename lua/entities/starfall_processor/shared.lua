@@ -65,7 +65,7 @@ function ENT:Compile(owner, files, mainfile)
 		isNewChip = false
 	end
 
-	local useCache, skipCache, newChecksum = false, false, nil
+	local useCache, newChecksum = false, nil
 	local update = self.mainfile ~= nil
 
 	self.error = nil
@@ -92,7 +92,7 @@ function ENT:Compile(owner, files, mainfile)
 	end
 
 	if useCache then
-		if owner.sf_latest_chip == self and not forceFail then
+		if owner.sf_latest_chip == self then
 			owner.sf_cache_id = newChecksum
 		end
 
