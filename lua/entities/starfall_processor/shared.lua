@@ -78,16 +78,16 @@ function ENT:Compile(owner, files, mainfile)
 	for filename, code in pairs(files) do
 		if code == "-removed-" then
 			self.files[filename] = nil
+
+			if isNewChip then
+				owner.sf_cache[filename] = nil
+			end
 		elseif filename == "*use-cache*" then
 			self.files[filename] = nil
 			newChecksum = code
 			useCache = true
 		else
 			self.files[filename] = code
-		end
-
-		if isNewChip then
-			owner.sf_cache[filename] = self.files[filename]
 		end
 	end
 
@@ -227,10 +227,6 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 			end)
 		end
 	end
-end
-
-function generateUID(files)
-	return tostring(SysTime())
 end
 
 properties.Add( "starfall", {

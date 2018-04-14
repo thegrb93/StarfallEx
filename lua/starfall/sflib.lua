@@ -731,7 +731,7 @@ else
 			else
 				if shouldUseCache() then
 					updatedFiles = getCacheDiff()
-					updatedFiles["*use-cache*"] = generateUID(list.files)
+					updatedFiles["*use-cache*"] = tostring(SysTime())
 				else
 					updatedFiles = table.Copy(list.files)
 					updatedFiles = table.Merge(updatedFiles, getFilesToRemoveOnCache())
