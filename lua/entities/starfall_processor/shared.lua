@@ -230,8 +230,8 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	end
 end
 
-function getCodebaseChecksum(files)
-	return tostring(math.random()):sub(-6)
+function generateUID(files)
+	return tostring(SysTime())
 end
 
 properties.Add( "starfall", {
