@@ -918,6 +918,7 @@ function render_library.setTextureFromScreen (ent)
 	if IsValid(ent) and ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
 		surface.SetMaterial(RT_Material)
+		render.SetMaterial(RT_Material)
 	else
 		draw.NoTexture()
 	end
@@ -1009,9 +1010,9 @@ function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
---- Draws a rectangle using the current color.
--- @param x Top left corner x coordinate
--- @param y Top left corner y coordinate
+--- Draws a rectangle using the current color. Use 3D functions for float coordinates
+-- @param x Top left corner x integer coordinate
+-- @param y Top left corner y integer coordinate
 -- @param w Width
 -- @param h Height
 function render_library.drawRect (x, y, w, h)
@@ -1023,9 +1024,9 @@ function render_library.drawRect (x, y, w, h)
 	surface.DrawRect(x, y, w, h)
 end
 
---- Draws a rectangle outline using the current color.
--- @param x Top left corner x coordinate
--- @param y Top left corner y coordinate
+--- Draws a rectangle outline using the current color. Use 3D functions for float coordinates
+-- @param x Top left corner x integer coordinate
+-- @param y Top left corner y integer coordinate
 -- @param w Width
 -- @param h Height
 function render_library.drawRectOutline (x, y, w, h)
@@ -1049,9 +1050,9 @@ function render_library.drawCircle (x, y, r)
 	surface.DrawCircle(x, y, r, currentcolor)
 end
 
---- Draws a textured rectangle.
--- @param x Top left corner x coordinate
--- @param y Top left corner y coordinate
+--- Draws a textured rectangle. Use 3D functions for float coordinates
+-- @param x Top left corner x integer coordinate
+-- @param y Top left corner y integer coordinate
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRect (x, y, w, h)
@@ -1063,9 +1064,9 @@ function render_library.drawTexturedRect (x, y, w, h)
 	surface.DrawTexturedRect (x, y, w, h)
 end
 
---- Draws a textured rectangle with UV coordinates
--- @param x Top left corner x coordinate
--- @param y Top left corner y coordinate
+--- Draws a textured rectangle with UV coordinates. Use 3D functions for float coordinates
+-- @param x Top left corner x integer coordinate
+-- @param y Top left corner y integer coordinate
 -- @param w Width
 -- @param h Height
 -- @param startU Texture mapping at rectangle origin
@@ -1102,11 +1103,11 @@ function render_library.drawTexturedRectRotated (x, y, w, h, rot)
 	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
 
---- Draws a line
--- @param x1 X start coordinate
--- @param y1 Y start coordinate
--- @param x2 X end coordinate
--- @param y2 Y end coordinate
+--- Draws a line. Use 3D functions for float coordinates
+-- @param x1 X start integer coordinate
+-- @param y1 Y start integer coordinate
+-- @param x2 X end interger coordinate
+-- @param y2 Y end integer coordinate
 function render_library.drawLine (x1, y1, x2, y2)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x1, TYPE_NUMBER)
