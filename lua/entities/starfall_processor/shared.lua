@@ -115,7 +115,7 @@ function ENT:Compile(owner, files, mainfile)
 
 		owner.sf_cache = table.Merge(owner.sf_cache, self.files)
 		self.files = table.Merge(self.files, owner.sf_cache)
-	elseif not isNewChip then
+	elseif isNewChip then
 		owner.sf_cache = table.Copy(self.files)
 	end
 
