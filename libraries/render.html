@@ -298,7 +298,7 @@ Draws a circle outline </td>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawLine">drawLine</a>( x1, y1, x2, y2&nbsp;)</td>
 			<td class="summary">
-Draws a line </td>
+Draws a line.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawPoly">drawPoly</a>( poly&nbsp;)</td>
@@ -348,7 +348,7 @@ Draws a rotated, textured rectangle.</td>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectUV">drawTexturedRectUV</a>( x, y, w, h, startU, startV, endU, endV&nbsp;)</td>
 			<td class="summary">
-Draws a textured rectangle with UV coordinates </td>
+Draws a textured rectangle with UV coordinates.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.enableDepth">enableDepth</a>( enable&nbsp;)</td>
@@ -994,17 +994,17 @@ Draws a circle outline</p>
 <dt><span class="realm_cl"></span><a name="render.drawLine"></a><strong>render.drawLine</strong>( x1, y1, x2, y2&nbsp;)</dt>
 <dd>
 	<p>
-Draws a line</p>
+Draws a line. Use 3D functions for float coordinates</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x1</tt> ― X start coordinate</li>
-			<li><tt>y1</tt> ― Y start coordinate</li>
-			<li><tt>x2</tt> ― X end coordinate</li>
-			<li><tt>y2</tt> ― Y end coordinate</li>
+			<li><tt>x1</tt> ― X start integer coordinate</li>
+			<li><tt>y1</tt> ― Y start integer coordinate</li>
+			<li><tt>x2</tt> ― X end interger coordinate</li>
+			<li><tt>y2</tt> ― Y end integer coordinate</li>
 		</ul>
 	</section>
 	
@@ -1035,15 +1035,15 @@ Draws a polygon.</p>
 <dt><span class="realm_cl"></span><a name="render.drawRect"></a><strong>render.drawRect</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
-Draws a rectangle using the current color.</p>
+Draws a rectangle using the current color. Use 3D functions for float coordinates</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x coordinate</li>
-			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
+			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
@@ -1057,15 +1057,15 @@ Draws a rectangle using the current color.</p>
 <dt><span class="realm_cl"></span><a name="render.drawRectOutline"></a><strong>render.drawRectOutline</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
-Draws a rectangle outline using the current color.</p>
+Draws a rectangle outline using the current color. Use 3D functions for float coordinates</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x coordinate</li>
-			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
+			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
@@ -1174,15 +1174,15 @@ Draws text with newlines and tabs</p>
 <dt><span class="realm_cl"></span><a name="render.drawTexturedRect"></a><strong>render.drawTexturedRect</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
-Draws a textured rectangle.</p>
+Draws a textured rectangle. Use 3D functions for float coordinates</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x coordinate</li>
-			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
+			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
@@ -1219,15 +1219,15 @@ Draws a rotated, textured rectangle.</p>
 <dt><span class="realm_cl"></span><a name="render.drawTexturedRectUV"></a><strong>render.drawTexturedRectUV</strong>( x, y, w, h, startU, startV, endU, endV&nbsp;)</dt>
 <dd>
 	<p>
-Draws a textured rectangle with UV coordinates</p>
+Draws a textured rectangle with UV coordinates. Use 3D functions for float coordinates</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x coordinate</li>
-			<li><tt>y</tt> ― Top left corner y coordinate</li>
+			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
+			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 			<li><tt>startU</tt> ― Texture mapping at rectangle origin</li>
