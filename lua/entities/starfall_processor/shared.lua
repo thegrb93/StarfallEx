@@ -90,7 +90,7 @@ function ENT:Compile(owner, files, mainfile)
 			owner.sf_cache_id = newChecksum
 		end
 
-		local cacheIsUpToDate = (owner.sf_cache_id == newChecksum) or (table.Count(owner.sf_cache) > 0)
+		local cacheIsUpToDate = (owner.sf_cache_id == newChecksum) and (table.Count(owner.sf_cache) > 0)
 
 		if not cacheIsUpToDate then
 			self.files = nil
