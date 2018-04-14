@@ -733,8 +733,7 @@ else
 					updatedFiles = getCacheDiff()
 					updatedFiles["*use-cache*"] = tostring(SysTime())
 				else
-					updatedFiles = table.Copy(list.files)
-					updatedFiles = table.Merge(updatedFiles, getFilesToRemoveOnCache())
+					updatedFiles = list.files
 				end
 			end
 

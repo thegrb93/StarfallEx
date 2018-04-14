@@ -29,18 +29,6 @@ util.AddNetworkString("starfall_processor_update_links")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 
-local function sanitizeFiles(files)
-	for filename, code in pairs(files) do
-		if code == "-remove-" then
-			files[filename] = nil
-		elseif filename == "*use-cache*" then
-			files[filename] = nil
-		end
-	end
-
-	return files
-end
-
 function ENT:SendCode (updatefiles, recipient)
 	net.Start("starfall_processor_download")
 	net.WriteEntity(self)
