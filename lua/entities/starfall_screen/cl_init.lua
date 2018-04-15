@@ -111,9 +111,9 @@ function ENT:DrawTranslucent ()
 		render.SetStencilReferenceValue(1)
 
 		--First draw a quad that defines the visible area
-		cam.Start({ type = "3D", znear = 3.001 })
+		render.DepthRange(0, 0.999)
 			render.DrawQuad(unpack(self.ScreenQuad))
-		cam.End()
+		render.DepthRange(0, 1)
 
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 		render.SetStencilTestMask(1)
