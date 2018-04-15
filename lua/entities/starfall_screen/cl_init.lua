@@ -93,6 +93,7 @@ function ENT:SetBackgroundColor(r, g, b, a)
 	self.ScreenColor = Color(r, g, b, math.max(a, 1))
 end
 
+local writez = Material("engine/writez")
 function ENT:DrawTranslucent ()
 	self:DrawModel()
 
@@ -111,9 +112,7 @@ function ENT:DrawTranslucent ()
 		render.SetStencilReferenceValue(1)
 
 		--First draw a quad that defines the visible area
-		render.DepthRange(0, 0.999)
-			render.DrawQuad(unpack(self.ScreenQuad))
-		render.DepthRange(0, 1)
+		render.DrawQuad(unpack(self.ScreenQuad))
 
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 		render.SetStencilTestMask(1)
@@ -121,6 +120,7 @@ function ENT:DrawTranslucent ()
 		--Clear it to the clear color and clear depth as well
 		render.ClearBuffersObeyStencil(self.ScreenColor.r, self.ScreenColor.g, self.ScreenColor.b, self.ScreenColor.a, true)
 
+		--Render the starfall stuff
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
 
@@ -130,6 +130,11 @@ function ENT:DrawTranslucent ()
 		render.PopFilterMin()
 
 		render.SetStencilEnable(false)
+
+		--Give the screen back its depth
+		render.SetMaterial(writez)
+		render.DrawQuad(unpack(self.ScreenQuad))
+
 	cam.PopModelMatrix()
 end
 
