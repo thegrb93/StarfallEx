@@ -49,7 +49,8 @@ function ENT:Initialize ()
 	self.Origin = info.offset
 
 	local w, h = 512 / self.Aspect, 512
-	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
+	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0)}
+	self.ScreenColor = Color(0, 0, 0, 255)
 end
 
 function ENT:LinkEnt (ent)
@@ -89,7 +90,7 @@ function ENT:Draw ()
 end
 
 function ENT:SetBackgroundColor(r, g, b, a)
-	self.ScreenQuad[5] = Color(r, g, b, math.max(a, 1))
+	self.ScreenColor = Color(r, g, b, math.max(a, 1))
 end
 
 function ENT:DrawTranslucent ()
@@ -109,13 +110,16 @@ function ENT:DrawTranslucent ()
 		render.SetStencilWriteMask(1)
 		render.SetStencilReferenceValue(1)
 
+		--First draw a quad that defines the visible area
 		cam.Start({ type = "3D", znear = 3.001 })
-			render.SetColorMaterial()
 			render.DrawQuad(unpack(self.ScreenQuad))
 		cam.End()
 
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 		render.SetStencilTestMask(1)
+
+		--Clear it to the clear color and clear depth as well
+		render.ClearBuffersObeyStencil(self.ScreenColor.r, self.ScreenColor.g, self.ScreenColor.b, self.ScreenColor.a, true)
 
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)
 		render.PushFilterMin(TEXFILTER.ANISOTROPIC)
