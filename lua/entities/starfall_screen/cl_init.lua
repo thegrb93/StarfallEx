@@ -112,6 +112,7 @@ function ENT:DrawTranslucent ()
 		render.SetStencilReferenceValue(1)
 
 		--First draw a quad that defines the visible area
+		render.SetColorMaterial()
 		render.DrawQuad(unpack(self.ScreenQuad))
 
 		render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
