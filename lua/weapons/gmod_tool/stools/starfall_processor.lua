@@ -98,7 +98,7 @@ function TOOL:LeftClick(trace)
 	if not SF.RequestCode(ply, sf, function(mainfile, files)
 		if not mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
-		sf:Compile(ply, files, mainfile)
+		sf:SetupFiles(ply, files, mainfile)
 		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
 			local model = sf.instance.ppdata.models[sf.instance.mainfile]
 			if util.IsValidModel(model) and util.IsValidProp(model) then

@@ -17,123 +17,17 @@ ENT.States          = {
 	None = 3,
 }
 
-local getfiledata = {}
 
-net.Receive("starfall_getcache", function()
-	local files = {}
-	local filecount = 0
-	local chip = net.ReadEntity()
-	local owner = net.ReadEntity()
-	local mainfile = net.ReadString()
-
-	if not getfiledata[chip] then return end
-
-	while net.ReadBit() == 1 and filecount < 256 do
-		local filename = net.ReadString()
-		filecount = filecount + 1
-
-		net.ReadStream(nil, function(code)
-			files[filename] = code
-
-			if table.Count(files) == filecount then
-				if chip:IsValid() and getfiledata[chip] then
-					getfiledata[chip](files, mainfile, owner)
-				end
-
-				getfiledata[chip] = nil
-			end
-		end)
-	end
-end)
-
-function getFilesFromChip(chip, callback)
-	getfiledata[chip] = callback
-	excludeFiles = excludeFiles or {}
-
-	net.Start("starfall_reqcache")
-	net.WriteEntity(chip)
-	net.SendToServer()
-end
-
-function ENT:Compile(owner, files, mainfile)
-	local isNewChip = true
-
+function ENT:Compile()
 	if self.instance then
 		self.instance:runScriptHook("removed")
 		self.instance:deinitialize()
 		self.instance = nil
-		isNewChip = false
 	end
-
-	local useCache, newChecksum = false, nil
-	local update = self.mainfile ~= nil
 
 	self.error = nil
-	self.mainfile = mainfile
-	self.files = self.files or {}
-	self.owner = owner
 
-	owner.sf_cache = owner.sf_cache or {}
-
-	for filename, code in pairs(files) do
-		if code == "-removed-" then
-			self.files[filename] = nil
-
-			if isNewChip then
-				owner.sf_cache[filename] = nil
-			end
-		elseif filename == "*use-cache*" then
-			self.files[filename] = nil
-			newChecksum = code
-			useCache = true
-		else
-			self.files[filename] = code
-		end
-	end
-
-	if useCache then
-		if owner.sf_latest_chip == self then
-			owner.sf_cache_id = newChecksum
-		end
-
-		local cacheIsUpToDate = (owner.sf_cache_id == newChecksum) and (table.Count(owner.sf_cache) > 0)
-
-		if not cacheIsUpToDate then
-			self.files = nil
-			owner.sf_cache = nil
-
-			if CLIENT then
-				getFilesFromChip(self, function(cache)
-					owner.sf_cache_id = newChecksum
-					self:Compile(owner, cache, mainfile)
-				end)
-			else
-				net.Start("starfall_cache_invalid")
-				net.Send(owner)
-				SF.AddNotify(owner, "Cache was invalid, upload chip again to retry", "ERROR", 4, "DRIP3")
-			end
-
-			return
-		end
-
-		owner.sf_cache = table.Merge(owner.sf_cache, self.files)
-		self.files = table.Merge(self.files, owner.sf_cache)
-	elseif isNewChip then
-		owner.sf_cache = table.Copy(self.files)
-	end
-
-	if SERVER then
-		owner.sf_latest_upload = files
-
-		if update then
-			self:SendCode(files)
-		elseif self.SendQueue then
-			self:SendCode(files, self.SendQueue)
-			self.SendQueue = nil
-		end
-	end
-
-	local ok, instance = SF.Instance.Compile(self.files, mainfile, owner, { entity = self })
+	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
@@ -169,6 +63,82 @@ function ENT:Compile(owner, files, mainfile)
 	if self.instance then
 		self.instance:runScriptHook("initialize")
 	end
+end
+
+function ENT:SetupFiles(owner, files, mainfile)
+	local useCache, newChecksum = false, nil
+	local update = self.instance == nil
+
+	self.mainfile = mainfile
+	self.owner = owner
+
+	owner.sf_cache = owner.sf_cache or {}
+
+	for filename, code in pairs(files) do
+		if code == "-removed-" then
+			self.files[filename] = nil
+
+			if not update then
+				owner.sf_cache[filename] = nil
+			end
+		elseif filename == "*use-cache*" then
+			self.files[filename] = nil
+			newChecksum = code
+			useCache = true
+		else
+			self.files[filename] = code
+		end
+	end
+
+	if useCache then
+		if owner.sf_latest_chip == self then
+			owner.sf_cache_id = newChecksum
+		end
+
+		local cacheIsUpToDate = (owner.sf_cache_id == newChecksum) and (table.Count(owner.sf_cache) > 0)
+
+		if not cacheIsUpToDate then
+			self.files = nil
+			owner.sf_cache = nil
+
+			if CLIENT then
+				-- This needs to be redone
+				-- getFilesFromChip(self, function(cache)
+					-- owner.sf_cache_id = newChecksum
+					-- self:Compile()
+				-- end)
+			else
+				net.Start("starfall_cache_invalid")
+				net.Send(owner)
+				SF.AddNotify(owner, "Cache was invalid, upload chip again to retry", "ERROR", 4, "DRIP3")
+			end
+
+			return
+		end
+
+		owner.sf_cache = table.Merge(owner.sf_cache, self.files)
+		self.files = table.Merge(self.files, owner.sf_cache)
+	elseif not update then
+		owner.sf_cache = table.Copy(self.files)
+	end
+
+	if SERVER then
+		owner.sf_latest_upload = files
+
+		if update then
+			SF.SendStarfall(msg, proc, owner, files, mainfile, recipient)
+			self:SendCode(files)
+		elseif self.SendQueue then
+			self:SendCode(files, self.SendQueue)
+			self.SendQueue = nil
+		end
+	end
+
+	self:Compile()
+end
+
+function ENT:SendCode(files, recipient)
+	SF.SendStarfall("starfall_processor_download", self, self.owner, files, self.mainfile, recipient)
 end
 
 function ENT:Error(err)
