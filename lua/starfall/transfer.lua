@@ -1,6 +1,6 @@
 
 -- Net extension stuff
-function net.ReadStarfall(callback)
+function net.ReadStarfall(ply, callback)
 	local sfdata = {
 		netfiles = {},
 		times = {},
@@ -9,8 +9,8 @@ function net.ReadStarfall(callback)
 		mainfile = net.ReadString(),
 	}
 
-	local numFiles = 0,
-	local completedFiles = 0,
+	local numFiles = 0
+	local completedFiles = 0
 	local err = false
 
 	local I = 0
@@ -20,7 +20,7 @@ function net.ReadStarfall(callback)
 		local filename = net.ReadString()
 		sfdata.times[filename] = net.ReadDouble()
 
-		net.ReadStream(nil, function(data)
+		net.ReadStream(ply, function(data)
 			if data == nil then err = true end
 			completedFiles = completedFiles + 1
 			sfdata.netfiles[filename] = data
@@ -45,7 +45,7 @@ function net.WriteStarfall(sfdata)
 	for filename, code in pairs(sfdata.netfiles) do
 		net.WriteBit(false)
 		net.WriteString(filename)
-		net.WriteDouble(sfdata.times[filename])
+		net.WriteDouble(sfdata.times[filename] or 0)
 		net.WriteStream(code)
 	end
 
@@ -83,11 +83,15 @@ if SERVER then
 			local cacheList = SF.GetCacheListing(sfdata.owner, ply)
 
 			for filename, code in pairs(sfdata.netfiles) do
-				if cacheList[filename] == sfdata.times[filename] then
-					sfdata.netfiles[filename] = " "
+				if sfdata.times[filename] and cache[filename] then
+					if cacheList[filename] == sfdata.times[filename] then
+						sfdata.netfiles[filename] = " "
+					else
+						sfdata.netfiles[filename] = cache[filename] and cache[filename].code or code
+						cacheList[filename] = sfdata.times[filename]
+					end
 				else
-					sfdata.netfiles[filename] = cache[filename] and cache[filename].code or code
-					cacheList[filename] = sfdata.times[filename]
+					sfdata.netfiles[filename] = code
 				end
 			end
 
@@ -114,7 +118,7 @@ if SERVER then
 		end
 	end
 
-	local uploaddata = SF.EntityTable("sfTransfer")
+	local uploaddata = setmetatable({},{__mode="k"})
 
 	--- Requests a player to send whatever code they have open in his/her editor to
 	-- the server.
@@ -145,7 +149,7 @@ if SERVER then
 
 		updata.reading = true
 
-		net.ReadStarfall(function(sfdata, err)
+		net.ReadStarfall(ply, function(sfdata, err)
 			if err then
 				if uploaddata[ply]==updata then
 					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
@@ -194,7 +198,9 @@ else
 				sfdata.files[filename] = cache[filename].code or ""
 			else
 				sfdata.files[filename] = code
-				cache[filename] = {code = code, time = sfdata.times[filename]}
+				if sfdata.times[filename]>0 then
+					cache[filename] = {code = code, time = sfdata.times[filename]}
+				end
 			end
 		end
 	end

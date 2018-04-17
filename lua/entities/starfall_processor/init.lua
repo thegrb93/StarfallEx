@@ -73,9 +73,9 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		end
 
 		if info.starfall then
-			local code, main = SF.DeserializeCode(info.starfall)
+			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			self:SetupFiles(ply, code, main)
+			self:SetupFiles({proc = self, owner = ply, files = files, netfiles = files, times = {}, mainfile = mainfile})
 		end
 	end
 end
