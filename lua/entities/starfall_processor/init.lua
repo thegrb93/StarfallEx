@@ -101,11 +101,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			if proc.owner.sf_latest_chip == proc then
-				proc:SendCode(proc.owner.sf_latest_upload, ply)
-			else
-				proc:SendCode(proc.files, ply)
-			end
+			proc:SendCode(proc.files, ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply
