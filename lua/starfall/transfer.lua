@@ -1,13 +1,16 @@
 
 -- Net extension stuff
 function net.ReadStarfall(callback)
-	local files = {}
-	local times = {}
-	local numFiles = 0
-	local completedFiles = 0
-	local proc = net.ReadEntity()
-	local owner = net.ReadEntity()
-	local main = net.ReadString()
+	local sfdata = {
+		netfiles = {},
+		times = {},
+		proc = net.ReadEntity(),
+		owner = net.ReadEntity(),
+		mainfile = net.ReadString(),
+	}
+
+	local numFiles = 0,
+	local completedFiles = 0,
 	local err = false
 
 	local I = 0
@@ -15,14 +18,14 @@ function net.ReadStarfall(callback)
 		if net.ReadBit() ~= 0 then break end
 
 		local filename = net.ReadString()
-		times[filename] = net.ReadDouble()
+		sfdata.times[filename] = net.ReadDouble()
 
 		net.ReadStream(nil, function(data)
 			if data == nil then err = true end
 			completedFiles = completedFiles + 1
-			files[filename] = data
+			sfdata.netfiles[filename] = data
 			if completedFiles == numFiles then
-				callback(proc, owner, files, times, main, err)
+				callback(sfdata, err)
 			end
 		end)
 
@@ -30,19 +33,19 @@ function net.ReadStarfall(callback)
 	end
 
 	if numFiles == 0 then
-		callback(proc, owner, files, times, main, err)
+		callback(sfdata, err)
 	end
 end
 
-function net.WriteStarfall(proc, owner, files, times, main)
-	net.WriteEntity(proc)
-	net.WriteEntity(owner)
-	net.WriteString(main)
+function net.WriteStarfall(sfdata)
+	net.WriteEntity(sfdata.proc)
+	net.WriteEntity(sfdata.owner)
+	net.WriteString(sfdata.mainfile)
 
-	for filename, code in pairs(files) do
+	for filename, code in pairs(sfdata.netfiles) do
 		net.WriteBit(false)
 		net.WriteString(filename)
-		net.WriteDouble(times[filename])
+		net.WriteDouble(sfdata.times[filename])
 		net.WriteStream(code)
 	end
 
@@ -56,62 +59,59 @@ if SERVER then
 	util.AddNetworkString("starfall_upload")
 
 	SF.CacheList = setmetatable({},{__mode="k"})
+	function SF.GetCacheListing(owner, ply)
+		local cacheList1 = SF.CacheList[ply]
+		if not cacheList1 then cacheList1 = setmetatable({},{__mode="k"}) SF.CacheList[ply] = cacheList1 end
+		local cacheList2 = cacheList1[owner]
+		if not cacheList2 then cacheList2 = {} cacheList1[owner] = cacheList2 end
+		return cacheList2
+	end
+
 	-- Sends starfall files to clients utilizing a cache
-	function SF.SendCachedStarfall(msg, proc, owner, files, times, mainfile, recipient)
+	function SF.SendCachedStarfall(msg, sfdata, recipient)
 		if recipient then
 			if type(recipient)~="table" then recipient = {recipient} end
 		else
 			recipient = player.GetAll()
 		end
 
-		for k, ply in pairs(recipient)
+		for k, ply in pairs(recipient) do
 			net.Start(msg)
 
-			local cache = SF.Cache[owner]
-			if not cache then cache = {} SF.Cache[owner] = cache end
-			local validCache = SF.CacheList[ply]
-			if not validCache then validCache = setmetatable({},{__mode="k"}) SF.CacheList[ply] = validCache end
-			local validCacheO = validCache[owner]
-			if not validCacheO then validCacheO = {} validCache[owner] = validCacheO end
+			local cache = SF.Cache[sfdata.owner]
+			if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
+			local cacheList = SF.GetCacheListing(sfdata.owner, ply)
 
-			local sendfiles = {}
-			for filename, code in pairs(files) do
-				local time = times[filename]
-				if cache[filename] and cache[filename].time == time then
-					if validCacheO[filename] == time then
-						sendfiles[filename] = " "
-					else
-						sendfiles[filename] = cache[filename].code or ""
-						validCacheO[filename] = time
-					end
+			for filename, code in pairs(sfdata.netfiles) do
+				if cacheList[filename] == sfdata.times[filename] then
+					sfdata.netfiles[filename] = " "
 				else
-					-- Anything received should be in the cache. If not, something bad happened.
-					sendfiles[filename] = code
-					times[filename] = "error"
+					sfdata.netfiles[filename] = cache[filename] and cache[filename].code or code
+					cacheList[filename] = sfdata.times[filename]
 				end
 			end
 
-			net.WriteStarfall(proc, owner, sendfiles, times, mainfile)
+			net.WriteStarfall(sfdata)
 			net.Send(ply)
 		end
 	end
 
 	-- Receives starfall files from clients utilizing a cache
-	function SF.ReceiveCachedStarfall(owner, files, times)
-		local cache = SF.Cache[owner]
-		if not cache then cache = {} SF.Cache[owner] = cache end
+	function SF.ReceiveCachedStarfall(sfdata)
+		local cache = SF.Cache[sfdata.owner]
+		if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
+		local cacheList = SF.GetCacheListing(sfdata.owner, sfdata.owner)
 
-		local recvfiles = {}
-		for filename, code in pairs(files) do
-			local time = times[filename]
-			if cache[filename] and cache[filename].time == time then
-				recvfiles[filename] = cache[filename].code or ""
+		sfdata.files = {}
+		for filename, code in pairs(sfdata.netfiles) do
+			if cache[filename] and cache[filename].time == sfdata.times[filename] then
+				sfdata.files[filename] = cache[filename].code or ""
 			else
-				recvfiles[filename] = code
+				sfdata.files[filename] = code
 				cache[filename] = {code = code, time = time}
+				cacheList[filename] = sfdata.times[filename]
 			end
 		end
-		return recvfiles
 	end
 
 	local uploaddata = SF.EntityTable("sfTransfer")
@@ -123,7 +123,7 @@ if SERVER then
 	-- @param callback Called when all of the code is recieved. Arguments are either the main filename and a table
 	-- of filename->code pairs, or nil if the client couldn't handle the request (due to bad includes, etc)
 	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
-	function SF.RequestCode(ply, sfEntity, callback)
+	function SF.RequestCode(ply, callback)
 		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
 
 		net.Start("starfall_requpload")
@@ -145,13 +145,13 @@ if SERVER then
 
 		updata.reading = true
 
-		net.ReadStarfall(function(proc, owner, files, main, err)
+		net.ReadStarfall(function(sfdata, err)
 			if err then
 				if uploaddata[ply]==updata then
 					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
 				end
 			else
-				updata.callback(main, files)
+				updata.callback(sfdata)
 			end
 			uploaddata[ply] = nil
 		end)
@@ -160,52 +160,51 @@ if SERVER then
 else
 
 	-- Sends starfall code to the server utilizing the cache
-	function SF.SendCachedStarfall(msg, proc, owner, files, mainfile)
+	function SF.SendCachedStarfall(msg, files, mainfile)
 		net.Start(msg)
 
 			local cache = SF.Cache[LocalPlayer()]
 			if not cache then cache = {} SF.Cache[LocalPlayer()] = cache end
 
-			local sendfiles, times = {}, {}
+			local netfiles, times = {}, {}
 			for filename, code in pairs(files) do
 				if cache[filename] and cache[filename].code == code then
-					sendfiles[filename] = " "
+					netfiles[filename] = " "
 					times[filename] = cache[filename].time
 				else
 					local time = SysTime()
-					sendfiles[filename] = code
+					netfiles[filename] = code
 					times[filename] = time
 					cache[filename] = {code = code, time = time}
 				end
 			end
-			net.WriteStarfall(proc, owner, sendfiles, times, mainfile)
+			net.WriteStarfall({proc = NULL, owner = NULL, netfiles = netfiles, mainfile = mainfile, times = times})
 
 		net.SendToServer()
 	end
 
 	-- Receives starfall files from the server utilizing a cache
-	function SF.ReceiveCachedStarfall(owner, files, times)
-		local cache = SF.Cache[owner]
-		if not cache then cache = {} SF.Cache[owner] = cache end
+	function SF.ReceiveCachedStarfall(sfdata)
+		local cache = SF.Cache[sfdata.owner]
+		if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
 
-		local recvfiles = {}
-		for filename, code in pairs(files) do
-			if filename2 then
-				recvfiles[filename] = cache[filename] or ""
+		sfdata.files = {}
+		for filename, code in pairs(sfdata.netfiles) do
+			if cache[filename] and cache[filename].time == sfdata.times[filename] then
+				sfdata.files[filename] = cache[filename].code or ""
 			else
-				recvfiles[filename] = code
-				cache[filename] = code
+				sfdata.files[filename] = code
+				cache[filename] = {code = code, time = sfdata.times[filename]}
 			end
 		end
-		return recvfiles
 	end
 
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
 		if ok then
-			SF.SendCachedStarfall("starfall_upload", NULL, NULL, list.files, list.mainfile)
+			SF.SendCachedStarfall("starfall_upload", list.files, list.mainfile)
 		else
-			SF.SendCachedStarfall("starfall_upload", NULL, NULL, {}, "")
+			SF.SendCachedStarfall("starfall_upload", {}, "")
 			if list then
 				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
 			end

@@ -65,27 +65,22 @@ function ENT:Compile()
 	end
 end
 
-function ENT:SetupFiles(owner, files, mainfile)
+function ENT:SetupFiles(sfdata)
 	local update = self.instance == nil
 
-	self.mainfile = mainfile
-	self.owner = owner
+	SF.ReceiveCachedStarfall(sfdata)
+	for k, v in pairs(sfdata) do self[k] = v end
 
 	if SERVER then
 		if update then
-			SF.SendStarfall(msg, proc, owner, files, mainfile, recipient)
-			self:SendCode(files)
+			SF.SendCachedStarfall("starfall_processor_download", sfdata)
 		elseif self.SendQueue then
-			self:SendCode(files, self.SendQueue)
+			SF.SendCachedStarfall("starfall_processor_download", sfdata, self.SendQueue)
 			self.SendQueue = nil
 		end
 	end
 
 	self:Compile()
-end
-
-function ENT:SendCode(files, recipient)
-	SF.SendStarfall("starfall_processor_download", self, self.owner, files, self.mainfile, recipient)
 end
 
 function ENT:Error(err)

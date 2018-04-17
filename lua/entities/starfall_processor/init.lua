@@ -10,8 +10,6 @@ function ENT:Initialize ()
 
 	self:SetNWInt("State", self.States.None)
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
-
-	self.files = {}
 end
 
 -- Sends a net message to all clients about the use.
@@ -101,7 +99,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			proc:SendCode(proc.files, ply)
+			SF.SendCachedStarfall("starfall_processor_download", proc, ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply

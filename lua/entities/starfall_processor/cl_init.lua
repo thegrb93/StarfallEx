@@ -6,7 +6,6 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 
 function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
-	self.files = {}
 end
 
 function ENT:Terminate()
@@ -70,10 +69,9 @@ end
 
 net.Receive("starfall_processor_download", function (len)
 
-	net.ReadStarfall(function(proc, owner, files, main, err)
-		if not proc:IsValid() or not owner:IsValid() or err then return end
-		owner.sf_latest_chip = proc
-		proc:SetupFiles(owner, files, main)
+	net.ReadStarfall(function(sfdata, err)
+		if not sfdata.proc:IsValid() or not sfdata.owner:IsValid() or err then return end
+		sfdata.proc:SetupFiles(sfdata)
 	end)
 
 end)
