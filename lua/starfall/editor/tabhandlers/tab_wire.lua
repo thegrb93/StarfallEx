@@ -2448,12 +2448,12 @@ function PANEL:_OnKeyCodeTyped(code)
 			end
 		elseif code == KEY_PAGEUP then
 			self.Caret[1] = self.Caret[1] - math_ceil(self.Size[1] / 2)
-			self.Scroll[1] = self.Scroll[1] - math_ceil(self.Size[1] / 2)
 			self:SetCaret(self.Caret)
+			self:ScrollCaret()
 		elseif code == KEY_PAGEDOWN then
 			self.Caret[1] = self.Caret[1] + math_ceil(self.Size[1] / 2)
-			self.Scroll[1] = self.Scroll[1] + math_ceil(self.Size[1] / 2)
 			self:SetCaret(self.Caret)
+			self:ScrollCaret()
 		elseif code == KEY_HOME then
 			local row = self.Rows[self.Caret[1]][1]
 			local first_char = row:find("%S") or row:len() + 1

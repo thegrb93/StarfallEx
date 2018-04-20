@@ -98,6 +98,7 @@ local function createFont(name, fontName, size, antialiasing)
 		antialias = antialiasing,
 		additive = false,
 		italic = false,
+		extended = true,
 	}
 	surface.CreateFont(name, fontTable)
 	fontTable.weight = 800
@@ -119,7 +120,7 @@ function Editor:GetFont(fontName, size, antialiasing)
 	end
 
 	surface.SetFont(name)
-	local width, height = surface.GetTextSize(" ")
+	local width, height = surface.GetTextSize("_")
 	return name, width, height
 end
 
