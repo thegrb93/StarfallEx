@@ -83,7 +83,6 @@ function hook_library.add (hookname, name, func)
 	hooks[name] = func
 
 	local instances = registered_instances[hookname]
-	print(instances)
 	if not instances then
 		instances = {}
 		registered_instances[hookname] = instances
@@ -231,14 +230,12 @@ function SF.hookAdd (realname, hookname, customargfunc, customretfunc, gmoverrid
 
 			if gmfunc then
 				GAMEMODE[realname] = function(...)
-					print('hi1')
 					local a,b,c,d,e,f = hookfunc(...)
 					if a~= nil then return a,b,c,d,e,f
 					else return gmfunc(...) end
 				end
 			else
 				GAMEMODE[realname] = function(...)
-					print('hi2')
 					return hookfunc(...)
 				end
 			end
