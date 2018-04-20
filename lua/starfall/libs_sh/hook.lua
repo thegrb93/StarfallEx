@@ -7,10 +7,62 @@
 local hook_library = SF.Libraries.Register("hook")
 local registered_instances = {}
 local gmod_hooks = {}
+local gmod_override_hooks = {}
 local wrapArguments = SF.Sanitize
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+
+local function getHookFunc(instances, hookname, customargfunc, customretfunc)
+	--- There are 4 varients of hookfunc depending on if there are custom callbacks
+	if customargfunc then
+		if customretfunc then
+			return function(...)
+				local result
+				for instance, _ in pairs(instances) do
+					local canrun, customargs = customargfunc(instance, ...)
+					if canrun then
+						local tbl = instance:runScriptHookForResult(hookname, wrapArguments(unpack(customargs)))
+						if tbl[1] then
+							local sane = customretfunc(instance, tbl, ...)
+							if sane ~= nil then result = sane end
+						end
+					end
+				end
+				return result
+			end
+		else
+			return function(...)
+				for instance, _ in pairs(instances) do
+					local canrun, customargs = customargfunc(instance, ...)
+					if canrun then
+						instance:runScriptHook(hookname, wrapArguments(unpack(customargs)))
+					end
+				end
+			end
+		end
+	else
+		if customretfunc then
+			return function(...)
+				local result
+				for instance, _ in pairs(instances) do
+					local tbl = instance:runScriptHookForResult(hookname, wrapArguments(...))
+					if tbl[1] then
+						local sane = customretfunc(instance, tbl, ...)
+						if sane ~= nil then result = sane end
+					end
+				end
+				return result
+			end
+		else
+			return function(...)
+				for instance, _ in pairs(instances) do
+					instance:runScriptHook(hookname, wrapArguments(...))
+				end
+			end
+		end
+	end
+end
 
 --- Sets a hook function
 -- @param hookname Name of the event
@@ -38,55 +90,7 @@ function hook_library.add (hookname, name, func)
 		local gmod_hook = gmod_hooks[hookname]
 		if gmod_hook then
 			local realname, customargfunc, customretfunc = unpack(gmod_hook)
-			--- There are 4 varients of hookfunc depending on if there are custom callbacks
-			local hookfunc
-			if customargfunc then
-				if customretfunc then
-					hookfunc = function(...)
-						local result
-						for instance, _ in pairs(instances) do
-							local canrun, customargs = customargfunc(instance, ...)
-							if canrun then
-								local tbl = instance:runScriptHookForResult(hookname, wrapArguments(unpack(customargs)))
-								if tbl[1] then
-									local sane = customretfunc(instance, tbl, ...)
-									if sane ~= nil then result = sane end
-								end
-							end
-						end
-						return result
-					end
-				else
-					hookfunc = function(...)
-						for instance, _ in pairs(instances) do
-							local canrun, customargs = customargfunc(instance, ...)
-							if canrun then
-								instance:runScriptHook(hookname, wrapArguments(unpack(customargs)))
-							end
-						end
-					end
-				end
-			else
-				if customretfunc then
-					hookfunc = function(...)
-						local result
-						for instance, _ in pairs(instances) do
-							local tbl = instance:runScriptHookForResult(hookname, wrapArguments(...))
-							if tbl[1] then
-								local sane = customretfunc(instance, tbl, ...)
-								if sane ~= nil then result = sane end
-							end
-						end
-						return result
-					end
-				else
-					hookfunc = function(...)
-						for instance, _ in pairs(instances) do
-							instance:runScriptHook(hookname, wrapArguments(...))
-						end
-					end
-				end
-			end
+			local hookfunc = getHookFunc(instances, hookname, customargfunc, customretfunc)
 			hook.Add(realname, "SF_Hook_"..realname, hookfunc)
 		end
 	end
@@ -178,7 +182,7 @@ function hook_library.remove (hookname, name)
 		if not next(instance.hooks[lower]) then
 			instance.hooks[lower] = nil
 			registered_instances[lower][instance] = nil
-			if not next(registered_instances[lower]) then
+			if not next(registered_instances[lower]) and not gmod_override_hooks[lower] then
 				registered_instances[lower] = nil
 				if gmod_hooks[lower] then
 					hook.Remove(gmod_hooks[lower][1], "SF_Hook_" .. gmod_hooks[lower][1])
@@ -191,7 +195,7 @@ end
 SF.Libraries.AddHook("deinitialize", function (instance)
 	for k, v in pairs(registered_instances) do
 		v[instance] = nil
-		if not next(v) then
+		if not next(v) and not gmod_override_hooks[k] then
 			registered_instances[k] = nil
 			if gmod_hooks[k] then
 				hook.Remove(gmod_hooks[k][1], "SF_Hook_" .. gmod_hooks[k][1])
@@ -207,8 +211,43 @@ end)
 -- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
 -- @param customretfunc Optional custom function
 -- Takes values returned from starfall hook and returns what should be passed to the gmod hook
-function SF.hookAdd (hookname, customhookname, customargfunc, customretfunc)
-	gmod_hooks[customhookname or hookname:lower()] = { hookname, customargfunc, customretfunc }
+-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
+function SF.hookAdd (realname, hookname, customargfunc, customretfunc, gmoverride)
+	hookname = hookname or realname:lower()
+	if gmoverride then
+		local function override(again)
+			gmod_override_hooks[hookname] = true
+			registered_instances[hookname] = {}
+			local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
+
+			local gmfunc
+			if again then
+				gmfunc = GAMEMODE["SF"..realname]
+			else
+				gmfunc = GAMEMODE[realname]
+				GAMEMODE["SF"..realname] = gmfunc
+			end
+
+			if gmfunc then
+				GAMEMODE[realname] = function(...)
+					local a,b,c,d,e,f = hookfunc(...)
+					if a~= nil then return a,b,c,d,e,f
+					else return gmfunc(...) end
+				end
+			else
+				GAMEMODE[realname] = function(...)
+					return hookfunc(...)
+				end
+			end
+		end
+		if GAMEMODE then
+			override(true)
+		else
+			hook.Add("Initialize", "SFOverride"..realname, override)
+		end
+	else
+		gmod_hooks[hookname] = { realname, customargfunc, customretfunc }
+	end
 end
 
 --Can only return if you are the first argument
@@ -237,7 +276,7 @@ if SERVER then
 	add("PlayerSpawn")
 	add("PlayerEnteredVehicle")
 	add("PlayerLeaveVehicle")
-	add("PlayerSay", nil, nil, returnOnlyOnYourself)
+	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
 	add("PlayerSpray")
 	add("PlayerUse")
 	add("PlayerSwitchFlashlight")
