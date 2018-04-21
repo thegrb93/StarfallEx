@@ -8,17 +8,6 @@ function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 end
 
-function ENT:Terminate()
-	if self.instance then
-		self.instance:deinitialize()
-		self.instance = nil
-	end
-end
-
-function ENT:Restart()
-	self:Compile()
-end
-
 function ENT:OnRemove ()
 	if self.instance then
 		self.instance:runScriptHook("removed")
@@ -41,19 +30,19 @@ function ENT:GetOverlayText()
 	if self.instance then
 		local bufferAvg = self.instance.cpu_average
 		clientstr = tostring(math.Round(bufferAvg * 1000000)) .. "us. (" .. tostring(math.floor(bufferAvg / self.instance.cpuQuota * 100)) .. "%)"
-	else
+	elseif self.error then
 		clientstr = "Errored / Terminated"
+	else
+		clientstr = "None"
 	end
 	if state == 1 then
 		serverstr = tostring(self:GetNWInt("CPUus", 0)) .. "us. (" .. tostring(self:GetNWFloat("CPUpercent", 0)) .. "%)"
 	elseif state == 2 then
 		serverstr = "Errored"
-	end
-	if serverstr then
-		return "- Starfall Processor -\n[ " .. self.name .. " ]\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 	else
-		return "(None)"
+		serverstr = "None"
 	end
+	return "- Starfall Processor -\n[ " .. self.name .. " ]\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 end
 
 if WireLib then

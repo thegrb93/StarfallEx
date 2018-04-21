@@ -554,7 +554,6 @@ end
 if SERVER then
 	util.AddNetworkString("starfall_addnotify")
 	util.AddNetworkString("starfall_console_print")
-	util.AddNetworkString("starfall_openeditor")
 	util.AddNetworkString("starfall_chatprint")
 
 	function SF.AddNotify (ply, msg, notifyType, duration, sound)
@@ -588,23 +587,8 @@ if SERVER then
 		end
 		net.Send(ply)
 	end
+
 else
-	net.Receive("starfall_openeditor", function(len)
-		SF.Editor.open()
-
-		local gate = net.ReadEntity()
-
-		hook.Add("Think", "SFWaitForEditor", function()
-			if SF.Editor.initialized then
-				if IsValid(gate) and gate.files then
-					for name, code in pairs(gate.files) do
-						SF.Editor.openWithCode(name, code)
-					end
-				end
-				hook.Remove("Think", "SFWaitForEditor")
-			end
-		end)
-	end)
 
 	function SF.AddNotify (ply, msg, type, duration, sound)
 		if ply == LocalPlayer() then

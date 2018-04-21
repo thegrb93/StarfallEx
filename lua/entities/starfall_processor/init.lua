@@ -45,6 +45,25 @@ function ENT:Think ()
 	end
 end
 
+function ENT:SendCode(recipient)
+	local sfdata = {
+		proc = self,
+		owner = self.owner,
+		mainfile = self.mainfile,
+		files = self.files,
+		times = self.times
+	}
+	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
+		sfdata.times = {}
+		for filename, v in pairs(sfdata.files) do
+			if self.instance.ppdata.serverorclient[filename] ~= "server" then
+				sfdata.times[filename] = self.times[filename]
+			end
+		end
+	end
+	SF.SendCachedStarfall("starfall_processor_download", sfdata, recipient)
+end
+
 function ENT:PreEntityCopy ()
 	if self.EntityMods then self.EntityMods.SFDupeInfo = nil end
 
@@ -100,7 +119,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if proc.mainfile and proc.files then
-			SF.SendCachedStarfall("starfall_processor_download", proc, ply)
+			proc:SendCode(ply)
 		else
 			proc.SendQueue = proc.SendQueue or {}
 			proc.SendQueue[#proc.SendQueue + 1] = ply

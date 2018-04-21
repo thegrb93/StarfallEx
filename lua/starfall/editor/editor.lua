@@ -115,9 +115,7 @@ if CLIENT then
 	end
 
 	function SF.Editor.open ()
-		if not SF.Editor.initialized then
-			SF.Editor.init ()
-		end
+		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
 	end
@@ -130,7 +128,6 @@ if CLIENT then
 	function SF.Editor.openWithCode(name, code,forceNewTab)
 		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open(name, code, forceNewTab)
-
 	end
 
 	function SF.Editor.pasteCode(code)

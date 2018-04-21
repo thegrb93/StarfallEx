@@ -138,7 +138,7 @@ function SF.Instance:runWithOps(func, ...)
 	debug.sethook(prevHook, mask, count)
 	SF.runningOps = prev
 	SF.OnRunningOps(prev)
-	
+
 	if tbl[1] then
 		--Do another cpu check in case the debug hook wasn't called
 		self.cpu_total = SysTime() - oldSysTime
@@ -312,7 +312,7 @@ function SF.Instance:deinitialize()
 end
 
 hook.Add("Think", "SF_Think", function()
-	
+
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then
 		SF.runningOps = false

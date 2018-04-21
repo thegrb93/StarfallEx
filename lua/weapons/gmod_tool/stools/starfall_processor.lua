@@ -15,6 +15,9 @@ cleanup.Register("starfall_processor")
 if SERVER then
 	CreateConVar('sbox_maxstarfall_processor', 20, { FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_ARCHIVE })
 
+	util.AddNetworkString("starfall_openeditor")
+	util.AddNetworkString("starfall_openeditorcode")
+
 	function MakeSF(pl, Pos, Ang, model, inputs, outputs)
 		if not pl:CheckLimit("starfall_processor") then return false end
 
@@ -48,6 +51,41 @@ else
 	language.Add("undone_Starfall Processor", "Undone Starfall Processor")
 	language.Add("Cleanup_starfall_processor", "Starfall Processors")
 	TOOL.Information = { "left", "right" }
+
+
+	net.Receive("starfall_openeditor", function(len)
+		SF.Editor.open()
+	end)
+
+	net.Receive("starfall_openeditorcode", function(len)
+		SF.Editor.open()
+
+		net.ReadStarfall(nil, function(sfdata, err)
+			if not sfdata.proc:IsValid() or not sfdata.owner:IsValid() or err then
+				SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
+			else
+				SF.ReceiveCachedStarfall(sfdata)
+				local function openfiles()
+					for filename, code in pairs(sfdata.files) do
+						SF.Editor.openWithCode(filename, code)
+					end
+				end
+
+				if SF.Editor.initialized then
+					openfiles()
+				else
+					hook.Add("Think", "SFWaitForEditor", function()
+						if SF.Editor.initialized then
+							openfiles()
+							hook.Remove("Think", "SFWaitForEditor")
+						end
+					end)
+				end
+
+			end
+		end)
+
+	end)
 end
 
 function TOOL:LeftClick(trace)
@@ -83,6 +121,7 @@ function TOOL:LeftClick(trace)
 		Ang.pitch = Ang.pitch + 90
 
 		sf = MakeSF(ply, trace.HitPos, Ang, model)
+		if not sf then return false end
 
 		local min = sf:OBBMins()
 		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
@@ -125,16 +164,13 @@ function TOOL:RightClick(trace)
 		local ply = self:GetOwner()
 		local ent = trace.Entity
 
-		net.Start("starfall_openeditor")
 		if IsValid(ent) and ent:GetClass() == "starfall_processor" then
-			net.WriteEntity(ent)
+			SF.SendCachedStarfall("starfall_openeditorcode", ent, ply)
 		else
-			net.WriteEntity(nil)
+			net.Start("starfall_openeditor") net.Send(ply)
 		end
-		net.Send(ply)
 
 	end
-
 	return false
 end
 

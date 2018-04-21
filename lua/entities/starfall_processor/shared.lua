@@ -27,6 +27,7 @@ function ENT:Compile()
 
 	self.error = nil
 
+	if not self.files[self.mainfile] then return end
 	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
@@ -69,18 +70,18 @@ function ENT:SetupFiles(sfdata)
 	local update = self.instance == nil
 
 	SF.ReceiveCachedStarfall(sfdata)
-	for k, v in pairs(sfdata) do self[k] = v end
+	table.Merge(self, sfdata)
+
+	self:Compile()
 
 	if SERVER then
 		if update then
-			SF.SendCachedStarfall("starfall_processor_download", sfdata)
+			self:SendCode()
 		elseif self.SendQueue then
-			SF.SendCachedStarfall("starfall_processor_download", sfdata, self.SendQueue)
+			self:SendCode(self.SendQueue)
 			self.SendQueue = nil
 		end
 	end
-
-	self:Compile()
 end
 
 function ENT:Error(err)
@@ -122,10 +123,10 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	end
 	local SubMenu = Option:AddSubMenu()
 	SubMenu:AddOption("Restart Clientside", function ()
-		ent:Restart()
+		ent:Compile()
 	end)
 	SubMenu:AddOption("Terminate Clientside", function ()
-		ent:Terminate()
+		ent:Error({message = "Terminated", traceback = ""})
 	end)
 	SubMenu:AddOption("Open Global Permissions", function ()
 		SF.Editor.openPermissionsPopup()
