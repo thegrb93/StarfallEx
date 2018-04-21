@@ -15,21 +15,32 @@ function net.ReadStarfall(ply, callback)
 
 	local I = 0
 	while I < 256 do
-		if net.ReadBit() ~= 0 then break end
+		local code = net.ReadUInt(8)
 
-		local filename = net.ReadString()
-		sfdata.times[filename] = net.ReadDouble()
+		if code == 2 then
 
-		net.ReadStream(ply, function(data)
-			if data == nil then err = true end
-			completedFiles = completedFiles + 1
-			sfdata.netfiles[filename] = data
-			if completedFiles == numFiles then
-				callback(sfdata, err)
-			end
-		end)
+			local filename = net.ReadString()
+			sfdata.times[filename] = net.ReadDouble()
 
-		numFiles = numFiles + 1
+		elseif code == 1 then
+
+			local filename = net.ReadString()
+			sfdata.times[filename] = net.ReadDouble()
+
+			net.ReadStream(ply, function(data)
+				if data == nil then err = true end
+				completedFiles = completedFiles + 1
+				sfdata.netfiles[filename] = data
+				if completedFiles == numFiles then
+					callback(sfdata, err)
+				end
+			end)
+
+			numFiles = numFiles + 1
+
+		else
+			break
+		end
 	end
 
 	if numFiles == 0 then
@@ -38,18 +49,27 @@ function net.ReadStarfall(ply, callback)
 end
 
 function net.WriteStarfall(sfdata)
+	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	net.WriteEntity(sfdata.proc)
 	net.WriteEntity(sfdata.owner)
 	net.WriteString(sfdata.mainfile)
 
-	for filename, code in pairs(sfdata.netfiles) do
-		net.WriteBit(false)
+	local I = 0
+	for filename, time in pairs(sfdata.times) do
+		if I > 255 then error("Number of files exceeds the current maximum (256)") end
+		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
+
+		local code = sfdata.netfiles[filename] and 1 or 2
+		net.WriteUInt(code, 8)
 		net.WriteString(filename)
-		net.WriteDouble(sfdata.times[filename] or 0)
-		net.WriteStream(code)
+		net.WriteDouble(time)
+		if code == 1 then
+			net.WriteStream(sfdata.netfiles[filename])
+		end
+		I = I + 1
 	end
 
-	net.WriteBit(true)
+	net.WriteUInt(0, 8)
 end
 
 SF.Cache = setmetatable({},{__mode="k"})
@@ -82,16 +102,17 @@ if SERVER then
 			if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
 			local cacheList = SF.GetCacheListing(sfdata.owner, ply)
 
-			for filename, code in pairs(sfdata.netfiles) do
-				if sfdata.times[filename] and cache[filename] then
-					if cacheList[filename] == sfdata.times[filename] then
-						sfdata.netfiles[filename] = " "
+			sfdata.netfiles = {}
+			for filename, time in pairs(sfdata.times) do
+				if time~=0 then
+					if cacheList[filename] == time then
+						sfdata.netfiles[filename] = nil
 					else
-						sfdata.netfiles[filename] = cache[filename] and cache[filename].code or code
-						cacheList[filename] = sfdata.times[filename]
+						sfdata.netfiles[filename] = cache[filename] and cache[filename].code or sfdata.files[filename]
+						cacheList[filename] = time
 					end
 				else
-					sfdata.netfiles[filename] = code
+					sfdata.netfiles[filename] = sfdata.files[filename]
 				end
 			end
 
@@ -107,13 +128,13 @@ if SERVER then
 		local cacheList = SF.GetCacheListing(sfdata.owner, sfdata.owner)
 
 		sfdata.files = {}
-		for filename, code in pairs(sfdata.netfiles) do
-			if cache[filename] and cache[filename].time == sfdata.times[filename] then
+		for filename, code in pairs(sfdata.times) do
+			if cache[filename] and cache[filename].time == time then
 				sfdata.files[filename] = cache[filename].code or ""
 			else
-				sfdata.files[filename] = code
-				cache[filename] = {code = code, time = time}
-				cacheList[filename] = sfdata.times[filename]
+				sfdata.files[filename] = sfdata.netfiles[filename]
+				cache[filename] = {code = sfdata.netfiles[filename], time = time}
+				cacheList[filename] = time
 			end
 		end
 	end
@@ -173,7 +194,6 @@ else
 			local netfiles, times = {}, {}
 			for filename, code in pairs(files) do
 				if cache[filename] and cache[filename].code == code then
-					netfiles[filename] = " "
 					times[filename] = cache[filename].time
 				else
 					local time = SysTime()
@@ -193,13 +213,13 @@ else
 		if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
 
 		sfdata.files = {}
-		for filename, code in pairs(sfdata.netfiles) do
+		for filename, time in pairs(sfdata.times) do
 			if cache[filename] and cache[filename].time == sfdata.times[filename] then
 				sfdata.files[filename] = cache[filename].code or ""
 			else
-				sfdata.files[filename] = code
-				if sfdata.times[filename]>0 then
-					cache[filename] = {code = code, time = sfdata.times[filename]}
+				sfdata.files[filename] = sfdata.netfiles[filename]
+				if time>0 then
+					cache[filename] = {code = sfdata.netfiles[filename], time = time}
 				end
 			end
 		end
