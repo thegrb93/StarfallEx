@@ -128,7 +128,7 @@ if SERVER then
 		local cacheList = SF.GetCacheListing(sfdata.owner, sfdata.owner)
 
 		sfdata.files = {}
-		for filename, code in pairs(sfdata.times) do
+		for filename, time in pairs(sfdata.times) do
 			if cache[filename] and cache[filename].time == time then
 				sfdata.files[filename] = cache[filename].code or ""
 			else
@@ -236,7 +236,6 @@ else
 			end
 		end
 	end)
-
 end
 
 
