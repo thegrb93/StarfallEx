@@ -22,30 +22,6 @@ function ENT:Use(activator)
 	end
 end
 
-util.AddNetworkString("starfall_processor_download")
-util.AddNetworkString("starfall_processor_update_links")
-util.AddNetworkString("starfall_processor_used")
-util.AddNetworkString("starfall_processor_link")
-
-function ENT:SendCode (updatefiles, recipient)
-	net.Start("starfall_processor_download")
-	net.WriteEntity(self)
-	net.WriteEntity(self.owner)
-	net.WriteString(self.mainfile)
-
-	for name, data in pairs(updatefiles) do
-
-		net.WriteBit(false)
-		net.WriteString(name)
-		net.WriteStream(data)
-
-	end
-
-	net.WriteBit(true)
-
-	if recipient then net.Send(recipient) else net.Broadcast() end
-end
-
 function ENT:OnRemove ()
 	if not self.instance then return end
 
@@ -56,26 +32,6 @@ function ENT:OnRemove ()
 		self.instance = nil
 	end
 end
-
--- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
-net.Receive("starfall_processor_download", function(len, ply)
-	local proc = net.ReadEntity()
-	if ply:IsValid() and proc:IsValid() then
-		if proc.mainfile and proc.files then
-			proc:SendCode(proc.files, ply)
-		else
-			proc.SendQueue = proc.SendQueue or {}
-			proc.SendQueue[#proc.SendQueue + 1] = ply
-		end
-	end
-end)
-
-net.Receive("starfall_processor_update_links", function(len, ply)
-	local linked = net.ReadEntity()
-	if IsValid(linked.link) then
-		linked:LinkEnt(linked.link, ply)
-	end
-end)
 
 function ENT:GetGateName()
 	return self.name
@@ -117,9 +73,10 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		end
 
 		if info.starfall then
-			local code, main = SF.DeserializeCode(info.starfall)
+			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			self:Compile(ply, code, main)
+			local times = {} for k, v in pairs(files) do times[k] = 0 end
+			self:SetupFiles({proc = self, owner = ply, files = files, netfiles = files, times = times, mainfile = mainfile})
 		end
 	end
 end
@@ -132,3 +89,29 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	end
 end
 hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
+
+util.AddNetworkString("starfall_processor_download")
+util.AddNetworkString("starfall_processor_used")
+util.AddNetworkString("starfall_processor_link")
+util.AddNetworkString("starfall_processor_update_links")
+
+-- Request code from the chip. If the chip doesn't have code yet add player to list to send when there is code.
+net.Receive("starfall_processor_download", function(len, ply)
+	local proc = net.ReadEntity()
+	if ply:IsValid() and proc:IsValid() then
+		if proc.mainfile and proc.files then
+			SF.SendCachedStarfall("starfall_processor_download", proc, ply)
+		else
+			proc.SendQueue = proc.SendQueue or {}
+			proc.SendQueue[#proc.SendQueue + 1] = ply
+		end
+	end
+end)
+
+net.Receive("starfall_processor_update_links", function(len, ply)
+	local linked = net.ReadEntity()
+	if IsValid(linked.link) then
+		linked:LinkEnt(linked.link, ply)
+	end
+end)
+

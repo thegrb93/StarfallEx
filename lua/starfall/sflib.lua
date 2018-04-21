@@ -13,6 +13,7 @@ if SERVER then
 	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions/core.lua")
 	AddCSLuaFile("netstream.lua")
+	AddCSLuaFile("transfer.lua")
 
 	AddCSLuaFile("editor/editor.lua")
 end
@@ -24,6 +25,7 @@ include("preprocessor.lua")
 include("permissions/core.lua")
 include("editor/editor.lua")
 include("netstream.lua")
+include("transfer.lua")
 
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
@@ -550,80 +552,10 @@ local function argsToChat(...)
 end
 
 if SERVER then
-	util.AddNetworkString("starfall_requpload")
-	util.AddNetworkString("starfall_upload")
 	util.AddNetworkString("starfall_addnotify")
 	util.AddNetworkString("starfall_console_print")
 	util.AddNetworkString("starfall_openeditor")
 	util.AddNetworkString("starfall_chatprint")
-
-	local uploaddata = SF.EntityTable("sfTransfer")
-
-	--- Requests a player to send whatever code they have open in his/her editor to
-	-- the server.
-	-- @server
-	-- @param ply Player to request code from
-	-- @param callback Called when all of the code is recieved. Arguments are either the main filename and a table
-	-- of filename->code pairs, or nil if the client couldn't handle the request (due to bad includes, etc)
-	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
-	function SF.RequestCode(ply, sfEntity, callback)
-		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
-
-		net.Start("starfall_requpload")
-		net.WriteEntity(sfEntity)
-		net.Send(ply)
-
-		uploaddata[ply] = {
-			files = {},
-			mainfile = nil,
-			needHeader = true,
-			callback = callback,
-			timeout = CurTime() + 1,
-			entity = sfEntity
-		}
-		return true
-	end
-
-	net.Receive("starfall_upload", function(len, ply)
-		local updata = uploaddata[ply]
-		if not updata then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to upload code without being requested (expect this message multiple times)\n")
-			return
-		end
-
-		updata.mainfile = net.ReadString()
-		local sf = updata.entity
-
-		local I = 0
-		while I < 256 do
-			if net.ReadBit() ~= 0 then break end
-			local filename = net.ReadString()
-
-			net.ReadStream(ply, function(data)
-				if not data and uploaddata[ply]==updata then
-					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
-					uploaddata[ply] = nil
-					return
-				end
-				updata.Completed = updata.Completed + 1
-				updata.files[filename] = data
-
-				if updata.Completed == updata.NumFiles then
-					updata.callback(updata.mainfile, updata.files)
-					uploaddata[ply] = nil
-				end
-			end)
-			I = I + 1
-		end
-
-		updata.Completed = 0
-		updata.NumFiles = I
-
-		if I == 0 then
-			updata.callback(updata.mainfile, updata.files)
-			uploaddata[ply] = nil
-		end
-	end)
 
 	function SF.AddNotify (ply, msg, notifyType, duration, sound)
 		if not IsValid(ply) then return end
@@ -662,62 +594,16 @@ else
 
 		local gate = net.ReadEntity()
 
-		hook.Add("Think", "WaitForEditor", function()
+		hook.Add("Think", "SFWaitForEditor", function()
 			if SF.Editor.initialized then
 				if IsValid(gate) and gate.files then
 					for name, code in pairs(gate.files) do
 						SF.Editor.openWithCode(name, code)
 					end
 				end
-				hook.Remove("Think", "WaitForEditor")
+				hook.Remove("Think", "SFWaitForEditor")
 			end
 		end)
-	end)
-
-	net.Receive("starfall_requpload", function(len)
-		local ok, list = SF.Editor.BuildIncludesTable()
-		local sf = net.ReadEntity()
-
-		if ok then
-			local updatedFiles = {}
-
-			if sf:IsValid() and sf.instance then
-				for filename, code in pairs(list.files) do
-					if sf.files[filename] ~= code then
-						updatedFiles[filename] = code
-					end
-				end
-				for filename, code in pairs(sf.files) do
-					if not list.files[filename] then
-						updatedFiles[filename] = "-removed-"
-					end
-				end
-			else
-				updatedFiles = list.files
-			end
-
-			--print("Uploading SF code")
-			net.Start("starfall_upload")
-			net.WriteString(list.mainfile)
-
-			for filename, code in pairs(updatedFiles) do
-				net.WriteBit(false)
-				net.WriteString(filename)
-				net.WriteStream(code)
-			end
-
-			net.WriteBit(true)
-			net.SendToServer()
-			--print("Done sending")
-		else
-			net.Start("starfall_upload")
-			net.WriteString("")
-			net.WriteBit(true)
-			net.SendToServer()
-			if list then
-				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
-			end
-		end
 	end)
 
 	function SF.AddNotify (ply, msg, type, duration, sound)

@@ -17,37 +17,17 @@ ENT.States          = {
 	None = 3,
 }
 
-function ENT:Compile(owner, files, mainfile)
+
+function ENT:Compile()
 	if self.instance then
 		self.instance:runScriptHook("removed")
 		self.instance:deinitialize()
 		self.instance = nil
 	end
 
-	local update = self.mainfile ~= nil
 	self.error = nil
-	self.mainfile = mainfile
-	self.files = self.files or {}
-	self.owner = owner
 
-	for filename, code in pairs(files) do
-		if code == "-removed-" then
-			self.files[filename] = nil
-		else
-			self.files[filename] = code
-		end
-	end
-
-	if SERVER then
-		if update then
-			self:SendCode(files)
-		elseif self.SendQueue then
-			self:SendCode(files, self.SendQueue)
-			self.SendQueue = nil
-		end
-	end
-
-	local ok, instance = SF.Instance.Compile(self.files, mainfile, owner, { entity = self })
+	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
@@ -83,6 +63,24 @@ function ENT:Compile(owner, files, mainfile)
 	if self.instance then
 		self.instance:runScriptHook("initialize")
 	end
+end
+
+function ENT:SetupFiles(sfdata)
+	local update = self.instance == nil
+
+	SF.ReceiveCachedStarfall(sfdata)
+	for k, v in pairs(sfdata) do self[k] = v end
+
+	if SERVER then
+		if update then
+			SF.SendCachedStarfall("starfall_processor_download", sfdata)
+		elseif self.SendQueue then
+			SF.SendCachedStarfall("starfall_processor_download", sfdata, self.SendQueue)
+			self.SendQueue = nil
+		end
+	end
+
+	self:Compile()
 end
 
 function ENT:Error(err)
