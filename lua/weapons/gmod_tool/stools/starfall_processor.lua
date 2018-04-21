@@ -61,7 +61,7 @@ else
 		SF.Editor.open()
 
 		net.ReadStarfall(nil, function(sfdata, err)
-			if not sfdata.proc:IsValid() or not sfdata.owner:IsValid() or err then
+			if err then
 				SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 			else
 				SF.ReceiveCachedStarfall(sfdata)
