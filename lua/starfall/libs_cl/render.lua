@@ -766,12 +766,12 @@ function render_library.setTexture (id)
 			surface.SetMaterial(data.urltextures[id])
 			render.SetMaterial(data.urltextures[id])
 		else
-			draw.NoTexture()
 			render.SetColorMaterial()
+			draw.NoTexture()
 		end
 	else
-		draw.NoTexture()
 		render.SetColorMaterial()
+		draw.NoTexture()
 	end
 end
 
@@ -884,15 +884,21 @@ end
 function render_library.setRenderTargetTexture (name)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (name, TYPE_STRING)
-
-	local rtname = data.rendertargets[name]
-	if rtname and globalRTs[rtname] then
-		RT_Material:SetTexture("$basetexture", globalRTs[rtname][1])
-		surface.SetMaterial(RT_Material)
-		render.SetMaterial(RT_Material)
-	else
+	if name == nil then
+		render.SetColorMaterial()
 		draw.NoTexture()
+	else
+		checkluatype (name, TYPE_STRING)
+
+		local rtname = data.rendertargets[name]
+		if rtname and globalRTs[rtname] then
+			RT_Material:SetTexture("$basetexture", globalRTs[rtname][1])
+			surface.SetMaterial(RT_Material)
+			render.SetMaterial(RT_Material)
+		else
+			render.SetColorMaterial()
+			draw.NoTexture()
+		end
 	end
 end
 
@@ -920,6 +926,7 @@ function render_library.setTextureFromScreen (ent)
 		surface.SetMaterial(RT_Material)
 		render.SetMaterial(RT_Material)
 	else
+		render.SetColorMaterial()
 		draw.NoTexture()
 	end
 
