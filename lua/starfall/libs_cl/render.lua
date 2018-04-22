@@ -1327,8 +1327,8 @@ function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps
 	checkluatype (longitudeSteps, TYPE_NUMBER)
 	checkluatype (latitudeSteps, TYPE_NUMBER)
 	pos = vunwrap(pos)
-	longitudeSteps = math.min(longitudeSteps, 50)
-	latitudeSteps = math.min(latitudeSteps, 50)
+	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
+	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
 	render.DrawSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, true)
 end
 
@@ -1344,8 +1344,8 @@ function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, lati
 	checkluatype (longitudeSteps, TYPE_NUMBER)
 	checkluatype (latitudeSteps, TYPE_NUMBER)
 	pos = vunwrap(pos)
-	longitudeSteps = math.min(longitudeSteps, 50)
-	latitudeSteps = math.min(latitudeSteps, 50)
+	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
+	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
 	render.DrawWireframeSphere(pos, radius, longitudeSteps, latitudeSteps, currentcolor, true)
 end
 
