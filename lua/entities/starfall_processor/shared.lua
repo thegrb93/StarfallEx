@@ -67,7 +67,7 @@ function ENT:Compile()
 end
 
 function ENT:SetupFiles(sfdata)
-	local update = self.instance == nil
+	local update = self.instance ~= nil
 
 	SF.ReceiveCachedStarfall(sfdata)
 	table.Merge(self, sfdata)
