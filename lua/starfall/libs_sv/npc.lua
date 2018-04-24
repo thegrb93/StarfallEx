@@ -9,7 +9,6 @@ local npc_methods, npc_metatable = SF.RegisterType("Npc")
 SF.Npcs.Methods = npc_methods
 SF.Npcs.Metatable = npc_metatable
 
-local dsetmeta = debug.setmetatable
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 local wrap, unwrap, ents_metatable
 
@@ -22,13 +21,11 @@ SF.AddHook("postload", function()
 	unwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable
 
-	SF.ApplyTypeDependencies(npc_methods, npc_metatable, "Entity")
-	SF.AddObjectWrapper(debug.getregistry().NPC, npc_metatable, function(object)
-		object = wrap(object)
-		dsetmeta(object, npc_metatable)
-		return object
-	end)
-	SF.AddObjectUnwrapper(npc_metatable, unwrap)
+	SF.ApplyTypeDependencies(npc_methods, npc_metatable, ents_metatable)
+	wrap, unwrap = SF.CreateWrapper(npc_methods, true, false, debug.getregistry().NPC, ents_metatable)
+
+	SF.Npcs.Wrap = wrap
+	SF.Npcs.Unwrap = unwrap
 end)
 
 do

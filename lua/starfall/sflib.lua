@@ -171,7 +171,6 @@ SF.Hooks = {}
 function SF.RegisterLibrary(name)
 	local methods = {}
 	SF.Libraries[name] = methods
-	SF.DefaultEnvironment[name] = methods
 	return methods
 end
 
@@ -182,10 +181,16 @@ end
 function SF.RegisterType(name)
 	local methods, metamethods = {}, {}
 	SF.Types[name] = metamethods
+	SF.Types[metamethods] = true
 	metamethods.__index = methods
 	metamethods.__methods = methods
 	metamethods.__metatable = name
 	return methods, metamethods
+end
+
+--- Gets a starfall type. ACF uses this so can't remove it. (otherwise it's useless)
+function SF.GetTypeDef(name)
+	return SF.Types[name]
 end
 
 --- Applies inheritance to a derived type.
@@ -237,6 +242,10 @@ end
 function SF.BuildEnvironment()
 	local env = {}
 	SF.DeepDeepCopy(SF.DefaultEnvironment, env, {})
+	for name, methods in pairs(SF.Libraries) do
+		env[name] = {}
+		SF.DeepDeepCopy(methods, env[name], {})
+	end
 	return env
 end
 
@@ -270,13 +279,10 @@ end
 -- @param val The value to be checked.
 -- @param typ A metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
--- @param default A value to return if val is nil.
-function SF.CheckType(val, typ, level, default)
+function SF.CheckType(val, typ, level)
 	local meta = dgetmeta(val)
-	if typemetatables[meta] and (meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ])) then
+	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and SF.Types[meta]) then
 		return val
-	elseif val == nil and default then
-		return default
 	else
 		-- Failed, throw error
 		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
@@ -299,13 +305,10 @@ end
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
--- @param default A value to return if val is nil.
-function SF.CheckLuaType(val, typ, level, default)
+function SF.CheckLuaType(val, typ, level)
 	local valtype = TypeID(val)
 	if valtype == typ then
 		return val
-	elseif val == nil and default then
-		return default
 	else
 		-- Failed, throw error
 		assert(type(typ) == "number")
@@ -721,7 +724,6 @@ end
 if SERVER then
 	AddCSLuaFile("sflib.lua")
 	AddCSLuaFile("instance.lua")
-	AddCSLuaFile("libraries.lua")
 	AddCSLuaFile("preprocessor.lua")
 	AddCSLuaFile("permissions/core.lua")
 	AddCSLuaFile("netstream.lua")
@@ -731,7 +733,6 @@ if SERVER then
 end
 
 include("instance.lua")
-include("libraries.lua")
 include("preprocessor.lua")
 include("permissions/core.lua")
 include("editor/editor.lua")
