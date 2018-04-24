@@ -289,8 +289,8 @@ function holograms_library.create (pos, ang, model, scale)
 
 	local holoent = ents.Create("starfall_hologram")
 	if holoent and holoent:IsValid() then
-		SF.setPos(holoent, pos)
-		SF.setAng(holoent, ang)
+		holoent:SetPos(SF.clampPos(pos))
+		holoent:SetAngles(ang)
 		holoent:SetModel(model)
 		holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, instance.player)
 		holoent:Spawn()

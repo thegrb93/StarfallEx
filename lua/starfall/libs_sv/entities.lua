@@ -355,7 +355,7 @@ function ents_methods:setPos (vec)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setPos")
 
-	SF.setPos(ent, vec)
+	ent:SetPos(SF.clampPos(vec))
 end
 
 --- Sets the entity's angles
@@ -370,7 +370,7 @@ function ents_methods:setAngles (ang)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setAngles")
 
-	SF.setAng(ent, ang)
+	ent:SetAngles(ang)
 end
 
 --- Sets the entity's linear velocity
@@ -492,7 +492,7 @@ end
 -- @param mass number mass
 function ents_methods:setMass (mass)
 	checktype(self, ents_metatable)
-	
+
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -529,7 +529,7 @@ end
 function ents_methods:setPhysMaterial(mat)
 	checktype(self, ents_metatable)
 	checkluatype(mat, TYPE_STRING)
-	
+
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
@@ -544,12 +544,12 @@ end
 -- @return the physical material
 function ents_methods:getPhysMaterial()
 	checktype(self, ents_metatable)
-	
+
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
-	
+
 	return phys:GetMaterial()
 end
 

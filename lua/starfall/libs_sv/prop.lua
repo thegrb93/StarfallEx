@@ -90,8 +90,8 @@ function props_library.create (pos, ang, model, frozen)
 	local propent = ents.Create("prop_physics")
 
 	propent:CallOnRemove("starfall_prop_delete", propOnDestroy, propdata, instance.player)
-	SF.setPos(propent, pos)
-	SF.setAng(propent, ang)
+	propent:SetPos(SF.clampPos(pos))
+	propent:SetAngles(ang)
 	propent:SetModel(model)
 	propent:Spawn()
 
@@ -159,8 +159,8 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 
 	comp:CallOnRemove("starfall_prop_delete", propOnDestroy, propdata, instance.player)
 
-	SF.setPos(comp, pos)
-	SF.setAng(comp, ang)
+	comp:SetPos(SF.clampPos(pos))
+	comp:SetAngles(ang)
 	comp:SetModel(model)
 	comp:Spawn()
 
@@ -330,8 +330,8 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		entity:CallOnRemove("starfall_prop_delete", propOnDestroy, propdata, instance.player)
 
-		SF.setPos(entity, pos)
-		SF.setAng(entity, ang)
+		entity:SetPos(SF.clampPos(pos))
+		entity:SetAngles(ang)
 
 		entity:Spawn()
 		entity:Activate()
