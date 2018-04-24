@@ -668,69 +668,37 @@ include("netstream.lua")
 include("transfer.lua")
 
 do
-
-	MsgN("-SF - Loading Libraries")
-
-	local print = function(...)
-		if SF_VERBOSE_INIT ~= false then return print(...) end
-	end
-	local MsgN = function(...)
-		if SF_VERBOSE_INIT ~= false then return MsgN(...) end
-	end
-
 	if SERVER then
 		local l
 
-		MsgN("- Loading shared libraries")
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			print("-  Loading "..filename)
 			include("starfall/libs_sh/"..filename)
 			AddCSLuaFile("starfall/libs_sh/"..filename)
 		end
-		MsgN("- End loading shared libraries")
 
-		MsgN("- Loading SF server-side libraries")
 		l = file.Find("starfall/libs_sv/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			print("-  Loading "..filename)
 			include("starfall/libs_sv/"..filename)
 		end
-		MsgN("- End loading server-side libraries")
 
-
-		MsgN("- Adding client-side libraries to send list")
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			print("-  Adding "..filename)
 			AddCSLuaFile("starfall/libs_cl/"..filename)
 		end
-		MsgN("- End loading client-side libraries")
-
-		MsgN("-End Loading SF Libraries")
 
 	else
 		local l
 
-		MsgN("- Loading shared libraries")
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			print("-  Loading "..filename)
 			include("starfall/libs_sh/"..filename)
 		end
-		MsgN("- End loading shared libraries")
 
-		MsgN("- Loading client-side libraries")
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			print("-  Loading "..filename)
 			include("starfall/libs_cl/"..filename)
 		end
-		MsgN("- End loading client-side libraries")
-
-
-		MsgN("-End Loading SF Libraries")
-
 	end
 end
 

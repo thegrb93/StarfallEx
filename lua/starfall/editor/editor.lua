@@ -26,11 +26,9 @@ if CLIENT then
 	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tab_editor", "wire", true, false)
 end
 
-MsgN("- Loading Editor TabHandlers")
 l = file.Find("starfall/editor/tabhandlers/tab_*.lua", "LUA")
 for _, name in pairs(l) do
 	name = name:sub(5,-5)
-	print("-  Loading "..name)
 	AddCSLuaFile("starfall/editor/tabhandlers/tab_"..name..".lua")
 	if CLIENT then
 		SF.Editor.TabHandlers[name] = include("starfall/editor/tabhandlers/tab_"..name..".lua")
