@@ -2,7 +2,7 @@
 
 --- FastLZ library
 -- @shared
-local fastlz_library = SF.Libraries.Register("fastlz")
+local fastlz_library = SF.RegisterLibrary("fastlz")
 local util = util
 
 --- Compress string using FastLZ

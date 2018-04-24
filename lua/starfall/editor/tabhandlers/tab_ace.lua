@@ -134,7 +134,7 @@ local function createLibraryMap ()
 		end
 	end
 
-	for lib, tbl in pairs(SF.Libraries.libraries) do --Constants/enums aren't present in docs ATM
+	for lib, tbl in pairs(SF.Libraries) do --Constants/enums aren't present in docs ATM
 		table.insert(libs, lib) -- Highlight library name
 		libsLookup[lib] = true
 		libMap[lib] = {}

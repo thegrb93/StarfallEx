@@ -162,52 +162,121 @@ function SF.Throw (msg, level, uncatchable)
 	error(SF.MakeError(msg, level, uncatchable, true), level)
 end
 
+SF.Libraries = {}
 SF.Types = {}
-local typemetatables = {}
---- Creates a type that is safe for SF scripts to use. Instances of the type
--- cannot access the type's metatable or metamethods.
--- @param name Name of table
--- @param supermeta The metatable to inheret from
--- @return The table to store normal methods
--- @return The table to store metamethods
-function SF.Typedef(name, supermeta)
-	--Keep the original type so we don't screw up inheritance
-	if SF.Types[name] then
-		return SF.Types[name].__methods, SF.Types[name]
-	end
+SF.Hooks = {}
 
+--- Creates and registers a library.
+-- @param name The library name
+function SF.RegisterLibrary(name)
+	local methods = {}
+	SF.Libraries[name] = methods
+	SF.DefaultEnvironment[name] = methods
+	return methods
+end
+
+--- Creates and registers a type.
+-- @param name The library name
+-- @return methods The type's methods
+-- @return metamethods The type's metamethods
+function SF.RegisterType(name)
 	local methods, metamethods = {}, {}
-	metamethods.__metatable = name
+	SF.Types[name] = metamethods
 	metamethods.__index = methods
 	metamethods.__methods = methods
-
-	if supermeta then
-		setmetatable(methods, { __index = supermeta.__index })
-		metamethods.__supertypes = { [supermeta] = true }
-		if supermeta.__supertypes then
-			for k, _ in pairs(supermeta.__supertypes) do
-				metamethods.__supertypes[k] = true
-			end
-		end
-	end
-
-	SF.Types[name] = metamethods
-	typemetatables[metamethods] = true
+	metamethods.__metatable = name
 	return methods, metamethods
 end
 
-function SF.GetTypeDef(name)
-	return SF.Types[name]
+--- Applies inheritance to a derived type.
+-- @param methods The type's methods table
+-- @param metamethods The type's metamethods table
+-- @param supermeta The meta of the inherited type
+function SF.ApplyTypeDependencies(methods, metamethods, supermeta)
+	local supermethods = supermeta.__methods
+
+	setmetatable(methods, {__index = supermethods})
+
+	metamethods.__supertypes = { [supermeta] = true }
+	if supermeta.__supertypes then
+		for k, _ in pairs(supermeta.__supertypes) do
+			metamethods.__supertypes[k] = true
+		end
+	end
+end
+
+function SF.DeepDeepCopy(src, dst, done)
+	-- Copy the values
+	for k, v in pairs(src) do
+		if type(k)=="table" then error("Tried to shallow copy a table!!") end
+		if type(v)=="table" then
+			if done[v] then
+				dst[k] = done[v]
+			else
+				local t = {}
+				done[v] = t
+				SF.DeepDeepCopy(v, t, done)
+				dst[k] = t
+			end
+		else
+			dst[k] = v
+		end
+	end
+
+	-- Copy the metatable
+	local meta = dgetmeta(src)
+	if meta then
+		local t = {}
+		SF.DeepDeepCopy(meta, t, done)
+		setmetatable(dst, t)
+	end
+end
+
+--- Builds an environment table
+-- @return The environment
+function SF.BuildEnvironment()
+	local env = {}
+	SF.DeepDeepCopy(SF.DefaultEnvironment, env, {})
+	return env
+end
+
+--- Registers a library hook. These hooks are only available to SF libraries,
+-- and are called by Libraries.CallHook.
+-- @param hookname The name of the hook.
+-- @param func The function to call
+function SF.AddHook(hookname, func)
+	local hook = SF.Hooks[hookname]
+	if not hook then
+		hook = {}
+		SF.Hooks[hookname] = hook
+	end
+
+	hook[#hook + 1] = func
+end
+
+--- Calls a library hook.
+-- @param hookname The name of the hook.
+-- @param ... The arguments to the functions that are called.
+function SF.CallHook(hookname, ...)
+	local hook = SF.Hooks[hookname]
+	if not hook then return end
+
+	for i = 1, #hook do
+		hook[i](...)
+	end
 end
 
 --- Checks the starfall type of val. Errors if the types don't match
 -- @param val The value to be checked.
--- @param typ A string type or metatable.
+-- @param typ A metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
-function SF.CheckType(val, typ, level)
+-- @param default A value to return if val is nil.
+function SF.CheckType(val, typ, level, default)
 	local meta = dgetmeta(val)
-	if meta == typ or (meta and typemetatables[meta] and meta.__supertypes and meta.__supertypes[typ]) then
+	if typemetatables[meta] and (meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ])) then
 		return val
+	elseif val == nil and default then
+		return default
 	else
 		-- Failed, throw error
 		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
@@ -219,14 +288,24 @@ function SF.CheckType(val, typ, level)
 	end
 end
 
+--- Gets the type of val.
+-- @param val The value to be checked.
+function SF.GetType(val)
+	local mt = dgetmeta(val)
+	return (mt and mt.__metatable and type(mt.__metatable) == "string") and mt.__metatable or type(val)
+end
+
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 3 is added to this value. Default is 0.
-function SF.CheckLuaType(val, typ, level)
+-- @param default A value to return if val is nil.
+function SF.CheckLuaType(val, typ, level, default)
 	local valtype = TypeID(val)
 	if valtype == typ then
 		return val
+	elseif val == nil and default then
+		return default
 	else
 		-- Failed, throw error
 		assert(type(typ) == "number")
@@ -273,33 +352,25 @@ local sf2sensitive_tables = {}
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
 function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta)
-	local s2sfmode = ""
-	local sf2smode = ""
-
-	if weakwrapper == nil or weakwrapper then
-		sf2smode = "k"
-		s2sfmode = "v"
-	end
-	if weaksensitive then
-		sf2smode = sf2smode.."v"
-		s2sfmode = s2sfmode.."k"
-	end
-
 	local sensitive2sf, sf2sensitive
 	if shared_meta then
 		sensitive2sf = sensitive2sf_tables[shared_meta]
 		sf2sensitive = sf2sensitive_tables[shared_meta]
 	else
-		-- Check if the wrapper already exists for this metatable and recycle it or shared wrappers won't work.
-		if sensitive2sf_tables[metatable] then
-			sensitive2sf = sensitive2sf_tables[metatable]
-			sf2sensitive = sf2sensitive_tables[metatable]
-		else
-			sensitive2sf = setmetatable({}, { __mode = s2sfmode })
-			sf2sensitive = setmetatable({}, { __mode = sf2smode })
-			sensitive2sf_tables[metatable] = sensitive2sf
-			sf2sensitive_tables[metatable] = sf2sensitive
+		local s2sfmode = ""
+		local sf2smode = ""
+		if weakwrapper == nil or weakwrapper then
+			sf2smode = "k"
+			s2sfmode = "v"
 		end
+		if weaksensitive then
+			sf2smode = sf2smode.."v"
+			s2sfmode = s2sfmode.."k"
+		end
+		sensitive2sf = setmetatable({}, { __mode = s2sfmode })
+		sf2sensitive = setmetatable({}, { __mode = sf2smode })
+		sensitive2sf_tables[metatable] = sensitive2sf
+		sf2sensitive_tables[metatable] = sf2sensitive
 	end
 
 	local function wrap(value)
@@ -736,7 +807,7 @@ end
 
 do
 	local function cleanHooks(path)
-		for k, v in pairs(SF.Libraries.hooks) do
+		for k, v in pairs(SF.Hooks) do
 			local i = 1
 			while i <= #v do
 				local hookfile = debug.getinfo(v[i], "S").short_src
@@ -789,7 +860,7 @@ do
 				sendToClient(cl_filename)
 			end
 			if postload then
-				SF.Libraries.CallHook("postload")
+				SF.CallHook("postload")
 			end
 		end)
 
@@ -804,7 +875,7 @@ do
 					cleanHooks(path)
 					local func = CompileString(file, root_path .. path)
 					func()
-					SF.Libraries.CallHook("postload")
+					SF.CallHook("postload")
 				end
 			end)
 		end)
@@ -812,4 +883,4 @@ do
 	end
 end
 
-SF.Libraries.CallHook("postload")
+SF.CallHook("postload")

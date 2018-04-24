@@ -6,7 +6,7 @@ SF.Entities = {}
 
 --- Entity type
 -- @shared
-local ents_methods, ents_metamethods = SF.Typedef("Entity")
+local ents_methods, ents_metamethods = SF.RegisterType("Entity")
 
 local ewrap, eunwrap = SF.CreateWrapper(ents_metamethods, true, true, debug.getregistry().Entity)
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
@@ -19,7 +19,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 

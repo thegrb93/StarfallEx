@@ -7,7 +7,7 @@ end
 
 --- Joystick library.
 -- @client
-local joystick_library = SF.Libraries.Register("joystick")
+local joystick_library = SF.RegisterLibrary("joystick")
 local next_updates = {}
 
 local function refresh(enum)

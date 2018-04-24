@@ -1,29 +1,15 @@
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
 -- @server
-local holograms_library = SF.Libraries.Register("holograms")
+local holograms_library = SF.RegisterLibrary("holograms")
 
 --- Hologram type
-local hologram_methods, hologram_metamethods = SF.Typedef("Hologram", SF.Entities.Metatable)
-local wrap, unwrap = SF.CreateWrapper(hologram_metamethods, true, false, nil, SF.Entities.Metatable)
+local hologram_methods, hologram_metamethods = SF.RegisterType("Hologram")
 
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local ang_meta, vec_meta, ent_meta
-local vunwrap, aunwrap, ewrap, eunwrap
-
-SF.Libraries.AddHook("postload", function()
-	ang_meta = SF.Angles.Metatable
-	vec_meta = SF.Vectors.Metatable
-	ent_meta = SF.Entities.Metatable
-
-	vunwrap = SF.Vectors.Unwrap
-	aunwrap = SF.Angles.Unwrap
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
-end)
 
 SF.Holograms = {}
 
@@ -34,13 +20,31 @@ SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows t
 
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
-SF.Holograms.Wrap = wrap
-SF.Holograms.Unwrap = unwrap
+
+local ang_meta, vec_meta, ent_meta
+local wrap, unwrap, vunwrap, aunwrap, ewrap, eunwrap
+SF.AddHook("postload", function()
+	ang_meta = SF.Angles.Metatable
+	vec_meta = SF.Vectors.Metatable
+	ent_meta = SF.Entities.Metatable
+
+	vunwrap = SF.Vectors.Unwrap
+	aunwrap = SF.Angles.Unwrap
+	ewrap = SF.Entities.Wrap
+	eunwrap = SF.Entities.Unwrap
+
+	SF.ApplyTypeDependencies(hologram_methods, hologram_metamethods, ent_meta)
+	wrap, unwrap = SF.CreateWrapper(hologram_metamethods, true, false, nil, ent_meta)
+
+	SF.Holograms.Wrap = wrap
+	SF.Holograms.Unwrap = unwrap
+end)
+
 
 -- Table with player keys that automatically cleans when player leaves.
 local plyCount = SF.EntityTable("playerHolos")
 
-SF.Libraries.AddHook("initialize", function(inst)
+SF.AddHook("initialize", function(inst)
 	inst.data.holograms = {
 		holos = {},
 		count = 0
@@ -55,7 +59,7 @@ local function hologramOnDestroy(holoent, holodata, ply)
 	end
 end
 
-SF.Libraries.AddHook("deinitialize", function(inst)
+SF.AddHook("deinitialize", function(inst)
 	local holos = inst.data.holograms.holos
 	local holo = next(holos)
 	while holo do

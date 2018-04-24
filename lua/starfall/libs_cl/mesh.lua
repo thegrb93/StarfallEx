@@ -7,7 +7,7 @@ local maxtriangles = CreateClientConVar("sf_mesh_maxtriangles", "50000", true, "
 
 --- Mesh type
 -- @client
-local mesh_methods, mesh_metamethods = SF.Typedef("Mesh")
+local mesh_methods, mesh_metamethods = SF.RegisterType("Mesh")
 local wrap, unwrap = SF.CreateWrapper(mesh_metamethods, true, false, debug.getregistry().IMesh)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -15,7 +15,7 @@ local checkpermission = SF.Permissions.check
 
 --- Mesh library.
 -- @client
-local mesh_library = SF.Libraries.Register("mesh")
+local mesh_library = SF.RegisterLibrary("mesh")
 
 SF.Mesh.Wrap = wrap
 SF.Mesh.Unwrap = unwrap
@@ -26,7 +26,7 @@ local dgetmeta = debug.getmetatable
 local col_meta, vec_meta
 local vwrap, vunwrap, cwrap, cunwraplocal
 local vertexCheck, vertexUnwrap
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 	col_meta = SF.Color.Metatable
 
@@ -76,11 +76,11 @@ local function destroyMesh(id, mesh, meshdata)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.Libraries.AddHook("initialize", function (inst)
+SF.AddHook("initialize", function (inst)
 	inst.data.meshes = {}
 end)
 
-SF.Libraries.AddHook("deinitialize", function (inst)
+SF.AddHook("deinitialize", function (inst)
 	local meshes = inst.data.meshes
 	local mesh = next(meshes)
 	while mesh do

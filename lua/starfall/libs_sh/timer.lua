@@ -6,7 +6,7 @@ local timer = timer
 
 --- Deals with time and timers.
 -- @shared
-local timer_library = SF.Libraries.Register("timer")
+local timer_library = SF.RegisterLibrary("timer")
 local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of timers that can be created")
 
 -- ------------------------- Time ------------------------- --
@@ -195,12 +195,12 @@ function timer_library.getTimersLeft()
 end
 
 
-SF.Libraries.AddHook("initialize", function(instance)
+SF.AddHook("initialize", function(instance)
 	instance.data.timers = {}
 	instance.data.timer_count = 0
 end)
 
-SF.Libraries.AddHook("deinitialize", function(instance)
+SF.AddHook("deinitialize", function(instance)
 	for name, _ in pairs(instance.data.timers) do
 		timer.Remove(name)
 	end

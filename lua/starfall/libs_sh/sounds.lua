@@ -2,7 +2,7 @@ SF.Sounds = {}
 
 --- Sound type
 -- @shared
-local sound_methods, sound_metamethods = SF.Typedef("Sound")
+local sound_methods, sound_metamethods = SF.RegisterType("Sound")
 local wrap, unwrap = SF.CreateWrapper(sound_metamethods, true, false, debug.getregistry().CSoundPatch)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -10,7 +10,7 @@ local checkpermission = SF.Permissions.check
 
 --- Sounds library.
 -- @shared
-local sound_library = SF.Libraries.Register("sounds")
+local sound_library = SF.RegisterLibrary("sounds")
 
 SF.Sounds.Wrap = wrap
 SF.Sounds.Unwrap = unwrap
@@ -31,14 +31,14 @@ do
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.Libraries.AddHook("initialize", function (inst)
+SF.AddHook("initialize", function (inst)
 	inst.data.sounds = {
 		sounds = {},
 		burst = SF.BurstObject(SF.Sounds.burstrate:GetFloat(), SF.Sounds.burstmax:GetFloat())
 	}
 end)
 
-SF.Libraries.AddHook("deinitialize", function (inst)
+SF.AddHook("deinitialize", function (inst)
 	local sounds = inst.data.sounds.sounds
 	local s = next(sounds)
 	while s do

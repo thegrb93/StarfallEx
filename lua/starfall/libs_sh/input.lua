@@ -35,7 +35,7 @@ if SERVER then return end
 
 ---- Input library.
 --- @client
-local input_methods = SF.Libraries.Register("input")
+local input_methods = SF.RegisterLibrary("input")
 
 SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 
@@ -128,7 +128,7 @@ function input_methods.enableCursor(enabled)
 	gui.EnableScreenClicker(enabled)
 end
 
-SF.Libraries.AddHook("starfall_hud_disconnected", function(inst)
+SF.AddHook("starfall_hud_disconnected", function(inst)
 	if not inst:isHUDActive() then
 		gui.EnableScreenClicker(false)
 	end
@@ -173,7 +173,7 @@ end)
 -- @param y Y coordinate moved
 
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	local _KEY = {
 		["FIRST"] = 0,
 		["NONE"] = 0,

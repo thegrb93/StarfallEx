@@ -134,7 +134,7 @@ local function createWireLibraryMap () -- Hashtable
 		libMap["Environment"][name] = type(val)
 	end
 
-	for lib, tbl in pairs(SF.Libraries.libraries) do --Constants/enums aren't present in docs ATM
+	for lib, tbl in pairs(SF.Libraries) do --Constants/enums aren't present in docs ATM
 		libMap[lib] = {}
 		for name, val in pairs(tbl) do
 			libMap[lib][name] = type(val)

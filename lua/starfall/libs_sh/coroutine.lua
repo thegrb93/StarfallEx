@@ -2,21 +2,21 @@
 
 --- Coroutine library
 -- @shared
-local coroutine_library = SF.Libraries.Register("coroutine")
+local coroutine_library = SF.RegisterLibrary("coroutine")
 local coroutine = coroutine
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local _, thread_metamethods = SF.Typedef("thread")
+local _, thread_metamethods = SF.RegisterType("thread")
 local wrap, unwrap = SF.CreateWrapper(thread_metamethods, true, false)
 
 
-SF.Libraries.AddHook("initialize", function(instance)
+SF.AddHook("initialize", function(instance)
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })
 end)
 
-SF.Libraries.AddHook("deinitialize", function(instance)
+SF.AddHook("deinitialize", function(instance)
 	for thread, wrapped in pairs(instance.data.coroutines) do
 		local unwrapped = unwrap(wrapped)
 		unwrapped.thread = nil

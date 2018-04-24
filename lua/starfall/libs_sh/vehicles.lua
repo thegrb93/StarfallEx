@@ -7,22 +7,21 @@ local checkpermission = SF.Permissions.check
 
 SF.Vehicles = {}
 --- Vehicle type
-local vehicle_methods, vehicle_metamethods = SF.Typedef("Vehicle", SF.Entities.Metatable)
+local vehicle_methods, vehicle_metamethods = SF.RegisterType("Vehicle")
 
 SF.Vehicles.Methods = vehicle_methods
 SF.Vehicles.Metatable = vehicle_metamethods
 
---- Custom wrapper/unwrapper is necessary for vehicle objects
--- wrapper
-local dsetmeta = debug.setmetatable
-local function wrap(object)
-	object = SF.Entities.Wrap(object)
-	dsetmeta(object, vehicle_metamethods)
-	return object
-end
+local wrap, unwrap, pwrap
+SF.AddHook("postload", function()
+	pwrap = SF.Players.Wrap
 
-SF.AddObjectWrapper(debug.getregistry().Vehicle, vehicle_metamethods, wrap)
-SF.AddObjectUnwrapper(vehicle_metamethods, SF.Entities.Unwrap)
+	SF.ApplyTypeDependencies(vehicle_methods, vehicle_metamethods, SF.Entities.Metatable)
+	wrap, unwrap = SF.CreateWrapper(vehicle_metamethods, true, false, debug.getregistry().Vehicle, SF.Entities.Metatable)
+
+	SF.Vehicles.Wrap = wrap
+	SF.Vehicles.Unwrap = unwrap
+end)
 
 -- Register privileges
 do
@@ -33,7 +32,7 @@ end
 --- To string
 -- @shared
 function vehicle_metamethods:__tostring()
-	local ent = SF.Entities.Unwrap(self)
+	local ent = unwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
 end
@@ -44,16 +43,16 @@ if SERVER then
 	-- @return Driver of vehicle
 	function vehicle_methods:getDriver ()
 		checktype(self, vehicle_metamethods)
-		local ent = SF.Entities.Unwrap(self)
+		local ent = unwrap(self)
 		if not IsValid(ent) then return end
-		return SF.WrapObject(ent:GetDriver())
+		return pwrap(ent:GetDriver())
 	end
 
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver ()
 		checktype(self, vehicle_metamethods)
-		local ent = SF.Entities.Unwrap(self)
+		local ent = unwrap(self)
 		if not IsValid(ent) then return end
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
@@ -68,8 +67,8 @@ if SERVER then
 	function vehicle_methods:getPassenger (n)
 		checktype(self, vehicle_metamethods)
 		checkluatype (n, TYPE_NUMBER)
-		local ent = SF.Entities.Unwrap(self)
-		return SF.WrapObject(ent:GetPassenger(n))
+		local ent = unwrap(self)
+		return pwrap(ent:GetPassenger(n))
 	end
 
 end

@@ -4,7 +4,7 @@
 
 SF.Npcs = {}
 --- Npc type
-local npc_methods, npc_metatable = SF.Typedef("Npc", SF.Entities.Metatable)
+local npc_methods, npc_metatable = SF.RegisterType("Npc")
 
 SF.Npcs.Methods = npc_methods
 SF.Npcs.Metatable = npc_metatable
@@ -17,11 +17,12 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	wrap = SF.Entities.Wrap
 	unwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable
 
+	SF.ApplyTypeDependencies(npc_methods, npc_metatable, "Entity")
 	SF.AddObjectWrapper(debug.getregistry().NPC, npc_metatable, function(object)
 		object = wrap(object)
 		dsetmeta(object, npc_metatable)

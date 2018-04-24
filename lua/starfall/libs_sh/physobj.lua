@@ -6,7 +6,7 @@ SF.PhysObjs = {}
 
 --- PhysObj Type
 -- @shared
-local physobj_methods, physobj_metatable = SF.Typedef("PhysObj")
+local physobj_methods, physobj_metatable = SF.RegisterType("PhysObj")
 local wrap, unwrap = SF.CreateWrapper(physobj_metatable, true, false)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -25,7 +25,7 @@ local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap
 local isValid = IsValid
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 

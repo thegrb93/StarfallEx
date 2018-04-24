@@ -2,7 +2,7 @@
 
 --- Http library. Requests content from urls.
 -- @shared
-local http_library = SF.Libraries.Register("http")
+local http_library = SF.RegisterLibrary("http")
 local http_interval = CreateConVar("sf_http_interval", "0.5", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "Interval in seconds in which one http request can be made")
 local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The maximum amount of active http requests at the same time")
 
@@ -12,7 +12,7 @@ SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the us
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
-SF.Libraries.AddHook("initialize", function(instance)
+SF.AddHook("initialize", function(instance)
 	instance.data.http = {
 		lastRequest = 0,
 		active = 0

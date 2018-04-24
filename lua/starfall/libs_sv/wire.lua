@@ -5,9 +5,9 @@
 if not WireLib then return end
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library = SF.Libraries.Register("wire")
+local wire_library = SF.RegisterLibrary("wire")
 
-SF.Libraries.AddHook("initialize", function(instance)
+SF.AddHook("initialize", function(instance)
 	local ent = instance.data.entity
 	if ent.Inputs == nil then
 		WireLib.CreateInputs(ent, {})
@@ -48,7 +48,7 @@ SF.Wire.Library = wire_library
 
 --- Wirelink type
 -- @server
-local wirelink_methods, wirelink_metatable = SF.Typedef("Wirelink")
+local wirelink_methods, wirelink_metatable = SF.RegisterType("Wirelink")
 local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable, true, true)
 local vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
 local vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
@@ -599,7 +599,7 @@ function wirelink_methods:getWiredToName(name)
 end
 
 -- ------------------------- Ports Metatable ------------------------- --
-local wire_ports_methods, wire_ports_metamethods = SF.Typedef("Ports")
+local wire_ports_methods, wire_ports_metamethods = SF.RegisterType("Ports")
 
 function wire_ports_metamethods:__index (name)
 	checkpermission(SF.instance, nil, "wire.input")
