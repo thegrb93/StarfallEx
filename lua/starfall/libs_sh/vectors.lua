@@ -2,7 +2,7 @@ SF.Vectors = {}
 
 --- Vector type
 -- @shared
-local vec_methods, vec_metamethods = SF.Typedef("Vector")
+local vec_methods, vec_metamethods = SF.RegisterType("Vector")
 
 local function wrap(tbl)
 	return setmetatable(tbl, vec_metamethods)
@@ -19,7 +19,7 @@ end
 SF.AddObjectWrapper(debug.getregistry().Vector, vec_metamethods, vwrap)
 SF.AddObjectUnwrapper(vec_metamethods, unwrap)
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	SF.DefaultEnvironment.Vector = function (x, y, z)
 		x = x or 0
 		return wrap({ x, y or x, z or (y and 0 or x) })
@@ -47,14 +47,12 @@ function vec_metamethods.__newindex (t, k, v)
 	end
 end
 
-local _p = vec_metamethods.__methods
-
 --- __index metamethod
 function vec_metamethods.__index (t, k)
 	if xyz[k] then
 		return rawget(t, xyz[k])
 	else
-		return _p[k]
+		return vec_methods[k]
 	end
 end
 

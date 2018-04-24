@@ -44,7 +44,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 
 	instance.player = player
 	instance.playerid = player:SteamID()
-	instance.env = SF.Libraries.BuildEnvironment()
+	instance.env = SF.BuildEnvironment()
 	instance.env._G = instance.env
 	instance.data = data or {}
 	instance.ppdata = {}
@@ -273,11 +273,11 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 	return tbl
 end
 
---- Runs a library hook. Alias to SF.Libraries.CallHook(hook, self, ...).
+--- Runs a library hook. Alias to SF.CallHook(hook, self, ...).
 -- @param hook Hook to run.
 -- @param ... Additional arguments.
 function SF.Instance:runLibraryHook(hook, ...)
-	return SF.Libraries.CallHook(hook, self, ...)
+	return SF.CallHook(hook, self, ...)
 end
 
 --- Runs an arbitrary function under the SF instance. This can be used

@@ -2,7 +2,7 @@
 
 --- Quaternion library
 -- @shared
-local quat_lib = SF.Libraries.Register("quaternion")
+local quat_lib = SF.RegisterLibrary("quaternion")
 
 local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 local checktype = SF.CheckType
@@ -43,7 +43,7 @@ local deg2rad = math.pi / 180
 local rad2deg = 180 / math.pi
 
 --- Quaternion type
-local quat_methods, quat_metamethods = SF.Typedef("Quaternion")
+local quat_methods, quat_metamethods = SF.RegisterType("Quaternion")
 
 --****************************** Helper functions ******************************--
 

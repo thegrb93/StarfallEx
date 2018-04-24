@@ -2,14 +2,16 @@
 SF.VMatrix = {}
 
 --- VMatrix type
-local vmatrix_methods, vmatrix_metamethods = SF.Typedef("VMatrix")
+local vmatrix_methods, vmatrix_metamethods = SF.RegisterType("VMatrix")
 local wrap, unwrap = SF.CreateWrapper(vmatrix_metamethods, true, false, debug.getregistry().VMatrix)
 local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
+
+local dgetmeta = debug.getmetatable
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
@@ -17,22 +19,18 @@ SF.Libraries.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap
-end)
 
-SF.VMatrix.Methods = vmatrix_methods
-SF.VMatrix.Metatable = vmatrix_metamethods
-SF.VMatrix.Wrap = wrap
-SF.VMatrix.Unwrap = unwrap
-
-local dgetmeta = debug.getmetatable
-
-SF.Libraries.AddHook("postload", function()
 	--- Returns a new VMatrix
 	-- @return New VMatrix
 	SF.DefaultEnvironment.Matrix = function (t)
 		return wrap(Matrix(t))
 	end
 end)
+
+SF.VMatrix.Methods = vmatrix_methods
+SF.VMatrix.Metatable = vmatrix_metamethods
+SF.VMatrix.Wrap = wrap
+SF.VMatrix.Unwrap = unwrap
 
 --- tostring metamethod
 -- @return string representing the matrix.
@@ -220,12 +218,12 @@ end
 -- @return The angle of rotation
 function vmatrix_methods:getAxisAngle()
 	local epsilon = 0.00001
-	
+
 	local m = unwrap(self):ToTable()
 	local m00, m01, m02 = unpack(m[1])
 	local m10, m11, m12 = unpack(m[2])
 	local m20, m21, m22 = unpack(m[3])
-	
+
 	if math.abs(m01-m10)< epsilon and math.abs(m02-m20)< epsilon and math.abs(m12-m21)< epsilon then
 		// singularity found
 		if math.abs(m01+m10) < epsilon and math.abs(m02+m20) < epsilon and math.abs(m12+m21) < epsilon and math.abs(m00+m11+m22-3) < epsilon then
@@ -261,7 +259,7 @@ function vmatrix_methods:getAxisAngle()
 			end
 		end
 	end
-	
+
 	local axis = Vector(m21 - m12, m02 - m20, m10 - m01)
 	local s = axis:Length()
 	if math.abs(s) < epsilon then s=1 end

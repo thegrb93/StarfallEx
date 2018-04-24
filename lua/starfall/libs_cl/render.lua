@@ -73,7 +73,7 @@
 -- @field TEXT_ALIGN_TOP
 -- @field TEXT_ALIGN_BOTTOM
 
-local render_library = SF.Libraries.Register("render")
+local render_library = SF.RegisterLibrary("render")
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
 render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
@@ -102,7 +102,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local COLOR_WHITE = Color(255, 255, 255)
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	vector_meta = SF.Vectors.Metatable
 	matrix_meta = SF.VMatrix.Metatable
 	col_meta = SF.Color.Metatable
@@ -147,7 +147,7 @@ local renderhooks = {
 	postdrawhud = true,
 }
 
-SF.Libraries.AddHook("prepare", function (instance, hook)
+SF.AddHook("prepare", function (instance, hook)
 	if renderhooks[hook] then
 		currentcolor = COLOR_WHITE
 		render.SetColorMaterial()
@@ -171,7 +171,7 @@ SF.Libraries.AddHook("prepare", function (instance, hook)
 	end
 end)
 
-SF.Libraries.AddHook("cleanup", function (instance, hook)
+SF.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0, 0, 0, 0, false)
@@ -203,7 +203,7 @@ SF.Libraries.AddHook("cleanup", function (instance, hook)
 	end
 end)
 
-SF.Libraries.AddHook("initialize", function(instance)
+SF.AddHook("initialize", function(instance)
 	instance.data.render = {}
 	instance.data.render.rendertargets = {}
 	instance.data.render.rendertargetcount = 0
@@ -212,7 +212,7 @@ SF.Libraries.AddHook("initialize", function(instance)
 	instance.data.render.urltexturecount = 0
 end)
 
-SF.Libraries.AddHook("deinitialize", function (instance)
+SF.AddHook("deinitialize", function (instance)
 	for k, v in pairs(instance.data.render.rendertargets) do
 		globalRTs[v][2] = true -- mark as available
 	end

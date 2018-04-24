@@ -11,7 +11,7 @@ end
 
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
-local bass_methods, bass_metamethods = SF.Typedef("Bass")
+local bass_methods, bass_metamethods = SF.RegisterType("Bass")
 local wrap, unwrap = SF.CreateWrapper(bass_metamethods, true, false, debug.getregistry().IGModAudioChannel)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -19,7 +19,7 @@ local checkpermission = SF.Permissions.check
 
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @client
-local bass_library = SF.Libraries.Register("bass")
+local bass_library = SF.RegisterLibrary("bass")
 
 SF.Bass.Wrap = wrap
 SF.Bass.Unwrap = unwrap
@@ -28,13 +28,13 @@ SF.Bass.Metatable = bass_metamethods
 
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.Libraries.AddHook("initialize", function (inst)
+SF.AddHook("initialize", function (inst)
 	inst.data.bass = {
 		sounds = {}
 	}
 end)
 
-SF.Libraries.AddHook("deinitialize", function (inst)
+SF.AddHook("deinitialize", function (inst)
 	local sounds = inst.data.bass.sounds
 	local s = next(sounds)
 	while s do

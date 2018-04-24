@@ -80,7 +80,7 @@ if CLIENT then
 			table.insert(libs, name)
 		end
 
-		for lib, tbl in pairs(SF.Libraries.libraries) do
+		for lib, tbl in pairs(SF.Libraries) do
 			libMap[lib] = {}
 			for name, val in pairs(tbl) do
 				table.insert(libMap[lib], name)
@@ -109,7 +109,7 @@ if CLIENT then
 		SF.Editor.createEditor()
 		SF.Editor.initialized = true
 
-		SF.Libraries.CallHook("editorinit")
+		SF.CallHook("editorinit")
 	end
 
 	function SF.Editor.open ()

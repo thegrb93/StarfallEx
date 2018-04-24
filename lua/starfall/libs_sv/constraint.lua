@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating constraints.
 -- @server
-local constraint_library = SF.Libraries.Register("constraint")
+local constraint_library = SF.RegisterLibrary("constraint")
 
 local vwrap = SF.WrapObject
 local vunwrap = SF.UnwrapObject
@@ -10,7 +10,7 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	ewrap = SF.Entities.Wrap
 	eunwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable

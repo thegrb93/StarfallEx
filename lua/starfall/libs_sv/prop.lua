@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @shared
-local props_library = SF.Libraries.Register("prop")
+local props_library = SF.RegisterLibrary("prop")
 
 local vunwrap = SF.UnwrapObject
 local checktype = SF.CheckType
@@ -25,7 +25,7 @@ SF.Permissions.registerPrivilege("prop.create", "Create prop", "Allows the user 
 -- Table with player keys that automatically cleans when player leaves.
 local plyCount = SF.EntityTable("playerProps")
 
-SF.Libraries.AddHook("initialize", function(inst)
+SF.AddHook("initialize", function(inst)
 	inst.data.props = {
 		props = {},
 		burst = SF.BurstObject(SF.Props.burstrate:GetFloat(), SF.Props.burstmax:GetFloat())
@@ -34,7 +34,7 @@ SF.Libraries.AddHook("initialize", function(inst)
 	plyCount[inst.player] = plyCount[inst.player] or 0
 end)
 
-SF.Libraries.AddHook("deinitialize", function(inst)
+SF.AddHook("deinitialize", function(inst)
 	if inst.data.props.clean ~= false then --Return true on nil too
 		for prop, _ in pairs(inst.data.props.props) do
 			local propent = SF.Entities.Unwrap(prop)

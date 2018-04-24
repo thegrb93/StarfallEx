@@ -4,7 +4,7 @@
 
 --- Deals with hooks
 -- @shared
-local hook_library = SF.Libraries.Register("hook")
+local hook_library = SF.RegisterLibrary("hook")
 local registered_instances = {}
 local gmod_hooks = {}
 local gmod_override_hooks = {}
@@ -192,7 +192,7 @@ function hook_library.remove (hookname, name)
 	end
 end
 
-SF.Libraries.AddHook("deinitialize", function (instance)
+SF.AddHook("deinitialize", function (instance)
 	for k, v in pairs(registered_instances) do
 		v[instance] = nil
 		if not next(v) and not gmod_override_hooks[k] then

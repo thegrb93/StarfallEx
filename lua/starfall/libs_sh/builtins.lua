@@ -264,7 +264,7 @@ if CLIENT then
 end
 
 -- String library
-local string_methods = SF.Libraries.Register("string")
+local string_methods = SF.RegisterLibrary("string")
 string_methods.byte = string.byte string_methods.byte = string.byte
 string_methods.char = string.char
 string_methods.comma = string.Comma string_methods.Comma = string.Comma
@@ -349,8 +349,9 @@ end
 -- @class table
 SF.DefaultEnvironment.string = nil
 
--- Math library
-local math_methods = SF.Libraries.Register("math")
+
+
+local math_methods = SF.RegisterLibrary("math")
 math_methods.abs = math.abs
 math_methods.acos = math.acos
 math_methods.angleDifference = math.AngleDifference
@@ -426,7 +427,9 @@ end
 -- @class table
 SF.DefaultEnvironment.math = nil
 
-local os_methods = SF.Libraries.Register("os")
+
+
+local os_methods = SF.RegisterLibrary("os")
 os_methods.clock = os.clock
 os_methods.date = function(format, time)
 	if format~=nil and string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
@@ -439,7 +442,9 @@ os_methods.time = os.time
 -- @class table
 SF.DefaultEnvironment.os = nil
 
-local table_methods = SF.Libraries.Register("table")
+
+
+local table_methods = SF.RegisterLibrary("table")
 table_methods.add = table.Add
 table_methods.clearKeys = table.ClearKeys
 table_methods.collapseKeyValue = table.CollapseKeyValue
@@ -483,7 +488,9 @@ table_methods.toString = table.ToString
 -- @class table
 SF.DefaultEnvironment.table = nil
 
-local bit_methods = SF.Libraries.Register("bit")
+
+
+local bit_methods = SF.RegisterLibrary("bit")
 bit_methods.arshift = bit.arshift
 bit_methods.band = bit.band
 bit_methods.bnot = bit.bnot
@@ -544,18 +551,19 @@ for i = 1, 5 do
 	local luaType = luaTypes[i]
 	local meta = debug.getmetatable(luaType)
 	if meta then
-		SF.Libraries.AddHook("prepare", function()
+		SF.AddHook("prepare", function()
 			debug.setmetatable(luaType, nil)
 		end)
-		SF.Libraries.AddHook("cleanup", function()
+		SF.AddHook("cleanup", function()
 			debug.setmetatable(luaType, meta)
 		end)
 	end
 end
 local gluastr = debug.getmetatable("")
-SF.Libraries.AddHook("prepare", function()
+local string_methods_copy = table.Copy(string_methods)
+SF.AddHook("prepare", function()
 	debug.setmetatable("", { __index = function(self, key)
-		local val = string_methods[key]
+		local val = string_methods_copy[key]
 		if (val) then
 			return val
 		elseif (tonumber(key)) then
@@ -565,7 +573,7 @@ SF.Libraries.AddHook("prepare", function()
 		end
 	end })
 end)
-SF.Libraries.AddHook("cleanup", function()
+SF.AddHook("cleanup", function()
 	debug.setmetatable("", gluastr)
 end)
 

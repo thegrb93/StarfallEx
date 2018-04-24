@@ -17,7 +17,7 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	TYPE_ENTITY = SF.Entities.Metatable
 	TYPE_VECTOR = SF.Types["Vector"]
 
@@ -27,12 +27,12 @@ end)
 
 --- Particle type
 -- @client
-local particle_methods, particle_metamethods = SF.Typedef("Particle")
+local particle_methods, particle_metamethods = SF.RegisterType("Particle")
 local wrap, unwrap = SF.CreateWrapper(particle_metamethods, false, false, debug.getregistry().CNewParticleEffect)
 
 --- Particle library.
 -- @client
-local particle_library = SF.Libraries.Register("particle")
+local particle_library = SF.RegisterLibrary("particle")
 
 SF.Particle.Wrap = wrap
 SF.Particle.Unwrap = unwrap
@@ -40,7 +40,7 @@ SF.Particle.Methods = particle_methods
 SF.Particle.Metatable = particle_metamethods
 
 -- Add PATTACH enum
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	local _PATTACH = {
 		["ABSORIGIN"] = PATTACH_ABSORIGIN,
 		["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
@@ -53,13 +53,13 @@ SF.Libraries.AddHook("postload", function()
 end)
 
 -- Create the storage for the metamethods
-SF.Libraries.AddHook("initialize", function (inst)
+SF.AddHook("initialize", function (inst)
 	inst.data.particle = {
 		particles = {},
 	}
 end)
 
-SF.Libraries.AddHook("deinitialize", function (inst)
+SF.AddHook("deinitialize", function (inst)
 	local particles = inst.data.particle.particles
 	local p = next(particles)
 	-- Remove all

@@ -2,7 +2,7 @@ SF.Angles = {}
 
 --- Angle Type
 -- @shared
-local ang_methods, ang_metamethods = SF.Typedef("Angle")
+local ang_methods, ang_metamethods = SF.RegisterType("Angle")
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -23,7 +23,7 @@ SF.AddObjectWrapper(debug.getregistry().Angle, ang_metamethods, awrap)
 SF.AddObjectUnwrapper(ang_metamethods, unwrap)
 
 local vwrap
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
 
 	SF.DefaultEnvironment.Angle = function (p, y, r)
@@ -53,14 +53,12 @@ function ang_metamethods.__newindex (t, k, v)
 	end
 end
 
-local _p = ang_metamethods.__methods
-
 --- __index metamethod
 function ang_metamethods.__index (t, k)
 	if pyr[k] then
 		return rawget(t, pyr[k])
 	else
-		return _p[k]
+		return ang_methods[k]
 	end
 end
 

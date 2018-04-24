@@ -6,7 +6,7 @@ SF.Entities = {}
 
 --- Entity type
 -- @shared
-local ents_methods, ents_metamethods = SF.Typedef("Entity")
+local ents_methods, ents_metamethods = SF.RegisterType("Entity")
 
 local ewrap, eunwrap = SF.CreateWrapper(ents_metamethods, true, true, debug.getregistry().Entity)
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
@@ -19,7 +19,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 
@@ -55,12 +55,19 @@ SF.Libraries.AddHook("postload", function()
 	end
 end)
 
--- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = ewrap
 SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
+
+--- To string
+-- @shared
+function ents_metamethods:__tostring ()
+	local ent = eunwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
 
 -- ------------------------- Methods ------------------------- --
 
@@ -310,14 +317,6 @@ function ents_methods:setRenderFX (renderfx)
 
 	ent:SetRenderFX(renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
-end
-
---- To string
--- @shared
-function ents_metamethods:__tostring ()
-	local ent = eunwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
 end
 
 --- Gets the parent of an entity

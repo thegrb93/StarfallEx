@@ -2,7 +2,7 @@ SF.Color = {}
 
 --- Color type
 --@shared
-local color_methods, color_metatable = SF.Typedef("Color", {})
+local color_methods, color_metatable = SF.RegisterType("Color")
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -28,7 +28,7 @@ SF.Color.Wrap = cwrap
 SF.Color.Unwrap = unwrap
 
 local dgetmeta = debug.getmetatable
-SF.Libraries.AddHook("postload", function()
+SF.AddHook("postload", function()
 	--- Creates a table struct that resembles a Color/
 	-- @name SF.DefaultEnvironment.Color
 	-- @class function
@@ -57,14 +57,12 @@ function color_metatable.__newindex (t, k, v)
 	end
 end
 
-local _p = color_metatable.__methods
-
 --- __index metamethod
 function color_metatable.__index (t, k)
 	if rgb[k] then
 		return rawget(t, rgb[k])
 	else
-		return _p[k]
+		return color_methods[k]
 	end
 end
 

@@ -8,7 +8,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 --- Net message library. Used for sending data from the server to the client and back
-local net_library = SF.Libraries.Register("net")
+local net_library = SF.RegisterLibrary("net")
 
 local burst_limit = CreateConVar("sf_net_burstmax", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
 					"The net message burst limit in kB.")
@@ -26,7 +26,7 @@ local function write(instance, type, size, ...)
 end
 
 local instances = {}
-SF.Libraries.AddHook("initialize", function(instance)
+SF.AddHook("initialize", function(instance)
 	instance.data.net = {
 		started = false,
 		burst = SF.BurstObject(burst_rate:GetFloat() * 1000, burst_limit:GetFloat() * 1000),
@@ -36,7 +36,7 @@ SF.Libraries.AddHook("initialize", function(instance)
 	}
 end)
 
-SF.Libraries.AddHook("cleanup", function (instance)
+SF.AddHook("cleanup", function (instance)
 	instance.data.net.started = false
 	instance.data.net.data = {}
 end)

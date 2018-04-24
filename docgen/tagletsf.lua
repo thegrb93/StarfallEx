@@ -81,7 +81,7 @@ local function check_function (line)
 end
 
 --- Checks if the line contains a library registration
--- (call to SF.Libraries.Register)
+-- (call to SF.RegisterLibrary)
 -- @param line string with line text
 -- @return the library name or nil if not found
 -- @return the table name used to store the library
@@ -89,14 +89,14 @@ local function check_library (line)
 	line = util.trim(line)
 
 	-- Global library
-	return line:match("^%s*local%s+([%w_]+).-=%s*SF%.Libraries%.Register%(%s*\"([^\"]+)\".-%)$")
+	return line:match("^%s*local%s+([%w_]+).-=%s*SF%.RegisterLibrary%(%s*\"([^\"]+)\".-%)$")
 end
 
 --- Checks if the line contains a class creation
 local function check_class (line)
 	line = util.trim(line)
 
-	return line:match("^%s*local%s+([%w_]+).-=%s*SF.Typedef%(%s*[\"']([^\"']+)[\"'].-%)$")
+	return line:match("^%s*local%s+([%w_]+).-=%s*SF%.RegisterType%(%s*[\"']([^\"']+)[\"'].-%)$")
 end
 
 -------------------------------------------------------------------------------

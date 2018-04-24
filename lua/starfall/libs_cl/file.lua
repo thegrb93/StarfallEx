@@ -4,11 +4,11 @@
 
 --- File functions. Allows modification of files.
 -- @client
-local file_library = SF.Libraries.Register("file")
+local file_library = SF.RegisterLibrary("file")
 
 --- File type
 -- @client
-local file_methods, file_metamethods = SF.Typedef("File")
+local file_methods, file_metamethods = SF.RegisterType("File")
 local wrap, unwrap = SF.CreateWrapper(file_metamethods, true, false)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -26,11 +26,11 @@ end
 file.CreateDir("sf_filedata/")
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.Libraries.AddHook("initialize", function (inst)
+SF.AddHook("initialize", function (inst)
 	inst.data.files = {}
 end)
 
-SF.Libraries.AddHook("deinitialize", function (inst)
+SF.AddHook("deinitialize", function (inst)
 	local files = inst.data.files
 	local file = next(files)
 	while file do
