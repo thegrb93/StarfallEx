@@ -166,6 +166,12 @@ function SF.DefaultEnvironment.quotaAverage ()
 	return SF.instance.cpu_average
 end
 
+--- Gets the starfall version
+-- @return Starfall version
+function SF.DefaultEnvironment.version ()
+	return SF.Version
+end
+
 --- Returns the total used time for all chips by the player.
 -- @return Total used CPU time of all your chips.
 function SF.DefaultEnvironment.quotaTotalUsed ()
