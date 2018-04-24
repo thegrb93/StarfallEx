@@ -55,12 +55,19 @@ SF.AddHook("postload", function()
 	end
 end)
 
--- ------------------------- Internal functions ------------------------- --
 
 SF.Entities.Wrap = ewrap
 SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
+
+--- To string
+-- @shared
+function ents_metamethods:__tostring ()
+	local ent = eunwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
 
 -- ------------------------- Methods ------------------------- --
 
@@ -310,14 +317,6 @@ function ents_methods:setRenderFX (renderfx)
 
 	ent:SetRenderFX(renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
-end
-
---- To string
--- @shared
-function ents_metamethods:__tostring ()
-	local ent = eunwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
 end
 
 --- Gets the parent of an entity
