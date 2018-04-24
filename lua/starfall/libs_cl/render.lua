@@ -120,7 +120,7 @@ end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
-SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { client = {} })
+SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { client = {}, urlwhitelist = {} })
 SF.Permissions.registerPrivilege("render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
@@ -677,7 +677,7 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
 		if prefix=="http" or prefix=="https" then
-			checkpermission (instance, nil, "render.urlmaterial")
+			checkpermission (instance, tx, "render.urlmaterial")
 			if #tx>2000 then SF.Throw("URL is too long!", 2) end
 			tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
 				return string.format("%%%02X", string.byte(str))

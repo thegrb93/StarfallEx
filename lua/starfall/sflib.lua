@@ -1,31 +1,13 @@
 -------------------------------------------------------------------------------
 -- The main Starfall library
 -------------------------------------------------------------------------------
+SF = SF or {}
 
-if SF ~= nil then return end
-SF = {}
+local dgetmeta = debug.getmetatable
 
--- Send files to client
-if SERVER then
-	AddCSLuaFile("sflib.lua")
-	AddCSLuaFile("instance.lua")
-	AddCSLuaFile("libraries.lua")
-	AddCSLuaFile("preprocessor.lua")
-	AddCSLuaFile("permissions/core.lua")
-	AddCSLuaFile("netstream.lua")
-	AddCSLuaFile("transfer.lua")
-
-	AddCSLuaFile("editor/editor.lua")
-end
-
--- Load files
-include("instance.lua")
-include("libraries.lua")
-include("preprocessor.lua")
-include("permissions/core.lua")
-include("editor/editor.lua")
-include("netstream.lua")
-include("transfer.lua")
+-------------------------------------------------------------------------------
+-- Some basic initialization
+-------------------------------------------------------------------------------
 
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
@@ -57,15 +39,91 @@ if SERVER then
 			end
 		end
 	end
-
 end
 
-local dgetmeta = debug.getmetatable
+-------------------------------------------------------------------------------
+-- Declare Basic Starfall Types
+-------------------------------------------------------------------------------
 
+function SF.EntityTable(key)
+	return setmetatable({},
+	{ __newindex = function(t, e, v)
+		rawset(t, e, v)
+		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
+	end })
+end
+
+
+--- Returns a class that can keep track of burst
+SF.BurstObject = {
+	use = function(self, amount)
+		self:check()
+		if self.val>= amount then
+			self.val = self.val - amount
+			return true
+		end
+		return false
+	end,
+	check = function(self)
+		self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
+		self.lasttick = CurTime()
+		return self.val
+	end,
+	__call = function(p, rate, max)
+		local t = {
+			rate = rate,
+			max = max,
+			val = max,
+			lasttick = 0
+		}
+		return setmetatable(t, p)
+	end
+}
+SF.BurstObject.__index = SF.BurstObject
+setmetatable(SF.BurstObject, SF.BurstObject)
+
+
+--- Returns a class that can whitelist/blacklist strings
+SF.StringRestrictor = {
+	check = function(self, value)
+		for k,v in pairs(self.blacklist) do
+			if string.match(value, v) then
+				return false
+			end
+		end
+		for k,v in pairs(self.whitelist) do
+			if string.match(value, v) then
+				return  true
+			end
+		end
+		return self.default
+	end,
+	addWhitelistEntry = function(self, value)
+		table.insert(self.whitelist, value)
+	end,
+	addBlacklistEntry = function(self, value)
+		table.insert(self.blacklist, value)
+	end,
+	__call = function(p, allowbydefault)
+		local t = {
+			whitelist = {}, -- patterns
+			blacklist = {}, -- patterns
+			default = allowbydefault or false,
+		}
+		return setmetatable(t, p)
+	end
+}
+SF.StringRestrictor.__index = SF.StringRestrictor
+setmetatable(SF.StringRestrictor, SF.StringRestrictor)
+
+
+-- Error type containing error info
 SF.Errormeta = {
 	__tostring = function(t) return t.message end,
 	__metatable = "SFError"
 }
+
+
 --- Builds an error type to that contains line numbers, file name, and traceback
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
@@ -88,6 +146,12 @@ function SF.MakeError (msg, level, uncatchable, prependinfo)
 		traceback = debug.traceback("", level)
 	}, SF.Errormeta)
 end
+
+
+-------------------------------------------------------------------------------
+-- Utility functions
+-------------------------------------------------------------------------------
+
 
 --- Throws an error like the throw function in builtins
 -- @param msg Message
@@ -317,15 +381,6 @@ function SF.UnwrapObject(object)
 	end
 end
 
---- Manages data tied to entities so that the data is cleaned when the entity is removed
-function SF.EntityTable(key)
-	return setmetatable({},
-	{ __newindex = function(t, e, v)
-		rawset(t, e, v)
-		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
-	end })
-end
-
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)
 	local tbl = string.Explode("[/\\]+", path, true)
@@ -344,33 +399,6 @@ function SF.NormalizePath(path)
 		end
 	end
 	return table.concat(tbl, "/")
-end
-
-
---- Returns a class that can keep track of burst
-function SF.BurstObject(rate, max)
-	local burstclass = {
-		use = function(self, amount)
-			self:check()
-			if self.val>= amount then
-				self.val = self.val - amount
-				return true
-			end
-			return false
-		end,
-		check = function(self)
-			self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
-			self.lasttick = CurTime()
-			return self.val
-		end
-	}
-	local t = {
-		rate = rate,
-		max = max,
-		val = max,
-		lasttick = 0
-	}
-	return setmetatable(t, { __index = burstclass })
 end
 
 --- Sanitizes and returns its argument list.
@@ -631,7 +659,29 @@ else
 	end
 end
 
------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
+-- Includes
+-------------------------------------------------------------------------------
+
+if SERVER then
+	AddCSLuaFile("sflib.lua")
+	AddCSLuaFile("instance.lua")
+	AddCSLuaFile("libraries.lua")
+	AddCSLuaFile("preprocessor.lua")
+	AddCSLuaFile("permissions/core.lua")
+	AddCSLuaFile("netstream.lua")
+	AddCSLuaFile("transfer.lua")
+
+	AddCSLuaFile("editor/editor.lua")
+end
+
+include("instance.lua")
+include("libraries.lua")
+include("preprocessor.lua")
+include("permissions/core.lua")
+include("editor/editor.lua")
+include("netstream.lua")
+include("transfer.lua")
 
 do
 
