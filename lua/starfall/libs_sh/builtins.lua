@@ -129,13 +129,6 @@ SF.DefaultEnvironment.getmetatable = function(tbl)
 	return getmetatable(tbl)
 end
 
---- Returns a type's methods table which can be edited
--- @param name Name of the type
-function SF.DefaultEnvironment.findMetaTable(name)
-	checkluatype (name, TYPE_STRING)
-	return SF.instance.types[name]
-end
-
 --- Generates the CRC checksum of the specified string. (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
 -- @name SF.DefaultEnvironment.crc
 -- @class function
@@ -158,31 +151,6 @@ SF.DefaultEnvironment.SERVER = SERVER
 -- @class function
 -- @return Boolean
 SF.DefaultEnvironment.isFirstTimePredicted = IsFirstTimePredicted
-
---- String library http://wiki.garrysmod.com/page/Category:string
--- @name SF.DefaultEnvironment.string
--- @class table
-SF.DefaultEnvironment.string = nil
-
---- The math library. http://wiki.garrysmod.com/page/Category:math
--- @name SF.DefaultEnvironment.math
--- @class table
-SF.DefaultEnvironment.math = nil
-
---- The os library. http://wiki.garrysmod.com/page/Category:os
--- @name SF.DefaultEnvironment.os
--- @class table
-SF.DefaultEnvironment.os = nil
-
---- Table library. http://wiki.garrysmod.com/page/Category:table
--- @name SF.DefaultEnvironment.table
--- @class table
-SF.DefaultEnvironment.table = nil
-
---- Bit library. http://wiki.garrysmod.com/page/Category:bit
--- @name SF.DefaultEnvironment.bit
--- @class table
-SF.DefaultEnvironment.bit = nil
 
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
@@ -376,6 +344,10 @@ end
 function string_methods.toColor(str)
 	return SF.WrapObject(string.ToColor(str))
 end
+--- String library http://wiki.garrysmod.com/page/Category:string
+-- @name SF.DefaultEnvironment.string
+-- @class table
+SF.DefaultEnvironment.string = nil
 
 
 
@@ -450,6 +422,10 @@ function math_methods.lerpVector(percent, from, to)
 
 	return SF.WrapObject(LerpVector(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
 end
+--- The math library. http://wiki.garrysmod.com/page/Category:math
+-- @name SF.DefaultEnvironment.math
+-- @class table
+SF.DefaultEnvironment.math = nil
 
 
 
@@ -461,6 +437,10 @@ os_methods.date = function(format, time)
 end
 os_methods.difftime = os.difftime
 os_methods.time = os.time
+--- The os library. http://wiki.garrysmod.com/page/Category:os
+-- @name SF.DefaultEnvironment.os
+-- @class table
+SF.DefaultEnvironment.os = nil
 
 
 
@@ -503,6 +483,10 @@ table_methods.sortByKey = table.SortByKey
 table_methods.sortByMember = table.SortByMember
 table_methods.sortDesc = table.SortDesc
 table_methods.toString = table.ToString
+--- Table library. http://wiki.garrysmod.com/page/Category:table
+-- @name SF.DefaultEnvironment.table
+-- @class table
+SF.DefaultEnvironment.table = nil
 
 
 
@@ -519,9 +503,22 @@ bit_methods.ror = bit.ror
 bit_methods.rshift = bit.rshift
 bit_methods.tobit = bit.tobit
 bit_methods.tohex = bit.tohex
+--- Bit library. http://wiki.garrysmod.com/page/Category:bit
+-- @name SF.DefaultEnvironment.bit
+-- @class table
+SF.DefaultEnvironment.bit = nil
 
 -- ------------------------- Functions ------------------------- --
 
+--- Gets a list of all libraries
+-- @return Table containing the names of each available library
+function SF.DefaultEnvironment.getLibraries()
+	local ret = {}
+	for k, v in pairs(SF.Libraries.libraries) do
+		ret[#ret + 1] = k
+	end
+	return ret
+end
 
 --- Set the value of a table index without invoking a metamethod
 --@param table The table to modify
