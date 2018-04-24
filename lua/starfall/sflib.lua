@@ -23,7 +23,7 @@ if SERVER then
 	local files, directories = file.Find( "addons/*", "GAME" )
 	local sf_dir = nil
 	for k,v in pairs(directories) do
-		if file.Exists("addons/"..v.."/lua/starfall", "GAME") then
+		if file.Exists("addons/"..v.."/lua/starfall/sflib.lua", "GAME") then
 			sf_dir = "addons/"..v.."/"
 			break
 		end
