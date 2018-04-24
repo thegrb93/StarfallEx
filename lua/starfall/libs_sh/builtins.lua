@@ -563,9 +563,10 @@ for i = 1, 5 do
 	end
 end
 local gluastr = debug.getmetatable("")
+local string_methods_copy = table.Copy(string_methods)
 SF.AddHook("prepare", function()
 	debug.setmetatable("", { __index = function(self, key)
-		local val = string_methods[key]
+		local val = string_methods_copy[key]
 		if (val) then
 			return val
 		elseif (tonumber(key)) then
