@@ -163,7 +163,7 @@ end
 --- Gets the Average CPU Time in the buffer
 -- @return Average CPU Time of the buffer.
 function SF.DefaultEnvironment.quotaAverage ()
-	return SF.instance.cpu_average
+	return SF.instance:movingCPUAverage()
 end
 
 --- Gets the starfall version
@@ -187,7 +187,7 @@ end
 function SF.DefaultEnvironment.quotaTotalAverage ()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[SF.instance.player]) do
-		total = total + instance.cpu_average
+		total = total + instance:movingCPUAverage()
 	end
 	return total
 end
