@@ -742,7 +742,7 @@ Returns the driver of the vehicle ";};["getPassenger"]={["class"]="function";["c
 Returns a passenger of a vehicle";["fname"]="getPassenger";["name"]="vehicle_methods:getPassenger";["param"]={[1]="n";["n"]="The index of the passenger to get";};["private"]=false;["realm"]="sv";["ret"]="amount of ammo";["server"]=true;["summary"]="\
 Returns a passenger of a vehicle ";};};["name"]="Vehicle";["summary"]="\
 Vehicle type ";["typtbl"]="vehicle_methods";};["Weapon"]={["class"]="class";["description"]="\
-Weapon type";["fields"]={};["methods"]={[1]="clip1";[10]="isCarriedByLocalPlayer";[11]="isWeaponVisible";[12]="lastShootTime";[2]="clip2";[3]="getActivity";[4]="getHoldType";[5]="getNextPrimaryFire";[6]="getNextSecondaryFire";[7]="getPrimaryAmmoType";[8]="getPrintName";[9]="getSecondaryAmmoType";["clip1"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
+Weapon type";["fields"]={};["methods"]={[1]="clip1";[10]="getToolMode";[11]="isCarriedByLocalPlayer";[12]="isWeaponVisible";[13]="lastShootTime";[2]="clip2";[3]="getActivity";[4]="getHoldType";[5]="getNextPrimaryFire";[6]="getNextSecondaryFire";[7]="getPrimaryAmmoType";[8]="getPrintName";[9]="getSecondaryAmmoType";["clip1"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
 Returns Ammo in primary clip";["fname"]="clip1";["name"]="weapon_methods:clip1";["param"]={};["private"]=false;["realm"]="sh";["ret"]="amount of ammo";["server"]=true;["summary"]="\
 Returns Ammo in primary clip ";};["clip2"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
 Returns Ammo in secondary clip";["fname"]="clip2";["name"]="weapon_methods:clip2";["param"]={};["private"]=false;["realm"]="sh";["ret"]="amount of ammo";["server"]=true;["summary"]="\
@@ -760,7 +760,9 @@ Gets the primary ammo type of the given weapon.";};["getPrintName"]={["class"]="
 Gets Display name of weapon";["fname"]="getPrintName";["name"]="weapon_methods:getPrintName";["param"]={};["private"]=false;["realm"]="cl";["ret"]="string Display name of weapon";["summary"]="\
 Gets Display name of weapon ";};["getSecondaryAmmoType"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
 Gets the secondary ammo type of the given weapon.";["fname"]="getSecondaryAmmoType";["name"]="weapon_methods:getSecondaryAmmoType";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Ammo number type";["server"]=true;["summary"]="\
-Gets the secondary ammo type of the given weapon.";};["isCarriedByLocalPlayer"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
+Gets the secondary ammo type of the given weapon.";};["getToolMode"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
+Returns the tool mode of the toolgun";["fname"]="getToolMode";["name"]="weapon_methods:getToolMode";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The tool mode of the toolgun";["server"]=true;["summary"]="\
+Returns the tool mode of the toolgun ";};["isCarriedByLocalPlayer"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
 Returns if the weapon is carried by the local player.";["fname"]="isCarriedByLocalPlayer";["name"]="weapon_methods:isCarriedByLocalPlayer";["param"]={};["private"]=false;["realm"]="cl";["ret"]="whether or not the weapon is carried by the local player";["summary"]="\
 Returns if the weapon is carried by the local player.";};["isWeaponVisible"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
 Returns whether the weapon is visible";["fname"]="isWeaponVisible";["name"]="weapon_methods:isWeaponVisible";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Whether the weapon is visble or not";["server"]=true;["summary"]="\
