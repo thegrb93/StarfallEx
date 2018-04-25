@@ -126,6 +126,15 @@ function weapon_methods:lastShootTime ()
 	return ent:LastShootTime()
 end
 
+--- Returns the tool mode of the toolgun
+-- @shared
+-- @return The tool mode of the toolgun
+function weapon_methods:getToolMode ()
+	checktype(self, weapon_metamethods)
+	local ent = unwrap(self)
+	return ent:GetClass()=="gmod_tool" and ent.Mode or ""
+end
+
 if CLIENT then
 	--- Gets Display name of weapon
 	-- @client
