@@ -51,7 +51,8 @@ function ENT:SendCode(recipient)
 		owner = self.owner,
 		mainfile = self.mainfile,
 		files = self.files,
-		times = self.times
+		times = self.times,
+		netfiles = self.netfiles
 	}
 	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
 		sfdata.times = {}

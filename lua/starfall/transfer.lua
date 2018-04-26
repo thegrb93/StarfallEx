@@ -89,7 +89,7 @@ if SERVER then
 
 	-- Sends starfall files to clients utilizing a cache
 	function SF.SendCachedStarfall(msg, sfdata, recipient)
-		if recipient then
+		--[[if recipient then
 			if type(recipient)~="table" then recipient = {recipient} end
 		else
 			recipient = player.GetAll()
@@ -118,25 +118,33 @@ if SERVER then
 
 			net.WriteStarfall(sfdata)
 			net.Send(ply)
-		end
+		end]]
+
+		debug.Trace()
+		PrintTable(sfdata)
+
+		net.Start(msg)
+		net.WriteStarfall(sfdata)
+		if recipient then net.Send(recipient) else net.Broadcast() end
 	end
 
 	-- Receives starfall files from clients utilizing a cache
 	function SF.ReceiveCachedStarfall(sfdata)
-		local cache = SF.Cache[sfdata.owner]
-		if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
-		local cacheList = SF.GetCacheListing(sfdata.owner, sfdata.owner)
+		-- local cache = SF.Cache[sfdata.owner]
+		-- if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
+		-- local cacheList = SF.GetCacheListing(sfdata.owner, sfdata.owner)
 
-		sfdata.files = {}
-		for filename, time in pairs(sfdata.times) do
-			if cache[filename] and cache[filename].time == time then
-				sfdata.files[filename] = cache[filename].code or ""
-			else
-				sfdata.files[filename] = sfdata.netfiles[filename]
-				cache[filename] = {code = sfdata.netfiles[filename], time = time}
-				cacheList[filename] = time
-			end
-		end
+		-- sfdata.files = {}
+		-- for filename, time in pairs(sfdata.times) do
+			-- if cache[filename] and cache[filename].time == time then
+				-- sfdata.files[filename] = cache[filename].code or ""
+			-- else
+				-- sfdata.files[filename] = sfdata.netfiles[filename]
+				-- cache[filename] = {code = sfdata.netfiles[filename], time = time}
+				-- cacheList[filename] = time
+			-- end
+		-- end
+		sfdata.files = sfdata.netfiles
 	end
 
 	local uploaddata = setmetatable({},{__mode="k"})
@@ -193,14 +201,14 @@ else
 
 			local netfiles, times = {}, {}
 			for filename, code in pairs(files) do
-				if cache[filename] and cache[filename].code == code then
-					times[filename] = cache[filename].time
-				else
+				-- if cache[filename] and cache[filename].code == code then
+					-- times[filename] = cache[filename].time
+				-- else
 					local time = SysTime()
 					netfiles[filename] = code
 					times[filename] = time
-					cache[filename] = {code = code, time = time}
-				end
+					-- cache[filename] = {code = code, time = time}
+				-- end
 			end
 			net.WriteStarfall({proc = NULL, owner = NULL, netfiles = netfiles, mainfile = mainfile, times = times})
 
@@ -209,7 +217,7 @@ else
 
 	-- Receives starfall files from the server utilizing a cache
 	function SF.ReceiveCachedStarfall(sfdata)
-		local cache = SF.Cache[sfdata.owner]
+		--[[local cache = SF.Cache[sfdata.owner]
 		if not cache then cache = {} SF.Cache[sfdata.owner] = cache end
 
 		sfdata.files = {}
@@ -222,7 +230,8 @@ else
 					cache[filename] = {code = sfdata.netfiles[filename], time = time}
 				end
 			end
-		end
+		end]]
+		sfdata.files = sfdata.netfiles
 	end
 
 	net.Receive("starfall_requpload", function(len)
