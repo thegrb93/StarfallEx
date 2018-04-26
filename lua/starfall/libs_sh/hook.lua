@@ -229,13 +229,13 @@ function SF.hookAdd (realname, hookname, customargfunc, customretfunc, gmoverrid
 			end
 
 			if gmfunc then
-				GAMEMODE[realname] = function(...)
+				GAMEMODE[realname] = function(gm, ...)
 					local a,b,c,d,e,f = hookfunc(...)
 					if a~= nil then return a,b,c,d,e,f
-					else return gmfunc(...) end
+					else return gmfunc(gm, ...) end
 				end
 			else
-				GAMEMODE[realname] = function(...)
+				GAMEMODE[realname] = function(gm, ...)
 					return hookfunc(...)
 				end
 			end
