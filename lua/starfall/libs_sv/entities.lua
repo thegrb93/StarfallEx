@@ -710,3 +710,29 @@ function ents_methods:removeTrails()
 
 	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
 end
+
+--- Sets a prop_physics to be unbreakable
+-- @param on Whether to make the prop unbreakable
+function ents_methods:setUnbreakable(on)
+	checktype(self, ents_metatable)
+	checkluatype(on, TYPE_BOOL)
+	local ent = unwrap(self)
+
+	if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
+	checkpermission(SF.instance, ent, "entities.canTool")
+	if ent:GetClass() ~= "prop_physics" then SF.Throw("setUnbreakable can only be used on prop_physics", 2) end
+
+	if not IsValid(SF.UnbreakableFilter) then
+		local FilterDamage = ents.FindByName("FilterDamage")[1]
+		if not FilterDamage then
+			local FilterDamage = ents.Create( "filter_activator_name" )
+			FilterDamage:SetKeyValue( "TargetName", "FilterDamage" )
+			FilterDamage:SetKeyValue( "negated", "1" )
+			FilterDamage:Spawn()
+		end
+		SF.UnbreakableFilter = FilterDamage
+	end
+
+	ent:Fire( "SetDamageFilter", on and "FilterDamage" or "", 0 )
+end
+
