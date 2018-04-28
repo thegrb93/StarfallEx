@@ -119,10 +119,6 @@ if SERVER then
 			net.WriteStarfall(sfdata)
 			net.Send(ply)
 		end]]
-
-		debug.Trace()
-		PrintTable(sfdata)
-
 		net.Start(msg)
 		net.WriteStarfall(sfdata)
 		if recipient then net.Send(recipient) else net.Broadcast() end
