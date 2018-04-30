@@ -11,7 +11,7 @@ do
 end
 
 local TYPE_ENTITY,TYPE_VECTOR
-local unwrap_entity
+local unwrap_entity, unwrap_vector
 local IsValid = IsValid
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -22,6 +22,7 @@ SF.AddHook("postload", function()
 	TYPE_VECTOR = SF.Types["Vector"]
 
 	unwrap_entity = SF.Entities.Unwrap
+	unwrap_vector = SF.Vectors.Unwrap
 end)
 
 
@@ -208,7 +209,7 @@ function particle_methods:setSortOrigin(origin)
 
 	checkValid(uw)
 
-	uw:SetSortOrgin(origin)
+	uw:SetSortOrgin(unwrap_vector(origin))
 
 
 end
@@ -226,7 +227,7 @@ function particle_methods:setControlPoint(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPoint(id,value)
+	uw:SetControlPoint(id,unwrap_vector(value))
 
 
 end
@@ -263,7 +264,7 @@ function particle_methods:setForwardVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointForwardVector(id,value)
+	uw:SetControlPointForwardVector(id,unwrap_vector(value))
 
 
 end
@@ -280,7 +281,7 @@ function particle_methods:setRightVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointRightVector(id,value)
+	uw:SetControlPointRightVector(id,unwrap_vector(value))
 
 
 end
@@ -298,7 +299,7 @@ function particle_methods:setUpVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointUpVector(id,value)
+	uw:SetControlPointUpVector(id,unwrap_vector(value))
 
 end
 
