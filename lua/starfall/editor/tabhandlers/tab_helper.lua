@@ -100,7 +100,7 @@ function PANEL:Undock()
 end
 
 function PANEL:GetCode() -- Return name of hanlder or code if it's editor
-	return "@name "..(self.title or "StarfallEx Reference")
+	return "--@name "..(self.title or "StarfallEx Reference")
 end
 
 function PANEL:SetCode()

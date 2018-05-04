@@ -250,6 +250,7 @@ else
 
 	net.Receive("starfall_requpload", function(len)
 		local mainfile = net.ReadString()
+		if #mainfile==0 then mainfile = nil end
 		local ok, list = SF.Editor.BuildIncludesTable(mainfile)
 		if ok then
 			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
