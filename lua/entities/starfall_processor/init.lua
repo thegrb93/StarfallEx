@@ -51,18 +51,19 @@ function ENT:SendCode(recipient)
 		owner = self.owner,
 		mainfile = self.mainfile,
 		files = self.files,
-		times = self.times,
-		netfiles = self.netfiles
+		-- times = self.times,
+		-- netfiles = self.netfiles
 	}
 	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
-		sfdata.times = {}
-		for filename, v in pairs(sfdata.files) do
+		-- sfdata.times = {}
+		sfdata.files = {}
+		for filename, code in pairs(self.files) do
 			if self.instance.ppdata.serverorclient[filename] ~= "server" then
-				sfdata.times[filename] = self.times[filename]
+				sfdata.files[filename] = code
 			end
 		end
 	end
-	SF.SendCachedStarfall("starfall_processor_download", sfdata, recipient)
+	SF.SendStarfall("starfall_processor_download", sfdata, recipient)
 end
 
 function ENT:PreEntityCopy ()
@@ -95,8 +96,7 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		if info.starfall then
 			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			local times = {} for k, v in pairs(files) do times[k] = 0 end
-			self:SetupFiles({proc = self, owner = ply, files = files, netfiles = files, times = times, mainfile = mainfile})
+			self:SetupFiles({owner = ply, files = files, mainfile = mainfile})
 		end
 	end
 end

@@ -1,13 +1,13 @@
 
 -- Net extension stuff
 function net.ReadStarfall(ply, callback)
-	local sfdata = {
-		netfiles = {},
-		times = {},
-		proc = net.ReadEntity(),
-		owner = net.ReadEntity(),
-		mainfile = net.ReadString(),
-	}
+	local sfdata = {files = {}}
+
+	if CLIENT then
+		sfdata.proc = net.ReadEntity()
+		sfdata.owner = net.ReadEntity()
+	end
+	sfdata.mainfile = net.ReadString()
 
 	local numFiles = 0
 	local completedFiles = 0
@@ -17,20 +17,20 @@ function net.ReadStarfall(ply, callback)
 	while I < 256 do
 		local code = net.ReadUInt(8)
 
-		if code == 2 then
+		-- if code == 2 then
+
+			-- local filename = net.ReadString()
+			-- sfdata.times[filename] = net.ReadDouble()
+
+		if code == 1 then
 
 			local filename = net.ReadString()
-			sfdata.times[filename] = net.ReadDouble()
-
-		elseif code == 1 then
-
-			local filename = net.ReadString()
-			sfdata.times[filename] = net.ReadDouble()
+			-- sfdata.times[filename] = net.ReadDouble()
 
 			net.ReadStream(ply, function(data)
 				if data == nil then err = true end
 				completedFiles = completedFiles + 1
-				sfdata.netfiles[filename] = data
+				sfdata.files[filename] = data
 				if completedFiles == numFiles then
 					callback(sfdata, err)
 				end
@@ -50,22 +50,24 @@ end
 
 function net.WriteStarfall(sfdata)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
-	net.WriteEntity(sfdata.proc)
-	net.WriteEntity(sfdata.owner)
+	if SERVER then
+		net.WriteEntity(sfdata.proc)
+		net.WriteEntity(sfdata.owner)
+	end
 	net.WriteString(sfdata.mainfile)
 
 	local I = 0
-	for filename, time in pairs(sfdata.times) do
+	for filename, code in pairs(sfdata.files) do
 		if I > 255 then error("Number of files exceeds the current maximum (256)") end
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
 
-		local code = sfdata.netfiles[filename] and 1 or 2
-		net.WriteUInt(code, 8)
+		-- local code = sfdata.netfiles[filename] and 1 or 2
+		net.WriteUInt(1, 8)
 		net.WriteString(filename)
-		net.WriteDouble(time)
-		if code == 1 then
-			net.WriteStream(sfdata.netfiles[filename])
-		end
+		-- net.WriteDouble(time)
+		-- if code == 1 then
+			net.WriteStream(code)
+		-- end
 		I = I + 1
 	end
 
@@ -87,7 +89,13 @@ if SERVER then
 		return cacheList2
 	end
 
-	-- Sends starfall files to clients utilizing a cache
+	-- Sends starfall files to clients
+	function SF.SendStarfall(msg, sfdata, recipient)
+		net.Start(msg)
+		net.WriteStarfall(sfdata)
+		if recipient then net.Send(recipient) else net.Broadcast() end
+	end
+
 	function SF.SendCachedStarfall(msg, sfdata, recipient)
 		--[[if recipient then
 			if type(recipient)~="table" then recipient = {recipient} end
@@ -180,6 +188,7 @@ if SERVER then
 					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
 				end
 			else
+				sfdata.owner = ply
 				updata.callback(sfdata)
 			end
 			uploaddata[ply] = nil
@@ -188,8 +197,15 @@ if SERVER then
 
 else
 
+	-- Sends starfall files to server
+	function SF.SendStarfall(msg, sfdata)
+		net.Start(msg)
+		net.WriteStarfall(sfdata)
+		net.SendToServer()
+	end
+
 	-- Sends starfall code to the server utilizing the cache
-	function SF.SendCachedStarfall(msg, files, mainfile)
+	function SF.SendCachedStarfall(msg, sfdata)
 		net.Start(msg)
 
 			local cache = SF.Cache[LocalPlayer()]
@@ -206,7 +222,7 @@ else
 					-- cache[filename] = {code = code, time = time}
 				-- end
 			end
-			net.WriteStarfall({proc = NULL, owner = NULL, netfiles = netfiles, mainfile = mainfile, times = times})
+			net.WriteStarfall({netfiles = netfiles, mainfile = mainfile, times = times})
 
 		net.SendToServer()
 	end
@@ -233,9 +249,9 @@ else
 	net.Receive("starfall_requpload", function(len)
 		local ok, list = SF.Editor.BuildIncludesTable()
 		if ok then
-			SF.SendCachedStarfall("starfall_upload", list.files, list.mainfile)
+			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
 		else
-			SF.SendCachedStarfall("starfall_upload", {}, "")
+			SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
 			if list then
 				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
 			end

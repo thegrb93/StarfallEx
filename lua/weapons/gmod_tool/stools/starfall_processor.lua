@@ -64,7 +64,6 @@ else
 			if err then
 				SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 			else
-				SF.ReceiveCachedStarfall(sfdata)
 				local function openfiles()
 					for filename, code in pairs(sfdata.files) do
 						SF.Editor.openWithCode(filename, code)
@@ -135,10 +134,7 @@ function TOOL:LeftClick(trace)
 	end
 
 	if not SF.RequestCode(ply, function(sfdata)
-		if not sfdata.mainfile then return end
 		if not IsValid(sf) then return end -- Probably removed during transfer
-		sfdata.proc = sf
-		sfdata.owner = ply
 		sf:SetupFiles(sfdata)
 
 		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
@@ -165,7 +161,7 @@ function TOOL:RightClick(trace)
 		local ent = trace.Entity
 
 		if IsValid(ent) and ent:GetClass() == "starfall_processor" then
-			SF.SendCachedStarfall("starfall_openeditorcode", ent, ply)
+			SF.SendStarfall("starfall_openeditorcode", ent, ply)
 		else
 			net.Start("starfall_openeditor") net.Send(ply)
 		end
