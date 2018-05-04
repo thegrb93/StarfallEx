@@ -23,7 +23,7 @@ function ENT:Use(activator)
 	end
 	
 	if self.link.instance then
-		self.link.instance:runScriptHook("starfallused", SF.Entities.Wrap(activator))
+		self.link.instance:runScriptHook("starfallused", SF.WrapObject(activator))
 	end
 end
 

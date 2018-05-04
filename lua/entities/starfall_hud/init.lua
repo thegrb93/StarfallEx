@@ -24,7 +24,7 @@ function ENT:SetHudEnabled(ply, mode)
 		if IsValid(self.link) then
 			local instance = self.link.instance
 			if instance then
-				instance:runScriptHook("hudconnected", SF.Entities.Wrap(self))
+				instance:runScriptHook("hudconnected", SF.WrapObject(self))
 			end
 		end
 		ply.sfhudenabled = self
@@ -34,7 +34,7 @@ function ENT:SetHudEnabled(ply, mode)
 		if IsValid(self.link) then
 			local instance = self.link.instance
 			if instance then
-				instance:runScriptHook("huddisconnected", SF.Entities.Wrap(self))
+				instance:runScriptHook("huddisconnected", SF.WrapObject(self))
 			end
 		end
 		ply.sfhudenabled = nil

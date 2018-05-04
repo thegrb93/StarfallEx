@@ -82,7 +82,7 @@ net.Receive( 'starfall_processor_used', function ( len )
 	if IsValid( chip ) then
 
 		if not chip.instance then return end
-		chip.instance:runScriptHook( 'starfallused', SF.Entities.Wrap( activator ) )
+		chip.instance:runScriptHook( 'starfallused', SF.WrapObject( activator ) )
 
 		if activator == LocalPlayer() then
 			if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then

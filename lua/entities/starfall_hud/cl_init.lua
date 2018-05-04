@@ -80,7 +80,7 @@ function ConnectHUD(ent)
 	if not IsValid(ent.link) then return end
 	local instance = ent.link.instance
 	if not instance then return end
-	instance:runScriptHook("hudconnected", SF.Entities.Wrap(ent))
+	instance:runScriptHook("hudconnected", SF.WrapObject(ent))
 	SF.CallHook("starfall_hud_connected", instance, ent)
 end
 
@@ -98,7 +98,7 @@ function DisconnectHUD(ent)
 	if not IsValid(ent.link) then return end
 	local instance = ent.link.instance
 	if not instance then return end
-	instance:runScriptHook("huddisconnected", SF.Entities.Wrap(ent))
+	instance:runScriptHook("huddisconnected", SF.WrapObject(ent))
 	SF.CallHook("starfall_hud_disconnected", instance, ent)
 end
 
