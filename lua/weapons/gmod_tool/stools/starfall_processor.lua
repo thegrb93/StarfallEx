@@ -47,10 +47,11 @@ else
 	language.Add("Tool.starfall_processor.desc", "Spawns a Starfall processor. (Press Shift+F to switch to the component tool)")
 	language.Add("Tool.starfall_processor.left", "Spawn a processor / upload code")
 	language.Add("Tool.starfall_processor.right", "Open editor")
+	language.Add("Tool.starfall_processor.reload", "Update code without changing main file")
 	language.Add("sboxlimit_starfall_processor", "You've hit the Starfall processor limit!")
 	language.Add("undone_Starfall Processor", "Undone Starfall Processor")
 	language.Add("Cleanup_starfall_processor", "Starfall Processors")
-	TOOL.Information = { "left", "right" }
+	TOOL.Information = { "left", "right", "reload" }
 
 
 	net.Receive("starfall_openeditor", function(len)
