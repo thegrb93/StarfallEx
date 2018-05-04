@@ -219,6 +219,7 @@ if CLIENT then
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and openfiles[mainfile]) then
 			mainfile = SF.Editor.getOpenFile() or "main"
+			if #mainfile == 0 then return false, "Invalid main file" end
 			openfiles[mainfile] = SF.Editor.getCode()
 		end
 

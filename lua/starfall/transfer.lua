@@ -255,7 +255,6 @@ else
 		if ok then
 			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
 		else
-			SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
 			if list then
 				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
 			end
