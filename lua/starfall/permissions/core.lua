@@ -65,10 +65,7 @@ end
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
 function P.check (instance, target, key)
-	if instance.permissionOverrides and instance.permissionOverrides[key] then
-		return
-	end
-	if P.permissionchecks[key](instance, target) then
+	if not (instance.permissionOverrides and instance.permissionOverrides[key]) and P.permissionchecks[key](instance, target) then
 		SF.Throw("Insufficient permissions: " .. key, 3)
 	end
 end

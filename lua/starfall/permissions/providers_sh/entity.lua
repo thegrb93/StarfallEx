@@ -26,7 +26,7 @@ local dumbtrace = {
 if SERVER then
 	P.checks = {
 		function(instance, target)
-			if IsValid(target) then
+			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
 				if instance.player:IsSuperAdmin() then return true end
 				return P.props[target]==instance.player
 			else
@@ -34,7 +34,7 @@ if SERVER then
 			end
 		end,
 		function(instance, target)
-			if IsValid(target) then
+			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
 				local pos = target:GetPos()
 				dumbtrace.Entity = target		
 				return hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false
@@ -43,7 +43,7 @@ if SERVER then
 			end
 		end,
 		function(instance, target)
-			if IsValid(target) then
+			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
 				if hook.Run("PhysgunPickup", instance.player, target) ~= false then
 					-- Some mods expect a release when there's a pickup involved.
 					hook.Run("PhysgunDrop", instance.player, target)
@@ -60,7 +60,7 @@ if SERVER then
 else
 	P.checks = {
 		function(instance, target)
-			if IsValid(target) then
+			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
 				if instance.player:IsSuperAdmin() then return true end
 				return target:GetNWEntity("SFPP")==instance.player
 			else

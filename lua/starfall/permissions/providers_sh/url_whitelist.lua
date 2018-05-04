@@ -9,6 +9,7 @@ P.settingsoptions = { "Enabled", "Disabled" }
 P.defaultsetting = 1
 P.checks = {
 	function(instance, target, key)
+		if TypeID(target) ~= TYPE_STRING then return false end
 		local prefix = string.match(target,"^(%w-)://") -- Check if protocol was given
 		if not prefix then -- If not, add http://
 			target = "http://"..target

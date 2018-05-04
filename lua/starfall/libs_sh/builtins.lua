@@ -211,6 +211,7 @@ end
 --@param obj Optional object to pass to the permission system.
 function SF.DefaultEnvironment.hasPermission(perm, obj)
 	checkluatype (perm, TYPE_STRING)
+	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
 	return SF.Permissions.hasAccess(SF.instance, SF.UnwrapObject(obj), perm)
 end
 
