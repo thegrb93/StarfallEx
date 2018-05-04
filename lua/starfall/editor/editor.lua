@@ -143,7 +143,7 @@ if CLIENT then
 	function SF.Editor.getOpenFile()
 		local path = SF.Editor.editor:GetChosenFile()
 		if path then
-			path = path:match("starfall/(.+)")
+			path = path:match("starfall/(.+)") or path
 		end
 		return path
 	end
@@ -151,10 +151,10 @@ if CLIENT then
 	function SF.Editor.getOpenFiles()
 		local files = {}
 		for i = 1, SF.Editor.editor:GetNumTabs() do
-			local path = SF.Editor.editor:GetTabContent(i).chosenfile
-			if path then
-				path = path:match("starfall/(.+)")
-				files[path] = SF.Editor.editor:GetTabContent(i):GetCode()
+			local tab = SF.Editor.editor:GetTabContent(i)
+			local path = tab.chosenfile
+			if path and tab.GetCode then
+				files[path:match("starfall/(.+)") or path] = tab:GetCode()
 			end
 		end
 		return files
