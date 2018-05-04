@@ -159,11 +159,13 @@ if SERVER then
 	-- @param ply Player to request code from
 	-- @param callback Called when all of the code is recieved. Arguments are either the main filename and a table
 	-- of filename->code pairs, or nil if the client couldn't handle the request (due to bad includes, etc)
+	-- @param mainfile Request code using this file as the main file rather than the current editor file.
 	-- @return True if the code was requested, false if an incomplete request is still in progress for that player
-	function SF.RequestCode(ply, callback)
+	function SF.RequestCode(ply, callback, mainfile)
 		if uploaddata[ply] and uploaddata[ply].timeout > CurTime() then return false end
 
 		net.Start("starfall_requpload")
+		net.WriteString(mainfile or "")
 		net.Send(ply)
 
 		uploaddata[ply] = {
@@ -247,7 +249,8 @@ else
 	end
 
 	net.Receive("starfall_requpload", function(len)
-		local ok, list = SF.Editor.BuildIncludesTable()
+		local mainfile = net.ReadString()
+		local ok, list = SF.Editor.BuildIncludesTable(mainfile)
 		if ok then
 			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
 		else

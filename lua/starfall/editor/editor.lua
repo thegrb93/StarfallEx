@@ -140,12 +140,24 @@ if CLIENT then
 		return SF.Editor.editor:GetCode() or ""
 	end
 
-	function SF.Editor.getOpenFile (includeMainDirectory)
+	function SF.Editor.getOpenFile()
 		local path = SF.Editor.editor:GetChosenFile()
-		if not includeMainDirectory and path then
-			maindir, path = path:match("(starfall/)(.+)")
+		if path then
+			path = path:match("starfall/(.+)")
 		end
 		return path
+	end
+
+	function SF.Editor.getOpenFiles()
+		local files = {}
+		for i = 1, SF.Editor.editor:GetNumTabs() do
+			local path = SF.Editor.editor:GetTabContent(i).chosenfile
+			if path then
+				path = path:match("starfall/(.+)")
+				files[path] = SF.Editor.editor:GetTabContent(i):GetCode()
+			end
+		end
+		return files
 	end
 
 	function SF.Editor.createEditor ()
@@ -199,46 +211,40 @@ if CLIENT then
 
 
 	--- (Client) Builds a table for the compiler to use
-	-- @param maincode The source code for the main chunk
-	-- @param codename The name of the main chunk
+	-- @param mainfile Manual selection of which file should be main. Otherwise it's the open file
 	-- @return True if ok, false if a file was missing
-	-- @return A table with mainfile = codename and files = a table of filenames and their contents, or the missing file path.
-	function SF.Editor.BuildIncludesTable (maincode, codename)
+	-- @return A table with mainfile name and files
+	function SF.Editor.BuildIncludesTable(mainfile)
 		if not SF.Editor.editor then SF.Editor.init() end
+		local openfiles = SF.Editor.getOpenFiles()
+		if not (mainfile and openfiles[mainfile]) then
+			mainfile = SF.Editor.getOpenFile() or "main"
+			openfiles[mainfile] = SF.Editor.getCode()
+		end
+
 		local tbl = {}
-		maincode = maincode or SF.Editor.getCode()
-		codename = codename or SF.Editor.getOpenFile() or "main"
-		tbl.mainfile = codename
+		tbl.mainfile = mainfile
 		tbl.files = {}
 		tbl.filecount = 0
 		tbl.includes = {}
 
-		local loaded = {}
 		local ppdata = {}
 
 		local function recursiveLoad (path, curdir)
-			if loaded[path] then return end
-			loaded[path] = true
+			if tbl.files[path] then return end
 
-			local code
-			local codedir
-			local codepath
-			if path == codename and maincode then
-				code = maincode
-				codedir = curdir
-				codepath = path
-			else
-				if string.sub(path, 1, 1)~="/" then
-					codepath = SF.NormalizePath(curdir .. path)
-					code = file.Read("starfall/" .. codepath, "DATA")
+			local code, codedir, codepath
 
-				end
-				if not code then
-					codepath = SF.NormalizePath(path)
-					code = file.Read("starfall/" .. codepath, "DATA")
-				end
-				codedir = string.GetPathFromFilename(codepath)
+			if string.sub(path, 1, 1)~="/" then
+				codepath = SF.NormalizePath(curdir .. path)
+				code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
 			end
+			if not code then
+				codepath = SF.NormalizePath(path)
+				code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
+			end
+			codedir = string.GetPathFromFilename(codepath)
+
 			if not code then
 				print("Bad include: " .. path)
 				return
@@ -261,7 +267,7 @@ if CLIENT then
 				end
 			end
 		end
-		local ok, msg = pcall(recursiveLoad, codename, string.GetPathFromFilename(codename))
+		local ok, msg = pcall(recursiveLoad, mainfile, string.GetPathFromFilename(mainfile))
 
 		local function findCycle (file, visited, recStack)
 			if not visited[file] then

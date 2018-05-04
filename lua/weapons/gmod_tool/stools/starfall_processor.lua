@@ -109,6 +109,25 @@ function TOOL:LeftClick(trace)
 		end
 	end
 
+	if not SF.RequestCode(ply, function(sfdata)
+		if not IsValid(sf) then return end -- Probably removed during transfer
+		sf:SetupFiles(sfdata)
+
+		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
+			local model = sf.instance.ppdata.models[sf.instance.mainfile]
+			if util.IsValidModel(model) and util.IsValidProp(model) then
+				constraint.RemoveAll(sf)
+				sf:PhysicsDestroy()
+				sf:SetModel(tostring(sf.instance.ppdata.models[sf.instance.mainfile]))
+				sf:PhysicsInit(SOLID_VPHYSICS)
+				timer.Simple(0, doWeld) -- Need timer or weld wont work
+			end
+		end
+	end) then
+		SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
+		return false
+	end
+
 	if ent:IsValid() and ent:GetClass() == "starfall_processor" then
 		sf = ent
 	else
@@ -133,24 +152,6 @@ function TOOL:LeftClick(trace)
 		undo.Finish()
 	end
 
-	if not SF.RequestCode(ply, function(sfdata)
-		if not IsValid(sf) then return end -- Probably removed during transfer
-		sf:SetupFiles(sfdata)
-
-		if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
-			local model = sf.instance.ppdata.models[sf.instance.mainfile]
-			if util.IsValidModel(model) and util.IsValidProp(model) then
-				constraint.RemoveAll(sf)
-				sf:PhysicsDestroy()
-				sf:SetModel(tostring(sf.instance.ppdata.models[sf.instance.mainfile]))
-				sf:PhysicsInit(SOLID_VPHYSICS)
-				timer.Simple(0, doWeld) -- Need timer or weld wont work
-			end
-		end
-	end) then
-		SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
-	end
-
 	return true
 end
 
@@ -171,7 +172,35 @@ function TOOL:RightClick(trace)
 end
 
 function TOOL:Reload(trace)
-	return false
+	if not trace.HitPos then return false end
+	local ply = self:GetOwner()
+	local sf = trace.Entity
+
+	if sf:IsValid() and sf:GetClass() == "starfall_processor" and sf.mainfile then
+		if CLIENT then return true end
+
+		if not SF.RequestCode(ply, function(sfdata)
+			if not IsValid(sf) then return end -- Probably removed during transfer
+			sf:SetupFiles(sfdata)
+
+			if sf.instance and sf.instance.ppdata.models and sf.instance.mainfile then
+				local model = sf.instance.ppdata.models[sf.instance.mainfile]
+				if util.IsValidModel(model) and util.IsValidProp(model) then
+					constraint.RemoveAll(sf)
+					sf:PhysicsDestroy()
+					sf:SetModel(tostring(sf.instance.ppdata.models[sf.instance.mainfile]))
+					sf:PhysicsInit(SOLID_VPHYSICS)
+					timer.Simple(0, doWeld) -- Need timer or weld wont work
+				end
+			end
+		end, sf.mainfile) then
+			SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
+		end
+
+		return true
+	else
+		return false
+	end
 end
 
 function TOOL:DrawHUD()
