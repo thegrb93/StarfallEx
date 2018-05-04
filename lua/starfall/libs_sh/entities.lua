@@ -37,7 +37,7 @@ SF.AddHook("postload", function()
 	end
 
 	function SF.DefaultEnvironment.owner ()
-		return SF.WrapObject(SF.instance.player)
+		return SF.Players.Wrap(SF.instance.player)
 	end
 
 	function SF.DefaultEnvironment.entity (num)
@@ -79,7 +79,7 @@ function ents_methods:getOwner ()
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 
 	if SF.Permissions.getOwner then
-		return ewrap(SF.Permissions.getOwner(ent))
+		return SF.Players.Wrap(SF.Permissions.getOwner(ent))
 	end
 end
 
