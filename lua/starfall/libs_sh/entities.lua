@@ -327,6 +327,14 @@ function ents_methods:getParent()
 	return ewrap(ent:GetParent())
 end
 
+--- Gets the children (the parented entities) of an entity
+-- @shared
+-- @return table of parented children
+function ents_methods:getChildren()
+	local ent = eunwrap(self)
+	return SF.Sanitize(ent:GetChildren())
+end
+
 --- Gets the attachment index the entity is parented to
 -- @shared
 -- @return number index of the attachment the entity is parented to or 0
