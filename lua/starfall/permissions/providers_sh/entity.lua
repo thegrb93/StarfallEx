@@ -61,7 +61,7 @@ else
 	P.checks = {
 		function(instance, target)
 			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
-				if instance.player:IsSuperAdmin() then return true end
+				if LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
 				return target:GetNWEntity("SFPP")==instance.player
 			else
 				return false
