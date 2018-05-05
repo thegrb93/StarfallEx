@@ -145,16 +145,29 @@ SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
 SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
 
 
-SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
-	if SF.Permissions.hasAccess(instance, nil, "input") then
-		local x, y = cmd:GetMouseX(), cmd:GetMouseY()
-		if x~=0 or y~=0 then
-			return true, { x, y }
+if CLIENT then
+	SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
+		if SF.Permissions.hasAccess(instance, nil, "input") then
+			local x, y = cmd:GetMouseX(), cmd:GetMouseY()
+			if x~=0 or y~=0 then
+				return true, { x, y }
+			end
+			return false
 		end
 		return false
-	end
-	return false
-end)
+	end)
+
+	SF.hookAdd("StartCommand", "mousewheeled", function(instance, ply, cmd)
+		if SF.Permissions.hasAccess(instance, nil, "input") then
+			local delta = cmd:GetMouseWheel()
+			if delta ~= 0 then
+				return true, {delta}
+			end
+			return false
+		end
+		return false
+	end)
+end
 
 --- Called when a button is pressed
 -- @name inputPressed
@@ -169,8 +182,15 @@ end)
 --- Called when the mouse is moved
 -- @name mousemoved
 -- @class hook
+-- @client
 -- @param x X coordinate moved
 -- @param y Y coordinate moved
+
+--- Called when the mouse wheel is rotated
+-- @name mouseWheeled
+-- @class hook
+-- @client
+-- @param delta Rotate delta
 
 
 SF.AddHook("postload", function()
