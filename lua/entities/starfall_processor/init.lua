@@ -59,7 +59,7 @@ function ENT:SendCode(recipient)
 		sfdata.files = {}
 		for filename, code in pairs(self.files) do
 			if self.instance.ppdata.serverorclient[filename] == "server" then
-				if self.instance.ppdata.scriptnames[filename] then
+				if self.instance.ppdata.scriptnames and self.instance.ppdata.scriptnames[filename] then
 					sfdata.files[filename] = "--@name " .. self.instance.ppdata.scriptnames[filename]
 				end
 			else
