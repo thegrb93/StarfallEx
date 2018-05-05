@@ -450,7 +450,6 @@ table_methods.add = table.Add
 table_methods.clearKeys = table.ClearKeys
 table_methods.collapseKeyValue = table.CollapseKeyValue
 table_methods.concat = table.concat
-table_methods.copy = table.Copy
 table_methods.copyFromTo = table.CopyFromTo
 table_methods.count = table.Count
 table_methods.empty = table.Empty
@@ -484,6 +483,30 @@ table_methods.sortByKey = table.SortByKey
 table_methods.sortByMember = table.SortByMember
 table_methods.sortDesc = table.SortDesc
 table_methods.toString = table.ToString
+
+function table_methods.copy( t, lookup_table )
+	if ( t == nil ) then return nil end
+
+	local meta = debug.getmetatable( t )
+	if SF.Types[meta] then return t end
+	local copy = {}
+	setmetatable( copy, meta )
+	for i, v in pairs( t ) do
+		if ( !istable( v ) ) then
+			copy[ i ] = v
+		else
+			lookup_table = lookup_table or {}
+			lookup_table[ t ] = copy
+			if ( lookup_table[ v ] ) then
+				copy[ i ] = lookup_table[ v ] -- we already copied this table. reuse the copy.
+			else
+				copy[ i ] = table_methods.copy( v, lookup_table ) -- not yet copied. copy it.
+			end
+		end
+	end
+	return copy
+end
+
 --- Table library. http://wiki.garrysmod.com/page/Category:table
 -- @name SF.DefaultEnvironment.table
 -- @class table
