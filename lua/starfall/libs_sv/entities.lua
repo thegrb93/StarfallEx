@@ -564,6 +564,14 @@ function ents_methods:isValidPhys()
 	return phys ~= nil
 end
 
+--- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key. 
+-- @server
+-- @return Boolean if the entity is being held or not
+function ents_methods:isPlayerHolding ()
+	checktype(self, ents_metatable)
+	return unwrap(self):IsPlayerHolding()
+end
+
 --- Sets entity gravity
 -- @param grav Bool should the entity respect gravity?
 function ents_methods:enableGravity (grav)
