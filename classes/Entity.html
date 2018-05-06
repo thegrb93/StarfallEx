@@ -123,6 +123,7 @@
 						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#mouseWheeled">mouseWheeled</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
 						<li><span class="realm_sh"></span><a href="../hooks.html#permissionrequest">permissionrequest</a></li>
@@ -472,6 +473,11 @@ Checks if the entity ONGROUND flag is set </td>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:isPlayer">isPlayer</a>( &nbsp;)</td>
 			<td class="summary">
 Checks if an entity is a player.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#Entity:isPlayerHolding">isPlayerHolding</a>( &nbsp;)</td>
+			<td class="summary">
+Returns true if the entity is being held by a player.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:isValid">isValid</a>( &nbsp;)</td>
@@ -1803,6 +1809,24 @@ Checks if an entity is a player.</p>
 		<h3>Returns</h3>
 		
 		<p>True if player, false if not</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="Entity:isPlayerHolding"></a><strong>Entity:isPlayerHolding</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Boolean if the entity is being held or not</p>
 		
 	</section>
 	
