@@ -28,11 +28,11 @@ function net.ReadStarfall(ply, callback)
 			-- sfdata.times[filename] = net.ReadDouble()
 
 			net.ReadStream(ply, function(data)
-				if data == nil then err = true end
+				if not data then err = true end
 				completedFiles = completedFiles + 1
 				sfdata.files[filename] = data
 				if completedFiles == numFiles then
-					callback(sfdata, err)
+					if err then callback() else callback(sfdata) end
 				end
 			end)
 
@@ -184,14 +184,16 @@ if SERVER then
 
 		updata.reading = true
 
-		net.ReadStarfall(ply, function(sfdata, err)
-			if err then
+		net.ReadStarfall(ply, function(sfdata)
+			if sfdata then
+				if #sfdata.mainfile > 0 then
+					sfdata.owner = ply
+					updata.callback(sfdata)
+				end
+			else
 				if uploaddata[ply]==updata then
 					SF.AddNotify(ply, "There was a problem uploading your code. Try again in a second.", "ERROR", 7, "ERROR1")
 				end
-			else
-				sfdata.owner = ply
-				updata.callback(sfdata)
 			end
 			uploaddata[ply] = nil
 		end)
@@ -255,6 +257,7 @@ else
 		if ok then
 			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
 		else
+			SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
 			if list then
 				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
 			end

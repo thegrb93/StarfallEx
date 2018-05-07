@@ -61,10 +61,8 @@ else
 	net.Receive("starfall_openeditorcode", function(len)
 		SF.Editor.open()
 
-		net.ReadStarfall(nil, function(sfdata, err)
-			if err then
-				SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
-			else
+		net.ReadStarfall(nil, function(sfdata)
+			if sfdata then
 				local function openfiles()
 					for filename, code in pairs(sfdata.files) do
 						SF.Editor.openWithCode(filename, code)
@@ -81,7 +79,8 @@ else
 						end
 					end)
 				end
-
+			else
+				SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 			end
 		end)
 
