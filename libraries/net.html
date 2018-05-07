@@ -255,6 +255,16 @@ Reads a large string stream from the net message </td>
 Reads a string from the net message </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readTable">readTable</a>( &nbsp;)</td>
+			<td class="summary">
+Reads an object from a net message automatically typing it </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readType">readType</a>( &nbsp;)</td>
+			<td class="summary">
+Reads an object from a net message automatically typing it </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.readUInt">readUInt</a>( n&nbsp;)</td>
 			<td class="summary">
 Reads an unsigned integer from the net message </td>
@@ -333,6 +343,16 @@ Streams a large 20MB string.</td>
 			<td class="name"><span class="realm_sh"></span><a href="#net.writeString">writeString</a>( t&nbsp;)</td>
 			<td class="summary">
 Writes a string to the net message.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeTable">writeTable</a>( t, v&nbsp;)</td>
+			<td class="summary">
+Writes a table to a net message automatically typing it.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeType">writeType</a>( v&nbsp;)</td>
+			<td class="summary">
+Writes an object to a net message automatically typing it </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.writeUInt">writeUInt</a>( t, n&nbsp;)</td>
@@ -597,6 +617,42 @@ Reads a string from the net message</p>
 		<h3>Returns</h3>
 		
 		<p>The string that was read</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.readTable"></a><strong>net.readTable</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads an object from a net message automatically typing it</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The object</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.readType"></a><strong>net.readType</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads an object from a net message automatically typing it</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The object</p>
 		
 	</section>
 	
@@ -908,6 +964,45 @@ Writes a string to the net message. Null characters will terminate the string.</
 		<ul>
 			
 			<li><tt>t</tt> ― The string to be written</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.writeTable"></a><strong>net.writeTable</strong>( t, v&nbsp;)</dt>
+<dd>
+	<p>
+Writes a table to a net message automatically typing it.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt></li>
+			<li><tt>v</tt> ― The object to write</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.writeType"></a><strong>net.writeType</strong>( v&nbsp;)</dt>
+<dd>
+	<p>
+Writes an object to a net message automatically typing it</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>v</tt> ― The object to write</li>
 		</ul>
 	</section>
 	
