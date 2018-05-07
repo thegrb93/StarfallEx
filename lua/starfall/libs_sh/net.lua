@@ -19,10 +19,9 @@ local burst_rate = CreateConVar("sf_net_burstrate", "5", { FCVAR_ARCHIVE, FCVAR_
 
 local streams = SF.EntityTable("playerStreams")
 
-local function write(instance, type, size, ...)
+local function write(instance, func, size, ...)
 	instance.data.net.size = instance.data.net.size + size
-
-	instance.data.net.data[#instance.data.net.data + 1] = { "Write" .. type, { ... } }
+	instance.data.net.data[#instance.data.net.data + 1] = { func, { ... } }
 end
 
 local instances = {}
@@ -57,7 +56,7 @@ function net_library.start(name)
 	instance.data.net.size = 8 -- 8 bytes overhead
 	instance.data.net.data = {}
 
-	write(instance, "String", #name, name)
+	write(instance, net.WriteString, #name, name)
 end
 
 --- Send a net message from client->server, or server->client.
@@ -78,7 +77,7 @@ function net_library.send (target, unreliable)
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(SF.instance.data.entity)
 	for i = 1, #data do
-		net[data[i][1]](unpack(data[i][2]))
+		data[i][1](unpack(data[i][2]))
 	end
 
 	if SERVER then
@@ -111,6 +110,91 @@ function net_library.send (target, unreliable)
 	instance.data.net.started = false
 end
 
+local netTypeSizes = {
+	[TYPE_NIL]		= function(x) return 1 end,
+	[TYPE_STRING]	= function(x) return 1+#x end,
+	[TYPE_NUMBER]	= function(x) return 1+8 end,
+	[TYPE_BOOL]		= function(x) return 1+1 end,
+	[TYPE_ENTITY]	= function(x) return 1+2 end,
+	[TYPE_VECTOR]	= function(x) return 1+12 end,
+	[TYPE_ANGLE]	= function(x) return 1+12 end,
+	[TYPE_MATRIX]	= function(x) return 1+64 end,
+	[TYPE_COLOR]	= function(x) return 1+4 end,
+}
+
+--- Writes an object to a net message automatically typing it
+-- @shared
+-- @param v The object to write
+function net_library.writeType(v)
+	local instance = SF.instance
+	if not instance.data.net.started then SF.Throw("net message not started", 2) end
+	
+	v = SF.UnwrapObject(v) or v
+	
+	local typeid = nil
+
+	if IsColor(v) then
+		typeid = TYPE_COLOR
+	else
+		typeid = TypeID(v)
+	end
+
+	local wv = net.WriteVars[typeid]
+	if wv then
+		if typeid == TYPE_TABLE then
+			write(instance, net.WriteUInt, 1, typeid, 8)
+			net_library.writeTable(v)
+		else
+			write(instance, wv, netTypeSizes[typeid](v), typeid, v)
+		end
+	else
+		SF.Throw("net.WriteType: Couldn't write " .. type(v) .. " (type " .. typeid .. ")", 2)
+	end
+	return true
+end
+
+--- Reads an object from a net message automatically typing it
+-- @shared
+-- @return The object
+function net_library.readType()
+	local typeid = net.ReadUInt(8)
+
+	if typeid == TYPE_TABLE then
+		return net_library.readTable()
+	else
+		local rv = net.ReadVars[typeid]
+		if rv then
+			local v = rv()
+			return SF.WrapObject(v) or v
+		end
+	end
+
+	SF.Throw("net.readType: Couldn't read type " .. typeid, 2)
+end
+
+--- Writes a table to a net message automatically typing it.
+-- @shared
+-- @param v The object to write
+function net_library.writeTable(t)
+	for k, v in pairs(t) do
+		net_library.writeType(k)
+		net_library.writeType(v)
+	end
+	net_library.writeType(nil)
+end
+
+--- Reads an object from a net message automatically typing it
+-- @shared
+-- @return The object
+function net_library.readTable()
+	local tab = {}
+	while true do
+		local k = net_library.readType()
+		if ( k == nil ) then return tab end
+		tab[k] = net_library.readType()
+	end
+end
+
 --- Writes a string to the net message. Null characters will terminate the string.
 -- @shared
 -- @param t The string to be written
@@ -121,7 +205,7 @@ function net_library.writeString(t)
 
 	checkluatype (t, TYPE_STRING)
 
-	write(instance, "String", #t, t)
+	write(instance, net.WriteString, #t, t)
 	return true
 end
 
@@ -145,7 +229,7 @@ function net_library.writeData(t, n)
 	checkluatype (t, TYPE_STRING)
 	checkluatype (n, TYPE_NUMBER)
 
-	write(instance, "Data", n, t, n)
+	write(instance, net.WriteData, n, t, n)
 	return true
 end
 
@@ -168,7 +252,7 @@ function net_library.writeStream(str)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (str, TYPE_STRING)
-	write(instance, "Stream", 8, str)
+	write(instance, net.WriteStream, 8, str)
 	return true
 end
 
@@ -200,7 +284,7 @@ function net_library.writeInt(t, n)
 	checkluatype (t, TYPE_NUMBER)
 	checkluatype (n, TYPE_NUMBER)
 
-	write(instance, "Int", math.ceil(n / 8), t, n)
+	write(instance, net.WriteInt, math.ceil(n / 8), t, n)
 	return true
 end
 
@@ -226,7 +310,7 @@ function net_library.writeUInt(t, n)
 	checkluatype (t, TYPE_NUMBER)
 	checkluatype (n, TYPE_NUMBER)
 
-	write(instance, "UInt", math.ceil(n / 8), t, n)
+	write(instance, net.WriteUInt, math.ceil(n / 8), t, n)
 	return true
 end
 
@@ -250,7 +334,7 @@ function net_library.writeBit(t)
 
 	checkluatype (t, TYPE_BOOL)
 
-	write(instance, "Bit", 1, t)
+	write(instance, net.WriteBit, 1, t)
 	return true
 end
 
@@ -272,7 +356,7 @@ function net_library.writeDouble(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, "Double", 8, t)
+	write(instance, net.WriteDouble, 8, t)
 	return true
 end
 
@@ -294,7 +378,7 @@ function net_library.writeFloat(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, "Float", 4, t)
+	write(instance, net.WriteFloat, 4, t)
 	return true
 end
 
@@ -316,7 +400,7 @@ function net_library.writeAngle(t)
 
 	checktype(t, SF.Types["Angle"])
 
-	write(instance, "Angle", 12, SF.Angles.Unwrap(t))
+	write(instance, net.WriteAngle, 12, SF.Angles.Unwrap(t))
 	return true
 end
 
@@ -338,7 +422,7 @@ function net_library.writeVector(t)
 
 	checktype(t, SF.Types["Vector"])
 
-	write(instance, "Vector", 12, SF.Vectors.Unwrap(t))
+	write(instance, net.WriteVector, 12, SF.Vectors.Unwrap(t))
 	return true
 end
 
@@ -360,7 +444,7 @@ function net_library.writeMatrix(t)
 
 	checktype(t, SF.Types["VMatrix"])
 
-	write(instance, "Matrix", 64, SF.VMatrix.Unwrap(t))
+	write(instance, net.WriteMatrix, 64, SF.VMatrix.Unwrap(t))
 	return true
 end
 
@@ -382,7 +466,7 @@ function net_library.writeColor(t)
 
 	checktype(t, SF.Types["Color"])
 
-	write(instance, "Color", 4, SF.Color.Unwrap(t))
+	write(instance, net.WriteColor, 4, SF.Color.Unwrap(t))
 	return true
 end
 
@@ -404,7 +488,7 @@ function net_library.writeEntity(t)
 
 	checktype(t, SF.Types["Entity"])
 
-	write(instance, "Entity", 2, SF.UnwrapObject(t))
+	write(instance, net.WriteEntity, 2, SF.UnwrapObject(t))
 	return true
 end
 
