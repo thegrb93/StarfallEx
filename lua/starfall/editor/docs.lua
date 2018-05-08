@@ -1306,10 +1306,14 @@ Reads a large string stream from the net message";["fname"]="readStream";["libra
 Reads a large string stream from the net message ";};["readString"]={["class"]="function";["client"]=true;["description"]="\
 Reads a string from the net message";["fname"]="readString";["library"]="net";["name"]="net_library.readString";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The string that was read";["server"]=true;["summary"]="\
 Reads a string from the net message ";};["readTable"]={["class"]="function";["client"]=true;["description"]="\
-Reads an object from a net message automatically typing it";["fname"]="readTable";["library"]="net";["name"]="net_library.readTable";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The object";["server"]=true;["summary"]="\
-Reads an object from a net message automatically typing it ";};["readType"]={["class"]="function";["client"]=true;["description"]="\
-Reads an object from a net message automatically typing it";["fname"]="readType";["library"]="net";["name"]="net_library.readType";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The object";["server"]=true;["summary"]="\
-Reads an object from a net message automatically typing it ";};["readUInt"]={["class"]="function";["client"]=true;["description"]="\
+Reads an object from a net message automatically typing it \
+Will throw an error if invalid type is read. Make sure to pcall it";["fname"]="readTable";["library"]="net";["name"]="net_library.readTable";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The object";["server"]=true;["summary"]="\
+Reads an object from a net message automatically typing it \
+Will throw an error if invalid type is read.";};["readType"]={["class"]="function";["client"]=true;["description"]="\
+Reads an object from a net message automatically typing it \
+Will throw an error if invalid type is read. Make sure to pcall it";["fname"]="readType";["library"]="net";["name"]="net_library.readType";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The object";["server"]=true;["summary"]="\
+Reads an object from a net message automatically typing it \
+Will throw an error if invalid type is read.";};["readUInt"]={["class"]="function";["client"]=true;["description"]="\
 Reads an unsigned integer from the net message";["fname"]="readUInt";["library"]="net";["name"]="net_library.readUInt";["param"]={[1]="n";["n"]="The amount of bits to read";};["private"]=false;["realm"]="sh";["ret"]="The unsigned integer that was read";["server"]=true;["summary"]="\
 Reads an unsigned integer from the net message ";};["readVector"]={["class"]="function";["client"]=true;["description"]="\
 Reads a vector from the net message";["fname"]="readVector";["library"]="net";["name"]="net_library.readVector";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The vector that was read";["server"]=true;["summary"]="\
