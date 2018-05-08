@@ -699,6 +699,13 @@ else
 	function SF.DefaultEnvironment.concmd (cmd)
 		checkluatype (cmd, TYPE_STRING)
 		checkpermission(SF.instance, nil, "console.command")
+		
+		for _, v in ipairs{"[\"'%s]*cl_yawspeed"} do
+			if string.find(cmd, v) then
+				SF.Throw("This command is blacklisted", 2)
+			end
+		end
+		
 		LocalPlayer():ConCommand(cmd)
 	end
 
