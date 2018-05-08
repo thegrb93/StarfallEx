@@ -154,6 +154,7 @@ function net_library.writeType(v)
 end
 
 --- Reads an object from a net message automatically typing it
+--- Will throw an error if invalid type is read. Make sure to pcall it
 -- @shared
 -- @return The object
 function net_library.readType()
@@ -184,6 +185,7 @@ function net_library.writeTable(t)
 end
 
 --- Reads an object from a net message automatically typing it
+--- Will throw an error if invalid type is read. Make sure to pcall it
 -- @shared
 -- @return The object
 function net_library.readTable()
