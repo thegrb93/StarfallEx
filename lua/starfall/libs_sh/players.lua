@@ -14,11 +14,10 @@ local checkpermission = SF.Permissions.check
 SF.Players.Methods = player_methods
 SF.Players.Metatable = player_metamethods
 
-local wrap, unwrap, ewrap, eunwrap, ents_metatable
+local wrap, unwrap, owrap, ents_metatable
 
 SF.AddHook("postload", function()
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
+	owrap = SF.WrapObject
 	ents_metatable = SF.Entities.Metatable
 
 	SF.ApplyTypeDependencies(player_methods, player_metamethods, ents_metatable)
@@ -246,7 +245,7 @@ function player_methods:getVehicle()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
 	if not IsValid(ent) then return end
-	return ewrap(ent:GetVehicle())
+	return SF.Vehicles.Wrap(ent:GetVehicle())
 end
 
 --- Returns whether the player is an admin
@@ -405,7 +404,7 @@ end
 -- @return Player's current view entity
 function player_methods:getViewEntity ()
 	checktype(self, player_metamethods)
-	return ewrap(unwrap(self):GetViewEntity())
+	return owrap(unwrap(self):GetViewEntity())
 end
 
 --- Returns a table of weapons the player is carrying
@@ -431,7 +430,7 @@ end
 -- @return Ground entity
 function player_methods:getGroundEntity()
 	checktype(self, player_metamethods)
-	return ewrap(unwrap(self):GetGroundEntity())
+	return owrap(unwrap(self):GetGroundEntity())
 end
 
 -- Gets the amount of ammo the player has.
@@ -458,7 +457,7 @@ if SERVER then
 		if not IsValid(pl) then SF.Throw("Invalid Player", 2) end
 
 		if ent~=nil then
-			ent = eunwrap(ent)
+			ent = unwrap(ent)
 			if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
 		end
 
