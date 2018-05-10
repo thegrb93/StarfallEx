@@ -205,27 +205,13 @@ function ents_methods:setNoDraw (draw)
 	ent:SetNoDraw(draw and true or false)
 end
 
-local shaderBlacklist = {
-	["LightmappedGeneric"] = true,
-}
-local materialBlacklist = {
-	["pp/copy"] = true,
-	["effects/ar2_altfire1"] = true,
-}
-local function invalidMaterial(material)
-	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
-	if materialBlacklist[material] then return true end
-	local mat = Material(material)
-	if mat and shaderBlacklist[mat:GetShader()] then return true end
-end
-
 --- Sets the material of the entity
 -- @shared
 -- @param material, string, New material name.
 function ents_methods:setMaterial (material)
 	checktype(self, ents_metamethods)
 	checkluatype (material, TYPE_STRING)
-	if invalidMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+	if not SF.CheckMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -242,7 +228,7 @@ end
 function ents_methods:setSubMaterial (index, material)
 	checktype(self, ents_metamethods)
 	checkluatype (material, TYPE_STRING)
-	if invalidMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+	if not SF.CheckMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end

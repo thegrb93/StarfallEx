@@ -330,6 +330,25 @@ function SF.CheckLuaType(val, typ, level)
 	end
 end
 
+
+local shaderBlacklist = {
+	["LightmappedGeneric"] = true,
+}
+local materialBlacklist = {
+	["pp/copy"] = true,
+	["effects/ar2_altfire1"] = true,
+}
+--- Checks that the material isn't malicious
+-- @param material The path to the material
+-- @return The material object or false if it's invalid
+function SF.CheckMaterial(material)
+	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
+	if materialBlacklist[material] then return false end
+	local mat = Material(material)
+	if not mat:IsError() and shaderBlacklist[mat:GetShader()] then return false end
+	return mat
+end
+
 --- Gets the type of val.
 -- @param val The value to be checked.
 function SF.GetType(val)

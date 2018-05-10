@@ -95,8 +95,8 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta
-local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap
+local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta, mat_meta
+local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap, maunwrap
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -108,6 +108,7 @@ SF.AddHook("postload", function()
 	col_meta = SF.Color.Metatable
 	ang_meta = SF.Angles.Metatable
 	ent_meta = SF.Entities.Metatable
+	mat_meta = SF.Materials.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	cwrap = SF.Color.Wrap
@@ -116,16 +117,11 @@ SF.AddHook("postload", function()
 	munwrap = SF.VMatrix.Unwrap
 	aunwrap = SF.Angles.Unwrap
 	eunwrap = SF.Entities.Unwrap
+	maunwrap = SF.Materials.Unwrap
 end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
-SF.Permissions.registerPrivilege("render.urlmaterial", "Render URL Materials", "Allows the user to load materials from online pictures", { client = {}, urlwhitelist = {} })
-SF.Permissions.registerPrivilege("render.datamaterial", "Render Data Materials", "Allows the user to load materials from base64 encoded data", { client = {} })
-
-local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
-local cv_max_url_materials = CreateConVar("sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE })
-local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
@@ -207,21 +203,12 @@ SF.AddHook("initialize", function(instance)
 	instance.data.render = {}
 	instance.data.render.rendertargets = {}
 	instance.data.render.rendertargetcount = 0
-	instance.data.render.textures = {}
-	instance.data.render.urltextures = {}
 	instance.data.render.urltexturecount = 0
 end)
 
 SF.AddHook("deinitialize", function (instance)
 	for k, v in pairs(instance.data.render.rendertargets) do
 		globalRTs[v][2] = true -- mark as available
-	end
-	for k, v in pairs(instance.data.render.textures) do
-		instance.data.render.textures[k] = nil
-	end
-	for k, v in pairs(instance.data.render.urltextures) do
-		v:SetUndefined("$basetexture")
-		instance.data.render.urltextures[k] = nil
 	end
 	if plyRTcount[instance.playerid] then
 		plyRTcount[instance.playerid] = plyRTcount[instance.playerid] - instance.data.render.rendertargetcount
@@ -251,58 +238,6 @@ local function sfCreateMaterial(name, skip_hack)
 	return CreateMaterial(name, "UnlitGeneric", tbl)
 end
 local RT_Material = sfCreateMaterial("SF_RT_Material")
----URL Textures
-local LoadingURLQueue = {}
-local function CheckURLDownloads()
-	local requestTbl = LoadingURLQueue[1]
-	if requestTbl then
-		if requestTbl.Panel then
-			if not requestTbl.Panel:IsLoading() then
-				timer.Simple(0.2, function()
-					local tex = requestTbl.Panel:GetHTMLMaterial():GetTexture("$basetexture")
-					requestTbl.Material:SetTexture("$basetexture", tex)
-					requestTbl.Panel:Remove()
-					if requestTbl.cb then requestTbl.cb() end
-				end)
-				table.remove(LoadingURLQueue, 1)
-			else
-				if CurTime() > requestTbl.Timeout then
-					requestTbl.Panel:Remove()
-					table.remove(LoadingURLQueue, 1)
-				end
-			end
-		else
-			local Panel = vgui.Create("DHTML")
-			Panel:SetSize(1024, 1024)
-			Panel:SetAlpha(0)
-			Panel:SetMouseInputEnabled(false)
-			Panel:SetHTML([[
-				<html><head><style type="text/css">
-					body {
-						background-image: url(]] .. requestTbl.Url .. [[);
-						background-size: contain;
-						background-position: ]] .. requestTbl.Alignment .. [[;
-						background-repeat: no-repeat;
-					}
-				</style></head><body></body></html>
-			]])
-			requestTbl.Timeout = CurTime() + 10
-			requestTbl.Panel = Panel
-		end
-	else
-		timer.Destroy("SF_URLMaterialChecker")
-	end
-end
-local function LoadURLMaterial(url, alignment, cb, skip_hack)
-	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()), skip_hack)
-
-	if #LoadingURLQueue == 0 then
-		timer.Create("SF_URLMaterialChecker", 1, 0, CheckURLDownloads)
-	end
-	LoadingURLQueue[#LoadingURLQueue + 1] = { Material = urlmaterial, Url = url, Alignment = alignment, cb = cb }
-
-	return urlmaterial
-end
 
 local validfonts = {
 	akbar = "Akbar",
@@ -670,110 +605,52 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	checkluatype (tx, TYPE_STRING)
 
 	local instance = SF.instance
-	local data = instance.data.render
-	if #tx > cv_max_data_material_size:GetInt() then
-		SF.Throw("Texture URL/Data too long!", 2)
-	end
+	
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
-		if prefix=="http" or prefix=="https" then
-			checkpermission (instance, tx, "render.urlmaterial")
-			if #tx>2000 then SF.Throw("URL is too long!", 2) end
-			tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
-				return string.format("%%%02X", string.byte(str))
-			end)
-			SF.HTTPNotify(instance.player, tx)
-		else
-			checkpermission (instance, nil, "render.datamaterial")
-			tx = string.match(tx, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
-			if not tx then --It's not valid
-				SF.Throw("Texture data isnt proper base64 encoded image.", 2)
-			end
-		end
-		if plyURLTexcount[instance.playerid] then
-			if plyURLTexcount[instance.playerid] >= cv_max_url_materials:GetInt() then
-				SF.Throw("URL Texture limit reached", 2)
-			else
-				plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] + 1
-			end
-		else
-			plyURLTexcount[instance.playerid] = 1
-		end
-		data.urltexturecount = data.urltexturecount + 1
-
-		if alignment then
-			checkluatype (alignment, TYPE_STRING)
-			local args = string.Split(alignment, " ")
-			local validargs = { ["left"] = true, ["center"] = true, ["right"] = true, ["top"] = true, ["bottom"] = true }
-			if #args ~= 1 and #args ~= 2 then SF.Throw("Invalid urltexture alignment given.") end
-			for i = 1, #args do
-				if not validargs[args[i]] then SF.Throw("Invalid urltexture alignment given.") end
-			end
-		else
-			alignment = "center"
-		end
-
-		local tbl = {}
-		data.urltextures[tbl] = LoadURLMaterial(tx, alignment, function()
-			if cb then
-				instance:runFunction(cb, tbl, tx)
-			end
-		end, skip_hack)
-		return tbl
+		return instance.env.material.createFromURL(tx, cb, alignment, skip_hack)
 	else
-		local id = surface.GetTextureID(tx)
-		if id then
-			local mat = Material(tx) -- Hacky way to get ITexture, if there is a better way - do it!
-			if not mat then return end
-			local cacheentry = sfCreateMaterial("SF_TEXTURE_" .. id, skip_hack)
-			cacheentry:SetTexture("$basetexture", mat:GetTexture("$basetexture"))
+		-- local id = surface.GetTextureID(tx)
+		-- if id then
+			-- local mat = Material(tx) -- Hacky way to get ITexture, if there is a better way - do it!
+			-- if mat:IsError() then SF.Throw("Invalid material path", 2) end
+			-- local cacheentry = sfCreateMaterial("SF_TEXTURE_" .. id, skip_hack)
+			-- cacheentry:SetTexture("$basetexture", mat:GetTexture("$basetexture"))
 
-			local tbl = {}
-			data.textures[tbl] = cacheentry
-			return tbl
-		end
+			-- local tbl = {}
+			-- data.textures[tbl] = cacheentry
+			-- return tbl
+		-- end
 	end
-
 end
 
 --- Releases the texture. Required if you reach the maximum url textures.
--- @param id Texture table. Aquired with render.getTextureID
-function render_library.destroyTexture(id)
-	local instance = SF.instance
-	local data = instance.data.render
-	if data.urltextures[id] then
-		plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] - 1
-		data.urltexturecount = data.urltexturecount - 1
-		data.urltextures[id]:SetUndefined("$basetexture")
-		data.urltextures[id] = nil
-	elseif data.textures[id] then
-		data.textures[id] = nil
-	else
-		SF.Throw("Cannot destroy an invalid texture.", 2)
-	end
+-- @param mat The material object
+function render_library.destroyTexture(mat)
+	mat:destroy()
 end
 
---- Sets the texture
--- @param id Texture table. Aquired with render.getTextureID
-function render_library.setTexture (id)
+--- Sets the current render material
+-- @param mat The material object
+function render_library.setTexture(mat)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	if id then
-		if data.textures[id] then
-			surface.SetMaterial(data.textures[id])
-			render.SetMaterial(data.textures[id])
-		elseif data.urltextures[id] then
-			surface.SetMaterial(data.urltextures[id])
-			render.SetMaterial(data.urltextures[id])
-		else
-			render.SetColorMaterial()
-			draw.NoTexture()
-		end
+	if mat then
+		checktype(mat, mat_meta)
+		local m = maunwrap(mat)
+		surface.SetMaterial(m)
+		render.SetMaterial(m)
 	else
 		render.SetColorMaterial()
 		draw.NoTexture()
 	end
 end
+
+--- Sets the current render material
+-- @param mat The material object
+function render_library.setMaterial(mat)
+end
+render_library.setMaterial = render_library.setTexture
 
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
