@@ -2,50 +2,29 @@
 -- Net extension stuff
 function net.ReadStarfall(ply, callback)
 	local sfdata = {files = {}}
-
 	if CLIENT then
 		sfdata.proc = net.ReadEntity()
 		sfdata.owner = net.ReadEntity()
 	end
 	sfdata.mainfile = net.ReadString()
 
-	local numFiles = 0
-	local completedFiles = 0
-	local err = false
+	local headers = {}
+	for I=1, net.ReadUInt(8) do
+		headers[#headers + 1] = {name = net.ReadString(), size = net.ReadUInt(32)}
+	end
 
-	local I = 0
-	while I < 256 do
-		local code = net.ReadUInt(8)
-
-		-- if code == 2 then
-
-			-- local filename = net.ReadString()
-			-- sfdata.times[filename] = net.ReadDouble()
-
-		if code == 1 then
-
-			local filename = net.ReadString()
-			-- sfdata.times[filename] = net.ReadDouble()
-
-			net.ReadStream(ply, function(data)
-				if not data then err = true end
-				completedFiles = completedFiles + 1
-				sfdata.files[filename] = data
-				if completedFiles == numFiles then
-					if err then callback() else callback(sfdata) end
-				end
-			end)
-
-			numFiles = numFiles + 1
-
+	net.ReadStream(ply, function(data)
+		if data then
+			local pos = 1
+			for k, v in pairs(headers) do
+				sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
+				pos = pos + v.size
+			end
+			callback(sfdata)
 		else
-			break
+			callback()
 		end
-	end
-
-	if numFiles == 0 then
-		callback(sfdata, err)
-	end
+	end)
 end
 
 function net.WriteStarfall(sfdata)
@@ -56,22 +35,19 @@ function net.WriteStarfall(sfdata)
 	end
 	net.WriteString(sfdata.mainfile)
 
-	local I = 0
+	local numfiles = table.Count(sfdata.files)
+	if numfiles > 255 then error("Number of files exceeds the current maximum (256)") end
+	net.WriteUInt(numfiles, 8)
+	
+	local filecodes = {}
 	for filename, code in pairs(sfdata.files) do
-		if I > 255 then error("Number of files exceeds the current maximum (256)") end
 		if #filename > 255 then error("File name too large: " .. #filename .. " (max is 255)") end
 
-		-- local code = sfdata.netfiles[filename] and 1 or 2
-		net.WriteUInt(1, 8)
 		net.WriteString(filename)
-		-- net.WriteDouble(time)
-		-- if code == 1 then
-			net.WriteStream(code)
-		-- end
-		I = I + 1
+		net.WriteUInt(#code, 32)
+		filecodes[#filecodes + 1] = code
 	end
-
-	net.WriteUInt(0, 8)
+	net.WriteStream(table.concat(filecodes))
 end
 
 SF.Cache = setmetatable({},{__mode="k"})
