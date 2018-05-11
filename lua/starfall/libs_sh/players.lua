@@ -441,9 +441,7 @@ end
 function player_methods:getAmmoCount(id)
 	checktype(self, player_metamethods)
 	local tid = type(id)
-	if tid~="number" and tid~="string" then
-		SF.Throw("Type mismatch (Expected number or string, got " .. tid .. ") in function getAmmoCount", 2)
-	end
+	if tid~="number" and tid~="string" then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
 
 	local ent = unwrap(self)
 	return ent:GetAmmoCount(id)

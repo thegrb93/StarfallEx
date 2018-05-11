@@ -95,7 +95,7 @@ local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta, mat_meta
+local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta, mat_meta, mat_meta2
 local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap, maunwrap
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -109,6 +109,7 @@ SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	ent_meta = SF.Entities.Metatable
 	mat_meta = SF.Materials.Metatable
+	mat_meta2 = SF.Materials.LMetatable
 
 	vwrap = SF.Vectors.Wrap
 	cwrap = SF.Color.Wrap
@@ -608,7 +609,7 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
-		return instance.env.material.createFromURL(tx, cb, alignment, skip_hack)
+		local m = instance.env.material.create(tx, cb, alignment, skip_hack)
 	else
 		-- local id = surface.GetTextureID(tx)
 		-- if id then
@@ -636,7 +637,9 @@ function render_library.setTexture(mat)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
-		checktype(mat, mat_meta)
+		local t = dgetmeta(mat)
+		if t~=mat_meta and t~=mat_meta2 then SF.ThrowTypeError("Material", SF.GetType(mat), 2) end
+		
 		local m = maunwrap(mat)
 		surface.SetMaterial(m)
 		render.SetMaterial(m)

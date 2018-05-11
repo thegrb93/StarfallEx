@@ -881,7 +881,7 @@ end
 -- @return DebugInfo table
 function SF.DefaultEnvironment.debugGetInfo (funcOrStackLevel, fields)
 	local TfuncOrStackLevel = type(funcOrStackLevel)
-	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.Throw("Type mismatch (Expected function or number, got " .. TfuncOrStackLevel .. ") in function debugGetInfo", 2) end
+	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields then checkluatype (fields, TYPE_STRING) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
