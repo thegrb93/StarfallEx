@@ -296,9 +296,6 @@ else
 	add("StartChat")
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
-	add("PostDrawHUD", "renderoffscreen", function(instance)
-		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
-	end)
 end
 
 -- Shared hooks

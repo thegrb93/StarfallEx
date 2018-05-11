@@ -83,6 +83,48 @@ SF.BurstObject.__index = SF.BurstObject
 setmetatable(SF.BurstObject, SF.BurstObject)
 
 
+--- Returns a class that can limit per player and recycle a indestructable resource
+SF.ResourceHandler = {
+	use = function(self, ply, t)
+		if self:check(ply) then
+			self.objects[t] = self.objects[t] or {}
+			local obj = next(self.objects[t])
+			if not obj then
+				self.n = self.n + 1
+				obj = self.allocator(t, self.n)
+			end
+			self.objects[t][obj] = nil
+			self.players[ply] = self.players[ply] + 1
+			return obj
+		end
+	end,
+	check = function(self, ply)
+		self.players[ply] = self.players[ply] or 0
+		return self.players[ply] < self.max
+	end,
+	free = function(self, ply, object)
+		local t = self.typer(object)
+		if not self.objects[t][object] then
+			if ply then self.players[ply] = self.players[ply] - 1 end
+			self.objects[t][object] = true
+		end
+	end,
+	__call = function(p, max, allocator, typer)
+		local t = {
+			n = 0,
+			allocator = allocator,
+			typer = typer,
+			objects = {},
+			players = setmetatable({},{__mode="k"}),
+			max = max,
+		}
+		return setmetatable(t, p)
+	end
+}
+SF.ResourceHandler.__index = SF.ResourceHandler
+setmetatable(SF.ResourceHandler, SF.ResourceHandler)
+
+
 --- Returns a class that can whitelist/blacklist strings
 SF.StringRestrictor = {
 	check = function(self, value)

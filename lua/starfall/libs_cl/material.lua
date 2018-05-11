@@ -10,11 +10,10 @@ do
 	P.registerPrivilege("material.datacreate", "Create material from raw image data", "Allows users to create a new material from raw image data.", { client = {} })
 end
 
-local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
-local cv_max_url_materials = CreateConVar("sf_render_maxurlmaterials", "20", { FCVAR_ARCHIVE })
+local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
 local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
---- For playing music there is `Material` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
+--- The `Material` type is used to control shaders in rendering.
 -- @client
 local material_methods, material_metamethods = SF.RegisterType("Material")
 local wrap, unwrap = SF.CreateWrapper(material_metamethods, true, false)
@@ -22,7 +21,7 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
---- `material` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
+--- `material` library is allows creating material objects which are used for controlling shaders in rendering.
 -- @client
 local material_library = SF.RegisterLibrary("material")
 
@@ -31,18 +30,28 @@ SF.Materials.Unwrap = unwrap
 SF.Materials.Methods = material_methods
 SF.Materials.Metatable = material_metamethods
 
+local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
+	function(shader, i)
+		return CreateMaterial("SF_TEXTURE_" .. i, shader, {})
+	end,
+	FindMetaTable("IMaterial").GetShader
+)
+
+cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
+	material_bank.max = cv_max_materials:GetInt()
+end )
+
 -- Register functions to be called when the chip is initialised and deinitialised
 SF.AddHook("initialize", function (inst)
 	inst.data.material = {
-		materials = {}
+		usermaterials = {}
 	}
 end)
 
 SF.AddHook("deinitialize", function (inst)
-	local materials = inst.data.material.materials
-	local s = next(materials)
-	while s do
-		s = next(materials)
+	for k, v in pairs(inst.data.material.usermaterials) do
+		material_bank:free(inst.player, v)
+		inst.data.material.usermaterials[k] = nil
 	end
 end)
 

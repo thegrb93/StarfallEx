@@ -118,20 +118,33 @@ SF.AddHook("postload", function()
 	aunwrap = SF.Angles.Unwrap
 	eunwrap = SF.Entities.Unwrap
 	maunwrap = SF.Materials.Unwrap
+	
+	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
+		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
+	end)
 end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
+
+local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
+
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 local view_matrix_stack = {}
 
-local globalRTs = {}
-local globalRTcount = 0
-local plyRTcount = {}
-local plyURLTexcount = {}
+local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
+	function(t, i)
+		return GetRenderTarget("Starfall_CustomRT_" .. i, 1024, 1024)
+	end,
+	function() return "RT" end
+)
+
+cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
+	rt_bank.max = cv_max_rendertargets:GetInt()
+end )
 
 local renderhooks = {
 	render = true,
@@ -202,25 +215,12 @@ end)
 SF.AddHook("initialize", function(instance)
 	instance.data.render = {}
 	instance.data.render.rendertargets = {}
-	instance.data.render.rendertargetcount = 0
-	instance.data.render.urltexturecount = 0
 end)
 
 SF.AddHook("deinitialize", function (instance)
 	for k, v in pairs(instance.data.render.rendertargets) do
-		globalRTs[v][2] = true -- mark as available
-	end
-	if plyRTcount[instance.playerid] then
-		plyRTcount[instance.playerid] = plyRTcount[instance.playerid] - instance.data.render.rendertargetcount
-		if plyRTcount[instance.playerid] == 0 then
-			plyRTcount[instance.playerid] = nil
-		end
-	end
-	if plyURLTexcount[instance.playerid] then
-		plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] - instance.data.render.urltexturecount
-		if plyURLTexcount[instance.playerid] == 0 then
-			plyURLTexcount[instance.playerid] = nil
-		end
+		rt_bank:free(instance.player, v)
+		instance.data.render.rendertargets[k] = nil
 	end
 end)
 
@@ -662,33 +662,11 @@ function render_library.createRenderTarget (name)
 	local data = instance.data.render
 	if data.rendertargets[name] then SF.Throw("A rendertarget with this name already exists!", 2) end
 
-	if plyRTcount[instance.playerid] then
-		if plyRTcount[instance.playerid] >= cv_max_rendertargets:GetInt() then
-			SF.Throw("Rendertarget limit reached", 2)
-		else
-			plyRTcount[instance.playerid] = plyRTcount[instance.playerid] + 1
-		end
-	else
-		plyRTcount[instance.playerid] = 1
-	end
-	data.rendertargetcount = data.rendertargetcount + 1
-
-	local rtname, rt
-	for k, v in pairs(globalRTs) do
-		if v[2] then rtname, rt = k, v break end
-	end
-	if rt then
-		rt[2] = false
-	else
-		globalRTcount = globalRTcount + 1
-		rtname = "Starfall_CustomRT_" .. globalRTcount
-		rt = { GetRenderTarget(rtname, 1024, 1024), false }
-		rt[3] = CreateMaterial("StarfallCustomModel_"..globalRTcount, "VertexLitGeneric", { ["$model"] = 1 })
-		rt[3]:SetTexture("$basetexture", rt[1])
-		globalRTs[rtname] = rt
-	end
-	render.ClearRenderTarget(rt[1], Color(0, 0, 0))
-	data.rendertargets[name] = rtname
+	local rt = rt_bank:use(instance.player, "RT")
+	if not rt then SF.Throw("Rendertarget limit reached", 2) end
+	
+	render.ClearRenderTarget(rt, Color(0, 0, 0))
+	data.rendertargets[name] = rt
 end
 
 --- Releases the rendertarget. Required if you reach the maximum rendertargets.
@@ -696,9 +674,9 @@ end
 function render_library.destroyRenderTarget(name)
 	local instance = SF.instance
 	local data = instance.data.render
-	local rtname = data.rendertargets[name]
-	if rtname then
-		globalRTs[rtname][2] = true
+	local rt = data.rendertargets[name]
+	if rt then
+		rt_bank:free(instance.player, rt)
 		data.rendertargets[name] = nil
 	else
 		SF.Throw("Cannot destroy an invalid rendertarget.", 2)
@@ -714,11 +692,7 @@ function render_library.selectRenderTarget (name)
 	if name then
 		checkluatype (name, TYPE_STRING)
 
-		local rtname = data.rendertargets[name]
-		if not rtname then SF.Throw("Invalid Rendertarget", 2) end
-		local rttbl = globalRTs[rtname]
-		if not rttbl then SF.Throw("Invalid Rendertarget", 2) end
-		local rt = rttbl[1]
+		local rt = data.rendertargets[name]
 		if not rt then SF.Throw("Invalid Rendertarget", 2) end
 
 		if not data.usingRT then
@@ -767,28 +741,15 @@ function render_library.setRenderTargetTexture (name)
 	else
 		checkluatype (name, TYPE_STRING)
 
-		local rtname = data.rendertargets[name]
-		if rtname and globalRTs[rtname] then
-			RT_Material:SetTexture("$basetexture", globalRTs[rtname][1])
+		local rt = data.rendertargets[name]
+		if rt then
+			RT_Material:SetTexture("$basetexture", rt)
 			surface.SetMaterial(RT_Material)
 			render.SetMaterial(RT_Material)
 		else
 			render.SetColorMaterial()
 			draw.NoTexture()
 		end
-	end
-end
-
---- Returns the model material name that uses the render target.
--- @param name Render target name
--- @return Model material name. use ent:setMaterial in clientside to set the entity's material to this
-function render_library.getRenderTargetMaterial(name)
-	local data = SF.instance.data.render
-	checkluatype (name, TYPE_STRING)
-
-	local rtname = data.rendertargets[name]
-	if rtname and globalRTs[rtname] then
-		return "!"..globalRTs[rtname][3]:GetName()
 	end
 end
 
