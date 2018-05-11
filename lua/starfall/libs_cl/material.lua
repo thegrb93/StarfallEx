@@ -7,7 +7,7 @@ do
 	P.registerPrivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
 	P.registerPrivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
 	P.registerPrivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
-	P.registerPrivilege("material.datacreate", "Create material from raw image data", "Allows users to create a new material from raw image data.", { client = {} })
+	P.registerPrivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
 end
 
 local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
@@ -16,7 +16,9 @@ local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", 
 --- The `Material` type is used to control shaders in rendering.
 -- @client
 local material_methods, material_metamethods = SF.RegisterType("Material")
+local lmaterial_methods, lmaterial_metamethods = SF.RegisterType("LockedMaterial") --Material that can't be modified
 local wrap, unwrap = SF.CreateWrapper(material_metamethods, true, false)
+local lwrap, lunwrap = SF.CreateWrapper(lmaterial_metamethods, true, false, material_metamethods)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -59,7 +61,7 @@ end)
 --- Loads a .vmt material or existing material. Throws an error if the material fails to load
 --- Existing created materials can be loaded with ! prepended to the name
 -- @param path The path of the material (don't include .vmt in the path)
--- @return The material object
+-- @return The material object. Can't be modified.
 function material_library.load(path)
 	checkluatype(path, TYPE_STRING)
 	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
@@ -67,11 +69,13 @@ function material_library.load(path)
 	local m = SF.CheckMaterial(path)
 	if not m then SF.Throw("The material is blacklisted", 2) end
 	if m:IsError() then SF.Throw("The material path is invalid", 2) end
-	return wrap(m)
+	return lwrap(m)
 end
 
 --- Creates a new blank material
 -- @param name The name of the material
+-- @param shader The shader of the material
+-- @param keyvalues A Keyvalue table to initialize the material with.
 function material_library.create(name)
 	checkpermission(SF.instance, path, "material.create")
 end
@@ -96,112 +100,252 @@ function material_library.createFromImage(path, params)
 	return wrap(m)
 end
 
+local LoadingURLQueue = {}
 --- Creates a material from a url
 -- @param name The name of the material
 -- @param callback The function called when the material finishes loading.
 function material_library.createFromURL(url, callback)
 	checkpermission(SF.instance, url, "material.urlcreate")
 	checkpermission(SF.instance, url, "material.datacreate")
-	
-	
+
+
 	if #tx > cv_max_data_material_size:GetInt() then
 		SF.Throw("Texture URL/Data too long!", 2)
 	end
-	
+
 	if prefix=="http" or prefix=="https" then
-			checkpermission (instance, tx, "render.urlmaterial")
-			if #tx>2000 then SF.Throw("URL is too long!", 2) end
-			tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
-				return string.format("%%%02X", string.byte(str))
-			end)
-			SF.HTTPNotify(instance.player, tx)
-		else
-			checkpermission (instance, nil, "render.datamaterial")
-			tx = string.match(tx, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
-			if not tx then --It's not valid
-				SF.Throw("Texture data isnt proper base64 encoded image.", 2)
-			end
+		checkpermission (instance, tx, "render.urlmaterial")
+		if #tx>2000 then SF.Throw("URL is too long!", 2) end
+		tx = string.gsub(tx, "[^%w _~%.%-/:]", function(str)
+			return string.format("%%%02X", string.byte(str))
+		end)
+		SF.HTTPNotify(instance.player, tx)
+	else
+		checkpermission (instance, nil, "render.datamaterial")
+		tx = string.match(tx, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
+		if not tx then --It's not valid
+			SF.Throw("Texture data isnt proper base64 encoded image.", 2)
 		end
-		if plyURLTexcount[instance.playerid] then
-			if plyURLTexcount[instance.playerid] >= cv_max_url_materials:GetInt() then
-				SF.Throw("URL Texture limit reached", 2)
-			else
-				plyURLTexcount[instance.playerid] = plyURLTexcount[instance.playerid] + 1
-			end
-		else
-			plyURLTexcount[instance.playerid] = 1
-		end
-		data.urltexturecount = data.urltexturecount + 1
+	end
 
-		if alignment then
-			checkluatype (alignment, TYPE_STRING)
-			local args = string.Split(alignment, " ")
-			local validargs = { ["left"] = true, ["center"] = true, ["right"] = true, ["top"] = true, ["bottom"] = true }
-			if #args ~= 1 and #args ~= 2 then SF.Throw("Invalid urltexture alignment given.") end
-			for i = 1, #args do
-				if not validargs[args[i]] then SF.Throw("Invalid urltexture alignment given.") end
-			end
-		else
-			alignment = "center"
+	if alignment then
+		checkluatype (alignment, TYPE_STRING)
+		local args = string.Split(alignment, " ")
+		local validargs = { ["left"] = true, ["center"] = true, ["right"] = true, ["top"] = true, ["bottom"] = true }
+		if #args ~= 1 and #args ~= 2 then SF.Throw("Invalid urltexture alignment given.") end
+		for i = 1, #args do
+			if not validargs[args[i]] then SF.Throw("Invalid urltexture alignment given.") end
 		end
+	else
+		alignment = "center"
+	end
 
-		local tbl = {}
-		data.urltextures[tbl] = LoadURLMaterial(tx, alignment, function()
-			if cb then
-				instance:runFunction(cb, tbl, tx)
-			end
-		end, skip_hack)
-		return tbl
-	
+	local tbl = {}
+	data.urltextures[tbl] = LoadURLMaterial(tx, alignment, function()
+		if cb then
+			instance:runFunction(cb, tbl, tx)
+		end
+	end, skip_hack)
+
 	local urlmaterial = sfCreateMaterial("SF_TEXTURE_" .. util.CRC(url .. SysTime()), skip_hack)
 
 	---URL Textures
-	local LoadingURLQueue = {}
-	local function CheckURLDownloads()
+	local Panel
+	local function NextInQueue()
+
 		local requestTbl = LoadingURLQueue[1]
 		if requestTbl then
-			if requestTbl.Panel then
-				if not requestTbl.Panel:IsLoading() then
-					timer.Simple(0.2, function()
-						local tex = requestTbl.Panel:GetHTMLMaterial():GetTexture("$basetexture")
-						requestTbl.Material:SetTexture("$basetexture", tex)
-						requestTbl.Panel:Remove()
-						if requestTbl.cb then requestTbl.cb() end
-					end)
-					table.remove(LoadingURLQueue, 1)
-				else
-					if CurTime() > requestTbl.Timeout then
-						requestTbl.Panel:Remove()
-						table.remove(LoadingURLQueue, 1)
-					end
-				end
+			if requestTbl.Instance.error then
+				table.remove(LoadingURLQueue, 1)
+				NextInQueue()
+				return
+			end
+			if Panel then
+				Panel:RunJavascript("img.src = \""..requestTbl.Url.."\";")
 			else
-				local Panel = vgui.Create("DHTML")
+				Panel = vgui.Create("DHTML")
 				Panel:SetSize(1024, 1024)
 				Panel:SetAlpha(0)
 				Panel:SetMouseInputEnabled(false)
-				Panel:SetHTML([[
-					<html><head><style type="text/css">
-						body {
-							background-image: url(]] .. requestTbl.Url .. [[);
-							background-size: contain;
-							background-position: ]] .. requestTbl.Alignment .. [[;
-							background-repeat: no-repeat;
-						}
-					</style></head><body></body></html>
-				]])
-				requestTbl.Timeout = CurTime() + 10
-				requestTbl.Panel = Panel
+				Panel:AddFunction("sf", "imageLoaded", function(w,h)
+					-- timer.Simple(0.2, function()
+						local tex = Panel:GetHTMLMaterial():GetTexture("$basetexture")
+						requestTbl.Material:SetTexture("$basetexture", tex)
+						if requestTbl.cb then requestTbl.cb() end
+						table.remove(LoadingURLQueue, 1)
+						timer.Simple(0, NextInQueue)
+					-- end)
+				end)
+				Panel:SetHTML([[<html style="overflow:hidden"><head><script>
+var img = new Image();
+img.onload = function (){
+	sf.imageLoaded(img.width, img.height);
+}
+img.src = "]]..requestTbl.Url..[[";
+</script></head><body></body></html>]])
+
+
 			end
-		else
-			timer.Destroy("SF_URLMaterialChecker")
+			timer.Create("SF_URLTextureTimeout", 10, 1, function()
+				table.remove(LoadingURLQueue, 1)
+				NextInQueue()
+			end)
+		elseif Panel then
+			Panel:Remove()
+			Panel = nil
 		end
 	end
-	
-	if #LoadingURLQueue == 0 then
-		timer.Create("SF_URLMaterialChecker", 1, 0, CheckURLDownloads)
-	end
-	LoadingURLQueue[#LoadingURLQueue + 1] = { Material = urlmaterial, Url = url, Alignment = alignment, cb = cb }
+
+	local inqueue = #LoadingURLQueue
+	LoadingURLQueue[inqueue + 1] = { Instance = SF.instance, Material = urlmaterial, Url = url, Alignment = alignment, cb = cb }
+	if inqueue == 0 then downloadFinished() end
 
 	return urlmaterial
 end
+
+--- Returns the material's engine name
+-- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+function material_methods:getName()
+	checktype(self, material_metamethods)
+	return unwrap(self):GetName()
+end
+function lmaterial_methods:getName()
+	checktype(self, lmaterial_metamethods)
+	return lunwrap(self):GetName()
+end
+
+--- Returns the shader name of the material
+-- @return The shader name of the material
+function material_methods:getShader()
+	checktype(self, material_metamethods)
+	return unwrap(self):GetShader()
+end
+function lmaterial_methods:getShader()
+	checktype(self, lmaterial_metamethods)
+	return lunwrap(self):GetShader()
+end
+
+--- Gets the base texture set to the material's width
+-- @return The basetexture's width
+function material_methods:getWidth()
+	checktype(self, material_metamethods)
+	return unwrap(self):Width()
+end
+function lmaterial_methods:getWidth()
+	checktype(self, lmaterial_metamethods)
+	return lunwrap(self):Width()
+end
+
+--- Gets the base texture set to the material's height
+-- @return The basetexture's height
+function material_methods:getHeight()
+	checktype(self, material_metamethods)
+	return unwrap(self):Height()
+end
+function lmaterial_methods:getHeight()
+	checktype(self, lmaterial_metamethods)
+	return lunwrap(self):Height()
+end
+
+--- Returns a color pixel value of a .png or .jpg material.
+-- @param x The x coordinate of the pixel
+-- @param y The y coordinate of the pixel
+-- @return The color value
+function material_methods:getColor(x, y)
+end
+
+--- Returns a float keyvalue
+-- @param key The key to get the float from
+-- @return The float value or nil if it doesn't exist
+function material_methods:getFloat(key)
+end
+
+--- Returns an int keyvalue
+-- @param key The key to get the int from
+-- @return The int value or nil if it doesn't exist
+function material_methods:getInt(key)
+end
+
+--- Returns a table of material keyvalues
+-- @return The table of keyvalues
+function material_methods:getKeyValues()
+end
+
+--- Returns a matrix keyvalue
+-- @param key The key to get the matrix from
+-- @return The matrix value or nil if it doesn't exist
+function material_methods:getMatrix(key)
+end
+
+--- Returns a string keyvalue
+-- @param key The key to get the string from
+-- @return The string value or nil if it doesn't exist
+function material_methods:getString(key)
+end
+
+--- Returns a texture id keyvalue
+-- @param key The key to get the texture from
+-- @return The string id of the texture or nil if it doesn't exist
+function material_methods:getTexture(key)
+end
+
+--- Returns a vector keyvalue
+-- @param key The key to get the vector from
+-- @return The string id of the texture
+function material_methods:getVector(key)
+end
+
+--- Returns a linear color-corrected vector keyvalue
+-- @param key The key to get the vector from
+-- @return The vector value or nil if it doesn't exist
+function material_methods:getVectorLinear(key)
+end
+
+-- function material_methods:isError()
+-- end
+
+-- function material_methods:recompute()
+-- end
+
+--- Sets a float keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setFloat(key, v)
+end
+
+--- Sets an int keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setInt(key, v)
+end
+
+--- Sets a matrix keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setMatrix(key, v)
+end
+
+--- Sets a string keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setString(key, v)
+end
+
+--- Sets a texture keyvalue
+-- @param key The key name to set
+-- @param v The texture name to set it to
+function material_methods:setTexture(key, v)
+end
+
+--- Sets a keyvalue to be undefined
+-- @param key The key name to set
+function material_methods:setUndefined(key)
+end
+
+--- Sets a vector keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setVector(key, v)
+end
+
+

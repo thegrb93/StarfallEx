@@ -89,11 +89,12 @@ SF.ResourceHandler = {
 		if self:check(ply) then
 			self.objects[t] = self.objects[t] or {}
 			local obj = next(self.objects[t])
-			if not obj then
+			if obj then
+				self.objects[t][obj] = nil
+			else
 				self.n = self.n + 1
 				obj = self.allocator(t, self.n)
 			end
-			self.objects[t][obj] = nil
 			self.players[ply] = self.players[ply] + 1
 			return obj
 		end
