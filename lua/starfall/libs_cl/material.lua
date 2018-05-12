@@ -86,6 +86,7 @@ end)
 
 --- Loads a .vmt material or existing material. Throws an error if the material fails to load
 --- Existing created materials can be loaded with ! prepended to the name
+--- Can't be modified
 -- @param path The path of the material (don't include .vmt in the path)
 -- @return The material object. Can't be modified.
 function material_library.load(path)
@@ -113,6 +114,7 @@ end
 
 local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
 --- Creates a .jpg or .png material from file
+--- Can't be modified
 -- @param path The path to the image file
 -- @param params The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters
 function material_library.createFromImage(path, params)
