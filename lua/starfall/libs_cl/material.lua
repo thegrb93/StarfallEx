@@ -454,7 +454,11 @@ local function NextInTextureQueue()
 	end
 end
 
-function material_methods:setTextureURL(key, url, cb, x, y, w, h)
+--- Loads an online image or base64 data to the specified texture key
+-- @param key The key name to set. $basetexture is the key name for most purposes.
+-- @param url The url or base64 data
+-- @param cb A callback called when loading is done. Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
+function material_methods:setTextureURL(key, url, cb)
 	checktype(self, material_metamethods)
 	checkluatype(key, TYPE_STRING)
 	checkluatype(url, TYPE_STRING)
@@ -509,6 +513,21 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 	LoadingTextureQueue[inqueue + 1] = requestTbl
 	if inqueue == 0 then timer.Simple(0, NextInTextureQueue) end
 end
+
+--- Sets a rendertarget texture to the specified texture key
+-- @param key The key name to set. $basetexture is the key name for most purposes.
+-- @param name The name of the rendertarget
+function material_methods:setTextureRenderTarget(key, name)
+	checktype(self, material_metamethods)
+	checkluatype(key, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
+	
+	local rt = SF.instance.data.render.rendertargets[name]
+	if not rt then SF.Throw("Invalid rendertarget: "..name, 2) end
+	
+	local m = unwrap(self)
+	m:SetTexture(key, rt)
+end 
 
 --- Frees a url texture so that another can be used
 -- @param key The material key where the texture is stored
