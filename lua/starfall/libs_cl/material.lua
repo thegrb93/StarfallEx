@@ -169,38 +169,34 @@ local LoadingTextureQueue = {}
 local function NextInTextureQueue()
 	local requestTbl = LoadingTextureQueue[1]
 	if requestTbl then
+		table.remove(LoadingTextureQueue, 1)
 		if requestTbl.Instance.error then
 			-- Chip already deinitialized so don't need to free anything
-			table.remove(LoadingTextureQueue, 1)
 			NextInTextureQueue()
 			return
 		end
 
-		local Panel = html_panel_bank:use(requestTbl.Instance.player, "HTMLPanel")
-
 		local function applyTexture()
 			if not requestTbl.Instance.error then
-				local mat = Panel:GetHTMLMaterial()
-				if not mat then timer.Simple(0.01, applyTexture) return end
+				local mat = requestTbl.Panel:GetHTMLMaterial()
+				if not mat then timer.Simple(0.1, applyTexture) return end
 				requestTbl.Material:SetTexture(requestTbl.Target, mat:GetTexture("$basetexture"))
 				if requestTbl.cb then
 					requestTbl.Instance:runFunction(requestTbl.cb, requestTbl.Tbl, requestTbl.Url)
 				end
+				timer.Simple(0.1, function() requestTbl.Panel:Hide() end)
 			end
-			table.remove(LoadingTextureQueue, 1)
 			NextInTextureQueue()
 		end
 
-		Panel:AddFunction("sf", "imageLoaded", applyTexture)
-		Panel:RunJavascript([[img.src = "]] .. requestTbl.Url .. [[";]])
-		Panel:Show()
-		requestTbl.Instance.data.material.htmlpanels[Panel] = true
+		requestTbl.Panel:AddFunction("sf", "imageLoaded", applyTexture)
+		requestTbl.Panel:RunJavascript([[img.src = "]] .. requestTbl.Url .. [[";]])
+		requestTbl.Panel:Show()
 
 		timer.Create("SF_URLTextureTimeout", 10, 1, function()
-			html_panel_bank:free(requestTbl.Instance.player, Panel)
-			requestTbl.Instance.data.material.htmlpanels[Panel] = nil
-			Panel:Hide()
-			table.remove(LoadingTextureQueue, 1)
+			html_panel_bank:free(requestTbl.Instance.player, requestTbl.Panel)
+			requestTbl.Instance.data.material.htmlpanels[requestTbl.Panel] = nil
+			requestTbl.Panel:Hide()
 			NextInTextureQueue()
 		end)
 	else
@@ -463,10 +459,13 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 		end
 	end
 
+	local Panel = html_panel_bank:use(instance.player, "HTMLPanel")
+	if not Panel then SF.Throw("Maximum url textures exceeded.", 2) end
+	instance.data.material.htmlpanels[Panel] = true
+
 	local inqueue = #LoadingTextureQueue
-	LoadingTextureQueue[inqueue + 1] = { Instance = instance, Tbl = self, Material = unwrap(self), Target = key, Url = url, cb = cb }
+	LoadingTextureQueue[inqueue + 1] = { Instance = instance, Tbl = self, Material = unwrap(self), Panel = Panel, Target = key, Url = url, cb = cb }
 	if inqueue == 0 then timer.Simple(0, NextInTextureQueue) end
-	
 end
 
 --- Sets a keyvalue to be undefined
