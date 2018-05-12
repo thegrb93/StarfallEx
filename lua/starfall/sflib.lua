@@ -56,19 +56,21 @@ end
 
 --- Returns a class that can keep track of burst
 SF.BurstObject = {
-	use = function(self, amount)
-		self:check()
-		if self.val>= amount then
-			self.val = self.val - amount
-			return true
+	__index = {
+		use = function(self, amount)
+			self:check()
+			if self.val>= amount then
+				self.val = self.val - amount
+				return true
+			end
+			return false
+		end,
+		check = function(self)
+			self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
+			self.lasttick = CurTime()
+			return self.val
 		end
-		return false
-	end,
-	check = function(self)
-		self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
-		self.lasttick = CurTime()
-		return self.val
-	end,
+	},
 	__call = function(p, rate, max)
 		local t = {
 			rate = rate,
@@ -79,38 +81,39 @@ SF.BurstObject = {
 		return setmetatable(t, p)
 	end
 }
-SF.BurstObject.__index = SF.BurstObject
 setmetatable(SF.BurstObject, SF.BurstObject)
 
 
 --- Returns a class that can limit per player and recycle a indestructable resource
 SF.ResourceHandler = {
-	use = function(self, ply, t)
-		if self:check(ply) then
-			self.objects[t] = self.objects[t] or {}
-			local obj = next(self.objects[t])
-			if obj then
-				self.objects[t][obj] = nil
-			else
-				self.n = self.n + 1
-				obj = self.allocator(t, self.n)
+	__index = {
+		use = function(self, ply, t)
+			if self:check(ply) then
+				self.objects[t] = self.objects[t] or {}
+				local obj = next(self.objects[t])
+				if obj then
+					self.objects[t][obj] = nil
+				else
+					self.n = self.n + 1
+					obj = self.allocator(t, self.n)
+				end
+				self.players[ply] = self.players[ply] + 1
+				return obj
 			end
-			self.players[ply] = self.players[ply] + 1
-			return obj
+		end,
+		check = function(self, ply)
+			self.players[ply] = self.players[ply] or 0
+			return self.players[ply] < self.max
+		end,
+		free = function(self, ply, object)
+			local t = self.typer(object)
+			if not self.objects[t][object] then
+				if ply then self.players[ply] = self.players[ply] - 1 end
+				self.objects[t][object] = true
+				if self.destructor then self.destructor(object) end
+			end
 		end
-	end,
-	check = function(self, ply)
-		self.players[ply] = self.players[ply] or 0
-		return self.players[ply] < self.max
-	end,
-	free = function(self, ply, object)
-		local t = self.typer(object)
-		if not self.objects[t][object] then
-			if ply then self.players[ply] = self.players[ply] - 1 end
-			self.objects[t][object] = true
-			if self.destructor then self.destructor(object) end
-		end
-	end,
+	},
 	__call = function(p, max, allocator, typer, destructor)
 		local t = {
 			n = 0,
@@ -124,31 +127,32 @@ SF.ResourceHandler = {
 		return setmetatable(t, p)
 	end
 }
-SF.ResourceHandler.__index = SF.ResourceHandler
 setmetatable(SF.ResourceHandler, SF.ResourceHandler)
 
 
 --- Returns a class that can whitelist/blacklist strings
 SF.StringRestrictor = {
-	check = function(self, value)
-		for k,v in pairs(self.blacklist) do
-			if string.match(value, v) then
-				return false
+	__index = {
+		check = function(self, value)
+			for k,v in pairs(self.blacklist) do
+				if string.match(value, v) then
+					return false
+				end
 			end
-		end
-		for k,v in pairs(self.whitelist) do
-			if string.match(value, v) then
-				return  true
+			for k,v in pairs(self.whitelist) do
+				if string.match(value, v) then
+					return  true
+				end
 			end
+			return self.default
+		end,
+		addWhitelistEntry = function(self, value)
+			table.insert(self.whitelist, value)
+		end,
+		addBlacklistEntry = function(self, value)
+			table.insert(self.blacklist, value)
 		end
-		return self.default
-	end,
-	addWhitelistEntry = function(self, value)
-		table.insert(self.whitelist, value)
-	end,
-	addBlacklistEntry = function(self, value)
-		table.insert(self.blacklist, value)
-	end,
+	},
 	__call = function(p, allowbydefault)
 		local t = {
 			whitelist = {}, -- patterns
@@ -158,7 +162,6 @@ SF.StringRestrictor = {
 		return setmetatable(t, p)
 	end
 }
-SF.StringRestrictor.__index = SF.StringRestrictor
 setmetatable(SF.StringRestrictor, SF.StringRestrictor)
 
 
