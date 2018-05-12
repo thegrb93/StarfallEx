@@ -58,7 +58,12 @@ local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function(shader, i)
 		return CreateMaterial("SF_TEXTURE_" .. i, shader, {})
 	end,
-	FindMetaTable("IMaterial").GetShader
+	FindMetaTable("IMaterial").GetShader,
+	function(material)
+		for k, v in pairs(material:GetKeyValues()) do
+			material:SetUndefined(k)
+		end
+	end
 )
 local html_panel_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function()
@@ -67,8 +72,9 @@ local html_panel_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 		Panel:SetAlpha(0)
 		Panel:SetMouseInputEnabled(false)
 		Panel:SetHTML(
-[[<html style="overflow:hidden"><body><script>
+[[<html style="overflow:hidden;margin: -8px -8px;"><body><script>
 var img = new Image();
+img.style.position="absolute";
 img.onload = function (){
 	sf.imageLoaded(img.width, img.height);
 }
@@ -78,7 +84,11 @@ document.body.appendChild(img);
 		Panel:Hide()
 		return Panel
 	end,
-	function() return "HTMLPanel" end
+	function() return "HTMLPanel" end,
+	function(Panel)
+		Panel:RunJavascript([[img.src="";img.removeAttribute("width");img.removeAttribute("height");]])
+		Panel:Hide()
+	end
 )
 
 cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
@@ -91,7 +101,8 @@ SF.AddHook("initialize", function (inst)
 	inst.data.material = {
 		usermaterials = {},
 		usermaterialnames = {},
-		htmlpanels = {}
+		htmlpanels = {},
+		htmlpanelstextures = {}
 	}
 end)
 
@@ -105,8 +116,10 @@ SF.AddHook("deinitialize", function (inst)
 	end
 	for k, v in pairs(inst.data.material.htmlpanels) do
 		html_panel_bank:free(inst.player, k)
-		k:Hide()
 		inst.data.material.htmlpanels[k] = nil
+	end
+	for k, v in pairs(inst.data.material.htmlpanelstextures) do
+		inst.data.material.htmlpanelstextures[k] = nil
 	end
 end)
 
@@ -170,43 +183,6 @@ function material_library.createFromImage(path, params)
 	local m = Material(path, table.concat(paramlist, " "))
 	if m:IsError() then SF.Throw("The material path is invalid", 2) end
 	return lwrap(m)
-end
-
-local LoadingTextureQueue = {}
-local function NextInTextureQueue()
-	local requestTbl = LoadingTextureQueue[1]
-	if requestTbl then
-		table.remove(LoadingTextureQueue, 1)
-		if requestTbl.Instance.error then
-			-- Chip already deinitialized so don't need to free anything
-			NextInTextureQueue()
-			return
-		end
-
-		local function applyTexture(w, h)
-			if not requestTbl.Instance.error then
-				local mat = requestTbl.Panel:GetHTMLMaterial()
-				if not mat then timer.Simple(0.1, function() applyTexture(w,h) end) return end
-				requestTbl.Material:SetTexture(requestTbl.Target, mat:GetTexture("$basetexture"))
-				if requestTbl.Callback then requestTbl.Callback(w, h) end
-				timer.Simple(0.1, function() requestTbl.Panel:Hide() end)
-			end
-			NextInTextureQueue()
-		end
-
-		requestTbl.Panel:AddFunction("sf", "imageLoaded", applyTexture)
-		requestTbl.Panel:RunJavascript([[img.src = "]] .. requestTbl.Url .. [[";]])
-		requestTbl.Panel:Show()
-
-		timer.Create("SF_URLTextureTimeout", 10, 1, function()
-			html_panel_bank:free(requestTbl.Instance.player, requestTbl.Panel)
-			requestTbl.Instance.data.material.htmlpanels[requestTbl.Panel] = nil
-			requestTbl.Panel:Hide()
-			NextInTextureQueue()
-		end)
-	else
-		timer.Remove("SF_URLTextureTimeout")
-	end
 end
 
 --- Free's a user created material allowing you to create others
@@ -458,6 +434,44 @@ function material_methods:setTexture(key, v)
 	unwrap(self):SetTexture(key, v)
 end
 
+local LoadingTextureQueue = {}
+local function NextInTextureQueue()
+	local requestTbl = LoadingTextureQueue[1]
+	if requestTbl then
+		table.remove(LoadingTextureQueue, 1)
+		if requestTbl.Instance.error then
+			-- Chip already deinitialized so don't need to free anything
+			NextInTextureQueue()
+			return
+		end
+
+		local function applyTexture(w, h)
+			if not requestTbl.Instance.error then
+				local mat = requestTbl.Panel:GetHTMLMaterial()
+				if not mat then timer.Simple(0.1, function() applyTexture(w,h) end) return end
+				local texture = mat:GetTexture("$basetexture")
+				requestTbl.Instance.data.material.htmlpanelstextures[texture:GetName()] = requestTbl.Panel
+				requestTbl.Material:SetTexture(requestTbl.Target, texture)
+				if requestTbl.Callback then requestTbl.Callback(w, h) end
+				-- timer.Simple(0.1, function() requestTbl.Panel:Hide() end)
+			end
+			NextInTextureQueue()
+		end
+
+		requestTbl.Panel:AddFunction("sf", "imageLoaded", applyTexture)
+		requestTbl.Panel:RunJavascript([[img.style.left="0px";img.style.top="0px";img.src="]] .. requestTbl.Url .. [[";]])
+		requestTbl.Panel:Show()
+
+		timer.Create("SF_URLTextureTimeout", 10, 1, function()
+			html_panel_bank:free(requestTbl.Instance.player, requestTbl.Panel)
+			requestTbl.Instance.data.material.htmlpanels[requestTbl.Panel] = nil
+			NextInTextureQueue()
+		end)
+	else
+		timer.Remove("SF_URLTextureTimeout")
+	end
+end
+
 function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 	checktype(self, material_metamethods)
 	checkluatype(key, TYPE_STRING)
@@ -496,11 +510,47 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 		Target = key,
 		Url = url
 	}
-	if cb then requestTbl.Callback = function(w, h) instance:runFunction(cb, self, url, w, h) end end
+	if cb then
+		requestTbl.Callback = function(w, h)
+			instance:runFunction(cb, self, url, w, h, function(x,y,w,h)
+				checkluatype(x, TYPE_NUMBER)
+				checkluatype(y, TYPE_NUMBER)
+				checkluatype(w, TYPE_NUMBER)
+				checkluatype(h, TYPE_NUMBER)
+				if not instance.data.material.htmlpanels[Panel] then SF.Throw("Tried to use an invalid panel", 2) end
+				Panel:RunJavascript([[img.style.position='absolute';img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;]])
+				-- Panel:Show()
+				-- timer.Simple(0.2, function() Panel:Hide() end)
+			end)
+		end
+	end
+	
 	local inqueue = #LoadingTextureQueue
 	LoadingTextureQueue[inqueue + 1] = requestTbl
 	if inqueue == 0 then timer.Simple(0, NextInTextureQueue) end
 end
+
+--- Frees a url texture so that another can be used
+-- @param key The material key where the texture is stored
+function material_methods:freeTextureURL(key)
+	checktype(self, material_metamethods)
+	checkluatype(key, TYPE_STRING)
+	
+	local m = unwrap(self)
+	local tex = m:GetTexture(key)
+	if not tex then SF.Throw("The texture at "..key.." isn't defined", 2) end
+	
+	local instance = SF.instance
+	
+	local name = tex:GetName()
+	local Panel = instance.data.material.htmlpanelstextures[name]
+	if not Panel then SF.Throw("The texture isn't a url texture", 2) end
+	m:SetUndefined(key)
+	instance.data.material.htmlpanelstextures[name] = nil
+	instance.data.material.htmlpanels[Panel] = nil
+	html_panel_bank:free(instance.player, Panel)
+end
+
 
 --- Sets a keyvalue to be undefined
 -- @param key The key name to set

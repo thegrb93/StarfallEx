@@ -108,12 +108,14 @@ SF.ResourceHandler = {
 		if not self.objects[t][object] then
 			if ply then self.players[ply] = self.players[ply] - 1 end
 			self.objects[t][object] = true
+			if self.destructor then self.destructor(object) end
 		end
 	end,
-	__call = function(p, max, allocator, typer)
+	__call = function(p, max, allocator, typer, destructor)
 		local t = {
 			n = 0,
 			allocator = allocator,
+			destructor = destructor,
 			typer = typer,
 			objects = {},
 			players = setmetatable({},{__mode="k"}),
