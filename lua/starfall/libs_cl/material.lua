@@ -56,7 +56,7 @@ local allowed_shaders = {
 }
 local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function(shader, i)
-		return CreateMaterial("SF_TEXTURE_" .. i, shader, {})
+		return CreateMaterial("sf_material_" .. shader .. "_" .. i, shader, {})
 	end,
 	FindMetaTable("IMaterial").GetShader,
 	function(material)
