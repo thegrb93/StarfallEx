@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Library constraint :: StarfallEx Reference</title>
+		<title>Library material :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -27,7 +27,7 @@
 						
 						<li><a href="../libraries/bass.html">bass</a></li>
 						<li><a href="../libraries/builtin.html">builtin</a></li>
-						<li><a>constraint</a></li>
+						<li><a href="../libraries/constraint.html">constraint</a></li>
 						<li><a href="../libraries/coroutine.html">coroutine</a></li>
 						<li><a href="../libraries/fastlz.html">fastlz</a></li>
 						<li><a href="../libraries/file.html">file</a></li>
@@ -39,7 +39,7 @@
 						<li><a href="../libraries/input.html">input</a></li>
 						<li><a href="../libraries/joystick.html">joystick</a></li>
 						<li><a href="../libraries/json.html">json</a></li>
-						<li><a href="../libraries/material.html">material</a></li>
+						<li><a>material</a></li>
 						<li><a href="../libraries/mesh.html">mesh</a></li>
 						<li><a href="../libraries/net.html">net</a></li>
 						<li><a href="../libraries/particle.html">particle</a></li>
@@ -179,9 +179,9 @@
 		</nav>
 		<main>
 
-<h1>Library <tt>constraint</tt></h1>
+<h1>Library <tt>material</tt></h1>
 <p>
-Library for creating and manipulating constraints.</p>
+`material` library is allows creating material objects which are used for controlling shaders in rendering.</p>
 
 
 
@@ -192,69 +192,20 @@ Library for creating and manipulating constraints.</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.axis">axis</a>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#material.create">create</a>( shader&nbsp;)</td>
 			<td class="summary">
-Axis two entities </td>
+Creates a new blank material </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.ballsocket">ballsocket</a>( e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#material.createFromImage">createFromImage</a>( path, params&nbsp;)</td>
 			<td class="summary">
-Ballsocket two entities </td>
+Creates a .jpg or .png material from file 
+Can't be modified </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.ballsocketadv">ballsocketadv</a>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#material.load">load</a>( path&nbsp;)</td>
 			<td class="summary">
-Advanced Ballsocket two entities </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.breakAll">breakAll</a>( e&nbsp;)</td>
-			<td class="summary">
-Breaks all constraints on an entity </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.breakType">breakType</a>( e, typename&nbsp;)</td>
-			<td class="summary">
-Breaks all constraints of a certain type on an entity </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.elastic">elastic</a>( index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech&nbsp;)</td>
-			<td class="summary">
-Elastic two entities </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.getTable">getTable</a>( ent&nbsp;)</td>
-			<td class="summary">
-Returns the table of constraints on an entity </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.nocollide">nocollide</a>( e1, e2, bone1, bone2&nbsp;)</td>
-			<td class="summary">
-Nocollides two entities </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.rope">rope</a>( index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid&nbsp;)</td>
-			<td class="summary">
-Ropes two entities </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.setElasticLength">setElasticLength</a>( index, e, length&nbsp;)</td>
-			<td class="summary">
-Sets the length of an elastic attached to the entity </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.setRopeLength">setRopeLength</a>( index, e, length&nbsp;)</td>
-			<td class="summary">
-Sets the length of a rope attached to the entity </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.slider">slider</a>( e1, e2, bone1, bone2, v1, v2, width&nbsp;)</td>
-			<td class="summary">
-Sliders two entities </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.weld">weld</a>( e1, e2, bone1, bone2, force_lim, nocollide&nbsp;)</td>
-			<td class="summary">
-Welds two entities </td>
+Loads a .vmt material or existing material.</td>
 		</tr>
 	</table>
 </section>
@@ -266,27 +217,17 @@ Welds two entities </td>
 	<dl>
 		
 		
-<dt><span class="realm_sv"></span><a name="constraint.axis"></a><strong>constraint.axis</strong>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="material.create"></a><strong>material.create</strong>( shader&nbsp;)</dt>
 <dd>
 	<p>
-Axis two entities</p>
+Creates a new blank material</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>torque_lim</tt></li>
-			<li><tt>friction</tt></li>
-			<li><tt>nocollide</tt></li>
-			<li><tt>laxis</tt></li>
+			<li><tt>shader</tt> ― The shader of the material. (UnlitGeneric or VertexLitGeneric)</li>
 		</ul>
 	</section>
 	
@@ -295,24 +236,19 @@ Axis two entities</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.ballsocket"></a><strong>constraint.ballsocket</strong>( e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="material.createFromImage"></a><strong>material.createFromImage</strong>( path, params&nbsp;)</dt>
 <dd>
 	<p>
-Ballsocket two entities</p>
+Creates a .jpg or .png material from file 
+Can't be modified</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>torque_lim</tt></li>
-			<li><tt>nocollide</tt></li>
+			<li><tt>path</tt> ― The path to the image file</li>
+			<li><tt>params</tt> ― The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters</li>
 		</ul>
 	</section>
 	
@@ -321,117 +257,19 @@ Ballsocket two entities</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.ballsocketadv"></a><strong>constraint.ballsocketadv</strong>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="material.load"></a><strong>material.load</strong>( path&nbsp;)</dt>
 <dd>
 	<p>
-Advanced Ballsocket two entities</p>
+Loads a .vmt material or existing material. Throws an error if the material fails to load 
+Existing created materials can be loaded with ! prepended to the name 
+Can't be modified</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>torque_lim</tt></li>
-			<li><tt>minv</tt></li>
-			<li><tt>maxv</tt></li>
-			<li><tt>frictionv</tt></li>
-			<li><tt>rotateonly</tt></li>
-			<li><tt>nocollide</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.breakAll"></a><strong>constraint.breakAll</strong>( e&nbsp;)</dt>
-<dd>
-	<p>
-Breaks all constraints on an entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.breakType"></a><strong>constraint.breakType</strong>( e, typename&nbsp;)</dt>
-<dd>
-	<p>
-Breaks all constraints of a certain type on an entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e</tt></li>
-			<li><tt>typename</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.elastic"></a><strong>constraint.elastic</strong>( index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech&nbsp;)</dt>
-<dd>
-	<p>
-Elastic two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>index</tt></li>
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>const</tt></li>
-			<li><tt>damp</tt></li>
-			<li><tt>rdamp</tt></li>
-			<li><tt>width</tt></li>
-			<li><tt>strech</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.getTable"></a><strong>constraint.getTable</strong>( ent&nbsp;)</dt>
-<dd>
-	<p>
-Returns the table of constraints on an entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>ent</tt> ― The entity</li>
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
 		</ul>
 	</section>
 	
@@ -439,153 +277,9 @@ Returns the table of constraints on an entity</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Table of entity constraints</p>
+		<p>The material object. Can't be modified.</p>
 		
 	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.nocollide"></a><strong>constraint.nocollide</strong>( e1, e2, bone1, bone2&nbsp;)</dt>
-<dd>
-	<p>
-Nocollides two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.rope"></a><strong>constraint.rope</strong>( index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid&nbsp;)</dt>
-<dd>
-	<p>
-Ropes two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>index</tt></li>
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>length</tt></li>
-			<li><tt>addlength</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>width</tt></li>
-			<li><tt>material</tt></li>
-			<li><tt>rigid</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.setElasticLength"></a><strong>constraint.setElasticLength</strong>( index, e, length&nbsp;)</dt>
-<dd>
-	<p>
-Sets the length of an elastic attached to the entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>index</tt></li>
-			<li><tt>e</tt></li>
-			<li><tt>length</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.setRopeLength"></a><strong>constraint.setRopeLength</strong>( index, e, length&nbsp;)</dt>
-<dd>
-	<p>
-Sets the length of a rope attached to the entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>index</tt></li>
-			<li><tt>e</tt></li>
-			<li><tt>length</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.slider"></a><strong>constraint.slider</strong>( e1, e2, bone1, bone2, v1, v2, width&nbsp;)</dt>
-<dd>
-	<p>
-Sliders two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>width</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.weld"></a><strong>constraint.weld</strong>( e1, e2, bone1, bone2, force_lim, nocollide&nbsp;)</dt>
-<dd>
-	<p>
-Welds two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e1</tt> ― The first entity</li>
-			<li><tt>e2</tt> ― The second entity</li>
-			<li><tt>bone1</tt> ― Number bone of the first entity</li>
-			<li><tt>bone2</tt> ― Number bone of the second entity</li>
-			<li><tt>force_lim</tt> ― Max force the weld can take before breaking</li>
-			<li><tt>nocollide</tt> ― Bool whether or not to nocollide the two entities</li>
-		</ul>
-	</section>
-	
-	
 	
 	
 </dd>

@@ -39,6 +39,7 @@
 						<li><a href="../libraries/input.html">input</a></li>
 						<li><a href="../libraries/joystick.html">joystick</a></li>
 						<li><a href="../libraries/json.html">json</a></li>
+						<li><a href="../libraries/material.html">material</a></li>
 						<li><a href="../libraries/mesh.html">mesh</a></li>
 						<li><a href="../libraries/net.html">net</a></li>
 						<li><a href="../libraries/particle.html">particle</a></li>
@@ -64,6 +65,7 @@
 						<li><a href="../classes/Entity.html">Entity</a></li>
 						<li><a href="../classes/File.html">File</a></li>
 						<li><a href="../classes/Hologram.html">Hologram</a></li>
+						<li><a href="../classes/Material.html">Material</a></li>
 						<li><a href="../classes/Mesh.html">Mesh</a></li>
 						<li><a href="../classes/Npc.html">Npc</a></li>
 						<li><a href="../classes/Particle.html">Particle</a></li>
@@ -242,7 +244,7 @@ Gets a 2D cursor position where ply is aiming.</td>
 Releases the rendertarget.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.destroyTexture">destroyTexture</a>( id&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#render.destroyTexture">destroyTexture</a>( mat&nbsp;)</td>
 			<td class="summary">
 Releases the texture.</td>
 		</tr>
@@ -372,11 +374,6 @@ Gets the default font </td>
 Returns width and height of the game window </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.getRenderTargetMaterial">getRenderTargetMaterial</a>( name&nbsp;)</td>
-			<td class="summary">
-Returns the model material name that uses the render target.</td>
-		</tr>
-		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.getResolution">getResolution</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the render context's width and height </td>
@@ -472,6 +469,11 @@ Sets the texture filtering function when viewing a far texture </td>
 Sets the font </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterial">setMaterial</a>( mat&nbsp;)</td>
+			<td class="summary">
+Sets the current render material </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.setRGBA">setRGBA</a>( r, g, b, a&nbsp;)</td>
 			<td class="summary">
 Sets the draw color by RGBA values </td>
@@ -522,9 +524,9 @@ Sets the unsigned 8-bit write bitflag mask to be used for any writes to the sten
 Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.setTexture">setTexture</a>( id&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setTexture">setTexture</a>( mat&nbsp;)</td>
 			<td class="summary">
-Sets the texture </td>
+Sets the current render material </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.setTextureFromScreen">setTextureFromScreen</a>( ent&nbsp;)</td>
@@ -766,7 +768,7 @@ Releases the rendertarget. Required if you reach the maximum rendertargets.</p>
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.destroyTexture"></a><strong>render.destroyTexture</strong>( id&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="render.destroyTexture"></a><strong>render.destroyTexture</strong>( mat&nbsp;)</dt>
 <dd>
 	<p>
 Releases the texture. Required if you reach the maximum url textures.</p>
@@ -776,7 +778,7 @@ Releases the texture. Required if you reach the maximum url textures.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>id</tt> ― Texture table. Aquired with render.getTextureID</li>
+			<li><tt>mat</tt> ― The material object</li>
 		</ul>
 	</section>
 	
@@ -1323,31 +1325,6 @@ Returns width and height of the game window</p>
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.getRenderTargetMaterial"></a><strong>render.getRenderTargetMaterial</strong>( name&nbsp;)</dt>
-<dd>
-	<p>
-Returns the model material name that uses the render target.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>name</tt> ― Render target name</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Model material name. use ent:setMaterial in clientside to set the entity's material to this</p>
-		
-	</section>
-	
-	
-</dd>
-		
 <dt><span class="realm_cl"></span><a name="render.getResolution"></a><strong>render.getResolution</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1453,9 +1430,9 @@ Make sure to store the texture to use it rather than calling this slow function 
 		<ul>
 			
 			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
-			<li><tt>cb</tt> ― Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url</li>
-			<li><tt>alignment</tt> ― Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp</li>
-			<li><tt>skip_hack</tt> ― Turns off texture hack so you can use UVs on 3D objects</li>
+			<li><tt>cb</tt> ― Optional callback for when a url texture finishes loading. Arguements are The material table and the url</li>
+			<li><tt>alignment</tt></li>
+			<li><tt>skip_hack</tt></li>
 		</ul>
 	</section>
 	
@@ -1463,7 +1440,7 @@ Make sure to store the texture to use it rather than calling this slow function 
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.</p>
+		<p>The material. Use it with render.setTexture. Returns nil if max url textures is reached.</p>
 		
 	</section>
 	
@@ -1760,6 +1737,25 @@ Sets the font</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.setMaterial"></a><strong>render.setMaterial</strong>( mat&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current render material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― The material object</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.setRGBA"></a><strong>render.setRGBA</strong>( r, g, b, a&nbsp;)</dt>
 <dd>
 	<p>
@@ -1954,17 +1950,17 @@ Sets the operation to be performed on the stencil buffer values if the stencil t
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.setTexture"></a><strong>render.setTexture</strong>( id&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="render.setTexture"></a><strong>render.setTexture</strong>( mat&nbsp;)</dt>
 <dd>
 	<p>
-Sets the texture</p>
+Sets the current render material</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>id</tt> ― Texture table. Aquired with render.getTextureID</li>
+			<li><tt>mat</tt> ― The material object</li>
 		</ul>
 	</section>
 	

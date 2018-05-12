@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Library constraint :: StarfallEx Reference</title>
+		<title>Material :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -27,7 +27,7 @@
 						
 						<li><a href="../libraries/bass.html">bass</a></li>
 						<li><a href="../libraries/builtin.html">builtin</a></li>
-						<li><a>constraint</a></li>
+						<li><a href="../libraries/constraint.html">constraint</a></li>
 						<li><a href="../libraries/coroutine.html">coroutine</a></li>
 						<li><a href="../libraries/fastlz.html">fastlz</a></li>
 						<li><a href="../libraries/file.html">file</a></li>
@@ -65,7 +65,7 @@
 						<li><a href="../classes/Entity.html">Entity</a></li>
 						<li><a href="../classes/File.html">File</a></li>
 						<li><a href="../classes/Hologram.html">Hologram</a></li>
-						<li><a href="../classes/Material.html">Material</a></li>
+						<li><a>Material</a></li>
 						<li><a href="../classes/Mesh.html">Mesh</a></li>
 						<li><a href="../classes/Npc.html">Npc</a></li>
 						<li><a href="../classes/Particle.html">Particle</a></li>
@@ -179,259 +179,164 @@
 		</nav>
 		<main>
 
-<h1>Library <tt>constraint</tt></h1>
+<h1><tt>Material</tt> type</h1>
 <p>
-Library for creating and manipulating constraints.</p>
+The `Material` type is used to control shaders in rendering.</p>
 
 
 
 
 
-<section class="functions">
-	<h2>Functions</h2>
+<section class="methods">
+	<h2>Methods</h2>
 	<table class="list">
-	
+		
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.axis">axis</a>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:destroy">destroy</a>( &nbsp;)</td>
 			<td class="summary">
-Axis two entities </td>
+Free's a user created material allowing you to create others </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.ballsocket">ballsocket</a>( e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getColor">getColor</a>( x, y&nbsp;)</td>
 			<td class="summary">
-Ballsocket two entities </td>
+Returns a color pixel value of the $basetexture a .png or .jpg material.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.ballsocketadv">ballsocketadv</a>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getFloat">getFloat</a>( key&nbsp;)</td>
 			<td class="summary">
-Advanced Ballsocket two entities </td>
+Returns a float keyvalue </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.breakAll">breakAll</a>( e&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getHeight">getHeight</a>( &nbsp;)</td>
 			<td class="summary">
-Breaks all constraints on an entity </td>
+Gets the base texture set to the material's height </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.breakType">breakType</a>( e, typename&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getInt">getInt</a>( key&nbsp;)</td>
 			<td class="summary">
-Breaks all constraints of a certain type on an entity </td>
+Returns an int keyvalue </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.elastic">elastic</a>( index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getKeyValues">getKeyValues</a>( &nbsp;)</td>
 			<td class="summary">
-Elastic two entities </td>
+Returns a table of material keyvalues </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.getTable">getTable</a>( ent&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getMatrix">getMatrix</a>( key&nbsp;)</td>
 			<td class="summary">
-Returns the table of constraints on an entity </td>
+Returns a matrix keyvalue </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.nocollide">nocollide</a>( e1, e2, bone1, bone2&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getName">getName</a>( &nbsp;)</td>
 			<td class="summary">
-Nocollides two entities </td>
+Returns the material's engine name </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.rope">rope</a>( index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getShader">getShader</a>( &nbsp;)</td>
 			<td class="summary">
-Ropes two entities </td>
+Returns the shader name of the material </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.setElasticLength">setElasticLength</a>( index, e, length&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getString">getString</a>( key&nbsp;)</td>
 			<td class="summary">
-Sets the length of an elastic attached to the entity </td>
+Returns a string keyvalue </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.setRopeLength">setRopeLength</a>( index, e, length&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getTexture">getTexture</a>( key&nbsp;)</td>
 			<td class="summary">
-Sets the length of a rope attached to the entity </td>
+Returns a texture id keyvalue </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.slider">slider</a>( e1, e2, bone1, bone2, v1, v2, width&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getVector">getVector</a>( key&nbsp;)</td>
 			<td class="summary">
-Sliders two entities </td>
+Returns a vector keyvalue </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#constraint.weld">weld</a>( e1, e2, bone1, bone2, force_lim, nocollide&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getVectorLinear">getVectorLinear</a>( key&nbsp;)</td>
 			<td class="summary">
-Welds two entities </td>
+Returns a linear color-corrected vector keyvalue </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:getWidth">getWidth</a>( &nbsp;)</td>
+			<td class="summary">
+Gets the base texture set to the material's width </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setFloat">setFloat</a>( key, v&nbsp;)</td>
+			<td class="summary">
+Sets a float keyvalue </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setInt">setInt</a>( key, v&nbsp;)</td>
+			<td class="summary">
+Sets an int keyvalue </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setMatrix">setMatrix</a>( key, v&nbsp;)</td>
+			<td class="summary">
+Sets a matrix keyvalue </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setString">setString</a>( key, v&nbsp;)</td>
+			<td class="summary">
+Sets a string keyvalue </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setTexture">setTexture</a>( key, v&nbsp;)</td>
+			<td class="summary">
+Sets a texture keyvalue </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setTextureRenderTarget">setTextureRenderTarget</a>( key, name&nbsp;)</td>
+			<td class="summary">
+Sets a rendertarget texture to the specified texture key </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setTextureURL">setTextureURL</a>( key, url, cb&nbsp;)</td>
+			<td class="summary">
+Loads an online image or base64 data to the specified texture key </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setUndefined">setUndefined</a>( key&nbsp;)</td>
+			<td class="summary">
+Sets a keyvalue to be undefined </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Material:setVector">setVector</a>( key, v&nbsp;)</td>
+			<td class="summary">
+Sets a vector keyvalue </td>
 		</tr>
 	</table>
 </section>
-
-
-
-<section class="functions_def">
-	<h2><a name="functions_def"></a>Functions definition</h2>
+<section class="methods_def">
+	<h2><a name="methods_def"></a>Methods definition</h2>
 	<dl>
 		
 		
-<dt><span class="realm_sv"></span><a name="constraint.axis"></a><strong>constraint.axis</strong>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:destroy"></a><strong>Material:destroy</strong>( &nbsp;)</dt>
 <dd>
 	<p>
-Axis two entities</p>
+Free's a user created material allowing you to create others</p>
 	
 	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>torque_lim</tt></li>
-			<li><tt>friction</tt></li>
-			<li><tt>nocollide</tt></li>
-			<li><tt>laxis</tt></li>
-		</ul>
-	</section>
 	
 	
 	
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.ballsocket"></a><strong>constraint.ballsocket</strong>( e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:getColor"></a><strong>Material:getColor</strong>( x, y&nbsp;)</dt>
 <dd>
 	<p>
-Ballsocket two entities</p>
+Returns a color pixel value of the $basetexture a .png or .jpg material.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>torque_lim</tt></li>
-			<li><tt>nocollide</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.ballsocketadv"></a><strong>constraint.ballsocketadv</strong>( e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide&nbsp;)</dt>
-<dd>
-	<p>
-Advanced Ballsocket two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>torque_lim</tt></li>
-			<li><tt>minv</tt></li>
-			<li><tt>maxv</tt></li>
-			<li><tt>frictionv</tt></li>
-			<li><tt>rotateonly</tt></li>
-			<li><tt>nocollide</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.breakAll"></a><strong>constraint.breakAll</strong>( e&nbsp;)</dt>
-<dd>
-	<p>
-Breaks all constraints on an entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.breakType"></a><strong>constraint.breakType</strong>( e, typename&nbsp;)</dt>
-<dd>
-	<p>
-Breaks all constraints of a certain type on an entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>e</tt></li>
-			<li><tt>typename</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.elastic"></a><strong>constraint.elastic</strong>( index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech&nbsp;)</dt>
-<dd>
-	<p>
-Elastic two entities</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>index</tt></li>
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>const</tt></li>
-			<li><tt>damp</tt></li>
-			<li><tt>rdamp</tt></li>
-			<li><tt>width</tt></li>
-			<li><tt>strech</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="constraint.getTable"></a><strong>constraint.getTable</strong>( ent&nbsp;)</dt>
-<dd>
-	<p>
-Returns the table of constraints on an entity</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>ent</tt> ― The entity</li>
+			<li><tt>x</tt> ― The x coordinate of the pixel</li>
+			<li><tt>y</tt> ― The y coordinate of the pixel</li>
 		</ul>
 	</section>
 	
@@ -439,27 +344,290 @@ Returns the table of constraints on an entity</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Table of entity constraints</p>
+		<p>The color value</p>
 		
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.nocollide"></a><strong>constraint.nocollide</strong>( e1, e2, bone1, bone2&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:getFloat"></a><strong>Material:getFloat</strong>( key&nbsp;)</dt>
 <dd>
 	<p>
-Nocollides two entities</p>
+Returns a float keyvalue</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
+			<li><tt>key</tt> ― The key to get the float from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The float value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getHeight"></a><strong>Material:getHeight</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets the base texture set to the material's height</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The basetexture's height</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getInt"></a><strong>Material:getInt</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Returns an int keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key to get the int from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The int value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getKeyValues"></a><strong>Material:getKeyValues</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns a table of material keyvalues</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The table of keyvalues</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getMatrix"></a><strong>Material:getMatrix</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a matrix keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key to get the matrix from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The matrix value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getName"></a><strong>Material:getName</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the material's engine name</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getShader"></a><strong>Material:getShader</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the shader name of the material</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The shader name of the material</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getString"></a><strong>Material:getString</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a string keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key to get the string from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getTexture"></a><strong>Material:getTexture</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a texture id keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key to get the texture from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string id of the texture or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getVector"></a><strong>Material:getVector</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a vector keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key to get the vector from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string id of the texture</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getVectorLinear"></a><strong>Material:getVectorLinear</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a linear color-corrected vector keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key to get the vector from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The vector value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:getWidth"></a><strong>Material:getWidth</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets the base texture set to the material's width</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The basetexture's width</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:setFloat"></a><strong>Material:setFloat</strong>( key, v&nbsp;)</dt>
+<dd>
+	<p>
+Sets a float keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key name to set</li>
+			<li><tt>v</tt> ― The value to set it to</li>
 		</ul>
 	</section>
 	
@@ -468,29 +636,18 @@ Nocollides two entities</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.rope"></a><strong>constraint.rope</strong>( index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:setInt"></a><strong>Material:setInt</strong>( key, v&nbsp;)</dt>
 <dd>
 	<p>
-Ropes two entities</p>
+Sets an int keyvalue</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>index</tt></li>
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>length</tt></li>
-			<li><tt>addlength</tt></li>
-			<li><tt>force_lim</tt></li>
-			<li><tt>width</tt></li>
-			<li><tt>material</tt></li>
-			<li><tt>rigid</tt></li>
+			<li><tt>key</tt> ― The key name to set</li>
+			<li><tt>v</tt> ― The value to set it to</li>
 		</ul>
 	</section>
 	
@@ -499,19 +656,18 @@ Ropes two entities</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.setElasticLength"></a><strong>constraint.setElasticLength</strong>( index, e, length&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:setMatrix"></a><strong>Material:setMatrix</strong>( key, v&nbsp;)</dt>
 <dd>
 	<p>
-Sets the length of an elastic attached to the entity</p>
+Sets a matrix keyvalue</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>index</tt></li>
-			<li><tt>e</tt></li>
-			<li><tt>length</tt></li>
+			<li><tt>key</tt> ― The key name to set</li>
+			<li><tt>v</tt> ― The value to set it to</li>
 		</ul>
 	</section>
 	
@@ -520,19 +676,18 @@ Sets the length of an elastic attached to the entity</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.setRopeLength"></a><strong>constraint.setRopeLength</strong>( index, e, length&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:setString"></a><strong>Material:setString</strong>( key, v&nbsp;)</dt>
 <dd>
 	<p>
-Sets the length of a rope attached to the entity</p>
+Sets a string keyvalue</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>index</tt></li>
-			<li><tt>e</tt></li>
-			<li><tt>length</tt></li>
+			<li><tt>key</tt> ― The key name to set</li>
+			<li><tt>v</tt> ― The value to set it to</li>
 		</ul>
 	</section>
 	
@@ -541,23 +696,18 @@ Sets the length of a rope attached to the entity</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.slider"></a><strong>constraint.slider</strong>( e1, e2, bone1, bone2, v1, v2, width&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:setTexture"></a><strong>Material:setTexture</strong>( key, v&nbsp;)</dt>
 <dd>
 	<p>
-Sliders two entities</p>
+Sets a texture keyvalue</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt></li>
-			<li><tt>e2</tt></li>
-			<li><tt>bone1</tt></li>
-			<li><tt>bone2</tt></li>
-			<li><tt>v1</tt></li>
-			<li><tt>v2</tt></li>
-			<li><tt>width</tt></li>
+			<li><tt>key</tt> ― The key name to set. $basetexture is the key name for most purposes.</li>
+			<li><tt>v</tt> ― The texture name to set it to.</li>
 		</ul>
 	</section>
 	
@@ -566,22 +716,78 @@ Sliders two entities</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="constraint.weld"></a><strong>constraint.weld</strong>( e1, e2, bone1, bone2, force_lim, nocollide&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Material:setTextureRenderTarget"></a><strong>Material:setTextureRenderTarget</strong>( key, name&nbsp;)</dt>
 <dd>
 	<p>
-Welds two entities</p>
+Sets a rendertarget texture to the specified texture key</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>e1</tt> ― The first entity</li>
-			<li><tt>e2</tt> ― The second entity</li>
-			<li><tt>bone1</tt> ― Number bone of the first entity</li>
-			<li><tt>bone2</tt> ― Number bone of the second entity</li>
-			<li><tt>force_lim</tt> ― Max force the weld can take before breaking</li>
-			<li><tt>nocollide</tt> ― Bool whether or not to nocollide the two entities</li>
+			<li><tt>key</tt> ― The key name to set. $basetexture is the key name for most purposes.</li>
+			<li><tt>name</tt> ― The name of the rendertarget</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:setTextureURL"></a><strong>Material:setTextureURL</strong>( key, url, cb&nbsp;)</dt>
+<dd>
+	<p>
+Loads an online image or base64 data to the specified texture key</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key name to set. $basetexture is the key name for most purposes.</li>
+			<li><tt>url</tt> ― The url or base64 data</li>
+			<li><tt>cb</tt> ― A callback called when loading is done. Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:setUndefined"></a><strong>Material:setUndefined</strong>( key&nbsp;)</dt>
+<dd>
+	<p>
+Sets a keyvalue to be undefined</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key name to set</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Material:setVector"></a><strong>Material:setVector</strong>( key, v&nbsp;)</dt>
+<dd>
+	<p>
+Sets a vector keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>key</tt> ― The key name to set</li>
+			<li><tt>v</tt> ― The value to set it to</li>
 		</ul>
 	</section>
 	
@@ -591,7 +797,6 @@ Welds two entities</p>
 </dd>
 	</dl>
 </section>
-
 		</main>
 		<footer>
 			<p>
