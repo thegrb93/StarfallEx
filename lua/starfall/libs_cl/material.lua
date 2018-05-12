@@ -100,7 +100,6 @@ end )
 SF.AddHook("initialize", function (inst)
 	inst.data.material = {
 		usermaterials = {},
-		usermaterialnames = {},
 		htmlpanels = {},
 		htmlpanelstextures = {}
 	}
@@ -108,11 +107,8 @@ end)
 
 SF.AddHook("deinitialize", function (inst)
 	for k, v in pairs(inst.data.material.usermaterials) do
-		material_bank:free(inst.player, v)
+		material_bank:free(inst.player, k)
 		inst.data.material.usermaterials[k] = nil
-	end
-	for k, v in pairs(inst.data.material.usermaterialnames) do
-		inst.data.material.usermaterialnames[k] = nil
 	end
 	for k, v in pairs(inst.data.material.htmlpanels) do
 		html_panel_bank:free(inst.player, k)
@@ -139,30 +135,17 @@ function material_library.load(path)
 end
 
 --- Creates a new blank material
--- @param name The name of the material
 -- @param shader The shader of the material. (UnlitGeneric or VertexLitGeneric)
 -- @param keyvalues A Keyvalue table to initialize the material with.
-function material_library.create(name, shader, keyvalues)
-	checkluatype(name, TYPE_STRING)
+function material_library.create(shader, keyvalues)
 	checkluatype(shader, TYPE_STRING)
 	local instance = SF.instance
 	checkpermission(instance, nil, "material.create")
-	if instance.data.material.usermaterials[name] then SF.Throw("The material name \""..name.."\" is already taken.", 2) end
 	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
 	local m = material_bank:use(instance.player, shader)
 	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
-	
-	local ret = wrap(m)
-	instance.data.material.usermaterials[name] = m
-	instance.data.material.usermaterialnames[ret] = name
-	return ret
-end
-
---- Gets a previously created material
--- @param name The name given to the material
-function material_library.get(name)
-	checkluatype(name, TYPE_STRING)
-	return wrap(SF.instance.data.material.usermaterials[name])
+	instance.data.material.usermaterials[m] = true
+	return wrap(m)
 end
 
 local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
@@ -190,19 +173,20 @@ function material_methods:destroy()
 	checktype(self, material_metamethods)
 
 	local instance = SF.instance
-	local name = instance.data.material.usermaterialnames[self]
-	if not name then SF.Throw("The material is already destroyed?", 2) end
+	local m = unwrap(self)
+	if not m then SF.Throw("The material is already destroyed?", 2) end
 	
 	local sensitive2sf, sf2sensitive = SF.GetWrapperTables(material_metamethods)
-	local m = sf2sensitive[self]
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
+	setmetatable(self, nil)
 	
-	instance.data.material.usermaterialnames[self] = nil
-	instance.data.material.usermaterials[name] = nil
+	instance.data.material.usermaterials[m] = nil
 	material_bank:free(instance.player, m)
 end
 function lmaterial_methods:destroy()
+	checktype(self, lmaterial_metamethods)
+	setmetatable(self, nil)
 end
 
 --- Returns the material's engine name
