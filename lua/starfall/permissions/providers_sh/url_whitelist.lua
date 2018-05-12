@@ -53,7 +53,7 @@ end
 ---  https://www.dropbox.com/s/abcd123/efg123.txt?dl=0
 ---  https://dl.dropboxusercontent.com/content_link/abc123/file?dl=1
 
-simple [[https://dl.dropboxusercontent.com]]
+simple [[dl.dropboxusercontent.com]]
 simple [[dl.dropbox.com]] --Sometimes redirects to usercontent link
 
 -- OneDrive
