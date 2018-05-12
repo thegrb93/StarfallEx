@@ -477,6 +477,14 @@ function SF.AddObjectUnwrapper(object_meta, unwrapper)
 	object_meta.__unwrap = unwrapper
 end
 
+--- Returns the wrapper table of a specified type
+-- @param meta The type's metatable
+-- @return The sf to sensitive wrapper table
+-- @return The sensitive to sf wrapper table
+function SF.GetWrapperTables(meta)
+	return sensitive2sf_tables[meta], sf2sensitive_tables[meta]
+end
+
 -- A list of safe data types
 local safe_types = {
 	["number"] = true,

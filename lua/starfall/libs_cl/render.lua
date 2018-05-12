@@ -12,7 +12,6 @@
 -- @class hook
 -- @client
 
-
 ---Called before drawing HUD (2D Context)
 -- @name predrawhud
 -- @class hook
@@ -598,30 +597,19 @@ end
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
 -- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
--- @param cb Optional callback for when a url texture finishes loading. param1 - The texture table, param2 - The texture url
--- @param alignment Optional alignment for the url texture. Default: "center", See http://www.w3schools.com/cssref/pr_background-position.asp
--- @param skip_hack Turns off texture hack so you can use UVs on 3D objects
--- @return Texture table. Use it with render.setTexture. Returns nil if max url textures is reached.
+-- @param cb Optional callback for when a url texture finishes loading. Arguements are The material table and the url
+-- @return The material. Use it with render.setTexture. Returns nil if max url textures is reached.
 function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	checkluatype (tx, TYPE_STRING)
 
 	local instance = SF.instance
-	
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
-		local m = instance.env.material.create(tx, cb, alignment, skip_hack)
+		local m = instance.env.material.create("SF_TEXTURE_" .. util.CRC(tx .. SysTime()), "UnlitGeneric")
+		m:setTextureURL("$basetexture", tx, cb)
+		return m
 	else
-		-- local id = surface.GetTextureID(tx)
-		-- if id then
-			-- local mat = Material(tx) -- Hacky way to get ITexture, if there is a better way - do it!
-			-- if mat:IsError() then SF.Throw("Invalid material path", 2) end
-			-- local cacheentry = sfCreateMaterial("SF_TEXTURE_" .. id, skip_hack)
-			-- cacheentry:SetTexture("$basetexture", mat:GetTexture("$basetexture"))
-
-			-- local tbl = {}
-			-- data.textures[tbl] = cacheentry
-			-- return tbl
-		-- end
+		return instance.env.material.load(tx)
 	end
 end
 

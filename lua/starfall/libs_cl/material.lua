@@ -90,6 +90,7 @@ end )
 SF.AddHook("initialize", function (inst)
 	inst.data.material = {
 		usermaterials = {},
+		usermaterialnames = {},
 		htmlpanels = {}
 	}
 end)
@@ -98,6 +99,9 @@ SF.AddHook("deinitialize", function (inst)
 	for k, v in pairs(inst.data.material.usermaterials) do
 		material_bank:free(inst.player, v)
 		inst.data.material.usermaterials[k] = nil
+	end
+	for k, v in pairs(inst.data.material.usermaterialnames) do
+		inst.data.material.usermaterialnames[k] = nil
 	end
 	for k, v in pairs(inst.data.material.htmlpanels) do
 		html_panel_bank:free(inst.player, k)
@@ -134,8 +138,11 @@ function material_library.create(name, shader, keyvalues)
 	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
 	local m = material_bank:use(instance.player, shader)
 	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
+	
+	local ret = wrap(m)
 	instance.data.material.usermaterials[name] = m
-	return wrap(m)
+	instance.data.material.usermaterialnames[ret] = name
+	return ret
 end
 
 --- Gets a previously created material
@@ -176,14 +183,12 @@ local function NextInTextureQueue()
 			return
 		end
 
-		local function applyTexture()
+		local function applyTexture(w, h)
 			if not requestTbl.Instance.error then
 				local mat = requestTbl.Panel:GetHTMLMaterial()
-				if not mat then timer.Simple(0.1, applyTexture) return end
+				if not mat then timer.Simple(0.1, function() applyTexture(w,h) end) return end
 				requestTbl.Material:SetTexture(requestTbl.Target, mat:GetTexture("$basetexture"))
-				if requestTbl.cb then
-					requestTbl.Instance:runFunction(requestTbl.cb, requestTbl.Tbl, requestTbl.Url)
-				end
+				if requestTbl.Callback then requestTbl.Callback(w, h) end
 				timer.Simple(0.1, function() requestTbl.Panel:Hide() end)
 			end
 			NextInTextureQueue()
@@ -202,6 +207,26 @@ local function NextInTextureQueue()
 	else
 		timer.Remove("SF_URLTextureTimeout")
 	end
+end
+
+--- Free's a user created material allowing you to create others
+function material_methods:destroy()
+	checktype(self, material_metamethods)
+
+	local instance = SF.instance
+	local name = instance.data.material.usermaterialnames[self]
+	if not name then SF.Throw("The material is already destroyed?", 2) end
+	
+	local sensitive2sf, sf2sensitive = SF.GetWrapperTables(material_metamethods)
+	local m = sf2sensitive[self]
+	sensitive2sf[m] = nil
+	sf2sensitive[self] = nil
+	
+	instance.data.material.usermaterialnames[self] = nil
+	instance.data.material.usermaterials[name] = nil
+	material_bank:free(instance.player, m)
+end
+function lmaterial_methods:destroy()
 end
 
 --- Returns the material's engine name
@@ -437,6 +462,7 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 	checktype(self, material_metamethods)
 	checkluatype(key, TYPE_STRING)
 	checkluatype(url, TYPE_STRING)
+	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
 
 	if #url > cv_max_data_material_size:GetInt() then
 		SF.Throw("Texture URL/Data too long!", 2)
@@ -463,8 +489,16 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 	if not Panel then SF.Throw("Maximum url textures exceeded.", 2) end
 	instance.data.material.htmlpanels[Panel] = true
 
+	requestTbl = {
+		Instance = instance,
+		Material = unwrap(self),
+		Panel = Panel,
+		Target = key,
+		Url = url
+	}
+	if cb then requestTbl.Callback = function(w, h) instance:runFunction(cb, self, url, w, h) end end
 	local inqueue = #LoadingTextureQueue
-	LoadingTextureQueue[inqueue + 1] = { Instance = instance, Tbl = self, Material = unwrap(self), Panel = Panel, Target = key, Url = url, cb = cb }
+	LoadingTextureQueue[inqueue + 1] = requestTbl
 	if inqueue == 0 then timer.Simple(0, NextInTextureQueue) end
 end
 
