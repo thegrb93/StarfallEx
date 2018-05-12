@@ -56,19 +56,21 @@ end
 
 --- Returns a class that can keep track of burst
 SF.BurstObject = {
-	use = function(self, amount)
-		self:check()
-		if self.val>= amount then
-			self.val = self.val - amount
-			return true
+	__index = {
+		use = function(self, amount)
+			self:check()
+			if self.val>= amount then
+				self.val = self.val - amount
+				return true
+			end
+			return false
+		end,
+		check = function(self)
+			self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
+			self.lasttick = CurTime()
+			return self.val
 		end
-		return false
-	end,
-	check = function(self)
-		self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
-		self.lasttick = CurTime()
-		return self.val
-	end,
+	},
 	__call = function(p, rate, max)
 		local t = {
 			rate = rate,
@@ -79,31 +81,78 @@ SF.BurstObject = {
 		return setmetatable(t, p)
 	end
 }
-SF.BurstObject.__index = SF.BurstObject
 setmetatable(SF.BurstObject, SF.BurstObject)
+
+
+--- Returns a class that can limit per player and recycle a indestructable resource
+SF.ResourceHandler = {
+	__index = {
+		use = function(self, ply, t)
+			if self:check(ply) then
+				self.objects[t] = self.objects[t] or {}
+				local obj = next(self.objects[t])
+				if obj then
+					self.objects[t][obj] = nil
+				else
+					self.n = self.n + 1
+					obj = self.allocator(t, self.n)
+				end
+				self.players[ply] = self.players[ply] + 1
+				return obj
+			end
+		end,
+		check = function(self, ply)
+			self.players[ply] = self.players[ply] or 0
+			return self.players[ply] < self.max
+		end,
+		free = function(self, ply, object)
+			local t = self.typer(object)
+			if not self.objects[t][object] then
+				if ply then self.players[ply] = self.players[ply] - 1 end
+				self.objects[t][object] = true
+				if self.destructor then self.destructor(object) end
+			end
+		end
+	},
+	__call = function(p, max, allocator, typer, destructor)
+		local t = {
+			n = 0,
+			allocator = allocator,
+			destructor = destructor,
+			typer = typer,
+			objects = {},
+			players = setmetatable({},{__mode="k"}),
+			max = max,
+		}
+		return setmetatable(t, p)
+	end
+}
+setmetatable(SF.ResourceHandler, SF.ResourceHandler)
 
 
 --- Returns a class that can whitelist/blacklist strings
 SF.StringRestrictor = {
-	check = function(self, value)
-		for k,v in pairs(self.blacklist) do
-			if string.match(value, v) then
-				return false
+	__index = {
+		check = function(self, value)
+			for k,v in pairs(self.blacklist) do
+				if string.match(value, v) then
+					return false
+				end
 			end
-		end
-		for k,v in pairs(self.whitelist) do
-			if string.match(value, v) then
-				return  true
+			for k,v in pairs(self.whitelist) do
+				if string.match(value, v) then
+					return  true
+				end
 			end
+			return self.default
+		end,
+		addWhitelistEntry = function(self, value)
+			table.insert(self.whitelist, value)
+		end,
+		addBlacklistEntry = function(self, value)
+			table.insert(self.blacklist, value)
 		end
-		return self.default
-	end,
-	addWhitelistEntry = function(self, value)
-		table.insert(self.whitelist, value)
-	end,
-	addBlacklistEntry = function(self, value)
-		table.insert(self.blacklist, value)
-	end,
+	},
 	__call = function(p, allowbydefault)
 		local t = {
 			whitelist = {}, -- patterns
@@ -113,7 +162,6 @@ SF.StringRestrictor = {
 		return setmetatable(t, p)
 	end
 }
-SF.StringRestrictor.__index = SF.StringRestrictor
 setmetatable(SF.StringRestrictor, SF.StringRestrictor)
 
 
@@ -275,22 +323,24 @@ function SF.CallHook(hookname, ...)
 	end
 end
 
+--- Throws a type error
+function SF.ThrowTypeError(expected, got, level)
+	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
+	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
+end
+
 --- Checks the starfall type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A metatable.
--- @param level Level at which to error at. 3 is added to this value. Default is 0.
+-- @param level Level at which to error at. 4 is added to this value. Default is 0.
 function SF.CheckType(val, typ, level)
 	local meta = dgetmeta(val)
 	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and SF.Types[meta]) then
 		return val
 	else
-		-- Failed, throw error
 		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
-
-		level = (level or 0) + 3
-		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-		local mt = getmetatable(val)
-		SF.Throw("Type mismatch (Expected " .. typ.__metatable .. ", got " .. (type(mt) == "string" and mt or type(val)) .. ") in function " .. funcname, level)
+		level = (level or 0) + 4
+		SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
 	end
 end
 
@@ -304,7 +354,7 @@ end
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
--- @param level Level at which to error at. 3 is added to this value. Default is 0.
+-- @param level Level at which to error at. 4 is added to this value. Default is 0.
 function SF.CheckLuaType(val, typ, level)
 	local valtype = TypeID(val)
 	if valtype == typ then
@@ -323,11 +373,28 @@ function SF.CheckLuaType(val, typ, level)
 			[TYPE_USERDATA] = "userdata"
 		}
 
-		level = (level or 0) + 3
-		local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-		local mt = getmetatable(val)
-		SF.Throw("Type mismatch (Expected " .. typeLookup[typ] .. ", got " .. (type(mt) == "string" and mt or typeLookup[valtype]) .. ") in function " .. funcname, level)
+		level = (level or 0) + 4
+		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
 	end
+end
+
+
+local shaderBlacklist = {
+	["LightmappedGeneric"] = true,
+}
+local materialBlacklist = {
+	["pp/copy"] = true,
+	["effects/ar2_altfire1"] = true,
+}
+--- Checks that the material isn't malicious
+-- @param material The path to the material
+-- @return The material object or false if it's invalid
+function SF.CheckMaterial(material)
+	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
+	if materialBlacklist[material] then return false end
+	local mat = Material(material)
+	if not mat:IsError() and shaderBlacklist[mat:GetShader()] then return false end
+	return mat
 end
 
 --- Gets the type of val.
@@ -413,6 +480,14 @@ end
 -- @param unwrapper function that unwraps object
 function SF.AddObjectUnwrapper(object_meta, unwrapper)
 	object_meta.__unwrap = unwrapper
+end
+
+--- Returns the wrapper table of a specified type
+-- @param meta The type's metatable
+-- @return The sf to sensitive wrapper table
+-- @return The sensitive to sf wrapper table
+function SF.GetWrapperTables(meta)
+	return sensitive2sf_tables[meta], sf2sensitive_tables[meta]
 end
 
 -- A list of safe data types
