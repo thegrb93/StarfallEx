@@ -136,8 +136,7 @@ end
 
 --- Creates a new blank material
 -- @param shader The shader of the material. (UnlitGeneric or VertexLitGeneric)
--- @param keyvalues A Keyvalue table to initialize the material with.
-function material_library.create(shader, keyvalues)
+function material_library.create(shader)
 	checkluatype(shader, TYPE_STRING)
 	local instance = SF.instance
 	checkpermission(instance, nil, "material.create")
@@ -437,7 +436,6 @@ local function NextInTextureQueue()
 				requestTbl.Instance.data.material.htmlpanelstextures[texture:GetName()] = requestTbl.Panel
 				requestTbl.Material:SetTexture(requestTbl.Target, texture)
 				if requestTbl.Callback then requestTbl.Callback(w, h) end
-				-- timer.Simple(0.1, function() requestTbl.Panel:Hide() end)
 			end
 			NextInTextureQueue()
 		end
@@ -503,8 +501,6 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 				checkluatype(h, TYPE_NUMBER)
 				if not instance.data.material.htmlpanels[Panel] then SF.Throw("Tried to use an invalid panel", 2) end
 				Panel:RunJavascript([[img.style.position='absolute';img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;]])
-				-- Panel:Show()
-				-- timer.Simple(0.2, function() Panel:Hide() end)
 			end)
 		end
 	end
