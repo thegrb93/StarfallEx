@@ -135,7 +135,7 @@ function material_library.create(name, shader, keyvalues)
 	local m = material_bank:use(instance.player, shader)
 	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
 	instance.data.material.usermaterials[name] = m
-	return lwrap(m)
+	return wrap(m)
 end
 
 --- Gets a previously created material
@@ -162,7 +162,7 @@ function material_library.createFromImage(path, params)
 	checkpermission(SF.instance, path, "material.imagecreate")
 	local m = Material(path, table.concat(paramlist, " "))
 	if m:IsError() then SF.Throw("The material path is invalid", 2) end
-	return wrap(m)
+	return lwrap(m)
 end
 
 local LoadingTextureQueue = {}
@@ -459,7 +459,7 @@ function material_methods:setTextureURL(key, url, cb, x, y, w, h)
 		checkpermission (instance, nil, "material.datacreate")
 		url = string.match(url, "data:image/[%w%+]+;base64,[%w/%+%=]+") -- No $ at end etc so there can be cariage return etc, we'll skip that part anyway
 		if not url then
-			SF.Throw("Texture data isnt proper base64 encoded image.", 2)
+			SF.Throw("Texture data isn't proper base64 encoded image.", 2)
 		end
 	end
 
