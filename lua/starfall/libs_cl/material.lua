@@ -329,8 +329,11 @@ end
 -- function material_methods:isError()
 -- end
 
--- function material_methods:recompute()
--- end
+--- Refreshes the material. Sometimes needed for certain parameters to update
+function material_methods:recompute()
+	checktype(self, material_metamethods)
+	unwrap(self):Recompute()
+end
 
 --- Sets a float keyvalue
 -- @param key The key name to set
@@ -550,7 +553,7 @@ end
 function material_methods:setVector(key, v)
 	checktype(self, material_metamethods)
 	checkluatype(key, TYPE_STRING)
-	checktype(v, vec_meta)
+	checktype(v, vector_meta)
 	unwrap(self):SetVector(key, vunwrap(v))
 end
 

@@ -4,90 +4,87 @@
 
 if SERVER then
 
-    local holo = holograms.create(chip():getPos(), chip():getAngles(), "models/Combine_Helicopter/helicopter_bomb01.mdl")
+	local holo = holograms.create(chip():getPos(), chip():getAngles(), "models/Combine_Helicopter/helicopter_bomb01.mdl")
 	holo:setNoDraw(true)
-    holo:setParent(chip())
-    hook.add("net","",function(name, len, pl)
-        holo:setMaterial(net.readString(), pl)
+	holo:setParent(chip())
+	hook.add("net","",function(name, len, pl)
+		holo:setMaterial(net.readString(), pl)
 		holo:setNoDraw(false)
-        net.start("sendholo")
-        net.writeEntity(holo)
-        net.send(pl)
-    end)
+		net.start("sendholo")
+		net.writeEntity(holo)
+		net.send(pl)
+	end)
 
 else
 
-    local texture, objdata, mymesh, holo
+	local texture, objdata, mymesh, holo
 
-    -- Used for setting up the hologram
-    hook.add("net","",function(name, len, pl)
-        local ent = net.readEntity()
-        ent:setHologramMesh(mymesh)
-        ent:setHologramRenderBounds(Vector(-200),Vector(200))
-    end)
+	-- Used for setting up the hologram
+	hook.add("net","",function(name, len, pl)
+		local ent = net.readEntity()
+		ent:setHologramMesh(mymesh)
+		ent:setHologramRenderBounds(Vector(-200),Vector(200))
+	end)
 
-    -- Renders the mesh using a HUD
-    local function renderHUD()
-        render.pushMatrix(chip():getMatrix(),true)
-        render.enableDepth(true)
-        render.setRenderTargetTexture("material")
-        mymesh:draw()
-        render.popMatrix()
-    end
+	-- Renders the mesh using a HUD
+	local function renderHUD()
+		render.pushMatrix(chip():getMatrix(),true)
+		render.enableDepth(true)
+		render.setRenderTargetTexture("material")
+		mymesh:draw()
+		render.popMatrix()
+	end
 
-    -- Render the mesh using a screen
-    local function renderScreen()
-        render.selectRenderTarget("mesh")
-        render.pushViewMatrix({type="3D", x=0, y=0, w=1024, h=1024, origin=Vector(-50,50,0), angles = Angle(0,0,0), aspect=1})
-        local rotation = Matrix()
-        rotation:rotate(Angle(timer.curtime()*10,0,0))
-        render.pushMatrix(rotation, true)
-        render.clear(Color(0,0,0,0),true)
-        render.enableDepth(true)
-        render.setRenderTargetTexture("material")
-        mymesh:draw()
-        render.popMatrix()
-        render.popViewMatrix()
-        render.selectRenderTarget()
+	-- Render the mesh using a screen
+	local function renderScreen()
+		render.selectRenderTarget("mesh")
+		render.pushViewMatrix({type="3D", x=0, y=0, w=1024, h=1024, origin=Vector(-50,50,0), angles = Angle(0,0,0), aspect=1})
+		local rotation = Matrix()
+		rotation:rotate(Angle(timer.curtime()*10,0,0))
+		render.pushMatrix(rotation, true)
+		render.clear(Color(0,0,0,0),true)
+		render.enableDepth(true)
+		render.setTexture(texture)
+		mymesh:draw()
+		render.popMatrix()
+		render.popViewMatrix()
+		render.selectRenderTarget()
 
-        render.enableDepth(false)
-        render.setRenderTargetTexture("mesh")
-        render.drawTexturedRect(0,0,512,512)
-    end
+		render.enableDepth(false)
+		render.setRenderTargetTexture("mesh")
+		render.drawTexturedRect(0,0,512,512)
+	end
 
-    local function init()
-        if not texture or not objdata then return end
+	local function init()
+		if not texture or not objdata then return end
 
-        render.createRenderTarget("mesh")
-        render.createRenderTarget("material")
-        hook.add("renderoffscreen","setup",function()
-            render.selectRenderTarget("material")
-            render.setTexture(texture)
-            render.clear()
-            render.drawTexturedRectUV(0,0,1024,1024,0,1,1,0)
-            render.selectRenderTarget()
+		local model_material = material.create("VertexLitGeneric")
+		model_material:setInt("$model",1)
+		model_material:setTexture("$basetexture",texture:getTexture("$basetexture"))
 
-            local start = mesh.trianglesLeft()
-            mymesh = mesh.createFromObj(objdata)
-            print("Used "..(start-mesh.trianglesLeft()).." triangles.")
+		render.createRenderTarget("mesh")
+		hook.add("renderoffscreen","setup",function()
+			local start = mesh.trianglesLeft()
+			mymesh = mesh.createFromObj(objdata)
+			print("Used "..(start-mesh.trianglesLeft()).." triangles.")
 
-            net.start("getholos")
-            net.writeString(render.getRenderTargetMaterial("material"))
-            net.send()
+			net.start("getholos")
+			net.writeString("!"..model_material:getName())
+			net.send()
 
-            hook.add("postdrawopaquerenderables","mesh",renderHUD)
-            hook.add("render","mesh",renderScreen)
-            hook.remove("renderoffscreen","setup")
-        end)
-    end
+			hook.add("postdrawopaquerenderables","mesh",renderHUD)
+			hook.add("render","mesh",renderScreen)
+			hook.remove("renderoffscreen","setup")
+		end)
+	end
 
-    render.getTextureID("https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0", function(tex)
-        texture = tex
-        init()
-    end, nil, true)
+	render.getTextureID("https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0", function(tex)
+		texture = tex
+		init()
+	end, nil, true)
 
-    http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(body)
-        objdata = body
-        init()
-    end)
+	http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(body)
+		objdata = body
+		init()
+	end)
 end
