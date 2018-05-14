@@ -250,7 +250,7 @@ Sets the whether an entity should be drawn or not";["fname"]="setNoDraw";["name"
 Sets the whether an entity should be drawn or not ";};["setNocollideAll"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Set's the entity to collide with nothing but the world";["fname"]="setNocollideAll";["name"]="ents_methods:setNocollideAll";["param"]={[1]="nocollide";["nocollide"]="Whether to collide with nothing except world or not.";};["private"]=false;["realm"]="sv";["summary"]="\
 Set's the entity to collide with nothing but the world ";};["setParent"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Parents the entity to another entity";["fname"]="setParent";["name"]="ents_methods:setParent";["param"]={[1]="ent";[2]="attachment";["attachment"]="Optional string attachment name to parent to";["ent"]="Entity to parent to";};["private"]=false;["realm"]="sv";["summary"]="\
+Parents the entity to another entity";["fname"]="setParent";["name"]="ents_methods:setParent";["param"]={[1]="ent";[2]="attachment";["attachment"]="Optional string attachment name to parent to";["ent"]="Entity to parent to. nil to unparent";};["private"]=false;["realm"]="sv";["summary"]="\
 Parents the entity to another entity ";};["setPhysMaterial"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Sets the physical material of the entity";["fname"]="setPhysMaterial";["name"]="ents_methods:setPhysMaterial";["param"]={[1]="mat";["mat"]="Material to use";};["private"]=false;["realm"]="sv";["summary"]="\
 Sets the physical material of the entity ";};["setPos"]={["class"]="function";["classlib"]="Entity";["description"]="\
