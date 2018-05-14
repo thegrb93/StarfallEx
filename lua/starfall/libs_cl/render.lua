@@ -118,7 +118,7 @@ SF.AddHook("postload", function()
 	aunwrap = SF.Angles.Unwrap
 	eunwrap = SF.Entities.Unwrap
 	maunwrap = SF.Materials.Unwrap
-	
+
 	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
 	end)
@@ -603,18 +603,15 @@ end
 function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	checkluatype (tx, TYPE_STRING)
 
-	local instance = SF.instance
+	local m = SF.instance.env.material.create("UnlitGeneric")
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
-		local m = instance.env.material.create("UnlitGeneric")
 		m:setTextureURL("$basetexture", tx, cb)
-		return m
 	else
-		local m = instance.env.material.create("UnlitGeneric")
 		m:setTexture("$basetexture", tx)
-		m:setInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
-		return m
 	end
+	m:setInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
+	return m
 end
 
 --- Releases the texture. Required if you reach the maximum url textures.
@@ -631,7 +628,7 @@ function render_library.setTexture(mat)
 	if mat then
 		local t = dgetmeta(mat)
 		if t~=mat_meta and t~=mat_meta2 then SF.ThrowTypeError("Material", SF.GetType(mat), 2) end
-		
+
 		local m = maunwrap(mat)
 		surface.SetMaterial(m)
 		render.SetMaterial(m)
@@ -659,7 +656,7 @@ function render_library.createRenderTarget (name)
 
 	local rt = rt_bank:use(instance.player, "RT")
 	if not rt then SF.Throw("Rendertarget limit reached", 2) end
-	
+
 	render.ClearRenderTarget(rt, Color(0, 0, 0))
 	data.rendertargets[name] = rt
 	data.validrendertargets[rt] = true
@@ -1280,6 +1277,36 @@ function render_library.draw3DQuad (vert1, vert2, vert3, vert4)
 	vert4 = vunwrap(vert4)
 
 	render.DrawQuad(vert1, vert2, vert3, vert4, currentcolor)
+end
+
+--- Draws 2 connected triangles with custom UVs.
+-- @param vert1 First vertex. {x, y, z, u, v}
+-- @param vert2 The second vertex.
+-- @param vert3 The third vertex.
+-- @param vert4 The fourth vertex.
+function render_library.draw3DQuadUV (vert1, vert2, vert3, vert4)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	mesh.Begin(MATERIAL_QUADS, 1)
+	local ok, err = pcall(function()
+		mesh.Position( Vector(vert1[1], vert1[2], vert1[3]) )
+		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.TexCoord( 0, vert1[4], vert1[5] )
+		mesh.AdvanceVertex()
+		mesh.Position( Vector(vert2[1], vert2[2], vert2[3]) )
+		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.TexCoord( 0, vert2[4], vert2[5] )
+		mesh.AdvanceVertex()
+		mesh.Position( Vector(vert3[1], vert3[2], vert3[3]) )
+		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.TexCoord( 0, vert3[4], vert3[5] )
+		mesh.AdvanceVertex()
+		mesh.Position( Vector(vert4[1], vert4[2], vert4[3]) )
+		mesh.Color( currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a )
+		mesh.TexCoord( 0, vert4[4], vert4[5] )
+		mesh.AdvanceVertex()
+	end)
+	mesh.End()
+	if not ok then SF.Throw(err, 2) end
 end
 
 --- Gets a 2D cursor position where ply is aiming.
