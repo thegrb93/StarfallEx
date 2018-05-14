@@ -14,6 +14,8 @@ local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVA
 local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
 --- The `Material` type is used to control shaders in rendering.
+--- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
+--- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
 -- @client
 local material_methods, material_metamethods = SF.RegisterType("Material")
 local lmaterial_methods, lmaterial_metamethods = SF.RegisterType("LockedMaterial") --Material that can't be modified
@@ -49,68 +51,6 @@ SF.AddHook("postload", function()
 	cunwrap = SF.Color.Unwrap
 	munwrap = SF.VMatrix.Unwrap
 end)
-
---[[
-$flags -- Can be written to with setInt("$flags",x)
-MATERIAL_VAR_DEBUG					  = (1 << 0)
-MATERIAL_VAR_NO_DEBUG_OVERRIDE		  = (1 << 1)
-MATERIAL_VAR_NO_DRAW				  = (1 << 2)
-MATERIAL_VAR_USE_IN_FILLRATE_MODE	  = (1 << 3)
-MATERIAL_VAR_VERTEXCOLOR			  = (1 << 4)
-MATERIAL_VAR_VERTEXALPHA			  = (1 << 5)
-MATERIAL_VAR_SELFILLUM				  = (1 << 6)
-MATERIAL_VAR_ADDITIVE				  = (1 << 7)
-MATERIAL_VAR_ALPHATEST				  = (1 << 8)
-MATERIAL_VAR_MULTIPASS				  = (1 << 9)
-MATERIAL_VAR_ZNEARER				  = (1 << 10)
-MATERIAL_VAR_MODEL					  = (1 << 11)
-MATERIAL_VAR_FLAT					  = (1 << 12)
-MATERIAL_VAR_NOCULL					  = (1 << 13)
-MATERIAL_VAR_NOFOG					  = (1 << 14)
-MATERIAL_VAR_IGNOREZ				  = (1 << 15)
-MATERIAL_VAR_DECAL					  = (1 << 16)
-MATERIAL_VAR_ENVMAPSPHERE			  = (1 << 17)
-MATERIAL_VAR_NOALPHAMOD				  = (1 << 18)
-MATERIAL_VAR_ENVMAPCAMERASPACE	      = (1 << 19)
-MATERIAL_VAR_BASEALPHAENVMAPMASK	  = (1 << 20)
-MATERIAL_VAR_TRANSLUCENT              = (1 << 21)
-MATERIAL_VAR_NORMALMAPALPHAENVMAPMASK = (1 << 22)
-MATERIAL_VAR_NEEDS_SOFTWARE_SKINNING  = (1 << 23)
-MATERIAL_VAR_OPAQUETEXTURE			  = (1 << 24)
-MATERIAL_VAR_ENVMAPMODE				  = (1 << 25)
-MATERIAL_VAR_SUPPRESS_DECALS		  = (1 << 26)
-MATERIAL_VAR_HALFLAMBERT			  = (1 << 27)
-MATERIAL_VAR_WIREFRAME                = (1 << 28)
-MATERIAL_VAR_ALLOWALPHATOCOVERAGE     = (1 << 29)
-MATERIAL_VAR_IGNORE_ALPHA_MODULATION  = (1 << 30)
-
-
-$flags2 -- These flags are read only! Can be read with getInt("$flags2")
-//	UNUSED											= (1 << 0),
-MATERIAL_VAR2_LIGHTING_UNLIT					= 0,
-MATERIAL_VAR2_LIGHTING_VERTEX_LIT				= (1 << 1)
-MATERIAL_VAR2_LIGHTING_LIGHTMAP					= (1 << 2)
-MATERIAL_VAR2_LIGHTING_BUMPED_LIGHTMAP			= (1 << 3)
-
-MATERIAL_VAR2_DIFFUSE_BUMPMAPPED_MODEL					= (1 << 4)
-MATERIAL_VAR2_USES_ENV_CUBEMAP							= (1 << 5)
-MATERIAL_VAR2_NEEDS_TANGENT_SPACES						= (1 << 6)
-MATERIAL_VAR2_NEEDS_SOFTWARE_LIGHTING					= (1 << 7)
-// GR - HDR path puts lightmap alpha in separate texture...
-MATERIAL_VAR2_BLEND_WITH_LIGHTMAP_ALPHA					= (1 << 8)
-MATERIAL_VAR2_NEEDS_BAKED_LIGHTING_SNAPSHOTS			= (1 << 9)
-MATERIAL_VAR2_USE_FLASHLIGHT							= (1 << 10)
-MATERIAL_VAR2_USE_FIXED_FUNCTION_BAKED_LIGHTING			= (1 << 11)
-MATERIAL_VAR2_NEEDS_FIXED_FUNCTION_FLASHLIGHT			= (1 << 12)
-MATERIAL_VAR2_USE_EDITOR								= (1 << 13)
-MATERIAL_VAR2_NEEDS_POWER_OF_TWO_FRAME_BUFFER_TEXTURE	= (1 << 14)
-MATERIAL_VAR2_NEEDS_FULL_FRAME_BUFFER_TEXTURE			= (1 << 15)
-MATERIAL_VAR2_IS_SPRITECARD								= (1 << 16)
-MATERIAL_VAR2_USES_VERTEXID								= (1 << 17)
-MATERIAL_VAR2_SUPPORTS_HW_SKINNING						= (1 << 18)
-MATERIAL_VAR2_SUPPORTS_FLASHLIGHT						= (1 << 19)
-]]
-
 
 local allowed_shaders = {
 	UnlitGeneric = true,
