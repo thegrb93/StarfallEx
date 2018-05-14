@@ -71,7 +71,7 @@ local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 )
 cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
 	material_bank.max = cv_max_materials:GetInt()
-end )
+end)
 
 -- Register functions to be called when the chip is initialised and deinitialised
 SF.AddHook("initialize", function (inst)
@@ -438,7 +438,7 @@ local function NextInTextureQueue()
 				end)
 			end
 		end
-		
+
 		if not Panel then
 			Panel = SF.URLTextureLoader
 			if not Panel then

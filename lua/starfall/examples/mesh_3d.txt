@@ -1,6 +1,8 @@
---@name Simple textured mesh
+--@name Textured mesh
 --@author Sparky
 --@shared
+
+--Link a screen or hud to the chip to see all the different ways to render a mesh
 
 if SERVER then
 
@@ -17,7 +19,10 @@ if SERVER then
 
 else
 
-	local texture, objdata, mymesh, holo
+	local textureloaded, objdata, mymesh, holo
+	local texture = material.create("VertexLitGeneric")
+	local screentexture = material.create("UnlitGeneric")
+	screentexture:setInt("$flags",48)
 
 	-- Used for setting up the hologram
 	hook.add("net","",function(name, len, pl)
@@ -30,7 +35,7 @@ else
 	local function renderHUD()
 		render.pushMatrix(chip():getMatrix(),true)
 		render.enableDepth(true)
-		render.setRenderTargetTexture("material")
+		render.setMaterial(texture)
 		mymesh:draw()
 		render.popMatrix()
 	end
@@ -44,7 +49,7 @@ else
 		render.pushMatrix(rotation, true)
 		render.clear(Color(0,0,0,0),true)
 		render.enableDepth(true)
-		render.setTexture(texture)
+		render.setTexture(screentexture)
 		mymesh:draw()
 		render.popMatrix()
 		render.popViewMatrix()
@@ -58,10 +63,6 @@ else
 	local function init()
 		if not texture or not objdata then return end
 
-		local model_material = material.create("VertexLitGeneric")
-		model_material:setInt("$model",1)
-		model_material:setTexture("$basetexture",texture:getTexture("$basetexture"))
-
 		render.createRenderTarget("mesh")
 		hook.add("renderoffscreen","setup",function()
 			local start = mesh.trianglesLeft()
@@ -69,7 +70,7 @@ else
 			print("Used "..(start-mesh.trianglesLeft()).." triangles.")
 
 			net.start("getholos")
-			net.writeString("!"..model_material:getName())
+			net.writeString("!"..texture:getName())
 			net.send()
 
 			hook.add("postdrawopaquerenderables","mesh",renderHUD)
@@ -78,10 +79,11 @@ else
 		end)
 	end
 
-	render.getTextureID("https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0", function(tex)
-		texture = tex
+	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0", function(tex)
+		screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
+		textureloaded = true
 		init()
-	end, nil, true)
+	end)
 
 	http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(body)
 		objdata = body

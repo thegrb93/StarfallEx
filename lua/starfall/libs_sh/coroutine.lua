@@ -11,6 +11,12 @@ local checkpermission = SF.Permissions.check
 local _, thread_metamethods = SF.RegisterType("thread")
 local wrap, unwrap = SF.CreateWrapper(thread_metamethods, true, false)
 
+SF.Coroutine = {}
+SF.Coroutine.Library = coroutine_library
+SF.Coroutine.Methods = _
+SF.Coroutine.Metatable = thread_metamethods
+SF.Coroutine.Wrap = wrap
+SF.Coroutine.Unwrap = unwrap
 
 SF.AddHook("initialize", function(instance)
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })

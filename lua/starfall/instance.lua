@@ -43,7 +43,6 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	local instance = setmetatable({}, SF.Instance)
 
 	instance.player = player
-	instance.playerid = player:SteamID()
 	instance.env = SF.BuildEnvironment()
 	instance.env._G = instance.env
 	instance.data = data or {}
