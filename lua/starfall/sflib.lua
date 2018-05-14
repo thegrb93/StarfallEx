@@ -45,12 +45,22 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
-function SF.EntityTable(key)
-	return setmetatable({},
-	{ __newindex = function(t, e, v)
-		rawset(t, e, v)
-		e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
-	end })
+if SERVER then
+	function SF.EntityTable(key)
+		return setmetatable({},
+		{ __newindex = function(t, e, v)
+			rawset(t, e, v)
+			e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
+		end })
+	end
+else
+	function SF.EntityTable(key)
+		return setmetatable({},
+		{ __newindex = function(t, e, v)
+			rawset(t, e, v)
+			e:CallOnRemove("SF_" .. key, function() timer.Simple(0, function() if not e:IsValid() then t[e] = nil end end) end)
+		end })
+	end
 end
 
 
@@ -492,10 +502,10 @@ end
 
 -- A list of safe data types
 local safe_types = {
-	["number"] = true,
-	["string"] = true,
-	["boolean"] = true,
-	["nil"] = true,
+	[TYPE_NUMBER] = true,
+	[TYPE_STRING] = true,
+	[TYPE_BOOL] = true,
+	[TYPE_NIL] = true,
 }
 
 --- Wraps the given object so that it is safe to pass into starfall
@@ -513,7 +523,7 @@ function SF.WrapObject(object)
 		end
 	end
 	-- Do not elseif here because strings do have a metatable.
-	if safe_types[type(object)] then
+	if safe_types[TypeID(object)] then
 		return object
 	end
 end
@@ -527,6 +537,9 @@ function SF.UnwrapObject(object)
 
 	if metatable and metatable.__unwrap then
 		return metatable.__unwrap(object)
+	end
+	if safe_types[TypeID(object)] then
+		return object
 	end
 end
 
@@ -559,53 +572,47 @@ end
 -- any possiblitiy of leakage. Functions will always be replaced with
 -- nil as there is no way to verify that they are safe.
 function SF.Sanitize(...)
-	local return_list = {}
-	local args = { ... }
+	local completed_tables = {}
 
-	for key, value in pairs(args) do
-		local typmeta = getmetatable(value)
-		local typ = type(typmeta) == "string" and typmeta or type(value)
-		if safe_types[typ] then
-			return_list[key] = value
-		elseif SF.WrapObject(value) then
-			return_list[key] = SF.WrapObject(value)
-		elseif typ == "table" then
-			local tbl = {}
-			for k, v in pairs(value) do
-				tbl[SF.Sanitize(k)] = SF.Sanitize(v)
+	local function RecursiveSanitize(tbl)
+		local return_list = {}
+		completed_tables[tbl] = return_list
+		for key, value in pairs(tbl) do
+			if not safe_types[TypeID(key)] then
+				key = SF.WrapObject(key) or completed_tables[key] or RecursiveSanitize(key)
 			end
-			return_list[key] = tbl
-		else
-			return_list[key] = nil
+			if not safe_types[TypeID(value)] then
+				value = SF.WrapObject(value) or completed_tables[value] or RecursiveSanitize(value)
+			end
+			return_list[key] = value
 		end
+		return return_list
 	end
 
-	return unpack(return_list)
+	return unpack(RecursiveSanitize({...}))
 end
 
 --- Takes output from starfall and does it's best to make the output
 -- fully usable outside of starfall environment
 function SF.Unsanitize(...)
-	local return_list = {}
+	local completed_tables = {}
 
-	local args = { ... }
-
-	for key, value in pairs(args) do
-		local typ = type(value)
-		if typ == "table" and SF.UnwrapObject(value) then
-			return_list[key] = SF.UnwrapObject(value)
-		elseif typ == "table" then
-			return_list[key] = {}
-
-			for k, v in pairs(value) do
-				return_list[key][SF.Unsanitize(k)] = SF.Unsanitize(v)
+	local function RecursiveUnsanitize(tbl)
+		local return_list = {}
+		completed_tables[tbl] = return_list
+		for key, value in pairs(tbl) do
+			if TypeID(key) == TYPE_TABLE then
+				key = SF.UnwrapObject(key) or completed_tables[key] or RecursiveUnsanitize(key)
 			end
-		else
+			if TypeID(value) == TYPE_TABLE then
+				value = SF.UnwrapObject(value) or completed_tables[value] or RecursiveUnsanitize(value)
+			end
 			return_list[key] = value
 		end
+		return return_list
 	end
 
-	return unpack(return_list)
+	return unpack(RecursiveUnsanitize({...}))
 end
 
 -- ------------------------------------------------------------------------- --
