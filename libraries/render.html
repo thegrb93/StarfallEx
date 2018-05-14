@@ -274,6 +274,11 @@ Draws a 3D Line </td>
 Draws 2 connected triangles.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DQuadUV">draw3DQuadUV</a>( vert1, vert2, vert3, vert4&nbsp;)</td>
+			<td class="summary">
+Draws 2 connected triangles with custom UVs.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.draw3DSphere">draw3DSphere</a>( pos, radius, longitudeSteps, latitudeSteps&nbsp;)</td>
 			<td class="summary">
 Draws a sphere </td>
@@ -875,6 +880,28 @@ Draws 2 connected triangles.</p>
 		<ul>
 			
 			<li><tt>vert1</tt> ― First vertex.</li>
+			<li><tt>vert2</tt> ― The second vertex.</li>
+			<li><tt>vert3</tt> ― The third vertex.</li>
+			<li><tt>vert4</tt> ― The fourth vertex.</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.draw3DQuadUV"></a><strong>render.draw3DQuadUV</strong>( vert1, vert2, vert3, vert4&nbsp;)</dt>
+<dd>
+	<p>
+Draws 2 connected triangles with custom UVs.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vert1</tt> ― First vertex. {x, y, z, u, v}</li>
 			<li><tt>vert2</tt> ― The second vertex.</li>
 			<li><tt>vert3</tt> ― The third vertex.</li>
 			<li><tt>vert4</tt> ― The fourth vertex.</li>
