@@ -612,7 +612,7 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	else
 		local m = instance.env.material.create("UnlitGeneric")
 		m:setTexture("$basetexture", tx)
-		m:setInt("$flags",48)
+		m:setInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
 		return m
 	end
 end
