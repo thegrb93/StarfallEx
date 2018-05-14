@@ -231,8 +231,7 @@ local function sfCreateMaterial(name, skip_hack)
 				["$nolod"] = 1,
 				["$ignorez"] = 1,
 				["$vertexcolor"] = 1,
-				["$vertexalpha"] = 1,
-				["$basetexturetransform"] = "center .5 .5 scale 1.032 1.032 rotate 0 translate 0 0"
+				["$vertexalpha"] = 1
 			}
 	if skip_hack then
 		tbl["$basetexturetransform"] = nil
@@ -607,11 +606,14 @@ function render_library.getTextureID (tx, cb, alignment, skip_hack)
 	local instance = SF.instance
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
-		local m = instance.env.material.create("UnlitGeneric")		
+		local m = instance.env.material.create("UnlitGeneric")
 		m:setTextureURL("$basetexture", tx, cb)
 		return m
 	else
-		return instance.env.material.load(tx)
+		local m = instance.env.material.create("UnlitGeneric")
+		m:setTexture("$basetexture", tx)
+		m:setInt("$flags",48)
+		return m
 	end
 end
 
