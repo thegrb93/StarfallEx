@@ -55,26 +55,28 @@ end
 -- ------------------------- Methods ------------------------- --
 
 --- Parents the entity to another entity
--- @param ent Entity to parent to
+-- @param ent Entity to parent to. nil to unparent
 -- @param attachment Optional string attachment name to parent to
 function ents_methods:setParent (ent, attachment)
 	checktype(self, ents_metatable)
-	checktype(ent, ents_metatable)
-
-	local ent = unwrap(ent)
 	local this = unwrap(self)
-
 	checkpermission(SF.instance, this, "entities.parent")
-	if ent:IsPlayer() then
-		if this:GetClass()~="starfall_hologram" then
-			SF.Throw("Insufficient permissions", 2)
+
+	if ent ~= nil then
+		checktype(ent, ents_metatable)
+		ent = unwrap(ent)
+		if ent:IsPlayer() then
+			if this:GetClass()~="starfall_hologram" then
+				SF.Throw("Insufficient permissions", 2)
+			end
+		else
+			checkpermission(SF.instance, ent, "entities.parent")
 		end
-	else
-		checkpermission(SF.instance, ent, "entities.parent")
 	end
 
 	this:SetParent(ent)
-	if attachment then
+
+	if ent ~= nil and attachment then
 		checkluatype(attachment, TYPE_STRING)
 		this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 	end
