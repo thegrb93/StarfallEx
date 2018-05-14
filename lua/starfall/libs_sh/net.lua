@@ -18,21 +18,30 @@ local burst_rate = CreateConVar("sf_net_burstrate", "5", { FCVAR_ARCHIVE, FCVAR_
 
 
 local streams = SF.EntityTable("playerStreams")
+local netBurst = SF.EntityTable("NetBurst")
 
-local function write(instance, func, size, ...)
-	instance.data.net.size = instance.data.net.size + size
-	instance.data.net.data[#instance.data.net.data + 1] = { func, { ... } }
-end
+cvars.AddChangeCallback( "sf_net_burstmax", function()
+	for k, v in pairs(netBurst) do
+		v.max = burst_limit:GetFloat() * 1000
+	end
+end)
+cvars.AddChangeCallback( "sf_net_burstrate", function()
+	for k, v in pairs(netBurst) do
+		v.rate = burst_rate:GetFloat() * 1000
+	end
+end)
 
 local instances = {}
 SF.AddHook("initialize", function(instance)
 	instance.data.net = {
 		started = false,
-		burst = SF.BurstObject(burst_rate:GetFloat() * 1000, burst_limit:GetFloat() * 1000),
 		size = 0,
 		data = {},
 		receives = {}
 	}
+	if not netBurst[instance.player] then
+		netBurst[instance.player] = SF.BurstObject(burst_rate:GetFloat() * 1000, burst_limit:GetFloat() * 1000)
+	end
 end)
 
 SF.AddHook("cleanup", function (instance)
@@ -42,6 +51,11 @@ end)
 
 if SERVER then
 	util.AddNetworkString("SF_netmessage")
+end
+
+local function write(instance, func, size, ...)
+	instance.data.net.size = instance.data.net.size + size
+	instance.data.net.data[#instance.data.net.data + 1] = { func, { ... } }
 end
 
 --- Starts the net message
@@ -68,7 +82,7 @@ function net_library.send (target, unreliable)
 	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	if not instance.data.net.burst:use(instance.data.net.size) then
+	if not netBurst[instance.player]:use(instance.data.net.size) then
 		SF.Throw("Net message exceeds limit!", 3)
 	end
 
@@ -128,9 +142,9 @@ local netTypeSizes = {
 function net_library.writeType(v)
 	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-	
+
 	v = SF.UnwrapObject(v) or v
-	
+
 	local typeid = nil
 
 	if IsColor(v) then
@@ -515,7 +529,7 @@ end
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
-	return SF.instance.data.net.burst:check() - SF.instance.data.net.size
+	return netBurst[SF.instance.player]:check() - SF.instance.data.net.size
 end
 
 --- Returns whether or not the library is currently reading data from a stream
@@ -530,7 +544,7 @@ net.Receive("SF_netmessage", function(len, ply)
 	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
 		local name = net.ReadString()
 		if ply then ply = SF.WrapObject(ply) end
-		
+
 		local recv = ent.instance.data.net.receives[name]
 		if recv then
 			ent.instance:runFunction(recv, len, ply)
