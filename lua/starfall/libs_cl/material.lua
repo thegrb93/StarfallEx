@@ -409,10 +409,12 @@ local function NextInTextureQueue()
 			else
 				local function copyTexture()
 					timer.Simple(0.1, function()
+						local mat = Panel:GetHTMLMaterial()
+						if not mat then timer.Simple(0.1, copyTexture) return end
 						render.PushRenderTarget(requestTbl.Texture)
 							render.Clear(0, 0, 0, 0, false, false)
 							cam.Start2D()
-							surface.SetMaterial(Panel:GetHTMLMaterial())
+							surface.SetMaterial(mat)
 							surface.SetDrawColor(255, 255, 255)
 							surface.DrawTexturedRect(0, 0, 1024, 1024)
 							cam.End2D()
@@ -438,6 +440,11 @@ local function NextInTextureQueue()
 				end)
 			end
 		end
+		local function errorTexture()
+			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
+			table.remove(LoadingTextureQueue, 1)
+			NextInTextureQueue()
+		end
 
 		if not Panel then
 			Panel = SF.URLTextureLoader
@@ -451,6 +458,7 @@ local function NextInTextureQueue()
 				var img = new Image();
 				img.style.position="absolute";
 				img.onload = function (){sf.imageLoaded(img.width, img.height);}
+				img.onerror = function (){sf.imageErrored();}
 				document.body.appendChild(img);
 				</script></body></html>]])
 				Panel:Hide()
@@ -459,10 +467,12 @@ local function NextInTextureQueue()
 		end
 
 		Panel:AddFunction("sf", "imageLoaded", applyTexture)
-		Panel:RunJavascript([[img.src="";img.removeAttribute("width");img.removeAttribute("height");img.style.left="0px";img.style.top="0px";img.src="]] .. requestTbl.Url .. [[";]])
+		Panel:AddFunction("sf", "imageErrored", errorTexture)
+		Panel:RunJavascript([[img.removeAttribute("src");img.removeAttribute("width");img.removeAttribute("height");img.style.left="0px";img.style.top="0px";img.src="]] .. requestTbl.Url .. [[";]])
 		Panel:Show()
 
 		timer.Create("SF_URLTextureTimeout", 10, 1, function()
+			if requestTbl.Callback then requestTbl.Callback() end
 			table.remove(LoadingTextureQueue, 1)
 			NextInTextureQueue()
 		end)
@@ -485,7 +495,7 @@ function material_methods:setTextureURL(key, url, cb)
 	local instance = SF.instance
 	local m = unwrap(self)
 	local texture = m:GetTexture(key)
-	if not (texture and instance.data.render.validrendertargets[texture]) then
+	if not (texture and instance.data.render.validrendertargets[texture:GetName()]) then
 		local name = "SF_TEXTURE_" .. util.CRC(url .. SysTime())
 		instance.env.render.createRenderTarget(name)
 		self:setTextureRenderTarget("$basetexture", name)
@@ -519,7 +529,7 @@ function material_methods:setTextureURL(key, url, cb)
 	}
 	if cb then
 		requestTbl.Callback = function(w, h, layout)
-			instance:runFunction(cb, self, url, w, h, layout)
+			if w then instance:runFunction(cb, self, url, w, h, layout) else instance:runFunction(cb) end
 		end
 	end
 

@@ -222,7 +222,7 @@ SF.AddHook("deinitialize", function (instance)
 	for k, v in pairs(instance.data.render.rendertargets) do
 		rt_bank:free(instance.player, v)
 		instance.data.render.rendertargets[k] = nil
-		instance.data.render.validrendertargets[v] = nil
+		instance.data.render.validrendertargets[v:GetName()] = nil
 	end
 end)
 
@@ -659,7 +659,7 @@ function render_library.createRenderTarget (name)
 
 	render.ClearRenderTarget(rt, Color(0, 0, 0))
 	data.rendertargets[name] = rt
-	data.validrendertargets[rt] = true
+	data.validrendertargets[rt:GetName()] = true
 end
 
 --- Releases the rendertarget. Required if you reach the maximum rendertargets.
@@ -671,7 +671,7 @@ function render_library.destroyRenderTarget(name)
 	if rt then
 		rt_bank:free(instance.player, rt)
 		data.rendertargets[name] = nil
-		data.validrendertargets[rt] = nil
+		data.validrendertargets[rt:GetName()] = nil
 	else
 		SF.Throw("Cannot destroy an invalid rendertarget.", 2)
 	end
