@@ -156,6 +156,7 @@ local renderhooks = {
 	postdrawhud = true,
 }
 
+local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
 SF.AddHook("prepare", function (instance, hook)
 	if renderhooks[hook] then
 		currentcolor = COLOR_WHITE
@@ -168,12 +169,13 @@ SF.AddHook("prepare", function (instance, hook)
 
 		if hook=="renderoffscreen" then
 			data.needRT = true
-			instance:runFunction(function()
-				if not data.rendertargets["dummyrt"] then
-					render_library.createRenderTarget ("dummyrt")
-				end
-				render_library.selectRenderTarget ("dummyrt")
-			end)
+			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
+			render.SetViewPort(0, 0, 1024, 1024)
+			cam.Start2D()
+			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
+			render.SetStencilEnable(false)
+			render.SetRenderTarget(dummyrt)
+			data.usingRT = true
 		else
 			data.needRT = false
 		end

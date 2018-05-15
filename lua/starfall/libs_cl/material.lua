@@ -408,18 +408,16 @@ local function NextInTextureQueue()
 				NextInTextureQueue()
 			else
 				local function copyTexture()
-					timer.Simple(0.1, function()
-						local mat = Panel:GetHTMLMaterial()
-						if not mat then timer.Simple(0.1, copyTexture) return end
-						render.PushRenderTarget(requestTbl.Texture)
-							render.Clear(0, 0, 0, 0, false, false)
-							cam.Start2D()
-							surface.SetMaterial(mat)
-							surface.SetDrawColor(255, 255, 255)
-							surface.DrawTexturedRect(0, 0, 1024, 1024)
-							cam.End2D()
-						render.PopRenderTarget()
-					end)
+					local mat = Panel:GetHTMLMaterial()
+					if not mat then timer.Simple(0.1, copyTexture) return end
+					render.PushRenderTarget(requestTbl.Texture)
+						render.Clear(0, 0, 0, 0, false, false)
+						cam.Start2D()
+						surface.SetMaterial(mat)
+						surface.SetDrawColor(255, 255, 255)
+						surface.DrawTexturedRect(0, 0, 1024, 1024)
+						cam.End2D()
+					render.PopRenderTarget()
 				end
 				local function layout(x,y,w,h)
 					if requestTbl ~= LoadingTextureQueue[1] then SF.Throw("Layout function is no longer valid", 2) end
@@ -428,11 +426,13 @@ local function NextInTextureQueue()
 					checkluatype(w, TYPE_NUMBER)
 					checkluatype(h, TYPE_NUMBER)
 					Panel:RunJavascript([[img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;]])
-					copyTexture()
+					timer.Simple(0.1, copyTexture)
 				end
 
-				copyTexture()
-				if requestTbl.Callback then requestTbl.Callback(w, h, layout) end
+				timer.Simple(0.1, function()
+					copyTexture()
+					if requestTbl.Callback then requestTbl.Callback(w, h, layout) end
+				end)
 
 				timer.Simple(1, function()
 					table.remove(LoadingTextureQueue, 1)
