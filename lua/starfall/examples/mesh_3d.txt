@@ -4,32 +4,24 @@
 
 --Link a screen or hud to the chip to see all the different ways to render a mesh
 
+local holo
 if SERVER then
 
-	local holo = holograms.create(chip():getPos(), chip():getAngles(), "models/Combine_Helicopter/helicopter_bomb01.mdl")
-	holo:setNoDraw(true)
+	holo = holograms.create(chip():getPos(), chip():getAngles(), "models/Combine_Helicopter/helicopter_bomb01.mdl")
 	holo:setParent(chip())
 	hook.add("net","",function(name, len, pl)
-		holo:setMaterial(net.readString(), pl)
-		holo:setNoDraw(false)
-		net.start("sendholo")
+		net.start("")
 		net.writeEntity(holo)
 		net.send(pl)
 	end)
 
 else
 
-	local textureloaded, objdata, mymesh, holo
+	local textureloaded, mymesh
 	local texture = material.create("VertexLitGeneric")
 	local screentexture = material.create("UnlitGeneric")
 	screentexture:setInt("$flags",48)
-
-	-- Used for setting up the hologram
-	hook.add("net","",function(name, len, pl)
-		local ent = net.readEntity()
-		ent:setHologramMesh(mymesh)
-		ent:setHologramRenderBounds(Vector(-200),Vector(200))
-	end)
+	render.createRenderTarget("mesh")
 
 	-- Renders the mesh using a HUD
 	local function renderHUD()
@@ -61,32 +53,31 @@ else
 	end
 
 	local function init()
-		if not texture or not objdata then return end
+		if not (mymesh and holo) then return end
 
-		render.createRenderTarget("mesh")
-		hook.add("renderoffscreen","setup",function()
-			local start = mesh.trianglesLeft()
-			mymesh = mesh.createFromObj(objdata)
-			print("Used "..(start-mesh.trianglesLeft()).." triangles.")
-
-			net.start("getholos")
-			net.writeString("!"..texture:getName())
-			net.send()
-
-			hook.add("postdrawopaquerenderables","mesh",renderHUD)
-			hook.add("render","mesh",renderScreen)
-			hook.remove("renderoffscreen","setup")
-		end)
+		holo:setHologramMesh(mymesh)
+		holo:setHologramRenderBounds(Vector(-200),Vector(200))
+		
+		hook.add("postdrawopaquerenderables","mesh",renderHUD)
+		hook.add("render","mesh",renderScreen)
 	end
-
-	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0", function(tex)
-		screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
-		textureloaded = true
+	
+	-- Used for setting up the hologram
+	hook.add("net","",function(name, len, pl)
+		holo = net.readEntity()
+		holo:setMaterial("!"..texture:getName())
 		init()
 	end)
+	net.start("") net.send()
 
-	http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(body)
-		objdata = body
+	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0")
+	screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
+
+	http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(objdata)
+		local start = mesh.trianglesLeft()
+		mymesh = mesh.createFromObj(objdata)
+		print("Used "..(start-mesh.trianglesLeft()).." triangles.")
 		init()
 	end)
 end
+

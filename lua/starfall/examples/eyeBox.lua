@@ -6,9 +6,7 @@
 
 if SERVER then
 	hook.add("net","",function(name,len,ply)
-		local e = chip():isWeldedTo()
-		e:setMaterial(net.readString(), ply)
-		
+		local e = chip():isWeldedTo()		
 		net.start("")
 		net.writeEntity(e)
 		net.send(ply)
@@ -23,7 +21,6 @@ else
 	m:setTextureRenderTarget("$basetexture", "rt")
 	
 	net.start("")
-	net.writeString("!"..m:getName())
 	net.send()
 
 	local function getEyes()
@@ -84,6 +81,7 @@ else
 	end
 	hook.add("net","",function()
 		ent = net.readEntity()
+		ent:setMaterial("!"..m:getName())
 		hook.add("renderoffscreen","init",initRender)
 	end)
 end
