@@ -212,6 +212,60 @@ function mesh_library.createFromObj(obj, thread)
 		if thread then thread_lib.yield(thread) end
 	end
 
+	-- Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
+	-- GLua version credit @willox https://github.com/CapsAdmin/pac3/pull/578/commits/43fa75c262cde661713cdaa9d1b09bc29ec796b4
+	local tan1, tan2 = {}, {}
+	for i = 1, #vertices do
+		tan1[i] = Vector(0, 0, 0)
+		tan2[i] = Vector(0, 0, 0)
+	end
+
+	for i = 1, #vertices - 2, 3 do
+		local vert1, vert2, vert3 = vertices[i], vertices[i+1], vertices[i+2]
+
+		local p1, p2, p3 = vert1.pos, vert2.pos, vert3.pos
+		local u1, u2, u3 = vert1.u, vert2.u, vert3.u
+		local v1, v2, v3 = vert1.v, vert2.v, vert3.v
+
+		local x1 = p2.x - p1.x;
+		local x2 = p3.x - p1.x;
+		local y1 = p2.y - p1.y;
+		local y2 = p3.y - p1.y;
+		local z1 = p2.z - p1.z;
+		local z2 = p3.z - p1.z;
+
+		local s1 = u2 - u1;
+		local s2 = u3 - u1;
+		local t1 = v2 - v1;
+		local t2 = v3 - v1;
+
+		local r = 1 / (s1 * t2 - s2 * t1)
+		local sdir = Vector((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+		local tdir = Vector((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+
+		tan1[i]:Add(sdir)
+		tan1[i+1]:Add(sdir)
+		tan1[i+2]:Add(sdir)
+
+		tan2[i]:Add(tdir)
+		tan2[i+1]:Add(tdir)
+		tan2[i+2]:Add(tdir)
+	end
+	if thread then thread_lib.yield(thread) end
+
+	for i = 1, #vertices do
+		local n = vertices[i].normal
+		local t = tan1[i]
+
+		local tan = (t - n * n:Dot(t))
+		tan:Normalize()
+
+		local w = (n:Cross(t)):Dot(tan2[i]) < 0 and -1 or 1
+
+		vertices[i].userdata = {tan[1], tan[2], tan[3], w}
+	end
+	if thread then thread_lib.yield(thread) end
+
 	plyTriangleCount[instance.player] = (plyTriangleCount[instance.player] or 0) + ntriangles
 
 	local mesh = Mesh()
