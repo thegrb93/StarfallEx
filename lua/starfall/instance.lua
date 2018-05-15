@@ -4,26 +4,29 @@
 -- the execution context.
 ---------------------------------------------------------------------
 
+local dsethook, dgethook
+dgethook = debug.gethook
+local function dsethookset() dsethook = SF.softLockProtection:GetBool() and debug.sethook or function() end end
+if SERVER then
+	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
+	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
+	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	cvars.AddChangeCallback( "sf_timebuffersoftlock", dsethookset)
+else
+	SF.cpuQuota = CreateClientConVar("sf_timebuffer_cl", 0.006, true, false, "The max average the CPU time can reach.")
+	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
+	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
+	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	cvars.AddChangeCallback( "sf_timebuffersoftlock", dsethookset)
+end
+dsethookset()
+
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
 
---- Instance fields
--- @name Instance
--- @class table
--- @field env Environment table for the script
--- @field data Data that libraries can store.
--- @field ppdata Preprocessor data
--- @field ops Currently used ops.
--- @field hooks Registered hooks
--- @field scripts The compiled script functions.
--- @field initialized True if initialized, nil if not.
--- @field error True if instance is errored and should not be executed
--- @field mainfile The main file
--- @field player The "owner" of the instance
-
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
-SF.allInstances = setmetatable({}, { __mode = "kv" })
+SF.allInstances = {}
 SF.playerInstances = {}
 
 --- Preprocesses and Compiles code and returns an Instance
@@ -110,7 +113,7 @@ function SF.Instance:runWithOps(func, ...)
 	end
 
 	local oldSysTime = SysTime() - self.cpu_total
-	local function cpuCheck ()
+	local function cpuCheck()
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 
@@ -128,13 +131,13 @@ function SF.Instance:runWithOps(func, ...)
 		end
 	end
 
-	local prevHook, mask, count = debug.gethook()
+	local prevHook, mask, count = dgethook()
 	local prev = SF.runningOps
 	SF.runningOps = true
 	SF.OnRunningOps(true)
-	debug.sethook(cpuCheck, "", 2000)
+	dsethook(cpuCheck, "", 2000)
 	local tbl = { xpcall(func, xpcall_callback, ...) }
-	debug.sethook(prevHook, mask, count)
+	dsethook(prevHook, mask, count)
 	SF.runningOps = prev
 	SF.OnRunningOps(prev)
 
@@ -201,11 +204,11 @@ function SF.Instance:initialize()
 	self.cpu_average = 0
 	self.cpu_softquota = 1
 
-	SF.allInstances[self] = self
+	SF.allInstances[self] = true
 	if SF.playerInstances[self.player] then
-		SF.playerInstances[self.player][self] = self
+		SF.playerInstances[self.player][self] = true
 	else
-		SF.playerInstances[self.player] = { [self] = self }
+		SF.playerInstances[self.player] = {[self] = true}
 	end
 
 	self:runLibraryHook("initialize")

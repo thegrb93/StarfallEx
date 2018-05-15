@@ -10,15 +10,6 @@ local dgetmeta = debug.getmetatable
 -------------------------------------------------------------------------------
 
 if SERVER then
-	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
-	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
-else
-	SF.cpuQuota = CreateClientConVar("sf_timebuffer_cl", 0.006, true, false, "The max average the CPU time can reach.")
-	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
-	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
-end
-
-if SERVER then
 	SF.Version = "StarfallEx"
 	local files, directories = file.Find( "addons/*", "GAME" )
 	local sf_dir = nil
