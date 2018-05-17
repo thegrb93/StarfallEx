@@ -42,14 +42,14 @@
 -- @class hook
 -- @client
 -- @param boolean isDrawingDepth Whether the current draw is writing depth.
--- @param boolean isDrawSkybox  Whether the current draw is drawing the skybox.
+-- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
 
 --- Called after opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name postdrawopaquerenderables
 -- @class hook
 -- @client
 -- @param boolean isDrawingDepth Whether the current draw is writing depth.
--- @param boolean isDrawSkybox  Whether the current draw is drawing the skybox.
+-- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
 
 --- Called when the engine wants to calculate the player's view
 -- @name calcview
@@ -166,7 +166,7 @@ SF.AddHook("prepare", function (instance, hook)
 
 		local data = instance.data.render
 		data.isRendering = true
-
+		data.noStencil = hook=="render"
 		if hook=="renderoffscreen" then
 			data.needRT = true
 			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
@@ -184,6 +184,7 @@ end)
 
 SF.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
+		render.SetStencilEnable(false)
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0, 0, 0, 0, false)
 		render.CullMode(MATERIAL_CULLMODE_CCW)
@@ -300,14 +301,15 @@ local defaultFont
 function render_library.setStencilEnable(enable)
 	enable = (enable == true) -- Make sure it's a boolean
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 	render.SetStencilEnable(enable)
 end
 
 --- Resets all values in the stencil buffer to zero.
 function render_library.clearStencil()
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 	render.ClearStencil()
 end
 
@@ -323,7 +325,7 @@ function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	checkluatype (a, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.ClearBuffersObeyStencil(r, g, b, a, depth)
 end
@@ -342,7 +344,7 @@ function render_library.clearStencilBufferRectangle(originX, originY, endX, endY
 	checkluatype (stencilValue, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.ClearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
 end
@@ -353,7 +355,7 @@ function render_library.setStencilCompareFunction(compareFunction)
 	checkluatype (compareFunction, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilCompareFunction(compareFunction )
 end
@@ -364,7 +366,7 @@ function render_library.setStencilFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilFailOperation(operation)
 end
@@ -375,7 +377,7 @@ function render_library.setStencilPassOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilPassOperation(operation)
 end
@@ -386,7 +388,7 @@ function render_library.setStencilZFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilZFailOperation(operation)
 end
@@ -397,7 +399,7 @@ function render_library.setStencilReferenceValue(referenceValue)
 	checkluatype (referenceValue, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilReferenceValue(referenceValue)
 end
@@ -408,7 +410,7 @@ function render_library.setStencilTestMask(mask)
 	checkluatype (mask, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilTestMask(mask)
 end
@@ -419,7 +421,7 @@ function render_library.setStencilWriteMask(mask)
 	checkluatype (mask, TYPE_NUMBER)
 
 	local renderdata = SF.instance.data.render
-	if not renderdata.usingRT then  SF.Throw("Stencil operations are allowed only inside RenderTarget!") end
+	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilWriteMask(mask)
 end
@@ -710,7 +712,7 @@ function render_library.selectRenderTarget (name)
 			end
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
-			if data.useStencil then -- Revert ALL stencil settings from screen
+			if data.noStencil then -- Revert ALL stencil settings from screen
 				render.SetStencilEnable(true)
 				render.SetStencilFailOperation(STENCILOPERATION_KEEP)
 				render.SetStencilZFailOperation(STENCILOPERATION_KEEP)
@@ -719,7 +721,6 @@ function render_library.selectRenderTarget (name)
 				render.SetStencilReferenceValue(1)
 				render.SetStencilCompareFunction(STENCILCOMPARISONFUNCTION_EQUAL)
 				render.SetStencilTestMask(1)
-
 			end
 		end
 	end
@@ -1145,7 +1146,7 @@ function render_library.clearDepth()
 end
 
 --- Draws a sprite in 3d space.
--- @param pos  Position of the sprite.
+-- @param pos Position of the sprite.
 -- @param width Width of the sprite.
 -- @param height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
@@ -1160,7 +1161,7 @@ end
 -- @param pos Position of the sphere
 -- @param radius Radius of the sphere
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
--- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
+-- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(pos, vector_meta)
@@ -1177,7 +1178,7 @@ end
 -- @param pos Position of the sphere
 -- @param radius Radius of the sphere
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
--- @param latitudeSteps  The amount of latitude steps. The larger this number is, the smoother the sphere is
+-- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, latitudeSteps)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(pos, vector_meta)
@@ -1205,7 +1206,7 @@ end
 
 --- Draws a box in 3D space
 -- @param origin Origin of the box.
--- @param angle Orientation  of the box
+-- @param angle Orientation of the box
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DBox (origin, angle, mins, maxs)
@@ -1224,7 +1225,7 @@ end
 
 --- Draws a wireframe box in 3D space
 -- @param origin Origin of the box.
--- @param angle Orientation  of the box
+-- @param angle Orientation of the box
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox (origin, angle, mins, maxs)

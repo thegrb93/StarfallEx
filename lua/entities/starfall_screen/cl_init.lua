@@ -62,10 +62,8 @@ function ENT:RenderScreen()
 		local instance = self.link.instance
 		if instance then
 			if SF.Permissions.hasAccess(instance, nil, "render.screen") then
-				local data = instance.data
 
-				data.render.renderEnt = self
-				data.render.useStencil = true
+				instance.data.render.renderEnt = self
 
 				instance:runScriptHook("render")
 			end
