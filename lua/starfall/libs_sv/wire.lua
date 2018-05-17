@@ -93,82 +93,72 @@ SF.Wire.WlUnwrap = wlunwrap
 
 -- ------------------------- Internal Library ------------------------- --
 
--- Allowed Expression2's types in tables and their short names
-local expression2types = {
-	n = "NORMAL",
-	s = "STRING",
-	v = "VECTOR",
-	a = "ANGLE",
-	xwl = "WIRELINK",
-	e = "ENTITY",
-	t = "TABLE"
+local function identity(data) return data end
+local typeToE2Type = {
+	[TYPE_NUMBER] = {identity, "n"},
+	[TYPE_STRING] = {identity, "s"},
+	[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
+	[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
+	[TYPE_ENTITY] = {identity, "e"}
 }
 
-local function convertFromExpression2(value, shortTypeName)
-	local typ = expression2types[shortTypeName]
-	if not typ or not SF.Wire.InputConverters[typ] then return nil end
-
-	return SF.Wire.InputConverters[typ](value)
-end
-
-local function convertToExpression2(value)
-	local typ = type(value)
-
-	-- Simple type?
-	if typ == "number" then return value, "n"
-	elseif typ == "string" then return value, "s"
-	elseif typ == "Vector" then return { value.x, value.y, value.z }, "v"
-	elseif typ == "Angle" then return { value.p, value.y, value.r }, "a"
-
-	-- We've got a table there. Is it wrapped object?
-	elseif typ == "table" then
-		local value = SF.Unsanitize(value)
-		typ = type(value)
-
-		if typ == "table" then
-			-- It is still table, do recursive convert
-			return SF.Wire.OutputConverters.TABLE(value), "t"
-
-		-- Unwrapped entity (wirelink goes to this, but it returns it as entity; don't think somebody needs to put wirelinks in table)
-		elseif typ == "Entity" then return value, "e" end
-	end
-
-	-- Nothing found / unallowed type
-	return nil, nil
-end
-
-local function identity(data) return data end
 local inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = function(value)
-		return vwrap(value)
-	end,
-	ANGLE = function(value)
-		return awrap(value)
-	end,
+	VECTOR = vwrap,
+	ANGLE = awrap,
 	WIRELINK = wlwrap,
 	ENTITY = ewrap,
 
-	TABLE = function(tbl)
-		if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
-		if tbl.size == 0 then return {} end -- Don't waste our time
-		local conv = {}
+	TABLE = function(data)
+		local completed_tables = {}
+		local function recursiveConvert(tbl)
+			if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
+			if tbl.size == 0 then return {} end
+			local conv = {}
+			completed_tables[tbl] = conv
 
-		-- Key-numeric part of table
-		for key, typ in pairs(tbl.ntypes) do
-			conv[key] = convertFromExpression2(tbl.n[key], typ)
+			-- Key-numeric part of table
+			for key, typ in pairs(tbl.ntypes) do
+				local val = tbl.n[key]
+				if typ=="t" then
+					conv[key] = completed_tables[val] or recursiveConvert(val)
+				else
+					conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
+				end
+			end
+
+			-- Key-string part of table
+			for key, typ in pairs(tbl.stypes) do
+				local val = tbl.s[key]
+				if typ=="t" then
+					conv[key] = completed_tables[val] or recursiveConvert(val)
+				else
+					conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
+				end
+			end
+
+			return conv
 		end
-
-		-- Key-string part of table
-		for key, typ in pairs(tbl.stypes) do
-			conv[key] = convertFromExpression2(tbl.s[key], typ)
+		return recursiveConvert(data)
+	end,
+	ARRAY = function(tbl)
+		local ret = {}
+		for i, v in ipairs(tbl) do
+			ret[i] = SF.WrapObject(v)
 		end
-
-		return conv
+		return ret
 	end
 }
+inputConverters.n = inputConverters.NORMAL
+inputConverters.s = inputConverters.STRING
+inputConverters.v = inputConverters.VECTOR
+inputConverters.a = inputConverters.ANGLE
+inputConverters.xwl = inputConverters.WIRELINK
+inputConverters.e = inputConverters.ENTITY
+inputConverters.t = inputConverters.TABLE
+inputConverters.r = inputConverters.ARRAY
 
 local outputConverters =
 {
@@ -180,42 +170,66 @@ local outputConverters =
 		checkluatype(data, TYPE_STRING, 1)
 		return data
 	end,
-	VECTOR = function (data)
+	VECTOR = function(data)
 		checktype(data, SF.Types["Vector"], 1)
 		return vunwrap(data)
 	end,
-	ANGLE = function (data)
+	ANGLE = function(data)
 		checktype(data, SF.Types["Angle"], 1)
 		return aunwrap(data)
 	end,
-	ENTITY = function (data)
-		checktype(data, SF.Types["Entity"])
+	ENTITY = function(data)
+		checktype(data, SF.Types["Entity"], 1)
 		return eunwrap(data)
 	end,
-
 	TABLE = function(data)
 		checkluatype(data, TYPE_TABLE, 1)
+		local completed_tables = {}
 
-		local tbl = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
+		local function recursiveConvert(tbl)
+			local ret = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
+			completed_tables[tbl] = ret
+			for key, value in pairs(tbl) do
 
-		for key, value in pairs(data) do
-			local value, shortType = convertToExpression2(value)
+				local ktyp = TypeID(key)
+				local valueList, typeList
+				if ktyp == TYPE_NUMBER then
+					valueList, typeList = ret.n, ret.ntypes
+				elseif ktyp == TYPE_STRING then
+					valueList, typeList = ret.s, ret.stypes
+				else
+					continue
+				end
 
-			if shortType then
-				if type(key) == "string" then
-					tbl.s[key] = value
-					tbl.stypes[key] = shortType
-					tbl.size = tbl.size + 1
+				value = SF.UnwrapObject(value) or value
+				local vtyp = TypeID(value)
+				local convert = typeToE2Type[vtyp]
 
-				elseif type(key) == "number" then
-					tbl.n[key] = value
-					tbl.ntypes[key] = shortType
-					tbl.size = tbl.size + 1
+				if convert then
+					valueList[key] = convert[1](value)
+					typeList[key] = convert[2]
+					ret.size = ret.size + 1
+				elseif vtyp == TYPE_TABLE then
+					valueList[key] = completed_tables[value] or recursiveConvert(value)
+					typeList[key] = "t"
+					ret.size = ret.size + 1
 				end
 			end
-		end
 
-		return tbl
+			return ret
+		end
+		return recursiveConvert(data)
+	end,
+	ARRAY = function(data)
+		local ret = {}
+		for i, v in ipairs(data) do
+			local obj = SF.UnwrapObject(v)
+			if obj then
+				local typ = typeToE2Type[TypeID(obj)]
+				ret[i] = typ and typ[1](obj)
+			end
+		end
+		return ret
 	end
 }
 
