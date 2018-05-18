@@ -98,8 +98,7 @@ function material_library.load(path)
 	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
 	checkpermission(SF.instance, path, "material.load")
 	local m = SF.CheckMaterial(path)
-	if not m then SF.Throw("The material is blacklisted", 2) end
-	if m:IsError() then SF.Throw("The material path is invalid", 2) end
+	if not m or m:IsError() then SF.Throw("This material doesn't exist or is blacklisted", 2) end
 	return lwrap(m)
 end
 

@@ -211,7 +211,7 @@ end
 function ents_methods:setMaterial (material)
 	checktype(self, ents_metamethods)
 	checkluatype (material, TYPE_STRING)
-	if not SF.CheckMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+	if SF.CheckMaterial(material) == false then SF.Throw("This material is blacklisted", 2) end
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -228,7 +228,7 @@ end
 function ents_methods:setSubMaterial (index, material)
 	checktype(self, ents_metamethods)
 	checkluatype (material, TYPE_STRING)
-	if not SF.CheckMaterial(material) then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+	if SF.CheckMaterial(material) == false then SF.Throw("This material is blacklisted", 2) end
 
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end

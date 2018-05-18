@@ -391,10 +391,11 @@ local materialBlacklist = {
 -- @param material The path to the material
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
+	if material == "" then return end
 	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
 	if materialBlacklist[material] then return false end
 	local mat = Material(material)
-	if not mat:IsError() and shaderBlacklist[mat:GetShader()] then return false end
+	if shaderBlacklist[mat:GetShader() or ""] then return false end
 	return mat
 end
 
