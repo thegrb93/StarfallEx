@@ -690,8 +690,10 @@ end
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
 	checktype(self, ents_metatable)
 	checkluatype(material, TYPE_STRING)
-
 	local ent = unwrap(self)
+	local time = CurTime()
+	if ent._lastTrailSet == time then SF.Throw("Can't modify trail more than once per frame", 2) end
+	ent._lastTrailSet = time
 
 	if string.find(material, '"', 1, true) then SF.Throw("Invalid Material", 2) end
 	if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
