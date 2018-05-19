@@ -55,6 +55,7 @@ end)
 local allowed_shaders = {
 	UnlitGeneric = true,
 	VertexLitGeneric = true,
+	Refract_DX90 = true,
 	Water_DX90 = true,
 	Sky_DX9 = true
 }
