@@ -108,7 +108,7 @@ end
 local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	for k, v in pairs(TimedPasteData[TimedPasteDataCurrent].CreatedEntities) do
 		if IsValid(v) and v:GetClass() == "starfall_processor" and v.instance then
-			v.instance:runScriptHook("initialize")
+			v.instance:runScriptHook("initialize", true)
 		end
 	end
 end

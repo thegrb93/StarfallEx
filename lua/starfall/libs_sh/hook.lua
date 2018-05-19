@@ -556,6 +556,7 @@ add("Tick")
 -- @name Initialize
 -- @class hook
 -- @server
+-- @param dupe True if the duplication that created the chip has finished
 
 --- Called when the local player opens their chat window.
 -- @name StartChat
