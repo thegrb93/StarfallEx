@@ -3,18 +3,18 @@
 
 if SERVER then
 	-- Code only executed on the server
-	local randomNumber = math.floor(math.random() * 100)
+	local randomNumber = math.random(0, 100)
 
-	hook.add("net", "uniqueHookNameHere", function (name, len, ply)
+	net.receive("request", function (len, ply)
 		-- ply being the client that sent the net message
+
 		-- A client is asking for the number
-		if name == "request" then
-			-- Send it to the client
-			net.start("number")
-				-- 8 is the amount of bits to use for the transmission
-				net.writeInt(randomNumber, 8)
-			net.send(ply)
-		end
+		-- Send it to the client
+		net.start("number")
+			-- UInt means that the number is an unsigned integer
+			-- 7 is the amount of bits to use for the transmission
+			net.writeUInt(randomNumber, 7)
+		net.send(ply)
 	end)
 else
 	-- Code only executed on the client
@@ -26,18 +26,15 @@ else
 	net.start("request")
 	net.send()
 
-	hook.add("net", "uniqueHookNameHerev2", function (name, len)
+	net.receive("number", function (len)
 		-- No client argument, since it can only come from the server
 		-- The server is sending us the number
-		if name == "number" then
-			randomNumber = net.readInt(8)
-		end
+		randomNumber = net.readUInt(7)
 	end)
 
 	-- The render hook is called every frame the client requires the screen to be rendered
 	-- If the client has 120 FPS then this hook will be called 120 in a second.
 	hook.add("render", "renderHook", function ()
-		render.clear()
 		if randomNumber then
 			render.setColor(Color(0, 255, 255, 255))
 			render.setFont(font)
