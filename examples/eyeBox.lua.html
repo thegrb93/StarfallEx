@@ -189,21 +189,26 @@
 -- Place this chip on a box to give it eyes
 
 if SERVER then
-	hook.add("net","",function(name,len,ply)
-		local e = chip():isWeldedTo()		
-		net.start("")
-		net.writeEntity(e)
-		net.send(ply)
-	end)
+	local weldedTo = chip():isWeldedTo()
+
+	if weldedTo and weldedTo:getModel():find("/wood_crate001a") then
+		hook.add("net","",function(name,len,ply)
+			net.start("")
+			net.writeEntity(weldedTo)
+			net.send(ply)
+		end)
+	else
+		print("Place this chip on a box to give it eyes")
+	end
 else
 	local ent
 	render.createRenderTarget("rt")
 	render.createRenderTarget("circle")
-	
-	local box = render.getTextureID("models/props_junk/woodcrates01a")    
+
+	local box = render.getTextureID("models/props_junk/woodcrates01a")
 	local m = material.create("VertexLitGeneric")
 	m:setTextureRenderTarget("$basetexture", "rt")
-	
+
 	net.start("")
 	net.send()
 
