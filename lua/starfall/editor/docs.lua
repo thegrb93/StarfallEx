@@ -895,7 +895,7 @@ Called when an entity is being picked up by a gravity gun";["name"]="GravGunOnPi
 Called when an entity is being picked up by a gravity gun ";};["GravGunPunt"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player punts with the gravity gun";["name"]="GravGunPunt";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being punted";["ply"]="Player punting the gravgun";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player punts with the gravity gun ";};["Initialize"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["name"]="Initialize";["param"]={};["realm"]="sh";["server"]=true;["summary"]="\
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["name"]="Initialize";["param"]={[1]="dupe";["dupe"]="True if the duplication that created the chip has finished";};["realm"]="sh";["server"]=true;["summary"]="\
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";};["KeyPress"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player presses a key";["name"]="KeyPress";["param"]={[1]="ply";[2]="key";["key"]="The key being pressed";["ply"]="Player pressing the key";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player presses a key ";};["KeyRelease"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
@@ -974,11 +974,11 @@ Called when local client changed instance permissions";["name"]="permissionreque
 Called when local client changed instance permissions ";};["postdrawhud"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called after drawing HUD (2D Context)";["name"]="postdrawhud";["param"]={};["realm"]="cl";["summary"]="\
 Called after drawing HUD (2D Context) ";};["postdrawopaquerenderables"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called after opaque entities are drawn. (Only works with HUD) (3D context)";["name"]="postdrawopaquerenderables";["param"]={[1]="boolean";["boolean"]="isDrawSkybox  Whether the current draw is drawing the skybox.";};["realm"]="cl";["summary"]="\
+Called after opaque entities are drawn. (Only works with HUD) (3D context)";["name"]="postdrawopaquerenderables";["param"]={[1]="boolean";["boolean"]="isDrawSkybox Whether the current draw is drawing the skybox.";};["realm"]="cl";["summary"]="\
 Called after opaque entities are drawn.";};["predrawhud"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called before drawing HUD (2D Context)";["name"]="predrawhud";["param"]={};["realm"]="cl";["summary"]="\
 Called before drawing HUD (2D Context) ";};["predrawopaquerenderables"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called before opaque entities are drawn. (Only works with HUD) (3D context)";["name"]="predrawopaquerenderables";["param"]={[1]="boolean";["boolean"]="isDrawSkybox  Whether the current draw is drawing the skybox.";};["realm"]="cl";["summary"]="\
+Called before opaque entities are drawn. (Only works with HUD) (3D context)";["name"]="predrawopaquerenderables";["param"]={[1]="boolean";["boolean"]="isDrawSkybox Whether the current draw is drawing the skybox.";};["realm"]="cl";["summary"]="\
 Called before opaque entities are drawn.";};["readcell"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when a high speed device reads from a wired SF chip";["name"]="readcell";["param"]={[1]="address";["address"]="The address requested";};["realm"]="sv";["ret"]="The value read";["server"]=true;["summary"]="\
 Called when a high speed device reads from a wired SF chip ";};["remote"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
@@ -1538,7 +1538,7 @@ Disables a scissoring rect which limits the drawing area.";["fname"]="disableSci
 Disables a scissoring rect which limits the drawing area.";};["draw3DBeam"]={["class"]="function";["description"]="\
 Draws textured beam.";["fname"]="draw3DBeam";["library"]="render";["name"]="render_library.draw3DBeam";["param"]={[1]="startPos";[2]="endPos";[3]="width";[4]="textureStart";[5]="textureEnd";["endPos"]="Beam end position.";["startPos"]="Beam start position.";["textureEnd"]="The end coordinate of the texture used.";["textureStart"]="The start coordinate of the texture used.";["width"]="The width of the beam.";};["private"]=false;["realm"]="cl";["summary"]="\
 Draws textured beam.";};["draw3DBox"]={["class"]="function";["description"]="\
-Draws a box in 3D space";["fname"]="draw3DBox";["library"]="render";["name"]="render_library.draw3DBox";["param"]={[1]="origin";[2]="angle";[3]="mins";[4]="maxs";["angle"]="Orientation  of the box";["maxs"]="End position of the box, relative to origin.";["mins"]="Start position of the box, relative to origin.";["origin"]="Origin of the box.";};["private"]=false;["realm"]="cl";["summary"]="\
+Draws a box in 3D space";["fname"]="draw3DBox";["library"]="render";["name"]="render_library.draw3DBox";["param"]={[1]="origin";[2]="angle";[3]="mins";[4]="maxs";["angle"]="Orientation of the box";["maxs"]="End position of the box, relative to origin.";["mins"]="Start position of the box, relative to origin.";["origin"]="Origin of the box.";};["private"]=false;["realm"]="cl";["summary"]="\
 Draws a box in 3D space ";};["draw3DLine"]={["class"]="function";["description"]="\
 Draws a 3D Line";["fname"]="draw3DLine";["library"]="render";["name"]="render_library.draw3DLine";["param"]={[1]="startPos";[2]="endPos";["endPos"]="Ending position";["startPos"]="Starting position";};["private"]=false;["realm"]="cl";["summary"]="\
 Draws a 3D Line ";};["draw3DQuad"]={["class"]="function";["description"]="\
@@ -1550,7 +1550,7 @@ Draws a sphere";["fname"]="draw3DSphere";["library"]="render";["name"]="render_l
 Draws a sphere ";};["draw3DSprite"]={["class"]="function";["description"]="\
 Draws a sprite in 3d space.";["fname"]="draw3DSprite";["library"]="render";["name"]="render_library.draw3DSprite";["param"]={[1]="pos";[2]="width";[3]="height";["height"]="Height of the sprite.";["pos"]="Position of the sprite.";["width"]="Width of the sprite.";};["private"]=false;["realm"]="cl";["summary"]="\
 Draws a sprite in 3d space.";};["draw3DWireframeBox"]={["class"]="function";["description"]="\
-Draws a wireframe box in 3D space";["fname"]="draw3DWireframeBox";["library"]="render";["name"]="render_library.draw3DWireframeBox";["param"]={[1]="origin";[2]="angle";[3]="mins";[4]="maxs";["angle"]="Orientation  of the box";["maxs"]="End position of the box, relative to origin.";["mins"]="Start position of the box, relative to origin.";["origin"]="Origin of the box.";};["private"]=false;["realm"]="cl";["summary"]="\
+Draws a wireframe box in 3D space";["fname"]="draw3DWireframeBox";["library"]="render";["name"]="render_library.draw3DWireframeBox";["param"]={[1]="origin";[2]="angle";[3]="mins";[4]="maxs";["angle"]="Orientation of the box";["maxs"]="End position of the box, relative to origin.";["mins"]="Start position of the box, relative to origin.";["origin"]="Origin of the box.";};["private"]=false;["realm"]="cl";["summary"]="\
 Draws a wireframe box in 3D space ";};["draw3DWireframeSphere"]={["class"]="function";["description"]="\
 Draws a wireframe sphere";["fname"]="draw3DWireframeSphere";["library"]="render";["name"]="render_library.draw3DWireframeSphere";["param"]={[1]="pos";[2]="radius";[3]="longitudeSteps";[4]="latitudeSteps";["latitudeSteps"]="The amount of latitude steps. The larger this number is, the smoother the sphere is";["longitudeSteps"]="The amount of longitude steps. The larger this number is, the smoother the sphere is";["pos"]="Position of the sphere";["radius"]="Radius of the sphere";};["private"]=false;["realm"]="cl";["summary"]="\
 Draws a wireframe sphere ";};["drawCircle"]={["class"]="function";["description"]="\
