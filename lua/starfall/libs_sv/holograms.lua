@@ -300,7 +300,6 @@ function holograms_library.create (pos, ang, model, scale)
 		holoent:Spawn()
 
 		hook.Run("PlayerSpawnedSENT", instance.player, holoent)
-		holoent:SetHoloOwner(instance.player)
 
 		if scale then
 			holoent:SetScale(scale)

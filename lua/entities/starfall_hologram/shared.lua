@@ -9,7 +9,7 @@ ENT.AdminSpawnable  = false
 
 function ENT:SetupDataTables()
 
-	self:NetworkVar("Entity", 0, "HoloOwner");
-	self:NetworkVar("Bool", 0, "SuppressEngineLighting");
+	self:NetworkVar("Bool", 0, "SuppressEngineLighting")
+	self:NetworkVar("Vector", 0, "Scale")
 
 end

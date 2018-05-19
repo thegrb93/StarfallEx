@@ -92,8 +92,8 @@ if CLIENT then
 		checkluatype (bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
@@ -105,8 +105,8 @@ if CLIENT then
 		checkluatype (bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
@@ -118,8 +118,8 @@ if CLIENT then
 		checkluatype (bone, TYPE_NUMBER)
 		checktype(ang, ang_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
@@ -131,8 +131,8 @@ if CLIENT then
 		local instance = SF.instance
 		checkpermission(instance, nil, "mesh")
 		local ent = eunwrap(self)
-		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
-		if instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
 			checktype(mesh, SF.Mesh.Metatable)
 			ent:SetModelScale(0, 0)
@@ -152,8 +152,8 @@ if CLIENT then
 		checktype(mins, vec_meta)
 		checktype(maxs, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
 
@@ -161,15 +161,20 @@ if CLIENT then
 	-- @client
 	-- @param mat VMatrix to use
 	function ents_methods:setHologramRenderMatrix(mat)
-		checktype(mat, SF.VMatrix.Metatable)
+		if mat ~= nil then checktype(mat, SF.VMatrix.Metatable) end
 		local ent = eunwrap(self)
-		if not isValid(ent) or not ent.GetHoloOwner then SF.Throw("The entity is invalid or not a hologram", 2) end
-		if SF.instance.player ~= ent:GetHoloOwner() then SF.Throw("This hologram doesn't belong to you", 2) end
-		local matrix = SF.VMatrix.Unwrap(mat)
-		if matrix:IsIdentity() then
-			ent:DisableMatrix("RenderMultiply")
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		
+		if mat then
+			local matrix = SF.VMatrix.Unwrap(mat)
+			if matrix:IsIdentity() then
+				ent:DisableMatrix("RenderMultiply")
+			else
+				ent:EnableMatrix("RenderMultiply", matrix)
+			end
 		else
-			ent:EnableMatrix("RenderMultiply", matrix)
+			ent:DisableMatrix("RenderMultiply")
 		end
 	end
 end
