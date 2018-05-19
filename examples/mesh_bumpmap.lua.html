@@ -189,7 +189,8 @@
 local holo
 if SERVER then
 
-	holo = holograms.create(chip():getPos()+Vector(0,0,100), chip():getAngles(), "models/Combine_Helicopter/helicopter_bomb01.mdl")
+	holo = holograms.create(chip():getPos()+Vector(0,0,50), chip():getAngles(), "models/Combine_Helicopter/helicopter_bomb01.mdl")
+	holo:setScale(Vector(0.1, 0.1, 0.1))
 	holo:setParent(chip())
 
 	hook.add("net","",function(name, len, pl)        
@@ -203,8 +204,8 @@ else
 	local sphere
 	local mat = material.create("VertexLitGeneric")
 	mat:setInt("$flags",138414080)
-	mat:setTexture("$basetexture", "phoenix_storms/cube")
-	mat:setTexture("$bumpmap", "phoenix_storms/cube_bump")
+	mat:setTexture("$basetexture", "hunter/myplastic")
+	mat:setTexture("$bumpmap", "hunter/myplastic_normal")
 	mat:setTexture("$envmap", "env_cubemap")
 	
 	mat:setFloat("$envmapcontrast", 1)
@@ -214,8 +215,8 @@ else
 	mat:setInt("$phong", 1)
 	mat:setFloat("$phongalbedotint", 0)
 	mat:setFloat("$phongboost", 2)
-	mat:setFloat("$phongexponent", 20)
-	mat:setVector("$phongfresnelranges", Vector(.219520, 0.612066, 1.000000))
+	mat:setFloat("$phongexponent", 60)
+	mat:setVector("$phongfresnelranges", Vector(0.219520, 0.612066, 1.000000))
 
 	net.start("")
 	net.send()
