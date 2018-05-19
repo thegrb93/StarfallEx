@@ -570,11 +570,13 @@ function SF.Sanitize(...)
 		local return_list = {}
 		completed_tables[tbl] = return_list
 		for key, value in pairs(tbl) do
-			if not safe_types[TypeID(key)] then
-				key = SF.WrapObject(key) or completed_tables[key] or RecursiveSanitize(key)
+			local keyt = TypeID(key)
+			local valuet = TypeID(value)
+			if not safe_types[keyt] then
+				key = SF.WrapObject(key) or completed_tables[key] or (keyt == TYPE_TABLE and RecursiveSanitize(key) or nil)
 			end
-			if not safe_types[TypeID(value)] then
-				value = SF.WrapObject(value) or completed_tables[value] or RecursiveSanitize(value)
+			if not safe_types[valuet] then
+				value = SF.WrapObject(value) or completed_tables[value] or (valuet == TYPE_TABLE and RecursiveSanitize(value) or nil)
 			end
 			return_list[key] = value
 		end
