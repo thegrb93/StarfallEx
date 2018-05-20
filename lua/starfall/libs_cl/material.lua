@@ -468,7 +468,13 @@ local function NextInTextureQueue()
 
 		Panel:AddFunction("sf", "imageLoaded", applyTexture)
 		Panel:AddFunction("sf", "imageErrored", errorTexture)
-		Panel:RunJavascript([[img.removeAttribute("src");img.removeAttribute("width");img.removeAttribute("height");img.style.left="0px";img.style.top="0px";img.src="]] .. requestTbl.Url .. [[";]])
+		Panel:RunJavascript(
+		[[img.removeAttribute("width");
+		img.removeAttribute("height");
+		img.style.left="0px";
+		img.style.top="0px";
+		img.src="]] .. requestTbl.Url .. [[";
+		if(img.complete){sf.imageLoaded(img.width, img.height);}]])
 		Panel:Show()
 
 		timer.Create("SF_URLTextureTimeout", 10, 1, function()
