@@ -86,7 +86,7 @@ window.addEventListener('load', function () {
 
 					methodsHtml +=
 						'<li><span class="realm_' + realm +
-						'">&nbsp;</span><a href="' + fromPath + 'classes/' + className + '.html#' + funcTable.classlib + ':' + funcTable.fname + '">' +
+						'">&nbsp;</span><a href="' + fromPath + 'classes/' + className + '.html#' + className + ':' + name + '">' +
 						className + ':' + name + '</a></li>';
 				}
 			}
