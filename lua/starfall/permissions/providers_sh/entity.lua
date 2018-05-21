@@ -1,5 +1,7 @@
 --- Provides permissions for entities based on CPPI if present
 
+local isentity = isentity
+
 local P = {}
 P.id = "entities"
 P.name = "Entity Permissions"
@@ -26,33 +28,33 @@ local dumbtrace = {
 if SERVER then
 	P.checks = {
 		function(instance, target)
-			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
+			if isentity(target) and target:IsValid() then
 				if instance.player:IsSuperAdmin() then return true end
-				return P.props[target]==instance.player
+				return P.props[target]==instance.player, "You're not the owner of this prop"
 			else
-				return false
+				return false, "Entity is invalid"
 			end
 		end,
 		function(instance, target)
-			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
+			if isentity(target) and target:IsValid() then
 				local pos = target:GetPos()
 				dumbtrace.Entity = target		
-				return hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false
+				return hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false, "Target doesn't have toolgun access"
 			else
-				return false
+				return false, "Entity is invalid"
 			end
 		end,
 		function(instance, target)
-			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
+			if isentity(target) and target:IsValid() then
 				if hook.Run("PhysgunPickup", instance.player, target) ~= false then
 					-- Some mods expect a release when there's a pickup involved.
 					hook.Run("PhysgunDrop", instance.player, target)
 					return true
 				else
-					return false
+					return false, "Target doesn't have physgun access"
 				end
 			else
-				return false
+				return false, "Entity is invalid"
 			end
 		end,
 		function() return true end
@@ -60,15 +62,15 @@ if SERVER then
 else
 	P.checks = {
 		function(instance, target)
-			if TypeID(target) == TYPE_ENTITY and target:IsValid() then
+			if isentity(target) and target:IsValid() then
 				if LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
-				return target:GetNWEntity("SFPP")==instance.player
+				return target:GetNWEntity("SFPP")==instance.player, "You're not the owner of this prop"
 			else
-				return false
+				return false, "Entity is invalid"
 			end
 		end,
-		function() return false end,
-		function() return false end,
+		function() return false, "Target doesn't have physgun access" end,
+		function() return false, "Target doesn't have toolgun access" end,
 		function() return true end
 	}
 end

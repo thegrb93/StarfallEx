@@ -9,16 +9,16 @@ P.settingsoptions = { "Enabled", "Disabled" }
 P.defaultsetting = 1
 P.checks = {
 	function(instance, target, key)
-		if TypeID(target) ~= TYPE_STRING then return false end
+		if TypeID(target) ~= TYPE_STRING then return false, "The url is not a string" end
 		local prefix = string.match(target,"^(%w-)://") -- Check if protocol was given
 		if not prefix then -- If not, add http://
 			target = "http://"..target
 		end
 
 		local prefix, site, data = string.match(target,"^(%w-)://([^/]*)/?(.*)")
-		if not site then return false end
+		if not site then return false, "This url is malformed" end
 		site = site.."/"..(data or "") -- Make sure there is / at the end of site
-		return urlrestrictor:check(site)
+		return urlrestrictor:check(site), "This url is not whitelisted"
 	end,
 	function() return true end,
 }

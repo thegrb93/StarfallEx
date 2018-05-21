@@ -65,13 +65,21 @@ end
 -- @param target the object on which the action is being performed
 -- @param key a string identifying the action being performed
 function P.check (instance, target, key)
-	if not (instance.permissionOverrides and instance.permissionOverrides[key]) and P.permissionchecks[key](instance, target) then
-		SF.Throw("Insufficient permissions: " .. key, 3)
+	if not (instance.permissionOverrides and instance.permissionOverrides[key]) then
+		local notok, reason = P.permissionchecks[key](instance, target)
+		if notok then
+			SF.Throw("Permission " .. key .. ": " .. reason, 3)
+		end
 	end
 end
 
 function P.hasAccess (instance, target, key)
-	return (instance.permissionOverrides and instance.permissionOverrides[key]) or not P.permissionchecks[key](instance, target)
+	if (instance.permissionOverrides and instance.permissionOverrides[key]) then
+		return true
+	else
+		local notok, reason = P.permissionchecks[key](instance, target)
+		if notok then return false, reason else return true end
+	end
 end
 
 function P.savePermissions()
@@ -95,7 +103,8 @@ function P.buildPermissionCheck(privilegeid)
 	end
 	P.permissionchecks[privilegeid] = function(instance, target)
 		for k, v in ipairs(checks) do
-			if not v(instance, target) then return true end
+			local ok, reason = v(instance, target)
+			if not ok then return true, reason end
 		end
 		return false
 	end
