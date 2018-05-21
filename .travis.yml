@@ -9,6 +9,7 @@ env:
 branches:
   only:
   - master
+  - ulua-docgen
 notifications:
   email: false
 install:
