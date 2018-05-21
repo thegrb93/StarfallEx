@@ -3,21 +3,16 @@ sudo: false
 compiler: gcc
 os:
 - linux
-env:
-  matrix:
-  - LUA=lua-5.1.5          LUAROCKS=2.2.2
 branches:
   only:
   - master
   - ulua-docgen
 notifications:
   email: false
-install:
-- ". ./install.sh"
-- luarocks install luadoc
 script:
+- chmod -R +xrw .
 - cd docgen
-- lua -v build_all.lua
+- ". ./build_docs.sh"
 
 after_success:
 - cd ..
