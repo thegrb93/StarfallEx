@@ -1,0 +1,248 @@
+body {
+	margin: 0;
+	width: calc(100% - 300px);
+	padding-left: 300px;
+	line-height: 150%;
+	letter-spacing: .2px;
+	font-family: Arial, sans-serif;
+	background-image: url(images/bg.png);
+	background-attachment: fixed;
+	background-color: #fff;
+}
+
+body, td, th {
+	font-size: 12pt;
+	color: #000;
+}
+
+h1, h2, h3, h4 {
+	line-height: initial;
+}
+
+code, pre, tt {
+	font-family: "Andale Mono", "Lucida Console", "Courier New", monospace;
+}
+*:not(h1) > tt {
+	padding: 1pt 4pt;
+	border: 1px solid #ccc;
+	border-radius: 4pt;
+	box-shadow: 0 2pt 2pt -2pt;
+	background-color: #ddd;
+}
+
+a {
+	font-weight: bold;
+	text-decoration: none;
+}
+a:visited {
+	color: #058;
+}
+
+input {
+	font-size: 10pt;
+	font-family: inherit;
+}
+
+img {
+	border-width: 0;
+}
+
+blockquote {
+	margin-left: 3em;
+}
+
+pre.example {
+	background-color: #f5f5f5;
+	border: 1px solid #bbb;
+	padding: 1em;
+	font-size: smaller;
+}
+
+table {
+	border-collapse: collapse;
+	margin-left: auto;
+	margin-right: auto;
+}
+td, th {
+	border: 1px solid #ccc;
+	padding: .5em;
+}
+
+.realm_cl, .realm_sv, .realm_sh {
+	display: inline-block;
+	margin-right: 5px;
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+}
+.realm_cl {
+	background-color: #f80;
+}
+.realm_sv {
+	background-color: #08f;
+}
+.realm_sh {
+	background: -moz-linear-gradient(45deg, #08f 0%, #08f 49%, #f80 51%, #f80 100%);
+	background: -webkit-linear-gradient(45deg, #08f 0%, #08f 49%, #f80 51%, #f80 100%);
+	background: -o-linear-gradient(45deg, #08f 0%, #08f 49%, #f80 51%, #f80 100%);
+	background: -ms-linear-gradient(45deg, #08f 0%, #08f 49%, #f80 51%, #f80 100%);
+	background: linear-gradient(45deg, #08f 0%, #08f 49%, #f80 51%, #f80 100%);
+}
+
+.star {
+	margin: 0 8px;
+	width: 24px;
+	height: 24px;
+	background-image: url(images/star.png);
+	background-size: 100%;
+	-webkit-filter: brightness(100%) sepia(100%) hue-rotate(180deg);
+	-webkit-transition: -webkit-filter .5s ease-out;
+}
+span.star {
+	display: inline-block;
+}
+
+nav {
+	position: fixed;
+	left: 0;
+	top: 0;
+	overflow-y: scroll;
+	width: 300px;
+	height: 100%;
+	background-image: url(images/nav_bg.png);
+	background-size: cover;
+	background-color: #000510;
+	color: #0ac;
+}
+
+nav section {
+	margin-bottom: 1em;
+}
+
+nav section > h1 {
+	margin: .5em 0;
+	padding: 1em;
+	font-size: 1em;
+	box-shadow: 0 -.5em 2em -.5em #fff;
+	background: -moz-linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .5) 49%, #222 51%, #222 100%);
+	background: -webkit-linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .5) 49%, #222 51%, #222 100%);
+	background: -o-linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .5) 49%, #222 51%, #222 100%);
+	background: -ms-linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .5) 49%, #222 51%, #222 100%);
+	background: linear-gradient(0deg, rgba(0, 0, 0, .5) 0%, rgba(0, 0, 0, .5) 49%, #222 51%, #222 100%);
+	color: #fff;
+}
+
+nav ul
+{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+}
+nav li
+{
+	margin: 0;
+	padding: 0 1em;
+	display: flex;
+	align-items: center;
+}
+
+nav a {
+	display: inline-block;
+	flex-grow: 1;
+	position: relative;
+	padding: .2em;
+	border-radius: .5em;
+	background-color: transparent;
+	color: inherit;
+}
+nav a[href]:hover {
+	background-color: #000;
+	color: #0ff;
+}
+nav a:not([href]) {
+	background-color: #058;
+	color: #fff;
+}
+nav a:not([href]):after {
+	content: '>';
+	position: absolute;
+	right: 0;
+	padding: 0 .5em;
+}
+
+#search {
+	padding: 0 .5em .5em;
+}
+#search_field {
+	width: 100%;
+	padding: .5em;
+	outline: none;
+	border: none;
+	border-radius: .5em;
+}
+#search_field:focus {
+	box-shadow: 0 0 1em #0ff;
+}
+
+main {
+	padding: 2em;
+}
+
+main a:link {
+	color: #05c;
+}
+main a:hover {
+	text-decoration: underline;
+}
+
+main > h1 {
+	text-align: center;
+	font-size: 3em;
+	color: #058;
+}
+
+main h2 {
+	margin: 2em 0 .5em 0;
+	font-size: 2em;
+	color: #555;
+}
+
+main h3 {
+	font-size: 1.2em;
+	color: #333;
+}
+
+main > .star {
+	margin: 0 auto;
+	width: 128px;
+	height: 128px;
+}
+
+table.list {
+	width: 100%;
+}
+table.list td.name {
+	max-width: 30%;
+	background-color: #f0f0f0;
+}
+table.list td.summary {
+	width: 60%;
+	max-width: 70%;
+}
+
+dt {
+	margin-top: 3em;
+	font-weight: bold;
+}
+
+footer {
+	margin: 1em 2em;
+	border-top: 1px solid #058;
+	color: #058;
+}
+
+footer a {
+	padding: .5em 1em;
+	border: 1px dotted #058;
+	border-radius: 1em;
+}

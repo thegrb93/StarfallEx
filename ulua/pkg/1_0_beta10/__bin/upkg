@@ -1,0 +1,33 @@
+local pkg = require 'pkg'
+
+local commands = {
+  status    = true,
+  available = true,
+  add       = true,
+  remove    = true,
+  update    = true,
+}
+
+local function err()
+  print[[
+Universal Lua package manager. Usage:
+upkg command [-s] [name] [version]
+  command : one of "status", "available", "add", "remove", "update"
+  -s      : enable searching (only for "status" and "available" commands)
+  name    : module name
+  version : module version]]
+  os.exit(1)
+end
+
+local cmd, search, name, ver = arg[1]
+if not cmd or not commands[cmd] then err() end
+
+search = arg[2] == '-s'
+if search then
+  if cmd ~= 'status' and cmd ~= 'available' then err() end
+  name, ver = '?'..arg[3], arg[4]
+else
+  name, ver = arg[2], arg[3]
+end
+
+pkg[cmd](name, ver)

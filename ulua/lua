@@ -1,0 +1,25 @@
+#!/bin/bash
+if ! [ -z ${BIT+x} ]; then
+  if [ "$BIT" == "32" ]; then
+    LJ_ARCH="x86"
+  elif [ "$BIT" == "64" ]; then
+    LJ_ARCH="x64"
+  else
+    echo "ERROR: BIT=$BIT is not a valid setting, use 32 or 64" 1>&2 && exit 1
+  fi
+else
+  LJ_ARCH="x86"
+fi
+LJ_VER_EXT="luajit/2_1_head20151128"
+LUA_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+if [ "$(uname)" == "Darwin" ]; then
+  LJ_SYS="OSX"
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+  LJ_SYS="Linux"
+else
+  echo "ERROR - Unsupported system: ""$(uname -s)" 1>&2 && exit 1
+fi
+LJ_CORE="$LUA_ROOT""/""$LJ_VER_EXT""/""$LJ_SYS""/""$LJ_ARCH"
+LUA_PATH="$LUA_ROOT""/?/init.lua;""$LUA_ROOT""/?.lua;""$LJ_CORE""/?/init.lua;""$LJ_CORE""/?.lua;"
+LUA_CPATH="$LUA_ROOT""/?.so;""$LUA_ROOT""/loadall.so;"
+LUA_ROOT="$LUA_ROOT" LUA_PATH="$LUA_PATH" LUA_CPATH="$LUA_CPATH" "$LJ_CORE""/"luajit -l__init $@

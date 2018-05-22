@@ -1,0 +1,4 @@
+#!/bin/bash
+BIN_ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+LUA_ROOT="$BIN_ROOT""/.."
+source "$LUA_ROOT"/lua "$LUA_ROOT""/""pkg/1_0_beta10/__bin/upkg" $@
