@@ -6,10 +6,10 @@ os:
 branches:
   only:
   - master
-  - ulua-docgen
 notifications:
   email: false
 script:
+- git clone -b docgen --single-branch https://github.com/thegrb93/StarfallEx.git docgen
 - chmod -R +xrw .
 - cd docgen
 - ". ./build_docs.sh"

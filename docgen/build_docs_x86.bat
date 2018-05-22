@@ -1,1 +1,0 @@
-ulua/lua -v build_all.lua
