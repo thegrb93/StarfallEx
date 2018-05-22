@@ -1,4 +1,9 @@
-local pkg = require 'pkg'
+local function prequire(m) 
+    local ok, err = pcall(require, m) 
+    if not ok then return nil, err end
+    return err
+end
+local pkg = prequire 'pkg'
 if not pkg then
     print("Not running using ULUA");
 else
