@@ -137,8 +137,8 @@ end
 function timer_library.adjust(name, delay, reps, func)
 	SF.CheckLuaType(name, TYPE_STRING)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
-	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
-	if func then SF.CheckLuaType(func, TYPE_FUNCTION) end
+	if reps~=nil then SF.CheckLuaType(reps, TYPE_NUMBER) end
+	if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) end
 
 	return timer.Adjust(mangle_timer_name(SF.instance, name), delay, reps, func)
 end
