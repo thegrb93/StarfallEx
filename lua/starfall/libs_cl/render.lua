@@ -229,19 +229,12 @@ SF.AddHook("deinitialize", function (instance)
 	end
 end)
 
-local function sfCreateMaterial(name, skip_hack)
-	local tbl = {
-				["$nolod"] = 1,
-				["$ignorez"] = 1,
-				["$vertexcolor"] = 1,
-				["$vertexalpha"] = 1
-			}
-	if skip_hack then
-		tbl["$basetexturetransform"] = nil
-	end
-	return CreateMaterial(name, "UnlitGeneric", tbl)
-end
-local RT_Material = sfCreateMaterial("SF_RT_Material")
+local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
+	["$nolod"] = 1,
+	["$ignorez"] = 1,
+	["$vertexcolor"] = 1,
+	["$vertexalpha"] = 1
+})
 
 local validfonts = {
 	akbar = "Akbar",
@@ -601,10 +594,11 @@ end
 
 --- Looks up a texture by file name. Use with render.setTexture to draw with it.
 --- Make sure to store the texture to use it rather than calling this slow function repeatedly.
+--- NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)
 -- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
--- @param cb Optional callback for when a url texture finishes loading. Arguements are The material table and the url
--- @return The material. Use it with render.setTexture. Returns nil if max url textures is reached.
-function render_library.getTextureID (tx, cb, alignment, skip_hack)
+-- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
+-- @return The material. Use it with render.setTexture
+function render_library.getTextureID (tx, cb)
 	checkluatype (tx, TYPE_STRING)
 
 	local m = SF.instance.env.material.create("UnlitGeneric")
@@ -852,9 +846,21 @@ function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
---- Draws a rectangle using the current color. Use 3D functions for float coordinates
--- @param x Top left corner x integer coordinate
--- @param y Top left corner y integer coordinate
+local quad_v1, quad_v2, quad_v3, quad_v4 = Vector(0,0,0), Vector(0,0,0), Vector(0,0,0), Vector(0,0,0)
+local function makeQuad(x, y, w, h)
+	local right, bot = x + w, y + h
+	quad_v1.x = x
+	quad_v1.y = y
+	quad_v2.x = right
+	quad_v2.y = y
+	quad_v3.x = right
+	quad_v3.y = bot
+	quad_v4.x = x
+	quad_v4.y = bot
+end
+--- Draws a rectangle using the current color
+-- @param x Top left corner x
+-- @param y Top left corner y
 -- @param w Width
 -- @param h Height
 function render_library.drawRect (x, y, w, h)
@@ -863,10 +869,11 @@ function render_library.drawRect (x, y, w, h)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (w, TYPE_NUMBER)
 	checkluatype (h, TYPE_NUMBER)
-	surface.DrawRect(x, y, w, h)
+	makeQuad(x, y, w, h)
+	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
---- Draws a rectangle outline using the current color. Use 3D functions for float coordinates
+--- Draws a rectangle outline using the current color.
 -- @param x Top left corner x integer coordinate
 -- @param y Top left corner y integer coordinate
 -- @param w Width
@@ -892,9 +899,9 @@ function render_library.drawCircle (x, y, r)
 	surface.DrawCircle(x, y, r, currentcolor)
 end
 
---- Draws a textured rectangle. Use 3D functions for float coordinates
--- @param x Top left corner x integer coordinate
--- @param y Top left corner y integer coordinate
+--- Draws a textured rectangle
+-- @param x Top left corner x
+-- @param y Top left corner y
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRect (x, y, w, h)
@@ -903,12 +910,13 @@ function render_library.drawTexturedRect (x, y, w, h)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (w, TYPE_NUMBER)
 	checkluatype (h, TYPE_NUMBER)
-	surface.DrawTexturedRect (x, y, w, h)
+	makeQuad(x, y, w, h)
+	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
---- Draws a textured rectangle with UV coordinates. Use 3D functions for float coordinates
--- @param x Top left corner x integer coordinate
--- @param y Top left corner y integer coordinate
+--- Draws a textured rectangle with UV coordinates
+-- @param x Top left corner x
+-- @param y Top left corner y
 -- @param w Width
 -- @param h Height
 -- @param startU Texture mapping at rectangle origin
@@ -925,7 +933,28 @@ function render_library.drawTexturedRectUV (x, y, w, h, startU, startV, endU, en
 	checkluatype (startV, TYPE_NUMBER)
 	checkluatype (endU, TYPE_NUMBER)
 	checkluatype (endV, TYPE_NUMBER)
-	surface.DrawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
+
+	local r,g,b,a = currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a
+
+	makeQuad(x, y, w, h)
+	mesh.Begin(MATERIAL_QUADS, 1)
+		mesh.Position( quad_v1 )
+		mesh.Color( r,g,b,a )
+		mesh.TexCoord( 0, startU, startV )
+		mesh.AdvanceVertex()
+		mesh.Position( quad_v2 )
+		mesh.Color( r,g,b,a )
+		mesh.TexCoord( 0, endU, startV )
+		mesh.AdvanceVertex()
+		mesh.Position( quad_v3 )
+		mesh.Color( r,g,b,a )
+		mesh.TexCoord( 0, endU, endV )
+		mesh.AdvanceVertex()
+		mesh.Position( quad_v4 )
+		mesh.Color( r,g,b,a )
+		mesh.TexCoord( 0, startU, endV )
+		mesh.AdvanceVertex()
+	mesh.End()
 end
 
 --- Draws a rotated, textured rectangle.
@@ -942,7 +971,23 @@ function render_library.drawTexturedRectRotated (x, y, w, h, rot)
 	checkluatype (h, TYPE_NUMBER)
 	checkluatype (rot, TYPE_NUMBER)
 
-	surface.DrawTexturedRectRotated(x, y, w, h, rot)
+	local rad = math.rad(rot)
+	local cos, sin = math.cos(rad), math.sin(rad)
+	makeQuad(-w/2, -h/2, w, h)
+	local function rotateVector(vec)
+		-- These locals are needed because the next line requires the vector to be unmodified
+		local x = vec.x * cos - vec.y * sin + x
+		local y = vec.x * sin + vec.y * cos + y
+		vec.x = x
+		vec.y = y
+	end
+
+	rotateVector(quad_v1)
+	rotateVector(quad_v2)
+	rotateVector(quad_v3)
+	rotateVector(quad_v4)
+
+	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
 --- Draws a line. Use 3D functions for float coordinates
