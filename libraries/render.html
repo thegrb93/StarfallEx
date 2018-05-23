@@ -316,7 +316,7 @@ Draws a polygon.</td>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawRect">drawRect</a>( x, y, w, h&nbsp;)</td>
 			<td class="summary">
-Draws a rectangle using the current color.</td>
+Draws a rectangle using the current color </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawRectOutline">drawRectOutline</a>( x, y, w, h&nbsp;)</td>
@@ -346,7 +346,7 @@ Draws text with newlines and tabs </td>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRect">drawTexturedRect</a>( x, y, w, h&nbsp;)</td>
 			<td class="summary">
-Draws a textured rectangle.</td>
+Draws a textured rectangle </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectRotated">drawTexturedRectRotated</a>( x, y, w, h, rot&nbsp;)</td>
@@ -356,7 +356,7 @@ Draws a rotated, textured rectangle.</td>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectUV">drawTexturedRectUV</a>( x, y, w, h, startU, startV, endU, endV&nbsp;)</td>
 			<td class="summary">
-Draws a textured rectangle with UV coordinates.</td>
+Draws a textured rectangle with UV coordinates </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.enableDepth">enableDepth</a>( enable&nbsp;)</td>
@@ -399,7 +399,7 @@ Returns information about the screen, such as world offsets, dimentions, and rot
 Gets the size of the specified text.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.getTextureID">getTextureID</a>( tx, cb, alignment, skip_hack&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getTextureID">getTextureID</a>( tx, cb&nbsp;)</td>
 			<td class="summary">
 Looks up a texture by file name.</td>
 		</tr>
@@ -1065,15 +1065,15 @@ Draws a polygon.</p>
 <dt><span class="realm_cl"></span><a name="render.drawRect"></a><strong>render.drawRect</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
-Draws a rectangle using the current color. Use 3D functions for float coordinates</p>
+Draws a rectangle using the current color</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
-			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
+			<li><tt>x</tt> ― Top left corner x</li>
+			<li><tt>y</tt> ― Top left corner y</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
@@ -1087,7 +1087,7 @@ Draws a rectangle using the current color. Use 3D functions for float coordinate
 <dt><span class="realm_cl"></span><a name="render.drawRectOutline"></a><strong>render.drawRectOutline</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
-Draws a rectangle outline using the current color. Use 3D functions for float coordinates</p>
+Draws a rectangle outline using the current color.</p>
 	
 	
 	<section class="parameters">
@@ -1204,15 +1204,15 @@ Draws text with newlines and tabs</p>
 <dt><span class="realm_cl"></span><a name="render.drawTexturedRect"></a><strong>render.drawTexturedRect</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
-Draws a textured rectangle. Use 3D functions for float coordinates</p>
+Draws a textured rectangle</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
-			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
+			<li><tt>x</tt> ― Top left corner x</li>
+			<li><tt>y</tt> ― Top left corner y</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 		</ul>
@@ -1249,15 +1249,15 @@ Draws a rotated, textured rectangle.</p>
 <dt><span class="realm_cl"></span><a name="render.drawTexturedRectUV"></a><strong>render.drawTexturedRectUV</strong>( x, y, w, h, startU, startV, endU, endV&nbsp;)</dt>
 <dd>
 	<p>
-Draws a textured rectangle with UV coordinates. Use 3D functions for float coordinates</p>
+Draws a textured rectangle with UV coordinates</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt> ― Top left corner x integer coordinate</li>
-			<li><tt>y</tt> ― Top left corner y integer coordinate</li>
+			<li><tt>x</tt> ― Top left corner x</li>
+			<li><tt>y</tt> ― Top left corner y</li>
 			<li><tt>w</tt> ― Width</li>
 			<li><tt>h</tt> ― Height</li>
 			<li><tt>startU</tt> ― Texture mapping at rectangle origin</li>
@@ -1445,11 +1445,12 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>( tx, cb, alignment, skip_hack&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>( tx, cb&nbsp;)</dt>
 <dd>
 	<p>
 Looks up a texture by file name. Use with render.setTexture to draw with it. 
-Make sure to store the texture to use it rather than calling this slow function repeatedly.</p>
+Make sure to store the texture to use it rather than calling this slow function repeatedly. 
+NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)</p>
 	
 	
 	<section class="parameters">
@@ -1457,9 +1458,7 @@ Make sure to store the texture to use it rather than calling this slow function 
 		<ul>
 			
 			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
-			<li><tt>cb</tt> ― Optional callback for when a url texture finishes loading. Arguements are The material table and the url</li>
-			<li><tt>alignment</tt></li>
-			<li><tt>skip_hack</tt></li>
+			<li><tt>cb</tt> ― An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
 		</ul>
 	</section>
 	
@@ -1467,7 +1466,7 @@ Make sure to store the texture to use it rather than calling this slow function 
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>The material. Use it with render.setTexture. Returns nil if max url textures is reached.</p>
+		<p>The material. Use it with render.setTexture</p>
 		
 	</section>
 	
