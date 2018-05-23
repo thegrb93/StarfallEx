@@ -398,14 +398,14 @@ local function NextInTextureQueue()
 		if requestTbl.Instance.error then
 			-- Chip already deinitialized so don't need to free anything
 			table.remove(LoadingTextureQueue, 1)
-			NextInTextureQueue()
+			timer.Simple(0, NextInTextureQueue)
 			return
 		end
 
 		local function applyTexture(w, h)
 			if requestTbl.Instance.error then
 				table.remove(LoadingTextureQueue, 1)
-				NextInTextureQueue()
+				timer.Simple(0, NextInTextureQueue)
 			else
 				local function copyTexture()
 					local mat = Panel:GetHTMLMaterial()
@@ -443,7 +443,7 @@ local function NextInTextureQueue()
 		local function errorTexture()
 			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
 			table.remove(LoadingTextureQueue, 1)
-			NextInTextureQueue()
+			timer.Simple(0, NextInTextureQueue)
 		end
 
 		if not Panel then
