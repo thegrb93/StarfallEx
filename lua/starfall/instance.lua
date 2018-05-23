@@ -4,22 +4,17 @@
 -- the execution context.
 ---------------------------------------------------------------------
 
-local dsethook, dgethook
-dgethook = debug.gethook
-local function dsethookset() dsethook = SF.softLockProtection:GetBool() and debug.sethook or function() end end
+local dsethook, dgethook = debug.sethook, debug.gethook
 if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
-	cvars.AddChangeCallback( "sf_timebuffersoftlock", dsethookset)
 else
 	SF.cpuQuota = CreateClientConVar("sf_timebuffer_cl", 0.006, true, false, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
-	cvars.AddChangeCallback( "sf_timebuffersoftlock", dsethookset)
 end
-dsethookset()
 
 SF.Instance = {}
 SF.Instance.__index = SF.Instance
@@ -58,6 +53,8 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.mainfile = mainfile
 	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
+	instance.run = SF.softLockProtection:GetBool() and SF.Instance.runWithOps or SF.Instance.runWithoutOps
+	instance.startram = collectgarbage("count")
 	if CLIENT and instance.cpuQuota <= 0 then
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
 	end
@@ -155,6 +152,25 @@ function SF.Instance:runWithOps(func, ...)
 	return tbl
 end
 
+--- Internal function - do not call.
+-- Runs a function without incrementing the instance ops coutner.
+-- This does no setup work and shouldn't be called by client code
+-- @param func The function to run
+-- @param ... Arguments to func
+-- @return True if ok
+-- @return A table of values that the hook returned
+function SF.Instance:runWithoutOps(func, ...)
+
+	local function xpcall_callback (err)
+		if debug.getmetatable(err)~=SF.Errormeta then
+			return SF.MakeError(err, 1)
+		end
+		return err
+	end
+
+	return { xpcall(func, xpcall_callback, ...) }
+end
+
 --- Internal function - Do not call. Prepares the script to be executed.
 -- This is done automatically by Initialize and runScriptHook.
 function SF.Instance:prepare(hook)
@@ -215,7 +231,7 @@ function SF.Instance:initialize()
 	self:prepare("_initialize")
 
 	local func = self.scripts[self.mainfile]
-	local tbl = self:runWithOps(func)
+	local tbl = self:run(func)
 	if not tbl[1] then
 		self:cleanup("_initialize", true, tbl[2])
 		self:Error(tbl[2])
@@ -236,7 +252,7 @@ function SF.Instance:runScriptHook(hook, ...)
 	if self:prepare(hook) then return {} end
 	local tbl
 	for name, func in pairs(self.hooks[hook]) do
-		tbl = self:runWithOps(func, ...)
+		tbl = self:run(func, ...)
 		if not tbl[1] then
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
 			self:cleanup(hook, true, tbl[2])
@@ -259,7 +275,7 @@ function SF.Instance:runScriptHookForResult(hook, ...)
 	if self:prepare(hook) then return {} end
 	local tbl
 	for name, func in pairs(self.hooks[hook]) do
-		tbl = self:runWithOps(func, ...)
+		tbl = self:run(func, ...)
 		if tbl[1] then
 			if tbl[2]~=nil then
 				break
@@ -290,7 +306,7 @@ end
 function SF.Instance:runFunction(func, ...)
 	if self:prepare("_runFunction") then return {} end
 
-	local tbl = self:runWithOps(func, ...)
+	local tbl = self:run(func, ...)
 	if tbl[1] then
 		self:cleanup("_runFunction", false)
 	else
