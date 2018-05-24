@@ -870,6 +870,7 @@ function render_library.drawRect (x, y, w, h)
 	checkluatype (w, TYPE_NUMBER)
 	checkluatype (h, TYPE_NUMBER)
 	makeQuad(x, y, w, h)
+	render.SetColorMaterial()
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
 
