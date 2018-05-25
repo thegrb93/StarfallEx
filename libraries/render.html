@@ -319,6 +319,12 @@ Draws a polygon.</td>
 Draws a rectangle using the current color </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawRectFast">drawRectFast</a>( x, y, w, h&nbsp;)</td>
+			<td class="summary">
+Draws a rectangle using the current color 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawRectOutline">drawRectOutline</a>( x, y, w, h&nbsp;)</td>
 			<td class="summary">
 Draws a rectangle outline using the current color.</td>
@@ -349,7 +355,18 @@ Draws text with newlines and tabs </td>
 Draws a textured rectangle </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectFast">drawTexturedRectFast</a>( x, y, w, h&nbsp;)</td>
+			<td class="summary">
+Draws a textured rectangle 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectRotated">drawTexturedRectRotated</a>( x, y, w, h, rot&nbsp;)</td>
+			<td class="summary">
+Draws a rotated, textured rectangle.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectRotatedFast">drawTexturedRectRotatedFast</a>( x, y, w, h, rot&nbsp;)</td>
 			<td class="summary">
 Draws a rotated, textured rectangle.</td>
 		</tr>
@@ -357,6 +374,12 @@ Draws a rotated, textured rectangle.</td>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectUV">drawTexturedRectUV</a>( x, y, w, h, startU, startV, endU, endV&nbsp;)</td>
 			<td class="summary">
 Draws a textured rectangle with UV coordinates </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawTexturedRectUVFast">drawTexturedRectUVFast</a>( x, y, w, h, startU, startV, endU, endV, UVHack&nbsp;)</td>
+			<td class="summary">
+Draws a textured rectangle with UV coordinates 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.enableDepth">enableDepth</a>( enable&nbsp;)</td>
@@ -1084,6 +1107,29 @@ Draws a rectangle using the current color</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.drawRectFast"></a><strong>render.drawRectFast</strong>( x, y, w, h&nbsp;)</dt>
+<dd>
+	<p>
+Draws a rectangle using the current color 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x</li>
+			<li><tt>y</tt> ― Top left corner y</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.drawRectOutline"></a><strong>render.drawRectOutline</strong>( x, y, w, h&nbsp;)</dt>
 <dd>
 	<p>
@@ -1223,10 +1269,57 @@ Draws a textured rectangle</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.drawTexturedRectFast"></a><strong>render.drawTexturedRectFast</strong>( x, y, w, h&nbsp;)</dt>
+<dd>
+	<p>
+Draws a textured rectangle 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x</li>
+			<li><tt>y</tt> ― Top left corner y</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.drawTexturedRectRotated"></a><strong>render.drawTexturedRectRotated</strong>( x, y, w, h, rot&nbsp;)</dt>
 <dd>
 	<p>
 Draws a rotated, textured rectangle.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― X coordinate of center of rect</li>
+			<li><tt>y</tt> ― Y coordinate of center of rect</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+			<li><tt>rot</tt> ― Rotation in degrees</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.drawTexturedRectRotatedFast"></a><strong>render.drawTexturedRectRotatedFast</strong>( x, y, w, h, rot&nbsp;)</dt>
+<dd>
+	<p>
+Draws a rotated, textured rectangle. 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution</p>
 	
 	
 	<section class="parameters">
@@ -1264,6 +1357,34 @@ Draws a textured rectangle with UV coordinates</p>
 			<li><tt>startV</tt> ― Texture mapping at rectangle origin</li>
 			<li><tt>endU</tt></li>
 			<li><tt>endV</tt> ― Texture mapping at rectangle end</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.drawTexturedRectUVFast"></a><strong>render.drawTexturedRectUVFast</strong>( x, y, w, h, startU, startV, endU, endV, UVHack&nbsp;)</dt>
+<dd>
+	<p>
+Draws a textured rectangle with UV coordinates 
+Faster, but uses integer coordinates and will get clipped by user's screen resolution</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― Top left corner x</li>
+			<li><tt>y</tt> ― Top left corner y</li>
+			<li><tt>w</tt> ― Width</li>
+			<li><tt>h</tt> ― Height</li>
+			<li><tt>startU</tt> ― Texture mapping at rectangle origin</li>
+			<li><tt>startV</tt> ― Texture mapping at rectangle origin</li>
+			<li><tt>endU</tt></li>
+			<li><tt>endV</tt> ― Texture mapping at rectangle end</li>
+			<li><tt>UVHack</tt> ― If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.</li>
 		</ul>
 	</section>
 	
