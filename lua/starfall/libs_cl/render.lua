@@ -814,11 +814,6 @@ end
 -- @param h Height
 function render_library.drawRoundedBox (r, x, y, w, h)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (r, TYPE_NUMBER)
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
 	draw.RoundedBox(r, x, y, w, h, currentcolor)
 end
 
@@ -834,15 +829,6 @@ end
 -- @param br Boolean Bottom right corner
 function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (r, TYPE_NUMBER)
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
-	checkluatype (tl, TYPE_BOOL)
-	checkluatype (tr, TYPE_BOOL)
-	checkluatype (bl, TYPE_BOOL)
-	checkluatype (br, TYPE_BOOL)
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
@@ -859,16 +845,23 @@ local function makeQuad(x, y, w, h)
 	quad_v4.y = bot
 end
 --- Draws a rectangle using the current color
+--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- @param x Top left corner x
+-- @param y Top left corner y
+-- @param w Width
+-- @param h Height
+function render_library.drawRectFast (x, y, w, h)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	surface.DrawRect(x, y, w, h)
+end
+
+--- Draws a rectangle using the current color
 -- @param x Top left corner x
 -- @param y Top left corner y
 -- @param w Width
 -- @param h Height
 function render_library.drawRect (x, y, w, h)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
 	makeQuad(x, y, w, h)
 	render.SetColorMaterial()
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
@@ -881,10 +874,6 @@ end
 -- @param h Height
 function render_library.drawRectOutline (x, y, w, h)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
 	surface.DrawOutlinedRect(x, y, w, h)
 end
 
@@ -894,10 +883,18 @@ end
 -- @param r Radius
 function render_library.drawCircle (x, y, r)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (r, TYPE_NUMBER)
 	surface.DrawCircle(x, y, r, currentcolor)
+end
+
+--- Draws a textured rectangle
+--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- @param x Top left corner x
+-- @param y Top left corner y
+-- @param w Width
+-- @param h Height
+function render_library.drawTexturedRectFast (x, y, w, h)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	surface.DrawTexturedRect(x, y, w, h)
 end
 
 --- Draws a textured rectangle
@@ -907,12 +904,32 @@ end
 -- @param h Height
 function render_library.drawTexturedRect (x, y, w, h)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
 	makeQuad(x, y, w, h)
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
+end
+
+--- Draws a textured rectangle with UV coordinates
+--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- @param x Top left corner x
+-- @param y Top left corner y
+-- @param w Width
+-- @param h Height
+-- @param startU Texture mapping at rectangle origin
+-- @param startV Texture mapping at rectangle origin
+-- @param endV Texture mapping at rectangle end
+-- @param endV Texture mapping at rectangle end
+-- @param UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
+function render_library.drawTexturedRectUVFast (x, y, w, h, startU, startV, endU, endV, UVHack)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	
+	if UVHack then
+		startU = ( startU * 32 - 0.5 ) / 31
+		startV = ( startV * 32 - 0.5 ) / 31
+		endU = ( endU * 32 - 0.5 ) / 31
+		endV = ( endV * 32 - 0.5 ) / 31
+	end
+	
+	surface.DrawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 end
 
 --- Draws a textured rectangle with UV coordinates
@@ -959,6 +976,19 @@ function render_library.drawTexturedRectUV (x, y, w, h, startU, startV, endU, en
 end
 
 --- Draws a rotated, textured rectangle.
+--- Faster, but uses integer coordinates and will get clipped by user's screen resolution
+-- @param x X coordinate of center of rect
+-- @param y Y coordinate of center of rect
+-- @param w Width
+-- @param h Height
+-- @param rot Rotation in degrees
+function render_library.drawTexturedRectRotatedFast (x, y, w, h, rot)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	surface.DrawTexturedRectRotated(x, y, w, h, rot)
+end
+
+--- Draws a rotated, textured rectangle.
 -- @param x X coordinate of center of rect
 -- @param y Y coordinate of center of rect
 -- @param w Width
@@ -966,11 +996,6 @@ end
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotated (x, y, w, h, rot)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
-	checkluatype (rot, TYPE_NUMBER)
 
 	local rad = math.rad(rot)
 	local cos, sin = math.cos(rad), math.sin(rad)
@@ -998,10 +1023,6 @@ end
 -- @param y2 Y end integer coordinate
 function render_library.drawLine (x1, y1, x2, y2)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x1, TYPE_NUMBER)
-	checkluatype (y1, TYPE_NUMBER)
-	checkluatype (x2, TYPE_NUMBER)
-	checkluatype (y2, TYPE_NUMBER)
 	surface.DrawLine(x1, y1, x2, y2)
 end
 
