@@ -229,23 +229,7 @@ if SERVER then
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
 
-		local torqueamount = torque:Length()
-		if torqueamount < 1.192093e-07 then return end
-		-- Convert torque from local to world axis
-		torque = phys:LocalToWorldVector(torque / torqueamount)
-
-		-- Find two vectors perpendicular to the torque axis
-		local off
-		if math.abs(torque.x) > 0.1 or math.abs(torque.z) > 0.1 then
-			off = Vector(-torque.z, 0, torque.x):GetNormalized()
-		else
-			off = Vector(-torque.y, torque.x, 0):GetNormalized()
-		end
-		local dir = torque:Cross(off)
-		off = off * torqueamount * 0.5
-
-		phys:ApplyForceOffset(dir, off)
-		phys:ApplyForceOffset(dir * -1, off * -1)
+		phys:ApplyTorqueCenter(torque)
 	end
 
 	--- Sets the mass of a physics object
