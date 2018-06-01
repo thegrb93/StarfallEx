@@ -43,6 +43,12 @@ SF.AddHook("initialize", function(instance)
 	end
 end)
 
+SF.AddHook("postload", function()
+	--- Returns an entities wirelink
+	-- @return Wirelink of the entity
+	SF.Entities.Methods.getWirelink = wire_library.getWirelink
+end)
+
 SF.Wire = {}
 SF.Wire.Library = wire_library
 
@@ -456,10 +462,6 @@ function wire_library.getWirelink (ent)
 
 	return wlwrap(ent)
 end
-
---- Returns an entities wirelink
--- @return Wirelink of the entity
-SF.Entities.Methods.getWirelink = wire_library.getWirelink
 
 -- ------------------------- Wirelink ------------------------- --
 
