@@ -148,14 +148,12 @@ function material_methods:destroy()
 	local sensitive2sf, sf2sensitive = SF.GetWrapperTables(material_metamethods)
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
-	setmetatable(self, nil)
 
 	instance.data.material.usermaterials[m] = nil
 	material_bank:free(instance.player, m)
 end
 function lmaterial_methods:destroy()
 	checktype(self, lmaterial_metamethods)
-	setmetatable(self, nil)
 end
 
 --- Returns the material's engine name
