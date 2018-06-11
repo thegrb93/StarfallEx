@@ -314,6 +314,7 @@ string_methods.trim = string.Trim string_methods.Trim = string.Trim
 string_methods.trimLeft = string.TrimLeft string_methods.TrimLeft = string.TrimLeft
 string_methods.trimRight = string.TrimRight string_methods.TrimRight = string.TrimRight
 string_methods.upper = string.upper
+string_methods.normalizePath = SF.NormalizePath
 
 --UTF8 part
 string_methods.utf8char = utf8.char
