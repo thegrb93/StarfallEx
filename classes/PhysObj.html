@@ -277,6 +277,12 @@ Gets the position of the physics object </td>
 Gets the velocity of the physics object </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:getVelocityAtPoint">getVelocityAtPoint</a>( vec&nbsp;)</td>
+			<td class="summary">
+Gets the velocity of the physics object at an arbitrary point in its local reference frame 
+This includes velocity at the point induced by rotational velocity </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:isValid">isValid</a>( &nbsp;)</td>
 			<td class="summary">
 Checks if the physics object is valid </td>
@@ -645,6 +651,32 @@ Gets the velocity of the physics object</p>
 		<h3>Returns</h3>
 		
 		<p>Vector velocity of the physics object</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="PhysObj:getVelocityAtPoint"></a><strong>PhysObj:getVelocityAtPoint</strong>( vec&nbsp;)</dt>
+<dd>
+	<p>
+Gets the velocity of the physics object at an arbitrary point in its local reference frame 
+This includes velocity at the point induced by rotational velocity</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>vec</tt> ― The point to get velocity of in local reference frame</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Vector Local velocity of the physics object at the point</p>
 		
 	</section>
 	
