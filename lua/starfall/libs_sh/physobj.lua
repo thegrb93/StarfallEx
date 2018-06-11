@@ -76,6 +76,16 @@ function physobj_methods:getVelocity()
 	return vwrap(unwrap(self):GetVelocity())
 end
 
+--- Gets the velocity of the physics object at an arbitrary point in its local reference frame
+--- This includes velocity at the point induced by rotational velocity
+-- @shared
+-- @param vec The point to get velocity of in local reference frame
+-- @return Vector Local velocity of the physics object at the point
+function physobj_methods:getVelocityAtPoint(vec)
+	checktype(vec, vec_meta)
+	return vwrap(unwrap(self):GetVelocityAtPoint(vunwrap(vec)))
+end
+
 --- Gets the angular velocity of the physics object
 -- @shared
 -- @return Vector angular velocity of the physics object
