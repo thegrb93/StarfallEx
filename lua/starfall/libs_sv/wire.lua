@@ -376,7 +376,13 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	checkpermission(SF.instance, entO, "wire.createWire")
 
 	if not entI.Inputs then SF.Throw("Source has no valid inputs") end
-	if not entO.Outputs then SF.Throw("Target has no valid outputs") end
+	if not entO.Outputs then
+		if outputname == "entity" then
+			WireLib.CreateEntityOutput( nil, entO, {true} )
+		else
+			SF.Throw("Target has no valid outputs")
+		end
+	end
 
 	if inputname == "" then SF.Throw("Invalid input name") end
 	if outputname == "" then SF.Throw("Invalid output name") end
