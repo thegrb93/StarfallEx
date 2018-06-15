@@ -1211,7 +1211,7 @@ Appends a string to the end of a file";["fname"]="append";["library"]="file";["n
 Appends a string to the end of a file ";};["createDir"]={["class"]="function";["description"]="\
 Creates a directory";["fname"]="createDir";["library"]="file";["name"]="file_library.createDir";["param"]={[1]="path";["path"]="Filepath relative to data/sf_filedata/.";};["private"]=false;["realm"]="cl";["summary"]="\
 Creates a directory ";};["delete"]={["class"]="function";["description"]="\
-Deletes a file";["fname"]="delete";["library"]="file";["name"]="file_library.delete";["param"]={[1]="path";["path"]="Filepath relative to data/sf_filedata/.";};["private"]=false;["realm"]="cl";["ret"]="True if successful, nil if error";["summary"]="\
+Deletes a file";["fname"]="delete";["library"]="file";["name"]="file_library.delete";["param"]={[1]="path";["path"]="Filepath relative to data/sf_filedata/.";};["private"]=false;["realm"]="cl";["ret"]="True if successful, nil if it wasn't found";["summary"]="\
 Deletes a file ";};["exists"]={["class"]="function";["description"]="\
 Checks if a file exists";["fname"]="exists";["library"]="file";["name"]="file_library.exists";["param"]={[1]="path";["path"]="Filepath relative to data/sf_filedata/.";};["private"]=false;["realm"]="cl";["ret"]="True if exists, false if not, nil if error";["summary"]="\
 Checks if a file exists ";};["find"]={["class"]="function";["description"]="\
