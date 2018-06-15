@@ -48,8 +48,6 @@ function file_library.open (path, mode)
 	if f then
 		SF.instance.data.files[f] = true
 		return wrap(f)
-	else
-		SF.Throw("Failed to open file", 2)
 	end
 end
 
@@ -60,7 +58,7 @@ function file_library.read (path)
 	checkpermission (SF.instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
 	local contents = file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
-	if contents then return contents else SF.Throw("file not found", 2) return end
+	return contents
 end
 
 --- Writes to a file
@@ -102,14 +100,15 @@ end
 
 --- Deletes a file
 -- @param path Filepath relative to data/sf_filedata/.
--- @return True if successful, nil if error
+-- @return True if successful, nil if it wasn't found
 function file_library.delete (path)
 	checkpermission (SF.instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	path = "sf_filedata/" .. SF.NormalizePath(path)
-	if not file.Exists(path, "DATA") then SF.Throw("file not found", 2) return end
-	file.Delete(path)
-	return true
+	if file.Exists(path, "DATA") then
+		file.Delete(path)
+		return true
+	end
 end
 
 --- Creates a directory
