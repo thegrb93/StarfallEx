@@ -31,16 +31,13 @@ SF.AddHook("initialize", function (inst)
 end)
 
 SF.AddHook("deinitialize", function (inst)
-	local files = inst.data.files
-	local file = next(files)
-	while file do
+	for file, _ in pairs(inst.data.files) do
 		file:Close()
-		file = next(files)
 	end
 end)
 
 --- Opens and returns a file
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 -- @param mode The file mode to use. See lua manual for explaination
 -- @return File object or nil if it failed
 function file_library.open (path, mode)
@@ -57,7 +54,7 @@ function file_library.open (path, mode)
 end
 
 --- Reads a file from path
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 -- @return Contents, or nil if error
 function file_library.read (path)
 	checkpermission (SF.instance, path, "file.read")
@@ -67,7 +64,7 @@ function file_library.read (path)
 end
 
 --- Writes to a file
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 -- @return True if OK, nil if error
 function file_library.write (path, data)
 	checkpermission (SF.instance, path, "file.write")
@@ -81,7 +78,7 @@ function file_library.write (path, data)
 end
 
 --- Appends a string to the end of a file
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 -- @param data String that will be appended to the file.
 function file_library.append (path, data)
 	checkpermission (SF.instance, path, "file.write")
@@ -95,7 +92,7 @@ function file_library.append (path, data)
 end
 
 --- Checks if a file exists
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 -- @return True if exists, false if not, nil if error
 function file_library.exists (path)
 	checkpermission (SF.instance, path, "file.exists")
@@ -104,7 +101,7 @@ function file_library.exists (path)
 end
 
 --- Deletes a file
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 -- @return True if successful, nil if error
 function file_library.delete (path)
 	checkpermission (SF.instance, path, "file.write")
@@ -116,7 +113,7 @@ function file_library.delete (path)
 end
 
 --- Creates a directory
--- @param path Filepath relative to data/sf_filedata/. Cannot contain '..'
+-- @param path Filepath relative to data/sf_filedata/.
 function file_library.createDir (path)
 	checkpermission (SF.instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
@@ -124,7 +121,7 @@ function file_library.createDir (path)
 end
 
 --- Enumerates a directory
--- @param path The folder to enumerate, relative to data/sf_filedata/. Cannot contain '..'
+-- @param path The folder to enumerate, relative to data/sf_filedata/.
 -- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
 -- @return Table of file names
 -- @return Table of directory names
