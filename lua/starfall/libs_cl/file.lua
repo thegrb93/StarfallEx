@@ -57,8 +57,7 @@ end
 function file_library.read (path)
 	checkpermission (SF.instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
-	local contents = file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
-	return contents
+	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
 --- Writes to a file
