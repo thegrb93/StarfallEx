@@ -28,6 +28,7 @@ local vwrap, cwrap, mwrap, vunwrap, cunwrap, munwrap
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local dsetmeta = debug.setmetatable
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
 -- @client
@@ -145,9 +146,16 @@ function material_methods:destroy()
 	local m = unwrap(self)
 	if not m then SF.Throw("The material is already destroyed?", 2) end
 
+	local name = m:GetName()
+	local rt = SF.instance.data.render.rendertargets[name]
+	if rt then
+		instance.env.render.destroyRenderTarget(name)
+	end
+	
 	local sensitive2sf, sf2sensitive = SF.GetWrapperTables(material_metamethods)
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
+	dsetmeta(self, nil)
 
 	instance.data.material.usermaterials[m] = nil
 	material_bank:free(instance.player, m)
