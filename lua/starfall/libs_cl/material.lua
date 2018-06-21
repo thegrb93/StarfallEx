@@ -401,6 +401,8 @@ local function NextInTextureQueue()
 		end
 
 		local function applyTexture(w, h)
+			if requestTbl.Loaded then return end
+			requestTbl.Loaded = true
 			if requestTbl.Instance.error then
 				table.remove(LoadingTextureQueue, 1)
 				timer.Simple(0, NextInTextureQueue)
