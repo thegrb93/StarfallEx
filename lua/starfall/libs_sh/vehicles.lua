@@ -27,6 +27,7 @@ end)
 do
 	local P = SF.Permissions
 	P.registerPrivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle")
+	P.registerPrivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle")
 end
 
 --- To string
@@ -70,5 +71,19 @@ if SERVER then
 		local ent = unwrap(self)
 		return pwrap(ent:GetPassenger(n))
 	end
+
+	-- Kills the driver of the vehicle
+	-- @server
+	function vehicle_methods:killDriver ()
+		checktype(self, vehicle_metamethods)
+		local ent = unwrap(self)
+		if not IsValid(ent) then return end
+		if ent:GetOwner() ~= SF.DefaultEnvironment.owner() then return end -- This is the right function...right?
+		local driver = ent:GetDriver()
+		if driver:IsValid() then
+			driver:Kill()
+		end
+	end
+
 
 end
