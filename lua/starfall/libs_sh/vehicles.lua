@@ -27,6 +27,7 @@ end)
 do
 	local P = SF.Permissions
 	P.registerPrivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle")
+	P.registerPrivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
 end
 
 --- To string
@@ -44,7 +45,7 @@ if SERVER then
 	function vehicle_methods:getDriver ()
 		checktype(self, vehicle_metamethods)
 		local ent = unwrap(self)
-		if not IsValid(ent) then return end
+		if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
 		return pwrap(ent:GetDriver())
 	end
 
@@ -53,7 +54,7 @@ if SERVER then
 	function vehicle_methods:ejectDriver ()
 		checktype(self, vehicle_metamethods)
 		local ent = unwrap(self)
-		if not IsValid(ent) then return end
+		if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
 			driver:ExitVehicle()
@@ -66,9 +67,24 @@ if SERVER then
 	-- @return amount of ammo
 	function vehicle_methods:getPassenger (n)
 		checktype(self, vehicle_metamethods)
-		checkluatype (n, TYPE_NUMBER)
+		checkluatype(n, TYPE_NUMBER)
 		local ent = unwrap(self)
+		if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
 		return pwrap(ent:GetPassenger(n))
 	end
+
+	-- Kills the driver of the vehicle
+	-- @server
+	function vehicle_methods:killDriver ()
+		checktype(self, vehicle_metamethods)
+		local ent = unwrap(self)
+		if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
+		checkpermission(SF.instance, ent, "vehicle.kill")
+		local driver = ent:GetDriver()
+		if driver:IsValid() then
+			driver:Kill()
+		end
+	end
+
 
 end
