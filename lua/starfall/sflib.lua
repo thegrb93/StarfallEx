@@ -211,6 +211,13 @@ function SF.Throw (msg, level, uncatchable)
 	error(SF.MakeError(msg, level, uncatchable, true), level)
 end
 
+--- Throws a type error
+function SF.ThrowTypeError(expected, got, level)
+	local level = 1 + (level or 1)
+	local funcname = debug.getinfo(level, "n").name or "<unnamed>"
+	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
+end
+
 SF.Libraries = {}
 SF.Types = {}
 SF.Hooks = {}
