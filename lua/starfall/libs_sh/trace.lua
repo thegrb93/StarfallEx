@@ -214,20 +214,30 @@ end
 SF.AddHook("postload", postload)
 
 local function convertFilter(filter)
-	local unwrapped = unwrap(filter)
-	if unwrapped then
-		return { unwrapped }
-	else
-		local l = {}
-		local count = 1
-		for i = 1, #filter do
-			local unwrapped = unwrap(filter[i])
-			if unwrapped then
-				l[count] = unwrapped
-				count = count + 1
+	local filterType = TypeID(filter)
+	if filterType == TYPE_NIL then
+		return nil
+	elseif filterType == TYPE_TABLE then
+		local unwrapped = unwrap(filter)
+		if unwrapped then
+			return unwrapped
+		else
+			local l = {}
+			for i = 1, #filter do
+				local unwrapped = unwrap(filter[i])
+				if unwrapped then
+					l[#l + 1] = unwrapped
+				end
 			end
+			return l
 		end
-		return l
+	elseif filterType == TYPE_FUNCTION then
+		return function(ent)
+			local ret = SF.instance:runFunction(filter, SF.WrapObject(ent))
+			if ret[1] then return ret[2] end
+		end
+	else
+		SF.ThrowTypeError("table or function", SF.GetType(filter), 3)
 	end
 end
 
@@ -245,17 +255,7 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	checktype(endpos, SF.Types.Vector)
 
 	local start, endpos = vunwrap(start), vunwrap(endpos)
-
-	if type(filter) == "function" then
-		local filterfunc = filter
-		filter = function(ent)
-			local ret = SF.instance:runFunction(filterfunc, SF.WrapObject(ent))
-			if ret[1] then return ret[2] end
-		end
-	elseif filter ~= nil then
-		checkluatype(filter, TYPE_TABLE)
-		filter = convertFilter(filter)
-	end
+	filter = convertFilter(filter)
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
@@ -296,17 +296,7 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 	checktype(maxbox, SF.Types.Vector)
 
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
-
-	if type(filter) == "function" then
-		local filterfunc = filter
-		filter = function(ent)
-			local ret = SF.instance:runFunction(filterfunc, SF.WrapObject(ent))
-			if ret[1] then return ret[2] end
-		end
-	elseif filter ~= nil then
-		checkluatype(filter, TYPE_TABLE)
-		filter = convertFilter(filter)
-	end
+	filter = convertFilter(filter)
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
