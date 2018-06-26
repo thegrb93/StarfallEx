@@ -186,13 +186,22 @@ function SF.MakeError (msg, level, uncatchable, prependinfo)
 		prependinfo = false
 	end
 	if type(msg) ~= "string" then msg = "(error object is not a string)" end
+
+	local traceback = debug.traceback("", level)
+	local lines = {}
+	for v in string.gmatch(traceback, "[^\n]+") do
+		if string.find(v, "[C]: in function 'xpcall'", 1, true) then break end
+		lines[#lines+1] = v
+	end
+	traceback = table.concat(lines, "\n")
+
 	return setmetatable({
 		uncatchable = false,
 		file = info.short_src,
 		line = info.currentline,
 		message = prependinfo and (info.short_src..":"..info.currentline..": "..msg) or msg,
 		uncatchable = uncatchable,
-		traceback = debug.traceback("", level)
+		traceback = traceback
 	}, SF.Errormeta)
 end
 
@@ -329,12 +338,6 @@ function SF.CallHook(hookname, ...)
 	for i = 1, #hook do
 		hook[i](...)
 	end
-end
-
---- Throws a type error
-function SF.ThrowTypeError(expected, got, level)
-	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
 end
 
 --- Checks the starfall type of val. Errors if the types don't match
