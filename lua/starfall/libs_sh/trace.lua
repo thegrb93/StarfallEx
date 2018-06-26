@@ -252,8 +252,9 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 			local ret = SF.instance:runFunction(filterfunc, SF.WrapObject(ent))
 			if ret[1] then return ret[2] end
 		end
-	else
-		filter = convertFilter(checkluatype (filter, TYPE_TABLE, 0, {}))
+	elseif filter ~= nil then
+		checkluatype(filter, TYPE_TABLE)
+		filter = convertFilter(filter)
 	end
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
@@ -302,8 +303,9 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 			local ret = SF.instance:runFunction(filterfunc, SF.WrapObject(ent))
 			if ret[1] then return ret[2] end
 		end
-	else
-		filter = convertFilter(checkluatype (filter, TYPE_TABLE, 0, {}))
+	elseif filter ~= nil then
+		checkluatype(filter, TYPE_TABLE)
+		filter = convertFilter(filter)
 	end
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
