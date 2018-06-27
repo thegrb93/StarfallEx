@@ -223,7 +223,7 @@ end
 --- Throws a type error
 function SF.ThrowTypeError(expected, got, level)
 	local level = 1 + (level or 1)
-	local funcname = debug.getinfo(level, "n").name or "<unnamed>"
+	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
 	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
 end
 
