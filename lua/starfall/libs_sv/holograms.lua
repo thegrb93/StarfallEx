@@ -276,8 +276,7 @@ function holograms_library.create (pos, ang, model, scale)
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checkluatype(model, TYPE_STRING)
-	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
-	if scale then
+	if scale ~= nil then
 		checktype(scale, vec_meta)
 		scale = vunwrap(scale)
 	end

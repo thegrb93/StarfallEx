@@ -82,9 +82,9 @@ function props_library.create (pos, ang, model, frozen)
 
 	local instance = SF.instance
 
-	if not instance.data.props.burst:use(1) then return SF.Throw("Can't spawn props that often", 2)
-	elseif personal_max_reached(instance) then return SF.Throw("Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2) end
-	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then return end
+	if not instance.data.props.burst:use(1) then SF.Throw("Can't spawn props that often", 2) end
+	if personal_max_reached(instance) then SF.Throw("Can't spawn props, maximum personal limit of " .. SF.Props.personalquota:GetInt() .. " has been reached", 2) end
+	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local propdata = instance.data.props
 	local propent = ents.Create("prop_physics")
@@ -95,7 +95,7 @@ function props_library.create (pos, ang, model, frozen)
 	propent:SetModel(model)
 	propent:Spawn()
 
-	if not propent:GetModel() then propent:Remove() return end
+	if not propent:GetModel() then propent:Remove() SF.Throw("Invalid model", 2) end
 
 	for I = 0,  propent:GetPhysicsObjectCount() - 1 do
 		local obj = propent:GetPhysicsObjectNum(I)
