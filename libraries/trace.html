@@ -192,6 +192,16 @@ Provides functions for doing line/AABB traces</p>
 	<table class="list">
 	
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithOBB">intersectRayWithOBB</a>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</td>
+			<td class="summary">
+Does a ray plane intersection returning the position hit or nil if not hit </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithOBB">intersectRayWithOBB</a>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</td>
+			<td class="summary">
+Does a ray plane intersection returning the position hit or nil if not hit </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#trace.trace">trace</a>( start, endpos, filter, mask, colgroup, ignworld&nbsp;)</td>
 			<td class="summary">
 Does a line trace </td>
@@ -210,6 +220,62 @@ Does a swept-AABB trace </td>
 	<h2><a name="functions_def"></a>Functions definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_sh"></span><a name="trace.intersectRayWithOBB"></a><strong>trace.intersectRayWithOBB</strong>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</dt>
+<dd>
+	<p>
+Does a ray plane intersection returning the position hit or nil if not hit</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>rayStart</tt> ― The origin of the ray</li>
+			<li><tt>rayDelta</tt> ― The direction and length of the ray</li>
+			<li><tt>planeOrigin</tt> ― The origin of the plane</li>
+			<li><tt>planeNormal</tt> ― The normal of the plane</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Hit position or nil if not hit</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="trace.intersectRayWithOBB"></a><strong>trace.intersectRayWithOBB</strong>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</dt>
+<dd>
+	<p>
+Does a ray plane intersection returning the position hit or nil if not hit</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>rayStart</tt> ― The origin of the ray</li>
+			<li><tt>rayDelta</tt> ― The direction and length of the ray</li>
+			<li><tt>planeOrigin</tt> ― The origin of the plane</li>
+			<li><tt>planeNormal</tt> ― The normal of the plane</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Hit position or nil if not hit</p>
+		
+	</section>
+	
+	
+</dd>
 		
 <dt><span class="realm_sh"></span><a name="trace.trace"></a><strong>trace.trace</strong>( start, endpos, filter, mask, colgroup, ignworld&nbsp;)</dt>
 <dd>
