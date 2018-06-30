@@ -58,9 +58,11 @@ end
 
 net.Receive("starfall_processor_download", function (len)
 
-	net.ReadStarfall(nil, function(sfdata)
-		if sfdata and sfdata.proc:IsValid() and sfdata.owner:IsValid() then
-			sfdata.proc:SetupFiles(sfdata)
+	net.ReadStarfall(nil, function(ok, sfdata)
+		if sfdata.proc:IsValid() and sfdata.owner:IsValid() then
+		    if ok then
+			    sfdata.proc:SetupFiles(sfdata)
+		    end
 		end
 	end)
 
