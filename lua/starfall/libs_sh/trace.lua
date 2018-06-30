@@ -4,7 +4,6 @@
 
 local dgetmeta = debug.getmetatable
 
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -204,12 +203,20 @@ end
 
 -- Local functions
 
-local wrap
-local unwrap
+local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
+local wrap, vwrap, awrap
+local unwrap, vunwrap, aunwrap
+local vecmeta, angmeta
 
 local function postload()
 	wrap = SF.Entities.Wrap
+	vwrap = SF.Vectors.Wrap
+	awrap = SF.Angles.Wrap
 	unwrap = SF.Entities.Unwrap
+	vunwrap = SF.Vectors.Unwrap
+	aunwrap = SF.Angles.Unwrap
+	vecmeta = SF.Vectors.Metatable
+	angmeta = SF.Angles.Metatable
 end
 SF.AddHook("postload", postload)
 
@@ -251,8 +258,8 @@ end
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	checkpermission(SF.instance, nil, "trace")
-	checktype(start, SF.Types.Vector)
-	checktype(endpos, SF.Types.Vector)
+	checktype(start, vecmeta)
+	checktype(endpos, vecmeta)
 
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 	filter = convertFilter(filter)
@@ -272,7 +279,7 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	local data = util.TraceLine(trace)
 	return setmetatable({}, {
 		__index = function(t, k)
-			return SF.WrapObject(data[k])
+			return owrap(data[k])
 		end,
 		__metatable = ""
 	})
@@ -290,10 +297,10 @@ end
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
 	checkpermission(SF.instance, nil, "trace")
-	checktype(start, SF.Types.Vector)
-	checktype(endpos, SF.Types.Vector)
-	checktype(minbox, SF.Types.Vector)
-	checktype(maxbox, SF.Types.Vector)
+	checktype(start, vecmeta)
+	checktype(endpos, vecmeta)
+	checktype(minbox, vecmeta)
+	checktype(maxbox, vecmeta)
 
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 	filter = convertFilter(filter)
@@ -315,8 +322,43 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 	local data = util.TraceHull(trace)
 	return setmetatable({}, {
 		__index = function(t, k)
-			return SF.WrapObject(data[k])
+			return owrap(data[k])
 		end,
 		__metatable = ""
 	})
+end
+
+--- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
+--@param rayStart The origin of the ray
+--@param rayDelta The direction and length of the ray
+--@param boxOrigin The origin of the box
+--@param boxAngles The box's angles
+--@param boxMins The box min bounding vector
+--@param boxMaxs The box max bounding vector
+--@return Hit position or nil if not hit
+--@return Hit normal or nil if not hit
+--@return Hit fraction or nil if not hit
+function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
+	checktype(rayStart, vecmeta)
+	checktype(rayDelta, vecmeta)
+	checktype(boxOrigin, vecmeta)
+	checktype(boxAngles, angmeta)
+	checktype(boxMins, vecmeta)
+	checktype(boxMaxs, vecmeta)
+	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
+	return vwrap(pos), vwrap(normal), fraction
+end
+
+--- Does a ray plane intersection returning the position hit or nil if not hit
+--@param rayStart The origin of the ray
+--@param rayDelta The direction and length of the ray
+--@param planeOrigin The origin of the plane
+--@param planeNormal The normal of the plane
+--@return Hit position or nil if not hit
+function trace_library.intersectRayWithOBB(rayStart, rayDelta, planeOrigin, planeNormal)
+	checktype(rayStart, vecmeta)
+	checktype(rayDelta, vecmeta)
+	checktype(planeOrigin, vecmeta)
+	checktype(planeNormal, vecmeta)
+	return vwrap(util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal)))
 end
