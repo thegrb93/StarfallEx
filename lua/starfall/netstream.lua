@@ -80,18 +80,22 @@ function net.WriteStream(data)
 		error("bad argument #1 to 'WriteStream' (string expected, got " .. type(data) .. ")", 2)
 	end
 
-	local compressed = util.Compress(data) or ""
-	local identifier = 1
+	local compressed = util.Compress(data)
+	if compressed then
+		local identifier = 1
 
-	while net.Stream.Data[identifier] do
-		identifier = identifier + 1
+		while net.Stream.Data[identifier] do
+			identifier = identifier + 1
+		end
+
+		net.Stream.Data[identifier] = compressed
+		timer.Create("StreamUlTimeout" .. identifier, net.Stream.Timeout, 1, function() net.Stream.Data[identifier] = nil end)
+
+		net.WriteUInt(math.ceil(#compressed / net.Stream.MaxSendSize), 32)
+		net.WriteUInt(identifier, 32)
+	else
+		net.WriteUInt(0, 32)
 	end
-
-	net.Stream.Data[identifier] = compressed
-	timer.Create("StreamUlTimeout" .. identifier, net.Stream.Timeout, 1, function() net.Stream.Data[identifier] = nil end)
-
-	net.WriteUInt(math.ceil(#compressed / net.Stream.MaxSendSize), 32)
-	net.WriteUInt(identifier, 32)
 
 end
 
@@ -112,12 +116,14 @@ function net.ReadStream(ply, callback)
 		error("bad argument #2 to 'ReadStream' (function expected, got " .. type(callback) .. ")", 2)
 	end
 
-	local queue = net.Stream.Queues[ply]
 
 	local numstreams = net.ReadUInt(32)
 	if numstreams == nil then return end
+	if numstreams == 0 then callback("") return end
 	local identifier = net.ReadUInt(32)
 	--print("Got info", numstreams, identifier)
+
+	local queue = net.Stream.Queues[ply]
 
 	if SERVER and queue and #queue == net.Stream.MaxServerQueues then
 		ErrorNoHalt("Receiving too many ReadStream requests from ", ply)

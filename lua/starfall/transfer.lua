@@ -19,7 +19,7 @@ function net.ReadStarfall(recipient, callback)
 			for k, v in pairs(headers) do
 				local ok, code = pcall(SF.RecvingCache, v.name, v.hash, string.sub(data, pos, pos+v.size-1), recipient)
 				if ok then
-					sfdata.files[name] = code
+					sfdata.files[v.name] = code
 					pos = pos + v.size
 				else
 					callback(false, code)
@@ -140,7 +140,7 @@ do -- Cache system
 		local cache = send_cache[code]
 		if cache then
 			cache.last_use = CurTime()
-			if cache.recipients[recipient] then
+			if not recipient or cache.recipients[recipient] then
 				return cache.hash, ""
 			else
 				cache.recipients[recipient] = true
