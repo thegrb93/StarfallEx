@@ -262,6 +262,11 @@ Returns the EntIndex of the entity </td>
 Extinguishes an entity </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#Entity:getAllConstrained">getAllConstrained</a>( constraintype&nbsp;)</td>
+			<td class="summary">
+Gets a table of all constrained entities to each other </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getAngleVelocity">getAngleVelocity</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the angular velocity of the entity </td>
@@ -980,6 +985,25 @@ Returns the EntIndex of the entity</p>
 Extinguishes an entity</p>
 	
 	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="Entity:getAllConstrained"></a><strong>Entity:getAllConstrained</strong>( constraintype&nbsp;)</dt>
+<dd>
+	<p>
+Gets a table of all constrained entities to each other</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>constraintype</tt> ― Optional type name of constraint to filter by</li>
+		</ul>
+	</section>
 	
 	
 	
@@ -1915,6 +1939,12 @@ Gets what the entity is welded to</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The first welded entity</p>
+		
+	</section>
 	
 	
 </dd>
