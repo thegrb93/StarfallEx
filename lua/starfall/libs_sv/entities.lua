@@ -550,7 +550,7 @@ function ents_methods:isValidPhys()
 	return phys ~= nil
 end
 
---- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key. 
+--- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.
 -- @server
 -- @return Boolean if the entity is being held or not
 function ents_methods:isPlayerHolding ()
@@ -643,25 +643,40 @@ function ents_methods:enableSphere (enabled)
 	phys:Wake()
 end
 
-
-local function ent1or2 (ent, con, num)
-	if not con then return nil end
-	if num then
-		con = con[num]
-		if not con then return nil end
-	end
-	if con.Ent1 == ent then return con.Ent2 end
-	return con.Ent1
-end
-
 --- Gets what the entity is welded to
-function ents_methods:isWeldedTo ()
-	local this = unwrap(self)
-	if not constraint.HasConstraints(this) then return nil end
-
-	return vwrap(ent1or2(this, constraint.FindConstraint(this, "Weld")))
+--@return The first welded entity
+function ents_methods:isWeldedTo()
+	checktype(self, ents_metatable)
+	local ent = unwrap(self)
+	local constr = constraint.FindConstraint(ent, "Weld")
+	if constr then
+		return vwrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
+	end
+	return nil
 end
 
+--- Gets a table of all constrained entities to each other
+--@param constraintype Optional type name of constraint to filter by
+function ents_methods:getAllConstrained(constraintype)
+	checktype(self, ents_metatable)
+	if constraintype ~= nil then checkluatype(constraintype, TYPE_STRING) end
+
+	local entity_lookup = {}
+	local entity_table = {}
+	local function recursive_find(ent)
+		if entity_lookup[ent] then return end
+		entity_lookup[ent] = true
+		entity_table[#entity_table + 1] = wrap(ent)
+		local constraints = constraintype and constraint.FindConstraints(ent, constraintype) or constraint.GetTable(ent)
+		for k, v in pairs(constraints) do
+			recursive_find(v.Ent1)
+			recursive_find(v.Ent2)
+		end
+	end
+	recursive_find(unwrap(self))
+
+	return entity_table
+end
 
 --- Adds a trail to the entity with the specified attributes.
 -- @param startSize The start size of the trail
