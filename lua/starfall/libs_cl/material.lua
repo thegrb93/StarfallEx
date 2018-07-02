@@ -417,7 +417,7 @@ local function NextInTextureQueue()
 			else
 				local function copyTexture()
 					local mat = Panel:GetHTMLMaterial()
-					if not mat then timer.Simple(0.1, copyTexture) return end
+					if not mat then return end
 					render.PushRenderTarget(requestTbl.Texture)
 						render.Clear(0, 0, 0, 0, false, false)
 						cam.Start2D()
@@ -427,22 +427,24 @@ local function NextInTextureQueue()
 						cam.End2D()
 					render.PopRenderTarget()
 				end
+				local usedlayout = false
 				local function layout(x,y,w,h)
+					if usedlayout then SF.Throw("You can only use layout once", 2) end
 					if requestTbl ~= LoadingTextureQueue[1] then SF.Throw("Layout function is no longer valid", 2) end
 					checkluatype(x, TYPE_NUMBER)
 					checkluatype(y, TYPE_NUMBER)
 					checkluatype(w, TYPE_NUMBER)
 					checkluatype(h, TYPE_NUMBER)
+					usedlayout = true
 					Panel:RunJavascript([[img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;]])
-					timer.Simple(0.1, copyTexture)
 				end
 
-				timer.Simple(0.1, function()
-					copyTexture()
+				timer.Simple(0, function()
 					if requestTbl.Callback then requestTbl.Callback(w, h, layout) end
 				end)
 
 				timer.Simple(1, function()
+					copyTexture()
 					table.remove(LoadingTextureQueue, 1)
 					NextInTextureQueue()
 				end)
