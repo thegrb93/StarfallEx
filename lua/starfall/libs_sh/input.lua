@@ -40,6 +40,7 @@ local input_methods = SF.RegisterLibrary("input")
 SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 
 ---- Gets the first key that is bound to the command passed
+--- @client
 --- @param binding The name of the bind
 --- @return The id of the first key bound
 --- @return The name of the first key bound
@@ -58,6 +59,7 @@ function input_methods.lookupBinding(binding)
 end
 
 ---- Gets whether a key is down
+--- @client
 --- @param key The key id, see input
 --- @return True if the key is down
 function input_methods.isKeyDown(key)
@@ -69,6 +71,7 @@ function input_methods.isKeyDown(key)
 end
 
 ---- Gets the name of a key from the id
+--- @client
 --- @param key The key id, see input
 --- @return The name of the key
 function input_methods.getKeyName(key)
@@ -80,6 +83,7 @@ function input_methods.getKeyName(key)
 end
 
 ---- Gets whether the shift key is down
+--- @client
 --- @return True if the shift key is down
 function input_methods.isShiftDown()
 	SF.Permissions.check(SF.instance, nil, "input")
@@ -88,6 +92,7 @@ function input_methods.isShiftDown()
 end
 
 ---- Gets whether the control key is down
+--- @client
 --- @return True if the control key is down
 function input_methods.isControlDown()
 	SF.Permissions.check(SF.instance, nil, "input")
@@ -96,6 +101,7 @@ function input_methods.isControlDown()
 end
 
 ---- Gets the position of the mouse
+--- @client
 --- @return The x position of the mouse
 --- @return The y position of the mouse
 function input_methods.getCursorPos()
@@ -105,6 +111,7 @@ function input_methods.getCursorPos()
 end
 
 ----Translates position on player's screen to aim vector
+--- @client
 --- @param x X coordinate on the screen
 --- @param y Y coordinate on the screen
 --- @return Aim vector
@@ -116,6 +123,7 @@ function input_methods.screenToVector(x, y)
 end
 
 ---- Sets the state of the mouse cursor
+--- @client
 --- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
@@ -170,16 +178,19 @@ if CLIENT then
 end
 
 --- Called when a button is pressed
+-- @client
 -- @name inputPressed
 -- @class hook
 -- @param button Number of the button
 
 --- Called when a button is released
+-- @client
 -- @name inputReleased
 -- @class hook
 -- @param button Number of the button
 
 --- Called when the mouse is moved
+-- @client
 -- @name mousemoved
 -- @class hook
 -- @client
@@ -187,6 +198,7 @@ end
 -- @param y Y coordinate moved
 
 --- Called when the mouse wheel is rotated
+-- @client
 -- @name mouseWheeled
 -- @class hook
 -- @client
