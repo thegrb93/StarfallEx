@@ -969,9 +969,9 @@ Called when the player connects to a HUD component linked to the Starfall Chip "
 Called when the player disconnects from a HUD component linked to the Starfall Chip";["name"]="huddisconnected";["param"]={};["realm"]="cl";["summary"]="\
 Called when the player disconnects from a HUD component linked to the Starfall Chip ";};["input"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when an input on a wired SF chip is written to";["name"]="input";["param"]={[1]="input";[2]="value";["input"]="The input name";["value"]="The value of the input";};["realm"]="sv";["summary"]="\
-Called when an input on a wired SF chip is written to ";};["inputPressed"]={["class"]="hook";["classForced"]=true;["description"]="\
+Called when an input on a wired SF chip is written to ";};["inputPressed"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a button is pressed";["name"]="inputPressed";["param"]={[1]="button";["button"]="Number of the button";};["realm"]="sh";["summary"]="\
-Called when a button is pressed ";};["inputReleased"]={["class"]="hook";["classForced"]=true;["description"]="\
+Called when a button is pressed ";};["inputReleased"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a button is released";["name"]="inputReleased";["param"]={[1]="button";["button"]="Number of the button";};["realm"]="sh";["summary"]="\
 Called when a button is released ";};["mouseWheeled"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when the mouse wheel is rotated";["name"]="mouseWheeled";["param"]={[1]="delta";["delta"]="Rotate delta";};["realm"]="sh";["summary"]="\
@@ -1291,22 +1291,22 @@ Runs a new http GET request ";};["post"]={["class"]="function";["description"]="
 Runs a new http POST request";["fname"]="post";["library"]="http";["name"]="http_library.post";["param"]={[1]="url";[2]="params";[3]="callbackSuccess";[4]="callbackFail";[5]="headers";["callbackFail"]="the function to be called on request fail, taking the failing reason as an argument";["callbackSuccess"]="the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)";["headers"]="POST headers to be sent";["params"]="POST parameters to be sent";["url"]="http target url";};["private"]=false;["realm"]="sh";["summary"]="\
 Runs a new http POST request ";};};["libtbl"]="http_library";["name"]="http";["server"]=true;["summary"]="\
 Http library.";["tables"]={};};["input"]={["class"]="library";["client"]=true;["description"]="\
-Input library.";["fields"]={};["functions"]={[1]="enableCursor";[2]="getCursorPos";[3]="getKeyName";[4]="isControlDown";[5]="isKeyDown";[6]="isShiftDown";[7]="lookupBinding";[8]="screenToVector";["enableCursor"]={["class"]="function";["description"]="\
-Sets the state of the mouse cursor";["fname"]="enableCursor";["library"]="input";["name"]="input_methods.enableCursor";["param"]={[1]="enabled";["enabled"]="Whether or not the cursor should be enabled";};["private"]=false;["realm"]="sh";["summary"]="\
-Sets the state of the mouse cursor ";};["getCursorPos"]={["class"]="function";["description"]="\
-Gets the position of the mouse";["fname"]="getCursorPos";["library"]="input";["name"]="input_methods.getCursorPos";["param"]={};["private"]=false;["realm"]="sh";["ret"]={[1]="The x position of the mouse";[2]="The y position of the mouse";};["summary"]="\
-Gets the position of the mouse ";};["getKeyName"]={["class"]="function";["description"]="\
-Gets the name of a key from the id";["fname"]="getKeyName";["library"]="input";["name"]="input_methods.getKeyName";["param"]={[1]="key";["key"]="The key id, see input";};["private"]=false;["realm"]="sh";["ret"]="The name of the key";["summary"]="\
-Gets the name of a key from the id ";};["isControlDown"]={["class"]="function";["description"]="\
-Gets whether the control key is down";["fname"]="isControlDown";["library"]="input";["name"]="input_methods.isControlDown";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if the control key is down";["summary"]="\
-Gets whether the control key is down ";};["isKeyDown"]={["class"]="function";["description"]="\
-Gets whether a key is down";["fname"]="isKeyDown";["library"]="input";["name"]="input_methods.isKeyDown";["param"]={[1]="key";["key"]="The key id, see input";};["private"]=false;["realm"]="sh";["ret"]="True if the key is down";["summary"]="\
-Gets whether a key is down ";};["isShiftDown"]={["class"]="function";["description"]="\
-Gets whether the shift key is down";["fname"]="isShiftDown";["library"]="input";["name"]="input_methods.isShiftDown";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if the shift key is down";["summary"]="\
-Gets whether the shift key is down ";};["lookupBinding"]={["class"]="function";["description"]="\
-Gets the first key that is bound to the command passed";["fname"]="lookupBinding";["library"]="input";["name"]="input_methods.lookupBinding";["param"]={[1]="binding";["binding"]="The name of the bind";};["private"]=false;["realm"]="sh";["ret"]={[1]="The id of the first key bound";[2]="The name of the first key bound";};["summary"]="\
-Gets the first key that is bound to the command passed ";};["screenToVector"]={["class"]="function";["description"]="\
-Translates position on player's screen to aim vector";["fname"]="screenToVector";["library"]="input";["name"]="input_methods.screenToVector";["param"]={[1]="x";[2]="y";["x"]="X coordinate on the screen";["y"]="Y coordinate on the screen";};["private"]=false;["realm"]="sh";["ret"]="Aim vector";["summary"]="\
+Input library.";["fields"]={};["functions"]={[1]="enableCursor";[2]="getCursorPos";[3]="getKeyName";[4]="isControlDown";[5]="isKeyDown";[6]="isShiftDown";[7]="lookupBinding";[8]="screenToVector";["enableCursor"]={["class"]="function";["client"]=true;["description"]="\
+Sets the state of the mouse cursor";["fname"]="enableCursor";["library"]="input";["name"]="input_methods.enableCursor";["param"]={[1]="enabled";["enabled"]="Whether or not the cursor should be enabled";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the state of the mouse cursor ";};["getCursorPos"]={["class"]="function";["client"]=true;["description"]="\
+Gets the position of the mouse";["fname"]="getCursorPos";["library"]="input";["name"]="input_methods.getCursorPos";["param"]={};["private"]=false;["realm"]="cl";["ret"]={[1]="The x position of the mouse";[2]="The y position of the mouse";};["summary"]="\
+Gets the position of the mouse ";};["getKeyName"]={["class"]="function";["client"]=true;["description"]="\
+Gets the name of a key from the id";["fname"]="getKeyName";["library"]="input";["name"]="input_methods.getKeyName";["param"]={[1]="key";["key"]="The key id, see input";};["private"]=false;["realm"]="cl";["ret"]="The name of the key";["summary"]="\
+Gets the name of a key from the id ";};["isControlDown"]={["class"]="function";["client"]=true;["description"]="\
+Gets whether the control key is down";["fname"]="isControlDown";["library"]="input";["name"]="input_methods.isControlDown";["param"]={};["private"]=false;["realm"]="cl";["ret"]="True if the control key is down";["summary"]="\
+Gets whether the control key is down ";};["isKeyDown"]={["class"]="function";["client"]=true;["description"]="\
+Gets whether a key is down";["fname"]="isKeyDown";["library"]="input";["name"]="input_methods.isKeyDown";["param"]={[1]="key";["key"]="The key id, see input";};["private"]=false;["realm"]="cl";["ret"]="True if the key is down";["summary"]="\
+Gets whether a key is down ";};["isShiftDown"]={["class"]="function";["client"]=true;["description"]="\
+Gets whether the shift key is down";["fname"]="isShiftDown";["library"]="input";["name"]="input_methods.isShiftDown";["param"]={};["private"]=false;["realm"]="cl";["ret"]="True if the shift key is down";["summary"]="\
+Gets whether the shift key is down ";};["lookupBinding"]={["class"]="function";["client"]=true;["description"]="\
+Gets the first key that is bound to the command passed";["fname"]="lookupBinding";["library"]="input";["name"]="input_methods.lookupBinding";["param"]={[1]="binding";["binding"]="The name of the bind";};["private"]=false;["realm"]="cl";["ret"]={[1]="The id of the first key bound";[2]="The name of the first key bound";};["summary"]="\
+Gets the first key that is bound to the command passed ";};["screenToVector"]={["class"]="function";["client"]=true;["description"]="\
+Translates position on player's screen to aim vector";["fname"]="screenToVector";["library"]="input";["name"]="input_methods.screenToVector";["param"]={[1]="x";[2]="y";["x"]="X coordinate on the screen";["y"]="Y coordinate on the screen";};["private"]=false;["realm"]="cl";["ret"]="Aim vector";["summary"]="\
 Translates position on player's screen to aim vector ";};};["libtbl"]="input_methods";["name"]="input";["summary"]="\
 Input library.";["tables"]={};};["joystick"]={["class"]="library";["client"]=true;["description"]="\
 Joystick library.";["fields"]={};["functions"]={[1]="getAxis";[2]="getButton";[3]="getName";[4]="getPov";[5]="numAxes";[6]="numButtons";[7]="numJoysticks";[8]="numPovs";["getAxis"]={["class"]="function";["description"]="\
