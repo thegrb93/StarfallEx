@@ -1,11 +1,11 @@
 
---- This should manage the player button hooks for singleplayer games.
+-- This should manage the player button hooks for singleplayer games.
 local PlayerButtonDown, PlayerButtonUp
 if game.SinglePlayer() then
 	if SERVER then
 		util.AddNetworkString("sf_relayinput")
 
-		--- These should only get called if the game is singleplayer or listen
+		-- These should only get called if the game is singleplayer or listen
 		hook.Add("PlayerButtonDown", "SF_PlayerButtonDown", function(ply, but)
 			net.Start("sf_relayinput")
 			net.WriteBool(true)
@@ -33,17 +33,17 @@ if game.SinglePlayer() then
 end
 if SERVER then return end
 
----- Input library.
---- @client
+--- Input library.
+-- @client
 local input_methods = SF.RegisterLibrary("input")
 
 SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 
----- Gets the first key that is bound to the command passed
---- @client
---- @param binding The name of the bind
---- @return The id of the first key bound
---- @return The name of the first key bound
+--- Gets the first key that is bound to the command passed
+-- @client
+-- @param binding The name of the bind
+-- @return The id of the first key bound
+-- @return The name of the first key bound
 
 function input_methods.lookupBinding(binding)
 	SF.CheckLuaType(binding, TYPE_STRING)
@@ -58,10 +58,10 @@ function input_methods.lookupBinding(binding)
 	end
 end
 
----- Gets whether a key is down
---- @client
---- @param key The key id, see input
---- @return True if the key is down
+--- Gets whether a key is down
+-- @client
+-- @param key The key id, see input
+-- @return True if the key is down
 function input_methods.isKeyDown(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
@@ -70,10 +70,10 @@ function input_methods.isKeyDown(key)
 	return input.IsKeyDown(key)
 end
 
----- Gets the name of a key from the id
---- @client
---- @param key The key id, see input
---- @return The name of the key
+--- Gets the name of a key from the id
+-- @client
+-- @param key The key id, see input
+-- @return The name of the key
 function input_methods.getKeyName(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
@@ -82,39 +82,39 @@ function input_methods.getKeyName(key)
 	return input.GetKeyName(key)
 end
 
----- Gets whether the shift key is down
---- @client
---- @return True if the shift key is down
+--- Gets whether the shift key is down
+-- @client
+-- @return True if the shift key is down
 function input_methods.isShiftDown()
 	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.IsShiftDown()
 end
 
----- Gets whether the control key is down
---- @client
---- @return True if the control key is down
+--- Gets whether the control key is down
+-- @client
+-- @return True if the control key is down
 function input_methods.isControlDown()
 	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.IsControlDown()
 end
 
----- Gets the position of the mouse
---- @client
---- @return The x position of the mouse
---- @return The y position of the mouse
+--- Gets the position of the mouse
+-- @client
+-- @return The x position of the mouse
+-- @return The y position of the mouse
 function input_methods.getCursorPos()
 	SF.Permissions.check(SF.instance, nil, "input")
 
 	return input.GetCursorPos()
 end
 
-----Translates position on player's screen to aim vector
---- @client
---- @param x X coordinate on the screen
---- @param y Y coordinate on the screen
---- @return Aim vector
+---Translates position on player's screen to aim vector
+-- @client
+-- @param x X coordinate on the screen
+-- @param y Y coordinate on the screen
+-- @return Aim vector
 function input_methods.screenToVector(x, y)
 	SF.Permissions.check(SF.instance, nil, "input")
 	SF.CheckLuaType(x, TYPE_NUMBER)
@@ -122,9 +122,9 @@ function input_methods.screenToVector(x, y)
 	return SF.WrapObject(gui.ScreenToVector(x, y))
 end
 
----- Sets the state of the mouse cursor
---- @client
---- @param enabled Whether or not the cursor should be enabled
+--- Sets the state of the mouse cursor
+-- @client
+-- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
 	SF.Permissions.check(SF.instance, nil, "input")
@@ -193,7 +193,6 @@ end
 -- @client
 -- @name mousemoved
 -- @class hook
--- @client
 -- @param x X coordinate moved
 -- @param y Y coordinate moved
 
@@ -201,7 +200,6 @@ end
 -- @client
 -- @name mouseWheeled
 -- @class hook
--- @client
 -- @param delta Rotate delta
 
 
