@@ -357,6 +357,14 @@ function ents_methods:getAttachment(index)
 	end
 end
 
+--- Returns a table of attachments
+-- @shared
+-- @return table of attachment id and attachment name or nil
+function ents_methods:getAttachments()
+	local ent = eunwrap(self)
+	return ent:GetAttachments()
+end
+
 --- Converts a ragdoll bone id to the corresponding physobject id
 -- @param boneid The ragdoll boneid
 -- @return The physobj id
