@@ -493,18 +493,11 @@ function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matricies", 2) end
-	local endfunc
-	if tbl.type == "2D" then
-		endfunc = "End2D"
-	elseif tbl.type == "3D" then
-		endfunc = "End3D"
-	else
-		SF.Throw("Camera type must be \"3D\" or \"2D\"", 2)
-	end
+	checkluatype(tbl, TYPE_TABLE)
 
 	local newtbl = {}
-	if tbl.origin ~= nil then checktype( tbl.origin, SF.Vectors.Metatable ) newtbl.origin = tbl.origin tbl.origin = nil end
-	if tbl.angles ~= nil then checktype( tbl.angles, SF.Angles.Metatable ) newtbl.angles = tbl.angles tbl.angles = nil end
+	if tbl.origin ~= nil then local origin = tbl.origin checktype( origin, SF.Vectors.Metatable ) newtbl.origin = vunwrap(origin) tbl.origin = nil end
+	if tbl.angles ~= nil then local angles = tbl.angles checktype( angles, SF.Angles.Metatable ) newtbl.angles = aunwrap(angles) tbl.angles = nil end
 
 	for k, v in pairs(tbl) do
 		local check = viewmatrix_checktypes[k]
@@ -515,8 +508,6 @@ function render_library.pushViewMatrix(tbl)
 			SF.Throw("Invalid key found in view matrix: " .. k, 2)
 		end
 	end
-	if newtbl.origin then newtbl.origin = vunwrap(newtbl.origin) end
-	if newtbl.angles then newtbl.angles = aunwrap(newtbl.angles) end
 	if newtbl.offcenter then
 		checkluatype (tbl.offcenter.left, TYPE_NUMBER)
 		checkluatype (tbl.offcenter.right, TYPE_NUMBER)
@@ -528,6 +519,15 @@ function render_library.pushViewMatrix(tbl)
 		checkluatype (tbl.ortho.right, TYPE_NUMBER)
 		checkluatype (tbl.ortho.bottom, TYPE_NUMBER)
 		checkluatype (tbl.ortho.top, TYPE_NUMBER)
+	end
+
+	local endfunc
+	if newtbl.type == "2D" then
+		endfunc = "End2D"
+	elseif newtbl.type == "3D" then
+		endfunc = "End3D"
+	else
+		SF.Throw("Camera type must be \"3D\" or \"2D\"", 2)
 	end
 
 	cam.Start(newtbl)
@@ -921,14 +921,14 @@ end
 -- @param UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
 function render_library.drawTexturedRectUVFast (x, y, w, h, startU, startV, endU, endV, UVHack)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	
+
 	if UVHack then
 		startU = ( startU * 32 - 0.5 ) / 31
 		startV = ( startV * 32 - 0.5 ) / 31
 		endU = ( endU * 32 - 0.5 ) / 31
 		endV = ( endV * 32 - 0.5 ) / 31
 	end
-	
+
 	surface.DrawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 end
 
