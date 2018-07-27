@@ -98,6 +98,7 @@ SF.ResourceHandler = {
 					self.n = self.n + 1
 					obj = self.allocator(t, self.n)
 				end
+				if self.initializer then self.initializer(t, obj) end
 				self.players[ply] = self.players[ply] + 1
 				return obj
 			end
@@ -115,10 +116,11 @@ SF.ResourceHandler = {
 			end
 		end
 	},
-	__call = function(p, max, allocator, typer, destructor)
+	__call = function(p, max, allocator, initializer, typer, destructor)
 		local t = {
 			n = 0,
 			allocator = allocator,
+			initializer = initializer,
 			destructor = destructor,
 			typer = typer,
 			objects = {},

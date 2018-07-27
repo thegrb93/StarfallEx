@@ -64,6 +64,11 @@ local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function(shader, i)
 		return CreateMaterial("sf_material_" .. shader .. "_" .. i, shader, {})
 	end,
+	function(shader, mat)
+		if shader == "UnlitGeneric" then
+			mat:SetInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
+		end
+	end,
 	FindMetaTable("IMaterial").GetShader,
 	function(material)
 		for k, v in pairs(material:GetKeyValues()) do

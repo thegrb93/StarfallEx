@@ -139,6 +139,12 @@ local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
 	function(t, i)
 		return GetRenderTarget("Starfall_CustomRT_" .. i, 1024, 1024)
 	end,
+	function(t, Rt)
+		local oldRt = render.GetRenderTarget()
+		render.SetRenderTarget( Rt )
+		render.Clear(0, 0, 0, 255, true)
+		render.SetRenderTarget( oldRt )
+	end,
 	function() return "RT" end
 )
 
@@ -608,7 +614,6 @@ function render_library.getTextureID (tx, cb)
 	else
 		m:setTexture("$basetexture", tx)
 	end
-	m:setInt("$flags",32816) --MATERIAL_VAR_VERTEXCOLOR + MATERIAL_VAR_VERTEXALPHA + MATERIAL_VAR_IGNOREZ
 	return m
 end
 
