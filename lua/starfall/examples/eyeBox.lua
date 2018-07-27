@@ -1,4 +1,4 @@
---@name eyebox
+--@name Eyebox
 --@author thegrb93 aka Sparky
 --@shared
 
@@ -41,32 +41,25 @@ else
 		return x1, y1, x2, y2
 	end
 
-	local function makeQuad(x,y,w,h) return Vector(x,y,0), Vector(x+w,y,0), Vector(x+w,y+h,0), Vector(x,y+h,0) end
-	local boxquad = {makeQuad(0,0,1024,1024)}
-	local eyeoutline1 = {makeQuad(705,595,110,110)}
-	local eyeoutline2 = {makeQuad(855,595,110,110)}
-	local eye1 = {makeQuad(710,600,100,100)}
-	local eye2 = {makeQuad(860,600,100,100)}
 	local function doRender()
 		render.selectRenderTarget("rt")
 		render.setRenderTargetTexture("circle")
 		render.setTexture(box)
-		render.setTexture(box)
-		render.draw3DQuad(unpack(boxquad))
+		render.drawTexturedRect(0,0,1024,1024)
 
 		render.setRenderTargetTexture("circle")
 		render.setColor(Color(0,0,0))
-		render.draw3DQuad(unpack(eyeoutline1))
-		render.draw3DQuad(unpack(eyeoutline2))
+		render.drawTexturedRect(705,595,110,110)
+		render.drawTexturedRect(855,595,110,110)
 
 		render.setColor(Color(255,255,255))
-		render.draw3DQuad(unpack(eye1))
-		render.draw3DQuad(unpack(eye2))
+		render.drawTexturedRect(710,600,100,100)
+		render.drawTexturedRect(860,600,100,100)
 
 		local x1, y1, x2, y2 = getEyes()
 		render.setColor(Color(0,0,0))
-		render.draw3DQuad(makeQuad(730+x1,620+y1,60,60))
-		render.draw3DQuad(makeQuad(880+x2,620+y2,60,60))
+		render.drawTexturedRect(730+x1,620+y1,60,60)
+		render.drawTexturedRect(880+x2,620+y2,60,60)
 		render.selectRenderTarget()
 	end
 
