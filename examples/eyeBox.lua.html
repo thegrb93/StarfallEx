@@ -189,11 +189,17 @@
 -- Place this chip on a box to give it eyes
 
 if SERVER then
-	hook.add("net","",function(name,len,ply)
-		net.start("")
-		net.writeEntity(chip():isWeldedTo())
-		net.send(ply)
-	end)
+	local weldedTo = chip():isWeldedTo()
+
+	if weldedTo and weldedTo:getModel():find("/wood_crate001a") then
+		hook.add("net","",function(name,len,ply)
+			net.start("")
+			net.writeEntity(weldedTo)
+			net.send(ply)
+		end)
+	else
+		print("Place this chip on a box to give it eyes")
+	end
 else
 	local ent
 	render.createRenderTarget("rt")
