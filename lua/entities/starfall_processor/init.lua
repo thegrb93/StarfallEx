@@ -12,6 +12,26 @@ function ENT:Initialize ()
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
 end
 
+function ENT:SetCustomModel(model)
+	local constraints = constraint.GetTable(self)
+	local entities = {}
+	for k, v in pairs(constraints) do
+		for o, p in pairs(v.Entity) do
+			entities[p.Index] = p.Entity
+		end
+	end
+	constraint.RemoveAll(self)
+	self:PhysicsDestroy()
+	self:SetModel(model)
+	self:PhysicsInit(SOLID_VPHYSICS)
+	local function remakeConstraints()
+		for k, v in pairs(constraints) do
+			duplicator.CreateConstraintFromTable(v, entities)
+		end
+	end
+	timer.Simple(0, remakeConstraints) -- Need timer or wont work
+end
+
 -- Sends a net message to all clients about the use.
 function ENT:Use(activator)
 	if activator:IsPlayer() then
