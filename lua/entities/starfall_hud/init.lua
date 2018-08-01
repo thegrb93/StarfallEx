@@ -38,6 +38,7 @@ function ENT:SetHudEnabled(ply, mode)
 			end
 		end
 		ply.sfhudenabled = nil
+		ply:SetViewEntity()
 	end
 
 	if mode == 1 then
@@ -46,9 +47,6 @@ function ENT:SetHudEnabled(ply, mode)
 		if ply.sfhudenabled then disconnect() else connect() end
 	else
 		disconnect()
-	end
-	if not ply.sfhudenabled then
-		ply:SetViewEntity()
 	end
 end
 
