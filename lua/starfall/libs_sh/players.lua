@@ -447,6 +447,14 @@ function player_methods:getAmmoCount(id)
 end
 
 if SERVER then
+	SF.AddHook("deinitialize", function(instance)
+		for k, pl in pairs(player.GetAll()) do
+			if pl.sfhudenabled and pl.sfhudenabled.link == instance.data.entity then
+				pl:SetViewEntity()
+			end
+		end
+	end)
+
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
 	-- @param ent Entity to set the player's view entity to, or nothing to reset it
