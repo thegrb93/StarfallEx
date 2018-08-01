@@ -33,6 +33,8 @@ function ENT:Compile()
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
 		self.name = tostring(instance.ppdata.scriptnames[instance.mainfile])
+	else
+		self.name = "Generic ( No-Name )"
 	end
 
 	self.instance = instance
