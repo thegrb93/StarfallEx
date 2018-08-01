@@ -1186,11 +1186,32 @@ end
 function render_library.parseMarkup(str, maxsize)
 	checkluatype (str, TYPE_STRING)
 	checkluatype (maxsize, TYPE_NUMBER)
+
 	local marked = markup.Parse(str, maxsize)
-	local markedindex = marked.__index
+
+	for i, block in ipairs(marked.blocks) do
+		local color = block.colour
+
+		if getmetatable(color) then
+			block.colour = {
+				r = color.r,
+				g = color.g,
+				b = color.b,
+				a = color.a
+			}
+		end
+	end
+
+	local index = {
+		Draw = marked.Draw,
+		GetWidth = marked.GetWidth,
+		GetHeight = marked.GetHeight,
+		Size = marked.Size
+	}
+
 	return setmetatable(marked, {
 		__newindex = function() end,
-		__index = markedindex,
+		__index = index,
 		__metatable = ""
 	})
 end
