@@ -52,7 +52,7 @@ end
 -- @param headers GET headers to be sent
 function http_library.get (url, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
-	SF.Permissions.check(SF.instance, nil, "http.get")
+	SF.Permissions.check(instance, nil, "http.get")
 
 	httpRequestReady(instance)
 
@@ -81,47 +81,71 @@ end
 
 --- Runs a new http POST request
 -- @param url http target url
--- @param params POST parameters to be sent
+-- @param payload POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
 -- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 -- @param headers POST headers to be sent
-function http_library.post (url, params, callbackSuccess, callbackFail, headers)
+function http_library.post (url, payload, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
-	SF.Permissions.check(SF.instance, nil, "http.post")
+	SF.Permissions.check(instance, nil, "http.post")
 
 	httpRequestReady(instance)
 
-	SF.CheckLuaType(url, TYPE_STRING)
+	local request = {
+		url = SF.CheckLuaType(url, TYPE_STRING),
+		method = "POST"
+	}
 
-	if params~=nil then
-		SF.CheckLuaType(params, TYPE_TABLE)
-		for k, v in pairs(params) do
-			if type(k) ~= "string" or type(v) ~= "string" then
-				SF.Throw("Post parameters can only contain string keys and string values", 2)
+	if payload~=nil then
+		local payloadType = TypeID(payload)
+
+		if payloadType == TYPE_TABLE then
+			for k, v in pairs(payload) do
+				if type(k) ~= "string" or type(v) ~= "string" then
+					SF.Throw("Post parameters can only contain string keys and string values", 2)
+				end
 			end
+
+			request.parameters = payload
+		elseif payloadType == TYPE_STRING then
+			request.body = payload
+		else
+			SF.ThrowTypeError("table or string", SF.GetType(payload), 2)
 		end
 	end
+
 	if headers~=nil then
 		SF.CheckLuaType(headers, TYPE_TABLE)
+		
 		for k, v in pairs(headers) do
 			if type(k) ~= "string" or type(v) ~= "string" then
 				SF.Throw("Headers can only contain string keys and string values", 2)
+			end
+
+			if string.lower(k) == "content-type" then
+				request.type = v
 			end
 		end
 	end
 
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+
+	request.success, request.failed =
+		function(body, len, headers, code)
+			runCallback(instance, callbackSuccess, body, len, headers, code)
+		end,
+
+		function(err)
+			runCallback(instance, callbackFail, err)
+		end
+
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
-	http.Post(url, params, function (body, len, headers, code)
-		runCallback(instance, callbackSuccess, body, len, headers, code)
-	end, function (err)
-		runCallback(instance, callbackFail, err)
-	end,
-	headers)
+
+	HTTP(request)
 end
 
 --- Converts data into base64 format or nil if the string is 0 length
