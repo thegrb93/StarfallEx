@@ -192,12 +192,12 @@ Provides functions for doing line/AABB traces</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithOBB">intersectRayWithOBB</a>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithOBB">intersectRayWithOBB</a>( rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs&nbsp;)</td>
 			<td class="summary">
-Does a ray plane intersection returning the position hit or nil if not hit </td>
+Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithOBB">intersectRayWithOBB</a>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithPlane">intersectRayWithPlane</a>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</td>
 			<td class="summary">
 Does a ray plane intersection returning the position hit or nil if not hit </td>
 		</tr>
@@ -221,10 +221,10 @@ Does a swept-AABB trace </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="trace.intersectRayWithOBB"></a><strong>trace.intersectRayWithOBB</strong>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="trace.intersectRayWithOBB"></a><strong>trace.intersectRayWithOBB</strong>( rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs&nbsp;)</dt>
 <dd>
 	<p>
-Does a ray plane intersection returning the position hit or nil if not hit</p>
+Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.</p>
 	
 	
 	<section class="parameters">
@@ -233,8 +233,10 @@ Does a ray plane intersection returning the position hit or nil if not hit</p>
 			
 			<li><tt>rayStart</tt> ― The origin of the ray</li>
 			<li><tt>rayDelta</tt> ― The direction and length of the ray</li>
-			<li><tt>planeOrigin</tt> ― The origin of the plane</li>
-			<li><tt>planeNormal</tt> ― The normal of the plane</li>
+			<li><tt>boxOrigin</tt> ― The origin of the box</li>
+			<li><tt>boxAngles</tt> ― The box's angles</li>
+			<li><tt>boxMins</tt> ― The box min bounding vector</li>
+			<li><tt>boxMaxs</tt> ― The box max bounding vector</li>
 		</ul>
 	</section>
 	
@@ -242,14 +244,18 @@ Does a ray plane intersection returning the position hit or nil if not hit</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Hit position or nil if not hit</p>
-		
+		<ol>
+			
+			<li>Hit position or nil if not hit</li>
+			<li>Hit normal or nil if not hit</li>
+			<li>Hit fraction or nil if not hit</li>
+		</ol>
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="trace.intersectRayWithOBB"></a><strong>trace.intersectRayWithOBB</strong>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="trace.intersectRayWithPlane"></a><strong>trace.intersectRayWithPlane</strong>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</dt>
 <dd>
 	<p>
 Does a ray plane intersection returning the position hit or nil if not hit</p>
