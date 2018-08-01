@@ -30,17 +30,17 @@ local function httpRequestReady (instance)
 end
 
 -- Runs the appropriate callback after a http request
-local function runCallback (instance, callback, ...)
-	if callback then
-		if IsValid(instance.data.entity) then
+local function runCallback(instance, callback)
+	return function(...)
+		if callback then
 			instance:runFunction(callback, ...)
 		end
+		instance.data.http.active = instance.data.http.active - 1
 	end
-	instance.data.http.active = instance.data.http.active - 1
 end
 
 --- Checks if a new http request can be started
-function http_library.canRequest ()
+function http_library.canRequest()
 	local httpData = SF.instance.data.http
 	return CurTime() - httpData.lastRequest >= http_interval:GetFloat() and httpData.active < http_max_active:GetInt()
 end
@@ -52,14 +52,14 @@ end
 -- @param headers GET headers to be sent
 function http_library.get (url, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
-	SF.Permissions.check(instance, nil, "http.get")
+	SF.Permissions.check(instance, url, "http.get")
 
 	httpRequestReady(instance)
 
 	SF.CheckLuaType(url, TYPE_STRING)
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
-	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
-	if headers~=nil then
+	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	if headers ~= nil then
 		SF.CheckLuaType(headers, TYPE_TABLE)
 		for k, v in pairs(headers) do
 			if type(k) ~= "string" or type(v) ~= "string" then
@@ -67,32 +67,29 @@ function http_library.get (url, callbackSuccess, callbackFail, headers)
 			end
 		end
 	end
+
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 
 	instance.data.http.lastRequest = CurTime()
 	instance.data.http.active = instance.data.http.active + 1
-	http.Fetch(url, function (body, len, headers, code)
-		runCallback(instance, callbackSuccess, body, len, headers, code)
-	end, function (err)
-		runCallback(instance, callbackFail, err)
-	end,
-	headers)
+	http.Fetch(url, runCallback(instance, callbackSuccess), runCallback(instance, callbackFail), headers)
 end
 
 --- Runs a new http POST request
 -- @param url http target url
--- @param payload POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
--- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
--- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
--- @param headers POST headers to be sent
+-- @param payload optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded
+-- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
+-- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
+-- @param headers optional POST headers to be sent
 function http_library.post (url, payload, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
-	SF.Permissions.check(instance, nil, "http.post")
+	SF.CheckLuaType(url, TYPE_STRING)
+	SF.Permissions.check(instance, url, "http.post")
 
 	httpRequestReady(instance)
 
 	local request = {
-		url = SF.CheckLuaType(url, TYPE_STRING),
+		url = url,
 		method = "POST"
 	}
 
@@ -130,17 +127,11 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 		request.headers = headers
 	end
 
-	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
-	if callbackFail then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
-
-	request.success, request.failed =
-		function(body, len, headers, code)
-			runCallback(instance, callbackSuccess, body, len, headers, code)
-		end,
-
-		function(err)
-			runCallback(instance, callbackFail, err)
-		end
+	if callbackSuccess ~= nil then SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION) end
+	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	
+	request.success = runCallback(instance, callbackSuccess)
+	request.failed = runCallback(instance, callbackFail)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
 
