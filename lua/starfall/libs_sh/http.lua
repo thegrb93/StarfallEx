@@ -126,6 +126,8 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 				request.type = v
 			end
 		end
+		
+		request.headers = headers
 	end
 
 	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
