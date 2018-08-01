@@ -291,10 +291,10 @@ Runs a new http POST request</p>
 		<ul>
 			
 			<li><tt>url</tt> ― http target url</li>
-			<li><tt>payload</tt> ― POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded</li>
-			<li><tt>callbackSuccess</tt> ― the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)</li>
-			<li><tt>callbackFail</tt> ― the function to be called on request fail, taking the failing reason as an argument</li>
-			<li><tt>headers</tt> ― POST headers to be sent</li>
+			<li><tt>payload</tt> ― optional POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded</li>
+			<li><tt>callbackSuccess</tt> ― optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)</li>
+			<li><tt>callbackFail</tt> ― optional function to be called on request fail, taking the failing reason as an argument</li>
+			<li><tt>headers</tt> ― optional POST headers to be sent</li>
 		</ul>
 	</section>
 	
