@@ -130,7 +130,10 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 	if callbackSuccess ~= nil then SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION) end
 	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
 	
-	request.success = runCallback(instance, callbackSuccess)
+	request.success = function(code, body, headers)
+		local callback = runCallback(instance, callbackSuccess)
+		callback(body, #body, headers, code)
+	end
 	request.failed = runCallback(instance, callbackFail)
 
 	if CLIENT then SF.HTTPNotify(instance.player, url) end
