@@ -90,9 +90,8 @@ function ENT:SendCode(recipient)
 	SF.SendStarfall("starfall_processor_download", sfdata, recipient)
 end
 
-function ENT:PreEntityCopy ()
-	if self.EntityMods then self.EntityMods.SFDupeInfo = nil end
-
+function ENT:PreEntityCopy()
+	duplicator.ClearEntityModifier(self, "SFDupeInfo")
 	if self.instance then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode(self.files, self.mainfile)
