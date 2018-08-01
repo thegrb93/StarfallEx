@@ -207,7 +207,7 @@ Checks if a new http request can be started </td>
 Runs a new http GET request </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#http.post">post</a>( url, params, callbackSuccess, callbackFail, headers&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#http.post">post</a>( url, payload, callbackSuccess, callbackFail, headers&nbsp;)</td>
 			<td class="summary">
 Runs a new http POST request </td>
 		</tr>
@@ -280,7 +280,7 @@ Runs a new http GET request</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="http.post"></a><strong>http.post</strong>( url, params, callbackSuccess, callbackFail, headers&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="http.post"></a><strong>http.post</strong>( url, payload, callbackSuccess, callbackFail, headers&nbsp;)</dt>
 <dd>
 	<p>
 Runs a new http POST request</p>
@@ -291,7 +291,7 @@ Runs a new http POST request</p>
 		<ul>
 			
 			<li><tt>url</tt> ― http target url</li>
-			<li><tt>params</tt> ― POST parameters to be sent</li>
+			<li><tt>payload</tt> ― POST payload to be sent, can be both table and string. When table is used, the request body is encoded as application/x-www-form-urlencoded</li>
 			<li><tt>callbackSuccess</tt> ― the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)</li>
 			<li><tt>callbackFail</tt> ― the function to be called on request fail, taking the failing reason as an argument</li>
 			<li><tt>headers</tt> ― POST headers to be sent</li>
