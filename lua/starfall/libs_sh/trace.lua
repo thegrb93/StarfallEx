@@ -355,7 +355,7 @@ end
 --@param planeOrigin The origin of the plane
 --@param planeNormal The normal of the plane
 --@return Hit position or nil if not hit
-function trace_library.intersectRayWithOBB(rayStart, rayDelta, planeOrigin, planeNormal)
+function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
 	checktype(rayStart, vecmeta)
 	checktype(rayDelta, vecmeta)
 	checktype(planeOrigin, vecmeta)
