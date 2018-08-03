@@ -706,19 +706,19 @@ else
 	--- Returns the local player's camera angles
 	-- @return The local player's camera angles
 	function SF.DefaultEnvironment.eyeAngles ()
-		return SF.WrapObject(EyeAngles())
+		return SF.WrapObject(LocalPlayer():EyeAngles())
 	end
 
 	--- Returns the local player's camera position
 	-- @return The local player's camera position
 	function SF.DefaultEnvironment.eyePos()
-		return SF.WrapObject(EyePos())
+		return SF.WrapObject(LocalPlayer():EyePos())
 	end
 
 	--- Returns the local player's camera forward vector
 	-- @return The local player's camera forward vector
 	function SF.DefaultEnvironment.eyeVector()
-		return SF.WrapObject(EyeVector())
+		return SF.WrapObject(LocalPlayer():GetAimVector())
 	end
 end
 
