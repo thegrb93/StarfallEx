@@ -666,11 +666,11 @@ function ents_methods:getAllConstrained(constraintype)
 	local function recursive_find(ent)
 		if entity_lookup[ent] then return end
 		entity_lookup[ent] = true
-		entity_table[#entity_table + 1] = wrap(ent)
+		if ent:IsValid() then entity_table[#entity_table + 1] = wrap(ent) end
 		local constraints = constraintype and constraint.FindConstraints(ent, constraintype) or constraint.GetTable(ent)
 		for k, v in pairs(constraints) do
-			recursive_find(v.Ent1)
-			recursive_find(v.Ent2)
+			if v.Ent1 then recursive_find(v.Ent1) end
+			if v.Ent2 then recursive_find(v.Ent2) end
 		end
 	end
 	recursive_find(unwrap(self))
