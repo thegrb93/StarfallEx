@@ -94,6 +94,14 @@ SF.AddHook("deinitialize", function (inst)
 	end
 end)
 
+local blacklisted_keys = {
+	["$flags2"] = true
+}
+local function checkkey(key)
+	checkluatype(key, TYPE_STRING, 1)
+	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
+end
+
 
 --- Loads a .vmt material or existing material. Throws an error if the material fails to load
 --- Existing created materials can be loaded with ! prepended to the name
@@ -355,7 +363,7 @@ end
 -- @param v The value to set it to
 function material_methods:setFloat(key, v)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
 	unwrap(self):SetFloat(key, v)
 end
@@ -365,7 +373,7 @@ end
 -- @param v The value to set it to
 function material_methods:setInt(key, v)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
 	unwrap(self):SetInt(key, v)
 end
@@ -375,7 +383,7 @@ end
 -- @param v The value to set it to
 function material_methods:setMatrix(key, v)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checktype(v, matrix_meta)
 	unwrap(self):SetMatrix(key, munwrap(v))
 end
@@ -385,7 +393,7 @@ end
 -- @param v The value to set it to
 function material_methods:setString(key, v)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checkluatype(v, TYPE_STRING)
 	unwrap(self):SetString(key, v)
 end
@@ -395,7 +403,7 @@ end
 -- @param v The texture name to set it to.
 function material_methods:setTexture(key, v)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checkluatype(v, TYPE_STRING)
 
 	unwrap(self):SetTexture(key, v)
@@ -509,7 +517,7 @@ end
 -- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
 function material_methods:setTextureURL(key, url, cb)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checkluatype(url, TYPE_STRING)
 	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
 
@@ -564,7 +572,7 @@ end
 -- @param name The name of the rendertarget
 function material_methods:setTextureRenderTarget(key, name)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checkluatype(name, TYPE_STRING)
 
 	local rt = SF.instance.data.render.rendertargets[name]
@@ -578,7 +586,7 @@ end
 -- @param key The key name to set
 function material_methods:setUndefined(key)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	unwrap(self):SetUndefined(key)
 end
 
@@ -587,7 +595,7 @@ end
 -- @param v The value to set it to
 function material_methods:setVector(key, v)
 	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
+	checkkey(key)
 	checktype(v, vector_meta)
 	unwrap(self):SetVector(key, vunwrap(v))
 end
