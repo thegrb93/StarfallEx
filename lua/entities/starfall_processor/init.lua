@@ -13,6 +13,7 @@ function ENT:Initialize ()
 end
 
 function ENT:SetCustomModel(model)
+	if self:GetModel() == model then return end
 	local constraints = constraint.GetTable(self)
 	local entities = {}
 	for k, v in pairs(constraints) do
@@ -20,6 +21,7 @@ function ENT:SetCustomModel(model)
 			entities[p.Index] = p.Entity
 		end
 	end
+	local movable = self:GetPhysicsObject():IsMoveable()
 	constraint.RemoveAll(self)
 	self:PhysicsDestroy()
 	self:SetModel(model)
@@ -28,7 +30,9 @@ function ENT:SetCustomModel(model)
 		for k, v in pairs(constraints) do
 			duplicator.CreateConstraintFromTable(v, entities)
 		end
+		self:GetPhysicsObject():EnableMotion(movable)
 	end
+	self:GetPhysicsObject():EnableMotion(false)
 	timer.Simple(0, remakeConstraints) -- Need timer or wont work
 end
 
