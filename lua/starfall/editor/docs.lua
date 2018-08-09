@@ -1335,13 +1335,15 @@ Convert JSON string to table ";};["encode"]={["class"]="function";["description"
 Convert table to JSON string";["fname"]="encode";["library"]="json";["name"]="json_library.encode";["param"]={[1]="tbl";["tbl"]="Table to encode";};["private"]=false;["realm"]="sh";["ret"]="JSON encoded string representation of the table";["summary"]="\
 Convert table to JSON string ";};};["libtbl"]="json_library";["name"]="json";["server"]=true;["summary"]="\
 JSON library ";["tables"]={};};["material"]={["class"]="library";["client"]=true;["description"]="\
-`material` library is allows creating material objects which are used for controlling shaders in rendering.";["fields"]={};["functions"]={[1]="create";[2]="createFromImage";[3]="load";["create"]={["class"]="function";["description"]="\
+`material` library is allows creating material objects which are used for controlling shaders in rendering.";["fields"]={};["functions"]={[1]="create";[2]="createFromImage";[3]="getTexture";[4]="load";["create"]={["class"]="function";["description"]="\
 Creates a new blank material";["fname"]="create";["library"]="material";["name"]="material_library.create";["param"]={[1]="shader";["shader"]="The shader of the material. (UnlitGeneric or VertexLitGeneric)";};["private"]=false;["realm"]="cl";["summary"]="\
 Creates a new blank material ";};["createFromImage"]={["class"]="function";["description"]="\
 Creates a .jpg or .png material from file \
 Can't be modified";["fname"]="createFromImage";["library"]="material";["name"]="material_library.createFromImage";["param"]={[1]="path";[2]="params";["params"]="The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters";["path"]="The path to the image file";};["private"]=false;["realm"]="cl";["summary"]="\
 Creates a .jpg or .png material from file \
-Can't be modified ";};["load"]={["class"]="function";["description"]="\
+Can't be modified ";};["getTexture"]={["class"]="function";["description"]="\
+Gets a texture from a material";["fname"]="getTexture";["library"]="material";["name"]="material_library.getTexture";["param"]={[1]="path";[2]="texture";["path"]="The path of the material (don't include .vmt in the path)";["texture"]="The texture key to get";};["private"]=false;["realm"]="cl";["ret"]="The texture's name";["summary"]="\
+Gets a texture from a material ";};["load"]={["class"]="function";["description"]="\
 Loads a .vmt material or existing material. Throws an error if the material fails to load \
 Existing created materials can be loaded with ! prepended to the name \
 Can't be modified";["fname"]="load";["library"]="material";["name"]="material_library.load";["param"]={[1]="path";["path"]="The path of the material (don't include .vmt in the path)";};["private"]=false;["realm"]="cl";["ret"]="The material object. Can't be modified.";["summary"]="\
