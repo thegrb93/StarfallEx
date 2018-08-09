@@ -4,6 +4,10 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 function ENT:Initialize()
 	self.clips = {}
 
+	net.Start("starfall_hologram_clip")
+		net.WriteUInt(self:EntIndex(), 16)
+	net.SendToServer()
+
 	--Hack to make scale work because self:EnableMatrix("RenderMultiply", self.render_matrix) doesn't work on join
 	timer.Simple(1, function() self.scale = nil end)
 end
@@ -144,15 +148,6 @@ function ENT:setupScale()
 		self:SetRenderBounds(propmax, propmin)
 	end
 end
-
-hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(ent)
-	-- Entity may not have its lua table yet so the only way is to check its class
-	if not ent.clips and ent:GetClass()=="starfall_hologram" then
-		net.Start("starfall_hologram_clip")
-		net.WriteUInt(ent:EntIndex(), 16)
-		net.SendToServer()
-	end
-end)
 
 local function ShowHologramOwners()
 	for _, ent in pairs(ents.FindByClass("starfall_hologram")) do
