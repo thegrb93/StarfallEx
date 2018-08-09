@@ -120,7 +120,6 @@ function ENT:Error(err)
 	if SERVER then
 		SF.Print(self.owner, traceback)
 	else
-		print(msg)
 		print(traceback)
 	end
 end

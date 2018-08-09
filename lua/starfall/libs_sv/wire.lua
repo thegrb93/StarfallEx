@@ -169,27 +169,27 @@ inputConverters.r = inputConverters.ARRAY
 local outputConverters =
 {
 	NORMAL = function(data)
-		checkluatype(data, TYPE_NUMBER, 1)
+		checkluatype(data, TYPE_NUMBER, 2)
 		return data
 	end,
 	STRING = function(data)
-		checkluatype(data, TYPE_STRING, 1)
+		checkluatype(data, TYPE_STRING, 2)
 		return data
 	end,
 	VECTOR = function(data)
-		checktype(data, SF.Types["Vector"], 1)
+		checktype(data, SF.Types["Vector"], 2)
 		return vunwrap(data)
 	end,
 	ANGLE = function(data)
-		checktype(data, SF.Types["Angle"], 1)
+		checktype(data, SF.Types["Angle"], 2)
 		return aunwrap(data)
 	end,
 	ENTITY = function(data)
-		checktype(data, SF.Types["Entity"], 1)
+		checktype(data, SF.Types["Entity"], 2)
 		return eunwrap(data)
 	end,
 	TABLE = function(data)
-		checkluatype(data, TYPE_TABLE, 1)
+		checkluatype(data, TYPE_TABLE, 2)
 		local completed_tables = {}
 
 		local function recursiveConvert(tbl)

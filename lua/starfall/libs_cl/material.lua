@@ -98,7 +98,7 @@ local blacklisted_keys = {
 	["$flags2"] = true
 }
 local function checkkey(key)
-	checkluatype(key, TYPE_STRING, 1)
+	checkluatype(key, TYPE_STRING, 2)
 	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
 end
 

@@ -345,14 +345,14 @@ end
 --- Checks the starfall type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A metatable.
--- @param level Level at which to error at. 4 is added to this value. Default is 0.
+-- @param level Level at which to error at. 2 is added to this value. Default is 1.
 function SF.CheckType(val, typ, level)
 	local meta = dgetmeta(val)
 	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and SF.Types[meta]) then
 		return val
 	else
 		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
-		level = (level or 0) + 3
+		level = (level or 1) + 2
 		SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
 	end
 end
@@ -367,7 +367,7 @@ end
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
--- @param level Level at which to error at. 4 is added to this value. Default is 0.
+-- @param level Level at which to error at. 2 is added to this value. Default is 1.
 function SF.CheckLuaType(val, typ, level)
 	local valtype = TypeID(val)
 	if valtype == typ then
@@ -386,7 +386,7 @@ function SF.CheckLuaType(val, typ, level)
 			[TYPE_USERDATA] = "userdata"
 		}
 
-		level = (level or 0) + 4
+		level = (level or 1) + 2
 		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
 	end
 end
