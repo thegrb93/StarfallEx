@@ -25,25 +25,31 @@ function ENT:Draw()
 	self:setupClip()
 	self:setupScale()
 
-	if self:GetSuppressEngineLighting() then
-		render.SuppressEngineLighting(true)
-		self:DrawModel()
-		render.SuppressEngineLighting(false)
-	else
-		self:DrawModel()
-	end
-
-	self:finishClip()
-end
-
-function ENT:GetRenderMesh()
-	if self.custom_mesh then
+	render.SuppressEngineLighting(self:GetSuppressEngineLighting())
+	if self.rendered_once and self.custom_mesh then
 		if self.custom_meta_data[self.custom_mesh] then
-			return { Mesh = self.custom_mesh, nil--[[Material = self.Material]], Matrix = self.render_matrix }
+			local m = self:GetBoneMatrix(0)
+			if m then
+				if self.render_matrix then m = m * self.render_matrix end
+				cam.PushModelMatrix(m)
+				local mat = Material(self:GetMaterial())
+				if mat then render.SetMaterial(mat) end
+				local col = self:GetColor()
+				render.SetColorModulation(col.r / 255, col.g / 255, col.b / 255)
+				self:DrawModel() --For some reason won't draw without this call
+				self.custom_mesh:Draw()
+				cam.PopModelMatrix()
+			end
 		else
 			self.custom_mesh = nil
 		end
+	else
+		self:DrawModel()
+		self.rendered_once = true
 	end
+	render.SuppressEngineLighting(false)
+
+	self:finishClip()
 end
 
 -- ------------------------ CLIPPING ------------------------ --
