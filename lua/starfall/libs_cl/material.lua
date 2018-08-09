@@ -117,6 +117,16 @@ function material_library.load(path)
 	return lwrap(m)
 end
 
+--- Gets a texture from a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param texture The texture key to get
+-- @return The texture's name
+function material_library.getTexture(path, texture)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(texture, TYPE_STRING)
+	return Material(path):GetTexture(texture):GetName()
+end
+
 --- Creates a new blank material
 -- @param shader The shader of the material. (UnlitGeneric or VertexLitGeneric)
 function material_library.create(shader)
