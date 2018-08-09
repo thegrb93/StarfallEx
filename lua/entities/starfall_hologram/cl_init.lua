@@ -3,6 +3,9 @@ ENT.RenderGroup = RENDERGROUP_BOTH
 
 function ENT:Initialize()
 	self.clips = {}
+
+	--Hack to make scale work because self:EnableMatrix("RenderMultiply", self.render_matrix) doesn't work on join
+	timer.Simple(1, function() self.scale = nil end)
 end
 
 function ENT:setupRenderGroup()
@@ -18,31 +21,25 @@ function ENT:Draw()
 	self:setupClip()
 	self:setupScale()
 
-	render.SuppressEngineLighting(self:GetSuppressEngineLighting())
-	if self.rendered_once and self.custom_mesh then
+	if self:GetSuppressEngineLighting() then
+		render.SuppressEngineLighting(true)
+		self:DrawModel()
+		render.SuppressEngineLighting(false)
+	else
+		self:DrawModel()
+	end
+
+	self:finishClip()
+end
+
+function ENT:GetRenderMesh()
+	if self.custom_mesh then
 		if self.custom_meta_data[self.custom_mesh] then
-			local m = self:GetBoneMatrix(0)
-			if m then
-				if self.render_matrix then m = m * self.render_matrix end
-				cam.PushModelMatrix(m)
-				local mat = Material(self:GetMaterial())
-				if mat then render.SetMaterial(mat) end
-				local col = self:GetColor()
-				render.SetColorModulation(col.r / 255, col.g / 255, col.b / 255)
-				self:DrawModel() --For some reason won't draw without this call
-				self.custom_mesh:Draw()
-				cam.PopModelMatrix()
-			end
+			return { Mesh = self.custom_mesh, nil--[[Material = self.Material]], Matrix = self.render_matrix }
 		else
 			self.custom_mesh = nil
 		end
-	else
-		self:DrawModel()
-		self.rendered_once = true
 	end
-	render.SuppressEngineLighting(false)
-
-	self:finishClip()
 end
 
 -- ------------------------ CLIPPING ------------------------ --
@@ -95,9 +92,9 @@ net.Receive("starfall_hologram_clip", function ()
 	local origin = net.ReadVector()
 	local normal = net.ReadVector()
 	local islocal = net.ReadBit() ~= 0
-	
+
 	local holoent = Entity(entid)
-	if holoent:IsValid() then
+	if holoent:IsValid() and holoent.UpdateClip then
 		holoent:UpdateClip(clipid, enabled, origin, normal, islocal)
 	else
 		local timeout = CurTime()+0.5
@@ -105,7 +102,7 @@ net.Receive("starfall_hologram_clip", function ()
 		hook.Add("Think", hookname, function()
 			if CurTime() < timeout then
 				local holoent = Entity(entid)
-				if holoent:IsValid() then
+				if holoent:IsValid() and holoent.UpdateClip then
 					holoent:UpdateClip(clipid, enabled, origin, normal, islocal)
 					hook.Remove("Think", hookname)
 				end
@@ -136,14 +133,14 @@ function ENT:setupScale()
 
 		local propmax = self:OBBMaxs()
 		local propmin = self:OBBMins()
-		
+
 		propmax.x = scale.x * propmax.x
 		propmax.y = scale.y * propmax.y
 		propmax.z = scale.z * propmax.z
 		propmin.x = scale.x * propmin.x
 		propmin.y = scale.y * propmin.y
 		propmin.z = scale.z * propmin.z
-		
+
 		self:SetRenderBounds(propmax, propmin)
 	end
 end
@@ -166,9 +163,9 @@ local function ShowHologramOwners()
 			name = ply:Name()
 			steamID = ply:SteamID()
 		end
-		
+
 		local vec = ent:GetPos():ToScreen()
-		
+
 		draw.DrawText(name .. "\n" .. steamID, "DermaDefault", vec.x, vec.y, Color(255, 0, 0, 255), 1)
 	end
 end
@@ -177,7 +174,7 @@ local display_owners = false
 concommand.Add("sf_holograms_display_owners", function()
 	display_owners = not display_owners
 
-	if display_owners then 
+	if display_owners then
 		hook.Add("HUDPaint", "sf_holograms_showowners", ShowHologramOwners)
 	else
 		hook.Remove("HUDPaint", "sf_holograms_showowners")
