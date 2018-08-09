@@ -352,7 +352,7 @@ function SF.CheckType(val, typ, level)
 		return val
 	else
 		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
-		level = (level or 0) + 4
+		level = (level or 0) + 3
 		SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
 	end
 end
