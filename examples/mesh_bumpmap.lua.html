@@ -193,7 +193,7 @@ if SERVER then
 	holo:setScale(Vector(0.1, 0.1, 0.1))
 	holo:setParent(chip())
 
-	hook.add("net","",function(name, len, pl)        
+	hook.add("net","",function(name, len, pl)
 		net.start("")
 		net.writeEntity(holo)
 		net.send(pl)
@@ -207,11 +207,11 @@ else
 	mat:setTexture("$basetexture", "hunter/myplastic")
 	mat:setTexture("$bumpmap", "hunter/myplastic_normal")
 	mat:setTexture("$envmap", "env_cubemap")
-	
+
 	mat:setFloat("$envmapcontrast", 1)
 	mat:setFloat("$envmapsaturation", 0.20000000298023)
 	mat:setVector("$envmaptint", Vector(0.006585, 0.006585, 0.006585))
-	
+
 	mat:setInt("$phong", 1)
 	mat:setFloat("$phongalbedotint", 0)
 	mat:setFloat("$phongboost", 2)
@@ -220,15 +220,15 @@ else
 
 	net.start("")
 	net.send()
-	
+
 	local function init()
 		if holo and sphere then
-			holo:setMaterial("!"..mat:getName())
 			holo:setHologramMesh(sphere)
+			holo:setHologramMaterial(mat)
 			holo:setHologramRenderBounds(Vector(-200),Vector(200))
 		end
 	end
-	
+
 	hook.add("net","",function(name, len, pl)
 		holo = net.readEntity()
 		init()

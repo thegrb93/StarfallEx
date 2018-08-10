@@ -240,16 +240,16 @@ else
 		if not (mymesh and holo) then return end
 
 		holo:setHologramMesh(mymesh)
+		holo:setHologramMaterial(texture)
 		holo:setHologramRenderBounds(Vector(-200),Vector(200))
-		
+
 		hook.add("postdrawopaquerenderables","mesh",renderHUD)
 		hook.add("render","mesh",renderScreen)
 	end
-	
+
 	-- Used for setting up the hologram
 	hook.add("net","",function(name, len, pl)
 		holo = net.readEntity()
-		holo:setMaterial("!"..texture:getName())
 		init()
 	end)
 	net.start("") net.send()
