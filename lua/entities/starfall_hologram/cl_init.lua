@@ -1,15 +1,15 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+ENT.DefaultMaterial = Material( "hunter/myplastic" )
+ENT.Material = ENT.DefaultMaterial
+
 function ENT:Initialize()
 	self.clips = {}
 
 	net.Start("starfall_hologram_clip")
 		net.WriteUInt(self:EntIndex(), 16)
 	net.SendToServer()
-
-	--Hack to make scale work because self:EnableMatrix("RenderMultiply", self.render_matrix) doesn't work on join
-	timer.Simple(1, function() self.scale = nil end)
 end
 
 function ENT:setupRenderGroup()
@@ -25,31 +25,25 @@ function ENT:Draw()
 	self:setupClip()
 	self:setupScale()
 
-	render.SuppressEngineLighting(self:GetSuppressEngineLighting())
-	if self.rendered_once and self.custom_mesh then
-		if self.custom_meta_data[self.custom_mesh] then
-			local m = self:GetBoneMatrix(0)
-			if m then
-				if self.render_matrix then m = m * self.render_matrix end
-				cam.PushModelMatrix(m)
-				local mat = Material(self:GetMaterial())
-				if mat then render.SetMaterial(mat) end
-				local col = self:GetColor()
-				render.SetColorModulation(col.r / 255, col.g / 255, col.b / 255)
-				self:DrawModel() --For some reason won't draw without this call
-				self.custom_mesh:Draw()
-				cam.PopModelMatrix()
-			end
+	if self:GetSuppressEngineLighting() then
+		render.SuppressEngineLighting(true)
+		self:DrawModel()
+		render.SuppressEngineLighting(false)
+	else
+		self:DrawModel()
+	end
+
+	self:finishClip()
+end
+
+function ENT:GetRenderMesh()
+	if self.custom_mesh then
+		if self.custom_mesh_data[self.custom_mesh] then
+			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
 		else
 			self.custom_mesh = nil
 		end
-	else
-		self:DrawModel()
-		self.rendered_once = true
 	end
-	render.SuppressEngineLighting(false)
-
-	self:finishClip()
 end
 
 -- ------------------------ CLIPPING ------------------------ --
@@ -133,12 +127,11 @@ function ENT:setupScale()
 	if self.scale ~= scale then
 		self.scale = scale
 		if scale == Vector(1, 1, 1) then
-			self.render_matrix = Matrix()
 			self:DisableMatrix("RenderMultiply")
 		else
-			self.render_matrix = Matrix()
-			self.render_matrix:Scale(scale)
-			self:EnableMatrix("RenderMultiply", self.render_matrix)
+			local scalematrix = Matrix()
+			scalematrix:Scale(scale)
+			self:EnableMatrix("RenderMultiply", scalematrix)
 		end
 
 		local propmax = self:OBBMaxs()
@@ -154,6 +147,12 @@ function ENT:setupScale()
 		self:SetRenderBounds(propmax, propmin)
 	end
 end
+
+hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(ent)
+	if ent.GetScale and ent.setupScale then
+		ent:setupScale()
+	end
+end)
 
 local function ShowHologramOwners()
 	for _, ent in pairs(ents.FindByClass("starfall_hologram")) do

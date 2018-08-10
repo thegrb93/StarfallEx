@@ -123,7 +123,6 @@ if CLIENT then
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
-
 	--- Sets a hologram entity's model to a custom Mesh
 	-- @client
 	-- @param mesh The mesh to set it to or nil to set back to normal
@@ -135,12 +134,26 @@ if CLIENT then
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
 			checktype(mesh, SF.Mesh.Metatable)
-			ent:SetModelScale(0, 0)
 			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
-			ent.custom_meta_data = instance.data.meshes
+			ent.custom_mesh_data = instance.data.meshes
 		else
-			ent:SetModelScale(1, 0)
 			ent.custom_mesh = nil
+		end
+	end
+
+	--- Sets a hologram entity's material to a custom material
+	-- @client
+	-- @param material The material to set it to or nil to set back to default
+	function ents_methods:setHologramMaterial(material)
+		local instance = SF.instance
+		local ent = eunwrap(self)
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		if material then
+			checktype(material, SF.Materials.Metatable)
+			ent.Material = SF.Materials.Unwrap(material)
+		else
+			ent.Material = ent.DefaultMaterial
 		end
 	end
 
