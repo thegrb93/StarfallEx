@@ -133,11 +133,18 @@ function input_methods.enableCursor(enabled)
 		SF.Throw("No HUD component connected", 2)
 	end
 
+	SF.instance.data.cursorEnabled = enabled
 	gui.EnableScreenClicker(enabled)
 end
 
+SF.AddHook("deinitialize", function(inst)
+	if inst.data.cursorEnabled then
+		gui.EnableScreenClicker(false)
+	end
+end)
+
 SF.AddHook("starfall_hud_disconnected", function(inst)
-	if not inst:isHUDActive() then
+	if inst.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
 end)
