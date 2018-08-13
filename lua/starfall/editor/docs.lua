@@ -1042,12 +1042,12 @@ Runs an included script, but does not cache the result.";};["entity"]={["class"]
 Returns the entity with index 'num'";["fname"]="entity";["library"]="builtin";["name"]="SF.DefaultEnvironment.entity";["param"]={[1]="num";["num"]="Entity index";};["realm"]="sh";["ret"]="entity";["summary"]="\
 Returns the entity with index 'num' ";};["error"]={["class"]="function";["description"]="\
 Throws a raw exception.";["fname"]="error";["library"]="builtin";["name"]="SF.DefaultEnvironment.error";["param"]={[1]="msg";[2]="level";["level"]="Which level in the stacktrace to blame. Defaults to 1";["msg"]="Exception message";};["private"]=false;["realm"]="sh";["summary"]="\
-Throws a raw exception.";};["eyeAngles"]={["class"]="function";["description"]="\
-Returns the local player's camera angles";["fname"]="eyeAngles";["library"]="builtin";["name"]="SF.DefaultEnvironment.eyeAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The local player's camera angles";["summary"]="\
-Returns the local player's camera angles ";};["eyePos"]={["class"]="function";["description"]="\
-Returns the local player's camera position";["fname"]="eyePos";["library"]="builtin";["name"]="SF.DefaultEnvironment.eyePos";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The local player's camera position";["summary"]="\
-Returns the local player's camera position ";};["eyeVector"]={["class"]="function";["description"]="\
-Returns the local player's camera forward vector";["fname"]="eyeVector";["library"]="builtin";["name"]="SF.DefaultEnvironment.eyeVector";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The local player's camera forward vector";["summary"]="\
+Throws a raw exception.";};["eyeAngles"]={["class"]="function";["client"]=true;["description"]="\
+Returns the local player's camera angles";["fname"]="eyeAngles";["library"]="builtin";["name"]="SF.DefaultEnvironment.eyeAngles";["param"]={};["private"]=false;["realm"]="cl";["ret"]="The local player's camera angles";["summary"]="\
+Returns the local player's camera angles ";};["eyePos"]={["class"]="function";["client"]=true;["description"]="\
+Returns the local player's camera position";["fname"]="eyePos";["library"]="builtin";["name"]="SF.DefaultEnvironment.eyePos";["param"]={};["private"]=false;["realm"]="cl";["ret"]="The local player's camera position";["summary"]="\
+Returns the local player's camera position ";};["eyeVector"]={["class"]="function";["client"]=true;["description"]="\
+Returns the local player's camera forward vector";["fname"]="eyeVector";["library"]="builtin";["name"]="SF.DefaultEnvironment.eyeVector";["param"]={};["private"]=false;["realm"]="cl";["ret"]="The local player's camera forward vector";["summary"]="\
 Returns the local player's camera forward vector ";};["getLibraries"]={["class"]="function";["description"]="\
 Gets a list of all libraries";["fname"]="getLibraries";["library"]="builtin";["name"]="SF.DefaultEnvironment.getLibraries";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Table containing the names of each available library";["summary"]="\
 Gets a list of all libraries ";};["getUserdata"]={["class"]="function";["description"]="\
