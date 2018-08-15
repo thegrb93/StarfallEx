@@ -43,26 +43,9 @@ SF.AddHook("initialize", function(instance)
 	end
 end)
 
-SF.AddHook("postload", function()
-	--- Returns an entities wirelink
-	-- @return Wirelink of the entity
-	SF.Entities.Methods.getWirelink = wire_library.getWirelink
-end)
-
 SF.Wire = {}
 SF.Wire.Library = wire_library
 
---- Wirelink type
--- @server
-local wirelink_methods, wirelink_metatable = SF.RegisterType("Wirelink")
-local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable, true, true)
-local vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
-local vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
-local ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-local COLOR_WHITE = Color(255, 255, 255)
 -- Register privileges
 do
 	local P = SF.Permissions
@@ -79,168 +62,181 @@ do
 	P.registerPrivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
 end
 
----
--- @class table
--- @name SF.Wire.WlMetatable
+--- Wirelink type
+-- @server
+local wirelink_methods, wirelink_metatable = SF.RegisterType("Wirelink")
+local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable, true, true)
+local vwrap, awrap
+local vunwrap, aunwrap
+local ewrap, eunwrap
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+local COLOR_WHITE = Color(255, 255, 255)
+
 SF.Wire.WlMetatable = wirelink_metatable
 SF.Wire.WlMethods = wirelink_methods
-
----
--- @class function
--- @name SF.Wire.WlWrap
--- @param wirelink
 SF.Wire.WlWrap = wlwrap
-
----
--- @class function
--- @name SF.Wire.WlUnwrap
--- @param wrapped
 SF.Wire.WlUnwrap = wlunwrap
 
--- ------------------------- Internal Library ------------------------- --
+local typeToE2Type
+local inputConverters
+local outputConverters
 
-local function identity(data) return data end
-local typeToE2Type = {
-	[TYPE_NUMBER] = {identity, "n"},
-	[TYPE_STRING] = {identity, "s"},
-	[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
-	[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
-	[TYPE_ENTITY] = {identity, "e"}
-}
+SF.AddHook("postload", function()
+	vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
+	vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
+	ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
+	
+	--- Returns an entities wirelink
+	-- @name Entity.getWirelink
+	-- @class function
+	-- @return Wirelink of the entity
+	SF.Entities.Methods.getWirelink = wire_library.getWirelink
 
-local inputConverters =
-{
-	NORMAL = identity,
-	STRING = identity,
-	VECTOR = vwrap,
-	ANGLE = awrap,
-	WIRELINK = wlwrap,
-	ENTITY = ewrap,
+	local function identity(data) return data end
+	typeToE2Type = {
+		[TYPE_NUMBER] = {identity, "n"},
+		[TYPE_STRING] = {identity, "s"},
+		[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
+		[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
+		[TYPE_ENTITY] = {identity, "e"}
+	}
 
-	TABLE = function(data)
-		local completed_tables = {}
-		local function recursiveConvert(tbl)
-			if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
-			if tbl.size == 0 then return {} end
-			local conv = {}
-			completed_tables[tbl] = conv
+	inputConverters =
+	{
+		NORMAL = identity,
+		STRING = identity,
+		VECTOR = vwrap,
+		ANGLE = awrap,
+		WIRELINK = wlwrap,
+		ENTITY = ewrap,
 
-			-- Key-numeric part of table
-			for key, typ in pairs(tbl.ntypes) do
-				local val = tbl.n[key]
-				if typ=="t" then
-					conv[key] = completed_tables[val] or recursiveConvert(val)
-				else
-					conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
+		TABLE = function(data)
+			local completed_tables = {}
+			local function recursiveConvert(tbl)
+				if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
+				if tbl.size == 0 then return {} end
+				local conv = {}
+				completed_tables[tbl] = conv
+
+				-- Key-numeric part of table
+				for key, typ in pairs(tbl.ntypes) do
+					local val = tbl.n[key]
+					if typ=="t" then
+						conv[key] = completed_tables[val] or recursiveConvert(val)
+					else
+						conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
+					end
 				end
+
+				-- Key-string part of table
+				for key, typ in pairs(tbl.stypes) do
+					local val = tbl.s[key]
+					if typ=="t" then
+						conv[key] = completed_tables[val] or recursiveConvert(val)
+					else
+						conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
+					end
+				end
+
+				return conv
 			end
-
-			-- Key-string part of table
-			for key, typ in pairs(tbl.stypes) do
-				local val = tbl.s[key]
-				if typ=="t" then
-					conv[key] = completed_tables[val] or recursiveConvert(val)
-				else
-					conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
-				end
+			return recursiveConvert(data)
+		end,
+		ARRAY = function(tbl)
+			local ret = {}
+			for i, v in ipairs(tbl) do
+				ret[i] = SF.WrapObject(v)
 			end
-
-			return conv
-		end
-		return recursiveConvert(data)
-	end,
-	ARRAY = function(tbl)
-		local ret = {}
-		for i, v in ipairs(tbl) do
-			ret[i] = SF.WrapObject(v)
-		end
-		return ret
-	end
-}
-inputConverters.n = inputConverters.NORMAL
-inputConverters.s = inputConverters.STRING
-inputConverters.v = inputConverters.VECTOR
-inputConverters.a = inputConverters.ANGLE
-inputConverters.xwl = inputConverters.WIRELINK
-inputConverters.e = inputConverters.ENTITY
-inputConverters.t = inputConverters.TABLE
-inputConverters.r = inputConverters.ARRAY
-
-local outputConverters =
-{
-	NORMAL = function(data)
-		checkluatype(data, TYPE_NUMBER, 2)
-		return data
-	end,
-	STRING = function(data)
-		checkluatype(data, TYPE_STRING, 2)
-		return data
-	end,
-	VECTOR = function(data)
-		checktype(data, SF.Types["Vector"], 2)
-		return vunwrap(data)
-	end,
-	ANGLE = function(data)
-		checktype(data, SF.Types["Angle"], 2)
-		return aunwrap(data)
-	end,
-	ENTITY = function(data)
-		checktype(data, SF.Types["Entity"], 2)
-		return eunwrap(data)
-	end,
-	TABLE = function(data)
-		checkluatype(data, TYPE_TABLE, 2)
-		local completed_tables = {}
-
-		local function recursiveConvert(tbl)
-			local ret = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
-			completed_tables[tbl] = ret
-			for key, value in pairs(tbl) do
-
-				local ktyp = TypeID(key)
-				local valueList, typeList
-				if ktyp == TYPE_NUMBER then
-					valueList, typeList = ret.n, ret.ntypes
-				elseif ktyp == TYPE_STRING then
-					valueList, typeList = ret.s, ret.stypes
-				else
-					continue
-				end
-
-				value = SF.UnwrapObject(value) or value
-				local vtyp = TypeID(value)
-				local convert = typeToE2Type[vtyp]
-
-				if convert then
-					valueList[key] = convert[1](value)
-					typeList[key] = convert[2]
-					ret.size = ret.size + 1
-				elseif vtyp == TYPE_TABLE then
-					valueList[key] = completed_tables[value] or recursiveConvert(value)
-					typeList[key] = "t"
-					ret.size = ret.size + 1
-				end
-			end
-
 			return ret
 		end
-		return recursiveConvert(data)
-	end,
-	ARRAY = function(data)
-		local ret = {}
-		for i, v in ipairs(data) do
-			local obj = SF.UnwrapObject(v)
-			if obj then
-				local typ = typeToE2Type[TypeID(obj)]
-				ret[i] = typ and typ[1](obj)
-			end
-		end
-		return ret
-	end
-}
+	}
+	inputConverters.n = inputConverters.NORMAL
+	inputConverters.s = inputConverters.STRING
+	inputConverters.v = inputConverters.VECTOR
+	inputConverters.a = inputConverters.ANGLE
+	inputConverters.xwl = inputConverters.WIRELINK
+	inputConverters.e = inputConverters.ENTITY
+	inputConverters.t = inputConverters.TABLE
+	inputConverters.r = inputConverters.ARRAY
 
-SF.Wire.InputConverters = inputConverters
-SF.Wire.OutputConverters = outputConverters
+	outputConverters =
+	{
+		NORMAL = function(data)
+			checkluatype(data, TYPE_NUMBER, 2)
+			return data
+		end,
+		STRING = function(data)
+			checkluatype(data, TYPE_STRING, 2)
+			return data
+		end,
+		VECTOR = function(data)
+			checktype(data, SF.Types["Vector"], 2)
+			return vunwrap(data)
+		end,
+		ANGLE = function(data)
+			checktype(data, SF.Types["Angle"], 2)
+			return aunwrap(data)
+		end,
+		ENTITY = function(data)
+			checktype(data, SF.Types["Entity"], 2)
+			return eunwrap(data)
+		end,
+		TABLE = function(data)
+			checkluatype(data, TYPE_TABLE, 2)
+			local completed_tables = {}
+
+			local function recursiveConvert(tbl)
+				local ret = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
+				completed_tables[tbl] = ret
+				for key, value in pairs(tbl) do
+
+					local ktyp = TypeID(key)
+					local valueList, typeList
+					if ktyp == TYPE_NUMBER then
+						valueList, typeList = ret.n, ret.ntypes
+					elseif ktyp == TYPE_STRING then
+						valueList, typeList = ret.s, ret.stypes
+					else
+						continue
+					end
+
+					value = SF.UnwrapObject(value) or value
+					local vtyp = TypeID(value)
+					local convert = typeToE2Type[vtyp]
+
+					if convert then
+						valueList[key] = convert[1](value)
+						typeList[key] = convert[2]
+						ret.size = ret.size + 1
+					elseif vtyp == TYPE_TABLE then
+						valueList[key] = completed_tables[value] or recursiveConvert(value)
+						typeList[key] = "t"
+						ret.size = ret.size + 1
+					end
+				end
+
+				return ret
+			end
+			return recursiveConvert(data)
+		end,
+		ARRAY = function(data)
+			local ret = {}
+			for i, v in ipairs(data) do
+				local obj = SF.UnwrapObject(v)
+				if obj then
+					local typ = typeToE2Type[TypeID(obj)]
+					ret[i] = typ and typ[1](obj)
+				end
+			end
+			return ret
+		end
+	}
+	
+	SF.Wire.InputConverters = inputConverters
+	SF.Wire.OutputConverters = outputConverters
+end)
 
 --- Adds an input type
 -- @param name Input type name. Case insensitive.
