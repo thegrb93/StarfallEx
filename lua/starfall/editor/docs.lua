@@ -899,17 +899,17 @@ Called when a player stops driving an entity";["name"]="EndEntityDriving";["para
 Called when a player stops driving an entity ";};["EntityRemoved"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when an entity is removed";["name"]="EntityRemoved";["param"]={[1]="ent";["ent"]="Entity being removed";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when an entity is removed ";};["EntityTakeDamage"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when an entity is damaged";["name"]="EntityTakeDamage";["param"]={[1]="target";[2]="attacker";[3]="inflictor";[4]="amount";[5]="type";[6]="position";[7]="force";["amount"]="How much damage";["attacker"]="Entity that attacked";["force"]="Force of the damage";["inflictor"]="Entity that inflicted the damage";["position"]="Position of the damage";["target"]="Entity that is hurt";["type"]="Type of the damage";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when an entity is damaged";["name"]="EntityTakeDamage";["param"]={[1]="target";[2]="attacker";[3]="inflictor";[4]="amount";[5]="type";[6]="position";[7]="force";["amount"]="How much damage";["attacker"]="Entity that attacked";["force"]="Force of the damage";["inflictor"]="Entity that inflicted the damage";["position"]="Position of the damage";["target"]="Entity that is hurt";["type"]="Type of the damage";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when an entity is damaged ";};["FinishChat"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when the local player closes their chat window.";["name"]="FinishChat";["param"]={};["realm"]="sh";["summary"]="\
+Called when the local player closes their chat window.";["name"]="FinishChat";["param"]={};["realm"]="cl";["summary"]="\
 Called when the local player closes their chat window.";};["GravGunOnDropped"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when an entity is being dropped by a gravity gun";["name"]="GravGunOnDropped";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being dropped";["ply"]="Player dropping the object";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when an entity is being dropped by a gravity gun";["name"]="GravGunOnDropped";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being dropped";["ply"]="Player dropping the object";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when an entity is being dropped by a gravity gun ";};["GravGunOnPickedUp"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when an entity is being picked up by a gravity gun";["name"]="GravGunOnPickedUp";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being picked up";["ply"]="Player picking up an object";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when an entity is being picked up by a gravity gun";["name"]="GravGunOnPickedUp";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being picked up";["ply"]="Player picking up an object";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when an entity is being picked up by a gravity gun ";};["GravGunPunt"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player punts with the gravity gun";["name"]="GravGunPunt";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being punted";["ply"]="Player punting the gravgun";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player punts with the gravity gun ";};["Initialize"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["name"]="Initialize";["param"]={[1]="dupe";["dupe"]="True if the duplication that created the chip has finished";};["realm"]="sh";["server"]=true;["summary"]="\
+Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";["name"]="Initialize";["param"]={[1]="dupe";["dupe"]="True if the duplication that created the chip has finished";};["realm"]="sv";["server"]=true;["summary"]="\
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.";};["KeyPress"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player presses a key";["name"]="KeyPress";["param"]={[1]="ply";[2]="key";["key"]="The key being pressed";["ply"]="Player pressing the key";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player presses a key ";};["KeyRelease"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
@@ -917,50 +917,50 @@ Called when a player releases a key";["name"]="KeyRelease";["param"]={[1]="ply";
 Called when a player releases a key ";};["OnEntityCreated"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when an entity gets created";["name"]="OnEntityCreated";["param"]={[1]="ent";["ent"]="New entity";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when an entity gets created ";};["OnPhysgunFreeze"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when an entity is being frozen";["name"]="OnPhysgunFreeze";["param"]={[1]="physgun";[2]="physobj";[3]="ent";[4]="ply";["ent"]="Entity being frozen";["physgun"]="Entity of the physgun";["physobj"]="PhysObj of the entity";["ply"]="Player freezing the entity";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when an entity is being frozen";["name"]="OnPhysgunFreeze";["param"]={[1]="physgun";[2]="physobj";[3]="ent";[4]="ply";["ent"]="Entity being frozen";["physgun"]="Entity of the physgun";["physobj"]="PhysObj of the entity";["ply"]="Player freezing the entity";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when an entity is being frozen ";};["OnPhysgunReload"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player reloads his physgun";["name"]="OnPhysgunReload";["param"]={[1]="physgun";[2]="ply";["physgun"]="Entity of the physgun";["ply"]="Player reloading the physgun";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a player reloads his physgun";["name"]="OnPhysgunReload";["param"]={[1]="physgun";[2]="ply";["physgun"]="Entity of the physgun";["ply"]="Player reloading the physgun";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a player reloads his physgun ";};["PhysgunDrop"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when an entity being held by a physgun gets dropped";["name"]="PhysgunDrop";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being dropped";["ply"]="Player droppig the entity";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when an entity being held by a physgun gets dropped ";};["PhysgunPickup"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when an entity gets picked up by a physgun";["name"]="PhysgunPickup";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being picked up";["ply"]="Player picking up the entity";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when an entity gets picked up by a physgun ";};["PlayerCanPickupWeapon"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a wants to pick up a weapon";["name"]="PlayerCanPickupWeapon";["param"]={[1]="ply";[2]="wep";["ply"]="Player";["wep"]="Weapon";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a wants to pick up a weapon";["name"]="PlayerCanPickupWeapon";["param"]={[1]="ply";[2]="wep";["ply"]="Player";["wep"]="Weapon";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a wants to pick up a weapon ";};["PlayerChat"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when a player's chat message is printed to the chat window";["name"]="PlayerChat";["param"]={[1]="ply";[2]="text";[3]="team";[4]="isdead";["isdead"]="Whether the message was send from a dead player";["ply"]="Player that said the message";["team"]="Whether the message was team only";["text"]="The message";};["realm"]="sh";["summary"]="\
+Called when a player's chat message is printed to the chat window";["name"]="PlayerChat";["param"]={[1]="ply";[2]="text";[3]="team";[4]="isdead";["isdead"]="Whether the message was send from a dead player";["ply"]="Player that said the message";["team"]="Whether the message was team only";["text"]="The message";};["realm"]="cl";["summary"]="\
 Called when a player's chat message is printed to the chat window ";};["PlayerDeath"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player dies";["name"]="PlayerDeath";["param"]={[1]="ply";[2]="inflictor";[3]="attacker";["attacker"]="Entity that killed the player";["inflictor"]="Entity used to kill the player";["ply"]="Player who died";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a player dies";["name"]="PlayerDeath";["param"]={[1]="ply";[2]="inflictor";[3]="attacker";["attacker"]="Entity that killed the player";["inflictor"]="Entity used to kill the player";["ply"]="Player who died";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a player dies ";};["PlayerDisconnected"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player disconnects";["name"]="PlayerDisconnected";["param"]={[1]="ply";["ply"]="Player that disconnected";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a player disconnects";["name"]="PlayerDisconnected";["param"]={[1]="ply";["ply"]="Player that disconnected";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a player disconnects ";};["PlayerEnteredVehicle"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a players enters a vehicle";["name"]="PlayerEnteredVehicle";["param"]={[1]="ply";[2]="vehicle";[3]="num";["num"]="Role";["ply"]="Player who entered a vehicle";["vehicle"]="Vehicle that was entered";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a players enters a vehicle";["name"]="PlayerEnteredVehicle";["param"]={[1]="ply";[2]="vehicle";[3]="num";["num"]="Role";["ply"]="Player who entered a vehicle";["vehicle"]="Vehicle that was entered";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a players enters a vehicle ";};["PlayerHurt"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player gets hurt";["name"]="PlayerHurt";["param"]={[1]="ply";[2]="attacker";[3]="newHealth";[4]="damageTaken";["attacker"]="Entity causing damage to the player";["damageTaken"]="Amount of damage the player has taken";["newHealth"]="New health of the player";["ply"]="Player being hurt";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player gets hurt ";};["PlayerInitialSpawn"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player spawns for the first time";["name"]="PlayerInitialSpawn";["param"]={[1]="ply";["ply"]="Player who spawned";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a player spawns for the first time";["name"]="PlayerInitialSpawn";["param"]={[1]="ply";["ply"]="Player who spawned";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a player spawns for the first time ";};["PlayerLeaveVehicle"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a players leaves a vehicle";["name"]="PlayerLeaveVehicle";["param"]={[1]="ply";[2]="vehicle";["ply"]="Player who left a vehicle";["vehicle"]="Vehicle that was left";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a players leaves a vehicle";["name"]="PlayerLeaveVehicle";["param"]={[1]="ply";[2]="vehicle";["ply"]="Player who left a vehicle";["vehicle"]="Vehicle that was left";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a players leaves a vehicle ";};["PlayerNoClip"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player toggles noclip";["name"]="PlayerNoClip";["param"]={[1]="ply";[2]="newState";["newState"]="New noclip state. True if on.";["ply"]="Player toggling noclip";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player toggles noclip ";};["PlayerSay"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player sends a chat message";["name"]="PlayerSay";["param"]={[1]="ply";[2]="text";[3]="teamChat";["ply"]="Player that sent the message";["teamChat"]="True if team chat";["text"]="Content of the message";};["realm"]="sh";["ret"]="New text. \"\" to stop from displaying. Nil to keep original.";["server"]=true;["summary"]="\
+Called when a player sends a chat message";["name"]="PlayerSay";["param"]={[1]="ply";[2]="text";[3]="teamChat";["ply"]="Player that sent the message";["teamChat"]="True if team chat";["text"]="Content of the message";};["realm"]="sv";["ret"]="New text. \"\" to stop from displaying. Nil to keep original.";["server"]=true;["summary"]="\
 Called when a player sends a chat message ";};["PlayerSpawn"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player spawns";["name"]="PlayerSpawn";["param"]={[1]="ply";["ply"]="Player who spawned";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a player spawns";["name"]="PlayerSpawn";["param"]={[1]="ply";["ply"]="Player who spawned";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a player spawns ";};["PlayerSpray"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a players sprays his logo";["name"]="PlayerSpray";["param"]={[1]="ply";["ply"]="Player that sprayed";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a players sprays his logo";["name"]="PlayerSpray";["param"]={[1]="ply";["ply"]="Player that sprayed";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a players sprays his logo ";};["PlayerSwitchFlashlight"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a players turns their flashlight on or off";["name"]="PlayerSwitchFlashlight";["param"]={[1]="ply";[2]="state";["ply"]="Player switching flashlight";["state"]="New flashlight state. True if on.";};["realm"]="sh";["server"]=true;["summary"]="\
+Called when a players turns their flashlight on or off";["name"]="PlayerSwitchFlashlight";["param"]={[1]="ply";[2]="state";["ply"]="Player switching flashlight";["state"]="New flashlight state. True if on.";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a players turns their flashlight on or off ";};["PlayerSwitchWeapon"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player switches their weapon";["name"]="PlayerSwitchWeapon";["param"]={[1]="ply";[2]="oldwep";[3]="newweapon";["newweapon"]="New weapon";["oldwep"]="Old weapon";["ply"]="Player droppig the entity";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player switches their weapon ";};["PlayerUse"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when a player holds their use key and looks at an entity. \
-Will continuously run.";["name"]="PlayerUse";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being used";["ply"]="Player using the entity";};["realm"]="sh";["server"]=true;["summary"]="\
+Will continuously run.";["name"]="PlayerUse";["param"]={[1]="ply";[2]="ent";["ent"]="Entity being used";["ply"]="Player using the entity";};["realm"]="sv";["server"]=true;["summary"]="\
 Called when a player holds their use key and looks at an entity.";};["PropBreak"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when an entity is broken";["name"]="PropBreak";["param"]={[1]="ply";[2]="ent";["ent"]="Entity broken";["ply"]="Player who broke it";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when an entity is broken ";};["Removed"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when the starfall chip is removed";["name"]="Removed";["param"]={};["realm"]="sh";["server"]=true;["summary"]="\
+Called when the starfall chip is removed";["name"]="Removed";["param"]={};["realm"]="sv";["server"]=true;["summary"]="\
 Called when the starfall chip is removed ";};["StartChat"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when the local player opens their chat window.";["name"]="StartChat";["param"]={};["realm"]="sh";["summary"]="\
+Called when the local player opens their chat window.";["name"]="StartChat";["param"]={};["realm"]="cl";["summary"]="\
 Called when the local player opens their chat window.";};["StartEntityDriving"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a player starts driving an entity";["name"]="StartEntityDriving";["param"]={[1]="ent";[2]="ply";["ent"]="Entity being driven";["ply"]="Player that is driving the entity";};["realm"]="sh";["server"]=true;["summary"]="\
 Called when a player starts driving an entity ";};["calcview"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
@@ -974,17 +974,17 @@ Called when the player disconnects from a HUD component linked to the Starfall C
 Called when the player disconnects from a HUD component linked to the Starfall Chip ";};["input"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when an input on a wired SF chip is written to";["name"]="input";["param"]={[1]="input";[2]="value";["input"]="The input name";["value"]="The value of the input";};["realm"]="sv";["summary"]="\
 Called when an input on a wired SF chip is written to ";};["inputPressed"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when a button is pressed";["name"]="inputPressed";["param"]={[1]="button";["button"]="Number of the button";};["realm"]="sh";["summary"]="\
+Called when a button is pressed";["name"]="inputPressed";["param"]={[1]="button";["button"]="Number of the button";};["realm"]="cl";["summary"]="\
 Called when a button is pressed ";};["inputReleased"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when a button is released";["name"]="inputReleased";["param"]={[1]="button";["button"]="Number of the button";};["realm"]="sh";["summary"]="\
+Called when a button is released";["name"]="inputReleased";["param"]={[1]="button";["button"]="Number of the button";};["realm"]="cl";["summary"]="\
 Called when a button is released ";};["mouseWheeled"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when the mouse wheel is rotated";["name"]="mouseWheeled";["param"]={[1]="delta";["delta"]="Rotate delta";};["realm"]="sh";["summary"]="\
+Called when the mouse wheel is rotated";["name"]="mouseWheeled";["param"]={[1]="delta";["delta"]="Rotate delta";};["realm"]="cl";["summary"]="\
 Called when the mouse wheel is rotated ";};["mousemoved"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when the mouse is moved";["name"]="mousemoved";["param"]={[1]="x";[2]="y";["x"]="X coordinate moved";["y"]="Y coordinate moved";};["realm"]="sh";["summary"]="\
+Called when the mouse is moved";["name"]="mousemoved";["param"]={[1]="x";[2]="y";["x"]="X coordinate moved";["y"]="Y coordinate moved";};["realm"]="cl";["summary"]="\
 Called when the mouse is moved ";};["net"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when a net message arrives";["name"]="net";["param"]={[1]="name";[2]="len";[3]="ply";["len"]="Length of the arriving net message in bytes";["name"]="Name of the arriving net message";["ply"]="On server, the player that sent the message. Nil on client.";};["realm"]="sh";["summary"]="\
 Called when a net message arrives ";};["permissionrequest"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
-Called when local client changed instance permissions";["name"]="permissionrequest";["param"]={};["realm"]="sh";["summary"]="\
+Called when local client changed instance permissions";["name"]="permissionrequest";["param"]={};["realm"]="cl";["summary"]="\
 Called when local client changed instance permissions ";};["postdrawhud"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called after drawing HUD (2D Context)";["name"]="postdrawhud";["param"]={};["realm"]="cl";["summary"]="\
 Called after drawing HUD (2D Context) ";};["postdrawopaquerenderables"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
