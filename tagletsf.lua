@@ -450,7 +450,7 @@ function parse_file (filepath, doc)
 			t.realm = "sh"
 		elseif t.client then
 			t.realm = "cl"
-		elseif f.server then
+		elseif t.server then
 			t.realm = "sv"
 		else
 			t.realm = realm
