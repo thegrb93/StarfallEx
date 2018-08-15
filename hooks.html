@@ -87,7 +87,7 @@
 						<li><span class="realm_sh"></span><a href="hooks.html#EndEntityDriving">EndEntityDriving</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#EntityRemoved">EntityRemoved</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#FinishChat">FinishChat</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#GravGunPunt">GravGunPunt</a></li>
@@ -100,7 +100,7 @@
 						<li><span class="realm_sh"></span><a href="hooks.html#PhysgunDrop">PhysgunDrop</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#PhysgunPickup">PhysgunPickup</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#PlayerChat">PlayerChat</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#PlayerDeath">PlayerDeath</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
@@ -116,19 +116,19 @@
 						<li><span class="realm_sh"></span><a href="hooks.html#PlayerUse">PlayerUse</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#PropBreak">PropBreak</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#Removed">Removed</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#StartChat">StartChat</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#StartEntityDriving">StartEntityDriving</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#calcview">calcview</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#drawhud">drawhud</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#hudconnected">hudconnected</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#huddisconnected">huddisconnected</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#input">input</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#inputPressed">inputPressed</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#inputReleased">inputReleased</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#mouseWheeled">mouseWheeled</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#mouseWheeled">mouseWheeled</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#mousemoved">mousemoved</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#net">net</a></li>
-						<li><span class="realm_sh"></span><a href="hooks.html#permissionrequest">permissionrequest</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#permissionrequest">permissionrequest</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#postdrawhud">postdrawhud</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#predrawhud">predrawhud</a></li>
@@ -201,7 +201,7 @@ Called when an entity is removed </td>
 Called when an entity is damaged </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#FinishChat">FinishChat</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#FinishChat">FinishChat</a>( &nbsp;)</td>
 			<td class="summary">
 Called when the local player closes their chat window.</td>
 		</tr>
@@ -266,7 +266,7 @@ Called when an entity gets picked up by a physgun </td>
 Called when a wants to pick up a weapon </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#PlayerChat">PlayerChat</a>( ply, text, team, isdead&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#PlayerChat">PlayerChat</a>( ply, text, team, isdead&nbsp;)</td>
 			<td class="summary">
 Called when a player's chat message is printed to the chat window </td>
 		</tr>
@@ -346,7 +346,7 @@ Called when an entity is broken </td>
 Called when the starfall chip is removed </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#StartChat">StartChat</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#StartChat">StartChat</a>( &nbsp;)</td>
 			<td class="summary">
 Called when the local player opens their chat window.</td>
 		</tr>
@@ -381,22 +381,22 @@ Called when the player disconnects from a HUD component linked to the Starfall C
 Called when an input on a wired SF chip is written to </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#inputPressed">inputPressed</a>( button&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#inputPressed">inputPressed</a>( button&nbsp;)</td>
 			<td class="summary">
 Called when a button is pressed </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#inputReleased">inputReleased</a>( button&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#inputReleased">inputReleased</a>( button&nbsp;)</td>
 			<td class="summary">
 Called when a button is released </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#mouseWheeled">mouseWheeled</a>( delta&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#mouseWheeled">mouseWheeled</a>( delta&nbsp;)</td>
 			<td class="summary">
 Called when the mouse wheel is rotated </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#mousemoved">mousemoved</a>( x, y&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#mousemoved">mousemoved</a>( x, y&nbsp;)</td>
 			<td class="summary">
 Called when the mouse is moved </td>
 		</tr>
@@ -406,7 +406,7 @@ Called when the mouse is moved </td>
 Called when a net message arrives </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#permissionrequest">permissionrequest</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#permissionrequest">permissionrequest</a>( &nbsp;)</td>
 			<td class="summary">
 Called when local client changed instance permissions </td>
 		</tr>
@@ -546,7 +546,7 @@ Called when an entity is damaged</p>
 		
 		
 	</dd>
-	<dt><a name="FinishChat"></a><span class="realm_sh"></span><strong>FinishChat</strong>( &nbsp;)</dt>
+	<dt><a name="FinishChat"></a><span class="realm_cl"></span><strong>FinishChat</strong>( &nbsp;)</dt>
 	<dd>
 		<p>
 Called when the local player closes their chat window.</p>
@@ -794,7 +794,7 @@ Called when a wants to pick up a weapon</p>
 		
 		
 	</dd>
-	<dt><a name="PlayerChat"></a><span class="realm_sh"></span><strong>PlayerChat</strong>( ply, text, team, isdead&nbsp;)</dt>
+	<dt><a name="PlayerChat"></a><span class="realm_cl"></span><strong>PlayerChat</strong>( ply, text, team, isdead&nbsp;)</dt>
 	<dd>
 		<p>
 Called when a player's chat message is printed to the chat window</p>
@@ -1121,7 +1121,7 @@ Called when the starfall chip is removed</p>
 		
 		
 	</dd>
-	<dt><a name="StartChat"></a><span class="realm_sh"></span><strong>StartChat</strong>( &nbsp;)</dt>
+	<dt><a name="StartChat"></a><span class="realm_cl"></span><strong>StartChat</strong>( &nbsp;)</dt>
 	<dd>
 		<p>
 Called when the local player opens their chat window.</p>
@@ -1228,7 +1228,7 @@ Called when an input on a wired SF chip is written to</p>
 		
 		
 	</dd>
-	<dt><a name="inputPressed"></a><span class="realm_sh"></span><strong>inputPressed</strong>( button&nbsp;)</dt>
+	<dt><a name="inputPressed"></a><span class="realm_cl"></span><strong>inputPressed</strong>( button&nbsp;)</dt>
 	<dd>
 		<p>
 Called when a button is pressed</p>
@@ -1245,7 +1245,7 @@ Called when a button is pressed</p>
 		
 		
 	</dd>
-	<dt><a name="inputReleased"></a><span class="realm_sh"></span><strong>inputReleased</strong>( button&nbsp;)</dt>
+	<dt><a name="inputReleased"></a><span class="realm_cl"></span><strong>inputReleased</strong>( button&nbsp;)</dt>
 	<dd>
 		<p>
 Called when a button is released</p>
@@ -1262,7 +1262,7 @@ Called when a button is released</p>
 		
 		
 	</dd>
-	<dt><a name="mouseWheeled"></a><span class="realm_sh"></span><strong>mouseWheeled</strong>( delta&nbsp;)</dt>
+	<dt><a name="mouseWheeled"></a><span class="realm_cl"></span><strong>mouseWheeled</strong>( delta&nbsp;)</dt>
 	<dd>
 		<p>
 Called when the mouse wheel is rotated</p>
@@ -1279,7 +1279,7 @@ Called when the mouse wheel is rotated</p>
 		
 		
 	</dd>
-	<dt><a name="mousemoved"></a><span class="realm_sh"></span><strong>mousemoved</strong>( x, y&nbsp;)</dt>
+	<dt><a name="mousemoved"></a><span class="realm_cl"></span><strong>mousemoved</strong>( x, y&nbsp;)</dt>
 	<dd>
 		<p>
 Called when the mouse is moved</p>
@@ -1322,7 +1322,7 @@ Called when a net message arrives</p>
 		
 		
 	</dd>
-	<dt><a name="permissionrequest"></a><span class="realm_sh"></span><strong>permissionrequest</strong>( &nbsp;)</dt>
+	<dt><a name="permissionrequest"></a><span class="realm_cl"></span><strong>permissionrequest</strong>( &nbsp;)</dt>
 	<dd>
 		<p>
 Called when local client changed instance permissions</p>
