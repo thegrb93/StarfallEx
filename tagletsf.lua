@@ -446,7 +446,15 @@ function parse_file (filepath, doc)
 	for t in class_iterator(blocks, "hook")() do
 		table.insert(doc.hooks, t.name)
 		doc.hooks[t.name] = t
-		t.realm = realm
+		if t.client and t.server then
+			t.realm = "sh"
+		elseif t.client then
+			t.realm = "cl"
+		elseif f.server then
+			t.realm = "sv"
+		else
+			t.realm = realm
+		end
 	end
 
 	for t in class_iterator(blocks, "directive")() do
