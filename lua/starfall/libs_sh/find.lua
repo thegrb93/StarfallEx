@@ -74,7 +74,7 @@ end
 -- @param pos The cone vertex position
 -- @param dir The direction to project the cone
 -- @param distance The length to project the cone
--- @param radius The angle of the cone
+-- @param radius The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°, 0 makes 180°, and so on.
 -- @param filter Optional function to filter results
 -- @return An array of found entities
 function find_library.inCone (pos, dir, distance, radius, filter)
