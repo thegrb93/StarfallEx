@@ -206,7 +206,7 @@ function ents_methods:setColor(clr)
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
 	ent:SetColor(clr)
 	ent:SetRenderMode(rendermode)
-	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = clr, RenderMode = rendermode }) end
+	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = clr[1], g = clr[2], b = clr[3], a = clr[4]}, RenderMode = rendermode }) end
 
 end
 
