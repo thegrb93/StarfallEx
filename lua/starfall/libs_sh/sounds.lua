@@ -16,6 +16,7 @@ SF.Sounds.Wrap = wrap
 SF.Sounds.Unwrap = unwrap
 SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
+SF.Sounds.SoundsByEntity = { }
 
 SF.Sounds.burstmax = CreateConVar("sf_sounds_burstmax", "20", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
 	"The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
@@ -48,6 +49,14 @@ SF.AddHook("deinitialize", function (inst)
 	end
 end)
 
+-- A workaround for CSoundPatch:Stop() bug
+hook.Add("EntityRemoved", "SF_StopSounds", function(ent)
+	if SF.Sounds.SoundsByEntity[ent] then
+		SF.Sounds.SoundsByEntity[ent]:Stop()
+		SF.Sounds.SoundsByEntity[ent] = nil
+	end
+end)
+
 --- Creates a sound and attaches it to an entity
 -- @param ent Entity to attach sound to.
 -- @param path Filepath to the sound file.
@@ -68,7 +77,11 @@ function sound_library.create (ent, path)
 		SF.Throw("Invalid Entity", 2)
 	end
 
-	local s = wrap(CreateSound(e, path))
+	local soundPatch = CreateSound(e, path)
+	SF.Sounds.SoundsByEntity[e] = soundPatch
+
+	local s = wrap(soundPatch)
+	
 	local i = SF.instance.data.sounds.sounds
 	i[s] = s
 
