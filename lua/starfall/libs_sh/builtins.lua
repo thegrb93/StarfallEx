@@ -847,14 +847,16 @@ end
 --- GLua's loadstring
 -- Works like loadstring, except that it executes by default in the main environment
 -- @param str String to execute
+-- @param env Custom environment for the loaded code
 -- @return Function of str
-function SF.DefaultEnvironment.loadstring (str, name)
-	name = "SF:" .. (name or tostring(SF.instance.env))
+function SF.DefaultEnvironment.loadstring (str, name, env)
+	if env ~= nil then checkluatype(env, TYPE_TABLE) else env = SF.instance.env end
+	name = "SF:" .. (name or tostring(env))
 	local func = CompileString(str, name, false)
 
 	-- CompileString returns an error as a string, better check before setfenv
 	if type(func) == "function" then
-		return setfenv(func, SF.instance.env)
+		return setfenv(func, env)
 	end
 
 	return func
