@@ -248,6 +248,12 @@ local function convertFilter(filter)
 	end
 end
 
+local function clampPos(pos)
+	if pos[1]>16384 then pos[1]=16384 elseif pos[1]<-16384 then pos[1]=-16384 end
+	if pos[2]>16384 then pos[2]=16384 elseif pos[2]<-16384 then pos[2]=-16384 end
+	if pos[3]>16384 then pos[3]=16384 elseif pos[3]<-16384 then pos[3]=-16384 end
+end
+
 --- Does a line trace
 -- @param start Start position
 -- @param endpos End position
@@ -268,8 +274,8 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 
 	local trace = {
-		start = start,
-		endpos = endpos,
+		start = clampPos(start),
+		endpos = clampPos(endpos),
 		filter = filter,
 		mask = mask,
 		collisiongroup = colgroup,
@@ -309,8 +315,8 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 
 	local trace = {
-		start = start,
-		endpos = endpos,
+		start = clampPos(start),
+		endpos = clampPos(endpos),
 		filter = filter,
 		mask = mask,
 		collisiongroup = colgroup,
