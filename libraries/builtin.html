@@ -294,7 +294,7 @@ Returns if this is the first time this hook was predicted.</td>
 Returns if the table has an isValid function and isValid returns true.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#builtin.loadstring">loadstring</a>( str, name&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.loadstring">loadstring</a>( str, name, env&nbsp;)</td>
 			<td class="summary">
 GLua's loadstring 
 Works like loadstring, except that it executes by default in the main environment </td>
@@ -967,7 +967,7 @@ Returns if the table has an isValid function and isValid returns true.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="builtin.loadstring"></a><strong>builtin.loadstring</strong>( str, name&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="builtin.loadstring"></a><strong>builtin.loadstring</strong>( str, name, env&nbsp;)</dt>
 <dd>
 	<p>
 GLua's loadstring 
@@ -980,6 +980,7 @@ Works like loadstring, except that it executes by default in the main environmen
 			
 			<li><tt>str</tt> ― String to execute</li>
 			<li><tt>name</tt></li>
+			<li><tt>env</tt> ― Custom environment for the loaded code</li>
 		</ul>
 	</section>
 	
