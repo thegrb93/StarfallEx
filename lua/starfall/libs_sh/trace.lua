@@ -248,10 +248,10 @@ local function convertFilter(filter)
 	end
 end
 
-local function clampPos(pos)
-	if pos[1]>16384 then pos[1]=16384 elseif pos[1]<-16384 then pos[1]=-16384 end
-	if pos[2]>16384 then pos[2]=16384 elseif pos[2]<-16384 then pos[2]=-16384 end
-	if pos[3]>16384 then pos[3]=16384 elseif pos[3]<-16384 then pos[3]=-16384 end
+local function checkvector(pos)
+	if pos.x ~= pos.x or pos.x == math.huge or pos.x == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos.y ~= pos.y or pos.y == math.huge or pos.y == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos.z ~= pos.z or pos.z == math.huge or pos.z == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
 end
 
 --- Does a line trace
@@ -268,14 +268,17 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	checktype(endpos, vecmeta)
 
 	local start, endpos = vunwrap(start), vunwrap(endpos)
+	checkvector(start)
+	checkvector(endpos)
+
 	filter = convertFilter(filter)
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 
 	local trace = {
-		start = clampPos(start),
-		endpos = clampPos(endpos),
+		start = start,
+		endpos = endpos,
 		filter = filter,
 		mask = mask,
 		collisiongroup = colgroup,
@@ -309,14 +312,19 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 	checktype(maxbox, vecmeta)
 
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
+	checkvector(start)
+	checkvector(endpos)
+	checkvector(minbox)
+	checkvector(maxbox)
+
 	filter = convertFilter(filter)
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
 	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
 	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
 
 	local trace = {
-		start = clampPos(start),
-		endpos = clampPos(endpos),
+		start = start,
+		endpos = endpos,
 		filter = filter,
 		mask = mask,
 		collisiongroup = colgroup,
