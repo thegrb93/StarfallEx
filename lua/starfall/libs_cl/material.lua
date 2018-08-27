@@ -58,7 +58,8 @@ local allowed_shaders = {
 	VertexLitGeneric = true,
 	Refract_DX90 = true,
 	Water_DX90 = true,
-	Sky_DX9 = true
+	Sky_DX9 = true,
+	gmodscreenspace = true,
 }
 local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function(shader, i)
