@@ -779,7 +779,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	if loadpriority then
 		for i = 1, #loadpriority do
 			for file, _ in pairs(SF.instance.scripts) do
-				if string.find(file, path .. "/" .. loadpriority[i] , 1) == 1 then
+				if file == path .. "/" .. loadpriority[i] then
 					returns[file] = SF.DefaultEnvironment.require(file)
 				end
 			end
@@ -787,7 +787,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	end
 
 	for file, _ in pairs(SF.instance.scripts) do
-		if string.find(file, path, 1) == 1 and not returns[file] then
+		if not returns[file] and string.match(file, path.."[^/]+%.txt$") then
 			returns[file] = SF.DefaultEnvironment.require(file)
 		end
 	end

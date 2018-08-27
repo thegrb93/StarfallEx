@@ -226,22 +226,21 @@ if CLIENT then
 		local tbl = {}
 		tbl.mainfile = mainfile
 		tbl.files = {}
-		tbl.filecount = 0
 		tbl.includes = {}
 
 		local ppdata = {}
 
 		local function recursiveLoad (path, curdir)
-			if tbl.files[path] then return end
-
 			local code, codedir, codepath
 
 			if string.sub(path, 1, 1)~="/" then
 				codepath = SF.NormalizePath(curdir .. path)
+				if tbl.files[codepath] then return end
 				code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
 			end
 			if not code then
 				codepath = SF.NormalizePath(path)
+				if tbl.files[codepath] then return end
 				code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
 			end
 			codedir = string.GetPathFromFilename(codepath)
@@ -258,13 +257,31 @@ if CLIENT then
 				local inc = ppdata.includes[codepath]
 				if not tbl.includes[codepath] then
 					tbl.includes[codepath] = inc
-					tbl.filecount = tbl.filecount + 1
 				else
 					assert(tbl.includes[codepath] == inc)
 				end
 
 				for i = 1, #inc do
 					recursiveLoad(inc[i], codedir)
+				end
+			end
+			if ppdata.includedirs and ppdata.includedirs[codepath] then
+				local inc = ppdata.includedirs[codepath]
+
+				for i = 1, #inc do
+					local dir = inc[i]
+					local files
+					if string.sub(dir, 1, 1)~="/" then
+						dir = SF.NormalizePath(codedir .. dir)
+						files = file.Find("starfall/" .. dir .. "/*", "DATA")
+					end
+					if not files or #files==0 then
+						dir = SF.NormalizePath(dir) .. "/"
+						files = file.Find("starfall/" .. dir .. "/*", "DATA")
+					end
+					for j = 1, #files do
+						recursiveLoad(files[i], dir .. "/")
+					end
 				end
 			end
 		end
@@ -320,43 +337,43 @@ if CLIENT then
 
 	local busy_players = { }
 	hook.Add("EntityRemoved", "starfall_busy_animation", function (ply)
-			busy_players[ply] = nil
-		end)
+		busy_players[ply] = nil
+	end)
 
 	local emitter = ParticleEmitter(vector_origin)
 
-	net.Receive("starfall_editor_status", function (len)
-			local ply = net.ReadEntity()
-			local status = net.ReadBit() ~= 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
-			if not ply:IsValid() or ply == LocalPlayer() then return end
+	net.Receive("starfall_editor_status", function(len)
+		local ply = net.ReadEntity()
+		local status = net.ReadBit() ~= 0 -- net.ReadBit returns 0 or 1, despite net.WriteBit taking a boolean
+		if not ply:IsValid() or ply == LocalPlayer() then return end
 
-			busy_players[ply] = status or nil
-		end)
+		busy_players[ply] = status or nil
+	end)
 
 	local rolldelta = math.rad(80)
 	timer.Create("starfall_editor_status", 1 / 3, 0, function ()
-			rolldelta = -rolldelta
-			for ply, _ in pairs(busy_players) do
-				local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1") or ply:LookupBone("ValveBiped.HC_Head_Bone") or 0
-				local BonePos, BoneAng = ply:GetBonePosition(BoneIndx)
-				local particle = emitter:Add("radon/starfall2", BonePos + Vector(math.random(-10, 10), math.random(-10, 10), 60 + math.random(0, 10)))
-				if particle then
-					particle:SetColor(math.random(30, 50), math.random(40, 150), math.random(180, 220))
-					particle:SetVelocity(Vector(0, 0, -40))
+		rolldelta = -rolldelta
+		for ply, _ in pairs(busy_players) do
+			local BoneIndx = ply:LookupBone("ValveBiped.Bip01_Head1") or ply:LookupBone("ValveBiped.HC_Head_Bone") or 0
+			local BonePos, BoneAng = ply:GetBonePosition(BoneIndx)
+			local particle = emitter:Add("radon/starfall2", BonePos + Vector(math.random(-10, 10), math.random(-10, 10), 60 + math.random(0, 10)))
+			if particle then
+				particle:SetColor(math.random(30, 50), math.random(40, 150), math.random(180, 220))
+				particle:SetVelocity(Vector(0, 0, -40))
 
-					particle:SetDieTime(1.5)
-					particle:SetLifeTime(0)
+				particle:SetDieTime(1.5)
+				particle:SetLifeTime(0)
 
-					particle:SetStartSize(10)
-					particle:SetEndSize(5)
+				particle:SetStartSize(10)
+				particle:SetEndSize(5)
 
-					particle:SetStartAlpha(255)
-					particle:SetEndAlpha(0)
+				particle:SetStartAlpha(255)
+				particle:SetEndAlpha(0)
 
-					particle:SetRollDelta(rolldelta)
-				end
+				particle:SetRollDelta(rolldelta)
 			end
-		end)
+		end
+	end)
 	concommand.Add("sf_editor_restart", function()
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
@@ -379,10 +396,10 @@ elseif SERVER then
 	local starfall_event = {}
 
 	concommand.Add("starfall_event", function (ply, command, args)
-			local handler = starfall_event[args[1] or ""]
-			if not handler then return end
-			return handler(ply, args)
-		end)
+		local handler = starfall_event[args[1] or ""]
+		if not handler then return end
+		return handler(ply, args)
+	end)
 
 	function starfall_event.editor_open (ply, args)
 		net.Start("starfall_editor_status")
