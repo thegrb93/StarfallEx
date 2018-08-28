@@ -280,7 +280,7 @@ if CLIENT then
 						files = file.Find("starfall/" .. dir .. "/*", "DATA")
 					end
 					for j = 1, #files do
-						recursiveLoad(files[i], dir .. "/")
+						recursiveLoad(files[j], dir .. "/")
 					end
 				end
 			end
