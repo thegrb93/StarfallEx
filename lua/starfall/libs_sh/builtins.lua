@@ -539,7 +539,7 @@ SF.DefaultEnvironment.bit = nil
 -- @return Table containing the names of each available library
 function SF.DefaultEnvironment.getLibraries()
 	local ret = {}
-	for k, v in pairs(SF.Libraries.libraries) do
+	for k, v in pairs(SF.Libraries) do
 		ret[#ret + 1] = k
 	end
 	return ret
