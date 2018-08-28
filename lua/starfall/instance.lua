@@ -51,6 +51,8 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.source = code
 	instance.initialized = false
 	instance.mainfile = mainfile
+	instance.requires = {}
+	instance.requirestack = {string.GetPathFromFilename(mainfile)}
 	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
 	instance.run = SF.softLockProtection:GetBool() and SF.Instance.runWithOps or SF.Instance.runWithoutOps

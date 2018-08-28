@@ -731,18 +731,13 @@ end
 -- @return Return value of the script
 function SF.DefaultEnvironment.require(file)
 	checkluatype (file, TYPE_STRING)
-	local loaded = SF.instance.data.reqloaded
-	if not loaded then
-		loaded = {}
-		SF.instance.data.reqloaded = loaded
-	end
-
+	local loaded = SF.instance.requires
 
 	local path
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
 	else
-		path = SF.NormalizePath(string.GetPathFromFilename(string.sub(debug.getinfo(2, "S").source, 5)) .. file)
+		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. file)
 		if not SF.instance.scripts[path] then
 			path = SF.NormalizePath(file)
 		end
@@ -753,8 +748,18 @@ function SF.DefaultEnvironment.require(file)
 	else
 		local func = SF.instance.scripts[path]
 		if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2) end
-		loaded[path] = func() or true
-		return loaded[path]
+
+		local stacklen = #SF.instance.requirestack + 1
+		SF.instance.requirestack[stacklen] = string.GetPathFromFilename(path)
+		local ok, ret = pcall(func)
+		SF.instance.requirestack[stacklen] = nil
+
+		if ok then
+			loaded[path] = ret or true
+			return loaded[path]
+		else
+			error(ret)
+		end
 	end
 end
 
@@ -771,7 +776,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	if string.sub(dir, 1, 1)=="/" then
 		path = SF.NormalizePath(dir)
 	else
-		path = SF.NormalizePath(string.GetPathFromFilename(string.sub(debug.getinfo(2, "S").source, 5)) .. dir)
+		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. dir)
 	end
 
 	local returns = {}
@@ -780,15 +785,15 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		for i = 1, #loadpriority do
 			for file, _ in pairs(SF.instance.scripts) do
 				if file == path .. "/" .. loadpriority[i] then
-					returns[file] = SF.DefaultEnvironment.require(file)
+					returns[file] = SF.DefaultEnvironment.require("/"..file)
 				end
 			end
 		end
 	end
 
 	for file, _ in pairs(SF.instance.scripts) do
-		if not returns[file] and string.match(file, path.."[^/]+%.txt$") then
-			returns[file] = SF.DefaultEnvironment.require(file)
+		if not returns[file] and string.match(file, "^"..path.."/[^/]+%.txt$") then
+			returns[file] = SF.DefaultEnvironment.require("/"..file)
 		end
 	end
 
