@@ -198,7 +198,7 @@ SF.AddHook("deinitialize", function (instance)
 		if not next(v) and not gmod_override_hooks[k] then
 			registered_instances[k] = nil
 			if gmod_hooks[k] then
-				hook.Remove(gmod_hooks[k][1], "SF_Hook_" .. lower)
+				hook.Remove(gmod_hooks[k][1], "SF_Hook_" .. k)
 			end
 		end
 	end
