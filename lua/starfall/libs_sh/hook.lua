@@ -91,7 +91,7 @@ function hook_library.add (hookname, name, func)
 		if gmod_hook then
 			local realname, customargfunc, customretfunc = unpack(gmod_hook)
 			local hookfunc = getHookFunc(instances, hookname, customargfunc, customretfunc)
-			hook.Add(realname, "SF_Hook_"..realname, hookfunc)
+			hook.Add(realname, "SF_Hook_"..hookname, hookfunc)
 		end
 	end
 	instances[inst] = true
@@ -185,7 +185,7 @@ function hook_library.remove (hookname, name)
 			if not next(registered_instances[lower]) and not gmod_override_hooks[lower] then
 				registered_instances[lower] = nil
 				if gmod_hooks[lower] then
-					hook.Remove(gmod_hooks[lower][1], "SF_Hook_" .. gmod_hooks[lower][1])
+					hook.Remove(gmod_hooks[lower][1], "SF_Hook_" .. lower)
 				end
 			end
 		end
@@ -198,7 +198,7 @@ SF.AddHook("deinitialize", function (instance)
 		if not next(v) and not gmod_override_hooks[k] then
 			registered_instances[k] = nil
 			if gmod_hooks[k] then
-				hook.Remove(gmod_hooks[k][1], "SF_Hook_" .. gmod_hooks[k][1])
+				hook.Remove(gmod_hooks[k][1], "SF_Hook_" .. k)
 			end
 		end
 	end
@@ -243,7 +243,7 @@ function SF.hookAdd (realname, hookname, customargfunc, customretfunc, gmoverrid
 		if GAMEMODE then
 			override(true)
 		else
-			hook.Add("Initialize", "SFOverride"..realname, override)
+			hook.Add("Initialize", "SFOverride"..hookname, override)
 		end
 	else
 		gmod_hooks[hookname] = { realname, customargfunc, customretfunc }
