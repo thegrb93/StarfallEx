@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Library fastlz :: StarfallEx Reference</title>
+		<title>Library effect :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -29,8 +29,8 @@
 						<li><a href="../libraries/builtin.html">builtin</a></li>
 						<li><a href="../libraries/constraint.html">constraint</a></li>
 						<li><a href="../libraries/coroutine.html">coroutine</a></li>
-						<li><a href="../libraries/effect.html">effect</a></li>
-						<li><a>fastlz</a></li>
+						<li><a>effect</a></li>
+						<li><a href="../libraries/fastlz.html">fastlz</a></li>
 						<li><a href="../libraries/file.html">file</a></li>
 						<li><a href="../libraries/find.html">find</a></li>
 						<li><a href="../libraries/game.html">game</a></li>
@@ -181,9 +181,9 @@
 		</nav>
 		<main>
 
-<h1>Library <tt>fastlz</tt></h1>
+<h1>Library <tt>effect</tt></h1>
 <p>
-FastLZ library</p>
+Effects library.</p>
 
 
 
@@ -194,14 +194,14 @@ FastLZ library</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#fastlz.compress">compress</a>( s&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#effect.create">create</a>( &nbsp;)</td>
 			<td class="summary">
-Compress string using FastLZ </td>
+Creates an effect data structure </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#fastlz.decompress">decompress</a>( s&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#effect.effectsLeft">effectsLeft</a>( &nbsp;)</td>
 			<td class="summary">
-Decompress using FastLZ </td>
+Returns number of effects able to be created </td>
 		</tr>
 	</table>
 </section>
@@ -213,50 +213,36 @@ Decompress using FastLZ </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="fastlz.compress"></a><strong>fastlz.compress</strong>( s&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="effect.create"></a><strong>effect.create</strong>( &nbsp;)</dt>
 <dd>
 	<p>
-Compress string using FastLZ</p>
+Creates an effect data structure</p>
 	
 	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>s</tt> ― String to compress</li>
-		</ul>
-	</section>
 	
 	
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>FastLZ compressed string</p>
+		<p>Effect Object</p>
 		
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="fastlz.decompress"></a><strong>fastlz.decompress</strong>( s&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="effect.effectsLeft"></a><strong>effect.effectsLeft</strong>( &nbsp;)</dt>
 <dd>
 	<p>
-Decompress using FastLZ</p>
+Returns number of effects able to be created</p>
 	
 	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>s</tt> ― FastLZ compressed string to decode</li>
-		</ul>
-	</section>
 	
 	
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Decompressed string</p>
+		<p>number of effects able to be created</p>
 		
 	</section>
 	
