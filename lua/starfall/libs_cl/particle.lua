@@ -29,7 +29,7 @@ end)
 --- Particle type
 -- @client
 local particle_methods, particle_metamethods = SF.RegisterType("Particle")
-local wrap, unwrap = SF.CreateWrapper(particle_metamethods, false, false, debug.getregistry().CNewParticleEffect)
+local wrap, unwrap = SF.CreateWrapper(particle_metamethods, false, false)
 
 --- Particle library.
 -- @client

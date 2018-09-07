@@ -92,7 +92,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
@@ -105,7 +105,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
@@ -118,7 +118,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(ang, ang_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end

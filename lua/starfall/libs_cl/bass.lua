@@ -12,7 +12,7 @@ end
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
 local bass_methods, bass_metamethods = SF.RegisterType("Bass")
-local wrap, unwrap = SF.CreateWrapper(bass_metamethods, true, false, debug.getregistry().IGModAudioChannel)
+local wrap, unwrap = SF.CreateWrapper(bass_metamethods, true, false)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check

@@ -85,6 +85,41 @@ SF.BurstObject = {
 setmetatable(SF.BurstObject, SF.BurstObject)
 
 
+--- Returns a class that can keep track of burst
+SF.BurstGenObject = {
+	__index = {
+		create = function(self, amount)
+			local obj = SF.BurstObject(self.ratecvar:GetFloat()*self.scale, self.maxcvar:GetFloat()*self.scale)
+			self.burstobjects[obj] = true
+			return obj
+		end,
+		updaterate = function(self)
+			local rate = self.ratecvar:GetFloat()*self.scale
+			for burst, _ in pairs(self.burstobjects) do burst.rate = rate end
+		end,
+		updatemax = function(self)
+			local max = self.maxcvar:GetFloat()*self.scale
+			for burst, _ in pairs(self.burstobjects) do burst.max = max end
+		end
+	},
+	__call = function(p, name, rate, max, ratehelp, maxhelp, scale)
+		scale = scale or 1
+		local ratename = "sf_"..name.."_burstrate"
+		local maxname = "sf_"..name.."_burstmax"
+		local t = {
+			ratecvar = CreateConVar(ratename, tostring(rate*scale), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, ratehelp),
+			maxcvar = CreateConVar(maxname, tostring(max*scale), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, maxhelp),
+			burstobjects = setmetatable({}, {__mode="k"}),
+			scale = scale
+		}
+		cvars.AddChangeCallback(ratename, function() t:updaterate() end)
+		cvars.AddChangeCallback(maxname, function() t:updatemax() end)
+		return setmetatable(t, p)
+	end
+}
+setmetatable(SF.BurstGenObject, SF.BurstGenObject)
+
+
 --- Returns a class that can limit per player and recycle a indestructable resource
 SF.ResourceHandler = {
 	__index = {

@@ -10,26 +10,9 @@ local checkpermission = SF.Permissions.check
 --- Net message library. Used for sending data from the server to the client and back
 local net_library = SF.RegisterLibrary("net")
 
-local burst_limit = CreateConVar("sf_net_burstmax", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-					"The net message burst limit in kB.")
-
-local burst_rate = CreateConVar("sf_net_burstrate", "5", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-						"Regen rate of net message burst in kB/sec.")
-
-
 local streams = SF.EntityTable("playerStreams")
 local netBurst = SF.EntityTable("NetBurst")
-
-cvars.AddChangeCallback( "sf_net_burstmax", function()
-	for k, v in pairs(netBurst) do
-		v.max = burst_limit:GetFloat() * 1000
-	end
-end)
-cvars.AddChangeCallback( "sf_net_burstrate", function()
-	for k, v in pairs(netBurst) do
-		v.rate = burst_rate:GetFloat() * 1000
-	end
-end)
+local netBurstGen = SF.BurstGenObject("net", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000)
 
 local instances = {}
 SF.AddHook("initialize", function(instance)
@@ -40,7 +23,7 @@ SF.AddHook("initialize", function(instance)
 		receives = {}
 	}
 	if not netBurst[instance.player] then
-		netBurst[instance.player] = SF.BurstObject(burst_rate:GetFloat() * 1000, burst_limit:GetFloat() * 1000)
+		netBurst[instance.player] = netBurstGen:create()
 	end
 end)
 

@@ -1,15 +1,9 @@
 SF.Mesh = {}
 
--- Register privileges
-SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
-
-local maxtriangles = CreateClientConVar("sf_mesh_maxtriangles", "200000", true, "How many triangles total can be loaded for meshes.")
-local maxrendertriangles = CreateClientConVar("sf_mesh_maxrendertriangles", "50000", true, "How many triangles total can be rendered with meshes per frame.")
-
 --- Mesh type
 -- @client
 local mesh_methods, mesh_metamethods = SF.RegisterType("Mesh")
-local wrap, unwrap = SF.CreateWrapper(mesh_metamethods, true, false, debug.getregistry().IMesh)
+local wrap, unwrap = SF.CreateWrapper(mesh_metamethods, true, false)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -61,16 +55,13 @@ SF.AddHook("postload", function()
 	}
 end)
 
-local plyTriangleCount = SF.EntityTable("MeshTriangles")
-local plyTriangleRenderBurst = SF.EntityTable("MeshBurst")
+-- Register privileges
+SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
 
-cvars.AddChangeCallback( "sf_mesh_maxrendertriangles", function()
-	for k, v in pairs(plyTriangleRenderBurst) do
-		local max = maxrendertriangles:GetFloat()*60
-		v.max = max
-		v.rate = max
-	end
-end)
+local maxtriangles = CreateClientConVar("sf_mesh_triangles_max", "200000", true, "How many triangles total can be loaded for meshes.")
+local plyTriangleCount = SF.EntityTable("MeshTriangles")
+local plyTriangleRenderBurstGen = SF.BurstGenObject("mesh_triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
+local plyTriangleRenderBurst = SF.EntityTable("MeshBurst")
 
 local function canAddTriangles(inst, triangles)
 	local ply = inst.player
@@ -95,7 +86,7 @@ SF.AddHook("initialize", function(inst)
 		plyTriangleCount[inst.player] = 0
 	end
 	if not plyTriangleRenderBurst[inst.player] then
-		plyTriangleRenderBurst[inst.player] = SF.BurstObject(maxrendertriangles:GetFloat() * 60, maxrendertriangles:GetFloat() * 60)
+		plyTriangleRenderBurst[inst.player] = plyTriangleRenderBurstGen:create()
 	end
 end)
 

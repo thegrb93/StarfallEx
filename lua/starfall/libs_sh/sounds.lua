@@ -3,7 +3,7 @@ SF.Sounds = {}
 --- Sound type
 -- @shared
 local sound_methods, sound_metamethods = SF.RegisterType("Sound")
-local wrap, unwrap = SF.CreateWrapper(sound_metamethods, true, false, debug.getregistry().CSoundPatch)
+local wrap, unwrap = SF.CreateWrapper(sound_metamethods, true, false)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -18,12 +18,6 @@ SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
 SF.Sounds.SoundsByEntity = { }
 
-SF.Sounds.burstmax = CreateConVar("sf_sounds_burstmax", "20", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-	"The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
-
-SF.Sounds.burstrate = CreateConVar("sf_sounds_burstrate", "10", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-	"The rate at which the burst regenerates per second.")
-
 -- Register Privileges
 do
 	local P = SF.Permissions
@@ -31,15 +25,16 @@ do
 	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 end
 
+local plySoundBurst = SF.EntityTable("playerSoundBurst")
+local plySoundBurstGen = SF.BurstGenObject("sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
+
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function (inst)
-	inst.data.sounds = {
-		sounds = {},
-		burst = SF.BurstObject(SF.Sounds.burstrate:GetFloat(), SF.Sounds.burstmax:GetFloat())
-	}
+SF.AddHook("initialize", function(inst)
+	inst.data.sounds = {sounds = {}}
+	plySoundBurst[inst.player] = plySoundBurst[inst.player] or plySoundBurstGen:create()
 end)
 
-SF.AddHook("deinitialize", function (inst)
+SF.AddHook("deinitialize", function(inst)
 	local sounds = inst.data.sounds.sounds
 	local s = next(sounds)
 	while s do
@@ -63,7 +58,7 @@ end)
 -- @return Sound Object
 function sound_library.create (ent, path)
 	checkpermission(SF.instance, { ent, path }, "sound.create")
-	if not SF.instance.data.sounds.burst:use(1) then SF.Throw("Can't create sounds that often", 2) end
+	if not plySoundBurst[SF.instance.player]:use(1) then SF.Throw("Can't create sounds that often", 2) end
 
 	checktype(ent, SF.Types["Entity"])
 	checkluatype (path, TYPE_STRING)
@@ -92,21 +87,20 @@ end
 --- Returns if a sound is able to be created
 -- @return If it is possible to make a sound
 function sound_library.canCreate()
-	return SF.instance.data.sounds.burst:check()>1
+	return plySoundBurst[SF.instance.player]:check()>1
 end
 
 --------------------------------------------------
 
 --- Starts to play the sound.
-function sound_methods:play ()
+function sound_methods:play()
 	checkpermission(SF.instance, unwrap(self), "sound.modify")
-	checktype(self, sound_metamethods)
 	unwrap(self):Play()
 end
 
 --- Stops the sound from being played.
 -- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
-function sound_methods:stop (fade)
+function sound_methods:stop(fade)
 	checkpermission(SF.instance, unwrap(self), "sound.modify")
 	if fade then
 		checkluatype (fade, TYPE_NUMBER)
@@ -119,7 +113,7 @@ end
 --- Sets the volume of the sound.
 -- @param vol Volume to set to, between 0 and 1.
 -- @param fade Time in seconds to transition to this new volume.
-function sound_methods:setVolume (vol, fade)
+function sound_methods:setVolume(vol, fade)
 	checkpermission(SF.instance, unwrap(self), "sound.modify")
 	checkluatype (vol, TYPE_NUMBER)
 
