@@ -1,4 +1,4 @@
-SF.Docs={["classes"]={[1]="Angle";[10]="Particle";[11]="PhysObj";[12]="Player";[13]="Quaternion";[14]="Sound";[15]="VMatrix";[16]="Vector";[17]="Vehicle";[18]="Weapon";[19]="Wirelink";[2]="Bass";[3]="Color";[4]="Entity";[5]="File";[6]="Hologram";[7]="Material";[8]="Mesh";[9]="Npc";["Angle"]={["class"]="class";["client"]=true;["description"]="\
+SF.Docs={["classes"]={[1]="Angle";[10]="Npc";[11]="Particle";[12]="PhysObj";[13]="Player";[14]="Quaternion";[15]="Sound";[16]="VMatrix";[17]="Vector";[18]="Vehicle";[19]="Weapon";[2]="Bass";[20]="Wirelink";[3]="Color";[4]="Effect";[5]="Entity";[6]="File";[7]="Hologram";[8]="Material";[9]="Mesh";["Angle"]={["class"]="class";["client"]=true;["description"]="\
 Angle Type";["fields"]={};["methods"]={[1]="getForward";[10]="setR";[11]="setY";[12]="setZero";[2]="getNormalized";[3]="getRight";[4]="getUp";[5]="isZero";[6]="normalize";[7]="rotateAroundAxis";[8]="set";[9]="setP";["getForward"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Return the Forward Vector ( direction the angle points ).";["fname"]="getForward";["name"]="ang_methods:getForward";["param"]={};["private"]=false;["realm"]="sh";["ret"]="vector normalised.";["summary"]="\
 Return the Forward Vector ( direction the angle points ).";};["getNormalized"]={["class"]="function";["classlib"]="Angle";["description"]="\
@@ -68,7 +68,75 @@ Set's the color's green and returns it.";["fname"]="setG";["name"]="color_method
 Set's the color's green and returns it.";};["setR"]={["class"]="function";["classlib"]="Color";["description"]="\
 Set's the color's red channel and returns it.";["fname"]="setR";["name"]="color_methods:setR";["param"]={[1]="r";["r"]="The red";};["private"]=false;["realm"]="sh";["ret"]="The modified color";["summary"]="\
 Set's the color's red channel and returns it.";};};["name"]="Color";["server"]=true;["summary"]="\
-Color type ";["typtbl"]="color_methods";};["Entity"]={["class"]="class";["client"]=true;["description"]="\
+Color type ";["typtbl"]="color_methods";};["Effect"]={["class"]="class";["client"]=true;["description"]="\
+Effect type";["fields"]={};["methods"]={[1]="getAngles";[10]="getMaterialIndex";[11]="getNormal";[12]="getOrigin";[13]="getRadius";[14]="getScale";[15]="getStart";[16]="getSurfaceProp";[17]="play";[18]="setAngles";[19]="setAttachment";[2]="getAttachment";[20]="setColor";[21]="setDamageType";[22]="setEntIndex";[23]="setEntity";[24]="setFlags";[25]="setHitBox";[26]="setMagnitude";[27]="setMaterialIndex";[28]="setNormal";[29]="setOrigin";[3]="getColor";[30]="setRadius";[31]="setScale";[32]="setStart";[33]="setSurfaceProp";[4]="getDamageType";[5]="getEntIndex";[6]="getEntity";[7]="getFlags";[8]="getHitBox";[9]="getMagnitude";["getAngles"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's angle";["fname"]="getAngles";["name"]="effect_methods:getAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's angle";["summary"]="\
+Returns the effect's angle ";};["getAttachment"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's attachment";["fname"]="getAttachment";["name"]="effect_methods:getAttachment";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's attachment";["summary"]="\
+Returns the effect's attachment ";};["getColor"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's color";["fname"]="getColor";["name"]="effect_methods:getColor";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's color";["summary"]="\
+Returns the effect's color ";};["getDamageType"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's damagetype";["fname"]="getDamageType";["name"]="effect_methods:getDamageType";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's damagetype";["summary"]="\
+Returns the effect's damagetype ";};["getEntIndex"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's entindex";["fname"]="getEntIndex";["name"]="effect_methods:getEntIndex";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's entindex";["summary"]="\
+Returns the effect's entindex ";};["getEntity"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's entity";["fname"]="getEntity";["name"]="effect_methods:getEntity";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's entity";["summary"]="\
+Returns the effect's entity ";};["getFlags"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's flags";["fname"]="getFlags";["name"]="effect_methods:getFlags";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's flags";["summary"]="\
+Returns the effect's flags ";};["getHitBox"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's hitbox";["fname"]="getHitBox";["name"]="effect_methods:getHitBox";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's hitbox";["summary"]="\
+Returns the effect's hitbox ";};["getMagnitude"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's magnitude";["fname"]="getMagnitude";["name"]="effect_methods:getMagnitude";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's magnitude";["summary"]="\
+Returns the effect's magnitude ";};["getMaterialIndex"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's material index";["fname"]="getMaterialIndex";["name"]="effect_methods:getMaterialIndex";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's material index";["summary"]="\
+Returns the effect's material index ";};["getNormal"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's normal";["fname"]="getNormal";["name"]="effect_methods:getNormal";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's normal";["summary"]="\
+Returns the effect's normal ";};["getOrigin"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's origin";["fname"]="getOrigin";["name"]="effect_methods:getOrigin";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's origin";["summary"]="\
+Returns the effect's origin ";};["getRadius"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's radius";["fname"]="getRadius";["name"]="effect_methods:getRadius";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's radius";["summary"]="\
+Returns the effect's radius ";};["getScale"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's scale";["fname"]="getScale";["name"]="effect_methods:getScale";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's scale";["summary"]="\
+Returns the effect's scale ";};["getStart"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's start position";["fname"]="getStart";["name"]="effect_methods:getStart";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's start position";["summary"]="\
+Returns the effect's start position ";};["getSurfaceProp"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Returns the effect's surface prop";["fname"]="getSurfaceProp";["name"]="effect_methods:getSurfaceProp";["param"]={};["private"]=false;["realm"]="sh";["ret"]="the effect's surface prop";["summary"]="\
+Returns the effect's surface prop ";};["play"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Plays the effect";["fname"]="play";["name"]="effect_methods:play";["param"]={[1]="eff";["eff"]="The effect type to play";};["private"]=false;["realm"]="sh";["summary"]="\
+Plays the effect ";};["setAngles"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's angles";["fname"]="setAngles";["name"]="effect_methods:setAngles";["param"]={[1]="ang";["ang"]="The angles";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's angles ";};["setAttachment"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's attachment";["fname"]="setAttachment";["name"]="effect_methods:setAttachment";["param"]={[1]="attachment";["attachment"]="The attachment";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's attachment ";};["setColor"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's color";["fname"]="setColor";["name"]="effect_methods:setColor";["param"]={[1]="color";["color"]="The color";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's color ";};["setDamageType"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's damage type";["fname"]="setDamageType";["name"]="effect_methods:setDamageType";["param"]={[1]="dmgtype";["dmgtype"]="The damage type";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's damage type ";};["setEntIndex"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's entity index";["fname"]="setEntIndex";["name"]="effect_methods:setEntIndex";["param"]={[1]="index";["index"]="The entity index";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's entity index ";};["setEntity"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's entity";["fname"]="setEntity";["name"]="effect_methods:setEntity";["param"]={[1]="ent";["ent"]="The entity";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's entity ";};["setFlags"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's flags";["fname"]="setFlags";["name"]="effect_methods:setFlags";["param"]={[1]="flags";["flags"]="The flags";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's flags ";};["setHitBox"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's hitbox";["fname"]="setHitBox";["name"]="effect_methods:setHitBox";["param"]={[1]="hitbox";["hitbox"]="The hitbox";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's hitbox ";};["setMagnitude"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's magnitude";["fname"]="setMagnitude";["name"]="effect_methods:setMagnitude";["param"]={[1]="magnitude";["magnitude"]="The magnitude";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's magnitude ";};["setMaterialIndex"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's material index";["fname"]="setMaterialIndex";["name"]="effect_methods:setMaterialIndex";["param"]={[1]="mat";["mat"]="The material index";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's material index ";};["setNormal"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's normal";["fname"]="setNormal";["name"]="effect_methods:setNormal";["param"]={[1]="normal";["normal"]="The vector normal";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's normal ";};["setOrigin"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's origin";["fname"]="setOrigin";["name"]="effect_methods:setOrigin";["param"]={[1]="origin";["origin"]="The vector origin";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's origin ";};["setRadius"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's radius";["fname"]="setRadius";["name"]="effect_methods:setRadius";["param"]={[1]="radius";["radius"]="The radius";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's radius ";};["setScale"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's scale";["fname"]="setScale";["name"]="effect_methods:setScale";["param"]={[1]="scale";["scale"]="The number scale";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's scale ";};["setStart"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's start";["fname"]="setStart";["name"]="effect_methods:setStart";["param"]={[1]="start";["start"]="The vector start";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's start ";};["setSurfaceProp"]={["class"]="function";["classlib"]="Effect";["description"]="\
+Sets the effect's surface property";["fname"]="setSurfaceProp";["name"]="effect_methods:setSurfaceProp";["param"]={[1]="prop";["prop"]="The surface property";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's surface property ";};};["name"]="Effect";["server"]=true;["summary"]="\
+Effect type ";["typtbl"]="effect_methods";};["Entity"]={["class"]="class";["client"]=true;["description"]="\
 Entity type";["fields"]={};["methods"]={[1]="addCollisionListener";[10]="enableGravity";[100]="setRenderMode";[101]="setSkin";[102]="setSolid";[103]="setSubMaterial";[104]="setTrails";[105]="setUnbreakable";[106]="setVelocity";[107]="translateBoneToPhysBone";[108]="translatePhysBoneToBone";[109]="unparent";[11]="enableMotion";[110]="worldToLocal";[111]="worldToLocalAngles";[12]="enableSphere";[13]="entIndex";[14]="extinguish";[15]="getAllConstrained";[16]="getAngleVelocity";[17]="getAngleVelocityAngle";[18]="getAngles";[19]="getAttachment";[2]="applyAngForce";[20]="getAttachmentParent";[21]="getAttachments";[22]="getBoneCount";[23]="getBoneMatrix";[24]="getBoneName";[25]="getBoneParent";[26]="getBonePosition";[27]="getChildren";[28]="getClass";[29]="getColor";[3]="applyDamage";[30]="getEyeAngles";[31]="getEyePos";[32]="getForward";[33]="getHealth";[34]="getInertia";[35]="getMass";[36]="getMassCenter";[37]="getMassCenterW";[38]="getMaterial";[39]="getMaterials";[4]="applyForceCenter";[40]="getMaxHealth";[41]="getModel";[42]="getOwner";[43]="getParent";[44]="getPhysMaterial";[45]="getPhysicsObject";[46]="getPhysicsObjectCount";[47]="getPhysicsObjectNum";[48]="getPos";[49]="getRight";[5]="applyForceOffset";[50]="getSkin";[51]="getSubMaterial";[52]="getUp";[53]="getVelocity";[54]="getWaterLevel";[55]="ignite";[56]="isFrozen";[57]="isNPC";[58]="isOnGround";[59]="isPlayer";[6]="applyTorque";[60]="isPlayerHolding";[61]="isValid";[62]="isValidPhys";[63]="isVehicle";[64]="isWeapon";[65]="isWeldedTo";[66]="linkComponent";[67]="localToWorld";[68]="localToWorldAngles";[69]="lookupAttachment";[7]="breakEnt";[70]="lookupBone";[71]="manipulateBoneAngles";[72]="manipulateBonePosition";[73]="manipulateBoneScale";[74]="obbCenter";[75]="obbCenterW";[76]="obbMaxs";[77]="obbMins";[78]="obbSize";[79]="remove";[8]="emitSound";[80]="removeCollisionListener";[81]="removeTrails";[82]="setAngles";[83]="setBodygroup";[84]="setColor";[85]="setDrawShadow";[86]="setFrozen";[87]="setHologramMaterial";[88]="setHologramMesh";[89]="setHologramRenderBounds";[9]="enableDrag";[90]="setHologramRenderMatrix";[91]="setInertia";[92]="setMass";[93]="setMaterial";[94]="setNoDraw";[95]="setNocollideAll";[96]="setParent";[97]="setPhysMaterial";[98]="setPos";[99]="setRenderFX";["addCollisionListener"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.";["fname"]="addCollisionListener";["name"]="ents_methods:addCollisionListener";["param"]={[1]="func";["func"]="The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData";};["private"]=false;["realm"]="sv";["summary"]="\
 Allows detecting collisions on an entity.";};["applyAngForce"]={["class"]="function";["classlib"]="Entity";["description"]="\
@@ -1010,7 +1078,7 @@ Think hook.";};["tick"]={["class"]="hook";["classForced"]=true;["client"]=true;[
 Tick hook. Called each game tick on both the server and client.";["name"]="tick";["param"]={};["realm"]="sh";["server"]=true;["summary"]="\
 Tick hook.";};["writecell"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when a high speed device writes to a wired SF chip";["name"]="writecell";["param"]={[1]="address";[2]="data";["address"]="The address written to";["data"]="The data being written";};["realm"]="sv";["summary"]="\
-Called when a high speed device writes to a wired SF chip ";};};["libraries"]={[1]="bass";[10]="hook";[11]="http";[12]="input";[13]="joystick";[14]="json";[15]="material";[16]="mesh";[17]="net";[18]="particle";[19]="physenv";[2]="builtin";[20]="prop";[21]="quaternion";[22]="render";[23]="sounds";[24]="team";[25]="timer";[26]="trace";[27]="von";[28]="wire";[3]="constraint";[4]="coroutine";[5]="fastlz";[6]="file";[7]="find";[8]="game";[9]="holograms";["bass"]={["class"]="library";["client"]=true;["description"]="\
+Called when a high speed device writes to a wired SF chip ";};};["libraries"]={[1]="bass";[10]="holograms";[11]="hook";[12]="http";[13]="input";[14]="joystick";[15]="json";[16]="material";[17]="mesh";[18]="net";[19]="particle";[2]="builtin";[20]="physenv";[21]="prop";[22]="quaternion";[23]="render";[24]="sounds";[25]="team";[26]="timer";[27]="trace";[28]="von";[29]="wire";[3]="constraint";[4]="coroutine";[5]="effect";[6]="fastlz";[7]="file";[8]="find";[9]="game";["bass"]={["class"]="library";["client"]=true;["description"]="\
 `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's \"2D\" context.";["fields"]={};["functions"]={[1]="loadFile";[2]="loadURL";["loadFile"]={["class"]="function";["description"]="\
 Loads a sound channel from a file.";["fname"]="loadFile";["library"]="bass";["name"]="bass_library.loadFile";["param"]={[1]="path";[2]="flags";[3]="callback";["callback"]="Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.";["flags"]="Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).";["path"]="File path to play from.";};["private"]=false;["realm"]="cl";["summary"]="\
 Loads a sound channel from a file.";};["loadURL"]={["class"]="function";["description"]="\
@@ -1209,7 +1277,13 @@ Creates a new coroutine.";["fname"]="wrap";["library"]="coroutine";["name"]="cor
 Creates a new coroutine.";};["yield"]={["class"]="function";["description"]="\
 Suspends the currently running coroutine. May not be called outside a coroutine.";["fname"]="yield";["library"]="coroutine";["name"]="coroutine_library.yield";["param"]={["..."]="optional parameters that will be returned to the main thread";[1]="...";};["private"]=false;["realm"]="sh";["ret"]="Any values passed to the coroutine";["summary"]="\
 Suspends the currently running coroutine.";};};["libtbl"]="coroutine_library";["name"]="coroutine";["server"]=true;["summary"]="\
-Coroutine library ";["tables"]={};};["fastlz"]={["class"]="library";["client"]=true;["description"]="\
+Coroutine library ";["tables"]={};};["effect"]={["class"]="library";["client"]=true;["description"]="\
+Effects library.";["fields"]={};["functions"]={[1]="create";[2]="effectsLeft";["create"]={["class"]="function";["description"]="\
+Creates an effect data structure";["fname"]="create";["library"]="effect";["name"]="effect_library.create";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Effect Object";["summary"]="\
+Creates an effect data structure ";};["effectsLeft"]={["class"]="function";["description"]="\
+Returns number of effects able to be created";["fname"]="effectsLeft";["library"]="effect";["name"]="effect_library.effectsLeft";["param"]={};["private"]=false;["realm"]="sh";["ret"]="number of effects able to be created";["summary"]="\
+Returns number of effects able to be created ";};};["libtbl"]="effect_library";["name"]="effect";["server"]=true;["summary"]="\
+Effects library.";["tables"]={};};["fastlz"]={["class"]="library";["client"]=true;["description"]="\
 FastLZ library";["fields"]={};["functions"]={[1]="compress";[2]="decompress";["compress"]={["class"]="function";["description"]="\
 Compress string using FastLZ";["fname"]="compress";["library"]="fastlz";["name"]="fastlz_library.compress";["param"]={[1]="s";["s"]="String to compress";};["private"]=false;["realm"]="sh";["ret"]="FastLZ compressed string";["summary"]="\
 Compress string using FastLZ ";};["decompress"]={["class"]="function";["description"]="\
