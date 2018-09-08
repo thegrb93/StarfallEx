@@ -465,7 +465,7 @@ Sets the light position ";};["setSize"]={["class"]="function";["classlib"]="Ligh
 Sets the size of the light (max is 1024)";["fname"]="setSize";["name"]="light_methods:setSize";["param"]={[1]="size";["size"]="The size of the light";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the size of the light (max is 1024) ";};["setStyle"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances";["fname"]="setStyle";["name"]="light_methods:setStyle";["param"]={[1]="style";["style"]="The number of the flicker style";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances ";};};["name"]="Light";["server"]=true;["summary"]="\
+Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances ";};};["name"]="Light";["summary"]="\
 Light type ";["typtbl"]="light_methods";};["Material"]={["class"]="class";["client"]=true;["description"]="\
 The `Material` type is used to control shaders in rendering. \
 For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters \
@@ -1108,7 +1108,7 @@ Think hook.";};["tick"]={["class"]="hook";["classForced"]=true;["client"]=true;[
 Tick hook. Called each game tick on both the server and client.";["name"]="tick";["param"]={};["realm"]="sh";["server"]=true;["summary"]="\
 Tick hook.";};["writecell"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called when a high speed device writes to a wired SF chip";["name"]="writecell";["param"]={[1]="address";[2]="data";["address"]="The address written to";["data"]="The data being written";};["realm"]="sv";["summary"]="\
-Called when a high speed device writes to a wired SF chip ";};};["libraries"]={[1]="bass";[10]="holograms";[11]="hook";[12]="http";[13]="input";[14]="joystick";[15]="json";[16]="material";[17]="mesh";[18]="net";[19]="particle";[2]="builtin";[20]="physenv";[21]="prop";[22]="quaternion";[23]="render";[24]="sounds";[25]="team";[26]="timer";[27]="trace";[28]="von";[29]="wire";[3]="constraint";[4]="coroutine";[5]="effect";[6]="fastlz";[7]="file";[8]="find";[9]="game";["bass"]={["class"]="library";["client"]=true;["description"]="\
+Called when a high speed device writes to a wired SF chip ";};};["libraries"]={[1]="bass";[10]="holograms";[11]="hook";[12]="http";[13]="input";[14]="joystick";[15]="json";[16]="light";[17]="material";[18]="mesh";[19]="net";[2]="builtin";[20]="particle";[21]="physenv";[22]="prop";[23]="quaternion";[24]="render";[25]="sounds";[26]="team";[27]="timer";[28]="trace";[29]="von";[3]="constraint";[30]="wire";[4]="coroutine";[5]="effect";[6]="fastlz";[7]="file";[8]="find";[9]="game";["bass"]={["class"]="library";["client"]=true;["description"]="\
 `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's \"2D\" context.";["fields"]={};["functions"]={[1]="loadFile";[2]="loadURL";["loadFile"]={["class"]="function";["description"]="\
 Loads a sound channel from a file.";["fname"]="loadFile";["library"]="bass";["name"]="bass_library.loadFile";["param"]={[1]="path";[2]="flags";[3]="callback";["callback"]="Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.";["flags"]="Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).";["path"]="File path to play from.";};["private"]=false;["realm"]="cl";["summary"]="\
 Loads a sound channel from a file.";};["loadURL"]={["class"]="function";["description"]="\
@@ -1440,7 +1440,11 @@ Convert JSON string to table";["fname"]="decode";["library"]="json";["name"]="js
 Convert JSON string to table ";};["encode"]={["class"]="function";["description"]="\
 Convert table to JSON string";["fname"]="encode";["library"]="json";["name"]="json_library.encode";["param"]={[1]="tbl";["tbl"]="Table to encode";};["private"]=false;["realm"]="sh";["ret"]="JSON encoded string representation of the table";["summary"]="\
 Convert table to JSON string ";};};["libtbl"]="json_library";["name"]="json";["server"]=true;["summary"]="\
-JSON library ";["tables"]={};};["material"]={["class"]="library";["client"]=true;["description"]="\
+JSON library ";["tables"]={};};["light"]={["class"]="library";["client"]=true;["description"]="\
+Light library.";["fields"]={};["functions"]={[1]="create";["create"]={["class"]="function";["description"]="\
+Creates a dynamic light";["fname"]="create";["library"]="light";["name"]="light_library.create";["param"]={[1]="pos";[2]="size";[3]="brightness";[4]="color";[5]="on";};["private"]=false;["realm"]="cl";["summary"]="\
+Creates a dynamic light ";};};["libtbl"]="light_library";["name"]="light";["summary"]="\
+Light library.";["tables"]={};};["material"]={["class"]="library";["client"]=true;["description"]="\
 `material` library is allows creating material objects which are used for controlling shaders in rendering.";["fields"]={};["functions"]={[1]="create";[2]="createFromImage";[3]="getTexture";[4]="load";["create"]={["class"]="function";["description"]="\
 Creates a new blank material";["fname"]="create";["library"]="material";["name"]="material_library.create";["param"]={[1]="shader";["shader"]="The shader of the material. (UnlitGeneric or VertexLitGeneric)";};["private"]=false;["realm"]="cl";["summary"]="\
 Creates a new blank material ";};["createFromImage"]={["class"]="function";["description"]="\
