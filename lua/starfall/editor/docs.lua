@@ -1,4 +1,4 @@
-SF.Docs={["classes"]={[1]="Angle";[10]="Npc";[11]="Particle";[12]="PhysObj";[13]="Player";[14]="Quaternion";[15]="Sound";[16]="VMatrix";[17]="Vector";[18]="Vehicle";[19]="Weapon";[2]="Bass";[20]="Wirelink";[3]="Color";[4]="Effect";[5]="Entity";[6]="File";[7]="Hologram";[8]="Material";[9]="Mesh";["Angle"]={["class"]="class";["client"]=true;["description"]="\
+SF.Docs={["classes"]={[1]="Angle";[10]="Mesh";[11]="Npc";[12]="Particle";[13]="PhysObj";[14]="Player";[15]="Quaternion";[16]="Sound";[17]="VMatrix";[18]="Vector";[19]="Vehicle";[2]="Bass";[20]="Weapon";[21]="Wirelink";[3]="Color";[4]="Effect";[5]="Entity";[6]="File";[7]="Hologram";[8]="Light";[9]="Material";["Angle"]={["class"]="class";["client"]=true;["description"]="\
 Angle Type";["fields"]={};["methods"]={[1]="getForward";[10]="setR";[11]="setY";[12]="setZero";[2]="getNormalized";[3]="getRight";[4]="getUp";[5]="isZero";[6]="normalize";[7]="rotateAroundAxis";[8]="set";[9]="setP";["getForward"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Return the Forward Vector ( direction the angle points ).";["fname"]="getForward";["name"]="ang_methods:getForward";["param"]={};["private"]=false;["realm"]="sh";["ret"]="vector normalised.";["summary"]="\
 Return the Forward Vector ( direction the angle points ).";};["getNormalized"]={["class"]="function";["classlib"]="Angle";["description"]="\
@@ -436,7 +436,37 @@ Sets the hologram linear velocity";["fname"]="setVel";["name"]="hologram_methods
 Sets the hologram linear velocity ";};["suppressEngineLighting"]={["class"]="function";["classForced"]=true;["classlib"]="Hologram";["description"]="\
 Suppress Engine Lighting of a hologram. Disabled by default.";["fname"]="suppressEngineLighting";["name"]="hologram_methods:suppressEngineLighting";["param"]={[1]="suppress";["suppress"]="Boolean to represent if shading should be set or not.";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Suppress Engine Lighting of a hologram.";};};["name"]="Hologram";["summary"]="\
-Hologram type ";["typtbl"]="hologram_methods";};["Material"]={["class"]="class";["client"]=true;["description"]="\
+Hologram type ";["typtbl"]="hologram_methods";};["Light"]={["class"]="class";["client"]=true;["description"]="\
+Light type";["fields"]={};["methods"]={[1]="setBrightness";[10]="setOn";[11]="setOuterAngle";[12]="setPos";[13]="setSize";[14]="setStyle";[2]="setColor";[3]="setDecay";[4]="setDieTime";[5]="setDirection";[6]="setInnerAngle";[7]="setMinLight";[8]="setNoModel";[9]="setNoWorld";["setBrightness"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light brightness";["fname"]="setBrightness";["name"]="light_methods:setBrightness";["param"]={[1]="brightness";["brightness"]="The light's brightness";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light brightness ";};["setColor"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the color of the light";["fname"]="setColor";["name"]="light_methods:setColor";["param"]={[1]="color";["color"]="The color of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the color of the light ";};["setDecay"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light decay speed in thousandths per second. 1000 lasts for 1 second, 2000 lasts for 0.5 seconds";["fname"]="setDecay";["name"]="light_methods:setDecay";["param"]={[1]="decay";["decay"]="The light's decay speed";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light decay speed in thousandths per second.";};["setDieTime"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light lifespan (Required for fade effect i.e. decay)";["fname"]="setDieTime";["name"]="light_methods:setDieTime";["param"]={[1]="dietime";["dietime"]="The how long the light will stay alive after turning it off.";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light lifespan (Required for fade effect i.e.";};["setDirection"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light direction (used with setInnerAngle and setOuterAngle)";["fname"]="setDirection";["name"]="light_methods:setDirection";["param"]={[1]="dir";["dir"]="Direction of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light direction (used with setInnerAngle and setOuterAngle) ";};["setInnerAngle"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light inner angle (used with setDirection and setOuterAngle)";["fname"]="setInnerAngle";["name"]="light_methods:setInnerAngle";["param"]={[1]="ang";["ang"]="Number inner angle of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light inner angle (used with setDirection and setOuterAngle) ";};["setMinLight"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the minimum light amount";["fname"]="setMinLight";["name"]="light_methods:setMinLight";["param"]={[1]="min";["min"]="The minimum light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the minimum light amount ";};["setNoModel"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets whether the light should cast onto models or not";["fname"]="setNoModel";["name"]="light_methods:setNoModel";["param"]={[1]="on";["on"]="Whether the light shouldn't cast onto the models";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets whether the light should cast onto models or not ";};["setNoWorld"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets whether the light should cast onto the world or not";["fname"]="setNoWorld";["name"]="light_methods:setNoWorld";["param"]={[1]="on";["on"]="Whether the light shouldn't cast onto the world";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets whether the light should cast onto the world or not ";};["setOn"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light to be on or not";["fname"]="setOn";["name"]="light_methods:setOn";["param"]={[1]="on";["on"]="Whether the light is on or not";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light to be on or not ";};["setOuterAngle"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light outer angle (used with setDirection and setInnerAngle)";["fname"]="setOuterAngle";["name"]="light_methods:setOuterAngle";["param"]={[1]="ang";["ang"]="Number outer angle of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light outer angle (used with setDirection and setInnerAngle) ";};["setPos"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the light position";["fname"]="setPos";["name"]="light_methods:setPos";["param"]={[1]="pos";["pos"]="The position of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the light position ";};["setSize"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the size of the light (max is 1024)";["fname"]="setSize";["name"]="light_methods:setSize";["param"]={[1]="size";["size"]="The size of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the size of the light (max is 1024) ";};["setStyle"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances";["fname"]="setStyle";["name"]="light_methods:setStyle";["param"]={[1]="style";["style"]="The number of the flicker style";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances ";};};["name"]="Light";["server"]=true;["summary"]="\
+Light type ";["typtbl"]="light_methods";};["Material"]={["class"]="class";["client"]=true;["description"]="\
 The `Material` type is used to control shaders in rendering. \
 For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters \
 For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags";["fields"]={};["methods"]={[1]="destroy";[10]="getString";[11]="getTexture";[12]="getVector";[13]="getVectorLinear";[14]="getWidth";[15]="recompute";[16]="setFloat";[17]="setInt";[18]="setMatrix";[19]="setString";[2]="getColor";[20]="setTexture";[21]="setTextureRenderTarget";[22]="setTextureURL";[23]="setUndefined";[24]="setVector";[3]="getFloat";[4]="getHeight";[5]="getInt";[6]="getKeyValues";[7]="getMatrix";[8]="getName";[9]="getShader";["destroy"]={["class"]="function";["classlib"]="Material";["description"]="\
