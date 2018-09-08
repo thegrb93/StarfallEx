@@ -1,19 +1,14 @@
 SF.Light = {}
 
--- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
-end
-
 --- Light type
--- @shared
+-- @client
 local light_methods, light_metamethods = SF.RegisterType("Light")
 local wrap, unwrap = SF.CreateWrapper(light_metamethods, true, false)
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
+--- Light library.
 -- @client
 local light_library = SF.RegisterLibrary("light")
 
@@ -34,6 +29,12 @@ SF.AddHook("postload", function()
 	cwrap = SF.Color.Wrap
 	cunwrap = SF.Color.Unwrap
 end)
+
+-- Register privileges
+do
+	local P = SF.Permissions
+	P.registerPrivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
+end
 
 local gSFLights = {}
 local gSFLightsQueue = {}
