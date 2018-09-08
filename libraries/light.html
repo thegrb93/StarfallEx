@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Library trace :: StarfallEx Reference</title>
+		<title>Library light :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -40,7 +40,7 @@
 						<li><a href="../libraries/input.html">input</a></li>
 						<li><a href="../libraries/joystick.html">joystick</a></li>
 						<li><a href="../libraries/json.html">json</a></li>
-						<li><a href="../libraries/light.html">light</a></li>
+						<li><a>light</a></li>
 						<li><a href="../libraries/material.html">material</a></li>
 						<li><a href="../libraries/mesh.html">mesh</a></li>
 						<li><a href="../libraries/net.html">net</a></li>
@@ -52,7 +52,7 @@
 						<li><a href="../libraries/sounds.html">sounds</a></li>
 						<li><a href="../libraries/team.html">team</a></li>
 						<li><a href="../libraries/timer.html">timer</a></li>
-						<li><a>trace</a></li>
+						<li><a href="../libraries/trace.html">trace</a></li>
 						<li><a href="../libraries/von.html">von</a></li>
 						<li><a href="../libraries/wire.html">wire</a></li>
 					</ul>
@@ -183,9 +183,9 @@
 		</nav>
 		<main>
 
-<h1>Library <tt>trace</tt></h1>
+<h1>Library <tt>light</tt></h1>
 <p>
-Provides functions for doing line/AABB traces</p>
+Light library.</p>
 
 
 
@@ -196,24 +196,9 @@ Provides functions for doing line/AABB traces</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithOBB">intersectRayWithOBB</a>( rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#light.create">create</a>( pos, size, brightness, color, on&nbsp;)</td>
 			<td class="summary">
-Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#trace.intersectRayWithPlane">intersectRayWithPlane</a>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</td>
-			<td class="summary">
-Does a ray plane intersection returning the position hit or nil if not hit </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#trace.trace">trace</a>( start, endpos, filter, mask, colgroup, ignworld&nbsp;)</td>
-			<td class="summary">
-Does a line trace </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#trace.traceHull">traceHull</a>( start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld&nbsp;)</td>
-			<td class="summary">
-Does a swept-AABB trace </td>
+Creates a dynamic light </td>
 		</tr>
 	</table>
 </section>
@@ -225,126 +210,25 @@ Does a swept-AABB trace </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="trace.intersectRayWithOBB"></a><strong>trace.intersectRayWithOBB</strong>( rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="light.create"></a><strong>light.create</strong>( pos, size, brightness, color, on&nbsp;)</dt>
 <dd>
 	<p>
-Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.</p>
+Creates a dynamic light</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>rayStart</tt> ― The origin of the ray</li>
-			<li><tt>rayDelta</tt> ― The direction and length of the ray</li>
-			<li><tt>boxOrigin</tt> ― The origin of the box</li>
-			<li><tt>boxAngles</tt> ― The box's angles</li>
-			<li><tt>boxMins</tt> ― The box min bounding vector</li>
-			<li><tt>boxMaxs</tt> ― The box max bounding vector</li>
+			<li><tt>pos</tt></li>
+			<li><tt>size</tt></li>
+			<li><tt>brightness</tt></li>
+			<li><tt>color</tt></li>
+			<li><tt>on</tt></li>
 		</ul>
 	</section>
 	
 	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<ol>
-			
-			<li>Hit position or nil if not hit</li>
-			<li>Hit normal or nil if not hit</li>
-			<li>Hit fraction or nil if not hit</li>
-		</ol>
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="trace.intersectRayWithPlane"></a><strong>trace.intersectRayWithPlane</strong>( rayStart, rayDelta, planeOrigin, planeNormal&nbsp;)</dt>
-<dd>
-	<p>
-Does a ray plane intersection returning the position hit or nil if not hit</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>rayStart</tt> ― The origin of the ray</li>
-			<li><tt>rayDelta</tt> ― The direction and length of the ray</li>
-			<li><tt>planeOrigin</tt> ― The origin of the plane</li>
-			<li><tt>planeNormal</tt> ― The normal of the plane</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Hit position or nil if not hit</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="trace.trace"></a><strong>trace.trace</strong>( start, endpos, filter, mask, colgroup, ignworld&nbsp;)</dt>
-<dd>
-	<p>
-Does a line trace</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>start</tt> ― Start position</li>
-			<li><tt>endpos</tt> ― End position</li>
-			<li><tt>filter</tt> ― Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit</li>
-			<li><tt>mask</tt> ― Trace mask</li>
-			<li><tt>colgroup</tt> ― The collision group of the trace</li>
-			<li><tt>ignworld</tt> ― Whether the trace should ignore world</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="trace.traceHull"></a><strong>trace.traceHull</strong>( start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld&nbsp;)</dt>
-<dd>
-	<p>
-Does a swept-AABB trace</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>start</tt> ― Start position</li>
-			<li><tt>endpos</tt> ― End position</li>
-			<li><tt>minbox</tt> ― Lower box corner</li>
-			<li><tt>maxbox</tt> ― Upper box corner</li>
-			<li><tt>filter</tt> ― Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit</li>
-			<li><tt>mask</tt> ― Trace mask</li>
-			<li><tt>colgroup</tt> ― The collision group of the trace</li>
-			<li><tt>ignworld</tt> ― Whether the trace should ignore world</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult</p>
-		
-	</section>
 	
 	
 </dd>
