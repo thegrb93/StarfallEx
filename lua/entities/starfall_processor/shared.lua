@@ -32,7 +32,7 @@ function ENT:Compile()
 	if not ok then self:Error(instance) return end
 
 	if instance.ppdata.scriptnames and instance.mainfile and instance.ppdata.scriptnames[instance.mainfile] then
-		self.name = tostring(instance.ppdata.scriptnames[instance.mainfile])
+		self.name = string.sub(tostring(instance.ppdata.scriptnames[instance.mainfile]), 1, 64)
 	else
 		self.name = "Generic ( No-Name )"
 	end
