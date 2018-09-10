@@ -36,6 +36,8 @@ do
 	P.registerPrivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
 end
 
+local maxSize = CreateClientConVar( "sf_light_maxsize", "1024", true, false, "Max size lights can be" )
+
 local gSFLights = {}
 local gSFLightsQueue = {}
 local gGmodLights = {}
@@ -129,6 +131,7 @@ end)
 --- Creates a dynamic light
 function light_library.create(pos, size, brightness, color, on)
 	local lightCount = #gSFLightsQueue
+	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
 	if lightCount >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	checkpermission(SF.instance, nil, "light.create")
 	checktype(pos, vec_meta)
@@ -141,7 +144,7 @@ function light_library.create(pos, size, brightness, color, on)
 
 	local col = cunwrap(color)
 	local light = {
-		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, 1024), brightness = brightness, r=col.r, g=col.g, b=col.b, decay = 1000},
+		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=col.r, g=col.g, b=col.b, decay = 1000},
 		slot = slot,
 		dietime = 1,
 		on = on
@@ -243,12 +246,12 @@ function light_methods:setPos(pos)
 	unwrap(self).data.pos = vunwrap(pos) 
 end
 
---- Sets the size of the light (max is 1024)
+--- Sets the size of the light (max is sf_light_maxsize)
 -- @param size The size of the light
 function light_methods:setSize(size)
 	checktype(self, light_metamethods)
 	checkluatype(size, TYPE_NUMBER)
-	unwrap(self).data.size = math.Clamp(size, 0, 1024)
+	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
 --- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
