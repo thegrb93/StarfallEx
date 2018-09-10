@@ -141,7 +141,7 @@ function light_library.create(pos, size, brightness, color, on)
 
 	local col = cunwrap(color)
 	local light = {
-		data = {pos = vunwrap(pos), size = size, brightness = brightness, r=col.r, g=col.g, b=col.b, decay = 1000},
+		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, 1024), brightness = brightness, r=col.r, g=col.g, b=col.b, decay = 1000},
 		slot = slot,
 		dietime = 1,
 		on = on
@@ -248,7 +248,7 @@ end
 function light_methods:setSize(size)
 	checktype(self, light_metamethods)
 	checkluatype(size, TYPE_NUMBER)
-	unwrap(self).data.size = size
+	unwrap(self).data.size = math.Clamp(size, 0, 1024)
 end
 
 --- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
