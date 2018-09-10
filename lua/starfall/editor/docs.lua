@@ -462,8 +462,8 @@ Sets the light outer angle (used with setDirection and setInnerAngle)";["fname"]
 Sets the light outer angle (used with setDirection and setInnerAngle) ";};["setPos"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the light position";["fname"]="setPos";["name"]="light_methods:setPos";["param"]={[1]="pos";["pos"]="The position of the light";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the light position ";};["setSize"]={["class"]="function";["classlib"]="Light";["description"]="\
-Sets the size of the light (max is 1024)";["fname"]="setSize";["name"]="light_methods:setSize";["param"]={[1]="size";["size"]="The size of the light";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets the size of the light (max is 1024) ";};["setStyle"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets the size of the light (max is sf_light_maxsize)";["fname"]="setSize";["name"]="light_methods:setSize";["param"]={[1]="size";["size"]="The size of the light";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the size of the light (max is sf_light_maxsize) ";};["setStyle"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances";["fname"]="setStyle";["name"]="light_methods:setStyle";["param"]={[1]="style";["style"]="The number of the flicker style";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances ";};};["name"]="Light";["summary"]="\
 Light type ";["typtbl"]="light_methods";};["Material"]={["class"]="class";["client"]=true;["description"]="\
