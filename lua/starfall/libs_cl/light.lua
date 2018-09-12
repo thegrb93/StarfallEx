@@ -194,7 +194,7 @@ end
 -- @param dir Direction of the light
 function light_methods:setDirection(dir)
 	checktype(self, light_metamethods)
-	checkluatype(dir, vec_meta)
+	checktype(dir, vec_meta)
 	unwrap(self).data.dir = vunwrap(dir) 
 end
 
@@ -242,7 +242,7 @@ end
 -- @param pos The position of the light
 function light_methods:setPos(pos)
 	checktype(self, light_metamethods)
-	checkluatype(pos, vec_meta)
+	checktype(pos, vec_meta)
 	unwrap(self).data.pos = vunwrap(pos) 
 end
 
