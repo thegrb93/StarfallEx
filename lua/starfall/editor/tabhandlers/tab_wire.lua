@@ -2394,13 +2394,6 @@ function PANEL:_OnKeyCodeTyped(code)
 			self:SetCaret(self:wordLeft(self.Caret))
 		elseif code == KEY_RIGHT then
 			self:SetCaret(self:wordRight(self.Caret))
-			--[[ -- old code that scrolls on ctrl-left/right:
-		elseif code == KEY_LEFT then
-			self.Scroll[2] = self.Scroll[2] - 1
-			if self.Scroll[2] < 1 then self.Scroll[2] = 1 end
-		elseif code == KEY_RIGHT then
-			self.Scroll[2] = self.Scroll[2] + 1
-			]]
 		elseif code == KEY_BACKSPACE then
 			if self:HasSelection() then
 				self:SetSelection()
@@ -2451,13 +2444,23 @@ function PANEL:_OnKeyCodeTyped(code)
 			if self:HasSelection() and not shift then
 				self:SetCaret(self.Caret, false)
 			else
-				self:SetCaret(self:MovePosition(self.Caret, -1))
+				local buffer = self:GetArea({ self.Caret, { self.Caret[1], 1 } })
+				local delta = -1
+				if self.Caret[2] % 4 == 1 and #(buffer) > 0 and string_rep(" ", #(buffer)) == buffer then
+					delta = -4
+				end
+				self:SetCaret(self:MovePosition(self.Caret, delta))
 			end
 		elseif code == KEY_RIGHT then
 			if self:HasSelection() and not shift then
 				self:SetCaret(self.Caret, false)
 			else
-				self:SetCaret(self:MovePosition(self.Caret, 1))
+				local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + 4 }, { self.Caret[1], 1 } })
+				local delta = 1
+				if self.Caret[2] % 4 == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + 4 - 1 then
+					delta = 4
+				end
+				self:SetCaret(self:MovePosition(self.Caret, delta))
 			end
 		elseif code == KEY_PAGEUP then
 			self.Caret[1] = self.Caret[1] - math_ceil(self.Size[1] / 2)
