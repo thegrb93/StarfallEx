@@ -35,6 +35,7 @@ local keywords = {
 	["not"] = { [true] = true, [false] = true },
 
 	-- keywords that cannot be followed by a "(":
+	["goto"] = { [true] = true },
 	["true"] = { [true] = true },
 	["false"] = { [true] = true },
 	["do"] = { [true] = true, [false] = true },
@@ -388,6 +389,8 @@ function EDITOR:SyntaxColorLine(row)
 
 		if self:NextPattern("^0[xb][a-fA-F0-9]+") then
 			tokenname = "number"
+		elseif self:NextPattern("^::[^:]*::") then
+    		tokenname = "string"
 		elseif self:NextPattern("^[0-9][0-9.e]*") then
 			tokenname = "number"
 		elseif self:NextPattern("^%:[a-zA-Z][a-zA-Z0-9_]*") then -- Methods
