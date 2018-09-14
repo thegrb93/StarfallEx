@@ -20,7 +20,6 @@ function TabHandler:Cleanup() -- Called when editor is reloaded/removed
 end
 
 function TabHandler:OnThemeChange()
-
 end
 
 local EMPTY_FUNC = function() end
@@ -98,6 +97,10 @@ end
 
 function PANEL:Validate(movecarret) -- Validate request, has to return success,message
 
+end
+
+function PANEL:GetCode()
+	return ""
 end
 --------------
 -- We're done
