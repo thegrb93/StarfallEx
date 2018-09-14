@@ -1283,7 +1283,7 @@ function PANEL:MovePosition(caret, offset)
 		offset = -offset
 
 		while true and row >= 1 do
-			if self.Rows[row][3] then
+			if self.Rows[row] and self.Rows[row][3] then
 				offset = offset - col
 				row = row - 1
 				col = #(self:GetRowText(row)) + 1
