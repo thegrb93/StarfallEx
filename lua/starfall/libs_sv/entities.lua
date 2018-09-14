@@ -122,6 +122,23 @@ function ents_methods:linkComponent (e)
 	end
 end
 
+--- Returns a list of entities linked to a processor
+-- @return A list of components linked to the entity
+function ents_methods:getLinkedComponents()
+	checktype(self, ents_metatable)
+	local ent = unwrap(self)
+	if ent:GetClass() ~= "starfall_processor" then SF.Throw("The target must be a starfall_processor", 2) end
+	
+	local list = {}
+	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+		if v.link == ent then list[#list+1] = wrap(v) end
+	end
+	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+		if v.link == ent then list[#list+1] = wrap(v) end
+	end
+	
+	return list
+end
 
 --- Plays a sound on the entity
 -- @param snd string Sound path
