@@ -2401,6 +2401,20 @@ function PANEL:_OnKeyCodeTyped(code)
 		elseif code == KEY_RIGHT then
 			self.Scroll[2] = self.Scroll[2] + 1
 			]]
+		elseif code == KEY_BACKSPACE then
+			if self:HasSelection() then
+				self:SetSelection()
+			else
+				self:SetCaret(self:SetArea({ self.Caret, self:wordLeft(self.Caret) }))
+				if self.OnTextChanged then self:OnTextChanged() end
+			end
+		elseif code == KEY_DELETE then
+			if self:HasSelection() then
+				self:SetSelection()
+			else
+				self:SetCaret(self:SetArea({ self.Caret, self:wordRight(self.Caret) }))
+				if self.OnTextChanged then self:OnTextChanged() end
+			end
 		elseif code == KEY_HOME then
 			self:SetCaret({ 1, 1 })
 		elseif code == KEY_END then
@@ -2534,6 +2548,7 @@ end
 local wordPatternGroup = "%w@_"
 -- helpers for ctrl-left/right
 function PANEL:wordLeft(caret)
+	caret = self:CopyPosition(caret)
 	local row = self:GetRowText(caret[1])
 	if caret[2] == 1 then
 		if caret[1] == 1 then return caret end
@@ -2546,6 +2561,7 @@ function PANEL:wordLeft(caret)
 end
 
 function PANEL:wordRight(caret)
+	caret = self:CopyPosition(caret)
 	local row = self:GetRowText(caret[1])
 	if caret[2] > #row then
 		if caret[1] == #self.Rows then return caret end
