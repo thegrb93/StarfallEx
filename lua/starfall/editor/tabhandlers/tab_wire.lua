@@ -2484,7 +2484,7 @@ function PANEL:_OnKeyCodeTyped(code)
 			else
 				local buffer = self:GetArea({ { self.Caret[1], self.Caret[2] + 4 }, { self.Caret[1], 1 } })
 				local delta = 1
-				if self.Caret[2] % 4 == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]]) >= self.Caret[2] + 4 - 1 then
+				if self.Caret[2] % 4 == 1 and string_rep(" ", #(buffer)) == buffer and #(self.Rows[self.Caret[1]][1]) >= self.Caret[2] + 4 - 1 then
 					delta = 4
 				end
 				self:SetCaret(self:SetArea({ self.Caret, self:MovePosition(self.Caret, delta) }))
