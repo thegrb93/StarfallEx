@@ -604,14 +604,18 @@ end)
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
 local function printTableX (t, indent, alreadyprinted)
-	for k, v in SF.DefaultEnvironment.pairs(t) do
-		if SF.GetType(v) == "table" and not alreadyprinted[v] then
-			alreadyprinted[v] = true
-			SF.instance.player:ChatPrint(string.rep("\t", indent) .. tostring(k) .. ":")
-			printTableX(v, indent + 1, alreadyprinted)
-		else
-			SF.instance.player:ChatPrint(string.rep("\t", indent) .. tostring(k) .. "\t=\t" .. tostring(v))
+	if next(t) then
+		for k, v in SF.DefaultEnvironment.pairs(t) do
+			if SF.GetType(v) == "table" and not alreadyprinted[v] then
+				alreadyprinted[v] = true
+				SF.instance.player:ChatPrint(string.rep("\t", indent) .. tostring(k) .. ":")
+				printTableX(v, indent + 1, alreadyprinted)
+			else
+				SF.instance.player:ChatPrint(string.rep("\t", indent) .. tostring(k) .. "\t=\t" .. tostring(v))
+			end
 		end
+	else
+		SF.instance.player:ChatPrint(string.rep("\t", indent).."{}")
 	end
 end
 
