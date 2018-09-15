@@ -165,7 +165,7 @@ end)
 
 net.Receive("starfall_report_error", function(len, ply)
 	local chip = net.ReadEntity()
-	if IsValid(chip) and not chip.ErroredPlayers[ply] and chip.owner ~= ply then
+	if chip:IsValid() and not chip.ErroredPlayers[ply] and chip.owner ~= ply then
 		chip.ErroredPlayers[ply] = true
 		SF.AddNotify(chip.owner, "Starfall: ("..chip.mainfile..") errored for player: ("..ply:Nick()..")", "ERROR", 7, "ERROR1")
 		SF.Print(chip.owner, string.sub(net.ReadString(), 1, 2048))
