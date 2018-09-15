@@ -51,6 +51,7 @@ function ENT:Compile()
 	if not ok then return end
 
 	if SERVER then
+		self.ErroredPlayers = {}
 		local clr = self:GetColor()
 		self:SetColor(Color(255, 255, 255, clr.a))
 		self:SetNWInt("State", self.States.Normal)
@@ -121,6 +122,11 @@ function ENT:Error(err)
 		SF.Print(self.owner, traceback)
 	else
 		print(traceback)
+
+		net.Start("starfall_report_error")
+		net.WriteEntity(self)
+		net.WriteString(msg.."\n"..traceback)
+		net.SendToServer()
 	end
 end
 
