@@ -9,11 +9,15 @@ if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	SF.RamCap = CreateConVar("sf_ramcap", 128000, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamSpikeCap = CreateConVar("sf_ramspikecap", 16000, "If a ram spike exceeds this limit (in kB), starfalls will be terminated")
 else
-	SF.cpuQuota = CreateClientConVar("sf_timebuffer_cl", 0.006, true, false, "The max average the CPU time can reach.")
-	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
-	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
+	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
+	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
+	SF.cpuBufferN = CreateConVar("sf_timebuffersize_cl", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	SF.RamCap = CreateConVar("sf_ramcap_cl", 128000, "If ram exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamSpikeCap = CreateConVar("sf_ramspikecap_cl", 16000, "If a ram spike exceeds this limit (in kB), starfalls will be terminated")
 end
 
 SF.Instance = {}
@@ -56,7 +60,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
 	instance.run = SF.softLockProtection:GetBool() and SF.Instance.runWithOps or SF.Instance.runWithoutOps
-	instance.startram = collectgarbage("count")
+
 	if CLIENT and instance.cpuQuota <= 0 then
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
 	end
@@ -333,6 +337,20 @@ end
 
 hook.Add("Think", "SF_Think", function()
 
+	local ram = collectgarbage("count")
+	if SF.Instance.Ram then
+		if ram - SF.Instance.Ram > SF.RamSpikeCap:GetInt() or ram > SF.RamCap:GetInt() then
+			for inst, _ in pairs(SF.allInstances) do
+				inst:Error(SF.MakeError("RAM usage limit exceeded!", 1))
+			end
+		end
+		SF.Instance.Ram = ram
+		SF.Instance.RamAvg = SF.Instance.RamAvg*0.999999 + ram*0.000001
+	else
+		SF.Instance.Ram = ram
+		SF.Instance.RamAvg = ram
+	end
+
 	-- Check and attempt recovery from potential failures
 	if SF.runningOps then
 		SF.runningOps = false
@@ -395,3 +413,4 @@ end
 function SF.Instance:movingCPUAverage()
 	return self.cpu_average + (self.cpu_total - self.cpu_average) * self.cpuQuotaRatio
 end
+
