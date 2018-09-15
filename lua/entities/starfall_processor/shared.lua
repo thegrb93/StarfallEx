@@ -123,10 +123,12 @@ function ENT:Error(err)
 	else
 		print(traceback)
 
-		net.Start("starfall_report_error")
-		net.WriteEntity(self)
-		net.WriteString(msg.."\n"..traceback)
-		net.SendToServer()
+		if self.owner ~= LocalPlayer() then
+			net.Start("starfall_report_error")
+			net.WriteEntity(self)
+			net.WriteString(msg.."\n"..traceback)
+			net.SendToServer()
+		end
 	end
 end
 
