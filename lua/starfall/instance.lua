@@ -339,13 +339,13 @@ hook.Add("Think", "SF_Think", function()
 
 	local ram = collectgarbage("count")
 	if SF.Instance.Ram then
-		if ram - SF.Instance.Ram > SF.RamSpikeCap:GetInt() or ram > SF.RamCap:GetInt() then
+		if ram - SF.Instance.Ram > SF.RamSpikeCap:GetInt() or ram - SF.Instance.RamAvg > SF.RamCap:GetInt() then
 			for inst, _ in pairs(SF.allInstances) do
 				inst:Error(SF.MakeError("RAM usage limit exceeded!", 1))
 			end
 		end
 		SF.Instance.Ram = ram
-		SF.Instance.RamAvg = SF.Instance.RamAvg*0.999999 + ram*0.000001
+		SF.Instance.RamAvg = SF.Instance.RamAvg*0.99999 + ram*0.00001
 	else
 		SF.Instance.Ram = ram
 		SF.Instance.RamAvg = ram
