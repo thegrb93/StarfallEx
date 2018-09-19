@@ -166,18 +166,6 @@ function SF.DefaultEnvironment.quotaAverage ()
 	return SF.instance:movingCPUAverage()
 end
 
---- Gets the current ram usage of the lua environment
--- @return The ram used in bytes
-function SF.DefaultEnvironment.ramUsed()
-	return SF.Instance.Ram
-end
-
---- Gets the moving average of ram usage of the lua environment
--- @return The ram used in bytes
-function SF.DefaultEnvironment.ramAverage()
-	return SF.Instance.RamAvg
-end
-
 --- Gets the starfall version
 -- @return Starfall version
 function SF.DefaultEnvironment.version ()
