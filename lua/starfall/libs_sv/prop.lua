@@ -8,8 +8,6 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Props = {}
-
 -- Register privileges
 SF.Permissions.registerPrivilege("prop.create", "Create prop", "Allows the user to create props")
 
@@ -382,7 +380,7 @@ end
 -- @return Number of props per second the user can spawn
 function props_library.spawnRate ()
 
-	return SF.Props.burst.ratecvar:GetFloat() or 4
+	return plyPropBurstGen.ratecvar:GetFloat()
 
 end
 
