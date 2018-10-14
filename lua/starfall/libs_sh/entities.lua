@@ -478,6 +478,14 @@ function ents_methods:isOnGround()
 	return eunwrap(self):IsOnGround()
 end
 
+--- Returns if the entity is ignited
+-- @shared
+-- @return Boolean if the entity is on fire or not
+function ents_methods:isOnFire()
+	checktype(self, ents_metamethods)
+	return eunwrap(self):IsOnFire()
+end
+
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity
