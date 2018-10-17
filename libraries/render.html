@@ -436,6 +436,11 @@ Looks up a texture by file name.</td>
 Checks if a hud component is connected to the Starfall Chip </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.overrideBlend">overrideBlend</a>( on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha&nbsp;)</td>
+			<td class="summary">
+Enables blend mode control.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.parseMarkup">parseMarkup</a>( str, maxsize&nbsp;)</td>
 			<td class="summary">
 Constructs a markup object for quick styled text drawing.</td>
@@ -1604,6 +1609,31 @@ NOTE: This no longer supports material names. Use texture names instead (Texture
 Checks if a hud component is connected to the Starfall Chip</p>
 	
 	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.overrideBlend"></a><strong>render.overrideBlend</strong>( on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha&nbsp;)</dt>
+<dd>
+	<p>
+Enables blend mode control. Read OpenGL or DirectX docs for more info</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>on</tt> ― Whether to control the blend mode of upcoming rendering</li>
+			<li><tt>srcBlend</tt> ― Number http://wiki.garrysmod.com/page/Enums/BLEND</li>
+			<li><tt>destBlend</tt> ― Number</li>
+			<li><tt>blendFunc</tt> ― Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC</li>
+			<li><tt>srcBlendAlpha</tt> ― Optional Number http://wiki.garrysmod.com/page/Enums/BLEND</li>
+			<li><tt>destBlendAlpha</tt> ― Optional Number</li>
+			<li><tt>blendFuncAlpha</tt> ― Optional Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC</li>
+		</ul>
+	</section>
 	
 	
 	
