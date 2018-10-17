@@ -191,6 +191,7 @@ end)
 SF.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
 		render.SetStencilEnable(false)
+		render.OverrideBlend(false)
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0, 0, 0, 0, false)
 		render.CullMode(MATERIAL_CULLMODE_CCW)
@@ -1226,8 +1227,22 @@ end
 --- Enables or disables Depth Buffer
 -- @param enable true to enable
 function render_library.enableDepth (enable)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	checkluatype (enable, TYPE_BOOL)
 	render.OverrideDepthEnable(enable, enable)
+end
+
+--- Enables blend mode control. Read OpenGL or DirectX docs for more info
+-- @param on Whether to control the blend mode of upcoming rendering
+-- @param srcBlend Number http://wiki.garrysmod.com/page/Enums/BLEND
+-- @param destBlend Number
+-- @param blendFunc Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC
+-- @param srcBlendAlpha Optional Number http://wiki.garrysmod.com/page/Enums/BLEND
+-- @param destBlendAlpha Optional Number
+-- @param blendFuncAlpha Optional Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC
+function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
+	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 end
 
 --- Resets the depth buffer
