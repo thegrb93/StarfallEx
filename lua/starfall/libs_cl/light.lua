@@ -39,7 +39,6 @@ end
 local maxSize = CreateClientConVar( "sf_light_maxsize", "1024", true, false, "Max size lights can be" )
 
 local gSFLights = {}
-local gSFLightsQueue = {}
 local gGmodLights = {}
 local gGmodWireLights = {}
 
@@ -65,11 +64,6 @@ hook.Add("NetworkEntityCreated","SF_TrackLights",function(e)
 			v.slot = getFreeSlot()
 			if v.slot then
 				gSFLights[v.slot] = v
-			else
-				-- Couldn't reallocate, just remove it
-				for k, v in pairs(gSFLightsQueue) do
-					if v == sfLight then table.remove(gSFLightsQueue, k) break end
-				end
 			end
 			gSFLights[index] = nil
 		end
@@ -83,26 +77,17 @@ hook.Add("EntityRemoved","SF_TrackLights",function(e)
 	gGmodWireLights[index] = nil
 end)
 
-local function processLights()
-	local used = 0
+local lastProcess
+local lightsUsed = 0
+local function processLights(curtime)
+	if lastProcess == curtime then return end
+	lastProcess = curtime
+	lightsUsed = 0
 	for k, v in pairs(gGmodLights) do
-		if v:GetOn() then used = used + 1 end
+		if v:GetOn() then lightsUsed = lightsUsed + 1 end
 	end
 	for k, v in pairs(gGmodWireLights) do
-		if v:GetGlow() then used = used + 1 end
-	end
-	local curtime = CurTime()
-	for i=1, #gSFLightsQueue do
-		if used >= 32 then break end
-		local light = gSFLightsQueue[i]
-		if light.on then
-			used = used + 1
-			local dynlight = DynamicLight(light.slot)
-			if dynlight then
-				for k, v in pairs(light.data) do dynlight[k] = v end
-				dynlight.dietime = curtime + light.dietime
-			end
-		end
+		if v:GetGlow() then lightsUsed = lightsUsed + 1 end
 	end
 end
 
@@ -113,32 +98,24 @@ end)
 
 SF.AddHook("deinitialize", function(inst)
 	local lights = inst.data.light.lights
-	local i = 1
-	while i<=#gSFLightsQueue do
-		local light = gSFLightsQueue[i]
-		if lights[light] then
-			table.remove(gSFLightsQueue, i)
-			gSFLights[light.slot] = nil
-		else
-			i = i + 1
-		end
-	end
-	if #gSFLightsQueue == 0 then
-		hook.Remove("Think", "SF_ProcessLights")
+	for light, _ in pairs(lights) do
+		gSFLights[light.slot] = nil
 	end
 end)
 
 --- Creates a dynamic light
-function light_library.create(pos, size, brightness, color, on)
-	local lightCount = #gSFLightsQueue
+-- @param pos The position of the light
+-- @param size The size of the light. Must be lower than sf_light_maxsize
+-- @param brightness The brightness of the light
+-- @param color The color of the light
+function light_library.create(pos, size, brightness, color)
+	if table.Count(SF.instance.data.light.lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
-	if lightCount >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	checkpermission(SF.instance, nil, "light.create")
 	checktype(pos, vec_meta)
 	checkluatype(size, TYPE_NUMBER)
 	checkluatype(brightness, TYPE_NUMBER)
 	checktype(color, col_meta)
-	checkluatype(on, TYPE_BOOL)
 	local slot = getFreeSlot()
 	if not slot then SF.Throw("Failed to allocate slot for the light", 2) end
 
@@ -152,18 +129,29 @@ function light_library.create(pos, size, brightness, color, on)
 
 	SF.instance.data.light.lights[light] = true
 	gSFLights[slot] = light
-	gSFLightsQueue[lightCount + 1] = light
-	if lightCount == 0 then hook.Add("Think", "SF_ProcessLights", processLights) end
 
 	return wrap(light)
 end
 
---- Sets the light to be on or not
--- @param on Whether the light is on or not
-function light_methods:setOn(on)
+--- Draws the light. Typically used in the think hook. Will throw an error if it fails (use pcall)
+function light_methods:draw()
 	checktype(self, light_metamethods)
-	checkluatype(on, TYPE_BOOL)
-	unwrap(self).on = on
+	local curtime = CurTime()
+	processLights(curtime)
+	if lightsUsed >= 32 then SF.Throw("Max number of dynamiclights reached", 2) end
+	lightsUsed = lightsUsed + 1
+	
+	local light = unwrap(self)
+	if not light.slot then
+		light.slot = getFreeSlot()
+		if not light.slot then SF.Throw("Failed to allocate slot for the light", 2) end
+	end
+
+	local dynlight = DynamicLight(light.slot)
+	if dynlight then
+		for k, v in pairs(light.data) do dynlight[k] = v end
+		dynlight.dietime = curtime + light.dietime
+	end
 end
 
 --- Sets the light brightness
