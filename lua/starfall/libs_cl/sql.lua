@@ -12,32 +12,17 @@ local checkpermission = SF.Permissions.check
 
 local sql_library = SF.RegisterLibrary("sql")
 
---Runs the appropriate callback for query errors
-local function runCallback(instance, callback)
-	return function(...)
-		if callback then
-			instance:runFunction(callback, ...)
-		end
-	end
-end
-
 --- Performs a query on the local SQLite database.
 -- @param query The query to execute.
--- @param callbackError The function to be called on query errors, taking the error as an argument.
 -- @return Table, false if there is an error, nil if the query returned no data.
-function sql_library.query( query, callbackError )
+function sql_library.query( query )
 	local instance = SF.instance
 	checkpermission(SF.instance, nil, "sql")
 	checkluatype(query, TYPE_STRING)
-	if callbackError ~= nil then checkluatype(callbackError, TYPE_FUNCTION) end
 
 	local query = sql.Query( query )
 
-	if query == false then
-		local callback = runCallback(instance, callbackError)
-		callback(sql.LastError())
-		return false
-	end
+	if query == false then return false end
 	return query
 end
 
