@@ -196,6 +196,11 @@ Light type</p>
 	<table class="list">
 		
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Light:draw">draw</a>( &nbsp;)</td>
+			<td class="summary">
+Draws the light.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Light:setBrightness">setBrightness</a>( brightness&nbsp;)</td>
 			<td class="summary">
 Sets the light brightness </td>
@@ -241,11 +246,6 @@ Sets whether the light should cast onto models or not </td>
 Sets whether the light should cast onto the world or not </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Light:setOn">setOn</a>( on&nbsp;)</td>
-			<td class="summary">
-Sets the light to be on or not </td>
-		</tr>
-		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Light:setOuterAngle">setOuterAngle</a>( ang&nbsp;)</td>
 			<td class="summary">
 Sets the light outer angle (used with setDirection and setInnerAngle) </td>
@@ -271,6 +271,18 @@ Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Lig
 	<h2><a name="methods_def"></a>Methods definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_cl"></span><a name="Light:draw"></a><strong>Light:draw</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Draws the light. Typically used in the think hook. Will throw an error if it fails (use pcall)</p>
+	
+	
+	
+	
+	
+	
+</dd>
 		
 <dt><span class="realm_cl"></span><a name="Light:setBrightness"></a><strong>Light:setBrightness</strong>( brightness&nbsp;)</dt>
 <dd>
@@ -435,25 +447,6 @@ Sets whether the light should cast onto the world or not</p>
 		<ul>
 			
 			<li><tt>on</tt> ― Whether the light shouldn't cast onto the world</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Light:setOn"></a><strong>Light:setOn</strong>( on&nbsp;)</dt>
-<dd>
-	<p>
-Sets the light to be on or not</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>on</tt> ― Whether the light is on or not</li>
 		</ul>
 	</section>
 	

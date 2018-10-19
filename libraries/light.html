@@ -196,7 +196,7 @@ Light library.</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#light.create">create</a>( pos, size, brightness, color, on&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#light.create">create</a>( pos, size, brightness, color&nbsp;)</td>
 			<td class="summary">
 Creates a dynamic light </td>
 		</tr>
@@ -210,7 +210,7 @@ Creates a dynamic light </td>
 	<dl>
 		
 		
-<dt><span class="realm_cl"></span><a name="light.create"></a><strong>light.create</strong>( pos, size, brightness, color, on&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="light.create"></a><strong>light.create</strong>( pos, size, brightness, color&nbsp;)</dt>
 <dd>
 	<p>
 Creates a dynamic light</p>
@@ -220,11 +220,10 @@ Creates a dynamic light</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>pos</tt></li>
-			<li><tt>size</tt></li>
-			<li><tt>brightness</tt></li>
-			<li><tt>color</tt></li>
-			<li><tt>on</tt></li>
+			<li><tt>pos</tt> ― The position of the light</li>
+			<li><tt>size</tt> ― The size of the light. Must be lower than sf_light_maxsize</li>
+			<li><tt>brightness</tt> ― The brightness of the light</li>
+			<li><tt>color</tt> ― The color of the light</li>
 		</ul>
 	</section>
 	
