@@ -23,7 +23,6 @@ function sql_library.query(query)
 
 	if query == false then
 		SF.Throw("Error running query: " .. sql.LastError(), 2)
-		return false
 	end
 	return query
 end
