@@ -66,9 +66,7 @@ SF.AddHook("deinitialize", function (inst)
 	-- Remove all
 	while p do
 		if IsValid(p) then
-			p:StopEmission() -- Technically should be using
-			-- p:StopEmissionAndDestroyImmediately()
-			-- but https://github.com/Facepunch/garrysmod-issues/issues/2700
+			p:StopEmissionAndDestroyImmediately()
 		end
 		particles[p] = nil
 		p = next(particles)
@@ -157,9 +155,6 @@ function particle_methods:stopEmission()
 
 end
 
---[[
-
-fix it god damn it
 --- Stops emission of the particle and destroys the object.
 function particle_methods:destroy()
 	checktype(self, particle_metamethods)
@@ -170,7 +165,6 @@ function particle_methods:destroy()
 	end
 
 end
---]]
 
 --- Restarts emission of the particle.
 function particle_methods:restart()
