@@ -441,7 +441,9 @@ Sets the hologram linear velocity ";};["suppressEngineLighting"]={["class"]="fun
 Suppress Engine Lighting of a hologram. Disabled by default.";["fname"]="suppressEngineLighting";["name"]="hologram_methods:suppressEngineLighting";["param"]={[1]="suppress";["suppress"]="Boolean to represent if shading should be set or not.";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Suppress Engine Lighting of a hologram.";};};["name"]="Hologram";["summary"]="\
 Hologram type ";["typtbl"]="hologram_methods";};["Light"]={["class"]="class";["client"]=true;["description"]="\
-Light type";["fields"]={};["methods"]={[1]="setBrightness";[10]="setOn";[11]="setOuterAngle";[12]="setPos";[13]="setSize";[14]="setStyle";[2]="setColor";[3]="setDecay";[4]="setDieTime";[5]="setDirection";[6]="setInnerAngle";[7]="setMinLight";[8]="setNoModel";[9]="setNoWorld";["setBrightness"]={["class"]="function";["classlib"]="Light";["description"]="\
+Light type";["fields"]={};["methods"]={[1]="draw";[10]="setNoWorld";[11]="setOuterAngle";[12]="setPos";[13]="setSize";[14]="setStyle";[2]="setBrightness";[3]="setColor";[4]="setDecay";[5]="setDieTime";[6]="setDirection";[7]="setInnerAngle";[8]="setMinLight";[9]="setNoModel";["draw"]={["class"]="function";["classlib"]="Light";["description"]="\
+Draws the light. Typically used in the think hook. Will throw an error if it fails (use pcall)";["fname"]="draw";["name"]="light_methods:draw";["param"]={};["private"]=false;["realm"]="cl";["summary"]="\
+Draws the light.";};["setBrightness"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the light brightness";["fname"]="setBrightness";["name"]="light_methods:setBrightness";["param"]={[1]="brightness";["brightness"]="The light's brightness";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the light brightness ";};["setColor"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the color of the light";["fname"]="setColor";["name"]="light_methods:setColor";["param"]={[1]="color";["color"]="The color of the light";};["private"]=false;["realm"]="cl";["summary"]="\
@@ -459,9 +461,7 @@ Sets the minimum light amount ";};["setNoModel"]={["class"]="function";["classli
 Sets whether the light should cast onto models or not";["fname"]="setNoModel";["name"]="light_methods:setNoModel";["param"]={[1]="on";["on"]="Whether the light shouldn't cast onto the models";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets whether the light should cast onto models or not ";};["setNoWorld"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets whether the light should cast onto the world or not";["fname"]="setNoWorld";["name"]="light_methods:setNoWorld";["param"]={[1]="on";["on"]="Whether the light shouldn't cast onto the world";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets whether the light should cast onto the world or not ";};["setOn"]={["class"]="function";["classlib"]="Light";["description"]="\
-Sets the light to be on or not";["fname"]="setOn";["name"]="light_methods:setOn";["param"]={[1]="on";["on"]="Whether the light is on or not";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets the light to be on or not ";};["setOuterAngle"]={["class"]="function";["classlib"]="Light";["description"]="\
+Sets whether the light should cast onto the world or not ";};["setOuterAngle"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the light outer angle (used with setDirection and setInnerAngle)";["fname"]="setOuterAngle";["name"]="light_methods:setOuterAngle";["param"]={[1]="ang";["ang"]="Number outer angle of the light";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the light outer angle (used with setDirection and setInnerAngle) ";};["setPos"]={["class"]="function";["classlib"]="Light";["description"]="\
 Sets the light position";["fname"]="setPos";["name"]="light_methods:setPos";["param"]={[1]="pos";["pos"]="The position of the light";};["private"]=false;["realm"]="cl";["summary"]="\
@@ -1446,7 +1446,7 @@ Convert table to JSON string";["fname"]="encode";["library"]="json";["name"]="js
 Convert table to JSON string ";};};["libtbl"]="json_library";["name"]="json";["server"]=true;["summary"]="\
 JSON library ";["tables"]={};};["light"]={["class"]="library";["client"]=true;["description"]="\
 Light library.";["fields"]={};["functions"]={[1]="create";["create"]={["class"]="function";["description"]="\
-Creates a dynamic light";["fname"]="create";["library"]="light";["name"]="light_library.create";["param"]={[1]="pos";[2]="size";[3]="brightness";[4]="color";[5]="on";};["private"]=false;["realm"]="cl";["summary"]="\
+Creates a dynamic light";["fname"]="create";["library"]="light";["name"]="light_library.create";["param"]={[1]="pos";[2]="size";[3]="brightness";[4]="color";["brightness"]="The brightness of the light";["color"]="The color of the light";["pos"]="The position of the light";["size"]="The size of the light. Must be lower than sf_light_maxsize";};["private"]=false;["realm"]="cl";["summary"]="\
 Creates a dynamic light ";};};["libtbl"]="light_library";["name"]="light";["summary"]="\
 Light library.";["tables"]={};};["material"]={["class"]="library";["client"]=true;["description"]="\
 `material` library is allows creating material objects which are used for controlling shaders in rendering.";["fields"]={};["functions"]={[1]="create";[2]="createFromImage";[3]="getTexture";[4]="load";["create"]={["class"]="function";["description"]="\
