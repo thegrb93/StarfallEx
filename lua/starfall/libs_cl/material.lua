@@ -525,7 +525,7 @@ end
 --- Loads an online image or base64 data to the specified texture key
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param url The url or base64 data
--- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
+-- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture. Note: The texture will not be copied until 1 second after loading.
 function material_methods:setTextureURL(key, url, cb)
 	checktype(self, material_metamethods)
 	checkkey(key)
