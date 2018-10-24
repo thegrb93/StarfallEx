@@ -108,7 +108,7 @@ Sets the effect's angles";["fname"]="setAngles";["name"]="effect_methods:setAngl
 Sets the effect's angles ";};["setAttachment"]={["class"]="function";["classlib"]="Effect";["description"]="\
 Sets the effect's attachment";["fname"]="setAttachment";["name"]="effect_methods:setAttachment";["param"]={[1]="attachment";["attachment"]="The attachment";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets the effect's attachment ";};["setColor"]={["class"]="function";["classlib"]="Effect";["description"]="\
-Sets the effect's color";["fname"]="setColor";["name"]="effect_methods:setColor";["param"]={[1]="color";["color"]="The color";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the effect's color";["fname"]="setColor";["name"]="effect_methods:setColor";["param"]={[1]="color";["color"]="The color represented by a byte 0-255. wtf?";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets the effect's color ";};["setDamageType"]={["class"]="function";["classlib"]="Effect";["description"]="\
 Sets the effect's damage type";["fname"]="setDamageType";["name"]="effect_methods:setDamageType";["param"]={[1]="dmgtype";["dmgtype"]="The damage type";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets the effect's damage type ";};["setEntIndex"]={["class"]="function";["classlib"]="Effect";["description"]="\
