@@ -37,6 +37,11 @@
 -- @class hook
 -- @client
 
+--- Called before entities are drawn. You can't render anything, but you can edit hologram matrices before they are drawn.
+-- @name hologrammatrix
+-- @class hook
+-- @client
+
 --- Called before opaque entities are drawn. (Only works with HUD) (3D context)
 -- @name predrawopaquerenderables
 -- @class hook
@@ -121,6 +126,10 @@ SF.AddHook("postload", function()
 
 	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
+	end)
+
+	SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
+		return not drawskybox, {}
 	end)
 end)
 
