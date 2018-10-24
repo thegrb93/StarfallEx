@@ -19,15 +19,12 @@ local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, ewrap, eunwrap
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
-	col_meta = SF.Color.Metatable
 	ent_meta = SF.Entities.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap
-	cwrap = SF.Color.Wrap
-	cunwrap = SF.Color.Unwrap
 	ewrap = SF.Entities.Wrap
 	eunwrap = SF.Entities.Unwrap
 end)
@@ -99,7 +96,7 @@ end
 -- @return the effect's color
 function effect_methods:getColor()
 	checktype(self, effect_metamethods)
-	return cwrap(unwrap(self):GetColor())
+	return unwrap(self):GetColor()
 end
 
 --- Returns the effect's damagetype
@@ -210,11 +207,11 @@ function effect_methods:setAttachment(attachment)
 end
 
 --- Sets the effect's color
--- @param color The color
+-- @param color The color represented by a byte 0-255. wtf?
 function effect_methods:setColor(color)
 	checktype(self, effect_metamethods)
-	checktype(color, col_meta)
-	unwrap(self):SetColor(cunwrap(color))
+	checkluatype(color, TYPE_NUMBER)
+	unwrap(self):SetColor(color)
 end
 
 --- Sets the effect's damage type
