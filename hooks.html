@@ -124,6 +124,7 @@
 						<li><span class="realm_sh"></span><a href="hooks.html#StartEntityDriving">StartEntityDriving</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#calcview">calcview</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#hologrammatrix">hologrammatrix</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#hudconnected">hudconnected</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#huddisconnected">huddisconnected</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#input">input</a></li>
@@ -368,6 +369,11 @@ Called when the engine wants to calculate the player's view </td>
 			<td class="name"><span class="realm_cl"></span><a href="#drawhud">drawhud</a>( &nbsp;)</td>
 			<td class="summary">
 Called when a frame is requested to be drawn on hud.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#hologrammatrix">hologrammatrix</a>( &nbsp;)</td>
+			<td class="summary">
+Called before entities are drawn.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#hudconnected">hudconnected</a>( &nbsp;)</td>
@@ -1192,6 +1198,14 @@ Called when the engine wants to calculate the player's view</p>
 	<dd>
 		<p>
 Called when a frame is requested to be drawn on hud. (2D Context)</p>
+		
+		
+		
+	</dd>
+	<dt><a name="hologrammatrix"></a><span class="realm_cl"></span><strong>hologrammatrix</strong>( &nbsp;)</dt>
+	<dd>
+		<p>
+Called before entities are drawn. You can't render anything, but you can edit hologram matrices before they are drawn.</p>
 		
 		
 		
