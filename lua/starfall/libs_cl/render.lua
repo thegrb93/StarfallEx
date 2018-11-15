@@ -147,6 +147,7 @@ local matrix_stack = {}
 local view_matrix_stack = {}
 local renderingView = false
 local renderingViewRt
+local drawViewerInView = false
 local MAX_CLIPPING_PLANES = 4
 local pushedClippingPlanes = 0
 
@@ -1582,7 +1583,7 @@ function render_library.isHUDActive()
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
--- @param view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData
+-- @param view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
@@ -1596,7 +1597,6 @@ function render_library.renderView(tbl)
 	if tbl.fov then checkluatype(tbl.fov, TYPE_NUMBER) end
 	if tbl.zfar then checkluatype(tbl.zfar, TYPE_NUMBER) end
 	if tbl.znear then checkluatype(tbl.znear, TYPE_NUMBER) end
-	if tbl.drawhud then checkluatype(tbl.drawhud, TYPE_BOOL) end
 	if tbl.drawmonitors then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
 	if tbl.drawviewmodel then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
 	
@@ -1641,12 +1641,17 @@ function render_library.renderView(tbl)
 	renderingView = true
 	data.renderingView = true
 
+	drawViewerInView = tbl.drawviewer == true
+
 	local oldRt = render.GetRenderTarget()
 	renderingViewRt = oldRt
 
+	render.PushRenderTarget(oldRt)
+	cam.Start3D() -- Seems to fix some of the issues with render operations leaking into default RT
+
 	render.RenderView({
-		origin = SF.UnwrapObject(tbl.origin),
-		angles = SF.UnwrapObject(tbl.angles),
+		origin = vunwrap(tbl.origin),
+		angles = aunwrap(tbl.angles),
 		aspectratio = tbl.aspectratio,
 		x = tbl.x,
 		y = tbl.y,
@@ -1655,12 +1660,13 @@ function render_library.renderView(tbl)
 		fov = tbl.fov,
 		zfar = tbl.zfar,
 		znear = tbl.znear,
-		drawhud = tbl.drawhud,
+		drawhud = false,
 		drawmonitors = tbl.drawmonitors,
 		drawviewmodel = tbl.drawviewmodel,
 	})
 	
-	render.SetRenderTarget(oldRt)
+	cam.End3D()
+	render.PopRenderTarget()
 
 	matrix_stack = prevData.matrix_stack
 	view_matrix_stack = prevData.view_matrix_stack
@@ -1675,6 +1681,22 @@ function render_library.renderView(tbl)
 	data.renderingView = false
 	data.isRendering = true
 end
+
+hook.Add("ShouldDrawLocalPlayer", "SF_DrawLocalPlayerInRenderView", function()
+	if renderingView and drawViewerInView then
+		cam.Start3D()
+		cam.End3D()
+		return true
+	end
+end)
+
+-- A fix for render view being rendered improperly when using a clipping plane.
+-- PreDrawHalos is used, because PreDrawHUD isn't always called. This results in halos not being affected by clipping planes.
+hook.Add("PreDrawHalos", "SF_DisableRenderViewClipping", function()
+	if renderingView then
+		render.EnableClipping(false)
+	end
+end)
 
 --- Returns whether render.renderView is being executed.
 function render_library.isInRenderView()
@@ -1719,7 +1741,7 @@ function render_library.pushCustomClipPlane(normal, distance)
 	checktype(normal, vector_meta)
 	checkluatype(distance, TYPE_NUMBER)
 	
-	render.PushCustomClipPlane(SF.UnwrapObject(normal), distance)
+	render.PushCustomClipPlane(vunwrap(normal), distance)
 
 	pushedClippingPlanes = pushedClippingPlanes + 1
 end
