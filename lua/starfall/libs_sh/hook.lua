@@ -319,7 +319,16 @@ add("OnEntityCreated", nil, function(instance, ent)
 end)
 add("EntityRemoved")
 add("PropBreak")
-add("EntityFireBullets")
+add("EntityFireBullets", nil, function(instance, ent, data)
+	local wrappedData = setmetatable({}, {
+		__index = function(t, k)
+			return SF.WrapObject(data[k])
+		end,
+		__metatable = ""
+	})
+
+	return true, { SF.WrapObject(ent), wrappedData }
+end)
 
 -- Other
 add("EndEntityDriving")
