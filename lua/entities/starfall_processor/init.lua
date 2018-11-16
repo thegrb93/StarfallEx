@@ -10,6 +10,7 @@ function ENT:Initialize ()
 
 	self:SetNWInt("State", self.States.None)
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
+	self.ErroredPlayers = {}
 end
 
 function ENT:SetCustomModel(model)
