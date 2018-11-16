@@ -387,6 +387,11 @@ Draws a textured rectangle with UV coordinates
 Faster, but uses integer coordinates and will get clipped by user's screen resolution </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.enableClipping">enableClipping</a>( state&nbsp;)</td>
+			<td class="summary">
+Sets the status of the clip renderer, returning previous state.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.enableDepth">enableDepth</a>( enable&nbsp;)</td>
 			<td class="summary">
 Enables or disables Depth Buffer </td>
@@ -437,6 +442,11 @@ Looks up a texture by file name.</td>
 Checks if a hud component is connected to the Starfall Chip </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.isInRenderView">isInRenderView</a>( &nbsp;)</td>
+			<td class="summary">
+Returns whether render.renderView is being executed.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.overrideBlend">overrideBlend</a>( on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha&nbsp;)</td>
 			<td class="summary">
 Enables blend mode control.</td>
@@ -447,6 +457,11 @@ Enables blend mode control.</td>
 Constructs a markup object for quick styled text drawing.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.popCustomClipPlane">popCustomClipPlane</a>( &nbsp;)</td>
+			<td class="summary">
+Removes the current active clipping plane from the clip plane stack.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.popMatrix">popMatrix</a>( &nbsp;)</td>
 			<td class="summary">
 Pops a matrix from the matrix stack.</td>
@@ -455,6 +470,11 @@ Pops a matrix from the matrix stack.</td>
 			<td class="name"><span class="realm_cl"></span><a href="#render.popViewMatrix">popViewMatrix</a>( &nbsp;)</td>
 			<td class="summary">
 Pops a view matrix from the matrix stack.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.pushCustomClipPlane">pushCustomClipPlane</a>( normal, distance&nbsp;)</td>
+			<td class="summary">
+Pushes a new clipping plane of the clip plane stack.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.pushMatrix">pushMatrix</a>( m, world&nbsp;)</td>
@@ -470,6 +490,16 @@ Pushes a perspective matrix onto the view matrix stack.</td>
 			<td class="name"><span class="realm_cl"></span><a href="#render.readPixel">readPixel</a>( x, y&nbsp;)</td>
 			<td class="summary">
 Reads the color of the specified pixel.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.renderView">renderView</a>( tbl, view&nbsp;)</td>
+			<td class="summary">
+Renders the scene with the specified viewData to the current active render target.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.renderViewsLeft">renderViewsLeft</a>( &nbsp;)</td>
+			<td class="summary">
+Returns how many render.renderView calls can be done in the current frame.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.selectRenderTarget">selectRenderTarget</a>( name&nbsp;)</td>
@@ -1403,6 +1433,31 @@ Faster, but uses integer coordinates and will get clipped by user's screen resol
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.enableClipping"></a><strong>render.enableClipping</strong>( state&nbsp;)</dt>
+<dd>
+	<p>
+Sets the status of the clip renderer, returning previous state.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>state</tt> ― New clipping state.</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Previous clipping state.</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.enableDepth"></a><strong>render.enableDepth</strong>( enable&nbsp;)</dt>
 <dd>
 	<p>
@@ -1616,6 +1671,18 @@ Checks if a hud component is connected to the Starfall Chip</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.isInRenderView"></a><strong>render.isInRenderView</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns whether render.renderView is being executed.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.overrideBlend"></a><strong>render.overrideBlend</strong>( on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha&nbsp;)</dt>
 <dd>
 	<p>
@@ -1667,6 +1734,18 @@ Constructs a markup object for quick styled text drawing.</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.popCustomClipPlane"></a><strong>render.popCustomClipPlane</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Removes the current active clipping plane from the clip plane stack.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.popMatrix"></a><strong>render.popMatrix</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1685,6 +1764,26 @@ Pops a matrix from the matrix stack.</p>
 Pops a view matrix from the matrix stack.</p>
 	
 	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.pushCustomClipPlane"></a><strong>render.pushCustomClipPlane</strong>( normal, distance&nbsp;)</dt>
+<dd>
+	<p>
+Pushes a new clipping plane of the clip plane stack.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>normal</tt> ― The normal of the clipping plane.</li>
+			<li><tt>distance</tt> ― The normal of the clipping plane.</li>
+		</ul>
+	</section>
 	
 	
 	
@@ -1752,6 +1851,38 @@ Reads the color of the specified pixel.</p>
 		<p>Color object with ( r, g, b, 255 ) from the specified pixel.</p>
 		
 	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.renderView"></a><strong>render.renderView</strong>( tbl, view&nbsp;)</dt>
+<dd>
+	<p>
+Renders the scene with the specified viewData to the current active render target.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>tbl</tt></li>
+			<li><tt>view</tt> ― The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.renderViewsLeft"></a><strong>render.renderViewsLeft</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns how many render.renderView calls can be done in the current frame.</p>
+	
+	
+	
+	
 	
 	
 </dd>
