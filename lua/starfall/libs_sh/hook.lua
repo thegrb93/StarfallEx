@@ -322,6 +322,16 @@ add("OnEntityCreated", nil, function(instance, ent)
 end)
 add("EntityRemoved")
 add("PropBreak")
+add("EntityFireBullets", nil, function(instance, ent, data)
+	local wrappedData = setmetatable({}, {
+		__index = function(t, k)
+			return SF.WrapObject(data[k])
+		end,
+		__metatable = ""
+	})
+
+	return true, { SF.WrapObject(ent), wrappedData }
+end)
 
 -- Other
 add("EndEntityDriving")
@@ -513,6 +523,13 @@ add("Tick")
 -- @shared
 -- @param ply Player who broke it
 -- @param ent Entity broken
+
+--- Called every time a bullet is fired from an entity
+-- @name EntityFireBullets
+-- @class hook
+-- @shared
+-- @param ent The entity that fired the bullet
+-- @param data The bullet data. See http://wiki.garrysmod.com/page/Structures/Bullet
 
 --- Called when an entity is damaged
 -- @name EntityTakeDamage
