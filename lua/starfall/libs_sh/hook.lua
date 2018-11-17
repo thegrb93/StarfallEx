@@ -9,6 +9,7 @@ local registered_instances = {}
 local gmod_hooks = {}
 local gmod_override_hooks = {}
 local wrapArguments = SF.Sanitize
+local wrapObject = SF.WrapObject
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -22,7 +23,7 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 				for instance, _ in pairs(instances) do
 					local canrun, customargs = customargfunc(instance, ...)
 					if canrun then
-						local tbl = instance:runScriptHookForResult(hookname, wrapArguments(unpack(customargs)))
+						local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
 						if tbl[1] then
 							local sane = customretfunc(instance, tbl, ...)
 							if sane ~= nil then result = sane end
@@ -36,7 +37,7 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 				for instance, _ in pairs(instances) do
 					local canrun, customargs = customargfunc(instance, ...)
 					if canrun then
-						instance:runScriptHook(hookname, wrapArguments(unpack(customargs)))
+						instance:runScriptHook(hookname, unpack(customargs))
 					end
 				end
 			end
@@ -283,12 +284,12 @@ if SERVER then
 	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
 	add("EntityTakeDamage", nil, function(instance, target, dmg)
-		return true, { target, dmg:GetAttacker(),
-			dmg:GetInflictor(),
+		return true, { target, wrapObject(dmg:GetAttacker()),
+			wrapObject(dmg:GetInflictor()),
 			dmg:GetDamage(),
 			dmg:GetDamageType(),
-			dmg:GetDamagePosition(),
-			dmg:GetDamageForce() }
+			wrapObject(dmg:GetDamagePosition()),
+			wrapObject(dmg:GetDamageForce()) }
 	end)
 
 else
@@ -313,7 +314,7 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 -- Entity hooks
 add("OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
-		instance:runScriptHook("onentitycreated", SF.WrapObject(ent))
+		instance:runScriptHook("onentitycreated", wrapObject(ent))
 	end)
 	return false
 end)
