@@ -127,7 +127,11 @@ SF.AddHook("postload", function()
 	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
 	end)
-
+    
+    SF.hookAdd("RenderScene", "renderscene", function(instance)
+        return SF.Permissions.hasAccess(instance, nil, "render.renderscene"), {}
+    end)
+    
 	SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
 		return not drawskybox, {}
 	end)
@@ -136,6 +140,7 @@ end)
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
 SF.Permissions.registerPrivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
+SF.Permissions.registerPrivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -171,6 +176,7 @@ end )
 local renderhooks = {
 	render = true,
 	renderoffscreen = true,
+    renderscene = true,
 	predrawopaquerenderables = true,
 	postdrawopaquerenderables = true,
 	predrawhud = true,
@@ -189,7 +195,8 @@ SF.AddHook("prepare", function (instance, hook)
 		local data = instance.data.render
 		data.isRendering = true
 		data.noStencil = hook=="render"
-		if hook=="renderoffscreen" then
+        data.isScenic = hook=="renderscene" --Whether we rendering scenes
+		if hook=="renderoffscreen" || hook=="renderscene" then
 			data.needRT = true
 			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
 			render.SetViewPort(0, 0, 1024, 1024)
@@ -1602,8 +1609,8 @@ function render_library.renderView(tbl)
 	
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	if data.noStencil then SF.Throw("Can't use render.renderView in render hook.", 2) end
-
+	if !data.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
+    
 	if data.renderingView then
 		SF.Throw("Already rendering a view.", 2)
 	end

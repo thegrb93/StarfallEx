@@ -5,7 +5,7 @@
 -- render.renderView allows to render the world into a render target
 -- Link the chip to a screen to see how it works
 
-setupPermissionRequest({ "render.offscreen", "render.renderView" }, "See an example of render.renderView.", true)
+setupPermissionRequest({ "render.renderscene", "render.renderView" }, "See an example of render.renderView.", true)
 local permissionSatisfied = hasPermission("render.renderView")
 
 local rtName = "mirror_rt"
@@ -17,7 +17,7 @@ mat:setTextureRenderTarget("$basetexture", rtName)
 local scrW, scrH
 local screenEnt
 
-hook.add("renderoffscreen", "render_view", function()
+hook.add("renderscene", "render_view", function()
     if not permissionSatisfied then return end
 
     if not render.isInRenderView() and screenEnt then
