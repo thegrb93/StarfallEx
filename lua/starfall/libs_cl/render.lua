@@ -127,11 +127,11 @@ SF.AddHook("postload", function()
 	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
 	end)
-    
-    SF.hookAdd("RenderScene", "renderscene", function(instance)
-        return SF.Permissions.hasAccess(instance, nil, "render.renderscene"), {}
-    end)
-    
+	
+	SF.hookAdd("RenderScene", "renderscene", function(instance)
+		return SF.Permissions.hasAccess(instance, nil, "render.renderscene"), {}
+	end)
+	
 	SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
 		return not drawskybox, {}
 	end)
@@ -176,7 +176,7 @@ end )
 local renderhooks = {
 	render = true,
 	renderoffscreen = true,
-    renderscene = true,
+	renderscene = true,
 	predrawopaquerenderables = true,
 	postdrawopaquerenderables = true,
 	predrawhud = true,
@@ -195,7 +195,7 @@ SF.AddHook("prepare", function (instance, hook)
 		local data = instance.data.render
 		data.isRendering = true
 		data.noStencil = hook=="render"
-        data.isScenic = hook=="renderscene" --Whether we rendering scenes
+		data.isScenic = hook=="renderscene" --Wether we rendering scenes
 		if hook=="renderoffscreen" || hook=="renderscene" then
 			data.needRT = true
 			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
@@ -1610,7 +1610,7 @@ function render_library.renderView(tbl)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if !data.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
-    
+	
 	if data.renderingView then
 		SF.Throw("Already rendering a view.", 2)
 	end
