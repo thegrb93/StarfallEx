@@ -610,7 +610,7 @@ end
 -- not available objects will be replaced with nil, so as to prevent
 -- any possiblitiy of leakage. Functions will always be replaced with
 -- nil as there is no way to verify that they are safe.
-function SF.Sanitize(...)
+function SF.Sanitize(original)
 	local completed_tables = {}
 
 	local function RecursiveSanitize(tbl)
@@ -630,12 +630,12 @@ function SF.Sanitize(...)
 		return return_list
 	end
 
-	return unpack(RecursiveSanitize({...}))
+	return RecursiveSanitize(original)
 end
 
 --- Takes output from starfall and does it's best to make the output
 -- fully usable outside of starfall environment
-function SF.Unsanitize(...)
+function SF.Unsanitize(original)
 	local completed_tables = {}
 
 	local function RecursiveUnsanitize(tbl)
@@ -653,7 +653,7 @@ function SF.Unsanitize(...)
 		return return_list
 	end
 
-	return unpack(RecursiveUnsanitize({...}))
+	return RecursiveUnsanitize(original)
 end
 
 -- ------------------------------------------------------------------------- --

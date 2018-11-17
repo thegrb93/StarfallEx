@@ -22,18 +22,6 @@ function game_lib.isLan ()
 	return GetConVar("sv_lan"):GetBool()
 end
 
---- Returns the gamemode as a String
-function game_lib.getGamemode ()
-	local rtn = {}
-	local t = gmod.GetGamemode()
-	for k, v in pairs(t) do
-		if type(v) ~= "function" and type(v) ~= "table" then
-			rtn[k:gsub("^%u", string.lower)] = v
-		end
-	end
-	return SF.Sanitize(rtn)
-end
-
 --- Returns whether or not the current game is single player
 function game_lib.isSinglePlayer ()
 	return game.SinglePlayer()

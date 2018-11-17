@@ -22,5 +22,5 @@ end
 -- See <a href="http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettings">PhysEnvPerformance Settings Table Structure</a> for table structure.
 -- @return table Performance Settings Table.
 function physenv_lib.getPerformanceSettings ()
-	return SF.Sanitize(table.Copy(physenv.GetPerformanceSettings()))
+	return SF.Sanitize(physenv.GetPerformanceSettings())
 end

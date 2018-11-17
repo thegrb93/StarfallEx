@@ -45,9 +45,10 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 	else
 		if customretfunc then
 			return function(...)
+				local args = wrapArguments({...})
 				local result
 				for instance, _ in pairs(instances) do
-					local tbl = instance:runScriptHookForResult(hookname, wrapArguments(...))
+					local tbl = instance:runScriptHookForResult(hookname, unpack(args))
 					if tbl[1] then
 						local sane = customretfunc(instance, tbl, ...)
 						if sane ~= nil then result = sane end
@@ -57,8 +58,9 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 			end
 		else
 			return function(...)
+				local args = wrapArguments({...})
 				for instance, _ in pairs(instances) do
-					instance:runScriptHook(hookname, wrapArguments(...))
+					instance:runScriptHook(hookname, unpack(args))
 				end
 			end
 		end
