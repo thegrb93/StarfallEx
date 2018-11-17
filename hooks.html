@@ -89,6 +89,7 @@
 					<ul>
 						
 						<li><span class="realm_sh"></span><a href="hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="hooks.html#EntityFireBullets">EntityFireBullets</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#EntityRemoved">EntityRemoved</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#FinishChat">FinishChat</a></li>
@@ -194,6 +195,11 @@
 			<td class="name"><span class="realm_sh"></span><a href="#EndEntityDriving">EndEntityDriving</a>( ent, ply&nbsp;)</td>
 			<td class="summary">
 Called when a player stops driving an entity </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#EntityFireBullets">EntityFireBullets</a>( ent, data&nbsp;)</td>
+			<td class="summary">
+Called every time a bullet is fired from an entity </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#EntityRemoved">EntityRemoved</a>( ent&nbsp;)</td>
@@ -498,6 +504,26 @@ Called when a player stops driving an entity</p>
 				</li>
 				<li>
 					<tt>ply</tt> ― Player that drove the entity
+				</li>
+			</ul>
+		</section>
+		
+		
+	</dd>
+	<dt><a name="EntityFireBullets"></a><span class="realm_sh"></span><strong>EntityFireBullets</strong>( ent, data&nbsp;)</dt>
+	<dd>
+		<p>
+Called every time a bullet is fired from an entity</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ent</tt> ― The entity that fired the bullet
+				</li>
+				<li>
+					<tt>data</tt> ― The bullet data. See http://wiki.garrysmod.com/page/Structures/Bullet
 				</li>
 			</ul>
 		</section>
