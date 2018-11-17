@@ -173,42 +173,50 @@ cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
 	rt_bank.max = cv_max_rendertargets:GetInt()
 end )
 
-local renderhooks = {
-	render = true,
-	renderoffscreen = true,
-	renderscene = true,
-	predrawopaquerenderables = true,
-	postdrawopaquerenderables = true,
-	predrawhud = true,
-	drawhud = true,
-	postdrawhud = true,
-}
+local function prepareRender(data)
+	currentcolor = COLOR_WHITE
+	render.SetColorMaterial()
+	draw.NoTexture()
+	surface.SetDrawColor(255, 255, 255, 255)
+	data.isRendering = true
+	data.noStencil = true
+	data.isScenic = false
+	data.needRT = false
+end
 
 local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
-SF.AddHook("prepare", function (instance, hook)
-	if renderhooks[hook] then
-		currentcolor = COLOR_WHITE
-		render.SetColorMaterial()
-		draw.NoTexture()
-		surface.SetDrawColor(255, 255, 255, 255)
+local function prepareRenderOffscreen(data)
+	prepareRender(data)
+	data.noStencil = false
+	data.needRT = true
+	data.oldViewPort = { 0, 0, ScrW(), ScrH() }
+	render.SetViewPort(0, 0, 1024, 1024)
+	cam.Start2D()
+	view_matrix_stack[#view_matrix_stack + 1] = "End2D"
+	render.SetStencilEnable(false)
+	render.SetRenderTarget(dummyrt)
+	data.usingRT = true
+end
 
-		local data = instance.data.render
-		data.isRendering = true
-		data.noStencil = hook=="render"
-		data.isScenic = hook=="renderscene" --Wether we rendering scenes
-		if hook=="renderoffscreen" || hook=="renderscene" then
-			data.needRT = true
-			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
-			render.SetViewPort(0, 0, 1024, 1024)
-			cam.Start2D()
-			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
-			render.SetStencilEnable(false)
-			render.SetRenderTarget(dummyrt)
-			data.usingRT = true
-		else
-			data.needRT = false
-		end
-	end
+local function prepareRenderScene(data)
+	prepareRenderOffscreen(data)
+	data.isScenic = true
+end
+
+local renderhooks = {
+	render = prepareRender,
+	renderoffscreen = prepareRenderOffscreen,
+	renderscene = prepareRenderScene,
+	predrawopaquerenderables = prepareRender,
+	postdrawopaquerenderables = prepareRender,
+	predrawhud = prepareRender,
+	drawhud = prepareRender,
+	postdrawhud = prepareRender,
+}
+
+SF.AddHook("prepare", function (instance, hook)
+	local renderPrepare = renderhooks[hook]
+	if renderPrepare then renderPrepare(instance.data.render) end
 end)
 
 SF.AddHook("cleanup", function (instance, hook)
