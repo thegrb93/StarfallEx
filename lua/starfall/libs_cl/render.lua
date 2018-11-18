@@ -179,7 +179,7 @@ local function prepareRender(data)
 	draw.NoTexture()
 	surface.SetDrawColor(255, 255, 255, 255)
 	data.isRendering = true
-	data.noStencil = true
+	data.noStencil = false
 	data.isScenic = false
 	data.needRT = false
 end
@@ -203,8 +203,13 @@ local function prepareRenderScene(data)
 	data.isScenic = true
 end
 
+local function prepareScreen(data)
+	prepareRender(data)
+	data.noStencil = true
+end
+
 local renderhooks = {
-	render = prepareRender,
+	render = prepareScreen,
 	renderoffscreen = prepareRenderOffscreen,
 	renderscene = prepareRenderScene,
 	predrawopaquerenderables = prepareRender,
