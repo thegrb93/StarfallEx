@@ -650,14 +650,14 @@ if SERVER then
 	function SF.DefaultEnvironment.setUserdata(str)
 		checkluatype (str, TYPE_STRING)
 		if #str>1048576 then SF.Throw("The userdata limit is 1MiB", 2) end
-		SF.instance.data.userdata = str
+		SF.instance.data.entity.starfalluserdata = str
 	end
 
 	--- Gets the chip's userdata that the duplicator tool loads
 	-- @server
 	-- @return String data
 	function SF.DefaultEnvironment.getUserdata()
-		return SF.instance.data.userdata or ""
+		return SF.instance.data.entity.starfalluserdata or ""
 	end
 else
 	--- Sets the chip's display name

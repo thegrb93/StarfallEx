@@ -44,8 +44,6 @@ function ENT:Compile()
 			self:Error(...)
 		end
 	end
-	instance.data.userdata = self.starfalluserdata
-	self.starfalluserdata = nil
 
 	local ok, msg, traceback = instance:initialize()
 	if not ok then return end

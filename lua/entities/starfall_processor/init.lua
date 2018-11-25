@@ -100,7 +100,7 @@ function ENT:PreEntityCopy()
 	if self.instance then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode(self.files, self.mainfile)
-		info.starfalluserdata = self.instance.data.userdata
+		info.starfalluserdata = self.starfalluserdata
 		duplicator.StoreEntityModifier(self, "SFDupeInfo", info)
 	end
 end
