@@ -247,17 +247,14 @@ function ents_methods:setSubMaterial(index, material)
 	checktype(self, ents_metamethods)
 	checkluatype(material, TYPE_STRING)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is blacklisted", 2) end
-
+	index = math.Clamp(index, 0, 255)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSubMaterial(index, material)
 	if SERVER then
-		local mod = "SubMaterialOverride_"..index
-		ent.EntityMods = ent.EntityMods or {}
-		ent.EntityMods[mod] = ent.EntityMods[mod] or {}
-		ent.EntityMods[mod] = material
+		duplicator.StoreEntityModifier( ent, "submaterial", {["SubMaterialOverride_"..index] = material} )
 	end
 end
 
