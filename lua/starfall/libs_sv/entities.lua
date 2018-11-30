@@ -695,6 +695,24 @@ function ents_methods:getAllConstrained(constraintype)
 			for k, child in pairs(ent:GetChildren()) do
 				recursive_find(child)
 			end
+			if istable(ent.Inputs) then
+				for k, v in pairs(ent.Inputs) do
+					if isentity(v.Src) and v.Src:IsValid() then
+						recursive_find(v.Src)
+					end
+				end
+			end
+			if istable(ent.Outputs) then
+				for k, v in pairs(ent.Outputs) do
+					if istable(v.Connected) then
+						for k, v in pairs(v.Connected) do
+							if isentity(v.Entity) and v.Entity:IsValid() then
+								recursive_find(v.Entity)
+							end
+						end
+					end
+				end
+			end
 		end
 	end
 	recursive_find(unwrap(self))
