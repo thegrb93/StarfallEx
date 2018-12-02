@@ -286,7 +286,7 @@ if SERVER then
 	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
 	add("EntityTakeDamage", nil, function(instance, target, dmg)
-		return true, { target, wrapObject(dmg:GetAttacker()),
+		return true, { wrapObject(target), wrapObject(dmg:GetAttacker()),
 			wrapObject(dmg:GetInflictor()),
 			dmg:GetDamage(),
 			dmg:GetDamageType(),
