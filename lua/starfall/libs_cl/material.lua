@@ -464,11 +464,12 @@ local function NextInTextureQueue()
 				end
 
 				timer.Simple(0, function()
-					if requestTbl.Callback then requestTbl.Callback(w, h, layout) end
+					if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
 				end)
 
 				timer.Simple(1, function()
 					copyTexture()
+					if requestTbl.CallbackDone then requestTbl.CallbackDone() end
 					table.remove(LoadingTextureQueue, 1)
 					NextInTextureQueue()
 				end)
@@ -525,12 +526,14 @@ end
 --- Loads an online image or base64 data to the specified texture key
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param url The url or base64 data
--- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture. Note: The texture will not be copied until 1 second after loading.
-function material_methods:setTextureURL(key, url, cb)
+-- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
+-- @param done An optional callback called when the image is done loading. Passes the material, url
+function material_methods:setTextureURL(key, url, cb, done)
 	checktype(self, material_metamethods)
 	checkkey(key)
 	checkluatype(url, TYPE_STRING)
 	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
+	if done ~= nil then checkluatype(done, TYPE_FUNCTION) end
 
 	local instance = SF.instance
 	local m = unwrap(self)
@@ -570,6 +573,11 @@ function material_methods:setTextureURL(key, url, cb)
 	if cb then
 		requestTbl.Callback = function(w, h, layout)
 			if w then instance:runFunction(cb, self, url, w, h, layout) else instance:runFunction(cb) end
+		end
+	end
+	if done then
+		requestTbl.CallbackDone = function()
+			instance:runFunction(done, self, url)
 		end
 	end
 
