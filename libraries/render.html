@@ -433,7 +433,7 @@ Returns information about the screen, such as world offsets, dimentions, and rot
 Gets the size of the specified text.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.getTextureID">getTextureID</a>( tx, cb&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getTextureID">getTextureID</a>( tx, cb, done&nbsp;)</td>
 			<td class="summary">
 Looks up a texture by file name.</td>
 		</tr>
@@ -1632,7 +1632,7 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>( tx, cb&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>( tx, cb, done&nbsp;)</dt>
 <dd>
 	<p>
 Looks up a texture by file name. Use with render.setTexture to draw with it. 
@@ -1646,6 +1646,7 @@ NOTE: This no longer supports material names. Use texture names instead (Texture
 			
 			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
 			<li><tt>cb</tt> ― An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
+			<li><tt>done</tt> ― An optional callback called when the image is done loading. Passes the material, url</li>
 		</ul>
 	</section>
 	
