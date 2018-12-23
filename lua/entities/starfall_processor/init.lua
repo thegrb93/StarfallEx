@@ -123,9 +123,17 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 end
 
 local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
-	for k, v in pairs(TimedPasteData[TimedPasteDataCurrent].CreatedEntities) do
+	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
+	local instances = {}
+	for k, v in pairs(entList) do
 		if IsValid(v) and v:GetClass() == "starfall_processor" and v.instance then
-			v.instance:runScriptHook("initialize", true)
+			instances[#instances+1] = v.instance
+		end
+	end
+	if next(instances) then
+		local sanitized = SF.Sanitize(entList)
+		for k, v in pairs(instances) do
+			v:runScriptHook("initialize", true, sanitized)
 		end
 	end
 end
