@@ -232,7 +232,7 @@ Called when an entity is being picked up by a gravity gun </td>
 Called when a player punts with the gravity gun </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Initialize">Initialize</a>( dupe&nbsp;)</td>
+			<td class="name"><span class="realm_sv"></span><a href="#Initialize">Initialize</a>( dupe, entTbl&nbsp;)</td>
 			<td class="summary">
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.</td>
 		</tr>
@@ -650,7 +650,7 @@ Called when a player punts with the gravity gun</p>
 		
 		
 	</dd>
-	<dt><a name="Initialize"></a><span class="realm_sv"></span><strong>Initialize</strong>( dupe&nbsp;)</dt>
+	<dt><a name="Initialize"></a><span class="realm_sv"></span><strong>Initialize</strong>( dupe, entTbl&nbsp;)</dt>
 	<dd>
 		<p>
 Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.</p>
@@ -661,6 +661,9 @@ Called after the starfall chip is placed/reloaded with the toolgun or duplicated
 				
 				<li>
 					<tt>dupe</tt> ― True if the duplication that created the chip has finished
+				</li>
+				<li>
+					<tt>entTbl</tt> ― If duped, A table of entities duped with the chip mapped to their previous indices. Otherwise, nil.
 				</li>
 			</ul>
 		</section>
