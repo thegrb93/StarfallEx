@@ -56,7 +56,7 @@ else
 	end
 end
 
-net.Receive("starfall_processor_download", function (len)
+net.Receive("starfall_processor_download", function(len)
 
 	net.ReadStarfall(nil, function(sfdata)
 		if sfdata and sfdata.proc:IsValid() and sfdata.owner:IsValid() then
@@ -74,7 +74,7 @@ net.Receive("starfall_processor_link", function()
 	end
 end)
 
-net.Receive( 'starfall_processor_used', function ( len )
+net.Receive("starfall_processor_used", function(len)
 	local chip = net.ReadEntity()
 	local activator = net.ReadEntity()
 	if not IsValid( chip ) then return end
@@ -83,16 +83,23 @@ net.Receive( 'starfall_processor_used', function ( len )
 	if IsValid( chip ) then
 
 		if not chip.instance then return end
-		chip.instance:runScriptHook( 'starfallused', SF.WrapObject( activator ) )
+		chip.instance:runScriptHook("starfallused", SF.WrapObject( activator ) )
 
 		if activator == LocalPlayer() then
 			if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then
-				local pnl = vgui.Create( 'SFChipPermissions' )
+				local pnl = vgui.Create("SFChipPermissions")
 				if pnl then pnl:OpenForChip( chip ) end
 			end
 		end
 	end
 end )
+
+net.Receive("starfall_processor_destroy", function(len)
+	local proc = net.ReadEntity()
+	if IsValid(proc) then
+		proc:Destroy()
+	end
+end)
 
 hook.Add("NetworkEntityCreated", "starfall_chip_reset", function(ent)
 	-- Entity may not have its lua table yet so the only way is to check its class

@@ -47,15 +47,8 @@ function ENT:Use(activator)
 	end
 end
 
-function ENT:OnRemove ()
-	if not self.instance then return end
-
-	self.instance:runScriptHook("removed")
-	--removed hook can cause instance to become nil
-	if self.instance then
-		self.instance:deinitialize()
-		self.instance = nil
-	end
+function ENT:OnRemove()
+	self:Destroy()
 end
 
 function ENT:GetGateName()
@@ -139,6 +132,7 @@ end
 hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
 
 util.AddNetworkString("starfall_processor_download")
+util.AddNetworkString("starfall_processor_destroy")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_processor_update_links")

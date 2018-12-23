@@ -20,9 +20,7 @@ ENT.States          = {
 
 function ENT:Compile()
 	if self.instance then
-		self.instance:runScriptHook("removed")
-		self.instance:deinitialize()
-		self.instance = nil
+		self:Destroy()
 	end
 
 	self.error = nil
@@ -67,8 +65,24 @@ function ENT:Compile()
 	end
 end
 
+function ENT:Destroy()
+	if self.instance then
+		self.instance:runScriptHook("removed")
+		--removed hook can cause instance to become nil
+		if self.instance then
+			self.instance:deinitialize()
+			self.instance = nil
+		end
+	end
+end
+
 function ENT:SetupFiles(sfdata)
 	local update = self.instance ~= nil
+	if SERVER and update then
+		net.Start("starfall_processor_destroy")
+		net.WriteEntity(self)
+		net.Broadcast()
+	end
 
 	self.owner = sfdata.owner
 	self.files = sfdata.files
