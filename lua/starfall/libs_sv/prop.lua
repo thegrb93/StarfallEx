@@ -16,6 +16,17 @@ local plyCount = SF.EntityTable("playerProps")
 local plyPropBurst = SF.EntityTable("playerPropBurst")
 local plyPropBurstGen = SF.BurstGenObject("props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
 
+local function propOnDestroy(propent, propdata, ply)
+	if plyCount[ply] then
+		plyCount[ply] = plyCount[ply] - 1
+	end
+	if not propdata.props then return end
+	local prop = SF.Entities.Wrap(propent)
+	if propdata.props[prop] then
+		propdata.props[prop] = nil
+	end
+end
+
 SF.AddHook("initialize", function(inst)
 	inst.data.props = {props = {}}
 	plyPropBurst[inst.player] = plyPropBurst[inst.player] or plyPropBurstGen:create()
@@ -23,26 +34,19 @@ SF.AddHook("initialize", function(inst)
 end)
 
 SF.AddHook("deinitialize", function(inst)
-	if inst.data.props.clean ~= false then --Return true on nil too
-		for prop, _ in pairs(inst.data.props.props) do
+	local props = inst.data.props
+	if props.clean ~= false then --Return true on nil too
+		for prop, _ in pairs(props.props) do
 			local propent = SF.Entities.Unwrap(prop)
 			if IsValid(propent) then
+				propent:RemoveCallOnRemove("starfall_prop_delete")
+				propOnDestroy(propent, props, inst.player)
 				propent:Remove()
 			end
 		end
 	end
-
-	inst.data.props.props = nil
+	props.props = nil
 end)
-
-local function propOnDestroy(propent, propdata, ply)
-	plyCount[ply] = plyCount[ply] - 1
-	if not propdata.props then return end
-	local prop = SF.Entities.Wrap(propent)
-	if propdata.props[prop] then
-		propdata.props[prop] = nil
-	end
-end
 
 --- Checks if the users personal limit of props has been exhausted
 -- @class function
