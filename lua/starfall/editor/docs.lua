@@ -1444,7 +1444,7 @@ Joystick library.";["tables"]={};};["json"]={["class"]="library";["client"]=true
 JSON library";["fields"]={};["functions"]={[1]="decode";[2]="encode";["decode"]={["class"]="function";["description"]="\
 Convert JSON string to table";["fname"]="decode";["library"]="json";["name"]="json_library.decode";["param"]={[1]="s";["s"]="String to decode";};["private"]=false;["realm"]="sh";["ret"]="Table representing the JSON object";["summary"]="\
 Convert JSON string to table ";};["encode"]={["class"]="function";["description"]="\
-Convert table to JSON string";["fname"]="encode";["library"]="json";["name"]="json_library.encode";["param"]={[1]="tbl";["tbl"]="Table to encode";};["private"]=false;["realm"]="sh";["ret"]="JSON encoded string representation of the table";["summary"]="\
+Convert table to JSON string";["fname"]="encode";["library"]="json";["name"]="json_library.encode";["param"]={[1]="tbl";[2]="prettyPrint";["prettyPrint"]="Optional. If true, formats and indents the resulting JSON";["tbl"]="Table to encode";};["private"]=false;["realm"]="sh";["ret"]="JSON encoded string representation of the table";["summary"]="\
 Convert table to JSON string ";};};["libtbl"]="json_library";["name"]="json";["server"]=true;["summary"]="\
 JSON library ";["tables"]={};};["light"]={["class"]="library";["client"]=true;["description"]="\
 Light library.";["fields"]={};["functions"]={[1]="create";["create"]={["class"]="function";["description"]="\
