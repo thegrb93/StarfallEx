@@ -64,7 +64,12 @@ else
 		function(instance, target)
 			if isentity(target) and target:IsValid() then
 				if instance.player == target or LocalPlayer()==instance.player or instance.player:IsSuperAdmin() then return true end
-				return target:GetNWEntity("SFPP")==instance.player, "You're not the owner of this prop"
+				local owner = target:GetNWEntity("SFPP")
+				if owner:IsValid() then
+					return owner==instance.player, "You're not the owner of this prop"
+				else
+					return false, "The entity's owner hasn't been transmitted yet or doesn't exist"
+				end
 			else
 				return false, "Entity is invalid"
 			end
