@@ -2318,7 +2318,7 @@ function PANEL:DuplicateLine()
 	else -- If you don't
 		-- Select the current line
 		self.Start = { self.Start[1], 1 }
-		self.Caret = { self.Start[1], #self.Rows[self.Start[1]] + 1 }
+		self.Caret = { self.Start[1], #self.Rows[self.Start[1]][1] + 1 }
 		-- Get the text
 		local str = self:GetSelection()
 		-- Repeat it
