@@ -149,7 +149,7 @@ function vec_methods:getAngle ()
 	return SF.WrapObject(unwrap(self):Angle())
 end
 
---- Returns the Angle between two vectors.
+--- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx (v)
