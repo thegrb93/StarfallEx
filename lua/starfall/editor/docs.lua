@@ -859,8 +859,8 @@ Dot product is the cosine of the angle between both vectors multiplied by their 
 Dot product is the cosine of the angle between both vectors multiplied by their lengths.";};["getAngle"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Get the vector's angle.";["fname"]="getAngle";["name"]="vec_methods:getAngle";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Angle";["summary"]="\
 Get the vector's angle.";};["getAngleEx"]={["class"]="function";["classlib"]="Vector";["description"]="\
-Returns the Angle between two vectors.";["fname"]="getAngleEx";["name"]="vec_methods:getAngleEx";["param"]={[1]="v";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="Angle";["summary"]="\
-Returns the Angle between two vectors.";};["getDistance"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.";["fname"]="getAngleEx";["name"]="vec_methods:getAngleEx";["param"]={[1]="v";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="Angle";["summary"]="\
+Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.";};["getDistance"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Returns the pythagorean distance between the vector and the other vector.";["fname"]="getDistance";["name"]="vec_methods:getDistance";["param"]={[1]="v";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="Number";["summary"]="\
 Returns the pythagorean distance between the vector and the other vector.";};["getDistanceSqr"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an expensive process.";["fname"]="getDistanceSqr";["name"]="vec_methods:getDistanceSqr";["param"]={[1]="v";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="Number";["summary"]="\
