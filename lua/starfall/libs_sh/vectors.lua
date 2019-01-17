@@ -409,9 +409,9 @@ function vec_methods:withinAABox (v1, v2)
 	SF.CheckType(v1, vec_metamethods)
 	SF.CheckType(v2, vec_metamethods)
 
-	if self[1] < v1[1] or self[1] > v2[1] then return false end
-	if self[2] < v1[2] or self[2] > v2[2] then return false end
-	if self[3] < v1[3] or self[3] > v2[3] then return false end
+	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
+	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
+	if self[3] < math.min(v1[3], v2[3]) or self[3] > math.max(v1[3], v2[3]) then return false end
 
 	return true
 end
