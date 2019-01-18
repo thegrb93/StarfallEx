@@ -586,6 +586,34 @@ function EDITOR:SyntaxColorLine(row)
 				end
 				self:NextPattern(".*") -- Rest of comment/directive
 			end
+		elseif self:NextPattern("//") then -- Comments
+			tokenname = "comment"
+			self:NextPattern("[^@]*") -- Skip everything BEFORE @
+			addToken(tokenname, self.tokendata)
+			self.tokendata = "" -- we dont need that anymore as we already added it
+
+			self:NextPattern("[%S]*") -- Find first word
+			if directives[self.tokendata] then --Directive
+				tokenname = "directive"
+			end
+			self:NextPattern(".*") -- Rest of comment/directive
+		elseif self:NextPattern("/%*") then -- C Block Comments
+			self:NextCharacter()
+			while self.character do
+				if self:NextPattern("%*/") then
+					tokenname = "comment"
+					break
+				end
+				if self.character == "\\" then self:NextCharacter() end
+				self:NextCharacter()
+			end
+
+			if tokenname == "" then -- If no ending */ was found...
+				self.blockcomment = 0
+				tokenname = "comment"
+			else
+				self:NextCharacter()
+			end
 		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.]") then
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat

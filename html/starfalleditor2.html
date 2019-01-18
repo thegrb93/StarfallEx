@@ -203,6 +203,10 @@
 								regex : "\\-\\-.*$"
 							},
 							{
+								token : "comment",
+								regex : "//.*$"
+							},
+							{
 								stateName: "bracketedString",
 								onMatch : function(value, currentState, stack){
 									stack.unshift(this.next, value.length, currentState);
