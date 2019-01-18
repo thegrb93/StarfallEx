@@ -6,6 +6,7 @@ ENT.Material = ENT.DefaultMaterial
 
 function ENT:Initialize()
 	self.clips = {}
+	self.scale = Vector(1,1,1)
 
 	net.Start("starfall_hologram_clip")
 		net.WriteUInt(self:EntIndex(), 16)
@@ -133,6 +134,18 @@ function ENT:setupScale()
 			scalematrix:Scale(scale)
 			self:EnableMatrix("RenderMultiply", scalematrix)
 		end
+
+		local propmax = self:OBBMaxs()
+		local propmin = self:OBBMins()
+
+		propmax.x = scale.x * propmax.x
+		propmax.y = scale.y * propmax.y
+		propmax.z = scale.z * propmax.z
+		propmin.x = scale.x * propmin.x
+		propmin.y = scale.y * propmin.y
+		propmin.z = scale.z * propmin.z
+
+		self:SetRenderBounds(propmax, propmin)
 	end
 end
 
