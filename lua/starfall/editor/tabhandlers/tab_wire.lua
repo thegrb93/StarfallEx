@@ -223,12 +223,14 @@ function TabHandler:RegisterSettings()
 		if value == "Custom..." then
 			Derma_StringRequestNoBlur("Enter custom font:", "", "", function(value)
 				RunConsoleCommand("sf_editor_wire_fontname", value)
-				FakeThemeChange()
+				FontSelect:SetFontInternal(SF.Editor.editor:GetFont(value, 16, TabHandler.EnableAntialiasing:GetBool()))
+				timer.Simple(0, FakeThemeChange)
 			end)
 		else
 			value = value:gsub(" %b()", "") -- Remove description
 			RunConsoleCommand("sf_editor_wire_fontname", value)
-			FakeThemeChange()
+			FontSelect:SetFontInternal(SF.Editor.editor:GetFont(value, 16, TabHandler.EnableAntialiasing:GetBool()))
+			timer.Simple(0, FakeThemeChange)
 		end
 	end
 	for k, v in pairs(self.Fonts) do
@@ -244,7 +246,7 @@ function TabHandler:RegisterSettings()
 	FontSizeSelect.OnSelect = function(panel, index, value)
 		value = value:gsub(" %b()", "")
 		RunConsoleCommand("sf_editor_wire_fontsize", value)
-		FakeThemeChange()
+		timer.Simple(0, FakeThemeChange)
 	end
 	for i = 11, 26 do
 		FontSizeSelect:AddChoice(i .. (i == 16 and " (Default)" or ""))
@@ -261,7 +263,7 @@ function TabHandler:RegisterSettings()
 	usePigments:SetTooltip("Enable/disable custom coloring of Color(r,g,b)")
 	usePigments.OnSelect = function(_, val)
 		RunConsoleCommand("sf_editor_wire_pigments", val-1)
-		FakeThemeChange()
+		timer.Simple(0, FakeThemeChange)
 	end
 	local linesHiddenFormat = form:TextEntry( "Format of hidden lines text", "sf_editor_wire_lines_hidden_format" )
 
