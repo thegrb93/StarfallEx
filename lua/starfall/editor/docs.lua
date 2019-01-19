@@ -25,7 +25,9 @@ Set's the angle's yaw and returns it.";};["setZero"]={["class"]="function";["cla
 Sets p,y,r to 0. This is faster than doing it manually.";["fname"]="setZero";["name"]="ang_methods:setZero";["param"]={};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
 Sets p,y,r to 0.";};};["name"]="Angle";["server"]=true;["summary"]="\
 Angle Type ";["typtbl"]="ang_methods";};["Bass"]={["class"]="class";["client"]=true;["description"]="\
-For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.";["fields"]={};["methods"]={[1]="getFFT";[10]="setPitch";[11]="setPos";[12]="setTime";[13]="setVolume";[14]="stop";[2]="getLength";[3]="getTime";[4]="isOnline";[5]="isValid";[6]="pause";[7]="play";[8]="setFade";[9]="setLooping";["getFFT"]={["class"]="function";["classlib"]="Bass";["description"]="\
+For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.";["fields"]={};["methods"]={[1]="destroy";[10]="setLooping";[11]="setPitch";[12]="setPos";[13]="setTime";[14]="setVolume";[15]="soundsLeft";[16]="stop";[2]="getFFT";[3]="getLength";[4]="getTime";[5]="isOnline";[6]="isValid";[7]="pause";[8]="play";[9]="setFade";["destroy"]={["class"]="function";["classlib"]="Bass";["description"]="\
+Removes the sound from the game so new one can be created if limit is reached";["fname"]="destroy";["name"]="bass_methods:destroy";["param"]={};["private"]=false;["realm"]="cl";["summary"]="\
+Removes the sound from the game so new one can be created if limit is reached ";};["getFFT"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Perform fast Fourier transform algorithm to compute the DFT of the sound channel.";["fname"]="getFFT";["name"]="bass_methods:getFFT";["param"]={[1]="n";["n"]="Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.";};["private"]=false;["realm"]="cl";["ret"]="Table containing DFT magnitudes, each between 0 and 1.";["summary"]="\
 Perform fast Fourier transform algorithm to compute the DFT of the sound channel.";};["getLength"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Gets the length of a sound channel.";["fname"]="getLength";["name"]="bass_methods:getLength";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Sound channel length in seconds.";["summary"]="\
@@ -51,7 +53,9 @@ Sets the position of the sound in 3D space.";};["setTime"]={["class"]="function"
 Sets the current playback time of the sound channel.";["fname"]="setTime";["name"]="bass_methods:setTime";["param"]={[1]="time";["time"]="Sound channel playback time in seconds.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the current playback time of the sound channel.";};["setVolume"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Sets the volume of the sound channel.";["fname"]="setVolume";["name"]="bass_methods:setVolume";["param"]={[1]="vol";["vol"]="Volume to set to, between 0 and 1.";};["private"]=false;["realm"]="cl";["summary"]="\
-Sets the volume of the sound channel.";};["stop"]={["class"]="function";["classlib"]="Bass";["description"]="\
+Sets the volume of the sound channel.";};["soundsLeft"]={["class"]="function";["classlib"]="Bass";["description"]="\
+Returns the number of sounds left that can be created";["fname"]="soundsLeft";["name"]="bass_methods.soundsLeft";["param"]={};["private"]=false;["realm"]="cl";["ret"]="The number of sounds left";["summary"]="\
+Returns the number of sounds left that can be created ";};["stop"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Stops playing the sound.";["fname"]="stop";["name"]="bass_methods:stop";["param"]={};["private"]=false;["realm"]="cl";["summary"]="\
 Stops playing the sound.";};};["name"]="Bass";["summary"]="\
 For playing music there is `Bass` type.";["typtbl"]="bass_methods";};["Color"]={["class"]="class";["client"]=true;["description"]="\
@@ -772,7 +776,9 @@ Returns vector pointing right for <this> ";};["up"]={["class"]="function";["clas
 Returns vector pointing up for <this>";["fname"]="up";["name"]="quat_methods:up";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Returns vector pointing up for <this> ";};};["name"]="Quaternion";["summary"]="\
 Quaternion type ";["typtbl"]="quat_methods";};["Sound"]={["class"]="class";["client"]=true;["description"]="\
-Sound type";["fields"]={};["methods"]={[1]="isPlaying";[2]="play";[3]="setPitch";[4]="setSoundLevel";[5]="setVolume";[6]="stop";["isPlaying"]={["class"]="function";["classlib"]="Sound";["description"]="\
+Sound type";["fields"]={};["methods"]={[1]="destroy";[2]="isPlaying";[3]="play";[4]="setPitch";[5]="setSoundLevel";[6]="setVolume";[7]="stop";["destroy"]={["class"]="function";["classlib"]="Sound";["description"]="\
+Removes the sound from the game so new one can be created if limit is reached";["fname"]="destroy";["name"]="sound_methods:destroy";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Removes the sound from the game so new one can be created if limit is reached ";};["isPlaying"]={["class"]="function";["classlib"]="Sound";["description"]="\
 Returns whether the sound is being played.";["fname"]="isPlaying";["name"]="sound_methods:isPlaying";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Returns whether the sound is being played.";};["play"]={["class"]="function";["classlib"]="Sound";["description"]="\
 Starts to play the sound.";["fname"]="play";["name"]="sound_methods:play";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
@@ -1272,7 +1278,7 @@ String library http://wiki.garrysmod.com/page/Category:string";["library"]="buil
 String library http://wiki.garrysmod.com/page/Category:string ";["tname"]="string";};["table"]={["class"]="table";["classForced"]=true;["description"]="\
 Table library. http://wiki.garrysmod.com/page/Category:table";["library"]="builtin";["name"]="SF.DefaultEnvironment.table";["param"]={};["summary"]="\
 Table library.";["tname"]="table";};};};["constraint"]={["class"]="library";["description"]="\
-Library for creating and manipulating constraints.";["fields"]={};["functions"]={[1]="axis";[10]="setElasticLength";[11]="setRopeLength";[12]="slider";[13]="weld";[2]="ballsocket";[3]="ballsocketadv";[4]="breakAll";[5]="breakType";[6]="elastic";[7]="getTable";[8]="nocollide";[9]="rope";["axis"]={["class"]="function";["description"]="\
+Library for creating and manipulating constraints.";["fields"]={};["functions"]={[1]="axis";[10]="rope";[11]="setConstraintClean";[12]="setElasticLength";[13]="setRopeLength";[14]="slider";[15]="weld";[2]="ballsocket";[3]="ballsocketadv";[4]="breakAll";[5]="breakType";[6]="constraintsLeft";[7]="elastic";[8]="getTable";[9]="nocollide";["axis"]={["class"]="function";["description"]="\
 Axis two entities";["fname"]="axis";["library"]="constraint";["name"]="constraint_library.axis";["param"]={[1]="e1";[10]="nocollide";[11]="laxis";[2]="e2";[3]="bone1";[4]="bone2";[5]="v1";[6]="v2";[7]="force_lim";[8]="torque_lim";[9]="friction";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Axis two entities ";};["ballsocket"]={["class"]="function";["description"]="\
 Ballsocket two entities";["fname"]="ballsocket";["library"]="constraint";["name"]="constraint_library.ballsocket";["param"]={[1]="e1";[2]="e2";[3]="bone1";[4]="bone2";[5]="v1";[6]="force_lim";[7]="torque_lim";[8]="nocollide";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
@@ -1282,7 +1288,9 @@ Advanced Ballsocket two entities ";};["breakAll"]={["class"]="function";["descri
 Breaks all constraints on an entity";["fname"]="breakAll";["library"]="constraint";["name"]="constraint_library.breakAll";["param"]={[1]="e";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Breaks all constraints on an entity ";};["breakType"]={["class"]="function";["description"]="\
 Breaks all constraints of a certain type on an entity";["fname"]="breakType";["library"]="constraint";["name"]="constraint_library.breakType";["param"]={[1]="e";[2]="typename";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
-Breaks all constraints of a certain type on an entity ";};["elastic"]={["class"]="function";["description"]="\
+Breaks all constraints of a certain type on an entity ";};["constraintsLeft"]={["class"]="function";["description"]="\
+Checks how many constraints can be spawned";["fname"]="constraintsLeft";["library"]="constraint";["name"]="constraint_library.constraintsLeft";["param"]={};["private"]=false;["realm"]="sv";["ret"]="number of constraints able to be spawned";["server"]=true;["summary"]="\
+Checks how many constraints can be spawned ";};["elastic"]={["class"]="function";["description"]="\
 Elastic two entities";["fname"]="elastic";["library"]="constraint";["name"]="constraint_library.elastic";["param"]={[1]="index";[10]="rdamp";[11]="width";[12]="strech";[2]="e1";[3]="e2";[4]="bone1";[5]="bone2";[6]="v1";[7]="v2";[8]="const";[9]="damp";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Elastic two entities ";};["getTable"]={["class"]="function";["description"]="\
 Returns the table of constraints on an entity";["fname"]="getTable";["library"]="constraint";["name"]="constraint_library.getTable";["param"]={[1]="ent";["ent"]="The entity";};["private"]=false;["realm"]="sv";["ret"]="Table of entity constraints";["summary"]="\
@@ -1290,7 +1298,9 @@ Returns the table of constraints on an entity ";};["nocollide"]={["class"]="func
 Nocollides two entities";["fname"]="nocollide";["library"]="constraint";["name"]="constraint_library.nocollide";["param"]={[1]="e1";[2]="e2";[3]="bone1";[4]="bone2";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Nocollides two entities ";};["rope"]={["class"]="function";["description"]="\
 Ropes two entities";["fname"]="rope";["library"]="constraint";["name"]="constraint_library.rope";["param"]={[1]="index";[10]="force_lim";[11]="width";[12]="material";[13]="rigid";[2]="e1";[3]="e2";[4]="bone1";[5]="bone2";[6]="v1";[7]="v2";[8]="length";[9]="addlength";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
-Ropes two entities ";};["setElasticLength"]={["class"]="function";["description"]="\
+Ropes two entities ";};["setConstraintClean"]={["class"]="function";["description"]="\
+Sets whether the chip should remove created constraints when the chip is removed";["fname"]="setConstraintClean";["library"]="constraint";["name"]="constraint_library.setConstraintClean";["param"]={[1]="on";["on"]="Boolean whether the constraints should be cleaned or not";};["private"]=false;["realm"]="sv";["summary"]="\
+Sets whether the chip should remove created constraints when the chip is removed ";};["setElasticLength"]={["class"]="function";["description"]="\
 Sets the length of an elastic attached to the entity";["fname"]="setElasticLength";["library"]="constraint";["name"]="constraint_library.setElasticLength";["param"]={[1]="index";[2]="e";[3]="length";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Sets the length of an elastic attached to the entity ";};["setRopeLength"]={["class"]="function";["description"]="\
 Sets the length of a rope attached to the entity";["fname"]="setRopeLength";["library"]="constraint";["name"]="constraint_library.setRopeLength";["param"]={[1]="index";[2]="e";[3]="length";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
@@ -1839,11 +1849,13 @@ Sets the texture of a screen entity ";};["traceSurfaceColor"]={["class"]="functi
 Does a trace and returns the color of the textel the trace hits.";["fname"]="traceSurfaceColor";["library"]="render";["name"]="render_library.traceSurfaceColor";["param"]={[1]="vec1";[2]="vec2";["vec1"]="The starting vector";["vec2"]="The ending vector";};["private"]=false;["realm"]="cl";["ret"]="The color vector. use vector:toColor to convert it to a color.";["summary"]="\
 Does a trace and returns the color of the textel the trace hits.";};};["libtbl"]="render_library";["name"]="render";["summary"]="\
 Render library.";["tables"]={};};["sounds"]={["class"]="library";["client"]=true;["description"]="\
-Sounds library.";["fields"]={};["functions"]={[1]="canCreate";[2]="create";["canCreate"]={["class"]="function";["description"]="\
+Sounds library.";["fields"]={};["functions"]={[1]="canCreate";[2]="create";[3]="soundsLeft";["canCreate"]={["class"]="function";["description"]="\
 Returns if a sound is able to be created";["fname"]="canCreate";["library"]="sounds";["name"]="sound_library.canCreate";["param"]={};["private"]=false;["realm"]="sh";["ret"]="If it is possible to make a sound";["summary"]="\
 Returns if a sound is able to be created ";};["create"]={["class"]="function";["description"]="\
 Creates a sound and attaches it to an entity";["fname"]="create";["library"]="sounds";["name"]="sound_library.create";["param"]={[1]="ent";[2]="path";["ent"]="Entity to attach sound to.";["path"]="Filepath to the sound file.";};["private"]=false;["realm"]="sh";["ret"]="Sound Object";["summary"]="\
-Creates a sound and attaches it to an entity ";};};["libtbl"]="sound_library";["name"]="sounds";["server"]=true;["summary"]="\
+Creates a sound and attaches it to an entity ";};["soundsLeft"]={["class"]="function";["description"]="\
+Returns the number of sounds left that can be created";["fname"]="soundsLeft";["library"]="sounds";["name"]="sound_library.soundsLeft";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The number of sounds left";["summary"]="\
+Returns the number of sounds left that can be created ";};};["libtbl"]="sound_library";["name"]="sounds";["server"]=true;["summary"]="\
 Sounds library.";["tables"]={};};["team"]={["class"]="library";["client"]=true;["description"]="\
 Library for retreiving information about teams";["fields"]={};["functions"]={[1]="bestAutoJoinTeam";[10]="getPlayers";[11]="getScore";[2]="exists";[3]="getAllTeams";[4]="getColor";[5]="getJoinable";[6]="getName";[7]="getNumDeaths";[8]="getNumFrags";[9]="getNumPlayers";["bestAutoJoinTeam"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns team with least players";["fname"]="bestAutoJoinTeam";["library"]="team";["name"]="team_library.bestAutoJoinTeam";["param"]={};["realm"]="sh";["ret"]="index of the best team to join";["summary"]="\
