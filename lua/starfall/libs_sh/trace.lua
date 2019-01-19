@@ -285,13 +285,7 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}
 
-	local data = util.TraceLine(trace)
-	return setmetatable({}, {
-		__index = function(t, k)
-			return owrap(data[k])
-		end,
-		__metatable = ""
-	})
+	return SF.StructWrapper(util.TraceLine(trace))
 end
 
 --- Does a swept-AABB trace
@@ -333,13 +327,7 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 		maxs = maxbox
 	}
 
-	local data = util.TraceHull(trace)
-	return setmetatable({}, {
-		__index = function(t, k)
-			return owrap(data[k])
-		end,
-		__metatable = ""
-	})
+	return SF.StructWrapper(util.TraceHull(trace))
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.

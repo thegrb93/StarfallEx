@@ -323,14 +323,7 @@ end)
 add("EntityRemoved")
 add("PropBreak")
 add("EntityFireBullets", nil, function(instance, ent, data)
-	local wrappedData = setmetatable({}, {
-		__index = function(t, k)
-			return SF.WrapObject(data[k])
-		end,
-		__metatable = ""
-	})
-
-	return true, { SF.WrapObject(ent), wrappedData }
+	return true, { SF.WrapObject(ent), SF.StructWrapper(data) }
 end)
 
 -- Other

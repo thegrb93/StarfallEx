@@ -67,9 +67,30 @@ function SF.EntityTable.__call(p, key, destructor)
 	}
 	return setmetatable(t, p)
 end
-
 setmetatable(SF.EntityTable, SF.EntityTable)
 
+--- Returns a class that wraps a structure and caches indexes
+SF.StructWrapper = {
+	__call = function(p, data)
+		local cache = {}
+		return setmetatable({}, {
+			__index = function(t, k)
+				if cache[k] then
+					return cache[k]
+				else
+					local ret = SF.WrapObject(data[k])
+					cache[k] = ret
+					return ret
+				end
+			end,
+			__newindex = function(t, k, v)
+				cache[k] = v
+			end,
+			__metatable = ""
+		})
+	end
+}
+setmetatable(SF.StructWrapper, SF.StructWrapper)
 
 --- Returns a class that can keep track of burst count/rate
 SF.BurstObject = {

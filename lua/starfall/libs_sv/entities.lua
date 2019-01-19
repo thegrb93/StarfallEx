@@ -281,12 +281,7 @@ function ents_methods:addCollisionListener (func)
 
 	local instance = SF.instance
 	ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data)
-		instance:runFunction(func, setmetatable({}, {
-			__index = function(t, k)
-				return SF.WrapObject(data[k])
-			end,
-			__metatable = ""
-		}))
+		instance:runFunction(func, SF.StructWrapper(data))
 	end)
 end
 

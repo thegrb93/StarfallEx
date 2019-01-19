@@ -390,13 +390,7 @@ end
 function player_methods:getEyeTrace ()
 	checkpermission(SF.instance, nil, "trace")
 
-	local data = unwrap(self):GetEyeTrace()
-	return setmetatable({}, {
-		__index = function(t, k)
-			return vwrap(data[k])
-		end,
-		__metatable = ""
-	})
+	return SF.StructWrapper(unwrap(self):GetEyeTrace())
 end
 
 --- Returns the player's current view entity
