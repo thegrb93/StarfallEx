@@ -107,8 +107,8 @@ SF.BurstGenObject = {
 		local ratename = "sf_"..name.."_burstrate"
 		local maxname = "sf_"..name.."_burstmax"
 		local t = {
-			ratecvar = CreateConVar(ratename, tostring(rate*scale), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, ratehelp),
-			maxcvar = CreateConVar(maxname, tostring(max*scale), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, maxhelp),
+			ratecvar = CreateConVar(ratename, tostring(rate), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, ratehelp),
+			maxcvar = CreateConVar(maxname, tostring(max), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, maxhelp),
 			burstobjects = setmetatable({}, {__mode="k"}),
 			scale = scale
 		}
