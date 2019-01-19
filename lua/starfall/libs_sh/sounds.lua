@@ -16,7 +16,6 @@ SF.Sounds.Wrap = wrap
 SF.Sounds.Unwrap = unwrap
 SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
-SF.Sounds.SoundsByEntity = { }
 
 -- Register Privileges
 do
@@ -24,31 +23,44 @@ do
 	P.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
 	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 end
-
+local plyMaxSounds
+if SERVER then
+	plyMaxSounds = CreateConVar("sf_sounds_personalquota", "20", FCVAR_ARCHIVE, "The number of sounds allowed to be playing via Starfall server at once")
+else
+	plyMaxSounds = CreateConVar("sf_sounds_personalquota_cl", "20", FCVAR_ARCHIVE, "The number of sounds allowed to be playing via Starfall client at once")
+end
+local plyCount = SF.EntityTable("playerSounds")
 local plySoundBurst = SF.EntityTable("playerSoundBurst")
 local plySoundBurstGen = SF.BurstGenObject("sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
 
--- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function(inst)
-	inst.data.sounds = {sounds = {}}
-	plySoundBurst[inst.player] = plySoundBurst[inst.player] or plySoundBurstGen:create()
-end)
-
-SF.AddHook("deinitialize", function(inst)
-	local sounds = inst.data.sounds.sounds
-	local s = next(sounds)
-	while s do
-		unwrap(s):Stop()
-		sounds[s] = nil
-		s = next(sounds)
+local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
+	for snd, _ in pairs(t) do
+		snd:Stop()
 	end
 end)
 
--- A workaround for CSoundPatch:Stop() bug
-hook.Add("EntityRemoved", "SF_StopSounds", function(ent)
-	if SF.Sounds.SoundsByEntity[ent] then
-		SF.Sounds.SoundsByEntity[ent]:Stop()
-		SF.Sounds.SoundsByEntity[ent] = nil
+local function soundsLeft(ply)
+	return plyMaxSounds:GetInt()<0 and -1 or (plyMaxSounds:GetInt() - plyCount[ply])
+end
+
+local function deleteSound(ply, ent, sound)
+	sound:Stop()
+	plyCount[ply] = plyCount[ply] - 1
+	if soundsByEntity[ent] then
+		soundsByEntity[ent][sound] = nil
+	end
+end
+
+-- Register functions to be called when the chip is initialised and deinitialised
+SF.AddHook("initialize", function(instance)
+	instance.data.sounds = {sounds = {}}
+	if not plySoundBurst[instance.player] then plySoundBurst[instance.player] = plySoundBurstGen:create() end
+	if not plyCount[instance.player] then plyCount[instance.player] = 0 end
+end)
+
+SF.AddHook("deinitialize", function(instance)
+	for s, ent in pairs(instance.data.sounds.sounds) do
+		deleteSound(instance.player, ent, s)
 	end
 end)
 
@@ -56,9 +68,11 @@ end)
 -- @param ent Entity to attach sound to.
 -- @param path Filepath to the sound file.
 -- @return Sound Object
-function sound_library.create (ent, path)
-	checkpermission(SF.instance, { ent, path }, "sound.create")
-	if not plySoundBurst[SF.instance.player]:use(1) then SF.Throw("Can't create sounds that often", 2) end
+function sound_library.create(ent, path)
+	local instance = SF.instance
+	checkpermission(instance, { ent, path }, "sound.create")
+	if soundsLeft(instance.player)==0 then SF.Throw("Reached the sounds limit: (" .. plyMaxSounds:GetInt() .. ")", 2) end
+	if not plySoundBurst[instance.player]:use(1) then SF.Throw("Can't create sounds that often", 2) end
 
 	checktype(ent, SF.Types["Entity"])
 	checkluatype (path, TYPE_STRING)
@@ -73,40 +87,61 @@ function sound_library.create (ent, path)
 	end
 
 	local soundPatch = CreateSound(e, path)
-	SF.Sounds.SoundsByEntity[e] = soundPatch
+	local snds = soundsByEntity[e]
+	if not snds then snds = {} soundsByEntity[e] = snds end
+	snds[soundPatch] = true
+	instance.data.sounds.sounds[soundPatch] = e
+	plyCount[instance.player] = plyCount[instance.player] + 1
 
-	local s = wrap(soundPatch)
-	
-	local i = SF.instance.data.sounds.sounds
-	i[s] = s
-
-	return i[s]
+	return wrap(soundPatch)
 end
 
 
 --- Returns if a sound is able to be created
 -- @return If it is possible to make a sound
 function sound_library.canCreate()
-	return plySoundBurst[SF.instance.player]:check()>1
+	return soundsLeft(SF.instance.player) ~= 0 and plySoundBurst[SF.instance.player]:check()>1
+end
+
+--- Returns the number of sounds left that can be created
+-- @return The number of sounds left
+function sound_library.soundsLeft()
+	return soundsLeft(SF.instance.player)
 end
 
 --------------------------------------------------
 
 --- Starts to play the sound.
 function sound_methods:play()
-	checkpermission(SF.instance, unwrap(self), "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 	unwrap(self):Play()
 end
 
 --- Stops the sound from being played.
 -- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
 function sound_methods:stop(fade)
-	checkpermission(SF.instance, unwrap(self), "sound.modify")
+	checkpermission(SF.instance, nil, "sound.modify")
 	if fade then
-		checkluatype (fade, TYPE_NUMBER)
+		checkluatype(fade, TYPE_NUMBER)
 		unwrap(self):FadeOut(math.max(fade, 0))
 	else
 		unwrap(self):Stop()
+	end
+end
+
+--- Removes the sound from the game so new one can be created if limit is reached
+function sound_methods:destroy()
+	local snd = unwrap(self)
+	local sounds = SF.instance.data.sounds.sounds
+	if snd and sounds[snd] then
+		deleteSound(SF.instance.player, sounds[snd], snd)
+		sounds[snd] = nil
+		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(sound_metamethods)
+		sensitive2sf[snd] = nil
+		sf2sensitive[self] = nil
+		debug.setmetatable(self, nil)
+	else
+		SF.Throw("Tried to destroy invalid sound", 2)
 	end
 end
 
@@ -114,8 +149,8 @@ end
 -- @param vol Volume to set to, between 0 and 1.
 -- @param fade Time in seconds to transition to this new volume.
 function sound_methods:setVolume(vol, fade)
-	checkpermission(SF.instance, unwrap(self), "sound.modify")
-	checkluatype (vol, TYPE_NUMBER)
+	checkpermission(SF.instance, nil, "sound.modify")
+	checkluatype(vol, TYPE_NUMBER)
 
 	if fade then
 		checkluatype (fade, TYPE_NUMBER)
@@ -131,9 +166,9 @@ end
 --- Sets the pitch of the sound.
 -- @param pitch Pitch to set to, between 0 and 255.
 -- @param fade Time in seconds to transition to this new pitch.
-function sound_methods:setPitch (pitch, fade)
-	checkpermission(SF.instance, unwrap(self), "sound.modify")
-	checkluatype (pitch, TYPE_NUMBER)
+function sound_methods:setPitch(pitch, fade)
+	checkpermission(SF.instance, nil, "sound.modify")
+	checkluatype(pitch, TYPE_NUMBER)
 
 	if fade then
 		checkluatype (fade, TYPE_NUMBER)
@@ -147,14 +182,14 @@ function sound_methods:setPitch (pitch, fade)
 end
 
 --- Returns whether the sound is being played.
-function sound_methods:isPlaying ()
+function sound_methods:isPlaying()
 	return unwrap(self):IsPlaying()
 end
 
 --- Sets the sound level in dB.
 -- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
-function sound_methods:setSoundLevel (level)
-	checkpermission(SF.instance, unwrap(self), "sound.modify")
-	checkluatype (level, TYPE_NUMBER)
+function sound_methods:setSoundLevel(level)
+	checkpermission(SF.instance, nil, "sound.modify")
+	checkluatype(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end

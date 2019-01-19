@@ -36,26 +36,42 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
+-- Returns a class that manages a table of entity keys
+SF.EntityTable = {}
 if SERVER then
-	function SF.EntityTable(key)
-		return setmetatable({},
-		{ __newindex = function(t, e, v)
-			rawset(t, e, v)
-			e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
-		end })
+	function SF.EntityTable.__newindex(t, e, v)
+		rawset(t, e, v)
+		e:CallOnRemove("SF_" .. t.key, function()
+			t[e] = nil
+			if t.destructor then t.destructor(e, v) end
+		end)
 	end
 else
-	function SF.EntityTable(key)
-		return setmetatable({},
-		{ __newindex = function(t, e, v)
-			rawset(t, e, v)
-			e:CallOnRemove("SF_" .. key, function() timer.Simple(0, function() if not e:IsValid() then t[e] = nil end end) end)
-		end })
+	function SF.EntityTable.__newindex(t, e, v)
+		rawset(t, e, v)
+		e:CallOnRemove("SF_" .. t.key, function()
+			timer.Simple(0, function()
+				if not e:IsValid() then
+					t[e] = nil
+					if t.destructor then t.destructor(e, v) end
+				end
+			end)
+		end)
 	end
 end
 
+function SF.EntityTable.__call(p, key, destructor)
+	local t = {
+		key = key,
+		destructor = destructor
+	}
+	return setmetatable(t, p)
+end
 
---- Returns a class that can keep track of burst
+setmetatable(SF.EntityTable, SF.EntityTable)
+
+
+--- Returns a class that can keep track of burst count/rate
 SF.BurstObject = {
 	__index = {
 		use = function(self, amount)
@@ -85,7 +101,7 @@ SF.BurstObject = {
 setmetatable(SF.BurstObject, SF.BurstObject)
 
 
---- Returns a class that can keep track of burst
+--- Returns a class that can manage burst objects
 SF.BurstGenObject = {
 	__index = {
 		create = function(self, amount)
