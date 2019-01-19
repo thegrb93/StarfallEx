@@ -40,7 +40,6 @@ do
 	P.registerPrivilege("entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence", { entities = {} })
 	P.registerPrivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
 	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
-	P.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 end
 
@@ -138,23 +137,6 @@ function ents_methods:getLinkedComponents()
 	end
 	
 	return list
-end
-
---- Plays a sound on the entity
--- @param snd string Sound path
--- @param lvl number soundLevel=75
--- @param pitch pitchPercent=100
--- @param volume volume=1
--- @param channel channel=CHAN_AUTO
-function ents_methods:emitSound (snd, lvl, pitch, volume, channel)
-	checktype(self, ents_metatable)
-	checkluatype(snd, TYPE_STRING)
-
-	local ent = unwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	checkpermission(SF.instance, ent, "entities.emitSound")
-
-	ent:EmitSound(snd, lvl, pitch, volume, channel)
 end
 
 --- Applies damage to an entity

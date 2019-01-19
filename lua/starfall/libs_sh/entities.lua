@@ -18,6 +18,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -190,6 +191,49 @@ if CLIENT then
 			ent:DisableMatrix("RenderMultiply")
 		end
 	end
+end
+
+local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)
+	for snd, _ in pairs(t) do
+		e:StopSound(snd)
+	end
+end)
+
+--- Plays a sound on the entity
+-- @param snd string Sound path
+-- @param lvl number soundLevel=75
+-- @param pitch pitchPercent=100
+-- @param volume volume=1
+-- @param channel channel=CHAN_AUTO
+function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
+	checktype(self, ents_metamethods)
+	checkluatype(snd, TYPE_STRING)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	checkpermission(SF.instance, ent, "entities.emitSound")
+
+	local snds
+	if not soundsByEntity[ent] then snds = {} soundsByEntity[ent] = snds end
+	snds[snd] = true
+	ent:EmitSound(snd, lvl, pitch, volume, channel)
+end
+
+--- Stops a sound on the entity
+-- @param snd string Soundscript path. See http://wiki.garrysmod.com/page/Entity/StopSound
+function ents_methods:stopSound(snd)
+	checktype(self, ents_metamethods)
+	checkluatype(snd, TYPE_STRING)
+
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	checkpermission(SF.instance, ent, "entities.emitSound")
+
+	if soundsByEntity[ent] then
+		soundsByEntity[ent][snd] = nil
+	end
+
+	ent:StopSound(snd)
 end
 
 --- Sets the color of the entity
