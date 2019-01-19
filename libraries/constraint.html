@@ -223,6 +223,11 @@ Breaks all constraints on an entity </td>
 Breaks all constraints of a certain type on an entity </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#constraint.constraintsLeft">constraintsLeft</a>( &nbsp;)</td>
+			<td class="summary">
+Checks how many constraints can be spawned </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#constraint.elastic">elastic</a>( index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech&nbsp;)</td>
 			<td class="summary">
 Elastic two entities </td>
@@ -241,6 +246,11 @@ Nocollides two entities </td>
 			<td class="name"><span class="realm_sv"></span><a href="#constraint.rope">rope</a>( index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid&nbsp;)</td>
 			<td class="summary">
 Ropes two entities </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#constraint.setConstraintClean">setConstraintClean</a>( on&nbsp;)</td>
+			<td class="summary">
+Sets whether the chip should remove created constraints when the chip is removed </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#constraint.setElasticLength">setElasticLength</a>( index, e, length&nbsp;)</td>
@@ -397,6 +407,24 @@ Breaks all constraints of a certain type on an entity</p>
 	
 </dd>
 		
+<dt><span class="realm_sv"></span><a name="constraint.constraintsLeft"></a><strong>constraint.constraintsLeft</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Checks how many constraints can be spawned</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>number of constraints able to be spawned</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sv"></span><a name="constraint.elastic"></a><strong>constraint.elastic</strong>( index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech&nbsp;)</dt>
 <dd>
 	<p>
@@ -497,6 +525,25 @@ Ropes two entities</p>
 			<li><tt>width</tt></li>
 			<li><tt>material</tt></li>
 			<li><tt>rigid</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="constraint.setConstraintClean"></a><strong>constraint.setConstraintClean</strong>( on&nbsp;)</dt>
+<dd>
+	<p>
+Sets whether the chip should remove created constraints when the chip is removed</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>on</tt> ― Boolean whether the constraints should be cleaned or not</li>
 		</ul>
 	</section>
 	

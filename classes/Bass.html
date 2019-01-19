@@ -198,6 +198,11 @@ For playing music there is `Bass` type. You can pause and set current playback t
 	<table class="list">
 		
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:destroy">destroy</a>( &nbsp;)</td>
+			<td class="summary">
+Removes the sound from the game so new one can be created if limit is reached </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Bass:getFFT">getFFT</a>( n&nbsp;)</td>
 			<td class="summary">
 Perform fast Fourier transform algorithm to compute the DFT of the sound channel.</td>
@@ -263,6 +268,11 @@ Sets the current playback time of the sound channel.</td>
 Sets the volume of the sound channel.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Bass:soundsLeft">soundsLeft</a>( &nbsp;)</td>
+			<td class="summary">
+Returns the number of sounds left that can be created </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Bass:stop">stop</a>( &nbsp;)</td>
 			<td class="summary">
 Stops playing the sound.</td>
@@ -273,6 +283,18 @@ Stops playing the sound.</td>
 	<h2><a name="methods_def"></a>Methods definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_cl"></span><a name="Bass:destroy"></a><strong>Bass:destroy</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Removes the sound from the game so new one can be created if limit is reached</p>
+	
+	
+	
+	
+	
+	
+</dd>
 		
 <dt><span class="realm_cl"></span><a name="Bass:getFFT"></a><strong>Bass:getFFT</strong>( n&nbsp;)</dt>
 <dd>
@@ -506,6 +528,24 @@ Sets the volume of the sound channel.</p>
 	</section>
 	
 	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Bass:soundsLeft"></a><strong>Bass:soundsLeft</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the number of sounds left that can be created</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The number of sounds left</p>
+		
+	</section>
 	
 	
 </dd>
