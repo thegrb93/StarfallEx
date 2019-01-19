@@ -228,6 +228,7 @@ function net_library.writeData(t, n)
 	checkluatype (t, TYPE_STRING)
 	checkluatype (n, TYPE_NUMBER)
 
+	n = math.Clamp(n, 0, 64000)
 	write(instance, net.WriteData, n, t, n)
 	return true
 end
@@ -283,6 +284,7 @@ function net_library.writeInt(t, n)
 	checkluatype (t, TYPE_NUMBER)
 	checkluatype (n, TYPE_NUMBER)
 
+	n = math.Clamp(n, 0, 32)
 	write(instance, net.WriteInt, math.ceil(n / 8), t, n)
 	return true
 end
@@ -309,6 +311,7 @@ function net_library.writeUInt(t, n)
 	checkluatype (t, TYPE_NUMBER)
 	checkluatype (n, TYPE_NUMBER)
 
+	n = math.Clamp(n, 0, 32)
 	write(instance, net.WriteUInt, math.ceil(n / 8), t, n)
 	return true
 end
