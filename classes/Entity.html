@@ -233,7 +233,7 @@ Applies torque </td>
 Invokes the entity's breaking animation and removes it.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Entity:emitSound">emitSound</a>( snd, lvl, pitch, volume, channel&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:emitSound">emitSound</a>( snd, lvl, pitch, volume, channel&nbsp;)</td>
 			<td class="summary">
 Plays a sound on the entity </td>
 		</tr>
@@ -738,6 +738,11 @@ Sets a prop_physics to be unbreakable </td>
 Sets the entity's linear velocity </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:stopSound">stopSound</a>( snd&nbsp;)</td>
+			<td class="summary">
+Stops a sound on the entity </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:translateBoneToPhysBone">translateBoneToPhysBone</a>( boneid&nbsp;)</td>
 			<td class="summary">
 Converts a ragdoll bone id to the corresponding physobject id </td>
@@ -898,7 +903,7 @@ Invokes the entity's breaking animation and removes it.</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Entity:emitSound"></a><strong>Entity:emitSound</strong>( snd, lvl, pitch, volume, channel&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="Entity:emitSound"></a><strong>Entity:emitSound</strong>( snd, lvl, pitch, volume, channel&nbsp;)</dt>
 <dd>
 	<p>
 Plays a sound on the entity</p>
@@ -2823,6 +2828,25 @@ Sets the entity's linear velocity</p>
 		<ul>
 			
 			<li><tt>vel</tt> ― New velocity</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Entity:stopSound"></a><strong>Entity:stopSound</strong>( snd&nbsp;)</dt>
+<dd>
+	<p>
+Stops a sound on the entity</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>snd</tt> ― string Soundscript path. See http://wiki.garrysmod.com/page/Entity/StopSound</li>
 		</ul>
 	</section>
 	
