@@ -527,6 +527,17 @@ function ents_methods:isOnFire()
 	return eunwrap(self):IsOnFire()
 end
 
+--- Returns the chip's name of E2s or starfalls
+function ents_methods:getChipName()
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if ent.GetGateName then
+		return ent:GetGateName()
+	else
+		SF.Throw("The entity is not a starfall or e2!", 2)
+	end
+end
+
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity

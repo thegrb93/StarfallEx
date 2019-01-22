@@ -51,10 +51,6 @@ function ENT:OnRemove()
 	self:Destroy()
 end
 
-function ENT:GetGateName()
-	return self.name
-end
-
 function ENT:Think ()
 	if self.instance then
 		local bufferAvg = self.instance.cpu_average

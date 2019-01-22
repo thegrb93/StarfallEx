@@ -107,6 +107,10 @@ function ENT:SetupFiles(sfdata)
 	end
 end
 
+function ENT:GetGateName()
+	return self.name
+end
+
 function ENT:Error(err)
 	self.error = err
 
