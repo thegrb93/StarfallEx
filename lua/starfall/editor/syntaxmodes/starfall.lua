@@ -193,6 +193,7 @@ function EDITOR:ResetTokenizer(row)
 	if p then p = p[2] end
 	self.multilinestring = p and p["multilinestring"] or false
 	self.blockcomment = p and p["blockcomment"] or false
+	self.cblockcomment = p and p["cblockcomment"] or false
 	lasttoken = nil
 end
 
@@ -224,6 +225,14 @@ function EDITOR:SyntaxColorLine(row)
 	if self.blockcomment then -- Closing block comments
 		if self:NextPattern(".-%]"..string.rep('=',self.blockcomment).."%]") then
 			self.blockcomment = nil
+		else
+			self:NextPattern(".*")
+		end
+
+		addToken("comment", self.tokendata)
+	elseif self.cblockcomment then
+		if self:NextPattern("%*/") then
+			self.cblockcomment = nil
 		else
 			self:NextPattern(".*")
 		end
@@ -556,7 +565,6 @@ function EDITOR:SyntaxColorLine(row)
 
 			if self:NextPattern("%[=*%[") then -- Block comment
 				local reps = #self.tokendata:match("%[(=*)%[")
-				self:NextCharacter()
 				while self.character do
 					if self:NextPattern("%]"..string.rep("=",reps).."%]") then
 						tokenname = "comment"
@@ -569,8 +577,6 @@ function EDITOR:SyntaxColorLine(row)
 				if tokenname == "" then -- If no ending ]] was found...
 					self.blockcomment = reps
 					tokenname = "comment"
-				else
-					self:NextCharacter()
 				end
 				--"string"
 			end
@@ -598,7 +604,6 @@ function EDITOR:SyntaxColorLine(row)
 			end
 			self:NextPattern(".*") -- Rest of comment/directive
 		elseif self:NextPattern("/%*") then -- C Block Comments
-			self:NextCharacter()
 			while self.character do
 				if self:NextPattern("%*/") then
 					tokenname = "comment"
@@ -609,10 +614,8 @@ function EDITOR:SyntaxColorLine(row)
 			end
 
 			if tokenname == "" then -- If no ending */ was found...
-				self.blockcomment = 0
+				self.cblockcomment = true
 				tokenname = "comment"
-			else
-				self:NextCharacter()
 			end
 		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.]") then
 			tokenname = "operator"
@@ -633,8 +636,9 @@ function EDITOR:SyntaxColorLine(row)
 	--So other rows can know that one contians unfinished blockcomment, multiline string etc
 	cols.multilinestring = self.multilinestring
 	cols.blockcomment = self.blockcomment
+	cols.cblockcomment = self.cblockcomment
 
-	cols.unfinished = self.multilinestring or self.blockcomment
+	cols.unfinished = self.multilinestring or self.blockcomment or self.cblockcomment
 	return cols
 end
 
