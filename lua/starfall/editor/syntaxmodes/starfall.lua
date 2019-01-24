@@ -193,7 +193,6 @@ function EDITOR:ResetTokenizer(row)
 	if p then p = p[2] end
 	self.multilinestring = p and p["multilinestring"] or false
 	self.blockcomment = p and p["blockcomment"] or false
-	self.cblockcomment = p and p["cblockcomment"] or false
 	lasttoken = nil
 end
 
@@ -223,16 +222,11 @@ function EDITOR:SyntaxColorLine(row)
 	local highlightmode = nil
 
 	if self.blockcomment then -- Closing block comments
-		if self:NextPattern(".-%]"..string.rep('=',self.blockcomment).."%]") then
-			self.blockcomment = nil
-		else
-			self:NextPattern(".*")
-		end
+		-- [0; +inf) for Lua comments, -1 for C comments
+		local blockEnd = (self.blockcomment >= 0) and (".-%]"..string.rep('=',self.blockcomment).."%]") or ("%*/")
 
-		addToken("comment", self.tokendata)
-	elseif self.cblockcomment then
-		if self:NextPattern("%*/") then
-			self.cblockcomment = nil
+		if self:NextPattern(blockEnd) then
+			self.blockcomment = nil
 		else
 			self:NextPattern(".*")
 		end
@@ -562,7 +556,7 @@ function EDITOR:SyntaxColorLine(row)
 				self:NextCharacter()
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
-
+			
 			if self:NextPattern("%[=*%[") then -- Block comment
 				local reps = #self.tokendata:match("%[(=*)%[")
 				while self.character do
@@ -594,14 +588,6 @@ function EDITOR:SyntaxColorLine(row)
 			end
 		elseif self:NextPattern("//") then -- Comments
 			tokenname = "comment"
-			self:NextPattern("[^@]*") -- Skip everything BEFORE @
-			addToken(tokenname, self.tokendata)
-			self.tokendata = "" -- we dont need that anymore as we already added it
-
-			self:NextPattern("[%S]*") -- Find first word
-			if directives[self.tokendata] then --Directive
-				tokenname = "directive"
-			end
 			self:NextPattern(".*") -- Rest of comment/directive
 		elseif self:NextPattern("/%*") then -- C Block Comments
 			while self.character do
@@ -614,7 +600,7 @@ function EDITOR:SyntaxColorLine(row)
 			end
 
 			if tokenname == "" then -- If no ending */ was found...
-				self.cblockcomment = true
+				self.blockcomment = -1
 				tokenname = "comment"
 			end
 		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.]") then
@@ -636,9 +622,8 @@ function EDITOR:SyntaxColorLine(row)
 	--So other rows can know that one contians unfinished blockcomment, multiline string etc
 	cols.multilinestring = self.multilinestring
 	cols.blockcomment = self.blockcomment
-	cols.cblockcomment = self.cblockcomment
 
-	cols.unfinished = self.multilinestring or self.blockcomment or self.cblockcomment
+	cols.unfinished = self.multilinestring or self.blockcomment
 	return cols
 end
 
