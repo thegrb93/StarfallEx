@@ -223,7 +223,7 @@ function EDITOR:SyntaxColorLine(row)
 
 	if self.blockcomment then -- Closing block comments
 		-- [0; +inf) for Lua comments, -1 for C comments
-		local blockEnd = (self.blockcomment >= 0) and (".-%]"..string.rep('=',self.blockcomment).."%]") or ("%*/")
+		local blockEnd = (self.blockcomment >= 0) and (".-%]"..string.rep('=',self.blockcomment).."%]") or (".-%*/")
 
 		if self:NextPattern(blockEnd) then
 			self.blockcomment = nil
