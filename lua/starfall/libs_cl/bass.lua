@@ -139,7 +139,7 @@ function bass_methods:destroy()
 	if snd and sounds[snd] then
 		deleteSound(SF.instance.player, snd)
 		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(sound_metamethods)
+		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(bass_metamethods)
 		sensitive2sf[snd] = nil
 		sf2sensitive[self] = nil
 		debug.setmetatable(self, nil)
