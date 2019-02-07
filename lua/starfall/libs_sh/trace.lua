@@ -348,7 +348,7 @@ function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAng
 	checktype(boxMins, vecmeta)
 	checktype(boxMaxs, vecmeta)
 	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
-	return vwrap(pos), vwrap(normal), fraction
+	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
 --- Does a ray plane intersection returning the position hit or nil if not hit
@@ -362,5 +362,6 @@ function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, pl
 	checktype(rayDelta, vecmeta)
 	checktype(planeOrigin, vecmeta)
 	checktype(planeNormal, vecmeta)
-	return vwrap(util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal)))
+	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
+	if pos then return vwrap(pos) end
 end
