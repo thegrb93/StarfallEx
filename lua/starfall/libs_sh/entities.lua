@@ -213,8 +213,8 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.emitSound")
 
-	local snds
-	if not soundsByEntity[ent] then snds = {} soundsByEntity[ent] = snds end
+	local snds = soundsByEntity[ent]
+	if not snds then snds = {} soundsByEntity[ent] = snds end
 	snds[snd] = true
 	ent:EmitSound(snd, lvl, pitch, volume, channel)
 end
