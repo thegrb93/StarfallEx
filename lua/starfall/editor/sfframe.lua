@@ -4,28 +4,30 @@ https://github.com/wiremod/wire
 File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_editor/sf_editor.lua
 ]]
 
---Part of WireLib
-local function Derma_StringRequestNoBlur(...)
-	local f = math.max
+if not Derma_StringRequestNoBlur then
+	--Part of WireLib
+	function Derma_StringRequestNoBlur(...)
+		local f = math.max
 
-	function math.max(...)
-		local ret = f(...)
+		function math.max(...)
+			local ret = f(...)
 
-		for i = 1,20 do
-			local name, value = debug.getlocal(2, i)
-			if name == "Window" then
-				value:SetBackgroundBlur( false )
-				break
+			for i = 1,20 do
+				local name, value = debug.getlocal(2, i)
+				if name == "Window" then
+					value:SetBackgroundBlur( false )
+					break
+				end
 			end
-		end
 
+			return ret
+		end
+		local ok, ret = xpcall(Derma_StringRequest, debug.traceback, ...)
+		math.max = f
+
+		if not ok then error(ret, 0) end
 		return ret
 	end
-	local ok, ret = xpcall(Derma_StringRequest, debug.traceback, ...)
-	math.max = f
-
-	if not ok then error(ret, 0) end
-	return ret
 end
 
 local function Derma_QueryNoBlur(...)
