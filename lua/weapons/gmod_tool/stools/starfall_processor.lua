@@ -151,7 +151,9 @@ function TOOL:RightClick(trace)
 		local ent = trace.Entity
 
 		if IsValid(ent) and ent:GetClass() == "starfall_processor" then
-			SF.SendStarfall("starfall_openeditorcode", ent, ply)
+			if ent.mainfile then
+				SF.SendStarfall("starfall_openeditorcode", ent, ply)
+			end
 		else
 			net.Start("starfall_openeditor") net.Send(ply)
 		end
