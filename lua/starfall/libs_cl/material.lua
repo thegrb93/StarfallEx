@@ -517,7 +517,7 @@ local function NextInTextureQueue()
 			table.remove(LoadingTextureQueue, 1)
 			NextInTextureQueue()
 		end)
-	else
+	elseif Panel then
 		timer.Remove("SF_URLTextureTimeout")
 		Panel:Hide()
 	end
