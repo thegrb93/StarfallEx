@@ -246,9 +246,13 @@ if SERVER then
 	-- @server
 	-- @param mass The mass to set it to
 	function physobj_methods:setMass(mass)
+		checkluatype(mass, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setMass")
-		phys:SetMass(math.Clamp(mass, 1, 50000))
+		local ent = phys:GetEntity()
+		checkpermission(SF.instance, ent, "entities.setMass")
+		local m = math.Clamp(mass, 1, 50000)
+		phys:SetMass(m)
+		duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
 	end
 
 	--- Sets the inertia of a physics object

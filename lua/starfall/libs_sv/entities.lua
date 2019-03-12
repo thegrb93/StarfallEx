@@ -472,6 +472,7 @@ end
 -- @param mass number mass
 function ents_methods:setMass (mass)
 	checktype(self, ents_metatable)
+	checkluatype(mass, TYPE_NUMBER)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -480,7 +481,9 @@ function ents_methods:setMass (mass)
 
 	checkpermission(SF.instance, ent, "entities.setMass")
 
-	phys:SetMass(math.Clamp(mass, 1, 50000))
+	local m = math.Clamp(mass, 1, 50000)
+	phys:SetMass(m)
+	duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
 end
 
 --- Sets the entity's inertia
