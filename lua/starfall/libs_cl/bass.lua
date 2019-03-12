@@ -130,6 +130,12 @@ function bass_library.loadURL (path, flags, callback)
 	end)
 end
 
+--- Returns the number of sounds left that can be created
+-- @return The number of sounds left
+function bass_library.soundsLeft()
+	return soundsLeft(SF.instance.player)
+end
+
 --------------------------------------------------
 
 --- Removes the sound from the game so new one can be created if limit is reached
@@ -331,11 +337,5 @@ function bass_methods:isValid()
 	local uw = unwrap(self)
 
 	return IsValid(uw)
-end
-
---- Returns the number of sounds left that can be created
--- @return The number of sounds left
-function bass_methods.soundsLeft()
-	return soundsLeft(SF.instance.player)
 end
 
