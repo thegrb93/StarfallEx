@@ -346,10 +346,7 @@ function bass_methods:getLevels()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
-
 	if IsValid(uw) then
-		local leftLevel, rightLevel = uw:GetLevel()
-		return leftLevel, rightLevel
+		return uw:GetLevel()
 	end
 end
