@@ -339,3 +339,17 @@ function bass_methods:isValid()
 	return IsValid(uw)
 end
 
+--- Gets the left and right levels of the audio channel
+-- @return The left sound level, a value between 0 and 1.
+-- @return The right sound level, a value between 0 and 1.
+function bass_methods:getLevels()
+	checktype(self, bass_metamethods)
+	local uw = unwrap(self)
+
+	checkpermission(SF.instance, nil, "sound.modify")
+
+	if IsValid(uw) then
+		local leftLevel, rightLevel = uw:GetLevel()
+		return leftLevel, rightLevel
+	end
+end
