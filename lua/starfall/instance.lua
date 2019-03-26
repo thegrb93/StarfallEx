@@ -124,6 +124,7 @@ function SF.Instance:runWithOps(func, ...)
 		end
 
 		if usedRatio>1 then
+			if SERVER then MsgC(Color(255,0,0),"[Starfall] CPU Quota exceeded by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")\n") end
 			safeThrow("CPU Quota exceeded.", true)
 		elseif usedRatio > self.cpu_softquota then
 			safeThrow("CPU Quota warning.")
