@@ -119,12 +119,17 @@ function SF.Instance:runWithOps(func, ...)
 		local function safeThrow(msg, nocatch)
 			local source = debug.getinfo(3, "S").short_src
 			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
+				if nocatch then
+					if SERVER then
+						SF.Print(nil, "[Starfall] CPU Quota exceeded by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")\n")
+						MsgC(Color(255,0,0), "[Starfall] CPU Quota exceeded by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")\n")
+					end
+				end
 				SF.Throw(msg, 3, nocatch)
 			end
 		end
 
 		if usedRatio>1 then
-			if SERVER then MsgC(Color(255,0,0),"[Starfall] CPU Quota exceeded by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")\n") end
 			safeThrow("CPU Quota exceeded.", true)
 		elseif usedRatio > self.cpu_softquota then
 			safeThrow("CPU Quota warning.")

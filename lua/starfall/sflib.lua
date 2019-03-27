@@ -820,7 +820,7 @@ if SERVER then
 	function SF.Print (ply, msg)
 		net.Start("starfall_console_print")
 			net.WriteString(msg)
-		net.Send(ply)
+		if ply then net.Send(ply) else net.Broadcast() end
 	end
 
 	function SF.ChatPrint(ply, ...)
