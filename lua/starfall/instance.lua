@@ -119,6 +119,14 @@ function SF.Instance:runWithOps(func, ...)
 		local function safeThrow(msg, nocatch)
 			local source = debug.getinfo(3, "S").short_src
 			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
+				if SERVER and nocatch then
+					local consolemsg = "[Starfall] CPU Quota exceeded"
+					if self.player:IsValid() then
+						consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
+					end
+					SF.Print(nil, consolemsg .. "\n")
+					MsgC(Color(255,0,0), consolemsg .. "\n")
+				end
 				SF.Throw(msg, 3, nocatch)
 			end
 		end
