@@ -51,8 +51,6 @@ do
 	local P = SF.Permissions
 	P.registerPrivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
 	P.registerPrivilege("wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs")
-	P.registerPrivilege("wire.output", "Output", "Allows the user to set the value of an output")
-	P.registerPrivilege("wire.input", "Input", "Allows the user to read the value of an input")
 	P.registerPrivilege("wire.wirelink", "Wirelink", "Allows the user to create a wirelink", { entities = {} })
 	P.registerPrivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink")
 	P.registerPrivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
@@ -619,18 +617,21 @@ end
 -- ------------------------- Ports Metatable ------------------------- --
 local wire_ports_methods, wire_ports_metamethods = SF.RegisterType("Ports")
 
-function wire_ports_metamethods:__index (name)
-	checkpermission(SF.instance, nil, "wire.input")
-	checkluatype(name, TYPE_STRING)
+wire_ports_metamethods.cache = {}
+wire_ports_metamethods.cacheval = {}
 
+function wire_ports_metamethods:__index(name)
 	local input = SF.instance.data.entity.Inputs[name]
-	if input and input.Src and input.Src:IsValid() then
-		return inputConverters[input.Type](input.Value)
+	if input then
+		if wire_ports_metamethods.cache[name]==input.Value then return wire_ports_metamethods.cacheval[name] end
+		local ret = inputConverters[input.Type](input.Value)
+		wire_ports_metamethods.cache[name] = input.Value
+		wire_ports_metamethods.cacheval[name] = ret
+		return ret
 	end
 end
 
-function wire_ports_metamethods:__newindex (name, value)
-	checkpermission(SF.instance, nil, "wire.output")
+function wire_ports_metamethods:__newindex(name, value)
 	checkluatype(name, TYPE_STRING)
 
 	local ent = SF.instance.data.entity
