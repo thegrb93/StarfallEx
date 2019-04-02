@@ -217,7 +217,7 @@ if CLIENT then
 	function SF.Editor.BuildIncludesTable(mainfile)
 		if not SF.Editor.editor then SF.Editor.init() end
 		local openfiles = SF.Editor.getOpenFiles()
-		if not (mainfile and openfiles[mainfile]) then
+		if not ((mainfile and openfiles[mainfile]) or file.Exists("starfall/" .. mainfile, "DATA")) then
 			mainfile = SF.Editor.getOpenFile() or "main"
 			if #mainfile == 0 then return false, "Invalid main file" end
 			openfiles[mainfile] = SF.Editor.getCode()
