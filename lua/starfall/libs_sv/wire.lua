@@ -9,6 +9,8 @@ local wire_library = SF.RegisterLibrary("wire")
 
 SF.AddHook("initialize", function(instance)
 	local ent = instance.data.entity
+	instance.data.wirecache = {}
+	instance.data.wirecachevals = {}
 	if ent.Inputs == nil then
 		WireLib.CreateInputs(ent, {})
 	end
@@ -617,16 +619,14 @@ end
 -- ------------------------- Ports Metatable ------------------------- --
 local wire_ports_methods, wire_ports_metamethods = SF.RegisterType("Ports")
 
-wire_ports_metamethods.cache = {}
-wire_ports_metamethods.cacheval = {}
-
 function wire_ports_metamethods:__index(name)
-	local input = SF.instance.data.entity.Inputs[name]
+	local data = SF.instance.data
+	local input = data.entity.Inputs[name]
 	if input then
-		if wire_ports_metamethods.cache[name]==input.Value then return wire_ports_metamethods.cacheval[name] end
+		if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
 		local ret = inputConverters[input.Type](input.Value)
-		wire_ports_metamethods.cache[name] = input.Value
-		wire_ports_metamethods.cacheval[name] = ret
+		data.wirecache[name] = input.Value
+		data.wirecachevals[name] = ret
 		return ret
 	end
 end
