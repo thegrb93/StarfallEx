@@ -116,9 +116,9 @@ function SF.Instance:runWithOps(func, ...)
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 
-		local function safeThrow(msg, nocatch)
+		local function safeThrow(msg, nocatch, force)
 			local source = debug.getinfo(3, "S").short_src
-			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
+			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) or force then
 				if SERVER and nocatch then
 					local consolemsg = "[Starfall] CPU Quota exceeded"
 					if self.player:IsValid() then
@@ -132,7 +132,11 @@ function SF.Instance:runWithOps(func, ...)
 		end
 
 		if usedRatio>1 then
-			safeThrow("CPU Quota exceeded.", true)
+			if usedRatio>1.5 then
+				safeThrow("CPU Quota exceeded.", true, true)
+			else
+				safeThrow("CPU Quota exceeded.", true)
+			end
 		elseif usedRatio > self.cpu_softquota then
 			safeThrow("CPU Quota warning.")
 		end
