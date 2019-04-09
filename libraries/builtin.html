@@ -479,10 +479,9 @@ Gets the starfall version </td>
 Translates the specified position and angle into the specified coordinate system </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#builtin.xpcall">xpcall</a>( func, callback, ..., funcThe, The, arguments&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.xpcall">xpcall</a>( func, callback, ...&nbsp;)</td>
 			<td class="summary">
-Lua's xpcall with SF throw implementation 
-Attempts to call the first function.</td>
+Lua's xpcall with SF throw implementation, and a traceback for debugging.</td>
 		</tr>
 	</table>
 </section>
@@ -1774,24 +1773,21 @@ Translates the specified position and angle into the specified coordinate system
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="builtin.xpcall"></a><strong>builtin.xpcall</strong>( func, callback, ..., funcThe, The, arguments&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="builtin.xpcall"></a><strong>builtin.xpcall</strong>( func, callback, ...&nbsp;)</dt>
 <dd>
 	<p>
-Lua's xpcall with SF throw implementation 
+Lua's xpcall with SF throw implementation, and a traceback for debugging. 
 Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function. 
-If execution fails, this returns false and the second function is called with the error message.</p>
+If execution fails, this returns false and the second function is called with the error message, and the stack trace.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>func</tt></li>
-			<li><tt>callback</tt></li>
-			<li><tt>...</tt></li>
-			<li><tt>funcThe</tt> ― function to call initially.</li>
-			<li><tt>The</tt> ― function to be called if execution of the first fails; the error message is passed as a string.</li>
-			<li><tt>arguments</tt> ― Arguments to pass to the initial function.</li>
+			<li><tt>func</tt> ― The function to call initially.</li>
+			<li><tt>callback</tt> ― The function to be called if execution of the first fails; the error message and stack trace are passed.</li>
+			<li><tt>...</tt> ― Varargs to pass to the initial function.</li>
 		</ul>
 	</section>
 	
@@ -1802,7 +1798,7 @@ If execution fails, this returns false and the second function is called with th
 		<ol>
 			
 			<li>Status of the execution; true for success, false for failure.</li>
-			<li>The returns of the first function if execution succeeded, otherwise the first return value of the error callback.</li>
+			<li>The returns of the first function if execution succeeded, otherwise the return values of the error callback.</li>
 		</ol>
 	</section>
 	
