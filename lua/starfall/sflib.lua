@@ -493,6 +493,7 @@ end
 -- ------------------------------------------------------------------------- --
 
 local object_wrappers = {}
+local object_unwrappers = {}
 local sensitive2sf_tables = {}
 local sf2sensitive_tables = {}
 
@@ -544,10 +545,8 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 
 	if target_metatable ~= nil then
 		object_wrappers[target_metatable] = wrap
-		metatable.__wrap = wrap
+		object_unwrappers[target_metatable] = unwrap
 	end
-
-	metatable.__unwrap = unwrap
 
 	return wrap, unwrap
 end
@@ -557,7 +556,6 @@ end
 -- @param sf_object_meta starfall metatable of object
 -- @param wrapper function that wraps object
 function SF.AddObjectWrapper(object_meta, sf_object_meta, wrapper)
-	sf_object_meta.__wrap = wrapper
 	object_wrappers[object_meta] = wrapper
 end
 
@@ -565,7 +563,7 @@ end
 -- @param object_meta metatable of object
 -- @param unwrapper function that unwraps object
 function SF.AddObjectUnwrapper(object_meta, unwrapper)
-	object_meta.__unwrap = unwrapper
+	object_unwrappers[object_meta] = unwrapper
 end
 
 --- Returns the wrapper table of a specified type
@@ -596,6 +594,12 @@ function SF.WrapObject(object)
 		local wrap = object_wrappers[metatable]
 		if wrap then
 			return wrap(object)
+		else
+			-- If the object is already an SF type
+			local sf2sensitive = sf2sensitive_tables[metatable]
+			if sf2sensitive and sf2sensitive[object] then
+				return object
+			end
 		end
 	end
 	-- Do not elseif here because strings do have a metatable.
@@ -610,9 +614,11 @@ end
 -- @return the unwrapped starfall object
 function SF.UnwrapObject(object)
 	local metatable = dgetmeta(object)
-
-	if metatable and metatable.__unwrap then
-		return metatable.__unwrap(object)
+	if metatable then
+		local unwrap = object_unwrappers[metatable]
+		if unwrap then
+			return unwrap(object)
+		end
 	end
 	if safe_types[TypeID(object)] then
 		return object
