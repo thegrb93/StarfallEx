@@ -74,7 +74,7 @@ if SERVER then
 
 	function SF.SendCachedStarfall(msg, sfdata, recipient)
 		--[[if recipient then
-			if type(recipient)~="table" then recipient = {recipient} end
+			if not istable(recipient) then recipient = {recipient} end
 		else
 			recipient = player.GetAll()
 		end

@@ -259,7 +259,7 @@ function SF.MakeError (msg, level, uncatchable, prependinfo)
 		info = { short_src = "", currentline = 0 }
 		prependinfo = false
 	end
-	if type(msg) ~= "string" then msg = "(error object is not a string)" end
+	if not isstring(msg) then msg = "(error object is not a string)" end
 
 	local traceback = debug.traceback("", level)
 	local lines = {}
@@ -352,8 +352,8 @@ end
 function SF.DeepDeepCopy(src, dst, done)
 	-- Copy the values
 	for k, v in pairs(src) do
-		if type(k)=="table" then error("Tried to shallow copy a table!!") end
-		if type(v)=="table" then
+		if istable(k) then error("Tried to shallow copy a table!!") end
+		if istable(v) then
 			if done[v] then
 				dst[k] = done[v]
 			else
@@ -423,7 +423,7 @@ function SF.CheckType(val, typ, level)
 	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and SF.Types[meta]) then
 		return val
 	else
-		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
+		assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
 		level = (level or 1) + 2
 		SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
 	end
@@ -433,7 +433,7 @@ end
 -- @param val The value to be checked.
 function SF.GetType(val)
 	local mt = dgetmeta(val)
-	return (mt and mt.__metatable and type(mt.__metatable) == "string") and mt.__metatable or type(val)
+	return (mt and mt.__metatable and isstring(mt.__metatable)) and mt.__metatable or type(val)
 end
 
 --- Checks the lua type of val. Errors if the types don't match
@@ -446,7 +446,7 @@ function SF.CheckLuaType(val, typ, level)
 		return val
 	else
 		-- Failed, throw error
-		assert(type(typ) == "number")
+		assert(isnumber(typ))
 		local typeLookup = {
 			[TYPE_BOOL] = "boolean",
 			[TYPE_FUNCTION] = "function",
@@ -487,7 +487,7 @@ end
 -- @param val The value to be checked.
 function SF.GetType(val)
 	local mt = dgetmeta(val)
-	return (mt and mt.__metatable and type(mt.__metatable) == "string") and mt.__metatable or type(val)
+	return (mt and mt.__metatable and isstring(mt.__metatable)) and mt.__metatable or type(val)
 end
 
 -- ------------------------------------------------------------------------- --
@@ -778,9 +778,9 @@ local function argsToChat(...)
 	if not color then processed[1] = Color(151, 211, 255) end
 	local i = 1
 	while i <= n do
-		if type(output[i])=="string" then
+		if isstring(output[i]) then
 			local j = i + 1
-			while j <= n and type(output[j])=="string" do
+			while j <= n and isstring(output[j]) do
 				j = j + 1
 			end
 			if i==(j-1) then

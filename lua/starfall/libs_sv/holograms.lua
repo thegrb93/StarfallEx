@@ -197,7 +197,7 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	local Holo = unwrap(self)
 	if not IsValid(Holo) then return end
 
-	if type(animation)=="string" then
+	if isstring(animation) then
 		animation = Holo:LookupSequence(animation)
 	end
 

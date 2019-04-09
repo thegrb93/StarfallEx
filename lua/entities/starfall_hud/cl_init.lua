@@ -43,7 +43,7 @@ function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
 
 	local tbl = instance:runScriptHookForResult("calcview", SF.WrapObject(pos),  SF.WrapObject(ang), fov, znear, zfar)
 	local ok, rt = tbl[1], tbl[2]
-	if ok and type(rt) == "table" then
+	if ok and istable(rt) then
 		return { origin = SF.UnwrapObject(rt.origin), angles = SF.UnwrapObject(rt.angles), fov = rt.fov, znear = rt.znear, zfar = rt.zfar, drawviewer = rt.drawviewer }
 	end
 end

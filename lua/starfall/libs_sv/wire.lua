@@ -280,8 +280,8 @@ function wire_library.adjustInputs (names, types)
 	for i = 1, #names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) ~= "string" then SF.Throw("Non-string input name: " .. newname, 2) end
-		if type(newtype) ~= "string" then SF.Throw("Non-string input type: " .. newtype, 2) end
+		if not isstring(newname) then SF.Throw("Non-string input name: " .. newname, 2) end
+		if not isstring(newtype) then SF.Throw("Non-string input type: " .. newtype, 2) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. newname, 2) end
@@ -308,8 +308,8 @@ function wire_library.adjustOutputs (names, types)
 	for i = 1, #names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) ~= "string" then SF.Throw("Non-string output name: " .. newname, 2) end
-		if type(newtype) ~= "string" then SF.Throw("Non-string output type: " .. newtype, 2) end
+		if not isstring(newname) then SF.Throw("Non-string output name: " .. newname, 2) end
+		if not isstring(newtype) then SF.Throw("Non-string output type: " .. newtype, 2) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. newname, 2) end
@@ -477,7 +477,7 @@ wirelink_metatable.__index = function(self, k)
 		local wl = wlunwrap(self)
 		if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 
-		if type(k) == "number" then
+		if isnumber(k) then
 			return wl.ReadCell and wl:ReadCell(k) or nil
 		else
 			local output = wl.Outputs and wl.Outputs[k]
@@ -493,7 +493,7 @@ wirelink_metatable.__newindex = function(self, k, v)
 	checktype(self, wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
-	if type(k) == "number" then
+	if isnumber(k) then
 		checkluatype(v, TYPE_NUMBER)
 		if not wl.WriteCell then return
 		else wl:WriteCell(k, v) end
