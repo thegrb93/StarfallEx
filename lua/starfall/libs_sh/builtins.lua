@@ -929,11 +929,11 @@ function SF.DefaultEnvironment.pcall (func, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	return false, SF.Sanitize(err)
+	return false, SF.Sanitize({err})[1]
 end
 
 local function xpcall_Callback (err)
-	return {SF.Sanitize(err), debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
+	return {SF.Sanitize({err})[1], debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
 end
 
 --- Lua's xpcall with SF throw implementation, and a traceback for debugging.
@@ -977,7 +977,7 @@ function SF.DefaultEnvironment.try (func, catch)
 	elseif uncatchable[err] then
 		SF.Throw(err, 2, true)
 	end
-	if catch then catch(SF.Sanitize(err)) end
+	if catch then catch(SF.Sanitize({err})[1]) end
 end
 
 
