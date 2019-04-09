@@ -932,20 +932,25 @@ function SF.DefaultEnvironment.pcall (func, ...)
 	return false, err
 end
 
---- Lua's xpcall with SF throw implementation
+local function xpcall_Callback (err)
+	return {err, debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
+end
+
+--- Lua's xpcall with SF throw implementation, and a traceback for debugging.
 -- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function.
--- If execution fails, this returns false and the second function is called with the error message.
--- @param funcThe function to call initially.
--- @param The function to be called if execution of the first fails; the error message is passed as a string.
--- @param arguments Arguments to pass to the initial function.
+-- If execution fails, this returns false and the second function is called with the error message, and the stack trace.
+-- @param func The function to call initially.
+-- @param callback The function to be called if execution of the first fails; the error message and stack trace are passed.
+-- @param ... Varargs to pass to the initial function.
 -- @return Status of the execution; true for success, false for failure.
--- @return The returns of the first function if execution succeeded, otherwise the first return value of the error callback.
+-- @return The returns of the first function if execution succeeded, otherwise the return values of the error callback.
 function SF.DefaultEnvironment.xpcall (func, callback, ...)
-	local vret = { pcall(func, ...) }
-	local ok, err = vret[1], vret[2]
+	local vret = { xpcall(func, xpcall_Callback, ...) }
+	local ok, errData = vret[1], vret[2]
 
 	if ok then return unpack(vret) end
 
+	local err, traceback = errData[1], errData[2]
 	if type(err) == "table" then
 		if err.uncatchable then
 			error(err)
@@ -954,8 +959,7 @@ function SF.DefaultEnvironment.xpcall (func, callback, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	local cret = callback(err)
-	return false, cret
+	return false, callback(err, traceback)
 end
 
 --- Try to execute a function and catch possible exceptions
