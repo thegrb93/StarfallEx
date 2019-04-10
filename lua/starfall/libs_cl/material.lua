@@ -128,6 +128,117 @@ function material_library.getTexture(path, texture)
 	return Material(path):GetTexture(texture):GetName()
 end
 
+--- Returns a table of keyvalues from a material
+-- @param path The path of the material (don't include .vmt in the path)
+function material_library.getKeyValues(path)
+	checkluatype(path, TYPE_STRING)
+	return SF.Sanitize(Material(path):GetKeyValues())
+end
+
+--- Returns a material's engine name
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+function material_library.getName(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):GetName()
+end
+
+--- Returns the shader name of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The shader name of the material
+function material_library.getShader(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):GetShader()
+end
+
+--- Returns the width of the member texture set for $basetexture of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The basetexture's width
+function material_library.getWidth(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):Width()
+end
+
+--- Returns the height of the member texture set for $basetexture of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The basetexture's height
+function material_library.getHeight(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):Height()
+end
+
+--- Returns a color pixel value of the $basetexture of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param x The x coordinate of the pixel
+-- @param y The y coordinate of the pixel
+-- @return The color value
+function material_library.getColor(path, x, y)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	return cwrap(Material(path):GetColor(x, y))
+end
+
+--- Returns a float keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the float from
+-- @return The float value or nil if it doesn't exist
+function material_library.getFloat(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return Material(path):GetFloat(key)
+end
+
+--- Returns an int keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the int from
+-- @return The int value or nil if it doesn't exist
+function material_library.getInt(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return Material(path):GetInt(key)
+end
+
+--- Returns a matrix keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the matrix from
+-- @return The matrix value or nil if it doesn't exist
+function material_library.getMatrix(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return mwrap(Material(path):GetMatrix(key))
+end
+
+--- Returns a string keyvalue
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the string from
+-- @return The string value or nil if it doesn't exist
+function material_library.getString(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return Material(path):GetString(key)
+end
+
+--- Returns a vector keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the vector from
+-- @return The string id of the texture
+function material_library.getVector(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(Material(path):GetVector(key))
+end
+
+--- Returns a linear color-corrected vector keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the vector from
+-- @return The vector value or nil if it doesn't exist
+function material_library.getVectorLinear(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(Material(path):GetVectorLinear(key))
+end
+
 --- Creates a new blank material
 -- @param shader The shader of the material. (UnlitGeneric or VertexLitGeneric)
 function material_library.create(shader)
