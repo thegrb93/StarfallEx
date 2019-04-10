@@ -130,6 +130,7 @@ end
 
 --- Returns a table of keyvalues from a material
 -- @param path The path of the material (don't include .vmt in the path)
+-- @return The table of keyvalues
 function material_library.getKeyValues(path)
 	checkluatype(path, TYPE_STRING)
 	return SF.Sanitize(Material(path):GetKeyValues())
