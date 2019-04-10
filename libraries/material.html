@@ -209,9 +209,69 @@ Creates a .jpg or .png material from file
 Can't be modified </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getColor">getColor</a>( path, x, y&nbsp;)</td>
+			<td class="summary">
+Returns a color pixel value of the $basetexture of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getFloat">getFloat</a>( path, key&nbsp;)</td>
+			<td class="summary">
+Returns a float keyvalue of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getHeight">getHeight</a>( path&nbsp;)</td>
+			<td class="summary">
+Returns the height of the member texture set for $basetexture of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getInt">getInt</a>( path, key&nbsp;)</td>
+			<td class="summary">
+Returns an int keyvalue of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getKeyValues">getKeyValues</a>( path&nbsp;)</td>
+			<td class="summary">
+Returns a table of keyvalues from a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getMatrix">getMatrix</a>( path, key&nbsp;)</td>
+			<td class="summary">
+Returns a matrix keyvalue of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getName">getName</a>( path&nbsp;)</td>
+			<td class="summary">
+Returns a material's engine name </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getShader">getShader</a>( path&nbsp;)</td>
+			<td class="summary">
+Returns the shader name of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getString">getString</a>( path, key&nbsp;)</td>
+			<td class="summary">
+Returns a string keyvalue </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#material.getTexture">getTexture</a>( path, texture&nbsp;)</td>
 			<td class="summary">
 Gets a texture from a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getVector">getVector</a>( path, key&nbsp;)</td>
+			<td class="summary">
+Returns a vector keyvalue of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getVectorLinear">getVectorLinear</a>( path, key&nbsp;)</td>
+			<td class="summary">
+Returns a linear color-corrected vector keyvalue of a material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#material.getWidth">getWidth</a>( path&nbsp;)</td>
+			<td class="summary">
+Returns the width of the member texture set for $basetexture of a material </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#material.load">load</a>( path&nbsp;)</td>
@@ -268,6 +328,237 @@ Can't be modified</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="material.getColor"></a><strong>material.getColor</strong>( path, x, y&nbsp;)</dt>
+<dd>
+	<p>
+Returns a color pixel value of the $basetexture of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>x</tt> ― The x coordinate of the pixel</li>
+			<li><tt>y</tt> ― The y coordinate of the pixel</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The color value</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getFloat"></a><strong>material.getFloat</strong>( path, key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a float keyvalue of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>key</tt> ― The key to get the float from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The float value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getHeight"></a><strong>material.getHeight</strong>( path&nbsp;)</dt>
+<dd>
+	<p>
+Returns the height of the member texture set for $basetexture of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The basetexture's height</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getInt"></a><strong>material.getInt</strong>( path, key&nbsp;)</dt>
+<dd>
+	<p>
+Returns an int keyvalue of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>key</tt> ― The key to get the int from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The int value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getKeyValues"></a><strong>material.getKeyValues</strong>( path&nbsp;)</dt>
+<dd>
+	<p>
+Returns a table of keyvalues from a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The table of keyvalues</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getMatrix"></a><strong>material.getMatrix</strong>( path, key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a matrix keyvalue of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>key</tt> ― The key to get the matrix from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The matrix value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getName"></a><strong>material.getName</strong>( path&nbsp;)</dt>
+<dd>
+	<p>
+Returns a material's engine name</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getShader"></a><strong>material.getShader</strong>( path&nbsp;)</dt>
+<dd>
+	<p>
+Returns the shader name of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The shader name of the material</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getString"></a><strong>material.getString</strong>( path, key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a string keyvalue</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>key</tt> ― The key to get the string from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="material.getTexture"></a><strong>material.getTexture</strong>( path, texture&nbsp;)</dt>
 <dd>
 	<p>
@@ -288,6 +579,83 @@ Gets a texture from a material</p>
 		<h3>Returns</h3>
 		
 		<p>The texture's name</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getVector"></a><strong>material.getVector</strong>( path, key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a vector keyvalue of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>key</tt> ― The key to get the vector from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string id of the texture</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getVectorLinear"></a><strong>material.getVectorLinear</strong>( path, key&nbsp;)</dt>
+<dd>
+	<p>
+Returns a linear color-corrected vector keyvalue of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+			<li><tt>key</tt> ― The key to get the vector from</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The vector value or nil if it doesn't exist</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="material.getWidth"></a><strong>material.getWidth</strong>( path&nbsp;)</dt>
+<dd>
+	<p>
+Returns the width of the member texture set for $basetexture of a material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The path of the material (don't include .vmt in the path)</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The basetexture's width</p>
 		
 	</section>
 	
