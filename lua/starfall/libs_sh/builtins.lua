@@ -87,7 +87,7 @@ SF.DefaultEnvironment.pairs = pairs
 -- @return The name of the object's type.
 SF.DefaultEnvironment.type = function(obj)
 	local tp = getmetatable(obj)
-	return type(tp) == "string" and tp or type(obj)
+	return isstring(tp) and tp or type(obj)
 end
 
 --- Returns the next key and value pair in a table.
@@ -238,7 +238,7 @@ if CLIENT then
 		local overrides = {}
 		for I = 1, c do
 			local v = perms[I]
-			if type(v) == "string" then
+			if isstring(v) then
 				if not privileges[v] then
 					SF.Throw("Invalid permission name: "..v)
 				end
@@ -862,7 +862,7 @@ function SF.DefaultEnvironment.loadstring (str, name)
 	local func = CompileString(str, name, false)
 
 	-- CompileString returns an error as a string, better check before setfenv
-	if type(func) == "function" then
+	if isfunction(func) then
 		return setfenv(func, SF.instance.env)
 	end
 
@@ -875,7 +875,7 @@ end
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv (func, tbl)
-	if type(func) ~= "function" or getfenv(func) == _G then SF.Throw("Main Thread is protected!", 2) end
+	if not isfunction(func) or getfenv(func) == _G then SF.Throw("Main Thread is protected!", 2) end
 	return setfenv(func, tbl)
 end
 
@@ -893,8 +893,7 @@ end
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
 function SF.DefaultEnvironment.debugGetInfo (funcOrStackLevel, fields)
-	local TfuncOrStackLevel = type(funcOrStackLevel)
-	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
+	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields then checkluatype (fields, TYPE_STRING) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
@@ -921,7 +920,7 @@ function SF.DefaultEnvironment.pcall (func, ...)
 
 	if ok then return unpack(vret) end
 
-	if type(err) == "table" then
+	if istable(err) then
 		if err.uncatchable then
 			error(err)
 		end
@@ -951,7 +950,7 @@ function SF.DefaultEnvironment.xpcall (func, callback, ...)
 	if ok then return unpack(vret) end
 
 	local err, traceback = errData[1], errData[2]
-	if type(err) == "table" then
+	if istable(err) then
 		if err.uncatchable then
 			error(err)
 		end
@@ -970,7 +969,7 @@ function SF.DefaultEnvironment.try (func, catch)
 	local ok, err = pcall(func)
 	if ok then return end
 
-	if type(err) == "table" then
+	if istable(err) then
 		if err.uncatchable then
 			error(err)
 		end

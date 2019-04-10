@@ -89,7 +89,7 @@ if CLIENT then
 		end
 
 		for lib, tbl in pairs(SF.Types) do
-			if type(tbl.__index) == "table" then
+			if istable(tbl.__index) then
 				for name, val in pairs(tbl.__index) do
 					table.insert(libs, "\\:"..name)
 				end

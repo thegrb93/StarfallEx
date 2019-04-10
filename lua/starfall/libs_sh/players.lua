@@ -433,8 +433,7 @@ end
 -- @return The amount of ammo player has in reserve.
 function player_methods:getAmmoCount(id)
 	checktype(self, player_metamethods)
-	local tid = type(id)
-	if tid~="number" and tid~="string" then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
+	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
 
 	local ent = unwrap(self)
 	return ent:GetAmmoCount(id)

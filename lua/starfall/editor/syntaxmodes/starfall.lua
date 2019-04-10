@@ -12,9 +12,6 @@ local surface_SetTextPos = surface.SetTextPos
 local surface_SetTextColor = surface.SetTextColor
 local surface_DrawText = surface.DrawText
 local EDITOR = {}
-local function istype(tp)
-	return false
-end
 
 -- keywords[name][nextchar!="("]
 local storageTypes = {

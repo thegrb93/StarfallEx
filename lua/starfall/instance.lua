@@ -33,7 +33,7 @@ SF.playerInstances = {}
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
 function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
-	if type(code) == "string" then
+	if isstring(code) then
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
 	end
@@ -76,7 +76,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 			instance.scripts[filename] = function() end
 		else
 			local func = CompileString(source, "SF:"..filename, false)
-			if type(func) == "string" then
+			if isstring(func) then
 				return false, { message = func, traceback = "" }
 			end
 			debug.setfenv(func, instance.env)

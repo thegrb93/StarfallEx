@@ -495,10 +495,10 @@ local function GetAceCSS(theme)
 	css = string.Replace(css,"ace-custom","ace-"..(name))
 	css = string.Replace(css,"\n","")
 	for k,v in pairs(theme) do
-		if type(v) == "table" and v["r"] == nil then 
+		if istable(v) and v["r"] == nil then 
 			v = v[1]
 		end
-		if type(v) != "table" then continue end
+		if not istable(v) then continue end
 		css = string.Replace(css,"%"..k.."%","#"..ColorToHex(v))
 	end
 	return css
