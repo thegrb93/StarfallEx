@@ -620,6 +620,8 @@ local function printTableX (t, indent, alreadyprinted)
 end
 
 if SERVER then
+	local userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
+
 	-- Prints a message to the player's chat.
 	-- @shared
 	-- @param ... Values to print
@@ -644,12 +646,15 @@ if SERVER then
 		SF.instance.player:ConCommand(cmd)
 	end
 
-	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB
+	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
 	-- @server
 	-- @param str String data
 	function SF.DefaultEnvironment.setUserdata(str)
 		checkluatype (str, TYPE_STRING)
-		if #str>1048576 then SF.Throw("The userdata limit is 1MiB", 2) end
+		local max = userdataLimit:GetInt()
+		if #str>max then
+			SF.Throw("The userdata limit is " .. string.Comma(max) .. " bytes", 2)
+		end
 		SF.instance.data.entity.starfalluserdata = str
 	end
 
