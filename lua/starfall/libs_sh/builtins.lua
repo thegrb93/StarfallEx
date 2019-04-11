@@ -646,7 +646,7 @@ if SERVER then
 		SF.instance.player:ConCommand(cmd)
 	end
 
-	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar
+	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
 	-- @server
 	-- @param str String data
 	function SF.DefaultEnvironment.setUserdata(str)
