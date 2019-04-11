@@ -490,7 +490,7 @@ function net_library.writeEntity(t)
 
 	checktype(t, SF.Types["Entity"])
 
-	write(instance, net.WriteEntity, 2, SF.UnwrapObject(t))
+	write(instance, net.WriteEntity, 2, SF.Entities.Unwrap(t))
 	return true
 end
 

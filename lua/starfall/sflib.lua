@@ -538,15 +538,14 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		sf2sensitive[tbl] = value
 		return tbl
 	end
+	if target_metatable ~= nil then
+		object_wrappers[target_metatable] = wrap
+	end
 
 	local function unwrap(value)
 		return sf2sensitive[value]
 	end
-
-	if target_metatable ~= nil then
-		object_wrappers[target_metatable] = wrap
-		object_unwrappers[target_metatable] = unwrap
-	end
+	object_unwrappers[metatable] = unwrap
 
 	return wrap, unwrap
 end
