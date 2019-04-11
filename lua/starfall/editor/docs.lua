@@ -1240,7 +1240,7 @@ Sets the chip's display name";["fname"]="setName";["library"]="builtin";["name"]
 Sets the chip's display name ";};["setSoftQuota"]={["class"]="function";["description"]="\
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";["fname"]="setSoftQuota";["library"]="builtin";["name"]="SF.DefaultEnvironment.setSoftQuota";["param"]={[1]="quota";["quota"]="The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.";};["setUserdata"]={["class"]="function";["description"]="\
-Sets the chip's userdata that the duplicator tool saves. max 1MiB";["fname"]="setUserdata";["library"]="builtin";["name"]="SF.DefaultEnvironment.setUserdata";["param"]={[1]="str";["str"]="String data";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
+Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max";["fname"]="setUserdata";["library"]="builtin";["name"]="SF.DefaultEnvironment.setUserdata";["param"]={[1]="str";["str"]="String data";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Sets the chip's userdata that the duplicator tool saves.";};["setfenv"]={["class"]="function";["description"]="\
 Lua's setfenv \
 Works like setfenv, but is restricted on functions";["fname"]="setfenv";["library"]="builtin";["name"]="SF.DefaultEnvironment.setfenv";["param"]={[1]="func";[2]="tbl";["func"]="Function to change environment of";["tbl"]="New environment";};["private"]=false;["realm"]="sh";["ret"]="func with environment set to tbl";["summary"]="\
