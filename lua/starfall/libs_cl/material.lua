@@ -168,7 +168,7 @@ function material_library.getHeight(path)
 	return Material(path):Height()
 end
 
---- Returns a color pixel value of the $basetexture of a material
+--- Returns a color pixel value of the $basetexture of a .png or .jpg material.
 -- @param path The path of the material (don't include .vmt in the path)
 -- @param x The x coordinate of the pixel
 -- @param y The y coordinate of the pixel
@@ -344,7 +344,7 @@ function lmaterial_methods:getHeight()
 	return lunwrap(self):Height()
 end
 
---- Returns a color pixel value of the $basetexture a .png or .jpg material.
+--- Returns a color pixel value of the $basetexture of a .png or .jpg material.
 -- @param x The x coordinate of the pixel
 -- @param y The y coordinate of the pixel
 -- @return The color value
