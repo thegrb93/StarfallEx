@@ -113,12 +113,14 @@ end
 -- If the stream owner cancels it, notify everyone who is subscribed
 function net.Stream.WriteStream:Remove()
 	if SERVER then
+		local sendTo = {}
 		for ply, _ in pairs(self.progress) do
 			self.progress[ply] = nil
 			self.finished[ply] = true
-			net.Start("NetStreamDownload")
-			net.Send(ply)
+			if ply:IsValid() then sendTo[#sendTo+1] = ply end
 		end
+		net.Start("NetStreamDownload")
+		net.Send(sendTo)
 	else
 		if self.progress[NULL] then
 			self.progress[NULL] = nil
@@ -172,6 +174,7 @@ function net.WriteStream(data, callback)
 	net.WriteUInt(numchunks, 32)
 	net.WriteUInt(identifier, 32)
 
+	return stream
 end
 
 --If the receiver is a player then add it to a queue.
