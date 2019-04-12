@@ -14,10 +14,9 @@ function net.Stream.ReadStream:Request()
 	--print("Requesting",self.identifier,#self.data)
 
 	net.Start("NetStreamRequest")
-	net.WriteBit(false)
-	net.WriteBit(false)
 	net.WriteUInt(self.identifier, 32)
-	net.WriteUInt(#self.data, 32)
+	net.WriteBit(false)
+	net.WriteBit(false)
 	if CLIENT then net.SendToServer() else net.Send(self.player) end
 
 	timer.Create("NetStreamReadTimeout" .. self.identifier, net.Stream.Timeout, 1, function() self:Remove() end)
@@ -54,9 +53,9 @@ function net.Stream.ReadStream:Remove()
 	if not ok then ErrorNoHalt(err) end
 
 	net.Start("NetStreamRequest")
+	net.WriteUInt(self.identifier, 32)
 	net.WriteBit(false)
 	net.WriteBit(true)
-	net.WriteUInt(self.identifier, 32)
 	if CLIENT then net.SendToServer() else net.Send(self.player) end
 
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
@@ -76,23 +75,29 @@ net.Stream.ReadStream.__index = net.Stream.ReadStream
 
 net.Stream.WriteStream = {}
 
-function net.Stream.WriteStream:Write(ply, index)
-	self.progress[ply] = index
+-- The player wants some data
+function net.Stream.WriteStream:Write(ply)
+	local progress = self.progress[ply] or 0
+	if progress < self.numchunks then
+		self.progress[ply] = progress + 1
 
-	net.Start("NetStreamDownload")
+		net.Start("NetStreamDownload")
 
-	local start = math.min(index * net.Stream.SendSize + 1, #self.data)
-	local endpos = math.min(start + net.Stream.SendSize - 1, #self.data)
-	local senddata = string.sub(self.data, start, endpos)
+		local start = math.min(progress * net.Stream.SendSize + 1, #self.data)
+		local endpos = math.min(start + net.Stream.SendSize - 1, #self.data)
+		local senddata = string.sub(self.data, start, endpos)
 
-	--print("Responding",#senddata,start,endpos)
+		--print("Responding",#senddata,start,endpos)
 
-	net.WriteData(senddata, #senddata)
+		net.WriteData(senddata, #senddata)
 
-	if CLIENT then net.SendToServer() else net.Send(ply) end
+		if CLIENT then net.SendToServer() else net.Send(ply) end
+	end
 end
 
+-- The player notified us they finished downloading or cancelled
 function net.Stream.WriteStream:Finished(ply)
+	self.progress[ply] = nil
 	self.finished[ply] = true
 	if self.callback then
 		local ok, err = xpcall(self.callback, debug.traceback, ply)
@@ -100,11 +105,28 @@ function net.Stream.WriteStream:Finished(ply)
 	end
 end
 
+-- Get player's download progress
 function net.Stream.WriteStream:GetProgress(ply)
 	return (self.progress[ply] or 0) * net.Stream.SendSize / #self.data
 end
 
+-- If the stream owner cancels it, notify everyone who is subscribed
 function net.Stream.WriteStream:Remove()
+	if SERVER then
+		for ply, _ in pairs(self.progress) do
+			self.progress[ply] = nil
+			self.finished[ply] = true
+			net.Start("NetStreamDownload")
+			net.Send(ply)
+		end
+	else
+		if self.progress[NULL] then
+			self.progress[NULL] = nil
+			self.finished[NULL] = true
+			net.Start("NetStreamDownload")
+			net.SendToServer()
+		end
+	end
 	net.Stream.WriteStreams[self.identifier] = nil
 end
 
@@ -138,6 +160,7 @@ function net.WriteStream(data, callback)
 	local stream = {
 		identifier = identifier,
 		data = compressed,
+		numchunks = numchunks,
 		callback = callback,
 		progress = {},
 		finished = {}
@@ -188,9 +211,9 @@ function net.ReadStream(ply, callback)
 	if not queue then queue = {} net.Stream.ReadStreamQueues[ply] = queue end
 
 	local stream = {
-		numchunks = numchunks,
 		identifier = identifier,
 		data = {},
+		numchunks = numchunks,
 		callback = callback,
 		queue = queue,
 		player = ply
@@ -200,9 +223,9 @@ function net.ReadStream(ply, callback)
 	if #queue > 1 then
 		timer.Create("NetStreamKeepAlive" .. identifier, net.Stream.Timeout / 2, 0, function()
 			net.Start("NetStreamRequest")
+			net.WriteUInt(identifier, 32)
 			net.WriteBit(true)
 			net.WriteBit(false)
-			net.WriteUInt(identifier, 32)
 			if CLIENT then net.SendToServer() else net.Send(ply) end
 		end)
 	else
@@ -221,9 +244,9 @@ end
 --Stream data is requested
 net.Receive("NetStreamRequest", function(len, ply)
 
+	local identifier = net.ReadUInt(32)
 	local keepalive = net.ReadBit() == 1
 	local completed = net.ReadBit() == 1
-	local identifier = net.ReadUInt(32)
 	local stream = net.Stream.WriteStreams[identifier]
 
 	ply = ply or NULL
@@ -234,10 +257,8 @@ net.Receive("NetStreamRequest", function(len, ply)
 			if completed then
 				stream:Finished(ply)
 			else
-				local index = net.ReadUInt(32)
-				stream:Write(ply, index)
+				stream:Write(ply)
 			end
-
 		end
 	end
 	
