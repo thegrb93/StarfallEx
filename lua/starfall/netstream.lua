@@ -11,14 +11,13 @@ net.Stream.ReadStream = {}
 --Send the data sender a request for data
 function net.Stream.ReadStream:Request()
 
+	--print("Requesting",self.identifier,#self.data)
+
 	net.Start("NetStreamRequest")
 	net.WriteBit(false)
 	net.WriteBit(false)
 	net.WriteUInt(self.identifier, 32)
 	net.WriteUInt(#self.data, 32)
-
-	--print("Requesting",self.identifier,#self.data)
-
 	if CLIENT then net.SendToServer() else net.Send(self.player) end
 
 	timer.Create("NetStreamReadTimeout" .. self.identifier, net.Stream.Timeout, 1, function() self:Remove() end)
