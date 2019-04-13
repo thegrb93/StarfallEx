@@ -262,7 +262,7 @@ Reads until the given byte and advances the buffer pointer.</td>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:seek">seek</a>( i&nbsp;)</td>
 			<td class="summary">
-Sets internal position to i.</td>
+Sets internal pointer to i.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:size">size</a>( &nbsp;)</td>
@@ -287,17 +287,17 @@ Writes the given string and advances the buffer pointer.</td>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeFloat">writeFloat</a>( x&nbsp;)</td>
 			<td class="summary">
-Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.</td>
+Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt16">writeInt16</a>( x&nbsp;)</td>
 			<td class="summary">
-Writes a short to the buffer and advances the buffer pointer.</td>
+Writes a short in little endian to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt32">writeInt32</a>( x&nbsp;)</td>
 			<td class="summary">
-Writes an int to the buffer and advances the buffer pointer.</td>
+Writes an int in little endian to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt8">writeInt8</a>( x&nbsp;)</td>
@@ -324,6 +324,12 @@ Returns the internal buffer</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The buffer table</p>
+		
+	</section>
 	
 	
 </dd>
@@ -336,6 +342,12 @@ Returns the buffer as a string</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The buffer as a string</p>
+		
+	</section>
 	
 	
 </dd>
@@ -350,11 +362,17 @@ Reads the specified number of bytes from the buffer and advances the buffer poin
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>n</tt></li>
+			<li><tt>n</tt> ― How many bytes to read</li>
 		</ul>
 	</section>
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>A string containing the bytes</p>
+		
+	</section>
 	
 	
 </dd>
@@ -367,6 +385,12 @@ Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointe
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The float32 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -379,6 +403,12 @@ Reads a signed 16-bit (two byte) integer from the byte stream and advances the b
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The int16 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -391,6 +421,12 @@ Reads a signed 32-bit (four byte) integer from the byte stream and advances the 
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The int32 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -403,6 +439,12 @@ Reads a signed 8-bit (one byte) integer from the byte stream and advances the bu
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The int8 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -415,6 +457,12 @@ returns a null terminated string, reads until "\x00" and advances the buffer poi
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string of bytes read</p>
+		
+	</section>
 	
 	
 </dd>
@@ -427,6 +475,12 @@ Reads an unsigned 16 bit (two byte) integer from the byte stream and advances th
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The uint16 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -439,6 +493,12 @@ Reads an unsigned 32 bit (four byte) integer from the byte stream and advances t
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The uint32 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -451,6 +511,12 @@ Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The uint8 at this position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -465,11 +531,17 @@ Reads until the given byte and advances the buffer pointer.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>byte</tt></li>
+			<li><tt>byte</tt> ― The byte to read until (in number form)</li>
 		</ul>
 	</section>
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The string of bytes read</p>
+		
+	</section>
 	
 	
 </dd>
@@ -477,14 +549,14 @@ Reads until the given byte and advances the buffer pointer.</p>
 <dt><span class="realm_sh"></span><a name="StringStream:seek"></a><strong>StringStream:seek</strong>( i&nbsp;)</dt>
 <dd>
 	<p>
-Sets internal position to i. The position will be clamped to 1-buffersize</p>
+Sets internal pointer to i. The position will be clamped to [1, buffersize+1]</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>i</tt></li>
+			<li><tt>i</tt> ― The position</li>
 		</ul>
 	</section>
 	
@@ -501,6 +573,12 @@ Tells the size of the byte stream.</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The buffer size</p>
+		
+	</section>
 	
 	
 </dd>
@@ -515,7 +593,7 @@ Move the internal pointer by amount i</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>i</tt></li>
+			<li><tt>i</tt> ― The offset</li>
 		</ul>
 	</section>
 	
@@ -532,6 +610,12 @@ Returns the internal position of the byte reader.</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The buffer position</p>
+		
+	</section>
 	
 	
 </dd>
@@ -546,7 +630,7 @@ Writes the given string and advances the buffer pointer.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>bytes</tt></li>
+			<li><tt>bytes</tt> ― A string of bytes to write</li>
 		</ul>
 	</section>
 	
@@ -558,7 +642,7 @@ Writes the given string and advances the buffer pointer.</p>
 <dt><span class="realm_sh"></span><a name="StringStream:writeFloat"></a><strong>StringStream:writeFloat</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
-Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.</p>
+Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
@@ -577,14 +661,14 @@ Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer
 <dt><span class="realm_sh"></span><a name="StringStream:writeInt16"></a><strong>StringStream:writeInt16</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
-Writes a short to the buffer and advances the buffer pointer.</p>
+Writes a short in little endian to the buffer and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt></li>
+			<li><tt>x</tt> ― An int16 to write</li>
 		</ul>
 	</section>
 	
@@ -596,14 +680,14 @@ Writes a short to the buffer and advances the buffer pointer.</p>
 <dt><span class="realm_sh"></span><a name="StringStream:writeInt32"></a><strong>StringStream:writeInt32</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
-Writes an int to the buffer and advances the buffer pointer.</p>
+Writes an int in little endian to the buffer and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt></li>
+			<li><tt>x</tt> ― An int32 to write</li>
 		</ul>
 	</section>
 	
@@ -622,7 +706,7 @@ Writes a byte to the buffer and advances the buffer pointer.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>x</tt></li>
+			<li><tt>x</tt> ― An int8 to write</li>
 		</ul>
 	</section>
 	
@@ -641,7 +725,7 @@ Writes a string to the buffer putting a null at the end and advances the buffer 
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>string</tt></li>
+			<li><tt>string</tt> ― The string of bytes to write</li>
 		</ul>
 	</section>
 	
