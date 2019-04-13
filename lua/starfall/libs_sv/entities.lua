@@ -653,10 +653,10 @@ function ents_methods:isWeldedTo()
 end
 
 --- Gets a table of all constrained entities to each other
---@param constraintype Optional type name of constraint to filter by
-function ents_methods:getAllConstrained(constraintype)
+--@param filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
+function ents_methods:getAllConstrained(filter)
 	checktype(self, ents_metatable)
-	if constraintype ~= nil then checkluatype(constraintype, TYPE_STRING) end
+	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
 
 	local entity_lookup = {}
 	local entity_table = {}
@@ -665,29 +665,35 @@ function ents_methods:getAllConstrained(constraintype)
 		entity_lookup[ent] = true
 		if ent:IsValid() then
 			entity_table[#entity_table + 1] = wrap(ent)
-			local constraints = constraintype and constraint.FindConstraints(ent, constraintype) or constraint.GetTable(ent)
+			local constraints = constraint.GetTable(ent)
 			for k, v in pairs(constraints) do
-				if v.Ent1 then recursive_find(v.Ent1) end
-				if v.Ent2 then recursive_find(v.Ent2) end
-			end
-			local parent = ent:GetParent()
-			if parent then recursive_find(parent) end
-			for k, child in pairs(ent:GetChildren()) do
-				recursive_find(child)
-			end
-			if istable(ent.Inputs) then
-				for k, v in pairs(ent.Inputs) do
-					if isentity(v.Src) and v.Src:IsValid() then
-						recursive_find(v.Src)
-					end
+				if not filter or filter[v.Type] then
+					if v.Ent1 then recursive_find(v.Ent1) end
+					if v.Ent2 then recursive_find(v.Ent2) end
 				end
 			end
-			if istable(ent.Outputs) then
-				for k, v in pairs(ent.Outputs) do
-					if istable(v.Connected) then
-						for k, v in pairs(v.Connected) do
-							if isentity(v.Entity) and v.Entity:IsValid() then
-								recursive_find(v.Entity)
+			if not filter or filter.Parent then
+				local parent = ent:GetParent()
+				if parent then recursive_find(parent) end
+				for k, child in pairs(ent:GetChildren()) do
+					recursive_find(child)
+				end
+			end
+			if not filter or filter.Wire then
+				if istable(ent.Inputs) then
+					for k, v in pairs(ent.Inputs) do
+						if isentity(v.Src) and v.Src:IsValid() then
+							recursive_find(v.Src)
+						end
+					end
+				end
+				if istable(ent.Outputs) then
+					for k, v in pairs(ent.Outputs) do
+						if istable(v.Connected) then
+							for k, v in pairs(v.Connected) do
+								if isentity(v.Entity) and v.Entity:IsValid() then
+									recursive_find(v.Entity)
+								end
 							end
 						end
 					end
