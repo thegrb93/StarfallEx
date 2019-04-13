@@ -514,25 +514,6 @@ end
 SF.DefaultEnvironment.table = nil
 
 
-
-local bit_methods = SF.RegisterLibrary("bit")
-bit_methods.arshift = bit.arshift
-bit_methods.band = bit.band
-bit_methods.bnot = bit.bnot
-bit_methods.bor = bit.bor
-bit_methods.bswap = bit.bswap
-bit_methods.bxor = bit.bxor
-bit_methods.lshift = bit.lshift
-bit_methods.rol = bit.rol
-bit_methods.ror = bit.ror
-bit_methods.rshift = bit.rshift
-bit_methods.tobit = bit.tobit
-bit_methods.tohex = bit.tohex
---- Bit library. http://wiki.garrysmod.com/page/Category:bit
--- @name SF.DefaultEnvironment.bit
--- @class table
-SF.DefaultEnvironment.bit = nil
-
 -- ------------------------- Functions ------------------------- --
 
 --- Gets a list of all libraries
