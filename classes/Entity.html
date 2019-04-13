@@ -268,7 +268,7 @@ Returns the EntIndex of the entity </td>
 Extinguishes an entity </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Entity:getAllConstrained">getAllConstrained</a>( constraintype&nbsp;)</td>
+			<td class="name"><span class="realm_sv"></span><a href="#Entity:getAllConstrained">getAllConstrained</a>( filter&nbsp;)</td>
 			<td class="summary">
 Gets a table of all constrained entities to each other </td>
 		</tr>
@@ -1037,7 +1037,7 @@ Extinguishes an entity</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Entity:getAllConstrained"></a><strong>Entity:getAllConstrained</strong>( constraintype&nbsp;)</dt>
+<dt><span class="realm_sv"></span><a name="Entity:getAllConstrained"></a><strong>Entity:getAllConstrained</strong>( filter&nbsp;)</dt>
 <dd>
 	<p>
 Gets a table of all constrained entities to each other</p>
@@ -1047,7 +1047,7 @@ Gets a table of all constrained entities to each other</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>constraintype</tt> ― Optional type name of constraint to filter by</li>
+			<li><tt>filter</tt> ― Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.</li>
 		</ul>
 	</section>
 	
