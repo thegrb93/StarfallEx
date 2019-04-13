@@ -1,22 +1,24 @@
+-------------------------------------------------------------------------------
+-- Bit functions
+-------------------------------------------------------------------------------
+
 --- Bit library http://wiki.garrysmod.com/page/Category:bit
 -- @shared
+local bit_library = SF.RegisterLibrary("bit")
+bit_library.arshift = bit.arshift
+bit_library.band = bit.band
+bit_library.bnot = bit.bnot
+bit_library.bor = bit.bor
+bit_library.bswap = bit.bswap
+bit_library.bxor = bit.bxor
+bit_library.lshift = bit.lshift
+bit_library.rol = bit.rol
+bit_library.ror = bit.ror
+bit_library.rshift = bit.rshift
+bit_library.tobit = bit.tobit
+bit_library.tohex = bit.tohex
 
 local checkluatype = SF.CheckLuaType
-
-local bit_methods = SF.RegisterLibrary("bit")
-bit_methods.arshift = bit.arshift
-bit_methods.band = bit.band
-bit_methods.bnot = bit.bnot
-bit_methods.bor = bit.bor
-bit_methods.bswap = bit.bswap
-bit_methods.bxor = bit.bxor
-bit_methods.lshift = bit.lshift
-bit_methods.rol = bit.rol
-bit_methods.ror = bit.ror
-bit_methods.rshift = bit.rshift
-bit_methods.tobit = bit.tobit
-bit_methods.tohex = bit.tohex
-
 
 --- StringStream type
 local ss_methods, ss_metamethods = SF.RegisterType("StringStream")
@@ -24,7 +26,7 @@ local ss_methods, ss_metamethods = SF.RegisterType("StringStream")
 --- Creates a StringStream object
 --@param stream A string to set the initial buffer to (default "")
 --@param i The initial buffer pointer (default 1)
-function bit_methods.stringstream(stream, i)
+function bit_library.stringstream(stream, i)
 	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
 	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
 	
@@ -55,25 +57,25 @@ local function ByterizeByte(n)
 end
 
 --- Returns little endian bytes (A B) (all 32 bits)
-function bit_methods.GetInt32BytesLE(n)
+function bit_library.GetInt32BytesLE(n)
 	local a,b,c,d = ByterizeInt(n)
 	return string.char(d,c,b,a)
 end
 
 --- Returns little endian bytes (A B) (first two bytes, 16 bits, of number )
-function bit_methods.getInt16BytesLE(n)
+function bit_library.getInt16BytesLE(n)
 	local a,b  = ByterizeShort(n)
 	return string.char(b,a)
 end
 
 --- Returns big endian bytes (A B) (all 32 bits)
-function bit_methods.GetInt32BytesBE(n)
+function bit_library.GetInt32BytesBE(n)
 	local a,b,c,d = ByterizeInt(n)
 	return string.char(a,b,c,d)
 end
 
 --- Returns big endian bytes (A B) (first two bytes, 16 bits, of number )
-function bit_methods.GetInt16BytesLE(n)
+function bit_library.GetInt16BytesLE(n)
 	local a,b  = ByterizeShort(n)
 	return string.char(a,b)
 end
