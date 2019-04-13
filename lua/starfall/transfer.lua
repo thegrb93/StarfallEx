@@ -154,7 +154,7 @@ if SERVER then
 	net.Receive("starfall_upload", function(len, ply)
 		local updata = uploaddata[ply]
 		if not updata or updata.reading then
-			ErrorNoHalt("SF: Player "..ply:GetName().." tried to upload code without being requested (expect this message multiple times)\n")
+			ErrorNoHalt("SF: Player "..ply:GetName().." tried to upload code without being requested.\n")
 			return
 		end
 

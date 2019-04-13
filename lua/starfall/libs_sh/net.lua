@@ -256,20 +256,35 @@ function net_library.writeStream(str)
 	return true
 end
 
---- Reads a large string stream from the net message
+--- Reads a large string stream from the net message.
 -- @shared
--- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data.
-
+-- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	local instance = SF.instance
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
-	streams[instance.player] = true
-
-	net.ReadStream((SERVER and instance.player or nil), function(data)
+	
+	streams[instance.player] = net.ReadStream((SERVER and instance.player or nil), function(data)
 		instance:runFunction(cb, data)
 		streams[instance.player] = false
 	end)
+end
+
+--- Cancels a currently running readStream
+-- @shared
+function net_library.cancelStream()
+	local instance = SF.instance
+	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
+	streams[instance.player]:Remove()
+end
+
+--- Returns the progress of a running readStream
+-- @shared
+-- @return The progress ratio 0-1
+function net_library.getStreamProgress()
+	local instance = SF.instance
+	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
+	return streams[instance.player]:GetProgress()
 end
 
 --- Writes an integer to the net message

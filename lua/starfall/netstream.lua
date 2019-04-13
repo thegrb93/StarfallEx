@@ -167,8 +167,9 @@ function net.WriteStream(data, callback)
 		progress = {},
 		finished = {}
 	}
+	setmetatable(stream, net.Stream.WriteStream)
 
-	net.Stream.WriteStreams[identifier] = setmetatable(stream, net.Stream.WriteStream)
+	net.Stream.WriteStreams[identifier] = stream
 	timer.Create("NetStreamWriteTimeout" .. identifier, net.Stream.Timeout, 1, function() stream:Remove() end)
 
 	net.WriteUInt(numchunks, 32)
@@ -221,8 +222,9 @@ function net.ReadStream(ply, callback)
 		queue = queue,
 		player = ply
 	}
+	setmetatable(stream, net.Stream.ReadStream)
 
-	queue[#queue + 1] = setmetatable(stream, net.Stream.ReadStream)
+	queue[#queue + 1] = stream
 	if #queue > 1 then
 		timer.Create("NetStreamKeepAlive" .. identifier, net.Stream.Timeout / 2, 0, function()
 			net.Start("NetStreamRequest")
@@ -232,9 +234,10 @@ function net.ReadStream(ply, callback)
 			if CLIENT then net.SendToServer() else net.Send(ply) end
 		end)
 	else
-		queue[1]:Request()
+		stream:Request()
 	end
 
+	return stream
 end
 
 if SERVER then
