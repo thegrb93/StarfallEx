@@ -198,9 +198,19 @@ Net message library. Used for sending data from the server to the client and bac
 	<table class="list">
 	
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.cancelStream">cancelStream</a>( &nbsp;)</td>
+			<td class="summary">
+Cancels a currently running readStream </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.getBytesLeft">getBytesLeft</a>( &nbsp;)</td>
 			<td class="summary">
 Returns available bandwidth in bytes </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.getStreamProgress">getStreamProgress</a>( &nbsp;)</td>
+			<td class="summary">
+Returns the progress of a running readStream </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.isStreaming">isStreaming</a>( &nbsp;)</td>
@@ -255,7 +265,7 @@ Reads a matrix from the net message </td>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.readStream">readStream</a>( cb&nbsp;)</td>
 			<td class="summary">
-Reads a large string stream from the net message </td>
+Reads a large string stream from the net message.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.readString">readString</a>( &nbsp;)</td>
@@ -384,6 +394,18 @@ Writes an vector to the net message </td>
 	<dl>
 		
 		
+<dt><span class="realm_sh"></span><a name="net.cancelStream"></a><strong>net.cancelStream</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Cancels a currently running readStream</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="net.getBytesLeft"></a><strong>net.getBytesLeft</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -396,6 +418,24 @@ Returns available bandwidth in bytes</p>
 		<h3>Returns</h3>
 		
 		<p>number of bytes that can be sent</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.getStreamProgress"></a><strong>net.getStreamProgress</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the progress of a running readStream</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The progress ratio 0-1</p>
 		
 	</section>
 	
@@ -599,14 +639,14 @@ Reads a matrix from the net message</p>
 <dt><span class="realm_sh"></span><a name="net.readStream"></a><strong>net.readStream</strong>( cb&nbsp;)</dt>
 <dd>
 	<p>
-Reads a large string stream from the net message</p>
+Reads a large string stream from the net message.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>cb</tt> ― Callback to run when the stream is finished. The first parameter in the callback is the data.</li>
+			<li><tt>cb</tt> ― Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled</li>
 		</ul>
 	</section>
 	
