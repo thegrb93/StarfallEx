@@ -112,24 +112,32 @@ local function UnpackIEEE754Float(b1, b2, b3, b4)
 end
 
 --- Returns little endian bytes (A B) (all 32 bits)
+--@param n The number to pack
+--@return The packed bytes
 function bit_library.getInt32BytesLE(n)
 	local a,b,c,d = ByterizeInt(n)
 	return string.char(d,c,b,a)
 end
 
 --- Returns little endian bytes (A B) (first two bytes, 16 bits, of number )
+--@param n The number to pack
+--@return The packed bytes
 function bit_library.getInt16BytesLE(n)
 	local a,b  = ByterizeShort(n)
 	return string.char(b,a)
 end
 
 --- Returns big endian bytes (A B) (all 32 bits)
+--@param n The number to pack
+--@return The packed bytes
 function bit_library.getInt32BytesBE(n)
 	local a,b,c,d = ByterizeInt(n)
 	return string.char(a,b,c,d)
 end
 
 --- Returns big endian bytes (A B) (first two bytes, 16 bits, of number )
+--@param n The number to pack
+--@return The packed bytes
 function bit_library.getInt16BytesBE(n)
 	local a,b  = ByterizeShort(n)
 	return string.char(a,b)
@@ -141,69 +149,36 @@ local function twos_compliment(x,bits)
 end
 
 function ss_metamethods:__tostring()
-	return string.format("StarfallBinaryReader [%u,%u]",0,self.Position)
+	return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
 end
 
---- Sets internal position to i. The position will be clamped to 1-buffersize
+--- Sets internal pointer to i. The position will be clamped to [1, buffersize+1]
+--@param i The position
 function ss_methods:seek(i)
 	self.pos = math.Clamp(i, 1, #self.buffer + 1)
 end
 
 --- Move the internal pointer by amount i
+--@param i The offset
 function ss_methods:skip(i)
 	self.pos = self.pos + i
 end
 
---- Tells the size of the byte stream.
-function ss_methods:size()
-	return #self.buffer
-end
-
---- Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
-function ss_methods:readUInt8()
-	local ret = self.buffer[self.pos]
-	self.pos = self.pos + 1
-	return ret
-end
-
---- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
-function ss_methods:readUInt16()
-	return self:readUInt8() + self:readUInt8() * 0x100
-end
-
---- Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.
-function ss_methods:readUInt32() 
-	return self:readUInt16() + self:readUInt16() * 0x10000
-end
-
---- Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
-function ss_methods:readInt8()
-	return twos_compliment(self:readUInt8(),8)
-end
-
---- Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.
-function ss_methods:readInt16()
-	return twos_compliment(self:readUInt16(),16)
-end
-
---- Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.
-function ss_methods:readInt32()
-	return twos_compliment(self:readUInt32(),32)
-end
-
---- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
-function ss_methods:readFloat()
-	local ret = UnpackIEEE754Float(self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3])
-	self.pos = self.pos + 4
-	return ret
-end
-
 --- Returns the internal position of the byte reader.
+--@return The buffer position
 function ss_methods:tell()
 	return self.pos
 end
 
+--- Tells the size of the byte stream.
+--@return The buffer size
+function ss_methods:size()
+	return #self.buffer
+end
+
 --- Reads the specified number of bytes from the buffer and advances the buffer pointer.
+--@param n How many bytes to read
+--@return A string containing the bytes
 function ss_methods:read(n)
 	n = math.max(n, 0)
 	local str = string.char(unpack(self.buffer, self.pos, self.pos+n-1))
@@ -211,16 +186,55 @@ function ss_methods:read(n)
 	return str
 end
 
---- Writes the given string and advances the buffer pointer.
-function ss_methods:write(bytes)
-	local buffer = {string.byte(bytes, 1, #bytes)}
-	for i=1, #buffer do
-		self.buffer[self.pos+i-1] = buffer[i]
-	end
-	self.pos = self.pos + #buffer
+--- Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
+--@return The uint8 at this position
+function ss_methods:readUInt8()
+	local ret = self.buffer[self.pos]
+	self.pos = self.pos + 1
+	return ret
+end
+
+--- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
+--@return The uint16 at this position
+function ss_methods:readUInt16()
+	return self:readUInt8() + self:readUInt8() * 0x100
+end
+
+--- Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.
+--@return The uint32 at this position
+function ss_methods:readUInt32() 
+	return self:readUInt16() + self:readUInt16() * 0x10000
+end
+
+--- Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
+--@return The int8 at this position
+function ss_methods:readInt8()
+	return twos_compliment(self:readUInt8(),8)
+end
+
+--- Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.
+--@return The int16 at this position
+function ss_methods:readInt16()
+	return twos_compliment(self:readUInt16(),16)
+end
+
+--- Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.
+--@return The int32 at this position
+function ss_methods:readInt32()
+	return twos_compliment(self:readUInt32(),32)
+end
+
+--- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
+--@return The float32 at this position
+function ss_methods:readFloat()
+	local ret = UnpackIEEE754Float(self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3])
+	self.pos = self.pos + 4
+	return ret
 end
 
 --- Reads until the given byte and advances the buffer pointer.
+--@param byte The byte to read until (in number form)
+--@return The string of bytes read
 function ss_methods:readUntil(byte)
 	local endpos = nil
 	for i=self.pos, #self.buffer do
@@ -233,29 +247,44 @@ function ss_methods:readUntil(byte)
 end
 
 --- returns a null terminated string, reads until "\x00" and advances the buffer pointer.
+--@return The string of bytes read
 function ss_methods:readString()
 	return self:readUntil(0)
 end
 
+
+--- Writes the given string and advances the buffer pointer.
+--@param bytes A string of bytes to write
+function ss_methods:write(bytes)
+	local buffer = {string.byte(bytes, 1, #bytes)}
+	for i=1, #buffer do
+		self.buffer[self.pos+i-1] = buffer[i]
+	end
+	self.pos = self.pos + #buffer
+end
+
 --- Writes a byte to the buffer and advances the buffer pointer.
+--@param x An int8 to write
 function ss_methods:writeInt8(x)
 	self.buffer[self.pos] = ByterizeByte(x)
 	self.pos = self.pos + 1
 end
 
---- Writes a short to the buffer and advances the buffer pointer.
+--- Writes a short in little endian to the buffer and advances the buffer pointer.
+--@param x An int16 to write
 function ss_methods:writeInt16(x)
 	self.buffer[self.pos+1], self.buffer[self.pos] = ByterizeShort(x)
 	self.pos = self.pos + 2
 end
 
---- Writes an int to the buffer and advances the buffer pointer.
+--- Writes an int in little endian to the buffer and advances the buffer pointer.
+--@param x An int32 to write
 function ss_methods:writeInt32(x)
 	self.buffer[self.pos+3], self.buffer[self.pos+2], self.buffer[self.pos+1], self.buffer[self.pos] = ByterizeInt(x)
 	self.pos = self.pos + 4
 end
 
---- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
+--- Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.
 --@param x The float to write
 function ss_methods:writeFloat(x)
 	self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3] = PackIEEE754Float(x)
@@ -263,17 +292,20 @@ function ss_methods:writeFloat(x)
 end
 
 --- Writes a string to the buffer putting a null at the end and advances the buffer pointer.
+--@param string The string of bytes to write
 function ss_methods:writeString(string)
 	self:write(string)
 	self:writeInt8(0)
 end
 
 --- Returns the buffer as a string
+--@return The buffer as a string
 function ss_methods:getString()
    return string.char(unpack(self.buffer))
 end
 
 --- Returns the internal buffer
+--@return The buffer table
 function ss_methods:getBuffer()
    return self.buffer
 end
