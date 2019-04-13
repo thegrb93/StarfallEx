@@ -1,1020 +1,346 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+
+<!DOCTYPE html>
 <html>
-<head>
-    <title>Reference</title>
-    <link rel="stylesheet" href="../luadoc.css" type="text/css" />
-	<!--meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/-->
-</head>
-
-<body>
-<div id="container">
-
-<div id="product">
-	<div id="product_logo"></div>
-	<div id="product_name"><big><b></b></big></div>
-	<div id="product_description"></div>
-</div> <!-- id="product" -->
-
-<div id="main">
-
-<div id="navigation">
-
-
-<h1>LuaDoc</h1>
-<ul>
-	
-	<li><a href="../index.html">Index</a></li>
-	
-</ul>
-
-
-<h1>Preprocessor directives</h1>
-<ul>
-
-	<li>
-		<a href="../directives.html#client">--@client</a>
-	</li>
-
-	<li>
-		<a href="../directives.html#include">--@include</a>
-	</li>
-
-	<li>
-		<a href="../directives.html#includedir">--@includedir</a>
-	</li>
-
-	<li>
-		<a href="../directives.html#model">--@model</a>
-	</li>
-
-	<li>
-		<a href="../directives.html#name">--@name</a>
-	</li>
-
-	<li>
-		<a href="../directives.html#server">--@server</a>
-	</li>
-
-</ul>
-
-<!-- Module list -->
-
-<h1>Libraries</h1>
-<ul>
-
-	<li>
-		<a href="../libraries/bass.html">bass</a>
-	</li>
-
-		<li><strong>bit</strong></li>
-	
-	<li>
-		<a href="../libraries/builtin.html">builtin</a>
-	</li>
-
-	<li>
-		<a href="../libraries/constraint.html">constraint</a>
-	</li>
-
-	<li>
-		<a href="../libraries/coroutine.html">coroutine</a>
-	</li>
-
-	<li>
-		<a href="../libraries/fastlz.html">fastlz</a>
-	</li>
-
-	<li>
-		<a href="../libraries/file.html">file</a>
-	</li>
-
-	<li>
-		<a href="../libraries/find.html">find</a>
-	</li>
-
-	<li>
-		<a href="../libraries/game.html">game</a>
-	</li>
-
-	<li>
-		<a href="../libraries/globaltables.html">globaltables</a>
-	</li>
-
-	<li>
-		<a href="../libraries/holograms.html">holograms</a>
-	</li>
-
-	<li>
-		<a href="../libraries/hook.html">hook</a>
-	</li>
-
-	<li>
-		<a href="../libraries/http.html">http</a>
-	</li>
-
-	<li>
-		<a href="../libraries/input.html">input</a>
-	</li>
-
-	<li>
-		<a href="../libraries/joystick.html">joystick</a>
-	</li>
-
-	<li>
-		<a href="../libraries/json.html">json</a>
-	</li>
-
-	<li>
-		<a href="../libraries/net.html">net</a>
-	</li>
-
-	<li>
-		<a href="../libraries/physenv.html">physenv</a>
-	</li>
-
-	<li>
-		<a href="../libraries/prop.html">prop</a>
-	</li>
-
-	<li>
-		<a href="../libraries/quaternion.html">quaternion</a>
-	</li>
-
-	<li>
-		<a href="../libraries/render.html">render</a>
-	</li>
-
-	<li>
-		<a href="../libraries/sounds.html">sounds</a>
-	</li>
-
-	<li>
-		<a href="../libraries/team.html">team</a>
-	</li>
-
-	<li>
-		<a href="../libraries/timer.html">timer</a>
-	</li>
-
-	<li>
-		<a href="../libraries/trace.html">trace</a>
-	</li>
-
-	<li>
-		<a href="../libraries/von.html">von</a>
-	</li>
-
-	<li>
-		<a href="../libraries/wire.html">wire</a>
-	</li>
-
-</ul>
-
-
-<h1>Types</h1>
-<ul>
-	
-			<li><a href="../classes/Angle.html">Angle</a></li>
-		
-			<li><a href="../classes/Bass.html">Bass</a></li>
-		
-			<li><a href="../classes/Bone.html">Bone</a></li>
-		
-			<li><a href="../classes/Color.html">Color</a></li>
-		
-			<li><a href="../classes/Entity.html">Entity</a></li>
-		
-			<li><a href="../classes/Hologram.html">Hologram</a></li>
-		
-			<li><a href="../classes/Npc.html">Npc</a></li>
-		
-			<li><a href="../classes/Player.html">Player</a></li>
-		
-			<li><a href="../classes/Quaternion.html">Quaternion</a></li>
-		
-			<li><a href="../classes/Sound.html">Sound</a></li>
-		
-			<li><a href="../classes/VMatrix.html">VMatrix</a></li>
-		
-			<li><a href="../classes/Vector.html">Vector</a></li>
-		
-			<li><a href="../classes/Vehicle.html">Vehicle</a></li>
-		
-			<li><a href="../classes/Weapon.html">Weapon</a></li>
-		
-			<li><a href="../classes/Wirelink.html">Wirelink</a></li>
-		
-</ul>
-
-<h1>Hooks</h1>
-<ul>
-
-	<li>
-		<a href="../hooks.html#EndEntityDriving">EndEntityDriving</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#EntityRemoved">EntityRemoved</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#FinishChat">FinishChat</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#GravGunPunt">GravGunPunt</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#Initialize">Initialize</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#KeyPress">KeyPress</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#KeyRelease">KeyRelease</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#OnEntityCreated">OnEntityCreated</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PhysgunDrop">PhysgunDrop</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PhysgunPickup">PhysgunPickup</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerDeath">PlayerDeath</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerHurt">PlayerHurt</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerNoClip">PlayerNoClip</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerSay">PlayerSay</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerSpawn">PlayerSpawn</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerSpray">PlayerSpray</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PlayerUse">PlayerUse</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#PropBreak">PropBreak</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#Removed">Removed</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#StartChat">StartChat</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#StartEntityDriving">StartEntityDriving</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#calcview">calcview</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#input">input</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#inputPressed">inputPressed</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#inputReleased">inputReleased</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#net">net</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#readcell">readcell</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#remote">remote</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#render">render</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#starfallUsed">starfallUsed</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#think">think</a>
-	</li>
-
-	<li>
-		<a href="../hooks.html#writecell">writecell</a>
-	</li>
-
-</ul>
-
-<h1>Examples</h1>
-<ul>
-
-	<li>
-		<a href="../examples/fireplace.lua.html">fireplace.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/coroutine.lua.html">coroutine.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/include.lua.html">include.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/console.lua.html">console.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/screencpuTime.lua.html">screencpuTime.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/class.lua.html">class.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/sync.lua.html">sync.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/music_player.lua.html">music_player.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/screenhelloworld.lua.html">screenhelloworld.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/included.lua.html">included.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/helloworld.lua.html">helloworld.lua</a>
-	</li>
-
-	<li>
-		<a href="../examples/cpuTime.lua.html">cpuTime.lua</a>
-	</li>
-
-</ul>
-
-<!-- File list -->
-
-
-
-
-
-
-</div><!-- id="navigation" -->
-
-<div id="content">
-
-<h1>Library <code>bit</code></h1>
-
+	<head>
+		<title>Library bit :: StarfallEx Reference</title>
+		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
+		<script> fromPath = "../"; </script>
+		<script src="../assets/js/common.js"></script>
+		<script src="../assets/js/search.js"></script>
+	</head>
+	<body>
+		<nav>
+			<section>
+				<h1>StarfallEx Reference</h1>
+				<ul>
+					<li><a href="../index.html">Home</a></li>
+				</ul>
+			</section>
+			<section id="search">
+				<input type="search" id="search_field" placeholder="Search...">
+			</section>
+			<section id="common_index">
+				<section>
+					<h1>Libraries</h1>
+					<ul>
+						
+						<li><a href="../libraries/bass.html">bass</a></li>
+						<li><a>bit</a></li>
+						<li><a href="../libraries/builtin.html">builtin</a></li>
+						<li><a href="../libraries/constraint.html">constraint</a></li>
+						<li><a href="../libraries/coroutine.html">coroutine</a></li>
+						<li><a href="../libraries/effect.html">effect</a></li>
+						<li><a href="../libraries/fastlz.html">fastlz</a></li>
+						<li><a href="../libraries/file.html">file</a></li>
+						<li><a href="../libraries/find.html">find</a></li>
+						<li><a href="../libraries/game.html">game</a></li>
+						<li><a href="../libraries/holograms.html">holograms</a></li>
+						<li><a href="../libraries/hook.html">hook</a></li>
+						<li><a href="../libraries/http.html">http</a></li>
+						<li><a href="../libraries/input.html">input</a></li>
+						<li><a href="../libraries/joystick.html">joystick</a></li>
+						<li><a href="../libraries/json.html">json</a></li>
+						<li><a href="../libraries/light.html">light</a></li>
+						<li><a href="../libraries/material.html">material</a></li>
+						<li><a href="../libraries/mesh.html">mesh</a></li>
+						<li><a href="../libraries/net.html">net</a></li>
+						<li><a href="../libraries/particle.html">particle</a></li>
+						<li><a href="../libraries/physenv.html">physenv</a></li>
+						<li><a href="../libraries/prop.html">prop</a></li>
+						<li><a href="../libraries/quaternion.html">quaternion</a></li>
+						<li><a href="../libraries/render.html">render</a></li>
+						<li><a href="../libraries/sounds.html">sounds</a></li>
+						<li><a href="../libraries/team.html">team</a></li>
+						<li><a href="../libraries/timer.html">timer</a></li>
+						<li><a href="../libraries/trace.html">trace</a></li>
+						<li><a href="../libraries/von.html">von</a></li>
+						<li><a href="../libraries/wire.html">wire</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Types</h1>
+					<ul>
+						
+						<li><a href="../classes/Angle.html">Angle</a></li>
+						<li><a href="../classes/Bass.html">Bass</a></li>
+						<li><a href="../classes/Color.html">Color</a></li>
+						<li><a href="../classes/Effect.html">Effect</a></li>
+						<li><a href="../classes/Entity.html">Entity</a></li>
+						<li><a href="../classes/File.html">File</a></li>
+						<li><a href="../classes/Hologram.html">Hologram</a></li>
+						<li><a href="../classes/Light.html">Light</a></li>
+						<li><a href="../classes/Material.html">Material</a></li>
+						<li><a href="../classes/Mesh.html">Mesh</a></li>
+						<li><a href="../classes/Npc.html">Npc</a></li>
+						<li><a href="../classes/Particle.html">Particle</a></li>
+						<li><a href="../classes/PhysObj.html">PhysObj</a></li>
+						<li><a href="../classes/Player.html">Player</a></li>
+						<li><a href="../classes/Quaternion.html">Quaternion</a></li>
+						<li><a href="../classes/Sound.html">Sound</a></li>
+						<li><a href="../classes/StringStream.html">StringStream</a></li>
+						<li><a href="../classes/VMatrix.html">VMatrix</a></li>
+						<li><a href="../classes/Vector.html">Vector</a></li>
+						<li><a href="../classes/Vehicle.html">Vehicle</a></li>
+						<li><a href="../classes/Weapon.html">Weapon</a></li>
+						<li><a href="../classes/Wirelink.html">Wirelink</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul>
+						
+						<li><span class="realm_sh"></span><a href="../hooks.html#EndEntityDriving">EndEntityDriving</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityFireBullets">EntityFireBullets</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#EntityRemoved">EntityRemoved</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#EntityTakeDamage">EntityTakeDamage</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#FinishChat">FinishChat</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#GravGunPunt">GravGunPunt</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#Initialize">Initialize</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyPress">KeyPress</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#OnEntityCreated">OnEntityCreated</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunDrop">PhysgunDrop</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PhysgunPickup">PhysgunPickup</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerCanPickupWeapon">PlayerCanPickupWeapon</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#PlayerChat">PlayerChat</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerDeath">PlayerDeath</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerDisconnected">PlayerDisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerEnteredVehicle">PlayerEnteredVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerHurt">PlayerHurt</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerInitialSpawn">PlayerInitialSpawn</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerLeaveVehicle">PlayerLeaveVehicle</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerNoClip">PlayerNoClip</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerSay">PlayerSay</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerSpawn">PlayerSpawn</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerSpray">PlayerSpray</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerSwitchFlashlight">PlayerSwitchFlashlight</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PlayerSwitchWeapon">PlayerSwitchWeapon</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#PlayerUse">PlayerUse</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#PropBreak">PropBreak</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#Removed">Removed</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#StartChat">StartChat</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#StartEntityDriving">StartEntityDriving</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#calcview">calcview</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#drawhud">drawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hologrammatrix">hologrammatrix</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#hudconnected">hudconnected</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#input">input</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#inputPressed">inputPressed</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#inputReleased">inputReleased</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#mouseWheeled">mouseWheeled</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#mousemoved">mousemoved</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#net">net</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#permissionrequest">permissionrequest</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawhud">postdrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#postdrawopaquerenderables">postdrawopaquerenderables</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawhud">predrawhud</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#predrawopaquerenderables">predrawopaquerenderables</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#readcell">readcell</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#remote">remote</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#render">render</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#renderoffscreen">renderoffscreen</a></li>
+						<li><span class="realm_cl"></span><a href="../hooks.html#starfallUsed">starfallUsed</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#think">think</a></li>
+						<li><span class="realm_sh"></span><a href="../hooks.html#tick">tick</a></li>
+						<li><span class="realm_sv"></span><a href="../hooks.html#writecell">writecell</a></li>
+					</ul>
+				</section>
+				<section>
+					<h1>Preprocessor directives</h1>
+					<ul>
+						
+						<li><a href="../directives.html#client">--@client</a></li>
+						<li><a href="../directives.html#include">--@include</a></li>
+						<li><a href="../directives.html#includedir">--@includedir</a></li>
+						<li><a href="../directives.html#model">--@model</a></li>
+						<li><a href="../directives.html#name">--@name</a></li>
+						<li><a href="../directives.html#server">--@server</a></li>
+					</ul>
+				</section>
+			</section>
+			<section id="search_index" style="display: none;">
+				<section>
+					<h1>Functions</h1>
+					<ul id="search_functions">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Methods</h1>
+					<ul id="search_methods">
+						
+					</ul>
+				</section>
+				<section>
+					<h1>Hooks</h1>
+					<ul id="search_hooks">
+						
+					</ul>
+				</section>
+			</section>
+		</nav>
+		<main>
+
+<h1>Library <tt>bit</tt></h1>
 <p>
-Bitwise library</p>
+Bit library http://wiki.garrysmod.com/page/Category:bit</p>
 
 
 
 
 
-
-
-<h2>Functions</h2>
-<table class="function_list">
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.arshift">arshift</a>&nbsp;(value, shiftCount)</td>
-	<td class="summary">
-Arithmetic shift right </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.band">band</a>&nbsp;(value1, ...)</td>
-	<td class="summary">
-Bitwise and </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.bnot">bnot</a>&nbsp;(value)</td>
-	<td class="summary">
-Bitwise not 
-Negates every bit </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.bor">bor</a>&nbsp;(value1, ...)</td>
-	<td class="summary">
-Bitwise or </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.bswap">bswap</a>&nbsp;(value)</td>
-	<td class="summary">
-Swaps byte order </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.bxor">bxor</a>&nbsp;(value1, ...)</td>
-	<td class="summary">
-Bitwise xor </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.lshift">lshift</a>&nbsp;(value, shiftCount)</td>
-	<td class="summary">
-Shift left </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.rol">rol</a>&nbsp;(value, shiftCount)</td>
-	<td class="summary">
-Rotate left </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.ror">ror</a>&nbsp;(value, shiftCount)</td>
-	<td class="summary">
-Rotate right </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.rshift">rshift</a>&nbsp;(value, shiftCount)</td>
-	<td class="summary">
-Shift right </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.tobit">tobit</a>&nbsp;(value)</td>
-	<td class="summary">
-Clamps to 32-bit integer </td>
-	</tr>
-
-	<tr>
-	<td class="name" nowrap><a href="#bit_library.tohex">tohex</a>&nbsp;(value, digits)</td>
-	<td class="summary">
-Returns the hexadecimal representation of the value </td>
-	</tr>
-
-</table>
+<section class="functions">
+	<h2>Functions</h2>
+	<table class="list">
+	
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.GetInt16BytesLE">GetInt16BytesLE</a>( n&nbsp;)</td>
+			<td class="summary">
+Returns big endian bytes (A B) (first two bytes, 16 bits, of number ) </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.GetInt32BytesBE">GetInt32BytesBE</a>( n&nbsp;)</td>
+			<td class="summary">
+Returns big endian bytes (A B) (all 32 bits) </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.GetInt32BytesLE">GetInt32BytesLE</a>( n&nbsp;)</td>
+			<td class="summary">
+Returns little endian bytes (A B) (all 32 bits) </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt16BytesLE">getInt16BytesLE</a>( n&nbsp;)</td>
+			<td class="summary">
+Returns little endian bytes (A B) (first two bytes, 16 bits, of number ) </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.stringstream">stringstream</a>( stream, i&nbsp;)</td>
+			<td class="summary">
+Creates a StringStream object </td>
+		</tr>
+	</table>
+</section>
 
 
 
-
-
-
-
-<br/>
-<br/>
-
-
-
-<h2><a name="functions"></a>Functions</h2>
-<dl class="function">
-
-
-
-<dt><a name="bit_library.arshift"></a><strong>bit_library.arshift</strong>&nbsp;(value, shiftCount)</dt>
+<section class="functions_def">
+	<h2><a name="functions_def"></a>Functions definition</h2>
+	<dl>
+		
+		
+<dt><span class="realm_sh"></span><a name="bit.GetInt16BytesLE"></a><strong>bit.GetInt16BytesLE</strong>( n&nbsp;)</dt>
 <dd>
-
-Arithmetic shift right
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns big endian bytes (A B) (first two bytes, 16 bits, of number )</p>
 	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
 	
-	<li>
-	  <code><em>shiftCount</em></code>: Amounts of bits to shift
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt></li>
+		</ul>
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Shifted value</ul>
-
-
-
-
-
+	
+	
+	
 </dd>
-
-
-
-
-<dt><a name="bit_library.band"></a><strong>bit_library.band</strong>&nbsp;(value1, ...)</dt>
+		
+<dt><span class="realm_sh"></span><a name="bit.GetInt32BytesBE"></a><strong>bit.GetInt32BytesBE</strong>( n&nbsp;)</dt>
 <dd>
-
-Bitwise and
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns big endian bytes (A B) (all 32 bits)</p>
 	
-	<li>
-	  <code><em>value1</em></code>: First value
-	</li>
 	
-	<li>
-	  <code><em>...</em></code>: More values
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt></li>
+		</ul>
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Bitwise and of all values</ul>
-
-
-
-
-
+	
+	
+	
 </dd>
-
-
-
-
-<dt><a name="bit_library.bnot"></a><strong>bit_library.bnot</strong>&nbsp;(value)</dt>
+		
+<dt><span class="realm_sh"></span><a name="bit.GetInt32BytesLE"></a><strong>bit.GetInt32BytesLE</strong>( n&nbsp;)</dt>
 <dd>
-
-Bitwise not 
-Negates every bit
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns little endian bytes (A B) (all 32 bits)</p>
 	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Negated value</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
 </dd>
-
-
-
-
-<dt><a name="bit_library.bor"></a><strong>bit_library.bor</strong>&nbsp;(value1, ...)</dt>
+		
+<dt><span class="realm_sh"></span><a name="bit.getInt16BytesLE"></a><strong>bit.getInt16BytesLE</strong>( n&nbsp;)</dt>
 <dd>
-
-Bitwise or
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Returns little endian bytes (A B) (first two bytes, 16 bits, of number )</p>
 	
-	<li>
-	  <code><em>value1</em></code>: First value
-	</li>
 	
-	<li>
-	  <code><em>...</em></code>: More values
-	</li>
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt></li>
+		</ul>
+	</section>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Bitwise or of all values</ul>
-
-
-
-
-
+	
+	
+	
 </dd>
-
-
-
-
-<dt><a name="bit_library.bswap"></a><strong>bit_library.bswap</strong>&nbsp;(value)</dt>
+		
+<dt><span class="realm_sh"></span><a name="bit.stringstream"></a><strong>bit.stringstream</strong>( stream, i&nbsp;)</dt>
 <dd>
-
-Swaps byte order
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
+	<p>
+Creates a StringStream object</p>
 	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
 	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Value with swapped byte order</ul>
-
-
-
-
-
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>stream</tt> ― A string to set the initial buffer to (default "")</li>
+			<li><tt>i</tt> ― The initial buffer pointer (default 1)</li>
+		</ul>
+	</section>
+	
+	
+	
+	
 </dd>
-
-
-
-
-<dt><a name="bit_library.bxor"></a><strong>bit_library.bxor</strong>&nbsp;(value1, ...)</dt>
-<dd>
-
-Bitwise xor
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value1</em></code>: First value
-	</li>
-	
-	<li>
-	  <code><em>...</em></code>: More values
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Bitwise xor of all values</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="bit_library.lshift"></a><strong>bit_library.lshift</strong>&nbsp;(value, shiftCount)</dt>
-<dd>
-
-Shift left
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
-	
-	<li>
-	  <code><em>shiftCount</em></code>: Amounts of bits to shift
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Shifted value</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="bit_library.rol"></a><strong>bit_library.rol</strong>&nbsp;(value, shiftCount)</dt>
-<dd>
-
-Rotate left
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
-	
-	<li>
-	  <code><em>shiftCount</em></code>: Amounts of bits to shift
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Rotated value</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="bit_library.ror"></a><strong>bit_library.ror</strong>&nbsp;(value, shiftCount)</dt>
-<dd>
-
-Rotate right
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
-	
-	<li>
-	  <code><em>shiftCount</em></code>: Amounts of bits to shift
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Rotated value</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="bit_library.rshift"></a><strong>bit_library.rshift</strong>&nbsp;(value, shiftCount)</dt>
-<dd>
-
-Shift right
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
-	
-	<li>
-	  <code><em>shiftCount</em></code>: Amounts of bits to shift
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Shifted value</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="bit_library.tobit"></a><strong>bit_library.tobit</strong>&nbsp;(value)</dt>
-<dd>
-
-Clamps to 32-bit integer
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value</em></code>: Value to be modified
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Clamped value</ul>
-
-
-
-
-
-</dd>
-
-
-
-
-<dt><a name="bit_library.tohex"></a><strong>bit_library.tohex</strong>&nbsp;(value, digits)</dt>
-<dd>
-
-Returns the hexadecimal representation of the value
-
-
-
-
-<h3>Parameters:</h3>
-<ul>
-	
-	<li>
-	  <code><em>value</em></code>: Value
-	</li>
-	
-	<li>
-	  <code><em>digits</em></code>: Amounts of digits. Optional.
-	</li>
-	
-</ul>
-
-
-
-
-
-
-<h3>Return value:</h3>
-<ul>Hexadecimal representation</ul>
-
-
-
-
-
-</dd>
-
-
-</dl>
-
-
-
-
-
-
-</div> <!-- id="content" -->
-
-</div> <!-- id="main" -->
-
-<div id="about">
-	<p><a href="http://validator.w3.org/check?uri=referer"><img src="http://www.w3.org/Icons/valid-xhtml10" alt="Valid XHTML 1.0!" height="31" width="88" /></a></p>
-</div> <!-- id="about" -->
-
-</div> <!-- id="container" -->	
-</body>
+	</dl>
+</section>
+
+		</main>
+		<footer>
+			<p>
+				StarfallEx Reference. Generated with LuaDoc.
+			</p>
+			<p>
+				<a href="https://github.com/thegrb93/StarfallEx" target="_blank">GitHub</a>
+				<a href="https://discord.gg/QTPgtk2" target="_blank">Discord</a>
+			</p>
+		</footer>
+	</body>
 </html>
