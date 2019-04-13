@@ -95,6 +95,21 @@ function SF.OnRunningOps(running)
 end
 SF.runningOps = false
 
+local function safeThrow(self, msg, nocatch, force)
+	local source = debug.getinfo(3, "S").short_src
+	if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) or force then
+		if SERVER and nocatch then
+			local consolemsg = "[Starfall] CPU Quota exceeded"
+			if self.player:IsValid() then
+				consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
+			end
+			SF.Print(nil, consolemsg .. "\n")
+			MsgC(Color(255,0,0), consolemsg .. "\n")
+		end
+		SF.Throw(msg, 3, nocatch)
+	end
+end
+
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code
@@ -115,30 +130,14 @@ function SF.Instance:runWithOps(func, ...)
 	local function cpuCheck()
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
-
-		local function safeThrow(msg, nocatch, force)
-			local source = debug.getinfo(3, "S").short_src
-			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) or force then
-				if SERVER and nocatch then
-					local consolemsg = "[Starfall] CPU Quota exceeded"
-					if self.player:IsValid() then
-						consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
-					end
-					SF.Print(nil, consolemsg .. "\n")
-					MsgC(Color(255,0,0), consolemsg .. "\n")
-				end
-				SF.Throw(msg, 3, nocatch)
-			end
-		end
-
 		if usedRatio>1 then
 			if usedRatio>1.5 then
-				safeThrow("CPU Quota exceeded.", true, true)
+				safeThrow(self, "CPU Quota exceeded.", true, true)
 			else
-				safeThrow("CPU Quota exceeded.", true)
+				safeThrow(self, "CPU Quota exceeded.", true)
 			end
 		elseif usedRatio > self.cpu_softquota then
-			safeThrow("CPU Quota warning.")
+			safeThrow(self, "CPU Quota warning.")
 		end
 	end
 
