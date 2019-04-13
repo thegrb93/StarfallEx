@@ -1,4 +1,4 @@
-SF.Docs={["classes"]={[1]="Angle";[10]="Mesh";[11]="Npc";[12]="Particle";[13]="PhysObj";[14]="Player";[15]="Quaternion";[16]="Sound";[17]="VMatrix";[18]="Vector";[19]="Vehicle";[2]="Bass";[20]="Weapon";[21]="Wirelink";[3]="Color";[4]="Effect";[5]="Entity";[6]="File";[7]="Hologram";[8]="Light";[9]="Material";["Angle"]={["class"]="class";["client"]=true;["description"]="\
+SF.Docs={["classes"]={[1]="Angle";[10]="Mesh";[11]="Npc";[12]="Particle";[13]="PhysObj";[14]="Player";[15]="Quaternion";[16]="Sound";[17]="StringStream";[18]="VMatrix";[19]="Vector";[2]="Bass";[20]="Vehicle";[21]="Weapon";[22]="Wirelink";[3]="Color";[4]="Effect";[5]="Entity";[6]="File";[7]="Hologram";[8]="Light";[9]="Material";["Angle"]={["class"]="class";["client"]=true;["description"]="\
 Angle Type";["fields"]={};["methods"]={[1]="getForward";[10]="setR";[11]="setY";[12]="setZero";[2]="getNormalized";[3]="getRight";[4]="getUp";[5]="isZero";[6]="normalize";[7]="rotateAroundAxis";[8]="set";[9]="setP";["getForward"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Return the Forward Vector ( direction the angle points ).";["fname"]="getForward";["name"]="ang_methods:getForward";["param"]={};["private"]=false;["realm"]="sh";["ret"]="vector normalised.";["summary"]="\
 Return the Forward Vector ( direction the angle points ).";};["getNormalized"]={["class"]="function";["classlib"]="Angle";["description"]="\
@@ -795,7 +795,49 @@ Sets the volume of the sound.";["fname"]="setVolume";["name"]="sound_methods:set
 Sets the volume of the sound.";};["stop"]={["class"]="function";["classlib"]="Sound";["description"]="\
 Stops the sound from being played.";["fname"]="stop";["name"]="sound_methods:stop";["param"]={[1]="fade";["fade"]="Time in seconds to fade out, if nil or 0 the sound stops instantly.";};["private"]=false;["realm"]="sh";["summary"]="\
 Stops the sound from being played.";};};["name"]="Sound";["server"]=true;["summary"]="\
-Sound type ";["typtbl"]="sound_methods";};["VMatrix"]={["class"]="class";["description"]="\
+Sound type ";["typtbl"]="sound_methods";};["StringStream"]={["class"]="class";["description"]="\
+StringStream type";["fields"]={};["methods"]={[1]="getBuffer";[10]="readUInt8";[11]="readUntil";[12]="seek";[13]="size";[14]="skip";[15]="tell";[16]="write";[17]="writeInt16";[18]="writeInt32";[19]="writeInt8";[2]="getString";[20]="writeString";[3]="read";[4]="readInt16";[5]="readInt32";[6]="readInt8";[7]="readString";[8]="readUInt16";[9]="readUInt32";["getBuffer"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Returns the internal buffer";["fname"]="getBuffer";["name"]="ss_methods:getBuffer";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Returns the internal buffer ";};["getString"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Returns the buffer as a string";["fname"]="getString";["name"]="ss_methods:getString";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Returns the buffer as a string ";};["read"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads the specified number of bytes from the buffer and advances the buffer pointer.";["fname"]="read";["name"]="ss_methods:read";["param"]={[1]="n";};["private"]=false;["realm"]="sh";["summary"]="\
+Reads the specified number of bytes from the buffer and advances the buffer pointer.";};["readInt16"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readInt16";["name"]="ss_methods:readInt16";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.";};["readInt32"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readInt32";["name"]="ss_methods:readInt32";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.";};["readInt8"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readInt8";["name"]="ss_methods:readInt8";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.";};["readString"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+returns a null terminated string, reads until \"\\x00\" and advances the buffer pointer.";["fname"]="readString";["name"]="ss_methods:readString";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+returns a null terminated string, reads until \"\\x00\" and advances the buffer pointer.";};["readUInt16"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readUInt16";["name"]="ss_methods:readUInt16";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.";};["readUInt32"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readUInt32";["name"]="ss_methods:readUInt32";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.";};["readUInt8"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readUInt8";["name"]="ss_methods:readUInt8";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.";};["readUntil"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads until the given byte and advances the buffer pointer.";["fname"]="readUntil";["name"]="ss_methods:readUntil";["param"]={[1]="byte";};["private"]=false;["realm"]="sh";["summary"]="\
+Reads until the given byte and advances the buffer pointer.";};["seek"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Sets internal position to i. The position will be clamped to 1-buffersize";["fname"]="seek";["name"]="ss_methods:seek";["param"]={[1]="i";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets internal position to i.";};["size"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Tells the size of the byte stream.";["fname"]="size";["name"]="ss_methods:size";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Tells the size of the byte stream.";};["skip"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Move the internal pointer by amount i";["fname"]="skip";["name"]="ss_methods:skip";["param"]={[1]="i";};["private"]=false;["realm"]="sh";["summary"]="\
+Move the internal pointer by amount i ";};["tell"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Returns the internal position of the byte reader.";["fname"]="tell";["name"]="ss_methods:tell";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Returns the internal position of the byte reader.";};["write"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes the given string and advances the buffer pointer.";["fname"]="write";["name"]="ss_methods:write";["param"]={[1]="bytes";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes the given string and advances the buffer pointer.";};["writeInt16"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes a short to the buffer and advances the buffer pointer.";["fname"]="writeInt16";["name"]="ss_methods:writeInt16";["param"]={[1]="int";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes a short to the buffer and advances the buffer pointer.";};["writeInt32"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes an int to the buffer and advances the buffer pointer.";["fname"]="writeInt32";["name"]="ss_methods:writeInt32";["param"]={[1]="int";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes an int to the buffer and advances the buffer pointer.";};["writeInt8"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes a byte to the buffer and advances the buffer pointer.";["fname"]="writeInt8";["name"]="ss_methods:writeInt8";["param"]={[1]="int";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes a byte to the buffer and advances the buffer pointer.";};["writeString"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes a null terminated string to the buffer and advances the buffer pointer.";["fname"]="writeString";["name"]="ss_methods:writeString";["param"]={[1]="string";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes a null terminated string to the buffer and advances the buffer pointer.";};};["name"]="StringStream";["summary"]="\
+StringStream type ";["typtbl"]="ss_methods";};["VMatrix"]={["class"]="class";["description"]="\
 VMatrix type";["fields"]={};["methods"]={[1]="getAngles";[10]="getTransposed";[11]="getUp";[12]="invert";[13]="invertTR";[14]="isIdentity";[15]="isRotationMatrix";[16]="rotate";[17]="scale";[18]="scaleTranslation";[19]="set";[2]="getAxisAngle";[20]="setAngles";[21]="setField";[22]="setForward";[23]="setIdentity";[24]="setRight";[25]="setScale";[26]="setTranslation";[27]="setUp";[28]="toTable";[29]="translate";[3]="getField";[30]="transpose";[4]="getForward";[5]="getInverse";[6]="getInverseTR";[7]="getRight";[8]="getScale";[9]="getTranslation";["getAngles"]={["class"]="function";["classlib"]="VMatrix";["description"]="\
 Returns angles";["fname"]="getAngles";["name"]="vmatrix_methods:getAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Angles";["summary"]="\
 Returns angles ";};["getAxisAngle"]={["class"]="function";["classlib"]="VMatrix";["description"]="\
@@ -1272,9 +1314,7 @@ Lua's xpcall with SF throw implementation, and a traceback for debugging. \
 Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function. \
 If execution fails, this returns false and the second function is called with the error message, and the stack trace.";["fname"]="xpcall";["library"]="builtin";["name"]="SF.DefaultEnvironment.xpcall";["param"]={["..."]="Varargs to pass to the initial function.";[1]="func";[2]="callback";[3]="...";["callback"]="The function to be called if execution of the first fails; the error message and stack trace are passed.";["func"]="The function to call initially.";};["private"]=false;["realm"]="sh";["ret"]={[1]="Status of the execution; true for success, false for failure.";[2]="The returns of the first function if execution succeeded, otherwise the return values of the error callback.";};["summary"]="\
 Lua's xpcall with SF throw implementation, and a traceback for debugging.";};};["libtbl"]="SF.DefaultEnvironment";["name"]="builtin";["server"]=true;["summary"]="\
-Built in values.";["tables"]={[1]="bit";[2]="math";[3]="os";[4]="string";[5]="table";["bit"]={["class"]="table";["classForced"]=true;["description"]="\
-Bit library. http://wiki.garrysmod.com/page/Category:bit";["library"]="builtin";["name"]="SF.DefaultEnvironment.bit";["param"]={};["summary"]="\
-Bit library.";["tname"]="bit";};["math"]={["class"]="table";["classForced"]=true;["description"]="\
+Built in values.";["tables"]={[1]="math";[2]="os";[3]="string";[4]="table";["math"]={["class"]="table";["classForced"]=true;["description"]="\
 The math library. http://wiki.garrysmod.com/page/Category:math";["library"]="builtin";["name"]="SF.DefaultEnvironment.math";["param"]={};["summary"]="\
 The math library.";["tname"]="math";};["os"]={["class"]="table";["classForced"]=true;["description"]="\
 The os library. http://wiki.garrysmod.com/page/Category:os";["library"]="builtin";["name"]="SF.DefaultEnvironment.os";["param"]={};["summary"]="\
