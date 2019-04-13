@@ -170,7 +170,7 @@ Returns the EntIndex of the entity";["fname"]="entIndex";["name"]="ents_methods:
 Returns the EntIndex of the entity ";};["extinguish"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Extinguishes an entity";["fname"]="extinguish";["name"]="ents_methods:extinguish";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
 Extinguishes an entity ";};["getAllConstrained"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Gets a table of all constrained entities to each other";["fname"]="getAllConstrained";["name"]="ents_methods:getAllConstrained";["param"]={[1]="constraintype";["constraintype"]="Optional type name of constraint to filter by";};["private"]=false;["realm"]="sv";["summary"]="\
+Gets a table of all constrained entities to each other";["fname"]="getAllConstrained";["name"]="ents_methods:getAllConstrained";["param"]={[1]="filter";["filter"]="Optional constraint type filter table where keys are the type name and values are 'true'. \"Wire\" and \"Parent\" are used for wires and parents.";};["private"]=false;["realm"]="sv";["summary"]="\
 Gets a table of all constrained entities to each other ";};["getAngleVelocity"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the angular velocity of the entity";["fname"]="getAngleVelocity";["name"]="ents_methods:getAngleVelocity";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The angular velocity as a vector";["server"]=true;["summary"]="\
 Returns the angular velocity of the entity ";};["getAngleVelocityAngle"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
