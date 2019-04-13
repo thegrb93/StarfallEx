@@ -56,8 +56,63 @@ local function ByterizeByte(n)
 	return n%256
 end
 
+--Credit https://stackoverflow.com/users/903234/rpfeltz
+local function PackIEEE754Float(number)
+    if number == 0 then
+        return 0x00, 0x00, 0x00, 0x00
+    elseif number ~= number then
+        return 0xFF, 0xFF, 0xFF, 0xFF
+    else
+        local sign = 0x00
+        if number < 0 then
+            sign = 0x80
+            number = -number
+        end
+        local mantissa, exponent = math.frexp(number)
+        exponent = exponent + 0x7F
+        if exponent <= 0 then
+            mantissa = math.ldexp(mantissa, exponent - 1)
+            exponent = 0
+        elseif exponent > 0 then
+            if exponent >= 0xFF then
+                return string.char(sign + 0x7F, 0x80, 0x00, 0x00)
+            elseif exponent == 1 then
+                exponent = 0
+            else
+                mantissa = mantissa * 2 - 1
+                exponent = exponent - 1
+            end
+        end
+        mantissa = math.floor(math.ldexp(mantissa, 23) + 0.5)
+        return sign + math.floor(exponent / 2),
+                (exponent % 2) * 0x80 + math.floor(mantissa / 0x10000),
+                math.floor(mantissa / 0x100) % 0x100,
+                mantissa % 0x100
+    end
+end
+local function UnpackIEEE754Float(b1, b2, b3, b4)
+    local exponent = (b1 % 0x80) * 0x02 + math.floor(b2 / 0x80)
+    local mantissa = math.ldexp(((b2 % 0x80) * 0x100 + b3) * 0x100 + b4, -23)
+    if exponent == 0xFF then
+        if mantissa > 0 then
+            return 0 / 0
+        else
+            mantissa = math.huge
+            exponent = 0x7F
+        end
+    elseif exponent > 0 then
+        mantissa = mantissa + 1
+    else
+        exponent = exponent + 1
+    end
+    if b1 >= 0x80 then
+        mantissa = -mantissa
+    end
+    return math.ldexp(mantissa, exponent - 0x7F)
+end
+
 --- Returns little endian bytes (A B) (all 32 bits)
-function bit_library.GetInt32BytesLE(n)
+function bit_library.getInt32BytesLE(n)
 	local a,b,c,d = ByterizeInt(n)
 	return string.char(d,c,b,a)
 end
@@ -69,20 +124,20 @@ function bit_library.getInt16BytesLE(n)
 end
 
 --- Returns big endian bytes (A B) (all 32 bits)
-function bit_library.GetInt32BytesBE(n)
+function bit_library.getInt32BytesBE(n)
 	local a,b,c,d = ByterizeInt(n)
 	return string.char(a,b,c,d)
 end
 
 --- Returns big endian bytes (A B) (first two bytes, 16 bits, of number )
-function bit_library.GetInt16BytesLE(n)
+function bit_library.getInt16BytesBE(n)
 	local a,b  = ByterizeShort(n)
 	return string.char(a,b)
 end
 
-local function twos_compliment(int,bits)
+local function twos_compliment(x,bits)
     local mask = 2^(bits - 1)
-    return -(bit.band(int,mask)) + (bit.band(int,bit.bnot(mask)))
+    return -(bit.band(x,mask)) + (bit.band(x,bit.bnot(mask)))
 end
 
 function ss_metamethods:__tostring()
@@ -91,7 +146,7 @@ end
 
 --- Sets internal position to i. The position will be clamped to 1-buffersize
 function ss_methods:seek(i)
-	self.pos = math.Clamp(i, 1, #self.buffer)
+	self.pos = math.Clamp(i, 1, #self.buffer + 1)
 end
 
 --- Move the internal pointer by amount i
@@ -136,6 +191,13 @@ function ss_methods:readInt32()
 	return twos_compliment(self:readUInt32(),32)
 end
 
+--- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
+function ss_methods:readFloat()
+	local ret = UnpackIEEE754Float(self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3])
+	self.pos = self.pos + 4
+	return ret
+end
+
 --- Returns the internal position of the byte reader.
 function ss_methods:tell()
 	return self.pos
@@ -176,22 +238,31 @@ function ss_methods:readString()
 end
 
 --- Writes a byte to the buffer and advances the buffer pointer.
-function ss_methods:writeInt8(int)
-	self.buffer[self.pos] = ByterizeByte(int)
+function ss_methods:writeInt8(x)
+	self.buffer[self.pos] = ByterizeByte(x)
 	self.pos = self.pos + 1
 end
 
 --- Writes a short to the buffer and advances the buffer pointer.
-function ss_methods:writeInt16(int)
-	self:write(bytestream.GetInt16BytesLE(int))
+function ss_methods:writeInt16(x)
+	self.buffer[self.pos+1], self.buffer[self.pos] = ByterizeShort(x)
+	self.pos = self.pos + 2
 end
 
 --- Writes an int to the buffer and advances the buffer pointer.
-function ss_methods:writeInt32(int)
-	self:write(bytestream.GetInt32BytesLE(int))
+function ss_methods:writeInt32(x)
+	self.buffer[self.pos+3], self.buffer[self.pos+2], self.buffer[self.pos+1], self.buffer[self.pos] = ByterizeInt(x)
+	self.pos = self.pos + 4
 end
 
---- Writes a null terminated string to the buffer and advances the buffer pointer.
+--- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
+--@param x The float to write
+function ss_methods:writeFloat(x)
+	self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3] = PackIEEE754Float(x)
+	self.pos = self.pos + 4
+end
+
+--- Writes a string to the buffer putting a null at the end and advances the buffer pointer.
 function ss_methods:writeString(string)
 	self:write(string)
 	self:writeInt8(0)
