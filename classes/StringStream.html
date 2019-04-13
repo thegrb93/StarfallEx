@@ -215,6 +215,11 @@ Returns the buffer as a string </td>
 Reads the specified number of bytes from the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readFloat">readFloat</a>( &nbsp;)</td>
+			<td class="summary">
+Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readInt16">readInt16</a>( &nbsp;)</td>
 			<td class="summary">
 Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.</td>
@@ -280,24 +285,29 @@ Returns the internal position of the byte reader.</td>
 Writes the given string and advances the buffer pointer.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt16">writeInt16</a>( int&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeFloat">writeFloat</a>( x&nbsp;)</td>
+			<td class="summary">
+Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt16">writeInt16</a>( x&nbsp;)</td>
 			<td class="summary">
 Writes a short to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt32">writeInt32</a>( int&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt32">writeInt32</a>( x&nbsp;)</td>
 			<td class="summary">
 Writes an int to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt8">writeInt8</a>( int&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt8">writeInt8</a>( x&nbsp;)</td>
 			<td class="summary">
 Writes a byte to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeString">writeString</a>( string&nbsp;)</td>
 			<td class="summary">
-Writes a null terminated string to the buffer and advances the buffer pointer.</td>
+Writes a string to the buffer putting a null at the end and advances the buffer pointer.</td>
 		</tr>
 	</table>
 </section>
@@ -343,6 +353,18 @@ Reads the specified number of bytes from the buffer and advances the buffer poin
 			<li><tt>n</tt></li>
 		</ul>
 	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readFloat"></a><strong>StringStream:readFloat</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.</p>
+	
+	
 	
 	
 	
@@ -533,7 +555,26 @@ Writes the given string and advances the buffer pointer.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="StringStream:writeInt16"></a><strong>StringStream:writeInt16</strong>( int&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="StringStream:writeFloat"></a><strong>StringStream:writeFloat</strong>( x&nbsp;)</dt>
+<dd>
+	<p>
+Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The float to write</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:writeInt16"></a><strong>StringStream:writeInt16</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
 Writes a short to the buffer and advances the buffer pointer.</p>
@@ -543,7 +584,7 @@ Writes a short to the buffer and advances the buffer pointer.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>int</tt></li>
+			<li><tt>x</tt></li>
 		</ul>
 	</section>
 	
@@ -552,7 +593,7 @@ Writes a short to the buffer and advances the buffer pointer.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="StringStream:writeInt32"></a><strong>StringStream:writeInt32</strong>( int&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="StringStream:writeInt32"></a><strong>StringStream:writeInt32</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
 Writes an int to the buffer and advances the buffer pointer.</p>
@@ -562,7 +603,7 @@ Writes an int to the buffer and advances the buffer pointer.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>int</tt></li>
+			<li><tt>x</tt></li>
 		</ul>
 	</section>
 	
@@ -571,7 +612,7 @@ Writes an int to the buffer and advances the buffer pointer.</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="StringStream:writeInt8"></a><strong>StringStream:writeInt8</strong>( int&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="StringStream:writeInt8"></a><strong>StringStream:writeInt8</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
 Writes a byte to the buffer and advances the buffer pointer.</p>
@@ -581,7 +622,7 @@ Writes a byte to the buffer and advances the buffer pointer.</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>int</tt></li>
+			<li><tt>x</tt></li>
 		</ul>
 	</section>
 	
@@ -593,7 +634,7 @@ Writes a byte to the buffer and advances the buffer pointer.</p>
 <dt><span class="realm_sh"></span><a name="StringStream:writeString"></a><strong>StringStream:writeString</strong>( string&nbsp;)</dt>
 <dd>
 	<p>
-Writes a null terminated string to the buffer and advances the buffer pointer.</p>
+Writes a string to the buffer putting a null at the end and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">

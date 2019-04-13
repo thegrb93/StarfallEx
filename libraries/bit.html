@@ -200,24 +200,24 @@ Bit library http://wiki.garrysmod.com/page/Category:bit</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.GetInt16BytesLE">GetInt16BytesLE</a>( n&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt16BytesBE">getInt16BytesBE</a>( n&nbsp;)</td>
 			<td class="summary">
 Returns big endian bytes (A B) (first two bytes, 16 bits, of number ) </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.GetInt32BytesBE">GetInt32BytesBE</a>( n&nbsp;)</td>
-			<td class="summary">
-Returns big endian bytes (A B) (all 32 bits) </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.GetInt32BytesLE">GetInt32BytesLE</a>( n&nbsp;)</td>
-			<td class="summary">
-Returns little endian bytes (A B) (all 32 bits) </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt16BytesLE">getInt16BytesLE</a>( n&nbsp;)</td>
 			<td class="summary">
 Returns little endian bytes (A B) (first two bytes, 16 bits, of number ) </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt32BytesBE">getInt32BytesBE</a>( n&nbsp;)</td>
+			<td class="summary">
+Returns big endian bytes (A B) (all 32 bits) </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt32BytesLE">getInt32BytesLE</a>( n&nbsp;)</td>
+			<td class="summary">
+Returns little endian bytes (A B) (all 32 bits) </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#bit.stringstream">stringstream</a>( stream, i&nbsp;)</td>
@@ -234,48 +234,10 @@ Creates a StringStream object </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="bit.GetInt16BytesLE"></a><strong>bit.GetInt16BytesLE</strong>( n&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="bit.getInt16BytesBE"></a><strong>bit.getInt16BytesBE</strong>( n&nbsp;)</dt>
 <dd>
 	<p>
 Returns big endian bytes (A B) (first two bytes, 16 bits, of number )</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>n</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="bit.GetInt32BytesBE"></a><strong>bit.GetInt32BytesBE</strong>( n&nbsp;)</dt>
-<dd>
-	<p>
-Returns big endian bytes (A B) (all 32 bits)</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>n</tt></li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="bit.GetInt32BytesLE"></a><strong>bit.GetInt32BytesLE</strong>( n&nbsp;)</dt>
-<dd>
-	<p>
-Returns little endian bytes (A B) (all 32 bits)</p>
 	
 	
 	<section class="parameters">
@@ -295,6 +257,44 @@ Returns little endian bytes (A B) (all 32 bits)</p>
 <dd>
 	<p>
 Returns little endian bytes (A B) (first two bytes, 16 bits, of number )</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="bit.getInt32BytesBE"></a><strong>bit.getInt32BytesBE</strong>( n&nbsp;)</dt>
+<dd>
+	<p>
+Returns big endian bytes (A B) (all 32 bits)</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>n</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="bit.getInt32BytesLE"></a><strong>bit.getInt32BytesLE</strong>( n&nbsp;)</dt>
+<dd>
+	<p>
+Returns little endian bytes (A B) (all 32 bits)</p>
 	
 	
 	<section class="parameters">
