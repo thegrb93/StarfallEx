@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Vehicle :: StarfallEx Reference</title>
+		<title>StringStream :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -77,10 +77,10 @@
 						<li><a href="../classes/Player.html">Player</a></li>
 						<li><a href="../classes/Quaternion.html">Quaternion</a></li>
 						<li><a href="../classes/Sound.html">Sound</a></li>
-						<li><a href="../classes/StringStream.html">StringStream</a></li>
+						<li><a>StringStream</a></li>
 						<li><a href="../classes/VMatrix.html">VMatrix</a></li>
 						<li><a href="../classes/Vector.html">Vector</a></li>
-						<li><a>Vehicle</a></li>
+						<li><a href="../classes/Vehicle.html">Vehicle</a></li>
 						<li><a href="../classes/Weapon.html">Weapon</a></li>
 						<li><a href="../classes/Wirelink.html">Wirelink</a></li>
 					</ul>
@@ -186,9 +186,9 @@
 		</nav>
 		<main>
 
-<h1><tt>Vehicle</tt> type</h1>
+<h1><tt>StringStream</tt> type</h1>
 <p>
-Vehicle type</p>
+StringStream type</p>
 
 
 
@@ -199,19 +199,104 @@ Vehicle type</p>
 	<table class="list">
 		
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Vehicle:ejectDriver">ejectDriver</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:getBuffer">getBuffer</a>( &nbsp;)</td>
 			<td class="summary">
-Ejects the driver of the vehicle </td>
+Returns the internal buffer </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Vehicle:getDriver">getDriver</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:getString">getString</a>( &nbsp;)</td>
 			<td class="summary">
-Returns the driver of the vehicle </td>
+Returns the buffer as a string </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Vehicle:getPassenger">getPassenger</a>( n&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:read">read</a>( n&nbsp;)</td>
 			<td class="summary">
-Returns a passenger of a vehicle </td>
+Reads the specified number of bytes from the buffer and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readInt16">readInt16</a>( &nbsp;)</td>
+			<td class="summary">
+Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readInt32">readInt32</a>( &nbsp;)</td>
+			<td class="summary">
+Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readInt8">readInt8</a>( &nbsp;)</td>
+			<td class="summary">
+Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readString">readString</a>( &nbsp;)</td>
+			<td class="summary">
+returns a null terminated string, reads until "\x00" and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readUInt16">readUInt16</a>( &nbsp;)</td>
+			<td class="summary">
+Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readUInt32">readUInt32</a>( &nbsp;)</td>
+			<td class="summary">
+Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readUInt8">readUInt8</a>( &nbsp;)</td>
+			<td class="summary">
+Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readUntil">readUntil</a>( byte&nbsp;)</td>
+			<td class="summary">
+Reads until the given byte and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:seek">seek</a>( i&nbsp;)</td>
+			<td class="summary">
+Sets internal position to i.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:size">size</a>( &nbsp;)</td>
+			<td class="summary">
+Tells the size of the byte stream.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:skip">skip</a>( i&nbsp;)</td>
+			<td class="summary">
+Move the internal pointer by amount i </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:tell">tell</a>( &nbsp;)</td>
+			<td class="summary">
+Returns the internal position of the byte reader.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:write">write</a>( bytes&nbsp;)</td>
+			<td class="summary">
+Writes the given string and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt16">writeInt16</a>( int&nbsp;)</td>
+			<td class="summary">
+Writes a short to the buffer and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt32">writeInt32</a>( int&nbsp;)</td>
+			<td class="summary">
+Writes an int to the buffer and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt8">writeInt8</a>( int&nbsp;)</td>
+			<td class="summary">
+Writes a byte to the buffer and advances the buffer pointer.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeString">writeString</a>( string&nbsp;)</td>
+			<td class="summary">
+Writes a null terminated string to the buffer and advances the buffer pointer.</td>
 		</tr>
 	</table>
 </section>
@@ -220,10 +305,10 @@ Returns a passenger of a vehicle </td>
 	<dl>
 		
 		
-<dt><span class="realm_sv"></span><a name="Vehicle:ejectDriver"></a><strong>Vehicle:ejectDriver</strong>( &nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="StringStream:getBuffer"></a><strong>StringStream:getBuffer</strong>( &nbsp;)</dt>
 <dd>
 	<p>
-Ejects the driver of the vehicle</p>
+Returns the internal buffer</p>
 	
 	
 	
@@ -232,45 +317,293 @@ Ejects the driver of the vehicle</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Vehicle:getDriver"></a><strong>Vehicle:getDriver</strong>( &nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="StringStream:getString"></a><strong>StringStream:getString</strong>( &nbsp;)</dt>
 <dd>
 	<p>
-Returns the driver of the vehicle</p>
+Returns the buffer as a string</p>
 	
 	
 	
 	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Driver of vehicle</p>
-		
-	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Vehicle:getPassenger"></a><strong>Vehicle:getPassenger</strong>( n&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="StringStream:read"></a><strong>StringStream:read</strong>( n&nbsp;)</dt>
 <dd>
 	<p>
-Returns a passenger of a vehicle</p>
+Reads the specified number of bytes from the buffer and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>n</tt> ― The index of the passenger to get</li>
+			<li><tt>n</tt></li>
 		</ul>
 	</section>
 	
 	
-	<section class="return">
-		<h3>Returns</h3>
+	
+	
+</dd>
 		
-		<p>amount of ammo</p>
+<dt><span class="realm_sh"></span><a name="StringStream:readInt16"></a><strong>StringStream:readInt16</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
 		
+<dt><span class="realm_sh"></span><a name="StringStream:readInt32"></a><strong>StringStream:readInt32</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads a signed 32-bit (four byte) integer from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readInt8"></a><strong>StringStream:readInt8</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readString"></a><strong>StringStream:readString</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+returns a null terminated string, reads until "\x00" and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readUInt16"></a><strong>StringStream:readUInt16</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readUInt32"></a><strong>StringStream:readUInt32</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readUInt8"></a><strong>StringStream:readUInt8</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readUntil"></a><strong>StringStream:readUntil</strong>( byte&nbsp;)</dt>
+<dd>
+	<p>
+Reads until the given byte and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>byte</tt></li>
+		</ul>
 	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:seek"></a><strong>StringStream:seek</strong>( i&nbsp;)</dt>
+<dd>
+	<p>
+Sets internal position to i. The position will be clamped to 1-buffersize</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>i</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:size"></a><strong>StringStream:size</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Tells the size of the byte stream.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:skip"></a><strong>StringStream:skip</strong>( i&nbsp;)</dt>
+<dd>
+	<p>
+Move the internal pointer by amount i</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>i</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:tell"></a><strong>StringStream:tell</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the internal position of the byte reader.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:write"></a><strong>StringStream:write</strong>( bytes&nbsp;)</dt>
+<dd>
+	<p>
+Writes the given string and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>bytes</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:writeInt16"></a><strong>StringStream:writeInt16</strong>( int&nbsp;)</dt>
+<dd>
+	<p>
+Writes a short to the buffer and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>int</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:writeInt32"></a><strong>StringStream:writeInt32</strong>( int&nbsp;)</dt>
+<dd>
+	<p>
+Writes an int to the buffer and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>int</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:writeInt8"></a><strong>StringStream:writeInt8</strong>( int&nbsp;)</dt>
+<dd>
+	<p>
+Writes a byte to the buffer and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>int</tt></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:writeString"></a><strong>StringStream:writeString</strong>( string&nbsp;)</dt>
+<dd>
+	<p>
+Writes a null terminated string to the buffer and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>string</tt></li>
+		</ul>
+	</section>
+	
+	
 	
 	
 </dd>
