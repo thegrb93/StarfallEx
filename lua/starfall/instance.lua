@@ -128,6 +128,13 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
+local function xpcall_callback (err)
+	if debug.getmetatable(err)~=SF.Errormeta then
+		return SF.MakeError(err, 1)
+	end
+	return err
+end
+
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code
@@ -136,14 +143,6 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
-
-	local function xpcall_callback (err)
-		if debug.getmetatable(err)~=SF.Errormeta then
-			return SF.MakeError(err, 1)
-		end
-		return err
-	end
-
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck()
 		self.cpu_total = SysTime() - oldSysTime
@@ -191,14 +190,6 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithoutOps(func, ...)
-
-	local function xpcall_callback (err)
-		if debug.getmetatable(err)~=SF.Errormeta then
-			return SF.MakeError(err, 1)
-		end
-		return err
-	end
-
 	return { xpcall(func, xpcall_callback, ...) }
 end
 
