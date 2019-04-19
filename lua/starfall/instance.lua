@@ -14,6 +14,7 @@ else
 	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
 end
 
 SF.Instance = {}
@@ -38,6 +39,23 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		code = { [mainfile] = code }
 	end
 
+	local quotaRun
+	if SERVER then
+		if SF.softLockProtection:GetBool() then
+			quotaRun = SF.Instance.runWithOps
+		else
+			quotaRun = SF.Instance.runWithoutOps
+		end
+	else
+		if SF.softLockProtection:GetBool() then
+			quotaRun = SF.Instance.runWithOps
+		elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
+			quotaRun = SF.Instance.runWithOps
+		else
+			quotaRun = SF.Instance.runWithoutOps
+		end
+	end
+
 	local instance = setmetatable({}, SF.Instance)
 
 	instance.player = player
@@ -53,9 +71,9 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.mainfile = mainfile
 	instance.requires = {}
 	instance.requirestack = {string.GetPathFromFilename(mainfile)}
-	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+	instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
-	instance.run = SF.softLockProtection:GetBool() and SF.Instance.runWithOps or SF.Instance.runWithoutOps
+	instance.run = quotaRun
 	instance.startram = collectgarbage("count")
 	if CLIENT and instance.cpuQuota <= 0 then
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
