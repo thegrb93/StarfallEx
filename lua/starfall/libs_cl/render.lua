@@ -1590,12 +1590,12 @@ end
 --- Does a trace and returns the color of the textel the trace hits.
 -- @param vec1 The starting vector
 -- @param vec2 The ending vector
--- @return The color vector. use vector:toColor to convert it to a color.
+-- @return The color
 function render_library.traceSurfaceColor(vec1, vec2)
 	checktype(vec1, vector_meta)
 	checktype(vec2, vector_meta)
 
-	return vwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)))
+	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
