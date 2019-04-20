@@ -1935,7 +1935,7 @@ Sets the current render material";["fname"]="setTexture";["library"]="render";["
 Sets the current render material ";};["setTextureFromScreen"]={["class"]="function";["description"]="\
 Sets the texture of a screen entity";["fname"]="setTextureFromScreen";["library"]="render";["name"]="render_library.setTextureFromScreen";["param"]={[1]="ent";["ent"]="Screen entity";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the texture of a screen entity ";};["traceSurfaceColor"]={["class"]="function";["description"]="\
-Does a trace and returns the color of the textel the trace hits.";["fname"]="traceSurfaceColor";["library"]="render";["name"]="render_library.traceSurfaceColor";["param"]={[1]="vec1";[2]="vec2";["vec1"]="The starting vector";["vec2"]="The ending vector";};["private"]=false;["realm"]="cl";["ret"]="The color vector. use vector:toColor to convert it to a color.";["summary"]="\
+Does a trace and returns the color of the textel the trace hits.";["fname"]="traceSurfaceColor";["library"]="render";["name"]="render_library.traceSurfaceColor";["param"]={[1]="vec1";[2]="vec2";["vec1"]="The starting vector";["vec2"]="The ending vector";};["private"]=false;["realm"]="cl";["ret"]="The color";["summary"]="\
 Does a trace and returns the color of the textel the trace hits.";};};["libtbl"]="render_library";["name"]="render";["summary"]="\
 Render library.";["tables"]={};};["sounds"]={["class"]="library";["client"]=true;["description"]="\
 Sounds library.";["fields"]={};["functions"]={[1]="canCreate";[2]="create";[3]="soundsLeft";["canCreate"]={["class"]="function";["description"]="\
