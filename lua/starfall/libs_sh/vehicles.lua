@@ -73,7 +73,7 @@ if SERVER then
 		return pwrap(ent:GetPassenger(n))
 	end
 
-	-- Kills the driver of the vehicle
+	--- Kills the driver of the vehicle
 	-- @server
 	function vehicle_methods:killDriver ()
 		checktype(self, vehicle_metamethods)
