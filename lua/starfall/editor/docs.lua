@@ -964,7 +964,7 @@ Multiply self with a Vector.";};["withinAABox"]={["class"]="function";["classlib
 Returns whenever the given vector is in a box created by the 2 other vectors.";["fname"]="withinAABox";["name"]="vec_methods:withinAABox";["param"]={[1]="v1";[2]="v2";["v1"]="Vector used to define AABox";["v2"]="Second Vector to define AABox";};["private"]=false;["realm"]="sh";["ret"]="bool True/False.";["summary"]="\
 Returns whenever the given vector is in a box created by the 2 other vectors.";};};["name"]="Vector";["server"]=true;["summary"]="\
 Vector type ";["typtbl"]="vec_methods";};["Vehicle"]={["class"]="class";["description"]="\
-Vehicle type";["fields"]={};["methods"]={[1]="ejectDriver";[2]="getDriver";[3]="getPassenger";[4]="killDriver";["ejectDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
+Vehicle type";["fields"]={};["methods"]={[1]="ejectDriver";[2]="getDriver";[3]="getPassenger";[4]="killDriver";[5]="lock";[6]="stripDriver";[7]="unlock";["ejectDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
 Ejects the driver of the vehicle";["fname"]="ejectDriver";["name"]="vehicle_methods:ejectDriver";["param"]={};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Ejects the driver of the vehicle ";};["getDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
 Returns the driver of the vehicle";["fname"]="getDriver";["name"]="vehicle_methods:getDriver";["param"]={};["private"]=false;["realm"]="sv";["ret"]="Driver of vehicle";["server"]=true;["summary"]="\
@@ -972,7 +972,13 @@ Returns the driver of the vehicle ";};["getPassenger"]={["class"]="function";["c
 Returns a passenger of a vehicle";["fname"]="getPassenger";["name"]="vehicle_methods:getPassenger";["param"]={[1]="n";["n"]="The index of the passenger to get";};["private"]=false;["realm"]="sv";["ret"]="amount of ammo";["server"]=true;["summary"]="\
 Returns a passenger of a vehicle ";};["killDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
 Kills the driver of the vehicle";["fname"]="killDriver";["name"]="vehicle_methods:killDriver";["param"]={};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
-Kills the driver of the vehicle ";};};["name"]="Vehicle";["summary"]="\
+Kills the driver of the vehicle ";};["lock"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
+Will lock the vehicle preventing players from entering or exiting the vehicle.";["fname"]="lock";["name"]="vehicle_methods:lock";["param"]={};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
+Will lock the vehicle preventing players from entering or exiting the vehicle.";};["stripDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
+Strips weapons of the driver";["fname"]="stripDriver";["name"]="vehicle_methods:stripDriver";["param"]={[1]="class";["class"]="Optional weapon class to strip. Otherwise all are stripped.";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
+Strips weapons of the driver ";};["unlock"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
+Will unlock the vehicle.";["fname"]="unlock";["name"]="vehicle_methods:unlock";["param"]={};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
+Will unlock the vehicle.";};};["name"]="Vehicle";["summary"]="\
 Vehicle type ";["typtbl"]="vehicle_methods";};["Weapon"]={["class"]="class";["description"]="\
 Weapon type";["fields"]={};["methods"]={[1]="clip1";[10]="getToolMode";[11]="isCarriedByLocalPlayer";[12]="isWeaponVisible";[13]="lastShootTime";[2]="clip2";[3]="getActivity";[4]="getHoldType";[5]="getNextPrimaryFire";[6]="getNextSecondaryFire";[7]="getPrimaryAmmoType";[8]="getPrintName";[9]="getSecondaryAmmoType";["clip1"]={["class"]="function";["classlib"]="Weapon";["client"]=true;["description"]="\
 Returns Ammo in primary clip";["fname"]="clip1";["name"]="weapon_methods:clip1";["param"]={};["private"]=false;["realm"]="sh";["ret"]="amount of ammo";["server"]=true;["summary"]="\
