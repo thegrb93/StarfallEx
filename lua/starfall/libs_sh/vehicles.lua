@@ -114,6 +114,9 @@ if SERVER then
 		local ent = unwrap(self)
 		if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
 		checkpermission(SF.instance, ent, "vehicle.lock")
+		local n = "SF_CanExitVehicle"..ent:EntIndex()
+		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
+		ent:CallOnRemove(n, function() hook.Remove("CanExitVehicle", n) end) 
 		ent:Fire("Lock")
 	end
 
@@ -124,6 +127,7 @@ if SERVER then
 		local ent = unwrap(self)
 		if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
 		checkpermission(SF.instance, ent, "vehicle.lock")
+		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		ent:Fire("Unlock")
 	end
 
