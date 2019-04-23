@@ -70,7 +70,7 @@ else
 	end)
 	net.start("") net.send()
 
-	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0")
+	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/79nhlngkvydv85f/renamon.png")
 	screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
 
 	http.get("https://dl.dropboxusercontent.com/s/cwob1j0nka0ko2e/renamon.obj",function(objdata)
