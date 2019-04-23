@@ -73,7 +73,7 @@ else
 	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0")
 	screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
 
-	http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(objdata)
+	http.get("https://dl.dropboxusercontent.com/s/cwob1j0nka0ko2e/renamon.obj",function(objdata)
 		local start = mesh.trianglesLeft()
 		mymesh = mesh.createFromObj(objdata)
 		print("Used "..(start-mesh.trianglesLeft()).." triangles.")
