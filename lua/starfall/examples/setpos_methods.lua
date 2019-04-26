@@ -18,6 +18,9 @@ To do this, you need to setPos() the physicsObject of an entity.
 
 This retains the interpolation and makes motion looks smooth.
 
+As an example, The red box has setPos on itself.
+The greenbox has setPos on the physicsObject.
+
 ]]--
 
 --ignore this bit, it's for creating the prop
