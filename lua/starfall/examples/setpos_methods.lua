@@ -9,10 +9,9 @@ end
 --[[
 This example code shows how smooth Setpos is achieved.
 
-You may have tried to directly setPos() an entity, right?
-You probably saw how the movement is very choppy.
+You may have tried to directly setPos() an entity and saw how the movement was very choppy.
 
-This is because this method doesn't utilize any interpolation.
+This is because this method doesn't have any interpolation.
 It can be good for other uses unless you want smooth motion with setPos().
 
 To do this, you need to setPos() the physicsObject of an entity. 
