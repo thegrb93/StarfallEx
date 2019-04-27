@@ -342,8 +342,8 @@ Parents the entity to another entity";["fname"]="setParent";["name"]="ents_metho
 Parents the entity to another entity ";};["setPhysMaterial"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Sets the physical material of the entity";["fname"]="setPhysMaterial";["name"]="ents_methods:setPhysMaterial";["param"]={[1]="mat";["mat"]="Material to use";};["private"]=false;["realm"]="sv";["summary"]="\
 Sets the physical material of the entity ";};["setPos"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entitiy's position";["fname"]="setPos";["name"]="ents_methods:setPos";["param"]={[1]="vec";["vec"]="New position";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entitiy's position ";};["setRenderFX"]={["class"]="function";["classForced"]=true;["classlib"]="Entity";["client"]=true;["description"]="\
+Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.";["fname"]="setPos";["name"]="ents_methods:setPos";["param"]={[1]="vec";["vec"]="New position";};["private"]=false;["realm"]="sv";["summary"]="\
+Sets the entitiy's position.";};["setRenderFX"]={["class"]="function";["classForced"]=true;["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the renderfx of the entity";["fname"]="setRenderFX";["name"]="ents_methods:setRenderFX";["param"]={[1]="renderfx";["renderfx"]="Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
 Sets the renderfx of the entity ";};["setRenderMode"]={["class"]="function";["classForced"]=true;["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the render mode of the entity";["fname"]="setRenderMode";["name"]="ents_methods:setRenderMode";["param"]={[1]="rendermode";["rendermode"]="Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
@@ -640,8 +640,8 @@ Sets the mass of a physics object";["fname"]="setMass";["name"]="physobj_methods
 Sets the mass of a physics object ";};["setMaterial"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Sets the physical material of a physics object";["fname"]="setMaterial";["name"]="physobj_methods:setMaterial";["param"]={[1]="material";["material"]="The physical material to set it to";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Sets the physical material of a physics object ";};["setPos"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
-Sets the position of the physics object";["fname"]="setPos";["name"]="physobj_methods:setPos";["param"]={[1]="pos";["pos"]="The position vector to set it to";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
-Sets the position of the physics object ";};["setVelocity"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.";["fname"]="setPos";["name"]="physobj_methods:setPos";["param"]={[1]="pos";["pos"]="The position vector to set it to";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
+Sets the position of the physics object.";};["setVelocity"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Sets the velocity of the physics object";["fname"]="setVelocity";["name"]="physobj_methods:setVelocity";["param"]={[1]="vel";["vel"]="The velocity vector to set it to";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Sets the velocity of the physics object ";};["wake"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Makes a sleeping physobj wakeup";["fname"]="wake";["name"]="physobj_methods:wake";["param"]={};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
