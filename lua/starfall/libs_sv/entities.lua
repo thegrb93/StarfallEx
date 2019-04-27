@@ -323,7 +323,7 @@ function ents_methods:setDrawShadow (draw, ply)
 	end
 end
 
---- Sets the entitiy's position
+--- Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
 -- @param vec New position
 function ents_methods:setPos (vec)
 	checktype(self, ents_metatable)

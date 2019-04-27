@@ -168,7 +168,7 @@ function physobj_methods:getMeshConvexes ()
 end
 
 if SERVER then
-	--- Sets the position of the physics object
+	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
 	-- @param pos The position vector to set it to
 	function physobj_methods:setPos(pos)
