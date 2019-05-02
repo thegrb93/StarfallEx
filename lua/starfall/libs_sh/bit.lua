@@ -149,7 +149,7 @@ local function PackIEEE754Double(number)
 end
 local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
     local exponent = (b1 % 0x80) * 0x10 + math.floor(b2 / 0x10)
-    local mantissa = math.ldexp(((((((b2 % 0xF0) * 0x100 + b3) * 0x100 + b4) * 0x100 + b5) * 0x100 + b6) * 0x100 + b7) * 0x100 + b8, -52)
+    local mantissa = math.ldexp(((((((b2 % 0x10) * 0x100 + b3) * 0x100 + b4) * 0x100 + b5) * 0x100 + b6) * 0x100 + b7) * 0x100 + b8, -52)
     if exponent == 0x7FF then
         if mantissa > 0 then
             return 0 / 0
@@ -165,7 +165,7 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
     if b1 >= 0x80 then
         mantissa = -mantissa
     end
-    return math.ldexp(mantissa, exponent - 0xFFFF)
+    return math.ldexp(mantissa, exponent - 0x3FF)
 end
 
 --- Returns little endian bytes (A B) (all 32 bits)
