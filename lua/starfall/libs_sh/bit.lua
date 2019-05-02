@@ -186,7 +186,7 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
 end
 
 local function twos_compliment(x,bits)
-	local mask = 2^(bits - 1)
+	local mask = bit.lshift(1, bits - 1)
 	return -(bit.band(x,mask)) + (bit.band(x,bit.bnot(mask)))
 end
 
