@@ -97,8 +97,11 @@ local function UnpackIEEE754Float(b1, b2, b3, b4)
         if mantissa > 0 then
             return 0 / 0
         else
-            mantissa = math.huge
-            exponent = 0x7F
+            if b1 >= 0x80 then
+                return -math.huge
+            else
+                return math.huge
+            end
         end
     elseif exponent > 0 then
         mantissa = mantissa + 1
@@ -154,8 +157,11 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
         if mantissa > 0 then
             return 0 / 0
         else
-            mantissa = math.huge
-            exponent = 0xFFFF
+            if b1 >= 0x80 then
+                return -math.huge
+            else
+                return math.huge
+            end
         end
     elseif exponent > 0 then
         mantissa = mantissa + 1
