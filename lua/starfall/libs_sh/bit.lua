@@ -57,11 +57,16 @@ local function ByterizeByte(n)
 end
 
 --Credit https://stackoverflow.com/users/903234/rpfeltz
+--Bugfixes and IEEE754Double credit to me
 local function PackIEEE754Float(number)
     if number == 0 then
         return 0x00, 0x00, 0x00, 0x00
+    elseif number == math.huge then
+        return 0x7F, 0x80, 0x00, 0x00
+    elseif number == -math.huge then
+        return 0xFF, 0x80, 0x00, 0x00
     elseif number ~= number then
-        return 0xFF, 0xFF, 0xFF, 0xFF
+        return 0xFF, 0xC0, 0x00, 0x00
     else
         local sign = 0x00
         if number < 0 then
@@ -75,7 +80,7 @@ local function PackIEEE754Float(number)
             exponent = 0
         elseif exponent > 0 then
             if exponent >= 0xFF then
-                return string.char(sign + 0x7F, 0x80, 0x00, 0x00)
+                return sign + 0x7F, 0x80, 0x00, 0x00
             elseif exponent == 1 then
                 exponent = 0
             else
@@ -116,8 +121,12 @@ end
 local function PackIEEE754Double(number)
     if number == 0 then
         return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    elseif number == math.huge then
+        return 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+    elseif number == -math.huge then
+        return 0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     elseif number ~= number then
-        return 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+        return 0xFF, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
     else
         local sign = 0x00
         if number < 0 then
@@ -125,13 +134,13 @@ local function PackIEEE754Double(number)
             number = -number
         end
         local mantissa, exponent = math.frexp(number)
-        exponent = exponent + 0xFFFF
+        exponent = exponent + 0x3FF
         if exponent <= 0 then
             mantissa = math.ldexp(mantissa, exponent - 1)
             exponent = 0
         elseif exponent > 0 then
             if exponent >= 0x7FF then
-                return string.char(sign + 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+                return sign + 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
             elseif exponent == 1 then
                 exponent = 0
             else
@@ -140,12 +149,12 @@ local function PackIEEE754Double(number)
             end
         end
         mantissa = math.floor(math.ldexp(mantissa, 52) + 0.5)
-        return sign + math.floor(exponent / 16),
-                (exponent % 16) * 0x10 + math.floor(mantissa / 0x1000000000000),
-                math.floor(mantissa / 0x10000000000) % 0x10000000000,
-                math.floor(mantissa / 0x100000000) % 0x100000000,
-                math.floor(mantissa / 0x1000000) % 0x1000000,
-                math.floor(mantissa / 0x10000) % 0x10000,
+        return sign + math.floor(exponent / 0x10),
+                (exponent % 0x10) * 0x10 + math.floor(mantissa / 0x1000000000000),
+                math.floor(mantissa / 0x10000000000) % 0x100,
+                math.floor(mantissa / 0x100000000) % 0x100,
+                math.floor(mantissa / 0x1000000) % 0x100,
+                math.floor(mantissa / 0x10000) % 0x100,
                 math.floor(mantissa / 0x100) % 0x100,
                 mantissa % 0x100
     end
