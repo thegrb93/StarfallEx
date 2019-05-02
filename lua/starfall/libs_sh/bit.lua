@@ -26,7 +26,8 @@ local ss_methods, ss_metamethods = SF.RegisterType("StringStream")
 --- Creates a StringStream object
 --@param stream A string to set the initial buffer to (default "")
 --@param i The initial buffer pointer (default 1)
-function bit_library.stringstream(stream, i)
+--@param endian The endianness of number types. "big" or "little" (default "little")
+function bit_library.stringstream(stream, i, endian)
 	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
 	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
 	
@@ -37,6 +38,7 @@ function bit_library.stringstream(stream, i)
 	
 	ret:write(stream)
 	ret:seek(i)
+	ret:setEndian(endian or "little")
 	
 	return ret
 end
@@ -59,169 +61,175 @@ end
 --Credit https://stackoverflow.com/users/903234/rpfeltz
 --Bugfixes and IEEE754Double credit to me
 local function PackIEEE754Float(number)
-    if number == 0 then
-        return 0x00, 0x00, 0x00, 0x00
-    elseif number == math.huge then
-        return 0x7F, 0x80, 0x00, 0x00
-    elseif number == -math.huge then
-        return 0xFF, 0x80, 0x00, 0x00
-    elseif number ~= number then
-        return 0xFF, 0xC0, 0x00, 0x00
-    else
-        local sign = 0x00
-        if number < 0 then
-            sign = 0x80
-            number = -number
-        end
-        local mantissa, exponent = math.frexp(number)
-        exponent = exponent + 0x7F
-        if exponent <= 0 then
-            mantissa = math.ldexp(mantissa, exponent - 1)
-            exponent = 0
-        elseif exponent > 0 then
-            if exponent >= 0xFF then
-                return sign + 0x7F, 0x80, 0x00, 0x00
-            elseif exponent == 1 then
-                exponent = 0
-            else
-                mantissa = mantissa * 2 - 1
-                exponent = exponent - 1
-            end
-        end
-        mantissa = math.floor(math.ldexp(mantissa, 23) + 0.5)
-        return sign + math.floor(exponent / 2),
-                (exponent % 2) * 0x80 + math.floor(mantissa / 0x10000),
-                math.floor(mantissa / 0x100) % 0x100,
-                mantissa % 0x100
-    end
+	if number == 0 then
+		return 0x00, 0x00, 0x00, 0x00
+	elseif number == math.huge then
+		return 0x7F, 0x80, 0x00, 0x00
+	elseif number == -math.huge then
+		return 0xFF, 0x80, 0x00, 0x00
+	elseif number ~= number then
+		return 0xFF, 0xC0, 0x00, 0x00
+	else
+		local sign = 0x00
+		if number < 0 then
+			sign = 0x80
+			number = -number
+		end
+		local mantissa, exponent = math.frexp(number)
+		exponent = exponent + 0x7F
+		if exponent <= 0 then
+			mantissa = math.ldexp(mantissa, exponent - 1)
+			exponent = 0
+		elseif exponent > 0 then
+			if exponent >= 0xFF then
+				return sign + 0x7F, 0x80, 0x00, 0x00
+			elseif exponent == 1 then
+				exponent = 0
+			else
+				mantissa = mantissa * 2 - 1
+				exponent = exponent - 1
+			end
+		end
+		mantissa = math.floor(math.ldexp(mantissa, 23) + 0.5)
+		return sign + math.floor(exponent / 2),
+				(exponent % 2) * 0x80 + math.floor(mantissa / 0x10000),
+				math.floor(mantissa / 0x100) % 0x100,
+				mantissa % 0x100
+	end
 end
 local function UnpackIEEE754Float(b1, b2, b3, b4)
-    local exponent = (b1 % 0x80) * 0x02 + math.floor(b2 / 0x80)
-    local mantissa = math.ldexp(((b2 % 0x80) * 0x100 + b3) * 0x100 + b4, -23)
-    if exponent == 0xFF then
-        if mantissa > 0 then
-            return 0 / 0
-        else
-            if b1 >= 0x80 then
-                return -math.huge
-            else
-                return math.huge
-            end
-        end
-    elseif exponent > 0 then
-        mantissa = mantissa + 1
-    else
-        exponent = exponent + 1
-    end
-    if b1 >= 0x80 then
-        mantissa = -mantissa
-    end
-    return math.ldexp(mantissa, exponent - 0x7F)
+	local exponent = (b1 % 0x80) * 0x02 + math.floor(b2 / 0x80)
+	local mantissa = math.ldexp(((b2 % 0x80) * 0x100 + b3) * 0x100 + b4, -23)
+	if exponent == 0xFF then
+		if mantissa > 0 then
+			return 0 / 0
+		else
+			if b1 >= 0x80 then
+				return -math.huge
+			else
+				return math.huge
+			end
+		end
+	elseif exponent > 0 then
+		mantissa = mantissa + 1
+	else
+		exponent = exponent + 1
+	end
+	if b1 >= 0x80 then
+		mantissa = -mantissa
+	end
+	return math.ldexp(mantissa, exponent - 0x7F)
 end
 local function PackIEEE754Double(number)
-    if number == 0 then
-        return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    elseif number == math.huge then
-        return 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    elseif number == -math.huge then
-        return 0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    elseif number ~= number then
-        return 0xFF, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-    else
-        local sign = 0x00
-        if number < 0 then
-            sign = 0x80
-            number = -number
-        end
-        local mantissa, exponent = math.frexp(number)
-        exponent = exponent + 0x3FF
-        if exponent <= 0 then
-            mantissa = math.ldexp(mantissa, exponent - 1)
-            exponent = 0
-        elseif exponent > 0 then
-            if exponent >= 0x7FF then
-                return sign + 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-            elseif exponent == 1 then
-                exponent = 0
-            else
-                mantissa = mantissa * 2 - 1
-                exponent = exponent - 1
-            end
-        end
-        mantissa = math.floor(math.ldexp(mantissa, 52) + 0.5)
-        return sign + math.floor(exponent / 0x10),
-                (exponent % 0x10) * 0x10 + math.floor(mantissa / 0x1000000000000),
-                math.floor(mantissa / 0x10000000000) % 0x100,
-                math.floor(mantissa / 0x100000000) % 0x100,
-                math.floor(mantissa / 0x1000000) % 0x100,
-                math.floor(mantissa / 0x10000) % 0x100,
-                math.floor(mantissa / 0x100) % 0x100,
-                mantissa % 0x100
-    end
+	if number == 0 then
+		return 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	elseif number == math.huge then
+		return 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	elseif number == -math.huge then
+		return 0xFF, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	elseif number ~= number then
+		return 0xFF, 0xF8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+	else
+		local sign = 0x00
+		if number < 0 then
+			sign = 0x80
+			number = -number
+		end
+		local mantissa, exponent = math.frexp(number)
+		exponent = exponent + 0x3FF
+		if exponent <= 0 then
+			mantissa = math.ldexp(mantissa, exponent - 1)
+			exponent = 0
+		elseif exponent > 0 then
+			if exponent >= 0x7FF then
+				return sign + 0x7F, 0xF0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+			elseif exponent == 1 then
+				exponent = 0
+			else
+				mantissa = mantissa * 2 - 1
+				exponent = exponent - 1
+			end
+		end
+		mantissa = math.floor(math.ldexp(mantissa, 52) + 0.5)
+		return sign + math.floor(exponent / 0x10),
+				(exponent % 0x10) * 0x10 + math.floor(mantissa / 0x1000000000000),
+				math.floor(mantissa / 0x10000000000) % 0x100,
+				math.floor(mantissa / 0x100000000) % 0x100,
+				math.floor(mantissa / 0x1000000) % 0x100,
+				math.floor(mantissa / 0x10000) % 0x100,
+				math.floor(mantissa / 0x100) % 0x100,
+				mantissa % 0x100
+	end
 end
 local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
-    local exponent = (b1 % 0x80) * 0x10 + math.floor(b2 / 0x10)
-    local mantissa = math.ldexp(((((((b2 % 0x10) * 0x100 + b3) * 0x100 + b4) * 0x100 + b5) * 0x100 + b6) * 0x100 + b7) * 0x100 + b8, -52)
-    if exponent == 0x7FF then
-        if mantissa > 0 then
-            return 0 / 0
-        else
-            if b1 >= 0x80 then
-                return -math.huge
-            else
-                return math.huge
-            end
-        end
-    elseif exponent > 0 then
-        mantissa = mantissa + 1
-    else
-        exponent = exponent + 1
-    end
-    if b1 >= 0x80 then
-        mantissa = -mantissa
-    end
-    return math.ldexp(mantissa, exponent - 0x3FF)
-end
-
---- Returns little endian bytes (A B) (all 32 bits)
---@param n The number to pack
---@return The packed bytes
-function bit_library.getInt32BytesLE(n)
-	local a,b,c,d = ByterizeInt(n)
-	return string.char(d,c,b,a)
-end
-
---- Returns little endian bytes (A B) (first two bytes, 16 bits, of number )
---@param n The number to pack
---@return The packed bytes
-function bit_library.getInt16BytesLE(n)
-	local a,b  = ByterizeShort(n)
-	return string.char(b,a)
-end
-
---- Returns big endian bytes (A B) (all 32 bits)
---@param n The number to pack
---@return The packed bytes
-function bit_library.getInt32BytesBE(n)
-	local a,b,c,d = ByterizeInt(n)
-	return string.char(a,b,c,d)
-end
-
---- Returns big endian bytes (A B) (first two bytes, 16 bits, of number )
---@param n The number to pack
---@return The packed bytes
-function bit_library.getInt16BytesBE(n)
-	local a,b  = ByterizeShort(n)
-	return string.char(a,b)
+	local exponent = (b1 % 0x80) * 0x10 + math.floor(b2 / 0x10)
+	local mantissa = math.ldexp(((((((b2 % 0x10) * 0x100 + b3) * 0x100 + b4) * 0x100 + b5) * 0x100 + b6) * 0x100 + b7) * 0x100 + b8, -52)
+	if exponent == 0x7FF then
+		if mantissa > 0 then
+			return 0 / 0
+		else
+			if b1 >= 0x80 then
+				return -math.huge
+			else
+				return math.huge
+			end
+		end
+	elseif exponent > 0 then
+		mantissa = mantissa + 1
+	else
+		exponent = exponent + 1
+	end
+	if b1 >= 0x80 then
+		mantissa = -mantissa
+	end
+	return math.ldexp(mantissa, exponent - 0x3FF)
 end
 
 local function twos_compliment(x,bits)
-    local mask = 2^(bits - 1)
-    return -(bit.band(x,mask)) + (bit.band(x,bit.bnot(mask)))
+	local mask = 2^(bits - 1)
+	return -(bit.band(x,mask)) + (bit.band(x,bit.bnot(mask)))
 end
 
 function ss_metamethods:__tostring()
 	return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
+end
+
+--- Sets the endianness of the string stream
+--@param endian The endianness of number types. "big" or "little" (default "little")
+function ss_methods:setEndian(endian)
+	if endian == "little" then
+		function self:readBytesEndian(start, stop)
+			local t = {}
+			for i=stop, start, -1 do
+				t[#t+1] = self.buffer[i]
+			end
+			return t
+		end
+		function self:writeBytesEndian(start, stop, t)
+			local o = #t
+			for i=start, stop do
+				self.buffer[i] = t[o]
+				o = o - 1
+			end
+		end
+	elseif endian == "big" then
+		function self:readBytesEndian(start, stop)
+			local t = {}
+			for i=start, stop do
+				t[#t+1] = self.buffer[i]
+			end
+			return t
+		end
+		function self:writeBytesEndian(start, stop, t)
+			local o = 1
+			for i=start, stop do
+				self.buffer[i] = t[o]
+				o = o + 1
+			end
+		end
+	else
+		SF.Throw("Invalid endian specified", 2)
+	end
 end
 
 --- Sets internal pointer to i. The position will be clamped to [1, buffersize+1]
@@ -269,13 +277,17 @@ end
 --- Reads an unsigned 16 bit (two byte) integer from the byte stream and advances the buffer pointer.
 --@return The uint16 at this position
 function ss_methods:readUInt16()
-	return self:readUInt8() + self:readUInt8() * 0x100
+	local t = self:readBytesEndian(self.pos, self.pos+1)
+	self.pos = self.pos + 2
+	return t[1] * 0x100 + t[2]
 end
 
 --- Reads an unsigned 32 bit (four byte) integer from the byte stream and advances the buffer pointer.
 --@return The uint32 at this position
-function ss_methods:readUInt32() 
-	return self:readUInt16() + self:readUInt16() * 0x10000
+function ss_methods:readUInt32()
+	local t = self:readBytesEndian(self.pos, self.pos+3)
+	self.pos = self.pos + 4
+	return t[1] * 0x1000000 + t[2] * 0x10000 + t[3] * 0x100 + t[4]
 end
 
 --- Reads a signed 8-bit (one byte) integer from the byte stream and advances the buffer pointer.
@@ -299,9 +311,17 @@ end
 --- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
 --@return The float32 at this position
 function ss_methods:readFloat()
-	local ret = UnpackIEEE754Float(self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3])
+	local t = self:readBytesEndian(self.pos, self.pos+3)
 	self.pos = self.pos + 4
-	return ret
+	return UnpackIEEE754Float(t[1], t[2], t[3], t[4])
+end
+
+--- Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.
+--@return The float32 at this position
+function ss_methods:readDouble()
+	local t = self:readBytesEndian(self.pos, self.pos+7)
+	self.pos = self.pos + 8
+	return UnpackIEEE754Double(t[1], t[2], t[3], t[4], t[5], t[6], t[7], t[8])
 end
 
 --- Reads until the given byte and advances the buffer pointer.
@@ -324,7 +344,6 @@ function ss_methods:readString()
 	return self:readUntil(0)
 end
 
-
 --- Writes the given string and advances the buffer pointer.
 --@param bytes A string of bytes to write
 function ss_methods:write(bytes)
@@ -342,25 +361,32 @@ function ss_methods:writeInt8(x)
 	self.pos = self.pos + 1
 end
 
---- Writes a short in little endian to the buffer and advances the buffer pointer.
+--- Writes a short to the buffer and advances the buffer pointer.
 --@param x An int16 to write
 function ss_methods:writeInt16(x)
-	self.buffer[self.pos+1], self.buffer[self.pos] = ByterizeShort(x)
+	self:writeBytesEndian(self.pos, self.pos + 1, { ByterizeShort(x) })
 	self.pos = self.pos + 2
 end
 
---- Writes an int in little endian to the buffer and advances the buffer pointer.
+--- Writes an int to the buffer and advances the buffer pointer.
 --@param x An int32 to write
 function ss_methods:writeInt32(x)
-	self.buffer[self.pos+3], self.buffer[self.pos+2], self.buffer[self.pos+1], self.buffer[self.pos] = ByterizeInt(x)
+	self:writeBytesEndian(self.pos, self.pos + 3, { ByterizeInt(x) })
 	self.pos = self.pos + 4
 end
 
---- Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.
+--- Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.
 --@param x The float to write
 function ss_methods:writeFloat(x)
-	self.buffer[self.pos], self.buffer[self.pos+1], self.buffer[self.pos+2], self.buffer[self.pos+3] = PackIEEE754Float(x)
+	self:writeBytesEndian(self.pos, self.pos + 3, { PackIEEE754Float(x) })
 	self.pos = self.pos + 4
+end
+
+--- Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.
+--@param x The double to write
+function ss_methods:writeDouble(x)
+	self:writeBytesEndian(self.pos, self.pos + 7, { PackIEEE754Double(x) })
+	self.pos = self.pos + 8
 end
 
 --- Writes a string to the buffer putting a null at the end and advances the buffer pointer.
