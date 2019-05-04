@@ -200,27 +200,7 @@ Bit library http://wiki.garrysmod.com/page/Category:bit</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt16BytesBE">getInt16BytesBE</a>( n&nbsp;)</td>
-			<td class="summary">
-Returns big endian bytes (A B) (first two bytes, 16 bits, of number ) </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt16BytesLE">getInt16BytesLE</a>( n&nbsp;)</td>
-			<td class="summary">
-Returns little endian bytes (A B) (first two bytes, 16 bits, of number ) </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt32BytesBE">getInt32BytesBE</a>( n&nbsp;)</td>
-			<td class="summary">
-Returns big endian bytes (A B) (all 32 bits) </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.getInt32BytesLE">getInt32BytesLE</a>( n&nbsp;)</td>
-			<td class="summary">
-Returns little endian bytes (A B) (all 32 bits) </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#bit.stringstream">stringstream</a>( stream, i&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#bit.stringstream">stringstream</a>( stream, i, endian&nbsp;)</td>
 			<td class="summary">
 Creates a StringStream object </td>
 		</tr>
@@ -234,107 +214,7 @@ Creates a StringStream object </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="bit.getInt16BytesBE"></a><strong>bit.getInt16BytesBE</strong>( n&nbsp;)</dt>
-<dd>
-	<p>
-Returns big endian bytes (A B) (first two bytes, 16 bits, of number )</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>n</tt> ― The number to pack</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>The packed bytes</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="bit.getInt16BytesLE"></a><strong>bit.getInt16BytesLE</strong>( n&nbsp;)</dt>
-<dd>
-	<p>
-Returns little endian bytes (A B) (first two bytes, 16 bits, of number )</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>n</tt> ― The number to pack</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>The packed bytes</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="bit.getInt32BytesBE"></a><strong>bit.getInt32BytesBE</strong>( n&nbsp;)</dt>
-<dd>
-	<p>
-Returns big endian bytes (A B) (all 32 bits)</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>n</tt> ― The number to pack</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>The packed bytes</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="bit.getInt32BytesLE"></a><strong>bit.getInt32BytesLE</strong>( n&nbsp;)</dt>
-<dd>
-	<p>
-Returns little endian bytes (A B) (all 32 bits)</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>n</tt> ― The number to pack</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>The packed bytes</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="bit.stringstream"></a><strong>bit.stringstream</strong>( stream, i&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="bit.stringstream"></a><strong>bit.stringstream</strong>( stream, i, endian&nbsp;)</dt>
 <dd>
 	<p>
 Creates a StringStream object</p>
@@ -346,6 +226,7 @@ Creates a StringStream object</p>
 			
 			<li><tt>stream</tt> ― A string to set the initial buffer to (default "")</li>
 			<li><tt>i</tt> ― The initial buffer pointer (default 1)</li>
+			<li><tt>endian</tt> ― The endianness of number types. "big" or "little" (default "little")</li>
 		</ul>
 	</section>
 	

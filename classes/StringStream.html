@@ -215,6 +215,11 @@ Returns the buffer as a string </td>
 Reads the specified number of bytes from the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readDouble">readDouble</a>( &nbsp;)</td>
+			<td class="summary">
+Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:readFloat">readFloat</a>( &nbsp;)</td>
 			<td class="summary">
 Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.</td>
@@ -265,6 +270,11 @@ Reads until the given byte and advances the buffer pointer.</td>
 Sets internal pointer to i.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:setEndian">setEndian</a>( endian&nbsp;)</td>
+			<td class="summary">
+Sets the endianness of the string stream </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:size">size</a>( &nbsp;)</td>
 			<td class="summary">
 Tells the size of the byte stream.</td>
@@ -285,19 +295,24 @@ Returns the internal position of the byte reader.</td>
 Writes the given string and advances the buffer pointer.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeDouble">writeDouble</a>( x&nbsp;)</td>
+			<td class="summary">
+Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeFloat">writeFloat</a>( x&nbsp;)</td>
 			<td class="summary">
-Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.</td>
+Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt16">writeInt16</a>( x&nbsp;)</td>
 			<td class="summary">
-Writes a short in little endian to the buffer and advances the buffer pointer.</td>
+Writes a short to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt32">writeInt32</a>( x&nbsp;)</td>
 			<td class="summary">
-Writes an int in little endian to the buffer and advances the buffer pointer.</td>
+Writes an int to the buffer and advances the buffer pointer.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#StringStream:writeInt8">writeInt8</a>( x&nbsp;)</td>
@@ -371,6 +386,24 @@ Reads the specified number of bytes from the buffer and advances the buffer poin
 		<h3>Returns</h3>
 		
 		<p>A string containing the bytes</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="StringStream:readDouble"></a><strong>StringStream:readDouble</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The float32 at this position</p>
 		
 	</section>
 	
@@ -565,6 +598,25 @@ Sets internal pointer to i. The position will be clamped to [1, buffersize+1]</p
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="StringStream:setEndian"></a><strong>StringStream:setEndian</strong>( endian&nbsp;)</dt>
+<dd>
+	<p>
+Sets the endianness of the string stream</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>endian</tt> ― The endianness of number types. "big" or "little" (default "little")</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="StringStream:size"></a><strong>StringStream:size</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -639,10 +691,29 @@ Writes the given string and advances the buffer pointer.</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="StringStream:writeDouble"></a><strong>StringStream:writeDouble</strong>( x&nbsp;)</dt>
+<dd>
+	<p>
+Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>x</tt> ― The double to write</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="StringStream:writeFloat"></a><strong>StringStream:writeFloat</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
-Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.</p>
+Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
@@ -661,7 +732,7 @@ Writes a 4 byte IEEE754 float in little endian to the byte stream and advances t
 <dt><span class="realm_sh"></span><a name="StringStream:writeInt16"></a><strong>StringStream:writeInt16</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
-Writes a short in little endian to the buffer and advances the buffer pointer.</p>
+Writes a short to the buffer and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
@@ -680,7 +751,7 @@ Writes a short in little endian to the buffer and advances the buffer pointer.</
 <dt><span class="realm_sh"></span><a name="StringStream:writeInt32"></a><strong>StringStream:writeInt32</strong>( x&nbsp;)</dt>
 <dd>
 	<p>
-Writes an int in little endian to the buffer and advances the buffer pointer.</p>
+Writes an int to the buffer and advances the buffer pointer.</p>
 	
 	
 	<section class="parameters">
