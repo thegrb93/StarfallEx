@@ -85,7 +85,7 @@ function ents_methods:getOwner()
 end
 
 if CLIENT then
-	--- Allows manipulation of a hologram's bones' positions
+	--- Allows manipulation of an entity's bones' positions
 	-- @client
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
@@ -98,7 +98,7 @@ if CLIENT then
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
-	--- Allows manipulation of a hologram's bones' scale
+	--- Allows manipulation of an entity's bones' scale
 	-- @client
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
@@ -111,7 +111,7 @@ if CLIENT then
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
-	--- Allows manipulation of a hologram's bones' angles
+	--- Allows manipulation of an entity's bones' angles
 	-- @client
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
@@ -122,74 +122,6 @@ if CLIENT then
 		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
-	end
-
-	--- Sets a hologram entity's model to a custom Mesh
-	-- @client
-	-- @param mesh The mesh to set it to or nil to set back to normal
-	function ents_methods:setHologramMesh(mesh)
-		local instance = SF.instance
-		checkpermission(instance, nil, "mesh")
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if mesh then
-			checktype(mesh, SF.Mesh.Metatable)
-			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
-			ent.custom_mesh_data = instance.data.meshes
-		else
-			ent.custom_mesh = nil
-		end
-	end
-
-	--- Sets a hologram entity's material to a custom material
-	-- @client
-	-- @param material The material to set it to or nil to set back to default
-	function ents_methods:setHologramMaterial(material)
-		local instance = SF.instance
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if material then
-			checktype(material, SF.Materials.Metatable)
-			ent.Material = SF.Materials.Unwrap(material)
-		else
-			ent.Material = ent.DefaultMaterial
-		end
-	end
-
-	--- Sets a hologram entity's renderbounds
-	-- @client
-	-- @param mins The lower bounding corner coordinate local to the hologram
-	-- @param maxs The upper bounding corner coordinate local to the hologram
-	function ents_methods:setHologramRenderBounds(mins, maxs)
-		checktype(mins, vec_meta)
-		checktype(maxs, vec_meta)
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
-		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
-	end
-
-	--- Sets a hologram entity's rendermatrix
-	-- @client
-	-- @param mat VMatrix to use
-	function ents_methods:setHologramRenderMatrix(mat)
-		if mat ~= nil then checktype(mat, SF.VMatrix.Metatable) end
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
-		
-		if mat then
-			local matrix = SF.VMatrix.Unwrap(mat)
-			if matrix:IsIdentity() then
-				ent:DisableMatrix("RenderMultiply")
-			else
-				ent:EnableMatrix("RenderMultiply", matrix)
-			end
-		else
-			ent:DisableMatrix("RenderMultiply")
-		end
 	end
 end
 
