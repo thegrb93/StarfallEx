@@ -43,19 +43,33 @@ function bit_library.stringstream(stream, i, endian)
 	return ret
 end
 
+local function checkErr(n)
+	if n==math.huge or n==-math.huge or n~=n then
+		SF.Throw("Can't convert error float to integer!", 4)
+	end
+end
+
 local function ByterizeInt(n)
+	checkErr(n)
 	n = (n < 0) and (4294967296 + n) or n
 	return math.floor(n/16777216)%256, math.floor(n/65536)%256, math.floor(n/256)%256, n%256
 end
 
 local function ByterizeShort(n)
+	checkErr(n)
 	n = (n < 0) and (65536 + n) or n
 	return math.floor(n/256)%256, n%256
 end
 
 local function ByterizeByte(n)
+	checkErr(n)
 	n = (n < 0) and (256 + n) or n
 	return n%256
+end
+
+local function twos_compliment(x,bits)
+	local limit = math.ldexp(1, bits - 1)
+	if x>limit then return x - limit*2 else return x end
 end
 
 --Credit https://stackoverflow.com/users/903234/rpfeltz
@@ -183,11 +197,6 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
 		mantissa = -mantissa
 	end
 	return math.ldexp(mantissa, exponent - 0x3FF)
-end
-
-local function twos_compliment(x,bits)
-	local limit = math.ldexp(1, bits - 1)
-	if x>limit then return x - limit*2 else return x end
 end
 
 function ss_metamethods:__tostring()
