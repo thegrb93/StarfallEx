@@ -186,8 +186,8 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
 end
 
 local function twos_compliment(x,bits)
-	local mask = bit.lshift(1, bits - 1)
-	return -(bit.band(x,mask)) + (bit.band(x,bit.bnot(mask)))
+	local limit = math.ldexp(1, bits - 1)
+	if x>limit then return x - limit*2 else return x end
 end
 
 function ss_metamethods:__tostring()
