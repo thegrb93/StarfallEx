@@ -796,13 +796,15 @@ Sets the volume of the sound.";};["stop"]={["class"]="function";["classlib"]="So
 Stops the sound from being played.";["fname"]="stop";["name"]="sound_methods:stop";["param"]={[1]="fade";["fade"]="Time in seconds to fade out, if nil or 0 the sound stops instantly.";};["private"]=false;["realm"]="sh";["summary"]="\
 Stops the sound from being played.";};};["name"]="Sound";["server"]=true;["summary"]="\
 Sound type ";["typtbl"]="sound_methods";};["StringStream"]={["class"]="class";["description"]="\
-StringStream type";["fields"]={};["methods"]={[1]="getBuffer";[10]="readUInt32";[11]="readUInt8";[12]="readUntil";[13]="seek";[14]="size";[15]="skip";[16]="tell";[17]="write";[18]="writeFloat";[19]="writeInt16";[2]="getString";[20]="writeInt32";[21]="writeInt8";[22]="writeString";[3]="read";[4]="readFloat";[5]="readInt16";[6]="readInt32";[7]="readInt8";[8]="readString";[9]="readUInt16";["getBuffer"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+StringStream type";["fields"]={};["methods"]={[1]="getBuffer";[10]="readUInt16";[11]="readUInt32";[12]="readUInt8";[13]="readUntil";[14]="seek";[15]="setEndian";[16]="size";[17]="skip";[18]="tell";[19]="write";[2]="getString";[20]="writeDouble";[21]="writeFloat";[22]="writeInt16";[23]="writeInt32";[24]="writeInt8";[25]="writeString";[3]="read";[4]="readDouble";[5]="readFloat";[6]="readInt16";[7]="readInt32";[8]="readInt8";[9]="readString";["getBuffer"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Returns the internal buffer";["fname"]="getBuffer";["name"]="ss_methods:getBuffer";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The buffer table";["summary"]="\
 Returns the internal buffer ";};["getString"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Returns the buffer as a string";["fname"]="getString";["name"]="ss_methods:getString";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The buffer as a string";["summary"]="\
 Returns the buffer as a string ";};["read"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Reads the specified number of bytes from the buffer and advances the buffer pointer.";["fname"]="read";["name"]="ss_methods:read";["param"]={[1]="n";["n"]="How many bytes to read";};["private"]=false;["realm"]="sh";["ret"]="A string containing the bytes";["summary"]="\
-Reads the specified number of bytes from the buffer and advances the buffer pointer.";};["readFloat"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads the specified number of bytes from the buffer and advances the buffer pointer.";};["readDouble"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.";["fname"]="readDouble";["name"]="ss_methods:readDouble";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The float32 at this position";["summary"]="\
+Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.";};["readFloat"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.";["fname"]="readFloat";["name"]="ss_methods:readFloat";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The float32 at this position";["summary"]="\
 Reads a 4 byte IEEE754 float from the byte stream and advances the buffer pointer.";};["readInt16"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Reads a signed 16-bit (two byte) integer from the byte stream and advances the buffer pointer.";["fname"]="readInt16";["name"]="ss_methods:readInt16";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The int16 at this position";["summary"]="\
@@ -822,7 +824,9 @@ Reads an unsigned 8-bit (one byte) integer from the byte stream and advances the
 Reads until the given byte and advances the buffer pointer.";["fname"]="readUntil";["name"]="ss_methods:readUntil";["param"]={[1]="byte";["byte"]="The byte to read until (in number form)";};["private"]=false;["realm"]="sh";["ret"]="The string of bytes read";["summary"]="\
 Reads until the given byte and advances the buffer pointer.";};["seek"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Sets internal pointer to i. The position will be clamped to [1, buffersize+1]";["fname"]="seek";["name"]="ss_methods:seek";["param"]={[1]="i";["i"]="The position";};["private"]=false;["realm"]="sh";["summary"]="\
-Sets internal pointer to i.";};["size"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Sets internal pointer to i.";};["setEndian"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Sets the endianness of the string stream";["fname"]="setEndian";["name"]="ss_methods:setEndian";["param"]={[1]="endian";["endian"]="The endianness of number types. \"big\" or \"little\" (default \"little\")";};["private"]=false;["realm"]="sh";["summary"]="\
+Sets the endianness of the string stream ";};["size"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Tells the size of the byte stream.";["fname"]="size";["name"]="ss_methods:size";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The buffer size";["summary"]="\
 Tells the size of the byte stream.";};["skip"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Move the internal pointer by amount i";["fname"]="skip";["name"]="ss_methods:skip";["param"]={[1]="i";["i"]="The offset";};["private"]=false;["realm"]="sh";["summary"]="\
@@ -830,13 +834,15 @@ Move the internal pointer by amount i ";};["tell"]={["class"]="function";["class
 Returns the internal position of the byte reader.";["fname"]="tell";["name"]="ss_methods:tell";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The buffer position";["summary"]="\
 Returns the internal position of the byte reader.";};["write"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Writes the given string and advances the buffer pointer.";["fname"]="write";["name"]="ss_methods:write";["param"]={[1]="bytes";["bytes"]="A string of bytes to write";};["private"]=false;["realm"]="sh";["summary"]="\
-Writes the given string and advances the buffer pointer.";};["writeFloat"]={["class"]="function";["classlib"]="StringStream";["description"]="\
-Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.";["fname"]="writeFloat";["name"]="ss_methods:writeFloat";["param"]={[1]="x";["x"]="The float to write";};["private"]=false;["realm"]="sh";["summary"]="\
-Writes a 4 byte IEEE754 float in little endian to the byte stream and advances the buffer pointer.";};["writeInt16"]={["class"]="function";["classlib"]="StringStream";["description"]="\
-Writes a short in little endian to the buffer and advances the buffer pointer.";["fname"]="writeInt16";["name"]="ss_methods:writeInt16";["param"]={[1]="x";["x"]="An int16 to write";};["private"]=false;["realm"]="sh";["summary"]="\
-Writes a short in little endian to the buffer and advances the buffer pointer.";};["writeInt32"]={["class"]="function";["classlib"]="StringStream";["description"]="\
-Writes an int in little endian to the buffer and advances the buffer pointer.";["fname"]="writeInt32";["name"]="ss_methods:writeInt32";["param"]={[1]="x";["x"]="An int32 to write";};["private"]=false;["realm"]="sh";["summary"]="\
-Writes an int in little endian to the buffer and advances the buffer pointer.";};["writeInt8"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes the given string and advances the buffer pointer.";};["writeDouble"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.";["fname"]="writeDouble";["name"]="ss_methods:writeDouble";["param"]={[1]="x";["x"]="The double to write";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes a 8 byte IEEE754 double to the byte stream and advances the buffer pointer.";};["writeFloat"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.";["fname"]="writeFloat";["name"]="ss_methods:writeFloat";["param"]={[1]="x";["x"]="The float to write";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes a 4 byte IEEE754 float to the byte stream and advances the buffer pointer.";};["writeInt16"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes a short to the buffer and advances the buffer pointer.";["fname"]="writeInt16";["name"]="ss_methods:writeInt16";["param"]={[1]="x";["x"]="An int16 to write";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes a short to the buffer and advances the buffer pointer.";};["writeInt32"]={["class"]="function";["classlib"]="StringStream";["description"]="\
+Writes an int to the buffer and advances the buffer pointer.";["fname"]="writeInt32";["name"]="ss_methods:writeInt32";["param"]={[1]="x";["x"]="An int32 to write";};["private"]=false;["realm"]="sh";["summary"]="\
+Writes an int to the buffer and advances the buffer pointer.";};["writeInt8"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Writes a byte to the buffer and advances the buffer pointer.";["fname"]="writeInt8";["name"]="ss_methods:writeInt8";["param"]={[1]="x";["x"]="An int8 to write";};["private"]=false;["realm"]="sh";["summary"]="\
 Writes a byte to the buffer and advances the buffer pointer.";};["writeString"]={["class"]="function";["classlib"]="StringStream";["description"]="\
 Writes a string to the buffer putting a null at the end and advances the buffer pointer.";["fname"]="writeString";["name"]="ss_methods:writeString";["param"]={[1]="string";["string"]="The string of bytes to write";};["private"]=false;["realm"]="sh";["summary"]="\
@@ -1189,16 +1195,8 @@ Loads a sound channel from an URL.";};["soundsLeft"]={["class"]="function";["des
 Returns the number of sounds left that can be created";["fname"]="soundsLeft";["library"]="bass";["name"]="bass_library.soundsLeft";["param"]={};["private"]=false;["realm"]="cl";["ret"]="The number of sounds left";["summary"]="\
 Returns the number of sounds left that can be created ";};};["libtbl"]="bass_library";["name"]="bass";["summary"]="\
 `bass` library is intended to be used only on client side.";["tables"]={};};["bit"]={["class"]="library";["client"]=true;["description"]="\
-Bit library http://wiki.garrysmod.com/page/Category:bit";["fields"]={};["functions"]={[1]="getInt16BytesBE";[2]="getInt16BytesLE";[3]="getInt32BytesBE";[4]="getInt32BytesLE";[5]="stringstream";["getInt16BytesBE"]={["class"]="function";["description"]="\
-Returns big endian bytes (A B) (first two bytes, 16 bits, of number )";["fname"]="getInt16BytesBE";["library"]="bit";["name"]="bit_library.getInt16BytesBE";["param"]={[1]="n";["n"]="The number to pack";};["private"]=false;["realm"]="sh";["ret"]="The packed bytes";["summary"]="\
-Returns big endian bytes (A B) (first two bytes, 16 bits, of number ) ";};["getInt16BytesLE"]={["class"]="function";["description"]="\
-Returns little endian bytes (A B) (first two bytes, 16 bits, of number )";["fname"]="getInt16BytesLE";["library"]="bit";["name"]="bit_library.getInt16BytesLE";["param"]={[1]="n";["n"]="The number to pack";};["private"]=false;["realm"]="sh";["ret"]="The packed bytes";["summary"]="\
-Returns little endian bytes (A B) (first two bytes, 16 bits, of number ) ";};["getInt32BytesBE"]={["class"]="function";["description"]="\
-Returns big endian bytes (A B) (all 32 bits)";["fname"]="getInt32BytesBE";["library"]="bit";["name"]="bit_library.getInt32BytesBE";["param"]={[1]="n";["n"]="The number to pack";};["private"]=false;["realm"]="sh";["ret"]="The packed bytes";["summary"]="\
-Returns big endian bytes (A B) (all 32 bits) ";};["getInt32BytesLE"]={["class"]="function";["description"]="\
-Returns little endian bytes (A B) (all 32 bits)";["fname"]="getInt32BytesLE";["library"]="bit";["name"]="bit_library.getInt32BytesLE";["param"]={[1]="n";["n"]="The number to pack";};["private"]=false;["realm"]="sh";["ret"]="The packed bytes";["summary"]="\
-Returns little endian bytes (A B) (all 32 bits) ";};["stringstream"]={["class"]="function";["description"]="\
-Creates a StringStream object";["fname"]="stringstream";["library"]="bit";["name"]="bit_library.stringstream";["param"]={[1]="stream";[2]="i";["i"]="The initial buffer pointer (default 1)";["stream"]="A string to set the initial buffer to (default \"\")";};["private"]=false;["realm"]="sh";["summary"]="\
+Bit library http://wiki.garrysmod.com/page/Category:bit";["fields"]={};["functions"]={[1]="stringstream";["stringstream"]={["class"]="function";["description"]="\
+Creates a StringStream object";["fname"]="stringstream";["library"]="bit";["name"]="bit_library.stringstream";["param"]={[1]="stream";[2]="i";[3]="endian";["endian"]="The endianness of number types. \"big\" or \"little\" (default \"little\")";["i"]="The initial buffer pointer (default 1)";["stream"]="A string to set the initial buffer to (default \"\")";};["private"]=false;["realm"]="sh";["summary"]="\
 Creates a StringStream object ";};};["libtbl"]="bit_library";["name"]="bit";["server"]=true;["summary"]="\
 Bit library http://wiki.garrysmod.com/page/Category:bit ";["tables"]={};};["builtin"]={["class"]="library";["classForced"]=true;["client"]=true;["description"]="\
 Built in values. These don't need to be loaded; they are in the default environment.";["fields"]={[1]="CLIENT";[2]="SERVER";["CLIENT"]={["class"]="field";["classForced"]=true;["description"]="\
