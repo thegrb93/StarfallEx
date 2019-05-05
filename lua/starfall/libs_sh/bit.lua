@@ -76,7 +76,6 @@ local function toString(buffer, start, stop)
 	-- Max unpack is 7997
 	local chartbl = {}
 	for i=start, stop, 7997 do
-		print(i, math.min(i+7997-1, stop))
 		chartbl[#chartbl + 1] = string.char(unpack(buffer, i, math.min(i+7997-1, stop)))
 	end
 	return table.concat(chartbl)
