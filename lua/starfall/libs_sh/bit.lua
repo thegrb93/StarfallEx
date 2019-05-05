@@ -81,16 +81,15 @@ local function toString(buffer, start, stop)
 	return table.concat(chartbl)
 end
 
-local function fromString(buffer)
+local function fromString(str, buffer, p)
 	-- Max string.byte is 8000
-	local out = {}
-	for i=1, #buffer, 8000 do
-		local b = {string.byte(buffer, i, math.min(i+8000-1, #buffer))}
+	for i=1, #str, 8000 do
+		local b = {string.byte(str, i, math.min(i+8000-1, #str))}
 		for o=1, #b do
-			out[#out+1] = b[o]
+			buffer[p] = b[o]
+			p = p + 1
 		end
 	end
-	return out
 end
 
 --Credit https://stackoverflow.com/users/903234/rpfeltz
@@ -377,11 +376,8 @@ end
 --- Writes the given string and advances the buffer pointer.
 --@param bytes A string of bytes to write
 function ss_methods:write(bytes)
-	local buffer = fromString(bytes)
-	for i=1, #buffer do
-		self.buffer[self.pos+i-1] = buffer[i]
-	end
-	self.pos = self.pos + #buffer
+	fromString(bytes, self.buffer, self.pos)
+	self.pos = self.pos + #bytes
 end
 
 --- Writes a byte to the buffer and advances the buffer pointer.
