@@ -69,6 +69,7 @@ else
 					for filename, code in pairs(sfdata.files) do
 						SF.Editor.openWithCode(filename, code)
 					end
+					-- Add mainfile last so it gets focus
 					SF.Editor.openWithCode(sfdata.mainfile, mainfile)
 				end
 
