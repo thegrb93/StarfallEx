@@ -64,9 +64,12 @@ else
 		net.ReadStarfall(nil, function(sfdata)
 			if sfdata then
 				local function openfiles()
+					local mainfile = sfdata.files[sfdata.mainfile]
+					sfdata.files[sfdata.mainfile] = nil
 					for filename, code in pairs(sfdata.files) do
 						SF.Editor.openWithCode(filename, code)
 					end
+					SF.Editor.openWithCode(sfdata.mainfile, mainfile)
 				end
 
 				if SF.Editor.initialized then
