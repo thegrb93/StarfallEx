@@ -1483,17 +1483,17 @@ function render_library.draw3DQuadUV (vert1, vert2, vert3, vert4)
 	if not ok then SF.Throw(err, 2) end
 end
 
---- Gets a 2D cursor position where ply is aiming.
--- @param ply player to get cursor position from(optional)
+--- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
+-- @param ply player to get cursor position from (default: player())
+-- @param screen An explicit screen to get the cursor pos of (default: The current rendering screen)
 -- @return x position
 -- @return y position
-function render_library.cursorPos(ply)
-	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
-
-	ply = ply and eunwrap(ply) or LocalPlayer()
-
-	if not IsValid(ply) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
+function render_library.cursorPos(ply, screen)
+	if ply~=nil then checktype(ply, ent_meta) ply = eunwrap(ply) else ply = LocalPlayer() end
+	if not (ply and ply:IsValid() and ply:IsPlayer()) then SF.Throw("Invalid player", 2) end
+	
+	if screen~=nil then checktype(screen, ent_meta) screen = eunwrap(screen) else screen = SF.instance.data.render.renderEnt end
+	if not (screen and screen:IsValid() and screen.Transform) then SF.Throw("Invalid screen", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
