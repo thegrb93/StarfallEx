@@ -1518,9 +1518,9 @@ function render_library.cursorPos(ply, screen)
 	local B = Normal:Dot(Pos-Start) / A
 	if (B >= 0) then
 		local w = 512 / screen.Aspect
-		local HitPos = WorldToLocal(Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles())
-		local x = HitPos.x / screen.Scale
-		local y = HitPos.y / screen.Scale
+		local HitPos = screen.Transform:GetInverseTR() * (Start + Dir * B)
+		local x = HitPos.x / screen.Scale^2
+		local y = HitPos.y / screen.Scale^2
 		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen
 		return x, y
 	end
