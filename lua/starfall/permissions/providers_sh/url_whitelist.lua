@@ -80,6 +80,14 @@ simple [[i.imgur.com]]
 
 simple [[pastebin.com]]
 
+-- gitlab
+
+simple [[gitlab.com]]
+
+-- bitbucket
+
+simple [[bitbucket.org]]
+
 -- github / gist
 --- Examples:
 ---  https://gist.githubusercontent.com/LUModder/f2b1c0c9bf98224f9679/raw/5644006aae8f0a8b930ac312324f46dd43839189/sh_sbdc.lua
@@ -87,6 +95,10 @@ simple [[pastebin.com]]
 
 simple [[raw.githubusercontent.com]]
 simple [[gist.githubusercontent.com]]
+
+-- teknik
+simple [[u.teknik.io]]
+simple [[p.teknik.io]]
 
 -- pomf
 -- note: there are a lot of forks of pomf so there are tons of sites. I only listed the mainly used ones. --Flex
