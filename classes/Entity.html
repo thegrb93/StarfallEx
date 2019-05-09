@@ -312,7 +312,7 @@ Returns the number of an entity's bones </td>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getBoneMatrix">getBoneMatrix</a>( bone&nbsp;)</td>
 			<td class="summary">
-Returns the matrix of the entity's bone </td>
+Returns the matrix of the entity's bone.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getBoneName">getBoneName</a>( bone&nbsp;)</td>
@@ -403,6 +403,11 @@ Gets an entities' material </td>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getMaterials">getMaterials</a>( &nbsp;)</td>
 			<td class="summary">
 Gets an entities' material list </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:getMatrix">getMatrix</a>( &nbsp;)</td>
+			<td class="summary">
+Returns the world transform matrix of the entity </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getMaxHealth">getMaxHealth</a>( &nbsp;)</td>
@@ -1194,7 +1199,7 @@ Returns the number of an entity's bones</p>
 <dt><span class="realm_sh"></span><a name="Entity:getBoneMatrix"></a><strong>Entity:getBoneMatrix</strong>( bone&nbsp;)</dt>
 <dd>
 	<p>
-Returns the matrix of the entity's bone</p>
+Returns the matrix of the entity's bone. Note: this method is slow/doesnt work well if the entity isn't animated.</p>
 	
 	
 	<section class="parameters">
@@ -1555,6 +1560,24 @@ Gets an entities' material list</p>
 		<h3>Returns</h3>
 		
 		<p>Material</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Entity:getMatrix"></a><strong>Entity:getMatrix</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the world transform matrix of the entity</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The matrix</p>
 		
 	</section>
 	
