@@ -146,6 +146,10 @@ function net.WriteStream(data, callback)
 
 	local compressed = util.Compress(data) or ""
 	local numchunks = math.ceil(#compressed / net.Stream.SendSize)
+	if numchunks == 0 then
+		net.WriteUInt(0, 32)
+		return
+	end
 	
 	if CLIENT and numchunks > net.Stream.MaxServerChunks then
 		ErrorNoHalt("net.WriteStream request is too large! ", #compressed/1048576, "MiB")
@@ -198,7 +202,13 @@ function net.ReadStream(ply, callback)
 	local queue = net.Stream.ReadStreamQueues[ply]
 
 	local numchunks = net.ReadUInt(32)
-	if numchunks == nil then return end
+	if numchunks == nil then
+		return
+	elseif numchunks == 0 then
+		local ok, err = xpcall(callback, debug.traceback, "")
+		if not ok then ErrorNoHalt(err) end
+		return
+	end
 	local identifier = net.ReadUInt(32)
 	--print("Got info", numchunks, identifier)
 
