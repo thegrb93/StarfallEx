@@ -583,7 +583,7 @@ function ents_methods:lookupBone(name)
 	return eunwrap(self):LookupBone(name)
 end
 
---- Returns the matrix of the entity's bone
+--- Returns the matrix of the entity's bone. Note: this method is slow/doesnt work well if the entity isn't animated.
 -- @shared
 -- @param bone Bone index. (def 0)
 -- @return The matrix
@@ -594,7 +594,15 @@ function ents_methods:getBoneMatrix(bone)
 	local ent = eunwrap(self)
 	return owrap(ent:GetBoneMatrix(bone))
 end
-ents_methods.getMatrix = ents_methods.getBoneMatrix
+
+--- Returns the world transform matrix of the entity
+-- @shared
+-- @return The matrix
+function ents_methods:getMatrix()
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	return owrap(ent:GetWorldTransformMatrix())
+end
 
 --- Returns the number of an entity's bones
 -- @shared
