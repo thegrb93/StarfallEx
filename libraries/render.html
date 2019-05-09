@@ -242,9 +242,9 @@ Creates a font.</td>
 Creates a new render target to draw onto.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.cursorPos">cursorPos</a>( ply&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#render.cursorPos">cursorPos</a>( ply, screen&nbsp;)</td>
 			<td class="summary">
-Gets a 2D cursor position where ply is aiming.</td>
+Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.destroyRenderTarget">destroyRenderTarget</a>( name&nbsp;)</td>
@@ -792,17 +792,18 @@ The dimensions will always be 1024x1024</p>
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.cursorPos"></a><strong>render.cursorPos</strong>( ply&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="render.cursorPos"></a><strong>render.cursorPos</strong>( ply, screen&nbsp;)</dt>
 <dd>
 	<p>
-Gets a 2D cursor position where ply is aiming.</p>
+Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>ply</tt> ― player to get cursor position from(optional)</li>
+			<li><tt>ply</tt> ― player to get cursor position from (default: player())</li>
+			<li><tt>screen</tt> ― An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)</li>
 		</ul>
 	</section>
 	
