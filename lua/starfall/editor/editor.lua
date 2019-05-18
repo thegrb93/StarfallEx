@@ -284,14 +284,15 @@ if CLIENT then
 				local inc = ppdata.includedirs[codepath]
 
 				for i = 1, #inc do
-					local dir = inc[i]
+					local origdir = inc[i]
+					local dir = origdir
 					local files
 					if string.sub(dir, 1, 1)~="/" then
-						dir = SF.NormalizePath(codedir .. dir)
+						dir = SF.NormalizePath(codedir .. origdir)
 						files = file.Find("starfall/" .. dir .. "/*", "DATA")
 					end
 					if not files or #files==0 then
-						dir = SF.NormalizePath(dir) .. "/"
+						dir = SF.NormalizePath(origdir)
 						files = file.Find("starfall/" .. dir .. "/*", "DATA")
 					end
 					for j = 1, #files do

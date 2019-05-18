@@ -767,6 +767,18 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		path = SF.NormalizePath(dir)
 	else
 		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. dir)
+		
+		-- If no scripts found in relative dir, try the root dir.
+		local foundScript = false
+		for file, _ in pairs(SF.instance.scripts) do
+			if string.match(file, "^"..path.."/[^/]+%.txt$") then
+				foundScript = true
+				break
+			end
+		end
+		if not foundScript then
+			path = SF.NormalizePath(dir)
+		end
 	end
 
 	local returns = {}
