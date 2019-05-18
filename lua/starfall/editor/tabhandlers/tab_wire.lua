@@ -857,8 +857,6 @@ function PANEL:OnMouseReleased(code)
 		self.MouseDown = nil
 		if not self.tmp then return end
 		self.Caret = self:CursorToCaret()
-		self:SetCaret(self.Caret)
-
 	end
 end
 
