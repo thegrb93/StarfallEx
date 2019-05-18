@@ -1485,6 +1485,12 @@ function Editor:GetTabContent(n)
 	end
 end
 
+function Editor:GetTab(n)
+	if self.C.TabHolder.Items[n] then
+		return self.C.TabHolder.Items[n]
+	end
+end
+
 function Editor:GetCurrentTabContent()
 	return self:GetActiveTab():GetPanel()
 end

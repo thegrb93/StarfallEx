@@ -298,13 +298,10 @@ function PANEL:openMenu (node)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
 						local oldFile = node:GetFileName()
-						local saveFile = string.GetPathFromFilename(oldFile) .. "/" .. text ..".txt"
-						local contents = file.Read(oldFile)
-						file.Delete(node:GetFileName())
-						file.Write(saveFile, contents)
-						SF.AddNotify(LocalPlayer(), "File renamed as " .. saveFile .. ".", "GENERIC", 7, "DRIP3")
+						local saveFile = string.GetPathFromFilename(oldFile) .. text ..".txt"
+						SF.Editor.renameFile(oldFile,saveFile)
 						self:ReloadTree()
-					end)
+				end)
 			end)
 		self.menu:AddSpacer()
 		self.menu:AddOption("Delete", function ()
