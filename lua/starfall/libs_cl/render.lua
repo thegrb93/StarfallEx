@@ -1613,18 +1613,19 @@ end
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
-	if tbl.origin then checktype(tbl.origin, vector_meta) end
-	if tbl.angles then checktype(tbl.angles, ang_meta) end
-	if tbl.aspectratio then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
-	if tbl.x then checkluatype(tbl.x, TYPE_NUMBER) end
-	if tbl.y then checkluatype(tbl.y, TYPE_NUMBER) end
-	if tbl.w then checkluatype(tbl.w, TYPE_NUMBER) end
-	if tbl.h then checkluatype(tbl.h, TYPE_NUMBER) end
-	if tbl.fov then checkluatype(tbl.fov, TYPE_NUMBER) end
-	if tbl.zfar then checkluatype(tbl.zfar, TYPE_NUMBER) end
-	if tbl.znear then checkluatype(tbl.znear, TYPE_NUMBER) end
-	if tbl.drawmonitors then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
-	if tbl.drawviewmodel then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
+	local origin, angles, w, h
+	if tbl.origin~=nil then checktype(tbl.origin, vector_meta) origin = vunwrap(tbl.origin) end
+	if tbl.angles~=nil then checktype(tbl.angles, ang_meta) angles = aunwrap(tbl.angles) end
+	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
+	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
+	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
+	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = math.Clamp(tbl.w, 1, 1024) end
+	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = math.Clamp(tbl.h, 1, 1024) end
+	if tbl.fov~=nil then checkluatype(tbl.fov, TYPE_NUMBER) end
+	if tbl.zfar~=nil then checkluatype(tbl.zfar, TYPE_NUMBER) end
+	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
+	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
+	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
 	
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -1676,13 +1677,13 @@ function render_library.renderView(tbl)
 	cam.Start3D() -- Seems to fix some of the issues with render operations leaking into default RT
 
 	render.RenderView({
-		origin = vunwrap(tbl.origin),
-		angles = aunwrap(tbl.angles),
+		origin = origin,
+		angles = angles,
 		aspectratio = tbl.aspectratio,
 		x = tbl.x,
 		y = tbl.y,
-		w = math.Clamp(tbl.w, 1, 1024),
-		h = math.Clamp(tbl.h, 1, 1024),
+		w = w,
+		h = h,
 		fov = tbl.fov,
 		zfar = tbl.zfar,
 		znear = tbl.znear,
