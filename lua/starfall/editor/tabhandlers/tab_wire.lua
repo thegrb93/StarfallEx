@@ -405,6 +405,8 @@ function PANEL:RemoveRowAt(line)
 	table_remove(self.Rows,line)
 	table_remove(self.RowTexts,line)
 	self:InvalidateLayout()
+	self:OnMouseWheeled(0)
+	self:ScrollCaret()
 end
 function PANEL:SetRowText(line, text)
 	if line > #self.Rows then
@@ -842,6 +844,7 @@ function PANEL:OnMousePressed(code)
 		if not input.IsKeyDown(KEY_LSHIFT) and not input.IsKeyDown(KEY_RSHIFT) then
 			self.Start = self:CopyPosition(cursor)
 		end
+		self:SetCaret(self.Caret)
 	elseif code == MOUSE_RIGHT then
 		self:OpenContextMenu()
 	end
@@ -854,6 +857,8 @@ function PANEL:OnMouseReleased(code)
 		self.MouseDown = nil
 		if not self.tmp then return end
 		self.Caret = self:CursorToCaret()
+		self:SetCaret(self.Caret)
+
 	end
 end
 
@@ -1241,8 +1246,8 @@ end
 -- be maintained only if Shift is pressed.
 function PANEL:SetCaret(caret, maintain_selection)
 	self.Caret = self:CopyPosition(caret)
-
-	self.Caret[1] = math.Clamp(self.Caret[1], 1, #self.Rows)
+	local rowNum = #self.Rows
+	self.Caret[1] = math.Clamp(self.Caret[1], 1, rowNum)
 	self.Caret[2] = math.Clamp(self.Caret[2], 1, #self:GetRowText(self.Caret[1]) + 1)
 
 	if maintain_selection == nil then
@@ -2333,7 +2338,6 @@ function PANEL:DuplicateLine()
 	self.Scroll = old_scroll
 	self:ScrollCaret()
 end
-
 function PANEL:_OnKeyCodeTyped(code)
 	local handled = true
 	self.Blink = RealTime()
@@ -2388,10 +2392,9 @@ function PANEL:_OnKeyCodeTyped(code)
 		elseif code == KEY_PAGEDOWN then
 			self:NextTab()
 		elseif code == KEY_UP then
-			self.Scroll[1] = self.Scroll[1] - 1
-			if self.Scroll[1] < 1 then self.Scroll[1] = 1 end
+			self:OnMouseWheeled(1)
 		elseif code == KEY_DOWN then
-			self.Scroll[1] = self.Scroll[1] + 1
+			self:OnMouseWheeled(-1)
 		elseif code == KEY_LEFT then
 			self:SetCaret(self:wordLeft(self.Caret))
 		elseif code == KEY_RIGHT then
@@ -2436,7 +2439,11 @@ function PANEL:_OnKeyCodeTyped(code)
 			end
 			self:SetCaret(self.Caret)
 		elseif code == KEY_DOWN then
-			if self.Caret[1] >= #self.Rows then return end
+			if self.Caret[1] >= #self.Rows then 
+					self.Caret[2] = #self.Rows[self.Caret[1]][1]
+					self:SetCaret(self.Caret)
+				return
+			end
 			self.Caret[1] = self.Caret[1] + 1
 			while self.Rows[self.Caret[1]][3] do
 				self.Caret[1] = self.Caret[1] + 1
