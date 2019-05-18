@@ -1606,9 +1606,6 @@ function Editor:LoadFile(Line, forcenewtab)
 					self:SetActiveTab(i)
 					if forcenewtab ~= nil then self:SetCode(str) end
 					return
-				elseif self:GetTabContent(i).GetCode and self:GetTabContent(i):GetCode() == str then
-					self:SetActiveTab(i)
-					return
 				end
 			end
 		end
