@@ -54,9 +54,7 @@ end)
 
 local function hologramOnDestroy(holoent, holodata, ply)
 	holodata[holoent] = nil
-	if plyCount[ply] then
-		plyCount[ply] = plyCount[ply] - 1
-	end
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 end
 
 SF.AddHook("deinitialize", function(inst)

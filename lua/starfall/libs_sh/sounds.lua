@@ -45,7 +45,7 @@ end
 
 local function deleteSound(ply, ent, sound)
 	sound:Stop()
-	plyCount[ply] = plyCount[ply] - 1
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 	if soundsByEntity[ent] then
 		soundsByEntity[ent][sound] = nil
 	end

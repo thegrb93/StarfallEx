@@ -64,7 +64,8 @@ local function checkMaxReached(ply)
 end
 
 local function constraintOnDestroy(ent, instance)
-	plyCount[instance.player] = plyCount[instance.player] - 1
+	local ply = instance.player
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 	instance.data.constraints.constraints[ent] = nil
 end
 

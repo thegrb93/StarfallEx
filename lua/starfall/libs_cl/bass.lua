@@ -35,7 +35,7 @@ end
 
 local function deleteSound(ply, sound)
 	if sound:IsValid() then sound:Stop() end
-	plyCount[ply] = plyCount[ply] - 1
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
