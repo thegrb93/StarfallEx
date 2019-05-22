@@ -191,7 +191,7 @@ function bass_methods:pause ()
 end
 
 --- Sets the volume of the sound channel.
--- @param vol Volume to set to, between 0 and 1.
+-- @param vol Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:setVolume (vol)
 	checktype(self, bass_metamethods)
 	checkluatype(vol, TYPE_NUMBER)
@@ -200,7 +200,7 @@ function bass_methods:setVolume (vol)
 	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
-		uw:SetVolume(math.Clamp(vol, 0, 1))
+		uw:SetVolume(math.Clamp(vol, 0, 10))
 	end
 end
 
