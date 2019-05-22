@@ -54,7 +54,7 @@ Sets the position of the sound in 3D space. Must have `3d` flag to get this work
 Sets the position of the sound in 3D space.";};["setTime"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Sets the current playback time of the sound channel.";["fname"]="setTime";["name"]="bass_methods:setTime";["param"]={[1]="time";["time"]="Sound channel playback time in seconds.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the current playback time of the sound channel.";};["setVolume"]={["class"]="function";["classlib"]="Bass";["description"]="\
-Sets the volume of the sound channel.";["fname"]="setVolume";["name"]="bass_methods:setVolume";["param"]={[1]="vol";["vol"]="Volume to set to, between 0 and 1.";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the volume of the sound channel.";["fname"]="setVolume";["name"]="bass_methods:setVolume";["param"]={[1]="vol";["vol"]="Volume multiplier (1 is normal), between 0x and 10x.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the volume of the sound channel.";};["stop"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Stops playing the sound.";["fname"]="stop";["name"]="bass_methods:stop";["param"]={};["private"]=false;["realm"]="cl";["summary"]="\
 Stops playing the sound.";};};["name"]="Bass";["summary"]="\
