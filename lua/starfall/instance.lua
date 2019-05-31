@@ -93,7 +93,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 			-- Lua doesn't have empty statements, so an empty file gives a syntax error
 			instance.scripts[filename] = function() end
 		else
-			local func = CompileString(source, "SF:"..filename, false)
+			local func = SF.CompileString(source, "SF:"..filename, false)
 			if isstring(func) then
 				return false, { message = func, traceback = "" }
 			end

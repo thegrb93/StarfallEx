@@ -857,7 +857,7 @@ end
 -- @return Function of str
 function SF.DefaultEnvironment.loadstring (str, name)
 	name = "SF:" .. (name or tostring(SF.instance.env))
-	local func = CompileString(str, name, false)
+	local func = SF.CompileString(str, name, false)
 
 	-- CompileString returns an error as a string, better check before setfenv
 	if isfunction(func) then

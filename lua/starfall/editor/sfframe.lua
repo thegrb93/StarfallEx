@@ -1366,7 +1366,7 @@ function Editor:Validate(gotoerror)
 
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We wont validate empty scripts
-	local err = CompileString(code , "Validation", false)
+	local err = SF.CompileString(code , "Validation", false)
 	local success = not isstring(err)
 	local row, message
 	if success then

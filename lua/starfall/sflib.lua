@@ -284,6 +284,12 @@ end
 -- Utility functions
 -------------------------------------------------------------------------------
 
+function SF.CompileString(str, name, handle)
+	if string.find(str, "continue", 1, true) then
+		return "Due to a glua bug. Use of the string 'continue' has been banned"
+	end
+	return CompileString(str, name, handle)
+end
 
 --- Throws an error like the throw function in builtins
 -- @param msg Message
