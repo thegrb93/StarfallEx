@@ -1373,7 +1373,8 @@ function Editor:Validate(gotoerror)
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
 	else
 		row = tonumber(err:match("%d+")) or 0
-		message = err:match(": .+$"):sub(3) or "Unknown"
+		message = err:match(": .+$")
+		message = message and message:sub(3) or "Unknown"
 		message = "Line "..row..":"..message
 		self.C.Val:SetBGColor(110, 0, 20, 255)
 		self.C.Val:SetText(" " .. message)
