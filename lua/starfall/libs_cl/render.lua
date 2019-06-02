@@ -158,7 +158,7 @@ local pushedClippingPlanes = 0
 
 local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
 	function(t, i)
-		return GetRenderTarget("Starfall_CustomRT_" .. i, 1024, 1024)
+		return GetRenderTargetEx("Starfall_CustomRT_" .. i, 1024, 1024, RT_SIZE_NO_CHANGE, MATERIAL_RT_DEPTH_SEPARATE, 0, 0, IMAGE_FORMAT_DEFAULT )
 	end,
 	function(t, Rt)
 		local oldRt = render.GetRenderTarget()
