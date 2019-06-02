@@ -1042,20 +1042,6 @@ function Editor:GetSettings()
 		self:GetParent():SetWorldClicker(bVal)
 	end
 
-	local ShowExamples = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(ShowExamples)
-	ShowExamples:SetConVar("sf_editor_showexamples")
-	ShowExamples:SetText("Show examples in file tree")
-	ShowExamples:SizeToContents()
-	ShowExamples:SetTooltip("Shows examples loaded from github in file tree.")
-
-	local ShowExamples = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(ShowExamples)
-	ShowExamples:SetConVar("sf_editor_showdatafiles")
-	ShowExamples:SetText("Show files from sf_filedata in file tree (UNSTABLE)")
-	ShowExamples:SizeToContents()
-	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
-
 	local LegacyHelper = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(LegacyHelper)
 	LegacyHelper:SetConVar("sf_helper_legacy")

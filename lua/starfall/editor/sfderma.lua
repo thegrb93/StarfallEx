@@ -5,32 +5,6 @@ PANEL = {}
 
 PANEL.windows = {}
 
-SF.Editor.ShowExamplesVar = CreateClientConVar("sf_editor_showexamples", "1", true, false)
-SF.Editor.ShowDataFilesVar = CreateClientConVar("sf_editor_showdatafiles", "0", true, false)
-
---[[ Loading SF Examples ]]
-
-if SF.Editor.ShowExamplesVar:GetBool() then
-
-	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
-	http.Fetch( examples_url,
-		function( body, len, headers, code )
-				if code == 200 then -- OK code
-					local data = util.JSONToTable( body )
-					SF.Docs["Examples"] = {}
-					for k,v in pairs(data) do
-						SF.Docs["Examples"][v.name] = v.download_url
-					end
-				end
-		end,
-		function( error )
-			SF.Docs["Examples"] = {}
-			print("[SF] Examples failed to load:"..tostring(error))
-		end
-	)
-end
---[[ End of SF Examples ]]
-
 --[[ Fonts ]]
 
 surface.CreateFont( "SF_PermissionsWarning", {
@@ -237,41 +211,37 @@ PANEL = {}
 function PANEL:Init ()
 end
 
-function PANEL:Setup (folder)
+function PANEL:Setup(folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddNode(folder)
+
+	self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
+	self.DataFiles:MakeFolder("sf_filedata","DATA",true)
+
 	--[[Waiting for examples, 10 tries each 1 second]]
-	if SF.Editor.ShowDataFilesVar:GetBool() then
-		self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
-		self.DataFiles:MakeFolder("sf_filedata","DATA",true)
-	end
-	if SF.Editor.ShowExamplesVar:GetBool() then
-		timer.Create("sf_filetree_waitforexamples",1, 10, function()
-
-			if SF.Docs["Examples"] then
+	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
+	http.Fetch( examples_url,
+		function( body, len, headers, code )
+			if code == 200 then -- OK code
+				local data = util.JSONToTable( body )
+				SF.Docs.Examples = {}
 				self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
-				for k,v in pairs(SF.Docs["Examples"]) do
-					local node = self.Examples:AddNode(k,"icon16/page_white.png")
-					node.FileURL = v
+				for k,v in pairs(data) do
+					SF.Docs.Examples[v.name] = v.download_url
+					local node = self.Examples:AddNode(v.name,"icon16/page_white.png")
+					node.FileURL = v.download_url
 				end
-				timer.Remove("sf_filetree_waitforexamples")
 			end
+		end,
+		function( error )
+			SF.Docs["Examples"] = {}
+			print("[SF] Examples failed to load:"..tostring(error))
+		end
+	)
 
-		end)
-	end
 	self:AddFiles("")
 end
 
-local function containsFile (dir, search)
-	local files, folders = file.Find(dir .. "/*", "DATA")
-	for k, file in pairs(files) do
-		if string.find(string.lower(file), string.lower(search)) then return true end
-	end
-	for k, folder in pairs(folders) do
-		if containsFile(dir .. "/" .. folder, search) then return true end
-	end
-	return false
-end
 local function sort(tbl)
 	local sorted = {}
 	for k, v in pairs(tbl) do sorted[#sorted+1] = {string.lower(v), v} end
@@ -279,6 +249,7 @@ local function sort(tbl)
 	for k, v in pairs(sorted) do tbl[k] = v[2] end
 end
 local function addFiles(search, dir, node)
+	local found = false
 	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
 	sort(allFiles)
 	sort(allFolders)
@@ -293,19 +264,23 @@ local function addFiles(search, dir, node)
 		end
 	else
 		for k, v in pairs(allFolders) do
-			if containsFile(dir .. "/" .. v, search) then
-				local newNode = node:AddNode(v)
+			local newNode = node:AddNode(v)
+			if addFiles(search, dir .. "/" .. v, newNode) then
 				newNode:SetExpanded(true)
-				addFiles(search, dir .. "/" .. v, newNode)
+				found = true
+			else
+				newNode:Remove()
 			end
 		end
 		for k, v in pairs(allFiles) do
 			if string.find(string.lower(v), string.lower(search)) then
 				local fnode = node:AddNode(v, "icon16/page_white.png")
 				fnode:SetFileName(dir.."/"..v)
+				found = true
 			end
 		end
 	end
+	return found
 end
 
 function PANEL:AddFiles(filter)
@@ -313,7 +288,9 @@ function PANEL:AddFiles(filter)
 	addFiles(filter, "starfall", self.Root)
 	if self.DataFiles then
 		if self.DataFiles.ChildNodes then self.DataFiles.ChildNodes:Clear() end
-		addFiles(filter, "sf_filedata", self.DataFiles)
+		if addFiles(filter, "sf_filedata", self.DataFiles) then
+			self.DataFiles:SetExpanded(true)
+		end
 	end
 	self.Root:SetExpanded(true)
 end
