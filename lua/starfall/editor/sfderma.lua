@@ -235,11 +235,11 @@ local invalid_filename_chars = {
 PANEL = {}
 
 function PANEL:Init ()
-
 end
+
 function PANEL:Setup (folder)
 	self.folder = folder
-	self.Root = self.RootNode:AddFolder(folder, folder, "DATA", true)
+	self.Root = self.RootNode:AddNode(folder)
 	--[[Waiting for examples, 10 tries each 1 second]]
 	if SF.Editor.ShowDataFilesVar:GetBool() then
 		self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
@@ -259,21 +259,73 @@ function PANEL:Setup (folder)
 
 		end)
 	end
+	self:AddFiles("")
+end
+
+local function containsFile (dir, search)
+	local files, folders = file.Find(dir .. "/*", "DATA")
+	for k, file in pairs(files) do
+		if string.find(string.lower(file), string.lower(search)) then return true end
+	end
+	for k, folder in pairs(folders) do
+		if containsFile(dir .. "/" .. folder, search) then return true end
+	end
+	return false
+end
+local function sort(tbl)
+	local sorted = {}
+	for k, v in pairs(tbl) do sorted[#sorted+1] = {string.lower(v), v} end
+	table.sort(sorted, function(a,b) return a[1]<b[1] end)
+	for k, v in pairs(sorted) do tbl[k] = v[2] end
+end
+local function addFiles(search, dir, node)
+	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
+	sort(allFiles)
+	sort(allFolders)
+	if search=="" then
+		for k, v in pairs(allFolders) do
+			local newNode = node:AddNode(v)
+			addFiles(search, dir .. "/" .. v, newNode)
+		end
+		for k, v in pairs(allFiles) do
+			local fnode = node:AddNode(v, "icon16/page_white.png")
+			fnode:SetFileName(dir.."/"..v)
+		end
+	else
+		for k, v in pairs(allFolders) do
+			if containsFile(dir .. "/" .. v, search) then
+				local newNode = node:AddNode(v)
+				newNode:SetExpanded(true)
+				addFiles(search, dir .. "/" .. v, newNode)
+			end
+		end
+		for k, v in pairs(allFiles) do
+			if string.find(string.lower(v), string.lower(search)) then
+				local fnode = node:AddNode(v, "icon16/page_white.png")
+				fnode:SetFileName(dir.."/"..v)
+			end
+		end
+	end
+end
+
+function PANEL:AddFiles(filter)
+	if self.Root.ChildNodes then self.Root.ChildNodes:Clear() end
+	addFiles(filter, "starfall", self.Root)
+	if self.DataFiles then
+		if self.DataFiles.ChildNodes then self.DataFiles.ChildNodes:Clear() end
+		addFiles(filter, "sf_filedata", self.DataFiles)
+	end
 	self.Root:SetExpanded(true)
 end
+
 function PANEL:ReloadTree ()
-	self.Root:Remove()
-	if self.Examples then
-		self.Examples:Remove()
-	end
-	if self.DataFiles then
-		self.DataFiles:Remove()
-	end
-	self:Setup(self.folder)
+	self:AddFiles("")
 end
+
 function PANEL:DoRightClick (node)
 	self:openMenu(node)
 end
+
 function PANEL:openMenu (node)
 	local menu
 	if node:GetFileName() then
@@ -418,43 +470,8 @@ function PANEL:Init ()
 
 	function searchBox:OnChange ()
 
-		if self:GetValue() == "" then
-			tree:ReloadTree()
-			return
-		end
+		tree:AddFiles(self:GetValue():PatternSafe())
 
-		tree.Root.ChildNodes:Clear()
-		local function containsFile (dir, search)
-			local files, folders = file.Find(dir .. "/*", "DATA")
-			for k, file in pairs(files) do
-				if string.find(string.lower(file), string.lower(search)) then return true end
-			end
-			for k, folder in pairs(folders) do
-				if containsFile(dir .. "/" .. folder, search) then return true end
-			end
-			return false
-		end
-		local function addFiles (search, dir, node)
-			local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
-			for k, v in pairs(allFolders) do
-				if containsFile(dir .. "/" .. v, search) then
-					local newNode = node:AddNode(v)
-					newNode:SetExpanded(true)
-					addFiles(search, dir .. "/" .. v, newNode)
-				end
-			end
-			for k, v in pairs(allFiles) do
-				if string.find(string.lower(v), string.lower(search)) then
-					local fnode = node:AddNode(v, "icon16/page_white.png")
-					fnode:SetFileName(dir.."/"..v)
-				end
-			end
-		end
-		addFiles(self:GetValue():PatternSafe(), "starfall", tree.Root)
-		if tree.DataFiles then
-			addFiles(self:GetValue():PatternSafe(), "sf_filedata", tree.DataFiles)
-		end
-		tree.Root:SetExpanded(true)
 	end
 	self.searchBox = searchBox
 
@@ -462,7 +479,7 @@ function PANEL:Init ()
 	self.Update:SetTall(20)
 	self.Update:Dock(BOTTOM)
 	self.Update:DockMargin(0, 0, 0, 0)
-	self.Update:SetText("Update")
+	self.Update:SetText("Refresh")
 	self.Update.DoClick = function(button)
 		tree:ReloadTree()
 		searchBox:SetValue("Search...")
