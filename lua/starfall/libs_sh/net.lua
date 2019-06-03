@@ -536,7 +536,6 @@ end
 --- Returns whether or not the library is currently reading data from a stream
 -- @return Boolean
 function net_library.isStreaming()
-	-- Can also be nil
 	return streams[SF.instance.player] ~= nil
 end
 
