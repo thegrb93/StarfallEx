@@ -537,8 +537,11 @@ end
 -- @return Boolean
 function net_library.isStreaming()
 	-- Can also be nil
-	return streams[SF.instance.player] == true
-end
+	if streams[SF.instance.player] then
+		return true -- Do not return the stream.
+	else
+		return false
+	end
 
 net.Receive("SF_netmessage", function(len, ply)
 	local ent = net.ReadEntity()
