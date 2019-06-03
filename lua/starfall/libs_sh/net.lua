@@ -538,6 +538,7 @@ end
 function net_library.isStreaming()
 	-- Can also be nil
 	return streams[SF.instance.player] ~= nil
+end
 
 net.Receive("SF_netmessage", function(len, ply)
 	local ent = net.ReadEntity()
