@@ -266,7 +266,7 @@ function net_library.readStream(cb)
 	
 	streams[instance.player] = net.ReadStream((SERVER and instance.player or nil), function(data)
 		instance:runFunction(cb, data)
-		streams[instance.player] = false
+		streams[instance.player] = nil
 	end)
 end
 
@@ -537,7 +537,7 @@ end
 -- @return Boolean
 function net_library.isStreaming()
 	-- Can also be nil
-	return streams[SF.instance.player] == true
+	return streams[SF.instance.player] ~= nil
 end
 
 net.Receive("SF_netmessage", function(len, ply)
