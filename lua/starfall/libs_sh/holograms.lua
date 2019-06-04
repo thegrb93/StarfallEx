@@ -37,11 +37,13 @@ SF.AddHook("postload", function()
 	SF.Holograms.Unwrap = unwrap
 	
 	--- Casts a hologram entity into the hologram type
-	-- @name Entity.getHologram
+	-- @name Entity.toHologram
 	-- @class function
 	-- @return Hologram type
-	function SF.Entities.Methods:getHologram()
+	function SF.Entities.Methods:toHologram()
 		checktype(self, ent_meta)
+		if eunwrap(self):GetClass() ~= "starfall_hologram" then SF.Throw("The entity isn't a hologram", 2) end
+		return setmetatable(self, hologram_metamethods)
 	end
 end)
 
@@ -63,8 +65,8 @@ if SERVER then
 		plyCount[inst.player] = plyCount[inst.player] or 0
 	end)
 
-	local function hologramOnDestroy(holoent, holodata, ply)
-		holodata[holoent] = nil
+	local function hologramOnDestroy(holo, holodata, ply)
+		holodata[holo] = nil
 		if plyCount[ply] then
 			plyCount[ply] = plyCount[ply] - 1
 		end
@@ -170,15 +172,15 @@ else
 	function hologram_methods:setMesh(mesh)
 		local instance = SF.instance
 		checkpermission(instance, nil, "mesh")
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
+		local holo = eunwrap(self)
+		if not isValid(holo) or holo:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(instance, holo, "entities.setRenderProperty")
 		if mesh then
 			checktype(mesh, SF.Mesh.Metatable)
-			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
-			ent.custom_mesh_data = instance.data.meshes
+			holo.custom_mesh = SF.Mesh.Unwrap(mesh)
+			holo.custom_mesh_data = instance.data.meshes
 		else
-			ent.custom_mesh = nil
+			holo.custom_mesh = nil
 		end
 	end
 
@@ -187,14 +189,14 @@ else
 	-- @param material The material to set it to or nil to set back to default
 	function hologram_methods:setMaterial(material)
 		local instance = SF.instance
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
+		local holo = eunwrap(self)
+		if not isValid(holo) or holo:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(instance, holo, "entities.setRenderProperty")
 		if material then
 			checktype(material, SF.Materials.Metatable)
-			ent.Material = SF.Materials.Unwrap(material)
+			holo.Material = SF.Materials.Unwrap(material)
 		else
-			ent.Material = ent.DefaultMaterial
+			holo.Material = holo.DefaultMaterial
 		end
 	end
 
@@ -205,10 +207,10 @@ else
 	function hologram_methods:setRenderBounds(mins, maxs)
 		checktype(mins, vec_meta)
 		checktype(maxs, vec_meta)
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
-		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
+		local holo = eunwrap(self)
+		if not isValid(holo) or holo:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, holo, "entities.setRenderProperty")
+		holo:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
 
 	--- Sets a hologram entity's rendermatrix
@@ -216,19 +218,19 @@ else
 	-- @param mat Starfall matrix to use
 	function hologram_methods:setRenderMatrix(mat)
 		if mat ~= nil then checktype(mat, SF.VMatrix.Metatable) end
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		local holo = eunwrap(self)
+		if not isValid(holo) or holo:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(SF.instance, holo, "entities.setRenderProperty")
 		
 		if mat then
 			local matrix = SF.VMatrix.Unwrap(mat)
 			if matrix:IsIdentity() then
-				ent:DisableMatrix("RenderMultiply")
+				holo:DisableMatrix("RenderMultiply")
 			else
-				ent:EnableMatrix("RenderMultiply", matrix)
+				holo:EnableMatrix("RenderMultiply", matrix)
 			end
 		else
-			ent:DisableMatrix("RenderMultiply")
+			holo:DisableMatrix("RenderMultiply")
 		end
 	end
 end
@@ -272,10 +274,10 @@ end
 -- @shared
 function hologram_methods:getFlexes()
 	checktype(self, hologram_metamethods)
-	local holoent = unwrap(self)
+	local holo = unwrap(self)
 	local flexes = {}
-	for i = 0, holoent:GetFlexNum()-1 do
-		flexes[holoent:GetFlexName(i)] = i
+	for i = 0, holo:GetFlexNum()-1 do
+		flexes[holo:GetFlexName(i)] = i
 	end
 	return flexes
 end
@@ -287,12 +289,12 @@ function hologram_methods:setFlexWeight(flexid, weight)
 	checkluatype(flexid, TYPE_NUMBER)
 	checkluatype(weight, TYPE_NUMBER)
 	flexid = math.floor(flexid)
-	local holoent = unwrap(self)
-	if flexid < 0 or flexid >= holoent:GetFlexNum() then
+	local holo = unwrap(self)
+	if flexid < 0 or flexid >= holo:GetFlexNum() then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
-	if IsValid(holoent) then
-		holoent:SetFlexWeight(flexid, weight)
+	if IsValid(holo) then
+		holo:SetFlexWeight(flexid, weight)
 	end
 end
 
@@ -300,9 +302,9 @@ end
 function hologram_methods:setFlexScale(scale)
 	checktype(self, hologram_metamethods)
 	checkluatype(scale, TYPE_NUMBER)
-	local holoent = unwrap(self)
-	if IsValid(holoent) then
-		holoent:SetFlexScale(scale)
+	local holo = unwrap(self)
+	if IsValid(holo) then
+		holo:SetFlexScale(scale)
 	end
 end
 
@@ -314,10 +316,9 @@ function hologram_methods:setModel (model)
 	checkluatype(model, TYPE_STRING)
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
-	local this = unwrap(self)
-	if IsValid(this) then
-		this:SetModel(model)
-	end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return end
+	holo:SetModel(model)
 end
 
 --- Suppress Engine Lighting of a hologram. Disabled by default.
@@ -327,10 +328,9 @@ end
 function hologram_methods:suppressEngineLighting (suppress)
 	checkluatype(suppress, TYPE_BOOL)
 
-	local this = unwrap(self)
-	if IsValid(this) then
-		this:SetSuppressEngineLighting(suppress)
-	end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return end
+	holo:SetSuppressEngineLighting(suppress)
 end
 
 --- Animates a hologram
@@ -340,31 +340,31 @@ end
 -- @param frame The starting frame number
 -- @param rate Frame speed. (1 is normal)
 function hologram_methods:setAnimation(animation, frame, rate)
-	local Holo = unwrap(self)
-	if not IsValid(Holo) then return end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return end
 
 	if isstring(animation) then
-		animation = Holo:LookupSequence(animation)
+		animation = holo:LookupSequence(animation)
 	end
 
 	frame = frame or 0
 	rate = rate or 1
 
-	if not Holo.Animated then
+	if not holo.Animated then
 		-- This must be run once on entities that will be animated
-		Holo.Animated = true
-		Holo.AutomaticFrameAdvance = true
+		holo.Animated = true
+		holo.AutomaticFrameAdvance = true
 
-		local OldThink = Holo.Think
-		function Holo:Think()
+		local OldThink = holo.Think
+		function holo:Think()
 			OldThink(self)
 			self:NextThink(CurTime())
 			return true
 		end
 	end
-	Holo:ResetSequence(animation)
-	Holo:SetCycle(frame)
-	Holo:SetPlaybackRate(rate)
+	holo:ResetSequence(animation)
+	holo:SetCycle(frame)
+	holo:SetPlaybackRate(rate)
 end
 
 --- Get the length of the current animation
@@ -372,10 +372,10 @@ end
 -- @class function
 -- @return Length of current animation in seconds
 function hologram_methods:getAnimationLength()
-	local Holo = unwrap(self)
-	if not IsValid(Holo) then return -1 end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return -1 end
 
-	return Holo:SequenceDuration()
+	return holo:SequenceDuration()
 end
 
 --- Convert animation name into animation number
@@ -383,10 +383,10 @@ end
 -- @param animation Name of the animation
 -- @return Animation index
 function hologram_methods:getAnimationNumber(animation)
-	local Holo = unwrap(self)
-	if not IsValid(Holo) then return 0 end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return 0 end
 
-	return Holo:LookupSequence(animation) or 0
+	return holo:LookupSequence(animation) or 0
 end
 
 --- Set the pose value of an animation. Turret/Head angles for example.
@@ -395,10 +395,10 @@ end
 -- @param pose Name of the pose parameter
 -- @param value Value to set it to.
 function hologram_methods:setPose(pose, value)
-	local Holo = unwrap(self)
-	if not IsValid(Holo) then return end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return end
 
-	Holo:SetPoseParameter(pose, value)
+	holo:SetPoseParameter(pose, value)
 end
 
 --- Get the pose value of an animation
@@ -407,8 +407,8 @@ end
 -- @param pose Pose parameter name
 -- @return Value of the pose parameter
 function hologram_methods:getPose(pose)
-	local Holo = unwrap(self)
-	if not IsValid(Holo) then return end
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then return end
 
-	return Holo:GetPoseParameter(pose)
+	return holo:GetPoseParameter(pose)
 end
