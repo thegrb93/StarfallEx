@@ -90,6 +90,7 @@
 					<h1>Hooks</h1>
 					<ul>
 						
+						<li><span class="realm_sv"></span><a href="hooks.html#Dupefinished">Dupefinished</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#EndEntityDriving">EndEntityDriving</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#EntityFireBullets">EntityFireBullets</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#EntityRemoved">EntityRemoved</a></li>
@@ -98,7 +99,6 @@
 						<li><span class="realm_sv"></span><a href="hooks.html#GravGunOnDropped">GravGunOnDropped</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#GravGunOnPickedUp">GravGunOnPickedUp</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#GravGunPunt">GravGunPunt</a></li>
-						<li><span class="realm_sv"></span><a href="hooks.html#Initialize">Initialize</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#KeyPress">KeyPress</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#KeyRelease">KeyRelease</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#OnEntityCreated">OnEntityCreated</a></li>
@@ -194,6 +194,11 @@
 	<table class="list">
 		
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#Dupefinished">Dupefinished</a>( entTbl&nbsp;)</td>
+			<td class="summary">
+Called after the starfall chip is duplicated and the duplication is finished.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#EndEntityDriving">EndEntityDriving</a>( ent, ply&nbsp;)</td>
 			<td class="summary">
 Called when a player stops driving an entity </td>
@@ -232,11 +237,6 @@ Called when an entity is being picked up by a gravity gun </td>
 			<td class="name"><span class="realm_sh"></span><a href="#GravGunPunt">GravGunPunt</a>( ply, ent&nbsp;)</td>
 			<td class="summary">
 Called when a player punts with the gravity gun </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Initialize">Initialize</a>( dupe, entTbl&nbsp;)</td>
-			<td class="summary">
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#KeyPress">KeyPress</a>( ply, key&nbsp;)</td>
@@ -492,6 +492,23 @@ Called when a high speed device writes to a wired SF chip </td>
 </section>
 <dl class="hooks">
 	
+	<dt><a name="Dupefinished"></a><span class="realm_sv"></span><strong>Dupefinished</strong>( entTbl&nbsp;)</dt>
+	<dd>
+		<p>
+Called after the starfall chip is duplicated and the duplication is finished.</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>entTbl</tt> ― A table of entities duped with the chip mapped to their previous indices.
+				</li>
+			</ul>
+		</section>
+		
+		
+	</dd>
 	<dt><a name="EndEntityDriving"></a><span class="realm_sh"></span><strong>EndEntityDriving</strong>( ent, ply&nbsp;)</dt>
 	<dd>
 		<p>
@@ -646,26 +663,6 @@ Called when a player punts with the gravity gun</p>
 				</li>
 				<li>
 					<tt>ent</tt> ― Entity being punted
-				</li>
-			</ul>
-		</section>
-		
-		
-	</dd>
-	<dt><a name="Initialize"></a><span class="realm_sv"></span><strong>Initialize</strong>( dupe, entTbl&nbsp;)</dt>
-	<dd>
-		<p>
-Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.</p>
-		
-		<section class="parameters">
-			<h3>Parameters</h3>
-			<ul>
-				
-				<li>
-					<tt>dupe</tt> ― True if the duplication that created the chip has finished
-				</li>
-				<li>
-					<tt>entTbl</tt> ― If duped, A table of entities duped with the chip mapped to their previous indices. Otherwise, nil.
 				</li>
 			</ul>
 		</section>
