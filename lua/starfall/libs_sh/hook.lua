@@ -565,12 +565,11 @@ add("Tick")
 -- @class hook
 -- @server
 
---- Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.
--- @name Initialize
+--- Called after the starfall chip is duplicated and the duplication is finished.
+-- @name Dupefinished
 -- @class hook
 -- @server
--- @param dupe True if the duplication that created the chip has finished
--- @param entTbl If duped, A table of entities duped with the chip mapped to their previous indices. Otherwise, nil.
+-- @param entTbl A table of entities duped with the chip mapped to their previous indices.
 
 --- Called when the local player opens their chat window.
 -- @name StartChat

@@ -113,23 +113,26 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		if info.starfall then
 			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			self:SetupFiles({owner = ply, files = files, mainfile = mainfile})
+			self.sfdata = {owner = ply, files = files, mainfile = mainfile}
 		end
 	end
 end
 
 local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
-	local instances = {}
+	local starfalls = {}
 	for k, v in pairs(entList) do
-		if IsValid(v) and v:GetClass() == "starfall_processor" and v.instance then
-			instances[#instances+1] = v.instance
+		if IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
+			starfalls[#starfalls+1] = v
 		end
 	end
-	if next(instances) then
+	if next(starfalls) then
 		local sanitized = SF.Sanitize(entList)
-		for k, v in pairs(instances) do
-			v:runScriptHook("initialize", true, sanitized)
+		for k, v in pairs(starfalls) do
+			v:SetupFiles(v.sfdata)
+			if v.instance then
+				v.instance:runScriptHook("dupefinished", sanitized)
+			end
 		end
 	end
 end

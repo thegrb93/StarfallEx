@@ -57,11 +57,6 @@ function ENT:Compile()
 			end
 		end
 	end
-
-	--TriggerInput can cause self.instance to become nil
-	if self.instance then
-		self.instance:runScriptHook("initialize")
-	end
 end
 
 function ENT:Destroy()
