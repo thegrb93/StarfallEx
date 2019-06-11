@@ -299,6 +299,7 @@ else
 	add("StartChat")
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
+	add("NetworkEntityCreated")
 end
 
 -- Shared hooks
