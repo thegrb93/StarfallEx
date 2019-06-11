@@ -505,6 +505,12 @@ add("Tick")
 -- @shared
 -- @param ent New entity
 
+--- Called when a clientside entity gets created or re-created via lag/PVS
+-- @name NetworkEntityCreated
+-- @class hook
+-- @client
+-- @param ent New entity
+
 --- Called when an entity is removed
 -- @name EntityRemoved
 -- @class hook
