@@ -101,6 +101,7 @@
 						<li><span class="realm_sh"></span><a href="hooks.html#GravGunPunt">GravGunPunt</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#KeyPress">KeyPress</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#KeyRelease">KeyRelease</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#NetworkEntityCreated">NetworkEntityCreated</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#OnEntityCreated">OnEntityCreated</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#OnPhysgunFreeze">OnPhysgunFreeze</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#OnPhysgunReload">OnPhysgunReload</a></li>
@@ -247,6 +248,11 @@ Called when a player presses a key </td>
 			<td class="name"><span class="realm_sh"></span><a href="#KeyRelease">KeyRelease</a>( ply, key&nbsp;)</td>
 			<td class="summary">
 Called when a player releases a key </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#NetworkEntityCreated">NetworkEntityCreated</a>( ent&nbsp;)</td>
+			<td class="summary">
+Called when a clientside entity gets created or re-created via lag/PVS </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#OnEntityCreated">OnEntityCreated</a>( ent&nbsp;)</td>
@@ -703,6 +709,23 @@ Called when a player releases a key</p>
 				</li>
 				<li>
 					<tt>key</tt> ― The key being released
+				</li>
+			</ul>
+		</section>
+		
+		
+	</dd>
+	<dt><a name="NetworkEntityCreated"></a><span class="realm_cl"></span><strong>NetworkEntityCreated</strong>( ent&nbsp;)</dt>
+	<dd>
+		<p>
+Called when a clientside entity gets created or re-created via lag/PVS</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>ent</tt> ― New entity
 				</li>
 			</ul>
 		</section>
