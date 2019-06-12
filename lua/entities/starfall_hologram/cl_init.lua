@@ -7,8 +7,6 @@ ENT.Material = ENT.DefaultMaterial
 function ENT:Initialize()
 	self.clips = {}
 	self.scale = Vector(1,1,1)
-	self.filter_mag = TEXFILTER.NONE
-	self.filter_min = TEXFILTER.NONE
 
 	net.Start("starfall_hologram_clip")
 		net.WriteUInt(self:EntIndex(), 16)
@@ -28,8 +26,8 @@ function ENT:Draw()
 	self:setupClip()
 	self:setupScale()
 
-	render.PushFilterMag(self.filter_mag)
-	render.PushFilterMin(self.filter_min)
+	if self.filter_mag then render.PushFilterMag(self.filter_mag) end
+	if self.filter_min then render.PushFilterMin(self.filter_min) end
 	
 	if self:GetSuppressEngineLighting() then
 		render.SuppressEngineLighting(true)
@@ -39,8 +37,8 @@ function ENT:Draw()
 		self:DrawModel()
 	end
 	
-	render.PopFilterMag()
-	render.PopFilterMin()
+	if self.filter_mag then render.PopFilterMag() end
+	if self.filter_min then render.PopFilterMin() end
 
 	self:finishClip()
 end

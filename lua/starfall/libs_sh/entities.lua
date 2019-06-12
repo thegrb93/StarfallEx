@@ -154,7 +154,7 @@ if CLIENT then
 			checkluatype(val, TYPE_NUMBER)
 			ent.filter_mag = val
 		else
-			ent.filter_mag = TEXFILTER.NONE
+			ent.filter_mag = nil
 		end
 	end
 
@@ -170,7 +170,7 @@ if CLIENT then
 			checkluatype(val, TYPE_NUMBER)
 			ent.filter_min = val
 		else
-			ent.filter_min = TEXFILTER.NONE
+			ent.filter_min = nil
 		end
 	end
 
