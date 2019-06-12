@@ -646,6 +646,16 @@ Sets the color of the entity </td>
 Sets whether an entity's shadow should be drawn </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Entity:setFilterMag">setFilterMag</a>( val&nbsp;)</td>
+			<td class="summary">
+Sets the texture filtering function when viewing a close texture </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Entity:setFilterMin">setFilterMin</a>( val&nbsp;)</td>
+			<td class="summary">
+Sets the texture filtering function when viewing a far texture </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Entity:setFrozen">setFrozen</a>( freeze&nbsp;)</td>
 			<td class="summary">
 Sets the entity frozen state </td>
@@ -2462,6 +2472,44 @@ Sets whether an entity's shadow should be drawn</p>
 			
 			<li><tt>draw</tt></li>
 			<li><tt>ply</tt> ― Optional player argument to set only for that player. Can also be table of players.</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Entity:setFilterMag"></a><strong>Entity:setFilterMag</strong>( val&nbsp;)</dt>
+<dd>
+	<p>
+Sets the texture filtering function when viewing a close texture</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Entity:setFilterMin"></a><strong>Entity:setFilterMin</strong>( val&nbsp;)</dt>
+<dd>
+	<p>
+Sets the texture filtering function when viewing a far texture</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
 		</ul>
 	</section>
 	
