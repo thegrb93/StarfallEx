@@ -26,6 +26,10 @@ function ENT:Draw()
 	self:setupClip()
 	self:setupScale()
 
+	local filter_mag, filter_min = self.filter_mag, self.filter_min
+	if filter_mag then render.PushFilterMag(filter_mag) end
+	if filter_min then render.PushFilterMin(filter_min) end
+	
 	if self:GetSuppressEngineLighting() then
 		render.SuppressEngineLighting(true)
 		self:DrawModel()
@@ -33,6 +37,9 @@ function ENT:Draw()
 	else
 		self:DrawModel()
 	end
+	
+	if filter_mag then render.PopFilterMag() end
+	if filter_min then render.PopFilterMin() end
 
 	self:finishClip()
 end

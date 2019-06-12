@@ -142,6 +142,38 @@ if CLIENT then
 		end
 	end
 
+	--- Sets the texture filtering function when viewing a close texture
+	-- @client
+	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+	function ents_methods:setFilterMag(val)
+		local instance = SF.instance
+		local ent = eunwrap(self)
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		if val then
+			checkluatype(val, TYPE_NUMBER)
+			ent.filter_mag = val
+		else
+			ent.filter_mag = nil
+		end
+	end
+
+	--- Sets the texture filtering function when viewing a far texture
+	-- @client
+	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+	function ents_methods:setFilterMin(val)
+		local instance = SF.instance
+		local ent = eunwrap(self)
+		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		if val then
+			checkluatype(val, TYPE_NUMBER)
+			ent.filter_min = val
+		else
+			ent.filter_min = nil
+		end
+	end
+
 	--- Sets a hologram entity's material to a custom material
 	-- @client
 	-- @param material The material to set it to or nil to set back to default
