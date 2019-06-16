@@ -214,9 +214,10 @@ end
 function PANEL:Setup(folder)
 	self.folder = folder
 	self.Root = self.RootNode:AddNode(folder)
+	self.Root:SetFolder(folder)
 
 	self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
-	self.DataFiles:MakeFolder("sf_filedata","DATA",true)
+	self.DataFiles:SetFolder("Data Files")
 
 	--[[Waiting for examples, 10 tries each 1 second]]
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
@@ -256,6 +257,7 @@ local function addFiles(search, dir, node)
 	if search=="" then
 		for k, v in pairs(allFolders) do
 			local newNode = node:AddNode(v)
+			newNode:SetFolder(v)
 			addFiles(search, dir .. "/" .. v, newNode)
 		end
 		for k, v in pairs(allFiles) do
@@ -265,6 +267,7 @@ local function addFiles(search, dir, node)
 	else
 		for k, v in pairs(allFolders) do
 			local newNode = node:AddNode(v)
+			newNode:SetFolder(v)
 			if addFiles(search, dir .. "/" .. v, newNode) then
 				newNode:SetExpanded(true)
 				found = true
@@ -285,13 +288,15 @@ end
 
 function PANEL:AddFiles(filter)
 	if self.Root.ChildNodes then self.Root.ChildNodes:Clear() end
-	addFiles(filter, "starfall", self.Root)
-	if self.DataFiles then
-		if self.DataFiles.ChildNodes then self.DataFiles.ChildNodes:Clear() end
-		if addFiles(filter, "sf_filedata", self.DataFiles) then
-			self.DataFiles:SetExpanded(true)
-		end
+	if addFiles(filter, "starfall", self.Root) then
+		self.Root:SetExpanded(true)
 	end
+	
+	if self.DataFiles.ChildNodes then self.DataFiles.ChildNodes:Clear() end
+	if addFiles(filter, "sf_filedata", self.DataFiles) then
+		self.DataFiles:SetExpanded(true)
+	end
+
 	self.Root:SetExpanded(true)
 end
 
@@ -300,10 +305,6 @@ function PANEL:ReloadTree ()
 end
 
 function PANEL:DoRightClick (node)
-	self:openMenu(node)
-end
-
-function PANEL:openMenu (node)
 	local menu
 	if node:GetFileName() then
 		menu = "file"
