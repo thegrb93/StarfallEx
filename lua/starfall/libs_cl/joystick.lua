@@ -1,5 +1,5 @@
 
-if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") then
+if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") or file.Exists("lua/bin/gmcl_joystick_win64.dll", "GAME") then
 	require("joystick")
 else
 	return
