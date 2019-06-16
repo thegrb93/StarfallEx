@@ -18,10 +18,20 @@ SF.AddHook("initialize", function(instance)
 	if not plyCount[instance.player] then plyCount[instance.player] = 0 end
 end)
 
+local function constraintOnDestroy(ent, constraints, ply)
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
+	constraints[ent] = nil
+end
+
 SF.AddHook("deinitialize", function(instance)
 	if instance.data.constraints.clean ~= false then --Return true on nil too
-		for ent, _ in pairs(instance.data.constraints.constraints) do
-			ent:Remove()
+		local constraints = instance.data.constraints.constraints
+		for ent, _ in pairs(constraints) do
+			if IsValid(ent) then
+				ent:RemoveCallOnRemove("starfall_constraint_delete")
+				constraintOnDestroy(ent, constraints, instance.player)
+				ent:Remove()
+			end
 		end
 	end
 end)
@@ -63,16 +73,12 @@ local function checkMaxReached(ply)
 	if max>=0 and plyCount[ply] >= max then SF.Throw("Max constraints reached: " .. max, 3) end
 end
 
-local function constraintOnDestroy(ent, instance)
-	local ply = instance.player
-	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
-	instance.data.constraints.constraints[ent] = nil
-end
-
 local function register(ent, instance)
-	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, instance)
-	plyCount[instance.player] = plyCount[instance.player] + 1
-	instance.data.constraints.constraints[ent] = true
+	local constraints = instance.data.constraints.constraints
+	local ply = instance.player
+	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, instance, constraints, ply)
+	plyCount[ply] = plyCount[ply] + 1
+	constraints[ent] = true
 end
 
 --- Welds two entities
