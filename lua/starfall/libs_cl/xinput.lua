@@ -11,46 +11,34 @@ local xinput_library = SF.RegisterLibrary("xinput")
 --- Gets the state of the controller.
 -- @param id Controller number. Starts at 0
 -- @return Table containing all input data of the controller, or false if the controller is not connected. The table uses this struct: https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad
-function xinput_library.getState(id)
-	return xinput.getState(id)
-end
+xinput_library.getState = xinput.getState
 
 --- Gets whether the button on the controller is currently pushed down.
 -- @param id Controller number. Starts at 0
 -- @param button The button to check for. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
 -- @return bool
-function xinput_library.getButton(id, button)
-	return xinput.getButton(id, button)
-end
+xinput_library.getButton = xinput.getButton
 
 --- Gets the current position of the trigger on the controller.
 -- @param id Controller number. Starts at 0
 -- @param trigger Which trigger to use. 0 is left
 -- @return 0-255 inclusive
-function xinput_library.getTrigger(id, trigger)
-	return xinput.getTrigger(id, trigger)
-end
+xinput_library.getTrigger = xinput.getTrigger
 
 --- Gets the current coordinates of the stick on the controller.
 -- @param id Controller number. Starts at 0
 -- @param stick Which stick to use. 0 is left
 -- @return Two numbers for the X and Y coordinates, respectively, each being between -32768 - 32767 inclusive
-function xinput_library.getStick(id, stick)
-	return xinput.getStick(id, stick)
-end
+xinput_library.getStick = xinput.getStick
 
 --- Attempts to check the battery level of the controller.
 -- @param id Controller number. Starts at 0
 -- @return If successful: a number between 0.0-1.0 inclusive. If unsuccessful: false, and a string error message
-function xinput_library.getBatteryLevel(id)
-	return xinput.getBatteryLevel(id)
-end
+xinput_library.getBatteryLevel = xinput.getBatteryLevel
 
 --- Gets all of the connected controllers.
 -- @return A table where each key is the ID of the controller that is connected. Disconnected controllers are not placed in the table.
-function xinput_library.getControllers()
-	return xinput.getControllers()
-end
+xinput_library.getControllers = xinput.getControllers
 
 --- Sets the rumble on the controller.
 -- @param id Controller number. Starts at 0
