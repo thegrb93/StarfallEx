@@ -9,34 +9,46 @@ end
 local xinput_library = SF.RegisterLibrary("xinput")
 
 --- Gets the state of the controller.
+-- @name xinput_library.getState
+-- @class function
 -- @param id Controller number. Starts at 0
 -- @return Table containing all input data of the controller, or false if the controller is not connected. The table uses this struct: https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad
 xinput_library.getState = xinput.getState
 
 --- Gets whether the button on the controller is currently pushed down.
+-- @name xinput_library.getButton
+-- @class function
 -- @param id Controller number. Starts at 0
 -- @param button The button to check for. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
 -- @return bool
 xinput_library.getButton = xinput.getButton
 
 --- Gets the current position of the trigger on the controller.
+-- @name xinput_library.getTrigger
+-- @class function
 -- @param id Controller number. Starts at 0
 -- @param trigger Which trigger to use. 0 is left
 -- @return 0-255 inclusive
 xinput_library.getTrigger = xinput.getTrigger
 
 --- Gets the current coordinates of the stick on the controller.
+-- @name xinput_library.getStick
+-- @class function
 -- @param id Controller number. Starts at 0
 -- @param stick Which stick to use. 0 is left
 -- @return Two numbers for the X and Y coordinates, respectively, each being between -32768 - 32767 inclusive
 xinput_library.getStick = xinput.getStick
 
 --- Attempts to check the battery level of the controller.
+-- @name xinput_library.getBatteryLevel
+-- @class function
 -- @param id Controller number. Starts at 0
 -- @return If successful: a number between 0.0-1.0 inclusive. If unsuccessful: false, and a string error message
 xinput_library.getBatteryLevel = xinput.getBatteryLevel
 
 --- Gets all of the connected controllers.
+-- @name xinput_library.getControllers
+-- @class function
 -- @return A table where each key is the ID of the controller that is connected. Disconnected controllers are not placed in the table.
 xinput_library.getControllers = xinput.getControllers
 
