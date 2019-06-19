@@ -59,9 +59,7 @@ xinput_library.getControllers = xinput.getControllers
 function xinput_library.setRumble(id, softPercent, hardPercent)
 	-- This longer function makes sure that the rumble doesn't continue when the instance is gone.
 	SF.CheckLuaType(id, TYPE_NUMBER)
-	if id % 1 ~= 0 then
-		SF.Throw("Controller ID must be an integer")
-	end
+	id = math.floor(id)
 	xinput.setRumble(id, softPercent, hardPercent) -- Does the rest of the type checking
 	SF.instance.data.xinputRumble[id][1] = softPercent
 	SF.instance.data.xinputRumble[id][2] = hardPercent
