@@ -517,7 +517,7 @@ Called when a controller has been disconnected.</td>
 Called when a controller button has been pressed.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#xinputReleased">xinputReleased</a>( id, when&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#xinputReleased">xinputReleased</a>( id, button, when&nbsp;)</td>
 			<td class="summary">
 Called when a controller button has been released.</td>
 		</tr>
@@ -1665,7 +1665,7 @@ Called when a controller button has been pressed. Client must have XInput Lua bi
 		
 		
 	</dd>
-	<dt><a name="xinputReleased"></a><span class="realm_cl"></span><strong>xinputReleased</strong>( id, when&nbsp;)</dt>
+	<dt><a name="xinputReleased"></a><span class="realm_cl"></span><strong>xinputReleased</strong>( id, button, when&nbsp;)</dt>
 	<dd>
 		<p>
 Called when a controller button has been released. Client must have XInput Lua binary installed.</p>
@@ -1675,7 +1675,10 @@ Called when a controller button has been released. Client must have XInput Lua b
 			<ul>
 				
 				<li>
-					<tt>id</tt> ― The button that was released. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
+					<tt>id</tt> ― Controller number. Starts at 0
+				</li>
+				<li>
+					<tt>button</tt> ― The button that was released. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
 				</li>
 				<li>
 					<tt>when</tt> ― The timer.realtime() at which this event occurred.
