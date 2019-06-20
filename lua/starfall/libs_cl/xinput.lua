@@ -115,7 +115,7 @@ SF.hookAdd("xinputStick", "xinputstick")
 -- @name xinputReleased
 -- @class hook
 -- @param id Controller number. Starts at 0
--- @param id The button that was released. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
+-- @param button The button that was released. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_
 -- @param when The timer.realtime() at which this event occurred.
 
 --- Called when a trigger on the controller has moved. Client must have XInput Lua binary installed.
