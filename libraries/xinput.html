@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Library fastlz :: StarfallEx Reference</title>
+		<title>Library xinput :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -31,7 +31,7 @@
 						<li><a href="../libraries/constraint.html">constraint</a></li>
 						<li><a href="../libraries/coroutine.html">coroutine</a></li>
 						<li><a href="../libraries/effect.html">effect</a></li>
-						<li><a>fastlz</a></li>
+						<li><a href="../libraries/fastlz.html">fastlz</a></li>
 						<li><a href="../libraries/file.html">file</a></li>
 						<li><a href="../libraries/find.html">find</a></li>
 						<li><a href="../libraries/game.html">game</a></li>
@@ -56,7 +56,7 @@
 						<li><a href="../libraries/trace.html">trace</a></li>
 						<li><a href="../libraries/von.html">von</a></li>
 						<li><a href="../libraries/wire.html">wire</a></li>
-						<li><a href="../libraries/xinput.html">xinput</a></li>
+						<li><a>xinput</a></li>
 					</ul>
 				</section>
 				<section>
@@ -195,9 +195,9 @@
 		</nav>
 		<main>
 
-<h1>Library <tt>fastlz</tt></h1>
+<h1>Library <tt>xinput</tt></h1>
 <p>
-FastLZ library</p>
+A simpler, hook-based, and more-powerful controller input library. Inputs are not lost between rendered frames, and there is support for rumble. Note: the client must have the XInput lua binary module installed in order to access this library. See more at https://github.com/mitterdoo/garrysmod-xinput</p>
 
 
 
@@ -208,14 +208,39 @@ FastLZ library</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#fastlz.compress">compress</a>( s&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.getBatteryLevel">getBatteryLevel</a>( id&nbsp;)</td>
 			<td class="summary">
-Compress string using FastLZ </td>
+Attempts to check the battery level of the controller.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#fastlz.decompress">decompress</a>( s&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.getButton">getButton</a>( id, button&nbsp;)</td>
 			<td class="summary">
-Decompress using FastLZ </td>
+Gets whether the button on the controller is currently pushed down.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.getControllers">getControllers</a>( &nbsp;)</td>
+			<td class="summary">
+Gets all of the connected controllers.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.getState">getState</a>( id&nbsp;)</td>
+			<td class="summary">
+Gets the state of the controller.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.getStick">getStick</a>( id, stick&nbsp;)</td>
+			<td class="summary">
+Gets the current coordinates of the stick on the controller.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.getTrigger">getTrigger</a>( id, trigger&nbsp;)</td>
+			<td class="summary">
+Gets the current position of the trigger on the controller.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#xinput.setRumble">setRumble</a>( id, softPercent, hardPercent&nbsp;)</td>
+			<td class="summary">
+Sets the rumble on the controller.</td>
 		</tr>
 	</table>
 </section>
@@ -227,17 +252,17 @@ Decompress using FastLZ </td>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="fastlz.compress"></a><strong>fastlz.compress</strong>( s&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="xinput.getBatteryLevel"></a><strong>xinput.getBatteryLevel</strong>( id&nbsp;)</dt>
 <dd>
 	<p>
-Compress string using FastLZ</p>
+Attempts to check the battery level of the controller.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>s</tt> ― String to compress</li>
+			<li><tt>id</tt> ― Controller number. Starts at 0</li>
 		</ul>
 	</section>
 	
@@ -245,24 +270,25 @@ Compress string using FastLZ</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>FastLZ compressed string</p>
+		<p>If successful: a number between 0.0-1.0 inclusive. If unsuccessful: false, and a string error message</p>
 		
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="fastlz.decompress"></a><strong>fastlz.decompress</strong>( s&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="xinput.getButton"></a><strong>xinput.getButton</strong>( id, button&nbsp;)</dt>
 <dd>
 	<p>
-Decompress using FastLZ</p>
+Gets whether the button on the controller is currently pushed down.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>s</tt> ― FastLZ compressed string to decode</li>
+			<li><tt>id</tt> ― Controller number. Starts at 0</li>
+			<li><tt>button</tt> ― The button to check for. See https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad_</li>
 		</ul>
 	</section>
 	
@@ -270,9 +296,125 @@ Decompress using FastLZ</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>Decompressed string</p>
+		<p>bool</p>
 		
 	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="xinput.getControllers"></a><strong>xinput.getControllers</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets all of the connected controllers.</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>A table where each key is the ID of the controller that is connected. Disconnected controllers are not placed in the table.</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="xinput.getState"></a><strong>xinput.getState</strong>( id&nbsp;)</dt>
+<dd>
+	<p>
+Gets the state of the controller.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― Controller number. Starts at 0</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Table containing all input data of the controller, or false if the controller is not connected. The table uses this struct: https://github.com/mitterdoo/garrysmod-xinput#xinput_gamepad</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="xinput.getStick"></a><strong>xinput.getStick</strong>( id, stick&nbsp;)</dt>
+<dd>
+	<p>
+Gets the current coordinates of the stick on the controller.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― Controller number. Starts at 0</li>
+			<li><tt>stick</tt> ― Which stick to use. 0 is left</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Two numbers for the X and Y coordinates, respectively, each being between -32768 - 32767 inclusive</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="xinput.getTrigger"></a><strong>xinput.getTrigger</strong>( id, trigger&nbsp;)</dt>
+<dd>
+	<p>
+Gets the current position of the trigger on the controller.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― Controller number. Starts at 0</li>
+			<li><tt>trigger</tt> ― Which trigger to use. 0 is left</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>0-255 inclusive</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="xinput.setRumble"></a><strong>xinput.setRumble</strong>( id, softPercent, hardPercent&nbsp;)</dt>
+<dd>
+	<p>
+Sets the rumble on the controller.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― Controller number. Starts at 0</li>
+			<li><tt>softPercent</tt> ― A number between 0.0-1.0 for how much the soft rumble motor should vibrate.</li>
+			<li><tt>hardPercent</tt> ― A number between 0.0-1.0 for how much the hard rumble motor should vibrate.</li>
+		</ul>
+	</section>
+	
+	
 	
 	
 </dd>

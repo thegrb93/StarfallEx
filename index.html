@@ -56,6 +56,7 @@
 						<li><a href="libraries/trace.html">trace</a></li>
 						<li><a href="libraries/von.html">von</a></li>
 						<li><a href="libraries/wire.html">wire</a></li>
+						<li><a href="libraries/xinput.html">xinput</a></li>
 					</ul>
 				</section>
 				<section>
@@ -150,6 +151,12 @@
 						<li><span class="realm_sh"></span><a href="hooks.html#think">think</a></li>
 						<li><span class="realm_sh"></span><a href="hooks.html#tick">tick</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#writecell">writecell</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#xinputConnected">xinputConnected</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#xinputDisconnected">xinputDisconnected</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#xinputPressed">xinputPressed</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#xinputReleased">xinputReleased</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#xinputStick">xinputStick</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#xinputTrigger">xinputTrigger</a></li>
 					</ul>
 				</section>
 				<section>
@@ -348,6 +355,11 @@ vON Library </td>
 			<td class="name"><a href="libraries/wire.html">wire</a></td>
 			<td class="summary">
 Wire library.</td>
+		</tr>
+		<tr>
+			<td class="name"><a href="libraries/xinput.html">xinput</a></td>
+			<td class="summary">
+A simpler, hook-based, and more-powerful controller input library.</td>
 		</tr>
 	</table>
 </section>
@@ -654,6 +666,36 @@ Tick hook.</td>
 			<td class="name"><span class="realm_sv"></span><a href="hooks.html#writecell">writecell</a></td>
 			<td class="summary">
 Called when a high speed device writes to a wired SF chip </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="hooks.html#xinputConnected">xinputConnected</a></td>
+			<td class="summary">
+Called when a controller has been connected.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="hooks.html#xinputDisconnected">xinputDisconnected</a></td>
+			<td class="summary">
+Called when a controller has been disconnected.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="hooks.html#xinputPressed">xinputPressed</a></td>
+			<td class="summary">
+Called when a controller button has been pressed.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="hooks.html#xinputReleased">xinputReleased</a></td>
+			<td class="summary">
+Called when a controller button has been released.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="hooks.html#xinputStick">xinputStick</a></td>
+			<td class="summary">
+Called when a stick on the controller has moved.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="hooks.html#xinputTrigger">xinputTrigger</a></td>
+			<td class="summary">
+Called when a trigger on the controller has moved.</td>
 		</tr>
 	</table>
 </section>
