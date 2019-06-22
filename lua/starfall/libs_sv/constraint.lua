@@ -76,7 +76,7 @@ end
 local function register(ent, instance)
 	local constraints = instance.data.constraints.constraints
 	local ply = instance.player
-	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, instance, constraints, ply)
+	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, constraints, ply)
 	plyCount[ply] = plyCount[ply] + 1
 	constraints[ent] = true
 end
