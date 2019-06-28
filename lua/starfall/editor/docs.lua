@@ -1445,7 +1445,7 @@ Reads a file from path ";};["write"]={["class"]="function";["description"]="\
 Writes to a file";["fname"]="write";["library"]="file";["name"]="file_library.write";["param"]={[1]="path";[2]="data";["path"]="Filepath relative to data/sf_filedata/.";};["private"]=false;["realm"]="cl";["ret"]="True if OK, nil if error";["summary"]="\
 Writes to a file ";};};["libtbl"]="file_library";["name"]="file";["summary"]="\
 File functions.";["tables"]={};};["find"]={["class"]="library";["client"]=true;["description"]="\
-Find library. Finds entities in various shapes.";["fields"]={};["functions"]={[1]="all";[2]="allPlayers";[3]="byClass";[4]="byModel";[5]="inBox";[6]="inCone";[7]="inSphere";["all"]={["class"]="function";["description"]="\
+Find library. Finds entities in various shapes.";["fields"]={};["functions"]={[1]="all";[2]="allPlayers";[3]="byClass";[4]="byModel";[5]="closest";[6]="inBox";[7]="inCone";[8]="inSphere";[9]="sortByClosest";["all"]={["class"]="function";["description"]="\
 Finds all entitites";["fname"]="all";["library"]="find";["name"]="find_library.all";["param"]={[1]="filter";["filter"]="Optional function to filter results";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
 Finds all entitites ";};["allPlayers"]={["class"]="function";["description"]="\
 Finds all players (including bots)";["fname"]="allPlayers";["library"]="find";["name"]="find_library.allPlayers";["param"]={[1]="filter";["filter"]="Optional function to filter results";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
@@ -1453,13 +1453,17 @@ Finds all players (including bots) ";};["byClass"]={["class"]="function";["descr
 Finds entities by class name";["fname"]="byClass";["library"]="find";["name"]="find_library.byClass";["param"]={[1]="class";[2]="filter";["class"]="The class name";["filter"]="Optional function to filter results";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
 Finds entities by class name ";};["byModel"]={["class"]="function";["description"]="\
 Finds entities by model";["fname"]="byModel";["library"]="find";["name"]="find_library.byModel";["param"]={[1]="model";[2]="filter";["filter"]="Optional function to filter results";["model"]="The model file";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
-Finds entities by model ";};["inBox"]={["class"]="function";["description"]="\
+Finds entities by model ";};["closest"]={["class"]="function";["description"]="\
+Finds the closest entity to a point";["fname"]="closest";["library"]="find";["name"]="find_library.closest";["param"]={[1]="ents";[2]="pos";["ents"]="The array of entities";["pos"]="The position";};["private"]=false;["realm"]="sh";["ret"]="The closest entity";["summary"]="\
+Finds the closest entity to a point ";};["inBox"]={["class"]="function";["description"]="\
 Finds entities in a box";["fname"]="inBox";["library"]="find";["name"]="find_library.inBox";["param"]={[1]="min";[2]="max";[3]="filter";["filter"]="Optional function to filter results";["max"]="Top corner";["min"]="Bottom corner";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
 Finds entities in a box ";};["inCone"]={["class"]="function";["description"]="\
 Finds entities in a cone";["fname"]="inCone";["library"]="find";["name"]="find_library.inCone";["param"]={[1]="pos";[2]="dir";[3]="distance";[4]="radius";[5]="filter";["dir"]="The direction to project the cone";["distance"]="The length to project the cone";["filter"]="Optional function to filter results";["pos"]="The cone vertex position";["radius"]="The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°, 0 makes 180°, and so on.";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
 Finds entities in a cone ";};["inSphere"]={["class"]="function";["description"]="\
 Finds entities in a sphere";["fname"]="inSphere";["library"]="find";["name"]="find_library.inSphere";["param"]={[1]="center";[2]="radius";[3]="filter";["center"]="Center of the sphere";["filter"]="Optional function to filter results";["radius"]="Sphere radius";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
-Finds entities in a sphere ";};};["libtbl"]="find_library";["name"]="find";["server"]=true;["summary"]="\
+Finds entities in a sphere ";};["sortByClosest"]={["class"]="function";["description"]="\
+Sorts an array of entities by how close they are to a point";["fname"]="sortByClosest";["library"]="find";["name"]="find_library.sortByClosest";["param"]={[1]="ents";[2]="pos";["ents"]="The array of entities";["pos"]="The position";};["private"]=false;["realm"]="sh";["ret"]="A table of the closest entities";["summary"]="\
+Sorts an array of entities by how close they are to a point ";};};["libtbl"]="find_library";["name"]="find";["server"]=true;["summary"]="\
 Find library.";["tables"]={};};["game"]={["class"]="library";["client"]=true;["description"]="\
 Game functions";["fields"]={};["functions"]={[1]="getHostname";[2]="getMap";[3]="getMaxPlayers";[4]="isDedicated";[5]="isLan";[6]="isSinglePlayer";["getHostname"]={["class"]="function";["description"]="\
 Returns The hostname";["fname"]="getHostname";["library"]="game";["name"]="game_lib.getHostname";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
