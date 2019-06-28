@@ -228,6 +228,11 @@ Finds entities by class name </td>
 Finds entities by model </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#find.closest">closest</a>( ents, pos&nbsp;)</td>
+			<td class="summary">
+Finds the closest entity to a point </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#find.inBox">inBox</a>( min, max, filter&nbsp;)</td>
 			<td class="summary">
 Finds entities in a box </td>
@@ -241,6 +246,11 @@ Finds entities in a cone </td>
 			<td class="name"><span class="realm_sh"></span><a href="#find.inSphere">inSphere</a>( center, radius, filter&nbsp;)</td>
 			<td class="summary">
 Finds entities in a sphere </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#find.sortByClosest">sortByClosest</a>( ents, pos&nbsp;)</td>
+			<td class="summary">
+Sorts an array of entities by how close they are to a point </td>
 		</tr>
 	</table>
 </section>
@@ -354,6 +364,32 @@ Finds entities by model</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="find.closest"></a><strong>find.closest</strong>( ents, pos&nbsp;)</dt>
+<dd>
+	<p>
+Finds the closest entity to a point</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ents</tt> ― The array of entities</li>
+			<li><tt>pos</tt> ― The position</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The closest entity</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="find.inBox"></a><strong>find.inBox</strong>( min, max, filter&nbsp;)</dt>
 <dd>
 	<p>
@@ -431,6 +467,32 @@ Finds entities in a sphere</p>
 		<h3>Returns</h3>
 		
 		<p>An array of found entities</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="find.sortByClosest"></a><strong>find.sortByClosest</strong>( ents, pos&nbsp;)</dt>
+<dd>
+	<p>
+Sorts an array of entities by how close they are to a point</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ents</tt> ― The array of entities</li>
+			<li><tt>pos</tt> ― The position</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>A table of the closest entities</p>
 		
 	</section>
 	
