@@ -102,14 +102,18 @@ function hologram_methods:setScale (scale)
 end
 
 --- Updates a clip plane
-function hologram_methods:setClip (index, enabled, origin, normal, islocal)
+function hologram_methods:setClip (index, enabled, origin, normal, islocal, entity)
 	checktype(self, hologram_metamethods)
 	checkluatype(index, TYPE_NUMBER)
 	checkluatype(enabled, TYPE_BOOL)
 	checktype(origin, vec_meta)
 	checktype(normal, vec_meta)
 	checkluatype(islocal, TYPE_BOOL)
-
+	if entity then
+		checktype(self, ent_meta)
+		entity = eunwrap(entity)
+		if not IsValid(entity) then SF.Throw("Entity is not valid", 2) end
+	end
 	local origin, normal = vunwrap(origin), vunwrap(normal)
 
 	local holo = unwrap(self)
@@ -117,7 +121,7 @@ function hologram_methods:setClip (index, enabled, origin, normal, islocal)
 		if enabled and not holo.clips[index] and table.Count(holo.clips)==8 then
 			SF.Throw("The maximum hologram clips is 8", 2)
 		end
-		holo:UpdateClip(index, enabled, origin, normal, islocal)
+		holo:UpdateClip(index, enabled, origin, normal, islocal, entity)
 	end
 end
 
