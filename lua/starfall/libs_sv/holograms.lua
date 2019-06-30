@@ -102,6 +102,7 @@ function hologram_methods:setScale (scale)
 end
 
 --- Updates a clip plane
+-- @param entity (Optional) Entity clip is local to
 function hologram_methods:setClip (index, enabled, origin, normal, islocal, entity)
 	checktype(self, hologram_metamethods)
 	checkluatype(index, TYPE_NUMBER)
