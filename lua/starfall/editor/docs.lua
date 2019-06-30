@@ -438,7 +438,7 @@ Sets the hologram's angular velocity.";["fname"]="setAngVel";["name"]="hologram_
 Sets the hologram's angular velocity.";};["setAnimation"]={["class"]="function";["classForced"]=true;["classlib"]="Hologram";["description"]="\
 Animates a hologram";["fname"]="setAnimation";["name"]="hologram_methods:setAnimation";["param"]={[1]="animation";[2]="frame";[3]="rate";["animation"]="number or string name";["frame"]="The starting frame number";["rate"]="Frame speed. (1 is normal)";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Animates a hologram ";};["setClip"]={["class"]="function";["classlib"]="Hologram";["description"]="\
-Updates a clip plane";["fname"]="setClip";["name"]="hologram_methods:setClip";["param"]={[1]="index";[2]="enabled";[3]="origin";[4]="normal";[5]="islocal";};["private"]=false;["realm"]="sv";["summary"]="\
+Updates a clip plane";["fname"]="setClip";["name"]="hologram_methods:setClip";["param"]={[1]="index";[2]="enabled";[3]="origin";[4]="normal";[5]="islocal";[6]="entity";["entity"]="(Optional) Entity clip is local to";};["private"]=false;["realm"]="sv";["summary"]="\
 Updates a clip plane ";};["setFlexScale"]={["class"]="function";["classlib"]="Hologram";["description"]="\
 Sets the scale of all flexes of a hologram";["fname"]="setFlexScale";["name"]="hologram_methods:setFlexScale";["param"]={[1]="scale";};["private"]=false;["realm"]="sv";["summary"]="\
 Sets the scale of all flexes of a hologram ";};["setFlexWeight"]={["class"]="function";["classlib"]="Hologram";["description"]="\
