@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Color :: StarfallEx Reference</title>
+		<title>Library sql :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -51,7 +51,7 @@
 						<li><a href="../libraries/quaternion.html">quaternion</a></li>
 						<li><a href="../libraries/render.html">render</a></li>
 						<li><a href="../libraries/sounds.html">sounds</a></li>
-						<li><a href="../libraries/sql.html">sql</a></li>
+						<li><a>sql</a></li>
 						<li><a href="../libraries/team.html">team</a></li>
 						<li><a href="../libraries/timer.html">timer</a></li>
 						<li><a href="../libraries/trace.html">trace</a></li>
@@ -66,7 +66,7 @@
 						
 						<li><a href="../classes/Angle.html">Angle</a></li>
 						<li><a href="../classes/Bass.html">Bass</a></li>
-						<li><a>Color</a></li>
+						<li><a href="../classes/Color.html">Color</a></li>
 						<li><a href="../classes/Effect.html">Effect</a></li>
 						<li><a href="../classes/Entity.html">Entity</a></li>
 						<li><a href="../classes/File.html">File</a></li>
@@ -196,102 +196,60 @@
 		</nav>
 		<main>
 
-<h1><tt>Color</tt> type</h1>
+<h1>Library <tt>sql</tt></h1>
 <p>
-Color type</p>
+SQL library.</p>
 
 
 
 
 
-<section class="methods">
-	<h2>Methods</h2>
+<section class="functions">
+	<h2>Functions</h2>
 	<table class="list">
-		
+	
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#Color:hsvToRGB">hsvToRGB</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#sql.SQLStr">SQLStr</a>( str, bNoQuotes&nbsp;)</td>
 			<td class="summary">
-Converts the color from HSV to RGB.</td>
+Escapes dangerous characters and symbols from user input used in an SQLite SQL Query.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#Color:rgbToHSV">rgbToHSV</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#sql.query">query</a>( query&nbsp;)</td>
 			<td class="summary">
-Converts the color from RGB to HSV.</td>
+Performs a query on the local SQLite database.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#Color:setA">setA</a>( a&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#sql.tableExists">tableExists</a>( tabname&nbsp;)</td>
 			<td class="summary">
-Set's the color's alpha and returns it.</td>
+Checks if a table exists within the local SQLite database.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#Color:setB">setB</a>( b&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#sql.tableRemove">tableRemove</a>( tabname&nbsp;)</td>
 			<td class="summary">
-Set's the color's blue and returns it.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#Color:setG">setG</a>( g&nbsp;)</td>
-			<td class="summary">
-Set's the color's green and returns it.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#Color:setR">setR</a>( r&nbsp;)</td>
-			<td class="summary">
-Set's the color's red channel and returns it.</td>
+Removes a table within the local SQLite database.</td>
 		</tr>
 	</table>
 </section>
-<section class="methods_def">
-	<h2><a name="methods_def"></a>Methods definition</h2>
+
+
+
+<section class="functions_def">
+	<h2><a name="functions_def"></a>Functions definition</h2>
 	<dl>
 		
 		
-<dt><span class="realm_sh"></span><a name="Color:hsvToRGB"></a><strong>Color:hsvToRGB</strong>( &nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="sql.SQLStr"></a><strong>sql.SQLStr</strong>( str, bNoQuotes&nbsp;)</dt>
 <dd>
 	<p>
-Converts the color from HSV to RGB.</p>
-	
-	
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>A triplet of numbers representing HSV.</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="Color:rgbToHSV"></a><strong>Color:rgbToHSV</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Converts the color from RGB to HSV.</p>
-	
-	
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>A triplet of numbers representing HSV.</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sh"></span><a name="Color:setA"></a><strong>Color:setA</strong>( a&nbsp;)</dt>
-<dd>
-	<p>
-Set's the color's alpha and returns it.</p>
+Escapes dangerous characters and symbols from user input used in an SQLite SQL Query.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>a</tt> ― The alpha</li>
+			<li><tt>str</tt> ― The string to be escaped.</li>
+			<li><tt>bNoQuotes</tt> ― Set this as true, and the function will not wrap the input string in apostrophes.</li>
 		</ul>
 	</section>
 	
@@ -299,24 +257,24 @@ Set's the color's alpha and returns it.</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>The modified color</p>
+		<p>The escaped input.</p>
 		
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="Color:setB"></a><strong>Color:setB</strong>( b&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="sql.query"></a><strong>sql.query</strong>( query&nbsp;)</dt>
 <dd>
 	<p>
-Set's the color's blue and returns it.</p>
+Performs a query on the local SQLite database.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>b</tt> ― The blue</li>
+			<li><tt>query</tt> ― The query to execute.</li>
 		</ul>
 	</section>
 	
@@ -324,24 +282,24 @@ Set's the color's blue and returns it.</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>The modified color</p>
+		<p>Query results as a table, nil if the query returned no data.</p>
 		
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="Color:setG"></a><strong>Color:setG</strong>( g&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="sql.tableExists"></a><strong>sql.tableExists</strong>( tabname&nbsp;)</dt>
 <dd>
 	<p>
-Set's the color's green and returns it.</p>
+Checks if a table exists within the local SQLite database.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>g</tt> ― The green</li>
+			<li><tt>tabname</tt> ― The table to check for.</li>
 		</ul>
 	</section>
 	
@@ -349,24 +307,24 @@ Set's the color's green and returns it.</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>The modified color</p>
+		<p>False if the table does not exist, true if it does.</p>
 		
 	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="Color:setR"></a><strong>Color:setR</strong>( r&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="sql.tableRemove"></a><strong>sql.tableRemove</strong>( tabname&nbsp;)</dt>
 <dd>
 	<p>
-Set's the color's red channel and returns it.</p>
+Removes a table within the local SQLite database.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>r</tt> ― The red</li>
+			<li><tt>tabname</tt> ― The table to remove.</li>
 		</ul>
 	</section>
 	
@@ -374,7 +332,7 @@ Set's the color's red channel and returns it.</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>The modified color</p>
+		<p>True if the table was successfully removed, false if not.</p>
 		
 	</section>
 	
@@ -382,6 +340,7 @@ Set's the color's red channel and returns it.</p>
 </dd>
 	</dl>
 </section>
+
 		</main>
 		<footer>
 			<p>
