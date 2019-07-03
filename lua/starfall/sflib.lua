@@ -283,8 +283,8 @@ end
 -------------------------------------------------------------------------------
 
 function SF.CompileString(str, name, handle)
-	if string.find(str, "continue", 1, true) then
-		return "Due to a glua bug. Use of the string 'continue' has been banned"
+	if string.find(str, "repeat.*continue.*until") then
+		return "Due to a glua bug. Use of the string 'continue' in repeat-until loops has been banned"
 	end
 	return CompileString(str, name, handle)
 end
