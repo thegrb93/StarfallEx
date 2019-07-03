@@ -415,3 +415,12 @@ function vec_methods:withinAABox (v1, v2)
 
 	return true
 end
+
+if SERVER then
+	--- Returns whether the vector is in world
+	-- @server
+	-- @return bool True/False.
+	function vec_methods:isInWorld ()
+		return util.IsInWorld(unwrap(self))
+	end
+end
