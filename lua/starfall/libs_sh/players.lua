@@ -439,6 +439,15 @@ function player_methods:getAmmoCount(id)
 	return ent:GetAmmoCount(id)
 end
 
+-- Returns wherher the player is typing in their chat
+-- @shared
+-- @return bool True/False
+function player_methods:isTyping()
+	checktype(self, player_metamethods)
+	local ent = unwrap(self)
+	return IsValid(ent) and ent:IsTyping()
+end
+
 if SERVER then
 	SF.AddHook("deinitialize", function(instance)
 		for k, pl in pairs(player.GetAll()) do
