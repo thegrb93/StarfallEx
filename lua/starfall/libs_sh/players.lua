@@ -439,6 +439,15 @@ function player_methods:getAmmoCount(id)
 	return ent:GetAmmoCount(id)
 end
 
+-- Returns whether the player is sprinting
+-- @shared
+-- @return bool True/False
+function player_methods:isSprinting()
+	checktype(self, player_metamethods)
+	local ent = unwrap(self)
+	return IsValid(ent) and ent:IsSprinting()
+end
+
 if SERVER then
 	SF.AddHook("deinitialize", function(instance)
 		for k, pl in pairs(player.GetAll()) do
