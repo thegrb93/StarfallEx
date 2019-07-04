@@ -918,7 +918,7 @@ Translate the matrix ";};["transpose"]={["class"]="function";["classlib"]="VMatr
 Transposes the matrix";["fname"]="transpose";["name"]="vmatrix_methods:transpose";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Transposes the matrix ";};};["name"]="VMatrix";["summary"]="\
 VMatrix type ";["typtbl"]="vmatrix_methods";};["Vector"]={["class"]="class";["client"]=true;["description"]="\
-Vector type";["fields"]={};["methods"]={[1]="add";[10]="getLength2D";[11]="getLength2DSqr";[12]="getLengthSqr";[13]="getNormalized";[14]="isEqualTol";[15]="isZero";[16]="mul";[17]="normalize";[18]="rotate";[19]="rotateAroundAxis";[2]="cross";[20]="set";[21]="setX";[22]="setY";[23]="setZ";[24]="setZero";[25]="sub";[26]="toScreen";[27]="vdiv";[28]="vmul";[29]="withinAABox";[3]="div";[4]="dot";[5]="getAngle";[6]="getAngleEx";[7]="getDistance";[8]="getDistanceSqr";[9]="getLength";["add"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Vector type";["fields"]={};["methods"]={[1]="add";[10]="getLength2D";[11]="getLength2DSqr";[12]="getLengthSqr";[13]="getNormalized";[14]="isEqualTol";[15]="isInWorld";[16]="isZero";[17]="mul";[18]="normalize";[19]="rotate";[2]="cross";[20]="rotateAroundAxis";[21]="set";[22]="setX";[23]="setY";[24]="setZ";[25]="setZero";[26]="sub";[27]="toScreen";[28]="vdiv";[29]="vmul";[3]="div";[30]="withinAABox";[4]="dot";[5]="getAngle";[6]="getAngleEx";[7]="getDistance";[8]="getDistanceSqr";[9]="getLength";["add"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Add vector - Modifies self.";["fname"]="add";["name"]="vec_methods:add";["param"]={[1]="v";["v"]="Vector to add";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
 Add vector - Modifies self.";};["cross"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.";["fname"]="cross";["name"]="vec_methods:cross";["param"]={[1]="v";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="Vector";["summary"]="\
@@ -946,7 +946,9 @@ Get the vector's length squared ( Saves computation by skipping the square root 
 Returns a new vector with the same direction by length of 1.";["fname"]="getNormalized";["name"]="vec_methods:getNormalized";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Vector Normalised";["summary"]="\
 Returns a new vector with the same direction by length of 1.";};["isEqualTol"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Is this vector and v equal within tolerance t.";["fname"]="isEqualTol";["name"]="vec_methods:isEqualTol";["param"]={[1]="v";[2]="t";["t"]="Tolerance number.";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="bool True/False.";["summary"]="\
-Is this vector and v equal within tolerance t.";};["isZero"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Is this vector and v equal within tolerance t.";};["isInWorld"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Returns whether the vector is in world";["fname"]="isInWorld";["name"]="vec_methods:isInWorld";["param"]={};["private"]=false;["realm"]="sv";["ret"]="bool True/False.";["server"]=true;["summary"]="\
+Returns whether the vector is in world ";};["isZero"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Are all fields zero.";["fname"]="isZero";["name"]="vec_methods:isZero";["param"]={};["private"]=false;["realm"]="sh";["ret"]="bool True/False";["summary"]="\
 Are all fields zero.";};["mul"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Scalar Multiplication of the vector. Self-Modifies.";["fname"]="mul";["name"]="vec_methods:mul";["param"]={[1]="n";["n"]="Scalar to multiply with.";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
