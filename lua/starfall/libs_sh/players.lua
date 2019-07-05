@@ -439,9 +439,9 @@ function player_methods:getAmmoCount(id)
 	return ent:GetAmmoCount(id)
 end
 
--- Returns wherher the player is typing in their chat
+-- Returns whether the player is typing in their chat
 -- @shared
--- @return bool True/False
+-- @return bool true/false
 function player_methods:isTyping()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
