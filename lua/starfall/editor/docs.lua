@@ -1567,7 +1567,14 @@ Creates a dynamic light";["fname"]="create";["library"]="light";["name"]="light_
 Creates a dynamic light ";};};["libtbl"]="light_library";["name"]="light";["summary"]="\
 Light library.";["tables"]={};};["material"]={["class"]="library";["client"]=true;["description"]="\
 `material` library is allows creating material objects which are used for controlling shaders in rendering.";["fields"]={};["functions"]={[1]="create";[10]="getShader";[11]="getString";[12]="getTexture";[13]="getVector";[14]="getVectorLinear";[15]="getWidth";[16]="load";[2]="createFromImage";[3]="getColor";[4]="getFloat";[5]="getHeight";[6]="getInt";[7]="getKeyValues";[8]="getMatrix";[9]="getName";["create"]={["class"]="function";["description"]="\
-Creates a new blank material";["fname"]="create";["library"]="material";["name"]="material_library.create";["param"]={[1]="shader";["shader"]="The shader of the material. (UnlitGeneric or VertexLitGeneric)";};["private"]=false;["realm"]="cl";["summary"]="\
+Creates a new blank material";["fname"]="create";["library"]="material";["name"]="material_library.create";["param"]={[1]="shader";["shader"]="The shader of the material. Must be one of \
+UnlitGeneric \
+VertexLitGeneric \
+Refract_DX90 \
+Water_DX90 \
+Sky_DX9 \
+gmodscreenspace \
+Modulate_DX9";};["private"]=false;["realm"]="cl";["summary"]="\
 Creates a new blank material ";};["createFromImage"]={["class"]="function";["description"]="\
 Creates a .jpg or .png material from file \
 Can't be modified";["fname"]="createFromImage";["library"]="material";["name"]="material_library.createFromImage";["param"]={[1]="path";[2]="params";["params"]="The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters";["path"]="The path to the image file";};["private"]=false;["realm"]="cl";["summary"]="\
