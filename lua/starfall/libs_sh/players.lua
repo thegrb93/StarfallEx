@@ -531,9 +531,9 @@ if CLIENT then
 		return ent and ent:IsMuted()
 	end
 	
-	--- Returns whenever the player is heard by the local player.
+	--- Returns whether the player is heard by the local player.
 	-- @client
-	-- @return bool True/False
+	-- @return bool true/false
 	function player_methods:isSpeaking()
 		checktype(self, player_metamethods)
 		local ent = unwrap(self)
