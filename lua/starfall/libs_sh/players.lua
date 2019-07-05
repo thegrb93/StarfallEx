@@ -446,6 +446,14 @@ function player_methods:isTyping()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
 	return IsValid(ent) and ent:IsTyping()
+
+--- Returns whether the player is sprinting
+-- @shared
+-- @return bool true/false
+function player_methods:isSprinting()
+	checktype(self, player_metamethods)
+	local ent = unwrap(self)
+	return IsValid(ent) and ent:IsSprinting()
 end
 
 if SERVER then
