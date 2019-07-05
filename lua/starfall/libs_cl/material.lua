@@ -60,7 +60,7 @@ local allowed_shaders = {
 	Water_DX90 = true,
 	Sky_DX9 = true,
 	gmodscreenspace = true,
-	Modulate = true,
+	Modulate_DX9 = true,
 }
 local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function(shader, i)
