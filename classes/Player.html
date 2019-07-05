@@ -219,6 +219,11 @@ Returns the name of the player's active weapon </td>
 Returns the player's aim vector </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Player:getAmmoCount">getAmmoCount</a>( id&nbsp;)</td>
+			<td class="summary">
+Gets the amount of ammo the player has.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Player:getArmor">getArmor</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the players armor </td>
@@ -247,6 +252,11 @@ Returns the amount of kills of the player </td>
 			<td class="name"><span class="realm_sh"></span><a href="#Player:getFriendStatus">getFriendStatus</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the relationship of the player to the local client </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Player:getGroundEntity">getGroundEntity</a>( &nbsp;)</td>
+			<td class="summary">
+Returns the entity that the player is standing on </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Player:getJumpPower">getJumpPower</a>( &nbsp;)</td>
@@ -394,9 +404,19 @@ Returns true if the player is noclipped </td>
 Returns whether the player is a player </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Player:isSprinting">isSprinting</a>( &nbsp;)</td>
+			<td class="summary">
+Returns whether the player is sprinting </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Player:isSuperAdmin">isSuperAdmin</a>( &nbsp;)</td>
 			<td class="summary">
 Returns whether the player is a super admin </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Player:isTyping">isTyping</a>( &nbsp;)</td>
+			<td class="summary">
+Returns whether the player is typing in their chat </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Player:isUserGroup">isUserGroup</a>( group&nbsp;)</td>
@@ -450,6 +470,31 @@ Returns the player's aim vector</p>
 		<h3>Returns</h3>
 		
 		<p>Aim vector</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getAmmoCount"></a><strong>Player:getAmmoCount</strong>( id&nbsp;)</dt>
+<dd>
+	<p>
+Gets the amount of ammo the player has.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― The string or number id of the ammo</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The amount of ammo player has in reserve.</p>
 		
 	</section>
 	
@@ -558,6 +603,24 @@ Returns the relationship of the player to the local client</p>
 		<h3>Returns</h3>
 		
 		<p>One of: "friend", "blocked", "none", "requested"</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:getGroundEntity"></a><strong>Player:getGroundEntity</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns the entity that the player is standing on</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Ground entity</p>
 		
 	</section>
 	
@@ -1093,6 +1156,24 @@ Returns whether the player is a player</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="Player:isSprinting"></a><strong>Player:isSprinting</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns whether the player is sprinting</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>bool true/false</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="Player:isSuperAdmin"></a><strong>Player:isSuperAdmin</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1105,6 +1186,24 @@ Returns whether the player is a super admin</p>
 		<h3>Returns</h3>
 		
 		<p>True if player is super admin</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Player:isTyping"></a><strong>Player:isTyping</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns whether the player is typing in their chat</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>bool true/false</p>
 		
 	</section>
 	
