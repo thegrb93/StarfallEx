@@ -446,6 +446,7 @@ function player_methods:isTyping()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
 	return IsValid(ent) and ent:IsTyping()
+end
 
 --- Returns whether the player is sprinting
 -- @shared
