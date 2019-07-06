@@ -244,6 +244,11 @@ Finds entities in a box </td>
 Finds entities in a cone </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#find.inPVS">inPVS</a>( pos, filter&nbsp;)</td>
+			<td class="summary">
+Finds entities that are in the PVS (Potentially Visible Set).</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#find.inSphere">inSphere</a>( center, radius, filter&nbsp;)</td>
 			<td class="summary">
 Finds entities in a sphere </td>
@@ -432,6 +437,32 @@ Finds entities in a cone</p>
 			<li><tt>dir</tt> ― The direction to project the cone</li>
 			<li><tt>distance</tt> ― The length to project the cone</li>
 			<li><tt>radius</tt> ― The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°, 0 makes 180°, and so on.</li>
+			<li><tt>filter</tt> ― Optional function to filter results</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>An array of found entities</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="find.inPVS"></a><strong>find.inPVS</strong>( pos, filter&nbsp;)</dt>
+<dd>
+	<p>
+Finds entities that are in the PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pos</tt> ― Vector view point</li>
 			<li><tt>filter</tt> ― Optional function to filter results</li>
 		</ul>
 	</section>
