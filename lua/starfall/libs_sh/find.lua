@@ -164,3 +164,19 @@ function find_library.sortByClosest(ents, pos)
 	end
 	return ret
 end
+
+if SERVER then
+	--- Finds entities that are in the PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+	-- @server
+	-- @param pos Vector view point
+	-- @param filter Optional function to filter results
+	-- @return An array of found entities
+	function find_library.inPVS (pos, filter)
+		checkpermission(SF.instance, nil, "find")
+		checktype(pos, SF.Types["Vector"])
+		
+		local pos = vunwrap(pos)
+		
+		return convert(ents.FindInPVS(pos), filter)
+	end
+end
