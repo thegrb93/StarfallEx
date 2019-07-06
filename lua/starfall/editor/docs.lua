@@ -424,7 +424,7 @@ Writes a long and advances the file position ";};["writeShort"]={["class"]="func
 Writes a short and advances the file position";["fname"]="writeShort";["name"]="file_methods:writeShort";["param"]={[1]="x";["x"]="The short to write";};["private"]=false;["realm"]="cl";["summary"]="\
 Writes a short and advances the file position ";};};["name"]="File";["summary"]="\
 File type ";["typtbl"]="file_methods";};["Hologram"]={["class"]="class";["description"]="\
-Hologram type";["fields"]={};["methods"]={[1]="getAnimationLength";[10]="setModel";[11]="setPose";[12]="setScale";[13]="setVel";[14]="suppressEngineLighting";[2]="getAnimationNumber";[3]="getFlexes";[4]="getPose";[5]="setAngVel";[6]="setAnimation";[7]="setClip";[8]="setFlexScale";[9]="setFlexWeight";["getAnimationLength"]={["class"]="function";["classForced"]=true;["classlib"]="Hologram";["description"]="\
+Hologram type";["fields"]={};["methods"]={[1]="getAnimationLength";[10]="setFlexWeight";[11]="setModel";[12]="setPose";[13]="setScale";[14]="setVel";[15]="suppressEngineLighting";[2]="getAnimationNumber";[3]="getFlexes";[4]="getPose";[5]="getScale";[6]="setAngVel";[7]="setAnimation";[8]="setClip";[9]="setFlexScale";["getAnimationLength"]={["class"]="function";["classForced"]=true;["classlib"]="Hologram";["description"]="\
 Get the length of the current animation";["fname"]="getAnimationLength";["name"]="hologram_methods:getAnimationLength";["param"]={};["private"]=false;["realm"]="sv";["ret"]="Length of current animation in seconds";["server"]=true;["summary"]="\
 Get the length of the current animation ";};["getAnimationNumber"]={["class"]="function";["classlib"]="Hologram";["description"]="\
 Convert animation name into animation number";["fname"]="getAnimationNumber";["name"]="hologram_methods:getAnimationNumber";["param"]={[1]="animation";["animation"]="Name of the animation";};["private"]=false;["realm"]="sv";["ret"]="Animation index";["server"]=true;["summary"]="\
@@ -433,7 +433,9 @@ Returns a table of flexname -> flexid pairs for use in flex functions. \
 These IDs become invalid when the hologram's model changes.";["fname"]="getFlexes";["name"]="hologram_methods:getFlexes";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
 Returns a table of flexname -> flexid pairs for use in flex functions.";};["getPose"]={["class"]="function";["classForced"]=true;["classlib"]="Hologram";["description"]="\
 Get the pose value of an animation";["fname"]="getPose";["name"]="hologram_methods:getPose";["param"]={[1]="pose";["pose"]="Pose parameter name";};["private"]=false;["realm"]="sv";["ret"]="Value of the pose parameter";["server"]=true;["summary"]="\
-Get the pose value of an animation ";};["setAngVel"]={["class"]="function";["classlib"]="Hologram";["description"]="\
+Get the pose value of an animation ";};["getScale"]={["class"]="function";["classlib"]="Hologram";["description"]="\
+Gets the hologram scale";["fname"]="getScale";["name"]="hologram_methods:getScale";["param"]={};["private"]=false;["realm"]="sv";["ret"]="Vector scale";["server"]=true;["summary"]="\
+Gets the hologram scale ";};["setAngVel"]={["class"]="function";["classlib"]="Hologram";["description"]="\
 Sets the hologram's angular velocity.";["fname"]="setAngVel";["name"]="hologram_methods:setAngVel";["param"]={[1]="angvel";["angvel"]="*Vector* angular velocity.";};["private"]=false;["realm"]="sv";["summary"]="\
 Sets the hologram's angular velocity.";};["setAnimation"]={["class"]="function";["classForced"]=true;["classlib"]="Hologram";["description"]="\
 Animates a hologram";["fname"]="setAnimation";["name"]="hologram_methods:setAnimation";["param"]={[1]="animation";[2]="frame";[3]="rate";["animation"]="number or string name";["frame"]="The starting frame number";["rate"]="Frame speed. (1 is normal)";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
