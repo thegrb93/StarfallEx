@@ -108,7 +108,7 @@ end
 function hologram_methods:getScale ()
 	checktype(self, hologram_metamethods)
 	local holo = unwrap(self)
-	if holo:IsValid() then
+	if holo and holo:IsValid() then
 		return vwrap(holo:GetScale())
 	end
 end
