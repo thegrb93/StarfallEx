@@ -29,6 +29,7 @@ SF.AddHook("postload", function()
 	ent_meta = SF.Entities.Metatable
 
 	vunwrap = SF.Vectors.Unwrap
+	vwrap = SF.Vectors.Wrap
 	aunwrap = SF.Angles.Unwrap
 	ewrap = SF.Entities.Wrap
 	eunwrap = SF.Entities.Unwrap
@@ -108,7 +109,7 @@ function hologram_methods:getScale ()
 	checktype(self, hologram_metamethods)
 	local holo = unwrap(self)
 	if holo then
-		return holo:GetScale()
+		return vwrap(holo:GetScale())
 	end
 end
 
