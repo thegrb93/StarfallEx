@@ -111,6 +111,22 @@ function find_library.byModel(model, filter)
 	return convert(ents.FindByModel(model), filter)
 end
 
+if SERVER then
+	--- Finds entities that are in the PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+	-- @server
+	-- @param pos Vector view point
+	-- @param filter Optional function to filter results
+	-- @return An array of found entities
+	function find_library.inPVS (pos, filter)
+		checkpermission(SF.instance, nil, "find")
+		checktype(pos, SF.Types["Vector"])
+		
+		local pos = vunwrap(pos)
+		
+		return convert(ents.FindInPVS(pos), filter)
+	end
+end
+
 --- Finds all players (including bots)
 -- @param filter Optional function to filter results
 -- @return An array of found entities
@@ -163,20 +179,4 @@ function find_library.sortByClosest(ents, pos)
 		ret[i] = distances[i][2]
 	end
 	return ret
-end
-
-if SERVER then
-	--- Finds entities that are in the PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
-	-- @server
-	-- @param pos Vector view point
-	-- @param filter Optional function to filter results
-	-- @return An array of found entities
-	function find_library.inPVS (pos, filter)
-		checkpermission(SF.instance, nil, "find")
-		checktype(pos, SF.Types["Vector"])
-		
-		local pos = vunwrap(pos)
-		
-		return convert(ents.FindInPVS(pos), filter)
-	end
 end
