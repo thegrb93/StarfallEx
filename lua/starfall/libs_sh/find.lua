@@ -121,9 +121,7 @@ if SERVER then
 		checkpermission(SF.instance, nil, "find")
 		checktype(pos, SF.Types["Vector"])
 		
-		local pos = vunwrap(pos)
-		
-		return convert(ents.FindInPVS(pos), filter)
+		return convert(ents.FindInPVS(vunwrap(pos)), filter)
 	end
 end
 
