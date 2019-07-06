@@ -22,7 +22,7 @@ SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
 
 local ang_meta, vec_meta, ent_meta
-local wrap, unwrap, vunwrap, aunwrap, ewrap, eunwrap
+local wrap, unwrap, vunwrap, vwrap, aunwrap, ewrap, eunwrap
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
