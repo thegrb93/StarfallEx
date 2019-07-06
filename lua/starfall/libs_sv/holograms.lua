@@ -101,6 +101,17 @@ function hologram_methods:setScale (scale)
 	end
 end
 
+--- Gets the hologram scale
+-- @server
+-- @return Vector scale
+function hologram_methods:getScale ()
+	checktype(self, hologram_metamethods)
+	local holo = unwrap(self)
+	if holo then
+		return holo:GetScale()
+	end
+end
+
 --- Updates a clip plane
 -- @param entity (Optional) Entity clip is local to
 function hologram_methods:setClip (index, enabled, origin, normal, islocal, entity)
