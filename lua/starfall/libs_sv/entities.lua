@@ -785,7 +785,7 @@ function ents_methods:testVectorPVS (pos)
 	local this = unwrap(self)
 	local pos = vunwrap(pos)
 
-	if not this and not this:IsValid() then SF.Throw("Entity is not valid", 2) end
+	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
 
 	return this:TestPVS(pos)
 end
@@ -800,7 +800,7 @@ function ents_methods:testEntityPVS (ent)
 	local this = unwrap(self)
 	local ent = unwrap(ent)
 
-	if not this and not this:IsValid() then SF.Throw("Entity is not valid", 2) end
+	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
 	
 	if ent and ent:IsValid() then
 		return this:TestPVS(ent)
