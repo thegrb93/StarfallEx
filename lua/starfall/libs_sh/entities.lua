@@ -19,6 +19,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
+SF.Permissions.registerPrivilege("entities.getAngles", "GetAngles", "Allows the user to get angles of an entity", { entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -754,7 +755,10 @@ end
 -- @return The angle
 function ents_methods:getAngles()
 	checktype(self, ents_metamethods)
+	
 	local ent = eunwrap(self)
+	checkpermission(SF.instance, ent, "entities.getAngles")
+	
 	return awrap(ent:GetAngles())
 end
 
