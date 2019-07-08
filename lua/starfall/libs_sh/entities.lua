@@ -19,6 +19,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
+SF.Permissions.registerPrivilege("entities.getVelocity", "GetVelocity", "Allows the user to get velocity of an entity", { entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -792,7 +793,10 @@ end
 function ents_methods:getVelocity()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
+	
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	checkpermission(SF.instance, ent, "entities.getVelocity")
+	
 	return vwrap(ent:GetVelocity())
 end
 
