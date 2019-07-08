@@ -19,6 +19,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
+SF.Permissions.registerPrivilege("entities.getPos", "GetPos", "Allows the user to get entitys position", { entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -593,7 +594,10 @@ end
 -- @return The position vector
 function ents_methods:getPos()
 	checktype(self, ents_metamethods)
+	
 	local ent = eunwrap(self)
+	checkpermission(SF.instance, ent, "entities.getPos")
+	
 	return vwrap(ent:GetPos())
 end
 
