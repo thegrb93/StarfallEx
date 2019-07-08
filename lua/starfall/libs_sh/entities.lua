@@ -757,7 +757,7 @@ function ents_methods:getAngles()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	
-	if not ent:IsPlayer() or not ent:IsNPC() then
+	if not ent:IsPlayer() and not ent:IsNPC() then
 		checkpermission(SF.instance, ent, "entities.getAngles")
 	end
 	
