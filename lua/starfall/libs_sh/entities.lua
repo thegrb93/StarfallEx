@@ -594,9 +594,11 @@ end
 -- @return The position vector
 function ents_methods:getPos()
 	checktype(self, ents_metamethods)
-	
 	local ent = eunwrap(self)
-	checkpermission(SF.instance, ent, "entities.getPos")
+	
+	if not ent:IsPlayer() or not ent:IsNPC() then
+		checkpermission(SF.instance, ent, "entities.getPos")
+	end
 	
 	return vwrap(ent:GetPos())
 end
