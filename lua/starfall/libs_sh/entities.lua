@@ -795,7 +795,7 @@ function ents_methods:getVelocity()
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	
-	if not ent:IsPlayer() or not ent:IsNPC() then
+	if not ent:IsPlayer() and not ent:IsNPC() then
 		checkpermission(SF.instance, ent, "entities.getVelocity")
 	end
 	
