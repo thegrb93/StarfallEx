@@ -445,7 +445,7 @@ end
 function player_methods:isTyping()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	return IsValid(ent) and ent:IsTyping()
+	return ent and ent:IsValid() and ent:IsTyping()
 end
 
 --- Returns whether the player is sprinting
@@ -546,7 +546,7 @@ if CLIENT then
 	function player_methods:isMuted()
 		checktype(self, player_metamethods)
 		local ent = unwrap(self)
-		return ent and ent:IsMuted()
+		return ent and ent:IsValid() and ent:IsMuted()
 	end
 	
 	--- Returns whether the player is heard by the local player.
@@ -555,6 +555,6 @@ if CLIENT then
 	function player_methods:isSpeaking()
 		checktype(self, player_metamethods)
 		local ent = unwrap(self)
-		return IsValid(ent) and ent:IsSpeaking()
+		return ent and ent:IsValid() and ent:IsSpeaking()
 	end
 end
