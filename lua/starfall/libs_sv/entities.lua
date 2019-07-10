@@ -775,34 +775,24 @@ function ents_methods:setUnbreakable(on)
 	ent:Fire( "SetDamageFilter", on and "FilterDamage" or "", 0 )
 end
 
---- Check if the given Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
--- @param pos Vector positon to test
+--- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+-- @param other Entity or Vector to test
 -- @return bool True/False
-function ents_methods:testVectorPVS (pos)
+function ents_methods:testPVS(other)
 	checktype(self, ents_metatable)
-	checktype(pos, SF.Types["Vector"])
-	
-	local this = unwrap(self)
-	local pos = vunwrap(pos)
 
+	local this = unwrap(self)
 	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
+
+	local meta = debug.getmetatable(other)
+	if meta==SF.Types["Vector"] then
+		other = vunwrap(other)
+	elseif meta~=SF.Types["Entity"] then
+		other = unwrap(other)
+		if not other or not other:IsValid() then SF.Throw("Other entity is not valid", 2) end
+	else
+		SF.ThrowTypeError("entity or vector", SF.GetType(other), 2)
+	end
 
 	return this:TestPVS(pos)
-end
-
---- Check if the given Entity is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
--- @param ent Entity to check using its bounding box
--- @return bool True/False
-function ents_methods:testEntityPVS (ent)
-	checktype(self, ents_metatable)
-	checktype(ent, ents_metatable)
-	
-	local this = unwrap(self)
-	local ent = unwrap(ent)
-
-	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
-	
-	if ent and ent:IsValid() then
-		return this:TestPVS(ent)
-	end
 end
