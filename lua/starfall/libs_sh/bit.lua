@@ -72,6 +72,26 @@ local function twos_compliment(x,bits)
 	if x>limit then return x - limit*2 else return x end
 end
 
+local function toString(buffer, start, stop)
+	-- Max unpack is 7997
+	local chartbl = {}
+	for i=start, stop, 7997 do
+		chartbl[#chartbl + 1] = string.char(unpack(buffer, i, math.min(i+7997-1, stop)))
+	end
+	return table.concat(chartbl)
+end
+
+local function fromString(str, buffer, p)
+	-- Max string.byte is 8000
+	for i=1, #str, 8000 do
+		local b = {string.byte(str, i, math.min(i+8000-1, #str))}
+		for o=1, #b do
+			buffer[p] = b[o]
+			p = p + 1
+		end
+	end
+end
+
 --Credit https://stackoverflow.com/users/903234/rpfeltz
 --Bugfixes and IEEE754Double credit to me
 local function PackIEEE754Float(number)
@@ -270,7 +290,7 @@ end
 --@return A string containing the bytes
 function ss_methods:read(n)
 	n = math.max(n, 0)
-	local str = string.char(unpack(self.buffer, self.pos, self.pos+n-1))
+	local str = toString(self.buffer, self.pos, self.pos+n-1)
 	self.pos = self.pos + n
 	return str
 end
@@ -342,7 +362,7 @@ function ss_methods:readUntil(byte)
 		if self.buffer[i] == byte then endpos = i break end
 	end
 	endpos = endpos or #self.buffer
-	local str = string.char(unpack(self.buffer, self.pos, endpos))
+	local str = toString(self.buffer, self.pos, endpos)
 	self.pos = endpos + 1
 	return str
 end
@@ -356,11 +376,8 @@ end
 --- Writes the given string and advances the buffer pointer.
 --@param bytes A string of bytes to write
 function ss_methods:write(bytes)
-	local buffer = {string.byte(bytes, 1, #bytes)}
-	for i=1, #buffer do
-		self.buffer[self.pos+i-1] = buffer[i]
-	end
-	self.pos = self.pos + #buffer
+	fromString(bytes, self.buffer, self.pos)
+	self.pos = self.pos + #bytes
 end
 
 --- Writes a byte to the buffer and advances the buffer pointer.
@@ -408,11 +425,11 @@ end
 --- Returns the buffer as a string
 --@return The buffer as a string
 function ss_methods:getString()
-   return string.char(unpack(self.buffer))
+	return toString(self.buffer, 1, #self.buffer)
 end
 
 --- Returns the internal buffer
 --@return The buffer table
 function ss_methods:getBuffer()
-   return self.buffer
+	return self.buffer
 end

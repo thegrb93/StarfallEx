@@ -12,8 +12,6 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local vwrap = SF.WrapObject
-
 SF.PhysObjs.Methods = physobj_methods
 SF.PhysObjs.Metatable = physobj_metamethods
 SF.PhysObjs.Wrap = wrap
@@ -22,17 +20,20 @@ SF.PhysObjs.Unwrap = unwrap
 local ewrap, eunwrap
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
 local ang_meta, vec_meta
-local vwrap, vunwrap, awrap, aunwrap
+local vwrap, vunwrap, awrap, aunwrap, mwrap
 local isValid = IsValid
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 
+	ewrap = SF.Entities.Wrap
+	eunwrap = SF.Entities.Unwrap
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap
+	mwrap = SF.VMatrix.Wrap
 end)
 
 local function check (v)
@@ -52,7 +53,7 @@ end
 -- @shared
 -- @return The entity attached to the physics object
 function physobj_methods:getEntity()
-	return SF.WrapObject(unwrap(self):GetEntity())
+	return ewrap(unwrap(self):GetEntity())
 end
 
 --- Gets the position of the physics object
@@ -60,6 +61,13 @@ end
 -- @return Vector position of the physics object
 function physobj_methods:getPos()
 	return vwrap(unwrap(self):GetPos())
+end
+
+--- Returns the world transform matrix of the physobj
+-- @shared
+-- @return The matrix
+function physobj_methods:getMatrix()
+	return mwrap(unwrap(self):GetPositionMatrix())
 end
 
 --- Gets the angles of the physics object

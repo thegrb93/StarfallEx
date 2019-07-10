@@ -600,7 +600,9 @@ function EDITOR:SyntaxColorLine(row)
 				self.blockcomment = -1
 				tokenname = "comment"
 			end
-		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.]") then
+		elseif self:NextPattern("[%>%<%!%~]%=") then
+			tokenname = "operator"
+		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.%>%<]") then
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat
 			tokenname = "operator"

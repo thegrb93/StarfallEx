@@ -5,32 +5,6 @@ PANEL = {}
 
 PANEL.windows = {}
 
-SF.Editor.ShowExamplesVar = CreateClientConVar("sf_editor_showexamples", "1", true, false)
-SF.Editor.ShowDataFilesVar = CreateClientConVar("sf_editor_showdatafiles", "0", true, false)
-
---[[ Loading SF Examples ]]
-
-if SF.Editor.ShowExamplesVar:GetBool() then
-
-	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
-	http.Fetch( examples_url,
-		function( body, len, headers, code )
-				if code == 200 then -- OK code
-					local data = util.JSONToTable( body )
-					SF.Docs["Examples"] = {}
-					for k,v in pairs(data) do
-						SF.Docs["Examples"][v.name] = v.download_url
-					end
-				end
-		end,
-		function( error )
-			SF.Docs["Examples"] = {}
-			print("[SF] Examples failed to load:"..tostring(error))
-		end
-	)
-end
---[[ End of SF Examples ]]
-
 --[[ Fonts ]]
 
 surface.CreateFont( "SF_PermissionsWarning", {
@@ -235,46 +209,102 @@ local invalid_filename_chars = {
 PANEL = {}
 
 function PANEL:Init ()
-
 end
-function PANEL:Setup (folder)
+
+function PANEL:Setup(folder)
 	self.folder = folder
-	self.Root = self.RootNode:AddFolder(folder, folder, "DATA", true)
+	self.Root = self.RootNode:AddNode(folder)
+	self.Root:SetFolder(folder)
+
+	self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
+	self.DataFiles:SetFolder("Data Files")
+
 	--[[Waiting for examples, 10 tries each 1 second]]
-	if SF.Editor.ShowDataFilesVar:GetBool() then
-		self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
-		self.DataFiles:MakeFolder("sf_filedata","DATA",true)
-	end
-	if SF.Editor.ShowExamplesVar:GetBool() then
-		timer.Create("sf_filetree_waitforexamples",1, 10, function()
-
-			if SF.Docs["Examples"] then
+	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
+	http.Fetch( examples_url,
+		function( body, len, headers, code )
+			if code == 200 then -- OK code
+				local data = util.JSONToTable( body )
+				SF.Docs.Examples = {}
 				self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
-				for k,v in pairs(SF.Docs["Examples"]) do
-					local node = self.Examples:AddNode(k,"icon16/page_white.png")
-					node.FileURL = v
+				for k,v in pairs(data) do
+					SF.Docs.Examples[v.name] = v.download_url
+					local node = self.Examples:AddNode(v.name,"icon16/page_white.png")
+					node.FileURL = v.download_url
 				end
-				timer.Remove("sf_filetree_waitforexamples")
 			end
+		end,
+		function( error )
+			SF.Docs["Examples"] = {}
+			print("[SF] Examples failed to load:"..tostring(error))
+		end
+	)
 
-		end)
+	self:AddFiles("")
+end
+
+local function sort(tbl)
+	local sorted = {}
+	for k, v in pairs(tbl) do sorted[#sorted+1] = {string.lower(v), v} end
+	table.sort(sorted, function(a,b) return a[1]<b[1] end)
+	for k, v in pairs(sorted) do tbl[k] = v[2] end
+end
+local function addFiles(search, dir, node)
+	local found = false
+	local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
+	sort(allFiles)
+	sort(allFolders)
+	if search=="" then
+		for k, v in pairs(allFolders) do
+			local newNode = node:AddNode(v)
+			newNode:SetFolder(v)
+			addFiles(search, dir .. "/" .. v, newNode)
+		end
+		for k, v in pairs(allFiles) do
+			local fnode = node:AddNode(v, "icon16/page_white.png")
+			fnode:SetFileName(dir.."/"..v)
+		end
+	else
+		for k, v in pairs(allFolders) do
+			local newNode = node:AddNode(v)
+			newNode:SetFolder(v)
+			if addFiles(search, dir .. "/" .. v, newNode) then
+				newNode:SetExpanded(true)
+				found = true
+			else
+				newNode:Remove()
+			end
+		end
+		for k, v in pairs(allFiles) do
+			if string.find(string.lower(v), string.lower(search)) then
+				local fnode = node:AddNode(v, "icon16/page_white.png")
+				fnode:SetFileName(dir.."/"..v)
+				found = true
+			end
+		end
 	end
+	return found
+end
+
+function PANEL:AddFiles(filter)
+	if self.Root.ChildNodes then self.Root.ChildNodes:Clear() end
+	if addFiles(filter, "starfall", self.Root) then
+		self.Root:SetExpanded(true)
+	end
+	
+	if self.DataFiles.ChildNodes then self.DataFiles.ChildNodes:Clear() end
+	if addFiles(filter, "sf_filedata", self.DataFiles) then
+		self.DataFiles:SetExpanded(true)
+	end
+
 	self.Root:SetExpanded(true)
 end
+
 function PANEL:ReloadTree ()
-	self.Root:Remove()
-	if self.Examples then
-		self.Examples:Remove()
-	end
-	if self.DataFiles then
-		self.DataFiles:Remove()
-	end
-	self:Setup(self.folder)
+	self:AddFiles("")
 end
+
 function PANEL:DoRightClick (node)
-	self:openMenu(node)
-end
-function PANEL:openMenu (node)
 	local menu
 	if node:GetFileName() then
 		menu = "file"
@@ -298,13 +328,10 @@ function PANEL:openMenu (node)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
 						local oldFile = node:GetFileName()
-						local saveFile = string.GetPathFromFilename(oldFile) .. "/" .. text ..".txt"
-						local contents = file.Read(oldFile)
-						file.Delete(node:GetFileName())
-						file.Write(saveFile, contents)
-						SF.AddNotify(LocalPlayer(), "File renamed as " .. saveFile .. ".", "GENERIC", 7, "DRIP3")
+						local saveFile = string.GetPathFromFilename(oldFile) .. text ..".txt"
+						SF.Editor.renameFile(oldFile,saveFile)
 						self:ReloadTree()
-					end)
+				end)
 			end)
 		self.menu:AddSpacer()
 		self.menu:AddOption("Delete", function ()
@@ -421,43 +448,8 @@ function PANEL:Init ()
 
 	function searchBox:OnChange ()
 
-		if self:GetValue() == "" then
-			tree:ReloadTree()
-			return
-		end
+		tree:AddFiles(self:GetValue():PatternSafe())
 
-		tree.Root.ChildNodes:Clear()
-		local function containsFile (dir, search)
-			local files, folders = file.Find(dir .. "/*", "DATA")
-			for k, file in pairs(files) do
-				if string.find(string.lower(file), string.lower(search)) then return true end
-			end
-			for k, folder in pairs(folders) do
-				if containsFile(dir .. "/" .. folder, search) then return true end
-			end
-			return false
-		end
-		local function addFiles (search, dir, node)
-			local allFiles, allFolders = file.Find(dir .. "/*", "DATA")
-			for k, v in pairs(allFolders) do
-				if containsFile(dir .. "/" .. v, search) then
-					local newNode = node:AddNode(v)
-					newNode:SetExpanded(true)
-					addFiles(search, dir .. "/" .. v, newNode)
-				end
-			end
-			for k, v in pairs(allFiles) do
-				if string.find(string.lower(v), string.lower(search)) then
-					local fnode = node:AddNode(v, "icon16/page_white.png")
-					fnode:SetFileName(dir.."/"..v)
-				end
-			end
-		end
-		addFiles(self:GetValue():PatternSafe(), "starfall", tree.Root)
-		if tree.DataFiles then
-			addFiles(self:GetValue():PatternSafe(), "sf_filedata", tree.DataFiles)
-		end
-		tree.Root:SetExpanded(true)
 	end
 	self.searchBox = searchBox
 
@@ -465,7 +457,7 @@ function PANEL:Init ()
 	self.Update:SetTall(20)
 	self.Update:Dock(BOTTOM)
 	self.Update:DockMargin(0, 0, 0, 0)
-	self.Update:SetText("Update")
+	self.Update:SetText("Refresh")
 	self.Update.DoClick = function(button)
 		tree:ReloadTree()
 		searchBox:SetValue("Search...")

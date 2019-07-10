@@ -32,9 +32,7 @@ end)
 
 local function propOnDestroy(ent, instance)
 	local ply = instance.player
-	if plyCount[ply] then
-		plyCount[ply] = plyCount[ply] - 1
-	end
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 	instance.data.props.props[ent] = nil
 end
 

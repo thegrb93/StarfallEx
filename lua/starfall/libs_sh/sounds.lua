@@ -37,7 +37,7 @@ local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
 	for snd, _ in pairs(t) do
 		snd:Stop()
 	end
-end)
+end, true)
 
 local function soundsLeft(ply)
 	return plyMaxSounds:GetInt()<0 and -1 or (plyMaxSounds:GetInt() - plyCount[ply])
@@ -45,7 +45,7 @@ end
 
 local function deleteSound(ply, ent, sound)
 	sound:Stop()
-	plyCount[ply] = plyCount[ply] - 1
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 	if soundsByEntity[ent] then
 		soundsByEntity[ent][sound] = nil
 	end

@@ -1,6 +1,3 @@
---- SQL library.
--- @client
-
 do
 	local P = SF.Permissions
 	P.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
@@ -10,6 +7,8 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
+--- SQL library.
+-- @client
 local sql_library = SF.RegisterLibrary("sql")
 
 --- Performs a query on the local SQLite database.

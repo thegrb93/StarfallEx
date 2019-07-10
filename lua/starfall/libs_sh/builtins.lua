@@ -767,6 +767,18 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		path = SF.NormalizePath(dir)
 	else
 		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. dir)
+		
+		-- If no scripts found in relative dir, try the root dir.
+		local foundScript = false
+		for file, _ in pairs(SF.instance.scripts) do
+			if string.match(file, "^"..path.."/[^/]+%.txt$") then
+				foundScript = true
+				break
+			end
+		end
+		if not foundScript then
+			path = SF.NormalizePath(dir)
+		end
 	end
 
 	local returns = {}
@@ -845,7 +857,7 @@ end
 -- @return Function of str
 function SF.DefaultEnvironment.loadstring (str, name)
 	name = "SF:" .. (name or tostring(SF.instance.env))
-	local func = CompileString(str, name, false)
+	local func = SF.CompileString(str, name, false)
 
 	-- CompileString returns an error as a string, better check before setfenv
 	if isfunction(func) then
@@ -918,7 +930,7 @@ function SF.DefaultEnvironment.pcall (func, ...)
 end
 
 local function xpcall_Callback (err)
-	return {SF.Sanitize({err})[1], debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
+	return {err, debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
 end
 
 --- Lua's xpcall with SF throw implementation, and a traceback for debugging.
@@ -944,7 +956,7 @@ function SF.DefaultEnvironment.xpcall (func, callback, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	return false, callback(err, traceback)
+	return false, callback(SF.Sanitize({err})[1], traceback)
 end
 
 --- Try to execute a function and catch possible exceptions

@@ -19,6 +19,9 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
+SF.Permissions.registerPrivilege("entities.getAngles", "GetAngles", "Allows the user to get angles of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.getVelocity", "GetVelocity", "Allows the user to get velocity of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.getPos", "GetPos", "Allows the user to get position of an entity", { entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -494,6 +497,11 @@ end
 function ents_methods:getPos()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
+	
+	if not ent:IsPlayer() and not ent:IsNPC() then
+		checkpermission(SF.instance, ent, "entities.getPos")
+	end
+	
 	return vwrap(ent:GetPos())
 end
 
@@ -515,7 +523,7 @@ function ents_methods:lookupBone(name)
 	return eunwrap(self):LookupBone(name)
 end
 
---- Returns the matrix of the entity's bone
+--- Returns the matrix of the entity's bone. Note: this method is slow/doesnt work well if the entity isn't animated.
 -- @shared
 -- @param bone Bone index. (def 0)
 -- @return The matrix
@@ -526,7 +534,15 @@ function ents_methods:getBoneMatrix(bone)
 	local ent = eunwrap(self)
 	return owrap(ent:GetBoneMatrix(bone))
 end
-ents_methods.getMatrix = ents_methods.getBoneMatrix
+
+--- Returns the world transform matrix of the entity
+-- @shared
+-- @return The matrix
+function ents_methods:getMatrix()
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	return owrap(ent:GetWorldTransformMatrix())
+end
 
 --- Returns the number of an entity's bones
 -- @shared
@@ -647,6 +663,11 @@ end
 function ents_methods:getAngles()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
+	
+	if not ent:IsPlayer() and not ent:IsNPC() then
+		checkpermission(SF.instance, ent, "entities.getAngles")
+	end
+	
 	return awrap(ent:GetAngles())
 end
 
@@ -685,6 +706,11 @@ function ents_methods:getVelocity()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	
+	if not ent:IsPlayer() and not ent:IsNPC() then
+		checkpermission(SF.instance, ent, "entities.getVelocity")
+	end
+	
 	return vwrap(ent:GetVelocity())
 end
 

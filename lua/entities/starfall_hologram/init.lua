@@ -15,10 +15,10 @@ function ENT:Initialize()
 	self.lastClipUpdate = {}
 end
 
-function ENT:UpdateClip(index, enabled, origin, normal, islocal)
+function ENT:UpdateClip(index, enabled, origin, normal, islocal, entity)
 	if self.lastClipUpdate[index] == CurTime() then return end
 	if enabled then
-		self.clips[index] = { origin = origin, normal = normal, islocal = islocal }
+		self.clips[index] = { origin = origin, normal = normal, islocal = islocal, entity = IsValid(entity) and entity or self }
 		self.lastClipUpdate[index] = CurTime()
 		self:SendClip(index)
 	elseif self.clips[index] then
@@ -38,6 +38,7 @@ function ENT:SendClip(index, ply)
 		net.WriteVector(clip.origin)
 		net.WriteVector(clip.normal)
 		net.WriteBit(clip.islocal)
+		net.WriteUInt(clip.entity:EntIndex(), 16)
 	else
 		net.WriteUInt(self:EntIndex(), 16)
 		net.WriteUInt(index, 16)
@@ -45,6 +46,7 @@ function ENT:SendClip(index, ply)
 		net.WriteVector(vector_origin)
 		net.WriteVector(vector_origin)
 		net.WriteBit(false)
+		net.WriteUInt(0, 16)
 	end
 	if ply then net.Send(ply) else net.Broadcast() end
 end

@@ -16,8 +16,8 @@ local ents_metatable = SF.Entities.Metatable
 --@name Entity
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
-local vwrap = SF.WrapObject
-local vunwrap = SF.UnwrapObject
+local owrap = SF.WrapObject
+local ounwrap = SF.UnwrapObject
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -42,6 +42,16 @@ do
 	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 end
+
+local vec_meta
+local vwrap, vunwrap
+
+SF.AddHook("postload", function()
+	vec_meta = SF.Vectors.Metatable
+
+	vwrap = SF.Vectors.Wrap
+	vunwrap = SF.Vectors.Unwrap
+end)
 
 -- ------------------------- Internal functions ------------------------- --
 
@@ -647,7 +657,7 @@ function ents_methods:isWeldedTo()
 	local ent = unwrap(self)
 	local constr = constraint.FindConstraint(ent, "Weld")
 	if constr then
-		return vwrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
+		return owrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
 	end
 	return nil
 end
@@ -775,3 +785,24 @@ function ents_methods:setUnbreakable(on)
 	ent:Fire( "SetDamageFilter", on and "FilterDamage" or "", 0 )
 end
 
+--- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+-- @param other Entity or Vector to test
+-- @return bool True/False
+function ents_methods:testPVS(other)
+	checktype(self, ents_metatable)
+
+	local this = unwrap(self)
+	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
+
+	local meta = debug.getmetatable(other)
+	if meta==vec_meta then
+		other = vunwrap(other)
+	elseif meta==ents_metatable then
+		other = unwrap(other)
+		if not other or not other:IsValid() then SF.Throw("Other entity is not valid", 2) end
+	else
+		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
+	end
+
+	return this:TestPVS(other)
+end

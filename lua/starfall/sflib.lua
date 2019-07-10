@@ -37,36 +37,34 @@ end
 -------------------------------------------------------------------------------
 
 -- Returns a class that manages a table of entity keys
-SF.EntityTable = {}
-if SERVER then
-	function SF.EntityTable.__newindex(t, e, v)
+SF.EntityTable = {
+	__newindex = function(t, e, v)
 		rawset(t, e, v)
-		e:CallOnRemove("SF_" .. t.key, function()
-			t[e] = nil
-			if t.destructor then t.destructor(e, v) end
-		end)
-	end
-else
-	function SF.EntityTable.__newindex(t, e, v)
-		rawset(t, e, v)
-		e:CallOnRemove("SF_" .. t.key, function()
-			timer.Simple(0, function()
-				if not e:IsValid() then
-					t[e] = nil
-					if t.destructor then t.destructor(e, v) end
-				end
+		if t.wait then
+			e:CallOnRemove("SF_" .. t.key, function()
+				timer.Simple(0, function()
+					if not e:IsValid() then
+						t[e] = nil
+						if t.destructor then t.destructor(e, v) end
+					end
+				end)
 			end)
-		end)
+		else
+			e:CallOnRemove("SF_" .. t.key, function()
+				t[e] = nil
+				if t.destructor then t.destructor(e, v) end
+			end)
+		end
+	end,
+	__call = function(p, key, destructor, dontwait)
+		local t = {
+			key = key,
+			destructor = destructor,
+			wait = CLIENT and not dontwait
+		}
+		return setmetatable(t, p)
 	end
-end
-
-function SF.EntityTable.__call(p, key, destructor)
-	local t = {
-		key = key,
-		destructor = destructor
-	}
-	return setmetatable(t, p)
-end
+}
 setmetatable(SF.EntityTable, SF.EntityTable)
 
 --- Returns a class that wraps a structure and caches indexes
@@ -284,6 +282,12 @@ end
 -- Utility functions
 -------------------------------------------------------------------------------
 
+function SF.CompileString(str, name, handle)
+	if string.find(str, "repeat.*continue.*until") then
+		return "Due to a glua bug. Use of the string 'continue' in repeat-until loops has been banned"
+	end
+	return CompileString(str, name, handle)
+end
 
 --- Throws an error like the throw function in builtins
 -- @param msg Message

@@ -35,7 +35,7 @@ end
 
 local function deleteSound(ply, sound)
 	if sound:IsValid() then sound:Stop() end
-	plyCount[ply] = plyCount[ply] - 1
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
@@ -191,7 +191,7 @@ function bass_methods:pause ()
 end
 
 --- Sets the volume of the sound channel.
--- @param vol Volume to set to, between 0 and 1.
+-- @param vol Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:setVolume (vol)
 	checktype(self, bass_metamethods)
 	checkluatype(vol, TYPE_NUMBER)
@@ -200,7 +200,7 @@ function bass_methods:setVolume (vol)
 	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
-		uw:SetVolume(math.Clamp(vol, 0, 1))
+		uw:SetVolume(math.Clamp(vol, 0, 10))
 	end
 end
 

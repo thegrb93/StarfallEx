@@ -26,6 +26,10 @@ function ENT:Draw()
 	self:setupClip()
 	self:setupScale()
 
+	local filter_mag, filter_min = self.filter_mag, self.filter_min
+	if filter_mag then render.PushFilterMag(filter_mag) end
+	if filter_min then render.PushFilterMin(filter_min) end
+	
 	if self:GetSuppressEngineLighting() then
 		render.SuppressEngineLighting(true)
 		self:DrawModel()
@@ -33,6 +37,9 @@ function ENT:Draw()
 	else
 		self:DrawModel()
 	end
+	
+	if filter_mag then render.PopFilterMag() end
+	if filter_min then render.PopFilterMin() end
 
 	self:finishClip()
 end
@@ -53,10 +60,11 @@ function ENT:setupClip()
 	if next(self.clips) then
 		render.EnableClipping(true)
 		for _, clip in pairs(self.clips) do
-			local norm, origin
+			local norm, origin, clipent
 			if clip.islocal then
-				norm = self:LocalToWorld(clip.normal) - self:GetPos()
-				origin = self:LocalToWorld(clip.origin)
+				clipent = IsValid(clip.entity) and clip.entity or self
+				norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
+				origin = clipent:LocalToWorld(clip.origin)
 			else
 				norm = clip.normal
 				origin = clip.origin
@@ -74,7 +82,7 @@ function ENT:finishClip()
 end
 
 --- Updates a clip plane definition.
-function ENT:UpdateClip(index, enabled, origin, normal, islocal)
+function ENT:UpdateClip(index, enabled, origin, normal, islocal, entity)
 	if enabled then
 		local clip = self.clips[index]
 		if not clip then
@@ -85,6 +93,7 @@ function ENT:UpdateClip(index, enabled, origin, normal, islocal)
 		clip.normal = normal
 		clip.origin = origin
 		clip.islocal = islocal
+		clip.entity = IsValid(entity) and entity or self
 	else
 		self.clips[index] = nil
 	end
@@ -97,10 +106,12 @@ net.Receive("starfall_hologram_clip", function ()
 	local origin = net.ReadVector()
 	local normal = net.ReadVector()
 	local islocal = net.ReadBit() ~= 0
+	local clipentid = net.ReadUInt(16)
 
 	local holoent = Entity(entid)
+	local clipent = Entity(clipentid)
 	if holoent:IsValid() and holoent.UpdateClip then
-		holoent:UpdateClip(clipid, enabled, origin, normal, islocal)
+		holoent:UpdateClip(clipid, enabled, origin, normal, islocal, clipent)
 	else
 		local timeout = CurTime()+0.5
 		local hookname = "SF_HoloClip"..entid
@@ -108,7 +119,7 @@ net.Receive("starfall_hologram_clip", function ()
 			if CurTime() < timeout then
 				local holoent = Entity(entid)
 				if holoent:IsValid() and holoent.UpdateClip then
-					holoent:UpdateClip(clipid, enabled, origin, normal, islocal)
+					holoent:UpdateClip(clipid, enabled, origin, normal, islocal, clipent)
 					hook.Remove("Think", hookname)
 				end
 			else

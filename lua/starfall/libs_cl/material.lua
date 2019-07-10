@@ -53,6 +53,7 @@ SF.AddHook("postload", function()
 	munwrap = SF.VMatrix.Unwrap
 end)
 
+-- Make sure to update the material.create doc if you add stuff to this list.
 local allowed_shaders = {
 	UnlitGeneric = true,
 	VertexLitGeneric = true,
@@ -60,6 +61,7 @@ local allowed_shaders = {
 	Water_DX90 = true,
 	Sky_DX9 = true,
 	gmodscreenspace = true,
+	Modulate_DX9 = true,
 }
 local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	function(shader, i)
@@ -241,7 +243,14 @@ function material_library.getVectorLinear(path, key)
 end
 
 --- Creates a new blank material
--- @param shader The shader of the material. (UnlitGeneric or VertexLitGeneric)
+-- @param shader The shader of the material. Must be one of
+--- UnlitGeneric
+--- VertexLitGeneric
+--- Refract_DX90
+--- Water_DX90
+--- Sky_DX9
+--- gmodscreenspace
+--- Modulate_DX9
 function material_library.create(shader)
 	checkluatype(shader, TYPE_STRING)
 	local instance = SF.instance

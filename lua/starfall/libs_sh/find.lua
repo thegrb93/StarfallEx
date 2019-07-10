@@ -111,6 +111,20 @@ function find_library.byModel(model, filter)
 	return convert(ents.FindByModel(model), filter)
 end
 
+if SERVER then
+	--- Finds entities that are in the PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+	-- @server
+	-- @param pos Vector view point
+	-- @param filter Optional function to filter results
+	-- @return An array of found entities
+	function find_library.inPVS (pos, filter)
+		checkpermission(SF.instance, nil, "find")
+		checktype(pos, SF.Types["Vector"])
+		
+		return convert(ents.FindInPVS(vunwrap(pos)), filter)
+	end
+end
+
 --- Finds all players (including bots)
 -- @param filter Optional function to filter results
 -- @return An array of found entities
@@ -127,4 +141,40 @@ function find_library.all(filter)
 	checkpermission(SF.instance, nil, "find")
 
 	return convert(ents.GetAll(), filter)
+end
+
+--- Finds the closest entity to a point
+-- @param ents The array of entities
+-- @param pos The position
+-- @return The closest entity
+function find_library.closest(ents, pos)
+	local closest = math.huge
+	local closestent
+
+	for k, v in pairs(ents) do
+		local d = v:getPos():getDistanceSqr(pos)
+		if d<closest then
+			closest = d
+			closestent = v
+		end
+	end
+
+	return closestent
+end
+
+--- Sorts an array of entities by how close they are to a point
+-- @param ents The array of entities
+-- @param pos The position
+-- @return A table of the closest entities
+function find_library.sortByClosest(ents, pos)
+	local distances = {}
+	for k, v in pairs(ents) do
+		distances[#distances+1] = {v:getPos():getDistanceSqr(pos), v}
+	end
+	table.sort(distances, function(a,b) return a[1]<b[1] end)
+	local ret = {}
+	for i=1, #distances do
+		ret[i] = distances[i][2]
+	end
+	return ret
 end
