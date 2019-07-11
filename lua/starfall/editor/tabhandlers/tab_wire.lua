@@ -2372,30 +2372,41 @@ function PANEL:DuplicateLine()
 	self:ScrollCaret()
 end
 
-function PANEL:SwapLine(dir)
-	local row = self.Caret[1]
+function PANEL:MoveSelection(dir)
+	local row = self.Start[1]
 
 	if (dir == -1 and row > 1) or (dir == 1 and row < #self.Rows) then
-		local startPos = self:CopyPosition(self.Caret)
+		local startPos = self:CopyPosition(self.Start)
+		local endPos = self:CopyPosition(self.Caret)
 
-		self.Start = { row, 1 }
-		self.Caret = { row, #self.Rows[self.Start[1]][1] + 1 }
+		if endPos[1] < startPos[1] or (endPos[1] == startPos[1] and endPos[2] < startPos[2]) then
+			startPos, endPos = endPos, startPos
+		end
+
+		self.Start = { startPos[1], 1 }
+		self.Caret = { endPos[1], #self.Rows[endPos[1]][1] + 1 }
 		local thisString = self:GetSelection()
 
-		self.Start = { row + dir, 1 }
-		self.Caret = { row + dir, #self.Rows[self.Start[1]][1] + 1 }
+		local nextRow = (dir == -1 and self.Start[1] or self.Caret[1]) + dir
+		self.Start = { nextRow , 1 }
+		self.Caret = { nextRow, #self.Rows[nextRow][1] + 1 }
 		local otherString = self:GetSelection()
 
 		self:SetSelection(thisString)
 
-		self.Start = { row, 1 }
-		self.Caret = { row, #self.Rows[self.Start[1]][1] + 1 }
+		local offset = 0
+		if dir == -1 then
+			offset = (endPos[1] - startPos[1])
+		end
+		self.Start = { startPos[1] + offset, 1 }
+		self.Caret = { endPos[1] + offset, #self.Rows[endPos[1] + offset][1] + 1 }
 
 		self:SetSelection(otherString)
 		
-		startPos[1] = row + dir
+		startPos[1] = startPos[1] + dir
+		endPos[1] = endPos[1] + dir
 		self.Start = self:CopyPosition(startPos)
-		self.Caret = self:CopyPosition(startPos)
+		self.Caret = self:CopyPosition(endPos)
 	end
 end
 
@@ -2487,9 +2498,9 @@ function PANEL:_OnKeyCodeTyped(code)
 	elseif alt then
 
 		if code == KEY_UP then
-			self:SwapLine(-1)
+			self:MoveSelection(-1)
 		elseif code == KEY_DOWN then
-			self:SwapLine(1)
+			self:MoveSelection(1)
 		else
 			handled = false
 		end
