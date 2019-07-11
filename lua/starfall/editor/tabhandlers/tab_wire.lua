@@ -2373,12 +2373,10 @@ function PANEL:DuplicateLine()
 end
 
 function PANEL:MoveSelection(dir)
-	local row = self.Start[1]
+	local startPos = self:CopyPosition(self.Start)
+	local endPos = self:CopyPosition(self.Caret)
 
-	if (dir == -1 and row > 1) or (dir == 1 and row < #self.Rows) then
-		local startPos = self:CopyPosition(self.Start)
-		local endPos = self:CopyPosition(self.Caret)
-
+	if (dir == -1 and startPos[1] > 1) or (dir == 1 and endPos[1] < #self.Rows) then
 		if endPos[1] < startPos[1] or (endPos[1] == startPos[1] and endPos[2] < startPos[2]) then
 			startPos, endPos = endPos, startPos
 		end
