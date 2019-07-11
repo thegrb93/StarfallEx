@@ -2131,6 +2131,7 @@ function PANEL:DoUndo()
 		self.Undo[#self.Undo] = nil
 
 		self:SetCaret(self:SetArea(undo[1], undo[2], true, false, undo[3], undo[4]), false)
+		
 		if self.OnTextChanged then self:OnTextChanged() end
 	end
 end
@@ -2389,17 +2390,16 @@ function PANEL:MoveSelection(dir)
 		self.Start = { nextRow , 1 }
 		self.Caret = { nextRow, #self.Rows[nextRow][1] + 1 }
 		local otherString = self:GetSelection()
-
-		self:SetSelection(thisString)
-
-		local offset = 0
+		
 		if dir == -1 then
-			offset = (endPos[1] - startPos[1])
+			self.Start = { startPos[1] + dir, 1 }
+			self.Caret = { endPos[1], #self.Rows[endPos[1]][1] + 1 }
+			self:SetSelection(thisString .. "\n" .. otherString)
+		else
+			self.Start = { startPos[1], 1 }
+			self.Caret = { endPos[1] + dir, #self.Rows[endPos[1] + dir][1] + 1 }
+			self:SetSelection(otherString .. "\n" .. thisString)
 		end
-		self.Start = { startPos[1] + offset, 1 }
-		self.Caret = { endPos[1] + offset, #self.Rows[endPos[1] + offset][1] + 1 }
-
-		self:SetSelection(otherString)
 		
 		startPos[1] = startPos[1] + dir
 		endPos[1] = endPos[1] + dir
