@@ -774,6 +774,11 @@ Sets the entity's linear velocity </td>
 Stops a sound on the entity </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#Entity:testPVS">testPVS</a>( other&nbsp;)</td>
+			<td class="summary">
+Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set).</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:translateBoneToPhysBone">translateBoneToPhysBone</a>( boneid&nbsp;)</td>
 			<td class="summary">
 Converts a ragdoll bone id to the corresponding physobject id </td>
@@ -2950,6 +2955,31 @@ Stops a sound on the entity</p>
 	</section>
 	
 	
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="Entity:testPVS"></a><strong>Entity:testPVS</strong>( other&nbsp;)</dt>
+<dd>
+	<p>
+Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>other</tt> ― Entity or Vector to test</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>bool True/False</p>
+		
+	</section>
 	
 	
 </dd>
