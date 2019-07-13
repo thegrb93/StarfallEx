@@ -20,7 +20,6 @@ local checkpermission = SF.Permissions.check
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
 SF.Permissions.registerPrivilege("entities.getAngles", "GetAngles", "Allows the user to get angles of an entity", { entities = {} })
-SF.Permissions.registerPrivilege("entities.getVelocity", "GetVelocity", "Allows the user to get velocity of an entity", { entities = {} })
 SF.Permissions.registerPrivilege("entities.getPos", "GetPos", "Allows the user to get position of an entity", { entities = {} })
 
 SF.AddHook("postload", function()
@@ -806,11 +805,6 @@ function ents_methods:getVelocity()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
-	
-	if not ent:IsPlayer() and not ent:IsNPC() then
-		checkpermission(SF.instance, ent, "entities.getVelocity")
-	end
-	
 	return vwrap(ent:GetVelocity())
 end
 
