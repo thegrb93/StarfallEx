@@ -201,21 +201,14 @@
 	<h2>SF code</h2>
 	<code>--@name Fireplace
 --@author INP - Radon
---@include libs/class.txt
 
 if SERVER then return end
 
 -- Credits to Natty for original fireplace idea as an example
 -- Credits to funkake for working out the kinks
 
--- We'll require our Class library, courtesy of Xandaros
--- Latest version of Class Lib: https://gist.github.com/Xandaros/ea8756e4c4ba00218855
-
--- It makes a global called Class()
-require("libs/class.txt")
-
 -- We'll call Particle as our constructor
-local Particle = Class()
+local Particle = class("Particle")
 
 -- Let's add our constructor definition
 function Particle:constructor (x, y, scale, xv, yv, clr)
