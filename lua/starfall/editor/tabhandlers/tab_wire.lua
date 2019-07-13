@@ -1446,6 +1446,14 @@ function PANEL:_OnTextChanged()
 		if input.IsKeyDown(KEY_V) then
 			-- ctrl+[shift+]V
 			ctrlv = true
+
+			if self.lastEmptySelectionCopy
+				and text == string_gsub(self.lastEmptySelectionCopy, "\r\n", "\n")
+				and self.Caret[1] == self.Start[1]
+				and self.Caret[2] == self.Start[2]  then
+				self.Caret[2] = 1
+				self.Start = self:CopyPosition(self.Caret)
+			end
 		else
 			-- ctrl+[shift+]key with key ~= V
 			return
@@ -2123,6 +2131,7 @@ function PANEL:DoUndo()
 		self.Undo[#self.Undo] = nil
 
 		self:SetCaret(self:SetArea(undo[1], undo[2], true, false, undo[3], undo[4]), false)
+		
 		if self.OnTextChanged then self:OnTextChanged() end
 	end
 end
@@ -2281,13 +2290,40 @@ function PANEL:ContextHelp()
 end
 
 function PANEL:Copy()
-	if not self:HasSelection() then return end
+	if not self:HasSelection() then 
+		local oldCaret = self:CopyPosition(self.Caret)
+
+		self.Start = { self.Caret[1], 1 }
+		self.Caret = { self.Caret[1], #self.Rows[self.Caret[1]][1] + 1 }
+
+		self.clipboard = self:GetSelection() .. "\r\n"
+
+		self.Caret = oldCaret
+		self.Start = self:CopyPosition(oldCaret)
+
+		self.lastEmptySelectionCopy = self.clipboard
+
+		return SetClipboardText(self.clipboard)
+	end
+
+	self.lastEmptySelectionCopy = nil
 	self.clipboard = string_gsub(self:GetSelection(), "\n", "\r\n")
 	return SetClipboardText(self.clipboard)
 end
 
 function PANEL:Cut()
 	self:Copy()
+
+	if not self:HasSelection() then
+		self.Start = { self.Caret[1], 1 }
+		
+		if self.Caret[1] < #self.Rows then
+			self.Caret = { self.Caret[1] + 1, 1 }
+		else
+			self.Caret = { self.Caret[1], #self.Rows[self.Caret[1]][1] + 1 }
+		end
+	end
+
 	return self:SetSelection("")
 end
 
@@ -2336,12 +2372,47 @@ function PANEL:DuplicateLine()
 	self.Scroll = old_scroll
 	self:ScrollCaret()
 end
+
+function PANEL:MoveSelection(dir)
+	local startPos = self:CopyPosition(self.Start)
+	local endPos = self:CopyPosition(self.Caret)
+
+	if (dir == -1 and startPos[1] > 1) or (dir == 1 and endPos[1] < #self.Rows) then
+		if endPos[1] < startPos[1] or (endPos[1] == startPos[1] and endPos[2] < startPos[2]) then
+			startPos, endPos = endPos, startPos
+		end
+
+		self.Start = { startPos[1], 1 }
+		self.Caret = { endPos[1], #self.Rows[endPos[1]][1] + 1 }
+		local thisString = self:GetSelection()
+
+		local nextRow = (dir == -1 and self.Start[1] or self.Caret[1]) + dir
+		self.Start = { nextRow , 1 }
+		self.Caret = { nextRow, #self.Rows[nextRow][1] + 1 }
+		local otherString = self:GetSelection()
+		
+		if dir == -1 then
+			self.Start = { startPos[1] + dir, 1 }
+			self.Caret = { endPos[1], #self.Rows[endPos[1]][1] + 1 }
+			self:SetSelection(thisString .. "\n" .. otherString)
+		else
+			self.Start = { startPos[1], 1 }
+			self.Caret = { endPos[1] + dir, #self.Rows[endPos[1] + dir][1] + 1 }
+			self:SetSelection(otherString .. "\n" .. thisString)
+		end
+		
+		startPos[1] = startPos[1] + dir
+		endPos[1] = endPos[1] + dir
+		self.Start = self:CopyPosition(startPos)
+		self.Caret = self:CopyPosition(endPos)
+	end
+end
+
 function PANEL:_OnKeyCodeTyped(code)
 	local handled = true
 	self.Blink = RealTime()
 
 	local alt = input.IsKeyDown(KEY_LALT) or input.IsKeyDown(KEY_RALT)
-	if alt then return end
 
 	local shift = input.IsKeyDown(KEY_LSHIFT) or input.IsKeyDown(KEY_RSHIFT)
 	local control = input.IsKeyDown(KEY_LCONTROL) or input.IsKeyDown(KEY_RCONTROL)
@@ -2354,6 +2425,7 @@ function PANEL:_OnKeyCodeTyped(code)
 	end
 
 	if control then
+
 		if code == KEY_A then
 			self:SelectAll()
 		elseif code == KEY_Z then
@@ -2421,8 +2493,18 @@ function PANEL:_OnKeyCodeTyped(code)
 			handled = false
 		end
 
-	else
+	elseif alt then
 
+		if code == KEY_UP then
+			self:MoveSelection(-1)
+		elseif code == KEY_DOWN then
+			self:MoveSelection(1)
+		else
+			handled = false
+		end
+
+	else
+		
 		if code == KEY_ENTER then
 			local row = self:GetRowText(self.Caret[1]):sub(1, self.Caret[2]-1)
 			local diff = (row:find("%S") or (row:len() + 1))-1
