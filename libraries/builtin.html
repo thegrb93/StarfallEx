@@ -219,6 +219,11 @@ If the result of the first argument is false or nil, an error is thrown with the
 Returns the entity representing a processor that this script is running on.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.class">class</a>( name, super&nbsp;)</td>
+			<td class="summary">
+Creates a 'middleclass' class object that can be used similarly to Java/C++ classes.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.concmd">concmd</a>( cmd&nbsp;)</td>
 			<td class="summary">
 Execute a console command </td>
@@ -580,6 +585,26 @@ Returns the entity representing a processor that this script is running on.</p>
 		<p>Starfall entity</p>
 		
 	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="builtin.class"></a><strong>builtin.class</strong>( name, super&nbsp;)</dt>
+<dd>
+	<p>
+Creates a 'middleclass' class object that can be used similarly to Java/C++ classes. See https://github.com/kikito/middleclass for examples.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>name</tt> ― The string name of the class</li>
+			<li><tt>super</tt> ― The (optional) parent class to inherit from</li>
+		</ul>
+	</section>
+	
+	
 	
 	
 </dd>
