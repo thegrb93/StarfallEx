@@ -28,12 +28,6 @@ SF.AddHook("postload", function()
 	SF.Npcs.Unwrap = unwrap
 end)
 
-do
-	local P = SF.Permissions
-	P.registerPrivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
-	P.registerPrivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
-end
-
 -- ------------------------------------------------------------------------- --
 function npc_metamethods:__tostring()
 	local ent = unwrap(self)
@@ -42,6 +36,10 @@ function npc_metamethods:__tostring()
 end
 
 if SERVER then
+	-- Register privileges
+	local P = SF.Permissions
+	P.registerPrivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
+	P.registerPrivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
 
 	--- Adds a relationship to the npc
 	-- @server
