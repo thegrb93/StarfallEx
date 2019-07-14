@@ -1,23 +1,16 @@
 --@name Fireplace
 --@author INP - Radon
---@include libs/class.txt
 
 if SERVER then return end
 
 -- Credits to Natty for original fireplace idea as an example
 -- Credits to funkake for working out the kinks
 
--- We'll require our Class library, courtesy of Xandaros
--- Latest version of Class Lib: https://gist.github.com/Xandaros/ea8756e4c4ba00218855
-
--- It makes a global called Class()
-require("libs/class.txt")
-
 -- We'll call Particle as our constructor
-local Particle = Class()
+local Particle = class("Particle")
 
 -- Let's add our constructor definition
-function Particle:constructor (x, y, scale, xv, yv, clr)
+function Particle:initialize (x, y, scale, xv, yv, clr)
 	-- Just standard assignment, we want to make sure we get all the properties.
 	-- If one of the params is nil, then the default value, 0, will be assigned.
 	self.x = x or 0
@@ -76,7 +69,7 @@ hook.add("render", "", function ()
 		for i = 1, math.random(4, 10) do
 
 			-- Make a new particle using our constructor.
-			local nP = Particle(math.random(-512, 512),
+			local nP = Particle:new(math.random(-512, 512),
 				math.random(-64, 32),
 				math.random(40, 80),
 				math.random() * 5 - 2,
