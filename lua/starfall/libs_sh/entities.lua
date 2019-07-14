@@ -181,7 +181,9 @@ function ents_methods:setColor(clr)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
-	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
+	local opaque = (clr.a == 255)
+	if ent.SFHoloOwner then ent.RenderGroup = opaque and RENDERGROUP_OPAQUE or RENDERGROUP_BOTH end
+	local rendermode = (opaque and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
 	ent:SetColor(clr)
 	ent:SetRenderMode(rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = clr[1], g = clr[2], b = clr[3], a = clr[4]}, RenderMode = rendermode }) end

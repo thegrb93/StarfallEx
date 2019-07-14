@@ -52,7 +52,7 @@ SF.AddHook("postload", function()
 	-- @return Hologram type
 	function SF.Entities.Methods:toHologram()
 		checktype(self, ent_meta)
-		if eunwrap(self):GetClass() ~= "starfall_hologram" then SF.Throw("The entity isn't a hologram", 2) end
+		if eunwrap(self).SFHoloOwner then SF.Throw("The entity isn't a hologram", 2) end
 		return setmetatable(self, hologram_metamethods)
 	end
 end)
@@ -68,6 +68,9 @@ if SERVER then
 else
 	SF.Holograms.personalquota = CreateClientConVar("sf_holograms_personalquota_cl", "200", true, false,
 		"The number of holograms allowed to spawn via Starfall scripts for a single player")
+
+	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "10", true, false,
+		"The max number of clips per hologram entity")
 
 	--- Sets a hologram entity's model to a custom Mesh
 	-- @client
@@ -174,13 +177,95 @@ else
 			checktype(mat, SF.VMatrix.Metatable)
 			local matrix = SF.VMatrix.Unwrap(mat)
 			if matrix:IsIdentity() then
+				holo.HoloMatrix = nil
 				holo:DisableMatrix("RenderMultiply")
 			else
+				holo.HoloMatrix = matrix
 				holo:EnableMatrix("RenderMultiply", matrix)
 			end
 		else
 			holo:DisableMatrix("RenderMultiply")
 		end
+	end
+
+
+	--- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
+	-- @client
+	-- @param scale Vector new scale
+	function hologram_methods:setScale(scale)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checktype(scale, vec_meta)
+		local scale = vunwrap(scale)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		if scale == Vector(1, 1, 1) then
+			holo.HoloMatrix = nil
+			holo:DisableMatrix("RenderMultiply")
+		else
+			local scalematrix = Matrix()
+			scalematrix:Scale(scale)
+			holo.HoloMatrix = scalematrix
+			holo:EnableMatrix("RenderMultiply", scalematrix)
+		end
+	end
+
+	--- Updates a clip plane
+	-- @client
+	-- @param index Whatever number you want the clip to be
+	-- @param enabled Whether the clip is enabled
+	-- @param origin The center of the clip plane in world coordinates
+	-- @param normal The the direction of the clip plane in world coordinates
+	function hologram_methods:setClip(index, enabled, origin, normal)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checkluatype(index, TYPE_NUMBER)
+		checkluatype(enabled, TYPE_BOOL)
+		checktype(origin, vec_meta)
+		checktype(normal, vec_meta)
+
+		local origin, normal = vunwrap(origin), vunwrap(normal)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		local clips = holo.clips
+		if enabled then
+			local clip = clips[index]
+			if not clip then
+				local max = SF.Holograms.maxclips:GetInt()
+				if table.Count(holo.clips)==max then
+					SF.Throw("The maximum hologram clips is " .. max, 2)
+				end
+				clip = {}
+				clips[index] = clip
+			end
+
+			clip.normal = normal
+			clip.origin = origin
+		else
+			clips[index] = nil
+		end
+	end
+	
+	
+	--- Suppress Engine Lighting of a hologram. Disabled by default.
+	-- @client
+	-- @param suppress Boolean to represent if shading should be set or not.
+	function hologram_methods:suppressEngineLighting (suppress)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checkluatype(suppress, TYPE_BOOL)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo.suppressEngineLighting = suppress
 	end
 end
 
@@ -217,16 +302,12 @@ end)
 
 --- Creates a hologram.
 -- @return The hologram object
-function holograms_library.create (pos, ang, model, scale)
+function holograms_library.create(pos, ang, model)
 	local instance = SF.instance
 	checkpermission(instance,  nil, "hologram.create")
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checkluatype(model, TYPE_STRING)
-	if scale ~= nil then
-		checktype(scale, vec_meta)
-		scale = vunwrap(scale)
-	end
 
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
@@ -241,6 +322,7 @@ function holograms_library.create (pos, ang, model, scale)
 	if SERVER then
 		holoent = ents.Create("starfall_hologram")
 		if holoent and holoent:IsValid() then
+			holoent.SFHoloOwner = instance.player
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
@@ -248,10 +330,6 @@ function holograms_library.create (pos, ang, model, scale)
 			holoent:Spawn()
 
 			hook.Run("PlayerSpawnedSENT", instance.player, holoent)
-
-			if scale then
-				holoent:SetScale(scale)
-			end
 
 			holodata[holoent] = true
 			plyCount[instance.player] = plyCount[instance.player] + 1
@@ -261,19 +339,13 @@ function holograms_library.create (pos, ang, model, scale)
 	else
 		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
 		if holoent and holoent:IsValid() then
+			holoent.SFHoloOwner = instance.player
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, instance.player)
 			table.Inherit(holoent:GetTable(), hologramSENT.t)
 			holoent:Initialize()
-			function holoent:GetScale() return self.scale end
-			function holoent:GetSuppressEngineLighting() return false end
 			holoent.RenderOverride = holoent.Draw
-			holoent.SFHoloOwner = instance.player
-
-			if scale then
-				holoent:SetScale(scale)
-			end
 
 			holodata[holoent] = true
 			plyCount[instance.player] = plyCount[instance.player] + 1
@@ -339,41 +411,6 @@ function hologram_methods:setAngVel (angvel)
 	holo:SetLocalAngularVelocity(aunwrap(angvel))
 end
 
---- Sets the hologram scale
--- @param scale Vector new scale
-function hologram_methods:setScale (scale)
-	checktype(self, hologram_metamethods)
-	checktype(scale, vec_meta)
-	local scale = vunwrap(scale)
-
-	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
-	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-	holo:SetScale(scale)
-end
-
---- Updates a clip plane
-function hologram_methods:setClip (index, enabled, origin, normal, islocal)
-	checktype(self, hologram_metamethods)
-	checkluatype(index, TYPE_NUMBER)
-	checkluatype(enabled, TYPE_BOOL)
-	checktype(origin, vec_meta)
-	checktype(normal, vec_meta)
-	checkluatype(islocal, TYPE_BOOL)
-
-	local origin, normal = vunwrap(origin), vunwrap(normal)
-
-	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
-	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-	if enabled and not holo.clips[index] and table.Count(holo.clips)==8 then
-		SF.Throw("The maximum hologram clips is 8", 2)
-	end
-	holo:UpdateClip(index, enabled, origin, normal, islocal)
-end
-
 --- Sets the model of a hologram
 -- @param model string model path
 function hologram_methods:setModel (model)
@@ -387,20 +424,6 @@ function hologram_methods:setModel (model)
 	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
 	holo:SetModel(model)
-end
-
---- Suppress Engine Lighting of a hologram. Disabled by default.
--- @param suppress Boolean to represent if shading should be set or not.
-function hologram_methods:suppressEngineLighting (suppress)
-	checktype(self, hologram_metamethods)
-	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
-
-	checkluatype(suppress, TYPE_BOOL)
-
-	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-	holo:SetSuppressEngineLighting(suppress)
 end
 
 --- Animates a hologram

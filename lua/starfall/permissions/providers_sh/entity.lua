@@ -223,10 +223,12 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return false, "Target doesn't have physgun access" end,
-				function() return false, "Target doesn't have toolgun access" end,
+				nil,
+				nil,
 				function() return true end
 			}
+			P.checks[2] = P.checks[1]
+			P.checks[3] = P.checks[1]
 
 			function SF.Permissions.getOwner(ent)
 				return ent:GetNWEntity("SFPP")
