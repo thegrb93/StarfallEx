@@ -81,13 +81,15 @@ function ents_methods:setParent (ent, attachment)
 		else
 			checkpermission(SF.instance, ent, "entities.parent")
 		end
-	end
 
-	this:SetParent(ent)
+		this:SetParent(ent)
 
-	if ent ~= nil and attachment then
-		checkluatype(attachment, TYPE_STRING)
-		this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		if attachment then
+			checkluatype(attachment, TYPE_STRING)
+			this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		end
+	else
+		this:SetParent()
 	end
 end
 
@@ -180,7 +182,7 @@ end
 -- @param vec The force vector
 function ents_methods:applyForceCenter (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 	local vec = vunwrap(vec)
 	if not check(vec) then SF.Throw("infinite vector", 2) end
 
@@ -199,8 +201,8 @@ end
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset (vec, offset)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
-	checktype(offset, SF.Types["Vector"])
+	checktype(vec, vec_meta)
+	checktype(offset, vec_meta)
 
 	local vec = vunwrap(vec)
 	local offset = vunwrap(offset)
@@ -265,7 +267,7 @@ end
 -- @param torque The torque vector
 function ents_methods:applyTorque (torque)
 	checktype(self, ents_metatable)
-	checktype(torque, SF.Types["Vector"])
+	checktype(torque, vec_meta)
 
 	local torque = vunwrap(torque)
 
@@ -337,7 +339,7 @@ end
 -- @param vec New position
 function ents_methods:setPos (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 
 	local vec = vunwrap(vec)
 	local ent = unwrap(self)
@@ -367,7 +369,7 @@ end
 -- @param vel New velocity
 function ents_methods:setVelocity (vel)
 	checktype(self, ents_metatable)
-	checktype(vel, SF.Types["Vector"])
+	checktype(vel, vec_meta)
 
 	local vel = vunwrap(vel)
 	local ent = unwrap(self)
@@ -500,7 +502,7 @@ end
 -- @param vec Inertia tensor
 function ents_methods:setInertia (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
