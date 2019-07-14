@@ -789,6 +789,99 @@ function ents_methods:worldToLocalAngles(data)
 	return awrap(ent:WorldToLocalAngles(data))
 end
 
+--- Gets the animation number from the animation name
+-- @param animation Name of the animation
+-- @return Animation index or -1 if invalid
+function ents_methods:lookupSequence(animation)
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(animation, TYPE_STRING)
+
+	return ent:LookupSequence(animation)
+end
+
+--- Get the length of an animation
+-- @param id (Optional) The id of the sequence, or will default to the currently playing sequence
+-- @return Length of the animation in seconds
+function ents_methods:sequenceDuration(id)
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	return ent:SequenceDuration()
+end
+
+--- Set the pose value of an animation. Turret/Head angles for example.
+-- @param pose Name of the pose parameter
+-- @param value Value to set it to.
+function ents_methods:setPose(pose, value)
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetPoseParameter(pose, value)
+end
+
+--- Get the pose value of an animation
+-- @param pose Pose parameter name
+-- @return Value of the pose parameter
+function ents_methods:getPose(pose)
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	return ent:GetPoseParameter(pose)
+end
+
+--- Returns a table of flexname -> flexid pairs for use in flex functions.
+function ents_methods:getFlexes()
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	local flexes = {}
+	for i = 0, ent:GetFlexNum()-1 do
+		flexes[ent:GetFlexName(i)] = i
+	end
+	return flexes
+end
+
+--- Sets the weight (value) of a flex.
+-- @param flexid The id of the flex
+-- @param weight The weight of the flex
+function ents_methods:setFlexWeight(flexid, weight)
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(flexid, TYPE_NUMBER)
+	checkluatype(weight, TYPE_NUMBER)
+	flexid = math.floor(flexid)
+
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if flexid < 0 or flexid >= ent:GetFlexNum() then
+		SF.Throw("Invalid flex: "..flexid, 2)
+	end
+
+	ent:SetFlexWeight(flexid, weight)
+end
+
+--- Sets the scale of all flexes of an entity
+function ents_methods:setFlexScale(scale)
+	checktype(self, ents_metamethods)
+	local ent = unwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(scale, TYPE_NUMBER)
+
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetFlexScale(scale)
+end
+
 --- Gets the model of an entity
 -- @shared
 -- @return Model of the entity
