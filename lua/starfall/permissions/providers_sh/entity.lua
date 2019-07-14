@@ -6,7 +6,7 @@ local P = {}
 P.id = "entities"
 P.name = "Entity Permissions"
 P.settingsoptions = { "Owner Only", "Can Tool", "Can Physgun", "Anything" }
-P.defaultsetting = 1
+P.defaultsetting = 2
 local truefunc = function() return true end
 P.checks = {truefunc, truefunc, truefunc, truefunc}
 SF.Permissions.registerProvider(P)
@@ -93,6 +93,9 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function() return true end
 			}
+			local entmeta = FindMetaTable("Entity")
+			if not entmeta.CPPICanTool then P.checks[2] = P.checks[1] end
+			if not entmeta.CPPICanPhysgun then P.checks[3] = P.checks[1] end
 		end
 	else
 		if SERVER then
