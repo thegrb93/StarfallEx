@@ -312,9 +312,10 @@ function holograms_library.create(pos, ang, model)
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
 
+	local ply = instance.player
 	local holodata = instance.data.holograms.holos
 
-	if plyCount[instance.player] >= SF.Holograms.personalquota:GetInt() then
+	if plyCount[ply] >= SF.Holograms.personalquota:GetInt() then
 		SF.Throw("Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2)
 	end
 
@@ -322,33 +323,34 @@ function holograms_library.create(pos, ang, model)
 	if SERVER then
 		holoent = ents.Create("starfall_hologram")
 		if holoent and holoent:IsValid() then
-			holoent.SFHoloOwner = instance.player
+			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, instance.player)
+			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			holoent:Spawn()
 
-			hook.Run("PlayerSpawnedSENT", instance.player, holoent)
+			hook.Run("PlayerSpawnedSENT", ply, holoent)
 
 			holodata[holoent] = true
-			plyCount[instance.player] = plyCount[instance.player] + 1
+			plyCount[ply] = plyCount[ply] + 1
 
 			return wrap(holoent)
 		end
 	else
 		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
 		if holoent and holoent:IsValid() then
-			holoent.SFHoloOwner = instance.player
+			function holoent:CPPIGetOwner() return ply end
+			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
-			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, instance.player)
+			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			table.Inherit(holoent:GetTable(), hologramSENT.t)
 			holoent:Initialize()
 			holoent.RenderOverride = holoent.Draw
 
 			holodata[holoent] = true
-			plyCount[instance.player] = plyCount[instance.player] + 1
+			plyCount[ply] = plyCount[ply] + 1
 
 			return wrap(holoent)
 		end

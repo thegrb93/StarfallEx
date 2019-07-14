@@ -231,7 +231,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			P.checks[3] = P.checks[1]
 
 			function SF.Permissions.getOwner(ent)
-				return ent:GetNWEntity("SFPP")
+				return ent.SFHoloOwner or ent:GetNWEntity("SFPP")
 			end
 		end
 	end
