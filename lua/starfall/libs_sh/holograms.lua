@@ -66,12 +66,56 @@ if SERVER then
 	SF.Holograms.personalquota = CreateConVar("sf_holograms_personalquota", "100", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
 		"The number of holograms allowed to spawn via Starfall scripts for a single player")
 
+
+	--- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
+	-- @shared
+	-- @param scale Vector new scale
+	function hologram_methods:setScale(scale)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checktype(scale, vec_meta)
+		local scale = vunwrap(scale)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:SetScale(scale)
+	end
+
+	--- Suppress Engine Lighting of a hologram. Disabled by default.
+	-- @shared
+	-- @param suppress Boolean to represent if shading should be set or not.
+	function hologram_methods:suppressEngineLighting (suppress)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checkluatype(suppress, TYPE_BOOL)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:SetSuppressEngineLighting(suppress)
+	end
+
 else
 	SF.Holograms.personalquota = CreateClientConVar("sf_holograms_personalquota_cl", "200", true, false,
 		"The number of holograms allowed to spawn via Starfall scripts for a single player")
 
 	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "10", true, false,
 		"The max number of clips per hologram entity")
+
+	function SF.Holograms.SetScale(holo, scale)
+		if scale == Vector(1, 1, 1) then
+			holo.HoloMatrix = nil
+			holo:DisableMatrix("RenderMultiply")
+		else
+			local scalematrix = Matrix()
+			scalematrix:Scale(scale)
+			holo.HoloMatrix = scalematrix
+			holo:EnableMatrix("RenderMultiply", scalematrix)
+		end
+	end
 
 	--- Sets a hologram entity's model to a custom Mesh
 	-- @client
@@ -189,10 +233,6 @@ else
 		end
 	end
 
-
-	--- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
-	-- @client
-	-- @param scale Vector new scale
 	function hologram_methods:setScale(scale)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
@@ -203,15 +243,7 @@ else
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
-		if scale == Vector(1, 1, 1) then
-			holo.HoloMatrix = nil
-			holo:DisableMatrix("RenderMultiply")
-		else
-			local scalematrix = Matrix()
-			scalematrix:Scale(scale)
-			holo.HoloMatrix = scalematrix
-			holo:EnableMatrix("RenderMultiply", scalematrix)
-		end
+		SF.Holograms.SetScale(holo, scale)
 	end
 
 	--- Updates a clip plane
@@ -252,11 +284,7 @@ else
 			clips[index] = nil
 		end
 	end
-	
-	
-	--- Suppress Engine Lighting of a hologram. Disabled by default.
-	-- @client
-	-- @param suppress Boolean to represent if shading should be set or not.
+
 	function hologram_methods:suppressEngineLighting (suppress)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
@@ -303,7 +331,7 @@ end)
 
 --- Creates a hologram.
 -- @return The hologram object
-function holograms_library.create(pos, ang, model)
+function holograms_library.create(pos, ang, model, scale)
 	local instance = SF.instance
 	checkpermission(instance,  nil, "hologram.create")
 	checktype(pos, vec_meta)
@@ -335,6 +363,10 @@ function holograms_library.create(pos, ang, model)
 			holodata[holoent] = true
 			plyCount[ply] = plyCount[ply] + 1
 
+			if scale~=nil then
+				checktype(scale, vec_meta)
+				holoent:SetScale(vunwrap(scale))
+			end
 			return wrap(holoent)
 		end
 	else
@@ -352,6 +384,11 @@ function holograms_library.create(pos, ang, model)
 
 			holodata[holoent] = true
 			plyCount[ply] = plyCount[ply] + 1
+
+			if scale~=nil then
+				checktype(scale, vec_meta)
+				SF.Holograms.SetScale(holoent, vunwrap(scale))
+			end
 
 			return wrap(holoent)
 		end

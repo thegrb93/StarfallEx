@@ -51,10 +51,47 @@ function ENT:GetRenderMesh()
 	end
 end
 
+net.Receive("starfall_hologram", function()
+	local index = net.ReadUInt(16)
+	local updateScale, scale = net.ReadBool()
+	if updateScale then scale = net.ReadVector() end
+	local updateSuppressEngineLighting, suppressEngineLighting = net.ReadBool()
+	if updateSuppressEngineLighting then suppressEngineLighting = net.ReadBool() end
+
+	local function applyHologram(self)
+		if self:IsValid() and self.IsSFHologram then
+			if updateScale then
+				SF.Holograms.SetScale(self, scale)
+			end
+			if updateSuppressEngineLighting then
+				self.suppressEngineLighting = suppressEngineLighting
+			end
+			return true
+		end
+		return false
+	end
+
+	if not applyHologram(Entity(index)) then
+		local timeout = CurTime()+5
+		local name = "SF_HologramUpdate"..index
+		hook.Add("Think", name, function()
+			if CurTime()>timeout or applyHologram(Entity(index)) then
+				hook.Remove("Think", name)
+			end
+		end)
+	end
+end)
+
 -- For when the hologram matrix gets cleared
 hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
-	if holo.HoloMatrix then
-		holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
+	if holo.IsSFHologram then
+		net.Start("starfall_hologram")
+		net.WriteEntity(holo)
+		net.SendToServer()
+
+		if holo.HoloMatrix then
+			holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
+		end
 	end
 end)
 
