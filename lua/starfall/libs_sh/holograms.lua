@@ -52,7 +52,7 @@ SF.AddHook("postload", function()
 	-- @return Hologram type
 	function SF.Entities.Methods:toHologram()
 		checktype(self, ent_meta)
-		if eunwrap(self).SFHoloOwner then SF.Throw("The entity isn't a hologram", 2) end
+		if eunwrap(self).IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
 		debug.setmetatable(self, hologram_metamethods)
 		return self
 	end
@@ -324,7 +324,6 @@ function holograms_library.create(pos, ang, model)
 	if SERVER then
 		holoent = ents.Create("starfall_hologram")
 		if holoent and holoent:IsValid() then
-			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
 			holoent:SetModel(model)
@@ -342,6 +341,7 @@ function holograms_library.create(pos, ang, model)
 		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
 		if holoent and holoent:IsValid() then
 			function holoent:CPPIGetOwner() return ply end
+			holoent.IsSFHologram = true
 			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)

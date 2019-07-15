@@ -182,7 +182,7 @@ function ents_methods:setColor(clr)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	local opaque = (clr.a == 255)
-	if ent.SFHoloOwner then ent.RenderGroup = opaque and RENDERGROUP_OPAQUE or RENDERGROUP_BOTH end
+	if ent.IsSFHologram then ent.RenderGroup = opaque and RENDERGROUP_OPAQUE or RENDERGROUP_BOTH end
 	local rendermode = (opaque and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
 	ent:SetColor(clr)
 	ent:SetRenderMode(rendermode)

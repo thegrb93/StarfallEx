@@ -1,6 +1,7 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "hunter/myplastic" )
 ENT.Material = ENT.DefaultMaterial
 
@@ -58,18 +59,20 @@ hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
 end)
 
 local function ShowHologramOwners()
-	for _, ent in pairs(ents.FindByClass("starfall_hologram")) do
-		local name = "No Owner"
-		local steamID = ""
-		local ply = SF.Permissions.getOwner(ent)
-		if ply:IsValid() then
-			name = ply:Name()
-			steamID = ply:SteamID()
+	for _, ent in pairs(ents.GetAll()) do
+		if ent.IsSFHologram then
+			local name = "No Owner"
+			local steamID = ""
+			local ply = SF.Permissions.getOwner(ent)
+			if ply:IsValid() then
+				name = ply:Name()
+				steamID = ply:SteamID()
+			end
+
+			local vec = ent:GetPos():ToScreen()
+
+			draw.DrawText(name .. "\n" .. steamID, "DermaDefault", vec.x, vec.y, Color(255, 0, 0, 255), 1)
 		end
-
-		local vec = ent:GetPos():ToScreen()
-
-		draw.DrawText(name .. "\n" .. steamID, "DermaDefault", vec.x, vec.y, Color(255, 0, 0, 255), 1)
 	end
 end
 
