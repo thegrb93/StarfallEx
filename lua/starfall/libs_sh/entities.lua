@@ -790,7 +790,7 @@ end
 -- @return Animation index or -1 if invalid
 function ents_methods:lookupSequence(animation)
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(animation, TYPE_STRING)
@@ -803,7 +803,7 @@ end
 -- @return Length of the animation in seconds
 function ents_methods:sequenceDuration(id)
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
 	return ent:SequenceDuration()
@@ -814,7 +814,7 @@ end
 -- @param value Value to set it to.
 function ents_methods:setPose(pose, value)
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
@@ -826,7 +826,7 @@ end
 -- @return Value of the pose parameter
 function ents_methods:getPose(pose)
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
 	return ent:GetPoseParameter(pose)
@@ -835,7 +835,7 @@ end
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
 function ents_methods:getFlexes()
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
 	local flexes = {}
@@ -850,7 +850,7 @@ end
 -- @param weight The weight of the flex
 function ents_methods:setFlexWeight(flexid, weight)
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(flexid, TYPE_NUMBER)
@@ -868,7 +868,7 @@ end
 --- Sets the scale of all flexes of an entity
 function ents_methods:setFlexScale(scale)
 	checktype(self, ents_metamethods)
-	local ent = unwrap(self)
+	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(scale, TYPE_NUMBER)

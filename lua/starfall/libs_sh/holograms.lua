@@ -53,7 +53,8 @@ SF.AddHook("postload", function()
 	function SF.Entities.Methods:toHologram()
 		checktype(self, ent_meta)
 		if eunwrap(self).SFHoloOwner then SF.Throw("The entity isn't a hologram", 2) end
-		return setmetatable(self, hologram_metamethods)
+		debug.setmetatable(self, hologram_metamethods)
+		return self
 	end
 end)
 
@@ -128,10 +129,10 @@ else
 		end
 	end
 
-	--- Sets a hologram entity's material to a custom starfall material
+	--- Sets a hologram entity's custom mesh material
 	-- @client
 	-- @param material The material to set it to or nil to set back to default
-	function hologram_methods:setMaterial(material)
+	function hologram_methods:setMeshMaterial(material)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
 		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
