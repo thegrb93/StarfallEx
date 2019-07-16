@@ -182,7 +182,7 @@ else
 	end
 
 	--- Sets the hologram's position.
-	-- @client
+	-- @shared
 	-- @param vec New position
 	function hologram_methods:setPos(vec)
 		checktype(self, hologram_metamethods)
@@ -198,7 +198,7 @@ else
 	end
 
 	--- Sets the hologram's angles.
-	-- @client
+	-- @shared
 	-- @param ang New angles
 	function hologram_methods:setAngles(ang)
 		checktype(self, hologram_metamethods)
