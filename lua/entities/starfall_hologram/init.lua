@@ -8,6 +8,8 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_NOCLIP)
 	self:DrawShadow(false)
 
+	self.scale = Vector(1,1,1)
+
 	self.update = false
 	self.updateScale = false
 	self.updateSuppressEngineLighting = false

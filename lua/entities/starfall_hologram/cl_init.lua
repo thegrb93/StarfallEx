@@ -8,6 +8,11 @@ ENT.Material = ENT.DefaultMaterial
 function ENT:Initialize()
 	self.clips = {}
 	self.suppressEngineLighting = false
+	self.scale = Vector(1,1,1)
+
+	net.Start("starfall_hologram")
+	net.WriteEntity(self)
+	net.SendToServer()
 end
 
 function ENT:Draw()
@@ -15,7 +20,13 @@ function ENT:Draw()
 	if next(self.clips) then
 		render.EnableClipping(true)
 		for _, clip in pairs(self.clips) do
-			render.PushCustomClipPlane(clip.normal, clip.normal:Dot(clip.origin))
+			local clipent = clip.entity
+			if clipent and clipent:IsValid() then
+				local norm = clipent:LocalToWorld(clip.normal) - clipent:GetPos()
+				render.PushCustomClipPlane(norm, norm:Dot(clipent:LocalToWorld(clip.origin)))
+			else
+				render.PushCustomClipPlane(clip.normal, clip.normal:Dot(clip.origin))
+			end
 			clipCount = clipCount + 1
 		end
 	end
@@ -84,14 +95,8 @@ end)
 
 -- For when the hologram matrix gets cleared
 hook.Add("NetworkEntityCreated", "starfall_hologram_rescale", function(holo)
-	if holo.IsSFHologram then
-		net.Start("starfall_hologram")
-		net.WriteEntity(holo)
-		net.SendToServer()
-
-		if holo.HoloMatrix then
-			holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
-		end
+	if holo.IsSFHologram and holo.HoloMatrix then
+		holo:EnableMatrix("RenderMultiply", holo.HoloMatrix)
 	end
 end)
 

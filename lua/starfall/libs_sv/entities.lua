@@ -43,14 +43,17 @@ do
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 end
 
-local vec_meta
-local vwrap, vunwrap
+local vec_meta, ang_meta
+local vwrap, vunwrap, awrap, aunwrap
 
 SF.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
+	ang_meta = SF.Angles.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
+	awrap = SF.Angles.Wrap
+	aunwrap = SF.Angles.Unwrap
 end)
 
 -- ------------------------- Internal functions ------------------------- --
@@ -223,9 +226,9 @@ end
 -- @param ang The force angle
 function ents_methods:applyAngForce (ang)
 	checktype(self, ents_metatable)
-	checktype(ang, SF.Types["Angle"])
+	checktype(ang, ang_meta)
 
-	local ang = SF.UnwrapObject(ang)
+	local ang = aunwrap(ang)
 	local ent = unwrap(self)
 
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -354,9 +357,9 @@ end
 -- @param ang New angles
 function ents_methods:setAngles (ang)
 	checktype(self, ents_metatable)
-	checktype(ang, SF.Types["Angle"])
-	local ang = SF.UnwrapObject(ang)
+	checktype(ang, ang_meta)
 
+	local ang = aunwrap(ang)
 	local ent = unwrap(self)
 
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end

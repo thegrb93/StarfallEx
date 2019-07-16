@@ -19,13 +19,14 @@ SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
 
 local ang_meta, vec_meta, ent_meta
-local wrap, unwrap, vunwrap, aunwrap, ewrap, eunwrap
+local wrap, unwrap, vwrap, vunwrap, aunwrap, ewrap, eunwrap
 local hologramSENT
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 	ent_meta = SF.Entities.Metatable
 
+	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	aunwrap = SF.Angles.Unwrap
 	ewrap = SF.Entities.Wrap
@@ -98,14 +99,77 @@ if SERVER then
 		holo:SetSuppressEngineLighting(suppress)
 	end
 
+	--- Sets the hologram linear velocity
+	-- @server
+	-- @param vel New velocity
+	function hologram_methods:setVel (vel)
+		checktype(self, hologram_metamethods)
+		checktype(vel, vec_meta)
+		local vel = vunwrap(vel)
+
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:SetLocalVelocity(vel)
+	end
+
+	--- Sets the hologram's angular velocity.
+	-- @server
+	-- @param angvel *Vector* angular velocity.
+	function hologram_methods:setAngVel (angvel)
+		checktype(self, hologram_metamethods)
+		checktype(angvel, ang_meta)
+
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:SetLocalAngularVelocity(aunwrap(angvel))
+	end
+
+	--- Animates a hologram
+	-- @server
+	-- @param animation number or string name
+	-- @param frame The starting frame number
+	-- @param rate Frame speed. (1 is normal)
+	function hologram_methods:setAnimation(animation, frame, rate)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		if isstring(animation) then
+			animation = holo:LookupSequence(animation)
+		end
+
+		frame = frame or 0
+		rate = rate or 1
+
+		if not holo.Animated then
+			-- This must be run once on entities that will be animated
+			holo.Animated = true
+			holo.AutomaticFrameAdvance = true
+
+			function holo:Think()
+				self:NextThink(CurTime())
+				return true
+			end
+		end
+		holo:ResetSequence(animation)
+		holo:SetCycle(frame)
+		holo:SetPlaybackRate(rate)
+	end
+
 else
 	SF.Holograms.personalquota = CreateClientConVar("sf_holograms_personalquota_cl", "200", true, false,
 		"The number of holograms allowed to spawn via Starfall scripts for a single player")
 
-	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "10", true, false,
+	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "8", true, false,
 		"The max number of clips per hologram entity")
 
+
 	function SF.Holograms.SetScale(holo, scale)
+		holo.scale = scale
 		if scale == Vector(1, 1, 1) then
 			holo.HoloMatrix = nil
 			holo:DisableMatrix("RenderMultiply")
@@ -115,6 +179,38 @@ else
 			holo.HoloMatrix = scalematrix
 			holo:EnableMatrix("RenderMultiply", scalematrix)
 		end
+	end
+
+	--- Sets the hologram's position.
+	-- @client
+	-- @param vec New position
+	function hologram_methods:setPos(vec)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checktype(vec, vec_meta)
+		local vec = vunwrap(vec)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:SetPos(SF.clampPos(vec))
+	end
+
+	--- Sets the hologram's angles.
+	-- @client
+	-- @param ang New angles
+	function hologram_methods:setAngles(ang)
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+
+		checktype(ang, ang_meta)
+		local ang = aunwrap(ang)
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:SetAngles(ang)
 	end
 
 	--- Sets a hologram entity's model to a custom Mesh
@@ -250,9 +346,10 @@ else
 	-- @client
 	-- @param index Whatever number you want the clip to be
 	-- @param enabled Whether the clip is enabled
-	-- @param origin The center of the clip plane in world coordinates
-	-- @param normal The the direction of the clip plane in world coordinates
-	function hologram_methods:setClip(index, enabled, origin, normal)
+	-- @param origin The center of the clip plane in world coordinates, or local to entity if it is specified
+	-- @param normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
+	-- @param entity (Optional) The entity to make coordinates local to, otherwise the world is used
+	function hologram_methods:setClip(index, enabled, origin, normal, entity)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
 		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
@@ -261,6 +358,11 @@ else
 		checkluatype(enabled, TYPE_BOOL)
 		checktype(origin, vec_meta)
 		checktype(normal, vec_meta)
+
+		if entity ~= nil then
+			checktype(entity, ent_meta)
+			entity = eunwrap(entity)
+		end
 
 		local origin, normal = vunwrap(origin), vunwrap(normal)
 
@@ -280,6 +382,7 @@ else
 
 			clip.normal = normal
 			clip.origin = origin
+			clip.entity = entity
 		else
 			clips[index] = nil
 		end
@@ -409,51 +512,22 @@ function holograms_library.hologramsLeft ()
 	return SF.Holograms.personalquota:GetInt() - plyCount[SF.instance.player]
 end
 
---- Sets the hologram's position.
--- @param vec New position
-function hologram_methods:setPos(vec)
+--- Gets the hologram scale.
+-- @shared
+-- @return Vector scale
+function hologram_methods:getScale()
 	checktype(self, hologram_metamethods)
 	local holo = unwrap(self)
 	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
 
-	checktype(vec, vec_meta)
-	local vec = vunwrap(vec)
-
 	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
-	holo:SetPos(SF.clampPos(vec))
-end
-
---- Sets the hologram linear velocity
--- @param vel New velocity
-function hologram_methods:setVel (vel)
-	checktype(self, hologram_metamethods)
-	checktype(vel, vec_meta)
-	local vel = vunwrap(vel)
-
-	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
-	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-	holo:SetLocalVelocity(vel)
-end
-
---- Sets the hologram's angular velocity.
--- @param angvel *Vector* angular velocity.
-function hologram_methods:setAngVel (angvel)
-	checktype(self, hologram_metamethods)
-	checktype(angvel, ang_meta)
-
-	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
-	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-	holo:SetLocalAngularVelocity(aunwrap(angvel))
+	return vwrap(holo.scale)
 end
 
 --- Sets the model of a hologram
 -- @param model string model path
-function hologram_methods:setModel (model)
+function hologram_methods:setModel(model)
 	checktype(self, hologram_metamethods)
 	local holo = unwrap(self)
 	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
@@ -466,35 +540,3 @@ function hologram_methods:setModel (model)
 	holo:SetModel(model)
 end
 
---- Animates a hologram
--- @param animation number or string name
--- @param frame The starting frame number
--- @param rate Frame speed. (1 is normal)
-function hologram_methods:setAnimation(animation, frame, rate)
-	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
-	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-	if isstring(animation) then
-		animation = holo:LookupSequence(animation)
-	end
-
-	frame = frame or 0
-	rate = rate or 1
-
-	if not holo.Animated then
-		-- This must be run once on entities that will be animated
-		holo.Animated = true
-		holo.AutomaticFrameAdvance = true
-
-		local OldThink = holo.Think
-		function holo:Think()
-			OldThink(self)
-			self:NextThink(CurTime())
-			return true
-		end
-	end
-	holo:ResetSequence(animation)
-	holo:SetCycle(frame)
-	holo:SetPlaybackRate(rate)
-end
