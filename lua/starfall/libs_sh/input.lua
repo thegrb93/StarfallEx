@@ -116,6 +116,10 @@ end
 function input_methods.getCursorVisible()
 	SF.Permissions.check(SF.instance, nil, "input")
 
+	if not SF.instance:isHUDActive() then
+		SF.Throw("No HUD component connected", 2)
+	end
+
 	return vgui.CursorVisible()
 end
 
