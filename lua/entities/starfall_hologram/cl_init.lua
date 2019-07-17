@@ -65,7 +65,7 @@ end
 net.Receive("starfall_hologram", function()
 	local index = net.ReadUInt(16)
 	local updateScale, scale = net.ReadBool()
-	if updateScale then scale = net.ReadVector() end
+	if updateScale then scale = Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()) end
 	local updateSuppressEngineLighting, suppressEngineLighting = net.ReadBool()
 	if updateSuppressEngineLighting then suppressEngineLighting = net.ReadBool() end
 

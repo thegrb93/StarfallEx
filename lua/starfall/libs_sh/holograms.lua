@@ -59,7 +59,7 @@ SF.AddHook("postload", function()
 	end
 end)
 
-SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms")
+SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
 SF.Permissions.registerPrivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
 
@@ -141,6 +141,10 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent.IsSFHologram = true
 			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
+
+			-- Due to garrysmod bug, null angle on initialization leads to invalid matrix
+			holoent:SetAngles(Angle(1,0,0))
+
 			holoent:SetAngles(ang)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			table.Inherit(holoent:GetTable(), hologramSENT.t)
