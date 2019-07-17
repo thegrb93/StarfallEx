@@ -487,13 +487,6 @@ function SF.CheckMaterial(material)
 	return mat
 end
 
---- Gets the type of val.
--- @param val The value to be checked.
-function SF.GetType(val)
-	local mt = dgetmeta(val)
-	return (mt and mt.__metatable and isstring(mt.__metatable)) and mt.__metatable or type(val)
-end
-
 -- ------------------------------------------------------------------------- --
 
 local object_wrappers = {}
