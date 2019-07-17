@@ -38,6 +38,7 @@ function ENT:Think()
 		if self.updateScale then
 			self.updateScale = false
 			net.WriteBool(true)
+			--net.WriteVector has bad precision
 			net.WriteFloat(self.scale.x)
 			net.WriteFloat(self.scale.y)
 			net.WriteFloat(self.scale.z)
@@ -63,6 +64,7 @@ net.Receive("starfall_hologram", function(len, ply)
 		net.WriteUInt(16, self:EntIndex())
 		if self.scale.x~=1 or self.scale.y~=1 or self.scale.z~=1 then
 			net.WriteBool(true)
+			--net.WriteVector has bad precision
 			net.WriteFloat(self.scale.x)
 			net.WriteFloat(self.scale.y)
 			net.WriteFloat(self.scale.z)
