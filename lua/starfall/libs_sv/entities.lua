@@ -43,14 +43,17 @@ do
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 end
 
-local vec_meta
-local vwrap, vunwrap
+local vec_meta, ang_meta
+local vwrap, vunwrap, awrap, aunwrap
 
 SF.AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
+	ang_meta = SF.Angles.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
+	awrap = SF.Angles.Wrap
+	aunwrap = SF.Angles.Unwrap
 end)
 
 -- ------------------------- Internal functions ------------------------- --
@@ -81,13 +84,15 @@ function ents_methods:setParent (ent, attachment)
 		else
 			checkpermission(SF.instance, ent, "entities.parent")
 		end
-	end
 
-	this:SetParent(ent)
+		this:SetParent(ent)
 
-	if ent ~= nil and attachment then
-		checkluatype(attachment, TYPE_STRING)
-		this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		if attachment then
+			checkluatype(attachment, TYPE_STRING)
+			this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		end
+	else
+		this:SetParent()
 	end
 end
 
@@ -180,7 +185,7 @@ end
 -- @param vec The force vector
 function ents_methods:applyForceCenter (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 	local vec = vunwrap(vec)
 	if not check(vec) then SF.Throw("infinite vector", 2) end
 
@@ -199,8 +204,8 @@ end
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset (vec, offset)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
-	checktype(offset, SF.Types["Vector"])
+	checktype(vec, vec_meta)
+	checktype(offset, vec_meta)
 
 	local vec = vunwrap(vec)
 	local offset = vunwrap(offset)
@@ -221,9 +226,9 @@ end
 -- @param ang The force angle
 function ents_methods:applyAngForce (ang)
 	checktype(self, ents_metatable)
-	checktype(ang, SF.Types["Angle"])
+	checktype(ang, ang_meta)
 
-	local ang = SF.UnwrapObject(ang)
+	local ang = aunwrap(ang)
 	local ent = unwrap(self)
 
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -265,7 +270,7 @@ end
 -- @param torque The torque vector
 function ents_methods:applyTorque (torque)
 	checktype(self, ents_metatable)
-	checktype(torque, SF.Types["Vector"])
+	checktype(torque, vec_meta)
 
 	local torque = vunwrap(torque)
 
@@ -337,7 +342,7 @@ end
 -- @param vec New position
 function ents_methods:setPos (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 
 	local vec = vunwrap(vec)
 	local ent = unwrap(self)
@@ -352,9 +357,9 @@ end
 -- @param ang New angles
 function ents_methods:setAngles (ang)
 	checktype(self, ents_metatable)
-	checktype(ang, SF.Types["Angle"])
-	local ang = SF.UnwrapObject(ang)
+	checktype(ang, ang_meta)
 
+	local ang = aunwrap(ang)
 	local ent = unwrap(self)
 
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -367,7 +372,7 @@ end
 -- @param vel New velocity
 function ents_methods:setVelocity (vel)
 	checktype(self, ents_metatable)
-	checktype(vel, SF.Types["Vector"])
+	checktype(vel, vec_meta)
 
 	local vel = vunwrap(vel)
 	local ent = unwrap(self)
@@ -500,7 +505,7 @@ end
 -- @param vec Inertia tensor
 function ents_methods:setInertia (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end

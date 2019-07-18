@@ -87,7 +87,7 @@ function ents_methods:getOwner()
 end
 
 if CLIENT then
-	--- Allows manipulation of a hologram's bones' positions
+	--- Allows manipulation of an entity's bones' positions
 	-- @client
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
@@ -100,7 +100,7 @@ if CLIENT then
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
-	--- Allows manipulation of a hologram's bones' scale
+	--- Allows manipulation of an entity's bones' scale
 	-- @client
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
@@ -113,7 +113,7 @@ if CLIENT then
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
-	--- Allows manipulation of a hologram's bones' angles
+	--- Allows manipulation of an entity's bones' angles
 	-- @client
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
@@ -124,106 +124,6 @@ if CLIENT then
 		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
-	end
-
-	--- Sets a hologram entity's model to a custom Mesh
-	-- @client
-	-- @param mesh The mesh to set it to or nil to set back to normal
-	function ents_methods:setHologramMesh(mesh)
-		local instance = SF.instance
-		checkpermission(instance, nil, "mesh")
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if mesh then
-			checktype(mesh, SF.Mesh.Metatable)
-			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
-			ent.custom_mesh_data = instance.data.meshes
-		else
-			ent.custom_mesh = nil
-		end
-	end
-
-	--- Sets the texture filtering function when viewing a close texture
-	-- @client
-	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
-	function ents_methods:setFilterMag(val)
-		local instance = SF.instance
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if val then
-			checkluatype(val, TYPE_NUMBER)
-			ent.filter_mag = val
-		else
-			ent.filter_mag = nil
-		end
-	end
-
-	--- Sets the texture filtering function when viewing a far texture
-	-- @client
-	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
-	function ents_methods:setFilterMin(val)
-		local instance = SF.instance
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if val then
-			checkluatype(val, TYPE_NUMBER)
-			ent.filter_min = val
-		else
-			ent.filter_min = nil
-		end
-	end
-
-	--- Sets a hologram entity's material to a custom material
-	-- @client
-	-- @param material The material to set it to or nil to set back to default
-	function ents_methods:setHologramMaterial(material)
-		local instance = SF.instance
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(instance, ent, "entities.setRenderProperty")
-		if material then
-			checktype(material, SF.Materials.Metatable)
-			ent.Material = SF.Materials.Unwrap(material)
-		else
-			ent.Material = ent.DefaultMaterial
-		end
-	end
-
-	--- Sets a hologram entity's renderbounds
-	-- @client
-	-- @param mins The lower bounding corner coordinate local to the hologram
-	-- @param maxs The upper bounding corner coordinate local to the hologram
-	function ents_methods:setHologramRenderBounds(mins, maxs)
-		checktype(mins, vec_meta)
-		checktype(maxs, vec_meta)
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
-		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
-	end
-
-	--- Sets a hologram entity's rendermatrix
-	-- @client
-	-- @param mat VMatrix to use
-	function ents_methods:setHologramRenderMatrix(mat)
-		if mat ~= nil then checktype(mat, SF.VMatrix.Metatable) end
-		local ent = eunwrap(self)
-		if not isValid(ent) or ent:GetClass()~="starfall_hologram" then SF.Throw("The entity is invalid or not a hologram", 2) end
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
-		
-		if mat then
-			local matrix = SF.VMatrix.Unwrap(mat)
-			if matrix:IsIdentity() then
-				ent:DisableMatrix("RenderMultiply")
-			else
-				ent:EnableMatrix("RenderMultiply", matrix)
-			end
-		else
-			ent:DisableMatrix("RenderMultiply")
-		end
 	end
 end
 
@@ -285,7 +185,6 @@ function ents_methods:setColor(clr)
 	ent:SetColor(clr)
 	ent:SetRenderMode(rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { Color = {r = clr[1], g = clr[2], b = clr[3], a = clr[4]}, RenderMode = rendermode }) end
-
 end
 
 --- Sets the whether an entity should be drawn or not
@@ -881,6 +780,99 @@ function ents_methods:worldToLocalAngles(data)
 	local data = aunwrap(data)
 
 	return awrap(ent:WorldToLocalAngles(data))
+end
+
+--- Gets the animation number from the animation name
+-- @param animation Name of the animation
+-- @return Animation index or -1 if invalid
+function ents_methods:lookupSequence(animation)
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(animation, TYPE_STRING)
+
+	return ent:LookupSequence(animation)
+end
+
+--- Get the length of an animation
+-- @param id (Optional) The id of the sequence, or will default to the currently playing sequence
+-- @return Length of the animation in seconds
+function ents_methods:sequenceDuration(id)
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	return ent:SequenceDuration()
+end
+
+--- Set the pose value of an animation. Turret/Head angles for example.
+-- @param pose Name of the pose parameter
+-- @param value Value to set it to.
+function ents_methods:setPose(pose, value)
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetPoseParameter(pose, value)
+end
+
+--- Get the pose value of an animation
+-- @param pose Pose parameter name
+-- @return Value of the pose parameter
+function ents_methods:getPose(pose)
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	return ent:GetPoseParameter(pose)
+end
+
+--- Returns a table of flexname -> flexid pairs for use in flex functions.
+function ents_methods:getFlexes()
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	local flexes = {}
+	for i = 0, ent:GetFlexNum()-1 do
+		flexes[ent:GetFlexName(i)] = i
+	end
+	return flexes
+end
+
+--- Sets the weight (value) of a flex.
+-- @param flexid The id of the flex
+-- @param weight The weight of the flex
+function ents_methods:setFlexWeight(flexid, weight)
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(flexid, TYPE_NUMBER)
+	checkluatype(weight, TYPE_NUMBER)
+	flexid = math.floor(flexid)
+
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if flexid < 0 or flexid >= ent:GetFlexNum() then
+		SF.Throw("Invalid flex: "..flexid, 2)
+	end
+
+	ent:SetFlexWeight(flexid, weight)
+end
+
+--- Sets the scale of all flexes of an entity
+function ents_methods:setFlexScale(scale)
+	checktype(self, ents_metamethods)
+	local ent = eunwrap(self)
+	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(scale, TYPE_NUMBER)
+
+	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+
+	ent:SetFlexScale(scale)
 end
 
 --- Gets the model of an entity
