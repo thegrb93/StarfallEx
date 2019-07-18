@@ -53,7 +53,7 @@ SF.AddHook("postload", function()
 	-- @return Hologram type
 	function SF.Entities.Methods:toHologram()
 		checktype(self, ent_meta)
-		if eunwrap(self).IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not eunwrap(self).IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
 		debug.setmetatable(self, hologram_metamethods)
 		return self
 	end
