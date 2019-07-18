@@ -61,9 +61,9 @@ hook.Add("NetworkEntityCreated","SF_TrackLights",function(e)
 	if ltable and not ltable[index] then
 		local sfLight = gSFLights[index]
 		if sfLight then
-			v.slot = getFreeSlot()
-			if v.slot then
-				gSFLights[v.slot] = v
+			sfLight.slot = getFreeSlot()
+			if sfLight.slot then
+				gSFLights[sfLight.slot] = sfLight
 			end
 			gSFLights[index] = nil
 		end
