@@ -369,6 +369,11 @@ Gets the entitiy's eye angles </td>
 Gets the entity's eye position </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:getFlexes">getFlexes</a>( &nbsp;)</td>
+			<td class="summary">
+Returns a table of flexname -> flexid pairs for use in flex functions.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getForward">getForward</a>( &nbsp;)</td>
 			<td class="summary">
 Gets the entity's forward vector </td>
@@ -462,6 +467,11 @@ Gets a physics objects of an entity </td>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getPos">getPos</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the position of the entity </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:getPose">getPose</a>( pose&nbsp;)</td>
+			<td class="summary">
+Get the pose value of an animation </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getRight">getRight</a>( &nbsp;)</td>
@@ -579,19 +589,24 @@ Gets the attachment index via the entity and it's attachment name </td>
 Returns the ragdoll bone index given a bone name </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:lookupSequence">lookupSequence</a>( animation&nbsp;)</td>
+			<td class="summary">
+Gets the animation number from the animation name </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Entity:manipulateBoneAngles">manipulateBoneAngles</a>( bone, ang&nbsp;)</td>
 			<td class="summary">
-Allows manipulation of a hologram's bones' angles </td>
+Allows manipulation of an entity's bones' angles </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Entity:manipulateBonePosition">manipulateBonePosition</a>( bone, vec&nbsp;)</td>
 			<td class="summary">
-Allows manipulation of a hologram's bones' positions </td>
+Allows manipulation of an entity's bones' positions </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#Entity:manipulateBoneScale">manipulateBoneScale</a>( bone, vec&nbsp;)</td>
 			<td class="summary">
-Allows manipulation of a hologram's bones' scale </td>
+Allows manipulation of an entity's bones' scale </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:obbCenter">obbCenter</a>( &nbsp;)</td>
@@ -634,6 +649,11 @@ Removes a collision listening hook from the entity so that a new one can be adde
 Removes trails from the entity </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:sequenceDuration">sequenceDuration</a>( id&nbsp;)</td>
+			<td class="summary">
+Get the length of an animation </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Entity:setAngles">setAngles</a>( ang&nbsp;)</td>
 			<td class="summary">
 Sets the entity's angles </td>
@@ -654,39 +674,19 @@ Sets the color of the entity </td>
 Sets whether an entity's shadow should be drawn </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Entity:setFilterMag">setFilterMag</a>( val&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:setFlexScale">setFlexScale</a>( scale&nbsp;)</td>
 			<td class="summary">
-Sets the texture filtering function when viewing a close texture </td>
+Sets the scale of all flexes of an entity </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Entity:setFilterMin">setFilterMin</a>( val&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:setFlexWeight">setFlexWeight</a>( flexid, weight&nbsp;)</td>
 			<td class="summary">
-Sets the texture filtering function when viewing a far texture </td>
+Sets the weight (value) of a flex.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Entity:setFrozen">setFrozen</a>( freeze&nbsp;)</td>
 			<td class="summary">
 Sets the entity frozen state </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Entity:setHologramMaterial">setHologramMaterial</a>( material&nbsp;)</td>
-			<td class="summary">
-Sets a hologram entity's material to a custom material </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Entity:setHologramMesh">setHologramMesh</a>( mesh&nbsp;)</td>
-			<td class="summary">
-Sets a hologram entity's model to a custom Mesh </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Entity:setHologramRenderBounds">setHologramRenderBounds</a>( mins, maxs&nbsp;)</td>
-			<td class="summary">
-Sets a hologram entity's renderbounds </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Entity:setHologramRenderMatrix">setHologramRenderMatrix</a>( mat&nbsp;)</td>
-			<td class="summary">
-Sets a hologram entity's rendermatrix </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Entity:setInertia">setInertia</a>( vec&nbsp;)</td>
@@ -727,6 +727,11 @@ Sets the physical material of the entity </td>
 			<td class="name"><span class="realm_sv"></span><a href="#Entity:setPos">setPos</a>( vec&nbsp;)</td>
 			<td class="summary">
 Sets the entitiy's position.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:setPose">setPose</a>( pose, value&nbsp;)</td>
+			<td class="summary">
+Set the pose value of an animation.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:setRenderFX">setRenderFX</a>( renderfx&nbsp;)</td>
@@ -1428,6 +1433,18 @@ Gets the entity's eye position</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="Entity:getFlexes"></a><strong>Entity:getFlexes</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns a table of flexname -> flexid pairs for use in flex functions.</p>
+	
+	
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="Entity:getForward"></a><strong>Entity:getForward</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1771,6 +1788,31 @@ Returns the position of the entity</p>
 		<h3>Returns</h3>
 		
 		<p>The position vector</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Entity:getPose"></a><strong>Entity:getPose</strong>( pose&nbsp;)</dt>
+<dd>
+	<p>
+Get the pose value of an animation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pose</tt> ― Pose parameter name</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Value of the pose parameter</p>
 		
 	</section>
 	
@@ -2229,10 +2271,35 @@ Returns the ragdoll bone index given a bone name</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="Entity:lookupSequence"></a><strong>Entity:lookupSequence</strong>( animation&nbsp;)</dt>
+<dd>
+	<p>
+Gets the animation number from the animation name</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>animation</tt> ― Name of the animation</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Animation index or -1 if invalid</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="Entity:manipulateBoneAngles"></a><strong>Entity:manipulateBoneAngles</strong>( bone, ang&nbsp;)</dt>
 <dd>
 	<p>
-Allows manipulation of a hologram's bones' angles</p>
+Allows manipulation of an entity's bones' angles</p>
 	
 	
 	<section class="parameters">
@@ -2252,7 +2319,7 @@ Allows manipulation of a hologram's bones' angles</p>
 <dt><span class="realm_cl"></span><a name="Entity:manipulateBonePosition"></a><strong>Entity:manipulateBonePosition</strong>( bone, vec&nbsp;)</dt>
 <dd>
 	<p>
-Allows manipulation of a hologram's bones' positions</p>
+Allows manipulation of an entity's bones' positions</p>
 	
 	
 	<section class="parameters">
@@ -2272,7 +2339,7 @@ Allows manipulation of a hologram's bones' positions</p>
 <dt><span class="realm_cl"></span><a name="Entity:manipulateBoneScale"></a><strong>Entity:manipulateBoneScale</strong>( bone, vec&nbsp;)</dt>
 <dd>
 	<p>
-Allows manipulation of a hologram's bones' scale</p>
+Allows manipulation of an entity's bones' scale</p>
 	
 	
 	<section class="parameters">
@@ -2415,6 +2482,31 @@ Removes trails from the entity</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="Entity:sequenceDuration"></a><strong>Entity:sequenceDuration</strong>( id&nbsp;)</dt>
+<dd>
+	<p>
+Get the length of an animation</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>id</tt> ― (Optional) The id of the sequence, or will default to the currently playing sequence</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Length of the animation in seconds</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sv"></span><a name="Entity:setAngles"></a><strong>Entity:setAngles</strong>( ang&nbsp;)</dt>
 <dd>
 	<p>
@@ -2493,17 +2585,17 @@ Sets whether an entity's shadow should be drawn</p>
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="Entity:setFilterMag"></a><strong>Entity:setFilterMag</strong>( val&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="Entity:setFlexScale"></a><strong>Entity:setFlexScale</strong>( scale&nbsp;)</dt>
 <dd>
 	<p>
-Sets the texture filtering function when viewing a close texture</p>
+Sets the scale of all flexes of an entity</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
+			<li><tt>scale</tt></li>
 		</ul>
 	</section>
 	
@@ -2512,17 +2604,18 @@ Sets the texture filtering function when viewing a close texture</p>
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="Entity:setFilterMin"></a><strong>Entity:setFilterMin</strong>( val&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="Entity:setFlexWeight"></a><strong>Entity:setFlexWeight</strong>( flexid, weight&nbsp;)</dt>
 <dd>
 	<p>
-Sets the texture filtering function when viewing a far texture</p>
+Sets the weight (value) of a flex.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
+			<li><tt>flexid</tt> ― The id of the flex</li>
+			<li><tt>weight</tt> ― The weight of the flex</li>
 		</ul>
 	</section>
 	
@@ -2542,83 +2635,6 @@ Sets the entity frozen state</p>
 		<ul>
 			
 			<li><tt>freeze</tt> ― Should the entity be frozen?</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Entity:setHologramMaterial"></a><strong>Entity:setHologramMaterial</strong>( material&nbsp;)</dt>
-<dd>
-	<p>
-Sets a hologram entity's material to a custom material</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>material</tt> ― The material to set it to or nil to set back to default</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Entity:setHologramMesh"></a><strong>Entity:setHologramMesh</strong>( mesh&nbsp;)</dt>
-<dd>
-	<p>
-Sets a hologram entity's model to a custom Mesh</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>mesh</tt> ― The mesh to set it to or nil to set back to normal</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Entity:setHologramRenderBounds"></a><strong>Entity:setHologramRenderBounds</strong>( mins, maxs&nbsp;)</dt>
-<dd>
-	<p>
-Sets a hologram entity's renderbounds</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>mins</tt> ― The lower bounding corner coordinate local to the hologram</li>
-			<li><tt>maxs</tt> ― The upper bounding corner coordinate local to the hologram</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Entity:setHologramRenderMatrix"></a><strong>Entity:setHologramRenderMatrix</strong>( mat&nbsp;)</dt>
-<dd>
-	<p>
-Sets a hologram entity's rendermatrix</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>mat</tt> ― VMatrix to use</li>
 		</ul>
 	</section>
 	
@@ -2772,6 +2788,26 @@ Sets the entitiy's position. No interpolation will occur clientside, use physobj
 		<ul>
 			
 			<li><tt>vec</tt> ― New position</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Entity:setPose"></a><strong>Entity:setPose</strong>( pose, value&nbsp;)</dt>
+<dd>
+	<p>
+Set the pose value of an animation. Turret/Head angles for example.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pose</tt> ― Name of the pose parameter</li>
+			<li><tt>value</tt> ― Value to set it to.</li>
 		</ul>
 	</section>
 	

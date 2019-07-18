@@ -209,29 +209,9 @@ Hologram type</p>
 	<table class="list">
 		
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:getAnimationLength">getAnimationLength</a>( &nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#Hologram:getScale">getScale</a>( &nbsp;)</td>
 			<td class="summary">
-Get the length of the current animation </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:getAnimationNumber">getAnimationNumber</a>( animation&nbsp;)</td>
-			<td class="summary">
-Convert animation name into animation number </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:getFlexes">getFlexes</a>( &nbsp;)</td>
-			<td class="summary">
-Returns a table of flexname -> flexid pairs for use in flex functions.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:getPose">getPose</a>( pose&nbsp;)</td>
-			<td class="summary">
-Get the pose value of an animation </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:getScale">getScale</a>( &nbsp;)</td>
-			<td class="summary">
-Gets the hologram scale </td>
+Gets the hologram scale.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setAngVel">setAngVel</a>( angvel&nbsp;)</td>
@@ -239,39 +219,64 @@ Gets the hologram scale </td>
 Sets the hologram's angular velocity.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Hologram:setAngles">setAngles</a>( ang&nbsp;)</td>
+			<td class="summary">
+Sets the hologram's angles.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setAnimation">setAnimation</a>( animation, frame, rate&nbsp;)</td>
 			<td class="summary">
 Animates a hologram </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setClip">setClip</a>( index, enabled, origin, normal, islocal, entity&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setClip">setClip</a>( index, enabled, origin, normal, entity&nbsp;)</td>
 			<td class="summary">
 Updates a clip plane </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setFlexScale">setFlexScale</a>( scale&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setFilterMag">setFilterMag</a>( val&nbsp;)</td>
 			<td class="summary">
-Sets the scale of all flexes of a hologram </td>
+Sets the texture filtering function when viewing a close texture </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setFlexWeight">setFlexWeight</a>( flexid, weight&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setFilterMin">setFilterMin</a>( val&nbsp;)</td>
 			<td class="summary">
-Sets the weight (value) of a flex.</td>
+Sets the texture filtering function when viewing a far texture </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setModel">setModel</a>( model&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setMesh">setMesh</a>( mesh&nbsp;)</td>
+			<td class="summary">
+Sets a hologram entity's model to a custom Mesh </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setMeshMaterial">setMeshMaterial</a>( material&nbsp;)</td>
+			<td class="summary">
+Sets a hologram entity's custom mesh material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Hologram:setModel">setModel</a>( model&nbsp;)</td>
 			<td class="summary">
 Sets the model of a hologram </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setPose">setPose</a>( pose, value&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#Hologram:setPos">setPos</a>( vec&nbsp;)</td>
 			<td class="summary">
-Set the pose value of an animation.</td>
+Sets the hologram's position.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setScale">setScale</a>( scale&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setRenderBounds">setRenderBounds</a>( mins, maxs&nbsp;)</td>
 			<td class="summary">
-Sets the hologram scale </td>
+Sets a hologram entity's renderbounds </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#Hologram:setRenderMatrix">setRenderMatrix</a>( mat&nbsp;)</td>
+			<td class="summary">
+Sets a hologram entity's rendermatrix </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Hologram:setScale">setScale</a>( scale&nbsp;)</td>
+			<td class="summary">
+Sets the hologram scale.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Hologram:setVel">setVel</a>( vel&nbsp;)</td>
@@ -279,7 +284,7 @@ Sets the hologram scale </td>
 Sets the hologram linear velocity </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Hologram:suppressEngineLighting">suppressEngineLighting</a>( suppress&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#Hologram:suppressEngineLighting">suppressEngineLighting</a>( suppress&nbsp;)</td>
 			<td class="summary">
 Suppress Engine Lighting of a hologram.</td>
 		</tr>
@@ -290,91 +295,10 @@ Suppress Engine Lighting of a hologram.</td>
 	<dl>
 		
 		
-<dt><span class="realm_sv"></span><a name="Hologram:getAnimationLength"></a><strong>Hologram:getAnimationLength</strong>( &nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="Hologram:getScale"></a><strong>Hologram:getScale</strong>( &nbsp;)</dt>
 <dd>
 	<p>
-Get the length of the current animation</p>
-	
-	
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Length of current animation in seconds</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="Hologram:getAnimationNumber"></a><strong>Hologram:getAnimationNumber</strong>( animation&nbsp;)</dt>
-<dd>
-	<p>
-Convert animation name into animation number</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>animation</tt> ― Name of the animation</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Animation index</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="Hologram:getFlexes"></a><strong>Hologram:getFlexes</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Returns a table of flexname -> flexid pairs for use in flex functions. 
-These IDs become invalid when the hologram's model changes.</p>
-	
-	
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="Hologram:getPose"></a><strong>Hologram:getPose</strong>( pose&nbsp;)</dt>
-<dd>
-	<p>
-Get the pose value of an animation</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>pose</tt> ― Pose parameter name</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Value of the pose parameter</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_sv"></span><a name="Hologram:getScale"></a><strong>Hologram:getScale</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Gets the hologram scale</p>
+Gets the hologram scale.</p>
 	
 	
 	
@@ -408,6 +332,25 @@ Sets the hologram's angular velocity.</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="Hologram:setAngles"></a><strong>Hologram:setAngles</strong>( ang&nbsp;)</dt>
+<dd>
+	<p>
+Sets the hologram's angles.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ang</tt> ― New angles</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sv"></span><a name="Hologram:setAnimation"></a><strong>Hologram:setAnimation</strong>( animation, frame, rate&nbsp;)</dt>
 <dd>
 	<p>
@@ -429,7 +372,7 @@ Animates a hologram</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:setClip"></a><strong>Hologram:setClip</strong>( index, enabled, origin, normal, islocal, entity&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Hologram:setClip"></a><strong>Hologram:setClip</strong>( index, enabled, origin, normal, entity&nbsp;)</dt>
 <dd>
 	<p>
 Updates a clip plane</p>
@@ -439,12 +382,11 @@ Updates a clip plane</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>index</tt></li>
-			<li><tt>enabled</tt></li>
-			<li><tt>origin</tt></li>
-			<li><tt>normal</tt></li>
-			<li><tt>islocal</tt></li>
-			<li><tt>entity</tt> ― (Optional) Entity clip is local to</li>
+			<li><tt>index</tt> ― Whatever number you want the clip to be</li>
+			<li><tt>enabled</tt> ― Whether the clip is enabled</li>
+			<li><tt>origin</tt> ― The center of the clip plane in world coordinates, or local to entity if it is specified</li>
+			<li><tt>normal</tt> ― The the direction of the clip plane in world coordinates, or local to entity if it is specified</li>
+			<li><tt>entity</tt> ― (Optional) The entity to make coordinates local to, otherwise the world is used</li>
 		</ul>
 	</section>
 	
@@ -453,17 +395,17 @@ Updates a clip plane</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:setFlexScale"></a><strong>Hologram:setFlexScale</strong>( scale&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Hologram:setFilterMag"></a><strong>Hologram:setFilterMag</strong>( val&nbsp;)</dt>
 <dd>
 	<p>
-Sets the scale of all flexes of a hologram</p>
+Sets the texture filtering function when viewing a close texture</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>scale</tt></li>
+			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
 		</ul>
 	</section>
 	
@@ -472,18 +414,17 @@ Sets the scale of all flexes of a hologram</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:setFlexWeight"></a><strong>Hologram:setFlexWeight</strong>( flexid, weight&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Hologram:setFilterMin"></a><strong>Hologram:setFilterMin</strong>( val&nbsp;)</dt>
 <dd>
 	<p>
-Sets the weight (value) of a flex.</p>
+Sets the texture filtering function when viewing a far texture</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>flexid</tt></li>
-			<li><tt>weight</tt></li>
+			<li><tt>val</tt> ― The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER</li>
 		</ul>
 	</section>
 	
@@ -492,7 +433,45 @@ Sets the weight (value) of a flex.</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:setModel"></a><strong>Hologram:setModel</strong>( model&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Hologram:setMesh"></a><strong>Hologram:setMesh</strong>( mesh&nbsp;)</dt>
+<dd>
+	<p>
+Sets a hologram entity's model to a custom Mesh</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mesh</tt> ― The mesh to set it to or nil to set back to normal</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Hologram:setMeshMaterial"></a><strong>Hologram:setMeshMaterial</strong>( material&nbsp;)</dt>
+<dd>
+	<p>
+Sets a hologram entity's custom mesh material</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>material</tt> ― The material to set it to or nil to set back to default</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Hologram:setModel"></a><strong>Hologram:setModel</strong>( model&nbsp;)</dt>
 <dd>
 	<p>
 Sets the model of a hologram</p>
@@ -511,18 +490,17 @@ Sets the model of a hologram</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:setPose"></a><strong>Hologram:setPose</strong>( pose, value&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="Hologram:setPos"></a><strong>Hologram:setPos</strong>( vec&nbsp;)</dt>
 <dd>
 	<p>
-Set the pose value of an animation. Turret/Head angles for example.</p>
+Sets the hologram's position.</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>pose</tt> ― Name of the pose parameter</li>
-			<li><tt>value</tt> ― Value to set it to.</li>
+			<li><tt>vec</tt> ― New position</li>
 		</ul>
 	</section>
 	
@@ -531,10 +509,49 @@ Set the pose value of an animation. Turret/Head angles for example.</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:setScale"></a><strong>Hologram:setScale</strong>( scale&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="Hologram:setRenderBounds"></a><strong>Hologram:setRenderBounds</strong>( mins, maxs&nbsp;)</dt>
 <dd>
 	<p>
-Sets the hologram scale</p>
+Sets a hologram entity's renderbounds</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mins</tt> ― The lower bounding corner coordinate local to the hologram</li>
+			<li><tt>maxs</tt> ― The upper bounding corner coordinate local to the hologram</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="Hologram:setRenderMatrix"></a><strong>Hologram:setRenderMatrix</strong>( mat&nbsp;)</dt>
+<dd>
+	<p>
+Sets a hologram entity's rendermatrix</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― Starfall matrix to use</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Hologram:setScale"></a><strong>Hologram:setScale</strong>( scale&nbsp;)</dt>
+<dd>
+	<p>
+Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix</p>
 	
 	
 	<section class="parameters">
@@ -569,7 +586,7 @@ Sets the hologram linear velocity</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Hologram:suppressEngineLighting"></a><strong>Hologram:suppressEngineLighting</strong>( suppress&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="Hologram:suppressEngineLighting"></a><strong>Hologram:suppressEngineLighting</strong>( suppress&nbsp;)</dt>
 <dd>
 	<p>
 Suppress Engine Lighting of a hologram. Disabled by default.</p>
