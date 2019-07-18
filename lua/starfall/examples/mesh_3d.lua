@@ -55,9 +55,9 @@ else
 	local function init()
 		if not (mymesh and holo) then return end
 
-		holo:setHologramMesh(mymesh)
-		holo:setHologramMaterial(texture)
-		holo:setHologramRenderBounds(Vector(-200),Vector(200))
+		holo:setMesh(mymesh)
+		holo:setMeshMaterial(texture)
+		holo:setRenderBounds(Vector(-200),Vector(200))
 
 		hook.add("postdrawopaquerenderables","mesh",renderHUD)
 		hook.add("render","mesh",renderScreen)
@@ -65,7 +65,7 @@ else
 
 	-- Used for setting up the hologram
 	hook.add("net","",function(name, len, pl)
-		holo = net.readEntity()
+		holo = net.readEntity():toHologram()
 		init()
 	end)
 	net.start("") net.send()
