@@ -429,7 +429,7 @@ function net_library.readAngle()
 	return SF.Angles.Wrap(net.ReadAngle())
 end
 
---- Writes an vector to the net message
+--- Writes an vector to the net message. Has significantly lower precision than writeFloat
 -- @shared
 -- @param t The vector to be written
 

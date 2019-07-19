@@ -246,7 +246,7 @@ function bass_methods:setFade (min, max)
 	end
 end
 
---- Sets whether the sound channel should loop.
+--- Sets whether the sound channel should loop. Requires the 'noblock' flag
 -- @param loop Boolean of whether the sound channel should loop.
 function bass_methods:setLooping (loop)
 	checktype(self, bass_metamethods)
@@ -272,7 +272,7 @@ function bass_methods:getLength ()
 	end
 end
 
---- Sets the current playback time of the sound channel.
+--- Sets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @param time Sound channel playback time in seconds.
 function bass_methods:setTime (time)
 	checktype(self, bass_metamethods)
@@ -286,7 +286,7 @@ function bass_methods:setTime (time)
 	end
 end
 
---- Gets the current playback time of the sound channel.
+--- Gets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @return Sound channel playback time in seconds.
 function bass_methods:getTime ()
 	checktype(self, bass_metamethods)
