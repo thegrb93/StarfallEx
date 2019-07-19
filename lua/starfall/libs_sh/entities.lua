@@ -803,7 +803,9 @@ function ents_methods:sequenceDuration(id)
 	local ent = eunwrap(self)
 	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
 
-	return ent:SequenceDuration()
+	if id~=nil then checkluatype(id, TYPE_NUMBER) end
+
+	return ent:SequenceDuration(id)
 end
 
 --- Set the pose value of an animation. Turret/Head angles for example.
