@@ -34,7 +34,7 @@ Gets the length of a sound channel.";["fname"]="getLength";["name"]="bass_method
 Gets the length of a sound channel.";};["getLevels"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Gets the left and right levels of the audio channel";["fname"]="getLevels";["name"]="bass_methods:getLevels";["param"]={};["private"]=false;["realm"]="cl";["ret"]={[1]="The left sound level, a value between 0 and 1.";[2]="The right sound level, a value between 0 and 1.";};["summary"]="\
 Gets the left and right levels of the audio channel ";};["getTime"]={["class"]="function";["classlib"]="Bass";["description"]="\
-Gets the current playback time of the sound channel.";["fname"]="getTime";["name"]="bass_methods:getTime";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Sound channel playback time in seconds.";["summary"]="\
+Gets the current playback time of the sound channel. Requires the 'noblock' flag";["fname"]="getTime";["name"]="bass_methods:getTime";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Sound channel playback time in seconds.";["summary"]="\
 Gets the current playback time of the sound channel.";};["isOnline"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Gets whether the sound channel is streamed online.";["fname"]="isOnline";["name"]="bass_methods:isOnline";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Boolean of whether the sound channel is streamed online.";["summary"]="\
 Gets whether the sound channel is streamed online.";};["isValid"]={["class"]="function";["classlib"]="Bass";["description"]="\
@@ -46,13 +46,13 @@ Starts to play the sound.";["fname"]="play";["name"]="bass_methods:play";["param
 Starts to play the sound.";};["setFade"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.";["fname"]="setFade";["name"]="bass_methods:setFade";["param"]={[1]="min";[2]="max";["max"]="The channel's volume stops decreasing when the listener is beyond this distance.";["min"]="The channel's volume is at maximum when the listener is within this distance";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the fade distance of the sound in 3D space.";};["setLooping"]={["class"]="function";["classlib"]="Bass";["description"]="\
-Sets whether the sound channel should loop.";["fname"]="setLooping";["name"]="bass_methods:setLooping";["param"]={[1]="loop";["loop"]="Boolean of whether the sound channel should loop.";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets whether the sound channel should loop. Requires the 'noblock' flag";["fname"]="setLooping";["name"]="bass_methods:setLooping";["param"]={[1]="loop";["loop"]="Boolean of whether the sound channel should loop.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets whether the sound channel should loop.";};["setPitch"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Sets the pitch of the sound channel.";["fname"]="setPitch";["name"]="bass_methods:setPitch";["param"]={[1]="pitch";["pitch"]="Pitch to set to, between 0 and 3.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the pitch of the sound channel.";};["setPos"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.";["fname"]="setPos";["name"]="bass_methods:setPos";["param"]={[1]="pos";["pos"]="Where to position the sound.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the position of the sound in 3D space.";};["setTime"]={["class"]="function";["classlib"]="Bass";["description"]="\
-Sets the current playback time of the sound channel.";["fname"]="setTime";["name"]="bass_methods:setTime";["param"]={[1]="time";["time"]="Sound channel playback time in seconds.";};["private"]=false;["realm"]="cl";["summary"]="\
+Sets the current playback time of the sound channel. Requires the 'noblock' flag";["fname"]="setTime";["name"]="bass_methods:setTime";["param"]={[1]="time";["time"]="Sound channel playback time in seconds.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the current playback time of the sound channel.";};["setVolume"]={["class"]="function";["classlib"]="Bass";["description"]="\
 Sets the volume of the sound channel.";["fname"]="setVolume";["name"]="bass_methods:setVolume";["param"]={[1]="vol";["vol"]="Volume multiplier (1 is normal), between 0x and 10x.";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the volume of the sound channel.";};["stop"]={["class"]="function";["classlib"]="Bass";["description"]="\
@@ -1713,8 +1713,8 @@ Writes an object to a net message automatically typing it";["fname"]="writeType"
 Writes an object to a net message automatically typing it ";};["writeUInt"]={["class"]="function";["client"]=true;["description"]="\
 Writes an unsigned integer to the net message";["fname"]="writeUInt";["library"]="net";["name"]="net_library.writeUInt";["param"]={[1]="t";[2]="n";["n"]="The amount of bits the integer consists of. Should not be greater than 32";["t"]="The integer to be written";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
 Writes an unsigned integer to the net message ";};["writeVector"]={["class"]="function";["client"]=true;["description"]="\
-Writes an vector to the net message";["fname"]="writeVector";["library"]="net";["name"]="net_library.writeVector";["param"]={[1]="t";["t"]="The vector to be written";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
-Writes an vector to the net message ";};};["libtbl"]="net_library";["name"]="net";["summary"]="\
+Writes an vector to the net message. Has significantly lower precision than writeFloat";["fname"]="writeVector";["library"]="net";["name"]="net_library.writeVector";["param"]={[1]="t";["t"]="The vector to be written";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
+Writes an vector to the net message.";};};["libtbl"]="net_library";["name"]="net";["summary"]="\
 Net message library.";["tables"]={};};["particle"]={["class"]="library";["client"]=true;["description"]="\
 Particle library.";["fields"]={};["functions"]={[1]="attach";["attach"]={["class"]="function";["description"]="\
 Attaches a particle to an entity.";["fname"]="attach";["library"]="particle";["name"]="particle_library.attach";["param"]={[1]="entity";[2]="particle";[3]="pattach";[4]="options";["entity"]="Entity to attach to";["options"]="Table of options";["particle"]="Name of the particle";["pattach"]="PATTACH enum";};["private"]=false;["realm"]="cl";["ret"]="Particle type.";["summary"]="\
