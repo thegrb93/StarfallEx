@@ -282,8 +282,8 @@ Checks if an entity is a vehicle.";["fname"]="isVehicle";["name"]="ents_methods:
 Checks if an entity is a vehicle.";};["isWeapon"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Checks if an entity is a weapon.";["fname"]="isWeapon";["name"]="ents_methods:isWeapon";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if weapon, false if not";["server"]=true;["summary"]="\
 Checks if an entity is a weapon.";};["isWeldedTo"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Gets what the entity is welded to";["fname"]="isWeldedTo";["name"]="ents_methods:isWeldedTo";["param"]={};["private"]=false;["realm"]="sv";["ret"]="The first welded entity";["summary"]="\
-Gets what the entity is welded to ";};["linkComponent"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Gets what the entity is welded to. If the entity is parented, returns the parent.";["fname"]="isWeldedTo";["name"]="ents_methods:isWeldedTo";["param"]={};["private"]=false;["realm"]="sv";["ret"]="The first welded/parent entity";["summary"]="\
+Gets what the entity is welded to.";};["linkComponent"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.";["fname"]="linkComponent";["name"]="ents_methods:linkComponent";["param"]={[1]="e";["e"]="Entity to link the component to. nil to clear links.";};["private"]=false;["realm"]="sv";["summary"]="\
 Links starfall components to a starfall processor or vehicle.";};["localToWorld"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Converts a vector in entity local space to world space";["fname"]="localToWorld";["name"]="ents_methods:localToWorld";["param"]={[1]="data";["data"]="Local space vector";};["private"]=false;["realm"]="sh";["ret"]="data as world space vector";["server"]=true;["summary"]="\
