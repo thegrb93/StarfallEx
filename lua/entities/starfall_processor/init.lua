@@ -100,7 +100,7 @@ local function EntityLookup(CreatedEntities)
 		if id == nil then return default end
 		if id == 0 then return game.GetWorld() end
 		local ent = CreatedEntities[id]
-		if IsValid(ent) then return ent else return default end
+		if (ent and ent:IsValid()) then return ent else return default end
 	end
 end
 function ENT:PostEntityPaste (ply, ent, CreatedEntities)
@@ -123,7 +123,7 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
 	local starfalls = {}
 	for k, v in pairs(entList) do
-		if IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
+		if v:IsValid() and v:GetClass() == "starfall_processor" and v.sfdata then
 			starfalls[#starfalls+1] = v
 		end
 	end
@@ -161,7 +161,7 @@ end)
 
 net.Receive("starfall_processor_update_links", function(len, ply)
 	local linked = net.ReadEntity()
-	if IsValid(linked.link) then
+	if (linked.link and linked.link:IsValid()) then
 		linked:LinkEnt(linked.link, ply)
 	end
 end)

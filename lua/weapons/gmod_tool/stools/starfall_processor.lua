@@ -23,7 +23,7 @@ if SERVER then
 		if not pl:CheckLimit("starfall_processor") then return false end
 
 		local sf = ents.Create("starfall_processor")
-		if not IsValid(sf) then return false end
+		if not (sf and sf:IsValid()) then return false end
 
 		sf:SetAngles(Ang)
 		sf:SetPos(Pos)
@@ -123,7 +123,7 @@ function TOOL:LeftClick(trace)
 	end
 
 	if not SF.RequestCode(ply, function(sfdata)
-		if not IsValid(sf) then return end -- Probably removed during transfer
+		if not (sf and sf:IsValid()) then return end -- Probably removed during transfer
 		sf:SetupFiles(sfdata)
 	end) then
 		SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
@@ -163,7 +163,7 @@ function TOOL:RightClick(trace)
 		local ply = self:GetOwner()
 		local ent = trace.Entity
 
-		if IsValid(ent) and ent:GetClass() == "starfall_processor" then
+		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
 			if ent.mainfile then
 				SF.SendStarfall("starfall_openeditorcode", ent, ply)
 			end
@@ -184,7 +184,7 @@ function TOOL:Reload(trace)
 		if CLIENT then return true end
 
 		if not SF.RequestCode(ply, function(sfdata)
-			if not IsValid(sf) then return end -- Probably removed during transfer
+			if not sf:IsValid() then return end -- Probably removed during transfer
 			sf:SetupFiles(sfdata)
 		end, sf.mainfile) then
 			SF.AddNotify(ply, "Cannot upload SF code, please wait for the current upload to finish.", "ERROR", 7, "ERROR1")
@@ -205,7 +205,7 @@ function TOOL:Think()
 	if model=="" then
 		model = self:GetClientInfo("Model")
 	end
-	if (not IsValid(self.GhostEntity) or self.GhostEntity:GetModel() ~= model) then
+	if not (self.GhostEntity and self.GhostEntity:IsValid()) or self.GhostEntity:GetModel() ~= model then
 		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
 	end
 
@@ -213,7 +213,7 @@ function TOOL:Think()
 	if (not trace.Hit) then return end
 	local ent = self.GhostEntity
 
-	if not IsValid(ent) then return end
+	if not (ent and ent:IsValid()) then return end
 	if (trace.Entity and trace.Entity:GetClass() == "starfall_processor" or trace.Entity:IsPlayer()) then
 
 		ent:SetNoDraw(true)
@@ -289,15 +289,16 @@ if CLIENT then
 	local function hookfunc(ply, bind, pressed)
 		if not pressed then return end
 
-		local activeWep = ply:GetActiveWeapon()
-
-		if bind == "impulse 100" and ply:KeyDown(IN_SPEED) and IsValid(activeWep) and activeWep:GetClass() == "gmod_tool" then
-			if activeWep.Mode == "starfall_processor" then
-				spawnmenu.ActivateTool("starfall_component")
-				return true
-			elseif activeWep.Mode == "starfall_component" then
-				spawnmenu.ActivateTool("starfall_processor")
-				return true
+		if bind == "impulse 100" and ply:KeyDown(IN_SPEED) then
+			local activeWep = ply:GetActiveWeapon()
+			if activeWep:IsValid() and activeWep:GetClass() == "gmod_tool" then
+				if activeWep.Mode == "starfall_processor" then
+					spawnmenu.ActivateTool("starfall_component")
+					return true
+				elseif activeWep.Mode == "starfall_component" then
+					spawnmenu.ActivateTool("starfall_processor")
+					return true
+				end
 			end
 		end
 	end

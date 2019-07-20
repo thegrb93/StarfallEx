@@ -805,7 +805,7 @@ if SERVER then
 	util.AddNetworkString("starfall_chatprint")
 
 	function SF.AddNotify (ply, msg, notifyType, duration, sound)
-		if not IsValid(ply) then return end
+		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
 		net.WriteString(msg)

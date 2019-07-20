@@ -21,7 +21,6 @@ local ewrap, eunwrap
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
 local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap, mwrap
-local isValid = IsValid
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable

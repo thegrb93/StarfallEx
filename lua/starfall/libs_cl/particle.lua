@@ -65,7 +65,7 @@ SF.AddHook("deinitialize", function (inst)
 	local p = next(particles)
 	-- Remove all
 	while p do
-		if IsValid(p) then
+		if p:IsValid() then
 			p:StopEmissionAndDestroyImmediately()
 		end
 		particles[p] = nil
@@ -78,7 +78,7 @@ local function badParticle(flags) -- implemented for future use in case anything
 end
 
 local function checkValid(emitter)
-	if not IsValid(emitter) then
+	if not (emitter and emitter:IsValid()) then
 		SF.Throw("Particle emitter is no longer valid.", 2)
 	end
 end
@@ -109,7 +109,7 @@ function particle_library.attach (entity, particle, pattach, options)
 
 	local PEffect = entity:CreateParticleEffect(particle,pattach,options)
 
-	if not IsValid(PEffect) then
+	if not (PEffect and PEffect:IsValid()) then
 		SF.Throw("Invalid particle system.", 2)
 	end
 
@@ -126,7 +126,7 @@ function particle_methods:isValid()
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	return IsValid(uw)
+	return uw and uw:IsValid()
 
 end
 
@@ -160,7 +160,7 @@ function particle_methods:destroy()
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:StopEmissionAndDestroyImmediately()
 	end
 
@@ -185,7 +185,7 @@ function particle_methods:isFinished()
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		return uw:isFinished()
 	end
 

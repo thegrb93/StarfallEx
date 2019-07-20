@@ -207,7 +207,7 @@ end
 function player_methods:getName ()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	if not IsValid(ent) then SF.Throw("Invalid Entity!", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity!", 2) end
 	return ent:GetName()
 end
 
@@ -244,7 +244,7 @@ end
 function player_methods:getVehicle()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	if not IsValid(ent) then return end
+	if not (ent and ent:IsValid()) then return end
 	return SF.Vehicles.Wrap(ent:GetVehicle())
 end
 
@@ -454,7 +454,7 @@ end
 function player_methods:isSprinting()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	return IsValid(ent) and ent:IsSprinting()
+	return (ent and ent:IsValid()) and ent:IsSprinting()
 end
 
 if SERVER then
@@ -471,14 +471,14 @@ if SERVER then
 	-- @param ent Entity to set the player's view entity to, or nothing to reset it
 	function player_methods:setViewEntity (ent)
 		local pl = unwrap(self)
-		if not IsValid(pl) then SF.Throw("Invalid Player", 2) end
+		if not (pl and pl:IsValid()) then SF.Throw("Invalid Player", 2) end
 
 		if ent~=nil then
 			ent = unwrap(ent)
-			if not IsValid(ent) then SF.Throw("Invalid Entity", 2) end
+			if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity", 2) end
 		end
 
-		if IsValid(pl.sfhudenabled) and pl.sfhudenabled.link == SF.instance.data.entity then
+		if (pl.sfhudenabled and pl.sfhudenabled:IsValid()) and pl.sfhudenabled.link == SF.instance.data.entity then
 			pl:SetViewEntity(ent)
 		end
 	end
@@ -489,7 +489,7 @@ if SERVER then
 	function player_methods:hasGodMode()
 		checktype(self, player_metamethods)
 		local ent = unwrap(self)
-		return IsValid(ent) and ent:HasGodMode() or false
+		return (ent and ent:IsValid()) and ent:HasGodMode() or false
 	end
 end
 
@@ -527,7 +527,7 @@ function player_methods:keyDown (key)
 	checkluatype (key, TYPE_NUMBER)
 
 	local ent = unwrap(self)
-	if not IsValid(ent) then return false end
+	if not (ent and ent:IsValid()) then return false end
 
 	return ent:KeyDown(key)
 end

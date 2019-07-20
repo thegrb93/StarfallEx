@@ -174,7 +174,7 @@ properties.Add( "starfall", {
 	Order = 999,
 	MenuIcon = "icon16/wrench.png", -- We should create an icon
 	Filter = function( self, ent, ply )
-		if not IsValid( ent ) then return false end
+		if not (ent and ent:IsValid()) then return false end
 		if not gamemode.Call( "CanProperty", ply, "starfall", ent ) then return false end
 		return ent.Starfall or ent.link and ent.link.Starfall
 	end,
