@@ -15,26 +15,30 @@ end
 
 function ENT:SetCustomModel(model)
 	if self:GetModel() == model then return end
-	local constraints = constraint.GetTable(self)
-	local entities = {}
-	for k, v in pairs(constraints) do
-		for o, p in pairs(v.Entity) do
-			entities[p.Index] = p.Entity
-		end
-	end
-	local movable = self:GetPhysicsObject():IsMoveable()
-	constraint.RemoveAll(self)
-	self:PhysicsDestroy()
-	self:SetModel(model)
-	self:PhysicsInit(SOLID_VPHYSICS)
-	local function remakeConstraints()
+	if self:GetParent():IsValid() then
+		self:SetModel(model)
+	else
+		local constraints = constraint.GetTable(self)
+		local entities = {}
 		for k, v in pairs(constraints) do
-			duplicator.CreateConstraintFromTable(v, entities)
+			for o, p in pairs(v.Entity) do
+				entities[p.Index] = p.Entity
+			end
 		end
-		self:GetPhysicsObject():EnableMotion(movable)
+		local movable = self:GetPhysicsObject():IsMoveable()
+		constraint.RemoveAll(self)
+		self:PhysicsDestroy()
+		self:SetModel(model)
+		self:PhysicsInit(SOLID_VPHYSICS)
+		local function remakeConstraints()
+			for k, v in pairs(constraints) do
+				duplicator.CreateConstraintFromTable(v, entities)
+			end
+			self:GetPhysicsObject():EnableMotion(movable)
+		end
+		self:GetPhysicsObject():EnableMotion(false)
+		timer.Simple(0, remakeConstraints) -- Need timer or wont work
 	end
-	self:GetPhysicsObject():EnableMotion(false)
-	timer.Simple(0, remakeConstraints) -- Need timer or wont work
 end
 
 -- Sends a net message to all clients about the use.
@@ -65,11 +69,8 @@ function ENT:SendCode(recipient)
 		owner = self.owner,
 		mainfile = self.mainfile,
 		files = self.files,
-		-- times = self.times,
-		-- netfiles = self.netfiles
 	}
 	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
-		-- sfdata.times = {}
 		sfdata.files = {}
 		for filename, code in pairs(self.files) do
 			if self.instance.ppdata.serverorclient[filename] == "server" then

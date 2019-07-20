@@ -655,14 +655,19 @@ function ents_methods:enableSphere (enabled)
 	phys:Wake()
 end
 
---- Gets what the entity is welded to
---@return The first welded entity
+--- Gets what the entity is welded to. If the entity is parented, returns the parent.
+--@return The first welded/parent entity
 function ents_methods:isWeldedTo()
 	checktype(self, ents_metatable)
 	local ent = unwrap(self)
 	local constr = constraint.FindConstraint(ent, "Weld")
 	if constr then
 		return owrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
+	else
+		local parent = ent:GetParent()
+		if parent:IsValid() then
+			return owrap(parent)
+		end
 	end
 	return nil
 end
