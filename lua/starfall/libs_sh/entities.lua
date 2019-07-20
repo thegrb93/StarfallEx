@@ -404,6 +404,16 @@ function ents_methods:getColor()
 	return cwrap(this:GetColor())
 end
 
+--- Casts a hologram entity into the hologram type
+-- @shared
+-- @return Hologram type
+function ents_methods:toHologram()
+	checktype(self, ents_metamethods)
+	if not eunwrap(self).IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
+	debug.setmetatable(self, SF.Holograms.Metatable)
+	return self
+end
+
 --- Checks if an entity is valid.
 -- @shared
 -- @return True if valid, false if not

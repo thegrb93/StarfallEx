@@ -46,17 +46,6 @@ SF.AddHook("postload", function()
 			end)
 		end
 	end
-
-	--- Casts a hologram entity into the hologram type
-	-- @name Entity.toHologram
-	-- @class function
-	-- @return Hologram type
-	function SF.Entities.Methods:toHologram()
-		checktype(self, ent_meta)
-		if not eunwrap(self).IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
-		debug.setmetatable(self, hologram_metamethods)
-		return self
-	end
 end)
 
 SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = { default = 2 } } or nil)
