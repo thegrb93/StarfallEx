@@ -544,6 +544,28 @@ end
 local LoadingTextureQueue = {}
 local Panel
 local function NextInTextureQueue()
+	if not Panel then
+		Panel = SF.URLTextureLoader
+		if not Panel then
+			Panel = vgui.Create("DHTML")
+			Panel:SetSize(1024, 1024)
+			Panel:SetAlpha(0)
+			Panel:SetMouseInputEnabled(false)
+			Panel:SetHTML(
+			[[<html style="overflow:hidden"><body><script>
+			var img = new Image();
+			img.style.position="absolute";
+			img.onload = function (){sf.imageLoaded(img.width, img.height);}
+			img.onerror = function (){sf.imageErrored();}
+			document.body.appendChild(img);
+			</script></body></html>]])
+			Panel:Hide()
+			SF.URLTextureLoader = Panel
+			timer.Simple(0.5, NextInTextureQueue)
+			return
+		end
+	end
+
 	local requestTbl = LoadingTextureQueue[1]
 	if requestTbl then
 		if requestTbl.Instance.error then
@@ -602,26 +624,6 @@ local function NextInTextureQueue()
 			timer.Simple(0, NextInTextureQueue)
 		end
 
-		if not Panel then
-			Panel = SF.URLTextureLoader
-			if not Panel then
-				Panel = vgui.Create("DHTML")
-				Panel:SetSize(1024, 1024)
-				Panel:SetAlpha(0)
-				Panel:SetMouseInputEnabled(false)
-				Panel:SetHTML(
-				[[<html style="overflow:hidden"><body><script>
-				var img = new Image();
-				img.style.position="absolute";
-				img.onload = function (){sf.imageLoaded(img.width, img.height);}
-				img.onerror = function (){sf.imageErrored();}
-				document.body.appendChild(img);
-				</script></body></html>]])
-				Panel:Hide()
-				SF.URLTextureLoader = Panel
-			end
-		end
-
 		Panel:AddFunction("sf", "imageLoaded", applyTexture)
 		Panel:AddFunction("sf", "imageErrored", errorTexture)
 		Panel:RunJavascript(
@@ -638,7 +640,8 @@ local function NextInTextureQueue()
 			table.remove(LoadingTextureQueue, 1)
 			NextInTextureQueue()
 		end)
-	elseif Panel then
+
+	else
 		timer.Remove("SF_URLTextureTimeout")
 		Panel:Hide()
 	end
