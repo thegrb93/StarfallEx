@@ -276,9 +276,9 @@ function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 	if bodygroupMask~=nil then checkluatype(bodygroupMask, TYPE_NUMBER) end
 	local ret = util.GetModelMeshes( model, lod, bodygroupMask )
 	if ret then
-		for k, v in pairs(ret) do
+		for k, v in ipairs(ret) do
 			v.verticies = nil
-			for o, p in pairs(v.triangles) do
+			for o, p in ipairs(v.triangles) do
 				p.color = cwrap(p.color)
 				p.normal = vwrap(p.normal)
 				p.tangent = vwrap(p.tangent)
