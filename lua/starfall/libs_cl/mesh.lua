@@ -265,6 +265,31 @@ function mesh_library.createFromObj(obj, thread)
 	return wrap(mesh)
 end
 
+--- Returns a table of visual meshes of given model or nil if the model is invalid
+-- @param model The full path to a model to get the visual meshes of.
+-- @param lod The lod of the model to use.
+-- @param bodygroupMask The bodygroupMask of the model to use.
+-- @return A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
+function mesh_library.getModelMeshes(model, lod, bodygroupMask)
+	checkluatype(model, TYPE_STRING)
+	if lod~=nil then checkluatype(lod, TYPE_NUMBER) end
+	if bodygroupMask~=nil then checkluatype(bodygroupMask, TYPE_NUMBER) end
+	local ret = util.GetModelMeshes( model, lod, bodygroupMask )
+	if ret then
+		for k, v in ipairs(ret) do
+			v.verticies = nil
+			for o, p in ipairs(v.triangles) do
+				if p.color then p.color = cwrap(p.color) end
+				p.normal = vwrap(p.normal)
+				p.tangent = vwrap(p.tangent)
+				if p.binormal then p.binormal = vwrap(p.binormal) end
+				p.pos = vwrap(p.pos)
+			end
+		end
+	end
+	return ret
+end
+
 --- Returns how many triangles can be created
 -- @return Number of triangles that can be created
 function mesh_library.trianglesLeft ()
