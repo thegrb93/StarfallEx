@@ -284,8 +284,8 @@ function mesh_library.createFromObjEx(obj, thread)
 			local points = {}
 			local c = 0
 			for p in f do
-				table.insert(points, p)
 				c = c + 1
+				points[c] = p
 			end
 			for i = 2, c - 1 do
 				local tri = #face
