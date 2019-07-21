@@ -480,6 +480,7 @@ local materialBlacklist = {
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end
+	if #material > 260 then return false end
 	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
 	if materialBlacklist[material] then return false end
 	local mat = Material(material)
