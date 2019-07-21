@@ -1004,7 +1004,7 @@ Ejects the driver of the vehicle";["fname"]="ejectDriver";["name"]="vehicle_meth
 Ejects the driver of the vehicle ";};["getDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
 Returns the driver of the vehicle";["fname"]="getDriver";["name"]="vehicle_methods:getDriver";["param"]={};["private"]=false;["realm"]="sv";["ret"]="Driver of vehicle";["server"]=true;["summary"]="\
 Returns the driver of the vehicle ";};["getPassenger"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
-Returns a passenger of a vehicle";["fname"]="getPassenger";["name"]="vehicle_methods:getPassenger";["param"]={[1]="n";["n"]="The index of the passenger to get";};["private"]=false;["realm"]="sv";["ret"]="amount of ammo";["server"]=true;["summary"]="\
+Returns a passenger of a vehicle";["fname"]="getPassenger";["name"]="vehicle_methods:getPassenger";["param"]={[1]="n";["n"]="The index of the passenger to get";};["private"]=false;["realm"]="sv";["ret"]="The passenger or NULL if empty";["server"]=true;["summary"]="\
 Returns a passenger of a vehicle ";};["killDriver"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
 Kills the driver of the vehicle";["fname"]="killDriver";["name"]="vehicle_methods:killDriver";["param"]={};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Kills the driver of the vehicle ";};["lock"]={["class"]="function";["classlib"]="Vehicle";["description"]="\
