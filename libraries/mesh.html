@@ -224,6 +224,11 @@ Creates a mesh from an obj file.</td>
 Creates a mesh from vertex data.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#mesh.getModelMeshes">getModelMeshes</a>( model, lod, bodygroupMask&nbsp;)</td>
+			<td class="summary">
+Returns a table of visual meshes of given model or nil if the model is invalid </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#mesh.trianglesLeft">trianglesLeft</a>( &nbsp;)</td>
 			<td class="summary">
 Returns how many triangles can be created </td>
@@ -315,6 +320,33 @@ Creates a mesh from vertex data.</p>
 		<h3>Returns</h3>
 		
 		<p>Mesh object</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="mesh.getModelMeshes"></a><strong>mesh.getModelMeshes</strong>( model, lod, bodygroupMask&nbsp;)</dt>
+<dd>
+	<p>
+Returns a table of visual meshes of given model or nil if the model is invalid</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>model</tt> ― The full path to a model to get the visual meshes of.</li>
+			<li><tt>lod</tt> ― The lod of the model to use.</li>
+			<li><tt>bodygroupMask</tt> ― The bodygroupMask of the model to use.</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.</p>
 		
 	</section>
 	
