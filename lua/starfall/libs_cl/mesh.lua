@@ -279,10 +279,10 @@ function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		for k, v in ipairs(ret) do
 			v.verticies = nil
 			for o, p in ipairs(v.triangles) do
-				p.color = cwrap(p.color)
+				if p.color then p.color = cwrap(p.color) end
 				p.normal = vwrap(p.normal)
 				p.tangent = vwrap(p.tangent)
-				p.binormal = vwrap(p.binormal)
+				if p.binormal then p.binormal = vwrap(p.binormal) end
 				p.pos = vwrap(p.pos)
 			end
 		end
