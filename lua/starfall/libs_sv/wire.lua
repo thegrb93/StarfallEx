@@ -9,6 +9,8 @@ local wire_library = SF.RegisterLibrary("wire")
 
 SF.AddHook("initialize", function(instance)
 	local ent = instance.data.entity
+	instance.data.wirecache = {}
+	instance.data.wirecachevals = {}
 	if ent.Inputs == nil then
 		WireLib.CreateInputs(ent, {})
 	end
@@ -51,8 +53,6 @@ do
 	local P = SF.Permissions
 	P.registerPrivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
 	P.registerPrivilege("wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs")
-	P.registerPrivilege("wire.output", "Output", "Allows the user to set the value of an output")
-	P.registerPrivilege("wire.input", "Input", "Allows the user to read the value of an input")
 	P.registerPrivilege("wire.wirelink", "Wirelink", "Allows the user to create a wirelink", { entities = {} })
 	P.registerPrivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink")
 	P.registerPrivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
@@ -280,8 +280,8 @@ function wire_library.adjustInputs (names, types)
 	for i = 1, #names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) ~= "string" then SF.Throw("Non-string input name: " .. newname, 2) end
-		if type(newtype) ~= "string" then SF.Throw("Non-string input type: " .. newtype, 2) end
+		if not isstring(newname) then SF.Throw("Non-string input name: " .. newname, 2) end
+		if not isstring(newtype) then SF.Throw("Non-string input type: " .. newtype, 2) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid input name: " .. newname, 2) end
@@ -308,8 +308,8 @@ function wire_library.adjustOutputs (names, types)
 	for i = 1, #names do
 		local newname = names[i]
 		local newtype = types[i]
-		if type(newname) ~= "string" then SF.Throw("Non-string output name: " .. newname, 2) end
-		if type(newtype) ~= "string" then SF.Throw("Non-string output type: " .. newtype, 2) end
+		if not isstring(newname) then SF.Throw("Non-string output name: " .. newname, 2) end
+		if not isstring(newtype) then SF.Throw("Non-string output type: " .. newtype, 2) end
 		newtype = newtype:upper()
 		newtype = sfTypeToWireTypeTable[newtype] or newtype
 		if not newname:match("^[%u][%a%d_]*$") then SF.Throw("Invalid output name: " .. newname, 2) end
@@ -477,7 +477,7 @@ wirelink_metatable.__index = function(self, k)
 		local wl = wlunwrap(self)
 		if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 
-		if type(k) == "number" then
+		if isnumber(k) then
 			return wl.ReadCell and wl:ReadCell(k) or nil
 		else
 			local output = wl.Outputs and wl.Outputs[k]
@@ -493,7 +493,7 @@ wirelink_metatable.__newindex = function(self, k, v)
 	checktype(self, wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
-	if type(k) == "number" then
+	if isnumber(k) then
 		checkluatype(v, TYPE_NUMBER)
 		if not wl.WriteCell then return
 		else wl:WriteCell(k, v) end
@@ -619,18 +619,19 @@ end
 -- ------------------------- Ports Metatable ------------------------- --
 local wire_ports_methods, wire_ports_metamethods = SF.RegisterType("Ports")
 
-function wire_ports_metamethods:__index (name)
-	checkpermission(SF.instance, nil, "wire.input")
-	checkluatype(name, TYPE_STRING)
-
-	local input = SF.instance.data.entity.Inputs[name]
-	if input and input.Src and input.Src:IsValid() then
-		return inputConverters[input.Type](input.Value)
+function wire_ports_metamethods:__index(name)
+	local data = SF.instance.data
+	local input = data.entity.Inputs[name]
+	if input then
+		if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
+		local ret = inputConverters[input.Type](input.Value)
+		data.wirecache[name] = input.Value
+		data.wirecachevals[name] = ret
+		return ret
 	end
 end
 
-function wire_ports_metamethods:__newindex (name, value)
-	checkpermission(SF.instance, nil, "wire.output")
+function wire_ports_metamethods:__newindex(name, value)
 	checkluatype(name, TYPE_STRING)
 
 	local ent = SF.instance.data.entity

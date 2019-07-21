@@ -10,6 +10,7 @@ local MakeSF
 
 TOOL.ClientConVar["Model"] = "models/spacecode/sfchip.mdl"
 TOOL.ClientConVar["ScriptModel"] = ""
+TOOL.ClientConVar["parent"] = "1"
 cleanup.Register("starfall_processor")
 
 if SERVER then
@@ -48,6 +49,7 @@ else
 	language.Add("Tool.starfall_processor.left", "Spawn a processor / upload code")
 	language.Add("Tool.starfall_processor.right", "Open editor")
 	language.Add("Tool.starfall_processor.reload", "Update code without changing main file")
+	language.Add("Tool.starfall_processor.parent", "Parent instead of Weld" )
 	language.Add("sboxlimit_starfall_processor", "You've hit the Starfall processor limit!")
 	language.Add("undone_Starfall Processor", "Undone Starfall Processor")
 	language.Add("Cleanup_starfall_processor", "Starfall Processors")
@@ -64,9 +66,13 @@ else
 		net.ReadStarfall(nil, function(sfdata)
 			if sfdata then
 				local function openfiles()
+					local mainfile = sfdata.files[sfdata.mainfile]
+					sfdata.files[sfdata.mainfile] = nil
 					for filename, code in pairs(sfdata.files) do
 						SF.Editor.openWithCode(filename, code)
 					end
+					-- Add mainfile last so it gets focus
+					SF.Editor.openWithCode(sfdata.mainfile, mainfile)
 				end
 
 				if SF.Editor.initialized then
@@ -99,14 +105,21 @@ function TOOL:LeftClick(trace)
 
 	local function doWeld()
 		if sf==ent then return end
-		local phys = sf:GetPhysicsObject()
+		local ret
 		if ent:IsValid() then
-			local const = constraint.Weld(sf, ent, 0, trace.PhysicsBone, 0, true, true)
+			if self:GetClientNumber( "parent", 0 ) != 0 then
+				sf:SetParent(ent)
+			else
+				local const = constraint.Weld(sf, ent, 0, trace.PhysicsBone, 0, true, true)
+				ret = const
+			end
+			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableCollisions(false) sf.nocollide = true end
-			return const
 		else
+			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableMotion(false) end
 		end
+		return ret
 	end
 
 	if not SF.RequestCode(ply, function(sfdata)
@@ -151,7 +164,9 @@ function TOOL:RightClick(trace)
 		local ent = trace.Entity
 
 		if IsValid(ent) and ent:GetClass() == "starfall_processor" then
-			SF.SendStarfall("starfall_openeditorcode", ent, ply)
+			if ent.mainfile then
+				SF.SendStarfall("starfall_openeditorcode", ent, ply)
+			end
 		else
 			net.Start("starfall_openeditor") net.Send(ply)
 		end
@@ -227,6 +242,7 @@ if CLIENT then
 
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_processor.name", Description = "#Tool.starfall_processor.desc" })
+		panel:AddControl("CheckBox", { Label = "#Tool.starfall_processor.parent", Command = "starfall_processor_parent" } )
 
 		local gateModels = list.Get("Starfall_gate_Models")
 		table.Merge(gateModels, list.Get("Wire_gate_Models"))

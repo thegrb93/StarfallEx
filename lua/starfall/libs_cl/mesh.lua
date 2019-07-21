@@ -39,9 +39,9 @@ SF.AddHook("postload", function()
 		tangent = function(v) return dgetmeta(v) == vec_meta end,
 		binormal = function(v) return dgetmeta(v) == vec_meta end,
 		pos = function(v) return dgetmeta(v) == vec_meta end,
-		u = function(v) return type(v) == "number" end,
-		v = function(v) return type(v) == "number" end,
-		userdata = function(v) return type(v) == "table" and type(v[1]) == "number" and type(v[2]) == "number" and type(v[3]) == "number" and type(v[4]) == "number" end
+		u = isnumber,
+		v = isnumber,
+		userdata = function(v) return istable(v) and isnumber(v[1]) and isnumber(v[2]) and isnumber(v[3]) and isnumber(v[4]) end
 	}
 	vertexUnwrap = {
 		color = cunwrap,
@@ -58,7 +58,7 @@ end)
 -- Register privileges
 SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
 
-local maxtriangles = CreateClientConVar("sf_mesh_triangles_max", "200000", true, "How many triangles total can be loaded for meshes.")
+local maxtriangles = CreateClientConVar("sf_mesh_triangles_max", "200000", true, false, "How many triangles total can be loaded for meshes.")
 local plyTriangleCount = SF.EntityTable("MeshTriangles")
 local plyTriangleRenderBurstGen = SF.BurstGenObject("mesh_triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
 local plyTriangleRenderBurst = SF.EntityTable("MeshBurst")

@@ -15,26 +15,30 @@ end
 
 function ENT:SetCustomModel(model)
 	if self:GetModel() == model then return end
-	local constraints = constraint.GetTable(self)
-	local entities = {}
-	for k, v in pairs(constraints) do
-		for o, p in pairs(v.Entity) do
-			entities[p.Index] = p.Entity
-		end
-	end
-	local movable = self:GetPhysicsObject():IsMoveable()
-	constraint.RemoveAll(self)
-	self:PhysicsDestroy()
-	self:SetModel(model)
-	self:PhysicsInit(SOLID_VPHYSICS)
-	local function remakeConstraints()
+	if self:GetParent():IsValid() then
+		self:SetModel(model)
+	else
+		local constraints = constraint.GetTable(self)
+		local entities = {}
 		for k, v in pairs(constraints) do
-			duplicator.CreateConstraintFromTable(v, entities)
+			for o, p in pairs(v.Entity) do
+				entities[p.Index] = p.Entity
+			end
 		end
-		self:GetPhysicsObject():EnableMotion(movable)
+		local movable = self:GetPhysicsObject():IsMoveable()
+		constraint.RemoveAll(self)
+		self:PhysicsDestroy()
+		self:SetModel(model)
+		self:PhysicsInit(SOLID_VPHYSICS)
+		local function remakeConstraints()
+			for k, v in pairs(constraints) do
+				duplicator.CreateConstraintFromTable(v, entities)
+			end
+			self:GetPhysicsObject():EnableMotion(movable)
+		end
+		self:GetPhysicsObject():EnableMotion(false)
+		timer.Simple(0, remakeConstraints) -- Need timer or wont work
 	end
-	self:GetPhysicsObject():EnableMotion(false)
-	timer.Simple(0, remakeConstraints) -- Need timer or wont work
 end
 
 -- Sends a net message to all clients about the use.
@@ -51,10 +55,6 @@ function ENT:OnRemove()
 	self:Destroy()
 end
 
-function ENT:GetGateName()
-	return self.name
-end
-
 function ENT:Think ()
 	if self.instance then
 		local bufferAvg = self.instance.cpu_average
@@ -69,11 +69,8 @@ function ENT:SendCode(recipient)
 		owner = self.owner,
 		mainfile = self.mainfile,
 		files = self.files,
-		-- times = self.times,
-		-- netfiles = self.netfiles
 	}
 	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
-		-- sfdata.times = {}
 		sfdata.files = {}
 		for filename, code in pairs(self.files) do
 			if self.instance.ppdata.serverorclient[filename] == "server" then
@@ -117,23 +114,26 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		if info.starfall then
 			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			self:SetupFiles({owner = ply, files = files, mainfile = mainfile})
+			self.sfdata = {owner = ply, files = files, mainfile = mainfile}
 		end
 	end
 end
 
 local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
-	local instances = {}
+	local starfalls = {}
 	for k, v in pairs(entList) do
-		if IsValid(v) and v:GetClass() == "starfall_processor" and v.instance then
-			instances[#instances+1] = v.instance
+		if IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
+			starfalls[#starfalls+1] = v
 		end
 	end
-	if next(instances) then
+	if next(starfalls) then
 		local sanitized = SF.Sanitize(entList)
-		for k, v in pairs(instances) do
-			v:runScriptHook("initialize", true, sanitized)
+		for k, v in pairs(starfalls) do
+			v:SetupFiles(v.sfdata)
+			if v.instance then
+				v.instance:runScriptHook("dupefinished", sanitized)
+			end
 		end
 	end
 end

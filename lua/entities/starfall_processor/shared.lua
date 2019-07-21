@@ -8,7 +8,6 @@ ENT.Purpose         = ""
 ENT.Instructions    = ""
 
 ENT.Spawnable       = false
-ENT.AdminSpawnable  = false
 
 ENT.Starfall        = true
 ENT.States          = {
@@ -58,11 +57,6 @@ function ENT:Compile()
 			end
 		end
 	end
-
-	--TriggerInput can cause self.instance to become nil
-	if self.instance then
-		self.instance:runScriptHook("initialize")
-	end
 end
 
 function ENT:Destroy()
@@ -105,6 +99,10 @@ function ENT:SetupFiles(sfdata)
 			self.SendQueue = nil
 		end
 	end
+end
+
+function ENT:GetGateName()
+	return self.name
 end
 
 function ENT:Error(err)

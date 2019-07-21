@@ -9,7 +9,8 @@ TOOL.Tab			= "Wire"
 
 TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
 TOOL.ClientConVar["ModelHUD"] = "models/bull/dynamicbutton.mdl"
-TOOL.ClientConVar["Type"] = 1
+TOOL.ClientConVar["Type"] = "1"
+TOOL.ClientConVar["parent"] = "1"
 cleanup.Register("starfall_components")
 
 if SERVER then
@@ -43,6 +44,7 @@ if SERVER then
 else
 	language.Add("Tool.starfall_component.name", "Starfall - Component")
 	language.Add("Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)")
+	language.Add("Tool.starfall_component.parent", "Parent instead of Weld" )
 	language.Add("sboxlimit_starfall_components", "You've hit the Starfall Component limit!")
 	language.Add("undone_Starfall Screen", "Undone Starfall Screen")
 	language.Add("undone_Starfall HUD", "Undone Starfall HUD")
@@ -81,11 +83,16 @@ function TOOL:LeftClick(trace)
 		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
 
 		local const
-		local phys = sf:GetPhysicsObject()
 		if trace.Entity:IsValid() then
-			local const = constraint.Weld(sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true)
+			if self:GetClientNumber( "parent", 0 ) != 0 then
+				sf:SetParent(trace.Entity)
+			else
+				const = constraint.Weld(sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true)
+			end
+			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableCollisions(false) sf.nocollide = true end
 		else
+			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableMotion(false) end
 		end
 
@@ -106,17 +113,22 @@ function TOOL:LeftClick(trace)
 		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
 
 		local const
-		local phys = sf:GetPhysicsObject()
 		if trace.Entity:IsValid() then
-			local const = constraint.Weld(sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true)
+			if self:GetClientNumber( "parent", 0 ) != 0 then
+				sf:SetParent(trace.Entity)
+			else
+				const = constraint.Weld(sf, trace.Entity, 0, trace.PhysicsBone, 0, true, true)
+			end
+			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableCollisions(false) sf.nocollide = true end
 		else
+			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableMotion(false) end
 		end
 
 		undo.Create("Starfall HUD")
 			undo.AddEntity(sf)
-			undo.AddEntity(const)
+			if const then undo.AddEntity(const) end
 			undo.SetPlayer(ply)
 		undo.Finish()
 
@@ -222,6 +234,7 @@ end
 if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" })
+		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.parent", Command = "starfall_component_parent" } )
 
 		local modelPanel = vgui.Create("DPanelSelect", panel)
 		modelPanel:EnableVerticalScrollbar()

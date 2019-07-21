@@ -16,8 +16,8 @@ local ents_metatable = SF.Entities.Metatable
 --@name Entity
 local ents_methods = SF.Entities.Methods
 local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
-local vwrap = SF.WrapObject
-local vunwrap = SF.UnwrapObject
+local owrap = SF.WrapObject
+local ounwrap = SF.UnwrapObject
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -42,6 +42,19 @@ do
 	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 end
+
+local vec_meta, ang_meta
+local vwrap, vunwrap, awrap, aunwrap
+
+SF.AddHook("postload", function()
+	vec_meta = SF.Vectors.Metatable
+	ang_meta = SF.Angles.Metatable
+
+	vwrap = SF.Vectors.Wrap
+	vunwrap = SF.Vectors.Unwrap
+	awrap = SF.Angles.Wrap
+	aunwrap = SF.Angles.Unwrap
+end)
 
 -- ------------------------- Internal functions ------------------------- --
 
@@ -71,13 +84,15 @@ function ents_methods:setParent (ent, attachment)
 		else
 			checkpermission(SF.instance, ent, "entities.parent")
 		end
-	end
 
-	this:SetParent(ent)
+		this:SetParent(ent)
 
-	if ent ~= nil and attachment then
-		checkluatype(attachment, TYPE_STRING)
-		this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		if attachment then
+			checkluatype(attachment, TYPE_STRING)
+			this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+		end
+	else
+		this:SetParent()
 	end
 end
 
@@ -170,7 +185,7 @@ end
 -- @param vec The force vector
 function ents_methods:applyForceCenter (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 	local vec = vunwrap(vec)
 	if not check(vec) then SF.Throw("infinite vector", 2) end
 
@@ -189,8 +204,8 @@ end
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset (vec, offset)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
-	checktype(offset, SF.Types["Vector"])
+	checktype(vec, vec_meta)
+	checktype(offset, vec_meta)
 
 	local vec = vunwrap(vec)
 	local offset = vunwrap(offset)
@@ -211,9 +226,9 @@ end
 -- @param ang The force angle
 function ents_methods:applyAngForce (ang)
 	checktype(self, ents_metatable)
-	checktype(ang, SF.Types["Angle"])
+	checktype(ang, ang_meta)
 
-	local ang = SF.UnwrapObject(ang)
+	local ang = aunwrap(ang)
 	local ent = unwrap(self)
 
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -255,7 +270,7 @@ end
 -- @param torque The torque vector
 function ents_methods:applyTorque (torque)
 	checktype(self, ents_metatable)
-	checktype(torque, SF.Types["Vector"])
+	checktype(torque, vec_meta)
 
 	local torque = vunwrap(torque)
 
@@ -323,11 +338,11 @@ function ents_methods:setDrawShadow (draw, ply)
 	end
 end
 
---- Sets the entitiy's position
+--- Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
 -- @param vec New position
 function ents_methods:setPos (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 
 	local vec = vunwrap(vec)
 	local ent = unwrap(self)
@@ -342,9 +357,9 @@ end
 -- @param ang New angles
 function ents_methods:setAngles (ang)
 	checktype(self, ents_metatable)
-	checktype(ang, SF.Types["Angle"])
-	local ang = SF.UnwrapObject(ang)
+	checktype(ang, ang_meta)
 
+	local ang = aunwrap(ang)
 	local ent = unwrap(self)
 
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -357,7 +372,7 @@ end
 -- @param vel New velocity
 function ents_methods:setVelocity (vel)
 	checktype(self, ents_metatable)
-	checktype(vel, SF.Types["Vector"])
+	checktype(vel, vec_meta)
 
 	local vel = vunwrap(vel)
 	local ent = unwrap(self)
@@ -472,6 +487,7 @@ end
 -- @param mass number mass
 function ents_methods:setMass (mass)
 	checktype(self, ents_metatable)
+	checkluatype(mass, TYPE_NUMBER)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -480,14 +496,16 @@ function ents_methods:setMass (mass)
 
 	checkpermission(SF.instance, ent, "entities.setMass")
 
-	phys:SetMass(math.Clamp(mass, 1, 50000))
+	local m = math.Clamp(mass, 1, 50000)
+	phys:SetMass(m)
+	duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
 end
 
 --- Sets the entity's inertia
 -- @param vec Inertia tensor
 function ents_methods:setInertia (vec)
 	checktype(self, ents_metatable)
-	checktype(vec, SF.Types["Vector"])
+	checktype(vec, vec_meta)
 
 	local ent = unwrap(self)
 	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
@@ -637,23 +655,28 @@ function ents_methods:enableSphere (enabled)
 	phys:Wake()
 end
 
---- Gets what the entity is welded to
---@return The first welded entity
+--- Gets what the entity is welded to. If the entity is parented, returns the parent.
+--@return The first welded/parent entity
 function ents_methods:isWeldedTo()
 	checktype(self, ents_metatable)
 	local ent = unwrap(self)
 	local constr = constraint.FindConstraint(ent, "Weld")
 	if constr then
-		return vwrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
+		return owrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
+	else
+		local parent = ent:GetParent()
+		if parent:IsValid() then
+			return owrap(parent)
+		end
 	end
 	return nil
 end
 
 --- Gets a table of all constrained entities to each other
---@param constraintype Optional type name of constraint to filter by
-function ents_methods:getAllConstrained(constraintype)
+--@param filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
+function ents_methods:getAllConstrained(filter)
 	checktype(self, ents_metatable)
-	if constraintype ~= nil then checkluatype(constraintype, TYPE_STRING) end
+	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
 
 	local entity_lookup = {}
 	local entity_table = {}
@@ -662,29 +685,35 @@ function ents_methods:getAllConstrained(constraintype)
 		entity_lookup[ent] = true
 		if ent:IsValid() then
 			entity_table[#entity_table + 1] = wrap(ent)
-			local constraints = constraintype and constraint.FindConstraints(ent, constraintype) or constraint.GetTable(ent)
+			local constraints = constraint.GetTable(ent)
 			for k, v in pairs(constraints) do
-				if v.Ent1 then recursive_find(v.Ent1) end
-				if v.Ent2 then recursive_find(v.Ent2) end
-			end
-			local parent = ent:GetParent()
-			if parent then recursive_find(parent) end
-			for k, child in pairs(ent:GetChildren()) do
-				recursive_find(child)
-			end
-			if istable(ent.Inputs) then
-				for k, v in pairs(ent.Inputs) do
-					if isentity(v.Src) and v.Src:IsValid() then
-						recursive_find(v.Src)
-					end
+				if not filter or filter[v.Type] then
+					if v.Ent1 then recursive_find(v.Ent1) end
+					if v.Ent2 then recursive_find(v.Ent2) end
 				end
 			end
-			if istable(ent.Outputs) then
-				for k, v in pairs(ent.Outputs) do
-					if istable(v.Connected) then
-						for k, v in pairs(v.Connected) do
-							if isentity(v.Entity) and v.Entity:IsValid() then
-								recursive_find(v.Entity)
+			if not filter or filter.Parent then
+				local parent = ent:GetParent()
+				if parent then recursive_find(parent) end
+				for k, child in pairs(ent:GetChildren()) do
+					recursive_find(child)
+				end
+			end
+			if not filter or filter.Wire then
+				if istable(ent.Inputs) then
+					for k, v in pairs(ent.Inputs) do
+						if isentity(v.Src) and v.Src:IsValid() then
+							recursive_find(v.Src)
+						end
+					end
+				end
+				if istable(ent.Outputs) then
+					for k, v in pairs(ent.Outputs) do
+						if istable(v.Connected) then
+							for k, v in pairs(v.Connected) do
+								if isentity(v.Entity) and v.Entity:IsValid() then
+									recursive_find(v.Entity)
+								end
 							end
 						end
 					end
@@ -766,3 +795,24 @@ function ents_methods:setUnbreakable(on)
 	ent:Fire( "SetDamageFilter", on and "FilterDamage" or "", 0 )
 end
 
+--- Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS
+-- @param other Entity or Vector to test
+-- @return bool True/False
+function ents_methods:testPVS(other)
+	checktype(self, ents_metatable)
+
+	local this = unwrap(self)
+	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
+
+	local meta = debug.getmetatable(other)
+	if meta==vec_meta then
+		other = vunwrap(other)
+	elseif meta==ents_metatable then
+		other = unwrap(other)
+		if not other or not other:IsValid() then SF.Throw("Other entity is not valid", 2) end
+	else
+		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
+	end
+
+	return this:TestPVS(other)
+end

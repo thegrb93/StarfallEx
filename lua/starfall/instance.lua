@@ -14,6 +14,7 @@ else
 	SF.cpuOwnerQuota = CreateClientConVar("sf_timebuffer_cl_owner", 0.015, true, false, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateClientConVar("sf_timebuffersize_cl", 100, true, false, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
 end
 
 SF.Instance = {}
@@ -33,9 +34,26 @@ SF.playerInstances = {}
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
 function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
-	if type(code) == "string" then
+	if isstring(code) then
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
+	end
+
+	local quotaRun
+	if SERVER then
+		if SF.softLockProtection:GetBool() then
+			quotaRun = SF.Instance.runWithOps
+		else
+			quotaRun = SF.Instance.runWithoutOps
+		end
+	else
+		if SF.softLockProtection:GetBool() then
+			quotaRun = SF.Instance.runWithOps
+		elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
+			quotaRun = SF.Instance.runWithOps
+		else
+			quotaRun = SF.Instance.runWithoutOps
+		end
 	end
 
 	local instance = setmetatable({}, SF.Instance)
@@ -53,9 +71,9 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.mainfile = mainfile
 	instance.requires = {}
 	instance.requirestack = {string.GetPathFromFilename(mainfile)}
-	instance.cpuQuota = (SERVER or LocalPlayer() ~= instance.player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+	instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
 	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
-	instance.run = SF.softLockProtection:GetBool() and SF.Instance.runWithOps or SF.Instance.runWithoutOps
+	instance.run = quotaRun
 	instance.startram = collectgarbage("count")
 	if CLIENT and instance.cpuQuota <= 0 then
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
@@ -75,8 +93,8 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 			-- Lua doesn't have empty statements, so an empty file gives a syntax error
 			instance.scripts[filename] = function() end
 		else
-			local func = CompileString(source, "SF:"..filename, false)
-			if type(func) == "string" then
+			local func = SF.CompileString(source, "SF:"..filename, false)
+			if isstring(func) then
 				return false, { message = func, traceback = "" }
 			end
 			debug.setfenv(func, instance.env)
@@ -95,6 +113,28 @@ function SF.OnRunningOps(running)
 end
 SF.runningOps = false
 
+local function safeThrow(self, msg, nocatch, force)
+	local source = debug.getinfo(3, "S").short_src
+	if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) or force then
+		if SERVER and nocatch then
+			local consolemsg = "[Starfall] CPU Quota exceeded"
+			if self.player:IsValid() then
+				consolemsg = consolemsg .. " by " .. self.player:Nick() .. " (" .. self.player:SteamID() .. ")"
+			end
+			SF.Print(nil, consolemsg .. "\n")
+			MsgC(Color(255,0,0), consolemsg .. "\n")
+		end
+		SF.Throw(msg, 3, nocatch)
+	end
+end
+
+local function xpcall_callback (err)
+	if debug.getmetatable(err)~=SF.Errormeta then
+		return SF.MakeError(err, 1)
+	end
+	return err
+end
+
 --- Internal function - do not call.
 -- Runs a function while incrementing the instance ops coutner.
 -- This does no setup work and shouldn't be called by client code
@@ -103,30 +143,18 @@ SF.runningOps = false
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithOps(func, ...)
-
-	local function xpcall_callback (err)
-		if debug.getmetatable(err)~=SF.Errormeta then
-			return SF.MakeError(err, 1)
-		end
-		return err
-	end
-
 	local oldSysTime = SysTime() - self.cpu_total
 	local function cpuCheck()
 		self.cpu_total = SysTime() - oldSysTime
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
-
-		local function safeThrow(msg, nocatch)
-			local source = debug.getinfo(3, "S").short_src
-			if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) then
-				SF.Throw(msg, 3, nocatch)
-			end
-		end
-
 		if usedRatio>1 then
-			safeThrow("CPU Quota exceeded.", true)
+			if usedRatio>1.5 then
+				safeThrow(self, "CPU Quota exceeded.", true, true)
+			else
+				safeThrow(self, "CPU Quota exceeded.", true)
+			end
 		elseif usedRatio > self.cpu_softquota then
-			safeThrow("CPU Quota warning.")
+			safeThrow(self, "CPU Quota warning.")
 		end
 	end
 
@@ -162,14 +190,6 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithoutOps(func, ...)
-
-	local function xpcall_callback (err)
-		if debug.getmetatable(err)~=SF.Errormeta then
-			return SF.MakeError(err, 1)
-		end
-		return err
-	end
-
 	return { xpcall(func, xpcall_callback, ...) }
 end
 

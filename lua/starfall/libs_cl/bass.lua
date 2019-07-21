@@ -35,7 +35,7 @@ end
 
 local function deleteSound(ply, sound)
 	if sound:IsValid() then sound:Stop() end
-	plyCount[ply] = plyCount[ply] - 1
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
@@ -130,6 +130,12 @@ function bass_library.loadURL (path, flags, callback)
 	end)
 end
 
+--- Returns the number of sounds left that can be created
+-- @return The number of sounds left
+function bass_library.soundsLeft()
+	return soundsLeft(SF.instance.player)
+end
+
 --------------------------------------------------
 
 --- Removes the sound from the game so new one can be created if limit is reached
@@ -139,7 +145,7 @@ function bass_methods:destroy()
 	if snd and sounds[snd] then
 		deleteSound(SF.instance.player, snd)
 		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(sound_metamethods)
+		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(bass_metamethods)
 		sensitive2sf[snd] = nil
 		sf2sensitive[self] = nil
 		debug.setmetatable(self, nil)
@@ -185,7 +191,7 @@ function bass_methods:pause ()
 end
 
 --- Sets the volume of the sound channel.
--- @param vol Volume to set to, between 0 and 1.
+-- @param vol Volume multiplier (1 is normal), between 0x and 10x.
 function bass_methods:setVolume (vol)
 	checktype(self, bass_metamethods)
 	checkluatype(vol, TYPE_NUMBER)
@@ -194,7 +200,7 @@ function bass_methods:setVolume (vol)
 	checkpermission(SF.instance, nil, "sound.modify")
 
 	if IsValid(uw) then
-		uw:SetVolume(math.Clamp(vol, 0, 1))
+		uw:SetVolume(math.Clamp(vol, 0, 10))
 	end
 end
 
@@ -240,7 +246,7 @@ function bass_methods:setFade (min, max)
 	end
 end
 
---- Sets whether the sound channel should loop.
+--- Sets whether the sound channel should loop. Requires the 'noblock' flag
 -- @param loop Boolean of whether the sound channel should loop.
 function bass_methods:setLooping (loop)
 	checktype(self, bass_metamethods)
@@ -266,7 +272,7 @@ function bass_methods:getLength ()
 	end
 end
 
---- Sets the current playback time of the sound channel.
+--- Sets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @param time Sound channel playback time in seconds.
 function bass_methods:setTime (time)
 	checktype(self, bass_metamethods)
@@ -280,7 +286,7 @@ function bass_methods:setTime (time)
 	end
 end
 
---- Gets the current playback time of the sound channel.
+--- Gets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @return Sound channel playback time in seconds.
 function bass_methods:getTime ()
 	checktype(self, bass_metamethods)
@@ -333,9 +339,14 @@ function bass_methods:isValid()
 	return IsValid(uw)
 end
 
---- Returns the number of sounds left that can be created
--- @return The number of sounds left
-function bass_methods.soundsLeft()
-	return soundsLeft(SF.instance.player)
-end
+--- Gets the left and right levels of the audio channel
+-- @return The left sound level, a value between 0 and 1.
+-- @return The right sound level, a value between 0 and 1.
+function bass_methods:getLevels()
+	checktype(self, bass_metamethods)
+	local uw = unwrap(self)
 
+	if IsValid(uw) then
+		return uw:GetLevel()
+	end
+end

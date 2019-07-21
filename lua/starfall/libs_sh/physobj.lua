@@ -12,8 +12,6 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local vwrap = SF.WrapObject
-
 SF.PhysObjs.Methods = physobj_methods
 SF.PhysObjs.Metatable = physobj_metamethods
 SF.PhysObjs.Wrap = wrap
@@ -22,17 +20,20 @@ SF.PhysObjs.Unwrap = unwrap
 local ewrap, eunwrap
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
 local ang_meta, vec_meta
-local vwrap, vunwrap, awrap, aunwrap
+local vwrap, vunwrap, awrap, aunwrap, mwrap
 local isValid = IsValid
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 
+	ewrap = SF.Entities.Wrap
+	eunwrap = SF.Entities.Unwrap
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap
+	mwrap = SF.VMatrix.Wrap
 end)
 
 local function check (v)
@@ -52,7 +53,7 @@ end
 -- @shared
 -- @return The entity attached to the physics object
 function physobj_methods:getEntity()
-	return SF.WrapObject(unwrap(self):GetEntity())
+	return ewrap(unwrap(self):GetEntity())
 end
 
 --- Gets the position of the physics object
@@ -60,6 +61,13 @@ end
 -- @return Vector position of the physics object
 function physobj_methods:getPos()
 	return vwrap(unwrap(self):GetPos())
+end
+
+--- Returns the world transform matrix of the physobj
+-- @shared
+-- @return The matrix
+function physobj_methods:getMatrix()
+	return mwrap(unwrap(self):GetPositionMatrix())
 end
 
 --- Gets the angles of the physics object
@@ -168,7 +176,7 @@ function physobj_methods:getMeshConvexes ()
 end
 
 if SERVER then
-	--- Sets the position of the physics object
+	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
 	-- @param pos The position vector to set it to
 	function physobj_methods:setPos(pos)
@@ -246,9 +254,13 @@ if SERVER then
 	-- @server
 	-- @param mass The mass to set it to
 	function physobj_methods:setMass(mass)
+		checkluatype(mass, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setMass")
-		phys:SetMass(math.Clamp(mass, 1, 50000))
+		local ent = phys:GetEntity()
+		checkpermission(SF.instance, ent, "entities.setMass")
+		local m = math.Clamp(mass, 1, 50000)
+		phys:SetMass(m)
+		duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
 	end
 
 	--- Sets the inertia of a physics object

@@ -31,7 +31,8 @@ SF.AddHook("deinitialize", function(instance)
 end)
 
 local function propOnDestroy(ent, instance)
-	plyCount[instance.player] = plyCount[instance.player] - 1
+	local ply = instance.player
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
 	instance.data.props.props[ent] = nil
 end
 

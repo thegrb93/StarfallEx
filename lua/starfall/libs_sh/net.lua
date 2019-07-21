@@ -12,7 +12,7 @@ local net_library = SF.RegisterLibrary("net")
 
 local streams = SF.EntityTable("playerStreams")
 local netBurst = SF.EntityTable("NetBurst")
-local netBurstGen = SF.BurstGenObject("net", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000)
+local netBurstGen = SF.BurstGenObject("net", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
 
 local instances = {}
 SF.AddHook("initialize", function(instance)
@@ -50,10 +50,10 @@ function net_library.start(name)
 	if instance.data.net.started then SF.Throw("net message was already started", 2) end
 
 	instance.data.net.started = true
-	instance.data.net.size = 8 -- 8 bytes overhead
+	instance.data.net.size = 8*8 -- 8 byte overhead
 	instance.data.net.data = {}
 
-	write(instance, net.WriteString, #name, name)
+	write(instance, net.WriteString, (#name + 1) * 8, name) -- Include null character
 end
 
 --- Send a net message from client->server, or server->client.
@@ -108,15 +108,15 @@ function net_library.send (target, unreliable)
 end
 
 local netTypeSizes = {
-	[TYPE_NIL]		= function(x) return 1 end,
-	[TYPE_STRING]	= function(x) return 1+#x end,
-	[TYPE_NUMBER]	= function(x) return 1+8 end,
-	[TYPE_BOOL]		= function(x) return 1+1 end,
-	[TYPE_ENTITY]	= function(x) return 1+2 end,
-	[TYPE_VECTOR]	= function(x) return 1+12 end,
-	[TYPE_ANGLE]	= function(x) return 1+12 end,
-	[TYPE_MATRIX]	= function(x) return 1+64 end,
-	[TYPE_COLOR]	= function(x) return 1+4 end,
+	[TYPE_NIL]		= function(x) return 8 end,			-- nil type
+	[TYPE_STRING]	= function(x) return (2+#x)*8 end,	-- string type, string, and null-terminator
+	[TYPE_NUMBER]	= function(x) return (1+8)*8 end,	-- number type, double (8 bytes)
+	[TYPE_BOOL]		= function(x) return 8+1 end,		-- bool type, bool (1 bit)
+	[TYPE_ENTITY]	= function(x) return (1+2)*8 end,	-- ent type, entity (2 bytes)
+	[TYPE_VECTOR]	= function(x) return 8+54 end,		-- vec type (8 bits), vector data (maximum 54 bits when compressed)
+	[TYPE_ANGLE]	= function(x) return 8+54 end,		-- angle type (8 bits), angle data (maximum 54 bits when compressed)
+	[TYPE_MATRIX]	= function(x) return (1+64)*8 end,	-- matr type, matrix data (64 bytes)
+	[TYPE_COLOR]	= function(x) return (1+4)*8 end,	-- color type, color data (4 bytes)
 }
 
 --- Writes an object to a net message automatically typing it
@@ -204,7 +204,7 @@ function net_library.writeString(t)
 
 	checkluatype (t, TYPE_STRING)
 
-	write(instance, net.WriteString, #t, t)
+	write(instance, net.WriteString, (#t+1)*8, t)
 	return true
 end
 
@@ -229,7 +229,7 @@ function net_library.writeData(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 64000)
-	write(instance, net.WriteData, n, t, n)
+	write(instance, net.WriteData, n*8, t, n)
 	return true
 end
 
@@ -252,24 +252,39 @@ function net_library.writeStream(str)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (str, TYPE_STRING)
-	write(instance, net.WriteStream, 8, str)
+	write(instance, net.WriteStream, 8*8, str)
 	return true
 end
 
---- Reads a large string stream from the net message
+--- Reads a large string stream from the net message.
 -- @shared
--- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data.
-
+-- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	local instance = SF.instance
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
-	streams[instance.player] = true
-
-	net.ReadStream((SERVER and instance.player or nil), function(data)
+	
+	streams[instance.player] = net.ReadStream((SERVER and instance.player or nil), function(data)
 		instance:runFunction(cb, data)
-		streams[instance.player] = false
+		streams[instance.player] = nil
 	end)
+end
+
+--- Cancels a currently running readStream
+-- @shared
+function net_library.cancelStream()
+	local instance = SF.instance
+	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
+	streams[instance.player]:Remove()
+end
+
+--- Returns the progress of a running readStream
+-- @shared
+-- @return The progress ratio 0-1
+function net_library.getStreamProgress()
+	local instance = SF.instance
+	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
+	return streams[instance.player]:GetProgress()
 end
 
 --- Writes an integer to the net message
@@ -285,7 +300,7 @@ function net_library.writeInt(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 32)
-	write(instance, net.WriteInt, math.ceil(n / 8), t, n)
+	write(instance, net.WriteInt, n, t, n)
 	return true
 end
 
@@ -312,7 +327,7 @@ function net_library.writeUInt(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 32)
-	write(instance, net.WriteUInt, math.ceil(n / 8), t, n)
+	write(instance, net.WriteUInt, n, t, n)
 	return true
 end
 
@@ -358,7 +373,7 @@ function net_library.writeDouble(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, net.WriteDouble, 8, t)
+	write(instance, net.WriteDouble, 8*8, t)
 	return true
 end
 
@@ -380,7 +395,7 @@ function net_library.writeFloat(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, net.WriteFloat, 4, t)
+	write(instance, net.WriteFloat, 4*8, t)
 	return true
 end
 
@@ -402,7 +417,7 @@ function net_library.writeAngle(t)
 
 	checktype(t, SF.Types["Angle"])
 
-	write(instance, net.WriteAngle, 12, SF.Angles.Unwrap(t))
+	write(instance, net.WriteAngle, 54, SF.Angles.Unwrap(t))
 	return true
 end
 
@@ -414,7 +429,7 @@ function net_library.readAngle()
 	return SF.Angles.Wrap(net.ReadAngle())
 end
 
---- Writes an vector to the net message
+--- Writes an vector to the net message. Has significantly lower precision than writeFloat
 -- @shared
 -- @param t The vector to be written
 
@@ -424,7 +439,7 @@ function net_library.writeVector(t)
 
 	checktype(t, SF.Types["Vector"])
 
-	write(instance, net.WriteVector, 12, SF.Vectors.Unwrap(t))
+	write(instance, net.WriteVector, 54, SF.Vectors.Unwrap(t))
 	return true
 end
 
@@ -446,7 +461,7 @@ function net_library.writeMatrix(t)
 
 	checktype(t, SF.Types["VMatrix"])
 
-	write(instance, net.WriteMatrix, 64, SF.VMatrix.Unwrap(t))
+	write(instance, net.WriteMatrix, 64*8, SF.VMatrix.Unwrap(t))
 	return true
 end
 
@@ -468,7 +483,7 @@ function net_library.writeColor(t)
 
 	checktype(t, SF.Types["Color"])
 
-	write(instance, net.WriteColor, 4, SF.Color.Unwrap(t))
+	write(instance, net.WriteColor, 4*8, SF.Color.Unwrap(t))
 	return true
 end
 
@@ -490,7 +505,7 @@ function net_library.writeEntity(t)
 
 	checktype(t, SF.Types["Entity"])
 
-	write(instance, net.WriteEntity, 2, SF.UnwrapObject(t))
+	write(instance, net.WriteEntity, 2*8, SF.Entities.Unwrap(t))
 	return true
 end
 
@@ -515,20 +530,26 @@ end
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
-	return netBurst[SF.instance.player]:check() - SF.instance.data.net.size
+	return math.floor((netBurst[SF.instance.player]:check() - SF.instance.data.net.size)/8)
+end
+
+--- Returns available bandwidth in bits
+-- @return number of bits that can be sent
+function net_library.getBitsLeft()
+	return math.floor(netBurst[SF.instance.player]:check() - SF.instance.data.net.size) -- Flooring, because the value can be decimal
 end
 
 --- Returns whether or not the library is currently reading data from a stream
 -- @return Boolean
 function net_library.isStreaming()
-	-- Can also be nil
-	return streams[SF.instance.player] == true
+	return streams[SF.instance.player] ~= nil
 end
 
 net.Receive("SF_netmessage", function(len, ply)
 	local ent = net.ReadEntity()
 	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
 		local name = net.ReadString()
+		len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
 		if ply then ply = SF.WrapObject(ply) end
 
 		local recv = ent.instance.data.net.receives[name]
@@ -544,5 +565,5 @@ end)
 -- @name net
 -- @class hook
 -- @param name Name of the arriving net message
--- @param len Length of the arriving net message in bytes
+-- @param len Length of the arriving net message in bits
 -- @param ply On server, the player that sent the message. Nil on client.

@@ -12,9 +12,6 @@ local surface_SetTextPos = surface.SetTextPos
 local surface_SetTextColor = surface.SetTextColor
 local surface_DrawText = surface.DrawText
 local EDITOR = {}
-local function istype(tp)
-	return false
-end
 
 -- keywords[name][nextchar!="("]
 local storageTypes = {
@@ -222,7 +219,10 @@ function EDITOR:SyntaxColorLine(row)
 	local highlightmode = nil
 
 	if self.blockcomment then -- Closing block comments
-		if self:NextPattern(".-%]"..string.rep('=',self.blockcomment).."%]") then
+		-- [0; +inf) for Lua comments, -1 for C comments
+		local blockEnd = (self.blockcomment >= 0) and (".-%]"..string.rep('=',self.blockcomment).."%]") or (".-%*/")
+
+		if self:NextPattern(blockEnd) then
 			self.blockcomment = nil
 		else
 			self:NextPattern(".*")
@@ -553,10 +553,9 @@ function EDITOR:SyntaxColorLine(row)
 				self:NextCharacter()
 			end
 		elseif self:NextPattern("%-%-") then -- Comments
-
+			
 			if self:NextPattern("%[=*%[") then -- Block comment
 				local reps = #self.tokendata:match("%[(=*)%[")
-				self:NextCharacter()
 				while self.character do
 					if self:NextPattern("%]"..string.rep("=",reps).."%]") then
 						tokenname = "comment"
@@ -569,8 +568,6 @@ function EDITOR:SyntaxColorLine(row)
 				if tokenname == "" then -- If no ending ]] was found...
 					self.blockcomment = reps
 					tokenname = "comment"
-				else
-					self:NextCharacter()
 				end
 				--"string"
 			end
@@ -586,7 +583,26 @@ function EDITOR:SyntaxColorLine(row)
 				end
 				self:NextPattern(".*") -- Rest of comment/directive
 			end
-		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.]") then
+		elseif self:NextPattern("//") then -- Comments
+			tokenname = "comment"
+			self:NextPattern(".*") -- Rest of comment/directive
+		elseif self:NextPattern("/%*") then -- C Block Comments
+			while self.character do
+				if self:NextPattern("%*/") then
+					tokenname = "comment"
+					break
+				end
+				if self.character == "\\" then self:NextCharacter() end
+				self:NextCharacter()
+			end
+
+			if tokenname == "" then -- If no ending */ was found...
+				self.blockcomment = -1
+				tokenname = "comment"
+			end
+		elseif self:NextPattern("[%>%<%!%~]%=") then
+			tokenname = "operator"
+		elseif self:NextPattern("[%+%-%/%*%^%%%#%=%.%>%<]") then
 			tokenname = "operator"
 		elseif self:NextPattern("%.%.") then -- .. string concat
 			tokenname = "operator"

@@ -55,9 +55,9 @@ else
 	local function init()
 		if not (mymesh and holo) then return end
 
-		holo:setHologramMesh(mymesh)
-		holo:setHologramMaterial(texture)
-		holo:setHologramRenderBounds(Vector(-200),Vector(200))
+		holo:setMesh(mymesh)
+		holo:setMeshMaterial(texture)
+		holo:setRenderBounds(Vector(-200),Vector(200))
 
 		hook.add("postdrawopaquerenderables","mesh",renderHUD)
 		hook.add("render","mesh",renderScreen)
@@ -65,15 +65,15 @@ else
 
 	-- Used for setting up the hologram
 	hook.add("net","",function(name, len, pl)
-		holo = net.readEntity()
+		holo = net.readEntity():toHologram()
 		init()
 	end)
 	net.start("") net.send()
 
-	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/4bi03xz7ngau2b0/renamon.png?dl=0")
+	texture:setTextureURL("$basetexture", "https://dl.dropboxusercontent.com/s/79nhlngkvydv85f/renamon.png")
 	screentexture:setTexture("$basetexture", texture:getTexture("$basetexture"))
 
-	http.get("https://dl.dropboxusercontent.com/s/q0ntawlmkunub45/renamon.obj?dl=0",function(objdata)
+	http.get("https://dl.dropboxusercontent.com/s/cwob1j0nka0ko2e/renamon.obj",function(objdata)
 		local start = mesh.trianglesLeft()
 		mymesh = mesh.createFromObj(objdata)
 		print("Used "..(start-mesh.trianglesLeft()).." triangles.")

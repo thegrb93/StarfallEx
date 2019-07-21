@@ -62,7 +62,7 @@ function http_library.get (url, callbackSuccess, callbackFail, headers)
 	if headers ~= nil then
 		SF.CheckLuaType(headers, TYPE_TABLE)
 		for k, v in pairs(headers) do
-			if type(k) ~= "string" or type(v) ~= "string" then
+			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
 			end
 		end
@@ -98,7 +98,7 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 
 		if payloadType == TYPE_TABLE then
 			for k, v in pairs(payload) do
-				if type(k) ~= "string" or type(v) ~= "string" then
+				if not isstring(k) or not isstring(v) then
 					SF.Throw("Post parameters can only contain string keys and string values", 2)
 				end
 			end
@@ -115,7 +115,7 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 		SF.CheckLuaType(headers, TYPE_TABLE)
 		
 		for k, v in pairs(headers) do
-			if type(k) ~= "string" or type(v) ~= "string" then
+			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
 			end
 

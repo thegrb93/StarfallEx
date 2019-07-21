@@ -89,7 +89,7 @@ if CLIENT then
 		end
 
 		for lib, tbl in pairs(SF.Types) do
-			if type(tbl.__index) == "table" then
+			if istable(tbl.__index) then
 				for name, val in pairs(tbl.__index) do
 					table.insert(libs, "\\:"..name)
 				end
@@ -146,6 +146,21 @@ if CLIENT then
 			path = path:match("starfall/(.+)") or path
 		end
 		return path
+	end
+
+	function SF.Editor.renameFile(oldFile, newFile)
+		local contents = file.Read(oldFile)
+		file.Delete(oldFile)
+		file.Write(newFile, contents)
+		SF.AddNotify(LocalPlayer(), "File renamed as " .. newFile .. ".", "GENERIC", 7, "DRIP3")
+		for i = 1, SF.Editor.editor:GetNumTabs() do
+			local ed = SF.Editor.editor:GetTabContent(i)
+			local path = ed.chosenfile
+			if path and path == oldFile then
+				ed.chosenfile = newFile
+				ed:OnTextChanged()
+			end
+		end
 	end
 
 	function SF.Editor.getOpenFiles()
@@ -217,7 +232,7 @@ if CLIENT then
 	function SF.Editor.BuildIncludesTable(mainfile)
 		if not SF.Editor.editor then SF.Editor.init() end
 		local openfiles = SF.Editor.getOpenFiles()
-		if not (mainfile and openfiles[mainfile]) then
+		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
 			mainfile = SF.Editor.getOpenFile() or "main"
 			if #mainfile == 0 then return false, "Invalid main file" end
 			openfiles[mainfile] = SF.Editor.getCode()
@@ -269,14 +284,15 @@ if CLIENT then
 				local inc = ppdata.includedirs[codepath]
 
 				for i = 1, #inc do
-					local dir = inc[i]
+					local origdir = inc[i]
+					local dir = origdir
 					local files
 					if string.sub(dir, 1, 1)~="/" then
-						dir = SF.NormalizePath(codedir .. dir)
+						dir = SF.NormalizePath(codedir .. origdir)
 						files = file.Find("starfall/" .. dir .. "/*", "DATA")
 					end
 					if not files or #files==0 then
-						dir = SF.NormalizePath(dir) .. "/"
+						dir = SF.NormalizePath(origdir)
 						files = file.Find("starfall/" .. dir .. "/*", "DATA")
 					end
 					for j = 1, #files do

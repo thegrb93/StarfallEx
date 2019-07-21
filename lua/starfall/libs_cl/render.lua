@@ -1483,17 +1483,22 @@ function render_library.draw3DQuadUV (vert1, vert2, vert3, vert4)
 	if not ok then SF.Throw(err, 2) end
 end
 
---- Gets a 2D cursor position where ply is aiming.
--- @param ply player to get cursor position from(optional)
+--- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
+-- @param ply player to get cursor position from (default: player())
+-- @param screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
 -- @return x position
 -- @return y position
-function render_library.cursorPos(ply)
-	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
-
-	ply = ply and eunwrap(ply) or LocalPlayer()
-
-	if not IsValid(ply) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
+function render_library.cursorPos(ply, screen)
+	if ply~=nil then
+		checktype(ply, ent_meta)
+		ply = eunwrap(ply)
+		if not (ply and ply:IsValid() and ply:IsPlayer()) then SF.Throw("Invalid player", 2) end
+	else
+		ply = LocalPlayer()
+	end
+	
+	if screen~=nil then checktype(screen, ent_meta) screen = eunwrap(screen) else screen = SF.instance.data.render.renderEnt end
+	if not (screen and screen:IsValid() and screen.Transform) then SF.Throw("Invalid screen", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
@@ -1513,9 +1518,9 @@ function render_library.cursorPos(ply)
 	local B = Normal:Dot(Pos-Start) / A
 	if (B >= 0) then
 		local w = 512 / screen.Aspect
-		local HitPos = WorldToLocal(Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles())
-		local x = HitPos.x / screen.Scale
-		local y = HitPos.y / screen.Scale
+		local HitPos = screen.Transform:GetInverseTR() * (Start + Dir * B)
+		local x = HitPos.x / screen.Scale^2
+		local y = HitPos.y / screen.Scale^2
 		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen
 		return x, y
 	end
@@ -1590,12 +1595,12 @@ end
 --- Does a trace and returns the color of the textel the trace hits.
 -- @param vec1 The starting vector
 -- @param vec2 The ending vector
--- @return The color vector. use vector:toColor to convert it to a color.
+-- @return The color
 function render_library.traceSurfaceColor(vec1, vec2)
 	checktype(vec1, vector_meta)
 	checktype(vec2, vector_meta)
 
-	return vwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)))
+	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
@@ -1608,18 +1613,19 @@ end
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
-	if tbl.origin then checktype(tbl.origin, vector_meta) end
-	if tbl.angles then checktype(tbl.angles, ang_meta) end
-	if tbl.aspectratio then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
-	if tbl.x then checkluatype(tbl.x, TYPE_NUMBER) end
-	if tbl.y then checkluatype(tbl.y, TYPE_NUMBER) end
-	if tbl.w then checkluatype(tbl.w, TYPE_NUMBER) end
-	if tbl.h then checkluatype(tbl.h, TYPE_NUMBER) end
-	if tbl.fov then checkluatype(tbl.fov, TYPE_NUMBER) end
-	if tbl.zfar then checkluatype(tbl.zfar, TYPE_NUMBER) end
-	if tbl.znear then checkluatype(tbl.znear, TYPE_NUMBER) end
-	if tbl.drawmonitors then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
-	if tbl.drawviewmodel then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
+	local origin, angles, w, h
+	if tbl.origin~=nil then checktype(tbl.origin, vector_meta) origin = vunwrap(tbl.origin) end
+	if tbl.angles~=nil then checktype(tbl.angles, ang_meta) angles = aunwrap(tbl.angles) end
+	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
+	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
+	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
+	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = math.Clamp(tbl.w, 1, 1024) end
+	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = math.Clamp(tbl.h, 1, 1024) end
+	if tbl.fov~=nil then checkluatype(tbl.fov, TYPE_NUMBER) end
+	if tbl.zfar~=nil then checkluatype(tbl.zfar, TYPE_NUMBER) end
+	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
+	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
+	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
 	
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -1671,13 +1677,13 @@ function render_library.renderView(tbl)
 	cam.Start3D() -- Seems to fix some of the issues with render operations leaking into default RT
 
 	render.RenderView({
-		origin = vunwrap(tbl.origin),
-		angles = aunwrap(tbl.angles),
+		origin = origin,
+		angles = angles,
 		aspectratio = tbl.aspectratio,
 		x = tbl.x,
 		y = tbl.y,
-		w = math.Clamp(tbl.w, 1, 1024),
-		h = math.Clamp(tbl.h, 1, 1024),
+		w = w,
+		h = h,
 		fov = tbl.fov,
 		zfar = tbl.zfar,
 		znear = tbl.znear,

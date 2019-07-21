@@ -419,7 +419,7 @@ function player_methods:getWeapon(wep)
 	return SF.Weapons.Wrap(unwrap(self):GetWeapon(wep))
 end
 
--- Returns the entity that the player is standing on
+--- Returns the entity that the player is standing on
 -- @shared
 -- @return Ground entity
 function player_methods:getGroundEntity()
@@ -427,17 +427,34 @@ function player_methods:getGroundEntity()
 	return owrap(unwrap(self):GetGroundEntity())
 end
 
--- Gets the amount of ammo the player has.
+--- Gets the amount of ammo the player has.
 -- @shared
 -- @param id The string or number id of the ammo
 -- @return The amount of ammo player has in reserve.
 function player_methods:getAmmoCount(id)
 	checktype(self, player_metamethods)
-	local tid = type(id)
-	if tid~="number" and tid~="string" then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
+	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
 
 	local ent = unwrap(self)
 	return ent:GetAmmoCount(id)
+end
+
+--- Returns whether the player is typing in their chat
+-- @shared
+-- @return bool true/false
+function player_methods:isTyping()
+	checktype(self, player_metamethods)
+	local ent = unwrap(self)
+	return ent and ent:IsValid() and ent:IsTyping()
+end
+
+--- Returns whether the player is sprinting
+-- @shared
+-- @return bool true/false
+function player_methods:isSprinting()
+	checktype(self, player_metamethods)
+	local ent = unwrap(self)
+	return IsValid(ent) and ent:IsSprinting()
 end
 
 if SERVER then
@@ -529,6 +546,15 @@ if CLIENT then
 	function player_methods:isMuted()
 		checktype(self, player_metamethods)
 		local ent = unwrap(self)
-		return ent and ent:IsMuted()
+		return ent and ent:IsValid() and ent:IsMuted()
+	end
+	
+	--- Returns whether the player is heard by the local player.
+	-- @client
+	-- @return bool true/false
+	function player_methods:isSpeaking()
+		checktype(self, player_metamethods)
+		local ent = unwrap(self)
+		return ent and ent:IsValid() and ent:IsSpeaking()
 	end
 end

@@ -87,7 +87,7 @@ SF.DefaultEnvironment.pairs = pairs
 -- @return The name of the object's type.
 SF.DefaultEnvironment.type = function(obj)
 	local tp = getmetatable(obj)
-	return type(tp) == "string" and tp or type(obj)
+	return isstring(tp) and tp or type(obj)
 end
 
 --- Returns the next key and value pair in a table.
@@ -238,7 +238,7 @@ if CLIENT then
 		local overrides = {}
 		for I = 1, c do
 			local v = perms[I]
-			if type(v) == "string" then
+			if isstring(v) then
 				if not privileges[v] then
 					SF.Throw("Invalid permission name: "..v)
 				end
@@ -514,25 +514,6 @@ end
 SF.DefaultEnvironment.table = nil
 
 
-
-local bit_methods = SF.RegisterLibrary("bit")
-bit_methods.arshift = bit.arshift
-bit_methods.band = bit.band
-bit_methods.bnot = bit.bnot
-bit_methods.bor = bit.bor
-bit_methods.bswap = bit.bswap
-bit_methods.bxor = bit.bxor
-bit_methods.lshift = bit.lshift
-bit_methods.rol = bit.rol
-bit_methods.ror = bit.ror
-bit_methods.rshift = bit.rshift
-bit_methods.tobit = bit.tobit
-bit_methods.tohex = bit.tohex
---- Bit library. http://wiki.garrysmod.com/page/Category:bit
--- @name SF.DefaultEnvironment.bit
--- @class table
-SF.DefaultEnvironment.bit = nil
-
 -- ------------------------- Functions ------------------------- --
 
 --- Gets a list of all libraries
@@ -620,6 +601,8 @@ local function printTableX (t, indent, alreadyprinted)
 end
 
 if SERVER then
+	local userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
+
 	-- Prints a message to the player's chat.
 	-- @shared
 	-- @param ... Values to print
@@ -644,12 +627,15 @@ if SERVER then
 		SF.instance.player:ConCommand(cmd)
 	end
 
-	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB
+	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
 	-- @server
 	-- @param str String data
 	function SF.DefaultEnvironment.setUserdata(str)
 		checkluatype (str, TYPE_STRING)
-		if #str>1048576 then SF.Throw("The userdata limit is 1MiB", 2) end
+		local max = userdataLimit:GetInt()
+		if #str>max then
+			SF.Throw("The userdata limit is " .. string.Comma(max) .. " bytes", 2)
+		end
 		SF.instance.data.entity.starfalluserdata = str
 	end
 
@@ -781,6 +767,18 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		path = SF.NormalizePath(dir)
 	else
 		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. dir)
+		
+		-- If no scripts found in relative dir, try the root dir.
+		local foundScript = false
+		for file, _ in pairs(SF.instance.scripts) do
+			if string.match(file, "^"..path.."/[^/]+%.txt$") then
+				foundScript = true
+				break
+			end
+		end
+		if not foundScript then
+			path = SF.NormalizePath(dir)
+		end
 	end
 
 	local returns = {}
@@ -859,10 +857,10 @@ end
 -- @return Function of str
 function SF.DefaultEnvironment.loadstring (str, name)
 	name = "SF:" .. (name or tostring(SF.instance.env))
-	local func = CompileString(str, name, false)
+	local func = SF.CompileString(str, name, false)
 
 	-- CompileString returns an error as a string, better check before setfenv
-	if type(func) == "function" then
+	if isfunction(func) then
 		return setfenv(func, SF.instance.env)
 	end
 
@@ -875,7 +873,7 @@ end
 -- @param tbl New environment
 -- @return func with environment set to tbl
 function SF.DefaultEnvironment.setfenv (func, tbl)
-	if type(func) ~= "function" or getfenv(func) == _G then SF.Throw("Main Thread is protected!", 2) end
+	if not isfunction(func) or getfenv(func) == _G then SF.Throw("Main Thread is protected!", 2) end
 	return setfenv(func, tbl)
 end
 
@@ -893,8 +891,7 @@ end
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
 function SF.DefaultEnvironment.debugGetInfo (funcOrStackLevel, fields)
-	local TfuncOrStackLevel = type(funcOrStackLevel)
-	if TfuncOrStackLevel~="function" and TfuncOrStackLevel~="number" then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
+	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields then checkluatype (fields, TYPE_STRING) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
@@ -921,7 +918,7 @@ function SF.DefaultEnvironment.pcall (func, ...)
 
 	if ok then return unpack(vret) end
 
-	if type(err) == "table" then
+	if istable(err) then
 		if err.uncatchable then
 			error(err)
 		end
@@ -929,24 +926,29 @@ function SF.DefaultEnvironment.pcall (func, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	return false, err
+	return false, SF.Sanitize({err})[1]
 end
 
---- Lua's xpcall with SF throw implementation
+local function xpcall_Callback (err)
+	return {err, debug.traceback(tostring(err), 2)} -- only way to return 2 values; level 2 to branch 
+end
+
+--- Lua's xpcall with SF throw implementation, and a traceback for debugging.
 -- Attempts to call the first function. If the execution succeeds, this returns true followed by the returns of the function.
--- If execution fails, this returns false and the second function is called with the error message.
--- @param funcThe function to call initially.
--- @param The function to be called if execution of the first fails; the error message is passed as a string.
--- @param arguments Arguments to pass to the initial function.
+-- If execution fails, this returns false and the second function is called with the error message, and the stack trace.
+-- @param func The function to call initially.
+-- @param callback The function to be called if execution of the first fails; the error message and stack trace are passed.
+-- @param ... Varargs to pass to the initial function.
 -- @return Status of the execution; true for success, false for failure.
--- @return The returns of the first function if execution succeeded, otherwise the first return value of the error callback.
+-- @return The returns of the first function if execution succeeded, otherwise the return values of the error callback.
 function SF.DefaultEnvironment.xpcall (func, callback, ...)
-	local vret = { pcall(func, ...) }
-	local ok, err = vret[1], vret[2]
+	local vret = { xpcall(func, xpcall_Callback, ...) }
+	local ok, errData = vret[1], vret[2]
 
 	if ok then return unpack(vret) end
 
-	if type(err) == "table" then
+	local err, traceback = errData[1], errData[2]
+	if istable(err) then
 		if err.uncatchable then
 			error(err)
 		end
@@ -954,8 +956,7 @@ function SF.DefaultEnvironment.xpcall (func, callback, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	local cret = callback(err)
-	return false, cret
+	return false, callback(SF.Sanitize({err})[1], traceback)
 end
 
 --- Try to execute a function and catch possible exceptions
@@ -966,14 +967,14 @@ function SF.DefaultEnvironment.try (func, catch)
 	local ok, err = pcall(func)
 	if ok then return end
 
-	if type(err) == "table" then
+	if istable(err) then
 		if err.uncatchable then
 			error(err)
 		end
 	elseif uncatchable[err] then
 		SF.Throw(err, 2, true)
 	end
-	if catch then catch(err) end
+	if catch then catch(SF.Sanitize({err})[1]) end
 end
 
 
@@ -1048,4 +1049,190 @@ function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, origi
 	)
 
 	return SF.WrapObject(worldPos), SF.WrapObject(worldAngles)
+end
+
+do
+	local middleclass = {
+		_VERSION     = 'middleclass v4.1.1',
+		_DESCRIPTION = 'Object Orientation for Lua',
+		_URL         = 'https://github.com/kikito/middleclass',
+		_LICENSE     = [[
+		MIT LICENSE
+
+		Copyright (c) 2011 Enrique García Cota
+
+		Permission is hereby granted, free of charge, to any person obtaining a
+		copy of this software and associated documentation files (the
+		"Software"), to deal in the Software without restriction, including
+		without limitation the rights to use, copy, modify, merge, publish,
+		distribute, sublicense, and/or sell copies of the Software, and to
+		permit persons to whom the Software is furnished to do so, subject to
+		the following conditions:
+
+		The above copyright notice and this permission notice shall be included
+		in all copies or substantial portions of the Software.
+
+		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+		OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+		IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+		CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+		SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+		]]
+	}
+
+	local function _createIndexWrapper(aClass, f)
+		if f == nil then
+		return aClass.__instanceDict
+		else
+		return function(self, name)
+			local value = aClass.__instanceDict[name]
+
+			if value ~= nil then
+			return value
+			elseif isfunction(f) then
+			return (f(self, name))
+			else
+			return f[name]
+			end
+		end
+		end
+	end
+
+	local function _propagateInstanceMethod(aClass, name, f)
+		f = name == "__index" and _createIndexWrapper(aClass, f) or f
+		aClass.__instanceDict[name] = f
+
+		for subclass in pairs(aClass.subclasses) do
+		if rawget(subclass.__declaredMethods, name) == nil then
+			_propagateInstanceMethod(subclass, name, f)
+		end
+		end
+	end
+
+	local function _declareInstanceMethod(aClass, name, f)
+		aClass.__declaredMethods[name] = f
+
+		if f == nil and aClass.super then
+		f = aClass.super.__instanceDict[name]
+		end
+
+		_propagateInstanceMethod(aClass, name, f)
+	end
+
+	local function _tostring(self) return "class " .. self.name end
+	local function _call(self, ...) return self:new(...) end
+
+	local function _createClass(name, super)
+		local dict = {}
+		dict.__index = dict
+
+		local aClass = { name = name, super = super, static = {},
+						 __instanceDict = dict, __declaredMethods = {},
+						 subclasses = setmetatable({}, {__mode='k'})  }
+
+		if super then
+		setmetatable(aClass.static, {
+			__index = function(_,k)
+			local result = rawget(dict,k)
+			if result == nil then
+				return super.static[k]
+			end
+			return result
+			end
+		})
+		else
+		setmetatable(aClass.static, { __index = function(_,k) return rawget(dict,k) end })
+		end
+
+		setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
+							 __call = _call, __newindex = _declareInstanceMethod })
+
+		return aClass
+	end
+
+	local function _includeMixin(aClass, mixin)
+		assert(istable(mixin), "mixin must be a table")
+
+		for name,method in pairs(mixin) do
+		if name ~= "included" and name ~= "static" then aClass[name] = method end
+		end
+
+		for name,method in pairs(mixin.static or {}) do
+		aClass.static[name] = method
+		end
+
+		if isfunction(mixin.included) then mixin:included(aClass) end
+		return aClass
+	end
+
+	local DefaultMixin = {
+		__tostring   = function(self) return "instance of " .. tostring(self.class) end,
+
+		initialize   = function(self, ...) end,
+
+		isInstanceOf = function(self, aClass)
+		return istable(aClass)
+			 and istable(self)
+			 and (self.class == aClass
+				or istable(self.class)
+				and isfunction(self.class.isSubclassOf)
+				and self.class:isSubclassOf(aClass))
+		end,
+
+		static = {
+		allocate = function(self)
+			assert(istable(self), "Make sure that you are using 'Class:allocate' instead of 'Class.allocate'")
+			return setmetatable({ class = self }, self.__instanceDict)
+		end,
+
+		new = function(self, ...)
+			assert(istable(self), "Make sure that you are using 'Class:new' instead of 'Class.new'")
+			local instance = self:allocate()
+			instance:initialize(...)
+			return instance
+		end,
+
+		subclass = function(self, name)
+			assert(istable(self), "Make sure that you are using 'Class:subclass' instead of 'Class.subclass'")
+			assert(isstring(name), "You must provide a name(string) for your class")
+
+			local subclass = _createClass(name, self)
+
+			for methodName, f in pairs(self.__instanceDict) do
+			_propagateInstanceMethod(subclass, methodName, f)
+			end
+			subclass.initialize = function(instance, ...) return self.initialize(instance, ...) end
+
+			self.subclasses[subclass] = true
+			self:subclassed(subclass)
+
+			return subclass
+		end,
+
+		subclassed = function(self, other) end,
+
+		isSubclassOf = function(self, other)
+			return istable(other) and
+				istable(self.super) and
+				( self.super == other or self.super:isSubclassOf(other) )
+		end,
+
+		include = function(self, ...)
+			assert(istable(self), "Make sure you that you are using 'Class:include' instead of 'Class.include'")
+			for _,mixin in ipairs({...}) do _includeMixin(self, mixin) end
+			return self
+		end
+		}
+	}
+
+	--- Creates a 'middleclass' class object that can be used similarly to Java/C++ classes. See https://github.com/kikito/middleclass for examples.
+	-- @param name The string name of the class
+	-- @param super The (optional) parent class to inherit from
+	function SF.DefaultEnvironment.class(name, super)
+		checkluatype (name, TYPE_STRING)
+		if super~=nil then checkluatype (super, TYPE_TABLE) end
+		return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
+	end
 end
