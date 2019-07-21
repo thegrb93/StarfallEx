@@ -64,7 +64,7 @@ if SERVER then
 	--- Returns a passenger of a vehicle
 	-- @server
 	-- @param n The index of the passenger to get
-	-- @return amount of ammo
+	-- @return The passenger or NULL if empty
 	function vehicle_methods:getPassenger (n)
 		checktype(self, vehicle_metamethods)
 		checkluatype(n, TYPE_NUMBER)
