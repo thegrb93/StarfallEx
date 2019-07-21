@@ -2,15 +2,35 @@ AddCSLuaFile('cl_init.lua')
 AddCSLuaFile('shared.lua')
 include('shared.lua')
 
-util.AddNetworkString("starfall_hud_set_enabled")
+util.AddNetworkString("starfall_custom_prop")
 
-ENT.MeshData = nil
-
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
-	self:PhysicsInitConvex(self.MeshData.Physics)
+	self:PhysicsInitMultiConvex(self.Mesh)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
+	self:EnableCustomCollisions(true)
+	self:DrawShadow(false)
+
+	local convexes = self:GetPhysicsObject():GetMeshConvexes()
+	local stream = SF.StringStream(data)
+	stream:writeInt32(#convexes)
+	for k, v in ipairs(convexes) do
+		stream:writeInt32(#v)
+		for o, p in ipairs(v) do
+			local pos = p.pos
+			stream:writeFloat(pos.x)
+			stream:writeFloat(pos.y)
+			stream:writeFloat(pos.z)
+		end
+	end
+	self.Mesh = nil
+	self.Data = stream:getString()
+
+	net.Start("starfall_custom_prop")
+	net.WriteUInt(self:EntIndex(), 16)
+	net.WriteStream(self.Data)
+	net.Broadcast()
 end
 
 function ENT:PreEntityCopy()

@@ -3,15 +3,16 @@
 -- @shared
 local props_library = SF.RegisterLibrary("prop")
 
-local vunwrap = SF.UnwrapObject
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 -- Register privileges
 SF.Permissions.registerPrivilege("prop.create", "Create prop", "Allows the user to create props")
+SF.Permissions.registerPrivilege("prop.createCustom", "Create custom prop", "Allows the user to create custom props")
 
 local plyMaxProps = CreateConVar("sf_props_personalquota", "-1", FCVAR_ARCHIVE, "The number of props allowed to spawn via Starfall")
+local plyMaxCustomSize = CreateConVar("sf_props_maxcustomsize", "500", FCVAR_ARCHIVE, "The max hull size of a custom prop")
 local plyCount = SF.EntityTable("playerProps")
 local plyPropBurst = SF.EntityTable("playerPropBurst")
 local plyPropBurstGen = SF.BurstGenObject("props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
@@ -28,6 +29,17 @@ SF.AddHook("deinitialize", function(instance)
 			prop:Remove()
 		end
 	end
+end)
+
+local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
+SF.AddHook("postload", function()
+	vec_meta = SF.Vectors.Metatable
+	ang_meta = SF.Angles.Metatable
+
+	vwrap = SF.Vectors.Wrap
+	vunwrap = SF.Vectors.Unwrap
+	awrap = SF.Angles.Wrap
+	aunwrap = SF.Angles.Unwrap
 end)
 
 local function propOnDestroy(ent, instance)
@@ -50,17 +62,17 @@ end
 --- Creates a prop.
 -- @server
 -- @return The prop object
-function props_library.create (pos, ang, model, frozen)
+function props_library.create(pos, ang, model, frozen)
 
 	checkpermission(SF.instance, nil, "prop.create")
 
-	checktype(pos, SF.Types["Vector"])
-	checktype(ang, SF.Types["Angle"])
+	checktype(pos, vec_meta)
+	checktype(ang, ang_meta)
 	checkluatype(model, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)
-	local ang = SF.Angles.Unwrap(ang)
+	local ang = aunwrap(ang)
 
 	local instance = SF.instance
 
@@ -101,6 +113,66 @@ function props_library.create (pos, ang, model, frozen)
 	return SF.Entities.Wrap(propent)
 end
 
+--- Creates a custom prop.
+-- @server
+-- @return The prop object
+function props_library.createCustom(pos, ang, vertices, frozen)
+
+	checkpermission(SF.instance, nil, "prop.createCustom")
+
+	checktype(pos, vec_meta)
+	checktype(ang, ang_meta)
+	checkluatype(vertices, TYPE_TABLE)
+	frozen = frozen and true or false
+
+	local uwVertices = {}
+	local stream = SF.StringStream(data)
+	local max = plyMaxCustomSize:GetFloat()
+	
+	for k, v in ipairs(vertices) do
+		local t = {}
+		for o, p in ipairs(v) do
+			checktype(p, vec_meta)
+			local vec = vunwrap(p)
+			if math.abs(vec.x)>max or math.abs(vec.y)>max or math.abs(vec.z)>max then SF.Throw("The custom prop cannot exceed a hull size of " .. max, 2) end
+			t[o] = vec
+		end
+		uwVertices[k] = t
+	end
+
+	local pos = vunwrap(pos)
+	local ang = aunwrap(ang)
+
+	local instance = SF.instance
+
+	if not plyPropBurst[instance.player]:use(1) then SF.Throw("Can't spawn props that often", 2) end
+	if maxReached(instance.player) then SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	if not gamemode.Call("PlayerSpawnProp", instance.player, "starfall_prop") then SF.Throw("Another hook prevented the prop from spawning", 2) end
+
+	local propdata = instance.data.props
+	
+	local propent = ents.Create("starfall_prop")
+	propent:SetPos(SF.clampPos(pos))
+	propent:SetAngles(ang)
+	propent.Mesh = uwVertices
+	propent:Spawn()
+	propent:GetPhysicsObject():EnableMotion(not frozen)
+
+	if propdata.undo then
+		undo.Create("Prop")
+			undo.SetPlayer(instance.player)
+			undo.AddEntity(propent)
+		undo.Finish("Starfall Prop")
+	end
+	instance.player:AddCleanup("props", propent)
+
+	gamemode.Call("PlayerSpawnedProp", instance.player, "starfall_prop", propent)
+
+	register(propent, instance)
+
+	return SF.Entities.Wrap(propent)
+end
+
 local allowed_components = {
 	["starfall_screen"] = true,
 	["starfall_hud"] = true,
@@ -115,14 +187,14 @@ local allowed_components = {
 -- @return Component entity
 function props_library.createComponent (pos, ang, class, model, frozen)
 	checkpermission(SF.instance,  nil, "prop.create")
-	checktype(pos, SF.Types["Vector"])
-	checktype(ang, SF.Types["Angle"])
+	checktype(pos, vec_meta)
+	checktype(ang, ang_meta)
 	checkluatype(class, TYPE_STRING)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
 	local pos = vunwrap(pos)
-	local ang = SF.Angles.Unwrap(ang)
+	local ang = aunwrap(ang)
 
 	local instance = SF.instance
 	local propdata = instance.data.props
@@ -178,13 +250,13 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	checkpermission(SF.instance,  nil, "prop.create")
 
-	checktype(pos, SF.Types["Vector"])
-	checktype(ang, SF.Types["Angle"])
+	checktype(pos, vec_meta)
+	checktype(ang, ang_meta)
 	checkluatype(class, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)
-	local ang = SF.Angles.Unwrap(ang)
+	local ang = aunwrap(ang)
 
 	local instance = SF.instance
 	if not plyPropBurst[instance.player]:use(1) then return SF.Throw("Can't spawn props that often", 2)

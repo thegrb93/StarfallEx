@@ -43,6 +43,8 @@ function bit_library.stringstream(stream, i, endian)
 	return ret
 end
 
+SF.StringStream = bit_library.stringstream
+
 local function checkErr(n)
 	if n==math.huge or n==-math.huge or n~=n then
 		SF.Throw("Can't convert error float to integer!", 4)
