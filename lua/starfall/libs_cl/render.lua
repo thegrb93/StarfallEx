@@ -1613,7 +1613,7 @@ end
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
-	local origin, angles, w, h
+	local origin, angles, w, h, ortho, offcenter
 	if tbl.origin~=nil then checktype(tbl.origin, vector_meta) origin = vunwrap(tbl.origin) end
 	if tbl.angles~=nil then checktype(tbl.angles, ang_meta) angles = aunwrap(tbl.angles) end
 	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
