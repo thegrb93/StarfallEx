@@ -1626,6 +1626,30 @@ function render_library.renderView(tbl)
 	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
 	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
 	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
+	if tbl.ortho~=nil then 
+		checkluatype(tbl.ortho, TYPE_BOOL) 
+		checkluatype(tbl.ortholeft, TYPE_NUMBER)
+		checkluatype(tbl.orthoright, TYPE_NUMBER)
+		checkluatype(tbl.orthotop, TYPE_NUMBER)
+		checkluatype(tbl.orthobottom, TYPE_NUMBER)
+	end	
+	if tbl.dopostprocess~=nil then checkluatype(tbl.dopostprocess, TYPE_BOOL) end
+	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, TYPE_BOOL) end
+	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, TYPE_NUMBER) end
+	if tbl.zfarviewmodel~=nil then checkluatype(tbl.zfarviewmodel, TYPE_NUMBER) end
+	if tbl.offcenter~=nil then 
+		checkluatype(tbl.offcenter, TYPE_TABLE)
+		checkluatype(tbl.offcenter.left, TYPE_NUMBER)
+		checkluatype(tbl.offcenter.right, TYPE_NUMBER)
+		checkluatype(tbl.offcenter.top, TYPE_NUMBER)
+		checkluatype(tbl.offcenter.bottom, TYPE_NUMBER)
+		offcenter = { 
+			left = tbl.offcenter.left,
+			right = tbl.offcenter.right,
+			top = tbl.offcenter.top,
+			bottom = tbl.offcenter.bottom,
+		}
+	end
 	
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -1690,6 +1714,16 @@ function render_library.renderView(tbl)
 		drawhud = false,
 		drawmonitors = tbl.drawmonitors,
 		drawviewmodel = tbl.drawviewmodel,
+		ortho = tbl.ortho,
+		ortholeft = tbl.ortholeft,
+		orthoright = tbl.orthoright,
+		orthotop = tbl.orthotop,
+		orthobottom = tbl.orthobottom,
+		dopostprocess = tbl.dopostprocess,
+		bloomtone = tbl.bloomtone,
+		znearviewmodel = tbl.znearviewmodel,
+		zfarviewmodel = tbl.zfarviewmodel,
+		offcenter = offcenter,
 	})
 	
 	cam.End3D()
