@@ -1627,12 +1627,18 @@ function render_library.renderView(tbl)
 	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
 	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
 	if tbl.ortho~=nil then 
-		checkluatype(tbl.ortho, TYPE_BOOL) 
-		checkluatype(tbl.ortholeft, TYPE_NUMBER)
-		checkluatype(tbl.orthoright, TYPE_NUMBER)
-		checkluatype(tbl.orthotop, TYPE_NUMBER)
-		checkluatype(tbl.orthobottom, TYPE_NUMBER)
-	end	
+		checkluatype(tbl.ortho, TYPE_TABLE)
+		checkluatype(tbl.ortho.left, TYPE_NUMBER)
+		checkluatype(tbl.ortho.right, TYPE_NUMBER)
+		checkluatype(tbl.ortho.top, TYPE_NUMBER)
+		checkluatype(tbl.ortho.bottom, TYPE_NUMBER)
+		ortho = { 
+			left = tbl.ortho.left,
+			right = tbl.ortho.right,
+			top = tbl.ortho.top,
+			bottom = tbl.ortho.bottom,
+		}
+	end
 	if tbl.dopostprocess~=nil then checkluatype(tbl.dopostprocess, TYPE_BOOL) end
 	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, TYPE_BOOL) end
 	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, TYPE_NUMBER) end
@@ -1714,7 +1720,7 @@ function render_library.renderView(tbl)
 		drawhud = false,
 		drawmonitors = tbl.drawmonitors,
 		drawviewmodel = tbl.drawviewmodel,
-		ortho = tbl.ortho,
+		ortho = ortho,
 		ortholeft = tbl.ortholeft,
 		orthoright = tbl.orthoright,
 		orthotop = tbl.orthotop,
