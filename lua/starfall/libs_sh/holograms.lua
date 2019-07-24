@@ -250,16 +250,14 @@ if SERVER then
 		frame = frame or 0
 		rate = rate or 1
 
-		if not holo.Animated then
-			-- This must be run once on entities that will be animated
+		if animation==0 then
+			holo.Animated = false
+			holo.AutomaticFrameAdvance = false
+		else
 			holo.Animated = true
 			holo.AutomaticFrameAdvance = true
-
-			function holo:Think()
-				self:NextThink(CurTime())
-				return true
-			end
 		end
+
 		holo:ResetSequence(animation)
 		holo:SetCycle(frame)
 		holo:SetPlaybackRate(rate)

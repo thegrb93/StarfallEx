@@ -55,6 +55,10 @@ function ENT:Think()
 		end
 		net.Broadcast()
 	end
+	if self.Animated then
+		self:NextThink(CurTime())
+		return true
+	end
 end
 
 net.Receive("starfall_hologram", function(len, ply)
