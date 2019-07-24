@@ -557,4 +557,13 @@ if CLIENT then
 		local ent = unwrap(self)
 		return ent and ent:IsValid() and ent:IsSpeaking()
 	end
+
+	--- Returns the voice volume of the player
+	-- @client
+	-- @return Returns the players voice volume, how loud the player's voice communication currently is, as a normal number. Doesn't work on local player unless the voice_loopback convar is set to 1.
+	function player_methods:voiceVolume()
+		checktype(self, player_metamethods)
+		local ent = unwrap(self)
+		return ent and ent:IsValid() and ent:VoiceVolume()
+	end
 end
