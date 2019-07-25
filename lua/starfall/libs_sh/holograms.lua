@@ -250,13 +250,7 @@ if SERVER then
 		frame = frame or 0
 		rate = rate or 1
 
-		if animation==0 then
-			holo.Animated = false
-			holo.AutomaticFrameAdvance = false
-		else
-			holo.Animated = true
-			holo.AutomaticFrameAdvance = true
-		end
+		holo.AutomaticFrameAdvance = animation~=0
 
 		holo:ResetSequence(animation)
 		holo:SetCycle(frame)
