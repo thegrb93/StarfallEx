@@ -100,19 +100,6 @@ simple [[gist.githubusercontent.com]]
 simple [[u.teknik.io]]
 simple [[p.teknik.io]]
 
--- pomf
--- note: there are a lot of forks of pomf so there are tons of sites. I only listed the mainly used ones. --Flex
---- Examples:
----  https://my.mixtape.moe/gxiznr.png
----  http://a.1339.cf/fppyhby.txt
----  http://b.1339.cf/fppyhby.txt
----  http://a.pomf.cat/jefjtb.txt
-
-simple [[my.mixtape.moe]]
-simple [[a.1339.cf]]
-simple [[b.1339.cf]]
-simple [[a.pomf.cat]]
-
 -- TinyPic
 --- Examples:
 ---  http://i68.tinypic.com/24b3was.gif
@@ -180,3 +167,15 @@ simple [[i.redd.it]]
 --- you don't even wanna know
 
 simple [[static1.e621.net]]
+
+-- ipfs
+--- Examples:
+--- https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/I/m/Ellis_Sigil.jpg
+
+simple [[ipfs.io]]
+
+-- neocities
+--- Examples:
+--- https://fauux.neocities.org/LainDressSlow.gif
+
+pattern [[([%w-_]+)%.neocities%.org/(.+)]]
