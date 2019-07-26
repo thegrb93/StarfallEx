@@ -178,4 +178,4 @@ simple [[ipfs.io]]
 --- Examples:
 --- https://fauux.neocities.org/LainDressSlow.gif
 
-pattern pattern [[([%w-_]+)%.neocities%.org/(.+)]]
+pattern [[([%w-_]+)%.neocities%.org/(.+)]]
