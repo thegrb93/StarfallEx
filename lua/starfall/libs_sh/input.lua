@@ -110,6 +110,15 @@ function input_methods.getCursorPos()
 	return input.GetCursorPos()
 end
 
+--- Gets whether the cursor is visible on the screen
+-- @client
+-- @return The cursor's visibility
+function input_methods.getCursorVisible()
+	SF.Permissions.check(SF.instance, nil, "input")
+
+	return vgui.CursorVisible()
+end
+
 ---Translates position on player's screen to aim vector
 -- @client
 -- @param x X coordinate on the screen

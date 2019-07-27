@@ -149,7 +149,7 @@ function vec_methods:getAngle ()
 	return SF.WrapObject(unwrap(self):Angle())
 end
 
---- Returns the Angle between two vectors.
+--- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx (v)
@@ -373,10 +373,18 @@ function vec_methods:rotateAroundAxis(axis, degrees, radians)
 			(z * x * (1-ca) - y * sa) * x2 + (z * y * (1-ca) + x * sa) * y2 + (ca + (z^2) * (1-ca)) * z2 })
 end
 
+--- Copies x,y,z from a vector and returns a new vector
+-- @return The copy of the vector
+function vec_methods:clone()
+	SF.CheckType(v, vec_metamethods)
+
+	return wrap({ self[1], self[2], self[3] })
+end
+
 --- Copies the values from the second vector to the first vector. Self-Modifies.
 -- @param v Second Vector
 -- @return nil
-function vec_methods:set (v)
+function vec_methods:set(v)
 	SF.CheckType(v, vec_metamethods)
 
 	self[1] = v[1]
@@ -409,9 +417,18 @@ function vec_methods:withinAABox (v1, v2)
 	SF.CheckType(v1, vec_metamethods)
 	SF.CheckType(v2, vec_metamethods)
 
-	if self[1] < v1[1] or self[1] > v2[1] then return false end
-	if self[2] < v1[2] or self[2] > v2[2] then return false end
-	if self[3] < v1[3] or self[3] > v2[3] then return false end
+	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
+	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
+	if self[3] < math.min(v1[3], v2[3]) or self[3] > math.max(v1[3], v2[3]) then return false end
 
 	return true
+end
+
+if SERVER then
+	--- Returns whether the vector is in world
+	-- @server
+	-- @return bool True/False.
+	function vec_methods:isInWorld ()
+		return util.IsInWorld(unwrap(self))
+	end
 end

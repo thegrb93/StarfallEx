@@ -10,30 +10,35 @@ function ENT:Initialize ()
 
 	self:SetNWInt("State", self.States.None)
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
+	self.ErroredPlayers = {}
 end
 
 function ENT:SetCustomModel(model)
 	if self:GetModel() == model then return end
-	local constraints = constraint.GetTable(self)
-	local entities = {}
-	for k, v in pairs(constraints) do
-		for o, p in pairs(v.Entity) do
-			entities[p.Index] = p.Entity
-		end
-	end
-	local movable = self:GetPhysicsObject():IsMoveable()
-	constraint.RemoveAll(self)
-	self:PhysicsDestroy()
-	self:SetModel(model)
-	self:PhysicsInit(SOLID_VPHYSICS)
-	local function remakeConstraints()
+	if self:GetParent():IsValid() then
+		self:SetModel(model)
+	else
+		local constraints = constraint.GetTable(self)
+		local entities = {}
 		for k, v in pairs(constraints) do
-			duplicator.CreateConstraintFromTable(v, entities)
+			for o, p in pairs(v.Entity) do
+				entities[p.Index] = p.Entity
+			end
 		end
-		self:GetPhysicsObject():EnableMotion(movable)
+		local movable = self:GetPhysicsObject():IsMoveable()
+		constraint.RemoveAll(self)
+		self:PhysicsDestroy()
+		self:SetModel(model)
+		self:PhysicsInit(SOLID_VPHYSICS)
+		local function remakeConstraints()
+			for k, v in pairs(constraints) do
+				duplicator.CreateConstraintFromTable(v, entities)
+			end
+			self:GetPhysicsObject():EnableMotion(movable)
+		end
+		self:GetPhysicsObject():EnableMotion(false)
+		timer.Simple(0, remakeConstraints) -- Need timer or wont work
 	end
-	self:GetPhysicsObject():EnableMotion(false)
-	timer.Simple(0, remakeConstraints) -- Need timer or wont work
 end
 
 -- Sends a net message to all clients about the use.
@@ -46,19 +51,8 @@ function ENT:Use(activator)
 	end
 end
 
-function ENT:OnRemove ()
-	if not self.instance then return end
-
-	self.instance:runScriptHook("removed")
-	--removed hook can cause instance to become nil
-	if self.instance then
-		self.instance:deinitialize()
-		self.instance = nil
-	end
-end
-
-function ENT:GetGateName()
-	return self.name
+function ENT:OnRemove()
+	self:Destroy()
 end
 
 function ENT:Think ()
@@ -75,11 +69,8 @@ function ENT:SendCode(recipient)
 		owner = self.owner,
 		mainfile = self.mainfile,
 		files = self.files,
-		-- times = self.times,
-		-- netfiles = self.netfiles
 	}
 	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
-		-- sfdata.times = {}
 		sfdata.files = {}
 		for filename, code in pairs(self.files) do
 			if self.instance.ppdata.serverorclient[filename] == "server" then
@@ -99,7 +90,7 @@ function ENT:PreEntityCopy()
 	if self.instance then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode(self.files, self.mainfile)
-		info.starfalluserdata = self.instance.data.userdata
+		info.starfalluserdata = self.starfalluserdata
 		duplicator.StoreEntityModifier(self, "SFDupeInfo", info)
 	end
 end
@@ -108,8 +99,8 @@ local function EntityLookup(CreatedEntities)
 	return function(id, default)
 		if id == nil then return default end
 		if id == 0 then return game.GetWorld() end
-		local ent = CreatedEntities[id] or (isnumber(id) and ents.GetByIndex(id))
-		if IsValid(ent) then return ent else return default end
+		local ent = CreatedEntities[id]
+		if (ent and ent:IsValid()) then return ent else return default end
 	end
 end
 function ENT:PostEntityPaste (ply, ent, CreatedEntities)
@@ -123,21 +114,33 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		if info.starfall then
 			local files, mainfile = SF.DeserializeCode(info.starfall)
 			self.starfalluserdata = info.starfalluserdata
-			self:SetupFiles({owner = ply, files = files, mainfile = mainfile})
+			self.sfdata = {owner = ply, files = files, mainfile = mainfile}
 		end
 	end
 end
 
 local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
-	for k, v in pairs(TimedPasteData[TimedPasteDataCurrent].CreatedEntities) do
-		if IsValid(v) and v:GetClass() == "starfall_processor" and v.instance then
-			v.instance:runScriptHook("initialize", true)
+	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
+	local starfalls = {}
+	for k, v in pairs(entList) do
+		if v:IsValid() and v:GetClass() == "starfall_processor" and v.sfdata then
+			starfalls[#starfalls+1] = v
+		end
+	end
+	if next(starfalls) then
+		local sanitized = SF.Sanitize(entList)
+		for k, v in pairs(starfalls) do
+			v:SetupFiles(v.sfdata)
+			if v.instance then
+				v.instance:runScriptHook("dupefinished", sanitized)
+			end
 		end
 	end
 end
 hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
 
 util.AddNetworkString("starfall_processor_download")
+util.AddNetworkString("starfall_processor_destroy")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_processor_update_links")
@@ -158,7 +161,7 @@ end)
 
 net.Receive("starfall_processor_update_links", function(len, ply)
 	local linked = net.ReadEntity()
-	if IsValid(linked.link) then
+	if (linked.link and linked.link:IsValid()) then
 		linked:LinkEnt(linked.link, ply)
 	end
 end)

@@ -4,28 +4,30 @@ https://github.com/wiremod/wire
 File in use: https://github.com/wiremod/wire/blob/master/lua/wire/client/text_editor/sf_editor.lua
 ]]
 
---Part of WireLib
-local function Derma_StringRequestNoBlur(...)
-	local f = math.max
+if not Derma_StringRequestNoBlur then
+	--Part of WireLib
+	function Derma_StringRequestNoBlur(...)
+		local f = math.max
 
-	function math.max(...)
-		local ret = f(...)
+		function math.max(...)
+			local ret = f(...)
 
-		for i = 1,20 do
-			local name, value = debug.getlocal(2, i)
-			if name == "Window" then
-				value:SetBackgroundBlur( false )
-				break
+			for i = 1,20 do
+				local name, value = debug.getlocal(2, i)
+				if name == "Window" then
+					value:SetBackgroundBlur( false )
+					break
+				end
 			end
-		end
 
+			return ret
+		end
+		local ok, ret = xpcall(Derma_StringRequest, debug.traceback, ...)
+		math.max = f
+
+		if not ok then error(ret, 0) end
 		return ret
 	end
-	local ok, ret = xpcall(Derma_StringRequest, debug.traceback, ...)
-	math.max = f
-
-	if not ok then error(ret, 0) end
-	return ret
 end
 
 local function Derma_QueryNoBlur(...)
@@ -555,25 +557,35 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 				menu:AddOption("Save", function()
 						self:FixTabFadeTime()
 						local old = self:GetLastTab()
+						local active = self:GetActiveTab()
 						self:SetActiveTab(pnl)
-						self:SaveFile(self:GetChosenFile(), true)
-						self:SetActiveTab(self:GetLastTab())
+						self:SaveFile(self:GetChosenFile(), false, false, function(strTextOut)
+							self:SetActiveTab(pnl)
+							self:SaveFile(strTextOut, false, false)
+							self:SetActiveTab(active)
+							self:SetLastTab(old)
+						end)
+						self:SetActiveTab(active)
 						self:SetLastTab(old)
 					end)
 				menu:AddOption("Save As", function()
 						self:FixTabFadeTime()
 						local old = self:GetLastTab()
-						self:SetActiveTab(pnl)
-						self:SaveFile(self:GetChosenFile(), false, true)
-						self:SetActiveTab(self:GetLastTab())
-						self:SetLastTab(old)
+						local active = self:GetActiveTab()
+						self:SaveFile(self:GetChosenFile(), false, true, function(strTextOut)
+							self:SetActiveTab(pnl)
+							self:SaveFile(strTextOut, false, false)
+							self:SetActiveTab(active)
+							self:SetLastTab(old)
+						end)
 					end)
 				menu:AddOption("Reload", function()
 						self:FixTabFadeTime()
 						local old = self:GetLastTab()
+						local active = self:GetActiveTab()
 						self:SetActiveTab(pnl)
 						self:LoadFile(content.chosenfile, false)
-						self:SetActiveTab(self:GetLastTab())
+						self:SetActiveTab(active)
 						self:SetLastTab(old)
 					end)
 				menu:AddSpacer()
@@ -1030,20 +1042,6 @@ function Editor:GetSettings()
 		self:GetParent():SetWorldClicker(bVal)
 	end
 
-	local ShowExamples = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(ShowExamples)
-	ShowExamples:SetConVar("sf_editor_showexamples")
-	ShowExamples:SetText("Show examples in file tree")
-	ShowExamples:SizeToContents()
-	ShowExamples:SetTooltip("Shows examples loaded from github in file tree.")
-
-	local ShowExamples = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(ShowExamples)
-	ShowExamples:SetConVar("sf_editor_showdatafiles")
-	ShowExamples:SetText("Show files from sf_filedata in file tree (UNSTABLE)")
-	ShowExamples:SizeToContents()
-	ShowExamples:SetTooltip("Show files from sf_filedata in file tree (UNSTABLE)")
-
 	local LegacyHelper = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(LegacyHelper)
 	LegacyHelper:SetConVar("sf_helper_legacy")
@@ -1291,14 +1289,15 @@ function Editor:SaveTabs()
 	local activeTab = self:GetActiveTabIndex()
 	tabs.selectedTab = activeTab
 	for i = 1, self:GetNumTabs() do
-		if not self:GetTabContent(i):GetTabHandler().IsEditor then
+		local tabContent = SF.Editor.editor.C.TabHolder.tabScroller.Panels[i]:GetPanel()
+		if not tabContent:GetTabHandler().IsEditor then
 			if tabs.selectedTab == i then
 				tabs.selectedTab = 1
 			end
 			continue
 		end
 		tabs[i] = {}
-		local filename = self:GetTabContent(i).chosenfile
+		local filename = tabContent.chosenfile
 		local filedatapath = "sf_filedata/"
 		if filename then
 			if filename:sub(1, #filedatapath) == filedatapath then -- Temporary fix before we update sf_tabs.txt format
@@ -1308,7 +1307,7 @@ function Editor:SaveTabs()
 			end
 		end
 		tabs[i].filename = filename
-		tabs[i].code = self:GetTabContent(i):GetCode()
+		tabs[i].code = tabContent:GetCode()
 	end
 
 	file.Write("sf_tabs.txt", util.TableToJSON(tabs))
@@ -1353,14 +1352,15 @@ function Editor:Validate(gotoerror)
 
 	local code = self:GetCode()
 	if #code < 1 then return true end -- We wont validate empty scripts
-	local err = CompileString(code , "Validation", false)
-	local success = type(err) ~= "string"
+	local err = SF.CompileString(code , "Validation", false)
+	local success = not isstring(err)
 	local row, message
 	if success then
 		self:SetValidatorStatus("Validation successful!", 0, 110, 20, 255)
 	else
 		row = tonumber(err:match("%d+")) or 0
-		message = err:match(": .+$"):sub(3) or "Unknown"
+		message = err:match(": .+$")
+		message = message and message:sub(3) or "Unknown"
 		message = "Line "..row..":"..message
 		self.C.Val:SetBGColor(110, 0, 20, 255)
 		self.C.Val:SetText(" " .. message)
@@ -1473,6 +1473,12 @@ function Editor:GetTabContent(n)
 	end
 end
 
+function Editor:GetTab(n)
+	if self.C.TabHolder.Items[n] then
+		return self.C.TabHolder.Items[n]
+	end
+end
+
 function Editor:GetCurrentTabContent()
 	return self:GetActiveTab():GetPanel()
 end
@@ -1524,7 +1530,7 @@ function Editor:Open(Line, code, forcenewtab)
 	hook.Run("StarfallEditorOpen")
 end
 
-function Editor:SaveFile(Line, close, SaveAs)
+function Editor:SaveFile(Line, close, SaveAs, Func)
 	self:ExtractName()
 
 	if not Line or SaveAs or Line == self.Location .. "/" .. ".txt" then
@@ -1553,8 +1559,12 @@ function Editor:SaveFile(Line, close, SaveAs)
 		end
 		Derma_StringRequestNoBlur("Save to New File", "", (str ~= nil and str .. "/" or "") .. self.savefilefn,
 			function(strTextOut)
-				strTextOut = string.gsub(strTextOut, ".", invalid_filename_chars)
-				self:SaveFile(self.Location .. "/" .. strTextOut .. ".txt", close)
+				strTextOut = self.Location .. "/" .. string.gsub(strTextOut, ".", invalid_filename_chars) .. ".txt"
+				if Func then
+					Func(strTextOut)
+				else
+					self:SaveFile(strTextOut, close)
+				end
 			end)
 		return
 	end
@@ -1590,9 +1600,6 @@ function Editor:LoadFile(Line, forcenewtab)
 					self:SetActiveTab(i)
 					if forcenewtab ~= nil then self:SetCode(str) end
 					return
-				elseif self:GetTabContent(i).GetCode and self:GetTabContent(i):GetCode() == str then
-					self:SetActiveTab(i)
-					return
 				end
 			end
 		end
@@ -1621,7 +1628,7 @@ function Editor:Close()
 
 	self:SaveEditorSettings()
 	local activeWep = LocalPlayer():GetActiveWeapon()
-	if IsValid(activeWep) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
+	if activeWep:IsValid() and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
 		local model = nil
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives("file", self:GetCode(), ppdata)

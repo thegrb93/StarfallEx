@@ -12,7 +12,7 @@ P.checks = {
 	end,
 	function(instance, target, key)
 		local owner = instance.player
-		return LocalPlayer()==owner or (IsValid(owner) and owner:GetFriendStatus()=="friend"), "This function can only be used on the player's or their friends' chips"
+		return LocalPlayer()==owner or (owner and owner:IsValid() and owner:GetFriendStatus()=="friend"), "This function can only be used on the player's or their friends' chips"
 	end,
 	function() return true end,
 	function() return false, "This function is disabled" end

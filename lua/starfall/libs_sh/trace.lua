@@ -285,13 +285,7 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}
 
-	local data = util.TraceLine(trace)
-	return setmetatable({}, {
-		__index = function(t, k)
-			return owrap(data[k])
-		end,
-		__metatable = ""
-	})
+	return SF.StructWrapper(util.TraceLine(trace))
 end
 
 --- Does a swept-AABB trace
@@ -333,13 +327,7 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 		maxs = maxbox
 	}
 
-	local data = util.TraceHull(trace)
-	return setmetatable({}, {
-		__index = function(t, k)
-			return owrap(data[k])
-		end,
-		__metatable = ""
-	})
+	return SF.StructWrapper(util.TraceHull(trace))
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
@@ -360,7 +348,7 @@ function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAng
 	checktype(boxMins, vecmeta)
 	checktype(boxMaxs, vecmeta)
 	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
-	return vwrap(pos), vwrap(normal), fraction
+	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
 
 --- Does a ray plane intersection returning the position hit or nil if not hit
@@ -374,5 +362,6 @@ function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, pl
 	checktype(rayDelta, vecmeta)
 	checktype(planeOrigin, vecmeta)
 	checktype(planeNormal, vecmeta)
-	return vwrap(util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal)))
+	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
+	if pos then return vwrap(pos) end
 end

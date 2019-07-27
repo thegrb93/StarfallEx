@@ -307,7 +307,7 @@ end
 function effect_methods:setStart(start)
 	checktype(self, effect_metamethods)
 	checktype(start, vec_meta)
-	unwrap(self):SetOrigin(vunwrap(start))
+	unwrap(self):SetStart(vunwrap(start))
 end
 
 --- Sets the effect's surface property

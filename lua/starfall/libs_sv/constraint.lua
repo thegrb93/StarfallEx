@@ -10,6 +10,32 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
+local plyMaxConstraints = CreateConVar("sf_constraints_personalquota", "600", FCVAR_ARCHIVE, "The number of constraints allowed to spawn via Starfall")
+local plyCount = SF.EntityTable("playerConstraints")
+
+SF.AddHook("initialize", function(instance)
+	instance.data.constraints = {constraints = {}}
+	if not plyCount[instance.player] then plyCount[instance.player] = 0 end
+end)
+
+local function constraintOnDestroy(ent, constraints, ply)
+	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
+	constraints[ent] = nil
+end
+
+SF.AddHook("deinitialize", function(instance)
+	if instance.data.constraints.clean ~= false then --Return true on nil too
+		local constraints = instance.data.constraints.constraints
+		for ent, _ in pairs(constraints) do
+			if (ent and ent:IsValid()) then
+				ent:RemoveCallOnRemove("starfall_constraint_delete")
+				constraintOnDestroy(ent, constraints, instance.player)
+				ent:Remove()
+			end
+		end
+	end
+end)
+
 SF.AddHook("postload", function()
 	ewrap = SF.Entities.Wrap
 	eunwrap = SF.Entities.Unwrap
@@ -42,6 +68,19 @@ do
 	P.registerPrivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
 end
 
+local function checkMaxReached(ply)
+	local max = plyMaxConstraints:GetInt()
+	if max>=0 and plyCount[ply] >= max then SF.Throw("Max constraints reached: " .. max, 3) end
+end
+
+local function register(ent, instance)
+	local constraints = instance.data.constraints.constraints
+	local ply = instance.player
+	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, constraints, ply)
+	plyCount[ply] = plyCount[ply] + 1
+	constraints[ent] = true
+end
+
 --- Welds two entities
 -- @param e1 The first entity
 -- @param e2 The second entity
@@ -53,6 +92,8 @@ end
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -69,7 +110,10 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	checkluatype(bone2, TYPE_NUMBER)
 	checkluatype(force_lim, TYPE_NUMBER)
 
-	constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
+	local ent = constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
+	if ent then
+		register(ent, instance)
+	end
 end
 
 --- Axis two entities
@@ -79,6 +123,8 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -102,7 +148,10 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	checkluatype(torque_lim, TYPE_NUMBER)
 	checkluatype(friction, TYPE_NUMBER)
 
-	constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
+	local ent = constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
+	if ent then
+		register(ent, instance)
+	end
 end
 
 --- Ballsocket two entities
@@ -111,6 +160,8 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -130,7 +181,10 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	checkluatype(force_lim, TYPE_NUMBER)
 	checkluatype(torque_lim, TYPE_NUMBER)
 
-	constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
+	local ent = constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
+	if ent then
+		register(ent, instance)
+	end
 end
 
 --- Advanced Ballsocket two entities
@@ -143,6 +197,8 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	checktype(minv, SF.Types["Vector"])
 	checktype(maxv, SF.Types["Vector"])
 	checktype(frictionv, SF.Types["Vector"])
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -167,7 +223,10 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	checkluatype(force_lim, TYPE_NUMBER)
 	checkluatype(torque_lim, TYPE_NUMBER)
 
-	constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
+	local ent = constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
+	if ent then
+		register(ent, instance)
+	end
 end
 
 --- Elastic two entities
@@ -177,6 +236,8 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -204,10 +265,13 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	e1.Elastics = e1.Elastics or {}
 	e2.Elastics = e2.Elastics or {}
 
-	local e = constraint.Elastic(ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", math.Clamp(width, 0, 50), strech)
+	local ent = constraint.Elastic(ent1, ent2, bone1, bone2, vec1, vec2, const, damp, rdamp, "cable/cable2", math.Clamp(width, 0, 50), strech)
+	if ent then
+		register(ent, instance)
 
-	e1.Elastics[index] = e
-	e2.Elastics[index] = e
+		e1.Elastics[index] = ent
+		e2.Elastics[index] = ent
+	end
 end
 
 --- Ropes two entities
@@ -217,6 +281,8 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -245,10 +311,13 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	e1.Ropes = e1.Ropes or {}
 	e2.Ropes = e2.Ropes or {}
 
-	local e = constraint.Rope(ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, math.Clamp(width, 0, 50), material, rigid)
+	local ent = constraint.Rope(ent1, ent2, bone1, bone2, vec1, vec2, length, addlength, force_lim, math.Clamp(width, 0, 50), material, rigid)
+	if ent then
+		register(ent, instance)
 
-	e1.Ropes[index] = e
-	e2.Ropes[index] = e
+		e1.Ropes[index] = ent
+		e2.Ropes[index] = ent
+	end
 end
 
 --- Sliders two entities
@@ -258,6 +327,9 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
+
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -275,7 +347,10 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	checkluatype(bone2, TYPE_NUMBER)
 	checkluatype(width, TYPE_NUMBER)
 
-	constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp(width, 0, 50), "cable/cable2")
+	local ent = constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp(width, 0, 50), "cable/cable2")
+	if ent then
+		register(ent, instance)
+	end
 end
 
 --- Nocollides two entities
@@ -283,6 +358,9 @@ end
 function constraint_library.nocollide(e1, e2, bone1, bone2)
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
+
+	local instance = SF.instance
+	checkMaxReached(instance.player)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -296,7 +374,10 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	checkluatype(bone1, TYPE_NUMBER)
 	checkluatype(bone2, TYPE_NUMBER)
 
-	constraint.NoCollide(ent1, ent2, bone1, bone2)
+	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2)
+	if ent then
+		register(ent, instance)
+	end
 end
 
 --- Sets the length of a rope attached to the entity
@@ -305,7 +386,7 @@ function constraint_library.setRopeLength(index, e, length)
 	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.rope")
 
 
@@ -315,7 +396,7 @@ function constraint_library.setRopeLength(index, e, length)
 
 	if e.Ropes then
 		local con = e.Ropes[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:SetKeyValue("addlength", length)
 		end
 	end
@@ -327,7 +408,7 @@ function constraint_library.setElasticLength(index, e, length)
 	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.elastic")
 
 	checkluatype(length, TYPE_NUMBER)
@@ -335,7 +416,7 @@ function constraint_library.setElasticLength(index, e, length)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:Fire("SetSpringLength", length, 0)
 		end
 	end
@@ -347,7 +428,7 @@ function constraint_library.breakAll(e)
 	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
@@ -361,7 +442,7 @@ function constraint_library.breakType(e, typename)
 
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.any")
 
 	constraint.RemoveConstraints(ent1, typename)
@@ -376,7 +457,23 @@ function constraint_library.getTable(ent)
 
 	ent = eunwrap(ent)
 
-	if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 
 	return SF.Sanitize(constraint.GetTable(ent))
 end
+
+--- Sets whether the chip should remove created constraints when the chip is removed
+-- @param on Boolean whether the constraints should be cleaned or not
+function constraint_library.setConstraintClean(on)
+	SF.instance.data.constraints.clean = on
+end
+
+--- Checks how many constraints can be spawned
+-- @server
+-- @return number of constraints able to be spawned
+function constraint_library.constraintsLeft()
+	local max = plyMaxConstraints:GetInt()
+	if max < 0 then return -1 end
+	return max - plyCount[SF.instance.player]
+end
+

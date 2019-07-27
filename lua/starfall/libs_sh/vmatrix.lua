@@ -165,6 +165,12 @@ function vmatrix_methods:setField(row, column, value)
 	unwrap(self):SetField(row, column, value)
 end
 
+--- Copies The matrix and returns a new matrix
+-- @return The copy of the matrix
+function vmatrix_methods:clone()
+	return wrap(Matrix(unwrap(self)))
+end
+
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)

@@ -49,8 +49,7 @@ function ENT:Initialize ()
 	self.Origin = info.offset
 
 	local w, h = 512 / self.Aspect, 512
-	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0)}
-	self.ScreenColor = Color(0, 0, 0, 255)
+	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
 end
 
 function ENT:LinkEnt (ent)
@@ -58,7 +57,7 @@ function ENT:LinkEnt (ent)
 end
 
 function ENT:RenderScreen()
-	if IsValid(self.link) then
+	if (self.link and self.link:IsValid()) then
 		local instance = self.link.instance
 		if instance then
 			if SF.Permissions.hasAccess(instance, nil, "render.screen") then
@@ -88,7 +87,7 @@ function ENT:Draw ()
 end
 
 function ENT:SetBackgroundColor(r, g, b, a)
-	self.ScreenColor = Color(r, g, b, math.max(a, 1))
+	self.ScreenQuad[5] = Color(r, g, b, math.max(a, 1))
 end
 
 local writez = Material("engine/writez")
@@ -117,7 +116,10 @@ function ENT:DrawTranslucent ()
 		render.SetStencilTestMask(1)
 
 		--Clear it to the clear color and clear depth as well
-		render.ClearBuffersObeyStencil(self.ScreenColor.r, self.ScreenColor.g, self.ScreenColor.b, self.ScreenColor.a, true)
+		local color = self.ScreenQuad[5]
+		if color.a == 255 then
+			render.ClearBuffersObeyStencil(color.r, color.g, color.b, color.a, true)
+		end
 
 		--Render the starfall stuff
 		render.PushFilterMag(TEXFILTER.ANISOTROPIC)

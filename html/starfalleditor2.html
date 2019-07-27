@@ -195,12 +195,38 @@
 								]
 							},
 							{
+								stateName: "blockComment",
+								onMatch : function(value, currentState, stack) {
+									stack.unshift(this.next, value.length, currentState);
+									return "comment";
+								},
+								regex : /\/\*/,
+								next  : [
+									{
+										onMatch : function(value, currentState, stack) {
+											stack.shift();
+											stack.shift();
+											this.next = stack.shift();
+											return "comment";
+										},
+										regex : /\*\//,
+										next  : "start"
+									}, {
+										defaultToken : "comment"
+									}
+								]
+							},
+							{
 								token : "string",
 								regex : "\\-\\-@.*$"
 							},
 							{
 								token : "comment",
 								regex : "\\-\\-.*$"
+							},
+							{
+								token : "comment",
+								regex : "//.*$"
 							},
 							{
 								stateName: "bracketedString",

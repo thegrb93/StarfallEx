@@ -466,7 +466,7 @@ function helper.create()
 			infopanel.deprecated.Enabled = false
 		end
 
-		if type(func.param) == "table" and #func.param > 0 then
+		if istable(func.param) and #func.param > 0 then
 			local params = ""
 			for p = 1, #func.param do
 				params = params .. "» " .. func.param[p] .. ": " .. (func.param[func.param[p]] or "") .. (p ~= #func.param and "\n" or "")
@@ -480,12 +480,12 @@ function helper.create()
 			infopanel.parameterList.Enabled = false
 		end
 
-		if type(func.ret) == "string" then
+		if isstring(func.ret) then
 			infopanel.returnvalue:SetText("Return value: ")
 			infopanel.returnvalueList:SetText(formatText(func.ret, true))
 			infopanel.returnvalue.Enabled = true
 			infopanel.returnvalueList.Enabled = true
-		elseif type(func.ret) == "table" then
+		elseif istable(func.ret) then
 			infopanel.returnvalue:SetText("Return values: ")
 			local rets = ""
 			local count = 1
@@ -501,7 +501,7 @@ function helper.create()
 			infopanel.returnvalueList.Enabled = false
 		end
 
-		if type(func.usage) == "string" then
+		if isstring(func.usage) then
 			infopanel.usage:SetText("Usage:")
 			infopanel.usage.Enabled = true
 			infopanel.usageBlock:SetText(string.gsub(string.Replace(func.usage , string.char(9), "    "), "\n", "", 1))

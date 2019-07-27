@@ -36,26 +36,61 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
-if SERVER then
-	function SF.EntityTable(key)
-		return setmetatable({},
-		{ __newindex = function(t, e, v)
-			rawset(t, e, v)
-			e:CallOnRemove("SF_" .. key, function() t[e] = nil end)
-		end })
+-- Returns a class that manages a table of entity keys
+SF.EntityTable = {
+	__newindex = function(t, e, v)
+		rawset(t, e, v)
+		if t.wait then
+			e:CallOnRemove("SF_" .. t.key, function()
+				timer.Simple(0, function()
+					if not e:IsValid() then
+						t[e] = nil
+						if t.destructor then t.destructor(e, v) end
+					end
+				end)
+			end)
+		else
+			e:CallOnRemove("SF_" .. t.key, function()
+				t[e] = nil
+				if t.destructor then t.destructor(e, v) end
+			end)
+		end
+	end,
+	__call = function(p, key, destructor, dontwait)
+		local t = {
+			key = key,
+			destructor = destructor,
+			wait = CLIENT and not dontwait
+		}
+		return setmetatable(t, p)
 	end
-else
-	function SF.EntityTable(key)
-		return setmetatable({},
-		{ __newindex = function(t, e, v)
-			rawset(t, e, v)
-			e:CallOnRemove("SF_" .. key, function() timer.Simple(0, function() if not e:IsValid() then t[e] = nil end end) end)
-		end })
+}
+setmetatable(SF.EntityTable, SF.EntityTable)
+
+--- Returns a class that wraps a structure and caches indexes
+SF.StructWrapper = {
+	__call = function(p, data)
+		local cache = {}
+		return setmetatable({}, {
+			__index = function(t, k)
+				if cache[k] then
+					return cache[k]
+				else
+					local ret = SF.WrapObject(data[k])
+					cache[k] = ret
+					return ret
+				end
+			end,
+			__newindex = function(t, k, v)
+				cache[k] = v
+			end,
+			__metatable = ""
+		})
 	end
-end
+}
+setmetatable(SF.StructWrapper, SF.StructWrapper)
 
-
---- Returns a class that can keep track of burst
+--- Returns a class that can keep track of burst count/rate
 SF.BurstObject = {
 	__index = {
 		use = function(self, amount)
@@ -85,7 +120,7 @@ SF.BurstObject = {
 setmetatable(SF.BurstObject, SF.BurstObject)
 
 
---- Returns a class that can keep track of burst
+--- Returns a class that can manage burst objects
 SF.BurstGenObject = {
 	__index = {
 		create = function(self, amount)
@@ -107,8 +142,8 @@ SF.BurstGenObject = {
 		local ratename = "sf_"..name.."_burstrate"
 		local maxname = "sf_"..name.."_burstmax"
 		local t = {
-			ratecvar = CreateConVar(ratename, tostring(rate*scale), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, ratehelp),
-			maxcvar = CreateConVar(maxname, tostring(max*scale), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, maxhelp),
+			ratecvar = CreateConVar(ratename, tostring(rate), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, ratehelp),
+			maxcvar = CreateConVar(maxname, tostring(max), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, maxhelp),
 			burstobjects = setmetatable({}, {__mode="k"}),
 			scale = scale
 		}
@@ -222,7 +257,7 @@ function SF.MakeError (msg, level, uncatchable, prependinfo)
 		info = { short_src = "", currentline = 0 }
 		prependinfo = false
 	end
-	if type(msg) ~= "string" then msg = "(error object is not a string)" end
+	if not isstring(msg) then msg = "(error object is not a string)" end
 
 	local traceback = debug.traceback("", level)
 	local lines = {}
@@ -247,6 +282,12 @@ end
 -- Utility functions
 -------------------------------------------------------------------------------
 
+function SF.CompileString(str, name, handle)
+	if string.find(str, "repeat.*continue.*until") then
+		return "Due to a glua bug. Use of the string 'continue' in repeat-until loops has been banned"
+	end
+	return CompileString(str, name, handle)
+end
 
 --- Throws an error like the throw function in builtins
 -- @param msg Message
@@ -315,8 +356,8 @@ end
 function SF.DeepDeepCopy(src, dst, done)
 	-- Copy the values
 	for k, v in pairs(src) do
-		if type(k)=="table" then error("Tried to shallow copy a table!!") end
-		if type(v)=="table" then
+		if istable(k) then error("Tried to shallow copy a table!!") end
+		if istable(v) then
 			if done[v] then
 				dst[k] = done[v]
 			else
@@ -386,7 +427,7 @@ function SF.CheckType(val, typ, level)
 	if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and SF.Types[meta]) then
 		return val
 	else
-		assert(type(typ) == "table" and typ.__metatable and type(typ.__metatable) == "string")
+		assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
 		level = (level or 1) + 2
 		SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
 	end
@@ -396,7 +437,7 @@ end
 -- @param val The value to be checked.
 function SF.GetType(val)
 	local mt = dgetmeta(val)
-	return (mt and mt.__metatable and type(mt.__metatable) == "string") and mt.__metatable or type(val)
+	return (mt and mt.__metatable and isstring(mt.__metatable)) and mt.__metatable or type(val)
 end
 
 --- Checks the lua type of val. Errors if the types don't match
@@ -409,7 +450,7 @@ function SF.CheckLuaType(val, typ, level)
 		return val
 	else
 		-- Failed, throw error
-		assert(type(typ) == "number")
+		assert(isnumber(typ))
 		local typeLookup = {
 			[TYPE_BOOL] = "boolean",
 			[TYPE_FUNCTION] = "function",
@@ -439,6 +480,7 @@ local materialBlacklist = {
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end
+	if #material > 260 then return false end
 	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
 	if materialBlacklist[material] then return false end
 	local mat = Material(material)
@@ -446,16 +488,10 @@ function SF.CheckMaterial(material)
 	return mat
 end
 
---- Gets the type of val.
--- @param val The value to be checked.
-function SF.GetType(val)
-	local mt = dgetmeta(val)
-	return (mt and mt.__metatable and type(mt.__metatable) == "string") and mt.__metatable or type(val)
-end
-
 -- ------------------------------------------------------------------------- --
 
 local object_wrappers = {}
+local object_unwrappers = {}
 local sensitive2sf_tables = {}
 local sf2sensitive_tables = {}
 
@@ -500,17 +536,14 @@ function SF.CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatabl
 		sf2sensitive[tbl] = value
 		return tbl
 	end
+	if target_metatable ~= nil then
+		object_wrappers[target_metatable] = wrap
+	end
 
 	local function unwrap(value)
 		return sf2sensitive[value]
 	end
-
-	if target_metatable ~= nil then
-		object_wrappers[target_metatable] = wrap
-		metatable.__wrap = wrap
-	end
-
-	metatable.__unwrap = unwrap
+	object_unwrappers[metatable] = unwrap
 
 	return wrap, unwrap
 end
@@ -520,7 +553,6 @@ end
 -- @param sf_object_meta starfall metatable of object
 -- @param wrapper function that wraps object
 function SF.AddObjectWrapper(object_meta, sf_object_meta, wrapper)
-	sf_object_meta.__wrap = wrapper
 	object_wrappers[object_meta] = wrapper
 end
 
@@ -528,7 +560,7 @@ end
 -- @param object_meta metatable of object
 -- @param unwrapper function that unwraps object
 function SF.AddObjectUnwrapper(object_meta, unwrapper)
-	object_meta.__unwrap = unwrapper
+	object_unwrappers[object_meta] = unwrapper
 end
 
 --- Returns the wrapper table of a specified type
@@ -559,6 +591,12 @@ function SF.WrapObject(object)
 		local wrap = object_wrappers[metatable]
 		if wrap then
 			return wrap(object)
+		else
+			-- If the object is already an SF type
+			local sf2sensitive = sf2sensitive_tables[metatable]
+			if sf2sensitive and sf2sensitive[object] then
+				return object
+			end
 		end
 	end
 	-- Do not elseif here because strings do have a metatable.
@@ -573,9 +611,11 @@ end
 -- @return the unwrapped starfall object
 function SF.UnwrapObject(object)
 	local metatable = dgetmeta(object)
-
-	if metatable and metatable.__unwrap then
-		return metatable.__unwrap(object)
+	if metatable then
+		local unwrap = object_unwrappers[metatable]
+		if unwrap then
+			return unwrap(object)
+		end
 	end
 	if safe_types[TypeID(object)] then
 		return object
@@ -610,7 +650,7 @@ end
 -- not available objects will be replaced with nil, so as to prevent
 -- any possiblitiy of leakage. Functions will always be replaced with
 -- nil as there is no way to verify that they are safe.
-function SF.Sanitize(...)
+function SF.Sanitize(original)
 	local completed_tables = {}
 
 	local function RecursiveSanitize(tbl)
@@ -630,12 +670,12 @@ function SF.Sanitize(...)
 		return return_list
 	end
 
-	return unpack(RecursiveSanitize({...}))
+	return RecursiveSanitize(original)
 end
 
 --- Takes output from starfall and does it's best to make the output
 -- fully usable outside of starfall environment
-function SF.Unsanitize(...)
+function SF.Unsanitize(original)
 	local completed_tables = {}
 
 	local function RecursiveUnsanitize(tbl)
@@ -653,7 +693,7 @@ function SF.Unsanitize(...)
 		return return_list
 	end
 
-	return unpack(RecursiveUnsanitize({...}))
+	return RecursiveUnsanitize(original)
 end
 
 -- ------------------------------------------------------------------------- --
@@ -741,9 +781,9 @@ local function argsToChat(...)
 	if not color then processed[1] = Color(151, 211, 255) end
 	local i = 1
 	while i <= n do
-		if type(output[i])=="string" then
+		if isstring(output[i]) then
 			local j = i + 1
-			while j <= n and type(output[j])=="string" do
+			while j <= n and isstring(output[j]) do
 				j = j + 1
 			end
 			if i==(j-1) then
@@ -766,7 +806,7 @@ if SERVER then
 	util.AddNetworkString("starfall_chatprint")
 
 	function SF.AddNotify (ply, msg, notifyType, duration, sound)
-		if not IsValid(ply) then return end
+		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
 		net.WriteString(msg)
@@ -783,7 +823,7 @@ if SERVER then
 	function SF.Print (ply, msg)
 		net.Start("starfall_console_print")
 			net.WriteString(msg)
-		net.Send(ply)
+		if ply then net.Send(ply) else net.Broadcast() end
 	end
 
 	function SF.ChatPrint(ply, ...)

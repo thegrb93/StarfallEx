@@ -39,9 +39,9 @@ SF.AddHook("postload", function()
 		tangent = function(v) return dgetmeta(v) == vec_meta end,
 		binormal = function(v) return dgetmeta(v) == vec_meta end,
 		pos = function(v) return dgetmeta(v) == vec_meta end,
-		u = function(v) return type(v) == "number" end,
-		v = function(v) return type(v) == "number" end,
-		userdata = function(v) return type(v) == "table" and type(v[1]) == "number" and type(v[2]) == "number" and type(v[3]) == "number" and type(v[4]) == "number" end
+		u = isnumber,
+		v = isnumber,
+		userdata = function(v) return istable(v) and isnumber(v[1]) and isnumber(v[2]) and isnumber(v[3]) and isnumber(v[4]) end
 	}
 	vertexUnwrap = {
 		color = cunwrap,
@@ -58,7 +58,7 @@ end)
 -- Register privileges
 SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
 
-local maxtriangles = CreateClientConVar("sf_mesh_triangles_max", "200000", true, "How many triangles total can be loaded for meshes.")
+local maxtriangles = CreateClientConVar("sf_mesh_triangles_max", "200000", true, false, "How many triangles total can be loaded for meshes.")
 local plyTriangleCount = SF.EntityTable("MeshTriangles")
 local plyTriangleRenderBurstGen = SF.BurstGenObject("mesh_triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
 local plyTriangleRenderBurst = SF.EntityTable("MeshBurst")
@@ -263,6 +263,172 @@ function mesh_library.createFromObj(obj, thread)
 	mesh:BuildFromTriangles(vertices)
 	instance.data.meshes[mesh] = { ntriangles = ntriangles }
 	return wrap(mesh)
+end
+
+--- Creates a mesh from an obj file. Supports meshes with normals and texture coordinates. Performs triangulation but is slower than createFromObj
+-- @param obj The obj file data
+-- @param thread An optional thread object that can be used to load the mesh over time to prevent hitting quota limit
+-- @return Mesh object
+function mesh_library.createFromObjEx(obj, thread)
+	checkpermission (SF.instance, nil, "mesh")
+	checkluatype (obj, TYPE_STRING)
+	if thread ~= nil then checktype(thread, thread_meta) end
+	local instance = SF.instance
+
+	local pos, norm, uv, face = {}, {}, {}, {}
+	local map = {
+		v = function(f) pos[#pos + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
+		vt = function(f) uv[#uv + 1] = tonumber(f()) uv[#uv + 1] = 1-tonumber(f()) end,
+		vn = function(f) norm[#norm + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
+		f = function(f) 
+			local points = {}
+			local c = 0
+			for p in f do
+				c = c + 1
+				points[c] = p
+			end
+			for i = 2, c - 1 do
+				local tri = #face
+				face[tri + 3] = points[1]
+				face[tri + 2] = points[i]
+				face[tri + 1] = points[i+1]
+			end
+		end
+	}
+	local ignore = { ["#"] = true, ["mtllib"] = true, ["usemtl"] = true, ["o"] = true, ["s"] = true, ["g"] = true }
+	for line in string.gmatch(obj, "[^\r\n]+") do
+		local components = {}
+		local f = string.gmatch(line, "%S+")
+		local tag = f()
+		if tag and not ignore[tag] then
+			local t = map[tag]
+			if t then
+				local ok = pcall(t, f)
+				if not ok then SF.Throw("Failed to parse tag: "..tag..". ("..line..")", 2) end
+			else
+				SF.Throw("Unknown tag in obj file: "..tag, 2)
+			end
+		end
+		if thread then thread_lib.yield(thread) end
+	end
+
+	if #face<3 or #face%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
+	local ntriangles = #face / 3
+	canAddTriangles(instance, ntriangles)
+
+	local vertices = {}
+	for _, v in ipairs(face) do
+		local vert = {}
+		local f = string.gmatch(v, "([^/]*)/?")
+		local posv = tonumber(f())
+		if posv then
+			vert.pos = pos[posv] or SF.Throw("Invalid face position index: "..tostring(posv), 2)
+		else
+			SF.Throw("Invalid face position index: "..tostring(posv), 2)
+		end
+		local texv = tonumber(f())
+		if texv then
+			local j = texv * 2
+			vert.u = uv[j-1] or SF.Throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+			vert.v = uv[j] or SF.Throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+		else
+			SF.Throw("Invalid face texture coordinate index: "..tostring(texv), 2)
+		end
+		local normv = tonumber(f())
+		if normv then
+			vert.normal = norm[normv] or SF.Throw("Invalid face normal index: "..tostring(normv), 2)
+		else
+			SF.Throw("Invalid face normal index: "..tostring(normv), 2)
+		end
+		vertices[_] = vert
+		if thread then thread_lib.yield(thread) end
+	end
+
+	-- Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
+	-- GLua version credit @willox https://github.com/CapsAdmin/pac3/pull/578/commits/43fa75c262cde661713cdaa9d1b09bc29ec796b4
+	local tan1, tan2 = {}, {}
+	for i = 1, #vertices do
+		tan1[i] = Vector(0, 0, 0)
+		tan2[i] = Vector(0, 0, 0)
+	end
+
+	for i = 1, #vertices - 2, 3 do
+		local vert1, vert2, vert3 = vertices[i], vertices[i+1], vertices[i+2]
+
+		local p1, p2, p3 = vert1.pos, vert2.pos, vert3.pos
+		local u1, u2, u3 = vert1.u, vert2.u, vert3.u
+		local v1, v2, v3 = vert1.v, vert2.v, vert3.v
+
+		local x1 = p2.x - p1.x;
+		local x2 = p3.x - p1.x;
+		local y1 = p2.y - p1.y;
+		local y2 = p3.y - p1.y;
+		local z1 = p2.z - p1.z;
+		local z2 = p3.z - p1.z;
+
+		local s1 = u2 - u1;
+		local s2 = u3 - u1;
+		local t1 = v2 - v1;
+		local t2 = v3 - v1;
+
+		local r = 1 / (s1 * t2 - s2 * t1)
+		local sdir = Vector((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+		local tdir = Vector((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+
+		tan1[i]:Add(sdir)
+		tan1[i+1]:Add(sdir)
+		tan1[i+2]:Add(sdir)
+
+		tan2[i]:Add(tdir)
+		tan2[i+1]:Add(tdir)
+		tan2[i+2]:Add(tdir)
+	end
+	if thread then thread_lib.yield(thread) end
+
+	for i = 1, #vertices do
+		local n = vertices[i].normal
+		local t = tan1[i]
+
+		local tan = (t - n * n:Dot(t))
+		tan:Normalize()
+
+		local w = (n:Cross(t)):Dot(tan2[i]) < 0 and -1 or 1
+
+		vertices[i].userdata = {tan[1], tan[2], tan[3], w}
+	end
+	if thread then thread_lib.yield(thread) end
+
+	plyTriangleCount[instance.player] = (plyTriangleCount[instance.player] or 0) + ntriangles
+
+	local mesh = Mesh()
+	mesh:BuildFromTriangles(vertices)
+	instance.data.meshes[mesh] = { ntriangles = ntriangles }
+	return wrap(mesh)
+end
+
+--- Returns a table of visual meshes of given model or nil if the model is invalid
+-- @param model The full path to a model to get the visual meshes of.
+-- @param lod The lod of the model to use.
+-- @param bodygroupMask The bodygroupMask of the model to use.
+-- @return A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
+function mesh_library.getModelMeshes(model, lod, bodygroupMask)
+	checkluatype(model, TYPE_STRING)
+	if lod~=nil then checkluatype(lod, TYPE_NUMBER) end
+	if bodygroupMask~=nil then checkluatype(bodygroupMask, TYPE_NUMBER) end
+	local ret = util.GetModelMeshes( model, lod, bodygroupMask )
+	if ret then
+		for k, v in ipairs(ret) do
+			v.verticies = nil
+			for o, p in ipairs(v.triangles) do
+				if p.color then p.color = cwrap(p.color) end
+				p.normal = vwrap(p.normal)
+				p.tangent = vwrap(p.tangent)
+				if p.binormal then p.binormal = vwrap(p.binormal) end
+				p.pos = vwrap(p.pos)
+			end
+		end
+	end
+	return ret
 end
 
 --- Returns how many triangles can be created

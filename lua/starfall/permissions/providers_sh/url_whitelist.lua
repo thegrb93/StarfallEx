@@ -80,6 +80,14 @@ simple [[i.imgur.com]]
 
 simple [[pastebin.com]]
 
+-- gitlab
+
+simple [[gitlab.com]]
+
+-- bitbucket
+
+simple [[bitbucket.org]]
+
 -- github / gist
 --- Examples:
 ---  https://gist.githubusercontent.com/LUModder/f2b1c0c9bf98224f9679/raw/5644006aae8f0a8b930ac312324f46dd43839189/sh_sbdc.lua
@@ -88,18 +96,9 @@ simple [[pastebin.com]]
 simple [[raw.githubusercontent.com]]
 simple [[gist.githubusercontent.com]]
 
--- pomf
--- note: there are a lot of forks of pomf so there are tons of sites. I only listed the mainly used ones. --Flex
---- Examples:
----  https://my.mixtape.moe/gxiznr.png
----  http://a.1339.cf/fppyhby.txt
----  http://b.1339.cf/fppyhby.txt
----  http://a.pomf.cat/jefjtb.txt
-
-simple [[my.mixtape.moe]]
-simple [[a.1339.cf]]
-simple [[b.1339.cf]]
-simple [[a.pomf.cat]]
+-- teknik
+simple [[u.teknik.io]]
+simple [[p.teknik.io]]
 
 -- TinyPic
 --- Examples:
@@ -168,3 +167,15 @@ simple [[i.redd.it]]
 --- you don't even wanna know
 
 simple [[static1.e621.net]]
+
+-- ipfs
+--- Examples:
+--- https://ipfs.io/ipfs/QmXoypizjW3WknFiJnKLwHCnL72vedxjQkDDP1mXWo6uco/I/m/Ellis_Sigil.jpg
+
+simple [[ipfs.io]]
+
+-- neocities
+--- Examples:
+--- https://fauux.neocities.org/LainDressSlow.gif
+
+pattern [[([%w-_]+)%.neocities%.org/(.+)]]

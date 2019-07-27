@@ -39,18 +39,18 @@ else
 
 	local function init()
 		if holo and sphere then
-			holo:setHologramMesh(sphere)
-			holo:setHologramMaterial(mat)
-			holo:setHologramRenderBounds(Vector(-200),Vector(200))
+			holo:setMesh(sphere)
+			holo:setMeshMaterial(mat)
+			holo:setRenderBounds(Vector(-200),Vector(200))
 		end
 	end
 
 	hook.add("net","",function(name, len, pl)
-		holo = net.readEntity()
+		holo = net.readEntity():toHologram()
 		init()
 	end)
 
-	http.get("https://dl.dropboxusercontent.com/s/243l0or1o3xolmu/sphere.obj?dl=0",function(data)
+	http.get("https://dl.dropboxusercontent.com/s/vdcb9ujr7qslg51/sphere.obj",function(data)
 		sphere = mesh.createFromObj(data)
 		init()
 	end)

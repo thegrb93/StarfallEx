@@ -127,7 +127,11 @@ SF.AddHook("postload", function()
 	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
 	end)
-
+	
+	SF.hookAdd("RenderScene", "renderscene", function(instance)
+		return SF.Permissions.hasAccess(instance, nil, "render.renderscene"), {}
+	end)
+	
 	SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
 		return not drawskybox, {}
 	end)
@@ -135,14 +139,22 @@ end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
+SF.Permissions.registerPrivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
+SF.Permissions.registerPrivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
+local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
 
 
 local currentcolor
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 local view_matrix_stack = {}
+local renderingView = false
+local renderingViewRt
+local drawViewerInView = false
+local MAX_CLIPPING_PLANES = 4
+local pushedClippingPlanes = 0
 
 local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
 	function(t, i)
@@ -161,40 +173,55 @@ cvars.AddChangeCallback( "sf_render_maxrendertargets", function()
 	rt_bank.max = cv_max_rendertargets:GetInt()
 end )
 
-local renderhooks = {
-	render = true,
-	renderoffscreen = true,
-	predrawopaquerenderables = true,
-	postdrawopaquerenderables = true,
-	predrawhud = true,
-	drawhud = true,
-	postdrawhud = true,
-}
+local function prepareRender(data)
+	currentcolor = COLOR_WHITE
+	render.SetColorMaterial()
+	draw.NoTexture()
+	surface.SetDrawColor(255, 255, 255, 255)
+	data.isRendering = true
+	data.noStencil = false
+	data.isScenic = false
+	data.needRT = false
+end
 
 local dummyrt = GetRenderTarget("starfall_dummyrt", 32, 32)
-SF.AddHook("prepare", function (instance, hook)
-	if renderhooks[hook] then
-		currentcolor = COLOR_WHITE
-		render.SetColorMaterial()
-		draw.NoTexture()
-		surface.SetDrawColor(255, 255, 255, 255)
+local function prepareRenderOffscreen(data)
+	prepareRender(data)
+	data.noStencil = false
+	data.needRT = true
+	data.oldViewPort = { 0, 0, ScrW(), ScrH() }
+	render.SetViewPort(0, 0, 1024, 1024)
+	cam.Start2D()
+	view_matrix_stack[#view_matrix_stack + 1] = "End2D"
+	render.SetStencilEnable(false)
+	render.SetRenderTarget(dummyrt)
+	data.usingRT = true
+end
 
-		local data = instance.data.render
-		data.isRendering = true
-		data.noStencil = hook=="render"
-		if hook=="renderoffscreen" then
-			data.needRT = true
-			data.oldViewPort = { 0, 0, ScrW(), ScrH() }
-			render.SetViewPort(0, 0, 1024, 1024)
-			cam.Start2D()
-			view_matrix_stack[#view_matrix_stack + 1] = "End2D"
-			render.SetStencilEnable(false)
-			render.SetRenderTarget(dummyrt)
-			data.usingRT = true
-		else
-			data.needRT = false
-		end
-	end
+local function prepareRenderScene(data)
+	prepareRenderOffscreen(data)
+	data.isScenic = true
+end
+
+local function prepareScreen(data)
+	prepareRender(data)
+	data.noStencil = true
+end
+
+local renderhooks = {
+	render = prepareScreen,
+	renderoffscreen = prepareRenderOffscreen,
+	renderscene = prepareRenderScene,
+	predrawopaquerenderables = prepareRender,
+	postdrawopaquerenderables = prepareRender,
+	predrawhud = prepareRender,
+	drawhud = prepareRender,
+	postdrawhud = prepareRender,
+}
+
+SF.AddHook("prepare", function (instance, hook)
+	local renderPrepare = renderhooks[hook]
+	if renderPrepare then renderPrepare(instance.data.render) end
 end)
 
 SF.AddHook("cleanup", function (instance, hook)
@@ -210,7 +237,11 @@ SF.AddHook("cleanup", function (instance, hook)
 		end
 		local data = instance.data.render
 		if data.usingRT then
-			render.SetRenderTarget()
+			if renderingView then
+				render.SetRenderTarget(renderingViewRt)
+			else
+				render.SetRenderTarget()
+			end
 			render.SetViewPort(unpack(data.oldViewPort))
 			data.usingRT = false
 		end
@@ -228,11 +259,22 @@ SF.AddHook("cleanup", function (instance, hook)
 		end
 		data.isRendering = false
 		data.needRT = false
+
+		for i = 1, pushedClippingPlanes do
+			render.PopCustomClipPlane()
+		end
+		pushedClippingPlanes = 0
+
+		if data.prevClippingState ~= nil then
+			render.EnableClipping(data.prevClippingState)
+			data.prevClippingState = nil
+		end
 	end
 end)
 
 SF.AddHook("initialize", function(instance)
 	instance.data.render = {}
+	instance.data.render.renderedViews = 0
 	instance.data.render.rendertargets = {}
 	instance.data.render.validrendertargets = {}
 end)
@@ -242,6 +284,12 @@ SF.AddHook("deinitialize", function (instance)
 		rt_bank:free(instance.player, v)
 		instance.data.render.rendertargets[k] = nil
 		instance.data.render.validrendertargets[v:GetName()] = nil
+	end
+end)
+
+hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
+	for instance, _ in pairs(SF.allInstances) do
+		instance.data.render.renderedViews = 0
 	end
 end)
 
@@ -450,7 +498,7 @@ function render_library.pushMatrix(m, world)
 
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local id = #matrix_stack
-	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matricies", 2) end
+	if id + 1 > MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
 	local newmatrix
 	if matrix_stack[id] then
 		newmatrix = matrix_stack[id] * munwrap(m)
@@ -491,7 +539,7 @@ end
 function render_library.popMatrix()
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	if #matrix_stack <= 0 then SF.Throw("Popped too many matricies", 2) end
+	if #matrix_stack <= 0 then SF.Throw("Popped too many matrices", 2) end
 	matrix_stack[#matrix_stack] = nil
 	cam.PopModelMatrix()
 end
@@ -508,7 +556,7 @@ local viewmatrix_checktypes =
 function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matricies", 2) end
+	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
 	checkluatype(tbl, TYPE_TABLE)
 
 	local newtbl = {}
@@ -555,7 +603,7 @@ function render_library.popViewMatrix()
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local i = #view_matrix_stack
-	if i == 0 then SF.Throw("Popped too many matricies", 2) end
+	if i == 0 then SF.Throw("Popped too many matrices", 2) end
 
 	cam[view_matrix_stack[i]]()
 	view_matrix_stack[i] = nil
@@ -613,14 +661,15 @@ end
 --- NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)
 -- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
 -- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
+-- @param done An optional callback called when the image is done loading. Passes the material, url
 -- @return The material. Use it with render.setTexture
-function render_library.getTextureID (tx, cb)
+function render_library.getTextureID (tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
 	local m = SF.instance.env.material.create("UnlitGeneric")
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
-		m:setTextureURL("$basetexture", tx, cb)
+		m:setTextureURL("$basetexture", tx, cb, done)
 	else
 		m:setTexture("$basetexture", tx)
 	end
@@ -713,7 +762,12 @@ function render_library.selectRenderTarget (name)
 		data.usingRT = true
 	else
 		if data.usingRT and not data.needRT then
-			render.SetRenderTarget()
+			if renderingView then
+				render.SetRenderTarget(renderingViewRt)
+			else
+				render.SetRenderTarget()
+			end
+
 			local i = #view_matrix_stack
 			if i>0 then
 				cam[view_matrix_stack[i]]()
@@ -765,7 +819,7 @@ function render_library.setTextureFromScreen (ent)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	ent = eunwrap(ent)
-	if IsValid(ent) and ent.GPU and ent.GPU.RT then
+	if (ent and ent:IsValid()) and ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
 		surface.SetMaterial(RT_Material)
 		render.SetMaterial(RT_Material)
@@ -1429,17 +1483,22 @@ function render_library.draw3DQuadUV (vert1, vert2, vert3, vert4)
 	if not ok then SF.Throw(err, 2) end
 end
 
---- Gets a 2D cursor position where ply is aiming.
--- @param ply player to get cursor position from(optional)
+--- Gets a 2D cursor position where ply is aiming at the current rendered screen or nil if they aren't aiming at it.
+-- @param ply player to get cursor position from (default: player())
+-- @param screen An explicit screen to get the cursor pos of (default: The current rendering screen using 'render' hook)
 -- @return x position
 -- @return y position
-function render_library.cursorPos(ply)
-	local screen = SF.instance.data.render.renderEnt
-	if not screen or screen:GetClass()~="starfall_screen" then return input.GetCursorPos() end
-
-	ply = ply and eunwrap(ply) or LocalPlayer()
-
-	if not IsValid(ply) or not ply:IsPlayer() then SF.Throw("Invalid Player", 2) end
+function render_library.cursorPos(ply, screen)
+	if ply~=nil then
+		checktype(ply, ent_meta)
+		ply = eunwrap(ply)
+		if not (ply and ply:IsValid() and ply:IsPlayer()) then SF.Throw("Invalid player", 2) end
+	else
+		ply = LocalPlayer()
+	end
+	
+	if screen~=nil then checktype(screen, ent_meta) screen = eunwrap(screen) else screen = SF.instance.data.render.renderEnt end
+	if not (screen and screen:IsValid() and screen.Transform) then SF.Throw("Invalid screen", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
@@ -1459,9 +1518,9 @@ function render_library.cursorPos(ply)
 	local B = Normal:Dot(Pos-Start) / A
 	if (B >= 0) then
 		local w = 512 / screen.Aspect
-		local HitPos = WorldToLocal(Start + Dir * B, Angle(), screen.Transform:GetTranslation(), screen.Transform:GetAngles())
-		local x = HitPos.x / screen.Scale
-		local y = HitPos.y / screen.Scale
+		local HitPos = screen.Transform:GetInverseTR() * (Start + Dir * B)
+		local x = HitPos.x / screen.Scale^2
+		local y = HitPos.y / screen.Scale^2
 		if x < 0 or x > w or y < 0 or y > 512 then return nil end -- Aiming off the screen
 		return x, y
 	end
@@ -1536,17 +1595,230 @@ end
 --- Does a trace and returns the color of the textel the trace hits.
 -- @param vec1 The starting vector
 -- @param vec2 The ending vector
--- @return The color vector. use vector:toColor to convert it to a color.
+-- @return The color
 function render_library.traceSurfaceColor(vec1, vec2)
 	checktype(vec1, vector_meta)
 	checktype(vec2, vector_meta)
 
-	return vwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)))
+	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
 
 --- Checks if a hud component is connected to the Starfall Chip
 function render_library.isHUDActive()
 	return SF.instance:isHUDActive()
+end
+
+--- Renders the scene with the specified viewData to the current active render target.
+-- @param view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
+function render_library.renderView(tbl)
+	checkluatype(tbl, TYPE_TABLE)
+
+	local origin, angles, w, h, ortho, offcenter
+	if tbl.origin~=nil then checktype(tbl.origin, vector_meta) origin = vunwrap(tbl.origin) end
+	if tbl.angles~=nil then checktype(tbl.angles, ang_meta) angles = aunwrap(tbl.angles) end
+	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
+	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
+	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
+	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = math.Clamp(tbl.w, 1, 1024) end
+	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = math.Clamp(tbl.h, 1, 1024) end
+	if tbl.fov~=nil then checkluatype(tbl.fov, TYPE_NUMBER) end
+	if tbl.zfar~=nil then checkluatype(tbl.zfar, TYPE_NUMBER) end
+	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
+	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
+	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
+	if tbl.ortho~=nil then 
+		checkluatype(tbl.ortho, TYPE_TABLE)
+		checkluatype(tbl.ortho.left, TYPE_NUMBER)
+		checkluatype(tbl.ortho.right, TYPE_NUMBER)
+		checkluatype(tbl.ortho.top, TYPE_NUMBER)
+		checkluatype(tbl.ortho.bottom, TYPE_NUMBER)
+		ortho = { 
+			left = tbl.ortho.left,
+			right = tbl.ortho.right,
+			top = tbl.ortho.top,
+			bottom = tbl.ortho.bottom,
+		}
+	end
+	if tbl.dopostprocess~=nil then checkluatype(tbl.dopostprocess, TYPE_BOOL) end
+	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, TYPE_BOOL) end
+	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, TYPE_NUMBER) end
+	if tbl.zfarviewmodel~=nil then checkluatype(tbl.zfarviewmodel, TYPE_NUMBER) end
+	if tbl.offcenter~=nil then 
+		checkluatype(tbl.offcenter, TYPE_TABLE)
+		checkluatype(tbl.offcenter.left, TYPE_NUMBER)
+		checkluatype(tbl.offcenter.right, TYPE_NUMBER)
+		checkluatype(tbl.offcenter.top, TYPE_NUMBER)
+		checkluatype(tbl.offcenter.bottom, TYPE_NUMBER)
+		offcenter = { 
+			left = tbl.offcenter.left,
+			right = tbl.offcenter.right,
+			top = tbl.offcenter.top,
+			bottom = tbl.offcenter.bottom,
+		}
+	end
+	
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if !data.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
+	
+	if data.renderingView then
+		SF.Throw("Already rendering a view.", 2)
+	end
+
+	if renderingView then
+		return
+	end
+
+	checkpermission(SF.instance, nil, "render.renderView")
+
+	if data.renderedViews >= cv_max_maxrenderviewsperframe:GetInt() then
+		SF.Throw("Max rendered views per frame exceeded!.", 2)
+	end
+
+	data.renderedViews = data.renderedViews + 1
+
+	local prevData = {
+		matrix_stack = matrix_stack,
+		view_matrix_stack = view_matrix_stack,
+		changedFilterMag = data.changedFilterMag,
+		changedFilterMin = data.changedFilterMin,
+		prevClippingState = data.prevClippingState,
+		noStencil = data.noStencil,
+		usingRT = data.usingRT,
+		pushedClippingPlanes = pushedClippingPlanes
+	}
+
+	matrix_stack = { }
+	view_matrix_stack = { }
+	data.changedFilterMag = false
+	data.changedFilterMin = false
+	data.prevClippingState = nil
+	pushedClippingPlanes = 0
+
+	renderingView = true
+	data.renderingView = true
+
+	drawViewerInView = tbl.drawviewer == true
+
+	local oldRt = render.GetRenderTarget()
+	renderingViewRt = oldRt
+
+	render.PushRenderTarget(oldRt)
+	cam.Start3D() -- Seems to fix some of the issues with render operations leaking into default RT
+
+	render.RenderView({
+		origin = origin,
+		angles = angles,
+		aspectratio = tbl.aspectratio,
+		x = tbl.x,
+		y = tbl.y,
+		w = w,
+		h = h,
+		fov = tbl.fov,
+		zfar = tbl.zfar,
+		znear = tbl.znear,
+		drawhud = false,
+		drawmonitors = tbl.drawmonitors,
+		drawviewmodel = tbl.drawviewmodel,
+		ortho = ortho,
+		dopostprocess = tbl.dopostprocess,
+		bloomtone = tbl.bloomtone,
+		znearviewmodel = tbl.znearviewmodel,
+		zfarviewmodel = tbl.zfarviewmodel,
+		offcenter = offcenter,
+	})
+	
+	cam.End3D()
+	render.PopRenderTarget()
+
+	matrix_stack = prevData.matrix_stack
+	view_matrix_stack = prevData.view_matrix_stack
+	data.changedFilterMag = prevData.changedFilterMag
+	data.changedFilterMin = prevData.changedFilterMin
+	data.prevClippingState = prevData.prevClippingState
+	data.noStencil = prevData.noStencil
+	data.usingRT = prevData.usingRT
+	pushedClippingPlanes = prevData.pushedClippingPlanes
+
+	renderingView = false	
+	data.renderingView = false
+	data.isRendering = true
+end
+
+hook.Add("ShouldDrawLocalPlayer", "SF_DrawLocalPlayerInRenderView", function()
+	if renderingView and drawViewerInView then
+		cam.Start3D()
+		cam.End3D()
+		return true
+	end
+end)
+
+-- A fix for render view being rendered improperly when using a clipping plane.
+-- PreDrawHalos is used, because PreDrawHUD isn't always called. This results in halos not being affected by clipping planes.
+hook.Add("PreDrawHalos", "SF_DisableRenderViewClipping", function()
+	if renderingView then
+		render.EnableClipping(false)
+	end
+end)
+
+--- Returns whether render.renderView is being executed.
+function render_library.isInRenderView()
+	return renderingView
+end
+
+--- Returns how many render.renderView calls can be done in the current frame.
+function render_library.renderViewsLeft()
+	return cv_max_maxrenderviewsperframe:GetInt() - SF.instance.data.render.renderedViews
+end
+
+--- Sets the status of the clip renderer, returning previous state.
+-- @param state New clipping state.
+-- @return Previous clipping state.
+function render_library.enableClipping(state)
+	local data = SF.instance.data.render
+
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	checkluatype(state, TYPE_BOOL)
+
+	local prevState = render.EnableClipping(state)
+
+	if data.prevClippingState == nil then
+		data.prevClippingState = prevState
+	end
+
+	return prevState
+end
+
+--- Pushes a new clipping plane of the clip plane stack.
+-- @param normal The normal of the clipping plane.
+-- @param distance The normal of the clipping plane.
+function render_library.pushCustomClipPlane(normal, distance)
+	local data = SF.instance.data.render
+
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+
+	if pushedClippingPlanes >= MAX_CLIPPING_PLANES then
+		SF.Throw("Pushed too many clipping planes.", 2)
+	end
+
+	checktype(normal, vector_meta)
+	checkluatype(distance, TYPE_NUMBER)
+	
+	render.PushCustomClipPlane(vunwrap(normal), distance)
+
+	pushedClippingPlanes = pushedClippingPlanes + 1
+end
+
+--- Removes the current active clipping plane from the clip plane stack.
+function render_library.popCustomClipPlane()
+	local data = SF.instance.data.render
+
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if pushedClippingPlanes == 0 then SF.Throw("Popped too many clipping planes.", 2) end
+	
+	render.PopCustomClipPlane()
+
+	pushedClippingPlanes = pushedClippingPlanes - 1
 end
 
 --- Called when a player uses the screen

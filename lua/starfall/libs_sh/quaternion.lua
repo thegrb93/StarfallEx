@@ -37,8 +37,6 @@ local min 	= math.min
 
 local delta = 0.0000001000000
 
-local isValid = IsValid
-
 local deg2rad = math.pi / 180
 local rad2deg = 180 / math.pi
 
@@ -154,7 +152,7 @@ end
 argTypesToQuat["Entity"] = function(ent)
 	ent = SF.UnwrapObject(ent)
 
-	if not isValid(ent) then
+	if not (ent and ent:IsValid()) then
 		return quicknew(0, 0, 0, 0)
 	end
 
@@ -444,6 +442,22 @@ end
 function quat_lib.inv(q)
 	local l = q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 	return quicknew(q[1] / l, -q[2] / l, -q[3] / l, -q[4] / l)
+end
+
+--- Copies from quaternion and returns a new quaternion
+-- @return The copy of the quaternion
+function quat_methods:clone()
+	return wrap({ self[1], self[2], self[3], self[4] })
+end
+
+--- Copies a quaternion to another.
+-- @param b The quaternion to copy from.
+-- @return nil
+function quat_methods:set(b)
+	self[1] = b[1]
+	self[2] = b[2]
+	self[3] = b[3]
+	self[4] = b[4]
 end
 
 --- Returns the conj of self

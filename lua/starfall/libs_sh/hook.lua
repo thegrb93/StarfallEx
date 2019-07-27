@@ -9,6 +9,7 @@ local registered_instances = {}
 local gmod_hooks = {}
 local gmod_override_hooks = {}
 local wrapArguments = SF.Sanitize
+local wrapObject = SF.WrapObject
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -22,7 +23,7 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 				for instance, _ in pairs(instances) do
 					local canrun, customargs = customargfunc(instance, ...)
 					if canrun then
-						local tbl = instance:runScriptHookForResult(hookname, wrapArguments(unpack(customargs)))
+						local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
 						if tbl[1] then
 							local sane = customretfunc(instance, tbl, ...)
 							if sane ~= nil then result = sane end
@@ -36,7 +37,7 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 				for instance, _ in pairs(instances) do
 					local canrun, customargs = customargfunc(instance, ...)
 					if canrun then
-						instance:runScriptHook(hookname, wrapArguments(unpack(customargs)))
+						instance:runScriptHook(hookname, unpack(customargs))
 					end
 				end
 			end
@@ -44,9 +45,10 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 	else
 		if customretfunc then
 			return function(...)
+				local args = wrapArguments({...})
 				local result
 				for instance, _ in pairs(instances) do
-					local tbl = instance:runScriptHookForResult(hookname, wrapArguments(...))
+					local tbl = instance:runScriptHookForResult(hookname, unpack(args))
 					if tbl[1] then
 						local sane = customretfunc(instance, tbl, ...)
 						if sane ~= nil then result = sane end
@@ -56,8 +58,9 @@ local function getHookFunc(instances, hookname, customargfunc, customretfunc)
 			end
 		else
 			return function(...)
+				local args = wrapArguments({...})
 				for instance, _ in pairs(instances) do
-					instance:runScriptHook(hookname, wrapArguments(...))
+					instance:runScriptHook(hookname, unpack(args))
 				end
 			end
 		end
@@ -283,12 +286,12 @@ if SERVER then
 	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
 	add("EntityTakeDamage", nil, function(instance, target, dmg)
-		return true, { target, dmg:GetAttacker(),
-			dmg:GetInflictor(),
+		return true, { wrapObject(target), wrapObject(dmg:GetAttacker()),
+			wrapObject(dmg:GetInflictor()),
 			dmg:GetDamage(),
 			dmg:GetDamageType(),
-			dmg:GetDamagePosition(),
-			dmg:GetDamageForce() }
+			wrapObject(dmg:GetDamagePosition()),
+			wrapObject(dmg:GetDamageForce()) }
 	end)
 
 else
@@ -296,6 +299,7 @@ else
 	add("StartChat")
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
+	add("NetworkEntityCreated")
 end
 
 -- Shared hooks
@@ -313,12 +317,15 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 -- Entity hooks
 add("OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
-		instance:runScriptHook("onentitycreated", SF.WrapObject(ent))
+		instance:runScriptHook("onentitycreated", wrapObject(ent))
 	end)
 	return false
 end)
 add("EntityRemoved")
 add("PropBreak")
+add("EntityFireBullets", nil, function(instance, ent, data)
+	return true, { SF.WrapObject(ent), SF.StructWrapper(data) }
+end)
 
 -- Other
 add("EndEntityDriving")
@@ -498,6 +505,12 @@ add("Tick")
 -- @shared
 -- @param ent New entity
 
+--- Called when a clientside entity gets created or re-created via lag/PVS
+-- @name NetworkEntityCreated
+-- @class hook
+-- @client
+-- @param ent New entity
+
 --- Called when an entity is removed
 -- @name EntityRemoved
 -- @class hook
@@ -510,6 +523,13 @@ add("Tick")
 -- @shared
 -- @param ply Player who broke it
 -- @param ent Entity broken
+
+--- Called every time a bullet is fired from an entity
+-- @name EntityFireBullets
+-- @class hook
+-- @shared
+-- @param ent The entity that fired the bullet
+-- @param data The bullet data. See http://wiki.garrysmod.com/page/Structures/Bullet
 
 --- Called when an entity is damaged
 -- @name EntityTakeDamage
@@ -552,11 +572,11 @@ add("Tick")
 -- @class hook
 -- @server
 
---- Called after the starfall chip is placed/reloaded with the toolgun or duplicated and the duplication is finished.
--- @name Initialize
+--- Called after the starfall chip is duplicated and the duplication is finished.
+-- @name Dupefinished
 -- @class hook
 -- @server
--- @param dupe True if the duplication that created the chip has finished
+-- @param entTbl A table of entities duped with the chip mapped to their previous indices.
 
 --- Called when the local player opens their chat window.
 -- @name StartChat
