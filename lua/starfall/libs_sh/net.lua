@@ -85,14 +85,14 @@ function net_library.send (target, unreliable)
 				local nt = { }
 				for i = 1, #target do
 					local pl = SF.Entities.Unwrap(target[i])
-					if IsValid(pl) and pl:IsPlayer() then
+					if pl and pl:IsValid() and pl:IsPlayer() then
 						nt[#nt + 1] = pl
 					end
 				end
 				sendfunc, newtarget = net.Send, nt
 			else
 				sendfunc, newtarget = net.Send, SF.Entities.Unwrap(target)
-				if not IsValid(newtarget) or not newtarget:IsPlayer() then SF.Throw("Invalid player", 2) end
+				if not (newtarget and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
 			end
 		else
 			sendfunc = net.Broadcast

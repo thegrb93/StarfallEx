@@ -27,7 +27,7 @@ SF.AddHook("deinitialize", function(instance)
 	if instance.data.constraints.clean ~= false then --Return true on nil too
 		local constraints = instance.data.constraints.constraints
 		for ent, _ in pairs(constraints) do
-			if IsValid(ent) then
+			if (ent and ent:IsValid()) then
 				ent:RemoveCallOnRemove("starfall_constraint_delete")
 				constraintOnDestroy(ent, constraints, instance.player)
 				ent:Remove()
@@ -386,7 +386,7 @@ function constraint_library.setRopeLength(index, e, length)
 	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.rope")
 
 
@@ -396,7 +396,7 @@ function constraint_library.setRopeLength(index, e, length)
 
 	if e.Ropes then
 		local con = e.Ropes[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:SetKeyValue("addlength", length)
 		end
 	end
@@ -408,7 +408,7 @@ function constraint_library.setElasticLength(index, e, length)
 	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.elastic")
 
 	checkluatype(length, TYPE_NUMBER)
@@ -416,7 +416,7 @@ function constraint_library.setElasticLength(index, e, length)
 
 	if e.Elastics then
 		local con = e.Elastics[index]
-		if IsValid(con) then
+		if (con and con:IsValid()) then
 			con:Fire("SetSpringLength", length, 0)
 		end
 	end
@@ -428,7 +428,7 @@ function constraint_library.breakAll(e)
 	checktype(e, ents_metatable)
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
@@ -442,7 +442,7 @@ function constraint_library.breakType(e, typename)
 
 	local ent1 = eunwrap(e)
 
-	if not IsValid(ent1) then SF.Throw("Invalid entity", 2) end
+	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.any")
 
 	constraint.RemoveConstraints(ent1, typename)
@@ -457,7 +457,7 @@ function constraint_library.getTable(ent)
 
 	ent = eunwrap(ent)
 
-	if not IsValid(ent) then SF.Throw("Invalid entity", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 
 	return SF.Sanitize(constraint.GetTable(ent))
 end

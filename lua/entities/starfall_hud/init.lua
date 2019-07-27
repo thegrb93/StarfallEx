@@ -21,7 +21,7 @@ function ENT:SetHudEnabled(ply, mode)
 	net.Send(ply)
 
 	local function connect()
-		if IsValid(self.link) then
+		if (self.link and self.link:IsValid()) then
 			local instance = self.link.instance
 			if instance then
 				instance:runScriptHook("hudconnected", SF.WrapObject(self))
@@ -31,7 +31,7 @@ function ENT:SetHudEnabled(ply, mode)
 	end
 
 	local function disconnect()
-		if IsValid(self.link) then
+		if (self.link and self.link:IsValid()) then
 			local instance = self.link.instance
 			if instance then
 				instance:runScriptHook("huddisconnected", SF.WrapObject(self))
@@ -95,8 +95,9 @@ hook.Add("PlayerEnteredVehicle", "Starfall_HUD_PlayerEnteredVehicle", function(p
 	for k, v in pairs(vehiclelinks) do
 		if vehicle == k and v:IsValid() then
 			vehicle:CallOnRemove("remove_sf_hud"..v:EntIndex(), function()
-				if not IsValid(v) then return end
-				v:SetHudEnabled(ply, 0)
+				if v:IsValid() then
+					v:SetHudEnabled(ply, 0)
+				end
 			end)
 			v:SetHudEnabled(ply, 1)
 		end
@@ -114,7 +115,7 @@ end)
 function ENT:PreEntityCopy ()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	local info = {}
-	if IsValid(self.link) then
+	if (self.link and self.link:IsValid()) then
 		info.link = self.link:EntIndex()
 	end
 	local linkedvehicles = {}
@@ -136,7 +137,7 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		local info = ent.EntityMods.SFLink
 		if info.link then
 			local e = CreatedEntities[info.link]
-			if IsValid(e) then
+			if (e and e:IsValid()) then
 				self:LinkEnt(e)
 			end
 		end
@@ -144,7 +145,7 @@ function ENT:PostEntityPaste (ply, ent, CreatedEntities)
 		if info.linkedvehicles then
 			for k, v in pairs(info.linkedvehicles) do
 				local e = CreatedEntities[v]
-				if IsValid(e) then
+				if (e and e:IsValid()) then
 					self:LinkVehicle(e)
 				end
 			end

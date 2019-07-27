@@ -652,7 +652,7 @@ else
 	function SF.DefaultEnvironment.setName(name)
 		checkluatype (name, TYPE_STRING)
 		local e = SF.instance.data.entity
-		if IsValid(e) then
+		if (e and e:IsValid()) then
 			e.name = string.sub(name, 1, 256)
 		end
 	end

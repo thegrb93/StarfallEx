@@ -365,8 +365,8 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	local entI = eunwrap(entI)
 	local entO = eunwrap(entO)
 
-	if not IsValid(entI) then SF.Throw("Invalid source") end
-	if not IsValid(entO) then SF.Throw("Invalid target") end
+	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
+	if not (entO and entO:IsValid()) then SF.Throw("Invalid target") end
 
 	checkpermission(SF.instance, entI, "wire.createWire")
 	checkpermission(SF.instance, entO, "wire.createWire")
@@ -403,7 +403,7 @@ function wire_library.delete (entI, inputname)
 
 	local entI = eunwrap(entI)
 
-	if not IsValid(entI) then SF.Throw("Invalid source") end
+	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
 
 	checkpermission(SF.instance, entI, "wire.deleteWire")
 
@@ -423,7 +423,7 @@ local function parseEntity(ent, io)
 		ent = SF.instance.data.entity or nil
 	end
 
-	if not IsValid(ent) then SF.Throw("Invalid source") end
+	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
 
 	local ret = {}
 	for k, v in pairs(ent[io]) do

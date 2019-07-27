@@ -20,7 +20,7 @@ if SERVER then
 		if not pl:CheckLimit("starfall_components") then return false end
 
 		local sf = ents.Create(class)
-		if not IsValid(sf) then return false end
+		if not (sf and sf:IsValid()) then return false end
 
 		sf:SetAngles(Ang)
 		sf:SetPos(Pos)
@@ -139,7 +139,7 @@ function TOOL:LeftClick(trace)
 end
 
 function TOOL:RightClick(trace)
-	if not trace.HitPos or not IsValid(trace.Entity) or trace.Entity:IsPlayer() then return false end
+	if not trace.HitPos or not (trace.Entity and trace.Entity:IsValid()) or trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
 	local ent = trace.Entity
@@ -154,7 +154,7 @@ function TOOL:RightClick(trace)
 			return false
 		end
 	elseif self:GetStage() == 1 then -- stage 1: right-clicking on something links it
-		if not IsValid(self.Component) then self:SetStage(0) return end
+		if not (self.Component and self.Component:IsValid()) then self:SetStage(0) return end
 		if self.Component:GetClass()=="starfall_screen" and ent:GetClass()=="starfall_processor" then
 
 			self.Component:LinkEnt(ent)
@@ -183,7 +183,7 @@ function TOOL:RightClick(trace)
 end
 
 function TOOL:Reload(trace)
-	if not trace.HitPos or not IsValid(trace.Entity) or trace.Entity:IsPlayer() then return false end
+	if not trace.HitPos or not (trace.Entity and trace.Entity:IsValid()) or trace.Entity:IsPlayer() then return false end
 	if CLIENT then return true end
 
 	local ent = trace.Entity
@@ -212,7 +212,7 @@ function TOOL:Think()
 	else
 		model = "models/bull/dynamicbutton.mdl"
 	end
-	if (not IsValid(self.GhostEntity) or self.GhostEntity:GetModel() ~= model) then
+	if not (self.GhostEntity and self.GhostEntity:IsValid()) or self.GhostEntity:GetModel() ~= model then
 		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
 	end
 
@@ -220,7 +220,7 @@ function TOOL:Think()
 	if (not trace.Hit) then return end
 	local ent = self.GhostEntity
 
-	if not IsValid(ent) then return end
+	if not (ent and ent:IsValid()) then return end
 
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90

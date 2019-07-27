@@ -74,7 +74,7 @@ SF.AddHook("deinitialize", function(inst)
 	local holos = inst.data.holograms.holos
 	local holo = next(holos)
 	while holo do
-		if IsValid(holo) then
+		if (holo and holo:IsValid()) then
 			holo:RemoveCallOnRemove("starfall_hologram_delete")
 			hologramOnDestroy(holo, holos, inst.player)
 			holo:Remove()
@@ -179,7 +179,7 @@ if SERVER then
 	function hologram_methods:setScale(scale)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checktype(scale, vec_meta)
 		local scale = vunwrap(scale)
@@ -195,7 +195,7 @@ if SERVER then
 	function hologram_methods:suppressEngineLighting (suppress)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkluatype(suppress, TYPE_BOOL)
 
@@ -213,7 +213,7 @@ if SERVER then
 		local vel = vunwrap(vel)
 
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
 		holo:SetLocalVelocity(vel)
@@ -227,7 +227,7 @@ if SERVER then
 		checktype(angvel, ang_meta)
 
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
@@ -240,7 +240,7 @@ if SERVER then
 	-- @param rate Frame speed. (1 is normal)
 	function hologram_methods:setAnimation(animation, frame, rate)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
 		if isstring(animation) then
@@ -284,7 +284,7 @@ else
 	function hologram_methods:setPos(vec)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checktype(vec, vec_meta)
 		local vec = vunwrap(vec)
@@ -300,7 +300,7 @@ else
 	function hologram_methods:setAngles(ang)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checktype(ang, ang_meta)
 		local ang = aunwrap(ang)
@@ -316,7 +316,7 @@ else
 	function hologram_methods:setMesh(mesh)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		local instance = SF.instance
 		checkpermission(instance, nil, "mesh")
@@ -336,7 +336,7 @@ else
 	function hologram_methods:setFilterMag(val)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -354,7 +354,7 @@ else
 	function hologram_methods:setFilterMin(val)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -372,7 +372,7 @@ else
 	function hologram_methods:setMeshMaterial(material)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -391,7 +391,7 @@ else
 	function hologram_methods:setRenderBounds(mins, maxs)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checktype(mins, vec_meta)
 		checktype(maxs, vec_meta)
@@ -407,7 +407,7 @@ else
 	function hologram_methods:setRenderMatrix(mat)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -429,7 +429,7 @@ else
 	function hologram_methods:setScale(scale)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checktype(scale, vec_meta)
 		local scale = vunwrap(scale)
@@ -449,7 +449,7 @@ else
 	function hologram_methods:setClip(index, enabled, origin, normal, entity)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkluatype(index, TYPE_NUMBER)
 		checkluatype(enabled, TYPE_BOOL)
@@ -488,7 +488,7 @@ else
 	function hologram_methods:suppressEngineLighting (suppress)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
-		if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkluatype(suppress, TYPE_BOOL)
 
@@ -504,7 +504,7 @@ end
 function hologram_methods:getScale()
 	checktype(self, hologram_metamethods)
 	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -516,7 +516,7 @@ end
 function hologram_methods:setModel(model)
 	checktype(self, hologram_metamethods)
 	local holo = unwrap(self)
-	if not IsValid(holo) then SF.Throw("The entity is invalid", 2) end
+	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(model, TYPE_STRING)
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end

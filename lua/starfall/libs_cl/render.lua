@@ -819,7 +819,7 @@ function render_library.setTextureFromScreen (ent)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	ent = eunwrap(ent)
-	if IsValid(ent) and ent.GPU and ent.GPU.RT then
+	if (ent and ent:IsValid()) and ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
 		surface.SetMaterial(RT_Material)
 		render.SetMaterial(RT_Material)

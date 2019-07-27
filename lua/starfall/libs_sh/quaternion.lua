@@ -37,8 +37,6 @@ local min 	= math.min
 
 local delta = 0.0000001000000
 
-local isValid = IsValid
-
 local deg2rad = math.pi / 180
 local rad2deg = 180 / math.pi
 
@@ -154,7 +152,7 @@ end
 argTypesToQuat["Entity"] = function(ent)
 	ent = SF.UnwrapObject(ent)
 
-	if not isValid(ent) then
+	if not (ent and ent:IsValid()) then
 		return quicknew(0, 0, 0, 0)
 	end
 

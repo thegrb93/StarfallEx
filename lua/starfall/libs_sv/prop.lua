@@ -226,7 +226,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		entity = ents.Create(npc.Class)
 
-		if IsValid(entity) then
+		if entity and entity:IsValid() then
 			if (npc.Model) then
 				entity:SetModel(npc.Model)
 			end
@@ -256,7 +256,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		entity = ents.Create(vehicle.Class)
 
-		if IsValid(entity) then
+		if entity and entity:IsValid() then
 			entity:SetModel(vehicle.Model)
 			if (vehicle.Model == "models/buggy.mdl") then
 				entity:SetKeyValue("vehiclescript", "scripts/vehicles/jeep_test.txt")
@@ -297,7 +297,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	end
 
-	if (IsValid(entity)) then
+	if entity and entity:IsValid() then
 
 		entity:SetPos(SF.clampPos(pos))
 		entity:SetAngles(ang)
