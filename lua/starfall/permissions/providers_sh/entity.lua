@@ -170,7 +170,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			if(cleanup) then
 				local backupcleanupAdd = cleanup.Add
 				function cleanup.Add(ply, enttype, ent)
-					if (ent and ent:IsValid()) and ply:IsPlayer() then
+					if ent and ent:IsValid() and ply:IsPlayer() then
 						PropOwn(ply, ent)
 					end
 					backupcleanupAdd(ply, enttype, ent)
