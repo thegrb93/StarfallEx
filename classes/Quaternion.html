@@ -209,6 +209,11 @@ Quaternion type</p>
 	<table class="list">
 		
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Quaternion:clone">clone</a>( &nbsp;)</td>
+			<td class="summary">
+Copies from quaternion and returns a new quaternion </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Quaternion:conj">conj</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the conj of self </td>
@@ -249,6 +254,11 @@ Returns the real component of the quaternion </td>
 Returns vector pointing right for <this> </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Quaternion:set">set</a>( b&nbsp;)</td>
+			<td class="summary">
+Copies a quaternion to another.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Quaternion:up">up</a>( &nbsp;)</td>
 			<td class="summary">
 Returns vector pointing up for <this> </td>
@@ -259,6 +269,24 @@ Returns vector pointing up for <this> </td>
 	<h2><a name="methods_def"></a>Methods definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_sh"></span><a name="Quaternion:clone"></a><strong>Quaternion:clone</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Copies from quaternion and returns a new quaternion</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The copy of the quaternion</p>
+		
+	</section>
+	
+	
+</dd>
 		
 <dt><span class="realm_sh"></span><a name="Quaternion:conj"></a><strong>Quaternion:conj</strong>( &nbsp;)</dt>
 <dd>
@@ -352,6 +380,31 @@ Returns vector pointing right for <this></p>
 	
 	
 	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Quaternion:set"></a><strong>Quaternion:set</strong>( b&nbsp;)</dt>
+<dd>
+	<p>
+Copies a quaternion to another.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>b</tt> ― The quaternion to copy from.</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>nil</p>
+		
+	</section>
 	
 	
 </dd>

@@ -209,6 +209,11 @@ Color type</p>
 	<table class="list">
 		
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Color:clone">clone</a>( &nbsp;)</td>
+			<td class="summary">
+Copies r,g,b,a from color and returns a new color </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Color:hsvToRGB">hsvToRGB</a>( &nbsp;)</td>
 			<td class="summary">
 Converts the color from HSV to RGB.</td>
@@ -217,6 +222,11 @@ Converts the color from HSV to RGB.</td>
 			<td class="name"><span class="realm_sh"></span><a href="#Color:rgbToHSV">rgbToHSV</a>( &nbsp;)</td>
 			<td class="summary">
 Converts the color from RGB to HSV.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Color:set">set</a>( b&nbsp;)</td>
+			<td class="summary">
+Copies r,g,b,a from color to another.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Color:setA">setA</a>( a&nbsp;)</td>
@@ -244,6 +254,24 @@ Set's the color's red channel and returns it.</td>
 	<h2><a name="methods_def"></a>Methods definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_sh"></span><a name="Color:clone"></a><strong>Color:clone</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Copies r,g,b,a from color and returns a new color</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The copy of the color</p>
+		
+	</section>
+	
+	
+</dd>
 		
 <dt><span class="realm_sh"></span><a name="Color:hsvToRGB"></a><strong>Color:hsvToRGB</strong>( &nbsp;)</dt>
 <dd>
@@ -275,6 +303,31 @@ Converts the color from RGB to HSV.</p>
 		<h3>Returns</h3>
 		
 		<p>A triplet of numbers representing HSV.</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Color:set"></a><strong>Color:set</strong>( b&nbsp;)</dt>
+<dd>
+	<p>
+Copies r,g,b,a from color to another.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>b</tt> ― The color to copy from.</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>nil</p>
 		
 	</section>
 	
