@@ -1,5 +1,7 @@
 SF.Docs={["classes"]={[1]="Angle";[10]="Mesh";[11]="Npc";[12]="Particle";[13]="PhysObj";[14]="Player";[15]="Quaternion";[16]="Sound";[17]="StringStream";[18]="VMatrix";[19]="Vector";[2]="Bass";[20]="Vehicle";[21]="Weapon";[22]="Wirelink";[3]="Color";[4]="Effect";[5]="Entity";[6]="File";[7]="Hologram";[8]="Light";[9]="Material";["Angle"]={["class"]="class";["client"]=true;["description"]="\
-Angle Type";["fields"]={};["methods"]={[1]="getForward";[10]="setR";[11]="setY";[12]="setZero";[2]="getNormalized";[3]="getRight";[4]="getUp";[5]="isZero";[6]="normalize";[7]="rotateAroundAxis";[8]="set";[9]="setP";["getForward"]={["class"]="function";["classlib"]="Angle";["description"]="\
+Angle Type";["fields"]={};["methods"]={[1]="clone";[10]="setP";[11]="setR";[12]="setY";[13]="setZero";[2]="getForward";[3]="getNormalized";[4]="getRight";[5]="getUp";[6]="isZero";[7]="normalize";[8]="rotateAroundAxis";[9]="set";["clone"]={["class"]="function";["classlib"]="Angle";["description"]="\
+Copies p,y,r from angle and returns a new angle";["fname"]="clone";["name"]="ang_methods:clone";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The copy of the angle";["summary"]="\
+Copies p,y,r from angle and returns a new angle ";};["getForward"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Return the Forward Vector ( direction the angle points ).";["fname"]="getForward";["name"]="ang_methods:getForward";["param"]={};["private"]=false;["realm"]="sh";["ret"]="vector normalised.";["summary"]="\
 Return the Forward Vector ( direction the angle points ).";};["getNormalized"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Returnes a normalized angle";["fname"]="getNormalized";["name"]="ang_methods:getNormalized";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Normalized angle table";["summary"]="\
@@ -14,7 +16,7 @@ Normalise angles eg (0,181,1) -> (0,-179,1).";["fname"]="normalize";["name"]="an
 Normalise angles eg (0,181,1) -> (0,-179,1).";};["rotateAroundAxis"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Return Rotated angle around the specified axis.";["fname"]="rotateAroundAxis";["name"]="ang_methods:rotateAroundAxis";["param"]={[1]="v";[2]="deg";[3]="rad";["deg"]="Number of degrees or nil if radians.";["rad"]="Number of radians or nil if degrees.";["v"]="Vector axis";};["private"]=false;["realm"]="sh";["ret"]="The modified angle";["summary"]="\
 Return Rotated angle around the specified axis.";};["set"]={["class"]="function";["classlib"]="Angle";["description"]="\
-Copies p,y,r from angle to another.";["fname"]="set";["name"]="ang_methods:set";["param"]={[1]="b";["b"]="Angle to copy from.";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
+Copies p,y,r from angle to another.";["fname"]="set";["name"]="ang_methods:set";["param"]={[1]="b";["b"]="The angle to copy from.";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
 Copies p,y,r from angle to another.";};["setP"]={["class"]="function";["classlib"]="Angle";["description"]="\
 Set's the angle's pitch and returns it.";["fname"]="setP";["name"]="ang_methods:setP";["param"]={[1]="p";["p"]="The pitch";};["private"]=false;["realm"]="sh";["ret"]="The modified angle";["summary"]="\
 Set's the angle's pitch and returns it.";};["setR"]={["class"]="function";["classlib"]="Angle";["description"]="\
@@ -59,11 +61,15 @@ Sets the volume of the sound channel.";};["stop"]={["class"]="function";["classl
 Stops playing the sound.";["fname"]="stop";["name"]="bass_methods:stop";["param"]={};["private"]=false;["realm"]="cl";["summary"]="\
 Stops playing the sound.";};};["name"]="Bass";["summary"]="\
 For playing music there is `Bass` type.";["typtbl"]="bass_methods";};["Color"]={["class"]="class";["client"]=true;["description"]="\
-Color type";["fields"]={};["methods"]={[1]="hsvToRGB";[2]="rgbToHSV";[3]="setA";[4]="setB";[5]="setG";[6]="setR";["hsvToRGB"]={["class"]="function";["classlib"]="Color";["client"]=true;["description"]="\
+Color type";["fields"]={};["methods"]={[1]="clone";[2]="hsvToRGB";[3]="rgbToHSV";[4]="set";[5]="setA";[6]="setB";[7]="setG";[8]="setR";["clone"]={["class"]="function";["classlib"]="Color";["description"]="\
+Copies r,g,b,a from color and returns a new color";["fname"]="clone";["name"]="color_methods:clone";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The copy of the color";["summary"]="\
+Copies r,g,b,a from color and returns a new color ";};["hsvToRGB"]={["class"]="function";["classlib"]="Color";["client"]=true;["description"]="\
 Converts the color from HSV to RGB.";["fname"]="hsvToRGB";["name"]="color_methods:hsvToRGB";["param"]={};["private"]=false;["realm"]="sh";["ret"]="A triplet of numbers representing HSV.";["server"]=true;["summary"]="\
 Converts the color from HSV to RGB.";};["rgbToHSV"]={["class"]="function";["classlib"]="Color";["client"]=true;["description"]="\
 Converts the color from RGB to HSV.";["fname"]="rgbToHSV";["name"]="color_methods:rgbToHSV";["param"]={};["private"]=false;["realm"]="sh";["ret"]="A triplet of numbers representing HSV.";["server"]=true;["summary"]="\
-Converts the color from RGB to HSV.";};["setA"]={["class"]="function";["classlib"]="Color";["description"]="\
+Converts the color from RGB to HSV.";};["set"]={["class"]="function";["classlib"]="Color";["description"]="\
+Copies r,g,b,a from color to another.";["fname"]="set";["name"]="color_methods:set";["param"]={[1]="b";["b"]="The color to copy from.";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
+Copies r,g,b,a from color to another.";};["setA"]={["class"]="function";["classlib"]="Color";["description"]="\
 Set's the color's alpha and returns it.";["fname"]="setA";["name"]="color_methods:setA";["param"]={[1]="a";["a"]="The alpha";};["private"]=false;["realm"]="sh";["ret"]="The modified color";["summary"]="\
 Set's the color's alpha and returns it.";};["setB"]={["class"]="function";["classlib"]="Color";["description"]="\
 Set's the color's blue and returns it.";["fname"]="setB";["name"]="color_methods:setB";["param"]={[1]="b";["b"]="The blue";};["private"]=false;["realm"]="sh";["ret"]="The modified color";["summary"]="\
@@ -789,7 +795,9 @@ Sets the view entity of the player.";};["voiceVolume"]={["class"]="function";["c
 Returns the voice volume of the player";["fname"]="voiceVolume";["name"]="player_methods:voiceVolume";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Returns the players voice volume, how loud the player's voice communication currently is, as a normal number. Doesn't work on local player unless the voice_loopback convar is set to 1.";["summary"]="\
 Returns the voice volume of the player ";};};["name"]="Player";["summary"]="\
 Player type ";["typtbl"]="player_methods";};["Quaternion"]={["class"]="class";["description"]="\
-Quaternion type";["fields"]={};["methods"]={[1]="conj";[2]="forward";[3]="i";[4]="j";[5]="k";[6]="r";[7]="real";[8]="right";[9]="up";["conj"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
+Quaternion type";["fields"]={};["methods"]={[1]="clone";[10]="set";[11]="up";[2]="conj";[3]="forward";[4]="i";[5]="j";[6]="k";[7]="r";[8]="real";[9]="right";["clone"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
+Copies from quaternion and returns a new quaternion";["fname"]="clone";["name"]="quat_methods:clone";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The copy of the quaternion";["summary"]="\
+Copies from quaternion and returns a new quaternion ";};["conj"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
 Returns the conj of self";["fname"]="conj";["name"]="quat_methods:conj";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Returns the conj of self ";};["forward"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
 Returns vector pointing forward for <this>";["fname"]="forward";["name"]="quat_methods:forward";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
@@ -805,7 +813,9 @@ Alias for :real() as r is easier ";};["real"]={["class"]="function";["classlib"]
 Returns the real component of the quaternion";["fname"]="real";["name"]="quat_methods:real";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Returns the real component of the quaternion ";};["right"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
 Returns vector pointing right for <this>";["fname"]="right";["name"]="quat_methods:right";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
-Returns vector pointing right for <this> ";};["up"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
+Returns vector pointing right for <this> ";};["set"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
+Copies a quaternion to another.";["fname"]="set";["name"]="quat_methods:set";["param"]={[1]="b";["b"]="The quaternion to copy from.";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
+Copies a quaternion to another.";};["up"]={["class"]="function";["classlib"]="Quaternion";["description"]="\
 Returns vector pointing up for <this>";["fname"]="up";["name"]="quat_methods:up";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Returns vector pointing up for <this> ";};};["name"]="Quaternion";["summary"]="\
 Quaternion type ";["typtbl"]="quat_methods";};["Sound"]={["class"]="class";["client"]=true;["description"]="\
@@ -877,7 +887,9 @@ Writes a byte to the buffer and advances the buffer pointer.";};["writeString"]=
 Writes a string to the buffer putting a null at the end and advances the buffer pointer.";["fname"]="writeString";["name"]="ss_methods:writeString";["param"]={[1]="string";["string"]="The string of bytes to write";};["private"]=false;["realm"]="sh";["summary"]="\
 Writes a string to the buffer putting a null at the end and advances the buffer pointer.";};};["name"]="StringStream";["summary"]="\
 StringStream type ";["typtbl"]="ss_methods";};["VMatrix"]={["class"]="class";["description"]="\
-VMatrix type";["fields"]={};["methods"]={[1]="getAngles";[10]="getTransposed";[11]="getUp";[12]="invert";[13]="invertTR";[14]="isIdentity";[15]="isRotationMatrix";[16]="rotate";[17]="scale";[18]="scaleTranslation";[19]="set";[2]="getAxisAngle";[20]="setAngles";[21]="setField";[22]="setForward";[23]="setIdentity";[24]="setRight";[25]="setScale";[26]="setTranslation";[27]="setUp";[28]="toTable";[29]="translate";[3]="getField";[30]="transpose";[4]="getForward";[5]="getInverse";[6]="getInverseTR";[7]="getRight";[8]="getScale";[9]="getTranslation";["getAngles"]={["class"]="function";["classlib"]="VMatrix";["description"]="\
+VMatrix type";["fields"]={};["methods"]={[1]="clone";[10]="getTranslation";[11]="getTransposed";[12]="getUp";[13]="invert";[14]="invertTR";[15]="isIdentity";[16]="isRotationMatrix";[17]="rotate";[18]="scale";[19]="scaleTranslation";[2]="getAngles";[20]="set";[21]="setAngles";[22]="setField";[23]="setForward";[24]="setIdentity";[25]="setRight";[26]="setScale";[27]="setTranslation";[28]="setUp";[29]="toTable";[3]="getAxisAngle";[30]="translate";[31]="transpose";[4]="getField";[5]="getForward";[6]="getInverse";[7]="getInverseTR";[8]="getRight";[9]="getScale";["clone"]={["class"]="function";["classlib"]="VMatrix";["description"]="\
+Copies The matrix and returns a new matrix";["fname"]="clone";["name"]="vmatrix_methods:clone";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The copy of the matrix";["summary"]="\
+Copies The matrix and returns a new matrix ";};["getAngles"]={["class"]="function";["classlib"]="VMatrix";["description"]="\
 Returns angles";["fname"]="getAngles";["name"]="vmatrix_methods:getAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Angles";["summary"]="\
 Returns angles ";};["getAxisAngle"]={["class"]="function";["classlib"]="VMatrix";["description"]="\
 Gets the rotation axis and angle of rotation of the rotation matrix";["fname"]="getAxisAngle";["name"]="vmatrix_methods:getAxisAngle";["param"]={};["private"]=false;["realm"]="sh";["ret"]={[1]="The axis of rotation";[2]="The angle of rotation";};["summary"]="\
@@ -939,9 +951,11 @@ Translate the matrix ";};["transpose"]={["class"]="function";["classlib"]="VMatr
 Transposes the matrix";["fname"]="transpose";["name"]="vmatrix_methods:transpose";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
 Transposes the matrix ";};};["name"]="VMatrix";["summary"]="\
 VMatrix type ";["typtbl"]="vmatrix_methods";};["Vector"]={["class"]="class";["client"]=true;["description"]="\
-Vector type";["fields"]={};["methods"]={[1]="add";[10]="getLength2D";[11]="getLength2DSqr";[12]="getLengthSqr";[13]="getNormalized";[14]="isEqualTol";[15]="isInWorld";[16]="isZero";[17]="mul";[18]="normalize";[19]="rotate";[2]="cross";[20]="rotateAroundAxis";[21]="set";[22]="setX";[23]="setY";[24]="setZ";[25]="setZero";[26]="sub";[27]="toScreen";[28]="vdiv";[29]="vmul";[3]="div";[30]="withinAABox";[4]="dot";[5]="getAngle";[6]="getAngleEx";[7]="getDistance";[8]="getDistanceSqr";[9]="getLength";["add"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Vector type";["fields"]={};["methods"]={[1]="add";[10]="getLength";[11]="getLength2D";[12]="getLength2DSqr";[13]="getLengthSqr";[14]="getNormalized";[15]="isEqualTol";[16]="isInWorld";[17]="isZero";[18]="mul";[19]="normalize";[2]="clone";[20]="rotate";[21]="rotateAroundAxis";[22]="set";[23]="setX";[24]="setY";[25]="setZ";[26]="setZero";[27]="sub";[28]="toScreen";[29]="vdiv";[3]="cross";[30]="vmul";[31]="withinAABox";[4]="div";[5]="dot";[6]="getAngle";[7]="getAngleEx";[8]="getDistance";[9]="getDistanceSqr";["add"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Add vector - Modifies self.";["fname"]="add";["name"]="vec_methods:add";["param"]={[1]="v";["v"]="Vector to add";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
-Add vector - Modifies self.";};["cross"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Add vector - Modifies self.";};["clone"]={["class"]="function";["classlib"]="Vector";["description"]="\
+Copies x,y,z from a vector and returns a new vector";["fname"]="clone";["name"]="vec_methods:clone";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The copy of the vector";["summary"]="\
+Copies x,y,z from a vector and returns a new vector ";};["cross"]={["class"]="function";["classlib"]="Vector";["description"]="\
 Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.";["fname"]="cross";["name"]="vec_methods:cross";["param"]={[1]="v";["v"]="Second Vector";};["private"]=false;["realm"]="sh";["ret"]="Vector";["summary"]="\
 Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.";};["div"]={["class"]="function";["classlib"]="Vector";["description"]="\
 \"Scalar Division\" of the vector. Self-Modifies.";["fname"]="div";["name"]="vec_methods:div";["param"]={[1]="n";["n"]="Scalar to divide by.";};["private"]=false;["realm"]="sh";["ret"]="nil";["summary"]="\
