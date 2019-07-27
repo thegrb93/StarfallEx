@@ -446,6 +446,22 @@ function quat_lib.inv(q)
 	return quicknew(q[1] / l, -q[2] / l, -q[3] / l, -q[4] / l)
 end
 
+--- Copies from quaternion and returns a new quaternion
+-- @return The copy of the quaternion
+function quat_methods:clone()
+	return wrap({ self[1], self[2], self[3], self[4] })
+end
+
+--- Copies a quaternion to another.
+-- @param b The quaternion to copy from.
+-- @return nil
+function quat_methods:set(b)
+	self[1] = b[1]
+	self[2] = b[2]
+	self[3] = b[3]
+	self[4] = b[4]
+end
+
 --- Returns the conj of self
 function quat_methods:conj()
 	return quat_lib.conj(self)
