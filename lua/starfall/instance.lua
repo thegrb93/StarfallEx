@@ -9,16 +9,13 @@ if SERVER then
 	SF.cpuQuota = CreateConVar("sf_timebuffer", 0.005, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
-	SF.RamCap = CreateConVar("sf_ramcap", 128000, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.RamSpikeCap = CreateConVar("sf_ramspikecap", 16000, "If a ram spike exceeds this limit (in kB), starfalls will be terminated")
+	SF.RamCap = CreateConVar("sf_ramcap", 200000, "If ram exceeds this limit (in kB), starfalls will be terminated")
 else
 	SF.cpuQuota = CreateConVar("sf_timebuffer_cl", 0.006, FCVAR_ARCHIVE, "The max average the CPU time can reach.")
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize_cl", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
-	SF.RamCap = CreateConVar("sf_ramcap_cl", 128000, "If ram exceeds this limit (in kB), starfalls will be terminated")
-	SF.RamSpikeCap = CreateConVar("sf_ramspikecap_cl", 16000, "If a ram spike exceeds this limit (in kB), starfalls will be terminated")
-	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
+	SF.RamCap = CreateConVar("sf_ramcap_cl", 200000, "If ram exceeds this limit (in kB), starfalls will be terminated")
 end
 
 SF.Instance = {}
@@ -360,13 +357,14 @@ hook.Add("Think", "SF_Think", function()
 
 	local ram = collectgarbage("count")
 	if SF.Instance.Ram then
-		if ram - SF.Instance.Ram > SF.RamSpikeCap:GetInt() or ram - SF.Instance.RamAvg > SF.RamCap:GetInt() then
+		if ram > SF.RamCap:GetInt() then
 			for inst, _ in pairs(SF.allInstances) do
-				inst:Error(SF.MakeError("RAM usage limit exceeded!", 1))
+				inst:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
 			end
+			collectgarbage()
 		end
 		SF.Instance.Ram = ram
-		SF.Instance.RamAvg = SF.Instance.RamAvg*0.99999 + ram*0.00001
+		SF.Instance.RamAvg = SF.Instance.RamAvg*0.999 + ram*0.001
 	else
 		SF.Instance.Ram = ram
 		SF.Instance.RamAvg = ram
