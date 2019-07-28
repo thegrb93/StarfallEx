@@ -73,7 +73,9 @@ local function canAddTriangles(inst, triangles)
 end
 
 local function destroyMesh(ply, mesh, meshdata)
-	plyTriangleCount[ply] = plyTriangleCount[ply] - meshdata[mesh].ntriangles
+	if plyTriangleCount[ply] then
+		plyTriangleCount[ply] = plyTriangleCount[ply] - meshdata[mesh].ntriangles
+	end
 
 	mesh:Destroy()
 	meshdata[mesh] = nil
