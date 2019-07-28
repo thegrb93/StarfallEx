@@ -727,6 +727,12 @@ else
 	end
 end
 
+--- Returns the table of scripts used by the chip
+-- @return Table of scripts used by the chip
+function SF.DefaultEnvironment.getScripts()
+	return SF.Sanitize(SF.instance.source)
+end
+
 --- Runs an included script and caches the result.
 -- Works pretty much like standard Lua require()
 -- @param file The file to include. Make sure to --@include it
