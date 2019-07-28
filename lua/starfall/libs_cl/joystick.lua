@@ -1,5 +1,4 @@
-
-if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") or file.Exists("lua/bin/gmcl_joystick_win64.dll", "GAME") then
+if (jit.os == "Windows" and (file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") or file.Exists("lua/bin/gmcl_joystick_win64.dll", "GAME"))) or (jit.os == "Linux" and file.Exists("lua/bin/gmcl_joystick_linux.dll", "GAME")) then
 	require("joystick")
 else
 	return
