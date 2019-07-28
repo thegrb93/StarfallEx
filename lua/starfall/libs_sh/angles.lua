@@ -194,15 +194,19 @@ function ang_methods:rotateAroundAxis (v, deg, rad)
 	return awrap(ret)
 end
 
---- Copies p,y,r from angle to another.
--- @param b Angle to copy from.
--- @return nil
-function ang_methods:set (b)
-	checktype(b, ang_metamethods)
+--- Copies p,y,r from angle and returns a new angle
+-- @return The copy of the angle
+function ang_methods:clone()
+	return wrap({ self[1], self[2], self[3] })
+end
 
-	self[1] = (b[1] or 0)
-	self[2] = (b[2] or 0)
-	self[3] = (b[3] or 0)
+--- Copies p,y,r from angle to another.
+-- @param b The angle to copy from.
+-- @return nil
+function ang_methods:set(b)
+	self[1] = b[1]
+	self[2] = b[2]
+	self[3] = b[3]
 end
 
 --- Sets p,y,r to 0. This is faster than doing it manually.

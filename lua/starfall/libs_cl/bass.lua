@@ -161,7 +161,7 @@ function bass_methods:play ()
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:Play()
 	end
 end
@@ -173,7 +173,7 @@ function bass_methods:stop ()
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:Stop()
 	end
 end
@@ -185,7 +185,7 @@ function bass_methods:pause ()
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:Pause()
 	end
 end
@@ -199,7 +199,7 @@ function bass_methods:setVolume (vol)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:SetVolume(math.Clamp(vol, 0, 10))
 	end
 end
@@ -213,7 +213,7 @@ function bass_methods:setPitch (pitch)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:SetPlaybackRate(math.Clamp(pitch, 0, 3))
 	end
 end
@@ -227,7 +227,7 @@ function bass_methods:setPos (pos)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:SetPos(SF.UnwrapObject(pos))
 	end
 end
@@ -241,7 +241,7 @@ function bass_methods:setFade (min, max)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 10000, 200000))
 	end
 end
@@ -254,7 +254,7 @@ function bass_methods:setLooping (loop)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:EnableLooping(loop)
 	end
 end
@@ -267,7 +267,7 @@ function bass_methods:getLength ()
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		return uw:GetLength()
 	end
 end
@@ -281,7 +281,7 @@ function bass_methods:setTime (time)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		uw:SetTime(time)
 	end
 end
@@ -294,7 +294,7 @@ function bass_methods:getTime ()
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		return uw:GetTime()
 	end
 end
@@ -308,7 +308,7 @@ function bass_methods:getFFT (n)
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		local arr = {}
 		uw:FFT(arr, n)
 		return arr
@@ -323,7 +323,7 @@ function bass_methods:isOnline()
 
 	checkpermission(SF.instance, nil, "sound.modify")
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		return uw:IsOnline()
 	end
 
@@ -336,7 +336,7 @@ function bass_methods:isValid()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	return IsValid(uw)
+	return uw and uw:IsValid()
 end
 
 --- Gets the left and right levels of the audio channel
@@ -346,7 +346,7 @@ function bass_methods:getLevels()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	if IsValid(uw) then
+	if (uw and uw:IsValid()) then
 		return uw:GetLevel()
 	end
 end

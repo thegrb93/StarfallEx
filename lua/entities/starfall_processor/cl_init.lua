@@ -69,7 +69,7 @@ end)
 net.Receive("starfall_processor_link", function()
 	local component = net.ReadEntity()
 	local proc = net.ReadEntity()
-	if IsValid(component) and component.LinkEnt then
+	if (component and component:IsValid()) and component.LinkEnt then
 		component:LinkEnt(proc)
 	end
 end)
@@ -77,26 +77,23 @@ end)
 net.Receive("starfall_processor_used", function(len)
 	local chip = net.ReadEntity()
 	local activator = net.ReadEntity()
-	if not IsValid( chip ) then return end
-	if chip.link then chip = chip.link end
+	if not (chip and chip:IsValid()) then return end
+	if chip.link and chip.link:IsValid() then chip = chip.link end
+	if not chip.instance then return end
 
-	if IsValid( chip ) then
+	chip.instance:runScriptHook("starfallused", SF.WrapObject( activator ))
 
-		if not chip.instance then return end
-		chip.instance:runScriptHook("starfallused", SF.WrapObject( activator ) )
-
-		if activator == LocalPlayer() then
-			if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then
-				local pnl = vgui.Create("SFChipPermissions")
-				if pnl then pnl:OpenForChip( chip ) end
-			end
+	if activator == LocalPlayer() then
+		if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then
+			local pnl = vgui.Create("SFChipPermissions")
+			if pnl then pnl:OpenForChip( chip ) end
 		end
 	end
-end )
+end)
 
 net.Receive("starfall_processor_destroy", function(len)
 	local proc = net.ReadEntity()
-	if IsValid(proc) then
+	if proc:IsValid() then
 		proc:Destroy()
 	end
 end)

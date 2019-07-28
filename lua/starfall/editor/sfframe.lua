@@ -1628,7 +1628,7 @@ function Editor:Close()
 
 	self:SaveEditorSettings()
 	local activeWep = LocalPlayer():GetActiveWeapon()
-	if IsValid(activeWep) and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
+	if activeWep:IsValid() and activeWep:GetClass() == "gmod_tool" and activeWep.Mode == "starfall_processor" then
 		local model = nil
 		local ppdata = {}
 		SF.Preprocessor.ParseDirectives("file", self:GetCode(), ppdata)

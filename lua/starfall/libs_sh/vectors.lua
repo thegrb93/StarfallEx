@@ -373,10 +373,18 @@ function vec_methods:rotateAroundAxis(axis, degrees, radians)
 			(z * x * (1-ca) - y * sa) * x2 + (z * y * (1-ca) + x * sa) * y2 + (ca + (z^2) * (1-ca)) * z2 })
 end
 
+--- Copies x,y,z from a vector and returns a new vector
+-- @return The copy of the vector
+function vec_methods:clone()
+	SF.CheckType(v, vec_metamethods)
+
+	return wrap({ self[1], self[2], self[3] })
+end
+
 --- Copies the values from the second vector to the first vector. Self-Modifies.
 -- @param v Second Vector
 -- @return nil
-function vec_methods:set (v)
+function vec_methods:set(v)
 	SF.CheckType(v, vec_metamethods)
 
 	self[1] = v[1]

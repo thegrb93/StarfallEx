@@ -149,6 +149,22 @@ function color_methods:hsvToRGB ()
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
 end
 
+--- Copies r,g,b,a from color and returns a new color
+-- @return The copy of the color
+function color_methods:clone()
+	return wrap({ self[1], self[2], self[3], self[4] })
+end
+
+--- Copies r,g,b,a from color to another.
+-- @param b The color to copy from.
+-- @return nil
+function color_methods:set(b)
+	self[1] = b[1]
+	self[2] = b[2]
+	self[3] = b[3]
+	self[4] = b[4]
+end
+
 --- Set's the color's red channel and returns it.
 -- @param r The red
 -- @return The modified color

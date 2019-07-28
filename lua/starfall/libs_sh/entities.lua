@@ -12,7 +12,6 @@ local ewrap, eunwrap = SF.CreateWrapper(ents_metamethods, true, true, debug.getr
 local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
 local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
-local isValid = IsValid
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -79,7 +78,7 @@ end
 function ents_methods:getOwner()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 
 	if SF.Permissions.getOwner then
 		return SF.Players.Wrap(SF.Permissions.getOwner(ent))
@@ -95,7 +94,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+		if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
@@ -108,7 +107,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+		if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
@@ -121,7 +120,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(ang, ang_meta)
 		local ent = eunwrap(self)
-		if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+		if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
@@ -144,7 +143,7 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.emitSound")
 
 	local snds = soundsByEntity[ent]
@@ -160,7 +159,7 @@ function ents_methods:stopSound(snd)
 	checkluatype(snd, TYPE_STRING)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.emitSound")
 
 	if soundsByEntity[ent] then
@@ -178,7 +177,7 @@ function ents_methods:setColor(clr)
 	checktype(clr, SF.Types["Color"])
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
@@ -194,7 +193,7 @@ function ents_methods:setNoDraw(draw)
 	checktype(self, ents_metamethods)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetNoDraw(draw and true or false)
@@ -206,10 +205,10 @@ end
 function ents_methods:setMaterial(material)
 	checktype(self, ents_metamethods)
 	checkluatype(material, TYPE_STRING)
-	if SF.CheckMaterial(material) == false then SF.Throw("This material is blacklisted", 2) end
+	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetMaterial(material)
@@ -223,10 +222,10 @@ end
 function ents_methods:setSubMaterial(index, material)
 	checktype(self, ents_metamethods)
 	checkluatype(material, TYPE_STRING)
-	if SF.CheckMaterial(material) == false then SF.Throw("This material is blacklisted", 2) end
+	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 	index = math.Clamp(index, 0, 255)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSubMaterial(index, material)
@@ -245,7 +244,7 @@ function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(value, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetBodygroup(bodygroup, value)
@@ -259,7 +258,7 @@ function ents_methods:setSkin(skinIndex)
 	checkluatype(skinIndex, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSkin(skinIndex)
@@ -274,7 +273,7 @@ function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetRenderMode(rendermode)
@@ -290,7 +289,7 @@ function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetRenderFX(renderfx)
@@ -357,7 +356,7 @@ end
 -- @return The physobj id
 function ents_methods:translateBoneToPhysBone(boneid)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
 	return ent:TranslateBoneToPhysBone(boneid)
 end
 
@@ -366,7 +365,7 @@ end
 -- @return The ragdoll bone id
 function ents_methods:translatePhysBoneToBone(boneid)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
 	return ent:TranslatePhysBoneToBone(boneid)
 end
 
@@ -374,7 +373,7 @@ end
 -- @return The number of physics objects on the entity
 function ents_methods:getPhysicsObjectCount()
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
 	return ent:GetPhysicsObjectCount()
 end
 
@@ -382,7 +381,7 @@ end
 -- @return The main physics object of the entity
 function ents_methods:getPhysicsObject()
 	local ent = eunwrap(self)
-	if not (isValid(ent) or ent:IsWorld()) then SF.Throw("Entity is not valid.", 2) end
+	if not ((ent and ent:IsValid()) or ent:IsWorld()) then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObject())
 end
 
@@ -392,7 +391,7 @@ end
 function ents_methods:getPhysicsObjectNum(id)
 	checkluatype(id, TYPE_NUMBER)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid.", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
 	return pwrap(ent:GetPhysicsObjectNum(id))
 end
 
@@ -419,7 +418,8 @@ end
 -- @return True if valid, false if not
 function ents_methods:isValid()
 	checktype(self, ents_metamethods)
-	return isValid(eunwrap(self))
+	local ent = eunwrap(self)
+	return ent and ent:IsValid()
 end
 
 --- Checks if an entity is a player.
@@ -647,9 +647,9 @@ end
 function ents_methods:getMassCenter()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
-	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetMassCenter())
 end
 
@@ -659,9 +659,9 @@ end
 function ents_methods:getMassCenterW()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
-	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(ent:LocalToWorld(phys:GetMassCenter()))
 end
 
@@ -686,9 +686,9 @@ function ents_methods:getMass()
 	checktype(self, ents_metamethods)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
-	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
 	return phys:GetMass()
 end
@@ -700,9 +700,9 @@ function ents_methods:getInertia()
 	checktype(self, ents_metamethods)
 
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
-	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
 	return vwrap(phys:GetInertia())
 end
@@ -713,7 +713,7 @@ end
 function ents_methods:getVelocity()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	return vwrap(ent:GetVelocity())
 end
 
@@ -723,9 +723,9 @@ end
 function ents_methods:getAngleVelocity()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
-	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetAngleVelocity())
 end
 
@@ -735,9 +735,9 @@ end
 function ents_methods:getAngleVelocityAngle()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("Entity is not valid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
-	if not isValid(phys) then SF.Throw("Physics object is invalid", 2) end
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	local vec = phys:GetAngleVelocity()
 	return awrap(Angle(vec.y, vec.z, vec.x))
 end
@@ -798,7 +798,7 @@ end
 function ents_methods:lookupSequence(animation)
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(animation, TYPE_STRING)
 
@@ -811,7 +811,7 @@ end
 function ents_methods:sequenceDuration(id)
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	if id~=nil then checkluatype(id, TYPE_NUMBER) end
 
@@ -824,7 +824,7 @@ end
 function ents_methods:setPose(pose, value)
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetPoseParameter(pose, value)
@@ -836,7 +836,7 @@ end
 function ents_methods:getPose(pose)
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	return ent:GetPoseParameter(pose)
 end
@@ -845,7 +845,7 @@ end
 function ents_methods:getFlexes()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	local flexes = {}
 	for i = 0, ent:GetFlexNum()-1 do
@@ -860,7 +860,7 @@ end
 function ents_methods:setFlexWeight(flexid, weight)
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(flexid, TYPE_NUMBER)
 	checkluatype(weight, TYPE_NUMBER)
@@ -878,7 +878,7 @@ end
 function ents_methods:setFlexScale(scale)
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	if not isValid(ent) then SF.Throw("The entity is invalid", 2) end
+	if not (ent and ent:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 	checkluatype(scale, TYPE_NUMBER)
 

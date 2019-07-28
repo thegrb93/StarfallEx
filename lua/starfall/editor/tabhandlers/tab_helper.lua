@@ -17,7 +17,7 @@ end
 
 local function htmlSetup(old, new)
 	if old then
-		if IsValid(new.html) then
+		if (new.html and new.html:IsValid()) then
 			new.html:Remove()
 		end
 		new.html = old.html
@@ -27,12 +27,12 @@ local function htmlSetup(old, new)
 
 	html:SetParent(new)
 	html.OnChangeTitle = function(_,title)
-		if not IsValid(new) then return end
+		if not (new and new:IsValid()) then return end
 		new:UpdateTitle(title or "SF Helper")
 	end
 
 	html.OnDocumentReady = function(_, url )
-		if not IsValid(new) then return end
+		if not (new and new:IsValid()) then return end
 		_.loaded = true
 		new.url = url
 	end

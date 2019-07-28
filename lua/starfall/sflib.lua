@@ -480,6 +480,7 @@ local materialBlacklist = {
 -- @return The material object or false if it's invalid
 function SF.CheckMaterial(material)
 	if material == "" then return end
+	if #material > 260 then return false end
 	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
 	if materialBlacklist[material] then return false end
 	local mat = Material(material)
@@ -805,7 +806,7 @@ if SERVER then
 	util.AddNetworkString("starfall_chatprint")
 
 	function SF.AddNotify (ply, msg, notifyType, duration, sound)
-		if not IsValid(ply) then return end
+		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
 		net.WriteString(msg)

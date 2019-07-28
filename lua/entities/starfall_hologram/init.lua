@@ -13,6 +13,7 @@ function ENT:Initialize()
 	self.update = false
 	self.updateScale = false
 	self.updateSuppressEngineLighting = false
+	self.AutomaticFrameAdvance = false
 end
 
 util.AddNetworkString("starfall_hologram")
@@ -54,6 +55,10 @@ function ENT:Think()
 			net.WriteBool(false)
 		end
 		net.Broadcast()
+	end
+	if self.AutomaticFrameAdvance then
+		self:NextThink(CurTime())
+		return true
 	end
 end
 

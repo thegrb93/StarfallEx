@@ -57,7 +57,7 @@ function ENT:LinkEnt (ent)
 end
 
 function ENT:RenderScreen()
-	if IsValid(self.link) then
+	if (self.link and self.link:IsValid()) then
 		local instance = self.link.instance
 		if instance then
 			if SF.Permissions.hasAccess(instance, nil, "render.screen") then
