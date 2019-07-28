@@ -15,6 +15,7 @@ else
 	SF.cpuOwnerQuota = CreateConVar("sf_timebuffer_cl_owner", 0.015, FCVAR_ARCHIVE, "The max average the CPU time can reach for your own chips.")
 	SF.cpuBufferN = CreateConVar("sf_timebuffersize_cl", 100, FCVAR_ARCHIVE, "The window width of the CPU time quota moving average.")
 	SF.softLockProtection = CreateConVar("sf_timebuffersoftlock_cl", 1, FCVAR_ARCHIVE, "Consumes more cpu, but protects from freezing the game. Only turn this off if you want to use a profiler on your scripts.")
+	SF.softLockProtectionOwner = CreateConVar("sf_timebuffersoftlock_cl_owner", 1, FCVAR_ARCHIVE, "If sf_timebuffersoftlock_cl is 0, this enabled will make it only your own chips will be affected.")
 	SF.RamCap = CreateConVar("sf_ramcap_cl", 500000, "If ram exceeds this limit (in kB), starfalls will be terminated")
 end
 
