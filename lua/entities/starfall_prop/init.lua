@@ -12,25 +12,10 @@ function ENT:Initialize()
 	self:EnableCustomCollisions(true)
 	self:DrawShadow(false)
 
-	local convexes = self:GetPhysicsObject():GetMeshConvexes()
-	local stream = SF.StringStream(data)
-	stream:writeInt32(#convexes)
-	for k, v in ipairs(convexes) do
-		stream:writeInt32(#v)
-		for o, p in ipairs(v) do
-			local pos = p.pos
-			stream:writeFloat(pos.x)
-			stream:writeFloat(pos.y)
-			stream:writeFloat(pos.z)
-		end
-	end
-	self.Mesh = nil
-	self.Data = stream:getString()
-
-	net.Start("starfall_custom_prop")
-	net.WriteUInt(self:EntIndex(), 16)
-	net.WriteStream(self.Data)
-	net.Broadcast()
+	local physobj = self:GetPhysicsObject()
+	physobj:SetMaterial( "concrete" )
+	physobj:EnableCollisions( true )
+	physobj:EnableDrag( true )
 end
 
 function ENT:PreEntityCopy()

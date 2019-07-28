@@ -17,10 +17,19 @@ local plyCount = SF.EntityTable("playerProps")
 local plyPropBurst = SF.EntityTable("playerPropBurst")
 local plyPropBurstGen = SF.BurstGenObject("props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
 
+local maxCustomSize = CreateConVar("sf_props_custom_maxsize", "500", FCVAR_ARCHIVE, "The max hull size of a custom prop")
+local minVertexDistance = CreateConVar("sf_props_custom_minvertexdistance", "0.5", FCVAR_ARCHIVE, "The min distance between two vertices in a custom prop")
+
+local maxVerticesTotal = CreateConVar("sf_props_custom_maxverticestotal", "14400", FCVAR_ARCHIVE, "The max verteces allowed per player")
+local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
+local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max verteces allowed per convex")
+local plyVertexCount = SF.EntityTable("playerPropVertices")
+
 SF.AddHook("initialize", function(instance)
 	instance.data.props = {props = {}}
 	plyPropBurst[instance.player] = plyPropBurst[instance.player] or plyPropBurstGen:create()
 	plyCount[instance.player] = plyCount[instance.player] or 0
+	plyVertexCount[instance.player] = plyVertexCount[instance.player] or 0
 end)
 
 SF.AddHook("deinitialize", function(instance)
@@ -75,10 +84,11 @@ function props_library.create(pos, ang, model, frozen)
 	local ang = aunwrap(ang)
 
 	local instance = SF.instance
+	local ply = instance.player
 
-	if not plyPropBurst[instance.player]:use(1) then SF.Throw("Can't spawn props that often", 2) end
-	if maxReached(instance.player) then SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
-	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then SF.Throw("Another hook prevented the prop from spawning", 2) end
+	if not plyPropBurst[ply]:use(1) then SF.Throw("Can't spawn props that often", 2) end
+	if maxReached(ply) then SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	if not gamemode.Call("PlayerSpawnProp", ply, model) then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local propdata = instance.data.props
 	local propent = ents.Create("prop_physics")
@@ -99,13 +109,13 @@ function props_library.create(pos, ang, model, frozen)
 
 	if propdata.undo then
 		undo.Create("Prop")
-			undo.SetPlayer(instance.player)
+			undo.SetPlayer(ply)
 			undo.AddEntity(propent)
 		undo.Finish("Prop (" .. tostring(model) .. ")")
 	end
-	instance.player:AddCleanup("props", propent)
+	ply:AddCleanup("props", propent)
 
-	gamemode.Call("PlayerSpawnedProp", instance.player, model, propent)
+	gamemode.Call("PlayerSpawnedProp", ply, model, propent)
 	FixInvalidPhysicsObject(propent)
 
 	register(propent, instance)
@@ -113,41 +123,92 @@ function props_library.create(pos, ang, model, frozen)
 	return SF.Entities.Wrap(propent)
 end
 
+<<<<<<< Updated upstream
+=======
+local customPropStream = {finished = {}}
+local customPropStreamPlayers = {}
+
+--- Returns if it is possible to create a custom prop yet
+-- @return boolean if a custom prop can be created
+-- @return The reason it couldn't be created
+function props_library.canCreateCustom()
+	for k, v in pairs(customPropStreamPlayers) do
+		if not customPropStream.finished[v] then
+			return false, "Waiting for previous prop to finish being created"
+		end
+	end
+
+	local ply = SF.instance.player
+	if maxReached(ply) then
+		return false, "Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached"
+	end
+	return true
+end
+
 --- Creates a custom prop.
 -- @server
 -- @return The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
-
-	checkpermission(SF.instance, nil, "prop.createCustom")
-
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checkluatype(vertices, TYPE_TABLE)
 	frozen = frozen and true or false
 
+	checkpermission(SF.instance, nil, "prop.createCustom")
+
+	local canCreate, reason = props_library.canCreateCustom()
+	if not canCreate then
+		SF.Throw(reason, 2)
+	end
+
+	local instance = SF.instance
+	local ply = instance.player
+
+	if not plyPropBurst[ply]:use(1) then SF.Throw("Can't spawn props that often", 2) end
+	if not gamemode.Call("PlayerSpawnProp", ply, "starfall_prop") then SF.Throw("Another hook prevented the prop from spawning", 2) end
+
 	local uwVertices = {}
-	local stream = SF.StringStream(data)
-	local max = plyMaxCustomSize:GetFloat()
+	local max = maxCustomSize:GetFloat()
+	local mindist = minVertexDistance:GetFloat()^2
+	local maxVerticesTotal = maxVerticesTotal:GetInt()
+	local maxVerticesPerConvex = maxVerticesPerConvex:GetInt()
+	local maxConvexesPerProp = maxConvexesPerProp:GetInt()
 	
+	local totalVertices = 0
 	for k, v in ipairs(vertices) do
+		if k>maxConvexesPerProp then SF.Throw("Exceeded the max convexes per prop (" .. maxConvexesPerProp .. ")", 2) end
+		totalVertices = totalVertices + #v
+		if totalVertices + plyVertexCount[ply] > maxVerticesTotal then SF.Throw("Exceed the total max vertices allowed (" .. maxVerticesTotal .. ")", 2) end
 		local t = {}
 		for o, p in ipairs(v) do
+			if o>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
 			checktype(p, vec_meta)
 			local vec = vunwrap(p)
 			if math.abs(vec.x)>max or math.abs(vec.y)>max or math.abs(vec.z)>max then SF.Throw("The custom prop cannot exceed a hull size of " .. max, 2) end
+			for i=1, o-1 do
+				if t[i]:DistToSqr(vec) < mindist then
+					SF.Throw("No two vertices can have a distance less than " .. minVertexDistance:GetFloat(), 2)
+				end
+			end
 			t[o] = vec
 		end
 		uwVertices[k] = t
 	end
 
+	local stream = SF.StringStream()
+	stream:writeInt32(#uwVertices)
+	for k, v in ipairs(uwVertices) do
+		stream:writeInt32(#v)
+		for o, p in ipairs(v) do
+			stream:writeFloat(p.x)
+			stream:writeFloat(p.y)
+			stream:writeFloat(p.z)
+		end
+	end
+	stream = stream:getString()
+
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
-
-	local instance = SF.instance
-
-	if not plyPropBurst[instance.player]:use(1) then SF.Throw("Can't spawn props that often", 2) end
-	if maxReached(instance.player) then SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
-	if not gamemode.Call("PlayerSpawnProp", instance.player, "starfall_prop") then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local propdata = instance.data.props
 	
@@ -155,18 +216,25 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	propent:SetPos(SF.clampPos(pos))
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
+	propent.Data = stream
 	propent:Spawn()
 	propent:GetPhysicsObject():EnableMotion(not frozen)
 
+	net.Start("starfall_custom_prop")
+	net.WriteUInt(propent:EntIndex(), 16)
+	customPropStreamPlayers = player.GetAll()
+	customPropStream = net.WriteStream(stream)
+	net.Broadcast()
+
 	if propdata.undo then
 		undo.Create("Prop")
-			undo.SetPlayer(instance.player)
+			undo.SetPlayer(ply)
 			undo.AddEntity(propent)
 		undo.Finish("Starfall Prop")
 	end
-	instance.player:AddCleanup("props", propent)
+	ply:AddCleanup("props", propent)
 
-	gamemode.Call("PlayerSpawnedProp", instance.player, "starfall_prop", propent)
+	gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
 
 	register(propent, instance)
 
@@ -197,12 +265,13 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	local ang = aunwrap(ang)
 
 	local instance = SF.instance
+	local ply = instance.player
 	local propdata = instance.data.props
 
-	if not instance.player:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
-	if not plyPropBurst[instance.player]:use(1) then return SF.Throw("Can't spawn props that often", 2) end
-	if maxReached(instance.player) then return SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
-	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then return end
+	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
+	if not plyPropBurst[ply]:use(1) then return SF.Throw("Can't spawn props that often", 2) end
+	if maxReached(ply) then return SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	if not gamemode.Call("PlayerSpawnProp", ply, model) then return end
 
 	local comp = ents.Create(class)
 
@@ -226,13 +295,13 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 
 	if propdata.undo then
 		undo.Create(class)
-			undo.SetPlayer(instance.player)
+			undo.SetPlayer(ply)
 			undo.AddEntity(comp)
 		undo.Finish("Prop (" .. tostring(model) .. ")")
 	end
 
-	instance.player:AddCount("starfall_components", comp)
-	instance.player:AddCleanup("starfall_components", comp)
+	ply:AddCount("starfall_components", comp)
+	ply:AddCleanup("starfall_components", comp)
 
 	register(comp, instance)
 
@@ -259,8 +328,9 @@ function props_library.createSent (pos, ang, class, frozen)
 	local ang = aunwrap(ang)
 
 	local instance = SF.instance
-	if not plyPropBurst[instance.player]:use(1) then return SF.Throw("Can't spawn props that often", 2)
-	elseif maxReached(instance.player) then return SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	local ply = instance.player
+	if not plyPropBurst[ply]:use(1) then return SF.Throw("Can't spawn props that often", 2)
+	elseif maxReached(ply) then return SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
 
 	local swep = list.Get("Weapon")[class]
 	local sent = list.Get("SpawnableEntities")[class]
@@ -273,9 +343,9 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	if swep then
 
-		if ((not swep.Spawnable and not instance.player:IsAdmin()) or
-				(swep.AdminOnly and not instance.player:IsAdmin())) then return end
-		if (not gamemode.Call("PlayerSpawnSWEP", instance.player, class, swep)) then return end
+		if ((not swep.Spawnable and not ply:IsAdmin()) or
+				(swep.AdminOnly and not ply:IsAdmin())) then return end
+		if (not gamemode.Call("PlayerSpawnSWEP", ply, class, swep)) then return end
 
 
 		entity = ents.Create(swep.ClassName)
@@ -284,8 +354,8 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	elseif sent then
 
-		if (sent.AdminOnly and not instance.player:IsAdmin()) then return false end
-		if (not gamemode.Call("PlayerSpawnSENT", instance.player, class)) then return end
+		if (sent.AdminOnly and not ply:IsAdmin()) then return false end
+		if (not gamemode.Call("PlayerSpawnSENT", ply, class)) then return end
 
 		entity = ents.Create(sent.ClassName)
 
@@ -293,8 +363,8 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	elseif npc then
 
-		if (npc.AdminOnly and not instance.player:IsAdmin()) then return false end
-		if (not gamemode.Call("PlayerSpawnNPC", instance.player, class, "")) then return end
+		if (npc.AdminOnly and not ply:IsAdmin()) then return false end
+		if (not gamemode.Call("PlayerSpawnNPC", ply, class, "")) then return end
 
 		entity = ents.Create(npc.Class)
 
@@ -324,7 +394,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	elseif vehicle then
 
-		if (not gamemode.Call("PlayerSpawnVehicle", instance.player, vehicle.Model, vehicle.Class, vehicle)) then return end
+		if (not gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle)) then return end
 
 		entity = ents.Create(vehicle.Class)
 
@@ -384,13 +454,13 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		if propdata.undo then
 			undo.Create("SF")
-				undo.SetPlayer(instance.player)
+				undo.SetPlayer(ply)
 				undo.AddEntity(entity)
 			undo.Finish("SF (" .. class .. ")")
 		end
 
-		instance.player:AddCleanup("props", entity)
-		gamemode.Call(hookcall, instance.player, entity)
+		ply:AddCleanup("props", entity)
+		gamemode.Call(hookcall, ply, entity)
 
 		register(entity, instance)
 
