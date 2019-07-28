@@ -393,6 +393,16 @@ Returns the total used time for all chips by the player.</td>
 Returns the current count for this Think's CPU Time.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.ramAverage">ramAverage</a>( &nbsp;)</td>
+			<td class="summary">
+Gets the moving average of ram usage of the lua environment </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.ramUsed">ramUsed</a>( &nbsp;)</td>
+			<td class="summary">
+Gets the current ram usage of the lua environment </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#builtin.rawget">rawget</a>( table, key, value&nbsp;)</td>
 			<td class="summary">
 Gets the value of a table index without invoking a metamethod </td>
@@ -1330,6 +1340,42 @@ If used on screens, will show 0 if only rendering is done. Operations must be do
 		<h3>Returns</h3>
 		
 		<p>Current quota used this Think</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="builtin.ramAverage"></a><strong>builtin.ramAverage</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets the moving average of ram usage of the lua environment</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The ram used in bytes</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="builtin.ramUsed"></a><strong>builtin.ramUsed</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets the current ram usage of the lua environment</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The ram used in bytes</p>
 		
 	</section>
 	
