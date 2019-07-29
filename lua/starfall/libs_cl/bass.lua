@@ -9,8 +9,7 @@ do
 
 end
 
-local plyMaxSounds = CreateConVar("sf_bass_personalquota", "20", FCVAR_ARCHIVE, "The number of sounds allowed to be playing via Starfall client at once")
-local plyCount = SF.EntityTable("playerBassSounds")
+local plyCount = SF.LimitObject("bass", 20, "The number of sounds allowed to be playing via Starfall client at once")
 
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
@@ -29,19 +28,14 @@ SF.Bass.Unwrap = unwrap
 SF.Bass.Methods = bass_methods
 SF.Bass.Metatable = bass_metamethods
 
-local function soundsLeft(ply)
-	return plyMaxSounds:GetInt()<0 and -1 or (plyMaxSounds:GetInt() - plyCount[ply])
-end
-
 local function deleteSound(ply, sound)
 	if sound:IsValid() then sound:Stop() end
-	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
+	plyCount:free(ply, 1)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
 SF.AddHook("initialize", function(instance)
 	instance.data.bass = {sounds = {}}
-	if not plyCount[instance.player] then plyCount[instance.player] = 0 end
 end)
 
 SF.AddHook("deinitialize", function(instance)
@@ -62,7 +56,6 @@ end
 function bass_library.loadFile (path, flags, callback)
 	local instance = SF.instance
 	checkpermission(instance, nil, "bass.loadFile")
-	if soundsLeft(instance.player)==0 then SF.Throw("Reached the sounds limit: (" .. plyMaxSounds:GetInt() .. ")", 2) end
 	
 	checkluatype(path, TYPE_STRING)
 	checkluatype(flags, TYPE_STRING)
@@ -76,16 +69,16 @@ function bass_library.loadFile (path, flags, callback)
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
-	plyCount[instance.player] = plyCount[instance.player] + 1
+	plyCount:checkuse(instance.player, 1)
+
 	sound.PlayFile(path, flags, function(snd, er, name)
 		if er then
-			if plyCount[instance.player] then plyCount[instance.player] = plyCount[instance.player] - 1 end
 			instance:runFunction(callback, nil, er, name)
 		else
-			if instance.error then
-				if plyCount[instance.player] then plyCount[instance.player] = plyCount[instance.player] - 1 end
+			if instance.error or not instance.player:IsValid() then
 				snd:Stop()
 			else
+				plyCount:free(instance.player, -1)
 				instance.data.bass.sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
@@ -100,7 +93,6 @@ end
 function bass_library.loadURL (path, flags, callback)
 	local instance = SF.instance
 	checkpermission(instance, path, "bass.loadURL")
-	if soundsLeft(instance.player)==0 then SF.Throw("Reached the sounds limit: (" .. plyMaxSounds:GetInt() .. ")", 2) end
 
 	checkluatype(path, TYPE_STRING)
 	checkluatype(flags, TYPE_STRING)
@@ -111,18 +103,17 @@ function bass_library.loadURL (path, flags, callback)
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
-	SF.HTTPNotify(instance.player, path)
+	plyCount:checkuse(instance.player, 1)
 
-	plyCount[instance.player] = plyCount[instance.player] + 1
+	SF.HTTPNotify(instance.player, path)
 	sound.PlayURL(path, flags, function(snd, er, name)
 		if er then
-			if plyCount[instance.player] then plyCount[instance.player] = plyCount[instance.player] - 1 end
 			instance:runFunction(callback, nil, er, name)
 		else
-			if instance.error then
-				if plyCount[instance.player] then plyCount[instance.player] = plyCount[instance.player] - 1 end
+			if instance.error or not instance.player:IsValid() then
 				snd:Stop()
 			else
+				plyCount:free(instance.player, -1)
 				instance.data.bass.sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
@@ -133,7 +124,7 @@ end
 --- Returns the number of sounds left that can be created
 -- @return The number of sounds left
 function bass_library.soundsLeft()
-	return soundsLeft(SF.instance.player)
+	return plyCount:check(SF.instance.player)
 end
 
 --------------------------------------------------

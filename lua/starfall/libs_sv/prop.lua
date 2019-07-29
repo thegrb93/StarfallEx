@@ -11,15 +11,11 @@ local checkpermission = SF.Permissions.check
 -- Register privileges
 SF.Permissions.registerPrivilege("prop.create", "Create prop", "Allows the user to create props")
 
-local plyMaxProps = CreateConVar("sf_props_personalquota", "-1", FCVAR_ARCHIVE, "The number of props allowed to spawn via Starfall")
-local plyCount = SF.EntityTable("playerProps")
-local plyPropBurst = SF.EntityTable("playerPropBurst")
-local plyPropBurstGen = SF.BurstGenObject("props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
+local plyCount = SF.LimitObject("props", -1, "The number of props allowed to spawn via Starfall")
+local plyPropBurst = SF.BurstObject("props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
 
 SF.AddHook("initialize", function(instance)
 	instance.data.props = {props = {}}
-	plyPropBurst[instance.player] = plyPropBurst[instance.player] or plyPropBurstGen:create()
-	plyCount[instance.player] = plyCount[instance.player] or 0
 end)
 
 SF.AddHook("deinitialize", function(instance)
@@ -32,19 +28,14 @@ end)
 
 local function propOnDestroy(ent, instance)
 	local ply = instance.player
-	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
+	plyCount:free(ply, 1)
 	instance.data.props.props[ent] = nil
 end
 
 local function register(ent, instance)
 	ent:CallOnRemove("starfall_prop_delete", propOnDestroy, instance)
-	plyCount[instance.player] = plyCount[instance.player] + 1
+	plyCount:free(instance.player, -1)
 	instance.data.props.props[ent] = true
-end
-
-local function maxReached(ply)
-	if plyMaxProps:GetInt() < 0 then return false end
-	return plyCount[ply] >= plyMaxProps:GetInt()
 end
 
 --- Creates a prop.
@@ -64,8 +55,8 @@ function props_library.create (pos, ang, model, frozen)
 
 	local instance = SF.instance
 
-	if not plyPropBurst[instance.player]:use(1) then SF.Throw("Can't spawn props that often", 2) end
-	if maxReached(instance.player) then SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	plyPropBurst:use(instance.player, 1)
+	plyCount:checkuse(instance.player, 1)
 	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local propdata = instance.data.props
@@ -128,9 +119,9 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	local propdata = instance.data.props
 
 	if not instance.player:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
-	if not plyPropBurst[instance.player]:use(1) then return SF.Throw("Can't spawn props that often", 2) end
-	if maxReached(instance.player) then return SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	plyPropBurst:use(instance.player, 1)
 	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then return end
+	plyCount:checkuse(instance.player, 1)
 
 	local comp = ents.Create(class)
 
@@ -187,8 +178,8 @@ function props_library.createSent (pos, ang, class, frozen)
 	local ang = SF.Angles.Unwrap(ang)
 
 	local instance = SF.instance
-	if not plyPropBurst[instance.player]:use(1) then return SF.Throw("Can't spawn props that often", 2)
-	elseif maxReached(instance.player) then return SF.Throw("Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached", 2) end
+	plyPropBurst:use(instance.player, 1)
+	plyCount:checkuse(instance.player, 1)
 
 	local swep = list.Get("Weapon")[class]
 	local sent = list.Get("SpawnableEntities")[class]
@@ -332,7 +323,7 @@ end
 function props_library.canSpawn()
 	local instance = SF.instance
 	if not SF.Permissions.hasAccess(instance, nil, "prop.create") then return false end
-	return not maxReached(instance.player) and plyPropBurst[instance.player]:check()>1
+	return plyCount:check(instance.player) > 0 and plyPropBurst:check(instance.player) >= 1
 end
 
 --- Checks how many props can be spawned
@@ -341,8 +332,7 @@ end
 function props_library.propsLeft()
 	local instance = SF.instance
 	if not SF.Permissions.hasAccess(instance,  nil, "prop.create") then return 0 end
-	if plyMaxProps:GetInt() < 0 then return -1 end
-	return math.min(plyMaxProps:GetInt() - plyCount[instance.player], plyPropBurst[instance.player]:check())
+	return math.min(plyCount:check(instance.player), plyPropBurst:check(instance.player))
 end
 
 --- Returns how many props per second the user can spawn
@@ -350,7 +340,7 @@ end
 -- @return Number of props per second the user can spawn
 function props_library.spawnRate()
 
-	return plyPropBurstGen.ratecvar:GetFloat()
+	return plyPropBurst.rate
 
 end
 
