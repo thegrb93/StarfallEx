@@ -1,8 +1,4 @@
-if (jit.os == "Windows" and ((jit.arch == "x86" and file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME")) or (jit.arch == "x64" and file.Exists("lua/bin/gmcl_joystick_win64.dll", "GAME")))) or (jit.os == "Linux" and file.Exists("lua/bin/gmcl_joystick_linux.dll", "GAME")) then
-	require("joystick")
-else
-	return
-end
+if not pcall(require, "joystick") then return end
 
 --- Joystick library.
 -- @client
