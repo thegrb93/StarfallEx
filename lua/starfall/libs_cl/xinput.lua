@@ -1,9 +1,4 @@
-if file.Exists("lua/bin/gmcl_xinput_win32.dll", "GAME") or file.Exists("lua/bin/gmcl_xinput_win64.dll", "GAME") then
-	require("xinput")
-else
-	return
-end
-
+if not pcall(require, "xinput") then return end
 --- A simpler, hook-based, and more-powerful controller input library. Inputs are not lost between rendered frames, and there is support for rumble. Note: the client must have the XInput lua binary module installed in order to access this library. See more at https://github.com/mitterdoo/garrysmod-xinput
 -- @client
 local xinput_library = SF.RegisterLibrary("xinput")
