@@ -58,25 +58,11 @@ end)
 -- Register privileges
 SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to create custom meshes for rendering.", { client = {} })
 
-local maxtriangles = CreateClientConVar("sf_mesh_triangles_max", "200000", true, false, "How many triangles total can be loaded for meshes.")
-local plyTriangleCount = SF.EntityTable("MeshTriangles")
-local plyTriangleRenderBurstGen = SF.BurstGenObject("mesh_triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
-local plyTriangleRenderBurst = SF.EntityTable("MeshBurst")
-
-local function canAddTriangles(inst, triangles)
-	local ply = inst.player
-	if plyTriangleCount[ply] then
-		if plyTriangleCount[ply] + triangles>maxtriangles:GetInt() then
-			SF.Throw("The triangle limit has been reached.", 3)
-		end
-	end
-end
+local plyTriangleCount = SF.LimitObject("mesh_triangles", 200000, "How many triangles total can be loaded for meshes.")
+local plyTriangleRenderBurst = SF.BurstObject("mesh_triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
 
 local function destroyMesh(ply, mesh, meshdata)
-	if plyTriangleCount[ply] then
-		plyTriangleCount[ply] = plyTriangleCount[ply] - meshdata[mesh].ntriangles
-	end
-
+	plyTriangleCount:free(ply, meshdata[mesh].ntriangles)
 	mesh:Destroy()
 	meshdata[mesh] = nil
 end
@@ -84,12 +70,6 @@ end
 -- Register functions to be called when the chip is initialised and deinitialised
 SF.AddHook("initialize", function(inst)
 	inst.data.meshes = {}
-	if not plyTriangleCount[inst.player] then
-		plyTriangleCount[inst.player] = 0
-	end
-	if not plyTriangleRenderBurst[inst.player] then
-		plyTriangleRenderBurst[inst.player] = plyTriangleRenderBurstGen:create()
-	end
 end)
 
 SF.AddHook("deinitialize", function(inst)
@@ -115,7 +95,7 @@ function mesh_library.createFromTable(verteces, thread)
 	local ntriangles = nvertices / 3
 
 	local instance = SF.instance
-	canAddTriangles(instance, ntriangles)
+	plyTriangleCount:checkuse(instance.player, ntriangles)
 
 	local unwrapped = {}
 	for i, vertex in ipairs(verteces) do
@@ -131,11 +111,10 @@ function mesh_library.createFromTable(verteces, thread)
 		if thread then thread_lib.yield(thread) end
 	end
 
-	plyTriangleCount[instance.player] = (plyTriangleCount[instance.player] or 0) + ntriangles
-
 	local mesh = Mesh()
 	mesh:BuildFromTriangles(unwrapped)
 	instance.data.meshes[mesh] = { ntriangles = ntriangles }
+	plyTriangleCount:free(instance.player, -ntriangles)
 	return wrap(mesh)
 end
 
@@ -175,7 +154,8 @@ function mesh_library.createFromObj(obj, thread)
 
 	if #face<3 or #face%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
 	local ntriangles = #face / 3
-	canAddTriangles(instance, ntriangles)
+
+	plyTriangleCount:checkuse(instance.player, ntriangles)
 
 	local vertices = {}
 	for _, v in ipairs(face) do
@@ -259,11 +239,10 @@ function mesh_library.createFromObj(obj, thread)
 	end
 	if thread then thread_lib.yield(thread) end
 
-	plyTriangleCount[instance.player] = (plyTriangleCount[instance.player] or 0) + ntriangles
-
 	local mesh = Mesh()
 	mesh:BuildFromTriangles(vertices)
 	instance.data.meshes[mesh] = { ntriangles = ntriangles }
+	plyTriangleCount:free(instance.player, -ntriangles)
 	return wrap(mesh)
 end
 
@@ -316,7 +295,8 @@ function mesh_library.createFromObjEx(obj, thread)
 
 	if #face<3 or #face%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
 	local ntriangles = #face / 3
-	canAddTriangles(instance, ntriangles)
+
+	plyTriangleCount:checkuse(instance.player, ntriangles)
 
 	local vertices = {}
 	for _, v in ipairs(face) do
@@ -400,11 +380,10 @@ function mesh_library.createFromObjEx(obj, thread)
 	end
 	if thread then thread_lib.yield(thread) end
 
-	plyTriangleCount[instance.player] = (plyTriangleCount[instance.player] or 0) + ntriangles
-
 	local mesh = Mesh()
 	mesh:BuildFromTriangles(vertices)
 	instance.data.meshes[mesh] = { ntriangles = ntriangles }
+	plyTriangleCount:free(instance.player, -ntriangles)
 	return wrap(mesh)
 end
 
@@ -437,7 +416,7 @@ end
 -- @return Number of triangles that can be created
 function mesh_library.trianglesLeft ()
 	if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
-		return maxtriangles:GetInt() - (plyTriangleCount[SF.instance.player] or 0)
+		return plyTriangleCount:check(SF.instance.player)
 	else
 		return 0
 	end
@@ -447,7 +426,7 @@ end
 -- @return Number of triangles that can be rendered
 function mesh_library.trianglesLeftRender ()
 	if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
-		return plyTriangleRenderBurst[SF.instance.player]:check()
+		return plyTriangleRenderBurst:check(SF.instance.player)
 	else
 		return 0
 	end
@@ -461,9 +440,7 @@ function mesh_methods:draw()
 	local meshdata = data.meshes[mesh]
 	if not meshdata then SF.Throw("Tried to use invalid mesh.", 2) end
 	if not data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	if not plyTriangleRenderBurst[SF.instance.player]:use(meshdata.ntriangles) then
-		SF.Throw("Exceeded render limit!", 2)
-	end
+	plyTriangleRenderBurst:use(SF.instance.player, meshdata.ntriangles)
 	mesh:Draw()
 end
 

@@ -90,70 +90,136 @@ SF.StructWrapper = {
 }
 setmetatable(SF.StructWrapper, SF.StructWrapper)
 
---- Returns a class that can keep track of burst count/rate
+--- Returns a class that can manage burst objects
 SF.BurstObject = {
 	__index = {
-		use = function(self, amount)
-			self:check()
-			if self.val>= amount then
-				self.val = self.val - amount
-				return true
+		use = function(self, ply, amount)
+			if ply:IsValid() then
+				local obj = self:get(ply)
+				local new = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max) - amount
+				if new < 0 then
+					SF.Throw("The ".. self.name .." burst limit has been exceeded.", 3)
+				end
+				obj.lasttick = CurTime()
+				obj.val = new
+			else
+				SF.Throw("Invalid starfall user", 3)
 			end
-			return false
 		end,
-		check = function(self)
-			self.val = math.min(self.val + (CurTime() - self.lasttick) * self.rate, self.max)
-			self.lasttick = CurTime()
-			return self.val
-		end
+		check = function(self, ply)
+			if ply:IsValid() then
+				local obj = self:get(ply)
+				obj.val = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
+				obj.lasttick = CurTime()
+				return obj.val
+			else
+				SF.Throw("Invalid starfall user", 3)
+			end
+		end,
+		get = function(self, ply)
+			local obj = self.objects[ply]
+			if not obj then
+				obj = {
+					val = self.max,
+					lasttick = 0
+				}
+				self.objects[ply] = obj
+			end
+			return obj
+		end,
 	},
-	__call = function(p, rate, max)
+	__call = function(p, name, rate, max, ratehelp, maxhelp, scale)
+		scale = scale or 1
+
 		local t = {
-			rate = rate,
-			max = max,
-			val = max,
-			lasttick = 0
+			name = name,
+			objects = SF.EntityTable("burst"..name)
 		}
+
+		local ratename = "sf_"..name.."_burstrate"..(CLIENT and "_cl" or "")
+		local ratecvar = CreateConVar(ratename, tostring(rate), FCVAR_ARCHIVE, ratehelp)
+		t.rate = ratecvar:GetFloat()*scale
+		cvars.AddChangeCallback(ratename, function() t.rate = ratecvar:GetFloat()*scale end)
+
+		local maxname = "sf_"..name.."_burstmax"..(CLIENT and "_cl" or "")
+		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
+		t.max = maxcvar:GetFloat()*scale
+		cvars.AddChangeCallback(maxname, function() t.max = maxcvar:GetFloat()*scale end)
+
 		return setmetatable(t, p)
 	end
 }
 setmetatable(SF.BurstObject, SF.BurstObject)
 
-
---- Returns a class that can manage burst objects
-SF.BurstGenObject = {
+--- Returns a class that limits the number of something per player
+SF.LimitObject = {
 	__index = {
-		create = function(self, amount)
-			local obj = SF.BurstObject(self.ratecvar:GetFloat()*self.scale, self.maxcvar:GetFloat()*self.scale)
-			self.burstobjects[obj] = true
+		use = function(self, ply, amount)
+			if ply:IsValid() then
+				local obj = self:get(ply)
+				local new = obj.val + amount
+				if new > self.max then
+					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
+				end
+				obj.val = new
+			else
+				SF.Throw("Invalid starfall user", 3)
+			end
+		end,
+		checkuse = function(self, ply, amount)
+			if ply:IsValid() then
+				local obj = self:get(ply)
+				if obj.val + amount > self.max then
+					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
+				end
+			else
+				SF.Throw("Invalid starfall user", 3)
+			end
+		end,
+		check = function(self, ply)
+			if ply:IsValid() then
+				return self.max - self:get(ply).val
+			else
+				SF.Throw("Invalid starfall user", 3)
+			end
+		end,
+		free = function(self, ply, amount)
+			local obj = self.objects[ply]
+			if obj then
+				obj.val = math.Clamp(obj.val - amount, 0, self.max)
+			end
+		end,
+		get = function(self, ply)
+			local obj = self.objects[ply]
+			if not obj then
+				obj = {
+					val = 0,
+				}
+				self.objects[ply] = obj
+			end
 			return obj
 		end,
-		updaterate = function(self)
-			local rate = self.ratecvar:GetFloat()*self.scale
-			for burst, _ in pairs(self.burstobjects) do burst.rate = rate end
-		end,
-		updatemax = function(self)
-			local max = self.maxcvar:GetFloat()*self.scale
-			for burst, _ in pairs(self.burstobjects) do burst.max = max end
-		end
 	},
-	__call = function(p, name, rate, max, ratehelp, maxhelp, scale)
-		scale = scale or 1
-		local ratename = "sf_"..name.."_burstrate"
-		local maxname = "sf_"..name.."_burstmax"
+	__call = function(p, name, max, maxhelp, scale)
 		local t = {
-			ratecvar = CreateConVar(ratename, tostring(rate), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, ratehelp),
-			maxcvar = CreateConVar(maxname, tostring(max), {FCVAR_ARCHIVE, FCVAR_REPLICATED}, maxhelp),
-			burstobjects = setmetatable({}, {__mode="k"}),
-			scale = scale
+			name = name,
+			objects = SF.EntityTable("limit"..name)
 		}
-		cvars.AddChangeCallback(ratename, function() t:updaterate() end)
-		cvars.AddChangeCallback(maxname, function() t:updatemax() end)
+
+		local maxname = "sf_"..name.."_max"..(CLIENT and "_cl" or "")
+		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
+		scale = scale or 1
+		local function calcMax()
+			t.max = maxcvar:GetFloat()*scale
+			if t.max<0 then t.max = math.huge end
+		end
+		calcMax()
+		cvars.AddChangeCallback(maxname, calcMax)
+
 		return setmetatable(t, p)
 	end
 }
-setmetatable(SF.BurstGenObject, SF.BurstGenObject)
-
+setmetatable(SF.LimitObject, SF.LimitObject)
 
 --- Returns a class that can limit per player and recycle a indestructable resource
 SF.ResourceHandler = {
