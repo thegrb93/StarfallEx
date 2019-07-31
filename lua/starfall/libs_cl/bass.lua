@@ -9,7 +9,7 @@ do
 
 end
 
-local plyCount = SF.LimitObject("bass", 20, "The number of sounds allowed to be playing via Starfall client at once")
+local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client

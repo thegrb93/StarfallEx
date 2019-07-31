@@ -10,7 +10,7 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local plyCount = SF.LimitObject("constraints", 600, "The number of constraints allowed to spawn via Starfall")
+local plyCount = SF.LimitObject("constraints", "constraints", 600, "The number of constraints allowed to spawn via Starfall")
 
 SF.AddHook("initialize", function(instance)
 	instance.data.constraints = {constraints = {}}

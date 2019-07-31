@@ -12,8 +12,15 @@ SF.Permissions.registerPrivilege("prop.create", "Create prop", "Allows the user 
 SF.Permissions.registerPrivilege("prop.createCustom", "Create custom prop", "Allows the user to create custom props")
 
 
-local plyCount = SF.LimitObject("props", -1, "The number of props allowed to spawn via Starfall")
-local plyPropBurst = SF.BurstObject("props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
+local plyCount = SF.LimitObject("props", "props", -1, "The number of props allowed to spawn via Starfall")
+local plyPropBurst = SF.BurstObject("props", "props", 4, 4, "Rate props can be spawned per second.", "Number of props that can be spawned in a short time.")
+
+local maxCustomSize = CreateConVar("sf_props_custom_maxsize", "500", FCVAR_ARCHIVE, "The max hull size of a custom prop")
+local minVertexDistance = CreateConVar("sf_props_custom_minvertexdistance", "0.5", FCVAR_ARCHIVE, "The min distance between two vertices in a custom prop")
+
+local plyVertexCount = SF.LimitObject("props_custom_vertices", "custom prop vertices", 14400, "The max vertices allowed to spawn custom props per player")
+local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
+local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
 SF.AddHook("initialize", function(instance)
 	instance.data.props = {props = {}}
@@ -110,21 +117,20 @@ end
 local customPropStream = {finished = {}}
 local customPropStreamPlayers = {}
 
---- Returns if it is possible to create a custom prop yet
--- @return boolean if a custom prop can be created
--- @return The reason it couldn't be created
-function props_library.canCreateCustom()
+local function customPropFinished()
 	for k, v in pairs(customPropStreamPlayers) do
 		if not customPropStream.finished[v] then
-			return false, "Waiting for previous prop to finish being created"
+			return false
 		end
 	end
-
-	local ply = SF.instance.player
-	if maxReached(ply) then
-		return false, "Can't spawn props, maximum personal limit of " .. plyMaxProps:GetInt() .. " has been reached"
-	end
 	return true
+end
+
+--- Returns if it is possible to create a custom prop yet
+-- @return boolean if a custom prop can be created
+function props_library.canCreateCustom()
+	local ply = SF.instance.player
+	return customPropFinished() and plyCount:check(ply) > 0 and plyPropBurst:check(ply) >= 1
 end
 
 --- Creates a custom prop.
@@ -138,15 +144,11 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	checkpermission(SF.instance, nil, "prop.createCustom")
 
-	local canCreate, reason = props_library.canCreateCustom()
-	if not canCreate then
-		SF.Throw(reason, 2)
-	end
-
 	local instance = SF.instance
 	local ply = instance.player
 
-	
+	if not customPropFinished() then SF.Throw("Waiting for previous custom prop to finish downloading", 2) end
+
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
 	if not gamemode.Call("PlayerSpawnProp", ply, "starfall_prop") then SF.Throw("Another hook prevented the prop from spawning", 2) end
@@ -154,7 +156,6 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local uwVertices = {}
 	local max = maxCustomSize:GetFloat()
 	local mindist = minVertexDistance:GetFloat()^2
-	local maxVerticesTotal = maxVerticesTotal:GetInt()
 	local maxVerticesPerConvex = maxVerticesPerConvex:GetInt()
 	local maxConvexesPerProp = maxConvexesPerProp:GetInt()
 	
@@ -162,7 +163,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	for k, v in ipairs(vertices) do
 		if k>maxConvexesPerProp then SF.Throw("Exceeded the max convexes per prop (" .. maxConvexesPerProp .. ")", 2) end
 		totalVertices = totalVertices + #v
-		if totalVertices + plyVertexCount[ply] > maxVerticesTotal then SF.Throw("Exceed the total max vertices allowed (" .. maxVerticesTotal .. ")", 2) end
+		plyVertexCount:checkuse(ply, totalVertices)
 		local t = {}
 		for o, p in ipairs(v) do
 			if o>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
@@ -178,6 +179,8 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 		end
 		uwVertices[k] = t
 	end
+
+	plyVertexCount:free(-totalVertices)
 
 	local stream = SF.StringStream()
 	stream:writeInt32(#uwVertices)

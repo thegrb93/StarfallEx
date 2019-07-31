@@ -35,7 +35,7 @@ do
 	P.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 end
 
-local plyEffectBurst = SF.BurstObject("effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
+local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 
 --- Effects library.
 -- @shared

@@ -11,7 +11,7 @@ local checkpermission = SF.Permissions.check
 local net_library = SF.RegisterLibrary("net")
 
 local streams = SF.EntityTable("playerStreams")
-local netBurst = SF.BurstObject("net", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
+local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
 
 local instances = {}
 SF.AddHook("initialize", function(instance)

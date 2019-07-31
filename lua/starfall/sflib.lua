@@ -128,20 +128,20 @@ SF.BurstObject = {
 			return obj
 		end,
 	},
-	__call = function(p, name, rate, max, ratehelp, maxhelp, scale)
+	__call = function(p, cvarname, limitname, rate, max, ratehelp, maxhelp, scale)
 		scale = scale or 1
 
 		local t = {
-			name = name,
-			objects = SF.EntityTable("burst"..name)
+			name = limitname,
+			objects = SF.EntityTable("burst"..cvarname)
 		}
 
-		local ratename = "sf_"..name.."_burstrate"..(CLIENT and "_cl" or "")
+		local ratename = "sf_"..cvarname.."_burstrate"..(CLIENT and "_cl" or "")
 		local ratecvar = CreateConVar(ratename, tostring(rate), FCVAR_ARCHIVE, ratehelp)
 		t.rate = ratecvar:GetFloat()*scale
 		cvars.AddChangeCallback(ratename, function() t.rate = ratecvar:GetFloat()*scale end)
 
-		local maxname = "sf_"..name.."_burstmax"..(CLIENT and "_cl" or "")
+		local maxname = "sf_"..cvarname.."_burstmax"..(CLIENT and "_cl" or "")
 		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
 		t.max = maxcvar:GetFloat()*scale
 		cvars.AddChangeCallback(maxname, function() t.max = maxcvar:GetFloat()*scale end)
@@ -200,13 +200,13 @@ SF.LimitObject = {
 			return obj
 		end,
 	},
-	__call = function(p, name, max, maxhelp, scale)
+	__call = function(p, cvarname, limitname, max, maxhelp, scale)
 		local t = {
-			name = name,
-			objects = SF.EntityTable("limit"..name)
+			name = limitname,
+			objects = SF.EntityTable("limit"..cvarname)
 		}
 
-		local maxname = "sf_"..name.."_max"..(CLIENT and "_cl" or "")
+		local maxname = "sf_"..cvarname.."_max"..(CLIENT and "_cl" or "")
 		local maxcvar = CreateConVar(maxname, tostring(max), FCVAR_ARCHIVE, maxhelp)
 		scale = scale or 1
 		local function calcMax()

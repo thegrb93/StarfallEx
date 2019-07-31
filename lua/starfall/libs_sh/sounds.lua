@@ -24,8 +24,8 @@ do
 	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 end
 
-local plyCount = SF.LimitObject("sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
-local plySoundBurst = SF.BurstObject("sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
+local plyCount = SF.LimitObject("sounds", "sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
+local plySoundBurst = SF.BurstObject("sounds", "sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
 
 local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
 	for snd, _ in pairs(t) do
