@@ -23,15 +23,9 @@ do
 	P.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
 	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 end
-local plyMaxSounds
-if SERVER then
-	plyMaxSounds = CreateConVar("sf_sounds_personalquota", "20", FCVAR_ARCHIVE, "The number of sounds allowed to be playing via Starfall server at once")
-else
-	plyMaxSounds = CreateConVar("sf_sounds_personalquota_cl", "20", FCVAR_ARCHIVE, "The number of sounds allowed to be playing via Starfall client at once")
-end
-local plyCount = SF.EntityTable("playerSounds")
-local plySoundBurst = SF.EntityTable("playerSoundBurst")
-local plySoundBurstGen = SF.BurstGenObject("sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
+
+local plyCount = SF.LimitObject("sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
+local plySoundBurst = SF.BurstObject("sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
 
 local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
 	for snd, _ in pairs(t) do
@@ -39,13 +33,9 @@ local soundsByEntity = SF.EntityTable("soundsByEntity", function(e, t)
 	end
 end, true)
 
-local function soundsLeft(ply)
-	return plyMaxSounds:GetInt()<0 and -1 or (plyMaxSounds:GetInt() - plyCount[ply])
-end
-
 local function deleteSound(ply, ent, sound)
 	sound:Stop()
-	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
+	plyCount:free(ply, 1)
 	if soundsByEntity[ent] then
 		soundsByEntity[ent][sound] = nil
 	end
@@ -54,8 +44,6 @@ end
 -- Register functions to be called when the chip is initialised and deinitialised
 SF.AddHook("initialize", function(instance)
 	instance.data.sounds = {sounds = {}}
-	if not plySoundBurst[instance.player] then plySoundBurst[instance.player] = plySoundBurstGen:create() end
-	if not plyCount[instance.player] then plyCount[instance.player] = 0 end
 end)
 
 SF.AddHook("deinitialize", function(instance)
@@ -69,13 +57,11 @@ end)
 -- @param path Filepath to the sound file.
 -- @return Sound Object
 function sound_library.create(ent, path)
+	checktype(ent, SF.Types["Entity"])
+	checkluatype(path, TYPE_STRING)
+
 	local instance = SF.instance
 	checkpermission(instance, { ent, path }, "sound.create")
-	if soundsLeft(instance.player)==0 then SF.Throw("Reached the sounds limit: (" .. plyMaxSounds:GetInt() .. ")", 2) end
-	if not plySoundBurst[instance.player]:use(1) then SF.Throw("Can't create sounds that often", 2) end
-
-	checktype(ent, SF.Types["Entity"])
-	checkluatype (path, TYPE_STRING)
 
 	if path:match('["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
@@ -86,12 +72,14 @@ function sound_library.create(ent, path)
 		SF.Throw("Invalid Entity", 2)
 	end
 
+	plySoundBurst:use(instance.player, 1)
+	plyCount:use(instance.player, 1)
+
 	local soundPatch = CreateSound(e, path)
 	local snds = soundsByEntity[e]
 	if not snds then snds = {} soundsByEntity[e] = snds end
 	snds[soundPatch] = true
 	instance.data.sounds.sounds[soundPatch] = e
-	plyCount[instance.player] = plyCount[instance.player] + 1
 
 	return wrap(soundPatch)
 end
@@ -100,13 +88,13 @@ end
 --- Returns if a sound is able to be created
 -- @return If it is possible to make a sound
 function sound_library.canCreate()
-	return soundsLeft(SF.instance.player) ~= 0 and plySoundBurst[SF.instance.player]:check()>1
+	return plyCount:check(SF.instance.player) > 0 and plySoundBurst:check(SF.instance.player) >= 1
 end
 
 --- Returns the number of sounds left that can be created
 -- @return The number of sounds left
 function sound_library.soundsLeft()
-	return soundsLeft(SF.instance.player)
+	return math.min(plyCount:check(SF.instance.player), plySoundBurst:check(SF.instance.player))
 end
 
 --------------------------------------------------

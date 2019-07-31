@@ -35,13 +35,7 @@ do
 	P.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 end
 
-local plyEffectBurst = SF.EntityTable("playerEffectBurst")
-local plyEffectBurstGen = SF.BurstGenObject("effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
-
--- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function (inst)
-	plyEffectBurst[inst.player] = plyEffectBurst[inst.player] or plyEffectBurstGen:create()
-end)
+local plyEffectBurst = SF.BurstObject("effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 
 --- Effects library.
 -- @shared
@@ -71,7 +65,7 @@ function effect_methods:play(eff)
 	
 	local instance = SF.instance
 	checkpermission(instance, nil, "effect.play")
-	if not plyEffectBurst[instance.player]:use(1) then SF.Throw("Playing effects too quickly", 2) end
+	plyEffectBurst:use(instance.player, 1)
 	
 	if effect_blacklist[eff] then SF.Throw("Effect ("..eff..") is blacklisted", 2) end
 

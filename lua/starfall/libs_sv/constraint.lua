@@ -10,16 +10,14 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local plyMaxConstraints = CreateConVar("sf_constraints_personalquota", "600", FCVAR_ARCHIVE, "The number of constraints allowed to spawn via Starfall")
-local plyCount = SF.EntityTable("playerConstraints")
+local plyCount = SF.LimitObject("constraints", 600, "The number of constraints allowed to spawn via Starfall")
 
 SF.AddHook("initialize", function(instance)
 	instance.data.constraints = {constraints = {}}
-	if not plyCount[instance.player] then plyCount[instance.player] = 0 end
 end)
 
 local function constraintOnDestroy(ent, constraints, ply)
-	if plyCount[ply] then plyCount[ply] = plyCount[ply] - 1 end
+	plyCount:free(ply, 1)
 	constraints[ent] = nil
 end
 
@@ -68,16 +66,11 @@ do
 	P.registerPrivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
 end
 
-local function checkMaxReached(ply)
-	local max = plyMaxConstraints:GetInt()
-	if max>=0 and plyCount[ply] >= max then SF.Throw("Max constraints reached: " .. max, 3) end
-end
-
 local function register(ent, instance)
 	local constraints = instance.data.constraints.constraints
 	local ply = instance.player
 	ent:CallOnRemove("starfall_constraint_delete", constraintOnDestroy, constraints, ply)
-	plyCount[ply] = plyCount[ply] + 1
+	plyCount:free(ply, -1)
 	constraints[ent] = true
 end
 
@@ -93,7 +86,7 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -124,7 +117,7 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -161,7 +154,7 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -198,7 +191,7 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	checktype(maxv, SF.Types["Vector"])
 	checktype(frictionv, SF.Types["Vector"])
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -237,7 +230,7 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -282,7 +275,7 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -329,7 +322,7 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	checktype(v2, SF.Types["Vector"])
 
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -360,7 +353,7 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	checktype(e2, ents_metatable)
 
 	local instance = SF.instance
-	checkMaxReached(instance.player)
+	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
@@ -474,6 +467,6 @@ end
 function constraint_library.constraintsLeft()
 	local max = plyMaxConstraints:GetInt()
 	if max < 0 then return -1 end
-	return max - plyCount[SF.instance.player]
+	return plyCount:check(SF.instance.player)
 end
 

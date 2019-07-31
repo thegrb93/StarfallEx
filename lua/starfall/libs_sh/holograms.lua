@@ -51,23 +51,15 @@ end)
 SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = { default = 2 } } or nil)
 SF.Permissions.registerPrivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
-
--- Table with player keys that automatically cleans when player leaves.
-local plyCount = SF.EntityTable("playerHolos")
+local plyCount = SF.LimitObject("holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
 
 SF.AddHook("initialize", function(inst)
-	inst.data.holograms = {
-		holos = {},
-		count = 0
-	}
-	plyCount[inst.player] = plyCount[inst.player] or 0
+	inst.data.holograms = {holos = {}}
 end)
 
 local function hologramOnDestroy(holo, holodata, ply)
 	holodata[holo] = nil
-	if plyCount[ply] then
-		plyCount[ply] = plyCount[ply] - 1
-	end
+	plyCount:free(ply, 1)
 end
 
 SF.AddHook("deinitialize", function(inst)
@@ -98,9 +90,7 @@ function holograms_library.create(pos, ang, model, scale)
 	local ply = instance.player
 	local holodata = instance.data.holograms.holos
 
-	if plyCount[ply] >= SF.Holograms.personalquota:GetInt() then
-		SF.Throw("Can't spawn holograms, maximum personal limit of " .. SF.Holograms.personalquota:GetInt() .. " has been reached", 2)
-	end
+	plyCount:checkuse(ply, 1)
 
 	local holoent
 	if SERVER then
@@ -115,12 +105,12 @@ function holograms_library.create(pos, ang, model, scale)
 			hook.Run("PlayerSpawnedSENT", ply, holoent)
 
 			holodata[holoent] = true
-			plyCount[ply] = plyCount[ply] + 1
 
 			if scale~=nil then
 				checktype(scale, vec_meta)
 				holoent:SetScale(vunwrap(scale))
 			end
+			plyCount:free(ply, -1)
 			return wrap(holoent)
 		end
 	else
@@ -141,13 +131,13 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent.RenderOverride = holoent.Draw
 
 			holodata[holoent] = true
-			plyCount[ply] = plyCount[ply] + 1
 
 			if scale~=nil then
 				checktype(scale, vec_meta)
 				SF.Holograms.SetScale(holoent, vunwrap(scale))
 			end
 
+			plyCount:free(ply, -1)
 			return wrap(holoent)
 		end
 	end
@@ -157,22 +147,17 @@ end
 -- @return True if user can spawn holograms, False if not.
 function holograms_library.canSpawn()
 	if not SF.Permissions.hasAccess(SF.instance,  nil, "hologram.create") then return false end
-	return plyCount[SF.instance.player] < SF.Holograms.personalquota:GetInt()
+	return plyCount:check(SF.instance.player) > 0
 end
 
 --- Checks how many holograms can be spawned
 -- @return number of holograms able to be spawned
 function holograms_library.hologramsLeft ()
 	if not SF.Permissions.hasAccess(SF.instance,  nil, "hologram.create") then return 0 end
-	return SF.Holograms.personalquota:GetInt() - plyCount[SF.instance.player]
+	return plyCount:check(SF.instance.player)
 end
 
 if SERVER then
-
-	SF.Holograms.personalquota = CreateConVar("sf_holograms_personalquota", "100", { FCVAR_ARCHIVE, FCVAR_REPLICATED },
-		"The number of holograms allowed to spawn via Starfall scripts for a single player")
-
-
 	--- Sets the hologram scale. Basically the same as setRenderMatrix() with a scaled matrix
 	-- @shared
 	-- @param scale Vector new scale
@@ -258,9 +243,6 @@ if SERVER then
 	end
 
 else
-	SF.Holograms.personalquota = CreateClientConVar("sf_holograms_personalquota_cl", "200", true, false,
-		"The number of holograms allowed to spawn via Starfall scripts for a single player")
-
 	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "8", true, false,
 		"The max number of clips per hologram entity")
 

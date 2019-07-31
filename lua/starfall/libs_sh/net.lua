@@ -11,8 +11,7 @@ local checkpermission = SF.Permissions.check
 local net_library = SF.RegisterLibrary("net")
 
 local streams = SF.EntityTable("playerStreams")
-local netBurst = SF.EntityTable("NetBurst")
-local netBurstGen = SF.BurstGenObject("net", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
+local netBurst = SF.BurstObject("net", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
 
 local instances = {}
 SF.AddHook("initialize", function(instance)
@@ -22,9 +21,6 @@ SF.AddHook("initialize", function(instance)
 		data = {},
 		receives = {}
 	}
-	if not netBurst[instance.player] then
-		netBurst[instance.player] = netBurstGen:create()
-	end
 end)
 
 SF.AddHook("cleanup", function (instance)
@@ -65,9 +61,7 @@ function net_library.send (target, unreliable)
 	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	if not netBurst[instance.player]:use(instance.data.net.size) then
-		SF.Throw("Net message exceeds limit!", 3)
-	end
+	netBurst:use(instance.player, instance.data.net.size)
 
 	local data = instance.data.net.data
 	if #data == 0 then return false end
@@ -530,13 +524,13 @@ end
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
-	return math.floor((netBurst[SF.instance.player]:check() - SF.instance.data.net.size)/8)
+	return math.floor((netBurst:check(SF.instance.player) - SF.instance.data.net.size)/8)
 end
 
 --- Returns available bandwidth in bits
 -- @return number of bits that can be sent
 function net_library.getBitsLeft()
-	return math.floor(netBurst[SF.instance.player]:check() - SF.instance.data.net.size) -- Flooring, because the value can be decimal
+	return math.floor(netBurst:check(SF.instance.player) - SF.instance.data.net.size) -- Flooring, because the value can be decimal
 end
 
 --- Returns whether or not the library is currently reading data from a stream
