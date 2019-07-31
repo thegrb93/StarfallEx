@@ -1,9 +1,4 @@
-
-if file.Exists("lua/bin/gmcl_joystick_win32.dll", "GAME") or file.Exists("lua/bin/gmcl_joystick_win64.dll", "GAME") then
-	require("joystick")
-else
-	return
-end
+if not pcall(require, "joystick") then return end
 
 --- Joystick library.
 -- @client
