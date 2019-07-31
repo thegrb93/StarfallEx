@@ -102,8 +102,9 @@ SF.BurstObject = {
 				end
 				obj.lasttick = CurTime()
 				obj.val = new
+			else
+				SF.Throw("Invalid starfall user", 3)
 			end
-			SF.Throw("Invalid starfall user", 3)
 		end,
 		check = function(self, ply)
 			if ply:IsValid() then
@@ -111,8 +112,9 @@ SF.BurstObject = {
 				obj.val = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
 				obj.lasttick = CurTime()
 				return obj.val
+			else
+				SF.Throw("Invalid starfall user", 3)
 			end
-			SF.Throw("Invalid starfall user", 3)
 		end,
 		get = function(self, ply)
 			local obj = self.objects[ply]
@@ -160,8 +162,9 @@ SF.LimitObject = {
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 				obj.val = new
+			else
+				SF.Throw("Invalid starfall user", 3)
 			end
-			SF.Throw("Invalid starfall user", 3)
 		end,
 		checkuse = function(self, ply, amount)
 			if ply:IsValid() then
@@ -169,14 +172,16 @@ SF.LimitObject = {
 				if obj.val + amount > self.max then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
+			else
+				SF.Throw("Invalid starfall user", 3)
 			end
-			SF.Throw("Invalid starfall user", 3)
 		end,
 		check = function(self, ply)
 			if ply:IsValid() then
 				return self.max - self:get(ply).val
+			else
+				SF.Throw("Invalid starfall user", 3)
 			end
-			SF.Throw("Invalid starfall user", 3)
 		end,
 		free = function(self, ply, amount)
 			local obj = self.objects[ply]
