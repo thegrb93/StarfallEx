@@ -135,8 +135,12 @@ end
 
 --- Creates a custom prop.
 -- @server
+-- @param pos The position to spawn the prop
+-- @param ang The angles to spawn the prop
+-- @param frozen Whether the prop starts frozen
+-- @param defaultmesh Whether to build a render mesh from the physics mesh (Will make spawning the custom props require more time)
 -- @return The prop object
-function props_library.createCustom(pos, ang, vertices, frozen)
+function props_library.createCustom(pos, ang, vertices, frozen, defaultmesh)
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checkluatype(vertices, TYPE_TABLE)
@@ -182,18 +186,6 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	plyVertexCount:free(-totalVertices)
 
-	local stream = SF.StringStream()
-	stream:writeInt32(#uwVertices)
-	for k, v in ipairs(uwVertices) do
-		stream:writeInt32(#v)
-		for o, p in ipairs(v) do
-			stream:writeFloat(p.x)
-			stream:writeFloat(p.y)
-			stream:writeFloat(p.z)
-		end
-	end
-	stream = stream:getString()
-
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
 
@@ -203,15 +195,31 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	propent:SetPos(SF.clampPos(pos))
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
-	propent.Data = stream
 	propent:Spawn()
-	propent:GetPhysicsObject():EnableMotion(not frozen)
+	
+	local phys = propent:GetPhysicsObject()
+	phys:EnableMotion(not frozen)
 
-	net.Start("starfall_custom_prop")
-	net.WriteUInt(propent:EntIndex(), 16)
-	customPropStreamPlayers = player.GetAll()
-	customPropStream = net.WriteStream(stream)
-	net.Broadcast()
+	if defaultmesh then
+		local convexes = phys:GetMeshConvexes()
+		local stream = SF.StringStream()
+		stream:writeInt32(#convexes)
+		for k, v in ipairs(convexes) do
+			stream:writeInt32(#v)
+			for o, p in ipairs(v) do
+				local vec = p.pos
+				stream:writeFloat(vec.x)
+				stream:writeFloat(vec.y)
+				stream:writeFloat(vec.z)
+			end
+		end
+
+		net.Start("starfall_custom_prop")
+		net.WriteUInt(propent:EntIndex(), 16)
+		customPropStreamPlayers = player.GetAll()
+		customPropStream = net.WriteStream(stream:getString())
+		net.Broadcast()
+	end
 
 	if propdata.undo then
 		undo.Create("Prop")

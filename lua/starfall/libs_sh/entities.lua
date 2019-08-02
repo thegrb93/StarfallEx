@@ -124,6 +124,61 @@ if CLIENT then
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
+
+	--- Sets a hologram or custom_prop model to a custom Mesh
+	-- @client
+	-- @param mesh The mesh to set it to or nil to set back to normal
+	function ents_methods:setMesh(mesh)
+		checktype(self, ents_metamethods)
+		local ent = eunwrap(self)
+		if not (ent and ent:IsValid() and ent.IsHologram) then SF.Throw("The entity is invalid", 2) end
+
+		local instance = SF.instance
+		checkpermission(instance, nil, "mesh")
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		if mesh then
+			checktype(mesh, SF.Mesh.Metatable)
+			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
+			ent.custom_mesh_data = instance.data.meshes
+		else
+			ent.custom_mesh = nil
+		end
+	end
+
+	--- Sets a hologram or custom_prop's custom mesh material
+	-- @client
+	-- @param material The material to set it to or nil to set back to default
+	function ents_methods:setMeshMaterial(material)
+		checktype(self, ents_metamethods)
+		local ent = eunwrap(self)
+		if not (ent and ent:IsValid() and ent.IsHologram) then SF.Throw("The entity is invalid", 2) end
+
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+
+		if material then
+			checktype(material, SF.Materials.Metatable)
+			ent.Material = SF.Materials.Unwrap(material)
+		else
+			ent.Material = ent.DefaultMaterial
+		end
+	end
+
+	--- Sets a hologram or custom_prop's renderbounds
+	-- @client
+	-- @param mins The lower bounding corner coordinate local to the hologram
+	-- @param maxs The upper bounding corner coordinate local to the hologram
+	function ents_methods:setRenderBounds(mins, maxs)
+		checktype(self, ents_metamethods)
+		local ent = eunwrap(self)
+		if not (ent and ent:IsValid() and ent.IsHologram) then SF.Throw("The entity is invalid", 2) end
+
+		checktype(mins, vec_meta)
+		checktype(maxs, vec_meta)
+
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+
+		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
+	end
 end
 
 local soundsByEntity = SF.EntityTable("emitSoundsByEntity", function(e, t)

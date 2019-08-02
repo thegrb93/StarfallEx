@@ -291,26 +291,6 @@ else
 
 		holo:SetAngles(ang)
 	end
-
-	--- Sets a hologram entity's model to a custom Mesh
-	-- @client
-	-- @param mesh The mesh to set it to or nil to set back to normal
-	function hologram_methods:setMesh(mesh)
-		checktype(self, hologram_metamethods)
-		local holo = unwrap(self)
-		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
-
-		local instance = SF.instance
-		checkpermission(instance, nil, "mesh")
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-		if mesh then
-			checktype(mesh, SF.Mesh.Metatable)
-			holo.custom_mesh = SF.Mesh.Unwrap(mesh)
-			holo.custom_mesh_data = instance.data.meshes
-		else
-			holo.custom_mesh = nil
-		end
-	end
 	
 	--- Sets the texture filtering function when viewing a close texture
 	-- @client
@@ -346,41 +326,6 @@ else
 		else
 			holo.filter_min = nil
 		end
-	end
-
-	--- Sets a hologram entity's custom mesh material
-	-- @client
-	-- @param material The material to set it to or nil to set back to default
-	function hologram_methods:setMeshMaterial(material)
-		checktype(self, hologram_metamethods)
-		local holo = unwrap(self)
-		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
-
-		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-		if material then
-			checktype(material, SF.Materials.Metatable)
-			holo.Material = SF.Materials.Unwrap(material)
-		else
-			holo.Material = holo.DefaultMaterial
-		end
-	end
-
-	--- Sets a hologram entity's renderbounds
-	-- @client
-	-- @param mins The lower bounding corner coordinate local to the hologram
-	-- @param maxs The upper bounding corner coordinate local to the hologram
-	function hologram_methods:setRenderBounds(mins, maxs)
-		checktype(self, hologram_metamethods)
-		local holo = unwrap(self)
-		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
-
-		checktype(mins, vec_meta)
-		checktype(maxs, vec_meta)
-
-		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-		holo:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
 
 	--- Sets a hologram entity's rendermatrix

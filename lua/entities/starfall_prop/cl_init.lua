@@ -1,11 +1,13 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
+ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 
 function ENT:Initialize()
-	self.rendermesh = Mesh(self.Material)
+	self.rendermesh = false
+	self:DrawShadow(false)
 end
 
 function ENT:Draw()
@@ -13,42 +15,15 @@ function ENT:Draw()
 end
 
 function ENT:GetRenderMesh()
-	return { Mesh = self.rendermesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
-end
-
-function ENT:BuildPhysics(mesh)
-	self:PhysicsInit(SOLID_VPHYSICS)
-	self:PhysicsInitMultiConvex(mesh)
-	self:SetMoveType(MOVETYPE_VPHYSICS)
-	self:SetSolid(SOLID_VPHYSICS)
-	self:EnableCustomCollisions(true)
-	self:DrawShadow(false)
-
-	local physobj = self:GetPhysicsObject()
-	function self:Think()
-		physobj:SetPos( self:GetPos() )
-		physobj:SetAngles( self:GetAngles() )
-	end
-	physobj:EnableMotion( false )
-	physobj:Sleep()
-
-	self.rendermesh:BuildFromTriangles(self:GetPhysicsObject():GetMeshConvexes()[1])
-	self:MarkShadowAsDirty()
-
-	local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
-	for k, v in ipairs(mesh) do
-		for o, p in ipairs(v) do
-			local x, y, z = p.x, p.y, p.z
-			if x>maxs.x then maxs.x = x end
-			if y>maxs.y then maxs.y = y end
-			if z>maxs.z then maxs.z = z end
-			if x<mins.x then mins.x = x end
-			if y<mins.y then mins.y = y end
-			if z<mins.z then mins.z = z end
+	if self.custom_mesh then
+		if self.custom_mesh_data[self.custom_mesh] then
+			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
+		else
+			self.custom_mesh = nil
 		end
+	elseif self.rendermesh then
+		return { Mesh = self.rendermesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
 	end
-	self:SetRenderBounds(mins, maxs)
-	self:SetCollisionBounds(mins, maxs)
 end
 
 net.Receive("starfall_custom_prop", function()
@@ -80,14 +55,22 @@ net.Receive("starfall_custom_prop", function()
 	local function applyData(data)
 		local stream = SF.StringStream(data)
 		local mesh = {}
+		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
 		for i=1, stream:readUInt32() do
-			local convex = {}
-			for j=1, stream:readUInt32() do
-				convex[j] = Vector(stream:readFloat(), stream:readFloat(), stream:readFloat())
+			for o=1, stream:readUInt32() do
+				local x, y, z = stream:readFloat(), stream:readFloat(), stream:readFloat()
+				if x>maxs.x then maxs.x = x end
+				if y>maxs.y then maxs.y = y end
+				if z>maxs.z then maxs.z = z end
+				if x<mins.x then mins.x = x end
+				if y<mins.y then mins.y = y end
+				if z<mins.z then mins.z = z end
+				mesh[#mesh+1] = {pos = Vector(x, y, z)}
 			end
-			mesh[i] = convex
 		end
-		self:BuildPhysics(mesh)
+		self.rendermesh = Mesh(self.Material)
+		self.rendermesh:BuildFromTriangles(mesh)
+		self:SetRenderBounds(mins, maxs)
 	end
 
 	net.ReadStream(nil, function(data)
