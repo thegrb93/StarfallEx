@@ -298,7 +298,7 @@ else
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
-		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+		checkpermission(SF.instance, holo, "hologram.create")
 
 		holo:Remove()
 	end
