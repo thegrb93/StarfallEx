@@ -197,11 +197,17 @@ function props_library.createCustom(pos, ang, vertices, frozen, defaultmesh)
 	propent.Mesh = uwVertices
 	propent:Spawn()
 	
-	local phys = propent:GetPhysicsObject()
-	phys:EnableMotion(not frozen)
+	local physobj = propent:GetPhysicsObject()
+	if not physobj:IsValid() then
+		SF.Throw("Custom prop generated with invalid physics object!", 2)
+	end
+
+	physobj:EnableCollisions(true)
+	physobj:EnableMotion(not frozen)
+	physobj:EnableDrag(true)
 
 	if defaultmesh then
-		local convexes = phys:GetMeshConvexes()
+		local convexes = physobj:GetMeshConvexes()
 		local stream = SF.StringStream()
 		stream:writeInt32(#convexes)
 		for k, v in ipairs(convexes) do

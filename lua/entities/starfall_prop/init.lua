@@ -11,8 +11,4 @@ function ENT:Initialize()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
 	self:DrawShadow(false)
-
-	local physobj = self:GetPhysicsObject()
-	physobj:EnableCollisions( true )
-	physobj:EnableDrag( true )
 end
