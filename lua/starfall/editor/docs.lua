@@ -436,9 +436,11 @@ Writes a long and advances the file position ";};["writeShort"]={["class"]="func
 Writes a short and advances the file position";["fname"]="writeShort";["name"]="file_methods:writeShort";["param"]={[1]="x";["x"]="The short to write";};["private"]=false;["realm"]="cl";["summary"]="\
 Writes a short and advances the file position ";};};["name"]="File";["summary"]="\
 File type ";["typtbl"]="file_methods";};["Hologram"]={["class"]="class";["description"]="\
-Hologram type";["fields"]={};["methods"]={[1]="getScale";[10]="setModel";[11]="setPos";[12]="setRenderBounds";[13]="setRenderMatrix";[14]="setScale";[15]="setVel";[16]="suppressEngineLighting";[2]="setAngVel";[3]="setAngles";[4]="setAnimation";[5]="setClip";[6]="setFilterMag";[7]="setFilterMin";[8]="setMesh";[9]="setMeshMaterial";["getScale"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
+Hologram type";["fields"]={};["methods"]={[1]="getScale";[10]="setMeshMaterial";[11]="setModel";[12]="setPos";[13]="setRenderBounds";[14]="setRenderMatrix";[15]="setScale";[16]="setVel";[17]="suppressEngineLighting";[2]="remove";[3]="setAngVel";[4]="setAngles";[5]="setAnimation";[6]="setClip";[7]="setFilterMag";[8]="setFilterMin";[9]="setMesh";["getScale"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
 Gets the hologram scale.";["fname"]="getScale";["name"]="hologram_methods:getScale";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Vector scale";["server"]=true;["summary"]="\
-Gets the hologram scale.";};["setAngVel"]={["class"]="function";["classlib"]="Hologram";["description"]="\
+Gets the hologram scale.";};["remove"]={["class"]="function";["classlib"]="Hologram";["description"]="\
+Removes a hologram";["fname"]="remove";["name"]="hologram_methods:remove";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Removes a hologram ";};["setAngVel"]={["class"]="function";["classlib"]="Hologram";["description"]="\
 Sets the hologram's angular velocity.";["fname"]="setAngVel";["name"]="hologram_methods:setAngVel";["param"]={[1]="angvel";["angvel"]="*Vector* angular velocity.";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Sets the hologram's angular velocity.";};["setAngles"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
 Sets the hologram's angles.";["fname"]="setAngles";["name"]="hologram_methods:setAngles";["param"]={[1]="ang";["ang"]="New angles";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
