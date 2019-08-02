@@ -292,6 +292,17 @@ else
 		holo:SetAngles(ang)
 	end
 
+	--- Removes a hologram
+	function hologram_methods:remove()
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
+
+		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+		holo:Remove()
+	end
+
 	--- Sets a hologram entity's model to a custom Mesh
 	-- @client
 	-- @param mesh The mesh to set it to or nil to set back to normal
