@@ -6,8 +6,22 @@ ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 
 function ENT:Initialize()
-	self.rendermesh = false
+	self.rendermesh = Mesh(self.Material)
 	self:DrawShadow(false)
+	self:EnableCustomCollisions( true ) 
+end
+
+function ENT:BuildPhysics(mesh)
+	self:PhysicsInitMultiConvex(mesh)
+	self:SetMoveType(MOVETYPE_NONE)
+	self:SetSolid(SOLID_VPHYSICS)
+	self:EnableCustomCollisions(true)
+
+	local physobj = self:GetPhysicsObject()
+	function self:Think()
+		physobj:SetPos( self:GetPos() )
+		physobj:SetAngles( self:GetAngles() )
+	end
 end
 
 function ENT:Draw()
@@ -21,7 +35,7 @@ function ENT:GetRenderMesh()
 		else
 			self.custom_mesh = nil
 		end
-	elseif self.rendermesh then
+	else
 		return { Mesh = self.rendermesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
 	end
 end
@@ -54,9 +68,10 @@ net.Receive("starfall_custom_prop", function()
 
 	local function applyData(data)
 		local stream = SF.StringStream(data)
-		local mesh = {}
+		local physmesh = {}
 		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
 		for i=1, stream:readUInt32() do
+			local convex = {}
 			for o=1, stream:readUInt32() do
 				local x, y, z = stream:readFloat(), stream:readFloat(), stream:readFloat()
 				if x>maxs.x then maxs.x = x end
@@ -65,12 +80,23 @@ net.Receive("starfall_custom_prop", function()
 				if x<mins.x then mins.x = x end
 				if y<mins.y then mins.y = y end
 				if z<mins.z then mins.z = z end
-				mesh[#mesh+1] = {pos = Vector(x, y, z)}
+				convex[o] = Vector(x, y, z)
+			end
+			physmesh[i] = convex
+		end
+		self:BuildPhysics(physmesh)
+
+		local convexes = self:GetPhysicsObject():GetMeshConvexes()
+		local rendermesh = convexes[1]
+		for i=2, #rendermesh do
+			for k, v in ipairs(rendermesh[i]) do
+				rendermesh[#rendermesh+1] = {pos = v}
 			end
 		end
-		self.rendermesh = Mesh(self.Material)
-		self.rendermesh:BuildFromTriangles(mesh)
+
+		self.rendermesh:BuildFromTriangles(rendermesh)
 		self:SetRenderBounds(mins, maxs)
+		self:SetCollisionBounds(mins, maxs)
 	end
 
 	net.ReadStream(nil, function(data)
