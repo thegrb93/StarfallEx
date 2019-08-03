@@ -176,6 +176,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 			checktype(p, vec_meta)
 			local vec = vunwrap(p)
 			if math.abs(vec.x)>max or math.abs(vec.y)>max or math.abs(vec.z)>max then SF.Throw("The custom prop cannot exceed a hull size of " .. max, 2) end
+			if vec.x~=vec.x or vec.y~=vec.y or vec.z~=vec.z then SF.Throw("Your mesh contains nan values!", 2) end
 			for i=1, o-1 do
 				if t[i]:DistToSqr(vec) < mindist then
 					SF.Throw("No two vertices can have a distance less than " .. minVertexDistance:GetFloat(), 2)
