@@ -114,13 +114,17 @@ function props_library.create(pos, ang, model, frozen)
 end
 
 
-local customPropStream = {finished = {}}
-local customPropStreamPlayers = {}
+local customPropStream = {players = {}}
 
 local function customPropFinished()
-	for k, v in pairs(customPropStreamPlayers) do
-		if not customPropStream.finished[v] then
-			return false
+	for k, v in pairs(customPropStream.players) do
+		if not customPropStream.stream.finished[v] then
+			if CurTime()<customPropStream.timeout then
+				return false
+			else
+				customPropStream.stream:Remove()
+				break
+			end
 		end
 	end
 	return true
@@ -215,8 +219,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	net.Start("starfall_custom_prop")
 	net.WriteUInt(propent:EntIndex(), 16)
-	customPropStreamPlayers = player.GetAll()
-	customPropStream = net.WriteStream(stream:getString())
+	customPropStream = {players = player.GetAll(), stream = net.WriteStream(stream:getString()), timeout = CurTime()+5}
 	net.Broadcast()
 
 	if propdata.undo then
