@@ -211,6 +211,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	physobj:EnableCollisions(true)
 	physobj:EnableMotion(not frozen)
 	physobj:EnableDrag(true)
+	physobj:Wake()
 
 	net.Start("starfall_custom_prop")
 	net.WriteUInt(propent:EntIndex(), 16)
