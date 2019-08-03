@@ -16,13 +16,15 @@ function ENT:BuildPhysics(mesh)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
+end
 
+function ENT:Think()
 	local physobj = self:GetPhysicsObject()
-	physobj:EnableMotion(false)
-	physobj:Sleep()
-	function self:Think()
+	if physobj:IsValid() then
 		physobj:SetPos( self:GetPos() )
 		physobj:SetAngles( self:GetAngles() )
+		physobj:EnableMotion(false)
+		physobj:Sleep()
 	end
 end
 
