@@ -209,6 +209,11 @@ Library for creating and manipulating physics-less models AKA "Props".</p>
 	<table class="list">
 	
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#prop.canCreateCustom">canCreateCustom</a>( &nbsp;)</td>
+			<td class="summary">
+Returns if it is possible to create a custom prop yet </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#prop.canSpawn">canSpawn</a>( &nbsp;)</td>
 			<td class="summary">
 Checks if a user can spawn anymore props.</td>
@@ -222,6 +227,11 @@ Creates a prop.</td>
 			<td class="name"><span class="realm_sv"></span><a href="#prop.createComponent">createComponent</a>( pos, ang, class, model, frozen&nbsp;)</td>
 			<td class="summary">
 Creates starfall component.\n Allowed components:\n starfall_hud\n starfall_screen </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#prop.createCustom">createCustom</a>( pos, ang, vertices, frozen&nbsp;)</td>
+			<td class="summary">
+Creates a custom prop.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#prop.createSent">createSent</a>( pos, ang, class, frozen&nbsp;)</td>
@@ -257,6 +267,24 @@ Returns how many props per second the user can spawn </td>
 	<h2><a name="functions_def"></a>Functions definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_sv"></span><a name="prop.canCreateCustom"></a><strong>prop.canCreateCustom</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns if it is possible to create a custom prop yet</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean if a custom prop can be created</p>
+		
+	</section>
+	
+	
+</dd>
 		
 <dt><span class="realm_sv"></span><a name="prop.canSpawn"></a><strong>prop.canSpawn</strong>( &nbsp;)</dt>
 <dd>
@@ -327,6 +355,34 @@ Creates starfall component.\n Allowed components:\n starfall_hud\n starfall_scre
 		<h3>Returns</h3>
 		
 		<p>Component entity</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="prop.createCustom"></a><strong>prop.createCustom</strong>( pos, ang, vertices, frozen&nbsp;)</dt>
+<dd>
+	<p>
+Creates a custom prop.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>pos</tt> ― The position to spawn the prop</li>
+			<li><tt>ang</tt> ― The angles to spawn the prop</li>
+			<li><tt>vertices</tt></li>
+			<li><tt>frozen</tt> ― Whether the prop starts frozen</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The prop object</p>
 		
 	</section>
 	
