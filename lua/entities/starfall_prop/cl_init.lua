@@ -13,11 +13,13 @@ end
 
 function ENT:BuildPhysics(mesh)
 	self:PhysicsInitMultiConvex(mesh)
-	self:SetMoveType(MOVETYPE_NONE)
+	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
 	self:EnableCustomCollisions(true)
 
 	local physobj = self:GetPhysicsObject()
+	physobj:EnableMotion(false)
+	physobj:Sleep()
 	function self:Think()
 		physobj:SetPos( self:GetPos() )
 		physobj:SetAngles( self:GetAngles() )
