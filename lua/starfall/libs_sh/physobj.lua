@@ -248,6 +248,20 @@ if SERVER then
 		phys:ApplyForceOffset(force, position)
 	end
 
+	--- Sets the angular velocity of an object
+	-- @server
+	-- @param angvel The local angvel vector to set
+	function physobj_methods:setAngleVelocity(angvel)
+		checktype(angvel, vec_meta)
+		angvel = vunwrap(angvel)
+		if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
+
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+
+		phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
+	end
+
 	--- Applys a angular velocity to an object
 	-- @server
 	-- @param angvel The local angvel vector to apply
