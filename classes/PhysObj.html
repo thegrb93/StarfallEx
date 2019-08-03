@@ -209,6 +209,11 @@ PhysObj Type</p>
 	<table class="list">
 		
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:addAngleVelocity">addAngleVelocity</a>( angvel&nbsp;)</td>
+			<td class="summary">
+Applys a angular velocity to an object </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:applyForceCenter">applyForceCenter</a>( force&nbsp;)</td>
 			<td class="summary">
 Applys a force to the center of the physics object </td>
@@ -330,7 +335,7 @@ Sets the inertia of a physics object </td>
 Sets the mass of a physics object </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:setMaterial">setMaterial</a>( material&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:setMaterial">setMaterial</a>( material&nbsp;)</td>
 			<td class="summary">
 Sets the physical material of a physics object </td>
 		</tr>
@@ -365,6 +370,25 @@ Returns a normal vector in the local reference frame of the physicsobject from t
 	<h2><a name="methods_def"></a>Methods definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_sv"></span><a name="PhysObj:addAngleVelocity"></a><strong>PhysObj:addAngleVelocity</strong>( angvel&nbsp;)</dt>
+<dd>
+	<p>
+Applys a angular velocity to an object</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>angvel</tt> ― The local angvel vector to apply</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
 		
 <dt><span class="realm_sv"></span><a name="PhysObj:applyForceCenter"></a><strong>PhysObj:applyForceCenter</strong>( force&nbsp;)</dt>
 <dd>
@@ -415,7 +439,7 @@ Applys a torque to a physics object</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>torque</tt> ― The local torque vector to apply</li>
+			<li><tt>torque</tt> ― The world torque vector to apply</li>
 		</ul>
 	</section>
 	
@@ -829,7 +853,7 @@ Sets the mass of a physics object</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="PhysObj:setMaterial"></a><strong>PhysObj:setMaterial</strong>( material&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="PhysObj:setMaterial"></a><strong>PhysObj:setMaterial</strong>( material&nbsp;)</dt>
 <dd>
 	<p>
 Sets the physical material of a physics object</p>
