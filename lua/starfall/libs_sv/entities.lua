@@ -179,7 +179,24 @@ function ents_methods:applyDamage(amt, attacker, inflictor)
 	ent:TakeDamage(amt, attacker, inflictor)
 end
 
+--- Applys a angular velocity to an object
+-- @param angvel The local angvel vector to apply
+function ents_methods:addAngleVelocity(angvel)
+	checktype(self, ents_metatable)
+	checktype(angvel, vec_meta)
+	angvel = vunwrap(angvel)
+	if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
 
+	local ent = unwrap(self)
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+	local phys = ent:GetPhysicsObject()
+	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
+
+	checkpermission(SF.instance, ent, "entities.applyForce")
+
+	phys:AddAngleVelocity(angvel)
+end
+	
 --- Applies linear force to the entity
 -- @param vec The force vector
 function ents_methods:applyForceCenter (vec)

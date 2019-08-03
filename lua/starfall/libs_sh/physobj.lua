@@ -174,6 +174,19 @@ function physobj_methods:getMeshConvexes ()
 	return SF.Sanitize(mesh)
 end
 
+--- Sets the physical material of a physics object
+-- @param material The physical material to set it to
+function physobj_methods:setMaterial(material)
+	checkluatype (material, TYPE_STRING)
+	local phys = unwrap(self)
+	checkpermission(SF.instance, phys:GetEntity(), "entities.setRenderProperty")
+	phys:SetMaterial(material)
+	if not phys:IsMoveable() then
+		phys:EnableMotion(true)
+		phys:EnableMotion(false)
+	end
+end
+
 if SERVER then
 	--- Sets the position of the physics object. Will cause interpolation of the entity in clientside, use entity.setPos to avoid this.
 	-- @server
@@ -235,9 +248,23 @@ if SERVER then
 		phys:ApplyForceOffset(force, position)
 	end
 
+	--- Applys a angular velocity to an object
+	-- @server
+	-- @param angvel The local angvel vector to apply
+	function physobj_methods:addAngleVelocity(angvel)
+		checktype(angvel, vec_meta)
+		angvel = vunwrap(angvel)
+		if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
+
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+
+		phys:AddAngleVelocity(angvel)
+	end
+
 	--- Applys a torque to a physics object
 	-- @server
-	-- @param torque The local torque vector to apply
+	-- @param torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
 		checktype(torque, vec_meta)
 		torque = vunwrap(torque)
@@ -302,20 +329,6 @@ if SERVER then
 		checkpermission(SF.instance, phys:GetEntity(), "entities.enableMotion")
 		phys:EnableMotion(move and true or false)
 		phys:Wake()
-	end
-
-	--- Sets the physical material of a physics object
-	-- @server
-	-- @param material The physical material to set it to
-	function physobj_methods:setMaterial(material)
-		checkluatype (material, TYPE_STRING)
-		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setMass")
-		phys:SetMaterial(material)
-		if not phys:IsMoveable() then
-			phys:EnableMotion(true)
-			phys:EnableMotion(false)
-		end
 	end
 
 	--- Makes a sleeping physobj wakeup
