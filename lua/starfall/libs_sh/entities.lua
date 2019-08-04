@@ -156,7 +156,8 @@ if CLIENT then
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 		if material then
-			checktype(material, SF.Materials.Metatable)
+			local t = debug.getmetatable(material)
+			if t~=SF.Materials.Metatable and t~=SF.Materials.LMetatable then SF.ThrowTypeError("Material", SF.GetType(material), 2) end
 			ent.Material = SF.Materials.Unwrap(material)
 		else
 			ent.Material = ent.DefaultMaterial
