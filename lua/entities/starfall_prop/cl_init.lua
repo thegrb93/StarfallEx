@@ -92,9 +92,9 @@ net.Receive("starfall_custom_prop", function()
 
 		local convexes = self:GetPhysicsObject():GetMeshConvexes()
 		local rendermesh = convexes[1]
-		for i=2, #rendermesh do
-			for k, v in ipairs(rendermesh[i]) do
-				rendermesh[#rendermesh+1] = {pos = v}
+		for i=2, #convexes do
+			for k, v in ipairs(convexes[i]) do
+				rendermesh[#rendermesh+1] = v
 			end
 		end
 
