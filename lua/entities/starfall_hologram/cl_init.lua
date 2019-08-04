@@ -105,7 +105,7 @@ local function ShowHologramOwners()
 		if ent.IsSFHologram then
 			local name = "No Owner"
 			local steamID = ""
-			local ply = ent.SFHoloOwner or SF.Permissions.getOwner(ent)
+			local ply = SF.Permissions.getOwner(ent)
 			if ply and ply:IsValid() then
 				name = ply:Name()
 				steamID = ply:SteamID()
