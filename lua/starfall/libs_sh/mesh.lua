@@ -152,6 +152,7 @@ end
 -- @param thread An optional thread object to gradually parse the data to prevent exceeding cpu
 -- @param triangulate Whether to triangulate the faces
 -- @return The table of vertices that can be passed to mesh.buildFromTriangles
+-- @return The table of obj data. table.positions can be given to prop.createCustom
 function mesh_library.parseObj(obj, thread, triangulate)
 	checkluatype (obj, TYPE_STRING)
 	if thread ~= nil then checktype(thread, thread_meta) end
