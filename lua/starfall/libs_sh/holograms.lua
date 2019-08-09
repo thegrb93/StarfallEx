@@ -500,6 +500,7 @@ else
 				holo.sf_parent.sf_children[holo] = nil
 			end
 			
+			holo.sf_parent = nil
 			holo:SetParent()
 			
 		end
