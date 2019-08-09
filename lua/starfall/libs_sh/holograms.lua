@@ -243,9 +243,9 @@ if SERVER then
 	end
 
 else
-	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "8", true, false,
-		"The max number of clips per hologram entity")
-
+	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "8", true, false, "The max number of clips per hologram entity")
+	
+	SF.Permissions.registerPrivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
 
 	function SF.Holograms.SetScale(holo, scale)
 		holo.scale = scale
@@ -434,6 +434,75 @@ else
 
 		holo.suppressEngineLighting = suppress
 	end
+	
+	local function parentChildren(ent)
+		for child, attachment in pairs(ent.sf_children) do
+			
+			if child and child:IsValid() then
+				
+				child:SetParent(ent, attachment)
+				
+				if child.sf_children then
+					return parentChildren(child)
+				end
+				
+			end
+		
+		end
+	end
+	
+	hook.Add("NotifyShouldTransmit", "starfall_hologram_parents", function(ent, transmit)
+		
+		if ent and ent:IsValid() and ent.sf_children then
+			parentChildren(ent)
+		end
+		
+	end)
+	
+	local holoChildrenMeta = { __mode = "k" }
+	
+	function hologram_methods:setParent (ent, attachment)
+		
+		checktype(self, hologram_metamethods)
+		local holo = unwrap(self)
+		if not (holo and holo:IsValid()) then SF.Throw("The hologram is invalid", 2) end
+		
+		checkpermission(SF.instance, holo, "hologram.setParent")
+		
+		if ent ~= nil then
+			
+			checktype(ent, ent_meta)
+			local parent = eunwrap(ent)
+			if not (parent and parent:IsValid()) then SF.Throw("The parent is invalid", 2) end
+			
+			if attachment == nil then attachment = -1 end
+			checkluatype(attachment, TYPE_NUMBER)
+			
+			if not parent.sf_children then
+				parent.sf_children = setmetatable({}, holoChildrenMeta)
+			end
+			
+			if holo.sf_parent then
+				holo.sf_parent.sf_children[holo] = nil
+			end
+			
+			parent.sf_children[holo] = attachment
+			holo.sf_parent = parent
+			
+			holo:SetParent(parent, attachment)
+			
+		else
+			
+			if holo.sf_parent then
+				holo.sf_parent.sf_children[holo] = nil
+			end
+			
+			holo:SetParent()
+			
+		end
+		
+	end
+	
 end
 
 --- Gets the hologram scale.
