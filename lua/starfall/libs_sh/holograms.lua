@@ -461,6 +461,9 @@ else
 	
 	local holoChildrenMeta = { __mode = "k" }
 	
+	--- Parents a hologram
+	-- @param ent Entity parent (nil to unparent)
+	-- @param attachment Optional attachment ID
 	function hologram_methods:setParent (ent, attachment)
 		
 		checktype(self, hologram_metamethods)
