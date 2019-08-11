@@ -353,7 +353,7 @@ function PANEL:DoRightClick (node)
 					function (text)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
-						local saveFile = node:GetFolder().."/"..text..".txt"
+						local saveFile = "starfall/"..node:GetFolder().."/"..text..".txt"
 						file.Write(saveFile, "")
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
 						self:ReloadTree()
