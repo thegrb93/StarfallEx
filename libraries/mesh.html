@@ -209,9 +209,34 @@ Mesh library.</p>
 	<table class="list">
 	
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#mesh.createFromObj">createFromObj</a>( obj, thread, triangulate&nbsp;)</td>
+			<td class="summary">
+Creates a mesh from an obj file.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#mesh.createFromTable">createFromTable</a>( verteces, thread&nbsp;)</td>
+			<td class="summary">
+Creates a mesh from vertex data.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#mesh.getModelMeshes">getModelMeshes</a>( model, lod, bodygroupMask&nbsp;)</td>
+			<td class="summary">
+Returns a table of visual meshes of given model or nil if the model is invalid </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#mesh.parseObj">parseObj</a>( obj, thread, triangulate&nbsp;)</td>
 			<td class="summary">
 Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#mesh.trianglesLeft">trianglesLeft</a>( &nbsp;)</td>
+			<td class="summary">
+Returns how many triangles can be created </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#mesh.trianglesLeftRender">trianglesLeftRender</a>( &nbsp;)</td>
+			<td class="summary">
+Returns how many triangles can be rendered </td>
 		</tr>
 	</table>
 </section>
@@ -222,6 +247,86 @@ Parses obj data into a table of vertices, normals, texture coordinates, colors, 
 	<h2><a name="functions_def"></a>Functions definition</h2>
 	<dl>
 		
+		
+<dt><span class="realm_sh"></span><a name="mesh.createFromObj"></a><strong>mesh.createFromObj</strong>( obj, thread, triangulate&nbsp;)</dt>
+<dd>
+	<p>
+Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>obj</tt> ― The obj file data</li>
+			<li><tt>thread</tt> ― An optional thread object that can be used to load the mesh over time to prevent hitting quota limit</li>
+			<li><tt>triangulate</tt> ― Whether to triangulate faces. (Consumes more CPU)</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Mesh object</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="mesh.createFromTable"></a><strong>mesh.createFromTable</strong>( verteces, thread&nbsp;)</dt>
+<dd>
+	<p>
+Creates a mesh from vertex data.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>verteces</tt> ― Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex</li>
+			<li><tt>thread</tt> ― An optional thread object that can be used to load the mesh over time to prevent hitting quota limit</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Mesh object</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="mesh.getModelMeshes"></a><strong>mesh.getModelMeshes</strong>( model, lod, bodygroupMask&nbsp;)</dt>
+<dd>
+	<p>
+Returns a table of visual meshes of given model or nil if the model is invalid</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>model</tt> ― The full path to a model to get the visual meshes of.</li>
+			<li><tt>lod</tt> ― The lod of the model to use.</li>
+			<li><tt>bodygroupMask</tt> ― The bodygroupMask of the model to use.</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.</p>
+		
+	</section>
+	
+	
+</dd>
 		
 <dt><span class="realm_sh"></span><a name="mesh.parseObj"></a><strong>mesh.parseObj</strong>( obj, thread, triangulate&nbsp;)</dt>
 <dd>
@@ -248,6 +353,42 @@ Parses obj data into a table of vertices, normals, texture coordinates, colors, 
 			<li>The table of vertices that can be passed to mesh.buildFromTriangles</li>
 			<li>The table of obj data. table.positions can be given to prop.createCustom</li>
 		</ol>
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="mesh.trianglesLeft"></a><strong>mesh.trianglesLeft</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns how many triangles can be created</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Number of triangles that can be created</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="mesh.trianglesLeftRender"></a><strong>mesh.trianglesLeftRender</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns how many triangles can be rendered</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Number of triangles that can be rendered</p>
+		
 	</section>
 	
 	
