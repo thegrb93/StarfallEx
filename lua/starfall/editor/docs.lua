@@ -446,7 +446,7 @@ Writes a long and advances the file position ";};["writeShort"]={["class"]="func
 Writes a short and advances the file position";["fname"]="writeShort";["name"]="file_methods:writeShort";["param"]={[1]="x";["x"]="The short to write";};["private"]=false;["realm"]="cl";["summary"]="\
 Writes a short and advances the file position ";};};["name"]="File";["summary"]="\
 File type ";["typtbl"]="file_methods";};["Hologram"]={["class"]="class";["description"]="\
-Hologram type";["fields"]={};["methods"]={[1]="getScale";[10]="setPos";[11]="setRenderMatrix";[12]="setScale";[13]="setVel";[14]="suppressEngineLighting";[2]="remove";[3]="setAngVel";[4]="setAngles";[5]="setAnimation";[6]="setClip";[7]="setFilterMag";[8]="setFilterMin";[9]="setModel";["getScale"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
+Hologram type";["fields"]={};["methods"]={[1]="getScale";[10]="setParent";[11]="setPos";[12]="setRenderMatrix";[13]="setScale";[14]="setVel";[15]="suppressEngineLighting";[2]="remove";[3]="setAngVel";[4]="setAngles";[5]="setAnimation";[6]="setClip";[7]="setFilterMag";[8]="setFilterMin";[9]="setModel";["getScale"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
 Gets the hologram scale.";["fname"]="getScale";["name"]="hologram_methods:getScale";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Vector scale";["server"]=true;["summary"]="\
 Gets the hologram scale.";};["remove"]={["class"]="function";["classlib"]="Hologram";["description"]="\
 Removes a hologram";["fname"]="remove";["name"]="hologram_methods:remove";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
@@ -464,7 +464,9 @@ Sets the texture filtering function when viewing a close texture ";};["setFilter
 Sets the texture filtering function when viewing a far texture";["fname"]="setFilterMin";["name"]="hologram_methods:setFilterMin";["param"]={[1]="val";["val"]="The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets the texture filtering function when viewing a far texture ";};["setModel"]={["class"]="function";["classlib"]="Hologram";["description"]="\
 Sets the model of a hologram";["fname"]="setModel";["name"]="hologram_methods:setModel";["param"]={[1]="model";["model"]="string model path";};["private"]=false;["realm"]="sh";["summary"]="\
-Sets the model of a hologram ";};["setPos"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
+Sets the model of a hologram ";};["setParent"]={["class"]="function";["classlib"]="Hologram";["description"]="\
+Parents a hologram";["fname"]="setParent";["name"]="hologram_methods:setParent";["param"]={[1]="ent";[2]="attachment";["attachment"]="Optional attachment ID";["ent"]="Entity parent (nil to unparent)";};["private"]=false;["realm"]="sh";["summary"]="\
+Parents a hologram ";};["setPos"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
 Sets the hologram's position.";["fname"]="setPos";["name"]="hologram_methods:setPos";["param"]={[1]="vec";["vec"]="New position";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
 Sets the hologram's position.";};["setRenderMatrix"]={["class"]="function";["classlib"]="Hologram";["client"]=true;["description"]="\
 Sets a hologram entity's rendermatrix";["fname"]="setRenderMatrix";["name"]="hologram_methods:setRenderMatrix";["param"]={[1]="mat";["mat"]="Starfall matrix to use";};["private"]=false;["realm"]="cl";["summary"]="\
