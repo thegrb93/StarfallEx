@@ -95,8 +95,12 @@ function ENT:DrawTranslucent ()
 	self:DrawModel()
 
 	if halo.RenderedEntity() == self then return end
+	
+	local boneMatrix = self:GetBoneMatrix(0)
+	if not boneMatrix then return end
+
 	-- Draw screen here
-	local transform = self:GetBoneMatrix(0) * self.ScreenMatrix
+	local transform = boneMatrix * self.ScreenMatrix
 	self.Transform = transform
 	cam.PushModelMatrix(transform)
 		render.ClearStencil()
