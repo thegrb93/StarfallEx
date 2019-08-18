@@ -235,4 +235,10 @@ hook.Add("Initialize","SF_PPInitialize",function()
 			end
 		end
 	end
+	
+	for privilegeid, privilege in pairs(SF.Permissions.privileges) do
+		if privilege[3].entities then
+			SF.Permissions.buildPermissionCheck(privilegeid)
+		end
+	end
 end)
