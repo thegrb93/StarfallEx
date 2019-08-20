@@ -16,10 +16,10 @@ local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
-SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { entities = {} })
-SF.Permissions.registerPrivilege("entities.getAngles", "GetAngles", "Allows the user to get angles of an entity", { entities = {} })
-SF.Permissions.registerPrivilege("entities.getPos", "GetPos", "Allows the user to get position of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", CLIENT and { client = {} } or { entities = {} })
+SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", CLIENT and { client = {} } or { entities = {} })
+SF.Permissions.registerPrivilege("entities.getAngles", "GetAngles", "Allows the user to get angles of an entity", CLIENT and { client = {} } or { entities = {} })
+SF.Permissions.registerPrivilege("entities.getPos", "GetPos", "Allows the user to get position of an entity", CLIENT and { client = {} } or { entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
