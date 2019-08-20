@@ -42,7 +42,10 @@ function ENT:GetOverlayText()
 	else
 		serverstr = "None"
 	end
-	return "- Starfall Processor -\n[ " .. self.name .. " ]\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
+	
+	local authorstr =  self.author and self.author:Trim() != "" and "\nAuthor: " .. self.author or ""
+	
+	return "- Starfall Processor -\n[ " .. self.name .. " ]"..authorstr.."\nServer CPU: " .. serverstr .. "\nClient CPU: " .. clientstr
 end
 
 if WireLib then

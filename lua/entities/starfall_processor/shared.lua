@@ -34,6 +34,13 @@ function ENT:Compile()
 		self.name = "Generic ( No-Name )"
 	end
 
+	if instance.ppdata.scriptauthors and instance.mainfile and instance.ppdata.scriptauthors[instance.mainfile] then
+		self.author = string.sub(tostring(instance.ppdata.scriptauthors[instance.mainfile]), 1, 64)
+	else
+		self.author = nil
+	end
+
+
 	self.instance = instance
 	instance.runOnError = function(inst, ...)
 		-- Have to make sure it's valid because the chip can be deleted before deinitialization and trigger errors

@@ -148,6 +148,12 @@ local function directive_name(args, filename, data)
 end
 SF.Preprocessor.SetGlobalDirective("name", directive_name)
 
+local function directive_author(args, filename, data)
+	if not data.scriptauthors then data.scriptauthors = {} end
+	data.scriptauthors[filename] = args
+end
+SF.Preprocessor.SetGlobalDirective("author", directive_author)
+
 local function directive_sharedscreen(args, filename, data)
 	if not data.sharedscreen then data.sharedscreen = true end
 
