@@ -154,12 +154,6 @@ local function directive_author(args, filename, data)
 end
 SF.Preprocessor.SetGlobalDirective("author", directive_author)
 
-local function directive_sharedscreen(args, filename, data)
-	if not data.sharedscreen then data.sharedscreen = true end
-
-end
-SF.Preprocessor.SetGlobalDirective("sharedscreen", directive_sharedscreen)
-
 local function directive_model(args, filename, data)
 	if not data.models then data.models = {} end
 	data.models[filename] = args
@@ -216,14 +210,6 @@ end)
 -- @usage
 -- \--@author TheAuthor
 -- -- CODE
-
---
--- if SERVER then
--- \	-- Do important calculations
--- \	-- Send net message
--- else
--- \	-- Display result of important calculations
--- end
 
 --- Set the model of the processor entity.
 -- This does not set the model of the screen entity
