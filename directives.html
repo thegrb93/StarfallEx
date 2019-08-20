@@ -164,6 +164,7 @@
 					<h1>Preprocessor directives</h1>
 					<ul>
 						
+						<li><a href="directives.html#author">--@author</a></li>
 						<li><a href="directives.html#client">--@client</a></li>
 						<li><a href="directives.html#include">--@include</a></li>
 						<li><a href="directives.html#includedir">--@includedir</a></li>
@@ -203,6 +204,11 @@
 	<table class="list">
 		
 		<tr>
+			<td class="name" nowrap><a href="#author">--@author</a> author</td>
+			<td class="summary">
+Set the author of the script.</td>
+		</tr>
+		<tr>
 			<td class="name" nowrap><a href="#client">--@client</a> </td>
 			<td class="summary">
 Set the processor to only run on the client.</td>
@@ -236,6 +242,31 @@ Set the processor to only run on the server.</td>
 </section>
 <dl class="directives">
 	
+	<dt><a name="author"></a><strong>--@author</strong> author</dt>
+	<dd>
+		<p>
+Set the author of the script. 
+This will set the author that will be shown on the overlay of the processor</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>author</tt> ― Author of the script
+				</li>
+				
+			</ul>
+		</section>
+		<section class="usage">
+			<h3>Usage</h3>
+			
+			<p><pre class="example">
+--@author TheAuthor 
+-- CODE</pre></p>
+			
+		</section>
+	</dd>
 	<dt><a name="client"></a><strong>--@client</strong> </dt>
 	<dd>
 		<p>
