@@ -208,6 +208,15 @@ end)
 -- \--@name Awesome script
 -- -- CODE
 
+--- Set the author of the script.
+-- This will set the author that will be shown on the overlay of the processor
+-- @name author
+-- @class directive
+-- @param author Author of the script
+-- @usage
+-- \--@author TheAuthor
+-- -- CODE
+
 --
 -- if SERVER then
 -- \	-- Do important calculations
