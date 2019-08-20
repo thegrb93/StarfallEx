@@ -1090,7 +1090,12 @@ Returns the type of output name, or nil if it doesn't exist";["fname"]="outputTy
 Returns the type of output name, or nil if it doesn't exist ";};["outputs"]={["class"]="function";["classlib"]="Wirelink";["description"]="\
 Returns a table of all of the wirelink's outputs";["fname"]="outputs";["name"]="wirelink_methods:outputs";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
 Returns a table of all of the wirelink's outputs ";};};["name"]="Wirelink";["server"]=true;["summary"]="\
-Wirelink type ";["typtbl"]="wirelink_methods";};};["directives"]={[1]="client";[2]="include";[3]="includedir";[4]="model";[5]="name";[6]="server";["client"]={["class"]="directive";["classForced"]=true;["description"]="\
+Wirelink type ";["typtbl"]="wirelink_methods";};};["directives"]={[1]="author";[2]="client";[3]="include";[4]="includedir";[5]="model";[6]="name";[7]="server";["author"]={["class"]="directive";["classForced"]=true;["description"]="\
+Set the author of the script. \
+This will set the author that will be shown on the overlay of the processor";["name"]="author";["param"]={[1]="author";["author"]="Author of the script";};["summary"]="\
+Set the author of the script.";["usage"]="\
+--@author TheAuthor \
+-- CODE";};["client"]={["class"]="directive";["classForced"]=true;["description"]="\
 Set the processor to only run on the client. Shared is default";["name"]="client";["param"]={};["summary"]="\
 Set the processor to only run on the client.";["usage"]="\
 --@client \
