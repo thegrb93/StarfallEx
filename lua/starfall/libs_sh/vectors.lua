@@ -376,7 +376,7 @@ end
 --- Copies x,y,z from a vector and returns a new vector
 -- @return The copy of the vector
 function vec_methods:clone()
-	SF.CheckType(v, vec_metamethods)
+	SF.CheckType(self, vec_metamethods)
 
 	return wrap({ self[1], self[2], self[3] })
 end
