@@ -43,7 +43,7 @@ SF.EntityTable = {
 		if t.wait then
 			e:CallOnRemove("SF_" .. t.key, function()
 				timer.Simple(0, function()
-					if not e:IsValid() then
+					if t[e] and not e:IsValid() then
 						t[e] = nil
 						if t.destructor then t.destructor(e, v) end
 					end
@@ -51,8 +51,10 @@ SF.EntityTable = {
 			end)
 		else
 			e:CallOnRemove("SF_" .. t.key, function()
-				t[e] = nil
-				if t.destructor then t.destructor(e, v) end
+				if t[e] then
+					t[e] = nil
+					if t.destructor then t.destructor(e, v) end
+				end
 			end)
 		end
 	end,
