@@ -95,7 +95,7 @@ hook.Add("PlayerEnteredVehicle", "Starfall_HUD_PlayerEnteredVehicle", function(p
 	for k, v in pairs(vehiclelinks) do
 		if vehicle == k and v:IsValid() then
 			vehicle:CallOnRemove("remove_sf_hud"..v:EntIndex(), function()
-				if v:IsValid() then
+				if v:IsValid() and ply:IsValid() then
 					v:SetHudEnabled(ply, 0)
 				end
 			end)
