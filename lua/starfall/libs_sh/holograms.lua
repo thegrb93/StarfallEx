@@ -48,7 +48,7 @@ SF.AddHook("postload", function()
 	end
 end)
 
-SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = { default = 2 } } or nil)
+SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
 SF.Permissions.registerPrivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
 local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
