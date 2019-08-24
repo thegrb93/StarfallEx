@@ -18,8 +18,6 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
-SF.Permissions.registerPrivilege("entities.getAngles", "GetAngles", "Allows the user to get angles of an entity", { client = (CLIENT and {} or nil), entities = {} })
-SF.Permissions.registerPrivilege("entities.getPos", "GetPos", "Allows the user to get position of an entity", { client = (CLIENT and {} or nil), entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -561,11 +559,6 @@ end
 function ents_methods:getPos()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	
-	if not ent:IsPlayer() and not ent:IsNPC() then
-		checkpermission(SF.instance, ent, "entities.getPos")
-	end
-	
 	return vwrap(ent:GetPos())
 end
 
@@ -727,11 +720,6 @@ end
 function ents_methods:getAngles()
 	checktype(self, ents_metamethods)
 	local ent = eunwrap(self)
-	
-	if not ent:IsPlayer() and not ent:IsNPC() then
-		checkpermission(SF.instance, ent, "entities.getAngles")
-	end
-	
 	return awrap(ent:GetAngles())
 end
 
