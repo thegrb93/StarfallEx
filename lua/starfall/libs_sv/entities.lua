@@ -57,10 +57,14 @@ end)
 
 -- ------------------------- Internal functions ------------------------- --
 
-local function check (v)
-	return 	-math.huge < v[1] and v[1] < math.huge and
-			-math.huge < v[2] and v[2] < math.huge and
-			-math.huge < v[3] and v[3] < math.huge
+local function checkvector(v)
+	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
+	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
+	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
+
+		SF.Throw("Input vector too large or NAN", 3)
+
+	end
 end
 
 -- ------------------------- Methods ------------------------- --
@@ -185,7 +189,7 @@ function ents_methods:setAngleVelocity(angvel)
 	checktype(self, ents_metatable)
 	checktype(angvel, vec_meta)
 	angvel = vunwrap(angvel)
-	if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
+	checkvector(angvel)
 
 	local ent = unwrap(self)
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
@@ -203,7 +207,7 @@ function ents_methods:addAngleVelocity(angvel)
 	checktype(self, ents_metatable)
 	checktype(angvel, vec_meta)
 	angvel = vunwrap(angvel)
-	if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
+	checkvector(angvel)
 
 	local ent = unwrap(self)
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
@@ -221,7 +225,7 @@ function ents_methods:applyForceCenter (vec)
 	checktype(self, ents_metatable)
 	checktype(vec, vec_meta)
 	local vec = vunwrap(vec)
-	if not check(vec) then SF.Throw("infinite vector", 2) end
+	checkvector(vec)
 
 	local ent = unwrap(self)
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
@@ -244,7 +248,8 @@ function ents_methods:applyForceOffset (vec, offset)
 	local vec = vunwrap(vec)
 	local offset = vunwrap(offset)
 
-	if not check(vec) or not check(offset) then SF.Throw("infinite vector", 2) end
+	checkvector(vec)
+	checkvector(offset)
 
 	local ent = unwrap(self)
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
@@ -266,7 +271,7 @@ function ents_methods:applyAngForce (ang)
 	local ent = unwrap(self)
 
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
-	if not check(ang) then SF.Throw("infinite angle", 2) end
+	checkvector(ang)
 
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
@@ -307,6 +312,7 @@ function ents_methods:applyTorque (torque)
 	checktype(torque, vec_meta)
 
 	local torque = vunwrap(torque)
+	checkvector(torque)
 
 	local ent = unwrap(self)
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
@@ -412,7 +418,7 @@ function ents_methods:setVelocity (vel)
 	local ent = unwrap(self)
 
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
-	if not check(vel) then SF.Throw("infinite vector", 2) end
+	checkvector(vel)
 
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
@@ -548,7 +554,7 @@ function ents_methods:setInertia (vec)
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
 	local vec = vunwrap(vec)
-	if not check(vec) then SF.Throw("infinite vector", 2) end
+	checkvector(vec)
 	vec[1] = math.Clamp(vec[1], 1, 100000)
 	vec[2] = math.Clamp(vec[2], 1, 100000)
 	vec[3] = math.Clamp(vec[3], 1, 100000)

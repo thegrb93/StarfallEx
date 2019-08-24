@@ -35,10 +35,14 @@ SF.AddHook("postload", function()
 	mwrap = SF.VMatrix.Wrap
 end)
 
-local function check (v)
-	return 	-math.huge < v[1] and v[1] < math.huge and
-			-math.huge < v[2] and v[2] < math.huge and
-			-math.huge < v[3] and v[3] < math.huge
+local function checkvector(v)
+	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
+	   v[2]<-1e12 or v[2]>1e12 or v[2]~=v[2] or
+	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
+
+		SF.Throw("Input vector too large or NAN", 3)
+
+	end
 end
 
 --- Checks if the physics object is valid
@@ -195,7 +199,7 @@ if SERVER then
 		checktype(pos, vec_meta)
 
 		local vec = vunwrap(pos)
-		if not check(vec) then SF.Throw("infinite vector", 2) end
+		checkvector(vec)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setPos")
@@ -209,7 +213,7 @@ if SERVER then
 		checktype(vel, vec_meta)
 
 		local vec = vunwrap(vel)
-		if not check(vec) then SF.Throw("infinite vector", 2) end
+		checkvector(vec)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setVelocity")
@@ -223,7 +227,7 @@ if SERVER then
 		checktype(force, vec_meta)
 
 		force = vunwrap(force)
-		if not check(force) then SF.Throw("infinite vector", 2) end
+		checkvector(force)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
@@ -239,9 +243,9 @@ if SERVER then
 		checktype(position, vec_meta)
 
 		force = vunwrap(force)
-		if not check(force) then SF.Throw("infinite force vector", 2) end
+		checkvector(force)
 		position = vunwrap(position)
-		if not check(position) then SF.Throw("infinite position vector", 2) end
+		checkvector(position)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
@@ -254,7 +258,7 @@ if SERVER then
 	function physobj_methods:setAngleVelocity(angvel)
 		checktype(angvel, vec_meta)
 		angvel = vunwrap(angvel)
-		if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
+		checkvector(angvel)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
@@ -268,7 +272,7 @@ if SERVER then
 	function physobj_methods:addAngleVelocity(angvel)
 		checktype(angvel, vec_meta)
 		angvel = vunwrap(angvel)
-		if not check(angvel) then SF.Throw("infinite angvel vector", 2) end
+		checkvector(angvel)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
@@ -282,7 +286,7 @@ if SERVER then
 	function physobj_methods:applyTorque(torque)
 		checktype(torque, vec_meta)
 		torque = vunwrap(torque)
-		if not check(torque) then SF.Throw("infinite torque vector", 2) end
+		checkvector(torque)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
@@ -311,7 +315,7 @@ if SERVER then
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setInertia")
 
 		local vec = vunwrap(inertia)
-		if not check(vec) then SF.Throw("infinite vector", 2) end
+		checkvector(vec)
 		vec[1] = math.Clamp(vec[1], 1, 100000)
 		vec[2] = math.Clamp(vec[2], 1, 100000)
 		vec[3] = math.Clamp(vec[3], 1, 100000)
