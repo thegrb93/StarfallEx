@@ -78,7 +78,7 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
-	local update = self.instance ~= nil
+	local update = self.instance ~= nil or self.error ~= nil
 	if SERVER and update then
 		net.Start("starfall_processor_destroy")
 		net.WriteEntity(self)
