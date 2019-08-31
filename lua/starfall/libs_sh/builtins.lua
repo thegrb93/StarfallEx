@@ -789,7 +789,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		-- If no scripts found in relative dir, try the root dir.
 		local foundScript = false
 		for file, _ in pairs(SF.instance.scripts) do
-			if string.match(file, "^"..path.."/[^/]+%.txt$") then
+			if string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$") then
 				foundScript = true
 				break
 			end
@@ -812,7 +812,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	end
 
 	for file, _ in pairs(SF.instance.scripts) do
-		if not returns[file] and string.match(file, "^"..path.."/[^/]+%.txt$") then
+		if not returns[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$") then
 			returns[file] = SF.DefaultEnvironment.require("/"..file)
 		end
 	end
