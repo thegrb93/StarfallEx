@@ -40,6 +40,9 @@ end
 SF.EntityTable = {
 	__newindex = function(t, e, v)
 		rawset(t, e, v)
+		if !IsEntity(e) then
+			return
+		end
 		if t.wait then
 			e:CallOnRemove("SF_" .. t.key, function()
 				timer.Simple(0, function()
