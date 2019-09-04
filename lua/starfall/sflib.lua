@@ -36,8 +36,7 @@ end
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
--- Returns a class that manages a table of entity keys
-SF.EntityTable = {
+local EntityTable = {
 	__newindex = function(t, e, v)
 		rawset(t, e, v)
 		if t.wait then
@@ -57,17 +56,17 @@ SF.EntityTable = {
 				end
 			end)
 		end
-	end,
-	__call = function(p, key, destructor, dontwait)
-		local t = {
-			key = key,
-			destructor = destructor,
-			wait = CLIENT and not dontwait
-		}
-		return setmetatable(t, p)
 	end
 }
-setmetatable(SF.EntityTable, SF.EntityTable)
+-- Returns a class that manages a table of entity keys
+function SF.EntityTable(key, destructor, dontwait)
+	local t = {
+		key = key,
+		destructor = destructor,
+		wait = CLIENT and not dontwait
+	}
+	return setmetatable(t, EntityTable)
+end
 
 --- Returns a class that wraps a structure and caches indexes
 SF.StructWrapper = {
