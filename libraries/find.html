@@ -255,9 +255,9 @@ Finds entities that are in the PVS (Potentially Visible Set).</td>
 Finds entities in a sphere </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#find.sortByClosest">sortByClosest</a>( ents, pos&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#find.sortByClosest">sortByClosest</a>( ents, pos, furthest&nbsp;)</td>
 			<td class="summary">
-Sorts an array of entities by how close they are to a point </td>
+Returns a sorted array of entities by how close they are to a point </td>
 		</tr>
 	</table>
 </section>
@@ -506,10 +506,10 @@ Finds entities in a sphere</p>
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="find.sortByClosest"></a><strong>find.sortByClosest</strong>( ents, pos&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="find.sortByClosest"></a><strong>find.sortByClosest</strong>( ents, pos, furthest&nbsp;)</dt>
 <dd>
 	<p>
-Sorts an array of entities by how close they are to a point</p>
+Returns a sorted array of entities by how close they are to a point</p>
 	
 	
 	<section class="parameters">
@@ -518,6 +518,7 @@ Sorts an array of entities by how close they are to a point</p>
 			
 			<li><tt>ents</tt> ― The array of entities</li>
 			<li><tt>pos</tt> ― The position</li>
+			<li><tt>furthest</tt> ― Whether to have the further entities first</li>
 		</ul>
 	</section>
 	
