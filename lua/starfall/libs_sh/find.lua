@@ -162,16 +162,23 @@ function find_library.closest(ents, pos)
 	return closestent
 end
 
---- Sorts an array of entities by how close they are to a point
+--- Returns a sorted array of entities by how close they are to a point
 -- @param ents The array of entities
 -- @param pos The position
+-- @param furthest Whether to have the further entities first
 -- @return A table of the closest entities
-function find_library.sortByClosest(ents, pos)
+function find_library.sortByClosest(ents, pos, furthest)
 	local distances = {}
-	for k, v in pairs(ents) do
-		distances[#distances+1] = {v:getPos():getDistanceSqr(pos), v}
+	for i=1, #ents do
+		distances[i] = {ents[i]:getPos():getDistanceSqr(pos), ents[i]}
 	end
-	table.sort(distances, function(a,b) return a[1]<b[1] end)
+	local sortfunc
+	if furthest then
+		sortfunc = function(a,b) return a[1]>b[1] end
+	else
+		sortfunc = function(a,b) return a[1]<b[1] end
+	end
+	table.sort(distances, sortfunc)
 	local ret = {}
 	for i=1, #distances do
 		ret[i] = distances[i][2]
