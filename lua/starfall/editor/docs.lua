@@ -1526,8 +1526,8 @@ Finds entities that are in the PVS (Potentially Visible Set). See: https://devel
 Finds entities that are in the PVS (Potentially Visible Set).";};["inSphere"]={["class"]="function";["description"]="\
 Finds entities in a sphere";["fname"]="inSphere";["library"]="find";["name"]="find_library.inSphere";["param"]={[1]="center";[2]="radius";[3]="filter";["center"]="Center of the sphere";["filter"]="Optional function to filter results";["radius"]="Sphere radius";};["private"]=false;["realm"]="sh";["ret"]="An array of found entities";["summary"]="\
 Finds entities in a sphere ";};["sortByClosest"]={["class"]="function";["description"]="\
-Sorts an array of entities by how close they are to a point";["fname"]="sortByClosest";["library"]="find";["name"]="find_library.sortByClosest";["param"]={[1]="ents";[2]="pos";["ents"]="The array of entities";["pos"]="The position";};["private"]=false;["realm"]="sh";["ret"]="A table of the closest entities";["summary"]="\
-Sorts an array of entities by how close they are to a point ";};};["libtbl"]="find_library";["name"]="find";["server"]=true;["summary"]="\
+Returns a sorted array of entities by how close they are to a point";["fname"]="sortByClosest";["library"]="find";["name"]="find_library.sortByClosest";["param"]={[1]="ents";[2]="pos";[3]="furthest";["ents"]="The array of entities";["furthest"]="Whether to have the further entities first";["pos"]="The position";};["private"]=false;["realm"]="sh";["ret"]="A table of the closest entities";["summary"]="\
+Returns a sorted array of entities by how close they are to a point ";};};["libtbl"]="find_library";["name"]="find";["server"]=true;["summary"]="\
 Find library.";["tables"]={};};["game"]={["class"]="library";["client"]=true;["description"]="\
 Game functions";["fields"]={};["functions"]={[1]="getHostname";[2]="getMap";[3]="getMaxPlayers";[4]="isDedicated";[5]="isLan";[6]="isSinglePlayer";["getHostname"]={["class"]="function";["description"]="\
 Returns The hostname";["fname"]="getHostname";["library"]="game";["name"]="game_lib.getHostname";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
