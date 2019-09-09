@@ -14,7 +14,7 @@ SF.AddHook("postload", function()
 		["UNDO"] = NOTIFY_UNDO,
 		["HINT"] = NOTIFY_HINT,
     	["CLEANUP"] = NOTIFY_CLEANUP,
-    }
+	}
 end)
 
 --- Displays a standard notification.
