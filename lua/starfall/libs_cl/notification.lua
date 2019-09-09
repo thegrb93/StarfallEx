@@ -13,7 +13,7 @@ SF.AddHook("postload", function()
 		["ERROR"] = NOTIFY_ERROR,
 		["UNDO"] = NOTIFY_UNDO,
 		["HINT"] = NOTIFY_HINT,
-        ["CLEANUP"] = NOTIFY_CLEANUP,
+    	["CLEANUP"] = NOTIFY_CLEANUP,
     }
 end)
 
