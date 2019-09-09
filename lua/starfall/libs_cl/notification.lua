@@ -40,7 +40,7 @@ function notification_library.AddProgress(id, text)
 end
 
 --- Removes the notification with the given index after 0.8 seconds
--- @param id Index of the notification
+-- @param id Index of the notification to kill
 function notification_library.Kill(id)
 	notification.Kill( id )
 end
