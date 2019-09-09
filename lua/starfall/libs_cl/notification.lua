@@ -5,6 +5,10 @@
 --- Notification functions. Allows the user to display hints on the bottom right of their screen
 -- @client
 local notification_library = SF.RegisterLibrary("notification")
+
+-- Register Priveleges
+SF.Permissions.registerPrivilege("notification.addLegacy", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
+
 SF.AddHook("postload", function()
 	-- @name SF.DefaultEnvironment.NOTIFY
 	-- @class table
