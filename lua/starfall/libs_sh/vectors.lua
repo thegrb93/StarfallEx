@@ -348,6 +348,18 @@ function vec_methods:rotate (b)
 	self[3] = vec.z
 end
 
+--- Returns Rotated vector by Angle b
+-- @param b Angle to rotate by.
+-- @return Rotated Vector
+function vec_methods:getRotated (b)
+	SF.CheckType(b, SF.Types["Angle"])
+
+	local vec = unwrap(self)
+	vec:Rotate(SF.UnwrapObject(b))
+
+	return wrap({ vec.x, vec.y, vec.z })
+end
+
 --- Return rotated vector by an axis
 -- @param axis Axis the rotate around
 -- @param degrees Angle to rotate by in degrees or nil if radians.

@@ -18,6 +18,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
+SF.Permissions.registerPrivilege("entities.getclip", "Emitsound", "Allows the user to get the clipping data of an entity", { client = (CLIENT and {} or nil), entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -455,6 +456,58 @@ end
 function ents_methods:getColor()
 	local this = eunwrap(self)
 	return cwrap(this:GetColor())
+end
+
+--- Gets the clipping of an entity
+-- @shared
+-- @return Table containing the clipdata
+function ents_methods:getClipping()
+	local ent = eunwrap(self)
+	
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
+	
+	local clips = {}
+	
+	-- Clips from visual clip tool
+	if ent.ClipData then
+		for i, clip in pairs(ent.ClipData) do
+			local normal = (clip[1] or clip.n):Forward()
+			
+			table.insert(clips, {
+				local_ent = self,
+				origin = vwrap((clip[4] or Vector()) + normal * (clip[2] or clip.d)),
+				normal = vwrap(normal)
+			})
+		end
+	end
+	
+	-- Clips from Starfall and E2 holograms
+	if ent.clips then
+		for i, clip in pairs(ent.clips) do
+			if clip.enabled ~= false then
+				table.insert(clips, {
+					local_ent = clip.localentid and (clip.localentid ~= 0 and ewrap(Entity(clip.localentid)) or self) or (clip.entity and ewrap(clip.entity) or false),
+					origin = vwrap(clip.origin),
+					normal = vwrap(clip.normal)
+				})
+			end
+		end
+	end
+	
+	-- Clips from Lemongate and ExpAdv holograms
+	if ent.CLIPS then
+		for i, clip in pairs(ent.CLIPS) do
+			if clip.ENABLED then
+				table.insert(clips, {
+					local_ent = not clip.Global and self or false,
+					origin = vwrap(Vector(clip.ORIGINX, clip.ORIGINY, clip.ORIGINZ)),
+					normal = vwrap(Vector(clip.NORMALX, clip.NORMALY, clip.NORMALZ))
+				})
+			end
+		end
+	end
+	
+	return clips
 end
 
 --- Casts a hologram entity into the hologram type
