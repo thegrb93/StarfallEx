@@ -2,12 +2,16 @@
 -- Notification functions
 -------------------------------------------------------------------------------
 
---- Notification functions. Allows the user to display hints on the bottom right of their screen
+-- Register Priveleges
+SF.Permissions.registerPrivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
+
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+
+--- Notification library. Allows the user to display hints on the bottom right of their screen
 -- @client
 local notification_library = SF.RegisterLibrary("notification")
-
--- Register Priveleges
-SF.Permissions.registerPrivilege("notification.addLegacy", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
 
 SF.AddHook("postload", function()
 	-- @name SF.DefaultEnvironment.NOTIFY
@@ -31,6 +35,10 @@ end)
 ---NOTIFY.CLEANUP
 -- @param length Time in seconds to display the notification
 function notification_library.addLegacy(text, type, length)
+	checkpermission(SF.instance, nil, "notification")
+	checkluatype(text, TYPE_STRING)
+	checkluatype(type, TYPE_NUMBER)
+	checkluatype(length, TYPE_NUMBER)
 	notification.AddLegacy( text, type, length )
 end
 
@@ -38,11 +46,14 @@ end
 -- @param id Index of the notification
 -- @param text The text to display
 function notification_library.addProgress(id, text)
+	checkpermission(SF.instance, nil, "notification")
+	checkluatype(text, TYPE_STRING)
 	notification.AddProgress( id, text )
 end
 
 --- Removes the notification with the given index after 0.8 seconds
 -- @param id Index of the notification to kill
 function notification_library.kill(id)
+	checkpermission(SF.instance, nil, "notification")
 	notification.Kill( id )
 end
