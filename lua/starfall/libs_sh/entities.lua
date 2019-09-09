@@ -484,8 +484,16 @@ function ents_methods:getClipping()
 	if ent.clips then
 		for i, clip in pairs(ent.clips) do
 			if clip.enabled ~= false then
+				local local_ent = false
+				
+				if clip.localentid then
+					local_ent = ewrap(Entity(clip.localentid))
+				elseif clip.entity then
+					local_ent = ewrap(clip.entity)
+				end
+				
 				table.insert(clips, {
-					local_ent = clip.localentid and (clip.localentid ~= 0 and ewrap(Entity(clip.localentid)) or self) or (clip.entity and ewrap(clip.entity) or false),
+					local_ent = local_ent,
 					origin = vwrap(clip.origin),
 					normal = vwrap(clip.normal)
 				})
