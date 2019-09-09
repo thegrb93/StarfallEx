@@ -18,7 +18,7 @@ local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
-SF.Permissions.registerPrivilege("entities.getclip", "Emitsound", "Allows the user to get the clipping data of an entity", { client = (CLIENT and {} or nil), entities = {} })
+SF.Permissions.registerPrivilege("entities.getclip", "GetClipping", "Allows the user to get the clipping data of an entity", { client = (CLIENT and {} or nil), entities = {} })
 
 SF.AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
@@ -465,6 +465,7 @@ function ents_methods:getClipping()
 	local ent = eunwrap(self)
 	
 	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
+	checkpermission(SF.instance, ent, "entities.getclip")
 	
 	local clips = {}
 	
