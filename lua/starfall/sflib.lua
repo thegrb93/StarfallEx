@@ -33,7 +33,7 @@ if SERVER then
 end
 
 -- Make sure this is done after metatables have been set
-hook.Add("PostInitEntity","SF_SanitizeTypeMetatables",function()
+hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	local function sanitizeTypeMeta(theType, myMeta)
 		local meta = debug.getmetatable(theType)
 		if meta then
