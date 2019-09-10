@@ -32,6 +32,59 @@ if SERVER then
 	end
 end
 
+-- Make sure this is done after metatables have been set
+hook.Add("PostInitEntity","SF_SanitizeTypeMetatables",function()
+	local function sanitizeTypeMeta(theType, myMeta)
+		local meta = debug.getmetatable(theType)
+		if meta then
+			for k, v in pairs(meta) do
+				if isfunction(v) then
+					local myMetaFunc = myMeta and myMeta[k]
+					if myMetaFunc then
+						meta[k] = function(...)
+							if SF.runningOps then return myMetaFunc(...) else return v(...) end
+						end
+					else
+						meta[k] = function(...)
+							if not SF.runningOps then return v(...) end
+						end
+					end
+				elseif istable(v) and k=="__index" then
+					local myMetaFunc = myMeta and myMeta[k]
+					if myMetaFunc then
+						meta[k] = function(t,k)
+							if SF.runningOps then return myMetaFunc(t,k) else return rawget(t,k) end
+						end
+					else
+						meta[k] = function(t,k)
+							if not SF.runningOps then return rawget(t,k) end
+						end
+					end
+				end
+			end
+		end
+	end
+
+	sanitizeTypeMeta(nil)
+	sanitizeTypeMeta(true)
+	sanitizeTypeMeta(0)
+	sanitizeTypeMeta(function() end)
+	sanitizeTypeMeta(coroutine.create(function() end))
+
+	local string_methods_copy = table.Copy(SF.Libraries.string)
+	local function sf_string_index(self, key)
+		local val = string_methods_copy[key]
+		if (val) then
+			return val
+		elseif (tonumber(key)) then
+			return self:sub(key, key)
+		else
+			SF.Throw("attempt to index a string value with bad key ('" .. tostring(key) .. "' is not part of the string library)", 2)
+		end
+	end
+	sanitizeTypeMeta("", {__index = sf_string_index})
+end)
+
 -------------------------------------------------------------------------------
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
