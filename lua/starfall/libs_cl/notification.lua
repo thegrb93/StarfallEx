@@ -33,13 +33,14 @@ end)
 ---NOTIFY.UNDO
 ---NOTIFY.HINT
 ---NOTIFY.CLEANUP
--- @param length Time in seconds to display the notification
+-- @param length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
 	checkpermission(SF.instance, nil, "notification")
 	checkluatype(text, TYPE_STRING)
 	checkluatype(type, TYPE_NUMBER)
 	checkluatype(length, TYPE_NUMBER)
-	notification.AddLegacy( text, type, length )
+	vlength = math.Clamp(length,1,30)
+	notification.AddLegacy( text, type, vlength )
 end
 
 local ids = {}
@@ -73,8 +74,10 @@ function notification_library.kill(id)
 end
 
 SF.AddHook("deinitialize", function( inst )
-	for id,_ in pairs(ids) do
-		notification.Kill( id )
-		ids[id] = nil
+	if inst.player == LocalPlayer() then
+		for id,_ in pairs(ids) do
+			notification.Kill( id )
+			ids[id] = nil
+		end
 	end
 end)
