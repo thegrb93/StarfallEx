@@ -13,6 +13,10 @@ local checkpermission = SF.Permissions.check
 -- @client
 local notification_library = SF.RegisterLibrary("notification")
 
+SF.AddHook("initialize", function(instance)
+	instance.data.notification = {notifications = {}}
+end)
+
 SF.AddHook("postload", function()
 	-- @name SF.DefaultEnvironment.NOTIFY
 	-- @class table
@@ -39,11 +43,10 @@ function notification_library.addLegacy(text, type, length)
 	checkluatype(text, TYPE_STRING)
 	checkluatype(type, TYPE_NUMBER)
 	checkluatype(length, TYPE_NUMBER)
-	vlength = math.Clamp(length,1,30)
-	notification.AddLegacy( text, type, vlength )
+	length = math.Clamp(length,1,30)
+	notification.AddLegacy( text, type, length )
 end
 
-local ids = {}
 
 --- Displays a notification with an animated progress bar, will persist unless killed or chip is removed.
 -- @param id String index of the notification
@@ -55,8 +58,9 @@ function notification_library.addProgress(id, text)
 	
 	--Keep the ID unique to each player
 	id = "SF:"..SF.instance.player:SteamID64()..id
+
 	notification.AddProgress( id, text )
-	ids[id] = true
+	instance.data.notification.notifications[id] = true
 end
 
 --- Removes the notification with the given index after 0.8 seconds
@@ -66,18 +70,16 @@ function notification_library.kill(id)
 	checkluatype(id, TYPE_STRING)
 	
 	id = "SF:"..SF.instance.player:SteamID64()..id
-	
-	if ids[id] then
+
+	if instance.data.notification.notifications[id] then
 		notification.Kill( id )
-		ids[id] = nil
+		instance.data.notification.notifications[id] = nil
 	end
 end
 
 SF.AddHook("deinitialize", function( inst )
-	if inst.player == LocalPlayer() then
-		for id,_ in pairs(ids) do
-			notification.Kill( id )
-			ids[id] = nil
-		end
+	for n,_ in pairs(instance.data.notification.notifications) do
+		notification.Kill( n )
+		instance.data.notification.notifications[n] = nil
 	end
 end)
