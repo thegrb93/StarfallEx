@@ -65,7 +65,7 @@
 -- @param fov Current fov of the camera
 -- @param znear Current near plane of the camera
 -- @param zfar Current far plane of the camera
--- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer}
+-- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
 
 --- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
