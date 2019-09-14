@@ -236,6 +236,11 @@ Gets the name of a key from the id </td>
 Gets whether the control key is down </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#input.isControlLocked">isControlLocked</a>( &nbsp;)</td>
+			<td class="summary">
+Gets whether the player's control is currenty locked </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#input.isKeyDown">isKeyDown</a>( key&nbsp;)</td>
 			<td class="summary">
 Gets whether a key is down </td>
@@ -244,6 +249,11 @@ Gets whether a key is down </td>
 			<td class="name"><span class="realm_cl"></span><a href="#input.isShiftDown">isShiftDown</a>( &nbsp;)</td>
 			<td class="summary">
 Gets whether the shift key is down </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#input.lockControls">lockControls</a>( enabled&nbsp;)</td>
+			<td class="summary">
+Locks game controls for typing purposes.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#input.lookupBinding">lookupBinding</a>( binding&nbsp;)</td>
@@ -366,6 +376,24 @@ Gets whether the control key is down</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="input.isControlLocked"></a><strong>input.isControlLocked</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets whether the player's control is currenty locked</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>Whether the player's control is locked</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="input.isKeyDown"></a><strong>input.isKeyDown</strong>( key&nbsp;)</dt>
 <dd>
 	<p>
@@ -405,6 +433,25 @@ Gets whether the shift key is down</p>
 		<p>True if the shift key is down</p>
 		
 	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="input.lockControls"></a><strong>input.lockControls</strong>( enabled&nbsp;)</dt>
+<dd>
+	<p>
+Locks game controls for typing purposes. Alt will unlock the controls. Has a 10 second cooldown.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>enabled</tt> ― Whether to lock or unlock the controls</li>
+		</ul>
+	</section>
+	
+	
 	
 	
 </dd>
