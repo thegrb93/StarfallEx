@@ -46,7 +46,7 @@ else
 	language.Add("Tool.starfall_component.name", "Starfall - Component")
 	language.Add("Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)")
 	language.Add("Tool.starfall_component.parent", "Parent instead of Weld" )
-	language.Add("Tool.starfall_component.lockcontrol", "Will lock the player's controls when used" )
+	language.Add("Tool.starfall_component.lockcontrol", "Locks the player's controls when used" )
 	language.Add("sboxlimit_starfall_components", "You've hit the Starfall Component limit!")
 	language.Add("undone_Starfall Screen", "Undone Starfall Screen")
 	language.Add("undone_Starfall HUD", "Undone Starfall HUD")
@@ -96,6 +96,10 @@ function TOOL:LeftClick(trace)
 		else
 			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableMotion(false) end
+		end
+
+		if self:GetClientNumber( "lockcontrol", 0 ) != 0 then
+			sf.locksControls = true
 		end
 
 		undo.Create("Starfall Screen")

@@ -156,7 +156,7 @@ local function unlockControls()
 end
 
 local function lockControls()
-	LocalPlayer():ChatPrint("Starfall locked your controls. Press 'Alt' to regain control or type 'sf_hud_unlink' in the console to disconnect yourself from all HUDs.")
+	LocalPlayer():ChatPrint("Starfall locked your controls. Press 'Alt' to regain control.")
 
 	hook.Add("PlayerBindPress", "sf_keyboard_blockinput", function(ply, bind, pressed)
 		if bind ~= "+attack" and bind ~= "+attack2" then return true end
