@@ -28,6 +28,9 @@ function ENT:SetHudEnabled(ply, mode)
 			end
 		end
 		ply.sfhudenabled = self
+		if self.locksControls then
+			net.Start("starfall_lock_control") net.WriteBool(true) net.Send(ply)
+		end
 	end
 
 	local function disconnect()
@@ -39,6 +42,9 @@ function ENT:SetHudEnabled(ply, mode)
 		end
 		ply.sfhudenabled = nil
 		ply:SetViewEntity()
+		if self.locksControls then
+			net.Start("starfall_lock_control") net.WriteBool(false) net.Send(ply)
+		end
 	end
 
 	if mode == 1 then
