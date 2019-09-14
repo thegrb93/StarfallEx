@@ -457,6 +457,66 @@ function ents_methods:getColor()
 	return cwrap(this:GetColor())
 end
 
+--- Gets the clipping of an entity
+-- @shared
+-- @return Table containing the clipdata
+function ents_methods:getClipping()
+	local ent = eunwrap(self)
+	
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid.", 2) end
+	
+	local clips = {}
+	
+	-- Clips from visual clip tool
+	if ent.ClipData then
+		for i, clip in pairs(ent.ClipData) do
+			local normal = (clip[1] or clip.n):Forward()
+			
+			table.insert(clips, {
+				local_ent = self,
+				origin = vwrap((clip[4] or Vector()) + normal * (clip[2] or clip.d)),
+				normal = vwrap(normal)
+			})
+		end
+	end
+	
+	-- Clips from Starfall and E2 holograms
+	if ent.clips then
+		for i, clip in pairs(ent.clips) do
+			if clip.enabled ~= false then
+				local local_ent = false
+				
+				if clip.localentid then
+					local_ent = ewrap(Entity(clip.localentid))
+				elseif clip.entity then
+					local_ent = ewrap(clip.entity)
+				end
+				
+				table.insert(clips, {
+					local_ent = local_ent,
+					origin = vwrap(clip.origin),
+					normal = vwrap(clip.normal)
+				})
+			end
+		end
+	end
+	
+	-- Clips from Lemongate and ExpAdv holograms
+	if ent.CLIPS then
+		for i, clip in pairs(ent.CLIPS) do
+			if clip.ENABLED then
+				table.insert(clips, {
+					local_ent = not clip.Global and self or false,
+					origin = vwrap(Vector(clip.ORIGINX, clip.ORIGINY, clip.ORIGINZ)),
+					normal = vwrap(Vector(clip.NORMALX, clip.NORMALY, clip.NORMALZ))
+				})
+			end
+		end
+	end
+	
+	return clips
+end
+
 --- Casts a hologram entity into the hologram type
 -- @shared
 -- @return Hologram type
