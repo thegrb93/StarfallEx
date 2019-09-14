@@ -14,7 +14,13 @@ local checkpermission = SF.Permissions.check
 local notification_library = SF.RegisterLibrary("notification")
 
 SF.AddHook("initialize", function(instance)
-	instance.data.notification = {notifications = {}}
+	instance.data.notifications = {}
+end)
+
+SF.AddHook("deinitialize", function(instance)
+	for n, _ in pairs(instance.data.notifications) do
+		notification.Kill( n )
+	end
 end)
 
 SF.AddHook("postload", function()
@@ -55,12 +61,16 @@ function notification_library.addProgress(id, text)
 	checkpermission(SF.instance, nil, "notification")
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
-	
+	local instance = SF.instance
+
+	if #id > 256 then SF.Throw("ID is greater than 256 limit!", 2) end
+	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
+
 	--Keep the ID unique to each player
-	id = "SF:"..SF.instance.player:SteamID64()..id
+	id = "SF:"..instance.player:SteamID64()..id
 
 	notification.AddProgress( id, text )
-	instance.data.notification.notifications[id] = true
+	instance.data.notifications[id] = true
 end
 
 --- Removes the notification with the given index after 0.8 seconds
@@ -68,18 +78,12 @@ end
 function notification_library.kill(id)
 	checkpermission(SF.instance, nil, "notification")
 	checkluatype(id, TYPE_STRING)
-	
-	id = "SF:"..SF.instance.player:SteamID64()..id
+	local instance = SF.instance
 
-	if instance.data.notification.notifications[id] then
+	id = "SF:"..instance.player:SteamID64()..id
+
+	if instance.data.notifications[id] then
 		notification.Kill( id )
-		instance.data.notification.notifications[id] = nil
+		instance.data.notifications[id] = nil
 	end
 end
-
-SF.AddHook("deinitialize", function( inst )
-	for n,_ in pairs(instance.data.notification.notifications) do
-		notification.Kill( n )
-		instance.data.notification.notifications[n] = nil
-	end
-end)
