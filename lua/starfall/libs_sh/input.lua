@@ -150,12 +150,15 @@ function input_methods.enableCursor(enabled)
 end
 
 
+local controlsLocked = false
 local function unlockControls()
+	controlsLocked = false
 	hook.Remove("PlayerBindPress", "sf_keyboard_blockinput")
 	hook.Remove("PlayerButtonDown", "sf_keyboard_unblockinput")
 end
 
 local function lockControls()
+	controlsLocked = true
 	LocalPlayer():ChatPrint("Starfall locked your controls. Press 'Alt' to regain control.")
 
 	hook.Add("PlayerBindPress", "sf_keyboard_blockinput", function(ply, bind, pressed)
@@ -196,6 +199,13 @@ function input_methods.lockControls(enabled)
 	else
 		unlockControls()
 	end
+end
+
+--- Gets whether the player's controls are currenty locked
+-- @client
+-- @return Whether the player's controls are locked
+function input_methods.areControlsLocked()
+	return controlsLocked
 end
 
 SF.AddHook("deinitialize", function(inst)
