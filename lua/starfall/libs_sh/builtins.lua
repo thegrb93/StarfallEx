@@ -558,43 +558,6 @@ function SF.DefaultEnvironment.rawget(table, key, value)
     return rawget(table, key)
 end
 
-local luaTypes = {
-	nil,
-	true,
-	0,
-	function() end,
-	coroutine.create(function() end)
-}
-for i = 1, 5 do
-	local luaType = luaTypes[i]
-	local meta = debug.getmetatable(luaType)
-	if meta then
-		SF.AddHook("prepare", function()
-			debug.setmetatable(luaType, nil)
-		end)
-		SF.AddHook("cleanup", function()
-			debug.setmetatable(luaType, meta)
-		end)
-	end
-end
-local gluastr = debug.getmetatable("")
-local string_methods_copy = table.Copy(string_methods)
-SF.AddHook("prepare", function()
-	debug.setmetatable("", { __index = function(self, key)
-		local val = string_methods_copy[key]
-		if (val) then
-			return val
-		elseif (tonumber(key)) then
-			return self:sub(key, key)
-		else
-			SF.Throw("attempt to index a string value with bad key ('" .. tostring(key) .. "' is not part of the string library)", 2)
-		end
-	end })
-end)
-SF.AddHook("cleanup", function()
-	debug.setmetatable("", gluastr)
-end)
-
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
 local function printTableX (t, indent, alreadyprinted)
 	if next(t) then
