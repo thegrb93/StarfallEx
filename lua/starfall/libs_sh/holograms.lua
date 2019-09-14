@@ -75,6 +75,21 @@ SF.AddHook("deinitialize", function(inst)
 	end
 end)
 
+local entmeta = FindMetaTable("Entity")
+local cl_hologram_meta = {
+	__index = function(t,k,v)
+		if k=="CPPIGetOwner" then return function(ent) return ent.SFHoloOwner end
+		elseif k=="CPPICanTool" then return function(ent, pl) return ent.SFHoloOwner==pl end
+		elseif k=="CPPICanPhysgun" then return function(ent, pl) return ent.SFHoloOwner==pl end
+		else return entmeta.__index(t,k,v)
+		end
+	end,
+	__newindex = entmeta.__newindex,
+	__concat = entmeta.__concat,
+	__tostring = entmeta.__tostring,
+	__eq = entmeta.__eq,
+}
+
 --- Creates a hologram.
 -- @return The hologram object
 function holograms_library.create(pos, ang, model, scale)
@@ -116,19 +131,15 @@ function holograms_library.create(pos, ang, model, scale)
 	else
 		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
 		if holoent and holoent:IsValid() then
-			function holoent:CPPIGetOwner() return ply end
 			holoent.IsSFHologram = true
 			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
-
-			-- Due to garrysmod bug, null angle on initialization leads to invalid matrix
-			holoent:SetAngles(Angle(1,0,0))
-
 			holoent:SetAngles(ang)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			table.Inherit(holoent:GetTable(), hologramSENT.t)
 			holoent:Initialize()
 			holoent.RenderOverride = holoent.Draw
+			debug.setmetatable(holoent, cl_hologram_meta)
 
 			holodata[holoent] = true
 
