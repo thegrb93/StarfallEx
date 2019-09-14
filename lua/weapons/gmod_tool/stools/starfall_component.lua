@@ -11,7 +11,6 @@ TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
 TOOL.ClientConVar["ModelHUD"] = "models/bull/dynamicbutton.mdl"
 TOOL.ClientConVar["Type"] = "1"
 TOOL.ClientConVar["parent"] = "1"
-TOOL.ClientConVar["lockcontrol"] = "0"
 cleanup.Register("starfall_components")
 
 if SERVER then
@@ -46,7 +45,6 @@ else
 	language.Add("Tool.starfall_component.name", "Starfall - Component")
 	language.Add("Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)")
 	language.Add("Tool.starfall_component.parent", "Parent instead of Weld" )
-	language.Add("Tool.starfall_component.lockcontrol", "Locks the player's controls when used" )
 	language.Add("sboxlimit_starfall_components", "You've hit the Starfall Component limit!")
 	language.Add("undone_Starfall Screen", "Undone Starfall Screen")
 	language.Add("undone_Starfall HUD", "Undone Starfall HUD")
@@ -98,10 +96,6 @@ function TOOL:LeftClick(trace)
 			if phys:IsValid() then phys:EnableMotion(false) end
 		end
 
-		if self:GetClientNumber( "lockcontrol", 0 ) != 0 then
-			sf.locksControls = true
-		end
-
 		undo.Create("Starfall Screen")
 			undo.AddEntity(sf)
 			if const then undo.AddEntity(const) end
@@ -130,10 +124,6 @@ function TOOL:LeftClick(trace)
 		else
 			local phys = sf:GetPhysicsObject()
 			if phys:IsValid() then phys:EnableMotion(false) end
-		end
-
-		if self:GetClientNumber( "lockcontrol", 0 ) != 0 then
-			sf.locksControls = true
 		end
 
 		undo.Create("Starfall HUD")
@@ -245,7 +235,6 @@ if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" })
 		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.parent", Command = "starfall_component_parent" } )
-		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.lockcontrol", Command = "starfall_component_lockcontrol" } )
 
 		local modelPanel = vgui.Create("DPanelSelect", panel)
 		modelPanel:EnableVerticalScrollbar()
