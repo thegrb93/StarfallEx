@@ -42,22 +42,22 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(...)
-							if SF.runningOps then return myMetaFunc(...) else return v(...) end
+							if SF.instance then return myMetaFunc(...) else return v(...) end
 						end
 					else
 						meta[k] = function(...)
-							if not SF.runningOps then return v(...) end
+							if not SF.instance then return v(...) end
 						end
 					end
 				elseif istable(v) and k=="__index" then
 					local myMetaFunc = myMeta and myMeta[k]
 					if myMetaFunc then
 						meta[k] = function(t,k)
-							if SF.runningOps then return myMetaFunc(t,k) else return rawget(t,k) end
+							if SF.instance then return myMetaFunc(t,k) else return rawget(t,k) end
 						end
 					else
 						meta[k] = function(t,k)
-							if not SF.runningOps then return rawget(t,k) end
+							if not SF.instance then return rawget(t,k) end
 						end
 					end
 				end

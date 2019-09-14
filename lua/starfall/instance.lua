@@ -193,12 +193,7 @@ end
 -- @return True if ok
 -- @return A table of values that the hook returned
 function SF.Instance:runWithoutOps(func, ...)
-	local prev = SF.runningOps
-	SF.runningOps = true
-	SF.OnRunningOps(true)
 	return { xpcall(func, xpcall_callback, ...) }
-	SF.runningOps = prev
-	SF.OnRunningOps(prev)
 end
 
 --- Internal function - Do not call. Prepares the script to be executed.
