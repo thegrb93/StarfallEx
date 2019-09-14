@@ -139,6 +139,21 @@ function ents_methods:linkComponent (e)
 	end
 end
 
+--- Sets a component's ability to lock a player's controls
+-- @param enable Whether the component will lock the player's controls when used
+function ents_methods:setComponentLocksControls(enable)
+	checktype(self, ents_metatable)
+	checkluatype(enable, TYPE_BOOL)
+	local ent = unwrap(self)
+	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+	checkpermission(SF.instance, ent, "entities.canTool")
+	if ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" then
+		ent.locksControls = enable
+	else
+		SF.Throw("Entity must be a starfall_screen or starfall_hud", 2)
+	end
+end
+
 --- Returns a list of entities linked to a processor
 -- @return A list of components linked to the entity
 function ents_methods:getLinkedComponents()

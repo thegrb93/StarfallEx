@@ -31,7 +31,10 @@ if game.SinglePlayer() then
 		end)
 	end
 end
-if SERVER then return end
+if SERVER then
+	util.AddNetworkString("starfall_lock_control")
+	return
+end
 
 --- Input library.
 -- @client
@@ -146,10 +149,70 @@ function input_methods.enableCursor(enabled)
 	gui.EnableScreenClicker(enabled)
 end
 
+
+local controlsLocked = false
+local function unlockControls()
+	controlsLocked = false
+	hook.Remove("PlayerBindPress", "sf_keyboard_blockinput")
+	hook.Remove("PlayerButtonDown", "sf_keyboard_unblockinput")
+end
+
+local function lockControls()
+	controlsLocked = true
+	LocalPlayer():ChatPrint("Starfall locked your controls. Press 'Alt' to regain control.")
+
+	hook.Add("PlayerBindPress", "sf_keyboard_blockinput", function(ply, bind, pressed)
+		if bind ~= "+attack" and bind ~= "+attack2" then return true end
+	end)
+	hook.Add("PlayerButtonDown", "sf_keyboard_unblockinput", function(ply, but)
+		if but == KEY_LALT or but == KEY_RALT then
+			unlockControls()
+		end
+	end)
+end
+
+net.Receive("starfall_lock_control", function()
+	if net.ReadBool() then
+		lockControls()
+	else
+		unlockControls()
+	end
+end)
+
+--- Locks game controls for typing purposes. Alt will unlock the controls. Has a 10 second cooldown.
+-- @client
+-- @param enabled Whether to lock or unlock the controls
+function input_methods.lockControls(enabled)
+	SF.CheckLuaType(enabled, TYPE_BOOL)
+	SF.Permissions.check(SF.instance, nil, "input")
+
+	if not SF.instance:isHUDActive() then
+		SF.Throw("No HUD component connected", 2)
+	end
+
+	if enabled then
+		if SF.instance.data.lockedControlCooldown and SF.instance.data.lockedControlCooldown > CurTime() then
+			SF.Throw("Cannot lock the player's controls yet", 2)
+		end
+		SF.instance.data.lockedControlCooldown = CurTime() + 10
+		lockControls()
+	else
+		unlockControls()
+	end
+end
+
+--- Gets whether the player's control is currenty locked
+-- @client
+-- @return Whether the player's control is locked
+function input_methods.isControlLocked()
+	return controlsLocked
+end
+
 SF.AddHook("deinitialize", function(inst)
 	if inst.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
+	unlockControls()
 end)
 
 SF.AddHook("starfall_hud_disconnected", function(inst)
