@@ -201,10 +201,10 @@ function input_methods.lockControls(enabled)
 	end
 end
 
---- Gets whether the player's controls are currenty locked
+--- Gets whether the player's control is currenty locked
 -- @client
--- @return Whether the player's controls are locked
-function input_methods.areControlsLocked()
+-- @return Whether the player's control is locked
+function input_methods.isControlLocked()
 	return controlsLocked
 end
 
