@@ -56,6 +56,19 @@ function ENT:DrawHologram()
 	self:DrawModel()
 end
 
+function ENT:DrawCLHologram()
+	local data = self:GetRenderMesh()
+	
+	if data then
+		cam.PushModelMatrix(self:GetWorldTransformMatrix())
+		render.SetMaterial(data.Material)
+		data.Mesh:Draw()
+		cam.PopModelMatrix()
+	else
+		self:DrawModel()
+	end
+end
+
 function ENT:GetRenderMesh()
 	if self.custom_mesh then
 		if self.custom_mesh_data[self.custom_mesh] then
