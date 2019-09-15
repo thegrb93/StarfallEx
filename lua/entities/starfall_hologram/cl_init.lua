@@ -37,10 +37,10 @@ function ENT:Draw()
 	
 	if self.suppressEngineLighting then
 		render.SuppressEngineLighting(true)
-		self:DrawModel()
+		self:DrawHologram()
 		render.SuppressEngineLighting(false)
 	else
-		self:DrawModel()
+		self:DrawHologram()
 	end
 	
 	if filter_mag then render.PopFilterMag() end
@@ -50,6 +50,10 @@ function ENT:Draw()
 		render.PopCustomClipPlane()
 	end
 	render.EnableClipping(false)
+end
+
+function ENT:DrawHologram()
+	self:DrawModel()
 end
 
 function ENT:GetRenderMesh()

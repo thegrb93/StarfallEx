@@ -81,6 +81,19 @@ local cl_hologram_meta = {
 		if k=="CPPIGetOwner" then return function(ent) return ent.SFHoloOwner end
 		elseif k=="CPPICanTool" then return function(ent, pl) return ent.SFHoloOwner==pl end
 		elseif k=="CPPICanPhysgun" then return function(ent, pl) return ent.SFHoloOwner==pl end
+		elseif k=="DrawHologram" then
+			return function(ent)
+				local data = ent:GetRenderMesh()
+				
+				if data then
+					cam.PushModelMatrix(ent:GetWorldTransformMatrix())
+					render.SetMaterial(data.Material)
+					data.Mesh:Draw()
+					cam.PopModelMatrix()
+				else
+					ent:DrawModel()
+				end
+			end
 		else return entmeta.__index(t,k,v)
 		end
 	end,
