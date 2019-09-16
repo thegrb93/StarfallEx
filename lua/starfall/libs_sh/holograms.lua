@@ -139,6 +139,7 @@ function holograms_library.create(pos, ang, model, scale)
 			table.Inherit(holoent:GetTable(), hologramSENT.t)
 			holoent:Initialize()
 			holoent.RenderOverride = holoent.Draw
+			holoent.DrawHologram = holoent.DrawCLHologram
 			debug.setmetatable(holoent, cl_hologram_meta)
 
 			holodata[holoent] = true
