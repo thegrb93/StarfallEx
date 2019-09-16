@@ -81,7 +81,6 @@ local cl_hologram_meta = {
 		if k=="CPPIGetOwner" then return function(ent) return ent.SFHoloOwner end
 		elseif k=="CPPICanTool" then return function(ent, pl) return ent.SFHoloOwner==pl end
 		elseif k=="CPPICanPhysgun" then return function(ent, pl) return ent.SFHoloOwner==pl end
-		elseif k=="DrawHologram" then
 		else return entmeta.__index(t,k,v)
 		end
 	end,
