@@ -74,6 +74,11 @@ local material_bank = SF.ResourceHandler(cv_max_materials:GetInt(),
 	end,
 	FindMetaTable("IMaterial").GetShader,
 	function(material)
+		-- This is necessary because when the material is going to be reused
+		-- it will set some of its undefined parameters to old values (engine bug?)
+		material:SetFloat("$alpha", 1)
+		material:SetVector("$color", Vector(1, 1, 1))
+
 		for k, v in pairs(material:GetKeyValues()) do
 			material:SetUndefined(k)
 		end
