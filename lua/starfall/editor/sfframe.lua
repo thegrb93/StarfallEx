@@ -71,7 +71,7 @@ Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
-local defaultCode = [=[--@name
+SF.DefaultCode = [=[--@name
 --@author
 --@shared
 
@@ -83,7 +83,7 @@ Reference Page: http://thegrb93.github.io/Starfall/
 
 Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
 ]]]=]
-defaultCode = string.gsub(defaultCode, "\r", "")
+SF.DefaultCode = string.gsub(SF.DefaultCode, "\r", "")
 
 
 cvars.AddChangeCallback("sf_editor_layout", function()
@@ -507,7 +507,7 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	local content = vgui.Create(th.ControlName)
 	content.parentpanel = self -- That's going to be Deprecated
 	content.GetTabHandler = function() return th end -- add :GetTabHandler()
-	content.IsSaved = function(self) return (not th.IsEditor) or self:GetCode() == self.savedCode or self:GetCode() == defaultCode or self:GetCode() == "" end
+	content.IsSaved = function(self) return (not th.IsEditor) or self:GetCode() == self.savedCode or self:GetCode() == SF.DefaultCode or self:GetCode() == "" end
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), content)
 	content.chosenfile = chosenfile
 	sheet.Tab.content = content -- For easy access
@@ -1269,7 +1269,7 @@ function Editor:NewScript(incurrent)
 		self:GetActiveTab():SetText("Generic")
 		self.C.TabHolder:InvalidateLayout()
 
-		self:SetCode(defaultCode)
+		self:SetCode(SF.DefaultCode)
 		self:GetCurrentTabContent().savedCode = self:GetCurrentTabContent():GetCode() -- It may return different line endings etc
 	end
 end
