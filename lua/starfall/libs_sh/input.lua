@@ -212,7 +212,8 @@ end
 -- @client
 -- @return Whether the player's control can be locked
 function input_methods.canLockControls()
-	return SF.instance.data.lockedControlCooldown and SF.instance.data.lockedControlCooldown <= CurTime()
+	if not SF.instance.data.lockedControlCooldown then return true end
+	return SF.instance.data.lockedControlCooldown <= CurTime()
 end
 
 SF.AddHook("deinitialize", function(inst)
