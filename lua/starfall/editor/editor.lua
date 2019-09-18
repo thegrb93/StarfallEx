@@ -150,16 +150,20 @@ if CLIENT then
 
 	function SF.Editor.renameFile(oldFile, newFile)
 		local contents = file.Read(oldFile)
-		file.Delete(oldFile)
 		file.Write(newFile, contents)
-		SF.AddNotify(LocalPlayer(), "File renamed as " .. newFile .. ".", "GENERIC", 7, "DRIP3")
-		for i = 1, SF.Editor.editor:GetNumTabs() do
-			local ed = SF.Editor.editor:GetTabContent(i)
-			local path = ed.chosenfile
-			if path and path == oldFile then
-				ed.chosenfile = newFile
-				ed:OnTextChanged()
+		if file.Read(newFile)==contents then
+			file.Delete(oldFile)
+			SF.AddNotify(LocalPlayer(), "File renamed as " .. newFile .. ".", "GENERIC", 7, "DRIP3")
+			for i = 1, SF.Editor.editor:GetNumTabs() do
+				local ed = SF.Editor.editor:GetTabContent(i)
+				local path = ed.chosenfile
+				if path and path == oldFile then
+					ed.chosenfile = newFile
+					ed:OnTextChanged()
+				end
 			end
+		else
+			SF.AddNotify(LocalPlayer(), "Failed to rename " .. oldFile .. " to " .. newFile, "ERROR", 7, "ERROR1")
 		end
 	end
 

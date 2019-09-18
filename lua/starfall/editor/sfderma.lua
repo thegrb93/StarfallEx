@@ -257,7 +257,7 @@ local function addFiles(search, dir, node)
 	if search=="" then
 		for k, v in pairs(allFolders) do
 			local newNode = node:AddNode(v)
-			newNode:SetFolder(v)
+			newNode:SetFolder(dir .. "/" .. v)
 			addFiles(search, dir .. "/" .. v, newNode)
 		end
 		for k, v in pairs(allFiles) do
@@ -328,7 +328,7 @@ function PANEL:DoRightClick (node)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
 						local oldFile = node:GetFileName()
-						local saveFile = string.GetPathFromFilename(oldFile) .. text ..".txt"
+						local saveFile = "starfall/" .. text ..".txt"
 						SF.Editor.renameFile(oldFile,saveFile)
 						self:ReloadTree()
 				end)
@@ -353,7 +353,7 @@ function PANEL:DoRightClick (node)
 					function (text)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
-						local saveFile = "starfall/"..node:GetFolder().."/"..text..".txt"
+						local saveFile = node:GetFolder().."/"..text..".txt"
 						file.Write(saveFile, "")
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
 						self:ReloadTree()
