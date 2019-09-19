@@ -208,6 +208,14 @@ function input_methods.isControlLocked()
 	return controlsLocked
 end
 
+--- Gets whether the player's control can be locked
+-- @client
+-- @return Whether the player's control can be locked
+function input_methods.canLockControls()
+	return SF.instance:isHUDActive() and
+		(not SF.instance.data.lockedControlCooldown or SF.instance.data.lockedControlCooldown <= CurTime())
+end
+
 SF.AddHook("deinitialize", function(inst)
 	if inst.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
