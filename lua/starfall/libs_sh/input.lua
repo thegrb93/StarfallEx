@@ -212,9 +212,8 @@ end
 -- @client
 -- @return Whether the player's control can be locked
 function input_methods.canLockControls()
-	if not SF.instance:isHUDActive() then return false end
-	if not SF.instance.data.lockedControlCooldown then return true end
-	return SF.instance.data.lockedControlCooldown <= CurTime()
+	return SF.instance:isHUDActive() and
+		(not SF.instance.data.lockedControlCooldown or SF.instance.data.lockedControlCooldown <= CurTime())
 end
 
 SF.AddHook("deinitialize", function(inst)
