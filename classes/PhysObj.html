@@ -216,6 +216,11 @@ PhysObj Type</p>
 Applys a angular velocity to an object </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:addGameFlags">addGameFlags</a>( flags&nbsp;)</td>
+			<td class="summary">
+Adds game flags to the physics object.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:applyForceCenter">applyForceCenter</a>( force&nbsp;)</td>
 			<td class="summary">
 Applys a force to the center of the physics object </td>
@@ -229,6 +234,11 @@ Applys an offset force to a physics object </td>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:applyTorque">applyTorque</a>( torque&nbsp;)</td>
 			<td class="summary">
 Applys a torque to a physics object </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:clearGameFlags">clearGameFlags</a>( flags&nbsp;)</td>
+			<td class="summary">
+Clears game flags from the physics object.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:enableDrag">enableDrag</a>( drag&nbsp;)</td>
@@ -310,6 +320,11 @@ Gets the velocity of the physics object </td>
 			<td class="summary">
 Gets the velocity of the physics object at an arbitrary point in its local reference frame 
 This includes velocity at the point induced by rotational velocity </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:hasGameFlags">hasGameFlags</a>( flags&nbsp;)</td>
+			<td class="summary">
+Returns whether the game flags of the physics object are set.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:isValid">isValid</a>( &nbsp;)</td>
@@ -397,6 +412,31 @@ Applys a angular velocity to an object</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="PhysObj:addGameFlags"></a><strong>PhysObj:addGameFlags</strong>( flags&nbsp;)</dt>
+<dd>
+	<p>
+Adds game flags to the physics object. Some flags cannot be modified</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>flags</tt> ― The flags to add. FVPHYSICS enum. Can be:<br> 
+FVPHYSICS.DMG_DISSOLVE<br> 
+FVPHYSICS.DMG_SLICE<br> 
+FVPHYSICS.HEAVY_OBJECT<br> 
+FVPHYSICS.NO_IMPACT_DMG<br> 
+FVPHYSICS.NO_NPC_IMPACT_DMG<br> 
+FVPHYSICS.NO_PLAYER_PICKUP<br></li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sv"></span><a name="PhysObj:applyForceCenter"></a><strong>PhysObj:applyForceCenter</strong>( force&nbsp;)</dt>
 <dd>
 	<p>
@@ -447,6 +487,31 @@ Applys a torque to a physics object</p>
 		<ul>
 			
 			<li><tt>torque</tt> ― The world torque vector to apply</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="PhysObj:clearGameFlags"></a><strong>PhysObj:clearGameFlags</strong>( flags&nbsp;)</dt>
+<dd>
+	<p>
+Clears game flags from the physics object. Some flags cannot be modified</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>flags</tt> ― The flags to add. FVPHYSICS enum. Can be:<br> 
+FVPHYSICS.DMG_DISSOLVE<br> 
+FVPHYSICS.DMG_SLICE<br> 
+FVPHYSICS.HEAVY_OBJECT<br> 
+FVPHYSICS.NO_IMPACT_DMG<br> 
+FVPHYSICS.NO_NPC_IMPACT_DMG<br> 
+FVPHYSICS.NO_PLAYER_PICKUP<br></li>
 		</ul>
 	</section>
 	
@@ -748,6 +813,31 @@ This includes velocity at the point induced by rotational velocity</p>
 		<h3>Returns</h3>
 		
 		<p>Vector Local velocity of the physics object at the point</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="PhysObj:hasGameFlags"></a><strong>PhysObj:hasGameFlags</strong>( flags&nbsp;)</dt>
+<dd>
+	<p>
+Returns whether the game flags of the physics object are set.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>flags</tt> ― The flags to test. FVPHYSICS enum.</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean If the flags are set</p>
 		
 	</section>
 	
