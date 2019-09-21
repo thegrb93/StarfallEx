@@ -33,6 +33,24 @@ SF.AddHook("postload", function()
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap
 	mwrap = SF.VMatrix.Wrap
+	
+	-- @name SF.DefaultEnvironment.FVPHYSICS
+	-- @class table
+	SF.DefaultEnvironment.FVPHYSICS = {
+		["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
+		["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
+		["DMG_SLICE"] = FVPHYSICS_DMG_SLICE,
+		["HEAVY_OBJECT"] = FVPHYSICS_HEAVY_OBJECT,
+		["MULTIOBJECT_ENTITY"] = FVPHYSICS_MULTIOBJECT_ENTITY,
+		["NO_IMPACT_DMG"] = FVPHYSICS_NO_IMPACT_DMG,
+		["NO_NPC_IMPACT_DMG"] = FVPHYSICS_NO_NPC_IMPACT_DMG,
+		["NO_PLAYER_PICKUP"] = FVPHYSICS_NO_PLAYER_PICKUP,
+		["NO_SELF_COLLISIONS"] = FVPHYSICS_NO_SELF_COLLISIONS,
+		["PART_OF_RAGDOLL"] = FVPHYSICS_PART_OF_RAGDOLL,
+		["PENETRATING"] = FVPHYSICS_PENETRATING,
+		["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
+		["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
+	}
 end)
 
 local function checkvector(v)
@@ -321,6 +339,58 @@ if SERVER then
 		vec[3] = math.Clamp(vec[3], 1, 100000)
 
 		phys:SetInertia(vec)
+	end
+	
+	
+	local validGameFlags = FVPHYSICS_DMG_DISSOLVE + FVPHYSICS_DMG_SLICE + FVPHYSICS_HEAVY_OBJECT + FVPHYSICS_NO_IMPACT_DMG +
+		FVPHYSICS_NO_NPC_IMPACT_DMG + FVPHYSICS_NO_PLAYER_PICKUP
+	--- Adds game flags to the physics object. Some flags cannot be modified
+	-- @param flags The flags to add. FVPHYSICS enum. Can be:<br>
+	-- FVPHYSICS.DMG_DISSOLVE<br>
+	-- FVPHYSICS.DMG_SLICE<br>
+	-- FVPHYSICS.HEAVY_OBJECT<br>
+	-- FVPHYSICS.NO_IMPACT_DMG<br>
+	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
+	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
+	function physobj_methods:addGameFlags(flags)
+		checkluatype(flags, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
+		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
+		if invalidFlags == 0 then
+			phys:AddGameFlag(flags)
+		else
+			SF.Throw("Invalid flags " .. invalidFlags, 2)
+		end
+	end
+	
+	--- Clears game flags from the physics object. Some flags cannot be modified
+	-- @param flags The flags to add. FVPHYSICS enum. Can be:<br>
+	-- FVPHYSICS.DMG_DISSOLVE<br>
+	-- FVPHYSICS.DMG_SLICE<br>
+	-- FVPHYSICS.HEAVY_OBJECT<br>
+	-- FVPHYSICS.NO_IMPACT_DMG<br>
+	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
+	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
+	function physobj_methods:clearGameFlags(flags)
+		checkluatype(flags, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
+		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
+		if invalidFlags == 0 then
+			phys:ClearGameFlag(flags)
+		else
+			SF.Throw("Invalid flags " .. invalidFlags, 2)
+		end
+	end
+	
+	--- Returns whether the game flags of the physics object are set.
+	-- @param flags The flags to test. FVPHYSICS enum.
+	-- @return boolean If the flags are set
+	function physobj_methods:hasGameFlags(flags)
+		checkluatype(flags, TYPE_NUMBER)
+		local phys = unwrap(self)
+		return phys:HasGameFlag(flags)
 	end
 	
 	--- Sets bone gravity
