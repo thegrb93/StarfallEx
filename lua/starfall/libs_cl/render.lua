@@ -178,6 +178,7 @@ local function prepareRender(data)
 	render.SetColorMaterial()
 	draw.NoTexture()
 	surface.SetDrawColor(255, 255, 255, 255)
+	surface.DisableClipping( true ) 
 	data.isRendering = true
 	data.noStencil = false
 	data.isScenic = false
@@ -226,6 +227,7 @@ end)
 
 SF.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
+		surface.DisableClipping(false) 
 		render.SetStencilEnable(false)
 		render.OverrideBlend(false)
 		render.OverrideDepthEnable(false, false)
