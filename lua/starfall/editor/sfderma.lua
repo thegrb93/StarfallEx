@@ -219,7 +219,6 @@ function PANEL:Setup(folder)
 	self.DataFiles = self.RootNode:AddNode("Data Files","icon16/folder_database.png")
 	self.DataFiles:SetFolder("Data Files")
 
-	--[[Waiting for examples, 10 tries each 1 second]]
 	local examples_url = "https://api.github.com/repos/thegrb93/StarfallEx/contents/lua/starfall/examples"
 	http.Fetch( examples_url,
 		function( body, len, headers, code )

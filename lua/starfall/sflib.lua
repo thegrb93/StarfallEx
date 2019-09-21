@@ -83,6 +83,32 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 		end
 	end
 	sanitizeTypeMeta("", {__index = sf_string_index})
+	
+	if not WireLib then WireLib = {} end
+	if not WireLib.PatchedDuplicator then
+		WireLib.PatchedDuplicator = true
+
+		local localPos
+
+		local oldSetLocalPos = duplicator.SetLocalPos
+		function duplicator.SetLocalPos(pos, ...)
+			localPos = pos
+			return oldSetLocalPos(pos, ...)
+		end
+
+		local oldPaste = duplicator.Paste
+		function duplicator.Paste(player, entityList, constraintList, ...)
+			local result = { oldPaste(player, entityList, constraintList, ...) }
+			local createdEntities, createdConstraints = result[1], result[2]
+			local data = {
+				EntityList = entityList, ConstraintList = constraintList,
+				CreatedEntities = createdEntities, CreatedConstraints = createdConstraints,
+				Player = player, HitPos = localPos,
+			}
+			hook.Run("AdvDupe_FinishPasting", {data}, 1)
+			return unpack(result)
+		end
+	end
 end)
 
 -------------------------------------------------------------------------------
