@@ -622,15 +622,31 @@ Starts emission of the particle.";};["stopEmission"]={["class"]="function";["cla
 Stops emission of the particle.";["fname"]="stopEmission";["name"]="particle_methods:stopEmission";["param"]={};["private"]=false;["realm"]="cl";["summary"]="\
 Stops emission of the particle.";};};["name"]="Particle";["summary"]="\
 Particle type ";["typtbl"]="particle_methods";};["PhysObj"]={["class"]="class";["client"]=true;["description"]="\
-PhysObj Type";["fields"]={};["methods"]={[1]="addAngleVelocity";[10]="getEntity";[11]="getInertia";[12]="getMass";[13]="getMassCenter";[14]="getMaterial";[15]="getMatrix";[16]="getMesh";[17]="getMeshConvexes";[18]="getPos";[19]="getVelocity";[2]="applyForceCenter";[20]="getVelocityAtPoint";[21]="isValid";[22]="localToWorld";[23]="localToWorldVector";[24]="setAngleVelocity";[25]="setInertia";[26]="setMass";[27]="setMaterial";[28]="setPos";[29]="setVelocity";[3]="applyForceOffset";[30]="wake";[31]="worldToLocal";[32]="worldToLocalVector";[4]="applyTorque";[5]="enableDrag";[6]="enableGravity";[7]="enableMotion";[8]="getAngleVelocity";[9]="getAngles";["addAngleVelocity"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+PhysObj Type";["fields"]={};["methods"]={[1]="addAngleVelocity";[10]="getAngleVelocity";[11]="getAngles";[12]="getEntity";[13]="getInertia";[14]="getMass";[15]="getMassCenter";[16]="getMaterial";[17]="getMatrix";[18]="getMesh";[19]="getMeshConvexes";[2]="addGameFlags";[20]="getPos";[21]="getVelocity";[22]="getVelocityAtPoint";[23]="hasGameFlags";[24]="isValid";[25]="localToWorld";[26]="localToWorldVector";[27]="setAngleVelocity";[28]="setInertia";[29]="setMass";[3]="applyForceCenter";[30]="setMaterial";[31]="setPos";[32]="setVelocity";[33]="wake";[34]="worldToLocal";[35]="worldToLocalVector";[4]="applyForceOffset";[5]="applyTorque";[6]="clearGameFlags";[7]="enableDrag";[8]="enableGravity";[9]="enableMotion";["addAngleVelocity"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Applys a angular velocity to an object";["fname"]="addAngleVelocity";["name"]="physobj_methods:addAngleVelocity";["param"]={[1]="angvel";["angvel"]="The local angvel vector to apply";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
-Applys a angular velocity to an object ";};["applyForceCenter"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+Applys a angular velocity to an object ";};["addGameFlags"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+Adds game flags to the physics object. Some flags cannot be modified";["fname"]="addGameFlags";["name"]="physobj_methods:addGameFlags";["param"]={[1]="flags";["flags"]="The flags to add. FVPHYSICS enum. Can be:<br> \
+FVPHYSICS.DMG_DISSOLVE<br> \
+FVPHYSICS.DMG_SLICE<br> \
+FVPHYSICS.HEAVY_OBJECT<br> \
+FVPHYSICS.NO_IMPACT_DMG<br> \
+FVPHYSICS.NO_NPC_IMPACT_DMG<br> \
+FVPHYSICS.NO_PLAYER_PICKUP<br>";};["private"]=false;["realm"]="sh";["summary"]="\
+Adds game flags to the physics object.";};["applyForceCenter"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Applys a force to the center of the physics object";["fname"]="applyForceCenter";["name"]="physobj_methods:applyForceCenter";["param"]={[1]="force";["force"]="The force vector to apply";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Applys a force to the center of the physics object ";};["applyForceOffset"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Applys an offset force to a physics object";["fname"]="applyForceOffset";["name"]="physobj_methods:applyForceOffset";["param"]={[1]="force";[2]="position";["force"]="The force vector to apply";["position"]="The position in world coordinates";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
 Applys an offset force to a physics object ";};["applyTorque"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Applys a torque to a physics object";["fname"]="applyTorque";["name"]="physobj_methods:applyTorque";["param"]={[1]="torque";["torque"]="The world torque vector to apply";};["private"]=false;["realm"]="sv";["server"]=true;["summary"]="\
-Applys a torque to a physics object ";};["enableDrag"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+Applys a torque to a physics object ";};["clearGameFlags"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+Clears game flags from the physics object. Some flags cannot be modified";["fname"]="clearGameFlags";["name"]="physobj_methods:clearGameFlags";["param"]={[1]="flags";["flags"]="The flags to add. FVPHYSICS enum. Can be:<br> \
+FVPHYSICS.DMG_DISSOLVE<br> \
+FVPHYSICS.DMG_SLICE<br> \
+FVPHYSICS.HEAVY_OBJECT<br> \
+FVPHYSICS.NO_IMPACT_DMG<br> \
+FVPHYSICS.NO_NPC_IMPACT_DMG<br> \
+FVPHYSICS.NO_PLAYER_PICKUP<br>";};["private"]=false;["realm"]="sh";["summary"]="\
+Clears game flags from the physics object.";};["enableDrag"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Sets the bone drag state";["fname"]="enableDrag";["name"]="physobj_methods:enableDrag";["param"]={[1]="drag";["drag"]="Bool should the bone have air resistence?";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets the bone drag state ";};["enableGravity"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Sets bone gravity";["fname"]="enableGravity";["name"]="physobj_methods:enableGravity";["param"]={[1]="grav";["grav"]="Bool should the bone respect gravity?";};["private"]=false;["realm"]="sh";["summary"]="\
@@ -664,7 +680,9 @@ Gets the velocity of the physics object ";};["getVelocityAtPoint"]={["class"]="f
 Gets the velocity of the physics object at an arbitrary point in its local reference frame \
 This includes velocity at the point induced by rotational velocity";["fname"]="getVelocityAtPoint";["name"]="physobj_methods:getVelocityAtPoint";["param"]={[1]="vec";["vec"]="The point to get velocity of in local reference frame";};["private"]=false;["realm"]="sh";["ret"]="Vector Local velocity of the physics object at the point";["server"]=true;["summary"]="\
 Gets the velocity of the physics object at an arbitrary point in its local reference frame \
-This includes velocity at the point induced by rotational velocity ";};["isValid"]={["class"]="function";["classlib"]="PhysObj";["client"]=true;["description"]="\
+This includes velocity at the point induced by rotational velocity ";};["hasGameFlags"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
+Returns whether the game flags of the physics object are set.";["fname"]="hasGameFlags";["name"]="physobj_methods:hasGameFlags";["param"]={[1]="flags";["flags"]="The flags to test. FVPHYSICS enum.";};["private"]=false;["realm"]="sh";["ret"]="boolean If the flags are set";["summary"]="\
+Returns whether the game flags of the physics object are set.";};["isValid"]={["class"]="function";["classlib"]="PhysObj";["client"]=true;["description"]="\
 Checks if the physics object is valid";["fname"]="isValid";["name"]="physobj_methods:isValid";["param"]={};["private"]=false;["realm"]="sh";["ret"]="boolean if the physics object is valid";["server"]=true;["summary"]="\
 Checks if the physics object is valid ";};["localToWorld"]={["class"]="function";["classlib"]="PhysObj";["description"]="\
 Returns a vector in the reference frame of the world from the local frame of the physicsobject";["fname"]="localToWorld";["name"]="physobj_methods:localToWorld";["param"]={[1]="vec";["vec"]="The vector to transform";};["private"]=false;["realm"]="sh";["ret"]="The transformed vector";["summary"]="\
