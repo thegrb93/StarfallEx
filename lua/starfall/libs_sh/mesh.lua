@@ -240,6 +240,7 @@ if CLIENT then
 	-- @param verteces Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex
 	-- @param thread An optional thread object that can be used to load the mesh over time to prevent hitting quota limit
 	-- @return Mesh object
+	-- @client
 	function mesh_library.createFromTable(verteces, thread)
 		checkpermission (SF.instance, nil, "mesh")
 		checkluatype (verteces, TYPE_TABLE)
@@ -278,6 +279,7 @@ if CLIENT then
 	-- @param thread An optional thread object that can be used to load the mesh over time to prevent hitting quota limit
 	-- @param triangulate Whether to triangulate faces. (Consumes more CPU)
 	-- @return Mesh object
+	-- @client
 	function mesh_library.createFromObj(obj, thread, triangulate)
 		checkluatype (obj, TYPE_STRING)
 		if thread ~= nil then checktype(thread, thread_meta) end
@@ -302,6 +304,7 @@ if CLIENT then
 	-- @param lod The lod of the model to use.
 	-- @param bodygroupMask The bodygroupMask of the model to use.
 	-- @return A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
+	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		checkluatype(model, TYPE_STRING)
 		if lod~=nil then checkluatype(lod, TYPE_NUMBER) end
@@ -324,6 +327,7 @@ if CLIENT then
 
 	--- Returns how many triangles can be created
 	-- @return Number of triangles that can be created
+	-- @client
 	function mesh_library.trianglesLeft ()
 		if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
 			return plyTriangleCount:check(SF.instance.player)
@@ -334,6 +338,7 @@ if CLIENT then
 
 	--- Returns how many triangles can be rendered
 	-- @return Number of triangles that can be rendered
+	-- @client
 	function mesh_library.trianglesLeftRender ()
 		if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
 			return plyTriangleRenderBurst:check(SF.instance.player)
@@ -716,6 +721,7 @@ if CLIENT then
 
 
 	--- Draws the mesh. Must be in a 3D rendering context.
+	-- @client
 	function mesh_methods:draw()
 		checktype(self, mesh_metamethods)
 		local mesh = unwrap(self)
@@ -728,6 +734,7 @@ if CLIENT then
 	end
 
 	--- Frees the mesh from memory
+	-- @client
 	function mesh_methods:destroy()
 		checktype(self, mesh_metamethods)
 		local mesh = unwrap(self)
