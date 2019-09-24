@@ -559,19 +559,28 @@ function SF.DefaultEnvironment.rawget(table, key, value)
 end
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
+
+local printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 local function printTableX (t, indent, alreadyprinted)
+	local ply = SF.instance.player
 	if next(t) then
 		for k, v in SF.DefaultEnvironment.pairs(t) do
 			if SF.GetType(v) == "table" and not alreadyprinted[v] then
 				alreadyprinted[v] = true
-				SF.instance.player:ChatPrint(string.rep("\t", indent) .. tostring(k) .. ":")
+				local s = string.rep("\t", indent) .. tostring(k) .. ":"
+				if SERVER then printBurst:use(ply, #s) end
+				ply:ChatPrint(s)
 				printTableX(v, indent + 1, alreadyprinted)
 			else
-				SF.instance.player:ChatPrint(string.rep("\t", indent) .. tostring(k) .. "\t=\t" .. tostring(v))
+				local s = string.rep("\t", indent) .. tostring(k) .. "\t=\t" .. tostring(v)
+				if SERVER then printBurst:use(ply, #s) end
+				ply:ChatPrint(s)
 			end
 		end
 	else
-		SF.instance.player:ChatPrint(string.rep("\t", indent).."{}")
+		local s = string.rep("\t", indent).."{}"
+		if SERVER then printBurst:use(ply, #s) end
+		ply:ChatPrint(s)
 	end
 end
 
@@ -582,7 +591,7 @@ if SERVER then
 	-- @shared
 	-- @param ... Values to print
 	function SF.DefaultEnvironment.print(...)
-		SF.ChatPrint(SF.instance.player, ...)
+		printBurst:use(SF.instance.player, SF.ChatPrint(SF.instance.player, ...))
 	end
 
 	--- Prints a table to player's chat

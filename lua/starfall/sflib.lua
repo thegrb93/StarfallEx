@@ -980,7 +980,9 @@ if SERVER then
 		for i, v in ipairs(tbl) do
 			net.WriteType(v)
 		end
+		local ret = net.BytesWritten()
 		net.Send(ply)
+		return ret
 	end
 
 else
