@@ -909,9 +909,6 @@ function Editor:InitComponents()
 		if not node:GetFileName() or not (string.GetExtensionFromFilename(node:GetFileName()) == "txt" or string.GetExtensionFromFilename(node:GetFileName()) == "lua") then return end
 		self:Open(node:GetFileName(), nil, false)
 	end
-	self.C.Browser.tree.Paint = function(_, w, h) --Fix for offset
-		draw.RoundedBox(0, 1, 0, w-2, h, Color(255, 255, 255))
-	end
 
 	self.C.Val:SetText(" Click to validate...")
 	self.C.Val.UpdateColours = function(button, skin)
