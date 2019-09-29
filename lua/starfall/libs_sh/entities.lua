@@ -70,7 +70,7 @@ end
 --- To string
 -- @shared
 function ents_metamethods:__tostring()
-	local ent = getent(self)
+	local ent = eunwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
 end
