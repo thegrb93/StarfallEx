@@ -1063,6 +1063,7 @@ do
 		l = file.Find("starfall/libs_sv/*.lua", "LUA")
 		for _, filename in pairs(l) do
 			include("starfall/libs_sv/"..filename)
+			AddCSLuaFile("starfall/libs_sv/"..filename)
 		end
 
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
