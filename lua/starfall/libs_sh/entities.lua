@@ -63,8 +63,12 @@ SF.Entities.Metatable = ents_metamethods
 
 local function getent(self)
 	local ent = eunwrap(self)
-	if not (ent and ent:IsValid()) then checktype(self, ents_metamethods, 3) SF.Throw("Entity is not valid.", 3) end
-	return ent
+	if ent and ent:IsValid() then
+		return ent
+	else
+		checktype(self, ents_metamethods, 3)
+		SF.Throw("Entity is not valid.", 3)
+	end
 end
 
 --- To string
