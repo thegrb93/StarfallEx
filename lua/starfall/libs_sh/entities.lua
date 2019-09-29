@@ -61,14 +61,16 @@ SF.Entities.Unwrap = eunwrap
 SF.Entities.Methods = ents_methods
 SF.Entities.Metatable = ents_metamethods
 
-local function checkent(self, ent)
+local function getent(self)
+	local ent = eunwrap(self)
 	if not (ent and ent:IsValid()) then checktype(self, ents_metamethods, 3) SF.Throw("Entity is not valid.", 3) end
+	return ent
 end
 
 --- To string
 -- @shared
 function ents_metamethods:__tostring()
-	local ent = eunwrap(self)
+	local ent = getent(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
 end
@@ -78,8 +80,7 @@ end
 --- Gets the owner of the entity
 -- @return Owner
 function ents_methods:getOwner()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 
 	if SF.Permissions.getOwner then
 		return SF.Players.Wrap(SF.Permissions.getOwner(ent))
@@ -94,8 +95,7 @@ if CLIENT then
 	function ents_methods:manipulateBonePosition(bone, vec)
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
-		local ent = eunwrap(self)
-		checkent(self, ent)
+		local ent = getent(self)
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
@@ -107,8 +107,7 @@ if CLIENT then
 	function ents_methods:manipulateBoneScale(bone, vec)
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
-		local ent = eunwrap(self)
-		checkent(self, ent)
+		local ent = getent(self)
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
@@ -120,8 +119,7 @@ if CLIENT then
 	function ents_methods:manipulateBoneAngles(bone, ang)
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(ang, ang_meta)
-		local ent = eunwrap(self)
-		checkent(self, ent)
+		local ent = getent(self)
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
@@ -130,8 +128,7 @@ if CLIENT then
 	-- @client
 	-- @param mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setMesh(mesh)
-		local ent = eunwrap(self)
-		checkent(self, ent)
+		local ent = getent(self)
 		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
 
 		local instance = SF.instance
@@ -150,8 +147,7 @@ if CLIENT then
 	-- @client
 	-- @param material The material to set it to or nil to set back to default
 	function ents_methods:setMeshMaterial(material)
-		local ent = eunwrap(self)
-		checkent(self, ent)
+		local ent = getent(self)
 		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
 
 		checkpermission(SF.instance, ent, "entities.setRenderProperty")
@@ -170,8 +166,7 @@ if CLIENT then
 	-- @param mins The lower bounding corner coordinate local to the hologram
 	-- @param maxs The upper bounding corner coordinate local to the hologram
 	function ents_methods:setRenderBounds(mins, maxs)
-		local ent = eunwrap(self)
-		checkent(self, ent)
+		local ent = getent(self)
 		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
 
 		checktype(mins, vec_meta)
@@ -198,8 +193,7 @@ end)
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.emitSound")
 
 	local snds = soundsByEntity[ent]
@@ -213,8 +207,7 @@ end
 function ents_methods:stopSound(snd)
 	checkluatype(snd, TYPE_STRING)
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.emitSound")
 
 	if soundsByEntity[ent] then
@@ -230,8 +223,7 @@ end
 function ents_methods:setColor(clr)
 	checktype(clr, SF.Types["Color"])
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
@@ -244,8 +236,7 @@ end
 -- @shared
 -- @param draw Whether to draw the entity or not.
 function ents_methods:setNoDraw(draw)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetNoDraw(draw and true or false)
@@ -258,8 +249,7 @@ function ents_methods:setMaterial(material)
 	checkluatype(material, TYPE_STRING)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetMaterial(material)
@@ -274,8 +264,7 @@ function ents_methods:setSubMaterial(index, material)
 	checkluatype(material, TYPE_STRING)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 	index = math.Clamp(index, 0, 255)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSubMaterial(index, material)
@@ -292,8 +281,7 @@ function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(bodygroup, TYPE_NUMBER)
 	checkluatype(value, TYPE_NUMBER)
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetBodygroup(bodygroup, value)
@@ -305,8 +293,7 @@ end
 function ents_methods:setSkin(skinIndex)
 	checkluatype(skinIndex, TYPE_NUMBER)
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetSkin(skinIndex)
@@ -319,8 +306,7 @@ end
 function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetRenderMode(rendermode)
@@ -334,8 +320,7 @@ end
 function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetRenderFX(renderfx)
@@ -346,8 +331,7 @@ end
 -- @shared
 -- @return Entity's parent or nil
 function ents_methods:getParent()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ewrap(ent:GetParent())
 end
 
@@ -355,8 +339,7 @@ end
 -- @shared
 -- @return table of parented children
 function ents_methods:getChildren()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return SF.Sanitize(ent:GetChildren())
 end
 
@@ -364,8 +347,7 @@ end
 -- @shared
 -- @return number index of the attachment the entity is parented to or 0
 function ents_methods:getAttachmentParent()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetParentAttachment()
 end
 
@@ -374,8 +356,7 @@ end
 -- @param name
 -- @return number of the attachment index, or 0 if it doesn't exist
 function ents_methods:lookupAttachment(name)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:LookupAttachment(name)
 end
 
@@ -384,8 +365,7 @@ end
 -- @param index The index of the attachment
 -- @return vector position, and angle orientation or nil if the attachment doesn't exist
 function ents_methods:getAttachment(index)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local t = ent:GetAttachment(index)
 	if t then
 		return vwrap(t.Pos), awrap(t.Ang)
@@ -396,8 +376,7 @@ end
 -- @shared
 -- @return table of attachment id and attachment name or nil
 function ents_methods:getAttachments()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetAttachments()
 end
 
@@ -405,8 +384,7 @@ end
 -- @param boneid The ragdoll boneid
 -- @return The physobj id
 function ents_methods:translateBoneToPhysBone(boneid)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:TranslateBoneToPhysBone(boneid)
 end
 
@@ -414,24 +392,21 @@ end
 -- @param boneid The physobject id
 -- @return The ragdoll bone id
 function ents_methods:translatePhysBoneToBone(boneid)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:TranslatePhysBoneToBone(boneid)
 end
 
 --- Gets the number of physicsobjects of an entity
 -- @return The number of physics objects on the entity
 function ents_methods:getPhysicsObjectCount()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetPhysicsObjectCount()
 end
 
 --- Gets the main physics objects of an entity
 -- @return The main physics object of the entity
 function ents_methods:getPhysicsObject()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if ent:IsWorld() then SF.Throw("Cannot get the world physobj.", 2) end
 	return pwrap(ent:GetPhysicsObject())
 end
@@ -441,8 +416,7 @@ end
 -- @return The physics object of the entity
 function ents_methods:getPhysicsObjectNum(id)
 	checkluatype(id, TYPE_NUMBER)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return pwrap(ent:GetPhysicsObjectNum(id))
 end
 
@@ -450,8 +424,7 @@ end
 -- @shared
 -- @return Color
 function ents_methods:getColor()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return cwrap(ent:GetColor())
 end
 
@@ -459,8 +432,7 @@ end
 -- @shared
 -- @return Table containing the clipdata
 function ents_methods:getClipping()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	
 	local clips = {}
 	
@@ -518,8 +490,7 @@ end
 -- @shared
 -- @return Hologram type
 function ents_methods:toHologram()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if not ent.IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
 	debug.setmetatable(self, SF.Holograms.Metatable)
 	return self
@@ -529,8 +500,7 @@ end
 -- @shared
 -- @return True if valid, false if not
 function ents_methods:isValid()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent and ent:IsValid()
 end
 
@@ -538,8 +508,7 @@ end
 -- @shared
 -- @return True if player, false if not
 function ents_methods:isPlayer()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:IsPlayer()
 end
 
@@ -547,8 +516,7 @@ end
 -- @shared
 -- @return True if weapon, false if not
 function ents_methods:isWeapon()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:IsWeapon()
 end
 
@@ -556,8 +524,7 @@ end
 -- @shared
 -- @return True if vehicle, false if not
 function ents_methods:isVehicle()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:IsVehicle()
 end
 
@@ -565,8 +532,7 @@ end
 -- @shared
 -- @return True if npc, false if not
 function ents_methods:isNPC()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:IsNPC()
 end
 
@@ -574,8 +540,7 @@ end
 -- @shared
 -- @return Boolean if it's flag is set or not
 function ents_methods:isOnGround()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:IsOnGround()
 end
 
@@ -583,15 +548,13 @@ end
 -- @shared
 -- @return Boolean if the entity is on fire or not
 function ents_methods:isOnFire()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:IsOnFire()
 end
 
 --- Returns the chip's name of E2s or starfalls
 function ents_methods:getChipName()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if ent.GetGateName then
 		return ent:GetGateName()
 	else
@@ -603,8 +566,7 @@ end
 -- @shared
 -- @return The numerical index of the entity
 function ents_methods:entIndex()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:EntIndex()
 end
 
@@ -612,8 +574,7 @@ end
 -- @shared
 -- @return The string class name
 function ents_methods:getClass()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetClass()
 end
 
@@ -621,8 +582,7 @@ end
 -- @shared
 -- @return The position vector
 function ents_methods:getPos()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:GetPos())
 end
 
@@ -630,8 +590,7 @@ end
 -- @shared
 -- @return The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way
 function ents_methods:getWaterLevel()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:WaterLevel()
 end
 
@@ -641,8 +600,7 @@ end
 -- @return The bone index
 function ents_methods:lookupBone(name)
 	checkluatype(name, TYPE_STRING)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:LookupBone(name)
 end
 
@@ -651,8 +609,7 @@ end
 -- @param bone Bone index. (def 0)
 -- @return The matrix
 function ents_methods:getBoneMatrix(bone)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 
 	return owrap(ent:GetBoneMatrix(bone))
@@ -662,8 +619,7 @@ end
 -- @shared
 -- @return The matrix
 function ents_methods:getMatrix()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return owrap(ent:GetWorldTransformMatrix())
 end
 
@@ -671,8 +627,7 @@ end
 -- @shared
 -- @return Number of bones
 function ents_methods:getBoneCount()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetBoneCount()
 end
 
@@ -681,8 +636,7 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Name of the bone
 function ents_methods:getBoneName(bone)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 	return ent:GetBoneName(bone)
 end
@@ -692,8 +646,7 @@ end
 -- @param bone Bone index. (def 0)
 -- @return Parent index of the bone
 function ents_methods:getBoneParent(bone)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 	return ent:GetBoneParent(bone)
 end
@@ -704,8 +657,7 @@ end
 -- @return Position of the bone
 -- @return Angle of the bone
 function ents_methods:getBonePosition(bone)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 	local pos, ang = ent:GetBonePosition(bone)
 	return vwrap(pos), awrap(ang)
@@ -715,8 +667,7 @@ end
 -- @shared
 -- @return The outer bounding box size
 function ents_methods:obbSize()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:OBBMaxs() - ent:OBBMins())
 end
 
@@ -724,8 +675,7 @@ end
 -- @shared
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenter()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:OBBCenter())
 end
 
@@ -733,8 +683,7 @@ end
 -- @shared
 -- @return The position vector of the outer bounding box center
 function ents_methods:obbCenterW()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:LocalToWorld(ent:OBBCenter()))
 end
 
@@ -742,8 +691,7 @@ end
 -- @shared
 -- @return The min bounding box vector
 function ents_methods:obbMins()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:OBBMins())
 end
 
@@ -751,8 +699,7 @@ end
 -- @shared
 -- @return The max bounding box vector
 function ents_methods:obbMaxs()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:OBBMaxs())
 end
 
@@ -760,8 +707,7 @@ end
 -- @shared
 -- @return The position vector of the mass center
 function ents_methods:getMassCenter()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetMassCenter())
@@ -771,8 +717,7 @@ end
 -- @shared
 -- @return The position vector of the mass center
 function ents_methods:getMassCenterW()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(ent:LocalToWorld(phys:GetMassCenter()))
@@ -782,8 +727,7 @@ end
 -- @shared
 -- @return The angle
 function ents_methods:getAngles()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return awrap(ent:GetAngles())
 end
 
@@ -791,8 +735,7 @@ end
 -- @shared
 -- @return The numerical mass
 function ents_methods:getMass()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -803,8 +746,7 @@ end
 -- @shared
 -- @return The principle moments of inertia as a vector
 function ents_methods:getInertia()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -815,8 +757,7 @@ end
 -- @shared
 -- @return The velocity vector
 function ents_methods:getVelocity()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:GetVelocity())
 end
 
@@ -824,8 +765,7 @@ end
 -- @shared
 -- @return The angular velocity as a vector
 function ents_methods:getAngleVelocity()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	return vwrap(phys:GetAngleVelocity())
@@ -835,8 +775,7 @@ end
 -- @shared
 -- @return The angular velocity as an angle
 function ents_methods:getAngleVelocityAngle()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	local vec = phys:GetAngleVelocity()
@@ -848,8 +787,7 @@ end
 -- @param data Local space vector
 -- @return data as world space vector
 function ents_methods:localToWorld(data)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checktype(data, vec_meta)
 
 	return vwrap(ent:LocalToWorld(vunwrap(data)))
@@ -860,8 +798,7 @@ end
 -- @param data Local space angle
 -- @return data as world space angle
 function ents_methods:localToWorldAngles(data)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checktype(data, ang_meta)
 	local data = aunwrap(data)
 
@@ -873,8 +810,7 @@ end
 -- @param data World space vector
 -- @return data as local space vector
 function ents_methods:worldToLocal(data)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checktype(data, vec_meta)
 
 	return vwrap(ent:WorldToLocal(vunwrap(data)))
@@ -885,8 +821,7 @@ end
 -- @param data World space angle
 -- @return data as local space angle
 function ents_methods:worldToLocalAngles(data)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checktype(data, ang_meta)
 	local data = aunwrap(data)
 
@@ -897,8 +832,7 @@ end
 -- @param animation Name of the animation
 -- @return Animation index or -1 if invalid
 function ents_methods:lookupSequence(animation)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkluatype(animation, TYPE_STRING)
 
 	return ent:LookupSequence(animation)
@@ -908,8 +842,7 @@ end
 -- @param id (Optional) The id of the sequence, or will default to the currently playing sequence
 -- @return Length of the animation in seconds
 function ents_methods:sequenceDuration(id)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	if id~=nil then checkluatype(id, TYPE_NUMBER) end
 
 	return ent:SequenceDuration(id)
@@ -919,8 +852,7 @@ end
 -- @param pose Name of the pose parameter
 -- @param value Value to set it to.
 function ents_methods:setPose(pose, value)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	ent:SetPoseParameter(pose, value)
@@ -930,15 +862,13 @@ end
 -- @param pose Pose parameter name
 -- @return Value of the pose parameter
 function ents_methods:getPose(pose)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetPoseParameter(pose)
 end
 
 --- Returns a table of flexname -> flexid pairs for use in flex functions.
 function ents_methods:getFlexes()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local flexes = {}
 	for i = 0, ent:GetFlexNum()-1 do
 		flexes[ent:GetFlexName(i)] = i
@@ -950,8 +880,7 @@ end
 -- @param flexid The id of the flex
 -- @param weight The weight of the flex
 function ents_methods:setFlexWeight(flexid, weight)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 
 	checkluatype(flexid, TYPE_NUMBER)
 	checkluatype(weight, TYPE_NUMBER)
@@ -967,8 +896,7 @@ end
 
 --- Sets the scale of all flexes of an entity
 function ents_methods:setFlexScale(scale)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 
 	checkluatype(scale, TYPE_NUMBER)
 
@@ -981,8 +909,7 @@ end
 -- @shared
 -- @return Model of the entity
 function ents_methods:getModel()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetModel()
 end
 
@@ -990,8 +917,7 @@ end
 -- @shared
 -- @return Max Health of the entity
 function ents_methods:getMaxHealth()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetMaxHealth()
 end
 
@@ -999,8 +925,7 @@ end
 -- @shared
 -- @return Health of the entity
 function ents_methods:getHealth()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:Health()
 end
 
@@ -1008,8 +933,7 @@ end
 -- @shared
 -- @return Angles of the entity's eyes
 function ents_methods:getEyeAngles()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return awrap(ent:EyeAngles())
 end
 
@@ -1018,8 +942,7 @@ end
 -- @return Eye position of the entity
 -- @return In case of a ragdoll, the position of the second eye
 function ents_methods:getEyePos()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	local pos1, pos2 = ent:EyePos()
 	if pos2 then
 		return vwrap(pos1), vwrap(pos2)
@@ -1032,8 +955,7 @@ end
 -- @class function
 -- @return String material
 function ents_methods:getMaterial()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetMaterial() or ""
 end
 
@@ -1042,8 +964,7 @@ end
 -- @class function
 -- @return String material
 function ents_methods:getSubMaterial(index)
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetSubMaterial(index) or ""
 end
 
@@ -1052,8 +973,7 @@ end
 -- @class function
 -- @return Material
 function ents_methods:getMaterials()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetMaterials() or {}
 end
 
@@ -1061,8 +981,7 @@ end
 -- @shared
 -- @return Skin number
 function ents_methods:getSkin()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return ent:GetSkin()
 end
 
@@ -1070,8 +989,7 @@ end
 -- @shared
 -- @return Vector up
 function ents_methods:getUp()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:GetUp())
 end
 
@@ -1079,8 +997,7 @@ end
 -- @shared
 -- @return Vector right
 function ents_methods:getRight()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:GetRight())
 end
 
@@ -1088,7 +1005,6 @@ end
 -- @shared
 -- @return Vector forward
 function ents_methods:getForward()
-	local ent = eunwrap(self)
-	checkent(self, ent)
+	local ent = getent(self)
 	return vwrap(ent:GetForward())
 end
