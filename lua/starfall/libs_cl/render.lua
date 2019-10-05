@@ -506,10 +506,11 @@ function render_library.pushMatrix(m, world)
 		newmatrix = matrix_stack[id] * munwrap(m)
 	else
 		newmatrix = munwrap(m)
+		if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
+			newmatrix = renderdata.renderEnt.Transform * newmatrix
+		end
 	end
-	if not world and renderdata.renderEnt and renderdata.renderEnt.Transform then
-		newmatrix = renderdata.renderEnt.Transform * newmatrix
-	end
+
 	matrix_stack[id + 1] = newmatrix
 	cam.PushModelMatrix(newmatrix)
 end
