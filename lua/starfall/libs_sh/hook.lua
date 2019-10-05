@@ -299,7 +299,12 @@ else
 	add("StartChat")
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
-	add("ChatTextChanged")
+	add("ChatTextChanged", nil, function(instance, txt)
+		if SF.Permissions.hasAccess(instance, nil, "input") then
+			return true, { txt }
+		end
+		return false
+	end)
 	add("NetworkEntityCreated")
 end
 
