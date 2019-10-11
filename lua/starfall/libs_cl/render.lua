@@ -135,9 +135,38 @@ SF.AddHook("postload", function()
 	SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
 		return not drawskybox, {}
 	end)
+	
+	local function canRenderHud(instance)
+		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {}
+	end
+
+	local function canRenderHudRenderables(instance, depth, skybox)
+		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {depth, skybox}
+	end
+
+	local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
+		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {SF.WrapObject(pos), SF.WrapObject(ang), fov, znear, zfar}
+	end
+
+	local function returnCalcview(instance, tbl)
+		local rt = tbl[2]
+		if istable(rt) then
+			rt.origin = SF.UnwrapObject(rt.origin)
+			rt.angles = SF.UnwrapObject(rt.angles)
+			return rt
+		end
+	end
+
+	SF.hookAdd("HUDPaint", "drawhud", canRenderHud)
+	SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudRenderables)
+	SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudRenderables)
+	SF.hookAdd("PreDrawHUD", nil, canRenderHud)
+	SF.hookAdd("PostDrawHUD", nil, canRenderHud)
+	SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
 end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
+SF.Permissions.registerPrivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
 SF.Permissions.registerPrivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
 SF.Permissions.registerPrivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
@@ -1579,6 +1608,7 @@ function render_library.getResolution()
 	if renderEnt then
 		return renderEnt:GetResolution()
 	end
+	return ScrW(), ScrH()
 end
 
 --- Returns width and height of the game window
@@ -1816,6 +1846,15 @@ function render_library.popCustomClipPlane()
 	render.PopCustomClipPlane()
 
 	pushedClippingPlanes = pushedClippingPlanes - 1
+end
+
+--- Sets the current instance to allow HUD drawing. Only works for owner of the chip
+--@param active Whether hud hooks should be active. true to force on, false to force off, nil to restore default.
+function render_library.setHUDActive(active)
+	if active ~= nil then checkluatype(active, TYPE_BOOL) end
+	local instance = SF.instance
+	if LocalPlayer()~=instance.player then SF.Throw("This function only works for the owner of the chip!", 2) end
+	instance.hudoverride = active
 end
 
 --- Called when a player uses the screen

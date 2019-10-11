@@ -19,61 +19,13 @@ function ENT:Draw ()
 	self:DrawModel()
 end
 
-function ENT:DrawHUD(hookname, ...)
-	if not (self.link and self.link:IsValid()) then return end
-	local instance = self.link.instance
-	if not instance then return end
-
-	render.PushFilterMag(TEXFILTER.ANISOTROPIC)
-	render.PushFilterMin(TEXFILTER.ANISOTROPIC)
-
-	instance.data.render.renderEnt = self
-
-	instance:runScriptHook(hookname, ...)
-
-	render.PopFilterMag()
-	render.PopFilterMin()
-end
-
-
-function ENT:DoCalcView(ply, pos, ang, fov, znear, zfar)
-	if not (self.link and self.link:IsValid()) then return end
-	local instance = self.link.instance
-	if not instance then return end
-
-	local tbl = instance:runScriptHookForResult("calcview", SF.WrapObject(pos), SF.WrapObject(ang), fov, znear, zfar)
-	local ok, rt = tbl[1], tbl[2]
-	if ok and istable(rt) then
-		return {
-			origin = SF.UnwrapObject(rt.origin),
-			angles = SF.UnwrapObject(rt.angles),
-			fov = rt.fov,
-			znear = rt.znear,
-			zfar = rt.zfar,
-			drawviewer = rt.drawviewer,
-			ortho = rt.ortho
-		}
-	end
-end
-
-function ENT:GetResolution()
-	return ScrW(), ScrH()
-end
-
 SF.ActiveHuds = {}
 local hook_pref = "starfall_hud_hook_"
 local ConnectHUD, DisconnectHUD
 
 local Hint_FirstPrint = true
 function ConnectHUD(ent)
-	local hookname = hook_pref..ent:EntIndex()
 	ent:CallOnRemove("sf_hud_unlink_on_remove", DisconnectHUD)
-	hook.Add("HUDPaint", hookname, function() ent:DrawHUD("drawhud") end)
-	hook.Add("PreDrawOpaqueRenderables", hookname, function(...) ent:DrawHUD("predrawopaquerenderables", ...) end)
-	hook.Add("PostDrawOpaqueRenderables", hookname, function(...) ent:DrawHUD("postdrawopaquerenderables", ...) end)
-	hook.Add("PreDrawHUD", hookname, function() ent:DrawHUD("predrawhud") end)
-	hook.Add("PostDrawHUD", hookname, function() ent:DrawHUD("postdrawhud") end)
-	hook.Add("CalcView", hookname, function(...) return ent:DoCalcView(...) end)
 	if (Hint_FirstPrint) then
 		LocalPlayer():ChatPrint("Starfall HUD Connected. NOTE: Type 'sf_hud_unlink' in the console to disconnect yourself from all HUDs.")
 		Hint_FirstPrint = nil
@@ -90,13 +42,7 @@ function ConnectHUD(ent)
 end
 
 function DisconnectHUD(ent)
-	local hookname = hook_pref..ent:EntIndex()
-	hook.Remove("HUDPaint", hookname)
-	hook.Remove("PreDrawOpaqueRenderables", hookname)
-	hook.Remove("PostDrawOpaqueRenderables", hookname)
-	hook.Remove("PostDrawHUD", hookname)
-	hook.Remove("PreDrawHUD", hookname)
-	hook.Remove("CalcView", hookname)
+	ent:RemoveCallOnRemove("sf_hud_unlink_on_remove")
 	LocalPlayer():ChatPrint("Starfall HUD Disconnected.")
 	SF.ActiveHuds[ent] = nil
 
