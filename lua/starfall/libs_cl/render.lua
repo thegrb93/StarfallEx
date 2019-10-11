@@ -687,7 +687,7 @@ end
 
 --- Sets the current render material
 -- @param mat The material object
-function render_library.setTexture(mat)
+function render_library.setMaterial(mat)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
@@ -702,12 +702,6 @@ function render_library.setTexture(mat)
 		draw.NoTexture()
 	end
 end
-
---- Sets the current render material
--- @param mat The material object
-function render_library.setMaterial(mat)
-end
-render_library.setMaterial = render_library.setTexture
 
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
