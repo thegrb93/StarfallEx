@@ -551,6 +551,11 @@ Sets the texture filtering function when viewing a far texture </td>
 Sets the font </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setHUDActive">setHUDActive</a>( active&nbsp;)</td>
+			<td class="summary">
+Sets the current instance to allow HUD drawing.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterial">setMaterial</a>( mat&nbsp;)</td>
 			<td class="summary">
 Sets the current render material </td>
@@ -2056,6 +2061,25 @@ Sets the font</p>
 - DermaLarge</pre></p>
 		
 	</section>
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setHUDActive"></a><strong>render.setHUDActive</strong>( active&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current instance to allow HUD drawing. Only works for owner of the chip</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>active</tt> ― Whether hud hooks should be active. true to force on, false to force off, nil to restore default.</li>
+		</ul>
+	</section>
+	
 	
 	
 	
