@@ -688,14 +688,15 @@ function render_library.setRGBA(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
 end
 
---- Looks up a texture by file name. Use with render.setTexture to draw with it.
---- Make sure to store the texture to use it rather than calling this slow function repeatedly.
+--- Looks up a texture by file name and creates an UnlitGeneric material with it.
+--- Also supports image URLs or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
+--- Make sure to store the material to use it rather than calling this slow function repeatedly.
 --- NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)
 -- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
 -- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
 -- @param done An optional callback called when the image is done loading. Passes the material, url
--- @return The material. Use it with render.setTexture
-function render_library.getTextureID (tx, cb, done)
+-- @return The material. Use with render.setMaterial to draw with it.
+function render_library.getMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
 	local m = SF.instance.env.material.create("UnlitGeneric")
