@@ -248,6 +248,11 @@ Sets the stencil value in a specified rect.</td>
 Creates a font.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.createMaterial">createMaterial</a>( tx, cb, done&nbsp;)</td>
+			<td class="summary">
+Looks up a texture by file name and creates an UnlitGeneric material with it.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.createRenderTarget">createRenderTarget</a>( name&nbsp;)</td>
 			<td class="summary">
 Creates a new render target to draw onto.</td>
@@ -424,11 +429,6 @@ Gets the default font </td>
 			<td class="name"><span class="realm_cl"></span><a href="#render.getGameResolution">getGameResolution</a>( &nbsp;)</td>
 			<td class="summary">
 Returns width and height of the game window </td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.getMaterial">getMaterial</a>( tx, cb, done&nbsp;)</td>
-			<td class="summary">
-Looks up a texture by file name and creates an UnlitGeneric material with it.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.getResolution">getResolution</a>( &nbsp;)</td>
@@ -779,6 +779,36 @@ Base font can be one of (keep in mind that these may not exist on all clients if
 		
 	</section>
 	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.createMaterial"></a><strong>render.createMaterial</strong>( tx, cb, done&nbsp;)</dt>
+<dd>
+	<p>
+Looks up a texture by file name and creates an UnlitGeneric material with it. 
+Also supports image URLs or image data: https://en.wikipedia.org/wiki/Data_URI_scheme 
+Make sure to store the material to use it rather than calling this slow function repeatedly. 
+NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
+			<li><tt>cb</tt> ― An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
+			<li><tt>done</tt> ― An optional callback called when the image is done loading. Passes the material, url</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The material. Use with render.setMaterial to draw with it.</p>
+		
+	</section>
 	
 	
 </dd>
@@ -1548,36 +1578,6 @@ Returns width and height of the game window</p>
 			<li>the X size of the game window</li>
 			<li>the Y size of the game window</li>
 		</ol>
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="render.getMaterial"></a><strong>render.getMaterial</strong>( tx, cb, done&nbsp;)</dt>
-<dd>
-	<p>
-Looks up a texture by file name and creates an UnlitGeneric material with it. 
-Also supports image URLs or image data: https://en.wikipedia.org/wiki/Data_URI_scheme 
-Make sure to store the material to use it rather than calling this slow function repeatedly. 
-NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
-			<li><tt>cb</tt> ― An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
-			<li><tt>done</tt> ― An optional callback called when the image is done loading. Passes the material, url</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>The material. Use with render.setMaterial to draw with it.</p>
-		
 	</section>
 	
 	

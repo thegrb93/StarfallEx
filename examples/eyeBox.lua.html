@@ -224,7 +224,7 @@ else
 	render.createRenderTarget("rt")
 	render.createRenderTarget("circle")
 
-	local box = render.getTextureID("models/props_junk/woodcrates01a")
+	local box = render.createMaterial("models/props_junk/woodcrates01a")
 	local m = material.create("VertexLitGeneric")
 	m:setTextureRenderTarget("$basetexture", "rt")
 
