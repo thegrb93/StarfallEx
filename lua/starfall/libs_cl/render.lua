@@ -696,7 +696,7 @@ end
 -- @param cb An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.
 -- @param done An optional callback called when the image is done loading. Passes the material, url
 -- @return The material. Use with render.setMaterial to draw with it.
-function render_library.getMaterial(tx, cb, done)
+function render_library.createMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
 	local m = SF.instance.env.material.create("UnlitGeneric")
