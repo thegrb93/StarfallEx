@@ -426,6 +426,11 @@ Gets the default font </td>
 Returns width and height of the game window </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.getMaterial">getMaterial</a>( tx, cb, done&nbsp;)</td>
+			<td class="summary">
+Looks up a texture by file name and creates an UnlitGeneric material with it.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.getResolution">getResolution</a>( &nbsp;)</td>
 			<td class="summary">
 Returns the render context's width and height </td>
@@ -444,11 +449,6 @@ Returns information about the screen, such as world offsets, dimentions, and rot
 			<td class="name"><span class="realm_cl"></span><a href="#render.getTextSize">getTextSize</a>( text&nbsp;)</td>
 			<td class="summary">
 Gets the size of the specified text.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.getTextureID">getTextureID</a>( tx, cb, done&nbsp;)</td>
-			<td class="summary">
-Looks up a texture by file name.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.isHUDActive">isHUDActive</a>( &nbsp;)</td>
@@ -1553,6 +1553,36 @@ Returns width and height of the game window</p>
 	
 </dd>
 		
+<dt><span class="realm_cl"></span><a name="render.getMaterial"></a><strong>render.getMaterial</strong>( tx, cb, done&nbsp;)</dt>
+<dd>
+	<p>
+Looks up a texture by file name and creates an UnlitGeneric material with it. 
+Also supports image URLs or image data: https://en.wikipedia.org/wiki/Data_URI_scheme 
+Make sure to store the material to use it rather than calling this slow function repeatedly. 
+NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
+			<li><tt>cb</tt> ― An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
+			<li><tt>done</tt> ― An optional callback called when the image is done loading. Passes the material, url</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The material. Use with render.setMaterial to draw with it.</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_cl"></span><a name="render.getResolution"></a><strong>render.getResolution</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1641,35 +1671,6 @@ Gets the size of the specified text. Don't forget to use setFont before calling 
 			<li>width of the text</li>
 			<li>height of the text</li>
 		</ol>
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="render.getTextureID"></a><strong>render.getTextureID</strong>( tx, cb, done&nbsp;)</dt>
-<dd>
-	<p>
-Looks up a texture by file name. Use with render.setTexture to draw with it. 
-Make sure to store the texture to use it rather than calling this slow function repeatedly. 
-NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>tx</tt> ― Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme</li>
-			<li><tt>cb</tt> ― An optional callback called when loading is done. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture.</li>
-			<li><tt>done</tt> ― An optional callback called when the image is done loading. Passes the material, url</li>
-		</ul>
-	</section>
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>The material. Use it with render.setTexture</p>
-		
 	</section>
 	
 	
