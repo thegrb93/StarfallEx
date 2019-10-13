@@ -44,7 +44,7 @@ else
 	local function doRender()
 		render.selectRenderTarget("rt")
 		render.setRenderTargetTexture("circle")
-		render.setTexture(box)
+		render.setMaterial(box)
 		render.drawTexturedRect(0,0,1024,1024)
 
 		render.setRenderTargetTexture("circle")
