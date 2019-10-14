@@ -465,8 +465,6 @@ end
 -- @server
 -- @return number of constraints able to be spawned
 function constraint_library.constraintsLeft()
-	local max = plyMaxConstraints:GetInt()
-	if max < 0 then return -1 end
 	return plyCount:check(SF.instance.player)
 end
 
