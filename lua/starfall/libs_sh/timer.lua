@@ -171,7 +171,7 @@ function timer_library.toggle(name)
 end
 
 --- Returns amount of time left (in seconds) before the timer executes its function.
--- @param The timer name
+-- @param name The timer name
 -- @return The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
 function timer_library.timeleft(name)
 	SF.CheckLuaType(name, TYPE_STRING)
@@ -180,7 +180,7 @@ function timer_library.timeleft(name)
 end
 
 --- Returns amount of repetitions/executions left before the timer destroys itself.
--- @param The timer name
+-- @param name The timer name
 -- @return The amount of executions left. Nil if timer doesnt exist
 function timer_library.repsleft(name)
 	SF.CheckLuaType(name, TYPE_STRING)
