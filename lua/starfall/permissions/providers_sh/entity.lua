@@ -99,22 +99,6 @@ hook.Add("Initialize","SF_PPInitialize",function()
 		end
 	else
 		if SERVER then
-			local dumbtrace = {
-				FractionLeftSolid = 0,
-				HitNonWorld       = true,
-				Fraction          = 0,
-				Entity            = NULL,
-				HitPos            = Vector(0, 0, 0),
-				HitNormal         = Vector(0, 0, 0),
-				HitBox            = 0,
-				Normal            = Vector(1, 0, 0),
-				Hit               = true,
-				HitGroup          = 0,
-				MatType           = 0,
-				StartPos          = Vector(0, 0, 0),
-				PhysicsBone       = 0,
-				WorldToLocal      = Vector(0, 0, 0),
-			}
 			P.checks = {
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
@@ -131,8 +115,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				function(instance, target)
 					if isentity(target) and target:IsValid() then
 						local pos = target:GetPos()
-						dumbtrace.Entity = target
-						if hook.Run("CanTool", instance.player, dumbtrace, "starfall_ent_lib") ~= false then
+						if hook.Run("CanTool", instance.player, SF.dumbTrace(target), "starfall_ent_lib") ~= false then
 							return true
 						else
 							return false, "Target doesn't have toolgun access"

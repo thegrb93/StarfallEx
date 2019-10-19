@@ -320,7 +320,7 @@ function props_library.createSent (pos, ang, class, frozen)
 	checkluatype(class, TYPE_STRING)
 	frozen = frozen and true or false
 
-	local pos = vunwrap(pos)
+	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 
 	local instance = SF.instance
@@ -340,8 +340,8 @@ function props_library.createSent (pos, ang, class, frozen)
 	if swep then
 
 		if ((not swep.Spawnable and not ply:IsAdmin()) or
-				(swep.AdminOnly and not ply:IsAdmin())) then return end
-		if (not gamemode.Call("PlayerSpawnSWEP", ply, class, swep)) then return end
+				(swep.AdminOnly and not ply:IsAdmin())) then SF.Throw("This swep is admin only!", 2) end
+		if (not gamemode.Call("PlayerSpawnSWEP", ply, class, swep)) then SF.Throw("Another hook prevented the swep from spawning", 2) end
 
 
 		entity = ents.Create(swep.ClassName)
@@ -350,17 +350,22 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	elseif sent then
 
-		if (sent.AdminOnly and not ply:IsAdmin()) then return false end
-		if (not gamemode.Call("PlayerSpawnSENT", ply, class)) then return end
+		if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
+		if (not gamemode.Call("PlayerSpawnSENT", ply, class)) then SF.Throw("Another hook prevented the sent from spawning", 2) end
+		local sent = scripted_ents.GetStored( class )
+		if not (sent and sent.t.SpawnFunction) then SF.Throw("This sent is not spawnable!", 2) end
+		entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
 
-		entity = ents.Create(sent.ClassName)
+		if entity and entity:IsValid() then
+			entity:SetCreator( ply )
+		end
 
 		hookcall = "PlayerSpawnedSENT"
 
 	elseif npc then
 
-		if (npc.AdminOnly and not ply:IsAdmin()) then return false end
-		if (not gamemode.Call("PlayerSpawnNPC", ply, class, "")) then return end
+		if (npc.AdminOnly and not ply:IsAdmin()) then SF.Throw("This npc is admin only!", 2) end
+		if (not gamemode.Call("PlayerSpawnNPC", ply, class, "")) then SF.Throw("Another hook prevented the npc from spawning", 2) end
 
 		entity = ents.Create(npc.Class)
 
@@ -390,7 +395,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	elseif vehicle then
 
-		if (not gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle)) then return end
+		if (not gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle)) then SF.Throw("Another hook prevented the vehicle from spawning", 2) end
 
 		entity = ents.Create(vehicle.Class)
 
@@ -437,7 +442,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	if entity and entity:IsValid() then
 
-		entity:SetPos(SF.clampPos(pos))
+		entity:SetPos(pos)
 		entity:SetAngles(ang)
 
 		entity:Spawn()

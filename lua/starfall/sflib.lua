@@ -856,6 +856,28 @@ function SF.clampPos(pos)
 	return pos
 end
 
+local dumbtrace = {
+	FractionLeftSolid = 0,
+	HitNonWorld       = true,
+	Fraction          = 0,
+	Entity            = NULL,
+	HitPos            = Vector(0, 0, 0),
+	HitNormal         = Vector(0, 0, 0),
+	HitBox            = 0,
+	Normal            = Vector(1, 0, 0),
+	Hit               = true,
+	HitGroup          = 0,
+	MatType           = 0,
+	StartPos          = Vector(0, 0, 0),
+	PhysicsBone       = 0,
+	WorldToLocal      = Vector(0, 0, 0),
+}
+function SF.dumbTrace(entity, pos)
+	if entity then dumbtrace.Entity = entity end
+	if pos then dumbtrace.HitPos = pos end
+	return dumbtrace
+end
+
 -- ------------------------------------------------------------------------- --
 
 local serialize_replace_regex = "[\"\n]"
