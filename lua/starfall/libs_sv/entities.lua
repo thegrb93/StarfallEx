@@ -9,6 +9,7 @@ local abs = math.abs
 
 local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
+local getent = SF.Entities.GetEntity
 
 --- Entity type
 --@class class
@@ -64,16 +65,6 @@ local function checkvector(v)
 
 		SF.Throw("Input vector too large or NAN", 3)
 
-	end
-end
-
-local function getent(self)
-	local ent = eunwrap(self)
-	if ent and ent:IsValid() then
-		return ent
-	else
-		checktype(self, ents_metamethods, 3)
-		SF.Throw("Entity is not valid.", 3)
 	end
 end
 

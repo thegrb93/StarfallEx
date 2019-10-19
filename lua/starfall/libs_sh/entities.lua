@@ -71,6 +71,8 @@ local function getent(self)
 	end
 end
 
+SF.Entities.GetEntity = getent
+
 --- To string
 -- @shared
 function ents_metamethods:__tostring()

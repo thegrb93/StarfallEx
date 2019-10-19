@@ -41,6 +41,7 @@ end
 local input_methods = SF.RegisterLibrary("input")
 
 SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
+SF.Permissions.registerPrivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
 
 --- Gets the first key that is bound to the command passed
 -- @client
@@ -147,6 +148,16 @@ function input_methods.enableCursor(enabled)
 
 	SF.instance.data.cursorEnabled = enabled
 	gui.EnableScreenClicker(enabled)
+end
+
+--- Makes the local player select a weapon
+-- @client
+-- @param weapon The weapon entity to select
+function input_methods.selectWeapon(weapon)
+	local ent = SF.Entities.GetEntity(weapon)
+	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
+	SF.Permissions.check(SF.instance, nil, "input.emulate")
+	input.SelectWeapon( ent ) 
 end
 
 
