@@ -419,10 +419,10 @@ end
 --- Invokes the entity's breaking animation and removes it.
 function ents_methods:breakEnt()
 	local ent = getent(self)
-	if ent:IsPlayer() or ent:IsFlagSet(FL_KILLME) then SF.Throw("Entity is not valid", 2) end
+	if ent:IsPlayer() or ent.WasBroken then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.remove")
 
-	ent:AddFlags(FL_KILLME)
+	ent.WasBroken = true
 	ent:Fire("break", 1, 0)
 end
 
