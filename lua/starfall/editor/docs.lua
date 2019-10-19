@@ -186,7 +186,7 @@ Returns the angular velocity of the entity";["fname"]="getAngleVelocityAngle";["
 Returns the angular velocity of the entity ";};["getAngles"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the angle of the entity";["fname"]="getAngles";["name"]="ents_methods:getAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The angle";["server"]=true;["summary"]="\
 Returns the angle of the entity ";};["getAttachment"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
-Gets the position and angle of an attachment";["fname"]="getAttachment";["name"]="ents_methods:getAttachment";["param"]={[1]="index";["index"]="The index of the attachment";};["private"]=false;["realm"]="sh";["ret"]="vector position, and angle orientation";["server"]=true;["summary"]="\
+Gets the position and angle of an attachment";["fname"]="getAttachment";["name"]="ents_methods:getAttachment";["param"]={[1]="index";["index"]="The index of the attachment";};["private"]=false;["realm"]="sh";["ret"]="vector position, and angle orientation or nil if the attachment doesn't exist";["server"]=true;["summary"]="\
 Gets the position and angle of an attachment ";};["getAttachmentParent"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the attachment index the entity is parented to";["fname"]="getAttachmentParent";["name"]="ents_methods:getAttachmentParent";["param"]={};["private"]=false;["realm"]="sh";["ret"]="number index of the attachment the entity is parented to or 0";["server"]=true;["summary"]="\
 Gets the attachment index the entity is parented to ";};["getAttachments"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
@@ -362,7 +362,7 @@ Sets the whether an entity should be drawn or not";["fname"]="setNoDraw";["name"
 Sets the whether an entity should be drawn or not ";};["setNocollideAll"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Set's the entity to collide with nothing but the world";["fname"]="setNocollideAll";["name"]="ents_methods:setNocollideAll";["param"]={[1]="nocollide";["nocollide"]="Whether to collide with nothing except world or not.";};["private"]=false;["realm"]="sv";["summary"]="\
 Set's the entity to collide with nothing but the world ";};["setParent"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Parents the entity to another entity";["fname"]="setParent";["name"]="ents_methods:setParent";["param"]={[1]="ent";[2]="attachment";["attachment"]="Optional string attachment name to parent to";["ent"]="Entity to parent to. nil to unparent";};["private"]=false;["realm"]="sv";["summary"]="\
+Parents the entity to another entity";["fname"]="setParent";["name"]="ents_methods:setParent";["param"]={[1]="parent";[2]="attachment";["attachment"]="Optional string attachment name to parent to";["parent"]="Entity to parent to. nil to unparent";};["private"]=false;["realm"]="sv";["summary"]="\
 Parents the entity to another entity ";};["setPhysMaterial"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Sets the physical material of the entity";["fname"]="setPhysMaterial";["name"]="ents_methods:setPhysMaterial";["param"]={[1]="mat";["mat"]="Material to use";};["private"]=false;["realm"]="sv";["summary"]="\
 Sets the physical material of the entity ";};["setPos"]={["class"]="function";["classlib"]="Entity";["description"]="\
