@@ -77,7 +77,7 @@ end
 -- @param radius The cosine of angle of the cone. 1 makes a 0° cone, 0.707 makes approximately 90°, 0 makes 180°, and so on.
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inCone (pos, dir, distance, radius, filter)
+function find_library.inCone(pos, dir, distance, radius, filter)
 	checkpermission(SF.instance, nil, "find")
 	checktype(pos, SF.Types["Vector"])
 	checktype(dir, SF.Types["Vector"])
@@ -89,6 +89,31 @@ function find_library.inCone (pos, dir, distance, radius, filter)
 	return convert(ents.FindInCone(pos, dir, distance, radius), filter)
 end
 
+--- Finds entities in a ray
+-- @param startpos The ray start
+-- @param endpos The ray end
+-- @param mins If not null, will define a lower bound of the ray's hull
+-- @param maxs If not null, will define a upper bound of the ray's hull
+-- @param filter Optional function to filter results
+-- @return An array of found entities
+function find_library.inRay(startpos, endpos, mins, maxs, filter)
+	checkpermission(SF.instance, nil, "find")
+
+	checktype(startpos, SF.Types["Vector"])
+	checktype(endpos, SF.Types["Vector"])
+	startpos = vunwrap(startpos)
+	endpos = vunwrap(endpos)
+
+	if mins ~= nil or maxs ~= nil then
+		checktype(mins, SF.Types["Vector"])
+		checktype(maxs, SF.Types["Vector"])
+		mins = vunwrap(mins)
+		maxs = vunwrap(maxs)
+	end
+
+	return convert(ents.FindAlongRay(startpos, endpos, mins, maxs), filter)
+end
+
 --- Finds entities by class name
 -- @param class The class name
 -- @param filter Optional function to filter results
@@ -98,6 +123,17 @@ function find_library.byClass(class, filter)
 	checkluatype (class, TYPE_STRING)
 
 	return convert(ents.FindByClass(class), filter)
+end
+
+--- Finds entities by their targetname
+-- @param name The targetname
+-- @param filter Optional function to filter results
+-- @return An array of found entities
+function find_library.byName(name, filter)
+	checkpermission(SF.instance, nil, "find")
+	checkluatype (name, TYPE_STRING)
+
+	return convert(ents.FindByName(name), filter)
 end
 
 --- Finds entities by model
