@@ -12,7 +12,7 @@
 -- @class hook
 -- @client
 
---- Called when a frame is requested to be drawn on hud. (2D Context)
+--- Called when a hud element is attempting to be drawn
 -- @name hudshoulddraw
 -- @class hook
 -- @client
