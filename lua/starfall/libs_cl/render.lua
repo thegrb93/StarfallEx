@@ -12,6 +12,12 @@
 -- @class hook
 -- @client
 
+--- Called when a frame is requested to be drawn on hud. (2D Context)
+-- @name hudshoulddraw
+-- @class hook
+-- @client
+-- @param string The name of the hud element trying to be drawn
+
 ---Called before drawing HUD (2D Context)
 -- @name predrawhud
 -- @class hook
@@ -136,12 +142,8 @@ SF.AddHook("postload", function()
 		return not drawskybox, {}
 	end)
 	
-	local function canRenderHud(instance)
-		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {}
-	end
-
-	local function canRenderHudRenderables(instance, depth, skybox)
-		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {depth, skybox}
+	local function canRenderHudSafeArgs(instance, ...)
+		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {...}
 	end
 
 	local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
@@ -157,11 +159,14 @@ SF.AddHook("postload", function()
 		end
 	end
 
-	SF.hookAdd("HUDPaint", "drawhud", canRenderHud)
-	SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudRenderables)
-	SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudRenderables)
-	SF.hookAdd("PreDrawHUD", nil, canRenderHud)
-	SF.hookAdd("PostDrawHUD", nil, canRenderHud)
+	SF.hookAdd("HUDPaint", "drawhud", canRenderHudSafeArgs)
+	SF.hookAdd("HUDShouldDraw", nil, canRenderHudSafeArgs, function(instance, args)
+		if args[2]==false then return false end
+	end)
+	SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
+	SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
+	SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
+	SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
 	SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
 end)
 
