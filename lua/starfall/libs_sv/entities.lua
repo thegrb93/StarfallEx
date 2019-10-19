@@ -657,7 +657,7 @@ function ents_methods:getAllConstrained(filter)
 		if entity_lookup[ent] then return end
 		entity_lookup[ent] = true
 		if ent:IsValid() then
-			entity_table[#entity_table + 1] = ewrap(ent)
+			entity_table[#entity_table + 1] = owrap(ent)
 			local constraints = constraint.GetTable(ent)
 			for k, v in pairs(constraints) do
 				if not filter or filter[v.Type] then
