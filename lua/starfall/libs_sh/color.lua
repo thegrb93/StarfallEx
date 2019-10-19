@@ -38,7 +38,11 @@ SF.AddHook("postload", function()
 	-- @param a - Alpha
 	-- @return New color
 	SF.DefaultEnvironment.Color = function (r, g, b, a)
-		return wrap({ r or 255, g or 255, b or 255, a or 255 })
+		if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
+		if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
+		if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
+		if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
+		return wrap({ r, g, b, a })
 	end
 end)
 

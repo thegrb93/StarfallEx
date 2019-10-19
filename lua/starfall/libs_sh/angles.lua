@@ -27,8 +27,10 @@ SF.AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
 
 	SF.DefaultEnvironment.Angle = function (p, y, r)
-		p = p or 0
-		return wrap({ p, y or p, r or p })
+		if p then checkluatype(p, TYPE_NUMBER) else p = 0 end
+		if y then checkluatype(y, TYPE_NUMBER) else y = p end
+		if r then checkluatype(r, TYPE_NUMBER) else r = p end
+		return wrap({ p, y, r })
 	end
 end)
 

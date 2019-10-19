@@ -1,5 +1,8 @@
 SF.Vectors = {}
 
+local checktype = SF.CheckType
+local checkluatype = SF.CheckLuaType
+
 --- Vector type
 -- @shared
 local vec_methods, vec_metamethods = SF.RegisterType("Vector")
@@ -21,8 +24,10 @@ SF.AddObjectUnwrapper(vec_metamethods, unwrap)
 
 SF.AddHook("postload", function()
 	SF.DefaultEnvironment.Vector = function (x, y, z)
-		x = x or 0
-		return wrap({ x, y or x, z or (y and 0 or x) })
+		if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
+		if y then checkluatype(y, TYPE_NUMBER) else y = x end
+		if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
+		return wrap({ x, y, z })
 	end
 end)
 
@@ -74,10 +79,10 @@ function vec_metamethods.__mul (a, b)
 			return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 		end
 
-		SF.CheckLuaType(b, TYPE_NUMBER)
+		checkluatype(b, TYPE_NUMBER)
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	else
-		SF.CheckLuaType(a, TYPE_NUMBER)
+		checkluatype(a, TYPE_NUMBER)
 		return wrap({ b[1] * a, b[2] * a, b[3] * a })
 	end
 end
@@ -90,11 +95,11 @@ function vec_metamethods.__div (a, b)
 		if dgetmeta(b) == vec_metamethods then
 			return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
 		else
-			SF.CheckLuaType(b, TYPE_NUMBER)
+			checkluatype(b, TYPE_NUMBER)
 			return wrap({ a[1] / b, a[2] / b, a[3] / b })
 		end
 	else
-		SF.CheckLuaType(a, TYPE_NUMBER)
+		checkluatype(a, TYPE_NUMBER)
 		return wrap({ a / b[1], a / b[2], a / b[3] })
 	end
 end
@@ -103,8 +108,8 @@ end
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
 function vec_metamethods.__add (a, b)
-	SF.CheckType(a, vec_metamethods)
-	SF.CheckType(b, vec_metamethods)
+	checktype(a, vec_metamethods)
+	checktype(b, vec_metamethods)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -113,8 +118,8 @@ end
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
 function vec_metamethods.__sub (a, b)
-	SF.CheckType(a, vec_metamethods)
-	SF.CheckType(b, vec_metamethods)
+	checktype(a, vec_metamethods)
+	checktype(b, vec_metamethods)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
@@ -122,7 +127,7 @@ end
 --- unary minus metamethod
 -- @return negated vector.
 function vec_metamethods.__unm (a)
-	SF.CheckType(a, vec_metamethods)
+	checktype(a, vec_metamethods)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
@@ -136,7 +141,7 @@ end
 -- @param v Vector to add
 -- @return nil
 function vec_methods:add (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	self[1] = self[1] + v[1]
 	self[2] = self[2] + v[2]
@@ -153,7 +158,7 @@ end
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	return SF.WrapObject(unwrap(self):AngleEx(unwrap(v)))
 end
@@ -162,7 +167,7 @@ end
 -- @param v Second Vector
 -- @return Vector
 function vec_methods:cross (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
@@ -173,7 +178,7 @@ local math_sqrt = math.sqrt
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistance (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -182,7 +187,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistanceSqr (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -191,7 +196,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:dot (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	return (self[1] * v[1] + self[2] * v[2] + self[3] * v[3])
 end
@@ -209,8 +214,8 @@ end
 -- @param t Tolerance number.
 -- @return bool True/False.
 function vec_methods:isEqualTol (v, t)
-	SF.CheckType(v, vec_metamethods)
-	SF.CheckLuaType(t, TYPE_NUMBER)
+	checktype(v, vec_metamethods)
+	checkluatype(t, TYPE_NUMBER)
 
 	return unwrap(self):IsEqualTol(unwrap(v), t)
 end
@@ -254,7 +259,7 @@ end
 -- @param n Scalar to multiply with.
 -- @return nil
 function vec_methods:mul (n)
-	SF.CheckLuaType(n, TYPE_NUMBER)
+	checkluatype(n, TYPE_NUMBER)
 
 	self[1] = self[1] * n
 	self[2] = self[2] * n
@@ -265,7 +270,7 @@ end
 -- @param n Scalar to divide by.
 -- @return nil
 function vec_methods:div (n)
-	SF.CheckLuaType(n, TYPE_NUMBER)
+	checkluatype(n, TYPE_NUMBER)
 
 	self[1] = self[1] / n
 	self[2] = self[2] / n
@@ -275,7 +280,7 @@ end
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to multiply with
 function vec_methods:vmul (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	self[1] = self[1] * v[1]
 	self[2] = self[2] * v[2]
@@ -285,7 +290,7 @@ end
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to divide by
 function vec_methods:vdiv (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	self[1] = self[1] / v[1]
 	self[2] = self[2] / v[2]
@@ -338,7 +343,7 @@ end
 -- @param b Angle to rotate by.
 -- @return nil.
 function vec_methods:rotate (b)
-	SF.CheckType(b, SF.Types["Angle"])
+	checktype(b, SF.Types["Angle"])
 
 	local vec = unwrap(self)
 	vec:Rotate(SF.UnwrapObject(b))
@@ -352,7 +357,7 @@ end
 -- @param b Angle to rotate by.
 -- @return Rotated Vector
 function vec_methods:getRotated (b)
-	SF.CheckType(b, SF.Types["Angle"])
+	checktype(b, SF.Types["Angle"])
 
 	local vec = unwrap(self)
 	vec:Rotate(SF.UnwrapObject(b))
@@ -366,13 +371,13 @@ end
 -- @param radians Angle to rotate by in radians or nil if degrees.
 -- @return Rotated vector
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
-	SF.CheckType(axis, vec_metamethods)
+	checktype(axis, vec_metamethods)
 
 	if degrees then
-		SF.CheckLuaType(degrees, TYPE_NUMBER)
+		checkluatype(degrees, TYPE_NUMBER)
 		radians = math.rad(degrees)
 	else
-		SF.CheckLuaType(radians, TYPE_NUMBER)
+		checkluatype(radians, TYPE_NUMBER)
 	end
 
 	local ca, sa = math.cos(radians), math.sin(radians)
@@ -388,7 +393,7 @@ end
 --- Copies x,y,z from a vector and returns a new vector
 -- @return The copy of the vector
 function vec_methods:clone()
-	SF.CheckType(self, vec_metamethods)
+	checktype(self, vec_metamethods)
 
 	return wrap({ self[1], self[2], self[3] })
 end
@@ -397,7 +402,7 @@ end
 -- @param v Second Vector
 -- @return nil
 function vec_methods:set(v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	self[1] = v[1]
 	self[2] = v[2]
@@ -408,7 +413,7 @@ end
 -- @param v Second Vector.
 -- @return nil
 function vec_methods:sub (v)
-	SF.CheckType(v, vec_metamethods)
+	checktype(v, vec_metamethods)
 
 	self[1] = self[1] - v[1]
 	self[2] = self[2] - v[2]
@@ -426,8 +431,8 @@ end
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
 function vec_methods:withinAABox (v1, v2)
-	SF.CheckType(v1, vec_metamethods)
-	SF.CheckType(v2, vec_metamethods)
+	checktype(v1, vec_metamethods)
+	checktype(v2, vec_metamethods)
 
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
 	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
