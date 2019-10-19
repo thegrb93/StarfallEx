@@ -134,6 +134,7 @@
 						<li><span class="realm_cl"></span><a href="hooks.html#hologrammatrix">hologrammatrix</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#hudconnected">hudconnected</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#huddisconnected">huddisconnected</a></li>
+						<li><span class="realm_cl"></span><a href="hooks.html#hudshoulddraw">hudshoulddraw</a></li>
 						<li><span class="realm_sv"></span><a href="hooks.html#input">input</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#inputPressed">inputPressed</a></li>
 						<li><span class="realm_cl"></span><a href="hooks.html#inputReleased">inputReleased</a></li>
@@ -408,6 +409,11 @@ Called when the player connects to a HUD component linked to the Starfall Chip <
 			<td class="name"><span class="realm_cl"></span><a href="#huddisconnected">huddisconnected</a>( &nbsp;)</td>
 			<td class="summary">
 Called when the player disconnects from a HUD component linked to the Starfall Chip </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#hudshoulddraw">hudshoulddraw</a>( string&nbsp;)</td>
+			<td class="summary">
+Called when a frame is requested to be drawn on hud.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#input">input</a>( input, value&nbsp;)</td>
@@ -1314,6 +1320,23 @@ Called when the player connects to a HUD component linked to the Starfall Chip</
 		<p>
 Called when the player disconnects from a HUD component linked to the Starfall Chip</p>
 		
+		
+		
+	</dd>
+	<dt><a name="hudshoulddraw"></a><span class="realm_cl"></span><strong>hudshoulddraw</strong>( string&nbsp;)</dt>
+	<dd>
+		<p>
+Called when a frame is requested to be drawn on hud. (2D Context)</p>
+		
+		<section class="parameters">
+			<h3>Parameters</h3>
+			<ul>
+				
+				<li>
+					<tt>string</tt> ― The name of the hud element trying to be drawn
+				</li>
+			</ul>
+		</section>
 		
 		
 	</dd>
