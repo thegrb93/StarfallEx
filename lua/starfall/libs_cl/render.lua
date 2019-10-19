@@ -262,6 +262,7 @@ SF.AddHook("cleanup", function (instance, hook)
 		render.OverrideDepthEnable(false, false)
 		render.SetScissorRect(0, 0, 0, 0, false)
 		render.CullMode(MATERIAL_CULLMODE_CCW)
+		render.SetLightingMode(0) 
 		for i = #matrix_stack, 1, -1 do
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
@@ -670,6 +671,14 @@ function render_library.setBackgroundColor(col, screen)
 	end
 end
 
+--- Sets the lighting mode
+-- @param mode The lighting mode. 0 - Default, 1 - Fullbright, 2 - Increased Fullbright
+function render_library.setLightingMode(mode)
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if mode ~= 0 and mode ~= 1 and mode ~= 2 then SF.Throw("Invalid mode.", 2) end
+	render.SetLightingMode(mode) 
+end
 
 --- Sets the draw color
 -- @param clr Color type
