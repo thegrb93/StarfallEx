@@ -746,7 +746,7 @@ Sets the whether an entity should be drawn or not </td>
 Set's the entity to collide with nothing but the world </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sv"></span><a href="#Entity:setParent">setParent</a>( ent, attachment&nbsp;)</td>
+			<td class="name"><span class="realm_sv"></span><a href="#Entity:setParent">setParent</a>( parent, attachment&nbsp;)</td>
 			<td class="summary">
 Parents the entity to another entity </td>
 		</tr>
@@ -1225,7 +1225,7 @@ Gets the position and angle of an attachment</p>
 	<section class="return">
 		<h3>Returns</h3>
 		
-		<p>vector position, and angle orientation</p>
+		<p>vector position, and angle orientation or nil if the attachment doesn't exist</p>
 		
 	</section>
 	
@@ -2893,7 +2893,7 @@ Set's the entity to collide with nothing but the world</p>
 	
 </dd>
 		
-<dt><span class="realm_sv"></span><a name="Entity:setParent"></a><strong>Entity:setParent</strong>( ent, attachment&nbsp;)</dt>
+<dt><span class="realm_sv"></span><a name="Entity:setParent"></a><strong>Entity:setParent</strong>( parent, attachment&nbsp;)</dt>
 <dd>
 	<p>
 Parents the entity to another entity</p>
@@ -2903,7 +2903,7 @@ Parents the entity to another entity</p>
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>ent</tt> ― Entity to parent to. nil to unparent</li>
+			<li><tt>parent</tt> ― Entity to parent to. nil to unparent</li>
 			<li><tt>attachment</tt> ― Optional string attachment name to parent to</li>
 		</ul>
 	</section>
