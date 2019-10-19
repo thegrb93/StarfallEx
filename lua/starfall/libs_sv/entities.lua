@@ -14,7 +14,7 @@ local ents_metatable = SF.Entities.Metatable
 --@class class
 --@name Entity
 local ents_methods = SF.Entities.Methods
-local wrap, unwrap = SF.Entities.Wrap, SF.Entities.Unwrap
+local ewrap, eunwrap = SF.Entities.Wrap, SF.Entities.Unwrap
 local owrap = SF.WrapObject
 local ounwrap = SF.UnwrapObject
 local checktype = SF.CheckType
@@ -67,57 +67,61 @@ local function checkvector(v)
 	end
 end
 
+local function getent(self)
+	local ent = eunwrap(self)
+	if ent and ent:IsValid() then
+		return ent
+	else
+		checktype(self, ents_metamethods, 3)
+		SF.Throw("Entity is not valid.", 3)
+	end
+end
+
 -- ------------------------- Methods ------------------------- --
 
 --- Parents the entity to another entity
--- @param ent Entity to parent to. nil to unparent
+-- @param parent Entity to parent to. nil to unparent
 -- @param attachment Optional string attachment name to parent to
-function ents_methods:setParent (ent, attachment)
-	checktype(self, ents_metatable)
-	local this = unwrap(self)
-	checkpermission(SF.instance, this, "entities.parent")
+function ents_methods:setParent(parent, attachment)
+	local ent = getent(self)
+	checkpermission(SF.instance, ent, "entities.parent")
 
-	if ent ~= nil then
-		checktype(ent, ents_metatable)
-		ent = unwrap(ent)
-		if ent:IsPlayer() then
-			if this:GetClass()~="starfall_hologram" then
+	if parent ~= nil then
+		local parentent = getent(parent)
+		if parentent:IsPlayer() then
+			if ent:GetClass()~="starfall_hologram" then
 				SF.Throw("Insufficient permissions", 2)
 			end
 		else
-			checkpermission(SF.instance, ent, "entities.parent")
+			checkpermission(SF.instance, parentent, "entities.parent")
 		end
 
-		this:SetParent(ent)
+		ent:SetParent(parentent)
 
 		if attachment then
 			checkluatype(attachment, TYPE_STRING)
-			this:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
+			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 		end
 	else
-		this:SetParent()
+		ent:SetParent()
 	end
 end
 
 --- Unparents the entity from another entity
-function ents_methods:unparent ()
-	local this = unwrap(self)
-	checkpermission(SF.instance, this, "entities.unparent")
-	this:SetParent(nil)
+function ents_methods:unparent()
+	local ent = getent(self)
+	checkpermission(SF.instance, ent, "entities.unparent")
+	ent:SetParent(nil)
 end
 
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
 -- @param e Entity to link the component to. nil to clear links.
-function ents_methods:linkComponent (e)
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:linkComponent(e)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.canTool")
 
 	if e then
-		checktype(e, ents_metatable)
-		local link = unwrap(e)
-		if not (link and link:IsValid()) then SF.Throw("Entity is not valid", 2) end
+		local link = getent(e)
 		checkpermission(SF.instance, link, "entities.canTool")
 
 		if link:GetClass()=="starfall_processor" and (ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud") then
@@ -142,10 +146,8 @@ end
 --- Sets a component's ability to lock a player's controls
 -- @param enable Whether the component will lock the player's controls when used
 function ents_methods:setComponentLocksControls(enable)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checkluatype(enable, TYPE_BOOL)
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" then
 		ent.locksControls = enable
@@ -157,16 +159,15 @@ end
 --- Returns a list of entities linked to a processor
 -- @return A list of components linked to the entity
 function ents_methods:getLinkedComponents()
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
+	local ent = getent(self)
 	if ent:GetClass() ~= "starfall_processor" then SF.Throw("The target must be a starfall_processor", 2) end
 	
 	local list = {}
 	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
-		if v.link == ent then list[#list+1] = wrap(v) end
+		if v.link == ent then list[#list+1] = ewrap(v) end
 	end
 	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
-		if v.link == ent then list[#list+1] = wrap(v) end
+		if v.link == ent then list[#list+1] = ewrap(v) end
 	end
 	
 	return list
@@ -177,22 +178,16 @@ end
 -- @param attacker damage attacker
 -- @param inflictor damage inflictor
 function ents_methods:applyDamage(amt, attacker, inflictor)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checkluatype(amt, TYPE_NUMBER)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.applyDamage")
 
 	if attacker then
-		checktype(attacker, ents_metatable)
-		attacker = unwrap(attacker)
-		if not (attacker and attacker:IsValid()) then SF.Throw("Entity is not valid", 2) end
+		attacker = getent(attacker)
 	end
 	if inflictor then
-		checktype(inflictor, ents_metatable)
-		inflictor = unwrap(inflictor)
-		if not (inflictor and inflictor:IsValid()) then SF.Throw("Entity is not valid", 2) end
+		inflictor = getent(inflictor)
 	end
 
 	ent:TakeDamage(amt, attacker, inflictor)
@@ -201,13 +196,11 @@ end
 --- Set the angular velocity of an object
 -- @param angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checktype(angvel, vec_meta)
 	angvel = vunwrap(angvel)
 	checkvector(angvel)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -219,13 +212,11 @@ end
 --- Applys a angular velocity to an object
 -- @param angvel The local angvel vector to apply
 function ents_methods:addAngleVelocity(angvel)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checktype(angvel, vec_meta)
 	angvel = vunwrap(angvel)
 	checkvector(angvel)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -236,14 +227,12 @@ end
 	
 --- Applies linear force to the entity
 -- @param vec The force vector
-function ents_methods:applyForceCenter (vec)
-	checktype(self, ents_metatable)
+function ents_methods:applyForceCenter(vec)
+	local ent = getent(self)
 	checktype(vec, vec_meta)
 	local vec = vunwrap(vec)
 	checkvector(vec)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -255,8 +244,8 @@ end
 --- Applies linear force to the entity with an offset
 -- @param vec The force vector
 -- @param offset An optional offset position
-function ents_methods:applyForceOffset (vec, offset)
-	checktype(self, ents_metatable)
+function ents_methods:applyForceOffset(vec, offset)
+	local ent = getent(self)
 	checktype(vec, vec_meta)
 	checktype(offset, vec_meta)
 
@@ -266,8 +255,6 @@ function ents_methods:applyForceOffset (vec, offset)
 	checkvector(vec)
 	checkvector(offset)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -278,14 +265,11 @@ end
 
 --- Applies angular force to the entity
 -- @param ang The force angle
-function ents_methods:applyAngForce (ang)
-	checktype(self, ents_metatable)
+function ents_methods:applyAngForce(ang)
+	local ent = getent(self)
 	checktype(ang, ang_meta)
 
 	local ang = aunwrap(ang)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkvector(ang)
 
 	local phys = ent:GetPhysicsObject()
@@ -322,15 +306,13 @@ end
 
 --- Applies torque
 -- @param torque The torque vector
-function ents_methods:applyTorque (torque)
-	checktype(self, ents_metatable)
+function ents_methods:applyTorque(torque)
+	local ent = getent(self)
 	checktype(torque, vec_meta)
 
 	local torque = vunwrap(torque)
 	checkvector(torque)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -341,11 +323,9 @@ end
 
 --- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
 -- @param func The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
-function ents_methods:addCollisionListener (func)
-	checktype(self, ents_metatable)
+function ents_methods:addCollisionListener(func)
+	local ent = getent(self)
 	checkluatype(func, TYPE_FUNCTION)
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
 
@@ -356,10 +336,8 @@ function ents_methods:addCollisionListener (func)
 end
 
 --- Removes a collision listening hook from the entity so that a new one can be added
-function ents_methods:removeCollisionListener ()
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:removeCollisionListener()
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if not ent.SF_CollisionCallback then SF.Throw("The entity isn't listening to collisions!", 2) end
 	ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
@@ -368,10 +346,8 @@ end
 
 --- Set's the entity to collide with nothing but the world
 -- @param nocollide Whether to collide with nothing except world or not.
-function ents_methods:setNocollideAll (nocollide)
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:setNocollideAll(nocollide)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setSolid")
 
 	ent:SetCollisionGroup (nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE)
@@ -379,11 +355,8 @@ end
 
 --- Sets whether an entity's shadow should be drawn
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
-function ents_methods:setDrawShadow (draw, ply)
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:setDrawShadow(draw, ply)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	if ply then
@@ -395,14 +368,11 @@ end
 
 --- Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.
 -- @param vec New position
-function ents_methods:setPos (vec)
-	checktype(self, ents_metatable)
+function ents_methods:setPos(vec)
+	local ent = getent(self)
 	checktype(vec, vec_meta)
 
 	local vec = vunwrap(vec)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setPos")
 
 	ent:SetPos(SF.clampPos(vec))
@@ -410,14 +380,11 @@ end
 
 --- Sets the entity's angles
 -- @param ang New angles
-function ents_methods:setAngles (ang)
-	checktype(self, ents_metatable)
+function ents_methods:setAngles(ang)
+	local ent = getent(self)
 	checktype(ang, ang_meta)
 
 	local ang = aunwrap(ang)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setAngles")
 
 	ent:SetAngles(ang)
@@ -425,14 +392,11 @@ end
 
 --- Sets the entity's linear velocity
 -- @param vel New velocity
-function ents_methods:setVelocity (vel)
-	checktype(self, ents_metatable)
+function ents_methods:setVelocity(vel)
+	local ent = getent(self)
 	checktype(vel, vec_meta)
 
 	local vel = vunwrap(vel)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkvector(vel)
 
 	local phys = ent:GetPhysicsObject()
@@ -444,22 +408,18 @@ function ents_methods:setVelocity (vel)
 end
 
 --- Removes an entity
-function ents_methods:remove ()
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not ent:IsValid() or ent:IsPlayer() then SF.Throw("Entity is not valid", 2) end
+function ents_methods:remove()
+	local ent = getent(self)
+	if ent:IsWorld() or ent:IsPlayer() then SF.Throw("Cannot remove world or player", 2) end
 	checkpermission(SF.instance, ent, "entities.remove")
 
 	ent:Remove()
 end
 
 --- Invokes the entity's breaking animation and removes it.
-function ents_methods:breakEnt ()
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) or ent:IsPlayer() or ent:IsFlagSet(FL_KILLME) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:breakEnt()
+	local ent = getent(self)
+	if ent:IsPlayer() or ent:IsFlagSet(FL_KILLME) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.remove")
 
 	ent:AddFlags(FL_KILLME)
@@ -470,11 +430,9 @@ end
 -- @param length How long the fire lasts
 -- @param radius (optional) How large the fire hitbox is (entity obb is the max)
 function ents_methods:ignite(length, radius)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checkluatype(length, TYPE_NUMBER)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) or ent:IsPlayer() then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.ignite")
 
 	if radius then
@@ -488,10 +446,7 @@ end
 
 --- Extinguishes an entity
 function ents_methods:extinguish()
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) or ent:IsPlayer() then SF.Throw("Entity is not valid", 2) end
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.ignite")
 
 	ent:Extinguish()
@@ -499,11 +454,8 @@ end
 
 --- Sets the entity frozen state
 -- @param freeze Should the entity be frozen?
-function ents_methods:setFrozen (freeze)
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:setFrozen(freeze)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -515,11 +467,8 @@ end
 
 --- Checks the entities frozen state
 -- @return True if entity is frozen
-function ents_methods:isFrozen ()
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:isFrozen()
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 	if phys:IsMoveable() then return false else return true end
@@ -528,11 +477,8 @@ end
 --- Sets the entity to be Solid or not.
 -- For more information please refer to GLua function http://wiki.garrysmod.com/page/Entity/SetNotSolid
 -- @param solid Boolean, Should the entity be solid?
-function ents_methods:setSolid (solid)
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:setSolid(solid)
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setSolid")
 
 	ent:SetNotSolid(not solid)
@@ -540,12 +486,9 @@ end
 
 --- Sets the entity's mass
 -- @param mass number mass
-function ents_methods:setMass (mass)
-	checktype(self, ents_metatable)
+function ents_methods:setMass(mass)
+	local ent = getent(self)
 	checkluatype(mass, TYPE_NUMBER)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -558,12 +501,9 @@ end
 
 --- Sets the entity's inertia
 -- @param vec Inertia tensor
-function ents_methods:setInertia (vec)
-	checktype(self, ents_metatable)
+function ents_methods:setInertia(vec)
+	local ent = getent(self)
 	checktype(vec, vec_meta)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	checkpermission(SF.instance, ent, "entities.setInertia")
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
@@ -580,11 +520,8 @@ end
 --- Sets the physical material of the entity
 -- @param mat Material to use
 function ents_methods:setPhysMaterial(mat)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checkluatype(mat, TYPE_STRING)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -596,10 +533,7 @@ end
 --- Get the physical material of the entity
 -- @return the physical material
 function ents_methods:getPhysMaterial()
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -609,10 +543,7 @@ end
 --- Checks whether entity has physics
 -- @return True if entity has physics
 function ents_methods:isValidPhys()
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	return phys ~= nil
 end
@@ -620,18 +551,15 @@ end
 --- Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.
 -- @server
 -- @return Boolean if the entity is being held or not
-function ents_methods:isPlayerHolding ()
-	checktype(self, ents_metatable)
-	return unwrap(self):IsPlayerHolding()
+function ents_methods:isPlayerHolding()
+	local ent = getent(self)
+	return ent:IsPlayerHolding()
 end
 
 --- Sets entity gravity
 -- @param grav Bool should the entity respect gravity?
-function ents_methods:enableGravity (grav)
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:enableGravity(grav)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -643,11 +571,8 @@ end
 
 --- Sets the entity drag state
 -- @param drag Bool should the entity have air resistence?
-function ents_methods:enableDrag (drag)
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:enableDrag(drag)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -658,11 +583,8 @@ end
 
 --- Sets the entity movement state
 -- @param move Bool should the entity move?
-function ents_methods:enableMotion (move)
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:enableMotion(move)
+	local ent = getent(self)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -675,11 +597,8 @@ end
 
 --- Sets the physics of an entity to be a sphere
 -- @param enabled Bool should the entity be spherical?
-function ents_methods:enableSphere (enabled)
-	checktype(self, ents_metatable)
-
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Entity is not valid", 2) end
+function ents_methods:enableSphere(enabled)
+	local ent = getent(self)
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("This function only works for prop_physics", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
@@ -713,8 +632,7 @@ end
 --- Gets what the entity is welded to. If the entity is parented, returns the parent.
 --@return The first welded/parent entity
 function ents_methods:isWeldedTo()
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
+	local ent = getent(self)
 	local constr = constraint.FindConstraint(ent, "Weld")
 	if constr then
 		return owrap(constr.Ent1 == ent and constr.Ent2 or constr.Ent1)
@@ -730,7 +648,7 @@ end
 --- Gets a table of all constrained entities to each other
 --@param filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
 function ents_methods:getAllConstrained(filter)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
 
 	local entity_lookup = {}
@@ -739,7 +657,7 @@ function ents_methods:getAllConstrained(filter)
 		if entity_lookup[ent] then return end
 		entity_lookup[ent] = true
 		if ent:IsValid() then
-			entity_table[#entity_table + 1] = wrap(ent)
+			entity_table[#entity_table + 1] = owrap(ent)
 			local constraints = constraint.GetTable(ent)
 			for k, v in pairs(constraints) do
 				if not filter or filter[v.Type] then
@@ -776,7 +694,7 @@ function ents_methods:getAllConstrained(filter)
 			end
 		end
 	end
-	recursive_find(unwrap(self))
+	recursive_find(eunwrap(self))
 
 	return entity_table
 end
@@ -790,15 +708,13 @@ end
 -- @param attachmentID Optional attachmentid the trail should attach to
 -- @param additive If the trail's rendering is additive
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checkluatype(material, TYPE_STRING)
-	local ent = unwrap(self)
 	local time = CurTime()
 	if ent._lastTrailSet == time then SF.Throw("Can't modify trail more than once per frame", 2) end
 	ent._lastTrailSet = time
 
 	if string.find(material, '"', 1, true) then SF.Throw("Invalid Material", 2) end
-	if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity", 2) end
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	local Data = {
@@ -816,10 +732,7 @@ end
 
 --- Removes trails from the entity
 function ents_methods:removeTrails()
-	checktype(self, ents_metatable)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity", 2) end
+	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
 
 	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
@@ -828,11 +741,8 @@ end
 --- Sets a prop_physics to be unbreakable
 -- @param on Whether to make the prop unbreakable
 function ents_methods:setUnbreakable(on)
-	checktype(self, ents_metatable)
+	local ent = getent(self)
 	checkluatype(on, TYPE_BOOL)
-	local ent = unwrap(self)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity", 2) end
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("setUnbreakable can only be used on prop_physics", 2) end
 
@@ -854,20 +764,16 @@ end
 -- @param other Entity or Vector to test
 -- @return bool True/False
 function ents_methods:testPVS(other)
-	checktype(self, ents_metatable)
-
-	local this = unwrap(self)
-	if not this or not this:IsValid() then SF.Throw("Entity is not valid", 2) end
+	local ent = getent(self)
 
 	local meta = debug.getmetatable(other)
 	if meta==vec_meta then
 		other = vunwrap(other)
 	elseif meta==ents_metatable then
-		other = unwrap(other)
-		if not other or not other:IsValid() then SF.Throw("Other entity is not valid", 2) end
+		other = getent(other)
 	else
 		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
 	end
 
-	return this:TestPVS(other)
+	return ent:TestPVS(other)
 end
