@@ -1269,7 +1269,7 @@ Called when a frame is requested to be drawn on screen. (2D/3D Context)";["name"
 Called when a frame is requested to be drawn on screen.";};["renderoffscreen"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)";["name"]="renderoffscreen";["param"]={};["realm"]="cl";["summary"]="\
 Called when a frame is requested to be drawn.";};["starfallUsed"]={["class"]="hook";["classForced"]=true;["description"]="\
-Called when a player uses the screen";["name"]="starfallUsed";["param"]={[1]="activator";["activator"]="Player using the screen";};["realm"]="cl";["summary"]="\
+Called when a player uses the screen";["name"]="starfallUsed";["param"]={[1]="activator";[2]="used";["activator"]="Player who used the screen or chip";["used"]="The screen or chip entity that was used";};["realm"]="cl";["summary"]="\
 Called when a player uses the screen ";};["think"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
 Think hook. Called each frame on the client and each game tick on the server.";["name"]="think";["param"]={};["realm"]="sh";["server"]=true;["summary"]="\
 Think hook.";};["tick"]={["class"]="hook";["classForced"]=true;["client"]=true;["description"]="\
