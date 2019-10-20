@@ -1875,7 +1875,8 @@ end
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
--- @param activator Player using the screen
+-- @param activator Player who used the screen or chip
+-- @param used The screen or chip entity that was used
 
 ---
 -- @name Screen information table

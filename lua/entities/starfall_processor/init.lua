@@ -46,6 +46,7 @@ function ENT:Use(activator)
 	if activator:IsPlayer() then
 		net.Start("starfall_processor_used")
 			net.WriteEntity(self)
+			net.WriteEntity(self)
 			net.WriteEntity(activator)
 		net.Broadcast()
 	end
