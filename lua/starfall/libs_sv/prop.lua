@@ -352,12 +352,18 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
 		if (not gamemode.Call("PlayerSpawnSENT", ply, class)) then SF.Throw("Another hook prevented the sent from spawning", 2) end
-		local sent = scripted_ents.GetStored( class )
-		if not (sent and sent.t.SpawnFunction) then SF.Throw("This sent is not spawnable!", 2) end
-		entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
 
-		if entity and entity:IsValid() then
-			entity:SetCreator( ply )
+		local sent = scripted_ents.GetStored( class )
+		if sent and sent.t.SpawnFunction then
+			entity = sent.t.SpawnFunction( sent.t, ply, SF.dumbTrace(NULL, pos), class )
+		else
+			entity = ents.Create( class )
+			if entity and entity:IsValid() then
+				entity:SetPos(pos)
+				entity:SetAngles(ang)
+				entity:Spawn()
+				entity:Activate()
+			end
 		end
 
 		hookcall = "PlayerSpawnedSENT"
@@ -389,6 +395,10 @@ function props_library.createSent (pos, ang, class, frozen)
 			if (npc.Skin) then
 				entity:SetSkin(npc.Skin)
 			end
+			entity:SetPos(pos)
+			entity:SetAngles(ang)
+			entity:Spawn()
+			entity:Activate()
 		end
 
 		hookcall = "PlayerSpawnedNPC"
@@ -434,6 +444,10 @@ function props_library.createSent (pos, ang, class, frozen)
 			entity.VehicleTable = vehicle
 
 			entity.ClassOverride = vehicle.Class
+			entity:SetPos(pos)
+			entity:SetAngles(ang)
+			entity:Spawn()
+			entity:Activate()
 		end
 
 		hookcall = "PlayerSpawnedVehicle"
@@ -442,11 +456,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	if entity and entity:IsValid() then
 
-		entity:SetPos(pos)
-		entity:SetAngles(ang)
-
-		entity:Spawn()
-		entity:Activate()
+		entity:SetCreator( ply )
 
 		local phys = entity:GetPhysicsObject()
 		if phys:IsValid() then
