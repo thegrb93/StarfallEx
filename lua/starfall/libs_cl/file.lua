@@ -130,6 +130,18 @@ function file_library.find (path, sorting)
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)
 end
 
+--- Enumerates a directory relative to gmod
+-- @param path The folder to enumerate, relative to garrysmod.
+-- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
+-- @return Table of file names
+-- @return Table of directory names
+function file_library.findInGame(path, sorting)
+	checkpermission (SF.instance, path, "file.exists")
+	checkluatype (path, TYPE_STRING)
+	if sorting then checkluatype (sorting, TYPE_STRING) end
+	return file.Find(SF.NormalizePath(path), "GAME", sorting)
+end
+
 --- Wait until all changes to the file are complete
 function file_methods:flush()
 	checktype(self, file_metamethods)
