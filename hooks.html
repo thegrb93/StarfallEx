@@ -491,7 +491,7 @@ Called when a frame is requested to be drawn on screen.</td>
 Called when a frame is requested to be drawn.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#starfallUsed">starfallUsed</a>( activator&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#starfallUsed">starfallUsed</a>( activator, used&nbsp;)</td>
 			<td class="summary">
 Called when a player uses the screen </td>
 		</tr>
@@ -1575,7 +1575,7 @@ Called when a frame is requested to be drawn. Doesn't require a screen or HUD bu
 		
 		
 	</dd>
-	<dt><a name="starfallUsed"></a><span class="realm_cl"></span><strong>starfallUsed</strong>( activator&nbsp;)</dt>
+	<dt><a name="starfallUsed"></a><span class="realm_cl"></span><strong>starfallUsed</strong>( activator, used&nbsp;)</dt>
 	<dd>
 		<p>
 Called when a player uses the screen</p>
@@ -1585,7 +1585,10 @@ Called when a player uses the screen</p>
 			<ul>
 				
 				<li>
-					<tt>activator</tt> ― Player using the screen
+					<tt>activator</tt> ― Player who used the screen or chip
+				</li>
+				<li>
+					<tt>used</tt> ― The screen or chip entity that was used
 				</li>
 			</ul>
 		</section>
