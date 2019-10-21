@@ -20,6 +20,8 @@ do
 	P.registerPrivilege("file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", { client = { default = 1 } })
 	P.registerPrivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
 	P.registerPrivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
+	P.registerPrivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
+	P.registerPrivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
 	P.registerPrivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
 end
 
@@ -124,10 +126,22 @@ end
 -- @return Table of file names
 -- @return Table of directory names
 function file_library.find (path, sorting)
-	checkpermission (SF.instance, path, "file.exists")
+	checkpermission (SF.instance, path, "file.find")
 	checkluatype (path, TYPE_STRING)
-	if sorting then checkluatype (sorting, TYPE_STRING) end
+	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)
+end
+
+--- Enumerates a directory relative to gmod
+-- @param path The folder to enumerate, relative to garrysmod.
+-- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
+-- @return Table of file names
+-- @return Table of directory names
+function file_library.findInGame(path, sorting)
+	checkpermission (SF.instance, path, "file.findInGame")
+	checkluatype (path, TYPE_STRING)
+	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
+	return file.Find(SF.NormalizePath(path), "GAME", sorting)
 end
 
 --- Wait until all changes to the file are complete

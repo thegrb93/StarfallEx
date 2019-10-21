@@ -506,8 +506,13 @@ end
 -- @shared
 -- @return True if valid, false if not
 function ents_methods:isValid()
-	local ent = getent(self)
-	return ent and ent:IsValid()
+	local ent = eunwrap(self)
+	if ent and ent:IsValid() then
+		return true
+	else
+		checktype(self, ents_metamethods, 2)
+		return false
+	end
 end
 
 --- Checks if an entity is a player.
