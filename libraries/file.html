@@ -237,6 +237,11 @@ Checks if a file exists </td>
 Enumerates a directory </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#file.findInGame">findInGame</a>( path, sorting&nbsp;)</td>
+			<td class="summary">
+Enumerates a directory relative to gmod </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#file.open">open</a>( path, mode&nbsp;)</td>
 			<td class="summary">
 Opens and returns a file </td>
@@ -361,6 +366,35 @@ Enumerates a directory</p>
 		<ul>
 			
 			<li><tt>path</tt> ― The folder to enumerate, relative to data/sf_filedata/.</li>
+			<li><tt>sorting</tt> ― Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<ol>
+			
+			<li>Table of file names</li>
+			<li>Table of directory names</li>
+		</ol>
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="file.findInGame"></a><strong>file.findInGame</strong>( path, sorting&nbsp;)</dt>
+<dd>
+	<p>
+Enumerates a directory relative to gmod</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>path</tt> ― The folder to enumerate, relative to garrysmod.</li>
 			<li><tt>sorting</tt> ― Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc</li>
 		</ul>
 	</section>
