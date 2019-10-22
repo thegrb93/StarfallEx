@@ -385,10 +385,6 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 
 	if not entI.Inputs[inputname] then SF.Throw("Invalid source input: " .. inputname) end
 	if not entO.Outputs[outputname] then SF.Throw("Invalid source output: " .. outputname) end
-	if entI.Inputs[inputname].Src then
-		local CheckInput = entI.Inputs[inputname]
-		if CheckInput.SrcId == outputname and CheckInput.Src == entO then SF.Throw("Source \"" .. inputname .. "\" is already wired to target \"" .. outputname .. "\"") end
-	end
 
 	WireLib.Link_Start(SF.instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
 	WireLib.Link_End(SF.instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, SF.instance.player)
