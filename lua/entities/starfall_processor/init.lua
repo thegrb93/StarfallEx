@@ -86,12 +86,14 @@ function ENT:SendCode(recipient)
 			end
 		end
 		local clientmain = ppdata.clientmain and ppdata.clientmain[sfdata.mainfile]
-		if sfdata.files[clientmain] then
-			sfdata.mainfile = clientmain
-		else
-			clientmain = SF.NormalizePath(string.GetPathFromFilename(sfdata.mainfile)..clientmain)
+		if clientmain then
 			if sfdata.files[clientmain] then
 				sfdata.mainfile = clientmain
+			else
+				clientmain = SF.NormalizePath(string.GetPathFromFilename(sfdata.mainfile)..clientmain)
+				if sfdata.files[clientmain] then
+					sfdata.mainfile = clientmain
+				end
 			end
 		end
 	end
