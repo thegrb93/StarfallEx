@@ -588,6 +588,7 @@ local function NextInTextureQueue()
 				timer.Simple(0, NextInTextureQueue)
 			else
 				local function copyTexture()
+					Panel:UpdateHTMLTexture()
 					local mat = Panel:GetHTMLMaterial()
 					if not mat then return end
 					render.PushRenderTarget(requestTbl.Texture)
