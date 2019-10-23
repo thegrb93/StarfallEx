@@ -4,6 +4,7 @@
 
 -- Register Priveleges
 SF.Permissions.registerPrivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
 
 local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
@@ -45,7 +46,11 @@ end)
 ---NOTIFY.CLEANUP
 -- @param length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
-	checkpermission(SF.instance, nil, "notification")
+	if SF.instance:isHUDActive() then
+		checkpermission(SF.instance, nil, "notification.hud")
+	else
+		checkpermission(SF.instance, nil, "notification")
+	end
 	checkluatype(text, TYPE_STRING)
 	checkluatype(type, TYPE_NUMBER)
 	checkluatype(length, TYPE_NUMBER)
@@ -58,7 +63,11 @@ end
 -- @param id String index of the notification
 -- @param text The text to display
 function notification_library.addProgress(id, text)
-	checkpermission(SF.instance, nil, "notification")
+	if SF.instance:isHUDActive() then
+		checkpermission(SF.instance, nil, "notification.hud")
+	else
+		checkpermission(SF.instance, nil, "notification")
+	end
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
 	local instance = SF.instance
@@ -76,7 +85,11 @@ end
 --- Removes the notification with the given index after 0.8 seconds
 -- @param id String index of the notification to kill
 function notification_library.kill(id)
-	checkpermission(SF.instance, nil, "notification")
+	if SF.instance:isHUDActive() then
+		checkpermission(SF.instance, nil, "notification.hud")
+	else
+		checkpermission(SF.instance, nil, "notification")
+	end
 	checkluatype(id, TYPE_STRING)
 	local instance = SF.instance
 
