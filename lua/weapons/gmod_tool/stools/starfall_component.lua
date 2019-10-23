@@ -210,7 +210,7 @@ function TOOL:Think()
 	if Type=="1" then
 		model = self:GetClientInfo("Model")
 	else
-		model = "models/bull/dynamicbutton.mdl"
+		model = self:GetClientInfo("ModelHUD")
 	end
 	if not (self.GhostEntity and self.GhostEntity:IsValid()) or self.GhostEntity:GetModel() ~= model then
 		self:MakeGhostEntity(model, Vector(0, 0, 0), Angle(0, 0, 0))
