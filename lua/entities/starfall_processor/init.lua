@@ -88,6 +88,11 @@ function ENT:SendCode(recipient)
 		local clientmain = ppdata.clientmain and ppdata.clientmain[sfdata.mainfile]
 		if sfdata.files[clientmain] then
 			sfdata.mainfile = clientmain
+		else
+			clientmain = SF.NormalizePath(string.GetPathFromFilename(sfdata.mainfile)..clientmain)
+			if sfdata.files[clientmain] then
+				sfdata.mainfile = clientmain
+			end
 		end
 	end
 	SF.SendStarfall("starfall_processor_download", sfdata, recipient)
