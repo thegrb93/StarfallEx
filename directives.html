@@ -168,6 +168,7 @@
 						
 						<li><a href="directives.html#author">--@author</a></li>
 						<li><a href="directives.html#client">--@client</a></li>
+						<li><a href="directives.html#clientmain">--@clientmain</a></li>
 						<li><a href="directives.html#include">--@include</a></li>
 						<li><a href="directives.html#includedir">--@includedir</a></li>
 						<li><a href="directives.html#model">--@model</a></li>
@@ -214,6 +215,11 @@ Set the author of the script.</td>
 			<td class="name" nowrap><a href="#client">--@client</a> </td>
 			<td class="summary">
 Set the processor to only run on the client.</td>
+		</tr>
+		<tr>
+			<td class="name" nowrap><a href="#clientmain">--@clientmain</a> </td>
+			<td class="summary">
+Set the client file to run as main.</td>
 		</tr>
 		<tr>
 			<td class="name" nowrap><a href="#include">--@include</a> path</td>
@@ -279,6 +285,20 @@ Set the processor to only run on the client. Shared is default</p>
 			
 			<p><pre class="example">
 --@client 
+-- CODE</pre></p>
+			
+		</section>
+	</dd>
+	<dt><a name="clientmain"></a><strong>--@clientmain</strong> </dt>
+	<dd>
+		<p>
+Set the client file to run as main. Can only be used in the main file.</p>
+		
+		<section class="usage">
+			<h3>Usage</h3>
+			
+			<p><pre class="example">
+--@clientmain somefile.txt 
 -- CODE</pre></p>
 			
 		</section>
