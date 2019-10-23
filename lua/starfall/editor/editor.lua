@@ -249,28 +249,38 @@ if CLIENT then
 
 		local ppdata = {}
 
+		local function findCodePath(path, curdir)
+			if string.sub(path, 1, 1)~="/" then
+				codepath = SF.NormalizePath(curdir .. path)
+				if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end
+			end
+			codepath = SF.NormalizePath(path)
+			if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end
+		end
+
 		local function recursiveLoad (path, curdir)
 			local code, codedir, codepath
 
-			if string.sub(path, 1, 1)~="/" then
-				codepath = SF.NormalizePath(curdir .. path)
-				if tbl.files[codepath] then return end
-				code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
+			local codepath = findCodePath(path, curdir)
+			if not codepath then
+				error("Bad include: " .. path)
 			end
-			if not code then
-				codepath = SF.NormalizePath(path)
-				if tbl.files[codepath] then return end
-				code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
-			end
-			codedir = string.GetPathFromFilename(codepath)
 
+			if tbl.files[codepath] then return end
+
+			code = openfiles[codepath] or file.Read("starfall/" .. codepath, "DATA")
 			if not code then
 				error("Bad include: " .. path)
 			end
 
+			codedir = string.GetPathFromFilename(codepath)
 			tbl.files[codepath] = code
 			SF.Preprocessor.ParseDirectives(codepath, code, ppdata)
 
+			local clientmain = ppdata.clientmain and ppdata.clientmain[codepath]
+			if clientmain then
+				ppdata.clientmain[codepath] = findCodePath(clientmain, curdir) or clientmain
+			end
 			if ppdata.includes and ppdata.includes[codepath] then
 				local inc = ppdata.includes[codepath]
 				if not tbl.includes[codepath] then
@@ -344,7 +354,7 @@ if CLIENT then
 		end
 
 		local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
-		if not tbl.files[clientmain] then
+		if clientmain and not tbl.files[clientmain] then
 			return false, "Clientmain not found: " .. clientmain
 		end
 
