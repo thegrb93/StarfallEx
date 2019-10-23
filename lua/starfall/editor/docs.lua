@@ -1114,7 +1114,7 @@ Returns the type of output name, or nil if it doesn't exist";["fname"]="outputTy
 Returns the type of output name, or nil if it doesn't exist ";};["outputs"]={["class"]="function";["classlib"]="Wirelink";["description"]="\
 Returns a table of all of the wirelink's outputs";["fname"]="outputs";["name"]="wirelink_methods:outputs";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
 Returns a table of all of the wirelink's outputs ";};};["name"]="Wirelink";["server"]=true;["summary"]="\
-Wirelink type ";["typtbl"]="wirelink_methods";};};["directives"]={[1]="author";[2]="client";[3]="include";[4]="includedir";[5]="model";[6]="name";[7]="server";["author"]={["class"]="directive";["classForced"]=true;["description"]="\
+Wirelink type ";["typtbl"]="wirelink_methods";};};["directives"]={[1]="author";[2]="client";[3]="clientmain";[4]="include";[5]="includedir";[6]="model";[7]="name";[8]="server";["author"]={["class"]="directive";["classForced"]=true;["description"]="\
 Set the author of the script. \
 This will set the author that will be shown on the overlay of the processor";["name"]="author";["param"]={[1]="author";["author"]="Author of the script";};["summary"]="\
 Set the author of the script.";["usage"]="\
@@ -1123,6 +1123,10 @@ Set the author of the script.";["usage"]="\
 Set the processor to only run on the client. Shared is default";["name"]="client";["param"]={};["summary"]="\
 Set the processor to only run on the client.";["usage"]="\
 --@client \
+-- CODE";};["clientmain"]={["class"]="directive";["classForced"]=true;["description"]="\
+Set the client file to run as main. Can only be used in the main file.";["name"]="clientmain";["param"]={};["summary"]="\
+Set the client file to run as main.";["usage"]="\
+--@clientmain somefile.txt \
 -- CODE";};["include"]={["class"]="directive";["classForced"]=true;["description"]="\
 Mark a file to be included in the upload. \
 This is required to use the file in require() and dofile()";["name"]="include";["param"]={[1]="path";["path"]="Path to the file";};["summary"]="\
