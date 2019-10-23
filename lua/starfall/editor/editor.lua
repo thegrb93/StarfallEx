@@ -265,8 +265,7 @@ if CLIENT then
 			codedir = string.GetPathFromFilename(codepath)
 
 			if not code then
-				print("Bad include: " .. path)
-				return
+				error("Bad include: " .. path)
 			end
 
 			tbl.files[codepath] = code
@@ -346,10 +345,13 @@ if CLIENT then
 
 		if ok then
 			return true, tbl
-		elseif msg:sub(1, 13) == "Bad include: " then
-			return false, msg
 		else
-			error(msg, 0)
+			local _1, _2, file = string.find(msg, "(Bad include%: .*)")
+			if file then
+				return false, file
+			else
+				error(msg, 0)
+			end
 		end
 	end
 
