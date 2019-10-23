@@ -71,16 +71,23 @@ function ENT:SendCode(recipient)
 		mainfile = self.mainfile,
 		files = self.files,
 	}
-	if self.instance and self.instance.ppdata and self.instance.ppdata.serverorclient then
-		sfdata.files = {}
-		for filename, code in pairs(self.files) do
-			if self.instance.ppdata.serverorclient[filename] == "server" then
-				if self.instance.ppdata.scriptnames and self.instance.ppdata.scriptnames[filename] then
-					sfdata.files[filename] = "--@name " .. self.instance.ppdata.scriptnames[filename]
+	local ppdata = self.instance and self.instance.ppdata
+	if ppdata then
+		if ppdata.serverorclient then
+			sfdata.files = {}
+			for filename, code in pairs(self.files) do
+				if ppdata.serverorclient[filename] == "server" then
+					if ppdata.scriptnames and ppdata.scriptnames[filename] then
+						sfdata.files[filename] = "--@name " .. ppdata.scriptnames[filename]
+					end
+				else
+					sfdata.files[filename] = code
 				end
-			else
-				sfdata.files[filename] = code
 			end
+		end
+		local clientmain = ppdata.clientmain and ppdata.clientmain[sfdata.mainfile]
+		if sfdata.files[clientmain] then
+			sfdata.mainfile = clientmain
 		end
 	end
 	SF.SendStarfall("starfall_processor_download", sfdata, recipient)

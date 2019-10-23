@@ -343,6 +343,11 @@ if CLIENT then
 			return false, "Loop in includes from: " .. cyclicFile
 		end
 
+		local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
+		if not tbl.files[clientmain] then
+			return false, "Clientmain not found: " .. clientmain
+		end
+
 		if ok then
 			return true, tbl
 		else

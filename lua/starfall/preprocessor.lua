@@ -170,6 +170,11 @@ SF.Preprocessor.SetGlobalDirective("client", function(args, filename, data)
 	data.serverorclient[filename] = "client"
 end)
 
+SF.Preprocessor.SetGlobalDirective("clientmain", function(args, filename, data)
+	if not data.clientmain then data.clientmain = {} end
+	data.clientmain[filename] = args
+end)
+
 --- Mark a file to be included in the upload.
 -- This is required to use the file in require() and dofile()
 -- @name include
@@ -232,4 +237,11 @@ end)
 -- @class directive
 -- @usage
 -- \--@client
+-- -- CODE
+
+--- Set the client file to run as main. Can only be used in the main file.
+-- @name clientmain
+-- @class directive
+-- @usage
+-- \--@clientmain somefile.txt
 -- -- CODE
