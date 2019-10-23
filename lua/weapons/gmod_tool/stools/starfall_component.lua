@@ -8,7 +8,7 @@ TOOL.Tab			= "Wire"
 -- ------------------------------- Sending / Receiving ------------------------------- --
 
 TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
-TOOL.ClientConVar["ModelHUD"] = "models/bull/dynamicbutton.mdl"
+TOOL.ClientConVar["ModelHUD"] = "models/spacecode/sfchip.mdl"
 TOOL.ClientConVar["Type"] = "1"
 TOOL.ClientConVar["parent"] = "1"
 cleanup.Register("starfall_components")
