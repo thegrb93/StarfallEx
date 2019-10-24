@@ -55,6 +55,15 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				function() return true end
 			}
+			
+			-- Temporary fix for #676
+			local function PropOwn(ply,ent)
+				ent:SetNWEntity("SFPP", ply)
+			end
+			
+			hook.Add("PlayerSpawnedSENT", "SFPP.PlayerSpawnedSENT", PropOwn)
+			hook.Add("PlayerSpawnedVehicle", "SFPP.PlayerSpawnedVehicle", PropOwn)
+			hook.Add("PlayerSpawnedSWEP", "SFPP.PlayerSpawnedSWEP", PropOwn)
 		else
 			P.checks = {
 				function(instance, target)
