@@ -123,8 +123,7 @@ function light_library.create(pos, size, brightness, color)
 	local light = {
 		data = {pos = vunwrap(pos), size = math.Clamp(size, 0, maxSize:GetFloat()), brightness = brightness, r=col.r, g=col.g, b=col.b, decay = 1000},
 		slot = slot,
-		dietime = 1,
-		on = on
+		dietime = 1
 	}
 
 	SF.instance.data.light.lights[light] = true
