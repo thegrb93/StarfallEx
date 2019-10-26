@@ -26,7 +26,7 @@ if CLIENT then
 	SF.Editor.CurrentTabHandler = CreateClientConVar("sf_editor_tab_editor", "wire", true, false)
 end
 
-l = file.Find("starfall/editor/tabhandlers/tab_*.lua", "LUA")
+local l = file.Find("starfall/editor/tabhandlers/tab_*.lua", "LUA")
 for _, name in pairs(l) do
 	name = name:sub(5,-5)
 	AddCSLuaFile("starfall/editor/tabhandlers/tab_"..name..".lua")
@@ -250,6 +250,7 @@ if CLIENT then
 		local ppdata = {}
 
 		local function findCodePath(path, curdir)
+			local codepath
 			if string.sub(path, 1, 1)~="/" then
 				codepath = SF.NormalizePath(curdir .. path)
 				if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end

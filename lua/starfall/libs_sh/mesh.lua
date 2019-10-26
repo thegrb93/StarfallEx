@@ -174,7 +174,7 @@ if CLIENT then
 
 	local dgetmeta = debug.getmetatable
 	local col_meta, vec_meta, thread_meta, thread_lib
-	local vwrap, vunwrap, cwrap, cunwraplocal, tunwrap
+	local vwrap, vunwrap, cwrap, cunwrap, tunwrap
 	local vertexCheck, vertexUnwrap
 	SF.AddHook("postload", function()
 		thread_lib = SF.Libraries.coroutine
@@ -486,7 +486,7 @@ if CLIENT then
 			return {he_face1,he_face2}
 		end
 
-		local function wrap_points( points )
+		function wrap_points( points )
 			local ret = {}
 			for k, p in pairs( points ) do
 				ret[#ret + 1] = {

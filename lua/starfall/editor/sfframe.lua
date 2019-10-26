@@ -438,7 +438,7 @@ function Editor:UpdateTabText(tab, title)
 	local _, text = getPreferredTitles(ed.chosenfile, ed.GetCode and ed:GetCode() or "")
 
 	title = title or ed.DefaultTitle
-	tabtext = title or text
+	local tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
 	if not ed:IsSaved() and tabtext:sub(-1) != "*" then

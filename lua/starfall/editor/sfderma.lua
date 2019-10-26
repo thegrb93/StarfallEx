@@ -1,7 +1,7 @@
 -- Starfall Derma
 
 -- Starfall Frame
-PANEL = {}
+local PANEL = {}
 
 PANEL.windows = {}
 

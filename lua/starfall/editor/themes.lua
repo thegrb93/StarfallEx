@@ -121,7 +121,7 @@ local function parseTextMate(text)
 
     -- Parse dict
 
-    function parseDict(dict)
+    local function parseDict(dict)
         if not dict.children then return { } end
 
         local tbl = { }

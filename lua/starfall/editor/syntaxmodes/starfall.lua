@@ -76,6 +76,7 @@ end
 
 -- cols[n] = { tokendata, color }
 local cols = {}
+local lastcol
 local lasttoken
 local unconnectable = {--Each token of this type shouldnt be connected because editor goes through them
 	["bracket"] = true,
@@ -799,7 +800,6 @@ function EDITOR:PaintTextOverlay()
 				startPos = #tokens
 			end
 		end
-		y2 = (self.Caret[1] - self:GetRowOffset(y) - self.Scroll[1]) * height
 		if x and y then
 			if not self.Rows[y][3] then
 				surface_SetDrawColor(colors.word_highlight.r,colors.word_highlight.g,colors.word_highlight.b,100)

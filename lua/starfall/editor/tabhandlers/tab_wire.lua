@@ -210,7 +210,7 @@ function TabHandler:RegisterSettings()
 
 	--- - FONTS
 	if system.IsLinux() then
-		label = vgui.Create("DLabel")
+		local label = vgui.Create("DLabel")
 		label:SetWrap(true)
 		label:SetText("Warning: You are running linux, you should make sure font is installed in your system or you wont be able to see it!")
 		label:SetPos(10, 0)
@@ -383,7 +383,7 @@ function PANEL:GetRowCache(line)
 	return self.Rows[line][2]
 end
 function PANEL:UnfoldHidden(line)
-	row = self.Rows[line]
+	local row = self.Rows[line]
 	if not row then return end
 	if row[3] then
 		local start = line - row.hiddenBy
