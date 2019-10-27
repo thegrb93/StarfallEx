@@ -25,8 +25,8 @@ SF.AddObjectUnwrapper(vec_metamethods, unwrap)
 SF.AddHook("postload", function()
 	SF.DefaultEnvironment.Vector = function (x, y, z)
 		if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
-		if y then checkluatype(y, TYPE_NUMBER) else y = x end
 		if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
+		if y then checkluatype(y, TYPE_NUMBER) else y = x end
 		return wrap({ x, y, z })
 	end
 end)
