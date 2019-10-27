@@ -13,10 +13,12 @@ TOOL.ClientConVar["Type"] = "1"
 TOOL.ClientConVar["parent"] = "1"
 cleanup.Register("starfall_components")
 
+local MakeComponent
+
 if SERVER then
 	CreateConVar('sbox_maxstarfall_components', 3, { FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_ARCHIVE })
 
-	local function MakeComponent(class, pl, Pos, Ang, model)
+	function MakeComponent(class, pl, Pos, Ang, model)
 		if not pl:CheckLimit("starfall_components") then return false end
 
 		local sf = ents.Create(class)
