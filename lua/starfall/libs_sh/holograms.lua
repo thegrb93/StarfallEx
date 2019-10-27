@@ -64,14 +64,16 @@ end
 
 SF.AddHook("deinitialize", function(inst)
 	local holos = inst.data.holograms.holos
-	local holo = next(holos)
-	while holo do
-		if (holo and holo:IsValid()) then
+	for holo, _ in pairs(holos) do
+		if holo:IsValid() then
 			holo:RemoveCallOnRemove("starfall_hologram_delete")
 			hologramOnDestroy(holo, holos, inst.player)
-			holo:Remove()
+			if CLIENT then
+				timer.Simple(0,function() holo:Remove() end)
+			else
+				holo:Remove()
+			end
 		end
-		holo = next(holos, holo)
 	end
 end)
 
@@ -309,6 +311,7 @@ else
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
+		if SF.instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
 
 		checkpermission(SF.instance, holo, "hologram.create")
 
