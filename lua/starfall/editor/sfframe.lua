@@ -873,8 +873,33 @@ function Editor:InitComponents()
 	self.C.Inf:SetImage("icon16/information.png")
 	self.C.Inf:Dock(RIGHT)
 	self.C.Inf.Paint = PaintFlatButton
+	self.CreditCount = 0
 	self.C.Inf.DoClick = function(btn)
 		self.C.Credit:SetVisible(not self.C.Credit:IsVisible())
+		self.CreditCount = self.CreditCount + 1
+		
+		if self.CreditCount == 6 then
+		
+		http.Fetch( "https://api.github.com/repos/thegrb93/StarfallEx/contributors",
+			function( body, len, headers, code )
+				local data = util.JSONToTable(body)
+				
+				local awesomePeople = "List of awesome people that contributed to StarfallEx:\n";
+				for k,v in ipairs(data) do
+					if v.login != "web-flow" then
+						awesomePeople = awesomePeople .. "\n" .. v.login
+					end
+				end
+				awesomePeople = awesomePeople .. "\n \nThanks!"
+				SF.Editor.openWithCode("Awesome people!", awesomePeople)
+				
+			end,
+			function( error )
+			end
+		 )
+		
+		end
+		
 	end
 
 	self.C.Sav:SetImage("icon16/disk.png")
