@@ -38,6 +38,7 @@ do
 	P.registerPrivilege("entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", { entities = {} })
 	P.registerPrivilege("entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", { entities = {} })
 	P.registerPrivilege("entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistence and change it's coefficient", { entities = {} })
+	P.registerPrivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
 	P.registerPrivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
 	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
 	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })

@@ -435,6 +435,25 @@ if SERVER then
 		phys:SetAngleDragCoefficient(coeff)
 	end
 
+	--- Returns air friction damping of the bone
+	-- @return Linear damping
+	-- @return Angular damping
+	function physobj_methods:getDamping()
+		local phys = unwrap(self)
+		return phys:GetDamping()
+	end
+	
+	--- Sets air friction damping of the bone
+	-- @param linear Number of the linear damping
+	-- @param angular Number of the angular damping
+	function physobj_methods:setDamping(linear, angular)
+		checkluatype(linear, TYPE_NUMBER)
+		checkluatype(angular, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.setDamping")
+		return phys:SetDamping(linear, angular)
+	end
+	
 	--- Sets the bone movement state
 	-- @param move Bool should the bone move?
 	function physobj_methods:enableMotion (move)
