@@ -1019,3 +1019,11 @@ function ents_methods:getForward()
 	local ent = getent(self)
 	return vwrap(ent:GetForward())
 end
+
+--- Returns the time the entity was created on
+-- @shared
+-- @return Seconds relative to timer.curtime()
+function ents_methods:getCreationTime()
+	local ent = getent(self)
+	return ent:GetCreationTime()
+end

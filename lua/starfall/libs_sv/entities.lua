@@ -768,3 +768,10 @@ function ents_methods:testPVS(other)
 
 	return ent:TestPVS(other)
 end
+
+--- Returns entity's creation ID (similar to entIndex, but the this ID is never reused)
+-- @return bool True/False
+function ents_methods:getCreationID()
+	local ent = getent(self)
+	return ent:GetCreationID()
+end
