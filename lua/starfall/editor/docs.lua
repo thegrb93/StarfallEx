@@ -212,10 +212,10 @@ Gets the clipping of an entity";["fname"]="getClipping";["name"]="ents_methods:g
 Gets the clipping of an entity ";};["getColor"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the color of an entity";["fname"]="getColor";["name"]="ents_methods:getColor";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Color";["server"]=true;["summary"]="\
 Gets the color of an entity ";};["getCreationID"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Returns entity's creation ID (similar to entIndex, but the this ID is never reused)";["fname"]="getCreationID";["name"]="ents_methods:getCreationID";["param"]={};["private"]=false;["realm"]="sv";["ret"]="bool True/False";["summary"]="\
-Returns entity's creation ID (similar to entIndex, but the this ID is never reused) ";};["getCreationTime"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
-Returns the time the entity was created on";["fname"]="getCreationTime";["name"]="ents_methods:getCreationTime";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Seconds relative to timer.curtime()";["server"]=true;["summary"]="\
-Returns the time the entity was created on ";};["getEyeAngles"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Returns entity's creation ID (similar to entIndex, but increments monotonically)";["fname"]="getCreationID";["name"]="ents_methods:getCreationID";["param"]={};["private"]=false;["realm"]="sv";["ret"]="The creation ID";["summary"]="\
+Returns entity's creation ID (similar to entIndex, but increments monotonically) ";};["getCreationTime"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Returns the timer.curtime() time the entity was created on";["fname"]="getCreationTime";["name"]="ents_methods:getCreationTime";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Seconds relative to server map start";["server"]=true;["summary"]="\
+Returns the timer.curtime() time the entity was created on ";};["getEyeAngles"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the entitiy's eye angles";["fname"]="getEyeAngles";["name"]="ents_methods:getEyeAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Angles of the entity's eyes";["server"]=true;["summary"]="\
 Gets the entitiy's eye angles ";};["getEyePos"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the entity's eye position";["fname"]="getEyePos";["name"]="ents_methods:getEyePos";["param"]={};["private"]=false;["realm"]="sh";["ret"]={[1]="Eye position of the entity";[2]="In case of a ragdoll, the position of the second eye";};["server"]=true;["summary"]="\
