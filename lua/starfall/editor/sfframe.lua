@@ -71,7 +71,11 @@ Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
 Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
-local defaultCode = [=[--@name
+function SF.DefaultCode()
+	if file.Exists("starfall/default.txt", "DATA") then
+		return file.Read("starfall/default.txt", "DATA")
+	else
+		local code = [=[--@name
 --@author
 --@shared
 
@@ -83,8 +87,11 @@ Reference Page: http://thegrb93.github.io/Starfall/
 
 Default Keyboard shortcuts: https://github.com/ajaxorg/ace/wiki/Default-Keyboard-Shortcuts
 ]]]=]
-defaultCode = string.gsub(defaultCode, "\r", "")
-
+		code = string.gsub(code, "\r", "")
+		file.Write("starfall/default.txt", code)
+		return code
+	end
+end
 
 cvars.AddChangeCallback("sf_editor_layout", function()
 	RunConsoleCommand("sf_editor_restart")
@@ -431,7 +438,7 @@ function Editor:UpdateTabText(tab, title)
 	local _, text = getPreferredTitles(ed.chosenfile, ed.GetCode and ed:GetCode() or "")
 
 	title = title or ed.DefaultTitle
-	tabtext = title or text
+	local tabtext = title or text
 	tab:SetToolTip(ed.chosenfile)
 	tabtext = tabtext or "Generic"
 	if not ed:IsSaved() and tabtext:sub(-1) != "*" then
@@ -507,7 +514,7 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 	local content = vgui.Create(th.ControlName)
 	content.parentpanel = self -- That's going to be Deprecated
 	content.GetTabHandler = function() return th end -- add :GetTabHandler()
-	content.IsSaved = function(self) return (not th.IsEditor) or self:GetCode() == self.savedCode or self:GetCode() == defaultCode or self:GetCode() == "" end
+	content.IsSaved = function(self) return (not th.IsEditor) or self:GetCode() == self.savedCode or self:GetCode() == SF.DefaultCode() or self:GetCode() == "" end
 	local sheet = self.C.TabHolder:AddSheet(extractNameFromFilePath(chosenfile), content)
 	content.chosenfile = chosenfile
 	sheet.Tab.content = content -- For easy access
@@ -934,9 +941,6 @@ function Editor:InitComponents()
 		if not node:GetFileName() or not (string.GetExtensionFromFilename(node:GetFileName()) == "txt" or string.GetExtensionFromFilename(node:GetFileName()) == "lua") then return end
 		self:Open(node:GetFileName(), nil, false)
 	end
-	self.C.Browser.tree.Paint = function(_, w, h) --Fix for offset
-		draw.RoundedBox(0, 1, 0, w-2, h, Color(255, 255, 255))
-	end
 
 	self.C.Val:SetText(" Click to validate...")
 	self.C.Val.UpdateColours = function(button, skin)
@@ -989,7 +993,6 @@ function Editor:InitComponents()
 	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for starfall by D.ツ") -- Sure why not ;)
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
-	self.C.Credit:SetEditable(false)
 
 end
 
@@ -1295,7 +1298,7 @@ function Editor:NewScript(incurrent)
 		self:GetActiveTab():SetText("Generic")
 		self.C.TabHolder:InvalidateLayout()
 
-		self:SetCode(defaultCode)
+		self:SetCode(SF.DefaultCode())
 		self:GetCurrentTabContent().savedCode = self:GetCurrentTabContent():GetCode() -- It may return different line endings etc
 	end
 end
