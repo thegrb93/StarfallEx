@@ -993,7 +993,7 @@ function Editor:InitComponents()
 	self.C.Credit:SetText("\t\tCREDITS\n\n\tEditor by: \tSyranide and Shandolum\n\n\tTabs (and more) added by Divran.\n\n\tFixed for GMod13 By Ninja101\n\n\tModified for starfall by D.ツ") -- Sure why not ;)
 	self.C.Credit:SetMultiline(true)
 	self.C.Credit:SetVisible(false)
-
+	self.C.Credit:SetEditable(false)
 end
 
 function Editor:GetSettings()
