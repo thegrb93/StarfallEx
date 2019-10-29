@@ -1020,9 +1020,9 @@ function ents_methods:getForward()
 	return vwrap(ent:GetForward())
 end
 
---- Returns the time the entity was created on
+--- Returns the timer.curtime() time the entity was created on
 -- @shared
--- @return Seconds relative to timer.curtime()
+-- @return Seconds relative to server map start
 function ents_methods:getCreationTime()
 	local ent = getent(self)
 	return ent:GetCreationTime()
