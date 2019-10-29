@@ -410,6 +410,31 @@ if SERVER then
 		phys:EnableDrag(drag and true or false)
 	end
 
+	--- Check if bone is affected by air resistance
+	-- @return boolean If bone is affected by drag
+	function physobj_methods:isDragEnabled()
+		local phys = unwrap(self)
+		return phys:IsDragEnabled()
+	end
+
+	--- Sets coefficient of air resistance affecting the bone
+	-- @param coeff Number how much drag affects the bone
+	function physobj_methods:setDragCoefficient(coeff)
+		checkluatype(coeff, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		phys:SetDragCoefficient(coeff)
+	end
+
+	--- Sets coefficient of air resistance affecting the bone when rotating
+	-- @param coeff Number how much drag affects the bone when rotating
+	function physobj_methods:setAngleDragCoefficient(coeff)
+		checkluatype(coeff, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		phys:SetAngleDragCoefficient(coeff)
+	end
+
 	--- Sets the bone movement state
 	-- @param move Bool should the bone move?
 	function physobj_methods:enableMotion (move)
