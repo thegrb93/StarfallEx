@@ -103,11 +103,12 @@ SF.AddHook("deinitialize", function(inst)
 	end
 end)
 
---- Creates a dynamic light
+--- Creates a dynamic light (make sure to draw it)
 -- @param pos The position of the light
 -- @param size The size of the light. Must be lower than sf_light_maxsize
 -- @param brightness The brightness of the light
 -- @param color The color of the light
+-- @return Dynamic light
 function light_library.create(pos, size, brightness, color)
 	if table.Count(SF.instance.data.light.lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
