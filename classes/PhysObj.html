@@ -268,6 +268,11 @@ Gets the angular velocity of the physics object </td>
 Gets the angles of the physics object </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:getDamping">getDamping</a>( &nbsp;)</td>
+			<td class="summary">
+Returns Movement damping of the bone.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:getEntity">getEntity</a>( &nbsp;)</td>
 			<td class="summary">
 Gets the entity attached to the physics object </td>
@@ -329,6 +334,11 @@ This includes velocity at the point induced by rotational velocity </td>
 Returns whether the game flags of the physics object are set.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:isDragEnabled">isDragEnabled</a>( &nbsp;)</td>
+			<td class="summary">
+Check if bone is affected by air resistance </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:isValid">isValid</a>( &nbsp;)</td>
 			<td class="summary">
 Checks if the physics object is valid </td>
@@ -344,9 +354,24 @@ Returns a vector in the reference frame of the world from the local frame of the
 Returns a normal vector in the reference frame of the world from the local frame of the physicsobject </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:setAngleDragCoefficient">setAngleDragCoefficient</a>( coeff&nbsp;)</td>
+			<td class="summary">
+Sets coefficient of air resistance affecting the bone when rotating.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:setAngleVelocity">setAngleVelocity</a>( angvel&nbsp;)</td>
 			<td class="summary">
 Sets the angular velocity of an object </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:setDamping">setDamping</a>( linear, angular&nbsp;)</td>
+			<td class="summary">
+Sets the movement damping of the bone.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:setDragCoefficient">setDragCoefficient</a>( coeff&nbsp;)</td>
+			<td class="summary">
+Sets coefficient of air resistance affecting the bone.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:setInertia">setInertia</a>( inertia&nbsp;)</td>
@@ -615,6 +640,27 @@ Gets the angles of the physics object</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="PhysObj:getDamping"></a><strong>PhysObj:getDamping</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns Movement damping of the bone.</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<ol>
+			
+			<li>Linear damping</li>
+			<li>Angular damping</li>
+		</ol>
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="PhysObj:getEntity"></a><strong>PhysObj:getEntity</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -846,6 +892,24 @@ Returns whether the game flags of the physics object are set.</p>
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="PhysObj:isDragEnabled"></a><strong>PhysObj:isDragEnabled</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Check if bone is affected by air resistance</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean If bone is affected by drag</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="PhysObj:isValid"></a><strong>PhysObj:isValid</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -914,6 +978,25 @@ Returns a normal vector in the reference frame of the world from the local frame
 	
 </dd>
 		
+<dt><span class="realm_sh"></span><a name="PhysObj:setAngleDragCoefficient"></a><strong>PhysObj:setAngleDragCoefficient</strong>( coeff&nbsp;)</dt>
+<dd>
+	<p>
+Sets coefficient of air resistance affecting the bone when rotating. Air resistance depends on the cross-section of the object.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>coeff</tt> ― Number how much drag affects the bone when rotating</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
 <dt><span class="realm_sv"></span><a name="PhysObj:setAngleVelocity"></a><strong>PhysObj:setAngleVelocity</strong>( angvel&nbsp;)</dt>
 <dd>
 	<p>
@@ -925,6 +1008,45 @@ Sets the angular velocity of an object</p>
 		<ul>
 			
 			<li><tt>angvel</tt> ― The local angvel vector to set</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="PhysObj:setDamping"></a><strong>PhysObj:setDamping</strong>( linear, angular&nbsp;)</dt>
+<dd>
+	<p>
+Sets the movement damping of the bone. Unlike air drag, it doesn't take into account the cross-section of the object.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>linear</tt> ― Number of the linear damping</li>
+			<li><tt>angular</tt> ― Number of the angular damping</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="PhysObj:setDragCoefficient"></a><strong>PhysObj:setDragCoefficient</strong>( coeff&nbsp;)</dt>
+<dd>
+	<p>
+Sets coefficient of air resistance affecting the bone. Air resistance depends on the cross-section of the object.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>coeff</tt> ― Number how much drag affects the bone</li>
 		</ul>
 	</section>
 	
