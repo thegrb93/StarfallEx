@@ -395,7 +395,7 @@ if SERVER then
 	
 	--- Sets bone gravity
 	-- @param grav Bool should the bone respect gravity?
-	function physobj_methods:enableGravity (grav)
+	function physobj_methods:enableGravity(grav)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.enableGravity")
 		phys:EnableGravity(grav and true or false)
@@ -404,15 +404,59 @@ if SERVER then
 
 	--- Sets the bone drag state
 	-- @param drag Bool should the bone have air resistence?
-	function physobj_methods:enableDrag (drag)
+	function physobj_methods:enableDrag(drag)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
 		phys:EnableDrag(drag and true or false)
 	end
 
+	--- Check if bone is affected by air resistance
+	-- @return boolean If bone is affected by drag
+	function physobj_methods:isDragEnabled()
+		local phys = unwrap(self)
+		return phys:IsDragEnabled()
+	end
+
+	--- Sets coefficient of air resistance affecting the bone. Air resistance depends on the cross-section of the object.
+	-- @param coeff Number how much drag affects the bone
+	function physobj_methods:setDragCoefficient(coeff)
+		checkluatype(coeff, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		phys:SetDragCoefficient(coeff)
+	end
+
+	--- Sets coefficient of air resistance affecting the bone when rotating. Air resistance depends on the cross-section of the object.
+	-- @param coeff Number how much drag affects the bone when rotating
+	function physobj_methods:setAngleDragCoefficient(coeff)
+		checkluatype(coeff, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		phys:SetAngleDragCoefficient(coeff)
+	end
+
+	--- Returns Movement damping of the bone.
+	-- @return Linear damping
+	-- @return Angular damping
+	function physobj_methods:getDamping()
+		local phys = unwrap(self)
+		return phys:GetDamping()
+	end
+	
+	--- Sets the movement damping of the bone. Unlike air drag, it doesn't take into account the cross-section of the object.
+	-- @param linear Number of the linear damping
+	-- @param angular Number of the angular damping
+	function physobj_methods:setDamping(linear, angular)
+		checkluatype(linear, TYPE_NUMBER)
+		checkluatype(angular, TYPE_NUMBER)
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.setDamping")
+		return phys:SetDamping(linear, angular)
+	end
+	
 	--- Sets the bone movement state
 	-- @param move Bool should the bone move?
-	function physobj_methods:enableMotion (move)
+	function physobj_methods:enableMotion(move)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.enableMotion")
 		phys:EnableMotion(move and true or false)
