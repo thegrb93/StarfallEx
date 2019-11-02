@@ -2025,8 +2025,8 @@ Enables a scissoring rect which limits the drawing area. Only works 2D contexts 
 Enables a scissoring rect which limits the drawing area.";};["getDefaultFont"]={["class"]="function";["description"]="\
 Gets the default font";["fname"]="getDefaultFont";["library"]="render";["name"]="render_library.getDefaultFont";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Default font";["summary"]="\
 Gets the default font ";};["getGameResolution"]={["class"]="function";["classForced"]=true;["description"]="\
-Returns width and height of the game window";["fname"]="getGameResolution";["library"]="render";["name"]="render_library.getGameResolution";["param"]={};["private"]=false;["realm"]="cl";["ret"]={[1]="the X size of the game window";[2]="the Y size of the game window";};["summary"]="\
-Returns width and height of the game window ";};["getResolution"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns width and height of the game window. If a rendertarget is selected, will return 1024, 1024";["fname"]="getGameResolution";["library"]="render";["name"]="render_library.getGameResolution";["param"]={};["private"]=false;["realm"]="cl";["ret"]={[1]="the X size of the game window";[2]="the Y size of the game window";};["summary"]="\
+Returns width and height of the game window.";};["getResolution"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns the render context's width and height";["fname"]="getResolution";["library"]="render";["name"]="render_library.getResolution";["param"]={};["private"]=false;["realm"]="cl";["ret"]={[1]="the X size of the current render context";[2]="the Y size of the current render context";};["summary"]="\
 Returns the render context's width and height ";};["getScreenEntity"]={["class"]="function";["description"]="\
 Returns the entity currently being rendered to";["fname"]="getScreenEntity";["library"]="render";["name"]="render_library.getScreenEntity";["param"]={};["private"]=false;["realm"]="cl";["ret"]="Entity of the screen or hud being rendered";["summary"]="\
