@@ -1651,7 +1651,7 @@ function render_library.isHUDActive()
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
--- @param view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
+-- @param tbl view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
