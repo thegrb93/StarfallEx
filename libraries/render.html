@@ -508,7 +508,7 @@ Pushes a perspective matrix onto the view matrix stack.</td>
 Reads the color of the specified pixel.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#render.renderView">renderView</a>( tbl, view&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#render.renderView">renderView</a>( tbl&nbsp;)</td>
 			<td class="summary">
 Renders the scene with the specified viewData to the current active render target.</td>
 		</tr>
@@ -1879,7 +1879,7 @@ Reads the color of the specified pixel.</p>
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="render.renderView"></a><strong>render.renderView</strong>( tbl, view&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="render.renderView"></a><strong>render.renderView</strong>( tbl&nbsp;)</dt>
 <dd>
 	<p>
 Renders the scene with the specified viewData to the current active render target.</p>
@@ -1889,8 +1889,7 @@ Renders the scene with the specified viewData to the current active render targe
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>tbl</tt></li>
-			<li><tt>view</tt> ― The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.</li>
+			<li><tt>tbl</tt> ― view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.</li>
 		</ul>
 	</section>
 	
