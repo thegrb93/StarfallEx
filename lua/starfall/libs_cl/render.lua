@@ -1619,19 +1619,28 @@ end
 -- @return the X size of the current render context
 -- @return the Y size of the current render context
 function render_library.getResolution()
-	local renderEnt = SF.instance.data.render.renderEnt
-	if renderEnt then
+	local data = SF.instance.data.render
+	if data.renderEnt then
 		return renderEnt:GetResolution()
 	end
-	return ScrW(), ScrH()
+	if data.usingRT then
+		return data.oldViewPort[3], data.oldViewPort[4]
+	else
+		return ScrW(), ScrH()
+	end
 end
 
---- Returns width and height of the game window
+--- Returns width and height of the game window. If a rendertarget is selected, will return 1024, 1024
 -- @class function
 -- @return the X size of the game window
 -- @return the Y size of the game window
 function render_library.getGameResolution()
-	return ScrW(), ScrH()
+	local data = SF.instance.data.render
+	if data.usingRT then
+		return data.oldViewPort[3], data.oldViewPort[4]
+	else
+		return ScrW(), ScrH()
+	end
 end
 
 --- Does a trace and returns the color of the textel the trace hits.
