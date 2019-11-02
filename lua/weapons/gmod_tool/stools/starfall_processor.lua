@@ -233,7 +233,219 @@ function TOOL:Think()
 end
 
 if CLIENT then
+	
+	--[[	TODO
+		
+			for editor script:
+		- display @name directive instead of filepath
+		- display realm
+		
+			for instance chip:
+		- display name, authros, ops
+		
+		- better particles
+		- search for a good font, mb starfall already has some good ones
+		- mb turn off world tooltip for sf chips, optional turned off by default tho
+		- convar to disable custom screen
+		- loads of optimization
+		
+	]]--
+	
+	surface.CreateFont("StarfallToolTitle", {
+		font = "Arial",
+		extended = false,
+		size = 64,
+		weight = 500,
+		blursize = 0,
+		scanlines = 0,
+		antialias = true,
+		underline = false,
+		italic = false,
+		strikeout = false,
+		symbol = false,
+		rotary = false,
+		shadow = false,
+		additive = false,
+		outline = false,
+	})
+	
+	surface.CreateFont("StarfallToolSmall", {
+		font = "Arial",
+		extended = false,
+		size = 35,
+		weight = 500,
+		blursize = 0,
+		scanlines = 0,
+		antialias = true,
+		underline = false,
+		italic = false,
+		strikeout = false,
+		symbol = false,
+		rotary = false,
+		shadow = false,
+		additive = false,
+		outline = false,
+	})
+	
+	local colors = {
+		bg = Color(33,33,33, 50),
+		fg = Color(255,255,255),
+		sf = Color(20,100,255),
+		sv = Color(0,161,255),
+		cl = Color(255,191,0),
+	}
+	
+	
+	local star_mat = Material("radon/starfall2")
+	local star_count = 8
+	local starflakes = {}
+	
+	local function getRandomFlake(id, prvVel, fromBottom)
+		return {
+			y = fromBottom and math.random(255+30,255+60) or math.random(-30,-60),
+			--x = 235/star_count*id,
+			x = 255 / star_count * id,
+			xvel = (prvVel or 0) * 0.3 + math.Rand(-0.1,0.1),
+			yvel = math.Rand(0.5,1) * (fromBottom and -1 or 1),
+			ang = math.Rand(0.5, 1),
+			angvel = math.Rand(0.5, 1),
+			size = math.random(50,80),
+			color = Color(math.random(0,40), math.random(120,190), math.random(200,255)),
+		}
+	end
+	
+	for i = 1, star_count do
+		local flake = getRandomFlake(i)
+		starflakes[i] = flake
+	end
+	
+	local prvEyeYaw = 0
+	
+	local sfToolMat = nil
+	local sfToolRt = nill
+	
+	local fileData = nil
+	local function updateFileData()
+		
+		local path = SF.Editor.getOpenFile()
+		if not path then return end
+		
+		local file = file.Read("starfall/"..path, "DATA")
+		if not file then return end
+		
+		local ppdata = {}
+		SF.Preprocessor.ParseDirectives("v", file, ppdata)
+		
+		fileData = {
+			name   = ppdata.scriptnames.v,
+			author = ppdata.scriptauthors.v,
+			realm  = ppdata.serverorclient.v or "shared"
+		}
+		
+	end
+	
+	
+	updateFileData()
+	PrintTable(fileData)
+	
+	
+	function TOOL:DrawToolScreen(w, h)
+		
+		if not sfToolMat then
+			sfToolRt = GetRenderTarget( "sf_tool_rt", w, h) 
+			sfToolMat = CreateMaterial( "sf_tool_mat", "UnlitGeneric", {
+				["$basetexture"] = sfToolRt:GetName(),
+				["$translucent"] = 1,
+				["$vertexcolor"] = 1
+			} )
+		end
 
+		render.PushRenderTarget(sfToolRt)
+		cam.Start2D()
+			
+			-- SF.Editor not valid at start of the game
+			--local filename = SF.Editor.getOpenFile() or "main"
+			
+			local ply = self:GetOwner()
+			
+			-- shake particles based on view yaw rotation
+			local eyeAng = ply:EyeAngles().y
+			local eyeYawVel = (((eyeAng - prvEyeYaw) % 360 ) + 360 ) % 360
+			if eyeYawVel > 180 then eyeYawVel = eyeYawVel - 360 end
+			prvEyeYaw = eyeAng
+			
+			-- shake particles based on left/right velocity
+			self.velY = self.velY or 0
+			local vel = ply:WorldToLocal(ply:GetPos() + ply:GetVelocity())
+			local velY = vel.y
+			local velX = vel.x / 10000
+			
+			-- cover the default texture
+			surface.SetDrawColor(colors.bg)
+			surface.DrawRect(0,0,w,h)
+			
+			-- render the particles
+			surface.SetMaterial(star_mat)
+			for i = 1, star_count do
+				
+				local flake = starflakes[i]
+				
+				flake.yvel = flake.yvel + velX
+				flake.xvel = flake.xvel + eyeYawVel/30 + velY/6000
+				
+				flake.x = flake.x + flake.xvel
+				flake.y = flake.y + flake.yvel
+				flake.ang = flake.ang + flake.angvel
+				
+				flake.angvel = flake.angvel + flake.xvel / 1000
+
+				local flakeAlpha = 255+60-flake.y
+				
+				if flakeAlpha <= 0 or flake.y < -60 then
+					starflakes[i] = getRandomFlake(i, flake.xvel, flake.y < -60)
+				elseif flake.x < -30 then
+					flake.x = w + 30
+				elseif flake.x > w + 30 then
+					flake.x = -30
+				end
+				
+				surface.SetDrawColor(flake.color.r, flake.color.g, flake.color.b, flakeAlpha)
+				surface.DrawTexturedRectRotated(flake.x, flake.y, flake.size, flake.size, flake.ang)
+				
+			end
+			
+			
+			draw.SimpleTextOutlined("Starfall", "StarfallToolTitle", w/2, 40, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, colors.bg)
+			
+			local ent = ply:GetEyeTraceNoCursor().Entity
+			
+			if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" and ent.instance then
+				
+				-- this will return nil sometimes, find out why
+				--draw.SimpleTextOutlined(ent.instance.ppdata.scriptnames.main, "StarfallToolSmall", w/2, h/2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, colors.bg)
+				
+			elseif SF.Editor then
+				
+				--draw.SimpleTextOutlined(SF.Editor.getOpenFile() or "main", "StarfallToolSmall", w/2, h/2, Color(255,255,255), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER, 4, colors.bg)
+				
+			end
+			--[[
+				ppdata:
+			scriptauthors:
+					main	=	
+			scriptnames:
+					main	=	Cipeczka
+			]]
+		cam.End2D()
+		render.PopRenderTarget()
+		
+		surface.SetDrawColor( 255, 255, 255, 255 )
+		surface.SetMaterial( sfToolMat )
+		surface.DrawTexturedRect( 0, 0, w, h )
+	
+	end
+	
+	
 	local lastclick = CurTime()
 
 	local function GotoDocs(button)
