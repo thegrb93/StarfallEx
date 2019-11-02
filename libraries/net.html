@@ -248,6 +248,11 @@ Reads an angle from the net message </td>
 Reads a bit from the net message </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.readBool">readBool</a>( &nbsp;)</td>
+			<td class="summary">
+Reads a boolean from the net message </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.readColor">readColor</a>( &nbsp;)</td>
 			<td class="summary">
 Reads a color from the net message </td>
@@ -338,6 +343,11 @@ Writes an angle to the net message </td>
 			<td class="name"><span class="realm_sh"></span><a href="#net.writeBit">writeBit</a>( t&nbsp;)</td>
 			<td class="summary">
 Writes a bit to the net message </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#net.writeBool">writeBool</a>( t&nbsp;)</td>
+			<td class="summary">
+Writes a bool to the net message </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#net.writeColor">writeColor</a>( t&nbsp;)</td>
@@ -528,6 +538,24 @@ Reads a bit from the net message</p>
 		<h3>Returns</h3>
 		
 		<p>The bit that was read. (0 for false, 1 for true)</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.readBool"></a><strong>net.readBool</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Reads a boolean from the net message</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The boolean that was read.</p>
 		
 	</section>
 	
@@ -874,6 +902,25 @@ Writes an angle to the net message</p>
 <dd>
 	<p>
 Writes a bit to the net message</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>t</tt> ― The bit to be written. (0 for false, 1 (or anything) for true)</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="net.writeBool"></a><strong>net.writeBool</strong>( t&nbsp;)</dt>
+<dd>
+	<p>
+Writes a bool to the net message</p>
 	
 	
 	<section class="parameters">
