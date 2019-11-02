@@ -337,15 +337,15 @@ end
 
 --- Writes a bit to the net message
 -- @shared
--- @param t The bit to be written. (boolean)
+-- @param t The bit to be written. (0 for false, 1 (or anything) for true)
 
 function net_library.writeBit(t)
 	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_BOOL)
+	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, net.WriteBit, 1, t)
+	write(instance, net.WriteBit, 1, t~=0)
 	return true
 end
 
@@ -355,6 +355,28 @@ end
 
 function net_library.readBit()
 	return net.ReadBit()
+end
+
+--- Writes a bool to the net message
+-- @shared
+-- @param t The bit to be written. (boolean)
+
+function net_library.writeBool(t)
+	local instance = SF.instance
+	if not instance.data.net.started then SF.Throw("net message not started", 2) end
+
+	checkluatype (t, TYPE_BOOL)
+
+	write(instance, net.WriteBool, 1, t)
+	return true
+end
+
+--- Reads a boolean from the net message
+-- @shared
+-- @return The boolean that was read.
+
+function net_library.readBool()
+	return net.ReadBool()
 end
 
 --- Writes a double to the net message
