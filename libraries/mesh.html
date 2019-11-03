@@ -213,12 +213,12 @@ Mesh library.</p>
 	<table class="list">
 	
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#mesh.createFromObj">createFromObj</a>( obj, thread, triangulate&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#mesh.createFromObj">createFromObj</a>( obj, threaded, triangulate&nbsp;)</td>
 			<td class="summary">
 Creates a mesh from an obj file.</td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#mesh.createFromTable">createFromTable</a>( verteces, thread&nbsp;)</td>
+			<td class="name"><span class="realm_cl"></span><a href="#mesh.createFromTable">createFromTable</a>( verteces, threaded&nbsp;)</td>
 			<td class="summary">
 Creates a mesh from vertex data.</td>
 		</tr>
@@ -228,7 +228,7 @@ Creates a mesh from vertex data.</td>
 Returns a table of visual meshes of given model or nil if the model is invalid </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><a href="#mesh.parseObj">parseObj</a>( obj, thread, triangulate&nbsp;)</td>
+			<td class="name"><span class="realm_sh"></span><a href="#mesh.parseObj">parseObj</a>( obj, threaded, triangulate&nbsp;)</td>
 			<td class="summary">
 Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents </td>
 		</tr>
@@ -252,7 +252,7 @@ Returns how many triangles can be rendered </td>
 	<dl>
 		
 		
-<dt><span class="realm_cl"></span><a name="mesh.createFromObj"></a><strong>mesh.createFromObj</strong>( obj, thread, triangulate&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="mesh.createFromObj"></a><strong>mesh.createFromObj</strong>( obj, threaded, triangulate&nbsp;)</dt>
 <dd>
 	<p>
 Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.</p>
@@ -263,7 +263,7 @@ Creates a mesh from an obj file. Only supports triangular meshes with normals an
 		<ul>
 			
 			<li><tt>obj</tt> ― The obj file data</li>
-			<li><tt>thread</tt> ― An optional thread object that can be used to load the mesh over time to prevent hitting quota limit</li>
+			<li><tt>threaded</tt> ― Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit</li>
 			<li><tt>triangulate</tt> ― Whether to triangulate faces. (Consumes more CPU)</li>
 		</ul>
 	</section>
@@ -279,7 +279,7 @@ Creates a mesh from an obj file. Only supports triangular meshes with normals an
 	
 </dd>
 		
-<dt><span class="realm_cl"></span><a name="mesh.createFromTable"></a><strong>mesh.createFromTable</strong>( verteces, thread&nbsp;)</dt>
+<dt><span class="realm_cl"></span><a name="mesh.createFromTable"></a><strong>mesh.createFromTable</strong>( verteces, threaded&nbsp;)</dt>
 <dd>
 	<p>
 Creates a mesh from vertex data.</p>
@@ -290,7 +290,7 @@ Creates a mesh from vertex data.</p>
 		<ul>
 			
 			<li><tt>verteces</tt> ― Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex</li>
-			<li><tt>thread</tt> ― An optional thread object that can be used to load the mesh over time to prevent hitting quota limit</li>
+			<li><tt>threaded</tt> ― Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit</li>
 		</ul>
 	</section>
 	
@@ -332,7 +332,7 @@ Returns a table of visual meshes of given model or nil if the model is invalid</
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><a name="mesh.parseObj"></a><strong>mesh.parseObj</strong>( obj, thread, triangulate&nbsp;)</dt>
+<dt><span class="realm_sh"></span><a name="mesh.parseObj"></a><strong>mesh.parseObj</strong>( obj, threaded, triangulate&nbsp;)</dt>
 <dd>
 	<p>
 Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents</p>
@@ -343,7 +343,7 @@ Parses obj data into a table of vertices, normals, texture coordinates, colors, 
 		<ul>
 			
 			<li><tt>obj</tt> ― The obj data</li>
-			<li><tt>thread</tt> ― An optional thread object to gradually parse the data to prevent exceeding cpu</li>
+			<li><tt>threaded</tt> ― Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit</li>
 			<li><tt>triangulate</tt> ― Whether to triangulate the faces</li>
 		</ul>
 	</section>
