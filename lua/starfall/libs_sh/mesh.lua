@@ -7,10 +7,9 @@ local checkpermission = SF.Permissions.check
 -- @shared
 local mesh_library = SF.RegisterLibrary("mesh")
 
-local thread_meta, thread_lib
+local thread_lib
 SF.AddHook("postload", function()
 	thread_lib = SF.Libraries.coroutine
-	thread_meta = SF.Coroutine.Metatable
 end)
 
 function SF.ParseObj(obj, thread, Vector, triangulate)
@@ -150,13 +149,15 @@ end
 
 --- Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents
 -- @param obj The obj data
--- @param thread An optional thread object to gradually parse the data to prevent exceeding cpu
+-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 -- @param triangulate Whether to triangulate the faces
 -- @return The table of vertices that can be passed to mesh.buildFromTriangles
 -- @return The table of obj data. table.positions can be given to prop.createCustom
-function mesh_library.parseObj(obj, thread, triangulate)
+function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
-	if thread ~= nil then checktype(thread, thread_meta) end
+	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
+	local thread
+	if threaded then thread = coroutine.running() if not thread then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 	if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
 
 	return SF.ParseObj(obj, thread, SF.DefaultEnvironment.Vector, triangulate)
@@ -173,11 +174,10 @@ if CLIENT then
 	SF.Mesh.Metatable = mesh_metamethods
 
 	local dgetmeta = debug.getmetatable
-	local col_meta, vec_meta, thread_meta, thread_lib
+	local col_meta, vec_meta
 	local vwrap, vunwrap, cwrap, cunwrap, tunwrap
 	local vertexCheck, vertexUnwrap
 	SF.AddHook("postload", function()
-		thread_lib = SF.Libraries.coroutine
 		vec_meta = SF.Vectors.Metatable
 		col_meta = SF.Color.Metatable
 		thread_meta = SF.Coroutine.Metatable
@@ -238,13 +238,15 @@ if CLIENT then
 
 	--- Creates a mesh from vertex data.
 	-- @param verteces Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex
-	-- @param thread An optional thread object that can be used to load the mesh over time to prevent hitting quota limit
+	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 	-- @return Mesh object
 	-- @client
-	function mesh_library.createFromTable(verteces, thread)
+	function mesh_library.createFromTable(verteces, threaded)
 		checkpermission (SF.instance, nil, "mesh")
 		checkluatype (verteces, TYPE_TABLE)
-		if thread ~= nil then checktype(thread, thread_meta) end
+		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
+		local thread
+		if threaded then thread = coroutine.running() if not thread then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 
 		local nvertices = #verteces
 		if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
@@ -276,13 +278,16 @@ if CLIENT then
 
 	--- Creates a mesh from an obj file. Only supports triangular meshes with normals and texture coordinates.
 	-- @param obj The obj file data
-	-- @param thread An optional thread object that can be used to load the mesh over time to prevent hitting quota limit
+	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 	-- @param triangulate Whether to triangulate faces. (Consumes more CPU)
 	-- @return Mesh object
 	-- @client
-	function mesh_library.createFromObj(obj, thread, triangulate)
+	function mesh_library.createFromObj(obj, threaded, triangulate)
 		checkluatype (obj, TYPE_STRING)
-		if thread ~= nil then checktype(thread, thread_meta) end
+		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
+		local thread
+		if threaded then thread = coroutine.running() if not thread then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+
 		if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
 
 		local instance = SF.instance
