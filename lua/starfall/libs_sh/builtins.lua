@@ -1041,6 +1041,13 @@ function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, origi
 	return SF.WrapObject(worldPos), SF.WrapObject(worldAngles)
 end
 
+--- Generates the CRC checksum of the current code (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
+-- @return The unsigned 32 bit checksum as a string
+function SF.DefaultEnvironment.crcSource()
+	local inst = SF.instance
+	return util.CRC(inst.source[inst.mainfile])
+end
+
 do
 	local middleclass = {
 		_VERSION     = 'middleclass v4.1.1',
