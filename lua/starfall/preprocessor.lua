@@ -217,7 +217,6 @@ end)
 -- -- CODE
 
 --- Set the model of the processor entity.
--- This does not set the model of the screen entity
 -- @name model
 -- @class directive
 -- @param model String of the model
