@@ -1157,8 +1157,7 @@ Mark a directory to be included in the upload.";["usage"]="\
 require( \"lib/someLibraryInLib.txt\" ) \
 require( \"lib/someOtherLibraryInLib.txt\" ) \
 -- CODE";};["model"]={["class"]="directive";["classForced"]=true;["description"]="\
-Set the model of the processor entity. \
-This does not set the model of the screen entity";["name"]="model";["param"]={[1]="model";["model"]="String of the model";};["summary"]="\
+Set the model of the processor entity.";["name"]="model";["param"]={[1]="model";["model"]="String of the model";};["summary"]="\
 Set the model of the processor entity.";["usage"]="\
 --@model models/props_junk/watermelon01.mdl \
 -- CODE";};["name"]={["class"]="directive";["classForced"]=true;["description"]="\
