@@ -105,6 +105,15 @@ function physobj_methods:getVelocity()
 	return vwrap(unwrap(self):GetVelocity())
 end
 
+--- Gets the axis aligned bounding box of the physics object
+-- @shared
+-- @return The mins of the AABB
+-- @return The maxs of the AABB
+function physobj_methods:getAABB()
+	local a, b = unwrap(self):GetAABB()
+	return vwrap(a), vwrap(b)
+end
+
 --- Gets the velocity of the physics object at an arbitrary point in its local reference frame
 --- This includes velocity at the point induced by rotational velocity
 -- @shared
