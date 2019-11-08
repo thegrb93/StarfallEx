@@ -58,6 +58,7 @@ local directives = {
 	["@shared"] = 0,
 	["@client"] = 0,
 	["@server"] = 0,
+	["@clientmain"] = 0,
 	["@model"] = 0,
 }
 --Color scheme:

@@ -225,14 +225,14 @@ end)
 -- \--@model models/props_junk/watermelon01.mdl
 -- -- CODE
 
---- Set the processor to only run on the server. Shared is default
+--- Set the current file to only run on the server. Shared is default
 -- @name server
 -- @class directive
 -- @usage
 -- \--@server
 -- -- CODE
 
---- Set the processor to only run on the client. Shared is default
+--- Set the current file to only run on the client. Shared is default
 -- @name client
 -- @class directive
 -- @usage
