@@ -714,6 +714,16 @@ function ents_methods:obbMaxs()
 	return vwrap(ent:OBBMaxs())
 end
 
+--- Returns Entity axis aligned bounding box in world coordinates
+-- @shared
+-- @return The min bounding box vector
+-- @return The max bounding box vector
+function ents_methods:worldSpaceAABB()
+	local ent = getent(self)
+	local a, b = ent:WorldSpaceAABB() 
+	return vwrap(a), vwrap(b)
+end
+
 --- Returns the local position of the entity's mass center
 -- @shared
 -- @return The position vector of the mass center
