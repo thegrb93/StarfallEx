@@ -43,6 +43,35 @@ local function mangle_simpletimer_name(instance)
 	return "sftimersimple_"..tostring(instance).."_"..simple_int
 end
 
+local function createTimer(name, delay, reps, func, simple)
+	local instance = SF.instance
+	if instance.data.timer_count > max_timers:GetInt() then SF.Throw("Max timers exceeded!", 2) end
+	instance.data.timer_count = instance.data.timer_count + 1
+
+	local timername
+	if simple then
+		timername = mangle_simpletimer_name(instance)
+	else
+		timername = mangle_timer_name(instance, name)
+	end
+	
+	local timerdata = {reps = reps, func = func}
+	local function timerCallback()
+		if timerdata.reps ~= 0 then
+			timerdata.reps = timerdata.reps - 1
+			if timerdata.reps<=0 then
+				instance.data.timer_count = instance.data.timer_count - 1
+				instance.data.timers[timername] = nil
+			end
+		end
+		instance:runFunction(timerdata.func)
+	end
+
+	timer.Create(timername, math.max(delay, 0.001), reps, timerCallback)
+
+	instance.data.timers[timername] = timerdata
+end
+
 --- Creates (and starts) a timer
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
@@ -54,39 +83,14 @@ function timer_library.create(name, delay, reps, func, simple)
 	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
 	SF.CheckLuaType(func, TYPE_FUNCTION)
 
-	local instance = SF.instance
-	if instance.data.timer_count > max_timers:GetInt() then SF.Throw("Max timers exceeded!", 2) end
-	instance.data.timer_count = instance.data.timer_count + 1
-
-	local timername
-	if simple then
-		timername = mangle_simpletimer_name(instance)
-	else
-		timername = mangle_timer_name(instance, name)
-	end
-
-	local function timercb()
-		if reps ~= 0 then
-			reps = reps - 1
-			if reps==0 then
-				instance.data.timer_count = instance.data.timer_count - 1
-				instance.data.timers[timername] = nil
-			end
-		end
-
-		instance:runFunction(func)
-	end
-
-	timer.Create(timername, math.max(delay, 0.001), reps, timercb)
-
-	instance.data.timers[timername] = true
+	createTimer(name, delay, reps, func, false)
 end
 
 --- Creates a simple timer, has no name, can't be stopped, paused, or destroyed.
 -- @param delay the time, in second, to set the timer to
 -- @param func the function to call when the timer is fired
 function timer_library.simple(delay, func)
-	timer_library.create("", delay, 1, func, true)
+	createTimer("", delay, 1, func, true)
 end
 
 --- Stops and removes the timer.
@@ -131,16 +135,22 @@ end
 --- Adjusts a timer
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
--- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
--- @param func The function to call when the tiemr is fired
+-- @param reps (Optional) The repititions of the tiemr. 0 = infinte, nil = 1
+-- @param func (Optional) The function to call when the tiemr is fired
 -- @return true if succeeded
 function timer_library.adjust(name, delay, reps, func)
 	SF.CheckLuaType(name, TYPE_STRING)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
-	if reps~=nil then SF.CheckLuaType(reps, TYPE_NUMBER) end
-	if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) end
 
-	return timer.Adjust(mangle_timer_name(SF.instance, name), delay, reps, func)
+	local instance = SF.instance
+	local timername = mangle_timer_name(instance, name)
+	local data = instance.data.timers[timername]
+
+	if data then
+		if reps~=nil then SF.CheckLuaType(reps, TYPE_NUMBER) data.reps = reps end
+		if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) data.func = func end
+		return timer.Adjust(timername, math.max(delay, 0.001), reps)
+	end
 end
 
 --- Pauses a timer
