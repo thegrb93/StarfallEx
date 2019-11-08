@@ -150,6 +150,8 @@ function timer_library.adjust(name, delay, reps, func)
 		if reps~=nil then SF.CheckLuaType(reps, TYPE_NUMBER) data.reps = reps end
 		if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) data.func = func end
 		return timer.Adjust(timername, math.max(delay, 0.001), reps)
+	else
+		return false
 	end
 end
 
