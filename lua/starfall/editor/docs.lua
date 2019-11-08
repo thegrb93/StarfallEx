@@ -1134,8 +1134,8 @@ This will set the author that will be shown on the overlay of the processor";["n
 Set the author of the script.";["usage"]="\
 --@author TheAuthor \
 -- CODE";};["client"]={["class"]="directive";["classForced"]=true;["description"]="\
-Set the processor to only run on the client. Shared is default";["name"]="client";["param"]={};["summary"]="\
-Set the processor to only run on the client.";["usage"]="\
+Set the current file to only run on the client. Shared is default";["name"]="client";["param"]={};["summary"]="\
+Set the current file to only run on the client.";["usage"]="\
 --@client \
 -- CODE";};["clientmain"]={["class"]="directive";["classForced"]=true;["description"]="\
 Set the client file to run as main. Can only be used in the main file.";["name"]="clientmain";["param"]={};["summary"]="\
@@ -1167,8 +1167,8 @@ This will become the name of the tab and will show on the overlay of the process
 Set the name of the script.";["usage"]="\
 --@name Awesome script \
 -- CODE";};["server"]={["class"]="directive";["classForced"]=true;["description"]="\
-Set the processor to only run on the server. Shared is default";["name"]="server";["param"]={};["summary"]="\
-Set the processor to only run on the server.";["usage"]="\
+Set the current file to only run on the server. Shared is default";["name"]="server";["param"]={};["summary"]="\
+Set the current file to only run on the server.";["usage"]="\
 --@server \
 -- CODE";};};["hooks"]={[1]="Dupefinished";[10]="KeyPress";[11]="KeyRelease";[12]="NetworkEntityCreated";[13]="OnEntityCreated";[14]="OnPhysgunFreeze";[15]="OnPhysgunReload";[16]="PhysgunDrop";[17]="PhysgunPickup";[18]="PlayerCanPickupWeapon";[19]="PlayerChat";[2]="EndEntityDriving";[20]="PlayerDeath";[21]="PlayerDisconnected";[22]="PlayerEnteredVehicle";[23]="PlayerHurt";[24]="PlayerInitialSpawn";[25]="PlayerLeaveVehicle";[26]="PlayerNoClip";[27]="PlayerSay";[28]="PlayerSpawn";[29]="PlayerSpray";[3]="EntityFireBullets";[30]="PlayerSwitchFlashlight";[31]="PlayerSwitchWeapon";[32]="PlayerUse";[33]="PropBreak";[34]="Removed";[35]="StartChat";[36]="StartEntityDriving";[37]="calcview";[38]="drawhud";[39]="hologrammatrix";[4]="EntityRemoved";[40]="hudconnected";[41]="huddisconnected";[42]="hudshoulddraw";[43]="input";[44]="inputPressed";[45]="inputReleased";[46]="mouseWheeled";[47]="mousemoved";[48]="net";[49]="permissionrequest";[5]="EntityTakeDamage";[50]="postdrawhud";[51]="postdrawopaquerenderables";[52]="predrawhud";[53]="predrawopaquerenderables";[54]="readcell";[55]="remote";[56]="render";[57]="renderoffscreen";[58]="starfallUsed";[59]="think";[6]="FinishChat";[60]="tick";[61]="writecell";[62]="xinputConnected";[63]="xinputDisconnected";[64]="xinputPressed";[65]="xinputReleased";[66]="xinputStick";[67]="xinputTrigger";[7]="GravGunOnDropped";[8]="GravGunOnPickedUp";[9]="GravGunPunt";["Dupefinished"]={["class"]="hook";["classForced"]=true;["description"]="\
 Called after the starfall chip is duplicated and the duplication is finished.";["name"]="Dupefinished";["param"]={[1]="entTbl";["entTbl"]="A table of entities duped with the chip mapped to their previous indices.";};["realm"]="sv";["server"]=true;["summary"]="\
