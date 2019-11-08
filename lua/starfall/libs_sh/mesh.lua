@@ -52,7 +52,7 @@ function SF.ParseObj(obj, thread, Vector, triangulate)
 				SF.Throw("Unknown tag in obj file: "..tag, 2)
 			end
 		end
-		if thread then thread_lib.yield(thread) end
+		if thread then thread_lib.yield() end
 	end
 
 	if #face<3 or #face%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
@@ -82,7 +82,7 @@ function SF.ParseObj(obj, thread, Vector, triangulate)
 			SF.Throw("Invalid face normal index: "..tostring(normv), 2)
 		end
 		vertices[_] = vert
-		if thread then thread_lib.yield(thread) end
+		if thread then thread_lib.yield() end
 	end
 
 	-- Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
@@ -130,7 +130,7 @@ function SF.ParseObj(obj, thread, Vector, triangulate)
 		add(tan2[i+1], tdir)
 		add(tan2[i+2], tdir)
 	end
-	if thread then thread_lib.yield(thread) end
+	if thread then thread_lib.yield() end
 
 	for i = 1, #vertices do
 		local n = vertices[i].normal
@@ -143,7 +143,7 @@ function SF.ParseObj(obj, thread, Vector, triangulate)
 
 		vertices[i].userdata = {tan[1], tan[2], tan[3], w}
 	end
-	if thread then thread_lib.yield(thread) end
+	if thread then thread_lib.yield() end
 	return vertices, {positions = pos, normals = norm, texturecoords = uv, faces = face}
 end
 
@@ -266,7 +266,7 @@ if CLIENT then
 				end
 			end
 			unwrapped[i] = vert
-			if thread then thread_lib.yield(thread) end
+			if thread then thread_lib.yield() end
 		end
 
 		local mesh = Mesh()
