@@ -1621,7 +1621,7 @@ end
 function render_library.getResolution()
 	local data = SF.instance.data.render
 	if data.renderEnt then
-		return renderEnt:GetResolution()
+		return data.renderEnt:GetResolution()
 	end
 	if data.usingRT then
 		return data.oldViewPort[3], data.oldViewPort[4]
