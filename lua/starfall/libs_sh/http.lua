@@ -157,9 +157,8 @@ end
 --@return The converted data
 function http_library.urlEncode(data)
 	SF.CheckLuaType(data, TYPE_STRING)
-	data = string.gsub(data, "[^%w _~%.%-]", function(char)
-		return "%" .. string.format("%02X", string.byte(char))
+	data = string.gsub(data, "[^%w_~%.%-]", function(char)
+		return string.format("%%%02X", string.byte(char))
 	end)
-	data = string.gsub(data, " ", "+")
 	return data
 end
