@@ -151,3 +151,14 @@ function http_library.base64Encode(data)
 	SF.CheckLuaType(data, TYPE_STRING)
 	return util.Base64Encode(data)
 end
+
+--- Encodes illegal url characters to be legal
+--@param data The data to convert
+--@return The converted data
+function http_library.urlEncode(data)
+	SF.CheckLuaType(data, TYPE_STRING)
+	data = string.gsub(data, "[^%w_~%.%-]", function(char)
+		return "%" .. string.format("%02X", string.byte(char))
+	end)
+	return data
+end
