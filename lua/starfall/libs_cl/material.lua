@@ -558,7 +558,6 @@ local function NextInTextureQueue()
 			Panel:SetMouseInputEnabled(false)
 			Panel:SetHTML(
 			[[<html style="overflow:hidden"><body><script>
-			// Wait 6 frames before running image loaded callback
 			function renderImage(){
 				requestAnimationFrame(function(){
 					requestAnimationFrame(function(){
@@ -590,59 +589,58 @@ local function NextInTextureQueue()
 
 		local function applyTexture(w, h)
 			--Timer to prevent being in javascript stack frame
-			timer.Simple(0, function()
-				if requestTbl.Instance.error then
-					table.remove(LoadingTextureQueue, 1)
-					timer.Simple(0, NextInTextureQueue)
-				else
-					local function imageDone()
-						if requestTbl.Loaded then return end
-						requestTbl.Loaded = true
+			if requestTbl.Instance.error then
+				table.remove(LoadingTextureQueue, 1)
+				timer.Simple(0, NextInTextureQueue)
+			else
+				local function imageDone(usedLayout)
+					if requestTbl.Loaded then return end
+					requestTbl.Loaded = true
 
+					hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
 						Panel:UpdateHTMLTexture()
-						timer.Simple(1,function()
-							local mat = Panel:GetHTMLMaterial()
-							if not mat then return end
+						local mat = Panel:GetHTMLMaterial()
+						if not mat then return end
 
-							render.PushRenderTarget(requestTbl.Texture)
-								render.Clear(0, 0, 0, 0, false, false)
-								cam.Start2D()
-								surface.SetMaterial(mat)
-								surface.SetDrawColor(255, 255, 255)
-								surface.DrawTexturedRect(0, 0, 1024, 1024)
-								cam.End2D()
-							render.PopRenderTarget()
+						render.PushRenderTarget(requestTbl.Texture)
+							render.Clear(0, 0, 0, 0, false, false)
+							cam.Start2D()
+							surface.SetMaterial(mat)
+							surface.SetDrawColor(255, 255, 255)
+							surface.DrawTexturedRect(0, 0, 1024, 1024)
+							cam.End2D()
+						render.PopRenderTarget()
 
-							if requestTbl.CallbackDone then requestTbl.CallbackDone() end
-							table.remove(LoadingTextureQueue, 1)
-							NextInTextureQueue()
-						end)
+						hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
+						if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+						table.remove(LoadingTextureQueue, 1)
+						timer.Simple(0, NextInTextureQueue)
+					end)
+				end
+
+				if requestTbl.Usedlayout then
+					imageDone()
+				else
+					local function layout(x,y,w,h)
+						if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
+						checkluatype(x, TYPE_NUMBER)
+						checkluatype(y, TYPE_NUMBER)
+						checkluatype(w, TYPE_NUMBER)
+						checkluatype(h, TYPE_NUMBER)
+						requestTbl.Usedlayout = true
+						Panel:RunJavascript([[
+							img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;
+							renderImage();
+						]])
 					end
 
-					if requestTbl.Usedlayout then
+					if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
+					if not requestTbl.Usedlayout then
+						requestTbl.Usedlayout = true
 						imageDone()
-					else
-						local function layout(x,y,w,h)
-							if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
-							checkluatype(x, TYPE_NUMBER)
-							checkluatype(y, TYPE_NUMBER)
-							checkluatype(w, TYPE_NUMBER)
-							checkluatype(h, TYPE_NUMBER)
-							requestTbl.Usedlayout = true
-							Panel:RunJavascript([[
-								img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;
-								renderImage();
-							]])
-						end
-
-						if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
-						if not requestTbl.Usedlayout then
-							requestTbl.Usedlayout = true
-							imageDone()
-						end
 					end
 				end
-			end)
+			end
 		end
 		local function errorTexture()
 			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
