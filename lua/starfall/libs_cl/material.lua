@@ -558,12 +558,16 @@ local function NextInTextureQueue()
 			Panel:SetMouseInputEnabled(false)
 			Panel:SetHTML(
 			[[<html style="overflow:hidden"><body><script>
+			// Wait 6 frames before running image loaded callback
 			function renderImage(){
-				requestAnimationFrame(function(){
+				var x = 1;
+				function doframe(){
 					requestAnimationFrame(function(){
-						sf.imageLoaded(img.width, img.height);
+						if(x==6){sf.imageLoaded(img.width, img.height);}
+						else{x += 1; doframe();}
 					});
-				});
+				}
+				doframe();
 			}
 			var img = new Image();
 			img.style.position="absolute";
