@@ -558,9 +558,16 @@ local function NextInTextureQueue()
 			Panel:SetMouseInputEnabled(false)
 			Panel:SetHTML(
 			[[<html style="overflow:hidden"><body><script>
+			function renderImage(){
+				requestAnimationFrame(function(){
+					requestAnimationFrame(function(){
+						sf.imageLoaded(img.width, img.height);
+					});
+				});
+			}
 			var img = new Image();
 			img.style.position="absolute";
-			img.onload = function (){sf.imageLoaded(img.width, img.height);}
+			img.onload = renderImage;
 			img.onerror = function (){sf.imageErrored();}
 			document.body.appendChild(img);
 			</script></body></html>]])
@@ -581,48 +588,58 @@ local function NextInTextureQueue()
 		end
 
 		local function applyTexture(w, h)
-			if requestTbl.Loaded then return end
-			requestTbl.Loaded = true
-			if requestTbl.Instance.error then
-				table.remove(LoadingTextureQueue, 1)
-				timer.Simple(0, NextInTextureQueue)
-			else
-				local function copyTexture()
-					Panel:UpdateHTMLTexture()
-					local mat = Panel:GetHTMLMaterial()
-					if not mat then return end
-					render.PushRenderTarget(requestTbl.Texture)
-						render.Clear(0, 0, 0, 0, false, false)
-						cam.Start2D()
-						surface.SetMaterial(mat)
-						surface.SetDrawColor(255, 255, 255)
-						surface.DrawTexturedRect(0, 0, 1024, 1024)
-						cam.End2D()
-					render.PopRenderTarget()
-				end
-				local usedlayout = false
-				local function layout(x,y,w,h)
-					if usedlayout then SF.Throw("You can only use layout once", 2) end
-					if requestTbl ~= LoadingTextureQueue[1] then SF.Throw("Layout function is no longer valid", 2) end
-					checkluatype(x, TYPE_NUMBER)
-					checkluatype(y, TYPE_NUMBER)
-					checkluatype(w, TYPE_NUMBER)
-					checkluatype(h, TYPE_NUMBER)
-					usedlayout = true
-					Panel:RunJavascript([[img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;]])
-				end
-
-				timer.Simple(0, function()
-					if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
-				end)
-
-				timer.Simple(1, function()
-					copyTexture()
-					if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+			--Timer to prevent being in javascript stack frame
+			timer.Simple(0, function()
+				if requestTbl.Instance.error then
 					table.remove(LoadingTextureQueue, 1)
-					NextInTextureQueue()
-				end)
-			end
+					timer.Simple(0, NextInTextureQueue)
+				else
+					local function imageDone()
+						if requestTbl.Loaded then return end
+						requestTbl.Loaded = true
+
+						Panel:UpdateHTMLTexture()
+						local mat = Panel:GetHTMLMaterial()
+						if not mat then return end
+
+						render.PushRenderTarget(requestTbl.Texture)
+							render.Clear(0, 0, 0, 0, false, false)
+							cam.Start2D()
+							surface.SetMaterial(mat)
+							surface.SetDrawColor(255, 255, 255)
+							surface.DrawTexturedRect(0, 0, 1024, 1024)
+							cam.End2D()
+						render.PopRenderTarget()
+
+						if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+						table.remove(LoadingTextureQueue, 1)
+						NextInTextureQueue()
+					end
+
+					if requestTbl.Usedlayout then
+						imageDone()
+					else
+						local function layout(x,y,w,h)
+							if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
+							checkluatype(x, TYPE_NUMBER)
+							checkluatype(y, TYPE_NUMBER)
+							checkluatype(w, TYPE_NUMBER)
+							checkluatype(h, TYPE_NUMBER)
+							requestTbl.Usedlayout = true
+							Panel:RunJavascript([[
+								img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;
+								renderImage();
+							]])
+						end
+
+						if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
+						if not requestTbl.Usedlayout then
+							requestTbl.Usedlayout = true
+							imageDone()
+						end
+					end
+				end
+			end)
 		end
 		local function errorTexture()
 			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
@@ -638,7 +655,7 @@ local function NextInTextureQueue()
 		img.style.left="0px";
 		img.style.top="0px";
 		img.src="]] .. requestTbl.Url .. [[";
-		if(img.complete){sf.imageLoaded(img.width, img.height);}]])
+		if(img.complete){renderImage();}]])
 		Panel:Show()
 
 		timer.Create("SF_URLTextureTimeout", 10, 1, function()
