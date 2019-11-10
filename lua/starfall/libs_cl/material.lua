@@ -560,12 +560,11 @@ local function NextInTextureQueue()
 			[[<html style="overflow:hidden"><body><script>
 			// Wait 6 frames before running image loaded callback
 			function renderImage(){
-				var x = 1;
-				function doframe(){
-					if(x==6){sf.imageLoaded(img.width, img.height);}
-					else{x += 1; requestAnimationFrame(doframe);}
-				}
-				doframe();
+				requestAnimationFrame(function(){
+					requestAnimationFrame(function(){
+						sf.imageLoaded(img.width, img.height);
+					});
+				});
 			}
 			var img = new Image();
 			img.style.position="absolute";
@@ -601,21 +600,23 @@ local function NextInTextureQueue()
 						requestTbl.Loaded = true
 
 						Panel:UpdateHTMLTexture()
-						local mat = Panel:GetHTMLMaterial()
-						if not mat then return end
+						timer.Simple(1,function()
+							local mat = Panel:GetHTMLMaterial()
+							if not mat then return end
 
-						render.PushRenderTarget(requestTbl.Texture)
-							render.Clear(0, 0, 0, 0, false, false)
-							cam.Start2D()
-							surface.SetMaterial(mat)
-							surface.SetDrawColor(255, 255, 255)
-							surface.DrawTexturedRect(0, 0, 1024, 1024)
-							cam.End2D()
-						render.PopRenderTarget()
+							render.PushRenderTarget(requestTbl.Texture)
+								render.Clear(0, 0, 0, 0, false, false)
+								cam.Start2D()
+								surface.SetMaterial(mat)
+								surface.SetDrawColor(255, 255, 255)
+								surface.DrawTexturedRect(0, 0, 1024, 1024)
+								cam.End2D()
+							render.PopRenderTarget()
 
-						if requestTbl.CallbackDone then requestTbl.CallbackDone() end
-						table.remove(LoadingTextureQueue, 1)
-						NextInTextureQueue()
+							if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+							table.remove(LoadingTextureQueue, 1)
+							NextInTextureQueue()
+						end)
 					end
 
 					if requestTbl.Usedlayout then
