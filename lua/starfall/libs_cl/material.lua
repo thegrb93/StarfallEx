@@ -562,10 +562,8 @@ local function NextInTextureQueue()
 			function renderImage(){
 				var x = 1;
 				function doframe(){
-					requestAnimationFrame(function(){
-						if(x==6){sf.imageLoaded(img.width, img.height);}
-						else{x += 1; doframe();}
-					});
+					if(x==6){sf.imageLoaded(img.width, img.height);}
+					else{x += 1; requestAnimationFrame(doframe);}
 				}
 				doframe();
 			}
