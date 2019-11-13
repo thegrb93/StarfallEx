@@ -687,7 +687,7 @@ function material_methods:setTextureURL(key, url, cb, done)
 	local m = unwrap(self)
 	local texture = m:GetTexture(key)
 	if not (texture and instance.data.render.validrendertargets[texture:GetName()]) then
-		local name = self:getName()
+		local name = self:getName() .. key
 		instance.env.render.createRenderTarget(name)
 		self:setTextureRenderTarget(key, name)
 		texture = instance.data.render.rendertargets[name]
