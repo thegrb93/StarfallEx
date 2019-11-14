@@ -138,7 +138,7 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	local entList = TimedPasteData[TimedPasteDataCurrent].CreatedEntities
 	local starfalls = {}
 	for k, v in pairs(entList) do
-		if v:IsValid() and v:GetClass() == "starfall_processor" and v.sfdata then
+		if IsValid(v) and v:GetClass() == "starfall_processor" and v.sfdata then
 			starfalls[#starfalls+1] = v
 		end
 	end
