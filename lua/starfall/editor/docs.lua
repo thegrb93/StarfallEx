@@ -1615,7 +1615,9 @@ Run a hook remotely. \
 This will call the hook \"remote\" on either a specified entity or all instances on the server/client";["fname"]="runRemote";["library"]="hook";["name"]="hook_library.runRemote";["param"]={["..."]="Payload. These parameters will be used to call the hook functions";[1]="recipient";[2]="...";["recipient"]="Starfall entity to call the hook on. Nil to run on every starfall entity";};["private"]=false;["realm"]="sh";["ret"]="tbl A list of the resultset of each called hook";["server"]=true;["summary"]="\
 Run a hook remotely.";};};["libtbl"]="hook_library";["name"]="hook";["server"]=true;["summary"]="\
 Deals with hooks ";["tables"]={};};["http"]={["class"]="library";["client"]=true;["description"]="\
-Http library. Requests content from urls.";["fields"]={};["functions"]={[1]="base64Encode";[2]="canRequest";[3]="get";[4]="post";[5]="urlEncode";["base64Encode"]={["class"]="function";["description"]="\
+Http library. Requests content from urls.";["fields"]={};["functions"]={[1]="base64Decode";[2]="base64Encode";[3]="canRequest";[4]="get";[5]="post";[6]="urlEncode";["base64Decode"]={["class"]="function";["description"]="\
+Converts data from base64 format";["fname"]="base64Decode";["library"]="http";["name"]="http_library.base64Decode";["param"]={[1]="data";[2]="threaded";["data"]="The data to convert";};["private"]=false;["realm"]="sh";["ret"]="The converted data";["summary"]="\
+Converts data from base64 format ";};["base64Encode"]={["class"]="function";["description"]="\
 Converts data into base64 format or nil if the string is 0 length";["fname"]="base64Encode";["library"]="http";["name"]="http_library.base64Encode";["param"]={[1]="data";["data"]="The data to convert";};["private"]=false;["realm"]="sh";["ret"]="The converted data";["summary"]="\
 Converts data into base64 format or nil if the string is 0 length ";};["canRequest"]={["class"]="function";["description"]="\
 Checks if a new http request can be started";["fname"]="canRequest";["library"]="http";["name"]="http_library.canRequest";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
