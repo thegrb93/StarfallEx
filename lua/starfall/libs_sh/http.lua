@@ -180,6 +180,7 @@ function http_library.base64Decode(data, threaded)
 
 	local bit_band, bit_rshift = bit.band, bit.rshift
 	local string_char, string_byte = string.char, string.byte
+	local coroutine_yield = coroutine.yield
 	local unpack = unpack
 
 	local digitBufferPos = 1
@@ -213,7 +214,7 @@ function http_library.base64Decode(data, threaded)
 			digitBufferPos = 1
 		end
 
-		if threaded then coroutine.yield() end
+		if threaded then coroutine_yield() end
 	end
 
 	local bytesRemain = dataLen % 4
