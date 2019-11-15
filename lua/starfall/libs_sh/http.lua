@@ -164,8 +164,19 @@ end
 --- Converts data from base64 format
 --@param data The data to convert
 --@return The converted data
-function http_library.base64Decode(data)
+function http_library.base64Decode(data, threaded)
 	SF.CheckLuaType(data, TYPE_STRING)
+
+	local thread
+	if threaded ~= nil then
+		if SF.CheckLuaType(threaded, TYPE_BOOL) then
+			thread = coroutine.running()
+
+			if not thread then
+				SF.Throw("Tried to use threading while not in a thread!", 2)
+			end
+		end
+	end
 
 	local bit_band, bit_rshift = bit.band, bit.rshift
 	local string_char, string_byte = string.char, string.byte
@@ -178,6 +189,7 @@ function http_library.base64Decode(data)
 	local chunkBuffer = {}
 
 	data = string.gsub(data, "=?=?$", "", 1)
+	data = string.gsub(data, "\n", "")
 	local dataLen = #data
 
 	for i = 1, dataLen - 3, 4 do
@@ -200,6 +212,8 @@ function http_library.base64Decode(data)
 
 			digitBufferPos = 1
 		end
+
+		if threaded then coroutine.yield() end
 	end
 
 	local bytesRemain = dataLen % 4
