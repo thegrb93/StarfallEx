@@ -1616,7 +1616,7 @@ This will call the hook \"remote\" on either a specified entity or all instances
 Run a hook remotely.";};};["libtbl"]="hook_library";["name"]="hook";["server"]=true;["summary"]="\
 Deals with hooks ";["tables"]={};};["http"]={["class"]="library";["client"]=true;["description"]="\
 Http library. Requests content from urls.";["fields"]={};["functions"]={[1]="base64Decode";[2]="base64Encode";[3]="canRequest";[4]="get";[5]="post";[6]="urlEncode";["base64Decode"]={["class"]="function";["description"]="\
-Converts data from base64 format";["fname"]="base64Decode";["library"]="http";["name"]="http_library.base64Decode";["param"]={[1]="data";[2]="threaded";["data"]="The data to convert";};["private"]=false;["realm"]="sh";["ret"]="The converted data";["summary"]="\
+Converts data from base64 format";["fname"]="base64Decode";["library"]="http";["name"]="http_library.base64Decode";["param"]={[1]="data";[2]="threaded";["data"]="The data to convert";["threaded"]="Optional bool";};["private"]=false;["realm"]="sh";["ret"]="The converted data";["summary"]="\
 Converts data from base64 format ";};["base64Encode"]={["class"]="function";["description"]="\
 Converts data into base64 format or nil if the string is 0 length";["fname"]="base64Encode";["library"]="http";["name"]="http_library.base64Encode";["param"]={[1]="data";["data"]="The data to convert";};["private"]=false;["realm"]="sh";["ret"]="The converted data";["summary"]="\
 Converts data into base64 format or nil if the string is 0 length ";};["canRequest"]={["class"]="function";["description"]="\
