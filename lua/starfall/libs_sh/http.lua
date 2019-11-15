@@ -163,6 +163,7 @@ end
 
 --- Converts data from base64 format
 --@param data The data to convert
+--@param threaded Optional bool
 --@return The converted data
 function http_library.base64Decode(data, threaded)
 	SF.CheckLuaType(data, TYPE_STRING)
