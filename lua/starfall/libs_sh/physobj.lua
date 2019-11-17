@@ -243,7 +243,7 @@ if SERVER then
 		checkvector(ang)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setPos")
+		checkpermission(SF.instance, phys:GetEntity(), "entities.setAngles")
 		phys:SetAngles(ang)
 	end
 
@@ -259,6 +259,21 @@ if SERVER then
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setVelocity")
 		phys:SetVelocity(vel)
+	end
+
+	--- Sets the buoyancy ratio of a physobject
+	-- @server
+	-- @param ratio The buoyancy ratio to use
+	function physobj_methods:setBuoyancyRatio(ratio)
+		checkluatype(ratio, TYPE_NUMBER)
+
+		if ratio<-1e12 or ratio>1e12 or ratio~=ratio then
+			SF.Throw("Input number too large or NAN", 3)
+		end
+
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.setMass")
+		phys:SetBuoyancyRatio(ratio)
 	end
 
 	--- Applys a force to the center of the physics object
