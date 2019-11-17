@@ -55,10 +55,12 @@ end)
 --- Creates a sound and attaches it to an entity
 -- @param ent Entity to attach sound to.
 -- @param path Filepath to the sound file.
+-- @param nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 -- @return Sound Object
-function sound_library.create(ent, path)
+function sound_library.create(ent, path, nofilter)
 	checktype(ent, SF.Types["Entity"])
 	checkluatype(path, TYPE_STRING)
+	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
 
 	local instance = SF.instance
 	checkpermission(instance, { ent, path }, "sound.create")
@@ -75,7 +77,12 @@ function sound_library.create(ent, path)
 	plySoundBurst:use(instance.player, 1)
 	plyCount:use(instance.player, 1)
 
-	local soundPatch = CreateSound(e, path)
+	local filter
+	if nofilter and SERVER then
+		filter = RecipientFilter()
+		filter:AddAllPlayers()
+	end
+	local soundPatch = CreateSound(e, path, filter)
 	local snds = soundsByEntity[e]
 	if not snds then snds = {} soundsByEntity[e] = snds end
 	snds[soundPatch] = true
