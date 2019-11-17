@@ -2143,7 +2143,7 @@ Render library.";["tables"]={};};["sounds"]={["class"]="library";["client"]=true
 Sounds library.";["fields"]={};["functions"]={[1]="canCreate";[2]="create";[3]="soundsLeft";["canCreate"]={["class"]="function";["description"]="\
 Returns if a sound is able to be created";["fname"]="canCreate";["library"]="sounds";["name"]="sound_library.canCreate";["param"]={};["private"]=false;["realm"]="sh";["ret"]="If it is possible to make a sound";["summary"]="\
 Returns if a sound is able to be created ";};["create"]={["class"]="function";["description"]="\
-Creates a sound and attaches it to an entity";["fname"]="create";["library"]="sounds";["name"]="sound_library.create";["param"]={[1]="ent";[2]="path";["ent"]="Entity to attach sound to.";["path"]="Filepath to the sound file.";};["private"]=false;["realm"]="sh";["ret"]="Sound Object";["summary"]="\
+Creates a sound and attaches it to an entity";["fname"]="create";["library"]="sounds";["name"]="sound_library.create";["param"]={[1]="ent";[2]="path";[3]="nofilter";["ent"]="Entity to attach sound to.";["nofilter"]="(Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.";["path"]="Filepath to the sound file.";};["private"]=false;["realm"]="sh";["ret"]="Sound Object";["summary"]="\
 Creates a sound and attaches it to an entity ";};["soundsLeft"]={["class"]="function";["description"]="\
 Returns the number of sounds left that can be created";["fname"]="soundsLeft";["library"]="sounds";["name"]="sound_library.soundsLeft";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The number of sounds left";["summary"]="\
 Returns the number of sounds left that can be created ";};};["libtbl"]="sound_library";["name"]="sounds";["server"]=true;["summary"]="\
