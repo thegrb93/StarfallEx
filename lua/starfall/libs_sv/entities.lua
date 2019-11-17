@@ -185,6 +185,30 @@ function ents_methods:applyDamage(amt, attacker, inflictor)
 	ent:TakeDamage(amt, attacker, inflictor)
 end
 
+--- Sets a custom prop's physics simulation forces. Thrusters and balloons use this.
+-- @param ang Angular Force (Torque)
+-- @param lin Linear Force
+-- @param mode The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force
+function ents_methods:setCustomPropForces(ang, lin, mode)
+	local ent = getent(self)
+	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
+
+	checkpermission(SF.instance, ent, "entities.applyForce")
+
+	ang = vunwrap(ang)
+	checkvector(ang)
+	lin = vunwrap(lin)
+	checkvector(lin)
+
+	checkluatype(mode, TYPE_NUMBER)
+	if mode ~= 0 and mode ~= 1 and mode ~= 2 and mode ~= 3 and mode ~= 4 then SF.Throw("Invalid mode", 2) end
+
+	function ent:PhysicsSimulate()
+		return ang, lin, mode
+	end
+	ent:StartMotionController()
+end
+
 --- Set the angular velocity of an object
 -- @param angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
