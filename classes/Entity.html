@@ -703,6 +703,11 @@ Sets the color of the entity </td>
 Sets a component's ability to lock a player's controls </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#Entity:setCustomPropForces">setCustomPropForces</a>( ang, lin, mode&nbsp;)</td>
+			<td class="summary">
+Sets a custom prop's physics simulation forces.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#Entity:setDrawShadow">setDrawShadow</a>( draw, ply&nbsp;)</td>
 			<td class="summary">
 Sets whether an entity's shadow should be drawn </td>
@@ -2727,6 +2732,27 @@ Sets a component's ability to lock a player's controls</p>
 		<ul>
 			
 			<li><tt>enable</tt> ― Whether the component will lock the player's controls when used</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="Entity:setCustomPropForces"></a><strong>Entity:setCustomPropForces</strong>( ang, lin, mode&nbsp;)</dt>
+<dd>
+	<p>
+Sets a custom prop's physics simulation forces. Thrusters and balloons use this.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ang</tt> ― Angular Force (Torque)</li>
+			<li><tt>lin</tt> ― Linear Force</li>
+			<li><tt>mode</tt> ― The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force</li>
 		</ul>
 	</section>
 	
