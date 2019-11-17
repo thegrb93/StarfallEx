@@ -225,12 +225,26 @@ if SERVER then
 	function physobj_methods:setPos(pos)
 		checktype(pos, vec_meta)
 
-		local vec = vunwrap(pos)
-		checkvector(vec)
+		pos = vunwrap(pos)
+		checkvector(pos)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setPos")
-		phys:SetPos(vec)
+		phys:SetPos(pos)
+	end
+
+	--- Sets the angles of the physics object. Will cause interpolation of the entity in clientside, use entity.setAngles to avoid this.
+	-- @server
+	-- @param ang The angle to set it to
+	function physobj_methods:setAngles(ang)
+		checktype(ang, ang_meta)
+
+		ang = aunwrap(ang)
+		checkvector(ang)
+
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.setPos")
+		phys:SetAngles(ang)
 	end
 
 	--- Sets the velocity of the physics object
@@ -239,12 +253,12 @@ if SERVER then
 	function physobj_methods:setVelocity(vel)
 		checktype(vel, vec_meta)
 
-		local vec = vunwrap(vel)
-		checkvector(vec)
+		vel = vunwrap(vel)
+		checkvector(vel)
 
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setVelocity")
-		phys:SetVelocity(vec)
+		phys:SetVelocity(vel)
 	end
 
 	--- Applys a force to the center of the physics object
