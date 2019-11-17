@@ -369,6 +369,11 @@ Sets coefficient of air resistance affecting the bone when rotating.</td>
 Sets the angular velocity of an object </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:setAngles">setAngles</a>( ang&nbsp;)</td>
+			<td class="summary">
+Sets the angles of the physics object.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:setDamping">setDamping</a>( linear, angular&nbsp;)</td>
 			<td class="summary">
 Sets the movement damping of the bone.</td>
@@ -1034,6 +1039,25 @@ Sets the angular velocity of an object</p>
 		<ul>
 			
 			<li><tt>angvel</tt> ― The local angvel vector to set</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="PhysObj:setAngles"></a><strong>PhysObj:setAngles</strong>( ang&nbsp;)</dt>
+<dd>
+	<p>
+Sets the angles of the physics object. Will cause interpolation of the entity in clientside, use entity.setAngles to avoid this.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>ang</tt> ― The angle to set it to</li>
 		</ul>
 	</section>
 	
