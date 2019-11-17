@@ -268,7 +268,7 @@ if SERVER then
 		checkluatype(ratio, TYPE_NUMBER)
 
 		if ratio<-1e12 or ratio>1e12 or ratio~=ratio then
-			SF.Throw("Input number too large or NAN", 3)
+			SF.Throw("Input number too large or NAN", 2)
 		end
 
 		local phys = unwrap(self)
