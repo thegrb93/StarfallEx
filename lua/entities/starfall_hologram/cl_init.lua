@@ -60,7 +60,12 @@ function ENT:DrawCLHologram()
 	local data = self:GetRenderMesh()
 	
 	if data then
-		cam.PushModelMatrix(self:GetWorldTransformMatrix())
+		if self.HoloMatrix then
+			cam.PushModelMatrix(self:GetWorldTransformMatrix() * self.HoloMatrix)
+		else
+			cam.PushModelMatrix(self:GetWorldTransformMatrix())
+		end
+		
 		render.SetMaterial(data.Material)
 		data.Mesh:Draw()
 		cam.PopModelMatrix()
