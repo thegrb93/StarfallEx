@@ -118,7 +118,7 @@ SF.runningOps = false
 
 local function safeThrow(self, msg, nocatch, force)
 	local source = debug.getinfo(3, "S").short_src
-	if string.find(source, "SF:", 1, true) or string.find(source, "starfall", 1, true) or force then
+	if string.find(source, "SF:", 1, true) or force then
 		if SERVER and nocatch then
 			local consolemsg = "[Starfall] CPU Quota exceeded"
 			if self.player:IsValid() then
