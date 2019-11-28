@@ -33,7 +33,7 @@ end
 local function httpRequestReady (instance)
 	local httpData = instance.data.http
 	if CurTime() - httpData.lastRequest < http_interval:GetFloat() or httpData.active >= http_max_active:GetInt() then
-		SF.Throw("You can't run a new http request yet", 2)
+		SF.Throw("You can't run a new http request yet", 3)
 	end
 	return true
 end
