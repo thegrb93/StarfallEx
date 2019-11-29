@@ -561,7 +561,10 @@ local function NextInTextureQueue()
 			function renderImage(){
 				requestAnimationFrame(function(){
 					requestAnimationFrame(function(){
-						sf.imageLoaded(img.width, img.height);
+						document.body.offsetWidth
+						requestAnimationFrame(function(){
+							sf.imageLoaded(img.width, img.height);
+						});
 					});
 				});
 			}
@@ -655,7 +658,7 @@ local function NextInTextureQueue()
 		img.removeAttribute("height");
 		img.style.left="0px";
 		img.style.top="0px";
-		img.src="]] .. requestTbl.Url .. [[";
+		img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";
 		if(img.complete){renderImage();}]])
 		Panel:Show()
 
