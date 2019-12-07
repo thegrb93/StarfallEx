@@ -1135,9 +1135,8 @@ do
 
 			local function sendToClient(path)
 				net.Start("sf_reloadlibrary")
-				local data = util.Compress(file.Read(path, "LUA"))
 				net.WriteString(path)
-				net.WriteStream(data)
+				net.WriteStream(file.Read(path, "LUA"))
 				net.Broadcast()
 			end
 
@@ -1171,8 +1170,7 @@ do
 		local root_path = SF.NormalizePath(string.GetPathFromFilename(debug.getinfo(1, "S").short_src).."../")
 		net.Receive("sf_reloadlibrary", function(len)
 			local path = net.ReadString()
-			net.ReadStream(nil, function(data)
-				local file = util.Decompress(data)
+			net.ReadStream(nil, function(file)
 				if file then
 					print("Reloaded library: " .. string.StripExtension(string.GetFileFromFilename(path)))
 					cleanHooks(path)
