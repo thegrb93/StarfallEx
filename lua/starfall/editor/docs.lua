@@ -1863,9 +1863,7 @@ See <a href=\"http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettin
 Gets the performance settings.</br> \
 See <a href=\"http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettings\">PhysEnvPerformance Settings Table Structure</a> for table structure.";};};["libtbl"]="physenv_lib";["name"]="physenv";["server"]=true;["summary"]="\
 Physenv functions ";["tables"]={};};["prop"]={["class"]="library";["client"]=true;["description"]="\
-Library for creating and manipulating physics-less models AKA \"Props\".";["fields"]={};["functions"]={[1]="canCreateCustom";[10]="spawnRate";[2]="canSpawn";[3]="create";[4]="createComponent";[5]="createCustom";[6]="createSent";[7]="propsLeft";[8]="setPropClean";[9]="setPropUndo";["canCreateCustom"]={["class"]="function";["description"]="\
-Returns if it is possible to create a custom prop yet";["fname"]="canCreateCustom";["library"]="prop";["name"]="props_library.canCreateCustom";["param"]={};["private"]=false;["realm"]="sv";["ret"]="boolean if a custom prop can be created";["summary"]="\
-Returns if it is possible to create a custom prop yet ";};["canSpawn"]={["class"]="function";["description"]="\
+Library for creating and manipulating physics-less models AKA \"Props\".";["fields"]={};["functions"]={[1]="canSpawn";[2]="create";[3]="createComponent";[4]="createCustom";[5]="createSent";[6]="propsLeft";[7]="setPropClean";[8]="setPropUndo";[9]="spawnRate";["canSpawn"]={["class"]="function";["description"]="\
 Checks if a user can spawn anymore props.";["fname"]="canSpawn";["library"]="prop";["name"]="props_library.canSpawn";["param"]={};["private"]=false;["realm"]="sv";["ret"]="True if user can spawn props, False if not.";["server"]=true;["summary"]="\
 Checks if a user can spawn anymore props.";};["create"]={["class"]="function";["description"]="\
 Creates a prop.";["fname"]="create";["library"]="prop";["name"]="props_library.create";["param"]={[1]="pos";[2]="ang";[3]="model";[4]="frozen";};["private"]=false;["realm"]="sv";["ret"]="The prop object";["server"]=true;["summary"]="\
