@@ -12,3 +12,17 @@ function ENT:Initialize()
 	self:EnableCustomCollisions(true)
 	self:DrawShadow(false)
 end
+
+function ENT:TransmitData(recip)
+	net.Start("starfall_custom_prop")
+	net.WriteUInt(self:EntIndex(), 16)
+	local stream = net.WriteStream(self.streamdata)
+	if recip then net.Send(recip) else net.Broadcast() end
+	return stream
+end
+
+hook.Add("PlayerInitialSpawn","SF_Initialize_Custom_Props",function(ply)
+	for k, v in ipairs(ents.FindByClass("starfall_prop")) do
+		v:TransmitData(ply)
+	end
+end)

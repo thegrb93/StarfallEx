@@ -113,30 +113,6 @@ function props_library.create(pos, ang, model, frozen)
 	return SF.Entities.Wrap(propent)
 end
 
-
-local customPropStream = {players = {}}
-
-local function customPropFinished()
-	for k, v in pairs(customPropStream.players) do
-		if not customPropStream.stream.finished[v] then
-			if CurTime()<customPropStream.timeout then
-				return false
-			else
-				customPropStream.stream:Remove()
-				break
-			end
-		end
-	end
-	return true
-end
-
---- Returns if it is possible to create a custom prop yet
--- @return boolean if a custom prop can be created
-function props_library.canCreateCustom()
-	local ply = SF.instance.player
-	return customPropFinished() and plyCount:check(ply) > 0 and plyPropBurst:check(ply) >= 1
-end
-
 --- Creates a custom prop.
 -- @server
 -- @param pos The position to spawn the prop
@@ -154,8 +130,6 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local instance = SF.instance
 	local ply = instance.player
 
-	if not customPropFinished() then SF.Throw("Waiting for previous custom prop to finish downloading", 2) end
-
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
 	if not gamemode.Call("PlayerSpawnProp", ply, "starfall_prop") then SF.Throw("Another hook prevented the prop from spawning", 2) end
@@ -167,11 +141,11 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local maxConvexesPerProp = maxConvexesPerProp:GetInt()
 	
 	local totalVertices = 0
-	local stream = SF.StringStream()
-	stream:writeInt32(#vertices)
+	local streamdata = SF.StringStream()
+	streamdata:writeInt32(#vertices)
 	for k, v in ipairs(vertices) do
 		if k>maxConvexesPerProp then SF.Throw("Exceeded the max convexes per prop (" .. maxConvexesPerProp .. ")", 2) end
-		stream:writeInt32(#v)
+		streamdata:writeInt32(#v)
 		totalVertices = totalVertices + #v
 		plyVertexCount:checkuse(ply, totalVertices)
 		local t = {}
@@ -186,13 +160,15 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 					SF.Throw("No two vertices can have a distance less than " .. minVertexDistance:GetFloat(), 2)
 				end
 			end
-			stream:writeFloat(vec.x)
-			stream:writeFloat(vec.y)
-			stream:writeFloat(vec.z)
+			streamdata:writeFloat(vec.x)
+			streamdata:writeFloat(vec.y)
+			streamdata:writeFloat(vec.z)
 			t[o] = vec
 		end
 		uwVertices[k] = t
 	end
+	streamdata = streamdata:getString()
+	SF.NetBurst:use(instance.player, #streamdata*8)
 
 	plyVertexCount:free(-totalVertices)
 
@@ -202,6 +178,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local propdata = instance.data.props
 	
 	local propent = ents.Create("starfall_prop")
+	propent.streamdata = streamdata
 	propent:SetPos(SF.clampPos(pos))
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
@@ -217,10 +194,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	physobj:EnableDrag(true)
 	physobj:Wake()
 
-	net.Start("starfall_custom_prop")
-	net.WriteUInt(propent:EntIndex(), 16)
-	customPropStream = {players = player.GetAll(), stream = net.WriteStream(stream:getString()), timeout = CurTime()+5}
-	net.Broadcast()
+	propent:TransmitData()
 
 	if propdata.undo then
 		undo.Create("Prop")

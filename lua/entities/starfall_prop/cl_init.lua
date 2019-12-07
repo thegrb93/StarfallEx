@@ -8,7 +8,7 @@ ENT.Material = ENT.DefaultMaterial
 function ENT:Initialize()
 	self.rendermesh = Mesh(self.Material)
 	self:DrawShadow(false)
-	self:EnableCustomCollisions( true ) 
+	self:EnableCustomCollisions( true )
 end
 
 function ENT:BuildPhysics(mesh)
