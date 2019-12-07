@@ -10,7 +10,7 @@ local MakeSF
 
 TOOL.ClientConVar["Model"] = "models/spacecode/sfchip.mdl"
 TOOL.ClientConVar["ScriptModel"] = ""
-TOOL.ClientConVar["parent"] = "1"
+TOOL.ClientConVar["parent"] = "0"
 cleanup.Register("starfall_processor")
 
 if SERVER then
