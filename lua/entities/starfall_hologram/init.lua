@@ -8,6 +8,8 @@ function ENT:Initialize()
 	self:SetMoveType(MOVETYPE_NOCLIP)
 	self:DrawShadow(false)
 
+	self.clips = {}
+	self.clipdata = ""
 	self.scale = Vector(1,1,1)
 
 	self.update = false
@@ -36,6 +38,7 @@ function ENT:Think()
 
 		net.Start("starfall_hologram")
 		net.WriteUInt(self:EntIndex(), 16)
+
 		if self.updateScale then
 			self.updateScale = false
 			net.WriteBool(true)
@@ -54,6 +57,30 @@ function ENT:Think()
 		else
 			net.WriteBool(false)
 		end
+
+		if self.updateClip then
+			self.updateClip = false
+			
+			local clipdata = SF.StringStream()
+			for k, v in pairs(self.clips) do
+				clipdata:writeDouble(k)
+				clipdata:writeFloat(v.normal[1])
+				clipdata:writeFloat(v.normal[2])
+				clipdata:writeFloat(v.normal[3])
+				clipdata:writeFloat(v.origin[1])
+				clipdata:writeFloat(v.origin[2])
+				clipdata:writeFloat(v.origin[3])
+				clipdata:writeInt16(v.entity and v.entity:EntIndex() or 0)
+			end
+			self.clipdata = clipdata:getString()
+			
+			net.WriteBool(true)
+			net.WriteUInt(#self.clipdata, 32)
+			net.WriteData(self.clipdata, #self.clipdata)
+		else
+			net.WriteBool(false)
+		end
+
 		net.Broadcast()
 	end
 	if self.AutomaticFrameAdvance then
@@ -62,11 +89,22 @@ function ENT:Think()
 	end
 end
 
+function ENT:SetClip(index, enabled, normal, origin, entity)
+	self.update = true
+	self.updateClip = true
+	if enabled then
+		self.clips[index] = {normal = normal, origin = origin, entity = entity}
+	else
+		self.clips[index] = nil
+	end
+end
+
 net.Receive("starfall_hologram", function(len, ply)
 	local self = net.ReadEntity()
 	if self:IsValid() and self.IsSFHologram then
 		net.Start("starfall_hologram")
 		net.WriteUInt(16, self:EntIndex())
+
 		if self.scale.x~=1 or self.scale.y~=1 or self.scale.z~=1 then
 			net.WriteBool(true)
 			--net.WriteVector has bad precision
@@ -83,6 +121,14 @@ net.Receive("starfall_hologram", function(len, ply)
 		else
 			net.WriteBool(false)
 		end
+
+		if self.clipdata~="" then
+			net.WriteBool(true)
+			net.WriteStream(self.clipdata)
+		else
+			net.WriteBool(false)
+		end
+
 		net.Send(ply)
 	end
 end)

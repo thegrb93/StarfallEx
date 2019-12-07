@@ -15,6 +15,8 @@ SF.Holograms = {}
 
 SF.Permissions.registerPrivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
 
+SF.Holograms.maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
+
 SF.Holograms.Methods = hologram_methods
 SF.Holograms.Metatable = hologram_metamethods
 
@@ -256,9 +258,7 @@ if SERVER then
 		holo:SetPlaybackRate(rate)
 	end
 
-else
-	SF.Holograms.maxclips = CreateClientConVar("sf_holograms_maxclips_cl", "8", true, false, "The max number of clips per hologram entity")
-	
+else	
 	SF.Permissions.registerPrivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
 
 	function SF.Holograms.SetScale(holo, scale)
@@ -392,52 +392,6 @@ else
 		SF.Holograms.SetScale(holo, scale)
 	end
 
-	--- Updates a clip plane
-	-- @client
-	-- @param index Whatever number you want the clip to be
-	-- @param enabled Whether the clip is enabled
-	-- @param origin The center of the clip plane in world coordinates, or local to entity if it is specified
-	-- @param normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
-	-- @param entity (Optional) The entity to make coordinates local to, otherwise the world is used
-	function hologram_methods:setClip(index, enabled, origin, normal, entity)
-		checktype(self, hologram_metamethods)
-		local holo = unwrap(self)
-		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
-
-		checkluatype(index, TYPE_NUMBER)
-		checkluatype(enabled, TYPE_BOOL)
-		checktype(origin, vec_meta)
-		checktype(normal, vec_meta)
-
-		if entity ~= nil then
-			checktype(entity, ent_meta)
-			entity = eunwrap(entity)
-		end
-
-		local origin, normal = vunwrap(origin), vunwrap(normal)
-
-		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
-
-		local clips = holo.clips
-		if enabled then
-			local clip = clips[index]
-			if not clip then
-				local max = SF.Holograms.maxclips:GetInt()
-				if table.Count(holo.clips)==max then
-					SF.Throw("The maximum hologram clips is " .. max, 2)
-				end
-				clip = {}
-				clips[index] = clip
-			end
-
-			clip.normal = normal
-			clip.origin = origin
-			clip.entity = entity
-		else
-			clips[index] = nil
-		end
-	end
-
 	function hologram_methods:suppressEngineLighting (suppress)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
@@ -522,6 +476,47 @@ else
 		
 	end
 	
+end
+
+--- Updates a clip plane
+-- @shared
+-- @param index Whatever number you want the clip to be
+-- @param enabled Whether the clip is enabled
+-- @param origin The center of the clip plane in world coordinates, or local to entity if it is specified
+-- @param normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
+-- @param entity (Optional) The entity to make coordinates local to, otherwise the world is used
+function hologram_methods:setClip(index, enabled, origin, normal, entity)
+	checktype(self, hologram_metamethods)
+	local holo = unwrap(self)
+	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
+
+	checkluatype(index, TYPE_NUMBER)
+	checkluatype(enabled, TYPE_BOOL)
+	checktype(origin, vec_meta)
+	checktype(normal, vec_meta)
+
+	if entity ~= nil then
+		checktype(entity, ent_meta)
+		entity = eunwrap(entity)
+	end
+
+	local origin, normal = vunwrap(origin), vunwrap(normal)
+
+	checkpermission(SF.instance, holo, "hologram.setRenderProperty")
+
+	if enabled then
+		local clips = holo.clips
+		if not clips[index] then
+			local max = SF.Holograms.maxclips:GetInt()
+			if table.Count(clips)==max then
+				SF.Throw("The maximum hologram clips is " .. max, 2)
+			end
+		end
+
+		holo:SetClip(index, enabled, normal, origin, entity)
+	else
+		holo:SetClip(index, false)
+	end
 end
 
 --- Gets the hologram scale.

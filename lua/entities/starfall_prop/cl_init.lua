@@ -46,31 +46,10 @@ end
 
 net.Receive("starfall_custom_prop", function()
 	local index = net.ReadUInt(16)
-	local self
+	local self, data
 
-	local function getEnt(e)
-		if e:IsValid() and e:GetClass()=="starfall_prop" then
-			self = e
-			return true
-		end
-		return false
-	end
-
-	local function findEnt(f)
-		local timeout = CurTime()+5
-		local name = "SF_CustomPropUpdate"..index
-		hook.Add("Think", name, function()
-			if getEnt(Entity(index)) then
-				f()
-				hook.Remove("Think", name)
-			elseif CurTime()>timeout then
-				hook.Remove("Think", name)
-			end
-		end)
-	end
-	findEnt(function() end)
-
-	local function applyData(data)
+	local function applyData()
+		if not (self and self:IsValid() and data) then return end
 		local stream = SF.StringStream(data)
 		local physmesh = {}
 		local mins, maxs = Vector(math.huge, math.huge, math.huge), Vector(-math.huge, -math.huge, -math.huge)
@@ -103,15 +82,15 @@ net.Receive("starfall_custom_prop", function()
 		self:SetCollisionBounds(mins, maxs)
 	end
 
-	net.ReadStream(nil, function(data)
-		if data then
-			if self then
-				if self:IsValid() then
-					applyData(data)
-				end
-			else
-				findEnt(function() applyData(data) end)
-			end
+	SF.WaitForEntity(index, function(e)
+		if e:GetClass()=="starfall_prop" then
+			self = e
+			applyData()
 		end
+	end)
+
+	net.ReadStream(nil, function(data_)
+		data = data_
+		applyData()
 	end)
 end)

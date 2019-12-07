@@ -613,6 +613,25 @@ function SF.CheckLuaType(val, typ, level)
 	end
 end
 
+function SF.WaitForEntity(index, callback)
+	local ent = Entity(index)
+	if ent:IsValid() then
+		callback(ent)
+	else
+		local timeout = CurTime()+5
+		local name = "SF_WaitForEntity"..index
+		hook.Add("Think", name, function()
+			local ent = Entity(index)
+			if ent:IsValid() then
+				callback(ent)
+				hook.Remove("Think", name)
+			elseif CurTime()>timeout then
+				hook.Remove("Think", name)
+			end
+		end)
+	end
+end
+
 
 local shaderBlacklist = {
 	["LightmappedGeneric"] = true,

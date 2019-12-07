@@ -15,6 +15,14 @@ function ENT:Initialize()
 	net.SendToServer()
 end
 
+function ENT:SetClip(index, enabled, normal, origin, entity)
+	if enabled then
+		self.clips[index] = {normal = normal, origin = origin, entity = entity}
+	else
+		self.clips[index] = nil
+	end
+end
+
 function ENT:Draw()
 	local clipCount = 0
 	if next(self.clips) then
@@ -90,29 +98,37 @@ net.Receive("starfall_hologram", function()
 	if updateScale then scale = Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()) end
 	local updateSuppressEngineLighting, suppressEngineLighting = net.ReadBool()
 	if updateSuppressEngineLighting then suppressEngineLighting = net.ReadBool() end
+	local updateClips, clipdata = net.ReadBool()
+	if updateClips then clipdata = SF.StringStream(net.ReadData(net.ReadUInt(32))) end
 
 	local function applyHologram(self)
-		if self:IsValid() and self.IsSFHologram then
+		if self.IsSFHologram then
 			if updateScale then
 				SF.Holograms.SetScale(self, scale)
 			end
 			if updateSuppressEngineLighting then
 				self.suppressEngineLighting = suppressEngineLighting
 			end
-			return true
+			if updateClips then
+				local clips = {}
+				for i=1, math.Round(#clipdata.buffer/34) do
+					local index = clipdata:readDouble()
+					local clip = {
+						normal = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
+						origin = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
+					}
+					local entind = clipdata:readUInt16()
+					if entind~=0 then
+						SF.WaitForEntity(entind, function(e) clip.entity = e end)
+					end
+					clips[index] = clip
+				end
+				self.clips = clips
+			end
 		end
-		return false
 	end
 
-	if not applyHologram(Entity(index)) then
-		local timeout = CurTime()+5
-		local name = "SF_HologramUpdate"..index
-		hook.Add("Think", name, function()
-			if CurTime()>timeout or applyHologram(Entity(index)) then
-				hook.Remove("Think", name)
-			end
-		end)
-	end
+	SF.WaitForEntity(index, applyHologram)
 end)
 
 -- For when the hologram matrix gets cleared
