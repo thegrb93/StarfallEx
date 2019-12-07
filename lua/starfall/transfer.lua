@@ -13,8 +13,9 @@ function net.ReadStarfall(ply, callback)
 		headers[#headers + 1] = {name = net.ReadString(), size = net.ReadUInt(32)}
 	end
 
+	local crc = net.ReadString()
 	net.ReadStream(ply, function(data)
-		if data then
+		if data and util.CRC(data)==crc then
 			local pos = 1
 			for k, v in pairs(headers) do
 				sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
@@ -47,7 +48,9 @@ function net.WriteStarfall(sfdata)
 		net.WriteUInt(#code, 32)
 		filecodes[#filecodes + 1] = code
 	end
-	net.WriteStream(table.concat(filecodes))
+	local data = table.concat(filecodes)
+	net.WriteString(util.CRC(data))
+	net.WriteStream(data)
 end
 
 if SERVER then
