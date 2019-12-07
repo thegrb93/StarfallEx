@@ -17,6 +17,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
+SF.Permissions.registerPrivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
 SF.AddHook("postload", function()
@@ -230,7 +231,11 @@ function ents_methods:setColor(clr)
 	checktype(clr, SF.Types["Color"])
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
 	ent:SetColor(clr)
@@ -256,7 +261,11 @@ function ents_methods:setMaterial(material)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	ent:SetMaterial(material)
 	if SERVER then duplicator.StoreEntityModifier(ent, "material", { MaterialOverride = material }) end
@@ -271,7 +280,11 @@ function ents_methods:setSubMaterial(index, material)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 	index = math.Clamp(index, 0, 255)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	ent:SetSubMaterial(index, material)
 	if SERVER then
@@ -288,7 +301,11 @@ function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(value, TYPE_NUMBER)
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	ent:SetBodygroup(bodygroup, value)
 end
@@ -300,7 +317,11 @@ function ents_methods:setSkin(skinIndex)
 	checkluatype(skinIndex, TYPE_NUMBER)
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	ent:SetSkin(skinIndex)
 end
@@ -313,7 +334,11 @@ function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	ent:SetRenderMode(rendermode)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderMode = rendermode }) end
@@ -327,7 +352,11 @@ function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	if SERVER and ent == SF.instance.player then
+		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	end
 
 	ent:SetRenderFX(renderfx)
 	if SERVER then duplicator.StoreEntityModifier(ent, "colour", { RenderFX = renderfx }) end
