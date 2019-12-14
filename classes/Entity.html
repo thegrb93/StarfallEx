@@ -393,6 +393,16 @@ Gets the entitiy's eye angles </td>
 Gets the entity's eye position </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:getFlexScale">getFlexScale</a>( &nbsp;)</td>
+			<td class="summary">
+Gets the scale of the entity flexes </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#Entity:getFlexWeight">getFlexWeight</a>( flexid&nbsp;)</td>
+			<td class="summary">
+Gets the weight (value) of a flex.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:getFlexes">getFlexes</a>( &nbsp;)</td>
 			<td class="summary">
 Returns a table of flexname -> flexid pairs for use in flex functions.</td>
@@ -715,7 +725,7 @@ Sets whether an entity's shadow should be drawn </td>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:setFlexScale">setFlexScale</a>( scale&nbsp;)</td>
 			<td class="summary">
-Sets the scale of all flexes of an entity </td>
+Sets the scale of the entity flexes </td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#Entity:setFlexWeight">setFlexWeight</a>( flexid, weight&nbsp;)</td>
@@ -1565,6 +1575,49 @@ Gets the entity's eye position</p>
 			<li>Eye position of the entity</li>
 			<li>In case of a ragdoll, the position of the second eye</li>
 		</ol>
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Entity:getFlexScale"></a><strong>Entity:getFlexScale</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Gets the scale of the entity flexes</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The scale of the flexes</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="Entity:getFlexWeight"></a><strong>Entity:getFlexWeight</strong>( flexid&nbsp;)</dt>
+<dd>
+	<p>
+Gets the weight (value) of a flex.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>flexid</tt> ― The id of the flex</li>
+		</ul>
+	</section>
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>The weight of the flex</p>
+		
 	</section>
 	
 	
@@ -2784,14 +2837,14 @@ Sets whether an entity's shadow should be drawn</p>
 <dt><span class="realm_sh"></span><a name="Entity:setFlexScale"></a><strong>Entity:setFlexScale</strong>( scale&nbsp;)</dt>
 <dd>
 	<p>
-Sets the scale of all flexes of an entity</p>
+Sets the scale of the entity flexes</p>
 	
 	
 	<section class="parameters">
 		<h3>Parameters</h3>
 		<ul>
 			
-			<li><tt>scale</tt></li>
+			<li><tt>scale</tt> ― The scale of the flexes to set</li>
 		</ul>
 	</section>
 	
