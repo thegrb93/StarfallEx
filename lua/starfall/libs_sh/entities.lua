@@ -926,6 +926,22 @@ function ents_methods:getFlexes()
 	return flexes
 end
 
+--- Gets the weight (value) of a flex.
+-- @param flexid The id of the flex
+-- @return The weight of the flex
+function ents_methods:getFlexWeight(flexid)
+	local ent = getent(self)
+
+	checkluatype(flexid, TYPE_NUMBER)
+	flexid = math.floor(flexid)
+
+	if flexid < 0 or flexid >= ent:GetFlexNum() then
+		SF.Throw("Invalid flex: "..flexid, 2)
+	end
+
+	return ent:GetFlexWeight(flexid)
+end
+
 --- Sets the weight (value) of a flex.
 -- @param flexid The id of the flex
 -- @param weight The weight of the flex
@@ -944,14 +960,19 @@ function ents_methods:setFlexWeight(flexid, weight)
 	ent:SetFlexWeight(flexid, weight)
 end
 
---- Sets the scale of all flexes of an entity
+--- Gets the scale of the entity flexes
+-- @return The scale of the flexes
+function ents_methods:getFlexScale()
+	local ent = getent(self)
+	return ent:GetFlexScale()
+end
+
+--- Sets the scale of the entity flexes
+-- @param scale The scale of the flexes to set
 function ents_methods:setFlexScale(scale)
 	local ent = getent(self)
-
 	checkluatype(scale, TYPE_NUMBER)
-
 	checkpermission(SF.instance, ent, "entities.setRenderProperty")
-
 	ent:SetFlexScale(scale)
 end
 
