@@ -63,8 +63,8 @@ else
 	net.Receive("starfall_openeditorcode", function(len)
 		SF.Editor.open()
 
-		net.ReadStarfall(nil, function(sfdata)
-			if sfdata then
+		net.ReadStarfall(nil, function(ok, sfdata)
+			if ok then
 				local function openfiles()
 					local mainfile = sfdata.files[sfdata.mainfile]
 					sfdata.files[sfdata.mainfile] = nil

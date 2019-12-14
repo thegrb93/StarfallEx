@@ -21,9 +21,9 @@ function net.ReadStarfall(ply, callback)
 				sfdata.files[v.name] = string.sub(data, pos, pos+v.size-1)
 				pos = pos + v.size
 			end
-			callback(sfdata)
+			callback(true, sfdata)
 		else
-			callback()
+			callback(false, sfdata)
 		end
 	end)
 end
@@ -86,8 +86,8 @@ if SERVER then
 
 		updata.reading = true
 
-		net.ReadStarfall(ply, function(sfdata)
-			if sfdata then
+		net.ReadStarfall(ply, function(ok, sfdata)
+			if ok then
 				if #sfdata.mainfile > 0 then
 					sfdata.owner = ply
 					updata.callback(sfdata)
