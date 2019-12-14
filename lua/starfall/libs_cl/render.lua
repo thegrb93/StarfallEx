@@ -261,7 +261,6 @@ end)
 
 SF.AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
-		surface.DisableClipping(false) 
 		render.SetStencilEnable(false)
 		render.OverrideBlend(false)
 		render.OverrideDepthEnable(false, false)
