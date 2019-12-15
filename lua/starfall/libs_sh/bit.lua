@@ -372,7 +372,8 @@ end
 --- returns a null terminated string, reads until "\x00" and advances the buffer pointer.
 --@return The string of bytes read
 function ss_methods:readString()
-	return self:readUntil(0)
+	local s = self:readUntil(0)
+	return string.sub(s, 1, #s-1)
 end
 
 --- Writes the given string and advances the buffer pointer.
