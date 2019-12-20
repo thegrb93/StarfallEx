@@ -295,34 +295,31 @@ if CLIENT then
 		cl = Color(255,191,0),
 	}
 	
-	
-	local star_mat = Material("radon/starfall2")
-	local star_count = 8
-	local starflakes = {}
-	
-	local function getRandomFlake(id, prvVel, fromBottom)
-		return {
-			y = fromBottom and math.random(255+30,255+60) or math.random(-30,-60),
-			--x = 235/star_count*id,
-			x = 255 / star_count * id,
-			xvel = (prvVel or 0) * 0.3 + math.Rand(-0.1,0.1),
-			yvel = math.Rand(0.5,1) * (fromBottom and -1 or 1),
-			ang = math.Rand(0.5, 1),
-			angvel = math.Rand(0.5, 1),
-			size = math.random(50,80),
-			color = Color(math.random(0,40), math.random(120,190), math.random(200,255)),
-		}
+	local function setRandomFlake(flake, frac, prvVel, fromBottom)
+		flake.y = fromBottom and math.random(255+30,255+60) or math.random(-30,-60)
+		--flake.x = 235/self.starCount*id
+		flake.x = 255 * frac
+		flake.xvel = prvVel * 0.3 + math.Rand(-0.1,0.1)
+		flake.yvel = math.Rand(0.5,1) * (fromBottom and -1 or 1)
+		flake.ang = math.Rand(0.5, 1)
+		flake.angvel = math.Rand(0.5, 1)
+		flake.size = math.random(50,80)
+		flake.color = Color(math.random(0,40), math.random(120,190), math.random(200,255))
 	end
 	
-	for i = 1, star_count do
-		local flake = getRandomFlake(i)
-		starflakes[i] = flake
+	function TOOL:Deploy()
+		self.starCount = 8
+		self.starflakes = {}
+		
+		for i = 1, self.starCount do
+			local flake = {}
+			setRandomFlake(flake, i / self.starCount, 0)
+			self.starflakes[i] = flake
+		end
+		
+		self.prvEyeYaw = 0
+		self.deployed = true
 	end
-	
-	local prvEyeYaw = 0
-	
-	local sfToolMat = nil
-	local sfToolRt = nill
 	
 	local fileData = nil
 	local function updateFileData()
@@ -344,25 +341,22 @@ if CLIENT then
 		
 	end
 	
-	
-	updateFileData()
-	PrintTable(fileData)
-	
-	
+	local starMat, sfToolMat, sfToolRt
 	function TOOL:DrawToolScreen(w, h)
-		
+		-- In singleplayer clientside deploy doesn't work
+		if not self.deployed then self:Deploy() end
 		if not sfToolMat then
+			starMat = Material("radon/starfall2.png", "smooth")
+			starMat:SetInt("$flags",32816)
+
 			sfToolRt = GetRenderTarget( "sf_tool_rt", w, h) 
 			sfToolMat = CreateMaterial( "sf_tool_mat", "UnlitGeneric", {
-				["$basetexture"] = sfToolRt:GetName(),
-				["$translucent"] = 1,
-				["$vertexcolor"] = 1
+				["$basetexture"] = sfToolRt:GetName()
 			} )
+			sfToolMat:SetInt("$flags",32816)
 		end
 
 		render.PushRenderTarget(sfToolRt)
-		cam.Start2D()
-			
 			-- SF.Editor not valid at start of the game
 			--local filename = SF.Editor.getOpenFile() or "main"
 			
@@ -370,9 +364,9 @@ if CLIENT then
 			
 			-- shake particles based on view yaw rotation
 			local eyeAng = ply:EyeAngles().y
-			local eyeYawVel = (((eyeAng - prvEyeYaw) % 360 ) + 360 ) % 360
+			local eyeYawVel = (((eyeAng - self.prvEyeYaw) % 360 ) + 360 ) % 360
 			if eyeYawVel > 180 then eyeYawVel = eyeYawVel - 360 end
-			prvEyeYaw = eyeAng
+			self.prvEyeYaw = eyeAng
 			
 			-- shake particles based on left/right velocity
 			self.velY = self.velY or 0
@@ -385,10 +379,10 @@ if CLIENT then
 			surface.DrawRect(0,0,w,h)
 			
 			-- render the particles
-			surface.SetMaterial(star_mat)
-			for i = 1, star_count do
+			surface.SetMaterial(starMat)
+			for i = 1, self.starCount do
 				
-				local flake = starflakes[i]
+				local flake = self.starflakes[i]
 				
 				flake.yvel = flake.yvel + velX
 				flake.xvel = flake.xvel + eyeYawVel/30 + velY/6000
@@ -402,7 +396,7 @@ if CLIENT then
 				local flakeAlpha = 255+60-flake.y
 				
 				if flakeAlpha <= 0 or flake.y < -60 then
-					starflakes[i] = getRandomFlake(i, flake.xvel, flake.y < -60)
+					setRandomFlake(self.starflakes[i], i / self.starCount, flake.xvel, flake.y < -60)
 				elseif flake.x < -30 then
 					flake.x = w + 30
 				elseif flake.x > w + 30 then
@@ -436,7 +430,6 @@ if CLIENT then
 			scriptnames:
 					main	=	Cipeczka
 			]]
-		cam.End2D()
 		render.PopRenderTarget()
 		
 		surface.SetDrawColor( 255, 255, 255, 255 )
