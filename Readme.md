@@ -1,7 +1,7 @@
 Starfall Scripting Environment
 ----------
 
-- Discord Server: [`https://discord.gg/KPa4cJp`](https://discord.gg/KPa4cJp)
+- Discord Server: [`https://discord.gg/yFBU8PU`](https://discord.gg/yFBU8PU)
 - Documentation: [`http://thegrb93.github.io/StarfallEx/`](http://thegrb93.github.io/StarfallEx/)
 
 
