@@ -586,7 +586,7 @@ local viewmatrix_checktypes =
 {
 	x = TYPE_NUMBER, y = TYPE_NUMBER, w = TYPE_NUMBER, h = TYPE_NUMBER, type = TYPE_STRING,
 	fov = TYPE_NUMBER, aspect = TYPE_NUMBER, zfar = TYPE_NUMBER, znear = TYPE_NUMBER, subrect = TYPE_BOOL,
-	bloomtone = TYPE_BOOL, offcenter = TYPE_TABLE, ortho = TYPE_TABLE
+	bloomtone = TYPE_BOOL, offcenter = TYPE_TABLE, ortho = TYPE_TABLE, origin = false, angles = false
 }
 --- Pushes a perspective matrix onto the view matrix stack.
 -- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
@@ -597,15 +597,15 @@ function render_library.pushViewMatrix(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
 	local newtbl = {}
-	if tbl.origin ~= nil then local origin = tbl.origin checktype( origin, SF.Vectors.Metatable ) newtbl.origin = vunwrap(origin) tbl.origin = nil end
-	if tbl.angles ~= nil then local angles = tbl.angles checktype( angles, SF.Angles.Metatable ) newtbl.angles = aunwrap(angles) tbl.angles = nil end
+	if tbl.origin ~= nil then local origin = tbl.origin checktype( origin, SF.Vectors.Metatable ) newtbl.origin = vunwrap(origin) end
+	if tbl.angles ~= nil then local angles = tbl.angles checktype( angles, SF.Angles.Metatable ) newtbl.angles = aunwrap(angles) end
 
 	for k, v in pairs(tbl) do
 		local check = viewmatrix_checktypes[k]
 		if check then
 			checkluatype (v, check)
 			newtbl[k] = v
-		else
+		elseif check ~= false then
 			SF.Throw("Invalid key found in view matrix: " .. k, 2)
 		end
 	end
