@@ -586,8 +586,10 @@ local viewmatrix_checktypes =
 {
 	x = TYPE_NUMBER, y = TYPE_NUMBER, w = TYPE_NUMBER, h = TYPE_NUMBER, type = TYPE_STRING,
 	fov = TYPE_NUMBER, aspect = TYPE_NUMBER, zfar = TYPE_NUMBER, znear = TYPE_NUMBER, subrect = TYPE_BOOL,
-	bloomtone = TYPE_BOOL, offcenter = TYPE_TABLE, ortho = TYPE_TABLE, origin = false, angles = false
+	bloomtone = TYPE_BOOL, offcenter = TYPE_TABLE, ortho = TYPE_TABLE
 }
+local viewmatrix_checktypes_ignore = {origin = true, angles = true}
+
 --- Pushes a perspective matrix onto the view matrix stack.
 -- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
@@ -605,7 +607,7 @@ function render_library.pushViewMatrix(tbl)
 		if check then
 			checkluatype (v, check)
 			newtbl[k] = v
-		elseif check ~= false then
+		elseif not viewmatrix_checktypes_ignore[k] then
 			SF.Throw("Invalid key found in view matrix: " .. k, 2)
 		end
 	end
