@@ -219,6 +219,35 @@ function vmatrix_methods:toTable()
 	return unwrap(self):ToTable()
 end
 
+--- Sets the rotation or the matrix to the rotation by an axis and angle
+-- @param axis The normalized axis of rotation
+-- @param angle The angle of rotation in radians
+function vmatrix_methods:setAxisAngle(axis, ang)
+	checktype(axis, vec_meta)
+	
+	local x, y, z = axis[1], axis[2], axis[3]
+	local c = math.cos(ang)
+	local s = math.sin(ang)
+	local cinv = 1 - c
+	
+	local xycinv = x*y*cinv
+	local xzcinv = x*z*cinv
+	local yzcinv = y*z*cinv
+	
+	local xs = x*s
+	local ys = y*s
+	local zs = z*s
+	
+	local forward = Vector(c + x^2*cinv, xycinv + zs, xzcinv - ys)
+	local right = Vector(zs - xycinv, -c - y^2*cinv, -yzcinv - xs)
+	local up = Vector(xzcinv + ys, yzcinv - xs, c + z^2*cinv)
+	
+	local m = unwrap(self)
+	m:SetForward(forward)
+	m:SetRight(right)
+	m:SetUp(up)
+end
+
 --- Gets the rotation axis and angle of rotation of the rotation matrix
 -- @return The axis of rotation
 -- @return The angle of rotation
