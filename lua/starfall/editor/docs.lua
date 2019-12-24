@@ -1505,13 +1505,15 @@ Finds entities in a sphere ";};["sortByClosest"]={["class"]="function";["descrip
 Returns a sorted array of entities by how close they are to a point";["fname"]="sortByClosest";["library"]="find";["name"]="find_library.sortByClosest";["param"]={[1]="ents";[2]="pos";[3]="furthest";["ents"]="The array of entities";["furthest"]="Whether to have the further entities first";["pos"]="The position";};["private"]=false;["realm"]="sh";["ret"]="A table of the closest entities";["summary"]="\
 Returns a sorted array of entities by how close they are to a point ";};};["libtbl"]="find_library";["name"]="find";["server"]=true;["summary"]="\
 Find library.";["tables"]={};};["game"]={["class"]="library";["client"]=true;["description"]="\
-Game functions";["fields"]={};["functions"]={[1]="getHostname";[2]="getMap";[3]="getMaxPlayers";[4]="hasFocus";[5]="isDedicated";[6]="isLan";[7]="isSinglePlayer";["getHostname"]={["class"]="function";["classForced"]=true;["description"]="\
+Game functions";["fields"]={};["functions"]={[1]="getHostname";[2]="getMap";[3]="getMaxPlayers";[4]="getSunInfo";[5]="hasFocus";[6]="isDedicated";[7]="isLan";[8]="isSinglePlayer";["getHostname"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns The hostname";["fname"]="getHostname";["library"]="game";["name"]="game_lib.getHostname";["param"]={};["realm"]="sh";["ret"]="string The hostname of the se`rver";["summary"]="\
 Returns The hostname ";};["getMap"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns the map name";["fname"]="getMap";["library"]="game";["name"]="game_lib.getMap";["param"]={};["realm"]="sh";["ret"]="string The name of the current map";["summary"]="\
 Returns the map name ";};["getMaxPlayers"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns the maximum player limit";["fname"]="getMaxPlayers";["library"]="game";["name"]="game_lib.getMaxPlayers";["param"]={};["realm"]="sh";["ret"]="number The max players allowed by the server";["summary"]="\
-Returns the maximum player limit ";};["hasFocus"]={["class"]="function";["classForced"]=true;["client"]=true;["description"]="\
+Returns the maximum player limit ";};["getSunInfo"]={["class"]="function";["client"]=true;["description"]="\
+Returns the direction and how obstructed the map's sun is";["fname"]="getSunInfo";["library"]="game";["name"]="game_lib.getSunInfo";["param"]={};["private"]=false;["realm"]="cl";["ret"]={[1]="vector The direction of the sun";[2]="number How obstructed the sun is 0 to 1.";};["summary"]="\
+Returns the direction and how obstructed the map's sun is ";};["hasFocus"]={["class"]="function";["classForced"]=true;["client"]=true;["description"]="\
 Returns if the game has focus or not, i.e. will return false if the game is minimized";["fname"]="hasFocus";["library"]="game";["name"]="game_lib.hasFocus";["param"]={};["realm"]="cl";["ret"]="boolean True if the game is focused";["summary"]="\
 Returns if the game has focus or not, i.e.";};["isDedicated"]={["class"]="function";["classForced"]=true;["description"]="\
 Returns whether or not the server is a dedicated server";["fname"]="isDedicated";["library"]="game";["name"]="game_lib.isDedicated";["param"]={};["realm"]="sh";["ret"]="boolean True if the game is a dedicated server";["summary"]="\
