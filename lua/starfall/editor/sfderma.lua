@@ -327,7 +327,7 @@ function PANEL:DoRightClick (node)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
 						local oldFile = node:GetFileName()
-						local saveFile = "starfall/" .. text ..".txt"
+						local saveFile = string.GetPathFromFilename(node:GetFileName()).."/"..text..".txt"
 						SF.Editor.renameFile(oldFile,saveFile)
 						self:ReloadTree()
 				end)
