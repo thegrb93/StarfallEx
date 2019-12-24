@@ -64,7 +64,7 @@ end
 
 net.Receive("starfall_hologram_clips", function(len, ply)
 	local self = net.ReadEntity()
-	if self:IsValid() and self.IsSFHologram then
+	if self:IsValid() and self.IsSFHologram and #self.clipdata>0 then
 		self:TransmitClips(ply)
 	end
 end)
