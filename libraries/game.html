@@ -228,12 +228,17 @@ Returns the map name </td>
 Returns the maximum player limit </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#game.hasFocus">hasFocus</a>( &nbsp;)</td>
+			<td class="summary">
+Returns if the game has focus or not, i.e.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#game.isDedicated">isDedicated</a>( &nbsp;)</td>
 			<td class="summary">
 Returns whether or not the server is a dedicated server </td>
 		</tr>
 		<tr>
-			<td class="name"><span class="realm_sh"></span><del><a href="#game.isLan">isLan</a>( &nbsp;)</del></td>
+			<td class="name"><span class="realm_sh"></span><a href="#game.isLan">isLan</a>( &nbsp;)</td>
 			<td class="summary">
 Returns true if the server is on a LAN </td>
 		</tr>
@@ -260,6 +265,12 @@ Returns The hostname</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>string The hostname of the se`rver</p>
+		
+	</section>
 	
 	
 </dd>
@@ -272,6 +283,12 @@ Returns the map name</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>string The name of the current map</p>
+		
+	</section>
 	
 	
 </dd>
@@ -284,6 +301,30 @@ Returns the maximum player limit</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>number The max players allowed by the server</p>
+		
+	</section>
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="game.hasFocus"></a><strong>game.hasFocus</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns if the game has focus or not, i.e. will return false if the game is minimized</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean True if the game is focused</p>
+		
+	</section>
 	
 	
 </dd>
@@ -296,21 +337,30 @@ Returns whether or not the server is a dedicated server</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean True if the game is a dedicated server</p>
+		
+	</section>
 	
 	
 </dd>
 		
-<dt><span class="realm_sh"></span><del><a name="game.isLan"></a><strong>game.isLan</strong>( &nbsp;)</del></dt>
+<dt><span class="realm_sh"></span><a name="game.isLan"></a><strong>game.isLan</strong>( &nbsp;)</dt>
 <dd>
 	<p>
 Returns true if the server is on a LAN</p>
 	
-	<blockquote class="deprecation">
-		Deprecated: Possibly add ConVar retrieval for users in future. Could implement with SF Script.
-	</blockquote>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean True if the game is a lan game</p>
+		
+	</section>
 	
 	
 </dd>
@@ -323,6 +373,12 @@ Returns whether or not the current game is single player</p>
 	
 	
 	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean True if the game is singleplayer</p>
+		
+	</section>
 	
 	
 </dd>
