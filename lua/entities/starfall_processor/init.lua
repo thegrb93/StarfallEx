@@ -8,9 +8,15 @@ function ENT:Initialize ()
 	self:SetSolid(SOLID_VPHYSICS)
 	self:SetUseType(SIMPLE_USE)
 
+	self:AddEFlags( EFL_FORCE_CHECK_TRANSMIT )
+
 	self:SetNWInt("State", self.States.None)
 	self:SetColor(Color(255, 0, 0, self:GetColor().a))
 	self.ErroredPlayers = {}
+end
+
+function ENT:UpdateTransmitState()
+	return TRANSMIT_ALWAYS
 end
 
 function ENT:SetCustomModel(model)
