@@ -33,6 +33,15 @@ if SERVER then
 			sf.Inputs = WireLib.AdjustSpecialInputs(sf, inputs[1], inputs[2])
 		end
 		if WireLib and outputs and outputs[1] and outputs[2] then
+			-- Initialize wirelink and entity outputs if present
+			for _, iname in pairs(outputs[1]) do
+				if iname == "entity" then
+					WireLib.CreateEntityOutput( nil, sf, {true} )
+				elseif iname == "wirelink" then
+					WireLib.CreateWirelinkOutput( nil, sf, {true} )
+				end
+			end
+
 			sf.Outputs = WireLib.AdjustSpecialOutputs(sf, outputs[1], outputs[2])
 		end
 
