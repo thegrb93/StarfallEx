@@ -17,7 +17,6 @@ if SERVER then
 	CreateConVar('sbox_maxstarfall_processor', 20, { FCVAR_REPLICATED, FCVAR_NOTIFY, FCVAR_ARCHIVE })
 
 	util.AddNetworkString("starfall_openeditor")
-	util.AddNetworkString("starfall_openeditorcode")
 
 	function MakeSF(pl, Pos, Ang, model, inputs, outputs)
 		if not pl:CheckLimit("starfall_processor") then return false end
@@ -55,41 +54,38 @@ else
 	language.Add("Cleanup_starfall_processor", "Starfall Processors")
 	TOOL.Information = { "left", "right", "reload" }
 
-
 	net.Receive("starfall_openeditor", function(len)
-		SF.Editor.open()
-	end)
-
-	net.Receive("starfall_openeditorcode", function(len)
+		SF.Version = net.ReadString()
 		SF.Editor.open()
 
-		net.ReadStarfall(nil, function(ok, sfdata)
-			if ok then
-				local function openfiles()
-					local mainfile = sfdata.files[sfdata.mainfile]
-					sfdata.files[sfdata.mainfile] = nil
-					for filename, code in pairs(sfdata.files) do
-						SF.Editor.openWithCode(filename, code)
-					end
-					-- Add mainfile last so it gets focus
-					SF.Editor.openWithCode(sfdata.mainfile, mainfile)
-				end
-
-				if SF.Editor.initialized then
-					openfiles()
-				else
-					hook.Add("Think", "SFWaitForEditor", function()
-						if SF.Editor.initialized then
-							openfiles()
-							hook.Remove("Think", "SFWaitForEditor")
+		if net.ReadBool() then
+			net.ReadStarfall(nil, function(ok, sfdata)
+				if ok then
+					local function openfiles()
+						local mainfile = sfdata.files[sfdata.mainfile]
+						sfdata.files[sfdata.mainfile] = nil
+						for filename, code in pairs(sfdata.files) do
+							SF.Editor.openWithCode(filename, code)
 						end
-					end)
-				end
-			else
-				SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
-			end
-		end)
+						-- Add mainfile last so it gets focus
+						SF.Editor.openWithCode(sfdata.mainfile, mainfile)
+					end
 
+					if SF.Editor.initialized then
+						openfiles()
+					else
+						hook.Add("Think", "SFWaitForEditor", function()
+							if SF.Editor.initialized then
+								openfiles()
+								hook.Remove("Think", "SFWaitForEditor")
+							end
+						end)
+					end
+				else
+					SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
+				end
+			end)
+		end
 	end)
 end
 
@@ -165,10 +161,17 @@ function TOOL:RightClick(trace)
 
 		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
 			if ent.mainfile then
-				SF.SendStarfall("starfall_openeditorcode", ent, ply)
+				net.Start("starfall_openeditor")
+				net.WriteString(SF.Version)
+				net.WriteBool(true)
+				net.WriteStarfall(ent)
+				net.Send(ply)
 			end
 		else
-			net.Start("starfall_openeditor") net.Send(ply)
+			net.Start("starfall_openeditor")
+			net.WriteString(SF.Version)
+			net.WriteBool(false)
+			net.Send(ply)
 		end
 
 	end

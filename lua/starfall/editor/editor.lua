@@ -189,7 +189,7 @@ if CLIENT then
 			if v.Init then v:Init() end
 		end
 
-		editor:Setup("Starfall Editor", "starfall", "Starfall")
+		editor:Setup("Starfall Editor (" .. SF.Version .. ")", "starfall", "Starfall")
 	end
 
 	function SF.Editor.createGlobalPermissionsPanel(client, server)
