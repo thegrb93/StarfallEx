@@ -147,39 +147,11 @@ Sets the effect's start ";};["setSurfaceProp"]={["class"]="function";["classlib"
 Sets the effect's surface property";["fname"]="setSurfaceProp";["name"]="effect_methods:setSurfaceProp";["param"]={[1]="prop";["prop"]="The surface property";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets the effect's surface property ";};};["name"]="Effect";["server"]=true;["summary"]="\
 Effect type ";["typtbl"]="effect_methods";};["Entity"]={["class"]="class";["client"]=true;["description"]="\
-Entity type";["fields"]={};["methods"]={[1]="addAngleVelocity";[10]="enableDrag";[100]="setComponentLocksControls";[101]="setCustomPropForces";[102]="setDrawShadow";[103]="setFlexScale";[104]="setFlexWeight";[105]="setFrozen";[106]="setInertia";[107]="setMass";[108]="setMaterial";[109]="setMesh";[11]="enableGravity";[110]="setMeshMaterial";[111]="setNoDraw";[112]="setNocollideAll";[113]="setParent";[114]="setPhysMaterial";[115]="setPos";[116]="setPose";[117]="setRenderBounds";[118]="setRenderFX";[119]="setRenderMode";[12]="enableMotion";[120]="setSkin";[121]="setSolid";[122]="setSubMaterial";[123]="setTrails";[124]="setUnbreakable";[125]="setVelocity";[126]="stopSound";[127]="testPVS";[128]="toHologram";[129]="translateBoneToPhysBone";[13]="enableSphere";[130]="translatePhysBoneToBone";[131]="unparent";[132]="worldSpaceAABB";[133]="worldToLocal";[134]="worldToLocalAngles";[14]="entIndex";[15]="extinguish";[16]="getAllConstrained";[17]="getAngleVelocity";[18]="getAngleVelocityAngle";[19]="getAngles";[2]="addCollisionListener";[20]="getAttachment";[21]="getAttachmentParent";[22]="getAttachments";[23]="getBoneCount";[24]="getBoneMatrix";[25]="getBoneName";[26]="getBoneParent";[27]="getBonePosition";[28]="getChildren";[29]="getChipName";[3]="applyAngForce";[30]="getClass";[31]="getClipping";[32]="getColor";[33]="getCreationID";[34]="getCreationTime";[35]="getEyeAngles";[36]="getEyePos";[37]="getFlexScale";[38]="getFlexWeight";[39]="getFlexes";[4]="applyDamage";[40]="getForward";[41]="getHealth";[42]="getInertia";[43]="getLinkedComponents";[44]="getMass";[45]="getMassCenter";[46]="getMassCenterW";[47]="getMaterial";[48]="getMaterials";[49]="getMatrix";[5]="applyForceCenter";[50]="getMaxHealth";[51]="getModel";[52]="getOwner";[53]="getParent";[54]="getPhysMaterial";[55]="getPhysicsObject";[56]="getPhysicsObjectCount";[57]="getPhysicsObjectNum";[58]="getPos";[59]="getPose";[6]="applyForceOffset";[60]="getRight";[61]="getSkin";[62]="getSubMaterial";[63]="getUp";[64]="getVelocity";[65]="getWaterLevel";[66]="ignite";[67]="isFrozen";[68]="isNPC";[69]="isOnFire";[7]="applyTorque";[70]="isOnGround";[71]="isPlayer";[72]="isPlayerHolding";[73]="isValid";[74]="isValidPhys";[75]="isVehicle";[76]="isWeapon";[77]="isWeldedTo";[78]="linkComponent";[79]="localToWorld";[8]="breakEnt";[80]="localToWorldAngles";[81]="lookupAttachment";[82]="lookupBone";[83]="lookupSequence";[84]="manipulateBoneAngles";[85]="manipulateBonePosition";[86]="manipulateBoneScale";[87]="obbCenter";[88]="obbCenterW";[89]="obbMaxs";[9]="emitSound";[90]="obbMins";[91]="obbSize";[92]="remove";[93]="removeCollisionListener";[94]="removeTrails";[95]="sequenceDuration";[96]="setAngleVelocity";[97]="setAngles";[98]="setBodygroup";[99]="setColor";["addAngleVelocity"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Applys a angular velocity to an object";["fname"]="addAngleVelocity";["name"]="ents_methods:addAngleVelocity";["param"]={[1]="angvel";["angvel"]="The local angvel vector to apply";};["private"]=false;["realm"]="sv";["summary"]="\
-Applys a angular velocity to an object ";};["addCollisionListener"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.";["fname"]="addCollisionListener";["name"]="ents_methods:addCollisionListener";["param"]={[1]="func";["func"]="The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData";};["private"]=false;["realm"]="sv";["summary"]="\
-Allows detecting collisions on an entity.";};["applyAngForce"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Applies angular force to the entity";["fname"]="applyAngForce";["name"]="ents_methods:applyAngForce";["param"]={[1]="ang";["ang"]="The force angle";};["private"]=false;["realm"]="sv";["summary"]="\
-Applies angular force to the entity ";};["applyDamage"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Applies damage to an entity";["fname"]="applyDamage";["name"]="ents_methods:applyDamage";["param"]={[1]="amt";[2]="attacker";[3]="inflictor";["amt"]="damage amount";["attacker"]="damage attacker";["inflictor"]="damage inflictor";};["private"]=false;["realm"]="sv";["summary"]="\
-Applies damage to an entity ";};["applyForceCenter"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Applies linear force to the entity";["fname"]="applyForceCenter";["name"]="ents_methods:applyForceCenter";["param"]={[1]="vec";["vec"]="The force vector";};["private"]=false;["realm"]="sv";["summary"]="\
-Applies linear force to the entity ";};["applyForceOffset"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Applies linear force to the entity with an offset";["fname"]="applyForceOffset";["name"]="ents_methods:applyForceOffset";["param"]={[1]="vec";[2]="offset";["offset"]="An optional offset position";["vec"]="The force vector";};["private"]=false;["realm"]="sv";["summary"]="\
-Applies linear force to the entity with an offset ";};["applyTorque"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Applies torque";["fname"]="applyTorque";["name"]="ents_methods:applyTorque";["param"]={[1]="torque";["torque"]="The torque vector";};["private"]=false;["realm"]="sv";["summary"]="\
-Applies torque ";};["breakEnt"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Invokes the entity's breaking animation and removes it.";["fname"]="breakEnt";["name"]="ents_methods:breakEnt";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
-Invokes the entity's breaking animation and removes it.";};["emitSound"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Entity type";["fields"]={};["methods"]={[1]="emitSound";[10]="getBoneMatrix";[11]="getBoneName";[12]="getBoneParent";[13]="getBonePosition";[14]="getChildren";[15]="getChipName";[16]="getClass";[17]="getClipping";[18]="getColor";[19]="getCreationTime";[2]="entIndex";[20]="getEyeAngles";[21]="getEyePos";[22]="getFlexScale";[23]="getFlexWeight";[24]="getFlexes";[25]="getForward";[26]="getHealth";[27]="getInertia";[28]="getMass";[29]="getMassCenter";[3]="getAngleVelocity";[30]="getMassCenterW";[31]="getMaterial";[32]="getMaterials";[33]="getMatrix";[34]="getMaxHealth";[35]="getModel";[36]="getOwner";[37]="getParent";[38]="getPhysicsObject";[39]="getPhysicsObjectCount";[4]="getAngleVelocityAngle";[40]="getPhysicsObjectNum";[41]="getPos";[42]="getPose";[43]="getRight";[44]="getSkin";[45]="getSubMaterial";[46]="getUp";[47]="getVelocity";[48]="getWaterLevel";[49]="isNPC";[5]="getAngles";[50]="isOnFire";[51]="isOnGround";[52]="isPlayer";[53]="isValid";[54]="isVehicle";[55]="isWeapon";[56]="localToWorld";[57]="localToWorldAngles";[58]="lookupAttachment";[59]="lookupBone";[6]="getAttachment";[60]="lookupSequence";[61]="manipulateBoneAngles";[62]="manipulateBonePosition";[63]="manipulateBoneScale";[64]="obbCenter";[65]="obbCenterW";[66]="obbMaxs";[67]="obbMins";[68]="obbSize";[69]="sequenceDuration";[7]="getAttachmentParent";[70]="setBodygroup";[71]="setColor";[72]="setFlexScale";[73]="setFlexWeight";[74]="setMaterial";[75]="setMesh";[76]="setMeshMaterial";[77]="setNoDraw";[78]="setPose";[79]="setRenderBounds";[8]="getAttachments";[80]="setRenderFX";[81]="setRenderMode";[82]="setSkin";[83]="setSubMaterial";[84]="stopSound";[85]="toHologram";[86]="translateBoneToPhysBone";[87]="translatePhysBoneToBone";[88]="worldSpaceAABB";[89]="worldToLocal";[9]="getBoneCount";[90]="worldToLocalAngles";["emitSound"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Plays a sound on the entity";["fname"]="emitSound";["name"]="ents_methods:emitSound";["param"]={[1]="snd";[2]="lvl";[3]="pitch";[4]="volume";[5]="channel";["channel"]="channel=CHAN_AUTO";["lvl"]="number soundLevel=75";["pitch"]="pitchPercent=100";["snd"]="string Sound path";["volume"]="volume=1";};["private"]=false;["realm"]="sh";["summary"]="\
-Plays a sound on the entity ";};["enableDrag"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity drag state";["fname"]="enableDrag";["name"]="ents_methods:enableDrag";["param"]={[1]="drag";["drag"]="Bool should the entity have air resistence?";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity drag state ";};["enableGravity"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets entity gravity";["fname"]="enableGravity";["name"]="ents_methods:enableGravity";["param"]={[1]="grav";["grav"]="Bool should the entity respect gravity?";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets entity gravity ";};["enableMotion"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity movement state";["fname"]="enableMotion";["name"]="ents_methods:enableMotion";["param"]={[1]="move";["move"]="Bool should the entity move?";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity movement state ";};["enableSphere"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the physics of an entity to be a sphere";["fname"]="enableSphere";["name"]="ents_methods:enableSphere";["param"]={[1]="enabled";["enabled"]="Bool should the entity be spherical?";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the physics of an entity to be a sphere ";};["entIndex"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Plays a sound on the entity ";};["entIndex"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the EntIndex of the entity";["fname"]="entIndex";["name"]="ents_methods:entIndex";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The numerical index of the entity";["server"]=true;["summary"]="\
-Returns the EntIndex of the entity ";};["extinguish"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Extinguishes an entity";["fname"]="extinguish";["name"]="ents_methods:extinguish";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
-Extinguishes an entity ";};["getAllConstrained"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Gets a table of all constrained entities to each other";["fname"]="getAllConstrained";["name"]="ents_methods:getAllConstrained";["param"]={[1]="filter";["filter"]="Optional constraint type filter table where keys are the type name and values are 'true'. \"Wire\" and \"Parent\" are used for wires and parents.";};["private"]=false;["realm"]="sv";["summary"]="\
-Gets a table of all constrained entities to each other ";};["getAngleVelocity"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Returns the EntIndex of the entity ";};["getAngleVelocity"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the angular velocity of the entity";["fname"]="getAngleVelocity";["name"]="ents_methods:getAngleVelocity";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The angular velocity as a vector";["server"]=true;["summary"]="\
 Returns the angular velocity of the entity ";};["getAngleVelocityAngle"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the angular velocity of the entity";["fname"]="getAngleVelocityAngle";["name"]="ents_methods:getAngleVelocityAngle";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The angular velocity as an angle";["server"]=true;["summary"]="\
@@ -211,9 +183,7 @@ Returns the class of the entity ";};["getClipping"]={["class"]="function";["clas
 Gets the clipping of an entity";["fname"]="getClipping";["name"]="ents_methods:getClipping";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Table containing the clipdata";["server"]=true;["summary"]="\
 Gets the clipping of an entity ";};["getColor"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the color of an entity";["fname"]="getColor";["name"]="ents_methods:getColor";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Color";["server"]=true;["summary"]="\
-Gets the color of an entity ";};["getCreationID"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Returns entity's creation ID (similar to entIndex, but increments monotonically)";["fname"]="getCreationID";["name"]="ents_methods:getCreationID";["param"]={};["private"]=false;["realm"]="sv";["ret"]="The creation ID";["summary"]="\
-Returns entity's creation ID (similar to entIndex, but increments monotonically) ";};["getCreationTime"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Gets the color of an entity ";};["getCreationTime"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the timer.curtime() time the entity was created on";["fname"]="getCreationTime";["name"]="ents_methods:getCreationTime";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Seconds relative to server map start";["server"]=true;["summary"]="\
 Returns the timer.curtime() time the entity was created on ";};["getEyeAngles"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the entitiy's eye angles";["fname"]="getEyeAngles";["name"]="ents_methods:getEyeAngles";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Angles of the entity's eyes";["server"]=true;["summary"]="\
@@ -231,9 +201,7 @@ Gets the entity's forward vector ";};["getHealth"]={["class"]="function";["class
 Gets the health of an entity";["fname"]="getHealth";["name"]="ents_methods:getHealth";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Health of the entity";["server"]=true;["summary"]="\
 Gets the health of an entity ";};["getInertia"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the principle moments of inertia of the entity";["fname"]="getInertia";["name"]="ents_methods:getInertia";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The principle moments of inertia as a vector";["server"]=true;["summary"]="\
-Returns the principle moments of inertia of the entity ";};["getLinkedComponents"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Returns a list of entities linked to a processor";["fname"]="getLinkedComponents";["name"]="ents_methods:getLinkedComponents";["param"]={};["private"]=false;["realm"]="sv";["ret"]="A list of components linked to the entity";["summary"]="\
-Returns a list of entities linked to a processor ";};["getMass"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Returns the principle moments of inertia of the entity ";};["getMass"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the mass of the entity";["fname"]="getMass";["name"]="ents_methods:getMass";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The numerical mass";["server"]=true;["summary"]="\
 Returns the mass of the entity ";};["getMassCenter"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the local position of the entity's mass center";["fname"]="getMassCenter";["name"]="ents_methods:getMassCenter";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The position vector of the mass center";["server"]=true;["summary"]="\
@@ -253,9 +221,7 @@ Gets the model of an entity ";};["getOwner"]={["class"]="function";["classlib"]=
 Gets the owner of the entity";["fname"]="getOwner";["name"]="ents_methods:getOwner";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Owner";["summary"]="\
 Gets the owner of the entity ";};["getParent"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Gets the parent of an entity";["fname"]="getParent";["name"]="ents_methods:getParent";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Entity's parent or nil";["server"]=true;["summary"]="\
-Gets the parent of an entity ";};["getPhysMaterial"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Get the physical material of the entity";["fname"]="getPhysMaterial";["name"]="ents_methods:getPhysMaterial";["param"]={};["private"]=false;["realm"]="sv";["ret"]="the physical material";["summary"]="\
-Get the physical material of the entity ";};["getPhysicsObject"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Gets the parent of an entity ";};["getPhysicsObject"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Gets the main physics objects of an entity";["fname"]="getPhysicsObject";["name"]="ents_methods:getPhysicsObject";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The main physics object of the entity";["summary"]="\
 Gets the main physics objects of an entity ";};["getPhysicsObjectCount"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Gets the number of physicsobjects of an entity";["fname"]="getPhysicsObjectCount";["name"]="ents_methods:getPhysicsObjectCount";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The number of physics objects on the entity";["summary"]="\
@@ -277,11 +243,7 @@ Gets the entity's up vector ";};["getVelocity"]={["class"]="function";["classlib
 Returns the velocity of the entity";["fname"]="getVelocity";["name"]="ents_methods:getVelocity";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The velocity vector";["server"]=true;["summary"]="\
 Returns the velocity of the entity ";};["getWaterLevel"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns how submerged the entity is in water";["fname"]="getWaterLevel";["name"]="ents_methods:getWaterLevel";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The water level. 0 none, 1 slightly, 2 at least halfway, 3 all the way";["server"]=true;["summary"]="\
-Returns how submerged the entity is in water ";};["ignite"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Ignites an entity";["fname"]="ignite";["name"]="ents_methods:ignite";["param"]={[1]="length";[2]="radius";["length"]="How long the fire lasts";["radius"]="(optional) How large the fire hitbox is (entity obb is the max)";};["private"]=false;["realm"]="sv";["summary"]="\
-Ignites an entity ";};["isFrozen"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Checks the entities frozen state";["fname"]="isFrozen";["name"]="ents_methods:isFrozen";["param"]={};["private"]=false;["realm"]="sv";["ret"]="True if entity is frozen";["summary"]="\
-Checks the entities frozen state ";};["isNPC"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Returns how submerged the entity is in water ";};["isNPC"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Checks if an entity is an npc.";["fname"]="isNPC";["name"]="ents_methods:isNPC";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if npc, false if not";["server"]=true;["summary"]="\
 Checks if an entity is an npc.";};["isOnFire"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns if the entity is ignited";["fname"]="isOnFire";["name"]="ents_methods:isOnFire";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Boolean if the entity is on fire or not";["server"]=true;["summary"]="\
@@ -289,21 +251,13 @@ Returns if the entity is ignited ";};["isOnGround"]={["class"]="function";["clas
 Checks if the entity ONGROUND flag is set";["fname"]="isOnGround";["name"]="ents_methods:isOnGround";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Boolean if it's flag is set or not";["server"]=true;["summary"]="\
 Checks if the entity ONGROUND flag is set ";};["isPlayer"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Checks if an entity is a player.";["fname"]="isPlayer";["name"]="ents_methods:isPlayer";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if player, false if not";["server"]=true;["summary"]="\
-Checks if an entity is a player.";};["isPlayerHolding"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Returns true if the entity is being held by a player. Either by Physics gun, Gravity gun or Use-key.";["fname"]="isPlayerHolding";["name"]="ents_methods:isPlayerHolding";["param"]={};["private"]=false;["realm"]="sv";["ret"]="Boolean if the entity is being held or not";["server"]=true;["summary"]="\
-Returns true if the entity is being held by a player.";};["isValid"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Checks if an entity is a player.";};["isValid"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Checks if an entity is valid.";["fname"]="isValid";["name"]="ents_methods:isValid";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if valid, false if not";["server"]=true;["summary"]="\
-Checks if an entity is valid.";};["isValidPhys"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Checks whether entity has physics";["fname"]="isValidPhys";["name"]="ents_methods:isValidPhys";["param"]={};["private"]=false;["realm"]="sv";["ret"]="True if entity has physics";["summary"]="\
-Checks whether entity has physics ";};["isVehicle"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Checks if an entity is valid.";};["isVehicle"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Checks if an entity is a vehicle.";["fname"]="isVehicle";["name"]="ents_methods:isVehicle";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if vehicle, false if not";["server"]=true;["summary"]="\
 Checks if an entity is a vehicle.";};["isWeapon"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Checks if an entity is a weapon.";["fname"]="isWeapon";["name"]="ents_methods:isWeapon";["param"]={};["private"]=false;["realm"]="sh";["ret"]="True if weapon, false if not";["server"]=true;["summary"]="\
-Checks if an entity is a weapon.";};["isWeldedTo"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Gets what the entity is welded to. If the entity is parented, returns the parent.";["fname"]="isWeldedTo";["name"]="ents_methods:isWeldedTo";["param"]={};["private"]=false;["realm"]="sv";["ret"]="The first welded/parent entity";["summary"]="\
-Gets what the entity is welded to.";};["linkComponent"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.";["fname"]="linkComponent";["name"]="ents_methods:linkComponent";["param"]={[1]="e";["e"]="Entity to link the component to. nil to clear links.";};["private"]=false;["realm"]="sv";["summary"]="\
-Links starfall components to a starfall processor or vehicle.";};["localToWorld"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Checks if an entity is a weapon.";};["localToWorld"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Converts a vector in entity local space to world space";["fname"]="localToWorld";["name"]="ents_methods:localToWorld";["param"]={[1]="data";["data"]="Local space vector";};["private"]=false;["realm"]="sh";["ret"]="data as world space vector";["server"]=true;["summary"]="\
 Converts a vector in entity local space to world space ";};["localToWorldAngles"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Converts an angle in entity local space to world space";["fname"]="localToWorldAngles";["name"]="ents_methods:localToWorldAngles";["param"]={[1]="data";["data"]="Local space angle";};["private"]=false;["realm"]="sh";["ret"]="data as world space angle";["server"]=true;["summary"]="\
@@ -329,39 +283,17 @@ Returns max local bounding box vector of the entity ";};["obbMins"]={["class"]="
 Returns min local bounding box vector of the entity";["fname"]="obbMins";["name"]="ents_methods:obbMins";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The min bounding box vector";["server"]=true;["summary"]="\
 Returns min local bounding box vector of the entity ";};["obbSize"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns the x, y, z size of the entity's outer bounding box (local to the entity)";["fname"]="obbSize";["name"]="ents_methods:obbSize";["param"]={};["private"]=false;["realm"]="sh";["ret"]="The outer bounding box size";["server"]=true;["summary"]="\
-Returns the x, y, z size of the entity's outer bounding box (local to the entity) ";};["remove"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Removes an entity";["fname"]="remove";["name"]="ents_methods:remove";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
-Removes an entity ";};["removeCollisionListener"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Removes a collision listening hook from the entity so that a new one can be added";["fname"]="removeCollisionListener";["name"]="ents_methods:removeCollisionListener";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
-Removes a collision listening hook from the entity so that a new one can be added ";};["removeTrails"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Removes trails from the entity";["fname"]="removeTrails";["name"]="ents_methods:removeTrails";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
-Removes trails from the entity ";};["sequenceDuration"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Returns the x, y, z size of the entity's outer bounding box (local to the entity) ";};["sequenceDuration"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Get the length of an animation";["fname"]="sequenceDuration";["name"]="ents_methods:sequenceDuration";["param"]={[1]="id";["id"]="(Optional) The id of the sequence, or will default to the currently playing sequence";};["private"]=false;["realm"]="sh";["ret"]="Length of the animation in seconds";["summary"]="\
-Get the length of an animation ";};["setAngleVelocity"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Set the angular velocity of an object";["fname"]="setAngleVelocity";["name"]="ents_methods:setAngleVelocity";["param"]={[1]="angvel";["angvel"]="The local angvel vector to set";};["private"]=false;["realm"]="sv";["summary"]="\
-Set the angular velocity of an object ";};["setAngles"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity's angles";["fname"]="setAngles";["name"]="ents_methods:setAngles";["param"]={[1]="ang";["ang"]="New angles";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity's angles ";};["setBodygroup"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Get the length of an animation ";};["setBodygroup"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the bodygroup of the entity";["fname"]="setBodygroup";["name"]="ents_methods:setBodygroup";["param"]={[1]="bodygroup";[2]="value";["bodygroup"]="Number, The ID of the bodygroup you're setting.";["value"]="Number, The value you're setting the bodygroup to.";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
 Sets the bodygroup of the entity ";};["setColor"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the color of the entity";["fname"]="setColor";["name"]="ents_methods:setColor";["param"]={[1]="clr";["clr"]="New color";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
-Sets the color of the entity ";};["setComponentLocksControls"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets a component's ability to lock a player's controls";["fname"]="setComponentLocksControls";["name"]="ents_methods:setComponentLocksControls";["param"]={[1]="enable";["enable"]="Whether the component will lock the player's controls when used";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets a component's ability to lock a player's controls ";};["setCustomPropForces"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets a custom prop's physics simulation forces. Thrusters and balloons use this.";["fname"]="setCustomPropForces";["name"]="ents_methods:setCustomPropForces";["param"]={[1]="ang";[2]="lin";[3]="mode";["ang"]="Angular Force (Torque)";["lin"]="Linear Force";["mode"]="The physics mode to use. 0 = Off, 1 = Local acceleration, 2 = Local force, 3 = Global Acceleration, 4 = Global force";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets a custom prop's physics simulation forces.";};["setDrawShadow"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets whether an entity's shadow should be drawn";["fname"]="setDrawShadow";["name"]="ents_methods:setDrawShadow";["param"]={[1]="draw";[2]="ply";["ply"]="Optional player argument to set only for that player. Can also be table of players.";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets whether an entity's shadow should be drawn ";};["setFlexScale"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Sets the color of the entity ";};["setFlexScale"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Sets the scale of the entity flexes";["fname"]="setFlexScale";["name"]="ents_methods:setFlexScale";["param"]={[1]="scale";["scale"]="The scale of the flexes to set";};["private"]=false;["realm"]="sh";["summary"]="\
 Sets the scale of the entity flexes ";};["setFlexWeight"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Sets the weight (value) of a flex.";["fname"]="setFlexWeight";["name"]="ents_methods:setFlexWeight";["param"]={[1]="flexid";[2]="weight";["flexid"]="The id of the flex";["weight"]="The weight of the flex";};["private"]=false;["realm"]="sh";["summary"]="\
-Sets the weight (value) of a flex.";};["setFrozen"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity frozen state";["fname"]="setFrozen";["name"]="ents_methods:setFrozen";["param"]={[1]="freeze";["freeze"]="Should the entity be frozen?";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity frozen state ";};["setInertia"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity's inertia";["fname"]="setInertia";["name"]="ents_methods:setInertia";["param"]={[1]="vec";["vec"]="Inertia tensor";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity's inertia ";};["setMass"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity's mass";["fname"]="setMass";["name"]="ents_methods:setMass";["param"]={[1]="mass";["mass"]="number mass";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity's mass ";};["setMaterial"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Sets the weight (value) of a flex.";};["setMaterial"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the material of the entity";["fname"]="setMaterial";["name"]="ents_methods:setMaterial";["param"]={[1]="material";["material"]=", string, New material name.";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
 Sets the material of the entity ";};["setMesh"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets a hologram or custom_prop model to a custom Mesh";["fname"]="setMesh";["name"]="ents_methods:setMesh";["param"]={[1]="mesh";["mesh"]="The mesh to set it to or nil to set back to normal";};["private"]=false;["realm"]="cl";["summary"]="\
@@ -369,15 +301,7 @@ Sets a hologram or custom_prop model to a custom Mesh ";};["setMeshMaterial"]={[
 Sets a hologram or custom_prop's custom mesh material";["fname"]="setMeshMaterial";["name"]="ents_methods:setMeshMaterial";["param"]={[1]="material";["material"]="The material to set it to or nil to set back to default";};["private"]=false;["realm"]="cl";["summary"]="\
 Sets a hologram or custom_prop's custom mesh material ";};["setNoDraw"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the whether an entity should be drawn or not";["fname"]="setNoDraw";["name"]="ents_methods:setNoDraw";["param"]={[1]="draw";["draw"]="Whether to draw the entity or not.";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
-Sets the whether an entity should be drawn or not ";};["setNocollideAll"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Set's the entity to collide with nothing but the world";["fname"]="setNocollideAll";["name"]="ents_methods:setNocollideAll";["param"]={[1]="nocollide";["nocollide"]="Whether to collide with nothing except world or not.";};["private"]=false;["realm"]="sv";["summary"]="\
-Set's the entity to collide with nothing but the world ";};["setParent"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Parents the entity to another entity";["fname"]="setParent";["name"]="ents_methods:setParent";["param"]={[1]="parent";[2]="attachment";["attachment"]="Optional string attachment name to parent to";["parent"]="Entity to parent to. nil to unparent";};["private"]=false;["realm"]="sv";["summary"]="\
-Parents the entity to another entity ";};["setPhysMaterial"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the physical material of the entity";["fname"]="setPhysMaterial";["name"]="ents_methods:setPhysMaterial";["param"]={[1]="mat";["mat"]="Material to use";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the physical material of the entity ";};["setPos"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entitiy's position. No interpolation will occur clientside, use physobj.setPos to have interpolation.";["fname"]="setPos";["name"]="ents_methods:setPos";["param"]={[1]="vec";["vec"]="New position";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entitiy's position.";};["setPose"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Sets the whether an entity should be drawn or not ";};["setPose"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Set the pose value of an animation. Turret/Head angles for example.";["fname"]="setPose";["name"]="ents_methods:setPose";["param"]={[1]="pose";[2]="value";["pose"]="Name of the pose parameter";["value"]="Value to set it to.";};["private"]=false;["realm"]="sh";["summary"]="\
 Set the pose value of an animation.";};["setRenderBounds"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets a hologram or custom_prop's renderbounds";["fname"]="setRenderBounds";["name"]="ents_methods:setRenderBounds";["param"]={[1]="mins";[2]="maxs";["maxs"]="The upper bounding corner coordinate local to the hologram";["mins"]="The lower bounding corner coordinate local to the hologram";};["private"]=false;["realm"]="cl";["summary"]="\
@@ -387,30 +311,17 @@ Sets the renderfx of the entity ";};["setRenderMode"]={["class"]="function";["cl
 Sets the render mode of the entity";["fname"]="setRenderMode";["name"]="ents_methods:setRenderMode";["param"]={[1]="rendermode";["rendermode"]="Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
 Sets the render mode of the entity ";};["setSkin"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the skin of the entity";["fname"]="setSkin";["name"]="ents_methods:setSkin";["param"]={[1]="skinIndex";["skinIndex"]="Number, Index of the skin to use.";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
-Sets the skin of the entity ";};["setSolid"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity to be Solid or not. \
-For more information please refer to GLua function http://wiki.garrysmod.com/page/Entity/SetNotSolid";["fname"]="setSolid";["name"]="ents_methods:setSolid";["param"]={[1]="solid";["solid"]="Boolean, Should the entity be solid?";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity to be Solid or not.";};["setSubMaterial"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Sets the skin of the entity ";};["setSubMaterial"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Sets the submaterial of the entity";["fname"]="setSubMaterial";["name"]="ents_methods:setSubMaterial";["param"]={[1]="index";[2]="material";["index"]=", number, submaterial index.";["material"]=", string, New material name.";};["private"]=false;["realm"]="sh";["server"]=true;["summary"]="\
-Sets the submaterial of the entity ";};["setTrails"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Adds a trail to the entity with the specified attributes.";["fname"]="setTrails";["name"]="ents_methods:setTrails";["param"]={[1]="startSize";[2]="endSize";[3]="length";[4]="material";[5]="color";[6]="attachmentID";[7]="additive";["additive"]="If the trail's rendering is additive";["attachmentID"]="Optional attachmentid the trail should attach to";["color"]="The color of the trail";["endSize"]="The end size of the trail";["length"]="The length size of the trail";["material"]="The material of the trail";["startSize"]="The start size of the trail";};["private"]=false;["realm"]="sv";["summary"]="\
-Adds a trail to the entity with the specified attributes.";};["setUnbreakable"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets a prop_physics to be unbreakable";["fname"]="setUnbreakable";["name"]="ents_methods:setUnbreakable";["param"]={[1]="on";["on"]="Whether to make the prop unbreakable";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets a prop_physics to be unbreakable ";};["setVelocity"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Sets the entity's linear velocity";["fname"]="setVelocity";["name"]="ents_methods:setVelocity";["param"]={[1]="vel";["vel"]="New velocity";};["private"]=false;["realm"]="sv";["summary"]="\
-Sets the entity's linear velocity ";};["stopSound"]={["class"]="function";["classlib"]="Entity";["description"]="\
+Sets the submaterial of the entity ";};["stopSound"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Stops a sound on the entity";["fname"]="stopSound";["name"]="ents_methods:stopSound";["param"]={[1]="snd";["snd"]="string Soundscript path. See http://wiki.garrysmod.com/page/Entity/StopSound";};["private"]=false;["realm"]="sh";["summary"]="\
-Stops a sound on the entity ";};["testPVS"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set). See: https://developer.valvesoftware.com/wiki/PVS";["fname"]="testPVS";["name"]="ents_methods:testPVS";["param"]={[1]="other";["other"]="Entity or Vector to test";};["private"]=false;["realm"]="sv";["ret"]="bool True/False";["summary"]="\
-Check if the given Entity or Vector is within this entity's PVS (Potentially Visible Set).";};["toHologram"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Stops a sound on the entity ";};["toHologram"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Casts a hologram entity into the hologram type";["fname"]="toHologram";["name"]="ents_methods:toHologram";["param"]={};["private"]=false;["realm"]="sh";["ret"]="Hologram type";["server"]=true;["summary"]="\
 Casts a hologram entity into the hologram type ";};["translateBoneToPhysBone"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Converts a ragdoll bone id to the corresponding physobject id";["fname"]="translateBoneToPhysBone";["name"]="ents_methods:translateBoneToPhysBone";["param"]={[1]="boneid";["boneid"]="The ragdoll boneid";};["private"]=false;["realm"]="sh";["ret"]="The physobj id";["summary"]="\
 Converts a ragdoll bone id to the corresponding physobject id ";};["translatePhysBoneToBone"]={["class"]="function";["classlib"]="Entity";["description"]="\
 Converts a physobject id to the corresponding ragdoll bone id";["fname"]="translatePhysBoneToBone";["name"]="ents_methods:translatePhysBoneToBone";["param"]={[1]="boneid";["boneid"]="The physobject id";};["private"]=false;["realm"]="sh";["ret"]="The ragdoll bone id";["summary"]="\
-Converts a physobject id to the corresponding ragdoll bone id ";};["unparent"]={["class"]="function";["classlib"]="Entity";["description"]="\
-Unparents the entity from another entity";["fname"]="unparent";["name"]="ents_methods:unparent";["param"]={};["private"]=false;["realm"]="sv";["summary"]="\
-Unparents the entity from another entity ";};["worldSpaceAABB"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
+Converts a physobject id to the corresponding ragdoll bone id ";};["worldSpaceAABB"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Returns Entity axis aligned bounding box in world coordinates";["fname"]="worldSpaceAABB";["name"]="ents_methods:worldSpaceAABB";["param"]={};["private"]=false;["realm"]="sh";["ret"]={[1]="The min bounding box vector";[2]="The max bounding box vector";};["server"]=true;["summary"]="\
 Returns Entity axis aligned bounding box in world coordinates ";};["worldToLocal"]={["class"]="function";["classlib"]="Entity";["client"]=true;["description"]="\
 Converts a vector in world space to entity local space";["fname"]="worldToLocal";["name"]="ents_methods:worldToLocal";["param"]={[1]="data";["data"]="World space vector";};["private"]=false;["realm"]="sh";["ret"]="data as local space vector";["server"]=true;["summary"]="\
@@ -1594,18 +1505,20 @@ Finds entities in a sphere ";};["sortByClosest"]={["class"]="function";["descrip
 Returns a sorted array of entities by how close they are to a point";["fname"]="sortByClosest";["library"]="find";["name"]="find_library.sortByClosest";["param"]={[1]="ents";[2]="pos";[3]="furthest";["ents"]="The array of entities";["furthest"]="Whether to have the further entities first";["pos"]="The position";};["private"]=false;["realm"]="sh";["ret"]="A table of the closest entities";["summary"]="\
 Returns a sorted array of entities by how close they are to a point ";};};["libtbl"]="find_library";["name"]="find";["server"]=true;["summary"]="\
 Find library.";["tables"]={};};["game"]={["class"]="library";["client"]=true;["description"]="\
-Game functions";["fields"]={};["functions"]={[1]="getHostname";[2]="getMap";[3]="getMaxPlayers";[4]="isDedicated";[5]="isLan";[6]="isSinglePlayer";["getHostname"]={["class"]="function";["description"]="\
-Returns The hostname";["fname"]="getHostname";["library"]="game";["name"]="game_lib.getHostname";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
-Returns The hostname ";};["getMap"]={["class"]="function";["description"]="\
-Returns the map name";["fname"]="getMap";["library"]="game";["name"]="game_lib.getMap";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
-Returns the map name ";};["getMaxPlayers"]={["class"]="function";["description"]="\
-Returns the maximum player limit";["fname"]="getMaxPlayers";["library"]="game";["name"]="game_lib.getMaxPlayers";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
-Returns the maximum player limit ";};["isDedicated"]={["class"]="function";["description"]="\
-Returns whether or not the server is a dedicated server";["fname"]="isDedicated";["library"]="game";["name"]="game_lib.isDedicated";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
-Returns whether or not the server is a dedicated server ";};["isLan"]={["class"]="function";["deprecated"]="Possibly add ConVar retrieval for users in future. Could implement with SF Script.";["description"]="\
-Returns true if the server is on a LAN";["fname"]="isLan";["library"]="game";["name"]="game_lib.isLan";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
-Returns true if the server is on a LAN ";};["isSinglePlayer"]={["class"]="function";["description"]="\
-Returns whether or not the current game is single player";["fname"]="isSinglePlayer";["library"]="game";["name"]="game_lib.isSinglePlayer";["param"]={};["private"]=false;["realm"]="sh";["summary"]="\
+Game functions";["fields"]={};["functions"]={[1]="getHostname";[2]="getMap";[3]="getMaxPlayers";[4]="hasFocus";[5]="isDedicated";[6]="isLan";[7]="isSinglePlayer";["getHostname"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns The hostname";["fname"]="getHostname";["library"]="game";["name"]="game_lib.getHostname";["param"]={};["realm"]="sh";["ret"]="string The hostname of the se`rver";["summary"]="\
+Returns The hostname ";};["getMap"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns the map name";["fname"]="getMap";["library"]="game";["name"]="game_lib.getMap";["param"]={};["realm"]="sh";["ret"]="string The name of the current map";["summary"]="\
+Returns the map name ";};["getMaxPlayers"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns the maximum player limit";["fname"]="getMaxPlayers";["library"]="game";["name"]="game_lib.getMaxPlayers";["param"]={};["realm"]="sh";["ret"]="number The max players allowed by the server";["summary"]="\
+Returns the maximum player limit ";};["hasFocus"]={["class"]="function";["classForced"]=true;["client"]=true;["description"]="\
+Returns if the game has focus or not, i.e. will return false if the game is minimized";["fname"]="hasFocus";["library"]="game";["name"]="game_lib.hasFocus";["param"]={};["realm"]="cl";["ret"]="boolean True if the game is focused";["summary"]="\
+Returns if the game has focus or not, i.e.";};["isDedicated"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns whether or not the server is a dedicated server";["fname"]="isDedicated";["library"]="game";["name"]="game_lib.isDedicated";["param"]={};["realm"]="sh";["ret"]="boolean True if the game is a dedicated server";["summary"]="\
+Returns whether or not the server is a dedicated server ";};["isLan"]={["class"]="function";["description"]="\
+Returns true if the server is on a LAN";["fname"]="isLan";["library"]="game";["name"]="game_lib.isLan";["param"]={};["private"]=false;["realm"]="sh";["ret"]="boolean True if the game is a lan game";["summary"]="\
+Returns true if the server is on a LAN ";};["isSinglePlayer"]={["class"]="function";["classForced"]=true;["description"]="\
+Returns whether or not the current game is single player";["fname"]="isSinglePlayer";["library"]="game";["name"]="game_lib.isSinglePlayer";["param"]={};["realm"]="sh";["ret"]="boolean True if the game is singleplayer";["summary"]="\
 Returns whether or not the current game is single player ";};};["libtbl"]="game_lib";["name"]="game";["server"]=true;["summary"]="\
 Game functions ";["tables"]={};};["holograms"]={["class"]="library";["client"]=true;["description"]="\
 Library for creating and manipulating physics-less models AKA \"Holograms\".";["fields"]={};["functions"]={[1]="canSpawn";[2]="create";[3]="hologramsLeft";["canSpawn"]={["class"]="function";["description"]="\
