@@ -22,7 +22,9 @@ function ENT:TransmitData(recip)
 end
 
 hook.Add("PlayerInitialSpawn","SF_Initialize_Custom_Props",function(ply)
-	for k, v in ipairs(ents.FindByClass("starfall_prop")) do
-		v:TransmitData(ply)
-	end
+	SF.WaitForPlayerInit(ply, function()
+		for k, v in ipairs(ents.FindByClass("starfall_prop")) do
+			v:TransmitData(ply)
+		end
+	end)
 end)

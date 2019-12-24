@@ -632,6 +632,22 @@ function SF.WaitForEntity(index, callback)
 	end
 end
 
+function SF.WaitForPlayerInit(ply, func)
+	local n = "SF_WaitForPlayerInit"..ply:EntIndex()
+	hook.Add("SetupMove", n, function(ply2)
+		if ply == ply2 then
+			func()
+			hook.Remove("SetupMove", n)
+			timer.Remove(n)
+		end
+	end)
+	timer.Create(n, 10, 0, function()
+		if not ply:IsValid() then
+			hook.Remove("SetupMove", n)
+			timer.Remove(n)
+		end
+	end)
+end
 
 local shaderBlacklist = {
 	["LightmappedGeneric"] = true,
