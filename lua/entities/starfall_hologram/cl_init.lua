@@ -7,10 +7,8 @@ ENT.Material = ENT.DefaultMaterial
 
 function ENT:Initialize()
 	self.clips = {}
-	self.suppressEngineLighting = false
-	self.scale = Vector(1,1,1)
 
-	net.Start("starfall_hologram")
+	net.Start("starfall_hologram_clips")
 	net.WriteEntity(self)
 	net.SendToServer()
 end
@@ -21,6 +19,10 @@ function ENT:SetClip(index, enabled, normal, origin, entity)
 	else
 		self.clips[index] = nil
 	end
+end
+
+function ENT:OnScaleChanged(name, old, scale)
+	SF.Holograms.SetScale(self, scale)
 end
 
 function ENT:Draw()
@@ -43,7 +45,7 @@ function ENT:Draw()
 	if filter_mag then render.PushFilterMag(filter_mag) end
 	if filter_min then render.PushFilterMin(filter_min) end
 	
-	if self.suppressEngineLighting then
+	if self:GetSuppressEngineLighting() then
 		render.SuppressEngineLighting(true)
 		self:DrawHologram()
 		render.SuppressEngineLighting(false)
@@ -92,39 +94,26 @@ function ENT:GetRenderMesh()
 	end
 end
 
-net.Receive("starfall_hologram", function()
+net.Receive("starfall_hologram_clips", function()
 	local index = net.ReadUInt(16)
-	local updateScale, scale = net.ReadBool()
-	if updateScale then scale = Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()) end
-	local updateSuppressEngineLighting, suppressEngineLighting = net.ReadBool()
-	if updateSuppressEngineLighting then suppressEngineLighting = net.ReadBool() end
-	local updateClips, clipdata = net.ReadBool()
-	if updateClips then clipdata = SF.StringStream(net.ReadData(net.ReadUInt(32))) end
+	local clipdata = SF.StringStream(net.ReadData(net.ReadUInt(32)))
 
 	local function applyHologram(self)
 		if self.IsSFHologram then
-			if updateScale then
-				SF.Holograms.SetScale(self, scale)
-			end
-			if updateSuppressEngineLighting then
-				self.suppressEngineLighting = suppressEngineLighting
-			end
-			if updateClips then
-				local clips = {}
-				for i=1, math.Round(#clipdata.buffer/34) do
-					local index = clipdata:readDouble()
-					local clip = {
-						normal = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
-						origin = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
-					}
-					local entind = clipdata:readUInt16()
-					if entind~=0 then
-						SF.WaitForEntity(entind, function(e) clip.entity = e end)
-					end
-					clips[index] = clip
+			local clips = {}
+			for i=1, math.Round(#clipdata.buffer/34) do
+				local index = clipdata:readDouble()
+				local clip = {
+					normal = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
+					origin = Vector(clipdata:readFloat(), clipdata:readFloat(), clipdata:readFloat()),
+				}
+				local entind = clipdata:readUInt16()
+				if entind~=0 then
+					SF.WaitForEntity(entind, function(e) clip.entity = e end)
 				end
-				self.clips = clips
+				clips[index] = clip
 			end
+			self.clips = clips
 		end
 	end
 
