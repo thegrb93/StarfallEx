@@ -7,32 +7,46 @@
 local game_lib = SF.RegisterLibrary("game")
 
 --- Returns the map name
-function game_lib.getMap ()
-	return game.GetMap()
-end
+-- @name game_lib.getMap
+-- @class function
+-- @return string The name of the current map
+game_lib.getMap = game.GetMap
 
 --- Returns The hostname
-function game_lib.getHostname ()
-	return GetHostName()
-end
+-- @name game_lib.getHostname
+-- @class function
+-- @return string The hostname of the se`rver
+game_lib.getHostname = GetHostName
 
 --- Returns true if the server is on a LAN
--- @deprecated Possibly add ConVar retrieval for users in future. Could implement with SF Script.
+-- @return boolean True if the game is a lan game
 function game_lib.isLan ()
 	return GetConVar("sv_lan"):GetBool()
 end
 
 --- Returns whether or not the current game is single player
-function game_lib.isSinglePlayer ()
-	return game.SinglePlayer()
-end
+-- @name game_lib.isSinglePlayer
+-- @class function
+-- @return boolean True if the game is singleplayer
+game_lib.isSinglePlayer = game.SinglePlayer
 
 --- Returns whether or not the server is a dedicated server
-function game_lib.isDedicated ()
-	return game.IsDedicated()
-end
+-- @name game_lib.isDedicated
+-- @class function
+-- @return boolean True if the game is a dedicated server
+game_lib.isDedicated = game.IsDedicated
 
 --- Returns the maximum player limit
-function game_lib.getMaxPlayers ()
-	return game.MaxPlayers()
+-- @name game_lib.getMaxPlayers
+-- @class function
+-- @return number The max players allowed by the server
+game_lib.getMaxPlayers = game.MaxPlayers
+
+if CLIENT then
+	--- Returns if the game has focus or not, i.e. will return false if the game is minimized
+	-- @name game_lib.hasFocus
+	-- @client
+	-- @class function
+	-- @return boolean True if the game is focused
+	game_lib.hasFocus = system.HasFocus
 end

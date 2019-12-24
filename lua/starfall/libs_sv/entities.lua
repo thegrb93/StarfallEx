@@ -11,9 +11,6 @@ local ents_lib = SF.Entities.Library
 local ents_metatable = SF.Entities.Metatable
 local getent = SF.Entities.GetEntity
 
---- Entity type
---@class class
---@name Entity
 local ents_methods = SF.Entities.Methods
 local ewrap, eunwrap = SF.Entities.Wrap, SF.Entities.Unwrap
 local owrap = SF.WrapObject
