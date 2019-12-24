@@ -1,8 +1,7 @@
-TOOL.Category		= "Chips, Gates"
+TOOL.Category		= "Starfall"
 TOOL.Name			= "Starfall - Processor"
 TOOL.Command		= nil
 TOOL.ConfigName		= ""
-TOOL.Tab			= "Wire"
 
 -- ------------------------------- Sending / Receiving ------------------------------- --
 
