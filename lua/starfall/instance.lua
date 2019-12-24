@@ -78,6 +78,11 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	instance.run = quotaRun
 	instance.startram = collectgarbage("count")
 
+	instance.typeMethods = {}
+	for k,v in pairs(SF.Types) do
+		instance.typeMethods[k] = {}
+	end
+
 	if CLIENT and instance.cpuQuota <= 0 then
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
 	end
