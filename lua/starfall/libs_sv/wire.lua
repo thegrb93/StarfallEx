@@ -317,7 +317,6 @@ function wire_library.adjustOutputs (names, types)
 		names[i] = newname
 		types[i] = newtype
 	end
-	ent._outputs = { names, types }
 
 	-- Restore wirelink and entity output if present, because these outputs are created by the Wire ToolGun
 	-- and breaks on every code update.
@@ -327,6 +326,8 @@ function wire_library.adjustOutputs (names, types)
 			table.insert(types, v.Type)
 		end
 	end
+
+	ent._outputs = { names, types }
 
 	WireLib.AdjustSpecialOutputs(ent, names, types)
 end
@@ -383,7 +384,7 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 
 	if not entI.Inputs then SF.Throw("Source has no valid inputs") end
 
-	-- Create wirelink or entity output on target if requested
+	-- Initialize wirelink and entity outputs on target if present
 	if outputname == "entity" then
 		WireLib.CreateEntityOutput( nil, entO, {true} )
 	elseif outputname == "wirelink" then
