@@ -66,7 +66,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
-	checkluatype(model, TYPE_STRING)
+	checkluatype(model, isstring)
 	frozen = frozen and true or false
 
 	local pos = vunwrap(pos)
@@ -122,7 +122,7 @@ end
 function props_library.createCustom(pos, ang, vertices, frozen)
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
-	checkluatype(vertices, TYPE_TABLE)
+	checkluatype(vertices, istable)
 	frozen = frozen and true or false
 
 	checkpermission(SF.instance, nil, "prop.createCustom")
@@ -227,7 +227,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	checkpermission(SF.instance,  nil, "prop.create")
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
-	checkluatype(class, TYPE_STRING)
+	checkluatype(class, isstring)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
@@ -291,7 +291,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
-	checkluatype(class, TYPE_STRING)
+	checkluatype(class, isstring)
 	frozen = frozen and true or false
 
 	local pos = SF.clampPos(vunwrap(pos))

@@ -101,7 +101,7 @@ function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance,  nil, "hologram.create")
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
-	checkluatype(model, TYPE_STRING)
+	checkluatype(model, isstring)
 
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
@@ -198,7 +198,7 @@ if SERVER then
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
-		checkluatype(suppress, TYPE_BOOL)
+		checkluatype(suppress, isbool)
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -329,7 +329,7 @@ else
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
 		if val then
-			checkluatype(val, TYPE_NUMBER)
+			checkluatype(val, isnumber)
 			holo.filter_mag = val
 		else
 			holo.filter_mag = nil
@@ -347,7 +347,7 @@ else
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
 		if val then
-			checkluatype(val, TYPE_NUMBER)
+			checkluatype(val, isnumber)
 			holo.filter_min = val
 		else
 			holo.filter_min = nil
@@ -397,7 +397,7 @@ else
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
-		checkluatype(suppress, TYPE_BOOL)
+		checkluatype(suppress, isbool)
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
@@ -448,7 +448,7 @@ else
 			if not (parent and parent:IsValid()) then SF.Throw("The parent is invalid", 2) end
 			
 			if attachment == nil then attachment = -1 end
-			checkluatype(attachment, TYPE_NUMBER)
+			checkluatype(attachment, isnumber)
 			
 			if not parent.sf_children then
 				parent.sf_children = setmetatable({}, holoChildrenMeta)
@@ -490,8 +490,8 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	local holo = unwrap(self)
 	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
-	checkluatype(index, TYPE_NUMBER)
-	checkluatype(enabled, TYPE_BOOL)
+	checkluatype(index, isnumber)
+	checkluatype(enabled, isbool)
 	checktype(origin, vec_meta)
 	checktype(normal, vec_meta)
 
@@ -539,7 +539,7 @@ function hologram_methods:setModel(model)
 	local holo = unwrap(self)
 	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
-	checkluatype(model, TYPE_STRING)
+	checkluatype(model, isstring)
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
 	checkpermission(SF.instance, holo, "hologram.setRenderProperty")

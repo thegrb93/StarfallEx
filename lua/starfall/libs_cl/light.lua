@@ -114,8 +114,8 @@ function light_library.create(pos, size, brightness, color)
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
 	checkpermission(SF.instance, nil, "light.create")
 	checktype(pos, vec_meta)
-	checkluatype(size, TYPE_NUMBER)
-	checkluatype(brightness, TYPE_NUMBER)
+	checkluatype(size, isnumber)
+	checkluatype(brightness, isnumber)
 	checktype(color, col_meta)
 	local slot = getFreeSlot()
 	if not slot then SF.Throw("Failed to allocate slot for the light", 2) end
@@ -158,7 +158,7 @@ end
 -- @param brightness The light's brightness
 function light_methods:setBrightness(brightness)
 	checktype(self, light_metamethods)
-	checkluatype(brightness, TYPE_NUMBER)
+	checkluatype(brightness, isnumber)
 	unwrap(self).data.brightness = brightness
 end
 
@@ -166,7 +166,7 @@ end
 -- @param decay The light's decay speed
 function light_methods:setDecay(decay)
 	checktype(self, light_metamethods)
-	checkluatype(decay, TYPE_NUMBER)
+	checkluatype(decay, isnumber)
 	unwrap(self).data.decay = decay
 end
 
@@ -174,7 +174,7 @@ end
 -- @param dietime The how long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
 	checktype(self, light_metamethods)
-	checkluatype(dietime, TYPE_NUMBER)
+	checkluatype(dietime, isnumber)
 	unwrap(self).dietime = math.max(dietime, 0)
 end
 
@@ -190,7 +190,7 @@ end
 -- @param ang Number inner angle of the light
 function light_methods:setInnerAngle(ang)
 	checktype(self, light_metamethods)
-	checkluatype(ang, TYPE_NUMBER)
+	checkluatype(ang, isnumber)
 	unwrap(self).data.innerangle = ang
 end
 
@@ -198,7 +198,7 @@ end
 -- @param ang Number outer angle of the light
 function light_methods:setOuterAngle(ang)
 	checktype(self, light_metamethods)
-	checkluatype(ang, TYPE_NUMBER)
+	checkluatype(ang, isnumber)
 	unwrap(self).data.outerangle = ang
 end
 
@@ -206,7 +206,7 @@ end
 -- @param min The minimum light
 function light_methods:setMinLight(min)
 	checktype(self, light_metamethods)
-	checkluatype(min, TYPE_NUMBER)
+	checkluatype(min, isnumber)
 	unwrap(self).data.minlight = min
 end
 
@@ -214,7 +214,7 @@ end
 -- @param on Whether the light shouldn't cast onto the world
 function light_methods:setNoWorld(on)
 	checktype(self, light_metamethods)
-	checkluatype(on, TYPE_BOOL)
+	checkluatype(on, isbool)
 	unwrap(self).data.noworld = on
 end
 
@@ -222,7 +222,7 @@ end
 -- @param on Whether the light shouldn't cast onto the models
 function light_methods:setNoModel(on)
 	checktype(self, light_metamethods)
-	checkluatype(on, TYPE_BOOL)
+	checkluatype(on, isbool)
 	unwrap(self).data.nomodel = on
 end
 
@@ -238,7 +238,7 @@ end
 -- @param size The size of the light
 function light_methods:setSize(size)
 	checktype(self, light_metamethods)
-	checkluatype(size, TYPE_NUMBER)
+	checkluatype(size, isnumber)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
@@ -246,7 +246,7 @@ end
 -- @param style The number of the flicker style
 function light_methods:setStyle(style)
 	checktype(self, light_metamethods)
-	checkluatype(style, TYPE_NUMBER)
+	checkluatype(style, isnumber)
 	unwrap(self).data.style = style
 end
 

@@ -65,11 +65,11 @@ function http_library.get (url, callbackSuccess, callbackFail, headers)
 
 	httpRequestReady(instance)
 
-	SF.CheckLuaType(url, TYPE_STRING)
-	SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION)
-	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	SF.CheckLuaType(url, isstring)
+	SF.CheckLuaType(callbackSuccess, isfunction)
+	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, isfunction) end
 	if headers ~= nil then
-		SF.CheckLuaType(headers, TYPE_TABLE)
+		SF.CheckLuaType(headers, istable)
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
 				SF.Throw("Headers can only contain string keys and string values", 2)
@@ -92,7 +92,7 @@ end
 -- @param headers optional POST headers to be sent
 function http_library.post (url, payload, callbackSuccess, callbackFail, headers)
 	local instance = SF.instance
-	SF.CheckLuaType(url, TYPE_STRING)
+	SF.CheckLuaType(url, isstring)
 	SF.Permissions.check(instance, url, "http.post")
 
 	httpRequestReady(instance)
@@ -103,9 +103,7 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 	}
 
 	if payload~=nil then
-		local payloadType = TypeID(payload)
-
-		if payloadType == TYPE_TABLE then
+		if istable(payload) then
 			for k, v in pairs(payload) do
 				if not isstring(k) or not isstring(v) then
 					SF.Throw("Post parameters can only contain string keys and string values", 2)
@@ -113,7 +111,7 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 			end
 
 			request.parameters = payload
-		elseif payloadType == TYPE_STRING then
+		elseif isstring(payload) then
 			request.body = payload
 		else
 			SF.ThrowTypeError("table or string", SF.GetType(payload), 2)
@@ -121,7 +119,7 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 	end
 
 	if headers~=nil then
-		SF.CheckLuaType(headers, TYPE_TABLE)
+		SF.CheckLuaType(headers, istable)
 		
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then
@@ -136,8 +134,8 @@ function http_library.post (url, payload, callbackSuccess, callbackFail, headers
 		request.headers = headers
 	end
 
-	if callbackSuccess ~= nil then SF.CheckLuaType(callbackSuccess, TYPE_FUNCTION) end
-	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, TYPE_FUNCTION) end
+	if callbackSuccess ~= nil then SF.CheckLuaType(callbackSuccess, isfunction) end
+	if callbackFail ~= nil then SF.CheckLuaType(callbackFail, isfunction) end
 	
 	request.success = function(code, body, headers)
 		local callback = runCallback(instance, callbackSuccess)
@@ -157,7 +155,7 @@ end
 --@param data The data to convert
 --@return The converted data
 function http_library.base64Encode(data)
-	SF.CheckLuaType(data, TYPE_STRING)
+	SF.CheckLuaType(data, isstring)
 	return util.Base64Encode(data)
 end
 
@@ -166,11 +164,11 @@ end
 --@param threaded Optional bool
 --@return The converted data
 function http_library.base64Decode(data, threaded)
-	SF.CheckLuaType(data, TYPE_STRING)
+	SF.CheckLuaType(data, isstring)
 
 	local thread
 	if threaded ~= nil then
-		if SF.CheckLuaType(threaded, TYPE_BOOL) then
+		if SF.CheckLuaType(threaded, isbool) then
 			thread = coroutine.running()
 
 			if not thread then
@@ -248,7 +246,7 @@ end
 --@param data The data to convert
 --@return The converted data
 function http_library.urlEncode(data)
-	SF.CheckLuaType(data, TYPE_STRING)
+	SF.CheckLuaType(data, isstring)
 	data = string.gsub(data, "[^%w_~%.%-%(%)!%*]", function(char)
 		return string.format("%%%02X", string.byte(char))
 	end)

@@ -588,28 +588,24 @@ end
 
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
--- @param typ A string type or metatable.
+-- @param check The typecheck function
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckLuaType(val, typ, level)
-	local valtype = TypeID(val)
-	if valtype == typ then
+function SF.CheckLuaType(val, check, level)
+	if check(val) then
 		return val
 	else
 		-- Failed, throw error
-		assert(isnumber(typ))
+		local valtype = TypeID(val)
 		local typeLookup = {
-			[TYPE_BOOL] = "boolean",
-			[TYPE_FUNCTION] = "function",
-			[TYPE_NIL] = "nil",
-			[TYPE_NUMBER] = "number",
-			[TYPE_STRING] = "string",
-			[TYPE_TABLE] = "table",
-			[TYPE_THREAD] = "thread",
-			[TYPE_USERDATA] = "userdata"
+			[isbool] = "boolean",
+			[isfunction] = "function",
+			[isnumber] = "number",
+			[isstring] = "string",
+			[istable] = "table",
 		}
 
 		level = (level or 1) + 2
-		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
+		SF.ThrowTypeError(typeLookup[check], SF.GetType(val), level)
 	end
 end
 

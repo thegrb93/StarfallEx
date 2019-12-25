@@ -412,10 +412,10 @@ end
 -- @param b Value of the blue channel to clear the current rt with.
 -- @param depth Clear the depth buffer.
 function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
-	checkluatype (r, TYPE_NUMBER)
-	checkluatype (g, TYPE_NUMBER)
-	checkluatype (b, TYPE_NUMBER)
-	checkluatype (a, TYPE_NUMBER)
+	checkluatype (r, isnumber)
+	checkluatype (g, isnumber)
+	checkluatype (b, isnumber)
+	checkluatype (a, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -430,11 +430,11 @@ end
 -- @param endY The end Y coordinate of the rectangle.
 -- @param stencilValue Value to set cleared stencil buffer to.
 function render_library.clearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
-	checkluatype (originX, TYPE_NUMBER)
-	checkluatype (originY, TYPE_NUMBER)
-	checkluatype (endX, TYPE_NUMBER)
-	checkluatype (endY, TYPE_NUMBER)
-	checkluatype (stencilValue, TYPE_NUMBER)
+	checkluatype (originX, isnumber)
+	checkluatype (originY, isnumber)
+	checkluatype (endX, isnumber)
+	checkluatype (endY, isnumber)
+	checkluatype (stencilValue, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -445,7 +445,7 @@ end
 --- Sets the compare function of the stencil. More: http://wiki.garrysmod.com/page/render/SetStencilCompareFunction
 -- @param compareFunction
 function render_library.setStencilCompareFunction(compareFunction)
-	checkluatype (compareFunction, TYPE_NUMBER)
+	checkluatype (compareFunction, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -456,7 +456,7 @@ end
 --- Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.garrysmod.com/page/render/SetStencilFailOperation
 -- @param operation
 function render_library.setStencilFailOperation(operation)
-	checkluatype (operation, TYPE_NUMBER)
+	checkluatype (operation, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -467,7 +467,7 @@ end
 --- Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.garrysmod.com/page/render/SetStencilPassOperation
 -- @param operation
 function render_library.setStencilPassOperation(operation)
-	checkluatype (operation, TYPE_NUMBER)
+	checkluatype (operation, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -478,7 +478,7 @@ end
 --- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.garrysmod.com/page/render/SetStencilZFailOperation
 -- @param operation
 function render_library.setStencilZFailOperation(operation)
-	checkluatype (operation, TYPE_NUMBER)
+	checkluatype (operation, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -489,7 +489,7 @@ end
 --- Sets the reference value which will be used for all stencil operations. This is an unsigned integer.
 -- @param referenceValue Reference value.
 function render_library.setStencilReferenceValue(referenceValue)
-	checkluatype (referenceValue, TYPE_NUMBER)
+	checkluatype (referenceValue, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -500,7 +500,7 @@ end
 --- Sets the unsigned 8-bit test bitflag mask to be used for any stencil testing.
 -- @param mask The mask bitflag.
 function render_library.setStencilTestMask(mask)
-	checkluatype (mask, TYPE_NUMBER)
+	checkluatype (mask, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -511,7 +511,7 @@ end
 --- Sets the unsigned 8-bit write bitflag mask to be used for any writes to the stencil buffer.
 -- @param mask The mask bitflag.
 function render_library.setStencilWriteMask(mask)
-	checkluatype (mask, TYPE_NUMBER)
+	checkluatype (mask, isnumber)
 
 	local renderdata = SF.instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
@@ -557,10 +557,10 @@ end
 function render_library.enableScissorRect(startX, startY, endX, endY)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (startX, TYPE_NUMBER)
-	checkluatype (startY, TYPE_NUMBER)
-	checkluatype (endX, TYPE_NUMBER)
-	checkluatype (endY, TYPE_NUMBER)
+	checkluatype (startX, isnumber)
+	checkluatype (startY, isnumber)
+	checkluatype (endX, isnumber)
+	checkluatype (endY, isnumber)
 	render.SetScissorRect(startX, startY, endX, endY, true)
 end
 
@@ -584,9 +584,9 @@ end
 
 local viewmatrix_checktypes =
 {
-	x = TYPE_NUMBER, y = TYPE_NUMBER, w = TYPE_NUMBER, h = TYPE_NUMBER, type = TYPE_STRING,
-	fov = TYPE_NUMBER, aspect = TYPE_NUMBER, zfar = TYPE_NUMBER, znear = TYPE_NUMBER, subrect = TYPE_BOOL,
-	bloomtone = TYPE_BOOL, offcenter = TYPE_TABLE, ortho = TYPE_TABLE
+	x = isnumber, y = isnumber, w = isnumber, h = isnumber, type = isstring,
+	fov = isnumber, aspect = isnumber, zfar = isnumber, znear = isnumber, subrect = isbool,
+	bloomtone = isbool, offcenter = istable, ortho = istable
 }
 local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 
@@ -596,7 +596,7 @@ function render_library.pushViewMatrix(tbl)
 	local renderdata = SF.instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
-	checkluatype(tbl, TYPE_TABLE)
+	checkluatype(tbl, istable)
 
 	local newtbl = {}
 	if tbl.origin ~= nil then local origin = tbl.origin checktype( origin, SF.Vectors.Metatable ) newtbl.origin = vunwrap(origin) end
@@ -612,16 +612,16 @@ function render_library.pushViewMatrix(tbl)
 		end
 	end
 	if newtbl.offcenter then
-		checkluatype (tbl.offcenter.left, TYPE_NUMBER)
-		checkluatype (tbl.offcenter.right, TYPE_NUMBER)
-		checkluatype (tbl.offcenter.bottom, TYPE_NUMBER)
-		checkluatype (tbl.offcenter.top, TYPE_NUMBER)
+		checkluatype (tbl.offcenter.left, isnumber)
+		checkluatype (tbl.offcenter.right, isnumber)
+		checkluatype (tbl.offcenter.bottom, isnumber)
+		checkluatype (tbl.offcenter.top, isnumber)
 	end
 	if newtbl.ortho then
-		checkluatype (tbl.ortho.left, TYPE_NUMBER)
-		checkluatype (tbl.ortho.right, TYPE_NUMBER)
-		checkluatype (tbl.ortho.bottom, TYPE_NUMBER)
-		checkluatype (tbl.ortho.top, TYPE_NUMBER)
+		checkluatype (tbl.ortho.left, isnumber)
+		checkluatype (tbl.ortho.right, isnumber)
+		checkluatype (tbl.ortho.bottom, isnumber)
+		checkluatype (tbl.ortho.top, isnumber)
 	end
 
 	local endfunc
@@ -697,7 +697,7 @@ end
 
 --- Sets the draw color by RGBA values
 function render_library.setRGBA(r, g, b, a)
-	checkluatype (r, TYPE_NUMBER) checkluatype (g, TYPE_NUMBER) checkluatype (b, TYPE_NUMBER) checkluatype (a, TYPE_NUMBER)
+	checkluatype (r, isnumber) checkluatype (g, isnumber) checkluatype (b, isnumber) checkluatype (a, isnumber)
 	currentcolor = Color(r, g, b, a)
 	surface.SetDrawColor(r, g, b, a)
 	surface.SetTextColor(r, g, b, a)
@@ -712,7 +712,7 @@ end
 -- @param done An optional callback called when the image is done loading. Passes the material, url
 -- @return The material. Use with render.setMaterial to draw with it.
 function render_library.createMaterial(tx, cb, done)
-	checkluatype (tx, TYPE_STRING)
+	checkluatype (tx, isstring)
 
 	local m = SF.instance.env.material.create("UnlitGeneric")
 	local _1, _2, prefix = tx:find("^(%w-):")
@@ -752,7 +752,7 @@ end
 -- The dimensions will always be 1024x1024
 -- @param name The name of the render target
 function render_library.createRenderTarget (name)
-	checkluatype (name, TYPE_STRING)
+	checkluatype (name, isstring)
 
 	local instance = SF.instance
 	local data = instance.data.render
@@ -788,7 +788,7 @@ function render_library.selectRenderTarget (name)
 	local data = SF.instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name then
-		checkluatype (name, TYPE_STRING)
+		checkluatype (name, isstring)
 
 		local rt = data.rendertargets[name]
 		if not rt then SF.Throw("Invalid Rendertarget", 2) end
@@ -841,7 +841,7 @@ function render_library.setRenderTargetTexture (name)
 		render.SetColorMaterial()
 		draw.NoTexture()
 	else
-		checkluatype (name, TYPE_STRING)
+		checkluatype (name, isstring)
 
 		local rt = data.rendertargets[name]
 		if rt then
@@ -875,7 +875,7 @@ end
 --- Sets the texture filtering function when viewing a close texture
 -- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 function render_library.setFilterMag(val)
-	checkluatype (val, TYPE_NUMBER)
+	checkluatype (val, isnumber)
 	if SF.instance.data.render.changedFilterMag then
 		render.PopFilterMag()
 	end
@@ -886,7 +886,7 @@ end
 --- Sets the texture filtering function when viewing a far texture
 -- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 function render_library.setFilterMin(val)
-	checkluatype (val, TYPE_NUMBER)
+	checkluatype (val, isnumber)
 	if SF.instance.data.render.changedFilterMin then
 		render.PopFilterMin()
 	end
@@ -1054,14 +1054,14 @@ end
 -- @param endV Texture mapping at rectangle end
 function render_library.drawTexturedRectUV (x, y, w, h, startU, startV, endU, endV)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (w, TYPE_NUMBER)
-	checkluatype (h, TYPE_NUMBER)
-	checkluatype (startU, TYPE_NUMBER)
-	checkluatype (startV, TYPE_NUMBER)
-	checkluatype (endU, TYPE_NUMBER)
-	checkluatype (endV, TYPE_NUMBER)
+	checkluatype (x, isnumber)
+	checkluatype (y, isnumber)
+	checkluatype (w, isnumber)
+	checkluatype (h, isnumber)
+	checkluatype (startU, isnumber)
+	checkluatype (startV, isnumber)
+	checkluatype (endU, isnumber)
+	checkluatype (endV, isnumber)
 
 	local r,g,b,a = currentcolor.r, currentcolor.g, currentcolor.b, currentcolor.a
 
@@ -1204,7 +1204,7 @@ defaultFont = render_library.createFont("Default", 16, 400, false, false, false,
 -- @return width of the text
 -- @return height of the text
 function render_library.getTextSize(text)
-	checkluatype (text, TYPE_STRING)
+	checkluatype (text, isstring)
 
 	surface.SetFont(SF.instance.data.render.font or defaultFont)
 	return surface.GetTextSize(text)
@@ -1254,11 +1254,11 @@ end
 -- @param alignment Text alignment
 function render_library.drawText (x, y, text, alignment)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (text, TYPE_STRING)
+	checkluatype (x, isnumber)
+	checkluatype (y, isnumber)
+	checkluatype (text, isstring)
 	if alignment then
-		checkluatype (alignment, TYPE_NUMBER)
+		checkluatype (alignment, isnumber)
 	end
 
 	local font = SF.instance.data.render.font or defaultFont
@@ -1274,11 +1274,11 @@ end
 -- @param yalign Text y alignment
 function render_library.drawSimpleText (x, y, text, xalign, yalign)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
-	checkluatype (text, TYPE_STRING)
-	if xalign then checkluatype (xalign, TYPE_NUMBER) end
-	if yalign then checkluatype (yalign, TYPE_NUMBER) end
+	checkluatype (x, isnumber)
+	checkluatype (y, isnumber)
+	checkluatype (text, isstring)
+	if xalign then checkluatype (xalign, isnumber) end
+	if yalign then checkluatype (yalign, isnumber) end
 
 	local font = SF.instance.data.render.font or defaultFont
 
@@ -1290,8 +1290,8 @@ end
 -- @param maxsize The max width of the markup
 -- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
 function render_library.parseMarkup(str, maxsize)
-	checkluatype (str, TYPE_STRING)
-	checkluatype (maxsize, TYPE_NUMBER)
+	checkluatype (str, isstring)
+	checkluatype (maxsize, isnumber)
 
 	local marked = markup.Parse(str, maxsize)
 
@@ -1325,7 +1325,7 @@ end
 --- Draws a polygon.
 -- @param poly Table of polygon vertices. Texture coordinates are optional. {{x=x1, y=y1, u=u1, v=v1}, ... }
 function render_library.drawPoly(poly)
-	checkluatype (poly, TYPE_TABLE)
+	checkluatype (poly, istable)
 	surface.DrawPoly(poly)
 end
 
@@ -1333,7 +1333,7 @@ end
 -- @param enable true to enable
 function render_library.enableDepth (enable)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	checkluatype (enable, TYPE_BOOL)
+	checkluatype (enable, isbool)
 	render.OverrideDepthEnable(enable, enable)
 end
 
@@ -1364,8 +1364,8 @@ end
 -- @param height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
 	checktype(pos, vector_meta)
-	checkluatype (width, TYPE_NUMBER)
-	checkluatype (height, TYPE_NUMBER)
+	checkluatype (width, isnumber)
+	checkluatype (height, isnumber)
 	pos = vunwrap(pos)
 	render.DrawSprite(pos, width, height)
 end
@@ -1378,9 +1378,9 @@ end
 function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(pos, vector_meta)
-	checkluatype (radius, TYPE_NUMBER)
-	checkluatype (longitudeSteps, TYPE_NUMBER)
-	checkluatype (latitudeSteps, TYPE_NUMBER)
+	checkluatype (radius, isnumber)
+	checkluatype (longitudeSteps, isnumber)
+	checkluatype (latitudeSteps, isnumber)
 	pos = vunwrap(pos)
 	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
 	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
@@ -1395,9 +1395,9 @@ end
 function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, latitudeSteps)
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(pos, vector_meta)
-	checkluatype (radius, TYPE_NUMBER)
-	checkluatype (longitudeSteps, TYPE_NUMBER)
-	checkluatype (latitudeSteps, TYPE_NUMBER)
+	checkluatype (radius, isnumber)
+	checkluatype (longitudeSteps, isnumber)
+	checkluatype (latitudeSteps, isnumber)
 	pos = vunwrap(pos)
 	longitudeSteps = math.Clamp(longitudeSteps, 3, 50)
 	latitudeSteps = math.Clamp(latitudeSteps, 3, 50)
@@ -1465,9 +1465,9 @@ function render_library.draw3DBeam (startPos, endPos, width, textureStart, textu
 	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(startPos, vector_meta)
 	checktype(endPos, vector_meta)
-	checkluatype (width, TYPE_NUMBER)
-	checkluatype (textureStart, TYPE_NUMBER)
-	checkluatype (textureEnd, TYPE_NUMBER)
+	checkluatype (width, isnumber)
+	checkluatype (textureStart, isnumber)
+	checkluatype (textureEnd, isnumber)
 
 	startPos = vunwrap(startPos)
 	endPos = vunwrap(endPos)
@@ -1608,8 +1608,8 @@ function render_library.readPixel (x, y)
 		SF.Throw("Not in rendering hook.", 2)
 	end
 
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
+	checkluatype (x, isnumber)
+	checkluatype (y, isnumber)
 
 	local r, g, b = render.ReadPixel(x, y)
 	return cwrap(Color(r, g, b, 255))
@@ -1663,27 +1663,27 @@ end
 --- Renders the scene with the specified viewData to the current active render target.
 -- @param tbl view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
-	checkluatype(tbl, TYPE_TABLE)
+	checkluatype(tbl, istable)
 
 	local origin, angles, w, h, ortho, offcenter
 	if tbl.origin~=nil then checktype(tbl.origin, vector_meta) origin = vunwrap(tbl.origin) end
 	if tbl.angles~=nil then checktype(tbl.angles, ang_meta) angles = aunwrap(tbl.angles) end
-	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
-	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
-	if tbl.y~=nil then checkluatype(tbl.y, TYPE_NUMBER) end
-	if tbl.w~=nil then checkluatype(tbl.w, TYPE_NUMBER) w = math.Clamp(tbl.w, 1, 1024) end
-	if tbl.h~=nil then checkluatype(tbl.h, TYPE_NUMBER) h = math.Clamp(tbl.h, 1, 1024) end
-	if tbl.fov~=nil then checkluatype(tbl.fov, TYPE_NUMBER) end
-	if tbl.zfar~=nil then checkluatype(tbl.zfar, TYPE_NUMBER) end
-	if tbl.znear~=nil then checkluatype(tbl.znear, TYPE_NUMBER) end
-	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, TYPE_BOOL) end
-	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, TYPE_BOOL) end
+	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, isnumber) end
+	if tbl.x~=nil then checkluatype(tbl.x, isnumber) end
+	if tbl.y~=nil then checkluatype(tbl.y, isnumber) end
+	if tbl.w~=nil then checkluatype(tbl.w, isnumber) w = math.Clamp(tbl.w, 1, 1024) end
+	if tbl.h~=nil then checkluatype(tbl.h, isnumber) h = math.Clamp(tbl.h, 1, 1024) end
+	if tbl.fov~=nil then checkluatype(tbl.fov, isnumber) end
+	if tbl.zfar~=nil then checkluatype(tbl.zfar, isnumber) end
+	if tbl.znear~=nil then checkluatype(tbl.znear, isnumber) end
+	if tbl.drawmonitors~=nil then checkluatype(tbl.drawmonitors, isbool) end
+	if tbl.drawviewmodel~=nil then checkluatype(tbl.drawviewmodel, isbool) end
 	if tbl.ortho~=nil then 
-		checkluatype(tbl.ortho, TYPE_TABLE)
-		checkluatype(tbl.ortho.left, TYPE_NUMBER)
-		checkluatype(tbl.ortho.right, TYPE_NUMBER)
-		checkluatype(tbl.ortho.top, TYPE_NUMBER)
-		checkluatype(tbl.ortho.bottom, TYPE_NUMBER)
+		checkluatype(tbl.ortho, istable)
+		checkluatype(tbl.ortho.left, isnumber)
+		checkluatype(tbl.ortho.right, isnumber)
+		checkluatype(tbl.ortho.top, isnumber)
+		checkluatype(tbl.ortho.bottom, isnumber)
 		ortho = { 
 			left = tbl.ortho.left,
 			right = tbl.ortho.right,
@@ -1691,16 +1691,16 @@ function render_library.renderView(tbl)
 			bottom = tbl.ortho.bottom,
 		}
 	end
-	if tbl.dopostprocess~=nil then checkluatype(tbl.dopostprocess, TYPE_BOOL) end
-	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, TYPE_BOOL) end
-	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, TYPE_NUMBER) end
-	if tbl.zfarviewmodel~=nil then checkluatype(tbl.zfarviewmodel, TYPE_NUMBER) end
+	if tbl.dopostprocess~=nil then checkluatype(tbl.dopostprocess, isbool) end
+	if tbl.bloomtone~=nil then checkluatype(tbl.bloomtone, isbool) end
+	if tbl.znearviewmodel~=nil then checkluatype(tbl.znearviewmodel, isnumber) end
+	if tbl.zfarviewmodel~=nil then checkluatype(tbl.zfarviewmodel, isnumber) end
 	if tbl.offcenter~=nil then 
-		checkluatype(tbl.offcenter, TYPE_TABLE)
-		checkluatype(tbl.offcenter.left, TYPE_NUMBER)
-		checkluatype(tbl.offcenter.right, TYPE_NUMBER)
-		checkluatype(tbl.offcenter.top, TYPE_NUMBER)
-		checkluatype(tbl.offcenter.bottom, TYPE_NUMBER)
+		checkluatype(tbl.offcenter, istable)
+		checkluatype(tbl.offcenter.left, isnumber)
+		checkluatype(tbl.offcenter.right, isnumber)
+		checkluatype(tbl.offcenter.top, isnumber)
+		checkluatype(tbl.offcenter.bottom, isnumber)
 		offcenter = { 
 			left = tbl.offcenter.left,
 			right = tbl.offcenter.right,
@@ -1830,7 +1830,7 @@ function render_library.enableClipping(state)
 	local data = SF.instance.data.render
 
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checkluatype(state, TYPE_BOOL)
+	checkluatype(state, isbool)
 
 	local prevState = render.EnableClipping(state)
 
@@ -1854,7 +1854,7 @@ function render_library.pushCustomClipPlane(normal, distance)
 	end
 
 	checktype(normal, vector_meta)
-	checkluatype(distance, TYPE_NUMBER)
+	checkluatype(distance, isnumber)
 	
 	render.PushCustomClipPlane(vunwrap(normal), distance)
 
@@ -1876,7 +1876,7 @@ end
 --- Sets the current instance to allow HUD drawing. Only works for owner of the chip
 --@param active Whether hud hooks should be active. true to force on, false to force off, nil to restore default.
 function render_library.setHUDActive(active)
-	if active ~= nil then checkluatype(active, TYPE_BOOL) end
+	if active ~= nil then checkluatype(active, isbool) end
 	local instance = SF.instance
 	if LocalPlayer()~=instance.player then SF.Throw("This function only works for the owner of the chip!", 2) end
 	instance.hudoverride = active

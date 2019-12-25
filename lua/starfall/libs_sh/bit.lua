@@ -28,8 +28,8 @@ local ss_methods, ss_metamethods = SF.RegisterType("StringStream")
 --@param i The initial buffer pointer (default 1)
 --@param endian The endianness of number types. "big" or "little" (default "little")
 function bit_library.stringstream(stream, i, endian)
-	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
-	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
+	if stream~=nil then checkluatype(stream, isstring) else stream = "" end
+	if i~=nil then checkluatype(i, isnumber) else i = 1 end
 	
 	local ret = setmetatable({
 		buffer = {},

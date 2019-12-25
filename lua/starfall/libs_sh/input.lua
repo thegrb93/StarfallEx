@@ -50,7 +50,7 @@ SF.Permissions.registerPrivilege("input.emulate", "Input", "Allows starfall to e
 -- @return The name of the first key bound
 
 function input_methods.lookupBinding(binding)
-	SF.CheckLuaType(binding, TYPE_STRING)
+	SF.CheckLuaType(binding, isstring)
 
 	SF.Permissions.check(SF.instance, nil, "input")
 
@@ -67,7 +67,7 @@ end
 -- @param key The key id, see input
 -- @return True if the key is down
 function input_methods.isKeyDown(key)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	SF.CheckLuaType(key, isnumber)
 
 	SF.Permissions.check(SF.instance, nil, "input")
 
@@ -79,7 +79,7 @@ end
 -- @param key The key id, see input
 -- @return The name of the key
 function input_methods.getKeyName(key)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	SF.CheckLuaType(key, isnumber)
 
 	SF.Permissions.check(SF.instance, nil, "input")
 
@@ -130,8 +130,8 @@ end
 -- @return Aim vector
 function input_methods.screenToVector(x, y)
 	SF.Permissions.check(SF.instance, nil, "input")
-	SF.CheckLuaType(x, TYPE_NUMBER)
-	SF.CheckLuaType(y, TYPE_NUMBER)
+	SF.CheckLuaType(x, isnumber)
+	SF.CheckLuaType(y, isnumber)
 	return SF.WrapObject(gui.ScreenToVector(x, y))
 end
 
@@ -139,7 +139,7 @@ end
 -- @client
 -- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor(enabled)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
+	SF.CheckLuaType(enabled, isbool)
 	SF.Permissions.check(SF.instance, nil, "input")
 
 	if not SF.instance:isHUDActive() then
@@ -194,7 +194,7 @@ end)
 -- @client
 -- @param enabled Whether to lock or unlock the controls
 function input_methods.lockControls(enabled)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
+	SF.CheckLuaType(enabled, isbool)
 	SF.Permissions.check(SF.instance, nil, "input")
 
 	if not SF.instance:isHUDActive() then

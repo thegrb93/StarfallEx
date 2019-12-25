@@ -221,10 +221,9 @@ end
 SF.AddHook("postload", postload)
 
 local function convertFilter(filter)
-	local filterType = TypeID(filter)
-	if filterType == TYPE_NIL then
+	if filter == nil then
 		return nil
-	elseif filterType == TYPE_TABLE then
+	elseif istable(filter) then
 		local unwrapped = unwrap(filter)
 		if unwrapped then
 			return unwrapped
@@ -238,7 +237,7 @@ local function convertFilter(filter)
 			end
 			return l
 		end
-	elseif filterType == TYPE_FUNCTION then
+	elseif isfunction(filter) then
 		return function(ent)
 			local ret = SF.instance:runFunction(filter, SF.WrapObject(ent))
 			if ret[1] then return ret[2] end
@@ -272,9 +271,9 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	checkvector(endpos)
 
 	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+	if mask ~= nil then checkluatype (mask, isnumber) end
+	if colgroup ~= nil then checkluatype (colgroup, isnumber) end
+	if ignworld ~= nil then checkluatype (ignworld, isbool) end
 
 	local trace = {
 		start = start,
@@ -312,9 +311,9 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 	checkvector(maxbox)
 
 	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+	if mask ~= nil then checkluatype (mask, isnumber) end
+	if colgroup ~= nil then checkluatype (colgroup, isnumber) end
+	if ignworld ~= nil then checkluatype (ignworld, isbool) end
 
 	local trace = {
 		start = start,

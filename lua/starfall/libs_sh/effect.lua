@@ -61,7 +61,7 @@ local effect_blacklist = {
 -- @param eff The effect type to play
 function effect_methods:play(eff)
 	checktype(self, effect_metamethods)
-	checkluatype(eff, TYPE_STRING)
+	checkluatype(eff, isstring)
 	
 	local instance = SF.instance
 	checkpermission(instance, nil, "effect.play")
@@ -196,7 +196,7 @@ end
 -- @param attachment The attachment
 function effect_methods:setAttachment(attachment)
 	checktype(self, effect_metamethods)
-	checkluatype(attachment, TYPE_NUMBER)
+	checkluatype(attachment, isnumber)
 	unwrap(self):SetAttachment(attachment)
 end
 
@@ -204,7 +204,7 @@ end
 -- @param color The color represented by a byte 0-255. wtf?
 function effect_methods:setColor(color)
 	checktype(self, effect_metamethods)
-	checkluatype(color, TYPE_NUMBER)
+	checkluatype(color, isnumber)
 	unwrap(self):SetColor(color)
 end
 
@@ -212,7 +212,7 @@ end
 -- @param dmgtype The damage type
 function effect_methods:setDamageType(dmgtype)
 	checktype(self, effect_metamethods)
-	checkluatype(dmgtype, TYPE_NUMBER)
+	checkluatype(dmgtype, isnumber)
 	unwrap(self):SetDamageType(dmgtype)
 end
 
@@ -220,7 +220,7 @@ end
 -- @param index The entity index
 function effect_methods:setEntIndex(index)
 	checktype(self, effect_metamethods)
-	checkluatype(index, TYPE_NUMBER)
+	checkluatype(index, isnumber)
 	unwrap(self):SetEntIndex(index)
 end
 
@@ -236,7 +236,7 @@ end
 -- @param flags The flags
 function effect_methods:setFlags(flags)
 	checktype(self, effect_metamethods)
-	checkluatype(flags, TYPE_NUMBER)
+	checkluatype(flags, isnumber)
 	unwrap(self):SetFlags(flags)
 end
 
@@ -244,7 +244,7 @@ end
 -- @param hitbox The hitbox
 function effect_methods:setHitBox(hitbox)
 	checktype(self, effect_metamethods)
-	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(hitbox, isnumber)
 	unwrap(self):SetHitBox(hitbox)
 end
 
@@ -252,7 +252,7 @@ end
 -- @param magnitude The magnitude
 function effect_methods:setMagnitude(magnitude)
 	checktype(self, effect_metamethods)
-	checkluatype(magnitude, TYPE_NUMBER)
+	checkluatype(magnitude, isnumber)
 	unwrap(self):SetMagnitude(magnitude)
 end
 
@@ -260,7 +260,7 @@ end
 -- @param mat The material index
 function effect_methods:setMaterialIndex(mat)
 	checktype(self, effect_metamethods)
-	checkluatype(mat, TYPE_NUMBER)
+	checkluatype(mat, isnumber)
 	unwrap(self):SetMaterialIndex(mat)
 end
 
@@ -284,7 +284,7 @@ end
 -- @param radius The radius
 function effect_methods:setRadius(radius)
 	checktype(self, effect_metamethods)
-	checkluatype(radius, TYPE_NUMBER)
+	checkluatype(radius, isnumber)
 	unwrap(self):SetRadius(radius)
 end
 
@@ -292,7 +292,7 @@ end
 -- @param scale The number scale
 function effect_methods:setScale(scale)
 	checktype(self, effect_metamethods)
-	checkluatype(scale, TYPE_NUMBER)
+	checkluatype(scale, isnumber)
 	unwrap(self):SetScale(scale)
 end
 
@@ -308,6 +308,6 @@ end
 -- @param prop The surface property
 function effect_methods:setSurfaceProp(prop)
 	checktype(self, effect_metamethods)
-	checkluatype(prop, TYPE_NUMBER)
+	checkluatype(prop, isnumber)
 	unwrap(self):SetSurfaceProp(prop)
 end

@@ -208,7 +208,7 @@ end
 --- Sets the physical material of a physics object
 -- @param material The physical material to set it to
 function physobj_methods:setMaterial(material)
-	checkluatype (material, TYPE_STRING)
+	checkluatype (material, isstring)
 	local phys = unwrap(self)
 	checkpermission(SF.instance, phys:GetEntity(), "entities.setRenderProperty")
 	phys:SetMaterial(material)
@@ -265,7 +265,7 @@ if SERVER then
 	-- @server
 	-- @param ratio The buoyancy ratio to use
 	function physobj_methods:setBuoyancyRatio(ratio)
-		checkluatype(ratio, TYPE_NUMBER)
+		checkluatype(ratio, isnumber)
 
 		if ratio<-1e12 or ratio>1e12 or ratio~=ratio then
 			SF.Throw("Input number too large or NAN", 2)
@@ -354,7 +354,7 @@ if SERVER then
 	-- @server
 	-- @param mass The mass to set it to
 	function physobj_methods:setMass(mass)
-		checkluatype(mass, TYPE_NUMBER)
+		checkluatype(mass, isnumber)
 		local phys = unwrap(self)
 		local ent = phys:GetEntity()
 		checkpermission(SF.instance, ent, "entities.setMass")
@@ -391,7 +391,7 @@ if SERVER then
 	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
 	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
 	function physobj_methods:addGameFlags(flags)
-		checkluatype(flags, TYPE_NUMBER)
+		checkluatype(flags, isnumber)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
 		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
@@ -411,7 +411,7 @@ if SERVER then
 	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
 	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
 	function physobj_methods:clearGameFlags(flags)
-		checkluatype(flags, TYPE_NUMBER)
+		checkluatype(flags, isnumber)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
 		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
@@ -426,7 +426,7 @@ if SERVER then
 	-- @param flags The flags to test. FVPHYSICS enum.
 	-- @return boolean If the flags are set
 	function physobj_methods:hasGameFlags(flags)
-		checkluatype(flags, TYPE_NUMBER)
+		checkluatype(flags, isnumber)
 		local phys = unwrap(self)
 		return phys:HasGameFlag(flags)
 	end
@@ -458,7 +458,7 @@ if SERVER then
 	--- Sets coefficient of air resistance affecting the bone. Air resistance depends on the cross-section of the object.
 	-- @param coeff Number how much drag affects the bone
 	function physobj_methods:setDragCoefficient(coeff)
-		checkluatype(coeff, TYPE_NUMBER)
+		checkluatype(coeff, isnumber)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
 		phys:SetDragCoefficient(coeff)
@@ -467,7 +467,7 @@ if SERVER then
 	--- Sets coefficient of air resistance affecting the bone when rotating. Air resistance depends on the cross-section of the object.
 	-- @param coeff Number how much drag affects the bone when rotating
 	function physobj_methods:setAngleDragCoefficient(coeff)
-		checkluatype(coeff, TYPE_NUMBER)
+		checkluatype(coeff, isnumber)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
 		phys:SetAngleDragCoefficient(coeff)
@@ -485,8 +485,8 @@ if SERVER then
 	-- @param linear Number of the linear damping
 	-- @param angular Number of the angular damping
 	function physobj_methods:setDamping(linear, angular)
-		checkluatype(linear, TYPE_NUMBER)
-		checkluatype(angular, TYPE_NUMBER)
+		checkluatype(linear, isnumber)
+		checkluatype(angular, isnumber)
 		local phys = unwrap(self)
 		checkpermission(SF.instance, phys:GetEntity(), "entities.setDamping")
 		return phys:SetDamping(linear, angular)

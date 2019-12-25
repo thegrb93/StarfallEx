@@ -27,9 +27,9 @@ SF.AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
 
 	SF.DefaultEnvironment.Angle = function (p, y, r)
-		if p then checkluatype(p, TYPE_NUMBER) else p = 0 end
-		if y then checkluatype(y, TYPE_NUMBER) else y = p end
-		if r then checkluatype(r, TYPE_NUMBER) else r = p end
+		if p then checkluatype(p, isnumber) else p = 0 end
+		if y then checkluatype(y, isnumber) else y = p end
+		if r then checkluatype(r, isnumber) else r = p end
 		return wrap({ p, y, r })
 	end
 end)
@@ -81,7 +81,7 @@ end
 -- @param n Number to multiply by.
 -- @return resultant angle.
 function ang_metamethods.__mul (a, n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype (n, isnumber)
 
 	return wrap({ a[1] * n, a[2] * n, a[3] * n })
 end
@@ -91,7 +91,7 @@ end
 -- @return resultant angle.
 function ang_metamethods.__div (a, n)
 	checktype(a, ang_metamethods)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype (n, isnumber)
 
 	return wrap({ a[1] / n, a[2] / n, a[3] / n })
 end
@@ -182,10 +182,10 @@ function ang_methods:rotateAroundAxis (v, deg, rad)
 	checktype(v, SF.Types["Vector"])
 
 	if rad then
-		checkluatype (rad, TYPE_NUMBER)
+		checkluatype (rad, isnumber)
 		deg = math.deg(rad)
 	else
-		checkluatype (deg, TYPE_NUMBER)
+		checkluatype (deg, isnumber)
 	end
 
 	local ret = Angle()

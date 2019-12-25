@@ -118,7 +118,7 @@ end
 --- Scales the absolute translation
 -- @param num Amount to scale by
 function vmatrix_methods:scaleTranslation(num)
-	checkluatype (num, TYPE_NUMBER)
+	checkluatype (num, isnumber)
 	unwrap(self):ScaleTranslation(num)
 end
 

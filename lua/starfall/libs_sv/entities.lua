@@ -88,7 +88,7 @@ function ents_methods:setParent(parent, attachment)
 		ent:SetParent(parentent)
 
 		if attachment then
-			checkluatype(attachment, TYPE_STRING)
+			checkluatype(attachment, isstring)
 			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 		end
 	else
@@ -136,7 +136,7 @@ end
 -- @param enable Whether the component will lock the player's controls when used
 function ents_methods:setComponentLocksControls(enable)
 	local ent = getent(self)
-	checkluatype(enable, TYPE_BOOL)
+	checkluatype(enable, isbool)
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" then
 		ent.locksControls = enable
@@ -168,7 +168,7 @@ end
 -- @param inflictor damage inflictor
 function ents_methods:applyDamage(amt, attacker, inflictor)
 	local ent = getent(self)
-	checkluatype(amt, TYPE_NUMBER)
+	checkluatype(amt, isnumber)
 
 	checkpermission(SF.instance, ent, "entities.applyDamage")
 
@@ -197,7 +197,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 	lin = vunwrap(lin)
 	checkvector(lin)
 
-	checkluatype(mode, TYPE_NUMBER)
+	checkluatype(mode, isnumber)
 	if mode ~= 0 and mode ~= 1 and mode ~= 2 and mode ~= 3 and mode ~= 4 then SF.Throw("Invalid mode", 2) end
 
 	function ent:PhysicsSimulate()
@@ -338,7 +338,7 @@ end
 -- @param func The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
 function ents_methods:addCollisionListener(func)
 	local ent = getent(self)
-	checkluatype(func, TYPE_FUNCTION)
+	checkluatype(func, isfunction)
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
 
@@ -444,12 +444,12 @@ end
 -- @param radius (optional) How large the fire hitbox is (entity obb is the max)
 function ents_methods:ignite(length, radius)
 	local ent = getent(self)
-	checkluatype(length, TYPE_NUMBER)
+	checkluatype(length, isnumber)
 
 	checkpermission(SF.instance, ent, "entities.ignite")
 
 	if radius then
-		checkluatype(radius, TYPE_NUMBER)
+		checkluatype(radius, isnumber)
 		local obbmins, obbmaxs = ent:OBBMins(), ent:OBBMaxs()
 		radius = math.Clamp(radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2)
 	end
@@ -501,7 +501,7 @@ end
 -- @param mass number mass
 function ents_methods:setMass(mass)
 	local ent = getent(self)
-	checkluatype(mass, TYPE_NUMBER)
+	checkluatype(mass, isnumber)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -534,7 +534,7 @@ end
 -- @param mat Material to use
 function ents_methods:setPhysMaterial(mat)
 	local ent = getent(self)
-	checkluatype(mat, TYPE_STRING)
+	checkluatype(mat, isstring)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -662,7 +662,7 @@ end
 --@param filter Optional constraint type filter table where keys are the type name and values are 'true'. "Wire" and "Parent" are used for wires and parents.
 function ents_methods:getAllConstrained(filter)
 	local ent = getent(self)
-	if filter ~= nil then checkluatype(filter, TYPE_TABLE) end
+	if filter ~= nil then checkluatype(filter, istable) end
 
 	local entity_lookup = {}
 	local entity_table = {}
@@ -722,7 +722,7 @@ end
 -- @param additive If the trail's rendering is additive
 function ents_methods:setTrails(startSize, endSize, length, material, color, attachmentID, additive)
 	local ent = getent(self)
-	checkluatype(material, TYPE_STRING)
+	checkluatype(material, isstring)
 	local time = CurTime()
 	if ent._lastTrailSet == time then SF.Throw("Can't modify trail more than once per frame", 2) end
 	ent._lastTrailSet = time
@@ -755,7 +755,7 @@ end
 -- @param on Whether to make the prop unbreakable
 function ents_methods:setUnbreakable(on)
 	local ent = getent(self)
-	checkluatype(on, TYPE_BOOL)
+	checkluatype(on, isbool)
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("setUnbreakable can only be used on prop_physics", 2) end
 

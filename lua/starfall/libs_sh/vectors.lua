@@ -24,9 +24,9 @@ SF.AddObjectUnwrapper(vec_metamethods, unwrap)
 
 SF.AddHook("postload", function()
 	SF.DefaultEnvironment.Vector = function (x, y, z)
-		if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
-		if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
-		if y then checkluatype(y, TYPE_NUMBER) else y = x end
+		if x then checkluatype(x, isnumber) else x = 0 end
+		if z then checkluatype(z, isnumber) else z = (y and 0 or x) end
+		if y then checkluatype(y, isnumber) else y = x end
 		return wrap({ x, y, z })
 	end
 end)
@@ -79,10 +79,10 @@ function vec_metamethods.__mul (a, b)
 			return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 		end
 
-		checkluatype(b, TYPE_NUMBER)
+		checkluatype(b, isnumber)
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	else
-		checkluatype(a, TYPE_NUMBER)
+		checkluatype(a, isnumber)
 		return wrap({ b[1] * a, b[2] * a, b[3] * a })
 	end
 end
@@ -95,11 +95,11 @@ function vec_metamethods.__div (a, b)
 		if dgetmeta(b) == vec_metamethods then
 			return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
 		else
-			checkluatype(b, TYPE_NUMBER)
+			checkluatype(b, isnumber)
 			return wrap({ a[1] / b, a[2] / b, a[3] / b })
 		end
 	else
-		checkluatype(a, TYPE_NUMBER)
+		checkluatype(a, isnumber)
 		return wrap({ a / b[1], a / b[2], a / b[3] })
 	end
 end
@@ -215,7 +215,7 @@ end
 -- @return bool True/False.
 function vec_methods:isEqualTol (v, t)
 	checktype(v, vec_metamethods)
-	checkluatype(t, TYPE_NUMBER)
+	checkluatype(t, isnumber)
 
 	return unwrap(self):IsEqualTol(unwrap(v), t)
 end
@@ -259,7 +259,7 @@ end
 -- @param n Scalar to multiply with.
 -- @return nil
 function vec_methods:mul (n)
-	checkluatype(n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 
 	self[1] = self[1] * n
 	self[2] = self[2] * n
@@ -270,7 +270,7 @@ end
 -- @param n Scalar to divide by.
 -- @return nil
 function vec_methods:div (n)
-	checkluatype(n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 
 	self[1] = self[1] / n
 	self[2] = self[2] / n
@@ -374,10 +374,10 @@ function vec_methods:rotateAroundAxis(axis, degrees, radians)
 	checktype(axis, vec_metamethods)
 
 	if degrees then
-		checkluatype(degrees, TYPE_NUMBER)
+		checkluatype(degrees, isnumber)
 		radians = math.rad(degrees)
 	else
-		checkluatype(radians, TYPE_NUMBER)
+		checkluatype(radians, isnumber)
 	end
 
 	local ca, sa = math.cos(radians), math.sin(radians)

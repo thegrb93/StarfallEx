@@ -100,7 +100,7 @@ if SERVER then
 	-- @param wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
 		checktype(self, npc_metamethods)
-		checkluatype(wep, TYPE_STRING)
+		checkluatype(wep, isstring)
 
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end

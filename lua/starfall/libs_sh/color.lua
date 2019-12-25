@@ -38,10 +38,10 @@ SF.AddHook("postload", function()
 	-- @param a - Alpha
 	-- @return New color
 	SF.DefaultEnvironment.Color = function (r, g, b, a)
-		if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
-		if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
-		if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
-		if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
+		if r then checkluatype(r, isnumber) else r = 255 end
+		if g then checkluatype(g, isnumber) else g = 255 end
+		if b then checkluatype(b, isnumber) else b = 255 end
+		if a then checkluatype(a, isnumber) else a = 255 end
 		return wrap({ r, g, b, a })
 	end
 end)
@@ -117,11 +117,11 @@ end
 -- @return Scaled color.
 function color_metatable.__mul (a, b)
 	if dgetmeta(a) == color_metatable then
-		checkluatype (b, TYPE_NUMBER)
+		checkluatype (b, isnumber)
 
 		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
 	else
-		checkluatype (a, TYPE_NUMBER)
+		checkluatype (a, isnumber)
 
 		return wrap({ clamp(b[1] * a), clamp(b[2] * a), clamp(b[3] * a), clamp(b[4] * a) })
 	end
@@ -132,7 +132,7 @@ end
 -- @return Scaled color.
 function color_metatable.__div (a, b)
 	checktype(a, color_metatable)
-	checkluatype (b, TYPE_NUMBER)
+	checkluatype (b, isnumber)
 
 	return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
 end

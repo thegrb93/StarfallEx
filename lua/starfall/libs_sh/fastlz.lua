@@ -9,7 +9,7 @@ local util = util
 --@param s String to compress
 --@return FastLZ compressed string
 function fastlz_library.compress (s)
-	SF.CheckLuaType(s, TYPE_STRING)
+	SF.CheckLuaType(s, isstring)
 	return util.Compress(s)
 end
 
@@ -17,6 +17,6 @@ end
 -- @param s FastLZ compressed string to decode
 -- @return Decompressed string
 function fastlz_library.decompress (s)
-	SF.CheckLuaType(s, TYPE_STRING)
+	SF.CheckLuaType(s, isstring)
 	return util.Decompress(s)
 end

@@ -78,10 +78,10 @@ end
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
 -- @param func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func)
-	SF.CheckLuaType(name, TYPE_STRING)
-	SF.CheckLuaType(delay, TYPE_NUMBER)
-	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
-	SF.CheckLuaType(func, TYPE_FUNCTION)
+	SF.CheckLuaType(name, isstring)
+	SF.CheckLuaType(delay, isnumber)
+	reps = SF.CheckLuaType(reps, isnumber, 0, 1)
+	SF.CheckLuaType(func, isfunction)
 
 	createTimer(name, delay, reps, func, false)
 end
@@ -96,7 +96,7 @@ end
 --- Stops and removes the timer.
 -- @param name The timer name
 function timer_library.remove(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 	local instance = SF.instance
 
 	local timername = mangle_timer_name(instance, name)
@@ -111,7 +111,7 @@ end
 -- @param name The timer name
 -- @return bool if the timer exists
 function timer_library.exists(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 	return timer.Exists(mangle_timer_name(SF.instance, name))
 end
 
@@ -119,7 +119,7 @@ end
 -- @param name The timer name
 -- @return false if the timer didn't exist or was already stopped, true otherwise.
 function timer_library.stop(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 	return timer.Stop(mangle_timer_name(SF.instance, name))
 end
 
@@ -127,7 +127,7 @@ end
 -- @param name The timer name
 -- @return true if the timer exists, false if it doesn't.
 function timer_library.start(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 
 	return timer.Start(mangle_timer_name(SF.instance, name))
 end
@@ -139,16 +139,16 @@ end
 -- @param func (Optional) The function to call when the tiemr is fired
 -- @return true if succeeded
 function timer_library.adjust(name, delay, reps, func)
-	SF.CheckLuaType(name, TYPE_STRING)
-	SF.CheckLuaType(delay, TYPE_NUMBER)
+	SF.CheckLuaType(name, isstring)
+	SF.CheckLuaType(delay, isnumber)
 
 	local instance = SF.instance
 	local timername = mangle_timer_name(instance, name)
 	local data = instance.data.timers[timername]
 
 	if data then
-		if reps~=nil then SF.CheckLuaType(reps, TYPE_NUMBER) data.reps = reps end
-		if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) data.func = func end
+		if reps~=nil then SF.CheckLuaType(reps, isnumber) data.reps = reps end
+		if func~=nil then SF.CheckLuaType(func, isfunction) data.func = func end
 		return timer.Adjust(timername, math.max(delay, 0.001), reps)
 	else
 		return false
@@ -159,7 +159,7 @@ end
 -- @param name The timer name
 -- @return false if the timer didn't exist or was already paused, true otherwise.
 function timer_library.pause(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 
 	return timer.Pause(mangle_timer_name(SF.instance, name))
 end
@@ -168,7 +168,7 @@ end
 -- @param name The timer name
 -- @return false if the timer didn't exist or was already running, true otherwise.
 function timer_library.unpause(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 
 	return timer.UnPause(mangle_timer_name(SF.instance, name))
 end
@@ -177,7 +177,7 @@ end
 -- @param name The timer name
 -- @return status of the timer.
 function timer_library.toggle(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 
 	return timer.Toggle(mangle_timer_name(SF.instance, name))
 end
@@ -186,7 +186,7 @@ end
 -- @param name The timer name
 -- @return The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
 function timer_library.timeleft(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 
 	return timer.TimeLeft(mangle_timer_name(SF.instance, name))
 end
@@ -195,7 +195,7 @@ end
 -- @param name The timer name
 -- @return The amount of executions left. Nil if timer doesnt exist
 function timer_library.repsleft(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	SF.CheckLuaType(name, isstring)
 
 	return timer.RepsLeft(mangle_timer_name(SF.instance, name))
 end

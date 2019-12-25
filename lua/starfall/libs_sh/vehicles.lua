@@ -67,7 +67,7 @@ if SERVER then
 	-- @return The passenger or NULL if empty
 	function vehicle_methods:getPassenger (n)
 		checktype(self, vehicle_metamethods)
-		checkluatype(n, TYPE_NUMBER)
+		checkluatype(n, isnumber)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		return pwrap(ent:GetPassenger(n))
@@ -91,7 +91,7 @@ if SERVER then
 	-- @server
 	function vehicle_methods:stripDriver (class)
 		checktype(self, vehicle_metamethods)
-		if class ~= nil then checkluatype(class, TYPE_STRING) end
+		if class ~= nil then checkluatype(class, isstring) end
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(SF.instance, ent, "vehicle.strip")

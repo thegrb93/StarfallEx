@@ -99,9 +99,9 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	force_lim = force_lim or 0
 	nocollide = nocollide and true or false
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(force_lim, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(force_lim, isnumber)
 
 	local ent = constraint.Weld(ent1, ent2, bone1, bone2, force_lim, nocollide)
 	if ent then
@@ -135,11 +135,11 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	friction = friction or 0
 	nocollide = nocollide and 1 or 0
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(force_lim, TYPE_NUMBER)
-	checkluatype(torque_lim, TYPE_NUMBER)
-	checkluatype(friction, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(force_lim, isnumber)
+	checkluatype(torque_lim, isnumber)
+	checkluatype(friction, isnumber)
 
 	local ent = constraint.Axis(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, friction, nocollide, axis)
 	if ent then
@@ -169,10 +169,10 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	torque_lim = torque_lim or 0
 	nocollide = nocollide and 1 or 0
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(force_lim, TYPE_NUMBER)
-	checkluatype(torque_lim, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(force_lim, isnumber)
+	checkluatype(torque_lim, isnumber)
 
 	local ent = constraint.Ballsocket(ent1, ent2, bone1, bone2, vec1, force_lim, torque_lim, nocollide)
 	if ent then
@@ -211,10 +211,10 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	rotateonly = rotateonly and 1 or 0
 	nocollide = nocollide and 1 or 0
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(force_lim, TYPE_NUMBER)
-	checkluatype(torque_lim, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(force_lim, isnumber)
+	checkluatype(torque_lim, isnumber)
 
 	local ent = constraint.AdvBallsocket(ent1, ent2, bone1, bone2, vec1, vec2, force_lim, torque_lim, mins.x, mins.y, mins.z, maxs.x, maxs.y, maxs.z, frictions.x, frictions.y, frictions.z, rotateonly, nocollide)
 	if ent then
@@ -248,12 +248,12 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	width = width or 0
 	strech = strech and true or false
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(const, TYPE_NUMBER)
-	checkluatype(damp, TYPE_NUMBER)
-	checkluatype(rdamp, TYPE_NUMBER)
-	checkluatype(width, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(const, isnumber)
+	checkluatype(damp, isnumber)
+	checkluatype(rdamp, isnumber)
+	checkluatype(width, isnumber)
 
 	e1.Elastics = e1.Elastics or {}
 	e2.Elastics = e2.Elastics or {}
@@ -294,12 +294,12 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	width = width or 0
 	rigid = rigid and true or false
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(length, TYPE_NUMBER)
-	checkluatype(addlength, TYPE_NUMBER)
-	checkluatype(force_lim, TYPE_NUMBER)
-	checkluatype(width, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(length, isnumber)
+	checkluatype(addlength, isnumber)
+	checkluatype(force_lim, isnumber)
+	checkluatype(width, isnumber)
 
 	e1.Ropes = e1.Ropes or {}
 	e2.Ropes = e2.Ropes or {}
@@ -336,9 +336,9 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	bone2 = bone2 or 0
 	width = width or 0
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
-	checkluatype(width, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
+	checkluatype(width, isnumber)
 
 	local ent = constraint.Slider(ent1, ent2, bone1, bone2, vec1, vec2, math.Clamp(width, 0, 50), "cable/cable2")
 	if ent then
@@ -364,8 +364,8 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
 
-	checkluatype(bone1, TYPE_NUMBER)
-	checkluatype(bone2, TYPE_NUMBER)
+	checkluatype(bone1, isnumber)
+	checkluatype(bone2, isnumber)
 
 	local ent = constraint.NoCollide(ent1, ent2, bone1, bone2)
 	if ent then
@@ -383,7 +383,7 @@ function constraint_library.setRopeLength(index, e, length)
 	checkpermission(SF.instance, ent1, "constraints.rope")
 
 
-	checkluatype(length, TYPE_NUMBER)
+	checkluatype(length, isnumber)
 	length = math.max(length, 0)
 
 
@@ -404,7 +404,7 @@ function constraint_library.setElasticLength(index, e, length)
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(SF.instance, ent1, "constraints.elastic")
 
-	checkluatype(length, TYPE_NUMBER)
+	checkluatype(length, isnumber)
 	length = math.max(length, 0)
 
 	if e.Elastics then
@@ -431,7 +431,7 @@ end
 -- @server
 function constraint_library.breakType(e, typename)
 	checktype(e, ents_metatable)
-	checkluatype(typename, TYPE_STRING)
+	checkluatype(typename, isstring)
 
 	local ent1 = eunwrap(e)
 

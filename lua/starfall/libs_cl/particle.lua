@@ -10,7 +10,7 @@ do
 
 end
 
-local TYPE_ENTITY,TYPE_VECTOR
+local ents_metamethods, vec_metamethods
 local unwrap_entity, unwrap_vector
 local IsValid = IsValid
 local checktype = SF.CheckType
@@ -18,8 +18,8 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 SF.AddHook("postload", function()
-	TYPE_ENTITY = SF.Entities.Metatable
-	TYPE_VECTOR = SF.Types["Vector"]
+	ents_metamethods = SF.Entities.Metatable
+	vec_metamethods = SF.Types["Vector"]
 
 	unwrap_entity = SF.Entities.Unwrap
 	unwrap_vector = SF.Vectors.Unwrap
@@ -93,10 +93,10 @@ end
 function particle_library.attach (entity, particle, pattach, options)
 	checkpermission (SF.instance.player, entity, "particle.attach")
 
-	checktype(entity, TYPE_ENTITY)
-	checkluatype (particle, TYPE_STRING)
-	checkluatype (pattach, TYPE_NUMBER)
-	checkluatype (options, TYPE_TABLE)
+	checktype(entity, ents_metamethods)
+	checkluatype (particle, isstring)
+	checkluatype (pattach, isnumber)
+	checkluatype (options, istable)
 
 	local entity = unwrap_entity(entity)
 
@@ -199,7 +199,7 @@ end
 function particle_methods:setSortOrigin(origin)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
-	checktype(origin, TYPE_VECTOR)
+	checktype(origin, vec_metamethods)
 
 	checkValid(uw)
 
@@ -216,8 +216,8 @@ function particle_methods:setControlPoint(id,value)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checkluatype (id, isnumber)
+	checktype(value, vec_metamethods)
 
 	checkValid(uw)
 
@@ -235,8 +235,8 @@ function particle_methods:setControlPointEntity(id,entity)
 	local uw = unwrap(self)
 	local entity = unwrap_entity(entity)
 
-	checkluatype (id, TYPE_NUMBER)
-	checktype(entity, TYPE_ENTITY)
+	checkluatype (id, isnumber)
+	checktype(entity, ents_metamethods)
 
 	checkValid(uw)
 
@@ -253,8 +253,8 @@ function particle_methods:setForwardVector(id,value)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checkluatype (id, isnumber)
+	checktype(value, vec_metamethods)
 
 	checkValid(uw)
 
@@ -270,8 +270,8 @@ function particle_methods:setRightVector(id,value)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checkluatype (id, isnumber)
+	checktype(value, vec_metamethods)
 
 	checkValid(uw)
 
@@ -288,8 +288,8 @@ function particle_methods:setUpVector(id,value)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checkluatype (id, isnumber)
+	checktype(value, vec_metamethods)
 
 	checkValid(uw)
 
@@ -305,8 +305,8 @@ function particle_methods:setControlPointParent(id,value)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
-	checkluatype (value, TYPE_NUMBER)
+	checkluatype (id, isnumber)
+	checkluatype (value, isnumber)
 
 	checkValid(uw)
 
