@@ -472,8 +472,9 @@ function SF.RegisterType(name)
 	SF.Types[name] = metamethods
 	SF.Types[metamethods] = true
 	metamethods.__index = function(_, ind)
-		if SF.instance.typeMethods[name][ind] then	
-			return SF.instance.typeMethods[name][ind]
+		local typeMethod = SF.instance.typeMethods[name][ind]
+		if typeMethod then	
+			return typeMethod
 		end
 		return methods[ind]
 	end
