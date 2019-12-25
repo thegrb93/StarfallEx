@@ -586,6 +586,13 @@ function SF.GetType(val)
 	return (mt and mt.__metatable and isstring(mt.__metatable)) and mt.__metatable or type(val)
 end
 
+local luaTypeLookup = {
+	[isbool] = "boolean",
+	[isfunction] = "function",
+	[isnumber] = "number",
+	[isstring] = "string",
+	[istable] = "table",
+}
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param check The typecheck function
@@ -595,17 +602,8 @@ function SF.CheckLuaType(val, check, level)
 		return val
 	else
 		-- Failed, throw error
-		local valtype = TypeID(val)
-		local typeLookup = {
-			[isbool] = "boolean",
-			[isfunction] = "function",
-			[isnumber] = "number",
-			[isstring] = "string",
-			[istable] = "table",
-		}
-
 		level = (level or 1) + 2
-		SF.ThrowTypeError(typeLookup[check], SF.GetType(val), level)
+		SF.ThrowTypeError(luaTypeLookup[check], SF.GetType(val), level)
 	end
 end
 
