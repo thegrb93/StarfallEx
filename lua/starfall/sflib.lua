@@ -30,6 +30,7 @@ if SERVER then
 			end
 		end
 	end
+	SetGlobalString("SF.Version", SF.Version)
 end
 
 -- Make sure this is done after metatables have been set

@@ -63,7 +63,6 @@ else
 	TOOL.Information = { "left", "right", "reload" }
 
 	net.Receive("starfall_openeditor", function(len)
-		SF.Version = net.ReadString()
 		SF.Editor.open()
 
 		if net.ReadBool() then
@@ -170,14 +169,12 @@ function TOOL:RightClick(trace)
 		if ent and ent:IsValid() and ent:GetClass() == "starfall_processor" then
 			if ent.mainfile then
 				net.Start("starfall_openeditor")
-				net.WriteString(SF.Version)
 				net.WriteBool(true)
 				net.WriteStarfall(ent)
 				net.Send(ply)
 			end
 		else
 			net.Start("starfall_openeditor")
-			net.WriteString(SF.Version)
 			net.WriteBool(false)
 			net.Send(ply)
 		end

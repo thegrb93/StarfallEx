@@ -181,7 +181,11 @@ end
 --- Gets the starfall version
 -- @return Starfall version
 function SF.DefaultEnvironment.version ()
-	return SF.Version
+	if SERVER then
+		return SF.Version
+	else
+		return GetGlobalString("SF.Version")
+	end
 end
 
 --- Returns the total used time for all chips by the player.
