@@ -98,14 +98,19 @@ function TOOL:GetAngle( trace, model, disable_flat )
 end
 
 -- Base function from WireMod tool_loader.lua
-function TOOL:GetPos( ent, trace )
+function TOOL:GetPos( ent, trace, disable_flat )
+	local createflat = self:GetClientNumber("createflat")
+	if disable_flat then
+		createflat = 0
+	end
+
 	-- move the ghost to aline properly to where the device will be made
 	local min = ent:OBBMins()
 	if self.GetGhostMin then -- tool has a function for getting the min
 		return ( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
 	elseif self.GhostMin then -- tool gives the axis for the OBBmin to use
 		return ( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
-	elseif self.ClientConVar.createflat and (self:GetClientNumber("createflat") == 1) ~= ((string.find(self:GetClientInfo("Model"), "pcb") or string.find(self:GetClientInfo("Model"), "hunter")) ~= nil) then
+	elseif self.ClientConVar.createflat and (createflat == 1) ~= ((string.find(self:GetClientInfo("Model"), "pcb") or string.find(self:GetClientInfo("Model"), "hunter")) ~= nil) then
 		-- Screens have odd models. If createflat is 1, or its 0 and its a PHX model, use max.x
 		return ( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
 	else -- default to the z OBBmin
@@ -159,7 +164,7 @@ function TOOL:LeftClick(trace)
 		local sf = MakeComponent("starfall_hud", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		sf:SetPos( self:GetPos( sf, trace ) )
+		sf:SetPos( self:GetPos( sf, trace, true ) )
 		sf:SetAngles( self:GetAngle( trace, model, true ) )
 
 		local const
@@ -273,7 +278,7 @@ function TOOL:Think()
 
 	if not (ent and ent:IsValid()) then return end
 
-	ent:SetPos( self:GetPos( ent, trace ) )
+	ent:SetPos( self:GetPos( ent, trace, Type == "2" ) )
 	ent:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
 end
 
