@@ -63,6 +63,56 @@ else
 	end
 end
 
+-- Base function from WireMod tool_loader.lua
+function TOOL:GetAngle( trace, model, disable_flat )
+	if not disable_flat then
+		disable_flat = false
+	end
+
+	local Ang
+	if math.abs(trace.HitNormal.x) < 0.001 and math.abs(trace.HitNormal.y) < 0.001 then
+		Ang = Vector(0,0,trace.HitNormal.z):Angle()
+	else
+		Ang = trace.HitNormal:Angle()
+	end
+	if self.GetGhostAngle then -- the tool as a function for getting the proper angle for the ghost
+		Ang = self:GetGhostAngle( trace )
+	elseif self.GhostAngle then -- the tool gives a fixed angle to add
+		Ang = Ang + self.GhostAngle
+	end
+	if self.ClientConVar.createflat and not disable_flat then
+		-- Screen models need a bit of adjustment
+		if (self:GetClientNumber("createflat") == 0) then
+			Ang.pitch = Ang.pitch + 90
+		end
+
+		if string.find(model, "pcb") or string.find(model, "hunter") then
+			-- PHX Screen models should thus be +180 when not flat, +90 when flat
+			Ang.pitch = Ang.pitch + 90
+		end
+	else
+		Ang.pitch = Ang.pitch + 90
+	end
+
+	return Ang
+end
+
+-- Base function from WireMod tool_loader.lua
+function TOOL:SetPos( ent, trace )
+	-- move the ghost to aline properly to where the device will be made
+	local min = ent:OBBMins()
+	if self.GetGhostMin then -- tool has a function for getting the min
+		ent:SetPos( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
+	elseif self.GhostMin then -- tool gives the axis for the OBBmin to use
+		ent:SetPos( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
+	elseif self.ClientConVar.createflat and (self:GetClientNumber("createflat") == 1) ~= ((string.find(self:GetClientInfo("Model"), "pcb") or string.find(self:GetClientInfo("Model"), "hunter")) ~= nil) then
+		-- Screens have odd models. If createflat is 1, or its 0 and its a PHX model, use max.x
+		ent:SetPos( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
+	else -- default to the z OBBmin
+		ent:SetPos( trace.HitPos - trace.HitNormal * min.z )
+	end
+end
+
 function TOOL:LeftClick(trace)
 	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() or trace.Entity:IsNPC() then return false end
@@ -70,24 +120,16 @@ function TOOL:LeftClick(trace)
 
 	local ply = self:GetOwner()
 
-	local Ang = trace.HitNormal:Angle()
-	Ang.pitch = Ang.pitch + 90
-
 	local component_type = self:GetClientInfo("Type")
 	if component_type == "1" then
-
-		if self:GetClientNumber( "createflat", 0 ) != 0 then
-			Ang.pitch = Ang.pitch - 90
-		end
-
 		local model = self:GetClientInfo("Model")
 		if not (util.IsValidModel(model) and util.IsValidProp(model)) then return false end
 
-		local sf = MakeComponent("starfall_screen", ply, Vector(), Ang, model)
+		local sf = MakeComponent("starfall_screen", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		local min = sf:OBBMins()
-		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
+		self:SetPos( sf, trace )
+		sf:SetAngles( self:GetAngle( trace, model ) )
 
 		local const
 		if trace.Entity:IsValid() then
@@ -113,11 +155,12 @@ function TOOL:LeftClick(trace)
 
 	elseif component_type == "2" then
 		local model = self:GetClientInfo("ModelHUD")
-		local sf = MakeComponent("starfall_hud", ply, Vector(), Ang, model)
+
+		local sf = MakeComponent("starfall_hud", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		local min = sf:OBBMins()
-		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
+		self:SetPos( sf, trace )
+		sf:SetAngles( self:GetAngle( trace, model, true ) )
 
 		local const
 		if trace.Entity:IsValid() then
@@ -214,6 +257,7 @@ function TOOL:Think()
 
 	local Type = self:GetClientInfo("Type")
 	local model
+
 	if Type=="1" then
 		model = self:GetClientInfo("Model")
 	else
@@ -229,17 +273,8 @@ function TOOL:Think()
 
 	if not (ent and ent:IsValid()) then return end
 
-	local Ang = trace.HitNormal:Angle()
-	Ang.pitch = Ang.pitch + 90
-
-	if Type=="1" and self:GetClientNumber( "createflat", 0 ) != 0 then
-		Ang.pitch = Ang.pitch - 90
-	end
-
-	local min = ent:OBBMins()
-	ent:SetPos(trace.HitPos - trace.HitNormal * min.z)
-	ent:SetAngles(Ang)
-
+	self:SetPos( ent, trace )
+	ent:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
 end
 
 if CLIENT then
