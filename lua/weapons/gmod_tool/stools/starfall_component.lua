@@ -98,18 +98,18 @@ function TOOL:GetAngle( trace, model, disable_flat )
 end
 
 -- Base function from WireMod tool_loader.lua
-function TOOL:SetPos( ent, trace )
+function TOOL:GetPos( ent, trace )
 	-- move the ghost to aline properly to where the device will be made
 	local min = ent:OBBMins()
 	if self.GetGhostMin then -- tool has a function for getting the min
-		ent:SetPos( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
+		return ( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
 	elseif self.GhostMin then -- tool gives the axis for the OBBmin to use
-		ent:SetPos( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
+		return ( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
 	elseif self.ClientConVar.createflat and (self:GetClientNumber("createflat") == 1) ~= ((string.find(self:GetClientInfo("Model"), "pcb") or string.find(self:GetClientInfo("Model"), "hunter")) ~= nil) then
 		-- Screens have odd models. If createflat is 1, or its 0 and its a PHX model, use max.x
-		ent:SetPos( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
+		return ( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
 	else -- default to the z OBBmin
-		ent:SetPos( trace.HitPos - trace.HitNormal * min.z )
+		return ( trace.HitPos - trace.HitNormal * min.z )
 	end
 end
 
@@ -128,7 +128,7 @@ function TOOL:LeftClick(trace)
 		local sf = MakeComponent("starfall_screen", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		self:SetPos( sf, trace )
+		sf:SetPos( self:GetPos( sf, trace ) )
 		sf:SetAngles( self:GetAngle( trace, model ) )
 
 		local const
@@ -159,7 +159,7 @@ function TOOL:LeftClick(trace)
 		local sf = MakeComponent("starfall_hud", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		self:SetPos( sf, trace )
+		sf:SetPos( self:GetPos( sf, trace ) )
 		sf:SetAngles( self:GetAngle( trace, model, true ) )
 
 		local const
@@ -273,7 +273,7 @@ function TOOL:Think()
 
 	if not (ent and ent:IsValid()) then return end
 
-	self:SetPos( ent, trace )
+	ent:SetPos( self:GetPos( ent, trace ) )
 	ent:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
 end
 
