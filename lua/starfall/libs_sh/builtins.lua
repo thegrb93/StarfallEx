@@ -871,6 +871,21 @@ function SF.DefaultEnvironment.setfenv (func, tbl)
 	return setfenv(func, tbl)
 end
 
+--- Set's metamethod on SF type
+-- @param sfType Name of SF type
+-- @param methodName Name of method
+-- @param method Method to set
+function SF.DefaultEnvironment.setTypeMethod(sfType, methodName, method)
+	if not isfunction(method) then SF.Throw("Method must be a function") end
+	checkluatype (sfType, TYPE_STRING)
+	checkluatype (methodName, TYPE_STRING)
+	
+	if not SF.instance.typeMethods[sfType] then
+		SF.Throw("Invalid type")
+	end
+	SF.instance.typeMethods[sfType][methodName] = method
+end
+
 --- Simple version of Lua's getfenv
 -- Returns the current environment
 -- @return Current environment
