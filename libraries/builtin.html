@@ -452,6 +452,11 @@ Sets the chip's display name </td>
 Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sh"></span><a href="#builtin.setTypeMethod">setTypeMethod</a>( sfType, methodName, method&nbsp;)</td>
+			<td class="summary">
+Set's metamethod on SF type </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#builtin.setUserdata">setUserdata</a>( str&nbsp;)</td>
 			<td class="summary">
 Sets the chip's userdata that the duplicator tool saves.</td>
@@ -1585,6 +1590,27 @@ Sets a CPU soft quota which will trigger a catchable error if the cpu goes over 
 		<ul>
 			
 			<li><tt>quota</tt> ― The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sh"></span><a name="builtin.setTypeMethod"></a><strong>builtin.setTypeMethod</strong>( sfType, methodName, method&nbsp;)</dt>
+<dd>
+	<p>
+Set's metamethod on SF type</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>sfType</tt> ― Name of SF type</li>
+			<li><tt>methodName</tt> ― Name of method</li>
+			<li><tt>method</tt> ― Method to set</li>
 		</ul>
 	</section>
 	
