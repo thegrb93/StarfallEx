@@ -501,6 +501,22 @@ if SERVER then
 		phys:Wake()
 	end
 
+	--- Returns whether the physobj is asleep
+	-- @server
+	-- @return boolean if the physobj is asleep
+	function physobj_methods:isAsleep()
+		local phys = unwrap(self)
+		return phys:IsAsleep()
+	end
+
+	--- Makes a physobj go to sleep. (like it's frozen but interacting wakes it back up)
+	-- @server
+	function physobj_methods:sleep()
+		local phys = unwrap(self)
+		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		phys:Sleep()
+	end
+
 	--- Makes a sleeping physobj wakeup
 	-- @server
 	function physobj_methods:wake()
