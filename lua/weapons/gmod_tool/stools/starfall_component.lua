@@ -65,9 +65,8 @@ end
 
 -- Base function from WireMod tool_loader.lua
 function TOOL:GetAngle( trace, model, disable_flat )
-	if not disable_flat then
-		disable_flat = false
-	end
+	local createflat = self:GetClientNumber("createflat")
+	if disable_flat then createflat = 0 end
 
 	local Ang
 	if math.abs(trace.HitNormal.x) < 0.001 and math.abs(trace.HitNormal.y) < 0.001 then
@@ -80,12 +79,8 @@ function TOOL:GetAngle( trace, model, disable_flat )
 	elseif self.GhostAngle then -- the tool gives a fixed angle to add
 		Ang = Ang + self.GhostAngle
 	end
-	if self.ClientConVar.createflat and not disable_flat then
-		-- Screen models need a bit of adjustment
-		if (self:GetClientNumber("createflat") == 0) then
-			Ang.pitch = Ang.pitch + 90
-		end
 
+	if (createflat == 1) then
 		if string.find(model, "pcb") or string.find(model, "hunter") then
 			-- PHX Screen models should thus be +180 when not flat, +90 when flat
 			Ang.pitch = Ang.pitch + 90
@@ -98,11 +93,9 @@ function TOOL:GetAngle( trace, model, disable_flat )
 end
 
 -- Base function from WireMod tool_loader.lua
-function TOOL:GetPos( ent, trace, disable_flat )
+function TOOL:GetPos( ent, trace, model, disable_flat )
 	local createflat = self:GetClientNumber("createflat")
-	if disable_flat then
-		createflat = 0
-	end
+	if disable_flat then createflat = 0 end
 
 	-- move the ghost to aline properly to where the device will be made
 	local min = ent:OBBMins()
@@ -110,7 +103,7 @@ function TOOL:GetPos( ent, trace, disable_flat )
 		return ( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
 	elseif self.GhostMin then -- tool gives the axis for the OBBmin to use
 		return ( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
-	elseif self.ClientConVar.createflat and (createflat == 1) ~= ((string.find(self:GetClientInfo("Model"), "pcb") or string.find(self:GetClientInfo("Model"), "hunter")) ~= nil) then
+	elseif self.ClientConVar.createflat and (createflat == 1) ~= ((string.find(model, "pcb") or string.find(model, "hunter")) ~= nil) then
 		-- Screens have odd models. If createflat is 1, or its 0 and its a PHX model, use max.x
 		return ( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
 	else -- default to the z OBBmin
@@ -133,7 +126,7 @@ function TOOL:LeftClick(trace)
 		local sf = MakeComponent("starfall_screen", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		sf:SetPos( self:GetPos( sf, trace ) )
+		sf:SetPos( self:GetPos( sf, trace, model ) )
 		sf:SetAngles( self:GetAngle( trace, model ) )
 
 		local const
@@ -164,7 +157,7 @@ function TOOL:LeftClick(trace)
 		local sf = MakeComponent("starfall_hud", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		sf:SetPos( self:GetPos( sf, trace, true ) )
+		sf:SetPos( self:GetPos( sf, trace, model, true ) )
 		sf:SetAngles( self:GetAngle( trace, model, true ) )
 
 		local const
@@ -278,7 +271,7 @@ function TOOL:Think()
 
 	if not (ent and ent:IsValid()) then return end
 
-	ent:SetPos( self:GetPos( ent, trace, Type == "2" ) )
+	ent:SetPos( self:GetPos( ent, trace, model, Type == "2" ) )
 	ent:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
 end
 
