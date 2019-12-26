@@ -339,6 +339,11 @@ This includes velocity at the point induced by rotational velocity </td>
 Returns whether the game flags of the physics object are set.</td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:isAsleep">isAsleep</a>( &nbsp;)</td>
+			<td class="summary">
+Returns whether the physobj is asleep </td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_sh"></span><a href="#PhysObj:isDragEnabled">isDragEnabled</a>( &nbsp;)</td>
 			<td class="summary">
 Check if bone is affected by air resistance </td>
@@ -412,6 +417,11 @@ Sets the position of the physics object.</td>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:setVelocity">setVelocity</a>( vel&nbsp;)</td>
 			<td class="summary">
 Sets the velocity of the physics object </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:sleep">sleep</a>( &nbsp;)</td>
+			<td class="summary">
+Makes a physobj go to sleep.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_sv"></span><a href="#PhysObj:wake">wake</a>( &nbsp;)</td>
@@ -928,6 +938,24 @@ Returns whether the game flags of the physics object are set.</p>
 	
 </dd>
 		
+<dt><span class="realm_sv"></span><a name="PhysObj:isAsleep"></a><strong>PhysObj:isAsleep</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Returns whether the physobj is asleep</p>
+	
+	
+	
+	
+	<section class="return">
+		<h3>Returns</h3>
+		
+		<p>boolean if the physobj is asleep</p>
+		
+	</section>
+	
+	
+</dd>
+		
 <dt><span class="realm_sh"></span><a name="PhysObj:isDragEnabled"></a><strong>PhysObj:isDragEnabled</strong>( &nbsp;)</dt>
 <dd>
 	<p>
@@ -1218,6 +1246,18 @@ Sets the velocity of the physics object</p>
 			<li><tt>vel</tt> ― The velocity vector to set it to</li>
 		</ul>
 	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_sv"></span><a name="PhysObj:sleep"></a><strong>PhysObj:sleep</strong>( &nbsp;)</dt>
+<dd>
+	<p>
+Makes a physobj go to sleep. (like it's frozen but interacting wakes it back up)</p>
+	
+	
 	
 	
 	
