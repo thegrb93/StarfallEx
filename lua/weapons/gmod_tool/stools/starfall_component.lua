@@ -10,6 +10,7 @@ TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
 TOOL.ClientConVar["ModelHUD"] = "models/spacecode/sfchip.mdl"
 TOOL.ClientConVar["Type"] = "1"
 TOOL.ClientConVar["parent"] = "0"
+TOOL.ClientConVar["createflat"] = "0"
 cleanup.Register("starfall_components")
 
 local MakeComponent
@@ -46,6 +47,7 @@ else
 	language.Add("Tool.starfall_component.name", "Starfall - Component")
 	language.Add("Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)")
 	language.Add("Tool.starfall_component.parent", "Parent instead of Weld" )
+	language.Add("Tool.starfall_component.createflat", "Create flat to surface" )
 	language.Add("sboxlimit_starfall_components", "You've hit the Starfall Component limit!")
 	language.Add("undone_Starfall Screen", "Undone Starfall Screen")
 	language.Add("undone_Starfall HUD", "Undone Starfall HUD")
@@ -73,6 +75,10 @@ function TOOL:LeftClick(trace)
 
 	local component_type = self:GetClientInfo("Type")
 	if component_type == "1" then
+
+		if self:GetClientNumber( "createflat", 0 ) != 0 then
+			Ang.pitch = Ang.pitch - 90
+		end
 
 		local model = self:GetClientInfo("Model")
 		if not (util.IsValidModel(model) and util.IsValidProp(model)) then return false end
@@ -226,6 +232,10 @@ function TOOL:Think()
 	local Ang = trace.HitNormal:Angle()
 	Ang.pitch = Ang.pitch + 90
 
+	if Type=="1" and self:GetClientNumber( "createflat", 0 ) != 0 then
+		Ang.pitch = Ang.pitch - 90
+	end
+
 	local min = ent:OBBMins()
 	ent:SetPos(trace.HitPos - trace.HitNormal * min.z)
 	ent:SetAngles(Ang)
@@ -236,6 +246,7 @@ if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" })
 		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.parent", Command = "starfall_component_parent" } )
+		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.createflat", Command = "starfall_component_createflat" } )
 
 		local modelPanel = vgui.Create("DPanelSelect", panel)
 		modelPanel:EnableVerticalScrollbar()
