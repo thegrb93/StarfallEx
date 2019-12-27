@@ -80,13 +80,17 @@ function TOOL:GetAngle( trace, model, disable_flat )
 		Ang = Ang + self.GhostAngle
 	end
 
-	if (createflat == 1) then
-		if string.find(model, "pcb") or string.find(model, "hunter") then
-			-- PHX Screen models should thus be +180 when not flat, +90 when flat
+	if string.find(model, "pcb") or string.find(model, "hunter") then
+		-- PHX Screen models should thus be +180 when not flat, +90 when flat
+		if createflat == 0 then
+			Ang.pitch = Ang.pitch + 180
+		else
 			Ang.pitch = Ang.pitch + 90
 		end
 	else
-		Ang.pitch = Ang.pitch + 90
+		if createflat == 0 then
+			Ang.pitch = Ang.pitch + 90
+		end
 	end
 
 	return Ang
