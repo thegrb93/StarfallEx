@@ -43,7 +43,22 @@ function bit_library.stringstream(stream, i, endian)
 	return ret
 end
 
-SF.StringStream = bit_library.stringstream
+local sfstringstreammeta = {__index = ss_methods}
+function SF.StringStream(stream, i, endian)
+	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
+	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
+	
+	local ret = setmetatable({
+		buffer = {},
+		pos = 1
+	}, sfstringstreammeta)
+	
+	ret:write(stream)
+	ret:seek(i)
+	ret:setEndian(endian or "little")
+	
+	return ret
+end
 
 local function checkErr(n)
 	if n==math.huge or n==-math.huge or n~=n then
