@@ -4,6 +4,14 @@
 
 assert(SF.Entities)
 
+
+-- Code below cannot be commented but also cannot be executed. (To be removed when new docgen is ready)
+if false then
+	--- Entity type
+	-- @shared
+	local ents_methods, ents_metamethods = SF.RegisterType("Entity")
+end
+
 local huge = math.huge
 local abs = math.abs
 
