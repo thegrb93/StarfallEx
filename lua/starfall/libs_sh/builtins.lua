@@ -484,7 +484,7 @@ table_methods.getn = table.getn
 table_methods.getWinningKey = table.GetWinningKey
 table_methods.hasValue = table.HasValue
 table_methods.inherit = table.Inherit
-table_methods.insert = table.insert
+table_methods.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^32-1) end table.insert(a,b,c) end
 table_methods.isSequential = table.IsSequential
 table_methods.keyFromValue = table.KeyFromValue
 table_methods.keysFromValue = table.KeysFromValue
