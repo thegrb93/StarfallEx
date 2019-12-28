@@ -144,6 +144,7 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:Initialize()
 			holoent.RenderOverride = holoent.Draw
 			holoent.DrawHologram = holoent.DrawCLHologram
+			holoent.GetSuppressEngineLighting = function() return false end
 			debug.setmetatable(holoent, cl_hologram_meta)
 
 			holodata[holoent] = true
@@ -193,7 +194,7 @@ if SERVER then
 	--- Suppress Engine Lighting of a hologram. Disabled by default.
 	-- @shared
 	-- @param suppress Boolean to represent if shading should be set or not.
-	function hologram_methods:suppressEngineLighting (suppress)
+	function hologram_methods:suppressEngineLighting(suppress)
 		checktype(self, hologram_metamethods)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
@@ -202,7 +203,11 @@ if SERVER then
 
 		checkpermission(SF.instance, holo, "hologram.setRenderProperty")
 
-		holo:SetSuppressEngineLighting(suppress)
+		if SERVER then
+			holo:SetSuppressEngineLighting(suppress)
+		else
+			holo.GetSuppressEngineLighting = function() return suppress end
+		end
 	end
 
 	--- Sets the hologram linear velocity
