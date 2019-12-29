@@ -10,6 +10,7 @@ TOOL.ClientConVar["Model"] = "models/hunter/plates/plate2x2.mdl"
 TOOL.ClientConVar["ModelHUD"] = "models/spacecode/sfchip.mdl"
 TOOL.ClientConVar["Type"] = "1"
 TOOL.ClientConVar["parent"] = "0"
+TOOL.ClientConVar["createflat"] = "0"
 cleanup.Register("starfall_components")
 
 local MakeComponent
@@ -46,6 +47,7 @@ else
 	language.Add("Tool.starfall_component.name", "Starfall - Component")
 	language.Add("Tool.starfall_component.desc", "Spawns a Starfall component. (Press Shift+F to switch to the processor tool)")
 	language.Add("Tool.starfall_component.parent", "Parent instead of Weld" )
+	language.Add("Tool.starfall_component.createflat", "Create flat to surface" )
 	language.Add("sboxlimit_starfall_components", "You've hit the Starfall Component limit!")
 	language.Add("undone_Starfall Screen", "Undone Starfall Screen")
 	language.Add("undone_Starfall HUD", "Undone Starfall HUD")
@@ -61,6 +63,58 @@ else
 	end
 end
 
+-- Base function from WireMod tool_loader.lua
+function TOOL:GetAngle( trace, model, disable_flat )
+	local createflat = self:GetClientNumber("createflat")
+	if disable_flat then createflat = 0 end
+
+	local Ang
+	if math.abs(trace.HitNormal.x) < 0.001 and math.abs(trace.HitNormal.y) < 0.001 then
+		Ang = Vector(0,0,trace.HitNormal.z):Angle()
+	else
+		Ang = trace.HitNormal:Angle()
+	end
+	if self.GetGhostAngle then -- the tool as a function for getting the proper angle for the ghost
+		Ang = self:GetGhostAngle( trace )
+	elseif self.GhostAngle then -- the tool gives a fixed angle to add
+		Ang = Ang + self.GhostAngle
+	end
+
+	if string.find(model, "pcb") or string.find(model, "hunter") then
+		-- PHX Screen models should thus be +180 when not flat, +90 when flat
+		if createflat == 0 then
+			Ang.pitch = Ang.pitch + 180
+		else
+			Ang.pitch = Ang.pitch + 90
+		end
+	else
+		if createflat == 0 then
+			Ang.pitch = Ang.pitch + 90
+		end
+	end
+
+	return Ang
+end
+
+-- Base function from WireMod tool_loader.lua
+function TOOL:GetPos( ent, trace, model, disable_flat )
+	local createflat = self:GetClientNumber("createflat")
+	if disable_flat then createflat = 0 end
+
+	-- move the ghost to aline properly to where the device will be made
+	local min = ent:OBBMins()
+	if self.GetGhostMin then -- tool has a function for getting the min
+		return ( trace.HitPos - trace.HitNormal * self:GetGhostMin( min, trace ) )
+	elseif self.GhostMin then -- tool gives the axis for the OBBmin to use
+		return ( trace.HitPos - trace.HitNormal * min[self.GhostMin] )
+	elseif self.ClientConVar.createflat and (createflat == 1) ~= ((string.find(model, "pcb") or string.find(model, "hunter")) ~= nil) then
+		-- Screens have odd models. If createflat is 1, or its 0 and its a PHX model, use max.x
+		return ( trace.HitPos + trace.HitNormal * ent:OBBMaxs().x )
+	else -- default to the z OBBmin
+		return ( trace.HitPos - trace.HitNormal * min.z )
+	end
+end
+
 function TOOL:LeftClick(trace)
 	if not trace.HitPos then return false end
 	if trace.Entity:IsPlayer() or trace.Entity:IsNPC() then return false end
@@ -68,20 +122,16 @@ function TOOL:LeftClick(trace)
 
 	local ply = self:GetOwner()
 
-	local Ang = trace.HitNormal:Angle()
-	Ang.pitch = Ang.pitch + 90
-
 	local component_type = self:GetClientInfo("Type")
 	if component_type == "1" then
-
 		local model = self:GetClientInfo("Model")
 		if not (util.IsValidModel(model) and util.IsValidProp(model)) then return false end
 
-		local sf = MakeComponent("starfall_screen", ply, Vector(), Ang, model)
+		local sf = MakeComponent("starfall_screen", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		local min = sf:OBBMins()
-		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
+		sf:SetPos( self:GetPos( sf, trace, model ) )
+		sf:SetAngles( self:GetAngle( trace, model ) )
 
 		local const
 		if trace.Entity:IsValid() then
@@ -107,11 +157,12 @@ function TOOL:LeftClick(trace)
 
 	elseif component_type == "2" then
 		local model = self:GetClientInfo("ModelHUD")
-		local sf = MakeComponent("starfall_hud", ply, Vector(), Ang, model)
+
+		local sf = MakeComponent("starfall_hud", ply, Vector(), Angle(), model)
 		if not sf then return false end
 
-		local min = sf:OBBMins()
-		sf:SetPos(trace.HitPos - trace.HitNormal * min.z)
+		sf:SetPos( self:GetPos( sf, trace, model, true ) )
+		sf:SetAngles( self:GetAngle( trace, model, true ) )
 
 		local const
 		if trace.Entity:IsValid() then
@@ -208,6 +259,7 @@ function TOOL:Think()
 
 	local Type = self:GetClientInfo("Type")
 	local model
+
 	if Type=="1" then
 		model = self:GetClientInfo("Model")
 	else
@@ -223,19 +275,15 @@ function TOOL:Think()
 
 	if not (ent and ent:IsValid()) then return end
 
-	local Ang = trace.HitNormal:Angle()
-	Ang.pitch = Ang.pitch + 90
-
-	local min = ent:OBBMins()
-	ent:SetPos(trace.HitPos - trace.HitNormal * min.z)
-	ent:SetAngles(Ang)
-
+	ent:SetPos( self:GetPos( ent, trace, model, Type == "2" ) )
+	ent:SetAngles( self:GetAngle( trace, model, Type == "2" ) )
 end
 
 if CLIENT then
 	function TOOL.BuildCPanel(panel)
 		panel:AddControl("Header", { Text = "#Tool.starfall_component.name", Description = "#Tool.starfall_component.desc" })
 		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.parent", Command = "starfall_component_parent" } )
+		panel:AddControl("CheckBox", { Label = "#Tool.starfall_component.createflat", Command = "starfall_component_createflat" } )
 
 		local modelPanel = vgui.Create("DPanelSelect", panel)
 		modelPanel:EnableVerticalScrollbar()
