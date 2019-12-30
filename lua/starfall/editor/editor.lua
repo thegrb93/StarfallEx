@@ -412,7 +412,8 @@ if CLIENT then
 			end
 		end
 	end)
-	concommand.Add("sf_editor_restart", function()
+	
+	local forceCloseEditor = function()
 		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Close()
 		for k, v in pairs(SF.Editor.TabHandlers) do
@@ -421,11 +422,13 @@ if CLIENT then
 		SF.Editor.initialized = false
 		SF.Editor.editor:Remove()
 		SF.Editor.editor = nil
-		SF.Editor.open ()
-		print("Editor reloaded")
-	end)
+
+	end
+	
 	concommand.Add("sf_editor_reload", function()
+		pcall(forceCloseEditor);
 		include("starfall/editor/editor.lua")
+		print("Editor reloaded")
 	end)
 elseif SERVER then
 
