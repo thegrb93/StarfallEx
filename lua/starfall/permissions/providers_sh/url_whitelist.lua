@@ -18,7 +18,7 @@ P.checks = {
 		local prefix, site, data = string.match(target,"^(%w-)://([^/]*)/?(.*)")
 		if not site then return false, "This url is malformed" end
 		site = site.."/"..(data or "") -- Make sure there is / at the end of site
-		return urlrestrictor:check(site), "This url is not whitelisted"
+		return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
 	end,
 	function() return true end,
 }
