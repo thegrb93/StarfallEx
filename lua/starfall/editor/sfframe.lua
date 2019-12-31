@@ -701,13 +701,6 @@ function Editor:CloseTab(_tab,dontask)
 
 	self:SaveTabs()
 
-	-- There's only one tab open, no need to actually close any tabs
-	if self:GetNumTabs() == 1 then
-		self:GetActiveTab():SetText("Generic")
-		self:NewScript(true)
-		return
-	end
-
 	-- Find the panel (for the scroller)
 	local tabscroller_sheetindex
 	for k, v in pairs(self.C.TabHolder.tabScroller.Panels) do
@@ -727,10 +720,7 @@ function Editor:CloseTab(_tab,dontask)
 					self:SetActiveTab(othertab)
 					self:SetLastTab()
 				else -- Reset the current tab (backup)
-					self:GetActiveTab():SetText("Generic")
-					self.C.TabHolder:InvalidateLayout()
-					self:NewScript(true)
-					return
+					self:NewTab()
 				end
 			else -- Change to the previous tab
 				self:SetActiveTab(self:GetLastTab())
@@ -741,10 +731,8 @@ function Editor:CloseTab(_tab,dontask)
 			if othertab and othertab:IsValid() then -- If that other tab is valid, use it
 				self:SetActiveTab(othertab)
 			else -- Reset the current tab (backup)
-				self:GetActiveTab():SetText("Generic")
 				self.C.TabHolder:InvalidateLayout()
-				self:NewScript(true)
-				return
+				self:NewTab()
 			end
 		end
 	end
