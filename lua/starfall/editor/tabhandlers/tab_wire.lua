@@ -2631,7 +2631,7 @@ function PANEL:_OnKeyCodeTyped(code)
 	end
 
 	if control and not handled then
-		handled = self:OnShortcut(code)
+		handled = self:OnShortcut(code, shift)
 	end
 
 	return handled

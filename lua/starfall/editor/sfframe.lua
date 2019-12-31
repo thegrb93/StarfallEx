@@ -628,9 +628,9 @@ function Editor:CreateTab(chosenfile, forcedTabHandler)
 		content.OnTextChanged = function()
 			self:UpdateTabText(sheet.Tab)
 		end
-		content.OnShortcut = function(_, code)
+		content.OnShortcut = function(_, code, shift)
 			if code == KEY_S then
-				self:SaveFile(self:GetChosenFile())
+				self:SaveFile(self:GetChosenFile(), false, shift)
 				self:Validate()
 			end
 		end
