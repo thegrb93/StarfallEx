@@ -748,6 +748,16 @@ function render_library.setMaterial(mat)
 	end
 end
 
+--- Check if the specified render target exists.
+-- @param name The name of the render target
+function render_library.renderTargetExists(name)
+	checkluatype (name, TYPE_STRING)
+
+	local instance = SF.instance
+	local data = instance.data.render
+	return data.rendertargets[name] ~= nil
+end
+
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
 -- @param name The name of the render target
