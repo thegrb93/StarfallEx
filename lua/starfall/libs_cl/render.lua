@@ -752,10 +752,7 @@ end
 -- @param name The name of the render target
 function render_library.renderTargetExists(name)
 	checkluatype (name, TYPE_STRING)
-
-	local instance = SF.instance
-	local data = instance.data.render
-	return data.rendertargets[name] ~= nil
+	return SF.instance.data.render.rendertargets[name] ~= nil
 end
 
 --- Creates a new render target to draw onto.
