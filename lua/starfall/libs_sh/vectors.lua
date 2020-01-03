@@ -47,6 +47,18 @@ local xyz = { x = 1, y = 2, z = 3 }
 function vec_metamethods.__newindex (t, k, v)
 	if xyz[k] then
 		rawset(t, xyz[k], v)
+
+	elseif (#k == 2 and xyz[k[1]] and xyz[k[2]])  then
+		checktype(v, vec_metamethods)
+
+		rawset(t, xyz[k[1]], rawget(v, 1))
+		rawset(t, xyz[k[2]], rawget(v, 2))
+	elseif (#k == 3 and xyz[k[1]] and xyz[k[2]] and xyz[k[3]]) then
+		checktype(v, vec_metamethods)
+
+		rawset(t, xyz[k[1]], rawget(v, 1))
+		rawset(t, xyz[k[2]], rawget(v, 2))
+		rawset(t, xyz[k[3]], rawget(v, 3))
 	else
 		rawset(t, k, v)
 	end
