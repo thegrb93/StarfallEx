@@ -52,12 +52,26 @@ function vec_metamethods.__newindex (t, k, v)
 	end
 end
 
+local math_min = math.min
+
 --- __index metamethod
 function vec_metamethods.__index (t, k)
 	if xyz[k] then
 		return rawget(t, xyz[k])
-	else
+	elseif vec_methods[k] ~= nil then
 		return vec_methods[k]
+	else 
+		-- Swizzle support
+		local v = {0,0,0}
+		for i = 1, math_min(#k,3)do
+			local vk = xyz[k[i]]
+			if vk then
+				v[i] = rawget(t, vk)
+			else
+				return nil -- Not a swizzle
+			end
+		end
+		return wrap(v)
 	end
 end
 
