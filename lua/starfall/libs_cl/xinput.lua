@@ -118,8 +118,8 @@ SF.hookAdd("xinputStick", "xinputstick")
 -- @name xinputTrigger
 -- @class hook
 -- @param id Controller number. Starts at 0
--- @param trigger The trigger that was moved. 0 is left
 -- @param value The position of the trigger. 0-255 inclusive
+-- @param trigger The trigger that was moved. 0 is left
 -- @param when The timer.realtime() at which this event occurred.
 
 --- Called when a stick on the controller has moved. Client must have XInput Lua binary installed.
@@ -127,7 +127,7 @@ SF.hookAdd("xinputStick", "xinputstick")
 -- @name xinputStick
 -- @class hook
 -- @param id Controller number. Starts at 0
--- @param stick The stick that was moved. 0 is left
 -- @param x The X coordinate of the trigger. -32768 - 32767 inclusive
 -- @param y The Y coordinate of the trigger. -32768 - 32767 inclusive
+-- @param stick The stick that was moved. 0 is left
 -- @param when The timer.realtime() at which this event occurred.
