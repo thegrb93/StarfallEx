@@ -365,6 +365,19 @@ function vec_methods:getRotated (b)
 	return wrap({ vec.x, vec.y, vec.z })
 end
 
+--- Returns an arbitrary orthogonal basis from the direction of the vector. Input must be a normalized vector
+-- @return Basis 1
+-- @return Basis 2
+function vec_methods:getBasis()
+	if self[3] < -0.9999999 then
+		return wrap({0.0, -1.0, 0.0}), wrap({-1.0, 0.0, 0.0})
+	end
+	local a = 1.0/(1.0 + self[3])
+	local b = -self[1]*self[2]*a
+
+	return wrap({ 1.0 - self[1]*self[1]*a, b, -self[1] }), wrap({ b, 1.0 - self[2]*self[2]*a, -self[2] })
+end
+
 --- Return rotated vector by an axis
 -- @param axis Axis the rotate around
 -- @param degrees Angle to rotate by in degrees or nil if radians.
