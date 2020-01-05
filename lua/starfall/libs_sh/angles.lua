@@ -26,6 +26,13 @@ local vwrap
 SF.AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
 
+	--- Creates an Angle struct
+	-- @name SF.DefaultEnvironment.Angle. Can be indexed with: 1, 2, 3, pitch, yaw, roll. 1,2,3 is most efficient.
+	-- @class function
+	-- @param p - Pitch
+	-- @param y - Yaw
+	-- @param r - Roll
+	-- @return Angle
 	SF.DefaultEnvironment.Angle = function (p, y, r)
 		if p then checkluatype(p, TYPE_NUMBER) else p = 0 end
 		if y then checkluatype(y, TYPE_NUMBER) else y = p end

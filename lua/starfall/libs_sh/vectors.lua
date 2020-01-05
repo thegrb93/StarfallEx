@@ -23,6 +23,13 @@ SF.AddObjectWrapper(debug.getregistry().Vector, vec_metamethods, vwrap)
 SF.AddObjectUnwrapper(vec_metamethods, unwrap)
 
 SF.AddHook("postload", function()
+	--- Creates a Vector struct
+	-- @name SF.DefaultEnvironment.Vector. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
+	-- @class function
+	-- @param x - X
+	-- @param y - Y
+	-- @param z - Z
+	-- @return Vector
 	SF.DefaultEnvironment.Vector = function (x, y, z)
 		if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
 		if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
