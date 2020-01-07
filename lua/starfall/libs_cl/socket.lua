@@ -1,6 +1,6 @@
 if not pcall(require, "socket.core") then return end
 
---- Socket library. Only usable by owner of starfall. http://w3.impa.br/~diego/software/luasocket/socket.html
+--- Socket library. Only usable by owner of starfall. Beware "Blocking" functions; they will freeze the game. See http://w3.impa.br/~diego/software/luasocket/socket.html
 -- @client
 local socket_library = SF.RegisterLibrary("socket")
 
