@@ -416,12 +416,9 @@ function ents_methods:setVelocity(vel)
 	local vel = vunwrap(vel)
 	checkvector(vel)
 
-	local phys = ent:GetPhysicsObject()
-	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
-
 	checkpermission(SF.instance, ent, "entities.setVelocity")
 
-	phys:SetVelocity(vel)
+	ent:SetVelocity(vel)
 end
 
 --- Removes an entity
