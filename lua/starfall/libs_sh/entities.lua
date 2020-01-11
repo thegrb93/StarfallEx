@@ -614,8 +614,12 @@ end
 -- @shared
 -- @return The string class name
 function ents_methods:getClass()
-	local ent = getent(self)
-	return ent:GetClass()
+	local ent = eunwrap(self)
+	if ent then
+		return ent:GetClass()
+	else
+		checktype(self, ents_metamethods, 2)
+	end
 end
 
 --- Returns the position of the entity
