@@ -64,7 +64,7 @@ SF.Entities.Metatable = ents_metamethods
 
 local function getent(self)
 	local ent = eunwrap(self)
-	if ent and ent:IsValid() then
+	if ent and (ent:IsValid() or ent:IsWorld()) then
 		return ent
 	else
 		checktype(self, ents_metamethods, 3)
@@ -614,12 +614,8 @@ end
 -- @shared
 -- @return The string class name
 function ents_methods:getClass()
-	local ent = eunwrap(self)
-	if ent then
-		return ent:GetClass()
-	else
-		checktype(self, ents_metamethods, 2)
-	end
+	local ent = getent(self)
+	return ent:GetClass()
 end
 
 --- Returns the position of the entity
