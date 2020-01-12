@@ -347,9 +347,16 @@ function ents_methods:addCollisionListener(func)
 	if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
 
 	local instance = SF.instance
-	ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data)
-		instance:runFunction(func, SF.StructWrapper(data))
-	end)
+	if ent:GetClass() == "prop_physics" then
+        ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data)
+            instance:runFunction(func, SF.StructWrapper(data))
+        end)
+    else
+        function ent:PhysicsCollide( data, ent )
+            instance:runFunction(func, SF.StructWrapper(data))
+        end
+        ent.SF_CollisionCallback = ent.PhysicsCollide
+    end
 end
 
 --- Removes a collision listening hook from the entity so that a new one can be added
@@ -357,7 +364,11 @@ function ents_methods:removeCollisionListener()
 	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.canTool")
 	if not ent.SF_CollisionCallback then SF.Throw("The entity isn't listening to collisions!", 2) end
-	ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+	if ent:GetClass() == "prop_physics" then
+        ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+    else
+        ent.PhysicsCollide = nil
+    end
 	ent.SF_CollisionCallback = nil
 end
 
