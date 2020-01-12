@@ -33,14 +33,18 @@ function ENT:Draw()
 end
 
 function ENT:GetRenderMesh()
+	-- Fix display model orientation
+	local mtx = Matrix()
+	mtx:Rotate( Angle( 0, -90, 0 ) )
+
 	if self.custom_mesh then
 		if self.custom_mesh_data[self.custom_mesh] then
-			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
+			return { Mesh = self.custom_mesh, Material = self.Material, Matrix = mtx }
 		else
 			self.custom_mesh = nil
 		end
 	else
-		return { Mesh = self.rendermesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
+		return { Mesh = self.rendermesh, Material = self.Material, Matrix = mtx }
 	end
 end
 
