@@ -44,6 +44,13 @@ function ENT:GetRenderMesh()
 	end
 end
 
+function ENT:OnRemove() 
+	if self.rendermesh then --prevent possible error
+		self.rendermesh:Destroy()
+		self.rendermesh = nil --garbage
+	end
+end
+
 net.Receive("starfall_custom_prop", function()
 	local index = net.ReadUInt(16)
 	local self, data

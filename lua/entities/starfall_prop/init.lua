@@ -21,10 +21,8 @@ function ENT:TransmitData(recip)
 	return stream
 end
 
-function ENT:OnRemove() --cleanup potential collision listener
-    if self.PhysicsCollide then
-        self.PhysicsCollide = nil
-    end
+function ENT:OnRemove() 
+	self.PhysicsCollide = nil --cleanup potential collision listener
 end
 
 hook.Add("PlayerInitialSpawn","SF_Initialize_Custom_Props",function(ply)
