@@ -362,7 +362,7 @@ end
 function ents_methods:removeCollisionListener()
 	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.canTool")
-	if not ent.SF_CollisionCallback or not ent.PhysicsCollide then SF.Throw("The entity isn't listening to collisions!", 2) end
+	if not ( ent.SF_CollisionCallback or ent.PhysicsCollide ) then SF.Throw("The entity isn't listening to collisions!", 2) end
 	if ent:GetClass() ~= "starfall_prop" then
 		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 		ent.SF_CollisionCallback = nil
