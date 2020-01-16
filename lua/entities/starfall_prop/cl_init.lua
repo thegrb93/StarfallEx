@@ -44,6 +44,18 @@ function ENT:GetRenderMesh()
 	end
 end
 
+function ENT:OnRemove()
+	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
+	if self.rendermesh then
+		timer.Simple(0, function()
+			if self.rendermesh and not self:IsValid() then
+				self.rendermesh:Destroy()
+				self.rendermesh = nil
+			end
+		end)
+	end
+end
+
 net.Receive("starfall_custom_prop", function()
 	local index = net.ReadUInt(16)
 	local self, data
