@@ -21,10 +21,6 @@ function ENT:TransmitData(recip)
 	return stream
 end
 
-function ENT:OnRemove() 
-	self.PhysicsCollide = nil --cleanup potential collision listener
-end
-
 hook.Add("PlayerInitialSpawn","SF_Initialize_Custom_Props",function(ply)
 	SF.WaitForPlayerInit(ply, function()
 		for k, v in ipairs(ents.FindByClass("starfall_prop")) do

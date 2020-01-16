@@ -352,7 +352,7 @@ function ents_methods:addCollisionListener(func)
 			instance:runFunction(func, SF.StructWrapper(data))
 		end)
 	else
-		function ent:PhysicsCollide( data, ent )
+		function ent:PhysicsCollide( data, phys )
 			instance:runFunction(func, SF.StructWrapper(data))
 		end
 	end
@@ -362,11 +362,12 @@ end
 function ents_methods:removeCollisionListener()
 	local ent = getent(self)
 	checkpermission(SF.instance, ent, "entities.canTool")
-	if not ( ent.SF_CollisionCallback or ent.PhysicsCollide ) then SF.Throw("The entity isn't listening to collisions!", 2) end
 	if ent:GetClass() ~= "starfall_prop" then
+		if not ent.SF_CollisionCallback then SF.Throw("The entity isn't listening to collisions!", 2) end
 		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 		ent.SF_CollisionCallback = nil
 	else
+		if not ent.PhysicsCollide then SF.Throw("The entity isn't listening to collisions!", 2) end
 		ent.PhysicsCollide = nil
 	end
 end
