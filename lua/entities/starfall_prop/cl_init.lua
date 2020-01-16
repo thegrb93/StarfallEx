@@ -48,8 +48,9 @@ function ENT:OnRemove()
 	-- This is required because snapshots can cause OnRemove to run even if it wasn't removed.
 	if self.rendermesh then
 		timer.Simple(0, function()
-			if not self:IsValid() then
+			if self.rendermesh and not self:IsValid() then
 				self.rendermesh:Destroy()
+				self.rendermesh = nil
 			end
 		end)
 	end
