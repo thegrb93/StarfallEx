@@ -1,4 +1,8 @@
-if not pcall(require, "socket.core") then return end
+local ok, err = pcall(require, "socket.core")
+if not ok then
+	if err~="Module not found!" then ErrorNoHalt(err) end
+	return
+end
 
 --- Socket library. Only usable by owner of starfall. Beware "Blocking" functions; they will freeze the game. See http://w3.impa.br/~diego/software/luasocket/socket.html
 -- @client
