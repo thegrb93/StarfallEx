@@ -7,4 +7,5 @@ Starfall Scripting Environment
 
 - Windows Joystick DLL Source: [`https://github.com/MattJeanes/Joystick-Modulet`](https://github.com/MattJeanes/Joystick-Module)
 - Windows XInput DLL Source: [`https://github.com/mitterdoo/garrysmod-xinput`](https://github.com/mitterdoo/garrysmod-xinput)
+- Windows Luasocket DLL Source: [`https://github.com/danielga/gmod_luasocket`](https://github.com/danielga/gmod_luasocket)
 - Linux Joystick DLL Source: [`https://gitlab.h08.us/puff/joystick-module-linux`](https://gitlab.h08.us/puff/joystick-module-linux)
