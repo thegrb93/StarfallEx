@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Particle :: StarfallEx Reference</title>
+		<title>Library socket :: StarfallEx Reference</title>
 		<link rel="stylesheet" href="../assets/stylesheet.css" type="text/css">
 		<script> fromPath = "../"; </script>
 		<script src="../assets/js/common.js"></script>
@@ -51,7 +51,7 @@
 						<li><a href="../libraries/prop.html">prop</a></li>
 						<li><a href="../libraries/quaternion.html">quaternion</a></li>
 						<li><a href="../libraries/render.html">render</a></li>
-						<li><a href="../libraries/socket.html">socket</a></li>
+						<li><a>socket</a></li>
 						<li><a href="../libraries/sounds.html">sounds</a></li>
 						<li><a href="../libraries/sql.html">sql</a></li>
 						<li><a href="../libraries/team.html">team</a></li>
@@ -77,7 +77,7 @@
 						<li><a href="../classes/Material.html">Material</a></li>
 						<li><a href="../classes/Mesh.html">Mesh</a></li>
 						<li><a href="../classes/Npc.html">Npc</a></li>
-						<li><a>Particle</a></li>
+						<li><a href="../classes/Particle.html">Particle</a></li>
 						<li><a href="../classes/PhysObj.html">PhysObj</a></li>
 						<li><a href="../classes/Player.html">Player</a></li>
 						<li><a href="../classes/Quaternion.html">Quaternion</a></li>
@@ -201,325 +201,21 @@
 		</nav>
 		<main>
 
-<h1><tt>Particle</tt> type</h1>
+<h1>Library <tt>socket</tt></h1>
 <p>
-Particle type</p>
+Socket library. Only usable by owner of starfall.<br> 
+Beware "Blocking" functions; they will freeze the game. See http://w3.impa.br/~diego/software/luasocket/socket.html<br> 
+Install the gmcl_socket.core_*.dll binary file to lua/bin and create a 'gm_socket_whitelist.txt' file in steamapps/common<br> 
+Each line in the whitelist will allow luasocket to access the specified domain and port. They are formatted as 'domain:port' e.g. 'garrysmod.com:80', '*.com:80' '95.123.12.22:27015'</p>
 
 
 
 
 
-<section class="methods">
-	<h2>Methods</h2>
-	<table class="list">
-		
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:destroy">destroy</a>( &nbsp;)</td>
-			<td class="summary">
-Stops emission of the particle and destroys the object.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:isFinished">isFinished</a>( &nbsp;)</td>
-			<td class="summary">
-Restarts emission of the particle.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:isValid">isValid</a>( &nbsp;)</td>
-			<td class="summary">
-Gets if the particle is valid or not.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:restart">restart</a>( &nbsp;)</td>
-			<td class="summary">
-Restarts emission of the particle.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setControlPoint">setControlPoint</a>( id, value, number, vector&nbsp;)</td>
-			<td class="summary">
-Sets a value for given control point.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setControlPointEntity">setControlPointEntity</a>( id, entity, number&nbsp;)</td>
-			<td class="summary">
-Essentially makes child control point follow the parent entity.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setControlPointParent">setControlPointParent</a>( id, value, number&nbsp;)</td>
-			<td class="summary">
-Sets the forward direction for given control point.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setForwardVector">setForwardVector</a>( id, value, number, vector&nbsp;)</td>
-			<td class="summary">
-Sets the forward direction for given control point.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setRightVector">setRightVector</a>( id, value, number, vector&nbsp;)</td>
-			<td class="summary">
-Sets the right direction for given control point.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setSortOrigin">setSortOrigin</a>( origin, vector&nbsp;)</td>
-			<td class="summary">
-Sets the sort origin for given particle system.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:setUpVector">setUpVector</a>( id, value, number, vector&nbsp;)</td>
-			<td class="summary">
-Sets the right direction for given control point.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:startEmission">startEmission</a>( &nbsp;)</td>
-			<td class="summary">
-Starts emission of the particle.</td>
-		</tr>
-		<tr>
-			<td class="name"><span class="realm_cl"></span><a href="#Particle:stopEmission">stopEmission</a>( &nbsp;)</td>
-			<td class="summary">
-Stops emission of the particle.</td>
-		</tr>
-	</table>
-</section>
-<section class="methods_def">
-	<h2><a name="methods_def"></a>Methods definition</h2>
-	<dl>
-		
-		
-<dt><span class="realm_cl"></span><a name="Particle:destroy"></a><strong>Particle:destroy</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Stops emission of the particle and destroys the object.</p>
-	
-	
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:isFinished"></a><strong>Particle:isFinished</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Restarts emission of the particle.</p>
-	
-	
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>bool finished</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:isValid"></a><strong>Particle:isValid</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Gets if the particle is valid or not.</p>
-	
-	
-	
-	
-	<section class="return">
-		<h3>Returns</h3>
-		
-		<p>Is valid or not</p>
-		
-	</section>
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:restart"></a><strong>Particle:restart</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Restarts emission of the particle.</p>
-	
-	
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setControlPoint"></a><strong>Particle:setControlPoint</strong>( id, value, number, vector&nbsp;)</dt>
-<dd>
-	<p>
-Sets a value for given control point.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>id</tt></li>
-			<li><tt>value</tt></li>
-			<li><tt>number</tt> ― Control Point ID (0-63)</li>
-			<li><tt>vector</tt> ― Value</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setControlPointEntity"></a><strong>Particle:setControlPointEntity</strong>( id, entity, number&nbsp;)</dt>
-<dd>
-	<p>
-Essentially makes child control point follow the parent entity.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>id</tt></li>
-			<li><tt>entity</tt> ― Entity parent</li>
-			<li><tt>number</tt> ― Child Control Point ID (0-63)</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setControlPointParent"></a><strong>Particle:setControlPointParent</strong>( id, value, number&nbsp;)</dt>
-<dd>
-	<p>
-Sets the forward direction for given control point.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>id</tt></li>
-			<li><tt>value</tt></li>
-			<li><tt>number</tt> ― Parent</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setForwardVector"></a><strong>Particle:setForwardVector</strong>( id, value, number, vector&nbsp;)</dt>
-<dd>
-	<p>
-Sets the forward direction for given control point.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>id</tt></li>
-			<li><tt>value</tt></li>
-			<li><tt>number</tt> ― Control Point ID (0-63)</li>
-			<li><tt>vector</tt> ― Forward</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setRightVector"></a><strong>Particle:setRightVector</strong>( id, value, number, vector&nbsp;)</dt>
-<dd>
-	<p>
-Sets the right direction for given control point.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>id</tt></li>
-			<li><tt>value</tt></li>
-			<li><tt>number</tt> ― Control Point ID (0-63)</li>
-			<li><tt>vector</tt> ― Right</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setSortOrigin"></a><strong>Particle:setSortOrigin</strong>( origin, vector&nbsp;)</dt>
-<dd>
-	<p>
-Sets the sort origin for given particle system. This is used as a helper to determine which particles are in front of which.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>origin</tt></li>
-			<li><tt>vector</tt> ― Sort Origin</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:setUpVector"></a><strong>Particle:setUpVector</strong>( id, value, number, vector&nbsp;)</dt>
-<dd>
-	<p>
-Sets the right direction for given control point.</p>
-	
-	
-	<section class="parameters">
-		<h3>Parameters</h3>
-		<ul>
-			
-			<li><tt>id</tt></li>
-			<li><tt>value</tt></li>
-			<li><tt>number</tt> ― Control Point ID (0-63)</li>
-			<li><tt>vector</tt> ― Right</li>
-		</ul>
-	</section>
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:startEmission"></a><strong>Particle:startEmission</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Starts emission of the particle.</p>
-	
-	
-	
-	
-	
-	
-</dd>
-		
-<dt><span class="realm_cl"></span><a name="Particle:stopEmission"></a><strong>Particle:stopEmission</strong>( &nbsp;)</dt>
-<dd>
-	<p>
-Stops emission of the particle.</p>
-	
-	
-	
-	
-	
-	
-</dd>
-	</dl>
-</section>
+
+
+
+
 		</main>
 		<footer>
 			<p>
