@@ -4,7 +4,7 @@
 
 local dgetmeta = debug.getmetatable
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 --[[
@@ -203,7 +203,7 @@ end
 
 -- Local functions
 
-local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local wrap, vwrap, awrap
 local unwrap, vunwrap, aunwrap
 local vecmeta, angmeta
@@ -218,7 +218,7 @@ local function postload()
 	vecmeta = SF.Vectors.Metatable
 	angmeta = SF.Angles.Metatable
 end
-SF.AddHook("postload", postload)
+instance:AddHook("postload", postload)
 
 local function convertFilter(filter)
 	local filterType = TypeID(filter)
@@ -240,7 +240,7 @@ local function convertFilter(filter)
 		end
 	elseif filterType == TYPE_FUNCTION then
 		return function(ent)
-			local ret = SF.instance:runFunction(filter, SF.WrapObject(ent))
+			local ret = instance:runFunction(filter, owrap(ent))
 			if ret[1] then return ret[2] end
 		end
 	else
@@ -263,7 +263,7 @@ end
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
-	checkpermission(SF.instance, nil, "trace")
+	checkpermission(instance, nil, "trace")
 	checktype(start, vecmeta)
 	checktype(endpos, vecmeta)
 
@@ -285,7 +285,7 @@ function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 		ignoreworld = ignworld,
 	}
 
-	return SF.StructWrapper(util.TraceLine(trace))
+	return SF.StructWrapper(instance, util.TraceLine(trace))
 end
 
 --- Does a swept-AABB trace
@@ -299,7 +299,7 @@ end
 -- @param ignworld Whether the trace should ignore world
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
-	checkpermission(SF.instance, nil, "trace")
+	checkpermission(instance, nil, "trace")
 	checktype(start, vecmeta)
 	checktype(endpos, vecmeta)
 	checktype(minbox, vecmeta)
@@ -327,7 +327,7 @@ function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, c
 		maxs = maxbox
 	}
 
-	return SF.StructWrapper(util.TraceHull(trace))
+	return SF.StructWrapper(instance, util.TraceHull(trace))
 end
 
 --- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.

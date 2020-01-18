@@ -111,7 +111,7 @@ function P.buildPermissionCheck(privilegeid)
 end
 
 -- Load the permission settings for each provider
-SF.AddHook("postload", function()
+function P.loadPermissionOptions()
 	local settings = util.JSONToTable(file.Read(P.filename) or "") or {}
 	for privilegeid, privilege in pairs(P.privileges) do
 		if settings[privilegeid] then
@@ -137,7 +137,7 @@ SF.AddHook("postload", function()
 		end
 		P.buildPermissionCheck(privilegeid)
 	end
-end)
+end
 
 -- Find and include all provider files.
 do

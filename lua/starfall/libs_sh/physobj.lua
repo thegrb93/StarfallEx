@@ -6,9 +6,9 @@ SF.PhysObjs = {}
 
 --- PhysObj Type
 -- @shared
-local physobj_methods, physobj_metatable = SF.RegisterType("PhysObj")
-local wrap, unwrap = SF.CreateWrapper(physobj_metatable, true, false)
-local checktype = SF.CheckType
+local physobj_methods, physobj_metatable = instance:RegisterType("PhysObj")
+local wrap, unwrap = instance:CreateWrapper(physobj_metatable, true, false)
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -18,11 +18,11 @@ SF.PhysObjs.Wrap = wrap
 SF.PhysObjs.Unwrap = unwrap
 
 local ewrap, eunwrap
-local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap, mwrap
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 
@@ -210,7 +210,7 @@ end
 function physobj_methods:setMaterial(material)
 	checkluatype (material, TYPE_STRING)
 	local phys = unwrap(self)
-	checkpermission(SF.instance, phys:GetEntity(), "entities.setRenderProperty")
+	checkpermission(instance, phys:GetEntity(), "entities.setRenderProperty")
 	phys:SetMaterial(material)
 	if not phys:IsMoveable() then
 		phys:EnableMotion(true)
@@ -229,7 +229,7 @@ if SERVER then
 		checkvector(pos)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setPos")
+		checkpermission(instance, phys:GetEntity(), "entities.setPos")
 		phys:SetPos(pos)
 	end
 
@@ -243,7 +243,7 @@ if SERVER then
 		checkvector(ang)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setAngles")
+		checkpermission(instance, phys:GetEntity(), "entities.setAngles")
 		phys:SetAngles(ang)
 	end
 
@@ -257,7 +257,7 @@ if SERVER then
 		checkvector(vel)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setVelocity")
+		checkpermission(instance, phys:GetEntity(), "entities.setVelocity")
 		phys:SetVelocity(vel)
 	end
 
@@ -272,7 +272,7 @@ if SERVER then
 		end
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setMass")
+		checkpermission(instance, phys:GetEntity(), "entities.setMass")
 		phys:SetBuoyancyRatio(ratio)
 	end
 
@@ -286,7 +286,7 @@ if SERVER then
 		checkvector(force)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceCenter(force)
 	end
 
@@ -304,7 +304,7 @@ if SERVER then
 		checkvector(position)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:ApplyForceOffset(force, position)
 	end
 
@@ -317,7 +317,7 @@ if SERVER then
 		checkvector(angvel)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
 	end
@@ -331,7 +331,7 @@ if SERVER then
 		checkvector(angvel)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:AddAngleVelocity(angvel)
 	end
@@ -345,7 +345,7 @@ if SERVER then
 		checkvector(torque)
 
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 
 		phys:ApplyTorqueCenter(torque)
 	end
@@ -357,7 +357,7 @@ if SERVER then
 		checkluatype(mass, TYPE_NUMBER)
 		local phys = unwrap(self)
 		local ent = phys:GetEntity()
-		checkpermission(SF.instance, ent, "entities.setMass")
+		checkpermission(instance, ent, "entities.setMass")
 		local m = math.Clamp(mass, 1, 50000)
 		phys:SetMass(m)
 		duplicator.StoreEntityModifier(ent, "mass", { Mass = m })
@@ -368,7 +368,7 @@ if SERVER then
 	-- @param inertia The inertia vector to set it to
 	function physobj_methods:setInertia(inertia)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setInertia")
+		checkpermission(instance, phys:GetEntity(), "entities.setInertia")
 
 		local vec = vunwrap(inertia)
 		checkvector(vec)
@@ -393,7 +393,7 @@ if SERVER then
 	function physobj_methods:addGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
+		checkpermission(instance, phys:GetEntity(), "entities.canTool")
 		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
 		if invalidFlags == 0 then
 			phys:AddGameFlag(flags)
@@ -413,7 +413,7 @@ if SERVER then
 	function physobj_methods:clearGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.canTool")
+		checkpermission(instance, phys:GetEntity(), "entities.canTool")
 		local invalidFlags = bit.band(bit.bnot(validGameFlags), flags)
 		if invalidFlags == 0 then
 			phys:ClearGameFlag(flags)
@@ -435,7 +435,7 @@ if SERVER then
 	-- @param grav Bool should the bone respect gravity?
 	function physobj_methods:enableGravity(grav)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableGravity")
+		checkpermission(instance, phys:GetEntity(), "entities.enableGravity")
 		phys:EnableGravity(grav and true or false)
 		phys:Wake()
 	end
@@ -444,7 +444,7 @@ if SERVER then
 	-- @param drag Bool should the bone have air resistence?
 	function physobj_methods:enableDrag(drag)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
 		phys:EnableDrag(drag and true or false)
 	end
 
@@ -460,7 +460,7 @@ if SERVER then
 	function physobj_methods:setDragCoefficient(coeff)
 		checkluatype(coeff, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
 		phys:SetDragCoefficient(coeff)
 	end
 
@@ -469,7 +469,7 @@ if SERVER then
 	function physobj_methods:setAngleDragCoefficient(coeff)
 		checkluatype(coeff, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableDrag")
+		checkpermission(instance, phys:GetEntity(), "entities.enableDrag")
 		phys:SetAngleDragCoefficient(coeff)
 	end
 
@@ -488,7 +488,7 @@ if SERVER then
 		checkluatype(linear, TYPE_NUMBER)
 		checkluatype(angular, TYPE_NUMBER)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.setDamping")
+		checkpermission(instance, phys:GetEntity(), "entities.setDamping")
 		return phys:SetDamping(linear, angular)
 	end
 	
@@ -496,7 +496,7 @@ if SERVER then
 	-- @param move Bool should the bone move?
 	function physobj_methods:enableMotion(move)
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.enableMotion")
+		checkpermission(instance, phys:GetEntity(), "entities.enableMotion")
 		phys:EnableMotion(move and true or false)
 		phys:Wake()
 	end
@@ -513,7 +513,7 @@ if SERVER then
 	-- @server
 	function physobj_methods:sleep()
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:Sleep()
 	end
 
@@ -521,7 +521,7 @@ if SERVER then
 	-- @server
 	function physobj_methods:wake()
 		local phys = unwrap(self)
-		checkpermission(SF.instance, phys:GetEntity(), "entities.applyForce")
+		checkpermission(instance, phys:GetEntity(), "entities.applyForce")
 		phys:Wake()
 	end
 end

@@ -2,8 +2,8 @@ SF.Angles = {}
 
 --- Angle Type
 -- @shared
-local ang_methods, ang_metamethods = SF.RegisterType("Angle")
-local checktype = SF.CheckType
+local ang_methods, ang_metamethods = instance:RegisterType("Angle")
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -23,7 +23,7 @@ SF.AddObjectWrapper(debug.getregistry().Angle, ang_metamethods, awrap)
 SF.AddObjectUnwrapper(ang_metamethods, unwrap)
 
 local vwrap
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vwrap = SF.Vectors.Wrap
 
 	--- Creates an Angle struct
@@ -198,7 +198,7 @@ function ang_methods:rotateAroundAxis (v, deg, rad)
 	local ret = Angle()
 
 	ret:Set(unwrap(self))
-	ret:RotateAroundAxis(SF.UnwrapObject(v), deg)
+	ret:RotateAroundAxis(instance.UnwrapObject(v), deg)
 
 	return awrap(ret)
 end

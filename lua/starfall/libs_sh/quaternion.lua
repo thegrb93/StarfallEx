@@ -4,8 +4,8 @@
 -- @shared
 local quat_lib = SF.RegisterLibrary("quaternion")
 
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
-local checktype = SF.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -41,7 +41,7 @@ local deg2rad = math.pi / 180
 local rad2deg = 180 / math.pi
 
 --- Quaternion type
-local quat_methods, quat_metamethods = SF.RegisterType("Quaternion")
+local quat_methods, quat_metamethods = instance:RegisterType("Quaternion")
 
 --****************************** Helper functions ******************************--
 
@@ -150,7 +150,7 @@ end
 
 --- Converts an Entity to a Quaternion format for generation
 argTypesToQuat["Entity"] = function(ent)
-	ent = SF.UnwrapObject(ent)
+	ent = ounwrap(ent)
 
 	if not (ent and ent:IsValid()) then
 		return quicknew(0, 0, 0, 0)
@@ -540,7 +540,7 @@ function quat_methods:forward()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
 
-	return vwrap(Vector(this1 * this1 + this2 * this2 - this3 * this3 - this4 * this4,
+	return owrap(Vector(this1 * this1 + this2 * this2 - this3 * this3 - this4 * this4,
 	t3 * this2 + t4 * this1,
 	t4 * this2 - t3 * this1))
 end
@@ -550,7 +550,7 @@ function quat_methods:right()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
 
-	return vwrap(Vector(t4 * this1 - t2 * this3,
+	return owrap(Vector(t4 * this1 - t2 * this3,
 	this2 * this2 - this1 * this1 + this4 * this4 - this3 * this3,
 	- t2 * this1 - t3 * this4))
 end
@@ -560,7 +560,7 @@ function quat_methods:up()
 	local this1, this2, this3, this4 = self[1], self[2], self[3], self[4]
 	local t2, t3, t4 = this2 * 2, this3 * 2, this4 * 2
 
-	return vwrap(Vector(t3 * this1 + t2 * this4,
+	return owrap(Vector(t3 * this1 + t2 * this4,
 	t3 * this4 - t2 * this1,
 	this1 * this1 - this2 * this2 - this3 * this3 + this4 * this4))
 end
@@ -593,7 +593,7 @@ end
 --- Returns the euler angle of rotation in degrees
 function quat_lib.rotationEulerAngle(q)
 	local l = sqrt(q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4])
-	if l == 0 then return SF.WrapObject(Angle(0, 0, 0)) end
+	if l == 0 then return owrap(Angle(0, 0, 0)) end
 	local q1, q2, q3, q4 = q[1] / l, q[2] / l, q[3] / l, q[4] / l
 
 	local x = Vector(q1 * q1 + q2 * q2 - q3 * q3 - q4 * q4,
@@ -616,7 +616,7 @@ function quat_lib.rotationEulerAngle(q)
 	local dot = q2 * q1 + q3 * q4
 	if dot < 0 then ang.roll = -ang.roll end
 
-	return SF.WrapObject(ang)
+	return owrap(ang)
 end
 
 --- Returns the angle of rotation in degrees (by coder0xff)
@@ -637,10 +637,10 @@ end
 function quat_lib.rotationAxis(q)
 	local m2 = q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 
-	if m2 == 0 then return vwrap(Vector(0, 0, 1)) end
+	if m2 == 0 then return owrap(Vector(0, 0, 1)) end
 
 	local m = sqrt(m2)
-	return vwrap(Vector(q[2] / m, q[3] / m, q[4] / m))
+	return owrap(Vector(q[2] / m, q[3] / m, q[4] / m))
 end
 
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff)
@@ -649,21 +649,21 @@ function quat_lib.rotationVector(q)
 	local l2 = q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 	local m2 = math.max(q[2] * q[2] + q[3] * q[3] + q[4] * q[4], 0)
 
-	if l2 == 0 or m2 == 0 then return vwrap(Vector(0, 0, 0)) end
+	if l2 == 0 or m2 == 0 then return owrap(Vector(0, 0, 0)) end
 
 	local s = 2 * acos(math.Clamp(q[1] / sqrt(l2), -1, 1)) * rad2deg
 
 	if s > 180 then s = s - 360 end
 
 	s = s / sqrt(m2)
-	return vwrap(Vector(q[2] * s, q[3] * s, q[4] * s))
+	return owrap(Vector(q[2] * s, q[3] * s, q[4] * s))
 end
 
 --[[****************************************************************************]]
 
 --- Converts <q> to a vector by dropping the real component
 function quat_lib.vec(q)
-	return vwrap(Vector(q[2], q[3], q[4]))
+	return owrap(Vector(q[2], q[3], q[4]))
 end
 
 --[[****************************************************************************]]

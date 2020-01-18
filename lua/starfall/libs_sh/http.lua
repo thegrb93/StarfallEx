@@ -12,7 +12,7 @@ SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the us
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.http = {
 		lastRequest = 0,
 		active = 0
@@ -50,7 +50,7 @@ end
 
 --- Checks if a new http request can be started
 function http_library.canRequest()
-	local httpData = SF.instance.data.http
+	local httpData = instance.data.http
 	return CurTime() - httpData.lastRequest >= http_interval:GetFloat() and httpData.active < http_max_active:GetInt()
 end
 
@@ -60,7 +60,6 @@ end
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 -- @param headers GET headers to be sent
 function http_library.get (url, callbackSuccess, callbackFail, headers)
-	local instance = SF.instance
 	SF.Permissions.check(instance, url, "http.get")
 
 	httpRequestReady(instance)
@@ -91,7 +90,6 @@ end
 -- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
 -- @param headers optional POST headers to be sent
 function http_library.post (url, payload, callbackSuccess, callbackFail, headers)
-	local instance = SF.instance
 	SF.CheckLuaType(url, TYPE_STRING)
 	SF.Permissions.check(instance, url, "http.post")
 

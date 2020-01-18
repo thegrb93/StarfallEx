@@ -13,9 +13,9 @@ local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds
 
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
-local bass_methods, bass_metamethods = SF.RegisterType("Bass")
-local wrap, unwrap = SF.CreateWrapper(bass_metamethods, true, false)
-local checktype = SF.CheckType
+local bass_methods, bass_metamethods = instance:RegisterType("Bass")
+local wrap, unwrap = instance:CreateWrapper(bass_metamethods, true, false)
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -34,11 +34,11 @@ local function deleteSound(ply, sound)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.bass = {sounds = {}}
 end)
 
-SF.AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function(instance)
 	for s, _ in pairs(instance.data.bass.sounds) do
 		deleteSound(instance.player, s)
 	end
@@ -46,7 +46,7 @@ end)
 
 local function not3D(flags)
 	for flag in string.gmatch(string.lower(flags), "%S+") do if flag=="3d" then return false end end
-	if SF.instance:isHUDActive() then return false end
+	if instance:isHUDActive() then return false end
 	return true
 end
 
@@ -55,7 +55,6 @@ end
 -- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadFile (path, flags, callback)
-	local instance = SF.instance
 	checkpermission(instance, nil, "bass.loadFile")
 	
 	checkluatype(path, TYPE_STRING)
@@ -92,7 +91,6 @@ end
 -- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
 function bass_library.loadURL (path, flags, callback)
-	local instance = SF.instance
 	checkpermission(instance, path, "bass.loadURL")
 
 	checkluatype(path, TYPE_STRING)
@@ -125,7 +123,7 @@ end
 --- Returns the number of sounds left that can be created
 -- @return The number of sounds left
 function bass_library.soundsLeft()
-	return plyCount:check(SF.instance.player)
+	return plyCount:check(instance.player)
 end
 
 --------------------------------------------------
@@ -133,9 +131,9 @@ end
 --- Removes the sound from the game so new one can be created if limit is reached
 function bass_methods:destroy()
 	local snd = unwrap(self)
-	local sounds = SF.instance.data.bass.sounds
+	local sounds = instance.data.bass.sounds
 	if snd and sounds[snd] then
-		deleteSound(SF.instance.player, snd)
+		deleteSound(instance.player, snd)
 		sounds[snd] = nil
 		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(bass_metamethods)
 		sensitive2sf[snd] = nil
@@ -151,7 +149,7 @@ function bass_methods:play ()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:Play()
@@ -163,7 +161,7 @@ function bass_methods:stop ()
 	checktype(self, bass_metamethods)
 	local uw =  unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:Stop()
@@ -175,7 +173,7 @@ function bass_methods:pause ()
 	checktype(self, bass_metamethods)
 	local uw =  unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:Pause()
@@ -189,7 +187,7 @@ function bass_methods:setVolume (vol)
 	checkluatype(vol, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:SetVolume(math.Clamp(vol, 0, 10))
@@ -203,7 +201,7 @@ function bass_methods:setPitch (pitch)
 	checkluatype(pitch, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:SetPlaybackRate(math.Clamp(pitch, 0, 3))
@@ -217,10 +215,10 @@ function bass_methods:setPos (pos)
 	checktype(pos, SF.Types["Vector"])
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
-		uw:SetPos(SF.UnwrapObject(pos))
+		uw:SetPos(instance.UnwrapObject(pos))
 	end
 end
 
@@ -231,7 +229,7 @@ function bass_methods:setFade (min, max)
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:Set3DFadeDistance(math.Clamp(min, 50, 1000), math.Clamp(max, 10000, 200000))
@@ -244,7 +242,7 @@ function bass_methods:setLooping (loop)
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:EnableLooping(loop)
@@ -257,7 +255,7 @@ function bass_methods:getLength ()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		return uw:GetLength()
@@ -271,7 +269,7 @@ function bass_methods:setTime (time)
 	checkluatype(time, TYPE_NUMBER)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		uw:SetTime(time)
@@ -284,7 +282,7 @@ function bass_methods:getTime ()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		return uw:GetTime()
@@ -298,7 +296,7 @@ function bass_methods:getFFT (n)
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		local arr = {}
@@ -313,7 +311,7 @@ function bass_methods:isOnline()
 	checktype(self, bass_metamethods)
 	local uw = unwrap(self)
 
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
 		return uw:IsOnline()

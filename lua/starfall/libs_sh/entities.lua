@@ -6,13 +6,13 @@ SF.Entities = {}
 
 --- Entity type
 -- @shared
-local ents_methods, ents_metamethods = SF.RegisterType("Entity")
+local ents_methods, ents_metamethods = instance:RegisterType("Entity")
 
-local ewrap, eunwrap = SF.CreateWrapper(ents_metamethods, true, true, debug.getregistry().Entity)
-local owrap, ounwrap = SF.WrapObject, SF.UnwrapObject
+local ewrap, eunwrap = instance:CreateWrapper(ents_metamethods, true, true, debug.getregistry().Entity)
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ang_meta, vec_meta
 local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -20,7 +20,7 @@ SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty",
 SF.Permissions.registerPrivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 
@@ -34,25 +34,25 @@ SF.AddHook("postload", function()
 	punwrap = SF.PhysObjs.Unwrap
 
 	function SF.DefaultEnvironment.chip()
-		return ewrap(SF.instance.data.entity)
+		return ewrap(instance.data.entity)
 	end
 
 	function SF.DefaultEnvironment.owner()
-		return SF.Players.Wrap(SF.instance.player)
+		return SF.Players.Wrap(instance.player)
 	end
 
 	function SF.DefaultEnvironment.entity(num)
 		checkluatype(num, TYPE_NUMBER)
-		return SF.WrapObject(Entity(num))
+		return owrap(Entity(num))
 	end
 
 	function SF.DefaultEnvironment.player(num)
 		if num then
 			checkluatype(num, TYPE_NUMBER)
-			return SF.WrapObject(Player(num))
+			return owrap(Player(num))
 		end
 
-		return SERVER and SF.DefaultEnvironment.owner() or SF.WrapObject(LocalPlayer())
+		return SERVER and SF.DefaultEnvironment.owner() or owrap(LocalPlayer())
 	end
 end)
 
@@ -103,7 +103,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = getent(self)
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
 	end
 
@@ -115,7 +115,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(vec, vec_meta)
 		local ent = getent(self)
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
 	end
 
@@ -127,7 +127,7 @@ if CLIENT then
 		checkluatype(bone, TYPE_NUMBER)
 		checktype(ang, ang_meta)
 		local ent = getent(self)
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
@@ -138,7 +138,6 @@ if CLIENT then
 		local ent = getent(self)
 		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
 
-		local instance = SF.instance
 		checkpermission(instance, nil, "mesh")
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
@@ -157,7 +156,7 @@ if CLIENT then
 		local ent = getent(self)
 		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
 
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		if material then
 			local t = debug.getmetatable(material)
@@ -179,7 +178,7 @@ if CLIENT then
 		checktype(mins, vec_meta)
 		checktype(maxs, vec_meta)
 
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
 	end
@@ -201,7 +200,7 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 	checkluatype(snd, TYPE_STRING)
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.emitSound")
+	checkpermission(instance, ent, "entities.emitSound")
 
 	local snds = soundsByEntity[ent]
 	if not snds then snds = {} soundsByEntity[ent] = snds end
@@ -215,7 +214,7 @@ function ents_methods:stopSound(snd)
 	checkluatype(snd, TYPE_STRING)
 
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.emitSound")
+	checkpermission(instance, ent, "entities.emitSound")
 
 	if soundsByEntity[ent] then
 		soundsByEntity[ent][snd] = nil
@@ -231,10 +230,10 @@ function ents_methods:setColor(clr)
 	checktype(clr, SF.Types["Color"])
 
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	local rendermode = (clr.a == 255 and RENDERMODE_NORMAL or RENDERMODE_TRANSALPHA)
@@ -248,7 +247,7 @@ end
 -- @param draw Whether to draw the entity or not.
 function ents_methods:setNoDraw(draw)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	ent:SetNoDraw(draw and true or false)
 end
@@ -261,10 +260,10 @@ function ents_methods:setMaterial(material)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	ent:SetMaterial(material)
@@ -280,10 +279,10 @@ function ents_methods:setSubMaterial(index, material)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 	index = math.Clamp(index, 0, 255)
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	ent:SetSubMaterial(index, material)
@@ -301,10 +300,10 @@ function ents_methods:setBodygroup(bodygroup, value)
 	checkluatype(value, TYPE_NUMBER)
 
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	ent:SetBodygroup(bodygroup, value)
@@ -317,10 +316,10 @@ function ents_methods:setSkin(skinIndex)
 	checkluatype(skinIndex, TYPE_NUMBER)
 
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	ent:SetSkin(skinIndex)
@@ -334,10 +333,10 @@ function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	ent:SetRenderMode(rendermode)
@@ -352,10 +351,10 @@ function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 
 	local ent = getent(self)
-	if SERVER and ent == SF.instance.player then
-		checkpermission(SF.instance, ent, "entities.setPlayerRenderProperty")
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
 	else
-		checkpermission(SF.instance, ent, "entities.setRenderProperty")
+		checkpermission(instance, ent, "entities.setRenderProperty")
 	end
 
 	ent:SetRenderFX(renderfx)
@@ -903,7 +902,7 @@ end
 -- @param value Value to set it to.
 function ents_methods:setPose(pose, value)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	ent:SetPoseParameter(pose, value)
 end
@@ -952,7 +951,7 @@ function ents_methods:setFlexWeight(flexid, weight)
 	checkluatype(weight, TYPE_NUMBER)
 	flexid = math.floor(flexid)
 
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 	if flexid < 0 or flexid >= ent:GetFlexNum() then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
@@ -972,7 +971,7 @@ end
 function ents_methods:setFlexScale(scale)
 	local ent = getent(self)
 	checkluatype(scale, TYPE_NUMBER)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 	ent:SetFlexScale(scale)
 end
 

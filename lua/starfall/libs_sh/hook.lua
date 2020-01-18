@@ -9,8 +9,8 @@ local registered_instances = {}
 local gmod_hooks = {}
 local gmod_override_hooks = {}
 local wrapArguments = SF.Sanitize
-local wrapObject = SF.WrapObject
-local checktype = SF.CheckType
+local wrapObject = instance.WrapObject
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -77,11 +77,10 @@ function hook_library.add (hookname, name, func)
 	checkluatype (func, TYPE_FUNCTION)
 
 	hookname = hookname:lower()
-	local inst = SF.instance
-	local hooks = inst.hooks[hookname]
+	local hooks = instance.hooks[hookname]
 	if not hooks then
 		hooks = {}
-		inst.hooks[hookname] = hooks
+		instance.hooks[hookname] = hooks
 	end
 	hooks[name] = func
 
@@ -97,7 +96,7 @@ function hook_library.add (hookname, name, func)
 			hook.Add(realname, "SF_Hook_"..hookname, hookfunc)
 		end
 	end
-	instances[inst] = true
+	instances[instance] = true
 end
 
 --- Run a hook
@@ -107,7 +106,6 @@ end
 function hook_library.run (hookname, ...)
 	checkluatype (hookname, TYPE_STRING)
 
-	local instance = SF.instance
 	local hook = hookname:lower()
 
 	if instance.hooks and instance.hooks[hook] then
@@ -150,15 +148,14 @@ function hook_library.runRemote (recipient, ...)
 		recipients = registered_instances["remote"] or {}
 	end
 
-	local instance = SF.instance
 
 	local results = {}
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hook_library.run("remote", SF.WrapObject(instance.data.entity), SF.WrapObject(instance.player), ...) }
+			result = { true, hook_library.run("remote", wrapObject(instance.data.entity), wrapObject(instance.player), ...) }
 		else
-			result = k:runScriptHookForResult("remote", SF.WrapObject(instance.data.entity), SF.WrapObject(instance.player), ...)
+			result = k:runScriptHookForResult("remote", wrapObject(instance.data.entity), wrapObject(instance.player), ...)
 		end
 
 		if result[1] and result[2]~=nil then
@@ -176,7 +173,6 @@ end
 function hook_library.remove (hookname, name)
 	checkluatype (hookname, TYPE_STRING)
 	checkluatype (name, TYPE_STRING)
-	local instance = SF.instance
 
 	local lower = hookname:lower()
 	if instance.hooks[lower] then
@@ -195,7 +191,7 @@ function hook_library.remove (hookname, name)
 	end
 end
 
-SF.AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function (instance)
 	for k, v in pairs(registered_instances) do
 		v[instance] = nil
 		if not next(v) and not gmod_override_hooks[k] then
@@ -330,7 +326,7 @@ end)
 add("EntityRemoved")
 add("PropBreak")
 add("EntityFireBullets", nil, function(instance, ent, data)
-	return true, { SF.WrapObject(ent), SF.StructWrapper(data) }
+	return true, { wrapObject(ent), SF.StructWrapper(instance, data) }
 end)
 
 -- Other

@@ -52,7 +52,7 @@ SF.Permissions.registerPrivilege("input.emulate", "Input", "Allows starfall to e
 function input_methods.lookupBinding(binding)
 	SF.CheckLuaType(binding, TYPE_STRING)
 
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	local bind = input.LookupBinding(binding)
 	if bind then
@@ -69,7 +69,7 @@ end
 function input_methods.isKeyDown(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	return input.IsKeyDown(key)
 end
@@ -81,7 +81,7 @@ end
 function input_methods.getKeyName(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	return input.GetKeyName(key)
 end
@@ -90,7 +90,7 @@ end
 -- @client
 -- @return True if the shift key is down
 function input_methods.isShiftDown()
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	return input.IsShiftDown()
 end
@@ -99,7 +99,7 @@ end
 -- @client
 -- @return True if the control key is down
 function input_methods.isControlDown()
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	return input.IsControlDown()
 end
@@ -109,7 +109,7 @@ end
 -- @return The x position of the mouse
 -- @return The y position of the mouse
 function input_methods.getCursorPos()
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	return input.GetCursorPos()
 end
@@ -118,7 +118,7 @@ end
 -- @client
 -- @return The cursor's visibility
 function input_methods.getCursorVisible()
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
 	return vgui.CursorVisible()
 end
@@ -129,10 +129,10 @@ end
 -- @param y Y coordinate on the screen
 -- @return Aim vector
 function input_methods.screenToVector(x, y)
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 	SF.CheckLuaType(x, TYPE_NUMBER)
 	SF.CheckLuaType(y, TYPE_NUMBER)
-	return SF.WrapObject(gui.ScreenToVector(x, y))
+	return instance.WrapObject(gui.ScreenToVector(x, y))
 end
 
 --- Sets the state of the mouse cursor
@@ -140,13 +140,13 @@ end
 -- @param enabled Whether or not the cursor should be enabled
 function input_methods.enableCursor(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
-	if not SF.instance:isHUDActive() then
+	if not instance:isHUDActive() then
 		SF.Throw("No HUD component connected", 2)
 	end
 
-	SF.instance.data.cursorEnabled = enabled
+	instance.data.cursorEnabled = enabled
 	gui.EnableScreenClicker(enabled)
 end
 
@@ -156,7 +156,7 @@ end
 function input_methods.selectWeapon(weapon)
 	local ent = SF.Entities.GetEntity(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
-	SF.Permissions.check(SF.instance, nil, "input.emulate")
+	SF.Permissions.check(instance, nil, "input.emulate")
 	input.SelectWeapon( ent ) 
 end
 
@@ -195,17 +195,17 @@ end)
 -- @param enabled Whether to lock or unlock the controls
 function input_methods.lockControls(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
-	SF.Permissions.check(SF.instance, nil, "input")
+	SF.Permissions.check(instance, nil, "input")
 
-	if not SF.instance:isHUDActive() then
+	if not instance:isHUDActive() then
 		SF.Throw("No HUD component connected", 2)
 	end
 
 	if enabled then
-		if SF.instance.data.lockedControlCooldown and SF.instance.data.lockedControlCooldown > CurTime() then
+		if instance.data.lockedControlCooldown and instance.data.lockedControlCooldown > CurTime() then
 			SF.Throw("Cannot lock the player's controls yet", 2)
 		end
-		SF.instance.data.lockedControlCooldown = CurTime() + 10
+		instance.data.lockedControlCooldown = CurTime() + 10
 		lockControls()
 	else
 		unlockControls()
@@ -223,19 +223,19 @@ end
 -- @client
 -- @return Whether the player's control can be locked
 function input_methods.canLockControls()
-	return SF.instance:isHUDActive() and
-		(not SF.instance.data.lockedControlCooldown or SF.instance.data.lockedControlCooldown <= CurTime())
+	return instance:isHUDActive() and
+		(not instance.data.lockedControlCooldown or instance.data.lockedControlCooldown <= CurTime())
 end
 
-SF.AddHook("deinitialize", function(inst)
-	if inst.data.cursorEnabled then
+instance:AddHook("deinitialize", function(instance)
+	if instance.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
 	unlockControls()
 end)
 
-SF.AddHook("starfall_hud_disconnected", function(inst)
-	if inst.data.cursorEnabled then
+instance:AddHook("starfall_hud_disconnected", function(instance)
+	if instance.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
 end)
@@ -301,7 +301,7 @@ end
 -- @param delta Rotate delta
 
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	local _KEY = {
 		["FIRST"] = 0,
 		["NONE"] = 0,

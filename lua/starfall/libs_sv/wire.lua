@@ -7,7 +7,7 @@ if not WireLib then return end
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library = SF.RegisterLibrary("wire")
 
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	local ent = instance.data.entity
 	instance.data.wirecache = {}
 	instance.data.wirecachevals = {}
@@ -64,12 +64,12 @@ end
 
 --- Wirelink type
 -- @server
-local wirelink_methods, wirelink_metatable = SF.RegisterType("Wirelink")
-local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable, true, true)
+local wirelink_methods, wirelink_metatable = instance:RegisterType("Wirelink")
+local wlwrap, wlunwrap = instance:CreateWrapper(wirelink_metatable, true, true)
 local vwrap, awrap
 local vunwrap, aunwrap
-local ewrap, eunwrap
-local checktype = SF.CheckType
+local owrap, ounwrap
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local COLOR_WHITE = Color(255, 255, 255)
@@ -83,10 +83,10 @@ local typeToE2Type
 local inputConverters
 local outputConverters
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
 	vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
-	ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
+	owrap, ounwrap = instance.WrapObject, SF.Entities.Unwrap
 	
 	--- Returns an entities wirelink
 	-- @name Entity.getWirelink
@@ -110,7 +110,7 @@ SF.AddHook("postload", function()
 		VECTOR = vwrap,
 		ANGLE = awrap,
 		WIRELINK = wlwrap,
-		ENTITY = ewrap,
+		ENTITY = owrap,
 
 		TABLE = function(data)
 			local completed_tables = {}
@@ -147,7 +147,7 @@ SF.AddHook("postload", function()
 		ARRAY = function(tbl)
 			local ret = {}
 			for i, v in ipairs(tbl) do
-				ret[i] = SF.WrapObject(v)
+				ret[i] = owrap(v)
 			end
 			return ret
 		end
@@ -181,7 +181,7 @@ SF.AddHook("postload", function()
 		end,
 		ENTITY = function(data)
 			checktype(data, SF.Types["Entity"], 2)
-			return eunwrap(data)
+			return ounwrap(data)
 		end,
 		TABLE = function(data)
 			checkluatype(data, TYPE_TABLE, 2)
@@ -202,7 +202,7 @@ SF.AddHook("postload", function()
 						continue
 					end
 
-					value = SF.UnwrapObject(value) or value
+					value = instance.UnwrapObject(value) or value
 					local vtyp = TypeID(value)
 					local convert = typeToE2Type[vtyp]
 
@@ -224,7 +224,7 @@ SF.AddHook("postload", function()
 		ARRAY = function(data)
 			local ret = {}
 			for i, v in ipairs(data) do
-				local obj = SF.UnwrapObject(v)
+				local obj = instance.UnwrapObject(v)
 				if obj then
 					local typ = typeToE2Type[TypeID(obj)]
 					ret[i] = typ and typ[1](obj)
@@ -270,10 +270,10 @@ local sfTypeToWireTypeTable = {
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs (names, types)
-	checkpermission(SF.instance, nil, "wire.setInputs")
+	checkpermission(instance, nil, "wire.setInputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
 
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
@@ -298,10 +298,10 @@ end
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs (names, types)
-	checkpermission(SF.instance, nil, "wire.setOutputs")
+	checkpermission(instance, nil, "wire.setOutputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
 
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
@@ -334,7 +334,7 @@ end
 
 --- Returns the wirelink representing this entity.
 function wire_library.self()
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity", 2) end
 	return wlwrap(ent)
 end
@@ -373,14 +373,14 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	end
 	material = ValidWireMat[material] and material or "cable/rope"
 
-	local entI = eunwrap(entI)
-	local entO = eunwrap(entO)
+	local entI = ounwrap(entI)
+	local entO = ounwrap(entO)
 
 	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
 	if not (entO and entO:IsValid()) then SF.Throw("Invalid target") end
 
-	checkpermission(SF.instance, entI, "wire.createWire")
-	checkpermission(SF.instance, entO, "wire.createWire")
+	checkpermission(instance, entI, "wire.createWire")
+	checkpermission(instance, entO, "wire.createWire")
 
 	if not entI.Inputs then SF.Throw("Source has no valid inputs") end
 
@@ -397,8 +397,8 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	if not entI.Inputs[inputname] then SF.Throw("Invalid source input: " .. inputname) end
 	if not entO.Outputs[outputname] then SF.Throw("Invalid source output: " .. outputname) end
 
-	WireLib.Link_Start(SF.instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
-	WireLib.Link_End(SF.instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, SF.instance.player)
+	WireLib.Link_Start(instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
+	WireLib.Link_End(instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, instance.player)
 end
 
 --- Unwires an entity's input
@@ -408,11 +408,11 @@ function wire_library.delete (entI, inputname)
 	checktype(entI, SF.Types["Entity"])
 	checkluatype(inputname, TYPE_STRING)
 
-	local entI = eunwrap(entI)
+	local entI = ounwrap(entI)
 
 	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
 
-	checkpermission(SF.instance, entI, "wire.deleteWire")
+	checkpermission(instance, entI, "wire.deleteWire")
 
 	if not entI.Inputs or not entI.Inputs[inputname] then SF.Throw("Entity does not have input: " .. inputname) end
 	if not entI.Inputs[inputname].Src then SF.Throw("Input \"" .. inputname .. "\" is not wired") end
@@ -424,10 +424,10 @@ local function parseEntity(ent, io)
 
 	if ent then
 		checktype(ent, SF.Types["Entity"])
-		ent = eunwrap(ent)
-		checkpermission(SF.instance, ent, "wire.get" .. io)
+		ent = ounwrap(ent)
+		checkpermission(instance, ent, "wire.get" .. io)
 	else
-		ent = SF.instance.data.entity or nil
+		ent = instance.data.entity or nil
 	end
 
 	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
@@ -461,12 +461,12 @@ end
 -- @return Wirelink of the entity
 function wire_library.getWirelink (ent)
 	checktype(ent, SF.Types["Entity"])
-	ent = eunwrap(ent)
+	ent = ounwrap(ent)
 	if not ent:IsValid() then return end
-	checkpermission(SF.instance, ent, "wire.wirelink")
+	checkpermission(instance, ent, "wire.wirelink")
 
 	if not ent.extended then
-		WireLib.CreateWirelinkOutput(SF.instance.player, ent, { true })
+		WireLib.CreateWirelinkOutput(instance.player, ent, { true })
 	end
 
 	return wlwrap(ent)
@@ -476,7 +476,7 @@ end
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
 wirelink_metatable.__index = function(self, k)
-	checkpermission(SF.instance, nil, "wire.wirelink.read")
+	checkpermission(instance, nil, "wire.wirelink.read")
 	checktype(self, wirelink_metatable)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
@@ -496,7 +496,7 @@ end
 
 --- Writes to an input.
 wirelink_metatable.__newindex = function(self, k, v)
-	checkpermission(SF.instance, nil, "wire.wirelink.write")
+	checkpermission(instance, nil, "wire.wirelink.write")
 	checktype(self, wirelink_metatable)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
@@ -538,7 +538,7 @@ end
 --- Returns the entity that the wirelink represents
 function wirelink_methods:entity()
 	checktype(self, wirelink_metatable)
-	return ewrap(wlunwrap(self))
+	return owrap(wlunwrap(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
@@ -605,7 +605,7 @@ function wirelink_methods:getWiredTo(name)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then
-		return ewrap(input.Src)
+		return owrap(input.Src)
 	end
 end
 
@@ -624,10 +624,10 @@ function wirelink_methods:getWiredToName(name)
 end
 
 -- ------------------------- Ports Metatable ------------------------- --
-local wire_ports_methods, wire_ports_metamethods = SF.RegisterType("Ports")
+local wire_ports_methods, wire_ports_metamethods = instance:RegisterType("Ports")
 
 function wire_ports_metamethods:__index(name)
-	local data = SF.instance.data
+	local data = instance.data
 	local input = data.entity.Inputs[name]
 	if input then
 		if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
@@ -641,7 +641,7 @@ end
 function wire_ports_metamethods:__newindex(name, value)
 	checkluatype(name, TYPE_STRING)
 
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	local output = ent.Outputs[name]
 	if output then
 		Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))

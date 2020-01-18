@@ -4,12 +4,12 @@
 -- @shared
 local coroutine_library = SF.RegisterLibrary("coroutine")
 local coroutine = coroutine
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-local _, thread_metamethods = SF.RegisterType("thread")
-local wrap, unwrap = SF.CreateWrapper(thread_metamethods, true, false)
+local _, thread_metamethods = instance:RegisterType("thread")
+local wrap, unwrap = instance:CreateWrapper(thread_metamethods, true, false)
 
 SF.Coroutine = {}
 SF.Coroutine.Methods = _
@@ -17,11 +17,11 @@ SF.Coroutine.Metatable = thread_metamethods
 SF.Coroutine.Wrap = wrap
 SF.Coroutine.Unwrap = unwrap
 
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })
 end)
 
-SF.AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function(instance)
 	for thread, wrapped in pairs(instance.data.coroutines) do
 		local unwrapped = unwrap(wrapped)
 		unwrapped.thread = nil
@@ -36,7 +36,7 @@ local function createCoroutine (func)
 	local curthread = coroutine.running()
 	local stacklevel
 	if curthread then
-		stacklevel = unwrap(SF.instance.data.coroutines[curthread]).stacklevel + 1
+		stacklevel = unwrap(instance.data.coroutines[curthread]).stacklevel + 1
 		if stacklevel == 100 then SF.Throw("Coroutine stack overflow!", 1) end
 	else
 		stacklevel = 0
@@ -49,7 +49,7 @@ local function createCoroutine (func)
 
 	local wrappedThread = wrap({ thread = thread, func = wrappedFunc, stacklevel = stacklevel })
 
-	SF.instance.data.coroutines[thread] = wrappedThread
+	instance.data.coroutines[thread] = wrappedThread
 
 	return wrappedFunc, wrappedThread
 end
@@ -87,7 +87,7 @@ end
 -- @return Any values passed to the coroutine
 function coroutine_library.yield (...)
 	local curthread = coroutine.running()
-	if curthread and SF.instance.data.coroutines[curthread] then
+	if curthread and instance.data.coroutines[curthread] then
 		return coroutine.yield(...)
 	else
 		SF.Throw("attempt to yield across C-call boundary", 2)
@@ -107,14 +107,14 @@ end
 -- @return Currently running coroutine
 function coroutine_library.running ()
 	local thread = coroutine.running()
-	return SF.instance.data.coroutines[thread]
+	return instance.data.coroutines[thread]
 end
 
 --- Suspends the coroutine for a number of seconds. Note that the coroutine will not resume automatically, but any attempts to resume the coroutine while it is waiting will not resume the coroutine and act as if the coroutine suspended itself immediately.
 -- @param time Time in seconds to suspend the coroutine
 function coroutine_library.wait (time)
 	local curthread = coroutine.running()
-	if curthread and SF.instance.data.coroutines[curthread] then
+	if curthread and instance.data.coroutines[curthread] then
 		checkluatype (time, TYPE_NUMBER)
 		coroutine.wait(time)
 	else

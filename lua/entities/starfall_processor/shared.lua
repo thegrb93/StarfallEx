@@ -42,7 +42,7 @@ function ENT:Compile()
 
 
 	self.instance = instance
-	instance.runOnError = function(inst, ...)
+	instance.runOnError = function(instance, ...)
 		-- Have to make sure it's valid because the chip can be deleted before deinitialization and trigger errors
 		if self:IsValid() then
 			self:Error(...)

@@ -1,5 +1,5 @@
 SF.Mesh = {}
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -8,7 +8,7 @@ local checkpermission = SF.Permissions.check
 local mesh_library = SF.RegisterLibrary("mesh")
 
 local thread_lib
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	thread_lib = SF.Libraries.coroutine
 end)
 
@@ -166,8 +166,8 @@ end
 if CLIENT then
 	--- Mesh type
 	-- @client
-	local mesh_methods, mesh_metamethods = SF.RegisterType("Mesh")
-	local wrap, unwrap = SF.CreateWrapper(mesh_metamethods, true, false)
+	local mesh_methods, mesh_metamethods = instance:RegisterType("Mesh")
+	local wrap, unwrap = instance:CreateWrapper(mesh_metamethods, true, false)
 	SF.Mesh.Wrap = wrap
 	SF.Mesh.Unwrap = unwrap
 	SF.Mesh.Methods = mesh_methods
@@ -177,7 +177,7 @@ if CLIENT then
 	local col_meta, vec_meta
 	local vwrap, vunwrap, cwrap, cunwrap, tunwrap
 	local vertexCheck, vertexUnwrap
-	SF.AddHook("postload", function()
+	instance:AddHook("postload", function()
 		vec_meta = SF.Vectors.Metatable
 		col_meta = SF.Color.Metatable
 		thread_meta = SF.Coroutine.Metatable
@@ -223,15 +223,15 @@ if CLIENT then
 	end
 
 	-- Register functions to be called when the chip is initialised and deinitialised
-	SF.AddHook("initialize", function(inst)
-		inst.data.meshes = {}
+	instance:AddHook("initialize", function(instance)
+		instance.data.meshes = {}
 	end)
 
-	SF.AddHook("deinitialize", function(inst)
-		local meshes = inst.data.meshes
+	instance:AddHook("deinitialize", function(instance)
+		local meshes = instance.data.meshes
 		local mesh = next(meshes)
 		while mesh do
-			destroyMesh(inst.player, mesh, meshes)
+			destroyMesh(instance.player, mesh, meshes)
 			mesh = next(meshes)
 		end
 	end)
@@ -242,7 +242,7 @@ if CLIENT then
 	-- @return Mesh object
 	-- @client
 	function mesh_library.createFromTable(verteces, threaded)
-		checkpermission (SF.instance, nil, "mesh")
+		checkpermission (instance, nil, "mesh")
 		checkluatype (verteces, TYPE_TABLE)
 		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
 		local thread
@@ -252,7 +252,6 @@ if CLIENT then
 		if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
 		local ntriangles = nvertices / 3
 
-		local instance = SF.instance
 		plyTriangleCount:checkuse(instance.player, ntriangles)
 
 		local unwrapped = {}
@@ -290,7 +289,6 @@ if CLIENT then
 
 		if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
 
-		local instance = SF.instance
 		checkpermission (instance, nil, "mesh")
 
 		local vertices = SF.ParseObj(obj, thread, Vector, triangulate)
@@ -334,8 +332,8 @@ if CLIENT then
 	-- @return Number of triangles that can be created
 	-- @client
 	function mesh_library.trianglesLeft ()
-		if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
-			return plyTriangleCount:check(SF.instance.player)
+		if SF.Permissions.hasAccess(instance, nil, "mesh") then
+			return plyTriangleCount:check(instance.player)
 		else
 			return 0
 		end
@@ -345,8 +343,8 @@ if CLIENT then
 	-- @return Number of triangles that can be rendered
 	-- @client
 	function mesh_library.trianglesLeftRender ()
-		if SF.Permissions.hasAccess(SF.instance, nil, "mesh") then
-			return plyTriangleRenderBurst:check(SF.instance.player)
+		if SF.Permissions.hasAccess(instance, nil, "mesh") then
+			return plyTriangleRenderBurst:check(instance.player)
 		else
 			return 0
 		end
@@ -730,11 +728,11 @@ if CLIENT then
 	function mesh_methods:draw()
 		checktype(self, mesh_metamethods)
 		local mesh = unwrap(self)
-		local data = SF.instance.data
+		local data = instance.data
 		local meshdata = data.meshes[mesh]
 		if not meshdata then SF.Throw("Tried to use invalid mesh.", 2) end
 		if not data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-		plyTriangleRenderBurst:use(SF.instance.player, meshdata.ntriangles)
+		plyTriangleRenderBurst:use(instance.player, meshdata.ntriangles)
 		mesh:Draw()
 	end
 
@@ -743,7 +741,6 @@ if CLIENT then
 	function mesh_methods:destroy()
 		checktype(self, mesh_metamethods)
 		local mesh = unwrap(self)
-		local instance = SF.instance
 		if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
 		destroyMesh(instance.player, mesh, instance.data.meshes)
 	end

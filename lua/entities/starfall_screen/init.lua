@@ -27,8 +27,9 @@ function ENT:Use(activator)
 		end
 	end
 	
-	if self.link.instance then
-		self.link.instance:runScriptHook("starfallused", SF.WrapObject(activator), SF.WrapObject(self))
+	local instance = self.link.instance
+	if instance then
+		instance:runScriptHook("starfallused", instance.WrapObject(activator), instance.WrapObject(self))
 	end
 end
 

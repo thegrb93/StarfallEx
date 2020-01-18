@@ -4,25 +4,25 @@
 
 SF.Npcs = {}
 --- Npc type
-local npc_methods, npc_metamethods = SF.RegisterType("Npc")
+local npc_methods, npc_metamethods = instance:RegisterType("Npc")
 
 SF.Npcs.Methods = npc_methods
 SF.Npcs.Metatable = npc_metamethods
 
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
+local vwrap, vunwrap = instance.WrapObject, instance.UnwrapObject
 local wrap, unwrap, ents_metatable
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	wrap = SF.Entities.Wrap
 	unwrap = SF.Entities.Unwrap
 	ents_metatable = SF.Entities.Metatable
 
 	SF.ApplyTypeDependencies(npc_methods, npc_metamethods, ents_metatable)
-	wrap, unwrap = SF.CreateWrapper(npc_metamethods, true, false, debug.getregistry().NPC, ents_metatable)
+	wrap, unwrap = instance:CreateWrapper(npc_metamethods, true, false, debug.getregistry().NPC, ents_metatable)
 
 	SF.Npcs.Wrap = wrap
 	SF.Npcs.Unwrap = unwrap
@@ -48,7 +48,7 @@ if SERVER then
 		checktype(self, npc_metamethods)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:AddRelationship(str)
 	end
 
@@ -77,7 +77,7 @@ if SERVER then
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		if not target:IsValid() then SF.Throw("Target is invalid", 2) end
 		if not relation then SF.Throw("Invalid relationship specified") end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:AddEntityRelationship(target, relation, priority)
 	end
 
@@ -104,7 +104,7 @@ if SERVER then
 
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.giveweapon")
+		checkpermission(instance, npc, "npcs.giveweapon")
 
 		local weapon = npc:GetActiveWeapon()
 		if (weapon:IsValid()) then
@@ -125,7 +125,7 @@ if SERVER then
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		if not target:IsValid() then SF.Throw("Target is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:SetTarget(target)
 	end
 
@@ -145,7 +145,7 @@ if SERVER then
 		checktype(self, npc_metamethods)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:SetSchedule(SCHED_NONE)
 	end
 
@@ -155,7 +155,7 @@ if SERVER then
 		checktype(self, npc_metamethods)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:SetSchedule(SCHED_MELEE_ATTACK1)
 	end
 
@@ -165,7 +165,7 @@ if SERVER then
 		checktype(self, npc_metamethods)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:SetSchedule(SCHED_RANGE_ATTACK1)
 	end
 
@@ -176,7 +176,7 @@ if SERVER then
 		checktype(self, npc_metamethods)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:SetLastPosition(vunwrap(vec))
 		npc:SetSchedule(SCHED_FORCED_GO)
 	end
@@ -188,7 +188,7 @@ if SERVER then
 		checktype(self, npc_metamethods)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		checkpermission(SF.instance, npc, "npcs.modify")
+		checkpermission(instance, npc, "npcs.modify")
 		npc:SetLastPosition(vunwrap(vec))
 		npc:SetSchedule(SCHED_FORCED_GO_RUN)
 	end

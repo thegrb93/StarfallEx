@@ -1,4 +1,4 @@
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 -------------------------------------------------------------------------------
@@ -7,17 +7,17 @@ local checkpermission = SF.Permissions.check
 
 SF.Vehicles = {}
 --- Vehicle type
-local vehicle_methods, vehicle_metamethods = SF.RegisterType("Vehicle")
+local vehicle_methods, vehicle_metamethods = instance:RegisterType("Vehicle")
 
 SF.Vehicles.Methods = vehicle_methods
 SF.Vehicles.Metatable = vehicle_metamethods
 
 local wrap, unwrap, pwrap
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	pwrap = SF.Players.Wrap
 
 	SF.ApplyTypeDependencies(vehicle_methods, vehicle_metamethods, SF.Entities.Metatable)
-	wrap, unwrap = SF.CreateWrapper(vehicle_metamethods, true, false, debug.getregistry().Vehicle, SF.Entities.Metatable)
+	wrap, unwrap = instance:CreateWrapper(vehicle_metamethods, true, false, debug.getregistry().Vehicle, SF.Entities.Metatable)
 
 	SF.Vehicles.Wrap = wrap
 	SF.Vehicles.Unwrap = unwrap
@@ -79,7 +79,7 @@ if SERVER then
 		checktype(self, vehicle_metamethods)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		checkpermission(SF.instance, ent, "vehicle.kill")
+		checkpermission(instance, ent, "vehicle.kill")
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
 			driver:Kill()
@@ -94,7 +94,7 @@ if SERVER then
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		checkpermission(SF.instance, ent, "vehicle.strip")
+		checkpermission(instance, ent, "vehicle.strip")
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
 			if class then
@@ -111,7 +111,7 @@ if SERVER then
 		checktype(self, vehicle_metamethods)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		checkpermission(SF.instance, ent, "vehicle.lock")
+		checkpermission(instance, ent, "vehicle.lock")
 		local n = "SF_CanExitVehicle"..ent:EntIndex()
 		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
 		ent:CallOnRemove(n, function() hook.Remove("CanExitVehicle", n) end) 
@@ -124,7 +124,7 @@ if SERVER then
 		checktype(self, vehicle_metamethods)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		checkpermission(SF.instance, ent, "vehicle.lock")
+		checkpermission(instance, ent, "vehicle.lock")
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		ent:Fire("Unlock")
 	end

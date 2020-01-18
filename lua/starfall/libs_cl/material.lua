@@ -17,15 +17,15 @@ local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", 
 --- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
 --- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
 -- @client
-local material_methods, material_metamethods = SF.RegisterType("Material")
-local lmaterial_methods, lmaterial_metamethods = SF.RegisterType("LockedMaterial") --Material that can't be modified
-local wrap, unwrap = SF.CreateWrapper(material_metamethods, true, false)
-local lwrap, lunwrap = SF.CreateWrapper(lmaterial_metamethods, true, false, nil, material_metamethods)
+local material_methods, material_metamethods = instance:RegisterType("Material")
+local lmaterial_methods, lmaterial_metamethods = instance:RegisterType("LockedMaterial") --Material that can't be modified
+local wrap, unwrap = instance:CreateWrapper(material_metamethods, true, false)
+local lwrap, lunwrap = instance:CreateWrapper(lmaterial_metamethods, true, false, nil, material_metamethods)
 
 local vector_meta, col_meta, matrix_meta
 local vwrap, cwrap, mwrap, vunwrap, cunwrap, munwrap
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local dsetmeta = debug.setmetatable
@@ -40,7 +40,7 @@ SF.Materials.Methods = material_methods
 SF.Materials.Metatable = material_metamethods
 SF.Materials.LMetatable = lmaterial_metamethods
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vector_meta = SF.Vectors.Metatable
 	col_meta = SF.Color.Metatable
 	matrix_meta = SF.VMatrix.Metatable
@@ -89,16 +89,16 @@ cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
 end)
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function (inst)
-	inst.data.material = {
+instance:AddHook("initialize", function (instance)
+	instance.data.material = {
 		usermaterials = {}
 	}
 end)
 
-SF.AddHook("deinitialize", function (inst)
-	for k, v in pairs(inst.data.material.usermaterials) do
-		material_bank:free(inst.player, k)
-		inst.data.material.usermaterials[k] = nil
+instance:AddHook("deinitialize", function (instance)
+	for k, v in pairs(instance.data.material.usermaterials) do
+		material_bank:free(instance.player, k)
+		instance.data.material.usermaterials[k] = nil
 	end
 end)
 
@@ -119,7 +119,7 @@ end
 function material_library.load(path)
 	checkluatype(path, TYPE_STRING)
 	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
-	checkpermission(SF.instance, path, "material.load")
+	checkpermission(instance, path, "material.load")
 	local m = SF.CheckMaterial(path)
 	if not m or m:IsError() then SF.Throw("This material doesn't exist or is blacklisted", 2) end
 	return lwrap(m)
@@ -258,7 +258,6 @@ end
 --- Modulate_DX9
 function material_library.create(shader)
 	checkluatype(shader, TYPE_STRING)
-	local instance = SF.instance
 	checkpermission(instance, nil, "material.create")
 	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
 	local m = material_bank:use(instance.player, shader)
@@ -282,7 +281,7 @@ function material_library.createFromImage(path, params)
 		if not image_params[s] then SF.Throw("Invalid parameter: "..s, 2) end
 		paramlist[#paramlist + 1] = s
 	end
-	checkpermission(SF.instance, path, "material.imagecreate")
+	checkpermission(instance, path, "material.imagecreate")
 	local m = Material(path, table.concat(paramlist, " "))
 	if m:IsError() then SF.Throw("The material path is invalid", 2) end
 	return lwrap(m)
@@ -292,12 +291,11 @@ end
 function material_methods:destroy()
 	checktype(self, material_metamethods)
 
-	local instance = SF.instance
 	local m = unwrap(self)
 	if not m then SF.Throw("The material is already destroyed?", 2) end
 
 	local name = m:GetName()
-	local rt = SF.instance.data.render.rendertargets[name]
+	local rt = instance.data.render.rendertargets[name]
 	if rt then
 		instance.env.render.destroyRenderTarget(name)
 	end
@@ -685,7 +683,6 @@ function material_methods:setTextureURL(key, url, cb, done)
 	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
 	if done ~= nil then checkluatype(done, TYPE_FUNCTION) end
 
-	local instance = SF.instance
 	local m = unwrap(self)
 	local texture = m:GetTexture(key)
 	if not (texture and instance.data.render.validrendertargets[texture:GetName()]) then
@@ -744,7 +741,7 @@ function material_methods:setTextureRenderTarget(key, name)
 	checkkey(key)
 	checkluatype(name, TYPE_STRING)
 
-	local rt = SF.instance.data.render.rendertargets[name]
+	local rt = instance.data.render.rendertargets[name]
 	if not rt then SF.Throw("Invalid rendertarget: "..name, 2) end
 
 	local m = unwrap(self)

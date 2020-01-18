@@ -3,7 +3,7 @@
 -- @shared
 local props_library = SF.RegisterLibrary("prop")
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -22,11 +22,11 @@ local plyVertexCount = SF.LimitObject("props_custom_vertices", "custom prop vert
 local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.props = {props = {}}
 end)
 
-SF.AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function(instance)
 	if instance.data.props.clean ~= false then --Return true on nil too
 		for prop, _ in pairs(instance.data.props.props) do
 			prop:Remove()
@@ -35,7 +35,7 @@ SF.AddHook("deinitialize", function(instance)
 end)
 
 local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 	ang_meta = SF.Angles.Metatable
 
@@ -62,7 +62,7 @@ end
 -- @return The prop object
 function props_library.create(pos, ang, model, frozen)
 
-	checkpermission(SF.instance, nil, "prop.create")
+	checkpermission(instance, nil, "prop.create")
 
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
@@ -72,7 +72,6 @@ function props_library.create(pos, ang, model, frozen)
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
 
-	local instance = SF.instance
 	local ply = instance.player
 
 
@@ -125,9 +124,8 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	checkluatype(vertices, TYPE_TABLE)
 	frozen = frozen and true or false
 
-	checkpermission(SF.instance, nil, "prop.createCustom")
+	checkpermission(instance, nil, "prop.createCustom")
 
-	local instance = SF.instance
 	local ply = instance.player
 
 	plyPropBurst:use(ply, 1)
@@ -224,7 +222,7 @@ local allowed_components = {
 -- @server
 -- @return Component entity
 function props_library.createComponent (pos, ang, class, model, frozen)
-	checkpermission(SF.instance,  nil, "prop.create")
+	checkpermission(instance,  nil, "prop.create")
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checkluatype(class, TYPE_STRING)
@@ -234,7 +232,6 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
 
-	local instance = SF.instance
 	local ply = instance.player
 	local propdata = instance.data.props
 
@@ -287,7 +284,7 @@ end
 -- @return The sent object
 function props_library.createSent (pos, ang, class, frozen)
 
-	checkpermission(SF.instance,  nil, "prop.create")
+	checkpermission(instance,  nil, "prop.create")
 
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
@@ -297,7 +294,6 @@ function props_library.createSent (pos, ang, class, frozen)
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 
-	local instance = SF.instance
 	local ply = instance.player
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -449,7 +445,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		register(entity, instance)
 
-		return SF.WrapObject(entity)
+		return instance.WrapObject(entity)
 	end
 end
 
@@ -457,7 +453,6 @@ end
 -- @server
 -- @return True if user can spawn props, False if not.
 function props_library.canSpawn()
-	local instance = SF.instance
 	if not SF.Permissions.hasAccess(instance, nil, "prop.create") then return false end
 	return plyCount:check(instance.player) > 0 and plyPropBurst:check(instance.player) >= 1
 end
@@ -466,7 +461,6 @@ end
 -- @server
 -- @return number of props able to be spawned
 function props_library.propsLeft()
-	local instance = SF.instance
 	if not SF.Permissions.hasAccess(instance,  nil, "prop.create") then return 0 end
 	return math.min(plyCount:check(instance.player), plyPropBurst:check(instance.player))
 end
@@ -483,11 +477,11 @@ end
 --- Sets whether the chip should remove created props when the chip is removed
 -- @param on Boolean whether the props should be cleaned or not
 function props_library.setPropClean(on)
-	SF.instance.data.props.clean = on
+	instance.data.props.clean = on
 end
 
 --- Sets whether the props should be undo-able
 -- @param on Boolean whether the props should be undo-able
 function props_library.setPropUndo(on)
-	SF.instance.data.props.undo = on
+	instance.data.props.undo = on
 end

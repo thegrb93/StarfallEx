@@ -2,9 +2,9 @@ SF.Effects = {}
 
 --- Effect type
 -- @shared
-local effect_methods, effect_metamethods = SF.RegisterType("Effect")
-local wrap, unwrap = SF.CreateWrapper(effect_metamethods, true, false)
-local checktype = SF.CheckType
+local effect_methods, effect_metamethods = instance:RegisterType("Effect")
+local wrap, unwrap = instance:CreateWrapper(effect_metamethods, true, false)
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -16,7 +16,7 @@ SF.Effects.Metatable = effect_metamethods
 local ang_meta, vec_meta, col_meta, ent_meta
 local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, ewrap, eunwrap
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 	ent_meta = SF.Entities.Metatable
@@ -50,7 +50,7 @@ end
 --- Returns number of effects able to be created
 -- @return number of effects able to be created
 function effect_library.effectsLeft()
-	return SF.instance.data.effects.burst:check()
+	return instance.data.effects.burst:check()
 end
 
 local effect_blacklist = {
@@ -63,7 +63,6 @@ function effect_methods:play(eff)
 	checktype(self, effect_metamethods)
 	checkluatype(eff, TYPE_STRING)
 	
-	local instance = SF.instance
 	checkpermission(instance, nil, "effect.play")
 	plyEffectBurst:use(instance.player, 1)
 	

@@ -4,24 +4,23 @@
 
 SF.Players = {}
 --- Player type
-local player_methods, player_metamethods = SF.RegisterType("Player")
+local player_methods, player_metamethods = instance:RegisterType("Player")
 
-local vwrap = SF.WrapObject
-local checktype = SF.CheckType
+local owrap = instance.WrapObject
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 SF.Players.Methods = player_methods
 SF.Players.Metatable = player_metamethods
 
-local wrap, unwrap, owrap, ents_metatable
+local wrap, unwrap, ents_metatable
 
-SF.AddHook("postload", function()
-	owrap = SF.WrapObject
+instance:AddHook("postload", function()
 	ents_metatable = SF.Entities.Metatable
 
 	SF.ApplyTypeDependencies(player_methods, player_metamethods, ents_metatable)
-	wrap, unwrap = SF.CreateWrapper(player_metamethods, true, false, debug.getregistry().Player, ents_metatable)
+	wrap, unwrap = instance:CreateWrapper(player_metamethods, true, false, debug.getregistry().Player, ents_metatable)
 
 	SF.Players.Wrap = wrap
 	SF.Players.Unwrap = unwrap
@@ -171,7 +170,7 @@ end
 function player_methods:getAimVector ()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	return ent and vwrap(ent:GetAimVector())
+	return ent and owrap(ent:GetAimVector())
 end
 
 --- Returns the player's field of view
@@ -226,7 +225,7 @@ end
 function player_methods:getShootPos ()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	return ent and vwrap(ent:GetShootPos())
+	return ent and owrap(ent:GetShootPos())
 end
 
 --- Returns whether the player is in a vehicle
@@ -388,9 +387,9 @@ end
 -- @shared
 -- @return table trace data https://wiki.garrysmod.com/page/Structures/TraceResult
 function player_methods:getEyeTrace ()
-	checkpermission(SF.instance, nil, "trace")
+	checkpermission(instance, nil, "trace")
 
-	return SF.StructWrapper(unwrap(self):GetEyeTrace())
+	return SF.StructWrapper(instance, unwrap(self):GetEyeTrace())
 end
 
 --- Returns the player's current view entity
@@ -458,7 +457,7 @@ function player_methods:isSprinting()
 end
 
 if SERVER then
-	SF.AddHook("deinitialize", function(instance)
+	instance:AddHook("deinitialize", function(instance)
 		for k, pl in pairs(player.GetAll()) do
 			if pl.sfhudenabled and pl.sfhudenabled.link == instance.data.entity then
 				pl:SetViewEntity()
@@ -478,7 +477,7 @@ if SERVER then
 			if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity", 2) end
 		end
 
-		if (pl.sfhudenabled and pl.sfhudenabled:IsValid()) and pl.sfhudenabled.link == SF.instance.data.entity then
+		if (pl.sfhudenabled and pl.sfhudenabled:IsValid()) and pl.sfhudenabled.link == instance.data.entity then
 			pl:SetViewEntity(ent)
 		end
 	end

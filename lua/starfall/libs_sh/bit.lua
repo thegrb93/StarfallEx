@@ -21,7 +21,7 @@ bit_library.tohex = bit.tohex
 local checkluatype = SF.CheckLuaType
 
 --- StringStream type
-local ss_methods, ss_metamethods = SF.RegisterType("StringStream")
+local ss_methods, ss_metamethods = instance:RegisterType("StringStream")
 
 --- Creates a StringStream object
 --@param stream A string to set the initial buffer to (default "")

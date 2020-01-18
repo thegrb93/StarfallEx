@@ -191,7 +191,7 @@ end
 --	Yeah, ton of parameters.
 function s_anyVariable(data, lastType, isNumeric, isKey, isLast, jobstate)
 
-	local unwrap = SF.UnwrapObject(data)
+	local unwrap = instance.UnwrapObject(data)
 	if unwrap then data = unwrap end
 
 	local tp = type(data)
@@ -603,7 +603,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 			a = find(s, "[;:}~]", i)
 
 			if a then
-				return SF.WrapObject(Entity(tonumber(sub(s, i, a - 1)))), a - 1
+				return instance.WrapObject(Entity(tonumber(sub(s, i, a - 1)))), a - 1
 			end
 
 			SF.Throw("vON: Entity ID definition started... Found no end.", 3)

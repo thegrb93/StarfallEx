@@ -3,7 +3,7 @@
 -------------------------------------------------------------------------------
 
 local net = net
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -15,7 +15,7 @@ local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net 
 SF.NetBurst = netBurst
 
 local instances = {}
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.net = {
 		started = false,
 		size = 0,
@@ -24,7 +24,7 @@ SF.AddHook("initialize", function(instance)
 	}
 end)
 
-SF.AddHook("cleanup", function (instance)
+instance:AddHook("cleanup", function (instance)
 	instance.data.net.started = false
 	instance.data.net.data = {}
 end)
@@ -43,7 +43,6 @@ end
 -- @param name The message name
 function net_library.start(name)
 	checkluatype (name, TYPE_STRING)
-	local instance = SF.instance
 	if instance.data.net.started then SF.Throw("net message was already started", 2) end
 
 	instance.data.net.started = true
@@ -59,7 +58,6 @@ end
 --@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send (target, unreliable)
 	if unreliable then checkluatype (unreliable, TYPE_BOOL) end
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	netBurst:use(instance.player, instance.data.net.size)
@@ -67,7 +65,7 @@ function net_library.send (target, unreliable)
 	local data = instance.data.net.data
 	if #data == 0 then return false end
 	net.Start("SF_netmessage", unreliable)
-	net.WriteEntity(SF.instance.data.entity)
+	net.WriteEntity(instance.data.entity)
 	for i = 1, #data do
 		data[i][1](unpack(data[i][2]))
 	end
@@ -118,10 +116,9 @@ local netTypeSizes = {
 -- @shared
 -- @param v The object to write
 function net_library.writeType(v)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	v = SF.UnwrapObject(v) or v
+	v = instance.UnwrapObject(v) or v
 
 	local typeid = nil
 
@@ -158,7 +155,7 @@ function net_library.readType()
 		local rv = net.ReadVars[typeid]
 		if rv then
 			local v = rv()
-			return SF.WrapObject(v) or v
+			return instance.WrapObject(v) or v
 		end
 	end
 
@@ -194,7 +191,6 @@ end
 -- @param t The string to be written
 
 function net_library.writeString(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_STRING)
@@ -217,7 +213,6 @@ end
 -- @param n How much of the string to write
 
 function net_library.writeData(t, n)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_STRING)
@@ -243,7 +238,6 @@ end
 -- @shared
 -- @param str The string to be written
 function net_library.writeStream(str)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (str, TYPE_STRING)
@@ -256,7 +250,6 @@ end
 -- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
-	local instance = SF.instance
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
 	
 	streams[instance.player] = net.ReadStream((SERVER and instance.player or nil), function(data)
@@ -268,7 +261,6 @@ end
 --- Cancels a currently running readStream
 -- @shared
 function net_library.cancelStream()
-	local instance = SF.instance
 	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
 	streams[instance.player]:Remove()
 end
@@ -277,7 +269,6 @@ end
 -- @shared
 -- @return The progress ratio 0-1
 function net_library.getStreamProgress()
-	local instance = SF.instance
 	if not streams[instance.player] then SF.Throw("Not currently reading a stream.", 2) end
 	return streams[instance.player]:GetProgress()
 end
@@ -288,7 +279,6 @@ end
 -- @param n The amount of bits the integer consists of
 
 function net_library.writeInt(t, n)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_NUMBER)
@@ -315,7 +305,6 @@ end
 -- @param n The amount of bits the integer consists of. Should not be greater than 32
 
 function net_library.writeUInt(t, n)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_NUMBER)
@@ -341,7 +330,6 @@ end
 -- @param t The bit to be written. (0 for false, 1 (or anything) for true)
 
 function net_library.writeBit(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_NUMBER)
@@ -363,7 +351,6 @@ end
 -- @param t The bit to be written. (boolean)
 
 function net_library.writeBool(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_BOOL)
@@ -385,7 +372,6 @@ end
 -- @param t The double to be written
 
 function net_library.writeDouble(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_NUMBER)
@@ -407,7 +393,6 @@ end
 -- @param t The float to be written
 
 function net_library.writeFloat(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (t, TYPE_NUMBER)
@@ -429,7 +414,6 @@ end
 -- @param t The angle to be written
 
 function net_library.writeAngle(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checktype(t, SF.Types["Angle"])
@@ -451,7 +435,6 @@ end
 -- @param t The vector to be written
 
 function net_library.writeVector(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checktype(t, SF.Types["Vector"])
@@ -473,7 +456,6 @@ end
 -- @param t The matrix to be written
 
 function net_library.writeMatrix(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checktype(t, SF.Types["VMatrix"])
@@ -495,7 +477,6 @@ end
 -- @param t The color to be written
 
 function net_library.writeColor(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checktype(t, SF.Types["Color"])
@@ -517,7 +498,6 @@ end
 -- @param t The entity to be written
 
 function net_library.writeEntity(t)
-	local instance = SF.instance
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checktype(t, SF.Types["Entity"])
@@ -531,7 +511,7 @@ end
 -- @return The entity that was read
 
 function net_library.readEntity()
-	return SF.WrapObject(net.ReadEntity())
+	return instance.WrapObject(net.ReadEntity())
 end
 
 --- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.
@@ -541,25 +521,25 @@ end
 function net_library.receive(name, func)
 	checkluatype (name, TYPE_STRING)
 	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
-	SF.instance.data.net.receives[name] = func
+	instance.data.net.receives[name] = func
 end
 
 --- Returns available bandwidth in bytes
 -- @return number of bytes that can be sent
 function net_library.getBytesLeft()
-	return math.floor((netBurst:check(SF.instance.player) - SF.instance.data.net.size)/8)
+	return math.floor((netBurst:check(instance.player) - instance.data.net.size)/8)
 end
 
 --- Returns available bandwidth in bits
 -- @return number of bits that can be sent
 function net_library.getBitsLeft()
-	return math.floor(netBurst:check(SF.instance.player) - SF.instance.data.net.size) -- Flooring, because the value can be decimal
+	return math.floor(netBurst:check(instance.player) - instance.data.net.size) -- Flooring, because the value can be decimal
 end
 
 --- Returns whether or not the library is currently reading data from a stream
 -- @return Boolean
 function net_library.isStreaming()
-	return streams[SF.instance.player] ~= nil
+	return streams[instance.player] ~= nil
 end
 
 net.Receive("SF_netmessage", function(len, ply)
@@ -567,7 +547,7 @@ net.Receive("SF_netmessage", function(len, ply)
 	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
 		local name = net.ReadString()
 		len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
-		if ply then ply = SF.WrapObject(ply) end
+		if ply then ply = instance.WrapObject(ply) end
 
 		local recv = ent.instance.data.net.receives[name]
 		if recv then

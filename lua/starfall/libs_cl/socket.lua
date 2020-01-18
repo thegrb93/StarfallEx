@@ -11,7 +11,7 @@ end
 -- @client
 local socket_library = SF.RegisterLibrary("socket")
 
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	if LocalPlayer() == instance.player then
 		instance.env.socket = socket
 	end

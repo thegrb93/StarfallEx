@@ -2,9 +2,9 @@ SF.Sounds = {}
 
 --- Sound type
 -- @shared
-local sound_methods, sound_metamethods = SF.RegisterType("Sound")
-local wrap, unwrap = SF.CreateWrapper(sound_metamethods, true, false)
-local checktype = SF.CheckType
+local sound_methods, sound_metamethods = instance:RegisterType("Sound")
+local wrap, unwrap = instance:CreateWrapper(sound_metamethods, true, false)
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -42,11 +42,11 @@ local function deleteSound(ply, ent, sound)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.sounds = {sounds = {}}
 end)
 
-SF.AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function(instance)
 	for s, ent in pairs(instance.data.sounds.sounds) do
 		deleteSound(instance.player, ent, s)
 	end
@@ -62,14 +62,13 @@ function sound_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
 
-	local instance = SF.instance
 	checkpermission(instance, { ent, path }, "sound.create")
 
 	if path:match('["?]') then
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 
-	local e = SF.UnwrapObject(ent)
+	local e = instance.UnwrapObject(ent)
 	if not (e or e:IsValid()) then
 		SF.Throw("Invalid Entity", 2)
 	end
@@ -95,27 +94,27 @@ end
 --- Returns if a sound is able to be created
 -- @return If it is possible to make a sound
 function sound_library.canCreate()
-	return plyCount:check(SF.instance.player) > 0 and plySoundBurst:check(SF.instance.player) >= 1
+	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1
 end
 
 --- Returns the number of sounds left that can be created
 -- @return The number of sounds left
 function sound_library.soundsLeft()
-	return math.min(plyCount:check(SF.instance.player), plySoundBurst:check(SF.instance.player))
+	return math.min(plyCount:check(instance.player), plySoundBurst:check(instance.player))
 end
 
 --------------------------------------------------
 
 --- Starts to play the sound.
 function sound_methods:play()
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 	unwrap(self):Play()
 end
 
 --- Stops the sound from being played.
 -- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
 function sound_methods:stop(fade)
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 	if fade then
 		checkluatype(fade, TYPE_NUMBER)
 		unwrap(self):FadeOut(math.max(fade, 0))
@@ -127,9 +126,9 @@ end
 --- Removes the sound from the game so new one can be created if limit is reached
 function sound_methods:destroy()
 	local snd = unwrap(self)
-	local sounds = SF.instance.data.sounds.sounds
+	local sounds = instance.data.sounds.sounds
 	if snd and sounds[snd] then
-		deleteSound(SF.instance.player, sounds[snd], snd)
+		deleteSound(instance.player, sounds[snd], snd)
 		sounds[snd] = nil
 		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(sound_metamethods)
 		sensitive2sf[snd] = nil
@@ -144,7 +143,7 @@ end
 -- @param vol Volume to set to, between 0 and 1.
 -- @param fade Time in seconds to transition to this new volume.
 function sound_methods:setVolume(vol, fade)
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 	checkluatype(vol, TYPE_NUMBER)
 
 	if fade then
@@ -162,7 +161,7 @@ end
 -- @param pitch Pitch to set to, between 0 and 255.
 -- @param fade Time in seconds to transition to this new pitch.
 function sound_methods:setPitch(pitch, fade)
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 	checkluatype(pitch, TYPE_NUMBER)
 
 	if fade then
@@ -184,7 +183,7 @@ end
 --- Sets the sound level in dB.
 -- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel(level)
-	checkpermission(SF.instance, nil, "sound.modify")
+	checkpermission(instance, nil, "sound.modify")
 	checkluatype(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end

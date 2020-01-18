@@ -2,9 +2,9 @@ SF.Light = {}
 
 --- Light type
 -- @client
-local light_methods, light_metamethods = SF.RegisterType("Light")
-local wrap, unwrap = SF.CreateWrapper(light_metamethods, true, false)
-local checktype = SF.CheckType
+local light_methods, light_metamethods = instance:RegisterType("Light")
+local wrap, unwrap = instance:CreateWrapper(light_metamethods, true, false)
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -20,7 +20,7 @@ SF.Light.Metatable = light_metamethods
 local vec_meta, col_meta
 local vwrap, vunwrap, cwrap, cunwrap
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 	col_meta = SF.Color.Metatable
 
@@ -92,12 +92,12 @@ local function processLights(curtime)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function(inst)
-	inst.data.light = {lights={}}
+instance:AddHook("initialize", function(instance)
+	instance.data.light = {lights={}}
 end)
 
-SF.AddHook("deinitialize", function(inst)
-	local lights = inst.data.light.lights
+instance:AddHook("deinitialize", function(instance)
+	local lights = instance.data.light.lights
 	for light, _ in pairs(lights) do
 		gSFLights[light.slot] = nil
 	end
@@ -110,9 +110,9 @@ end)
 -- @param color The color of the light
 -- @return Dynamic light
 function light_library.create(pos, size, brightness, color)
-	if table.Count(SF.instance.data.light.lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
+	if table.Count(instance.data.light.lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
-	checkpermission(SF.instance, nil, "light.create")
+	checkpermission(instance, nil, "light.create")
 	checktype(pos, vec_meta)
 	checkluatype(size, TYPE_NUMBER)
 	checkluatype(brightness, TYPE_NUMBER)
@@ -127,7 +127,7 @@ function light_library.create(pos, size, brightness, color)
 		dietime = 1
 	}
 
-	SF.instance.data.light.lights[light] = true
+	instance.data.light.lights[light] = true
 	gSFLights[slot] = light
 
 	return wrap(light)

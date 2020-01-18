@@ -107,12 +107,12 @@ local cam = cam
 local dgetmeta = debug.getmetatable
 local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta, mat_meta, mat_meta2
 local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap, maunwrap
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local COLOR_WHITE = Color(255, 255, 255)
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vector_meta = SF.Vectors.Metatable
 	matrix_meta = SF.VMatrix.Metatable
 	col_meta = SF.Color.Metatable
@@ -147,14 +147,14 @@ SF.AddHook("postload", function()
 	end
 
 	local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {SF.WrapObject(pos), SF.WrapObject(ang), fov, znear, zfar}
+		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {instance.WrapObject(pos), instance.WrapObject(ang), fov, znear, zfar}
 	end
 
 	local function returnCalcview(instance, tbl)
 		local rt = tbl[2]
 		if istable(rt) then
-			rt.origin = SF.UnwrapObject(rt.origin)
-			rt.angles = SF.UnwrapObject(rt.angles)
+			rt.origin = instance.UnwrapObject(rt.origin)
+			rt.angles = instance.UnwrapObject(rt.angles)
 			return rt
 		end
 	end
@@ -254,12 +254,12 @@ local renderhooks = {
 	postdrawhud = prepareRender,
 }
 
-SF.AddHook("prepare", function (instance, hook)
+instance:AddHook("prepare", function (instance, hook)
 	local renderPrepare = renderhooks[hook]
 	if renderPrepare then renderPrepare(instance.data.render) end
 end)
 
-SF.AddHook("cleanup", function (instance, hook)
+instance:AddHook("cleanup", function (instance, hook)
 	if renderhooks[hook] then
 		render.SetStencilEnable(false)
 		render.OverrideBlend(false)
@@ -308,14 +308,14 @@ SF.AddHook("cleanup", function (instance, hook)
 	end
 end)
 
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function(instance)
 	instance.data.render = {}
 	instance.data.render.renderedViews = 0
 	instance.data.render.rendertargets = {}
 	instance.data.render.validrendertargets = {}
 end)
 
-SF.AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function (instance)
 	for k, v in pairs(instance.data.render.rendertargets) do
 		rt_bank:free(instance.player, v)
 		instance.data.render.rendertargets[k] = nil
@@ -393,7 +393,7 @@ local defaultFont
 -- @param enable true to enable, false to disable
 function render_library.setStencilEnable(enable)
 	enable = (enable == true) -- Make sure it's a boolean
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 	render.SetStencilEnable(enable)
@@ -401,7 +401,7 @@ end
 
 --- Resets all values in the stencil buffer to zero.
 function render_library.clearStencil()
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 	render.ClearStencil()
 end
@@ -417,7 +417,7 @@ function render_library.clearBuffersObeyStencil(r, g, b, a, depth)
 	checkluatype (b, TYPE_NUMBER)
 	checkluatype (a, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.ClearBuffersObeyStencil(r, g, b, a, depth)
@@ -436,7 +436,7 @@ function render_library.clearStencilBufferRectangle(originX, originY, endX, endY
 	checkluatype (endY, TYPE_NUMBER)
 	checkluatype (stencilValue, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.ClearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
@@ -447,7 +447,7 @@ end
 function render_library.setStencilCompareFunction(compareFunction)
 	checkluatype (compareFunction, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilCompareFunction(compareFunction )
@@ -458,7 +458,7 @@ end
 function render_library.setStencilFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilFailOperation(operation)
@@ -469,7 +469,7 @@ end
 function render_library.setStencilPassOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilPassOperation(operation)
@@ -480,7 +480,7 @@ end
 function render_library.setStencilZFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilZFailOperation(operation)
@@ -491,7 +491,7 @@ end
 function render_library.setStencilReferenceValue(referenceValue)
 	checkluatype (referenceValue, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilReferenceValue(referenceValue)
@@ -502,7 +502,7 @@ end
 function render_library.setStencilTestMask(mask)
 	checkluatype (mask, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilTestMask(mask)
@@ -513,7 +513,7 @@ end
 function render_library.setStencilWriteMask(mask)
 	checkluatype (mask, TYPE_NUMBER)
 
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if renderdata.noStencil and not renderdata.usingRT then SF.Throw("Stencil operations must be used inside RenderTarget or HUD") end
 
 	render.SetStencilWriteMask(mask)
@@ -526,7 +526,7 @@ end
 -- @param world Should the transformation be relative to the screen or world?
 function render_library.pushMatrix(m, world)
 	checktype(m, matrix_meta)
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 
 	if world == nil then
 		world = renderdata.usingRT
@@ -555,7 +555,7 @@ end
 -- @param endX X end coordinate of the scissor rect.
 -- @param endX Y end coordinate of the scissor rect.
 function render_library.enableScissorRect(startX, startY, endX, endY)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (startX, TYPE_NUMBER)
 	checkluatype (startY, TYPE_NUMBER)
@@ -566,7 +566,7 @@ end
 
 --- Disables a scissoring rect which limits the drawing area.
 function render_library.disableScissorRect()
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	render.SetScissorRect(0 , 0 , 0 , 0, false)
 
@@ -574,7 +574,7 @@ end
 
 --- Pops a matrix from the matrix stack.
 function render_library.popMatrix()
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #matrix_stack <= 0 then SF.Throw("Popped too many matrices", 2) end
 	matrix_stack[#matrix_stack] = nil
@@ -593,7 +593,7 @@ local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 --- Pushes a perspective matrix onto the view matrix stack.
 -- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if #view_matrix_stack == MATRIX_STACK_LIMIT then SF.Throw("Pushed too many matrices", 2) end
 	checkluatype(tbl, TYPE_TABLE)
@@ -639,7 +639,7 @@ end
 
 --- Pops a view matrix from the matrix stack.
 function render_library.popViewMatrix()
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local i = #view_matrix_stack
 	if i == 0 then SF.Throw("Popped too many matrices", 2) end
@@ -652,14 +652,14 @@ end
 -- @param col Color of background
 -- @screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)
-	local renderdata = SF.instance.data.render
+	local renderdata = instance.data.render
 
 	checktype(col, col_meta)
 
 	if screen then
 		checktype(screen, ent_meta)
 		screen = eunwrap(screen)
-		if screen.link ~= SF.instance.data.entity then
+		if screen.link ~= instance.data.entity then
 			SF.Throw("Entity has to be linked!", 2)
 		end
 	else
@@ -680,7 +680,7 @@ end
 --- Sets the lighting mode
 -- @param mode The lighting mode. 0 - Default, 1 - Fullbright, 2 - Increased Fullbright
 function render_library.setLightingMode(mode)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mode ~= 0 and mode ~= 1 and mode ~= 2 then SF.Throw("Invalid mode.", 2) end
 	render.SetLightingMode(mode) 
@@ -714,7 +714,7 @@ end
 function render_library.createMaterial(tx, cb, done)
 	checkluatype (tx, TYPE_STRING)
 
-	local m = SF.instance.env.material.create("UnlitGeneric")
+	local m = instance.env.material.create("UnlitGeneric")
 	local _1, _2, prefix = tx:find("^(%w-):")
 	if prefix=="http" or prefix=="https" or prefix == "data" then
 		m:setTextureURL("$basetexture", tx, cb, done)
@@ -733,7 +733,7 @@ end
 --- Sets the current render material
 -- @param mat The material object
 function render_library.setMaterial(mat)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
 		local t = dgetmeta(mat)
@@ -752,7 +752,7 @@ end
 -- @param name The name of the render target
 function render_library.renderTargetExists(name)
 	checkluatype (name, TYPE_STRING)
-	return SF.instance.data.render.rendertargets[name] ~= nil
+	return instance.data.render.rendertargets[name] ~= nil
 end
 
 --- Creates a new render target to draw onto.
@@ -761,7 +761,6 @@ end
 function render_library.createRenderTarget (name)
 	checkluatype (name, TYPE_STRING)
 
-	local instance = SF.instance
 	local data = instance.data.render
 	if data.rendertargets[name] then SF.Throw("A rendertarget with this name already exists!", 2) end
 
@@ -776,7 +775,6 @@ end
 --- Releases the rendertarget. Required if you reach the maximum rendertargets.
 -- @param name Rendertarget name
 function render_library.destroyRenderTarget(name)
-	local instance = SF.instance
 	local data = instance.data.render
 	local rt = data.rendertargets[name]
 	if rt then
@@ -792,7 +790,7 @@ end
 -- Nil for the visible RT.
 -- @param name Name of the render target to use
 function render_library.selectRenderTarget (name)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name then
 		checkluatype (name, TYPE_STRING)
@@ -842,7 +840,7 @@ end
 -- Nil to reset.
 -- @param name Name of the render target to use
 function render_library.setRenderTargetTexture (name)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name == nil then
 		render.SetColorMaterial()
@@ -865,7 +863,7 @@ end
 --- Sets the texture of a screen entity
 -- @param ent Screen entity
 function render_library.setTextureFromScreen (ent)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	ent = eunwrap(ent)
 	if (ent and ent:IsValid()) and ent.GPU and ent.GPU.RT then
@@ -883,10 +881,10 @@ end
 -- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 function render_library.setFilterMag(val)
 	checkluatype (val, TYPE_NUMBER)
-	if SF.instance.data.render.changedFilterMag then
+	if instance.data.render.changedFilterMag then
 		render.PopFilterMag()
 	end
-	SF.instance.data.render.changedFilterMag = true
+	instance.data.render.changedFilterMag = true
 	render.PushFilterMag(val)
 end
 
@@ -894,17 +892,17 @@ end
 -- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 function render_library.setFilterMin(val)
 	checkluatype (val, TYPE_NUMBER)
-	if SF.instance.data.render.changedFilterMin then
+	if instance.data.render.changedFilterMin then
 		render.PopFilterMin()
 	end
-	SF.instance.data.render.changedFilterMin = true
+	instance.data.render.changedFilterMin = true
 	render.PushFilterMin(val)
 end
 
 --- Changes the cull mode
 -- @param mode Cull mode. 0 for counter clock wise, 1 for clock wise
 function render_library.setCullMode(mode)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 
 	render.CullMode(mode == 1 and 1 or 0)
 end
@@ -913,8 +911,8 @@ end
 -- @param clr Color type to clear with
 -- @param depth Boolean if should clear depth
 function render_library.clear (clr, depth)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	if SF.instance.data.render.usingRT then
+	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	if instance.data.render.usingRT then
 		if clr == nil then
 			render.Clear(0, 0, 0, 255, depth)
 		else
@@ -931,7 +929,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRoundedBox (r, x, y, w, h)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	draw.RoundedBox(r, x, y, w, h, currentcolor)
 end
 
@@ -946,7 +944,7 @@ end
 -- @param bl Boolean Bottom left corner
 -- @param br Boolean Bottom right corner
 function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
 
@@ -969,7 +967,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRectFast (x, y, w, h)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawRect(x, y, w, h)
 end
 
@@ -979,7 +977,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRect (x, y, w, h)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
 	render.SetColorMaterial()
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
@@ -991,7 +989,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawRectOutline (x, y, w, h)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawOutlinedRect(x, y, w, h)
 end
 
@@ -1000,7 +998,7 @@ end
 -- @param y Center y coordinate
 -- @param r Radius
 function render_library.drawCircle (x, y, r)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawCircle(x, y, r, currentcolor)
 end
 
@@ -1011,7 +1009,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRectFast (x, y, w, h)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawTexturedRect(x, y, w, h)
 end
 
@@ -1021,7 +1019,7 @@ end
 -- @param w Width
 -- @param h Height
 function render_library.drawTexturedRect (x, y, w, h)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
 end
@@ -1038,7 +1036,7 @@ end
 -- @param endV Texture mapping at rectangle end
 -- @param UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
 function render_library.drawTexturedRectUVFast (x, y, w, h, startU, startV, endU, endV, UVHack)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	if UVHack then
 		startU = ( startU * 32 - 0.5 ) / 31
@@ -1060,7 +1058,7 @@ end
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
 function render_library.drawTexturedRectUV (x, y, w, h, startU, startV, endU, endV)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (w, TYPE_NUMBER)
@@ -1101,7 +1099,7 @@ end
 -- @param h Height
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotatedFast (x, y, w, h, rot)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	surface.DrawTexturedRectRotated(x, y, w, h, rot)
 end
@@ -1113,7 +1111,7 @@ end
 -- @param h Height
 -- @param rot Rotation in degrees
 function render_library.drawTexturedRectRotated (x, y, w, h, rot)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	local rad = math.rad(rot)
 	local cos, sin = math.cos(rad), math.sin(rad)
@@ -1140,7 +1138,7 @@ end
 -- @param x2 X end interger coordinate
 -- @param y2 Y end integer coordinate
 function render_library.drawLine (x1, y1, x2, y2)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawLine(x1, y1, x2, y2)
 end
 
@@ -1213,7 +1211,7 @@ defaultFont = render_library.createFont("Default", 16, 400, false, false, false,
 function render_library.getTextSize(text)
 	checkluatype (text, TYPE_STRING)
 
-	surface.SetFont(SF.instance.data.render.font or defaultFont)
+	surface.SetFont(instance.data.render.font or defaultFont)
 	return surface.GetTextSize(text)
 end
 
@@ -1244,7 +1242,7 @@ end
 -- \- DermaLarge
 function render_library.setFont(font)
 	if not defined_fonts[font] then SF.Throw("Font does not exist.", 2) end
-	SF.instance.data.render.font = font
+	instance.data.render.font = font
 	--surface.SetFont(font)
 end
 
@@ -1260,7 +1258,7 @@ end
 -- @param text Text to draw
 -- @param alignment Text alignment
 function render_library.drawText (x, y, text, alignment)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (text, TYPE_STRING)
@@ -1268,7 +1266,7 @@ function render_library.drawText (x, y, text, alignment)
 		checkluatype (alignment, TYPE_NUMBER)
 	end
 
-	local font = SF.instance.data.render.font or defaultFont
+	local font = instance.data.render.font or defaultFont
 
 	draw.DrawText(text, font, x, y, currentcolor, alignment)
 end
@@ -1280,14 +1278,14 @@ end
 -- @param xalign Text x alignment
 -- @param yalign Text y alignment
 function render_library.drawSimpleText (x, y, text, xalign, yalign)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (text, TYPE_STRING)
 	if xalign then checkluatype (xalign, TYPE_NUMBER) end
 	if yalign then checkluatype (yalign, TYPE_NUMBER) end
 
-	local font = SF.instance.data.render.font or defaultFont
+	local font = instance.data.render.font or defaultFont
 
 	draw.SimpleText(text, font, x, y, currentcolor, xalign, yalign)
 end
@@ -1339,7 +1337,7 @@ end
 --- Enables or disables Depth Buffer
 -- @param enable true to enable
 function render_library.enableDepth (enable)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	checkluatype (enable, TYPE_BOOL)
 	render.OverrideDepthEnable(enable, enable)
 end
@@ -1353,14 +1351,14 @@ end
 -- @param destBlendAlpha Optional Number
 -- @param blendFuncAlpha Optional Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC
 function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 end
 
 --- Resets the depth buffer
 function render_library.clearDepth()
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
-	if SF.instance.data.render.usingRT then
+	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
+	if instance.data.render.usingRT then
 		render.ClearDepth()
 	end
 end
@@ -1383,7 +1381,7 @@ end
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(pos, vector_meta)
 	checkluatype (radius, TYPE_NUMBER)
 	checkluatype (longitudeSteps, TYPE_NUMBER)
@@ -1400,7 +1398,7 @@ end
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, latitudeSteps)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(pos, vector_meta)
 	checkluatype (radius, TYPE_NUMBER)
 	checkluatype (longitudeSteps, TYPE_NUMBER)
@@ -1415,7 +1413,7 @@ end
 -- @param startPos Starting position
 -- @param endPos Ending position
 function render_library.draw3DLine (startPos, endPos)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(startPos, vector_meta)
 	checktype(endPos, vector_meta)
 	startPos = vunwrap(startPos)
@@ -1430,7 +1428,7 @@ end
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DBox (origin, angle, mins, maxs)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(origin, vector_meta)
 	checktype(mins, vector_meta)
 	checktype(maxs, vector_meta)
@@ -1449,7 +1447,7 @@ end
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox (origin, angle, mins, maxs)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(origin, vector_meta)
 	checktype(mins, vector_meta)
 	checktype(maxs, vector_meta)
@@ -1469,7 +1467,7 @@ end
 -- @param textureStart The start coordinate of the texture used.
 -- @param textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam (startPos, endPos, width, textureStart, textureEnd)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(startPos, vector_meta)
 	checktype(endPos, vector_meta)
 	checkluatype (width, TYPE_NUMBER)
@@ -1488,7 +1486,7 @@ end
 -- @param vert3 The third vertex.
 -- @param vert4 The fourth vertex.
 function render_library.draw3DQuad (vert1, vert2, vert3, vert4)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checktype(vert1, vector_meta)
 	checktype(vert2, vector_meta)
 	checktype(vert3, vector_meta)
@@ -1508,7 +1506,7 @@ end
 -- @param vert3 The third vertex.
 -- @param vert4 The fourth vertex.
 function render_library.draw3DQuadUV (vert1, vert2, vert3, vert4)
-	if not SF.instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local ok, err = pcall(function()
 		mesh.Position( Vector(vert1[1], vert1[2], vert1[3]) )
@@ -1546,7 +1544,7 @@ function render_library.cursorPos(ply, screen)
 		ply = LocalPlayer()
 	end
 	
-	if screen~=nil then checktype(screen, ent_meta) screen = eunwrap(screen) else screen = SF.instance.data.render.renderEnt end
+	if screen~=nil then checktype(screen, ent_meta) screen = eunwrap(screen) else screen = instance.data.render.renderEnt end
 	if not (screen and screen:IsValid() and screen.Transform) then SF.Throw("Invalid screen", 2) end
 
 	local Normal, Pos
@@ -1591,16 +1589,16 @@ end
 --- Returns the entity currently being rendered to
 -- @return Entity of the screen or hud being rendered
 function render_library.getScreenEntity()
-	return ewrap(SF.instance.data.render.renderEnt)
+	return ewrap(instance.data.render.renderEnt)
 end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
 function render_library.capturePixels ()
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
 	end
-	if SF.instance.data.render.usingRT then
+	if instance.data.render.usingRT then
 		render.CapturePixels()
 	end
 end
@@ -1610,7 +1608,7 @@ end
 -- @param y Pixel y-coordinate.
 -- @return Color object with ( r, g, b, 255 ) from the specified pixel.
 function render_library.readPixel (x, y)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
 	end
@@ -1627,7 +1625,7 @@ end
 -- @return the X size of the current render context
 -- @return the Y size of the current render context
 function render_library.getResolution()
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if data.renderEnt then
 		return data.renderEnt:GetResolution()
 	end
@@ -1643,7 +1641,7 @@ end
 -- @return the X size of the game window
 -- @return the Y size of the game window
 function render_library.getGameResolution()
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if data.usingRT then
 		return data.oldViewPort[3], data.oldViewPort[4]
 	else
@@ -1664,7 +1662,7 @@ end
 
 --- Checks if a hud component is connected to the Starfall Chip
 function render_library.isHUDActive()
-	return SF.instance:isHUDActive()
+	return instance:isHUDActive()
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
@@ -1716,7 +1714,7 @@ function render_library.renderView(tbl)
 		}
 	end
 	
-	local data = SF.instance.data.render
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if !data.isScenic then SF.Throw("Can't use render.renderView outside of renderscene hook.", 2) end
 	
@@ -1728,7 +1726,7 @@ function render_library.renderView(tbl)
 		return
 	end
 
-	checkpermission(SF.instance, nil, "render.renderView")
+	checkpermission(instance, nil, "render.renderView")
 
 	if data.renderedViews >= cv_max_maxrenderviewsperframe:GetInt() then
 		SF.Throw("Max rendered views per frame exceeded!.", 2)
@@ -1827,14 +1825,14 @@ end
 
 --- Returns how many render.renderView calls can be done in the current frame.
 function render_library.renderViewsLeft()
-	return cv_max_maxrenderviewsperframe:GetInt() - SF.instance.data.render.renderedViews
+	return cv_max_maxrenderviewsperframe:GetInt() - instance.data.render.renderedViews
 end
 
 --- Sets the status of the clip renderer, returning previous state.
 -- @param state New clipping state.
 -- @return Previous clipping state.
 function render_library.enableClipping(state)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype(state, TYPE_BOOL)
@@ -1852,7 +1850,7 @@ end
 -- @param normal The normal of the clipping plane.
 -- @param distance The normal of the clipping plane.
 function render_library.pushCustomClipPlane(normal, distance)
-	local data = SF.instance.data.render
+	local data = instance.data.render
 
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
@@ -1870,7 +1868,7 @@ end
 
 --- Removes the current active clipping plane from the clip plane stack.
 function render_library.popCustomClipPlane()
-	local data = SF.instance.data.render
+	local data = instance.data.render
 
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if pushedClippingPlanes == 0 then SF.Throw("Popped too many clipping planes.", 2) end
@@ -1884,7 +1882,6 @@ end
 --@param active Whether hud hooks should be active. true to force on, false to force off, nil to restore default.
 function render_library.setHUDActive(active)
 	if active ~= nil then checkluatype(active, TYPE_BOOL) end
-	local instance = SF.instance
 	if LocalPlayer()~=instance.player then SF.Throw("This function only works for the owner of the chip!", 2) end
 	instance.hudoverride = active
 end

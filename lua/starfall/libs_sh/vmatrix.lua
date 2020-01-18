@@ -2,16 +2,16 @@
 SF.VMatrix = {}
 
 --- VMatrix type
-local vmatrix_methods, vmatrix_metamethods = SF.RegisterType("VMatrix")
-local wrap, unwrap = SF.CreateWrapper(vmatrix_metamethods, true, false, debug.getregistry().VMatrix)
+local vmatrix_methods, vmatrix_metamethods = instance:RegisterType("VMatrix")
+local wrap, unwrap = instance:CreateWrapper(vmatrix_metamethods, true, false, debug.getregistry().VMatrix)
 local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
 
 local dgetmeta = debug.getmetatable
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	vec_meta = SF.Vectors.Metatable
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
@@ -126,7 +126,7 @@ end
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
 	checktype(ang, ang_meta)
-	unwrap(self):SetAngles(SF.UnwrapObject(ang))
+	unwrap(self):SetAngles(instance.UnwrapObject(ang))
 end
 
 --- Sets the translation

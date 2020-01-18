@@ -1,4 +1,4 @@
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -157,13 +157,13 @@ SF.DefaultEnvironment.isFirstTimePredicted = IsFirstTimePredicted
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
 -- @return Current quota used this Think
 function SF.DefaultEnvironment.quotaUsed ()
-	return SF.instance.cpu_total
+	return instance.cpu_total
 end
 
 --- Gets the Average CPU Time in the buffer
 -- @return Average CPU Time of the buffer.
 function SF.DefaultEnvironment.quotaAverage ()
-	return SF.instance:movingCPUAverage()
+	return instance:movingCPUAverage()
 end
 
 --- Gets the current ram usage of the lua environment
@@ -192,7 +192,7 @@ end
 -- @return Total used CPU time of all your chips.
 function SF.DefaultEnvironment.quotaTotalUsed ()
 	local total = 0
-	for instance, _ in pairs(SF.playerInstances[SF.instance.player]) do
+	for instance, _ in pairs(SF.playerInstances[instance.player]) do
 		total = total + instance.cpu_total
 	end
 	return total
@@ -202,7 +202,7 @@ end
 -- @return Total average CPU Time of all your chips.
 function SF.DefaultEnvironment.quotaTotalAverage ()
 	local total = 0
-	for instance, _ in pairs(SF.playerInstances[SF.instance.player]) do
+	for instance, _ in pairs(SF.playerInstances[instance.player]) do
 		total = total + instance:movingCPUAverage()
 	end
 	return total
@@ -212,14 +212,14 @@ end
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
 -- @return Max SysTime allowed to take for execution of the chip in a Think.
 function SF.DefaultEnvironment.quotaMax ()
-	return SF.instance.cpuQuota
+	return instance.cpuQuota
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function SF.DefaultEnvironment.setSoftQuota (quota)
 	checkluatype (quota, TYPE_NUMBER)
-	SF.instance.cpu_softquota = quota
+	instance.cpu_softquota = quota
 end
 
 --- Checks if the chip is capable of performing an action.
@@ -228,7 +228,7 @@ end
 function SF.DefaultEnvironment.hasPermission(perm, obj)
 	checkluatype (perm, TYPE_STRING)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
-	return SF.Permissions.hasAccess(SF.instance, SF.UnwrapObject(obj), perm)
+	return SF.Permissions.hasAccess(instance, instance.UnwrapObject(obj), perm)
 end
 
 if CLIENT then
@@ -264,10 +264,10 @@ if CLIENT then
 				overrides[v] = true
 			end
 		end
-		SF.instance.permissionRequest = {}
-		SF.instance.permissionRequest.overrides = overrides
-		SF.instance.permissionRequest.description = string.gsub( desc, '%s+$', '' )
-		SF.instance.permissionRequest.showOnUse = showOnUse == true
+		instance.permissionRequest = {}
+		instance.permissionRequest.overrides = overrides
+		instance.permissionRequest.description = string.gsub( desc, '%s+$', '' )
+		instance.permissionRequest.showOnUse = showOnUse == true
 
 	end
 
@@ -275,7 +275,7 @@ if CLIENT then
 	--@return Boolean of whether the client gave all permissions specified in last request or not.
 	--@client
 	function SF.DefaultEnvironment.permissionRequestSatisfied()
-		return SF.Permissions.permissionRequestSatisfied( SF.instance )
+		return SF.Permissions.permissionRequestSatisfied( instance )
 	end
 
 end
@@ -357,10 +357,10 @@ function string_methods.rep(str, rep, sep)
 	return table.concat(ret, sep)
 end
 function string_methods.fromColor(color)
-	return string.FromColor(SF.UnwrapObject(color))
+	return string.FromColor(instance.UnwrapObject(color))
 end
 function string_methods.toColor(str)
-	return SF.WrapObject(string.ToColor(str))
+	return instance.WrapObject(string.ToColor(str))
 end
 --- String library http://wiki.garrysmod.com/page/Category:string
 -- @name SF.DefaultEnvironment.string
@@ -417,7 +417,7 @@ math_methods.tanh = math.tanh
 math_methods.timeFraction = math.TimeFraction
 math_methods.truncate = math.Truncate
 function math_methods.bSplinePoint(tDiff, tPoints, tMax)
-	return SF.WrapObject(math.BSplinePoint(tDiff, SF.Unsanitize(tPoints), tMax))
+	return instance.WrapObject(math.BSplinePoint(tDiff, SF.Unsanitize(tPoints), tMax))
 end
 function math_methods.lerp(percent, from, to)
 	checkluatype (percent, TYPE_NUMBER)
@@ -431,14 +431,14 @@ function math_methods.lerpAngle(percent, from, to)
 	checktype(from, SF.Types["Angle"])
 	checktype(to, SF.Types["Angle"])
 
-	return SF.WrapObject(LerpAngle(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
+	return instance.WrapObject(LerpAngle(percent, instance.UnwrapObject(from), instance.UnwrapObject(to)))
 end
 function math_methods.lerpVector(percent, from, to)
 	checkluatype (percent, TYPE_NUMBER)
 	checktype(from, SF.Types["Vector"])
 	checktype(to, SF.Types["Vector"])
 
-	return SF.WrapObject(LerpVector(percent, SF.UnwrapObject(from), SF.UnwrapObject(to)))
+	return instance.WrapObject(LerpVector(percent, instance.UnwrapObject(from), instance.UnwrapObject(to)))
 end
 --- The math library. http://wiki.garrysmod.com/page/Category:math
 -- @name SF.DefaultEnvironment.math
@@ -566,7 +566,7 @@ SF.Permissions.registerPrivilege("console.command", "Console command", "Allows t
 
 local printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 local function printTableX (t, indent, alreadyprinted)
-	local ply = SF.instance.player
+	local ply = instance.player
 	if next(t) then
 		for k, v in SF.DefaultEnvironment.pairs(t) do
 			if SF.GetType(v) == "table" and not alreadyprinted[v] then
@@ -588,14 +588,66 @@ local function printTableX (t, indent, alreadyprinted)
 	end
 end
 
+
+local function argsToChat(...)
+	local n = select('#', ...)
+	local input = { ... }
+	local output = {}
+	local color = false
+	for i = 1, n do
+		local add
+		if dgetmeta(input[i]) == instance.Types.Color then
+			color = true
+			add = Color(input[i][1], input[i][2], input[i][3])
+		else
+			add = tostring(input[i])
+		end
+		output[i] = add
+	end
+	-- Combine the strings with tabs
+	local processed = {}
+	if not color then processed[1] = Color(151, 211, 255) end
+	local i = 1
+	while i <= n do
+		if isstring(output[i]) then
+			local j = i + 1
+			while j <= n and isstring(output[j]) do
+				j = j + 1
+			end
+			if i==(j-1) then
+				processed[#processed + 1] = output[i]
+			else
+				processed[#processed + 1] = table.concat({ unpack(output, i, j) }, "\t")
+			end
+			i = j
+		else
+			processed[#processed + 1] = output[i]
+			i = i + 1
+		end
+	end
+	return processed
+end
+
+
 if SERVER then
+	util.AddNetworkString("starfall_chatprint")
 	local userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
 
 	-- Prints a message to the player's chat.
 	-- @shared
 	-- @param ... Values to print
 	function SF.DefaultEnvironment.print(...)
-		printBurst:use(SF.instance.player, SF.ChatPrint(SF.instance.player, ...))
+		local tbl = argsToChat(...)
+
+		net.Start("starfall_chatprint")
+		net.WriteUInt(#tbl, 32)
+		for i, v in ipairs(tbl) do
+			net.WriteType(v)
+		end
+		local bytes = net.BytesWritten()
+		net.Send(instance.player)
+	
+		printBurst:use(instance.player, bytes)
 	end
 
 	--- Prints a table to player's chat
@@ -611,8 +663,8 @@ if SERVER then
 	function SF.DefaultEnvironment.concmd (cmd)
 		checkluatype (cmd, TYPE_STRING)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
-		checkpermission(SF.instance, nil, "console.command")
-		SF.instance.player:ConCommand(cmd)
+		checkpermission(instance, nil, "console.command")
+		instance.player:ConCommand(cmd)
 	end
 
 	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
@@ -624,14 +676,14 @@ if SERVER then
 		if #str>max then
 			SF.Throw("The userdata limit is " .. string.Comma(max) .. " bytes", 2)
 		end
-		SF.instance.data.entity.starfalluserdata = str
+		instance.data.entity.starfalluserdata = str
 	end
 
 	--- Gets the chip's userdata that the duplicator tool loads
 	-- @server
 	-- @return String data
 	function SF.DefaultEnvironment.getUserdata()
-		return SF.instance.data.entity.starfalluserdata or ""
+		return instance.data.entity.starfalluserdata or ""
 	end
 else
 	--- Sets the chip's display name
@@ -639,7 +691,7 @@ else
 	-- @param name Name
 	function SF.DefaultEnvironment.setName(name)
 		checkluatype (name, TYPE_STRING)
-		local e = SF.instance.data.entity
+		local e = instance.data.entity
 		if (e and e:IsValid()) then
 			e.name = string.sub(name, 1, 256)
 		end
@@ -648,7 +700,7 @@ else
 	--- Sets clipboard text. Only works on the owner of the chip.
 	-- @param txt Text to set to the clipboard
 	function SF.DefaultEnvironment.setClipboardText(txt)
-		if SF.instance.player ~= LocalPlayer() then return end
+		if instance.player ~= LocalPlayer() then return end
 		checkluatype (txt, TYPE_STRING)
 		SetClipboardText(txt)
 	end
@@ -657,27 +709,27 @@ else
 	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
 	-- @param text The message text.
 	function SF.DefaultEnvironment.printMessage(mtype, text)
-		if SF.instance.player ~= LocalPlayer() then return end
+		if instance.player ~= LocalPlayer() then return end
 		checkluatype (text, TYPE_STRING)
-		SF.instance.player:PrintMessage(mtype, text)
+		instance.player:PrintMessage(mtype, text)
 	end
 
 	function SF.DefaultEnvironment.print(...)
-		if SF.instance.player == LocalPlayer() then
-			SF.ChatPrint(...)
+		if instance.player == LocalPlayer() then
+			chat.AddText(unpack(argsToChat(...)))
 		end
 	end
 
 	function SF.DefaultEnvironment.printTable (tbl)
 		checkluatype (tbl, TYPE_TABLE)
-		if SF.instance.player == LocalPlayer() then
+		if instance.player == LocalPlayer() then
 			printTableX(tbl, 0, { tbl = true })
 		end
 	end
 
 	function SF.DefaultEnvironment.concmd (cmd)
 		checkluatype (cmd, TYPE_STRING)
-		checkpermission(SF.instance, nil, "console.command")
+		checkpermission(instance, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
 	end
 
@@ -685,28 +737,28 @@ else
 	-- @client
 	-- @return The local player's camera angles
 	function SF.DefaultEnvironment.eyeAngles ()
-		return SF.WrapObject(LocalPlayer():EyeAngles())
+		return instance.WrapObject(LocalPlayer():EyeAngles())
 	end
 
 	--- Returns the local player's camera position
 	-- @client
 	-- @return The local player's camera position
 	function SF.DefaultEnvironment.eyePos()
-		return SF.WrapObject(LocalPlayer():EyePos())
+		return instance.WrapObject(LocalPlayer():EyePos())
 	end
 
 	--- Returns the local player's camera forward vector
 	-- @client
 	-- @return The local player's camera forward vector
 	function SF.DefaultEnvironment.eyeVector()
-		return SF.WrapObject(LocalPlayer():GetAimVector())
+		return instance.WrapObject(LocalPlayer():GetAimVector())
 	end
 end
 
 --- Returns the table of scripts used by the chip
 -- @return Table of scripts used by the chip
 function SF.DefaultEnvironment.getScripts()
-	return SF.Sanitize(SF.instance.source)
+	return SF.Sanitize(instance.source)
 end
 
 --- Runs an included script and caches the result.
@@ -715,14 +767,14 @@ end
 -- @return Return value of the script
 function SF.DefaultEnvironment.require(file)
 	checkluatype (file, TYPE_STRING)
-	local loaded = SF.instance.requires
+	local loaded = instance.requires
 
 	local path
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
 	else
-		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. file)
-		if not SF.instance.scripts[path] then
+		path = SF.NormalizePath(instance.requirestack[#instance.requirestack] .. file)
+		if not instance.scripts[path] then
 			path = SF.NormalizePath(file)
 		end
 	end
@@ -730,13 +782,13 @@ function SF.DefaultEnvironment.require(file)
 	if loaded[path] then
 		return loaded[path]
 	else
-		local func = SF.instance.scripts[path]
+		local func = instance.scripts[path]
 		if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2) end
 
-		local stacklen = #SF.instance.requirestack + 1
-		SF.instance.requirestack[stacklen] = string.GetPathFromFilename(path)
+		local stacklen = #instance.requirestack + 1
+		instance.requirestack[stacklen] = string.GetPathFromFilename(path)
 		local ok, ret = pcall(func)
-		SF.instance.requirestack[stacklen] = nil
+		instance.requirestack[stacklen] = nil
 
 		if ok then
 			loaded[path] = ret or true
@@ -760,11 +812,11 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 	if string.sub(dir, 1, 1)=="/" then
 		path = SF.NormalizePath(dir)
 	else
-		path = SF.NormalizePath(SF.instance.requirestack[#SF.instance.requirestack] .. dir)
+		path = SF.NormalizePath(instance.requirestack[#instance.requirestack] .. dir)
 		
 		-- If no scripts found in relative dir, try the root dir.
 		local foundScript = false
-		for file, _ in pairs(SF.instance.scripts) do
+		for file, _ in pairs(instance.scripts) do
 			if string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$") then
 				foundScript = true
 				break
@@ -779,7 +831,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 
 	if loadpriority then
 		for i = 1, #loadpriority do
-			for file, _ in pairs(SF.instance.scripts) do
+			for file, _ in pairs(instance.scripts) do
 				if file == path .. "/" .. loadpriority[i] then
 					returns[file] = SF.DefaultEnvironment.require("/"..file)
 				end
@@ -787,7 +839,7 @@ function SF.DefaultEnvironment.requiredir(dir, loadpriority)
 		end
 	end
 
-	for file, _ in pairs(SF.instance.scripts) do
+	for file, _ in pairs(instance.scripts) do
 		if not returns[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
 			returns[file] = SF.DefaultEnvironment.require("/"..file)
 		end
@@ -807,11 +859,11 @@ function SF.DefaultEnvironment.dofile(file)
 		path = SF.NormalizePath(file)
 	else
 		path = SF.NormalizePath(string.GetPathFromFilename(string.sub(debug.getinfo(2, "S").source, 5)) .. file)
-		if not SF.instance.scripts[path] then
+		if not instance.scripts[path] then
 			path = SF.NormalizePath(file)
 		end
 	end
-	local func = SF.instance.scripts[path]
+	local func = instance.scripts[path]
 	if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2) end
 	return func()
 end
@@ -828,7 +880,7 @@ function SF.DefaultEnvironment.dodir(dir, loadpriority)
 
 	if loadpriority then
 		for i = 0, #loadpriority do
-			for file, _ in pairs(SF.instance.scripts) do
+			for file, _ in pairs(instance.scripts) do
 				if string.find(file, dir .. "/" .. loadpriority[i] , 1) == 1 then
 					returns[file] = SF.DefaultEnvironment.dofile(file)
 				end
@@ -836,7 +888,7 @@ function SF.DefaultEnvironment.dodir(dir, loadpriority)
 		end
 	end
 
-	for file, _ in pairs(SF.instance.scripts) do
+	for file, _ in pairs(instance.scripts) do
 		if string.find(file, dir, 1) == 1 then
 			returns[file] = SF.DefaultEnvironment.dofile(file)
 		end
@@ -850,12 +902,12 @@ end
 -- @param str String to execute
 -- @return Function of str
 function SF.DefaultEnvironment.loadstring (str, name)
-	name = "SF:" .. (name or tostring(SF.instance.env))
+	name = "SF:" .. (name or tostring(instance.env))
 	local func = SF.CompileString(str, name, false)
 
 	-- CompileString returns an error as a string, better check before setfenv
 	if isfunction(func) then
-		return setfenv(func, SF.instance.env)
+		return setfenv(func, instance.env)
 	end
 
 	return func
@@ -880,10 +932,10 @@ function SF.DefaultEnvironment.setTypeMethod(sfType, methodName, method)
 	checkluatype (sfType, TYPE_STRING)
 	checkluatype (methodName, TYPE_STRING)
 	
-	if not SF.instance.typeMethods[sfType] then
+	if not instance.Types[sfType] then
 		SF.Throw("Invalid type")
 	end
-	SF.instance.typeMethods[sfType][methodName] = method
+	instance.Types[sfType].__methods[methodName] = method
 end
 
 --- Simple version of Lua's getfenv
@@ -1028,13 +1080,13 @@ function SF.DefaultEnvironment.worldToLocal(pos, ang, newSystemOrigin, newSystem
 	checktype(newSystemAngles, SF.Types["Angle"])
 
 	local localPos, localAngles = WorldToLocal(
-		SF.UnwrapObject(pos),
-		SF.UnwrapObject(ang),
-		SF.UnwrapObject(newSystemOrigin),
-		SF.UnwrapObject(newSystemAngles)
+		instance.UnwrapObject(pos),
+		instance.UnwrapObject(ang),
+		instance.UnwrapObject(newSystemOrigin),
+		instance.UnwrapObject(newSystemAngles)
 	)
 
-	return SF.WrapObject(localPos), SF.WrapObject(localAngles)
+	return instance.WrapObject(localPos), instance.WrapObject(localAngles)
 end
 
 --- Translates the specified position and angle from the specified local coordinate system
@@ -1051,13 +1103,13 @@ function SF.DefaultEnvironment.localToWorld(localPos, localAng, originPos, origi
 	checktype(originAngle, SF.Types["Angle"])
 
 	local worldPos, worldAngles = LocalToWorld(
-		SF.UnwrapObject(localPos),
-		SF.UnwrapObject(localAng),
-		SF.UnwrapObject(originPos),
-		SF.UnwrapObject(originAngle)
+		instance.UnwrapObject(localPos),
+		instance.UnwrapObject(localAng),
+		instance.UnwrapObject(originPos),
+		instance.UnwrapObject(originAngle)
 	)
 
-	return SF.WrapObject(worldPos), SF.WrapObject(worldAngles)
+	return instance.WrapObject(worldPos), instance.WrapObject(worldAngles)
 end
 
 do

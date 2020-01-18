@@ -8,9 +8,9 @@ local file_library = SF.RegisterLibrary("file")
 
 --- File type
 -- @client
-local file_methods, file_metamethods = SF.RegisterType("File")
-local wrap, unwrap = SF.CreateWrapper(file_metamethods, true, false)
-local checktype = SF.CheckType
+local file_methods, file_metamethods = instance:RegisterType("File")
+local wrap, unwrap = instance:CreateWrapper(file_metamethods, true, false)
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -28,12 +28,12 @@ end
 file.CreateDir("sf_filedata/")
 
 -- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function (inst)
-	inst.data.files = {}
+instance:AddHook("initialize", function (instance)
+	instance.data.files = {}
 end)
 
-SF.AddHook("deinitialize", function (inst)
-	for file, _ in pairs(inst.data.files) do
+instance:AddHook("deinitialize", function (instance)
+	for file, _ in pairs(instance.data.files) do
 		file:Close()
 	end
 end)
@@ -43,12 +43,12 @@ end)
 -- @param mode The file mode to use. See lua manual for explaination
 -- @return File object or nil if it failed
 function file_library.open (path, mode)
-	checkpermission (SF.instance, path, "file.open")
+	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (mode, TYPE_STRING)
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), mode, "DATA")
 	if f then
-		SF.instance.data.files[f] = true
+		instance.data.files[f] = true
 		return wrap(f)
 	end
 end
@@ -57,7 +57,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return Contents, or nil if error
 function file_library.read (path)
-	checkpermission (SF.instance, path, "file.read")
+	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
@@ -66,7 +66,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return True if OK, nil if error
 function file_library.write (path, data)
-	checkpermission (SF.instance, path, "file.write")
+	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (data, TYPE_STRING)
 
@@ -80,7 +80,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/.
 -- @param data String that will be appended to the file.
 function file_library.append (path, data)
-	checkpermission (SF.instance, path, "file.write")
+	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (data, TYPE_STRING)
 
@@ -94,7 +94,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return True if exists, false if not, nil if error
 function file_library.exists (path)
-	checkpermission (SF.instance, path, "file.exists")
+	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
@@ -103,7 +103,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return True if successful, nil if it wasn't found
 function file_library.delete (path)
-	checkpermission (SF.instance, path, "file.write")
+	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	path = "sf_filedata/" .. SF.NormalizePath(path)
 	if file.Exists(path, "DATA") then
@@ -115,7 +115,7 @@ end
 --- Creates a directory
 -- @param path Filepath relative to data/sf_filedata/.
 function file_library.createDir (path)
-	checkpermission (SF.instance, path, "file.write")
+	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	file.CreateDir("sf_filedata/" .. SF.NormalizePath(path))
 end
@@ -126,7 +126,7 @@ end
 -- @return Table of file names
 -- @return Table of directory names
 function file_library.find (path, sorting)
-	checkpermission (SF.instance, path, "file.find")
+	checkpermission (instance, path, "file.find")
 	checkluatype (path, TYPE_STRING)
 	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)
@@ -138,7 +138,7 @@ end
 -- @return Table of file names
 -- @return Table of directory names
 function file_library.findInGame(path, sorting)
-	checkpermission (SF.instance, path, "file.findInGame")
+	checkpermission (instance, path, "file.findInGame")
 	checkluatype (path, TYPE_STRING)
 	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
 	return file.Find(SF.NormalizePath(path), "GAME", sorting)
@@ -154,7 +154,7 @@ end
 function file_methods:close()
 	checktype(self, file_metamethods)
 	local f = unwrap(self)
-	SF.instance.data.files[f] = nil
+	instance.data.files[f] = nil
 	f:Close()
 end
 

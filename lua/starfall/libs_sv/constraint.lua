@@ -1,27 +1,19 @@
-
---- Library for creating and manipulating constraints.
--- @server
-local constraint_library = SF.RegisterLibrary("constraint")
-
-local vwrap = SF.WrapObject
-local vunwrap = SF.UnwrapObject
-local ewrap, eunwrap, ents_metatable
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-
+-- Global to all starfalls
 local plyCount = SF.LimitObject("constraints", "constraints", 600, "The number of constraints allowed to spawn via Starfall")
 
-SF.AddHook("initialize", function(instance)
-	instance.data.constraints = {constraints = {}}
-end)
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 local function constraintOnDestroy(ent, constraints, ply)
 	plyCount:free(ply, 1)
 	constraints[ent] = nil
 end
 
-SF.AddHook("deinitialize", function(instance)
+instance:AddHook("initialize", function(instance)
+	instance.data.constraints = {constraints = {}}
+end)
+
+instance:AddHook("deinitialize", function(instance)
 	if instance.data.constraints.clean ~= false then --Return true on nil too
 		local constraints = instance.data.constraints.constraints
 		for ent, _ in pairs(constraints) do
@@ -34,16 +26,29 @@ SF.AddHook("deinitialize", function(instance)
 	end
 end)
 
-SF.AddHook("postload", function()
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
-	ents_metatable = SF.Entities.Metatable
-end)
+-- Local to each starfall
+return {
+function(instance) -- Called for library declarations
+
+--- Library for creating and manipulating constraints.
+-- @server
+instance:RegisterLibrary("constraint")
+
+end,
+function(instance) -- Called for library definitions
+
+local constraint_library = instance.Libraries.constraint
+local vwrap = instance.WrapObject
+local vunwrap = instance.UnwrapObject
+local ewrap = instance.Types.Entities.Wrap
+local eunwrap = instance.Types.Entities.Unwrap
+local ents_metatable = instance.Types.Entities.Metatable
+local checktype = instance.CheckType
 
 local function checkConstraint(e, t)
 	if e then
 		if e:IsValid() then
-			checkpermission(SF.instance, e, t)
+			checkpermission(instance, e, t)
 		elseif not e:IsWorld() then
 			SF.Throw("Invalid Entity", 3)
 		end
@@ -85,7 +90,6 @@ end
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -116,7 +120,6 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -153,7 +156,6 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -190,7 +192,6 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	checktype(minv, SF.Types["Vector"])
 	checktype(maxv, SF.Types["Vector"])
 	checktype(frictionv, SF.Types["Vector"])
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -229,7 +230,6 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -274,7 +274,6 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	checktype(e2, ents_metatable)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -321,7 +320,6 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	checktype(v1, SF.Types["Vector"])
 	checktype(v2, SF.Types["Vector"])
 
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -352,7 +350,6 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 	checktype(e1, ents_metatable)
 	checktype(e2, ents_metatable)
 
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -380,7 +377,7 @@ function constraint_library.setRopeLength(index, e, length)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.rope")
+	checkpermission(instance, ent1, "constraints.rope")
 
 
 	checkluatype(length, TYPE_NUMBER)
@@ -402,7 +399,7 @@ function constraint_library.setElasticLength(index, e, length)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.elastic")
+	checkpermission(instance, ent1, "constraints.elastic")
 
 	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
@@ -422,7 +419,7 @@ function constraint_library.breakAll(e)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.any")
+	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
 end
@@ -436,7 +433,7 @@ function constraint_library.breakType(e, typename)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.any")
+	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveConstraints(ent1, typename)
 end
@@ -458,13 +455,14 @@ end
 --- Sets whether the chip should remove created constraints when the chip is removed
 -- @param on Boolean whether the constraints should be cleaned or not
 function constraint_library.setConstraintClean(on)
-	SF.instance.data.constraints.clean = on
+	instance.data.constraints.clean = on
 end
 
 --- Checks how many constraints can be spawned
 -- @server
 -- @return number of constraints able to be spawned
 function constraint_library.constraintsLeft()
-	return plyCount:check(SF.instance.player)
+	return plyCount:check(instance.player)
 end
 
+end

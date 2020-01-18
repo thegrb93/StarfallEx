@@ -13,11 +13,11 @@ end
 local TYPE_ENTITY,TYPE_VECTOR
 local unwrap_entity, unwrap_vector
 local IsValid = IsValid
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	TYPE_ENTITY = SF.Entities.Metatable
 	TYPE_VECTOR = SF.Types["Vector"]
 
@@ -28,8 +28,8 @@ end)
 
 --- Particle type
 -- @client
-local particle_methods, particle_metamethods = SF.RegisterType("Particle")
-local wrap, unwrap = SF.CreateWrapper(particle_metamethods, false, false)
+local particle_methods, particle_metamethods = instance:RegisterType("Particle")
+local wrap, unwrap = instance:CreateWrapper(particle_metamethods, false, false)
 
 --- Particle library.
 -- @client
@@ -41,7 +41,7 @@ SF.Particle.Methods = particle_methods
 SF.Particle.Metatable = particle_metamethods
 
 -- Add PATTACH enum
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	local _PATTACH = {
 		["ABSORIGIN"] = PATTACH_ABSORIGIN,
 		["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
@@ -54,14 +54,14 @@ SF.AddHook("postload", function()
 end)
 
 -- Create the storage for the metamethods
-SF.AddHook("initialize", function (inst)
-	inst.data.particle = {
+instance:AddHook("initialize", function (instance)
+	instance.data.particle = {
 		particles = {},
 	}
 end)
 
-SF.AddHook("deinitialize", function (inst)
-	local particles = inst.data.particle.particles
+instance:AddHook("deinitialize", function (instance)
+	local particles = instance.data.particle.particles
 	local p = next(particles)
 	-- Remove all
 	while p do
@@ -91,7 +91,7 @@ end
 -- @param options Table of options
 -- @return Particle type.
 function particle_library.attach (entity, particle, pattach, options)
-	checkpermission (SF.instance.player, entity, "particle.attach")
+	checkpermission (instance.player, entity, "particle.attach")
 
 	checktype(entity, TYPE_ENTITY)
 	checkluatype (particle, TYPE_STRING)
@@ -104,7 +104,6 @@ function particle_library.attach (entity, particle, pattach, options)
 		SF.Throw("Invalid particle path: " .. particle, 2)
 	end
 
-	local instance = SF.instance
 
 
 	local PEffect = entity:CreateParticleEffect(particle,pattach,options)

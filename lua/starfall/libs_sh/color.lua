@@ -2,8 +2,8 @@ SF.Color = {}
 
 --- Color type
 --@shared
-local color_methods, color_metatable = SF.RegisterType("Color")
-local checktype = SF.CheckType
+local color_methods, color_metatable = instance:RegisterType("Color")
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -28,7 +28,7 @@ SF.Color.Wrap = cwrap
 SF.Color.Unwrap = unwrap
 
 local dgetmeta = debug.getmetatable
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	--- Creates a table struct that resembles a Color/
 	-- @name SF.DefaultEnvironment.Color
 	-- @class function

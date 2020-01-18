@@ -1,11 +1,11 @@
 SF.Vectors = {}
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 
 --- Vector type
 -- @shared
-local vec_methods, vec_metamethods = SF.RegisterType("Vector")
+local vec_methods, vec_metamethods = instance:RegisterType("Vector")
 
 local function wrap(tbl)
 	return setmetatable(tbl, vec_metamethods)
@@ -22,7 +22,7 @@ end
 SF.AddObjectWrapper(debug.getregistry().Vector, vec_metamethods, vwrap)
 SF.AddObjectUnwrapper(vec_metamethods, unwrap)
 
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	--- Creates a Vector struct
 	-- @name SF.DefaultEnvironment.Vector. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
 	-- @class function
@@ -184,7 +184,7 @@ end
 --- Get the vector's angle.
 -- @return Angle
 function vec_methods:getAngle ()
-	return SF.WrapObject(unwrap(self):Angle())
+	return instance.WrapObject(unwrap(self):Angle())
 end
 
 --- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
@@ -193,7 +193,7 @@ end
 function vec_methods:getAngleEx (v)
 	checktype(v, vec_metamethods)
 
-	return SF.WrapObject(unwrap(self):AngleEx(unwrap(v)))
+	return instance.WrapObject(unwrap(self):AngleEx(unwrap(v)))
 end
 
 --- Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.
@@ -379,7 +379,7 @@ function vec_methods:rotate (b)
 	checktype(b, SF.Types["Angle"])
 
 	local vec = unwrap(self)
-	vec:Rotate(SF.UnwrapObject(b))
+	vec:Rotate(instance.UnwrapObject(b))
 
 	self[1] = vec.x
 	self[2] = vec.y
@@ -393,7 +393,7 @@ function vec_methods:getRotated (b)
 	checktype(b, SF.Types["Angle"])
 
 	local vec = unwrap(self)
-	vec:Rotate(SF.UnwrapObject(b))
+	vec:Rotate(instance.UnwrapObject(b))
 
 	return wrap({ vec.x, vec.y, vec.z })
 end

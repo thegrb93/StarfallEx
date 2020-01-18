@@ -3,7 +3,7 @@
 -- @shared
 local team_library = SF.RegisterLibrary("team")
 local cwrap, cunwrap
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	cwrap = SF.Color.Wrap
 	cunwrap = SF.Color.Unwrap
 end)

@@ -4,23 +4,23 @@
 
 SF.Weapons = {}
 --- Weapon type
-local weapon_methods, weapon_metamethods = SF.RegisterType("Weapon")
+local weapon_methods, weapon_metamethods = instance:RegisterType("Weapon")
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 SF.Weapons.Methods = weapon_methods
 SF.Weapons.Metatable = weapon_metamethods
 
-local checktype = SF.CheckType
+local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 local wrap, unwrap
-SF.AddHook("postload", function()
+instance:AddHook("postload", function()
 	SF.ApplyTypeDependencies(weapon_methods, weapon_metamethods, SF.Entities.Metatable)
-	wrap, unwrap = SF.CreateWrapper(weapon_metamethods, true, false, debug.getregistry().Weapon, SF.Entities.Metatable)
+	wrap, unwrap = instance:CreateWrapper(weapon_metamethods, true, false, debug.getregistry().Weapon, SF.Entities.Metatable)
 
 	SF.Weapons.Wrap = wrap
 	SF.Weapons.Unwrap = unwrap

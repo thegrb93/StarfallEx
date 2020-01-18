@@ -56,20 +56,20 @@ function xinput_library.setRumble(id, softPercent, hardPercent)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	id = math.floor(id)
 	xinput.setRumble(id, softPercent, hardPercent) -- Does the rest of the type checking
-	SF.instance.data.xinputRumble[id][1] = softPercent
-	SF.instance.data.xinputRumble[id][2] = hardPercent
+	instance.data.xinputRumble[id][1] = softPercent
+	instance.data.xinputRumble[id][2] = hardPercent
 end
 
-SF.AddHook("initialize", function(inst)
-	inst.data.xinputRumble = {}
+instance:AddHook("initialize", function(instance)
+	instance.data.xinputRumble = {}
 	for i = 0, 3 do
-		inst.data.xinputRumble[i] = {0, 0}
+		instance.data.xinputRumble[i] = {0, 0}
 	end
 end)
 
-SF.AddHook("deinitialize", function(inst)
+instance:AddHook("deinitialize", function(instance)
 	for i = 0, 3 do
-		local rumble = inst.data.xinputRumble[i]
+		local rumble = instance.data.xinputRumble[i]
 		if rumble[1] > 0 or rumble[2] > 0 then
 			xinput.setRumble(i, 0, 0)
 		end
