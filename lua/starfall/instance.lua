@@ -671,7 +671,7 @@ end
 function SF.Instance:Error(err)
 	if self.error then return end
 	if self.runOnError then -- We have a custom error function, use that instead
-		self:runOnError(err)
+		self.runOnError(err)
 	else
 		-- Default behavior
 		self:deinitialize()

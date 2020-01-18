@@ -836,8 +836,8 @@ do
 			net.ReadStarfall(nil, function(ok, data)
 				if ok then
 					print("Reloaded library: " .. data.mainfile)
+					SF.Modules[data.mainfile] = nil
 					for path, code in pairs(data.files) do
-						SF.Modules[data.mainfile] = nil
 						local ok, tbl = xpcall(CompileString, debug.traceback, file, root_path .. path, false)
 						if ok then
 							addModule(data.mainfile, tbl)
