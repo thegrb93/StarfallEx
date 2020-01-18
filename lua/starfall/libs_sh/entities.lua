@@ -1,17 +1,4 @@
--------------------------------------------------------------------------------
--- Shared entity library functions
--------------------------------------------------------------------------------
-
---- Entity type
--- @shared
-local ents_methods, ents_metamethods = instance:RegisterType("Entity")
-
-local ewrap, eunwrap = instance:CreateWrapper(ents_metamethods, true, true, debug.getregistry().Entity)
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ang_meta, vec_meta
-local col_meta = instance.Types.Color
-local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -19,28 +6,30 @@ SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty",
 SF.Permissions.registerPrivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
-instance:AddHook("postload", function()
-	ang_meta = SF.Angles.Metatable
-	vec_meta = SF.Vectors.Metatable
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
 
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
-	cwrap = SF.Color.Wrap
-	cunwrap = SF.Color.Unwrap
-	pwrap = SF.PhysObjs.Wrap
-	punwrap = SF.PhysObjs.Unwrap
+--- Entity type
+-- @shared
+local ents_methods, ents_meta = instance:RegisterType("Entity")
+local ewrap, eunwrap = instance:CreateWrapper(ents_meta, true, true, debug.getregistry().Entity)
 
-	
-end)
+end, function(instance) -- Called for library definitions
+
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
+local checktype = instance.CheckType
 
 local function getent(self)
 	local ent = eunwrap(self)
 	if ent and (ent:IsValid() or ent:IsWorld()) then
 		return ent
 	else
-		checktype(self, ents_metamethods, 3)
+		checktype(self, ents_meta, 3)
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
@@ -49,7 +38,7 @@ instance.Types.Entity.GetEntity = getent
 
 --- To string
 -- @shared
-function ents_metamethods:__tostring()
+function ents_meta:__tostring()
 	local ent = eunwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
@@ -511,7 +500,7 @@ function ents_methods:isValid()
 	if ent and ent:IsValid() then
 		return true
 	else
-		checktype(self, ents_metamethods, 2)
+		checktype(self, ents_meta, 2)
 		return false
 	end
 end
@@ -1059,3 +1048,5 @@ function ents_methods:getCreationTime()
 	local ent = getent(self)
 	return ent:GetCreationTime()
 end
+
+end}

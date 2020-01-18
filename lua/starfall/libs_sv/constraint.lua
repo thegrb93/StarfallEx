@@ -21,8 +21,7 @@ local function constraintOnDestroy(ent, constraints, ply)
 end
 
 -- Local to each starfall
-return {
-function(instance) -- Called for library declarations
+return { function(instance) -- Called for library declarations
 
 --- Library for creating and manipulating constraints.
 -- @server
@@ -45,8 +44,7 @@ instance:AddHook("deinitialize", function(instance)
 	end
 end)
 
-end,
-function(instance) -- Called for library definitions
+end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 
@@ -461,4 +459,4 @@ function constraint_library.constraintsLeft()
 	return plyCount:check(instance.player)
 end
 
-end
+end}

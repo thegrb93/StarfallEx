@@ -4,26 +4,23 @@ local checkpermission = SF.Permissions.check
 local dgetmeta = debug.getmetatable
 
 SF.Permissions.registerPrivilege("console.command", "Console command", "Allows the starfall to run console commands", { client = { default = 4 } })
-local userdataLimit
+
+local userdataLimit, printBurst
 if SERVER then
 	util.AddNetworkString("starfall_chatprint")
 	userdataLimit = CreateConVar("sf_userdata_max", "1048576", { FCVAR_ARCHIVE }, "The maximum size of userdata (in bytes) that can be stored on a Starfall chip (saved in duplications).")
-else
+	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 end
 
-local printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
-
 -- Local to each starfall
-return {
-function(instance) -- Called for library declarations
+return { function(instance) -- Called for library declarations
 
 instance:RegisterLibrary("string")
 instance:RegisterLibrary("math")
 instance:RegisterLibrary("os")
 instance:RegisterLibrary("table")
 
-end,
-function(instance) -- Called for library definitions
+end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -1160,4 +1157,4 @@ end
 -- @param super The (optional) parent class to inherit from
 Environment.class = SF.Class
 
-end
+end}
