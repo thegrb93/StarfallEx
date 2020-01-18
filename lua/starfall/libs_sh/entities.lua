@@ -36,6 +36,7 @@ end, function(instance) -- Called for library definitions
 local checktype = instance.CheckType
 local getent = instance.Types.Entity.GetEntity
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ply_meta, plwrap, plunwrap = instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
@@ -58,7 +59,7 @@ function ents_methods:getOwner()
 	local ent = getent(self)
 
 	if SF.Permissions.getOwner then
-		return instance.Types.Player.Wrap(SF.Permissions.getOwner(ent))
+		return plwrap(SF.Permissions.getOwner(ent))
 	end
 end
 
@@ -109,8 +110,8 @@ if CLIENT then
 		checkpermission(instance, nil, "mesh")
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
-			checktype(mesh, SF.Mesh.Metatable)
-			ent.custom_mesh = SF.Mesh.Unwrap(mesh)
+			checktype(mesh, instance.Types.Mesh)
+			ent.custom_mesh = instance.Types.Mesh.Unwrap(mesh)
 			ent.custom_mesh_data = instance.data.meshes
 		else
 			ent.custom_mesh = nil
@@ -128,8 +129,8 @@ if CLIENT then
 
 		if material then
 			local t = debug.getmetatable(material)
-			if t~=SF.Materials.Metatable and t~=SF.Materials.LMetatable then SF.ThrowTypeError("Material", SF.GetType(material), 2) end
-			ent.Material = SF.Materials.Unwrap(material)
+			if t~=instance.Types.Material and t~=instance.Types.LMaterial then SF.ThrowTypeError("Material", SF.GetType(material), 2) end
+			ent.Material = instance.Types.Material.Unwrap(material)
 		else
 			ent.Material = ent.DefaultMaterial
 		end

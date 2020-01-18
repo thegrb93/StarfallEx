@@ -722,7 +722,7 @@ function ents_methods:setTrails(startSize, endSize, length, material, color, att
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	local Data = {
-		Color = SF.Color.Unwrap(color),
+		Color = instance.Types.Color.Unwrap(color),
 		Length = length,
 		StartSize = math.Clamp(startSize, 0, 128),
 		EndSize = math.Clamp(endSize, 0, 128),

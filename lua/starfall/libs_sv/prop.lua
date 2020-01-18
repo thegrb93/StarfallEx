@@ -44,6 +44,8 @@ end, function(instance) -- Called for library definitions
 
 local props_library = instance.Libraries.prop
 local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
@@ -111,7 +113,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	register(propent)
 
-	return instance.Types.Entity.Wrap(propent)
+	return ewrap(propent)
 end
 
 --- Creates a custom prop.
@@ -208,7 +210,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	register(propent)
 
-	return instance.Types.Entity.Wrap(propent)
+	return ewrap(propent)
 end
 
 local allowed_components = {
@@ -274,7 +276,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 
 	register(comp)
 
-	return instance.Types.Entity.Wrap(comp)
+	return ewrap(comp)
 end
 
 --- Creates a sent.
@@ -447,7 +449,7 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		register(entity)
 
-		return instance.WrapObject(entity)
+		return owrap(entity)
 	end
 end
 
