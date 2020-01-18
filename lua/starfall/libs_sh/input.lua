@@ -227,14 +227,14 @@ function input_methods.canLockControls()
 		(not instance.data.lockedControlCooldown or instance.data.lockedControlCooldown <= CurTime())
 end
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	if instance.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
 	unlockControls()
 end)
 
-instance:AddHook("starfall_hud_disconnected", function(instance)
+instance:AddHook("starfall_hud_disconnected", function()
 	if instance.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end

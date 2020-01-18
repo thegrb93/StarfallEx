@@ -196,10 +196,7 @@ trace_library.CONTENTS_LADDER = CONTENTS_LADDER
 trace_library.CONTENTS_HITBOX = CONTENTS_HITBOX
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("trace", "Trace", "Allows the user to start traces")
-end
+SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
 
 -- Local functions
 

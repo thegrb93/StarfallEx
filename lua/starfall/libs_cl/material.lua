@@ -1,14 +1,11 @@
 SF.Materials = {}
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("material.load", "Load material", "Allows users to load a vmt material.", { client = {} })
-	P.registerPrivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
-	P.registerPrivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
-	P.registerPrivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
-	P.registerPrivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
-end
+SF.Permissions.registerPrivilege("material.load", "Load material", "Allows users to load a vmt material.", { client = {} })
+SF.Permissions.registerPrivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
+SF.Permissions.registerPrivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
+SF.Permissions.registerPrivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
+SF.Permissions.registerPrivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
 
 local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
 local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
@@ -89,13 +86,13 @@ cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
 end)
 
 -- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function (instance)
+instance:AddHook("initialize", function()
 	instance.data.material = {
 		usermaterials = {}
 	}
 end)
 
-instance:AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function()
 	for k, v in pairs(instance.data.material.usermaterials) do
 		material_bank:free(instance.player, k)
 		instance.data.material.usermaterials[k] = nil

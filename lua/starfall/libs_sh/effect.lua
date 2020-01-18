@@ -30,10 +30,7 @@ instance:AddHook("postload", function()
 end)
 
 -- Register Privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
-end
+SF.Permissions.registerPrivilege("effect.play", "Effect", "Allows the user to play effects", { client = {} })
 
 local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects can be spawned per second.", "Number of effects that can be spawned in a short time.")
 

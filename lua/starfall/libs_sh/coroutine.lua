@@ -17,11 +17,11 @@ SF.Coroutine.Metatable = thread_metamethods
 SF.Coroutine.Wrap = wrap
 SF.Coroutine.Unwrap = unwrap
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	for thread, wrapped in pairs(instance.data.coroutines) do
 		local unwrapped = unwrap(wrapped)
 		unwrapped.thread = nil

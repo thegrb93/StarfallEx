@@ -14,11 +14,11 @@ local checkpermission = SF.Permissions.check
 -- @client
 local notification_library = instance:RegisterLibrary("notification")
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.notifications = {}
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	for n, _ in pairs(instance.data.notifications) do
 		notification.Kill( n )
 	end

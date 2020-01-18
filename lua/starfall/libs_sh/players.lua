@@ -450,7 +450,7 @@ function player_methods:isSprinting()
 end
 
 if SERVER then
-	instance:AddHook("deinitialize", function(instance)
+	instance:AddHook("deinitialize", function()
 		for k, pl in pairs(player.GetAll()) do
 			if pl.sfhudenabled and pl.sfhudenabled.link == instance.data.entity then
 				pl:SetViewEntity()

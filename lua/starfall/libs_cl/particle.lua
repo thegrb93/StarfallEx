@@ -1,14 +1,7 @@
 SF.Particle = {}
 
 -- Create permission types.
-
-do
-
-	local P = SF.Permissions
-	--------------------------
-	P.registerPrivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
-
-end
+SF.Permissions.registerPrivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
 
 local ent_meta = instance.Types.Entity
 local vec_meta = instance.Types.Vector
@@ -52,13 +45,13 @@ instance:AddHook("postload", function()
 end)
 
 -- Create the storage for the metamethods
-instance:AddHook("initialize", function (instance)
+instance:AddHook("initialize", function()
 	instance.data.particle = {
 		particles = {},
 	}
 end)
 
-instance:AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function()
 	local particles = instance.data.particle.particles
 	local p = next(particles)
 	-- Remove all

@@ -33,11 +33,10 @@ end
 
 if SERVER then
 	-- Register privileges
-	local P = SF.Permissions
-	P.registerPrivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
-	P.registerPrivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
-	P.registerPrivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
-	P.registerPrivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
+	SF.Permissions.registerPrivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
+	SF.Permissions.registerPrivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
+	SF.Permissions.registerPrivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
+	SF.Permissions.registerPrivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 
 	--- Returns the driver of the vehicle
 	-- @server

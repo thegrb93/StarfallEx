@@ -11,7 +11,7 @@ end
 -- @client
 local socket_library = instance:RegisterLibrary("socket")
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	if LocalPlayer() == instance.player then
 		instance.env.socket = socket
 	end

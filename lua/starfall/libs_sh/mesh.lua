@@ -223,11 +223,11 @@ if CLIENT then
 	end
 
 	-- Register functions to be called when the chip is initialised and deinitialised
-	instance:AddHook("initialize", function(instance)
+	instance:AddHook("initialize", function()
 		instance.data.meshes = {}
 	end)
 
-	instance:AddHook("deinitialize", function(instance)
+	instance:AddHook("deinitialize", function()
 		local meshes = instance.data.meshes
 		local mesh = next(meshes)
 		while mesh do

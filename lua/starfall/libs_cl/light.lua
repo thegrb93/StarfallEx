@@ -31,10 +31,7 @@ instance:AddHook("postload", function()
 end)
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
-end
+SF.Permissions.registerPrivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
 
 local maxSize = CreateClientConVar( "sf_light_maxsize", "1024", true, false, "Max size lights can be" )
 
@@ -92,11 +89,11 @@ local function processLights(curtime)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.light = {lights={}}
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	local lights = instance.data.light.lights
 	for light, _ in pairs(lights) do
 		gSFLights[light.slot] = nil

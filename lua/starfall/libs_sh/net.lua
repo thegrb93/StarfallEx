@@ -15,7 +15,7 @@ local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net 
 SF.NetBurst = netBurst
 
 local instances = {}
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.net = {
 		started = false,
 		size = 0,
@@ -24,7 +24,7 @@ instance:AddHook("initialize", function(instance)
 	}
 end)
 
-instance:AddHook("cleanup", function (instance)
+instance:AddHook("cleanup", function()
 	instance.data.net.started = false
 	instance.data.net.data = {}
 end)

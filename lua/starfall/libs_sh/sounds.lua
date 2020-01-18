@@ -18,11 +18,8 @@ SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
 
 -- Register Privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
-	P.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
-end
+SF.Permissions.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
+SF.Permissions.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 
 local plyCount = SF.LimitObject("sounds", "sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 local plySoundBurst = SF.BurstObject("sounds", "sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
@@ -42,11 +39,11 @@ local function deleteSound(ply, ent, sound)
 end
 
 -- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.sounds = {sounds = {}}
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	for s, ent in pairs(instance.data.sounds.sounds) do
 		deleteSound(instance.player, ent, s)
 	end

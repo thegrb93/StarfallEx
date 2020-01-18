@@ -254,12 +254,12 @@ local renderhooks = {
 	postdrawhud = prepareRender,
 }
 
-instance:AddHook("prepare", function (instance, hook)
+instance:AddHook("prepare", function(hook)
 	local renderPrepare = renderhooks[hook]
 	if renderPrepare then renderPrepare(instance.data.render) end
 end)
 
-instance:AddHook("cleanup", function (instance, hook)
+instance:AddHook("cleanup", function(hook)
 	if renderhooks[hook] then
 		render.SetStencilEnable(false)
 		render.OverrideBlend(false)
@@ -308,14 +308,14 @@ instance:AddHook("cleanup", function (instance, hook)
 	end
 end)
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.render = {}
 	instance.data.render.renderedViews = 0
 	instance.data.render.rendertargets = {}
 	instance.data.render.validrendertargets = {}
 end)
 
-instance:AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function ()
 	for k, v in pairs(instance.data.render.rendertargets) do
 		rt_bank:free(instance.player, v)
 		instance.data.render.rendertargets[k] = nil

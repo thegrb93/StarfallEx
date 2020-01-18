@@ -191,7 +191,7 @@ function hook_library.remove (hookname, name)
 	end
 end
 
-instance:AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function()
 	for k, v in pairs(registered_instances) do
 		v[instance] = nil
 		if not next(v) and not gmod_override_hooks[k] then

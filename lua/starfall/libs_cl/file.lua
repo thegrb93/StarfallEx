@@ -15,24 +15,21 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", { client = { default = 1 } })
-	P.registerPrivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
-	P.registerPrivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
-	P.registerPrivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
-	P.registerPrivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
-	P.registerPrivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
-end
+SF.Permissions.registerPrivilege("file.read", "Read files", "Allows the user to read files from data/sf_filedata directory", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("file.write", "Write files", "Allows the user to write files to data/sf_filedata directory", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("file.exists", "File existence check", "Allows the user to determine whether a file in data/sf_filedata exists", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("file.find", "File find", "Allows the user to see what files are in data/sf_filedata", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("file.findInGame", "File find in garrysmod", "Allows the user to see what files are in garrysmod", { client = { default = 1 } })
+SF.Permissions.registerPrivilege("file.open", "Get a file object", "Allows the user to use a file object", { client = { default = 1 } })
 
 file.CreateDir("sf_filedata/")
 
 -- Register functions to be called when the chip is initialised and deinitialised
-instance:AddHook("initialize", function (instance)
+instance:AddHook("initialize", function()
 	instance.data.files = {}
 end)
 
-instance:AddHook("deinitialize", function (instance)
+instance:AddHook("deinitialize", function()
 	for file, _ in pairs(instance.data.files) do
 		file:Close()
 	end

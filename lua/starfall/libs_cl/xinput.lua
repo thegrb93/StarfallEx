@@ -60,14 +60,14 @@ function xinput_library.setRumble(id, softPercent, hardPercent)
 	instance.data.xinputRumble[id][2] = hardPercent
 end
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.xinputRumble = {}
 	for i = 0, 3 do
 		instance.data.xinputRumble[i] = {0, 0}
 	end
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	for i = 0, 3 do
 		local rumble = instance.data.xinputRumble[i]
 		if rumble[1] > 0 or rumble[2] > 0 then

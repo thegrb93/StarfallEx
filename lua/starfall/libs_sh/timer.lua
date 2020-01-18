@@ -204,12 +204,12 @@ function timer_library.getTimersLeft()
 end
 
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.timers = {}
 	instance.data.timer_count = 0
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	for name, _ in pairs(instance.data.timers) do
 		timer.Remove(name)
 	end

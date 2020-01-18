@@ -20,18 +20,20 @@ local function constraintOnDestroy(ent, constraints, ply)
 	constraints[ent] = nil
 end
 
+
 -- Local to each starfall
 return { function(instance) -- Called for library declarations
 
+
 --- Library for creating and manipulating constraints.
 -- @server
-instance:RegisterLibrary("constraint")
+local constraint_library = instance:RegisterLibrary("constraint")
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.constraints = {constraints = {}}
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	if instance.data.constraints.clean ~= false then --Return true on nil too
 		local constraints = instance.data.constraints.constraints
 		for ent, _ in pairs(constraints) do
@@ -44,12 +46,13 @@ instance:AddHook("deinitialize", function(instance)
 	end
 end)
 
+
 end, function(instance) -- Called for library definitions
 
-local checktype = instance.CheckType
 
 local constraint_library = instance.Libraries.constraint
 
+local checktype = instance.CheckType
 local ents_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 

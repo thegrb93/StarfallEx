@@ -6,23 +6,17 @@ SF.Permissions.registerPrivilege("entities.setRenderProperty", "RenderProperty",
 SF.Permissions.registerPrivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
 SF.Permissions.registerPrivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
+
 -- Local to each starfall
 return { function(instance) -- Called for library declarations
+
+
+local checktype = instance.CheckType
 
 --- Entity type
 -- @shared
 local ents_methods, ents_meta = instance:RegisterType("Entity")
 local ewrap, eunwrap = instance:CreateWrapper(ents_meta, true, true, debug.getregistry().Entity)
-
-end, function(instance) -- Called for library definitions
-
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
-local checktype = instance.CheckType
 
 local function getent(self)
 	local ent = eunwrap(self)
@@ -33,8 +27,20 @@ local function getent(self)
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
-
 instance.Types.Entity.GetEntity = getent
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local getent = instance.Types.Entity.GetEntity
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
+local mat_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
 --- To string
 -- @shared
@@ -613,7 +619,7 @@ function ents_methods:getBoneMatrix(bone)
 	local ent = getent(self)
 	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
 
-	return owrap(ent:GetBoneMatrix(bone))
+	return mwrap(ent:GetBoneMatrix(bone))
 end
 
 --- Returns the world transform matrix of the entity
@@ -621,7 +627,7 @@ end
 -- @return The matrix
 function ents_methods:getMatrix()
 	local ent = getent(self)
-	return owrap(ent:GetWorldTransformMatrix())
+	return mwrap(ent:GetWorldTransformMatrix())
 end
 
 --- Returns the number of an entity's bones

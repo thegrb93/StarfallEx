@@ -12,15 +12,19 @@ if SERVER then
 	printBurst = SF.BurstObject("print", "print", 3000, 10000, "The print burst regen rate in Bytes/sec.", "The print burst limit in Bytes")
 end
 
+
 -- Local to each starfall
 return { function(instance) -- Called for library declarations
+
 
 instance:RegisterLibrary("string")
 instance:RegisterLibrary("math")
 instance:RegisterLibrary("os")
 instance:RegisterLibrary("table")
 
+
 end, function(instance) -- Called for library definitions
+
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject

@@ -12,7 +12,7 @@ SF.Permissions.registerPrivilege("http.post", "HTTP Post method", "Allows the us
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.http = {
 		lastRequest = 0,
 		active = 0

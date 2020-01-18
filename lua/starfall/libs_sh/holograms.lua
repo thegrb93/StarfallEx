@@ -55,7 +55,7 @@ SF.Permissions.registerPrivilege("hologram.setRenderProperty", "RenderProperty",
 
 local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
 
-instance:AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.holograms = {holos = {}}
 end)
 
@@ -64,7 +64,7 @@ local function hologramOnDestroy(holo, holodata, ply)
 	plyCount:free(ply, 1)
 end
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	local holos = instance.data.holograms.holos
 	for holo, _ in pairs(holos) do
 		if holo:IsValid() then

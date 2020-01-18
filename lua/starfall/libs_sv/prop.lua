@@ -1,9 +1,4 @@
-
---- Library for creating and manipulating physics-less models AKA "Props".
--- @shared
-local props_library = instance:RegisterLibrary("prop")
-
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -22,11 +17,20 @@ local plyVertexCount = SF.LimitObject("props_custom_vertices", "custom prop vert
 local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
-instance:AddHook("initialize", function(instance)
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Library for creating and manipulating physics-less models AKA "Props".
+-- @shared
+instance:RegisterLibrary("prop")
+
+instance:AddHook("initialize", function()
 	instance.data.props = {props = {}}
 end)
 
-instance:AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	if instance.data.props.clean ~= false then --Return true on nil too
 		for prop, _ in pairs(instance.data.props.props) do
 			prop:Remove()
@@ -34,25 +38,23 @@ instance:AddHook("deinitialize", function(instance)
 	end
 end)
 
-local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
-instance:AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
-	ang_meta = SF.Angles.Metatable
 
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
-end)
+end, function(instance) -- Called for library definitions
 
-local function propOnDestroy(ent, instance)
+
+local props_library = instance.Libraries.prop
+local checktype = instance.CheckType
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
+local function propOnDestroy(ent)
 	local ply = instance.player
 	plyCount:free(ply, 1)
 	instance.data.props.props[ent] = nil
 end
 
-local function register(ent, instance)
-	ent:CallOnRemove("starfall_prop_delete", propOnDestroy, instance)
+local function register(ent)
+	ent:CallOnRemove("starfall_prop_delete", propOnDestroy)
 	plyCount:free(instance.player, -1)
 	instance.data.props.props[ent] = true
 end
@@ -107,7 +109,7 @@ function props_library.create(pos, ang, model, frozen)
 	gamemode.Call("PlayerSpawnedProp", ply, model, propent)
 	FixInvalidPhysicsObject(propent)
 
-	register(propent, instance)
+	register(propent)
 
 	return instance.Types.Entity.Wrap(propent)
 end
@@ -204,7 +206,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
 
-	register(propent, instance)
+	register(propent)
 
 	return instance.Types.Entity.Wrap(propent)
 end
@@ -270,7 +272,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	ply:AddCount("starfall_components", comp)
 	ply:AddCleanup("starfall_components", comp)
 
-	register(comp, instance)
+	register(comp)
 
 	return instance.Types.Entity.Wrap(comp)
 end
@@ -443,7 +445,7 @@ function props_library.createSent (pos, ang, class, frozen)
 		ply:AddCleanup("props", entity)
 		gamemode.Call(hookcall, ply, entity)
 
-		register(entity, instance)
+		register(entity)
 
 		return instance.WrapObject(entity)
 	end
@@ -485,3 +487,5 @@ end
 function props_library.setPropUndo(on)
 	instance.data.props.undo = on
 end
+
+end}

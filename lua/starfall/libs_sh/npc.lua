@@ -37,9 +37,8 @@ end
 
 if SERVER then
 	-- Register privileges
-	local P = SF.Permissions
-	P.registerPrivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
-	P.registerPrivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
+	SF.Permissions.registerPrivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
+	SF.Permissions.registerPrivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
 
 	--- Adds a relationship to the npc
 	-- @server

@@ -1,7 +1,4 @@
-do
-	local P = SF.Permissions
-	P.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
-end
+SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
 
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType

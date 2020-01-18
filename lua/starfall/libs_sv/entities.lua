@@ -1,63 +1,29 @@
--------------------------------------------------------------------------------
--- Serverside Entity functions
--------------------------------------------------------------------------------
-
-assert(instance.Types.Entity)
-
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
 
 local huge = math.huge
 local abs = math.abs
 
-local ents_metatable = instance.Types.Entity
-local getent = instance.Types.Entity.GetEntity
-
---- Entity type
---@class class
---@name Entity
-local ents_methods = instance.Types.Entity.Methods
-local ewrap, eunwrap = instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local owrap = instance.WrapObject
-local ounwrap = instance.UnwrapObject
-local checktype = instance.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
-	P.registerPrivilege("entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", { entities = {} })
-	P.registerPrivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
-	P.registerPrivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
-	P.registerPrivilege("entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", { entities = {} })
-	P.registerPrivilege("entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation", { entities = {} })
-	P.registerPrivilege("entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", { entities = {} })
-	P.registerPrivilege("entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", { entities = {} })
-	P.registerPrivilege("entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", { entities = {} })
-	P.registerPrivilege("entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", { entities = {} })
-	P.registerPrivilege("entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", { entities = {} })
-	P.registerPrivilege("entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", { entities = {} })
-	P.registerPrivilege("entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", { entities = {} })
-	P.registerPrivilege("entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistance and change it's coefficient", { entities = {} })
-	P.registerPrivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
-	P.registerPrivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
-	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
-	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
-end
-
-local vec_meta, ang_meta
-local vwrap, vunwrap, awrap, aunwrap
-
-instance:AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
-	ang_meta = SF.Angles.Metatable
-
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
-end)
-
--- ------------------------- Internal functions ------------------------- --
+SF.Permissions.registerPrivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", { entities = {} })
+SF.Permissions.registerPrivilege("entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", { entities = {} })
+SF.Permissions.registerPrivilege("entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistance and change it's coefficient", { entities = {} })
+SF.Permissions.registerPrivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
+SF.Permissions.registerPrivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
+SF.Permissions.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
+SF.Permissions.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -65,9 +31,25 @@ local function checkvector(v)
 	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
 
 		SF.Throw("Input vector too large or NAN", 3)
-
 	end
 end
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+end, function(instance) -- Called for library definitions
+
+
+local getent = instance.Types.Entity.GetEntity
+local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
+
 
 -- ------------------------- Methods ------------------------- --
 
@@ -791,7 +773,7 @@ function ents_methods:testPVS(other)
 	local meta = debug.getmetatable(other)
 	if meta==vec_meta then
 		other = vunwrap(other)
-	elseif meta==ents_metatable then
+	elseif meta==ents_meta then
 		other = getent(other)
 	else
 		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
@@ -806,3 +788,5 @@ function ents_methods:getCreationID()
 	local ent = getent(self)
 	return ent:GetCreationID()
 end
+
+end}

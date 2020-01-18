@@ -13,10 +13,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("find", "Find", "Allows the user to access the find library")
-end
+SF.Permissions.registerPrivilege("find", "Find", "Allows the user to access the find library")
 
 local function convert(results, func)
 	if func then checkluatype (func, TYPE_FUNCTION) end
