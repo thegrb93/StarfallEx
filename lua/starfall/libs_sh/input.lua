@@ -38,7 +38,7 @@ end
 
 --- Input library.
 -- @client
-local input_methods = SF.RegisterLibrary("input")
+local input_methods = instance:RegisterLibrary("input")
 
 SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
 SF.Permissions.registerPrivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
@@ -58,7 +58,7 @@ function input_methods.lookupBinding(binding)
 	if bind then
 		bind = bind:upper()
 
-		return SF.DefaultEnvironment.KEY[bind] or SF.DefaultEnvironment.MOUSE[bind], bind
+		return instance.env.KEY[bind] or instance.env.MOUSE[bind], bind
 	end
 end
 
@@ -154,7 +154,7 @@ end
 -- @client
 -- @param weapon The weapon entity to select
 function input_methods.selectWeapon(weapon)
-	local ent = SF.Entities.GetEntity(weapon)
+	local ent = instance.Types.Entity.GetEntity(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
 	SF.Permissions.check(instance, nil, "input.emulate")
 	input.SelectWeapon( ent ) 

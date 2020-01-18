@@ -2,7 +2,7 @@
 
 --- JSON library
 -- @shared
-local json_library = SF.RegisterLibrary("json")
+local json_library = instance:RegisterLibrary("json")
 local util = util
 
 --- Convert table to JSON string

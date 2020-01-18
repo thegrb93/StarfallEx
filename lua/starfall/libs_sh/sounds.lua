@@ -10,7 +10,7 @@ local checkpermission = SF.Permissions.check
 
 --- Sounds library.
 -- @shared
-local sound_library = SF.RegisterLibrary("sounds")
+local sound_library = instance:RegisterLibrary("sounds")
 
 SF.Sounds.Wrap = wrap
 SF.Sounds.Unwrap = unwrap
@@ -58,7 +58,7 @@ end)
 -- @param nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 -- @return Sound Object
 function sound_library.create(ent, path, nofilter)
-	checktype(ent, SF.Types["Entity"])
+	checktype(ent, instance.Types.Entity)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
 

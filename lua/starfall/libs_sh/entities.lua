@@ -2,8 +2,6 @@
 -- Shared entity library functions
 -------------------------------------------------------------------------------
 
-SF.Entities = {}
-
 --- Entity type
 -- @shared
 local ents_methods, ents_metamethods = instance:RegisterType("Entity")
@@ -11,6 +9,7 @@ local ents_methods, ents_metamethods = instance:RegisterType("Entity")
 local ewrap, eunwrap = instance:CreateWrapper(ents_metamethods, true, true, debug.getregistry().Entity)
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ang_meta, vec_meta
+local col_meta = instance.Types.Color
 local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, pwrap, punwrap
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
@@ -33,34 +32,8 @@ instance:AddHook("postload", function()
 	pwrap = SF.PhysObjs.Wrap
 	punwrap = SF.PhysObjs.Unwrap
 
-	function SF.DefaultEnvironment.chip()
-		return ewrap(instance.data.entity)
-	end
-
-	function SF.DefaultEnvironment.owner()
-		return SF.Players.Wrap(instance.player)
-	end
-
-	function SF.DefaultEnvironment.entity(num)
-		checkluatype(num, TYPE_NUMBER)
-		return owrap(Entity(num))
-	end
-
-	function SF.DefaultEnvironment.player(num)
-		if num then
-			checkluatype(num, TYPE_NUMBER)
-			return owrap(Player(num))
-		end
-
-		return SERVER and SF.DefaultEnvironment.owner() or owrap(LocalPlayer())
-	end
+	
 end)
-
-
-SF.Entities.Wrap = ewrap
-SF.Entities.Unwrap = eunwrap
-SF.Entities.Methods = ents_methods
-SF.Entities.Metatable = ents_metamethods
 
 local function getent(self)
 	local ent = eunwrap(self)
@@ -72,7 +45,7 @@ local function getent(self)
 	end
 end
 
-SF.Entities.GetEntity = getent
+instance.Types.Entity.GetEntity = getent
 
 --- To string
 -- @shared
@@ -90,7 +63,7 @@ function ents_methods:getOwner()
 	local ent = getent(self)
 
 	if SF.Permissions.getOwner then
-		return SF.Players.Wrap(SF.Permissions.getOwner(ent))
+		return instance.Types.Player.Wrap(SF.Permissions.getOwner(ent))
 	end
 end
 
@@ -227,7 +200,7 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor(clr)
-	checktype(clr, SF.Types["Color"])
+	checktype(clr, col_meta)
 
 	local ent = getent(self)
 	if SERVER and ent == instance.player then

@@ -4,7 +4,7 @@
 
 --- File functions. Allows modification of files.
 -- @client
-local file_library = SF.RegisterLibrary("file")
+local file_library = instance:RegisterLibrary("file")
 
 --- File type
 -- @client

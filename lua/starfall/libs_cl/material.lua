@@ -32,7 +32,7 @@ local dsetmeta = debug.setmetatable
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
 -- @client
-local material_library = SF.RegisterLibrary("material")
+local material_library = instance:RegisterLibrary("material")
 
 SF.Materials.Wrap = wrap
 SF.Materials.Unwrap = unwrap

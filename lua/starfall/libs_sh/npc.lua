@@ -17,9 +17,9 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 instance:AddHook("postload", function()
-	wrap = SF.Entities.Wrap
-	unwrap = SF.Entities.Unwrap
-	ents_metatable = SF.Entities.Metatable
+	wrap = instance.Types.Entity.Wrap
+	unwrap = instance.Types.Entity.Unwrap
+	ents_metatable = instance.Types.Entity.Metatable
 
 	SF.ApplyTypeDependencies(npc_methods, npc_metamethods, ents_metatable)
 	wrap, unwrap = instance:CreateWrapper(npc_metamethods, true, false, debug.getregistry().NPC, ents_metatable)

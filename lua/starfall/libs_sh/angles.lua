@@ -6,6 +6,7 @@ local ang_methods, ang_metamethods = instance:RegisterType("Angle")
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local vec_meta = instance.Types.Vector
 
 local function wrap(tbl)
 	return setmetatable(tbl, ang_metamethods)
@@ -186,7 +187,7 @@ end
 -- @param rad Number of radians or nil if degrees.
 -- @return The modified angle
 function ang_methods:rotateAroundAxis (v, deg, rad)
-	checktype(v, SF.Types["Vector"])
+	checktype(v, vec_meta)
 
 	if rad then
 		checkluatype (rad, TYPE_NUMBER)

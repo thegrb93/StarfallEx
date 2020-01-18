@@ -10,7 +10,8 @@ do
 
 end
 
-local TYPE_ENTITY,TYPE_VECTOR
+local ent_meta = instance.Types.Entity
+local vec_meta = instance.Types.Vector
 local unwrap_entity, unwrap_vector
 local IsValid = IsValid
 local checktype = instance.CheckType
@@ -18,10 +19,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 instance:AddHook("postload", function()
-	TYPE_ENTITY = SF.Entities.Metatable
-	TYPE_VECTOR = SF.Types["Vector"]
-
-	unwrap_entity = SF.Entities.Unwrap
+	unwrap_entity = instance.Types.Entity.Unwrap
 	unwrap_vector = SF.Vectors.Unwrap
 end)
 
@@ -33,7 +31,7 @@ local wrap, unwrap = instance:CreateWrapper(particle_metamethods, false, false)
 
 --- Particle library.
 -- @client
-local particle_library = SF.RegisterLibrary("particle")
+local particle_library = instance:RegisterLibrary("particle")
 
 SF.Particle.Wrap = wrap
 SF.Particle.Unwrap = unwrap
@@ -93,7 +91,7 @@ end
 function particle_library.attach (entity, particle, pattach, options)
 	checkpermission (instance.player, entity, "particle.attach")
 
-	checktype(entity, TYPE_ENTITY)
+	checktype(entity, ent_meta)
 	checkluatype (particle, TYPE_STRING)
 	checkluatype (pattach, TYPE_NUMBER)
 	checkluatype (options, TYPE_TABLE)
@@ -198,7 +196,7 @@ end
 function particle_methods:setSortOrigin(origin)
 	checktype(self, particle_metamethods)
 	local uw = unwrap(self)
-	checktype(origin, TYPE_VECTOR)
+	checktype(origin, vec_meta)
 
 	checkValid(uw)
 
@@ -216,7 +214,7 @@ function particle_methods:setControlPoint(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -235,7 +233,7 @@ function particle_methods:setControlPointEntity(id,entity)
 	local entity = unwrap_entity(entity)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(entity, TYPE_ENTITY)
+	checktype(entity, ent_meta)
 
 	checkValid(uw)
 
@@ -253,7 +251,7 @@ function particle_methods:setForwardVector(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -270,7 +268,7 @@ function particle_methods:setRightVector(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -288,7 +286,7 @@ function particle_methods:setUpVector(id,value)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, TYPE_VECTOR)
+	checktype(value, vec_meta)
 
 	checkValid(uw)
 

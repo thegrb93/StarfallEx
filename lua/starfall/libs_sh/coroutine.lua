@@ -2,7 +2,7 @@
 
 --- Coroutine library
 -- @shared
-local coroutine_library = SF.RegisterLibrary("coroutine")
+local coroutine_library = instance:RegisterLibrary("coroutine")
 local coroutine = coroutine
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType

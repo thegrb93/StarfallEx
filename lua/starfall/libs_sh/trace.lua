@@ -103,7 +103,7 @@ end
 -- @field CONTENTS_TRANSLUCENT
 -- @field CONTENTS_LADDER
 -- @field CONTENTS_HITBOX
-local trace_library = SF.RegisterLibrary("trace")
+local trace_library = instance:RegisterLibrary("trace")
 
 -- Material Enumeration
 trace_library.MAT_ANTLION = MAT_ANTLION
@@ -209,10 +209,10 @@ local unwrap, vunwrap, aunwrap
 local vecmeta, angmeta
 
 local function postload()
-	wrap = SF.Entities.Wrap
+	wrap = instance.Types.Entity.Wrap
 	vwrap = SF.Vectors.Wrap
 	awrap = SF.Angles.Wrap
-	unwrap = SF.Entities.Unwrap
+	unwrap = instance.Types.Entity.Unwrap
 	vunwrap = SF.Vectors.Unwrap
 	aunwrap = SF.Angles.Unwrap
 	vecmeta = SF.Vectors.Metatable

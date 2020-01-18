@@ -2,7 +2,7 @@
 
 --- Quaternion library
 -- @shared
-local quat_lib = SF.RegisterLibrary("quaternion")
+local quat_lib = instance:RegisterLibrary("quaternion")
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local checktype = instance.CheckType

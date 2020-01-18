@@ -4,8 +4,9 @@
 
 --- Find library. Finds entities in various shapes.
 -- @shared
-local find_library = SF.RegisterLibrary("find")
+local find_library = instance:RegisterLibrary("find")
 
+local vec_meta = instance.Types.Vector
 local vunwrap = instance.UnwrapObject
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
@@ -47,8 +48,8 @@ end
 -- @return An array of found entities
 function find_library.inBox (min, max, filter)
 	checkpermission(instance, nil, "find")
-	checktype(min, SF.Types["Vector"])
-	checktype(max, SF.Types["Vector"])
+	checktype(min, vec_meta)
+	checktype(max, vec_meta)
 
 	local min, max = vunwrap(min), vunwrap(max)
 
@@ -62,7 +63,7 @@ end
 -- @return An array of found entities
 function find_library.inSphere (center, radius, filter)
 	checkpermission(instance, nil, "find")
-	checktype(center, SF.Types["Vector"])
+	checktype(center, vec_meta)
 	checkluatype (radius, TYPE_NUMBER)
 
 	local center = vunwrap(center)
@@ -79,8 +80,8 @@ end
 -- @return An array of found entities
 function find_library.inCone(pos, dir, distance, radius, filter)
 	checkpermission(instance, nil, "find")
-	checktype(pos, SF.Types["Vector"])
-	checktype(dir, SF.Types["Vector"])
+	checktype(pos, vec_meta)
+	checktype(dir, vec_meta)
 	checkluatype (distance, TYPE_NUMBER)
 	checkluatype (radius, TYPE_NUMBER)
 
@@ -99,14 +100,14 @@ end
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
 	checkpermission(instance, nil, "find")
 
-	checktype(startpos, SF.Types["Vector"])
-	checktype(endpos, SF.Types["Vector"])
+	checktype(startpos, vec_meta)
+	checktype(endpos, vec_meta)
 	startpos = vunwrap(startpos)
 	endpos = vunwrap(endpos)
 
 	if mins ~= nil or maxs ~= nil then
-		checktype(mins, SF.Types["Vector"])
-		checktype(maxs, SF.Types["Vector"])
+		checktype(mins, vec_meta)
+		checktype(maxs, vec_meta)
 		mins = vunwrap(mins)
 		maxs = vunwrap(maxs)
 	end
@@ -155,7 +156,7 @@ if SERVER then
 	-- @return An array of found entities
 	function find_library.inPVS (pos, filter)
 		checkpermission(instance, nil, "find")
-		checktype(pos, SF.Types["Vector"])
+		checktype(pos, vec_meta)
 		
 		return convert(ents.FindInPVS(vunwrap(pos)), filter)
 	end

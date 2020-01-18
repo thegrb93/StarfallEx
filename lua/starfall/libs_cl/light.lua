@@ -10,7 +10,7 @@ local checkpermission = SF.Permissions.check
 
 --- Light library.
 -- @client
-local light_library = SF.RegisterLibrary("light")
+local light_library = instance:RegisterLibrary("light")
 
 SF.Light.Wrap = wrap
 SF.Light.Unwrap = unwrap

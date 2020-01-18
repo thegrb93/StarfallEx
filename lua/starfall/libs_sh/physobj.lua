@@ -26,8 +26,8 @@ instance:AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
 
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
+	ewrap = instance.Types.Entity.Wrap
+	eunwrap = instance.Types.Entity.Unwrap
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	awrap = SF.Angles.Wrap

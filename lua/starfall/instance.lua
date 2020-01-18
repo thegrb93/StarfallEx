@@ -102,7 +102,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 			if isstring(func) then
 				return false, { message = func, traceback = "" }
 			end
-			debug.setfenv(func, instance.Libraries)
+			debug.setfenv(func, instance.env)
 			instance.scripts[filename] = func
 		end
 	end
@@ -223,6 +223,9 @@ function SF.Instance:CreateWrapper(metatable, weakwrapper, weaksensitive, target
 	end
 	self.object_unwrappers[metatable] = unwrap
 
+	metatable.Wrap = wrap
+	metatable.Unwrap = unwrap
+
 	return wrap, unwrap
 end
 
@@ -260,6 +263,10 @@ function SF.Instance:BuildEnvironment()
 	local object_unwrappers = {}
 	local sensitive2sf_tables = {}
 	local sf2sensitive_tables = {}
+	self.object_wrappers = object_wrappers
+	self.object_unwrappers = object_unwrappers
+	self.sensitive2sf_tables = sensitive2sf_tables
+	self.sf2sensitive_tables = sf2sensitive_tables
 
 	--- Gets the type of val.
 	-- @param val The value to be checked.
@@ -395,7 +402,8 @@ function SF.Instance:BuildEnvironment()
 	for k, v in pairs(SF.Modules) do
 		v[2](self)
 	end
-	self.Libraries._G = self.Libraries
+	table.Inherit( self.env, self.Libraries ) 
+	self.env._G = self.env
 end
 
 --- Overridable hook for pcall-based hook systems

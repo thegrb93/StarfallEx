@@ -19,14 +19,14 @@ local vwrap, vunwrap, awrap, aunwrap, cwrap, cunwrap, ewrap, eunwrap
 instance:AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
-	ent_meta = SF.Entities.Metatable
+	ent_meta = instance.Types.Entity.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	awrap = SF.Angles.Wrap
 	aunwrap = SF.Angles.Unwrap
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
+	ewrap = instance.Types.Entity.Wrap
+	eunwrap = instance.Types.Entity.Unwrap
 end)
 
 -- Register Privileges
@@ -39,7 +39,7 @@ local plyEffectBurst = SF.BurstObject("effects", "effects", 60, 5, "Rate effects
 
 --- Effects library.
 -- @shared
-local effect_library = SF.RegisterLibrary("effect")
+local effect_library = instance:RegisterLibrary("effect")
 
 --- Creates an effect data structure
 -- @return Effect Object

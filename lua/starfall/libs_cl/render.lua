@@ -83,7 +83,7 @@
 -- @field TEXT_ALIGN_TOP
 -- @field TEXT_ALIGN_BOTTOM
 
-local render_library = SF.RegisterLibrary("render")
+local render_library = instance:RegisterLibrary("render")
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
 render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
@@ -117,17 +117,17 @@ instance:AddHook("postload", function()
 	matrix_meta = SF.VMatrix.Metatable
 	col_meta = SF.Color.Metatable
 	ang_meta = SF.Angles.Metatable
-	ent_meta = SF.Entities.Metatable
+	ent_meta = instance.Types.Entity.Metatable
 	mat_meta = SF.Materials.Metatable
 	mat_meta2 = SF.Materials.LMetatable
 
 	vwrap = SF.Vectors.Wrap
 	cwrap = SF.Color.Wrap
-	ewrap = SF.Entities.Wrap
+	ewrap = instance.Types.Entity.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	munwrap = SF.VMatrix.Unwrap
 	aunwrap = SF.Angles.Unwrap
-	eunwrap = SF.Entities.Unwrap
+	eunwrap = instance.Types.Entity.Unwrap
 	maunwrap = SF.Materials.Unwrap
 
 	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)

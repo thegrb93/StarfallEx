@@ -14,10 +14,10 @@ SF.Vehicles.Metatable = vehicle_metamethods
 
 local wrap, unwrap, pwrap
 instance:AddHook("postload", function()
-	pwrap = SF.Players.Wrap
+	pwrap = instance.Types.Player.Wrap
 
-	SF.ApplyTypeDependencies(vehicle_methods, vehicle_metamethods, SF.Entities.Metatable)
-	wrap, unwrap = instance:CreateWrapper(vehicle_metamethods, true, false, debug.getregistry().Vehicle, SF.Entities.Metatable)
+	SF.ApplyTypeDependencies(vehicle_methods, vehicle_metamethods, instance.Types.Entity.Metatable)
+	wrap, unwrap = instance:CreateWrapper(vehicle_metamethods, true, false, debug.getregistry().Vehicle, instance.Types.Entity.Metatable)
 
 	SF.Vehicles.Wrap = wrap
 	SF.Vehicles.Unwrap = unwrap

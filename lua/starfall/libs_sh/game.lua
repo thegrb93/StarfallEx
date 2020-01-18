@@ -4,7 +4,7 @@
 
 --- Game functions
 -- @shared
-local game_lib = SF.RegisterLibrary("game")
+local game_lib = instance:RegisterLibrary("game")
 
 --- Returns the map name
 -- @name game_lib.getMap

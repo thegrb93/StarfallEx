@@ -15,13 +15,14 @@ local plyCount = SF.LimitObject("bass", "bass sounds", 20, "The number of sounds
 -- @client
 local bass_methods, bass_metamethods = instance:RegisterType("Bass")
 local wrap, unwrap = instance:CreateWrapper(bass_metamethods, true, false)
+local vec_meta = instance.Types.Vector
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @client
-local bass_library = SF.RegisterLibrary("bass")
+local bass_library = instance:RegisterLibrary("bass")
 
 SF.Bass.Wrap = wrap
 SF.Bass.Unwrap = unwrap
@@ -212,7 +213,7 @@ end
 -- @param pos Where to position the sound.
 function bass_methods:setPos (pos)
 	checktype(self, bass_metamethods)
-	checktype(pos, SF.Types["Vector"])
+	checktype(pos, vec_meta)
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")

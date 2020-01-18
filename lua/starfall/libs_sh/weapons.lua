@@ -19,8 +19,8 @@ local checkpermission = SF.Permissions.check
 
 local wrap, unwrap
 instance:AddHook("postload", function()
-	SF.ApplyTypeDependencies(weapon_methods, weapon_metamethods, SF.Entities.Metatable)
-	wrap, unwrap = instance:CreateWrapper(weapon_metamethods, true, false, debug.getregistry().Weapon, SF.Entities.Metatable)
+	SF.ApplyTypeDependencies(weapon_methods, weapon_metamethods, instance.Types.Entity.Metatable)
+	wrap, unwrap = instance:CreateWrapper(weapon_metamethods, true, false, debug.getregistry().Weapon, instance.Types.Entity.Metatable)
 
 	SF.Weapons.Wrap = wrap
 	SF.Weapons.Unwrap = unwrap

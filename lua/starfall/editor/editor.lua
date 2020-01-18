@@ -69,36 +69,6 @@ if CLIENT then
 		['"'] = "",
 	}
 
-
-	local function createLibraryMap ()
-
-		local libMap, libs = {}, {}
-
-		libMap["Environment"] = {}
-		for name, val in pairs(SF.DefaultEnvironment) do
-			table.insert(libMap["Environment"], name)
-			table.insert(libs, name)
-		end
-
-		for lib, tbl in pairs(SF.Libraries) do
-			libMap[lib] = {}
-			for name, val in pairs(tbl) do
-				table.insert(libMap[lib], name)
-				table.insert(libs, lib.."\\."..name)
-			end
-		end
-
-		for lib, tbl in pairs(SF.Types) do
-			if istable(tbl.__index) then
-				for name, val in pairs(tbl.__index) do
-					table.insert(libs, "\\:"..name)
-				end
-			end
-		end
-
-		return libMap, table.concat(libs, "|")
-	end
-
 	function SF.Editor.init ()
 
 		if not file.Exists("starfall", "DATA") then

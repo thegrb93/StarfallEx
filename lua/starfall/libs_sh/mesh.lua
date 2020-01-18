@@ -5,7 +5,7 @@ local checkpermission = SF.Permissions.check
 
 --- Mesh library.
 -- @shared
-local mesh_library = SF.RegisterLibrary("mesh")
+local mesh_library = instance:RegisterLibrary("mesh")
 
 local thread_lib
 instance:AddHook("postload", function()

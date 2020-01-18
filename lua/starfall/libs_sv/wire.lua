@@ -5,7 +5,7 @@
 if not WireLib then return end
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library = SF.RegisterLibrary("wire")
+local wire_library = instance:RegisterLibrary("wire")
 
 instance:AddHook("initialize", function(instance)
 	local ent = instance.data.entity
@@ -69,6 +69,7 @@ local wlwrap, wlunwrap = instance:CreateWrapper(wirelink_metatable, true, true)
 local vwrap, awrap
 local vunwrap, aunwrap
 local owrap, ounwrap
+local vec_meta, ang_meta, ent_meta, col_meta = instance.Types.Vector, instance.Types.Angle, instance.Types.Entity, instance.Types.Color
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
@@ -86,13 +87,13 @@ local outputConverters
 instance:AddHook("postload", function()
 	vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
 	vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
-	owrap, ounwrap = instance.WrapObject, SF.Entities.Unwrap
+	owrap, ounwrap = instance.WrapObject, instance.Types.Entity.Unwrap
 	
 	--- Returns an entities wirelink
 	-- @name Entity.getWirelink
 	-- @class function
 	-- @return Wirelink of the entity
-	SF.Entities.Methods.getWirelink = wire_library.getWirelink
+	instance.Types.Entity.Methods.getWirelink = wire_library.getWirelink
 
 	local function identity(data) return data end
 	typeToE2Type = {
@@ -172,15 +173,15 @@ instance:AddHook("postload", function()
 			return data
 		end,
 		VECTOR = function(data)
-			checktype(data, SF.Types["Vector"], 2)
+			checktype(data, vec_meta, 2)
 			return vunwrap(data)
 		end,
 		ANGLE = function(data)
-			checktype(data, SF.Types["Angle"], 2)
+			checktype(data, ang_meta, 2)
 			return aunwrap(data)
 		end,
 		ENTITY = function(data)
-			checktype(data, SF.Types["Entity"], 2)
+			checktype(data, ent_meta, 2)
 			return ounwrap(data)
 		end,
 		TABLE = function(data)
@@ -355,8 +356,8 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param color Color of the wire(optional)
 -- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
 function wire_library.create (entI, entO, inputname, outputname, width, color, material)
-	checktype(entI, SF.Types["Entity"])
-	checktype(entO, SF.Types["Entity"])
+	checktype(entI, ent_meta)
+	checktype(entO, ent_meta)
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 
@@ -367,7 +368,7 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 		width = math.Clamp(width, 0, 5)
 	end
 	if color ~= nil then
-		checktype(color, SF.Types['Color'])
+		checktype(color, col_meta)
 	else
 		color = COLOR_WHITE
 	end
@@ -405,7 +406,7 @@ end
 -- @param entI Entity with input
 -- @param inputname Input to be un-wired
 function wire_library.delete (entI, inputname)
-	checktype(entI, SF.Types["Entity"])
+	checktype(entI, ent_meta)
 	checkluatype(inputname, TYPE_STRING)
 
 	local entI = ounwrap(entI)
@@ -423,7 +424,7 @@ end
 local function parseEntity(ent, io)
 
 	if ent then
-		checktype(ent, SF.Types["Entity"])
+		checktype(ent, ent_meta)
 		ent = ounwrap(ent)
 		checkpermission(instance, ent, "wire.get" .. io)
 	else
@@ -460,7 +461,7 @@ end
 -- @param ent Wire entity
 -- @return Wirelink of the entity
 function wire_library.getWirelink (ent)
-	checktype(ent, SF.Types["Entity"])
+	checktype(ent, ent_meta)
 	ent = ounwrap(ent)
 	if not ent:IsValid() then return end
 	checkpermission(instance, ent, "wire.wirelink")

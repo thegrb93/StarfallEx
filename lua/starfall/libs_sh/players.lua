@@ -2,7 +2,6 @@
 -- Player functions.
 -------------------------------------------------------------------------------
 
-SF.Players = {}
 --- Player type
 local player_methods, player_metamethods = instance:RegisterType("Player")
 
@@ -11,19 +10,13 @@ local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-SF.Players.Methods = player_methods
-SF.Players.Metatable = player_metamethods
-
 local wrap, unwrap, ents_metatable
 
 instance:AddHook("postload", function()
-	ents_metatable = SF.Entities.Metatable
+	ents_metatable = instance.Types.Entity.Metatable
 
 	SF.ApplyTypeDependencies(player_methods, player_metamethods, ents_metatable)
 	wrap, unwrap = instance:CreateWrapper(player_metamethods, true, false, debug.getregistry().Player, ents_metatable)
-
-	SF.Players.Wrap = wrap
-	SF.Players.Unwrap = unwrap
 
 	--- ENUMs of in_keys for use with player:keyDown:
 	-- ALT1,

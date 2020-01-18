@@ -1,7 +1,7 @@
 
 --- Library for retreiving information about teams
 -- @shared
-local team_library = SF.RegisterLibrary("team")
+local team_library = instance:RegisterLibrary("team")
 local cwrap, cunwrap
 instance:AddHook("postload", function()
 	cwrap = SF.Color.Wrap

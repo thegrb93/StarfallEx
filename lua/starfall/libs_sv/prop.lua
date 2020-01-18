@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @shared
-local props_library = SF.RegisterLibrary("prop")
+local props_library = instance:RegisterLibrary("prop")
 
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
@@ -109,7 +109,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	register(propent, instance)
 
-	return SF.Entities.Wrap(propent)
+	return instance.Types.Entity.Wrap(propent)
 end
 
 --- Creates a custom prop.
@@ -206,7 +206,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	register(propent, instance)
 
-	return SF.Entities.Wrap(propent)
+	return instance.Types.Entity.Wrap(propent)
 end
 
 local allowed_components = {
@@ -272,7 +272,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 
 	register(comp, instance)
 
-	return SF.Entities.Wrap(comp)
+	return instance.Types.Entity.Wrap(comp)
 end
 
 --- Creates a sent.

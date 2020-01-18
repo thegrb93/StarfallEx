@@ -8,7 +8,7 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 --- Net message library. Used for sending data from the server to the client and back
-local net_library = SF.RegisterLibrary("net")
+local net_library = instance:RegisterLibrary("net")
 
 local streams = SF.EntityTable("playerStreams")
 local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
@@ -77,14 +77,14 @@ function net_library.send (target, unreliable)
 			if target[1] then
 				local nt = { }
 				for i = 1, #target do
-					local pl = SF.Entities.Unwrap(target[i])
+					local pl = instance.Types.Entity.Unwrap(target[i])
 					if pl and pl:IsValid() and pl:IsPlayer() then
 						nt[#nt + 1] = pl
 					end
 				end
 				sendfunc, newtarget = net.Send, nt
 			else
-				sendfunc, newtarget = net.Send, SF.Entities.Unwrap(target)
+				sendfunc, newtarget = net.Send, instance.Types.Entity.Unwrap(target)
 				if not (newtarget and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
 			end
 		else
@@ -416,7 +416,7 @@ end
 function net_library.writeAngle(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, SF.Types["Angle"])
+	checktype(t, instance.Types.Angle)
 
 	write(instance, net.WriteAngle, 54, SF.Angles.Unwrap(t))
 	return true
@@ -437,7 +437,7 @@ end
 function net_library.writeVector(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, SF.Types["Vector"])
+	checktype(t, instance.Types.Vector)
 
 	write(instance, net.WriteVector, 54, SF.Vectors.Unwrap(t))
 	return true
@@ -458,7 +458,7 @@ end
 function net_library.writeMatrix(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, SF.Types["VMatrix"])
+	checktype(t, instance.Types.VMatrix)
 
 	write(instance, net.WriteMatrix, 64*8, SF.VMatrix.Unwrap(t))
 	return true
@@ -479,7 +479,7 @@ end
 function net_library.writeColor(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, SF.Types["Color"])
+	checktype(t, instance.Types.Color)
 
 	write(instance, net.WriteColor, 4*8, SF.Color.Unwrap(t))
 	return true
@@ -500,9 +500,9 @@ end
 function net_library.writeEntity(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, SF.Types["Entity"])
+	checktype(t, instance.Types.Entity)
 
-	write(instance, net.WriteEntity, 2*8, SF.Entities.Unwrap(t))
+	write(instance, net.WriteEntity, 2*8, instance.Types.Entity.Unwrap(t))
 	return true
 end
 

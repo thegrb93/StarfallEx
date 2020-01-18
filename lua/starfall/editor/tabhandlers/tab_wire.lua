@@ -106,49 +106,22 @@ function TabHandler:GetSyntaxColor(name)
 end
 
 ---------------------
-local libsworkingastypes = { -- those aren't present in docs
-	["string"] = true,
-	["table"] = true,
-}
-local function createWireLibraryMap () -- Hashtable
-
+local function createWireLibraryMap()
 	local libMap = {}
-	libMap["Methods"] = {}
+	libMap.Methods = {}
+
 	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
+		if not isstring(lib) then continue end
 		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end -- We gotta skip numberics
-			libMap["Methods"][name] = true
+			if not isstring(name) then continue end
+			libMap.Methods[name] = true
 		end
 	end
-
-	libMap["Environment"] = {}
-	for name, val in pairs(SF.DefaultEnvironment) do
-		if istable(val) then
-			libMap["Environment"][name] = {}
-			for n, v in pairs(val) do
-				libMap["Environment"][name][n] = type(v)
-			end
-			continue
-		end
-		libMap["Environment"][name] = type(val)
-	end
-
-	for lib, tbl in pairs(SF.Libraries) do --Constants/enums aren't present in docs ATM
-		libMap[lib] = {}
-		for name, val in pairs(tbl) do
-			libMap[lib][name] = type(val)
-			if libsworkingastypes[lib] then
-				libMap["Methods"][name] = true
-			end
-		end
-	end
-	--Gathering data from docs
 	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
+		if not isstring(lib) then continue end
 		libMap[lib] = {}
 		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end -- We gotta skip numberics
+			if not isstring(name) then continue end
 			libMap[lib][name] = val.class
 		end
 	end

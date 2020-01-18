@@ -12,7 +12,7 @@ local checkpermission = SF.Permissions.check
 
 --- Notification library. Allows the user to display hints on the bottom right of their screen
 -- @client
-local notification_library = SF.RegisterLibrary("notification")
+local notification_library = instance:RegisterLibrary("notification")
 
 instance:AddHook("initialize", function(instance)
 	instance.data.notifications = {}

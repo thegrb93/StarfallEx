@@ -9,7 +9,7 @@ local checkpermission = SF.Permissions.check
 
 --- SQL library.
 -- @client
-local sql_library = SF.RegisterLibrary("sql")
+local sql_library = instance:RegisterLibrary("sql")
 
 --- Performs a query on the local SQLite database.
 -- @param query The query to execute.

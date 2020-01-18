@@ -1,7 +1,7 @@
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
 -- @shared
-local holograms_library = SF.RegisterLibrary("holograms")
+local holograms_library = instance:RegisterLibrary("holograms")
 
 --- Hologram type
 local hologram_methods, hologram_metamethods = instance:RegisterType("Hologram")
@@ -26,13 +26,13 @@ local hologramSENT
 instance:AddHook("postload", function()
 	ang_meta = SF.Angles.Metatable
 	vec_meta = SF.Vectors.Metatable
-	ent_meta = SF.Entities.Metatable
+	ent_meta = instance.Types.Entity.Metatable
 
 	vwrap = SF.Vectors.Wrap
 	vunwrap = SF.Vectors.Unwrap
 	aunwrap = SF.Angles.Unwrap
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
+	ewrap = instance.Types.Entity.Wrap
+	eunwrap = instance.Types.Entity.Unwrap
 
 	SF.ApplyTypeDependencies(hologram_methods, hologram_metamethods, ent_meta)
 	wrap, unwrap = instance:CreateWrapper(hologram_metamethods, true, false, nil, ent_meta)

@@ -2,7 +2,7 @@ if not pcall(require, "joystick") then return end
 
 --- Joystick library.
 -- @client
-local joystick_library = SF.RegisterLibrary("joystick")
+local joystick_library = instance:RegisterLibrary("joystick")
 local next_updates = {}
 
 local function refresh(enum)

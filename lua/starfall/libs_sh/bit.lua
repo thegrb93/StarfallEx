@@ -4,7 +4,7 @@
 
 --- Bit library http://wiki.garrysmod.com/page/Category:bit
 -- @shared
-local bit_library = SF.RegisterLibrary("bit")
+local bit_library = instance:RegisterLibrary("bit")
 bit_library.arshift = bit.arshift
 bit_library.band = bit.band
 bit_library.bnot = bit.bnot
