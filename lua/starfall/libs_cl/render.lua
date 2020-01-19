@@ -335,12 +335,6 @@ SF.AddHook("deinitialize", function (instance)
 	end
 end)
 
-local aspectRatio = ScrW() / ScrH() -- For some reason, render.BlurRenderTarget performs the blur based on the game's window size. This compensates for that
-
-hook.Add("Think", "SF_Fetch_AspectRatio", function()
-	aspectRatio = ScrW() / ScrH()
-end)
-
 hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
 	for instance, _ in pairs(SF.allInstances) do
 		instance.data.render.renderedViews = 0
@@ -933,6 +927,8 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 	passes = math.Clamp(blurx, 0, 100)
 
 	local rt = render.GetRenderTarget()
+	local w, h = render_library.getGameResolution()
+	local aspectRatio = ScrW() / ScrH()
 
 	render.BlurRenderTarget(rt, blurx*aspectRatio, blury, passes)
 
