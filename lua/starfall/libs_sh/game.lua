@@ -62,7 +62,7 @@ if CLIENT then
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_lib.getSunInfo()
 		local info = util.GetSunInfo()
-		return SF.Vectors.Wrap(info.direction), info.obstruction
+		return instance.Types.Vector.Wrap(info.direction), info.obstruction
 	end
 end
 

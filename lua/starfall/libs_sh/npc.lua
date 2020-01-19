@@ -1,51 +1,46 @@
--------------------------------------------------------------------------------
--- Npc functions.
--------------------------------------------------------------------------------
-
-SF.Npcs = {}
---- Npc type
-local npc_methods, npc_metamethods = instance:RegisterType("Npc")
-
-SF.Npcs.Methods = npc_methods
-SF.Npcs.Metatable = npc_metamethods
-
-local vwrap, vunwrap = instance.WrapObject, instance.UnwrapObject
-local wrap, unwrap, ents_metatable
-
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
-instance:AddHook("postload", function()
-	wrap = instance.Types.Entity.Wrap
-	unwrap = instance.Types.Entity.Unwrap
-	ents_metatable = instance.Types.Entity.Metatable
+if SERVER then
+	-- Register privileges
+	registerprivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
+	registerprivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
+end
 
-	SF.ApplyTypeDependencies(npc_methods, npc_metamethods, ents_metatable)
-	wrap, unwrap = instance:CreateWrapper(npc_metamethods, true, false, debug.getregistry().NPC, ents_metatable)
 
-	SF.Npcs.Wrap = wrap
-	SF.Npcs.Unwrap = unwrap
-end)
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Npc type
+local npc_methods, npc_meta = instance:RegisterType("Npc")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+
+local wrap, unwrap = instance:CreateWrapper(npc_meta, true, false, debug.getregistry().NPC, ents_meta)
+instance:ApplyTypeDependencies(npc_methods, npc_meta, ents_meta)
 
 -- ------------------------------------------------------------------------- --
-function npc_metamethods:__tostring()
+function npc_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
 end
 
 if SERVER then
-	local registerprivilege = SF.Permissions.registerPrivilege
-	-- Register privileges
-	registerprivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
-	registerprivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
-
 	--- Adds a relationship to the npc
 	-- @server
 	-- @param str The relationship string. http://wiki.garrysmod.com/page/NPC/AddRelationship
 	function npc_methods:addRelationship(str)
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -70,7 +65,7 @@ if SERVER then
 	-- @param disp String of the relationship. (hate fear like neutral)
 	-- @param priority number how strong the relationship is. Higher number is stronger
 	function npc_methods:addEntityRelationship(ent, disp, priority)
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		local relation = dispositions[disp]
@@ -86,8 +81,8 @@ if SERVER then
 	-- @param ent Target entity
 	-- @return string relationship of the npc with the target
 	function npc_methods:getRelationship(ent)
-		checktype(self, npc_metamethods)
-		checktype(ent, ents_metatable)
+		checktype(self, npc_meta)
+		checktype(ent, ents_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
@@ -99,7 +94,7 @@ if SERVER then
 	-- @server
 	-- @param wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		checkluatype(wep, TYPE_STRING)
 
 		local npc = unwrap(self)
@@ -119,8 +114,8 @@ if SERVER then
 	-- @server
 	-- @param ent Target entity
 	function npc_methods:setEnemy(ent)
-		checktype(self, npc_metamethods)
-		checktype(ent, ents_metatable)
+		checktype(self, npc_meta)
+		checktype(ent, ents_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
@@ -133,16 +128,16 @@ if SERVER then
 	-- @server
 	-- @return Entity the npc is fighting
 	function npc_methods:getEnemy()
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
-		return vwrap(npc:GetEnemy())
+		return owrap(npc:GetEnemy())
 	end
 
 	--- Stops the npc
 	-- @server
 	function npc_methods:stop()
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -152,7 +147,7 @@ if SERVER then
 	--- Makes the npc do a melee attack
 	-- @server
 	function npc_methods:attackMelee()
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -162,7 +157,7 @@ if SERVER then
 	--- Makes the npc do a ranged attack
 	-- @server
 	function npc_methods:attackRange()
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -173,11 +168,11 @@ if SERVER then
 	-- @server
 	-- @param vec The position of the destination
 	function npc_methods:goWalk(vec)
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
-		npc:SetLastPosition(vunwrap(vec))
+		npc:SetLastPosition(ounwrap(vec))
 		npc:SetSchedule(SCHED_FORCED_GO)
 	end
 
@@ -185,11 +180,13 @@ if SERVER then
 	-- @server
 	-- @param vec The position of the destination
 	function npc_methods:goRun(vec)
-		checktype(self, npc_metamethods)
+		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
-		npc:SetLastPosition(vunwrap(vec))
+		npc:SetLastPosition(ounwrap(vec))
 		npc:SetSchedule(SCHED_FORCED_GO_RUN)
 	end
 end
+
+end}

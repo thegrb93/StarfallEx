@@ -61,18 +61,13 @@
 		-	Fixed addition of extra entity types. I messed up really badly.
 --]]
 
---- vON Library
--- @shared
-local von = instance:RegisterLibrary("von")
 
 local _deserialize, _serialize, _d_meta, _s_meta, d_findVariable, s_anyVariable
 local sub, gsub, find, insert, concat, error, tonumber, tostring, type, next = string.sub, string.gsub, string.find, table.insert, table.concat, error, tonumber, tostring, type, next
 
 
-
 --[[    This section contains localized functions which (de)serialize
 		variables according to the types found.                          ]]
-
 
 
 --	This is kept away from the table for speed.
@@ -636,7 +631,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 			end
 
 			if x and y and z then
-				return SF.Vectors.Wrap(Vector(x, y, z)), a - 1
+				return instance.Types.Vector.Wrap(Vector(x, y, z)), a - 1
 			end
 
 			SF.Throw("vON: Vector definition started... Found no end.", 3)
@@ -809,6 +804,21 @@ _s_meta = {
 	__metatable = false
 }
 
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- vON Library
+-- @shared
+local von = instance:RegisterLibrary("von")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local von = instance.Libraries.von
+
 --- Deserialize a string
 -- @shared
 -- @class function
@@ -824,3 +834,5 @@ von.deserialize = setmetatable({}, _d_meta)
 -- @param tbl Table to serialize
 -- @return String
 von.serialize = setmetatable({}, _s_meta)
+
+end}

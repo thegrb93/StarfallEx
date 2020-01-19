@@ -1,20 +1,40 @@
--------------------------------------------------------------------------------
--- Networking library.
--------------------------------------------------------------------------------
-
+-- Global to all starfalls
 local net = net
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-
---- Net message library. Used for sending data from the server to the client and back
-local net_library = instance:RegisterLibrary("net")
 
 local streams = SF.EntityTable("playerStreams")
 local netBurst = SF.BurstObject("net", "net message", 5, 10, "Regen rate of net message burst in kB/sec.", "The net message burst limit in kB.", 1000 * 8)
 SF.NetBurst = netBurst
 
-local instances = {}
+if SERVER then
+	util.AddNetworkString("SF_netmessage")
+end
+
+net.Receive("SF_netmessage", function(len, ply)
+	local ent = net.ReadEntity()
+	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
+		local name = net.ReadString()
+		len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
+		if ply then ply = instance.WrapObject(ply) end
+
+		local recv = ent.instance.data.net.receives[name]
+		if recv then
+			ent.instance:runFunction(recv, len, ply)
+		else
+			ent.instance:runScriptHook("net", name, len, ply)
+		end
+	end
+end)
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Net message library. Used for sending data from the server to the client and back
+local net_library = instance:RegisterLibrary("net")
+
 instance:AddHook("initialize", function()
 	instance.data.net = {
 		started = false,
@@ -29,11 +49,15 @@ instance:AddHook("cleanup", function()
 	instance.data.net.data = {}
 end)
 
-if SERVER then
-	util.AddNetworkString("SF_netmessage")
-end
 
-local function write(instance, func, size, ...)
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local net_library = instance.Libraries.net
+
+
+local function write(func, size, ...)
 	instance.data.net.size = instance.data.net.size + size
 	instance.data.net.data[#instance.data.net.data + 1] = { func, { ... } }
 end
@@ -49,7 +73,7 @@ function net_library.start(name)
 	instance.data.net.size = 8*8 -- 8 byte overhead
 	instance.data.net.data = {}
 
-	write(instance, net.WriteString, (#name + 1) * 8, name) -- Include null character
+	write(net.WriteString, (#name + 1) * 8, name) -- Include null character
 end
 
 --- Send a net message from client->server, or server->client.
@@ -133,10 +157,10 @@ function net_library.writeType(v)
 	local wv = net.WriteVars[typeid]
 	if wv then
 		if typeid == TYPE_TABLE then
-			write(instance, net.WriteUInt, 1, typeid, 8)
+			write(net.WriteUInt, 1, typeid, 8)
 			netwritetable(v)
 		else
-			write(instance, wv, netTypeSizes[typeid](v), typeid, v)
+			write(wv, netTypeSizes[typeid](v), typeid, v)
 		end
 	else
 		SF.Throw("net.WriteType: Couldn't write " .. type(v) .. " (type " .. typeid .. ")", 2)
@@ -201,7 +225,7 @@ function net_library.writeString(t)
 
 	checkluatype (t, TYPE_STRING)
 
-	write(instance, net.WriteString, (#t+1)*8, t)
+	write(net.WriteString, (#t+1)*8, t)
 	return true
 end
 
@@ -225,7 +249,7 @@ function net_library.writeData(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 64000)
-	write(instance, net.WriteData, n*8, t, n)
+	write(net.WriteData, n*8, t, n)
 	return true
 end
 
@@ -247,7 +271,7 @@ function net_library.writeStream(str)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (str, TYPE_STRING)
-	write(instance, net.WriteStream, 8*8, str)
+	write(net.WriteStream, 8*8, str)
 	return true
 end
 
@@ -291,7 +315,7 @@ function net_library.writeInt(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 32)
-	write(instance, net.WriteInt, n, t, n)
+	write(net.WriteInt, n, t, n)
 	return true
 end
 
@@ -317,7 +341,7 @@ function net_library.writeUInt(t, n)
 	checkluatype (n, TYPE_NUMBER)
 
 	n = math.Clamp(n, 0, 32)
-	write(instance, net.WriteUInt, n, t, n)
+	write(net.WriteUInt, n, t, n)
 	return true
 end
 
@@ -340,7 +364,7 @@ function net_library.writeBit(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, net.WriteBit, 1, t~=0)
+	write(net.WriteBit, 1, t~=0)
 	return true
 end
 
@@ -361,7 +385,7 @@ function net_library.writeBool(t)
 
 	checkluatype (t, TYPE_BOOL)
 
-	write(instance, net.WriteBool, 1, t)
+	write(net.WriteBool, 1, t)
 	return true
 end
 
@@ -382,7 +406,7 @@ function net_library.writeDouble(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, net.WriteDouble, 8*8, t)
+	write(net.WriteDouble, 8*8, t)
 	return true
 end
 
@@ -403,7 +427,7 @@ function net_library.writeFloat(t)
 
 	checkluatype (t, TYPE_NUMBER)
 
-	write(instance, net.WriteFloat, 4*8, t)
+	write(net.WriteFloat, 4*8, t)
 	return true
 end
 
@@ -424,7 +448,7 @@ function net_library.writeAngle(t)
 
 	checktype(t, instance.Types.Angle)
 
-	write(instance, net.WriteAngle, 54, instance.Types.Angle.Unwrap(t))
+	write(net.WriteAngle, 54, instance.Types.Angle.Unwrap(t))
 	return true
 end
 
@@ -445,7 +469,7 @@ function net_library.writeVector(t)
 
 	checktype(t, instance.Types.Vector)
 
-	write(instance, net.WriteVector, 54, SF.Vectors.Unwrap(t))
+	write(net.WriteVector, 54, instance.Types.Vector.Unwrap(t))
 	return true
 end
 
@@ -454,7 +478,7 @@ end
 -- @return The vector that was read
 
 function net_library.readVector()
-	return SF.Vectors.Wrap(net.ReadVector())
+	return instance.Types.Vector.Wrap(net.ReadVector())
 end
 
 --- Writes an matrix to the net message
@@ -466,7 +490,7 @@ function net_library.writeMatrix(t)
 
 	checktype(t, instance.Types.VMatrix)
 
-	write(instance, net.WriteMatrix, 64*8, SF.VMatrix.Unwrap(t))
+	write(net.WriteMatrix, 64*8, instance.Types.VMatrix.Unwrap(t))
 	return true
 end
 
@@ -475,7 +499,7 @@ end
 -- @return The matrix that was read
 
 function net_library.readMatrix()
-	return SF.VMatrix.Wrap(net.ReadMatrix())
+	return instance.Types.VMatrix.Wrap(net.ReadMatrix())
 end
 
 --- Writes an color to the net message
@@ -487,7 +511,7 @@ function net_library.writeColor(t)
 
 	checktype(t, instance.Types.Color)
 
-	write(instance, net.WriteColor, 4*8, SF.Color.Unwrap(t))
+	write(net.WriteColor, 4*8, instance.Types.Color.Unwrap(t))
 	return true
 end
 
@@ -496,7 +520,7 @@ end
 -- @return The color that was read
 
 function net_library.readColor()
-	return SF.Color.Wrap(net.ReadColor())
+	return instance.Types.Color.Wrap(net.ReadColor())
 end
 
 --- Writes an entity to the net message
@@ -508,7 +532,7 @@ function net_library.writeEntity(t)
 
 	checktype(t, instance.Types.Entity)
 
-	write(instance, net.WriteEntity, 2*8, instance.Types.Entity.Unwrap(t))
+	write(net.WriteEntity, 2*8, instance.Types.Entity.Unwrap(t))
 	return true
 end
 
@@ -548,21 +572,7 @@ function net_library.isStreaming()
 	return streams[instance.player] ~= nil
 end
 
-net.Receive("SF_netmessage", function(len, ply)
-	local ent = net.ReadEntity()
-	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
-		local name = net.ReadString()
-		len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
-		if ply then ply = instance.WrapObject(ply) end
-
-		local recv = ent.instance.data.net.receives[name]
-		if recv then
-			ent.instance:runFunction(recv, len, ply)
-		else
-			ent.instance:runScriptHook("net", name, len, ply)
-		end
-	end
-end)
+end}
 
 --- Called when a net message arrives
 -- @name net

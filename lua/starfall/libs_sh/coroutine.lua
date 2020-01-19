@@ -1,21 +1,18 @@
---- Coroutine library
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local coroutine = coroutine
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Coroutine library
 -- @shared
 local coroutine_library = instance:RegisterLibrary("coroutine")
-local coroutine = coroutine
-local checktype = instance.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
-local _, thread_metamethods = instance:RegisterType("thread")
-local wrap, unwrap = instance:CreateWrapper(thread_metamethods, true, false)
-
-SF.Coroutine = {}
-SF.Coroutine.Methods = _
-SF.Coroutine.Metatable = thread_metamethods
-SF.Coroutine.Wrap = wrap
-SF.Coroutine.Unwrap = unwrap
+local _, thread_meta = instance:RegisterType("thread")
+local wrap, unwrap = instance:CreateWrapper(thread_meta, true, false)
 
 instance:AddHook("initialize", function()
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })
@@ -29,6 +26,13 @@ instance:AddHook("deinitialize", function()
 		instance.data.coroutines[thread] = nil
 	end
 end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.Wrap, instance.Types.thread.Unwrap
 
 
 local function createCoroutine (func)
@@ -77,7 +81,7 @@ end
 -- @param ... optional parameters that will be passed to the coroutine
 -- @return Any values the coroutine is returning to the main thread
 function coroutine_library.resume (thread, ...)
-	checktype(thread, thread_metamethods)
+	checktype(thread, thread_meta)
 	local func = unwrap(thread).func
 	return func(...)
 end
@@ -98,7 +102,7 @@ end
 -- @param thread The coroutine
 -- @return Either "suspended", "running", "normal" or "dead"
 function coroutine_library.status (thread)
-	checktype(thread, thread_metamethods)
+	checktype(thread, thread_meta)
 	local thread = unwrap(thread).thread
 	return coroutine.status(thread)
 end
@@ -121,3 +125,5 @@ function coroutine_library.wait (time)
 		SF.Throw("attempt to yield across C-call boundary", 2)
 	end
 end
+
+end}

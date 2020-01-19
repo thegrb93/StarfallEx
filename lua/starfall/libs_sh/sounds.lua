@@ -1,22 +1,7 @@
-SF.Sounds = {}
-
---- Sound type
--- @shared
-local sound_methods, sound_metamethods = instance:RegisterType("Sound")
-local wrap, unwrap = instance:CreateWrapper(sound_metamethods, true, false)
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
-
---- Sounds library.
--- @shared
-local sound_library = instance:RegisterLibrary("sounds")
-
-SF.Sounds.Wrap = wrap
-SF.Sounds.Unwrap = unwrap
-SF.Sounds.Methods = sound_methods
-SF.Sounds.Metatable = sound_metamethods
 
 -- Register Privileges
 registerprivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
@@ -39,6 +24,19 @@ local function deleteSound(ply, ent, sound)
 	end
 end
 
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+--- Sounds library.
+-- @shared
+local sound_library = instance:RegisterLibrary("sounds")
+
+--- Sound type
+-- @shared
+local sound_methods, sound_meta = instance:RegisterType("Sound")
+local wrap, unwrap = instance:CreateWrapper(sound_meta, true, false)
+
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()
 	instance.data.sounds = {sounds = {}}
@@ -49,6 +47,15 @@ instance:AddHook("deinitialize", function()
 		deleteSound(instance.player, ent, s)
 	end
 end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local sound_library = instance.Libraries.sounds
+local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, instance.Types.Sound, instance.Types.Sound.Wrap, instance.Types.Sound.Unwrap
+
 
 --- Creates a sound and attaches it to an entity
 -- @param ent Entity to attach sound to.
@@ -128,7 +135,7 @@ function sound_methods:destroy()
 	if snd and sounds[snd] then
 		deleteSound(instance.player, sounds[snd], snd)
 		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = instance:GetWrapperTables(sound_metamethods)
+		local sensitive2sf, sf2sensitive = instance:GetWrapperTables(sound_meta)
 		sensitive2sf[snd] = nil
 		sf2sensitive[self] = nil
 		debug.setmetatable(self, nil)
@@ -185,3 +192,5 @@ function sound_methods:setSoundLevel(level)
 	checkluatype(level, TYPE_NUMBER)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end
+
+end}

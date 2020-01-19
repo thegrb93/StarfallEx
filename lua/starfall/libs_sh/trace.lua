@@ -1,26 +1,36 @@
--------------------------------------------------------------------------------
--- Trace library
--------------------------------------------------------------------------------
-
-local dgetmeta = debug.getmetatable
-
+-- Global to all starfalls
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
---[[
--- Here's a neat little script to convert enumerations wiki.gmod.com-style
--- into something usable in code
+local dgetmeta = debug.getmetatable
 
-local lines = <copy+paste enumeration with trailing \n here>
+-- Register privileges
+SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
 
-for line in lines:gmatch("([^\n]*)\n") do
- local v = line:match("^.*|%s*(.*)$")
- print("trace_library."..v.." = "..v)
+local function checkvector(pos)
+	if pos.x ~= pos.x or pos.x == math.huge or pos.x == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos.y ~= pos.y or pos.y == math.huge or pos.y == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos.z ~= pos.z or pos.z == math.huge or pos.z == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
 end
-]]
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Provides functions for doing line/AABB traces
 -- @shared
+local trace_library = instance:RegisterLibrary("trace")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local trace_library = instance.Libraries.trace
+
+-- Material Enumeration
+-- @name trace.MAT
+-- @class table
 -- @field MAT_ANTLION
 -- @field MAT_BLOODYFLESH
 -- @field MAT_CONCRETE
@@ -41,6 +51,30 @@ end
 -- @field MAT_WOOD
 -- @field MAT_DEFAULT
 -- @field MAT_GLASS
+trace_library.MAT_ANTLION = MAT_ANTLION
+trace_library.MAT_BLOODYFLESH = MAT_BLOODYFLESH
+trace_library.MAT_CONCRETE = MAT_CONCRETE
+trace_library.MAT_DIRT = MAT_DIRT
+trace_library.MAT_FLESH = MAT_FLESH
+trace_library.MAT_GRATE = MAT_GRATE
+trace_library.MAT_ALIENFLESH = MAT_ALIENFLESH
+trace_library.MAT_CLIP = MAT_CLIP
+trace_library.MAT_PLASTIC = MAT_PLASTIC
+trace_library.MAT_METAL = MAT_METAL
+trace_library.MAT_SAND = MAT_SAND
+trace_library.MAT_FOLIAGE = MAT_FOLIAGE
+trace_library.MAT_COMPUTER = MAT_COMPUTER
+trace_library.MAT_SLOSH = MAT_SLOSH
+trace_library.MAT_TILE = MAT_TILE
+trace_library.MAT_GRASS = MAT_GRASS
+trace_library.MAT_VENT = MAT_VENT
+trace_library.MAT_WOOD = MAT_WOOD
+trace_library.MAT_DEFAULT = MAT_DEFAULT
+trace_library.MAT_GLASS = MAT_GLASS
+
+-- Hithroup Enumeration
+-- @name trace.HITGROUP
+-- @class table
 -- @field HITGROUP_GENERIC
 -- @field HITGROUP_HEAD
 -- @field HITGROUP_CHEST
@@ -50,6 +84,19 @@ end
 -- @field HITGROUP_LEFTLEG
 -- @field HITGROUP_RIGHTLEG
 -- @field HITGROUP_GEAR
+trace_library.HITGROUP_GENERIC = HITGROUP_GENERIC
+trace_library.HITGROUP_HEAD = HITGROUP_HEAD
+trace_library.HITGROUP_CHEST = HITGROUP_CHEST
+trace_library.HITGROUP_STOMACH = HITGROUP_STOMACH
+trace_library.HITGROUP_LEFTARM = HITGROUP_LEFTARM
+trace_library.HITGROUP_RIGHTARM = HITGROUP_RIGHTARM
+trace_library.HITGROUP_LEFTLEG = HITGROUP_LEFTLEG
+trace_library.HITGROUP_RIGHTLEG = HITGROUP_RIGHTLEG
+trace_library.HITGROUP_GEAR = HITGROUP_GEAR
+
+-- Mask Enumerations
+-- @name trace.MASK
+-- @class table
 -- @field MASK_SPLITAREAPORTAL
 -- @field MASK_SOLID_BRUSHONLY
 -- @field MASK_WATER
@@ -71,6 +118,31 @@ end
 -- @field MASK_SHOT_HULL
 -- @field MASK_SHOT
 -- @field MASK_ALL
+trace_library.MASK_SPLITAREAPORTAL = MASK_SPLITAREAPORTAL
+trace_library.MASK_SOLID_BRUSHONLY = MASK_SOLID_BRUSHONLY
+trace_library.MASK_WATER = MASK_WATER
+trace_library.MASK_BLOCKLOS = MASK_BLOCKLOS
+trace_library.MASK_OPAQUE = MASK_OPAQUE
+trace_library.MASK_VISIBLE = MASK_VISIBLE
+trace_library.MASK_DEADSOLID = MASK_DEADSOLID
+trace_library.MASK_PLAYERSOLID_BRUSHONLY = MASK_PLAYERSOLID_BRUSHONLY
+trace_library.MASK_NPCWORLDSTATIC = MASK_NPCWORLDSTATIC
+trace_library.MASK_NPCSOLID_BRUSHONLY = MASK_NPCSOLID_BRUSHONLY
+trace_library.MASK_CURRENT = MASK_CURRENT
+trace_library.MASK_SHOT_PORTAL = MASK_SHOT_PORTAL
+trace_library.MASK_SOLID = MASK_SOLID
+trace_library.MASK_BLOCKLOS_AND_NPCS = MASK_BLOCKLOS_AND_NPCS
+trace_library.MASK_OPAQUE_AND_NPCS = MASK_OPAQUE_AND_NPCS
+trace_library.MASK_VISIBLE_AND_NPCS = MASK_VISIBLE_AND_NPCS
+trace_library.MASK_PLAYERSOLID = MASK_PLAYERSOLID
+trace_library.MASK_NPCSOLID = MASK_NPCSOLID
+trace_library.MASK_SHOT_HULL = MASK_SHOT_HULL
+trace_library.MASK_SHOT = MASK_SHOT
+trace_library.MASK_ALL = MASK_ALL
+
+-- Content Enumerations
+-- @name trace.CONTENTS
+-- @class table
 -- @field CONTENTS_EMPTY
 -- @field CONTENTS_SOLID
 -- @field CONTENTS_WINDOW
@@ -103,65 +175,6 @@ end
 -- @field CONTENTS_TRANSLUCENT
 -- @field CONTENTS_LADDER
 -- @field CONTENTS_HITBOX
-local trace_library = instance:RegisterLibrary("trace")
-
--- Material Enumeration
-trace_library.MAT_ANTLION = MAT_ANTLION
-trace_library.MAT_BLOODYFLESH = MAT_BLOODYFLESH
-trace_library.MAT_CONCRETE = MAT_CONCRETE
-trace_library.MAT_DIRT = MAT_DIRT
-trace_library.MAT_FLESH = MAT_FLESH
-trace_library.MAT_GRATE = MAT_GRATE
-trace_library.MAT_ALIENFLESH = MAT_ALIENFLESH
-trace_library.MAT_CLIP = MAT_CLIP
-trace_library.MAT_PLASTIC = MAT_PLASTIC
-trace_library.MAT_METAL = MAT_METAL
-trace_library.MAT_SAND = MAT_SAND
-trace_library.MAT_FOLIAGE = MAT_FOLIAGE
-trace_library.MAT_COMPUTER = MAT_COMPUTER
-trace_library.MAT_SLOSH = MAT_SLOSH
-trace_library.MAT_TILE = MAT_TILE
-trace_library.MAT_GRASS = MAT_GRASS
-trace_library.MAT_VENT = MAT_VENT
-trace_library.MAT_WOOD = MAT_WOOD
-trace_library.MAT_DEFAULT = MAT_DEFAULT
-trace_library.MAT_GLASS = MAT_GLASS
-
--- Hithroup Enumeration
-trace_library.HITGROUP_GENERIC = HITGROUP_GENERIC
-trace_library.HITGROUP_HEAD = HITGROUP_HEAD
-trace_library.HITGROUP_CHEST = HITGROUP_CHEST
-trace_library.HITGROUP_STOMACH = HITGROUP_STOMACH
-trace_library.HITGROUP_LEFTARM = HITGROUP_LEFTARM
-trace_library.HITGROUP_RIGHTARM = HITGROUP_RIGHTARM
-trace_library.HITGROUP_LEFTLEG = HITGROUP_LEFTLEG
-trace_library.HITGROUP_RIGHTLEG = HITGROUP_RIGHTLEG
-trace_library.HITGROUP_GEAR = HITGROUP_GEAR
-
--- Mask Enumerations
-trace_library.MASK_SPLITAREAPORTAL = MASK_SPLITAREAPORTAL
-trace_library.MASK_SOLID_BRUSHONLY = MASK_SOLID_BRUSHONLY
-trace_library.MASK_WATER = MASK_WATER
-trace_library.MASK_BLOCKLOS = MASK_BLOCKLOS
-trace_library.MASK_OPAQUE = MASK_OPAQUE
-trace_library.MASK_VISIBLE = MASK_VISIBLE
-trace_library.MASK_DEADSOLID = MASK_DEADSOLID
-trace_library.MASK_PLAYERSOLID_BRUSHONLY = MASK_PLAYERSOLID_BRUSHONLY
-trace_library.MASK_NPCWORLDSTATIC = MASK_NPCWORLDSTATIC
-trace_library.MASK_NPCSOLID_BRUSHONLY = MASK_NPCSOLID_BRUSHONLY
-trace_library.MASK_CURRENT = MASK_CURRENT
-trace_library.MASK_SHOT_PORTAL = MASK_SHOT_PORTAL
-trace_library.MASK_SOLID = MASK_SOLID
-trace_library.MASK_BLOCKLOS_AND_NPCS = MASK_BLOCKLOS_AND_NPCS
-trace_library.MASK_OPAQUE_AND_NPCS = MASK_OPAQUE_AND_NPCS
-trace_library.MASK_VISIBLE_AND_NPCS = MASK_VISIBLE_AND_NPCS
-trace_library.MASK_PLAYERSOLID = MASK_PLAYERSOLID
-trace_library.MASK_NPCSOLID = MASK_NPCSOLID
-trace_library.MASK_SHOT_HULL = MASK_SHOT_HULL
-trace_library.MASK_SHOT = MASK_SHOT
-trace_library.MASK_ALL = MASK_ALL
-
--- Content Enumerations
 trace_library.CONTENTS_EMPTY = CONTENTS_EMPTY
 trace_library.CONTENTS_SOLID = CONTENTS_SOLID
 trace_library.CONTENTS_WINDOW = CONTENTS_WINDOW
@@ -195,27 +208,10 @@ trace_library.CONTENTS_TRANSLUCENT = CONTENTS_TRANSLUCENT
 trace_library.CONTENTS_LADDER = CONTENTS_LADDER
 trace_library.CONTENTS_HITBOX = CONTENTS_HITBOX
 
--- Register privileges
-SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
-
--- Local functions
-
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local wrap, vwrap, awrap
-local unwrap, vunwrap, aunwrap
-local vecmeta, angmeta
-
-local function postload()
-	wrap = instance.Types.Entity.Wrap
-	vwrap = SF.Vectors.Wrap
-	awrap = SF.Angles.Wrap
-	unwrap = instance.Types.Entity.Unwrap
-	vunwrap = SF.Vectors.Unwrap
-	aunwrap = SF.Angles.Unwrap
-	vecmeta = SF.Vectors.Metatable
-	angmeta = SF.Angles.Metatable
-end
-instance:AddHook("postload", postload)
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local function convertFilter(filter)
 	local filterType = TypeID(filter)
@@ -243,12 +239,6 @@ local function convertFilter(filter)
 	else
 		SF.ThrowTypeError("table or function", SF.GetType(filter), 3)
 	end
-end
-
-local function checkvector(pos)
-	if pos.x ~= pos.x or pos.x == math.huge or pos.x == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	if pos.y ~= pos.y or pos.y == math.huge or pos.y == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	if pos.z ~= pos.z or pos.z == math.huge or pos.z == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
 end
 
 --- Does a line trace
@@ -362,3 +352,5 @@ function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, pl
 	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
 	if pos then return vwrap(pos) end
 end
+
+end}

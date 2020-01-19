@@ -1,15 +1,113 @@
--------------------------------------------------------------------------------
--- Hook library
--------------------------------------------------------------------------------
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+local haspermission = SF.Permissions.hasAccess
+
+--Can only return if you are the first argument
+local function returnOnlyOnYourself(instance, args, ply)
+	if instance.player ~= ply then return end
+	return args[2]
+end
+
+--Can only return false on yourself
+local function returnOnlyOnYourselfFalse(instance, args, ply)
+	if instance.player ~= ply then return end
+	if args[2]==false then return false end
+end
+
+local add = SF.hookAdd
+
+if SERVER then
+	-- Server hooks
+	add("GravGunOnPickedUp")
+	add("GravGunOnDropped")
+	add("OnPhysgunFreeze")
+	add("OnPhysgunReload")
+	add("PlayerDeath")
+	add("PlayerDisconnected")
+	add("PlayerInitialSpawn")
+	add("PlayerSpawn")
+	add("PlayerEnteredVehicle")
+	add("PlayerLeaveVehicle")
+	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
+	add("PlayerSpray")
+	add("PlayerUse")
+	add("PlayerSwitchFlashlight")
+	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
+
+	add("EntityTakeDamage", nil, function(instance, target, dmg)
+		return true, { instance.WrapObject(target), instance.WrapObject(dmg:GetAttacker()),
+			instance.WrapObject(dmg:GetInflictor()),
+			dmg:GetDamage(),
+			dmg:GetDamageType(),
+			instance.Types.Vector.Wrap(dmg:GetDamagePosition()),
+			instance.Types.Vector.Wrap(dmg:GetDamageForce()) }
+	end)
+
+else
+	-- Client hooks
+	add("StartChat")
+	add("FinishChat")
+	add("OnPlayerChat", "playerchat")
+	add("ChatTextChanged", nil, function(instance, txt)
+		if haspermission(instance, nil, "input") then
+			return true, { txt }
+		end
+		return false
+	end)
+	add("NetworkEntityCreated")
+end
+
+-- Shared hooks
+
+-- Player hooks
+add("PlayerHurt")
+add("PlayerNoClip")
+add("KeyPress")
+add("KeyRelease")
+add("GravGunPunt")
+add("PhysgunPickup")
+add("PhysgunDrop")
+add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
+
+-- Entity hooks
+add("OnEntityCreated", nil, function(instance, ent)
+	timer.Simple(0, function()
+		instance:runScriptHook("onentitycreated", instance.WrapObject(ent))
+	end)
+	return false
+end)
+add("EntityRemoved")
+add("PropBreak")
+add("EntityFireBullets", nil, function(instance, ent, data)
+	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data) }
+end)
+
+-- Other
+add("EndEntityDriving")
+add("StartEntityDriving")
+add("Tick")
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Deals with hooks
 -- @shared
 local hook_library = instance:RegisterLibrary("hook")
-local owrap = instance.WrapObject
+
+instance:AddHook("deinitialize", function()
+	SF.HookDestroyInstance(instance)
+end)
+
+
+end, function(instance) -- Called for library definitions
+
+
 local checktype = instance.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-local haspermission = SF.Permissions.hasAccess
+local hook_library = instance.Libraries.hook
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ply_meta, pwrap, punwrap = instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 
 
 --- Sets a hook function
@@ -70,7 +168,7 @@ local hookrun = hook_library.run
 -- @param ... Payload. These parameters will be used to call the hook functions
 -- @return tbl A list of the resultset of each called hook
 function hook_library.runRemote (recipient, ...)
-	if recipient then checktype(recipient, instance.Types.Entity.Metatable) end
+	if recipient then checktype(recipient, ent_meta) end
 
 	local recipients
 	if recipient then
@@ -88,9 +186,9 @@ function hook_library.runRemote (recipient, ...)
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hookrun("remote", owrap(instance.data.entity), owrap(instance.player), ...) }
+			result = { true, hookrun("remote", ewrap(instance.data.entity), pwrap(instance.player), ...) }
 		else
-			result = k:runScriptHookForResult("remote", owrap(instance.data.entity), owrap(instance.player), ...)
+			result = k:runScriptHookForResult("remote", ewrap(instance.data.entity), pwrap(instance.player), ...)
 		end
 
 		if result[1] and result[2]~=nil then
@@ -120,94 +218,7 @@ function hook_library.remove (hookname, name)
 	end
 end
 
-instance:AddHook("deinitialize", function()
-	SF.HookDestroyInstance(instance)
-end)
-
---Can only return if you are the first argument
-local function returnOnlyOnYourself(instance, args, ply)
-	if instance.player ~= ply then return end
-	return args[2]
-end
-
---Can only return false on yourself
-local function returnOnlyOnYourselfFalse(instance, args, ply)
-	if instance.player ~= ply then return end
-	if args[2]==false then return false end
-end
-
-local add = SF.hookAdd
-
-if SERVER then
-	-- Server hooks
-	add("GravGunOnPickedUp")
-	add("GravGunOnDropped")
-	add("OnPhysgunFreeze")
-	add("OnPhysgunReload")
-	add("PlayerDeath")
-	add("PlayerDisconnected")
-	add("PlayerInitialSpawn")
-	add("PlayerSpawn")
-	add("PlayerEnteredVehicle")
-	add("PlayerLeaveVehicle")
-	add("PlayerSay", nil, nil, returnOnlyOnYourself, true)
-	add("PlayerSpray")
-	add("PlayerUse")
-	add("PlayerSwitchFlashlight")
-	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
-
-	add("EntityTakeDamage", nil, function(instance, target, dmg)
-		return true, { owrap(target), owrap(dmg:GetAttacker()),
-			owrap(dmg:GetInflictor()),
-			dmg:GetDamage(),
-			dmg:GetDamageType(),
-			owrap(dmg:GetDamagePosition()),
-			owrap(dmg:GetDamageForce()) }
-	end)
-
-else
-	-- Client hooks
-	add("StartChat")
-	add("FinishChat")
-	add("OnPlayerChat", "playerchat")
-	add("ChatTextChanged", nil, function(instance, txt)
-		if haspermission(instance, nil, "input") then
-			return true, { txt }
-		end
-		return false
-	end)
-	add("NetworkEntityCreated")
-end
-
--- Shared hooks
-
--- Player hooks
-add("PlayerHurt")
-add("PlayerNoClip")
-add("KeyPress")
-add("KeyRelease")
-add("GravGunPunt")
-add("PhysgunPickup")
-add("PhysgunDrop")
-add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
-
--- Entity hooks
-add("OnEntityCreated", nil, function(instance, ent)
-	timer.Simple(0, function()
-		instance:runScriptHook("onentitycreated", owrap(ent))
-	end)
-	return false
-end)
-add("EntityRemoved")
-add("PropBreak")
-add("EntityFireBullets", nil, function(instance, ent, data)
-	return true, { owrap(ent), SF.StructWrapper(instance, data) }
-end)
-
--- Other
-add("EndEntityDriving")
-add("StartEntityDriving")
-add("Tick")
+end}
 
 --- Called when an entity is being picked up by a gravity gun
 -- @name GravGunOnPickedUp

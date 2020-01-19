@@ -1,84 +1,26 @@
-
---- Library for creating and manipulating physics-less models AKA "Holograms".
--- @shared
-local holograms_library = instance:RegisterLibrary("holograms")
-
---- Hologram type
-local hologram_methods, hologram_metamethods = instance:RegisterType("Hologram")
-
+-- Global to all starfalls
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
-
-SF.Holograms = {}
-
 registerprivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
-
-SF.Holograms.maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
-
-SF.Holograms.Methods = hologram_methods
-SF.Holograms.Metatable = hologram_metamethods
-
-local ang_meta, vec_meta, ent_meta
-local wrap, unwrap, vwrap, vunwrap, aunwrap, ewrap, eunwrap
-local hologramSENT
-instance:AddHook("postload", function()
-	ang_meta = SF.Angles.Metatable
-	vec_meta = SF.Vectors.Metatable
-	ent_meta = instance.Types.Entity.Metatable
-
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	aunwrap = SF.Angles.Unwrap
-	ewrap = instance.Types.Entity.Wrap
-	eunwrap = instance.Types.Entity.Unwrap
-
-	SF.ApplyTypeDependencies(hologram_methods, hologram_metamethods, ent_meta)
-	wrap, unwrap = instance:CreateWrapper(hologram_metamethods, true, false, nil, ent_meta)
-
-	SF.Holograms.Wrap = wrap
-	SF.Holograms.Unwrap = unwrap
-
-	if CLIENT then
-		hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
-		if not hologramSENT then
-			hook.Add("Initialize","SF_GetHologramRenderFunc",function()
-				hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
-			end)
-		end
-	end
-end)
-
 registerprivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
 registerprivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
 local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
 
-instance:AddHook("initialize", function()
-	instance.data.holograms = {holos = {}}
-end)
+local maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
 
-local function hologramOnDestroy(holo, holodata, ply)
-	holodata[holo] = nil
-	plyCount:free(ply, 1)
-end
-
-instance:AddHook("deinitialize", function()
-	local holos = instance.data.holograms.holos
-	for holo, _ in pairs(holos) do
-		if holo:IsValid() then
-			holo:RemoveCallOnRemove("starfall_hologram_delete")
-			hologramOnDestroy(holo, holos, instance.player)
-			if CLIENT then
-				timer.Simple(0,function() holo:Remove() end)
-			else
-				holo:Remove()
-			end
-		end
+local hologramSENT
+if CLIENT then
+	hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
+	if not hologramSENT then
+		hook.Add("Initialize","SF_GetHologramRenderFunc",function()
+			hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
+		end)
 	end
-end)
+end
 
 local entmeta = FindMetaTable("Entity")
 local cl_hologram_meta = {
@@ -95,10 +37,83 @@ local cl_hologram_meta = {
 	__eq = entmeta.__eq,
 }
 
+if CLIENT then
+	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
+
+	local function parentChildren(ent)
+		for child, attachment in pairs(ent.sf_children) do
+			if child and child:IsValid() then
+				child:SetParent(ent, attachment)
+				
+				if child.sf_children then
+					return parentChildren(child)
+				end
+			end
+		end
+	end
+
+	hook.Add("NotifyShouldTransmit", "starfall_hologram_parents", function(ent, transmit)
+		if ent and ent:IsValid() and ent.sf_children then
+			parentChildren(ent)
+		end
+	end)
+end
+
+local function hologramOnDestroy(holo, holodata, ply)
+	holodata[holo] = nil
+	plyCount:free(ply, 1)
+end
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Library for creating and manipulating physics-less models AKA "Holograms".
+-- @shared
+local holograms_library = instance:RegisterLibrary("holograms")
+
+--- Hologram type
+local hologram_methods, hologram_meta = instance:RegisterType("Hologram")
+
+
+instance:AddHook("initialize", function()
+	instance.data.holograms = {holos = {}}
+end)
+
+instance:AddHook("deinitialize", function()
+	local holos = instance.data.holograms.holos
+	for holo, _ in pairs(holos) do
+		if holo:IsValid() then
+			holo:RemoveCallOnRemove("starfall_hologram_delete")
+			hologramOnDestroy(holo, holos, instance.player)
+			if CLIENT then
+				timer.Simple(0,function() holo:Remove() end)
+			else
+				holo:Remove()
+			end
+		end
+	end
+end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local holograms_library = instance.Libraries.holograms
+local hologram_methods, hologram_meta = instance.Types.Hologram.Methods, instance.Types.Hologram
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
+local wrap, unwrap = instance:CreateWrapper(hologram_meta, true, false, nil, ent_meta)
+instance:ApplyTypeDependencies(hologram_methods, hologram_meta, ent_meta)
+
+
 --- Creates a hologram.
 -- @return The hologram object
 function holograms_library.create(pos, ang, model, scale)
-	checkpermission(instance,  nil, "hologram.create")
+	checkpermission(instance, nil, "hologram.create")
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checkluatype(model, TYPE_STRING)
@@ -178,7 +193,7 @@ if SERVER then
 	-- @shared
 	-- @param scale Vector new scale
 	function hologram_methods:setScale(scale)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -194,7 +209,7 @@ if SERVER then
 	-- @shared
 	-- @param suppress Boolean to represent if shading should be set or not.
 	function hologram_methods:suppressEngineLighting (suppress)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -209,7 +224,7 @@ if SERVER then
 	-- @server
 	-- @param vel New velocity
 	function hologram_methods:setVel (vel)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		checktype(vel, vec_meta)
 		local vel = vunwrap(vel)
 
@@ -224,7 +239,7 @@ if SERVER then
 	-- @server
 	-- @param angvel *Vector* angular velocity.
 	function hologram_methods:setAngVel (angvel)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		checktype(angvel, ang_meta)
 
 		local holo = unwrap(self)
@@ -258,9 +273,7 @@ if SERVER then
 		holo:SetPlaybackRate(rate)
 	end
 
-else	
-	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
-
+else
 	function SF.Holograms.SetScale(holo, scale)
 		holo.scale = scale
 		if scale == Vector(1, 1, 1) then
@@ -278,7 +291,7 @@ else
 	-- @shared
 	-- @param vec New position
 	function hologram_methods:setPos(vec)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -294,7 +307,7 @@ else
 	-- @shared
 	-- @param ang New angles
 	function hologram_methods:setAngles(ang)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -308,7 +321,7 @@ else
 
 	--- Removes a hologram
 	function hologram_methods:remove()
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 		if instance.data.render.isRendering then SF.Throw("Cannot remove while in rendering hook!", 2) end
@@ -322,7 +335,7 @@ else
 	-- @client
 	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 	function hologram_methods:setFilterMag(val)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -340,7 +353,7 @@ else
 	-- @client
 	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
 	function hologram_methods:setFilterMin(val)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -358,15 +371,15 @@ else
 	-- @client
 	-- @param mat Starfall matrix to use
 	function hologram_methods:setRenderMatrix(mat)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		if mat ~= nil then
-			checktype(mat, SF.VMatrix.Metatable)
-			local matrix = SF.VMatrix.Unwrap(mat)
+			checktype(mat, instance.Types.VMatrix.Metatable)
+			local matrix = instance.Types.VMatrix.Unwrap(mat)
 			if matrix:IsIdentity() then
 				holo.HoloMatrix = nil
 				holo:DisableMatrix("RenderMultiply")
@@ -380,7 +393,7 @@ else
 	end
 
 	function hologram_methods:setScale(scale)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -393,7 +406,7 @@ else
 	end
 
 	function hologram_methods:suppressEngineLighting (suppress)
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -404,30 +417,6 @@ else
 		holo.suppressEngineLighting = suppress
 	end
 	
-	local function parentChildren(ent)
-		for child, attachment in pairs(ent.sf_children) do
-			
-			if child and child:IsValid() then
-				
-				child:SetParent(ent, attachment)
-				
-				if child.sf_children then
-					return parentChildren(child)
-				end
-				
-			end
-		
-		end
-	end
-	
-	hook.Add("NotifyShouldTransmit", "starfall_hologram_parents", function(ent, transmit)
-		
-		if ent and ent:IsValid() and ent.sf_children then
-			parentChildren(ent)
-		end
-		
-	end)
-	
 	local holoChildrenMeta = { __mode = "k" }
 	
 	--- Parents a hologram
@@ -435,7 +424,7 @@ else
 	-- @param attachment Optional attachment ID
 	function hologram_methods:setParent (ent, attachment)
 		
-		checktype(self, hologram_metamethods)
+		checktype(self, hologram_meta)
 		local holo = unwrap(self)
 		if not (holo and holo:IsValid()) then SF.Throw("The hologram is invalid", 2) end
 		
@@ -486,7 +475,7 @@ end
 -- @param normal The the direction of the clip plane in world coordinates, or local to entity if it is specified
 -- @param entity (Optional) The entity to make coordinates local to, otherwise the world is used
 function hologram_methods:setClip(index, enabled, origin, normal, entity)
-	checktype(self, hologram_metamethods)
+	checktype(self, hologram_meta)
 	local holo = unwrap(self)
 	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -507,7 +496,7 @@ function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	if enabled then
 		local clips = holo.clips
 		if not clips[index] then
-			local max = SF.Holograms.maxclips:GetInt()
+			local max = maxclips:GetInt()
 			if table.Count(clips)==max then
 				SF.Throw("The maximum hologram clips is " .. max, 2)
 			end
@@ -523,7 +512,7 @@ end
 -- @shared
 -- @return Vector scale
 function hologram_methods:getScale()
-	checktype(self, hologram_metamethods)
+	checktype(self, hologram_meta)
 	local holo = unwrap(self)
 	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -535,7 +524,7 @@ end
 --- Sets the model of a hologram
 -- @param model string model path
 function hologram_methods:setModel(model)
-	checktype(self, hologram_metamethods)
+	checktype(self, hologram_meta)
 	local holo = unwrap(self)
 	if not (holo and holo:IsValid()) then SF.Throw("The entity is invalid", 2) end
 
@@ -547,3 +536,4 @@ function hologram_methods:setModel(model)
 	holo:SetModel(model)
 end
 
+end}

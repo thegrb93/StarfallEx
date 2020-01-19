@@ -1,57 +1,6 @@
--------------------------------------------------------------------------------
--- PhysObj functions.
--------------------------------------------------------------------------------
-
-SF.PhysObjs = {}
-
---- PhysObj Type
--- @shared
-local physobj_methods, physobj_metatable = instance:RegisterType("PhysObj")
-local wrap, unwrap = instance:CreateWrapper(physobj_metatable, true, false)
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-
-SF.PhysObjs.Methods = physobj_methods
-SF.PhysObjs.Metatable = physobj_metamethods
-SF.PhysObjs.Wrap = wrap
-SF.PhysObjs.Unwrap = unwrap
-
-local ewrap, eunwrap
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ang_meta, vec_meta
-local vwrap, vunwrap, awrap, aunwrap, mwrap
-
-instance:AddHook("postload", function()
-	ang_meta = SF.Angles.Metatable
-	vec_meta = SF.Vectors.Metatable
-
-	ewrap = instance.Types.Entity.Wrap
-	eunwrap = instance.Types.Entity.Unwrap
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
-	mwrap = SF.VMatrix.Wrap
-	
-	-- @name SF.DefaultEnvironment.FVPHYSICS
-	-- @class table
-	SF.DefaultEnvironment.FVPHYSICS = {
-		["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
-		["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
-		["DMG_SLICE"] = FVPHYSICS_DMG_SLICE,
-		["HEAVY_OBJECT"] = FVPHYSICS_HEAVY_OBJECT,
-		["MULTIOBJECT_ENTITY"] = FVPHYSICS_MULTIOBJECT_ENTITY,
-		["NO_IMPACT_DMG"] = FVPHYSICS_NO_IMPACT_DMG,
-		["NO_NPC_IMPACT_DMG"] = FVPHYSICS_NO_NPC_IMPACT_DMG,
-		["NO_PLAYER_PICKUP"] = FVPHYSICS_NO_PLAYER_PICKUP,
-		["NO_SELF_COLLISIONS"] = FVPHYSICS_NO_SELF_COLLISIONS,
-		["PART_OF_RAGDOLL"] = FVPHYSICS_PART_OF_RAGDOLL,
-		["PENETRATING"] = FVPHYSICS_PENETRATING,
-		["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
-		["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
-	}
-end)
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -62,6 +11,45 @@ local function checkvector(v)
 
 	end
 end
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- PhysObj Type
+-- @shared
+local physobj_methods, physobj_meta = instance:RegisterType("PhysObj")
+local wrap, unwrap = instance:CreateWrapper(physobj_meta, true, false)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local physobj_methods, physobj_meta, wrap, unwrap = instance.Types.PhysObj.Methods, instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local mat_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
+-- @name Environment.FVPHYSICS
+-- @class table
+instance.env.FVPHYSICS = {
+	["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
+	["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
+	["DMG_SLICE"] = FVPHYSICS_DMG_SLICE,
+	["HEAVY_OBJECT"] = FVPHYSICS_HEAVY_OBJECT,
+	["MULTIOBJECT_ENTITY"] = FVPHYSICS_MULTIOBJECT_ENTITY,
+	["NO_IMPACT_DMG"] = FVPHYSICS_NO_IMPACT_DMG,
+	["NO_NPC_IMPACT_DMG"] = FVPHYSICS_NO_NPC_IMPACT_DMG,
+	["NO_PLAYER_PICKUP"] = FVPHYSICS_NO_PLAYER_PICKUP,
+	["NO_SELF_COLLISIONS"] = FVPHYSICS_NO_SELF_COLLISIONS,
+	["PART_OF_RAGDOLL"] = FVPHYSICS_PART_OF_RAGDOLL,
+	["PENETRATING"] = FVPHYSICS_PENETRATING,
+	["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
+	["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
+}
 
 --- Checks if the physics object is valid
 -- @shared
@@ -525,3 +513,5 @@ if SERVER then
 		phys:Wake()
 	end
 end
+
+end}

@@ -1,10 +1,16 @@
--------------------------------------------------------------------------------
--- Physenv library
--------------------------------------------------------------------------------
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Physenv functions
 -- @shared
 local physenv_lib = instance:RegisterLibrary("physenv")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local physenv_lib = instance.Libraries.physenv
 
 --- Gets the air density.
 -- @return number Air Density
@@ -24,3 +30,5 @@ end
 function physenv_lib.getPerformanceSettings ()
 	return instance.Sanitize(physenv.GetPerformanceSettings())
 end
+
+end}

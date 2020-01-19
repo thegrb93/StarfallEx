@@ -1,12 +1,17 @@
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Library for retreiving information about teams
 -- @shared
 local team_library = instance:RegisterLibrary("team")
-local cwrap, cunwrap
-instance:AddHook("postload", function()
-	cwrap = SF.Color.Wrap
-	cunwrap = SF.Color.Unwrap
-end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local team_library = instance.Libraries.team
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 
 --- Returns a table containing team information
 -- @return table containing team information
@@ -82,3 +87,5 @@ team_library.getNumFrags = team.TotalFrags
 -- @param ind Index of the team
 -- @return boolean
 team_library.exists = team.Valid
+
+end}

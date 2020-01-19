@@ -1,13 +1,34 @@
--------------------------------------------------------------------------------
--- Time library
--------------------------------------------------------------------------------
-
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
 local timer = timer
+
+local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of timers that can be created")
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Deals with time and timers.
 -- @shared
 local timer_library = instance:RegisterLibrary("timer")
-local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of timers that can be created")
+
+instance:AddHook("initialize", function()
+	instance.data.timers = {}
+	instance.data.timer_count = 0
+end)
+
+instance:AddHook("deinitialize", function()
+	for name, _ in pairs(instance.data.timers) do
+		timer.Remove(name)
+	end
+end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local timer_library = instance.Libraries.timer
 
 -- ------------------------- Time ------------------------- --
 
@@ -33,12 +54,12 @@ end
 
 -- ------------------------- Timers ------------------------- --
 
-local function mangle_timer_name(instance, name)
+local function mangle_timer_name(name)
 	return "sftimer_"..tostring(instance).."_"..name
 end
 
 local simple_int = 0
-local function mangle_simpletimer_name(instance)
+local function mangle_simpletimer_name()
 	simple_int = simple_int + 1
 	return "sftimersimple_"..tostring(instance).."_"..simple_int
 end
@@ -49,9 +70,9 @@ local function createTimer(name, delay, reps, func, simple)
 
 	local timername
 	if simple then
-		timername = mangle_simpletimer_name(instance)
+		timername = mangle_simpletimer_name()
 	else
-		timername = mangle_timer_name(instance, name)
+		timername = mangle_timer_name(name)
 	end
 	
 	local timerdata = {reps = reps, func = func}
@@ -97,7 +118,7 @@ end
 function timer_library.remove(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	local timername = mangle_timer_name(instance, name)
+	local timername = mangle_timer_name(name)
 	if instance.data.timers[timername] then
 		instance.data.timer_count = instance.data.timer_count - 1
 		instance.data.timers[timername] = nil
@@ -110,7 +131,7 @@ end
 -- @return bool if the timer exists
 function timer_library.exists(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	return timer.Exists(mangle_timer_name(instance, name))
+	return timer.Exists(mangle_timer_name(name))
 end
 
 --- Stops a timer
@@ -118,7 +139,7 @@ end
 -- @return false if the timer didn't exist or was already stopped, true otherwise.
 function timer_library.stop(name)
 	SF.CheckLuaType(name, TYPE_STRING)
-	return timer.Stop(mangle_timer_name(instance, name))
+	return timer.Stop(mangle_timer_name(name))
 end
 
 --- Starts a timer
@@ -127,7 +148,7 @@ end
 function timer_library.start(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	return timer.Start(mangle_timer_name(instance, name))
+	return timer.Start(mangle_timer_name(name))
 end
 
 --- Adjusts a timer
@@ -140,7 +161,7 @@ function timer_library.adjust(name, delay, reps, func)
 	SF.CheckLuaType(name, TYPE_STRING)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
 
-	local timername = mangle_timer_name(instance, name)
+	local timername = mangle_timer_name(name)
 	local data = instance.data.timers[timername]
 
 	if data then
@@ -158,7 +179,7 @@ end
 function timer_library.pause(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	return timer.Pause(mangle_timer_name(instance, name))
+	return timer.Pause(mangle_timer_name(name))
 end
 
 --- Unpauses a timer
@@ -167,7 +188,7 @@ end
 function timer_library.unpause(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	return timer.UnPause(mangle_timer_name(instance, name))
+	return timer.UnPause(mangle_timer_name(name))
 end
 
 --- Runs either timer.pause or timer.unpause based on the timer's current status.
@@ -176,7 +197,7 @@ end
 function timer_library.toggle(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	return timer.Toggle(mangle_timer_name(instance, name))
+	return timer.Toggle(mangle_timer_name(name))
 end
 
 --- Returns amount of time left (in seconds) before the timer executes its function.
@@ -185,7 +206,7 @@ end
 function timer_library.timeleft(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	return timer.TimeLeft(mangle_timer_name(instance, name))
+	return timer.TimeLeft(mangle_timer_name(name))
 end
 
 --- Returns amount of repetitions/executions left before the timer destroys itself.
@@ -194,7 +215,7 @@ end
 function timer_library.repsleft(name)
 	SF.CheckLuaType(name, TYPE_STRING)
 
-	return timer.RepsLeft(mangle_timer_name(instance, name))
+	return timer.RepsLeft(mangle_timer_name(name))
 end
 
 --- Returns number of available timers
@@ -203,14 +224,4 @@ function timer_library.getTimersLeft()
 	return max_timers:GetInt() - instance.data.timer_count
 end
 
-
-instance:AddHook("initialize", function()
-	instance.data.timers = {}
-	instance.data.timer_count = 0
-end)
-
-instance:AddHook("deinitialize", function()
-	for name, _ in pairs(instance.data.timers) do
-		timer.Remove(name)
-	end
-end)
+end}

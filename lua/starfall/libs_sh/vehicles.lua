@@ -1,36 +1,8 @@
+-- Global to all starfalls
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
--------------------------------------------------------------------------------
--- Vehicle functions.
--------------------------------------------------------------------------------
-
-SF.Vehicles = {}
---- Vehicle type
-local vehicle_methods, vehicle_metamethods = instance:RegisterType("Vehicle")
-
-SF.Vehicles.Methods = vehicle_methods
-SF.Vehicles.Metatable = vehicle_metamethods
-
-local wrap, unwrap, pwrap
-instance:AddHook("postload", function()
-	pwrap = instance.Types.Player.Wrap
-
-	SF.ApplyTypeDependencies(vehicle_methods, vehicle_metamethods, instance.Types.Entity.Metatable)
-	wrap, unwrap = instance:CreateWrapper(vehicle_metamethods, true, false, debug.getregistry().Vehicle, instance.Types.Entity.Metatable)
-
-	SF.Vehicles.Wrap = wrap
-	SF.Vehicles.Unwrap = unwrap
-end)
-
---- To string
--- @shared
-function vehicle_metamethods:__tostring()
-	local ent = unwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
-end
 
 if SERVER then
 	-- Register privileges
@@ -38,12 +10,41 @@ if SERVER then
 	registerprivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
 	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
+end
 
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Vehicle type
+local vehicle_methods, vehicle_meta = instance:RegisterType("Vehicle")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local vehicle_methods, vehicle_meta = instance.Types.Vehicle.Methods, instance.Types.Vehicle
+local ply_meta, pwrap, punwrap = instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
+
+instance:ApplyTypeDependencies(vehicle_methods, vehicle_meta, instance.Types.Entity)
+local wrap, unwrap = instance:CreateWrapper(vehicle_meta, true, false, debug.getregistry().Vehicle, instance.Types.Entity)
+
+
+--- To string
+-- @shared
+function vehicle_meta:__tostring()
+	local ent = unwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
+
+if SERVER then
 	--- Returns the driver of the vehicle
 	-- @server
 	-- @return Driver of vehicle
 	function vehicle_methods:getDriver ()
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		return pwrap(ent:GetDriver())
@@ -52,7 +53,7 @@ if SERVER then
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver ()
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		local driver = ent:GetDriver()
@@ -66,7 +67,7 @@ if SERVER then
 	-- @param n The index of the passenger to get
 	-- @return The passenger or NULL if empty
 	function vehicle_methods:getPassenger (n)
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		checkluatype(n, TYPE_NUMBER)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
@@ -76,7 +77,7 @@ if SERVER then
 	--- Kills the driver of the vehicle
 	-- @server
 	function vehicle_methods:killDriver ()
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.kill")
@@ -90,7 +91,7 @@ if SERVER then
 	-- @param class Optional weapon class to strip. Otherwise all are stripped.
 	-- @server
 	function vehicle_methods:stripDriver (class)
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
@@ -108,7 +109,7 @@ if SERVER then
 	--- Will lock the vehicle preventing players from entering or exiting the vehicle.
 	-- @server
 	function vehicle_methods:lock()
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.lock")
@@ -121,13 +122,13 @@ if SERVER then
 	--- Will unlock the vehicle.
 	-- @server
 	function vehicle_methods:unlock()
-		checktype(self, vehicle_metamethods)
+		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.lock")
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		ent:Fire("Unlock")
 	end
-
-
 end
+
+end}
