@@ -927,8 +927,8 @@ function render_library.drawBlurEffect(blurx, blury, passes)
 	passes = math.Clamp(blurx, 0, 100)
 
 	local rt = render.GetRenderTarget()
-	local w, h = render_library.getGameResolution()
-	local aspectRatio = ScrW() / ScrH()
+	local w, h = data.oldViewPort[3], data.oldViewPort[4]
+	local aspectRatio = w / h
 
 	render.BlurRenderTarget(rt, blurx*aspectRatio, blury, passes)
 
