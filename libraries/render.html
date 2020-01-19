@@ -326,6 +326,11 @@ Draws a wireframe box in 3D space </td>
 Draws a wireframe sphere </td>
 		</tr>
 		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.drawBlurEffect">drawBlurEffect</a>( blurx, blury, passes&nbsp;)</td>
+			<td class="summary">
+Applies a blur effect to the active rendertarget.</td>
+		</tr>
+		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.drawCircle">drawCircle</a>( x, y, r&nbsp;)</td>
 			<td class="summary">
 Draws a circle outline </td>
@@ -572,6 +577,31 @@ Sets the lighting mode </td>
 			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterial">setMaterial</a>( mat&nbsp;)</td>
 			<td class="summary">
 Sets the current render material </td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterialEffectAdd">setMaterialEffectAdd</a>( mat&nbsp;)</td>
+			<td class="summary">
+Sets the current render material to the given material or the rendertarget, applying an additive shader when drawn.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterialEffectBloom">setMaterialEffectBloom</a>( mat, levelr, levelg, levelb, colormul&nbsp;)</td>
+			<td class="summary">
+Sets the current render material to the given material or the rendertarget, applying a bloom shader to the texture.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterialEffectColorModify">setMaterialEffectColorModify</a>( mat, cmStructure&nbsp;)</td>
+			<td class="summary">
+Sets the current render material to the given material or the rendertarget, applying a color modification shader to the texture.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterialEffectDownsample">setMaterialEffectDownsample</a>( mat, darken, multiply&nbsp;)</td>
+			<td class="summary">
+Sets the current render material to the given material or the rendertarget, darkening the texture, and scaling up color values.</td>
+		</tr>
+		<tr>
+			<td class="name"><span class="realm_cl"></span><a href="#render.setMaterialEffectSub">setMaterialEffectSub</a>( mat&nbsp;)</td>
+			<td class="summary">
+Sets the current render material to the given material or the rendertarget, applying a subtractive shader when drawn.</td>
 		</tr>
 		<tr>
 			<td class="name"><span class="realm_cl"></span><a href="#render.setRGBA">setRGBA</a>( r, g, b, a&nbsp;)</td>
@@ -1113,6 +1143,27 @@ Draws a wireframe sphere</p>
 			<li><tt>radius</tt> ― Radius of the sphere</li>
 			<li><tt>longitudeSteps</tt> ― The amount of longitude steps. The larger this number is, the smoother the sphere is</li>
 			<li><tt>latitudeSteps</tt> ― The amount of latitude steps. The larger this number is, the smoother the sphere is</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.drawBlurEffect"></a><strong>render.drawBlurEffect</strong>( blurx, blury, passes&nbsp;)</dt>
+<dd>
+	<p>
+Applies a blur effect to the active rendertarget. This must be used with a rendertarget created beforehand.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>blurx</tt> ― The amount of horizontal blur to apply.</li>
+			<li><tt>blury</tt> ― The amount of vertical blur to apply.</li>
+			<li><tt>passes</tt> ― The number of times the blur effect is applied.</li>
 		</ul>
 	</section>
 	
@@ -2147,6 +2198,108 @@ Sets the current render material</p>
 		<ul>
 			
 			<li><tt>mat</tt> ― The material object</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setMaterialEffectAdd"></a><strong>render.setMaterialEffectAdd</strong>( mat&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current render material to the given material or the rendertarget, applying an additive shader when drawn.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― The material object to use the texture of, or the name of a rendertarget to use instead.</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setMaterialEffectBloom"></a><strong>render.setMaterialEffectBloom</strong>( mat, levelr, levelg, levelb, colormul&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current render material to the given material or the rendertarget, applying a bloom shader to the texture.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― The material object to use the texture of, or the name of a rendertarget to use instead.</li>
+			<li><tt>levelr</tt> ― Multiplier for all red pixels. 1 = unchanged</li>
+			<li><tt>levelg</tt> ― Multiplier for all green pixels. 1 = unchanged</li>
+			<li><tt>levelb</tt> ― Multiplier for all blue pixels. 1 = unchanged</li>
+			<li><tt>colormul</tt> ― Multiplier for all three colors. 1 = unchanged</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setMaterialEffectColorModify"></a><strong>render.setMaterialEffectColorModify</strong>( mat, cmStructure&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current render material to the given material or the rendertarget, applying a color modification shader to the texture. Alias: render.setMaterialEffectColourModify</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― The material object to use the texture of, or the name of a rendertarget to use instead.</li>
+			<li><tt>cmStructure</tt> ― A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setMaterialEffectDownsample"></a><strong>render.setMaterialEffectDownsample</strong>( mat, darken, multiply&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current render material to the given material or the rendertarget, darkening the texture, and scaling up color values.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― The material object to use the texture of, or the name of a rendertarget to use instead.</li>
+			<li><tt>darken</tt> ― The amount to darken the texture by. -1 to 1 inclusive.</li>
+			<li><tt>multiply</tt> ― The amount to multiply the pixel colors by.</li>
+		</ul>
+	</section>
+	
+	
+	
+	
+</dd>
+		
+<dt><span class="realm_cl"></span><a name="render.setMaterialEffectSub"></a><strong>render.setMaterialEffectSub</strong>( mat&nbsp;)</dt>
+<dd>
+	<p>
+Sets the current render material to the given material or the rendertarget, applying a subtractive shader when drawn.</p>
+	
+	
+	<section class="parameters">
+		<h3>Parameters</h3>
+		<ul>
+			
+			<li><tt>mat</tt> ― The material object to use the texture of, or the name of a rendertarget to use instead.</li>
 		</ul>
 	</section>
 	
