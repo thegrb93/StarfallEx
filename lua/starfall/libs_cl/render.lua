@@ -175,6 +175,7 @@ SF.Permissions.registerPrivilege("render.hud", "Render Hud", "Allows the user to
 SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
 SF.Permissions.registerPrivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
 SF.Permissions.registerPrivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
+SF.Permissions.registerPrivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -189,6 +190,15 @@ local renderingViewRt
 local drawViewerInView = false
 local MAX_CLIPPING_PLANES = 4
 local pushedClippingPlanes = 0
+local pp = {
+	add = Material("pp/add"),				-- basetexture
+	sub = Material("pp/sub"),				-- basetexture
+	bloom = Material("pp/bloom"),			-- basetexture, levelr, levelg, levelb, colormul
+	colour = Material("pp/colour"),			-- fbtexture, pp_colour_*: addr, addg, addb, brightness, colour, contrast, mulr, mulg, mulb
+	downsample = Material("pp/downsample")	-- fbtexture, darken, multiply
+
+}
+local tex_screenEffect = render.GetScreenEffectTexture(0)
 
 local rt_bank = SF.ResourceHandler(cv_max_rendertargets:GetInt(),
 	function(t, i)
@@ -267,6 +277,8 @@ SF.AddHook("cleanup", function (instance, hook)
 		render.SetScissorRect(0, 0, 0, 0, false)
 		render.CullMode(MATERIAL_CULLMODE_CCW)
 		render.SetLightingMode(0) 
+		pp.colour:SetTexture("$fbtexture", tex_screenEffect)
+		pp.downsample:SetTexture("$fbtexture", tex_screenEffect)
 		for i = #matrix_stack, 1, -1 do
 			cam.PopModelMatrix()
 			matrix_stack[i] = nil
@@ -746,6 +758,180 @@ function render_library.setMaterial(mat)
 		render.SetColorMaterial()
 		draw.NoTexture()
 	end
+end
+
+
+local function gettexture(mat)
+
+	local t = dgetmeta(mat)
+	if t ~= mat_meta and t ~= mat_meta2 then
+		if TypeID(mat) ~= TYPE_STRING then
+			SF.ThrowTypeError("Material or string", SF.GetType(mat), 3)
+		end
+		local rt = SF.instance.data.render.rendertargets[mat]
+		if not rt then SF.Throw("Invalid Rendertarget", 3) end
+		return rt
+	else
+		return maunwrap(mat):GetTexture("$basetexture")
+	end
+
+end
+
+--- Sets the current render material to the given material or the rendertarget, applying an additive shader when drawn.
+-- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+function render_library.setMaterialEffectAdd(mat)
+
+	checkpermission(SF.instance, nil, "render.effects")
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	local tex = gettexture(mat)
+
+	pp.add:SetTexture("$basetexture", tex)
+	surface.SetMaterial(pp.add)
+	render.SetMaterial(pp.add)
+
+end
+
+--- Sets the current render material to the given material or the rendertarget, applying a subtractive shader when drawn.
+-- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+function render_library.setMaterialEffectSub(mat)
+
+	checkpermission(SF.instance, nil, "render.effects")
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	local tex = gettexture(mat)
+
+	pp.sub:SetTexture("$basetexture", tex)
+	surface.SetMaterial(pp.sub)
+	render.SetMaterial(pp.sub)
+
+end
+
+--- Sets the current render material to the given material or the rendertarget, applying a bloom shader to the texture.
+-- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param levelr Multiplier for all red pixels. 1 = unchanged
+-- @param levelg Multiplier for all green pixels. 1 = unchanged
+-- @param levelb Multiplier for all blue pixels. 1 = unchanged
+-- @param colormul Multiplier for all three colors. 1 = unchanged
+function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colormul)
+
+	checkpermission(SF.instance, nil, "render.effects")
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	local tex = gettexture(mat)
+	checkluatype(levelr, TYPE_NUMBER)
+	checkluatype(levelg, TYPE_NUMBER)
+	checkluatype(levelb, TYPE_NUMBER)
+	checkluatype(colormul, TYPE_NUMBER)
+	levelr = math.Clamp(levelr, -1024, 1024)
+	levelg = math.Clamp(levelg, -1024, 1024)
+	levelb = math.Clamp(levelb, -1024, 1024)
+	colormul = math.Clamp(colormul, -1024, 1024)
+
+	pp.bloom:SetTexture("$basetexture", tex)
+	pp.bloom:SetFloat("$levelr", levelr)
+	pp.bloom:SetFloat("$levelg", levelg)
+	pp.bloom:SetFloat("$levelb", levelb)
+	pp.bloom:SetFloat("$colormul", colormul)
+	surface.SetMaterial(pp.bloom)
+	render.SetMaterial(pp.bloom)
+
+end
+
+--- Sets the current render material to the given material or the rendertarget, darkening the texture, and scaling up color values.
+-- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param darken The amount to darken the texture by. -1 to 1 inclusive.
+-- @param multiply The amount to multiply the pixel colors by.
+function render_library.setMaterialEffectDownsample(mat, darken, multiply)
+
+	checkpermission(SF.instance, nil, "render.effects")
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	local tex = gettexture(mat)
+	checkluatype(darken, TYPE_NUMBER)
+	checkluatype(multiply, TYPE_NUMBER)
+	darken = math.Clamp(darken, -1, 1)
+	multiply = math.Clamp(multiply, 0, 1024)
+
+	pp.downsample:SetTexture("$fbtexture", tex)
+	pp.downsample:SetFloat("$darken", darken)
+	pp.downsample:SetFloat("$multiply", multiply)
+	surface.SetMaterial(pp.downsample)
+	render.SetMaterial(pp.downsample)
+
+end
+
+
+local defaultCM = {
+	addr = 0,
+	addg = 0,
+	addb = 0,
+	brightness = 0,
+	colour = 1,
+	contrast = 1,
+	mulr = 1,
+	mulg = 1,
+	mulb = 1
+}
+
+--- Sets the current render material to the given material or the rendertarget, applying a color modification shader to the texture. Alias: render.setMaterialEffectColourModify
+-- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
+-- @param cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
+function render_library.setMaterialEffectColorModify(mat, cmStructure)
+
+	checkpermission(SF.instance, nil, "render.effects")
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	local tex = gettexture(mat)
+	checkluatype(cmStructure, TYPE_TABLE)
+
+	for key, default in pairs(defaultCM) do
+		local value = cmStructure[key]
+		if TypeID(value) == TYPE_NIL then
+			if key == "colour" then
+				value = cmStructure["color"] or default
+			else
+				value = default
+			end
+		elseif TypeID(value) ~= TYPE_NUMBER then SF.Throw("Invalid type for key \"" .. key .. "\" (expected number, got " .. SF.GetType(value) .. ")", 2) end
+
+		value = math.Clamp(value, -1024, 1024)
+		pp.colour:SetFloat("$pp_colour_" .. key, value)
+	end
+
+	pp.colour:SetTexture("$fbtexture", tex)
+	surface.SetMaterial(pp.colour)
+	render.SetMaterial(pp.colour)
+
+end
+
+render_library.setMaterialEffectColourModify = render_library.setMaterialEffectColorModify
+
+
+local aspectRatio = ScrW() / ScrH() -- For some reason, render.BlurRenderTarget performs the blur based on the game's window size. This compensates for that
+
+--- Applies a blur effect to the active rendertarget. This must be used with a rendertarget created beforehand.
+-- @param blurx The amount of horizontal blur to apply.
+-- @param blury The amount of vertical blur to apply.
+-- @param passes The number of times the blur effect is applied.
+function render_library.drawBlurEffect(blurx, blury, passes)
+
+	checkpermission(SF.instance, nil, "render.effects")
+	local data = SF.instance.data.render
+	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
+	if not data.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
+
+	checkluatype(blurx, TYPE_NUMBER)
+	checkluatype(blury, TYPE_NUMBER)
+	checkluatype(passes, TYPE_NUMBER)
+	blurx = math.Clamp(blurx, 0, 1024)
+	blury = math.Clamp(blury, 0, 1024)
+	passes = math.Clamp(blurx, 0, 100)
+
+	local rt = render.GetRenderTarget()
+
+	render.BlurRenderTarget(rt, blurx*aspectRatio, blury, passes)
+
 end
 
 --- Check if the specified render target exists.
