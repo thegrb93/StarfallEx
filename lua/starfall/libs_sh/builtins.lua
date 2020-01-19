@@ -890,19 +890,14 @@ function Environment.setfenv(func, tbl)
 	return setfenv(func, tbl)
 end
 
---- Set's metamethod on SF type
+--- Gets an SF type's methods table
 -- @param sfType Name of SF type
--- @param methodName Name of method
--- @param method Method to set
-function Environment.setTypeMethod(sfType, methodName, method)
-	if not isfunction(method) then SF.Throw("Method must be a function") end
+-- @return Table of the type's methods which can be edited or iterated
+function Environment.getMethods(sfType)
 	checkluatype(sfType, TYPE_STRING)
-	checkluatype(methodName, TYPE_STRING)
-	
-	if not instance.Types[sfType] then
-		SF.Throw("Invalid type")
-	end
-	instance.Types[sfType].Methods[methodName] = method
+	local typemeta = instance.Types[sfType]
+	if not typemeta then SF.Throw("Invalid type") end
+	return typemeta.Methods
 end
 
 --- Simple version of Lua's getfenv
