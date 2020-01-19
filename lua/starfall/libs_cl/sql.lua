@@ -1,12 +1,24 @@
 SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
 
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- SQL library.
 -- @client
 local sql_library = instance:RegisterLibrary("sql")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local sql_library = instance.Libraries.sql
+local checktype = instance.CheckType
 
 --- Performs a query on the local SQLite database.
 -- @param query The query to execute.
@@ -56,3 +68,5 @@ function sql_library.SQLStr(str, bNoQuotes)
 	
 	return sql.SQLStr(str, bNoQuotes)
 end
+
+end}

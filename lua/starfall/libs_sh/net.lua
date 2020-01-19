@@ -112,6 +112,8 @@ local netTypeSizes = {
 	[TYPE_COLOR]	= function(x) return (1+4)*8 end,	-- color type, color data (4 bytes)
 }
 
+local netwritetable, netreadtable, netwritetype, netreadtype
+
 --- Writes an object to a net message automatically typing it
 -- @shared
 -- @param v The object to write
@@ -132,7 +134,7 @@ function net_library.writeType(v)
 	if wv then
 		if typeid == TYPE_TABLE then
 			write(instance, net.WriteUInt, 1, typeid, 8)
-			net_library.writeTable(v)
+			netwritetable(v)
 		else
 			write(instance, wv, netTypeSizes[typeid](v), typeid, v)
 		end
@@ -141,6 +143,7 @@ function net_library.writeType(v)
 	end
 	return true
 end
+netwritetype = net_library.writeType
 
 --- Reads an object from a net message automatically typing it
 --- Will throw an error if invalid type is read. Make sure to pcall it
@@ -150,7 +153,7 @@ function net_library.readType()
 	local typeid = net.ReadUInt(8)
 
 	if typeid == TYPE_TABLE then
-		return net_library.readTable()
+		return netreadtable()
 	else
 		local rv = net.ReadVars[typeid]
 		if rv then
@@ -161,17 +164,19 @@ function net_library.readType()
 
 	SF.Throw("net.readType: Couldn't read type " .. typeid, 2)
 end
+netreadtype = net_library.readType
 
 --- Writes a table to a net message automatically typing it.
 -- @shared
 -- @param v The object to write
 function net_library.writeTable(t)
 	for k, v in pairs(t) do
-		net_library.writeType(k)
-		net_library.writeType(v)
+		netwritetype(k)
+		netwritetype(v)
 	end
-	net_library.writeType(nil)
+	netwritetype(nil)
 end
+netwritetable = net_library.writeTable
 
 --- Reads an object from a net message automatically typing it
 --- Will throw an error if invalid type is read. Make sure to pcall it
@@ -180,11 +185,12 @@ end
 function net_library.readTable()
 	local tab = {}
 	while true do
-		local k = net_library.readType()
+		local k = netreadtype()
 		if ( k == nil ) then return tab end
-		tab[k] = net_library.readType()
+		tab[k] = netreadtype()
 	end
 end
+netreadtable = net_library.readTable
 
 --- Writes a string to the net message. Null characters will terminate the string.
 -- @shared

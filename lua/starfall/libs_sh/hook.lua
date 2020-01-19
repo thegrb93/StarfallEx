@@ -128,6 +128,8 @@ end
 -- @param owner The owner of the sender
 -- @param ... The payload that was supplied when calling the hook
 
+local hookrun = hook_library.run
+
 --- Run a hook remotely.
 -- This will call the hook "remote" on either a specified entity or all instances on the server/client
 -- @shared
@@ -153,7 +155,7 @@ function hook_library.runRemote (recipient, ...)
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hook_library.run("remote", wrapObject(instance.data.entity), wrapObject(instance.player), ...) }
+			result = { true, hookrun("remote", wrapObject(instance.data.entity), wrapObject(instance.player), ...) }
 		else
 			result = k:runScriptHookForResult("remote", wrapObject(instance.data.entity), wrapObject(instance.player), ...)
 		end
