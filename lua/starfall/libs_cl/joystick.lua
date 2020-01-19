@@ -1,8 +1,5 @@
-if not pcall(require, "joystick") then return end
+if not pcall(require, "joystick") then return {function() end, function() end} end
 
---- Joystick library.
--- @client
-local joystick_library = instance:RegisterLibrary("joystick")
 local next_updates = {}
 
 local function refresh(enum)
@@ -13,6 +10,21 @@ local function refresh(enum)
 		joystick.refresh(enum)
 	end
 end
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Joystick library.
+-- @client
+local joystick_library = instance:RegisterLibrary("joystick")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local joystick_library = instance.Libraries.joystick
+
 
 --- Gets the axis data value.
 -- @param enum Joystick number. Starts at 0
@@ -78,3 +90,5 @@ function joystick_library.numButtons(enum)
 	refresh(enum)
 	return joystick.count(enum, 3)
 end
+
+end}

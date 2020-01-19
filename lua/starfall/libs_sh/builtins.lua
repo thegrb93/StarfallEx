@@ -456,7 +456,7 @@ math_methods.tanh = math.tanh
 math_methods.timeFraction = math.TimeFraction
 math_methods.truncate = math.Truncate
 function math_methods.bSplinePoint(tDiff, tPoints, tMax)
-	return vwrap(math.BSplinePoint(tDiff, SF.Unsanitize(tPoints), tMax))
+	return vwrap(math.BSplinePoint(tDiff, instance.Unsanitize(tPoints), tMax))
 end
 function math_methods.lerp(percent, from, to)
 	checkluatype(percent, TYPE_NUMBER)
@@ -800,7 +800,7 @@ end
 --- Returns the table of scripts used by the chip
 -- @return Table of scripts used by the chip
 function Environment.getScripts()
-	return SF.Sanitize(instance.source)
+	return instance.Sanitize(instance.source)
 end
 
 --- Runs an included script and caches the result.
@@ -977,7 +977,7 @@ function Environment.setTypeMethod(sfType, methodName, method)
 	if not instance.Types[sfType] then
 		SF.Throw("Invalid type")
 	end
-	instance.Types[sfType].__methods[methodName] = method
+	instance.Types[sfType].Methods[methodName] = method
 end
 
 --- Simple version of Lua's getfenv
@@ -1029,7 +1029,7 @@ function Environment.pcall(func, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	return false, SF.Sanitize({err})[1]
+	return false, instance.Sanitize({err})[1]
 end
 
 local function xpcall_Callback(err)
@@ -1059,7 +1059,7 @@ function Environment.xpcall(func, callback, ...)
 		SF.Throw(err, 2, true)
 	end
 
-	return false, callback(SF.Sanitize({err})[1], traceback)
+	return false, callback(instance.Sanitize({err})[1], traceback)
 end
 
 --- Try to execute a function and catch possible exceptions
@@ -1077,7 +1077,7 @@ function Environment.try(func, catch)
 	elseif uncatchable[err] then
 		SF.Throw(err, 2, true)
 	end
-	if catch then catch(SF.Sanitize({err})[1]) end
+	if catch then catch(instance.Sanitize({err})[1]) end
 end
 
 

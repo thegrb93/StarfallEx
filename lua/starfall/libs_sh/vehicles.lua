@@ -1,6 +1,7 @@
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 -------------------------------------------------------------------------------
 -- Vehicle functions.
 -------------------------------------------------------------------------------
@@ -33,10 +34,10 @@ end
 
 if SERVER then
 	-- Register privileges
-	SF.Permissions.registerPrivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
-	SF.Permissions.registerPrivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
-	SF.Permissions.registerPrivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
-	SF.Permissions.registerPrivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
+	registerprivilege("vehicle.eject", "Vehicle eject", "Removes a driver from vehicle", { entities = {} })
+	registerprivilege("vehicle.kill", "Vehicle kill", "Kills a driver in vehicle", { entities = {} })
+	registerprivilege("vehicle.strip", "Vehicle strip", "Strips weapons from a driver in vehicle", { entities = {} })
+	registerprivilege("vehicle.lock", "Vehicle lock", "Allow vehicle locking/unlocking", { entities = {} })
 
 	--- Returns the driver of the vehicle
 	-- @server

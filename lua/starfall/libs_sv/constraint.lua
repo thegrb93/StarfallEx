@@ -1,17 +1,18 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
-SF.Permissions.registerPrivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.axis", "Axis", "Allows the user to axis two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.slider", "Slider", "Allows the user to slider two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.rope", "Rope", "Allows the user to rope two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.elastic", "Elastic", "Allows the user to elastic two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { entities = {} })
-SF.Permissions.registerPrivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
+registerprivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
+registerprivilege("constraints.axis", "Axis", "Allows the user to axis two entities", { entities = {} })
+registerprivilege("constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { entities = {} })
+registerprivilege("constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { entities = {} })
+registerprivilege("constraints.slider", "Slider", "Allows the user to slider two entities", { entities = {} })
+registerprivilege("constraints.rope", "Rope", "Allows the user to rope two entities", { entities = {} })
+registerprivilege("constraints.elastic", "Elastic", "Allows the user to elastic two entities", { entities = {} })
+registerprivilege("constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { entities = {} })
+registerprivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
 
 local plyCount = SF.LimitObject("constraints", "constraints", 600, "The number of constraints allowed to spawn via Starfall")
 
@@ -446,7 +447,7 @@ function constraint_library.getTable(ent)
 
 	if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 
-	return SF.Sanitize(constraint.GetTable(ent))
+	return instance.Sanitize(constraint.GetTable(ent))
 end
 
 --- Sets whether the chip should remove created constraints when the chip is removed

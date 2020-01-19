@@ -1,16 +1,17 @@
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
-SF.Permissions.registerPrivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
-SF.Permissions.registerPrivilege("wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs")
-SF.Permissions.registerPrivilege("wire.wirelink", "Wirelink", "Allows the user to create a wirelink", { entities = {} })
-SF.Permissions.registerPrivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink")
-SF.Permissions.registerPrivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
-SF.Permissions.registerPrivilege("wire.createWire", "Create Wire", "Allows the user to create a wire between two entities", { entities = {} })
-SF.Permissions.registerPrivilege("wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities", { entities = {} })
-SF.Permissions.registerPrivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity")
-SF.Permissions.registerPrivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
+registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
+registerprivilege("wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs")
+registerprivilege("wire.wirelink", "Wirelink", "Allows the user to create a wirelink", { entities = {} })
+registerprivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink")
+registerprivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
+registerprivilege("wire.createWire", "Create Wire", "Allows the user to create a wire between two entities", { entities = {} })
+registerprivilege("wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities", { entities = {} })
+registerprivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity")
+registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
 
 -- Local to each starfall
 return { function(instance) -- Called for library declarations

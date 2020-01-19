@@ -1,14 +1,16 @@
--------------------------------------------------------------------------------
--- Notification functions
--------------------------------------------------------------------------------
-
--- Register Priveleges
-SF.Permissions.registerPrivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
-SF.Permissions.registerPrivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
-
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
+
+-- Register Priveleges
+registerprivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
+registerprivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Notification library. Allows the user to display hints on the bottom right of their screen
 -- @client
@@ -24,17 +26,19 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-instance:AddHook("postload", function()
-	-- @name SF.DefaultEnvironment.NOTIFY
-	-- @class table
-	SF.DefaultEnvironment.NOTIFY = {
-		["GENERIC"] = NOTIFY_GENERIC,
-		["ERROR"] = NOTIFY_ERROR,
-		["UNDO"] = NOTIFY_UNDO,
-		["HINT"] = NOTIFY_HINT,
-		["CLEANUP"] = NOTIFY_CLEANUP
-	}
-end)
+
+end, function(instance) -- Called for library definitions
+
+
+-- @name Environment.NOTIFY
+-- @class table
+instance.env.NOTIFY = {
+	["GENERIC"] = NOTIFY_GENERIC,
+	["ERROR"] = NOTIFY_ERROR,
+	["UNDO"] = NOTIFY_UNDO,
+	["HINT"] = NOTIFY_HINT,
+	["CLEANUP"] = NOTIFY_CLEANUP
+}
 
 --- Displays a standard notification.
 -- @param text The text to display
@@ -98,3 +102,5 @@ function notification_library.kill(id)
 		instance.data.notifications[id] = nil
 	end
 end
+
+end}

@@ -1,10 +1,16 @@
--------------------------------------------------------------------------------
--- Game library
--------------------------------------------------------------------------------
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Game functions
 -- @shared
 local game_lib = instance:RegisterLibrary("game")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local game_lib = instance.Libraries.game
 
 --- Returns the map name
 -- @name game_lib.getMap
@@ -59,3 +65,5 @@ if CLIENT then
 		return SF.Vectors.Wrap(info.direction), info.obstruction
 	end
 end
+
+end}

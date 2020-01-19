@@ -1,88 +1,3 @@
--------------------------------------------------------------------------------
--- Render library
--------------------------------------------------------------------------------
-
---- Called when a frame is requested to be drawn on screen. (2D/3D Context)
--- @name render
--- @class hook
--- @client
-
---- Called when a frame is requested to be drawn on hud. (2D Context)
--- @name drawhud
--- @class hook
--- @client
-
---- Called when a hud element is attempting to be drawn
--- @name hudshoulddraw
--- @class hook
--- @client
--- @param string The name of the hud element trying to be drawn
-
----Called before drawing HUD (2D Context)
--- @name predrawhud
--- @class hook
--- @client
-
----Called after drawing HUD (2D Context)
--- @name postdrawhud
--- @class hook
--- @client
-
---- Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)
--- @name renderoffscreen
--- @class hook
--- @client
-
---- Called when the player connects to a HUD component linked to the Starfall Chip
--- @name hudconnected
--- @class hook
--- @client
-
---- Called when the player disconnects from a HUD component linked to the Starfall Chip
--- @name huddisconnected
--- @class hook
--- @client
-
---- Called before entities are drawn. You can't render anything, but you can edit hologram matrices before they are drawn.
--- @name hologrammatrix
--- @class hook
--- @client
-
---- Called before opaque entities are drawn. (Only works with HUD) (3D context)
--- @name predrawopaquerenderables
--- @class hook
--- @client
--- @param boolean isDrawingDepth Whether the current draw is writing depth.
--- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
-
---- Called after opaque entities are drawn. (Only works with HUD) (3D context)
--- @name postdrawopaquerenderables
--- @class hook
--- @client
--- @param boolean isDrawingDepth Whether the current draw is writing depth.
--- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
-
---- Called when the engine wants to calculate the player's view
--- @name calcview
--- @class hook
--- @client
--- @param pos Current position of the camera
--- @param ang Current angles of the camera
--- @param fov Current fov of the camera
--- @param znear Current near plane of the camera
--- @param zfar Current far plane of the camera
--- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
-
---- Render library. Screens are 512x512 units. Most functions require
--- that you be in the rendering hook to call, otherwise an error is
--- thrown. +x is right, +y is down
--- @entity starfall_screen
--- @field TEXT_ALIGN_LEFT
--- @field TEXT_ALIGN_CENTER
--- @field TEXT_ALIGN_RIGHT
--- @field TEXT_ALIGN_TOP
--- @field TEXT_ALIGN_BOTTOM
-
 local render = render
 local surface = surface
 local clamp = math.Clamp
@@ -92,14 +7,15 @@ local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local haspermission = SF.Permissions.hasAccess
+local registerprivilege = SF.Permissions.registerPrivilege
 local COLOR_WHITE = Color(255, 255, 255)
 
-SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
-SF.Permissions.registerPrivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
-SF.Permissions.registerPrivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
-SF.Permissions.registerPrivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
-SF.Permissions.registerPrivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
-SF.Permissions.registerPrivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
+registerprivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
+registerprivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
+registerprivilege("render.offscreen", "Render Screen", "Allows the user to render without a screen", { client = {} })
+registerprivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
+registerprivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
+registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -165,14 +81,6 @@ local defined_fonts = {
 for k, v in pairs(defined_fonts) do
 	validfonts[string.lower(k)] = k
 end
-
---- Vertex format
--- @name Vertex Format
--- @class table
--- @field x X coordinate
--- @field y Y coordinate
--- @field u U coordinate (optional, default is 0)
--- @field v V coordinate (optional, default is 0)
 
 local currentcolor
 local defaultFont
@@ -259,27 +167,6 @@ local renderhooks = {
 }
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
-local render_library = instance:RegisterLibrary("render")
-
-
-end, function(instance) -- Called for library definitions
-
-
-local render_library = instance.Libraries.render
-local checktype = instance.CheckType
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
-local mtl_meta, mtlwrap, mtlunwrap = instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
-local mtl_meta2 = instance.Types.LockedMaterial
-
 SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 	return haspermission(instance, nil, "render.offscreen"), {}
 end)
@@ -318,6 +205,31 @@ SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
 SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+--- Render library. Screens are 512x512 units. Most functions require
+-- that you be in the rendering hook to call, otherwise an error is
+-- thrown. +x is right, +y is down
+local render_library = instance:RegisterLibrary("render")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local render_library = instance.Libraries.render
+local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+local mtl_meta, mtlwrap, mtlunwrap = instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
+local mtl_meta2 = instance.Types.LockedMaterial
+
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
 render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
@@ -1765,7 +1677,7 @@ end
 function render_library.getScreenInfo(e)
 	local screen = eunwrap(e)
 	if screen then
-		return SF.Sanitize(screen.ScreenInfo)
+		return instance.Sanitize(screen.ScreenInfo)
 	end
 end
 
@@ -2069,6 +1981,79 @@ function render_library.setHUDActive(active)
 	instance.hudoverride = active
 end
 
+end}
+
+--- Called when a frame is requested to be drawn on screen. (2D/3D Context)
+-- @name render
+-- @class hook
+-- @client
+
+--- Called when a frame is requested to be drawn on hud. (2D Context)
+-- @name drawhud
+-- @class hook
+-- @client
+
+--- Called when a hud element is attempting to be drawn
+-- @name hudshoulddraw
+-- @class hook
+-- @client
+-- @param string The name of the hud element trying to be drawn
+
+---Called before drawing HUD (2D Context)
+-- @name predrawhud
+-- @class hook
+-- @client
+
+---Called after drawing HUD (2D Context)
+-- @name postdrawhud
+-- @class hook
+-- @client
+
+--- Called when a frame is requested to be drawn. Doesn't require a screen or HUD but only works on rendertargets. (2D Context)
+-- @name renderoffscreen
+-- @class hook
+-- @client
+
+--- Called when the player connects to a HUD component linked to the Starfall Chip
+-- @name hudconnected
+-- @class hook
+-- @client
+
+--- Called when the player disconnects from a HUD component linked to the Starfall Chip
+-- @name huddisconnected
+-- @class hook
+-- @client
+
+--- Called before entities are drawn. You can't render anything, but you can edit hologram matrices before they are drawn.
+-- @name hologrammatrix
+-- @class hook
+-- @client
+
+--- Called before opaque entities are drawn. (Only works with HUD) (3D context)
+-- @name predrawopaquerenderables
+-- @class hook
+-- @client
+-- @param boolean isDrawingDepth Whether the current draw is writing depth.
+-- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
+
+--- Called after opaque entities are drawn. (Only works with HUD) (3D context)
+-- @name postdrawopaquerenderables
+-- @class hook
+-- @client
+-- @param boolean isDrawingDepth Whether the current draw is writing depth.
+-- @param boolean isDrawSkybox Whether the current draw is drawing the skybox.
+
+--- Called when the engine wants to calculate the player's view
+-- @name calcview
+-- @class hook
+-- @client
+-- @param pos Current position of the camera
+-- @param ang Current angles of the camera
+-- @param fov Current fov of the camera
+-- @param znear Current near plane of the camera
+-- @param zfar Current far plane of the camera
+-- @return table Table containing information for the camera. {origin=camera origin, angles=camera angles, fov=camera fov, znear=znear, zfar=zfar, drawviewer=drawviewer, ortho=ortho table}
+
 --- Called when a player uses the screen
 -- @name starfallUsed
 -- @class hook
@@ -2089,4 +2074,18 @@ end
 -- @field z Screen plane offset in local coordinates (relative to offset?)
 -- @field rot Screen rotation
 
-end}
+--- Vertex format
+-- @name Vertex Format
+-- @class table
+-- @field x X coordinate
+-- @field y Y coordinate
+-- @field u U coordinate (optional, default is 0)
+-- @field v V coordinate (optional, default is 0)
+
+-- @name Text align enum
+-- @class table
+-- @field TEXT_ALIGN_LEFT
+-- @field TEXT_ALIGN_CENTER
+-- @field TEXT_ALIGN_RIGHT
+-- @field TEXT_ALIGN_TOP
+-- @field TEXT_ALIGN_BOTTOM

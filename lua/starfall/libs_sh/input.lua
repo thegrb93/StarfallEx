@@ -1,4 +1,6 @@
 
+local registerprivilege = SF.Permissions.registerPrivilege
+
 -- This should manage the player button hooks for singleplayer games.
 local PlayerButtonDown, PlayerButtonUp
 if game.SinglePlayer() then
@@ -40,8 +42,8 @@ end
 -- @client
 local input_methods = instance:RegisterLibrary("input")
 
-SF.Permissions.registerPrivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
-SF.Permissions.registerPrivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
+registerprivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
+registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
 
 --- Gets the first key that is bound to the command passed
 -- @client

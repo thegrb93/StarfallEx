@@ -7,6 +7,7 @@ local wrap, unwrap = instance:CreateWrapper(sound_metamethods, true, false)
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
 --- Sounds library.
 -- @shared
@@ -18,8 +19,8 @@ SF.Sounds.Methods = sound_methods
 SF.Sounds.Metatable = sound_metamethods
 
 -- Register Privileges
-SF.Permissions.registerPrivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
-SF.Permissions.registerPrivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
+registerprivilege("sound.create", "Sound", "Allows the user to create sounds", { client = {} })
+registerprivilege("sound.modify", "Sound", "Allows the user to modify created sounds", { client = {} })
 
 local plyCount = SF.LimitObject("sounds", "sounds", 20, "The number of sounds allowed to be playing via Starfall client at once")
 local plySoundBurst = SF.BurstObject("sounds", "sounds", 10, 5, "The rate at which the burst regenerates per second.", "The number of sounds allowed to be made in a short interval of time via Starfall scripts for a single instance ( burst )")
@@ -127,7 +128,7 @@ function sound_methods:destroy()
 	if snd and sounds[snd] then
 		deleteSound(instance.player, sounds[snd], snd)
 		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = SF.GetWrapperTables(sound_metamethods)
+		local sensitive2sf, sf2sensitive = instance:GetWrapperTables(sound_metamethods)
 		sensitive2sf[snd] = nil
 		sf2sensitive[self] = nil
 		debug.setmetatable(self, nil)

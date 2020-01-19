@@ -1,37 +1,10 @@
-SF.Light = {}
-
---- Light type
--- @client
-local light_methods, light_metamethods = instance:RegisterType("Light")
-local wrap, unwrap = instance:CreateWrapper(light_metamethods, true, false)
-local checktype = instance.CheckType
+-- Global to each starfall
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-
---- Light library.
--- @client
-local light_library = instance:RegisterLibrary("light")
-
-SF.Light.Wrap = wrap
-SF.Light.Unwrap = unwrap
-SF.Light.Methods = light_methods
-SF.Light.Metatable = light_metamethods
-
-local vec_meta, col_meta
-local vwrap, vunwrap, cwrap, cunwrap
-
-instance:AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
-	col_meta = SF.Color.Metatable
-
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	cwrap = SF.Color.Wrap
-	cunwrap = SF.Color.Unwrap
-end)
+local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
-SF.Permissions.registerPrivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
+registerprivilege("light.create", "Create dynamic lights.", "Allows creation of dynamic lights.", { client = {} })
 
 local maxSize = CreateClientConVar( "sf_light_maxsize", "1024", true, false, "Max size lights can be" )
 
@@ -88,6 +61,20 @@ local function processLights(curtime)
 	end
 end
 
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Light type
+-- @client
+local light_methods, light_meta = instance:RegisterType("Light")
+local wrap, unwrap = instance:CreateWrapper(light_meta, true, false)
+
+--- Light library.
+-- @client
+local light_library = instance:RegisterLibrary("light")
+
+
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()
 	instance.data.light = {lights={}}
@@ -99,6 +86,17 @@ instance:AddHook("deinitialize", function()
 		gSFLights[light.slot] = nil
 	end
 end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local light_library = instance.Libraries.light
+local light_methods, light_meta, wrap, unwrap = instance.Types.Light.Methods, instance.Types.Light, instance.Types.Light.Wrap, instance.Types.Light.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+
 
 --- Creates a dynamic light (make sure to draw it)
 -- @param pos The position of the light
@@ -132,7 +130,7 @@ end
 
 --- Draws the light. Typically used in the think hook. Will throw an error if it fails (use pcall)
 function light_methods:draw()
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	local curtime = CurTime()
 	processLights(curtime)
 	if lightsUsed >= 32 then SF.Throw("Max number of dynamiclights reached", 2) end
@@ -154,7 +152,7 @@ end
 --- Sets the light brightness
 -- @param brightness The light's brightness
 function light_methods:setBrightness(brightness)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(brightness, TYPE_NUMBER)
 	unwrap(self).data.brightness = brightness
 end
@@ -162,7 +160,7 @@ end
 --- Sets the light decay speed in thousandths per second. 1000 lasts for 1 second, 2000 lasts for 0.5 seconds
 -- @param decay The light's decay speed
 function light_methods:setDecay(decay)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(decay, TYPE_NUMBER)
 	unwrap(self).data.decay = decay
 end
@@ -170,7 +168,7 @@ end
 --- Sets the light lifespan (Required for fade effect i.e. decay)
 -- @param dietime The how long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(dietime, TYPE_NUMBER)
 	unwrap(self).dietime = math.max(dietime, 0)
 end
@@ -178,7 +176,7 @@ end
 --- Sets the light direction (used with setInnerAngle and setOuterAngle)
 -- @param dir Direction of the light
 function light_methods:setDirection(dir)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checktype(dir, vec_meta)
 	unwrap(self).data.dir = vunwrap(dir) 
 end
@@ -186,7 +184,7 @@ end
 --- Sets the light inner angle (used with setDirection and setOuterAngle)
 -- @param ang Number inner angle of the light
 function light_methods:setInnerAngle(ang)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(ang, TYPE_NUMBER)
 	unwrap(self).data.innerangle = ang
 end
@@ -194,7 +192,7 @@ end
 --- Sets the light outer angle (used with setDirection and setInnerAngle)
 -- @param ang Number outer angle of the light
 function light_methods:setOuterAngle(ang)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(ang, TYPE_NUMBER)
 	unwrap(self).data.outerangle = ang
 end
@@ -202,7 +200,7 @@ end
 --- Sets the minimum light amount
 -- @param min The minimum light
 function light_methods:setMinLight(min)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(min, TYPE_NUMBER)
 	unwrap(self).data.minlight = min
 end
@@ -210,7 +208,7 @@ end
 --- Sets whether the light should cast onto the world or not
 -- @param on Whether the light shouldn't cast onto the world
 function light_methods:setNoWorld(on)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(on, TYPE_BOOL)
 	unwrap(self).data.noworld = on
 end
@@ -218,7 +216,7 @@ end
 --- Sets whether the light should cast onto models or not
 -- @param on Whether the light shouldn't cast onto the models
 function light_methods:setNoModel(on)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(on, TYPE_BOOL)
 	unwrap(self).data.nomodel = on
 end
@@ -226,7 +224,7 @@ end
 --- Sets the light position
 -- @param pos The position of the light
 function light_methods:setPos(pos)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checktype(pos, vec_meta)
 	unwrap(self).data.pos = vunwrap(pos) 
 end
@@ -234,7 +232,7 @@ end
 --- Sets the size of the light (max is sf_light_maxsize)
 -- @param size The size of the light
 function light_methods:setSize(size)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(size, TYPE_NUMBER)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
@@ -242,7 +240,7 @@ end
 --- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
 -- @param style The number of the flicker style
 function light_methods:setStyle(style)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checkluatype(style, TYPE_NUMBER)
 	unwrap(self).data.style = style
 end
@@ -250,7 +248,7 @@ end
 --- Sets the color of the light
 -- @param color The color of the light
 function light_methods:setColor(color)
-	checktype(self, light_metamethods)
+	checktype(self, light_meta)
 	checktype(color, col_meta)
 	local col = cunwrap(color)
 	local data = unwrap(self).data
@@ -259,3 +257,4 @@ function light_methods:setColor(color)
 	data.b = col.b
 end
 
+end}

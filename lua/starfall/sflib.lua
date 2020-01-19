@@ -295,6 +295,7 @@ do
 		}
 	}
 
+	local checkluatype = SF.CheckLuaType
 	function SF.Class(name, super)
 		checkluatype(name, TYPE_STRING)
 		if super~=nil then checkluatype(super, TYPE_TABLE) end
@@ -608,6 +609,154 @@ function SF.MakeError (msg, level, uncatchable, prependinfo)
 		uncatchable = uncatchable,
 		traceback = traceback
 	}, SF.Errormeta)
+end
+
+
+-------------------------------------------------------------------------------
+-- Starfall instance hook management
+-------------------------------------------------------------------------------
+
+do
+	local registered_instances = {}
+	local gmod_hooks = {}
+
+	local function getHookFunc(instances, hookname, customargfunc, customretfunc)
+		--- There are 4 varients of hookfunc depending on if there are custom callbacks
+		if customargfunc then
+			if customretfunc then
+				return function(...)
+					local result
+					for instance, _ in pairs(instances) do
+						local canrun, customargs = customargfunc(instance, ...)
+						if canrun then
+							local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
+							if tbl[1] then
+								local sane = customretfunc(instance, tbl, ...)
+								if sane ~= nil then result = sane end
+							end
+						end
+					end
+					return result
+				end
+			else
+				return function(...)
+					for instance, _ in pairs(instances) do
+						local canrun, customargs = customargfunc(instance, ...)
+						if canrun then
+							instance:runScriptHook(hookname, unpack(customargs))
+						end
+					end
+				end
+			end
+		else
+			if customretfunc then
+				return function(...)
+					local args = instance.Sanitize({...})
+					local result
+					for instance, _ in pairs(instances) do
+						local tbl = instance:runScriptHookForResult(hookname, unpack(args))
+						if tbl[1] then
+							local sane = customretfunc(instance, tbl, ...)
+							if sane ~= nil then result = sane end
+						end
+					end
+					return result
+				end
+			else
+				return function(...)
+					local args = instance.Sanitize({...})
+					for instance, _ in pairs(instances) do
+						instance:runScriptHook(hookname, unpack(args))
+					end
+				end
+			end
+		end
+	end
+
+	--- Add a GMod hook so that SF gets access to it
+	-- @shared
+	-- @param hookname The hook name. In-SF hookname will be lowercased
+	-- @param customargfunc Optional custom function
+	-- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
+	-- @param customretfunc Optional custom function
+	-- Takes values returned from starfall hook and returns what should be passed to the gmod hook
+	-- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
+	function SF.hookAdd(realname, hookname, customargfunc, customretfunc, gmoverride)
+		hookname = hookname or realname:lower()
+		registered_instances[hookname] = {}
+		if gmoverride then
+			local function override(again)
+				local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
+
+				local gmfunc
+				if again then
+					gmfunc = GAMEMODE["SF"..realname]
+				else
+					gmfunc = GAMEMODE[realname]
+					GAMEMODE["SF"..realname] = gmfunc
+				end
+
+				if gmfunc then
+					GAMEMODE[realname] = function(gm, ...)
+						local a,b,c,d,e,f = hookfunc(...)
+						if a~= nil then return a,b,c,d,e,f
+						else return gmfunc(gm, ...) end
+					end
+				else
+					GAMEMODE[realname] = function(gm, ...)
+						return hookfunc(...)
+					end
+				end
+			end
+			if GAMEMODE then
+				override(true)
+			else
+				hook.Add("Initialize", "SF_Hook_Override"..hookname, override)
+			end
+		else
+			gmod_hooks[hookname] = { realname, customargfunc, customretfunc }
+		end
+	end
+
+	function SF.HookAddInstance(instance, hookname)
+		local instances = registered_instances[hookname]
+		if instances then
+			if next(instances)==nil then
+				local gmod_hook = gmod_hooks[hookname]
+				if gmod_hook then
+					local realname, customargfunc, customretfunc = unpack(gmod_hook)
+					local hookfunc = getHookFunc(instances, hookname, customargfunc, customretfunc)
+					hook.Add(realname, "SF_Hook_"..hookname, hookfunc)
+				end
+			end
+			instances[instance] = true
+		end
+	end
+	
+	function SF.HookRemoveInstance(instance, hookname)
+		local instances = registered_instances[hookname]
+		if instances then
+			instances[instance] = nil
+			if not next(instances) then
+				local gmod_hook = gmod_hooks[hookname]
+				if gmod_hook then
+					hook.Remove(gmod_hook[1], "SF_Hook_" .. hookname)
+				end
+			end
+		end
+	end
+
+	function SF.HookDestroyInstance(instance)
+		for hookname, instances in pairs(registered_instances) do
+			instances[instance] = nil
+			if not next(instances) then
+				local gmod_hook = gmod_hooks[hookname]
+				if gmod_hook then
+					hook.Remove(gmod_hook[1], "SF_Hook_" .. hookname)
+				end
+			end
+		end
+	end
 end
 
 

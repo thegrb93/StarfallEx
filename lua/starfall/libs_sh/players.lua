@@ -154,7 +154,7 @@ end
 function player_methods:getActiveWeapon ()
 	checktype(self, player_metamethods)
 	local ent = unwrap(self)
-	return ent and SF.Weapons.Wrap(ent:GetActiveWeapon())
+	return ent and instance.Types.Weapon.Wrap(ent:GetActiveWeapon())
 end
 
 --- Returns the player's aim vector
@@ -398,7 +398,7 @@ end
 -- @return Table of weapons
 function player_methods:getWeapons()
 	checktype(self, player_metamethods)
-	return SF.Sanitize(unwrap(self):GetWeapons())
+	return instance.Sanitize(unwrap(self):GetWeapons())
 end
 
 --- Returns the specified weapon or nil if the player doesn't have it
@@ -408,7 +408,7 @@ end
 function player_methods:getWeapon(wep)
 	checktype(self, player_metamethods)
 	checkluatype (wep, TYPE_STRING)
-	return SF.Weapons.Wrap(unwrap(self):GetWeapon(wep))
+	return instance.Types.Weapon.Wrap(unwrap(self):GetWeapon(wep))
 end
 
 --- Returns the entity that the player is standing on

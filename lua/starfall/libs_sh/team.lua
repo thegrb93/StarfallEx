@@ -11,7 +11,7 @@ end)
 --- Returns a table containing team information
 -- @return table containing team information
 function team_library.getAllTeams()
-	return SF.Sanitize(team.GetAllTeams())
+	return instance.Sanitize(team.GetAllTeams())
 end
 
 --- Returns the color of a team
@@ -25,7 +25,7 @@ end
 -- @param ind Index of the team
 -- @return Table of players
 function team_library.getPlayers(ind)
-	return SF.Sanitize(team.GetPlayers(ind))
+	return instance.Sanitize(team.GetPlayers(ind))
 end
 
 --- Returns team with least players

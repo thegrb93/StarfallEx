@@ -1,48 +1,24 @@
-SF.Particle = {}
-
--- Create permission types.
-SF.Permissions.registerPrivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
-
-local ent_meta = instance.Types.Entity
-local vec_meta = instance.Types.Vector
-local unwrap_entity, unwrap_vector
-local IsValid = IsValid
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
+local IsValid = IsValid
 
-instance:AddHook("postload", function()
-	unwrap_entity = instance.Types.Entity.Unwrap
-	unwrap_vector = SF.Vectors.Unwrap
-end)
+-- Create permission types.
+registerprivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
 
 
 --- Particle type
 -- @client
-local particle_methods, particle_metamethods = instance:RegisterType("Particle")
-local wrap, unwrap = instance:CreateWrapper(particle_metamethods, false, false)
+local particle_methods, particle_meta = instance:RegisterType("Particle")
+local wrap, unwrap = instance:CreateWrapper(particle_meta, false, false)
 
 --- Particle library.
 -- @client
 local particle_library = instance:RegisterLibrary("particle")
-
-SF.Particle.Wrap = wrap
-SF.Particle.Unwrap = unwrap
-SF.Particle.Methods = particle_methods
-SF.Particle.Metatable = particle_metamethods
-
--- Add PATTACH enum
-instance:AddHook("postload", function()
-	local _PATTACH = {
-		["ABSORIGIN"] = PATTACH_ABSORIGIN,
-		["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
-		["CUSTOMORIGIN"] =  PATTACH_CUSTOMORIGIN,
-		["POINT"] = PATTACH_POINT,
-		["POINT_FOLLOW"] = PATTACH_POINT_FOLLOW,
-		["WORLDORIGIN"] =  PATTACH_WORLDORIGIN,
-	}
-	SF.DefaultEnvironment.PATTACH = _PATTACH
-end)
 
 -- Create the storage for the metamethods
 instance:AddHook("initialize", function()
@@ -63,6 +39,30 @@ instance:AddHook("deinitialize", function()
 		p = next(particles)
 	end
 end)
+
+
+end, function(instance) -- Called for library definitions
+
+local particle_library = instance.Libraries.particle
+local particle_methods = instance.Types.Particle.Methods
+
+local checktype = instance.CheckType
+local particle_meta, wrap, unwrap = instance.Types.Particle, instance.Types.Particle.Wrap, instance.Types.Particle.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
+
+-- Add PATTACH enum
+local _PATTACH = {
+	["ABSORIGIN"] = PATTACH_ABSORIGIN,
+	["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
+	["CUSTOMORIGIN"] =  PATTACH_CUSTOMORIGIN,
+	["POINT"] = PATTACH_POINT,
+	["POINT_FOLLOW"] = PATTACH_POINT_FOLLOW,
+	["WORLDORIGIN"] =  PATTACH_WORLDORIGIN,
+}
+instance.env.PATTACH = _PATTACH
+
 
 local function badParticle(flags) -- implemented for future use in case anything is found to be unfriendly.
 	return false
@@ -89,7 +89,7 @@ function particle_library.attach (entity, particle, pattach, options)
 	checkluatype (pattach, TYPE_NUMBER)
 	checkluatype (options, TYPE_TABLE)
 
-	local entity = unwrap_entity(entity)
+	local entity = eunwrap(entity)
 
 	if badParticle(particle) then
 		SF.Throw("Invalid particle path: " .. particle, 2)
@@ -113,7 +113,7 @@ end
 --- Gets if the particle is valid or not.
 -- @return Is valid or not
 function particle_methods:isValid()
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	return uw and uw:IsValid()
@@ -122,7 +122,7 @@ end
 
 --- Starts emission of the particle.
 function particle_methods:startEmission()
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -135,7 +135,7 @@ end
 
 --- Stops emission of the particle.
 function particle_methods:stopEmission()
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -147,7 +147,7 @@ end
 
 --- Stops emission of the particle and destroys the object.
 function particle_methods:destroy()
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	if (uw and uw:IsValid()) then
@@ -158,7 +158,7 @@ end
 
 --- Restarts emission of the particle.
 function particle_methods:restart()
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -172,7 +172,7 @@ end
 --- Restarts emission of the particle.
 -- @return bool finished
 function particle_methods:isFinished()
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	if (uw and uw:IsValid()) then
@@ -187,7 +187,7 @@ end
 --- Sets the sort origin for given particle system. This is used as a helper to determine which particles are in front of which.
 -- @param vector Sort Origin
 function particle_methods:setSortOrigin(origin)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 	checktype(origin, vec_meta)
 
@@ -203,7 +203,7 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Value
 function particle_methods:setControlPoint(id,value)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -221,9 +221,9 @@ end
 -- @param number Child Control Point ID (0-63)
 -- @param entity Entity parent
 function particle_methods:setControlPointEntity(id,entity)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
-	local entity = unwrap_entity(entity)
+	local entity = eunwrap(entity)
 
 	checkluatype (id, TYPE_NUMBER)
 	checktype(entity, ent_meta)
@@ -240,7 +240,7 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Forward
 function particle_methods:setForwardVector(id,value)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -257,7 +257,7 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Right
 function particle_methods:setRightVector(id,value)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -275,7 +275,7 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Right
 function particle_methods:setUpVector(id,value)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -292,7 +292,7 @@ end
 -- @param number Child Control Point ID (0-63)
 -- @param number Parent
 function particle_methods:setControlPointParent(id,value)
-	checktype(self, particle_metamethods)
+	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
@@ -303,3 +303,5 @@ function particle_methods:setControlPointParent(id,value)
 	uw:SetControlPointParent(id,value)
 
 end
+
+end}

@@ -1,19 +1,26 @@
--------------------------------------------------------------------------------
--- Find functions
--------------------------------------------------------------------------------
-
---- Find library. Finds entities in various shapes.
--- @shared
-local find_library = instance:RegisterLibrary("find")
-
-local vec_meta = instance.Types.Vector
-local vunwrap = instance.UnwrapObject
-local checktype = instance.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 -- Register privileges
 SF.Permissions.registerPrivilege("find", "Find", "Allows the user to access the find library")
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Find library. Finds entities in various shapes.
+-- @shared
+local find_library = instance:RegisterLibrary("find")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local find_library = instance.Libraries.find
+local checktype = instance.CheckType
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+
 
 local function convert(results, func)
 	if func then checkluatype (func, TYPE_FUNCTION) end
@@ -219,3 +226,5 @@ function find_library.sortByClosest(ents, pos, furthest)
 	end
 	return ret
 end
+
+end}

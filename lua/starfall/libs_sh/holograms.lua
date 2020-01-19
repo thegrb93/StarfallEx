@@ -9,11 +9,12 @@ local hologram_methods, hologram_metamethods = instance:RegisterType("Hologram")
 local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
 
 SF.Holograms = {}
 
-SF.Permissions.registerPrivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
+registerprivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
 
 SF.Holograms.maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
 
@@ -50,8 +51,8 @@ instance:AddHook("postload", function()
 	end
 end)
 
-SF.Permissions.registerPrivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
-SF.Permissions.registerPrivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
+registerprivilege("hologram.create", "Create hologram", "Allows the user to create holograms", CLIENT and { client = {} } or nil)
+registerprivilege("hologram.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { entities = {} })
 
 local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of holograms allowed to spawn via Starfall scripts for a single player")
 
@@ -258,7 +259,7 @@ if SERVER then
 	end
 
 else	
-	SF.Permissions.registerPrivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
+	registerprivilege("hologram.setParent", "Set Parent", "Allows the user to parent a hologram", { entities = {} })
 
 	function SF.Holograms.SetScale(holo, scale)
 		holo.scale = scale

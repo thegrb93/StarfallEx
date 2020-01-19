@@ -195,14 +195,14 @@ end
 -- @return table of MeshVertex structures
 function physobj_methods:getMesh ()
 	local mesh = unwrap(self):GetMesh()
-	return SF.Sanitize(mesh)
+	return instance.Sanitize(mesh)
 end
 
 --- Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
 -- @return table of MeshVertex structures
 function physobj_methods:getMeshConvexes ()
 	local mesh = unwrap(self):GetMeshConvexes()
-	return SF.Sanitize(mesh)
+	return instance.Sanitize(mesh)
 end
 
 --- Sets the physical material of a physics object

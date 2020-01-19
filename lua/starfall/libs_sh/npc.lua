@@ -36,9 +36,10 @@ function npc_metamethods:__tostring()
 end
 
 if SERVER then
+	local registerprivilege = SF.Permissions.registerPrivilege
 	-- Register privileges
-	SF.Permissions.registerPrivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
-	SF.Permissions.registerPrivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
+	registerprivilege("npcs.modify", "Modify", "Allows the user to modify npcs", { entities = {} })
+	registerprivilege("npcs.giveweapon", "Give weapon", "Allows the user to give npcs weapons", { entities = {} })
 
 	--- Adds a relationship to the npc
 	-- @server

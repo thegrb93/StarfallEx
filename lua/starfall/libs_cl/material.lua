@@ -1,54 +1,17 @@
-SF.Materials = {}
-
--- Register privileges
-SF.Permissions.registerPrivilege("material.load", "Load material", "Allows users to load a vmt material.", { client = {} })
-SF.Permissions.registerPrivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
-SF.Permissions.registerPrivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
-SF.Permissions.registerPrivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
-SF.Permissions.registerPrivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
-
-local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
-local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
-
---- The `Material` type is used to control shaders in rendering.
---- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
---- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
--- @client
-local material_methods, material_metamethods = instance:RegisterType("Material")
-local lmaterial_methods, lmaterial_metamethods = instance:RegisterType("LockedMaterial") --Material that can't be modified
-local wrap, unwrap = instance:CreateWrapper(material_metamethods, true, false)
-local lwrap, lunwrap = instance:CreateWrapper(lmaterial_metamethods, true, false, nil, material_metamethods)
-
-local vector_meta, col_meta, matrix_meta
-local vwrap, cwrap, mwrap, vunwrap, cunwrap, munwrap
-
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local dsetmeta = debug.setmetatable
+local registerprivilege = SF.Permissions.registerPrivilege
 
---- `material` library is allows creating material objects which are used for controlling shaders in rendering.
--- @client
-local material_library = instance:RegisterLibrary("material")
+-- Register privileges
+registerprivilege("material.load", "Load material", "Allows users to load a vmt material.", { client = {} })
+registerprivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
+registerprivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
+registerprivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
+registerprivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
 
-SF.Materials.Wrap = wrap
-SF.Materials.Unwrap = unwrap
-SF.Materials.Methods = material_methods
-SF.Materials.Metatable = material_metamethods
-SF.Materials.LMetatable = lmaterial_metamethods
-
-instance:AddHook("postload", function()
-	vector_meta = SF.Vectors.Metatable
-	col_meta = SF.Color.Metatable
-	matrix_meta = SF.VMatrix.Metatable
-
-	vwrap = SF.Vectors.Wrap
-	cwrap = SF.Color.Wrap
-	mwrap = SF.VMatrix.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	cunwrap = SF.Color.Unwrap
-	munwrap = SF.VMatrix.Unwrap
-end)
+local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
+local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
 -- Make sure to update the material.create doc if you add stuff to this list.
 local allowed_shaders = {
@@ -85,6 +48,172 @@ cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
 	material_bank.max = cv_max_materials:GetInt()
 end)
 
+local blacklisted_keys = {
+	["$flags2"] = true
+}
+local function checkkey(key)
+	checkluatype(key, TYPE_STRING, 2)
+	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
+end
+
+local LoadingTextureQueue = {}
+local Panel
+local function NextInTextureQueue()
+	if not Panel then
+		Panel = SF.URLTextureLoader
+		if not Panel then
+			Panel = vgui.Create("DHTML")
+			Panel:SetSize(1024, 1024)
+			Panel:SetAlpha(0)
+			Panel:SetMouseInputEnabled(false)
+			Panel:SetHTML(
+			[[<html style="overflow:hidden"><body><script>
+			function renderImage(){
+				requestAnimationFrame(function(){
+					requestAnimationFrame(function(){
+						document.body.offsetWidth
+						requestAnimationFrame(function(){
+							sf.imageLoaded(img.width, img.height);
+						});
+					});
+				});
+			}
+			var img = new Image();
+			img.style.position="absolute";
+			img.onload = renderImage;
+			img.onerror = function (){sf.imageErrored();}
+			document.body.appendChild(img);
+			</script></body></html>]])
+			Panel:Hide()
+			SF.URLTextureLoader = Panel
+			timer.Simple(0.5, NextInTextureQueue)
+			return
+		end
+	end
+
+	local requestTbl = LoadingTextureQueue[1]
+	if requestTbl then
+		if requestTbl.Instance.error then
+			-- Chip already deinitialized so don't need to free anything
+			table.remove(LoadingTextureQueue, 1)
+			timer.Simple(0, NextInTextureQueue)
+			return
+		end
+
+		local function applyTexture(w, h)
+			--Timer to prevent being in javascript stack frame
+			if requestTbl.Instance.error then
+				table.remove(LoadingTextureQueue, 1)
+				timer.Simple(0, NextInTextureQueue)
+			else
+				local function imageDone(usedLayout)
+					if requestTbl.Loaded then return end
+					requestTbl.Loaded = true
+
+					hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
+						Panel:UpdateHTMLTexture()
+						local mat = Panel:GetHTMLMaterial()
+						if not mat then return end
+
+						render.PushRenderTarget(requestTbl.Texture)
+							render.Clear(0, 0, 0, 0, false, false)
+							cam.Start2D()
+							surface.SetMaterial(mat)
+							surface.SetDrawColor(255, 255, 255)
+							surface.DrawTexturedRect(0, 0, 1024, 1024)
+							cam.End2D()
+						render.PopRenderTarget()
+
+						hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
+						if requestTbl.CallbackDone then requestTbl.CallbackDone() end
+						table.remove(LoadingTextureQueue, 1)
+						timer.Simple(0, NextInTextureQueue)
+					end)
+				end
+
+				if requestTbl.Usedlayout then
+					imageDone()
+				else
+					local function layout(x,y,w,h)
+						if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
+						checkluatype(x, TYPE_NUMBER)
+						checkluatype(y, TYPE_NUMBER)
+						checkluatype(w, TYPE_NUMBER)
+						checkluatype(h, TYPE_NUMBER)
+						requestTbl.Usedlayout = true
+						Panel:RunJavascript([[
+							img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;
+							renderImage();
+						]])
+					end
+
+					if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
+					if not requestTbl.Usedlayout then
+						requestTbl.Usedlayout = true
+						imageDone()
+					end
+				end
+			end
+		end
+		local function errorTexture()
+			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
+			table.remove(LoadingTextureQueue, 1)
+			timer.Simple(0, NextInTextureQueue)
+		end
+
+		Panel:AddFunction("sf", "imageLoaded", applyTexture)
+		Panel:AddFunction("sf", "imageErrored", errorTexture)
+		Panel:RunJavascript(
+		[[img.removeAttribute("width");
+		img.removeAttribute("height");
+		img.style.left="0px";
+		img.style.top="0px";
+		img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]])
+		Panel:Show()
+
+		timer.Create("SF_URLTextureTimeout", 10, 1, function()
+			if requestTbl.Callback then requestTbl.Callback() end
+			table.remove(LoadingTextureQueue, 1)
+			NextInTextureQueue()
+		end)
+
+	else
+		timer.Remove("SF_URLTextureTimeout")
+		Panel:Hide()
+	end
+end
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- The `Material` type is used to control shaders in rendering.
+--- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
+--- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
+-- @client
+local material_methods, material_meta = instance:RegisterType("Material")
+local lmaterial_methods, lmaterial_meta = instance:RegisterType("LockedMaterial") --Material that can't be modified
+local wrap, unwrap = instance:CreateWrapper(material_meta, true, false)
+local lwrap, lunwrap = instance:CreateWrapper(lmaterial_meta, true, false, nil, material_meta)
+
+
+--- `material` library is allows creating material objects which are used for controlling shaders in rendering.
+-- @client
+local material_library = instance:RegisterLibrary("material")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local material_library = instance.Libraries.material
+local material_methods, material_meta, wrap, unwrap = instance.Types.Material.Methods, instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
+local lmaterial_methods, lmaterial_meta, lwrap, lunwrap = instance.Types.LockedMaterial.Methods, instance.Types.LockedMaterial, instance.Types.LockedMaterial.Wrap, instance.Types.LockedMaterial.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()
 	instance.data.material = {
@@ -98,15 +227,6 @@ instance:AddHook("deinitialize", function()
 		instance.data.material.usermaterials[k] = nil
 	end
 end)
-
-local blacklisted_keys = {
-	["$flags2"] = true
-}
-local function checkkey(key)
-	checkluatype(key, TYPE_STRING, 2)
-	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
-end
-
 
 --- Loads a .vmt material or existing material. Throws an error if the material fails to load
 --- Existing created materials can be loaded with ! prepended to the name
@@ -137,7 +257,7 @@ end
 -- @return The table of keyvalues
 function material_library.getKeyValues(path)
 	checkluatype(path, TYPE_STRING)
-	return SF.Sanitize(Material(path):GetKeyValues())
+	return instance.Sanitize(Material(path):GetKeyValues())
 end
 
 --- Returns a material's engine name
@@ -286,7 +406,7 @@ end
 
 --- Free's a user created material allowing you to create others
 function material_methods:destroy()
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 
 	local m = unwrap(self)
 	if not m then SF.Throw("The material is already destroyed?", 2) end
@@ -297,7 +417,7 @@ function material_methods:destroy()
 		instance.env.render.destroyRenderTarget(name)
 	end
 	
-	local sensitive2sf, sf2sensitive = SF.GetWrapperTables(material_metamethods)
+	local sensitive2sf, sf2sensitive = instance:GetWrapperTables(material_meta)
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
 	dsetmeta(self, nil)
@@ -306,50 +426,50 @@ function material_methods:destroy()
 	material_bank:free(instance.player, m)
 end
 function lmaterial_methods:destroy()
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 end
 
 --- Returns the material's engine name
 -- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
 function material_methods:getName()
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	return unwrap(self):GetName()
 end
 function lmaterial_methods:getName()
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	return lunwrap(self):GetName()
 end
 
 --- Returns the shader name of the material
 -- @return The shader name of the material
 function material_methods:getShader()
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	return unwrap(self):GetShader()
 end
 function lmaterial_methods:getShader()
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	return lunwrap(self):GetShader()
 end
 
 --- Gets the base texture set to the material's width
 -- @return The basetexture's width
 function material_methods:getWidth()
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	return unwrap(self):Width()
 end
 function lmaterial_methods:getWidth()
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	return lunwrap(self):Width()
 end
 
 --- Gets the base texture set to the material's height
 -- @return The basetexture's height
 function material_methods:getHeight()
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	return unwrap(self):Height()
 end
 function lmaterial_methods:getHeight()
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	return lunwrap(self):Height()
 end
 
@@ -358,13 +478,13 @@ end
 -- @param y The y coordinate of the pixel
 -- @return The color value
 function material_methods:getColor(x, y)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
 	return cwrap(unwrap(self):GetColor(x, y))
 end
 function lmaterial_methods:getColor(x, y)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
 	return cwrap(lunwrap(self):GetColor(x, y))
@@ -374,12 +494,12 @@ end
 -- @param key The key to get the float from
 -- @return The float value or nil if it doesn't exist
 function material_methods:getFloat(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return unwrap(self):GetFloat(key)
 end
 function lmaterial_methods:getFloat(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetFloat(key)
 end
@@ -388,12 +508,12 @@ end
 -- @param key The key to get the int from
 -- @return The int value or nil if it doesn't exist
 function material_methods:getInt(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return unwrap(self):GetInt(key)
 end
 function lmaterial_methods:getInt(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetInt(key)
 end
@@ -401,24 +521,24 @@ end
 --- Returns a table of material keyvalues
 -- @return The table of keyvalues
 function material_methods:getKeyValues()
-	checktype(self, material_metamethods)
-	return SF.Sanitize(unwrap(self):GetKeyValues())
+	checktype(self, material_meta)
+	return instance.Sanitize(unwrap(self):GetKeyValues())
 end
 function lmaterial_methods:getKeyValues()
-	checktype(self, lmaterial_metamethods)
-	return SF.Sanitize(lunwrap(self):GetKeyValues())
+	checktype(self, lmaterial_meta)
+	return instance.Sanitize(lunwrap(self):GetKeyValues())
 end
 
 --- Returns a matrix keyvalue
 -- @param key The key to get the matrix from
 -- @return The matrix value or nil if it doesn't exist
 function material_methods:getMatrix(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(unwrap(self):GetMatrix(key))
 end
 function lmaterial_methods:getMatrix(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(lunwrap(self):GetMatrix(key))
 end
@@ -427,12 +547,12 @@ end
 -- @param key The key to get the string from
 -- @return The string value or nil if it doesn't exist
 function material_methods:getString(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return unwrap(self):GetString(key)
 end
 function lmaterial_methods:getString(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetString(key)
 end
@@ -441,13 +561,13 @@ end
 -- @param key The key to get the texture from
 -- @return The string id of the texture or nil if it doesn't exist
 function material_methods:getTexture(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	local tex = unwrap(self):GetTexture(key)
 	if tex then return tex:GetName() end
 end
 function lmaterial_methods:getTexture(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	local tex = lunwrap(self):GetTexture(key)
 	if tex then return tex:GetName() end
@@ -457,12 +577,12 @@ end
 -- @param key The key to get the vector from
 -- @return The string id of the texture
 function material_methods:getVector(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(unwrap(self):GetVector(key))
 end
 function lmaterial_methods:getVector(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVector(key))
 end
@@ -471,12 +591,12 @@ end
 -- @param key The key to get the vector from
 -- @return The vector value or nil if it doesn't exist
 function material_methods:getVectorLinear(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(unwrap(self):GetVectorLinear(key))
 end
 function lmaterial_methods:getVectorLinear(key)
-	checktype(self, lmaterial_metamethods)
+	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVectorLinear(key))
 end
@@ -486,7 +606,7 @@ end
 
 --- Refreshes the material. Sometimes needed for certain parameters to update
 function material_methods:recompute()
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	unwrap(self):Recompute()
 end
 
@@ -494,7 +614,7 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setFloat(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
 	unwrap(self):SetFloat(key, v)
@@ -504,7 +624,7 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setInt(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
 	unwrap(self):SetInt(key, v)
@@ -514,7 +634,7 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setMatrix(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checktype(v, matrix_meta)
 	unwrap(self):SetMatrix(key, munwrap(v))
@@ -524,7 +644,7 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setString(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_STRING)
 	unwrap(self):SetString(key, v)
@@ -534,138 +654,11 @@ end
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param v The texture name to set it to.
 function material_methods:setTexture(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_STRING)
 
 	unwrap(self):SetTexture(key, v)
-end
-
-local LoadingTextureQueue = {}
-local Panel
-local function NextInTextureQueue()
-	if not Panel then
-		Panel = SF.URLTextureLoader
-		if not Panel then
-			Panel = vgui.Create("DHTML")
-			Panel:SetSize(1024, 1024)
-			Panel:SetAlpha(0)
-			Panel:SetMouseInputEnabled(false)
-			Panel:SetHTML(
-			[[<html style="overflow:hidden"><body><script>
-			function renderImage(){
-				requestAnimationFrame(function(){
-					requestAnimationFrame(function(){
-						document.body.offsetWidth
-						requestAnimationFrame(function(){
-							sf.imageLoaded(img.width, img.height);
-						});
-					});
-				});
-			}
-			var img = new Image();
-			img.style.position="absolute";
-			img.onload = renderImage;
-			img.onerror = function (){sf.imageErrored();}
-			document.body.appendChild(img);
-			</script></body></html>]])
-			Panel:Hide()
-			SF.URLTextureLoader = Panel
-			timer.Simple(0.5, NextInTextureQueue)
-			return
-		end
-	end
-
-	local requestTbl = LoadingTextureQueue[1]
-	if requestTbl then
-		if requestTbl.Instance.error then
-			-- Chip already deinitialized so don't need to free anything
-			table.remove(LoadingTextureQueue, 1)
-			timer.Simple(0, NextInTextureQueue)
-			return
-		end
-
-		local function applyTexture(w, h)
-			--Timer to prevent being in javascript stack frame
-			if requestTbl.Instance.error then
-				table.remove(LoadingTextureQueue, 1)
-				timer.Simple(0, NextInTextureQueue)
-			else
-				local function imageDone(usedLayout)
-					if requestTbl.Loaded then return end
-					requestTbl.Loaded = true
-
-					hook.Add("PreRender","SF_HTMLPanelCopyTexture",function()
-						Panel:UpdateHTMLTexture()
-						local mat = Panel:GetHTMLMaterial()
-						if not mat then return end
-
-						render.PushRenderTarget(requestTbl.Texture)
-							render.Clear(0, 0, 0, 0, false, false)
-							cam.Start2D()
-							surface.SetMaterial(mat)
-							surface.SetDrawColor(255, 255, 255)
-							surface.DrawTexturedRect(0, 0, 1024, 1024)
-							cam.End2D()
-						render.PopRenderTarget()
-
-						hook.Remove("PreRender","SF_HTMLPanelCopyTexture")
-						if requestTbl.CallbackDone then requestTbl.CallbackDone() end
-						table.remove(LoadingTextureQueue, 1)
-						timer.Simple(0, NextInTextureQueue)
-					end)
-				end
-
-				if requestTbl.Usedlayout then
-					imageDone()
-				else
-					local function layout(x,y,w,h)
-						if requestTbl.Usedlayout then SF.Throw("You can only use layout once", 2) end
-						checkluatype(x, TYPE_NUMBER)
-						checkluatype(y, TYPE_NUMBER)
-						checkluatype(w, TYPE_NUMBER)
-						checkluatype(h, TYPE_NUMBER)
-						requestTbl.Usedlayout = true
-						Panel:RunJavascript([[
-							img.style.left=']]..x..[[px';img.style.top=']]..y..[[px';img.width=]]..w..[[;img.height=]]..h..[[;
-							renderImage();
-						]])
-					end
-
-					if requestTbl.Callback then requestTbl.Callback(w, h, layout, false) end
-					if not requestTbl.Usedlayout then
-						requestTbl.Usedlayout = true
-						imageDone()
-					end
-				end
-			end
-		end
-		local function errorTexture()
-			if not requestTbl.Instance.error and requestTbl.Callback then requestTbl.Callback() end
-			table.remove(LoadingTextureQueue, 1)
-			timer.Simple(0, NextInTextureQueue)
-		end
-
-		Panel:AddFunction("sf", "imageLoaded", applyTexture)
-		Panel:AddFunction("sf", "imageErrored", errorTexture)
-		Panel:RunJavascript(
-		[[img.removeAttribute("width");
-		img.removeAttribute("height");
-		img.style.left="0px";
-		img.style.top="0px";
-		img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]])
-		Panel:Show()
-
-		timer.Create("SF_URLTextureTimeout", 10, 1, function()
-			if requestTbl.Callback then requestTbl.Callback() end
-			table.remove(LoadingTextureQueue, 1)
-			NextInTextureQueue()
-		end)
-
-	else
-		timer.Remove("SF_URLTextureTimeout")
-		Panel:Hide()
-	end
 end
 
 --- Loads an online image or base64 data to the specified texture key
@@ -674,7 +667,7 @@ end
 -- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
 -- @param done An optional callback called when the image is done loading. Passes the material, url
 function material_methods:setTextureURL(key, url, cb, done)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(url, TYPE_STRING)
 	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
@@ -734,7 +727,7 @@ end
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param name The name of the rendertarget
 function material_methods:setTextureRenderTarget(key, name)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(name, TYPE_STRING)
 
@@ -748,7 +741,7 @@ end
 --- Sets a keyvalue to be undefined
 -- @param key The key name to set
 function material_methods:setUndefined(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	unwrap(self):SetUndefined(key)
 end
@@ -757,10 +750,10 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setVector(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
-	checktype(v, vector_meta)
+	checktype(v, vec_meta)
 	unwrap(self):SetVector(key, vunwrap(v))
 end
 
-
+end}

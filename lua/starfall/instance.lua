@@ -151,7 +151,7 @@ function SF.Instance:RegisterType(name)
 	local methods, metamethods = {}, {}
 	self.Types[name] = metamethods
 	metamethods.__index = methods
-	metamethods.__methods = methods
+	metamethods.Methods = methods
 	metamethods.__metatable = name
 	return methods, metamethods
 end
@@ -161,7 +161,7 @@ end
 -- @param metamethods The type's metamethods table
 -- @param supermeta The meta of the inherited type
 function SF.Instance:ApplyTypeDependencies(methods, metamethods, supermeta)
-	local supermethods = supermeta.__methods
+	local supermethods = supermeta.Methods
 
 	setmetatable(methods, {__index = supermethods})
 

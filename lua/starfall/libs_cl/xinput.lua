@@ -4,6 +4,13 @@ if not pcall(require, "xinput") then return {function() end, function() end} end
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
+SF.hookAdd("xinputConnected", "xinputconnected")
+SF.hookAdd("xinputDisconnected", "xinputdisconnected")
+SF.hookAdd("xinputPressed", "xinputpressed")
+SF.hookAdd("xinputReleased", "xinputreleased")
+SF.hookAdd("xinputTrigger", "xinputtrigger")
+SF.hookAdd("xinputStick", "xinputstick")
+
 
 -- Local to each starfall
 return { function(instance) -- Called for library declarations
@@ -32,12 +39,6 @@ end)
 
 end, function(instance) -- Called for library definitions
 
-SF.hookAdd("xinputConnected", "xinputconnected")
-SF.hookAdd("xinputDisconnected", "xinputdisconnected")
-SF.hookAdd("xinputPressed", "xinputpressed")
-SF.hookAdd("xinputReleased", "xinputreleased")
-SF.hookAdd("xinputTrigger", "xinputtrigger")
-SF.hookAdd("xinputStick", "xinputstick")
 
 local xinput_library = instance.Libraries.xinput
 

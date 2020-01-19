@@ -1,10 +1,11 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
-SF.Permissions.registerPrivilege("prop.create", "Create prop", "Allows the user to create props")
-SF.Permissions.registerPrivilege("prop.createCustom", "Create custom prop", "Allows the user to create custom props")
+registerprivilege("prop.create", "Create prop", "Allows the user to create props")
+registerprivilege("prop.createCustom", "Create custom prop", "Allows the user to create custom props")
 
 
 local plyCount = SF.LimitObject("props", "props", -1, "The number of props allowed to spawn via Starfall")
