@@ -1,5 +1,3 @@
-if not WireLib then return {function() end, function() end} end
-
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
@@ -16,6 +14,7 @@ SF.Permissions.registerPrivilege("wire.getOutputs", "Get Outputs", "Allows the u
 
 -- Local to each starfall
 return { function(instance) -- Called for library declarations
+if not WireLib then return end
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
 local wire_library = instance:RegisterLibrary("wire")
@@ -65,6 +64,7 @@ end)
 
 
 end, function(instance) -- Called for library definitions
+if not WireLib then return end
 
 
 local wire_library = instance.Libraries.wire
