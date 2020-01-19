@@ -30,7 +30,7 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
 instance:ApplyTypeDependencies(player_methods, player_meta, ent_meta)
-local wrap, unwrap = instance:CreateWrapper(player_meta, true, false, debug.getregistry().Player, ent_meta)
+local wrap, unwrap = instance:CreateWrapper(player_meta, false, true, debug.getregistry().Player, ent_meta)
 
 instance.env.IN_KEY = {
 	["ALT1"] = IN_ALT1,

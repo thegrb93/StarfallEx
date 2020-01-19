@@ -17,7 +17,7 @@ local checktype = instance.CheckType
 --- Entity type
 -- @shared
 local ents_methods, ent_meta = instance:RegisterType("Entity")
-local ewrap, eunwrap = instance:CreateWrapper(ent_meta, true, true, debug.getregistry().Entity)
+local ewrap, eunwrap = instance:CreateWrapper(ent_meta, false, true, debug.getregistry().Entity)
 
 local function getent(self)
 	local ent = eunwrap(self)

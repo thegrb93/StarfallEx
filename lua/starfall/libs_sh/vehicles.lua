@@ -27,7 +27,7 @@ local checktype = instance.CheckType
 local vehicle_methods, vehicle_meta = instance.Types.Vehicle.Methods, instance.Types.Vehicle
 
 instance:ApplyTypeDependencies(vehicle_methods, vehicle_meta, instance.Types.Entity)
-local wrap, unwrap = instance:CreateWrapper(vehicle_meta, true, false, debug.getregistry().Vehicle, instance.Types.Entity)
+local wrap, unwrap = instance:CreateWrapper(vehicle_meta, false, true, debug.getregistry().Vehicle, instance.Types.Entity)
 
 
 --- To string

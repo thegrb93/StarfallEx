@@ -19,7 +19,7 @@ return { function(instance) -- Called for library declarations
 --- PhysObj Type
 -- @shared
 local physobj_methods, physobj_meta = instance:RegisterType("PhysObj")
-local wrap, unwrap = instance:CreateWrapper(physobj_meta, true, false)
+local wrap, unwrap = instance:CreateWrapper(physobj_meta, false, true)
 
 
 end, function(instance) -- Called for library definitions

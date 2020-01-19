@@ -190,18 +190,8 @@ function SF.Instance:CreateWrapper(metatable, weakwrapper, weaksensitive, target
 		sensitive2sf = self.sensitive2sf_tables[shared_meta]
 		sf2sensitive = self.sf2sensitive_tables[shared_meta]
 	else
-		local s2sfmode = ""
-		local sf2smode = ""
-		if weakwrapper == nil or weakwrapper then
-			sf2smode = "k"
-			s2sfmode = "v"
-		end
-		if weaksensitive then
-			sf2smode = sf2smode.."v"
-			s2sfmode = s2sfmode.."k"
-		end
-		sensitive2sf = setmetatable({}, { __mode = s2sfmode })
-		sf2sensitive = setmetatable({}, { __mode = sf2smode })
+		sf2sensitive = setmetatable({}, { __mode = (weakwrapper and "k" or "") .. (weaksensitive and "v" or "") })
+		sensitive2sf = setmetatable({}, { __mode = (weaksensitive and "k" or "") .. (weakwrapper and "v" or "") })
 		self.sensitive2sf_tables[metatable] = sensitive2sf
 		self.sf2sensitive_tables[metatable] = sf2sensitive
 	end

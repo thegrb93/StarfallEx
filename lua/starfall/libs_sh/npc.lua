@@ -26,7 +26,7 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local npc_methods, npc_meta = instance.Types.Npc.Methods, instance.Types.Npc
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
-local wrap, unwrap = instance:CreateWrapper(npc_meta, true, false, debug.getregistry().NPC, ent_meta)
+local wrap, unwrap = instance:CreateWrapper(npc_meta, false, true, debug.getregistry().NPC, ent_meta)
 instance:ApplyTypeDependencies(npc_methods, npc_meta, ent_meta)
 
 -- ------------------------------------------------------------------------- --
