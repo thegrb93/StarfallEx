@@ -85,7 +85,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	local propdata = instance.data.props
 	local propent = ents.Create("prop_physics")
-
+	register(propent, instance)
 	propent:SetPos(SF.clampPos(pos))
 	propent:SetAngles(ang)
 	propent:SetModel(model)
@@ -110,8 +110,6 @@ function props_library.create(pos, ang, model, frozen)
 
 	gamemode.Call("PlayerSpawnedProp", ply, model, propent)
 	FixInvalidPhysicsObject(propent)
-
-	register(propent)
 
 	return ewrap(propent)
 end
@@ -180,6 +178,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local propdata = instance.data.props
 	
 	local propent = ents.Create("starfall_prop")
+	register(propent, instance)
 	propent.streamdata = streamdata
 	propent:SetPos(SF.clampPos(pos))
 	propent:SetAngles(ang)
@@ -207,8 +206,6 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	ply:AddCleanup("props", propent)
 
 	gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
-
-	register(propent)
 
 	return ewrap(propent)
 end
@@ -245,7 +242,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 	if not gamemode.Call("PlayerSpawnProp", ply, model) then return end
 
 	local comp = ents.Create(class)
-
+	register(comp, instance)
 	comp:SetPos(SF.clampPos(pos))
 	comp:SetAngles(ang)
 	comp:SetModel(model)
@@ -273,8 +270,6 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 
 	ply:AddCount("starfall_components", comp)
 	ply:AddCleanup("starfall_components", comp)
-
-	register(comp)
 
 	return ewrap(comp)
 end
@@ -429,6 +424,7 @@ function props_library.createSent (pos, ang, class, frozen)
 	end
 
 	if entity and entity:IsValid() then
+		register(entity, instance)
 
 		entity:SetCreator( ply )
 
@@ -446,8 +442,6 @@ function props_library.createSent (pos, ang, class, frozen)
 
 		ply:AddCleanup("props", entity)
 		gamemode.Call(hookcall, ply, entity)
-
-		register(entity)
 
 		return owrap(entity)
 	end
