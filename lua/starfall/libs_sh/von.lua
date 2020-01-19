@@ -669,7 +669,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 			end
 
 			if p and y and r then
-				return SF.Angles.Wrap(Angle(p, y, r)), a - 1
+				return instance.Types.Angle.Wrap(Angle(p, y, r)), a - 1
 			end
 
 			SF.Throw("vON: Angle definition started... Found no end.", 3)

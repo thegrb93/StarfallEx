@@ -19,12 +19,11 @@ local function vwrap(vec)
 	return wrap({ vec[1], vec[2], vec[3] })
 end
 
-SF.AddObjectWrapper(debug.getregistry().Vector, vec_metamethods, vwrap)
-SF.AddObjectUnwrapper(vec_metamethods, unwrap)
+SF.AddCustomWrapper(debug.getregistry().Vector, vec_metamethods, vwrap, unwrap)
 
 instance:AddHook("postload", function()
-	--- Creates a Vector struct
-	-- @name SF.DefaultEnvironment.Vector. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
+	--- Creates a Vector struct. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
+	-- @name Environment.Vector
 	-- @class function
 	-- @param x - X
 	-- @param y - Y

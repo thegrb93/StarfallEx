@@ -424,7 +424,7 @@ function net_library.writeAngle(t)
 
 	checktype(t, instance.Types.Angle)
 
-	write(instance, net.WriteAngle, 54, SF.Angles.Unwrap(t))
+	write(instance, net.WriteAngle, 54, instance.Types.Angle.Unwrap(t))
 	return true
 end
 
@@ -433,7 +433,7 @@ end
 -- @return The angle that was read
 
 function net_library.readAngle()
-	return SF.Angles.Wrap(net.ReadAngle())
+	return instance.Types.Angle.Wrap(net.ReadAngle())
 end
 
 --- Writes an vector to the net message. Has significantly lower precision than writeFloat

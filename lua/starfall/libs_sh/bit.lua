@@ -1,48 +1,8 @@
--------------------------------------------------------------------------------
--- Bit functions
--------------------------------------------------------------------------------
-
---- Bit library http://wiki.garrysmod.com/page/Category:bit
--- @shared
-local bit_library = instance:RegisterLibrary("bit")
-bit_library.arshift = bit.arshift
-bit_library.band = bit.band
-bit_library.bnot = bit.bnot
-bit_library.bor = bit.bor
-bit_library.bswap = bit.bswap
-bit_library.bxor = bit.bxor
-bit_library.lshift = bit.lshift
-bit_library.rol = bit.rol
-bit_library.ror = bit.ror
-bit_library.rshift = bit.rshift
-bit_library.tobit = bit.tobit
-bit_library.tohex = bit.tohex
-
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 
 --- StringStream type
-local ss_methods, ss_metamethods = instance:RegisterType("StringStream")
-
---- Creates a StringStream object
---@param stream A string to set the initial buffer to (default "")
---@param i The initial buffer pointer (default 1)
---@param endian The endianness of number types. "big" or "little" (default "little")
-function bit_library.stringstream(stream, i, endian)
-	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
-	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
-	
-	local ret = setmetatable({
-		buffer = {},
-		pos = 1
-	}, ss_metamethods)
-	
-	ret:write(stream)
-	ret:seek(i)
-	ret:setEndian(endian or "little")
-	
-	return ret
-end
-
+local ss_methods, ss_meta = SF.Instance.RegisterType({}, "StringStream")
 local sfstringstreammeta = {__index = ss_methods}
 function SF.StringStream(stream, i, endian)
 	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
@@ -236,7 +196,7 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
 	return math.ldexp(mantissa, exponent - 0x3FF)
 end
 
-function ss_metamethods:__tostring()
+function ss_meta:__tostring()
 	return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
 end
 
@@ -451,3 +411,52 @@ end
 function ss_methods:getBuffer()
 	return self.buffer
 end
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Bit library http://wiki.garrysmod.com/page/Category:bit
+-- @shared
+local bit_library = instance:RegisterLibrary("bit")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local bit_library = instance.Libraries.bit
+bit_library.arshift = bit.arshift
+bit_library.band = bit.band
+bit_library.bnot = bit.bnot
+bit_library.bor = bit.bor
+bit_library.bswap = bit.bswap
+bit_library.bxor = bit.bxor
+bit_library.lshift = bit.lshift
+bit_library.rol = bit.rol
+bit_library.ror = bit.ror
+bit_library.rshift = bit.rshift
+bit_library.tobit = bit.tobit
+bit_library.tohex = bit.tohex
+
+
+--- Creates a StringStream object
+--@param stream A string to set the initial buffer to (default "")
+--@param i The initial buffer pointer (default 1)
+--@param endian The endianness of number types. "big" or "little" (default "little")
+function bit_library.stringstream(stream, i, endian)
+	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
+	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
+	
+	local ret = setmetatable({
+		buffer = {},
+		pos = 1
+	}, ss_meta)
+	
+	ret:write(stream)
+	ret:seek(i)
+	ret:setEndian(endian or "little")
+	
+	return ret
+end
+
+end}

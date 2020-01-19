@@ -1,11 +1,20 @@
-SF.Color = {}
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+local dgetmeta = debug.getmetatable
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+end, function(instance) -- Called for library definitions
+
 
 --- Color type
 --@shared
 local color_methods, color_metatable = instance:RegisterType("Color")
 local checktype = instance.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
 local function wrap(tbl)
 	return setmetatable(tbl, color_metatable)
@@ -19,32 +28,23 @@ local function cwrap(clr)
 	return wrap({ clr.r, clr.g, clr.b, clr.a })
 end
 
-SF.AddObjectWrapper(debug.getregistry().Color, color_metatable, cwrap)
-SF.AddObjectUnwrapper(color_metatable, unwrap)
+SF.AddCustomWrapper(debug.getregistry().Color, color_metatable, cwrap, unwrap)
 
-SF.Color.Methods = color_methods
-SF.Color.Metatable = color_metatable
-SF.Color.Wrap = cwrap
-SF.Color.Unwrap = unwrap
-
-local dgetmeta = debug.getmetatable
-instance:AddHook("postload", function()
-	--- Creates a table struct that resembles a Color/
-	-- @name SF.DefaultEnvironment.Color
-	-- @class function
-	-- @param r - Red
-	-- @param g - Green
-	-- @param b - Blue
-	-- @param a - Alpha
-	-- @return New color
-	SF.DefaultEnvironment.Color = function (r, g, b, a)
-		if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
-		if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
-		if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
-		if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
-		return wrap({ r, g, b, a })
-	end
-end)
+--- Creates a table struct that resembles a Color
+-- @name SF.DefaultEnvironment.Color
+-- @class function
+-- @param r - Red
+-- @param g - Green
+-- @param b - Blue
+-- @param a - Alpha
+-- @return New color
+instance.env.Color = function (r, g, b, a)
+	if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
+	if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
+	if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
+	if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
+	return wrap({ r, g, b, a })
+end
 
 -- Lookup table.
 -- Index 1->4 have associative rgba for use in __index. Saves lots of checks

@@ -233,15 +233,11 @@ end
 -- @param object_meta metatable of object
 -- @param sf_object_meta starfall metatable of object
 -- @param wrapper function that wraps object
-function SF.Instance:AddObjectWrapper(object_meta, sf_object_meta, wrapper)
+function SF.Instance:AddCustomWrapper(object_meta, sf_object_meta, wrapper, unwrapper)
 	self.object_wrappers[object_meta] = wrapper
-end
-
---- Helper function for adding custom unwrappers
--- @param object_meta metatable of object
--- @param unwrapper function that unwraps object
-function SF.Instance:AddObjectUnwrapper(object_meta, unwrapper)
 	self.object_unwrappers[object_meta] = unwrapper
+	sf_object_meta.Wrap = wrapper
+	sf_object_meta.Unwrap = unwrapper
 end
 
 --- Returns the wrapper table of a specified type
@@ -258,6 +254,7 @@ function SF.Instance:BuildEnvironment()
 	self.Hooks = {}
 	self.Libraries = {}
 	self.Types = {}
+	self.env = {}
 
 	local object_wrappers = {}
 	local object_unwrappers = {}

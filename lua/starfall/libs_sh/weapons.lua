@@ -2,7 +2,7 @@
 -- Weapon functions.
 -------------------------------------------------------------------------------
 
-SF.Weapons = {}
+
 --- Weapon type
 local weapon_methods, weapon_metamethods = instance:RegisterType("Weapon")
 

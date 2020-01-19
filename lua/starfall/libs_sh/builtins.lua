@@ -33,8 +33,7 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local pwrap = instance.Types.Player.Wrap
 
-local Environment = {}
-instance.env = Environment
+local Environment = instance.env
 
 --- Built in values. These don't need to be loaded; they are in the default environment.
 -- @name builtin

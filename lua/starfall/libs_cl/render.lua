@@ -520,8 +520,8 @@ function render_library.pushViewMatrix(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
 	local newtbl = {}
-	if tbl.origin ~= nil then local origin = tbl.origin checktype( origin, SF.Vectors.Metatable ) newtbl.origin = vunwrap(origin) end
-	if tbl.angles ~= nil then local angles = tbl.angles checktype( angles, SF.Angles.Metatable ) newtbl.angles = aunwrap(angles) end
+	if tbl.origin ~= nil then local origin = tbl.origin checktype( origin, vec_meta ) newtbl.origin = vunwrap(origin) end
+	if tbl.angles ~= nil then local angles = tbl.angles checktype( angles, ang_meta ) newtbl.angles = aunwrap(angles) end
 
 	for k, v in pairs(tbl) do
 		local check = viewmatrix_checktypes[k]
