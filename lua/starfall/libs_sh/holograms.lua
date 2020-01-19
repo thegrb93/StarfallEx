@@ -1,5 +1,4 @@
 -- Global to all starfalls
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -100,6 +99,7 @@ end)
 end, function(instance) -- Called for library definitions
 
 
+local checktype = instance.CheckType
 local holograms_library = instance.Libraries.holograms
 local hologram_methods, hologram_meta = instance.Types.Hologram.Methods, instance.Types.Hologram
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -165,7 +165,7 @@ function holograms_library.create(pos, ang, model, scale)
 
 			if scale~=nil then
 				checktype(scale, vec_meta)
-				SF.Holograms.SetScale(holoent, vunwrap(scale))
+				SF.SetHologramScale(holoent, vunwrap(scale))
 			end
 
 			plyCount:free(ply, -1)
@@ -274,7 +274,7 @@ if SERVER then
 	end
 
 else
-	function SF.Holograms.SetScale(holo, scale)
+	function SF.SetHologramScale(holo, scale)
 		holo.scale = scale
 		if scale == Vector(1, 1, 1) then
 			holo.HoloMatrix = nil
@@ -402,7 +402,7 @@ else
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		SF.Holograms.SetScale(holo, scale)
+		SF.SetHologramScale(holo, scale)
 	end
 
 	function hologram_methods:suppressEngineLighting (suppress)

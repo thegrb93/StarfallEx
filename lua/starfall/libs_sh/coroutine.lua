@@ -32,6 +32,7 @@ end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
+local coroutine_library = instance.Libraries.coroutine
 local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.Wrap, instance.Types.thread.Unwrap
 
 

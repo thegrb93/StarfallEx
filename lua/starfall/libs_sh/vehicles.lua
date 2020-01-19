@@ -1,5 +1,4 @@
 -- Global to all starfalls
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -24,8 +23,8 @@ local vehicle_methods, vehicle_meta = instance:RegisterType("Vehicle")
 end, function(instance) -- Called for library definitions
 
 
+local checktype = instance.CheckType
 local vehicle_methods, vehicle_meta = instance.Types.Vehicle.Methods, instance.Types.Vehicle
-local ply_meta, pwrap, punwrap = instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 
 instance:ApplyTypeDependencies(vehicle_methods, vehicle_meta, instance.Types.Entity)
 local wrap, unwrap = instance:CreateWrapper(vehicle_meta, true, false, debug.getregistry().Vehicle, instance.Types.Entity)
@@ -47,7 +46,7 @@ if SERVER then
 		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		return pwrap(ent:GetDriver())
+		return instance.Types.Player.Wrap(ent:GetDriver())
 	end
 
 	--- Ejects the driver of the vehicle
@@ -71,7 +70,7 @@ if SERVER then
 		checkluatype(n, TYPE_NUMBER)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		return pwrap(ent:GetPassenger(n))
+		return instance.Types.Player.Wrap(ent:GetPassenger(n))
 	end
 
 	--- Kills the driver of the vehicle

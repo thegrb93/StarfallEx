@@ -12,10 +12,6 @@ return { function(instance) -- Called for library declarations
 -- @shared
 local ang_methods, ang_meta = instance:RegisterType("Angle")
 
-local function wrap(tbl)
-	return setmetatable(tbl, ang_meta)
-end
-
 local function unwrap(obj)
 	return Angle(obj[1], obj[2], obj[3])
 end
@@ -24,15 +20,18 @@ local function awrap(ang)
 	return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)
 end
 
-SF.AddCustomWrapper(debug.getregistry().Angle, ang_meta, awrap, unwrap)
+instance:AddCustomWrapper(debug.getregistry().Angle, ang_meta, awrap, unwrap)
 
 
 end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
-local ang_methods, ang_meta, wrap, unwrap = instance.Types.Vector.Angle.Methods, instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local ang_methods, ang_meta, awrap, unwrap = instance.Types.Angle.Methods, instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local function wrap(tbl)
+	return setmetatable(tbl, ang_meta)
+end
 
 --- Creates an Angle struct. Can be indexed with: 1, 2, 3, pitch, yaw, roll. 1,2,3 is most efficient.
 -- @name Environment.Angle

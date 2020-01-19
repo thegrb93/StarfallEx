@@ -16,15 +16,15 @@ local checktype = instance.CheckType
 
 --- Entity type
 -- @shared
-local ents_methods, ents_meta = instance:RegisterType("Entity")
-local ewrap, eunwrap = instance:CreateWrapper(ents_meta, true, true, debug.getregistry().Entity)
+local ents_methods, ent_meta = instance:RegisterType("Entity")
+local ewrap, eunwrap = instance:CreateWrapper(ent_meta, true, true, debug.getregistry().Entity)
 
 local function getent(self)
 	local ent = eunwrap(self)
 	if ent and (ent:IsValid() or ent:IsWorld()) then
 		return ent
 	else
-		checktype(self, ents_meta, 3)
+		checktype(self, ent_meta, 3)
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
@@ -36,8 +36,7 @@ end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local getent = instance.Types.Entity.GetEntity
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ply_meta, plwrap, plunwrap = instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
@@ -46,7 +45,7 @@ local mat_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 
 --- To string
 -- @shared
-function ents_meta:__tostring()
+function ent_meta:__tostring()
 	local ent = eunwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
@@ -60,7 +59,7 @@ function ents_methods:getOwner()
 	local ent = getent(self)
 
 	if SF.Permissions.getOwner then
-		return plwrap(SF.Permissions.getOwner(ent))
+		return instance.Types.Player.Wrap(SF.Permissions.getOwner(ent))
 	end
 end
 
@@ -496,7 +495,7 @@ end
 function ents_methods:toHologram()
 	local ent = getent(self)
 	if not ent.IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
-	debug.setmetatable(self, SF.Holograms.Metatable)
+	debug.setmetatable(self, instance.Types.Hologram)
 	return self
 end
 
@@ -508,7 +507,7 @@ function ents_methods:isValid()
 	if ent and ent:IsValid() then
 		return true
 	else
-		checktype(self, ents_meta, 2)
+		checktype(self, ent_meta, 2)
 		return false
 	end
 end

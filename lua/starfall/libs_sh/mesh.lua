@@ -1,5 +1,4 @@
 -- Global to all starfalls
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local haspermission = SF.Permissions.hasAccess
@@ -561,7 +560,6 @@ end, function(instance) -- Called for library definitions
 
 
 local mesh_library = instance.Libraries.mesh
-local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 local thread_yield = instance.Libraries.coroutine.yield
 local vector = instance.env.Vector
 
@@ -581,6 +579,8 @@ end
 
 if CLIENT then
 
+	local checktype = instance.CheckType
+	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 	local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 	local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 

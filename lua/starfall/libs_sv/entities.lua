@@ -46,7 +46,7 @@ end, function(instance) -- Called for library definitions
 local getent = instance.Types.Entity.GetEntity
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
@@ -774,7 +774,7 @@ function ents_methods:testPVS(other)
 	local meta = debug.getmetatable(other)
 	if meta==vec_meta then
 		other = vunwrap(other)
-	elseif meta==ents_meta then
+	elseif meta==ent_meta then
 		other = getent(other)
 	else
 		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)

@@ -13,16 +13,19 @@ end
 
 net.Receive("SF_netmessage", function(len, ply)
 	local ent = net.ReadEntity()
-	if ent:IsValid() and ent.instance and ent.instance.runScriptHook then
-		local name = net.ReadString()
-		len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
-		if ply then ply = instance.WrapObject(ply) end
+	if ent:IsValid() then
+		local instance = ent.instance
+		if instance and instance.runScriptHook then
+			local name = net.ReadString()
+			len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
+			if ply then ply = instance.WrapObject(ply) end
 
-		local recv = ent.instance.data.net.receives[name]
-		if recv then
-			ent.instance:runFunction(recv, len, ply)
-		else
-			ent.instance:runScriptHook("net", name, len, ply)
+			local recv = instance.data.net.receives[name]
+			if recv then
+				instance:runFunction(recv, len, ply)
+			else
+				instance:runScriptHook("net", name, len, ply)
+			end
 		end
 	end
 end)

@@ -1,4 +1,3 @@
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
@@ -29,6 +28,7 @@ end)
 
 end, function(instance) -- Called for library definitions
 
+local notification_library = instance.Libraries.notification
 
 -- @name Environment.NOTIFY
 -- @class table

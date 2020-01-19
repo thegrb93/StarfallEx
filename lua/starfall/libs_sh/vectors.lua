@@ -12,10 +12,6 @@ return { function(instance) -- Called for library declarations
 -- @shared
 local vec_methods, vec_meta = instance:RegisterType("Vector")
 
-local function wrap(tbl)
-	return setmetatable(tbl, vec_meta)
-end
-
 local function unwrap(obj)
 	return Vector(obj[1], obj[2], obj[3])
 end
@@ -24,17 +20,18 @@ local function vwrap(vec)
 	return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)
 end
 
-SF.AddCustomWrapper(debug.getregistry().Vector, vec_meta, vwrap, unwrap)
+instance:AddCustomWrapper(debug.getregistry().Vector, vec_meta, vwrap, unwrap)
 
 
 end, function(instance) -- Called for library definitions
 
 
-
 local checktype = instance.CheckType
 local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-
+local function wrap(tbl)
+	return setmetatable(tbl, vec_meta)
+end
 
 --- Creates a Vector struct. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
 -- @name Environment.Vector

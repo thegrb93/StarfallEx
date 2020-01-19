@@ -82,7 +82,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
 	end
 
-	self:BuildEnvironment()
+	instance:BuildEnvironment()
 
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
@@ -114,19 +114,19 @@ end
 -- @param name The hook name
 -- @param func The hook function
 function SF.Instance:AddHook(name, func)
-	local hook = self.Hooks[hookname]
+	local hook = self.Hooks[name]
 	if hook then
 		hook[#hook + 1] = func
 	else
-		self.Hooks[hookname] = {func}
+		self.Hooks[name] = {func}
 	end
 end
 
 --- Runs a library hook.
--- @param hook Hook to run.
+-- @param name Hook to run.
 -- @param ... Additional arguments.
-function SF.Instance:RunHook(hook, ...)
-	local hook = self.Hooks[hookname]
+function SF.Instance:RunHook(name, ...)
+	local hook = self.Hooks[name]
 	if hook then
 		for i = 1, #hook do
 			hook[i](...)

@@ -73,11 +73,9 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	sanitizeTypeMeta(function() end)
 	sanitizeTypeMeta(coroutine.create(function() end))
 
-	local dummyenv = {}
-	SF.Instance.BuildEnvironment(dummyenv)
-	local string_methods_copy = table.Copy(dummyenv.env.string)
+	local string_methods = SF.SafeStringLib
 	local function sf_string_index(self, key)
-		local val = string_methods_copy[key]
+		local val = string_methods[key]
 		if (val) then
 			return val
 		elseif (tonumber(key)) then
@@ -115,193 +113,10 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	end
 end)
 
+
 -------------------------------------------------------------------------------
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
-
-do
-	local middleclass = {
-		_VERSION     = 'middleclass v4.1.1',
-		_DESCRIPTION = 'Object Orientation for Lua',
-		_URL         = 'https://github.com/kikito/middleclass',
-		_LICENSE     = [[
-		MIT LICENSE
-
-		Copyright (c) 2011 Enrique García Cota
-
-		Permission is hereby granted, free of charge, to any person obtaining a
-		copy of this software and associated documentation files (the
-		"Software"), to deal in the Software without restriction, including
-		without limitation the rights to use, copy, modify, merge, publish,
-		distribute, sublicense, and/or sell copies of the Software, and to
-		permit persons to whom the Software is furnished to do so, subject to
-		the following conditions:
-
-		The above copyright notice and this permission notice shall be included
-		in all copies or substantial portions of the Software.
-
-		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
-		OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-		IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
-		CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
-		SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-		]]
-	}
-
-	local function _createIndexWrapper(aClass, f)
-		if f == nil then
-		return aClass.__instanceDict
-		else
-		return function(self, name)
-			local value = aClass.__instanceDict[name]
-
-			if value ~= nil then
-			return value
-			elseif isfunction(f) then
-			return (f(self, name))
-			else
-			return f[name]
-			end
-		end
-		end
-	end
-
-	local function _propagateInstanceMethod(aClass, name, f)
-		f = name == "__index" and _createIndexWrapper(aClass, f) or f
-		aClass.__instanceDict[name] = f
-
-		for subclass in pairs(aClass.subclasses) do
-		if rawget(subclass.__declaredMethods, name) == nil then
-			_propagateInstanceMethod(subclass, name, f)
-		end
-		end
-	end
-
-	local function _declareInstanceMethod(aClass, name, f)
-		aClass.__declaredMethods[name] = f
-
-		if f == nil and aClass.super then
-		f = aClass.super.__instanceDict[name]
-		end
-
-		_propagateInstanceMethod(aClass, name, f)
-	end
-
-	local function _tostring(self) return "class " .. self.name end
-	local function _call(self, ...) return self:new(...) end
-
-	local function _createClass(name, super)
-		local dict = {}
-		dict.__index = dict
-
-		local aClass = { name = name, super = super, static = {},
-						 __instanceDict = dict, __declaredMethods = {},
-						 subclasses = setmetatable({}, {__mode='k'})  }
-
-		if super then
-		setmetatable(aClass.static, {
-			__index = function(_,k)
-			local result = rawget(dict,k)
-			if result == nil then
-				return super.static[k]
-			end
-			return result
-			end
-		})
-		else
-		setmetatable(aClass.static, { __index = function(_,k) return rawget(dict,k) end })
-		end
-
-		setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
-							 __call = _call, __newindex = _declareInstanceMethod })
-
-		return aClass
-	end
-
-	local function _includeMixin(aClass, mixin)
-		assert(istable(mixin), "mixin must be a table")
-
-		for name,method in pairs(mixin) do
-		if name ~= "included" and name ~= "static" then aClass[name] = method end
-		end
-
-		for name,method in pairs(mixin.static or {}) do
-		aClass.static[name] = method
-		end
-
-		if isfunction(mixin.included) then mixin:included(aClass) end
-		return aClass
-	end
-
-	local DefaultMixin = {
-		__tostring   = function(self) return "instance of " .. tostring(self.class) end,
-
-		initialize   = function(self, ...) end,
-
-		isInstanceOf = function(self, aClass)
-		return istable(aClass)
-			 and istable(self)
-			 and (self.class == aClass
-				or istable(self.class)
-				and isfunction(self.class.isSubclassOf)
-				and self.class:isSubclassOf(aClass))
-		end,
-
-		static = {
-		allocate = function(self)
-			assert(istable(self), "Make sure that you are using 'Class:allocate' instead of 'Class.allocate'")
-			return setmetatable({ class = self }, self.__instanceDict)
-		end,
-
-		new = function(self, ...)
-			assert(istable(self), "Make sure that you are using 'Class:new' instead of 'Class.new'")
-			local instance = self:allocate()
-			instance:initialize(...)
-			return instance
-		end,
-
-		subclass = function(self, name)
-			assert(istable(self), "Make sure that you are using 'Class:subclass' instead of 'Class.subclass'")
-			assert(isstring(name), "You must provide a name(string) for your class")
-
-			local subclass = _createClass(name, self)
-
-			for methodName, f in pairs(self.__instanceDict) do
-			_propagateInstanceMethod(subclass, methodName, f)
-			end
-			subclass.initialize = function(instance, ...) return self.initialize(instance, ...) end
-
-			self.subclasses[subclass] = true
-			self:subclassed(subclass)
-
-			return subclass
-		end,
-
-		subclassed = function(self, other) end,
-
-		isSubclassOf = function(self, other)
-			return istable(other) and
-				istable(self.super) and
-				( self.super == other or self.super:isSubclassOf(other) )
-		end,
-
-		include = function(self, ...)
-			assert(istable(self), "Make sure you that you are using 'Class:include' instead of 'Class.include'")
-			for _,mixin in ipairs({...}) do _includeMixin(self, mixin) end
-			return self
-		end
-		}
-	}
-
-	local checkluatype = SF.CheckLuaType
-	function SF.Class(name, super)
-		checkluatype(name, TYPE_STRING)
-		if super~=nil then checkluatype(super, TYPE_TABLE) end
-		return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
-	end
-end
 
 local EntityTable = {
 	__newindex = function(t, e, v)
@@ -1036,6 +851,273 @@ else
 	end)
 end
 
+
+do
+	local middleclass = {
+		_VERSION     = 'middleclass v4.1.1',
+		_DESCRIPTION = 'Object Orientation for Lua',
+		_URL         = 'https://github.com/kikito/middleclass',
+		_LICENSE     = [[
+		MIT LICENSE
+
+		Copyright (c) 2011 Enrique García Cota
+
+		Permission is hereby granted, free of charge, to any person obtaining a
+		copy of this software and associated documentation files (the
+		"Software"), to deal in the Software without restriction, including
+		without limitation the rights to use, copy, modify, merge, publish,
+		distribute, sublicense, and/or sell copies of the Software, and to
+		permit persons to whom the Software is furnished to do so, subject to
+		the following conditions:
+
+		The above copyright notice and this permission notice shall be included
+		in all copies or substantial portions of the Software.
+
+		THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+		OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+		MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+		IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+		CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+		TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+		SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+		]]
+	}
+
+	local function _createIndexWrapper(aClass, f)
+		if f == nil then
+		return aClass.__instanceDict
+		else
+		return function(self, name)
+			local value = aClass.__instanceDict[name]
+
+			if value ~= nil then
+			return value
+			elseif isfunction(f) then
+			return (f(self, name))
+			else
+			return f[name]
+			end
+		end
+		end
+	end
+
+	local function _propagateInstanceMethod(aClass, name, f)
+		f = name == "__index" and _createIndexWrapper(aClass, f) or f
+		aClass.__instanceDict[name] = f
+
+		for subclass in pairs(aClass.subclasses) do
+		if rawget(subclass.__declaredMethods, name) == nil then
+			_propagateInstanceMethod(subclass, name, f)
+		end
+		end
+	end
+
+	local function _declareInstanceMethod(aClass, name, f)
+		aClass.__declaredMethods[name] = f
+
+		if f == nil and aClass.super then
+		f = aClass.super.__instanceDict[name]
+		end
+
+		_propagateInstanceMethod(aClass, name, f)
+	end
+
+	local function _tostring(self) return "class " .. self.name end
+	local function _call(self, ...) return self:new(...) end
+
+	local function _createClass(name, super)
+		local dict = {}
+		dict.__index = dict
+
+		local aClass = { name = name, super = super, static = {},
+						 __instanceDict = dict, __declaredMethods = {},
+						 subclasses = setmetatable({}, {__mode='k'})  }
+
+		if super then
+		setmetatable(aClass.static, {
+			__index = function(_,k)
+			local result = rawget(dict,k)
+			if result == nil then
+				return super.static[k]
+			end
+			return result
+			end
+		})
+		else
+		setmetatable(aClass.static, { __index = function(_,k) return rawget(dict,k) end })
+		end
+
+		setmetatable(aClass, { __index = aClass.static, __tostring = _tostring,
+							 __call = _call, __newindex = _declareInstanceMethod })
+
+		return aClass
+	end
+
+	local function _includeMixin(aClass, mixin)
+		assert(istable(mixin), "mixin must be a table")
+
+		for name,method in pairs(mixin) do
+		if name ~= "included" and name ~= "static" then aClass[name] = method end
+		end
+
+		for name,method in pairs(mixin.static or {}) do
+		aClass.static[name] = method
+		end
+
+		if isfunction(mixin.included) then mixin:included(aClass) end
+		return aClass
+	end
+
+	local DefaultMixin = {
+		__tostring   = function(self) return "instance of " .. tostring(self.class) end,
+
+		initialize   = function(self, ...) end,
+
+		isInstanceOf = function(self, aClass)
+		return istable(aClass)
+			 and istable(self)
+			 and (self.class == aClass
+				or istable(self.class)
+				and isfunction(self.class.isSubclassOf)
+				and self.class:isSubclassOf(aClass))
+		end,
+
+		static = {
+		allocate = function(self)
+			assert(istable(self), "Make sure that you are using 'Class:allocate' instead of 'Class.allocate'")
+			return setmetatable({ class = self }, self.__instanceDict)
+		end,
+
+		new = function(self, ...)
+			assert(istable(self), "Make sure that you are using 'Class:new' instead of 'Class.new'")
+			local instance = self:allocate()
+			instance:initialize(...)
+			return instance
+		end,
+
+		subclass = function(self, name)
+			assert(istable(self), "Make sure that you are using 'Class:subclass' instead of 'Class.subclass'")
+			assert(isstring(name), "You must provide a name(string) for your class")
+
+			local subclass = _createClass(name, self)
+
+			for methodName, f in pairs(self.__instanceDict) do
+			_propagateInstanceMethod(subclass, methodName, f)
+			end
+			subclass.initialize = function(instance, ...) return self.initialize(instance, ...) end
+
+			self.subclasses[subclass] = true
+			self:subclassed(subclass)
+
+			return subclass
+		end,
+
+		subclassed = function(self, other) end,
+
+		isSubclassOf = function(self, other)
+			return istable(other) and
+				istable(self.super) and
+				( self.super == other or self.super:isSubclassOf(other) )
+		end,
+
+		include = function(self, ...)
+			assert(istable(self), "Make sure you that you are using 'Class:include' instead of 'Class.include'")
+			for _,mixin in ipairs({...}) do _includeMixin(self, mixin) end
+			return self
+		end
+		}
+	}
+
+	local checkluatype = SF.CheckLuaType
+	function SF.Class(name, super)
+		checkluatype(name, TYPE_STRING)
+		if super~=nil then checkluatype(super, TYPE_TABLE) end
+		return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
+	end
+end
+
+
+do
+	local checkluatype = SF.CheckLuaType
+	local string_methods = {}
+	string_methods.byte = string.byte string_methods.byte = string.byte
+	string_methods.char = string.char
+	string_methods.comma = string.Comma string_methods.Comma = string.Comma
+	string_methods.dump = string.dump
+	string_methods.endsWith = string.EndsWith string_methods.EndsWith = string.EndsWith
+	string_methods.explode = string.Explode string_methods.Explode = string.Explode
+	string_methods.find = string.find
+	string_methods.format = string.format
+	string_methods.formattedTime = string.FormattedTime string_methods.FormattedTime = string.FormattedTime
+	string_methods.getChar = string.GetChar string_methods.GetChar = string.GetChar
+	string_methods.getExtensionFromFilename = string.GetExtensionFromFilename string_methods.GetExtensionFromFilename = string.GetExtensionFromFilename
+	string_methods.getFileFromFilename = string.GetFileFromFilename string_methods.GetFileFromFilename = string.GetFileFromFilename
+	string_methods.getPathFromFilename = string.GetPathFromFilename string_methods.GetPathFromFilename = string.GetPathFromFilename
+	string_methods.gfind = string.gfind
+	string_methods.gmatch = string.gmatch
+	string_methods.gsub = string.gsub
+	string_methods.implode = string.Implode string_methods.Implode = string.Implode
+	local function javascriptSafe(str)
+		checkluatype(str, TYPE_STRING)
+		return string.JavascriptSafe(str)
+	end
+	string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
+	string_methods.left = string.Left string_methods.Left = string.Left
+	string_methods.len = string.len
+	string_methods.lower = string.lower
+	string_methods.match = string.match
+	string_methods.niceSize = string.NiceSize string_methods.NiceSize = string.NiceSize
+	string_methods.niceTime = string.NiceTime string_methods.NiceTime = string.NiceTime
+	local function patternSafe(str)
+		checkluatype(str, TYPE_STRING)
+		return string.PatternSafe(str)
+	end
+	string_methods.patternSafe = patternSafe string_methods.PatternSafe = patternSafe
+	string_methods.replace = string.Replace string_methods.Replace = string.Replace
+	string_methods.reverse = string.reverse
+	string_methods.right = string.Right string_methods.Right = string.Right
+	string_methods.setChar = string.SetChar string_methods.SetChar = string.SetChar
+	string_methods.split = string.Split string_methods.Split = string.Split
+	string_methods.startWith = string.StartWith string_methods.StartWith = string.StartWith
+	string_methods.stripExtension = string.StripExtension string_methods.StripExtension = string.StripExtension
+	string_methods.sub = string.sub
+	string_methods.toMinutesSeconds = string.ToMinutesSeconds string_methods.ToMinutesSeconds = string.ToMinutesSeconds
+	string_methods.toMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds string_methods.ToMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds
+	string_methods.toTable = string.ToTable string_methods.ToTable = string.ToTable
+	string_methods.trim = string.Trim string_methods.Trim = string.Trim
+	string_methods.trimLeft = string.TrimLeft string_methods.TrimLeft = string.TrimLeft
+	string_methods.trimRight = string.TrimRight string_methods.TrimRight = string.TrimRight
+	string_methods.upper = string.upper
+	string_methods.normalizePath = SF.NormalizePath
+
+	--UTF8 part
+	string_methods.utf8char = utf8.char
+	string_methods.utf8codepoint = utf8.codepoint
+	string_methods.utf8codes = utf8.codes
+	string_methods.utf8force = utf8.force
+	string_methods.utf8len = utf8.len
+	string_methods.utf8offset = utf8.offset
+
+	local rep_chunk = 1000000
+	function string_methods.rep(str, rep, sep)
+		if rep < 0.5 then return "" end
+
+		local ret = {}
+		for i = 1, rep / rep_chunk do
+			ret[#ret + 1] = string.rep(str, rep_chunk, sep)
+		end
+
+		local r = rep%rep_chunk
+		if r>0.5 then
+			ret[#ret + 1] = string.rep(str, r, sep)
+		end
+
+		return table.concat(ret, sep)
+	end
+	SF.SafeStringLib = string_methods
+end
+
+
 -------------------------------------------------------------------------------
 -- Includes
 -------------------------------------------------------------------------------
@@ -1072,7 +1154,7 @@ do
 			return tbl[1]
 		elseif #tbl == 2 then
 			local a, b, c, d = tbl[1][1], tbl[1][2], tbl[2][1], tbl[2][2]
-			return {function() a() c() end, function() b() d() end}
+			return {function(i) a(i) c(i) end, function(i) b(i) d(i) end}
 		else
 			error("This shouldn't happen!")
 		end
@@ -1115,9 +1197,7 @@ do
 		SF.Modules[k] = getMergedModule(v)
 	end
 	SF.Permissions.loadPermissionOptions()
-end
 
-do
 	if SERVER then
 		local function sendToClient(name, tbl)
 			if #tbl==0 then return end
@@ -1172,10 +1252,8 @@ do
 					print("Reloaded library: " .. data.mainfile)
 					SF.Modules[data.mainfile] = nil
 					for path, code in pairs(data.files) do
-						local ok, tbl = xpcall(CompileString, debug.traceback, file, root_path .. path, false)
-						if ok then
-							addModule(data.mainfile, tbl)
-						end
+						local tbl = CompileString(code, root_path .. path, false)()
+						addModule(data.mainfile, tbl)
 					end
 					SF.Modules[data.mainfile] = getMergedModule(SF.Modules[data.mainfile])
 				end
@@ -1184,3 +1262,4 @@ do
 
 	end
 end
+

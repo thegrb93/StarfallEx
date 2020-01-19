@@ -15,6 +15,7 @@ end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
+local weapon_methods, weapon_meta = instance.Types.Weapon.Methods, instance.Types.Weapon
 instance:ApplyTypeDependencies(weapon_methods, weapon_meta, instance.Types.Entity)
 local wrap, unwrap = instance:CreateWrapper(weapon_meta, true, false, debug.getregistry().Weapon, instance.Types.Entity)
 

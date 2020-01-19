@@ -107,7 +107,6 @@ end, function(instance) -- Called for library definitions
 local checktype = instance.CheckType
 local hook_library = instance.Libraries.hook
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local ply_meta, pwrap, punwrap = instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 
 
 --- Sets a hook function
@@ -186,9 +185,9 @@ function hook_library.runRemote (recipient, ...)
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hookrun("remote", ewrap(instance.data.entity), pwrap(instance.player), ...) }
+			result = { true, hookrun("remote", ewrap(instance.data.entity), instance.Types.Player.Wrap(instance.player), ...) }
 		else
-			result = k:runScriptHookForResult("remote", ewrap(instance.data.entity), pwrap(instance.player), ...)
+			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.data.entity), k.Types.Player.Wrap(instance.player), k.Sanitize(instance.Unsanitize(...)))
 		end
 
 		if result[1] and result[2]~=nil then

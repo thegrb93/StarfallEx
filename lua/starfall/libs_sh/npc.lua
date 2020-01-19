@@ -23,10 +23,11 @@ end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local npc_methods, npc_meta = instance.Types.Npc.Methods, instance.Types.Npc
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
-local wrap, unwrap = instance:CreateWrapper(npc_meta, true, false, debug.getregistry().NPC, ents_meta)
-instance:ApplyTypeDependencies(npc_methods, npc_meta, ents_meta)
+local wrap, unwrap = instance:CreateWrapper(npc_meta, true, false, debug.getregistry().NPC, ent_meta)
+instance:ApplyTypeDependencies(npc_methods, npc_meta, ent_meta)
 
 -- ------------------------------------------------------------------------- --
 function npc_meta:__tostring()
@@ -82,7 +83,7 @@ if SERVER then
 	-- @return string relationship of the npc with the target
 	function npc_methods:getRelationship(ent)
 		checktype(self, npc_meta)
-		checktype(ent, ents_meta)
+		checktype(ent, ent_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
@@ -115,7 +116,7 @@ if SERVER then
 	-- @param ent Target entity
 	function npc_methods:setEnemy(ent)
 		checktype(self, npc_meta)
-		checktype(ent, ents_meta)
+		checktype(ent, ent_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end

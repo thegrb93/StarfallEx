@@ -124,7 +124,7 @@ end
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
 	checktype(ang, ang_meta)
-	unwrap(self):SetAngles(instance.UnwrapObject(ang))
+	unwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the translation

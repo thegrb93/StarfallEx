@@ -2,7 +2,7 @@
 local checkluatype = SF.CheckLuaType
 
 --- StringStream type
-local ss_methods, ss_meta = SF.Instance.RegisterType({}, "StringStream")
+local ss_methods, ss_meta = SF.Instance.RegisterType({Types = {}}, "StringStream")
 local sfstringstreammeta = {__index = ss_methods}
 function SF.StringStream(stream, i, endian)
 	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end

@@ -17,7 +17,7 @@ end
 return { function(instance) -- Called for library declarations
 
 
-instance:RegisterLibrary("string")
+instance.Libraries.string = table.Copy(SF.SafeStringLib)
 instance:RegisterLibrary("math")
 instance:RegisterLibrary("os")
 instance:RegisterLibrary("table")
@@ -28,10 +28,10 @@ end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-local pwrap = instance.Types.Player.Wrap
 
 local Environment = instance.env
 
@@ -52,7 +52,7 @@ end
 -- @class function
 -- @return Owner entity
 function Environment.owner()
-	return pwrap(instance.player)
+	return instance.Types.Player.Wrap(instance.player)
 end
 
 --- Same as owner() on the server. On the client, returns the local player
@@ -61,10 +61,10 @@ end
 function Environment.player(num)
 	if num then
 		checkluatype(num, TYPE_NUMBER)
-		return pwrap(Player(num))
+		return instance.Types.Player.Wrap(Player(num))
 	end
 
-	return SERVER and Environment.owner() or pwrap(LocalPlayer())
+	return SERVER and Environment.owner() or instance.Types.Player.Wrap(LocalPlayer())
 end
 
 
@@ -320,80 +320,6 @@ end
 
 -- String library
 local string_methods = instance.Libraries.string
-string_methods.byte = string.byte string_methods.byte = string.byte
-string_methods.char = string.char
-string_methods.comma = string.Comma string_methods.Comma = string.Comma
-string_methods.dump = string.dump
-string_methods.endsWith = string.EndsWith string_methods.EndsWith = string.EndsWith
-string_methods.explode = string.Explode string_methods.Explode = string.Explode
-string_methods.find = string.find
-string_methods.format = string.format
-string_methods.formattedTime = string.FormattedTime string_methods.FormattedTime = string.FormattedTime
-string_methods.getChar = string.GetChar string_methods.GetChar = string.GetChar
-string_methods.getExtensionFromFilename = string.GetExtensionFromFilename string_methods.GetExtensionFromFilename = string.GetExtensionFromFilename
-string_methods.getFileFromFilename = string.GetFileFromFilename string_methods.GetFileFromFilename = string.GetFileFromFilename
-string_methods.getPathFromFilename = string.GetPathFromFilename string_methods.GetPathFromFilename = string.GetPathFromFilename
-string_methods.gfind = string.gfind
-string_methods.gmatch = string.gmatch
-string_methods.gsub = string.gsub
-string_methods.implode = string.Implode string_methods.Implode = string.Implode
-local function javascriptSafe(str)
-	checkluatype(str, TYPE_STRING)
-	return string.JavascriptSafe(str)
-end
-string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
-string_methods.left = string.Left string_methods.Left = string.Left
-string_methods.len = string.len
-string_methods.lower = string.lower
-string_methods.match = string.match
-string_methods.niceSize = string.NiceSize string_methods.NiceSize = string.NiceSize
-string_methods.niceTime = string.NiceTime string_methods.NiceTime = string.NiceTime
-local function patternSafe(str)
-	checkluatype(str, TYPE_STRING)
-	return string.PatternSafe(str)
-end
-string_methods.patternSafe = patternSafe string_methods.PatternSafe = patternSafe
-string_methods.replace = string.Replace string_methods.Replace = string.Replace
-string_methods.reverse = string.reverse
-string_methods.right = string.Right string_methods.Right = string.Right
-string_methods.setChar = string.SetChar string_methods.SetChar = string.SetChar
-string_methods.split = string.Split string_methods.Split = string.Split
-string_methods.startWith = string.StartWith string_methods.StartWith = string.StartWith
-string_methods.stripExtension = string.StripExtension string_methods.StripExtension = string.StripExtension
-string_methods.sub = string.sub
-string_methods.toMinutesSeconds = string.ToMinutesSeconds string_methods.ToMinutesSeconds = string.ToMinutesSeconds
-string_methods.toMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds string_methods.ToMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds
-string_methods.toTable = string.ToTable string_methods.ToTable = string.ToTable
-string_methods.trim = string.Trim string_methods.Trim = string.Trim
-string_methods.trimLeft = string.TrimLeft string_methods.TrimLeft = string.TrimLeft
-string_methods.trimRight = string.TrimRight string_methods.TrimRight = string.TrimRight
-string_methods.upper = string.upper
-string_methods.normalizePath = SF.NormalizePath
-
---UTF8 part
-string_methods.utf8char = utf8.char
-string_methods.utf8codepoint = utf8.codepoint
-string_methods.utf8codes = utf8.codes
-string_methods.utf8force = utf8.force
-string_methods.utf8len = utf8.len
-string_methods.utf8offset = utf8.offset
-
-local rep_chunk = 1000000
-function string_methods.rep(str, rep, sep)
-	if rep < 0.5 then return "" end
-
-	local ret = {}
-	for i = 1, rep / rep_chunk do
-		ret[#ret + 1] = string.rep(str, rep_chunk, sep)
-	end
-
-	local r = rep%rep_chunk
-	if r>0.5 then
-		ret[#ret + 1] = string.rep(str, r, sep)
-	end
-
-	return table.concat(ret, sep)
-end
 function string_methods.fromColor(color)
 	return string.FromColor(cunwrap(color))
 end

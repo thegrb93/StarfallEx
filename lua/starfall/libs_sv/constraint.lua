@@ -54,7 +54,7 @@ end, function(instance) -- Called for library definitions
 local constraint_library = instance.Libraries.constraint
 
 local checktype = instance.CheckType
-local ents_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 local function checkConstraint(e, t)
@@ -86,8 +86,8 @@ end
 -- @param nocollide Bool whether or not to nocollide the two entities
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -114,8 +114,8 @@ end
 --- Axis two entities
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	checktype(v1, vec_meta)
 	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
@@ -151,8 +151,8 @@ end
 --- Ballsocket two entities
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	checktype(v1, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
@@ -183,8 +183,8 @@ end
 --- Advanced Ballsocket two entities
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	checktype(v1, vec_meta)
 	checktype(v2, vec_meta)
 	checktype(minv, vec_meta)
@@ -224,8 +224,8 @@ end
 --- Elastic two entities
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	checktype(v1, vec_meta)
 	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
@@ -268,8 +268,8 @@ end
 --- Ropes two entities
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	checktype(v1, vec_meta)
 	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
@@ -313,8 +313,8 @@ end
 --- Sliders two entities
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	checktype(v1, vec_meta)
 	checktype(v2, vec_meta)
 
@@ -345,8 +345,8 @@ end
 --- Nocollides two entities
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
-	checktype(e1, ents_meta)
-	checktype(e2, ents_meta)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 
 	plyCount:checkuse(instance.player, 1)
 
@@ -371,7 +371,7 @@ end
 --- Sets the length of a rope attached to the entity
 -- @server
 function constraint_library.setRopeLength(index, e, length)
-	checktype(e, ents_meta)
+	checktype(e, ent_meta)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
@@ -393,7 +393,7 @@ end
 --- Sets the length of an elastic attached to the entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
-	checktype(e, ents_meta)
+	checktype(e, ent_meta)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
@@ -413,7 +413,7 @@ end
 --- Breaks all constraints on an entity
 -- @server
 function constraint_library.breakAll(e)
-	checktype(e, ents_meta)
+	checktype(e, ent_meta)
 	local ent1 = eunwrap(e)
 
 	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
@@ -425,7 +425,7 @@ end
 --- Breaks all constraints of a certain type on an entity
 -- @server
 function constraint_library.breakType(e, typename)
-	checktype(e, ents_meta)
+	checktype(e, ent_meta)
 	checkluatype(typename, TYPE_STRING)
 
 	local ent1 = eunwrap(e)
@@ -441,7 +441,7 @@ end
 -- @param ent The entity
 -- @return Table of entity constraints
 function constraint_library.getTable(ent)
-	checktype(ent, ents_meta)
+	checktype(ent, ent_meta)
 
 	ent = eunwrap(ent)
 

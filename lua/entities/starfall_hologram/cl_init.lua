@@ -104,7 +104,7 @@ net.Receive("starfall_hologram", function()
 	local function applyHologram(self)
 		if self.IsSFHologram then
 			if updateScale then
-				SF.Holograms.SetScale(self, scale)
+				SF.SetHologramScale(self, scale)
 			end
 			if updateSuppressEngineLighting then
 				self.suppressEngineLighting = suppressEngineLighting

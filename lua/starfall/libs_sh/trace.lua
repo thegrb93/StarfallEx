@@ -1,5 +1,4 @@
 -- Global to all starfalls
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local dgetmeta = debug.getmetatable
@@ -26,7 +25,12 @@ local trace_library = instance:RegisterLibrary("trace")
 end, function(instance) -- Called for library definitions
 
 
+local checktype = instance.CheckType
 local trace_library = instance.Libraries.trace
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 -- Material Enumeration
 -- @name trace.MAT
@@ -208,23 +212,18 @@ trace_library.CONTENTS_TRANSLUCENT = CONTENTS_TRANSLUCENT
 trace_library.CONTENTS_LADDER = CONTENTS_LADDER
 trace_library.CONTENTS_HITBOX = CONTENTS_HITBOX
 
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-
 local function convertFilter(filter)
 	local filterType = TypeID(filter)
 	if filterType == TYPE_NIL then
 		return nil
 	elseif filterType == TYPE_TABLE then
-		local unwrapped = unwrap(filter)
+		local unwrapped = eunwrap(filter)
 		if unwrapped then
 			return unwrapped
 		else
 			local l = {}
 			for i = 1, #filter do
-				local unwrapped = unwrap(filter[i])
+				local unwrapped = eunwrap(filter[i])
 				if unwrapped then
 					l[#l + 1] = unwrapped
 				end
@@ -251,8 +250,8 @@ end
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace (start, endpos, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
-	checktype(start, vecmeta)
-	checktype(endpos, vecmeta)
+	checktype(start, vec_meta)
+	checktype(endpos, vec_meta)
 
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 	checkvector(start)
@@ -287,10 +286,10 @@ end
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull (start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
-	checktype(start, vecmeta)
-	checktype(endpos, vecmeta)
-	checktype(minbox, vecmeta)
-	checktype(maxbox, vecmeta)
+	checktype(start, vec_meta)
+	checktype(endpos, vec_meta)
+	checktype(minbox, vec_meta)
+	checktype(maxbox, vec_meta)
 
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 	checkvector(start)
@@ -328,12 +327,12 @@ end
 --@return Hit normal or nil if not hit
 --@return Hit fraction or nil if not hit
 function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
-	checktype(rayStart, vecmeta)
-	checktype(rayDelta, vecmeta)
-	checktype(boxOrigin, vecmeta)
+	checktype(rayStart, vec_meta)
+	checktype(rayDelta, vec_meta)
+	checktype(boxOrigin, vec_meta)
 	checktype(boxAngles, angmeta)
-	checktype(boxMins, vecmeta)
-	checktype(boxMaxs, vecmeta)
+	checktype(boxMins, vec_meta)
+	checktype(boxMaxs, vec_meta)
 	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
 	if pos then return vwrap(pos), vwrap(normal), fraction end
 end
@@ -345,10 +344,10 @@ end
 --@param planeNormal The normal of the plane
 --@return Hit position or nil if not hit
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
-	checktype(rayStart, vecmeta)
-	checktype(rayDelta, vecmeta)
-	checktype(planeOrigin, vecmeta)
-	checktype(planeNormal, vecmeta)
+	checktype(rayStart, vec_meta)
+	checktype(rayDelta, vec_meta)
+	checktype(planeOrigin, vec_meta)
+	checktype(planeNormal, vec_meta)
 	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
 	if pos then return vwrap(pos) end
 end
