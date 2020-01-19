@@ -83,92 +83,16 @@
 -- @field TEXT_ALIGN_TOP
 -- @field TEXT_ALIGN_BOTTOM
 
-local render_library = instance:RegisterLibrary("render")
-
-render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
-render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
-render_library.TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
-render_library.TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
-render_library.TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
-
---- Vertex format
--- @name Vertex Format
--- @class table
--- @field x X coordinate
--- @field y Y coordinate
--- @field u U coordinate (optional, default is 0)
--- @field v V coordinate (optional, default is 0)
-
 local render = render
 local surface = surface
 local clamp = math.Clamp
 local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
-local vector_meta, matrix_meta, col_meta, ang_meta, ent_meta, mat_meta, mat_meta2
-local vwrap, cwrap, ewrap, vunwrap, munwrap, aunwrap, eunwrap, maunwrap
-local checktype = instance.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local haspermission = SF.Permissions.hasAccess
 local COLOR_WHITE = Color(255, 255, 255)
-
-instance:AddHook("postload", function()
-	vector_meta = SF.Vectors.Metatable
-	matrix_meta = SF.VMatrix.Metatable
-	col_meta = SF.Color.Metatable
-	ang_meta = SF.Angles.Metatable
-	ent_meta = instance.Types.Entity.Metatable
-	mat_meta = SF.Materials.Metatable
-	mat_meta2 = SF.Materials.LMetatable
-
-	vwrap = SF.Vectors.Wrap
-	cwrap = SF.Color.Wrap
-	ewrap = instance.Types.Entity.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	munwrap = SF.VMatrix.Unwrap
-	aunwrap = SF.Angles.Unwrap
-	eunwrap = instance.Types.Entity.Unwrap
-	maunwrap = SF.Materials.Unwrap
-
-	SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
-		return SF.Permissions.hasAccess(instance, nil, "render.offscreen"), {}
-	end)
-	
-	SF.hookAdd("RenderScene", "renderscene", function(instance)
-		return SF.Permissions.hasAccess(instance, nil, "render.renderscene"), {}
-	end)
-	
-	SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
-		return not drawskybox, {}
-	end)
-	
-	local function canRenderHudSafeArgs(instance, ...)
-		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {...}
-	end
-
-	local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-		return instance:isHUDActive() and SF.Permissions.hasAccess(instance, nil, "render.hud"), {instance.WrapObject(pos), instance.WrapObject(ang), fov, znear, zfar}
-	end
-
-	local function returnCalcview(instance, tbl)
-		local rt = tbl[2]
-		if istable(rt) then
-			rt.origin = instance.UnwrapObject(rt.origin)
-			rt.angles = instance.UnwrapObject(rt.angles)
-			return rt
-		end
-	end
-
-	SF.hookAdd("HUDPaint", "drawhud", canRenderHudSafeArgs)
-	SF.hookAdd("HUDShouldDraw", nil, canRenderHudSafeArgs, function(instance, args)
-		if args[2]==false then return false end
-	end)
-	SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
-	SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
-	SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
-	SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
-	SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
-end)
 
 SF.Permissions.registerPrivilege("render.screen", "Render Screen", "Allows the user to render to a starfall screen", { client = {} })
 SF.Permissions.registerPrivilege("render.hud", "Render Hud", "Allows the user to render to your hud", { client = {} })
@@ -180,8 +104,78 @@ SF.Permissions.registerPrivilege("render.effects", "Render Effects", "Allows the
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
 
+hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
+	for instance, _ in pairs(SF.allInstances) do
+		instance.data.render.renderedViews = 0
+	end
+end)
+
+local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
+	["$nolod"] = 1,
+	["$ignorez"] = 1,
+	["$vertexcolor"] = 1,
+	["$vertexalpha"] = 1
+})
+
+local validfonts = {
+	akbar = "Akbar",
+	coolvetica = "Coolvetica",
+	roboto = "Roboto",
+	["roboto mono"] = "Roboto Mono",
+	["fontawesome"] = "FontAwesome",
+	["courier new"] = "Courier New",
+	verdana = "Verdana",
+	arial = "Arial",
+	halflife2 = "HalfLife2",
+	hl2mp = "hl2mp",
+	csd = "csd",
+	tahoma = "Tahoma",
+	trebuchet = "Trebuchet",
+	["trebuchet ms"] = "Trebuchet MS",
+	["dejavu sans mono"] = "DejaVu Sans Mono",
+	["lucida console"] = "Lucida Console",
+	["times new roman"] = "Times New Roman"
+}
+
+local defined_fonts = {
+	DebugFixed = true,
+	DebugFixedSmall = true,
+	Default = true,
+	Marlett = true,
+	Trebuchet18 = true,
+	Trebuchet24 = true,
+	HudHintTextLarge = true,
+	HudHintTextSmall = true,
+	CenterPrintText = true,
+	HudSelectionText = true,
+	CloseCaption_Normal = true,
+	CloseCaption_Bold = true,
+	CloseCaption_BoldItalic = true,
+	ChatFont = true,
+	TargetID = true,
+	TargetIDSmall = true,
+	HL2MPTypeDeath = true,
+	BudgetLabel = true,
+	HudNumbers = true,
+	DermaDefault = true,
+	DermaDefaultBold = true,
+	DermaLarge = true,
+}
+-- Using an already defined font's name will use its font
+for k, v in pairs(defined_fonts) do
+	validfonts[string.lower(k)] = k
+end
+
+--- Vertex format
+-- @name Vertex Format
+-- @class table
+-- @field x X coordinate
+-- @field y Y coordinate
+-- @field u U coordinate (optional, default is 0)
+-- @field v V coordinate (optional, default is 0)
 
 local currentcolor
+local defaultFont
 local MATRIX_STACK_LIMIT = 8
 local matrix_stack = {}
 local view_matrix_stack = {}
@@ -264,6 +258,73 @@ local renderhooks = {
 	postdrawhud = prepareRender,
 }
 
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+local render_library = instance:RegisterLibrary("render")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local render_library = instance.Libraries.render
+local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+local mtl_meta, mtlwrap, mtlunwrap = instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
+local mtl_meta2 = instance.Types.LockedMaterial
+
+SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
+	return haspermission(instance, nil, "render.offscreen"), {}
+end)
+
+SF.hookAdd("RenderScene", "renderscene", function(instance)
+	return haspermission(instance, nil, "render.renderscene"), {}
+end)
+
+SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
+	return not drawskybox, {}
+end)
+
+local function canRenderHudSafeArgs(instance, ...)
+	return instance:isHUDActive() and haspermission(instance, nil, "render.hud"), {...}
+end
+
+local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
+	return instance:isHUDActive() and haspermission(instance, nil, "render.hud"), {instance.WrapObject(pos), instance.WrapObject(ang), fov, znear, zfar}
+end
+
+local function returnCalcview(instance, tbl)
+	local rt = tbl[2]
+	if istable(rt) then
+		rt.origin = instance.UnwrapObject(rt.origin)
+		rt.angles = instance.UnwrapObject(rt.angles)
+		return rt
+	end
+end
+
+SF.hookAdd("HUDPaint", "drawhud", canRenderHudSafeArgs)
+SF.hookAdd("HUDShouldDraw", nil, canRenderHudSafeArgs, function(instance, args)
+	if args[2]==false then return false end
+end)
+SF.hookAdd("PreDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
+SF.hookAdd("PostDrawOpaqueRenderables", nil, canRenderHudSafeArgs)
+SF.hookAdd("PreDrawHUD", nil, canRenderHudSafeArgs)
+SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
+SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
+
+render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
+render_library.TEXT_ALIGN_CENTER = TEXT_ALIGN_CENTER
+render_library.TEXT_ALIGN_RIGHT = TEXT_ALIGN_RIGHT
+render_library.TEXT_ALIGN_TOP = TEXT_ALIGN_TOP
+render_library.TEXT_ALIGN_BOTTOM = TEXT_ALIGN_BOTTOM
+
 instance:AddHook("prepare", function(hook)
 	local renderPrepare = renderhooks[hook]
 	if renderPrepare then renderPrepare(instance.data.render) end
@@ -334,70 +395,6 @@ instance:AddHook("deinitialize", function ()
 		instance.data.render.validrendertargets[v:GetName()] = nil
 	end
 end)
-
-hook.Add("PreRender", "SF_PreRender_ResetRenderedViews", function()
-	for instance, _ in pairs(SF.allInstances) do
-		instance.data.render.renderedViews = 0
-	end
-end)
-
-local RT_Material = CreateMaterial("SF_RT_Material", "UnlitGeneric", {
-	["$nolod"] = 1,
-	["$ignorez"] = 1,
-	["$vertexcolor"] = 1,
-	["$vertexalpha"] = 1
-})
-
-local validfonts = {
-	akbar = "Akbar",
-	coolvetica = "Coolvetica",
-	roboto = "Roboto",
-	["roboto mono"] = "Roboto Mono",
-	["fontawesome"] = "FontAwesome",
-	["courier new"] = "Courier New",
-	verdana = "Verdana",
-	arial = "Arial",
-	halflife2 = "HalfLife2",
-	hl2mp = "hl2mp",
-	csd = "csd",
-	tahoma = "Tahoma",
-	trebuchet = "Trebuchet",
-	["trebuchet ms"] = "Trebuchet MS",
-	["dejavu sans mono"] = "DejaVu Sans Mono",
-	["lucida console"] = "Lucida Console",
-	["times new roman"] = "Times New Roman"
-}
-
-local defined_fonts = {
-	DebugFixed = true,
-	DebugFixedSmall = true,
-	Default = true,
-	Marlett = true,
-	Trebuchet18 = true,
-	Trebuchet24 = true,
-	HudHintTextLarge = true,
-	HudHintTextSmall = true,
-	CenterPrintText = true,
-	HudSelectionText = true,
-	CloseCaption_Normal = true,
-	CloseCaption_Bold = true,
-	CloseCaption_BoldItalic = true,
-	ChatFont = true,
-	TargetID = true,
-	TargetIDSmall = true,
-	HL2MPTypeDeath = true,
-	BudgetLabel = true,
-	HudNumbers = true,
-	DermaDefault = true,
-	DermaDefaultBold = true,
-	DermaLarge = true,
-}
--- Using an already defined font's name will use its font
-for k, v in pairs(defined_fonts) do
-	validfonts[string.lower(k)] = k
-end
-
-local defaultFont
 
 -- ------------------------------------------------------------------ --
 
@@ -749,9 +746,9 @@ function render_library.setMaterial(mat)
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
 		local t = dgetmeta(mat)
-		if t~=mat_meta and t~=mat_meta2 then SF.ThrowTypeError("Material", SF.GetType(mat), 2) end
+		if t~=mtl_meta and t~=mtl_meta2 then SF.ThrowTypeError("Material", SF.GetType(mat), 2) end
 
-		local m = maunwrap(mat)
+		local m = mtlunwrap(mat)
 		surface.SetMaterial(m)
 		render.SetMaterial(m)
 	else
@@ -764,7 +761,7 @@ end
 local function gettexture(mat)
 
 	local t = dgetmeta(mat)
-	if t ~= mat_meta and t ~= mat_meta2 then
+	if t ~= mtl_meta and t ~= mtl_meta2 then
 		if TypeID(mat) ~= TYPE_STRING then
 			SF.ThrowTypeError("Material or string", SF.GetType(mat), 3)
 		end
@@ -772,7 +769,7 @@ local function gettexture(mat)
 		if not rt then SF.Throw("Invalid Rendertarget", 3) end
 		return rt
 	else
-		return maunwrap(mat):GetTexture("$basetexture")
+		return mtlunwrap(mat):GetTexture("$basetexture")
 	end
 
 end
@@ -2091,3 +2088,5 @@ end
 -- @field y2 Corner of screen in local coordinates (relative to offset?)
 -- @field z Screen plane offset in local coordinates (relative to offset?)
 -- @field rot Screen rotation
+
+end}
