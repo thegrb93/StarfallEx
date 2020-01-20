@@ -1159,64 +1159,32 @@ do
 			error("This shouldn't happen!")
 		end
 	end
-
-	if SERVER then
-		local l
-
-		l = file.Find("starfall/libs_sh/*.lua", "LUA")
+	local function loadModule(folder, clientonly, serveronly)
+		local l = file.Find(folder.."*.lua", "LUA")
 		for _, filename in pairs(l) do
-			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_sh/"..filename)
-			if ok and istable(mod) and mod[1] and mod[2] then
-				addModule(string.StripExtension(filename), mod)
-				AddCSLuaFile("starfall/libs_sh/"..filename)
-			else
-				ErrorNoHalt(mod)
-			end
-		end
-
-		l = file.Find("starfall/libs_sv/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_sv/"..filename)
-			if ok and istable(mod) and mod[1] and mod[2] then
-				addModule(string.StripExtension(filename), mod)
-				AddCSLuaFile("starfall/libs_sv/"..filename)
-			else
-				ErrorNoHalt(mod)
-			end
-		end
-
-		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			AddCSLuaFile("starfall/libs_cl/"..filename)
-		end
-	else
-		local l
-
-		l = file.Find("starfall/libs_sh/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_sh/"..filename)
-			if ok and istable(mod) and mod[1] and mod[2] then
-				addModule(string.StripExtension(filename), mod)
-			else
-				ErrorNoHalt(mod)
-			end
-		end
-
-		l = file.Find("starfall/libs_cl/*.lua", "LUA")
-		for _, filename in pairs(l) do
-			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_cl/"..filename)
-			if ok and istable(mod) and mod[1] and mod[2] then
-				addModule(string.StripExtension(filename), mod)
-			else
-				ErrorNoHalt(mod)
+			local path = folder..filename
+			if SERVER then AddCSLuaFile(path) end
+			if not ((clientonly and SERVER) or (serveronly and CLIENT)) then
+				local ok, mod = xpcall(include, debug.traceback, path)
+				if ok then
+					if istable(mod) and mod[1] and mod[2] then
+						addModule(string.StripExtension(filename), mod)
+					else
+						ErrorNoHalt("[SF] Attempt to load bad module: " .. path)
+					end
+				else
+					ErrorNoHalt(mod)
+				end
 			end
 		end
 	end
 
+	loadModule("starfall/libs_sh/", false, false)
+	loadModule("starfall/libs_sv/", false, true)
+	loadModule("starfall/libs_cl/", true, false)
 	for k, v in pairs(SF.Modules) do
 		SF.Modules[k] = getMergedModule(v)
 	end
-	SF.Permissions.loadPermissionOptions()
 
 	if SERVER then
 		local function sendToClient(name, tbl)
@@ -1282,3 +1250,4 @@ do
 	end
 end
 
+SF.Permissions.loadPermissionOptions()
