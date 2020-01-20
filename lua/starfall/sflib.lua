@@ -1146,17 +1146,6 @@ do
 	end
 
 	if SERVER then
-		local function sendToClient(name, tbl)
-			if #tbl==0 then return end
-			local files = {}
-			for k, path in pairs(tbl) do
-				files[path] = file.Read(path, "LUA")
-			end
-			net.Start("sf_reloadlibrary")
-			net.WriteStarfall({files = files, mainfile = name, proc = Entity(0), owner = Entity(0)})
-			net.Broadcast()
-		end
-
 		-- Command to reload the libraries
 		util.AddNetworkString("sf_reloadlibrary")
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
@@ -1187,7 +1176,15 @@ do
 			if file.Exists(cl_filename, "LUA") then
 				sendToClientTbl[#sendToClientTbl+1] = cl_filename
 			end
-			sendToClient(filename, sendToClientTbl)
+			if #sendToClientTbl>0 then
+				local files = {}
+				for k, path in pairs(sendToClientTbl) do
+					files[path] = file.Read(path, "LUA")
+				end
+				net.Start("sf_reloadlibrary")
+				net.WriteStarfall({files = files, mainfile = filename, proc = Entity(0), owner = Entity(0)})
+				net.Broadcast()
+			end
 		end)
 
 	else
