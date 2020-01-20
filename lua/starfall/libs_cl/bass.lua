@@ -70,16 +70,17 @@ function bass_library.loadFile (path, flags, callback)
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
-	plyCount:checkuse(instance.player, 1)
+	plyCount:use(instance.player, 1)
 
 	sound.PlayFile(path, flags, function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
+			if instance.player:IsValid() then plyCount:free(instance.player, 1) end
 		else
 			if instance.error or not instance.player:IsValid() then
 				snd:Stop()
+				if instance.player:IsValid() then plyCount:free(instance.player, 1) end
 			else
-				plyCount:free(instance.player, -1)
 				instance.data.bass.sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
@@ -104,17 +105,18 @@ function bass_library.loadURL (path, flags, callback)
 		checkpermission(instance, nil, "bass.play2D")
 	end
 
-	plyCount:checkuse(instance.player, 1)
+	plyCount:use(instance.player, 1)
 
 	SF.HTTPNotify(instance.player, path)
 	sound.PlayURL(path, flags, function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
+			if instance.player:IsValid() then plyCount:free(instance.player, 1) end
 		else
 			if instance.error or not instance.player:IsValid() then
 				snd:Stop()
+				if instance.player:IsValid() then plyCount:free(instance.player, 1) end
 			else
-				plyCount:free(instance.player, -1)
 				instance.data.bass.sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
 			end
