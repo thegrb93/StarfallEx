@@ -82,7 +82,10 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
 	end
 
-	instance:BuildEnvironment()
+	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
+	if not ok then
+		return false, { message = "", traceback = err }
+	end
 
 	for filename, source in pairs(code) do
 		if not dontpreprocess then
