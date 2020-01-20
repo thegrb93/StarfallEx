@@ -3,4 +3,6 @@ list.Set("Starfall_gate_Models", "models/spacecode/sfchip.mdl", true)
 list.Set("Starfall_gate_Models", "models/spacecode/sfchip_medium.mdl", true)
 list.Set("Starfall_gate_Models", "models/spacecode/sfchip_small.mdl", true)
 
+SF = {}
+
 include("starfall/SFLib.lua")

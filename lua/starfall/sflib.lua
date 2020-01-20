@@ -1,38 +1,8 @@
 -------------------------------------------------------------------------------
 -- The main Starfall library
 -------------------------------------------------------------------------------
-SF = SF or {}
 SF.Modules = {}
-
 local dgetmeta = debug.getmetatable
-
--------------------------------------------------------------------------------
--- Some basic initialization
--------------------------------------------------------------------------------
-
-if SERVER then
-	SF.Version = "StarfallEx"
-	local files, directories = file.Find( "addons/*", "GAME" )
-	local sf_dir = nil
-	for k,v in pairs(directories) do
-		if file.Exists("addons/"..v.."/lua/starfall/sflib.lua", "GAME") then
-			sf_dir = "addons/"..v.."/"
-			break
-		end
-	end
-	if sf_dir then
-		local head = file.Read(sf_dir..".git/HEAD","GAME") -- Where head points to
-		if head then
-			head = head:sub(6,-2) -- skipping ref: and new line
-			local lastCommit = file.Read( sf_dir..".git/"..head, "GAME")
-
-			if lastCommit then
-				SF.Version = SF.Version .. "_" .. lastCommit:sub(1,7) -- We need only first 7 to be safely unique
-			end
-		end
-	end
-	SetGlobalString("SF.Version", SF.Version)
-end
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
@@ -1122,17 +1092,6 @@ end
 -- Includes
 -------------------------------------------------------------------------------
 
-if SERVER then
-	AddCSLuaFile("sflib.lua")
-	AddCSLuaFile("instance.lua")
-	AddCSLuaFile("preprocessor.lua")
-	AddCSLuaFile("permissions/core.lua")
-	AddCSLuaFile("netstream.lua")
-	AddCSLuaFile("transfer.lua")
-
-	AddCSLuaFile("editor/editor.lua")
-end
-
 include("instance.lua")
 include("preprocessor.lua")
 include("permissions/core.lua")
@@ -1246,7 +1205,6 @@ do
 				end
 			end)
 		end)
-
 	end
 end
 
