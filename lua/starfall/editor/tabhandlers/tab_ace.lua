@@ -116,6 +116,8 @@ end
 local function createLibraryMap ()
 	local libMap, libs = {}, {}
 	local libsLookup = {}
+	
+	libMap.Environment = {}
 
 	for lib, tbl in pairs(SF.Docs.classes) do
 		if not isstring(lib) then continue end

@@ -414,7 +414,7 @@ function EDITOR:SyntaxColorLine(row)
 				tokenname = "storageType"
 			elseif keywords[sstr][keyword] then
 				tokenname = "keyword"
-			--[[elseif libmap["Environment"][sstr] then -- We Environment /constant
+			elseif libmap["Environment"][sstr] then -- We Environment /constant
 				local val = libmap["Environment"][sstr]
 				if istable(val) then
 					addToken("constant", self.tokendata)
@@ -443,7 +443,7 @@ function EDITOR:SyntaxColorLine(row)
 					else
 						tokenname = "constant"
 					end
-				end]]
+				end
 			elseif libmap[sstr] then --We found library
 				addToken("library", self.tokendata)
 				self.tokendata = ""

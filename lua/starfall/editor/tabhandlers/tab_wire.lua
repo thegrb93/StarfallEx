@@ -109,6 +109,7 @@ end
 local function createWireLibraryMap()
 	local libMap = {}
 	libMap.Methods = {}
+	libMap.Environment = {}
 
 	for lib, tbl in pairs(SF.Docs.classes) do
 		if not isstring(lib) then continue end
