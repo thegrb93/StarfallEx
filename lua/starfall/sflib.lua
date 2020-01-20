@@ -1165,14 +1165,24 @@ do
 
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			addModule(string.StripExtension(filename), include("starfall/libs_sh/"..filename))
-			AddCSLuaFile("starfall/libs_sh/"..filename)
+			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_sh/"..filename)
+			if ok and istable(mod) and mod[1] and mod[2] then
+				addModule(string.StripExtension(filename), mod)
+				AddCSLuaFile("starfall/libs_sh/"..filename)
+			else
+				ErrorNoHalt(mod)
+			end
 		end
 
 		l = file.Find("starfall/libs_sv/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			addModule(string.StripExtension(filename), include("starfall/libs_sv/"..filename))
-			AddCSLuaFile("starfall/libs_sv/"..filename)
+			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_sv/"..filename)
+			if ok and istable(mod) and mod[1] and mod[2] then
+				addModule(string.StripExtension(filename), mod)
+				AddCSLuaFile("starfall/libs_sv/"..filename)
+			else
+				ErrorNoHalt(mod)
+			end
 		end
 
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
@@ -1184,12 +1194,22 @@ do
 
 		l = file.Find("starfall/libs_sh/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			addModule(string.StripExtension(filename), include("starfall/libs_sh/"..filename))
+			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_sh/"..filename)
+			if ok and istable(mod) and mod[1] and mod[2] then
+				addModule(string.StripExtension(filename), mod)
+			else
+				ErrorNoHalt(mod)
+			end
 		end
 
 		l = file.Find("starfall/libs_cl/*.lua", "LUA")
 		for _, filename in pairs(l) do
-			addModule(string.StripExtension(filename), include("starfall/libs_cl/"..filename))
+			local ok, mod = xpcall(include, debug.traceback, "starfall/libs_cl/"..filename)
+			if ok and istable(mod) and mod[1] and mod[2] then
+				addModule(string.StripExtension(filename), mod)
+			else
+				ErrorNoHalt(mod)
+			end
 		end
 	end
 
@@ -1236,7 +1256,6 @@ do
 				end
 
 				SF.Modules[filename] = getMergedModule(SF.Modules[filename])
-				xpcall(SF.Modules[filename][1], debug.traceback)
 			end
 			if file.Exists(cl_filename, "LUA") then
 				sendToClientTbl[#sendToClientTbl+1] = cl_filename
