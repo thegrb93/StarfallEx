@@ -1163,7 +1163,7 @@ do
 		local l = file.Find(folder.."*.lua", "LUA")
 		for _, filename in pairs(l) do
 			local path = folder..filename
-			if SERVER then AddCSLuaFile(path) end
+			if SERVER and not serveronly then AddCSLuaFile(path) end
 			if not ((clientonly and SERVER) or (serveronly and CLIENT)) then
 				local ok, mod = xpcall(include, debug.traceback, path)
 				if ok then
