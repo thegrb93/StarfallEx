@@ -49,6 +49,7 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local cunwrap = instance.Types.Color.Unwrap
 
 
 
@@ -723,7 +724,7 @@ function ents_methods:setTrails(startSize, endSize, length, material, color, att
 	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	local Data = {
-		Color = instance.Types.Color.Unwrap(color),
+		Color = cunwrap(color),
 		Length = length,
 		StartSize = math.Clamp(startSize, 0, 128),
 		EndSize = math.Clamp(endSize, 0, 128),

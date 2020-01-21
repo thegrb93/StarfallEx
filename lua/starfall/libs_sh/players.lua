@@ -28,6 +28,8 @@ local checktype = instance.CheckType
 local player_methods, player_meta = instance.Types.Player.Methods, instance.Types.Player
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
+local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 
 instance:ApplyTypeDependencies(player_methods, player_meta, ent_meta)
 local wrap, unwrap = instance:CreateWrapper(player_meta, false, true, debug.getregistry().Player, ent_meta)
@@ -139,7 +141,7 @@ end
 function player_methods:getActiveWeapon()
 	checktype(self, player_meta)
 	local ent = unwrap(self)
-	return ent and instance.Types.Weapon.Wrap(ent:GetActiveWeapon())
+	return ent and wwrap(ent:GetActiveWeapon())
 end
 
 --- Returns the player's aim vector
@@ -148,7 +150,7 @@ end
 function player_methods:getAimVector()
 	checktype(self, player_meta)
 	local ent = unwrap(self)
-	return ent and owrap(ent:GetAimVector())
+	return ent and vwrap(ent:GetAimVector())
 end
 
 --- Returns the player's field of view
@@ -203,7 +205,7 @@ end
 function player_methods:getShootPos()
 	checktype(self, player_meta)
 	local ent = unwrap(self)
-	return ent and owrap(ent:GetShootPos())
+	return ent and vwrap(ent:GetShootPos())
 end
 
 --- Returns whether the player is in a vehicle
@@ -222,7 +224,7 @@ function player_methods:getVehicle()
 	checktype(self, player_meta)
 	local ent = unwrap(self)
 	if not (ent and ent:IsValid()) then return end
-	return instance.Types.Vehicle.Wrap(ent:GetVehicle())
+	return vhwrap(ent:GetVehicle())
 end
 
 --- Returns whether the player is an admin
@@ -393,7 +395,7 @@ end
 function player_methods:getWeapon(wep)
 	checktype(self, player_meta)
 	checkluatype(wep, TYPE_STRING)
-	return instance.Types.Weapon.Wrap(unwrap(self):GetWeapon(wep))
+	return wwrap(unwrap(self):GetWeapon(wep))
 end
 
 --- Returns the entity that the player is standing on

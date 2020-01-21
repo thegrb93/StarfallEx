@@ -222,7 +222,7 @@ function bass_methods:setPos (pos)
 	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
-		uw:SetPos(instance.UnwrapObject(pos))
+		uw:SetPos(vunwrap(pos))
 	end
 end
 

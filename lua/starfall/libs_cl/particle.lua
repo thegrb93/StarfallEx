@@ -50,6 +50,7 @@ local checktype = instance.CheckType
 local particle_meta, wrap, unwrap = instance.Types.Particle, instance.Types.Particle.Wrap, instance.Types.Particle.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 
 -- Add PATTACH enum
@@ -84,12 +85,11 @@ end
 function particle_library.attach (entity, particle, pattach, options)
 	checkpermission (instance.player, entity, "particle.attach")
 
-	checktype(entity, ent_meta)
 	checkluatype (particle, TYPE_STRING)
 	checkluatype (pattach, TYPE_NUMBER)
 	checkluatype (options, TYPE_TABLE)
 
-	local entity = eunwrap(entity)
+	local entity = getent(entity)
 
 	if badParticle(particle) then
 		SF.Throw("Invalid particle path: " .. particle, 2)
@@ -223,10 +223,9 @@ end
 function particle_methods:setControlPointEntity(id,entity)
 	checktype(self, particle_meta)
 	local uw = unwrap(self)
-	local entity = eunwrap(entity)
+	local entity = getent(entity)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(entity, ent_meta)
 
 	checkValid(uw)
 

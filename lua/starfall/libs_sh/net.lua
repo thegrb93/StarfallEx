@@ -18,7 +18,7 @@ net.Receive("SF_netmessage", function(len, ply)
 		if instance and instance.runScriptHook then
 			local name = net.ReadString()
 			len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
-			if ply then ply = instance.WrapObject(ply) end
+			if ply then ply = instance.Types.Player.Wrap(ply) end
 
 			local recv = instance.data.net.receives[name]
 			if recv then
@@ -58,7 +58,12 @@ end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local net_library = instance.Libraries.net
-
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 local function write(func, size, ...)
 	instance.data.net.size = instance.data.net.size + size
@@ -83,7 +88,7 @@ end
 --@shared
 --@param target Optional target location to send the net message.
 --@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
-function net_library.send (target, unreliable)
+function net_library.send(target, unreliable)
 	if unreliable then checkluatype (unreliable, TYPE_BOOL) end
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -104,14 +109,14 @@ function net_library.send (target, unreliable)
 			if target[1] then
 				local nt = { }
 				for i = 1, #target do
-					local pl = instance.Types.Entity.Unwrap(target[i])
+					local pl = eunwrap(target[i])
 					if pl and pl:IsValid() and pl:IsPlayer() then
 						nt[#nt + 1] = pl
 					end
 				end
 				sendfunc, newtarget = net.Send, nt
 			else
-				sendfunc, newtarget = net.Send, instance.Types.Entity.Unwrap(target)
+				sendfunc, newtarget = net.Send, eunwrap(target)
 				if not (newtarget and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
 			end
 		else
@@ -449,9 +454,9 @@ end
 function net_library.writeAngle(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, instance.Types.Angle)
+	checktype(t, ang_meta)
 
-	write(net.WriteAngle, 54, instance.Types.Angle.Unwrap(t))
+	write(net.WriteAngle, 54, aunwrap(t))
 	return true
 end
 
@@ -460,7 +465,7 @@ end
 -- @return The angle that was read
 
 function net_library.readAngle()
-	return instance.Types.Angle.Wrap(net.ReadAngle())
+	return awrap(net.ReadAngle())
 end
 
 --- Writes an vector to the net message. Has significantly lower precision than writeFloat
@@ -470,9 +475,9 @@ end
 function net_library.writeVector(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, instance.Types.Vector)
+	checktype(t, vec_meta)
 
-	write(net.WriteVector, 54, instance.Types.Vector.Unwrap(t))
+	write(net.WriteVector, 54, vunwrap(t))
 	return true
 end
 
@@ -481,7 +486,7 @@ end
 -- @return The vector that was read
 
 function net_library.readVector()
-	return instance.Types.Vector.Wrap(net.ReadVector())
+	return vwrap(net.ReadVector())
 end
 
 --- Writes an matrix to the net message
@@ -491,9 +496,9 @@ end
 function net_library.writeMatrix(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, instance.Types.VMatrix)
+	checktype(t, mtx_meta)
 
-	write(net.WriteMatrix, 64*8, instance.Types.VMatrix.Unwrap(t))
+	write(net.WriteMatrix, 64*8, munwrap(t))
 	return true
 end
 
@@ -502,7 +507,7 @@ end
 -- @return The matrix that was read
 
 function net_library.readMatrix()
-	return instance.Types.VMatrix.Wrap(net.ReadMatrix())
+	return mwrap(net.ReadMatrix())
 end
 
 --- Writes an color to the net message
@@ -512,9 +517,9 @@ end
 function net_library.writeColor(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, instance.Types.Color)
+	checktype(t, col_meta)
 
-	write(net.WriteColor, 4*8, instance.Types.Color.Unwrap(t))
+	write(net.WriteColor, 4*8, cunwrap(t))
 	return true
 end
 
@@ -523,7 +528,7 @@ end
 -- @return The color that was read
 
 function net_library.readColor()
-	return instance.Types.Color.Wrap(net.ReadColor())
+	return cwrap(net.ReadColor())
 end
 
 --- Writes an entity to the net message
@@ -532,10 +537,7 @@ end
 
 function net_library.writeEntity(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-
-	checktype(t, instance.Types.Entity)
-
-	write(net.WriteEntity, 2*8, instance.Types.Entity.Unwrap(t))
+	write(net.WriteEntity, 2*8, getent(t))
 	return true
 end
 

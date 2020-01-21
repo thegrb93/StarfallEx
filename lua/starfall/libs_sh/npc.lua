@@ -173,7 +173,7 @@ if SERVER then
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
-		npc:SetLastPosition(ounwrap(vec))
+		npc:SetLastPosition(vunwrap(vec))
 		npc:SetSchedule(SCHED_FORCED_GO)
 	end
 
@@ -185,7 +185,7 @@ if SERVER then
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
-		npc:SetLastPosition(ounwrap(vec))
+		npc:SetLastPosition(vunwrap(vec))
 		npc:SetSchedule(SCHED_FORCED_GO_RUN)
 	end
 end

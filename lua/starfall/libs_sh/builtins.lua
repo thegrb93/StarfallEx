@@ -567,7 +567,7 @@ local function argsToChat(...)
 	for i = 1, n do
 		local val = input[i]
 		local add
-		if dgetmeta(val) == instance.Types.Color then
+		if dgetmeta(val) == col_meta then
 			color = true
 			add = Color(val[1], val[2], val[3])
 		else

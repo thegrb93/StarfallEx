@@ -36,6 +36,7 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 --- Creates an effect data structure
 -- @return Effect Object
@@ -219,8 +220,7 @@ end
 -- @param ent The entity
 function effect_methods:setEntity(ent)
 	checktype(self, effect_meta)
-	checktype(ent, ent_meta)
-	unwrap(self):SetEntity(eunwrap(ent))
+	unwrap(self):SetEntity(getent(ent))
 end
 
 --- Sets the effect's flags

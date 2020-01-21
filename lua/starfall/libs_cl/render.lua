@@ -184,14 +184,14 @@ local function canRenderHudSafeArgs(instance, ...)
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return instance:isHUDActive() and haspermission(instance, nil, "render.hud"), {instance.WrapObject(pos), instance.WrapObject(ang), fov, znear, zfar}
+	return instance:isHUDActive() and haspermission(instance, nil, "render.hud"), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
 
 local function returnCalcview(instance, tbl)
 	local rt = tbl[2]
 	if istable(rt) then
-		rt.origin = instance.UnwrapObject(rt.origin)
-		rt.angles = instance.UnwrapObject(rt.angles)
+		rt.origin = instance.Types.Vector.Unwrap(rt.origin)
+		rt.angles = instance.Types.Angle.Unwrap(rt.angles)
 		return rt
 	end
 end
@@ -221,7 +221,6 @@ end, function(instance) -- Called for library definitions
 
 local render_library = instance.Libraries.render
 local checktype = instance.CheckType
-local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -229,6 +228,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local mtl_meta, mtlwrap, mtlunwrap = instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
 local mtl_meta2 = instance.Types.LockedMaterial
+local getent = instance.Types.Entity.GetEntity
 
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
@@ -578,8 +578,7 @@ function render_library.setBackgroundColor(col, screen)
 	checktype(col, col_meta)
 
 	if screen then
-		checktype(screen, ent_meta)
-		screen = eunwrap(screen)
+		screen = getent(screen)
 		if screen.link ~= instance.data.entity then
 			SF.Throw("Entity has to be linked!", 2)
 		end
@@ -960,8 +959,8 @@ end
 function render_library.setTextureFromScreen (ent)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
-	ent = eunwrap(ent)
-	if (ent and ent:IsValid()) and ent.GPU and ent.GPU.RT then
+	ent = getent(ent)
+	if ent.GPU and ent.GPU.RT then
 		RT_Material:SetTexture("$basetexture", ent.GPU.RT)
 		surface.SetMaterial(RT_Material)
 		render.SetMaterial(RT_Material)
@@ -1632,15 +1631,14 @@ end
 -- @return y position
 function render_library.cursorPos(ply, screen)
 	if ply~=nil then
-		checktype(ply, ent_meta)
-		ply = eunwrap(ply)
-		if not (ply and ply:IsValid() and ply:IsPlayer()) then SF.Throw("Invalid player", 2) end
+		ply = getent(ply)
+		if not ply:IsPlayer() then SF.Throw("Entity isn't a player", 2) end
 	else
 		ply = LocalPlayer()
 	end
 	
-	if screen~=nil then checktype(screen, ent_meta) screen = eunwrap(screen) else screen = instance.data.render.renderEnt end
-	if not (screen and screen:IsValid() and screen.Transform) then SF.Throw("Invalid screen", 2) end
+	if screen~=nil then screen = getent(screen) else screen = instance.data.render.renderEnt end
+	if not screen.Transform then SF.Throw("Invalid screen", 2) end
 
 	local Normal, Pos
 	-- Get monitor screen pos & size
@@ -1675,10 +1673,9 @@ end
 -- @param e The screen to get info from.
 -- @return A table describing the screen.
 function render_library.getScreenInfo(e)
-	local screen = eunwrap(e)
-	if screen then
-		return instance.Sanitize(screen.ScreenInfo)
-	end
+	local screen = getent(e)
+	if not screen.ScreenInfo then SF.Throw("Invalid screen", 2) end
+	return instance.Sanitize(screen.ScreenInfo)
 end
 
 --- Returns the entity currently being rendered to

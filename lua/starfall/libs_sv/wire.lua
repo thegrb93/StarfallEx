@@ -72,18 +72,20 @@ local wire_library = instance.Libraries.wire
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
+local getent = instance.Types.Entity.GetEntity
 
 --- Returns an entities wirelink
 -- @name Entity.getWirelink
 -- @class function
 -- @return Wirelink of the entity
-instance.Types.Entity.Methods.getWirelink = wire_library.getWirelink
+ents_methods.getWirelink = wire_library.getWirelink
 
 local function identity(data) return data end
 local typeToE2Type = {
@@ -172,8 +174,7 @@ local outputConverters =
 		return aunwrap(data)
 	end,
 	ENTITY = function(data)
-		checktype(data, ent_meta, 2)
-		return eunwrap(data)
+		return getent(data)
 	end,
 	TABLE = function(data)
 		checkluatype(data, TYPE_TABLE, 2)
@@ -378,13 +379,10 @@ end
 --- Unwires an entity's input
 -- @param entI Entity with input
 -- @param inputname Input to be un-wired
-function wire_library.delete (entI, inputname)
-	checktype(entI, ent_meta)
+function wire_library.delete(entI, inputname)
 	checkluatype(inputname, TYPE_STRING)
 
-	local entI = eunwrap(entI)
-
-	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
+	local entI = getent(entI)
 
 	checkpermission(instance, entI, "wire.deleteWire")
 

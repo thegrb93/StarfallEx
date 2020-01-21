@@ -197,7 +197,7 @@ function ang_methods:rotateAroundAxis (v, deg, rad)
 	local ret = Angle()
 
 	ret:Set(unwrap(self))
-	ret:RotateAroundAxis(instance.UnwrapObject(v), deg)
+	ret:RotateAroundAxis(vunwrap(v), deg)
 
 	return awrap(ret)
 end

@@ -11,6 +11,7 @@ end, function(instance) -- Called for library definitions
 
 
 local game_lib = instance.Libraries.game
+local vwrap = instance.Types.Vector.Wrap
 
 --- Returns the map name
 -- @name game_lib.getMap
@@ -62,7 +63,7 @@ if CLIENT then
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_lib.getSunInfo()
 		local info = util.GetSunInfo()
-		return instance.Types.Vector.Wrap(info.direction), info.obstruction
+		return vwrap(info.direction), info.obstruction
 	end
 end
 

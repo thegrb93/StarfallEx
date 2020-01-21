@@ -28,6 +28,7 @@ local vehicle_methods, vehicle_meta = instance.Types.Vehicle.Methods, instance.T
 
 instance:ApplyTypeDependencies(vehicle_methods, vehicle_meta, instance.Types.Entity)
 local wrap, unwrap = instance:CreateWrapper(vehicle_meta, false, true, debug.getregistry().Vehicle, instance.Types.Entity)
+local pwrap = instance.Types.Player.Wrap
 
 
 --- To string
@@ -46,7 +47,7 @@ if SERVER then
 		checktype(self, vehicle_meta)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		return instance.Types.Player.Wrap(ent:GetDriver())
+		return pwrap(ent:GetDriver())
 	end
 
 	--- Ejects the driver of the vehicle
@@ -70,7 +71,7 @@ if SERVER then
 		checkluatype(n, TYPE_NUMBER)
 		local ent = unwrap(self)
 		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		return instance.Types.Player.Wrap(ent:GetPassenger(n))
+		return pwrap(ent:GetPassenger(n))
 	end
 
 	--- Kills the driver of the vehicle

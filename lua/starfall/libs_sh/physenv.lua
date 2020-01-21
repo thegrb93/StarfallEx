@@ -11,6 +11,7 @@ end, function(instance) -- Called for library definitions
 
 
 local physenv_lib = instance.Libraries.physenv
+local vwrap = instance.Types.Vector.Wrap
 
 --- Gets the air density.
 -- @return number Air Density
@@ -21,7 +22,7 @@ end
 --- Gets the gravity vector
 -- @return Vector Gravity Vector ( eg Vector(0,0,-600) )
 function physenv_lib.getGravity ()
-	return instance.WrapObject(physenv.GetGravity())
+	return vwrap(physenv.GetGravity())
 end
 
 --- Gets the performance settings.</br>

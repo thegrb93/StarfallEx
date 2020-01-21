@@ -131,7 +131,8 @@ end, function(instance) -- Called for library definitions
 
 
 local input_library = instance.Libraries.input
-
+local vwrap = instance.Types.Vector.Wrap
+local getent = instance.Types.Entity.GetEntity
 
 --- Gets the first key that is bound to the command passed
 -- @client
@@ -222,7 +223,7 @@ function input_library.screenToVector(x, y)
 	SF.Permissions.check(instance, nil, "input")
 	SF.CheckLuaType(x, TYPE_NUMBER)
 	SF.CheckLuaType(y, TYPE_NUMBER)
-	return instance.WrapObject(gui.ScreenToVector(x, y))
+	return vwrap(gui.ScreenToVector(x, y))
 end
 
 --- Sets the state of the mouse cursor
@@ -244,7 +245,7 @@ end
 -- @client
 -- @param weapon The weapon entity to select
 function input_library.selectWeapon(weapon)
-	local ent = instance.Types.Entity.GetEntity(weapon)
+	local ent = getent(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
 	SF.Permissions.check(instance, nil, "input.emulate")
 	input.SelectWeapon( ent ) 

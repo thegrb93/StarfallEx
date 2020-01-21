@@ -107,7 +107,8 @@ end, function(instance) -- Called for library definitions
 local checktype = instance.CheckType
 local hook_library = instance.Libraries.hook
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-
+local getent = instance.Types.Entity.GetEntity
+local pwrap = instance.Types.Player.Wrap
 
 --- Sets a hook function
 -- @param hookname Name of the event
@@ -167,11 +168,9 @@ local hookrun = hook_library.run
 -- @param ... Payload. These parameters will be used to call the hook functions
 -- @return tbl A list of the resultset of each called hook
 function hook_library.runRemote (recipient, ...)
-	if recipient then checktype(recipient, ent_meta) end
-
 	local recipients
 	if recipient then
-		local ent = instance.Types.Entity.Unwrap(recipient)
+		local ent = getent(recipient)
 		if not ent.instance then SF.Throw("Entity has no starfall instance", 2) end
 		recipients = {
 			[ent.instance] = true
@@ -185,7 +184,7 @@ function hook_library.runRemote (recipient, ...)
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
-			result = { true, hookrun("remote", ewrap(instance.data.entity), instance.Types.Player.Wrap(instance.player), ...) }
+			result = { true, hookrun("remote", ewrap(instance.data.entity), pwrap(instance.player), ...) }
 		else
 			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.data.entity), k.Types.Player.Wrap(instance.player), k.Sanitize(instance.Unsanitize(...)))
 		end

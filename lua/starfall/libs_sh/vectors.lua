@@ -379,7 +379,7 @@ end
 -- @param b Angle to rotate by.
 -- @return nil.
 function vec_methods:rotate (b)
-	checktype(b, instance.Types.Angle)
+	checktype(b, ang_meta)
 
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -393,7 +393,7 @@ end
 -- @param b Angle to rotate by.
 -- @return Rotated Vector
 function vec_methods:getRotated (b)
-	checktype(b, instance.Types.Angle)
+	checktype(b, ang_meta)
 
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))

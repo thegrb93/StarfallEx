@@ -54,6 +54,7 @@ local quat_methods, quat_meta = instance.Types.Quaternion.Methods, instance.Type
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 
 --****************************** Helper functions ******************************--
@@ -163,11 +164,7 @@ end
 
 --- Converts an Entity to a Quaternion format for generation
 argTypesToQuat["Entity"] = function(ent)
-	ent = eunwrap(ent)
-
-	if not (ent and ent:IsValid()) then
-		return quicknew(0, 0, 0, 0)
-	end
+	ent = getent(ent)
 
 	local ang = ent:GetAngles()
 	local p, y, r = ang.p, ang.y, ang.r

@@ -56,6 +56,7 @@ local constraint_library = instance.Libraries.constraint
 local checktype = instance.CheckType
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 local function checkConstraint(e, t)
 	if e then
@@ -371,12 +372,9 @@ end
 --- Sets the length of a rope attached to the entity
 -- @server
 function constraint_library.setRopeLength(index, e, length)
-	checktype(e, ent_meta)
-	local ent1 = eunwrap(e)
+	local ent1 = getent(e)
 
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(instance, ent1, "constraints.rope")
-
 
 	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
@@ -393,10 +391,8 @@ end
 --- Sets the length of an elastic attached to the entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
-	checktype(e, ent_meta)
-	local ent1 = eunwrap(e)
+	local ent1 = getent(e)
 
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(instance, ent1, "constraints.elastic")
 
 	checkluatype(length, TYPE_NUMBER)
@@ -413,10 +409,7 @@ end
 --- Breaks all constraints on an entity
 -- @server
 function constraint_library.breakAll(e)
-	checktype(e, ent_meta)
-	local ent1 = eunwrap(e)
-
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
+	local ent1 = getent(e)
 	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
@@ -425,12 +418,10 @@ end
 --- Breaks all constraints of a certain type on an entity
 -- @server
 function constraint_library.breakType(e, typename)
-	checktype(e, ent_meta)
 	checkluatype(typename, TYPE_STRING)
 
-	local ent1 = eunwrap(e)
+	local ent1 = getent(e)
 
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
 	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveConstraints(ent1, typename)
@@ -441,13 +432,7 @@ end
 -- @param ent The entity
 -- @return Table of entity constraints
 function constraint_library.getTable(ent)
-	checktype(ent, ent_meta)
-
-	ent = eunwrap(ent)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-
-	return instance.Sanitize(constraint.GetTable(ent))
+	return instance.Sanitize(constraint.GetTable(getent(ent)))
 end
 
 --- Sets whether the chip should remove created constraints when the chip is removed

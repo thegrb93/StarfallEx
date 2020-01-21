@@ -55,6 +55,8 @@ end, function(instance) -- Called for library definitions
 local checktype = instance.CheckType
 local sound_library = instance.Libraries.sounds
 local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, instance.Types.Sound, instance.Types.Sound.Wrap, instance.Types.Sound.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 
 --- Creates a sound and attaches it to an entity
@@ -63,7 +65,6 @@ local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, in
 -- @param nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 -- @return Sound Object
 function sound_library.create(ent, path, nofilter)
-	checktype(ent, instance.Types.Entity)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
 
@@ -73,10 +74,7 @@ function sound_library.create(ent, path, nofilter)
 		SF.Throw("Invalid sound path: " .. path, 2)
 	end
 
-	local e = instance.UnwrapObject(ent)
-	if not (e or e:IsValid()) then
-		SF.Throw("Invalid Entity", 2)
-	end
+	local e = getent(ent)
 
 	plySoundBurst:use(instance.player, 1)
 	plyCount:use(instance.player, 1)
