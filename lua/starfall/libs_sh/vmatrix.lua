@@ -9,8 +9,7 @@ return { function(instance) -- Called for library declarations
 
 
 --- VMatrix type
-local vmatrix_methods, vmatrix_meta = instance:RegisterType("VMatrix")
-local wrap, unwrap = instance:CreateWrapper(vmatrix_meta, true, false, debug.getregistry().VMatrix)
+local vmatrix_methods, vmatrix_meta = instance:RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
 
 end, function(instance) -- Called for library definitions

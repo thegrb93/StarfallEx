@@ -191,10 +191,8 @@ return { function(instance) -- Called for library declarations
 --- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
 --- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
 -- @client
-local material_methods, material_meta = instance:RegisterType("Material")
-local lmaterial_methods, lmaterial_meta = instance:RegisterType("LockedMaterial") --Material that can't be modified
-local wrap, unwrap = instance:CreateWrapper(material_meta, true, false)
-local lwrap, lunwrap = instance:CreateWrapper(lmaterial_meta, true, false, nil, material_meta)
+local material_methods, material_meta = instance:RegisterType("Material", true, false)
+local lmaterial_methods, lmaterial_meta = instance:RegisterType("LockedMaterial", true, false, nil, "Material") --Material that can't be modified
 
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
@@ -213,6 +211,9 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
+-- We don't want locked material able to access unlocked material methods
+lmaterial_meta.__index = lmaterial_methods
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()

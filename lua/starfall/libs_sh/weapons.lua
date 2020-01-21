@@ -8,16 +8,14 @@ return { function(instance) -- Called for library declarations
 
 
 --- Weapon type
-local weapon_methods, weapon_meta = instance:RegisterType("Weapon")
+local weapon_methods, weapon_meta = instance:RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
 
 
 end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
-local weapon_methods, weapon_meta = instance.Types.Weapon.Methods, instance.Types.Weapon
-instance:ApplyTypeDependencies(weapon_methods, weapon_meta, instance.Types.Entity)
-local wrap, unwrap = instance:CreateWrapper(weapon_meta, false, true, debug.getregistry().Weapon, instance.Types.Entity)
+local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 
 
 --- To string

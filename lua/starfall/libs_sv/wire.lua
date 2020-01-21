@@ -22,8 +22,7 @@ local wire_library = instance:RegisterLibrary("wire")
 
 --- Wirelink type
 -- @server
-local wirelink_methods, wirelink_meta = instance:RegisterType("Wirelink")
-local wlwrap, wlunwrap = instance:CreateWrapper(wirelink_meta, false, true)
+local wirelink_methods, wirelink_meta = instance:RegisterType("Wirelink", false, true)
 
 instance:AddHook("initialize", function()
 	local ent = instance.data.entity

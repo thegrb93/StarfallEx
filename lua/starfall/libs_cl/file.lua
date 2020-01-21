@@ -23,8 +23,7 @@ local file_library = instance:RegisterLibrary("file")
 
 --- File type
 -- @client
-local file_methods, file_meta = instance:RegisterType("File")
-local wrap, unwrap = instance:CreateWrapper(file_meta, true, false)
+local file_methods, file_meta = instance:RegisterType("File", true, false)
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()

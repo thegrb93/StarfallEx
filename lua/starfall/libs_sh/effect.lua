@@ -22,8 +22,7 @@ local effect_library = instance:RegisterLibrary("effect")
 
 --- Effect type
 -- @shared
-local effect_methods, effect_meta = instance:RegisterType("Effect")
-local wrap, unwrap = instance:CreateWrapper(effect_meta, true, false)
+local effect_methods, effect_meta = instance:RegisterType("Effect", true, false)
 
 
 end, function(instance) -- Called for library definitions

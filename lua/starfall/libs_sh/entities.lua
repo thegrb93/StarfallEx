@@ -16,8 +16,10 @@ local checktype = instance.CheckType
 
 --- Entity type
 -- @shared
-local ents_methods, ent_meta = instance:RegisterType("Entity")
-local ewrap, eunwrap = instance:CreateWrapper(ent_meta, false, true, debug.getregistry().Entity)
+local ents_methods, ent_meta = instance:RegisterType("Entity", false, true, debug.getregistry().Entity)
+
+-- Create our wrapper the old fasioned way since getent needs it. We don't derive anything so should be fine
+local ewrap, eunwrap = instance:CreateWrapper(ent_meta)
 
 local function getent(self)
 	local ent = eunwrap(self)

@@ -8,7 +8,7 @@ return { function(instance) -- Called for library declarations
 
 
 --- Player type
-local player_methods, player_meta = instance:RegisterType("Player")
+local player_methods, player_meta = instance:RegisterType("Player", false, true, debug.getregistry().Player, "Entity")
 
 if SERVER then
 	instance:AddHook("deinitialize", function()
@@ -25,14 +25,11 @@ end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
-local player_methods, player_meta = instance.Types.Player.Methods, instance.Types.Player
+local player_methods, player_meta, wrap, unwrap = instance.Types.Player.Methods, instance.Types.Player, instance.Types.Player.Wrap, instance.Types.Player.Unwrap
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
-
-instance:ApplyTypeDependencies(player_methods, player_meta, ent_meta)
-local wrap, unwrap = instance:CreateWrapper(player_meta, false, true, debug.getregistry().Player, ent_meta)
 
 instance.env.IN_KEY = {
 	["ALT1"] = IN_ALT1,

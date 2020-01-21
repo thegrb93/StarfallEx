@@ -67,8 +67,7 @@ return { function(instance) -- Called for library declarations
 
 --- Light type
 -- @client
-local light_methods, light_meta = instance:RegisterType("Light")
-local wrap, unwrap = instance:CreateWrapper(light_meta, true, false)
+local light_methods, light_meta = instance:RegisterType("Light", true, false)
 
 --- Light library.
 -- @client

@@ -15,7 +15,7 @@ return { function(instance) -- Called for library declarations
 
 
 --- Npc type
-local npc_methods, npc_meta = instance:RegisterType("Npc")
+local npc_methods, npc_meta = instance:RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
 
 
 end, function(instance) -- Called for library definitions
@@ -23,11 +23,8 @@ end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
-local npc_methods, npc_meta = instance.Types.Npc.Methods, instance.Types.Npc
+local npc_methods, npc_meta, wrap, unwrap = instance.Types.Npc.Methods, instance.Types.Npc, instance.Types.Npc.Wrap, instance.Types.Npc.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-
-local wrap, unwrap = instance:CreateWrapper(npc_meta, false, true, debug.getregistry().NPC, ent_meta)
-instance:ApplyTypeDependencies(npc_methods, npc_meta, ent_meta)
 
 -- ------------------------------------------------------------------------- --
 function npc_meta:__tostring()

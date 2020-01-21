@@ -537,8 +537,7 @@ local mesh_library = instance:RegisterLibrary("mesh")
 if CLIENT then
 	--- Mesh type
 	-- @client
-	local mesh_methods, mesh_meta = instance:RegisterType("Mesh")
-	local wrap, unwrap = instance:CreateWrapper(mesh_meta, true, false)
+	local mesh_methods, mesh_meta = instance:RegisterType("Mesh", true, false)
 
 	-- Register functions to be called when the chip is initialised and deinitialised
 	instance:AddHook("initialize", function()

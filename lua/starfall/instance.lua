@@ -148,55 +148,51 @@ end
 
 --- Creates and registers a type.
 -- @param name The library name
--- @return methods The type's methods
--- @return metamethods The type's metamethods
-function SF.Instance:RegisterType(name)
-	local methods, metamethods = {}, {}
-	self.Types[name] = metamethods
-	metamethods.__index = methods
-	metamethods.Methods = methods
-	metamethods.__metatable = name
-	return methods, metamethods
-end
-
---- Applies inheritance to a derived type.
--- @param methods The type's methods table
--- @param metamethods The type's metamethods table
--- @param supermeta The meta of the inherited type
-function SF.Instance:ApplyTypeDependencies(methods, metamethods, supermeta)
-	local supermethods = supermeta.Methods
-
-	setmetatable(methods, {__index = supermethods})
-
-	metamethods.__supertypes = { [supermeta] = true }
-	if supermeta.__supertypes then
-		for k, _ in pairs(supermeta.__supertypes) do
-			metamethods.__supertypes[k] = true
-		end
-	end
-end
-
---- Creates wrap/unwrap functions for sensitive values, by using a lookup table
--- (which is set to have weak keys and values)
--- @param metatable The metatable to assign the wrapped value.
 -- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
 -- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
 -- @param target_metatable (optional) The metatable of the object that will get
 -- 		wrapped by these wrapper functions.  This is required if you want to
 -- 		have the object be auto-recognized by the generic self.WrapObject
 --		function.
+-- @param super Optional type name that this will inherit from
+-- @return methods The type's methods
+-- @return metamethods The type's metamethods
+function SF.Instance:RegisterType(name, weakwrapper, weaksensitive, target_metatable, super)
+	local methods, metamethods = {}, {}
+	metamethods.__index = methods
+	metamethods.__metatable = name
+
+	metamethods.Methods = methods
+	metamethods.supertype = super
+	metamethods.weakwrapper = weakwrapper
+	metamethods.weaksensitive = weaksensitive
+	metamethods.target_metatable = target_metatable
+
+	self.Types[name] = metamethods
+	return methods, metamethods
+end
+
+--- Creates wrap/unwrap functions for sensitive values, by using a lookup table
+-- (which is set to have weak keys and values)
+-- @param metatable The metatable to assign the wrapped value.
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.Instance:CreateWrapper(metatable, weakwrapper, weaksensitive, target_metatable, shared_meta)
+function SF.Instance:CreateWrapper(metatable)
+	-- If the type already has wrappers, dont re-assign
+	if self.object_unwrappers[metatable] then return end
+
 	local sensitive2sf, sf2sensitive
-	if shared_meta then
-		sensitive2sf = self.sensitive2sf_tables[shared_meta]
-		sf2sensitive = self.sf2sensitive_tables[shared_meta]
-	else
-		sf2sensitive = setmetatable({}, { __mode = (weakwrapper and "k" or "") .. (weaksensitive and "v" or "") })
-		sensitive2sf = setmetatable({}, { __mode = (weaksensitive and "k" or "") .. (weakwrapper and "v" or "") })
+	if metatable.supertype then
+		sensitive2sf = self.sensitive2sf_tables[metatable.supertype]
+		sf2sensitive = self.sf2sensitive_tables[metatable.supertype]
+	elseif metatable.weakwrapper~=nil and metatable.weaksensitive~=nil then
+		sf2sensitive = setmetatable({}, { __mode = (metatable.weakwrapper and "k" or "") .. (metatable.weaksensitive and "v" or "") })
+		sensitive2sf = setmetatable({}, { __mode = (metatable.weaksensitive and "k" or "") .. (metatable.weakwrapper and "v" or "") })
 		self.sensitive2sf_tables[metatable] = sensitive2sf
 		self.sf2sensitive_tables[metatable] = sf2sensitive
+	else
+		-- The type will not have wrappers assigned
+		return
 	end
 
 	local function wrap(value)
@@ -207,8 +203,8 @@ function SF.Instance:CreateWrapper(metatable, weakwrapper, weaksensitive, target
 		sf2sensitive[tbl] = value
 		return tbl
 	end
-	if target_metatable ~= nil then
-		self.object_wrappers[target_metatable] = wrap
+	if metatable.target_metatable then
+		self.object_wrappers[metatable.target_metatable] = wrap
 	end
 
 	local function unwrap(value)
@@ -271,7 +267,7 @@ function SF.Instance:BuildEnvironment()
 	-- @param level Level at which to error at. 2 is added to this value. Default is 1.
 	function self.CheckType(val, typ, level)
 		local meta = dgetmeta(val)
-		if meta == typ or (meta and meta.__supertypes and meta.__supertypes[typ] and object_unwrappers[meta]) then
+		if meta == typ or (meta and meta.supertype == typ and object_unwrappers[meta]) then
 			return val
 		else
 			assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
@@ -389,6 +385,19 @@ function SF.Instance:BuildEnvironment()
 	for k, v in pairs(SF.Modules) do
 		v[1](self)
 	end
+	
+	for k, v in pairs(self.Types) do
+		if v.supertype then
+			local supermeta = self.Types[v.supertype]
+			setmetatable(v.Methods, {__index = supermeta.Methods})
+			v.supertype = supermeta
+		end
+	end
+	
+	for k, v in pairs(self.Types) do
+		self:CreateWrapper(v)
+	end
+	
 	for k, v in pairs(SF.Modules) do
 		v[2](self)
 	end

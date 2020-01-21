@@ -13,8 +13,7 @@ return { function(instance) -- Called for library declarations
 
 --- Particle type
 -- @client
-local particle_methods, particle_meta = instance:RegisterType("Particle")
-local wrap, unwrap = instance:CreateWrapper(particle_meta, false, false)
+local particle_methods, particle_meta = instance:RegisterType("Particle", false, false)
 
 --- Particle library.
 -- @client

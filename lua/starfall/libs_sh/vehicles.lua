@@ -17,17 +17,14 @@ return { function(instance) -- Called for library declarations
 
 
 --- Vehicle type
-local vehicle_methods, vehicle_meta = instance:RegisterType("Vehicle")
+local vehicle_methods, vehicle_meta = instance:RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
 
 
 end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
-local vehicle_methods, vehicle_meta = instance.Types.Vehicle.Methods, instance.Types.Vehicle
-
-instance:ApplyTypeDependencies(vehicle_methods, vehicle_meta, instance.Types.Entity)
-local wrap, unwrap = instance:CreateWrapper(vehicle_meta, false, true, debug.getregistry().Vehicle, instance.Types.Entity)
+local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 local pwrap = instance.Types.Player.Wrap
 
 

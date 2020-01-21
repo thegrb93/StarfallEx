@@ -11,8 +11,7 @@ return { function(instance) -- Called for library declarations
 -- @shared
 local coroutine_library = instance:RegisterLibrary("coroutine")
 
-local _, thread_meta = instance:RegisterType("thread")
-local wrap, unwrap = instance:CreateWrapper(thread_meta, true, false)
+local _, thread_meta = instance:RegisterType("thread", true, false)
 
 instance:AddHook("initialize", function()
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })

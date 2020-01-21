@@ -73,7 +73,7 @@ return { function(instance) -- Called for library declarations
 local holograms_library = instance:RegisterLibrary("holograms")
 
 --- Hologram type
-local hologram_methods, hologram_meta = instance:RegisterType("Hologram")
+local hologram_methods, hologram_meta = instance:RegisterType("Hologram", true, false, nil, "Entity")
 
 
 instance:AddHook("initialize", function()
@@ -101,15 +101,12 @@ end, function(instance) -- Called for library definitions
 
 local checktype = instance.CheckType
 local holograms_library = instance.Libraries.holograms
-local hologram_methods, hologram_meta = instance.Types.Hologram.Methods, instance.Types.Hologram
+local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local getent = instance.Types.Entity.GetEntity
-
-local wrap, unwrap = instance:CreateWrapper(hologram_meta, true, false, nil, ent_meta)
-instance:ApplyTypeDependencies(hologram_methods, hologram_meta, ent_meta)
 
 
 --- Creates a hologram.

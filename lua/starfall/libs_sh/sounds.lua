@@ -34,8 +34,7 @@ local sound_library = instance:RegisterLibrary("sounds")
 
 --- Sound type
 -- @shared
-local sound_methods, sound_meta = instance:RegisterType("Sound")
-local wrap, unwrap = instance:CreateWrapper(sound_meta, true, false)
+local sound_methods, sound_meta = instance:RegisterType("Sound", true, false)
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()

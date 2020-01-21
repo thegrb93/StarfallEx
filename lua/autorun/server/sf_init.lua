@@ -4,7 +4,7 @@ AddCSLuaFile("starfall/preprocessor.lua")
 AddCSLuaFile("starfall/permissions/core.lua")
 AddCSLuaFile("starfall/netstream.lua")
 AddCSLuaFile("starfall/transfer.lua")
-AddCSLuaFile("editor/editor.lua")
+AddCSLuaFile("starfall/editor/editor.lua")
 
 resource.AddFile("materials/models/spacecode/glass.vmt")
 resource.AddFile("materials/models/spacecode/sfchip.vmt")

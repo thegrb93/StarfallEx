@@ -19,8 +19,7 @@ return { function(instance) -- Called for library declarations
 
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
-local bass_methods, bass_meta = instance:RegisterType("Bass")
-local wrap, unwrap = instance:CreateWrapper(bass_meta, true, false)
+local bass_methods, bass_meta = instance:RegisterType("Bass", true, false)
 
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @client
