@@ -779,7 +779,7 @@ local function deserialize(str, allowIdRewriting)
 	if type(str) == "string" then
 		return _d_table(str, nil, #str, true, { {}, allowIdRewriting })
 	end
-	SF.Throw("vON: You must deserialize a string, not a " .. type(str), 2)
+	SF.Throw("vON: You must deserialize a string, not a " .. type(str), 3)
 end
 
 local function serialize(data, checkRecursion)
@@ -794,7 +794,7 @@ local function serialize(data, checkRecursion)
 
 		return _s_table(data, nil, nil, nil, nil, true, { false })
 	end
-	SF.Throw("vON: You must serialize a table, not a " .. type(data), 2)
+	SF.Throw("vON: You must serialize a table, not a " .. type(data), 3)
 end
 
 
