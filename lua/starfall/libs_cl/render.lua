@@ -1462,7 +1462,7 @@ end
 -- @param width Width of the sprite.
 -- @param height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
-	checktype(pos, vector_meta)
+	checktype(pos, vec_meta)
 	checkluatype (width, TYPE_NUMBER)
 	checkluatype (height, TYPE_NUMBER)
 	pos = vunwrap(pos)
@@ -1476,7 +1476,7 @@ end
 -- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(pos, vector_meta)
+	checktype(pos, vec_meta)
 	checkluatype (radius, TYPE_NUMBER)
 	checkluatype (longitudeSteps, TYPE_NUMBER)
 	checkluatype (latitudeSteps, TYPE_NUMBER)
@@ -1493,7 +1493,7 @@ end
 -- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
 function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, latitudeSteps)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(pos, vector_meta)
+	checktype(pos, vec_meta)
 	checkluatype (radius, TYPE_NUMBER)
 	checkluatype (longitudeSteps, TYPE_NUMBER)
 	checkluatype (latitudeSteps, TYPE_NUMBER)
@@ -1508,8 +1508,8 @@ end
 -- @param endPos Ending position
 function render_library.draw3DLine (startPos, endPos)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(startPos, vector_meta)
-	checktype(endPos, vector_meta)
+	checktype(startPos, vec_meta)
+	checktype(endPos, vec_meta)
 	startPos = vunwrap(startPos)
 	endPos = vunwrap(endPos)
 
@@ -1523,9 +1523,9 @@ end
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DBox (origin, angle, mins, maxs)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(origin, vector_meta)
-	checktype(mins, vector_meta)
-	checktype(maxs, vector_meta)
+	checktype(origin, vec_meta)
+	checktype(mins, vec_meta)
+	checktype(maxs, vec_meta)
 	checktype(angle, ang_meta)
 	origin = vunwrap(origin)
 	mins = vunwrap(mins)
@@ -1542,9 +1542,9 @@ end
 -- @param maxs End position of the box, relative to origin.
 function render_library.draw3DWireframeBox (origin, angle, mins, maxs)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(origin, vector_meta)
-	checktype(mins, vector_meta)
-	checktype(maxs, vector_meta)
+	checktype(origin, vec_meta)
+	checktype(mins, vec_meta)
+	checktype(maxs, vec_meta)
 	checktype(angle, ang_meta)
 	origin = vunwrap(origin)
 	mins = vunwrap(mins)
@@ -1562,8 +1562,8 @@ end
 -- @param textureEnd The end coordinate of the texture used.
 function render_library.draw3DBeam (startPos, endPos, width, textureStart, textureEnd)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(startPos, vector_meta)
-	checktype(endPos, vector_meta)
+	checktype(startPos, vec_meta)
+	checktype(endPos, vec_meta)
 	checkluatype (width, TYPE_NUMBER)
 	checkluatype (textureStart, TYPE_NUMBER)
 	checkluatype (textureEnd, TYPE_NUMBER)
@@ -1581,10 +1581,10 @@ end
 -- @param vert4 The fourth vertex.
 function render_library.draw3DQuad (vert1, vert2, vert3, vert4)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
-	checktype(vert1, vector_meta)
-	checktype(vert2, vector_meta)
-	checktype(vert3, vector_meta)
-	checktype(vert4, vector_meta)
+	checktype(vert1, vec_meta)
+	checktype(vert2, vec_meta)
+	checktype(vert3, vec_meta)
+	checktype(vert4, vec_meta)
 
 	vert1 = vunwrap(vert1)
 	vert2 = vunwrap(vert2)
@@ -1746,8 +1746,8 @@ end
 -- @param vec2 The ending vector
 -- @return The color
 function render_library.traceSurfaceColor(vec1, vec2)
-	checktype(vec1, vector_meta)
-	checktype(vec2, vector_meta)
+	checktype(vec1, vec_meta)
+	checktype(vec2, vec_meta)
 
 	return cwrap(render.GetSurfaceColor(vunwrap(vec1), vunwrap(vec2)):ToColor())
 end
@@ -1763,7 +1763,7 @@ function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 
 	local origin, angles, w, h, ortho, offcenter
-	if tbl.origin~=nil then checktype(tbl.origin, vector_meta) origin = vunwrap(tbl.origin) end
+	if tbl.origin~=nil then checktype(tbl.origin, vec_meta) origin = vunwrap(tbl.origin) end
 	if tbl.angles~=nil then checktype(tbl.angles, ang_meta) angles = aunwrap(tbl.angles) end
 	if tbl.aspectratio~=nil then checkluatype(tbl.aspectratio, TYPE_NUMBER) end
 	if tbl.x~=nil then checkluatype(tbl.x, TYPE_NUMBER) end
@@ -1950,7 +1950,7 @@ function render_library.pushCustomClipPlane(normal, distance)
 		SF.Throw("Pushed too many clipping planes.", 2)
 	end
 
-	checktype(normal, vector_meta)
+	checktype(normal, vec_meta)
 	checkluatype(distance, TYPE_NUMBER)
 	
 	render.PushCustomClipPlane(vunwrap(normal), distance)

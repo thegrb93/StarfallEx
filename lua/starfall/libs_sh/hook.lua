@@ -168,7 +168,6 @@ local hookrun = hook_library.run
 -- @param ... Payload. These parameters will be used to call the hook functions
 -- @return tbl A list of the resultset of each called hook
 function hook_library.runRemote (recipient, ...)
-	local argn = select("#", ...)
 	local recipients
 	if recipient then
 		local ent = getent(recipient)
@@ -180,6 +179,7 @@ function hook_library.runRemote (recipient, ...)
 		recipients = SF.allInstances
 	end
 
+	local argn = select("#", ...)
 	local unsanitized = instance.Unsanitize({...})
 	local results = {}
 	for k, _ in pairs(recipients) do
