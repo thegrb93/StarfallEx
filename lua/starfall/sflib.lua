@@ -630,6 +630,13 @@ function SF.WaitForPlayerInit(ply, func)
 	end)
 end
 
+--- Gets the type of val.
+-- @param val The value to be checked.
+function SF.GetType(val)
+	local meta = dgetmeta(val)
+	return isstring(meta.__metatable) and meta.__metatable or type(val)
+end
+
 local shaderBlacklist = {
 	["LightmappedGeneric"] = true,
 }

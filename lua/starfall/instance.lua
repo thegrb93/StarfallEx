@@ -242,13 +242,6 @@ function SF.Instance:BuildEnvironment()
 	self.object_wrappers = object_wrappers
 	self.object_unwrappers = object_unwrappers
 
-	--- Gets the type of val.
-	-- @param val The value to be checked.
-	function self.GetType(val)
-		local meta = dgetmeta(val)
-		return object_unwrappers[meta] and meta.__metatable or type(val)
-	end
-
 	--- Checks the starfall type of val. Errors if the types don't match
 	-- @param val The value to be checked.
 	-- @param typ A metatable.
