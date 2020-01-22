@@ -78,10 +78,11 @@ local math_min = math.min
 
 --- __index metamethod
 function vec_meta.__index (t, k)
-	if xyz[k] then
+	local method = vec_methods[k]
+	if method ~= nil then
+		return method
+	elseif xyz[k] then
 		return rawget(t, xyz[k])
-	elseif vec_methods[k] ~= nil then
-		return vec_methods[k]
 	else 
 		-- Swizzle support
 		local v = {0,0,0}

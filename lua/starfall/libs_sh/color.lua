@@ -68,10 +68,11 @@ end
 
 --- __index metamethod
 function color_meta.__index (t, k)
-	if rgb[k] then
+	local method = color_methods[k]
+	if method then
+		return method
+	elseif rgb[k] then
 		return rawget(t, rgb[k])
-	else
-		return color_methods[k]
 	end
 end
 

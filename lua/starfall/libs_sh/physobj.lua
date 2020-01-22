@@ -18,7 +18,7 @@ return { function(instance) -- Called for library declarations
 
 --- PhysObj Type
 -- @shared
-local physobj_methods, physobj_meta = instance:RegisterType("PhysObj", false, true)
+local physobj_methods, physobj_meta = instance:RegisterType("PhysObj", true, false)
 
 
 end, function(instance) -- Called for library definitions

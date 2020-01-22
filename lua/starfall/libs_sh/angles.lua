@@ -63,10 +63,11 @@ end
 
 --- __index metamethod
 function ang_meta.__index (t, k)
-	if pyr[k] then
+	local method = ang_methods[k]
+	if method then
+		return method
+	elseif pyr[k] then
 		return rawget(t, pyr[k])
-	else
-		return ang_methods[k]
 	end
 end
 
