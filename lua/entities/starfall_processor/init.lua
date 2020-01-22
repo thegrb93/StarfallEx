@@ -151,8 +151,9 @@ local function dupefinished(TimedPasteData, TimedPasteDataCurrent)
 	if next(starfalls) then
 		for k, v in pairs(starfalls) do
 			v:SetupFiles(v.sfdata)
-			if v.instance then
-				v.instance:runScriptHook("dupefinished", instance.Sanitize(entList))
+			local instance = v.instance
+			if instance then
+				instance:runScriptHook("dupefinished", instance.Sanitize(entList))
 			end
 		end
 	end

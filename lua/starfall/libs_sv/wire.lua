@@ -36,8 +36,9 @@ instance:AddHook("initialize", function()
 	end
 
 	function ent:TriggerInput (key, value)
-		if self.instance then
-			self.instance:runScriptHook("input", key, inputConverters[self.Inputs[key].Type](value))
+		local instance = self.instance
+		if instance then
+			instance:runScriptHook("input", key, instance.WireInputConverters[self.Inputs[key].Type](value))
 		end
 	end
 
@@ -79,12 +80,6 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
 local getent = instance.Types.Entity.GetEntity
-
---- Returns an entities wirelink
--- @name Entity.getWirelink
--- @class function
--- @return Wirelink of the entity
-ents_methods.getWirelink = wire_library.getWirelink
 
 local function identity(data) return data end
 local typeToE2Type = {
@@ -153,6 +148,7 @@ inputConverters.xwl = inputConverters.WIRELINK
 inputConverters.e = inputConverters.ENTITY
 inputConverters.t = inputConverters.TABLE
 inputConverters.r = inputConverters.ARRAY
+instance.WireInputConverters = inputConverters
 
 local outputConverters =
 {
@@ -442,6 +438,12 @@ function wire_library.getWirelink (ent)
 
 	return wlwrap(ent)
 end
+
+--- Returns an entities wirelink
+-- @name Entity.getWirelink
+-- @class function
+-- @return Wirelink of the entity
+ents_methods.getWirelink = wire_library.getWirelink
 
 -- ------------------------- Wirelink ------------------------- --
 

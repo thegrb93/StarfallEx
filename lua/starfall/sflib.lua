@@ -436,10 +436,9 @@ do
 		else
 			if customretfunc then
 				return function(...)
-					local args = instance.Sanitize({...})
 					local result
 					for instance, _ in pairs(instances) do
-						local tbl = instance:runScriptHookForResult(hookname, unpack(args))
+						local tbl = instance:runScriptHookForResult(hookname, unpack(instance.Sanitize({...})))
 						if tbl[1] then
 							local sane = customretfunc(instance, tbl, ...)
 							if sane ~= nil then result = sane end
@@ -449,9 +448,8 @@ do
 				end
 			else
 				return function(...)
-					local args = instance.Sanitize({...})
 					for instance, _ in pairs(instances) do
-						instance:runScriptHook(hookname, unpack(args))
+						instance:runScriptHook(hookname, unpack(instance.Sanitize({...})))
 					end
 				end
 			end

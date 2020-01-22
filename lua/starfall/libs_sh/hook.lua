@@ -168,6 +168,7 @@ local hookrun = hook_library.run
 -- @param ... Payload. These parameters will be used to call the hook functions
 -- @return tbl A list of the resultset of each called hook
 function hook_library.runRemote (recipient, ...)
+	local argn = select("#", ...)
 	local recipients
 	if recipient then
 		local ent = getent(recipient)
@@ -179,14 +180,14 @@ function hook_library.runRemote (recipient, ...)
 		recipients = SF.allInstances
 	end
 
-
+	local unsanitized = instance.Unsanitize({...})
 	local results = {}
 	for k, _ in pairs(recipients) do
 		local result
 		if k==instance then
 			result = { true, hookrun("remote", ewrap(instance.data.entity), pwrap(instance.player), ...) }
 		else
-			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.data.entity), k.Types.Player.Wrap(instance.player), k.Sanitize(instance.Unsanitize(...)))
+			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.data.entity), k.Types.Player.Wrap(instance.player), unpack(k.Sanitize(unsanitized), 1, argn))
 		end
 
 		if result[1] and result[2]~=nil then
