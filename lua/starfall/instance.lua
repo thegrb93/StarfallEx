@@ -409,7 +409,7 @@ local function safeThrow(self, msg, nocatch, force)
 end
 
 local function xpcall_callback (err)
-	if debug.getmetatable(err)~=SF.Errormeta then
+	if dgetmeta(err)~=SF.Errormeta then
 		return SF.MakeError(err, 1)
 	end
 	return err

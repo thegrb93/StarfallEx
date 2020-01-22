@@ -1,7 +1,6 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-local dgetmeta = debug.getmetatable
 
 -- Register privileges
 SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
