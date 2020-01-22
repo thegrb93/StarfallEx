@@ -183,13 +183,13 @@ function SF.Instance:CreateWrapper(metatable)
 
 	local sensitive2sf, sf2sensitive
 	if metatable.supertype then
-		sensitive2sf = self.sensitive2sf_tables[metatable.supertype]
-		sf2sensitive = self.sf2sensitive_tables[metatable.supertype]
+		sensitive2sf = metatable.supertype.sensitive2sf
+		sf2sensitive = metatable.supertype.sf2sensitive
 	elseif metatable.weakwrapper~=nil and metatable.weaksensitive~=nil then
 		sf2sensitive = setmetatable({}, { __mode = (metatable.weakwrapper and "k" or "") .. (metatable.weaksensitive and "v" or "") })
 		sensitive2sf = setmetatable({}, { __mode = (metatable.weaksensitive and "k" or "") .. (metatable.weakwrapper and "v" or "") })
-		self.sensitive2sf_tables[metatable] = sensitive2sf
-		self.sf2sensitive_tables[metatable] = sf2sensitive
+		metatable.sensitive2sf = sensitive2sf
+		metatable.sf2sensitive = sf2sensitive
 	else
 		-- The type will not have wrappers assigned
 		return
@@ -229,14 +229,6 @@ function SF.Instance:AddCustomWrapper(object_meta, sf_object_meta, wrapper, unwr
 	sf_object_meta.Unwrap = unwrapper
 end
 
---- Returns the wrapper table of a specified type
--- @param meta The type's metatable
--- @return The sf to sensitive wrapper table
--- @return The sensitive to sf wrapper table
-function SF.Instance:GetWrapperTables(meta)
-	return self.sensitive2sf_tables[meta], self.sf2sensitive_tables[meta]
-end
-
 --- Builds an environment table
 -- @return The environment
 function SF.Instance:BuildEnvironment()
@@ -247,12 +239,8 @@ function SF.Instance:BuildEnvironment()
 
 	local object_wrappers = {}
 	local object_unwrappers = {}
-	local sensitive2sf_tables = {}
-	local sf2sensitive_tables = {}
 	self.object_wrappers = object_wrappers
 	self.object_unwrappers = object_unwrappers
-	self.sensitive2sf_tables = sensitive2sf_tables
-	self.sf2sensitive_tables = sf2sensitive_tables
 
 	--- Gets the type of val.
 	-- @param val The value to be checked.
@@ -297,9 +285,8 @@ function SF.Instance:BuildEnvironment()
 			if wrap then
 				return wrap(object)
 			else
-				-- If the object is already an SF type
-				local sf2sensitive = sf2sensitive_tables[metatable]
-				if sf2sensitive and sf2sensitive[object] then
+				-- Check if the object is already an SF type
+				if object_unwrappers[metatable] then
 					return object
 				end
 			end

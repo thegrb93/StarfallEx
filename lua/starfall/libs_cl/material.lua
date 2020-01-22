@@ -418,7 +418,7 @@ function material_methods:destroy()
 		instance.env.render.destroyRenderTarget(name)
 	end
 	
-	local sensitive2sf, sf2sensitive = instance:GetWrapperTables(material_meta)
+	local sensitive2sf, sf2sensitive = material_meta.sensitive2sf, material_meta.sf2sensitive
 	sensitive2sf[m] = nil
 	sf2sensitive[self] = nil
 	dsetmeta(self, nil)

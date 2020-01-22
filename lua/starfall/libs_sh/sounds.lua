@@ -132,7 +132,7 @@ function sound_methods:destroy()
 	if snd and sounds[snd] then
 		deleteSound(instance.player, sounds[snd], snd)
 		sounds[snd] = nil
-		local sensitive2sf, sf2sensitive = instance:GetWrapperTables(sound_meta)
+		local sensitive2sf, sf2sensitive = sound_meta.sensitive2sf, sound_meta.sf2sensitive
 		sensitive2sf[snd] = nil
 		sf2sensitive[self] = nil
 		debug.setmetatable(self, nil)
