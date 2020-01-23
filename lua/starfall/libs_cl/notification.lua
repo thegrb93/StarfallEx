@@ -1,40 +1,44 @@
--------------------------------------------------------------------------------
--- Notification functions
--------------------------------------------------------------------------------
-
--- Register Priveleges
-SF.Permissions.registerPrivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
-SF.Permissions.registerPrivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
-
-local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
+
+-- Register Priveleges
+registerprivilege("notification", "Create notifications", "Allows the user to create notifications on their screen", { client = { default = 1 } })
+registerprivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Notification library. Allows the user to display hints on the bottom right of their screen
 -- @client
-local notification_library = SF.RegisterLibrary("notification")
+local notification_library = instance:RegisterLibrary("notification")
 
-SF.AddHook("initialize", function(instance)
+instance:AddHook("initialize", function()
 	instance.data.notifications = {}
 end)
 
-SF.AddHook("deinitialize", function(instance)
+instance:AddHook("deinitialize", function()
 	for n, _ in pairs(instance.data.notifications) do
 		notification.Kill( n )
 	end
 end)
 
-SF.AddHook("postload", function()
-	-- @name SF.DefaultEnvironment.NOTIFY
-	-- @class table
-	SF.DefaultEnvironment.NOTIFY = {
-		["GENERIC"] = NOTIFY_GENERIC,
-		["ERROR"] = NOTIFY_ERROR,
-		["UNDO"] = NOTIFY_UNDO,
-		["HINT"] = NOTIFY_HINT,
-		["CLEANUP"] = NOTIFY_CLEANUP
-	}
-end)
+
+end, function(instance) -- Called for library definitions
+
+local notification_library = instance.Libraries.notification
+
+-- @name Environment.NOTIFY
+-- @class table
+instance.env.NOTIFY = {
+	["GENERIC"] = NOTIFY_GENERIC,
+	["ERROR"] = NOTIFY_ERROR,
+	["UNDO"] = NOTIFY_UNDO,
+	["HINT"] = NOTIFY_HINT,
+	["CLEANUP"] = NOTIFY_CLEANUP
+}
 
 --- Displays a standard notification.
 -- @param text The text to display
@@ -46,10 +50,10 @@ end)
 ---NOTIFY.CLEANUP
 -- @param length Time in seconds to display the notification (Max length of 30)
 function notification_library.addLegacy(text, type, length)
-	if SF.instance:isHUDActive() then
-		checkpermission(SF.instance, nil, "notification.hud")
+	if instance:isHUDActive() then
+		checkpermission(instance, nil, "notification.hud")
 	else
-		checkpermission(SF.instance, nil, "notification")
+		checkpermission(instance, nil, "notification")
 	end
 	checkluatype(text, TYPE_STRING)
 	checkluatype(type, TYPE_NUMBER)
@@ -63,14 +67,13 @@ end
 -- @param id String index of the notification
 -- @param text The text to display
 function notification_library.addProgress(id, text)
-	if SF.instance:isHUDActive() then
-		checkpermission(SF.instance, nil, "notification.hud")
+	if instance:isHUDActive() then
+		checkpermission(instance, nil, "notification.hud")
 	else
-		checkpermission(SF.instance, nil, "notification")
+		checkpermission(instance, nil, "notification")
 	end
 	checkluatype(id, TYPE_STRING)
 	checkluatype(text, TYPE_STRING)
-	local instance = SF.instance
 
 	if #id > 256 then SF.Throw("ID is greater than 256 limit!", 2) end
 	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
@@ -85,13 +88,12 @@ end
 --- Removes the notification with the given index after 0.8 seconds
 -- @param id String index of the notification to kill
 function notification_library.kill(id)
-	if SF.instance:isHUDActive() then
-		checkpermission(SF.instance, nil, "notification.hud")
+	if instance:isHUDActive() then
+		checkpermission(instance, nil, "notification.hud")
 	else
-		checkpermission(SF.instance, nil, "notification")
+		checkpermission(instance, nil, "notification")
 	end
 	checkluatype(id, TYPE_STRING)
-	local instance = SF.instance
 
 	id = "SF:"..instance.player:SteamID64()..id
 
@@ -100,3 +102,5 @@ function notification_library.kill(id)
 		instance.data.notifications[id] = nil
 	end
 end
+
+end}

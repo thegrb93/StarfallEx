@@ -91,12 +91,13 @@ net.Receive("starfall_processor_used", function(len)
 	local activator = net.ReadEntity()
 	if not (chip and chip:IsValid()) then return end
 	if not (used and used:IsValid()) then return end
-	if not chip.instance then return end
+	local instance = chip.instance
+	if not instance then return end
 
-	chip.instance:runScriptHook("starfallused", SF.WrapObject( activator ), SF.WrapObject( used ))
+	instance:runScriptHook("starfallused", instance.WrapObject( activator ), instance.WrapObject( used ))
 
 	if activator == LocalPlayer() then
-		if chip.instance.permissionRequest and chip.instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( chip.instance ) then
+		if instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
 			local pnl = vgui.Create("SFChipPermissions")
 			if pnl then pnl:OpenForChip( chip ) end
 		end

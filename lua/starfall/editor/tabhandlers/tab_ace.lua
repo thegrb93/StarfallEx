@@ -114,45 +114,21 @@ local function loadSessions()
 end
 
 local function createLibraryMap ()
-
 	local libMap, libs = {}, {}
 	local libsLookup = {}
+	
+	libMap.Environment = {}
 
-	libMap["Environment"] = {}
-	for name, val in pairs(SF.DefaultEnvironment) do
-		table.insert(libMap["Environment"], name)
-		table.insert(libs, name)
-	end
-
-	--Gathering data from docs
 	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
+		if not isstring(lib) then continue end
 		libMap[lib] = {}
 		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end -- We gotta skip numberics
+			if not isstring(name) then continue end
 			table.insert(libs, "\\:"..name)
 		end
 	end
-
-	for lib, tbl in pairs(SF.Libraries) do --Constants/enums aren't present in docs ATM
-		table.insert(libs, lib) -- Highlight library name
-		libsLookup[lib] = true
-		libMap[lib] = {}
-
-		for name, val in pairs(tbl) do
-			local fullname = lib .. "\\." .. name
-
-			if libsLookup[fullname] then continue end
-			libsLookup[fullname] = true
-
-			table.insert(libMap[lib], name)
-			table.insert(libs, fullname)
-		end
-	end
-
-	--Gathering data from docs
 	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end -- We gotta skip numberics
+		if not isstring(lib) then continue end
 
 		if not libsLookup[lib] then
 			table.insert(libs, lib)
@@ -162,7 +138,7 @@ local function createLibraryMap ()
 		libMap[lib] = {}
 
 		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end -- We gotta skip numberics
+			if not isstring(name) then continue end
 
 			local fullname = lib .. "\\." .. name
 			if libsLookup[fullname] then continue end

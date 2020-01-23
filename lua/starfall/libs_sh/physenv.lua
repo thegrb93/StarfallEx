@@ -1,10 +1,17 @@
--------------------------------------------------------------------------------
--- Physenv library
--------------------------------------------------------------------------------
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Physenv functions
 -- @shared
-local physenv_lib = SF.RegisterLibrary("physenv")
+local physenv_lib = instance:RegisterLibrary("physenv")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local physenv_lib = instance.Libraries.physenv
+local vwrap = instance.Types.Vector.Wrap
 
 --- Gets the air density.
 -- @return number Air Density
@@ -15,12 +22,14 @@ end
 --- Gets the gravity vector
 -- @return Vector Gravity Vector ( eg Vector(0,0,-600) )
 function physenv_lib.getGravity ()
-	return SF.WrapObject(physenv.GetGravity())
+	return vwrap(physenv.GetGravity())
 end
 
 --- Gets the performance settings.</br>
 -- See <a href="http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettings">PhysEnvPerformance Settings Table Structure</a> for table structure.
 -- @return table Performance Settings Table.
 function physenv_lib.getPerformanceSettings ()
-	return SF.Sanitize(physenv.GetPerformanceSettings())
+	return instance.Sanitize(physenv.GetPerformanceSettings())
 end
+
+end}

@@ -1,40 +1,37 @@
 -- Credits to Radon & Xandaros
-SF.VMatrix = {}
+local checkluatype = SF.CheckLuaType
+local dgetmeta = debug.getmetatable
+
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- VMatrix type
-local vmatrix_methods, vmatrix_metamethods = SF.RegisterType("VMatrix")
-local wrap, unwrap = SF.CreateWrapper(vmatrix_metamethods, true, false, debug.getregistry().VMatrix)
-local vec_meta, vwrap, vunwrap, ang_meta, awrap, aunwrap
+local vmatrix_methods, vmatrix_meta = instance:RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
-local dgetmeta = debug.getmetatable
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
-SF.AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
+end, function(instance) -- Called for library definitions
 
-	ang_meta = SF.Angles.Metatable
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
 
-	--- Returns a new VMatrix
-	-- @return New VMatrix
-	SF.DefaultEnvironment.Matrix = function (t)
-		return wrap(Matrix(t))
-	end
-end)
+local checktype = instance.CheckType
+local vmatrix_methods, vmatrix_meta, wrap, unwrap = instance.Types.VMatrix.Methods, instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
-SF.VMatrix.Methods = vmatrix_methods
-SF.VMatrix.Metatable = vmatrix_metamethods
-SF.VMatrix.Wrap = wrap
-SF.VMatrix.Unwrap = unwrap
+
+--- Returns a new VMatrix
+-- @name Environment.Matrix
+-- @class function
+-- @return New VMatrix
+function instance.env.Matrix(t)
+	return wrap(Matrix(t))
+end
 
 --- tostring metamethod
 -- @return string representing the matrix.
-function vmatrix_metamethods:__tostring()
+function vmatrix_meta:__tostring()
 	return unwrap(self):__tostring()
 end
 
@@ -126,7 +123,7 @@ end
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
 	checktype(ang, ang_meta)
-	unwrap(self):SetAngles(SF.UnwrapObject(ang))
+	unwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the translation
@@ -174,7 +171,7 @@ end
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)
-	checktype(src, vmatrix_metamethods)
+	checktype(src, vmatrix_meta)
 	unwrap(self):Set(unwrap(src))
 end
 
@@ -331,24 +328,24 @@ function vmatrix_methods:transpose()
 	transposeMatrix(m, m)
 end
 
-function vmatrix_metamethods.__add(lhs, rhs)
-	checktype(lhs, vmatrix_metamethods)
-	checktype(rhs, vmatrix_metamethods)
+function vmatrix_meta.__add(lhs, rhs)
+	checktype(lhs, vmatrix_meta)
+	checktype(rhs, vmatrix_meta)
 
 	return wrap(unwrap(lhs) + unwrap(rhs))
 end
 
-function vmatrix_metamethods.__sub(lhs, rhs)
-	checktype(lhs, vmatrix_metamethods)
-	checktype(rhs, vmatrix_metamethods)
+function vmatrix_meta.__sub(lhs, rhs)
+	checktype(lhs, vmatrix_meta)
+	checktype(rhs, vmatrix_meta)
 
 	return wrap(unwrap(lhs) - unwrap(rhs))
 end
 
-function vmatrix_metamethods.__mul(lhs, rhs)
-	checktype(lhs, vmatrix_metamethods)
+function vmatrix_meta.__mul(lhs, rhs)
+	checktype(lhs, vmatrix_meta)
 	local rhsmeta = dgetmeta(rhs)
-	if rhsmeta == vmatrix_metamethods then
+	if rhsmeta == vmatrix_meta then
 		return wrap(unwrap(lhs) * unwrap(rhs))
 	elseif rhsmeta == vec_meta then
 		return vwrap(unwrap(lhs) * vunwrap(rhs))
@@ -356,3 +353,5 @@ function vmatrix_metamethods.__mul(lhs, rhs)
 		SF.Throw("Matrix must be multiplied with another matrix or vector on right hand side", 2)
 	end
 end
+
+end}

@@ -1,21 +1,30 @@
-do
-	local P = SF.Permissions
-	P.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
-end
+SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
 
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
 --- SQL library.
 -- @client
-local sql_library = SF.RegisterLibrary("sql")
+local sql_library = instance:RegisterLibrary("sql")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local sql_library = instance.Libraries.sql
+local checktype = instance.CheckType
 
 --- Performs a query on the local SQLite database.
 -- @param query The query to execute.
 -- @return Query results as a table, nil if the query returned no data.
 function sql_library.query(query)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(query, TYPE_STRING)
 
 	local query = sql.Query(query)
@@ -30,7 +39,7 @@ end
 -- @param tabname The table to check for.
 -- @return False if the table does not exist, true if it does.
 function sql_library.tableExists(tabname)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
 	
 	return sql.TableExists(tabname)
@@ -40,7 +49,7 @@ end
 -- @param tabname The table to remove.
 -- @return True if the table was successfully removed, false if not.
 function sql_library.tableRemove(tabname)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(tabname, TYPE_STRING)
 	
 	if not sql.TableExists(tabname) then return false end
@@ -53,9 +62,11 @@ end
 -- @param bNoQuotes Set this as true, and the function will not wrap the input string in apostrophes.
 -- @return The escaped input.
 function sql_library.SQLStr(str, bNoQuotes)
-	checkpermission(SF.instance, nil, "sql")
+	checkpermission(instance, nil, "sql")
 	checkluatype(str, TYPE_STRING)
 	checkluatype(bNoQuotes, TYPE_BOOL)
 	
 	return sql.SQLStr(str, bNoQuotes)
 end
+
+end}

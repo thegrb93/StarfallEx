@@ -1,13 +1,30 @@
--------------------------------------------------------------------------------
--- Wire library.
--------------------------------------------------------------------------------
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
+-- Register privileges
+registerprivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
+registerprivilege("wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs")
+registerprivilege("wire.wirelink", "Wirelink", "Allows the user to create a wirelink", { entities = {} })
+registerprivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink")
+registerprivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
+registerprivilege("wire.createWire", "Create Wire", "Allows the user to create a wire between two entities", { entities = {} })
+registerprivilege("wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities", { entities = {} })
+registerprivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity")
+registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
 if not WireLib then return end
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library = SF.RegisterLibrary("wire")
+local wire_library = instance:RegisterLibrary("wire")
 
-SF.AddHook("initialize", function(instance)
+--- Wirelink type
+-- @server
+local wirelink_methods, wirelink_meta = instance:RegisterType("Wirelink", false, true)
+
+instance:AddHook("initialize", function()
 	local ent = instance.data.entity
 	instance.data.wirecache = {}
 	instance.data.wirecachevals = {}
@@ -19,8 +36,9 @@ SF.AddHook("initialize", function(instance)
 	end
 
 	function ent:TriggerInput (key, value)
-		if self.instance then
-			self.instance:runScriptHook("input", key, SF.Wire.InputConverters[self.Inputs[key].Type](value))
+		local instance = self.instance
+		if instance then
+			instance:runScriptHook("input", key, instance.WireInputConverters[self.Inputs[key].Type](value))
 		end
 	end
 
@@ -45,212 +63,164 @@ SF.AddHook("initialize", function(instance)
 	end
 end)
 
-SF.Wire = {}
-SF.Wire.Library = wire_library
 
--- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("wire.setOutputs", "Set outputs", "Allows the user to specify the set of outputs")
-	P.registerPrivilege("wire.setInputs", "Set inputs", "Allows the user to specify the set of inputs")
-	P.registerPrivilege("wire.wirelink", "Wirelink", "Allows the user to create a wirelink", { entities = {} })
-	P.registerPrivilege("wire.wirelink.read", "Wirelink Read", "Allows the user to read from wirelink")
-	P.registerPrivilege("wire.wirelink.write", "Wirelink Write", "Allows the user to write to wirelink")
-	P.registerPrivilege("wire.createWire", "Create Wire", "Allows the user to create a wire between two entities", { entities = {} })
-	P.registerPrivilege("wire.deleteWire", "Delete Wire", "Allows the user to delete a wire between two entities", { entities = {} })
-	P.registerPrivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity")
-	P.registerPrivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
-end
+end, function(instance) -- Called for library definitions
+if not WireLib then return end
 
---- Wirelink type
--- @server
-local wirelink_methods, wirelink_metatable = SF.RegisterType("Wirelink")
-local wlwrap, wlunwrap = SF.CreateWrapper(wirelink_metatable, true, true)
-local vwrap, awrap
-local vunwrap, aunwrap
-local ewrap, eunwrap
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
+
+local wire_library = instance.Libraries.wire
+
+local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
+local getent = instance.Types.Entity.GetEntity
 
-SF.Wire.WlMetatable = wirelink_metatable
-SF.Wire.WlMethods = wirelink_methods
-SF.Wire.WlWrap = wlwrap
-SF.Wire.WlUnwrap = wlunwrap
+local function identity(data) return data end
+local typeToE2Type = {
+	[TYPE_NUMBER] = {identity, "n"},
+	[TYPE_STRING] = {identity, "s"},
+	[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
+	[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
+	[TYPE_ENTITY] = {identity, "e"}
+}
 
-local typeToE2Type
 local inputConverters
-local outputConverters
+inputConverters =
+{
+	NORMAL = identity,
+	STRING = identity,
+	VECTOR = vwrap,
+	ANGLE = awrap,
+	WIRELINK = wlwrap,
+	ENTITY = owrap,
 
-SF.AddHook("postload", function()
-	vwrap, awrap = SF.Vectors.Wrap, SF.Angles.Wrap
-	vunwrap, aunwrap = SF.Vectors.Unwrap, SF.Angles.Unwrap
-	ewrap, eunwrap = SF.WrapObject, SF.Entities.Unwrap
-	
-	--- Returns an entities wirelink
-	-- @name Entity.getWirelink
-	-- @class function
-	-- @return Wirelink of the entity
-	SF.Entities.Methods.getWirelink = wire_library.getWirelink
+	TABLE = function(data)
+		local completed_tables = {}
+		local function recursiveConvert(tbl)
+			if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
+			if tbl.size == 0 then return {} end
+			local conv = {}
+			completed_tables[tbl] = conv
 
-	local function identity(data) return data end
-	typeToE2Type = {
-		[TYPE_NUMBER] = {identity, "n"},
-		[TYPE_STRING] = {identity, "s"},
-		[TYPE_VECTOR] = {function(x) return {x.x, x.y, x.z} end, "v"},
-		[TYPE_ANGLE] = {function(x) return {x.p, x.y, x.r} end, "a"},
-		[TYPE_ENTITY] = {identity, "e"}
-	}
+			-- Key-numeric part of table
+			for key, typ in pairs(tbl.ntypes) do
+				local val = tbl.n[key]
+				if typ=="t" then
+					conv[key] = completed_tables[val] or recursiveConvert(val)
+				else
+					conv[key] = inputConverters[typ] and inputConverters[typ](val)
+				end
+			end
 
-	inputConverters =
-	{
-		NORMAL = identity,
-		STRING = identity,
-		VECTOR = vwrap,
-		ANGLE = awrap,
-		WIRELINK = wlwrap,
-		ENTITY = ewrap,
+			-- Key-string part of table
+			for key, typ in pairs(tbl.stypes) do
+				local val = tbl.s[key]
+				if typ=="t" then
+					conv[key] = completed_tables[val] or recursiveConvert(val)
+				else
+					conv[key] = inputConverters[typ] and inputConverters[typ](val)
+				end
+			end
 
-		TABLE = function(data)
-			local completed_tables = {}
-			local function recursiveConvert(tbl)
-				if not tbl.s or not tbl.stypes or not tbl.n or not tbl.ntypes or not tbl.size then return {} end
-				if tbl.size == 0 then return {} end
-				local conv = {}
-				completed_tables[tbl] = conv
+			return conv
+		end
+		return recursiveConvert(data)
+	end,
+	ARRAY = function(tbl)
+		local ret = {}
+		for i, v in ipairs(tbl) do
+			ret[i] = owrap(v)
+		end
+		return ret
+	end
+}
+inputConverters.n = inputConverters.NORMAL
+inputConverters.s = inputConverters.STRING
+inputConverters.v = inputConverters.VECTOR
+inputConverters.a = inputConverters.ANGLE
+inputConverters.xwl = inputConverters.WIRELINK
+inputConverters.e = inputConverters.ENTITY
+inputConverters.t = inputConverters.TABLE
+inputConverters.r = inputConverters.ARRAY
+instance.WireInputConverters = inputConverters
 
-				-- Key-numeric part of table
-				for key, typ in pairs(tbl.ntypes) do
-					local val = tbl.n[key]
-					if typ=="t" then
-						conv[key] = completed_tables[val] or recursiveConvert(val)
-					else
-						conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
-					end
+local outputConverters =
+{
+	NORMAL = function(data)
+		checkluatype(data, TYPE_NUMBER, 2)
+		return data
+	end,
+	STRING = function(data)
+		checkluatype(data, TYPE_STRING, 2)
+		return data
+	end,
+	VECTOR = function(data)
+		checktype(data, vec_meta, 2)
+		return vunwrap(data)
+	end,
+	ANGLE = function(data)
+		checktype(data, ang_meta, 2)
+		return aunwrap(data)
+	end,
+	ENTITY = function(data)
+		return getent(data)
+	end,
+	TABLE = function(data)
+		checkluatype(data, TYPE_TABLE, 2)
+		local completed_tables = {}
+
+		local function recursiveConvert(tbl)
+			local ret = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
+			completed_tables[tbl] = ret
+			for key, value in pairs(tbl) do
+
+				local ktyp = TypeID(key)
+				local valueList, typeList
+				if ktyp == TYPE_NUMBER then
+					valueList, typeList = ret.n, ret.ntypes
+				elseif ktyp == TYPE_STRING then
+					valueList, typeList = ret.s, ret.stypes
+				else
+					continue
 				end
 
-				-- Key-string part of table
-				for key, typ in pairs(tbl.stypes) do
-					local val = tbl.s[key]
-					if typ=="t" then
-						conv[key] = completed_tables[val] or recursiveConvert(val)
-					else
-						conv[key] = SF.Wire.InputConverters[typ] and SF.Wire.InputConverters[typ](val)
-					end
-				end
+				value = ounwrap(value) or value
+				local vtyp = TypeID(value)
+				local convert = typeToE2Type[vtyp]
 
-				return conv
+				if convert then
+					valueList[key] = convert[1](value)
+					typeList[key] = convert[2]
+					ret.size = ret.size + 1
+				elseif vtyp == TYPE_TABLE then
+					valueList[key] = completed_tables[value] or recursiveConvert(value)
+					typeList[key] = "t"
+					ret.size = ret.size + 1
+				end
 			end
-			return recursiveConvert(data)
-		end,
-		ARRAY = function(tbl)
-			local ret = {}
-			for i, v in ipairs(tbl) do
-				ret[i] = SF.WrapObject(v)
-			end
+
 			return ret
 		end
-	}
-	inputConverters.n = inputConverters.NORMAL
-	inputConverters.s = inputConverters.STRING
-	inputConverters.v = inputConverters.VECTOR
-	inputConverters.a = inputConverters.ANGLE
-	inputConverters.xwl = inputConverters.WIRELINK
-	inputConverters.e = inputConverters.ENTITY
-	inputConverters.t = inputConverters.TABLE
-	inputConverters.r = inputConverters.ARRAY
-
-	outputConverters =
-	{
-		NORMAL = function(data)
-			checkluatype(data, TYPE_NUMBER, 2)
-			return data
-		end,
-		STRING = function(data)
-			checkluatype(data, TYPE_STRING, 2)
-			return data
-		end,
-		VECTOR = function(data)
-			checktype(data, SF.Types["Vector"], 2)
-			return vunwrap(data)
-		end,
-		ANGLE = function(data)
-			checktype(data, SF.Types["Angle"], 2)
-			return aunwrap(data)
-		end,
-		ENTITY = function(data)
-			checktype(data, SF.Types["Entity"], 2)
-			return eunwrap(data)
-		end,
-		TABLE = function(data)
-			checkluatype(data, TYPE_TABLE, 2)
-			local completed_tables = {}
-
-			local function recursiveConvert(tbl)
-				local ret = { istable = true, size = 0, n = {}, ntypes = {}, s = {}, stypes = {} }
-				completed_tables[tbl] = ret
-				for key, value in pairs(tbl) do
-
-					local ktyp = TypeID(key)
-					local valueList, typeList
-					if ktyp == TYPE_NUMBER then
-						valueList, typeList = ret.n, ret.ntypes
-					elseif ktyp == TYPE_STRING then
-						valueList, typeList = ret.s, ret.stypes
-					else
-						continue
-					end
-
-					value = SF.UnwrapObject(value) or value
-					local vtyp = TypeID(value)
-					local convert = typeToE2Type[vtyp]
-
-					if convert then
-						valueList[key] = convert[1](value)
-						typeList[key] = convert[2]
-						ret.size = ret.size + 1
-					elseif vtyp == TYPE_TABLE then
-						valueList[key] = completed_tables[value] or recursiveConvert(value)
-						typeList[key] = "t"
-						ret.size = ret.size + 1
-					end
-				end
-
-				return ret
+		return recursiveConvert(data)
+	end,
+	ARRAY = function(data)
+		local ret = {}
+		for i, v in ipairs(data) do
+			local obj = ounwrap(v)
+			if obj then
+				local typ = typeToE2Type[TypeID(obj)]
+				ret[i] = typ and typ[1](obj)
 			end
-			return recursiveConvert(data)
-		end,
-		ARRAY = function(data)
-			local ret = {}
-			for i, v in ipairs(data) do
-				local obj = SF.UnwrapObject(v)
-				if obj then
-					local typ = typeToE2Type[TypeID(obj)]
-					ret[i] = typ and typ[1](obj)
-				end
-			end
-			return ret
 		end
-	}
-	
-	SF.Wire.InputConverters = inputConverters
-	SF.Wire.OutputConverters = outputConverters
-end)
-
---- Adds an input type
--- @param name Input type name. Case insensitive.
--- @param converter The function used to convert the wire data to SF data (eg, wrapping)
-function SF.Wire.AddInputType(name, converter)
-	inputConverters[name:upper()] = converter
-end
-
---- Adds an output type
--- @param name Output type name. Case insensitive.
--- @param deconverter The function used to check for the appropriate type and convert the SF data to wire data (eg, unwrapping)
-function SF.Wire.AddOutputType(name, deconverter)
-	outputConverters[name:upper()] = deconverter
-end
+		return ret
+	end
+}
 
 -- ------------------------- Basic Wire Functions ------------------------- --
 
@@ -270,10 +240,10 @@ local sfTypeToWireTypeTable = {
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs (names, types)
-	checkpermission(SF.instance, nil, "wire.setInputs")
+	checkpermission(instance, nil, "wire.setInputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
 
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
@@ -298,10 +268,10 @@ end
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs (names, types)
-	checkpermission(SF.instance, nil, "wire.setOutputs")
+	checkpermission(instance, nil, "wire.setOutputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
 
 	if #names ~= #types then SF.Throw("Table lengths not equal", 2) end
@@ -334,7 +304,7 @@ end
 
 --- Returns the wirelink representing this entity.
 function wire_library.self()
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity", 2) end
 	return wlwrap(ent)
 end
@@ -355,8 +325,8 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param color Color of the wire(optional)
 -- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
 function wire_library.create (entI, entO, inputname, outputname, width, color, material)
-	checktype(entI, SF.Types["Entity"])
-	checktype(entO, SF.Types["Entity"])
+	checktype(entI, ent_meta)
+	checktype(entO, ent_meta)
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 
@@ -367,7 +337,7 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 		width = math.Clamp(width, 0, 5)
 	end
 	if color ~= nil then
-		checktype(color, SF.Types['Color'])
+		checktype(color, col_meta)
 	else
 		color = COLOR_WHITE
 	end
@@ -379,8 +349,8 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
 	if not (entO and entO:IsValid()) then SF.Throw("Invalid target") end
 
-	checkpermission(SF.instance, entI, "wire.createWire")
-	checkpermission(SF.instance, entO, "wire.createWire")
+	checkpermission(instance, entI, "wire.createWire")
+	checkpermission(instance, entO, "wire.createWire")
 
 	if not entI.Inputs then SF.Throw("Source has no valid inputs") end
 
@@ -397,22 +367,19 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 	if not entI.Inputs[inputname] then SF.Throw("Invalid source input: " .. inputname) end
 	if not entO.Outputs[outputname] then SF.Throw("Invalid source output: " .. outputname) end
 
-	WireLib.Link_Start(SF.instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
-	WireLib.Link_End(SF.instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, SF.instance.player)
+	WireLib.Link_Start(instance.player:UniqueID(), entI, entI:WorldToLocal(entI:GetPos()), inputname, material, color, width)
+	WireLib.Link_End(instance.player:UniqueID(), entO, entO:WorldToLocal(entO:GetPos()), outputname, instance.player)
 end
 
 --- Unwires an entity's input
 -- @param entI Entity with input
 -- @param inputname Input to be un-wired
-function wire_library.delete (entI, inputname)
-	checktype(entI, SF.Types["Entity"])
+function wire_library.delete(entI, inputname)
 	checkluatype(inputname, TYPE_STRING)
 
-	local entI = eunwrap(entI)
+	local entI = getent(entI)
 
-	if not (entI and entI:IsValid()) then SF.Throw("Invalid source") end
-
-	checkpermission(SF.instance, entI, "wire.deleteWire")
+	checkpermission(instance, entI, "wire.deleteWire")
 
 	if not entI.Inputs or not entI.Inputs[inputname] then SF.Throw("Entity does not have input: " .. inputname) end
 	if not entI.Inputs[inputname].Src then SF.Throw("Input \"" .. inputname .. "\" is not wired") end
@@ -423,11 +390,11 @@ end
 local function parseEntity(ent, io)
 
 	if ent then
-		checktype(ent, SF.Types["Entity"])
+		checktype(ent, ent_meta)
 		ent = eunwrap(ent)
-		checkpermission(SF.instance, ent, "wire.get" .. io)
+		checkpermission(instance, ent, "wire.get" .. io)
 	else
-		ent = SF.instance.data.entity or nil
+		ent = instance.data.entity or nil
 	end
 
 	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
@@ -460,24 +427,30 @@ end
 -- @param ent Wire entity
 -- @return Wirelink of the entity
 function wire_library.getWirelink (ent)
-	checktype(ent, SF.Types["Entity"])
+	checktype(ent, ent_meta)
 	ent = eunwrap(ent)
 	if not ent:IsValid() then return end
-	checkpermission(SF.instance, ent, "wire.wirelink")
+	checkpermission(instance, ent, "wire.wirelink")
 
 	if not ent.extended then
-		WireLib.CreateWirelinkOutput(SF.instance.player, ent, { true })
+		WireLib.CreateWirelinkOutput(instance.player, ent, { true })
 	end
 
 	return wlwrap(ent)
 end
 
+--- Returns an entities wirelink
+-- @name Entity.getWirelink
+-- @class function
+-- @return Wirelink of the entity
+ents_methods.getWirelink = wire_library.getWirelink
+
 -- ------------------------- Wirelink ------------------------- --
 
 --- Retrieves an output. Returns nil if the output doesn't exist.
-wirelink_metatable.__index = function(self, k)
-	checkpermission(SF.instance, nil, "wire.wirelink.read")
-	checktype(self, wirelink_metatable)
+wirelink_meta.__index = function(self, k)
+	checkpermission(instance, nil, "wire.wirelink.read")
+	checktype(self, wirelink_meta)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
 	else
@@ -495,9 +468,9 @@ wirelink_metatable.__index = function(self, k)
 end
 
 --- Writes to an input.
-wirelink_metatable.__newindex = function(self, k, v)
-	checkpermission(SF.instance, nil, "wire.wirelink.write")
-	checktype(self, wirelink_metatable)
+wirelink_meta.__newindex = function(self, k, v)
+	checkpermission(instance, nil, "wire.wirelink.write")
+	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if isnumber(k) then
@@ -513,13 +486,13 @@ end
 
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
 function wirelink_methods:isValid()
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	return wlunwrap(self) and true or false
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
 function wirelink_methods:inputType(name)
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return end
 	local input = wl.Inputs[name]
@@ -528,7 +501,7 @@ end
 
 --- Returns the type of output name, or nil if it doesn't exist
 function wirelink_methods:outputType(name)
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return end
 	local output = wl.Outputs[name]
@@ -537,13 +510,13 @@ end
 
 --- Returns the entity that the wirelink represents
 function wirelink_methods:entity()
-	checktype(self, wirelink_metatable)
-	return ewrap(wlunwrap(self))
+	checktype(self, wirelink_meta)
+	return owrap(wlunwrap(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
 function wirelink_methods:inputs()
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local Inputs = wl.Inputs
@@ -564,7 +537,7 @@ end
 
 --- Returns a table of all of the wirelink's outputs
 function wirelink_methods:outputs()
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local Outputs = wl.Outputs
@@ -586,7 +559,7 @@ end
 --- Checks if an input is wired.
 -- @param name Name of the input to check
 function wirelink_methods:isWired(name)
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
@@ -599,13 +572,13 @@ end
 -- @param name Name of the input
 -- @return The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
 	if input and input.Src and input.Src:IsValid() then
-		return ewrap(input.Src)
+		return owrap(input.Src)
 	end
 end
 
@@ -613,7 +586,7 @@ end
 -- @param name Name of the input of the wirelink.
 -- @return String name of the output that the input is wired to.
 function wirelink_methods:getWiredToName(name)
-	checktype(self, wirelink_metatable)
+	checktype(self, wirelink_meta)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
@@ -624,10 +597,10 @@ function wirelink_methods:getWiredToName(name)
 end
 
 -- ------------------------- Ports Metatable ------------------------- --
-local wire_ports_methods, wire_ports_metamethods = SF.RegisterType("Ports")
+local wire_ports_methods, wire_ports_metamethods = instance:RegisterType("Ports")
 
 function wire_ports_metamethods:__index(name)
-	local data = SF.instance.data
+	local data = instance.data
 	local input = data.entity.Inputs[name]
 	if input then
 		if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
@@ -641,7 +614,7 @@ end
 function wire_ports_metamethods:__newindex(name, value)
 	checkluatype(name, TYPE_STRING)
 
-	local ent = SF.instance.data.entity
+	local ent = instance.data.entity
 	local output = ent.Outputs[name]
 	if output then
 		Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
@@ -674,3 +647,5 @@ wire_library.ports = setmetatable({}, wire_ports_metamethods)
 -- @class hook
 -- @param address The address written to
 -- @param data The data being written
+
+end}

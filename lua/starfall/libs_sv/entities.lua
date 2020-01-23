@@ -1,64 +1,30 @@
--------------------------------------------------------------------------------
--- Serverside Entity functions
--------------------------------------------------------------------------------
-
-assert(SF.Entities)
-
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
 local huge = math.huge
 local abs = math.abs
 
-local ents_lib = SF.Entities.Library
-local ents_metatable = SF.Entities.Metatable
-local getent = SF.Entities.GetEntity
-
---- Entity type
---@class class
---@name Entity
-local ents_methods = SF.Entities.Methods
-local ewrap, eunwrap = SF.Entities.Wrap, SF.Entities.Unwrap
-local owrap = SF.WrapObject
-local ounwrap = SF.UnwrapObject
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 -- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
-	P.registerPrivilege("entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", { entities = {} })
-	P.registerPrivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
-	P.registerPrivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
-	P.registerPrivilege("entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", { entities = {} })
-	P.registerPrivilege("entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation", { entities = {} })
-	P.registerPrivilege("entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", { entities = {} })
-	P.registerPrivilege("entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", { entities = {} })
-	P.registerPrivilege("entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", { entities = {} })
-	P.registerPrivilege("entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", { entities = {} })
-	P.registerPrivilege("entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", { entities = {} })
-	P.registerPrivilege("entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", { entities = {} })
-	P.registerPrivilege("entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", { entities = {} })
-	P.registerPrivilege("entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistance and change it's coefficient", { entities = {} })
-	P.registerPrivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
-	P.registerPrivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
-	P.registerPrivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
-	P.registerPrivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
-end
-
-local vec_meta, ang_meta
-local vwrap, vunwrap, awrap, aunwrap
-
-SF.AddHook("postload", function()
-	vec_meta = SF.Vectors.Metatable
-	ang_meta = SF.Angles.Metatable
-
-	vwrap = SF.Vectors.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	awrap = SF.Angles.Wrap
-	aunwrap = SF.Angles.Unwrap
-end)
-
--- ------------------------- Internal functions ------------------------- --
+registerprivilege("entities.parent", "Parent", "Allows the user to parent an entity to another entity", { entities = {} })
+registerprivilege("entities.unparent", "Unparent", "Allows the user to remove the parent of an entity", { entities = {} })
+registerprivilege("entities.applyDamage", "Apply damage", "Allows the user to apply damage to an entity", { entities = {} })
+registerprivilege("entities.applyForce", "Apply force", "Allows the user to apply force to an entity", { entities = {} })
+registerprivilege("entities.setPos", "Set Position", "Allows the user to teleport an entity to another location", { entities = {} })
+registerprivilege("entities.setAngles", "Set Angles", "Allows the user to teleport an entity to another orientation", { entities = {} })
+registerprivilege("entities.setVelocity", "Set Velocity", "Allows the user to change the velocity of an entity", { entities = {} })
+registerprivilege("entities.setFrozen", "Set Frozen", "Allows the user to freeze and unfreeze an entity", { entities = {} })
+registerprivilege("entities.setSolid", "Set Solid", "Allows the user to change the solidity of an entity", { entities = {} })
+registerprivilege("entities.setMass", "Set Mass", "Allows the user to change the mass of an entity", { entities = {} })
+registerprivilege("entities.setInertia", "Set Inertia", "Allows the user to change the inertia of an entity", { entities = {} })
+registerprivilege("entities.enableGravity", "Enable gravity", "Allows the user to change whether an entity is affected by gravity", { entities = {} })
+registerprivilege("entities.enableMotion", "Set Motion", "Allows the user to disable an entity's motion", { entities = {} })
+registerprivilege("entities.enableDrag", "Set Drag", "Allows the user to disable an entity's air resistance and change it's coefficient", { entities = {} })
+registerprivilege("entities.setDamping", "Set Damping", "Allows the user to change entity's air friction damping", { entities = {} })
+registerprivilege("entities.remove", "Remove", "Allows the user to remove entities", { entities = {} })
+registerprivilege("entities.ignite", "Ignite", "Allows the user to ignite entities", { entities = {} })
+registerprivilege("entities.canTool", "CanTool", "Whether or not the user can use the toolgun on the entity", { entities = {} })
 
 local function checkvector(v)
 	if v[1]<-1e12 or v[1]>1e12 or v[1]~=v[1] or
@@ -66,9 +32,26 @@ local function checkvector(v)
 	   v[3]<-1e12 or v[3]>1e12 or v[3]~=v[3] then
 
 		SF.Throw("Input vector too large or NAN", 3)
-
 	end
 end
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+end, function(instance) -- Called for library definitions
+
+
+local getent = instance.Types.Entity.GetEntity
+local checktype = instance.CheckType
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local cunwrap = instance.Types.Color.Unwrap
+
+
 
 -- ------------------------- Methods ------------------------- --
 
@@ -77,7 +60,7 @@ end
 -- @param attachment Optional string attachment name to parent to
 function ents_methods:setParent(parent, attachment)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.parent")
+	checkpermission(instance, ent, "entities.parent")
 
 	if parent ~= nil then
 		local parentent = getent(parent)
@@ -86,7 +69,7 @@ function ents_methods:setParent(parent, attachment)
 				SF.Throw("Insufficient permissions", 2)
 			end
 		else
-			checkpermission(SF.instance, parentent, "entities.parent")
+			checkpermission(instance, parentent, "entities.parent")
 		end
 
 		ent:SetParent(parentent)
@@ -103,7 +86,7 @@ end
 --- Unparents the entity from another entity
 function ents_methods:unparent()
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.unparent")
+	checkpermission(instance, ent, "entities.unparent")
 	ent:SetParent(nil)
 end
 
@@ -111,11 +94,11 @@ end
 -- @param e Entity to link the component to. nil to clear links.
 function ents_methods:linkComponent(e)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.canTool")
+	checkpermission(instance, ent, "entities.canTool")
 
 	if e then
 		local link = getent(e)
-		checkpermission(SF.instance, link, "entities.canTool")
+		checkpermission(instance, link, "entities.canTool")
 
 		if link:GetClass()=="starfall_processor" and (ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud") then
 			ent:LinkEnt(link)
@@ -141,7 +124,7 @@ end
 function ents_methods:setComponentLocksControls(enable)
 	local ent = getent(self)
 	checkluatype(enable, TYPE_BOOL)
-	checkpermission(SF.instance, ent, "entities.canTool")
+	checkpermission(instance, ent, "entities.canTool")
 	if ent:GetClass()=="starfall_screen" or ent:GetClass()=="starfall_hud" then
 		ent.locksControls = enable
 	else
@@ -174,7 +157,7 @@ function ents_methods:applyDamage(amt, attacker, inflictor)
 	local ent = getent(self)
 	checkluatype(amt, TYPE_NUMBER)
 
-	checkpermission(SF.instance, ent, "entities.applyDamage")
+	checkpermission(instance, ent, "entities.applyDamage")
 
 	if attacker then
 		attacker = getent(attacker)
@@ -194,7 +177,7 @@ function ents_methods:setCustomPropForces(ang, lin, mode)
 	local ent = getent(self)
 	if ent:GetClass()~="starfall_prop" then SF.Throw("The entity isn't a custom prop", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	ang = vunwrap(ang)
 	checkvector(ang)
@@ -221,7 +204,7 @@ function ents_methods:setAngleVelocity(angvel)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	phys:AddAngleVelocity(angvel - phys:GetAngleVelocity())
 end
@@ -237,7 +220,7 @@ function ents_methods:addAngleVelocity(angvel)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	phys:AddAngleVelocity(angvel)
 end
@@ -253,7 +236,7 @@ function ents_methods:applyForceCenter(vec)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	phys:ApplyForceCenter(vec)
 end
@@ -275,7 +258,7 @@ function ents_methods:applyForceOffset(vec, offset)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	phys:ApplyForceOffset(vec, offset)
 end
@@ -292,7 +275,7 @@ function ents_methods:applyAngForce(ang)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	-- assign vectors
 	local up = ent:GetUp()
@@ -333,7 +316,7 @@ function ents_methods:applyTorque(torque)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.applyForce")
+	checkpermission(instance, ent, "entities.applyForce")
 
 	phys:ApplyTorqueCenter(torque)
 end
@@ -343,17 +326,16 @@ end
 function ents_methods:addCollisionListener(func)
 	local ent = getent(self)
 	checkluatype(func, TYPE_FUNCTION)
-	checkpermission(SF.instance, ent, "entities.canTool")
+	checkpermission(instance, ent, "entities.canTool")
 	
-	local instance = SF.instance
 	if ent:GetClass() ~= "starfall_prop" then
 		if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
 		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data)
-			instance:runFunction(func, SF.StructWrapper(data))
+			instance:runFunction(func, SF.StructWrapper(instance, data))
 		end)
 	else
 		function ent:PhysicsCollide( data, phys )
-			instance:runFunction(func, SF.StructWrapper(data))
+			instance:runFunction(func, SF.StructWrapper(instance, data))
 		end
 	end
 end
@@ -361,7 +343,7 @@ end
 --- Removes a collision listening hook from the entity so that a new one can be added
 function ents_methods:removeCollisionListener()
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.canTool")
+	checkpermission(instance, ent, "entities.canTool")
 	if ent:GetClass() ~= "starfall_prop" then
 		if not ent.SF_CollisionCallback then SF.Throw("The entity isn't listening to collisions!", 2) end
 		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
@@ -375,7 +357,7 @@ end
 -- @param nocollide Whether to collide with nothing except world or not.
 function ents_methods:setNocollideAll(nocollide)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setSolid")
+	checkpermission(instance, ent, "entities.setSolid")
 
 	ent:SetCollisionGroup (nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE)
 end
@@ -384,7 +366,7 @@ end
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setDrawShadow(draw, ply)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	if ply then
 		sendRenderPropertyToClient(ply, ent, 9, draw and true or false)
@@ -400,7 +382,7 @@ function ents_methods:setPos(vec)
 	checktype(vec, vec_meta)
 
 	local vec = vunwrap(vec)
-	checkpermission(SF.instance, ent, "entities.setPos")
+	checkpermission(instance, ent, "entities.setPos")
 
 	ent:SetPos(SF.clampPos(vec))
 end
@@ -412,7 +394,7 @@ function ents_methods:setAngles(ang)
 	checktype(ang, ang_meta)
 
 	local ang = aunwrap(ang)
-	checkpermission(SF.instance, ent, "entities.setAngles")
+	checkpermission(instance, ent, "entities.setAngles")
 
 	ent:SetAngles(ang)
 end
@@ -426,7 +408,7 @@ function ents_methods:setVelocity(vel)
 	local vel = vunwrap(vel)
 	checkvector(vel)
 
-	checkpermission(SF.instance, ent, "entities.setVelocity")
+	checkpermission(instance, ent, "entities.setVelocity")
 
 	ent:SetVelocity(vel)
 end
@@ -435,7 +417,7 @@ end
 function ents_methods:remove()
 	local ent = getent(self)
 	if ent:IsWorld() or ent:IsPlayer() then SF.Throw("Cannot remove world or player", 2) end
-	checkpermission(SF.instance, ent, "entities.remove")
+	checkpermission(instance, ent, "entities.remove")
 
 	ent:Remove()
 end
@@ -444,7 +426,7 @@ end
 function ents_methods:breakEnt()
 	local ent = getent(self)
 	if ent:IsPlayer() or ent.WasBroken then SF.Throw("Entity is not valid", 2) end
-	checkpermission(SF.instance, ent, "entities.remove")
+	checkpermission(instance, ent, "entities.remove")
 
 	ent.WasBroken = true
 	ent:Fire("break", 1, 0)
@@ -457,7 +439,7 @@ function ents_methods:ignite(length, radius)
 	local ent = getent(self)
 	checkluatype(length, TYPE_NUMBER)
 
-	checkpermission(SF.instance, ent, "entities.ignite")
+	checkpermission(instance, ent, "entities.ignite")
 
 	if radius then
 		checkluatype(radius, TYPE_NUMBER)
@@ -471,7 +453,7 @@ end
 --- Extinguishes an entity
 function ents_methods:extinguish()
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.ignite")
+	checkpermission(instance, ent, "entities.ignite")
 
 	ent:Extinguish()
 end
@@ -483,7 +465,7 @@ function ents_methods:setFrozen(freeze)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.setFrozen")
+	checkpermission(instance, ent, "entities.setFrozen")
 
 	phys:EnableMotion(not (freeze and true or false))
 	phys:Wake()
@@ -503,7 +485,7 @@ end
 -- @param solid Boolean, Should the entity be solid?
 function ents_methods:setSolid(solid)
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setSolid")
+	checkpermission(instance, ent, "entities.setSolid")
 
 	ent:SetNotSolid(not solid)
 end
@@ -516,7 +498,7 @@ function ents_methods:setMass(mass)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.setMass")
+	checkpermission(instance, ent, "entities.setMass")
 
 	local m = math.Clamp(mass, 1, 50000)
 	phys:SetMass(m)
@@ -528,7 +510,7 @@ end
 function ents_methods:setInertia(vec)
 	local ent = getent(self)
 	checktype(vec, vec_meta)
-	checkpermission(SF.instance, ent, "entities.setInertia")
+	checkpermission(instance, ent, "entities.setInertia")
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -549,7 +531,7 @@ function ents_methods:setPhysMaterial(mat)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.setMass")
+	checkpermission(instance, ent, "entities.setMass")
 
 	construct.SetPhysProp(nil, ent, 0, phys, { Material = mat })
 end
@@ -587,7 +569,7 @@ function ents_methods:enableGravity(grav)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.enableGravity")
+	checkpermission(instance, ent, "entities.enableGravity")
 
 	phys:EnableGravity(grav and true or false)
 	phys:Wake()
@@ -600,7 +582,7 @@ function ents_methods:enableDrag(drag)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.enableDrag")
+	checkpermission(instance, ent, "entities.enableDrag")
 
 	phys:EnableDrag(drag and true or false)
 end
@@ -612,7 +594,7 @@ function ents_methods:enableMotion(move)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
-	checkpermission(SF.instance, ent, "entities.enableMotion")
+	checkpermission(instance, ent, "entities.enableMotion")
 
 	phys:EnableMotion(move and true or false)
 	phys:Wake()
@@ -626,7 +608,7 @@ function ents_methods:enableSphere(enabled)
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("This function only works for prop_physics", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
-	checkpermission(SF.instance, ent, "entities.enableMotion")
+	checkpermission(instance, ent, "entities.enableMotion")
 
 	local ismove = phys:IsMoveable()
 	local mass = phys:GetMass()
@@ -739,10 +721,10 @@ function ents_methods:setTrails(startSize, endSize, length, material, color, att
 	ent._lastTrailSet = time
 
 	if string.find(material, '"', 1, true) then SF.Throw("Invalid Material", 2) end
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 
 	local Data = {
-		Color = SF.Color.Unwrap(color),
+		Color = cunwrap(color),
 		Length = length,
 		StartSize = math.Clamp(startSize, 0, 128),
 		EndSize = math.Clamp(endSize, 0, 128),
@@ -751,15 +733,15 @@ function ents_methods:setTrails(startSize, endSize, length, material, color, att
 		Additive = additive,
 	}
 
-	duplicator.EntityModifiers.trail(SF.instance.player, ent, Data)
+	duplicator.EntityModifiers.trail(instance.player, ent, Data)
 end
 
 --- Removes trails from the entity
 function ents_methods:removeTrails()
 	local ent = getent(self)
-	checkpermission(SF.instance, ent, "entities.setRenderProperty")
+	checkpermission(instance, ent, "entities.setRenderProperty")
 
-	duplicator.EntityModifiers.trail(SF.instance.player, ent, nil)
+	duplicator.EntityModifiers.trail(instance.player, ent, nil)
 end
 
 --- Sets a prop_physics to be unbreakable
@@ -767,7 +749,7 @@ end
 function ents_methods:setUnbreakable(on)
 	local ent = getent(self)
 	checkluatype(on, TYPE_BOOL)
-	checkpermission(SF.instance, ent, "entities.canTool")
+	checkpermission(instance, ent, "entities.canTool")
 	if ent:GetClass() ~= "prop_physics" then SF.Throw("setUnbreakable can only be used on prop_physics", 2) end
 
 	if not (SF.UnbreakableFilter and SF.UnbreakableFilter:IsValid()) then
@@ -793,7 +775,7 @@ function ents_methods:testPVS(other)
 	local meta = debug.getmetatable(other)
 	if meta==vec_meta then
 		other = vunwrap(other)
-	elseif meta==ents_metatable then
+	elseif meta==ent_meta then
 		other = getent(other)
 	else
 		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
@@ -808,3 +790,5 @@ function ents_methods:getCreationID()
 	local ent = getent(self)
 	return ent:GetCreationID()
 end
+
+end}

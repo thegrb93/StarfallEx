@@ -1,50 +1,55 @@
-SF.Color = {}
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+local dgetmeta = debug.getmetatable
+
+local math_Clamp = math.Clamp
+local clamp = function(v) return math_Clamp(v, 0, 255) end
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Color type
 --@shared
-local color_methods, color_metatable = SF.RegisterType("Color")
-local checktype = SF.CheckType
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-
-local function wrap(tbl)
-	return setmetatable(tbl, color_metatable)
-end
+local color_methods, color_meta = instance:RegisterType("Color")
+local checktype = instance.CheckType
 
 local function unwrap(obj)
 	return Color((tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255))
 end
 
 local function cwrap(clr)
-	return wrap({ clr.r, clr.g, clr.b, clr.a })
+	return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
 end
 
-SF.AddObjectWrapper(debug.getregistry().Color, color_metatable, cwrap)
-SF.AddObjectUnwrapper(color_metatable, unwrap)
+instance:AddCustomWrapper(debug.getregistry().Color, color_meta, cwrap, unwrap)
 
-SF.Color.Methods = color_methods
-SF.Color.Metatable = color_metatable
-SF.Color.Wrap = cwrap
-SF.Color.Unwrap = unwrap
 
-local dgetmeta = debug.getmetatable
-SF.AddHook("postload", function()
-	--- Creates a table struct that resembles a Color/
-	-- @name SF.DefaultEnvironment.Color
-	-- @class function
-	-- @param r - Red
-	-- @param g - Green
-	-- @param b - Blue
-	-- @param a - Alpha
-	-- @return New color
-	SF.DefaultEnvironment.Color = function (r, g, b, a)
-		if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
-		if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
-		if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
-		if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
-		return wrap({ r, g, b, a })
-	end
-end)
+end, function(instance) -- Called for library definitions
+
+
+local color_methods, color_meta, cwrap, unwrap = instance.Types.Color.Methods, instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local function wrap(tbl)
+	return setmetatable(tbl, color_meta)
+end
+
+--- Creates a table struct that resembles a Color
+-- @name Environment.Color
+-- @class function
+-- @param r - Red
+-- @param g - Green
+-- @param b - Blue
+-- @param a - Alpha
+-- @return New color
+instance.env.Color = function (r, g, b, a)
+	if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
+	if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
+	if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
+	if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
+	return wrap({ r, g, b, a })
+end
 
 -- Lookup table.
 -- Index 1->4 have associative rgba for use in __index. Saves lots of checks
@@ -53,7 +58,7 @@ end)
 local rgb = { r = 1, g = 2, b = 3, a = 4, h = 1, s = 2, v = 3, l = 3 }
 
 --- __newindex metamethod
-function color_metatable.__newindex (t, k, v)
+function color_meta.__newindex (t, k, v)
 	if rgb[k] then
 		rawset(t, rgb[k], v)
 	else
@@ -62,40 +67,38 @@ function color_metatable.__newindex (t, k, v)
 end
 
 --- __index metamethod
-function color_metatable.__index (t, k)
-	if rgb[k] then
+function color_meta.__index (t, k)
+	local method = color_methods[k]
+	if method then
+		return method
+	elseif rgb[k] then
 		return rawget(t, rgb[k])
-	else
-		return color_methods[k]
 	end
 end
 
 --- __tostring metamethod
-function color_metatable.__tostring (c)
+function color_meta.__tostring (c)
 	return c[1] .. " " .. c[2] .. " " .. c[3] .. " " .. c[4]
 end
 
 --- __concat metamethod
-function color_metatable.__concat (...)
+function color_meta.__concat (...)
 	local t = { ... }
 	return tostring(t[1]) .. tostring(t[2])
 end
 
 --- __eq metamethod
-function color_metatable.__eq (a, b)
+function color_meta.__eq (a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3] and a[4]==b[4]
 end
-
-local math_Clamp = math.Clamp
-local clamp = function(v) return math_Clamp(v, 0, 255) end
 
 --- addition metamethod
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Added color.
-function color_metatable.__add (a, b)
-	checktype(a, color_metatable)
-	checktype(b, color_metatable)
+function color_meta.__add (a, b)
+	checktype(a, color_meta)
+	checktype(b, color_meta)
 
 	return wrap({ clamp(a[1] + b[1]), clamp(a[2] + b[2]), clamp(a[3] + b[3]), clamp(a[4] + b[4]) })
 end
@@ -104,9 +107,9 @@ end
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Subtracted color.
-function color_metatable.__sub (a, b)
-	checktype(a, color_metatable)
-	checktype(b, color_metatable)
+function color_meta.__sub (a, b)
+	checktype(a, color_meta)
+	checktype(b, color_meta)
 
 	return wrap({ clamp(a[1]-b[1]), clamp(a[2]-b[2]), clamp(a[3]-b[3]), clamp(a[4]-b[4]) })
 end
@@ -115,8 +118,8 @@ end
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Scaled color.
-function color_metatable.__mul (a, b)
-	if dgetmeta(a) == color_metatable then
+function color_meta.__mul (a, b)
+	if dgetmeta(a) == color_meta then
 		checkluatype (b, TYPE_NUMBER)
 
 		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
@@ -130,8 +133,8 @@ end
 --- division metamethod
 -- @param rhs Right side of equation
 -- @return Scaled color.
-function color_metatable.__div (a, b)
-	checktype(a, color_metatable)
+function color_meta.__div (a, b)
+	checktype(a, color_meta)
 	checkluatype (b, TYPE_NUMBER)
 
 	return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
@@ -200,3 +203,5 @@ function color_methods:setA(a)
 	self[4] = a
 	return self
 end
+
+end}

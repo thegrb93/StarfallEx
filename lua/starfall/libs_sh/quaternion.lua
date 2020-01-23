@@ -1,13 +1,5 @@
---- Quaternion library
-
---- Quaternion library
--- @shared
-local quat_lib = SF.RegisterLibrary("quaternion")
-
-local vwrap, vunwrap = SF.WrapObject, SF.UnwrapObject
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
 --[[
 -- Quaternion Support
@@ -40,14 +32,36 @@ local delta = 0.0000001000000
 local deg2rad = math.pi / 180
 local rad2deg = 180 / math.pi
 
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Quaternion library
+-- @shared
+local quat_lib = instance:RegisterLibrary("quaternion")
+
 --- Quaternion type
-local quat_methods, quat_metamethods = SF.RegisterType("Quaternion")
+local quat_methods, quat_meta = instance:RegisterType("Quaternion")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local quat_lib = instance.Libraries.quaternion
+local quat_methods, quat_meta = instance.Types.Quaternion.Methods, instance.Types.Quaternion
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
+
 
 --****************************** Helper functions ******************************--
 
 local function quicknew(r, i, j, k)
 	local new = { r, i, j, k }
-	setmetatable(new, quat_metamethods)
+	setmetatable(new, quat_meta)
 	return new
 end
 
@@ -150,11 +164,7 @@ end
 
 --- Converts an Entity to a Quaternion format for generation
 argTypesToQuat["Entity"] = function(ent)
-	ent = SF.UnwrapObject(ent)
-
-	if not (ent and ent:IsValid()) then
-		return quicknew(0, 0, 0, 0)
-	end
+	ent = getent(ent)
 
 	local ang = ent:GetAngles()
 	local p, y, r = ang.p, ang.y, ang.r
@@ -239,7 +249,7 @@ local function format(value)
 end
 
 
-quat_metamethods.__tostring = format
+quat_meta.__tostring = format
 
 
 
@@ -262,15 +272,15 @@ end
 
 
 
-quat_metamethods.__unm = function(q)
+quat_meta.__unm = function(q)
 	return quicknew(-q[1], -q[2], -q[3], -q[4])
 end
 
 
-quat_metamethods.__add = function(lhs, rhs)
+quat_meta.__add = function(lhs, rhs)
 
-	checktype(lhs, quat_metamethods)
-	checktype(rhs, quat_metamethods)
+	checktype(lhs, quat_meta)
+	checktype(rhs, quat_meta)
 
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -289,7 +299,7 @@ quat_metamethods.__add = function(lhs, rhs)
 end
 
 
-quat_metamethods.__sub = function(lhs, rhs)
+quat_meta.__sub = function(lhs, rhs)
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
 
@@ -307,7 +317,7 @@ quat_metamethods.__sub = function(lhs, rhs)
 end
 
 
-quat_metamethods.__mul = function(lhs, rhs)
+quat_meta.__mul = function(lhs, rhs)
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
 
@@ -346,9 +356,9 @@ quat_metamethods.__mul = function(lhs, rhs)
 end
 
 
-quat_metamethods.__div = function(lhs, rhs)
-	checktype(lhs, quat_metamethods)
-	checktype(rhs, quat_metamethods)
+quat_meta.__div = function(lhs, rhs)
+	checktype(lhs, quat_meta)
+	checktype(rhs, quat_meta)
 
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -384,9 +394,9 @@ quat_metamethods.__div = function(lhs, rhs)
 end
 
 
-quat_metamethods.__pow = function(lhs, rhs)
-	checktype(lhs, quat_metamethods)
-	checktype(rhs, quat_metamethods)
+quat_meta.__pow = function(lhs, rhs)
+	checktype(lhs, quat_meta)
+	checktype(rhs, quat_meta)
 
 
 	local ltype = SF.GetType(lhs)
@@ -408,7 +418,7 @@ end
 
 --[[****************************************************************************]]
 
-quat_metamethods.__eq = function(lhs, rhs)
+quat_meta.__eq = function(lhs, rhs)
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
 
@@ -593,7 +603,7 @@ end
 --- Returns the euler angle of rotation in degrees
 function quat_lib.rotationEulerAngle(q)
 	local l = sqrt(q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4])
-	if l == 0 then return SF.WrapObject(Angle(0, 0, 0)) end
+	if l == 0 then return awrap(Angle(0, 0, 0)) end
 	local q1, q2, q3, q4 = q[1] / l, q[2] / l, q[3] / l, q[4] / l
 
 	local x = Vector(q1 * q1 + q2 * q2 - q3 * q3 - q4 * q4,
@@ -616,7 +626,7 @@ function quat_lib.rotationEulerAngle(q)
 	local dot = q2 * q1 + q3 * q4
 	if dot < 0 then ang.roll = -ang.roll end
 
-	return SF.WrapObject(ang)
+	return awrap(ang)
 end
 
 --- Returns the angle of rotation in degrees (by coder0xff)
@@ -645,7 +655,7 @@ end
 
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff)
 function quat_lib.rotationVector(q)
-	checktype(q, quat_metamethods)
+	checktype(q, quat_meta)
 	local l2 = q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 	local m2 = math.max(q[2] * q[2] + q[3] * q[3] + q[4] * q[4], 0)
 
@@ -667,3 +677,5 @@ function quat_lib.vec(q)
 end
 
 --[[****************************************************************************]]
+
+end}

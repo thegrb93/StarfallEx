@@ -61,18 +61,13 @@
 		-	Fixed addition of extra entity types. I messed up really badly.
 --]]
 
---- vON Library
--- @shared
-local von = SF.RegisterLibrary("von")
 
 local _deserialize, _serialize, _d_meta, _s_meta, d_findVariable, s_anyVariable
 local sub, gsub, find, insert, concat, error, tonumber, tostring, type, next = string.sub, string.gsub, string.find, table.insert, table.concat, error, tonumber, tostring, type, next
-
-
+local g_instance
 
 --[[    This section contains localized functions which (de)serialize
 		variables according to the types found.                          ]]
-
 
 
 --	This is kept away from the table for speed.
@@ -191,7 +186,7 @@ end
 --	Yeah, ton of parameters.
 function s_anyVariable(data, lastType, isNumeric, isKey, isLast, jobstate)
 
-	local unwrap = SF.UnwrapObject(data)
+	local unwrap = g_instance.UnwrapObject(data)
 	if unwrap then data = unwrap end
 
 	local tp = type(data)
@@ -603,7 +598,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 			a = find(s, "[;:}~]", i)
 
 			if a then
-				return SF.WrapObject(Entity(tonumber(sub(s, i, a - 1)))), a - 1
+				return g_instance.WrapObject(Entity(tonumber(sub(s, i, a - 1)))), a - 1
 			end
 
 			SF.Throw("vON: Entity ID definition started... Found no end.", 3)
@@ -636,7 +631,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 			end
 
 			if x and y and z then
-				return SF.Vectors.Wrap(Vector(x, y, z)), a - 1
+				return g_instance.Types.Vector.Wrap(Vector(x, y, z)), a - 1
 			end
 
 			SF.Throw("vON: Vector definition started... Found no end.", 3)
@@ -669,7 +664,7 @@ if gmod then	--	Luckily, a specific table named after the game is present in Gar
 			end
 
 			if p and y and r then
-				return SF.Angles.Wrap(Angle(p, y, r)), a - 1
+				return g_instance.Types.Angle.Wrap(Angle(p, y, r)), a - 1
 			end
 
 			SF.Throw("vON: Angle definition started... Found no end.", 3)
@@ -780,34 +775,42 @@ end
 local _s_table = _serialize.table
 local _d_table = _deserialize.table
 
-_d_meta = {
-	__call = function(self, str, allowIdRewriting)
-		if type(str) == "string" then
-			return _d_table(str, nil, #str, true, { {}, allowIdRewriting })
+local function deserialize(str, allowIdRewriting)
+	if type(str) == "string" then
+		return _d_table(str, nil, #str, true, { {}, allowIdRewriting })
+	end
+	SF.Throw("vON: You must deserialize a string, not a " .. type(str), 3)
+end
+
+local function serialize(data, checkRecursion)
+	if type(data) == "table" then
+		if checkRecursion then
+			local assoc, checked = {}, { ID = 1 }
+
+			checkTableForRecursion(data, checked, assoc)
+
+			return _s_table(data, nil, nil, nil, nil, true, { assoc, {} })
 		end
-		SF.Throw("vON: You must deserialize a string, not a " .. type(str), 2)
-	end,
-	__newindex = function() end,
-	__metatable = false
-}
-_s_meta = {
-	__call = function(self, data, checkRecursion)
-		if type(data) == "table" then
-			if checkRecursion then
-				local assoc, checked = {}, { ID = 1 }
 
-				checkTableForRecursion(data, checked, assoc)
+		return _s_table(data, nil, nil, nil, nil, true, { false })
+	end
+	SF.Throw("vON: You must serialize a table, not a " .. type(data), 3)
+end
 
-				return _s_table(data, nil, nil, nil, nil, true, { assoc, {} })
-			end
 
-			return _s_table(data, nil, nil, nil, nil, true, { false })
-		end
-		SF.Throw("vON: You must serialize a table, not a " .. type(data), 2)
-	end,
-	__newindex = function() end,
-	__metatable = false
-}
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- vON Library
+-- @shared
+local von_library = instance:RegisterLibrary("von")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local von_library = instance.Libraries.von
 
 --- Deserialize a string
 -- @shared
@@ -815,7 +818,10 @@ _s_meta = {
 -- @name von.deserialize
 -- @param str String to deserialize
 -- @return Table
-von.deserialize = setmetatable({}, _d_meta)
+function von_library.deserialize(str)
+	g_instance = instance
+	return deserialize(str)
+end
 
 --- Serialize a table
 -- @shared
@@ -823,4 +829,9 @@ von.deserialize = setmetatable({}, _d_meta)
 -- @name von.serialize
 -- @param tbl Table to serialize
 -- @return String
-von.serialize = setmetatable({}, _s_meta)
+function von_library.serialize(tbl)
+	g_instance = instance
+	return serialize(tbl)
+end
+
+end}

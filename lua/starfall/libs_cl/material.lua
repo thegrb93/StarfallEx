@@ -1,57 +1,17 @@
-SF.Materials = {}
-
--- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("material.load", "Load material", "Allows users to load a vmt material.", { client = {} })
-	P.registerPrivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
-	P.registerPrivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
-	P.registerPrivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
-	P.registerPrivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
-end
-
-local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
-local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
-
---- The `Material` type is used to control shaders in rendering.
---- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
---- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
--- @client
-local material_methods, material_metamethods = SF.RegisterType("Material")
-local lmaterial_methods, lmaterial_metamethods = SF.RegisterType("LockedMaterial") --Material that can't be modified
-local wrap, unwrap = SF.CreateWrapper(material_metamethods, true, false)
-local lwrap, lunwrap = SF.CreateWrapper(lmaterial_metamethods, true, false, nil, material_metamethods)
-
-local vector_meta, col_meta, matrix_meta
-local vwrap, cwrap, mwrap, vunwrap, cunwrap, munwrap
-
-local checktype = SF.CheckType
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 local dsetmeta = debug.setmetatable
+local registerprivilege = SF.Permissions.registerPrivilege
 
---- `material` library is allows creating material objects which are used for controlling shaders in rendering.
--- @client
-local material_library = SF.RegisterLibrary("material")
+-- Register privileges
+registerprivilege("material.load", "Load material", "Allows users to load a vmt material.", { client = {} })
+registerprivilege("material.create", "Create material", "Allows users to create a new custom material.", { client = {} })
+registerprivilege("material.imagecreate", "Create material from image", "Allows users to create a new material from an image file.", { client = {} })
+registerprivilege("material.urlcreate", "Create material from online image", "Allows users to create a new material from an online image.", { client = {}, urlwhitelist = {} })
+registerprivilege("material.datacreate", "Create material from base64 image data", "Allows users to create a new material from base64 image data.", { client = {} })
 
-SF.Materials.Wrap = wrap
-SF.Materials.Unwrap = unwrap
-SF.Materials.Methods = material_methods
-SF.Materials.Metatable = material_metamethods
-SF.Materials.LMetatable = lmaterial_metamethods
-
-SF.AddHook("postload", function()
-	vector_meta = SF.Vectors.Metatable
-	col_meta = SF.Color.Metatable
-	matrix_meta = SF.VMatrix.Metatable
-
-	vwrap = SF.Vectors.Wrap
-	cwrap = SF.Color.Wrap
-	mwrap = SF.VMatrix.Wrap
-	vunwrap = SF.Vectors.Unwrap
-	cunwrap = SF.Color.Unwrap
-	munwrap = SF.VMatrix.Unwrap
-end)
+local cv_max_materials = CreateConVar("sf_render_maxusermaterials", "40", { FCVAR_ARCHIVE })
+local cv_max_data_material_size = CreateConVar("sf_render_maxdatamaterialsize", "1000000", { FCVAR_ARCHIVE })
 
 -- Make sure to update the material.create doc if you add stuff to this list.
 local allowed_shaders = {
@@ -88,462 +48,12 @@ cvars.AddChangeCallback( "sf_render_maxusermaterials", function()
 	material_bank.max = cv_max_materials:GetInt()
 end)
 
--- Register functions to be called when the chip is initialised and deinitialised
-SF.AddHook("initialize", function (inst)
-	inst.data.material = {
-		usermaterials = {}
-	}
-end)
-
-SF.AddHook("deinitialize", function (inst)
-	for k, v in pairs(inst.data.material.usermaterials) do
-		material_bank:free(inst.player, k)
-		inst.data.material.usermaterials[k] = nil
-	end
-end)
-
 local blacklisted_keys = {
 	["$flags2"] = true
 }
 local function checkkey(key)
 	checkluatype(key, TYPE_STRING, 2)
 	if blacklisted_keys[string.lower(key)] then SF.Throw("Blocked material key: "..key, 3) end
-end
-
-
---- Loads a .vmt material or existing material. Throws an error if the material fails to load
---- Existing created materials can be loaded with ! prepended to the name
---- Can't be modified
--- @param path The path of the material (don't include .vmt in the path)
--- @return The material object. Can't be modified.
-function material_library.load(path)
-	checkluatype(path, TYPE_STRING)
-	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
-	checkpermission(SF.instance, path, "material.load")
-	local m = SF.CheckMaterial(path)
-	if not m or m:IsError() then SF.Throw("This material doesn't exist or is blacklisted", 2) end
-	return lwrap(m)
-end
-
---- Gets a texture from a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param texture The texture key to get
--- @return The texture's name
-function material_library.getTexture(path, texture)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(texture, TYPE_STRING)
-	return Material(path):GetTexture(texture):GetName()
-end
-
---- Returns a table of keyvalues from a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The table of keyvalues
-function material_library.getKeyValues(path)
-	checkluatype(path, TYPE_STRING)
-	return SF.Sanitize(Material(path):GetKeyValues())
-end
-
---- Returns a material's engine name
--- @param path The path of the material (don't include .vmt in the path)
--- @return The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
-function material_library.getName(path)
-	checkluatype(path, TYPE_STRING)
-	return Material(path):GetName()
-end
-
---- Returns the shader name of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The shader name of the material
-function material_library.getShader(path)
-	checkluatype(path, TYPE_STRING)
-	return Material(path):GetShader()
-end
-
---- Returns the width of the member texture set for $basetexture of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The basetexture's width
-function material_library.getWidth(path)
-	checkluatype(path, TYPE_STRING)
-	return Material(path):Width()
-end
-
---- Returns the height of the member texture set for $basetexture of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @return The basetexture's height
-function material_library.getHeight(path)
-	checkluatype(path, TYPE_STRING)
-	return Material(path):Height()
-end
-
---- Returns a color pixel value of the $basetexture of a .png or .jpg material.
--- @param path The path of the material (don't include .vmt in the path)
--- @param x The x coordinate of the pixel
--- @param y The y coordinate of the pixel
--- @return The color value
-function material_library.getColor(path, x, y)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(x, TYPE_NUMBER)
-	checkluatype(y, TYPE_NUMBER)
-	return cwrap(Material(path):GetColor(x, y))
-end
-
---- Returns a float keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the float from
--- @return The float value or nil if it doesn't exist
-function material_library.getFloat(path, key)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(key, TYPE_STRING)
-	return Material(path):GetFloat(key)
-end
-
---- Returns an int keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the int from
--- @return The int value or nil if it doesn't exist
-function material_library.getInt(path, key)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(key, TYPE_STRING)
-	return Material(path):GetInt(key)
-end
-
---- Returns a matrix keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the matrix from
--- @return The matrix value or nil if it doesn't exist
-function material_library.getMatrix(path, key)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(key, TYPE_STRING)
-	return mwrap(Material(path):GetMatrix(key))
-end
-
---- Returns a string keyvalue
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the string from
--- @return The string value or nil if it doesn't exist
-function material_library.getString(path, key)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(key, TYPE_STRING)
-	return Material(path):GetString(key)
-end
-
---- Returns a vector keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the vector from
--- @return The string id of the texture
-function material_library.getVector(path, key)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(Material(path):GetVector(key))
-end
-
---- Returns a linear color-corrected vector keyvalue of a material
--- @param path The path of the material (don't include .vmt in the path)
--- @param key The key to get the vector from
--- @return The vector value or nil if it doesn't exist
-function material_library.getVectorLinear(path, key)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(Material(path):GetVectorLinear(key))
-end
-
---- Creates a new blank material
--- @param shader The shader of the material. Must be one of
---- UnlitGeneric
---- VertexLitGeneric
---- Refract_DX90
---- Water_DX90
---- Sky_DX9
---- gmodscreenspace
---- Modulate_DX9
-function material_library.create(shader)
-	checkluatype(shader, TYPE_STRING)
-	local instance = SF.instance
-	checkpermission(instance, nil, "material.create")
-	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
-	local m = material_bank:use(instance.player, shader)
-	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
-	instance.data.material.usermaterials[m] = true
-	return wrap(m)
-end
-
-local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
---- Creates a .jpg or .png material from file
---- Can't be modified
--- @param path The path to the image file
--- @param params The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters
-function material_library.createFromImage(path, params)
-	checkluatype(path, TYPE_STRING)
-	checkluatype(params, TYPE_STRING)
-	local ext = string.GetExtensionFromFilename(path)
-	if ext ~= "jpg" and ext ~= "png" then SF.Throw("Expected a .jpg or .png file", 2) end
-	local paramlist = {}
-	for s in string.gmatch(string.lower(params), "%S+") do
-		if not image_params[s] then SF.Throw("Invalid parameter: "..s, 2) end
-		paramlist[#paramlist + 1] = s
-	end
-	checkpermission(SF.instance, path, "material.imagecreate")
-	local m = Material(path, table.concat(paramlist, " "))
-	if m:IsError() then SF.Throw("The material path is invalid", 2) end
-	return lwrap(m)
-end
-
---- Free's a user created material allowing you to create others
-function material_methods:destroy()
-	checktype(self, material_metamethods)
-
-	local instance = SF.instance
-	local m = unwrap(self)
-	if not m then SF.Throw("The material is already destroyed?", 2) end
-
-	local name = m:GetName()
-	local rt = SF.instance.data.render.rendertargets[name]
-	if rt then
-		instance.env.render.destroyRenderTarget(name)
-	end
-	
-	local sensitive2sf, sf2sensitive = SF.GetWrapperTables(material_metamethods)
-	sensitive2sf[m] = nil
-	sf2sensitive[self] = nil
-	dsetmeta(self, nil)
-
-	instance.data.material.usermaterials[m] = nil
-	material_bank:free(instance.player, m)
-end
-function lmaterial_methods:destroy()
-	checktype(self, lmaterial_metamethods)
-end
-
---- Returns the material's engine name
--- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
-function material_methods:getName()
-	checktype(self, material_metamethods)
-	return unwrap(self):GetName()
-end
-function lmaterial_methods:getName()
-	checktype(self, lmaterial_metamethods)
-	return lunwrap(self):GetName()
-end
-
---- Returns the shader name of the material
--- @return The shader name of the material
-function material_methods:getShader()
-	checktype(self, material_metamethods)
-	return unwrap(self):GetShader()
-end
-function lmaterial_methods:getShader()
-	checktype(self, lmaterial_metamethods)
-	return lunwrap(self):GetShader()
-end
-
---- Gets the base texture set to the material's width
--- @return The basetexture's width
-function material_methods:getWidth()
-	checktype(self, material_metamethods)
-	return unwrap(self):Width()
-end
-function lmaterial_methods:getWidth()
-	checktype(self, lmaterial_metamethods)
-	return lunwrap(self):Width()
-end
-
---- Gets the base texture set to the material's height
--- @return The basetexture's height
-function material_methods:getHeight()
-	checktype(self, material_metamethods)
-	return unwrap(self):Height()
-end
-function lmaterial_methods:getHeight()
-	checktype(self, lmaterial_metamethods)
-	return lunwrap(self):Height()
-end
-
---- Returns a color pixel value of the $basetexture of a .png or .jpg material.
--- @param x The x coordinate of the pixel
--- @param y The y coordinate of the pixel
--- @return The color value
-function material_methods:getColor(x, y)
-	checktype(self, material_metamethods)
-	checkluatype(x, TYPE_NUMBER)
-	checkluatype(y, TYPE_NUMBER)
-	return cwrap(unwrap(self):GetColor(x, y))
-end
-function lmaterial_methods:getColor(x, y)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(x, TYPE_NUMBER)
-	checkluatype(y, TYPE_NUMBER)
-	return cwrap(lunwrap(self):GetColor(x, y))
-end
-
---- Returns a float keyvalue
--- @param key The key to get the float from
--- @return The float value or nil if it doesn't exist
-function material_methods:getFloat(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return unwrap(self):GetFloat(key)
-end
-function lmaterial_methods:getFloat(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return lunwrap(self):GetFloat(key)
-end
-
---- Returns an int keyvalue
--- @param key The key to get the int from
--- @return The int value or nil if it doesn't exist
-function material_methods:getInt(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return unwrap(self):GetInt(key)
-end
-function lmaterial_methods:getInt(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return lunwrap(self):GetInt(key)
-end
-
---- Returns a table of material keyvalues
--- @return The table of keyvalues
-function material_methods:getKeyValues()
-	checktype(self, material_metamethods)
-	return SF.Sanitize(unwrap(self):GetKeyValues())
-end
-function lmaterial_methods:getKeyValues()
-	checktype(self, lmaterial_metamethods)
-	return SF.Sanitize(lunwrap(self):GetKeyValues())
-end
-
---- Returns a matrix keyvalue
--- @param key The key to get the matrix from
--- @return The matrix value or nil if it doesn't exist
-function material_methods:getMatrix(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return mwrap(unwrap(self):GetMatrix(key))
-end
-function lmaterial_methods:getMatrix(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return mwrap(lunwrap(self):GetMatrix(key))
-end
-
---- Returns a string keyvalue
--- @param key The key to get the string from
--- @return The string value or nil if it doesn't exist
-function material_methods:getString(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return unwrap(self):GetString(key)
-end
-function lmaterial_methods:getString(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return lunwrap(self):GetString(key)
-end
-
---- Returns a texture id keyvalue
--- @param key The key to get the texture from
--- @return The string id of the texture or nil if it doesn't exist
-function material_methods:getTexture(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	local tex = unwrap(self):GetTexture(key)
-	if tex then return tex:GetName() end
-end
-function lmaterial_methods:getTexture(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	local tex = lunwrap(self):GetTexture(key)
-	if tex then return tex:GetName() end
-end
-
---- Returns a vector keyvalue
--- @param key The key to get the vector from
--- @return The string id of the texture
-function material_methods:getVector(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(unwrap(self):GetVector(key))
-end
-function lmaterial_methods:getVector(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(lunwrap(self):GetVector(key))
-end
-
---- Returns a linear color-corrected vector keyvalue
--- @param key The key to get the vector from
--- @return The vector value or nil if it doesn't exist
-function material_methods:getVectorLinear(key)
-	checktype(self, material_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(unwrap(self):GetVectorLinear(key))
-end
-function lmaterial_methods:getVectorLinear(key)
-	checktype(self, lmaterial_metamethods)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(lunwrap(self):GetVectorLinear(key))
-end
-
--- function material_methods:isError()
--- end
-
---- Refreshes the material. Sometimes needed for certain parameters to update
-function material_methods:recompute()
-	checktype(self, material_metamethods)
-	unwrap(self):Recompute()
-end
-
---- Sets a float keyvalue
--- @param key The key name to set
--- @param v The value to set it to
-function material_methods:setFloat(key, v)
-	checktype(self, material_metamethods)
-	checkkey(key)
-	checkluatype(v, TYPE_NUMBER)
-	unwrap(self):SetFloat(key, v)
-end
-
---- Sets an int keyvalue
--- @param key The key name to set
--- @param v The value to set it to
-function material_methods:setInt(key, v)
-	checktype(self, material_metamethods)
-	checkkey(key)
-	checkluatype(v, TYPE_NUMBER)
-	unwrap(self):SetInt(key, v)
-end
-
---- Sets a matrix keyvalue
--- @param key The key name to set
--- @param v The value to set it to
-function material_methods:setMatrix(key, v)
-	checktype(self, material_metamethods)
-	checkkey(key)
-	checktype(v, matrix_meta)
-	unwrap(self):SetMatrix(key, munwrap(v))
-end
-
---- Sets a string keyvalue
--- @param key The key name to set
--- @param v The value to set it to
-function material_methods:setString(key, v)
-	checktype(self, material_metamethods)
-	checkkey(key)
-	checkluatype(v, TYPE_STRING)
-	unwrap(self):SetString(key, v)
-end
-
---- Sets a texture keyvalue
--- @param key The key name to set. $basetexture is the key name for most purposes.
--- @param v The texture name to set it to.
-function material_methods:setTexture(key, v)
-	checktype(self, material_metamethods)
-	checkkey(key)
-	checkluatype(v, TYPE_STRING)
-
-	unwrap(self):SetTexture(key, v)
 end
 
 local LoadingTextureQueue = {}
@@ -673,19 +183,497 @@ local function NextInTextureQueue()
 	end
 end
 
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- The `Material` type is used to control shaders in rendering.
+--- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
+--- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
+-- @client
+local material_methods, material_meta = instance:RegisterType("Material", true, false)
+local lmaterial_methods, lmaterial_meta = instance:RegisterType("LockedMaterial", true, false, nil, "Material") --Material that can't be modified
+
+
+--- `material` library is allows creating material objects which are used for controlling shaders in rendering.
+-- @client
+local material_library = instance:RegisterLibrary("material")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local material_library = instance.Libraries.material
+local material_methods, material_meta, wrap, unwrap = instance.Types.Material.Methods, instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
+local lmaterial_methods, lmaterial_meta, lwrap, lunwrap = instance.Types.LockedMaterial.Methods, instance.Types.LockedMaterial, instance.Types.LockedMaterial.Wrap, instance.Types.LockedMaterial.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
+-- We don't want locked material able to access unlocked material methods
+lmaterial_meta.__index = lmaterial_methods
+
+-- Register functions to be called when the chip is initialised and deinitialised
+instance:AddHook("initialize", function()
+	instance.data.material = {
+		usermaterials = {}
+	}
+end)
+
+instance:AddHook("deinitialize", function()
+	for k, v in pairs(instance.data.material.usermaterials) do
+		material_bank:free(instance.player, k)
+		instance.data.material.usermaterials[k] = nil
+	end
+end)
+
+--- Loads a .vmt material or existing material. Throws an error if the material fails to load
+--- Existing created materials can be loaded with ! prepended to the name
+--- Can't be modified
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The material object. Can't be modified.
+function material_library.load(path)
+	checkluatype(path, TYPE_STRING)
+	if string.GetExtensionFromFilename(path) then SF.Throw("The path cannot have an extension", 2) end
+	checkpermission(instance, path, "material.load")
+	local m = SF.CheckMaterial(path)
+	if not m or m:IsError() then SF.Throw("This material doesn't exist or is blacklisted", 2) end
+	return lwrap(m)
+end
+
+--- Gets a texture from a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param texture The texture key to get
+-- @return The texture's name
+function material_library.getTexture(path, texture)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(texture, TYPE_STRING)
+	return Material(path):GetTexture(texture):GetName()
+end
+
+--- Returns a table of keyvalues from a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The table of keyvalues
+function material_library.getKeyValues(path)
+	checkluatype(path, TYPE_STRING)
+	return instance.Sanitize(Material(path):GetKeyValues())
+end
+
+--- Returns a material's engine name
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The name of a material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+function material_library.getName(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):GetName()
+end
+
+--- Returns the shader name of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The shader name of the material
+function material_library.getShader(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):GetShader()
+end
+
+--- Returns the width of the member texture set for $basetexture of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The basetexture's width
+function material_library.getWidth(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):Width()
+end
+
+--- Returns the height of the member texture set for $basetexture of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @return The basetexture's height
+function material_library.getHeight(path)
+	checkluatype(path, TYPE_STRING)
+	return Material(path):Height()
+end
+
+--- Returns a color pixel value of the $basetexture of a .png or .jpg material.
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param x The x coordinate of the pixel
+-- @param y The y coordinate of the pixel
+-- @return The color value
+function material_library.getColor(path, x, y)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	return cwrap(Material(path):GetColor(x, y))
+end
+
+--- Returns a float keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the float from
+-- @return The float value or nil if it doesn't exist
+function material_library.getFloat(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return Material(path):GetFloat(key)
+end
+
+--- Returns an int keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the int from
+-- @return The int value or nil if it doesn't exist
+function material_library.getInt(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return Material(path):GetInt(key)
+end
+
+--- Returns a matrix keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the matrix from
+-- @return The matrix value or nil if it doesn't exist
+function material_library.getMatrix(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return mwrap(Material(path):GetMatrix(key))
+end
+
+--- Returns a string keyvalue
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the string from
+-- @return The string value or nil if it doesn't exist
+function material_library.getString(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return Material(path):GetString(key)
+end
+
+--- Returns a vector keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the vector from
+-- @return The string id of the texture
+function material_library.getVector(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(Material(path):GetVector(key))
+end
+
+--- Returns a linear color-corrected vector keyvalue of a material
+-- @param path The path of the material (don't include .vmt in the path)
+-- @param key The key to get the vector from
+-- @return The vector value or nil if it doesn't exist
+function material_library.getVectorLinear(path, key)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(Material(path):GetVectorLinear(key))
+end
+
+--- Creates a new blank material
+-- @param shader The shader of the material. Must be one of
+--- UnlitGeneric
+--- VertexLitGeneric
+--- Refract_DX90
+--- Water_DX90
+--- Sky_DX9
+--- gmodscreenspace
+--- Modulate_DX9
+function material_library.create(shader)
+	checkluatype(shader, TYPE_STRING)
+	checkpermission(instance, nil, "material.create")
+	if not allowed_shaders[shader] then SF.Throw("Tried to use unsupported shader: "..shader, 2) end
+	local m = material_bank:use(instance.player, shader)
+	if not m then SF.Throw("Exceeded the maximum user materials", 2) end
+	instance.data.material.usermaterials[m] = true
+	return wrap(m)
+end
+
+local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["noclamp"] = true,["smooth"] = true}
+--- Creates a .jpg or .png material from file
+--- Can't be modified
+-- @param path The path to the image file
+-- @param params The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters
+function material_library.createFromImage(path, params)
+	checkluatype(path, TYPE_STRING)
+	checkluatype(params, TYPE_STRING)
+	local ext = string.GetExtensionFromFilename(path)
+	if ext ~= "jpg" and ext ~= "png" then SF.Throw("Expected a .jpg or .png file", 2) end
+	local paramlist = {}
+	for s in string.gmatch(string.lower(params), "%S+") do
+		if not image_params[s] then SF.Throw("Invalid parameter: "..s, 2) end
+		paramlist[#paramlist + 1] = s
+	end
+	checkpermission(instance, path, "material.imagecreate")
+	local m = Material(path, table.concat(paramlist, " "))
+	if m:IsError() then SF.Throw("The material path is invalid", 2) end
+	return lwrap(m)
+end
+
+--- Free's a user created material allowing you to create others
+function material_methods:destroy()
+	checktype(self, material_meta)
+
+	local m = unwrap(self)
+	if not m then SF.Throw("The material is already destroyed?", 2) end
+
+	local name = m:GetName()
+	local rt = instance.data.render.rendertargets[name]
+	if rt then
+		instance.env.render.destroyRenderTarget(name)
+	end
+	
+	local sensitive2sf, sf2sensitive = material_meta.sensitive2sf, material_meta.sf2sensitive
+	sensitive2sf[m] = nil
+	sf2sensitive[self] = nil
+	dsetmeta(self, nil)
+
+	instance.data.material.usermaterials[m] = nil
+	material_bank:free(instance.player, m)
+end
+function lmaterial_methods:destroy()
+	checktype(self, lmaterial_meta)
+end
+
+--- Returns the material's engine name
+-- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
+function material_methods:getName()
+	checktype(self, material_meta)
+	return unwrap(self):GetName()
+end
+function lmaterial_methods:getName()
+	checktype(self, lmaterial_meta)
+	return lunwrap(self):GetName()
+end
+
+--- Returns the shader name of the material
+-- @return The shader name of the material
+function material_methods:getShader()
+	checktype(self, material_meta)
+	return unwrap(self):GetShader()
+end
+function lmaterial_methods:getShader()
+	checktype(self, lmaterial_meta)
+	return lunwrap(self):GetShader()
+end
+
+--- Gets the base texture set to the material's width
+-- @return The basetexture's width
+function material_methods:getWidth()
+	checktype(self, material_meta)
+	return unwrap(self):Width()
+end
+function lmaterial_methods:getWidth()
+	checktype(self, lmaterial_meta)
+	return lunwrap(self):Width()
+end
+
+--- Gets the base texture set to the material's height
+-- @return The basetexture's height
+function material_methods:getHeight()
+	checktype(self, material_meta)
+	return unwrap(self):Height()
+end
+function lmaterial_methods:getHeight()
+	checktype(self, lmaterial_meta)
+	return lunwrap(self):Height()
+end
+
+--- Returns a color pixel value of the $basetexture of a .png or .jpg material.
+-- @param x The x coordinate of the pixel
+-- @param y The y coordinate of the pixel
+-- @return The color value
+function material_methods:getColor(x, y)
+	checktype(self, material_meta)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	return cwrap(unwrap(self):GetColor(x, y))
+end
+function lmaterial_methods:getColor(x, y)
+	checktype(self, lmaterial_meta)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
+	return cwrap(lunwrap(self):GetColor(x, y))
+end
+
+--- Returns a float keyvalue
+-- @param key The key to get the float from
+-- @return The float value or nil if it doesn't exist
+function material_methods:getFloat(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	return unwrap(self):GetFloat(key)
+end
+function lmaterial_methods:getFloat(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	return lunwrap(self):GetFloat(key)
+end
+
+--- Returns an int keyvalue
+-- @param key The key to get the int from
+-- @return The int value or nil if it doesn't exist
+function material_methods:getInt(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	return unwrap(self):GetInt(key)
+end
+function lmaterial_methods:getInt(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	return lunwrap(self):GetInt(key)
+end
+
+--- Returns a table of material keyvalues
+-- @return The table of keyvalues
+function material_methods:getKeyValues()
+	checktype(self, material_meta)
+	return instance.Sanitize(unwrap(self):GetKeyValues())
+end
+function lmaterial_methods:getKeyValues()
+	checktype(self, lmaterial_meta)
+	return instance.Sanitize(lunwrap(self):GetKeyValues())
+end
+
+--- Returns a matrix keyvalue
+-- @param key The key to get the matrix from
+-- @return The matrix value or nil if it doesn't exist
+function material_methods:getMatrix(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	return mwrap(unwrap(self):GetMatrix(key))
+end
+function lmaterial_methods:getMatrix(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	return mwrap(lunwrap(self):GetMatrix(key))
+end
+
+--- Returns a string keyvalue
+-- @param key The key to get the string from
+-- @return The string value or nil if it doesn't exist
+function material_methods:getString(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	return unwrap(self):GetString(key)
+end
+function lmaterial_methods:getString(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	return lunwrap(self):GetString(key)
+end
+
+--- Returns a texture id keyvalue
+-- @param key The key to get the texture from
+-- @return The string id of the texture or nil if it doesn't exist
+function material_methods:getTexture(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	local tex = unwrap(self):GetTexture(key)
+	if tex then return tex:GetName() end
+end
+function lmaterial_methods:getTexture(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	local tex = lunwrap(self):GetTexture(key)
+	if tex then return tex:GetName() end
+end
+
+--- Returns a vector keyvalue
+-- @param key The key to get the vector from
+-- @return The string id of the texture
+function material_methods:getVector(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(unwrap(self):GetVector(key))
+end
+function lmaterial_methods:getVector(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(lunwrap(self):GetVector(key))
+end
+
+--- Returns a linear color-corrected vector keyvalue
+-- @param key The key to get the vector from
+-- @return The vector value or nil if it doesn't exist
+function material_methods:getVectorLinear(key)
+	checktype(self, material_meta)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(unwrap(self):GetVectorLinear(key))
+end
+function lmaterial_methods:getVectorLinear(key)
+	checktype(self, lmaterial_meta)
+	checkluatype(key, TYPE_STRING)
+	return vwrap(lunwrap(self):GetVectorLinear(key))
+end
+
+-- function material_methods:isError()
+-- end
+
+--- Refreshes the material. Sometimes needed for certain parameters to update
+function material_methods:recompute()
+	checktype(self, material_meta)
+	unwrap(self):Recompute()
+end
+
+--- Sets a float keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setFloat(key, v)
+	checktype(self, material_meta)
+	checkkey(key)
+	checkluatype(v, TYPE_NUMBER)
+	unwrap(self):SetFloat(key, v)
+end
+
+--- Sets an int keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setInt(key, v)
+	checktype(self, material_meta)
+	checkkey(key)
+	checkluatype(v, TYPE_NUMBER)
+	unwrap(self):SetInt(key, v)
+end
+
+--- Sets a matrix keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setMatrix(key, v)
+	checktype(self, material_meta)
+	checkkey(key)
+	checktype(v, matrix_meta)
+	unwrap(self):SetMatrix(key, munwrap(v))
+end
+
+--- Sets a string keyvalue
+-- @param key The key name to set
+-- @param v The value to set it to
+function material_methods:setString(key, v)
+	checktype(self, material_meta)
+	checkkey(key)
+	checkluatype(v, TYPE_STRING)
+	unwrap(self):SetString(key, v)
+end
+
+--- Sets a texture keyvalue
+-- @param key The key name to set. $basetexture is the key name for most purposes.
+-- @param v The texture name to set it to.
+function material_methods:setTexture(key, v)
+	checktype(self, material_meta)
+	checkkey(key)
+	checkluatype(v, TYPE_STRING)
+
+	unwrap(self):SetTexture(key, v)
+end
+
 --- Loads an online image or base64 data to the specified texture key
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param url The url or base64 data
 -- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
 -- @param done An optional callback called when the image is done loading. Passes the material, url
 function material_methods:setTextureURL(key, url, cb, done)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(url, TYPE_STRING)
 	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
 	if done ~= nil then checkluatype(done, TYPE_FUNCTION) end
 
-	local instance = SF.instance
 	local m = unwrap(self)
 	local texture = m:GetTexture(key)
 	if not (texture and instance.data.render.validrendertargets[texture:GetName()]) then
@@ -740,11 +728,11 @@ end
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param name The name of the rendertarget
 function material_methods:setTextureRenderTarget(key, name)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(name, TYPE_STRING)
 
-	local rt = SF.instance.data.render.rendertargets[name]
+	local rt = instance.data.render.rendertargets[name]
 	if not rt then SF.Throw("Invalid rendertarget: "..name, 2) end
 
 	local m = unwrap(self)
@@ -754,7 +742,7 @@ end
 --- Sets a keyvalue to be undefined
 -- @param key The key name to set
 function material_methods:setUndefined(key)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
 	unwrap(self):SetUndefined(key)
 end
@@ -763,10 +751,10 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setVector(key, v)
-	checktype(self, material_metamethods)
+	checktype(self, material_meta)
 	checkkey(key)
-	checktype(v, vector_meta)
+	checktype(v, vec_meta)
 	unwrap(self):SetVector(key, vunwrap(v))
 end
 
-
+end}

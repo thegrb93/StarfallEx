@@ -1,9 +1,18 @@
--- FastLZ library
+local util = util
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- FastLZ library
 -- @shared
-local fastlz_library = SF.RegisterLibrary("fastlz")
-local util = util
+local fastlz_library = instance:RegisterLibrary("fastlz")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local fastlz_library = instance.Libraries.fastlz
 
 --- Compress string using FastLZ
 --@param s String to compress
@@ -20,3 +29,5 @@ function fastlz_library.decompress (s)
 	SF.CheckLuaType(s, TYPE_STRING)
 	return util.Decompress(s)
 end
+
+end}

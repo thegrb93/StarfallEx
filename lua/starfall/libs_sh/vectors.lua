@@ -1,49 +1,52 @@
-SF.Vectors = {}
-
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
+local dgetmeta = debug.getmetatable
+
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Vector type
 -- @shared
-local vec_methods, vec_metamethods = SF.RegisterType("Vector")
-
-local function wrap(tbl)
-	return setmetatable(tbl, vec_metamethods)
-end
+local vec_methods, vec_meta = instance:RegisterType("Vector")
 
 local function unwrap(obj)
 	return Vector(obj[1], obj[2], obj[3])
 end
 
 local function vwrap(vec)
-	return wrap({ vec[1], vec[2], vec[3] })
+	return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)
 end
 
-SF.AddObjectWrapper(debug.getregistry().Vector, vec_metamethods, vwrap)
-SF.AddObjectUnwrapper(vec_metamethods, unwrap)
+instance:AddCustomWrapper(debug.getregistry().Vector, vec_meta, vwrap, unwrap)
 
-SF.AddHook("postload", function()
-	--- Creates a Vector struct
-	-- @name SF.DefaultEnvironment.Vector. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
-	-- @class function
-	-- @param x - X
-	-- @param y - Y
-	-- @param z - Z
-	-- @return Vector
-	SF.DefaultEnvironment.Vector = function (x, y, z)
-		if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
-		if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
-		if y then checkluatype(y, TYPE_NUMBER) else y = x end
-		return wrap({ x, y, z })
-	end
-end)
 
-SF.Vectors.Wrap = vwrap
-SF.Vectors.Unwrap = unwrap
-SF.Vectors.Methods = vec_methods
-SF.Vectors.Metatable = vec_metamethods
+end, function(instance) -- Called for library definitions
 
-local dgetmeta = debug.getmetatable
+
+local checktype = instance.CheckType
+local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local function wrap(tbl)
+	return setmetatable(tbl, vec_meta)
+end
+
+--- Creates a Vector struct. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
+-- @name Environment.Vector
+-- @class function
+-- @param x - X
+-- @param y - Y
+-- @param z - Z
+-- @return Vector
+function instance.env.Vector(x, y, z)
+	if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
+	if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
+	if y then checkluatype(y, TYPE_NUMBER) else y = x end
+	return wrap({ x, y, z })
+end
+
 
 -- Lookup table.
 -- Index 1->3 have associative xyz for use in __index. Saves lots of checks
@@ -51,17 +54,17 @@ local dgetmeta = debug.getmetatable
 local xyz = { x = 1, y = 2, z = 3 }
 
 --- __newindex metamethod
-function vec_metamethods.__newindex (t, k, v)
+function vec_meta.__newindex (t, k, v)
 	if xyz[k] then
 		rawset(t, xyz[k], v)
 
 	elseif (#k == 2 and xyz[k[1]] and xyz[k[2]])  then
-		checktype(v, vec_metamethods)
+		checktype(v, vec_meta)
 
 		rawset(t, xyz[k[1]], rawget(v, 1))
 		rawset(t, xyz[k[2]], rawget(v, 2))
 	elseif (#k == 3 and xyz[k[1]] and xyz[k[2]] and xyz[k[3]]) then
-		checktype(v, vec_metamethods)
+		checktype(v, vec_meta)
 
 		rawset(t, xyz[k[1]], rawget(v, 1))
 		rawset(t, xyz[k[2]], rawget(v, 2))
@@ -74,11 +77,12 @@ end
 local math_min = math.min
 
 --- __index metamethod
-function vec_metamethods.__index (t, k)
-	if xyz[k] then
+function vec_meta.__index (t, k)
+	local method = vec_methods[k]
+	if method ~= nil then
+		return method
+	elseif xyz[k] then
 		return rawget(t, xyz[k])
-	elseif vec_methods[k] ~= nil then
-		return vec_methods[k]
 	else 
 		-- Swizzle support
 		local v = {0,0,0}
@@ -98,7 +102,7 @@ local table_concat = table.concat
 
 --- tostring metamethod
 -- @return string representing the vector.
-function vec_metamethods.__tostring (a)
+function vec_meta.__tostring (a)
 	return table_concat(a, ' ', 1, 3)
 end
 
@@ -106,9 +110,9 @@ end
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Scaled vector.
-function vec_metamethods.__mul (a, b)
-	if dgetmeta(a) == vec_metamethods then
-		if dgetmeta(b) == vec_metamethods then
+function vec_meta.__mul (a, b)
+	if dgetmeta(a) == vec_meta then
+		if dgetmeta(b) == vec_meta then
 			return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 		end
 
@@ -123,9 +127,9 @@ end
 --- division metamethod
 -- @param b Scalar or vector to divide the scalar or vector by
 -- @return Scaled vector.
-function vec_metamethods.__div (a, b)
-	if dgetmeta(a) == vec_metamethods then
-		if dgetmeta(b) == vec_metamethods then
+function vec_meta.__div (a, b)
+	if dgetmeta(a) == vec_meta then
+		if dgetmeta(b) == vec_meta then
 			return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
 		else
 			checkluatype(b, TYPE_NUMBER)
@@ -140,9 +144,9 @@ end
 --- add metamethod
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
-function vec_metamethods.__add (a, b)
-	checktype(a, vec_metamethods)
-	checktype(b, vec_metamethods)
+function vec_meta.__add (a, b)
+	checktype(a, vec_meta)
+	checktype(b, vec_meta)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -150,23 +154,23 @@ end
 --- sub metamethod
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
-function vec_metamethods.__sub (a, b)
-	checktype(a, vec_metamethods)
-	checktype(b, vec_metamethods)
+function vec_meta.__sub (a, b)
+	checktype(a, vec_meta)
+	checktype(b, vec_meta)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
 --- unary minus metamethod
 -- @return negated vector.
-function vec_metamethods.__unm (a)
-	checktype(a, vec_metamethods)
+function vec_meta.__unm (a)
+	checktype(a, vec_meta)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
 --- equivalence metamethod
 -- @return bool if both sides are equal.
-function vec_metamethods.__eq (a, b)
+function vec_meta.__eq (a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
@@ -174,7 +178,7 @@ end
 -- @param v Vector to add
 -- @return nil
 function vec_methods:add (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	self[1] = self[1] + v[1]
 	self[2] = self[2] + v[2]
@@ -184,23 +188,23 @@ end
 --- Get the vector's angle.
 -- @return Angle
 function vec_methods:getAngle ()
-	return SF.WrapObject(unwrap(self):Angle())
+	return awrap(unwrap(self):Angle())
 end
 
 --- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
-	return SF.WrapObject(unwrap(self):AngleEx(unwrap(v)))
+	return awrap(unwrap(self):AngleEx(unwrap(v)))
 end
 
 --- Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.
 -- @param v Second Vector
 -- @return Vector
 function vec_methods:cross (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
@@ -211,7 +215,7 @@ local math_sqrt = math.sqrt
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistance (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -220,7 +224,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistanceSqr (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -229,7 +233,7 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:dot (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	return (self[1] * v[1] + self[2] * v[2] + self[3] * v[3])
 end
@@ -247,7 +251,7 @@ end
 -- @param t Tolerance number.
 -- @return bool True/False.
 function vec_methods:isEqualTol (v, t)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 	checkluatype(t, TYPE_NUMBER)
 
 	return unwrap(self):IsEqualTol(unwrap(v), t)
@@ -313,7 +317,7 @@ end
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to multiply with
 function vec_methods:vmul (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	self[1] = self[1] * v[1]
 	self[2] = self[2] * v[2]
@@ -323,7 +327,7 @@ end
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to divide by
 function vec_methods:vdiv (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	self[1] = self[1] / v[1]
 	self[2] = self[2] / v[2]
@@ -376,10 +380,10 @@ end
 -- @param b Angle to rotate by.
 -- @return nil.
 function vec_methods:rotate (b)
-	checktype(b, SF.Types["Angle"])
+	checktype(b, ang_meta)
 
 	local vec = unwrap(self)
-	vec:Rotate(SF.UnwrapObject(b))
+	vec:Rotate(aunwrap(b))
 
 	self[1] = vec.x
 	self[2] = vec.y
@@ -390,10 +394,10 @@ end
 -- @param b Angle to rotate by.
 -- @return Rotated Vector
 function vec_methods:getRotated (b)
-	checktype(b, SF.Types["Angle"])
+	checktype(b, ang_meta)
 
 	local vec = unwrap(self)
-	vec:Rotate(SF.UnwrapObject(b))
+	vec:Rotate(aunwrap(b))
 
 	return wrap({ vec.x, vec.y, vec.z })
 end
@@ -417,7 +421,7 @@ end
 -- @param radians Angle to rotate by in radians or nil if degrees.
 -- @return Rotated vector
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
-	checktype(axis, vec_metamethods)
+	checktype(axis, vec_meta)
 
 	if degrees then
 		checkluatype(degrees, TYPE_NUMBER)
@@ -439,7 +443,7 @@ end
 --- Copies x,y,z from a vector and returns a new vector
 -- @return The copy of the vector
 function vec_methods:clone()
-	checktype(self, vec_metamethods)
+	checktype(self, vec_meta)
 
 	return wrap({ self[1], self[2], self[3] })
 end
@@ -448,7 +452,7 @@ end
 -- @param v Second Vector
 -- @return nil
 function vec_methods:set(v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	self[1] = v[1]
 	self[2] = v[2]
@@ -459,7 +463,7 @@ end
 -- @param v Second Vector.
 -- @return nil
 function vec_methods:sub (v)
-	checktype(v, vec_metamethods)
+	checktype(v, vec_meta)
 
 	self[1] = self[1] - v[1]
 	self[2] = self[2] - v[2]
@@ -477,8 +481,8 @@ end
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
 function vec_methods:withinAABox (v1, v2)
-	checktype(v1, vec_metamethods)
-	checktype(v2, vec_metamethods)
+	checktype(v1, vec_meta)
+	checktype(v2, vec_meta)
 
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
 	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
@@ -495,3 +499,5 @@ if SERVER then
 		return util.IsInWorld(unwrap(self))
 	end
 end
+
+end}

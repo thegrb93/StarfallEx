@@ -1,10 +1,17 @@
--------------------------------------------------------------------------------
--- Game library
--------------------------------------------------------------------------------
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
 
 --- Game functions
 -- @shared
-local game_lib = SF.RegisterLibrary("game")
+local game_lib = instance:RegisterLibrary("game")
+
+
+end, function(instance) -- Called for library definitions
+
+
+local game_lib = instance.Libraries.game
+local vwrap = instance.Types.Vector.Wrap
 
 --- Returns the map name
 -- @name game_lib.getMap
@@ -56,6 +63,8 @@ if CLIENT then
 	-- @return number How obstructed the sun is 0 to 1.
 	function game_lib.getSunInfo()
 		local info = util.GetSunInfo()
-		return SF.Vectors.Wrap(info.direction), info.obstruction
+		return vwrap(info.direction), info.obstruction
 	end
 end
+
+end}

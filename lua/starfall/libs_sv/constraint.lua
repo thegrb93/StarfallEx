@@ -1,27 +1,40 @@
-
---- Library for creating and manipulating constraints.
--- @server
-local constraint_library = SF.RegisterLibrary("constraint")
-
-local vwrap = SF.WrapObject
-local vunwrap = SF.UnwrapObject
-local ewrap, eunwrap, ents_metatable
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
+
+-- Register privileges
+registerprivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
+registerprivilege("constraints.axis", "Axis", "Allows the user to axis two entities", { entities = {} })
+registerprivilege("constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { entities = {} })
+registerprivilege("constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { entities = {} })
+registerprivilege("constraints.slider", "Slider", "Allows the user to slider two entities", { entities = {} })
+registerprivilege("constraints.rope", "Rope", "Allows the user to rope two entities", { entities = {} })
+registerprivilege("constraints.elastic", "Elastic", "Allows the user to elastic two entities", { entities = {} })
+registerprivilege("constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { entities = {} })
+registerprivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
 
 local plyCount = SF.LimitObject("constraints", "constraints", 600, "The number of constraints allowed to spawn via Starfall")
-
-SF.AddHook("initialize", function(instance)
-	instance.data.constraints = {constraints = {}}
-end)
 
 local function constraintOnDestroy(ent, constraints, ply)
 	plyCount:free(ply, 1)
 	constraints[ent] = nil
 end
 
-SF.AddHook("deinitialize", function(instance)
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Library for creating and manipulating constraints.
+-- @server
+local constraint_library = instance:RegisterLibrary("constraint")
+
+instance:AddHook("initialize", function()
+	instance.data.constraints = {constraints = {}}
+end)
+
+instance:AddHook("deinitialize", function()
 	if instance.data.constraints.clean ~= false then --Return true on nil too
 		local constraints = instance.data.constraints.constraints
 		for ent, _ in pairs(constraints) do
@@ -34,36 +47,27 @@ SF.AddHook("deinitialize", function(instance)
 	end
 end)
 
-SF.AddHook("postload", function()
-	ewrap = SF.Entities.Wrap
-	eunwrap = SF.Entities.Unwrap
-	ents_metatable = SF.Entities.Metatable
-end)
+
+end, function(instance) -- Called for library definitions
+
+
+local constraint_library = instance.Libraries.constraint
+
+local checktype = instance.CheckType
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
 
 local function checkConstraint(e, t)
 	if e then
 		if e:IsValid() then
-			checkpermission(SF.instance, e, t)
+			checkpermission(instance, e, t)
 		elseif not e:IsWorld() then
 			SF.Throw("Invalid Entity", 3)
 		end
 	else
 		SF.Throw("Invalid Entity", 3)
 	end
-end
-
--- Register privileges
-do
-	local P = SF.Permissions
-	P.registerPrivilege("constraints.weld", "Weld", "Allows the user to weld two entities", { entities = {} })
-	P.registerPrivilege("constraints.axis", "Axis", "Allows the user to axis two entities", { entities = {} })
-	P.registerPrivilege("constraints.ballsocket", "Ballsocket", "Allows the user to ballsocket two entities", { entities = {} })
-	P.registerPrivilege("constraints.ballsocketadv", "BallsocketAdv", "Allows the user to advanced ballsocket two entities", { entities = {} })
-	P.registerPrivilege("constraints.slider", "Slider", "Allows the user to slider two entities", { entities = {} })
-	P.registerPrivilege("constraints.rope", "Rope", "Allows the user to rope two entities", { entities = {} })
-	P.registerPrivilege("constraints.elastic", "Elastic", "Allows the user to elastic two entities", { entities = {} })
-	P.registerPrivilege("constraints.nocollide", "Nocollide", "Allows the user to nocollide two entities", { entities = {} })
-	P.registerPrivilege("constraints.any", "Any", "General constraint functions", { entities = {} })
 end
 
 local function register(ent, instance)
@@ -83,9 +87,8 @@ end
 -- @param nocollide Bool whether or not to nocollide the two entities
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	local instance = SF.instance
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -112,11 +115,10 @@ end
 --- Axis two entities
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	checktype(v1, SF.Types["Vector"])
-	checktype(v2, SF.Types["Vector"])
-	local instance = SF.instance
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
+	checktype(v1, vec_meta)
+	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -150,10 +152,9 @@ end
 --- Ballsocket two entities
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	checktype(v1, SF.Types["Vector"])
-	local instance = SF.instance
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
+	checktype(v1, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -183,14 +184,13 @@ end
 --- Advanced Ballsocket two entities
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	checktype(v1, SF.Types["Vector"])
-	checktype(v2, SF.Types["Vector"])
-	checktype(minv, SF.Types["Vector"])
-	checktype(maxv, SF.Types["Vector"])
-	checktype(frictionv, SF.Types["Vector"])
-	local instance = SF.instance
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
+	checktype(v1, vec_meta)
+	checktype(v2, vec_meta)
+	checktype(minv, vec_meta)
+	checktype(maxv, vec_meta)
+	checktype(frictionv, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -225,11 +225,10 @@ end
 --- Elastic two entities
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	checktype(v1, SF.Types["Vector"])
-	checktype(v2, SF.Types["Vector"])
-	local instance = SF.instance
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
+	checktype(v1, vec_meta)
+	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -270,11 +269,10 @@ end
 --- Ropes two entities
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	checktype(v1, SF.Types["Vector"])
-	checktype(v2, SF.Types["Vector"])
-	local instance = SF.instance
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
+	checktype(v1, vec_meta)
+	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -316,12 +314,11 @@ end
 --- Sliders two entities
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
-	checktype(v1, SF.Types["Vector"])
-	checktype(v2, SF.Types["Vector"])
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
+	checktype(v1, vec_meta)
+	checktype(v2, vec_meta)
 
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -349,10 +346,9 @@ end
 --- Nocollides two entities
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
-	checktype(e1, ents_metatable)
-	checktype(e2, ents_metatable)
+	checktype(e1, ent_meta)
+	checktype(e2, ent_meta)
 
-	local instance = SF.instance
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -376,12 +372,9 @@ end
 --- Sets the length of a rope attached to the entity
 -- @server
 function constraint_library.setRopeLength(index, e, length)
-	checktype(e, ents_metatable)
-	local ent1 = eunwrap(e)
+	local ent1 = getent(e)
 
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.rope")
-
+	checkpermission(instance, ent1, "constraints.rope")
 
 	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
@@ -398,11 +391,9 @@ end
 --- Sets the length of an elastic attached to the entity
 -- @server
 function constraint_library.setElasticLength(index, e, length)
-	checktype(e, ents_metatable)
-	local ent1 = eunwrap(e)
+	local ent1 = getent(e)
 
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.elastic")
+	checkpermission(instance, ent1, "constraints.elastic")
 
 	checkluatype(length, TYPE_NUMBER)
 	length = math.max(length, 0)
@@ -418,11 +409,8 @@ end
 --- Breaks all constraints on an entity
 -- @server
 function constraint_library.breakAll(e)
-	checktype(e, ents_metatable)
-	local ent1 = eunwrap(e)
-
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.any")
+	local ent1 = getent(e)
+	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveAll(ent1)
 end
@@ -430,13 +418,11 @@ end
 --- Breaks all constraints of a certain type on an entity
 -- @server
 function constraint_library.breakType(e, typename)
-	checktype(e, ents_metatable)
 	checkluatype(typename, TYPE_STRING)
 
-	local ent1 = eunwrap(e)
+	local ent1 = getent(e)
 
-	if not (ent1 and ent1:IsValid()) then SF.Throw("Invalid entity", 2) end
-	checkpermission(SF.instance, ent1, "constraints.any")
+	checkpermission(instance, ent1, "constraints.any")
 
 	constraint.RemoveConstraints(ent1, typename)
 end
@@ -446,25 +432,20 @@ end
 -- @param ent The entity
 -- @return Table of entity constraints
 function constraint_library.getTable(ent)
-	checktype(ent, ents_metatable)
-
-	ent = eunwrap(ent)
-
-	if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-
-	return SF.Sanitize(constraint.GetTable(ent))
+	return instance.Sanitize(constraint.GetTable(getent(ent)))
 end
 
 --- Sets whether the chip should remove created constraints when the chip is removed
 -- @param on Boolean whether the constraints should be cleaned or not
 function constraint_library.setConstraintClean(on)
-	SF.instance.data.constraints.clean = on
+	instance.data.constraints.clean = on
 end
 
 --- Checks how many constraints can be spawned
 -- @server
 -- @return number of constraints able to be spawned
 function constraint_library.constraintsLeft()
-	return plyCount:check(SF.instance.player)
+	return plyCount:check(instance.player)
 end
 
+end}

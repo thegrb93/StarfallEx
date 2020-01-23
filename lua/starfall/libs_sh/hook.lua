@@ -1,257 +1,7 @@
--------------------------------------------------------------------------------
--- Hook library
--------------------------------------------------------------------------------
-
---- Deals with hooks
--- @shared
-local hook_library = SF.RegisterLibrary("hook")
-local registered_instances = {}
-local gmod_hooks = {}
-local gmod_override_hooks = {}
-local wrapArguments = SF.Sanitize
-local wrapObject = SF.WrapObject
-local checktype = SF.CheckType
+-- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
-
-local function getHookFunc(instances, hookname, customargfunc, customretfunc)
-	--- There are 4 varients of hookfunc depending on if there are custom callbacks
-	if customargfunc then
-		if customretfunc then
-			return function(...)
-				local result
-				for instance, _ in pairs(instances) do
-					local canrun, customargs = customargfunc(instance, ...)
-					if canrun then
-						local tbl = instance:runScriptHookForResult(hookname, unpack(customargs))
-						if tbl[1] then
-							local sane = customretfunc(instance, tbl, ...)
-							if sane ~= nil then result = sane end
-						end
-					end
-				end
-				return result
-			end
-		else
-			return function(...)
-				for instance, _ in pairs(instances) do
-					local canrun, customargs = customargfunc(instance, ...)
-					if canrun then
-						instance:runScriptHook(hookname, unpack(customargs))
-					end
-				end
-			end
-		end
-	else
-		if customretfunc then
-			return function(...)
-				local args = wrapArguments({...})
-				local result
-				for instance, _ in pairs(instances) do
-					local tbl = instance:runScriptHookForResult(hookname, unpack(args))
-					if tbl[1] then
-						local sane = customretfunc(instance, tbl, ...)
-						if sane ~= nil then result = sane end
-					end
-				end
-				return result
-			end
-		else
-			return function(...)
-				local args = wrapArguments({...})
-				for instance, _ in pairs(instances) do
-					instance:runScriptHook(hookname, unpack(args))
-				end
-			end
-		end
-	end
-end
-
---- Sets a hook function
--- @param hookname Name of the event
--- @param name Unique identifier
--- @param func Function to run
-function hook_library.add (hookname, name, func)
-	checkluatype (hookname, TYPE_STRING)
-	checkluatype (name, TYPE_STRING)
-	checkluatype (func, TYPE_FUNCTION)
-
-	hookname = hookname:lower()
-	local inst = SF.instance
-	local hooks = inst.hooks[hookname]
-	if not hooks then
-		hooks = {}
-		inst.hooks[hookname] = hooks
-	end
-	hooks[name] = func
-
-	local instances = registered_instances[hookname]
-	if not instances then
-		instances = {}
-		registered_instances[hookname] = instances
-
-		local gmod_hook = gmod_hooks[hookname]
-		if gmod_hook then
-			local realname, customargfunc, customretfunc = unpack(gmod_hook)
-			local hookfunc = getHookFunc(instances, hookname, customargfunc, customretfunc)
-			hook.Add(realname, "SF_Hook_"..hookname, hookfunc)
-		end
-	end
-	instances[inst] = true
-end
-
---- Run a hook
--- @shared
--- @param hookname The hook name
--- @param ... arguments
-function hook_library.run (hookname, ...)
-	checkluatype (hookname, TYPE_STRING)
-
-	local instance = SF.instance
-	local hook = hookname:lower()
-
-	if instance.hooks and instance.hooks[hook] then
-		local tbl
-		for name, func in pairs(instance.hooks[hook]) do
-			tbl = { func(...) }
-			if tbl[1]~=nil then
-				return unpack(tbl)
-			end
-		end
-	end
-end
-
---- Remote hook.
--- This hook can be called from other instances
--- @name remote
--- @class hook
--- @shared
--- @param sender The entity that caused the hook to run
--- @param owner The owner of the sender
--- @param ... The payload that was supplied when calling the hook
-
---- Run a hook remotely.
--- This will call the hook "remote" on either a specified entity or all instances on the server/client
--- @shared
--- @param recipient Starfall entity to call the hook on. Nil to run on every starfall entity
--- @param ... Payload. These parameters will be used to call the hook functions
--- @return tbl A list of the resultset of each called hook
-function hook_library.runRemote (recipient, ...)
-	if recipient then checktype(recipient, SF.Entities.Metatable) end
-
-	local recipients
-	if recipient then
-		local ent = SF.Entities.Unwrap(recipient)
-		if not ent.instance then SF.Throw("Entity has no starfall instance", 2) end
-		recipients = {
-			[ent.instance] = true
-		}
-	else
-		recipients = registered_instances["remote"] or {}
-	end
-
-	local instance = SF.instance
-
-	local results = {}
-	for k, _ in pairs(recipients) do
-		local result
-		if k==instance then
-			result = { true, hook_library.run("remote", SF.WrapObject(instance.data.entity), SF.WrapObject(instance.player), ...) }
-		else
-			result = k:runScriptHookForResult("remote", SF.WrapObject(instance.data.entity), SF.WrapObject(instance.player), ...)
-		end
-
-		if result[1] and result[2]~=nil then
-			results[#results + 1] = { unpack(result, 2) }
-		end
-
-	end
-	return results
-end
-
---- Remove a hook
--- @shared
--- @param hookname The hook name
--- @param name The unique name for this hook
-function hook_library.remove (hookname, name)
-	checkluatype (hookname, TYPE_STRING)
-	checkluatype (name, TYPE_STRING)
-	local instance = SF.instance
-
-	local lower = hookname:lower()
-	if instance.hooks[lower] then
-		instance.hooks[lower][name] = nil
-
-		if not next(instance.hooks[lower]) then
-			instance.hooks[lower] = nil
-			registered_instances[lower][instance] = nil
-			if not next(registered_instances[lower]) and not gmod_override_hooks[lower] then
-				registered_instances[lower] = nil
-				if gmod_hooks[lower] then
-					hook.Remove(gmod_hooks[lower][1], "SF_Hook_" .. lower)
-				end
-			end
-		end
-	end
-end
-
-SF.AddHook("deinitialize", function (instance)
-	for k, v in pairs(registered_instances) do
-		v[instance] = nil
-		if not next(v) and not gmod_override_hooks[k] then
-			registered_instances[k] = nil
-			if gmod_hooks[k] then
-				hook.Remove(gmod_hooks[k][1], "SF_Hook_" .. k)
-			end
-		end
-	end
-end)
-
---- Add a GMod hook so that SF gets access to it
--- @shared
--- @param hookname The hook name. In-SF hookname will be lowercased
--- @param customargfunc Optional custom function
--- Returns true if the hook should be called, then extra arguements to be passed to the starfall hooks
--- @param customretfunc Optional custom function
--- Takes values returned from starfall hook and returns what should be passed to the gmod hook
--- @param gmoverride Whether this hook should override the gamemode function (makes the hook run last, but adds a little overhead)
-function SF.hookAdd (realname, hookname, customargfunc, customretfunc, gmoverride)
-	hookname = hookname or realname:lower()
-	if gmoverride then
-		local function override(again)
-			gmod_override_hooks[hookname] = true
-			registered_instances[hookname] = {}
-			local hookfunc = getHookFunc(registered_instances[hookname], hookname, customargfunc, customretfunc)
-
-			local gmfunc
-			if again then
-				gmfunc = GAMEMODE["SF"..realname]
-			else
-				gmfunc = GAMEMODE[realname]
-				GAMEMODE["SF"..realname] = gmfunc
-			end
-
-			if gmfunc then
-				GAMEMODE[realname] = function(gm, ...)
-					local a,b,c,d,e,f = hookfunc(...)
-					if a~= nil then return a,b,c,d,e,f
-					else return gmfunc(gm, ...) end
-				end
-			else
-				GAMEMODE[realname] = function(gm, ...)
-					return hookfunc(...)
-				end
-			end
-		end
-		if GAMEMODE then
-			override(true)
-		else
-			hook.Add("Initialize", "SFOverride"..hookname, override)
-		end
-	else
-		gmod_hooks[hookname] = { realname, customargfunc, customretfunc }
-	end
-end
+local haspermission = SF.Permissions.hasAccess
 
 --Can only return if you are the first argument
 local function returnOnlyOnYourself(instance, args, ply)
@@ -286,12 +36,12 @@ if SERVER then
 	add("PlayerCanPickupWeapon", nil, nil, returnOnlyOnYourselfFalse)
 
 	add("EntityTakeDamage", nil, function(instance, target, dmg)
-		return true, { wrapObject(target), wrapObject(dmg:GetAttacker()),
-			wrapObject(dmg:GetInflictor()),
+		return true, { instance.WrapObject(target), instance.WrapObject(dmg:GetAttacker()),
+			instance.WrapObject(dmg:GetInflictor()),
 			dmg:GetDamage(),
 			dmg:GetDamageType(),
-			wrapObject(dmg:GetDamagePosition()),
-			wrapObject(dmg:GetDamageForce()) }
+			instance.Types.Vector.Wrap(dmg:GetDamagePosition()),
+			instance.Types.Vector.Wrap(dmg:GetDamageForce()) }
 	end)
 
 else
@@ -300,7 +50,7 @@ else
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
 	add("ChatTextChanged", nil, function(instance, txt)
-		if SF.Permissions.hasAccess(instance, nil, "input") then
+		if haspermission(instance, nil, "input") then
 			return true, { txt }
 		end
 		return false
@@ -323,20 +73,151 @@ add("PlayerSwitchWeapon", nil, nil, returnOnlyOnYourselfFalse)
 -- Entity hooks
 add("OnEntityCreated", nil, function(instance, ent)
 	timer.Simple(0, function()
-		instance:runScriptHook("onentitycreated", wrapObject(ent))
+		instance:runScriptHook("onentitycreated", instance.WrapObject(ent))
 	end)
 	return false
 end)
 add("EntityRemoved")
 add("PropBreak")
 add("EntityFireBullets", nil, function(instance, ent, data)
-	return true, { SF.WrapObject(ent), SF.StructWrapper(data) }
+	return true, { instance.WrapObject(ent), SF.StructWrapper(instance, data) }
 end)
 
 -- Other
 add("EndEntityDriving")
 add("StartEntityDriving")
 add("Tick")
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
+--- Deals with hooks
+-- @shared
+local hook_library = instance:RegisterLibrary("hook")
+
+instance:AddHook("deinitialize", function()
+	SF.HookDestroyInstance(instance)
+end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local checktype = instance.CheckType
+local hook_library = instance.Libraries.hook
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local getent = instance.Types.Entity.GetEntity
+local pwrap = instance.Types.Player.Wrap
+
+--- Sets a hook function
+-- @param hookname Name of the event
+-- @param name Unique identifier
+-- @param func Function to run
+function hook_library.add (hookname, name, func)
+	checkluatype (hookname, TYPE_STRING)
+	checkluatype (name, TYPE_STRING)
+	checkluatype (func, TYPE_FUNCTION)
+
+	hookname = hookname:lower()
+	local hooks = instance.hooks[hookname]
+	if not hooks then
+		hooks = {}
+		instance.hooks[hookname] = hooks
+	end
+	hooks[name] = func
+
+	SF.HookAddInstance(instance, hookname)
+end
+
+--- Run a hook
+-- @shared
+-- @param hookname The hook name
+-- @param ... arguments
+function hook_library.run (hookname, ...)
+	checkluatype (hookname, TYPE_STRING)
+
+	local hook = hookname:lower()
+
+	if instance.hooks and instance.hooks[hook] then
+		local tbl
+		for name, func in pairs(instance.hooks[hook]) do
+			tbl = { func(...) }
+			if tbl[1]~=nil then
+				return unpack(tbl)
+			end
+		end
+	end
+end
+
+--- Remote hook.
+-- This hook can be called from other instances
+-- @name remote
+-- @class hook
+-- @shared
+-- @param sender The entity that caused the hook to run
+-- @param owner The owner of the sender
+-- @param ... The payload that was supplied when calling the hook
+
+local hookrun = hook_library.run
+
+--- Run a hook remotely.
+-- This will call the hook "remote" on either a specified entity or all instances on the server/client
+-- @shared
+-- @param recipient Starfall entity to call the hook on. Nil to run on every starfall entity
+-- @param ... Payload. These parameters will be used to call the hook functions
+-- @return tbl A list of the resultset of each called hook
+function hook_library.runRemote (recipient, ...)
+	local recipients
+	if recipient then
+		local ent = getent(recipient)
+		if not ent.instance then SF.Throw("Entity has no starfall instance", 2) end
+		recipients = {
+			[ent.instance] = true
+		}
+	else
+		recipients = SF.allInstances
+	end
+
+	local argn = select("#", ...)
+	local unsanitized = instance.Unsanitize({...})
+	local results = {}
+	for k, _ in pairs(recipients) do
+		local result
+		if k==instance then
+			result = { true, hookrun("remote", ewrap(instance.data.entity), pwrap(instance.player), ...) }
+		else
+			result = k:runScriptHookForResult("remote", k.Types.Entity.Wrap(instance.data.entity), k.Types.Player.Wrap(instance.player), unpack(k.Sanitize(unsanitized), 1, argn))
+		end
+
+		if result[1] and result[2]~=nil then
+			results[#results + 1] = { unpack(result, 2) }
+		end
+
+	end
+	return results
+end
+
+--- Remove a hook
+-- @shared
+-- @param hookname The hook name
+-- @param name The unique name for this hook
+function hook_library.remove (hookname, name)
+	checkluatype (hookname, TYPE_STRING)
+	checkluatype (name, TYPE_STRING)
+
+	local lower = hookname:lower()
+	if instance.hooks[lower] then
+		instance.hooks[lower][name] = nil
+
+		if not next(instance.hooks[lower]) then
+			instance.hooks[lower] = nil
+			SF.HookRemoveInstance(instance, hook)
+		end
+	end
+end
+
+end}
 
 --- Called when an entity is being picked up by a gravity gun
 -- @name GravGunOnPickedUp

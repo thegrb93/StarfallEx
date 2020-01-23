@@ -1,7 +1,46 @@
-if not pcall(require, "xinput") then return end
+if not pcall(require, "xinput") then return {function() end, function() end} end
+
+-- Global to all starfalls
+local checkluatype = SF.CheckLuaType
+local checkpermission = SF.Permissions.check
+
+SF.hookAdd("xinputConnected", "xinputconnected")
+SF.hookAdd("xinputDisconnected", "xinputdisconnected")
+SF.hookAdd("xinputPressed", "xinputpressed")
+SF.hookAdd("xinputReleased", "xinputreleased")
+SF.hookAdd("xinputTrigger", "xinputtrigger")
+SF.hookAdd("xinputStick", "xinputstick")
+
+
+-- Local to each starfall
+return { function(instance) -- Called for library declarations
+
+
 --- A simpler, hook-based, and more-powerful controller input library. Inputs are not lost between rendered frames, and there is support for rumble. Note: the client must have the XInput lua binary module installed in order to access this library. See more at https://github.com/mitterdoo/garrysmod-xinput
 -- @client
-local xinput_library = SF.RegisterLibrary("xinput")
+local xinput_library = instance:RegisterLibrary("xinput")
+
+instance:AddHook("initialize", function()
+	instance.data.xinputRumble = {}
+	for i = 0, 3 do
+		instance.data.xinputRumble[i] = {0, 0}
+	end
+end)
+
+instance:AddHook("deinitialize", function()
+	for i = 0, 3 do
+		local rumble = instance.data.xinputRumble[i]
+		if rumble[1] > 0 or rumble[2] > 0 then
+			xinput.setRumble(i, 0, 0)
+		end
+	end
+end)
+
+
+end, function(instance) -- Called for library definitions
+
+
+local xinput_library = instance.Libraries.xinput
 
 --- Gets the state of the controller.
 -- @name xinput_library.getState
@@ -56,32 +95,11 @@ function xinput_library.setRumble(id, softPercent, hardPercent)
 	SF.CheckLuaType(id, TYPE_NUMBER)
 	id = math.floor(id)
 	xinput.setRumble(id, softPercent, hardPercent) -- Does the rest of the type checking
-	SF.instance.data.xinputRumble[id][1] = softPercent
-	SF.instance.data.xinputRumble[id][2] = hardPercent
+	instance.data.xinputRumble[id][1] = softPercent
+	instance.data.xinputRumble[id][2] = hardPercent
 end
 
-SF.AddHook("initialize", function(inst)
-	inst.data.xinputRumble = {}
-	for i = 0, 3 do
-		inst.data.xinputRumble[i] = {0, 0}
-	end
-end)
-
-SF.AddHook("deinitialize", function(inst)
-	for i = 0, 3 do
-		local rumble = inst.data.xinputRumble[i]
-		if rumble[1] > 0 or rumble[2] > 0 then
-			xinput.setRumble(i, 0, 0)
-		end
-	end
-end)
-
-SF.hookAdd("xinputConnected", "xinputconnected")
-SF.hookAdd("xinputDisconnected", "xinputdisconnected")
-SF.hookAdd("xinputPressed", "xinputpressed")
-SF.hookAdd("xinputReleased", "xinputreleased")
-SF.hookAdd("xinputTrigger", "xinputtrigger")
-SF.hookAdd("xinputStick", "xinputstick")
+end}
 
 --- Called when a controller has been connected. Client must have XInput Lua binary installed.
 -- @client
