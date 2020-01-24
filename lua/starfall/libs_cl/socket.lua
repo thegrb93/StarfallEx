@@ -1,7 +1,7 @@
 local ok, err = pcall(require, "socket.core")
 if not ok then
 	if err~="Module not found!" then ErrorNoHalt(err) end
-	return
+	return function() end
 end
 
 -----------------------------------------------------------------------------

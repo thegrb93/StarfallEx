@@ -1,4 +1,4 @@
-if not pcall(require, "joystick") then return end
+if not pcall(require, "joystick") then return function() end end
 
 local next_updates = {}
 
