@@ -8,18 +8,21 @@ registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "A
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
-local checktype = instance.CheckType
-
 --- Entity type
 -- @shared
-local ents_methods, ent_meta = instance:RegisterType("Entity", false, true, debug.getregistry().Entity)
+SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
 
--- Create our wrapper the old fasioned way since getent needs it. We don't derive anything so should be fine
-local ewrap, eunwrap = instance:CreateWrapper(ent_meta)
+
+
+return function(instance)
+
+local checktype = instance.CheckType
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
+local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
+local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
 local function getent(self)
 	local ent = eunwrap(self)
@@ -31,19 +34,6 @@ local function getent(self)
 	end
 end
 instance.Types.Entity.GetEntity = getent
-
-
-end, function(instance) -- Called for library definitions
-
-
-local checktype = instance.CheckType
-local getent = instance.Types.Entity.GetEntity
-local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
-local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
-local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
 --- To string
 -- @shared
@@ -1048,4 +1038,4 @@ function ents_methods:getCreationTime()
 	return ent:GetCreationTime()
 end
 
-end}
+end

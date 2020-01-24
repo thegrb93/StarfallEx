@@ -1,15 +1,11 @@
 local util = util
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- FastLZ library
 -- @shared
-local fastlz_library = instance:RegisterLibrary("fastlz")
+SF.RegisterLibrary("fastlz")
 
 
-end, function(instance) -- Called for library definitions
+return function(instance)
 
 
 local fastlz_library = instance.Libraries.fastlz
@@ -30,4 +26,4 @@ function fastlz_library.decompress (s)
 	return util.Decompress(s)
 end
 
-end}
+end

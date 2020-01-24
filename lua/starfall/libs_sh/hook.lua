@@ -88,26 +88,26 @@ add("EndEntityDriving")
 add("StartEntityDriving")
 add("Tick")
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 
 --- Deals with hooks
 -- @shared
-local hook_library = instance:RegisterLibrary("hook")
+SF.RegisterLibrary("hook")
+
+
+return function(instance)
+
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
 
 instance:AddHook("deinitialize", function()
 	SF.HookDestroyInstance(instance)
 end)
 
-
-end, function(instance) -- Called for library definitions
-
-
 local checktype = instance.CheckType
 local hook_library = instance.Libraries.hook
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local getent = instance.Types.Entity.GetEntity
 local pwrap = instance.Types.Player.Wrap
 
 --- Sets a hook function
@@ -217,7 +217,7 @@ function hook_library.remove (hookname, name)
 	end
 end
 
-end}
+end
 
 --- Called when an entity is being picked up by a gravity gun
 -- @name GravGunOnPickedUp

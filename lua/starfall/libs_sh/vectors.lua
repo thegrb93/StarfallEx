@@ -3,28 +3,20 @@ local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Vector type
 -- @shared
-local vec_methods, vec_meta = instance:RegisterType("Vector")
-
-local function unwrap(obj)
-	return Vector(obj[1], obj[2], obj[3])
-end
-
-local function vwrap(vec)
-	return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)
-end
-
-instance:AddCustomWrapper(debug.getregistry().Vector, vec_meta, vwrap, unwrap)
+SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(vec_meta)
+	return function(vec)
+		return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)
+	end,
+	function(obj)
+		return Vector(obj[1], obj[2], obj[3])
+	end
+end)
 
 
-end, function(instance) -- Called for library definitions
 
+return function(instance)
 
 local checktype = instance.CheckType
 local vec_methods, vec_meta, vwrap, unwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -500,4 +492,4 @@ if SERVER then
 	end
 end
 
-end}
+end

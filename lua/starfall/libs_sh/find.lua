@@ -5,17 +5,11 @@ local checkpermission = SF.Permissions.check
 -- Register privileges
 SF.Permissions.registerPrivilege("find", "Find", "Allows the user to access the find library")
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Find library. Finds entities in various shapes.
 -- @shared
-local find_library = instance:RegisterLibrary("find")
+SF.RegisterLibrary("find")
 
-
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local find_library = instance.Libraries.find
 local checktype = instance.CheckType
@@ -227,4 +221,4 @@ function find_library.sortByClosest(ents, pos, furthest)
 	return ret
 end
 
-end}
+end

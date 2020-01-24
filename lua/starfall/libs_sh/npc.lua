@@ -10,16 +10,10 @@ if SERVER then
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Npc type
-local npc_methods, npc_meta = instance:RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
+SF.RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
 
-
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -187,4 +181,4 @@ if SERVER then
 	end
 end
 
-end}
+end

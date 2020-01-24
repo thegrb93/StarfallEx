@@ -14,16 +14,16 @@ local function deleteSound(ply, sound)
 	plyCount:free(ply, 1)
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 --- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
 -- @client
-local bass_methods, bass_meta = instance:RegisterType("Bass", true, false)
+SF.RegisterType("Bass", true, false)
 
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
 -- @client
-local bass_library = instance:RegisterLibrary("bass")
+SF.RegisterLibrary("bass")
+
+
+return function(instance)
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()
@@ -35,8 +35,6 @@ instance:AddHook("deinitialize", function()
 		deleteSound(instance.player, s)
 	end
 end)
-
-end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
@@ -344,4 +342,4 @@ function bass_methods:getLevels()
 	end
 end
 
-end}
+end

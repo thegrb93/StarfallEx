@@ -183,24 +183,19 @@ local function NextInTextureQueue()
 	end
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- The `Material` type is used to control shaders in rendering.
 --- For a list of shader parameters, see https://developer.valvesoftware.com/wiki/Category:List_of_Shader_Parameters
 --- For a list of $flags and $flags2, see https://developer.valvesoftware.com/wiki/Material_Flags
 -- @client
-local material_methods, material_meta = instance:RegisterType("Material", true, false)
-local lmaterial_methods, lmaterial_meta = instance:RegisterType("LockedMaterial", true, false, nil, "Material") --Material that can't be modified
+SF.RegisterType("Material", true, false)
+SF.RegisterType("LockedMaterial", true, false, nil, "Material") --Material that can't be modified
 
 
 --- `material` library is allows creating material objects which are used for controlling shaders in rendering.
 -- @client
-local material_library = instance:RegisterLibrary("material")
+SF.RegisterLibrary("material")
 
-
-end, function(instance) -- Called for library definitions
+return function(instance)
 
 
 local checktype = instance.CheckType
@@ -757,4 +752,4 @@ function material_methods:setVector(key, v)
 	unwrap(self):SetVector(key, vunwrap(v))
 end
 
-end}
+end

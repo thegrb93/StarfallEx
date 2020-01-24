@@ -2,8 +2,14 @@
 local checkluatype = SF.CheckLuaType
 
 --- StringStream type
-local ss_methods, ss_meta = SF.Instance.RegisterType({Types = {}}, "StringStream")
-local sfstringstreammeta = {__index = ss_methods}
+local ss_methods = {}
+local ss_meta = {
+	__index = ss_methods,
+	__metatable = "StringStream",
+	__tostring = function(self)
+		return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
+	end
+}
 function SF.StringStream(stream, i, endian)
 	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
 	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
@@ -11,7 +17,7 @@ function SF.StringStream(stream, i, endian)
 	local ret = setmetatable({
 		buffer = {},
 		pos = 1
-	}, sfstringstreammeta)
+	}, ss_meta)
 	
 	ret:write(stream)
 	ret:seek(i)
@@ -194,10 +200,6 @@ local function UnpackIEEE754Double(b1, b2, b3, b4, b5, b6, b7, b8)
 		mantissa = -mantissa
 	end
 	return math.ldexp(mantissa, exponent - 0x3FF)
-end
-
-function ss_meta:__tostring()
-	return string.format("Stringstream [%u,%u]",self.pos, #self.buffer)
 end
 
 --- Sets the endianness of the string stream
@@ -412,17 +414,13 @@ function ss_methods:getBuffer()
 	return self.buffer
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 
 --- Bit library http://wiki.garrysmod.com/page/Category:bit
 -- @shared
-local bit_library = instance:RegisterLibrary("bit")
+SF.RegisterLibrary("bit")
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local bit_library = instance.Libraries.bit
 bit_library.arshift = bit.arshift
@@ -440,23 +438,11 @@ bit_library.tohex = bit.tohex
 
 
 --- Creates a StringStream object
+--@name bit_library.stringstream
+--@class function
 --@param stream A string to set the initial buffer to (default "")
 --@param i The initial buffer pointer (default 1)
 --@param endian The endianness of number types. "big" or "little" (default "little")
-function bit_library.stringstream(stream, i, endian)
-	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
-	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
-	
-	local ret = setmetatable({
-		buffer = {},
-		pos = 1
-	}, ss_meta)
-	
-	ret:write(stream)
-	ret:seek(i)
-	ret:setEndian(endian or "little")
-	
-	return ret
-end
+bit_library.stringstream = SF.StringStream
 
-end}
+end

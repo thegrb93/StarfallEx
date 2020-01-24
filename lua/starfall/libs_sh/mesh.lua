@@ -526,19 +526,21 @@ local function destroyMesh(ply, mesh, meshdata)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Mesh library.
 -- @shared
-local mesh_library = instance:RegisterLibrary("mesh")
+SF.RegisterLibrary("mesh")
 
 if CLIENT then
 	--- Mesh type
 	-- @client
-	local mesh_methods, mesh_meta = instance:RegisterType("Mesh", true, false)
+	SF.RegisterType("Mesh", true, false)
+end
 
+
+return function(instance)
+
+
+if CLIENT then
 	-- Register functions to be called when the chip is initialised and deinitialised
 	instance:AddHook("initialize", function()
 		instance.data.meshes = {}
@@ -553,10 +555,6 @@ if CLIENT then
 		end
 	end)
 end
-
-
-end, function(instance) -- Called for library definitions
-
 
 local mesh_library = instance.Libraries.mesh
 local thread_yield = instance.Libraries.coroutine.yield
@@ -739,5 +737,5 @@ if CLIENT then
 	end
 end
 
-end}
+end
 

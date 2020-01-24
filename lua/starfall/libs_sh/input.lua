@@ -105,13 +105,17 @@ SF.hookAdd("StartCommand", "mousewheeled", function(instance, ply, cmd)
 end)
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Input library.
 -- @client
-local input_library = instance:RegisterLibrary("input")
+SF.RegisterLibrary("input")
+
+
+return function(instance)
+
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
 
 instance:AddHook("deinitialize", function()
 	if instance.data.cursorEnabled then
@@ -127,12 +131,8 @@ instance:AddHook("starfall_hud_disconnected", function()
 end)
 
 
-end, function(instance) -- Called for library definitions
-
-
 local input_library = instance.Libraries.input
 local vwrap = instance.Types.Vector.Wrap
-local getent = instance.Types.Entity.GetEntity
 
 --- Gets the first key that is bound to the command passed
 -- @client
@@ -461,7 +461,7 @@ instance.env.MOUSE = {
 }
 
 
-end}
+end
 
 
 --- Called when a button is pressed

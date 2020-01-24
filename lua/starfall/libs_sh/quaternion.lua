@@ -33,20 +33,15 @@ local deg2rad = math.pi / 180
 local rad2deg = 180 / math.pi
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Quaternion library
 -- @shared
-local quat_lib = instance:RegisterLibrary("quaternion")
+SF.RegisterLibrary("quaternion")
 
 --- Quaternion type
-local quat_methods, quat_meta = instance:RegisterType("Quaternion")
+SF.RegisterType("Quaternion")
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local quat_lib = instance.Libraries.quaternion
@@ -54,7 +49,11 @@ local quat_methods, quat_meta = instance.Types.Quaternion.Methods, instance.Type
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local getent = instance.Types.Entity.GetEntity
+
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
 
 
 --****************************** Helper functions ******************************--
@@ -678,4 +677,4 @@ end
 
 --[[****************************************************************************]]
 
-end}
+end

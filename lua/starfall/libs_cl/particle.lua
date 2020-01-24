@@ -6,24 +6,24 @@ local IsValid = IsValid
 -- Create permission types.
 registerprivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Particle type
 -- @client
-local particle_methods, particle_meta = instance:RegisterType("Particle", false, false)
+SF.RegisterType("Particle", false, false)
 
 --- Particle library.
 -- @client
-local particle_library = instance:RegisterLibrary("particle")
+SF.RegisterLibrary("particle")
 
--- Create the storage for the metamethods
+
+return function(instance)
+
+local getent
 instance:AddHook("initialize", function()
 	instance.data.particle = {
 		particles = {},
 	}
+
+	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
@@ -39,9 +39,6 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-
-end, function(instance) -- Called for library definitions
-
 local particle_library = instance.Libraries.particle
 local particle_methods = instance.Types.Particle.Methods
 
@@ -49,7 +46,6 @@ local checktype = instance.CheckType
 local particle_meta, wrap, unwrap = instance.Types.Particle, instance.Types.Particle.Wrap, instance.Types.Particle.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local getent = instance.Types.Entity.GetEntity
 
 
 -- Add PATTACH enum
@@ -302,4 +298,4 @@ function particle_methods:setControlPointParent(id,value)
 
 end
 
-end}
+end

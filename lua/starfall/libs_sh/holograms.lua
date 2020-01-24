@@ -64,20 +64,21 @@ local function hologramOnDestroy(holo, holodata, ply)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Library for creating and manipulating physics-less models AKA "Holograms".
 -- @shared
-local holograms_library = instance:RegisterLibrary("holograms")
+SF.RegisterLibrary("holograms")
 
 --- Hologram type
-local hologram_methods, hologram_meta = instance:RegisterType("Hologram", true, false, nil, "Entity")
+SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 
+
+return function(instance)
+
+local getent
 instance:AddHook("initialize", function()
 	instance.data.holograms = {holos = {}}
+	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
@@ -96,9 +97,6 @@ instance:AddHook("deinitialize", function()
 end)
 
 
-end, function(instance) -- Called for library definitions
-
-
 local checktype = instance.CheckType
 local holograms_library = instance.Libraries.holograms
 local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
@@ -106,7 +104,6 @@ local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, in
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
-local getent = instance.Types.Entity.GetEntity
 
 
 --- Casts a hologram entity into the hologram type
@@ -542,4 +539,4 @@ function hologram_methods:setModel(model)
 	holo:SetModel(model)
 end
 
-end}
+end

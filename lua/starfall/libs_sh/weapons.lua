@@ -3,16 +3,12 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 
 --- Weapon type
-local weapon_methods, weapon_meta = instance:RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
+SF.RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
@@ -147,4 +143,4 @@ if CLIENT then
 	end
 end
 
-end}
+end

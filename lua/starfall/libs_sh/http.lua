@@ -19,13 +19,11 @@ do
 	end
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Http library. Requests content from urls.
 -- @shared
-local http_library = instance:RegisterLibrary("http")
+SF.RegisterLibrary("http")
+
+return function(instance)
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0
@@ -35,9 +33,6 @@ instance:AddHook("initialize", function()
 		active = 0
 	}
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local http_library = instance.Libraries.http
@@ -267,4 +262,4 @@ function http_library.urlEncode(data)
 	return data
 end
 
-end}
+end

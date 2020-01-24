@@ -12,21 +12,17 @@ local effect_blacklist = {
 	dof_node = true
 }
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 
 --- Effects library.
 -- @shared
-local effect_library = instance:RegisterLibrary("effect")
+SF.RegisterLibrary("effect")
 
 --- Effect type
 -- @shared
-local effect_methods, effect_meta = instance:RegisterType("Effect", true, false)
+SF.RegisterType("Effect", true, false)
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local effect_library = instance.Libraries.effect
@@ -35,7 +31,11 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local getent = instance.Types.Entity.GetEntity
+
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
 
 --- Creates an effect data structure
 -- @return Effect Object
@@ -302,4 +302,4 @@ function effect_methods:setSurfaceProp(prop)
 	unwrap(self):SetSurfaceProp(prop)
 end
 
-end}
+end

@@ -207,16 +207,13 @@ SF.hookAdd("PostDrawHUD", nil, canRenderHudSafeArgs)
 SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 --- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
-local render_library = instance:RegisterLibrary("render")
+SF.RegisterLibrary("render")
 
 
-end, function(instance) -- Called for library definitions
+return function(instance)
 
 
 local render_library = instance.Libraries.render
@@ -228,7 +225,6 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local mtl_meta, mtlwrap, mtlunwrap = instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
 local mtl_meta2 = instance.Types.LockedMaterial
-local getent = instance.Types.Entity.GetEntity
 
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
@@ -292,12 +288,13 @@ instance:AddHook("cleanup", function(hook)
 		end
 	end
 end)
-
+local getent
 instance:AddHook("initialize", function()
 	instance.data.render = {}
 	instance.data.render.renderedViews = 0
 	instance.data.render.rendertargets = {}
 	instance.data.render.validrendertargets = {}
+	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function ()
@@ -1978,7 +1975,7 @@ function render_library.setHUDActive(active)
 	instance.hudoverride = active
 end
 
-end}
+end
 
 --- Called when a frame is requested to be drawn on screen. (2D/3D Context)
 -- @name render

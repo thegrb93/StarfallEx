@@ -140,13 +140,11 @@ end
 --- Creates and registers a library.
 -- @param name The library name
 -- @return methods The library's methods
-function SF.Instance:RegisterLibrary(name)
-	local methods = {}
-	self.Libraries[name] = methods
-	return methods
+function SF.RegisterLibrary(name)
+	SF.Libraries[name] = true
 end
 
---- Creates and registers a type.
+--- Registers a type.
 -- @param name The library name
 -- @param weakwrapper Make the wrapper weak inside the internal lookup table. Default: True
 -- @param weaksensitive Make the sensitive data weak inside the internal lookup table. Default: True
@@ -157,19 +155,14 @@ end
 -- @param super Optional type name that this will inherit from
 -- @return methods The type's methods
 -- @return metamethods The type's metamethods
-function SF.Instance:RegisterType(name, weakwrapper, weaksensitive, target_metatable, super)
-	local methods, metamethods = {}, {}
-	metamethods.__index = methods
-	metamethods.__metatable = name
-
-	metamethods.Methods = methods
-	metamethods.supertype = super
-	metamethods.weakwrapper = weakwrapper
-	metamethods.weaksensitive = weaksensitive
-	metamethods.target_metatable = target_metatable
-
-	self.Types[name] = metamethods
-	return methods, metamethods
+function SF.RegisterType(name, weakwrapper, weaksensitive, target_metatable, supertype, customwrappers)
+	SF.Types[name] = {
+		weakwrapper = weakwrapper,
+		weaksensitive = weaksensitive,
+		target_metatable = target_metatable,
+		supertype = supertype,
+		customwrappers = customwrappers,
+	}
 end
 
 --- Creates wrap/unwrap functions for sensitive values, by using a lookup table
@@ -177,56 +170,49 @@ end
 -- @param metatable The metatable to assign the wrapped value.
 -- @return The function to wrap sensitive values to a SF-safe table
 -- @return The function to unwrap the SF-safe table to the sensitive table
-function SF.Instance:CreateWrapper(metatable)
+function SF.Instance:CreateWrapper(metatable, typedata)
+	
+	local wrap, unwrap
 	-- If the type already has wrappers, dont re-assign
-	if self.object_unwrappers[metatable] then return end
-
-	local sensitive2sf, sf2sensitive
-	if metatable.supertype then
-		sensitive2sf = metatable.supertype.sensitive2sf
-		sf2sensitive = metatable.supertype.sf2sensitive
-	elseif metatable.weakwrapper~=nil and metatable.weaksensitive~=nil then
-		sf2sensitive = setmetatable({}, { __mode = (metatable.weakwrapper and "k" or "") .. (metatable.weaksensitive and "v" or "") })
-		sensitive2sf = setmetatable({}, { __mode = (metatable.weaksensitive and "k" or "") .. (metatable.weakwrapper and "v" or "") })
-		metatable.sensitive2sf = sensitive2sf
-		metatable.sf2sensitive = sf2sensitive
+	if typedata.weakwrapper==nil or typedata.weaksensitive==nil then
+		if typedata.customwrappers then
+			wrap, unwrap = typedata.customwrappers(metatable)
+		else
+			return
+		end
 	else
-		-- The type will not have wrappers assigned
-		return
+
+		local sensitive2sf, sf2sensitive
+		if metatable.supertype then
+			sensitive2sf = metatable.supertype.sensitive2sf
+			sf2sensitive = metatable.supertype.sf2sensitive
+		else
+			sf2sensitive = setmetatable({}, { __mode = (typedata.weakwrapper and "k" or "") .. (typedata.weaksensitive and "v" or "") })
+			sensitive2sf = setmetatable({}, { __mode = (typedata.weaksensitive and "k" or "") .. (typedata.weakwrapper and "v" or "") })
+			metatable.sensitive2sf = sensitive2sf
+			metatable.sf2sensitive = sf2sensitive
+		end
+
+		function wrap(value)
+			if value == nil then return nil end
+			if sensitive2sf[value] then return sensitive2sf[value] end
+			local tbl = setmetatable({}, metatable)
+			sensitive2sf[value] = tbl
+			sf2sensitive[tbl] = value
+			return tbl
+		end
+		function unwrap(value)
+			return sf2sensitive[value]
+		end
 	end
 
-	local function wrap(value)
-		if value == nil then return nil end
-		if sensitive2sf[value] then return sensitive2sf[value] end
-		local tbl = setmetatable({}, metatable)
-		sensitive2sf[value] = tbl
-		sf2sensitive[tbl] = value
-		return tbl
-	end
-	if metatable.target_metatable then
-		self.object_wrappers[metatable.target_metatable] = wrap
-	end
-
-	local function unwrap(value)
-		return sf2sensitive[value]
+	if typedata.target_metatable then
+		self.object_wrappers[typedata.target_metatable] = wrap
 	end
 	self.object_unwrappers[metatable] = unwrap
 
 	metatable.Wrap = wrap
 	metatable.Unwrap = unwrap
-
-	return wrap, unwrap
-end
-
---- Helper function for adding custom wrappers
--- @param object_meta metatable of object
--- @param sf_object_meta starfall metatable of object
--- @param wrapper function that wraps object
-function SF.Instance:AddCustomWrapper(object_meta, sf_object_meta, wrapper, unwrapper)
-	self.object_wrappers[object_meta] = wrapper
-	self.object_unwrappers[object_meta] = unwrapper
-	sf_object_meta.Wrap = wrapper
-	sf_object_meta.Unwrap = unwrapper
 end
 
 --- Builds an environment table
@@ -362,24 +348,30 @@ function SF.Instance:BuildEnvironment()
 		return RecursiveUnsanitize(original)
 	end
 	
-	for k, v in pairs(SF.Modules) do
-		v[1](self)
+	for name, _ in pairs(SF.Libraries) do
+		self.Libraries[name] = {}
 	end
 	
-	for k, v in pairs(self.Types) do
-		if v.supertype then
-			local supermeta = self.Types[v.supertype]
-			setmetatable(v.Methods, {__index = supermeta.Methods})
-			v.supertype = supermeta
+	for name, typedata in pairs(SF.Types) do
+		local methods = {}
+		local metatable = {__metatable = name, __index = methods, supertype = typedata.supertype, Methods = methods}
+		self.Types[name] = metatable
+	end
+	
+	for name, meta in pairs(self.Types) do
+		print(name)
+		PrintTable(SF.Types[name])
+		if meta.supertype then
+			local supermeta = self.Types[meta.supertype]
+			meta.supertype = supermeta
+			setmetatable(meta.Methods, {__index = supermeta.Methods})
 		end
-	end
-	
-	for k, v in pairs(self.Types) do
-		self:CreateWrapper(v)
+		
+		self:CreateWrapper(meta, SF.Types[name])
 	end
 	
 	for k, v in pairs(SF.Modules) do
-		v[2](self)
+		v(self)
 	end
 	table.Inherit( self.env, self.Libraries ) 
 	self.env._G = self.env
@@ -494,8 +486,9 @@ function SF.Instance:initialize()
 		SF.playerInstances[self.player] = {[self] = true}
 	end
 
-	self:RunHook("initialize", "_initialize")
+	self:RunHook("initialize")
 
+	self:RunHook("prepare", "_initialize")
 	local func = self.scripts[self.mainfile]
 	local tbl = self:run(func)
 	if not tbl[1] then

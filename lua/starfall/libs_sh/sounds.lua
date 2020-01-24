@@ -25,20 +25,21 @@ local function deleteSound(ply, ent, sound)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 --- Sounds library.
 -- @shared
-local sound_library = instance:RegisterLibrary("sounds")
+SF.RegisterLibrary("sounds")
 
 --- Sound type
 -- @shared
-local sound_methods, sound_meta = instance:RegisterType("Sound", true, false)
+SF.RegisterType("Sound", true, false)
 
--- Register functions to be called when the chip is initialised and deinitialised
+
+return function(instance)
+
+local getent
 instance:AddHook("initialize", function()
 	instance.data.sounds = {sounds = {}}
+	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
@@ -47,15 +48,10 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-
-end, function(instance) -- Called for library definitions
-
-
 local checktype = instance.CheckType
 local sound_library = instance.Libraries.sounds
 local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, instance.Types.Sound, instance.Types.Sound.Wrap, instance.Types.Sound.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local getent = instance.Types.Entity.GetEntity
 
 
 --- Creates a sound and attaches it to an entity
@@ -190,4 +186,4 @@ function sound_methods:setSoundLevel(level)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end
 
-end}
+end

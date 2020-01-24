@@ -1,14 +1,11 @@
--- Local to each starfall
-return { function(instance) -- Called for library declarations
 
 
 --- Physenv functions
 -- @shared
-local physenv_lib = instance:RegisterLibrary("physenv")
+SF.RegisterLibrary("physenv")
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local physenv_lib = instance.Libraries.physenv
 local vwrap = instance.Types.Vector.Wrap
@@ -32,4 +29,4 @@ function physenv_lib.getPerformanceSettings ()
 	return instance.Sanitize(physenv.GetPerformanceSettings())
 end
 
-end}
+end

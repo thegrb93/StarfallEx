@@ -1,13 +1,10 @@
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 
 --- Library for retreiving information about teams
 -- @shared
-local team_library = instance:RegisterLibrary("team")
+SF.RegisterLibrary("team")
 
 
-end, function(instance) -- Called for library definitions
+return function(instance)
 
 
 local team_library = instance.Libraries.team
@@ -88,4 +85,4 @@ team_library.getNumFrags = team.TotalFrags
 -- @return boolean
 team_library.exists = team.Valid
 
-end}
+end

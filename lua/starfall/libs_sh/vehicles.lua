@@ -12,16 +12,10 @@ if SERVER then
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Vehicle type
-local vehicle_methods, vehicle_meta = instance:RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
+SF.RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
 
-
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
@@ -128,4 +122,4 @@ if SERVER then
 	end
 end
 
-end}
+end

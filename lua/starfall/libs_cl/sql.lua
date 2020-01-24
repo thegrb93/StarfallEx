@@ -1,21 +1,14 @@
-SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
-
--- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
+SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
 
 --- SQL library.
 -- @client
-local sql_library = instance:RegisterLibrary("sql")
+SF.RegisterLibrary("sql")
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local sql_library = instance.Libraries.sql
 local checktype = instance.CheckType
@@ -69,4 +62,4 @@ function sql_library.SQLStr(str, bNoQuotes)
 	return sql.SQLStr(str, bNoQuotes)
 end
 
-end}
+end

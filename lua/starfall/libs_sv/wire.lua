@@ -13,18 +13,21 @@ registerprivilege("wire.deleteWire", "Delete Wire", "Allows the user to delete a
 registerprivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs of an entity")
 registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-if not WireLib then return end
-
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
-local wire_library = instance:RegisterLibrary("wire")
+SF.RegisterLibrary("wire")
 
 --- Wirelink type
 -- @server
-local wirelink_methods, wirelink_meta = instance:RegisterType("Wirelink", false, true)
+SF.RegisterType("Wirelink", false, true)
 
+return function(instance)
+if not WireLib then return end
+
+
+local getent
 instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+
 	local ent = instance.data.entity
 	instance.data.wirecache = {}
 	instance.data.wirecachevals = {}
@@ -64,10 +67,6 @@ instance:AddHook("initialize", function()
 end)
 
 
-end, function(instance) -- Called for library definitions
-if not WireLib then return end
-
-
 local wire_library = instance.Libraries.wire
 
 local checktype = instance.CheckType
@@ -79,7 +78,7 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
 local COLOR_WHITE = Color(255, 255, 255)
-local getent = instance.Types.Entity.GetEntity
+
 
 local function identity(data) return data end
 local typeToE2Type = {
@@ -596,36 +595,33 @@ function wirelink_methods:getWiredToName(name)
 	end
 end
 
--- ------------------------- Ports Metatable ------------------------- --
-local wire_ports_methods, wire_ports_metamethods = instance:RegisterType("Ports")
-
-function wire_ports_metamethods:__index(name)
-	local data = instance.data
-	local input = data.entity.Inputs[name]
-	if input then
-		if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
-		local ret = inputConverters[input.Type](input.Value)
-		data.wirecache[name] = input.Value
-		data.wirecachevals[name] = ret
-		return ret
-	end
-end
-
-function wire_ports_metamethods:__newindex(name, value)
-	checkluatype(name, TYPE_STRING)
-
-	local ent = instance.data.entity
-	local output = ent.Outputs[name]
-	if output then
-		Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
-	end
-end
-
 --- Ports table. Reads from this table will read from the wire input
 -- of the same name. Writes will write to the wire output of the same name.
 -- @class table
 -- @name wire_library.ports
-wire_library.ports = setmetatable({}, wire_ports_metamethods)
+wire_library.ports = setmetatable({}, {
+	__index = function(self, name)
+		local data = instance.data
+		local input = data.entity.Inputs[name]
+		if input then
+			if data.wirecache[name]==input.Value then return data.wirecachevals[name] end
+			local ret = inputConverters[input.Type](input.Value)
+			data.wirecache[name] = input.Value
+			data.wirecachevals[name] = ret
+			return ret
+		end
+	end,
+
+	__newindex = function(self, name, value)
+		checkluatype(name, TYPE_STRING)
+
+		local ent = instance.data.entity
+		local output = ent.Outputs[name]
+		if output then
+			Wire_TriggerOutput(ent, name, outputConverters[output.Type](value))
+		end
+	end
+})
 
 -- ------------------------- Hook Documentation ------------------------- --
 
@@ -648,4 +644,4 @@ wire_library.ports = setmetatable({}, wire_ports_metamethods)
 -- @param address The address written to
 -- @param data The data being written
 
-end}
+end

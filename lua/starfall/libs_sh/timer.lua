@@ -5,13 +5,12 @@ local timer = timer
 local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of timers that can be created")
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Deals with time and timers.
 -- @shared
-local timer_library = instance:RegisterLibrary("timer")
+SF.RegisterLibrary("timer")
+
+
+return function(instance)
 
 instance:AddHook("initialize", function()
 	instance.data.timers = {}
@@ -23,9 +22,6 @@ instance:AddHook("deinitialize", function()
 		timer.Remove(name)
 	end
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local timer_library = instance.Libraries.timer
@@ -224,4 +220,4 @@ function timer_library.getTimersLeft()
 	return max_timers:GetInt() - instance.data.timer_count
 end
 
-end}
+end

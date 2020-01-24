@@ -1,13 +1,12 @@
 local util = util
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
 
 --- JSON library
 -- @shared
-local json_library = instance:RegisterLibrary("json")
+SF.RegisterLibrary("json")
 
-end, function(instance) -- Called for library definitions
+
+return function(instance)
 
 
 local json_library = instance.Libraries.json
@@ -29,4 +28,4 @@ function json_library.decode (s)
 	return instance.Sanitize(util.JSONToTable(s))
 end
 
-end}
+end

@@ -1,4 +1,4 @@
-if not pcall(require, "joystick") then return {function() end, function() end} end
+if not pcall(require, "joystick") then return end
 
 local next_updates = {}
 
@@ -11,17 +11,11 @@ local function refresh(enum)
 	end
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Joystick library.
 -- @client
-local joystick_library = instance:RegisterLibrary("joystick")
+SF.RegisterLibrary("joystick")
 
-
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local joystick_library = instance.Libraries.joystick
 
@@ -91,4 +85,4 @@ function joystick_library.numButtons(enum)
 	return joystick.count(enum, 3)
 end
 
-end}
+end

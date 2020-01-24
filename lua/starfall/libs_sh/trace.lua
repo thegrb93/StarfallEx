@@ -12,17 +12,11 @@ local function checkvector(pos)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Provides functions for doing line/AABB traces
 -- @shared
-local trace_library = instance:RegisterLibrary("trace")
+SF.RegisterLibrary("trace")
 
-
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local trace_library = instance.Libraries.trace
@@ -351,4 +345,4 @@ function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, pl
 	if pos then return vwrap(pos) end
 end
 
-end}
+end

@@ -36,14 +36,9 @@ local function checkvector(v)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
 
+return function(instance)
 
-end, function(instance) -- Called for library definitions
-
-
-local getent = instance.Types.Entity.GetEntity
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -51,7 +46,10 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local cunwrap = instance.Types.Color.Unwrap
 
-
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
 
 -- ------------------------- Methods ------------------------- --
 
@@ -791,4 +789,4 @@ function ents_methods:getCreationID()
 	return ent:GetCreationID()
 end
 
-end}
+end

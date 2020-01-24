@@ -3,12 +3,12 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Player type
-local player_methods, player_meta = instance:RegisterType("Player", false, true, debug.getregistry().Player, "Entity")
+SF.RegisterType("Player", false, true, debug.getregistry().Player, "Entity")
+
+
+return function(instance)
+
 
 if SERVER then
 	instance:AddHook("deinitialize", function()
@@ -19,9 +19,6 @@ if SERVER then
 		end
 	end)
 end
-
-
-end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
@@ -537,7 +534,7 @@ if CLIENT then
 	end
 end
 
-end}
+end
 
 --- ENUMs of in_keys for use with player:keyDown:
 -- ALT1,

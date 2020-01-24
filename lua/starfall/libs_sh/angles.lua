@@ -2,28 +2,19 @@
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Angle Type
 -- @shared
-local ang_methods, ang_meta = instance:RegisterType("Angle")
-
-local function unwrap(obj)
-	return Angle(obj[1], obj[2], obj[3])
-end
-
-local function awrap(ang)
-	return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)
-end
-
-instance:AddCustomWrapper(debug.getregistry().Angle, ang_meta, awrap, unwrap)
+SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(ang_meta)
+	return function(ang)
+		return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)
+	end,
+	function(obj)
+		return Angle(obj[1], obj[2], obj[3])
+	end
+end)
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local ang_methods, ang_meta, awrap, unwrap = instance.Types.Angle.Methods, instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
@@ -249,4 +240,4 @@ function ang_methods:setR(r)
 	return self
 end
 
-end}
+end

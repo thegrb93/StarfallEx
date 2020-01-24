@@ -13,18 +13,15 @@ if SERVER then
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
+SF.RegisterLibrary("string")
+SF.RegisterLibrary("math")
+SF.RegisterLibrary("os")
+SF.RegisterLibrary("table")
 
+
+return function(instance)
 
 instance.Libraries.string = table.Copy(SF.SafeStringLib)
-instance:RegisterLibrary("math")
-instance:RegisterLibrary("os")
-instance:RegisterLibrary("table")
-
-
-end, function(instance) -- Called for library definitions
-
 
 local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -1081,4 +1078,4 @@ end
 -- @param super The (optional) parent class to inherit from
 Environment.class = SF.Class
 
-end}
+end

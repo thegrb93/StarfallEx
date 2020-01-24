@@ -2,16 +2,14 @@
 local checkluatype = SF.CheckLuaType
 local coroutine = coroutine
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Coroutine library
 -- @shared
-local coroutine_library = instance:RegisterLibrary("coroutine")
+SF.RegisterLibrary("coroutine")
 
-local _, thread_meta = instance:RegisterType("thread", true, false)
+SF.RegisterType("thread", true, false)
+
+
+return function(instance)
 
 instance:AddHook("initialize", function()
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })
@@ -25,9 +23,6 @@ instance:AddHook("deinitialize", function()
 		instance.data.coroutines[thread] = nil
 	end
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
@@ -126,4 +121,4 @@ function coroutine_library.wait (time)
 	end
 end
 
-end}
+end

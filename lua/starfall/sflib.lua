@@ -2,6 +2,8 @@
 -- The main Starfall library
 -------------------------------------------------------------------------------
 SF.Modules = {}
+SF.Types = {}
+SF.Libraries = {}
 local dgetmeta = debug.getmetatable
 
 -- Make sure this is done after metatables have been set
@@ -1117,8 +1119,8 @@ do
 		if #tbl == 1 then
 			return tbl[1]
 		elseif #tbl == 2 then
-			local a, b, c, d = tbl[1][1], tbl[1][2], tbl[2][1], tbl[2][2]
-			return {function(i) a(i) c(i) end, function(i) b(i) d(i) end}
+			local a, b = tbl[1], tbl[2]
+			return function(i) a(i) b(i) end
 		else
 			error("This shouldn't happen!")
 		end
@@ -1131,13 +1133,13 @@ do
 			if not ((clientonly and SERVER) or (serveronly and CLIENT)) then
 				local ok, mod = xpcall(include, debug.traceback, path)
 				if ok then
-					if istable(mod) and mod[1] and mod[2] then
+					if isfunction(mod) then
 						addModule(string.StripExtension(filename), mod)
 					else
-						ErrorNoHalt("[SF] Attempt to load bad module: " .. path)
+						ErrorNoHalt("[SF] Attempt to load bad module: " .. path .. "\n")
 					end
 				else
-					ErrorNoHalt(mod)
+					ErrorNoHalt(mod .. "\n")
 				end
 			end
 		end

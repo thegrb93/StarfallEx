@@ -19,13 +19,12 @@ local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex"
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @shared
-instance:RegisterLibrary("prop")
+SF.RegisterLibrary("prop")
+
+
+return function(instance)
 
 instance:AddHook("initialize", function()
 	instance.data.props = {props = {}}
@@ -38,9 +37,6 @@ instance:AddHook("deinitialize", function()
 		end
 	end
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local props_library = instance.Libraries.prop
@@ -485,4 +481,4 @@ function props_library.setPropUndo(on)
 	instance.data.props.undo = on
 end
 
-end}
+end

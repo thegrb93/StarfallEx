@@ -22,16 +22,18 @@ local function constraintOnDestroy(ent, constraints, ply)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Library for creating and manipulating constraints.
 -- @server
-local constraint_library = instance:RegisterLibrary("constraint")
+SF.RegisterLibrary("constraint")
 
+
+return function(instance)
+
+
+local getent
 instance:AddHook("initialize", function()
 	instance.data.constraints = {constraints = {}}
+	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("deinitialize", function()
@@ -47,16 +49,11 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-
-end, function(instance) -- Called for library definitions
-
-
 local constraint_library = instance.Libraries.constraint
 
 local checktype = instance.CheckType
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local getent = instance.Types.Entity.GetEntity
 
 local function checkConstraint(e, t)
 	if e then
@@ -448,4 +445,4 @@ function constraint_library.constraintsLeft()
 	return plyCount:check(instance.player)
 end
 
-end}
+end

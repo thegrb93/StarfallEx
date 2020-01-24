@@ -7,13 +7,12 @@ registerprivilege("notification", "Create notifications", "Allows the user to cr
 registerprivilege("notification.hud", "Create notifications with HUD connected", "Allows a user to create notifications on the player's screen if connected to a HUD", { client = {} })
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Notification library. Allows the user to display hints on the bottom right of their screen
 -- @client
-local notification_library = instance:RegisterLibrary("notification")
+SF.RegisterLibrary("notification")
+
+return function(instance)
+
 
 instance:AddHook("initialize", function()
 	instance.data.notifications = {}
@@ -25,8 +24,6 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-
-end, function(instance) -- Called for library definitions
 
 local notification_library = instance.Libraries.notification
 
@@ -103,4 +100,4 @@ function notification_library.kill(id)
 	end
 end
 
-end}
+end

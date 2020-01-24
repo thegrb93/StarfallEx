@@ -12,18 +12,16 @@ registerprivilege("file.open", "Get a file object", "Allows the user to use a fi
 
 file.CreateDir("sf_filedata/")
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- File functions. Allows modification of files.
 -- @client
-local file_library = instance:RegisterLibrary("file")
+SF.RegisterLibrary("file")
 
 --- File type
 -- @client
-local file_methods, file_meta = instance:RegisterType("File", true, false)
+SF.RegisterType("File", true, false)
+
+
+return function(instance)
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()
@@ -35,9 +33,6 @@ instance:AddHook("deinitialize", function()
 		file:Close()
 	end
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
@@ -309,4 +304,4 @@ function file_methods:writeShort(x)
 	unwrap(self):WriteShort(x)
 end
 
-end}
+end

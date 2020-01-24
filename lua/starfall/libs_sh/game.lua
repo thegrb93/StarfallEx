@@ -1,14 +1,10 @@
--- Local to each starfall
-return { function(instance) -- Called for library declarations
 
 
 --- Game functions
 -- @shared
-local game_lib = instance:RegisterLibrary("game")
+SF.RegisterLibrary("game")
 
-
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local game_lib = instance.Libraries.game
 local vwrap = instance.Types.Vector.Wrap
@@ -67,4 +63,4 @@ if CLIENT then
 	end
 end
 
-end}
+end

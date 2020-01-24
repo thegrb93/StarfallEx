@@ -7,28 +7,19 @@ local math_Clamp = math.Clamp
 local clamp = function(v) return math_Clamp(v, 0, 255) end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Color type
 --@shared
-local color_methods, color_meta = instance:RegisterType("Color")
-local checktype = instance.CheckType
-
-local function unwrap(obj)
-	return Color((tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255))
-end
-
-local function cwrap(clr)
-	return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
-end
-
-instance:AddCustomWrapper(debug.getregistry().Color, color_meta, cwrap, unwrap)
+SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(color_meta)
+	return function(clr)
+		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
+	end,
+	function(obj)
+		return Color((tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255))
+	end
+end)
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local color_methods, color_meta, cwrap, unwrap = instance.Types.Color.Methods, instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local function wrap(tbl)
@@ -204,4 +195,4 @@ function color_methods:setA(a)
 	return self
 end
 
-end}
+end

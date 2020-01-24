@@ -798,17 +798,12 @@ local function serialize(data, checkRecursion)
 end
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- vON Library
 -- @shared
-local von_library = instance:RegisterLibrary("von")
+SF.RegisterLibrary("von")
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local von_library = instance.Libraries.von
 
@@ -834,4 +829,4 @@ function von_library.serialize(tbl)
 	return serialize(tbl)
 end
 
-end}
+end

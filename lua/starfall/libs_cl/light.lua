@@ -61,17 +61,16 @@ local function processLights(curtime)
 	end
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Light type
 -- @client
-local light_methods, light_meta = instance:RegisterType("Light", true, false)
+SF.RegisterType("Light", true, false)
 
 --- Light library.
 -- @client
-local light_library = instance:RegisterLibrary("light")
+SF.RegisterLibrary("light")
+
+
+return function(instance)
 
 
 -- Register functions to be called when the chip is initialised and deinitialised
@@ -85,9 +84,6 @@ instance:AddHook("deinitialize", function()
 		gSFLights[light.slot] = nil
 	end
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
@@ -256,4 +252,4 @@ function light_methods:setColor(color)
 	data.b = col.b
 end
 
-end}
+end

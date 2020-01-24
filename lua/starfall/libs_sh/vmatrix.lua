@@ -3,17 +3,11 @@ local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
 
-
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- VMatrix type
-local vmatrix_methods, vmatrix_meta = instance:RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
+SF.RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
 
-end, function(instance) -- Called for library definitions
-
+return function(instance)
 
 local checktype = instance.CheckType
 local vmatrix_methods, vmatrix_meta, wrap, unwrap = instance.Types.VMatrix.Methods, instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
@@ -354,4 +348,4 @@ function vmatrix_meta.__mul(lhs, rhs)
 	end
 end
 
-end}
+end

@@ -31,13 +31,13 @@ net.Receive("SF_netmessage", function(len, ply)
 end)
 
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
-
 --- Net message library. Used for sending data from the server to the client and back
-local net_library = instance:RegisterLibrary("net")
+SF.RegisterLibrary("net")
 
+
+return function(instance)
+
+local getent
 instance:AddHook("initialize", function()
 	instance.data.net = {
 		started = false,
@@ -45,15 +45,13 @@ instance:AddHook("initialize", function()
 		data = {},
 		receives = {}
 	}
+	getent = instance.Types.Entity.GetEntity
 end)
 
 instance:AddHook("cleanup", function()
 	instance.data.net.started = false
 	instance.data.net.data = {}
 end)
-
-
-end, function(instance) -- Called for library definitions
 
 
 local checktype = instance.CheckType
@@ -63,7 +61,6 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
-local getent = instance.Types.Entity.GetEntity
 
 local function write(func, size, ...)
 	instance.data.net.size = instance.data.net.size + size
@@ -577,7 +574,7 @@ function net_library.isStreaming()
 	return streams[instance.player] ~= nil
 end
 
-end}
+end
 
 --- Called when a net message arrives
 -- @name net

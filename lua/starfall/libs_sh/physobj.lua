@@ -12,16 +12,13 @@ local function checkvector(v)
 	end
 end
 
--- Local to each starfall
-return { function(instance) -- Called for library declarations
-
 
 --- PhysObj Type
 -- @shared
-local physobj_methods, physobj_meta = instance:RegisterType("PhysObj", true, false)
+SF.RegisterType("PhysObj", true, false)
 
 
-end, function(instance) -- Called for library definitions
+return function(instance)
 
 
 local checktype = instance.CheckType
@@ -512,4 +509,4 @@ if SERVER then
 	end
 end
 
-end}
+end
