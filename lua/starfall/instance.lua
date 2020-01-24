@@ -359,8 +359,6 @@ function SF.Instance:BuildEnvironment()
 	end
 	
 	for name, meta in pairs(self.Types) do
-		print(name)
-		PrintTable(SF.Types[name])
 		if meta.supertype then
 			local supermeta = self.Types[meta.supertype]
 			meta.supertype = supermeta
