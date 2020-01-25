@@ -8,7 +8,9 @@ registerprivilege("notification.hud", "Create notifications with HUD connected",
 
 
 --- Notification library. Allows the user to display hints on the bottom right of their screen
--- @client
+-- @name notification
+-- @class library
+-- @libtbl notification_library
 SF.RegisterLibrary("notification")
 
 return function(instance)
@@ -27,7 +29,7 @@ end)
 
 local notification_library = instance.Libraries.notification
 
--- @name Environment.NOTIFY
+-- @name builtins_library.NOTIFY
 -- @class table
 instance.env.NOTIFY = {
 	["GENERIC"] = NOTIFY_GENERIC,

@@ -6,13 +6,18 @@ local IsValid = IsValid
 -- Create permission types.
 registerprivilege("particle.attach", "Allow users to create particle", { client = {}, entities = {} })
 
---- Particle type
--- @client
-SF.RegisterType("Particle", false, false)
 
 --- Particle library.
--- @client
+-- @name particle
+-- @class library
+-- @libtbl particle_library
 SF.RegisterLibrary("particle")
+
+--- Particle type
+-- @name Particle
+-- @class type
+-- @libtbl particle_methods
+SF.RegisterType("Particle", false, false)
 
 
 return function(instance)

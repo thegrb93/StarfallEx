@@ -58,6 +58,7 @@ end)
 -- @param attachment Optional string attachment name to parent to
 function ents_methods:setParent(parent, attachment)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkpermission(instance, ent, "entities.parent")
 
 	if parent ~= nil then
@@ -355,6 +356,7 @@ end
 -- @param nocollide Whether to collide with nothing except world or not.
 function ents_methods:setNocollideAll(nocollide)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkpermission(instance, ent, "entities.setSolid")
 
 	ent:SetCollisionGroup (nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE)
@@ -483,6 +485,7 @@ end
 -- @param solid Boolean, Should the entity be solid?
 function ents_methods:setSolid(solid)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkpermission(instance, ent, "entities.setSolid")
 
 	ent:SetNotSolid(not solid)
@@ -492,6 +495,7 @@ end
 -- @param mass number mass
 function ents_methods:setMass(mass)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkluatype(mass, TYPE_NUMBER)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
@@ -507,6 +511,7 @@ end
 -- @param vec Inertia tensor
 function ents_methods:setInertia(vec)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checktype(vec, vec_meta)
 	checkpermission(instance, ent, "entities.setInertia")
 	local phys = ent:GetPhysicsObject()
@@ -525,6 +530,7 @@ end
 -- @param mat Material to use
 function ents_methods:setPhysMaterial(mat)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	checkluatype(mat, TYPE_STRING)
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
@@ -564,6 +570,7 @@ end
 -- @param grav Bool should the entity respect gravity?
 function ents_methods:enableGravity(grav)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -577,6 +584,7 @@ end
 -- @param drag Bool should the entity have air resistence?
 function ents_methods:enableDrag(drag)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
@@ -589,6 +597,7 @@ end
 -- @param move Bool should the entity move?
 function ents_methods:enableMotion(move)
 	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 

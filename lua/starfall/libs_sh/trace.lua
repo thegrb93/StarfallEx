@@ -13,7 +13,9 @@ end
 
 
 --- Provides functions for doing line/AABB traces
--- @shared
+-- @name trace
+-- @class library
+-- @libtbl trace_library
 SF.RegisterLibrary("trace")
 
 return function(instance)

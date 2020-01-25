@@ -23,7 +23,9 @@ end
 
 
 --- Library for creating and manipulating constraints.
--- @server
+-- @name constraint
+-- @class library
+-- @libtbl constraint_library
 SF.RegisterLibrary("constraint")
 
 
@@ -58,7 +60,11 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local function checkConstraint(e, t)
 	if e then
 		if e:IsValid() then
-			checkpermission(instance, e, t)
+			if e:GetMoveType() == MOVETYPE_VPHYSICS then
+				checkpermission(instance, e, t)
+			else
+				SF.Throw("Can only constrain entities with physics", 3)
+			end
 		elseif not e:IsWorld() then
 			SF.Throw("Invalid Entity", 3)
 		end

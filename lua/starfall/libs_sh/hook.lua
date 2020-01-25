@@ -90,7 +90,9 @@ add("Tick")
 
 
 --- Deals with hooks
--- @shared
+-- @name hook
+-- @class library
+-- @libtbl hook_library
 SF.RegisterLibrary("hook")
 
 

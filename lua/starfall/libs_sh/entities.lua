@@ -9,7 +9,9 @@ registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play so
 
 
 --- Entity type
--- @shared
+-- @name Entity
+-- @class type
+-- @libtbl ents_methods
 SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
 
 

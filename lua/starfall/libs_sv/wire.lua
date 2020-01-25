@@ -14,10 +14,15 @@ registerprivilege("wire.getInputs", "Get Inputs", "Allows the user to get Inputs
 registerprivilege("wire.getOutputs", "Get Outputs", "Allows the user to get Outputs of an entity")
 
 --- Wire library. Handles wire inputs/outputs, wirelinks, etc.
+-- @name wire
+-- @class library
+-- @libtbl wire_library
 SF.RegisterLibrary("wire")
 
 --- Wirelink type
--- @server
+-- @name Wirelink
+-- @class type
+-- @libtbl wirelink_methods
 SF.RegisterType("Wirelink", false, true)
 
 return function(instance)

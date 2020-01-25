@@ -5,6 +5,9 @@ local checkpermission = SF.Permissions.check
 
 
 --- Weapon type
+-- @name Weapon
+-- @class type
+-- @libtbl weapon_methods
 SF.RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
 
 
@@ -14,8 +17,6 @@ local checktype = instance.CheckType
 local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 
 
---- To string
--- @shared
 function weapon_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"

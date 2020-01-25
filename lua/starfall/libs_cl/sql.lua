@@ -4,7 +4,9 @@ local checkpermission = SF.Permissions.check
 SF.Permissions.registerPrivilege("sql", "Perform actions on the local SQLite database.", "Allows users to perform actions on the local SQLite database.", { client = { default = 1 } })
 
 --- SQL library.
--- @client
+-- @name sql
+-- @class library
+-- @libtbl sql_library
 SF.RegisterLibrary("sql")
 
 

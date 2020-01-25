@@ -3,7 +3,9 @@ local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
 
 --- Angle Type
--- @shared
+-- @name Angle
+-- @class type
+-- @libtbl ang_methods
 SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(ang_meta)
 	return function(ang)
 		return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)
@@ -24,7 +26,7 @@ local function wrap(tbl)
 end
 
 --- Creates an Angle struct. Can be indexed with: 1, 2, 3, pitch, yaw, roll. 1,2,3 is most efficient.
--- @name Environment.Angle
+-- @name builtins_library.Angle
 -- @class function
 -- @param p - Pitch
 -- @param y - Yaw

@@ -26,11 +26,15 @@ end
 
 
 --- Sounds library.
--- @shared
+-- @name sounds
+-- @class library
+-- @libtbl sounds_library
 SF.RegisterLibrary("sounds")
 
 --- Sound type
--- @shared
+-- @name Sound
+-- @class type
+-- @libtbl sound_methods
 SF.RegisterType("Sound", true, false)
 
 
@@ -49,7 +53,7 @@ instance:AddHook("deinitialize", function()
 end)
 
 local checktype = instance.CheckType
-local sound_library = instance.Libraries.sounds
+local sounds_library = instance.Libraries.sounds
 local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, instance.Types.Sound, instance.Types.Sound.Wrap, instance.Types.Sound.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
@@ -59,7 +63,7 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 -- @param path Filepath to the sound file.
 -- @param nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 -- @return Sound Object
-function sound_library.create(ent, path, nofilter)
+function sounds_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
 	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
 
@@ -91,13 +95,13 @@ end
 
 --- Returns if a sound is able to be created
 -- @return If it is possible to make a sound
-function sound_library.canCreate()
+function sounds_library.canCreate()
 	return plyCount:check(instance.player) > 0 and plySoundBurst:check(instance.player) >= 1
 end
 
 --- Returns the number of sounds left that can be created
 -- @return The number of sounds left
-function sound_library.soundsLeft()
+function sounds_library.soundsLeft()
 	return math.min(plyCount:check(instance.player), plySoundBurst:check(instance.player))
 end
 

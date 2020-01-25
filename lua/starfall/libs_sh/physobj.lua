@@ -14,7 +14,9 @@ end
 
 
 --- PhysObj Type
--- @shared
+-- @name PhysObj
+-- @class type
+-- @libtbl physobj_methods
 SF.RegisterType("PhysObj", true, false)
 
 
@@ -28,7 +30,7 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
--- @name Environment.FVPHYSICS
+-- @name builtins_library.FVPHYSICS
 -- @class table
 instance.env.FVPHYSICS = {
 	["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,

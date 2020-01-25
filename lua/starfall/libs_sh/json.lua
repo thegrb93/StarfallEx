@@ -2,7 +2,9 @@ local util = util
 
 
 --- JSON library
--- @shared
+-- @name json
+-- @class library
+-- @libtbl json_library
 SF.RegisterLibrary("json")
 
 

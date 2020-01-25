@@ -65,10 +65,15 @@ end
 
 
 --- Library for creating and manipulating physics-less models AKA "Holograms".
--- @shared
+-- @name holograms
+-- @class library
+-- @libtbl holograms_library
 SF.RegisterLibrary("holograms")
 
 --- Hologram type
+-- @name Hologram
+-- @class type
+-- @libtbl hologram_methods
 SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 
@@ -104,6 +109,14 @@ local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, in
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
+
+function hologram_meta:__tostring()
+	local ent = unwrap(self)
+	if not ent then return "(null entity)"
+	else return tostring(ent) end
+end
+
 
 
 --- Casts a hologram entity into the hologram type

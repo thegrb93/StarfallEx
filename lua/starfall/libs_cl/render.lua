@@ -210,6 +210,9 @@ SF.hookAdd("CalcView", nil, canCalcview, returnCalcview)
 --- Render library. Screens are 512x512 units. Most functions require
 -- that you be in the rendering hook to call, otherwise an error is
 -- thrown. +x is right, +y is down
+-- @name render
+-- @class library
+-- @libtbl render_library
 SF.RegisterLibrary("render")
 
 
