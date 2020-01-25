@@ -38,7 +38,7 @@ function ConnectHUD(ent)
 	local instance = ent.link.instance
 	if not instance then return end
 	instance:runScriptHook("hudconnected", instance.WrapObject(ent))
-	instance:CallHook("starfall_hud_connected", ent)
+	instance:RunHook("starfall_hud_connected", ent)
 end
 
 function DisconnectHUD(ent)
@@ -50,7 +50,7 @@ function DisconnectHUD(ent)
 	local instance = ent.link.instance
 	if not instance then return end
 	instance:runScriptHook("huddisconnected", instance.WrapObject(ent))
-	instance:CallHook("starfall_hud_disconnected", ent)
+	instance:RunHook("starfall_hud_disconnected", ent)
 end
 
 net.Receive("starfall_hud_set_enabled" , function()
