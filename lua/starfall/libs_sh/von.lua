@@ -799,7 +799,9 @@ end
 
 
 --- vON Library
--- @shared
+-- @name von
+-- @class library
+-- @libtbl von_library
 SF.RegisterLibrary("von")
 
 

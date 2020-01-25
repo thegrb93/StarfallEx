@@ -6,7 +6,9 @@ local checkpermission = SF.Permissions.check
 SF.Permissions.registerPrivilege("find", "Find", "Allows the user to access the find library")
 
 --- Find library. Finds entities in various shapes.
--- @shared
+-- @name find
+-- @class library
+-- @libtbl find_library
 SF.RegisterLibrary("find")
 
 return function(instance)

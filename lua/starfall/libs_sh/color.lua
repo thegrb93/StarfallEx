@@ -8,7 +8,9 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 
 
 --- Color type
---@shared
+-- @name Color
+-- @class type
+-- @libtbl color_methods
 SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(color_meta)
 	return function(clr)
 		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
@@ -27,7 +29,7 @@ local function wrap(tbl)
 end
 
 --- Creates a table struct that resembles a Color
--- @name Environment.Color
+-- @name builtins_library.Color
 -- @class function
 -- @param r - Red
 -- @param g - Green

@@ -1,6 +1,8 @@
 
 --- Library for retreiving information about teams
--- @shared
+-- @name team
+-- @class library
+-- @libtbl team_library
 SF.RegisterLibrary("team")
 
 

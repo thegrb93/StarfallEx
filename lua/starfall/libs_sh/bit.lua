@@ -416,7 +416,9 @@ end
 
 
 --- Bit library http://wiki.garrysmod.com/page/Category:bit
--- @shared
+-- @name bit
+-- @class library
+-- @libtbl bit_library
 SF.RegisterLibrary("bit")
 
 

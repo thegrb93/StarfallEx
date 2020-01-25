@@ -1,7 +1,9 @@
 
 
 --- Physenv functions
--- @shared
+-- @name physenv
+-- @class library
+-- @libtbl physenv_lib
 SF.RegisterLibrary("physenv")
 
 

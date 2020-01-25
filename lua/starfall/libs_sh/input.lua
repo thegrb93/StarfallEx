@@ -106,7 +106,9 @@ end)
 
 
 --- Input library.
--- @client
+-- @name input
+-- @class library
+-- @libtbl input_library
 SF.RegisterLibrary("input")
 
 
@@ -630,7 +632,7 @@ end
 -- SCROLLLOCKTOGGLE,
 -- LAST,
 -- COUNT
--- @name Environment.KEY
+-- @name builtins_library.KEY
 -- @class table
 
 --- ENUMs of mouse buttons for use with input library:
@@ -651,5 +653,5 @@ end
 -- COUNT,
 -- FIRST,
 -- LAST
--- @name Environment.MOUSE
+-- @name builtins_library.MOUSE
 -- @class table

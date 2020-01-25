@@ -4,6 +4,9 @@ local checkpermission = SF.Permissions.check
 
 
 --- Player type
+-- @name Player
+-- @class type
+-- @libtbl player_methods
 SF.RegisterType("Player", false, true, debug.getregistry().Player, "Entity")
 
 
@@ -57,8 +60,7 @@ instance.env.IN_KEY = {
 	["RUN"] = IN_RUN,
 }
 
---- To string
--- @shared
+
 function player_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
@@ -562,5 +564,5 @@ end
 -- BULLRUSH,
 -- CANCEL,
 -- RUN
--- @name Environment.IN_KEY
+-- @name builtins_library.IN_KEY
 -- @class table

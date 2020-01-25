@@ -14,11 +14,15 @@ local effect_blacklist = {
 
 
 --- Effects library.
--- @shared
+-- @name effect
+-- @class library
+-- @libtbl effect_library
 SF.RegisterLibrary("effect")
 
 --- Effect type
--- @shared
+-- @name Effect
+-- @class type
+-- @libtbl effect_methods
 SF.RegisterType("Effect", true, false)
 
 

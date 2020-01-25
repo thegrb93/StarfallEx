@@ -14,13 +14,17 @@ local function deleteSound(ply, sound)
 	plyCount:free(ply, 1)
 end
 
---- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
--- @client
-SF.RegisterType("Bass", true, false)
-
 --- `bass` library is intended to be used only on client side. It's good for streaming local and remote sound files and playing them directly in player's "2D" context.
--- @client
+-- @name bass
+-- @class library
+-- @libtbl bass_library
 SF.RegisterLibrary("bass")
+
+--- For playing music there is `Bass` type. You can pause and set current playback time in it. If you're looking to apply DSP effects on present game sounds, use `Sound` instead.
+-- @name Bass
+-- @class type
+-- @libtbl bass_methods
+SF.RegisterType("Bass", true, false)
 
 
 return function(instance)

@@ -11,6 +11,9 @@ end
 
 
 --- Npc type
+-- @name Npc
+-- @class type
+-- @libtbl npc_methods
 SF.RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
 
 return function(instance)
@@ -20,12 +23,13 @@ local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local npc_methods, npc_meta, wrap, unwrap = instance.Types.Npc.Methods, instance.Types.Npc, instance.Types.Npc.Wrap, instance.Types.Npc.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 
--- ------------------------------------------------------------------------- --
+
 function npc_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"
 	else return tostring(ent) end
 end
+
 
 if SERVER then
 	--- Adds a relationship to the npc

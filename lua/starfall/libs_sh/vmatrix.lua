@@ -4,6 +4,9 @@ local dgetmeta = debug.getmetatable
 
 
 --- VMatrix type
+-- @name VMatrix
+-- @class type
+-- @libtbl vmatrix_methods
 SF.RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
 
@@ -16,7 +19,7 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 
 --- Returns a new VMatrix
--- @name Environment.Matrix
+-- @name builtins_library.Matrix
 -- @class function
 -- @return New VMatrix
 function instance.env.Matrix(t)

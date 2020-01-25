@@ -6,7 +6,9 @@ local max_timers = CreateConVar("sf_maxtimers", "200", { FCVAR_ARCHIVE, FCVAR_RE
 
 
 --- Deals with time and timers.
--- @shared
+-- @name timer
+-- @class library
+-- @libtbl timer_library
 SF.RegisterLibrary("timer")
 
 

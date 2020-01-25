@@ -13,9 +13,28 @@ if SERVER then
 end
 
 
+--- Lua string library https://wiki.garrysmod.com/page/Category:string
+-- @name string
+-- @class library
+-- @libtbl string_library
 SF.RegisterLibrary("string")
+
+--- Lua math library https://wiki.garrysmod.com/page/Category:math
+-- @name math
+-- @class library
+-- @libtbl math_library
 SF.RegisterLibrary("math")
+
+--- Lua os library https://wiki.garrysmod.com/page/Category:os
+-- @name os
+-- @class library
+-- @libtbl os_library
 SF.RegisterLibrary("os")
+
+--- Lua table library https://wiki.garrysmod.com/page/Category:table
+-- @name table
+-- @class library
+-- @libtbl table_library
 SF.RegisterLibrary("table")
 
 
@@ -30,192 +49,187 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 
-local Environment = instance.env
+local builtins_library = instance.env
 
---- Built in values. These don't need to be loaded; they are in the default environment.
+--- Built in values. These don't need to be loaded; they are in the default builtins_library.
 -- @name builtin
 -- @shared
 -- @class library
--- @libtbl Environment
+-- @libtbl builtins_library
 
 --- Returns the entity representing a processor that this script is running on.
--- @name Environment.chip
 -- @return Starfall entity
-function Environment.chip()
+function builtins_library.chip()
 	return ewrap(instance.data.entity)
 end
 
 --- Returns whoever created the chip
--- @class function
 -- @return Owner entity
-function Environment.owner()
+function builtins_library.owner()
 	return instance.Types.Player.Wrap(instance.player)
 end
 
 --- Same as owner() on the server. On the client, returns the local player
--- @name Environment.player
 -- @return Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
-function Environment.player(num)
+function builtins_library.player(num)
 	if num then
 		checkluatype(num, TYPE_NUMBER)
 		return instance.Types.Player.Wrap(Player(num))
 	end
 
-	return SERVER and Environment.owner() or instance.Types.Player.Wrap(LocalPlayer())
+	return SERVER and builtins_library.owner() or instance.Types.Player.Wrap(LocalPlayer())
 end
 
 
 --- Returns the entity with index 'num'
--- @name Environment.entity
 -- @param num Entity index
 -- @return entity
-function Environment.entity(num)
+function builtins_library.entity(num)
 	checkluatype(num, TYPE_NUMBER)
 	return owrap(Entity(num))
 end
 
 
 --- Used to select single values from a vararg or get the count of values in it.
--- @name Environment.select
+-- @name builtins_library.select
 -- @class function
 -- @param parameter
 -- @param vararg
 -- @return Returns a number or vararg, depending on the select method.
-Environment.select = select
+builtins_library.select = select
 
 --- Attempts to convert the value to a string.
--- @name Environment.tostring
+-- @name builtins_library.tostring
 -- @class function
 -- @param obj
 -- @return obj as string
-Environment.tostring = tostring
+builtins_library.tostring = tostring
 
 --- Attempts to convert the value to a number.
--- @name Environment.tonumber
+-- @name builtins_library.tonumber
 -- @class function
 -- @param obj
 -- @return obj as number
-Environment.tonumber = tonumber
+builtins_library.tonumber = tonumber
 
 --- Returns an iterator function for a for loop, to return ordered key-value pairs from a table.
--- @name Environment.ipairs
+-- @name builtins_library.ipairs
 -- @class function
 -- @param tbl Table to iterate over
 -- @return Iterator function
 -- @return Table tbl
 -- @return 0 as current index
-Environment.ipairs = ipairs
+builtins_library.ipairs = ipairs
 
 --- Returns an iterator function for a for loop that will return the values of the specified table in an arbitrary order.
--- @name Environment.pairs
+-- @name builtins_library.pairs
 -- @class function
 -- @param tbl Table to iterate over
 -- @return Iterator function
 -- @return Table tbl
 -- @return nil as current index
-Environment.pairs = pairs
+builtins_library.pairs = pairs
 
 --- Returns a string representing the name of the type of the passed object.
--- @name Environment.type
--- @class function
+-- @name builtins_library.type
 -- @param obj Object to get type of
 -- @return The name of the object's type.
-Environment.type = function(obj)
+function builtins_library.type(obj)
 	local tp = getmetatable(obj)
 	return isstring(tp) and tp or type(obj)
 end
 
 --- Returns the next key and value pair in a table.
--- @name Environment.next
+-- @name builtins_library.next
 -- @class function
 -- @param tbl Table to get the next key-value pair of
 -- @param k Previous key (can be nil)
 -- @return Key or nil
 -- @return Value or nil
-Environment.next = next
+builtins_library.next = next
 
 --- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
--- @name Environment.assert
+-- @name builtins_library.assert
 -- @class function
 -- @param condition
 -- @param msg
-Environment.assert = function(condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) else return condition end end
+builtins_library.assert = function(condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) else return condition end end
 
 --- This function takes a numeric indexed table and return all the members as a vararg.
--- @name Environment.unpack
+-- @name builtins_library.unpack
 -- @class function
 -- @param tbl
 -- @return Elements of tbl
-Environment.unpack = unpack
+builtins_library.unpack = unpack
 
 --- Sets, changes or removes a table's metatable. Doesn't work on most internal metatables
--- @name Environment.setmetatable
+-- @name builtins_library.setmetatable
 -- @class function
 -- @param tbl The table to set the metatable of
 -- @param meta The metatable to use
 -- @return tbl with metatable set to meta
-Environment.setmetatable = setmetatable
+builtins_library.setmetatable = setmetatable
 
 --- Returns the metatable of an object. Doesn't work on most internal metatables
 -- @param tbl Table to get metatable of
 -- @return The metatable of tbl
-Environment.getmetatable = function(tbl)
+builtins_library.getmetatable = function(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 	return getmetatable(tbl)
 end
 
 --- Generates the CRC checksum of the specified string. (https://en.wikipedia.org/wiki/Cyclic_redundancy_check)
--- @name Environment.crc
+-- @name builtins_library.crc
 -- @class function
 -- @param stringToHash The string to calculate the checksum of
 -- @return The unsigned 32 bit checksum as a string
-Environment.crc = util.CRC
+builtins_library.crc = util.CRC
 
 --- Constant that denotes whether the code is executed on the client
--- @name Environment.CLIENT
+-- @name builtins_library.CLIENT
 -- @class field
-Environment.CLIENT = CLIENT
+builtins_library.CLIENT = CLIENT
 
 --- Constant that denotes whether the code is executed on the server
--- @name Environment.SERVER
+-- @name builtins_library.SERVER
 -- @class field
-Environment.SERVER = SERVER
+builtins_library.SERVER = SERVER
 
 --- Returns if this is the first time this hook was predicted.
--- @name Environment.isFirstTimePredicted
+-- @name builtins_library.isFirstTimePredicted
 -- @class function
 -- @return Boolean
-Environment.isFirstTimePredicted = IsFirstTimePredicted
+builtins_library.isFirstTimePredicted = IsFirstTimePredicted
 
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
 -- @return Current quota used this Think
-function Environment.quotaUsed()
+function builtins_library.quotaUsed()
 	return instance.cpu_total
 end
 
 --- Gets the Average CPU Time in the buffer
 -- @return Average CPU Time of the buffer.
-function Environment.quotaAverage()
+function builtins_library.quotaAverage()
 	return instance:movingCPUAverage()
 end
 
---- Gets the current ram usage of the lua environment
+--- Gets the current ram usage of the lua builtins_library
 -- @return The ram used in bytes
-function Environment.ramUsed()
+function builtins_library.ramUsed()
 	return SF.Instance.Ram
 end
 
---- Gets the moving average of ram usage of the lua environment
+--- Gets the moving average of ram usage of the lua builtins_library
 -- @return The ram used in bytes
-function Environment.ramAverage()
+function builtins_library.ramAverage()
 	return SF.Instance.RamAvg
 end
 
 --- Gets the starfall version
 -- @return Starfall version
-function Environment.version()
+function builtins_library.version()
 	if SERVER then
 		return SF.Version
 	else
@@ -225,7 +239,7 @@ end
 
 --- Returns the total used time for all chips by the player.
 -- @return Total used CPU time of all your chips.
-function Environment.quotaTotalUsed()
+function builtins_library.quotaTotalUsed()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
 		total = total + instance.cpu_total
@@ -235,7 +249,7 @@ end
 
 --- Returns the total average time for all chips by the player.
 -- @return Total average CPU Time of all your chips.
-function Environment.quotaTotalAverage()
+function builtins_library.quotaTotalAverage()
 	local total = 0
 	for instance, _ in pairs(SF.playerInstances[instance.player]) do
 		total = total + instance:movingCPUAverage()
@@ -246,13 +260,13 @@ end
 --- Gets the CPU Time max.
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
 -- @return Max SysTime allowed to take for execution of the chip in a Think.
-function Environment.quotaMax()
+function builtins_library.quotaMax()
 	return instance.cpuQuota
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
-function Environment.setSoftQuota(quota)
+function builtins_library.setSoftQuota(quota)
 	checkluatype(quota, TYPE_NUMBER)
 	instance.cpu_softquota = quota
 end
@@ -260,7 +274,7 @@ end
 --- Checks if the chip is capable of performing an action.
 --@param perm The permission id to check
 --@param obj Optional object to pass to the permission system.
-function Environment.hasPermission(perm, obj)
+function builtins_library.hasPermission(perm, obj)
 	checkluatype(perm, TYPE_STRING)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
 	return SF.Permissions.hasAccess(instance, ounwrap(obj), perm)
@@ -278,7 +292,7 @@ if CLIENT then
 	--@param desc Description attached to request.
 	--@param showOnUse Whether request will popup when player uses chip or linked screen.
 	--@client
-	function Environment.setupPermissionRequest( perms, desc, showOnUse )
+	function builtins_library.setupPermissionRequest( perms, desc, showOnUse )
 		checkluatype( desc, TYPE_STRING )
 		checkluatype( perms, TYPE_TABLE )
 		local c = #perms
@@ -309,7 +323,7 @@ if CLIENT then
 	--- Is permission request fully satisfied.
 	--@return Boolean of whether the client gave all permissions specified in last request or not.
 	--@client
-	function Environment.permissionRequestSatisfied()
+	function builtins_library.permissionRequestSatisfied()
 		return SF.Permissions.permissionRequestSatisfied( instance )
 	end
 
@@ -324,9 +338,9 @@ function string_methods.toColor(str)
 	return cwrap(string.ToColor(str))
 end
 --- String library http://wiki.garrysmod.com/page/Category:string
--- @name Environment.string
+-- @name builtins_library.string
 -- @class table
-Environment.string = nil
+builtins_library.string = nil
 
 
 
@@ -402,9 +416,9 @@ function math_methods.lerpVector(percent, from, to)
 	return vwrap(LerpVector(percent, vunwrap(from), vunwrap(to)))
 end
 --- The math library. http://wiki.garrysmod.com/page/Category:math
--- @name Environment.math
+-- @name builtins_library.math
 -- @class table
-Environment.math = nil
+builtins_library.math = nil
 
 
 
@@ -417,9 +431,9 @@ end
 os_methods.difftime = os.difftime
 os_methods.time = os.time
 --- The os library. http://wiki.garrysmod.com/page/Category:os
--- @name Environment.os
+-- @name builtins_library.os
 -- @class table
-Environment.os = nil
+builtins_library.os = nil
 
 
 
@@ -500,16 +514,16 @@ function table.merge( dest, source )
 end
 
 --- Table library. http://wiki.garrysmod.com/page/Category:table
--- @name Environment.table
+-- @name builtins_library.table
 -- @class table
-Environment.table = nil
+builtins_library.table = nil
 
 
 -- ------------------------- Functions ------------------------- --
 
 --- Gets all libraries
 -- @return Table where each key is the library name and value is table of the library
-function Environment.getLibraries()
+function builtins_library.getLibraries()
 	return instance.Libraries
 end
 
@@ -517,7 +531,7 @@ end
 --@param table The table to modify
 --@param key The index of the table
 --@param value The value to set the index equal to
-function Environment.rawset(table, key, value)
+function builtins_library.rawset(table, key, value)
     checkluatype(table, TYPE_TABLE)
 
     rawset(table, key, value)
@@ -527,7 +541,7 @@ end
 --@param table The table to get the value from
 --@param key The index of the table
 --@return The value of the index
-function Environment.rawget(table, key, value)
+function builtins_library.rawget(table, key, value)
     checkluatype(table, TYPE_TABLE)
 
     return rawget(table, key)
@@ -536,7 +550,7 @@ end
 local function printTableX(t, indent, alreadyprinted)
 	local ply = instance.player
 	if next(t) then
-		for k, v in Environment.pairs(t) do
+		for k, v in builtins_library.pairs(t) do
 			if SF.GetType(v) == "table" and not alreadyprinted[v] then
 				alreadyprinted[v] = true
 				local s = string.rep("\t", indent) .. tostring(k) .. ":"
@@ -600,7 +614,7 @@ if SERVER then
 	-- Prints a message to the player's chat.
 	-- @shared
 	-- @param ... Values to print
-	function Environment.print(...)
+	function builtins_library.print(...)
 		local tbl = argsToChat(...)
 
 		net.Start("starfall_chatprint")
@@ -616,7 +630,7 @@ if SERVER then
 
 	--- Prints a table to player's chat
 	-- @param tbl Table to print
-	function Environment.printTable(tbl)
+	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
 		printTableX(tbl, 0, { tbl = true })
 	end
@@ -624,7 +638,7 @@ if SERVER then
 	--- Execute a console command
 	-- @shared
 	-- @param cmd Command to execute
-	function Environment.concmd(cmd)
+	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
 		checkpermission(instance, nil, "console.command")
@@ -634,7 +648,7 @@ if SERVER then
 	--- Sets the chip's userdata that the duplicator tool saves. max 1MiB; can be changed with convar sf_userdata_max
 	-- @server
 	-- @param str String data
-	function Environment.setUserdata(str)
+	function builtins_library.setUserdata(str)
 		checkluatype(str, TYPE_STRING)
 		local max = userdataLimit:GetInt()
 		if #str>max then
@@ -646,14 +660,14 @@ if SERVER then
 	--- Gets the chip's userdata that the duplicator tool loads
 	-- @server
 	-- @return String data
-	function Environment.getUserdata()
+	function builtins_library.getUserdata()
 		return instance.data.entity.starfalluserdata or ""
 	end
 else
 	--- Sets the chip's display name
 	-- @client
 	-- @param name Name
-	function Environment.setName(name)
+	function builtins_library.setName(name)
 		checkluatype(name, TYPE_STRING)
 		local e = instance.data.entity
 		if (e and e:IsValid()) then
@@ -663,7 +677,7 @@ else
 
 	--- Sets clipboard text. Only works on the owner of the chip.
 	-- @param txt Text to set to the clipboard
-	function Environment.setClipboardText(txt)
+	function builtins_library.setClipboardText(txt)
 		if instance.player ~= LocalPlayer() then return end
 		checkluatype(txt, TYPE_STRING)
 		SetClipboardText(txt)
@@ -672,26 +686,26 @@ else
 	--- Prints a message to your chat, console, or the center of your screen.
 	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
 	-- @param text The message text.
-	function Environment.printMessage(mtype, text)
+	function builtins_library.printMessage(mtype, text)
 		if instance.player ~= LocalPlayer() then return end
 		checkluatype(text, TYPE_STRING)
 		instance.player:PrintMessage(mtype, text)
 	end
 
-	function Environment.print(...)
+	function builtins_library.print(...)
 		if instance.player == LocalPlayer() then
 			chat.AddText(unpack(argsToChat(...)))
 		end
 	end
 
-	function Environment.printTable(tbl)
+	function builtins_library.printTable(tbl)
 		checkluatype(tbl, TYPE_TABLE)
 		if instance.player == LocalPlayer() then
 			printTableX(tbl, 0, { tbl = true })
 		end
 	end
 
-	function Environment.concmd(cmd)
+	function builtins_library.concmd(cmd)
 		checkluatype(cmd, TYPE_STRING)
 		checkpermission(instance, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
@@ -700,28 +714,28 @@ else
 	--- Returns the local player's camera angles
 	-- @client
 	-- @return The local player's camera angles
-	function Environment.eyeAngles()
+	function builtins_library.eyeAngles()
 		return awrap(LocalPlayer():EyeAngles())
 	end
 
 	--- Returns the local player's camera position
 	-- @client
 	-- @return The local player's camera position
-	function Environment.eyePos()
+	function builtins_library.eyePos()
 		return vwrap(LocalPlayer():EyePos())
 	end
 
 	--- Returns the local player's camera forward vector
 	-- @client
 	-- @return The local player's camera forward vector
-	function Environment.eyeVector()
+	function builtins_library.eyeVector()
 		return vwrap(LocalPlayer():GetAimVector())
 	end
 end
 
 --- Returns the table of scripts used by the chip
 -- @return Table of scripts used by the chip
-function Environment.getScripts()
+function builtins_library.getScripts()
 	return instance.Sanitize(instance.source)
 end
 
@@ -729,7 +743,7 @@ end
 -- Works pretty much like standard Lua require()
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
-function Environment.require(file)
+function builtins_library.require(file)
 	checkluatype(file, TYPE_STRING)
 	local loaded = instance.requires
 
@@ -768,7 +782,7 @@ end
 -- @param dir The directory to include. Make sure to --@includedir it
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
-function Environment.requiredir(dir, loadpriority)
+function builtins_library.requiredir(dir, loadpriority)
 	checkluatype(dir, TYPE_STRING)
 	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
 
@@ -797,7 +811,7 @@ function Environment.requiredir(dir, loadpriority)
 		for i = 1, #loadpriority do
 			for file, _ in pairs(instance.scripts) do
 				if file == path .. "/" .. loadpriority[i] then
-					returns[file] = Environment.require("/"..file)
+					returns[file] = builtins_library.require("/"..file)
 				end
 			end
 		end
@@ -805,7 +819,7 @@ function Environment.requiredir(dir, loadpriority)
 
 	for file, _ in pairs(instance.scripts) do
 		if not returns[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
-			returns[file] = Environment.require("/"..file)
+			returns[file] = builtins_library.require("/"..file)
 		end
 	end
 
@@ -816,7 +830,7 @@ end
 -- Pretty much like standard Lua dofile()
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
-function Environment.dofile(file)
+function builtins_library.dofile(file)
 	checkluatype(file, TYPE_STRING)
 	local path
 	if string.sub(file, 1, 1)=="/" then
@@ -836,7 +850,7 @@ end
 -- @param dir The directory to include. Make sure to --@includedir it
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
-function Environment.dodir(dir, loadpriority)
+function builtins_library.dodir(dir, loadpriority)
 	checkluatype(dir, TYPE_STRING)
 	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
 
@@ -846,7 +860,7 @@ function Environment.dodir(dir, loadpriority)
 		for i = 0, #loadpriority do
 			for file, _ in pairs(instance.scripts) do
 				if string.find(file, dir .. "/" .. loadpriority[i] , 1) == 1 then
-					returns[file] = Environment.dofile(file)
+					returns[file] = builtins_library.dofile(file)
 				end
 			end
 		end
@@ -854,7 +868,7 @@ function Environment.dodir(dir, loadpriority)
 
 	for file, _ in pairs(instance.scripts) do
 		if string.find(file, dir, 1) == 1 then
-			returns[file] = Environment.dofile(file)
+			returns[file] = builtins_library.dofile(file)
 		end
 	end
 
@@ -862,10 +876,10 @@ function Environment.dodir(dir, loadpriority)
 end
 
 --- GLua's loadstring
--- Works like loadstring, except that it executes by default in the main environment
+-- Works like loadstring, except that it executes by default in the main builtins_library
 -- @param str String to execute
 -- @return Function of str
-function Environment.loadstring(str, name)
+function builtins_library.loadstring(str, name)
 	name = "SF:" .. (name or tostring(instance.env))
 	local func = SF.CompileString(str, name, false)
 
@@ -879,10 +893,10 @@ end
 
 --- Lua's setfenv
 -- Works like setfenv, but is restricted on functions
--- @param func Function to change environment of
--- @param tbl New environment
--- @return func with environment set to tbl
-function Environment.setfenv(func, tbl)
+-- @param func Function to change builtins_library of
+-- @param tbl New builtins_library
+-- @return func with builtins_library set to tbl
+function builtins_library.setfenv(func, tbl)
 	if not isfunction(func) or getfenv(func) == _G then SF.Throw("Main Thread is protected!", 2) end
 	return setfenv(func, tbl)
 end
@@ -890,7 +904,7 @@ end
 --- Gets an SF type's methods table
 -- @param sfType Name of SF type
 -- @return Table of the type's methods which can be edited or iterated
-function Environment.getMethods(sfType)
+function builtins_library.getMethods(sfType)
 	checkluatype(sfType, TYPE_STRING)
 	local typemeta = instance.Types[sfType]
 	if not typemeta then SF.Throw("Invalid type") end
@@ -898,9 +912,9 @@ function Environment.getMethods(sfType)
 end
 
 --- Simple version of Lua's getfenv
--- Returns the current environment
--- @return Current environment
-function Environment.getfenv()
+-- Returns the current builtins_library
+-- @return Current builtins_library
+function builtins_library.getfenv()
 	local fenv = getfenv(2)
 	if fenv ~= _G then return fenv end
 end
@@ -910,7 +924,7 @@ end
 -- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
-function Environment.debugGetInfo(funcOrStackLevel, fields)
+function builtins_library.debugGetInfo(funcOrStackLevel, fields)
 	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields then checkluatype(fields, TYPE_STRING) end
 
@@ -932,7 +946,7 @@ local uncatchable = {
 -- @param arguments Arguments to call the function with.
 -- @return If the function had no errors occur within it.
 -- @return If an error occurred, this will be a string containing the error message. Otherwise, this will be the return values of the function passed in.
-function Environment.pcall(func, ...)
+function builtins_library.pcall(func, ...)
 	local vret = { pcall(func, ...) }
 	local ok, err = vret[1], vret[2]
 
@@ -961,7 +975,7 @@ end
 -- @param ... Varargs to pass to the initial function.
 -- @return Status of the execution; true for success, false for failure.
 -- @return The returns of the first function if execution succeeded, otherwise the return values of the error callback.
-function Environment.xpcall(func, callback, ...)
+function builtins_library.xpcall(func, callback, ...)
 	local vret = { xpcall(func, xpcall_Callback, ...) }
 	local ok, errData = vret[1], vret[2]
 
@@ -983,7 +997,7 @@ end
 -- Similar to xpcall, but a bit more in-depth
 -- @param func Function to execute
 -- @param catch Optional function to execute in case func fails
-function Environment.try(func, catch)
+function builtins_library.try(func, catch)
 	local ok, err = pcall(func)
 	if ok then return end
 
@@ -1002,21 +1016,21 @@ end
 -- @param msg Message string
 -- @param level Which level in the stacktrace to blame. Defaults to 1
 -- @param uncatchable Makes this exception uncatchable
-function Environment.throw(msg, level, uncatchable)
+function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end
 
 --- Throws a raw exception.
 -- @param msg Exception message
 -- @param level Which level in the stacktrace to blame. Defaults to 1
-function Environment.error(msg, level)
+function builtins_library.error(msg, level)
 	error(msg or "an unspecified error occured", 1 + (level or 1))
 end
 
 --- Returns if the table has an isValid function and isValid returns true.
 --@param object Table to check
 --@return If it is valid
-function Environment.isValid(object)
+function builtins_library.isValid(object)
 
 	if (not object) then return false end
 	if (not object.isValid) then return false end
@@ -1032,7 +1046,7 @@ end
 -- @param newSystemAngles The angles of the system to translate to
 -- @return localPos
 -- @return localAngles
-function Environment.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
+function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
 	checktype(pos, vec_meta)
 	checktype(ang, ang_meta)
 	checktype(newSystemOrigin, vec_meta)
@@ -1055,7 +1069,7 @@ end
 -- @param originAngle The angles of the source coordinate system, as a world angle
 -- @return worldPos
 -- @return worldAngles
-function Environment.localToWorld(localPos, localAng, originPos, originAngle)
+function builtins_library.localToWorld(localPos, localAng, originPos, originAngle)
 	checktype(localPos, vec_meta)
 	checktype(localAng, ang_meta)
 	checktype(originPos, vec_meta)
@@ -1072,10 +1086,10 @@ function Environment.localToWorld(localPos, localAng, originPos, originAngle)
 end
 
 --- Creates a 'middleclass' class object that can be used similarly to Java/C++ classes. See https://github.com/kikito/middleclass for examples.
--- @name Environment.class
+-- @name builtins_library.class
 -- @class function
 -- @param name The string name of the class
 -- @param super The (optional) parent class to inherit from
-Environment.class = SF.Class
+builtins_library.class = SF.Class
 
 end

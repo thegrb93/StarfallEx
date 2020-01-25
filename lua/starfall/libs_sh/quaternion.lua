@@ -34,10 +34,15 @@ local rad2deg = 180 / math.pi
 
 
 --- Quaternion library
--- @shared
+-- @name quaternion
+-- @class library
+-- @libtbl quat_lib
 SF.RegisterLibrary("quaternion")
 
 --- Quaternion type
+-- @name Quaternion
+-- @class type
+-- @libtbl quat_methods
 SF.RegisterType("Quaternion")
 
 

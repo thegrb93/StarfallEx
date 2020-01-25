@@ -4,7 +4,9 @@ local dgetmeta = debug.getmetatable
 
 
 --- Vector type
--- @shared
+-- @name Vector
+-- @class type
+-- @libtbl vec_methods
 SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(vec_meta)
 	return function(vec)
 		return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)
@@ -26,7 +28,7 @@ local function wrap(tbl)
 end
 
 --- Creates a Vector struct. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
--- @name Environment.Vector
+-- @name builtins_library.Vector
 -- @class function
 -- @param x - X
 -- @param y - Y

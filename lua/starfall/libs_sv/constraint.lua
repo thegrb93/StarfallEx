@@ -23,7 +23,9 @@ end
 
 
 --- Library for creating and manipulating constraints.
--- @server
+-- @name constraint
+-- @class library
+-- @libtbl constraint_library
 SF.RegisterLibrary("constraint")
 
 

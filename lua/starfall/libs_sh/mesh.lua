@@ -527,12 +527,16 @@ end
 
 
 --- Mesh library.
--- @shared
+-- @name mesh
+-- @class library
+-- @libtbl mesh_library
 SF.RegisterLibrary("mesh")
 
 if CLIENT then
 	--- Mesh type
-	-- @client
+	-- @name Mesh
+	-- @class type
+	-- @libtbl mesh_methods
 	SF.RegisterType("Mesh", true, false)
 end
 

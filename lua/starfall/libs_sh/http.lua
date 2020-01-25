@@ -20,7 +20,9 @@ do
 end
 
 --- Http library. Requests content from urls.
--- @shared
+-- @name http
+-- @class library
+-- @libtbl http_library
 SF.RegisterLibrary("http")
 
 return function(instance)

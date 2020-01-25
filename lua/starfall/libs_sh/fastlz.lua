@@ -1,7 +1,9 @@
 local util = util
 
 --- FastLZ library
--- @shared
+-- @name fastlz
+-- @class library
+-- @libtbl fastlz_library
 SF.RegisterLibrary("fastlz")
 
 

@@ -13,11 +13,15 @@ registerprivilege("file.open", "Get a file object", "Allows the user to use a fi
 file.CreateDir("sf_filedata/")
 
 --- File functions. Allows modification of files.
--- @client
+-- @name file
+-- @class library
+-- @libtbl file_library
 SF.RegisterLibrary("file")
 
 --- File type
--- @client
+-- @name File
+-- @class type
+-- @libtbl file_methods
 SF.RegisterType("File", true, false)
 
 

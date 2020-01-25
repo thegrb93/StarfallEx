@@ -12,7 +12,9 @@ local function refresh(enum)
 end
 
 --- Joystick library.
--- @client
+-- @name joystick
+-- @class library
+-- @libtbl joystick_library
 SF.RegisterLibrary("joystick")
 
 return function(instance)

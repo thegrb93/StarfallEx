@@ -32,6 +32,9 @@ end)
 
 
 --- Net message library. Used for sending data from the server to the client and back
+-- @name net
+-- @class library
+-- @libtbl net_library
 SF.RegisterLibrary("net")
 
 

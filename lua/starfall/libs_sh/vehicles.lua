@@ -13,6 +13,9 @@ end
 
 
 --- Vehicle type
+-- @name Vehicle
+-- @class type
+-- @libtbl vehicle_methods
 SF.RegisterType("Vehicle", false, true, debug.getregistry().Vehicle, "Entity")
 
 return function(instance)
@@ -22,8 +25,6 @@ local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Metho
 local pwrap = instance.Types.Player.Wrap
 
 
---- To string
--- @shared
 function vehicle_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent then return "(null entity)"

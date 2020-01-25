@@ -3,7 +3,9 @@ local checkluatype = SF.CheckLuaType
 local coroutine = coroutine
 
 --- Coroutine library
--- @shared
+-- @name coroutine
+-- @class library
+-- @libtbl coroutine_library
 SF.RegisterLibrary("coroutine")
 
 SF.RegisterType("thread", true, false)

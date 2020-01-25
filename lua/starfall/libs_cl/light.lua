@@ -61,13 +61,17 @@ local function processLights(curtime)
 	end
 end
 
---- Light type
--- @client
-SF.RegisterType("Light", true, false)
-
 --- Light library.
--- @client
+-- @name light
+-- @class library
+-- @libtbl light_library
 SF.RegisterLibrary("light")
+
+--- Light type
+-- @name Light
+-- @class type
+-- @libtbl light_methods
+SF.RegisterType("Light", true, false)
 
 
 return function(instance)
