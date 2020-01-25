@@ -368,8 +368,12 @@ function SF.Instance:BuildEnvironment()
 		self:CreateWrapper(meta, SF.Types[name])
 	end
 	
-	for k, v in pairs(SF.Modules) do
-		v(self)
+	for name, mod in pairs(SF.Modules) do
+		for filename, data in pairs(mod) do
+			if data.init then
+				data.init(self)
+			end
+		end
 	end
 	table.Inherit( self.env, self.Libraries ) 
 	self.env._G = self.env

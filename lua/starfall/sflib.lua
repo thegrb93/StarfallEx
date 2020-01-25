@@ -1107,105 +1107,94 @@ include("netstream.lua")
 include("transfer.lua")
 
 do
-	local function addModule(name, tbl)
-		local t = SF.Modules[name]
-		if t then
-			t[#t+1] = tbl
+	local function compileModule(source, path)
+		local ok, func = xpcall(function() return CompileString(source, path)() end, debug.traceback)
+		if ok then
+			if not isfunction(init) then
+				ErrorNoHalt("[SF] Attempt to load bad module: " .. path .. "\n")
+				init = nil
+			end
 		else
-			SF.Modules[name] = {tbl}
+			ErrorNoHalt(init .. "\n")
+			init = nil
 		end
+		return init
 	end
-	local function getMergedModule(tbl)
-		if #tbl == 1 then
-			return tbl[1]
-		elseif #tbl == 2 then
-			local a, b = tbl[1], tbl[2]
-			return function(i) a(i) b(i) end
-		else
-			error("This shouldn't happen!")
+	
+	local function addModule(name, path, shouldrun)
+		local source = file.Read(path, "LUA")
+		AddCSLuaFile(path)
+		local init
+		if shouldrun then
+			init = compileModule(source, path)
 		end
+		local tbl = SF.Modules[name]
+		if not tbl then tbl = {} SF.Modules[name] = tbl end
+		tbl[path] = {source = source, init = init}
 	end
-	local function loadModule(folder, clientonly, serveronly)
+
+	local function loadModules(folder, shouldrun)
 		local l = file.Find(folder.."*.lua", "LUA")
 		for _, filename in pairs(l) do
 			local path = folder..filename
-			if SERVER and not serveronly then AddCSLuaFile(path) end
-			if not ((clientonly and SERVER) or (serveronly and CLIENT)) then
-				local ok, mod = xpcall(include, debug.traceback, path)
-				if ok then
-					if isfunction(mod) then
-						addModule(string.StripExtension(filename), mod)
-					else
-						ErrorNoHalt("[SF] Attempt to load bad module: " .. path .. "\n")
-					end
-				else
-					ErrorNoHalt(mod .. "\n")
-				end
-			end
+			addModule(string.StripExtension(filename), path, shouldrun)
 		end
 	end
 
-	loadModule("starfall/libs_sh/", false, false)
-	loadModule("starfall/libs_sv/", false, true)
-	loadModule("starfall/libs_cl/", true, false)
-	for k, v in pairs(SF.Modules) do
-		SF.Modules[k] = getMergedModule(v)
-	end
+	loadModules("starfall/libs_sh/", SERVER or CLIENT)
+	loadModules("starfall/libs_sv/", SERVER)
+	loadModules("starfall/libs_cl/", CLIENT)
 
 	if SERVER then
 		-- Command to reload the libraries
 		util.AddNetworkString("sf_reloadlibrary")
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
 			if ply:IsValid() and not ply:IsSuperAdmin() then return end
-			local filename = arg[1]
-			if not filename then return end
-			filename = string.lower(filename)
+			local name = arg[1]
+			if not name then return end
+			name = string.lower(name)
 
-			local sv_filename = "starfall/libs_sv/"..filename..".lua"
-			local sh_filename = "starfall/libs_sh/"..filename..".lua"
-			local cl_filename = "starfall/libs_cl/"..filename..".lua"
+			local sv_filename = "starfall/libs_sv/"..name..".lua"
+			local sh_filename = "starfall/libs_sh/"..name..".lua"
+			local cl_filename = "starfall/libs_cl/"..name..".lua"
 
 			local sendToClientTbl = {}
 			if file.Exists(sh_filename, "LUA") or file.Exists(sv_filename, "LUA") then
-				print("Reloaded library: " .. filename)
-				SF.Modules[filename] = nil
-
+				print("Reloaded library: " .. name)
+				SF.Modules[name] = {}
 				if file.Exists(sh_filename, "LUA") then
-					addModule(filename, include(sh_filename))
+					addModule(name, sh_filename, true)
 					sendToClientTbl[#sendToClientTbl+1] = sh_filename
 				end
 				if file.Exists(sv_filename, "LUA") then
-					addModule(filename, include(sv_filename))
+					addModule(name, sv_filename, true)
 				end
-
-				SF.Modules[filename] = getMergedModule(SF.Modules[filename])
 			end
 			if file.Exists(cl_filename, "LUA") then
+				addModule(name, cl_filename, false)
 				sendToClientTbl[#sendToClientTbl+1] = cl_filename
 			end
 			if #sendToClientTbl>0 then
 				local files = {}
 				for k, path in pairs(sendToClientTbl) do
-					files[path] = file.Read(path, "LUA")
+					files[path] = SF.Modules[name][path].source
 				end
 				net.Start("sf_reloadlibrary")
-				net.WriteStarfall({files = files, mainfile = filename, proc = Entity(0), owner = Entity(0)})
+				net.WriteStarfall({files = files, mainfile = name, proc = Entity(0), owner = Entity(0)})
 				net.Broadcast()
 			end
 		end)
 
 	else
-		local root_path = SF.NormalizePath(string.GetPathFromFilename(debug.getinfo(1, "S").short_src).."../")
 		net.Receive("sf_reloadlibrary", function(len)
 			net.ReadStarfall(nil, function(ok, data)
 				if ok then
 					print("Reloaded library: " .. data.mainfile)
-					SF.Modules[data.mainfile] = nil
+					SF.Modules[data.mainfile] = {}
 					for path, code in pairs(data.files) do
-						local tbl = CompileString(code, root_path .. path, false)()
-						addModule(data.mainfile, tbl)
+						local init = CompileString(code, path, false)()
+						SF.Modules[data.mainfile][path] = {source = code, init = init}
 					end
-					SF.Modules[data.mainfile] = getMergedModule(SF.Modules[data.mainfile])
 				end
 			end)
 		end)
@@ -1213,3 +1202,4 @@ do
 end
 
 SF.Permissions.loadPermissionOptions()
+include("editor/editor.lua")
