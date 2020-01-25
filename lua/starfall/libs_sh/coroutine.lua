@@ -11,6 +11,12 @@ SF.RegisterType("thread", true, false)
 
 return function(instance)
 
+
+local checktype = instance.CheckType
+local coroutine_library = instance.Libraries.coroutine
+local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.Wrap, instance.Types.thread.Unwrap
+
+
 instance:AddHook("initialize", function()
 	instance.data.coroutines = setmetatable({}, { __mode = "v" })
 end)
@@ -23,11 +29,6 @@ instance:AddHook("deinitialize", function()
 		instance.data.coroutines[thread] = nil
 	end
 end)
-
-
-local checktype = instance.CheckType
-local coroutine_library = instance.Libraries.coroutine
-local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.Wrap, instance.Types.thread.Unwrap
 
 
 local function createCoroutine (func)
