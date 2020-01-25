@@ -36,7 +36,7 @@ if game.SinglePlayer() then
 end
 if SERVER then
 	util.AddNetworkString("starfall_lock_control")
-	return {function() end, function() end}
+	return function() end
 end
 
 registerprivilege("input", "Input", "Allows the user to see what buttons you're pressing.", { client = {} })
