@@ -363,9 +363,15 @@ function SF.Instance:BuildEnvironment()
 			local supermeta = self.Types[meta.supertype]
 			meta.supertype = supermeta
 			setmetatable(meta.Methods, {__index = supermeta.Methods})
+		else
+			self:CreateWrapper(meta, SF.Types[name])
 		end
-		
-		self:CreateWrapper(meta, SF.Types[name])
+	end
+	
+	for name, meta in pairs(self.Types) do
+		if meta.supertype then
+			self:CreateWrapper(meta, SF.Types[name])
+		end
 	end
 	
 	for name, mod in pairs(SF.Modules) do
