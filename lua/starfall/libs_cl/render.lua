@@ -571,7 +571,7 @@ end
 
 --- Sets background color of screen
 -- @param col Color of background
--- @screen (Optional) entity of screen
+-- @param screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)
 	local renderdata = instance.data.render
 
@@ -1246,7 +1246,6 @@ end
 -- @param outline Enable outline?
 -- @param blur Enable blur?
 -- @param extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
--- @usage
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- Akbar
 -- \- Coolvetica
@@ -1311,7 +1310,7 @@ end
 
 --- Sets the font
 -- @param font The font to use
--- @usage Use a font created by render.createFont or use one of these already defined fonts:
+-- Use a font created by render.createFont or use one of these already defined fonts:
 -- \- DebugFixed
 -- \- DebugFixedSmall
 -- \- Default

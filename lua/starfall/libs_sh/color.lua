@@ -11,6 +11,7 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 -- @name Color
 -- @class type
 -- @libtbl color_methods
+-- @libtbl color_meta
 SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(color_meta)
 	return function(clr)
 		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)

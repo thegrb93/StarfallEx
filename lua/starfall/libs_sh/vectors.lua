@@ -7,6 +7,7 @@ local dgetmeta = debug.getmetatable
 -- @name Vector
 -- @class type
 -- @libtbl vec_methods
+-- @libtbl vec_meta
 SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(vec_meta)
 	return function(vec)
 		return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)

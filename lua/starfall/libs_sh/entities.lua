@@ -12,6 +12,7 @@ registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play so
 -- @name Entity
 -- @class type
 -- @libtbl ents_methods
+-- @libtbl ent_meta
 SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
 
 
@@ -38,7 +39,6 @@ end
 instance.Types.Entity.GetEntity = getent
 
 --- To string
--- @shared
 function ent_meta:__tostring()
 	local ent = eunwrap(self)
 	if not ent then return "(null entity)"

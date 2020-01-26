@@ -7,6 +7,7 @@ local dgetmeta = debug.getmetatable
 -- @name VMatrix
 -- @class type
 -- @libtbl vmatrix_methods
+-- @libtbl vmatrix_meta
 SF.RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
 

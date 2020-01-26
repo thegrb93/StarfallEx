@@ -4,13 +4,10 @@ if not ok then
 	return function() end
 end
 
------------------------------------------------------------------------------
 -- LuaSocket helper module
 -- Author: Diego Nehab
------------------------------------------------------------------------------
------------------------------------------------------------------------------
+
 -- Exported auxiliar functions
------------------------------------------------------------------------------
 function socket.connect4(address, port, laddress, lport)
     return socket.connect(address, port, laddress, lport, "inet")
 end
@@ -61,9 +58,7 @@ function socket.choose(table)
     end
 end
 
------------------------------------------------------------------------------
 -- Socket sources and sinks, conforming to LTN12
------------------------------------------------------------------------------
 -- create namespaces inside LuaSocket namespace
 local sourcet, sinkt = {}, {}
 socket.sourcet = sourcet

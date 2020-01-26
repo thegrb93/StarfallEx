@@ -43,6 +43,7 @@ SF.RegisterLibrary("quaternion")
 -- @name Quaternion
 -- @class type
 -- @libtbl quat_methods
+-- @libtbl quat_meta
 SF.RegisterType("Quaternion")
 
 
@@ -106,22 +107,18 @@ end
 --******************************************************************************--
 
 local argTypesToQuat = {}
---- Converts a number to a Quaternion format for generation
 argTypesToQuat["number"] = function(num)
 	return quicknew(num, 0, 0, 0)
 end
 
---- Converts 4 numbers to a Quaternion format for generation
 argTypesToQuat["numbernumbernumbernumber"] = function(a, b, c, d)
 	return quicknew(a, b, c, d)
 end
 
---- Converts a Vector to a Quaternion format for generation
 argTypesToQuat["Vector"] = function(vec)
 	return quicknew(0, vec.x, vec.y, vec.z)
 end
 
---- Converts an Angle to a Quaternion format for generation
 argTypesToQuat["Angle"] = function(ang)
 	local p, y, r = ang.p, ang.y, ang.r
 	p = p * deg2rad * 0.5
@@ -133,12 +130,10 @@ argTypesToQuat["Angle"] = function(ang)
 	return qmul(qy, qmul(qp, qr))
 end
 
---- Converts a Number/Vector combination to a Quaternion format for generation
 argTypesToQuat["numberVector"] = function(num, vec)
-	return quicknew(num, vec.x, vec.y, vec.z) -- TODO Cannot change protect metatable? fix this
+	return quicknew(num, vec.x, vec.y, vec.z)
 end
 
---- Converts two Vectors to a Quaternion format for generation using Cross product and the angle between them
 argTypesToQuat["VectorVector"] = function(forward, up)
 	local x = Vector(forward.x, forward.y, forward.z)
 	local z = Vector(up.x, up.y, up.z)
@@ -166,7 +161,6 @@ argTypesToQuat["VectorVector"] = function(forward, up)
 	return qmul(qy, qmul(qp, qr))
 end
 
---- Converts an Entity to a Quaternion format for generation
 argTypesToQuat["Entity"] = function(ent)
 	ent = getent(ent)
 
@@ -274,13 +268,15 @@ function quat_lib.qk(n)
 end
 
 
-
-
+--- Negate a quaternion
+-- @return resultant quaternion.
 quat_meta.__unm = function(q)
 	return quicknew(-q[1], -q[2], -q[3], -q[4])
 end
 
-
+--- Add a quaternion
+-- @param q Quaternion or number to add.
+-- @return resultant quaternion.
 quat_meta.__add = function(lhs, rhs)
 
 	checktype(lhs, quat_meta)
@@ -302,7 +298,9 @@ quat_meta.__add = function(lhs, rhs)
 	SF.Throw("Tried to add a " .. ltype .. " to a " .. rtype, 2)
 end
 
-
+--- Subtract a quaternion
+-- @param q Quaternion or number to subtract.
+-- @return resultant quaternion.
 quat_meta.__sub = function(lhs, rhs)
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -320,7 +318,9 @@ quat_meta.__sub = function(lhs, rhs)
 	SF.Throw("Tried to subtract a " .. ltype .. " from a " .. rtype, 2)
 end
 
-
+--- Multiply a quaternion
+-- @param q Quaternion or number to multiply by.
+-- @return resultant quaternion.
 quat_meta.__mul = function(lhs, rhs)
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -359,7 +359,9 @@ quat_meta.__mul = function(lhs, rhs)
 	SF.Throw("Tried to multiply a " .. ltype .. " with a " .. rtype, 2)
 end
 
-
+--- Divide a quaternion
+-- @param q Quaternion or number to divide by.
+-- @return resultant quaternion.
 quat_meta.__div = function(lhs, rhs)
 	checktype(lhs, quat_meta)
 	checktype(rhs, quat_meta)
@@ -397,7 +399,9 @@ quat_meta.__div = function(lhs, rhs)
 	SF.Throw("Tried to divide a " .. ltype .. " with a " .. rtype, 2)
 end
 
-
+--- Pow a quaternion
+-- @param q Quaternion or number to pow by.
+-- @return resultant quaternion.
 quat_meta.__pow = function(lhs, rhs)
 	checktype(lhs, quat_meta)
 	checktype(rhs, quat_meta)
@@ -419,9 +423,9 @@ quat_meta.__pow = function(lhs, rhs)
 	SF.Throw("Tried to exponentiate a " .. ltype .. " with a " .. rtype, 2)
 end
 
-
---[[****************************************************************************]]
-
+--- Return if two quaternions are equal
+-- @param q Quaternion to compare with.
+-- @return If the two are equal.
 quat_meta.__eq = function(lhs, rhs)
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)

@@ -1,10 +1,96 @@
 local Docs = {}
 SF.Docs = Docs
 
-local curfile
+Docs.Directives = {}
+Docs.Types = {}
+Docs.Libraries = {}
+Docs.Hooks = {}
 
+local curfile
+local methodstolib = {}
+local members = {}
+
+
+local function processMembers()
+	for k, data in ipairs(members) do
+		local _1, _2, libtblname, funcname = string.find(data.name, "([%w_]+)%s*[%.%:]%s*([%w_]+)")
+		if libtblname then
+			data.name = funcname
+			local lib = methodstolib[libtblname]
+			if lib then
+				if Docs.Types[lib] then
+					Docs.Types[lib].methods[funcname] = data
+				elseif Docs.Libraries[lib] then
+					Docs.Libraries[lib].methods[funcname] = data
+				else
+					ErrorNoHalt("Invalid function lib name!\n" .. libtblname .. "\n" .. funcname .. "\n")
+				end
+			else
+				ErrorNoHalt("Invalid function lib name!\n" .. libtblname .. "\n" .. funcname .. "\n")
+			end
+		else
+			ErrorNoHalt("Couldn't extract lib/function name from function!\n" .. data.name .. "\n")
+		end
+	end
+end
+
+
+local processTypes = {
+	["type"] = function(data)
+		for k, v in ipairs(data.libtbl) do
+			methodstolib[v] = data.name
+		end
+		Docs.Types[data.name] = data
+		data.methods = {}
+	end,
+	["library"] = function(data)
+		for k, v in ipairs(data.libtbl) do
+			methodstolib[v] = data.name
+		end
+		Docs.Libraries[data.name] = data
+		data.tables = {}
+		data.methods = {}
+		data.fields = {}
+	end,
+	["hook"] = function(data)
+		Docs.Hooks[data.name] = data
+	end,
+	["directive"] = function(data)
+		Docs.Directives[data.name] = data
+	end,
+	["function"] = function(data)
+		members[#members+1] = data
+	end,
+	["table"] = function(data)
+		members[#members+1] = data
+	end,
+	["field"] = function(data)
+		members[#members+1] = data
+	end
+}
 local function process(data, nextline)
-	PrintTable(data)
+	if not data.class then
+		if string.find(nextline, "function", 1, true) then
+			data.class = "function"
+		else
+			return
+		end
+	end
+	if not data.name then
+		if data.class=="function" or data.class=="table" then
+			data.name = nextline
+		else
+			ErrorNoHalt("Invalid doc name for class (" .. data.class .. ") in file: " .. curfile .. "\n")
+			return
+		end
+	end
+	local processFunc = processTypes[data.class]
+	if processFunc then
+		data.description = table.concat(data.description, "\n")
+		processFunc(data, nextline)
+	else
+		ErrorNoHalt("Invalid doc class (" .. data.class .. ") in file: " .. curfile .. "\n")
+	end
 end
 
 local parseAttributes = {
@@ -24,7 +110,9 @@ local parseAttributes = {
 		parsing.name = value
 	end,
 	["libtbl"] = function(parsing, value)
-		parsing.libtbl = value
+		local t = parsing.libtbl
+		if not t then t = {} parsing.libtbl = t end
+		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
 		local name, desc = string.match(value, "%s*([%w_]+)%s*(.*)")
@@ -41,6 +129,11 @@ local parseAttributes = {
 		if not t then t = {} parsing.returns = t end
 		t[#t+1] = value
 	end,
+	["field"] = function(parsing, value)
+		local t = parsing.fields
+		if not t then t = {} parsing.fields = t end
+		t[#t+1] = value
+	end
 }
 local function parse(parsing, data)
 	local attribute, value = string.match(data, "%s*@(%w+)%s*(.*)")
@@ -104,3 +197,5 @@ for name, mod in pairs(SF.Modules) do
 		scan(data.source, realm(filename))
 	end
 end
+processMembers()
+PrintTable(SF.Docs)
