@@ -462,10 +462,16 @@ end
 -- @server
 
 --- Called after the starfall chip is duplicated and the duplication is finished.
--- @name Dupefinished
+-- @name DupeFinished
 -- @class hook
 -- @server
 -- @param entTbl A table of entities duped with the chip mapped to their previous indices.
+
+--- Called after a client's starfall has initialized. Use this to know when it's safe to send net messages to the client.
+-- @name ClientInitialized
+-- @class hook
+-- @server
+-- @param ply The player that initialized
 
 --- Called when the local player opens their chat window.
 -- @name StartChat

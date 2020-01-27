@@ -66,10 +66,17 @@ net.Receive("starfall_processor_download", function(len)
 			if ok then
 				if sfdata.owner:IsValid() then
 					sfdata.proc:SetupFiles(sfdata)
+					if sfdata.proc.instance then
+						net.Start("starfall_processor_download")
+						net.WriteEntity(sfdata.proc)
+						net.WriteBool(false)
+						net.SendToServer()
+					end
 				end
 			else
 				net.Start("starfall_processor_download")
 				net.WriteEntity(sfdata.proc)
+				net.WriteBool(true)
 				net.SendToServer()
 			end
 		end
@@ -116,6 +123,7 @@ hook.Add("NetworkEntityCreated", "starfall_chip_reset", function(ent)
 	if not ent.instance and ent:GetClass()=="starfall_processor" then
 		net.Start("starfall_processor_download")
 		net.WriteEntity(ent)
+		net.WriteBool(true)
 		net.SendToServer()
 	end
 end)

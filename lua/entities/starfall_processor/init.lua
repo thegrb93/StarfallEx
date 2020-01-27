@@ -171,11 +171,18 @@ util.AddNetworkString("starfall_report_error")
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
-		if proc.mainfile and proc.files then
-			proc:SendCode(ply)
+		if net.ReadBool() then -- True = we want to download; False = finished downloading
+			if proc.mainfile and proc.files then
+				proc:SendCode(ply)
+			else
+				proc.SendQueue = proc.SendQueue or {}
+				proc.SendQueue[#proc.SendQueue + 1] = ply
+			end
 		else
-			proc.SendQueue = proc.SendQueue or {}
-			proc.SendQueue[#proc.SendQueue + 1] = ply
+			local instance = proc.instance
+			if instance then
+				instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))
+			end
 		end
 	end
 end)
