@@ -611,7 +611,7 @@ local function argsToChat(...)
 end
 
 if SERVER then
-	-- Prints a message to the player's chat.
+	--- Prints a message to the player's chat.
 	-- @shared
 	-- @param ... Values to print
 	function builtins_library.print(...)
