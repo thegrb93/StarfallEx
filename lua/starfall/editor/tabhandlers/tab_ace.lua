@@ -117,37 +117,37 @@ local function createLibraryMap ()
 	local libMap, libs = {}, {}
 	local libsLookup = {}
 	
-	libMap.Environment = {}
+	-- libMap.Environment = {}
 
-	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end
-		libMap[lib] = {}
-		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end
-			table.insert(libs, "\\:"..name)
-		end
-	end
-	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end
+	-- for lib, tbl in pairs(SF.Docs.classes) do
+		-- if not isstring(lib) then continue end
+		-- libMap[lib] = {}
+		-- for name, val in pairs(tbl.methods) do
+			-- if not isstring(name) then continue end
+			-- table.insert(libs, "\\:"..name)
+		-- end
+	-- end
+	-- for lib, tbl in pairs(SF.Docs.libraries) do
+		-- if not isstring(lib) then continue end
 
-		if not libsLookup[lib] then
-			table.insert(libs, lib)
-			libsLookup[lib] = true
-		end
+		-- if not libsLookup[lib] then
+			-- table.insert(libs, lib)
+			-- libsLookup[lib] = true
+		-- end
 
-		libMap[lib] = {}
+		-- libMap[lib] = {}
 
-		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end
+		-- for name, val in pairs(tbl.functions) do
+			-- if not isstring(name) then continue end
 
-			local fullname = lib .. "\\." .. name
-			if libsLookup[fullname] then continue end
-			libsLookup[fullname] = true
+			-- local fullname = lib .. "\\." .. name
+			-- if libsLookup[fullname] then continue end
+			-- libsLookup[fullname] = true
 
-			table.insert(libMap[lib], name)
-			table.insert(libs, fullname)
-		end
-	end
+			-- table.insert(libMap[lib], name)
+			-- table.insert(libs, fullname)
+		-- end
+	-- end
 
 	return libMap, table.concat(libs, "|")
 end

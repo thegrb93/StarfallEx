@@ -52,7 +52,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local builtins_library = instance.env
 
 --- Built in values. These don't need to be loaded; they are in the default builtins_library.
--- @name builtin
+-- @name builtins
 -- @shared
 -- @class library
 -- @libtbl builtins_library

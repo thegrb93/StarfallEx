@@ -18,10 +18,15 @@ local function processMembers()
 			data.name = funcname
 			local lib = methodstolib[libtblname]
 			if lib then
+				local tblindex
+				if data.class == "table" then tblindex = "tables"
+				elseif data.class == "field" then tblindex = "fields"
+				elseif data.class == "function" then tblindex = "methods"
+				end
 				if Docs.Types[lib] then
-					Docs.Types[lib].methods[funcname] = data
+					Docs.Types[lib][tblindex][funcname] = data
 				elseif Docs.Libraries[lib] then
-					Docs.Libraries[lib].methods[funcname] = data
+					Docs.Libraries[lib][tblindex][funcname] = data
 				else
 					ErrorNoHalt("Invalid function lib name!\n" .. libtblname .. "\n" .. funcname .. "\n")
 				end
@@ -115,11 +120,11 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["param"] = function(parsing, value)
-		local name, desc = string.match(value, "%s*([%w_]+)%s*(.*)")
+		local name, description = string.match(value, "%s*([%w_]+)%s*(.*)")
 		if name then
 			local t = parsing.params
 			if not t then t = {} parsing.params = t end
-			t[#t+1] = {name = name, desc = desc}
+			t[#t+1] = {name = name, description = description}
 		else
 			ErrorNoHalt("Invalid param doc (" .. value .. ") in file: " .. curfile .. "\n")
 		end
@@ -130,9 +135,14 @@ local parseAttributes = {
 		t[#t+1] = value
 	end,
 	["field"] = function(parsing, value)
-		local t = parsing.fields
-		if not t then t = {} parsing.fields = t end
-		t[#t+1] = value
+		local name, description = string.match(value, "%s*([%w_]+)%s*(.*)")
+		if name then
+			local t = parsing.fields
+			if not t then t = {} parsing.fields = t end
+			t[#t+1] = {name = name, description = description}
+		else
+			ErrorNoHalt("Invalid field doc (" .. value .. ") in file: " .. curfile .. "\n")
+		end
 	end
 }
 local function parse(parsing, data)
@@ -151,7 +161,9 @@ local function parse(parsing, data)
 end
 
 local function scan(src, realm)
-	local lines = string.gmatch(src, "[^\r\n]+")
+	local linetbl = string.Explode("\r?\n", src, true)
+	local i = 0
+	local function lines() i=i+1 return linetbl[i] end
 	local parsing
 	for line in lines do
 		if parsing then
@@ -198,4 +210,3 @@ for name, mod in pairs(SF.Modules) do
 	end
 end
 processMembers()
-PrintTable(SF.Docs)

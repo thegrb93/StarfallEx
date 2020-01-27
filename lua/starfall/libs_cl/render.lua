@@ -2057,7 +2057,7 @@ end
 -- @param used The screen or chip entity that was used
 
 ---
--- @name Screen information table
+-- @name render_library.Screen information table
 -- @class table
 -- @field Name Pretty name of model
 -- @field offset Offset of screen from prop
@@ -2071,14 +2071,15 @@ end
 -- @field rot Screen rotation
 
 --- Vertex format
--- @name Vertex Format
+-- @name render_library.Vertex Format
 -- @class table
 -- @field x X coordinate
 -- @field y Y coordinate
 -- @field u U coordinate (optional, default is 0)
 -- @field v V coordinate (optional, default is 0)
 
--- @name Text align enum
+--- 
+-- @name render_library.Text align enum
 -- @class table
 -- @field TEXT_ALIGN_LEFT
 -- @field TEXT_ALIGN_CENTER

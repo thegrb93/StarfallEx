@@ -111,19 +111,33 @@ local function createWireLibraryMap()
 	libMap.Methods = {}
 	libMap.Environment = {}
 
-	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end
-		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end
-			libMap.Methods[name] = true
+	for typename, tbl in pairs(SF.Docs.Types) do
+		for methodname, val in pairs(tbl.methods) do
+			libMap.Methods[methodname] = true
 		end
 	end
-	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end
-		libMap[lib] = {}
-		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end
-			libMap[lib][name] = val.class
+	for libname, lib in pairs(SF.Docs.Libraries) do
+		local tbl
+		if libname == "builtins" then
+			tbl = libMap.Environment
+		else
+			tbl = {}
+			libMap[libname] = tbl
+		end
+		for name, val in pairs(lib.methods) do
+			tbl[name] = val.class
+		end
+		for name, val in pairs(lib.fields) do
+			tbl[name] = val.class
+		end
+	end
+	for name, val in pairs(SF.Docs.Libraries.builtins.tables) do
+		local tbl = {}
+		libMap[name] = tbl
+		if val.fields then
+			for _, fielddata in pairs(val.fields) do
+				tbl[fielddata.name] = "field"
+			end
 		end
 	end
 
