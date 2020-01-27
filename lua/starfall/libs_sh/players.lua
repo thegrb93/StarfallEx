@@ -538,31 +538,31 @@ end
 
 end
 
---- ENUMs of in_keys for use with player:keyDown:
--- ALT1,
--- ALT2,
--- ATTACK,
--- ATTACK2,
--- BACK,
--- DUCK,
--- FORWARD,
--- JUMP,
--- LEFT,
--- MOVELEFT,
--- MOVERIGHT,
--- RELOAD,
--- RIGHT,
--- SCORE,
--- SPEED,
--- USE,
--- WALK,
--- ZOOM,
--- GRENADE1,
--- GRENADE2,
--- WEAPON1,
--- WEAPON2,
--- BULLRUSH,
--- CANCEL,
--- RUN
+--- ENUMs of in_keys for use with player:keyDown
 -- @name builtins_library.IN_KEY
 -- @class table
+-- @field ALT1
+-- @field ALT2
+-- @field ATTACK
+-- @field ATTACK2
+-- @field BACK
+-- @field DUCK
+-- @field FORWARD
+-- @field JUMP
+-- @field LEFT
+-- @field MOVELEFT
+-- @field MOVERIGHT
+-- @field RELOAD
+-- @field RIGHT
+-- @field SCORE
+-- @field SPEED
+-- @field USE
+-- @field WALK
+-- @field ZOOM
+-- @field GRENADE1
+-- @field GRENADE2
+-- @field WEAPON1
+-- @field WEAPON2
+-- @field BULLRUSH
+-- @field CANCEL
+-- @field RUN

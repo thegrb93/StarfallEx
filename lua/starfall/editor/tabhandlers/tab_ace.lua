@@ -118,34 +118,38 @@ local function createLibraryMap ()
 	local libsLookup = {}
 	
 	libMap.Environment = {}
-
-	for lib, tbl in pairs(SF.Docs.classes) do
-		if not isstring(lib) then continue end
-		libMap[lib] = {}
-		for name, val in pairs(tbl.methods) do
-			if not isstring(name) then continue end
-			table.insert(libs, "\\:"..name)
+	
+	for typename, tbl in pairs(SF.Docs.Types) do
+		libMap[typename] = {}
+		for methodname, val in pairs(tbl.methods) do
+			table.insert(libs, "\\:"..methodname)
 		end
 	end
-	for lib, tbl in pairs(SF.Docs.libraries) do
-		if not isstring(lib) then continue end
-
-		if not libsLookup[lib] then
-			table.insert(libs, lib)
-			libsLookup[lib] = true
+	for libname, lib in pairs(SF.Docs.Libraries) do
+		table.insert(libs, libname)
+		local tbl
+		if libname == "builtins" then
+			tbl = libMap.Environment
+		else
+			tbl = {}
+			libMap[libname] = tbl
 		end
-
-		libMap[lib] = {}
-
-		for name, val in pairs(tbl.functions) do
-			if not isstring(name) then continue end
-
-			local fullname = lib .. "\\." .. name
-			if libsLookup[fullname] then continue end
-			libsLookup[fullname] = true
-
-			table.insert(libMap[lib], name)
-			table.insert(libs, fullname)
+		for name, val in pairs(lib.methods) do
+			table.insert(tbl, name)
+			table.insert(libs, libname.."\\."..name)
+		end
+		for name, val in pairs(lib.fields) do
+			table.insert(tbl, name)
+			table.insert(libs, libname.."\\."..name)
+		end
+	end
+	for name, val in pairs(SF.Docs.Libraries.builtins.tables) do
+		local tbl = {}
+		libMap[name] = tbl
+		if val.fields then
+			for _, fielddata in pairs(val.fields) do
+				table.insert(tbl, fielddata.name)
+			end
 		end
 	end
 

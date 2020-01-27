@@ -810,9 +810,6 @@ return function(instance)
 local von_library = instance.Libraries.von
 
 --- Deserialize a string
--- @shared
--- @class function
--- @name von.deserialize
 -- @param str String to deserialize
 -- @return Table
 function von_library.deserialize(str)
@@ -821,9 +818,6 @@ function von_library.deserialize(str)
 end
 
 --- Serialize a table
--- @shared
--- @class function
--- @name von.serialize
 -- @param tbl Table to serialize
 -- @return String
 function von_library.serialize(tbl)

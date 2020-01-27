@@ -6,6 +6,7 @@ local checkpermission = SF.Permissions.check
 -- @name Angle
 -- @class type
 -- @libtbl ang_methods
+-- @libtbl ang_meta
 SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(ang_meta)
 	return function(ang)
 		return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)

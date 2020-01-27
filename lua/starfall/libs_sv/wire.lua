@@ -23,6 +23,7 @@ SF.RegisterLibrary("wire")
 -- @name Wirelink
 -- @class type
 -- @libtbl wirelink_methods
+-- @libtbl wirelink_meta
 SF.RegisterType("Wirelink", false, true)
 
 return function(instance)
@@ -444,7 +445,6 @@ function wire_library.getWirelink (ent)
 end
 
 --- Returns an entities wirelink
--- @name Entity.getWirelink
 -- @class function
 -- @return Wirelink of the entity
 ents_methods.getWirelink = wire_library.getWirelink

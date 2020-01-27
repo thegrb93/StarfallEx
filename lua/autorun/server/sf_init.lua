@@ -81,4 +81,4 @@ end
 SetGlobalString("SF.Version", SF.Version)
 
 
-include("starfall/SFLib.lua")
+include("starfall/sflib.lua")

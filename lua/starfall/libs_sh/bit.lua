@@ -2,6 +2,10 @@
 local checkluatype = SF.CheckLuaType
 
 --- StringStream type
+-- @name StringStream
+-- @class type
+-- @libtbl ss_methods
+
 local ss_methods = {}
 local ss_meta = {
 	__index = ss_methods,

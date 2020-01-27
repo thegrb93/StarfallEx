@@ -571,7 +571,7 @@ end
 
 --- Sets background color of screen
 -- @param col Color of background
--- @screen (Optional) entity of screen
+-- @param screen (Optional) entity of screen
 function render_library.setBackgroundColor(col, screen)
 	local renderdata = instance.data.render
 
@@ -1246,7 +1246,6 @@ end
 -- @param outline Enable outline?
 -- @param blur Enable blur?
 -- @param extended Allows the font to display glyphs outside of Latin-1 range. Unicode code points above 0xFFFF are not supported. Required to use FontAwesome
--- @usage
 -- Base font can be one of (keep in mind that these may not exist on all clients if they are not shipped with starfall):
 -- \- Akbar
 -- \- Coolvetica
@@ -1311,7 +1310,7 @@ end
 
 --- Sets the font
 -- @param font The font to use
--- @usage Use a font created by render.createFont or use one of these already defined fonts:
+-- Use a font created by render.createFont or use one of these already defined fonts:
 -- \- DebugFixed
 -- \- DebugFixedSmall
 -- \- Default
@@ -2058,7 +2057,7 @@ end
 -- @param used The screen or chip entity that was used
 
 ---
--- @name Screen information table
+-- @name render_library.Screen information table
 -- @class table
 -- @field Name Pretty name of model
 -- @field offset Offset of screen from prop
@@ -2072,14 +2071,15 @@ end
 -- @field rot Screen rotation
 
 --- Vertex format
--- @name Vertex Format
+-- @name render_library.Vertex Format
 -- @class table
 -- @field x X coordinate
 -- @field y Y coordinate
 -- @field u U coordinate (optional, default is 0)
 -- @field v V coordinate (optional, default is 0)
 
--- @name Text align enum
+--- 
+-- @name render_library.Text align enum
 -- @class table
 -- @field TEXT_ALIGN_LEFT
 -- @field TEXT_ALIGN_CENTER

@@ -22,7 +22,7 @@ local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "4
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @name prop
 -- @class library
--- @libtbl prop_library
+-- @libtbl props_library
 SF.RegisterLibrary("prop")
 
 
