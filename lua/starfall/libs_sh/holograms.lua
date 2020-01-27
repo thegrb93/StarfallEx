@@ -19,6 +19,19 @@ if CLIENT then
 			hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
 		end)
 	end
+	
+	function SF.SetHologramScale(holo, scale)
+		holo.scale = scale
+		if scale == Vector(1, 1, 1) then
+			holo.HoloMatrix = nil
+			holo:DisableMatrix("RenderMultiply")
+		else
+			local scalematrix = Matrix()
+			scalematrix:Scale(scale)
+			holo.HoloMatrix = scalematrix
+			holo:EnableMatrix("RenderMultiply", scalematrix)
+		end
+	end
 end
 
 local entmeta = FindMetaTable("Entity")
@@ -294,19 +307,6 @@ if SERVER then
 	end
 
 else
-	function SF.SetHologramScale(holo, scale)
-		holo.scale = scale
-		if scale == Vector(1, 1, 1) then
-			holo.HoloMatrix = nil
-			holo:DisableMatrix("RenderMultiply")
-		else
-			local scalematrix = Matrix()
-			scalematrix:Scale(scale)
-			holo.HoloMatrix = scalematrix
-			holo:EnableMatrix("RenderMultiply", scalematrix)
-		end
-	end
-
 	--- Sets the hologram's position.
 	-- @shared
 	-- @param vec New position

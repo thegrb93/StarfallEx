@@ -327,7 +327,7 @@ function SF.Instance:BuildEnvironment()
 
 	--- Takes output from starfall and does it's best to make the output
 	-- fully usable outside of starfall environment
-	function SF.Unsanitize(original)
+	function self.Unsanitize(original)
 		local completed_tables = {}
 
 		local function RecursiveUnsanitize(tbl)
