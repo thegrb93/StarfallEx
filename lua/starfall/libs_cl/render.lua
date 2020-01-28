@@ -676,7 +676,7 @@ local function gettexture(mat)
 		if TypeID(mat) ~= TYPE_STRING then
 			SF.ThrowTypeError("Material or string", SF.GetType(mat), 3)
 		end
-		local rt = SF.instance.data.render.rendertargets[mat]
+		local rt = instance.data.render.rendertargets[mat]
 		if not rt then SF.Throw("Invalid Rendertarget", 3) end
 		return rt
 	else
@@ -689,8 +689,8 @@ end
 -- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
 function render_library.setMaterialEffectAdd(mat)
 
-	checkpermission(SF.instance, nil, "render.effects")
-	local data = SF.instance.data.render
+	checkpermission(instance, nil, "render.effects")
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
 
@@ -704,8 +704,8 @@ end
 -- @param mat The material object to use the texture of, or the name of a rendertarget to use instead.
 function render_library.setMaterialEffectSub(mat)
 
-	checkpermission(SF.instance, nil, "render.effects")
-	local data = SF.instance.data.render
+	checkpermission(instance, nil, "render.effects")
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
 
@@ -723,8 +723,8 @@ end
 -- @param colormul Multiplier for all three colors. 1 = unchanged
 function render_library.setMaterialEffectBloom(mat, levelr, levelg, levelb, colormul)
 
-	checkpermission(SF.instance, nil, "render.effects")
-	local data = SF.instance.data.render
+	checkpermission(instance, nil, "render.effects")
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
 	checkluatype(levelr, TYPE_NUMBER)
@@ -752,8 +752,8 @@ end
 -- @param multiply The amount to multiply the pixel colors by.
 function render_library.setMaterialEffectDownsample(mat, darken, multiply)
 
-	checkpermission(SF.instance, nil, "render.effects")
-	local data = SF.instance.data.render
+	checkpermission(instance, nil, "render.effects")
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
 	checkluatype(darken, TYPE_NUMBER)
@@ -787,8 +787,8 @@ local defaultCM = {
 -- @param cmStructure A table where each key must be of "addr", "addg", "addb", "brightness", "color" or "colour", "contrast", "mulr", "mulg", and "mulb". All keys are optional.
 function render_library.setMaterialEffectColorModify(mat, cmStructure)
 
-	checkpermission(SF.instance, nil, "render.effects")
-	local data = SF.instance.data.render
+	checkpermission(instance, nil, "render.effects")
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	local tex = gettexture(mat)
 	checkluatype(cmStructure, TYPE_TABLE)
@@ -822,8 +822,8 @@ render_library.setMaterialEffectColourModify = render_library.setMaterialEffectC
 -- @param passes The number of times the blur effect is applied.
 function render_library.drawBlurEffect(blurx, blury, passes)
 
-	checkpermission(SF.instance, nil, "render.effects")
-	local data = SF.instance.data.render
+	checkpermission(instance, nil, "render.effects")
+	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if not data.usingRT then SF.Throw("Cannot use this function outside of a rendertarget.", 2) end
 
