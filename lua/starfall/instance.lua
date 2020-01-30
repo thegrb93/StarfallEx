@@ -176,33 +176,48 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 	-- If the type already has wrappers, dont re-assign
 	if typedata.weakwrapper==nil or typedata.weaksensitive==nil then
 		if typedata.customwrappers then
-			wrap, unwrap = typedata.customwrappers(metatable)
+			wrap, unwrap = typedata.customwrappers(self, metatable)
 		else
 			return
 		end
 	else
 
-		local sensitive2sf, sf2sensitive
-		if metatable.supertype then
-			sensitive2sf = metatable.supertype.sensitive2sf
-			sf2sensitive = metatable.supertype.sf2sensitive
-		else
-			sf2sensitive = setmetatable({}, { __mode = (typedata.weakwrapper and "k" or "") .. (typedata.weaksensitive and "v" or "") })
-			sensitive2sf = setmetatable({}, { __mode = (typedata.weaksensitive and "k" or "") .. (typedata.weakwrapper and "v" or "") })
-			metatable.sensitive2sf = sensitive2sf
-			metatable.sf2sensitive = sf2sensitive
-		end
+		local sf2sensitive = setmetatable({}, { __mode = (typedata.weakwrapper and "k" or "") .. (typedata.weaksensitive and "v" or "") })
+		local sensitive2sf = setmetatable({}, { __mode = (typedata.weaksensitive and "k" or "") .. (typedata.weakwrapper and "v" or "") })
+		metatable.sensitive2sf = sensitive2sf
+		metatable.sf2sensitive = sf2sensitive
 
-		function wrap(value)
-			if value == nil then return nil end
-			if sensitive2sf[value] then return sensitive2sf[value] end
-			local tbl = setmetatable({}, metatable)
-			sensitive2sf[value] = tbl
-			sf2sensitive[tbl] = value
-			return tbl
+		if metatable.supertype then
+			local supersensitive2sf = metatable.supertype.sensitive2sf
+			local supersf2sensitive = metatable.supertype.sf2sensitive
+
+			function wrap(value)
+				if value == nil then return nil end
+				if sensitive2sf[value] then return sensitive2sf[value] end
+				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
+				sf2sensitive[tbl] = value
+				supersensitive2sf[value] = tbl
+				supersf2sensitive[tbl] = value
+				return tbl
+			end
+		else
+			function wrap(value)
+				if value == nil then return nil end
+				if sensitive2sf[value] then return sensitive2sf[value] end
+				local tbl = setmetatable({}, metatable)
+				sensitive2sf[value] = tbl
+				sf2sensitive[tbl] = value
+				return tbl
+			end
 		end
 		function unwrap(value)
-			return sf2sensitive[value]
+			local ret = sf2sensitive[value]
+			if ret then
+				return ret
+			else
+				self.CheckType(value, metatable, 2)
+			end
 		end
 	end
 

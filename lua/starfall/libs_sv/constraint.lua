@@ -53,7 +53,6 @@ end)
 
 local constraint_library = instance.Libraries.constraint
 
-local checktype = instance.CheckType
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
@@ -90,8 +89,6 @@ end
 -- @param nocollide Bool whether or not to nocollide the two entities
 -- @server
 function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -118,10 +115,6 @@ end
 --- Axis two entities
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
-	checktype(v1, vec_meta)
-	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -155,9 +148,6 @@ end
 --- Ballsocket two entities
 -- @server
 function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
-	checktype(v1, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -187,13 +177,6 @@ end
 --- Advanced Ballsocket two entities
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
-	checktype(v1, vec_meta)
-	checktype(v2, vec_meta)
-	checktype(minv, vec_meta)
-	checktype(maxv, vec_meta)
-	checktype(frictionv, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -228,10 +211,6 @@ end
 --- Elastic two entities
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
-	checktype(v1, vec_meta)
-	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -272,10 +251,6 @@ end
 --- Ropes two entities
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
-	checktype(v1, vec_meta)
-	checktype(v2, vec_meta)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
@@ -317,10 +292,6 @@ end
 --- Sliders two entities
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
-	checktype(v1, vec_meta)
-	checktype(v2, vec_meta)
 
 	plyCount:checkuse(instance.player, 1)
 
@@ -349,8 +320,6 @@ end
 --- Nocollides two entities
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
-	checktype(e1, ent_meta)
-	checktype(e2, ent_meta)
 
 	plyCount:checkuse(instance.player, 1)
 

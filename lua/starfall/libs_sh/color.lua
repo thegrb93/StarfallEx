@@ -12,11 +12,12 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 -- @class type
 -- @libtbl color_methods
 -- @libtbl color_meta
-SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(color_meta)
+SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(instance, color_meta)
 	return function(clr)
 		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
 	end,
 	function(obj)
+		instance.CheckType(obj, color_meta, 2)
 		return Color((tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255))
 	end
 end)
@@ -91,8 +92,6 @@ end
 -- @param rhs Right side of equation
 -- @return Added color.
 function color_meta.__add (a, b)
-	checktype(a, color_meta)
-	checktype(b, color_meta)
 
 	return wrap({ clamp(a[1] + b[1]), clamp(a[2] + b[2]), clamp(a[3] + b[3]), clamp(a[4] + b[4]) })
 end
@@ -102,8 +101,6 @@ end
 -- @param rhs Right side of equation
 -- @return Subtracted color.
 function color_meta.__sub (a, b)
-	checktype(a, color_meta)
-	checktype(b, color_meta)
 
 	return wrap({ clamp(a[1]-b[1]), clamp(a[2]-b[2]), clamp(a[3]-b[3]), clamp(a[4]-b[4]) })
 end
@@ -128,7 +125,6 @@ end
 -- @param rhs Right side of equation
 -- @return Scaled color.
 function color_meta.__div (a, b)
-	checktype(a, color_meta)
 	checkluatype (b, TYPE_NUMBER)
 
 	return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })

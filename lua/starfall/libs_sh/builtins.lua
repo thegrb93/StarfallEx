@@ -42,7 +42,6 @@ return function(instance)
 
 instance.Libraries.string = table.Copy(SF.SafeStringLib)
 
-local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -403,15 +402,11 @@ function math_methods.lerp(percent, from, to)
 end
 function math_methods.lerpAngle(percent, from, to)
 	checkluatype(percent, TYPE_NUMBER)
-	checktype(from, ang_meta)
-	checktype(to, ang_meta)
 
 	return awrap(LerpAngle(percent, aunwrap(from), aunwrap(to)))
 end
 function math_methods.lerpVector(percent, from, to)
 	checkluatype(percent, TYPE_NUMBER)
-	checktype(from, vec_meta)
-	checktype(to, vec_meta)
 
 	return vwrap(LerpVector(percent, vunwrap(from), vunwrap(to)))
 end
@@ -1047,10 +1042,6 @@ end
 -- @return localPos
 -- @return localAngles
 function builtins_library.worldToLocal(pos, ang, newSystemOrigin, newSystemAngles)
-	checktype(pos, vec_meta)
-	checktype(ang, ang_meta)
-	checktype(newSystemOrigin, vec_meta)
-	checktype(newSystemAngles, ang_meta)
 
 	local localPos, localAngles = WorldToLocal(
 		vunwrap(pos),
@@ -1070,10 +1061,6 @@ end
 -- @return worldPos
 -- @return worldAngles
 function builtins_library.localToWorld(localPos, localAng, originPos, originAngle)
-	checktype(localPos, vec_meta)
-	checktype(localAng, ang_meta)
-	checktype(originPos, vec_meta)
-	checktype(originAngle, ang_meta)
 
 	local worldPos, worldAngles = LocalToWorld(
 		vunwrap(localPos),

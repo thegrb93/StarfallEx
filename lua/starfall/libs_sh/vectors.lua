@@ -8,11 +8,12 @@ local dgetmeta = debug.getmetatable
 -- @class type
 -- @libtbl vec_methods
 -- @libtbl vec_meta
-SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(vec_meta)
+SF.RegisterType("Vector", nil, nil, debug.getregistry().Vector, nil, function(instance, vec_meta)
 	return function(vec)
 		return setmetatable({ vec[1], vec[2], vec[3] }, vec_meta)
 	end,
 	function(obj)
+		instance.CheckType(obj, vec_meta, 2)
 		return Vector(obj[1], obj[2], obj[3])
 	end
 end)
@@ -140,8 +141,6 @@ end
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
 function vec_meta.__add (a, b)
-	checktype(a, vec_meta)
-	checktype(b, vec_meta)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -150,8 +149,6 @@ end
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
 function vec_meta.__sub (a, b)
-	checktype(a, vec_meta)
-	checktype(b, vec_meta)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
@@ -159,7 +156,6 @@ end
 --- unary minus metamethod
 -- @return negated vector.
 function vec_meta.__unm (a)
-	checktype(a, vec_meta)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
@@ -173,7 +169,6 @@ end
 -- @param v Vector to add
 -- @return nil
 function vec_methods:add (v)
-	checktype(v, vec_meta)
 
 	self[1] = self[1] + v[1]
 	self[2] = self[2] + v[2]
@@ -190,7 +185,6 @@ end
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx (v)
-	checktype(v, vec_meta)
 
 	return awrap(unwrap(self):AngleEx(unwrap(v)))
 end
@@ -199,7 +193,6 @@ end
 -- @param v Second Vector
 -- @return Vector
 function vec_methods:cross (v)
-	checktype(v, vec_meta)
 
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
@@ -210,7 +203,6 @@ local math_sqrt = math.sqrt
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistance (v)
-	checktype(v, vec_meta)
 
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -219,7 +211,6 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistanceSqr (v)
-	checktype(v, vec_meta)
 
 	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -228,7 +219,6 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:dot (v)
-	checktype(v, vec_meta)
 
 	return (self[1] * v[1] + self[2] * v[2] + self[3] * v[3])
 end
@@ -246,7 +236,6 @@ end
 -- @param t Tolerance number.
 -- @return bool True/False.
 function vec_methods:isEqualTol (v, t)
-	checktype(v, vec_meta)
 	checkluatype(t, TYPE_NUMBER)
 
 	return unwrap(self):IsEqualTol(unwrap(v), t)
@@ -312,7 +301,6 @@ end
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to multiply with
 function vec_methods:vmul (v)
-	checktype(v, vec_meta)
 
 	self[1] = self[1] * v[1]
 	self[2] = self[2] * v[2]
@@ -322,7 +310,6 @@ end
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to divide by
 function vec_methods:vdiv (v)
-	checktype(v, vec_meta)
 
 	self[1] = self[1] / v[1]
 	self[2] = self[2] / v[2]
@@ -375,7 +362,6 @@ end
 -- @param b Angle to rotate by.
 -- @return nil.
 function vec_methods:rotate (b)
-	checktype(b, ang_meta)
 
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -389,7 +375,6 @@ end
 -- @param b Angle to rotate by.
 -- @return Rotated Vector
 function vec_methods:getRotated (b)
-	checktype(b, ang_meta)
 
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -416,7 +401,6 @@ end
 -- @param radians Angle to rotate by in radians or nil if degrees.
 -- @return Rotated vector
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
-	checktype(axis, vec_meta)
 
 	if degrees then
 		checkluatype(degrees, TYPE_NUMBER)
@@ -438,7 +422,6 @@ end
 --- Copies x,y,z from a vector and returns a new vector
 -- @return The copy of the vector
 function vec_methods:clone()
-	checktype(self, vec_meta)
 
 	return wrap({ self[1], self[2], self[3] })
 end
@@ -447,7 +430,6 @@ end
 -- @param v Second Vector
 -- @return nil
 function vec_methods:set(v)
-	checktype(v, vec_meta)
 
 	self[1] = v[1]
 	self[2] = v[2]
@@ -458,7 +440,6 @@ end
 -- @param v Second Vector.
 -- @return nil
 function vec_methods:sub (v)
-	checktype(v, vec_meta)
 
 	self[1] = self[1] - v[1]
 	self[2] = self[2] - v[2]
@@ -476,8 +457,6 @@ end
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
 function vec_methods:withinAABox (v1, v2)
-	checktype(v1, vec_meta)
-	checktype(v2, vec_meta)
 
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
 	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end

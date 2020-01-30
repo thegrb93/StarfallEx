@@ -52,7 +52,6 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-local checktype = instance.CheckType
 local sounds_library = instance.Libraries.sounds
 local sound_methods, sound_meta, wrap, unwrap = instance.Types.Sound.Methods, instance.Types.Sound, instance.Types.Sound.Wrap, instance.Types.Sound.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap

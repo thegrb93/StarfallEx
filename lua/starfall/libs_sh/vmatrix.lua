@@ -13,7 +13,6 @@ SF.RegisterType("VMatrix", true, false, debug.getregistry().VMatrix)
 
 return function(instance)
 
-local checktype = instance.CheckType
 local vmatrix_methods, vmatrix_meta, wrap, unwrap = instance.Types.VMatrix.Methods, instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -62,7 +61,6 @@ end
 --- Rotate the matrix
 -- @param ang Angle to rotate by
 function vmatrix_methods:rotate(ang)
-	checktype(ang, ang_meta)
 	unwrap(self):Rotate(aunwrap(ang))
 end
 
@@ -99,14 +97,12 @@ end
 --- Sets the scale
 -- @param vec New scale
 function vmatrix_methods:setScale(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):SetScale(vunwrap(vec))
 end
 
 --- Scale the matrix
 -- @param vec Vector to scale by
 function vmatrix_methods:scale(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):Scale(vunwrap(vec))
 end
 
@@ -120,35 +116,30 @@ end
 --- Sets the angles
 -- @param ang New angles
 function vmatrix_methods:setAngles(ang)
-	checktype(ang, ang_meta)
 	unwrap(self):SetAngles(aunwrap(ang))
 end
 
 --- Sets the translation
 -- @param vec New translation
 function vmatrix_methods:setTranslation(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):SetTranslation(vunwrap(vec))
 end
 
 --- Sets the forward direction of the matrix. First column
 -- @param forward The forward vector
 function vmatrix_methods:setForward(forward)
-	checktype(forward, vec_meta)
 	unwrap(self):SetForward(vunwrap(forward))
 end
 
 --- Sets the right direction of the matrix. Negated second column
 -- @param right The right vector
 function vmatrix_methods:setRight(right)
-	checktype(right, vec_meta)
 	unwrap(self):SetRight(vunwrap(right))
 end
 
 --- Sets the up direction of the matrix. Third column
 -- @param up The up vector
 function vmatrix_methods:setUp(up)
-	checktype(up, vec_meta)
 	unwrap(self):SetUp(vunwrap(up))
 end
 
@@ -169,7 +160,6 @@ end
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)
-	checktype(src, vmatrix_meta)
 	unwrap(self):Set(unwrap(src))
 end
 
@@ -204,7 +194,6 @@ end
 --- Translate the matrix
 -- @param vec Vector to translate by
 function vmatrix_methods:translate(vec)
-	checktype(vec, vec_meta)
 	unwrap(self):Translate(vunwrap(vec))
 end
 
@@ -218,7 +207,6 @@ end
 -- @param axis The normalized axis of rotation
 -- @param angle The angle of rotation in radians
 function vmatrix_methods:setAxisAngle(axis, ang)
-	checktype(axis, vec_meta)
 	
 	local x, y, z = axis[1], axis[2], axis[3]
 	local c = math.cos(ang)
@@ -327,21 +315,16 @@ function vmatrix_methods:transpose()
 end
 
 function vmatrix_meta.__add(lhs, rhs)
-	checktype(lhs, vmatrix_meta)
-	checktype(rhs, vmatrix_meta)
 
 	return wrap(unwrap(lhs) + unwrap(rhs))
 end
 
 function vmatrix_meta.__sub(lhs, rhs)
-	checktype(lhs, vmatrix_meta)
-	checktype(rhs, vmatrix_meta)
 
 	return wrap(unwrap(lhs) - unwrap(rhs))
 end
 
 function vmatrix_meta.__mul(lhs, rhs)
-	checktype(lhs, vmatrix_meta)
 	local rhsmeta = dgetmeta(rhs)
 	if rhsmeta == vmatrix_meta then
 		return wrap(unwrap(lhs) * unwrap(rhs))

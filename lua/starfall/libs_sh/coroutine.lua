@@ -14,7 +14,6 @@ SF.RegisterType("thread", true, false)
 return function(instance)
 
 
-local checktype = instance.CheckType
 local coroutine_library = instance.Libraries.coroutine
 local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.Wrap, instance.Types.thread.Unwrap
 
@@ -79,7 +78,6 @@ end
 -- @param ... optional parameters that will be passed to the coroutine
 -- @return Any values the coroutine is returning to the main thread
 function coroutine_library.resume (thread, ...)
-	checktype(thread, thread_meta)
 	local func = unwrap(thread).func
 	return func(...)
 end
@@ -100,7 +98,6 @@ end
 -- @param thread The coroutine
 -- @return Either "suspended", "running", "normal" or "dead"
 function coroutine_library.status (thread)
-	checktype(thread, thread_meta)
 	local thread = unwrap(thread).thread
 	return coroutine.status(thread)
 end

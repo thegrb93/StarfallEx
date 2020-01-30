@@ -107,7 +107,6 @@ instance:AddHook("deinitialize", function()
 	SF.HookDestroyInstance(instance)
 end)
 
-local checktype = instance.CheckType
 local hook_library = instance.Libraries.hook
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local pwrap = instance.Types.Player.Wrap

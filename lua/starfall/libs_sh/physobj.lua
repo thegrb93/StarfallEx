@@ -23,7 +23,6 @@ SF.RegisterType("PhysObj", true, false)
 return function(instance)
 
 
-local checktype = instance.CheckType
 local physobj_methods, physobj_meta, wrap, unwrap = instance.Types.PhysObj.Methods, instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
@@ -105,7 +104,6 @@ end
 -- @param vec The point to get velocity of in local reference frame
 -- @return Vector Local velocity of the physics object at the point
 function physobj_methods:getVelocityAtPoint(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):GetVelocityAtPoint(vunwrap(vec)))
 end
 
@@ -148,7 +146,6 @@ end
 -- @param vec The vector to transform
 -- @return The transformed vector
 function physobj_methods:worldToLocal(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):WorldToLocal(vunwrap(vec)))
 end
 
@@ -156,7 +153,6 @@ end
 -- @param vec The vector to transform
 -- @return The transformed vector
 function physobj_methods:localToWorld(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):LocalToWorld(vunwrap(vec)))
 end
 
@@ -164,7 +160,6 @@ end
 -- @param vec The normal vector to transform
 -- @return The transformed vector
 function physobj_methods:worldToLocalVector(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):WorldToLocalVector(vunwrap(vec)))
 end
 
@@ -172,7 +167,6 @@ end
 -- @param vec The normal vector to transform
 -- @return The transformed vector
 function physobj_methods:localToWorldVector(vec)
-	checktype(vec, vec_meta)
 	return vwrap(unwrap(self):LocalToWorldVector(vunwrap(vec)))
 end
 
@@ -208,7 +202,6 @@ if SERVER then
 	-- @server
 	-- @param pos The position vector to set it to
 	function physobj_methods:setPos(pos)
-		checktype(pos, vec_meta)
 
 		pos = vunwrap(pos)
 		checkvector(pos)
@@ -222,7 +215,6 @@ if SERVER then
 	-- @server
 	-- @param ang The angle to set it to
 	function physobj_methods:setAngles(ang)
-		checktype(ang, ang_meta)
 
 		ang = aunwrap(ang)
 		checkvector(ang)
@@ -236,7 +228,6 @@ if SERVER then
 	-- @server
 	-- @param vel The velocity vector to set it to
 	function physobj_methods:setVelocity(vel)
-		checktype(vel, vec_meta)
 
 		vel = vunwrap(vel)
 		checkvector(vel)
@@ -265,7 +256,6 @@ if SERVER then
 	-- @server
 	-- @param force The force vector to apply
 	function physobj_methods:applyForceCenter(force)
-		checktype(force, vec_meta)
 
 		force = vunwrap(force)
 		checkvector(force)
@@ -280,8 +270,6 @@ if SERVER then
 	-- @param force The force vector to apply
 	-- @param position The position in world coordinates
 	function physobj_methods:applyForceOffset(force, position)
-		checktype(force, vec_meta)
-		checktype(position, vec_meta)
 
 		force = vunwrap(force)
 		checkvector(force)
@@ -297,7 +285,6 @@ if SERVER then
 	-- @server
 	-- @param angvel The local angvel vector to set
 	function physobj_methods:setAngleVelocity(angvel)
-		checktype(angvel, vec_meta)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
 
@@ -311,7 +298,6 @@ if SERVER then
 	-- @server
 	-- @param angvel The local angvel vector to apply
 	function physobj_methods:addAngleVelocity(angvel)
-		checktype(angvel, vec_meta)
 		angvel = vunwrap(angvel)
 		checkvector(angvel)
 
@@ -325,7 +311,6 @@ if SERVER then
 	-- @server
 	-- @param torque The world torque vector to apply
 	function physobj_methods:applyTorque(torque)
-		checktype(torque, vec_meta)
 		torque = vunwrap(torque)
 		checkvector(torque)
 

@@ -13,7 +13,6 @@ SF.RegisterLibrary("sql")
 return function(instance)
 
 local sql_library = instance.Libraries.sql
-local checktype = instance.CheckType
 
 --- Performs a query on the local SQLite database.
 -- @param query The query to execute.

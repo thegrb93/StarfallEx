@@ -18,7 +18,6 @@ SF.RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
 
 return function(instance)
 
-local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local npc_methods, npc_meta, wrap, unwrap = instance.Types.Npc.Methods, instance.Types.Npc, instance.Types.Npc.Wrap, instance.Types.Npc.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -36,7 +35,6 @@ if SERVER then
 	-- @server
 	-- @param str The relationship string. http://wiki.garrysmod.com/page/NPC/AddRelationship
 	function npc_methods:addRelationship(str)
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -61,7 +59,6 @@ if SERVER then
 	-- @param disp String of the relationship. (hate fear like neutral)
 	-- @param priority number how strong the relationship is. Higher number is stronger
 	function npc_methods:addEntityRelationship(ent, disp, priority)
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		local relation = dispositions[disp]
@@ -77,8 +74,6 @@ if SERVER then
 	-- @param ent Target entity
 	-- @return string relationship of the npc with the target
 	function npc_methods:getRelationship(ent)
-		checktype(self, npc_meta)
-		checktype(ent, ent_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
@@ -90,7 +85,6 @@ if SERVER then
 	-- @server
 	-- @param wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
-		checktype(self, npc_meta)
 		checkluatype(wep, TYPE_STRING)
 
 		local npc = unwrap(self)
@@ -110,8 +104,6 @@ if SERVER then
 	-- @server
 	-- @param ent Target entity
 	function npc_methods:setEnemy(ent)
-		checktype(self, npc_meta)
-		checktype(ent, ent_meta)
 		local npc = unwrap(self)
 		local target = unwrap(ent)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
@@ -124,7 +116,6 @@ if SERVER then
 	-- @server
 	-- @return Entity the npc is fighting
 	function npc_methods:getEnemy()
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		return owrap(npc:GetEnemy())
@@ -133,7 +124,6 @@ if SERVER then
 	--- Stops the npc
 	-- @server
 	function npc_methods:stop()
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -143,7 +133,6 @@ if SERVER then
 	--- Makes the npc do a melee attack
 	-- @server
 	function npc_methods:attackMelee()
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -153,7 +142,6 @@ if SERVER then
 	--- Makes the npc do a ranged attack
 	-- @server
 	function npc_methods:attackRange()
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -164,7 +152,6 @@ if SERVER then
 	-- @server
 	-- @param vec The position of the destination
 	function npc_methods:goWalk(vec)
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
@@ -176,7 +163,6 @@ if SERVER then
 	-- @server
 	-- @param vec The position of the destination
 	function npc_methods:goRun(vec)
-		checktype(self, npc_meta)
 		local npc = unwrap(self)
 		if not npc:IsValid() then SF.Throw("NPC is invalid", 2) end
 		checkpermission(instance, npc, "npcs.modify")
