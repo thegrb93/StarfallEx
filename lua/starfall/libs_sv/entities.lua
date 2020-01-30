@@ -39,7 +39,6 @@ end
 
 return function(instance)
 
-local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
@@ -196,7 +195,6 @@ end
 -- @param angvel The local angvel vector to set
 function ents_methods:setAngleVelocity(angvel)
 	local ent = getent(self)
-	checktype(angvel, vec_meta)
 	angvel = vunwrap(angvel)
 	checkvector(angvel)
 
@@ -212,7 +210,6 @@ end
 -- @param angvel The local angvel vector to apply
 function ents_methods:addAngleVelocity(angvel)
 	local ent = getent(self)
-	checktype(angvel, vec_meta)
 	angvel = vunwrap(angvel)
 	checkvector(angvel)
 
@@ -228,7 +225,6 @@ end
 -- @param vec The force vector
 function ents_methods:applyForceCenter(vec)
 	local ent = getent(self)
-	checktype(vec, vec_meta)
 	local vec = vunwrap(vec)
 	checkvector(vec)
 
@@ -245,8 +241,6 @@ end
 -- @param offset An optional offset position
 function ents_methods:applyForceOffset(vec, offset)
 	local ent = getent(self)
-	checktype(vec, vec_meta)
-	checktype(offset, vec_meta)
 
 	local vec = vunwrap(vec)
 	local offset = vunwrap(offset)
@@ -266,7 +260,6 @@ end
 -- @param ang The force angle
 function ents_methods:applyAngForce(ang)
 	local ent = getent(self)
-	checktype(ang, ang_meta)
 
 	local ang = aunwrap(ang)
 	checkvector(ang)
@@ -307,7 +300,6 @@ end
 -- @param torque The torque vector
 function ents_methods:applyTorque(torque)
 	local ent = getent(self)
-	checktype(torque, vec_meta)
 
 	local torque = vunwrap(torque)
 	checkvector(torque)
@@ -379,7 +371,6 @@ end
 -- @param vec New position
 function ents_methods:setPos(vec)
 	local ent = getent(self)
-	checktype(vec, vec_meta)
 
 	local vec = vunwrap(vec)
 	checkpermission(instance, ent, "entities.setPos")
@@ -391,7 +382,6 @@ end
 -- @param ang New angles
 function ents_methods:setAngles(ang)
 	local ent = getent(self)
-	checktype(ang, ang_meta)
 
 	local ang = aunwrap(ang)
 	checkpermission(instance, ent, "entities.setAngles")
@@ -403,7 +393,6 @@ end
 -- @param vel New velocity
 function ents_methods:setVelocity(vel)
 	local ent = getent(self)
-	checktype(vel, vec_meta)
 
 	local vel = vunwrap(vel)
 	checkvector(vel)
@@ -512,7 +501,6 @@ end
 function ents_methods:setInertia(vec)
 	local ent = getent(self)
 	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
-	checktype(vec, vec_meta)
 	checkpermission(instance, ent, "entities.setInertia")
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end

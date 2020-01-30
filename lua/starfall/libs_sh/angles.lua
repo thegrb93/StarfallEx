@@ -7,11 +7,12 @@ local checkpermission = SF.Permissions.check
 -- @class type
 -- @libtbl ang_methods
 -- @libtbl ang_meta
-SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(ang_meta)
+SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(checktype, ang_meta)
 	return function(ang)
 		return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)
 	end,
 	function(obj)
+		checktype(obj, ang_meta, 2)
 		return Angle(obj[1], obj[2], obj[3])
 	end
 end)
@@ -19,7 +20,6 @@ end)
 
 return function(instance)
 
-local checktype = instance.CheckType
 local ang_methods, ang_meta, awrap, unwrap = instance.Types.Angle.Methods, instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local function wrap(tbl)
@@ -66,11 +66,6 @@ end
 
 local table_concat = table.concat
 
-local math_nAng = math.NormalizeAngle
-local function normalizedAngTable(tbl)
-	return { math_nAng(tbl[1]), math_nAng(tbl[2]), math_nAng(tbl[3]) }
-end
-
 --- tostring metamethod
 -- @return string representing the angle.
 function ang_meta.__tostring (a)
@@ -90,7 +85,6 @@ end
 -- @param n Number to divided by.
 -- @return resultant angle.
 function ang_meta.__div (a, n)
-	checktype(a, ang_meta)
 	checkluatype (n, TYPE_NUMBER)
 
 	return wrap({ a[1] / n, a[2] / n, a[3] / n })
@@ -113,8 +107,6 @@ end
 -- @param a Angle to add.
 -- @return resultant angle.
 function ang_meta.__add (a, b)
-	checktype(a, ang_meta)
-	checktype(b, ang_meta)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -123,8 +115,6 @@ end
 -- @param a Angle to subtract.
 -- @return resultant angle.
 function ang_meta.__sub (a, b)
-	checktype(a, ang_meta)
-	checktype(b, ang_meta)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
@@ -148,11 +138,10 @@ function ang_methods:normalize ()
 	self[3] = math_nAng(self[3])
 end
 
---- Returnes a normalized angle
+--- Converts all the angle values to be -180 to 180
 -- @return Normalized angle table
 function ang_methods:getNormalized ()
-	checktype(self, ang_meta)
-	return wrap(normalizedAngTable(self))
+	return wrap({ (tbl[1] + 180) % 360 - 180, (tbl[2] + 180) % 360 - 180, (tbl[3] + 180) % 360 - 180 })
 end
 
 --- Return the Forward Vector ( direction the angle points ).
@@ -179,7 +168,6 @@ end
 -- @param rad Number of radians or nil if degrees.
 -- @return The modified angle
 function ang_methods:rotateAroundAxis (v, deg, rad)
-	checktype(v, vec_meta)
 
 	if rad then
 		checkluatype (rad, TYPE_NUMBER)

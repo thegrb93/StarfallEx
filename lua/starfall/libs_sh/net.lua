@@ -57,7 +57,6 @@ instance:AddHook("cleanup", function()
 end)
 
 
-local checktype = instance.CheckType
 local net_library = instance.Libraries.net
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
@@ -454,7 +453,6 @@ end
 function net_library.writeAngle(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, ang_meta)
 
 	write(net.WriteAngle, 54, aunwrap(t))
 	return true
@@ -475,7 +473,6 @@ end
 function net_library.writeVector(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, vec_meta)
 
 	write(net.WriteVector, 54, vunwrap(t))
 	return true
@@ -496,7 +493,6 @@ end
 function net_library.writeMatrix(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, mtx_meta)
 
 	write(net.WriteMatrix, 64*8, munwrap(t))
 	return true
@@ -517,7 +513,6 @@ end
 function net_library.writeColor(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checktype(t, col_meta)
 
 	write(net.WriteColor, 4*8, cunwrap(t))
 	return true

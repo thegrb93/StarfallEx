@@ -42,7 +42,6 @@ end)
 
 
 local props_library = instance.Libraries.prop
-local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
@@ -67,12 +66,10 @@ function props_library.create(pos, ang, model, frozen)
 
 	checkpermission(instance, nil, "prop.create")
 
-	checktype(pos, vec_meta)
-	checktype(ang, ang_meta)
 	checkluatype(model, TYPE_STRING)
 	frozen = frozen and true or false
 
-	local pos = vunwrap(pos)
+	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 
 	local ply = instance.player
@@ -85,7 +82,7 @@ function props_library.create(pos, ang, model, frozen)
 	local propdata = instance.data.props
 	local propent = ents.Create("prop_physics")
 	register(propent, instance)
-	propent:SetPos(SF.clampPos(pos))
+	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent:SetModel(model)
 	propent:Spawn()
@@ -120,8 +117,8 @@ end
 -- @param frozen Whether the prop starts frozen
 -- @return The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
-	checktype(pos, vec_meta)
-	checktype(ang, ang_meta)
+	local pos = SF.clampPos(vunwrap(pos))
+	local ang = aunwrap(ang)
 	checkluatype(vertices, TYPE_TABLE)
 	frozen = frozen and true or false
 
@@ -150,7 +147,6 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 		local t = {}
 		for o, p in ipairs(v) do
 			if o>maxVerticesPerConvex then SF.Throw("Exceeded the max vertices per convex (" .. maxVerticesPerConvex .. ")", 2) end
-			checktype(p, vec_meta)
 			local vec = vunwrap(p)
 			if math.abs(vec.x)>max or math.abs(vec.y)>max or math.abs(vec.z)>max then SF.Throw("The custom prop cannot exceed a hull size of " .. max, 2) end
 			if vec.x~=vec.x or vec.y~=vec.y or vec.z~=vec.z then SF.Throw("Your mesh contains nan values!", 2) end
@@ -171,15 +167,12 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	plyVertexCount:free(-totalVertices)
 
-	local pos = vunwrap(pos)
-	local ang = aunwrap(ang)
-
 	local propdata = instance.data.props
 	
 	local propent = ents.Create("starfall_prop")
 	register(propent, instance)
 	propent.streamdata = streamdata
-	propent:SetPos(SF.clampPos(pos))
+	propent:SetPos(pos)
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
 	propent:Spawn()
@@ -223,13 +216,11 @@ local allowed_components = {
 -- @return Component entity
 function props_library.createComponent (pos, ang, class, model, frozen)
 	checkpermission(instance,  nil, "prop.create")
-	checktype(pos, vec_meta)
-	checktype(ang, ang_meta)
 	checkluatype(class, TYPE_STRING)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
-	local pos = vunwrap(pos)
+	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 
 	local ply = instance.player
@@ -242,7 +233,7 @@ function props_library.createComponent (pos, ang, class, model, frozen)
 
 	local comp = ents.Create(class)
 	register(comp, instance)
-	comp:SetPos(SF.clampPos(pos))
+	comp:SetPos(pos)
 	comp:SetAngles(ang)
 	comp:SetModel(model)
 	comp:Spawn()
@@ -284,8 +275,6 @@ function props_library.createSent (pos, ang, class, frozen)
 
 	checkpermission(instance,  nil, "prop.create")
 
-	checktype(pos, vec_meta)
-	checktype(ang, ang_meta)
 	checkluatype(class, TYPE_STRING)
 	frozen = frozen and true or false
 

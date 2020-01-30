@@ -14,7 +14,6 @@ SF.RegisterLibrary("find")
 return function(instance)
 
 local find_library = instance.Libraries.find
-local checktype = instance.CheckType
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 
@@ -48,8 +47,6 @@ end
 -- @return An array of found entities
 function find_library.inBox (min, max, filter)
 	checkpermission(instance, nil, "find")
-	checktype(min, vec_meta)
-	checktype(max, vec_meta)
 
 	local min, max = vunwrap(min), vunwrap(max)
 
@@ -63,7 +60,6 @@ end
 -- @return An array of found entities
 function find_library.inSphere (center, radius, filter)
 	checkpermission(instance, nil, "find")
-	checktype(center, vec_meta)
 	checkluatype (radius, TYPE_NUMBER)
 
 	local center = vunwrap(center)
@@ -80,8 +76,6 @@ end
 -- @return An array of found entities
 function find_library.inCone(pos, dir, distance, radius, filter)
 	checkpermission(instance, nil, "find")
-	checktype(pos, vec_meta)
-	checktype(dir, vec_meta)
 	checkluatype (distance, TYPE_NUMBER)
 	checkluatype (radius, TYPE_NUMBER)
 
@@ -100,14 +94,10 @@ end
 function find_library.inRay(startpos, endpos, mins, maxs, filter)
 	checkpermission(instance, nil, "find")
 
-	checktype(startpos, vec_meta)
-	checktype(endpos, vec_meta)
 	startpos = vunwrap(startpos)
 	endpos = vunwrap(endpos)
 
 	if mins ~= nil or maxs ~= nil then
-		checktype(mins, vec_meta)
-		checktype(maxs, vec_meta)
 		mins = vunwrap(mins)
 		maxs = vunwrap(maxs)
 	end
@@ -156,7 +146,6 @@ if SERVER then
 	-- @return An array of found entities
 	function find_library.inPVS (pos, filter)
 		checkpermission(instance, nil, "find")
-		checktype(pos, vec_meta)
 		
 		return convert(ents.FindInPVS(vunwrap(pos)), filter)
 	end

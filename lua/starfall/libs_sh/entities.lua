@@ -19,7 +19,6 @@ SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
 
 return function(instance)
 
-local checktype = instance.CheckType
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -32,7 +31,6 @@ local function getent(self)
 	if ent and (ent:IsValid() or ent:IsWorld()) then
 		return ent
 	else
-		checktype(self, ent_meta, 3)
 		SF.Throw("Entity is not valid.", 3)
 	end
 end
@@ -64,7 +62,6 @@ if CLIENT then
 	-- @param vec The position it should be manipulated to
 	function ents_methods:manipulateBonePosition(bone, vec)
 		checkluatype(bone, TYPE_NUMBER)
-		checktype(vec, vec_meta)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
@@ -76,7 +73,6 @@ if CLIENT then
 	-- @param vec The scale it should be manipulated to
 	function ents_methods:manipulateBoneScale(bone, vec)
 		checkluatype(bone, TYPE_NUMBER)
-		checktype(vec, vec_meta)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
@@ -88,7 +84,6 @@ if CLIENT then
 	-- @param ang The angle it should be manipulated to
 	function ents_methods:manipulateBoneAngles(bone, ang)
 		checkluatype(bone, TYPE_NUMBER)
-		checktype(ang, ang_meta)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
@@ -104,7 +99,6 @@ if CLIENT then
 		checkpermission(instance, nil, "mesh")
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		if mesh then
-			checktype(mesh, instance.Types.Mesh)
 			ent.custom_mesh = instance.Types.Mesh.Unwrap(mesh)
 			ent.custom_mesh_data = instance.data.meshes
 		else
@@ -138,8 +132,6 @@ if CLIENT then
 		local ent = getent(self)
 		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
 
-		checktype(mins, vec_meta)
-		checktype(maxs, vec_meta)
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
@@ -190,7 +182,6 @@ end
 -- @shared
 -- @param clr New color
 function ents_methods:setColor(clr)
-	checktype(clr, col_meta)
 
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
@@ -491,7 +482,6 @@ function ents_methods:isValid()
 	if ent and ent:IsValid() then
 		return true
 	else
-		checktype(self, ent_meta, 2)
 		return false
 	end
 end
@@ -790,7 +780,6 @@ end
 -- @return data as world space vector
 function ents_methods:localToWorld(data)
 	local ent = getent(self)
-	checktype(data, vec_meta)
 
 	return vwrap(ent:LocalToWorld(vunwrap(data)))
 end
@@ -801,7 +790,6 @@ end
 -- @return data as world space angle
 function ents_methods:localToWorldAngles(data)
 	local ent = getent(self)
-	checktype(data, ang_meta)
 	local data = aunwrap(data)
 
 	return awrap(ent:LocalToWorldAngles(data))
@@ -813,7 +801,6 @@ end
 -- @return data as local space vector
 function ents_methods:worldToLocal(data)
 	local ent = getent(self)
-	checktype(data, vec_meta)
 
 	return vwrap(ent:WorldToLocal(vunwrap(data)))
 end
@@ -824,7 +811,6 @@ end
 -- @return data as local space angle
 function ents_methods:worldToLocalAngles(data)
 	local ent = getent(self)
-	checktype(data, ang_meta)
 	local data = aunwrap(data)
 
 	return awrap(ent:WorldToLocalAngles(data))

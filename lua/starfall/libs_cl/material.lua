@@ -202,7 +202,6 @@ SF.RegisterType("LockedMaterial", true, false, nil, "Material") --Material that 
 return function(instance)
 
 
-local checktype = instance.CheckType
 local material_library = instance.Libraries.material
 local material_methods, material_meta, wrap, unwrap = instance.Types.Material.Methods, instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
 local lmaterial_methods, lmaterial_meta, lwrap, lunwrap = instance.Types.LockedMaterial.Methods, instance.Types.LockedMaterial, instance.Types.LockedMaterial.Wrap, instance.Types.LockedMaterial.Unwrap
@@ -406,7 +405,6 @@ end
 
 --- Free's a user created material allowing you to create others
 function material_methods:destroy()
-	checktype(self, material_meta)
 
 	local m = unwrap(self)
 	if not m then SF.Throw("The material is already destroyed?", 2) end
@@ -426,50 +424,41 @@ function material_methods:destroy()
 	material_bank:free(instance.player, m)
 end
 function lmaterial_methods:destroy()
-	checktype(self, lmaterial_meta)
 end
 
 --- Returns the material's engine name
 -- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
 function material_methods:getName()
-	checktype(self, material_meta)
 	return unwrap(self):GetName()
 end
 function lmaterial_methods:getName()
-	checktype(self, lmaterial_meta)
 	return lunwrap(self):GetName()
 end
 
 --- Returns the shader name of the material
 -- @return The shader name of the material
 function material_methods:getShader()
-	checktype(self, material_meta)
 	return unwrap(self):GetShader()
 end
 function lmaterial_methods:getShader()
-	checktype(self, lmaterial_meta)
 	return lunwrap(self):GetShader()
 end
 
 --- Gets the base texture set to the material's width
 -- @return The basetexture's width
 function material_methods:getWidth()
-	checktype(self, material_meta)
 	return unwrap(self):Width()
 end
 function lmaterial_methods:getWidth()
-	checktype(self, lmaterial_meta)
 	return lunwrap(self):Width()
 end
 
 --- Gets the base texture set to the material's height
 -- @return The basetexture's height
 function material_methods:getHeight()
-	checktype(self, material_meta)
 	return unwrap(self):Height()
 end
 function lmaterial_methods:getHeight()
-	checktype(self, lmaterial_meta)
 	return lunwrap(self):Height()
 end
 
@@ -478,13 +467,11 @@ end
 -- @param y The y coordinate of the pixel
 -- @return The color value
 function material_methods:getColor(x, y)
-	checktype(self, material_meta)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
 	return cwrap(unwrap(self):GetColor(x, y))
 end
 function lmaterial_methods:getColor(x, y)
-	checktype(self, lmaterial_meta)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
 	return cwrap(lunwrap(self):GetColor(x, y))
@@ -494,12 +481,10 @@ end
 -- @param key The key to get the float from
 -- @return The float value or nil if it doesn't exist
 function material_methods:getFloat(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return unwrap(self):GetFloat(key)
 end
 function lmaterial_methods:getFloat(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetFloat(key)
 end
@@ -508,12 +493,10 @@ end
 -- @param key The key to get the int from
 -- @return The int value or nil if it doesn't exist
 function material_methods:getInt(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return unwrap(self):GetInt(key)
 end
 function lmaterial_methods:getInt(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetInt(key)
 end
@@ -521,11 +504,9 @@ end
 --- Returns a table of material keyvalues
 -- @return The table of keyvalues
 function material_methods:getKeyValues()
-	checktype(self, material_meta)
 	return instance.Sanitize(unwrap(self):GetKeyValues())
 end
 function lmaterial_methods:getKeyValues()
-	checktype(self, lmaterial_meta)
 	return instance.Sanitize(lunwrap(self):GetKeyValues())
 end
 
@@ -533,12 +514,10 @@ end
 -- @param key The key to get the matrix from
 -- @return The matrix value or nil if it doesn't exist
 function material_methods:getMatrix(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(unwrap(self):GetMatrix(key))
 end
 function lmaterial_methods:getMatrix(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(lunwrap(self):GetMatrix(key))
 end
@@ -547,12 +526,10 @@ end
 -- @param key The key to get the string from
 -- @return The string value or nil if it doesn't exist
 function material_methods:getString(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return unwrap(self):GetString(key)
 end
 function lmaterial_methods:getString(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetString(key)
 end
@@ -561,13 +538,11 @@ end
 -- @param key The key to get the texture from
 -- @return The string id of the texture or nil if it doesn't exist
 function material_methods:getTexture(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	local tex = unwrap(self):GetTexture(key)
 	if tex then return tex:GetName() end
 end
 function lmaterial_methods:getTexture(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	local tex = lunwrap(self):GetTexture(key)
 	if tex then return tex:GetName() end
@@ -577,12 +552,10 @@ end
 -- @param key The key to get the vector from
 -- @return The string id of the texture
 function material_methods:getVector(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(unwrap(self):GetVector(key))
 end
 function lmaterial_methods:getVector(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVector(key))
 end
@@ -591,12 +564,10 @@ end
 -- @param key The key to get the vector from
 -- @return The vector value or nil if it doesn't exist
 function material_methods:getVectorLinear(key)
-	checktype(self, material_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(unwrap(self):GetVectorLinear(key))
 end
 function lmaterial_methods:getVectorLinear(key)
-	checktype(self, lmaterial_meta)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVectorLinear(key))
 end
@@ -606,7 +577,6 @@ end
 
 --- Refreshes the material. Sometimes needed for certain parameters to update
 function material_methods:recompute()
-	checktype(self, material_meta)
 	unwrap(self):Recompute()
 end
 
@@ -614,7 +584,6 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setFloat(key, v)
-	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
 	unwrap(self):SetFloat(key, v)
@@ -624,7 +593,6 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setInt(key, v)
-	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_NUMBER)
 	unwrap(self):SetInt(key, v)
@@ -634,9 +602,7 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setMatrix(key, v)
-	checktype(self, material_meta)
 	checkkey(key)
-	checktype(v, matrix_meta)
 	unwrap(self):SetMatrix(key, munwrap(v))
 end
 
@@ -644,7 +610,6 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setString(key, v)
-	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_STRING)
 	unwrap(self):SetString(key, v)
@@ -654,7 +619,6 @@ end
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param v The texture name to set it to.
 function material_methods:setTexture(key, v)
-	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(v, TYPE_STRING)
 
@@ -667,7 +631,6 @@ end
 -- @param cb An optional callback called when image is loaded. Passes nil if it fails or Passes the material, url, width, height, and layout function which can be called with x, y, w, h to reposition the image in the texture
 -- @param done An optional callback called when the image is done loading. Passes the material, url
 function material_methods:setTextureURL(key, url, cb, done)
-	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(url, TYPE_STRING)
 	if cb ~= nil then checkluatype(cb, TYPE_FUNCTION) end
@@ -727,7 +690,6 @@ end
 -- @param key The key name to set. $basetexture is the key name for most purposes.
 -- @param name The name of the rendertarget
 function material_methods:setTextureRenderTarget(key, name)
-	checktype(self, material_meta)
 	checkkey(key)
 	checkluatype(name, TYPE_STRING)
 
@@ -741,7 +703,6 @@ end
 --- Sets a keyvalue to be undefined
 -- @param key The key name to set
 function material_methods:setUndefined(key)
-	checktype(self, material_meta)
 	checkkey(key)
 	unwrap(self):SetUndefined(key)
 end
@@ -750,9 +711,7 @@ end
 -- @param key The key name to set
 -- @param v The value to set it to
 function material_methods:setVector(key, v)
-	checktype(self, material_meta)
 	checkkey(key)
-	checktype(v, vec_meta)
 	unwrap(self):SetVector(key, vunwrap(v))
 end
 

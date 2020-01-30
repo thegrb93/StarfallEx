@@ -47,7 +47,6 @@ end)
 local particle_library = instance.Libraries.particle
 local particle_methods = instance.Types.Particle.Methods
 
-local checktype = instance.CheckType
 local particle_meta, wrap, unwrap = instance.Types.Particle, instance.Types.Particle.Wrap, instance.Types.Particle.Unwrap
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -113,7 +112,6 @@ end
 --- Gets if the particle is valid or not.
 -- @return Is valid or not
 function particle_methods:isValid()
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	return uw and uw:IsValid()
@@ -122,7 +120,6 @@ end
 
 --- Starts emission of the particle.
 function particle_methods:startEmission()
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -135,7 +132,6 @@ end
 
 --- Stops emission of the particle.
 function particle_methods:stopEmission()
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -147,7 +143,6 @@ end
 
 --- Stops emission of the particle and destroys the object.
 function particle_methods:destroy()
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	if (uw and uw:IsValid()) then
@@ -158,7 +153,6 @@ end
 
 --- Restarts emission of the particle.
 function particle_methods:restart()
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkValid(uw)
@@ -172,7 +166,6 @@ end
 --- Restarts emission of the particle.
 -- @return bool finished
 function particle_methods:isFinished()
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	if (uw and uw:IsValid()) then
@@ -187,9 +180,7 @@ end
 --- Sets the sort origin for given particle system. This is used as a helper to determine which particles are in front of which.
 -- @param vector Sort Origin
 function particle_methods:setSortOrigin(origin)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
-	checktype(origin, vec_meta)
 
 	checkValid(uw)
 
@@ -203,11 +194,9 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Value
 function particle_methods:setControlPoint(id,value)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -221,7 +210,6 @@ end
 -- @param number Child Control Point ID (0-63)
 -- @param entity Entity parent
 function particle_methods:setControlPointEntity(id,entity)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 	local entity = getent(entity)
 
@@ -239,11 +227,9 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Forward
 function particle_methods:setForwardVector(id,value)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -256,11 +242,9 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Right
 function particle_methods:setRightVector(id,value)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -274,11 +258,9 @@ end
 -- @param number Control Point ID (0-63)
 -- @param vector Right
 function particle_methods:setUpVector(id,value)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)
-	checktype(value, vec_meta)
 
 	checkValid(uw)
 
@@ -291,7 +273,6 @@ end
 -- @param number Child Control Point ID (0-63)
 -- @param number Parent
 function particle_methods:setControlPointParent(id,value)
-	checktype(self, particle_meta)
 	local uw = unwrap(self)
 
 	checkluatype (id, TYPE_NUMBER)

@@ -75,7 +75,6 @@ end)
 
 local wire_library = instance.Libraries.wire
 
-local checktype = instance.CheckType
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local wirelink_methods, wirelink_meta, wlwrap, wlunwrap = instance.Types.Wirelink.Methods, instance.Types.Wirelink, instance.Types.Wirelink.Wrap, instance.Types.Wirelink.Unwrap
@@ -166,11 +165,9 @@ local outputConverters =
 		return data
 	end,
 	VECTOR = function(data)
-		checktype(data, vec_meta, 2)
 		return vunwrap(data)
 	end,
 	ANGLE = function(data)
-		checktype(data, ang_meta, 2)
 		return aunwrap(data)
 	end,
 	ENTITY = function(data)
@@ -330,8 +327,6 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param color Color of the wire(optional)
 -- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
 function wire_library.create (entI, entO, inputname, outputname, width, color, material)
-	checktype(entI, ent_meta)
-	checktype(entO, ent_meta)
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 
@@ -342,7 +337,6 @@ function wire_library.create (entI, entO, inputname, outputname, width, color, m
 		width = math.Clamp(width, 0, 5)
 	end
 	if color ~= nil then
-		checktype(color, col_meta)
 	else
 		color = COLOR_WHITE
 	end
@@ -395,7 +389,6 @@ end
 local function parseEntity(ent, io)
 
 	if ent then
-		checktype(ent, ent_meta)
 		ent = eunwrap(ent)
 		checkpermission(instance, ent, "wire.get" .. io)
 	else
@@ -432,7 +425,6 @@ end
 -- @param ent Wire entity
 -- @return Wirelink of the entity
 function wire_library.getWirelink (ent)
-	checktype(ent, ent_meta)
 	ent = eunwrap(ent)
 	if not ent:IsValid() then return end
 	checkpermission(instance, ent, "wire.wirelink")
@@ -454,7 +446,6 @@ ents_methods.getWirelink = wire_library.getWirelink
 --- Retrieves an output. Returns nil if the output doesn't exist.
 wirelink_meta.__index = function(self, k)
 	checkpermission(instance, nil, "wire.wirelink.read")
-	checktype(self, wirelink_meta)
 	if wirelink_methods[k] then
 		return wirelink_methods[k]
 	else
@@ -474,7 +465,6 @@ end
 --- Writes to an input.
 wirelink_meta.__newindex = function(self, k, v)
 	checkpermission(instance, nil, "wire.wirelink.write")
-	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if isnumber(k) then
@@ -490,13 +480,11 @@ end
 
 --- Checks if a wirelink is valid. (ie. doesn't point to an invalid entity)
 function wirelink_methods:isValid()
-	checktype(self, wirelink_meta)
 	return wlunwrap(self) and true or false
 end
 
 --- Returns the type of input name, or nil if it doesn't exist
 function wirelink_methods:inputType(name)
-	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return end
 	local input = wl.Inputs[name]
@@ -505,7 +493,6 @@ end
 
 --- Returns the type of output name, or nil if it doesn't exist
 function wirelink_methods:outputType(name)
-	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return end
 	local output = wl.Outputs[name]
@@ -514,13 +501,11 @@ end
 
 --- Returns the entity that the wirelink represents
 function wirelink_methods:entity()
-	checktype(self, wirelink_meta)
 	return owrap(wlunwrap(self))
 end
 
 --- Returns a table of all of the wirelink's inputs
 function wirelink_methods:inputs()
-	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local Inputs = wl.Inputs
@@ -541,7 +526,6 @@ end
 
 --- Returns a table of all of the wirelink's outputs
 function wirelink_methods:outputs()
-	checktype(self, wirelink_meta)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local Outputs = wl.Outputs
@@ -563,7 +547,6 @@ end
 --- Checks if an input is wired.
 -- @param name Name of the input to check
 function wirelink_methods:isWired(name)
-	checktype(self, wirelink_meta)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
@@ -576,7 +559,6 @@ end
 -- @param name Name of the input
 -- @return The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
-	checktype(self, wirelink_meta)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
@@ -590,7 +572,6 @@ end
 -- @param name Name of the input of the wirelink.
 -- @return String name of the output that the input is wired to.
 function wirelink_methods:getWiredToName(name)
-	checktype(self, wirelink_meta)
 	checkluatype(name, TYPE_STRING)
 	local wl = wlunwrap(self)
 	if not wl then return nil end

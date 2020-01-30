@@ -49,7 +49,6 @@ SF.RegisterType("Quaternion")
 
 return function(instance)
 
-local checktype = instance.CheckType
 local quat_lib = instance.Libraries.quaternion
 local quat_methods, quat_meta = instance.Types.Quaternion.Methods, instance.Types.Quaternion
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -279,8 +278,6 @@ end
 -- @return resultant quaternion.
 quat_meta.__add = function(lhs, rhs)
 
-	checktype(lhs, quat_meta)
-	checktype(rhs, quat_meta)
 
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -363,8 +360,6 @@ end
 -- @param q Quaternion or number to divide by.
 -- @return resultant quaternion.
 quat_meta.__div = function(lhs, rhs)
-	checktype(lhs, quat_meta)
-	checktype(rhs, quat_meta)
 
 	local ltype = SF.GetType(lhs)
 	local rtype = SF.GetType(rhs)
@@ -403,8 +398,6 @@ end
 -- @param q Quaternion or number to pow by.
 -- @return resultant quaternion.
 quat_meta.__pow = function(lhs, rhs)
-	checktype(lhs, quat_meta)
-	checktype(rhs, quat_meta)
 
 
 	local ltype = SF.GetType(lhs)
@@ -663,7 +656,6 @@ end
 
 --- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degress (by coder0xff)
 function quat_lib.rotationVector(q)
-	checktype(q, quat_meta)
 	local l2 = q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 	local m2 = math.max(q[2] * q[2] + q[3] * q[3] + q[4] * q[4], 0)
 

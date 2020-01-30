@@ -580,7 +580,6 @@ end
 
 if CLIENT then
 
-	local checktype = instance.CheckType
 	local mesh_methods, mesh_meta, wrap, unwrap = instance.Types.Mesh.Methods, instance.Types.Mesh, instance.Types.Mesh.Wrap, instance.Types.Mesh.Unwrap
 	local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 	local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
@@ -721,7 +720,6 @@ if CLIENT then
 	--- Draws the mesh. Must be in a 3D rendering context.
 	-- @client
 	function mesh_methods:draw()
-		checktype(self, mesh_meta)
 		local mesh = unwrap(self)
 		local data = instance.data
 		local meshdata = data.meshes[mesh]
@@ -734,7 +732,6 @@ if CLIENT then
 	--- Frees the mesh from memory
 	-- @client
 	function mesh_methods:destroy()
-		checktype(self, mesh_meta)
 		local mesh = unwrap(self)
 		if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
 		destroyMesh(instance.player, mesh, instance.data.meshes)

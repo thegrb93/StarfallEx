@@ -13,7 +13,6 @@ SF.RegisterType("Weapon", false, true, debug.getregistry().Weapon, "Entity")
 
 return function(instance)
 
-local checktype = instance.CheckType
 local weapon_methods, weapon_meta, wrap, unwrap = instance.Types.Weapon.Methods, instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 
 
@@ -29,7 +28,6 @@ end
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip1 ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:Clip1()
 end
@@ -38,7 +36,6 @@ end
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip2 ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:Clip2()
 end
@@ -47,7 +44,6 @@ end
 -- @shared
 -- @return number Current activity
 function weapon_methods:getActivity ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetActivity()
 end
@@ -56,7 +52,6 @@ end
 -- @shared
 -- @return string Holdtype
 function weapon_methods:getHoldType ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetHoldType()
 end
@@ -65,7 +60,6 @@ end
 -- @shared
 -- @return The time, relative to CurTime
 function weapon_methods:getNextPrimaryFire ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetNextPrimaryFire()
 end
@@ -74,7 +68,6 @@ end
 -- @shared
 -- @return The time, relative to CurTime
 function weapon_methods:getNextSecondaryFire ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetNextSecondaryFire()
 end
@@ -83,7 +76,6 @@ end
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getPrimaryAmmoType ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetPrimaryAmmoType()
 end
@@ -92,7 +84,6 @@ end
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getSecondaryAmmoType ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetSecondaryAmmoType()
 end
@@ -101,7 +92,6 @@ end
 -- @shared
 -- @return Whether the weapon is visble or not
 function weapon_methods:isWeaponVisible ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:IsWeaponVisible()
 end
@@ -110,7 +100,6 @@ end
 -- @shared
 -- @return Time the weapon was last shot
 function weapon_methods:lastShootTime ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:LastShootTime()
 end
@@ -119,7 +108,6 @@ end
 -- @shared
 -- @return The tool mode of the toolgun
 function weapon_methods:getToolMode ()
-	checktype(self, weapon_meta)
 	local ent = unwrap(self)
 	return ent:GetClass()=="gmod_tool" and ent.Mode or ""
 end
@@ -129,7 +117,6 @@ if CLIENT then
 	-- @client
 	-- @return string Display name of weapon
 	function weapon_methods:getPrintName ()
-		checktype(self, weapon_meta)
 		local ent = unwrap(self)
 		return ent:GetPrintName()
 	end
@@ -138,7 +125,6 @@ if CLIENT then
 	-- @client
 	-- @return whether or not the weapon is carried by the local player
 	function weapon_methods:isCarriedByLocalPlayer ()
-		checktype(self, weapon_meta)
 		local ent = unwrap(self)
 		return ent:IsCarriedByLocalPlayer()
 	end
