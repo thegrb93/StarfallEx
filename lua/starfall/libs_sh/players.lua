@@ -62,7 +62,7 @@ instance.env.IN_KEY = {
 
 function player_meta:__tostring()
 	local ent = unwrap(self)
-	if not ent then return "(null entity)"
+	if not ent:IsValid() then return "(null entity)"
 	else return tostring(ent) end
 end
 
@@ -72,194 +72,168 @@ end
 -- @shared
 -- @return True if player alive
 function player_methods:isAlive()
-	local ent = unwrap(self)
-	return ent and ent:Alive()
+	return unwrap(self):Alive()
 end
 
 --- Returns the players armor
 -- @shared
 -- @return Armor
 function player_methods:getArmor()
-	local ent = unwrap(self)
-	return ent and ent:Armor()
+	return unwrap(self):Armor()
 end
 
 --- Returns whether the player is crouching
 -- @shared
 -- @return True if player crouching
 function player_methods:isCrouching()
-	local ent = unwrap(self)
-	return ent and ent:Crouching()
+	return unwrap(self):Crouching()
 end
 
 --- Returns the amount of deaths of the player
 -- @shared
 -- @return Amount of deaths
 function player_methods:getDeaths()
-	local ent = unwrap(self)
-	return ent and ent:Deaths()
+	return unwrap(self):Deaths()
 end
 
 --- Returns whether the player's flashlight is on
 -- @shared
 -- @return True if player has flashlight on
 function player_methods:isFlashlightOn()
-	local ent = unwrap(self)
-	return ent and ent:FlashlightIsOn()
+	return unwrap(self):FlashlightIsOn()
 end
 
 --- Returns true if the player is noclipped
 -- @shared
 -- @return true if the player is noclipped
 function player_methods:isNoclipped()
-	local ent = unwrap(self)
-	return ent and ent:GetMoveType() == MOVETYPE_NOCLIP
+	return unwrap(self):GetMoveType() == MOVETYPE_NOCLIP
 end
 
 --- Returns the amount of kills of the player
 -- @shared
 -- @return Amount of kills
 function player_methods:getFrags()
-	local ent = unwrap(self)
-	return ent and ent:Frags()
+	return unwrap(self):Frags()
 end
 
 --- Returns the name of the player's active weapon
 -- @shared
 -- @return The weapon
 function player_methods:getActiveWeapon()
-	local ent = unwrap(self)
-	return ent and wwrap(ent:GetActiveWeapon())
+	return wwrap(unwrap(self):GetActiveWeapon())
 end
 
 --- Returns the player's aim vector
 -- @shared
 -- @return Aim vector
 function player_methods:getAimVector()
-	local ent = unwrap(self)
-	return ent and vwrap(ent:GetAimVector())
+	return vwrap(unwrap(self):GetAimVector())
 end
 
 --- Returns the player's field of view
 -- @shared
 -- @return Field of view
 function player_methods:getFOV()
-	local ent = unwrap(self)
-	return ent and ent:GetFOV()
+	return unwrap(self):GetFOV()
 end
 
 --- Returns the player's jump power
 -- @shared
 -- @return Jump power
 function player_methods:getJumpPower()
-	local ent = unwrap(self)
-	return ent and ent:GetJumpPower()
+	return unwrap(self):GetJumpPower()
 end
 
 --- Returns the player's maximum speed
 -- @shared
 -- @return Maximum speed
 function player_methods:getMaxSpeed()
-	local ent = unwrap(self)
-	return ent and ent:GetMaxSpeed()
+	return unwrap(self):GetMaxSpeed()
 end
 
 --- Returns the player's name
 -- @shared
 -- @return Name
 function player_methods:getName()
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity!", 2) end
-	return ent:GetName()
+	return unwrap(self):GetName()
 end
 
 --- Returns the player's running speed
 -- @shared
 -- @return Running speed
 function player_methods:getRunSpeed()
-	local ent = unwrap(self)
-	return ent and ent:GetRunSpeed()
+	return unwrap(self):GetRunSpeed()
 end
 
 --- Returns the player's shoot position
 -- @shared
 -- @return Shoot position
 function player_methods:getShootPos()
-	local ent = unwrap(self)
-	return ent and vwrap(ent:GetShootPos())
+	return vwrap(unwrap(self):GetShootPos())
 end
 
 --- Returns whether the player is in a vehicle
 -- @shared
 -- @return True if player in vehicle
 function player_methods:inVehicle()
-	local ent = unwrap(self)
-	return ent and ent:InVehicle()
+	return unwrap(self):InVehicle()
 end
 
 --- Returns the vehicle the player is driving
 -- @shared
 -- @return Vehicle if player in vehicle or nil
 function player_methods:getVehicle()
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then return end
-	return vhwrap(ent:GetVehicle())
+	return vhwrap(unwrap(self):GetVehicle())
 end
 
 --- Returns whether the player is an admin
 -- @shared
 -- @return True if player is admin
 function player_methods:isAdmin()
-	local ent = unwrap(self)
-	return ent and ent:IsAdmin()
+	return unwrap(self):IsAdmin()
 end
 
 --- Returns whether the player is a bot
 -- @shared
 -- @return True if player is a bot
 function player_methods:isBot()
-	local ent = unwrap(self)
-	return ent and ent:IsBot()
+	return unwrap(self):IsBot()
 end
 
 --- Returns whether the player is connected
 -- @shared
 -- @return True if player is connected
 function player_methods:isConnected()
-	local ent = unwrap(self)
-	return ent and ent:IsConnected()
+	return unwrap(self):IsConnected()
 end
 
 --- Returns whether the player is frozen
 -- @shared
 -- @return True if player is frozen
 function player_methods:isFrozen()
-	local ent = unwrap(self)
-	return ent and ent:IsFrozen()
+	return unwrap(self):IsFrozen()
 end
 
 --- Returns whether the player is an NPC
 -- @shared
 -- @return True if player is an NPC
 function player_methods:isNPC()
-	local ent = unwrap(self)
-	return ent and ent:IsNPC()
+	return unwrap(self):IsNPC()
 end
 
 --- Returns whether the player is a player
 -- @shared
 -- @return True if player is player
 function player_methods:isPlayer()
-	local ent = unwrap(self)
-	return ent and ent:IsPlayer()
+	return unwrap(self):IsPlayer()
 end
 
 --- Returns whether the player is a super admin
 -- @shared
 -- @return True if player is super admin
 function player_methods:isSuperAdmin()
-	local ent = unwrap(self)
-	return ent and ent:IsSuperAdmin()
+	return unwrap(self):IsSuperAdmin()
 end
 
 --- Returns whether the player belongs to a usergroup
@@ -267,64 +241,56 @@ end
 -- @param group Group to check against
 -- @return True if player belongs to group
 function player_methods:isUserGroup(group)
-	local ent = unwrap(self)
-	return ent and ent:IsUserGroup(group)
+	return unwrap(self):IsUserGroup(group)
 end
 
 --- Returns the player's current ping
 -- @shared
 -- @return ping
 function player_methods:getPing()
-	local ent = unwrap(self)
-	return ent and ent:Ping()
+	return unwrap(self):Ping()
 end
 
 --- Returns the player's steam ID
 -- @shared
 -- @return steam ID
 function player_methods:getSteamID()
-	local ent = unwrap(self)
-	return ent and ent:SteamID()
+	return unwrap(self):SteamID()
 end
 
 --- Returns the player's community ID
 -- @shared
 -- @return community ID
 function player_methods:getSteamID64()
-	local ent = unwrap(self)
-	return ent and ent:SteamID64()
+	return unwrap(self):SteamID64()
 end
 
 --- Returns the player's current team
 -- @shared
 -- @return team
 function player_methods:getTeam()
-	local ent = unwrap(self)
-	return ent and ent:Team()
+	return unwrap(self):Team()
 end
 
 --- Returns the name of the player's current team
 -- @shared
 -- @return team name
 function player_methods:getTeamName()
-	local ent = unwrap(self)
-	return ent and team.GetName(ent:Team())
+	return team.GetName(unwrap(self):Team())
 end
 
 --- Returns the player's unique ID
 -- @shared
 -- @return unique ID
 function player_methods:getUniqueID()
-	local ent = unwrap(self)
-	return ent and ent:UniqueID()
+	return unwrap(self):UniqueID()
 end
 
 --- Returns the player's user ID
 -- @shared
 -- @return user ID
 function player_methods:getUserID()
-	local ent = unwrap(self)
-	return ent and ent:UserID()
+	return unwrap(self):UserID()
 end
 
 --- Returns a table with information of what the player is looking at
@@ -373,24 +339,21 @@ end
 function player_methods:getAmmoCount(id)
 	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
 
-	local ent = unwrap(self)
-	return ent:GetAmmoCount(id)
+	return unwrap(self):GetAmmoCount(id)
 end
 
 --- Returns whether the player is typing in their chat
 -- @shared
 -- @return bool true/false
 function player_methods:isTyping()
-	local ent = unwrap(self)
-	return ent and ent:IsValid() and ent:IsTyping()
+	return unwrap(self):IsTyping()
 end
 
 --- Returns whether the player is sprinting
 -- @shared
 -- @return bool true/false
 function player_methods:isSprinting()
-	local ent = unwrap(self)
-	return (ent and ent:IsValid()) and ent:IsSprinting()
+	return unwrap(self):IsSprinting()
 end
 
 if SERVER then
@@ -399,11 +362,8 @@ if SERVER then
 	-- @param ent Entity to set the player's view entity to, or nothing to reset it
 	function player_methods:setViewEntity(ent)
 		local pl = unwrap(self)
-		if not (pl and pl:IsValid()) then SF.Throw("Invalid Player", 2) end
-
 		if ent~=nil then
-			ent = unwrap(ent)
-			if not (ent and ent:IsValid()) then SF.Throw("Invalid Entity", 2) end
+			ent = getent(ent)
 		end
 
 		if (pl.sfhudenabled and pl.sfhudenabled:IsValid()) and pl.sfhudenabled.link == instance.data.entity then
@@ -415,8 +375,7 @@ if SERVER then
 	-- @server
 	-- @return True if the player has godmode
 	function player_methods:hasGodMode()
-		local ent = unwrap(self)
-		return (ent and ent:IsValid()) and ent:HasGodMode() or false
+		return unwrap(self):HasGodMode()
 	end
 end
 
@@ -452,41 +411,34 @@ end
 function player_methods:keyDown(key)
 	checkluatype(key, TYPE_NUMBER)
 
-	local ent = unwrap(self)
-	if not (ent and ent:IsValid()) then return false end
-
-	return ent:KeyDown(key)
+	return unwrap(self):KeyDown(key)
 end
 
 if CLIENT then
 	--- Returns the relationship of the player to the local client
 	-- @return One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
-		local ent = unwrap(self)
-		return ent and ent:GetFriendStatus()
+		unwrap(self):GetFriendStatus()
 	end
 
 	--- Returns whether the local player has muted the player
 	-- @return True if the player was muted
 	function player_methods:isMuted()
-		local ent = unwrap(self)
-		return ent and ent:IsValid() and ent:IsMuted()
+		unwrap(self):IsMuted()
 	end
 	
 	--- Returns whether the player is heard by the local player.
 	-- @client
 	-- @return bool true/false
 	function player_methods:isSpeaking()
-		local ent = unwrap(self)
-		return ent and ent:IsValid() and ent:IsSpeaking()
+		unwrap(self):IsSpeaking()
 	end
 
 	--- Returns the voice volume of the player
 	-- @client
 	-- @return Returns the players voice volume, how loud the player's voice communication currently is, as a normal number. Doesn't work on local player unless the voice_loopback convar is set to 1.
 	function player_methods:voiceVolume()
-		local ent = unwrap(self)
-		return ent and ent:IsValid() and ent:VoiceVolume()
+		unwrap(self):VoiceVolume()
 	end
 end
 

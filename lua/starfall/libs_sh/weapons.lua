@@ -28,80 +28,70 @@ end
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip1 ()
-	local ent = unwrap(self)
-	return ent:Clip1()
+	return unwrap(self):Clip1()
 end
 
 --- Returns Ammo in secondary clip
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip2 ()
-	local ent = unwrap(self)
-	return ent:Clip2()
+	return unwrap(self):Clip2()
 end
 
 --- Returns the sequence enumeration number that the weapon is playing. Must be used on a view model.
 -- @shared
 -- @return number Current activity
 function weapon_methods:getActivity ()
-	local ent = unwrap(self)
-	return ent:GetActivity()
+	return unwrap(self):GetActivity()
 end
 
 --- Returns the hold type of the weapon.
 -- @shared
 -- @return string Holdtype
 function weapon_methods:getHoldType ()
-	local ent = unwrap(self)
-	return ent:GetHoldType()
+	return unwrap(self):GetHoldType()
 end
 
 --- Gets the next time the weapon can primary fire.
 -- @shared
 -- @return The time, relative to CurTime
 function weapon_methods:getNextPrimaryFire ()
-	local ent = unwrap(self)
-	return ent:GetNextPrimaryFire()
+	return unwrap(self):GetNextPrimaryFire()
 end
 
 --- Gets the next time the weapon can secondary fire.
 -- @shared
 -- @return The time, relative to CurTime
 function weapon_methods:getNextSecondaryFire ()
-	local ent = unwrap(self)
-	return ent:GetNextSecondaryFire()
+	return unwrap(self):GetNextSecondaryFire()
 end
 
 --- Gets the primary ammo type of the given weapon.
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getPrimaryAmmoType ()
-	local ent = unwrap(self)
-	return ent:GetPrimaryAmmoType()
+	return unwrap(self):GetPrimaryAmmoType()
 end
 
 --- Gets the secondary ammo type of the given weapon.
 -- @shared
 -- @return Ammo number type
 function weapon_methods:getSecondaryAmmoType ()
-	local ent = unwrap(self)
-	return ent:GetSecondaryAmmoType()
+	return unwrap(self):GetSecondaryAmmoType()
 end
 
 --- Returns whether the weapon is visible
 -- @shared
 -- @return Whether the weapon is visble or not
 function weapon_methods:isWeaponVisible ()
-	local ent = unwrap(self)
-	return ent:IsWeaponVisible()
+	return unwrap(self):IsWeaponVisible()
 end
 
 --- Returns the time since a weapon was last fired at a float variable
 -- @shared
 -- @return Time the weapon was last shot
 function weapon_methods:lastShootTime ()
-	local ent = unwrap(self)
-	return ent:LastShootTime()
+	return unwrap(self):LastShootTime()
 end
 
 --- Returns the tool mode of the toolgun
@@ -117,16 +107,14 @@ if CLIENT then
 	-- @client
 	-- @return string Display name of weapon
 	function weapon_methods:getPrintName ()
-		local ent = unwrap(self)
-		return ent:GetPrintName()
+		return unwrap(self):GetPrintName()
 	end
 
 	--- Returns if the weapon is carried by the local player.
 	-- @client
 	-- @return whether or not the weapon is carried by the local player
 	function weapon_methods:isCarriedByLocalPlayer ()
-		local ent = unwrap(self)
-		return ent:IsCarriedByLocalPlayer()
+		return unwrap(self):IsCarriedByLocalPlayer()
 	end
 end
 

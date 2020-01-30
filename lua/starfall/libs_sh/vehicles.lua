@@ -35,17 +35,13 @@ if SERVER then
 	-- @server
 	-- @return Driver of vehicle
 	function vehicle_methods:getDriver ()
-		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		return pwrap(ent:GetDriver())
+		return pwrap(unwrap(self):GetDriver())
 	end
 
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver ()
-		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		local driver = ent:GetDriver()
+		local driver = unwrap(self):GetDriver()
 		if driver:IsValid() then
 			driver:ExitVehicle()
 		end
@@ -57,16 +53,13 @@ if SERVER then
 	-- @return The passenger or NULL if empty
 	function vehicle_methods:getPassenger (n)
 		checkluatype(n, TYPE_NUMBER)
-		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
-		return pwrap(ent:GetPassenger(n))
+		return pwrap(unwrap(self):GetPassenger(n))
 	end
 
 	--- Kills the driver of the vehicle
 	-- @server
 	function vehicle_methods:killDriver ()
 		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.kill")
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
@@ -80,7 +73,6 @@ if SERVER then
 	function vehicle_methods:stripDriver (class)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
 		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.strip")
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
@@ -96,7 +88,6 @@ if SERVER then
 	-- @server
 	function vehicle_methods:lock()
 		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.lock")
 		local n = "SF_CanExitVehicle"..ent:EntIndex()
 		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
@@ -108,7 +99,6 @@ if SERVER then
 	-- @server
 	function vehicle_methods:unlock()
 		local ent = unwrap(self)
-		if not (ent and ent:IsValid()) then SF.Throw("Invalid entity", 2) end
 		checkpermission(instance, ent, "vehicle.lock")
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		ent:Fire("Unlock")
