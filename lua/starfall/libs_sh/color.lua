@@ -12,12 +12,12 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 -- @class type
 -- @libtbl color_methods
 -- @libtbl color_meta
-SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(instance, color_meta)
+SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(checktype, color_meta)
 	return function(clr)
 		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
 	end,
 	function(obj)
-		instance.CheckType(obj, color_meta, 2)
+		checktype(obj, color_meta, 2)
 		return Color((tonumber(obj[1]) or 255), (tonumber(obj[2]) or 255), (tonumber(obj[3]) or 255), (tonumber(obj[4]) or 255))
 	end
 end)

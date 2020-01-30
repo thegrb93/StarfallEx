@@ -176,7 +176,7 @@ function SF.Instance:CreateWrapper(metatable, typedata)
 	-- If the type already has wrappers, dont re-assign
 	if typedata.weakwrapper==nil or typedata.weaksensitive==nil then
 		if typedata.customwrappers then
-			wrap, unwrap = typedata.customwrappers(self, metatable)
+			wrap, unwrap = typedata.customwrappers(self.CheckType, metatable)
 		else
 			return
 		end
