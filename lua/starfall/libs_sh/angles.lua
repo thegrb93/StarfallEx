@@ -10,7 +10,7 @@ local dgetmeta = debug.getmetatable
 -- @libtbl ang_meta
 SF.RegisterType("Angle", nil, nil, debug.getregistry().Angle, nil, function(checktype, ang_meta)
 	return function(ang)
-		return setmetatable({ ang[1], ang[2], ang[3] }, ang_meta)
+		return setmetatable({ ang:Unpack() }, ang_meta)
 	end,
 	function(obj)
 		checktype(obj, ang_meta, 2)

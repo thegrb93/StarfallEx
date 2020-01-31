@@ -14,7 +14,7 @@ local clamp = function(v) return math_Clamp(v, 0, 255) end
 -- @libtbl color_meta
 SF.RegisterType("Color", nil, nil, debug.getregistry().Color, nil, function(checktype, color_meta)
 	return function(clr)
-		return setmetatable({ clr.r, clr.g, clr.b, clr.a }, color_meta)
+		return setmetatable({ clr:Unpack() }, color_meta)
 	end,
 	function(obj)
 		checktype(obj, color_meta, 2)
