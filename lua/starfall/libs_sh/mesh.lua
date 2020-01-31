@@ -679,20 +679,24 @@ if CLIENT then
 		checkluatype(model, TYPE_STRING)
 		if lod~=nil then checkluatype(lod, TYPE_NUMBER) end
 		if bodygroupMask~=nil then checkluatype(bodygroupMask, TYPE_NUMBER) end
-		local ret = util.GetModelMeshes( model, lod, bodygroupMask )
-		if ret then
-			for k, v in ipairs(ret) do
-				v.verticies = nil
+		local mesh = util.GetModelMeshes( model, lod, bodygroupMask )
+		local output = {}
+		if mesh then
+			for k, v in ipairs(mesh) do
+				local verts = {}
+				output[k] = {triangles = verts}
 				for o, p in ipairs(v.triangles) do
-					if p.color then p.color = cwrap(p.color) end
-					p.normal = vwrap(p.normal)
-					p.tangent = vwrap(p.tangent)
-					if p.binormal then p.binormal = vwrap(p.binormal) end
-					p.pos = vwrap(p.pos)
+					local tri = {}
+					verts[o] = tri
+					if p.color then tri.color = cwrap(p.color) end
+					tri.normal = vwrap(p.normal)
+					tri.tangent = vwrap(p.tangent)
+					if p.binormal then tri.binormal = vwrap(p.binormal) end
+					tri.pos = vwrap(p.pos)
 				end
 			end
 		end
-		return ret
+		return output
 	end
 
 	--- Returns how many triangles can be created
