@@ -28,6 +28,7 @@ local function saveSettings()
 end
 
 function helper.create()
+	if not SF.Docs then return end
 
 	helper.Views = {}
 
@@ -623,7 +624,8 @@ end
 
 function helper.show()
 	if not helper.Frame then helper.create() end
-	helper.Frame:Open()
+	-- helper.create() will fail if docs aren't ready
+	if helper.Frame then helper.Frame:Open() end
 end
 
 local lastw, lasth = 0, 0

@@ -224,17 +224,14 @@ function PANEL:Setup(folder)
 		function( body, len, headers, code )
 			if code == 200 then -- OK code
 				local data = util.JSONToTable( body )
-				SF.Docs.Examples = {}
 				self.Examples = self.RootNode:AddNode("Examples","icon16/help.png")
 				for k,v in pairs(data) do
-					SF.Docs.Examples[v.name] = v.download_url
 					local node = self.Examples:AddNode(v.name,"icon16/page_white.png")
 					node.FileURL = v.download_url
 				end
 			end
 		end,
 		function( error )
-			SF.Docs["Examples"] = {}
 			print("[SF] Examples failed to load:"..tostring(error))
 		end
 	)

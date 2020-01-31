@@ -618,8 +618,8 @@ function SF.WaitForEntity(index, callback)
 	end
 end
 
-function SF.WaitForPlayerInit(ply, func)
-	local n = "SF_WaitForPlayerInit"..ply:EntIndex()
+function SF.WaitForPlayerInit(ply, name, func)
+	local n = "SF_WaitForPlayerInit"..name..ply:EntIndex()
 	hook.Add("SetupMove", n, function(ply2)
 		if ply:IsValid() then
 			if ply == ply2 then
@@ -1121,9 +1121,7 @@ do
 		return init
 	end
 	
-	local function addModule(name, path, shouldrun)
-		local source = file.Read(path, "LUA")
-		AddCSLuaFile(path)
+	local function addModule(source, name, path, shouldrun)
 		local init
 		if shouldrun then
 			init = compileModule(source, path)
@@ -1137,17 +1135,38 @@ do
 		local l = file.Find(folder.."*.lua", "LUA")
 		for _, filename in pairs(l) do
 			local path = folder..filename
-			addModule(string.StripExtension(filename), path, shouldrun)
+			local source = file.Read(path, "LUA")
+			addModule(source, string.StripExtension(filename), path, shouldrun)
 		end
 	end
 
-	loadModules("starfall/libs_sh/", SERVER or CLIENT)
-	loadModules("starfall/libs_sv/", SERVER)
-	loadModules("starfall/libs_cl/", CLIENT)
+	if SERVER then
+		util.AddNetworkString("sf_receivelibrary")
+
+		loadModules("starfall/libs_sh/", SERVER or CLIENT)
+		loadModules("starfall/libs_sv/", SERVER)
+		loadModules("starfall/libs_cl/", CLIENT)
+		
+		SF.Permissions.loadPermissionOptions()
+
+		hook.Add("PlayerInitialSpawn","SF_Initialize_Libraries",function(ply)
+			SF.WaitForPlayerInit(ply, "InitLibs", function()
+				local files = {}
+				for name, mod in pairs(SF.Modules) do
+					for path, val in pairs(mod) do
+						files[name..":"..path] = val.source
+					end
+				end
+				net.Start("sf_receivelibrary")
+				net.WriteBool(true)
+				net.WriteStarfall({files = files, mainfile = "", proc = Entity(0), owner = Entity(0)})
+				net.Broadcast()
+			end)
+		end)
+	end
 
 	if SERVER then
 		-- Command to reload the libraries
-		util.AddNetworkString("sf_reloadlibrary")
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
 			if ply:IsValid() and not ply:IsSuperAdmin() then return end
 			local name = arg[1]
@@ -1177,23 +1196,42 @@ do
 			if #sendToClientTbl>0 then
 				local files = {}
 				for k, path in pairs(sendToClientTbl) do
-					files[path] = SF.Modules[name][path].source
+					files[name..":"..path] = SF.Modules[name][path].source
 				end
-				net.Start("sf_reloadlibrary")
+				net.Start("sf_receivelibrary")
+				net.WriteBool(false)
 				net.WriteStarfall({files = files, mainfile = name, proc = Entity(0), owner = Entity(0)})
 				net.Broadcast()
 			end
 		end)
 
 	else
-		net.Receive("sf_reloadlibrary", function(len)
+		net.Receive("sf_receivelibrary", function(len)
+			local init = net.ReadBool()
 			net.ReadStarfall(nil, function(ok, data)
 				if ok then
-					print("Reloaded library: " .. data.mainfile)
-					SF.Modules[data.mainfile] = {}
-					for path, code in pairs(data.files) do
-						local init = CompileString(code, path, false)()
-						SF.Modules[data.mainfile][path] = {source = code, init = init}
+					if not init then
+						SF.Modules[data.mainfile] = {}
+						print("Reloaded library: " .. data.mainfile)
+					end
+					for k, code in pairs(data.files) do
+						local modname, path = string.match(k, "(.+):(.+)")
+						local t = SF.Modules[modname]
+						if not t then t = {} SF.Modules[modname] = t end
+						local shouldrun
+						if string.find(path, "starfall/libs_sv", 1, true) then
+							shouldrun = SERVER
+						elseif string.find(path, "starfall/libs_sh", 1, true) then
+							shouldrun = true
+						elseif string.find(path, "starfall/libs_cl", 1, true) then
+							shouldrun = CLIENT
+						end
+						SF.Modules[modname][path] = {source = code, init = shouldrun and compileModule(code, path) or nil}
+					end
+					if init then
+						print("Starting docs")
+						SF.Permissions.loadPermissionOptions()
+						include("starfall/editor/docs.lua")
 					end
 				end
 			end)
@@ -1201,5 +1239,4 @@ do
 	end
 end
 
-SF.Permissions.loadPermissionOptions()
 include("editor/editor.lua")

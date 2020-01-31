@@ -45,7 +45,6 @@ SF.Editor.HelperURL = CreateConVar("sf_editor_helperurl", "http://thegrb93.githu
 ------------------
 
 if CLIENT then
-	include("docs.lua")
 	include("sfhelper.lua")
 	include("sfderma.lua")
 	include("sfframe.lua") -- Editor's frame
@@ -74,7 +73,7 @@ if CLIENT then
 		if not file.Exists("starfall", "DATA") then
 			file.CreateDir("starfall")
 		end
-		if SF.Editor.editor then return end
+		if not SF.Docs or SF.Editor.editor then return end
 
 		SF.Editor.createEditor()
 		SF.Editor.initialized = true
@@ -82,17 +81,20 @@ if CLIENT then
 
 	function SF.Editor.open()
 		if not SF.Editor.initialized then SF.Editor.init() end
+		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
 	end
 
 	function SF.Editor.openFile(fl,forceNewTab)
 		if not SF.Editor.initialized then SF.Editor.init() end
+		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Open(fl, nil, forceNewTab)
 	end
 
 	function SF.Editor.openWithCode(name, code,forceNewTab)
 		if not SF.Editor.initialized then SF.Editor.init() end
+		if not SF.Editor.initialized then return end
 		SF.Editor.editor:Open(name, code, forceNewTab)
 	end
 
