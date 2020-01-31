@@ -115,7 +115,7 @@ local pwrap = instance.Types.Player.Wrap
 -- @param hookname Name of the event
 -- @param name Unique identifier
 -- @param func Function to run
-function hook_library.add (hookname, name, func)
+function hook_library.add(hookname, name, func)
 	checkluatype (hookname, TYPE_STRING)
 	checkluatype (name, TYPE_STRING)
 	checkluatype (func, TYPE_FUNCTION)
@@ -135,7 +135,7 @@ end
 -- @shared
 -- @param hookname The hook name
 -- @param ... arguments
-function hook_library.run (hookname, ...)
+function hook_library.run(hookname, ...)
 	checkluatype (hookname, TYPE_STRING)
 
 	local hook = hookname:lower()
@@ -168,7 +168,7 @@ local hookrun = hook_library.run
 -- @param recipient Starfall entity to call the hook on. Nil to run on every starfall entity
 -- @param ... Payload. These parameters will be used to call the hook functions
 -- @return tbl A list of the resultset of each called hook
-function hook_library.runRemote (recipient, ...)
+function hook_library.runRemote(recipient, ...)
 	local recipients
 	if recipient then
 		local ent = getent(recipient)
@@ -203,7 +203,7 @@ end
 -- @shared
 -- @param hookname The hook name
 -- @param name The unique name for this hook
-function hook_library.remove (hookname, name)
+function hook_library.remove(hookname, name)
 	checkluatype (hookname, TYPE_STRING)
 	checkluatype (name, TYPE_STRING)
 

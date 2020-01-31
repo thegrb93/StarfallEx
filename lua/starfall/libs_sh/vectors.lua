@@ -50,7 +50,7 @@ end
 local xyz = { x = 1, y = 2, z = 3 }
 
 --- __newindex metamethod
-function vec_meta.__newindex (t, k, v)
+function vec_meta.__newindex(t, k, v)
 	if xyz[k] then
 		rawset(t, xyz[k], v)
 
@@ -74,7 +74,7 @@ local math_min = math.min
 
 --- __index metamethod
 -- Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
-function vec_meta.__index (t, k)
+function vec_meta.__index(t, k)
 	local method = vec_methods[k]
 	if method ~= nil then
 		return method
@@ -99,7 +99,7 @@ local table_concat = table.concat
 
 --- tostring metamethod
 -- @return string representing the vector.
-function vec_meta.__tostring (a)
+function vec_meta.__tostring(a)
 	return table_concat(a, ' ', 1, 3)
 end
 
@@ -107,7 +107,7 @@ end
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Scaled vector.
-function vec_meta.__mul (a, b)
+function vec_meta.__mul(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	elseif isnumber(a) then
@@ -124,7 +124,7 @@ end
 --- division metamethod
 -- @param b Scalar or vector to divide the scalar or vector by
 -- @return Scaled vector.
-function vec_meta.__div (a, b)
+function vec_meta.__div(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] / b, a[2] / b, a[3] / b })
 	elseif isnumber(a) then
@@ -141,7 +141,7 @@ end
 --- add metamethod
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
-function vec_meta.__add (a, b)
+function vec_meta.__add(a, b)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -149,27 +149,27 @@ end
 --- sub metamethod
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
-function vec_meta.__sub (a, b)
+function vec_meta.__sub(a, b)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
 --- unary minus metamethod
 -- @return negated vector.
-function vec_meta.__unm (a)
+function vec_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
 --- equivalence metamethod
 -- @return bool if both sides are equal.
-function vec_meta.__eq (a, b)
+function vec_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
 --- Add vector - Modifies self.
 -- @param v Vector to add
 -- @return nil
-function vec_methods:add (v)
+function vec_methods:add(v)
 
 	self[1] = self[1] + v[1]
 	self[2] = self[2] + v[2]
@@ -178,14 +178,14 @@ end
 
 --- Get the vector's angle.
 -- @return Angle
-function vec_methods:getAngle ()
+function vec_methods:getAngle()
 	return awrap(unwrap(self):Angle())
 end
 
 --- Returns the vector's euler angle with respect to the other vector as if it were the new vertical axis.
 -- @param v Second Vector
 -- @return Angle
-function vec_methods:getAngleEx (v)
+function vec_methods:getAngleEx(v)
 
 	return awrap(unwrap(self):AngleEx(unwrap(v)))
 end
@@ -193,7 +193,7 @@ end
 --- Calculates the cross product of the 2 vectors, creates a unique perpendicular vector to both input vectors.
 -- @param v Second Vector
 -- @return Vector
-function vec_methods:cross (v)
+function vec_methods:cross(v)
 
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
@@ -203,7 +203,7 @@ local math_sqrt = math.sqrt
 --- Returns the pythagorean distance between the vector and the other vector.
 -- @param v Second Vector
 -- @return Number
-function vec_methods:getDistance (v)
+function vec_methods:getDistance(v)
 
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -211,7 +211,7 @@ end
 --- Returns the squared distance of 2 vectors, this is faster Vector:getDistance as calculating the square root is an expensive process.
 -- @param v Second Vector
 -- @return Number
-function vec_methods:getDistanceSqr (v)
+function vec_methods:getDistanceSqr(v)
 
 	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
@@ -219,14 +219,14 @@ end
 --- Dot product is the cosine of the angle between both vectors multiplied by their lengths. A.B = ||A||||B||cosA.
 -- @param v Second Vector
 -- @return Number
-function vec_methods:dot (v)
+function vec_methods:dot(v)
 
 	return (self[1] * v[1] + self[2] * v[2] + self[3] * v[3])
 end
 
 --- Returns a new vector with the same direction by length of 1.
 -- @return Vector Normalised
-function vec_methods:getNormalized ()
+function vec_methods:getNormalized()
 	local len = math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)
 
 	return wrap({ self[1] / len, self[2] / len, self[3] / len })
@@ -236,7 +236,7 @@ end
 -- @param v Second Vector
 -- @param t Tolerance number.
 -- @return bool True/False.
-function vec_methods:isEqualTol (v, t)
+function vec_methods:isEqualTol(v, t)
 	checkluatype(t, TYPE_NUMBER)
 
 	return unwrap(self):IsEqualTol(unwrap(v), t)
@@ -244,38 +244,38 @@ end
 
 --- Are all fields zero.
 -- @return bool True/False
-function vec_methods:isZero ()
+function vec_methods:isZero()
 	return self[1]==0 and self[2]==0 and self[3]==0
 end
 
 --- Get the vector's Length.
 -- @return number Length.
-function vec_methods:getLength ()
+function vec_methods:getLength()
 	return math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)
 end
 
 --- Get the vector's length squared ( Saves computation by skipping the square root ).
 -- @return number length squared.
-function vec_methods:getLengthSqr ()
+function vec_methods:getLengthSqr()
 	return (self[1]^2 + self[2]^2 + self[3]^2)
 end
 
 --- Returns the length of the vector in two dimensions, without the Z axis.
 -- @return number length
-function vec_methods:getLength2D ()
+function vec_methods:getLength2D()
 	return math_sqrt(self[1]^2 + self[2]^2)
 end
 
 --- Returns the length squared of the vector in two dimensions, without the Z axis. ( Saves computation by skipping the square root )
 -- @return number length squared.
-function vec_methods:getLength2DSqr ()
+function vec_methods:getLength2DSqr()
 	return (self[1]^2 + self[2]^2)
 end
 
 --- Scalar Multiplication of the vector. Self-Modifies.
 -- @param n Scalar to multiply with.
 -- @return nil
-function vec_methods:mul (n)
+function vec_methods:mul(n)
 	checkluatype(n, TYPE_NUMBER)
 
 	self[1] = self[1] * n
@@ -286,7 +286,7 @@ end
 --- "Scalar Division" of the vector. Self-Modifies.
 -- @param n Scalar to divide by.
 -- @return nil
-function vec_methods:div (n)
+function vec_methods:div(n)
 	checkluatype(n, TYPE_NUMBER)
 
 	self[1] = self[1] / n
@@ -296,7 +296,7 @@ end
 
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to multiply with
-function vec_methods:vmul (v)
+function vec_methods:vmul(v)
 
 	self[1] = self[1] * v[1]
 	self[2] = self[2] * v[2]
@@ -305,7 +305,7 @@ end
 
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to divide by
-function vec_methods:vdiv (v)
+function vec_methods:vdiv(v)
 
 	self[1] = self[1] / v[1]
 	self[2] = self[2] / v[2]
@@ -314,7 +314,7 @@ end
 
 --- Set's all vector fields to 0.
 -- @return nil
-function vec_methods:setZero ()
+function vec_methods:setZero()
 	self[1] = 0
 	self[2] = 0
 	self[3] = 0
@@ -346,7 +346,7 @@ end
 
 --- Normalise the vector, same direction, length 1. Self-Modifies.
 -- @return nil
-function vec_methods:normalize ()
+function vec_methods:normalize()
 	local len = math_sqrt(self[1]^2 + self[2]^2 + self[3]^2)
 
 	self[1] = self[1] / len
@@ -357,7 +357,7 @@ end
 --- Rotate the vector by Angle b. Self-Modifies.
 -- @param b Angle to rotate by.
 -- @return nil.
-function vec_methods:rotate (b)
+function vec_methods:rotate(b)
 
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -370,7 +370,7 @@ end
 --- Returns Rotated vector by Angle b
 -- @param b Angle to rotate by.
 -- @return Rotated Vector
-function vec_methods:getRotated (b)
+function vec_methods:getRotated(b)
 
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
@@ -435,7 +435,7 @@ end
 --- Subtract v from this Vector. Self-Modifies.
 -- @param v Second Vector.
 -- @return nil
-function vec_methods:sub (v)
+function vec_methods:sub(v)
 
 	self[1] = self[1] - v[1]
 	self[2] = self[2] - v[2]
@@ -444,7 +444,7 @@ end
 
 --- Translates the vectors position into 2D user screen coordinates.
 -- @return A table {x=screenx,y=screeny,visible=visible}
-function vec_methods:toScreen ()
+function vec_methods:toScreen()
 	return unwrap(self):ToScreen()
 end
 
@@ -452,7 +452,7 @@ end
 -- @param v1 Vector used to define AABox
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
-function vec_methods:withinAABox (v1, v2)
+function vec_methods:withinAABox(v1, v2)
 
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
 	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
@@ -465,7 +465,7 @@ if SERVER then
 	--- Returns whether the vector is in world
 	-- @server
 	-- @return bool True/False.
-	function vec_methods:isInWorld ()
+	function vec_methods:isInWorld()
 		return util.IsInWorld(unwrap(self))
 	end
 end

@@ -37,7 +37,7 @@ surface.CreateFont("SFTitle", {
 
 --[[ StarfallFrame ]]
 
-function PANEL:Init ()
+function PANEL:Init()
 	for _, v in pairs(self:GetChildren()) do v:Remove() end
 	local frame = self
 	self:ShowCloseButton(false)
@@ -94,7 +94,7 @@ function PANEL:Paint(w, h)
 	draw.RoundedBox(0, 0, 0, w, h, SF.Editor.colors.dark)
 end
 
-function PANEL:Open ()
+function PANEL:Open()
 	self:SetVisible(true)
 	self:SetKeyBoardInputEnabled(true)
 	self:MakePopup()
@@ -102,15 +102,15 @@ function PANEL:Open ()
 
 	self:OnOpen()
 end
-function PANEL:new_Close ()
+function PANEL:new_Close()
 	self:OnClose()
 	self:SetKeyBoardInputEnabled(false)
 	self:_Close()
 end
 
-function PANEL:OnOpen ()
+function PANEL:OnOpen()
 end
-function PANEL:OnClose ()
+function PANEL:OnClose()
 end
 
 vgui.Register("StarfallFrame", PANEL, "DFrame")
@@ -126,12 +126,12 @@ local icon_cache = {
 
 }
 
-function PANEL:Init ()
+function PANEL:Init()
 	self:SetText("")
 	self:SetSize(22, 22)
 	self.autoSize = true
 end
-function PANEL:SetIcon (icon)
+function PANEL:SetIcon(icon)
 	if icon_cache[icon] then
 		icon = icon_cache[icon]
 	else
@@ -142,7 +142,7 @@ end
 function PANEL:SetAutoSize(val)
 	self.autoSize = val
 end
-function PANEL:PerformLayout ()
+function PANEL:PerformLayout()
 	if self:GetText() ~= "" and self.autoSize then
 		self:SizeToContentsX()
 		self:SetWide(self:GetWide() + 14)
@@ -160,19 +160,19 @@ PANEL.Paint = function (button, w, h)
 		surface.DrawTexturedRect(6, h/2 - 8, 16, 16)
 	end
 end
-function PANEL:UpdateColours (skin)
+function PANEL:UpdateColours(skin)
 	return self:SetTextStyleColor(self.labelCol or SF.Editor.colors.light)
 end
-function PANEL:SetHoverColor (col)
+function PANEL:SetHoverColor(col)
 	self.backgroundHoverCol = col
 end
-function PANEL:SetColor (col)
+function PANEL:SetColor(col)
 	self.backgroundCol = col
 end
-function PANEL:SetLabelColor (col)
+function PANEL:SetLabelColor(col)
 	self.labelCol = col
 end
-function PANEL:DoClick ()
+function PANEL:DoClick()
 
 end
 
@@ -208,7 +208,7 @@ local invalid_filename_chars = {
 
 PANEL = {}
 
-function PANEL:Init ()
+function PANEL:Init()
 end
 
 function PANEL:Setup(folder)
@@ -299,11 +299,11 @@ function PANEL:AddFiles(filter)
 	self.Root:SetExpanded(true)
 end
 
-function PANEL:ReloadTree ()
+function PANEL:ReloadTree()
 	self:AddFiles("")
 end
 
-function PANEL:DoRightClick (node)
+function PANEL:DoRightClick(node)
 	local menu
 	if node:GetFileName() then
 		menu = "file"
@@ -415,7 +415,7 @@ derma.DefineControl("StarfallFileTree", "", PANEL, "DTree")
 -- File Browser
 PANEL = {}
 
-function PANEL:Init ()
+function PANEL:Init()
 
 	self:Dock(FILL)
 	self:DockMargin(0, 5, 0, 0)
@@ -431,7 +431,7 @@ function PANEL:Init ()
 	searchBox:SetValue("Search...")
 
 	searchBox._OnGetFocus = searchBox.OnGetFocus
-	function searchBox:OnGetFocus ()
+	function searchBox:OnGetFocus()
 		if self:GetValue() == "Search..." then
 			self:SetValue("")
 		end
@@ -439,14 +439,14 @@ function PANEL:Init ()
 	end
 
 	searchBox._OnLoseFocus = searchBox.OnLoseFocus
-	function searchBox:OnLoseFocus ()
+	function searchBox:OnLoseFocus()
 		if self:GetValue() == "" then
 			self:SetText("Search...")
 		end
 		searchBox:_OnLoseFocus()
 	end
 
-	function searchBox:OnChange ()
+	function searchBox:OnChange()
 
 		tree:AddFiles(self:GetValue():PatternSafe())
 
@@ -463,7 +463,7 @@ function PANEL:Init ()
 		searchBox:SetValue("Search...")
 	end
 end
-function PANEL:GetComponents ()
+function PANEL:GetComponents()
 	return self.searchBox, self.tree
 end
 
@@ -474,7 +474,7 @@ derma.DefineControl("StarfallFileBrowser", "", PANEL, "DPanel")
 
 PANEL = {}
 
-local function CreatePermissionsPanel ( parent )
+local function CreatePermissionsPanel( parent )
 	local chip = parent.chip
 	local panel = vgui.Create( 'DPanel', parent )
 	panel:Dock( FILL )
@@ -635,7 +635,7 @@ function PANEL:OpenForChip( chip, showOverrides )
 
 end
 
-function PANEL:Init ()
+function PANEL:Init()
 	self:ShowCloseButton( false )
 	self:DockPadding( 5, 5, 5, 5 )
 	self:SetSize( 640, 400 )

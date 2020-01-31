@@ -113,7 +113,7 @@ local function loadSessions()
 	end
 end
 
-local function createLibraryMap ()
+local function createLibraryMap()
 	local libMap, libs = {}, {}
 	local libsLookup = {}
 	
@@ -164,7 +164,7 @@ end
 
 local function fixKeys(key, notfirst)
 
-	local function repeatKey ()
+	local function repeatKey()
 		timer.Create("repeatKey"..key, not notfirst and 0.5 or 0.02, 1, function () TabHandler.html:OnKeyCodePressed(key, true) end)
 	end
 
@@ -288,9 +288,9 @@ function TabHandler:RegisterSettings()
 	form.Header:SetVisible(false)
 	form.Paint = function () end
 
-	local function setDoClick (panel)
+	local function setDoClick(panel)
 		panel:SetDark(false)
-		function panel:OnChange ()
+		function panel:OnChange()
 			saveSettings()
 			timer.Simple(0.1, function () updateSettings() end)
 		end
@@ -373,7 +373,7 @@ function TabHandler:Init() -- It's caled when editor is initalized, you can crea
 		local libMap, libs = createLibraryMap()
 		html:QueueJavascript("libraryMap = " .. util.TableToJSON(libMap))
 		html:QueueJavascript("createStarfallMode(\"" .. libs .. "\")")
-		function html:OnKeyCodePressed (key, notfirst)
+		function html:OnKeyCodePressed(key, notfirst)
 
 			if input.IsKeyDown(KEY_LCONTROL) then
 				self:OnShortcut(key)

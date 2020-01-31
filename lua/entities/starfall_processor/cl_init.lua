@@ -8,7 +8,7 @@ function ENT:Initialize()
 	self.name = "Generic ( No-Name )"
 end
 
-function ENT:OnRemove ()
+function ENT:OnRemove()
 	if self.instance then
 		self.instance:runScriptHook("removed")
 	end

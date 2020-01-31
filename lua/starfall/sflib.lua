@@ -371,7 +371,7 @@ SF.Errormeta = {
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
 -- @param prependinfo The error message needs file and line number info
-function SF.MakeError (msg, level, uncatchable, prependinfo)
+function SF.MakeError(msg, level, uncatchable, prependinfo)
 	level = 1 + (level or 1)
 	local info = debug.getinfo(level, "Sl")
 	if not info then
@@ -560,7 +560,7 @@ end
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame
 -- @param uncatchable Makes this exception uncatchable
-function SF.Throw (msg, level, uncatchable)
+function SF.Throw(msg, level, uncatchable)
 	local level = 1 + (level or 1)
 	error(SF.MakeError(msg, level, uncatchable, true), level)
 end
@@ -768,7 +768,7 @@ if SERVER then
 	util.AddNetworkString("starfall_addnotify")
 	util.AddNetworkString("starfall_console_print")
 
-	function SF.AddNotify (ply, msg, notifyType, duration, sound)
+	function SF.AddNotify(ply, msg, notifyType, duration, sound)
 		if not (ply and ply:IsValid()) then return end
 
 		net.Start("starfall_addnotify")
@@ -783,7 +783,7 @@ if SERVER then
 		end
 	end
 
-	function SF.Print (ply, msg)
+	function SF.Print(ply, msg)
 		net.Start("starfall_console_print")
 			net.WriteString(msg)
 		if ply then net.Send(ply) else net.Broadcast() end
@@ -791,7 +791,7 @@ if SERVER then
 
 else
 
-	function SF.AddNotify (ply, msg, type, duration, sound)
+	function SF.AddNotify(ply, msg, type, duration, sound)
 		if ply == LocalPlayer() then
 			print(msg)
 			GAMEMODE:AddNotify(msg, notificationsMap[type], duration)

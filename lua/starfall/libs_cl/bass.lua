@@ -56,7 +56,7 @@ end
 -- @param path File path to play from.
 -- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
-function bass_library.loadFile (path, flags, callback)
+function bass_library.loadFile(path, flags, callback)
 	checkpermission(instance, nil, "bass.loadFile")
 	
 	checkluatype(path, TYPE_STRING)
@@ -93,7 +93,7 @@ end
 -- @param path URL path to play from.
 -- @param flags Flags for the sound (`3d`, `mono`, `noplay`, `noblock`).
 -- @param callback Function which is called when the sound channel is loaded. It'll get 3 arguments: `Bass` object, error number and name.
-function bass_library.loadURL (path, flags, callback)
+function bass_library.loadURL(path, flags, callback)
 	checkpermission(instance, path, "bass.loadURL")
 
 	checkluatype(path, TYPE_STRING)
@@ -149,7 +149,7 @@ function bass_methods:destroy()
 end
 
 --- Starts to play the sound.
-function bass_methods:play ()
+function bass_methods:play()
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -160,7 +160,7 @@ function bass_methods:play ()
 end
 
 --- Stops playing the sound.
-function bass_methods:stop ()
+function bass_methods:stop()
 	local uw =  unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -171,7 +171,7 @@ function bass_methods:stop ()
 end
 
 --- Pauses the sound.
-function bass_methods:pause ()
+function bass_methods:pause()
 	local uw =  unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -183,7 +183,7 @@ end
 
 --- Sets the volume of the sound channel.
 -- @param vol Volume multiplier (1 is normal), between 0x and 10x.
-function bass_methods:setVolume (vol)
+function bass_methods:setVolume(vol)
 	checkluatype(vol, TYPE_NUMBER)
 	local uw = unwrap(self)
 
@@ -196,7 +196,7 @@ end
 
 --- Sets the pitch of the sound channel.
 -- @param pitch Pitch to set to, between 0 and 3.
-function bass_methods:setPitch (pitch)
+function bass_methods:setPitch(pitch)
 	checkluatype(pitch, TYPE_NUMBER)
 	local uw = unwrap(self)
 
@@ -209,7 +209,7 @@ end
 
 --- Sets the position of the sound in 3D space. Must have `3d` flag to get this work on.
 -- @param pos Where to position the sound.
-function bass_methods:setPos (pos)
+function bass_methods:setPos(pos)
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -222,7 +222,7 @@ end
 --- Sets the fade distance of the sound in 3D space. Must have `3d` flag to get this work on.
 -- @param min The channel's volume is at maximum when the listener is within this distance
 -- @param max The channel's volume stops decreasing when the listener is beyond this distance.
-function bass_methods:setFade (min, max)
+function bass_methods:setFade(min, max)
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -234,7 +234,7 @@ end
 
 --- Sets whether the sound channel should loop. Requires the 'noblock' flag
 -- @param loop Boolean of whether the sound channel should loop.
-function bass_methods:setLooping (loop)
+function bass_methods:setLooping(loop)
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -246,7 +246,7 @@ end
 
 --- Gets the length of a sound channel.
 -- @return Sound channel length in seconds.
-function bass_methods:getLength ()
+function bass_methods:getLength()
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -258,7 +258,7 @@ end
 
 --- Sets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @param time Sound channel playback time in seconds.
-function bass_methods:setTime (time)
+function bass_methods:setTime(time)
 	checkluatype(time, TYPE_NUMBER)
 	local uw = unwrap(self)
 
@@ -271,7 +271,7 @@ end
 
 --- Gets the current playback time of the sound channel. Requires the 'noblock' flag
 -- @return Sound channel playback time in seconds.
-function bass_methods:getTime ()
+function bass_methods:getTime()
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")
@@ -284,7 +284,7 @@ end
 --- Perform fast Fourier transform algorithm to compute the DFT of the sound channel.
 -- @param n Number of consecutive audio samples, between 0 and 7. Depending on this parameter you will get 256*2^n samples.
 -- @return Table containing DFT magnitudes, each between 0 and 1.
-function bass_methods:getFFT (n)
+function bass_methods:getFFT(n)
 	local uw = unwrap(self)
 
 	checkpermission(instance, nil, "sound.modify")

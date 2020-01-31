@@ -36,7 +36,7 @@ function helper.create()
 	helper.Frame:Center()
 	helper.Frame:SetTitle("SF Helper")
 	helper.Frame._PerformLayout2 = helper.Frame.PerformLayout
-	function helper.Frame:PerformLayout (...)
+	function helper.Frame:PerformLayout(...)
 		local w, h = helper.Frame:GetSize()
 		if w < 620 then w = 620 end
 		if h < 410 then h = 410 end
@@ -388,7 +388,7 @@ function helper.create()
 		text = string.gsub(text, "<[^>]*>", "")
 		return text
 	end
-	createDocList("Functions", function (view, doc)
+	createDocList("Functions", function(view, doc)
 		for _, func in ipairs(doc.functions) do
 			local func_data = doc.functions[func]
 			local line = view.FunctionsList:AddLine(func .. "( " .. table.concat(func_data.param, ", ") .. " )", formatText(func_data.summary))

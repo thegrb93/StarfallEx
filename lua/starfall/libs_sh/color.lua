@@ -53,7 +53,7 @@ end
 local rgb = { r = 1, g = 2, b = 3, a = 4, h = 1, s = 2, v = 3, l = 3 }
 
 --- __newindex metamethod
-function color_meta.__newindex (t, k, v)
+function color_meta.__newindex(t, k, v)
 	if rgb[k] then
 		rawset(t, rgb[k], v)
 	else
@@ -62,7 +62,7 @@ function color_meta.__newindex (t, k, v)
 end
 
 --- __index metamethod
-function color_meta.__index (t, k)
+function color_meta.__index(t, k)
 	local method = color_methods[k]
 	if method then
 		return method
@@ -72,18 +72,18 @@ function color_meta.__index (t, k)
 end
 
 --- __tostring metamethod
-function color_meta.__tostring (c)
+function color_meta.__tostring(c)
 	return c[1] .. " " .. c[2] .. " " .. c[3] .. " " .. c[4]
 end
 
 --- __concat metamethod
-function color_meta.__concat (...)
+function color_meta.__concat(...)
 	local t = { ... }
 	return tostring(t[1]) .. tostring(t[2])
 end
 
 --- __eq metamethod
-function color_meta.__eq (a, b)
+function color_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3] and a[4]==b[4]
 end
 
@@ -91,7 +91,7 @@ end
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Added color.
-function color_meta.__add (a, b)
+function color_meta.__add(a, b)
 
 	return wrap({ clamp(a[1] + b[1]), clamp(a[2] + b[2]), clamp(a[3] + b[3]), clamp(a[4] + b[4]) })
 end
@@ -100,7 +100,7 @@ end
 -- @param lhs Left side of equation
 -- @param rhs Right side of equation
 -- @return Subtracted color.
-function color_meta.__sub (a, b)
+function color_meta.__sub(a, b)
 
 	return wrap({ clamp(a[1]-b[1]), clamp(a[2]-b[2]), clamp(a[3]-b[3]), clamp(a[4]-b[4]) })
 end
@@ -108,7 +108,7 @@ end
 --- multiplication metamethod
 -- @param b Number or Color to multiply by
 -- @return Scaled color.
-function color_meta.__mul (a, b)
+function color_meta.__mul(a, b)
 	if isnumber(b) then
 		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
 	elseif isnumber(a) then
@@ -125,7 +125,7 @@ end
 --- division metamethod
 -- @param b Number or Color to multiply by
 -- @return Scaled color.
-function color_meta.__div (a, b)
+function color_meta.__div(a, b)
 	if isnumber(b) then
 		return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
 	elseif isnumber(a) then
@@ -142,7 +142,7 @@ end
 --- Converts the color from RGB to HSV.
 --@shared
 --@return A triplet of numbers representing HSV.
-function color_methods:rgbToHSV ()
+function color_methods:rgbToHSV()
 	local h, s, v = ColorToHSV(self)
 	return wrap({ h, s, v, 255 })
 end
@@ -150,7 +150,7 @@ end
 --- Converts the color from HSV to RGB.
 --@shared
 --@return A triplet of numbers representing HSV.
-function color_methods:hsvToRGB ()
+function color_methods:hsvToRGB()
 	local rgb = HSVToColor(self[1], self[2], self[3])
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
 end

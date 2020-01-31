@@ -10,7 +10,7 @@ if SERVER then return end
 local Particle = class("Particle")
 
 -- Let's add our constructor definition
-function Particle:initialize (x, y, scale, xv, yv, clr)
+function Particle:initialize(x, y, scale, xv, yv, clr)
 	-- Just standard assignment, we want to make sure we get all the properties.
 	-- If one of the params is nil, then the default value, 0, will be assigned.
 	self.x = x or 0
@@ -22,7 +22,7 @@ function Particle:initialize (x, y, scale, xv, yv, clr)
 end
 
 -- A think method, we'll use this to change particle states.
-function Particle:think ()
+function Particle:think()
 	-- We draw first, then change state.
 
 	self:draw()
@@ -44,7 +44,7 @@ function Particle:think ()
 end
 
 -- draw method so that each pixel can be drawn by itself.
-function Particle:draw ()
+function Particle:draw()
 	render.setColor(self.color)
 	render.drawRect(self.x + 512, self.y + 780, self.scale, self.scale)
 end

@@ -42,13 +42,13 @@ if SERVER then
 	--- Returns the driver of the vehicle
 	-- @server
 	-- @return Driver of vehicle
-	function vehicle_methods:getDriver ()
+	function vehicle_methods:getDriver()
 		return pwrap(getveh(self):GetDriver())
 	end
 
 	--- Ejects the driver of the vehicle
 	-- @server
-	function vehicle_methods:ejectDriver ()
+	function vehicle_methods:ejectDriver()
 		local driver = getveh(self):GetDriver()
 		if driver:IsValid() then
 			driver:ExitVehicle()
@@ -59,14 +59,14 @@ if SERVER then
 	-- @server
 	-- @param n The index of the passenger to get
 	-- @return The passenger or NULL if empty
-	function vehicle_methods:getPassenger (n)
+	function vehicle_methods:getPassenger(n)
 		checkluatype(n, TYPE_NUMBER)
 		return pwrap(getveh(self):GetPassenger(n))
 	end
 
 	--- Kills the driver of the vehicle
 	-- @server
-	function vehicle_methods:killDriver ()
+	function vehicle_methods:killDriver()
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.kill")
 		local driver = ent:GetDriver()
@@ -78,7 +78,7 @@ if SERVER then
 	--- Strips weapons of the driver
 	-- @param class Optional weapon class to strip. Otherwise all are stripped.
 	-- @server
-	function vehicle_methods:stripDriver (class)
+	function vehicle_methods:stripDriver(class)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.strip")

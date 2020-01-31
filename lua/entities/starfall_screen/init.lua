@@ -3,7 +3,7 @@ AddCSLuaFile('shared.lua')
 include('shared.lua')
 
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -33,7 +33,7 @@ function ENT:Use(activator)
 	end
 end
 
-function ENT:LinkEnt (ent, ply)
+function ENT:LinkEnt(ent, ply)
 	self.link = ent
 	net.Start("starfall_processor_link")
 		net.WriteEntity(self)
@@ -41,14 +41,14 @@ function ENT:LinkEnt (ent, ply)
 	if ply then net.Send(ply) else net.Broadcast() end
 end
 
-function ENT:PreEntityCopy ()
+function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	if (self.link and self.link:IsValid()) then
 		duplicator.StoreEntityModifier(self, "SFLink", { link = self.link:EntIndex() })
 	end
 end
 
-function ENT:PostEntityPaste (ply, ent, CreatedEntities)
+function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFLink then
 		local info = ent.EntityMods.SFLink
 		if info.link then

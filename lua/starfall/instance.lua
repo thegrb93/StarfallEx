@@ -419,7 +419,7 @@ local function safeThrow(self, msg, nocatch, force)
 	end
 end
 
-local function xpcall_callback (err)
+local function xpcall_callback(err)
 	if dgetmeta(err)~=SF.Errormeta then
 		return SF.MakeError(err, 1)
 	end

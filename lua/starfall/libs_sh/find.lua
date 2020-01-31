@@ -45,7 +45,7 @@ end
 -- @param max Top corner
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inBox (min, max, filter)
+function find_library.inBox(min, max, filter)
 	checkpermission(instance, nil, "find")
 
 	local min, max = vunwrap(min), vunwrap(max)
@@ -58,7 +58,7 @@ end
 -- @param radius Sphere radius
 -- @param filter Optional function to filter results
 -- @return An array of found entities
-function find_library.inSphere (center, radius, filter)
+function find_library.inSphere(center, radius, filter)
 	checkpermission(instance, nil, "find")
 	checkluatype (radius, TYPE_NUMBER)
 
@@ -144,7 +144,7 @@ if SERVER then
 	-- @param pos Vector view point
 	-- @param filter Optional function to filter results
 	-- @return An array of found entities
-	function find_library.inPVS (pos, filter)
+	function find_library.inPVS(pos, filter)
 		checkpermission(instance, nil, "find")
 		
 		return convert(ents.FindInPVS(vunwrap(pos)), filter)

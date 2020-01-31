@@ -10,7 +10,7 @@ surface.CreateFont("Starfall_ErrorFont", {
 	weight = 200
 })
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
 	net.Start("starfall_processor_update_links")
@@ -52,7 +52,7 @@ function ENT:Initialize ()
 	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
 end
 
-function ENT:LinkEnt (ent)
+function ENT:LinkEnt(ent)
 	self.link = ent
 end
 
@@ -82,7 +82,7 @@ function ENT:RenderScreen()
 	end
 end
 
-function ENT:Draw ()
+function ENT:Draw()
 	self:DrawModel()
 end
 
@@ -91,7 +91,7 @@ function ENT:SetBackgroundColor(r, g, b, a)
 end
 
 local writez = Material("engine/writez")
-function ENT:DrawTranslucent ()
+function ENT:DrawTranslucent()
 	self:DrawModel()
 
 	if halo.RenderedEntity() == self then return end

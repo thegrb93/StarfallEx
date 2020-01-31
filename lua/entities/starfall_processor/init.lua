@@ -2,7 +2,7 @@ AddCSLuaFile("cl_init.lua")
 AddCSLuaFile("shared.lua")
 include("shared.lua")
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
 	self:SetSolid(SOLID_VPHYSICS)
@@ -62,7 +62,7 @@ function ENT:OnRemove()
 	self:Destroy()
 end
 
-function ENT:Think ()
+function ENT:Think()
 	if self.instance then
 		local bufferAvg = self.instance.cpu_average
 		self:SetNWInt("CPUus", math.Round(bufferAvg * 1000000))
@@ -124,7 +124,7 @@ local function EntityLookup(CreatedEntities)
 		if (ent and ent:IsValid()) then return ent else return default end
 	end
 end
-function ENT:PostEntityPaste (ply, ent, CreatedEntities)
+function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFDupeInfo then
 		local info = ent.EntityMods.SFDupeInfo
 

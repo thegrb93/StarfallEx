@@ -47,7 +47,7 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 -- @param path Filepath relative to data/sf_filedata/.
 -- @param mode The file mode to use. See lua manual for explaination
 -- @return File object or nil if it failed
-function file_library.open (path, mode)
+function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (mode, TYPE_STRING)
@@ -61,7 +61,7 @@ end
 --- Reads a file from path
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return Contents, or nil if error
-function file_library.read (path)
+function file_library.read(path)
 	checkpermission (instance, path, "file.read")
 	checkluatype (path, TYPE_STRING)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
@@ -70,7 +70,7 @@ end
 --- Writes to a file
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return True if OK, nil if error
-function file_library.write (path, data)
+function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (data, TYPE_STRING)
@@ -84,7 +84,7 @@ end
 --- Appends a string to the end of a file
 -- @param path Filepath relative to data/sf_filedata/.
 -- @param data String that will be appended to the file.
-function file_library.append (path, data)
+function file_library.append(path, data)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	checkluatype (data, TYPE_STRING)
@@ -98,7 +98,7 @@ end
 --- Checks if a file exists
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return True if exists, false if not, nil if error
-function file_library.exists (path)
+function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
 	checkluatype (path, TYPE_STRING)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
@@ -107,7 +107,7 @@ end
 --- Deletes a file
 -- @param path Filepath relative to data/sf_filedata/.
 -- @return True if successful, nil if it wasn't found
-function file_library.delete (path)
+function file_library.delete(path)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	path = "sf_filedata/" .. SF.NormalizePath(path)
@@ -119,7 +119,7 @@ end
 
 --- Creates a directory
 -- @param path Filepath relative to data/sf_filedata/.
-function file_library.createDir (path)
+function file_library.createDir(path)
 	checkpermission (instance, path, "file.write")
 	checkluatype (path, TYPE_STRING)
 	file.CreateDir("sf_filedata/" .. SF.NormalizePath(path))
@@ -130,7 +130,7 @@ end
 -- @param sorting Optional sorting arguement. Either nameasc, namedesc, dateasc, datedesc
 -- @return Table of file names
 -- @return Table of directory names
-function file_library.find (path, sorting)
+function file_library.find(path, sorting)
 	checkpermission (instance, path, "file.find")
 	checkluatype (path, TYPE_STRING)
 	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end

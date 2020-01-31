@@ -69,7 +69,7 @@ if CLIENT then
 		['"'] = "",
 	}
 
-	function SF.Editor.init ()
+	function SF.Editor.init()
 
 		if not file.Exists("starfall", "DATA") then
 			file.CreateDir("starfall")
@@ -80,7 +80,7 @@ if CLIENT then
 		SF.Editor.initialized = true
 	end
 
-	function SF.Editor.open ()
+	function SF.Editor.open()
 		if not SF.Editor.initialized then SF.Editor.init() end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
@@ -100,11 +100,11 @@ if CLIENT then
 		SF.Editor.editor:PasteCode(code)
 	end
 
-	function SF.Editor.close ()
+	function SF.Editor.close()
 		SF.Editor.editor:Close()
 	end
 
-	function SF.Editor.getCode ()
+	function SF.Editor.getCode()
 		return SF.Editor.editor:GetCode() or ""
 	end
 
@@ -147,7 +147,7 @@ if CLIENT then
 		return files
 	end
 
-	function SF.Editor.createEditor ()
+	function SF.Editor.createEditor()
 		local editor = vgui.Create("StarfallEditorFrame") --Should define own frame later
 
 		if SF.Editor.editor then SF.Editor.editor:Remove() end
@@ -227,7 +227,7 @@ if CLIENT then
 			if openfiles[codepath] or file.Exists("starfall/" .. codepath, "DATA") then return codepath end
 		end
 
-		local function recursiveLoad (path, curdir)
+		local function recursiveLoad(path, curdir)
 			local code, codedir, codepath
 
 			local codepath = findCodePath(path, curdir)
@@ -285,7 +285,7 @@ if CLIENT then
 		end
 		local ok, msg = pcall(recursiveLoad, mainfile, string.GetPathFromFilename(mainfile))
 
-		local function findCycle (file, visited, recStack)
+		local function findCycle(file, visited, recStack)
 			if not visited[file] then
 				--Mark the current file as visited and part of recursion stack
 				visited[file] = true
@@ -410,14 +410,14 @@ elseif SERVER then
 		return handler(ply, args)
 	end)
 
-	function starfall_event.editor_open (ply, args)
+	function starfall_event.editor_open(ply, args)
 		net.Start("starfall_editor_status")
 		net.WriteEntity(ply)
 		net.WriteBit(true)
 		net.Broadcast()
 	end
 
-	function starfall_event.editor_close (ply, args)
+	function starfall_event.editor_close(ply, args)
 		net.Start("starfall_editor_status")
 		net.WriteEntity(ply)
 		net.WriteBit(false)

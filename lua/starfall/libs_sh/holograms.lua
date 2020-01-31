@@ -219,7 +219,7 @@ end
 
 --- Checks how many holograms can be spawned
 -- @return number of holograms able to be spawned
-function holograms_library.hologramsLeft ()
+function holograms_library.hologramsLeft()
 	if not SF.Permissions.hasAccess(instance,  nil, "hologram.create") then return 0 end
 	return plyCount:check(instance.player)
 end
@@ -240,7 +240,7 @@ if SERVER then
 	--- Suppress Engine Lighting of a hologram. Disabled by default.
 	-- @shared
 	-- @param suppress Boolean to represent if shading should be set or not.
-	function hologram_methods:suppressEngineLighting (suppress)
+	function hologram_methods:suppressEngineLighting(suppress)
 		local holo = getholo(self)
 
 		checkluatype(suppress, TYPE_BOOL)
@@ -253,7 +253,7 @@ if SERVER then
 	--- Sets the hologram linear velocity
 	-- @server
 	-- @param vel New velocity
-	function hologram_methods:setVel (vel)
+	function hologram_methods:setVel(vel)
 		local vel = vunwrap(vel)
 
 		local holo = getholo(self)
@@ -265,7 +265,7 @@ if SERVER then
 	--- Sets the hologram's angular velocity.
 	-- @server
 	-- @param angvel *Vector* angular velocity.
-	function hologram_methods:setAngVel (angvel)
+	function hologram_methods:setAngVel(angvel)
 
 		local holo = getholo(self)
 		checkpermission(instance, holo, "hologram.setRenderProperty")
@@ -394,7 +394,7 @@ else
 		SF.SetHologramScale(holo, scale)
 	end
 
-	function hologram_methods:suppressEngineLighting (suppress)
+	function hologram_methods:suppressEngineLighting(suppress)
 		local holo = getholo(self)
 
 		checkluatype(suppress, TYPE_BOOL)
@@ -409,7 +409,7 @@ else
 	--- Parents a hologram
 	-- @param ent Entity parent (nil to unparent)
 	-- @param attachment Optional attachment ID
-	function hologram_methods:setParent (ent, attachment)
+	function hologram_methods:setParent(ent, attachment)
 		
 		local holo = getholo(self)
 		

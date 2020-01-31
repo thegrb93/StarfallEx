@@ -6,7 +6,7 @@ util.AddNetworkString("starfall_hud_set_enabled")
 
 local vehiclelinks = SF.EntityTable("vehicleLinks")
 
-function ENT:Initialize ()
+function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 	self:PhysicsInit(SOLID_VPHYSICS)
 	self:SetMoveType(MOVETYPE_VPHYSICS)
@@ -76,7 +76,7 @@ function ENT:Use(ply)
 	end
 end
 
-function ENT:LinkEnt (ent, ply)
+function ENT:LinkEnt(ent, ply)
 	self.link = ent
 	net.Start("starfall_processor_link")
 		net.WriteEntity(self)
@@ -118,7 +118,7 @@ hook.Add("PlayerLeaveVehicle", "Starfall_HUD_PlayerLeaveVehicle", function(ply, 
 	end
 end)
 
-function ENT:PreEntityCopy ()
+function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	local info = {}
 	if (self.link and self.link:IsValid()) then
@@ -138,7 +138,7 @@ function ENT:PreEntityCopy ()
 	end
 end
 
-function ENT:PostEntityPaste (ply, ent, CreatedEntities)
+function ENT:PostEntityPaste(ply, ent, CreatedEntities)
 	if ent.EntityMods and ent.EntityMods.SFLink then
 		local info = ent.EntityMods.SFLink
 		if info.link then

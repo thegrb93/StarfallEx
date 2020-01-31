@@ -698,7 +698,7 @@ if CLIENT then
 	--- Returns how many triangles can be created
 	-- @return Number of triangles that can be created
 	-- @client
-	function mesh_library.trianglesLeft ()
+	function mesh_library.trianglesLeft()
 		if haspermission(instance, nil, "mesh") then
 			return plyTriangleCount:check(instance.player)
 		else
@@ -709,7 +709,7 @@ if CLIENT then
 	--- Returns how many triangles can be rendered
 	-- @return Number of triangles that can be rendered
 	-- @client
-	function mesh_library.trianglesLeftRender ()
+	function mesh_library.trianglesLeftRender()
 		if haspermission(instance, nil, "mesh") then
 			return plyTriangleRenderBurst:check(instance.player)
 		else

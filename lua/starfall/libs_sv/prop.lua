@@ -214,7 +214,7 @@ local allowed_components = {
 -- @param frozen True to spawn frozen
 -- @server
 -- @return Component entity
-function props_library.createComponent (pos, ang, class, model, frozen)
+function props_library.createComponent(pos, ang, class, model, frozen)
 	checkpermission(instance,  nil, "prop.create")
 	checkluatype(class, TYPE_STRING)
 
@@ -271,7 +271,7 @@ end
 -- @param frozen True to spawn frozen
 -- @server
 -- @return The sent object
-function props_library.createSent (pos, ang, class, frozen)
+function props_library.createSent(pos, ang, class, frozen)
 
 	checkpermission(instance,  nil, "prop.create")
 

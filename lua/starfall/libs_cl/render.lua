@@ -848,7 +848,7 @@ end
 --- Creates a new render target to draw onto.
 -- The dimensions will always be 1024x1024
 -- @param name The name of the render target
-function render_library.createRenderTarget (name)
+function render_library.createRenderTarget(name)
 	checkluatype (name, TYPE_STRING)
 
 	local data = instance.data.render
@@ -879,7 +879,7 @@ end
 --- Selects the render target to draw on.
 -- Nil for the visible RT.
 -- @param name Name of the render target to use
-function render_library.selectRenderTarget (name)
+function render_library.selectRenderTarget(name)
 	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name then
@@ -929,7 +929,7 @@ end
 --- Sets the active texture to the render target with the specified name.
 -- Nil to reset.
 -- @param name Name of the render target to use
-function render_library.setRenderTargetTexture (name)
+function render_library.setRenderTargetTexture(name)
 	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if name == nil then
@@ -952,7 +952,7 @@ end
 
 --- Sets the texture of a screen entity
 -- @param ent Screen entity
-function render_library.setTextureFromScreen (ent)
+function render_library.setTextureFromScreen(ent)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	ent = getent(ent)
@@ -1000,7 +1000,7 @@ end
 --- Clears the active render target
 -- @param clr Color type to clear with
 -- @param depth Boolean if should clear depth
-function render_library.clear (clr, depth)
+function render_library.clear(clr, depth)
 	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	if instance.data.render.usingRT then
 		if clr == nil then
@@ -1017,7 +1017,7 @@ end
 -- @param y Top left corner y coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRoundedBox (r, x, y, w, h)
+function render_library.drawRoundedBox(r, x, y, w, h)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	draw.RoundedBox(r, x, y, w, h, currentcolor)
 end
@@ -1032,7 +1032,7 @@ end
 -- @param tr Boolean Top right corner
 -- @param bl Boolean Bottom left corner
 -- @param br Boolean Bottom right corner
-function render_library.drawRoundedBoxEx (r, x, y, w, h, tl, tr, bl, br)
+function render_library.drawRoundedBoxEx(r, x, y, w, h, tl, tr, bl, br)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	draw.RoundedBoxEx(r, x, y, w, h, currentcolor, tl, tr, bl, br)
 end
@@ -1055,7 +1055,7 @@ end
 -- @param y Top left corner y
 -- @param w Width
 -- @param h Height
-function render_library.drawRectFast (x, y, w, h)
+function render_library.drawRectFast(x, y, w, h)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawRect(x, y, w, h)
 end
@@ -1065,7 +1065,7 @@ end
 -- @param y Top left corner y
 -- @param w Width
 -- @param h Height
-function render_library.drawRect (x, y, w, h)
+function render_library.drawRect(x, y, w, h)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
 	render.SetColorMaterial()
@@ -1077,7 +1077,7 @@ end
 -- @param y Top left corner y integer coordinate
 -- @param w Width
 -- @param h Height
-function render_library.drawRectOutline (x, y, w, h)
+function render_library.drawRectOutline(x, y, w, h)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawOutlinedRect(x, y, w, h)
 end
@@ -1086,7 +1086,7 @@ end
 -- @param x Center x coordinate
 -- @param y Center y coordinate
 -- @param r Radius
-function render_library.drawCircle (x, y, r)
+function render_library.drawCircle(x, y, r)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawCircle(x, y, r, currentcolor)
 end
@@ -1097,7 +1097,7 @@ end
 -- @param y Top left corner y
 -- @param w Width
 -- @param h Height
-function render_library.drawTexturedRectFast (x, y, w, h)
+function render_library.drawTexturedRectFast(x, y, w, h)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawTexturedRect(x, y, w, h)
 end
@@ -1107,7 +1107,7 @@ end
 -- @param y Top left corner y
 -- @param w Width
 -- @param h Height
-function render_library.drawTexturedRect (x, y, w, h)
+function render_library.drawTexturedRect(x, y, w, h)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	makeQuad(x, y, w, h)
 	render.DrawQuad(quad_v1, quad_v2, quad_v3, quad_v4, currentcolor)
@@ -1124,7 +1124,7 @@ end
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
 -- @param UVHack If enabled, will scale the UVs to compensate for internal bug. Should be true for user created materials.
-function render_library.drawTexturedRectUVFast (x, y, w, h, startU, startV, endU, endV, UVHack)
+function render_library.drawTexturedRectUVFast(x, y, w, h, startU, startV, endU, endV, UVHack)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	if UVHack then
@@ -1146,7 +1146,7 @@ end
 -- @param startV Texture mapping at rectangle origin
 -- @param endV Texture mapping at rectangle end
 -- @param endV Texture mapping at rectangle end
-function render_library.drawTexturedRectUV (x, y, w, h, startU, startV, endU, endV)
+function render_library.drawTexturedRectUV(x, y, w, h, startU, startV, endU, endV)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
@@ -1187,7 +1187,7 @@ end
 -- @param w Width
 -- @param h Height
 -- @param rot Rotation in degrees
-function render_library.drawTexturedRectRotatedFast (x, y, w, h, rot)
+function render_library.drawTexturedRectRotatedFast(x, y, w, h, rot)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	surface.DrawTexturedRectRotated(x, y, w, h, rot)
@@ -1199,7 +1199,7 @@ end
 -- @param w Width
 -- @param h Height
 -- @param rot Rotation in degrees
-function render_library.drawTexturedRectRotated (x, y, w, h, rot)
+function render_library.drawTexturedRectRotated(x, y, w, h, rot)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	local rad = math.rad(rot)
@@ -1226,7 +1226,7 @@ end
 -- @param y1 Y start integer coordinate
 -- @param x2 X end interger coordinate
 -- @param y2 Y end integer coordinate
-function render_library.drawLine (x1, y1, x2, y2)
+function render_library.drawLine(x1, y1, x2, y2)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	surface.DrawLine(x1, y1, x2, y2)
 end
@@ -1345,7 +1345,7 @@ end
 -- @param y Y coordinate
 -- @param text Text to draw
 -- @param alignment Text alignment
-function render_library.drawText (x, y, text, alignment)
+function render_library.drawText(x, y, text, alignment)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
@@ -1365,7 +1365,7 @@ end
 -- @param text Text to draw
 -- @param xalign Text x alignment
 -- @param yalign Text y alignment
-function render_library.drawSimpleText (x, y, text, xalign, yalign)
+function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
@@ -1424,7 +1424,7 @@ end
 
 --- Enables or disables Depth Buffer
 -- @param enable true to enable
-function render_library.enableDepth (enable)
+function render_library.enableDepth(enable)
 	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	checkluatype (enable, TYPE_BOOL)
 	render.OverrideDepthEnable(enable, enable)
@@ -1467,7 +1467,7 @@ end
 -- @param radius Radius of the sphere
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
-function render_library.draw3DSphere (pos, radius, longitudeSteps, latitudeSteps)
+function render_library.draw3DSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (radius, TYPE_NUMBER)
 	checkluatype (longitudeSteps, TYPE_NUMBER)
@@ -1483,7 +1483,7 @@ end
 -- @param radius Radius of the sphere
 -- @param longitudeSteps The amount of longitude steps. The larger this number is, the smoother the sphere is
 -- @param latitudeSteps The amount of latitude steps. The larger this number is, the smoother the sphere is
-function render_library.draw3DWireframeSphere (pos, radius, longitudeSteps, latitudeSteps)
+function render_library.draw3DWireframeSphere(pos, radius, longitudeSteps, latitudeSteps)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (radius, TYPE_NUMBER)
 	checkluatype (longitudeSteps, TYPE_NUMBER)
@@ -1497,7 +1497,7 @@ end
 --- Draws a 3D Line
 -- @param startPos Starting position
 -- @param endPos Ending position
-function render_library.draw3DLine (startPos, endPos)
+function render_library.draw3DLine(startPos, endPos)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	startPos = vunwrap(startPos)
 	endPos = vunwrap(endPos)
@@ -1510,7 +1510,7 @@ end
 -- @param angle Orientation of the box
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
-function render_library.draw3DBox (origin, angle, mins, maxs)
+function render_library.draw3DBox(origin, angle, mins, maxs)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
 	mins = vunwrap(mins)
@@ -1525,7 +1525,7 @@ end
 -- @param angle Orientation of the box
 -- @param mins Start position of the box, relative to origin.
 -- @param maxs End position of the box, relative to origin.
-function render_library.draw3DWireframeBox (origin, angle, mins, maxs)
+function render_library.draw3DWireframeBox(origin, angle, mins, maxs)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	origin = vunwrap(origin)
 	mins = vunwrap(mins)
@@ -1541,7 +1541,7 @@ end
 -- @param width The width of the beam.
 -- @param textureStart The start coordinate of the texture used.
 -- @param textureEnd The end coordinate of the texture used.
-function render_library.draw3DBeam (startPos, endPos, width, textureStart, textureEnd)
+function render_library.draw3DBeam(startPos, endPos, width, textureStart, textureEnd)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	checkluatype (width, TYPE_NUMBER)
 	checkluatype (textureStart, TYPE_NUMBER)
@@ -1558,7 +1558,7 @@ end
 -- @param vert2 The second vertex.
 -- @param vert3 The third vertex.
 -- @param vert4 The fourth vertex.
-function render_library.draw3DQuad (vert1, vert2, vert3, vert4)
+function render_library.draw3DQuad(vert1, vert2, vert3, vert4)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 
 	vert1 = vunwrap(vert1)
@@ -1574,7 +1574,7 @@ end
 -- @param vert2 The second vertex.
 -- @param vert3 The third vertex.
 -- @param vert4 The fourth vertex.
-function render_library.draw3DQuadUV (vert1, vert2, vert3, vert4)
+function render_library.draw3DQuadUV(vert1, vert2, vert3, vert4)
 	if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	mesh.Begin(MATERIAL_QUADS, 1)
 	local ok, err = pcall(function()
@@ -1660,7 +1660,7 @@ function render_library.getScreenEntity()
 end
 
 --- Dumps the current render target and allows the pixels to be accessed by render.readPixel.
-function render_library.capturePixels ()
+function render_library.capturePixels()
 	local data = instance.data.render
 	if not data.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
@@ -1674,7 +1674,7 @@ end
 -- @param x Pixel x-coordinate.
 -- @param y Pixel y-coordinate.
 -- @return Color object with ( r, g, b, 255 ) from the specified pixel.
-function render_library.readPixel (x, y)
+function render_library.readPixel(x, y)
 	local data = instance.data.render
 	if not data.isRendering then
 		SF.Throw("Not in rendering hook.", 2)

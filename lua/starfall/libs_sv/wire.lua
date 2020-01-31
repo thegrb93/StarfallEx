@@ -44,14 +44,14 @@ instance:AddHook("initialize", function()
 		WireLib.CreateOutputs(ent, {})
 	end
 
-	function ent:TriggerInput (key, value)
+	function ent:TriggerInput(key, value)
 		local instance = self.instance
 		if instance then
 			instance:runScriptHook("input", key, instance.WireInputConverters[self.Inputs[key].Type](value))
 		end
 	end
 
-	function ent:ReadCell (address)
+	function ent:ReadCell(address)
 		if self.instance then
 			local tbl = self.instance:runScriptHookForResult("readcell", address)
 			if tbl[1] then
@@ -61,7 +61,7 @@ instance:AddHook("initialize", function()
 		return 0
 	end
 
-	function ent:WriteCell (address, data)
+	function ent:WriteCell(address, data)
 		if self.instance then
 			local tbl = self.instance:runScriptHookForResult("writecell", address, data)
 			if tbl[1] then
@@ -241,7 +241,7 @@ local sfTypeToWireTypeTable = {
 -- letter and contain only alphabetical characters.
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. Can be shortcuts. May be modified by the function.
-function wire_library.adjustInputs (names, types)
+function wire_library.adjustInputs(names, types)
 	checkpermission(instance, nil, "wire.setInputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
@@ -269,7 +269,7 @@ end
 -- letter and contain only alphabetical characters.
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. Can be shortcuts. May be modified by the function.
-function wire_library.adjustOutputs (names, types)
+function wire_library.adjustOutputs(names, types)
 	checkpermission(instance, nil, "wire.setOutputs")
 	checkluatype(names, TYPE_TABLE)
 	checkluatype(types, TYPE_TABLE)
@@ -326,7 +326,7 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param width Width of the wire(optional)
 -- @param color Color of the wire(optional)
 -- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
-function wire_library.create (entI, entO, inputname, outputname, width, color, material)
+function wire_library.create(entI, entO, inputname, outputname, width, color, material)
 	checkluatype(inputname, TYPE_STRING)
 	checkluatype(outputname, TYPE_STRING)
 
@@ -410,21 +410,21 @@ end
 --- Returns a table of entity's inputs
 -- @param entI Entity with input(s)
 -- @return Table of entity's inputs
-function wire_library.getInputs (entI)
+function wire_library.getInputs(entI)
 	return parseEntity(entI, "Inputs")
 end
 
 --- Returns a table of entity's outputs
 -- @param entO Entity with output(s)
 -- @return Table of entity's outputs
-function wire_library.getOutputs (entO)
+function wire_library.getOutputs(entO)
 	return parseEntity(entO, "Outputs")
 end
 
 --- Returns a wirelink to a wire entity
 -- @param ent Wire entity
 -- @return Wirelink of the entity
-function wire_library.getWirelink (ent)
+function wire_library.getWirelink(ent)
 	ent = eunwrap(ent)
 	if not ent:IsValid() then return end
 	checkpermission(instance, ent, "wire.wirelink")

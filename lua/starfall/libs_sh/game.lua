@@ -25,7 +25,7 @@ game_library.getHostname = GetHostName
 
 --- Returns true if the server is on a LAN
 -- @return boolean True if the game is a lan game
-function game_library.isLan ()
+function game_library.isLan()
 	return GetConVar("sv_lan"):GetBool()
 end
 

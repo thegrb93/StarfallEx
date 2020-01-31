@@ -17,7 +17,7 @@ local json_library = instance.Libraries.json
 --@param tbl Table to encode
 --@param prettyPrint Optional. If true, formats and indents the resulting JSON
 --@return JSON encoded string representation of the table
-function json_library.encode (tbl, prettyPrint)
+function json_library.encode(tbl, prettyPrint)
 	SF.CheckLuaType(tbl, TYPE_TABLE)
 	return util.TableToJSON(instance.Unsanitize(tbl), prettyPrint)
 end
@@ -25,7 +25,7 @@ end
 --- Convert JSON string to table
 -- @param s String to decode
 -- @return Table representing the JSON object
-function json_library.decode (s)
+function json_library.decode(s)
 	SF.CheckLuaType(s, TYPE_STRING)
 	return instance.Sanitize(util.JSONToTable(s))
 end

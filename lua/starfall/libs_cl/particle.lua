@@ -81,7 +81,7 @@ end
 -- @param pattach PATTACH enum
 -- @param options Table of options
 -- @return Particle type.
-function particle_library.attach (entity, particle, pattach, options)
+function particle_library.attach(entity, particle, pattach, options)
 	checkpermission (instance.player, entity, "particle.attach")
 
 	checkluatype (particle, TYPE_STRING)

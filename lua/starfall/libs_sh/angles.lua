@@ -47,7 +47,7 @@ end
 local pyr = { p = 1, y = 2, r = 3, pitch = 1, yaw = 2, roll = 3 }
 
 --- __newindex metamethod
-function ang_meta.__newindex (t, k, v)
+function ang_meta.__newindex(t, k, v)
 	if pyr[k] then
 		rawset(t, pyr[k], v)
 	else
@@ -57,7 +57,7 @@ end
 
 --- __index metamethod
 -- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
-function ang_meta.__index (t, k)
+function ang_meta.__index(t, k)
 	local method = ang_methods[k]
 	if method then
 		return method
@@ -70,14 +70,14 @@ local table_concat = table.concat
 
 --- tostring metamethod
 -- @return string representing the angle.
-function ang_meta.__tostring (a)
+function ang_meta.__tostring(a)
 	return table_concat(a, ' ', 1, 3)
 end
 
 --- __mul metamethod ang1 * b or ang1 * ang2.
 -- @param b Number or Angle to multiply by.
 -- @return resultant angle.
-function ang_meta.__mul (a, b)
+function ang_meta.__mul(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	elseif isnumber(a) then
@@ -94,7 +94,7 @@ end
 --- __div metamethod ang1 / b or ang1 / ang2.
 -- @param b Number or Angle to divided by.
 -- @return resultant angle.
-function ang_meta.__div (a, b)
+function ang_meta.__div(a, b)
 	if isnumber(b) then
 		return wrap({ a[1] / b, a[2] / b, a[3] / b })
 	elseif isnumber(a) then
@@ -110,21 +110,21 @@ end
 
 --- __unm metamethod -ang.
 -- @return resultant angle.
-function ang_meta.__unm (a)
+function ang_meta.__unm(a)
 	return wrap({ -a[1], -a[2], -a[3] })
 end
 
 --- __eq metamethod ang1 == ang2.
 -- @param a Angle to check against.
 -- @return bool
-function ang_meta.__eq (a, b)
+function ang_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
 --- __add metamethod ang1 + ang2.
 -- @param a Angle to add.
 -- @return resultant angle.
-function ang_meta.__add (a, b)
+function ang_meta.__add(a, b)
 
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
@@ -132,20 +132,20 @@ end
 --- __sub metamethod ang1 - ang2.
 -- @param a Angle to subtract.
 -- @return resultant angle.
-function ang_meta.__sub (a, b)
+function ang_meta.__sub(a, b)
 
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
 --- Returns if p,y,r are all 0.
 -- @return boolean
-function ang_methods:isZero ()
+function ang_methods:isZero()
 	return self[1]==0 and self[2]==0 and self[3]==0
 end
 
 --- Normalise angles eg (0,181,1) -> (0,-179,1).
 -- @return nil
-function ang_methods:normalize ()
+function ang_methods:normalize()
 	self[1] = math_nAng(self[1])
 	self[2] = math_nAng(self[2])
 	self[3] = math_nAng(self[3])
@@ -153,25 +153,25 @@ end
 
 --- Converts all the angle values to be -180 to 180
 -- @return Normalized angle table
-function ang_methods:getNormalized ()
+function ang_methods:getNormalized()
 	return wrap({ (tbl[1] + 180) % 360 - 180, (tbl[2] + 180) % 360 - 180, (tbl[3] + 180) % 360 - 180 })
 end
 
 --- Return the Forward Vector ( direction the angle points ).
 -- @return vector normalised.
-function ang_methods:getForward ()
+function ang_methods:getForward()
 	return vwrap(unwrap(self):Forward())
 end
 
 --- Return the Right Vector relative to the angle dir.
 -- @return vector normalised.
-function ang_methods:getRight ()
+function ang_methods:getRight()
 	return vwrap(unwrap(self):Right())
 end
 
 --- Return the Up Vector relative to the angle dir.
 -- @return vector normalised.
-function ang_methods:getUp ()
+function ang_methods:getUp()
 	return vwrap(unwrap(self):Up())
 end
 
@@ -180,7 +180,7 @@ end
 -- @param deg Number of degrees or nil if radians.
 -- @param rad Number of radians or nil if degrees.
 -- @return The modified angle
-function ang_methods:rotateAroundAxis (v, deg, rad)
+function ang_methods:rotateAroundAxis(v, deg, rad)
 
 	if rad then
 		checkluatype (rad, TYPE_NUMBER)
@@ -214,7 +214,7 @@ end
 
 --- Sets p,y,r to 0. This is faster than doing it manually.
 -- @return nil
-function ang_methods:setZero ()
+function ang_methods:setZero()
 	self[1] = 0
 	self[2] = 0
 	self[3] = 0

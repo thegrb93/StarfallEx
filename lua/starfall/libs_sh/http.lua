@@ -70,7 +70,7 @@ end
 -- @param callbackSuccess the function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail the function to be called on request fail, taking the failing reason as an argument
 -- @param headers GET headers to be sent
-function http_library.get (url, callbackSuccess, callbackFail, headers)
+function http_library.get(url, callbackSuccess, callbackFail, headers)
 	checkpermission(instance, url, "http.get")
 
 	httpRequestReady()
@@ -100,7 +100,7 @@ end
 -- @param callbackSuccess optional function to be called on request success, taking the arguments body (string), length (number), headers (table) and code (number)
 -- @param callbackFail optional function to be called on request fail, taking the failing reason as an argument
 -- @param headers optional POST headers to be sent
-function http_library.post (url, payload, callbackSuccess, callbackFail, headers)
+function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 	checkluatype(url, TYPE_STRING)
 	checkpermission(instance, url, "http.post")
 
