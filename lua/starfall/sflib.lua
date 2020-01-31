@@ -1188,18 +1188,15 @@ do
 				print("Reloaded library: " .. name)
 				SF.Modules[name] = {}
 				if file.Exists(sh_filename, "LUA") then
-					local source = file.Read(sh_filename, "LUA")
-					addModule(source, name, sh_filename, true)
+					addModule(name, sh_filename, true)
 					sendToClientTbl[#sendToClientTbl+1] = sh_filename
 				end
 				if file.Exists(sv_filename, "LUA") then
-					local source = file.Read(sv_filename, "LUA")
-					addModule(source, name, sv_filename, true)
+					addModule(name, sv_filename, true)
 				end
 			end
 			if file.Exists(cl_filename, "LUA") then
-				local source = file.Read(cl_filename, "LUA")
-				addModule(source, name, cl_filename, false)
+				addModule(name, cl_filename, false)
 				sendToClientTbl[#sendToClientTbl+1] = cl_filename
 			end
 			if #sendToClientTbl>0 then
@@ -1238,7 +1235,7 @@ do
 						local t2 = t[path]
 						if not t2 then t2 = {} t[path] = t2 end
 						t2.source = code
-						if init and shouldrun then
+						if shouldrun then
 							t2.init = compileModule(code, path)
 						end
 					end
