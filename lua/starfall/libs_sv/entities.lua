@@ -344,16 +344,6 @@ function ents_methods:removeCollisionListener()
 	end
 end
 
---- Set's the entity to collide with nothing but the world
--- @param nocollide Whether to collide with nothing except world or not.
-function ents_methods:setNocollideAll(nocollide)
-	local ent = getent(self)
-	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
-	checkpermission(instance, ent, "entities.setSolid")
-
-	ent:SetCollisionGroup (nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE)
-end
-
 --- Sets whether an entity's shadow should be drawn
 -- @param ply Optional player argument to set only for that player. Can also be table of players.
 function ents_methods:setDrawShadow(draw, ply)
@@ -478,6 +468,28 @@ function ents_methods:setSolid(solid)
 	checkpermission(instance, ent, "entities.setSolid")
 
 	ent:SetNotSolid(not solid)
+end
+
+--- Sets the entity's collision group
+-- @param group The COLLISION_GROUP value to set it to
+function ents_methods:setCollisionGroup(group)
+	checkluatype(group, TYPE_NUMBER)
+	if group < 0 or group >= LAST_SHARED_COLLISION_GROUP then SF.Throw("Invalid collision group value", 2) end
+	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
+	checkpermission(instance, ent, "entities.setSolid")
+
+	ent:SetCollisionGroup(group)
+end
+
+--- Set's the entity to collide with nothing but the world. Alias to entity:setCollisionGroup(COLLISION_GROUP_WORLD)
+-- @param nocollide Whether to collide with nothing except world or not.
+function ents_methods:setNocollideAll(nocollide)
+	local ent = getent(self)
+	if ent:IsPlayer() then SF.Throw("Target is a player!", 2) end
+	checkpermission(instance, ent, "entities.setSolid")
+
+	ent:SetCollisionGroup(nocollide and COLLISION_GROUP_WORLD or COLLISION_GROUP_NONE)
 end
 
 --- Sets the entity's mass
@@ -785,5 +797,52 @@ function ents_methods:getCreationID()
 	local ent = getent(self)
 	return ent:GetCreationID()
 end
+
+--- ENUMs of collision groups for use with entity:setCollisionGroup
+-- @name builtins_library.COLLISION_GROUP
+-- @field NONE
+-- @field DEBRIS
+-- @field DEBRIS_TRIGGER
+-- @field INTERACTIVE_DEBRIS
+-- @field INTERACTIVE
+-- @field PLAYER
+-- @field BREAKABLE_GLASS
+-- @field VEHICLE
+-- @field PLAYER_MOVEMENT
+-- @field NPC
+-- @field IN_VEHICLE
+-- @field WEAPON
+-- @field VEHICLE_CLIP
+-- @field PROJECTILE
+-- @field DOOR_BLOCKER
+-- @field PASSABLE_DOOR
+-- @field DISSOLVING
+-- @field PUSHAWAY
+-- @field NPC_ACTOR
+-- @field NPC_SCRIPTED
+-- @field WORLD
+instance.env.COLLISION_GROUP = {
+	["NONE"] = COLLISION_GROUP_NONE,
+	["DEBRIS"] = COLLISION_GROUP_DEBRIS,
+	["DEBRIS_TRIGGER"] = COLLISION_GROUP_DEBRIS_TRIGGER,
+	["INTERACTIVE_DEBRIS"] = COLLISION_GROUP_INTERACTIVE_DEBRIS,
+	["INTERACTIVE"] = COLLISION_GROUP_INTERACTIVE,
+	["PLAYER"] = COLLISION_GROUP_PLAYER,
+	["BREAKABLE_GLASS"] = COLLISION_GROUP_BREAKABLE_GLASS,
+	["VEHICLE"] = COLLISION_GROUP_VEHICLE,
+	["PLAYER_MOVEMENT"] = COLLISION_GROUP_PLAYER_MOVEMENT,
+	["NPC"] = COLLISION_GROUP_NPC,
+	["IN_VEHICLE"] = COLLISION_GROUP_IN_VEHICLE,
+	["WEAPON"] = COLLISION_GROUP_WEAPON,
+	["VEHICLE_CLIP"] = COLLISION_GROUP_VEHICLE_CLIP,
+	["PROJECTILE"] = COLLISION_GROUP_PROJECTILE,
+	["DOOR_BLOCKER"] = COLLISION_GROUP_DOOR_BLOCKER,
+	["PASSABLE_DOOR"] = COLLISION_GROUP_PASSABLE_DOOR,
+	["DISSOLVING"] = COLLISION_GROUP_DISSOLVING,
+	["PUSHAWAY"] = COLLISION_GROUP_PUSHAWAY,
+	["NPC_ACTOR"] = COLLISION_GROUP_NPC_ACTOR,
+	["NPC_SCRIPTED"] = COLLISION_GROUP_NPC_SCRIPTED,
+	["WORLD"] = COLLISION_GROUP_WORLD
+}
 
 end

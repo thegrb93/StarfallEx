@@ -31,34 +31,6 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local wep_meta, wwrap, wunwrap = instance.Types.Weapon, instance.Types.Weapon.Wrap, instance.Types.Weapon.Unwrap
 local veh_meta, vhwrap, vhunwrap = instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 
-instance.env.IN_KEY = {
-	["ALT1"] = IN_ALT1,
-	["ALT2"] = IN_ALT2,
-	["ATTACK"] = IN_ATTACK,
-	["ATTACK2"] = IN_ATTACK2,
-	["BACK"] = IN_BACK,
-	["DUCK"] = IN_DUCK,
-	["FORWARD"] = IN_FORWARD,
-	["JUMP"] = IN_JUMP,
-	["LEFT"] = IN_LEFT,
-	["MOVELEFT"] = IN_MOVELEFT,
-	["MOVERIGHT"] = IN_MOVERIGHT,
-	["RELOAD"] = IN_RELOAD,
-	["RIGHT"] = IN_RIGHT,
-	["SCORE"] = IN_SCORE,
-	["SPEED"] = IN_SPEED,
-	["USE"] = IN_USE,
-	["WALK"] = IN_WALK,
-	["ZOOM"] = IN_ZOOM,
-	["GRENADE1"] = IN_GRENADE1,
-	["GRENADE2"] = IN_GRENADE2,
-	["WEAPON1"] = IN_WEAPON1,
-	["WEAPON2"] = IN_WEAPON2,
-	["BULLRUSH"] = IN_BULLRUSH,
-	["CANCEL"] = IN_CANCEL,
-	["RUN"] = IN_RUN,
-}
-
 
 local function getply(self)
 	local ent = unwrap(self)
@@ -391,32 +363,7 @@ end
 
 --- Returns whether or not the player is pushing the key.
 -- @shared
--- @param key Key to check.
----IN_KEY.ALT1
----IN_KEY.ALT2
----IN_KEY.ATTACK
----IN_KEY.ATTACK2
----IN_KEY.BACK
----IN_KEY.DUCK
----IN_KEY.FORWARD
----IN_KEY.JUMP
----IN_KEY.LEFT
----IN_KEY.MOVELEFT
----IN_KEY.MOVERIGHT
----IN_KEY.RELOAD
----IN_KEY.RIGHT
----IN_KEY.SCORE
----IN_KEY.SPEED
----IN_KEY.USE
----IN_KEY.WALK
----IN_KEY.ZOOM
----IN_KEY.GRENADE1
----IN_KEY.GRENADE2
----IN_KEY.WEAPON1
----IN_KEY.WEAPON2
----IN_KEY.BULLRUSH
----IN_KEY.CANCEL
----IN_KEY.RUN
+-- @param key Key to check. IN_KEY table values
 -- @return True or false
 function player_methods:keyDown(key)
 	checkluatype(key, TYPE_NUMBER)
@@ -452,8 +399,6 @@ if CLIENT then
 	end
 end
 
-end
-
 --- ENUMs of in_keys for use with player:keyDown
 -- @name builtins_library.IN_KEY
 -- @class table
@@ -482,3 +427,32 @@ end
 -- @field BULLRUSH
 -- @field CANCEL
 -- @field RUN
+instance.env.IN_KEY = {
+	["ALT1"] = IN_ALT1,
+	["ALT2"] = IN_ALT2,
+	["ATTACK"] = IN_ATTACK,
+	["ATTACK2"] = IN_ATTACK2,
+	["BACK"] = IN_BACK,
+	["DUCK"] = IN_DUCK,
+	["FORWARD"] = IN_FORWARD,
+	["JUMP"] = IN_JUMP,
+	["LEFT"] = IN_LEFT,
+	["MOVELEFT"] = IN_MOVELEFT,
+	["MOVERIGHT"] = IN_MOVERIGHT,
+	["RELOAD"] = IN_RELOAD,
+	["RIGHT"] = IN_RIGHT,
+	["SCORE"] = IN_SCORE,
+	["SPEED"] = IN_SPEED,
+	["USE"] = IN_USE,
+	["WALK"] = IN_WALK,
+	["ZOOM"] = IN_ZOOM,
+	["GRENADE1"] = IN_GRENADE1,
+	["GRENADE2"] = IN_GRENADE2,
+	["WEAPON1"] = IN_WEAPON1,
+	["WEAPON2"] = IN_WEAPON2,
+	["BULLRUSH"] = IN_BULLRUSH,
+	["CANCEL"] = IN_CANCEL,
+	["RUN"] = IN_RUN,
+}
+
+end
