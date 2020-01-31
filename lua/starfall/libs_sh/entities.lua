@@ -28,7 +28,7 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 
 local function getent(self)
 	local ent = eunwrap(self)
-	if ent and (ent:IsValid() or ent:IsWorld()) then
+	if ent:IsValid() or ent:IsWorld() then
 		return ent
 	else
 		SF.Throw("Entity is not valid.", 3)

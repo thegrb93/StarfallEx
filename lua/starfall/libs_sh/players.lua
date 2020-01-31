@@ -60,6 +60,16 @@ instance.env.IN_KEY = {
 }
 
 
+local function getply(self)
+	local ent = unwrap(self)
+	if ent:IsValid() then
+		return ent
+	else
+		SF.Throw("Entity is not valid.", 3)
+	end
+end
+
+
 function player_meta:__tostring()
 	local ent = unwrap(self)
 	if not ent:IsValid() then return "(null entity)"
@@ -72,168 +82,168 @@ end
 -- @shared
 -- @return True if player alive
 function player_methods:isAlive()
-	return unwrap(self):Alive()
+	return getply(self):Alive()
 end
 
 --- Returns the players armor
 -- @shared
 -- @return Armor
 function player_methods:getArmor()
-	return unwrap(self):Armor()
+	return getply(self):Armor()
 end
 
 --- Returns whether the player is crouching
 -- @shared
 -- @return True if player crouching
 function player_methods:isCrouching()
-	return unwrap(self):Crouching()
+	return getply(self):Crouching()
 end
 
 --- Returns the amount of deaths of the player
 -- @shared
 -- @return Amount of deaths
 function player_methods:getDeaths()
-	return unwrap(self):Deaths()
+	return getply(self):Deaths()
 end
 
 --- Returns whether the player's flashlight is on
 -- @shared
 -- @return True if player has flashlight on
 function player_methods:isFlashlightOn()
-	return unwrap(self):FlashlightIsOn()
+	return getply(self):FlashlightIsOn()
 end
 
 --- Returns true if the player is noclipped
 -- @shared
 -- @return true if the player is noclipped
 function player_methods:isNoclipped()
-	return unwrap(self):GetMoveType() == MOVETYPE_NOCLIP
+	return getply(self):GetMoveType() == MOVETYPE_NOCLIP
 end
 
 --- Returns the amount of kills of the player
 -- @shared
 -- @return Amount of kills
 function player_methods:getFrags()
-	return unwrap(self):Frags()
+	return getply(self):Frags()
 end
 
 --- Returns the name of the player's active weapon
 -- @shared
 -- @return The weapon
 function player_methods:getActiveWeapon()
-	return wwrap(unwrap(self):GetActiveWeapon())
+	return wwrap(getply(self):GetActiveWeapon())
 end
 
 --- Returns the player's aim vector
 -- @shared
 -- @return Aim vector
 function player_methods:getAimVector()
-	return vwrap(unwrap(self):GetAimVector())
+	return vwrap(getply(self):GetAimVector())
 end
 
 --- Returns the player's field of view
 -- @shared
 -- @return Field of view
 function player_methods:getFOV()
-	return unwrap(self):GetFOV()
+	return getply(self):GetFOV()
 end
 
 --- Returns the player's jump power
 -- @shared
 -- @return Jump power
 function player_methods:getJumpPower()
-	return unwrap(self):GetJumpPower()
+	return getply(self):GetJumpPower()
 end
 
 --- Returns the player's maximum speed
 -- @shared
 -- @return Maximum speed
 function player_methods:getMaxSpeed()
-	return unwrap(self):GetMaxSpeed()
+	return getply(self):GetMaxSpeed()
 end
 
 --- Returns the player's name
 -- @shared
 -- @return Name
 function player_methods:getName()
-	return unwrap(self):GetName()
+	return getply(self):GetName()
 end
 
 --- Returns the player's running speed
 -- @shared
 -- @return Running speed
 function player_methods:getRunSpeed()
-	return unwrap(self):GetRunSpeed()
+	return getply(self):GetRunSpeed()
 end
 
 --- Returns the player's shoot position
 -- @shared
 -- @return Shoot position
 function player_methods:getShootPos()
-	return vwrap(unwrap(self):GetShootPos())
+	return vwrap(getply(self):GetShootPos())
 end
 
 --- Returns whether the player is in a vehicle
 -- @shared
 -- @return True if player in vehicle
 function player_methods:inVehicle()
-	return unwrap(self):InVehicle()
+	return getply(self):InVehicle()
 end
 
 --- Returns the vehicle the player is driving
 -- @shared
 -- @return Vehicle if player in vehicle or nil
 function player_methods:getVehicle()
-	return vhwrap(unwrap(self):GetVehicle())
+	return vhwrap(getply(self):GetVehicle())
 end
 
 --- Returns whether the player is an admin
 -- @shared
 -- @return True if player is admin
 function player_methods:isAdmin()
-	return unwrap(self):IsAdmin()
+	return getply(self):IsAdmin()
 end
 
 --- Returns whether the player is a bot
 -- @shared
 -- @return True if player is a bot
 function player_methods:isBot()
-	return unwrap(self):IsBot()
+	return getply(self):IsBot()
 end
 
 --- Returns whether the player is connected
 -- @shared
 -- @return True if player is connected
 function player_methods:isConnected()
-	return unwrap(self):IsConnected()
+	return getply(self):IsConnected()
 end
 
 --- Returns whether the player is frozen
 -- @shared
 -- @return True if player is frozen
 function player_methods:isFrozen()
-	return unwrap(self):IsFrozen()
+	return getply(self):IsFrozen()
 end
 
 --- Returns whether the player is an NPC
 -- @shared
 -- @return True if player is an NPC
 function player_methods:isNPC()
-	return unwrap(self):IsNPC()
+	return getply(self):IsNPC()
 end
 
 --- Returns whether the player is a player
 -- @shared
 -- @return True if player is player
 function player_methods:isPlayer()
-	return unwrap(self):IsPlayer()
+	return getply(self):IsPlayer()
 end
 
 --- Returns whether the player is a super admin
 -- @shared
 -- @return True if player is super admin
 function player_methods:isSuperAdmin()
-	return unwrap(self):IsSuperAdmin()
+	return getply(self):IsSuperAdmin()
 end
 
 --- Returns whether the player belongs to a usergroup
@@ -241,56 +251,56 @@ end
 -- @param group Group to check against
 -- @return True if player belongs to group
 function player_methods:isUserGroup(group)
-	return unwrap(self):IsUserGroup(group)
+	return getply(self):IsUserGroup(group)
 end
 
 --- Returns the player's current ping
 -- @shared
 -- @return ping
 function player_methods:getPing()
-	return unwrap(self):Ping()
+	return getply(self):Ping()
 end
 
 --- Returns the player's steam ID
 -- @shared
 -- @return steam ID
 function player_methods:getSteamID()
-	return unwrap(self):SteamID()
+	return getply(self):SteamID()
 end
 
 --- Returns the player's community ID
 -- @shared
 -- @return community ID
 function player_methods:getSteamID64()
-	return unwrap(self):SteamID64()
+	return getply(self):SteamID64()
 end
 
 --- Returns the player's current team
 -- @shared
 -- @return team
 function player_methods:getTeam()
-	return unwrap(self):Team()
+	return getply(self):Team()
 end
 
 --- Returns the name of the player's current team
 -- @shared
 -- @return team name
 function player_methods:getTeamName()
-	return team.GetName(unwrap(self):Team())
+	return team.GetName(getply(self):Team())
 end
 
 --- Returns the player's unique ID
 -- @shared
 -- @return unique ID
 function player_methods:getUniqueID()
-	return unwrap(self):UniqueID()
+	return getply(self):UniqueID()
 end
 
 --- Returns the player's user ID
 -- @shared
 -- @return user ID
 function player_methods:getUserID()
-	return unwrap(self):UserID()
+	return getply(self):UserID()
 end
 
 --- Returns a table with information of what the player is looking at
@@ -299,21 +309,21 @@ end
 function player_methods:getEyeTrace()
 	checkpermission(instance, nil, "trace")
 
-	return SF.StructWrapper(instance, unwrap(self):GetEyeTrace())
+	return SF.StructWrapper(instance, getply(self):GetEyeTrace())
 end
 
 --- Returns the player's current view entity
 -- @shared
 -- @return Player's current view entity
 function player_methods:getViewEntity()
-	return owrap(unwrap(self):GetViewEntity())
+	return owrap(getply(self):GetViewEntity())
 end
 
 --- Returns a table of weapons the player is carrying
 -- @shared
 -- @return Table of weapons
 function player_methods:getWeapons()
-	return instance.Sanitize(unwrap(self):GetWeapons())
+	return instance.Sanitize(getply(self):GetWeapons())
 end
 
 --- Returns the specified weapon or nil if the player doesn't have it
@@ -322,14 +332,14 @@ end
 -- @return weapon
 function player_methods:getWeapon(wep)
 	checkluatype(wep, TYPE_STRING)
-	return wwrap(unwrap(self):GetWeapon(wep))
+	return wwrap(getply(self):GetWeapon(wep))
 end
 
 --- Returns the entity that the player is standing on
 -- @shared
 -- @return Ground entity
 function player_methods:getGroundEntity()
-	return owrap(unwrap(self):GetGroundEntity())
+	return owrap(getply(self):GetGroundEntity())
 end
 
 --- Gets the amount of ammo the player has.
@@ -339,21 +349,21 @@ end
 function player_methods:getAmmoCount(id)
 	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
 
-	return unwrap(self):GetAmmoCount(id)
+	return getply(self):GetAmmoCount(id)
 end
 
 --- Returns whether the player is typing in their chat
 -- @shared
 -- @return bool true/false
 function player_methods:isTyping()
-	return unwrap(self):IsTyping()
+	return getply(self):IsTyping()
 end
 
 --- Returns whether the player is sprinting
 -- @shared
 -- @return bool true/false
 function player_methods:isSprinting()
-	return unwrap(self):IsSprinting()
+	return getply(self):IsSprinting()
 end
 
 if SERVER then
@@ -361,7 +371,7 @@ if SERVER then
 	-- @server
 	-- @param ent Entity to set the player's view entity to, or nothing to reset it
 	function player_methods:setViewEntity(ent)
-		local pl = unwrap(self)
+		local pl = getply(self)
 		if ent~=nil then
 			ent = getent(ent)
 		end
@@ -375,7 +385,7 @@ if SERVER then
 	-- @server
 	-- @return True if the player has godmode
 	function player_methods:hasGodMode()
-		return unwrap(self):HasGodMode()
+		return getply(self):HasGodMode()
 	end
 end
 
@@ -411,34 +421,34 @@ end
 function player_methods:keyDown(key)
 	checkluatype(key, TYPE_NUMBER)
 
-	return unwrap(self):KeyDown(key)
+	return getply(self):KeyDown(key)
 end
 
 if CLIENT then
 	--- Returns the relationship of the player to the local client
 	-- @return One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
-		unwrap(self):GetFriendStatus()
+		getply(self):GetFriendStatus()
 	end
 
 	--- Returns whether the local player has muted the player
 	-- @return True if the player was muted
 	function player_methods:isMuted()
-		unwrap(self):IsMuted()
+		getply(self):IsMuted()
 	end
 	
 	--- Returns whether the player is heard by the local player.
 	-- @client
 	-- @return bool true/false
 	function player_methods:isSpeaking()
-		unwrap(self):IsSpeaking()
+		getply(self):IsSpeaking()
 	end
 
 	--- Returns the voice volume of the player
 	-- @client
 	-- @return Returns the players voice volume, how loud the player's voice communication currently is, as a normal number. Doesn't work on local player unless the voice_loopback convar is set to 1.
 	function player_methods:voiceVolume()
-		unwrap(self):VoiceVolume()
+		getply(self):VoiceVolume()
 	end
 end
 

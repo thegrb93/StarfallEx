@@ -23,6 +23,14 @@ return function(instance)
 local vehicle_methods, vehicle_meta, wrap, unwrap = instance.Types.Vehicle.Methods, instance.Types.Vehicle, instance.Types.Vehicle.Wrap, instance.Types.Vehicle.Unwrap
 local pwrap = instance.Types.Player.Wrap
 
+local function getveh(self)
+	local ent = unwrap(self)
+	if ent:IsValid() then
+		return ent
+	else
+		SF.Throw("Entity is not valid.", 3)
+	end
+end
 
 function vehicle_meta:__tostring()
 	local ent = unwrap(self)
@@ -35,13 +43,13 @@ if SERVER then
 	-- @server
 	-- @return Driver of vehicle
 	function vehicle_methods:getDriver ()
-		return pwrap(unwrap(self):GetDriver())
+		return pwrap(getveh(self):GetDriver())
 	end
 
 	--- Ejects the driver of the vehicle
 	-- @server
 	function vehicle_methods:ejectDriver ()
-		local driver = unwrap(self):GetDriver()
+		local driver = getveh(self):GetDriver()
 		if driver:IsValid() then
 			driver:ExitVehicle()
 		end
@@ -53,13 +61,13 @@ if SERVER then
 	-- @return The passenger or NULL if empty
 	function vehicle_methods:getPassenger (n)
 		checkluatype(n, TYPE_NUMBER)
-		return pwrap(unwrap(self):GetPassenger(n))
+		return pwrap(getveh(self):GetPassenger(n))
 	end
 
 	--- Kills the driver of the vehicle
 	-- @server
 	function vehicle_methods:killDriver ()
-		local ent = unwrap(self)
+		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.kill")
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
@@ -72,7 +80,7 @@ if SERVER then
 	-- @server
 	function vehicle_methods:stripDriver (class)
 		if class ~= nil then checkluatype(class, TYPE_STRING) end
-		local ent = unwrap(self)
+		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.strip")
 		local driver = ent:GetDriver()
 		if driver:IsValid() then
@@ -87,7 +95,7 @@ if SERVER then
 	--- Will lock the vehicle preventing players from entering or exiting the vehicle.
 	-- @server
 	function vehicle_methods:lock()
-		local ent = unwrap(self)
+		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.lock")
 		local n = "SF_CanExitVehicle"..ent:EntIndex()
 		hook.Add("CanExitVehicle", n, function(v) if v==ent then return false end end)
@@ -98,7 +106,7 @@ if SERVER then
 	--- Will unlock the vehicle.
 	-- @server
 	function vehicle_methods:unlock()
-		local ent = unwrap(self)
+		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.lock")
 		hook.Remove("CanExitVehicle", "SF_CanExitVehicle"..ent:EntIndex())
 		ent:Fire("Unlock")
