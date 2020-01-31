@@ -312,6 +312,20 @@ function ents_methods:applyTorque(torque)
 	phys:ApplyTorqueCenter(torque)
 end
 
+local entity_collisions = {}
+local function addCollisions(func)
+	return function(data)
+		if next(entity_collisions)==nil then
+			timer.Simple(0, function()
+				for i=1, #entity_collisions do
+					instance:runFunction(func, SF.StructWrapper(instance, entity_collisions[i]))
+					entity_collisions[i] = nil
+				end
+			end)
+		end
+		entity_collisions[#entity_collisions+1] = data
+	end
+end
 --- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
 -- @param func The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
 function ents_methods:addCollisionListener(func)
@@ -319,15 +333,12 @@ function ents_methods:addCollisionListener(func)
 	checkluatype(func, TYPE_FUNCTION)
 	checkpermission(instance, ent, "entities.canTool")
 	
+	local callback = addCollisions(func)
 	if ent:GetClass() ~= "starfall_prop" then
 		if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
-		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data)
-			instance:runFunction(func, SF.StructWrapper(instance, data))
-		end)
+		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
 	else
-		function ent:PhysicsCollide( data, phys )
-			instance:runFunction(func, SF.StructWrapper(instance, data))
-		end
+		function ent:PhysicsCollide( data, phys ) callback(data) end
 	end
 end
 
