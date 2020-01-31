@@ -244,7 +244,7 @@ function vmatrix_methods:getAxisAngle()
 	if math.abs(m01-m10)< epsilon and math.abs(m02-m20)< epsilon and math.abs(m12-m21)< epsilon then
 		// singularity found
 		if math.abs(m01+m10) < epsilon and math.abs(m02+m20) < epsilon and math.abs(m12+m21) < epsilon and math.abs(m00+m11+m22-3) < epsilon then
-			return vwrap2(1,0,0), 0
+			return vwrap2({1,0,0}), 0
 		end
 		// otherwise this singularity is angle = math.pi
 		local xx = (m00+1)/2
@@ -255,24 +255,24 @@ function vmatrix_methods:getAxisAngle()
 		local yz = (m12+m21)/4
 		if xx > yy and xx > zz then
 			if xx < epsilon then
-				return vwrap2(0, 0.7071, 0.7071), math.pi
+				return vwrap2({0, 0.7071, 0.7071}), math.pi
 			else
 				local x = math.sqrt(xx)
-				return vwrap2(x, xy/x, xz/x), math.pi
+				return vwrap2({x, xy/x, xz/x}), math.pi
 			end
 		elseif yy > zz then
 			if yy < epsilon then
-				return vwrap2(0.7071, 0, 0.7071), math.pi
+				return vwrap2({0.7071, 0, 0.7071}), math.pi
 			else
 				local y = math.sqrt(yy)
-				return vwrap2(y, xy/y, yz/y), math.pi
+				return vwrap2({y, xy/y, yz/y}), math.pi
 			end
 		else
 			if zz < epsilon then
-				return vwrap2(0.7071, 0.7071, 0), math.pi
+				return vwrap2({0.7071, 0.7071, 0}), math.pi
 			else
 				local z = math.sqrt(zz)
-				return vwrap2(z, xz/z, yz/z), math.pi
+				return vwrap2({z, xz/z, yz/z}), math.pi
 			end
 		end
 	end
