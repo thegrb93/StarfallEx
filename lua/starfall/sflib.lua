@@ -618,17 +618,25 @@ function SF.WaitForEntity(index, callback)
 	end
 end
 
-function SF.WaitForPlayerInit(ply, name, func)
-	local n = "SF_WaitForPlayerInit"..name..ply:EntIndex()
-	hook.Add("SetupMove", n, function(ply2, mv, cmd)
-		if ply:IsValid() then
-			if ply == ply2 and not cmd:IsForced() then
-				func()
-				hook.Remove("SetupMove", n)
+if SERVER then
+	local initplayers = {}
+	concommand.Add("_sf_plyinit",function(ply)
+		if initplayers[ply] then
+			for k, v in ipairs(initplayers[ply]) do
+				v()
 			end
-		else
-			hook.Remove("SetupMove", n)
+			initplayers[ply] = nil
 		end
+	end)
+	function SF.WaitForPlayerInit(ply, func)
+		local t = initplayers[ply]
+		if not t then t = {} initplayers[ply] = t end
+		t[#t+1] = func
+	end
+else
+	hook.Add("HUDPaint","SF_Init",function()
+		RunConsoleCommand("_sf_plyinit")
+		hook.Remove("HUDPaint","SF_Init")
 	end)
 end
 
@@ -1150,7 +1158,7 @@ do
 		SF.Permissions.loadPermissionOptions()
 
 		hook.Add("PlayerInitialSpawn","SF_Initialize_Libraries",function(ply)
-			SF.WaitForPlayerInit(ply, "InitLibs", function()
+			SF.WaitForPlayerInit(ply, function()
 				local files = {}
 				for name, mod in pairs(SF.Modules) do
 					for path, val in pairs(mod) do
