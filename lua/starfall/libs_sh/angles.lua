@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local dgetmeta = debug.getmetatable
 
 --- Angle Type
 -- @name Angle
@@ -26,7 +27,7 @@ local function wrap(tbl)
 	return setmetatable(tbl, ang_meta)
 end
 
---- Creates an Angle struct. Can be indexed with: 1, 2, 3, pitch, yaw, roll. 1,2,3 is most efficient.
+--- Creates an Angle struct.
 -- @name builtins_library.Angle
 -- @class function
 -- @param p - Pitch
@@ -55,6 +56,7 @@ function ang_meta.__newindex (t, k, v)
 end
 
 --- __index metamethod
+-- Can be indexed with: 1, 2, 3, p, y, r, pitch, yaw, roll. 1,2,3 is most efficient.
 function ang_meta.__index (t, k)
 	local method = ang_methods[k]
 	if method then
@@ -72,22 +74,38 @@ function ang_meta.__tostring (a)
 	return table_concat(a, ' ', 1, 3)
 end
 
---- __mul metamethod ang1 * n.
--- @param n Number to multiply by.
+--- __mul metamethod ang1 * b or ang1 * ang2.
+-- @param b Number or Angle to multiply by.
 -- @return resultant angle.
-function ang_meta.__mul (a, n)
-	checkluatype (n, TYPE_NUMBER)
-
-	return wrap({ a[1] * n, a[2] * n, a[3] * n })
+function ang_meta.__mul (a, b)
+	if isnumber(b) then
+		return wrap({ a[1] * b, a[2] * b, a[3] * b })
+	elseif isnumber(a) then
+		return wrap({ b[1] * a, b[2] * a, b[3] * a })
+	elseif dgetmeta(a) == ang_meta and dgetmeta(b) == ang_meta then
+		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
+	elseif dgetmeta(a) == ang_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
 end
 
---- __div metamethod ang1 / n.
--- @param n Number to divided by.
+--- __div metamethod ang1 / b or ang1 / ang2.
+-- @param b Number or Angle to divided by.
 -- @return resultant angle.
-function ang_meta.__div (a, n)
-	checkluatype (n, TYPE_NUMBER)
-
-	return wrap({ a[1] / n, a[2] / n, a[3] / n })
+function ang_meta.__div (a, b)
+	if isnumber(b) then
+		return wrap({ a[1] / b, a[2] / b, a[3] / b })
+	elseif isnumber(a) then
+		return wrap({ a / b[1], a / b[2], a / b[3] })
+	elseif dgetmeta(a) == ang_meta and dgetmeta(b) == ang_meta then
+		return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
+	elseif dgetmeta(a) == ang_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
 end
 
 --- __unm metamethod -ang.
@@ -122,12 +140,7 @@ end
 --- Returns if p,y,r are all 0.
 -- @return boolean
 function ang_methods:isZero ()
-	if self[1] ~= 0 then return false
-	elseif self[2] ~= 0 then return false
-	elseif self[3] ~= 0 then return false
-	end
-
-	return true
+	return self[1]==0 and self[2]==0 and self[3]==0
 end
 
 --- Normalise angles eg (0,181,1) -> (0,-179,1).

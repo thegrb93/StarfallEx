@@ -106,28 +106,37 @@ function color_meta.__sub (a, b)
 end
 
 --- multiplication metamethod
--- @param lhs Left side of equation
--- @param rhs Right side of equation
+-- @param b Number or Color to multiply by
 -- @return Scaled color.
 function color_meta.__mul (a, b)
-	if dgetmeta(a) == color_meta then
-		checkluatype (b, TYPE_NUMBER)
-
+	if isnumber(b) then
 		return wrap({ clamp(a[1] * b), clamp(a[2] * b), clamp(a[3] * b), clamp(a[4] * b) })
-	else
-		checkluatype (a, TYPE_NUMBER)
-
+	elseif isnumber(a) then
 		return wrap({ clamp(b[1] * a), clamp(b[2] * a), clamp(b[3] * a), clamp(b[4] * a) })
+	elseif dgetmeta(a) == color_meta and dgetmeta(b) == color_meta then
+		return wrap({ clamp(a[1] * b[1]), clamp(a[2] * b[2]), clamp(a[3] * b[3]), clamp(a[4] * b[4]) })
+	elseif dgetmeta(a) == color_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
 	end
 end
 
 --- division metamethod
--- @param rhs Right side of equation
+-- @param b Number or Color to multiply by
 -- @return Scaled color.
 function color_meta.__div (a, b)
-	checkluatype (b, TYPE_NUMBER)
-
-	return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
+	if isnumber(b) then
+		return wrap({ clamp(a[1] / b), clamp(a[2] / b), clamp(a[3] / b), clamp(a[4] / b) })
+	elseif isnumber(a) then
+		return wrap({ clamp(b[1] / a), clamp(b[2] / a), clamp(b[3] / a), clamp(b[4] / a) })
+	elseif dgetmeta(a) == color_meta and dgetmeta(b) == color_meta then
+		return wrap({ clamp(a[1] / b[1]), clamp(a[2] / b[2]), clamp(a[3] / b[3]), clamp(a[4] / b[4]) })
+	elseif dgetmeta(a) == color_meta then
+		checkluatype(b, TYPE_NUMBER)
+	else
+		checkluatype(a, TYPE_NUMBER)
+	end
 end
 
 --- Converts the color from RGB to HSV.

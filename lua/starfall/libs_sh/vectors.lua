@@ -29,7 +29,7 @@ local function wrap(tbl)
 	return setmetatable(tbl, vec_meta)
 end
 
---- Creates a Vector struct. Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
+--- Creates a Vector struct.
 -- @name builtins_library.Vector
 -- @class function
 -- @param x - X
@@ -73,6 +73,7 @@ end
 local math_min = math.min
 
 --- __index metamethod
+-- Can be indexed with: 1, 2, 3, x, y, z, xx, xy, xz, xxx, xyz, zyx, etc.. 1,2,3 is most efficient.
 function vec_meta.__index (t, k)
 	local method = vec_methods[k]
 	if method ~= nil then
@@ -107,16 +108,16 @@ end
 -- @param rhs Right side of equation
 -- @return Scaled vector.
 function vec_meta.__mul (a, b)
-	if dgetmeta(a) == vec_meta then
-		if dgetmeta(b) == vec_meta then
-			return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
-		end
-
-		checkluatype(b, TYPE_NUMBER)
+	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
+	elseif isnumber(a) then
+		return wrap({ b[1] * a, b[2] * a, b[3] * a })
+	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == vec_meta then
+		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
+	elseif dgetmeta(a) == vec_meta then
+		checkluatype(b, TYPE_NUMBER)
 	else
 		checkluatype(a, TYPE_NUMBER)
-		return wrap({ b[1] * a, b[2] * a, b[3] * a })
 	end
 end
 
@@ -124,16 +125,16 @@ end
 -- @param b Scalar or vector to divide the scalar or vector by
 -- @return Scaled vector.
 function vec_meta.__div (a, b)
-	if dgetmeta(a) == vec_meta then
-		if dgetmeta(b) == vec_meta then
-			return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
-		else
-			checkluatype(b, TYPE_NUMBER)
-			return wrap({ a[1] / b, a[2] / b, a[3] / b })
-		end
+	if isnumber(b) then
+		return wrap({ a[1] / b, a[2] / b, a[3] / b })
+	elseif isnumber(a) then
+		return wrap({ a / b[1], a / b[2], a / b[3] })
+	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == vec_meta then
+		return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
+	elseif dgetmeta(a) == vec_meta then
+		checkluatype(b, TYPE_NUMBER)
 	else
 		checkluatype(a, TYPE_NUMBER)
-		return wrap({ a / b[1], a / b[2], a / b[3] })
 	end
 end
 
@@ -244,12 +245,7 @@ end
 --- Are all fields zero.
 -- @return bool True/False
 function vec_methods:isZero ()
-	if self[1] ~= 0 then return false
-	elseif self[2] ~= 0 then return false
-	elseif self[3] ~= 0 then return false
-	end
-
-	return true
+	return self[1]==0 and self[2]==0 and self[3]==0
 end
 
 --- Get the vector's Length.
