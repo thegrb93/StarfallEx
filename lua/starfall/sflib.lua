@@ -618,25 +618,17 @@ function SF.WaitForEntity(index, callback)
 	end
 end
 
-if SERVER then
-	local initplayers = setmetatable({},{__mode="k"})
-	concommand.Add("_sf_plyinit",function(ply)
-		if initplayers[ply] then
-			for k, v in ipairs(initplayers[ply]) do
-				v()
+function SF.WaitForPlayerInit(ply, name, func)
+	local n = "SF_WaitForPlayerInit"..name..ply:EntIndex()
+	hook.Add("SetupMove", n, function(ply2, mv, cmd)
+		if ply:IsValid() then
+			if ply == ply2 and not cmd:IsForced() then
+				func()
+				hook.Remove("SetupMove", n)
 			end
-			initplayers[ply] = nil
+		else
+			hook.Remove("SetupMove", n)
 		end
-	end)
-	function SF.WaitForPlayerInit(ply, func)
-		local t = initplayers[ply]
-		if not t then t = {} initplayers[ply] = t end
-		t[#t+1] = func
-	end
-else
-	hook.Add("HUDPaint","SF_Init",function()
-		RunConsoleCommand("_sf_plyinit")
-		hook.Remove("HUDPaint","SF_Init")
 	end)
 end
 
@@ -1129,10 +1121,16 @@ do
 		return init
 	end
 	
-	local function addModule(source, name, path, shouldrun)
-		local init
-		if shouldrun then
-			init = compileModule(source, path)
+	local function addModule(name, path, shouldrun)
+		local source, init
+		if SERVER then
+			AddCSLuaFile(path)
+			source = file.Read(path, "LUA")
+			if shouldrun then
+				init = compileModule(source, path)
+			end
+		else
+			init = CompileFile(path)()
 		end
 		local tbl = SF.Modules[name]
 		if not tbl then tbl = {} SF.Modules[name] = tbl end
@@ -1143,22 +1141,20 @@ do
 		local l = file.Find(folder.."*.lua", "LUA")
 		for _, filename in pairs(l) do
 			local path = folder..filename
-			local source = file.Read(path, "LUA")
-			addModule(source, string.StripExtension(filename), path, shouldrun)
+			addModule(string.StripExtension(filename), path, shouldrun)
 		end
 	end
+
+	loadModules("starfall/libs_sh/", SERVER or CLIENT)
+	loadModules("starfall/libs_sv/", SERVER)
+	loadModules("starfall/libs_cl/", CLIENT)
+	SF.Permissions.loadPermissionOptions()
 
 	if SERVER then
 		util.AddNetworkString("sf_receivelibrary")
 
-		loadModules("starfall/libs_sh/", SERVER or CLIENT)
-		loadModules("starfall/libs_sv/", SERVER)
-		loadModules("starfall/libs_cl/", CLIENT)
-		
-		SF.Permissions.loadPermissionOptions()
-
 		hook.Add("PlayerInitialSpawn","SF_Initialize_Libraries",function(ply)
-			SF.WaitForPlayerInit(ply, function()
+			SF.WaitForPlayerInit(ply, "InitLibs", function()
 				local files = {}
 				for name, mod in pairs(SF.Modules) do
 					for path, val in pairs(mod) do
@@ -1237,10 +1233,14 @@ do
 						elseif string.find(path, "starfall/libs_cl", 1, true) then
 							shouldrun = CLIENT
 						end
-						SF.Modules[modname][path] = {source = code, init = shouldrun and compileModule(code, path) or nil}
+						local t2 = t[path]
+						if not t2 then t2 = {} t[path] = t2 end
+						t2.source = code
+						if init and shouldrun then
+							t2.init = compileModule(code, path)
+						end
 					end
 					if init then
-						SF.Permissions.loadPermissionOptions()
 						include("starfall/editor/docs.lua")
 					end
 				end
