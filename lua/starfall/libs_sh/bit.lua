@@ -429,17 +429,41 @@ SF.RegisterLibrary("bit")
 return function(instance)
 
 local bit_library = instance.Libraries.bit
+---
+-- @class function
 bit_library.arshift = bit.arshift
+---
+-- @class function
 bit_library.band = bit.band
+---
+-- @class function
 bit_library.bnot = bit.bnot
+---
+-- @class function
 bit_library.bor = bit.bor
+---
+-- @class function
 bit_library.bswap = bit.bswap
+---
+-- @class function
 bit_library.bxor = bit.bxor
+---
+-- @class function
 bit_library.lshift = bit.lshift
+---
+-- @class function
 bit_library.rol = bit.rol
+---
+-- @class function
 bit_library.ror = bit.ror
+---
+-- @class function
 bit_library.rshift = bit.rshift
+---
+-- @class function
 bit_library.tobit = bit.tobit
+---
+-- @class function
 bit_library.tohex = bit.tohex
 
 

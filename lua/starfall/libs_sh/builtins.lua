@@ -329,148 +329,319 @@ if CLIENT then
 end
 
 -- String library
-local string_methods = instance.Libraries.string
-function string_methods.fromColor(color)
+local string_library = instance.Libraries.string
+---
+-- @class function
+function string_library.fromColor(color)
 	return string.FromColor(cunwrap(color))
 end
-function string_methods.toColor(str)
+---
+-- @class function
+function string_library.toColor(str)
 	return cwrap(string.ToColor(str))
 end
---- String library http://wiki.garrysmod.com/page/Category:string
--- @name builtins_library.string
--- @class table
-builtins_library.string = nil
 
 
 
-local math_methods = instance.Libraries.math
-math_methods.abs = math.abs
-math_methods.acos = math.acos
-math_methods.angleDifference = math.AngleDifference
-math_methods.approach = math.Approach
-math_methods.approachAngle = math.ApproachAngle
-math_methods.asin = math.asin
-math_methods.atan = math.atan
-math_methods.atan2 = math.atan2
-math_methods.binToInt = math.BinToInt
-math_methods.calcBSplineN = math.calcBSplineN
-math_methods.ceil = math.ceil
-math_methods.clamp = math.Clamp
-math_methods.cos = math.cos
-math_methods.cosh = math.cosh
-math_methods.deg = math.deg
-math_methods.dist = math.Dist
-math_methods.distance = math.Distance
-math_methods.easeInOut = math.EaseInOut
-math_methods.exp = math.exp
-math_methods.floor = math.floor
-math_methods.fmod = math.fmod
-math_methods.frexp = math.frexp
-math_methods.huge = math.huge
-math_methods.intToBin = math.IntToBin
-math_methods.ldexp = math.ldexp
-math_methods.log = math.log
-math_methods.log10 = math.log10
-math_methods.max = math.max
-math_methods.min = math.Min
-math_methods.mod = math.mod
-math_methods.modf = math.modf
-math_methods.normalizeAngle = math.NormalizeAngle
-math_methods.pi = math.pi
-math_methods.pow = math.pow
-math_methods.rad = math.rad
-math_methods.rand = math.Rand
-math_methods.random = math.random
-math_methods.remap = math.Remap
-math_methods.round = math.Round
-math_methods.sin = math.sin
-math_methods.sinh = math.sinh
-math_methods.sqrt = math.sqrt
-math_methods.tan = math.tan
-math_methods.tanh = math.tanh
-math_methods.timeFraction = math.TimeFraction
-math_methods.truncate = math.Truncate
-function math_methods.bSplinePoint(tDiff, tPoints, tMax)
+local math_library = instance.Libraries.math
+---
+-- @class function
+math_library.abs = math.abs
+---
+-- @class function
+math_library.acos = math.acos
+---
+-- @class function
+math_library.angleDifference = math.AngleDifference
+---
+-- @class function
+math_library.approach = math.Approach
+---
+-- @class function
+math_library.approachAngle = math.ApproachAngle
+---
+-- @class function
+math_library.asin = math.asin
+---
+-- @class function
+math_library.atan = math.atan
+---
+-- @class function
+math_library.atan2 = math.atan2
+---
+-- @class function
+math_library.binToInt = math.BinToInt
+---
+-- @class function
+math_library.calcBSplineN = math.calcBSplineN
+---
+-- @class function
+math_library.ceil = math.ceil
+---
+-- @class function
+math_library.clamp = math.Clamp
+---
+-- @class function
+math_library.cos = math.cos
+---
+-- @class function
+math_library.cosh = math.cosh
+---
+-- @class function
+math_library.deg = math.deg
+---
+-- @class function
+math_library.dist = math.Dist
+---
+-- @class function
+math_library.distance = math.Distance
+---
+-- @class function
+math_library.easeInOut = math.EaseInOut
+---
+-- @class function
+math_library.exp = math.exp
+---
+-- @class function
+math_library.floor = math.floor
+---
+-- @class function
+math_library.fmod = math.fmod
+---
+-- @class function
+math_library.frexp = math.frexp
+---
+-- @class function
+math_library.huge = math.huge
+---
+-- @class function
+math_library.intToBin = math.IntToBin
+---
+-- @class function
+math_library.ldexp = math.ldexp
+---
+-- @class function
+math_library.log = math.log
+---
+-- @class function
+math_library.log10 = math.log10
+---
+-- @class function
+math_library.max = math.max
+---
+-- @class function
+math_library.min = math.Min
+---
+-- @class function
+math_library.mod = math.mod
+---
+-- @class function
+math_library.modf = math.modf
+---
+-- @class function
+math_library.normalizeAngle = math.NormalizeAngle
+math_library.pi = math.pi
+---
+-- @class function
+math_library.pow = math.pow
+---
+-- @class function
+math_library.rad = math.rad
+---
+-- @class function
+math_library.rand = math.Rand
+---
+-- @class function
+math_library.random = math.random
+---
+-- @class function
+math_library.remap = math.Remap
+---
+-- @class function
+math_library.round = math.Round
+---
+-- @class function
+math_library.sin = math.sin
+---
+-- @class function
+math_library.sinh = math.sinh
+---
+-- @class function
+math_library.sqrt = math.sqrt
+---
+-- @class function
+math_library.tan = math.tan
+---
+-- @class function
+math_library.tanh = math.tanh
+---
+-- @class function
+math_library.timeFraction = math.TimeFraction
+---
+-- @class function
+math_library.truncate = math.Truncate
+---
+-- @class function
+function math_library.bSplinePoint(tDiff, tPoints, tMax)
 	return vwrap(math.BSplinePoint(tDiff, instance.Unsanitize(tPoints), tMax))
 end
-function math_methods.lerp(percent, from, to)
+---
+-- @class function
+function math_library.lerp(percent, from, to)
 	checkluatype(percent, TYPE_NUMBER)
 	checkluatype(from, TYPE_NUMBER)
 	checkluatype(to, TYPE_NUMBER)
 
 	return Lerp(percent, from, to)
 end
-function math_methods.lerpAngle(percent, from, to)
+---
+-- @class function
+function math_library.lerpAngle(percent, from, to)
 	checkluatype(percent, TYPE_NUMBER)
 
 	return awrap(LerpAngle(percent, aunwrap(from), aunwrap(to)))
 end
-function math_methods.lerpVector(percent, from, to)
+---
+-- @class function
+function math_library.lerpVector(percent, from, to)
 	checkluatype(percent, TYPE_NUMBER)
 
 	return vwrap(LerpVector(percent, vunwrap(from), vunwrap(to)))
 end
---- The math library. http://wiki.garrysmod.com/page/Category:math
--- @name builtins_library.math
--- @class table
-builtins_library.math = nil
 
 
 
-local os_methods = instance.Libraries.os
-os_methods.clock = os.clock
-os_methods.date = function(format, time)
+local os_library = instance.Libraries.os
+---
+-- @class function
+os_library.clock = os.clock
+---
+-- @class function
+os_library.date = function(format, time)
 	if format~=nil and string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
 	return os.date(format, time)
 end
-os_methods.difftime = os.difftime
-os_methods.time = os.time
---- The os library. http://wiki.garrysmod.com/page/Category:os
--- @name builtins_library.os
--- @class table
-builtins_library.os = nil
+---
+-- @class function
+os_library.difftime = os.difftime
+---
+-- @class function
+os_library.time = os.time
 
 
 
-local table_methods = instance.Libraries.table
-table_methods.add = table.Add
-table_methods.clearKeys = table.ClearKeys
-table_methods.collapseKeyValue = table.CollapseKeyValue
-table_methods.concat = table.concat
-table_methods.copyFromTo = table.CopyFromTo
-table_methods.count = table.Count
-table_methods.empty = table.Empty
-table_methods.findNext = table.FindNext
-table_methods.findPrev = table.FindPrev
-table_methods.forceInsert = table.ForceInsert
-table_methods.forEach = table.ForEach
-table_methods.foreachi = table.foreachi
-table_methods.getFirstKey = table.GetFirstKey
-table_methods.getFirstValue = table.GetFirstValue
-table_methods.getKeys = table.GetKeys
-table_methods.getLastKey = table.GetLastKey
-table_methods.getLastValue = table.GetLastValue
-table_methods.getn = table.getn
-table_methods.getWinningKey = table.GetWinningKey
-table_methods.hasValue = table.HasValue
-table_methods.inherit = table.Inherit
-table_methods.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^31-1) return table.insert(a,b,c) else return table.insert(a,b) end end
-table_methods.isSequential = table.IsSequential
-table_methods.keyFromValue = table.KeyFromValue
-table_methods.keysFromValue = table.KeysFromValue
-table_methods.lowerKeyNames = table.LowerKeyNames
-table_methods.maxn = table.maxn
-table_methods.random = table.Random
-table_methods.remove = table.remove
-table_methods.removeByValue = table.RemoveByValue
-table_methods.reverse = table.Reverse
-table_methods.sort = table.sort
-table_methods.sortByKey = table.SortByKey
-table_methods.sortByMember = table.SortByMember
-table_methods.sortDesc = table.SortDesc
-table_methods.toString = table.ToString
-
-function table_methods.copy( t, lookup_table )
+local table_library = instance.Libraries.table
+---
+-- @class function
+table_library.add = table.Add
+---
+-- @class function
+table_library.clearKeys = table.ClearKeys
+---
+-- @class function
+table_library.collapseKeyValue = table.CollapseKeyValue
+---
+-- @class function
+table_library.concat = table.concat
+---
+-- @class function
+table_library.copyFromTo = table.CopyFromTo
+---
+-- @class function
+table_library.count = table.Count
+---
+-- @class function
+table_library.empty = table.Empty
+---
+-- @class function
+table_library.findNext = table.FindNext
+---
+-- @class function
+table_library.findPrev = table.FindPrev
+---
+-- @class function
+table_library.forceInsert = table.ForceInsert
+---
+-- @class function
+table_library.forEach = table.ForEach
+---
+-- @class function
+table_library.foreachi = table.foreachi
+---
+-- @class function
+table_library.getFirstKey = table.GetFirstKey
+---
+-- @class function
+table_library.getFirstValue = table.GetFirstValue
+---
+-- @class function
+table_library.getKeys = table.GetKeys
+---
+-- @class function
+table_library.getLastKey = table.GetLastKey
+---
+-- @class function
+table_library.getLastValue = table.GetLastValue
+---
+-- @class function
+table_library.getn = table.getn
+---
+-- @class function
+table_library.getWinningKey = table.GetWinningKey
+---
+-- @class function
+table_library.hasValue = table.HasValue
+---
+-- @class function
+table_library.inherit = table.Inherit
+---
+-- @class function
+table_library.insert = function(a,b,c) if c~=nil then b = math.Clamp(b, 1, 2^31-1) return table.insert(a,b,c) else return table.insert(a,b) end end
+---
+-- @class function
+table_library.isSequential = table.IsSequential
+---
+-- @class function
+table_library.keyFromValue = table.KeyFromValue
+---
+-- @class function
+table_library.keysFromValue = table.KeysFromValue
+---
+-- @class function
+table_library.lowerKeyNames = table.LowerKeyNames
+---
+-- @class function
+table_library.maxn = table.maxn
+---
+-- @class function
+table_library.random = table.Random
+---
+-- @class function
+table_library.remove = table.remove
+---
+-- @class function
+table_library.removeByValue = table.RemoveByValue
+---
+-- @class function
+table_library.reverse = table.Reverse
+---
+-- @class function
+table_library.sort = table.sort
+---
+-- @class function
+table_library.sortByKey = table.SortByKey
+---
+-- @class function
+table_library.sortByMember = table.SortByMember
+---
+-- @class function
+table_library.sortDesc = table.SortDesc
+---
+-- @class function
+table_library.toString = table.ToString
+---
+-- @class function
+function table_library.copy( t, lookup_table )
 	if ( t == nil ) then return nil end
 
 	local meta = dgetmeta( t )
@@ -486,19 +657,20 @@ function table_methods.copy( t, lookup_table )
 			if ( lookup_table[ v ] ) then
 				copy[ i ] = lookup_table[ v ] -- we already copied this table. reuse the copy.
 			else
-				copy[ i ] = table_methods.copy( v, lookup_table ) -- not yet copied. copy it.
+				copy[ i ] = table_library.copy( v, lookup_table ) -- not yet copied. copy it.
 			end
 		end
 	end
 	return copy
 end
-
-function table.merge( dest, source )
+---
+-- @class function
+function table_library.merge( dest, source )
 
 	for k, v in pairs( source ) do
 		local meta = dgetmeta( t )
 		if ( istable( v ) and not (meta and instance.object_unwrappers[meta]) and istable( dest[ k ] ) ) then
-			table.Merge( dest[ k ], v )
+			table_library.merge( dest[ k ], v )
 		else
 			dest[ k ] = v
 		end
@@ -507,11 +679,6 @@ function table.merge( dest, source )
 	return dest
 
 end
-
---- Table library. http://wiki.garrysmod.com/page/Category:table
--- @name builtins_library.table
--- @class table
-builtins_library.table = nil
 
 
 -- ------------------------- Functions ------------------------- --

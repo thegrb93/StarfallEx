@@ -167,7 +167,7 @@ local function scan(src, realm)
 	local parsing
 	for line in lines do
 		if parsing then
-			local data = string.match(line, "^%s*%-%-%-*(.+)")
+			local data = string.match(line, "^%s*%-%-%-*(.*)")
 			if data then
 				parse(parsing, data)
 			else
@@ -180,7 +180,7 @@ local function scan(src, realm)
 			end
 		end
 		if not parsing then
-			local desc = string.match(line, "^%s*%-%-%-(.+)")
+			local desc = string.match(line, "^%s*%-%-%-(.*)")
 			if desc then
 				parsing = {
 					description = {desc},
