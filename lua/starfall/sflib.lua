@@ -619,7 +619,7 @@ function SF.WaitForEntity(index, callback)
 end
 
 if SERVER then
-	local initplayers = {}
+	local initplayers = setmetatable({},{__mode="k"})
 	concommand.Add("_sf_plyinit",function(ply)
 		if initplayers[ply] then
 			for k, v in ipairs(initplayers[ply]) do
