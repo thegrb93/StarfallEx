@@ -26,6 +26,126 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
+local function convertFilter(filter)
+	if filter == nil then
+		return nil
+	elseif istable(filter) then
+		if ent_meta.sf2sensitive[filter]==nil then
+			local l = {}
+			for i, v in ipairs(filter) do
+				l[i] = eunwrap(v)
+			end
+			return l
+		else
+			return eunwrap(filter)
+		end
+	elseif isfunction(filter) then
+		return function(ent)
+			local ret = instance:runFunction(filter, owrap(ent))
+			if ret[1] then return ret[2] end
+		end
+	else
+		SF.ThrowTypeError("table or function", SF.GetType(filter), 3)
+	end
+end
+
+--- Does a line trace
+-- @param start Start position
+-- @param endpos End position
+-- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param mask Trace mask
+-- @param colgroup The collision group of the trace
+-- @param ignworld Whether the trace should ignore world
+-- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
+function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
+	checkpermission(instance, nil, "trace")
+	checkvector(start)
+	checkvector(endpos)
+
+	local start, endpos = vunwrap(start), vunwrap(endpos)
+
+	filter = convertFilter(filter)
+	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
+	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
+	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+
+	local trace = {
+		start = start,
+		endpos = endpos,
+		filter = filter,
+		mask = mask,
+		collisiongroup = colgroup,
+		ignoreworld = ignworld,
+	}
+
+	return SF.StructWrapper(instance, util.TraceLine(trace))
+end
+
+--- Does a swept-AABB trace
+-- @param start Start position
+-- @param endpos End position
+-- @param minbox Lower box corner
+-- @param maxbox Upper box corner
+-- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
+-- @param mask Trace mask
+-- @param colgroup The collision group of the trace
+-- @param ignworld Whether the trace should ignore world
+-- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
+function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
+	checkpermission(instance, nil, "trace")
+	checkvector(start)
+	checkvector(endpos)
+	checkvector(minbox)
+	checkvector(maxbox)
+
+	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
+
+	filter = convertFilter(filter)
+	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
+	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
+	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+
+	local trace = {
+		start = start,
+		endpos = endpos,
+		filter = filter,
+		mask = mask,
+		collisiongroup = colgroup,
+		ignoreworld = ignworld,
+		mins = minbox,
+		maxs = maxbox
+	}
+
+	return SF.StructWrapper(instance, util.TraceHull(trace))
+end
+
+--- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
+--@param rayStart The origin of the ray
+--@param rayDelta The direction and length of the ray
+--@param boxOrigin The origin of the box
+--@param boxAngles The box's angles
+--@param boxMins The box min bounding vector
+--@param boxMaxs The box max bounding vector
+--@return Hit position or nil if not hit
+--@return Hit normal or nil if not hit
+--@return Hit fraction or nil if not hit
+function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
+	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
+	if pos then return vwrap(pos), vwrap(normal), fraction end
+end
+
+--- Does a ray plane intersection returning the position hit or nil if not hit
+--@param rayStart The origin of the ray
+--@param rayDelta The direction and length of the ray
+--@param planeOrigin The origin of the plane
+--@param planeNormal The normal of the plane
+--@return Hit position or nil if not hit
+function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
+	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
+	if pos then return vwrap(pos) end
+end
+
+
 -- Material Enumeration
 -- @name trace.MAT
 -- @class table
@@ -205,129 +325,5 @@ trace_library.CONTENTS_DETAIL = CONTENTS_DETAIL
 trace_library.CONTENTS_TRANSLUCENT = CONTENTS_TRANSLUCENT
 trace_library.CONTENTS_LADDER = CONTENTS_LADDER
 trace_library.CONTENTS_HITBOX = CONTENTS_HITBOX
-
-local function convertFilter(filter)
-	local filterType = TypeID(filter)
-	if filterType == TYPE_NIL then
-		return nil
-	elseif filterType == TYPE_TABLE then
-		local unwrapped = eunwrap(filter)
-		if unwrapped then
-			return unwrapped
-		else
-			local l = {}
-			for i = 1, #filter do
-				local unwrapped = eunwrap(filter[i])
-				if unwrapped then
-					l[#l + 1] = unwrapped
-				end
-			end
-			return l
-		end
-	elseif filterType == TYPE_FUNCTION then
-		return function(ent)
-			local ret = instance:runFunction(filter, owrap(ent))
-			if ret[1] then return ret[2] end
-		end
-	else
-		SF.ThrowTypeError("table or function", SF.GetType(filter), 3)
-	end
-end
-
---- Does a line trace
--- @param start Start position
--- @param endpos End position
--- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
--- @param mask Trace mask
--- @param colgroup The collision group of the trace
--- @param ignworld Whether the trace should ignore world
--- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
-function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
-	checkpermission(instance, nil, "trace")
-	checkvector(start)
-	checkvector(endpos)
-
-	local start, endpos = vunwrap(start), vunwrap(endpos)
-
-	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
-
-	local trace = {
-		start = start,
-		endpos = endpos,
-		filter = filter,
-		mask = mask,
-		collisiongroup = colgroup,
-		ignoreworld = ignworld,
-	}
-
-	return SF.StructWrapper(instance, util.TraceLine(trace))
-end
-
---- Does a swept-AABB trace
--- @param start Start position
--- @param endpos End position
--- @param minbox Lower box corner
--- @param maxbox Upper box corner
--- @param filter Entity/array of entities to filter, or a function callback with an entity arguement that returns whether the trace should hit
--- @param mask Trace mask
--- @param colgroup The collision group of the trace
--- @param ignworld Whether the trace should ignore world
--- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
-function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
-	checkpermission(instance, nil, "trace")
-	checkvector(start)
-	checkvector(endpos)
-	checkvector(minbox)
-	checkvector(maxbox)
-
-	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
-
-	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
-
-	local trace = {
-		start = start,
-		endpos = endpos,
-		filter = filter,
-		mask = mask,
-		collisiongroup = colgroup,
-		ignoreworld = ignworld,
-		mins = minbox,
-		maxs = maxbox
-	}
-
-	return SF.StructWrapper(instance, util.TraceHull(trace))
-end
-
---- Does a ray box intersection returning the position hit, normal, and trace fraction, or nil if not hit.
---@param rayStart The origin of the ray
---@param rayDelta The direction and length of the ray
---@param boxOrigin The origin of the box
---@param boxAngles The box's angles
---@param boxMins The box min bounding vector
---@param boxMaxs The box max bounding vector
---@return Hit position or nil if not hit
---@return Hit normal or nil if not hit
---@return Hit fraction or nil if not hit
-function trace_library.intersectRayWithOBB(rayStart, rayDelta, boxOrigin, boxAngles, boxMins, boxMaxs)
-	local pos, normal, fraction = util.IntersectRayWithOBB(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(boxOrigin), aunwrap(boxAngles), vunwrap(boxMins), vunwrap(boxMaxs))
-	if pos then return vwrap(pos), vwrap(normal), fraction end
-end
-
---- Does a ray plane intersection returning the position hit or nil if not hit
---@param rayStart The origin of the ray
---@param rayDelta The direction and length of the ray
---@param planeOrigin The origin of the plane
---@param planeNormal The normal of the plane
---@return Hit position or nil if not hit
-function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
-	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
-	if pos then return vwrap(pos) end
-end
 
 end
