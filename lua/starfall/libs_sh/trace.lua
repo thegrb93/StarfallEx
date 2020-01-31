@@ -6,9 +6,9 @@ local checkpermission = SF.Permissions.check
 SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
 
 local function checkvector(pos)
-	if pos.x ~= pos.x or pos.x == math.huge or pos.x == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	if pos.y ~= pos.y or pos.y == math.huge or pos.y == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
-	if pos.z ~= pos.z or pos.z == math.huge or pos.z == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos[1] ~= pos[1] or pos[1] == math.huge or pos[1] == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos[2] ~= pos[2] or pos[2] == math.huge or pos[2] == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
+	if pos[3] ~= pos[3] or pos[3] == math.huge or pos[3] == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
 end
 
 
@@ -244,10 +244,10 @@ end
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
-
-	local start, endpos = vunwrap(start), vunwrap(endpos)
 	checkvector(start)
 	checkvector(endpos)
+
+	local start, endpos = vunwrap(start), vunwrap(endpos)
 
 	filter = convertFilter(filter)
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
@@ -278,12 +278,12 @@ end
 -- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
 function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
-
-	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 	checkvector(start)
 	checkvector(endpos)
 	checkvector(minbox)
 	checkvector(maxbox)
+
+	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 
 	filter = convertFilter(filter)
 	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
