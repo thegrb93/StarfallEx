@@ -161,6 +161,18 @@ function vmatrix_methods:clone()
 	return wrap(Matrix(unwrap(self)))
 end
 
+--- Returns all 16 fields of the matrix in row-major order
+-- @return 16 numbers
+function vmatrix_methods:unpack()
+	return unwrap(self):Unpack()
+end
+
+--- Allows you to set all 16 fields in row-major order
+-- @param ... The 16 fields
+function vmatrix_methods:setUnpacked(...)
+	unwrap(self):SetUnpacked(...)
+end
+
 --- Copies the values from the second matrix to the first matrix. Self-Modifies
 -- @param src Second matrix
 function vmatrix_methods:set(src)
