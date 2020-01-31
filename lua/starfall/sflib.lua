@@ -1130,7 +1130,9 @@ do
 				init = compileModule(source, path)
 			end
 		else
-			init = CompileFile(path)()
+			if shouldrun then
+				init = CompileFile(path)()
+			end
 		end
 		local tbl = SF.Modules[name]
 		if not tbl then tbl = {} SF.Modules[name] = tbl end
