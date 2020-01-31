@@ -620,9 +620,9 @@ end
 
 function SF.WaitForPlayerInit(ply, name, func)
 	local n = "SF_WaitForPlayerInit"..name..ply:EntIndex()
-	hook.Add("SetupMove", n, function(ply2)
+	hook.Add("SetupMove", n, function(ply2, mv, cmd)
 		if ply:IsValid() then
-			if ply == ply2 then
+			if ply == ply2 and not cmd:IsForced() then
 				func()
 				hook.Remove("SetupMove", n)
 			end
@@ -1182,15 +1182,18 @@ do
 				print("Reloaded library: " .. name)
 				SF.Modules[name] = {}
 				if file.Exists(sh_filename, "LUA") then
-					addModule(name, sh_filename, true)
+					local source = file.Read(sh_filename, "LUA")
+					addModule(source, name, sh_filename, true)
 					sendToClientTbl[#sendToClientTbl+1] = sh_filename
 				end
 				if file.Exists(sv_filename, "LUA") then
-					addModule(name, sv_filename, true)
+					local source = file.Read(sv_filename, "LUA")
+					addModule(source, name, sv_filename, true)
 				end
 			end
 			if file.Exists(cl_filename, "LUA") then
-				addModule(name, cl_filename, false)
+				local source = file.Read(cl_filename, "LUA")
+				addModule(source, name, cl_filename, false)
 				sendToClientTbl[#sendToClientTbl+1] = cl_filename
 			end
 			if #sendToClientTbl>0 then
@@ -1229,7 +1232,6 @@ do
 						SF.Modules[modname][path] = {source = code, init = shouldrun and compileModule(code, path) or nil}
 					end
 					if init then
-						print("Starting docs")
 						SF.Permissions.loadPermissionOptions()
 						include("starfall/editor/docs.lua")
 					end
