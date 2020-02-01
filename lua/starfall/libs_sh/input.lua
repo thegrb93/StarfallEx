@@ -1,4 +1,5 @@
 -- Global to all starfalls
+local checkluatype = SF.CheckLuaType
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
 
@@ -143,7 +144,7 @@ local vwrap = instance.Types.Vector.Wrap
 -- @return The name of the first key bound
 
 function input_library.lookupBinding(binding)
-	SF.CheckLuaType(binding, TYPE_STRING)
+	checkluatype(binding, isstring)
 
 	SF.Permissions.check(instance, nil, "input")
 
@@ -160,7 +161,7 @@ end
 -- @param key The key id, see input
 -- @return True if the key is down
 function input_library.isKeyDown(key)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	checkluatype(key, isnumber)
 
 	SF.Permissions.check(instance, nil, "input")
 
@@ -172,7 +173,7 @@ end
 -- @param key The key id, see input
 -- @return The name of the key
 function input_library.getKeyName(key)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	checkluatype(key, isnumber)
 
 	SF.Permissions.check(instance, nil, "input")
 
@@ -223,8 +224,8 @@ end
 -- @return Aim vector
 function input_library.screenToVector(x, y)
 	SF.Permissions.check(instance, nil, "input")
-	SF.CheckLuaType(x, TYPE_NUMBER)
-	SF.CheckLuaType(y, TYPE_NUMBER)
+	checkluatype(x, isnumber)
+	checkluatype(y, isnumber)
 	return vwrap(gui.ScreenToVector(x, y))
 end
 
@@ -232,7 +233,7 @@ end
 -- @client
 -- @param enabled Whether or not the cursor should be enabled
 function input_library.enableCursor(enabled)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
+	checkluatype(enabled, isbool)
 	SF.Permissions.check(instance, nil, "input")
 
 	if not instance:isHUDActive() then
@@ -257,7 +258,7 @@ end
 -- @client
 -- @param enabled Whether to lock or unlock the controls
 function input_library.lockControls(enabled)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
+	checkluatype(enabled, isbool)
 	SF.Permissions.check(instance, nil, "input")
 
 	if not instance:isHUDActive() then

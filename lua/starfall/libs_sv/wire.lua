@@ -157,11 +157,11 @@ instance.WireInputConverters = inputConverters
 local outputConverters =
 {
 	NORMAL = function(data)
-		checkluatype(data, TYPE_NUMBER, 2)
+		checkluatype(data, isnumber, 2)
 		return data
 	end,
 	STRING = function(data)
-		checkluatype(data, TYPE_STRING, 2)
+		checkluatype(data, isstring, 2)
 		return data
 	end,
 	VECTOR = function(data)
@@ -174,7 +174,7 @@ local outputConverters =
 		return getent(data)
 	end,
 	TABLE = function(data)
-		checkluatype(data, TYPE_TABLE, 2)
+		checkluatype(data, istable, 2)
 		local completed_tables = {}
 
 		local function recursiveConvert(tbl)
@@ -182,11 +182,10 @@ local outputConverters =
 			completed_tables[tbl] = ret
 			for key, value in pairs(tbl) do
 
-				local ktyp = TypeID(key)
 				local valueList, typeList
-				if ktyp == TYPE_NUMBER then
+				if isnumber(key) == TYPE_NUMBER then
 					valueList, typeList = ret.n, ret.ntypes
-				elseif ktyp == TYPE_STRING then
+				elseif isstring(key) == TYPE_STRING then
 					valueList, typeList = ret.s, ret.stypes
 				else
 					continue
@@ -243,8 +242,8 @@ local sfTypeToWireTypeTable = {
 -- @param types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs(names, types)
 	checkpermission(instance, nil, "wire.setInputs")
-	checkluatype(names, TYPE_TABLE)
-	checkluatype(types, TYPE_TABLE)
+	checkluatype(names, istable)
+	checkluatype(types, istable)
 	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity to create inputs on", 2) end
 
@@ -271,8 +270,8 @@ end
 -- @param types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs(names, types)
 	checkpermission(instance, nil, "wire.setOutputs")
-	checkluatype(names, TYPE_TABLE)
-	checkluatype(types, TYPE_TABLE)
+	checkluatype(names, istable)
+	checkluatype(types, istable)
 	local ent = instance.data.entity
 	if not ent then SF.Throw("No entity to create outputs on", 2) end
 
@@ -327,13 +326,13 @@ local ValidWireMat = { 	["cable/rope"] = true, ["cable/cable2"] = true, ["cable/
 -- @param color Color of the wire(optional)
 -- @param material Material of the wire(optional), Valid materials are cable/rope, cable/cable2, cable/xbeam, cable/redlaser, cable/blue_elec, cable/physbeam, cable/hydra, arrowire/arrowire, arrowire/arrowire2
 function wire_library.create(entI, entO, inputname, outputname, width, color, material)
-	checkluatype(inputname, TYPE_STRING)
-	checkluatype(outputname, TYPE_STRING)
+	checkluatype(inputname, isstring)
+	checkluatype(outputname, isstring)
 
 	if width == nil then
 		width = 0
 	else
-		checkluatype (width, TYPE_NUMBER)
+		checkluatype(width, isnumber)
 		width = math.Clamp(width, 0, 5)
 	end
 	if color ~= nil then
@@ -374,7 +373,7 @@ end
 -- @param entI Entity with input
 -- @param inputname Input to be un-wired
 function wire_library.delete(entI, inputname)
-	checkluatype(inputname, TYPE_STRING)
+	checkluatype(inputname, isstring)
 
 	local entI = getent(entI)
 
@@ -468,7 +467,7 @@ wirelink_meta.__newindex = function(self, k, v)
 	local wl = wlunwrap(self)
 	if not wl or not wl:IsValid() or not wl.extended then return end -- TODO: What is wl.extended?
 	if isnumber(k) then
-		checkluatype(v, TYPE_NUMBER)
+		checkluatype(v, isnumber)
 		if not wl.WriteCell then return
 		else wl:WriteCell(k, v) end
 	else
@@ -547,7 +546,7 @@ end
 --- Checks if an input is wired.
 -- @param name Name of the input to check
 function wirelink_methods:isWired(name)
-	checkluatype(name, TYPE_STRING)
+	checkluatype(name, isstring)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
@@ -559,7 +558,7 @@ end
 -- @param name Name of the input
 -- @return The entity the wirelink is wired to
 function wirelink_methods:getWiredTo(name)
-	checkluatype(name, TYPE_STRING)
+	checkluatype(name, isstring)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
@@ -572,7 +571,7 @@ end
 -- @param name Name of the input of the wirelink.
 -- @return String name of the output that the input is wired to.
 function wirelink_methods:getWiredToName(name)
-	checkluatype(name, TYPE_STRING)
+	checkluatype(name, isstring)
 	local wl = wlunwrap(self)
 	if not wl then return nil end
 	local input = wl.Inputs[name]
@@ -599,7 +598,7 @@ wire_library.ports = setmetatable({}, {
 	end,
 
 	__newindex = function(self, name, value)
-		checkluatype(name, TYPE_STRING)
+		checkluatype(name, isstring)
 
 		local ent = instance.data.entity
 		local output = ent.Outputs[name]

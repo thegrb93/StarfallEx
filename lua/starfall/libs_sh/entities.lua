@@ -61,7 +61,7 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param vec The position it should be manipulated to
 	function ents_methods:manipulateBonePosition(bone, vec)
-		checkluatype(bone, TYPE_NUMBER)
+		checkluatype(bone, isnumber)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBonePosition(bone, vunwrap(vec))
@@ -72,7 +72,7 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param vec The scale it should be manipulated to
 	function ents_methods:manipulateBoneScale(bone, vec)
-		checkluatype(bone, TYPE_NUMBER)
+		checkluatype(bone, isnumber)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneScale(bone, vunwrap(vec))
@@ -83,7 +83,7 @@ if CLIENT then
 	-- @param bone The bone ID
 	-- @param ang The angle it should be manipulated to
 	function ents_methods:manipulateBoneAngles(bone, ang)
-		checkluatype(bone, TYPE_NUMBER)
+		checkluatype(bone, isnumber)
 		local ent = getent(self)
 		checkpermission(instance, ent, "entities.setRenderProperty")
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
@@ -152,7 +152,7 @@ end, true)
 -- @param volume volume=1
 -- @param channel channel=CHAN_AUTO
 function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
-	checkluatype(snd, TYPE_STRING)
+	checkluatype(snd, isstring)
 
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.emitSound")
@@ -166,7 +166,7 @@ end
 --- Stops a sound on the entity
 -- @param snd string Soundscript path. See http://wiki.garrysmod.com/page/Entity/StopSound
 function ents_methods:stopSound(snd)
-	checkluatype(snd, TYPE_STRING)
+	checkluatype(snd, isstring)
 
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.emitSound")
@@ -210,7 +210,7 @@ end
 -- @shared
 -- @param material, string, New material name.
 function ents_methods:setMaterial(material)
-	checkluatype(material, TYPE_STRING)
+	checkluatype(material, isstring)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
 	local ent = getent(self)
@@ -229,7 +229,7 @@ end
 -- @param index, number, submaterial index.
 -- @param material, string, New material name.
 function ents_methods:setSubMaterial(index, material)
-	checkluatype(material, TYPE_STRING)
+	checkluatype(material, isstring)
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 	index = math.Clamp(index, 0, 255)
 	local ent = getent(self)
@@ -250,8 +250,8 @@ end
 -- @param bodygroup Number, The ID of the bodygroup you're setting.
 -- @param value Number, The value you're setting the bodygroup to.
 function ents_methods:setBodygroup(bodygroup, value)
-	checkluatype(bodygroup, TYPE_NUMBER)
-	checkluatype(value, TYPE_NUMBER)
+	checkluatype(bodygroup, isnumber)
+	checkluatype(value, isnumber)
 
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
@@ -267,7 +267,7 @@ end
 -- @shared
 -- @param skinIndex Number, Index of the skin to use.
 function ents_methods:setSkin(skinIndex)
-	checkluatype(skinIndex, TYPE_NUMBER)
+	checkluatype(skinIndex, isnumber)
 
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
@@ -284,7 +284,7 @@ end
 -- @class function
 -- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
 function ents_methods:setRenderMode(rendermode)
-	checkluatype(rendermode, TYPE_NUMBER)
+	checkluatype(rendermode, isnumber)
 
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
@@ -302,7 +302,7 @@ end
 -- @class function
 -- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
 function ents_methods:setRenderFX(renderfx)
-	checkluatype(renderfx, TYPE_NUMBER)
+	checkluatype(renderfx, isnumber)
 
 	local ent = getent(self)
 	if SERVER and ent == instance.player then
@@ -403,7 +403,7 @@ end
 -- @param id The physics object id (starts at 0)
 -- @return The physics object of the entity
 function ents_methods:getPhysicsObjectNum(id)
-	checkluatype(id, TYPE_NUMBER)
+	checkluatype(id, isnumber)
 	local ent = getent(self)
 	return pwrap(ent:GetPhysicsObjectNum(id))
 end
@@ -581,7 +581,7 @@ end
 -- @param name The bone's string name
 -- @return The bone index
 function ents_methods:lookupBone(name)
-	checkluatype(name, TYPE_STRING)
+	checkluatype(name, isstring)
 	local ent = getent(self)
 	return ent:LookupBone(name)
 end
@@ -592,7 +592,7 @@ end
 -- @return The matrix
 function ents_methods:getBoneMatrix(bone)
 	local ent = getent(self)
-	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
+	if bone == nil then bone = 0 else checkluatype(bone, isnumber) end
 
 	return mwrap(ent:GetBoneMatrix(bone))
 end
@@ -619,7 +619,7 @@ end
 -- @return Name of the bone
 function ents_methods:getBoneName(bone)
 	local ent = getent(self)
-	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
+	if bone == nil then bone = 0 else checkluatype(bone, isnumber) end
 	return ent:GetBoneName(bone)
 end
 
@@ -629,7 +629,7 @@ end
 -- @return Parent index of the bone
 function ents_methods:getBoneParent(bone)
 	local ent = getent(self)
-	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
+	if bone == nil then bone = 0 else checkluatype(bone, isnumber) end
 	return ent:GetBoneParent(bone)
 end
 
@@ -640,7 +640,7 @@ end
 -- @return Angle of the bone
 function ents_methods:getBonePosition(bone)
 	local ent = getent(self)
-	if bone == nil then bone = 0 else checkluatype(bone, TYPE_NUMBER) end
+	if bone == nil then bone = 0 else checkluatype(bone, isnumber) end
 	local pos, ang = ent:GetBonePosition(bone)
 	return vwrap(pos), awrap(ang)
 end
@@ -821,7 +821,7 @@ end
 -- @return Animation index or -1 if invalid
 function ents_methods:lookupSequence(animation)
 	local ent = getent(self)
-	checkluatype(animation, TYPE_STRING)
+	checkluatype(animation, isstring)
 
 	return ent:LookupSequence(animation)
 end
@@ -831,7 +831,7 @@ end
 -- @return Length of the animation in seconds
 function ents_methods:sequenceDuration(id)
 	local ent = getent(self)
-	if id~=nil then checkluatype(id, TYPE_NUMBER) end
+	if id~=nil then checkluatype(id, isnumber) end
 
 	return ent:SequenceDuration(id)
 end
@@ -870,7 +870,7 @@ end
 function ents_methods:getFlexWeight(flexid)
 	local ent = getent(self)
 
-	checkluatype(flexid, TYPE_NUMBER)
+	checkluatype(flexid, isnumber)
 	flexid = math.floor(flexid)
 
 	if flexid < 0 or flexid >= ent:GetFlexNum() then
@@ -886,8 +886,8 @@ end
 function ents_methods:setFlexWeight(flexid, weight)
 	local ent = getent(self)
 
-	checkluatype(flexid, TYPE_NUMBER)
-	checkluatype(weight, TYPE_NUMBER)
+	checkluatype(flexid, isnumber)
+	checkluatype(weight, isnumber)
 	flexid = math.floor(flexid)
 
 	checkpermission(instance, ent, "entities.setRenderProperty")
@@ -909,7 +909,7 @@ end
 -- @param scale The scale of the flexes to set
 function ents_methods:setFlexScale(scale)
 	local ent = getent(self)
-	checkluatype(scale, TYPE_NUMBER)
+	checkluatype(scale, isnumber)
 	checkpermission(instance, ent, "entities.setRenderProperty")
 	ent:SetFlexScale(scale)
 end

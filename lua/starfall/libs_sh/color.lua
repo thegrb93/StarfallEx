@@ -39,10 +39,10 @@ end
 -- @param a - Alpha
 -- @return New color
 instance.env.Color = function (r, g, b, a)
-	if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
-	if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
-	if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
-	if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
+	if r then checkluatype(r, isnumber) else r = 255 end
+	if g then checkluatype(g, isnumber) else g = 255 end
+	if b then checkluatype(b, isnumber) else b = 255 end
+	if a then checkluatype(a, isnumber) else a = 255 end
 	return wrap({ r, g, b, a })
 end
 
@@ -116,9 +116,9 @@ function color_meta.__mul(a, b)
 	elseif dgetmeta(a) == color_meta and dgetmeta(b) == color_meta then
 		return wrap({ clamp(a[1] * b[1]), clamp(a[2] * b[2]), clamp(a[3] * b[3]), clamp(a[4] * b[4]) })
 	elseif dgetmeta(a) == color_meta then
-		checkluatype(b, TYPE_NUMBER)
+		checkluatype(b, isnumber)
 	else
-		checkluatype(a, TYPE_NUMBER)
+		checkluatype(a, isnumber)
 	end
 end
 
@@ -133,9 +133,9 @@ function color_meta.__div(a, b)
 	elseif dgetmeta(a) == color_meta and dgetmeta(b) == color_meta then
 		return wrap({ clamp(a[1] / b[1]), clamp(a[2] / b[2]), clamp(a[3] / b[3]), clamp(a[4] / b[4]) })
 	elseif dgetmeta(a) == color_meta then
-		checkluatype(b, TYPE_NUMBER)
+		checkluatype(b, isnumber)
 	else
-		checkluatype(a, TYPE_NUMBER)
+		checkluatype(a, isnumber)
 	end
 end
 

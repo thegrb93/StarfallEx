@@ -571,9 +571,9 @@ local vector = instance.env.Vector
 -- @return The table of vertices that can be passed to mesh.buildFromTriangles
 -- @return The table of obj data. table.positions can be given to prop.createCustom
 function mesh_library.parseObj(obj, threaded, triangulate)
-	checkluatype (obj, TYPE_STRING)
-	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
-	if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
+	checkluatype(obj, isstring)
+	if threaded ~= nil then checkluatype(threaded, isbool) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+	if triangulate ~= nil then checkluatype(triangulate, isbool) end
 
 	return SF.ParseObj(obj, threaded and thread_yield, vector, triangulate)
 end
@@ -613,8 +613,8 @@ if CLIENT then
 	-- @client
 	function mesh_library.createFromTable(verteces, threaded)
 		checkpermission (instance, nil, "mesh")
-		checkluatype (verteces, TYPE_TABLE)
-		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
+		checkluatype(verteces, istable)
+		if threaded ~= nil then checkluatype(threaded, isbool) end
 		local thread
 		if threaded then thread = coroutine.running() if not thread then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 
@@ -652,9 +652,9 @@ if CLIENT then
 	-- @return Mesh object
 	-- @client
 	function mesh_library.createFromObj(obj, threaded, triangulate)
-		checkluatype (obj, TYPE_STRING)
-		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
-		if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
+		checkluatype(obj, isstring)
+		if threaded ~= nil then checkluatype(threaded, isbool) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+		if triangulate ~= nil then checkluatype(triangulate, isbool) end
 
 		checkpermission (instance, nil, "mesh")
 
@@ -676,9 +676,9 @@ if CLIENT then
 	-- @return A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
 	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
-		checkluatype(model, TYPE_STRING)
-		if lod~=nil then checkluatype(lod, TYPE_NUMBER) end
-		if bodygroupMask~=nil then checkluatype(bodygroupMask, TYPE_NUMBER) end
+		checkluatype(model, isstring)
+		if lod~=nil then checkluatype(lod, isnumber) end
+		if bodygroupMask~=nil then checkluatype(bodygroupMask, isnumber) end
 		local mesh = util.GetModelMeshes( model, lod, bodygroupMask )
 		local output = {}
 		if mesh then

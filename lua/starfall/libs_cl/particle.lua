@@ -84,9 +84,9 @@ end
 function particle_library.attach(entity, particle, pattach, options)
 	checkpermission (instance.player, entity, "particle.attach")
 
-	checkluatype (particle, TYPE_STRING)
-	checkluatype (pattach, TYPE_NUMBER)
-	checkluatype (options, TYPE_TABLE)
+	checkluatype(particle, isstring)
+	checkluatype(pattach, isnumber)
+	checkluatype(options, istable)
 
 	local entity = getent(entity)
 
@@ -196,7 +196,7 @@ end
 function particle_methods:setControlPoint(id,value)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
+	checkluatype(id, isnumber)
 
 	checkValid(uw)
 
@@ -213,7 +213,7 @@ function particle_methods:setControlPointEntity(id,entity)
 	local uw = unwrap(self)
 	local entity = getent(entity)
 
-	checkluatype (id, TYPE_NUMBER)
+	checkluatype(id, isnumber)
 
 	checkValid(uw)
 
@@ -229,7 +229,7 @@ end
 function particle_methods:setForwardVector(id,value)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
+	checkluatype(id, isnumber)
 
 	checkValid(uw)
 
@@ -244,7 +244,7 @@ end
 function particle_methods:setRightVector(id,value)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
+	checkluatype(id, isnumber)
 
 	checkValid(uw)
 
@@ -260,7 +260,7 @@ end
 function particle_methods:setUpVector(id,value)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
+	checkluatype(id, isnumber)
 
 	checkValid(uw)
 
@@ -275,8 +275,8 @@ end
 function particle_methods:setControlPointParent(id,value)
 	local uw = unwrap(self)
 
-	checkluatype (id, TYPE_NUMBER)
-	checkluatype (value, TYPE_NUMBER)
+	checkluatype(id, isnumber)
+	checkluatype(value, isnumber)
 
 	checkValid(uw)
 

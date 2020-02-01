@@ -18,7 +18,7 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 
 
 local function convert(results, func)
-	if func then checkluatype (func, TYPE_FUNCTION) end
+	if func then checkluatype(func, isfunction) end
 	local wrap = instance.WrapObject
 
 	local t = {}
@@ -60,7 +60,7 @@ end
 -- @return An array of found entities
 function find_library.inSphere(center, radius, filter)
 	checkpermission(instance, nil, "find")
-	checkluatype (radius, TYPE_NUMBER)
+	checkluatype(radius, isnumber)
 
 	local center = vunwrap(center)
 
@@ -76,8 +76,8 @@ end
 -- @return An array of found entities
 function find_library.inCone(pos, dir, distance, radius, filter)
 	checkpermission(instance, nil, "find")
-	checkluatype (distance, TYPE_NUMBER)
-	checkluatype (radius, TYPE_NUMBER)
+	checkluatype(distance, isnumber)
+	checkluatype(radius, isnumber)
 
 	local pos, dir = vunwrap(pos), vunwrap(dir)
 
@@ -111,7 +111,7 @@ end
 -- @return An array of found entities
 function find_library.byClass(class, filter)
 	checkpermission(instance, nil, "find")
-	checkluatype (class, TYPE_STRING)
+	checkluatype(class, isstring)
 
 	return convert(ents.FindByClass(class), filter)
 end
@@ -122,7 +122,7 @@ end
 -- @return An array of found entities
 function find_library.byName(name, filter)
 	checkpermission(instance, nil, "find")
-	checkluatype (name, TYPE_STRING)
+	checkluatype(name, isstring)
 
 	return convert(ents.FindByName(name), filter)
 end
@@ -133,7 +133,7 @@ end
 -- @return An array of found entities
 function find_library.byModel(model, filter)
 	checkpermission(instance, nil, "find")
-	checkluatype (model, TYPE_STRING)
+	checkluatype(model, isstring)
 
 	return convert(ents.FindByModel(model), filter)
 end

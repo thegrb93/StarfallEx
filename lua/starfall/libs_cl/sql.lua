@@ -19,7 +19,7 @@ local sql_library = instance.Libraries.sql
 -- @return Query results as a table, nil if the query returned no data.
 function sql_library.query(query)
 	checkpermission(instance, nil, "sql")
-	checkluatype(query, TYPE_STRING)
+	checkluatype(query, isstring)
 
 	local query = sql.Query(query)
 
@@ -34,7 +34,7 @@ end
 -- @return False if the table does not exist, true if it does.
 function sql_library.tableExists(tabname)
 	checkpermission(instance, nil, "sql")
-	checkluatype(tabname, TYPE_STRING)
+	checkluatype(tabname, isstring)
 	
 	return sql.TableExists(tabname)
 end
@@ -44,7 +44,7 @@ end
 -- @return True if the table was successfully removed, false if not.
 function sql_library.tableRemove(tabname)
 	checkpermission(instance, nil, "sql")
-	checkluatype(tabname, TYPE_STRING)
+	checkluatype(tabname, isstring)
 	
 	if not sql.TableExists(tabname) then return false end
 	sql.Query("DROP TABLE " .. tabname)
@@ -57,8 +57,8 @@ end
 -- @return The escaped input.
 function sql_library.SQLStr(str, bNoQuotes)
 	checkpermission(instance, nil, "sql")
-	checkluatype(str, TYPE_STRING)
-	checkluatype(bNoQuotes, TYPE_BOOL)
+	checkluatype(str, isstring)
+	checkluatype(bNoQuotes, isbool)
 	
 	return sql.SQLStr(str, bNoQuotes)
 end

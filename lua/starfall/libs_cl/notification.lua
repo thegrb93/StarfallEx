@@ -54,9 +54,9 @@ function notification_library.addLegacy(text, type, length)
 	else
 		checkpermission(instance, nil, "notification")
 	end
-	checkluatype(text, TYPE_STRING)
-	checkluatype(type, TYPE_NUMBER)
-	checkluatype(length, TYPE_NUMBER)
+	checkluatype(text, isstring)
+	checkluatype(type, isnumber)
+	checkluatype(length, isnumber)
 	length = math.Clamp(length,1,30)
 	notification.AddLegacy( text, type, length )
 end
@@ -71,8 +71,8 @@ function notification_library.addProgress(id, text)
 	else
 		checkpermission(instance, nil, "notification")
 	end
-	checkluatype(id, TYPE_STRING)
-	checkluatype(text, TYPE_STRING)
+	checkluatype(id, isstring)
+	checkluatype(text, isstring)
 
 	if #id > 256 then SF.Throw("ID is greater than 256 limit!", 2) end
 	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
@@ -92,7 +92,7 @@ function notification_library.kill(id)
 	else
 		checkpermission(instance, nil, "notification")
 	end
-	checkluatype(id, TYPE_STRING)
+	checkluatype(id, isstring)
 
 	id = "SF:"..instance.player:SteamID64()..id
 

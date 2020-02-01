@@ -106,8 +106,8 @@ function light_library.create(pos, size, brightness, color)
 	if table.Count(instance.data.light.lights) >= 256 then SF.Throw("Too many lights have already been allocated (max 256)", 2) end
 	if maxSize:GetFloat() == 0 then SF.Throw("sf_light_maxsize is set to 0", 2) end
 	checkpermission(instance, nil, "light.create")
-	checkluatype(size, TYPE_NUMBER)
-	checkluatype(brightness, TYPE_NUMBER)
+	checkluatype(size, isnumber)
+	checkluatype(brightness, isnumber)
 	local slot = getFreeSlot()
 	if not slot then SF.Throw("Failed to allocate slot for the light", 2) end
 
@@ -147,21 +147,21 @@ end
 --- Sets the light brightness
 -- @param brightness The light's brightness
 function light_methods:setBrightness(brightness)
-	checkluatype(brightness, TYPE_NUMBER)
+	checkluatype(brightness, isnumber)
 	unwrap(self).data.brightness = brightness
 end
 
 --- Sets the light decay speed in thousandths per second. 1000 lasts for 1 second, 2000 lasts for 0.5 seconds
 -- @param decay The light's decay speed
 function light_methods:setDecay(decay)
-	checkluatype(decay, TYPE_NUMBER)
+	checkluatype(decay, isnumber)
 	unwrap(self).data.decay = decay
 end
 
 --- Sets the light lifespan (Required for fade effect i.e. decay)
 -- @param dietime The how long the light will stay alive after turning it off.
 function light_methods:setDieTime(dietime)
-	checkluatype(dietime, TYPE_NUMBER)
+	checkluatype(dietime, isnumber)
 	unwrap(self).dietime = math.max(dietime, 0)
 end
 
@@ -174,35 +174,35 @@ end
 --- Sets the light inner angle (used with setDirection and setOuterAngle)
 -- @param ang Number inner angle of the light
 function light_methods:setInnerAngle(ang)
-	checkluatype(ang, TYPE_NUMBER)
+	checkluatype(ang, isnumber)
 	unwrap(self).data.innerangle = ang
 end
 
 --- Sets the light outer angle (used with setDirection and setInnerAngle)
 -- @param ang Number outer angle of the light
 function light_methods:setOuterAngle(ang)
-	checkluatype(ang, TYPE_NUMBER)
+	checkluatype(ang, isnumber)
 	unwrap(self).data.outerangle = ang
 end
 
 --- Sets the minimum light amount
 -- @param min The minimum light
 function light_methods:setMinLight(min)
-	checkluatype(min, TYPE_NUMBER)
+	checkluatype(min, isnumber)
 	unwrap(self).data.minlight = min
 end
 
 --- Sets whether the light should cast onto the world or not
 -- @param on Whether the light shouldn't cast onto the world
 function light_methods:setNoWorld(on)
-	checkluatype(on, TYPE_BOOL)
+	checkluatype(on, isbool)
 	unwrap(self).data.noworld = on
 end
 
 --- Sets whether the light should cast onto models or not
 -- @param on Whether the light shouldn't cast onto the models
 function light_methods:setNoModel(on)
-	checkluatype(on, TYPE_BOOL)
+	checkluatype(on, isbool)
 	unwrap(self).data.nomodel = on
 end
 
@@ -215,14 +215,14 @@ end
 --- Sets the size of the light (max is sf_light_maxsize)
 -- @param size The size of the light
 function light_methods:setSize(size)
-	checkluatype(size, TYPE_NUMBER)
+	checkluatype(size, isnumber)
 	unwrap(self).data.size = math.Clamp(size, 0, maxSize:GetFloat())
 end
 
 --- Sets the flicker style of the light https://developer.valvesoftware.com/wiki/Light_dynamic#Appearances
 -- @param style The number of the flicker style
 function light_methods:setStyle(style)
-	checkluatype(style, TYPE_NUMBER)
+	checkluatype(style, isnumber)
 	unwrap(self).data.style = style
 end
 

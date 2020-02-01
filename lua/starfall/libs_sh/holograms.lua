@@ -154,7 +154,7 @@ end
 -- @return The hologram object
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
-	checkluatype(model, TYPE_STRING)
+	checkluatype(model, isstring)
 
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
@@ -243,7 +243,7 @@ if SERVER then
 	function hologram_methods:suppressEngineLighting(suppress)
 		local holo = getholo(self)
 
-		checkluatype(suppress, TYPE_BOOL)
+		checkluatype(suppress, isbool)
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
@@ -340,7 +340,7 @@ else
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		if val then
-			checkluatype(val, TYPE_NUMBER)
+			checkluatype(val, isnumber)
 			holo.filter_mag = val
 		else
 			holo.filter_mag = nil
@@ -356,7 +356,7 @@ else
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
 		if val then
-			checkluatype(val, TYPE_NUMBER)
+			checkluatype(val, isnumber)
 			holo.filter_min = val
 		else
 			holo.filter_min = nil
@@ -397,7 +397,7 @@ else
 	function hologram_methods:suppressEngineLighting(suppress)
 		local holo = getholo(self)
 
-		checkluatype(suppress, TYPE_BOOL)
+		checkluatype(suppress, isbool)
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
@@ -419,7 +419,7 @@ else
 			local parent = getent(ent)
 			
 			if attachment == nil then attachment = -1 end
-			checkluatype(attachment, TYPE_NUMBER)
+			checkluatype(attachment, isnumber)
 			
 			if not parent.sf_children then
 				parent.sf_children = setmetatable({}, holoChildrenMeta)
@@ -459,8 +459,8 @@ end
 function hologram_methods:setClip(index, enabled, origin, normal, entity)
 	local holo = getholo(self)
 
-	checkluatype(index, TYPE_NUMBER)
-	checkluatype(enabled, TYPE_BOOL)
+	checkluatype(index, isnumber)
+	checkluatype(enabled, isbool)
 
 	if entity ~= nil then
 		entity = getent(entity)
@@ -501,7 +501,7 @@ end
 function hologram_methods:setModel(model)
 	local holo = getholo(self)
 
-	checkluatype(model, TYPE_STRING)
+	checkluatype(model, isstring)
 	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")

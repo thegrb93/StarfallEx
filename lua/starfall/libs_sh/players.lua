@@ -303,7 +303,7 @@ end
 -- @param wep String weapon class
 -- @return weapon
 function player_methods:getWeapon(wep)
-	checkluatype(wep, TYPE_STRING)
+	checkluatype(wep, isstring)
 	return wwrap(getply(self):GetWeapon(wep))
 end
 
@@ -366,7 +366,7 @@ end
 -- @param key Key to check. IN_KEY table values
 -- @return True or false
 function player_methods:keyDown(key)
-	checkluatype(key, TYPE_NUMBER)
+	checkluatype(key, isnumber)
 
 	return getply(self):KeyDown(key)
 end

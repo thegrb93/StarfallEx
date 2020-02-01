@@ -256,10 +256,9 @@ function SF.Instance:BuildEnvironment()
 
 	-- A list of safe data types
 	local safe_types = {
-		[TYPE_NUMBER] = true,
-		[TYPE_STRING] = true,
-		[TYPE_BOOL] = true,
-		[TYPE_NIL] = true,
+		[dgetmeta(0)] = true,
+		[dgetmeta("")] = true,
+		[dgetmeta(true)] = true,
 	}
 
 	--- Wraps the given object so that it is safe to pass into starfall
@@ -271,19 +270,19 @@ function SF.Instance:BuildEnvironment()
 	local function WrapObject(object)
 		local metatable = dgetmeta(object)
 		if metatable then
-			local wrap = object_wrappers[metatable]
-			if wrap then
-				return wrap(object)
+			if safe_types[metatable] then
+				return object
 			else
-				-- Check if the object is already an SF type
-				if object_unwrappers[metatable] then
-					return object
+				local wrap = object_wrappers[metatable]
+				if wrap then
+					return wrap(object)
+				else
+					-- Check if the object is already an SF type
+					if object_unwrappers[metatable] then
+						return object
+					end
 				end
 			end
-		end
-		-- Do not elseif here because strings do have a metatable.
-		if safe_types[TypeID(object)] then
-			return object
 		end
 	end
 	self.WrapObject = WrapObject
@@ -295,13 +294,14 @@ function SF.Instance:BuildEnvironment()
 	local function UnwrapObject(object)
 		local metatable = dgetmeta(object)
 		if metatable then
-			local unwrap = object_unwrappers[metatable]
-			if unwrap then
-				return unwrap(object)
+			if safe_types[metatable] then
+				return object
+			else
+				local unwrap = object_unwrappers[metatable]
+				if unwrap then
+					return unwrap(object)
+				end
 			end
-		end
-		if safe_types[TypeID(object)] then
-			return object
 		end
 	end
 	self.UnwrapObject = UnwrapObject
@@ -320,13 +320,13 @@ function SF.Instance:BuildEnvironment()
 			local return_list = {}
 			completed_tables[tbl] = return_list
 			for key, value in pairs(tbl) do
-				local keyt = TypeID(key)
-				local valuet = TypeID(value)
+				local keyt = dgetmeta(key)
+				local valuet = dgetmeta(value)
 				if not safe_types[keyt] then
-					key = WrapObject(key) or (keyt == TYPE_TABLE and (completed_tables[key] or RecursiveSanitize(key)) or nil)
+					key = WrapObject(key) or (istable(key) and (completed_tables[key] or RecursiveSanitize(key)) or nil)
 				end
 				if not safe_types[valuet] then
-					value = WrapObject(value) or (valuet == TYPE_TABLE and (completed_tables[value] or RecursiveSanitize(value)) or nil)
+					value = WrapObject(value) or (istable(value) and (completed_tables[value] or RecursiveSanitize(value)) or nil)
 				end
 				return_list[key] = value
 			end
@@ -345,10 +345,10 @@ function SF.Instance:BuildEnvironment()
 			local return_list = {}
 			completed_tables[tbl] = return_list
 			for key, value in pairs(tbl) do
-				if TypeID(key) == TYPE_TABLE then
+				if istable(key) then
 					key = UnwrapObject(key) or completed_tables[key] or RecursiveUnsanitize(key)
 				end
-				if TypeID(value) == TYPE_TABLE then
+				if istable(value) then
 					value = UnwrapObject(value) or completed_tables[value] or RecursiveUnsanitize(value)
 				end
 				return_list[key] = value

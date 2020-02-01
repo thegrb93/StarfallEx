@@ -91,7 +91,7 @@ if SERVER then
 	-- @server
 	-- @param wep The classname of the weapon
 	function npc_methods:giveWeapon(wep)
-		checkluatype(wep, TYPE_STRING)
+		checkluatype(wep, isstring)
 
 		local npc = getnpc(self)
 		checkpermission(instance, npc, "npcs.giveweapon")

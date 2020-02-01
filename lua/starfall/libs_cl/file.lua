@@ -49,8 +49,8 @@ local file_methods, file_meta, wrap, unwrap = instance.Types.File.Methods, insta
 -- @return File object or nil if it failed
 function file_library.open(path, mode)
 	checkpermission (instance, path, "file.open")
-	checkluatype (path, TYPE_STRING)
-	checkluatype (mode, TYPE_STRING)
+	checkluatype(path, isstring)
+	checkluatype(mode, isstring)
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), mode, "DATA")
 	if f then
 		instance.data.files[f] = true
@@ -63,7 +63,7 @@ end
 -- @return Contents, or nil if error
 function file_library.read(path)
 	checkpermission (instance, path, "file.read")
-	checkluatype (path, TYPE_STRING)
+	checkluatype(path, isstring)
 	return file.Read("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
@@ -72,8 +72,8 @@ end
 -- @return True if OK, nil if error
 function file_library.write(path, data)
 	checkpermission (instance, path, "file.write")
-	checkluatype (path, TYPE_STRING)
-	checkluatype (data, TYPE_STRING)
+	checkluatype(path, isstring)
+	checkluatype(data, isstring)
 
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), "wb", "DATA")
 	if not f then SF.Throw("Couldn't open file for writing.", 2) return end
@@ -86,8 +86,8 @@ end
 -- @param data String that will be appended to the file.
 function file_library.append(path, data)
 	checkpermission (instance, path, "file.write")
-	checkluatype (path, TYPE_STRING)
-	checkluatype (data, TYPE_STRING)
+	checkluatype(path, isstring)
+	checkluatype(data, isstring)
 
 	local f = file.Open("sf_filedata/" .. SF.NormalizePath(path), "ab", "DATA")
 	if not f then SF.Throw("Couldn't open file for writing.", 2) return end
@@ -100,7 +100,7 @@ end
 -- @return True if exists, false if not, nil if error
 function file_library.exists(path)
 	checkpermission (instance, path, "file.exists")
-	checkluatype (path, TYPE_STRING)
+	checkluatype(path, isstring)
 	return file.Exists("sf_filedata/" .. SF.NormalizePath(path), "DATA")
 end
 
@@ -109,7 +109,7 @@ end
 -- @return True if successful, nil if it wasn't found
 function file_library.delete(path)
 	checkpermission (instance, path, "file.write")
-	checkluatype (path, TYPE_STRING)
+	checkluatype(path, isstring)
 	path = "sf_filedata/" .. SF.NormalizePath(path)
 	if file.Exists(path, "DATA") then
 		file.Delete(path)
@@ -121,7 +121,7 @@ end
 -- @param path Filepath relative to data/sf_filedata/.
 function file_library.createDir(path)
 	checkpermission (instance, path, "file.write")
-	checkluatype (path, TYPE_STRING)
+	checkluatype(path, isstring)
 	file.CreateDir("sf_filedata/" .. SF.NormalizePath(path))
 end
 
@@ -132,8 +132,8 @@ end
 -- @return Table of directory names
 function file_library.find(path, sorting)
 	checkpermission (instance, path, "file.find")
-	checkluatype (path, TYPE_STRING)
-	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
+	checkluatype(path, isstring)
+	if sorting~=nil then checkluatype(sorting, isstring) end
 	return file.Find("sf_filedata/" .. SF.NormalizePath(path), "DATA", sorting)
 end
 
@@ -144,8 +144,8 @@ end
 -- @return Table of directory names
 function file_library.findInGame(path, sorting)
 	checkpermission (instance, path, "file.findInGame")
-	checkluatype (path, TYPE_STRING)
-	if sorting~=nil then checkluatype (sorting, TYPE_STRING) end
+	checkluatype(path, isstring)
+	if sorting~=nil then checkluatype(sorting, isstring) end
 	return file.Find(SF.NormalizePath(path), "GAME", sorting)
 end
 
@@ -164,7 +164,7 @@ end
 --- Sets the file position
 -- @param n The position to set it to
 function file_methods:seek(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 	unwrap(self):Seek(n)
 end
 
@@ -172,7 +172,7 @@ end
 -- @param n How much to move the position
 -- @return The resulting position
 function file_methods:skip(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 	return unwrap(self):Skip(n)
 end
 
@@ -240,49 +240,49 @@ end
 --- Writes a string to the file and advances the file position
 -- @param str The data to write
 function file_methods:write(str)
-	checkluatype (str, TYPE_STRING)
+	checkluatype(str, isstring)
 	unwrap(self):Write(str)
 end
 
 --- Writes a boolean and advances the file position
 -- @param x The boolean to write
 function file_methods:writeBool(x)
-	checkluatype (x, TYPE_BOOL)
+	checkluatype(x, isbool)
 	unwrap(self):WriteBool(x)
 end
 
 --- Writes a byte and advances the file position
 -- @param x The byte to write
 function file_methods:writeByte(x)
-	checkluatype (x, TYPE_NUMBER)
+	checkluatype(x, isnumber)
 	unwrap(self):WriteByte(x)
 end
 
 --- Writes a double and advances the file position
 -- @param x The double to write
 function file_methods:writeDouble(x)
-	checkluatype (x, TYPE_NUMBER)
+	checkluatype(x, isnumber)
 	unwrap(self):WriteDouble(x)
 end
 
 --- Writes a float and advances the file position
 -- @param x The float to write
 function file_methods:writeFloat(x)
-	checkluatype (x, TYPE_NUMBER)
+	checkluatype(x, isnumber)
 	unwrap(self):WriteFloat(x)
 end
 
 --- Writes a long and advances the file position
 -- @param x The long to write
 function file_methods:writeLong(x)
-	checkluatype (x, TYPE_NUMBER)
+	checkluatype(x, isnumber)
 	unwrap(self):WriteLong(x)
 end
 
 --- Writes a short and advances the file position
 -- @param x The short to write
 function file_methods:writeShort(x)
-	checkluatype (x, TYPE_NUMBER)
+	checkluatype(x, isnumber)
 	unwrap(self):WriteShort(x)
 end
 

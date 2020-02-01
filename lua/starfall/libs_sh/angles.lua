@@ -35,9 +35,9 @@ end
 -- @param r - Roll
 -- @return Angle
 instance.env.Angle = function (p, y, r)
-	if p then checkluatype(p, TYPE_NUMBER) else p = 0 end
-	if y then checkluatype(y, TYPE_NUMBER) else y = p end
-	if r then checkluatype(r, TYPE_NUMBER) else r = p end
+	if p then checkluatype(p, isnumber) else p = 0 end
+	if y then checkluatype(y, isnumber) else y = p end
+	if r then checkluatype(r, isnumber) else r = p end
 	return wrap({ p, y, r })
 end
 
@@ -85,9 +85,9 @@ function ang_meta.__mul(a, b)
 	elseif dgetmeta(a) == ang_meta and dgetmeta(b) == ang_meta then
 		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 	elseif dgetmeta(a) == ang_meta then
-		checkluatype(b, TYPE_NUMBER)
+		checkluatype(b, isnumber)
 	else
-		checkluatype(a, TYPE_NUMBER)
+		checkluatype(a, isnumber)
 	end
 end
 
@@ -102,9 +102,9 @@ function ang_meta.__div(a, b)
 	elseif dgetmeta(a) == ang_meta and dgetmeta(b) == ang_meta then
 		return wrap({ a[1] / b[1], a[2] / b[2], a[3] / b[3] })
 	elseif dgetmeta(a) == ang_meta then
-		checkluatype(b, TYPE_NUMBER)
+		checkluatype(b, isnumber)
 	else
-		checkluatype(a, TYPE_NUMBER)
+		checkluatype(a, isnumber)
 	end
 end
 
@@ -183,10 +183,10 @@ end
 function ang_methods:rotateAroundAxis(v, deg, rad)
 
 	if rad then
-		checkluatype (rad, TYPE_NUMBER)
+		checkluatype(rad, isnumber)
 		deg = math.deg(rad)
 	else
-		checkluatype (deg, TYPE_NUMBER)
+		checkluatype(deg, isnumber)
 	end
 
 	local ret = Angle()

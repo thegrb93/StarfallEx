@@ -59,7 +59,7 @@ end
 -- @param func Function of the coroutine
 -- @return coroutine
 function coroutine_library.create(func)
-	checkluatype (func, TYPE_FUNCTION)
+	checkluatype(func, isfunction)
 	local wrappedFunc, wrappedThread = createCoroutine(func)
 	return wrappedThread
 end
@@ -68,7 +68,7 @@ end
 -- @param func Function of the coroutine
 -- @return A function that, when called, resumes the created coroutine. Any parameters to that function will be passed to the coroutine.
 function coroutine_library.wrap(func)
-	checkluatype (func, TYPE_FUNCTION)
+	checkluatype(func, isfunction)
 	local wrappedFunc, wrappedThread = createCoroutine(func)
 	return wrappedFunc
 end
@@ -114,7 +114,7 @@ end
 function coroutine_library.wait(time)
 	local curthread = coroutine.running()
 	if curthread and instance.data.coroutines[curthread] then
-		checkluatype (time, TYPE_NUMBER)
+		checkluatype(time, isnumber)
 		coroutine.wait(time)
 	else
 		SF.Throw("attempt to yield across C-call boundary", 2)

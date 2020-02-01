@@ -60,7 +60,7 @@ if SERVER then
 	-- @param n The index of the passenger to get
 	-- @return The passenger or NULL if empty
 	function vehicle_methods:getPassenger(n)
-		checkluatype(n, TYPE_NUMBER)
+		checkluatype(n, isnumber)
 		return pwrap(getveh(self):GetPassenger(n))
 	end
 
@@ -79,7 +79,7 @@ if SERVER then
 	-- @param class Optional weapon class to strip. Otherwise all are stripped.
 	-- @server
 	function vehicle_methods:stripDriver(class)
-		if class ~= nil then checkluatype(class, TYPE_STRING) end
+		if class ~= nil then checkluatype(class, isstring) end
 		local ent = getveh(self)
 		checkpermission(instance, ent, "vehicle.strip")
 		local driver = ent:GetDriver()

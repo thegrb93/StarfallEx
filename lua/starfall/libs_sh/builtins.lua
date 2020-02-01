@@ -72,7 +72,7 @@ end
 -- @return Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
 function builtins_library.player(num)
 	if num then
-		checkluatype(num, TYPE_NUMBER)
+		checkluatype(num, isnumber)
 		return instance.Types.Player.Wrap(Player(num))
 	end
 
@@ -84,7 +84,7 @@ end
 -- @param num Entity index
 -- @return entity
 function builtins_library.entity(num)
-	checkluatype(num, TYPE_NUMBER)
+	checkluatype(num, isnumber)
 	return owrap(Entity(num))
 end
 
@@ -173,7 +173,7 @@ builtins_library.setmetatable = setmetatable
 -- @param tbl Table to get metatable of
 -- @return The metatable of tbl
 builtins_library.getmetatable = function(tbl)
-	checkluatype(tbl, TYPE_TABLE)
+	checkluatype(tbl, istable)
 	return getmetatable(tbl)
 end
 
@@ -266,7 +266,7 @@ end
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function builtins_library.setSoftQuota(quota)
-	checkluatype(quota, TYPE_NUMBER)
+	checkluatype(quota, isnumber)
 	instance.cpu_softquota = quota
 end
 
@@ -274,7 +274,7 @@ end
 --@param perm The permission id to check
 --@param obj Optional object to pass to the permission system.
 function builtins_library.hasPermission(perm, obj)
-	checkluatype(perm, TYPE_STRING)
+	checkluatype(perm, isstring)
 	if not SF.Permissions.permissionchecks[perm] then SF.Throw("Permission doesn't exist", 2) end
 	return SF.Permissions.hasAccess(instance, ounwrap(obj), perm)
 end
@@ -292,8 +292,8 @@ if CLIENT then
 	--@param showOnUse Whether request will popup when player uses chip or linked screen.
 	--@client
 	function builtins_library.setupPermissionRequest( perms, desc, showOnUse )
-		checkluatype( desc, TYPE_STRING )
-		checkluatype( perms, TYPE_TABLE )
+		checkluatype( desc, isstring)
+		checkluatype( perms, istable)
 		local c = #perms
 		if #desc > 400 then
 			SF.Throw( "Description too long." )
@@ -488,23 +488,23 @@ end
 ---
 -- @class function
 function math_library.lerp(percent, from, to)
-	checkluatype(percent, TYPE_NUMBER)
-	checkluatype(from, TYPE_NUMBER)
-	checkluatype(to, TYPE_NUMBER)
+	checkluatype(percent, isnumber)
+	checkluatype(from, isnumber)
+	checkluatype(to, isnumber)
 
 	return Lerp(percent, from, to)
 end
 ---
 -- @class function
 function math_library.lerpAngle(percent, from, to)
-	checkluatype(percent, TYPE_NUMBER)
+	checkluatype(percent, isnumber)
 
 	return awrap(LerpAngle(percent, aunwrap(from), aunwrap(to)))
 end
 ---
 -- @class function
 function math_library.lerpVector(percent, from, to)
-	checkluatype(percent, TYPE_NUMBER)
+	checkluatype(percent, isnumber)
 
 	return vwrap(LerpVector(percent, vunwrap(from), vunwrap(to)))
 end
@@ -694,7 +694,7 @@ end
 --@param key The index of the table
 --@param value The value to set the index equal to
 function builtins_library.rawset(table, key, value)
-    checkluatype(table, TYPE_TABLE)
+    checkluatype(table, istable)
 
     rawset(table, key, value)
 end
@@ -704,7 +704,7 @@ end
 --@param key The index of the table
 --@return The value of the index
 function builtins_library.rawget(table, key, value)
-    checkluatype(table, TYPE_TABLE)
+    checkluatype(table, istable)
 
     return rawget(table, key)
 end
@@ -793,7 +793,7 @@ if SERVER then
 	--- Prints a table to player's chat
 	-- @param tbl Table to print
 	function builtins_library.printTable(tbl)
-		checkluatype(tbl, TYPE_TABLE)
+		checkluatype(tbl, istable)
 		printTableX(tbl, 0, { tbl = true })
 	end
 
@@ -801,7 +801,7 @@ if SERVER then
 	-- @shared
 	-- @param cmd Command to execute
 	function builtins_library.concmd(cmd)
-		checkluatype(cmd, TYPE_STRING)
+		checkluatype(cmd, isstring)
 		if #cmd > 512 then SF.Throw("Console command is too long!", 2) end
 		checkpermission(instance, nil, "console.command")
 		instance.player:ConCommand(cmd)
@@ -811,7 +811,7 @@ if SERVER then
 	-- @server
 	-- @param str String data
 	function builtins_library.setUserdata(str)
-		checkluatype(str, TYPE_STRING)
+		checkluatype(str, isstring)
 		local max = userdataLimit:GetInt()
 		if #str>max then
 			SF.Throw("The userdata limit is " .. string.Comma(max) .. " bytes", 2)
@@ -830,7 +830,7 @@ else
 	-- @client
 	-- @param name Name
 	function builtins_library.setName(name)
-		checkluatype(name, TYPE_STRING)
+		checkluatype(name, isstring)
 		local e = instance.data.entity
 		if (e and e:IsValid()) then
 			e.name = string.sub(name, 1, 256)
@@ -841,7 +841,7 @@ else
 	-- @param txt Text to set to the clipboard
 	function builtins_library.setClipboardText(txt)
 		if instance.player ~= LocalPlayer() then return end
-		checkluatype(txt, TYPE_STRING)
+		checkluatype(txt, isstring)
 		SetClipboardText(txt)
 	end
 
@@ -850,7 +850,7 @@ else
 	-- @param text The message text.
 	function builtins_library.printMessage(mtype, text)
 		if instance.player ~= LocalPlayer() then return end
-		checkluatype(text, TYPE_STRING)
+		checkluatype(text, isstring)
 		instance.player:PrintMessage(mtype, text)
 	end
 
@@ -861,14 +861,14 @@ else
 	end
 
 	function builtins_library.printTable(tbl)
-		checkluatype(tbl, TYPE_TABLE)
+		checkluatype(tbl, istable)
 		if instance.player == LocalPlayer() then
 			printTableX(tbl, 0, { tbl = true })
 		end
 	end
 
 	function builtins_library.concmd(cmd)
-		checkluatype(cmd, TYPE_STRING)
+		checkluatype(cmd, isstring)
 		checkpermission(instance, nil, "console.command")
 		LocalPlayer():ConCommand(cmd)
 	end
@@ -906,7 +906,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function builtins_library.require(file)
-	checkluatype(file, TYPE_STRING)
+	checkluatype(file, isstring)
 	local loaded = instance.requires
 
 	local path
@@ -945,8 +945,8 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function builtins_library.requiredir(dir, loadpriority)
-	checkluatype(dir, TYPE_STRING)
-	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
+	checkluatype(dir, isstring)
+	if loadpriority then checkluatype(loadpriority, istable) end
 
 	local path
 	if string.sub(dir, 1, 1)=="/" then
@@ -993,7 +993,7 @@ end
 -- @param file The file to include. Make sure to --@include it
 -- @return Return value of the script
 function builtins_library.dofile(file)
-	checkluatype(file, TYPE_STRING)
+	checkluatype(file, isstring)
 	local path
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
@@ -1013,8 +1013,8 @@ end
 -- @param loadpriority Table of files that should be loaded before any others in the directory
 -- @return Table of return values of the scripts
 function builtins_library.dodir(dir, loadpriority)
-	checkluatype(dir, TYPE_STRING)
-	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
+	checkluatype(dir, isstring)
+	if loadpriority then checkluatype(loadpriority, istable) end
 
 	local returns = {}
 
@@ -1067,7 +1067,7 @@ end
 -- @param sfType Name of SF type
 -- @return Table of the type's methods which can be edited or iterated
 function builtins_library.getMethods(sfType)
-	checkluatype(sfType, TYPE_STRING)
+	checkluatype(sfType, isstring)
 	local typemeta = instance.Types[sfType]
 	if not typemeta then SF.Throw("Invalid type") end
 	return typemeta.Methods
@@ -1088,7 +1088,7 @@ end
 -- @return DebugInfo table
 function builtins_library.debugGetInfo(funcOrStackLevel, fields)
 	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
-	if fields then checkluatype(fields, TYPE_STRING) end
+	if fields then checkluatype(fields, isstring) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
 	if ret then

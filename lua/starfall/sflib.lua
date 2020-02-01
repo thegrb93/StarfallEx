@@ -8,8 +8,8 @@ local dgetmeta = debug.getmetatable
 
 -- Make sure this is done after metatables have been set
 hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
-	local function sanitizeTypeMeta(theType, myMeta)
-		local meta = debug.getmetatable(theType)
+	local function sanitizeTypeMeta(theType, checktype, myMeta)
+		local meta = dgetmeta(theType)
 		if meta then
 			for k, v in pairs(meta) do
 				if isfunction(v) then
@@ -36,14 +36,20 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 					end
 				end
 			end
+		else
+			meta = {}
+			debug.setmetatable(theType, meta)
+		end
+		if checktype then
+			_G[checktype] = function(x) return dgetmeta(x)==meta end
 		end
 	end
 
 	sanitizeTypeMeta(nil)
-	sanitizeTypeMeta(true)
-	sanitizeTypeMeta(0)
-	sanitizeTypeMeta(function() end)
-	sanitizeTypeMeta(coroutine.create(function() end))
+	sanitizeTypeMeta(true, "isbool")
+	sanitizeTypeMeta(0, "isnumber")
+	sanitizeTypeMeta(function() end, "isfunction")
+	sanitizeTypeMeta(coroutine.create(function() end), "isthread")
 
 	local string_methods = SF.SafeStringLib
 	local function sf_string_index(self, key)
@@ -56,7 +62,7 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 			SF.Throw("attempt to index a string value with bad key ('" .. tostring(key) .. "' is not part of the string library)", 2)
 		end
 	end
-	sanitizeTypeMeta("", {__index = sf_string_index})
+	sanitizeTypeMeta("", "isstring", {__index = sf_string_index})
 	
 	if not WireLib then WireLib = {} end
 	if not WireLib.PatchedDuplicator then
@@ -574,28 +580,25 @@ end
 
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
--- @param typ A string type or metatable.
+-- @param typecheck The typecheck function
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckLuaType(val, typ, level)
-	local valtype = TypeID(val)
-	if valtype == typ then
+function SF.CheckLuaType(val, typecheck, level)
+	if typecheck(val) then
 		return val
 	else
 		-- Failed, throw error
-		assert(isnumber(typ))
+		assert(isfunction(typecheck))
 		local typeLookup = {
-			[TYPE_BOOL] = "boolean",
-			[TYPE_FUNCTION] = "function",
-			[TYPE_NIL] = "nil",
-			[TYPE_NUMBER] = "number",
-			[TYPE_STRING] = "string",
-			[TYPE_TABLE] = "table",
-			[TYPE_THREAD] = "thread",
-			[TYPE_USERDATA] = "userdata"
+			[isbool] = "boolean",
+			[isfunction] = "function",
+			[isnumber] = "number",
+			[isstring] = "string",
+			[istable] = "table",
+			[isthread] = "thread"
 		}
 
 		level = (level or 1) + 2
-		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
+		SF.ThrowTypeError(typeLookup[typecheck], SF.GetType(val), level)
 	end
 end
 
@@ -1007,8 +1010,8 @@ do
 
 	local checkluatype = SF.CheckLuaType
 	function SF.Class(name, super)
-		checkluatype(name, TYPE_STRING)
-		if super~=nil then checkluatype(super, TYPE_TABLE) end
+		checkluatype(name, isstring)
+		if super~=nil then checkluatype(super, istable) end
 		return super and super:subclass(name) or _includeMixin(_createClass(name), DefaultMixin)
 	end
 end
@@ -1035,7 +1038,7 @@ do
 	string_methods.gsub = string.gsub
 	string_methods.implode = string.Implode string_methods.Implode = string.Implode
 	local function javascriptSafe(str)
-		checkluatype(str, TYPE_STRING)
+		checkluatype(str, isstring)
 		return string.JavascriptSafe(str)
 	end
 	string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
@@ -1046,7 +1049,7 @@ do
 	string_methods.niceSize = string.NiceSize string_methods.NiceSize = string.NiceSize
 	string_methods.niceTime = string.NiceTime string_methods.NiceTime = string.NiceTime
 	local function patternSafe(str)
-		checkluatype(str, TYPE_STRING)
+		checkluatype(str, isstring)
 		return string.PatternSafe(str)
 	end
 	string_methods.patternSafe = patternSafe string_methods.PatternSafe = patternSafe

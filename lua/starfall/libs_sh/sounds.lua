@@ -63,8 +63,8 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 -- @param nofilter (Optional) Boolean Make the sound play for everyone regardless of range or location. Only affects Server-side sounds.
 -- @return Sound Object
 function sounds_library.create(ent, path, nofilter)
-	checkluatype(path, TYPE_STRING)
-	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
+	checkluatype(path, isstring)
+	if nofilter~=nil then checkluatype(filter, isbool) end
 
 	checkpermission(instance, { ent, path }, "sound.create")
 
@@ -117,7 +117,7 @@ end
 function sound_methods:stop(fade)
 	checkpermission(instance, nil, "sound.modify")
 	if fade then
-		checkluatype(fade, TYPE_NUMBER)
+		checkluatype(fade, isnumber)
 		unwrap(self):FadeOut(math.max(fade, 0))
 	else
 		unwrap(self):Stop()
@@ -145,10 +145,10 @@ end
 -- @param fade Time in seconds to transition to this new volume.
 function sound_methods:setVolume(vol, fade)
 	checkpermission(instance, nil, "sound.modify")
-	checkluatype(vol, TYPE_NUMBER)
+	checkluatype(vol, isnumber)
 
 	if fade then
-		checkluatype (fade, TYPE_NUMBER)
+		checkluatype(fade, isnumber)
 		fade = math.abs(fade, 0)
 	else
 		fade = 0
@@ -163,10 +163,10 @@ end
 -- @param fade Time in seconds to transition to this new pitch.
 function sound_methods:setPitch(pitch, fade)
 	checkpermission(instance, nil, "sound.modify")
-	checkluatype(pitch, TYPE_NUMBER)
+	checkluatype(pitch, isnumber)
 
 	if fade then
-		checkluatype (fade, TYPE_NUMBER)
+		checkluatype(fade, isnumber)
 		fade = math.max(fade, 0)
 	else
 		fade = 0
@@ -185,7 +185,7 @@ end
 -- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel(level)
 	checkpermission(instance, nil, "sound.modify")
-	checkluatype(level, TYPE_NUMBER)
+	checkluatype(level, isnumber)
 	unwrap(self):SetSoundLevel(math.Clamp(level, 0, 511))
 end
 

@@ -65,9 +65,9 @@ function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 	local start, endpos = vunwrap(start), vunwrap(endpos)
 
 	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+	if mask ~= nil then checkluatype(mask, isnumber) end
+	if colgroup ~= nil then checkluatype(colgroup, isnumber) end
+	if ignworld ~= nil then checkluatype(ignworld, isbool) end
 
 	local trace = {
 		start = start,
@@ -101,9 +101,9 @@ function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, co
 	local start, endpos, minbox, maxbox = vunwrap(start), vunwrap(endpos), vunwrap(minbox), vunwrap(maxbox)
 
 	filter = convertFilter(filter)
-	if mask ~= nil then checkluatype (mask, TYPE_NUMBER) end
-	if colgroup ~= nil then checkluatype (colgroup, TYPE_NUMBER) end
-	if ignworld ~= nil then checkluatype (ignworld, TYPE_BOOL) end
+	if mask ~= nil then checkluatype(mask, isnumber) end
+	if colgroup ~= nil then checkluatype(colgroup, isnumber) end
+	if ignworld ~= nil then checkluatype(ignworld, isbool) end
 
 	local trace = {
 		start = start,

@@ -73,7 +73,7 @@ end
 -- @shared
 -- @param name The message name
 function net_library.start(name)
-	checkluatype (name, TYPE_STRING)
+	checkluatype(name, isstring)
 	if instance.data.net.started then SF.Throw("net message was already started", 2) end
 
 	instance.data.net.started = true
@@ -88,7 +88,7 @@ end
 --@param target Optional target location to send the net message.
 --@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
-	if unreliable then checkluatype (unreliable, TYPE_BOOL) end
+	if unreliable then checkluatype(unreliable, isbool) end
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	netBurst:use(instance.player, instance.data.net.size)
@@ -230,7 +230,7 @@ netreadtable = net_library.readTable
 function net_library.writeString(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_STRING)
+	checkluatype(t, isstring)
 
 	write(net.WriteString, (#t+1)*8, t)
 	return true
@@ -252,8 +252,8 @@ end
 function net_library.writeData(t, n)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_STRING)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(t, isstring)
+	checkluatype(n, isnumber)
 
 	n = math.Clamp(n, 0, 64000)
 	write(net.WriteData, n*8, t, n)
@@ -266,7 +266,7 @@ end
 -- @return The string that was read
 
 function net_library.readData(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 	n = math.Clamp(n, 0, 64000)
 	return net.ReadData(n)
 end
@@ -277,7 +277,7 @@ end
 function net_library.writeStream(str)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (str, TYPE_STRING)
+	checkluatype(str, isstring)
 	write(net.WriteStream, 8*8, str)
 	return true
 end
@@ -286,7 +286,7 @@ end
 -- @shared
 -- @param cb Callback to run when the stream is finished. The first parameter in the callback is the data. Will be nil if transfer fails or is cancelled
 function net_library.readStream(cb)
-	checkluatype (cb, TYPE_FUNCTION)
+	checkluatype(cb, isfunction)
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
 	
 	streams[instance.player] = net.ReadStream((SERVER and instance.player or nil), function(data)
@@ -318,8 +318,8 @@ end
 function net_library.writeInt(t, n)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_NUMBER)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(t, isnumber)
+	checkluatype(n, isnumber)
 
 	n = math.Clamp(n, 0, 32)
 	write(net.WriteInt, n, t, n)
@@ -332,7 +332,7 @@ end
 -- @return The integer that was read
 
 function net_library.readInt(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 	return net.ReadInt(n)
 end
 
@@ -344,8 +344,8 @@ end
 function net_library.writeUInt(t, n)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_NUMBER)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(t, isnumber)
+	checkluatype(n, isnumber)
 
 	n = math.Clamp(n, 0, 32)
 	write(net.WriteUInt, n, t, n)
@@ -358,7 +358,7 @@ end
 -- @return The unsigned integer that was read
 
 function net_library.readUInt(n)
-	checkluatype (n, TYPE_NUMBER)
+	checkluatype(n, isnumber)
 	return net.ReadUInt(n)
 end
 
@@ -369,7 +369,7 @@ end
 function net_library.writeBit(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_NUMBER)
+	checkluatype(t, isnumber)
 
 	write(net.WriteBit, 1, t~=0)
 	return true
@@ -390,7 +390,7 @@ end
 function net_library.writeBool(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_BOOL)
+	checkluatype(t, isbool)
 
 	write(net.WriteBool, 1, t)
 	return true
@@ -411,7 +411,7 @@ end
 function net_library.writeDouble(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_NUMBER)
+	checkluatype(t, isnumber)
 
 	write(net.WriteDouble, 8*8, t)
 	return true
@@ -432,7 +432,7 @@ end
 function net_library.writeFloat(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	checkluatype (t, TYPE_NUMBER)
+	checkluatype(t, isnumber)
 
 	write(net.WriteFloat, 4*8, t)
 	return true
@@ -549,8 +549,8 @@ end
 -- @param name The name of the net message
 -- @param func The callback or nil to remove callback. (len - length of the net message, ply - player that sent it or nil if clientside)
 function net_library.receive(name, func)
-	checkluatype (name, TYPE_STRING)
-	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
+	checkluatype(name, isstring)
+	if func~=nil then checkluatype(func, isfunction) end
 	instance.data.net.receives[name] = func
 end
 

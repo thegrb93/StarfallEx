@@ -116,9 +116,9 @@ local pwrap = instance.Types.Player.Wrap
 -- @param name Unique identifier
 -- @param func Function to run
 function hook_library.add(hookname, name, func)
-	checkluatype (hookname, TYPE_STRING)
-	checkluatype (name, TYPE_STRING)
-	checkluatype (func, TYPE_FUNCTION)
+	checkluatype(hookname, isstring)
+	checkluatype(name, isstring)
+	checkluatype(func, isfunction)
 
 	hookname = hookname:lower()
 	local hooks = instance.hooks[hookname]
@@ -136,7 +136,7 @@ end
 -- @param hookname The hook name
 -- @param ... arguments
 function hook_library.run(hookname, ...)
-	checkluatype (hookname, TYPE_STRING)
+	checkluatype(hookname, isstring)
 
 	local hook = hookname:lower()
 
@@ -204,8 +204,8 @@ end
 -- @param hookname The hook name
 -- @param name The unique name for this hook
 function hook_library.remove(hookname, name)
-	checkluatype (hookname, TYPE_STRING)
-	checkluatype (name, TYPE_STRING)
+	checkluatype(hookname, isstring)
+	checkluatype(name, isstring)
 
 	local lower = hookname:lower()
 	if instance.hooks[lower] then

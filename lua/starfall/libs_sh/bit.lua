@@ -15,8 +15,8 @@ local ss_meta = {
 	end
 }
 function SF.StringStream(stream, i, endian)
-	if stream~=nil then checkluatype(stream, TYPE_STRING) else stream = "" end
-	if i~=nil then checkluatype(i, TYPE_NUMBER) else i = 1 end
+	if stream~=nil then checkluatype(stream, isstring) else stream = "" end
+	if i~=nil then checkluatype(i, isnumber) else i = 1 end
 	
 	local ret = setmetatable({
 		buffer = {},

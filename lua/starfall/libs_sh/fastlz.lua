@@ -1,3 +1,4 @@
+local checkluatype = SF.CheckLuaType
 local util = util
 
 --- FastLZ library
@@ -16,7 +17,7 @@ local fastlz_library = instance.Libraries.fastlz
 --@param s String to compress
 --@return FastLZ compressed string
 function fastlz_library.compress(s)
-	SF.CheckLuaType(s, TYPE_STRING)
+	checkluatype(s, isstring)
 	return util.Compress(s)
 end
 
@@ -24,7 +25,7 @@ end
 -- @param s FastLZ compressed string to decode
 -- @return Decompressed string
 function fastlz_library.decompress(s)
-	SF.CheckLuaType(s, TYPE_STRING)
+	checkluatype(s, isstring)
 	return util.Decompress(s)
 end
 
