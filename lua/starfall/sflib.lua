@@ -550,7 +550,7 @@ end
 -------------------------------------------------------------------------------
 
 --- Require .dll but doesn't throw an error. Returns true if success or false if fail.
-function SF.require(moduleName)
+function SF.Require(moduleName)
 	local osSuffix = assert(
 		(system.IsWindows() and (jit.arch~="x64" and "win32" or "win64"))
 		or (system.IsLinux() and "linux")
@@ -560,8 +560,13 @@ function SF.require(moduleName)
 	local realmPrefix = SERVER and "sv" or "cl"
 
 	if file.Exists("lua/bin/gm"..realmPrefix.."_"..moduleName.."_"..osSuffix..".dll", "GAME") then
-		require(moduleName)
-		return true
+		local ok, err = pcall(require, moduleName)
+		if ok then
+			return true
+		else
+			ErrorNoHalt(err)
+			return false
+		end
 	end
 	return false
 end

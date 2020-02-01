@@ -1,4 +1,4 @@
-if not SF.require("joystick") then return function() end end
+if not SF.Require("joystick") then return function() end end
 
 local next_updates = {}
 

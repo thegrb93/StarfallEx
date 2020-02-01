@@ -1,10 +1,4 @@
-local ok, err = pcall(SF.require, "socket.core")
-if ok then
-	if not err then return function() end end
-else
-	ErrorNoHalt(err)
-	return function() end
-end
+if not SF.Require("socket.core") then return function() end end
 
 -- LuaSocket helper module
 -- Author: Diego Nehab
