@@ -1,4 +1,4 @@
-if not pcall(require, "xinput") then return function() end end
+if not SF.require("xinput") then return function() end end
 
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check

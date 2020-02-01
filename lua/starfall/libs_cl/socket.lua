@@ -1,8 +1,9 @@
-local ok, err = pcall(require, "socket.core")
+local ok, err = pcall(SF.require, "socket.core")
 if not ok then
-	if err~="Module not found!" then ErrorNoHalt(err) end
+	ErrorNoHalt(err)
 	return function() end
 end
+if not err then return function() end end
 
 -- LuaSocket helper module
 -- Author: Diego Nehab

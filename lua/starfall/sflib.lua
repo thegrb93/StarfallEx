@@ -549,6 +549,24 @@ end
 -- Utility functions
 -------------------------------------------------------------------------------
 
+--- Require .dll but doesn't throw an error. Returns true if success or false if fail.
+function SF.require(moduleName)
+	local osSuffix = assert(
+		(system.IsWindows() and (jit.arch~="x64" and "win32" or "win64"))
+		or (system.IsLinux() and "linux")
+		or (system.IsOSX() and "osx"),
+		"couldn't determine system type?"
+	)
+	local realmPrefix = SERVER and "sv" or "cl"
+
+	if file.Exists("lua/bin/gm"..realmPrefix.."_"..moduleName.."_"..osSuffix..".dll", "GAME") then
+		require(moduleName)
+		return true
+	end
+	return false
+end
+
+
 function SF.CompileString(str, name, handle)
 	if string.find(str, "repeat.*continue.*until") then
 		return "Due to a glua bug. Use of the string 'continue' in repeat-until loops has been banned"
