@@ -218,8 +218,8 @@ if CLIENT then
 	-- @param mainfile Manual selection of which file should be main. Otherwise it's the open file
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile name and files
-	function SF.Editor.BuildIncludesTable(mainfile)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.BuildIncludesTable(mainfile) end) return end
+	function SF.Editor.BuildIncludesTable(mainfile, success, err)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.BuildIncludesTable(mainfile, success, err) end) return end
 		
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
@@ -346,14 +346,10 @@ if CLIENT then
 		end
 
 		if ok then
-			return true, tbl
+			success(tbl)
 		else
 			local _1, _2, file = string.find(msg, "(Bad include%: .*)")
-			if file then
-				return false, file
-			else
-				error(msg, 0)
-			end
+			err(file or msg)
 		end
 	end
 

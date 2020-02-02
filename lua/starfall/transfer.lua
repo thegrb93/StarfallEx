@@ -113,15 +113,15 @@ else
 	net.Receive("starfall_upload", function(len)
 		local mainfile = net.ReadString()
 		if #mainfile==0 then mainfile = nil end
-		local ok, list = SF.Editor.BuildIncludesTable(mainfile)
-		if ok then
-			SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
-		else
-			SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
-			if list then
-				SF.AddNotify(LocalPlayer(), list, "ERROR", 7, "ERROR1")
+		SF.Editor.BuildIncludesTable(mainfile,
+			function(list)
+				SF.SendStarfall("starfall_upload", {files = list.files, mainfile = list.mainfile})
+			end,
+			function(err)
+				SF.SendStarfall("starfall_upload", {files = {}, mainfile = ""})
+				SF.AddNotify(LocalPlayer(), err, "ERROR", 7, "ERROR1")
 			end
-		end
+		)
 	end)
 end
 
