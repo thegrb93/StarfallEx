@@ -135,7 +135,7 @@ end
 net.Stream.WriteStream.__index = net.Stream.WriteStream
 
 --Store the data and write the file info so receivers can request it.
-function net.WriteStream(data, callback)
+function net.WriteStream(data, callback, dontcompress)
 
 	if not isstring(data) then
 		error("bad argument #1 to 'WriteStream' (string expected, got " .. type(data) .. ")", 2)
@@ -144,15 +144,17 @@ function net.WriteStream(data, callback)
 		error("bad argument #2 to 'WriteStream' (function expected, got " .. type(callback) .. ")", 2)
 	end
 
-	local compressed = util.Compress(data) or ""
-	local numchunks = math.ceil(#compressed / net.Stream.SendSize)
+	if not dontcompress then
+		data = util.Compress(data) or ""
+	end
+	local numchunks = math.ceil(#data / net.Stream.SendSize)
 	if numchunks == 0 then
 		net.WriteUInt(0, 32)
 		return
 	end
 	
 	if CLIENT and numchunks > net.Stream.MaxServerChunks then
-		ErrorNoHalt("net.WriteStream request is too large! ", #compressed/1048576, "MiB")
+		ErrorNoHalt("net.WriteStream request is too large! ", #data/1048576, "MiB")
 		net.WriteUInt(0, 32)
 		net.WriteUInt(0, 32)
 		return
@@ -165,7 +167,7 @@ function net.WriteStream(data, callback)
 
 	local stream = {
 		identifier = identifier,
-		data = compressed,
+		data = data,
 		numchunks = numchunks,
 		callback = callback,
 		progress = {},

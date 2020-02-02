@@ -162,7 +162,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 		end
 		uwVertices[k] = t
 	end
-	streamdata = streamdata:getString()
+	streamdata = util.Compress(streamdata:getString())
 	SF.NetBurst:use(instance.player, #streamdata*8)
 
 	plyVertexCount:free(-totalVertices)
