@@ -68,26 +68,13 @@ else
 		if net.ReadBool() then
 			net.ReadStarfall(nil, function(ok, sfdata)
 				if ok then
-					local function openfiles()
-						local mainfile = sfdata.files[sfdata.mainfile]
-						sfdata.files[sfdata.mainfile] = nil
-						for filename, code in pairs(sfdata.files) do
-							SF.Editor.openWithCode(filename, code)
-						end
-						-- Add mainfile last so it gets focus
-						SF.Editor.openWithCode(sfdata.mainfile, mainfile)
+					local mainfile = sfdata.files[sfdata.mainfile]
+					sfdata.files[sfdata.mainfile] = nil
+					for filename, code in pairs(sfdata.files) do
+						SF.Editor.openWithCode(filename, code)
 					end
-
-					if SF.Editor.initialized then
-						openfiles()
-					else
-						hook.Add("Think", "SFWaitForEditor", function()
-							if SF.Editor.initialized then
-								openfiles()
-								hook.Remove("Think", "SFWaitForEditor")
-							end
-						end)
-					end
+					-- Add mainfile last so it gets focus
+					SF.Editor.openWithCode(sfdata.mainfile, mainfile)
 				else
 					SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 				end

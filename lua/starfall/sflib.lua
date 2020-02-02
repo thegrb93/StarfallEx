@@ -655,6 +655,116 @@ function SF.WaitForPlayerInit(ply, name, func)
 	end)
 end
 
+
+-- Table networking
+do
+	local typetostringfuncs = {
+		[TYPE_NUMBER] = function(ss, x) ss:writeInt8(TYPE_NUMBER) ss:writeDouble(x) end,
+		[TYPE_STRING] = function(ss, x) ss:writeInt8(TYPE_STRING) ss:writeInt32(#x) ss:write(x) end,
+		[TYPE_BOOL] = function(ss, x) ss:writeInt8(TYPE_BOOL) ss:writeInt8(x and 1 or 0) end,
+		[TYPE_ENTITY] = function(ss, x) ss:writeInt8(TYPE_ENTITY) ss:writeInt16(x:EntIndex()) end,
+		[TYPE_VECTOR] = function(ss, x) ss:writeInt8(TYPE_VECTOR) for i=1, 3 do ss:writeFloat(x[i]) end end,
+		[TYPE_ANGLE] = function(ss, x) ss:writeInt8(TYPE_ANGLE) for i=1, 3 do ss:writeFloat(x[i]) end end,
+		[TYPE_COLOR] = function(ss, x) ss:writeInt8(TYPE_COLOR) for i=1, 4 do ss:writeInt8(x[i]) end end,
+		[TYPE_MATRIX] = function(ss, x) ss:writeInt8(TYPE_MATRIX) for k, v in ipairs{x:Unpack()} do ss:writeFloat(v) end end,
+	}
+	local stringtotypefuncs = {
+		[TYPE_NUMBER] = function(ss) return ss:readDouble() end,
+		[TYPE_STRING] = function(ss) return ss:read(ss:readUInt32()) end,
+		[TYPE_BOOL] = function(ss) return ss:readUInt8() == 1 end,
+		[TYPE_ENTITY] = function(ss) return Entity(ss:readUInt16()) end,
+		[TYPE_VECTOR] = function(ss) return Vector(ss:readFloat(), ss:readFloat(), ss:readFloat()) end,
+		[TYPE_ANGLE] = function(ss) return Angle(ss:readFloat(), ss:readFloat(), ss:readFloat()) end,
+		[TYPE_COLOR] = function(ss) return Color(ss:readUInt8(), ss:readUInt8(), ss:readUInt8(), ss:readUInt8()) end,
+		[TYPE_MATRIX] = function(ss)
+			local t = {} for i=1, 16 do t[i] = ss:readFloat() end
+			local m = Matrix() m:SetUnpacked(unpack(t))
+			return m
+		end,
+	}
+	--- Convert table to string data.
+	-- Only works with strings, numbers, tables, bools, 
+	function SF.TableToString(tbl, instance)
+		local ss = SF.StringStream()
+		local tableLoopupCtr = 1
+		local tableLookup = {}
+
+		local function typeToString(val)
+			local func = typetostringfuncs[TypeID(val)]
+			if func then func(ss, val) else error("Invalid type " .. SF.GetType(val)) end
+		end
+
+		typetostringfuncs[TYPE_TABLE] = function(ss, val)
+			if instance then
+				local unwrapped = instance.UnwrapObject(val)
+				if unwrapped then
+					typeToString(unwrapped)
+					return
+				end
+			end
+			
+			ss:writeInt8(TYPE_TABLE)
+			
+			local lookup = tableLookup[val]
+			if lookup then
+				ss:writeInt16(lookup)
+				return
+			end
+			
+			tableLookup[val] = tableLoopupCtr
+			tableLoopupCtr = tableLoopupCtr + 1
+			ss:writeInt16(tableLoopupCtr)
+			ss:writeInt16(table.Count(val))
+			
+			for key, value in pairs(val) do
+				typeToString(key)
+				typeToString(value)
+			end
+		end
+
+		typeToString(tbl)
+		return ss:getString()
+	end
+
+	--- Convert string data to table
+	function SF.StringToTable(str, instance)
+		local ss = SF.StringStream(str)
+		local tableLookup = {}
+
+		local function stringToType()
+			local t = ss:readUInt8()
+			local func = stringtotypefuncs[t]
+			if func then return func(ss) else error("Invalid type " .. t) end
+		end
+
+		stringtotypefuncs[TYPE_TABLE] = function(ss)
+			local index = ss:readUInt16()
+			local lookup = tableLookup[index]
+			if lookup then
+				return lookup
+			end
+			
+			local t = {}
+			tableLookup[index] = t
+			
+			for i=1, ss:readUInt16() do
+				local key, val
+				if instance then
+					key = instance.WrapObject(stringToType())
+					val = instance.WrapObject(stringToType())
+				else
+					key = stringToType()
+					val = stringToType()
+				end
+				t[key] = val
+			end
+			return t
+		end
+
+		return stringToType()
+	end
+end
+
 --- Gets the type of val.
 -- @param val The value to be checked.
 function SF.GetType(val)
@@ -1177,24 +1287,9 @@ do
 
 	if SERVER then
 		util.AddNetworkString("sf_receivelibrary")
+		include("starfall/editor/docs.lua")
+		SF.Docs = util.Compress(SF.TableToString(SF.Docs))
 
-		hook.Add("PlayerInitialSpawn","SF_Initialize_Libraries",function(ply)
-			SF.WaitForPlayerInit(ply, "InitLibs", function()
-				local files = {}
-				for name, mod in pairs(SF.Modules) do
-					for path, val in pairs(mod) do
-						files[name..":"..path] = val.source
-					end
-				end
-				net.Start("sf_receivelibrary")
-				net.WriteBool(true)
-				net.WriteStarfall({files = files, mainfile = "", proc = Entity(0), owner = Entity(0)})
-				net.Broadcast()
-			end)
-		end)
-	end
-
-	if SERVER then
 		-- Command to reload the libraries
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
 			if ply:IsValid() and not ply:IsSuperAdmin() then return end
@@ -1262,13 +1357,8 @@ do
 							t2.init = compileModule(code, path)
 						end
 					end
-					if init then
-						include("starfall/editor/docs.lua")
-					end
 				end
 			end)
 		end)
 	end
 end
-
-include("editor/editor.lua")

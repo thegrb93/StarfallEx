@@ -50,6 +50,10 @@ if CLIENT then
 	include("sfframe.lua") -- Editor's frame
 	include("themes.lua")
 
+	if not file.Exists("starfall", "DATA") then
+		file.CreateDir("starfall")
+	end
+
 	-- Colors
 	SF.Editor.colors = {}
 	SF.Editor.colors.dark = Color(36, 41, 53)
@@ -68,33 +72,44 @@ if CLIENT then
 		['"'] = "",
 	}
 
-	function SF.Editor.init()
-
-		if not file.Exists("starfall", "DATA") then
-			file.CreateDir("starfall")
+	function SF.Editor.init(callback)
+		if SF.Editor.initialized or SF.Editor.editor then return end
+		
+		if not SF.Docs then
+			if not SF.WaitingForDocs then
+				SF.WaitingForDocs = {}
+				net.Start("starfall_docs")
+				net.SendToServer()
+				hook.Add("Think","SF_WaitingForDocs",function()
+					if SF.Docs then
+						SF.Editor.init()
+						for k, v in ipairs(SF.WaitingForDocs) do v() end
+						SF.WaitingForDocs = nil
+						hook.Remove("Think","SF_WaitingForDocs")
+					end
+				end)
+			end
+			SF.WaitingForDocs[#SF.WaitingForDocs+1] = callback
+			return
 		end
-		if not SF.Docs or SF.Editor.editor then return end
 
 		SF.Editor.createEditor()
 		SF.Editor.initialized = true
 	end
 
 	function SF.Editor.open()
-		if not SF.Editor.initialized then SF.Editor.init() end
-		if not SF.Editor.initialized then return end
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.open() end) return end
 		SF.Editor.editor:Open()
 		RunConsoleCommand("starfall_event", "editor_open")
 	end
 
-	function SF.Editor.openFile(fl,forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init() end
-		if not SF.Editor.initialized then return end
+	function SF.Editor.openFile(fl, forceNewTab)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openFile(fl, forceNewTab) end) return end
 		SF.Editor.editor:Open(fl, nil, forceNewTab)
 	end
 
-	function SF.Editor.openWithCode(name, code,forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init() end
-		if not SF.Editor.initialized then return end
+	function SF.Editor.openWithCode(name, code, forceNewTab)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openWithCode(name, code, forceNewTab) end) return end
 		SF.Editor.editor:Open(name, code, forceNewTab)
 	end
 
@@ -204,7 +219,8 @@ if CLIENT then
 	-- @return True if ok, false if a file was missing
 	-- @return A table with mainfile name and files
 	function SF.Editor.BuildIncludesTable(mainfile)
-		if not SF.Editor.editor then SF.Editor.init() end
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.BuildIncludesTable(mainfile) end) return end
+		
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
 			mainfile = SF.Editor.getOpenFile() or "main"
@@ -396,13 +412,32 @@ if CLIENT then
 	end
 	
 	concommand.Add("sf_editor_reload", function()
-		pcall(forceCloseEditor);
+		pcall(forceCloseEditor)
 		include("starfall/editor/editor.lua")
 		print("Editor reloaded")
+	end)
+	
+	net.Receive("starfall_docs", function(len, ply)
+		net.ReadStream(nil, function(data)
+			local ok, docs
+			if data then
+				ok, docs = xpcall(function() return SF.StringToTable(data) end, debug.traceback)
+			end
+			if ok then
+				SF.Docs = docs
+			else
+				if docs then
+					ErrorNoHalt("There was an error decoding the docs. Rejoin to try again.\n" .. docs .. "\n")
+				else
+					ErrorNoHalt("There was an error transmitting the docs. Rejoin to try again.\n")
+				end
+			end
+		end)
 	end)
 elseif SERVER then
 
 	util.AddNetworkString("starfall_editor_status")
+	util.AddNetworkString("starfall_docs")
 
 	local starfall_event = {}
 
@@ -413,6 +448,10 @@ elseif SERVER then
 	end)
 
 	function starfall_event.editor_open(ply, args)
+		local t = ply.SF_NextEditorStatus
+		if t and CurTime()<t then return end
+		ply.SF_NextEditorStatus = CurTime()+0.1
+
 		net.Start("starfall_editor_status")
 		net.WriteEntity(ply)
 		net.WriteBit(true)
@@ -420,9 +459,22 @@ elseif SERVER then
 	end
 
 	function starfall_event.editor_close(ply, args)
+		local t = ply.SF_NextEditorStatus
+		if t and CurTime()<t then return end
+		ply.SF_NextEditorStatus = CurTime()+0.1
+
 		net.Start("starfall_editor_status")
 		net.WriteEntity(ply)
 		net.WriteBit(false)
 		net.Broadcast()
 	end
+	
+	net.Receive("starfall_docs", function(len, ply)
+		if not ply.SF_SentDocs then
+			ply.SF_SentDocs = true
+			net.Start("starfall_docs")
+			net.WriteStream(SF.Docs, nil, true)
+			net.Send(ply)
+		end
+	end)
 end
