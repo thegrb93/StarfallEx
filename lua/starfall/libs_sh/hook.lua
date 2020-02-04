@@ -213,7 +213,7 @@ function hook_library.remove(hookname, name)
 
 		if not next(instance.hooks[lower]) then
 			instance.hooks[lower] = nil
-			SF.HookRemoveInstance(instance, hook)
+			SF.HookRemoveInstance(instance, hookname)
 		end
 	end
 end

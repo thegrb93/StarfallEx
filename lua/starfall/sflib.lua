@@ -520,7 +520,7 @@ do
 	
 	function SF.HookRemoveInstance(instance, hookname)
 		local instances = registered_instances[hookname]
-		if instances then
+		if instances and instances[instance] then
 			instances[instance] = nil
 			if not next(instances) then
 				local gmod_hook = gmod_hooks[hookname]
@@ -533,11 +533,13 @@ do
 
 	function SF.HookDestroyInstance(instance)
 		for hookname, instances in pairs(registered_instances) do
-			instances[instance] = nil
-			if not next(instances) then
-				local gmod_hook = gmod_hooks[hookname]
-				if gmod_hook then
-					hook.Remove(gmod_hook[1], "SF_Hook_" .. hookname)
+			if instances[instance] then
+				instances[instance] = nil
+				if not next(instances) then
+					local gmod_hook = gmod_hooks[hookname]
+					if gmod_hook then
+						hook.Remove(gmod_hook[1], "SF_Hook_" .. hookname)
+					end
 				end
 			end
 		end

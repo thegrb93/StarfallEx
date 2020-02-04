@@ -20,7 +20,6 @@ function ENT:Draw()
 end
 
 SF.ActiveHuds = {}
-local hook_pref = "starfall_hud_hook_"
 local ConnectHUD, DisconnectHUD
 
 local Hint_FirstPrint = true

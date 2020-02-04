@@ -188,11 +188,17 @@ local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
 end
 
 local function returnCalcview(instance, tbl)
-	local rt = tbl[2]
-	if istable(rt) then
-		rt.origin = instance.Types.Vector.Unwrap(rt.origin)
-		rt.angles = instance.Types.Angle.Unwrap(rt.angles)
-		return rt
+	local t = tbl[2]
+	if istable(t) then
+		local ret = {}
+		pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end)
+		pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end)
+		ret.fov = t.fov
+		ret.znear = t.znear
+		ret.zfar = t.zfar
+		ret.drawviewer = t.drawviewer
+		ret.ortho  = t.ortho
+		return ret
 	end
 end
 
