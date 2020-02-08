@@ -23,7 +23,10 @@ function ENT:Use(activator)
 		net.Broadcast()
 		
 		if self.locksControls then
-			net.Start("starfall_lock_control") net.WriteBool(true) net.Send(activator)
+			net.Start("starfall_lock_control")
+				net.WriteEntity(self.link)
+				net.WriteBool(true)
+			net.Send(activator)
 		end
 	end
 	

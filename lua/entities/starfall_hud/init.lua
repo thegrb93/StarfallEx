@@ -26,11 +26,15 @@ function ENT:SetHudEnabled(ply, mode)
 			if instance then
 				instance:runScriptHook("hudconnected", instance.WrapObject(self))
 			end
+			
+			if self.locksControls then
+				net.Start("starfall_lock_control")
+					net.WriteEntity(self.link)
+					net.WriteBool(true)
+				net.Send(ply)
+			end
 		end
 		ply.sfhudenabled = self
-		if self.locksControls then
-			net.Start("starfall_lock_control") net.WriteBool(true) net.Send(ply)
-		end
 	end
 
 	local function disconnect()
@@ -39,12 +43,16 @@ function ENT:SetHudEnabled(ply, mode)
 			if instance then
 				instance:runScriptHook("huddisconnected", instance.WrapObject(self))
 			end
+
+			if self.locksControls then
+				net.Start("starfall_lock_control")
+					net.WriteEntity(self.link)
+					net.WriteBool(false)
+				net.Send(ply)
+			end
 		end
 		ply.sfhudenabled = nil
 		ply:SetViewEntity()
-		if self.locksControls then
-			net.Start("starfall_lock_control") net.WriteBool(false) net.Send(ply)
-		end
 	end
 
 	if mode == 1 then

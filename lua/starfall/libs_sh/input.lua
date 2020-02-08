@@ -43,13 +43,15 @@ registerprivilege("input", "Input", "Allows the user to see what buttons you're 
 registerprivilege("input.emulate", "Input", "Allows starfall to emulate user input.", { client = { default = 1 } })
 
 local controlsLocked = false
-local function unlockControls()
+local function unlockControls(instance)
+	instance.data.input.controlsLocked = false
 	controlsLocked = false
 	hook.Remove("PlayerBindPress", "sf_keyboard_blockinput")
 	hook.Remove("PlayerButtonDown", "sf_keyboard_unblockinput")
 end
 
-local function lockControls()
+local function lockControls(instance)
+	instance.data.input.controlsLocked = true
 	controlsLocked = true
 	LocalPlayer():ChatPrint("Starfall locked your controls. Press 'Alt' to regain control.")
 
@@ -58,16 +60,22 @@ local function lockControls()
 	end)
 	hook.Add("PlayerButtonDown", "sf_keyboard_unblockinput", function(ply, but)
 		if but == KEY_LALT or but == KEY_RALT then
-			unlockControls()
+			unlockControls(instance)
 		end
 	end)
 end
 
 net.Receive("starfall_lock_control", function()
-	if net.ReadBool() then
-		lockControls()
-	else
-		unlockControls()
+	local ent = net.ReadEntity()
+	if ent:IsValid() then
+		local instance = ent.instance
+		if instance and not instance.error then
+			if net.ReadBool() then
+				lockControls(instance)
+			else
+				unlockControls(instance)
+			end
+		end
 	end
 end)
 
@@ -117,13 +125,14 @@ return function(instance)
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	instance.data.input = {controlsLocked = false}
 end)
 
 instance:AddHook("deinitialize", function()
 	if instance.data.cursorEnabled then
 		gui.EnableScreenClicker(false)
 	end
-	unlockControls()
+	unlockControls(instance)
 end)
 
 instance:AddHook("starfall_hud_disconnected", function()
@@ -260,7 +269,7 @@ function input_library.lockControls(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
 	SF.Permissions.check(instance, nil, "input")
 
-	if not instance:isHUDActive() then
+	if not instance:isHUDActive() and (enabled or not instance.data.input.controlsLocked) then
 		SF.Throw("No HUD component connected", 2)
 	end
 
@@ -269,9 +278,9 @@ function input_library.lockControls(enabled)
 			SF.Throw("Cannot lock the player's controls yet", 2)
 		end
 		instance.data.lockedControlCooldown = CurTime() + 10
-		lockControls()
+		lockControls(instance)
 	else
-		unlockControls()
+		unlockControls(instance)
 	end
 end
 
