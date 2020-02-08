@@ -47,10 +47,9 @@ local function createCoroutine(func)
 	-- Hack to get the coroutine from a wrapped function. Necessary because coroutine.create is not available
 	local wrappedFunc = coroutine.wrap(function()
 		local thread = coroutine.running()
+		local function cleanupThread(...) instance.data.coroutines[thread] = nil return ... end
 		coroutine.yield(thread)
-		local ret = {func()}
-		instance.data.coroutines[thread] = nil
-		return unpack(ret, 1, table.maxn(ret))
+		return cleanupThread(func())
 	end)
 
 	local thread = wrappedFunc()
