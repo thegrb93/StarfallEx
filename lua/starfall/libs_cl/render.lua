@@ -191,8 +191,8 @@ local function returnCalcview(instance, tbl)
 	local t = tbl[2]
 	if istable(t) then
 		local ret = {}
-		pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end)
-		pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end)
+		if t.origin then pcall(function() ret.origin = instance.Types.Vector.Unwrap(t.origin) end) end
+		if t.angles then pcall(function() ret.angles = instance.Types.Angle.Unwrap(t.angles) end) end
 		ret.fov = t.fov
 		ret.znear = t.znear
 		ret.zfar = t.zfar
