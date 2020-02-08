@@ -410,7 +410,7 @@ end
 -- @return The angle that was read
 
 function net_library.readAngle()
-	return awrap(net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
+	return awrap(Angle(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
 
 --- Writes an vector to the net message. Has significantly lower precision than writeFloat
@@ -430,7 +430,7 @@ end
 -- @return The vector that was read
 
 function net_library.readVector()
-	return vwrap(net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
+	return vwrap(Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
 
 --- Writes an matrix to the net message
