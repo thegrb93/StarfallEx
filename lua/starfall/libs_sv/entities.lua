@@ -36,7 +36,6 @@ local function checkvector(v)
 end
 
 
-
 return function(instance)
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
@@ -48,6 +47,19 @@ local cunwrap = instance.Types.Color.Unwrap
 local getent
 instance:AddHook("initialize", function()
 	getent = instance.Types.Entity.GetEntity
+	instance.data.collisionlisteners = setmetatable({},{__mode="k"})
+end)
+instance:AddHook("deinitialize", function()
+	for ent in next, instance.data.collisionlisteners do
+		if ent:IsValid() then
+			if ent:GetClass() ~= "starfall_prop" then
+				ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
+				ent.SF_CollisionCallback = nil
+			else
+				ent.PhysicsCollide = nil
+			end
+		end
+	end
 end)
 
 -- ------------------------- Methods ------------------------- --
@@ -338,8 +350,10 @@ function ents_methods:addCollisionListener(func)
 		if ent.SF_CollisionCallback then SF.Throw("The entity is already listening to collisions!", 2) end
 		ent.SF_CollisionCallback = ent:AddCallback("PhysicsCollide", function(ent, data) callback(data) end)
 	else
+		if ent.PhysicsCollide then SF.Throw("The entity is already listening to collisions!", 2) end
 		function ent:PhysicsCollide( data, phys ) callback(data) end
 	end
+	instance.data.collisionlisteners[ent] = true
 end
 
 --- Removes a collision listening hook from the entity so that a new one can be added
@@ -351,8 +365,10 @@ function ents_methods:removeCollisionListener()
 		ent:RemoveCallback("PhysicsCollide", ent.SF_CollisionCallback)
 		ent.SF_CollisionCallback = nil
 	else
+		if not ent.PhysicsCollide then SF.Throw("The entity isn't listening to collisions!", 2) end
 		ent.PhysicsCollide = nil
 	end
+	instance.data.collisionlisteners[ent] = nil
 end
 
 --- Sets whether an entity's shadow should be drawn
