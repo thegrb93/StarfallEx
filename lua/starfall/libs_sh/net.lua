@@ -131,97 +131,44 @@ function net_library.send(target, unreliable)
 	instance.data.net.started = false
 end
 
-local netTypeSizes = {
-	[TYPE_NIL]		= function(x) return 8 end,			-- nil type
-	[TYPE_STRING]	= function(x) return (2+#x)*8 end,	-- string type, string, and null-terminator
-	[TYPE_NUMBER]	= function(x) return (1+8)*8 end,	-- number type, double (8 bytes)
-	[TYPE_BOOL]		= function(x) return 8+1 end,		-- bool type, bool (1 bit)
-	[TYPE_ENTITY]	= function(x) return (1+2)*8 end,	-- ent type, entity (2 bytes)
-	[TYPE_VECTOR]	= function(x) return 8+54 end,		-- vec type (8 bits), vector data (maximum 54 bits when compressed)
-	[TYPE_ANGLE]	= function(x) return 8+54 end,		-- angle type (8 bits), angle data (maximum 54 bits when compressed)
-	[TYPE_MATRIX]	= function(x) return (1+64)*8 end,	-- matr type, matrix data (64 bytes)
-	[TYPE_COLOR]	= function(x) return (1+4)*8 end,	-- color type, color data (4 bytes)
-}
-
-local netwritetable, netreadtable, netwritetype, netreadtype
-
 --- Writes an object to a net message automatically typing it
 -- @shared
 -- @param v The object to write
 function net_library.writeType(v)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	v = instance.UnwrapObject(v) or v
-
-	local typeid = nil
-
-	if IsColor(v) then
-		typeid = TYPE_COLOR
-	else
-		typeid = TypeID(v)
-	end
-
-	local wv = net.WriteVars[typeid]
-	if wv then
-		if typeid == TYPE_TABLE then
-			write(net.WriteUInt, 1, typeid, 8)
-			netwritetable(v)
-		else
-			write(wv, netTypeSizes[typeid](v), typeid, v)
-		end
-	else
-		SF.Throw("net.WriteType: Couldn't write " .. type(v) .. " (type " .. typeid .. ")", 2)
-	end
-	return true
+	local str = util.Compress(SF.TableToString({v}, instance))
+	write(net.WriteUInt, 32, #str, 32)
+	write(net.WriteData, #str*8, str, #str)
 end
-netwritetype = net_library.writeType
 
 --- Reads an object from a net message automatically typing it
 --- Will throw an error if invalid type is read. Make sure to pcall it
 -- @shared
 -- @return The object
 function net_library.readType()
-	local typeid = net.ReadUInt(8)
-
-	if typeid == TYPE_TABLE then
-		return netreadtable()
-	else
-		local rv = net.ReadVars[typeid]
-		if rv then
-			local v = rv()
-			return instance.WrapObject(v) or v
-		end
-	end
-
-	SF.Throw("net.readType: Couldn't read type " .. typeid, 2)
+	return SF.StringToTable(util.Decompress(net.ReadData(net.ReadUInt(32))), instance)[1]
 end
-netreadtype = net_library.readType
 
 --- Writes a table to a net message automatically typing it.
 -- @shared
 -- @param v The object to write
 function net_library.writeTable(t)
-	for k, v in pairs(t) do
-		netwritetype(k)
-		netwritetype(v)
-	end
-	netwritetype(nil)
+	if not instance.data.net.started then SF.Throw("net message not started", 2) end
+	checkluatype(t, TYPE_TABLE)
+	
+	local str = util.Compress(SF.TableToString(t, instance))
+	write(net.WriteUInt, 32, #str, 32)
+	write(net.WriteData, #str*8, str, #str)
 end
-netwritetable = net_library.writeTable
 
 --- Reads an object from a net message automatically typing it
 --- Will throw an error if invalid type is read. Make sure to pcall it
 -- @shared
 -- @return The object
 function net_library.readTable()
-	local tab = {}
-	while true do
-		local k = netreadtype()
-		if ( k == nil ) then return tab end
-		tab[k] = netreadtype()
-	end
+	return SF.StringToTable(util.Decompress(net.ReadData(net.ReadUInt(32))), instance)
 end
-netreadtable = net_library.readTable
 
 --- Writes a string to the net message. Null characters will terminate the string.
 -- @shared
@@ -452,9 +399,9 @@ end
 
 function net_library.writeAngle(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-
-
-	write(net.WriteAngle, 54, aunwrap(t))
+	write(net.WriteFloat, 4*8, t[1])
+	write(net.WriteFloat, 4*8, t[2])
+	write(net.WriteFloat, 4*8, t[3])
 	return true
 end
 
@@ -463,7 +410,7 @@ end
 -- @return The angle that was read
 
 function net_library.readAngle()
-	return awrap(net.ReadAngle())
+	return awrap(net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
 end
 
 --- Writes an vector to the net message. Has significantly lower precision than writeFloat
@@ -472,9 +419,9 @@ end
 
 function net_library.writeVector(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-
-
-	write(net.WriteVector, 54, vunwrap(t))
+	write(net.WriteFloat, 4*8, t[1])
+	write(net.WriteFloat, 4*8, t[2])
+	write(net.WriteFloat, 4*8, t[3])
 	return true
 end
 
@@ -483,7 +430,7 @@ end
 -- @return The vector that was read
 
 function net_library.readVector()
-	return vwrap(net.ReadVector())
+	return vwrap(net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
 end
 
 --- Writes an matrix to the net message
@@ -492,9 +439,10 @@ end
 
 function net_library.writeMatrix(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-
-
-	write(net.WriteMatrix, 64*8, munwrap(t))
+	local vals = {munwrap(t):Unpack()}
+	for i=1, 16 do
+		write(net.WriteFloat, 4*8, vals[i])
+	end
 	return true
 end
 
@@ -503,7 +451,9 @@ end
 -- @return The matrix that was read
 
 function net_library.readMatrix()
-	return mwrap(net.ReadMatrix())
+	local m = Matrix()
+	m:SetUnpacked(net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
+	return mwrap(m)
 end
 
 --- Writes an color to the net message
@@ -512,8 +462,6 @@ end
 
 function net_library.writeColor(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-
-
 	write(net.WriteColor, 4*8, cunwrap(t))
 	return true
 end

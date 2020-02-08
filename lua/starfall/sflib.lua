@@ -752,8 +752,10 @@ do
 			for i=1, ss:readUInt16() do
 				local key, val
 				if instance then
-					key = instance.WrapObject(stringToType())
-					val = instance.WrapObject(stringToType())
+					key = stringToType()
+					key = instance.WrapObject(key) or key
+					val = stringToType()
+					val = instance.WrapObject(val) or val
 				else
 					key = stringToType()
 					val = stringToType()
