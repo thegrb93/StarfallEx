@@ -19,7 +19,7 @@ local thread_meta, wrap, unwrap = instance.Types.thread, instance.Types.thread.W
 
 
 instance:AddHook("initialize", function()
-	instance.data.coroutines = setmetatable({}, { __mode = "v" })
+	instance.data.coroutines = {}
 end)
 
 instance:AddHook("deinitialize", function()
@@ -42,9 +42,16 @@ local function createCoroutine(func)
 	else
 		stacklevel = 0
 	end
+
 	-- Can't use coroutine.create, because of a bug that prevents halting the program when it exceeds quota
 	-- Hack to get the coroutine from a wrapped function. Necessary because coroutine.create is not available
-	local wrappedFunc = coroutine.wrap(function() return func(coroutine.yield(coroutine.running())) end)
+	local wrappedFunc = coroutine.wrap(function()
+		local thread = coroutine.running()
+		coroutine.yield(thread)
+		local ret = {func()}
+		instance.data.coroutines[thread] = nil
+		return unpack(ret, 1, table.maxn(ret))
+	end)
 
 	local thread = wrappedFunc()
 
