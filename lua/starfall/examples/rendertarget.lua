@@ -12,7 +12,7 @@ local paint = coroutine.wrap(function()
             render.setColor(Color(x*y % 360,1,1):hsvToRGB())
             render.drawRectFast(x,y,1,1)
         end
-        coroutine.yield(false)
+        coroutine.yield()
     end
     return true
 end)
