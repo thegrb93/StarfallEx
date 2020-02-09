@@ -56,14 +56,14 @@ http.get("https://dl.dropboxusercontent.com/s/cwob1j0nka0ko2e/renamon.obj",funct
 		hook.add("render","mesh",renderScreen)
 	end
 
-	local thread = coroutine.create(function() mymesh = mesh.createFromObj(objdata, true) end)
+	local loadmesh = coroutine.wrap(function() mymesh = mesh.createFromObj(objdata, true).Renamon return true end)
 	hook.add("think","loadingMesh",function()
-		while coroutine.status(thread)~="dead" and quotaAverage()<quotaMax()/2 do
-			coroutine.resume(thread)
-		end
-		if coroutine.status(thread)=="dead" then
-			doneLoadingMesh()
-			hook.remove("think","loadingMesh")
+		while quotaAverage()<quotaMax()/2 do
+			if loadmesh() then
+				doneLoadingMesh()
+				hook.remove("think","loadingMesh")
+				return
+			end
 		end
 	end)
 end)
