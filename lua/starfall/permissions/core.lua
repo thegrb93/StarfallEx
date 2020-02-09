@@ -53,7 +53,7 @@ end
 function P.registerPrivilege(id, name, description, arg)
 	arg = arg or {}
 	--All privileges should get usergroup
-	if not arg.usergroup then
+	if not arg.usergroups then
 		arg.usergroups = {}
 	end
 
