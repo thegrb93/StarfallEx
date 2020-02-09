@@ -6,13 +6,6 @@
 
 render.createRenderTarget("myrendertarget")
 
-local function done()
-    hook.add("render","",function()
-        render.setRenderTargetTexture("myrendertarget")
-        render.drawTexturedRectFast(0,0,512,512)
-    end)
-end
-
 local paint = coroutine.wrap(function()
     for y=0, 1023 do
         for x=0, 1023 do
@@ -28,10 +21,14 @@ hook.add("renderoffscreen","",function()
     render.selectRenderTarget("myrendertarget")
     while quotaAverage()<quotaMax()*0.5 do
         if paint() then
-            done()
             hook.remove("renderoffscreen","")
             return
         end
     end
+end)
+
+hook.add("render","",function()
+    render.setRenderTargetTexture("myrendertarget")
+    render.drawTexturedRectFast(0,0,512,512)
 end)
 
