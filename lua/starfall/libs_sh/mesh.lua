@@ -589,8 +589,9 @@ local vector = instance.env.Vector
 -- @param obj The obj data
 -- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 -- @param triangulate Whether to triangulate the faces
--- @return The table of vertices that can be passed to mesh.buildFromTriangles
--- @return The table of obj data. table.positions can be given to prop.createCustom
+-- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables containing:
+-- [1] The table of vertices that can be passed to mesh.buildFromTriangles
+-- [2] The table of obj data. table.positions can be given to prop.createCustom
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
 	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
@@ -670,7 +671,7 @@ if CLIENT then
 	-- @param obj The obj file data
 	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 	-- @param triangulate Whether to triangulate faces. (Consumes more CPU)
-	-- @return Mesh object
+	-- @return Table of Mesh objects. The keys correspond to the objs object names
 	-- @client
 	function mesh_library.createFromObj(obj, threaded, triangulate)
 		checkluatype (obj, TYPE_STRING)
