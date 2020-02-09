@@ -13,7 +13,7 @@ surface.CreateFont("Starfall_ErrorFont", {
 function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
-	net.Start("starfall_processor_update_links")
+	net.Start("starfall_processor_link")
 		net.WriteEntity(self)
 	net.SendToServer()
 
