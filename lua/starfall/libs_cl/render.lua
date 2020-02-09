@@ -1462,8 +1462,6 @@ end
 -- @param width Width of the sprite.
 -- @param height Height of the sprite.
 function render_library.draw3DSprite(pos, width, height)
-	checkluatype (width, TYPE_NUMBER)
-	checkluatype (height, TYPE_NUMBER)
 	pos = vunwrap(pos)
 	render.DrawSprite(pos, width, height)
 end
@@ -1685,9 +1683,6 @@ function render_library.readPixel(x, y)
 	if not data.isRendering then
 		SF.Throw("Not in rendering hook.", 2)
 	end
-
-	checkluatype (x, TYPE_NUMBER)
-	checkluatype (y, TYPE_NUMBER)
 
 	local r, g, b = render.ReadPixel(x, y)
 	return cwrap(Color(r, g, b, 255))
