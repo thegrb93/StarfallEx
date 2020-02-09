@@ -71,10 +71,10 @@ else
 					local mainfile = sfdata.files[sfdata.mainfile]
 					sfdata.files[sfdata.mainfile] = nil
 					for filename, code in pairs(sfdata.files) do
-						SF.Editor.openWithCode(filename, code)
+						SF.Editor.openWithCode(filename, code, nil, true)
 					end
 					-- Add mainfile last so it gets focus
-					SF.Editor.openWithCode(sfdata.mainfile, mainfile)
+					SF.Editor.openWithCode(sfdata.mainfile, mainfile, nil, true)
 				else
 					SF.AddNotify(LocalPlayer(), "Error downloading SF code.", "ERROR", 7, "ERROR1")
 				end

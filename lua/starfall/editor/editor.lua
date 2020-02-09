@@ -108,9 +108,9 @@ if CLIENT then
 		SF.Editor.editor:Open(fl, nil, forceNewTab)
 	end
 
-	function SF.Editor.openWithCode(name, code, forceNewTab)
-		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openWithCode(name, code, forceNewTab) end) return end
-		SF.Editor.editor:Open(name, code, forceNewTab)
+	function SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists)
+		if not SF.Editor.initialized then SF.Editor.init(function() SF.Editor.openWithCode(name, code, forceNewTab, checkFileExists) end) return end
+		SF.Editor.editor:Open(name, code, forceNewTab, checkFileExists)
 	end
 
 	function SF.Editor.pasteCode(code)

@@ -1508,7 +1508,7 @@ function Editor:GetCode()
 	end
 end
 
-function Editor:Open(Line, code, forcenewtab)
+function Editor:Open(Line, code, forcenewtab, checkFileExists)
 	timer.Create("sfautosave", 5, 0, function()
 		self:SaveTabs()
 	end)
@@ -1517,14 +1517,13 @@ function Editor:Open(Line, code, forcenewtab)
 	if code then
 		if not forcenewtab then
 			for i = 1, self:GetNumTabs() do
-				if self:GetTabContent(i).chosenfile == Line then
-					self:SetActiveTab(i)
-					self:SetCode(code)
-					return
-				elseif self:GetTabContent(i):GetCode() == code then
+				if self:GetTabContent(i):GetCode() == code then
 					self:SetActiveTab(i)
 					return
 				end
+			end
+			if checkFileExists and file.Exists("starfall/" .. Line, "DATA") and file.Read("starfall/" .. Line, "DATA")==code then
+				return
 			end
 		end
 		local title, tabtext = getPreferredTitles(Line, code)
