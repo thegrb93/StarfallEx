@@ -45,9 +45,9 @@ hook.Add("InitPostEntity","SF_SanitizeTypeMetatables",function()
 	sanitizeTypeMeta(function() end)
 	sanitizeTypeMeta(coroutine.create(function() end))
 
-	local string_methods = SF.SafeStringLib
+	local string_library = SF.SafeStringLib
 	local function sf_string_index(self, key)
-		local val = string_methods[key]
+		local val = string_library[key]
 		if (val) then
 			return val
 		elseif (tonumber(key)) then
@@ -1153,67 +1153,67 @@ end
 
 do
 	local checkluatype = SF.CheckLuaType
-	local string_methods = {}
-	string_methods.byte = string.byte string_methods.byte = string.byte
-	string_methods.char = string.char
-	string_methods.comma = string.Comma string_methods.Comma = string.Comma
-	string_methods.dump = string.dump
-	string_methods.endsWith = string.EndsWith string_methods.EndsWith = string.EndsWith
-	string_methods.explode = string.Explode string_methods.Explode = string.Explode
-	string_methods.find = string.find
-	string_methods.format = string.format
-	string_methods.formattedTime = string.FormattedTime string_methods.FormattedTime = string.FormattedTime
-	string_methods.getChar = string.GetChar string_methods.GetChar = string.GetChar
-	string_methods.getExtensionFromFilename = string.GetExtensionFromFilename string_methods.GetExtensionFromFilename = string.GetExtensionFromFilename
-	string_methods.getFileFromFilename = string.GetFileFromFilename string_methods.GetFileFromFilename = string.GetFileFromFilename
-	string_methods.getPathFromFilename = string.GetPathFromFilename string_methods.GetPathFromFilename = string.GetPathFromFilename
-	string_methods.gfind = string.gfind
-	string_methods.gmatch = string.gmatch
-	string_methods.gsub = string.gsub
-	string_methods.implode = string.Implode string_methods.Implode = string.Implode
+	local string_library = {}
+	string_library.byte = string.byte
+	string_library.char = string.char
+	string_library.comma = string.Comma string_library.Comma = string.Comma
+	string_library.dump = string.dump
+	string_library.endsWith = string.EndsWith string_library.EndsWith = string.EndsWith
+	string_library.explode = string.Explode string_library.Explode = string.Explode
+	string_library.find = string.find
+	string_library.format = string.format
+	string_library.formattedTime = string.FormattedTime string_library.FormattedTime = string.FormattedTime
+	string_library.getChar = string.GetChar string_library.GetChar = string.GetChar
+	string_library.getExtensionFromFilename = string.GetExtensionFromFilename string_library.GetExtensionFromFilename = string.GetExtensionFromFilename
+	string_library.getFileFromFilename = string.GetFileFromFilename string_library.GetFileFromFilename = string.GetFileFromFilename
+	string_library.getPathFromFilename = string.GetPathFromFilename string_library.GetPathFromFilename = string.GetPathFromFilename
+	string_library.gfind = string.gfind
+	string_library.gmatch = string.gmatch
+	string_library.gsub = string.gsub
+	string_library.implode = string.Implode string_library.Implode = string.Implode
 	local function javascriptSafe(str)
 		checkluatype(str, TYPE_STRING)
 		return string.JavascriptSafe(str)
 	end
-	string_methods.javascriptSafe = javascriptSafe string_methods.JavascriptSafe = javascriptSafe
-	string_methods.left = string.Left string_methods.Left = string.Left
-	string_methods.len = string.len
-	string_methods.lower = string.lower
-	string_methods.match = string.match
-	string_methods.niceSize = string.NiceSize string_methods.NiceSize = string.NiceSize
-	string_methods.niceTime = string.NiceTime string_methods.NiceTime = string.NiceTime
+	string_library.javascriptSafe = javascriptSafe string_library.JavascriptSafe = javascriptSafe
+	string_library.left = string.Left string_library.Left = string.Left
+	string_library.len = string.len
+	string_library.lower = string.lower
+	string_library.match = string.match
+	string_library.niceSize = string.NiceSize string_library.NiceSize = string.NiceSize
+	string_library.niceTime = string.NiceTime string_library.NiceTime = string.NiceTime
 	local function patternSafe(str)
 		checkluatype(str, TYPE_STRING)
 		return string.PatternSafe(str)
 	end
-	string_methods.patternSafe = patternSafe string_methods.PatternSafe = patternSafe
-	string_methods.replace = string.Replace string_methods.Replace = string.Replace
-	string_methods.reverse = string.reverse
-	string_methods.right = string.Right string_methods.Right = string.Right
-	string_methods.setChar = string.SetChar string_methods.SetChar = string.SetChar
-	string_methods.split = string.Split string_methods.Split = string.Split
-	string_methods.startWith = string.StartWith string_methods.StartWith = string.StartWith
-	string_methods.stripExtension = string.StripExtension string_methods.StripExtension = string.StripExtension
-	string_methods.sub = string.sub
-	string_methods.toMinutesSeconds = string.ToMinutesSeconds string_methods.ToMinutesSeconds = string.ToMinutesSeconds
-	string_methods.toMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds string_methods.ToMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds
-	string_methods.toTable = string.ToTable string_methods.ToTable = string.ToTable
-	string_methods.trim = string.Trim string_methods.Trim = string.Trim
-	string_methods.trimLeft = string.TrimLeft string_methods.TrimLeft = string.TrimLeft
-	string_methods.trimRight = string.TrimRight string_methods.TrimRight = string.TrimRight
-	string_methods.upper = string.upper
-	string_methods.normalizePath = SF.NormalizePath
+	string_library.patternSafe = patternSafe string_library.PatternSafe = patternSafe
+	string_library.replace = string.Replace string_library.Replace = string.Replace
+	string_library.reverse = string.reverse
+	string_library.right = string.Right string_library.Right = string.Right
+	string_library.setChar = string.SetChar string_library.SetChar = string.SetChar
+	string_library.split = string.Split string_library.Split = string.Split
+	string_library.startWith = string.StartWith string_library.StartWith = string.StartWith
+	string_library.stripExtension = string.StripExtension string_library.StripExtension = string.StripExtension
+	string_library.sub = string.sub
+	string_library.toMinutesSeconds = string.ToMinutesSeconds string_library.ToMinutesSeconds = string.ToMinutesSeconds
+	string_library.toMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds string_library.ToMinutesSecondsMilliseconds = string.ToMinutesSecondsMilliseconds
+	string_library.toTable = string.ToTable string_library.ToTable = string.ToTable
+	string_library.trim = string.Trim string_library.Trim = string.Trim
+	string_library.trimLeft = string.TrimLeft string_library.TrimLeft = string.TrimLeft
+	string_library.trimRight = string.TrimRight string_library.TrimRight = string.TrimRight
+	string_library.upper = string.upper
+	string_library.normalizePath = SF.NormalizePath
 
 	--UTF8 part
-	string_methods.utf8char = utf8.char
-	string_methods.utf8codepoint = utf8.codepoint
-	string_methods.utf8codes = utf8.codes
-	string_methods.utf8force = utf8.force
-	string_methods.utf8len = utf8.len
-	string_methods.utf8offset = utf8.offset
+	string_library.utf8char = utf8.char
+	string_library.utf8codepoint = utf8.codepoint
+	string_library.utf8codes = utf8.codes
+	string_library.utf8force = utf8.force
+	string_library.utf8len = utf8.len
+	string_library.utf8offset = utf8.offset
 
 	local rep_chunk = 1000000
-	function string_methods.rep(str, rep, sep)
+	function string_library.rep(str, rep, sep)
 		if rep < 0.5 then return "" end
 
 		local ret = {}
@@ -1228,7 +1228,7 @@ do
 
 		return table.concat(ret, sep)
 	end
-	SF.SafeStringLib = string_methods
+	SF.SafeStringLib = string_library
 end
 
 
