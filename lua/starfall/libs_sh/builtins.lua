@@ -40,8 +40,6 @@ SF.RegisterLibrary("table")
 
 return function(instance)
 
-instance.Libraries.string = table.Copy(SF.SafeStringLib)
-
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
