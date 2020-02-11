@@ -388,7 +388,8 @@ function SF.Instance:BuildEnvironment()
 	for name, mod in pairs(SF.Modules) do
 		for filename, data in pairs(mod) do
 			if data.init then
-				data.init(self)
+				local ok, err = xpcall(function() data.init(self) end, debug.traceback)
+				if not ok then ErrorNoHalt(err) end
 			end
 		end
 	end
