@@ -9,7 +9,7 @@ render.createRenderTarget("myrendertarget")
 local paint = coroutine.wrap(function()
     for y=0, 1023 do
         for x=0, 1023 do
-            render.setColor(Color(x*y % 360,1,1):hsvToRGB())
+            render.setColor(Color(x*y*360/512 % 360,1,1):hsvToRGB())
             render.drawRectFast(x,y,1,1)
         end
         coroutine.yield()
