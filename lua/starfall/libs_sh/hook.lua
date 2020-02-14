@@ -56,6 +56,7 @@ else
 		return false
 	end)
 	add("NetworkEntityCreated")
+	add("NotifyShouldTransmit")
 end
 
 -- Shared hooks
@@ -398,6 +399,15 @@ end
 -- @class hook
 -- @client
 -- @param ent New entity
+
+--- Called when a clientside entity transmit state is changed. Usually when changing PVS
+-- If you want clientside render changes to persist on an entity you have to re-apply them
+-- each time it begins transmitting again
+-- @name NotifyShouldTransmit
+-- @class hook
+-- @client
+-- @param ent The entity
+-- @param shouldtransmit Whether it is now transmitting or not
 
 --- Called when an entity is removed
 -- @name EntityRemoved
