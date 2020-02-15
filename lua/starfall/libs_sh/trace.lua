@@ -4,6 +4,7 @@ local checkpermission = SF.Permissions.check
 
 -- Register privileges
 SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
+SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
 
 local function checkvector(pos)
 	if pos[1] ~= pos[1] or pos[1] == math.huge or pos[1] == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
@@ -143,6 +144,24 @@ end
 function trace_library.intersectRayWithPlane(rayStart, rayDelta, planeOrigin, planeNormal)
 	local pos = util.IntersectRayWithPlane(vunwrap(rayStart), vunwrap(rayDelta), vunwrap(planeOrigin), vunwrap(planeNormal))
 	if pos then return vwrap(pos) end
+end
+
+--- Does a line trace and applies a decal to wherever is hit
+-- @param name The decal name, see https://wiki.facepunch.com/gmod/util.Decal
+-- @param start Start position
+-- @param endpos End position
+-- @param filter (Optional) Entity/array of entities to filter
+function trace_library.decal(name, start, endpos, filter)
+	checkpermission(instance, nil, "trace.decal")
+	checkluatype(name, TYPE_STRING)
+	checkvector(start)
+	checkvector(endpos)
+
+	local start, endpos = vunwrap(start), vunwrap(endpos)
+
+	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
+
+	util.Decal( name, start, endpos, filter )
 end
 
 
