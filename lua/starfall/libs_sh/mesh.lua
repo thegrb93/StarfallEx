@@ -719,6 +719,9 @@ if CLIENT then
 					tri.tangent = vwrap(p.tangent)
 					if p.binormal then tri.binormal = vwrap(p.binormal) end
 					tri.pos = vwrap(p.pos)
+					tri.u = p.u
+					tri.v = p.v
+					tri.userdata = p.userdata
 				end
 			end
 		end
