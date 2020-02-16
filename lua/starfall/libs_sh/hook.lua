@@ -109,7 +109,7 @@ instance:AddHook("deinitialize", function()
 end)
 
 local hook_library = instance.Libraries.hook
-local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local pwrap = instance.Types.Player.Wrap
 
 --- Sets a hook function
