@@ -61,11 +61,6 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
 	html:OpenURL(SF.Editor.HelperURL:GetString())
-	timer.Simple(3,function()
-		if not html.loaded then
-			SF.AddNotify(LocalPlayer(), "Your connection seems to be slow or offline, you may try using legacy helper(available from settings).", "GENERIC" , 10, "DRIP2")
-		end
-	end)
 	self.html = html
 	htmlSetup(nil, self)
 end
