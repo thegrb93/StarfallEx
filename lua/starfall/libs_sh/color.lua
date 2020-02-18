@@ -151,7 +151,7 @@ end
 --@shared
 --@return A triplet of numbers representing HSV.
 function color_methods:hsvToRGB()
-	local rgb = HSVToColor(self[1], self[2], self[3])
+	local rgb = HSVToColor(math.Clamp(self[1] % 360, 0, 360), math.Clamp(self[2], 0, 1), math.Clamp(self[3], 0, 1))
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
 end
 
