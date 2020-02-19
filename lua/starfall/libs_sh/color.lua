@@ -155,6 +155,16 @@ function color_methods:hsvToRGB()
 	return wrap({ rgb.r, rgb.g, rgb.b, (rgb.a or 255) })
 end
 
+--- Round the color values. Self-Modifies.
+-- @param idp (Default 0) The integer decimal place to round to. 
+-- @return nil
+function color_methods:round(idp)
+	self[1] = math.Round(self[1], idp)
+	self[2] = math.Round(self[2], idp)
+	self[3] = math.Round(self[3], idp)
+	self[4] = math.Round(self[4], idp)
+end
+
 --- Copies r,g,b,a from color and returns a new color
 -- @return The copy of the color
 function color_methods:clone()

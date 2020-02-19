@@ -197,6 +197,15 @@ function ang_methods:rotateAroundAxis(v, deg, rad)
 	return awrap(ret)
 end
 
+--- Round the angle values. Self-Modifies.
+-- @param idp (Default 0) The integer decimal place to round to. 
+-- @return nil
+function ang_methods:round(idp)
+	self[1] = math.Round(self[1], idp)
+	self[2] = math.Round(self[2], idp)
+	self[3] = math.Round(self[3], idp)
+end
+
 --- Copies p,y,r from angle and returns a new angle
 -- @return The copy of the angle
 function ang_methods:clone()

@@ -142,7 +142,6 @@ end
 -- @param v Vector to add
 -- @return Resultant vector after addition operation.
 function vec_meta.__add(a, b)
-
 	return wrap({ a[1] + b[1], a[2] + b[2], a[3] + b[3] })
 end
 
@@ -150,7 +149,6 @@ end
 -- @param v Vector to subtract
 -- @return Resultant vector after subtraction operation.
 function vec_meta.__sub(a, b)
-
 	return wrap({ a[1]-b[1], a[2]-b[2], a[3]-b[3] })
 end
 
@@ -166,16 +164,6 @@ function vec_meta.__eq(a, b)
 	return a[1]==b[1] and a[2]==b[2] and a[3]==b[3]
 end
 
---- Add vector - Modifies self.
--- @param v Vector to add
--- @return nil
-function vec_methods:add(v)
-
-	self[1] = self[1] + v[1]
-	self[2] = self[2] + v[2]
-	self[3] = self[3] + v[3]
-end
-
 --- Get the vector's angle.
 -- @return Angle
 function vec_methods:getAngle()
@@ -186,7 +174,6 @@ end
 -- @param v Second Vector
 -- @return Angle
 function vec_methods:getAngleEx(v)
-
 	return awrap(unwrap(self):AngleEx(unwrap(v)))
 end
 
@@ -194,7 +181,6 @@ end
 -- @param v Second Vector
 -- @return Vector
 function vec_methods:cross(v)
-
 	return wrap({ self[2] * v[3] - self[3] * v[2], self[3] * v[1] - self[1] * v[3], self[1] * v[2] - self[2] * v[1] })
 end
 
@@ -204,7 +190,6 @@ local math_sqrt = math.sqrt
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistance(v)
-
 	return math_sqrt((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
 
@@ -212,7 +197,6 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:getDistanceSqr(v)
-
 	return ((v[1]-self[1])^2 + (v[2]-self[2])^2 + (v[3]-self[3])^2)
 end
 
@@ -220,7 +204,6 @@ end
 -- @param v Second Vector
 -- @return Number
 function vec_methods:dot(v)
-
 	return (self[1] * v[1] + self[2] * v[2] + self[3] * v[3])
 end
 
@@ -272,6 +255,24 @@ function vec_methods:getLength2DSqr()
 	return (self[1]^2 + self[2]^2)
 end
 
+--- Add vector - Modifies self.
+-- @param v Vector to add
+-- @return nil
+function vec_methods:add(v)
+	self[1] = self[1] + v[1]
+	self[2] = self[2] + v[2]
+	self[3] = self[3] + v[3]
+end
+
+--- Subtract v from this Vector. Self-Modifies.
+-- @param v Second Vector.
+-- @return nil
+function vec_methods:sub(v)
+	self[1] = self[1] - v[1]
+	self[2] = self[2] - v[2]
+	self[3] = self[3] - v[3]
+end
+
 --- Scalar Multiplication of the vector. Self-Modifies.
 -- @param n Scalar to multiply with.
 -- @return nil
@@ -297,7 +298,6 @@ end
 --- Multiply self with a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to multiply with
 function vec_methods:vmul(v)
-
 	self[1] = self[1] * v[1]
 	self[2] = self[2] * v[2]
 	self[3] = self[3] * v[3]
@@ -306,7 +306,6 @@ end
 --- Divide self by a Vector. Self-Modifies. ( convenience function )
 -- @param v Vector to divide by
 function vec_methods:vdiv(v)
-
 	self[1] = self[1] / v[1]
 	self[2] = self[2] / v[2]
 	self[3] = self[3] / v[3]
@@ -358,7 +357,6 @@ end
 -- @param b Angle to rotate by.
 -- @return nil.
 function vec_methods:rotate(b)
-
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
 
@@ -371,7 +369,6 @@ end
 -- @param b Angle to rotate by.
 -- @return Rotated Vector
 function vec_methods:getRotated(b)
-
 	local vec = unwrap(self)
 	vec:Rotate(aunwrap(b))
 
@@ -397,7 +394,6 @@ end
 -- @param radians Angle to rotate by in radians or nil if degrees.
 -- @return Rotated vector
 function vec_methods:rotateAroundAxis(axis, degrees, radians)
-
 	if degrees then
 		checkluatype(degrees, TYPE_NUMBER)
 		radians = math.rad(degrees)
@@ -415,10 +411,18 @@ function vec_methods:rotateAroundAxis(axis, degrees, radians)
 			(z * x * (1-ca) - y * sa) * x2 + (z * y * (1-ca) + x * sa) * y2 + (ca + (z^2) * (1-ca)) * z2 })
 end
 
+--- Round the vector values. Self-Modifies.
+-- @param idp (Default 0) The integer decimal place to round to. 
+-- @return nil
+function vec_methods:round(idp)
+	self[1] = math.Round(self[1], idp)
+	self[2] = math.Round(self[2], idp)
+	self[3] = math.Round(self[3], idp)
+end
+
 --- Copies x,y,z from a vector and returns a new vector
 -- @return The copy of the vector
 function vec_methods:clone()
-
 	return wrap({ self[1], self[2], self[3] })
 end
 
@@ -426,20 +430,9 @@ end
 -- @param v Second Vector
 -- @return nil
 function vec_methods:set(v)
-
 	self[1] = v[1]
 	self[2] = v[2]
 	self[3] = v[3]
-end
-
---- Subtract v from this Vector. Self-Modifies.
--- @param v Second Vector.
--- @return nil
-function vec_methods:sub(v)
-
-	self[1] = self[1] - v[1]
-	self[2] = self[2] - v[2]
-	self[3] = self[3] - v[3]
 end
 
 --- Translates the vectors position into 2D user screen coordinates.
@@ -453,7 +446,6 @@ end
 -- @param v2 Second Vector to define AABox
 -- @return bool True/False.
 function vec_methods:withinAABox(v1, v2)
-
 	if self[1] < math.min(v1[1], v2[1]) or self[1] > math.max(v1[1], v2[1]) then return false end
 	if self[2] < math.min(v1[2], v2[2]) or self[2] > math.max(v1[2], v2[2]) then return false end
 	if self[3] < math.min(v1[3], v2[3]) or self[3] > math.max(v1[3], v2[3]) then return false end
