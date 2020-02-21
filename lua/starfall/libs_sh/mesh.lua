@@ -695,6 +695,19 @@ if CLIENT then
 		return meshes
 	end
 
+	local function wrapVertex(p)
+		local tri = {}
+		if p.color then tri.color = cwrap(p.color) end
+		tri.normal = vwrap(p.normal)
+		tri.tangent = vwrap(p.tangent)
+		if p.binormal then tri.binormal = vwrap(p.binormal) end
+		tri.pos = vwrap(p.pos)
+		tri.u = p.u
+		tri.v = p.v
+		tri.userdata = p.userdata
+		tri.weights = p.weights
+		return tri
+	end
 	--- Returns a table of visual meshes of given model or nil if the model is invalid
 	-- @param model The full path to a model to get the visual meshes of.
 	-- @param lod The lod of the model to use.
@@ -710,19 +723,13 @@ if CLIENT then
 		if mesh then
 			for k, v in ipairs(mesh) do
 				local triangles = {}
-				output[k] = {triangles = triangles, material = v.material}
+				local verts = {}
+				output[k] = {triangles = triangles, material = v.material, verticies = verts}
 				for o, p in ipairs(v.triangles) do
-					local tri = {}
-					triangles[o] = tri
-					if p.color then tri.color = cwrap(p.color) end
-					tri.normal = vwrap(p.normal)
-					tri.tangent = vwrap(p.tangent)
-					if p.binormal then tri.binormal = vwrap(p.binormal) end
-					tri.pos = vwrap(p.pos)
-					tri.u = p.u
-					tri.v = p.v
-					tri.userdata = p.userdata
-					tri.weights = p.weights
+					triangles[o] = wrapVertex(p)
+				end
+				for o, p in ipairs(v.verticies) do
+					verts[o] = wrapVertex(p)
 				end
 			end
 		end
