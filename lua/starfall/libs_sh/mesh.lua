@@ -709,11 +709,11 @@ if CLIENT then
 		local output = {}
 		if mesh then
 			for k, v in ipairs(mesh) do
-				local verts = {}
-				output[k] = {triangles = verts}
+				local triangles = {}
+				output[k] = {triangles = triangles, material = v.material}
 				for o, p in ipairs(v.triangles) do
 					local tri = {}
-					verts[o] = tri
+					triangles[o] = tri
 					if p.color then tri.color = cwrap(p.color) end
 					tri.normal = vwrap(p.normal)
 					tri.tangent = vwrap(p.tangent)
@@ -722,6 +722,7 @@ if CLIENT then
 					tri.u = p.u
 					tri.v = p.v
 					tri.userdata = p.userdata
+					tri.weights = p.weights
 				end
 			end
 		end
