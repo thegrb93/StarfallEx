@@ -581,6 +581,14 @@ function SF.CompileString(str, name, handle)
 	return CompileString(str, name, handle)
 end
 
+--- The safest write file function
+function SF.FileWrite(path, data)
+	path = SF.NormalizePath(path)
+	file.CreateDir(string.GetPathFromFilename( path ))
+	file.Write(path, data)
+	return file.Read(path)==data
+end
+
 --- Throws an error like the throw function in builtins
 -- @param msg Message
 -- @param level Which level in the stacktrace to blame

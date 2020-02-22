@@ -350,7 +350,7 @@ function PANEL:DoRightClick(node)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
 						local saveFile = node:GetFolder().."/"..text..".txt"
-						file.Write(saveFile, SF.DefaultCode())
+						SF.FileWrite(saveFile, SF.DefaultCode())
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
 						self:ReloadTree()
 						SF.Editor.openFile(saveFile)

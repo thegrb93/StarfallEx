@@ -1585,18 +1585,20 @@ function Editor:SaveFile(Line, close, SaveAs, Func)
 		return
 	end
 
-	file.Write(Line, self:GetCode())
+	if SF.FileWrite(Line, self:GetCode()) then
+		local panel = self.C.Val
+		timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
+		surface.PlaySound("ambient/water/drip3.wav")
 
-	local panel = self.C.Val
-	timer.Simple(0, function() panel.SetText(panel, " Saved as " .. Line) end)
-	surface.PlaySound("ambient/water/drip3.wav")
+		self:ChosenFile(Line)
+		self:UpdateTabText(self:GetActiveTab())
+		if close then
 
-	self:ChosenFile(Line)
-	self:UpdateTabText(self:GetActiveTab())
-	if close then
-
-		GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
-		self:Close()
+			GAMEMODE:AddNotify("Source code saved as " .. Line .. ".", NOTIFY_GENERIC, 7)
+			self:Close()
+		end
+	else
+		SF.AddNotify(LocalPlayer(), "Failed to save " .. Line, "ERROR", 7, "ERROR1")
 	end
 end
 
