@@ -6,6 +6,8 @@ local checkpermission = SF.Permissions.check
 SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
 SF.Permissions.registerPrivilege("trace.decal", "Decal Trace", "Allows the user to apply decals with traces")
 
+local plyDecalBurst = SF.BurstObject("decals", "decals", 50, 50, "Rate decals can be created per second.", "Number of decals that can be created in a short time.")
+
 local function checkvector(pos)
 	if pos[1] ~= pos[1] or pos[1] == math.huge or pos[1] == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
 	if pos[2] ~= pos[2] or pos[2] == math.huge or pos[2] == -math.huge then SF.Throw("Inf or nan vector in trace position", 3) end
@@ -161,6 +163,7 @@ function trace_library.decal(name, start, endpos, filter)
 
 	if filter ~= nil then checkluatype(filter, TYPE_TABLE) filter = convertFilter(filter) end
 
+	plyDecalBurst:use(instance.player, 1)
 	util.Decal( name, start, endpos, filter )
 end
 
