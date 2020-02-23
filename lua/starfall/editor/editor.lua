@@ -415,7 +415,7 @@ if CLIENT then
 		net.ReadStream(nil, function(data)
 			local ok, docs
 			if data then
-				ok, docs = xpcall(function() return SF.StringToTable(data) end, debug.traceback)
+				ok, docs = xpcall(function() return SF.StringToTable(util.Decompress(data)) end, debug.traceback)
 			end
 			if ok then
 				SF.Docs = docs

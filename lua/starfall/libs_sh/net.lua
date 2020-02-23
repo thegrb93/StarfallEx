@@ -98,7 +98,8 @@ function net_library.send(target, unreliable)
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(instance.data.entity)
 	for i = 1, #data do
-		data[i][1](unpack(data[i][2]))
+		local args = data[i][2]
+		data[i][1](unpack(args, 1, table.maxn(args)))
 	end
 
 	if SERVER then
@@ -221,11 +222,12 @@ end
 --- Streams a large 20MB string.
 -- @shared
 -- @param str The string to be written
-function net_library.writeStream(str)
+-- @param compress Compress the data. True by default
+function net_library.writeStream(str, compress)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	checkluatype (str, TYPE_STRING)
-	write(net.WriteStream, 8*8, str)
+	write(net.WriteStream, 8*8, str, nil, not compress)
 	return true
 end
 

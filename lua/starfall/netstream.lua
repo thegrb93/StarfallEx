@@ -33,7 +33,10 @@ function net.Stream.ReadStream:Read(len)
 
 	self.data[#self.data + 1] = net.ReadData(size)
 	if #self.data == self.numchunks then
-		self.returndata = util.Decompress(table.concat(self.data))
+		self.returndata = table.concat(self.data)
+		if self.compressed then
+			self.returndata = util.Decompress(self.returndata)
+		end
 		self:Remove()
 	else
 		self:Request()
@@ -144,9 +147,11 @@ function net.WriteStream(data, callback, dontcompress)
 		error("bad argument #2 to 'WriteStream' (function expected, got " .. type(callback) .. ")", 2)
 	end
 
-	if not dontcompress then
+	local compressed = not dontcompress
+	if compressed then
 		data = util.Compress(data) or ""
 	end
+
 	local numchunks = math.ceil(#data / net.Stream.SendSize)
 	if numchunks == 0 then
 		net.WriteUInt(0, 32)
@@ -168,6 +173,7 @@ function net.WriteStream(data, callback, dontcompress)
 	local stream = {
 		identifier = identifier,
 		data = data,
+		compressed = compressed,
 		numchunks = numchunks,
 		callback = callback,
 		progress = {},
@@ -180,6 +186,7 @@ function net.WriteStream(data, callback, dontcompress)
 
 	net.WriteUInt(numchunks, 32)
 	net.WriteUInt(identifier, 32)
+	net.WriteBool(compressed)
 
 	return stream
 end
@@ -212,6 +219,7 @@ function net.ReadStream(ply, callback)
 		return
 	end
 	local identifier = net.ReadUInt(32)
+	local compressed = net.ReadBool()
 	--print("Got info", numchunks, identifier)
 
 	if SERVER and queue and #queue == net.Stream.MaxServerReadStreams then
@@ -229,6 +237,7 @@ function net.ReadStream(ply, callback)
 	local stream = {
 		identifier = identifier,
 		data = {},
+		compressed = compressed,
 		numchunks = numchunks,
 		callback = callback,
 		queue = queue,
