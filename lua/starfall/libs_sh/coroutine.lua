@@ -48,8 +48,7 @@ local function createCoroutine(func)
 	local wrappedFunc = coroutine.wrap(function()
 		local thread = coroutine.running()
 		local function cleanupThread(...) instance.data.coroutines[thread] = nil return ... end
-		coroutine.yield(thread)
-		return cleanupThread(func())
+		return cleanupThread(func(coroutine.yield(thread)))
 	end)
 
 	local thread = wrappedFunc()
