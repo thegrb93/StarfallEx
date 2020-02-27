@@ -583,7 +583,10 @@ end
 
 local mesh_library = instance.Libraries.mesh
 local thread_yield = instance.Libraries.coroutine.yield
-local vector = instance.env.Vector
+local vector
+instance:AddHook("initialize", function()
+	vector = instance.env.Vector
+end)
 
 --- Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents
 -- @param obj The obj data
