@@ -626,7 +626,7 @@ function render_library.setRGBA(r, g, b, a)
 end
 
 --- Looks up a texture by file name and creates an UnlitGeneric material with it.
---- Also supports image URLs or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
+--- Also supports image URLs or image data (These will create a rendertarget for the $basetexture): https://en.wikipedia.org/wiki/Data_URI_scheme
 --- Make sure to store the material to use it rather than calling this slow function repeatedly.
 --- NOTE: This no longer supports material names. Use texture names instead (Textures are .vtf, material are .vmt)
 -- @param tx Texture file path, a http url, or image data: https://en.wikipedia.org/wiki/Data_URI_scheme
