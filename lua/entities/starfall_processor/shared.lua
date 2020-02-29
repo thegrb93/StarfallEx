@@ -140,7 +140,7 @@ function ENT:Error(err)
 	else
 		print(traceback)
 
-		if self.owner ~= LocalPlayer() then
+		if self.owner ~= LocalPlayer() and GetConVarNumber("sf_timebuffer_cl")>0 then
 			net.Start("starfall_report_error")
 			net.WriteEntity(self)
 			net.WriteString(msg.."\n"..traceback)
