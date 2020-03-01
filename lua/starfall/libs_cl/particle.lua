@@ -184,7 +184,7 @@ function particle_methods:setSortOrigin(origin)
 
 	checkValid(uw)
 
-	uw:SetSortOrgin(unwrap_vector(origin))
+	uw:SetSortOrgin(vunwrap(origin))
 
 
 end
@@ -200,7 +200,7 @@ function particle_methods:setControlPoint(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPoint(id,unwrap_vector(value))
+	uw:SetControlPoint(id,vunwrap(value))
 
 
 end
@@ -233,7 +233,7 @@ function particle_methods:setForwardVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointForwardVector(id,unwrap_vector(value))
+	uw:SetControlPointForwardVector(id,vunwrap(value))
 
 
 end
@@ -248,7 +248,7 @@ function particle_methods:setRightVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointRightVector(id,unwrap_vector(value))
+	uw:SetControlPointRightVector(id,vunwrap(value))
 
 
 end
@@ -264,7 +264,7 @@ function particle_methods:setUpVector(id,value)
 
 	checkValid(uw)
 
-	uw:SetControlPointUpVector(id,unwrap_vector(value))
+	uw:SetControlPointUpVector(id,vunwrap(value))
 
 end
 
