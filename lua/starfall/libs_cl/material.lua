@@ -275,7 +275,7 @@ local function NextInTextureQueue()
 		img.style.left="0px";
 		img.style.top="0px";
 		img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]]..
-		BRANCH ~= "x86-64" and "\nif(img.complete){sf.imageLoaded(img.width, img.height);}" or "")
+		(BRANCH ~= "x86-64" and "\nif(img.complete){sf.imageLoaded(img.width, img.height);}" or ""))
 		Panel:Show()
 
 		timer.Create("SF_URLTextureTimeout", 10, 1, function()
