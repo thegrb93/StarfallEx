@@ -201,15 +201,31 @@ builtins_library.isFirstTimePredicted = IsFirstTimePredicted
 --- Returns the current count for this Think's CPU Time.
 -- This value increases as more executions are done, may not be exactly as you want.
 -- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
+-- @param chip If specified will return it's value instead
 -- @return Current quota used this Think
-function builtins_library.quotaUsed()
-	return instance.cpu_total
+function builtins_library.quotaUsed(chip)
+	if chip then
+		local sf = eunwrap(chip)
+		if sf.instance then
+			return sf.instance.cpu_total
+		end
+	else
+		return instance.cpu_total
+	end
 end
 
 --- Gets the Average CPU Time in the buffer
+-- @param chip If specified will return it's value instead
 -- @return Average CPU Time of the buffer.
-function builtins_library.quotaAverage()
-	return instance:movingCPUAverage()
+function builtins_library.quotaAverage(chip)
+	if chip then
+		local sf = eunwrap(chip)
+		if sf.instance and sf.instance.movingCPUAverage then
+			return sf.instance:movingCPUAverage()
+		end
+	else
+		return instance:movingCPUAverage()
+	end
 end
 
 --- Gets the current ram usage of the lua builtins_library
@@ -256,9 +272,17 @@ end
 
 --- Gets the CPU Time max.
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
+-- @param chip If specified will return it's value instead
 -- @return Max SysTime allowed to take for execution of the chip in a Think.
-function builtins_library.quotaMax()
-	return instance.cpuQuota
+function builtins_library.quotaMax(chip)
+	if chip then
+		local sf = eunwrap(chip)
+		if sf.instance then
+			return sf.instance.cpuQuota
+		end
+	else
+		return instance.cpuQuota
+	end
 end
 
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
