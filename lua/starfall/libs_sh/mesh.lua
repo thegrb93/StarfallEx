@@ -597,9 +597,8 @@ end)
 -- @param obj The obj data
 -- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 -- @param triangulate Whether to triangulate the faces
--- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables containing:
--- [1] The table of vertices that can be passed to mesh.buildFromTriangles
--- [2] The table of obj data. table.positions can be given to prop.createCustom
+-- @return Table of Mesh tables. The keys correspond to the objs object names, and the values are tables of vertices that can be passed to mesh.buildFromTriangles
+-- @return Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
 	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
