@@ -9,14 +9,19 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 	local meshes = {}
 	local name, nextname
 	local lines = string.gmatch(obj, "[^\r\n]+")
+	
+	local pos, norm, uv, faces = {}, {}, {}, {}
+	local map = {
+		v = function(f) pos[#pos + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
+		vt = function(f) uv[#uv + 1] = tonumber(f()) uv[#uv + 1] = 1-tonumber(f()) end,
+		vn = function(f) norm[#norm + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
+	}
+	local ignore = { ["#"] = true, ["mtllib"] = true, ["usemtl"] = true, ["s"] = true }
+		
 	while true do
 		local timeToStop = false
-		local pos, norm, uv, face = {}, {}, {}, {}
-		local map = {
-			v = function(f) pos[#pos + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
-			vt = function(f) uv[#uv + 1] = tonumber(f()) uv[#uv + 1] = 1-tonumber(f()) end,
-			vn = function(f) norm[#norm + 1] = Vector(tonumber(f()), tonumber(f()), tonumber(f())) end,
-		}
+
+		local face = {}
 		if triangulate then
 			map.f = function(f) 
 				local points = {}
@@ -36,7 +41,6 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 			map.f = function(f) local i = #face face[i + 3] = f() face[i + 2] = f() face[i + 1] = f() end
 		end
 
-		local ignore = { ["#"] = true, ["mtllib"] = true, ["usemtl"] = true, ["s"] = true }
 		for line in lines do
 			local components = {}
 			local f = string.gmatch(line, "%S+")
@@ -153,12 +157,13 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 			vertices[i].userdata = {tan[1], tan[2], tan[3], w}
 		end
 		if thread_yield then thread_yield() end
-		meshes[name] = {vertices, {positions = pos, normals = norm, texturecoords = uv, faces = face}}
+		meshes[name] = vertices
+		faces[name] = face
 		if timeToStop then break end
 		name = nextname
 		nextname = nil
 	end
-	return meshes
+	return meshes, {positions = pos, normals = norm, texturecoords = uv, faces = faces}
 end
 
 
@@ -684,8 +689,7 @@ if CLIENT then
 		checkpermission (instance, nil, "mesh")
 
 		local meshes = SF.ParseObj(obj, threaded and thread_yield, Vector, triangulate)
-		for name, v in pairs(meshes) do
-			local vertices = v[1]
+		for name, vertices in pairs(meshes) do
 			local ntriangles = #vertices / 3
 			plyTriangleCount:use(instance.player, ntriangles)
 
