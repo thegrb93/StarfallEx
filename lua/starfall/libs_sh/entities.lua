@@ -545,6 +545,69 @@ function ents_methods:getChipName()
 	end
 end
 
+--- Gets the author of the specified starfall or e2.
+-- @shared
+-- @return The author of the starfall chip.
+function ents_methods:getChipAuthor()
+	local ent = getent(self)
+	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	
+	return ent.author
+end
+
+--- Returns the current count for this Think's CPU Time of the specified starfall.
+-- This value increases as more executions are done, may not be exactly as you want.
+-- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
+-- @shared
+-- @return Current quota used this Think
+function ents_methods:getQuotaUsed()
+	local ent = getent(self)
+	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	
+	return ent.instance.cpu_total
+end
+
+--- Gets the Average CPU Time in the buffer of the specified starfall
+-- @shared
+-- @return Average CPU Time of the buffer of the specified starfall.
+function ents_methods:getQuotaAverage()
+	local ent = getent(self)
+	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	
+	return ent.instance:movingCPUAverage()
+end
+
+--- Gets the CPU Time max of the specified starfall of the specified starfall.
+-- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
+-- @shared
+-- @return Max SysTime allowed to take for execution of the chip in a Think.
+function ents_methods:getQuotaMax()
+	local ent = getent(self)
+	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	
+	return ent.instance.cpuQuota
+end
+
+if SERVER then
+	--- Gets all players the specified starfall errored for.
+	-- This excludes the owner of the starfall chip.
+	-- @server
+	-- @return A table containg the errored players.
+	function ents_methods:getErroredPlayers()
+		local ent = getent(self)
+		if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+		
+		local plys = {}
+		for ply, _ in pairs(ent.ErroredPlayers) do
+			if ply:IsValid() then
+				table.insert(plys, plywrap(ply))
+			end
+		end
+		
+		return plys
+	end
+end
+
 --- Returns the EntIndex of the entity
 -- @shared
 -- @return The numerical index of the entity
@@ -1025,79 +1088,6 @@ end
 function ents_methods:getCreationTime()
 	local ent = getent(self)
 	return ent:GetCreationTime()
-end
-
---- Returns the current count for this Think's CPU Time of the specified starfall.
--- This value increases as more executions are done, may not be exactly as you want.
--- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
--- @shared
--- @return Current quota used this Think
-function ents_methods:getQuotaUsed()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.instance.cpu_total
-end
-
---- Gets the Average CPU Time in the buffer of the specified starfall
--- @shared
--- @return Average CPU Time of the buffer of the specified starfall.
-function ents_methods:getQuotaAverage()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.instance:movingCPUAverage()
-end
-
---- Gets the CPU Time max of the specified starfall of the specified starfall.
--- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
--- @shared
--- @return Max SysTime allowed to take for execution of the chip in a Think.
-function ents_methods:getQuotaMax()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.instance.cpuQuota
-end
-
---- Gets the name of the specified starfall.
--- @shared
--- @return The name of the starfall chip.
-function ents_methods:getName()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.name
-end
-
---- Gets the author of the specified starfall.
--- @shared
--- @return The author of the starfall chip.
-function ents_methods:getAuthor()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.author
-end
-
-if SERVER then
-	--- Gets all players the specified starfall errored for.
-	-- This excludes the owner of the starfall chip.
-	-- @server
-	-- @return A table containg the errored players.
-	function ents_methods:getErroredPlayers()
-		local ent = getent(self)
-		if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-		
-		local plys = {}
-		for ply, _ in pairs(ent.ErroredPlayers) do
-			if ply:IsValid() then
-				table.insert(plys, plywrap(ply))
-			end
-		end
-		
-		return plys
-	end
 end
 
 end
