@@ -578,7 +578,7 @@ function ents_methods:getQuotaAverage()
 	elseif ent.WireDebugName == "Expression 2" then
 		return ent.context.timebench
 	else
-		SF.Throw("The entity isn't a starfall or expression2 chip", 2) end
+		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
 	end
 end
 
@@ -593,7 +593,7 @@ function ents_methods:getQuotaMax()
 	elseif ent.WireDebugName == "Expression 2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else
-		SF.Throw("The entity isn't a starfall or expression2 chip", 2) end
+		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
 	end
 end
 
