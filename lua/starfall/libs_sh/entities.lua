@@ -556,6 +556,18 @@ function ents_methods:getChipAuthor()
 	return ent.author
 end
 
+--- Returns the current count for this Think's CPU Time of the specified starfall.
+-- This value increases as more executions are done, may not be exactly as you want.
+-- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
+-- @shared
+-- @return Current quota used this Think
+function ents_methods:getQuotaUsed()
+	local ent = getent(self)
+	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
+	
+	return ent.instance.cpu_total
+end
+
 --- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
 -- @shared
 -- @return Average CPU Time of the buffer of the specified starfall or expression2.
