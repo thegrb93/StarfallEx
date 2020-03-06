@@ -267,6 +267,13 @@ function builtins_library.quotaMax()
 	return instance.cpuQuota
 end
 
+--- Gets the Ram Usage max.
+-- Gets the maximum ram usage of all chips, if any chip exceeds this limit all chips will error.
+-- @return The max ram in bytes
+function builtins_library.ramMax()
+	return SF.RamCap:GetInt()
+end
+
 --- Sets a CPU soft quota which will trigger a catchable error if the cpu goes over a certain amount.
 -- @param quota The threshold where the soft error will be thrown. Ratio of current cpu to the max cpu usage. 0.5 is 50%
 function builtins_library.setSoftQuota(quota)
