@@ -535,17 +535,18 @@ function ents_methods:isOnFire()
 	return ent:IsOnFire()
 end
 
---- Returns the chip's name of E2s or starfalls
+--- Returns the starfall or expression2's name
+-- @return The name of the chip
 function ents_methods:getChipName()
 	local ent = getent(self)
 	if ent.GetGateName then
 		return ent:GetGateName()
 	else
-		SF.Throw("The entity is not a starfall or e2!", 2)
+		SF.Throw("The entity is not a starfall or expression2!", 2)
 	end
 end
 
---- Gets the author of the specified starfall or e2.
+--- Gets the author of the specified starfall.
 -- @shared
 -- @return The author of the starfall chip.
 function ents_methods:getChipAuthor()
@@ -555,37 +556,33 @@ function ents_methods:getChipAuthor()
 	return ent.author
 end
 
---- Returns the current count for this Think's CPU Time of the specified starfall.
--- This value increases as more executions are done, may not be exactly as you want.
--- If used on screens, will show 0 if only rendering is done. Operations must be done in the Think loop for them to be counted.
+--- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
 -- @shared
--- @return Current quota used this Think
-function ents_methods:getQuotaUsed()
-	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.instance.cpu_total
-end
-
---- Gets the Average CPU Time in the buffer of the specified starfall
--- @shared
--- @return Average CPU Time of the buffer of the specified starfall.
+-- @return Average CPU Time of the buffer of the specified starfall or expression2.
 function ents_methods:getQuotaAverage()
 	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.instance:movingCPUAverage()
+	if ent.Starfall then
+		return ent.instance:movingCPUAverage()
+	elseif ent.WireDebugName == "Expression 2" then
+		return ent.context.timebench
+	else
+		SF.Throw("The entity isn't a starfall or expression2 chip", 2) end
+	end
 end
 
---- Gets the CPU Time max of the specified starfall of the specified starfall.
+--- Gets the CPU Time max of the specified starfall of the specified starfall or expression2.
 -- CPU Time is stored in a buffer of N elements, if the average of this exceeds quotaMax, the chip will error.
 -- @shared
 -- @return Max SysTime allowed to take for execution of the chip in a Think.
 function ents_methods:getQuotaMax()
 	local ent = getent(self)
-	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
-	
-	return ent.instance.cpuQuota
+	if ent.Starfall then
+		return ent.instance.cpuQuota
+	elseif ent.WireDebugName == "Expression 2" then
+		return GetConVarNumber("wire_expression2_quotatime")
+	else
+		SF.Throw("The entity isn't a starfall or expression2 chip", 2) end
+	end
 end
 
 if SERVER then
