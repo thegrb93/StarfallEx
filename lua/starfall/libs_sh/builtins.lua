@@ -212,16 +212,22 @@ function builtins_library.quotaAverage()
 	return instance:movingCPUAverage()
 end
 
---- Gets the current ram usage of the lua builtins_library
--- @return The ram used in bytes
+--- Gets the current ram usage of the gmod lua environment
+-- @return The ram used in kilobytes
 function builtins_library.ramUsed()
 	return SF.Instance.Ram
 end
 
---- Gets the moving average of ram usage of the lua builtins_library
--- @return The ram used in bytes
+--- Gets the moving average of ram usage of the gmod lua environment
+-- @return The ram used in kilobytes
 function builtins_library.ramAverage()
 	return SF.Instance.RamAvg
+end
+
+--- Gets the max allowed ram usage of the gmod lua environment
+-- @return The max ram usage in kilobytes
+function builtins_library.ramMax()
+	return SF.RamCap:GetInt()
 end
 
 --- Gets the starfall version
