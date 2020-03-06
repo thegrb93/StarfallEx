@@ -222,7 +222,7 @@ if CLIENT then
 		local openfiles = SF.Editor.getOpenFiles()
 		if not (mainfile and (openfiles[mainfile] or file.Exists("starfall/" .. mainfile, "DATA"))) then
 			mainfile = SF.Editor.getOpenFile() or "main"
-			if #mainfile == 0 then return false, "Invalid main file" end
+			if #mainfile == 0 then err("Invalid main file") return end
 			openfiles[mainfile] = SF.Editor.getCode()
 		end
 
@@ -301,49 +301,49 @@ if CLIENT then
 		end
 		local ok, msg = pcall(recursiveLoad, mainfile, string.GetPathFromFilename(mainfile))
 
-		local function findCycle(file, visited, recStack)
-			if not visited[file] then
-				--Mark the current file as visited and part of recursion stack
-				visited[file] = true
-				recStack[file] = true
+		if ok then
+			local function findCycle(file, visited, recStack)
+				if not visited[file] then
+					--Mark the current file as visited and part of recursion stack
+					visited[file] = true
+					recStack[file] = true
 
-				--Recurse for all the files included in this file
-				for k, v in pairs(ppdata.includes[file] or {}) do
-					if recStack[v] then
-						return true, file
-					elseif not visited[v] then
-						local cyclic, cyclicFile = findCycle(v, visited, recStack)
-						if cyclic then return true, cyclicFile end
+					--Recurse for all the files included in this file
+					for k, v in pairs(ppdata.includes[file] or {}) do
+						if recStack[v] then
+							return true, file
+						elseif not visited[v] then
+							local cyclic, cyclicFile = findCycle(v, visited, recStack)
+							if cyclic then return true, cyclicFile end
+						end
 					end
+				end
+
+				--Remove this file from the recursion stack
+				recStack[file] = false
+				return false, nil
+			end
+
+			local isCyclic = false
+			local cyclicFile = nil
+			for k, v in pairs(ppdata.includes or {}) do
+				local cyclic, file = findCycle(k, {}, {})
+				if cyclic then
+					isCyclic = true
+					cyclicFile = file
+					break
 				end
 			end
 
-			--Remove this file from the recursion stack
-			recStack[file] = false
-			return false, nil
-		end
-
-		local isCyclic = false
-		local cyclicFile = nil
-		for k, v in pairs(ppdata.includes or {}) do
-			local cyclic, file = findCycle(k, {}, {})
-			if cyclic then
-				isCyclic = true
-				cyclicFile = file
-				break
+			if isCyclic then
+				err("Loop in includes from: " .. cyclicFile) return
 			end
-		end
 
-		if isCyclic then
-			return false, "Loop in includes from: " .. cyclicFile
-		end
+			local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
+			if clientmain and not tbl.files[clientmain] then
+				err("Clientmain not found: " .. clientmain) return
+			end
 
-		local clientmain = ppdata.clientmain and ppdata.clientmain[tbl.mainfile]
-		if clientmain and not tbl.files[clientmain] then
-			return false, "Clientmain not found: " .. clientmain
-		end
-
-		if ok then
 			success(tbl)
 		else
 			local _1, _2, file = string.find(msg, "(Bad include%: .*)")

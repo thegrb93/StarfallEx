@@ -1276,7 +1276,8 @@ do
 			end
 		else
 			if shouldrun then
-				init = CompileFile(path)()
+				init = CompileFile(path)
+				if init then init = init() end
 			end
 		end
 		local tbl = SF.Modules[name]
