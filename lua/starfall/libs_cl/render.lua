@@ -1984,6 +1984,11 @@ end
 -- @class hook
 -- @client
 
+--- Called when a scene is requested to be drawn. This is used for the render.renderview function.
+-- @name renderscene
+-- @class hook
+-- @client
+
 --- Called when the player connects to a HUD component linked to the Starfall Chip
 -- @name hudconnected
 -- @class hook
