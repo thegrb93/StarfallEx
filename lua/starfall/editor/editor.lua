@@ -77,8 +77,16 @@ if CLIENT then
 		
 		if not SF.Docs then
 			if not SF.WaitingForDocs then
+				local docfile = file.Open("sf_docs.txt", "rb", "DATA")
+				if docfile then
+					SF.DocsData = docfile:Read(docfile:Size())
+					docfile:Close()
+				else
+					SF.DocsData = ""
+				end
 				SF.WaitingForDocs = {}
 				net.Start("starfall_docs")
+				net.WriteString(util.CRC(SF.DocsData))
 				net.SendToServer()
 				hook.Add("Think","SF_WaitingForDocs",function()
 					if SF.Docs then
@@ -411,22 +419,40 @@ if CLIENT then
 		print("Editor reloaded")
 	end)
 	
-	net.Receive("starfall_docs", function(len, ply)
-		net.ReadStream(nil, function(data)
-			local ok, docs
-			if data then
-				ok, docs = xpcall(function() return SF.StringToTable(util.Decompress(data)) end, debug.traceback)
-			end
-			if ok then
-				SF.Docs = docs
+	local function initDocs(data)
+		local ok, docs
+		if data then
+			ok, docs = xpcall(function() return SF.StringToTable(util.Decompress(data)) end, debug.traceback)
+		end
+		if ok then
+			SF.Docs = docs
+		else
+			if docs then
+				ErrorNoHalt("There was an error decoding the docs. Rejoin to try again.\n" .. docs .. "\n")
 			else
-				if docs then
-					ErrorNoHalt("There was an error decoding the docs. Rejoin to try again.\n" .. docs .. "\n")
-				else
-					ErrorNoHalt("There was an error transmitting the docs. Rejoin to try again.\n")
-				end
+				ErrorNoHalt("There was an error transmitting the docs. Rejoin to try again.\n")
 			end
-		end)
+			SF.AddNotify(LocalPlayer(), "Error processing Starfall documentation!", "GENERIC", 7, "DRIP3")
+		end
+	end
+	net.Receive("starfall_docs", function(len, ply)
+		if net.ReadBool() then
+			initDocs(SF.DocsData)
+			SF.DocsData = nil
+		else
+			SF.AddNotify(LocalPlayer(), "Downloading Starfall Documentation", "GENERIC", 7, "DRIP3")
+			net.ReadStream(nil, function(data)
+				local docfile = file.Open("sf_docs.txt", "wb", "DATA")
+				if docfile then
+					docfile:Write(data)
+					docfile:Close()
+					SF.AddNotify(LocalPlayer(), "Documentation saved to sf_docs.txt!", "GENERIC", 7, "DRIP3")
+				else
+					SF.AddNotify(LocalPlayer(), "Error saving Starfall documentation!", "GENERIC", 7, "DRIP3")
+				end
+				initDocs(data)
+			end)
+		end
 	end)
 elseif SERVER then
 
@@ -466,8 +492,14 @@ elseif SERVER then
 	net.Receive("starfall_docs", function(len, ply)
 		if not ply.SF_SentDocs then
 			ply.SF_SentDocs = true
+
 			net.Start("starfall_docs")
-			net.WriteStream(SF.Docs, nil, true)
+			if SF.DocsCRC == net.ReadString() then
+				net.WriteBool(true)
+			else
+				net.WriteBool(false)
+				net.WriteStream(SF.Docs, nil, true)
+			end
 			net.Send(ply)
 		end
 	end)

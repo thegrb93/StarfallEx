@@ -1302,6 +1302,7 @@ do
 		util.AddNetworkString("sf_receivelibrary")
 		include("starfall/editor/docs.lua")
 		SF.Docs = util.Compress(SF.TableToString(SF.Docs))
+		SF.DocsCRC = util.CRC(SF.Docs)
 
 		-- Command to reload the libraries
 		concommand.Add("sf_reloadlibrary", function(ply, com, arg)
