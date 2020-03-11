@@ -398,18 +398,24 @@ if CLIENT then
 		getply(self):VoiceVolume()
 	end
 	
-	--- Animates a hologram
+	--- Animates a player
 	-- @client
 	-- @param animation sequence string or act number. https://wiki.facepunch.com/gmod/Enums/ACT
-	-- @param loop Should the gesture loop
-	-- @param slot The gesture slot to use. GESTURE_SLOT table values
-	-- @param weight The weight of the gesture
+	-- @param loop Optional bool, should the gesture loop
+	-- @param slot Optional int, the gesture slot to use. GESTURE_SLOT table values
+	-- @param weight Optional float, the weight of the gesture. Ranging from 0-1
 	function player_methods:playGesture(animation, loop, slot, weight)
-		slot = slot or GESTURE_SLOT_CUSTOM
-		checkluatype(slot, TYPE_NUMBER)
+		if slot == nil then
+			slot = GESTURE_SLOT_CUSTOM
+		else
+			checkluatype(slot, TYPE_NUMBER)
+		end
 		
-		weight = weight or 1
-		checkluatype(weight, TYPE_NUMBER)
+		if weight == nil then
+			weight = 1
+		else
+			checkluatype(weight, TYPE_NUMBER)
+		end
 		
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")

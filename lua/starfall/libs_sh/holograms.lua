@@ -511,7 +511,7 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	holo:SetPlaybackRate(rate)
 end
 
---- Applies a engine effect to the hologram
+--- Applies engine effects to the hologram
 -- @shared
 -- @param effect The effects to add. EF table values
 function hologram_methods:addEffects(effect)
@@ -523,7 +523,7 @@ function hologram_methods:addEffects(effect)
 	holo:AddEffects(effect)
 end
 
---- Removes a engine effect from the hologram
+--- Removes engine effects from the hologram
 -- @shared
 -- @param effect The effects to remove. EF table values
 function hologram_methods:removeEffects(effect)

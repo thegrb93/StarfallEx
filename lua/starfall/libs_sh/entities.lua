@@ -1072,7 +1072,7 @@ function ents_methods:getCreationTime()
 	return ent:GetCreationTime()
 end
 
---- Applies a engine effect to the hologram
+--- Checks if an engine effect is applied to the entity
 -- @shared
 -- @param effect The effect to check. EF table values
 -- @return True or false
