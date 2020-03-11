@@ -263,6 +263,44 @@ function ents_methods:setBodygroup(bodygroup, value)
 	ent:SetBodygroup(bodygroup, value)
 end
 
+--- Returns the bodygroup value of the entity with given index
+-- @shared
+-- @param id The bodygroup's number index
+-- @return The bodygroup value
+function ents_methods:getBodygroup(id)
+	checkluatype(id, TYPE_NUMBER)
+	local ent = getent(self)
+	return ent:GetBodygroup(id)
+end
+
+--- Returns a list of all bodygroups of the entity
+-- @shared
+-- @return Bodygroups as a table of BodyGroupDatas. https://wiki.facepunch.com/gmod/Structures/BodyGroupData
+function ents_methods:getBodygroups()
+	local ent = getent(self)
+	return ent:GetBodyGroups()
+end
+
+--- Returns the bodygroup index of the entity with given name
+-- @shared
+-- @param name The bodygroup's string name
+-- @return The bodygroup index
+function ents_methods:lookupBodygroup(name)
+	checkluatype(name, TYPE_STRING)
+	local ent = getent(self)
+	return ent:FindBodygroupByName(name)
+end
+
+--- Returns the bodygroup name of the entity with given index
+-- @shared
+-- @param id The bodygroup's number index
+-- @return The bodygroup name
+function ents_methods:getBodygroupName(id)
+	checkluatype(id, TYPE_NUMBER)
+	local ent = getent(self)
+	return ent:GetBodygroupName(id)
+end
+
 --- Sets the skin of the entity
 -- @shared
 -- @param skinIndex Number, Index of the skin to use.
@@ -277,6 +315,22 @@ function ents_methods:setSkin(skinIndex)
 	end
 
 	ent:SetSkin(skinIndex)
+end
+
+--- Gets the skin number of the entity
+-- @shared
+-- @return Skin number
+function ents_methods:getSkin()
+	local ent = getent(self)
+	return ent:GetSkin()
+end
+
+--- Returns the amount of skins of the entity
+-- @shared
+-- @return The amount of skins
+function ents_methods:getSkinCount()
+	local ent = getent(self)
+	return ent:SkinCount()
 end
 
 --- Sets the render mode of the entity
@@ -986,14 +1040,6 @@ function ents_methods:getMaterials()
 	return ent:GetMaterials() or {}
 end
 
---- Gets the skin number of the entity
--- @shared
--- @return Skin number
-function ents_methods:getSkin()
-	local ent = getent(self)
-	return ent:GetSkin()
-end
-
 --- Gets the entity's up vector
 -- @shared
 -- @return Vector up
@@ -1024,6 +1070,17 @@ end
 function ents_methods:getCreationTime()
 	local ent = getent(self)
 	return ent:GetCreationTime()
+end
+
+--- Applies a engine effect to the hologram
+-- @shared
+-- @param effect The effect to check. EF table values
+-- @return True or false
+function ents_methods:isEffectActive(effect)
+	checkluatype(effect, TYPE_NUMBER)
+	
+	local ent = getent(self)
+	return ent:IsEffectActive(effect)
 end
 
 end
