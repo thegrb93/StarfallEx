@@ -93,10 +93,19 @@ SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 return function(instance)
 
+
+local holograms_library = instance.Libraries.holograms
+local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
+local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
+local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
+
 local getent
 instance:AddHook("initialize", function()
 	instance.data.holograms = {holos = {}}
 	getent = instance.Types.Entity.GetEntity
+	hologram_meta.__tostring = ent_meta.__tostring
 end)
 
 instance:AddHook("deinitialize", function()
@@ -114,14 +123,6 @@ instance:AddHook("deinitialize", function()
 	end
 end)
 
-
-local holograms_library = instance.Libraries.holograms
-local hologram_methods, hologram_meta, wrap, unwrap = instance.Types.Hologram.Methods, instance.Types.Hologram, instance.Types.Hologram.Wrap, instance.Types.Hologram.Unwrap
-local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
-local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
-local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
-
 local function getholo(self)
 	local ent = unwrap(self)
 	if ent:IsValid() then
@@ -131,22 +132,13 @@ local function getholo(self)
 	end
 end
 
-function hologram_meta:__tostring()
-	local ent = unwrap(self)
-	if not ent then return "(null entity)"
-	else return tostring(ent) end
-end
-
-
-
 --- Casts a hologram entity into the hologram type
 -- @shared
 -- @return Hologram type
 function ents_methods:toHologram()
 	local ent = getent(self)
 	if not ent.IsSFHologram then SF.Throw("The entity isn't a hologram", 2) end
-	debug.setmetatable(self, hologram_meta)
-	return self
+	return wrap(eunwrap(self))
 end
 
 
