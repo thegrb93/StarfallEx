@@ -1,0 +1,145 @@
+
+@mixin clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $color-dark-1;
+  color: white;
+}
+body, html {
+  margin: 0;
+  padding: 0;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.app{
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+.page 
+{
+  padding: 20px;
+}
+.sidebar
+{
+  display: flex;
+  flex-direction: column;
+  flex: 2;
+  padding: 0 5px 0 10px;
+  background-color: $color-dark-2;
+  box-shadow: 2px 0px 10px #00000099;
+  .sidebar-children {
+    margin-top: 5px;
+
+    .sidebar-item-children {
+      padding-left: 10px;
+      margin-left: 6px;
+      border-left: 1px solid $color-border-dark;
+    }
+    .sidebar-item-content {
+      display: flex;
+
+      .collapse 
+      {
+        font-weight: bolder;
+        margin-left: 2px;
+        margin-right: 4px;
+        width: 10px;
+        @include clickable();
+      }
+    }
+  }
+  .version{
+    background-color: $color-dark-3;
+    margin-top:auto;
+    margin-bottom: 10px;
+    display:flex;
+    flex-direction: column;
+    text-align: center;
+    font-size: 0.8em;
+    .version-label
+    {
+      font-weight: bolder;
+    }
+    .updates-check
+    {
+      font-size: 0.9em;
+      font-weight: bold;
+      color: $color-border;
+    }
+    
+  }
+  .search
+  {
+    width: 100%;
+    border-top: 1px solid $color-border;
+    border-bottom: 1px solid $color-border;
+    display: flex;
+    input {
+      width: 100%;
+      margin: 10px 0 10px 0;
+      background-color: $color-dark-4;
+      border: 1px solid $color-border-dark;
+      color: white;
+    }
+  }
+  .logo
+  {
+    display: flex;
+    padding: 10px 20px 20px 10px;
+    align-items: center;
+    justify-content: center;
+    img {
+      width: 48px;
+      height: 48px;  
+      filter: drop-shadow(3px 3px 3px #000);
+    }
+    .text
+    {
+      font-size: 40px;
+      text-shadow: 3px 3px 3px #000;
+    }
+  }
+}
+.page
+{
+  flex:10;
+  text-shadow: 1px 1px 2px #000;
+}
+
+.realm-icon
+{
+  width: 1em;
+  height: 1em;
+  margin-top: 3px;
+  margin-right: 4px;
+  border-radius: 10%;
+  &-client
+  {
+    background: linear-gradient(45deg, #dea909 50%, #dea909 50.001%);
+  }
+  
+  &-server
+  {
+    background: linear-gradient(45deg, #03a9f4 50%, #03a9f4 50.001%);
+  }
+  
+  &-shared
+  {
+    background: linear-gradient(45deg, #03a9f4 50%, #dea909 50.001%);
+  }
+}
+

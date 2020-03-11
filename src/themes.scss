@@ -1,0 +1,23 @@
+.dark-theme
+{
+    $primary-color: #333;
+    $color-dark-1: $primary-color;
+    $color-dark-2: darken( $primary-color, 5% );
+    $color-dark-3: darken( $primary-color, 6.5% );
+    $color-dark-4: darken( $primary-color, 10% );
+    $color-border: #bbb;
+    $color-border-dark: #444;
+    @import "main.scss";
+}
+
+.name-theme
+{
+    $primary-color: #ffc0cb;
+    $color-dark-1: $primary-color;
+    $color-dark-2: darken( $primary-color, 5% );
+    $color-dark-3: darken( $primary-color, 6.5% );
+    $color-dark-4: darken( $primary-color, 10% );
+    $color-border: #bbb;
+    $color-border-dark: #444;
+    @import "main.scss";
+}
