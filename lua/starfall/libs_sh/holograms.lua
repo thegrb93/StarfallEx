@@ -491,18 +491,28 @@ end
 --- Animates a hologram
 -- @shared
 -- @param animation number or string name
--- @param frame The starting frame number
--- @param rate Frame speed. (1 is normal)
+-- @param frame Optional int (Default 0) The starting frame number
+-- @param rate Optional float (Default 1) Frame speed
 function hologram_methods:setAnimation(animation, frame, rate)
 	local holo = getholo(self)
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
 	if isstring(animation) then
 		animation = holo:LookupSequence(animation)
+	elseif not isnumber(animation) then
+		SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
 	end
 
-	frame = frame or 0
-	rate = rate or 1
+	if frame == nil then
+		frame = 0
+	else
+		checkluatype(frame, TYPE_NUMBER)
+	end
+	if rate == nil then
+		rate = 1
+	else
+		checkluatype(rate, TYPE_NUMBER)
+	end
 
 	holo.AutomaticFrameAdvance = animation~=-1
 

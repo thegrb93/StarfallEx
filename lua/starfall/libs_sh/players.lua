@@ -398,12 +398,12 @@ if CLIENT then
 		getply(self):VoiceVolume()
 	end
 	
-	--- Animates a player
+	--- Plays gesture animations on a player
 	-- @client
 	-- @param animation sequence string or act number. https://wiki.facepunch.com/gmod/Enums/ACT
-	-- @param loop Optional bool, should the gesture loop
-	-- @param slot Optional int, the gesture slot to use. GESTURE_SLOT table values
-	-- @param weight Optional float, the weight of the gesture. Ranging from 0-1
+	-- @param loop Optional bool (Default true), should the gesture loop
+	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
+	-- @param weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:playGesture(animation, loop, slot, weight)
 		if slot == nil then
 			slot = GESTURE_SLOT_CUSTOM
@@ -422,9 +422,9 @@ if CLIENT then
 		
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
+		elseif not isnumber(animation) then
+			SF.ThrowTypeError("number or string", SF.GetType(animation), 2) end
 		end
-		
-		if not isnumber(animation) then SF.ThrowTypeError("number or string", SF.GetType(animation), 2) end
 		
 		ply:AnimResetGestureSlot(slot)
 		ply:AnimRestartGesture(slot, animation, not loop)
