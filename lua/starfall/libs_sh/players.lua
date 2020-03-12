@@ -423,7 +423,7 @@ if CLIENT then
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
 		elseif not isnumber(animation) then
-			SF.ThrowTypeError("number or string", SF.GetType(animation), 2) end
+			SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
 		end
 		
 		ply:AnimResetGestureSlot(slot)
@@ -431,9 +431,15 @@ if CLIENT then
 		ply:AnimSetGestureWeight(slot, weight)
 	end
 
+	--- Resets gesture animations on a player
+	-- @client
+	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	function player_methods:resetGesture(slot)
-		slot = slot or GESTURE_SLOT_CUSTOM
-		checkluatype(slot, TYPE_NUMBER)
+		if slot == nil then
+			slot = GESTURE_SLOT_CUSTOM
+		else
+			checkluatype(slot, TYPE_NUMBER)
+		end
 		
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
