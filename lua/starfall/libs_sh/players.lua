@@ -397,6 +397,55 @@ if CLIENT then
 	function player_methods:voiceVolume()
 		getply(self):VoiceVolume()
 	end
+	
+	--- Plays gesture animations on a player
+	-- @client
+	-- @param animation sequence string or act number. https://wiki.facepunch.com/gmod/Enums/ACT
+	-- @param loop Optional bool (Default true), should the gesture loop
+	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
+	-- @param weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
+	function player_methods:playGesture(animation, loop, slot, weight)
+		if slot == nil then
+			slot = GESTURE_SLOT_CUSTOM
+		else
+			checkluatype(slot, TYPE_NUMBER)
+		end
+		
+		if weight == nil then
+			weight = 1
+		else
+			checkluatype(weight, TYPE_NUMBER)
+		end
+		
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if isstring(animation) then
+			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
+		elseif not isnumber(animation) then
+			SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
+		end
+		
+		ply:AnimResetGestureSlot(slot)
+		ply:AnimRestartGesture(slot, animation, not loop)
+		ply:AnimSetGestureWeight(slot, weight)
+	end
+
+	--- Resets gesture animations on a player
+	-- @client
+	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
+	function player_methods:resetGesture(slot)
+		if slot == nil then
+			slot = GESTURE_SLOT_CUSTOM
+		else
+			checkluatype(slot, TYPE_NUMBER)
+		end
+		
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		ply:AnimResetGestureSlot(slot)
+	end
 end
 
 --- ENUMs of in_keys for use with player:keyDown
@@ -453,6 +502,26 @@ instance.env.IN_KEY = {
 	["BULLRUSH"] = IN_BULLRUSH,
 	["CANCEL"] = IN_CANCEL,
 	["RUN"] = IN_RUN,
+}
+
+--- ENUMs of gesture_slot for use with player:playGesture player:resetGesture
+-- @name builtins_library.GESTURE_SLOT
+-- @class table
+-- @field ATTACK_AND_RELOAD
+-- @field GRENADE
+-- @field JUMP
+-- @field SWIM
+-- @field FLINCH
+-- @field VCD
+-- @field CUSTOM
+instance.env.GESTURE_SLOT = {
+	["ATTACK_AND_RELOAD"] = GESTURE_SLOT_ATTACK_AND_RELOAD,
+	["GRENADE"] = GESTURE_SLOT_GRENADE,
+	["JUMP"] = GESTURE_SLOT_JUMP,
+	["SWIM"] = GESTURE_SLOT_SWIM,
+	["FLINCH"] = GESTURE_SLOT_FLINCH,
+	["VCD"] = GESTURE_SLOT_VCD,
+	["CUSTOM"] = GESTURE_SLOT_CUSTOM
 }
 
 end

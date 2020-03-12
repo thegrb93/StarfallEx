@@ -265,28 +265,7 @@ if SERVER then
 		holo:SetLocalAngularVelocity(aunwrap(angvel))
 	end
 
-	--- Animates a hologram
-	-- @server
-	-- @param animation number or string name
-	-- @param frame The starting frame number
-	-- @param rate Frame speed. (1 is normal)
-	function hologram_methods:setAnimation(animation, frame, rate)
-		local holo = getholo(self)
-		checkpermission(instance, holo, "hologram.setRenderProperty")
-
-		if isstring(animation) then
-			animation = holo:LookupSequence(animation)
-		end
-
-		frame = frame or 0
-		rate = rate or 1
-
-		holo.AutomaticFrameAdvance = animation~=-1
-
-		holo:ResetSequence(animation)
-		holo:SetCycle(frame)
-		holo:SetPlaybackRate(rate)
-	end
+	
 
 else
 	--- Sets the hologram's position.
@@ -500,5 +479,90 @@ function hologram_methods:setModel(model)
 
 	holo:SetModel(model)
 end
+
+--- Animates a hologram
+-- @shared
+-- @param animation number or string name
+-- @param frame Optional int (Default 0) The starting frame number
+-- @param rate Optional float (Default 1) Frame speed
+function hologram_methods:setAnimation(animation, frame, rate)
+	local holo = getholo(self)
+	checkpermission(instance, holo, "hologram.setRenderProperty")
+
+	if isstring(animation) then
+		animation = holo:LookupSequence(animation)
+	elseif not isnumber(animation) then
+		SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
+	end
+
+	if frame == nil then
+		frame = 0
+	else
+		checkluatype(frame, TYPE_NUMBER)
+	end
+	if rate == nil then
+		rate = 1
+	else
+		checkluatype(rate, TYPE_NUMBER)
+	end
+
+	holo.AutomaticFrameAdvance = animation~=-1
+
+	holo:ResetSequence(animation)
+	holo:SetCycle(frame)
+	holo:SetPlaybackRate(rate)
+end
+
+--- Applies engine effects to the hologram
+-- @shared
+-- @param effect The effects to add. EF table values
+function hologram_methods:addEffects(effect)
+	checkluatype(effect, TYPE_NUMBER)
+	
+	local holo = getholo(self)
+	checkpermission(instance, holo, "entities.setRenderProperty")
+	
+	holo:AddEffects(effect)
+end
+
+--- Removes engine effects from the hologram
+-- @shared
+-- @param effect The effects to remove. EF table values
+function hologram_methods:removeEffects(effect)
+	checkluatype(effect, TYPE_NUMBER)
+	
+	local holo = getholo(self)
+	checkpermission(instance, holo, "entities.setRenderProperty")
+	
+	holo:RemoveEffects(effect)
+end
+
+--- ENUMs of ef for use with hologram:addEffects hologram:removeEffects entity:isEffectActive
+-- @name builtins_library.EF
+-- @class table
+-- @field BONEMERGE
+-- @field BONEMERGE_FASTCULL
+-- @field BRIGHTLIGHT
+-- @field DIMLIGHT
+-- @field NOINTERP
+-- @field NOSHADOW
+-- @field NODRAW
+-- @field NORECEIVESHADOW
+-- @field ITEM_BLINK
+-- @field PARENT_ANIMATES
+-- @field FOLLOWBONE
+instance.env.EF = {
+	BONEMERGE = EF_BONEMERGE,
+	BONEMERGE_FASTCULL = EF_BONEMERGE_FASTCULL,
+	BRIGHTLIGHT = EF_BRIGHTLIGHT,
+	DIMLIGHT = EF_DIMLIGHT,
+	NOINTERP = EF_NOINTERP,
+	NOSHADOW = EF_NOSHADOW,
+	NODRAW = EF_NODRAW,
+	NORECEIVESHADOW = EF_NORECEIVESHADOW,
+	ITEM_BLINK = EF_ITEM_BLINK,
+	PARENT_ANIMATES = EF_PARENT_ANIMATES,
+	FOLLOWBONE = EF_FOLLOWBONE
+}
 
 end
