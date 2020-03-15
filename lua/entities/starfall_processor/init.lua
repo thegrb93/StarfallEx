@@ -83,9 +83,14 @@ function ENT:SendCode(recipient)
 			sfdata.files = {}
 			for filename, code in pairs(self.files) do
 				if ppdata.serverorclient[filename] == "server" then
+					local infodata = {}
 					if ppdata.scriptnames and ppdata.scriptnames[filename] then
-						sfdata.files[filename] = "--@name " .. ppdata.scriptnames[filename]
+						infodata[#infodata + 1] = "--@name " .. ppdata.scriptnames[filename]
 					end
+					if ppdata.scriptauthors and ppdata.scriptauthors[filename] then
+						infodata[#infodata + 1] = "--@author " .. ppdata.scriptauthors[filename]
+					end
+					sfdata.files[filename] = table.concat(infodata, "\n")
 				else
 					sfdata.files[filename] = code
 				end
