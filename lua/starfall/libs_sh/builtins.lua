@@ -322,20 +322,36 @@ end
 
 
 local os_library = instance.Libraries.os
----
+
+--- Returns the approximate cpu time the application ran.
+-- This function has different precision on Linux (1/100).
 -- @class function
+-- @return The runtime
 os_library.clock = os.clock
----
+
+--- Returns the date/time as a formatted string or in a table.
+-- See https://wiki.facepunch.com/gmod/Structures/DateData for the table structure
 -- @class function
+-- @param format The format string. If starts with an '!', it will use UTC timezone rather than the local timezone
+-- @param time Time to use for the format
+-- @return If format is equal to '*t' or '!*t' then it will return a table with DateData structure, otherwise a string
 os_library.date = function(format, time)
 	if format~=nil and string.find(format, "%%[^%%aAbBcCdDSHeUmMjIpwxXzZyY]") then SF.Throw("Bad date format", 2) end
 	return os.date(format, time)
 end
----
+
+--- Subtracts the second of the first value and rounds the result
 -- @class function
+-- @param timeA The first value
+-- @param timeB The value to subtract
+-- @return Time difference
 os_library.difftime = os.difftime
----
+
+--- Returns the system time in seconds past the unix epoch.
+-- If a table is supplied, the function attempts to build a system time with the specified table members
 -- @class function
+-- @param dateData Optional table to generate the time from. This table's data is interpreted as being in the local timezone
+-- @return Seconds passed since Unix epoch
 os_library.time = os.time
 
 
