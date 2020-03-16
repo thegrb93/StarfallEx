@@ -115,7 +115,7 @@ math_library.cosh = math.cosh
 -- @return Angle in degrees
 math_library.deg = math.deg
 
---- Calculates the difference between two points in 2D space (Same as math.distance)
+--- Calculates the difference between two points in 2D space (DEPRECATED! You should use math.distance instead)
 -- @class function
 -- @param x1 X position of first point
 -- @param y1 Y position of first point
@@ -209,7 +209,7 @@ math_library.max = math.max
 -- @return The smallest number
 math_library.min = math.Min
 
---- Returns the modulus of the specified values. You should use the % operator instead.
+--- Returns the modulus of the specified values. (DEPRECATED! You should use the % operator instead)
 -- @class function
 -- @param base The base value
 -- @param mod The modulator
