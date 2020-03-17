@@ -31,11 +31,25 @@ function weapon_methods:clip1()
 	return unwrap(self):Clip1()
 end
 
+--- Returns Maximum ammo in primary clip
+-- @shared
+-- @return amount of ammo
+function weapon_methods:maxClip1()
+	return unwrap(self):GetMaxClip1()
+end
+
 --- Returns Ammo in secondary clip
 -- @shared
 -- @return amount of ammo
 function weapon_methods:clip2()
 	return unwrap(self):Clip2()
+end
+
+--- Returns Maximum ammo in secondary clip
+-- @shared
+-- @return amount of ammo
+function weapon_methods:maxClip2()
+	return unwrap(self):GetMaxClip2()
 end
 
 --- Returns the sequence enumeration number that the weapon is playing. Must be used on a view model.

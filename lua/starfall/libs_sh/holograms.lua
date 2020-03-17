@@ -418,6 +418,13 @@ else
 		
 	end
 	
+	--- Manually draws a hologram, requires a 3d render context
+	-- @client
+	function hologram_methods:draw()
+		local holo = getholo(self)
+		holo:SetupBones()
+		holo:DrawModel()
+	end
 end
 
 --- Updates a clip plane

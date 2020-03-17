@@ -90,6 +90,17 @@ if CLIENT then
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
+	--- Allows manipulation of an entity's bones' jiggle status
+	-- @client
+	-- @param bone The bone ID
+	-- @param enabled Whether to make the bone jiggly or not
+	function ents_methods:manipulateBoneJiggle(bone, state)
+		checkluatype(bone, TYPE_NUMBER)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		ent:ManipulateBoneJiggle(bone, state and 1 or 0)
+	end
+
 	--- Sets a hologram or custom_prop model to a custom Mesh
 	-- @client
 	-- @param mesh The mesh to set it to or nil to set back to normal
