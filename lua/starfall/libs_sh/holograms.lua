@@ -421,6 +421,8 @@ else
 	--- Manually draws a hologram, requires a 3d render context
 	-- @client
 	function hologram_methods:draw()
+		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		
 		local holo = getholo(self)
 		holo:SetupBones()
 		holo:DrawModel()
