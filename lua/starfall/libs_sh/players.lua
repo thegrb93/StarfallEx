@@ -297,6 +297,7 @@ function player_methods:getViewEntity()
 end
 
 --- Returns the player's view model
+-- In the Client realm, other players' viewmodels are not available unless they are being spectated
 -- @shared
 -- @return Player's view model
 function player_methods:getViewModel()
@@ -381,8 +382,8 @@ if SERVER then
 		local ply = getply(self)
 		checkpermission(instance, ply, "player.dropweapon")
 		
-		if target then target = vunwrap(target) end
-		if velocity then velocity = vunwrap(velocity) end
+		if target~=nil then target = vunwrap(target) end
+		if velocity~=nil then velocity = vunwrap(velocity) end
 		
 		if isstring(weapon) then
 			ply:DropNamedWeapon(weapon, target, velocity)
