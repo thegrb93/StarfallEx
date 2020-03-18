@@ -18,6 +18,11 @@ SF.RegisterType("Player", false, true, debug.getregistry().Player, "Entity")
 return function(instance)
 
 
+local getent
+instance:AddHook("initialize", function()
+	getent = instance.Types.Entity.GetEntity
+end)
+
 if SERVER then
 	instance:AddHook("deinitialize", function()
 		for k, pl in pairs(player.GetAll()) do
