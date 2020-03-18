@@ -397,14 +397,15 @@ local function parseEntity(ent, io)
 
 	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
 
-	local ret = {}
+	local names, types = {}, {}
 	for k, v in pairs(ent[io]) do
 		if k ~= "" then
-			table.insert(ret, k)
+			table.insert(names, k)
+			table.insert(types, v.Type)
 		end
 	end
 
-	return ret
+	return names, types
 end
 
 --- Returns a table of entity's inputs
