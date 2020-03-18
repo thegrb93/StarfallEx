@@ -1,7 +1,12 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
 local checkpermission = SF.Permissions.check
+local registerprivilege = SF.Permissions.registerPrivilege
 
+if SERVER then
+	-- Register privileges
+	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
+end
 
 --- Player type
 -- @name Player
@@ -291,6 +296,14 @@ function player_methods:getViewEntity()
 	return owrap(getply(self):GetViewEntity())
 end
 
+--- Returns the player's view model
+-- In the Client realm, other players' viewmodels are not available unless they are being spectated
+-- @shared
+-- @return Player's view model
+function player_methods:getViewModel()
+	return owrap(getply(self):GetViewModel(0))
+end
+
 --- Returns a table of weapons the player is carrying
 -- @shared
 -- @return Table of weapons
@@ -358,6 +371,26 @@ if SERVER then
 	-- @return True if the player has godmode
 	function player_methods:hasGodMode()
 		return getply(self):HasGodMode()
+	end
+
+	--- Drops the players' weapon
+	-- @server
+	-- @param weapon The weapon entity or class to drop
+	-- @param target If set, launches the weapon at the given position
+	-- @param velocity If set and target is unset, launches the weapon with the given velocity
+	function player_methods:dropWeapon(weapon, target, velocity)
+		local ply = getply(self)
+		checkpermission(instance, ply, "player.dropweapon")
+		
+		if target~=nil then target = vunwrap(target) end
+		if velocity~=nil then velocity = vunwrap(velocity) end
+		
+		if isstring(weapon) then
+			ply:DropNamedWeapon(weapon, target, velocity)
+		else
+			weapon = wunwrap(weapon)
+			ply:DropWeapon(weapon, target, velocity)
+		end
 	end
 end
 
@@ -445,6 +478,29 @@ if CLIENT then
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
 		ply:AnimResetGestureSlot(slot)
+	end
+	
+	-- Sets the weight of the gesture animation in the given gesture slot
+	-- @client
+	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
+	-- @param weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
+	function player_methods:setGestureWeight(slot, weight)
+		if slot == nil then
+			slot = GESTURE_SLOT_CUSTOM
+		else
+			checkluatype(slot, TYPE_NUMBER)
+		end
+		
+		if weight == nil then
+			weight = 1
+		else
+			checkluatype(weight, TYPE_NUMBER)
+		end
+		
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		ply:AnimSetGestureWeight(slot, weight)
 	end
 end
 
