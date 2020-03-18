@@ -162,9 +162,9 @@ pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
 
--- Ungodly things
+-- Furry things
 --- Examples:
---- you don't even wanna know
+--- https://static1.e621.net/data/8f/db/8fdbc9af34698d470c90ca6cb69c5529.jpg
 
 simple [[static1.e621.net]]
 
