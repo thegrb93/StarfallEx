@@ -49,6 +49,45 @@ end
 function TabHandler:Cleanup() -- Called when editor is reloaded/removed
 end
 
+function initDoc(html)
+	function addPage(name, class, iconType, icon, data, parent)
+		html:RunJavascript([[SF_DOC.AddPage("]]..name..[[", "]]..class..[[", "]]..iconType..[[", "]]..icon..[[", {}, "]]..parent..[[")]])
+	end
+	addPage("Libraries", "category", "", "", {}, "")
+	addPage("Types", "category", "", "", {}, "")
+	addPage("Hooks", "category", "", "", {}, "")
+
+	--Libraries
+	
+	for _, lib in pairs(SF.Docs.Libraries) do
+
+		addPage(lib.name, "library", "realm", lib.realm, {}, "Libraries")
+		local path = "Libraries."..lib.name
+		
+		for _, method in pairs(lib.methods) do
+			addPage(method.name, "library", "realm", method.realm, {}, path)
+		
+		end
+	
+	end
+
+	for _, hook in pairs(SF.Docs.Hooks) do
+
+		addPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks")
+	
+	end
+
+	for _, t in pairs(SF.Docs.Types) do
+
+		addPage(t.name, "type", "realm", t.realm, {}, "Types")
+	
+	end
+
+
+	html:RunJavascript("SF_DOC.FinishSetup()")
+end
+
+
 
 -----------------------
 -- VGUI part (content)
@@ -60,7 +99,8 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:OpenURL(SF.Editor.HelperURL:GetString())
+	html:OpenURL("asset://garrysmod/html/sf_doc.html")
+	timer.Simple(1, function() initDoc(html) end)
 	self.html = html
 	htmlSetup(nil, self)
 end
