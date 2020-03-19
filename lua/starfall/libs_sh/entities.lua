@@ -1188,7 +1188,7 @@ function ents_methods:getPersistent()
 end
 
 --- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
--- When used on bullet, it will return the weapon that fired it. When used on player-equipped weapon, it will return the player. 
+-- Used on entities with custom physics like held SWEPs and fired bullets in which case player entity should be returned.
 -- @shared
 -- @return Owner
 function ents_methods:entOwner()
