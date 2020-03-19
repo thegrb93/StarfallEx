@@ -1187,7 +1187,8 @@ function ents_methods:getPersistent()
 	return ent:GetPersistent()
 end
 
---- Returns the assigned owner. Use Entity.getOwner to check prop ownership
+--- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
+-- When used on bullet, it will return the weapon that fired it. When used on player-equipped weapon, it will return the player. 
 -- @shared
 -- @return Owner
 function ents_methods:entOwner()
