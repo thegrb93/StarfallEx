@@ -410,14 +410,16 @@ end
 
 --- Returns a table of entity's inputs
 -- @param entI Entity with input(s)
--- @return Table of entity's inputs
+-- @return Table of entity's input names
+-- @return Table of entity's input types
 function wire_library.getInputs(entI)
 	return parseEntity(entI, "Inputs")
 end
 
 --- Returns a table of entity's outputs
 -- @param entO Entity with output(s)
--- @return Table of entity's outputs
+-- @return Table of entity's output names
+-- @return Table of entity's output types
 function wire_library.getOutputs(entO)
 	return parseEntity(entO, "Outputs")
 end

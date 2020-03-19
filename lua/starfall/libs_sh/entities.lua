@@ -5,6 +5,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
+registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
 
@@ -1166,6 +1167,24 @@ function ents_methods:isEffectActive(effect)
 	
 	local ent = getent(self)
 	return ent:IsEffectActive(effect)
+end
+
+--- Marks entity as persistent, disallowing players from physgunning it. Persistent entities save on server shutdown when sbox_persist is set
+-- @shared
+-- @param persist True to make persistent
+function ents_methods:setPersistent(persist)
+	checkluatype(persist, TYPE_BOOL)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.setPersistent")
+	ent:SetPersistent(persist)
+end
+
+--- Checks if entity is marked as persistent
+-- @shared
+-- @return True if the entity is persistent 
+function ents_methods:getPersistent()
+	local ent = getent(self)
+	return ent:GetPersistent()
 end
 
 --- Returns the assigned owner. Use Entity.getOwner to check prop ownership
