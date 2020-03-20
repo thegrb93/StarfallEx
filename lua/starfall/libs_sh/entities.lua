@@ -20,6 +20,7 @@ SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
 
 return function(instance)
 
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -1184,6 +1185,15 @@ end
 function ents_methods:getPersistent()
 	local ent = getent(self)
 	return ent:GetPersistent()
+end
+
+--- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
+-- Used on entities with custom physics like held SWEPs and fired bullets in which case player entity should be returned.
+-- @shared
+-- @return Owner
+function ents_methods:entOwner()
+	local ent = getent(self)
+	return owrap(ent:GetOwner())
 end
 
 end
