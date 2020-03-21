@@ -24,7 +24,7 @@ function ENT:Compile()
 
 	self.error = nil
 
-	if not self.files[self.mainfile] then return end
+	if not (self.mainfile and self.files and self.files[self.mainfile]) then return end
 	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
