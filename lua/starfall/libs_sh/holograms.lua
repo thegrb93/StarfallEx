@@ -480,9 +480,7 @@ end
 -- @param model string model path
 function hologram_methods:setModel(model)
 	local holo = getholo(self)
-
 	checkluatype(model, TYPE_STRING)
-	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
