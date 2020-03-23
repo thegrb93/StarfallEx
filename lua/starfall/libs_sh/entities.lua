@@ -632,7 +632,7 @@ function ents_methods:getQuotaUsed()
 	local ent = getent(self)
 	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 	
-	return ent.instance.cpu_total
+	return ent.instance and ent.instance.cpu_total or 0
 end
 
 --- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
@@ -641,7 +641,7 @@ end
 function ents_methods:getQuotaAverage()
 	local ent = getent(self)
 	if ent.Starfall then
-		return ent.instance:movingCPUAverage()
+		return ent.instance and ent.instance:movingCPUAverage() or 0
 	elseif ent.WireDebugName == "Expression 2" then
 		return ent.context.timebench
 	else
@@ -656,7 +656,7 @@ end
 function ents_methods:getQuotaMax()
 	local ent = getent(self)
 	if ent.Starfall then
-		return ent.instance.cpuQuota
+		return ent.instance and ent.instance.cpuQuota or 0
 	elseif ent.WireDebugName == "Expression 2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else
