@@ -150,7 +150,13 @@ builtins_library.next = next
 -- @class function
 -- @param condition
 -- @param msg
-builtins_library.assert = function(condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) else return condition end end
+builtins_library.assert = function(condition, ...) 
+	if not condition then
+		SF.Throw((...) or "assertion failed!", 2) 
+	else
+		return condition, ...
+	end
+end
 
 --- This function takes a numeric indexed table and return all the members as a vararg.
 -- @name builtins_library.unpack
