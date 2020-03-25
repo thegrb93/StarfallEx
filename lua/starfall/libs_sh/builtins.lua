@@ -145,19 +145,6 @@ end
 -- @return Value or nil
 builtins_library.next = next
 
---- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
--- @name builtins_library.assert
--- @class function
--- @param condition
--- @param msg
-builtins_library.assert = function(condition, ...) 
-	if not condition then
-		SF.Throw((...) or "assertion failed!", 2) 
-	else
-		return condition, ...
-	end
-end
-
 --- This function takes a numeric indexed table and return all the members as a vararg.
 -- @name builtins_library.unpack
 -- @class function
@@ -1336,12 +1323,18 @@ function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end
 
---- Throws a raw exception.
+--- Throws a raw exception. Use 'throw' if you need more control over the stack level
+-- @name builtins_library.error
+-- @class function
 -- @param msg Exception message
--- @param level Which level in the stacktrace to blame. Defaults to 1
-function builtins_library.error(msg, level)
-	error(msg or "an unspecified error occured", 1 + (level or 1))
-end
+builtins_library.error = error
+
+--- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
+-- @name builtins_library.assert
+-- @class function
+-- @param condition
+-- @param msg
+builtins_library.assert = assert
 
 --- Returns if the table has an isValid function and isValid returns true.
 --@param object Table to check
