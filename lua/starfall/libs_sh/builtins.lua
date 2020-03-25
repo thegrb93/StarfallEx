@@ -1323,11 +1323,13 @@ function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end
 
---- Throws a raw exception. Use 'throw' if you need more control over the stack level
+--- Throws an exception. Alias of 'throw'
 -- @name builtins_library.error
 -- @class function
--- @param msg Exception message
-builtins_library.error = error
+-- @param msg Message string
+-- @param level Which level in the stacktrace to blame. Defaults to 1
+-- @param uncatchable Makes this exception uncatchable
+builtins_library.error = builtins_library.throw
 
 --- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
 -- @name builtins_library.assert
