@@ -64,7 +64,7 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 -- @return Sound Object
 function sounds_library.create(ent, path, nofilter)
 	checkluatype(path, TYPE_STRING)
-	if nofilter~=nil then checkluatype(filter, TYPE_BOOL) end
+	if nofilter~=nil then checkluatype(nofilter, TYPE_BOOL) end
 
 	checkpermission(instance, { ent, path }, "sound.create")
 
