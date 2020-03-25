@@ -195,7 +195,7 @@ function bass_methods:setVolume(vol)
 end
 
 --- Sets the pitch of the sound channel.
--- @param pitch Pitch to set to, between 0 and 3.
+-- @param pitch Pitch to set to, between 0 and 100. 1 is normal pitch.
 function bass_methods:setPitch(pitch)
 	checkluatype(pitch, TYPE_NUMBER)
 	local uw = unwrap(self)
@@ -203,7 +203,7 @@ function bass_methods:setPitch(pitch)
 	checkpermission(instance, nil, "sound.modify")
 
 	if (uw and uw:IsValid()) then
-		uw:SetPlaybackRate(math.Clamp(pitch, 0, 3))
+		uw:SetPlaybackRate(math.Clamp(pitch, 0, 100))
 	end
 end
 
