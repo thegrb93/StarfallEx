@@ -500,3 +500,12 @@ end
 -- @param text The message
 -- @param team Whether the message was team only
 -- @param isdead Whether the message was send from a dead player
+
+
+--- Called when starfall chip errors
+-- @name StarfallError
+-- @class hook
+-- @shared
+-- @param ent Starfall chip that errored
+-- @param ply Owner of the chip on server or player that script errored for on client
+-- @param err Error message

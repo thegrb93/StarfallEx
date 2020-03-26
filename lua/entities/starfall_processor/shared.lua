@@ -147,6 +147,10 @@ function ENT:Error(err)
 			net.SendToServer()
 		end
 	end
+	
+	for inst, _ in pairs(SF.allInstances) do
+		inst:runScriptHook("starfallerror", inst.Types.Entity.Wrap(self), inst.Types.Player.Wrap(SERVER and self.owner or LocalPlayer()), msg)
+	end
 end
 
 local function MenuOpen( ContextMenu, Option, Entity, Trace )
