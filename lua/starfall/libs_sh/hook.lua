@@ -501,7 +501,6 @@ end
 -- @param team Whether the message was team only
 -- @param isdead Whether the message was send from a dead player
 
-
 --- Called when starfall chip errors
 -- @name StarfallError
 -- @class hook
