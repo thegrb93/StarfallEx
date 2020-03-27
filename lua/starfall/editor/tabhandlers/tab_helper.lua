@@ -51,21 +51,35 @@ end
 
 function initDoc(html)
 	function addPage(name, class, iconType, icon, data, parent)
-		html:RunJavascript([[SF_DOC.AddPage("]]..name..[[", "]]..class..[[", "]]..iconType..[[", "]]..icon..[[", {}, "]]..parent..[[")]])
+		local dataJson = util.TableToJSON(data)
+		html:RunJavascript([[SF_DOC.AddPage("]]..name..[[", "]]..class..[[", "]]..iconType..[[", "]]..icon..[[", ]]..dataJson..[[, "]]..parent..[[")]])
 	end
 	addPage("Libraries", "category", "", "", {}, "")
 	addPage("Types", "category", "", "", {}, "")
 	addPage("Hooks", "category", "", "", {}, "")
 
 	--Libraries
-	
 	for _, lib in pairs(SF.Docs.Libraries) do
 
-		addPage(lib.name, "library", "realm", lib.realm, {}, "Libraries")
-		local path = "Libraries."..lib.name
+		local libData = {
+			name = lib.name,
+			realm = lib.realm,
+			description = lib.description,
+			methods = {}
+		};
 		
 		for _, method in pairs(lib.methods) do
-			addPage(method.name, "library", "realm", method.realm, {}, path)
+			libData.methods[method.name] = method.description;
+		
+		end
+
+		addPage(lib.name, "library", "realm", lib.realm, libData, "Libraries")
+		
+		
+		local path = "Libraries."..lib.name
+			
+		for _, method in pairs(lib.methods) do
+			addPage(method.name, "method", "realm", method.realm, {}, path)
 		
 		end
 	
