@@ -121,13 +121,13 @@ function hook_library.add(hookname, name, func)
 	checkluatype (name, TYPE_STRING)
 	checkluatype (func, TYPE_FUNCTION)
 
-	hookname = hookname:lower()
+	hookname = string.lower(hookname)
 	local hooks = instance.hooks[hookname]
 	if not hooks then
-		hooks = {}
+		hooks = SF.HookTable()
 		instance.hooks[hookname] = hooks
 	end
-	hooks[name] = func
+	hooks:add(name, func)
 
 	SF.HookAddInstance(instance, hookname)
 end
@@ -139,11 +139,11 @@ end
 function hook_library.run(hookname, ...)
 	checkluatype (hookname, TYPE_STRING)
 
-	local hook = hookname:lower()
-
-	if instance.hooks and instance.hooks[hook] then
+	hookname = string.lower(hookname)
+	local hooks = instance.hooks[hookname]
+	if hooks then
 		local tbl
-		for name, func in pairs(instance.hooks[hook]) do
+		for name, func in hooks:pairs() do
 			tbl = { func(...) }
 			if tbl[1]~=nil then
 				return unpack(tbl)
@@ -208,13 +208,13 @@ function hook_library.remove(hookname, name)
 	checkluatype (hookname, TYPE_STRING)
 	checkluatype (name, TYPE_STRING)
 
-	local lower = hookname:lower()
-	if instance.hooks[lower] then
-		instance.hooks[lower][name] = nil
-
-		if not next(instance.hooks[lower]) then
-			instance.hooks[lower] = nil
-			SF.HookRemoveInstance(instance, lower)
+	hookname = string.lower(hookname)
+	local hooks = instance.hooks[hookname]
+	if hooks then
+		hooks:remove(name)
+		if hooks:isEmpty() then
+			instance.hooks[hookname] = nil
+			SF.HookRemoveInstance(instance, hookname)
 		end
 	end
 end

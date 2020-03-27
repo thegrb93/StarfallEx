@@ -527,10 +527,12 @@ end
 -- @return True if it executed ok, false if not or if there was no hook
 -- @return If the first return value is false then the error message or nil if no hook was registered
 function SF.Instance:runScriptHook(hook, ...)
-	if self.error or not self.hooks[hook] then return {} end
+	if self.error then return {} end
+	local hooks = self.hooks[hook]
+	if not hooks then return {} end
 	self:RunHook("prepare", hook)
 	local tbl
-	for name, func in pairs(self.hooks[hook]) do
+	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if not tbl[1] then
 			tbl[2].message = "Hook '" .. hook .. "' errored with: " .. tbl[2].message
@@ -550,10 +552,12 @@ end
 -- @return If the first return value is false then the error message or nil if no hook was registered. Else any values that the hook returned.
 -- @return The traceback if the instance errored
 function SF.Instance:runScriptHookForResult(hook, ...)
-	if self.error or not self.hooks[hook] then return {} end
+	if self.error then return {} end
+	local hooks = self.hooks[hook]
+	if not hooks then return {} end
 	self:RunHook("prepare", hook)
 	local tbl
-	for name, func in pairs(self.hooks[hook]) do
+	for name, func in hooks:pairs() do
 		tbl = self:run(func, ...)
 		if tbl[1] then
 			if tbl[2]~=nil then

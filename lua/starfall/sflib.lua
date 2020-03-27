@@ -458,6 +458,36 @@ do
 		end
 	end
 
+	--- Returns a class that can manage hooks. Required because adding to a table being iterated with pairs is undefined behavior.
+	SF.HookTable = {
+		__index = {
+			add = function(self, index, func)
+				self.hookstoadd[index] = func
+			end,
+			remove = function(self, index)
+				self.hooks[index] = nil
+				self.hookstoadd[index] = nil
+			end,
+			isEmpty = function(self)
+				return next(self.hooks)==nil and next(self.hookstoadd)==nil
+			end,
+			pairs = function(self)
+				for k, v in pairs(self.hookstoadd) do
+					self.hooks[k] = v
+					self.hookstoadd[k] = nil
+				end
+				return pairs(self.hooks)
+			end
+		},
+		__call = function(p)
+			return setmetatable({
+				hooks = {},
+				hookstoadd = {}
+			}, p)
+		end
+	}
+	setmetatable(SF.HookTable, SF.HookTable)
+
 	--- Add a GMod hook so that SF gets access to it
 	-- @shared
 	-- @param hookname The hook name. In-SF hookname will be lowercased
