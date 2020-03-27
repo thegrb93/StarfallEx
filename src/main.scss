@@ -25,7 +25,7 @@ code {
 }
 
 .app{
-  display: flex;
+
   width: 100vw;
   height: 100vh;
 }
@@ -35,15 +35,23 @@ code {
 }
 .sidebar
 {
-  display: flex;
-  flex-direction: column;
-  flex: 3;
-  padding: 0 5px 0 10px;
+  padding: 0 20px 0 20px;
   background-color: $color-dark-2;
   box-shadow: 2px 0px 10px #00000099;
+  position: fixed;
+  top: 0;
+  height: 100%;
+  width: 18%;
+  left: 0;
+  
   .sidebar-children {
     margin-top: 5px;
-    overflow-y: scroll;
+    overflow: auto;
+    position: relative;
+    top: 0;
+    width: auto;
+    height: 70%;
+
     .sidebar-item-children {
       padding-left: 25px;
       margin-left: 6px;
@@ -67,21 +75,30 @@ code {
   }
   .version{
     background-color: $color-dark-3;
-    margin-top:auto;
-    margin-bottom: 10px;
-    display:flex;
-    flex-direction: column;
+    padding-bottom: 10px;
+    padding-top: 5px;
     text-align: center;
-    font-size: 0.8em;
+    font-size: .8em;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    margin-left: -20px;
     .version-label
     {
       font-weight: bolder;
+      display: block;
+    }
+    .version-text
+    {
+      display: block;
     }
     .updates-check
     {
       font-size: 0.9em;
       font-weight: bold;
       color: $color-border;
+      display: block;
     }
     
   }
@@ -90,7 +107,6 @@ code {
     width: 100%;
     border-top: 1px solid $color-border;
     border-bottom: 1px solid $color-border;
-    display: flex;
     input {
       width: 100%;
       margin: 10px 0 10px 0;
@@ -101,25 +117,31 @@ code {
   }
   .logo
   {
-    display: flex;
-    padding: 10px 20px 20px 10px;
+    padding: 10px 0px 20px 00px;
     align-items: center;
     justify-content: center;
+    width: 100%;
     img {
       width: 48px;
       height: 48px;  
       filter: drop-shadow(3px 3px 3px #000);
+      position: relative;
+      top: 10px;
+      left: 10%;
     }
     .text
     {
       font-size: 40px;
       text-shadow: 3px 3px 3px #000;
+      position: relative;
+      left: 10%;
+      top: 10%;
     }
   }
 }
 .page
 {
-  flex:10;
+  margin-left: 20%;
   text-shadow: 1px 1px 2px #000;
   overflow-y: auto;
 }
