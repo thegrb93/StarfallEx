@@ -37,17 +37,20 @@ code {
 {
   display: flex;
   flex-direction: column;
-  flex: 2;
+  flex: 3;
   padding: 0 5px 0 10px;
   background-color: $color-dark-2;
   box-shadow: 2px 0px 10px #00000099;
   .sidebar-children {
     margin-top: 5px;
-
+    overflow-y: scroll;
     .sidebar-item-children {
-      padding-left: 10px;
+      padding-left: 25px;
       margin-left: 6px;
       border-left: 1px solid $color-border-dark;
+    }
+    .name-selected {
+      color: #33AA33
     }
     .sidebar-item-content {
       display: flex;
@@ -118,6 +121,20 @@ code {
 {
   flex:10;
   text-shadow: 1px 1px 2px #000;
+  overflow-y: auto;
+}
+
+.page-library
+{
+  table {
+    border-collapse: collapse;
+  }
+  td {
+    padding: 2px;
+  }
+  table, td {
+    border: 1px solid white;
+  }
 }
 
 .realm-icon

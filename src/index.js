@@ -11,7 +11,7 @@ let pages = {};
 const SF_DOC = {
     AddPage: (name, type, iconType, icon, data, parent = "") =>
     {
-        if(parent!="")
+        if(parent!=="")
         {
             parent = "." + parent;
         }
@@ -28,13 +28,14 @@ const SF_DOC = {
             name: name,
             type: type,
             data: data,
-            sidebarItem: sidebarItem
+            sidebarItem: sidebarItem,
+            path: path,
+            class: type
         }
         pages[path] = page;
 
-        if(parent != "")
+        if(parent !== "")
         {
-            console.log(pages, parent);
             pages[parent].sidebarItem.children.push(sidebarItem);
         }
         else
@@ -45,7 +46,7 @@ const SF_DOC = {
     },
     FinishSetup: () =>
     {
-        ReactDOM.render(<App sidebarItems = {sidebarItems} />, document.getElementById("root"));
+        ReactDOM.render(<App sidebarItems = {sidebarItems} pages={pages} />, document.getElementById("root"));
     }
 }
 
@@ -53,7 +54,7 @@ SF_DOC.AddPage("Test Category", "category", "", "", {});
 
 SF_DOC.AddPage("Test Item", "category", {}, "", "", "Test Category");
 
-//SF_DOC.FinishSetup();
+SF_DOC.FinishSetup();
 
 window.SF_DOC = SF_DOC;
 

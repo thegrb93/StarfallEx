@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import logo from '../logo.png'
 import Icon from "./Icon"
 const _ = require('lodash');
@@ -59,32 +59,7 @@ function performSearch(item, text)
   return expanded;
 }
 
-function reducer(state, action)
-{
-  console.log("ACTION", action);
-  let newState = cloneState(state);
-  switch(action.type)
-  {
-    case "SEARCH":
-      for(const key in newState.items)
-      {
-        performSearch(newState.items[key], action.value);
-      }
-      return {
-        ...newState,
-        searchText: action.value
-      };
-    case "TOGGLE_COLLAPSE":
-      const path = action.value;
-      newState.flatMap[path].collapsed = !newState.flatMap[path].collapsed;
-      return newState;
-    default:
-      return state;
-  
-  }
-}
-
-function renderElements(items, dispatch)
+function renderElements(items, dispatch, currentPage)
 {
   const output = [];
   for(const key in items)
@@ -92,9 +67,9 @@ function renderElements(items, dispatch)
     const item = items[key];
     if(item.hidden) { continue; }
     output.push((
-      <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType}>
+      <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} selected={item.path === currentPage}>
         {
-          items && items.length > 0 && renderElements(item.children, dispatch)
+          items && items.length > 0 && renderElements(item.children, dispatch, currentPage)
         }
       </SidebarElement>
     ));
@@ -108,9 +83,40 @@ export default function Sidebar(props)
   const initialState = {
     items: props.items,
     flatMap: buildFlatMap(props.items),
-    searchText: "",
-    currentPage: ""
+    searchText: ""
+  };
+  function reducer(state, action)
+  {
+    console.log("ACTION", action);
+    let newState = cloneState(state);
+    switch(action.type)
+    {
+      case "SEARCH":
+        for(const key in newState.items)
+        {
+          performSearch(newState.items[key], action.value);
+        }
+        return {
+          ...newState,
+          searchText: action.value
+        };
+      case "TOGGLE_COLLAPSE":
+        const path = action.value;
+        newState.flatMap[path].collapsed = !newState.flatMap[path].collapsed;
+        return newState;
+      case "CHANGE_PAGE":
+        if(action.value === props.currentPage) //For some reason it can be called twice?
+        {
+          return state;
+        }
+        props.changePage(action.value);
+        return state;
+      default:
+        return state;
+    
+    }
   }
+
   assignPaths(initialState.items);
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -127,7 +133,7 @@ export default function Sidebar(props)
         <input placeholder="Search.." onChange={(ev) => dispatch({type: "SEARCH", value: ev.target.value})} value = {state.searchText} />
       </div>
       <div className = "sidebar-children">
-        { renderElements(state.items, dispatch) }          
+        { renderElements(state.items, dispatch, props.currentPage) }          
       </div>
       <div className = "version">
           <span className="version-label">Version:</span>
@@ -140,7 +146,7 @@ export default function Sidebar(props)
 
 function SidebarElement(props)
 {
-    const {collapsed, name, path, children, dispatch, icon, iconType} = props;
+    const {collapsed, name, path, children, dispatch, icon, iconType, selected} = props;
 
     const hasChildren = children && children.length > 0;
 
@@ -158,7 +164,7 @@ function SidebarElement(props)
               )
             }           
             <Icon type={iconType} value={icon} />
-            <div className = "name" onClick = {() => dispatch({type:"CHANGE_PAGE", value: path})}>
+            <div className = {"name" + (selected ? " name-selected" : "")} onClick = {() => dispatch({type:"CHANGE_PAGE", value: path})}>
               {name}
             </div>
           </div>

@@ -1,10 +1,23 @@
 import React from 'react';
+import LibraryPage from './Pages/Library';
 
-export default function Page()
+function mapClass(c)
 {
-  return (
-    <div className="page">
-      Example page. You should also see menu on the left, but I am far too lazy to finish it today.
-    </div>
-  )
+  switch(c)
+  {
+    case "library":
+      return LibraryPage;
+    default:
+      return null;
+  }
+}
+
+export default function Page(props)
+{
+  const MappedPage = mapClass(props.class);
+  if(MappedPage !== null)
+  {
+    return <MappedPage {...props.data} /> 
+  }
+  return <div className="page"></div>;
 }
