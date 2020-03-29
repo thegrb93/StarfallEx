@@ -78,7 +78,6 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
-	local update = self.instance ~= nil or self.error ~= nil
 	if SERVER and update then
 		net.Start("starfall_processor_destroy")
 		net.WriteEntity(self)
@@ -98,13 +97,8 @@ function ENT:SetupFiles(sfdata)
 				self:SetCustomModel(model)
 			end
 		end
-	
-		if update then
-			self:SendCode()
-		elseif self.SendQueue then
-			self:SendCode(self.SendQueue)
-			self.SendQueue = nil
-		end
+
+		self:SendCode()
 	end
 end
 
