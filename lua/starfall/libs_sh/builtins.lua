@@ -1222,7 +1222,7 @@ function builtins_library.getfenv()
 	if fenv ~= _G then return fenv end
 end
 
---- GLua's getinfo()
+--- GLua's debug.getinfo()
 -- Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo)
 -- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
@@ -1236,6 +1236,20 @@ function builtins_library.debugGetInfo(funcOrStackLevel, fields)
 		ret.func = nil
 		return ret
 	end
+end
+
+--- GLua's debug.getlocal()
+-- Returns the name of a function or stack's locals
+-- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param index The index of the local to get
+-- @return The name of the local
+function builtins_library.debugGetLocal(funcOrStackLevel, index)
+	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
+	checkluatype(index, TYPE_NUMBER)
+
+	local name = debug.getlocal(funcOrStackLevel, index)
+	-- debug.getlocal returns two values, make sure we only return the first
+	return name
 end
 
 local uncatchable = {
