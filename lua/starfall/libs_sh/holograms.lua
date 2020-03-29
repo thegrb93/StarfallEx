@@ -31,6 +31,9 @@ if CLIENT then
 			holo.HoloMatrix = scalematrix
 			holo:EnableMatrix("RenderMultiply", scalematrix)
 		end
+		if not holo.userrenderbounds then
+			holo:SetRenderBounds(holo:OBBMins() * scale, holo:OBBMaxs() * scale)
+		end
 	end
 end
 
@@ -179,7 +182,6 @@ function holograms_library.create(pos, ang, model, scale)
 	else
 		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
 		if holoent and holoent:IsValid() then
-			holoent.IsSFHologram = true
 			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)

@@ -108,7 +108,7 @@ if CLIENT then
 	-- @param mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setMesh(mesh)
 		local ent = getent(self)
-		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, nil, "mesh")
 		checkpermission(instance, ent, "entities.setRenderProperty")
@@ -125,7 +125,7 @@ if CLIENT then
 	-- @param material The material to set it to or nil to set back to default
 	function ents_methods:setMeshMaterial(material)
 		local ent = getent(self)
-		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
@@ -144,12 +144,13 @@ if CLIENT then
 	-- @param maxs The upper bounding corner coordinate local to the hologram
 	function ents_methods:setRenderBounds(mins, maxs)
 		local ent = getent(self)
-		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
+		ent.userrenderbounds = true
 	end
 end
 
