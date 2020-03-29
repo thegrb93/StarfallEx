@@ -118,13 +118,3 @@ net.Receive("starfall_processor_destroy", function(len)
 	end
 end)
 
-hook.Add("NetworkEntityCreated", "starfall_chip_reset", function(ent)
-	-- Entity may not have its lua table yet so the only way is to check its class
-	if not ent.instance and ent:GetClass()=="starfall_processor" then
-		net.Start("starfall_processor_download")
-		net.WriteEntity(ent)
-		net.WriteBool(true)
-		net.SendToServer()
-	end
-end)
-
