@@ -1694,7 +1694,7 @@ end
 -- @return the Y size of the current render context
 function render_library.getResolution()
 	local data = instance.data.render
-	if data.renderEnt then
+	if data.renderEnt and data.renderEnt.GetResolution then
 		return data.renderEnt:GetResolution()
 	end
 	if data.usingRT then
