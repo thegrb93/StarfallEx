@@ -179,7 +179,7 @@ argTypesToQuat["Weapon"] = argTypesToQuat["Entity"]
 
 
 
---- Creates a new Quaternion given a variety of inputs
+--- Creates a new Quaternion given a variety of inputs. Usage quaternion:New(...)
 -- @param ... A series of arguments which lead to valid generation of a quaternion.
 -- See argTypesToQuat table for examples of acceptable inputs.
 function quat_lib.New(self, ...)
