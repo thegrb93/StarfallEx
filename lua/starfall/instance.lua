@@ -631,13 +631,14 @@ hook.Add("Think", "SF_Think", function()
 	end
 
 	for pl, insts in pairs(SF.playerInstances) do
-		local plquota = (SERVER or LocalPlayer() ~= pl) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		local plquota
 		local cputotal = 0
 		for instance, _ in pairs(insts) do
 			instance.cpu_average = instance:movingCPUAverage()
 			instance.cpu_total = 0
 			instance:runScriptHook("think")
 			cputotal = cputotal + instance.cpu_average
+			plquota = instance.cpuQuota
 		end
 
 		if cputotal>plquota then
