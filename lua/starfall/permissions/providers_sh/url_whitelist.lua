@@ -183,4 +183,4 @@ pattern [[([%w-_]+)%.neocities%.org/(.+)]]
 -- Soundcloud
 --- Examples:
 --- https://i1.sndcdn.com/artworks-000046176006-0xtkjy-large.jpg
-simple [[i1.sndcdn.com]]
+pattern [[(%w+)%.sndcdn%.com/(.+)]]
