@@ -179,3 +179,8 @@ simple [[ipfs.io]]
 --- https://fauux.neocities.org/LainDressSlow.gif
 
 pattern [[([%w-_]+)%.neocities%.org/(.+)]]
+
+-- Soundcloud
+--- Examples:
+--- https://i1.sndcdn.com/artworks-000046176006-0xtkjy-large.jpg
+pattern [[(%w+)%.sndcdn%.com/(.+)]]
