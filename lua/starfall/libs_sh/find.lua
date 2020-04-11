@@ -15,7 +15,7 @@ return function(instance)
 
 local find_library = instance.Libraries.find
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-
+local plywrap = instance.Types.Player.Wrap
 
 local function convert(results, func)
 	if func then checkluatype (func, TYPE_FUNCTION) end
@@ -210,6 +210,22 @@ function find_library.sortByClosest(ents, pos, furthest)
 		ret[i] = distances[i][2]
 	end
 	return ret
+end
+
+--- Finds the first player with the given name
+-- @param name Name to search for
+-- @param exact Should the name match exactly
+-- @return Found player or nil
+function find_library.playerByName(name, exact)
+	checkpermission(instance, nil, "find")
+	checkluatype(name, TYPE_STRING)
+	checkluatype(exact or false, TYPE_BOOL)
+	
+	for k, ply in ipairs(player.GetHumans()) do
+		if ply:GetName() == name or ( not exact and string.find(string.lower(ply:GetName()), string.lower(name)) ) then
+			return plywrap(ply)
+		end
+	end
 end
 
 end
