@@ -221,7 +221,7 @@ function find_library.playerByName(name, exact)
 	checkluatype(name, TYPE_STRING)
 	checkluatype(exact or false, TYPE_BOOL)
 	
-	for k, ply in ipairs(player.GetHumans()) do
+	for k, ply in ipairs(player.GetAll()) do
 		if ply:GetName() == name or ( not exact and string.find(string.lower(ply:GetName()), string.lower(name)) ) then
 			return plywrap(ply)
 		end
