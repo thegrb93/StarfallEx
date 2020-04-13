@@ -99,8 +99,8 @@ inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = vwrap,
-	ANGLE = awrap,
+	VECTOR = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y, vec[3] or vec.z }, vec_meta) end,
+	ANGLE = function(ang) return setmetatable({ ang[1] or ang.p, ang[2] or ang.y, ang[3] or ang.r }, ang_meta) end,
 	WIRELINK = wlwrap,
 	ENTITY = owrap,
 
@@ -139,7 +139,11 @@ inputConverters =
 	ARRAY = function(tbl)
 		local ret = {}
 		for i, v in ipairs(tbl) do
-			ret[i] = owrap(v)
+			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) and isnumber(v[3] or v.z or v.r) then
+				ret[i] = inputConverters.VECTOR(v)
+			else
+				ret[i] = owrap(v)
+			end
 		end
 		return ret
 	end
