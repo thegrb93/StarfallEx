@@ -15,7 +15,7 @@ return function(instance)
 
 local find_library = instance.Libraries.find
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
-
+local plywrap = instance.Types.Player.Wrap
 
 local function convert(results, func)
 	if func then checkluatype (func, TYPE_FUNCTION) end
@@ -209,6 +209,43 @@ function find_library.sortByClosest(ents, pos, furthest)
 	for i=1, #distances do
 		ret[i] = distances[i][2]
 	end
+	return ret
+end
+
+--- Finds the first player with the given name
+-- @param name Name to search for
+-- @param casesensitive Boolean should the match be case sensitive?
+-- @param exact Boolean should the name match exactly
+-- @return Table of found players
+function find_library.playersByName(name, casesensitive, exact)
+	checkpermission(instance, nil, "find")
+	checkluatype(name, TYPE_STRING)
+	if casesensitive~=nil then checkluatype(casesensitive, TYPE_BOOL) end
+	if exact~=nil then checkluatype(exact, TYPE_BOOL) end
+
+	local ret = {}
+	local getName
+	if casesensitive then
+		getName = function(ply) return ply:GetName() end
+	else
+		name = string.lower(name)
+		getName = function(ply) return string.lower(ply:GetName()) end
+	end
+
+	if exact then
+		for k, ply in ipairs(player.GetAll()) do
+			if getName(ply) == name then
+				ret[#ret+1] = plywrap(ply)
+			end
+		end
+	else
+		for k, ply in ipairs(player.GetAll()) do
+			if string.find(getName(ply), name, 1, true) then
+				ret[#ret+1] = plywrap(ply)
+			end
+		end
+	end
+
 	return ret
 end
 
