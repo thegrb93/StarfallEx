@@ -214,18 +214,39 @@ end
 
 --- Finds the first player with the given name
 -- @param name Name to search for
--- @param exact Should the name match exactly
--- @return Found player or nil
-function find_library.playerByName(name, exact)
+-- @param casesensitive Boolean should the match be case sensitive?
+-- @param exact Boolean should the name match exactly
+-- @return Table of found players
+function find_library.playersByName(name, casesensitive, exact)
 	checkpermission(instance, nil, "find")
 	checkluatype(name, TYPE_STRING)
-	checkluatype(exact or false, TYPE_BOOL)
-	
-	for k, ply in ipairs(player.GetAll()) do
-		if ply:GetName() == name or ( not exact and string.find(string.lower(ply:GetName()), string.lower(name)) ) then
-			return plywrap(ply)
+	if casesensitive~=nil then checkluatype(casesensitive, TYPE_BOOL) end
+	if exact~=nil then checkluatype(exact, TYPE_BOOL) end
+
+	local ret = {}
+	local getName
+	if casesensitive then
+		getName = function(ply) return ply:GetName() end
+	else
+		name = string.lower(name)
+		getName = function(ply) return string.lower(ply:GetName()) end
+	end
+
+	if exact then
+		for k, ply in ipairs(player.GetAll()) do
+			if getName(ply) == name then
+				ret[#ret+1] = plywrap(ply)
+			end
+		end
+	else
+		for k, ply in ipairs(player.GetAll()) do
+			if string.find(getName(ply), name, 1, true) then
+				ret[#ret+1] = plywrap(ply)
+			end
 		end
 	end
+
+	return ret
 end
 
 end
