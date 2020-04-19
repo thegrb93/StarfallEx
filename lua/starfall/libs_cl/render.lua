@@ -1408,10 +1408,10 @@ function render_library.parseMarkup(str, maxsize)
 	end
 
 	local index = {
-		Draw = marked.Draw,
-		GetWidth = marked.GetWidth,
-		GetHeight = marked.GetHeight,
-		Size = marked.Size
+		draw = marked.Draw,
+		getWidth = marked.GetWidth,
+		getHeight = marked.GetHeight,
+		getSize = marked.Size
 	}
 
 	return setmetatable(marked, {
