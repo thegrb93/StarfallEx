@@ -302,6 +302,12 @@ function props_library.createSent(pos, ang, class, frozen)
 
 
 		entity = ents.Create(swep.ClassName)
+		if entity and entity:IsValid() then
+			entity:SetPos(pos)
+			entity:SetAngles(ang)
+			entity:Spawn()
+			entity:Activate()
+		end
 
 		hookcall = "PlayerSpawnedSWEP"
 
