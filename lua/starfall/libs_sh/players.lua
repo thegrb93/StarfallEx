@@ -397,6 +397,13 @@ if SERVER then
 			ply:DropWeapon(weapon, target, velocity)
 		end
 	end
+	
+	--- Returns the hitgroup where the player was last hit.
+	-- @server
+	-- @return Hitgroup, see https://wiki.facepunch.com/gmod/Enums/HITGROUP
+	function player_methods:lastHitGroup()
+		return getply(self):LastHitGroup()
+	end
 end
 
 --- Returns whether or not the player is pushing the key.
