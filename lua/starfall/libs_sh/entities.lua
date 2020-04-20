@@ -1258,7 +1258,9 @@ end
 -- @param hitbox The number of the hit box.
 -- @param hitboxset The number of the hit box set. This should be 0 in most cases.
 -- @return The hitbox group of given hitbox. See https://wiki.facepunch.com/gmod/Enums/HITGROUP
-function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)	
+function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(hitboxset, TYPE_NUMBER)
 	local ent = getent(self)
 	return ent:GetHitBoxHitGroup(hitbox, hitboxset)
 end
