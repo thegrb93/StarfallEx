@@ -1197,4 +1197,66 @@ function ents_methods:entOwner()
 	return owrap(ent:GetOwner())
 end
 
+--- Gets the bounds (min and max corners) of a hit box.
+-- @shared
+-- @param hitbox The number of the hitbox.
+-- @param group The number of the hitbox group, 0 in most cases.
+-- @return Hitbox mins vector.
+-- @return Hitbox maxs vector.
+function ents_methods:getHitBoxBounds(hitbox, group)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(group, TYPE_NUMBER)
+	local mins, maxs = getent(self):GetHitBoxBounds(hitbox, group)
+	if mins and maxs then
+		return vwrap(mins), vwrap(maxs)
+	end
+end
+
+--- Gets number of hitboxes in a group.
+-- @shared
+-- @param group The number of the hitbox group.
+-- @return Number of hitboxes
+function ents_methods:getHitBoxCount(group)
+	checkluatype(group, TYPE_NUMBER)
+	return getent(self):GetHitBoxCount(group)
+end
+
+--- Gets the bone the given hitbox is attached to.
+-- @shared
+-- @param hitbox The number of the hitbox.
+-- @param group The number of the hitbox group, 0 in most cases.
+-- @return Bone ID
+function ents_methods:getHitBoxBone(hitbox, group)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(group, TYPE_NUMBER)	
+	return getent(self):GetHitBoxBone(hitbox, group)
+end
+
+--- Returns entity's current hit box set.
+-- @shared
+-- @return Hitbox set number, nil if entity has no hitboxes.
+-- @return Hitbox set name, nil if entity has no hitboxes.
+function ents_methods:getHitBoxSet()	
+	local num, str = getent(self):GetHitboxSet()
+	return num, str
+end
+
+--- Returns entity's number of hitbox sets.
+-- @shared
+-- @return Number of hitbox sets.
+function ents_methods:getHitBoxSetCount()	
+	return getent(self):GetHitboxSetCount()
+end
+
+--- Gets the hit group of a given hitbox in a given hitbox set.
+-- @shared
+-- @param hitbox The number of the hit box.
+-- @param hitboxset The number of the hit box set. This should be 0 in most cases.
+-- @return The hitbox group of given hitbox. See https://wiki.facepunch.com/gmod/Enums/HITGROUP
+function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(hitboxset, TYPE_NUMBER)
+	return getent(self):GetHitBoxHitGroup(hitbox, hitboxset)
+end
+
 end
