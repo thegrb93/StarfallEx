@@ -1228,7 +1228,7 @@ end
 -- @return Bone ID
 function ents_methods:getHitBoxBone(hitbox, group)
 	checkluatype(hitbox, TYPE_NUMBER)
-	checkluatype(group, TYPE_NUMBER)	
+	checkluatype(group, TYPE_NUMBER)
 	return getent(self):GetHitBoxBone(hitbox, group)
 end
 
@@ -1236,15 +1236,14 @@ end
 -- @shared
 -- @return Hitbox set number, nil if entity has no hitboxes.
 -- @return Hitbox set name, nil if entity has no hitboxes.
-function ents_methods:getHitBoxSet()	
-	local num, str = getent(self):GetHitboxSet()
-	return num, str
+function ents_methods:getHitBoxSet()
+	return getent(self):GetHitboxSet()
 end
 
 --- Returns entity's number of hitbox sets.
 -- @shared
 -- @return Number of hitbox sets.
-function ents_methods:getHitBoxSetCount()	
+function ents_methods:getHitBoxSetCount()
 	return getent(self):GetHitboxSetCount()
 end
 
