@@ -140,7 +140,7 @@ function sound_methods:destroy()
 	end
 end
 
---- Sets the volume of the sound.
+--- Sets the volume of the sound. Won't work unless the sound is playing.
 -- @param vol Volume to set to, between 0 and 1.
 -- @param fade Time in seconds to transition to this new volume.
 function sound_methods:setVolume(vol, fade)
@@ -158,7 +158,7 @@ function sound_methods:setVolume(vol, fade)
 	unwrap(self):ChangeVolume(vol, fade)
 end
 
---- Sets the pitch of the sound.
+--- Sets the pitch of the sound. Won't work unless the sound is playing.
 -- @param pitch Pitch to set to, between 0 and 255.
 -- @param fade Time in seconds to transition to this new pitch.
 function sound_methods:setPitch(pitch, fade)
@@ -181,7 +181,7 @@ function sound_methods:isPlaying()
 	return unwrap(self):IsPlaying()
 end
 
---- Sets the sound level in dB.
+--- Sets the sound level in dB. Won't work unless the sound is playing.
 -- @param level dB level, see <a href='https://developer.valvesoftware.com/wiki/Soundscripts#SoundLevel'> Vale Dev Wiki</a>, for information on the value to use.
 function sound_methods:setSoundLevel(level)
 	checkpermission(instance, nil, "sound.modify")
