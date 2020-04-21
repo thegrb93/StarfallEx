@@ -1206,8 +1206,7 @@ end
 function ents_methods:getHitBoxBounds(hitbox, group)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(group, TYPE_NUMBER)
-	local ent = getent(self)
-	local mins, maxs = ent:GetHitBoxBounds(hitbox, group)
+	local mins, maxs = getent(self):GetHitBoxBounds(hitbox, group)
 	if mins and maxs then
 		return vwrap(mins), vwrap(maxs)
 	end
@@ -1219,8 +1218,7 @@ end
 -- @return Number of hitboxes
 function ents_methods:getHitBoxCount(group)
 	checkluatype(group, TYPE_NUMBER)
-	local ent = getent(self)
-	return ent:GetHitBoxCount(group)
+	return getent(self):GetHitBoxCount(group)
 end
 
 --- Gets the bone the given hitbox is attached to.
@@ -1231,8 +1229,7 @@ end
 function ents_methods:getHitBoxBone(hitbox, group)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(group, TYPE_NUMBER)	
-	local ent = getent(self)
-	return ent:GetHitBoxBone(hitbox, group)
+	return getent(self):GetHitBoxBone(hitbox, group)
 end
 
 --- Returns entity's current hit box set.
@@ -1240,8 +1237,7 @@ end
 -- @return Hitbox set number, nil if entity has no hitboxes.
 -- @return Hitbox set name, nil if entity has no hitboxes.
 function ents_methods:getHitBoxSet()	
-	local ent = getent(self)
-	local num, str = ent:GetHitboxSet()
+	local num, str = getent(self):GetHitboxSet()
 	return num, str
 end
 
@@ -1249,8 +1245,7 @@ end
 -- @shared
 -- @return Number of hitbox sets.
 function ents_methods:getHitBoxSetCount()	
-	local ent = getent(self)
-	return ent:GetHitboxSetCount()
+	return getent(self):GetHitboxSetCount()
 end
 
 --- Gets the hit group of a given hitbox in a given hitbox set.
@@ -1261,8 +1256,7 @@ end
 function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(hitboxset, TYPE_NUMBER)
-	local ent = getent(self)
-	return ent:GetHitBoxHitGroup(hitbox, hitboxset)
+	return getent(self):GetHitBoxHitGroup(hitbox, hitboxset)
 end
 
 end
