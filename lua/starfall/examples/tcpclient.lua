@@ -21,15 +21,15 @@ do -- tcptask
 		self.fail = fail
 	end
 
-	function tcptask:success()
+	function tcptask.success()
 	end
 
-	function tcptask:fail()
+	function tcptask.fail()
 	end
 
 	function tcptask:isTimedout()
 		if self.timeout then
-			return timer.curtime()<self.timeout
+			return timer.curtime()>=self.timeout
 		else
 			self.timeout = timer.curtime()+operationTimeout
 			return false
@@ -43,18 +43,19 @@ do -- tcpconnecttask
 		self.socket:connect(addr, port)
 	end
 
-	function tcpconnecttask:run()
+	function tcpconnecttask:process()
 		local r, w, e = socket.select(nil, {self.socket}, 0)
 		if e==nil then
-			self:success()
+			self.client.connected = true
+			self.success()
 		elseif e=="timeout" then
 			if self:isTimedout() then
-				self:fail("Connect operation timed out!")
+				self.fail("Connect operation timed out!")
 			else
 				return false
 			end
 		else
-			self:fail(e)
+			self.fail(e)
 		end
 		return true
 	end
@@ -67,74 +68,75 @@ do -- tcpsendtask
 		self.bytesSent = 0
 	end
 
-	function tcpsendtask:run()
+	function tcpsendtask:process()
 		local r, w, e = socket.select(nil, {self.socket}, 0)
 		if e==nil then
 			local sent, err, sent2 = self.socket:send(self.data, self.bytesSent+1, math.min(#self.data, self.bytesSent+2048))
-			print(sent, err, sent2)
+			--print(sent, err, sent2)
 			if err==nil then
 				self.bytesSent = self.bytesSent + sent
 				if self.bytesSent == #self.data then
-					self:success()
+					self.success()
 				else
 					return false
 				end
 			elseif err=="closed" then
-				self:fail(err, sent2)
+				self.fail(err, sent2)
 				self.client:close()
 			elseif err=="timeout" then
 				if self:isTimedout() then
-					self:fail("Send operation timed out!")
+					self.fail("Send operation timed out!")
 				else
 					return false
 				end
 			else
-				self:fail(err)
+				self.fail(err)
 			end
 		elseif e=="timeout" then
 			if self:isTimedout() then
-				self:fail("Send operation timed out!")
+				self.fail("Send operation timed out!")
 			else
 				return false
 			end
 		else
-			self:fail(e)
+			self.fail(e)
 		end
 		return true
 	end
 end
 
 do -- tcprecvtask
-	function tcprecvtask:initialize(client, addr, port, success, fail)
+	function tcprecvtask:initialize(client, success, fail)
 		tcptask.initialize(self, client, success, fail)
 	end
 
-	function tcprecvtask:run()
+	function tcprecvtask:process()
 		local r, w, e = socket.select({self.socket}, nil, 0)
 		if e==nil then
 			local recv, err, recv2 = self.socket:receive(2048)
+			--print(recv, err, recv2)
 			if err==nil then
-				self:success(recv)
+				self.success(recv)
 			elseif err=="closed" then
-				self:success(recv2, true)
+				self.success(recv2, true)
 				self.client:close()
 			elseif err=="timeout" then
 				if self:isTimedout() then
-					self:fail("Receive operation timed out!")
+					self.fail("Receive operation timed out!")
 				else
 					return false
 				end
 			else
-				self:fail(err)
+				self.fail(err)
 			end
 		elseif e=="timeout" then
 			if self:isTimedout() then
-				self:fail("Receive operation timed out!")
+				self.fail("Receive operation timed out!")
 			else
 				return false
 			end
 		else
-			self:fail(e)
+			self.fail(e)
 		end
 		return true
 	end
@@ -156,9 +158,9 @@ do -- tcpclient
 
 	function tcpclient:connect(addr, port, success, fail)
 		if self.connected then
-			error("This socket is already connected!")
+			error("This socket is already connected!", 2)
 		elseif self.connecting then
-			error("This socket is already connecting!")
+			error("This socket is already connecting!", 2)
 		else
 			self.connecting = tcpconnecttask:new(self, addr, port, success, fail)
 		end
@@ -168,7 +170,7 @@ do -- tcpclient
 		if self.connected then
 			self.recvqueue[#self.recvqueue + 1] = tcprecvtask:new(self, success, fail)
 		else
-			error("The socket is not connected!")
+			error("The socket is not connected!", 2)
 		end
 	end
 
@@ -176,7 +178,7 @@ do -- tcpclient
 		if self.connected then
 			self.sendqueue[#self.sendqueue + 1] = tcpsendtask:new(self, data, success, fail)
 		else
-			error("The socket is not connected!")
+			error("The socket is not connected!", 2)
 		end
 	end
 
@@ -188,14 +190,8 @@ do -- tcpclient
 			if #self.sendqueue>0 and self.sendqueue[1]:process() then
 				table.remove(self.sendqueue, 1)
 			end
-		elseif self.connecting then
-			local result = self.connecting:process()
-			if result == true then
-				self.connected = true
-				self.connecting = nil
-			elseif result == false then
-				self.connecting = nil
-			end
+		elseif self.connecting and self.connecting:process() then
+			self.connecting = nil
 		end
 	end
 
@@ -209,19 +205,20 @@ do -- tcpclient
 end
 
 local sock = tcpclient:new()
-sock:connect("sparkysandbox.org", 80, nil, error)
-sock:send("GET / HTTP/1.0\r\nHost: sparkysandbox.org\r\n\r\n", nil, error)
--- Keep reading until it closes or times out.
-local chunks = {}
-local function receiveData()
-	sock:receive(function(data, closed)
-		chunks[#chunks+1] = data
-		if closed then
-			print(table.concat(chunks))
-		else
-			receiveData()
-		end
-	end, error)
-end
-receiveData()
+sock:connect("sparkysandbox.org", 80, function()
+	sock:send("GET / HTTP/1.0\r\nHost: sparkysandbox.org\r\n\r\n", nil, error)
+	-- Keep reading until it closes or times out.
+	local chunks = {}
+	local function receiveData()
+		sock:receive(function(data, closed)
+			chunks[#chunks+1] = data
+			if closed then
+				print(table.concat(chunks))
+			else
+				receiveData()
+			end
+		end, error)
+	end
+	receiveData()
+end, error)
 
