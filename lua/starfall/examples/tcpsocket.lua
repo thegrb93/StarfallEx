@@ -1,13 +1,13 @@
---@name Asynchronous tcp http example
+--@name Asynchronous tcp client http example
 --@author Sparky
 --@client
 
 -- Requires setup of the socket library
 -- This example performs async GET request from an http server and prints the response.
 
-local tcp = class("tcp")
+local tcpclient = class("tcpclient")
 
-function tcp:initialize()
+function tcpclient:initialize()
 	self.queue = {}
 	self.tries = 0
 	self.maxtries = 60
@@ -18,7 +18,7 @@ function tcp:initialize()
 	hook.add("think",tostring(self),function() self:process() end)
 end
 
-function tcp:connect(addr, port, success, fail)
+function tcpclient:connect(addr, port, success, fail)
 	self.queue[#self.queue + 1] = function(timeout)
 		self.socket:connect(addr, port)
 		return true
@@ -33,7 +33,7 @@ function tcp:connect(addr, port, success, fail)
 	end
 end
 
-function tcp:receive(success, fail)
+function tcpclient:receive(success, fail)
 	self.queue[#self.queue + 1] = function(timeout)
 		if timeout then if fail then fail("Receive operation timed out!") end return end
 		local r, w, e = socket.select({self.socket}, nil, 0)
@@ -56,7 +56,7 @@ function tcp:receive(success, fail)
 	end
 end
 
-function tcp:send(data, success, fail)
+function tcpclient:send(data, success, fail)
 	local bytesSent = 0
 	self.queue[#self.queue + 1] = function(timeout)
 		if timeout then if fail then fail("Send operation timed out!") end return end
@@ -82,7 +82,7 @@ function tcp:send(data, success, fail)
 	end
 end
 
-function tcp:process()
+function tcpclient:process()
 	local func = self.queue[1]
 	if func then
 		local result = func()
@@ -103,13 +103,13 @@ function tcp:process()
 	end
 end
 
-function tcp:close()
+function tcpclient:close()
 	hook.remove("think",tostring(self))
 	self.socket:close()
 	self.socket = nil
 end
 
-local sock = tcp:new()
+local sock = tcpclient:new()
 sock:connect("sparkysandbox.org", 80, nil, error)
 sock:send("GET / HTTP/1.0\r\nHost: sparkysandbox.org\r\n\r\n", nil, error)
 sock:receive(function(data)
