@@ -71,7 +71,7 @@ function tcp:send(data, success, fail)
 					if success then success() end
 					return true
 				end
-				table.insert(self.queue, 2, self.queue[1])
+				return false
 			else
 				if fail then fail(err) end
 			end
@@ -89,6 +89,8 @@ function tcp:process()
 		if result then
 			self.tries = 0
 			table.remove(self.queue, 1)
+		elseif result == false then
+			self.tries = 0
 		else
 			if self.tries == self.maxtries then
 				func(true)
