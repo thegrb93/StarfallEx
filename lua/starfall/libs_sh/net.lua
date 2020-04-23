@@ -88,7 +88,8 @@ end
 --@param target Optional target location to send the net message.
 --@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
-	if unreliable then checkluatype (unreliable, TYPE_BOOL) end
+	if target~=nil then checkluatype(target, TYPE_TABLE) end
+	if unreliable then checkluatype(unreliable, TYPE_BOOL) end
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	netBurst:use(instance.player, instance.data.net.size)
@@ -103,26 +104,26 @@ function net_library.send(target, unreliable)
 	end
 
 	if SERVER then
-		local sendfunc, newtarget
-
 		if target then
-			if target[1] then
-				local nt = { }
+			local newtarget = instance.UnwrapObject(target)
+			if newtarget then
+				if not (newtarget.IsValid and newtarget.IsPlayer and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
+			else
+				if #target == 0 then SF.Throw("Send array is empty", 2) end
+				newtarget = {}
 				for i = 1, #target do
 					local pl = eunwrap(target[i])
-					if pl and pl:IsValid() and pl:IsPlayer() then
-						nt[#nt + 1] = pl
+					if pl:IsValid() and pl:IsPlayer() then
+						newtarget[i] = pl
+					else
+						SF.Throw("Invalid player inside send array", 2)
 					end
 				end
-				sendfunc, newtarget = net.Send, nt
-			else
-				sendfunc, newtarget = net.Send, eunwrap(target)
-				if not (newtarget and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
 			end
+			net.Send(newtarget)
 		else
-			sendfunc = net.Broadcast
+			net.Broadcast()
 		end
-		sendfunc(newtarget)
 	else
 		net.SendToServer()
 	end
