@@ -48,8 +48,9 @@ game_library.isDedicated = game.IsDedicated
 game_library.getMaxPlayers = game.MaxPlayers
 
 --- Checks whether the specified game is mounted
--- @name String identifier of the game, eg. 'cstrike'
+-- @name game_library.isMounted
 -- @class function
+-- @param str String identifier of the game, eg. 'cstrike'
 -- @return True if the game is mounted
 game_library.isMounted = IsMounted
 
