@@ -193,6 +193,23 @@ function ents_methods:stopSound(snd)
 	ent:StopSound(snd)
 end
 
+--- Returns a list of entities linked to a processor
+-- @return A list of components linked to the entity
+function ents_methods:getLinkedComponents()
+	local ent = getent(self)
+	if ent:GetClass() ~= "starfall_processor" then SF.Throw("The target must be a starfall_processor", 2) end
+
+	local list = {}
+	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+		if v.link == ent then list[#list+1] = ewrap(v) end
+	end
+	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+		if v.link == ent then list[#list+1] = ewrap(v) end
+	end
+
+	return list
+end
+
 --- Sets the color of the entity
 -- @shared
 -- @param clr New color

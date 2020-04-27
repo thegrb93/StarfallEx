@@ -508,3 +508,15 @@ end
 -- @param ent Starfall chip that errored
 -- @param ply Owner of the chip on server or player that script errored for on client
 -- @param err Error message
+
+--- Called when a component is linked to the starfall
+-- @name ComponentLinked
+-- @class hook
+-- @shared
+-- @param ent The component entity
+
+--- Called when a component is unlinked to the starfall
+-- @name ComponentUnlinked
+-- @class hook
+-- @shared
+-- @param ent The component entity

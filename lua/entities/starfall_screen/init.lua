@@ -36,14 +36,6 @@ function ENT:Use(activator)
 	end
 end
 
-function ENT:LinkEnt(ent, ply)
-	self.link = ent
-	net.Start("starfall_processor_link")
-		net.WriteEntity(self)
-		net.WriteEntity(ent)
-	if ply then net.Send(ply) else net.Broadcast() end
-end
-
 function ENT:PreEntityCopy()
 	if self.EntityMods then self.EntityMods.SFLink = nil end
 	if (self.link and self.link:IsValid()) then

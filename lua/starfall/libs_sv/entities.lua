@@ -101,7 +101,7 @@ function ents_methods:unparent()
 end
 
 --- Links starfall components to a starfall processor or vehicle. Screen can only connect to processor. HUD can connect to processor and vehicle.
--- @param e Entity to link the component to. nil to clear links.
+-- @param e Entity to link the component to, a vehicle or starfall for huds, or a starfall for screens. nil to clear links.
 function ents_methods:linkComponent(e)
 	local ent = getent(self)
 	checkpermission(instance, ent, "entities.canTool")
@@ -140,23 +140,6 @@ function ents_methods:setComponentLocksControls(enable)
 	else
 		SF.Throw("Entity must be a starfall_screen or starfall_hud", 2)
 	end
-end
-
---- Returns a list of entities linked to a processor
--- @return A list of components linked to the entity
-function ents_methods:getLinkedComponents()
-	local ent = getent(self)
-	if ent:GetClass() ~= "starfall_processor" then SF.Throw("The target must be a starfall_processor", 2) end
-	
-	local list = {}
-	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
-		if v.link == ent then list[#list+1] = ewrap(v) end
-	end
-	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
-		if v.link == ent then list[#list+1] = ewrap(v) end
-	end
-	
-	return list
 end
 
 --- Applies damage to an entity
