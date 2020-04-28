@@ -29,6 +29,9 @@ function ENT:LinkEnt(ent, transmit)
 		end
 
 		if SERVER then
+			net.Start("starfall_processor_link")
+			net.WriteEntity(self)
+			net.WriteEntity(ent)
 			if transmit then net.Send(transmit) else net.Broadcast() end
 		end
 	end
