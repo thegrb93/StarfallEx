@@ -20,7 +20,7 @@ P.checks = {
 		site = site.."/"..(data or "") -- Make sure there is / at the end of site
 		return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
 	end,
-	function() return true end,
+	"allow"
 }
 
 SF.Permissions.registerProvider(P)

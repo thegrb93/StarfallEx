@@ -96,17 +96,28 @@ end
 function P.buildPermissionCheck(privilegeid)
 	local privilege = P.privileges[privilegeid]	
 	local checks = {}
+	local allAllow = true
+	local anyBlock = false
 	for providerid, v in pairs(privilege[3]) do
 		if P.providers[providerid] then
-			checks[#checks+1] = P.providers[providerid].checks[v.setting]
+			local check = P.providers[providerid].checks[v.setting]
+			if check == "allow" then check = function() return true end else allAllow = false end
+			if check == "block" then anyBlock = true break end
+			checks[#checks+1] = check
 		end
 	end
-	P.permissionchecks[privilegeid] = function(instance, target)
-		for k, v in ipairs(checks) do
-			local ok, reason = v(instance, target)
-			if not ok then return true, reason end
+	if allAllow then
+		P.permissionchecks[privilegeid] = function() return false end
+	elseif anyBlock then
+		P.permissionchecks[privilegeid] = function() return true, "This function's permission is blocked!" end
+	else
+		P.permissionchecks[privilegeid] = function(instance, target)
+			for k, v in ipairs(checks) do
+				local ok, reason = v(instance, target)
+				if not ok then return true, reason end
+			end
+			return false
 		end
-		return false
 	end
 end
 

@@ -10,8 +10,8 @@ P.checks = {
 	function(instance, target, key)
 		return instance.player:IsAdmin(), "This function is admin only"
 	end,
-	function() return true end,
-	function() return false, "This function is disabled" end
+	"allow",
+	"block"
 }
 
 SF.Permissions.registerProvider(P)
