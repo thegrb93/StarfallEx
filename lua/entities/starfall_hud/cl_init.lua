@@ -11,10 +11,6 @@ function ENT:Initialize()
 	net.SendToServer()
 end
 
-function ENT:LinkEnt(ent)
-	self.link = ent
-end
-
 function ENT:Draw()
 	self:DrawModel()
 end

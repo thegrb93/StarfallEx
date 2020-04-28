@@ -64,6 +64,13 @@ function ENT:Compile()
 			end
 		end
 	end
+
+	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+		if v.link == self then v.link = nil v:LinkEnt(self) end
+	end
+	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+		if v.link == self then v.link = nil v:LinkEnt(self) end
+	end
 end
 
 function ENT:Destroy()

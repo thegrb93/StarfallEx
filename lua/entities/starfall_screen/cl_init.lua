@@ -52,10 +52,6 @@ function ENT:Initialize()
 	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
 end
 
-function ENT:LinkEnt(ent)
-	self.link = ent
-end
-
 function ENT:RenderScreen()
 	if (self.link and self.link:IsValid()) then
 		local instance = self.link.instance
