@@ -5,6 +5,8 @@
 -- Requires setup of the socket library
 -- This example performs async GET request from an http server and prints the response.
 
+-- Upon placing the chip, the socket will perform an http request and save the response to sf_filedata/httpdata.txt
+
 local operationTimeout = 5
 
 local tcpclient = class("tcpclient")
@@ -144,8 +146,7 @@ do -- tcprecvtask
 end
 
 do -- tcpclient
-	function tcpclient:initialize(pollrate)
-		self.pollrate = pollrate or 1
+	function tcpclient:initialize()
 		self.connected = false
 		self.sendqueue = {}
 		self.recvqueue = {}
@@ -186,7 +187,7 @@ do -- tcpclient
 
 	function tcpclient:process()
 		if self.connected then
-			for i=1, self.pollrate do
+			while (#self.recvqueue>0 or #self.sendqueue>0) and quotaAverage()<quotaMax()*0.1 do
 				if #self.recvqueue>0 and self.recvqueue[1]:process() then
 					table.remove(self.recvqueue, 1)
 				end
@@ -208,7 +209,7 @@ do -- tcpclient
 	end
 end
 
-local sock = tcpclient:new(10)
+local sock = tcpclient:new()
 sock:connect("sparkysandbox.org", 80, function()
 	-- Keep reading until it closes or times out.
 	local chunks = {}
@@ -216,7 +217,7 @@ sock:connect("sparkysandbox.org", 80, function()
 		sock:receive(function(data, err)
 			chunks[#chunks+1] = data
 			if err=="closed" then
-				print(table.concat(chunks))
+				file.write("httpdata.txt", table.concat(chunks))
 			else
 				receiveData()
 			end
