@@ -636,7 +636,7 @@ if CLIENT then
 	}
 
 	--- Creates a mesh from vertex data.
-	-- @param verteces Table containing vertex data. http://wiki.garrysmod.com/page/Structures/MeshVertex
+	-- @param verteces Table containing vertex data. http://wiki.facepunch.com/gmod/Structures/MeshVertex
 	-- @param threaded Optional bool, use threading object that can be used to load the mesh over time to prevent hitting quota limit
 	-- @return Mesh object
 	-- @client

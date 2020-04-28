@@ -25,7 +25,7 @@ function physenv_lib.getGravity()
 end
 
 --- Gets the performance settings.</br>
--- See <a href="http://wiki.garrysmod.com/page/Structures/PhysEnvPerformanceSettings">PhysEnvPerformance Settings Table Structure</a> for table structure.
+-- See http://wiki.facepunch.com/gmod/Structures/PhysEnvPerformanceSettings for table structure.
 -- @return table Performance Settings Table.
 function physenv_lib.getPerformanceSettings()
 	return instance.Sanitize(physenv.GetPerformanceSettings())

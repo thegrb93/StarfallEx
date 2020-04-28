@@ -307,7 +307,7 @@ else
 
 	--- Sets the texture filtering function when viewing a close texture
 	-- @client
-	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+	-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMag(val)
 		local holo = getholo(self)
 
@@ -323,7 +323,7 @@ else
 
 	--- Sets the texture filtering function when viewing a far texture
 	-- @client
-	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+	-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMin(val)
 		local holo = getholo(self)
 

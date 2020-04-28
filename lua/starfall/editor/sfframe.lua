@@ -125,7 +125,7 @@ function Editor:GetFont(fontName, size, antialiasing)
 	if not self.CreatedFonts[name] then
 		self.CreatedFonts[name] = true
 		createFont(name, fontName, size, antialiasing)
-		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained there http://wiki.garrysmod.com/page/surface/CreateFont
+		timer.Simple(0, function() createFont(name, fontName, size, antialiasing) end) --Fix for bug explained there https://wiki.facepunch.com/gmod/surface.CreateFont
 	end
 
 	surface.SetFont(name)

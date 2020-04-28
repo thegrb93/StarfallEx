@@ -339,7 +339,7 @@ local function addCollisions(func)
 	end
 end
 --- Allows detecting collisions on an entity. You can only do this once for the entity's entire lifespan so use it wisely.
--- @param func The callback function with argument, table collsiondata, http://wiki.garrysmod.com/page/Structures/CollisionData
+-- @param func The callback function with argument, table collsiondata, http://wiki.facepunch.com/gmod/Structures/CollisionData
 function ents_methods:addCollisionListener(func)
 	local ent = getent(self)
 	checkluatype(func, TYPE_FUNCTION)
@@ -487,7 +487,6 @@ function ents_methods:isFrozen()
 end
 
 --- Sets the entity to be Solid or not.
--- For more information please refer to GLua function http://wiki.garrysmod.com/page/Entity/SetNotSolid
 -- @param solid Boolean, Should the entity be solid?
 function ents_methods:setSolid(solid)
 	local ent = getent(self)

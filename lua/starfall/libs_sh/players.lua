@@ -287,7 +287,7 @@ end
 
 --- Returns a table with information of what the player is looking at
 -- @shared
--- @return table trace data https://wiki.garrysmod.com/page/Structures/TraceResult
+-- @return table trace data https://wiki.facepunch.com/gmod/Structures/TraceResult
 function player_methods:getEyeTrace()
 	checkpermission(instance, nil, "trace")
 

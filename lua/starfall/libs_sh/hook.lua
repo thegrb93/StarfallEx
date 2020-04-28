@@ -427,7 +427,7 @@ end
 -- @class hook
 -- @shared
 -- @param ent The entity that fired the bullet
--- @param data The bullet data. See http://wiki.garrysmod.com/page/Structures/Bullet
+-- @param data The bullet data. See http://wiki.facepunch.com/gmod/Structures/Bullet
 
 --- Called when an entity is damaged
 -- @name EntityTakeDamage

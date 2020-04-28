@@ -179,7 +179,7 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 end
 
 --- Stops a sound on the entity
--- @param snd string Soundscript path. See http://wiki.garrysmod.com/page/Entity/StopSound
+-- @param snd string Soundscript path. See http://wiki.facepunch.com/gmod/Entity:StopSound
 function ents_methods:stopSound(snd)
 	checkluatype(snd, TYPE_STRING)
 
@@ -351,7 +351,7 @@ end
 --- Sets the render mode of the entity
 -- @shared
 -- @class function
--- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
+-- @param rendermode Number, rendermode to use. http://wiki.facepunch.com/gmod/Enums/RENDERMODE
 function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
@@ -369,7 +369,7 @@ end
 --- Sets the renderfx of the entity
 -- @shared
 -- @class function
--- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
+-- @param renderfx Number, renderfx to use. http://wiki.facepunch.com/gmod/Enums/kRenderFx
 function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 

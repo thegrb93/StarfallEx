@@ -13,25 +13,25 @@ if SERVER then
 end
 
 
---- Lua string library https://wiki.garrysmod.com/page/Category:string
+--- Lua string library https://wiki.facepunch.com/gmod/Category:string
 -- @name string
 -- @class library
 -- @libtbl string_library
 SF.RegisterLibrary("string")
 
---- Lua math library https://wiki.garrysmod.com/page/Category:math
+--- Lua math library https://wiki.facepunch.com/gmod/Category:math
 -- @name math
 -- @class library
 -- @libtbl math_library
 SF.RegisterLibrary("math")
 
---- Lua os library https://wiki.garrysmod.com/page/Category:os
+--- Lua os library https://wiki.facepunch.com/gmod/Category:os
 -- @name os
 -- @class library
 -- @libtbl os_library
 SF.RegisterLibrary("os")
 
---- Lua table library https://wiki.garrysmod.com/page/Category:table
+--- Lua table library https://wiki.facepunch.com/gmod/Category:table
 -- @name table
 -- @class library
 -- @libtbl table_library
@@ -987,7 +987,7 @@ else
 	end
 
 	--- Prints a message to your chat, console, or the center of your screen.
-	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
+	-- @param mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param text The message text.
 	function builtins_library.printMessage(mtype, text)
 		if instance.player ~= LocalPlayer() then return end
@@ -1223,7 +1223,7 @@ function builtins_library.getfenv()
 end
 
 --- GLua's debug.getinfo()
--- Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo)
+-- Returns a DebugInfo structure containing the passed function's info https://wiki.facepunch.com/gmod/Structures/DebugInfo
 -- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table

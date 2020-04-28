@@ -419,7 +419,7 @@ function ss_methods:getBuffer()
 end
 
 
---- Bit library http://wiki.garrysmod.com/page/Category:bit
+--- Bit library http://wiki.facepunch.com/gmod/Category:bit
 -- @name bit
 -- @class library
 -- @libtbl bit_library

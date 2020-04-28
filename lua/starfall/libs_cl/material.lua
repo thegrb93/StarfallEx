@@ -493,7 +493,7 @@ local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["n
 --- Creates a .jpg or .png material from file
 --- Can't be modified
 -- @param path The path to the image file
--- @param params The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters
+-- @param params The shader parameters to apply to the material. See https://wiki.facepunch.com/gmod/Material_Parameters
 function material_library.createFromImage(path, params)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(params, TYPE_STRING)

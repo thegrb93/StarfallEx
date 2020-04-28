@@ -170,14 +170,14 @@ function physobj_methods:localToWorldVector(vec)
 	return vwrap(unwrap(self):LocalToWorldVector(vunwrap(vec)))
 end
 
---- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+--- Returns a table of MeshVertex structures where each 3 vertices represent a triangle. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table of MeshVertex structures
 function physobj_methods:getMesh()
 	local mesh = unwrap(self):GetMesh()
 	return instance.Sanitize(mesh)
 end
 
---- Returns a structured table, the physics mesh of the physics object. See: http://wiki.garrysmod.com/page/Structures/MeshVertex
+--- Returns a structured table, the physics mesh of the physics object. See: http://wiki.facepunch.com/gmod/Structures/MeshVertex
 -- @return table of MeshVertex structures
 function physobj_methods:getMeshConvexes()
 	local mesh = unwrap(self):GetMeshConvexes()
