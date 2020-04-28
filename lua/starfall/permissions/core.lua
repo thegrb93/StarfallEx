@@ -114,6 +114,14 @@ function P.buildPermissionCheck(privilegeid)
 		P.permissionchecks[privilegeid] = function() return false end
 	elseif anyBlock then
 		P.permissionchecks[privilegeid] = function() return true, "This function's permission is blocked!" end
+	elseif #checks==0 then
+		P.permissionchecks[privilegeid] = function() return false end
+	elseif #checks==1 then
+		local check = checks[1]
+		P.permissionchecks[privilegeid] = function(instance, target)
+			local ok, reason = check(instance, target)
+			return not ok, reason
+		end
 	else
 		P.permissionchecks[privilegeid] = function(instance, target)
 			for k, v in ipairs(checks) do
