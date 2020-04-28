@@ -101,9 +101,13 @@ function P.buildPermissionCheck(privilegeid)
 	for providerid, v in pairs(privilege[3]) do
 		if P.providers[providerid] then
 			local check = P.providers[providerid].checks[v.setting]
-			if check == "allow" then check = function() return true end else allAllow = false end
-			if check == "block" then anyBlock = true break end
-			checks[#checks+1] = check
+			if check == "block" then
+				anyBlock = true
+				break
+			elseif check ~= "allow" then
+				allAllow = false
+				checks[#checks+1] = check
+			end
 		end
 	end
 	if allAllow then
