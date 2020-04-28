@@ -118,12 +118,13 @@ do -- tcprecvtask
 			if err==nil then
 				self.success(recv)
 			elseif err=="closed" then
-				self.success(recv2, true)
+				self.success(recv2, err)
 				self.client:close()
 			elseif err=="timeout" then
 				if self:isTimedout() then
 					self.fail("Receive operation timed out!")
 				else
+					self.success(recv2, err)
 					return false
 				end
 			else
@@ -143,7 +144,8 @@ do -- tcprecvtask
 end
 
 do -- tcpclient
-	function tcpclient:initialize()
+	function tcpclient:initialize(pollrate)
+		self.pollrate = pollrate or 1
 		self.connected = false
 		self.sendqueue = {}
 		self.recvqueue = {}
@@ -184,11 +186,13 @@ do -- tcpclient
 
 	function tcpclient:process()
 		if self.connected then
-			if #self.recvqueue>0 and self.recvqueue[1]:process() then
-				table.remove(self.recvqueue, 1)
-			end
-			if #self.sendqueue>0 and self.sendqueue[1]:process() then
-				table.remove(self.sendqueue, 1)
+			for i=1, self.pollrate do
+				if #self.recvqueue>0 and self.recvqueue[1]:process() then
+					table.remove(self.recvqueue, 1)
+				end
+				if #self.sendqueue>0 and self.sendqueue[1]:process() then
+					table.remove(self.sendqueue, 1)
+				end
 			end
 		elseif self.connecting and self.connecting:process() then
 			self.connecting = nil
@@ -204,21 +208,21 @@ do -- tcpclient
 	end
 end
 
-local sock = tcpclient:new()
+local sock = tcpclient:new(10)
 sock:connect("sparkysandbox.org", 80, function()
-	sock:send("GET / HTTP/1.0\r\nHost: sparkysandbox.org\r\n\r\n", nil, error)
 	-- Keep reading until it closes or times out.
 	local chunks = {}
 	local function receiveData()
-		sock:receive(function(data, closed)
+		sock:receive(function(data, err)
 			chunks[#chunks+1] = data
-			if closed then
+			if err=="closed" then
 				print(table.concat(chunks))
 			else
 				receiveData()
 			end
 		end, error)
 	end
-	receiveData()
+
+	sock:send("GET / HTTP/1.0\r\nHost: sparkysandbox.org\r\n\r\n", receiveData, error)
 end, error)
 
