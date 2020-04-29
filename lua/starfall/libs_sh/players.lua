@@ -649,11 +649,12 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = ply.sf_animation
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
 		checkluatype(time, TYPE_NUMBER)
 		
-		ply.sf_animation.progress = time / ply.sf_animation.duration
+		anim.progress = (time / anim.duration - anim.min) * (1 / anim.range)
 	end
 	
 	--- Sets the animation playback rate
