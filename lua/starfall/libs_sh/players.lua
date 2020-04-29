@@ -6,6 +6,37 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
+else
+	-- Player animation
+	hook.Add("CalcMainActivity", "sf_player_animation", function(ply, vel)
+		local anim = ply.sf_animation
+		if not anim then return end
+		
+		if anim.auto then
+			anim.progress = anim.progress + FrameTime() / anim.duration * anim.rate / anim.range
+			
+			local more = anim.progress > 1
+			if more or anim.progress < 0 then
+				if anim.loop then
+					if anim.bounce then
+						anim.rate = -anim.rate
+						anim.progress = -anim.progress + (more and 2 or 0)
+					else
+						anim.progress = anim.progress % 1
+					end
+				else
+					ply.sf_animation = nil
+					
+					return
+				end
+			end
+		end
+		
+		ply:SetCycle(anim.min + anim.progress * anim.range)
+		
+		local seq = anim.sequence
+		return anim.activity or seq, seq
+	end)
 end
 
 --- Player type
@@ -492,7 +523,7 @@ if CLIENT then
 		ply:AnimResetGestureSlot(slot)
 	end
 	
-	-- Sets the weight of the gesture animation in the given gesture slot
+	--- Sets the weight of the gesture animation in the given gesture slot
 	-- @client
 	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	-- @param weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
@@ -513,6 +544,213 @@ if CLIENT then
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
 		ply:AnimSetGestureWeight(slot, weight)
+	end
+	
+	--- Plays an animation on the player
+	-- @client
+	-- @param sequence Sequence number or string name
+	-- @param progress Optional float (Default 0), the progress of the animation. Ranging from 0-1
+	-- @param rate Optional float (Default 1), the playback rate of the animation
+	-- @param loop Optional bool (Default false), should the animation loop
+	-- @param auto_advance Optional bool (Default true), should the animation handle advancing itself
+	-- @param act Optional number or string name (Default sequence value), the activity the player should use
+	function player_methods:setAnimation(seq, progress, rate, loop, auto_advance, act)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if isstring(seq) then
+			seq = ply:LookupSequence(seq)
+		elseif not isnumber(seq) then
+			SF.ThrowTypeError("number or string", SF.GetType(seq), 2)
+		end
+		
+		if progress == nil then
+			progress = 0
+		else
+			checkluatype(progress, TYPE_NUMBER)
+		end
+		
+		if rate == nil then
+			rate = 1
+		else
+			checkluatype(rate, TYPE_NUMBER)
+		end
+		
+		if act ~= nil then
+			if isstring(act) then
+				act = ply:LookupSequence(act)
+			elseif act ~= nil and not isnumber(act) then
+				SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
+			end
+		end
+		
+		ply:SetCycle(progress)
+		
+		ply.sf_animation = {}
+		ply.sf_animation.sequence = seq
+		ply.sf_animation.activity = act
+		ply.sf_animation.rate = rate
+		ply.sf_animation.loop = loop and true or false
+		ply.sf_animation.auto = auto_advance ~= false
+		ply.sf_animation.bounce = false
+		ply.sf_animation.min = 0
+		ply.sf_animation.max = 1
+		
+		ply.sf_animation.range = 1
+		ply.sf_animation.progress = progress
+		ply.sf_animation.duration = ply:SequenceDuration(seq)
+	end
+	
+	--- Resets the animation
+	-- @client
+	function player_methods:resetAnimation()
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		ply.sf_animation = nil
+	end
+	
+	--- Sets the animation activity
+	-- @client
+	-- @param activity number or string name, keep empty to use the animation sequence
+	function player_methods:setAnimationActivity(act)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		if isstring(act) then
+			act = ply:LookupSequence(act)
+		elseif act ~= nil and not isnumber(act) then
+			SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
+		end
+		
+		ply.sf_animation.activity = act
+	end
+	
+	--- Sets the animation progress
+	-- @client
+	-- @param progress The progress of the animation. Ranging from 0-1
+	function player_methods:setAnimationProgress(progress)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		checkluatype(progress, TYPE_NUMBER)
+		
+		ply.sf_animation.progress = progress
+	end
+	
+	--- Sets the animation time
+	-- @client
+	-- @param time The time of the animation in seconds. Float
+	function player_methods:setAnimationTime(time)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		checkluatype(time, TYPE_NUMBER)
+		
+		ply.sf_animation.progress = time / ply.sf_animation.duration
+	end
+	
+	--- Sets the animation playback rate
+	-- @client
+	-- @param rate The playback rate of the animation. Float
+	function player_methods:setAnimationRate(rate)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		checkluatype(rate, TYPE_NUMBER)
+		
+		ply.sf_animation.rate = rate
+	end
+	
+	--- Sets the animation audo advance
+	-- @client
+	-- @param auto_advance Should the animation handle advancing itself. Bool
+	function player_methods:setAnimationAutoAdvance(auto_advance)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		ply.sf_animation.auto = auto_advance and true or false
+	end
+	
+	--- Sets the animation bounce
+	-- @client
+	-- @param bounce Should the animation bounce instead of loop. Bool
+	function player_methods:setAnimationBounce(bounce)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		ply.sf_animation.bounce = bounce and true or false
+	end
+	
+	--- Sets the animation loop
+	-- @client
+	-- @param loop Should the animation loop. Bool
+	function player_methods:setAnimationLoop(loop)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		ply.sf_animation.loop = loop and true or false
+	end
+	
+	--- Sets the animation range
+	-- @client
+	-- @param min Min. Ranging from 0-1
+	-- @param max Max. Ranging from 0-1
+	function player_methods:setAnimationRange(min, max)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		
+		checkluatype(min, TYPE_NUMBER)
+		checkluatype(max, TYPE_NUMBER)
+		
+		ply.sf_animation.min = math.max(min, 0)
+		ply.sf_animation.max = math.min(max, 1)
+		ply.sf_animation.range = ply.sf_animation.max - ply.sf_animation.min
+	end
+	
+	--- Gets whether a animation is playing
+	-- @client
+	-- @return True or false
+	function player_methods:isPlayingAnimation()
+		local ply = getply(self)
+		return ply.sf_animation and true or false
+	end
+	
+	--- Gets the progress of the animation ranging 0-1
+	-- @client
+	-- @return Progress ranging 0-1
+	function player_methods:getAnimationProgress()
+		local ply = getply(self)
+		
+		if not ply.sf_animation then return 0 end
+		return ply.sf_animation.progress
+	end
+	
+	--- Gets the animation time
+	-- @client
+	-- @return Time in seconds
+	function player_methods:getAnimationTime()
+		local ply = getply(self)
+		
+		local anim = ply.sf_animation
+		if not anim then return 0 end
+		return (anim.progress * anim.range + anim.min) * anim.duration
 	end
 end
 
