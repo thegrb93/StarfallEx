@@ -92,20 +92,10 @@ function net_library.send(target, unreliable)
 	if unreliable then checkluatype(unreliable, TYPE_BOOL) end
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
-	netBurst:use(instance.player, instance.data.net.size)
-
-	local data = instance.data.net.data
-	if #data == 0 then return false end
-	net.Start("SF_netmessage", unreliable)
-	net.WriteEntity(instance.data.entity)
-	for i = 1, #data do
-		local args = data[i][2]
-		data[i][1](unpack(args, 1, table.maxn(args)))
-	end
-
+	local newtarget
 	if SERVER then
 		if target then
-			local newtarget = instance.UnwrapObject(target)
+			newtarget = instance.UnwrapObject(target)
 			if newtarget then
 				if not (newtarget.IsValid and newtarget.IsPlayer and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
 			else
@@ -120,6 +110,20 @@ function net_library.send(target, unreliable)
 					end
 				end
 			end
+		end
+	end
+
+	netBurst:use(instance.player, instance.data.net.size)
+
+	net.Start("SF_netmessage", unreliable)
+	net.WriteEntity(instance.data.entity)
+	local data = instance.data.net.data
+	for i = 1, #data do
+		local args = data[i][2]
+		data[i][1](unpack(args, 1, table.maxn(args)))
+	end
+	if SERVER then
+		if newtarget then
 			net.Send(newtarget)
 		else
 			net.Broadcast()
