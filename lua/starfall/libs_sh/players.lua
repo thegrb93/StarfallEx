@@ -451,27 +451,27 @@ if CLIENT then
 	--- Returns the relationship of the player to the local client
 	-- @return One of: "friend", "blocked", "none", "requested"
 	function player_methods:getFriendStatus()
-		getply(self):GetFriendStatus()
+		return getply(self):GetFriendStatus()
 	end
 
 	--- Returns whether the local player has muted the player
 	-- @return True if the player was muted
 	function player_methods:isMuted()
-		getply(self):IsMuted()
+		return getply(self):IsMuted()
 	end
 	
 	--- Returns whether the player is heard by the local player.
 	-- @client
 	-- @return bool true/false
 	function player_methods:isSpeaking()
-		getply(self):IsSpeaking()
+		return getply(self):IsSpeaking()
 	end
 
 	--- Returns the voice volume of the player
 	-- @client
 	-- @return Returns the players voice volume, how loud the player's voice communication currently is, as a normal number. Doesn't work on local player unless the voice_loopback convar is set to 1.
 	function player_methods:voiceVolume()
-		getply(self):VoiceVolume()
+		return getply(self):VoiceVolume()
 	end
 	
 	--- Plays gesture animations on a player
@@ -481,20 +481,11 @@ if CLIENT then
 	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	-- @param weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:playGesture(animation, loop, slot, weight)
-		if slot == nil then
-			slot = GESTURE_SLOT_CUSTOM
-		else
-			checkluatype(slot, TYPE_NUMBER)
-		end
-		
-		if weight == nil then
-			weight = 1
-		else
-			checkluatype(weight, TYPE_NUMBER)
-		end
-		
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
+		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
 		
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
@@ -511,14 +502,10 @@ if CLIENT then
 	-- @client
 	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	function player_methods:resetGesture(slot)
-		if slot == nil then
-			slot = GESTURE_SLOT_CUSTOM
-		else
-			checkluatype(slot, TYPE_NUMBER)
-		end
-		
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
 		
 		ply:AnimResetGestureSlot(slot)
 	end
@@ -528,20 +515,11 @@ if CLIENT then
 	-- @param slot Optional int (Default GESTURE_SLOT.CUSTOM), the gesture slot to use. GESTURE_SLOT table values
 	-- @param weight Optional float (Default 1), the weight of the gesture. Ranging from 0-1
 	function player_methods:setGestureWeight(slot, weight)
-		if slot == nil then
-			slot = GESTURE_SLOT_CUSTOM
-		else
-			checkluatype(slot, TYPE_NUMBER)
-		end
-		
-		if weight == nil then
-			weight = 1
-		else
-			checkluatype(weight, TYPE_NUMBER)
-		end
-		
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
+		
+		if slot == nil then slot = GESTURE_SLOT_CUSTOM else checkluatype(slot, TYPE_NUMBER) end
+		if weight == nil then weight = 1 else checkluatype(weight, TYPE_NUMBER) end
 		
 		ply:AnimSetGestureWeight(slot, weight)
 	end
@@ -564,22 +542,13 @@ if CLIENT then
 			SF.ThrowTypeError("number or string", SF.GetType(seq), 2)
 		end
 		
-		if progress == nil then
-			progress = 0
-		else
-			checkluatype(progress, TYPE_NUMBER)
-		end
-		
-		if rate == nil then
-			rate = 1
-		else
-			checkluatype(rate, TYPE_NUMBER)
-		end
+		if progress == nil then progress = 0 else checkluatype(progress, TYPE_NUMBER) end
+		if rate == nil then rate = 1 else checkluatype(rate, TYPE_NUMBER) end
 		
 		if act ~= nil then
 			if isstring(act) then
 				act = ply:LookupSequence(act)
-			elseif act ~= nil and not isnumber(act) then
+			elseif not isnumber(act) then
 				SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
 			end
 		end
