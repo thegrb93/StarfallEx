@@ -6,37 +6,66 @@ local registerprivilege = SF.Permissions.registerPrivilege
 if SERVER then
 	-- Register privileges
 	registerprivilege("player.dropweapon", "DropWeapon", "Drops a weapon from the player", { entities = {} })
-else
-	-- Player animation
-	hook.Add("CalcMainActivity", "sf_player_animation", function(ply, vel)
-		local anim = ply.sf_animation
-		if not anim then return end
-		
-		if anim.auto then
-			anim.progress = anim.progress + FrameTime() / anim.duration * anim.rate / anim.range
-			
-			local more = anim.progress > 1
-			if more or anim.progress < 0 then
-				if anim.loop then
-					if anim.bounce then
-						anim.rate = -anim.rate
-						anim.progress = -anim.progress + (more and 2 or 0)
-					else
-						anim.progress = anim.progress % 1
-					end
-				else
-					ply.sf_animation = nil
+end
+
+-- Player animation
+local playerAnimAdd
+local playerAnimRemove
+local playerAnimGet
+if CLIENT then
+	local playerAnimation
+	
+	playerAnimAdd = function(ply, anim)
+		if table.Count(playerAnimation) == 3 then
+			hook.Add("CalcMainActivity", "sf_player_animation", function(ply, vel)
+				local anim = playerAnimation[ply]
+				if not anim then return end
+				
+				if anim.auto then
+					anim.progress = anim.progress + FrameTime() / anim.duration * anim.rate / anim.range
 					
-					return
+					local more = anim.progress > 1
+					if more or anim.progress < 0 then
+						if anim.loop then
+							if anim.bounce then
+								anim.rate = -anim.rate
+								anim.progress = -anim.progress + (more and 2 or 0)
+							else
+								anim.progress = anim.progress % 1
+							end
+						else
+							playerAnimRemove(ply)
+							
+							return
+						end
+					end
 				end
-			end
+				
+				ply:SetCycle(anim.min + anim.progress * anim.range)
+				
+				local seq = anim.sequence
+				return anim.activity or seq, seq
+			end)
 		end
 		
-		ply:SetCycle(anim.min + anim.progress * anim.range)
+		playerAnimation[ply] = anim
 		
-		local seq = anim.sequence
-		return anim.activity or seq, seq
-	end)
+		return anim
+	end
+	
+	playerAnimRemove = function(ply)
+		playerAnimation[ply] = nil
+		
+		if table.Count(playerAnimation) == 3 then
+			hook.Remove("CalcMainActivity", "sf_player_animation")
+		end
+	end
+	
+	playerAnimGet = function(ply)
+		return playerAnimation[ply]
+	end
+	
+	playerAnimation = SF.EntityTable("playerAnimation", playerAnimRemove, true)
 end
 
 --- Player type
@@ -555,19 +584,19 @@ if CLIENT then
 		
 		ply:SetCycle(progress)
 		
-		ply.sf_animation = {}
-		ply.sf_animation.sequence = seq
-		ply.sf_animation.activity = act
-		ply.sf_animation.rate = rate
-		ply.sf_animation.loop = loop and true or false
-		ply.sf_animation.auto = auto_advance ~= false
-		ply.sf_animation.bounce = false
-		ply.sf_animation.min = 0
-		ply.sf_animation.max = 1
+		local anim = playerAnimAdd(ply, {})
+		anim.sequence = seq
+		anim.activity = act
+		anim.rate = rate
+		anim.loop = loop and true or false
+		anim.auto = auto_advance ~= false
+		anim.bounce = false
+		anim.min = 0
+		anim.max = 1
 		
-		ply.sf_animation.range = 1
-		ply.sf_animation.progress = progress
-		ply.sf_animation.duration = ply:SequenceDuration(seq)
+		anim.range = 1
+		anim.progress = progress
+		anim.duration = ply:SequenceDuration(seq)
 	end
 	
 	--- Resets the animation
@@ -576,7 +605,7 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		ply.sf_animation = nil
+		playerAnimRemove(ply)
 	end
 	
 	--- Sets the animation activity
@@ -586,7 +615,8 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
 		if isstring(act) then
 			act = ply:LookupSequence(act)
@@ -594,7 +624,7 @@ if CLIENT then
 			SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
 		end
 		
-		ply.sf_animation.activity = act
+		anim.activity = act
 	end
 	
 	--- Sets the animation progress
@@ -604,11 +634,12 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
 		checkluatype(progress, TYPE_NUMBER)
 		
-		ply.sf_animation.progress = progress
+		anim.progress = progress
 	end
 	
 	--- Sets the animation time
@@ -618,7 +649,7 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		local anim = ply.sf_animation
+		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
 		checkluatype(time, TYPE_NUMBER)
@@ -633,11 +664,12 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
 		checkluatype(rate, TYPE_NUMBER)
 		
-		ply.sf_animation.rate = rate
+		anim.rate = rate
 	end
 	
 	--- Sets the animation audo advance
@@ -647,9 +679,10 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		ply.sf_animation.auto = auto_advance and true or false
+		anim.auto = auto_advance and true or false
 	end
 	
 	--- Sets the animation bounce
@@ -659,9 +692,10 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		ply.sf_animation.bounce = bounce and true or false
+		anim.bounce = bounce and true or false
 	end
 	
 	--- Sets the animation loop
@@ -671,9 +705,10 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		ply.sf_animation.loop = loop and true or false
+		anim.loop = loop and true or false
 	end
 	
 	--- Sets the animation range
@@ -684,14 +719,15 @@ if CLIENT then
 		local ply = getply(self)
 		checkpermission(instance, ply, "entities.setPlayerRenderProperty")
 		
-		if not ply.sf_animation then SF.Throw("No animation is playing.", 2) end
+		local anim = playerAnimGet(ply)
+		if not anim then SF.Throw("No animation is playing.", 2) end
 		
 		checkluatype(min, TYPE_NUMBER)
 		checkluatype(max, TYPE_NUMBER)
 		
-		ply.sf_animation.min = math.max(min, 0)
-		ply.sf_animation.max = math.min(max, 1)
-		ply.sf_animation.range = ply.sf_animation.max - ply.sf_animation.min
+		anim.min = math.max(min, 0)
+		anim.max = math.min(max, 1)
+		anim.range = anim.max - anim.min
 	end
 	
 	--- Gets whether a animation is playing
@@ -699,7 +735,7 @@ if CLIENT then
 	-- @return True or false
 	function player_methods:isPlayingAnimation()
 		local ply = getply(self)
-		return ply.sf_animation and true or false
+		return playerAnimGet(ply) and true or false
 	end
 	
 	--- Gets the progress of the animation ranging 0-1
@@ -707,9 +743,10 @@ if CLIENT then
 	-- @return Progress ranging 0-1
 	function player_methods:getAnimationProgress()
 		local ply = getply(self)
+		local anim = playerAnimGet(ply)
 		
-		if not ply.sf_animation then return 0 end
-		return ply.sf_animation.progress
+		if not anim then return 0 end
+		return anim.progress
 	end
 	
 	--- Gets the animation time
@@ -717,8 +754,8 @@ if CLIENT then
 	-- @return Time in seconds
 	function player_methods:getAnimationTime()
 		local ply = getply(self)
+		local anim = playerAnimGet(ply)
 		
-		local anim = ply.sf_animation
 		if not anim then return 0 end
 		return (anim.progress * anim.range + anim.min) * anim.duration
 	end
