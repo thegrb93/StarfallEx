@@ -90,36 +90,30 @@ end)
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
-local EntityTable = {
-	__newindex = function(t, e, v)
-		rawset(t, e, v)
-		if t.wait then
-			e:CallOnRemove("SF_" .. t.key, function()
-				timer.Simple(0, function()
-					if t[e] and not e:IsValid() then
-						t[e] = nil
-						if t.destructor then t.destructor(e, v) end
-					end
-				end)
-			end)
-		else
-			e:CallOnRemove("SF_" .. t.key, function()
-				if t[e] then
-					t[e] = nil
-					if t.destructor then t.destructor(e, v) end
-				end
-			end)
-		end
-	end
-}
 -- Returns a class that manages a table of entity keys
 function SF.EntityTable(key, destructor, dontwait)
-	local t = {
-		key = key,
-		destructor = destructor,
-		wait = CLIENT and not dontwait
-	}
-	return setmetatable(t, EntityTable)
+	return setmetatable({}, {
+		__newindex = function(t, e, v)
+			rawset(t, e, v)
+			if dontwait then
+				e:CallOnRemove("SF_" .. key, function()
+					if t[e] then
+						t[e] = nil
+						if destructor then destructor(e, v) end
+					end
+				end)
+			else
+				e:CallOnRemove("SF_" .. key, function()
+					timer.Simple(0, function()
+						if t[e] and not e:IsValid() then
+							t[e] = nil
+							if destructor then destructor(e, v) end
+						end
+					end)
+				end)
+			end
+		end
+	})
 end
 
 --- Returns a class that wraps a structure and caches indexes
