@@ -49,60 +49,6 @@ end
 function TabHandler:Cleanup() -- Called when editor is reloaded/removed
 end
 
-function initDoc(html)
-	function addPage(name, class, iconType, icon, data, parent)
-		local dataJson = util.TableToJSON(data)
-		html:RunJavascript([[SF_DOC.AddPage("]]..name..[[", "]]..class..[[", "]]..iconType..[[", "]]..icon..[[", ]]..dataJson..[[, "]]..parent..[[")]])
-	end
-	addPage("Libraries", "category", "", "", {}, "")
-	addPage("Types", "category", "", "", {}, "")
-	addPage("Hooks", "category", "", "", {}, "")
-
-	--Libraries
-	for _, lib in pairs(SF.Docs.Libraries) do
-
-		local libData = {
-			name = lib.name,
-			realm = lib.realm,
-			description = lib.description,
-			methods = {}
-		};
-		
-		for _, method in pairs(lib.methods) do
-			libData.methods[method.name] = method.description;
-		
-		end
-
-		addPage(lib.name, "library", "realm", lib.realm, libData, "Libraries")
-		
-		
-		local path = "Libraries."..lib.name
-			
-		for _, method in pairs(lib.methods) do
-			addPage(method.name, "method", "realm", method.realm, {}, path)
-		
-		end
-	
-	end
-
-	for _, hook in pairs(SF.Docs.Hooks) do
-
-		addPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks")
-	
-	end
-
-	for _, t in pairs(SF.Docs.Types) do
-
-		addPage(t.name, "type", "realm", t.realm, {}, "Types")
-	
-	end
-
-
-	html:RunJavascript("SF_DOC.FinishSetup()")
-end
-
-
-
 -----------------------
 -- VGUI part (content)
 -----------------------
@@ -114,7 +60,9 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
 	html:OpenURL("asset://garrysmod/html/sf_doc.html")
-	timer.Simple(1, function() initDoc(html) end)
+	timer.Simple(1, function()
+		html:RunJavascript([[SF_DOC.BuildPages("]]..util.TableToJSON(SF.Docs)..[[");]])
+	end)
 	self.html = html
 	htmlSetup(nil, self)
 end
