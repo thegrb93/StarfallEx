@@ -44,30 +44,27 @@ const SF_DOC = {
         }
 
     },
+    BuildPages: (jsonString) =>
+    {
+        var DocTable = JSON.parse(jsonString);
+        
+        
+        this.FinishSetup();
+    },
     FinishSetup: () =>
     {
         ReactDOM.render(<App sidebarItems = {sidebarItems} pages={pages} />, document.getElementById("root"));
     }
 }
 
-/*SF_DOC.AddPage("Test Category", "category", "", "", {});
-
-SF_DOC.AddPage("Test Item", "category", {}, "", "", "Test Category");
-
-for (let i = 0; i < 5; i++) {
-    SF_DOC.AddPage("Test Category "+i, "category", "", "", {});
-    for (let v = 0; v < 10; v++) {
-        let icon = ""
-        switch(Math.floor(Math.random() * 3)){
-            case 0: icon = "shared"; break;
-            case 1: icon = "server"; break;
-            case 2: icon = "client"; break;
-        }
-        SF_DOC.AddPage("Test Item "+v, "category", "realm", icon, "", "Test Category "+i);
-    }
-}
-
-SF_DOC.FinishSetup(); */
+var xmlhttp = new XMLHttpRequest();
+xmlhttp.onreadystatechange = function() {
+  if (this.readyState == 4 && this.status == 200) {
+    SF_DOC.BuildPages(this.responseText);
+  }
+};
+xmlhttp.open("GET", "docs.json", true);
+xmlhttp.send(); 
 
 window.SF_DOC = SF_DOC;
 
