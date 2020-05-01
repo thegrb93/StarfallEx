@@ -19,8 +19,8 @@ const SF_DOC = {
         const sidebarItem = {
             name: name,
             collapsed: false,
-			iconType: iconType,
-			icon: icon,
+            iconType: iconType,
+            icon: icon,
             hidden: false,
             children: []
         }
@@ -47,8 +47,45 @@ const SF_DOC = {
     BuildPages: (jsonString) =>
     {
         var DocTable = JSON.parse(jsonString);
-        
-        
+
+        this.AddPage("Libraries", "category", "", "", {}, "");
+        this.AddPage("Types", "category", "", "", {}, "");
+        this.AddPage("Hooks", "category", "", "", {}, "");
+
+        for (const libkey in DocTable.Libraries) {
+            const lib = DocTable.Libraries[libkey];
+
+            var libData = {
+                name: lib.name,
+                realm: lib.realm,
+                description: lib.description,
+                methods: []
+            };
+
+            for (const methodkey in lib.methods) {
+                const method = lib.methods[methodkey];
+                libData.methods[method.name] = method.description;
+            }
+
+            this.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
+
+            const path = "Libraries."+lib.name
+            for (const methodkey in lib.methods) {
+                const method = lib.methods[methodkey];
+                this.AddPage(method.name, "method", "realm", method.realm, {}, path);
+            }
+        }
+
+        for (const hookkey in DocTable.Hooks) {
+            const hook = DocTable.Hooks[hookkey];
+            this.AddPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks");
+        }
+
+        for (const typekey in DocTable.Types) {
+            const t = DocTable.Types[typekey];
+            this.AddPage(t.name, "type", "realm", t.realm, {}, "Types");
+        }
+
         this.FinishSetup();
     },
     FinishSetup: () =>
@@ -63,8 +100,8 @@ xmlhttp.onreadystatechange = function() {
     SF_DOC.BuildPages(this.responseText);
   }
 };
-xmlhttp.open("GET", "docs.json", true);
-xmlhttp.send(); 
+xmlhttp.open("GET", "sf_docs.json", true);
+xmlhttp.send();
 
 window.SF_DOC = SF_DOC;
 
