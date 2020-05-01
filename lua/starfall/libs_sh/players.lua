@@ -16,7 +16,7 @@ if CLIENT then
 	local playerAnimation
 	
 	playerAnimAdd = function(ply, anim)
-		if table.Count(playerAnimation) == 3 then
+		if next(playerAnimation) == nil then
 			hook.Add("CalcMainActivity", "sf_player_animation", function(ply, vel)
 				local anim = playerAnimation[ply]
 				if not anim then return end
@@ -56,7 +56,7 @@ if CLIENT then
 	playerAnimRemove = function(ply)
 		playerAnimation[ply] = nil
 		
-		if table.Count(playerAnimation) == 3 then
+		if next(playerAnimation) == nil then
 			hook.Remove("CalcMainActivity", "sf_player_animation")
 		end
 	end
