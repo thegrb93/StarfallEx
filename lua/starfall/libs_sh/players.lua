@@ -357,6 +357,16 @@ function player_methods:isSprinting()
 end
 
 if SERVER then
+	--- Lets you change the size of yourself if the server has sf_permissions_entity_owneraccess 1
+    -- @param scale The scale to apply (min 0.001, max 100)
+	-- @server
+	function player_methods:setModelScale(scale)
+		checkluatype(scale, TYPE_NUMBER)
+		local ply = getply(self)
+		checkpermission(instance, ply, "entities.setRenderProperty")
+		ply:SetModelScale(math.Clamp(scale, 0.001, 100))
+	end
+
 	--- Sets the view entity of the player. Only works if they are linked to a hud.
 	-- @server
 	-- @param ent Entity to set the player's view entity to, or nothing to reset it
