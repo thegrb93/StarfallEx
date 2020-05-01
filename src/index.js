@@ -50,8 +50,7 @@ const SF_DOC = {
         this.AddPage("Types", "category", "", "", {}, "");
         this.AddPage("Hooks", "category", "", "", {}, "");
 
-        for (const libkey in DocTable.Libraries) {
-            const lib = DocTable.Libraries[libkey];
+        for (const [_, lib] of Object.entries(DocTable.Libraries)) {
 
             var libData = {
                 name: lib.name,
@@ -60,27 +59,23 @@ const SF_DOC = {
                 methods: []
             };
 
-            for (const methodkey in lib.methods) {
-                const method = lib.methods[methodkey];
+            for (const [_, method] of Object.entries(lib.methods)) {
                 libData.methods[method.name] = method.description;
             }
 
             this.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
 
             const path = "Libraries."+lib.name
-            for (const methodkey in lib.methods) {
-                const method = lib.methods[methodkey];
+            for (const [_, method] of Object.entries(lib.methods)) {
                 this.AddPage(method.name, "method", "realm", method.realm, {}, path);
             }
         }
 
-        for (const hookkey in DocTable.Hooks) {
-            const hook = DocTable.Hooks[hookkey];
+        for (const [_, hook] of Object.entries(DocTable.Hooks)) {
             this.AddPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks");
         }
 
-        for (const typekey in DocTable.Types) {
-            const t = DocTable.Types[typekey];
+        for (const [_, t] of Object.entries(DocTable.Types)) {
             this.AddPage(t.name, "type", "realm", t.realm, {}, "Types");
         }
 
