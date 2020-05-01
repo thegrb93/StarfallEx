@@ -44,10 +44,8 @@ const SF_DOC = {
         }
 
     },
-    BuildPages: (jsonString) =>
+    BuildPages: (DocTable) =>
     {
-        var DocTable = JSON.parse(jsonString);
-
         this.AddPage("Libraries", "category", "", "", {}, "");
         this.AddPage("Types", "category", "", "", {}, "");
         this.AddPage("Hooks", "category", "", "", {}, "");
@@ -97,7 +95,7 @@ const SF_DOC = {
 var xmlhttp = new XMLHttpRequest();
 xmlhttp.onreadystatechange = function() {
   if (this.readyState == 4 && this.status == 200) {
-    SF_DOC.BuildPages(this.responseText);
+    SF_DOC.BuildPages(JSON.parse(this.responseText));
   }
 };
 xmlhttp.open("GET", "sf_docs.json", true);
