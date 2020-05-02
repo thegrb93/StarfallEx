@@ -573,6 +573,8 @@ if CLIENT then
 		
 		if progress == nil then progress = 0 else checkluatype(progress, TYPE_NUMBER) end
 		if rate == nil then rate = 1 else checkluatype(rate, TYPE_NUMBER) end
+		if loop == nil then loop = false else checkluatype(loop, TYPE_BOOLEAN) end
+		if auto_advance == nil then auto_advance = true else checkluatype(auto_advance, TYPE_BOOLEAN) end
 		
 		if act ~= nil then
 			if isstring(act) then
@@ -588,8 +590,8 @@ if CLIENT then
 		anim.sequence = seq
 		anim.activity = act
 		anim.rate = rate
-		anim.loop = loop and true or false
-		anim.auto = auto_advance ~= false
+		anim.loop = loop
+		anim.auto = auto_advance
 		anim.bounce = false
 		anim.min = 0
 		anim.max = 1
@@ -682,7 +684,9 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		anim.auto = auto_advance and true or false
+		checkluatype(auto_advance, TYPE_BOOLEAN)
+		
+		anim.auto = auto_advance
 	end
 	
 	--- Sets the animation bounce
@@ -695,7 +699,9 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		anim.bounce = bounce and true or false
+		checkluatype(bounce, TYPE_BOOLEAN)
+		
+		anim.bounce = bounce
 	end
 	
 	--- Sets the animation loop
@@ -708,7 +714,9 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		anim.loop = loop and true or false
+		checkluatype(loop, TYPE_BOOLEAN)
+		
+		anim.loop = loop
 	end
 	
 	--- Sets the animation range
@@ -735,7 +743,7 @@ if CLIENT then
 	-- @return True or false
 	function player_methods:isPlayingAnimation()
 		local ply = getply(self)
-		return playerAnimGet(ply) and true or false
+		return playerAnimGet(ply) ~= nil
 	end
 	
 	--- Gets the progress of the animation ranging 0-1
