@@ -1,6 +1,7 @@
 local lfs = require"lfs"
 local json = require"json"
 
+print(lfs.currentdir())
 local outputdir = arg[1] or "."
 local sourcecode = arg[2] or "../lua/starfall"
 
