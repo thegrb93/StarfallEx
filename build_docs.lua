@@ -1,5 +1,5 @@
 local lfs = require"lfs"
-local json = require"json"
+local json = require"json.lua"
 
 io.write(lfs.currentdir())
 local outputdir = arg[1] or "."
