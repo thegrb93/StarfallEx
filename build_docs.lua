@@ -11,7 +11,7 @@ local function readModules(path)
         if not moduleTbl then moduleTbl = {} SF.Modules[file] = moduleTbl end
         
         local filen = path.."/"..file
-        local f = assert(lfs.open(filen, "r"))
+        local f = assert(io.open(filen, "r"))
         moduleTbl[filen] = {source = f:read("*all")}
         f:close()
     end
@@ -22,6 +22,6 @@ readModules(sourcecode.."/libs_sv")
 
 require(sourcecode.."/editor/docs")
 
-local docout = assert(lfs.open(outputdir.."/sf_doc.json", "w"))
+local docout = assert(io.open(outputdir.."/sf_doc.json", "w"))
 docout:write(json.encode(SF.Docs))
 docout:close()
