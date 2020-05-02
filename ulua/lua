@@ -20,6 +20,6 @@ else
   echo "ERROR - Unsupported system: ""$(uname -s)" 1>&2 && exit 1
 fi
 LJ_CORE="$LUA_ROOT""/""$LJ_VER_EXT""/""$LJ_SYS""/""$LJ_ARCH"
-LUA_PATH="$LUA_ROOT""/?/init.lua;""$LUA_ROOT""/?.lua;""$LJ_CORE""/?/init.lua;""$LJ_CORE""/?.lua;"
+LUA_PATH="$LUA_ROOT""/../?.lua;""$LUA_ROOT""/../../starfall/editor/?.lua;""$LUA_ROOT""/?/init.lua;""$LUA_ROOT""/?.lua;""$LJ_CORE""/?/init.lua;""$LJ_CORE""/?.lua;"
 LUA_CPATH="$LUA_ROOT""/?.so;""$LUA_ROOT""/loadall.so;"
 LUA_ROOT="$LUA_ROOT" LUA_PATH="$LUA_PATH" LUA_CPATH="$LUA_CPATH" "$LJ_CORE""/"luajit -l__init $@

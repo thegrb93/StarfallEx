@@ -1,7 +1,6 @@
 local lfs = require"lfs"
-local json = require"json.lua"
+local json = require"json"
 
-io.write(lfs.currentdir())
 local outputdir = arg[1] or "."
 local sourcecode = arg[2] or "../lua/starfall"
 
@@ -21,7 +20,7 @@ readModules(sourcecode.."/libs_cl")
 readModules(sourcecode.."/libs_sh")
 readModules(sourcecode.."/libs_sv")
 
-require(sourcecode.."/editor/docs.lua")
+require"docs"
 
 local docout = assert(io.open(outputdir.."/sf_doc.json", "w"))
 docout:write(json.encode(SF.Docs))
