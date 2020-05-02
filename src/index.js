@@ -89,11 +89,11 @@ const SF_DOC = {
 
 var xmlhttp = new XMLHttpRequest();
 xmlhttp.onreadystatechange = function() {
-  if (this.readyState == 4 && this.status == 200) {
+  if (this.readyState === 4 && this.status === 200) {
     SF_DOC.BuildPages(JSON.parse(this.responseText));
   }
 };
-xmlhttp.open("GET", "sf_docs.json", true);
+xmlhttp.open("GET", "sf_doc.json", true);
 xmlhttp.send();
 
 window.SF_DOC = SF_DOC;
