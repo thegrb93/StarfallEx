@@ -20,7 +20,7 @@ readModules(sourcecode.."/libs_cl")
 readModules(sourcecode.."/libs_sh")
 readModules(sourcecode.."/libs_sv")
 
-require(sourcecode.."editor/docs")
+require(sourcecode.."/editor/docs")
 
 local docout = assert(lfs.open(outputdir.."/sf_doc.json", "w"))
 docout:write(json.encode(SF.Docs))
