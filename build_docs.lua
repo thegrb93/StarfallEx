@@ -1,7 +1,7 @@
 local lfs = require"lfs"
 local json = require"json"
 
-local outputdir = arg[1] or "../doc/"
+local outputdir = arg[1] or "."
 local sourcecode = arg[2] or "../lua/starfall"
 
 SF = {Modules = {}}
