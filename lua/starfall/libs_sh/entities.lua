@@ -1047,8 +1047,13 @@ function ents_methods:setFlexWeight(flexid, weight)
 	checkluatype(flexid, TYPE_NUMBER)
 	checkluatype(weight, TYPE_NUMBER)
 	flexid = math.floor(flexid)
-
-	checkpermission(instance, ent, "entities.setRenderProperty")
+	
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(instance, ent, "entities.setRenderProperty")
+	end
+	
 	if flexid < 0 or flexid >= ent:GetFlexNum() then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
@@ -1068,7 +1073,13 @@ end
 function ents_methods:setFlexScale(scale)
 	local ent = getent(self)
 	checkluatype(scale, TYPE_NUMBER)
-	checkpermission(instance, ent, "entities.setRenderProperty")
+	
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(instance, ent, "entities.setRenderProperty")
+	end
+	
 	ent:SetFlexScale(scale)
 end
 
