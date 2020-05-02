@@ -1,16 +1,27 @@
-
-require "luadoc"
+local lfs = require"lfs"
+local json = require"json"
 
 local outputdir = arg[1] or "../doc/"
 local sourcecode = arg[2] or "../lua/starfall"
 
-return luadoc.main({ sourcecode }, {
-	output_dir = outputdir,
-	basepath = sourcecode,
-	--template_dir = "luadoc/doclet/html/",
-	nomodules = false,
-	nofiles = true,
-	verbose = false,
-	taglet = "tagletsf",
-	doclet = "docletsfhtml",
-})
+SF = {Modules = {}}
+local function readModules(path)
+    for file in lfs.dir(path) do
+        local moduleTbl = SF.Modules[file]
+        if not moduleTbl then moduleTbl = {} SF.Modules[file] = moduleTbl end
+        
+        local filen = path.."/"..file
+        local f = assert(lfs.open(filen, "r"))
+        moduleTbl[filen] = {source = f:read("*all")}
+        f:close()
+    end
+end
+readModules(sourcecode.."/libs_cl")
+readModules(sourcecode.."/libs_sh")
+readModules(sourcecode.."/libs_sv")
+
+require(sourcecode.."/editor/docs")
+
+local docout = assert(lfs.open(outputdir.."/sf_doc.json", "w"))
+docout:write(json.encode(SF.Docs))
+docout:close()
