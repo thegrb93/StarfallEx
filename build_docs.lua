@@ -5,7 +5,7 @@ function string.Explode(separator, str, withpattern)
 	local current_pos = 1
 
 	for i = 1, #str do
-		local start_pos, end_pos = string.find( str, separator, current_pos, !withpattern )
+		local start_pos, end_pos = string.find( str, separator, current_pos, not withpattern )
 		if ( !start_pos ) then break end
 		ret[ i ] = string.sub( str, current_pos, start_pos - 1 )
 		current_pos = end_pos + 1
