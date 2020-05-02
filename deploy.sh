@@ -42,7 +42,7 @@ cd ..
 
 # Get files that have to be pushed to gh-pages
 echo "Moving doc files"
-cp -f sf_doc.json out/
+cp -f docgen/sf_doc.json out/
 
 cd out
 
