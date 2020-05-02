@@ -10,8 +10,9 @@ local function readModules(path)
         local moduleTbl = SF.Modules[file]
         if not moduleTbl then moduleTbl = {} SF.Modules[file] = moduleTbl end
         
-        local f = assert(lfs.open(path.."/"..file, "r"))
-        moduleTbl[#moduleTbl+1] = f:read("*all")
+        local filen = path.."/"..file
+        local f = assert(lfs.open(filen, "r"))
+        moduleTbl[filen] = {source = f:read("*all")}
         f:close()
     end
 end
