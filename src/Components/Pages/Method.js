@@ -11,7 +11,7 @@ export default function MethodPage(props)
 
     let paramPart = null;
     const paramList = props.parameters.map(x => 
-        (<li key={x.name}><span>{x.name}</span> - <span>{x.description}</span></li>)
+        (<li key={x.name}><span>{x.name}</span> - <span className="accept-newlines">{x.description}</span></li>)
     );
     if(paramList.length > 0)
     {
@@ -42,7 +42,7 @@ export default function MethodPage(props)
     return (
         <div className="page page-method">
             {titlePart}
-            <span className="description">{props.description}</span>
+            <span className="description accept-newlines">{props.description}</span>
             {paramPart}
             {returnsPart}
         </div>

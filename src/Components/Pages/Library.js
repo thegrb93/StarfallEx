@@ -11,7 +11,7 @@ export default function LibraryPage(props)
       methods.push((
             <tr key = {key}>
                 <td><ClickAction action={props.changePage} value ={props.path+"."+key}>{key}</ClickAction></td>
-                <td>{value}</td>
+                <td className="accept-newlines">{value}</td>
             </tr>
         ));
     }
@@ -20,7 +20,7 @@ export default function LibraryPage(props)
         <div className="page page-library">
             {props.path}
             <h1>{props.name}</h1>
-            <span>{props.description}</span>
+            <span className="accept-newlines">{props.description}</span>
 
             <h3>Methods:</h3>
             <table>

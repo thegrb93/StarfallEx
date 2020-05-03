@@ -9,7 +9,7 @@ export default function HookPage(props)
 
     let paramPart = null;
     const paramList = props.parameters.map(x => 
-        (<li key={x.name}><span>{x.name}</span> - <span>{x.description}</span></li>)
+        (<li key={x.name}><span>{x.name}</span> - <span className="accept-newlines">{x.description}</span></li>)
     );
     if(paramList.length > 0)
     {
@@ -23,7 +23,7 @@ export default function HookPage(props)
         );
     }
 
-    const returnsList = props.returns.map((x, index)=> <li key={index}>{x}</li>);
+    const returnsList = props.returns.map((x, index)=> <li key={index} className="accept-newlines">{x}</li>);
     let returnsPart = null;
     if(returnsList.length > 0)
     {
@@ -40,7 +40,7 @@ export default function HookPage(props)
     return (
         <div className="page page-hook">
             {titlePart}
-            <span className="description">{props.description}</span>
+            <span className="description accept-newlines">{props.description}</span>
             {paramPart}
             {returnsPart}
         </div>
