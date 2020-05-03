@@ -583,8 +583,8 @@ if CLIENT then
 		
 		if progress == nil then progress = 0 else checkluatype(progress, TYPE_NUMBER) end
 		if rate == nil then rate = 1 else checkluatype(rate, TYPE_NUMBER) end
-		if loop == nil then loop = false else checkluatype(loop, TYPE_BOOLEAN) end
-		if auto_advance == nil then auto_advance = true else checkluatype(auto_advance, TYPE_BOOLEAN) end
+		if loop == nil then loop = false else checkluatype(loop, TYPE_BOOL) end
+		if auto_advance == nil then auto_advance = true else checkluatype(auto_advance, TYPE_BOOL) end
 		
 		if act ~= nil then
 			if isstring(act) then
@@ -694,7 +694,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		checkluatype(auto_advance, TYPE_BOOLEAN)
+		checkluatype(auto_advance, TYPE_BOOL)
 		
 		anim.auto = auto_advance
 	end
@@ -709,7 +709,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		checkluatype(bounce, TYPE_BOOLEAN)
+		checkluatype(bounce, TYPE_BOOL)
 		
 		anim.bounce = bounce
 	end
@@ -724,7 +724,7 @@ if CLIENT then
 		local anim = playerAnimGet(ply)
 		if not anim then SF.Throw("No animation is playing.", 2) end
 		
-		checkluatype(loop, TYPE_BOOLEAN)
+		checkluatype(loop, TYPE_BOOL)
 		
 		anim.loop = loop
 	end
