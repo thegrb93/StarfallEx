@@ -22,6 +22,7 @@ const SF_DOC = {
             iconType: iconType,
             icon: icon,
             hidden: false,
+            type: type,
             children: []
         }
         const page = {
@@ -82,7 +83,15 @@ const SF_DOC = {
         }
 
         for (const [_, hook] of Object.entries(DocTable.Hooks)) {
-            SF_DOC.AddPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks");
+            let hookData = {
+                name: hook.name,
+                description: hook.description,
+                realm: hook.realm,
+                description: hook.description,
+                parameters: hook.params ?? [],
+                returns: hook.returns ?? []
+            }
+            SF_DOC.AddPage(hook.name, "hook", "realm", hook.realm, hookData, "Hooks");
         }
 
         for (const [_, t] of Object.entries(DocTable.Types)) {

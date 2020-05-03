@@ -69,19 +69,22 @@ function renderElements(items, dispatch, currentPage)
   const output = [];
 
   const sortedItems = items.sort((a,b)=>{
-    const name1 = a.name.toUpperCase();
-    const name2 = b.name.toUpperCase();
-
-    if(name1 < name2)
-    {
-      return -1;
-    }
-    else if(name1 > name2)
-    {
-      return 1;
-    }
-    return 0;
-  }) 
+      const name1 = a.name.toUpperCase();
+      const name2 = b.name.toUpperCase();
+      if(a.type == "category" && b.type == "category") //Categories are equal, don't sort them by name, just leave add-order
+      {
+        return 0;
+      }
+      if(name1 < name2)
+      {
+        return -1;
+      }
+      else if(name1 > name2)
+      {
+        return 1;
+      }
+      return 0;
+    });
 
   for(const item of sortedItems)
   {

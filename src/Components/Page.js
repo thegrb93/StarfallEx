@@ -2,6 +2,7 @@ import React from 'react';
 import LibraryPage from './Pages/Library';
 import MethodPage from './Pages/Method';
 import TypePage from './Pages/Type';
+import HookPage from './Pages/Hook';
 
 function mapClass(c)
 {
@@ -13,6 +14,8 @@ function mapClass(c)
       return MethodPage;
     case "type":
       return TypePage;
+    case "hook":
+      return HookPage;
     default:
       return null;
   }
