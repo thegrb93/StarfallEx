@@ -1410,3 +1410,46 @@ end
 builtins_library.class = SF.Class
 
 end
+
+--- Mark a file to be included in the upload.
+-- This is required to use the file in require() and dofile()
+-- @name include
+-- @class directive
+-- @param path Path to the file
+
+--- Mark a directory to be included in the upload.
+-- This is optional to include all files in the directory in require() and dofile()
+-- @name includedir
+-- @class directive
+-- @param path Path to the directory
+
+--- Set the name of the script.
+-- This will become the name of the tab and will show on the overlay of the processor. --@name Awesome script
+-- @name name
+-- @class directive
+-- @param name Name of the script
+
+--- Set the author of the script.
+-- This will set the author that will be shown on the overlay of the processor. --@author TheAuthor
+-- @name author
+-- @class directive
+-- @param author Author of the script
+
+--- Set the model of the processor entity. --@model models/props_junk/watermelon01.mdl
+-- @name model
+-- @class directive
+-- @param model String of the model
+
+--- Set the current file to only run on the server. Shared is default. --@server
+-- @name server
+-- @class directive
+
+--- Set the current file to only run on the client. Shared is default. --@client
+-- @name client
+-- @class directive
+
+--- Set the client file to run as main. Can only be used in the main file. --@clientmain somefile.txt
+-- @name clientmain
+-- @class directive
+-- @param filename The file to run as main on client
+
