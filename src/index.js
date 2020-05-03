@@ -52,7 +52,7 @@ const SF_DOC = {
 
         for (const [_, lib] of Object.entries(DocTable.Libraries)) {
 
-            var libData = {
+            let libData = {
                 name: lib.name,
                 realm: lib.realm,
                 description: lib.description,
@@ -67,7 +67,15 @@ const SF_DOC = {
 
             const path = "Libraries."+lib.name
             for (const [_, method] of Object.entries(lib.methods)) {
-                SF_DOC.AddPage(method.name, "method", "realm", method.realm, {}, path);
+                let methodData = {
+                    name: method.name,
+                    description: method.description,
+                    realm: method.realm,
+                    description: method.description,
+                    parameters: method.params ?? [],
+                    returns: method.returns ?? []
+                }
+                SF_DOC.AddPage(method.name, "method", "realm", method.realm, methodData, path);
             }
         }
 

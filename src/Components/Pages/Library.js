@@ -18,7 +18,9 @@ export default function LibraryPage(props)
 
             <h3>Methods:</h3>
             <table>
+                <tbody>
                 {methods}
+                </tbody>
             </table>
         </div>
 
