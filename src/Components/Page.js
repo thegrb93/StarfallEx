@@ -1,6 +1,7 @@
 import React from 'react';
 import LibraryPage from './Pages/Library';
 import MethodPage from './Pages/Method';
+import TypePage from './Pages/Type';
 
 function mapClass(c)
 {
@@ -10,6 +11,8 @@ function mapClass(c)
       return LibraryPage;
     case "method":
       return MethodPage;
+    case "type":
+      return TypePage;
     default:
       return null;
   }
