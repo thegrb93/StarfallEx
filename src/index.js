@@ -46,9 +46,9 @@ const SF_DOC = {
     },
     BuildPages: (DocTable) =>
     {
-        this.AddPage("Libraries", "category", "", "", {}, "");
-        this.AddPage("Types", "category", "", "", {}, "");
-        this.AddPage("Hooks", "category", "", "", {}, "");
+        SF_DOC.AddPage("Libraries", "category", "", "", {}, "");
+        SF_DOC.AddPage("Types", "category", "", "", {}, "");
+        SF_DOC.AddPage("Hooks", "category", "", "", {}, "");
 
         for (const [_, lib] of Object.entries(DocTable.Libraries)) {
 
@@ -63,23 +63,23 @@ const SF_DOC = {
                 libData.methods[method.name] = method.description;
             }
 
-            this.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
+            SF_DOC.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
 
             const path = "Libraries."+lib.name
             for (const [_, method] of Object.entries(lib.methods)) {
-                this.AddPage(method.name, "method", "realm", method.realm, {}, path);
+                SF_DOC.AddPage(method.name, "method", "realm", method.realm, {}, path);
             }
         }
 
         for (const [_, hook] of Object.entries(DocTable.Hooks)) {
-            this.AddPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks");
+            SF_DOC.AddPage(hook.name, "hook", "realm", hook.realm, {}, "Hooks");
         }
 
         for (const [_, t] of Object.entries(DocTable.Types)) {
-            this.AddPage(t.name, "type", "realm", t.realm, {}, "Types");
+            SF_DOC.AddPage(t.name, "type", "realm", t.realm, {}, "Types");
         }
 
-        this.FinishSetup();
+        SF_DOC.FinishSetup();
     },
     FinishSetup: () =>
     {
