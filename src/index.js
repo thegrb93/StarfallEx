@@ -18,7 +18,7 @@ const SF_DOC = {
         const path = parent + "." + name;
         const sidebarItem = {
             name: name,
-            collapsed: false,
+            collapsed: true,
             iconType: iconType,
             icon: icon,
             hidden: false,

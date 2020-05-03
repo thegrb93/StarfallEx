@@ -62,9 +62,24 @@ function performSearch(item, text)
 function renderElements(items, dispatch, currentPage)
 {
   const output = [];
-  for(const key in items)
+
+  const sortedItems = items.sort((a,b)=>{
+    const name1 = a.name.toUpperCase();
+    const name2 = b.name.toUpperCase();
+
+    if(name1 < name2)
+    {
+      return -1;
+    }
+    else if(name1 > name2)
+    {
+      return 1;
+    }
+    return 0;
+  }) 
+
+  for(const item of sortedItems)
   {
-    const item = items[key];
     if(item.hidden) { continue; }
     output.push((
       <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} selected={item.path === currentPage}>
