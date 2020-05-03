@@ -74,6 +74,7 @@ const SF_DOC = {
                     description: method.description,
                     parameters: method.params ?? [],
                     returns: method.returns ?? [],
+                    parent: lib.name,
                     type: "library",
                 }
                 SF_DOC.AddPage(method.name, "method", "realm", method.realm, methodData, path);
@@ -85,7 +86,6 @@ const SF_DOC = {
         }
 
         for (const [_, t] of Object.entries(DocTable.Types)) {
-            SF_DOC.AddPage(t.name, "type", "realm", t.realm, {}, "Types");
             let typeData = {
                 name: t.name,
                 realm: t.realm,
@@ -96,8 +96,23 @@ const SF_DOC = {
             for (const [_, method] of Object.entries(t.methods)) {
                 typeData.methods[method.name] = method.description;
             }
-
+            
             SF_DOC.AddPage(t.name, "type", "realm", t.realm, typeData, "Types");
+
+            const path = "Types."+t.name
+            for (const [_, method] of Object.entries(t.methods)) {
+                let methodData = {
+                    name: method.name,
+                    description: method.description,
+                    realm: method.realm,
+                    description: method.description,
+                    parameters: method.params ?? [],
+                    returns: method.returns ?? [],
+                    parent: t.name,
+                    type: "type",
+                }
+                SF_DOC.AddPage(method.name, "method", "realm", method.realm, methodData, path);
+            }
         }
 
         SF_DOC.FinishSetup();

@@ -8,7 +8,10 @@ export default function MethodPage(props)
 
 
     const callParams = props.parameters.map(x => x.name).join(",\xa0");
-    const titlePart = (<h1 class="method-title"><Icon type="realm" value={props.realm} />{props.name}({callParams})</h1>);
+    const callSplitter = props.type==="library" ? "." : ":";
+    
+
+    const titlePart = (<h1 class="method-title"><Icon type="realm" value={props.realm} />{props.parent}{callSplitter}{props.name}({callParams})</h1>);
 
     let paramPart = null;
     const paramList = props.parameters.map(x => 
