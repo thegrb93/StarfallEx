@@ -55,6 +55,11 @@ function performSearch(item, text)
   }
   expanded = expanded || item.path.toUpperCase().includes(text.toUpperCase());
   item.hidden = !expanded;
+  item.collapsed = !expanded;
+  if(text == "")
+  {
+    item.collapsed = true;
+  }
 
   return expanded;
 }
