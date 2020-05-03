@@ -3,15 +3,11 @@ import Icon from '../Icon';
 
 export default function MethodPage(props)
 {
-    console.log("Rendering method "+JSON.stringify(props))
-
-
-
     const callParams = props.parameters.map(x => x.name).join(",\xa0");
     const callSplitter = props.type==="library" ? "." : ":";
     
 
-    const titlePart = (<h1 class="method-title"><Icon type="realm" value={props.realm} />{props.parent}{callSplitter}{props.name}({callParams})</h1>);
+    const titlePart = (<h1 className="method-title"><Icon type="realm" value={props.realm} />{props.parent}{callSplitter}{props.name}({callParams})</h1>);
 
     let paramPart = null;
     const paramList = props.parameters.map(x => 
@@ -36,7 +32,7 @@ export default function MethodPage(props)
         returnsPart = (
         <div className="returns">
             <h2>Returns</h2>
-            <ul clasName="returns-list">
+            <ul className="returns-list">
                 {returnsList}
             </ul>
         </div>

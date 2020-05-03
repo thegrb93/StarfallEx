@@ -3,13 +3,9 @@ import Icon from '../Icon';
 
 export default function HookPage(props)
 {
-    console.log("Rendering hook", props);
-
-
-
     const callParams = props.parameters.map(x => x.name).join(",\xa0");   
 
-    const titlePart = (<h1 class="hook-title"><Icon type="realm" value={props.realm} />{props.name}({callParams})</h1>);
+    const titlePart = (<h1 className="hook-title"><Icon type="realm" value={props.realm} />{props.name}({callParams})</h1>);
 
     let paramPart = null;
     const paramList = props.parameters.map(x => 

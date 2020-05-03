@@ -110,7 +110,6 @@ export default function Sidebar(props)
   };
   function reducer(state, action)
   {
-    console.log("ACTION", action);
     let newState = cloneState(state);
     switch(action.type)
     {

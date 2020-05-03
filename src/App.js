@@ -10,21 +10,19 @@ function App(props) {
   {
     const title = props.pages[newPage].name
     const type = props.pages[newPage].class
-    console.log("Type:",type);
     if(type === "category")
     {
       return;
     }
 
     document.title = "SF Reference: "+title
-    console.log("Changed page to:", newPage)
     setPage(newPage);
   }
 
   return (
     <div className="app">
       <SideBar items = {props.sidebarItems} changePage = {changePage} currentPage = {currentPage} />
-      <Page {...props.pages[currentPage]} />
+      <Page {...props.pages[currentPage]} changePage = {changePage} />
     </div>
   );
 }

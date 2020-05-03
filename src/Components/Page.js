@@ -26,7 +26,7 @@ export default function Page(props)
   const MappedPage = mapClass(props.class);
   if(MappedPage !== null)
   {
-    return <MappedPage {...props.data} /> 
+    return <MappedPage {...props.data} path = {props.path} changePage = {props.changePage} /> 
   }
   return <div className="page"></div>;
 }
