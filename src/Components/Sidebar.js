@@ -64,6 +64,29 @@ function performSearch(item, text)
   return expanded;
 }
 
+function unfoldPage(item, text)
+{
+  let expanded = false;
+  if(item.children && item.children.length > 0)
+  {
+    for(const key in item.children)
+    {
+      if(unfoldPage(item.children[key], text))
+      {
+        expanded = true;
+      }
+    }
+  }
+  expanded = !item.collapsed || expanded || item.path.toUpperCase().includes(text.toUpperCase());
+  item.collapsed = !expanded;
+  if(text == "")
+  {
+    item.collapsed = true;
+  }
+
+  return expanded;
+}
+
 function renderElements(items, dispatch, currentPage)
 {
   const output = [];
@@ -106,7 +129,8 @@ export default function Sidebar(props)
   const initialState = {
     items: props.items,
     flatMap: buildFlatMap(props.items),
-    searchText: ""
+    searchText: "",
+    curForcedUnfold: props.currentPage
   };
   function reducer(state, action)
   {
@@ -122,6 +146,16 @@ export default function Sidebar(props)
           ...newState,
           searchText: action.value
         };
+      case "FORCE_UNFOLD":
+        for(const key in newState.items)
+        {
+          unfoldPage(newState.items[key], action.value);
+        }
+        return {
+          ...newState,
+          curForcedUnfold: action.value
+        }
+
       case "TOGGLE_COLLAPSE":
         const path = action.value;
         newState.flatMap[path].collapsed = !newState.flatMap[path].collapsed;
@@ -142,7 +176,10 @@ export default function Sidebar(props)
   assignPaths(initialState.items);
 
   const [state, dispatch] = useReducer(reducer, initialState);
-
+  if(state.curForcedUnfold != props.currentPage)
+  {
+    dispatch({type: "FORCE_UNFOLD", value: props.currentPage});
+  }
   return (
     <div className = "sidebar">
       <div className="logo">
