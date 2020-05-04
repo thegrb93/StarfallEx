@@ -10,15 +10,6 @@ local http_max_active = CreateConVar("sf_http_max_active", "3", { FCVAR_ARCHIVE,
 registerprivilege("http.get", "HTTP Get method", "Allows the user to request html data", { client = { default = 1 }, urlwhitelist = { default = 2 } })
 registerprivilege("http.post", "HTTP Post method", "Allows the user to post html data", { client = { default = 1 }, urlwhitelist = { default = 2 } })
 
-local base64Digits = {}
-do
-	local base64Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
-	
-	for i = 1, #base64Alphabet do
-		base64Digits[string.byte(base64Alphabet[i])] = i - 1
-	end
-end
-
 --- Http library. Requests content from urls.
 -- @name http
 -- @class library
@@ -163,95 +154,18 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 end
 
 --- Converts data into base64 format or nil if the string is 0 length
+--@name http_library.base64Encode
+--@class function
 --@param data The data to convert
 --@return The converted data
-function http_library.base64Encode(data)
-	checkluatype(data, TYPE_STRING)
-	return util.Base64Encode(data)
-end
+http_library.base64Encode = util.Base64Encode
 
 --- Converts data from base64 format
+--@name http_library.base64Decode
+--@class function
 --@param data The data to convert
---@param threaded Optional bool
 --@return The converted data
-function http_library.base64Decode(data, threaded)
-	checkluatype(data, TYPE_STRING)
-
-	local thread
-	if threaded ~= nil then
-		if checkluatype(threaded, TYPE_BOOL) then
-			thread = coroutine.running()
-
-			if not thread then
-				SF.Throw("Tried to use threading while not in a thread!", 2)
-			end
-		end
-	end
-
-	local bit_band, bit_rshift = bit.band, bit.rshift
-	local string_char, string_byte = string.char, string.byte
-	local coroutine_yield = coroutine.yield
-	local unpack = unpack
-
-	local digitBufferPos = 1
-	local digitBuffer = {}
-
-	local chunkBufferPos = 1
-	local chunkBuffer = {}
-
-	data = string.gsub(data, "=?=?$", "", 1)
-	data = string.gsub(data, "\n", "")
-	local dataLen = #data
-
-	for i = 1, dataLen - 3, 4 do
-		local b0, b1, b2, b3 = string_byte(data, i, i + 3)
-		local d0, d1, d2, d3 = base64Digits[b0], base64Digits[b1], base64Digits[b2], base64Digits[b3]
-
-		if not (d0 and d1 and d2 and d3) then
-			SF.Throw("Base64 string contains invalid characters", 2)
-		end
-
-		digitBuffer[digitBufferPos]     = 0x04 * d0                 + bit_rshift(d1, 4)
-		digitBuffer[digitBufferPos + 1] = 0x10 * bit_band(d1, 0x0F) + bit_rshift(d2, 2)
-		digitBuffer[digitBufferPos + 2] = 0x40 * bit_band(d2, 0x03) + d3
-
-		if digitBufferPos <= 7993 then
-			digitBufferPos = digitBufferPos + 3
-		else
-			chunkBuffer[chunkBufferPos] = string_char(unpack(digitBuffer))
-			chunkBufferPos = chunkBufferPos + 1
-
-			digitBufferPos = 1
-		end
-
-		if threaded then coroutine_yield() end
-	end
-
-	local bytesRemain = dataLen % 4
-	if bytesRemain ~= 0 then
-		local start = dataLen - bytesRemain + 1
-		local b0, b1, b2 = string_byte(data, start, start + 2)
-		local d0, d1, d2 = base64Digits[b0], base64Digits[b1], base64Digits[b2]
-
-		if not (d0 and d1 and (d2 or bytesRemain == 2)) then
-			SF.Throw("Base64 string contains invalid characters", 2)
-		end
-
-		digitBuffer[digitBufferPos] = 0x04 * d0 + bit_rshift(d1, 4)
-		digitBufferPos = digitBufferPos + 1
-
-		if d2 then
-			digitBuffer[digitBufferPos] = 0x10 * bit_band(d1, 0x0F) + bit_rshift(d2, 2)
-			digitBufferPos = digitBufferPos + 1
-		end
-	end
-
-	if digitBufferPos ~= 1 then
-		chunkBuffer[chunkBufferPos] = string_char(unpack(digitBuffer, 1, digitBufferPos - 1))
-	end
-
-	return table.concat(chunkBuffer)
-end
+http_library.base64Decode = util.Base64Decode
 
 --- Encodes illegal url characters to be legal
 --@param data The data to convert
