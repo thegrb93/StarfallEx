@@ -168,6 +168,7 @@ math_library.fmod = math.fmod
 math_library.frexp = math.frexp
 
 --- Variable containing the largest possible number (any numerical comparison every number will be less than this).
+-- @field
 math_library.huge = math.huge
 
 --- Converts an integer to a binary (base-2) string.
@@ -230,6 +231,7 @@ math_library.modf = math.modf
 math_library.normalizeAngle = math.NormalizeAngle
 
 --- Variable containing mathematical constant pi (3.1415926535898).
+-- @field
 math_library.pi = math.pi
 
 ---Returns x raised to the power y
