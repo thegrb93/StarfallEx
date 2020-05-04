@@ -155,7 +155,7 @@ code {
     border-collapse: collapse;
   }
   td {
-    padding: 2px;
+    padding: 5px;
   }
   table, td {
     border: 1px solid white;
@@ -241,4 +241,31 @@ code {
 .accept-newlines
 {
   white-space: pre-line;
+}
+.page-contributors
+{
+  padding-left: 60px;
+  li {
+    list-style-type: none;
+    margin-bottom: 5px;
+    line-height: 24px;
+    margin-left: 0;
+    padding-left: 0;
+  }
+  ul {
+    margin-left: 0;
+    padding-left: 20px;
+  }
+  .name {
+    font-size: 20px;
+  }
+  .avatar {
+    background-color: white;
+    border-radius: 2px;
+    margin-right: 5px;
+    vertical-align: top;
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+  }
 }

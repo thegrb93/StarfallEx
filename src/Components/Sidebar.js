@@ -1,6 +1,7 @@
 import React, { useReducer, useEffect } from 'react';
 import logo from '../logo.png'
 import Icon from "./Icon"
+import Version from "./Version"
 const _ = require('lodash');
 
 function cloneState(state)
@@ -95,7 +96,7 @@ function renderElements(items, dispatch, currentPage)
   const sortedItems = items.sort((a,b)=>{
       const name1 = a.name.toUpperCase();
       const name2 = b.name.toUpperCase();
-      if(a.type == "category" && b.type == "category") //Categories are equal, don't sort them by name, just leave add-order
+      if((a.type === "category" || a.type === "contributors") && (b.type === "category" || b.type === "contributors")) //Categories are equal, don't sort them by name, just leave add-order
       {
         return 0;
       }
@@ -201,11 +202,7 @@ export default function Sidebar(props)
       <div className = "sidebar-children">
         { renderElements(state.items, dispatch, props.currentPage) }          
       </div>
-      <div className = "version">
-          <span className="version-label">Version:</span>
-          <span className="version-text">StarfallEx_Sevi&amp;NameBestShip</span>
-          <span className="updates-check">(Check for updates)</span>
-      </div>
+      <Version />
     </div>
   )
 }

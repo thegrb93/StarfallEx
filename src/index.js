@@ -51,6 +51,7 @@ const SF_DOC = {
         SF_DOC.AddPage("Types", "category", "", "", {}, "");
         SF_DOC.AddPage("Hooks", "category", "", "", {}, "");
         SF_DOC.AddPage("Directives", "category", "", "", {}, "");
+        SF_DOC.AddPage("Contributors", "contributors", "letter-simple", "🌟", {}, "");
 
         for (const [_, lib] of Object.entries(DocTable.Libraries)) {
 
@@ -160,7 +161,11 @@ const SF_DOC = {
 var xmlhttp = new XMLHttpRequest();
 xmlhttp.onreadystatechange = function() {
   if (this.readyState === 4 && this.status === 200) {
-    SF_DOC.BuildPages(JSON.parse(this.responseText));
+    let json = JSON.parse(this.responseText);
+
+    window.SFVersion = json.Version;
+
+    SF_DOC.BuildPages(json);
   }
 };
 xmlhttp.open("GET", "sf_doc.json", true);

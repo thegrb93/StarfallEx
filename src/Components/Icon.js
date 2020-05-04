@@ -13,6 +13,8 @@ export default function Icon(props)
             return <RealmIconMethod value = {value} />
         case "letter":
             return <LetterIcon value = {value} />
+        case "letter-simple":
+            return <LetterSimpleIcon value = {value} />
         default:
             return null;
     }
@@ -52,5 +54,13 @@ function LetterIcon(props)
 
     return (
         <div className={"letter-icon"}>{value}</div>
+    )
+}
+function LetterSimpleIcon(props)
+{
+    const {value} = props;
+
+    return (
+        <div>{value}</div>
     )
 }

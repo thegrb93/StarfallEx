@@ -5,6 +5,7 @@ import TypePage from './Pages/Type';
 import HookPage from './Pages/Hook';
 import TablePage from './Pages/Table';
 import MarkdownPage from './Pages/MarkdownPage';
+import ContributorsPage from './Pages/Contributors';
 
 function mapClass(c)
 {
@@ -22,6 +23,8 @@ function mapClass(c)
       return TablePage;
     case "markdown":
       return MarkdownPage;
+    case "contributors":
+      return ContributorsPage;
     default:
       return null;
   }
