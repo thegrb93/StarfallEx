@@ -113,7 +113,7 @@ function renderElements(items, dispatch, currentPage)
   {
     if(item.hidden) { continue; }
     output.push((
-      <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} selected={item.path === currentPage}>
+      <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} type = {item.type} selected={item.path === currentPage}>
         {
           items && items.length > 0 && renderElements(item.children, dispatch, currentPage)
         }
@@ -205,7 +205,7 @@ export default function Sidebar(props)
 
 function SidebarElement(props)
 {
-    const {collapsed, name, path, children, dispatch, icon, iconType, selected} = props;
+    const {collapsed, name, path, children, dispatch, icon, iconType, selected, type} = props;
 
     const hasChildren = children && children.length > 0;
 
@@ -223,7 +223,7 @@ function SidebarElement(props)
               )
             }           
             <Icon type={iconType} value={icon} />
-            <div className = {"name" + (selected ? " name-selected" : "")} onClick = {() => dispatch({type:"CHANGE_PAGE", value: path})}>
+            <div className = {"name" + (selected ? " name-selected" : "")} onClick = {() => type === "category"? dispatch({type:"TOGGLE_COLLAPSE", value: path}) : dispatch({type:"CHANGE_PAGE", value: path})}>
               {name}
             </div>
           </div>

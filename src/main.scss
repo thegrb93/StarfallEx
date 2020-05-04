@@ -63,7 +63,9 @@ code {
     }
     .sidebar-item-content {
       display: flex;
-
+      .name {
+        @include clickable();
+      }
       .collapse 
       {
         font-weight: bolder;
