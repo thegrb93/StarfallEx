@@ -368,7 +368,7 @@ function render_library.clearStencilBufferRectangle(originX, originY, endX, endY
 	render.ClearStencilBufferRectangle(originX, originY, endX, endY, stencilValue)
 end
 
---- Sets the compare function of the stencil. More: http://wiki.garrysmod.com/page/render/SetStencilCompareFunction
+--- Sets the compare function of the stencil. More: https://wiki.facepunch.com/gmod/render.SetStencilCompareFunction
 -- @param compareFunction
 function render_library.setStencilCompareFunction(compareFunction)
 	checkluatype (compareFunction, TYPE_NUMBER)
@@ -379,7 +379,7 @@ function render_library.setStencilCompareFunction(compareFunction)
 	render.SetStencilCompareFunction(compareFunction )
 end
 
---- Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.garrysmod.com/page/render/SetStencilFailOperation
+--- Sets the operation to be performed on the stencil buffer values if the compare function was not successful. More: http://wiki.facepunch.com/gmod/render.SetStencilFailOperation
 -- @param operation
 function render_library.setStencilFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
@@ -390,7 +390,7 @@ function render_library.setStencilFailOperation(operation)
 	render.SetStencilFailOperation(operation)
 end
 
---- Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.garrysmod.com/page/render/SetStencilPassOperation
+--- Sets the operation to be performed on the stencil buffer values if the compare function was successful. More: http://wiki.facepunch.com/gmod/render.SetStencilPassOperation
 -- @param operation
 function render_library.setStencilPassOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
@@ -401,7 +401,7 @@ function render_library.setStencilPassOperation(operation)
 	render.SetStencilPassOperation(operation)
 end
 
---- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.garrysmod.com/page/render/SetStencilZFailOperation
+--- Sets the operation to be performed on the stencil buffer values if the stencil test is passed but the depth buffer test fails. More: http://wiki.facepunch.com/gmod/render.SetStencilZFailOperation
 -- @param operation
 function render_library.setStencilZFailOperation(operation)
 	checkluatype (operation, TYPE_NUMBER)
@@ -516,7 +516,7 @@ local viewmatrix_checktypes =
 local viewmatrix_checktypes_ignore = {origin = true, angles = true}
 
 --- Pushes a perspective matrix onto the view matrix stack.
--- @param tbl The view matrix data. See http://wiki.garrysmod.com/page/Structures/RenderCamData
+-- @param tbl The view matrix data. See http://wiki.facepunch.com/gmod/Structures/RenderCamData
 function render_library.pushViewMatrix(tbl)
 	local renderdata = instance.data.render
 	if not renderdata.isRendering then SF.Throw("Not in rendering hook.", 2) end
@@ -974,7 +974,7 @@ function render_library.setTextureFromScreen(ent)
 end
 
 --- Sets the texture filtering function when viewing a close texture
--- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 function render_library.setFilterMag(val)
 	checkluatype (val, TYPE_NUMBER)
 	if instance.data.render.changedFilterMag then
@@ -985,7 +985,7 @@ function render_library.setFilterMag(val)
 end
 
 --- Sets the texture filtering function when viewing a far texture
--- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 function render_library.setFilterMin(val)
 	checkluatype (val, TYPE_NUMBER)
 	if instance.data.render.changedFilterMin then
@@ -1387,7 +1387,7 @@ end
 --- Constructs a markup object for quick styled text drawing.
 -- @param str The markup string to parse
 -- @param maxsize The max width of the markup
--- @return The markup object. See https://wiki.garrysmod.com/page/Category:MarkupObject
+-- @return The markup object. See https://wiki.facepunch.com/gmod/markup.Parse
 function render_library.parseMarkup(str, maxsize)
 	checkluatype (str, TYPE_STRING)
 	checkluatype (maxsize, TYPE_NUMBER)
@@ -1408,10 +1408,10 @@ function render_library.parseMarkup(str, maxsize)
 	end
 
 	local index = {
-		Draw = marked.Draw,
-		GetWidth = marked.GetWidth,
-		GetHeight = marked.GetHeight,
-		Size = marked.Size
+		draw = marked.Draw,
+		getWidth = marked.GetWidth,
+		getHeight = marked.GetHeight,
+		getSize = marked.Size
 	}
 
 	return setmetatable(marked, {
@@ -1438,12 +1438,12 @@ end
 
 --- Enables blend mode control. Read OpenGL or DirectX docs for more info
 -- @param on Whether to control the blend mode of upcoming rendering
--- @param srcBlend Number http://wiki.garrysmod.com/page/Enums/BLEND
+-- @param srcBlend Number http://wiki.facepunch.com/gmod/Enums/BLEND
 -- @param destBlend Number
--- @param blendFunc Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC
--- @param srcBlendAlpha Optional Number http://wiki.garrysmod.com/page/Enums/BLEND
+-- @param blendFunc Number http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
+-- @param srcBlendAlpha Optional Number http://wiki.facepunch.com/gmod/Enums/BLEND
 -- @param destBlendAlpha Optional Number
--- @param blendFuncAlpha Optional Number http://wiki.garrysmod.com/page/Enums/BLENDFUNC
+-- @param blendFuncAlpha Optional Number http://wiki.facepunch.com/gmod/Enums/BLENDFUNC
 function render_library.overrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
 	if not instance.data.render.isRendering then SF.Throw("Not in a rendering hook.", 2) end
 	render.OverrideBlend(on, srcBlend, destBlend, blendFunc, srcBlendAlpha, destBlendAlpha, blendFuncAlpha)
@@ -1694,7 +1694,7 @@ end
 -- @return the Y size of the current render context
 function render_library.getResolution()
 	local data = instance.data.render
-	if data.renderEnt then
+	if data.renderEnt and data.renderEnt.GetResolution then
 		return data.renderEnt:GetResolution()
 	end
 	if data.usingRT then
@@ -1732,7 +1732,7 @@ function render_library.isHUDActive()
 end
 
 --- Renders the scene with the specified viewData to the current active render target.
--- @param tbl view The view data to be used in the rendering. See http://wiki.garrysmod.com/page/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
+-- @param tbl view The view data to be used in the rendering. See http://wiki.facepunch.com/gmod/Structures/ViewData. There's an additional key drawviewer used to tell the engine whether the local player model should be rendered.
 function render_library.renderView(tbl)
 	checkluatype(tbl, TYPE_TABLE)
 

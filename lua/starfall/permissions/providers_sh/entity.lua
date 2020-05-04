@@ -59,7 +59,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return true end
+				"allow"
 			}
 		else
 			P.checks = {
@@ -100,7 +100,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return true end
+				"allow"
 			}
 			local entmeta = FindMetaTable("Entity")
 			if not entmeta.CPPICanTool then P.checks[2] = P.checks[1] end
@@ -149,7 +149,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 						return false, "Entity is invalid"
 					end
 				end,
-				function() return true end
+				"allow"
 			}
 
 			P.props = setmetatable({},{__mode="k"})
@@ -220,7 +220,7 @@ hook.Add("Initialize","SF_PPInitialize",function()
 				end,
 				nil,
 				nil,
-				function() return true end
+				"allow"
 			}
 			P.checks[2] = P.checks[1]
 			P.checks[3] = P.checks[1]

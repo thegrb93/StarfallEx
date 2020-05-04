@@ -126,13 +126,6 @@ end
 -- @return Value or nil
 builtins_library.next = next
 
---- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
--- @name builtins_library.assert
--- @class function
--- @param condition
--- @param msg
-builtins_library.assert = function(condition, msg) if not condition then SF.Throw(msg or "assertion failed!", 2) else return condition end end
-
 --- This function takes a numeric indexed table and return all the members as a vararg.
 -- @name builtins_library.unpack
 -- @class function
@@ -513,7 +506,7 @@ else
 	end
 
 	--- Prints a message to your chat, console, or the center of your screen.
-	-- @param mtype How the message should be displayed. See http://wiki.garrysmod.com/page/Enums/HUD
+	-- @param mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param text The message text.
 	function builtins_library.printMessage(mtype, text)
 		if instance.player ~= LocalPlayer() then return end
@@ -748,8 +741,8 @@ function builtins_library.getfenv()
 	if fenv ~= _G then return fenv end
 end
 
---- GLua's getinfo()
--- Returns a DebugInfo structure containing the passed function's info (https://wiki.garrysmod.com/page/Structures/DebugInfo)
+--- GLua's debug.getinfo()
+-- Returns a DebugInfo structure containing the passed function's info https://wiki.facepunch.com/gmod/Structures/DebugInfo
 -- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
@@ -762,6 +755,20 @@ function builtins_library.debugGetInfo(funcOrStackLevel, fields)
 		ret.func = nil
 		return ret
 	end
+end
+
+--- GLua's debug.getlocal()
+-- Returns the name of a function or stack's locals
+-- @param funcOrStackLevel Function or stack level to get info about. Defaults to stack level 0.
+-- @param index The index of the local to get
+-- @return The name of the local
+function builtins_library.debugGetLocal(funcOrStackLevel, index)
+	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
+	checkluatype(index, TYPE_NUMBER)
+
+	local name = debug.getlocal(funcOrStackLevel, index)
+	-- debug.getlocal returns two values, make sure we only return the first
+	return name
 end
 
 local uncatchable = {
@@ -849,12 +856,20 @@ function builtins_library.throw(msg, level, uncatchable)
 	SF.Throw(msg, 1 + (level or 1), uncatchable)
 end
 
---- Throws a raw exception.
--- @param msg Exception message
+--- Throws an exception. Alias of 'throw'
+-- @name builtins_library.error
+-- @class function
+-- @param msg Message string
 -- @param level Which level in the stacktrace to blame. Defaults to 1
-function builtins_library.error(msg, level)
-	error(msg or "an unspecified error occured", 1 + (level or 1))
-end
+-- @param uncatchable Makes this exception uncatchable
+builtins_library.error = builtins_library.throw
+
+--- If the result of the first argument is false or nil, an error is thrown with the second argument as the message.
+-- @name builtins_library.assert
+-- @class function
+-- @param condition
+-- @param msg
+builtins_library.assert = assert
 
 --- Returns if the table has an isValid function and isValid returns true.
 --@param object Table to check
@@ -914,3 +929,46 @@ end
 builtins_library.class = SF.Class
 
 end
+
+--- Mark a file to be included in the upload.
+-- This is required to use the file in require() and dofile()
+-- @name include
+-- @class directive
+-- @param path Path to the file
+
+--- Mark a directory to be included in the upload.
+-- This is optional to include all files in the directory in require() and dofile()
+-- @name includedir
+-- @class directive
+-- @param path Path to the directory
+
+--- Set the name of the script.
+-- This will become the name of the tab and will show on the overlay of the processor. --@name Awesome script
+-- @name name
+-- @class directive
+-- @param name Name of the script
+
+--- Set the author of the script.
+-- This will set the author that will be shown on the overlay of the processor. --@author TheAuthor
+-- @name author
+-- @class directive
+-- @param author Author of the script
+
+--- Set the model of the processor entity. --@model models/props_junk/watermelon01.mdl
+-- @name model
+-- @class directive
+-- @param model String of the model
+
+--- Set the current file to only run on the server. Shared is default. --@server
+-- @name server
+-- @class directive
+
+--- Set the current file to only run on the client. Shared is default. --@client
+-- @name client
+-- @class directive
+
+--- Set the client file to run as main. Can only be used in the main file. --@clientmain somefile.txt
+-- @name clientmain
+-- @class directive
+-- @param filename The file to run as main on client
+

@@ -5,6 +5,7 @@ local registerprivilege = SF.Permissions.registerPrivilege
 
 registerprivilege("entities.setRenderProperty", "RenderProperty", "Allows the user to change the rendering of an entity", { client = (CLIENT and {} or nil), entities = {} })
 registerprivilege("entities.setPlayerRenderProperty", "PlayerRenderProperty", "Allows the user to change the rendering of themselves", {})
+registerprivilege("entities.setPersistent", "SetPersistent", "Allows the user to change entity's persistent state", { entities = {} })
 registerprivilege("entities.emitSound", "Emitsound", "Allows the user to play sounds on entities", { client = (CLIENT and {} or nil), entities = {} })
 
 
@@ -19,6 +20,7 @@ SF.RegisterType("Entity", false, true, debug.getregistry().Entity)
 
 return function(instance)
 
+local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ents_methods, ent_meta, ewrap, eunwrap = instance.Types.Entity.Methods, instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
@@ -90,12 +92,23 @@ if CLIENT then
 		ent:ManipulateBoneAngles(bone, aunwrap(ang))
 	end
 
+	--- Allows manipulation of an entity's bones' jiggle status
+	-- @client
+	-- @param bone The bone ID
+	-- @param enabled Whether to make the bone jiggly or not
+	function ents_methods:manipulateBoneJiggle(bone, state)
+		checkluatype(bone, TYPE_NUMBER)
+		local ent = getent(self)
+		checkpermission(instance, ent, "entities.setRenderProperty")
+		ent:ManipulateBoneJiggle(bone, state and 1 or 0)
+	end
+
 	--- Sets a hologram or custom_prop model to a custom Mesh
 	-- @client
 	-- @param mesh The mesh to set it to or nil to set back to normal
 	function ents_methods:setMesh(mesh)
 		local ent = getent(self)
-		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, nil, "mesh")
 		checkpermission(instance, ent, "entities.setRenderProperty")
@@ -112,7 +125,7 @@ if CLIENT then
 	-- @param material The material to set it to or nil to set back to default
 	function ents_methods:setMeshMaterial(material)
 		local ent = getent(self)
-		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
@@ -131,12 +144,13 @@ if CLIENT then
 	-- @param maxs The upper bounding corner coordinate local to the hologram
 	function ents_methods:setRenderBounds(mins, maxs)
 		local ent = getent(self)
-		if not ent.IsHologram then SF.Throw("The entity isn't a hologram", 2) end
+		if not ent.IsSFHologram and not ent.IsSFProp then SF.Throw("The entity isn't a hologram or custom-prop", 2) end
 
 
 		checkpermission(instance, ent, "entities.setRenderProperty")
 
 		ent:SetRenderBounds(vunwrap(mins), vunwrap(maxs))
+		ent.userrenderbounds = true
 	end
 end
 
@@ -165,7 +179,7 @@ function ents_methods:emitSound(snd, lvl, pitch, volume, channel)
 end
 
 --- Stops a sound on the entity
--- @param snd string Soundscript path. See http://wiki.garrysmod.com/page/Entity/StopSound
+-- @param snd string Soundscript path. See http://wiki.facepunch.com/gmod/Entity:StopSound
 function ents_methods:stopSound(snd)
 	checkluatype(snd, TYPE_STRING)
 
@@ -177,6 +191,23 @@ function ents_methods:stopSound(snd)
 	end
 
 	ent:StopSound(snd)
+end
+
+--- Returns a list of entities linked to a processor
+-- @return A list of components linked to the entity
+function ents_methods:getLinkedComponents()
+	local ent = getent(self)
+	if ent:GetClass() ~= "starfall_processor" then SF.Throw("The target must be a starfall_processor", 2) end
+
+	local list = {}
+	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+		if v.link == ent then list[#list+1] = ewrap(v) end
+	end
+	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+		if v.link == ent then list[#list+1] = ewrap(v) end
+	end
+
+	return list
 end
 
 --- Sets the color of the entity
@@ -337,7 +368,7 @@ end
 --- Sets the render mode of the entity
 -- @shared
 -- @class function
--- @param rendermode Number, rendermode to use. http://wiki.garrysmod.com/page/Enums/RENDERMODE
+-- @param rendermode Number, rendermode to use. http://wiki.facepunch.com/gmod/Enums/RENDERMODE
 function ents_methods:setRenderMode(rendermode)
 	checkluatype(rendermode, TYPE_NUMBER)
 
@@ -355,7 +386,7 @@ end
 --- Sets the renderfx of the entity
 -- @shared
 -- @class function
--- @param renderfx Number, renderfx to use. http://wiki.garrysmod.com/page/Enums/kRenderFx
+-- @param renderfx Number, renderfx to use. http://wiki.facepunch.com/gmod/Enums/kRenderFx
 function ents_methods:setRenderFX(renderfx)
 	checkluatype(renderfx, TYPE_NUMBER)
 
@@ -619,7 +650,7 @@ function ents_methods:getQuotaUsed()
 	local ent = getent(self)
 	if not ent.Starfall then SF.Throw("The entity isn't a starfall chip", 2) end
 	
-	return ent.instance.cpu_total
+	return ent.instance and ent.instance.cpu_total or 0
 end
 
 --- Gets the Average CPU Time in the buffer of the specified starfall or expression2.
@@ -628,7 +659,7 @@ end
 function ents_methods:getQuotaAverage()
 	local ent = getent(self)
 	if ent.Starfall then
-		return ent.instance:movingCPUAverage()
+		return ent.instance and ent.instance:movingCPUAverage() or 0
 	elseif ent.WireDebugName == "Expression 2" then
 		return ent.context.timebench
 	else
@@ -643,7 +674,7 @@ end
 function ents_methods:getQuotaMax()
 	local ent = getent(self)
 	if ent.Starfall then
-		return ent.instance.cpuQuota
+		return ent.instance and ent.instance.cpuQuota or 0
 	elseif ent.WireDebugName == "Expression 2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else
@@ -1016,8 +1047,13 @@ function ents_methods:setFlexWeight(flexid, weight)
 	checkluatype(flexid, TYPE_NUMBER)
 	checkluatype(weight, TYPE_NUMBER)
 	flexid = math.floor(flexid)
-
-	checkpermission(instance, ent, "entities.setRenderProperty")
+	
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(instance, ent, "entities.setRenderProperty")
+	end
+	
 	if flexid < 0 or flexid >= ent:GetFlexNum() then
 		SF.Throw("Invalid flex: "..flexid, 2)
 	end
@@ -1037,7 +1073,13 @@ end
 function ents_methods:setFlexScale(scale)
 	local ent = getent(self)
 	checkluatype(scale, TYPE_NUMBER)
-	checkpermission(instance, ent, "entities.setRenderProperty")
+	
+	if SERVER and ent == instance.player then
+		checkpermission(instance, ent, "entities.setPlayerRenderProperty")
+	else
+		checkpermission(instance, ent, "entities.setRenderProperty")
+	end
+	
 	ent:SetFlexScale(scale)
 end
 
@@ -1154,6 +1196,94 @@ function ents_methods:isEffectActive(effect)
 	
 	local ent = getent(self)
 	return ent:IsEffectActive(effect)
+end
+
+--- Marks entity as persistent, disallowing players from physgunning it. Persistent entities save on server shutdown when sbox_persist is set
+-- @shared
+-- @param persist True to make persistent
+function ents_methods:setPersistent(persist)
+	checkluatype(persist, TYPE_BOOL)
+	local ent = getent(self)
+	checkpermission(instance, ent, "entities.setPersistent")
+	ent:SetPersistent(persist)
+end
+
+--- Checks if entity is marked as persistent
+-- @shared
+-- @return True if the entity is persistent 
+function ents_methods:getPersistent()
+	local ent = getent(self)
+	return ent:GetPersistent()
+end
+
+--- Returns the game assigned owner of an entity. This doesn't take CPPI into account and will return nil for most standard entities.
+-- Used on entities with custom physics like held SWEPs and fired bullets in which case player entity should be returned.
+-- @shared
+-- @return Owner
+function ents_methods:entOwner()
+	local ent = getent(self)
+	return owrap(ent:GetOwner())
+end
+
+--- Gets the bounds (min and max corners) of a hit box.
+-- @shared
+-- @param hitbox The number of the hitbox.
+-- @param group The number of the hitbox group, 0 in most cases.
+-- @return Hitbox mins vector.
+-- @return Hitbox maxs vector.
+function ents_methods:getHitBoxBounds(hitbox, group)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(group, TYPE_NUMBER)
+	local mins, maxs = getent(self):GetHitBoxBounds(hitbox, group)
+	if mins and maxs then
+		return vwrap(mins), vwrap(maxs)
+	end
+end
+
+--- Gets number of hitboxes in a group.
+-- @shared
+-- @param group The number of the hitbox group.
+-- @return Number of hitboxes
+function ents_methods:getHitBoxCount(group)
+	checkluatype(group, TYPE_NUMBER)
+	return getent(self):GetHitBoxCount(group)
+end
+
+--- Gets the bone the given hitbox is attached to.
+-- @shared
+-- @param hitbox The number of the hitbox.
+-- @param group The number of the hitbox group, 0 in most cases.
+-- @return Bone ID
+function ents_methods:getHitBoxBone(hitbox, group)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(group, TYPE_NUMBER)
+	return getent(self):GetHitBoxBone(hitbox, group)
+end
+
+--- Returns entity's current hit box set.
+-- @shared
+-- @return Hitbox set number, nil if entity has no hitboxes.
+-- @return Hitbox set name, nil if entity has no hitboxes.
+function ents_methods:getHitBoxSet()
+	return getent(self):GetHitboxSet()
+end
+
+--- Returns entity's number of hitbox sets.
+-- @shared
+-- @return Number of hitbox sets.
+function ents_methods:getHitBoxSetCount()
+	return getent(self):GetHitboxSetCount()
+end
+
+--- Gets the hit group of a given hitbox in a given hitbox set.
+-- @shared
+-- @param hitbox The number of the hit box.
+-- @param hitboxset The number of the hit box set. This should be 0 in most cases.
+-- @return The hitbox group of given hitbox. See https://wiki.facepunch.com/gmod/Enums/HITGROUP
+function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
+	checkluatype(hitbox, TYPE_NUMBER)
+	checkluatype(hitboxset, TYPE_NUMBER)
+	return getent(self):GetHitBoxHitGroup(hitbox, hitboxset)
 end
 
 end

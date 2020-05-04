@@ -143,20 +143,6 @@ function ang_methods:isZero()
 	return self[1]==0 and self[2]==0 and self[3]==0
 end
 
---- Normalise angles eg (0,181,1) -> (0,-179,1).
--- @return nil
-function ang_methods:normalize()
-	self[1] = math_nAng(self[1])
-	self[2] = math_nAng(self[2])
-	self[3] = math_nAng(self[3])
-end
-
---- Converts all the angle values to be -180 to 180
--- @return Normalized angle table
-function ang_methods:getNormalized()
-	return wrap({ (tbl[1] + 180) % 360 - 180, (tbl[2] + 180) % 360 - 180, (tbl[3] + 180) % 360 - 180 })
-end
-
 --- Return the Forward Vector ( direction the angle points ).
 -- @return vector normalised.
 function ang_methods:getForward()

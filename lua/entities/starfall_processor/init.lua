@@ -71,6 +71,7 @@ function ENT:Think()
 end
 
 function ENT:SendCode(recipient)
+	if not (self.mainfile and self.files) then return end
 	local sfdata = {
 		proc = self,
 		owner = self.owner,
@@ -176,12 +177,7 @@ net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
 		if net.ReadBool() then -- True = we want to download; False = finished downloading
-			if proc.mainfile and proc.files then
-				proc:SendCode(ply)
-			else
-				proc.SendQueue = proc.SendQueue or {}
-				proc.SendQueue[#proc.SendQueue + 1] = ply
-			end
+			proc:SendCode(ply)
 		else
 			local instance = proc.instance
 			if instance then
@@ -205,5 +201,13 @@ net.Receive("starfall_report_error", function(len, ply)
 		SF.AddNotify(chip.owner, "Starfall: ("..chip.mainfile..") errored for player: ("..ply:Nick()..")", "ERROR", 7, "ERROR1")
 		SF.Print(chip.owner, string.sub(net.ReadString(), 1, 2048))
 	end
+end)
+
+hook.Add("PlayerInitialSpawn","SF_Initialize_Processor",function(ply)
+	SF.WaitForPlayerInit(ply, "InitProcessor", function()
+		for k, v in ipairs(ents.FindByClass("starfall_processor")) do
+			v:SendCode(ply)
+		end
+	end)
 end)
 

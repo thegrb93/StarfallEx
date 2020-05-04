@@ -59,7 +59,7 @@ end
 -- @param mask Trace mask
 -- @param colgroup The collision group of the trace
 -- @param ignworld Whether the trace should ignore world
--- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
+-- @return Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.trace(start, endpos, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
 	checkvector(start)
@@ -93,7 +93,7 @@ end
 -- @param mask Trace mask
 -- @param colgroup The collision group of the trace
 -- @param ignworld Whether the trace should ignore world
--- @return Result of the trace https://wiki.garrysmod.com/page/Structures/TraceResult
+-- @return Result of the trace https://wiki.facepunch.com/gmod/Structures/TraceResult
 function trace_library.traceHull(start, endpos, minbox, maxbox, filter, mask, colgroup, ignworld)
 	checkpermission(instance, nil, "trace")
 	checkvector(start)

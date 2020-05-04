@@ -90,36 +90,30 @@ end)
 -- Declare Basic Starfall Types
 -------------------------------------------------------------------------------
 
-local EntityTable = {
-	__newindex = function(t, e, v)
-		rawset(t, e, v)
-		if t.wait then
-			e:CallOnRemove("SF_" .. t.key, function()
-				timer.Simple(0, function()
-					if t[e] and not e:IsValid() then
-						t[e] = nil
-						if t.destructor then t.destructor(e, v) end
-					end
-				end)
-			end)
-		else
-			e:CallOnRemove("SF_" .. t.key, function()
-				if t[e] then
-					t[e] = nil
-					if t.destructor then t.destructor(e, v) end
-				end
-			end)
-		end
-	end
-}
 -- Returns a class that manages a table of entity keys
 function SF.EntityTable(key, destructor, dontwait)
-	local t = {
-		key = key,
-		destructor = destructor,
-		wait = CLIENT and not dontwait
-	}
-	return setmetatable(t, EntityTable)
+	return setmetatable({}, {
+		__newindex = function(t, e, v)
+			rawset(t, e, v)
+			if dontwait then
+				e:CallOnRemove("SF_" .. key, function()
+					if t[e] then
+						t[e] = nil
+						if destructor then destructor(e, v) end
+					end
+				end)
+			else
+				e:CallOnRemove("SF_" .. key, function()
+					timer.Simple(0, function()
+						if t[e] and not e:IsValid() then
+							t[e] = nil
+							if destructor then destructor(e, v) end
+						end
+					end)
+				end)
+			end
+		end
+	})
 end
 
 --- Returns a class that wraps a structure and caches indexes
@@ -457,6 +451,36 @@ do
 			end
 		end
 	end
+
+	--- Returns a class that can manage hooks. Required because adding to a table being iterated with pairs is undefined behavior.
+	SF.HookTable = {
+		__index = {
+			add = function(self, index, func)
+				self.hookstoadd[index] = func
+			end,
+			remove = function(self, index)
+				self.hooks[index] = nil
+				self.hookstoadd[index] = nil
+			end,
+			isEmpty = function(self)
+				return next(self.hooks)==nil and next(self.hookstoadd)==nil
+			end,
+			pairs = function(self)
+				for k, v in pairs(self.hookstoadd) do
+					self.hooks[k] = v
+					self.hookstoadd[k] = nil
+				end
+				return pairs(self.hooks)
+			end
+		},
+		__call = function(p)
+			return setmetatable({
+				hooks = {},
+				hookstoadd = {}
+			}, p)
+		end
+	}
+	setmetatable(SF.HookTable, SF.HookTable)
 
 	--- Add a GMod hook so that SF gets access to it
 	-- @shared

@@ -20,7 +20,7 @@ P.checks = {
 		site = site.."/"..(data or "") -- Make sure there is / at the end of site
 		return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
 	end,
-	function() return true end,
+	"allow"
 }
 
 SF.Permissions.registerProvider(P)
@@ -162,9 +162,9 @@ pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
 
--- Ungodly things
+-- Furry things
 --- Examples:
---- you don't even wanna know
+--- https://static1.e621.net/data/8f/db/8fdbc9af34698d470c90ca6cb69c5529.jpg
 
 simple [[static1.e621.net]]
 
@@ -179,3 +179,8 @@ simple [[ipfs.io]]
 --- https://fauux.neocities.org/LainDressSlow.gif
 
 pattern [[([%w-_]+)%.neocities%.org/(.+)]]
+
+-- Soundcloud
+--- Examples:
+--- https://i1.sndcdn.com/artworks-000046176006-0xtkjy-large.jpg
+pattern [[(%w+)%.sndcdn%.com/(.+)]]

@@ -24,7 +24,7 @@ function ENT:Compile()
 
 	self.error = nil
 
-	if not self.files[self.mainfile] then return end
+	if not (self.mainfile and self.files and self.files[self.mainfile]) then return end
 	local ok, instance = SF.Instance.Compile(self.files, self.mainfile, self.owner, { entity = self })
 	if not ok then self:Error(instance) return end
 
@@ -64,6 +64,13 @@ function ENT:Compile()
 			end
 		end
 	end
+
+	for k, v in ipairs(ents.FindByClass("starfall_screen")) do
+		if v.link == self then v.link = nil v:LinkEnt(self) end
+	end
+	for k, v in ipairs(ents.FindByClass("starfall_hud")) do
+		if v.link == self then v.link = nil v:LinkEnt(self) end
+	end
 end
 
 function ENT:Destroy()
@@ -78,7 +85,6 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
-	local update = self.instance ~= nil or self.error ~= nil
 	if SERVER and update then
 		net.Start("starfall_processor_destroy")
 		net.WriteEntity(self)
@@ -98,13 +104,8 @@ function ENT:SetupFiles(sfdata)
 				self:SetCustomModel(model)
 			end
 		end
-	
-		if update then
-			self:SendCode()
-		elseif self.SendQueue then
-			self:SendCode(self.SendQueue)
-			self.SendQueue = nil
-		end
+
+		self:SendCode()
 	end
 end
 
@@ -146,6 +147,10 @@ function ENT:Error(err)
 			net.WriteString(msg.."\n"..traceback)
 			net.SendToServer()
 		end
+	end
+	
+	for inst, _ in pairs(SF.allInstances) do
+		inst:runScriptHook("starfallerror", inst.Types.Entity.Wrap(self), inst.Types.Player.Wrap(SERVER and self.owner or LocalPlayer()), msg)
 	end
 end
 

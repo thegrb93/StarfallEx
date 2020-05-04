@@ -174,6 +174,8 @@ local function NextInTextureQueue()
 			Panel:SetMouseInputEnabled(false)
 			Panel:SetHTML(
 			[[<html style="overflow:hidden"><body><script>
+			if (!requestAnimationFrame)
+				var requestAnimationFrame = webkitRequestAnimationFrame;
 			function renderImage(){
 				requestAnimationFrame(function(){
 					requestAnimationFrame(function(){
@@ -275,7 +277,7 @@ local function NextInTextureQueue()
 		img.style.left="0px";
 		img.style.top="0px";
 		img.src="]] .. string.JavascriptSafe( requestTbl.Url ) .. [[";]]..
-		(BRANCH ~= "x86-64" and "\nif(img.complete){sf.imageLoaded(img.width, img.height);}" or ""))
+		(BRANCH == "unknown" and "\nif(img.complete)renderImage();" or ""))
 		Panel:Show()
 
 		timer.Create("SF_URLTextureTimeout", 10, 1, function()
@@ -493,7 +495,7 @@ local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["n
 --- Creates a .jpg or .png material from file
 --- Can't be modified
 -- @param path The path to the image file
--- @param params The shader parameters to apply to the material. See http://wiki.garrysmod.com/page/Material_Parameters
+-- @param params The shader parameters to apply to the material. See https://wiki.facepunch.com/gmod/Material_Parameters
 function material_library.createFromImage(path, params)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(params, TYPE_STRING)

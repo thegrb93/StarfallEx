@@ -99,8 +99,8 @@ inputConverters =
 {
 	NORMAL = identity,
 	STRING = identity,
-	VECTOR = vwrap,
-	ANGLE = awrap,
+	VECTOR = function(vec) return setmetatable({ vec[1] or vec.x, vec[2] or vec.y, vec[3] or vec.z }, vec_meta) end,
+	ANGLE = function(ang) return setmetatable({ ang[1] or ang.p, ang[2] or ang.y, ang[3] or ang.r }, ang_meta) end,
 	WIRELINK = wlwrap,
 	ENTITY = owrap,
 
@@ -139,7 +139,11 @@ inputConverters =
 	ARRAY = function(tbl)
 		local ret = {}
 		for i, v in ipairs(tbl) do
-			ret[i] = owrap(v)
+			if istable(v) and isnumber(v[1] or v.x or v.p) and isnumber(v[2] or v.y) and isnumber(v[3] or v.z or v.r) then
+				ret[i] = inputConverters.VECTOR(v)
+			else
+				ret[i] = owrap(v)
+			end
 		end
 		return ret
 	end
@@ -397,26 +401,29 @@ local function parseEntity(ent, io)
 
 	if not (ent and ent:IsValid()) then SF.Throw("Invalid source") end
 
-	local ret = {}
+	local names, types = {}, {}
 	for k, v in pairs(ent[io]) do
 		if k ~= "" then
-			table.insert(ret, k)
+			table.insert(names, k)
+			table.insert(types, v.Type)
 		end
 	end
 
-	return ret
+	return names, types
 end
 
 --- Returns a table of entity's inputs
 -- @param entI Entity with input(s)
--- @return Table of entity's inputs
+-- @return Table of entity's input names
+-- @return Table of entity's input types
 function wire_library.getInputs(entI)
 	return parseEntity(entI, "Inputs")
 end
 
 --- Returns a table of entity's outputs
 -- @param entO Entity with output(s)
--- @return Table of entity's outputs
+-- @return Table of entity's output names
+-- @return Table of entity's output types
 function wire_library.getOutputs(entO)
 	return parseEntity(entO, "Outputs")
 end

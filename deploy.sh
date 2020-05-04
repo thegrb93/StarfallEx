@@ -42,7 +42,7 @@ cd ..
 
 # Get files that have to be pushed to gh-pages
 echo "Moving doc files"
-cp -rf doc/* out/
+cp -f docgen/sf_doc.json out/
 
 cd out
 
@@ -61,37 +61,5 @@ else
 fi
 cd ..
 
-#Let's also check for doc.lua
-local head_ref branch_ref
-head_ref=$(git rev-parse HEAD)
-if [[ $? -ne 0 || ! $head_ref ]]; then
-	echo "failed to get HEAD reference"
-	exit 1
-fi
-branch_ref=$(git rev-parse "$TRAVIS_BRANCH")
-if [[ $? -ne 0 || ! $branch_ref ]]; then
-	echo "failed to get $TRAVIS_BRANCH reference"
-	exit 1
-fi
-if [[ $head_ref != $branch_ref ]]; then
-	echo "HEAD ref ($head_ref) does not match $TRAVIS_BRANCH ref ($branch_ref)"
-	echo "someone may have pushed new commits before this build cloned the repo"
-	exit 1
-fi
-if ! git checkout "$TRAVIS_BRANCH"; then
-	echo "failed to checkout $TRAVIS_BRANCH"
-	exit 1
-fi
-
-#Add only docs.lua
-git add "lua/starfall/editor/docs.lua"
-if git diff --quiet --staged --ignore-space-at-eol -b -w --ignore-blank-lines; then #checking if there is a diff for staged changes (so only doc)
-    echo "No changes to docs.lua, skipping."
-else
-	echo "Commiting.."
-	git commit -m "Updating documentation: ${SHA} [ci skip]"
-	echo "Pushing.."
-	git push --quiet $SSH_REPO $TRAVIS_BRANCH
-fi
 
 echo "Done!"

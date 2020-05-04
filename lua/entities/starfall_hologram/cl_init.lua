@@ -9,6 +9,7 @@ function ENT:Initialize()
 	self.clips = {}
 	self.suppressEngineLighting = false
 	self.scale = Vector(1,1,1)
+	self.userrenderbounds = false
 
 	net.Start("starfall_hologram")
 	net.WriteEntity(self)

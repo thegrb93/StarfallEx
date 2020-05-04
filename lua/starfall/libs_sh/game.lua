@@ -20,7 +20,7 @@ game_library.getMap = game.GetMap
 --- Returns The hostname
 -- @name game_library.getHostname
 -- @class function
--- @return string The hostname of the se`rver
+-- @return string The hostname of the server
 game_library.getHostname = GetHostName
 
 --- Returns true if the server is on a LAN
@@ -46,6 +46,13 @@ game_library.isDedicated = game.IsDedicated
 -- @class function
 -- @return number The max players allowed by the server
 game_library.getMaxPlayers = game.MaxPlayers
+
+--- Checks whether the specified game is mounted
+-- @name game_library.isMounted
+-- @class function
+-- @param str String identifier of the game, eg. 'cstrike'
+-- @return True if the game is mounted
+game_library.isMounted = IsMounted
 
 if CLIENT then
 	--- Returns if the game has focus or not, i.e. will return false if the game is minimized

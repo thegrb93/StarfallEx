@@ -121,13 +121,13 @@ function hook_library.add(hookname, name, func)
 	checkluatype (name, TYPE_STRING)
 	checkluatype (func, TYPE_FUNCTION)
 
-	hookname = hookname:lower()
+	hookname = string.lower(hookname)
 	local hooks = instance.hooks[hookname]
 	if not hooks then
-		hooks = {}
+		hooks = SF.HookTable()
 		instance.hooks[hookname] = hooks
 	end
-	hooks[name] = func
+	hooks:add(name, func)
 
 	SF.HookAddInstance(instance, hookname)
 end
@@ -139,11 +139,11 @@ end
 function hook_library.run(hookname, ...)
 	checkluatype (hookname, TYPE_STRING)
 
-	local hook = hookname:lower()
-
-	if instance.hooks and instance.hooks[hook] then
+	hookname = string.lower(hookname)
+	local hooks = instance.hooks[hookname]
+	if hooks then
 		local tbl
-		for name, func in pairs(instance.hooks[hook]) do
+		for name, func in hooks:pairs() do
 			tbl = { func(...) }
 			if tbl[1]~=nil then
 				return unpack(tbl)
@@ -208,13 +208,13 @@ function hook_library.remove(hookname, name)
 	checkluatype (hookname, TYPE_STRING)
 	checkluatype (name, TYPE_STRING)
 
-	local lower = hookname:lower()
-	if instance.hooks[lower] then
-		instance.hooks[lower][name] = nil
-
-		if not next(instance.hooks[lower]) then
-			instance.hooks[lower] = nil
-			SF.HookRemoveInstance(instance, lower)
+	hookname = string.lower(hookname)
+	local hooks = instance.hooks[hookname]
+	if hooks then
+		hooks:remove(name)
+		if hooks:isEmpty() then
+			instance.hooks[hookname] = nil
+			SF.HookRemoveInstance(instance, hookname)
 		end
 	end
 end
@@ -427,7 +427,7 @@ end
 -- @class hook
 -- @shared
 -- @param ent The entity that fired the bullet
--- @param data The bullet data. See http://wiki.garrysmod.com/page/Structures/Bullet
+-- @param data The bullet data. See http://wiki.facepunch.com/gmod/Structures/Bullet
 
 --- Called when an entity is damaged
 -- @name EntityTakeDamage
@@ -500,3 +500,23 @@ end
 -- @param text The message
 -- @param team Whether the message was team only
 -- @param isdead Whether the message was send from a dead player
+
+--- Called when starfall chip errors
+-- @name StarfallError
+-- @class hook
+-- @shared
+-- @param ent Starfall chip that errored
+-- @param ply Owner of the chip on server or player that script errored for on client
+-- @param err Error message
+
+--- Called when a component is linked to the starfall
+-- @name ComponentLinked
+-- @class hook
+-- @shared
+-- @param ent The component entity
+
+--- Called when a component is unlinked to the starfall
+-- @name ComponentUnlinked
+-- @class hook
+-- @shared
+-- @param ent The component entity

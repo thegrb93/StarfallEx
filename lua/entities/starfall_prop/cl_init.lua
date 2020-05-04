@@ -1,7 +1,6 @@
 include("shared.lua")
 ENT.RenderGroup = RENDERGROUP_BOTH
 
-ENT.IsHologram = true
 ENT.DefaultMaterial = Material( "models/wireframe" )
 ENT.Material = ENT.DefaultMaterial
 

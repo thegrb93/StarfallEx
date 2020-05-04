@@ -88,41 +88,46 @@ end
 --@param target Optional target location to send the net message.
 --@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
-	if unreliable then checkluatype (unreliable, TYPE_BOOL) end
+	if target~=nil then checkluatype(target, TYPE_TABLE) end
+	if unreliable then checkluatype(unreliable, TYPE_BOOL) end
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
+
+	local newtarget
+	if SERVER then
+		if target then
+			newtarget = instance.UnwrapObject(target)
+			if newtarget then
+				if not (newtarget.IsValid and newtarget.IsPlayer and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
+			else
+				if #target == 0 then SF.Throw("Send array is empty", 2) end
+				newtarget = {}
+				for i = 1, #target do
+					local pl = eunwrap(target[i])
+					if pl:IsValid() and pl:IsPlayer() then
+						newtarget[i] = pl
+					else
+						SF.Throw("Invalid player inside send array", 2)
+					end
+				end
+			end
+		end
+	end
 
 	netBurst:use(instance.player, instance.data.net.size)
 
-	local data = instance.data.net.data
-	if #data == 0 then return false end
 	net.Start("SF_netmessage", unreliable)
 	net.WriteEntity(instance.data.entity)
+	local data = instance.data.net.data
 	for i = 1, #data do
 		local args = data[i][2]
 		data[i][1](unpack(args, 1, table.maxn(args)))
 	end
-
 	if SERVER then
-		local sendfunc, newtarget
-
-		if target then
-			if target[1] then
-				local nt = { }
-				for i = 1, #target do
-					local pl = eunwrap(target[i])
-					if pl and pl:IsValid() and pl:IsPlayer() then
-						nt[#nt + 1] = pl
-					end
-				end
-				sendfunc, newtarget = net.Send, nt
-			else
-				sendfunc, newtarget = net.Send, eunwrap(target)
-				if not (newtarget and newtarget:IsValid() and newtarget:IsPlayer()) then SF.Throw("Invalid player", 2) end
-			end
+		if newtarget then
+			net.Send(newtarget)
 		else
-			sendfunc = net.Broadcast
+			net.Broadcast()
 		end
-		sendfunc(newtarget)
 	else
 		net.SendToServer()
 	end

@@ -84,14 +84,6 @@ function ENT:Use(ply)
 	end
 end
 
-function ENT:LinkEnt(ent, ply)
-	self.link = ent
-	net.Start("starfall_processor_link")
-		net.WriteEntity(self)
-		net.WriteEntity(ent)
-	if ply then net.Send(ply) else net.Broadcast() end
-end
-
 function ENT:LinkVehicle(ent)
 	if ent then
 		vehiclelinks[ent] = self

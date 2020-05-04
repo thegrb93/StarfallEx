@@ -31,6 +31,9 @@ if CLIENT then
 			holo.HoloMatrix = scalematrix
 			holo:EnableMatrix("RenderMultiply", scalematrix)
 		end
+		if not holo.userrenderbounds then
+			holo:SetRenderBounds(holo:OBBMins() * scale, holo:OBBMaxs() * scale)
+		end
 	end
 end
 
@@ -147,6 +150,7 @@ end
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
+	if string.GetExtensionFromFilename( model ) ~= "mdl" then SF.Throw("Invalid model extension. (Expected .mdl)", 2) end
 
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
@@ -179,7 +183,6 @@ function holograms_library.create(pos, ang, model, scale)
 	else
 		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
 		if holoent and holoent:IsValid() then
-			holoent.IsSFHologram = true
 			holoent.SFHoloOwner = ply
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
@@ -304,7 +307,7 @@ else
 
 	--- Sets the texture filtering function when viewing a close texture
 	-- @client
-	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+	-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMag(val)
 		local holo = getholo(self)
 
@@ -320,7 +323,7 @@ else
 
 	--- Sets the texture filtering function when viewing a far texture
 	-- @client
-	-- @param val The filter function to use http://wiki.garrysmod.com/page/Enums/TEXFILTER
+	-- @param val The filter function to use http://wiki.facepunch.com/gmod/Enums/TEXFILTER
 	function hologram_methods:setFilterMin(val)
 		local holo = getholo(self)
 
@@ -418,6 +421,15 @@ else
 		
 	end
 	
+	--- Manually draws a hologram, requires a 3d render context
+	-- @client
+	function hologram_methods:draw()
+		if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end
+		
+		local holo = getholo(self)
+		holo:SetupBones()
+		holo:DrawModel()
+	end
 end
 
 --- Updates a clip plane
@@ -471,9 +483,9 @@ end
 -- @param model string model path
 function hologram_methods:setModel(model)
 	local holo = getholo(self)
-
 	checkluatype(model, TYPE_STRING)
-	if not util.IsValidModel(model) then SF.Throw("Model is invalid", 2) end
+
+	if string.GetExtensionFromFilename( model ) ~= "mdl" then SF.Throw("Invalid model extension. (Expected .mdl)", 2) end
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
