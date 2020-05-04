@@ -19,7 +19,7 @@ export default function TypePage(props)
     return (
         <div className="page page-type">
             <h1>{props.name}</h1>
-            <span className="accept-newlines">{props.description}</span>
+            <p className="accept-newlines">{props.description}</p>
 
             <h3>Methods:</h3>
             <table>

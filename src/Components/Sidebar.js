@@ -77,8 +77,9 @@ function unfoldPage(item, text)
       }
     }
   }
-  expanded = !item.collapsed || expanded || item.path.toUpperCase().includes(text.toUpperCase());
-  item.collapsed = !expanded;
+  
+  expanded = expanded || item.path.toUpperCase().includes(text.toUpperCase());
+  item.collapsed = !(expanded || !item.collapsed);
   if(text == "")
   {
     item.collapsed = true;
@@ -147,6 +148,7 @@ export default function Sidebar(props)
           searchText: action.value
         };
       case "FORCE_UNFOLD":
+        console.log("Forcing unfold on", action.value);
         for(const key in newState.items)
         {
           unfoldPage(newState.items[key], action.value);
@@ -165,7 +167,10 @@ export default function Sidebar(props)
         {
           return state;
         }
-        props.changePage(action.value);
+        setTimeout(() => {
+          props.changePage(action.value);
+
+        }, 1);
         return state;
       default:
         return state;
@@ -178,7 +183,9 @@ export default function Sidebar(props)
   const [state, dispatch] = useReducer(reducer, initialState);
   if(state.curForcedUnfold != props.currentPage)
   {
-    dispatch({type: "FORCE_UNFOLD", value: props.currentPage});
+    setTimeout(() => {
+      dispatch({type: "FORCE_UNFOLD", value: props.currentPage});
+    }, 1);
   }
   return (
     <div className = "sidebar">

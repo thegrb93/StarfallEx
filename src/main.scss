@@ -6,7 +6,7 @@
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+  font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -54,7 +54,7 @@ code {
     width: auto;
 
     .sidebar-item-children {
-      padding-left: 25px;
+      padding-left: 15px;
       margin-left: 6px;
       border-left: 1px solid $color-border-dark;
     }
@@ -149,7 +149,7 @@ code {
   overflow-y: auto;
 }
 
-.page-library, .page-type
+.page-library, .page-type, .page-table
 {
   table {
     border-collapse: collapse;
@@ -182,14 +182,42 @@ code {
   }
 }
 
-
-.realm-icon
+.letter-icon
 {
-  width: 1em;
-  height: 1em;
+  width: 15px;
+  height: 15px;
   margin-top: 3px;
   margin-right: 4px;
   border-radius: 10%;
+
+  text-align: center;
+  padding: 2px 2px 2px 2px;
+  line-height: 90%;
+
+  color: #FFFFFF;
+  text-shadow: #474747 1px 1px 1px;
+  font-size: 0.9em;
+  font-weight: bold;
+
+  background: #333;
+}
+.realm-icon
+{
+  width: 15px;
+  height: 15px;
+  margin-top: 3px;
+  margin-right: 4px;
+  border-radius: 10%;
+
+  text-align: center;
+  padding: 2px 2px 2px 2px;
+  line-height: 90%;
+
+  color: #FFFFFF;
+  text-shadow: #474747 1px 1px 1px;
+  font-size: 0.9em;
+  font-weight: bold;
+
   &-client
   {
     background: linear-gradient(45deg, #dea909 50%, #dea909 50.001%);

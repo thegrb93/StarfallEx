@@ -3,6 +3,8 @@ import LibraryPage from './Pages/Library';
 import MethodPage from './Pages/Method';
 import TypePage from './Pages/Type';
 import HookPage from './Pages/Hook';
+import TablePage from './Pages/Table';
+import MarkdownPage from './Pages/MarkdownPage';
 
 function mapClass(c)
 {
@@ -16,6 +18,10 @@ function mapClass(c)
       return TypePage;
     case "hook":
       return HookPage;
+    case "table":
+      return TablePage;
+    case "markdown":
+      return MarkdownPage;
     default:
       return null;
   }

@@ -40,7 +40,7 @@ export default function HookPage(props)
     return (
         <div className="page page-hook">
             {titlePart}
-            <span className="description accept-newlines">{props.description}</span>
+            <p className="description accept-newlines">{props.description}</p>
             {paramPart}
             {returnsPart}
         </div>

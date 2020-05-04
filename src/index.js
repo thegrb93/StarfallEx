@@ -50,6 +50,7 @@ const SF_DOC = {
         SF_DOC.AddPage("Libraries", "category", "", "", {}, "");
         SF_DOC.AddPage("Types", "category", "", "", {}, "");
         SF_DOC.AddPage("Hooks", "category", "", "", {}, "");
+        SF_DOC.AddPage("Directives", "category", "", "", {}, "");
 
         for (const [_, lib] of Object.entries(DocTable.Libraries)) {
 
@@ -57,11 +58,16 @@ const SF_DOC = {
                 name: lib.name,
                 realm: lib.realm,
                 description: lib.description,
-                methods: []
+                methods: [],
+                tables: []
             };
 
             for (const [_, method] of Object.entries(lib.methods)) {
                 libData.methods[method.name] = method.description;
+            }
+
+            for (const [_, table] of Object.entries(lib.tables)) {
+                libData.tables[table.name] = table.description;
             }
 
             SF_DOC.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
@@ -78,7 +84,20 @@ const SF_DOC = {
                     parent: lib.name,
                     type: "library",
                 }
-                SF_DOC.AddPage(method.name, "method", "realm", method.realm, methodData, path);
+                SF_DOC.AddPage(method.name, "method", "method-realm", method.realm, methodData, path);
+            }
+
+            for (const [_, table] of Object.entries(lib.tables)) {
+                let tableData = {
+                    name: table.name,
+                    description: table.description,
+                    realm: table.realm,
+                    description: table.description,
+                    fields: table.fields ?? [],
+                    parent: lib.name,
+                    type: "table",
+                }
+                SF_DOC.AddPage(table.name, "table", "table-realm", table.realm, tableData, path);
             }
         }
 
@@ -94,6 +113,12 @@ const SF_DOC = {
             SF_DOC.AddPage(hook.name, "hook", "realm", hook.realm, hookData, "Hooks");
         }
 
+        for (const [_, directive] of Object.entries(DocTable.Directives)) {
+            SF_DOC.AddPage(directive.name, "markdown", "letter", "@", {
+                title: "--@"+directive.name,
+                content: directive.description
+            }, "Directives");
+        }
         for (const [_, t] of Object.entries(DocTable.Types)) {
             let typeData = {
                 name: t.name,
