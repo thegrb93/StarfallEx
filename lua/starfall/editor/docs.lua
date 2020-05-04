@@ -1,6 +1,7 @@
 local Docs = {}
 SF.Docs = Docs
 
+Docs.Version = SF.Version or "master"
 Docs.Directives = {}
 Docs.Types = {}
 Docs.Libraries = {}
