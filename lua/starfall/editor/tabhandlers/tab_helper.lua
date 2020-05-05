@@ -60,8 +60,11 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
 	html:OpenURL("asset://garrysmod/html/sf_doc.html")
-	timer.Simple(1, function()
-		html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
+	hook.Add("Think","SF_DocLoading",function()
+		if not html:IsLoading() then
+			html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
+			hook.Remove("Think","SF_DocLoading")
+		end
 	end)
 	self.html = html
 	htmlSetup(nil, self)
