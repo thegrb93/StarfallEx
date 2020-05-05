@@ -412,7 +412,7 @@ end
 --- Sets the length of a rope attached to the entity
 -- @param index Index of the rope constraint
 -- @param e Entity that has the constraint
--- @param length New length of the rope
+-- @param length New length of the constraint
 -- @server
 function constraint_library.setRopeLength(index, e, length)
 	local ent1 = getent(e)
