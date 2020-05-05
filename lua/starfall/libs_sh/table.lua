@@ -62,7 +62,7 @@ table_library.empty = table.Empty
 -- @class function
 -- @param tbl Table to search
 -- @param val Any value to return element after
--- @returns Found element
+-- @return Found element
 table_library.findNext = table.FindNext
 
 --- Returns the value positioned before the supplied value in a table. If it isn't found then the last element in the table is returned.
@@ -149,7 +149,7 @@ table_library.hasValue = table.HasValue
 -- @class function
 -- @param target Table to copy data to
 -- @param base Table to copy data from
--- @returns The target table
+-- @return The target table
 table_library.inherit = table.Inherit
 
 --- Inserts a value into a table at the end of the table or at the given position.

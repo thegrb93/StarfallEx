@@ -718,7 +718,7 @@ if CLIENT then
 	-- @param model The full path to a model to get the visual meshes of.
 	-- @param lod The lod of the model to use.
 	-- @param bodygroupMask The bodygroupMask of the model to use.
-	-- @return A table of tables with the following format:<br><br>string material - The material of the specific mesh<br>table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles<br>table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table.<br>Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:<br><br>number boneID - The bone this vertex is attached to<br>number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
+	-- @return A table of tables with the following format:  string material - The material of the specific mesh table triangles - A table of MeshVertex structures ready to be fed into IMesh:BuildFromTriangles table verticies - A table of MeshVertex structures representing all the vertexes of the mesh. This table is used internally to generate the "triangles" table. Each MeshVertex structure returned also has an extra table of tables field called "weights" with the following data:  number boneID - The bone this vertex is attached to number weight - How "strong" this vertex is attached to the bone. A vertex can be attached to multiple bones at once.
 	-- @client
 	function mesh_library.getModelMeshes(model, lod, bodygroupMask)
 		checkluatype(model, TYPE_STRING)

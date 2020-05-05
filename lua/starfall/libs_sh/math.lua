@@ -4,6 +4,8 @@ local checkluatype = SF.CheckLuaType
 --- Lua math library https://wiki.garrysmod.com/page/Category:math
 -- @name math
 -- @class library
+-- @field huge inf error-float. Represents infinity.
+-- @field pi mathematical constant pi (3.1415926535898).
 -- @libtbl math_library
 SF.RegisterLibrary("math")
 
@@ -167,8 +169,6 @@ math_library.fmod = math.fmod
 -- @return Exponent integer
 math_library.frexp = math.frexp
 
---- Variable containing the largest possible number (any numerical comparison every number will be less than this).
--- @field
 math_library.huge = math.huge
 
 --- Converts an integer to a binary (base-2) string.
@@ -230,8 +230,6 @@ math_library.modf = math.modf
 -- @return The normalized angle
 math_library.normalizeAngle = math.NormalizeAngle
 
---- Variable containing mathematical constant pi (3.1415926535898).
--- @field
 math_library.pi = math.pi
 
 ---Returns x raised to the power y

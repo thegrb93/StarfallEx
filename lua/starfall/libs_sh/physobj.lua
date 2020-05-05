@@ -31,6 +31,19 @@ local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.
 
 -- @name builtins_library.FVPHYSICS
 -- @class table
+-- @field CONSTRAINT_STATIC
+-- @field DMG_DISSOLVE
+-- @field DMG_SLICE
+-- @field HEAVY_OBJECT
+-- @field MULTIOBJECT_ENTITY
+-- @field NO_IMPACT_DMG
+-- @field NO_NPC_IMPACT_DMG
+-- @field NO_PLAYER_PICKUP
+-- @field NO_SELF_COLLISIONS
+-- @field PART_OF_RAGDOLL
+-- @field PENETRATING
+-- @field PLAYER_HELD
+-- @field WAS_THROWN
 instance.env.FVPHYSICS = {
 	["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
 	["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
@@ -352,14 +365,14 @@ if SERVER then
 	
 	local validGameFlags = FVPHYSICS_DMG_DISSOLVE + FVPHYSICS_DMG_SLICE + FVPHYSICS_HEAVY_OBJECT + FVPHYSICS_NO_IMPACT_DMG +
 		FVPHYSICS_NO_NPC_IMPACT_DMG + FVPHYSICS_NO_PLAYER_PICKUP
-	--- Adds game flags to the physics object. Some flags cannot be modified
-	-- @param flags The flags to add. FVPHYSICS enum. Can be:<br>
-	-- FVPHYSICS.DMG_DISSOLVE<br>
-	-- FVPHYSICS.DMG_SLICE<br>
-	-- FVPHYSICS.HEAVY_OBJECT<br>
-	-- FVPHYSICS.NO_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
+	--- Adds game flags to the physics object. Some flags cannot be modified. Can be:
+	-- FVPHYSICS.DMG_DISSOLVE
+	-- FVPHYSICS.DMG_SLICE
+	-- FVPHYSICS.HEAVY_OBJECT
+	-- FVPHYSICS.NO_IMPACT_DMG
+	-- FVPHYSICS.NO_NPC_IMPACT_DMG
+	-- FVPHYSICS.NO_PLAYER_PICKUP
+	-- @param flags The flags to add. FVPHYSICS enum.
 	function physobj_methods:addGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)
@@ -372,14 +385,14 @@ if SERVER then
 		end
 	end
 	
-	--- Clears game flags from the physics object. Some flags cannot be modified
-	-- @param flags The flags to add. FVPHYSICS enum. Can be:<br>
-	-- FVPHYSICS.DMG_DISSOLVE<br>
-	-- FVPHYSICS.DMG_SLICE<br>
-	-- FVPHYSICS.HEAVY_OBJECT<br>
-	-- FVPHYSICS.NO_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_NPC_IMPACT_DMG<br>
-	-- FVPHYSICS.NO_PLAYER_PICKUP<br>
+	--- Clears game flags from the physics object. Some flags cannot be modified. Can be:
+	-- FVPHYSICS.DMG_DISSOLVE
+	-- FVPHYSICS.DMG_SLICE
+	-- FVPHYSICS.HEAVY_OBJECT
+	-- FVPHYSICS.NO_IMPACT_DMG
+	-- FVPHYSICS.NO_NPC_IMPACT_DMG
+	-- FVPHYSICS.NO_PLAYER_PICKUP
+	-- @param flags The flags to add. FVPHYSICS enum.
 	function physobj_methods:clearGameFlags(flags)
 		checkluatype(flags, TYPE_NUMBER)
 		local phys = unwrap(self)

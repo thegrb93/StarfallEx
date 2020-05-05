@@ -131,9 +131,9 @@ sourcet["default"] = sourcet["until-closed"]
 
 socket.source = socket.choose(sourcet)
 
---- Socket library. Only usable by owner of starfall.<br>
--- Beware "Blocking" functions; they will freeze the game. See http://w3.impa.br/~diego/software/luasocket/socket.html<br>
--- Install the gmcl_socket.core_*.dll binary file to lua/bin and create a 'gm_socket_whitelist.txt' file in steamapps/common<br>
+--- Socket library. Only usable by owner of starfall.
+-- Beware "Blocking" functions; they will freeze the game. See http://w3.impa.br/~diego/software/luasocket/socket.html
+-- Install the gmcl_socket.core_*.dll binary file to lua/bin and create a 'gm_socket_whitelist.txt' file in steamapps/common
 -- Each line in the whitelist will allow luasocket to access the specified domain and port. They are formatted as 'domain:port' e.g. 'garrysmod.com:80', '*.com:80' '95.123.12.22:27015'
 -- @name socket
 -- @class library
