@@ -113,6 +113,17 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 end
 
 --- Axis two entities
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
+-- @param v1 Position on the first entity, in its local space coordinates
+-- @param v2 Position on the second entity, in its local space coordinates
+-- @param force_lim Amount of force until it breaks, 0 = Unbreakable
+-- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
+-- @param friction Friction of the constraint
+-- @param nocollide Bool whether or not to nocollide the two entities
+-- @param laxis Local axis, if set, then position on the second entity (v2 argument) will not be used in the final constraint, however it's still required
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
 	plyCount:checkuse(instance.player, 1)
@@ -145,14 +156,22 @@ function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque
 	end
 end
 
---- Ballsocket two entities
+--- Ballsocket two entities together. For more options, see constraint.ballsocketadv
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
+-- @param pos Position of the joint, relative to the second entity
+-- @param force_lim Amount of force until it breaks, 0 = Unbreakable
+-- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
+-- @param nocollide Bool whether or not to nocollide the two entities
 -- @server
-function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torque_lim, nocollide)
+function constraint_library.ballsocket(e1, e2, bone1, bone2, pos, force_lim, torque_lim, nocollide)
 	plyCount:checkuse(instance.player, 1)
 
 	local ent1 = eunwrap(e1)
 	local ent2 = eunwrap(e2)
-	local vec1 = vunwrap(v1)
+	local vec1 = vunwrap(pos)
 
 	checkConstraint(ent1, "constraints.ballsocket")
 	checkConstraint(ent2, "constraints.ballsocket")
@@ -174,7 +193,20 @@ function constraint_library.ballsocket(e1, e2, bone1, bone2, v1, force_lim, torq
 	end
 end
 
---- Advanced Ballsocket two entities
+--- Ballsocket two entities together with more options
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
+-- @param v1 Position on the first entity, in its local space coordinates
+-- @param v2 Position on the second entity, in its local space coordinates
+-- @param force_lim Amount of force until it breaks, 0 = Unbreakable
+-- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
+-- @param minv Vector defining minimum rotation angle, local to the constraint
+-- @param maxv Vector defining minimum rotation angle, local to the constraint
+-- @param frictionv Vector defining rotational friction, local to the constraint
+-- @param rotateonly If True, ballsocket will only affect the rotation allowing for free movement, otherwise it will limit both - rotation and movement
+-- @param nocollide Bool whether or not to nocollide the two entities
 -- @server
 function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, minv, maxv, frictionv, rotateonly, nocollide)
 	plyCount:checkuse(instance.player, 1)
@@ -208,7 +240,19 @@ function constraint_library.ballsocketadv(e1, e2, bone1, bone2, v1, v2, force_li
 	end
 end
 
---- Elastic two entities
+--- Elastic constraint between two entities
+-- @param index Index of the elastic constraint
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
+-- @param v1 Position on the first entity, in its local space coordinates
+-- @param v2 Position on the second entity, in its local space coordinates
+-- @param const Constant of the constraint. Default = 1000
+-- @param damp Damping of the constraint. Default = 100
+-- @param rdamp Rotational damping of the constraint. Default = 0
+-- @param width Width of the created constraint
+-- @param strech True to mark as strech-only
 -- @server
 function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, damp, rdamp, width, strech)
 	plyCount:checkuse(instance.player, 1)
@@ -248,7 +292,20 @@ function constraint_library.elastic(index, e1, e2, bone1, bone2, v1, v2, const, 
 	end
 end
 
---- Ropes two entities
+--- Creates a rope between two entities
+-- @param index Index of the rope constraint
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
+-- @param v1 Position on the first entity, in its local space coordinates
+-- @param v2 Position on the second entity, in its local space coordinates
+-- @param length Length of the created rope
+-- @param addlength Amount to add to the base length of the rope. Default = 0
+-- @param force_lim Amount of force until it breaks, 0 = Unbreakable
+-- @param width Width of the rope
+-- @param material Material of the rope
+-- @param rigid Whether the rope is rigid
 -- @server
 function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, addlength, force_lim, width, material, rigid)
 	plyCount:checkuse(instance.player, 1)
@@ -290,6 +347,13 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 end
 
 --- Sliders two entities
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
+-- @param v1 Position on the first entity, in its local space coordinates
+-- @param v2 Position on the second entity, in its local space coordinates
+-- @param width Width of the slider 
 -- @server
 function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 
@@ -318,6 +382,10 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 end
 
 --- Nocollides two entities
+-- @param e1 The first entity
+-- @param e2 The second entity
+-- @param bone1 Number bone of the first entity
+-- @param bone2 Number bone of the second entity
 -- @server
 function constraint_library.nocollide(e1, e2, bone1, bone2)
 
@@ -342,6 +410,9 @@ function constraint_library.nocollide(e1, e2, bone1, bone2)
 end
 
 --- Sets the length of a rope attached to the entity
+-- @param index Index of the rope constraint
+-- @param e Entity that has the constraint
+-- @param length New length of the rope
 -- @server
 function constraint_library.setRopeLength(index, e, length)
 	local ent1 = getent(e)
@@ -361,6 +432,9 @@ function constraint_library.setRopeLength(index, e, length)
 end
 
 --- Sets the length of an elastic attached to the entity
+-- @param index Index of the elastic constraint
+-- @param e Entity that has the constraint
+-- @param length New length of the constraint
 -- @server
 function constraint_library.setElasticLength(index, e, length)
 	local ent1 = getent(e)
@@ -379,6 +453,7 @@ function constraint_library.setElasticLength(index, e, length)
 end
 
 --- Breaks all constraints on an entity
+-- @param e Entity to remove the constraints from
 -- @server
 function constraint_library.breakAll(e)
 	local ent1 = getent(e)
@@ -388,6 +463,8 @@ function constraint_library.breakAll(e)
 end
 
 --- Breaks all constraints of a certain type on an entity
+-- @param e Entity to be affected
+-- @param typename Name of the constraint type, ie. Weld, Elastic, NoCollide, etc.
 -- @server
 function constraint_library.breakType(e, typename)
 	checkluatype(typename, TYPE_STRING)
