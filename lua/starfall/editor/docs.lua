@@ -211,4 +211,3 @@ for name, mod in pairs(SF.Modules) do
 	end
 end
 processMembers()
-PrintTable(SF.Docs.Libraries.socket)
