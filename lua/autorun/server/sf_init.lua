@@ -18,6 +18,7 @@ resource.AddFile("models/spacecode/sfchip_small.mdl")
 resource.AddFile("resource/fonts/DejaVuSansMono.ttf")
 resource.AddFile("resource/fonts/RobotoMono.ttf")
 resource.AddFile("resource/fonts/FontAwesome.ttf")
+resource.AddFile("html/sf_doc.html")
 
 local files = file.Find("html/starfalleditor*", "GAME")
 if files[1] then 

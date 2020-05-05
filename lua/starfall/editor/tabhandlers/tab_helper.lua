@@ -49,7 +49,6 @@ end
 function TabHandler:Cleanup() -- Called when editor is reloaded/removed
 end
 
-
 -----------------------
 -- VGUI part (content)
 -----------------------
@@ -60,7 +59,13 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:OpenURL(SF.Editor.HelperURL:GetString())
+	html:OpenURL("asset://garrysmod/html/sf_doc.html")
+	hook.Add("Think","SF_DocLoading",function()
+		if not html:IsLoading() then
+			html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
+			hook.Remove("Think","SF_DocLoading")
+		end
+	end)
 	self.html = html
 	htmlSetup(nil, self)
 end
