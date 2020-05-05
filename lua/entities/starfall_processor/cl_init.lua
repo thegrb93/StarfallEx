@@ -87,8 +87,11 @@ end)
 net.Receive("starfall_processor_link", function()
 	local component = net.ReadEntity()
 	local proc = net.ReadEntity()
-	if (component and component:IsValid()) and component.LinkEnt then
-		component:LinkEnt(proc)
+
+	if component:IsValid() then
+		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+		local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
+		linkEnt(component, proc)
 	end
 end)
 
