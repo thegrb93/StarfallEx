@@ -147,7 +147,7 @@ local parseAttributes = {
 	end
 }
 local function parse(parsing, data)
-	local attribute, value = string.match(data, "%s*@(%w+)%s*(.*)")
+	local attribute, value = string.match(data, "^%s*@(%w+)%s*(.*)")
 	if attribute then
 		local parser = parseAttributes[attribute]
 		if parser then

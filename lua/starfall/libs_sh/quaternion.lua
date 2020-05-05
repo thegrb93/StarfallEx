@@ -251,17 +251,17 @@ quat_meta.__tostring = format
 
 
 
---- Returns Quaternion <n>*i
+--- Returns Quaternion i
 function quat_lib.qi(n)
 	return quicknew(0, n or 1, 0, 0)
 end
 
---- Returns Quaternion <n>*j
+--- Returns Quaternion j
 function quat_lib.qj(n)
 	return quicknew(0, 0, n or 1, 0)
 end
 
---- Returns Quaternion <n>*k
+--- Returns Quaternion k
 function quat_lib.qk(n)
 	return quicknew(0, 0, 0, n or 1)
 end
