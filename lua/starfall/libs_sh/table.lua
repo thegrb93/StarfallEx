@@ -285,8 +285,7 @@ end
 function table_library.merge( dest, source )
 
 	for k, v in pairs( source ) do
-		local meta = dgetmeta( t )
-		if ( istable( v ) and not (meta and instance.object_unwrappers[meta]) and istable( dest[ k ] ) ) then
+		if ( istable( v ) and istable( dest[ k ] ) and not instance.IsSFType( v ) and not instance.IsSFType( dest[ k ] ) ) then
 			table_library.merge( dest[ k ], v )
 		else
 			dest[ k ] = v

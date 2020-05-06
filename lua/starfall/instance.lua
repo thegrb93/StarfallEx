@@ -254,6 +254,11 @@ function SF.Instance:BuildEnvironment()
 		end
 	end
 
+	function self.IsSFType(val)
+		local metatable = dgetmeta(val)
+		return metatable and object_unwrappers[metatable]~=nil
+	end
+
 	-- A list of safe data types
 	local safe_types = {
 		[TYPE_NUMBER] = true,
