@@ -43,6 +43,7 @@ code {
   height: 100%;
   width: 18%;
   left: 0;
+  overflow-x: hidden;
   
   .sidebar-children {
     overflow-y: auto;
@@ -118,27 +119,38 @@ code {
       color: white;
     }
   }
+  
+  @media only screen and (max-width: 1210px)
+  {
+	.sidebar .logo
+	{
+	  margin-top: 10px;
+	}
+	
+	.sidebar .logo img
+	{
+	  display: none;
+	}
+  }
+  
   .logo
   {
     padding: 10px 0px 20px 00px;
-    align-items: center;
-    justify-content: center;
+    text-align: center;
     width: 100%;
+    white-space: nowrap;
     img {
       width: 48px;
       height: 48px;  
       filter: drop-shadow(3px 3px 3px #000);
       position: relative;
       top: 10px;
-      left: 10%;
     }
     .text
     {
       font-size: 40px;
       text-shadow: 3px 3px 3px #000;
       position: relative;
-      left: 10%;
-      top: 10%;
     }
   }
 }
@@ -204,6 +216,7 @@ code {
 .realm-icon
 {
   width: 15px;
+  min-width: 15px;
   height: 15px;
   margin-top: 3px;
   margin-right: 4px;
