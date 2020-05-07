@@ -13,9 +13,9 @@ return function(instance)
 local surfaceinfo_methods, surfaceinfo_meta, swrap, sunwrap = instance.Types.SurfaceInfo.Methods, instance.Types.SurfaceInfo, instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
 function surfaceinfo_meta:__tostring()
-	local surfinf = sunwrap(self)
-	if not surfinf then return "(null SurfaceInfo)"
-	else return tostring(surfinf) end
+	local surfInfo = sunwrap(self)
+	if not surfInfo then return "(null SurfaceInfo)"
+	else return tostring(surfInfo) end
 end
 
 
@@ -28,20 +28,18 @@ local lwrap, lunwrap = instance.Types.LockedMaterial.Wrap, instance.Types.Locked
 -- @client
 -- @return Material of one portion of a brush model.
 function surfaceinfo_methods:getMaterial()
-    local surface = sunwrap(self)
-    return lwrap(surface:GetMaterial())
+    return lwrap(sunwrap(self):GetMaterial())
 end
 
 --- Returns a list of vertices the brush surface is built from.
 -- @shared
 -- @return A list of Vector points. This will usually be 4 corners of a quadrilateral in counter-clockwise order.
 function surfaceinfo_methods:getVertices()
-    local surface = sunwrap(self)
-    local t = surface:GetVertices()
+    local t = sunwrap(self):GetVertices()
     local out = {}
     if not t then return out end
-    for K,Vec in ipairs(t) do
-        out[K] = vwrap(Vec)
+    for k,vec in ipairs(t) do
+        out[k] = vwrap(vec)
     end
     return out
 end
@@ -51,8 +49,7 @@ end
 -- @shared
 -- @return Returns true if this surface won't be drawn.
 function surfaceinfo_methods:isNoDraw()
-    local surface = sunwrap(self)
-    return surface:IsNoDraw()
+    return sunwrap(self):IsNoDraw()
 end
 
 --- Checks if the brush surface is displaying the skybox.
@@ -60,8 +57,7 @@ end
 -- @shared
 -- @return Returns true if the surface is the sky.
 function surfaceinfo_methods:isSky()
-    local surface = sunwrap(self)
-    return surface:IsSky()
+    return sunwrap(self):IsSky()
 end
 
 --- Checks if the brush surface is water.
@@ -69,8 +65,7 @@ end
 -- @shared
 -- @return Returns true if the surface is water.
 function surfaceinfo_methods:isWater()
-    local surface = sunwrap(self)
-    return surface:IsWater()
+    return sunwrap(self):IsWater()
 end
 
 end
