@@ -231,8 +231,7 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
-local mtl_meta, mtlwrap, mtlunwrap = instance.Types.Material, instance.Types.Material.Wrap, instance.Types.Material.Unwrap
-local mtl_meta2 = instance.Types.LockedMaterial
+local mtlunwrap = instance.Types.LockedMaterial.Unwrap
 
 
 render_library.TEXT_ALIGN_LEFT = TEXT_ALIGN_LEFT
@@ -658,9 +657,6 @@ function render_library.setMaterial(mat)
 	local data = instance.data.render
 	if not data.isRendering then SF.Throw("Not in rendering hook.", 2) end
 	if mat then
-		local t = dgetmeta(mat)
-		if t~=mtl_meta and t~=mtl_meta2 then SF.ThrowTypeError("Material", SF.GetType(mat), 2) end
-
 		local m = mtlunwrap(mat)
 		surface.SetMaterial(m)
 		render.SetMaterial(m)
@@ -672,19 +668,13 @@ end
 
 
 local function gettexture(mat)
-
-	local t = dgetmeta(mat)
-	if t ~= mtl_meta and t ~= mtl_meta2 then
-		if TypeID(mat) ~= TYPE_STRING then
-			SF.ThrowTypeError("Material or string", SF.GetType(mat), 3)
-		end
+	if isstring(mat) then
 		local rt = instance.data.render.rendertargets[mat]
 		if not rt then SF.Throw("Invalid Rendertarget", 3) end
 		return rt
 	else
 		return mtlunwrap(mat):GetTexture("$basetexture")
 	end
-
 end
 
 --- Sets the current render material to the given material or the rendertarget, applying an additive shader when drawn.

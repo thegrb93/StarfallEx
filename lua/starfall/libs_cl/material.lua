@@ -304,8 +304,8 @@ SF.RegisterLibrary("material")
 -- @name Material
 -- @class type
 -- @libtbl material_methods
-SF.RegisterType("Material", true, false)
-SF.RegisterType("LockedMaterial", true, false, nil, "Material") --Material that can't be modified
+SF.RegisterType("Material", true, false, nil, "LockedMaterial")
+SF.RegisterType("LockedMaterial", true, false) --Material that can't be modified
 
 
 return function(instance)
@@ -318,9 +318,6 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
 local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local matrix_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
-
--- We don't want locked material able to access unlocked material methods
-lmaterial_meta.__index = lmaterial_methods
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()

@@ -131,8 +131,7 @@ if CLIENT then
 
 		if material then
 			local t = debug.getmetatable(material)
-			if t~=instance.Types.Material and t~=instance.Types.LMaterial then SF.ThrowTypeError("Material", SF.GetType(material), 2) end
-			ent.Material = instance.Types.Material.Unwrap(material)
+			ent.Material = instance.Types.LockedMaterial.Unwrap(material)
 		else
 			ent.Material = ent.DefaultMaterial
 		end
