@@ -1,8 +1,4 @@
--- Globals
-local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-local registerprivilege = SF.Permissions.registerPrivilege
-
+-- Globals unneeded for now
 
 --- SurfaceInfo type
 -- @name SurfaceInfo
@@ -26,13 +22,14 @@ end
 ----------- Methods -----------
 
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
+local lwrap, lunwrap = instance.Types.LockedMaterial.Wrap, instance.Types.LockedMaterial.Unwrap
 
 --- Returns the brush surface's material.
--- @shared
+-- @client
 -- @return Material of one portion of a brush model.
 function surfaceinfo_methods:getMaterial()
     local surface = sunwrap(self)
-    return surface:GetMaterial()
+    return lwrap(surface:GetMaterial())
 end
 
 --- Returns a list of vertices the brush surface is built from.
