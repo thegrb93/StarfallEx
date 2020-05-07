@@ -28,6 +28,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local plywrap = instance.Types.Player.Wrap
+local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
 local function getent(self)
 	local ent = eunwrap(self)
@@ -1283,6 +1284,21 @@ function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
 	checkluatype(hitbox, TYPE_NUMBER)
 	checkluatype(hitboxset, TYPE_NUMBER)
 	return getent(self):GetHitBoxHitGroup(hitbox, hitboxset)
+end
+
+--- Returns a table of brushes surfaces for brush model entities.
+-- @shared
+-- @class function
+-- @return Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
+function ents_methods:getBrushSurfaces()
+	local ent = getent(self)
+	local t = ent:GetBrushSurfaces()
+	if not t then return end
+	local out = {}
+	for k,surface in ipairs(t) do
+		out[k] = swrap(surface)
+	end
+	return out
 end
 
 end
