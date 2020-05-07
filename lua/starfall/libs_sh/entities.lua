@@ -1297,7 +1297,7 @@ function ents_methods:getBrushSurfaces()
 	local out = {}
 	if t then
 		for k,surface in ipairs(t) do
-			out[K] = swrap(surface)
+			out[k] = swrap(surface)
 		end
 	end
 	return out
