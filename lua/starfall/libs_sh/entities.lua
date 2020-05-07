@@ -1290,15 +1290,14 @@ end
 --- Returns a table of brushes surfaces for brush model entities.
 -- @shared
 -- @class function
--- @return Table of SurfaceInfos if the entity has a brush model, or an empty table otherwise.
+-- @return Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
 function ents_methods:getBrushSurfaces()
 	local ent = getent(self)
 	local t = ent:GetBrushSurfaces()
+	if not t then return end
 	local out = {}
-	if t then
-		for k,surface in ipairs(t) do
-			out[k] = swrap(surface)
-		end
+	for k,surface in ipairs(t) do
+		out[k] = swrap(surface)
 	end
 	return out
 end
