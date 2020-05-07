@@ -13,9 +13,7 @@ return function(instance)
 local surfaceinfo_methods, surfaceinfo_meta, swrap, sunwrap = instance.Types.SurfaceInfo.Methods, instance.Types.SurfaceInfo, instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
 function surfaceinfo_meta:__tostring()
-	local surfInfo = sunwrap(self)
-	if not surfInfo then return "(null SurfaceInfo)"
-	else return tostring(surfInfo) end
+	return "SurfaceInfo"
 end
 
 
