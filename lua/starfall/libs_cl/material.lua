@@ -533,50 +533,38 @@ function lmaterial_methods:destroy()
 end
 
 --- Returns the material's engine name
+-- @name material_methods.getName
 -- @return The name of the material. If this material is user created, add ! to the beginning of this to use it with entity.setMaterial
-function material_methods:getName()
-	return unwrap(self):GetName()
-end
 function lmaterial_methods:getName()
 	return lunwrap(self):GetName()
 end
 
 --- Returns the shader name of the material
+-- @name material_methods.getShader
 -- @return The shader name of the material
-function material_methods:getShader()
-	return unwrap(self):GetShader()
-end
 function lmaterial_methods:getShader()
 	return lunwrap(self):GetShader()
 end
 
 --- Gets the base texture set to the material's width
+-- @name material_methods.getWidth
 -- @return The basetexture's width
-function material_methods:getWidth()
-	return unwrap(self):Width()
-end
 function lmaterial_methods:getWidth()
 	return lunwrap(self):Width()
 end
 
 --- Gets the base texture set to the material's height
+-- @name material_methods.getHeight
 -- @return The basetexture's height
-function material_methods:getHeight()
-	return unwrap(self):Height()
-end
 function lmaterial_methods:getHeight()
 	return lunwrap(self):Height()
 end
 
 --- Returns a color pixel value of the $basetexture of a .png or .jpg material.
+-- @name material_methods.getColor
 -- @param x The x coordinate of the pixel
 -- @param y The y coordinate of the pixel
 -- @return The color value
-function material_methods:getColor(x, y)
-	checkluatype(x, TYPE_NUMBER)
-	checkluatype(y, TYPE_NUMBER)
-	return cwrap(unwrap(self):GetColor(x, y))
-end
 function lmaterial_methods:getColor(x, y)
 	checkluatype(x, TYPE_NUMBER)
 	checkluatype(y, TYPE_NUMBER)
@@ -584,70 +572,52 @@ function lmaterial_methods:getColor(x, y)
 end
 
 --- Returns a float keyvalue
+-- @name material_methods.getFloat
 -- @param key The key to get the float from
 -- @return The float value or nil if it doesn't exist
-function material_methods:getFloat(key)
-	checkluatype(key, TYPE_STRING)
-	return unwrap(self):GetFloat(key)
-end
 function lmaterial_methods:getFloat(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetFloat(key)
 end
 
 --- Returns an int keyvalue
+-- @name material_methods.getInt
 -- @param key The key to get the int from
 -- @return The int value or nil if it doesn't exist
-function material_methods:getInt(key)
-	checkluatype(key, TYPE_STRING)
-	return unwrap(self):GetInt(key)
-end
 function lmaterial_methods:getInt(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetInt(key)
 end
 
 --- Returns a table of material keyvalues
+-- @name material_methods.getKeyValues
 -- @return The table of keyvalues
-function material_methods:getKeyValues()
-	return instance.Sanitize(unwrap(self):GetKeyValues())
-end
 function lmaterial_methods:getKeyValues()
 	return instance.Sanitize(lunwrap(self):GetKeyValues())
 end
 
 --- Returns a matrix keyvalue
+-- @name material_methods.getMatrix
 -- @param key The key to get the matrix from
 -- @return The matrix value or nil if it doesn't exist
-function material_methods:getMatrix(key)
-	checkluatype(key, TYPE_STRING)
-	return mwrap(unwrap(self):GetMatrix(key))
-end
 function lmaterial_methods:getMatrix(key)
 	checkluatype(key, TYPE_STRING)
 	return mwrap(lunwrap(self):GetMatrix(key))
 end
 
 --- Returns a string keyvalue
+-- @name material_methods.getString
 -- @param key The key to get the string from
 -- @return The string value or nil if it doesn't exist
-function material_methods:getString(key)
-	checkluatype(key, TYPE_STRING)
-	return unwrap(self):GetString(key)
-end
 function lmaterial_methods:getString(key)
 	checkluatype(key, TYPE_STRING)
 	return lunwrap(self):GetString(key)
 end
 
 --- Returns a texture id keyvalue
+-- @name material_methods.getTexture
 -- @param key The key to get the texture from
 -- @return The string id of the texture or nil if it doesn't exist
-function material_methods:getTexture(key)
-	checkluatype(key, TYPE_STRING)
-	local tex = unwrap(self):GetTexture(key)
-	if tex then return tex:GetName() end
-end
 function lmaterial_methods:getTexture(key)
 	checkluatype(key, TYPE_STRING)
 	local tex = lunwrap(self):GetTexture(key)
@@ -655,31 +625,22 @@ function lmaterial_methods:getTexture(key)
 end
 
 --- Returns a vector keyvalue
+-- @name material_methods.getVector
 -- @param key The key to get the vector from
 -- @return The string id of the texture
-function material_methods:getVector(key)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(unwrap(self):GetVector(key))
-end
 function lmaterial_methods:getVector(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVector(key))
 end
 
 --- Returns a linear color-corrected vector keyvalue
+-- @name material_methods.getVectorLinear
 -- @param key The key to get the vector from
 -- @return The vector value or nil if it doesn't exist
-function material_methods:getVectorLinear(key)
-	checkluatype(key, TYPE_STRING)
-	return vwrap(unwrap(self):GetVectorLinear(key))
-end
 function lmaterial_methods:getVectorLinear(key)
 	checkluatype(key, TYPE_STRING)
 	return vwrap(lunwrap(self):GetVectorLinear(key))
 end
-
--- function material_methods:isError()
--- end
 
 --- Refreshes the material. Sometimes needed for certain parameters to update
 function material_methods:recompute()
