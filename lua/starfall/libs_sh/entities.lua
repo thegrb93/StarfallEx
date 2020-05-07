@@ -1286,4 +1286,20 @@ function ents_methods:getHitBoxHitGroup(hitbox, hitboxset)
 	return getent(self):GetHitBoxHitGroup(hitbox, hitboxset)
 end
 
+--- Returns a table of brushes surfaces for brush model entities.
+-- @shared
+-- @class function
+-- @return Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
+function ents_methods:getBrushSurfaces()
+	local ent = getent(self)
+	local t = ent:GetBrushSurfaces()
+	out = {}
+	if t then
+		for K,Surface in ipairs(t) do
+			out[K] = swrap(Surface)
+		end
+	end
+	return out
+end
+
 end
