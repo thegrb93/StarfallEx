@@ -28,6 +28,7 @@ local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap
 local phys_meta, pwrap, punwrap = instance.Types.PhysObj, instance.Types.PhysObj.Wrap, instance.Types.PhysObj.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 local plywrap = instance.Types.Player.Wrap
+local swrap, sunwrap = instance.Types.SurfaceInfo.Wrap, instance.Types.SurfaceInfo.Unwrap
 
 local function getent(self)
 	local ent = eunwrap(self)
@@ -1289,14 +1290,14 @@ end
 --- Returns a table of brushes surfaces for brush model entities.
 -- @shared
 -- @class function
--- @return Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
+-- @return Table of SurfaceInfos if the entity has a brush model, or an empty table otherwise.
 function ents_methods:getBrushSurfaces()
 	local ent = getent(self)
 	local t = ent:GetBrushSurfaces()
-	out = {}
+	local out = {}
 	if t then
-		for K,Surface in ipairs(t) do
-			out[K] = swrap(Surface)
+		for k,surface in ipairs(t) do
+			out[K] = swrap(surface)
 		end
 	end
 	return out
