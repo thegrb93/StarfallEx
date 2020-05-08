@@ -149,7 +149,6 @@ export default function Sidebar(props)
           searchText: action.value
         };
       case "FORCE_UNFOLD":
-        console.log("Forcing unfold on", action.value);
         for(const key in newState.items)
         {
           unfoldPage(newState.items[key], action.value);
@@ -227,7 +226,7 @@ function SidebarElement(props)
               )
             }           
             <Icon type={iconType} value={icon} />
-            <div className = {"name" + (selected ? " name-selected" : "")} onClick = {() => type === "category"? dispatch({type:"TOGGLE_COLLAPSE", value: path}) : dispatch({type:"CHANGE_PAGE", value: path})}>
+            <div className = {"name" + (selected ? " name-selected" : "")} onClick = {function() {dispatch({type:"TOGGLE_COLLAPSE", value: path}); dispatch({type:"CHANGE_PAGE", value: path});}}>
               {name}
             </div>
           </div>

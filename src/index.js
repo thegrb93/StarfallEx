@@ -8,6 +8,30 @@ import * as serviceWorker from './serviceWorker';
 let sidebarItems = [];
 let pages = {};
 
+if (!Object.entries) {
+  Object.entries = function( obj ){
+    var ownProps = Object.keys( obj ),
+        i = ownProps.length,
+        resArray = new Array(i); // preallocate the Array
+    while (i--)
+      resArray[i] = [ownProps[i], obj[ownProps[i]]];
+    
+    return resArray;
+  };
+}
+
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    'use strict';
+
+    if (search instanceof RegExp) {
+      throw TypeError('first argument must not be a RegExp');
+    } 
+    if (start === undefined) { start = 0; }
+    return this.indexOf(search, start) !== -1;
+  };
+}
+
 const SF_DOC = {
     AddPage: (name, type, iconType, icon, data, parent = "") =>
     {
