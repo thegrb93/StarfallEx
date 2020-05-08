@@ -146,6 +146,9 @@ end
 
 
 --- Creates a hologram.
+-- @param pos The position to create the hologram
+-- @param model The model to give the hologram
+-- @param scale (Optional) The scale to give the hologram
 -- @return The hologram object
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
