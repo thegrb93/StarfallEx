@@ -123,7 +123,7 @@ end
 -- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
 -- @param friction Friction of the constraint
 -- @param nocollide Bool whether or not to nocollide the two entities
--- @param laxis Local axis, if set, then position on the second entity (v2 argument) will not be used in the final constraint, however it's still required
+-- @param laxis Optional axis of the constraint, local to the first entity
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
 	plyCount:checkuse(instance.player, 1)
@@ -202,8 +202,8 @@ end
 -- @param v2 Position on the second entity, in its local space coordinates
 -- @param force_lim Amount of force until it breaks, 0 = Unbreakable
 -- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
--- @param minv Vector defining minimum rotation angle, local to the constraint
--- @param maxv Vector defining minimum rotation angle, local to the constraint
+-- @param minv Vector defining minimum rotation angle based on world axes
+-- @param maxv Vector defining maximum rotation angle based on world axes
 -- @param frictionv Vector defining rotational friction, local to the constraint
 -- @param rotateonly If True, ballsocket will only affect the rotation allowing for free movement, otherwise it will limit both - rotation and movement
 -- @param nocollide Bool whether or not to nocollide the two entities
