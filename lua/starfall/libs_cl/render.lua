@@ -16,6 +16,7 @@ registerprivilege("render.offscreen", "Render Screen", "Allows the user to rende
 registerprivilege("render.renderView", "Render View", "Allows the user to render the world again with custom perspective", { client = {} })
 registerprivilege("render.renderscene", "Render Scene", "Allows the user to render a world again without a screen with custom perspective", { client = {} })
 registerprivilege("render.effects", "Render Effects", "Allows the user to render special effects such as screen blur, color modification, and bloom", { client = {} })
+registerprivilege("render.calcview", "Render CalcView", "Allows the use of the CalcView hook", { client = {} })
 
 local cv_max_rendertargets = CreateConVar("sf_render_maxrendertargets", "20", { FCVAR_ARCHIVE })
 local cv_max_maxrenderviewsperframe = CreateConVar("sf_render_maxrenderviewsperframe", "2", { FCVAR_ARCHIVE })
@@ -184,7 +185,7 @@ local function canRenderHudSafeArgs(instance, ...)
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return instance:isHUDActive() and haspermission(instance, nil, "render.hud"), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
+	return instance:isHUDActive() and haspermission(instance, nil, "render.calcview"), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
 
 local function returnCalcview(instance, tbl)
