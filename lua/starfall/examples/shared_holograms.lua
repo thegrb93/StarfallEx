@@ -47,7 +47,7 @@ else
     
     net.receive("holo", function(len)
         -- Since the client may not have created the hologram yet, it's important to use the callback of net.readEntity to wait and be sure it exists first.
-        local holo_index = net.readEntity(receivedHologram)
+        net.readEntity(receivedHologram)
     end)
     
 end
