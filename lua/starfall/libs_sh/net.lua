@@ -476,15 +476,15 @@ end
 -- @return The entity that was read
 function net_library.readEntity(callback)
 	local index = net.ReadUInt(16)
-	--[[if callback ~= nil and CLIENT then
+	if callback ~= nil and CLIENT then
 		checkluatype(callback, TYPE_FUNCTION)
 		SF.WaitForEntity(index, function(ent)
 			if ent ~= nil then ent = instance.WrapObject(ent) end
 			instance:runFunction(callback, ent)
 		end)
-	else]]
+	else
 		return instance.WrapObject(Entity(index))
-	--end
+	end
 end
 
 --- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.

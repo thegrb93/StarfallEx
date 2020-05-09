@@ -656,24 +656,33 @@ function SF.CheckLuaType(val, typ, level)
 	end
 end
 
-local counter = 0
-function SF.WaitForEntity(index, callback)
-	local ent = Entity(index)
-	if ent:IsValid() then
-		callback(ent)
-	else
-		local timeout = CurTime()+5
-		local name = "SF_WaitForEntity"..counter
-		counter = (counter + 1)%4294967295
-		hook.Add("Think", name, function()
+do
+	local waitingEntities = {}
+	local function findWaitingEntities()
+		local time = CurTime()
+		for index, v in pairs(waitingEntities) do
 			local ent = Entity(index)
 			if ent:IsValid() then
-				callback(ent)
-				hook.Remove("Think", name)
-			elseif CurTime()>timeout then
-				hook.Remove("Think", name)
+				for _, func in ipairs(v) do func(ent) end
+				waitingEntities[index] = nil
+			elseif time>v.timeout then
+				for _, func in ipairs(v) do func() end
+				waitingEntities[index] = nil
 			end
-		end)
+		end
+		if next(waitingEntities) == nil then hook.Remove("Think", "SF_WaitingForEntities") end
+	end
+
+	function SF.WaitForEntity(index, callback)
+		local ent = Entity(index)
+		if ent:IsValid() then
+			callback(ent)
+		else
+			if next(waitingEntities) == nil then hook.Add("Think", "SF_WaitingForEntities", findWaitingEntities) end
+			local indexTbl = waitingEntities[index]
+			if not indexTbl then indexTbl = {timeout = CurTime()+5} waitingEntities[index] = indexTbl end
+			indexTbl[#indexTbl+1] = callback
+		end
 	end
 end
 
