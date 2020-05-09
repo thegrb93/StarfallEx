@@ -103,7 +103,7 @@ net.Receive("starfall_hologram", function()
 	if updateClips then clipdata = SF.StringStream(net.ReadData(net.ReadUInt(32))) end
 
 	local function applyHologram(self)
-		if self.IsSFHologram then
+		if self and self.IsSFHologram then
 			if updateScale then
 				SF.SetHologramScale(self, scale)
 			end

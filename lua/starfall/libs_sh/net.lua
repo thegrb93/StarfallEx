@@ -268,7 +268,6 @@ end
 -- @shared
 -- @param t The integer to be written
 -- @param n The amount of bits the integer consists of
-
 function net_library.writeInt(t, n)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -284,7 +283,6 @@ end
 -- @shared
 -- @param n The amount of bits to read
 -- @return The integer that was read
-
 function net_library.readInt(n)
 	checkluatype (n, TYPE_NUMBER)
 	return net.ReadInt(n)
@@ -294,7 +292,6 @@ end
 -- @shared
 -- @param t The integer to be written
 -- @param n The amount of bits the integer consists of. Should not be greater than 32
-
 function net_library.writeUInt(t, n)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -310,7 +307,6 @@ end
 -- @shared
 -- @param n The amount of bits to read
 -- @return The unsigned integer that was read
-
 function net_library.readUInt(n)
 	checkluatype (n, TYPE_NUMBER)
 	return net.ReadUInt(n)
@@ -319,7 +315,6 @@ end
 --- Writes a bit to the net message
 -- @shared
 -- @param t The bit to be written. (0 for false, 1 (or anything) for true)
-
 function net_library.writeBit(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -332,7 +327,6 @@ end
 --- Reads a bit from the net message
 -- @shared
 -- @return The bit that was read. (0 for false, 1 for true)
-
 function net_library.readBit()
 	return net.ReadBit()
 end
@@ -340,7 +334,6 @@ end
 --- Writes a bool to the net message
 -- @shared
 -- @param t The bit to be written. (boolean)
-
 function net_library.writeBool(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -353,7 +346,6 @@ end
 --- Reads a boolean from the net message
 -- @shared
 -- @return The boolean that was read.
-
 function net_library.readBool()
 	return net.ReadBool()
 end
@@ -361,7 +353,6 @@ end
 --- Writes a double to the net message
 -- @shared
 -- @param t The double to be written
-
 function net_library.writeDouble(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -374,7 +365,6 @@ end
 --- Reads a double from the net message
 -- @shared
 -- @return The double that was read
-
 function net_library.readDouble()
 	return net.ReadDouble()
 end
@@ -382,7 +372,6 @@ end
 --- Writes a float to the net message
 -- @shared
 -- @param t The float to be written
-
 function net_library.writeFloat(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
@@ -395,7 +384,6 @@ end
 --- Reads a float from the net message
 -- @shared
 -- @return The float that was read
-
 function net_library.readFloat()
 	return net.ReadFloat()
 end
@@ -403,7 +391,6 @@ end
 --- Writes an angle to the net message
 -- @shared
 -- @param t The angle to be written
-
 function net_library.writeAngle(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 	write(net.WriteFloat, 4*8, t[1])
@@ -415,7 +402,6 @@ end
 --- Reads an angle from the net message
 -- @shared
 -- @return The angle that was read
-
 function net_library.readAngle()
 	return awrap(Angle(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
@@ -423,7 +409,6 @@ end
 --- Writes an vector to the net message. Has significantly lower precision than writeFloat
 -- @shared
 -- @param t The vector to be written
-
 function net_library.writeVector(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 	write(net.WriteFloat, 4*8, t[1])
@@ -435,7 +420,6 @@ end
 --- Reads a vector from the net message
 -- @shared
 -- @return The vector that was read
-
 function net_library.readVector()
 	return vwrap(Vector(net.ReadFloat(), net.ReadFloat(), net.ReadFloat()))
 end
@@ -443,7 +427,6 @@ end
 --- Writes an matrix to the net message
 -- @shared
 -- @param t The matrix to be written
-
 function net_library.writeMatrix(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 	local vals = {munwrap(t):Unpack()}
@@ -456,7 +439,6 @@ end
 --- Reads a matrix from the net message
 -- @shared
 -- @return The matrix that was read
-
 function net_library.readMatrix()
 	local m = Matrix()
 	m:SetUnpacked(net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat(), net.ReadFloat())
@@ -466,7 +448,6 @@ end
 --- Writes an color to the net message
 -- @shared
 -- @param t The color to be written
-
 function net_library.writeColor(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 	write(net.WriteColor, 4*8, cunwrap(t))
@@ -476,7 +457,6 @@ end
 --- Reads a color from the net message
 -- @shared
 -- @return The color that was read
-
 function net_library.readColor()
 	return cwrap(net.ReadColor())
 end
@@ -484,19 +464,27 @@ end
 --- Writes an entity to the net message
 -- @shared
 -- @param t The entity to be written
-
 function net_library.writeEntity(t)
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
-	write(net.WriteEntity, 2*8, getent(t))
+	write(net.WriteUInt, 16, getent(t):EntIndex(), 16)
 	return true
 end
 
 --- Reads a entity from the net message
 -- @shared
+-- @param callback (Client only) optional callback to be ran whenever the entity becomes valid; returns nothing if this is used. The callback passes the entity if it succeeds or nil if it fails.
 -- @return The entity that was read
-
-function net_library.readEntity()
-	return instance.WrapObject(net.ReadEntity())
+function net_library.readEntity(callback)
+	local index = net.ReadUInt(16)
+	if callback ~= nil and CLIENT then
+		checkluatype(callback, TYPE_FUNCTION)
+		SF.WaitForEntity(index, function(ent)
+			if ent ~= nil then ent = instance.WrapObject(ent) end
+			instance:runFunction(callback, ent)
+		end)
+	else
+		return instance.WrapObject(Entity(index))
+	end
 end
 
 --- Like glua net.Receive, adds a callback that is called when a net message with the matching name is received. If this happens, the net hook won't be called.

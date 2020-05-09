@@ -656,13 +656,15 @@ function SF.CheckLuaType(val, typ, level)
 	end
 end
 
+local counter = 0
 function SF.WaitForEntity(index, callback)
 	local ent = Entity(index)
 	if ent:IsValid() then
 		callback(ent)
 	else
 		local timeout = CurTime()+5
-		local name = "SF_WaitForEntity"..index
+		local name = "SF_WaitForEntity"..counter
+		counter = (counter + 1)%4294967295
 		hook.Add("Think", name, function()
 			local ent = Entity(index)
 			if ent:IsValid() then

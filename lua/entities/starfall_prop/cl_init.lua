@@ -94,7 +94,7 @@ net.Receive("starfall_custom_prop", function()
 	end
 
 	SF.WaitForEntity(index, function(e)
-		if e:GetClass()=="starfall_prop" then
+		if e and e:GetClass()=="starfall_prop" then
 			self = e
 			applyData()
 		end
