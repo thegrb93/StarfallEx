@@ -32,9 +32,11 @@ else
         if ent==nil then error("Failed to get hologram!") end
         -- We need to convert it back to it's original type in order to use the Hologram methods on it
         local server_holo = ent:toHologram()
+        
         -- Let's now initialize a continuous hook that will use clientside-only method setRenderMatrix on our serverside hologram
         local m = Matrix()
         hook.add("tick", "scale", function()
+            if not server_holo:isValid() then return end
             local scale = 0.75 + math.sin(timer.curtime() * 10) / 4
             m:setScale(Vector(scale))
             m:rotate(Angle(0, 1, 0))
