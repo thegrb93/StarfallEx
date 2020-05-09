@@ -30,6 +30,7 @@ else
     
     local function receivedHologram(ent)
         if ent==nil then error("Failed to get hologram!") end
+        
         -- We need to convert it back to it's original type in order to use the Hologram methods on it
         local server_holo = ent:toHologram()
         
@@ -37,13 +38,13 @@ else
         local m = Matrix()
         hook.add("tick", "scale", function()
             if not server_holo:isValid() then return end
+            
             local scale = 0.75 + math.sin(timer.curtime() * 10) / 4
             m:setScale(Vector(scale))
             m:rotate(Angle(0, 1, 0))
             server_holo:setRenderMatrix(m)
         end)
     end
-    
     
     net.receive("holo", function(len)
         -- Since the client may not have created the hologram yet, it's important to use the callback of net.readEntity to wait and be sure it exists first.
