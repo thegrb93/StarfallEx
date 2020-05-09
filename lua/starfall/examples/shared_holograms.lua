@@ -14,8 +14,7 @@ if SERVER then
     
     hook.add("ClientInitialized", "cl_init", function(ply)
         net.start("holo")
-            -- To solve common issue with entities being invalid on client, we will send their index instead of using net.writeEntity
-            net.writeUInt(realm_holo:entIndex(), 16)
+            net.writeEntity(realm_holo)
         net.send(ply)
     end)
     
@@ -29,29 +28,24 @@ else
     -- you can manually set the render bounds (worth noting, that this method is part of the Entity type and works on clientside holograms)
     realm_holo:setRenderBounds(Vector(-5), Vector(5))
     
-    net.receive("holo", function(len)
-        local holo_index = net.readUInt(16)
-        
-        -- We now need to implement a system that will check check if the entity has initialized on the client, a timer will do for this example
-        timer.create("check_valid", 0.1, 0, function()
-            local ent = entity(holo_index)
-            if not ent or not ent:isValid() then return end
-            
-            -- Once the entity is valid, we need to convert it back to it's original type in order to use the Hologram methods on it
-            local server_holo = ent:toHologram()
-            
-            -- Let's now initialize a continuous hook that will use clientside-only method setRenderMatrix on our serverside hologram
-            local m = Matrix()
-            hook.add("tick", "scale", function()
-                local scale = 0.75 + math.sin(timer.curtime() * 10) / 4
-                m:setScale(Vector(scale))
-                m:rotate(Angle(0, 1, 0))
-                server_holo:setRenderMatrix(m)
-            end)
-            
-            -- Don't forget to remove the timer
-            timer.remove("check_valid")
+    local function receivedHologram(ent)
+        if ent==nil then error("Failed to get hologram!") end
+        -- We need to convert it back to it's original type in order to use the Hologram methods on it
+        local server_holo = ent:toHologram()
+        -- Let's now initialize a continuous hook that will use clientside-only method setRenderMatrix on our serverside hologram
+        local m = Matrix()
+        hook.add("tick", "scale", function()
+            local scale = 0.75 + math.sin(timer.curtime() * 10) / 4
+            m:setScale(Vector(scale))
+            m:rotate(Angle(0, 1, 0))
+            server_holo:setRenderMatrix(m)
         end)
+    end
+    
+    
+    net.receive("holo", function(len)
+        -- Since the client may not have created the hologram yet, it's important to use the callback of net.readEntity to wait and be sure it exists first.
+        local holo_index = net.readEntity(receivedHologram)
     end)
     
 end
