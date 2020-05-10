@@ -32,7 +32,8 @@ if CLIENT then
 			holo:EnableMatrix("RenderMultiply", scalematrix)
 		end
 		if not holo.userrenderbounds then
-			holo:SetRenderBounds(holo:OBBMins() * scale, holo:OBBMaxs() * scale)
+			local mins, maxs = holo:GetModelBounds()
+			holo:SetRenderBounds(mins * scale, maxs * scale)
 		end
 	end
 end
