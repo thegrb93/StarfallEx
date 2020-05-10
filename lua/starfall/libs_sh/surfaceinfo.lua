@@ -6,7 +6,7 @@
 -- @libtbl surfaceinfo_methods
 -- @libtbl surfaceinfo_meta
 
-SF.RegisterType("SurfaceInfo",false,true,debug.getregistry().SurfaceInfo)
+SF.RegisterType("SurfaceInfo",true,false,debug.getregistry().SurfaceInfo)
 
 return function(instance) 
 
