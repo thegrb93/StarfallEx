@@ -577,13 +577,17 @@ end
 
 --- Require .dll but doesn't throw an error. Returns true if success or false if fail.
 function SF.Require(moduleName)
-	local osSuffix = assert(
-		(system.IsWindows() and "win")
-		or (system.IsLinux() and "linux")
-		or (system.IsOSX() and "osx"),
-		"couldn't determine system type?"
-	)..(jit.arch~="x64" and "32" or "64")
 	local realmPrefix = SERVER and "sv" or "cl"
+	local osSuffix
+	if system.IsWindows() then
+		osSuffix = (jit.arch~="x64" and "win32" or "win64")
+	elseif system.IsLinux() then
+		osSuffix = (jit.arch~="x64" and "linux" or "linux64")
+	elseif system.IsOSX() then 
+		osSuffix = (jit.arch~="x64" and "osx" or "osx64")
+	else
+		error("couldn't determine system type?")
+	end
 
 	if file.Exists("lua/bin/gm"..realmPrefix.."_"..moduleName.."_"..osSuffix..".dll", "GAME") then
 		local ok, err = pcall(require, moduleName)
