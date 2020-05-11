@@ -733,7 +733,8 @@ do
 	}
 	--- Convert table to string data.
 	-- Only works with strings, numbers, tables, bools, 
-	function SF.TableToString(tbl, instance)
+	function SF.TableToString(tbl, instance, sorted)
+		local pairs = sorted and SortedPairs or pairs
 		local ss = SF.StringStream()
 		local tableLoopupCtr = 1
 		local tableLookup = {}
@@ -1340,7 +1341,7 @@ do
 	if SERVER then
 		util.AddNetworkString("sf_receivelibrary")
 		include("starfall/editor/docs.lua")
-		SF.Docs = util.Compress(SF.TableToString(SF.Docs))
+		SF.Docs = util.Compress(SF.TableToString(SF.Docs, nil, true))
 		SF.DocsCRC = util.CRC(SF.Docs)
 
 		-- Command to reload the libraries
