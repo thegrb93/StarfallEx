@@ -112,18 +112,18 @@ function constraint_library.weld(e1, e2, bone1, bone2, force_lim, nocollide)
 	end
 end
 
---- Axis two entities
+--- Axis two entities. v1 in e1's coordinates and v2 in e2's coodinates (or laxis in e1's coordinates again) define the axis
 -- @param e1 The first entity
 -- @param e2 The second entity
 -- @param bone1 Number bone of the first entity
 -- @param bone2 Number bone of the second entity
--- @param v1 Position on the first entity, in its local space coordinates
--- @param v2 Position on the second entity, in its local space coordinates
+-- @param v1 Position to center the axis, local to e1's space coordinates
+-- @param v2 The second position defining the axis, local to e2's space coordinates. The laxis may be specified instead which is local to e1's space coordinates
 -- @param force_lim Amount of force until it breaks, 0 = Unbreakable
 -- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
 -- @param friction Friction of the constraint
 -- @param nocollide Bool whether or not to nocollide the two entities
--- @param laxis Optional axis of the constraint, local to the first entity
+-- @param laxis Optional second position of the constraint, same as v2 but local to the first entity
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
 	plyCount:checkuse(instance.player, 1)
