@@ -59,8 +59,12 @@ local function register(ent)
 	instance.data.props.props[ent] = true
 end
 
---- Creates a prop.
+--- Creates a prop
 -- @server
+-- @param pos Initial entity position
+-- @param ang Initial entity angles
+-- @param model Model path
+-- @param frozen True to spawn the entity in a frozen state. Default = False
 -- @return The prop object
 function props_library.create(pos, ang, model, frozen)
 
