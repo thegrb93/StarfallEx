@@ -123,7 +123,7 @@ end
 -- @param torque_lim Amount of torque until it breaks, 0 = Unbreakable
 -- @param friction Friction of the constraint
 -- @param nocollide Bool whether or not to nocollide the two entities
--- @param laxis Optional second position of the constraint, same as v2 but local to the first entity
+-- @param laxis Optional second position of the constraint, same as v2 but local to e1
 -- @server
 function constraint_library.axis(e1, e2, bone1, bone2, v1, v2, force_lim, torque_lim, friction, nocollide, laxis)
 	plyCount:checkuse(instance.player, 1)
