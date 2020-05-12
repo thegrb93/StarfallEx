@@ -156,6 +156,7 @@ code {
   flex-grow: 1;
   flex-shrink: 1;
   min-width: 70%;
+  max-width: 95%;
 }
 .page-container
 {
@@ -205,6 +206,7 @@ code {
   margin-top: 3px;
   margin-right: 4px;
   border-radius: 10%;
+  flex-shrink: 0;
 
   text-align: center;
   padding: 2px 2px 2px 2px;
