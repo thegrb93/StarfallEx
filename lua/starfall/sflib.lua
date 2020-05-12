@@ -95,22 +95,24 @@ function SF.EntityTable(key, destructor, dontwait)
 	return setmetatable({}, {
 		__newindex = function(t, e, v)
 			rawset(t, e, v)
-			if dontwait then
-				e:CallOnRemove("SF_" .. key, function()
-					if t[e] then
-						t[e] = nil
-						if destructor then destructor(e, v) end
-					end
-				end)
-			else
-				e:CallOnRemove("SF_" .. key, function()
-					timer.Simple(0, function()
-						if t[e] and not e:IsValid() then
+			if e ~= NULL then
+				if dontwait then
+					e:CallOnRemove("SF_" .. key, function()
+						if t[e] then
 							t[e] = nil
 							if destructor then destructor(e, v) end
 						end
 					end)
-				end)
+				else
+					e:CallOnRemove("SF_" .. key, function()
+						timer.Simple(0, function()
+							if t[e] and not e:IsValid() then
+								t[e] = nil
+								if destructor then destructor(e, v) end
+							end
+						end)
+					end)
+				end
 			end
 		end
 	})
@@ -143,10 +145,10 @@ setmetatable(SF.StructWrapper, SF.StructWrapper)
 SF.BurstObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==NULL then
 				local obj = self:get(ply)
 				local new = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max) - amount
-				if new < 0 then
+				if new < 0 and ply~=NULL then
 					SF.Throw("The ".. self.name .." burst limit has been exceeded.", 3)
 				end
 				obj.lasttick = CurTime()
@@ -156,7 +158,7 @@ SF.BurstObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==NULL then
 				local obj = self:get(ply)
 				obj.val = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
 				obj.lasttick = CurTime()
@@ -204,10 +206,10 @@ setmetatable(SF.BurstObject, SF.BurstObject)
 SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==NULL then
 				local obj = self:get(ply)
 				local new = obj.val + amount
-				if new > self.max then
+				if new > self.max and ply~=NULL then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 				obj.val = new
@@ -216,9 +218,9 @@ SF.LimitObject = {
 			end
 		end,
 		checkuse = function(self, ply, amount)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==NULL then
 				local obj = self:get(ply)
-				if obj.val + amount > self.max then
+				if obj.val + amount > self.max and ply~=NULL then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
@@ -226,7 +228,7 @@ SF.LimitObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() then
+			if ply:IsValid() or ply==NULL then
 				return self.max - self:get(ply).val
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -289,13 +291,12 @@ SF.ResourceHandler = {
 			end
 		end,
 		check = function(self, ply)
-			self.players[ply] = self.players[ply] or 0
-			return self.players[ply] < self.max
+			return self.players[ply] < self.max or ply==NULL
 		end,
 		free = function(self, ply, object)
 			local t = self.typer(object)
 			if not self.objects[t][object] then
-				if ply then self.players[ply] = self.players[ply] - 1 end
+				if self.players[ply] <= 1 then self.players[ply] = nil else self.players[ply] = self.players[ply] - 1 end
 				self.objects[t][object] = true
 				if self.destructor then self.destructor(object) end
 			end
@@ -309,7 +310,7 @@ SF.ResourceHandler = {
 			destructor = destructor,
 			typer = typer,
 			objects = {},
-			players = setmetatable({},{__mode="k"}),
+			players = setmetatable({},{__index=function() return 0 end}),
 			max = max,
 		}
 		return setmetatable(t, p)

@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
@@ -30,6 +29,7 @@ SF.RegisterLibrary("constraint")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 
 local getent

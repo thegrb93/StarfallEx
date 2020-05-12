@@ -5,7 +5,6 @@ local max = math.max
 local cam = cam
 local dgetmeta = debug.getmetatable
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local haspermission = SF.Permissions.hasAccess
 local registerprivilege = SF.Permissions.registerPrivilege
 local COLOR_WHITE = Color(255, 255, 255)
@@ -169,11 +168,11 @@ local renderhooks = {
 
 
 SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
-	return haspermission(instance, nil, "render.offscreen"), {}
+	return (instance.player == NULL or haspermission(instance, nil, "render.offscreen")), {}
 end)
 
 SF.hookAdd("RenderScene", "renderscene", function(instance)
-	return haspermission(instance, nil, "render.renderscene"), {}
+	return (instance.player == NULL or haspermission(instance, nil, "render.renderscene")), {}
 end)
 
 SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
@@ -181,11 +180,11 @@ SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, draw
 end)
 
 local function canRenderHudSafeArgs(instance, ...)
-	return instance:isHUDActive() and haspermission(instance, nil, "render.hud"), {...}
+	return instance:isHUDActive() and (instance.player == NULL or haspermission(instance, nil, "render.hud")), {...}
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return instance:isHUDActive() and haspermission(instance, nil, "render.calcview"), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
+	return instance:isHUDActive() and (instance.player == NULL or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
 
 local function returnCalcview(instance, tbl)
@@ -224,6 +223,7 @@ SF.RegisterLibrary("render")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 
 local render_library = instance.Libraries.render

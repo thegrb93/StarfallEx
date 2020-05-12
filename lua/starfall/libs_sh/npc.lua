@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 if SERVER then
@@ -17,6 +16,7 @@ end
 SF.RegisterType("Npc", false, true, debug.getregistry().NPC, "Entity")
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local npc_methods, npc_meta, wrap, unwrap = instance.Types.Npc.Methods, instance.Types.Npc, instance.Types.Npc.Wrap, instance.Types.Npc.Unwrap

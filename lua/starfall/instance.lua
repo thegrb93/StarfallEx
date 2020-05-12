@@ -27,7 +27,11 @@ SF.Instance.__index = SF.Instance
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
 SF.allInstances = {}
-SF.playerInstances = {}
+SF.playerInstances = SF.EntityTable("playerInstances", function(e, t)
+	for instance, _ in pairs(t) do
+		instance:Error(SF.MakeError("SF: Player Disconnected", 1))
+	end
+end)
 
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
@@ -45,13 +49,17 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 
 	local quotaRun
 	if SERVER then
-		if SF.softLockProtection:GetBool() then
+		if player == NULL then
+			quotaRun = SF.Instance.runWithoutOps
+		elseif SF.softLockProtection:GetBool() then
 			quotaRun = SF.Instance.runWithOps
 		else
 			quotaRun = SF.Instance.runWithoutOps
 		end
 	else
-		if SF.softLockProtection:GetBool() then
+		if player == NULL then
+			quotaRun = SF.Instance.runWithoutOps
+		elseif SF.softLockProtection:GetBool() then
 			quotaRun = SF.Instance.runWithOps
 		elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
 			quotaRun = SF.Instance.runWithOps
@@ -505,11 +513,9 @@ function SF.Instance:initialize()
 	self.cpu_softquota = 1
 
 	SF.allInstances[self] = true
-	if SF.playerInstances[self.player] then
-		SF.playerInstances[self.player][self] = true
-	else
-		SF.playerInstances[self.player] = {[self] = true}
-	end
+
+	local plInsts = SF.playerInstances[self.player]
+	if plInsts then plInsts[self] = true else SF.playerInstances[self.player] = {[self] = true} end
 
 	self:RunHook("initialize")
 
@@ -602,12 +608,11 @@ end
 
 --- Deinitializes the instance. After this, the instance should be discarded.
 function SF.Instance:deinitialize()
+	if self.error then return end
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
-	SF.playerInstances[self.player][self] = nil
-	if not next(SF.playerInstances[self.player]) then
-		SF.playerInstances[self.player] = nil
-	end
+	local plInsts = SF.playerInstances[self.player]
+	if plInsts then plInsts[self] = nil end
 	self.error = true
 end
 
@@ -617,7 +622,7 @@ hook.Add("Think", "SF_Think", function()
 	if SF.Instance.Ram then
 		if ram > SF.RamCap:GetInt() then
 			for instance, _ in pairs(SF.allInstances) do
-				instance:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
+				instance:Error(SF.MakeError("SF: Global RAM usage limit exceeded!!", 1))
 			end
 			collectgarbage()
 		end

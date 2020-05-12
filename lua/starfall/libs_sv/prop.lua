@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
@@ -27,6 +26,7 @@ SF.RegisterLibrary("prop")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 instance:AddHook("initialize", function()
 	instance.data.props = {props = {}}

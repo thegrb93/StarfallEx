@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
 
 -- Register Privileges
@@ -27,6 +26,7 @@ SF.RegisterType("Effect", true, false)
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 local effect_library = instance.Libraries.effect
 local effect_methods, effect_meta, wrap, unwrap = instance.Types.Effect.Methods, instance.Types.Effect, instance.Types.Effect.Wrap, instance.Types.Effect.Unwrap

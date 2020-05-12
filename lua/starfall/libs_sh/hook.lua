@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local haspermission = SF.Permissions.hasAccess
 
 --Can only return if you are the first argument
@@ -50,7 +49,7 @@ else
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
 	add("ChatTextChanged", nil, function(instance, txt)
-		if haspermission(instance, nil, "input") then
+		if instance.player == NULL or haspermission(instance, nil, "input") then
 			return true, { txt }
 		end
 		return false

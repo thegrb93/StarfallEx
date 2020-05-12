@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register Privileges
@@ -39,6 +38,7 @@ SF.RegisterType("Sound", true, false)
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 local getent
 instance:AddHook("initialize", function()

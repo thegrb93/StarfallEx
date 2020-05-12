@@ -1,5 +1,4 @@
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
@@ -28,6 +27,7 @@ SF.RegisterType("Bass", true, false)
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()
@@ -76,11 +76,11 @@ function bass_library.loadFile(path, flags, callback)
 	sound.PlayFile(path, flags, function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
-			if instance.player:IsValid() then plyCount:free(instance.player, 1) end
+			plyCount:free(instance.player, 1)
 		else
-			if instance.error or not instance.player:IsValid() then
+			if instance.error then
 				snd:Stop()
-				if instance.player:IsValid() then plyCount:free(instance.player, 1) end
+				plyCount:free(instance.player, 1)
 			else
 				instance.data.bass.sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")
@@ -111,11 +111,11 @@ function bass_library.loadURL(path, flags, callback)
 	sound.PlayURL(path, flags, function(snd, er, name)
 		if er then
 			instance:runFunction(callback, nil, er, name)
-			if instance.player:IsValid() then plyCount:free(instance.player, 1) end
+			plyCount:free(instance.player, 1)
 		else
-			if instance.error or not instance.player:IsValid() then
+			if instance.error then
 				snd:Stop()
-				if instance.player:IsValid() then plyCount:free(instance.player, 1) end
+				plyCount:free(instance.player, 1)
 			else
 				instance.data.bass.sounds[snd] = true
 				instance:runFunction(callback, wrap(snd), 0, "")

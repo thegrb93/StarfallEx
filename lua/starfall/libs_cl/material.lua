@@ -1,5 +1,4 @@
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local dsetmeta = debug.setmetatable
 local registerprivilege = SF.Permissions.registerPrivilege
 
@@ -309,6 +308,7 @@ SF.RegisterType("LockedMaterial", true, false) --Material that can't be modified
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 
 local material_library = instance.Libraries.material

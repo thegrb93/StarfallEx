@@ -1,7 +1,6 @@
 if not SF.Require("xinput") then return function() end end
 
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
 SF.hookAdd("xinputConnected", "xinputconnected")
 SF.hookAdd("xinputDisconnected", "xinputdisconnected")
@@ -18,6 +17,7 @@ SF.RegisterLibrary("xinput")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 instance:AddHook("initialize", function()
 	instance.data.xinputRumble = {}

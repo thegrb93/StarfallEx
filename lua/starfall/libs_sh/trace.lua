@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 
 -- Register privileges
 SF.Permissions.registerPrivilege("trace", "Trace", "Allows the user to start traces")
@@ -22,6 +21,7 @@ end
 SF.RegisterLibrary("trace")
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 local trace_library = instance.Libraries.trace
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject

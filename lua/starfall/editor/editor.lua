@@ -359,10 +359,7 @@ if CLIENT then
 
 	-- CLIENT ANIMATION
 
-	local busy_players = { }
-	hook.Add("EntityRemoved", "starfall_busy_animation", function (ply)
-		busy_players[ply] = nil
-	end)
+	local busy_players = SF.EntityTable("starfall_busy_animation")
 
 	local emitter = ParticleEmitter(vector_origin)
 

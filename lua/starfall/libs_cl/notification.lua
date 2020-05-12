@@ -1,5 +1,4 @@
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register Priveleges
@@ -14,6 +13,7 @@ registerprivilege("notification.hud", "Create notifications with HUD connected",
 SF.RegisterLibrary("notification")
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 
 instance:AddHook("initialize", function()
