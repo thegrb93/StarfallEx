@@ -5,7 +5,9 @@ import Page from './Components/Page';
 
 
 function App(props) {
-  const [currentPage, setPage] = useState(props.pages[Object.keys(props.pages)[0]].path);
+
+  
+  const [currentPage, setPage] = useState(props.pages[Object.keys(props.pages)[4]].path);
   function changePage(newPage)
   {
     const title = props.pages[newPage].name
@@ -22,7 +24,9 @@ function App(props) {
   return (
     <div className="app">
       <SideBar items = {props.sidebarItems} changePage = {changePage} currentPage = {currentPage} />
-      <Page {...props.pages[currentPage]} changePage = {changePage} />
+      <div className="page-container">
+        <Page {...props.pages[currentPage]} changePage = {changePage} />
+      </div>
     </div>
   );
 }

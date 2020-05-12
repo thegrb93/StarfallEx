@@ -1,11 +1,20 @@
 import React from 'react';
 import Icon from '../Icon';
 
-export default function HookPage(props)
+export default function MethodCard(props)
 {
-    const callParams = props.parameters.map(x => x.name).join(",\xa0");   
+    let callParams = props.parameters.map(x => x.name).join(",\xa0");
+    let callSplitter = props.type==="library" ? "." : ":";
+    let parentName = props.parent;
+    
+    if(parentName === "builtins")
+    {
+        parentName = "";
+        callSplitter = "";
+    }
 
-    const titlePart = (<h1 className="hook-title"><Icon type="realm" value={props.realm} />{props.name}({callParams})</h1>);
+
+    const titlePart = (<h1 className="card-title"><Icon type="realm" value={props.realm} />{parentName}{callSplitter}{props.name}({callParams})</h1>);
 
     let paramPart = null;
     const paramList = props.parameters.map(x => 
@@ -23,14 +32,14 @@ export default function HookPage(props)
         );
     }
 
-    const returnsList = props.returns.map((x, index)=> <li key={index} className="accept-newlines">{x}</li>);
+    const returnsList = props.returns.map((x, index)=> <li key={index}>{x}</li>);
     let returnsPart = null;
     if(returnsList.length > 0)
     {
         returnsPart = (
         <div className="returns">
             <h2>Returns</h2>
-            <ul clasName="returns-list">
+            <ul className="returns-list">
                 {returnsList}
             </ul>
         </div>
@@ -38,12 +47,12 @@ export default function HookPage(props)
     }
 
     return (
-        <div className="page page-hook">
+        <React.Fragment>
             {titlePart}
             <p className="description accept-newlines">{props.description}</p>
             {paramPart}
             {returnsPart}
-        </div>
+        </React.Fragment>
 
     );
 }

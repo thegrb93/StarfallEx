@@ -15,7 +15,13 @@ const SF_DOC = {
         {
             parent = "." + parent;
         }
+        
         const path = parent + "." + name;
+        
+        data._path = path;
+        data._children = [];
+        data._class = type;
+
         const sidebarItem = {
             name: name,
             collapsed: true,
@@ -34,9 +40,10 @@ const SF_DOC = {
             class: type
         }
         pages[path] = page;
-
+        
         if(parent !== "")
         {
+            pages[parent].data._children.push(data);
             pages[parent].sidebarItem.children.push(sidebarItem);
         }
         else
@@ -59,18 +66,8 @@ const SF_DOC = {
                 name: lib.name,
                 realm: lib.realm,
                 description: lib.description,
-                methods: [],
-                tables: []
             };
-
-            for (const [_, method] of Object.entries(lib.methods)) {
-                libData.methods[method.name] = method.description;
-            }
-
-            for (const [_, table] of Object.entries(lib.tables)) {
-                libData.tables[table.name] = table.description;
-            }
-
+            
             SF_DOC.AddPage(lib.name, "library", "realm", lib.realm, libData, "Libraries");
 
             const path = "Libraries."+lib.name
@@ -125,11 +122,6 @@ const SF_DOC = {
                 name: t.name,
                 realm: t.realm,
                 description: t.description,
-                methods: []
-            }
-
-            for (const [_, method] of Object.entries(t.methods)) {
-                typeData.methods[method.name] = method.description;
             }
             
             SF_DOC.AddPage(t.name, "type", "realm", t.realm, typeData, "Types");

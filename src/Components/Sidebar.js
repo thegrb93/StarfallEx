@@ -217,13 +217,17 @@ function SidebarElement(props)
         <div className = "sidebar-item">
           <div className="sidebar-item-content">
             {
-              hasChildren &&
+              hasChildren ?
               (
                 <div className = {"collapse " + (collapsed ? "collapsed" : "expanded")} onClick = {() => dispatch({type:"TOGGLE_COLLAPSE", value: path})}>
                 <span>
                 {collapsed ? "-" : "+"}
                 </span>
               </div>  
+              )
+              :
+              (
+                <div className = "collapse-placeholder"></div>
               )
             }           
             <Icon type={iconType} value={icon} />

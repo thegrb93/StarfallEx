@@ -16,7 +16,7 @@ export default function Icon(props)
         case "letter-simple":
             return <LetterSimpleIcon value = {value} />
         default:
-            return null;
+            return <div className="icon-placeholder"> </div>;
     }
 }
 
