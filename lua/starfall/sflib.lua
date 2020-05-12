@@ -99,16 +99,16 @@ function SF.EntityTable(key, destructor, dontwait)
 				if dontwait then
 					e:CallOnRemove("SF_" .. key, function()
 						if t[e] then
-							t[e] = nil
 							if destructor then destructor(e, v) end
+							t[e] = nil
 						end
 					end)
 				else
 					e:CallOnRemove("SF_" .. key, function()
 						timer.Simple(0, function()
 							if t[e] and not e:IsValid() then
-								t[e] = nil
 								if destructor then destructor(e, v) end
+								t[e] = nil
 							end
 						end)
 					end)
