@@ -12,7 +12,6 @@ AddCSLuaFile("syntaxmodes/starfall.lua")
 AddCSLuaFile("sfframe.lua")
 AddCSLuaFile("sfderma.lua")
 AddCSLuaFile("docs.lua")
-AddCSLuaFile("sfhelper.lua")
 AddCSLuaFile("themes.lua")
 AddCSLuaFile("xml.lua")
 
@@ -45,7 +44,6 @@ SF.Editor.HelperURL = CreateConVar("sf_editor_helperurl", "http://thegrb93.githu
 ------------------
 
 if CLIENT then
-	include("sfhelper.lua")
 	include("sfderma.lua")
 	include("sfframe.lua") -- Editor's frame
 	include("themes.lua")

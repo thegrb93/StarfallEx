@@ -68,7 +68,6 @@ Editor.NewTabOnOpenVar = CreateClientConVar("sf_editor_new_tab_on_open", "1", tr
 Editor.OpenOldTabsVar = CreateClientConVar("sf_editor_openoldtabs", "1", true, false)
 Editor.WorldClickerVar = CreateClientConVar("sf_editor_worldclicker", "0", true, false)
 Editor.LayoutVar = CreateClientConVar("sf_editor_layout", "0", true, false)
-Editor.UseLegacyHelper = CreateClientConVar("sf_helper_legacy", "0", true, false)
 Editor.StartHelperUndocked = CreateClientConVar("sf_helper_startundocked", "0", true, false)
 
 function SF.DefaultCode()
@@ -1059,12 +1058,6 @@ function Editor:GetSettings()
 		self:GetParent():SetWorldClicker(bVal)
 	end
 
-	local LegacyHelper = vgui.Create("DCheckBoxLabel")
-	dlist:AddItem(LegacyHelper)
-	LegacyHelper:SetConVar("sf_helper_legacy")
-	LegacyHelper:SetText("Use legacy helper")
-	LegacyHelper:SizeToContents()
-
 	local UndockHelper = vgui.Create("DCheckBoxLabel")
 	dlist:AddItem(UndockHelper)
 	UndockHelper:SetConVar("sf_helper_startundocked")
@@ -1672,18 +1665,10 @@ function Editor:Setup(nTitle, nLocation, nEditorType)
 	SFHelp:Dock(RIGHT)
 	SFHelp:SetText("SFHelper")
 	SFHelp.DoClick = function()
-		if Editor.UseLegacyHelper:GetBool() then
-			if SF.Helper.Frame and SF.Helper.Frame:IsVisible() then
-				SF.Helper.Frame:Close()
-			else
-				SF.Helper.show()
-			end
-		else
-			local sheet = self:CreateTab("", "helper")
-			self:SetActiveTab(sheet.Tab)
-			if Editor.StartHelperUndocked:GetBool() then
-				sheet.Tab.content:Undock()
-			end
+		local sheet = self:CreateTab("", "helper")
+		self:SetActiveTab(sheet.Tab)
+		if Editor.StartHelperUndocked:GetBool() then
+			sheet.Tab.content:Undock()
 		end
 	end
 	self.C.SFHelp = SFHelp
