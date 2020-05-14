@@ -997,7 +997,15 @@ else
 	end)
 
 	function SF.HTTPNotify(ply, url)
-		MsgC(Color(255, 255, 0), "SF HTTP: " .. ply:Nick() .. " [" .. ply:SteamID() .. "]: requested url ", Color(255,255,255), url, "\n")
+		local plyStr
+		if ply:IsValid() then
+			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
+		elseif ply == NULL then
+			plyStr = "Superuser"
+		else
+			plyStr = "Invalid user"
+		end
+		MsgC(Color(255, 255, 0), "SF HTTP: " .. plyStr .. ": requested url ", Color(255,255,255), url, "\n")
 	end
 
 	net.Receive("starfall_console_print", function ()

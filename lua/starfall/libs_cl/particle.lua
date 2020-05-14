@@ -82,7 +82,7 @@ end
 -- @param options Table of options
 -- @return Particle type.
 function particle_library.attach(entity, particle, pattach, options)
-	checkpermission (instance.player, entity, "particle.attach")
+	checkpermission(instance, entity, "particle.attach")
 
 	checkluatype (particle, TYPE_STRING)
 	checkluatype (pattach, TYPE_NUMBER)

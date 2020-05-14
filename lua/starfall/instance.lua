@@ -27,21 +27,16 @@ SF.Instance.__index = SF.Instance
 --- A set of all instances that have been created. It has weak keys and values.
 -- Instances are put here after initialization.
 SF.allInstances = {}
-SF.playerInstances = SF.EntityTable("playerInstances", function(e, t)
-	for instance, _ in pairs(t) do
-		instance:Error(SF.MakeError("SF: Player Disconnected", 1))
-	end
-end)
+SF.playerInstances = {}
 
 --- Preprocesses and Compiles code and returns an Instance
 -- @param code Either a string of code, or a {path=source} table
 -- @param mainfile If code is a table, this specifies the first file to parse.
 -- @param player The "owner" of the instance
 -- @param data The table to set instance.data to. Default is a new table.
--- @param dontpreprocess Set to true to skip preprocessing
 -- @return True if no errors, false if errors occured.
 -- @return The compiled instance, or the error message.
-function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
+function SF.Instance.Compile(code, mainfile, player, data)
 	if isstring(code) then
 		mainfile = mainfile or "generic"
 		code = { [mainfile] = code }
@@ -49,17 +44,13 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 
 	local quotaRun
 	if SERVER then
-		if player == NULL then
-			quotaRun = SF.Instance.runWithoutOps
-		elseif SF.softLockProtection:GetBool() then
+		if SF.softLockProtection:GetBool() then
 			quotaRun = SF.Instance.runWithOps
 		else
 			quotaRun = SF.Instance.runWithoutOps
 		end
 	else
-		if player == NULL then
-			quotaRun = SF.Instance.runWithoutOps
-		elseif SF.softLockProtection:GetBool() then
+		if SF.softLockProtection:GetBool() then
 			quotaRun = SF.Instance.runWithOps
 		elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
 			quotaRun = SF.Instance.runWithOps
@@ -96,9 +87,7 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 	end
 
 	for filename, source in pairs(code) do
-		if not dontpreprocess then
-			SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
-		end
+		SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
 
 		local serverorclient
 		if  instance.ppdata.serverorclient then
@@ -115,6 +104,13 @@ function SF.Instance.Compile(code, mainfile, player, data, dontpreprocess)
 			end
 			debug.setfenv(func, instance.env)
 			instance.scripts[filename] = func
+		end
+	end
+	if player ~= NULL and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
+		if player:IsSuperAdmin() then
+			instance.player = NULL
+		else
+			return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" }
 		end
 	end
 
@@ -513,9 +509,11 @@ function SF.Instance:initialize()
 	self.cpu_softquota = 1
 
 	SF.allInstances[self] = true
-
-	local plInsts = SF.playerInstances[self.player]
-	if plInsts then plInsts[self] = true else SF.playerInstances[self.player] = {[self] = true} end
+	if SF.playerInstances[self.player] then
+		SF.playerInstances[self.player][self] = true
+	else
+		SF.playerInstances[self.player] = {[self] = true}
+	end
 
 	self:RunHook("initialize")
 
@@ -608,11 +606,12 @@ end
 
 --- Deinitializes the instance. After this, the instance should be discarded.
 function SF.Instance:deinitialize()
-	if self.error then return end
 	self:RunHook("deinitialize")
 	SF.allInstances[self] = nil
-	local plInsts = SF.playerInstances[self.player]
-	if plInsts then plInsts[self] = nil end
+	SF.playerInstances[self.player][self] = nil
+	if not next(SF.playerInstances[self.player]) then
+		SF.playerInstances[self.player] = nil
+	end
 	self.error = true
 end
 
@@ -622,7 +621,7 @@ hook.Add("Think", "SF_Think", function()
 	if SF.Instance.Ram then
 		if ram > SF.RamCap:GetInt() then
 			for instance, _ in pairs(SF.allInstances) do
-				instance:Error(SF.MakeError("SF: Global RAM usage limit exceeded!!", 1))
+				instance:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
 			end
 			collectgarbage()
 		end

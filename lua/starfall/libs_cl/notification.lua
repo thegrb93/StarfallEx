@@ -78,7 +78,13 @@ function notification_library.addProgress(id, text)
 	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
 
 	--Keep the ID unique to each player
-	id = "SF:"..instance.player:SteamID64()..id
+	if instance.player == NULL then
+		id = "SF:Superuser"..id
+	elseif instance.player:IsValid() then
+		id = "SF:"..instance.player:SteamID64()..id
+	else
+		SF.Throw("Invalid chip owner", 2)
+	end
 
 	notification.AddProgress( id, text )
 	instance.data.notifications[id] = true

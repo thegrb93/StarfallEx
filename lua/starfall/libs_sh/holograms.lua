@@ -175,7 +175,7 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			holoent:Spawn()
 
-			hook.Run("PlayerSpawnedSENT", ply, holoent)
+			if ply ~= NULL then gamemode.Call("PlayerSpawnedSENT", ply, holoent) end
 
 			holodata[holoent] = true
 

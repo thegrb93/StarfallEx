@@ -174,3 +174,8 @@ SF.Preprocessor.SetGlobalDirective("clientmain", function(args, filename, data)
 	if not data.clientmain then data.clientmain = {} end
 	data.clientmain[filename] = args
 end)
+
+SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
+	if not data.superuser then data.superuser = {} end
+	data.superuser[filename] = true
+end)

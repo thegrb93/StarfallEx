@@ -129,7 +129,9 @@ function ENT:Error(err)
 	if newline then
 		msg = string.sub(msg, 1, newline - 1)
 	end
-	SF.AddNotify(self.owner, msg, "ERROR", 7, "ERROR1")
+	if self.owner:IsValid() then
+		SF.AddNotify(self.owner, msg, "ERROR", 7, "ERROR1")
+	end
 
 	if self.instance then
 		self.instance:deinitialize()
@@ -137,11 +139,13 @@ function ENT:Error(err)
 	end
 
 	if SERVER then
-		SF.Print(self.owner, traceback)
+		if self.owner:IsValid() then
+			SF.Print(self.owner, traceback)
+		end
 	else
 		print(traceback)
 
-		if self.owner ~= LocalPlayer() and GetConVarNumber("sf_timebuffer_cl")>0 then
+		if self.owner ~= LocalPlayer() and self.owner:IsValid() and GetConVarNumber("sf_timebuffer_cl")>0 then
 			net.Start("starfall_report_error")
 			net.WriteEntity(self)
 			net.WriteString(msg.."\n"..traceback)
@@ -170,14 +174,12 @@ local function MenuOpen( ContextMenu, Option, Entity, Trace )
 	SubMenu:AddOption("Open Global Permissions", function ()
 		SF.Editor.openPermissionsPopup()
 	end)
-	if ent.instance then
-		if ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
-				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0 then
-			SubMenu:AddOption("Overriding Permissions", function ()
-				local pnl = vgui.Create("SFChipPermissions")
-				if pnl then pnl:OpenForChip(ent) end
-			end)
-		end
+	if ent.instance and ent.owner ~= NULL and (ent.instance.permissionRequest and ent.instance.permissionRequest.overrides and table.Count(ent.instance.permissionRequest.overrides) > 0
+				or ent.instance.permissionOverrides and table.Count(ent.instance.permissionOverrides) > 0) then
+		SubMenu:AddOption("Overriding Permissions", function ()
+			local pnl = vgui.Create("SFChipPermissions")
+			if pnl then pnl:OpenForChip(ent) end
+		end)
 	end
 end
 
