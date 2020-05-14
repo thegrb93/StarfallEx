@@ -242,7 +242,7 @@ local sfTypeToWireTypeTable = {
 }
 
 --- Creates/Modifies wire inputs. All wire ports must begin with an uppercase
--- letter and contain only alphabetical characters.
+-- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param names An array of input names. May be modified by the function.
 -- @param types An array of input types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustInputs(names, types)
@@ -270,7 +270,7 @@ function wire_library.adjustInputs(names, types)
 end
 
 --- Creates/Modifies wire outputs. All wire ports must begin with an uppercase
--- letter and contain only alphabetical characters.
+-- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param names An array of output names. May be modified by the function.
 -- @param types An array of output types. Can be shortcuts. May be modified by the function.
 function wire_library.adjustOutputs(names, types)
@@ -309,7 +309,7 @@ function wire_library.adjustOutputs(names, types)
 end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
--- letter and contain only alphabetical characters.
+-- letter and contain only alphabetical characters or numbers but may not begin with a number.
 -- @param inputs A key-value table with input port names as keys and types as values. Can be nil to not affect input ports.
 -- @param outputs A key-value table with output port names as keys and types as values. Can be nil to not affect output ports.
 function wire_library.adjustPorts(inputs, outputs)
