@@ -972,7 +972,7 @@ end
 -- @class directive
 -- @param filename The file to run as main on client
 
---- Lets the chip run with no restrictions. Can only be used in the main file. --@superuser
+--- Lets the chip run with no restrictions and the chip owner becomes NULL. Can only be used in the main file. --@superuser
 -- @name superuser
 -- @class directive
 
