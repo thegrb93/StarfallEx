@@ -42,44 +42,15 @@ function SF.Instance.Compile(code, mainfile, player, data)
 		code = { [mainfile] = code }
 	end
 
-	local quotaRun
-	if SERVER then
-		if SF.softLockProtection:GetBool() then
-			quotaRun = SF.Instance.runWithOps
-		else
-			quotaRun = SF.Instance.runWithoutOps
-		end
-	else
-		if SF.softLockProtection:GetBool() then
-			quotaRun = SF.Instance.runWithOps
-		elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
-			quotaRun = SF.Instance.runWithOps
-		else
-			quotaRun = SF.Instance.runWithoutOps
-		end
-	end
-
 	local instance = setmetatable({}, SF.Instance)
-
-	instance.player = player
 	instance.data = data or {}
 	instance.ppdata = {}
-	instance.ops = 0
 	instance.hooks = {}
 	instance.scripts = {}
 	instance.source = code
-	instance.initialized = false
 	instance.mainfile = mainfile
 	instance.requires = {}
 	instance.requirestack = {string.GetPathFromFilename(mainfile)}
-	instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
-	instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
-	instance.run = quotaRun
-	instance.startram = collectgarbage("count")
-
-	if CLIENT and instance.cpuQuota <= 0 then
-		return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
-	end
 
 	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
 	if not ok then
@@ -106,13 +77,51 @@ function SF.Instance.Compile(code, mainfile, player, data)
 			instance.scripts[filename] = func
 		end
 	end
+
 	if player ~= NULL and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
 		if player:IsSuperAdmin() then
-			instance.player = NULL
+			player = NULL
 		else
 			return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" }
 		end
 	end
+	instance.player = player
+
+	local quotaRun
+	if player == NULL then
+		quotaRun = SF.Instance.runWithoutOps
+	else
+		if SERVER then
+			if SF.softLockProtection:GetBool() then
+				quotaRun = SF.Instance.runWithOps
+			else
+				quotaRun = SF.Instance.runWithoutOps
+			end
+		else
+			if SF.softLockProtection:GetBool() then
+				quotaRun = SF.Instance.runWithOps
+			elseif SF.softLockProtectionOwner:GetBool() and LocalPlayer() ~= player then
+				quotaRun = SF.Instance.runWithOps
+			else
+				quotaRun = SF.Instance.runWithoutOps
+			end
+		end
+	end
+	instance.run = quotaRun
+	
+	if quotaRun == SF.Instance.runWithOps then
+		instance.cpuQuota = (SERVER or LocalPlayer() ~= player) and SF.cpuQuota:GetFloat() or SF.cpuOwnerQuota:GetFloat()
+		instance.cpuQuotaRatio = 1 / SF.cpuBufferN:GetInt()
+
+		if CLIENT and instance.cpuQuota <= 0 then
+			return false, { message = "Cannot execute with 0 sf_timebuffer", traceback = "" }
+		end
+	else
+		instance.cpuQuota = math.huge
+		instance.cpuQuotaRatio = 0
+	end
+
+	instance.startram = collectgarbage("count")
 
 	return true, instance
 end
@@ -501,9 +510,6 @@ end
 -- @return The error message, if applicable
 -- @return The error traceback, if applicable
 function SF.Instance:initialize()
-	assert(not self.initialized, "Already initialized!")
-	self.initialized = true
-
 	self.cpu_total = 0
 	self.cpu_average = 0
 	self.cpu_softquota = 1
@@ -692,7 +698,7 @@ function SF.Instance:Error(err)
 	end
 end
 
--- Don't self modify. The average should only the modified per tick.
+-- Don't self modify. The average should only be modified per tick.
 function SF.Instance:movingCPUAverage()
 	return self.cpu_average + (self.cpu_total - self.cpu_average) * self.cpuQuotaRatio
 end
