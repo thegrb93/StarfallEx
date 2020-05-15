@@ -1,5 +1,4 @@
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
@@ -26,6 +25,7 @@ SF.RegisterType("File", true, false)
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 -- Register functions to be called when the chip is initialised and deinitialised
 instance:AddHook("initialize", function()

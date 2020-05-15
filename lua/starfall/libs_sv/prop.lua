@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
@@ -27,6 +26,7 @@ SF.RegisterLibrary("prop")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 instance:AddHook("initialize", function()
 	instance.data.props = {props = {}}
@@ -81,7 +81,7 @@ function props_library.create(pos, ang, model, frozen)
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
-	if not gamemode.Call("PlayerSpawnProp", instance.player, model) then SF.Throw("Another hook prevented the prop from spawning", 2) end
+	if ply ~= NULL and gamemode.Call("PlayerSpawnProp", ply, model)==false then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local propdata = instance.data.props
 	local propent = ents.Create("prop_physics")
@@ -99,17 +99,19 @@ function props_library.create(pos, ang, model, frozen)
 			obj:EnableMotion(not frozen)
 		end
 	end
-
-	if propdata.undo then
-		undo.Create("Prop")
-			undo.SetPlayer(ply)
-			undo.AddEntity(propent)
-		undo.Finish("Prop (" .. tostring(model) .. ")")
-	end
-	ply:AddCleanup("props", propent)
-
-	gamemode.Call("PlayerSpawnedProp", ply, model, propent)
 	FixInvalidPhysicsObject(propent)
+
+	if ply ~= NULL then
+		gamemode.Call("PlayerSpawnedProp", ply, model, propent)
+
+		if propdata.undo then
+			undo.Create("Prop")
+				undo.SetPlayer(ply)
+				undo.AddEntity(propent)
+			undo.Finish("Prop (" .. tostring(model) .. ")")
+		end
+		ply:AddCleanup("props", propent)
+	end
 
 	return ewrap(propent)
 end
@@ -132,7 +134,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
-	if not gamemode.Call("PlayerSpawnProp", ply, "starfall_prop") then SF.Throw("Another hook prevented the prop from spawning", 2) end
+	if instance.player ~= NULL and gamemode.Call("PlayerSpawnProp", ply, "starfall_prop")==false then SF.Throw("Another hook prevented the prop from spawning", 2) end
 
 	local uwVertices = {}
 	local max = maxCustomSize:GetFloat()
@@ -193,15 +195,17 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 
 	propent:TransmitData()
 
-	if propdata.undo then
-		undo.Create("Prop")
-			undo.SetPlayer(ply)
-			undo.AddEntity(propent)
-		undo.Finish("Starfall Prop")
-	end
-	ply:AddCleanup("props", propent)
+	if ply ~= NULL then
+		gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
 
-	gamemode.Call("PlayerSpawnedProp", ply, "starfall_prop", propent)
+		if propdata.undo then
+			undo.Create("Prop")
+				undo.SetPlayer(ply)
+				undo.AddEntity(propent)
+			undo.Finish("Starfall Prop")
+		end
+		ply:AddCleanup("props", propent)
+	end
 
 	return ewrap(propent)
 end
@@ -233,7 +237,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
-	if not gamemode.Call("PlayerSpawnProp", ply, model) then return end
+	if ply ~= NULL and gamemode.Call("PlayerSpawnProp", ply, model)==false then SF.Throw("Another hook prevented the model from spawning", 2) end
 
 	local comp = ents.Create(class)
 	register(comp, instance)
@@ -255,15 +259,17 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 		end
 	end
 
-	if propdata.undo then
-		undo.Create(class)
-			undo.SetPlayer(ply)
-			undo.AddEntity(comp)
-		undo.Finish("Prop (" .. tostring(model) .. ")")
-	end
+	if ply ~= NULL then
+		if propdata.undo then
+			undo.Create(class)
+				undo.SetPlayer(ply)
+				undo.AddEntity(comp)
+			undo.Finish("Prop (" .. tostring(model) .. ")")
+		end
 
-	ply:AddCount("starfall_components", comp)
-	ply:AddCleanup("starfall_components", comp)
+		ply:AddCount("starfall_components", comp)
+		ply:AddCleanup("starfall_components", comp)
+	end
 
 	return ewrap(comp)
 end
@@ -299,11 +305,11 @@ function props_library.createSent(pos, ang, class, frozen)
 	local hookcall
 
 	if swep then
-
-		if ((not swep.Spawnable and not ply:IsAdmin()) or
-				(swep.AdminOnly and not ply:IsAdmin())) then SF.Throw("This swep is admin only!", 2) end
-		if (not gamemode.Call("PlayerSpawnSWEP", ply, class, swep)) then SF.Throw("Another hook prevented the swep from spawning", 2) end
-
+		if ply ~= NULL then
+			if ((not swep.Spawnable and not ply:IsAdmin()) or
+					(swep.AdminOnly and not ply:IsAdmin())) then SF.Throw("This swep is admin only!", 2) end
+			if gamemode.Call("PlayerSpawnSWEP", ply, class, swep) == false then SF.Throw("Another hook prevented the swep from spawning", 2) end
+		end
 
 		entity = ents.Create(swep.ClassName)
 		if entity and entity:IsValid() then
@@ -316,9 +322,10 @@ function props_library.createSent(pos, ang, class, frozen)
 		hookcall = "PlayerSpawnedSWEP"
 
 	elseif sent then
-
-		if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
-		if (not gamemode.Call("PlayerSpawnSENT", ply, class)) then SF.Throw("Another hook prevented the sent from spawning", 2) end
+		if ply ~= NULL then
+			if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
+			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
+		end
 
 		local sent = scripted_ents.GetStored( class )
 		if sent and sent.t.SpawnFunction then
@@ -336,9 +343,10 @@ function props_library.createSent(pos, ang, class, frozen)
 		hookcall = "PlayerSpawnedSENT"
 
 	elseif npc then
-
-		if (npc.AdminOnly and not ply:IsAdmin()) then SF.Throw("This npc is admin only!", 2) end
-		if (not gamemode.Call("PlayerSpawnNPC", ply, class, "")) then SF.Throw("Another hook prevented the npc from spawning", 2) end
+		if ply ~= NULL then
+			if (npc.AdminOnly and not ply:IsAdmin()) then SF.Throw("This npc is admin only!", 2) end
+			if gamemode.Call("PlayerSpawnNPC", ply, class, "") == false then SF.Throw("Another hook prevented the npc from spawning", 2) end
+		end
 
 		entity = ents.Create(npc.Class)
 
@@ -371,8 +379,7 @@ function props_library.createSent(pos, ang, class, frozen)
 		hookcall = "PlayerSpawnedNPC"
 
 	elseif vehicle then
-
-		if (not gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle)) then SF.Throw("Another hook prevented the vehicle from spawning", 2) end
+		if ply ~= NULL and gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle) == false then SF.Throw("Another hook prevented the vehicle from spawning", 2) end
 
 		entity = ents.Create(vehicle.Class)
 
@@ -431,15 +438,17 @@ function props_library.createSent(pos, ang, class, frozen)
 			phys:EnableMotion(not frozen)
 		end
 
-		if propdata.undo then
-			undo.Create("SF")
-				undo.SetPlayer(ply)
-				undo.AddEntity(entity)
-			undo.Finish("SF (" .. class .. ")")
+		if ply ~= NULL then
+			if propdata.undo then
+				undo.Create("SF")
+					undo.SetPlayer(ply)
+					undo.AddEntity(entity)
+				undo.Finish("SF (" .. class .. ")")
+			end
+		
+			ply:AddCleanup("props", entity)
+			gamemode.Call(hookcall, ply, entity)
 		end
-
-		ply:AddCleanup("props", entity)
-		gamemode.Call(hookcall, ply, entity)
 
 		return owrap(entity)
 	end

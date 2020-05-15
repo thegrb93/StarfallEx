@@ -1,5 +1,4 @@
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 -- Register privileges
@@ -28,6 +27,7 @@ SF.RegisterType("Wirelink", false, true)
 
 return function(instance)
 if not WireLib then return end
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 
 local getent

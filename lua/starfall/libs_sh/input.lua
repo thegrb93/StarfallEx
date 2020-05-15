@@ -121,6 +121,7 @@ SF.RegisterLibrary("input")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 local getent
 instance:AddHook("initialize", function()
@@ -154,7 +155,7 @@ local vwrap = instance.Types.Vector.Wrap
 function input_library.lookupBinding(binding)
 	SF.CheckLuaType(binding, TYPE_STRING)
 
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	local bind = input.LookupBinding(binding)
 	if bind then
@@ -171,7 +172,7 @@ end
 function input_library.isKeyDown(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	return input.IsKeyDown(key)
 end
@@ -183,7 +184,7 @@ end
 function input_library.getKeyName(key)
 	SF.CheckLuaType(key, TYPE_NUMBER)
 
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	return input.GetKeyName(key)
 end
@@ -192,7 +193,7 @@ end
 -- @client
 -- @return True if the shift key is down
 function input_library.isShiftDown()
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	return input.IsShiftDown()
 end
@@ -201,7 +202,7 @@ end
 -- @client
 -- @return True if the control key is down
 function input_library.isControlDown()
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	return input.IsControlDown()
 end
@@ -211,7 +212,7 @@ end
 -- @return The x position of the mouse
 -- @return The y position of the mouse
 function input_library.getCursorPos()
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	return input.GetCursorPos()
 end
@@ -220,7 +221,7 @@ end
 -- @client
 -- @return The cursor's visibility
 function input_library.getCursorVisible()
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	return vgui.CursorVisible()
 end
@@ -231,7 +232,7 @@ end
 -- @param y Y coordinate on the screen
 -- @return Aim vector
 function input_library.screenToVector(x, y)
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 	SF.CheckLuaType(x, TYPE_NUMBER)
 	SF.CheckLuaType(y, TYPE_NUMBER)
 	return vwrap(gui.ScreenToVector(x, y))
@@ -242,7 +243,7 @@ end
 -- @param enabled Whether or not the cursor should be enabled
 function input_library.enableCursor(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	if not instance:isHUDActive() then
 		SF.Throw("No HUD component connected", 2)
@@ -258,7 +259,7 @@ end
 function input_library.selectWeapon(weapon)
 	local ent = getent(weapon)
 	if not (ent:IsWeapon() and ent:IsCarriedByLocalPlayer()) then SF.Throw("This weapon is not your own!", 2) end
-	SF.Permissions.check(instance, nil, "input.emulate")
+	checkpermission(instance, nil, "input.emulate")
 	input.SelectWeapon( ent ) 
 end
 
@@ -267,7 +268,7 @@ end
 -- @param enabled Whether to lock or unlock the controls
 function input_library.lockControls(enabled)
 	SF.CheckLuaType(enabled, TYPE_BOOL)
-	SF.Permissions.check(instance, nil, "input")
+	checkpermission(instance, nil, "input")
 
 	if not instance:isHUDActive() and (enabled or not instance.data.input.controlsLocked) then
 		SF.Throw("No HUD component connected", 2)

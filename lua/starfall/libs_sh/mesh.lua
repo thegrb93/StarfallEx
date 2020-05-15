@@ -1,7 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
-local haspermission = SF.Permissions.hasAccess
 local dgetmeta = debug.getmetatable
 
 
@@ -568,6 +566,8 @@ end
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local haspermission = instance.player ~= NULL and SF.Permissions.hasAccess or function() return true end
 
 
 if CLIENT then

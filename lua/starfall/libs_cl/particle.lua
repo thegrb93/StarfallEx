@@ -1,5 +1,4 @@
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 local IsValid = IsValid
 
@@ -21,6 +20,7 @@ SF.RegisterType("Particle", false, false)
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 local getent
 instance:AddHook("initialize", function()
@@ -82,7 +82,7 @@ end
 -- @param options Table of options
 -- @return Particle type.
 function particle_library.attach(entity, particle, pattach, options)
-	checkpermission (instance.player, entity, "particle.attach")
+	checkpermission(instance, entity, "particle.attach")
 
 	checkluatype (particle, TYPE_STRING)
 	checkluatype (pattach, TYPE_NUMBER)

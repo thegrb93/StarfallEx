@@ -1,6 +1,5 @@
 -- Global to all starfalls
 local checkluatype = SF.CheckLuaType
-local checkpermission = SF.Permissions.check
 local registerprivilege = SF.Permissions.registerPrivilege
 
 registerprivilege("hologram.modify", "Modify holograms", "Allows the user to modify holograms", { entities = {} })
@@ -96,6 +95,7 @@ SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 
 return function(instance)
+local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
 
 
 local holograms_library = instance.Libraries.holograms
@@ -175,7 +175,7 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			holoent:Spawn()
 
-			hook.Run("PlayerSpawnedSENT", ply, holoent)
+			if ply ~= NULL then gamemode.Call("PlayerSpawnedSENT", ply, holoent) end
 
 			holodata[holoent] = true
 

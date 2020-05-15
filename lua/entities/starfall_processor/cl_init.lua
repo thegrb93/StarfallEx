@@ -64,7 +64,7 @@ net.Receive("starfall_processor_download", function(len)
 	net.ReadStarfall(nil, function(ok, sfdata)
 		if sfdata.proc:IsValid() then
 			if ok then
-				if sfdata.owner:IsValid() then
+				if sfdata.owner:IsValid() or sfdata.owner==NULL then
 					sfdata.proc:SetupFiles(sfdata)
 					if sfdata.proc.instance then
 						net.Start("starfall_processor_download")
@@ -106,11 +106,9 @@ net.Receive("starfall_processor_used", function(len)
 
 	instance:runScriptHook("starfallused", instance.WrapObject( activator ), instance.WrapObject( used ))
 
-	if activator == LocalPlayer() then
-		if instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
-			local pnl = vgui.Create("SFChipPermissions")
-			if pnl then pnl:OpenForChip( chip ) end
-		end
+	if activator == LocalPlayer() and chip.owner ~= NULL and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
+		local pnl = vgui.Create("SFChipPermissions")
+		if pnl then pnl:OpenForChip( chip ) end
 	end
 end)
 
