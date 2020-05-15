@@ -313,14 +313,14 @@ end
 -- @param inputs A key-value table with input port names as keys and types as values. Can be nil to not affect input ports.
 -- @param outputs A key-value table with output port names as keys and types as values. Can be nil to not affect output ports.
 function wire_library.adjustPorts(inputs, outputs)
-	if inputs then
+	if inputs ~= nil then
 		checkluatype(inputs, TYPE_TABLE)
 
 		local names = {}
 		local types = {}
 
 		for n,t in pairs( inputs ) do
-			if not isstring(n) or not isstring(t) then SF.Throw("Expected string string key value pairs, got a " .. type(n) .. " " .. type(t) .. " pair.", 2) end
+			if not isstring(n) or not isstring(t) then SF.Throw("Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
 
 			table.insert(names, n)
 			table.insert(types, t)
@@ -329,14 +329,14 @@ function wire_library.adjustPorts(inputs, outputs)
 		wire_library.adjustInputs(names, types)
 	end
 
-	if outputs then
+	if outputs ~= nil then
 		checkluatype(outputs, TYPE_TABLE)
 
 		local names = {}
 		local types = {}
 
 		for n,t in pairs( outputs ) do
-			if not isstring(n) or not isstring(t) then SF.Throw("Expected string string key value pairs, got a " .. type(n) .. " " .. type(t) .. " pair.", 2) end
+			if not isstring(n) or not isstring(t) then SF.Throw("Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
 
 			table.insert(names, n)
 			table.insert(types, t)
