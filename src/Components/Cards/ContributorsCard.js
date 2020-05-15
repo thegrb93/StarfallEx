@@ -31,7 +31,7 @@ export default function ContributorsCard(props)
                 {x.login}
             </span>
             <span className="text">
-                &nbsp;made <span class="contributions">{x.contributions}</span> contributions
+                &nbsp;made <span className="contributions">{x.contributions}</span> contributions
             </span>
         </li>
     ));

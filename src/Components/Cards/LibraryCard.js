@@ -5,7 +5,7 @@ export default function LibraryCard(props)
 {
     return (
         <React.Fragment>
-            <h1 class="card-title"><Icon type="realm" value={props.realm} />{props.name}</h1>
+            <h1 className="card-title"><Icon type="realm" value={props.realm} />{props.name}</h1>
             <p className="accept-newlines">
                 {props.description}
             </p>

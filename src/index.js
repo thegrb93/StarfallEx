@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom';
 import './themes.scss';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
+import { HashRouter } from 'react-router-dom';
 
 let sidebarItems = [];
 let pages = {};
@@ -11,12 +12,11 @@ let pages = {};
 const SF_DOC = {
     AddPage: (name, type, iconType, icon, data, parent = "") =>
     {
-        if(parent!=="")
+        let path = name;
+        if(parent !== "")
         {
-            parent = "." + parent;
+            path = parent + "." + name;
         }
-        
-        const path = parent + "." + name;
         
         data._path = path;
         data._children = [];
@@ -39,12 +39,12 @@ const SF_DOC = {
             path: path,
             class: type
         }
-        pages[path] = page;
+        pages[path.toLowerCase()] = page;
         
         if(parent !== "")
         {
-            pages[parent].data._children.push(data);
-            pages[parent].sidebarItem.children.push(sidebarItem);
+            pages[parent.toLowerCase()].data._children.push(data);
+            pages[parent.toLowerCase()].sidebarItem.children.push(sidebarItem);
         }
         else
         {

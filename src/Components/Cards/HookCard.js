@@ -30,7 +30,7 @@ export default function HookCard(props)
         returnsPart = (
         <div className="returns">
             <h2>Returns</h2>
-            <ul clasName="returns-list">
+            <ul className="returns-list">
                 {returnsList}
             </ul>
         </div>

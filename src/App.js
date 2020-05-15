@@ -1,32 +1,38 @@
 import React, { useEffect, useState } from 'react';
 import SideBar from './Components/Sidebar';
 import Page from './Components/Page';
+import { HashRouter, useParams, useRouteMatch } from 'react-router-dom';
 
+
+function AppBody(props)
+{
+  const routeMatch = useRouteMatch("/:page");
+  let currentPagePath = "contributors";
+
+  if(routeMatch !== null && routeMatch.params !== undefined && routeMatch.params.page !== undefined)
+  {
+    currentPagePath = routeMatch.params.page.toLowerCase();
+  }
+
+  const currentPage = props.pages[currentPagePath];
+
+  return (
+    <React.Fragment>
+      <SideBar items = {props.sidebarItems} currentPage = {currentPagePath} />
+      <div className="page-container">
+        <Page {...currentPage}/>
+      </div>
+    </React.Fragment>
+  );
+}
 
 
 function App(props) {
-
-  
-  const [currentPage, setPage] = useState(props.pages[Object.keys(props.pages)[4]].path);
-  function changePage(newPage)
-  {
-    const title = props.pages[newPage].name
-    const type = props.pages[newPage].class
-    if(type === "category")
-    {
-      return;
-    }
-
-    document.title = "SF Reference: "+title
-    setPage(newPage);
-  }
-
   return (
     <div className="app">
-      <SideBar items = {props.sidebarItems} changePage = {changePage} currentPage = {currentPage} />
-      <div className="page-container">
-        <Page {...props.pages[currentPage]} changePage = {changePage} />
-      </div>
+      <HashRouter hashType="noslash">
+        <AppBody {...props} />
+      </HashRouter>
     </div>
   );
 }

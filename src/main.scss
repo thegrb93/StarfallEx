@@ -63,9 +63,10 @@ code {
       margin-left: 6px;
       border-left: 1px solid $color-border-dark;
     }
-    .name 
+    .name
     {
       color: $color-menu;
+      text-decoration: none;
     }
     .name-selected {
       color: $color-menu-selected;
