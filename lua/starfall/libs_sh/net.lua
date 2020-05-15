@@ -17,6 +17,7 @@ net.Receive("SF_netmessage", function(len, ply)
 		if instance and instance.runScriptHook then
 			local name = net.ReadString()
 			len = len - 16 - (#name + 1) * 8 -- This gets rid of the 2-byte entity, and the null-terminated string, making this now quantify the length of the user's net message
+			instance.data.net.ply = ply
 			if ply then ply = instance.Types.Player.Wrap(ply) end
 
 			local recv = instance.data.net.receives[name]
@@ -242,9 +243,17 @@ function net_library.readStream(cb)
 	checkluatype (cb, TYPE_FUNCTION)
 	if streams[instance.player] then SF.Throw("The previous stream must finish before reading another.", 2) end
 	
-	streams[instance.player] = net.ReadStream((SERVER and instance.player or nil), function(data)
+	local streamOwner, target
+	if instance.player ~= NULL then
+		streamOwner = instance.player
+		target = instance.player
+	else
+		streamOwner = NULL
+		target = instance.data.net.ply
+	end
+	streams[streamOwner] = net.ReadStream((SERVER and target or nil), function(data)
 		instance:runFunction(cb, data)
-		streams[instance.player] = nil
+		streams[streamOwner] = nil
 	end)
 end
 
