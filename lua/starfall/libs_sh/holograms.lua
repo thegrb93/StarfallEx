@@ -155,6 +155,8 @@ end
 function holograms_library.create(pos, ang, model, scale)
 	checkpermission(instance, nil, "hologram.create")
 	checkluatype(model, TYPE_STRING)
+	model = model:gsub("%z", "")
+
 	if string.GetExtensionFromFilename( model ) ~= "mdl" then SF.Throw("Invalid model extension. (Expected .mdl)", 2) end
 
 	local pos = vunwrap(pos)
@@ -489,6 +491,7 @@ end
 function hologram_methods:setModel(model)
 	local holo = getholo(self)
 	checkluatype(model, TYPE_STRING)
+	model = model:gsub("%z", "")
 
 	if string.GetExtensionFromFilename( model ) ~= "mdl" then SF.Throw("Invalid model extension. (Expected .mdl)", 2) end
 
