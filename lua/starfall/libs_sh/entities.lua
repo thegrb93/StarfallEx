@@ -243,6 +243,7 @@ end
 -- @param material, string, New material name.
 function ents_methods:setMaterial(material)
 	checkluatype(material, TYPE_STRING)
+	material = string.gsub(material, "%z", "")
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
 
 	local ent = getent(self)
@@ -262,7 +263,9 @@ end
 -- @param material, string, New material name.
 function ents_methods:setSubMaterial(index, material)
 	checkluatype(material, TYPE_STRING)
+	material = string.gsub(material, "%z", "")
 	if SF.CheckMaterial(material) == false then SF.Throw("This material is invalid", 2) end
+	
 	index = math.Clamp(index, 0, 255)
 	local ent = getent(self)
 	if SERVER and ent == instance.player then

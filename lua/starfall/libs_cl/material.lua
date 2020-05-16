@@ -498,6 +498,11 @@ function material_library.createFromImage(path, params)
 	checkluatype(params, TYPE_STRING)
 	local ext = string.GetExtensionFromFilename(path)
 	if ext ~= "jpg" and ext ~= "png" then SF.Throw("Expected a .jpg or .png file", 2) end
+
+	if not file.Exists(SF.NormalizePath("materials/" .. path) , "GAME") then
+		SF.Throw("The material path is invalid", 2)
+	end
+
 	local paramlist = {}
 	for s in string.gmatch(string.lower(params), "%S+") do
 		if not image_params[s] then SF.Throw("Invalid parameter: "..s, 2) end

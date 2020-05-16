@@ -838,7 +838,7 @@ local materialBlacklist = {
 function SF.CheckMaterial(material)
 	if material == "" then return end
 	if #material > 260 then return false end
-	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
+	material = string.StripExtension(SF.NormalizePath(string.lower(string.gsub(material, "%z", ""))))
 	if materialBlacklist[material] then return false end
 	local mat = Material(material)
 	if shaderBlacklist[mat:GetShader() or ""] then return false end
