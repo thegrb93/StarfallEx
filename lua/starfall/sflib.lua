@@ -838,7 +838,7 @@ local materialBlacklist = {
 function SF.CheckMaterial(material)
 	if material == "" then return end
 	if #material > 260 then return false end
-	material = string.StripExtension(SF.NormalizePath(string.lower(string.gsub(material, "%z", ""))))
+	material = string.StripExtension(SF.NormalizePath(string.lower(material)))
 	if materialBlacklist[material] then return false end
 	local mat = Material(material)
 	if shaderBlacklist[mat:GetShader() or ""] then return false end
@@ -847,6 +847,9 @@ end
 
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)
+	local null = string.find(path, "\x00", 1, true)
+	if null then path = string.sub(path, 1, null-1) end
+
 	local tbl = string.Explode("[/\\]+", path, true)
 	if #tbl == 1 then return path end
 	local i = 1
