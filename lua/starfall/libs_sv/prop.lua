@@ -69,12 +69,12 @@ end
 function props_library.create(pos, ang, model, frozen)
 
 	checkpermission(instance, nil, "prop.create")
-
 	checkluatype(model, TYPE_STRING)
 	frozen = frozen and true or false
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
+	model = SF.NormalizePath(model)
 
 	local ply = instance.player
 
@@ -225,11 +225,13 @@ local allowed_components = {
 function props_library.createComponent(pos, ang, class, model, frozen)
 	checkpermission(instance,  nil, "prop.create")
 	checkluatype(class, TYPE_STRING)
+	checkluatype(model, TYPE_STRING)
 
 	if not allowed_components[class] then return SF.Throw("Invalid class!", 1) end
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
+	model = SF.NormalizePath(model)
 
 	local ply = instance.player
 	local propdata = instance.data.props
