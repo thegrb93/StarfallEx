@@ -310,20 +310,24 @@ end
 
 --- Creates/Modifies wire inputs/outputs. All wire ports must begin with an uppercase
 -- letter and contain only alphabetical characters or numbers but may not begin with a number.
--- @param inputs A key-value table with input port names as keys and types as values. Can be nil to not affect input ports.
--- @param outputs A key-value table with output port names as keys and types as values. Can be nil to not affect output ports.
+-- @param inputs (Optional) A key-value table with input port names as keys and types as values. e.g. {MyInput="number"} or {MyInput={type="number"}}. If nil, input ports won't be changed.
+-- @param outputs (Optional) A key-value table with output port names as keys and types as values. e.g. {MyOutput="number"} or {MyOutput={type="number"}}. If nil, output ports won't be changed.
 function wire_library.adjustPorts(inputs, outputs)
 	if inputs ~= nil then
 		checkluatype(inputs, TYPE_TABLE)
 
-		local names = {}
-		local types = {}
+		local ports, names, types = {}, {}, {}
 
 		for n,t in pairs( inputs ) do
-			if not isstring(n) or not isstring(t) then SF.Throw("Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
+			if istable(t) then t = t.type end
+			if not isstring(n) or not isstring(t) then SF.Throw("Inputs Error! Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
 
-			table.insert(names, n)
-			table.insert(types, t)
+			ports[#ports+1] = {string.lower(n),n,t}
+		end
+		table.sort(ports, function(a,b) return a[1]<b[1] end)
+		for k, v in ipairs(ports) do
+			names[k] = v[2]
+			types[k] = v[3]
 		end
 
 		wire_library.adjustInputs(names, types)
@@ -332,14 +336,18 @@ function wire_library.adjustPorts(inputs, outputs)
 	if outputs ~= nil then
 		checkluatype(outputs, TYPE_TABLE)
 
-		local names = {}
-		local types = {}
+		local ports, names, types = {}, {}, {}
 
 		for n,t in pairs( outputs ) do
-			if not isstring(n) or not isstring(t) then SF.Throw("Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
+			if istable(t) then t = t.type end
+			if not isstring(n) or not isstring(t) then SF.Throw("Outputs Error! Expected string string key value pairs, got a " .. SF.GetType(n) .. " " .. SF.GetType(t) .. " pair.", 2) end
 
-			table.insert(names, n)
-			table.insert(types, t)
+			ports[#ports+1] = {string.lower(n),n,t}
+		end
+		table.sort(ports, function(a,b) return a[1]<b[1] end)
+		for k, v in ipairs(ports) do
+			names[k] = v[2]
+			types[k] = v[3]
 		end
 
 		wire_library.adjustOutputs(names, types)
