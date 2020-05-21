@@ -28,11 +28,9 @@ function net.Stream.ReadStream:Request()
 end
 
 --Received data so process it
-function net.Stream.ReadStream:Read(len)
+function net.Stream.ReadStream:Read()
 
-	local size = math.floor(len / 8)
-	--print("Got", size)
-
+	local size = net.ReadUInt(32)
 	if size == 0 then self:Remove() return end
 
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
@@ -95,6 +93,7 @@ function net.Stream.WriteStream:Write(ply)
 	if chunk then
 		self.clients[ply].progress = progress
 		net.Start("NetStreamDownload")
+		net.WriteUInt(#chunk.data, 32)
 		net.WriteString(chunk.crc)
 		net.WriteData(chunk.data, #chunk.data)
 		if CLIENT then net.SendToServer() else net.Send(ply) end
@@ -123,6 +122,7 @@ function net.Stream.WriteStream:Remove()
 		if ply:IsValid() then sendTo[#sendTo+1] = ply end
 	end
 	net.Start("NetStreamDownload")
+	net.WriteUInt(0, 32)
 	if SERVER then net.Send(sendTo) else net.SendToServer() end
 	net.Stream.WriteStreams[self.identifier] = nil
 end
@@ -325,7 +325,7 @@ net.Receive("NetStreamDownload", function(len, ply)
 	local queue = net.Stream.ReadStreamQueues[ply]
 	if queue and queue[1] then
 
-		queue[1]:Read(len)
+		queue[1]:Read()
 
 	end
 
