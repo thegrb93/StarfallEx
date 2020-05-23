@@ -85,14 +85,18 @@ net.Receive("starfall_processor_download", function(len)
 end)
 
 net.Receive("starfall_processor_link", function()
-	local component = net.ReadEntity()
-	local proc = net.ReadEntity()
-
-	if component:IsValid() then
-		-- https://github.com/Facepunch/garrysmod-issues/issues/3127
-		local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
-		linkEnt(component, proc)
+	local component, proc
+	
+	local function link()
+		if IsValid(component) and IsValid(proc) then
+			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
+			local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
+			linkEnt(component, proc)
+		end
 	end
+	
+	SF.WaitForEntity(net.ReadUInt(16), function(ent) component = ent link() end)
+	SF.WaitForEntity(net.ReadUInt(16), function(ent) proc = ent link() end)
 end)
 
 net.Receive("starfall_processor_used", function(len)
