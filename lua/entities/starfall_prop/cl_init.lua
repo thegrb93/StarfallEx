@@ -101,7 +101,9 @@ net.Receive("starfall_custom_prop", function()
 	end)
 
 	net.ReadStream(nil, function(data_)
-		data = util.Decompress(data_)
-		applyData()
+		if data_ then
+			data = util.Decompress(data_)
+			applyData()
+		end
 	end)
 end)
