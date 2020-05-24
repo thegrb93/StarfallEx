@@ -68,6 +68,7 @@ function net.Stream.ReadStream:Remove()
 	if CLIENT then net.SendToServer() else net.Send(self.player) end
 
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
+	timer.Remove("NetStreamKeepAlive" .. self.identifier)
 
 	if self == self.queue[1] then
 		table.remove(self.queue, 1)
