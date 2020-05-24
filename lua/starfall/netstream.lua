@@ -94,8 +94,8 @@ net.Stream.WriteStream = {}
 
 -- The player wants some data
 function net.Stream.WriteStream:Write(ply)
-	local progress = net.ReadUInt(32)
-	local chunk = self.chunks[progress+1]
+	local progress = net.ReadUInt(32)+1
+	local chunk = self.chunks[progress]
 	if chunk then
 		self.clients[ply].progress = progress
 		net.Start("NetStreamDownload")
