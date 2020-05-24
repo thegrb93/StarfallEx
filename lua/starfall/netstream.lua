@@ -28,15 +28,13 @@ function net.Stream.ReadStream:Request()
 end
 
 --Received data so process it
-function net.Stream.ReadStream:Read()
-
-	local size = net.ReadUInt(32)
-	if size == 0 then self:Remove() return end
+function net.Stream.ReadStream:Read(size)
 
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
 
 	local crc = net.ReadString()
 	local data = net.ReadData(size)
+
 	if crc == util.CRC(data) then
 		self.chunks[#self.chunks + 1] = data
 	end
@@ -70,16 +68,24 @@ function net.Stream.ReadStream:Remove()
 	if CLIENT then net.SendToServer() else net.Send(self.player) end
 
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
-	table.remove(self.queue, 1)
 
-	local nextInQueue = self.queue[1]
-	if nextInQueue then
-		timer.Remove("NetStreamKeepAlive" .. nextInQueue.identifier)
-		nextInQueue:Request()
+	if self == self.queue[1] then
+		table.remove(self.queue, 1)
+		local nextInQueue = self.queue[1]
+		if nextInQueue then
+			timer.Remove("NetStreamKeepAlive" .. nextInQueue.identifier)
+			nextInQueue:Request()
+		else
+			net.Stream.ReadStreamQueues[self.player] = nil
+		end
 	else
-		net.Stream.ReadStreamQueues[self.player] = nil
+		for k, v in ipairs(self.queue) do
+			if v == self then
+				table.remove(self.queue, k)
+				break
+			end
+		end
 	end
-
 end
 
 net.Stream.ReadStream.__index = net.Stream.ReadStream
@@ -118,11 +124,15 @@ end
 function net.Stream.WriteStream:Remove()
 	local sendTo = {}
 	for ply, client in pairs(self.clients) do
-		client.finished = true
-		if ply:IsValid() then sendTo[#sendTo+1] = ply end
+		if not client.finished then
+			client.finished = true
+			if ply:IsValid() then sendTo[#sendTo+1] = ply end
+		end
 	end
+
 	net.Start("NetStreamDownload")
 	net.WriteUInt(0, 32)
+	net.WriteUInt(self.identifier, 32)
 	if SERVER then net.Send(sendTo) else net.SendToServer() end
 	net.Stream.WriteStreams[self.identifier] = nil
 end
@@ -130,6 +140,7 @@ end
 net.Stream.WriteStream.__index = net.Stream.WriteStream
 
 --Store the data and write the file info so receivers can request it.
+local identifier = 1
 function net.WriteStream(data, callback, dontcompress)
 
 	if not isstring(data) then
@@ -165,9 +176,14 @@ function net.WriteStream(data, callback, dontcompress)
 		}
 	end
 	
-	local identifier = 1
+	local startid = identifier
 	while net.Stream.WriteStreams[identifier] do
-		identifier = identifier + 1
+		identifier = identifier % 1024 + 1
+		if identifier == startid then
+			ErrorNoHalt("Netstream is full of WriteStreams!")
+			net.WriteUInt(0, 32)
+			return
+		end
 	end
 
 	local stream = {
@@ -323,10 +339,19 @@ net.Receive("NetStreamDownload", function(len, ply)
 
 	ply = ply or NULL
 	local queue = net.Stream.ReadStreamQueues[ply]
-	if queue and queue[1] then
-
-		queue[1]:Read()
-
+	if queue then
+		local size = net.ReadUInt(32)
+		if size > 0 then
+			queue[1]:Read(size)
+		else
+			local id = net.ReadUInt(32)
+			for k, v in ipairs(queue) do
+				if v.identifier == id then
+					v:Remove()
+					break
+				end
+			end
+		end
 	end
 
 end)
