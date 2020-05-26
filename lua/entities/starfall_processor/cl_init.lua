@@ -91,7 +91,9 @@ net.Receive("starfall_processor_link", function()
 		if IsValid(component) and IsValid(proc) then
 			-- https://github.com/Facepunch/garrysmod-issues/issues/3127
 			local linkEnt = baseclass.Get(component:GetClass()).LinkEnt
-			linkEnt(component, proc)
+			if linkEnt and proc:GetClass()=="starfall_processor" then
+				linkEnt(component, proc)
+			end
 		end
 	end
 	
