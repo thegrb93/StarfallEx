@@ -75,6 +75,7 @@ function props_library.create(pos, ang, model, frozen)
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 	model = SF.NormalizePath(model)
+	if not (util.IsValidModel(model) and util.IsValidProp(model)) then SF.Throw("Invalid model", 2) end
 
 	local ply = instance.player
 
@@ -232,6 +233,7 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
 	model = SF.NormalizePath(model)
+	if not (util.IsValidModel(model) and util.IsValidProp(model)) then SF.Throw("Invalid model", 2) end
 
 	local ply = instance.player
 	local propdata = instance.data.props

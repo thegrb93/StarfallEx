@@ -23,6 +23,7 @@ if SERVER then
 
 		local sf = ents.Create(class)
 		if not (sf and sf:IsValid()) then return false end
+		if not (util.IsValidModel(model) and util.IsValidProp(model)) then model = "models/spacecode/sfchip.mdl" end
 
 		sf:SetAngles(Ang)
 		sf:SetPos(Pos)

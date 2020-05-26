@@ -22,6 +22,7 @@ if SERVER then
 
 		local sf = ents.Create("starfall_processor")
 		if not (sf and sf:IsValid()) then return false end
+		if not (util.IsValidModel(model) and util.IsValidProp(model)) then model = "models/spacecode/sfchip.mdl" end
 
 		sf:SetAngles(Ang)
 		sf:SetPos(Pos)
@@ -124,7 +125,6 @@ function TOOL:LeftClick(trace)
 		sf = ent
 	else
 		local model = self:GetClientInfo("Model")
-		if not (util.IsValidModel(model) and util.IsValidProp(model)) then return false end
 		if not self:GetSWEP():CheckLimit("starfall_processor") then return false end
 
 		local Ang = trace.HitNormal:Angle()

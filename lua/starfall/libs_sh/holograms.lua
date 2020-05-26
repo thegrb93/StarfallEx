@@ -157,7 +157,7 @@ function holograms_library.create(pos, ang, model, scale)
 	checkluatype(model, TYPE_STRING)
 	model = SF.NormalizePath(model)
 
-	if string.GetExtensionFromFilename( model ) ~= "mdl" then SF.Throw("Invalid model extension. (Expected .mdl)", 2) end
+	if not util.IsValidModel(model) then SF.Throw("Invalid model", 2) end
 
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
@@ -493,7 +493,7 @@ function hologram_methods:setModel(model)
 	checkluatype(model, TYPE_STRING)
 	model = SF.NormalizePath(model)
 
-	if string.GetExtensionFromFilename( model ) ~= "mdl" then SF.Throw("Invalid model extension. (Expected .mdl)", 2) end
+	if not util.IsValidModel(model) then SF.Throw("Invalid model", 2) end
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
