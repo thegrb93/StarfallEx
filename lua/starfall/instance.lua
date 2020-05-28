@@ -484,8 +484,6 @@ function SF.Instance:runWithOps(func, ...)
 		local usedRatio = self:movingCPUAverage() / self.cpuQuota
 		if usedRatio>1 then
 			return {false, SF.MakeError("CPU Quota exceeded.", 1, true, true)}
-		elseif usedRatio > self.cpu_softquota then
-			return {false, SF.MakeError("CPU Quota warning.", 1, false, true)}
 		end
 	end
 
