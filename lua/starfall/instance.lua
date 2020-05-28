@@ -50,7 +50,7 @@ function SF.Instance.Compile(code, mainfile, player, data)
 	instance.source = code
 	instance.mainfile = mainfile
 	instance.requires = {}
-	instance.requirestack = {string.GetPathFromFilename(mainfile)}
+	instance.requirestack = {mainfile}
 
 	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
 	if not ok then

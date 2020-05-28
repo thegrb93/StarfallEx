@@ -573,7 +573,7 @@ function builtins_library.require(file)
 	if string.sub(file, 1, 1)=="/" then
 		path = SF.NormalizePath(file)
 	else
-		path = SF.NormalizePath(instance.requirestack[#instance.requirestack] .. file)
+		path = SF.NormalizePath(string.GetPathFromFilename(instance.requirestack[#instance.requirestack]) .. file)
 		if not instance.scripts[path] then
 			path = SF.NormalizePath(file)
 		end
@@ -585,8 +585,12 @@ function builtins_library.require(file)
 		local func = instance.scripts[path]
 		if not func then SF.Throw("Can't find file '" .. path .. "' (did you forget to --@include it?)", 2) end
 
+		if table.HasValue(instance.requirestack, path) then
+			SF.Throw("Cyclic require dependency", 2)
+		end
+
 		local stacklen = #instance.requirestack + 1
-		instance.requirestack[stacklen] = string.GetPathFromFilename(path)
+		instance.requirestack[stacklen] = path
 		local ok, ret = pcall(func)
 		instance.requirestack[stacklen] = nil
 
@@ -612,7 +616,7 @@ function builtins_library.requiredir(dir, loadpriority)
 	if string.sub(dir, 1, 1)=="/" then
 		path = SF.NormalizePath(dir)
 	else
-		path = SF.NormalizePath(instance.requirestack[#instance.requirestack] .. dir)
+		path = SF.NormalizePath(string.GetPathFromFilename(instance.requirestack[#instance.requirestack]) .. dir)
 		
 		-- If no scripts found in relative dir, try the root dir.
 		local foundScript = false
@@ -631,17 +635,16 @@ function builtins_library.requiredir(dir, loadpriority)
 
 	if loadpriority then
 		for i = 1, #loadpriority do
-			for file, _ in pairs(instance.scripts) do
-				if file == path .. "/" .. loadpriority[i] then
-					returns[file] = builtins_library.require("/"..file)
-				end
+			local file = path .. "/" .. loadpriority[i]
+			if instance.scripts[file] and not table.HasValue(instance.requirestack, file) then
+				returns[file] = builtins_library.require("/"..file)
 			end
 		end
-	end
-
-	for file, _ in pairs(instance.scripts) do
-		if not returns[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) then
-			returns[file] = builtins_library.require("/"..file)
+	else
+		for file, _ in pairs(instance.scripts) do
+			if (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) and not table.HasValue(instance.requirestack, file) then
+				returns[file] = builtins_library.require("/"..file)
+			end
 		end
 	end
 
