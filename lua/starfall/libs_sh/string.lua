@@ -205,6 +205,14 @@ string_library.niceTime = sfstring.NiceTime
 -- @return The sanitized string
 string_library.patternSafe = sfstring.patternSafe
 
+--- Repeats the given string n times
+-- @class function
+-- @param str The string to repeat
+-- @param rep Number of times to repeat the string
+-- @param sep (Optional) seperator string between each repeated string
+-- @return String result
+string_library.rep = sfstring.rep
+
 --- Replaces all occurrences of the supplied second string.
 -- @class function
 -- @param str The string we are seeking to replace an occurrence(s)
