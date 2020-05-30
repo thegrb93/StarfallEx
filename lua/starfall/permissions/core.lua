@@ -102,6 +102,7 @@ function P.buildPermissionCheck(privilegeid)
 		if P.providers[providerid] then
 			local check = P.providers[providerid].checks[v.setting]
 			if check == "block" then
+				allAllow = false
 				anyBlock = true
 				break
 			elseif check ~= "allow" then
