@@ -25,47 +25,61 @@ code {
 }
 
 .app{
-
-  //width: 100vw;
+  width: 100vw;
   height: 100vh;
+  display: flex;
+  flex-direction: row;
 }
-.page 
+
+.card
 {
-  padding: 20px;
+  font-size: 0.9em;
+  border-top: 1px solid $color-border;
+  .card-children
+  {
+    margin-left: 20px;
+  }
+  .card-title
+  {
+    display: flex;
+    align-items: center;
+  } 
 }
+
 .sidebar
 {
-  padding: 0 20px 0 20px;
   background-color: $color-dark-2;
   box-shadow: 2px 0px 10px #00000099;
-  position: fixed;
-  top: 0;
-  height: 100%;
-  width: 18%;
-  left: 0;
-  overflow-x: hidden;
-  
+  display: flex;
+  flex-direction: column;
+  flex-basis: 20%;
+  align-items: stretch;
   .sidebar-children {
     overflow-y: auto;
-    position: absolute;
-    top: 130px;
-    bottom: 65px;
-    left: 20px;
-    right: 0;
-    width: auto;
-
+    flex-grow: 1;
+    margin: 5px 20px 5px 20px;
     .sidebar-item-children {
       padding-left: 15px;
       margin-left: 6px;
       border-left: 1px solid $color-border-dark;
     }
+    .name
+    {
+      color: $color-menu;
+      text-decoration: none;
+    }
     .name-selected {
-      color: #33AA33
+      color: $color-menu-selected;
     }
     .sidebar-item-content {
       display: flex;
       .name {
         @include clickable();
+      }
+      .collapse-placeholder {
+        margin-left: 2px;
+        margin-right: 4px;
+        width:10px;
       }
       .collapse 
       {
@@ -83,11 +97,6 @@ code {
     padding-top: 5px;
     text-align: center;
     font-size: .8em;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    max-height: auto;
-    margin-left: -20px;
     .version-label
     {
       font-weight: bolder;
@@ -108,16 +117,18 @@ code {
   }
   .search
   {
-    width: 100%;
     border-top: 1px solid $color-border;
     border-bottom: 1px solid $color-border;
+    margin: 0 20px 0 20px;
+    display:flex;
     input {
-      width: 100%;
+      flex-grow: 1;
       margin: 10px 0 10px 0;
       background-color: $color-dark-4;
       border: 1px solid $color-border-dark;
       color: white;
     }
+    
   }
   
   @media only screen and (max-width: 1210px)
@@ -136,32 +147,42 @@ code {
   .logo
   {
     padding: 10px 0px 20px 00px;
-    text-align: center;
-    width: 100%;
-    white-space: nowrap;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction: row;
     img {
       width: 48px;
       height: 48px;  
       filter: drop-shadow(3px 3px 3px #000);
-      position: relative;
-      top: 10px;
     }
     .text
     {
+      display:block;
       font-size: 40px;
       text-shadow: 3px 3px 3px #000;
-      position: relative;
     }
   }
 }
 .page
 {
-  margin-left: 20%;
   text-shadow: 1px 1px 2px #000;
+  padding: 20px;
+  flex-grow: 1;
+  flex-shrink: 1;
+  min-width: 70%;
+  max-width: 95%;
+}
+.page-container
+{
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   overflow-y: auto;
 }
 
-.page-library, .page-type, .page-table
+.card-table
 {
   table {
     border-collapse: collapse;
@@ -171,26 +192,6 @@ code {
   }
   table, td {
     border: 1px solid white;
-  }
-}
-
-.page-method
-{
-  .method-title
-  {
-    .realm-icon{
-      display: inline-block;
-    }
-  }
-}
-
-.page-hook
-{
-  .hook-title
-  {
-    .realm-icon{
-      display: inline-block;
-    }
   }
 }
 
@@ -221,6 +222,7 @@ code {
   margin-top: 3px;
   margin-right: 4px;
   border-radius: 10%;
+  flex-shrink: 0;
 
   text-align: center;
   padding: 2px 2px 2px 2px;
@@ -255,7 +257,7 @@ code {
 {
   white-space: pre-line;
 }
-.page-contributors
+.card-contributors
 {
   padding-left: 60px;
   li {

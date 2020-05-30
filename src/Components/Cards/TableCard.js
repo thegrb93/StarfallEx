@@ -1,8 +1,16 @@
 import React from 'react';
-import ClickAction from "../ClickAction";
+import Icon from '../Icon';
 
-export default function TablePage(props)
+export default function TableCard(props)
 {
+    let parentName = props.parent;
+    let callSplitter = ".";
+    if(parentName === "builtins")
+    {
+        parentName = "";
+        callSplitter = "";
+    }
+
     const fields = props.fields.map(x => (
         <tr key = {x.name}>
             <td>{x.name}</td>
@@ -12,8 +20,8 @@ export default function TablePage(props)
     ));
 
     return (
-        <div className="page page-table">
-            <h1>{props.name}</h1>
+        <React.Fragment>
+            <h1 className="card-title"><Icon type="realm" value={props.realm} />{parentName}{callSplitter}{props.name}</h1>
             <p className="accept-newlines">{props.description}</p>
 
             <table>
@@ -21,7 +29,7 @@ export default function TablePage(props)
                 {fields}
                 </tbody>
             </table>
-        </div>
+        </React.Fragment>
 
     )
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-export default function ContributorsPage(props)
+export default function ContributorsCard(props)
 {
     const [contributorsData, setContributorsData] = useState([]);
 
@@ -31,18 +31,18 @@ export default function ContributorsPage(props)
                 {x.login}
             </span>
             <span className="text">
-                &nbsp;made <span class="contributions">{x.contributions}</span> contributions
+                &nbsp;made <span className="contributions">{x.contributions}</span> contributions
             </span>
         </li>
     ));
     return (
-        <div className="page page-contributors">
+        <React.Fragment>
             <h1>List of awesome people that contributed to StarfallEx:</h1>
             <ul>
                 {contributors}
             </ul>
 
             <span>Thanks!</span>
-        </div>
+        </React.Fragment>
     )
 }

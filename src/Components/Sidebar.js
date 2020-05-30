@@ -2,6 +2,7 @@ import React, { useReducer, useEffect } from 'react';
 import logo from '../logo.png'
 import Icon from "./Icon"
 import Version from "./Version"
+import {Link} from 'react-router-dom';
 const _ = require('lodash');
 
 function cloneState(state)
@@ -17,7 +18,13 @@ function assignPaths(items, pathRoot="")
   for(const key in items)
   {
     const item = items[key];
-    item.path = pathRoot + "." + item.name;
+    if(pathRoot !== "")
+    {
+      item.path = pathRoot + "." + item.name;
+    }
+    else{
+      item.path = item.name;
+    }
     if(item.children && item.children.length > 0)
     {
       assignPaths(item.children, item.path);
@@ -115,7 +122,7 @@ function renderElements(items, dispatch, currentPage)
   {
     if(item.hidden) { continue; }
     output.push((
-      <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} type = {item.type} selected={item.path === currentPage}>
+      <SidebarElement key={item.path} path={item.path} name={item.name} collapsed={item.collapsed} dispatch={dispatch} icon = {item.icon} iconType = {item.iconType} type = {item.type} selected={item.path.toLowerCase() === currentPage}>
         {
           items && items.length > 0 && renderElements(item.children, dispatch, currentPage)
         }
@@ -162,16 +169,6 @@ export default function Sidebar(props)
         const path = action.value;
         newState.flatMap[path].collapsed = !newState.flatMap[path].collapsed;
         return newState;
-      case "CHANGE_PAGE":
-        if(action.value === props.currentPage) //For some reason it can be called twice?
-        {
-          return state;
-        }
-        setTimeout(() => {
-          props.changePage(action.value);
-
-        }, 1);
-        return state;
       default:
         return state;
     
@@ -211,12 +208,25 @@ function SidebarElement(props)
     const {collapsed, name, path, children, dispatch, icon, iconType, selected, type} = props;
 
     const hasChildren = children && children.length > 0;
+    let linkElement = (
+      <div className = {"name" + (selected ? " name-selected": "")} onClick = {() => dispatch({type:"TOGGLE_COLLAPSE", value: path})}>
+      {name}
+      </div>
+    );
+    if(!selected && type !== "category")
+    {
+      linkElement = (
+        <Link to = {path} className="name">
+            {name}
+        </Link>
+      );
+    }
 
     return (
         <div className = "sidebar-item">
           <div className="sidebar-item-content">
             {
-              hasChildren &&
+              hasChildren ?
               (
                 <div className = {"collapse " + (collapsed ? "collapsed" : "expanded")} onClick = {() => dispatch({type:"TOGGLE_COLLAPSE", value: path})}>
                 <span>
@@ -224,11 +234,13 @@ function SidebarElement(props)
                 </span>
               </div>  
               )
+              :
+              (
+                <div className = "collapse-placeholder"></div>
+              )
             }           
             <Icon type={iconType} value={icon} />
-            <div className = {"name" + (selected ? " name-selected" : "")} onClick = {function() {dispatch({type:"TOGGLE_COLLAPSE", value: path}); dispatch({type:"CHANGE_PAGE", value: path});}}>
-              {name}
-            </div>
+            {linkElement}
           </div>
           {!collapsed && hasChildren &&
           (
