@@ -130,6 +130,20 @@ code {
     }
     
   }
+  
+  @media only screen and (max-width: 1210px)
+  {
+	.sidebar .logo
+	{
+	  margin-top: 10px;
+	}
+	
+	.sidebar .logo img
+	{
+	  display: none;
+	}
+  }
+  
   .logo
   {
     padding: 10px 0px 20px 00px;
@@ -203,6 +217,7 @@ code {
 .realm-icon
 {
   width: 15px;
+  min-width: 15px;
   height: 15px;
   margin-top: 3px;
   margin-right: 4px;
