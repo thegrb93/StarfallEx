@@ -9,6 +9,9 @@ local PANEL = {} -- It's our VGUI
 -------------------------------
 
 function TabHandler:Init() -- It's caled when editor is initalized, you can create library map there etc
+	http.Fetch(SF.Editor.HelperURL:GetString(), function(data)
+		self.htmldata = data
+	end)
 end
 
 function TabHandler:RegisterSettings() -- Setting panels should be registered there
@@ -35,6 +38,7 @@ local function htmlSetup(old, new)
 		if not (new and new:IsValid()) then return end
 		_.loaded = true
 		new.url = url
+		html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
 	end
 end
 
@@ -59,13 +63,7 @@ function PANEL:Init() --That's init of VGUI like other PANEL:Methods(), separate
 	html:DockPadding(0, 0, 0, 0)
 	html:SetKeyboardInputEnabled(true)
 	html:SetMouseInputEnabled(true)
-	html:OpenURL("asset://garrysmod/html/sf_doc.html")
-	hook.Add("Think","SF_DocLoading",function()
-		if not html:IsLoading() then
-			html:RunJavascript([[SF_DOC.BuildPages(]]..util.TableToJSON(SF.Docs)..[[);]])
-			hook.Remove("Think","SF_DocLoading")
-		end
-	end)
+	html:SetHTML(TabHandler.htmldata)
 	self.html = html
 	htmlSetup(nil, self)
 end
