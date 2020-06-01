@@ -943,6 +943,7 @@ local soundsMap = {
 	["CONFIRM2"] = 7,	[7] = "buttons/button14.wav",
 	["CONFIRM3"] = 8,	[8] = "buttons/button15.wav",
 	["CONFIRM4"] = 9,	[9] = "buttons/button17.wav",
+	["SILENT"] = 10,
 }
 local notificationsMap = {
 	["GENERIC"] = 0,
