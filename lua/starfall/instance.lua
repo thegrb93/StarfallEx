@@ -44,7 +44,6 @@ function SF.Instance.Compile(code, mainfile, player, data)
 
 	local instance = setmetatable({}, SF.Instance)
 	instance.data = data or {}
-	instance.ppdata = {}
 	instance.hooks = {}
 	instance.scripts = {}
 	instance.source = code
@@ -52,30 +51,9 @@ function SF.Instance.Compile(code, mainfile, player, data)
 	instance.requires = {}
 	instance.requirestack = {mainfile}
 
-	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
-	if not ok then
-		return false, { message = "", traceback = err }
-	end
-
+	instance.ppdata = {}
 	for filename, source in pairs(code) do
 		SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
-
-		local serverorclient
-		if  instance.ppdata.serverorclient then
-			serverorclient = instance.ppdata.serverorclient[filename]
-		end
-
-		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
-			-- Lua doesn't have empty statements, so an empty file gives a syntax error
-			instance.scripts[filename] = function() end
-		else
-			local func = SF.CompileString(source, "SF:"..filename, false)
-			if isstring(func) then
-				return false, { message = func, traceback = "" }
-			end
-			debug.setfenv(func, instance.env)
-			instance.scripts[filename] = func
-		end
 	end
 
 	if player ~= NULL and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
@@ -119,6 +97,29 @@ function SF.Instance.Compile(code, mainfile, player, data)
 	else
 		instance.cpuQuota = math.huge
 		instance.cpuQuotaRatio = 0
+	end
+
+	local ok, err = xpcall(instance.BuildEnvironment, debug.traceback, instance)
+	if not ok then
+		return false, { message = "", traceback = err }
+	end
+	for filename, source in pairs(code) do
+		local serverorclient
+		if instance.ppdata.serverorclient then
+			serverorclient = instance.ppdata.serverorclient[filename]
+		end
+
+		if string.match(source, "^[%s\n]*$") or (serverorclient == "server" and CLIENT) or (serverorclient == "client" and SERVER) then
+			-- Lua doesn't have empty statements, so an empty file gives a syntax error
+			instance.scripts[filename] = function() end
+		else
+			local func = SF.CompileString(source, "SF:"..filename, false)
+			if isstring(func) then
+				return false, { message = func, traceback = "" }
+			end
+			debug.setfenv(func, instance.env)
+			instance.scripts[filename] = func
+		end
 	end
 
 	instance.startram = collectgarbage("count")
