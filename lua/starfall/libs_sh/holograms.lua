@@ -157,7 +157,7 @@ function holograms_library.create(pos, ang, model, scale)
 	checkluatype(model, TYPE_STRING)
 	model = SF.NormalizePath(model)
 
-	if (SERVER and not util.IsValidModel(model)) or (CLIENT and string.GetExtensionFromFilename(mdl) ~= "mdl") then SF.Throw("Invalid model", 2) end
+	if (SERVER and not util.IsValidModel(model)) or (CLIENT and string.GetExtensionFromFilename(model) ~= "mdl") then SF.Throw("Invalid model", 2) end
 
 	local pos = vunwrap(pos)
 	local ang = aunwrap(ang)
