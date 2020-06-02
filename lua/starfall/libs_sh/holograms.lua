@@ -493,7 +493,7 @@ function hologram_methods:setModel(model)
 	checkluatype(model, TYPE_STRING)
 	model = SF.NormalizePath(model)
 
-	if (SERVER and not util.IsValidModel(model)) or (CLIENT and string.GetExtensionFromFilename(mdl) ~= "mdl") then SF.Throw("Invalid model", 2) end
+	if (SERVER and not util.IsValidModel(model)) or (CLIENT and string.GetExtensionFromFilename(model) ~= "mdl") then SF.Throw("Invalid model", 2) end
 
 	checkpermission(instance, holo, "hologram.setRenderProperty")
 
