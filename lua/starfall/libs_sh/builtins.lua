@@ -498,6 +498,7 @@ else
 	end
 
 	--- Sets clipboard text. Only works on the owner of the chip.
+	-- @client
 	-- @param txt Text to set to the clipboard
 	function builtins_library.setClipboardText(txt)
 		if instance.player ~= LocalPlayer() then return end
@@ -506,6 +507,7 @@ else
 	end
 
 	--- Prints a message to your chat, console, or the center of your screen.
+	-- @client
 	-- @param mtype How the message should be displayed. See http://wiki.facepunch.com/gmod/Enums/HUD
 	-- @param text The message text.
 	function builtins_library.printMessage(mtype, text)
