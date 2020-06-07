@@ -93,13 +93,13 @@ end
 --- Creates (and starts) a timer
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
--- @param reps The repititions of the tiemr. 0 = infinte
+-- @param reps The repititions of the timer. 0 = infinte
 -- @param func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func)
-	SF.CheckLuaType(name, TYPE_STRING)
-	SF.CheckLuaType(delay, TYPE_NUMBER)
-	SF.CheckLuaType(reps, TYPE_NUMBER)
-	SF.CheckLuaType(func, TYPE_FUNCTION)
+	checkluatype(name, TYPE_STRING)
+	checkluatype(delay, TYPE_NUMBER)
+	checkluatype(reps, TYPE_NUMBER)
+	checkluatype(func, TYPE_FUNCTION)
 
 	createTimer(name, delay, reps, func, false)
 end
@@ -114,7 +114,7 @@ end
 --- Stops and removes the timer.
 -- @param name The timer name
 function timer_library.remove(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	local timername = mangle_timer_name(name)
 	if instance.data.timers[timername] then
@@ -128,7 +128,7 @@ end
 -- @param name The timer name
 -- @return bool if the timer exists
 function timer_library.exists(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 	return timer.Exists(mangle_timer_name(name))
 end
 
@@ -136,7 +136,7 @@ end
 -- @param name The timer name
 -- @return false if the timer didn't exist or was already stopped, true otherwise.
 function timer_library.stop(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 	return timer.Stop(mangle_timer_name(name))
 end
 
@@ -144,7 +144,7 @@ end
 -- @param name The timer name
 -- @return true if the timer exists, false if it doesn't.
 function timer_library.start(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	return timer.Start(mangle_timer_name(name))
 end
@@ -152,19 +152,19 @@ end
 --- Adjusts a timer
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
--- @param reps (Optional) The repititions of the tiemr. 0 = infinte, nil = 1
--- @param func (Optional) The function to call when the tiemr is fired
+-- @param reps (Optional) The repititions of the timer. 0 = infinte, nil = 1
+-- @param func (Optional) The function to call when the timer is fired
 -- @return true if succeeded
 function timer_library.adjust(name, delay, reps, func)
-	SF.CheckLuaType(name, TYPE_STRING)
-	SF.CheckLuaType(delay, TYPE_NUMBER)
+	checkluatype(name, TYPE_STRING)
+	checkluatype(delay, TYPE_NUMBER)
 
 	local timername = mangle_timer_name(name)
 	local data = instance.data.timers[timername]
 
 	if data then
-		if reps~=nil then SF.CheckLuaType(reps, TYPE_NUMBER) data.reps = reps end
-		if func~=nil then SF.CheckLuaType(func, TYPE_FUNCTION) data.func = func end
+		if reps~=nil then checkluatype(reps, TYPE_NUMBER) data.reps = reps end
+		if func~=nil then checkluatype(func, TYPE_FUNCTION) data.func = func end
 		return timer.Adjust(timername, math.max(delay, 0.001), reps)
 	else
 		return false
@@ -175,7 +175,7 @@ end
 -- @param name The timer name
 -- @return false if the timer didn't exist or was already paused, true otherwise.
 function timer_library.pause(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	return timer.Pause(mangle_timer_name(name))
 end
@@ -184,7 +184,7 @@ end
 -- @param name The timer name
 -- @return false if the timer didn't exist or was already running, true otherwise.
 function timer_library.unpause(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	return timer.UnPause(mangle_timer_name(name))
 end
@@ -193,7 +193,7 @@ end
 -- @param name The timer name
 -- @return status of the timer.
 function timer_library.toggle(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	return timer.Toggle(mangle_timer_name(name))
 end
@@ -202,7 +202,7 @@ end
 -- @param name The timer name
 -- @return The amount of time left (in seconds). If the timer is paused, the amount will be negative. Nil if timer doesnt exist
 function timer_library.timeleft(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	return timer.TimeLeft(mangle_timer_name(name))
 end
@@ -211,7 +211,7 @@ end
 -- @param name The timer name
 -- @return The amount of executions left. Nil if timer doesnt exist
 function timer_library.repsleft(name)
-	SF.CheckLuaType(name, TYPE_STRING)
+	checkluatype(name, TYPE_STRING)
 
 	return timer.RepsLeft(mangle_timer_name(name))
 end
