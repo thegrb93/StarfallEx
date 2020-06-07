@@ -96,6 +96,7 @@ end
 -- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
 -- @param func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func)
+	reps = reps or 1
 	SF.CheckLuaType(name, TYPE_STRING)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
 	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
