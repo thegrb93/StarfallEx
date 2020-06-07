@@ -93,12 +93,12 @@ end
 --- Creates (and starts) a timer
 -- @param name The timer name
 -- @param delay The time, in seconds, to set the timer to.
--- @param reps The repititions of the tiemr. 0 = infinte, nil = 1
+-- @param reps The repititions of the tiemr. 0 = infinte
 -- @param func The function to call when the timer is fired
 function timer_library.create(name, delay, reps, func)
 	SF.CheckLuaType(name, TYPE_STRING)
 	SF.CheckLuaType(delay, TYPE_NUMBER)
-	reps = SF.CheckLuaType(reps, TYPE_NUMBER, 0, 1)
+	SF.CheckLuaType(reps, TYPE_NUMBER)
 	SF.CheckLuaType(func, TYPE_FUNCTION)
 
 	createTimer(name, delay, reps, func, false)
