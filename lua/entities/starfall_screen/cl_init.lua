@@ -59,8 +59,9 @@ function ENT:RenderScreen()
 			if SF.Permissions.hasAccess(instance, nil, "render.screen") then
 
 				instance.data.render.renderEnt = self
-
 				instance:runScriptHook("render")
+				instance.data.render.renderEnt = nil
+
 			end
 		elseif self.link.error then
 			local error = self.link.error
