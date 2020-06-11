@@ -662,7 +662,7 @@ function ents_methods:getQuotaAverage()
 	if ent.Starfall then
 		return ent.instance and ent.instance:movingCPUAverage() or 0
 	elseif ent.WireDebugName == "Expression 2" then
-		return ent.context.timebench
+		return SERVER and ent.context.timebench or ent:GetOverlayData().timebench
 	else
 		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
 	end
