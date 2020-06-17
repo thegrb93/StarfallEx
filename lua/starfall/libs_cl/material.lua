@@ -496,10 +496,12 @@ local image_params = {["nocull"] = true,["alphatest"] = true,["mips"] = true,["n
 function material_library.createFromImage(path, params)
 	checkluatype(path, TYPE_STRING)
 	checkluatype(params, TYPE_STRING)
+
+	path = SF.NormalizePath(path)
 	local ext = string.GetExtensionFromFilename(path)
 	if ext ~= "jpg" and ext ~= "png" then SF.Throw("Expected a .jpg or .png file", 2) end
 
-	if not (file.Exists(SF.NormalizePath("materials/" .. path), "GAME") or file.Exists(SF.NormalizePath("data/" .. path) , "GAME")) then
+	if not (file.Exists("materials/" .. path, "GAME") or (string.sub(path,1,5)=="data/" and file.Exists(path,"GAME"))) then
 		SF.Throw("The material path is invalid", 2)
 	end
 
