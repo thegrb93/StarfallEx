@@ -1273,21 +1273,11 @@ do
 	string_library.utf8len = utf8.len
 	string_library.utf8offset = utf8.offset
 
-	local rep_chunk = 1000000
+	local max_rep = 1000000
 	function string_library.rep(str, rep, sep)
-		if rep < 0.5 then return "" end
+		if #str*rep+(sep and #sep or 0)*rep > max_rep then SF.Throw("Max string.rep length is " .. max_rep, 2) end
 
-		local ret = {}
-		for i = 1, rep / rep_chunk do
-			ret[#ret + 1] = string.rep(str, rep_chunk, sep)
-		end
-
-		local r = rep%rep_chunk
-		if r>0.5 then
-			ret[#ret + 1] = string.rep(str, r, sep)
-		end
-
-		return table.concat(ret, sep)
+		return string.rep(str, rep, sep)
 	end
 	SF.SafeStringLib = string_library
 end
