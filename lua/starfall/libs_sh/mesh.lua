@@ -601,8 +601,8 @@ end)
 -- @return Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
-	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
-	if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
+	if threaded ~= true then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+	if triangulate ~= true then checkluatype(triangulate, TYPE_BOOL) end
 
 	return SF.ParseObj(obj, threaded and thread_yield, vector, triangulate)
 end
@@ -643,7 +643,7 @@ if CLIENT then
 	function mesh_library.createFromTable(verteces, threaded)
 		checkpermission (instance, nil, "mesh")
 		checkluatype (verteces, TYPE_TABLE)
-		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
+		if threaded ~= true then checkluatype(threaded, TYPE_BOOL) end
 		local thread
 		if threaded then thread = coroutine.running() if not thread then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 
@@ -682,8 +682,8 @@ if CLIENT then
 	-- @client
 	function mesh_library.createFromObj(obj, threaded, triangulate)
 		checkluatype (obj, TYPE_STRING)
-		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
-		if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
+		if threaded ~= true then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+		if triangulate ~= true then checkluatype(triangulate, TYPE_BOOL) end
 
 		checkpermission (instance, nil, "mesh")
 
