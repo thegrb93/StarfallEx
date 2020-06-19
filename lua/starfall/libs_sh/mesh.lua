@@ -601,7 +601,7 @@ end)
 -- @return Table of Mesh data. {positions = positionData, normals = normalData, texturecoords = texturecoordData, faces = faceData}
 function mesh_library.parseObj(obj, threaded, triangulate)
 	checkluatype (obj, TYPE_STRING)
-	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+	if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if threaded and not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 	if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
 
 	return SF.ParseObj(obj, threaded and thread_yield, vector, triangulate)
@@ -643,9 +643,7 @@ if CLIENT then
 	function mesh_library.createFromTable(verteces, threaded)
 		checkpermission (instance, nil, "mesh")
 		checkluatype (verteces, TYPE_TABLE)
-		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) end
-		local thread
-		if threaded then thread = coroutine.running() if not thread then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if threaded and not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 
 		local nvertices = #verteces
 		if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
@@ -664,7 +662,7 @@ if CLIENT then
 				end
 			end
 			unwrapped[i] = vert
-			if thread then thread_yield() end
+			if threaded then thread_yield() end
 		end
 
 		local mesh = Mesh()
@@ -682,7 +680,7 @@ if CLIENT then
 	-- @client
 	function mesh_library.createFromObj(obj, threaded, triangulate)
 		checkluatype (obj, TYPE_STRING)
-		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
+		if threaded ~= nil then checkluatype(threaded, TYPE_BOOL) if threaded and not coroutine.running() then SF.Throw("Tried to use threading while not in a thread!", 2) end end
 		if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
 
 		checkpermission (instance, nil, "mesh")
