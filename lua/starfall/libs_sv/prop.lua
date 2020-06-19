@@ -121,6 +121,7 @@ end
 -- @server
 -- @param pos The position to spawn the prop
 -- @param ang The angles to spawn the prop
+-- @param vertices The table of tables of vectices that make up the physics mesh {{v1,v2,...},{v1,v2,...},...}
 -- @param frozen Whether the prop starts frozen
 -- @return The prop object
 function props_library.createCustom(pos, ang, vertices, frozen)
