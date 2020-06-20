@@ -29,6 +29,6 @@ end)
 
 hook.add("render","",function()
     render.setRenderTargetTexture("myrendertarget")
-    render.drawTexturedRectFast(0,0,512,512)
+    render.drawTexturedRect(0,0,512,512)
 end)
 
