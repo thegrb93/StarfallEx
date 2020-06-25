@@ -1915,6 +1915,7 @@ end
 -- @class hook
 -- @client
 -- @param string The name of the hud element trying to be drawn
+-- @return Return false to not draw the element
 
 ---Called before drawing HUD (2D Context)
 -- @name predrawhud
