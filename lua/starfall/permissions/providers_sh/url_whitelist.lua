@@ -2,29 +2,40 @@
 
 local urlrestrictor = SF.StringRestrictor(false)
 
+local function checkWhitelist(instance, target, key)
+	if TypeID(target) ~= TYPE_STRING then return false, "The url is not a string" end
+	local prefix = string.match(target,"^(%w-)://") -- Check if protocol was given
+	if not prefix then -- If not, add http://
+		target = "http://"..target
+	end
+
+	local prefix, site, data = string.match(target,"^(%w-)://([^/]*)/?(.*)")
+	if not site then return false, "This url is malformed" end
+	site = site.."/"..(data or "") -- Make sure there is / at the end of site
+	return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
+end
+
 local P = {}
 P.id = "urlwhitelist"
 P.name = "URL Whitelist"
-P.settingsoptions = { "Enabled", "Disabled" }
+P.settingsoptions = { "Enabled", "Disabled", "Disabled for owner" }
 P.defaultsetting = 1
 P.checks = {
-	function(instance, target, key)
-		if TypeID(target) ~= TYPE_STRING then return false, "The url is not a string" end
-		local prefix = string.match(target,"^(%w-)://") -- Check if protocol was given
-		if not prefix then -- If not, add http://
-			target = "http://"..target
-		end
-
-		local prefix, site, data = string.match(target,"^(%w-)://([^/]*)/?(.*)")
-		if not site then return false, "This url is malformed" end
-		site = site.."/"..(data or "") -- Make sure there is / at the end of site
-		return urlrestrictor:check(site), "This url is not whitelisted. See https://github.com/thegrb93/StarfallEx/wiki/Whitelist for more information."
-	end,
-	"allow"
+	checkWhitelist,
+	"allow",
+	nil
 }
 
-SF.Permissions.registerProvider(P)
+if SERVER then
+	P.checks[3] = checkWhitelist
+else
+	P.checks[3] = function(instance, target, player)
+		if instance.player == LocalPlayer() then return true end
+		return checkWhitelist(instance, target, player)
+	end
+end
 
+SF.Permissions.registerProvider(P)
 
 local function pattern(txt)
 	txt = "^"..txt.."$"
