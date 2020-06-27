@@ -167,7 +167,6 @@ end
 hook.Add("AdvDupe_FinishPasting", "SF_dupefinished", dupefinished)
 
 util.AddNetworkString("starfall_processor_download")
-util.AddNetworkString("starfall_processor_destroy")
 util.AddNetworkString("starfall_processor_used")
 util.AddNetworkString("starfall_processor_link")
 util.AddNetworkString("starfall_report_error")

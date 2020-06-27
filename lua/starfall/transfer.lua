@@ -25,6 +25,8 @@ function net.ReadStarfall(ply, callback)
 			callback(false, sfdata)
 		end
 	end)
+
+	return sfdata
 end
 
 function net.WriteStarfall(sfdata)

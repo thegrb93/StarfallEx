@@ -61,7 +61,7 @@ end
 
 net.Receive("starfall_processor_download", function(len)
 
-	net.ReadStarfall(nil, function(ok, sfdata)
+	local sfdata = net.ReadStarfall(nil, function(ok, sfdata)
 		if sfdata.proc:IsValid() then
 			if ok then
 				if sfdata.owner:IsValid() or sfdata.owner==NULL then
@@ -81,6 +81,10 @@ net.Receive("starfall_processor_download", function(len)
 			end
 		end
 	end)
+
+	if sfdata.proc:IsValid() then
+		sfdata.proc:Destroy()
+	end
 
 end)
 
@@ -115,13 +119,6 @@ net.Receive("starfall_processor_used", function(len)
 	if activator == LocalPlayer() and chip.owner ~= NULL and instance.permissionRequest and instance.permissionRequest.showOnUse and not SF.Permissions.permissionRequestSatisfied( instance ) then
 		local pnl = vgui.Create("SFChipPermissions")
 		if pnl then pnl:OpenForChip( chip ) end
-	end
-end)
-
-net.Receive("starfall_processor_destroy", function(len)
-	local proc = net.ReadEntity()
-	if proc:IsValid() then
-		proc:Destroy()
 	end
 end)
 

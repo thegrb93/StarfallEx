@@ -85,12 +85,6 @@ function ENT:Destroy()
 end
 
 function ENT:SetupFiles(sfdata)
-	if SERVER and update then
-		net.Start("starfall_processor_destroy")
-		net.WriteEntity(self)
-		net.Broadcast()
-	end
-
 	self.owner = sfdata.owner
 	self.files = sfdata.files
 	self.mainfile = sfdata.mainfile
