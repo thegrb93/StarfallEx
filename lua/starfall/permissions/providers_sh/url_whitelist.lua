@@ -19,15 +19,13 @@ local P = {}
 P.id = "urlwhitelist"
 P.name = "URL Whitelist"
 P.settingsoptions = { "Enabled", "Disabled" }
+P.defaultsetting = 1
 P.checks = {
 	checkWhitelist,
 	"allow",
 }
 
-if SERVER then
-	P.defaultsetting = 1
-else
-	P.defaultsetting = 3
+if CLIENT then
 	P.settingsoptions[3] = "Disabled for owner"
 	P.checks[3] = function(instance, target, player)
 		if instance.player == LocalPlayer() then return true end
