@@ -734,8 +734,9 @@ end
 function builtins_library.getMethods(sfType)
 	checkluatype(sfType, TYPE_STRING)
 	local typemeta = instance.Types[sfType]
-	if not typemeta then SF.Throw("Invalid type") end
-	return typemeta.Methods
+	if typemeta then
+		return typemeta.Methods
+	end
 end
 
 --- Simple version of Lua's getfenv
