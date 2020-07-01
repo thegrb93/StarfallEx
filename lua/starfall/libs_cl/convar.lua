@@ -32,7 +32,7 @@ end
 function convar_library.exists(name)
 	checkpermission(instance, nil, "convar")
 	checkluatype(name, TYPE_STRING)
-	return GetConVar(name) and true or false
+	return GetConVar(name)~=nil
 end
 
 --- Returns default value of the ConVar
