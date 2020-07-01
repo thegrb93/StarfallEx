@@ -17,6 +17,19 @@ local plyVertexCount = SF.LimitObject("props_custom_vertices", "custom prop vert
 local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
+--- Alternative SENT list
+local function registerSent(class, data)
+	data.model = data.model or {"Model", TYPE_STRING, "models/maxofs2d/button_05.mdl"}
+	
+	list.Set("starfall_creatable_sent", class, data)
+end
+
+registerSent("gmod_button", {
+	key       = {"key",         TYPE_NUMBER, 0},
+	label     = {"description", TYPE_STRING, ""},
+	toggle    = {"toggle",      TYPE_BOOL,   false},
+	nocollide = {"nocollide",   TYPE_BOOL,   true}
+})
 
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @name prop
@@ -284,10 +297,10 @@ end
 -- @param ang Angle of created sent
 -- @param class Class of created sent
 -- @param frozen True to spawn frozen
+-- @oaran data Table additional entity data to be supplied
 -- @server
 -- @return The sent object
-function props_library.createSent(pos, ang, class, frozen)
-
+function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 
 	checkluatype(class, TYPE_STRING)
@@ -304,6 +317,7 @@ function props_library.createSent(pos, ang, class, frozen)
 	local sent = list.Get("SpawnableEntities")[class]
 	local npc = list.Get("NPC")[class]
 	local vehicle = list.Get("Vehicles")[class]
+	local sent2 = list.Get("starfall_creatable_sent")[class]
 
 	local propdata = instance.data.props
 	local entity
@@ -325,7 +339,6 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedSWEP"
-
 	elseif sent then
 		if ply ~= NULL then
 			if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
@@ -346,7 +359,6 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedSENT"
-
 	elseif npc then
 		if ply ~= NULL then
 			if (npc.AdminOnly and not ply:IsAdmin()) then SF.Throw("This npc is admin only!", 2) end
@@ -382,7 +394,6 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedNPC"
-
 	elseif vehicle then
 		if ply ~= NULL and gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle) == false then SF.Throw("Another hook prevented the vehicle from spawning", 2) end
 
@@ -430,9 +441,37 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedVehicle"
-
+	elseif sent2 then
+		if ply ~= NULL then
+			if (sent2.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
+			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
+		end
+		
+		local enttbl = {}
+		
+		-- Apply data
+		for param, org in pairs(sent2) do
+			local value = data[param]
+			if value then
+				checkluatype(value, org[2])
+				
+				enttbl[org[1]] = value
+			else
+				enttbl[org[1]] = org[3]
+			end
+		end
+		
+		-- Supply additional data
+		enttbl.Name = ""
+		enttbl.Class = class
+		enttbl.Pos = pos
+		enttbl.Angle = ang
+		
+		entity = duplicator.CreateEntityFromTable(ply, enttbl)
+		
+		hookcall = "PlayerSpawnedSENT"
 	end
-
+	
 	if entity and entity:IsValid() then
 		register(entity, instance)
 
