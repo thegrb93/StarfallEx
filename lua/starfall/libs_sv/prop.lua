@@ -17,20 +17,6 @@ local plyVertexCount = SF.LimitObject("props_custom_vertices", "custom prop vert
 local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
---- Alternative SENT list
-local function registerSent(class, data)
-	data.model = data.model or {"Model", TYPE_STRING, "models/maxofs2d/button_05.mdl"}
-	
-	list.Set("starfall_creatable_sent", class, data)
-end
-
-registerSent("gmod_button", {
-	key       = {"key",         TYPE_NUMBER, 0},
-	label     = {"description", TYPE_STRING, ""},
-	toggle    = {"toggle",      TYPE_BOOL,   false},
-	nocollide = {"nocollide",   TYPE_BOOL,   true}
-})
-
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @name prop
 -- @class library
@@ -450,8 +436,9 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		local enttbl = {}
 		
 		-- Apply data
-		for param, org in pairs(sent2) do
+		for param, org in pairs(sent2[1]) do
 			local value = data[param]
+			
 			if value then
 				checkluatype(value, org[2])
 				
@@ -462,10 +449,15 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 		
 		-- Supply additional data
+		enttbl.Data = enttbl
 		enttbl.Name = ""
 		enttbl.Class = class
 		enttbl.Pos = pos
 		enttbl.Angle = ang
+		
+		if sent2._preFactory then
+			sent2._preFactory(enttbl)
+		end
 		
 		entity = duplicator.CreateEntityFromTable(ply, enttbl)
 		
