@@ -1,7 +1,7 @@
 
 local checkluatype = SF.CheckLuaType
 
-SF.Permissions.registerPrivilege("convar", "Read ConVars", "Allows Starfall to read your game settings", { client = { default = 4 } })
+SF.Permissions.registerPrivilege("convar", "Read ConVars", "Allows Starfall to read your game settings", { client = { default = 1 } })
 
 
 --- ConVar library https://wiki.facepunch.com/gmod/ConVar
@@ -21,7 +21,7 @@ local function getValidConVar(name)
 	checkluatype(name, TYPE_STRING)
 	
 	local cvar = GetConVar(name)
-	if not cvar then SF.Throw("Trying to access a non-existent ConVar", 3) end
+	if not cvar then SF.Throw("Trying to access non-existent ConVar", 3) end
 	return cvar
 end
 
