@@ -28,10 +28,11 @@ end
 
 --- Check if the given ConVar exists
 -- @param name Name of the ConVar
+-- @return True if exists
 function convar_library.exists(name)
 	checkpermission(instance, nil, "convar")
 	checkluatype(name, TYPE_STRING)
-	return ConVarExists(name) and GetConVar(name)
+	return GetConVar(name) and true or false
 end
 
 --- Returns default value of the ConVar
