@@ -523,6 +523,17 @@ function SF.Instance:initialize()
 	self:RunHook("initialize")
 
 	self:RunHook("prepare", "_initialize")
+
+	if self.ppdata.tscm and self.ppdata.tscm[self.mainfile] then
+		-- Enable TSCM compatibility. This operates inside the quota and other protections as it plays a lot with the environment directly.
+		local tbl = self:run(self.enableTSCMCompatibility)
+		if not tbl[1] then
+			self:RunHook("cleanup", "_initialize", true, tbl[2])
+			self:Error(tbl[2])
+			return false, tbl[2]
+		end
+	end
+
 	local func = self.scripts[self.mainfile]
 	local tbl = self:run(func)
 	if not tbl[1] then

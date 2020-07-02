@@ -179,3 +179,8 @@ SF.Preprocessor.SetGlobalDirective("superuser", function(args, filename, data)
 	if not data.superuser then data.superuser = {} end
 	data.superuser[filename] = true
 end)
+
+SF.Preprocessor.SetGlobalDirective("tscm", function(args, filename, data)
+	if not data.tscm then data.tscm = {} end
+	data.tscm[filename] = true
+end)

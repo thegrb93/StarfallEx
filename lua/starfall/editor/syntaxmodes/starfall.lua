@@ -61,6 +61,7 @@ local directives = {
 	["@clientmain"] = 0,
 	["@superuser"] = 0,
 	["@model"] = 0,
+	["@tscm"] = 0
 }
 --Color scheme:
 --{foreground color, background color, fontStyle}

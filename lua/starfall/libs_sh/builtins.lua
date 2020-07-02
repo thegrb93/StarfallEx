@@ -982,3 +982,7 @@ end
 -- @name superuser
 -- @class directive
 
+--- Enables TSCM compatibility mode. This is useful to get a TSCM script running, but isn't very documented right now. Can only be used in the main file. --@tscm
+-- @name tscm
+-- @class directive
+
