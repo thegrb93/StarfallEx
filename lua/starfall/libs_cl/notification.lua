@@ -29,16 +29,6 @@ end)
 
 local notification_library = instance.Libraries.notification
 
--- @name builtins_library.NOTIFY
--- @class table
-instance.env.NOTIFY = {
-	["GENERIC"] = NOTIFY_GENERIC,
-	["ERROR"] = NOTIFY_ERROR,
-	["UNDO"] = NOTIFY_UNDO,
-	["HINT"] = NOTIFY_HINT,
-	["CLEANUP"] = NOTIFY_CLEANUP
-}
-
 --- Displays a standard notification.
 -- @param text The text to display
 -- @param type Determines the notification method.

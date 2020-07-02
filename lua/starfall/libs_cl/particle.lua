@@ -52,18 +52,6 @@ local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wr
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 
 
--- Add PATTACH enum
-local _PATTACH = {
-	["ABSORIGIN"] = PATTACH_ABSORIGIN,
-	["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
-	["CUSTOMORIGIN"] =  PATTACH_CUSTOMORIGIN,
-	["POINT"] = PATTACH_POINT,
-	["POINT_FOLLOW"] = PATTACH_POINT_FOLLOW,
-	["WORLDORIGIN"] =  PATTACH_WORLDORIGIN,
-}
-instance.env.PATTACH = _PATTACH
-
-
 local function badParticle(flags) -- implemented for future use in case anything is found to be unfriendly.
 	return false
 end

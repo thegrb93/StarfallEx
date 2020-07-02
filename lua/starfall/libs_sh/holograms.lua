@@ -557,32 +557,5 @@ function hologram_methods:removeEffects(effect)
 	holo:RemoveEffects(effect)
 end
 
---- ENUMs of ef for use with hologram:addEffects hologram:removeEffects entity:isEffectActive
--- @name builtins_library.EF
--- @class table
--- @field BONEMERGE
--- @field BONEMERGE_FASTCULL
--- @field BRIGHTLIGHT
--- @field DIMLIGHT
--- @field NOINTERP
--- @field NOSHADOW
--- @field NODRAW
--- @field NORECEIVESHADOW
--- @field ITEM_BLINK
--- @field PARENT_ANIMATES
--- @field FOLLOWBONE
-instance.env.EF = {
-	BONEMERGE = EF_BONEMERGE,
-	BONEMERGE_FASTCULL = EF_BONEMERGE_FASTCULL,
-	BRIGHTLIGHT = EF_BRIGHTLIGHT,
-	DIMLIGHT = EF_DIMLIGHT,
-	NOINTERP = EF_NOINTERP,
-	NOSHADOW = EF_NOSHADOW,
-	NODRAW = EF_NODRAW,
-	NORECEIVESHADOW = EF_NORECEIVESHADOW,
-	ITEM_BLINK = EF_ITEM_BLINK,
-	PARENT_ANIMATES = EF_PARENT_ANIMATES,
-	FOLLOWBONE = EF_FOLLOWBONE
-}
 
 end

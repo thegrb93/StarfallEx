@@ -29,36 +29,6 @@ local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local mtx_meta, mwrap, munwrap = instance.Types.VMatrix, instance.Types.VMatrix.Wrap, instance.Types.VMatrix.Unwrap
 
--- @name builtins_library.FVPHYSICS
--- @class table
--- @field CONSTRAINT_STATIC
--- @field DMG_DISSOLVE
--- @field DMG_SLICE
--- @field HEAVY_OBJECT
--- @field MULTIOBJECT_ENTITY
--- @field NO_IMPACT_DMG
--- @field NO_NPC_IMPACT_DMG
--- @field NO_PLAYER_PICKUP
--- @field NO_SELF_COLLISIONS
--- @field PART_OF_RAGDOLL
--- @field PENETRATING
--- @field PLAYER_HELD
--- @field WAS_THROWN
-instance.env.FVPHYSICS = {
-	["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
-	["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
-	["DMG_SLICE"] = FVPHYSICS_DMG_SLICE,
-	["HEAVY_OBJECT"] = FVPHYSICS_HEAVY_OBJECT,
-	["MULTIOBJECT_ENTITY"] = FVPHYSICS_MULTIOBJECT_ENTITY,
-	["NO_IMPACT_DMG"] = FVPHYSICS_NO_IMPACT_DMG,
-	["NO_NPC_IMPACT_DMG"] = FVPHYSICS_NO_NPC_IMPACT_DMG,
-	["NO_PLAYER_PICKUP"] = FVPHYSICS_NO_PLAYER_PICKUP,
-	["NO_SELF_COLLISIONS"] = FVPHYSICS_NO_SELF_COLLISIONS,
-	["PART_OF_RAGDOLL"] = FVPHYSICS_PART_OF_RAGDOLL,
-	["PENETRATING"] = FVPHYSICS_PENETRATING,
-	["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
-	["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
-}
 
 --- Checks if the physics object is valid
 -- @shared

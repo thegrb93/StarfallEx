@@ -1,0 +1,558 @@
+
+
+return function(instance)
+local env = instance.env
+
+--- Notification library enums
+-- @name builtins_library.NOTIFY
+-- @class table
+-- @field GENERIC
+-- @field ERROR
+-- @field UNDO
+-- @field HINT
+-- @field CLEANUP
+env.NOTIFY = {
+	["GENERIC"] = NOTIFY_GENERIC,
+	["ERROR"] = NOTIFY_ERROR,
+	["UNDO"] = NOTIFY_UNDO,
+	["HINT"] = NOTIFY_HINT,
+	["CLEANUP"] = NOTIFY_CLEANUP
+}
+
+
+--- ENUMs of keyboard keys for use with input library
+-- @name builtins_library.KEY
+-- @class table
+-- @field FIRST
+-- @field NONE
+-- @field 0
+-- @field 1
+-- @field 2
+-- @field 3
+-- @field 4
+-- @field 5
+-- @field 6
+-- @field 7
+-- @field 8
+-- @field 9
+-- @field A
+-- @field B
+-- @field C
+-- @field D
+-- @field E
+-- @field F
+-- @field G
+-- @field H
+-- @field I
+-- @field J
+-- @field K
+-- @field L
+-- @field M
+-- @field N
+-- @field O
+-- @field P
+-- @field Q
+-- @field R
+-- @field S
+-- @field T
+-- @field U
+-- @field V
+-- @field W
+-- @field X
+-- @field Y
+-- @field Z
+-- @field KP_INS
+-- @field PAD_0
+-- @field KP_END
+-- @field PAD_1
+-- @field KP_DOWNARROW 
+-- @field PAD_2
+-- @field KP_PGDN
+-- @field PAD_3
+-- @field KP_LEFTARROW
+-- @field PAD_4
+-- @field KP_5 
+-- @field PAD_5
+-- @field KP_RIGHTARROW
+-- @field PAD_6
+-- @field KP_HOME
+-- @field PAD_7
+-- @field KP_UPARROW
+-- @field PAD_8
+-- @field KP_PGUP
+-- @field PAD_9
+-- @field PAD_DIVIDE
+-- @field KP_SLASH
+-- @field KP_MULTIPLY
+-- @field PAD_MULTIPLY
+-- @field KP_MINUS
+-- @field PAD_MINUS
+-- @field KP_PLUS
+-- @field PAD_PLUS
+-- @field KP_ENTER
+-- @field PAD_ENTER
+-- @field KP_DEL
+-- @field PAD_DECIMAL
+-- @field LBRACKET
+-- @field RBRACKET
+-- @field SEMICOLON
+-- @field APOSTROPHE
+-- @field BACKQUOTE
+-- @field COMMA
+-- @field PERIOD
+-- @field SLASH
+-- @field BACKSLASH
+-- @field MINUS
+-- @field EQUAL
+-- @field ENTER
+-- @field SPACE
+-- @field BACKSPACE
+-- @field TAB
+-- @field CAPSLOCK
+-- @field NUMLOCK
+-- @field ESCAPE
+-- @field SCROLLLOCK
+-- @field INS
+-- @field INSERT
+-- @field DEL
+-- @field DELETE
+-- @field HOME
+-- @field END
+-- @field PGUP
+-- @field PAGEUP
+-- @field PGDN
+-- @field PAGEDOWN
+-- @field PAUSE
+-- @field BREAK
+-- @field SHIFT
+-- @field LSHIFT
+-- @field RSHIFT
+-- @field ALT
+-- @field LALT
+-- @field RALT
+-- @field CTRL
+-- @field LCONTROL
+-- @field RCTRL
+-- @field RCONTROL
+-- @field LWIN
+-- @field RWIN
+-- @field APP
+-- @field UPARROW
+-- @field UP
+-- @field LEFTARROW
+-- @field LEFT
+-- @field DOWNARROW
+-- @field DOWN
+-- @field RIGHTARROW
+-- @field RIGHT
+-- @field F1
+-- @field F2
+-- @field F3
+-- @field F4
+-- @field F5
+-- @field F6
+-- @field F7
+-- @field F8
+-- @field F9
+-- @field F10
+-- @field F11
+-- @field F12
+-- @field CAPSLOCKTOGGLE
+-- @field NUMLOCKTOGGLE
+-- @field SCROLLLOCKTOGGLE
+-- @field LAST
+-- @field COUNT
+env.KEY = {
+	["FIRST"] = 0,
+	["NONE"] = 0,
+	["0"] = 1,
+	["1"] = 2,
+	["2"] = 3,
+	["3"] = 4,
+	["4"] = 5,
+	["5"] = 6,
+	["6"] = 7,
+	["7"] = 8,
+	["8"] = 9,
+	["9"] = 10,
+	["A"] = 11,
+	["B"] = 12,
+	["C"] = 13,
+	["D"] = 14,
+	["E"] = 15,
+	["F"] = 16,
+	["G"] = 17,
+	["H"] = 18,
+	["I"] = 19,
+	["J"] = 20,
+	["K"] = 21,
+	["L"] = 22,
+	["M"] = 23,
+	["N"] = 24,
+	["O"] = 25,
+	["P"] = 26,
+	["Q"] = 27,
+	["R"] = 28,
+	["S"] = 29,
+	["T"] = 30,
+	["U"] = 31,
+	["V"] = 32,
+	["W"] = 33,
+	["X"] = 34,
+	["Y"] = 35,
+	["Z"] = 36,
+	["KP_INS"] = 37,
+	["PAD_0"] = 37,
+	["KP_END"] = 38,
+	["PAD_1"] = 38,
+	["KP_DOWNARROW "] = 39,
+	["PAD_2"] = 39,
+	["KP_PGDN"] = 40,
+	["PAD_3"] = 40,
+	["KP_LEFTARROW"] = 41,
+	["PAD_4"] = 41,
+	["KP_5 "] = 42,
+	["PAD_5"] = 42,
+	["KP_RIGHTARROW"] = 43,
+	["PAD_6"] = 43,
+	["KP_HOME"] = 44,
+	["PAD_7"] = 44,
+	["KP_UPARROW"] = 45,
+	["PAD_8"] = 45,
+	["KP_PGUP"] = 46,
+	["PAD_9"] = 46,
+	["PAD_DIVIDE"] = 47,
+	["KP_SLASH"] = 47,
+	["KP_MULTIPLY"] = 48,
+	["PAD_MULTIPLY"] = 48,
+	["KP_MINUS"] = 49,
+	["PAD_MINUS"] = 49,
+	["KP_PLUS"] = 50,
+	["PAD_PLUS"] = 50,
+	["KP_ENTER"] = 51,
+	["PAD_ENTER"] = 51,
+	["KP_DEL"] = 52,
+	["PAD_DECIMAL"] = 52,
+	["["] = 53,
+	["LBRACKET"] = 53,
+	["]"] = 54,
+	["RBRACKET"] = 54,
+	["SEMICOLON"] = 55,
+	["'"] = 56,
+	["APOSTROPHE"] = 56,
+	["`"] = 57,
+	["BACKQUOTE"] = 57,
+	[","] = 58,
+	["COMMA"] = 58,
+	["."] = 59,
+	["PERIOD"] = 59,
+	["/"] = 60,
+	["SLASH"] = 60,
+	["\\"] = 61,
+	["BACKSLASH"] = 61,
+	["-"] = 62,
+	["MINUS"] = 62,
+	["="] = 63,
+	["EQUAL"] = 63,
+	["ENTER"] = 64,
+	["SPACE"] = 65,
+	["BACKSPACE"] = 66,
+	["TAB"] = 67,
+	["CAPSLOCK"] = 68,
+	["NUMLOCK"] = 69,
+	["ESCAPE"] = 70,
+	["SCROLLLOCK"] = 71,
+	["INS"] = 72,
+	["INSERT"] = 72,
+	["DEL"] = 73,
+	["DELETE"] = 73,
+	["HOME"] = 74,
+	["END"] = 75,
+	["PGUP"] = 76,
+	["PAGEUP"] = 76,
+	["PGDN"] = 77,
+	["PAGEDOWN"] = 77,
+	["PAUSE"] = 78,
+	["BREAK"] = 78,
+	["SHIFT"] = 79,
+	["LSHIFT"] = 79,
+	["RSHIFT"] = 80,
+	["ALT"] = 81,
+	["LALT"] = 81,
+	["RALT"] = 82,
+	["CTRL"] = 83,
+	["LCONTROL"] = 83,
+	["RCTRL"] = 84,
+	["RCONTROL"] = 84,
+	["LWIN"] = 85,
+	["RWIN"] = 86,
+	["APP"] = 87,
+	["UPARROW"] = 88,
+	["UP"] = 88,
+	["LEFTARROW"] = 89,
+	["LEFT"] = 89,
+	["DOWNARROW"] = 90,
+	["DOWN"] = 90,
+	["RIGHTARROW"] = 91,
+	["RIGHT"] = 91,
+	["F1"] = 92,
+	["F2"] = 93,
+	["F3"] = 94,
+	["F4"] = 95,
+	["F5"] = 96,
+	["F6"] = 97,
+	["F7"] = 98,
+	["F8"] = 99,
+	["F9"] = 100,
+	["F10"] = 101,
+	["F11"] = 102,
+	["F12"] = 103,
+	["CAPSLOCKTOGGLE"] = 104,
+	["NUMLOCKTOGGLE"] = 105,
+	["SCROLLLOCKTOGGLE"] = 106,
+	["LAST"] = 106,
+	["COUNT"] = 106
+}
+
+--- ENUMs of mouse buttons for use with input library
+-- @name builtins_library.MOUSE
+-- @class table
+-- @field MOUSE1
+-- @field LEFT
+-- @field MOUSE2
+-- @field RIGHT
+-- @field MOUSE3
+-- @field MIDDLE
+-- @field MOUSE4
+-- @field 4
+-- @field MOUSE5
+-- @field 5
+-- @field MWHEELUP
+-- @field WHEEL_UP
+-- @field MWHEELDOWN
+-- @field WHEEL_DOWN
+-- @field COUNT
+-- @field FIRST
+-- @field LAST
+env.MOUSE = {
+	["MOUSE1"] = 107,
+	["LEFT"] = 107,
+	["MOUSE2"] = 108,
+	["RIGHT"] = 108,
+	["MOUSE3"] = 109,
+	["MIDDLE"] = 109,
+	["MOUSE4"] = 110,
+	["4"] = 110,
+	["MOUSE5"] = 111,
+	["5"] = 111,
+	["MWHEELUP"] = 112,
+	["WHEEL_UP"] = 112,
+	["MWHEELDOWN"] = 113,
+	["WHEEL_DOWN"] = 113,
+	["COUNT"] = 7,
+	["FIRST"] = 107,
+	["LAST"] = 113
+}
+
+--- PATTACH enum for particle library
+-- @name builtins_library.PATTACH
+-- @class table
+-- @field ABSORIGIN
+-- @field ABSORIGIN_FOLLOW
+-- @field CUSTOMORIGIN
+-- @field POINT
+-- @field POINT_FOLLOW
+-- @field WORLDORIGIN
+env.PATTACH = {
+	["ABSORIGIN"] = PATTACH_ABSORIGIN,
+	["ABSORIGIN_FOLLOW"] =  PATTACH_ABSORIGIN_FOLLOW,
+	["CUSTOMORIGIN"] =  PATTACH_CUSTOMORIGIN,
+	["POINT"] = PATTACH_POINT,
+	["POINT_FOLLOW"] = PATTACH_POINT_FOLLOW,
+	["WORLDORIGIN"] =  PATTACH_WORLDORIGIN,
+}
+
+--- ENUMs of ef for use with hologram:addEffects hologram:removeEffects entity:isEffectActive
+-- @name builtins_library.EF
+-- @class table
+-- @field BONEMERGE
+-- @field BONEMERGE_FASTCULL
+-- @field BRIGHTLIGHT
+-- @field DIMLIGHT
+-- @field NOINTERP
+-- @field NOSHADOW
+-- @field NODRAW
+-- @field NORECEIVESHADOW
+-- @field ITEM_BLINK
+-- @field PARENT_ANIMATES
+-- @field FOLLOWBONE
+env.EF = {
+	BONEMERGE = EF_BONEMERGE,
+	BONEMERGE_FASTCULL = EF_BONEMERGE_FASTCULL,
+	BRIGHTLIGHT = EF_BRIGHTLIGHT,
+	DIMLIGHT = EF_DIMLIGHT,
+	NOINTERP = EF_NOINTERP,
+	NOSHADOW = EF_NOSHADOW,
+	NODRAW = EF_NODRAW,
+	NORECEIVESHADOW = EF_NORECEIVESHADOW,
+	ITEM_BLINK = EF_ITEM_BLINK,
+	PARENT_ANIMATES = EF_PARENT_ANIMATES,
+	FOLLOWBONE = EF_FOLLOWBONE
+}
+
+-- @name builtins_library.FVPHYSICS
+-- @class table
+-- @field CONSTRAINT_STATIC
+-- @field DMG_DISSOLVE
+-- @field DMG_SLICE
+-- @field HEAVY_OBJECT
+-- @field MULTIOBJECT_ENTITY
+-- @field NO_IMPACT_DMG
+-- @field NO_NPC_IMPACT_DMG
+-- @field NO_PLAYER_PICKUP
+-- @field NO_SELF_COLLISIONS
+-- @field PART_OF_RAGDOLL
+-- @field PENETRATING
+-- @field PLAYER_HELD
+-- @field WAS_THROWN
+env.FVPHYSICS = {
+	["CONSTRAINT_STATIC"] = FVPHYSICS_CONSTRAINT_STATIC,
+	["DMG_DISSOLVE"] = FVPHYSICS_DMG_DISSOLVE,
+	["DMG_SLICE"] = FVPHYSICS_DMG_SLICE,
+	["HEAVY_OBJECT"] = FVPHYSICS_HEAVY_OBJECT,
+	["MULTIOBJECT_ENTITY"] = FVPHYSICS_MULTIOBJECT_ENTITY,
+	["NO_IMPACT_DMG"] = FVPHYSICS_NO_IMPACT_DMG,
+	["NO_NPC_IMPACT_DMG"] = FVPHYSICS_NO_NPC_IMPACT_DMG,
+	["NO_PLAYER_PICKUP"] = FVPHYSICS_NO_PLAYER_PICKUP,
+	["NO_SELF_COLLISIONS"] = FVPHYSICS_NO_SELF_COLLISIONS,
+	["PART_OF_RAGDOLL"] = FVPHYSICS_PART_OF_RAGDOLL,
+	["PENETRATING"] = FVPHYSICS_PENETRATING,
+	["PLAYER_HELD"] = FVPHYSICS_PLAYER_HELD,
+	["WAS_THROWN"] = FVPHYSICS_WAS_THROWN,
+}
+
+--- ENUMs of in_keys for use with player:keyDown
+-- @name builtins_library.IN_KEY
+-- @class table
+-- @field ALT1
+-- @field ALT2
+-- @field ATTACK
+-- @field ATTACK2
+-- @field BACK
+-- @field DUCK
+-- @field FORWARD
+-- @field JUMP
+-- @field LEFT
+-- @field MOVELEFT
+-- @field MOVERIGHT
+-- @field RELOAD
+-- @field RIGHT
+-- @field SCORE
+-- @field SPEED
+-- @field USE
+-- @field WALK
+-- @field ZOOM
+-- @field GRENADE1
+-- @field GRENADE2
+-- @field WEAPON1
+-- @field WEAPON2
+-- @field BULLRUSH
+-- @field CANCEL
+-- @field RUN
+env.IN_KEY = {
+	["ALT1"] = IN_ALT1,
+	["ALT2"] = IN_ALT2,
+	["ATTACK"] = IN_ATTACK,
+	["ATTACK2"] = IN_ATTACK2,
+	["BACK"] = IN_BACK,
+	["DUCK"] = IN_DUCK,
+	["FORWARD"] = IN_FORWARD,
+	["JUMP"] = IN_JUMP,
+	["LEFT"] = IN_LEFT,
+	["MOVELEFT"] = IN_MOVELEFT,
+	["MOVERIGHT"] = IN_MOVERIGHT,
+	["RELOAD"] = IN_RELOAD,
+	["RIGHT"] = IN_RIGHT,
+	["SCORE"] = IN_SCORE,
+	["SPEED"] = IN_SPEED,
+	["USE"] = IN_USE,
+	["WALK"] = IN_WALK,
+	["ZOOM"] = IN_ZOOM,
+	["GRENADE1"] = IN_GRENADE1,
+	["GRENADE2"] = IN_GRENADE2,
+	["WEAPON1"] = IN_WEAPON1,
+	["WEAPON2"] = IN_WEAPON2,
+	["BULLRUSH"] = IN_BULLRUSH,
+	["CANCEL"] = IN_CANCEL,
+	["RUN"] = IN_RUN,
+}
+
+--- ENUMs of gesture_slot for use with player:playGesture player:resetGesture
+-- @name builtins_library.GESTURE_SLOT
+-- @class table
+-- @field ATTACK_AND_RELOAD
+-- @field GRENADE
+-- @field JUMP
+-- @field SWIM
+-- @field FLINCH
+-- @field VCD
+-- @field CUSTOM
+env.GESTURE_SLOT = {
+	["ATTACK_AND_RELOAD"] = GESTURE_SLOT_ATTACK_AND_RELOAD,
+	["GRENADE"] = GESTURE_SLOT_GRENADE,
+	["JUMP"] = GESTURE_SLOT_JUMP,
+	["SWIM"] = GESTURE_SLOT_SWIM,
+	["FLINCH"] = GESTURE_SLOT_FLINCH,
+	["VCD"] = GESTURE_SLOT_VCD,
+	["CUSTOM"] = GESTURE_SLOT_CUSTOM
+}
+
+--- ENUMs of collision groups for use with entity:setCollisionGroup
+-- @name builtins_library.COLLISION_GROUP
+-- @field NONE
+-- @field DEBRIS
+-- @field DEBRIS_TRIGGER
+-- @field INTERACTIVE_DEBRIS
+-- @field INTERACTIVE
+-- @field PLAYER
+-- @field BREAKABLE_GLASS
+-- @field VEHICLE
+-- @field PLAYER_MOVEMENT
+-- @field NPC
+-- @field IN_VEHICLE
+-- @field WEAPON
+-- @field VEHICLE_CLIP
+-- @field PROJECTILE
+-- @field DOOR_BLOCKER
+-- @field PASSABLE_DOOR
+-- @field DISSOLVING
+-- @field PUSHAWAY
+-- @field NPC_ACTOR
+-- @field NPC_SCRIPTED
+-- @field WORLD
+instance.env.COLLISION_GROUP = {
+	["NONE"] = COLLISION_GROUP_NONE,
+	["DEBRIS"] = COLLISION_GROUP_DEBRIS,
+	["DEBRIS_TRIGGER"] = COLLISION_GROUP_DEBRIS_TRIGGER,
+	["INTERACTIVE_DEBRIS"] = COLLISION_GROUP_INTERACTIVE_DEBRIS,
+	["INTERACTIVE"] = COLLISION_GROUP_INTERACTIVE,
+	["PLAYER"] = COLLISION_GROUP_PLAYER,
+	["BREAKABLE_GLASS"] = COLLISION_GROUP_BREAKABLE_GLASS,
+	["VEHICLE"] = COLLISION_GROUP_VEHICLE,
+	["PLAYER_MOVEMENT"] = COLLISION_GROUP_PLAYER_MOVEMENT,
+	["NPC"] = COLLISION_GROUP_NPC,
+	["IN_VEHICLE"] = COLLISION_GROUP_IN_VEHICLE,
+	["WEAPON"] = COLLISION_GROUP_WEAPON,
+	["VEHICLE_CLIP"] = COLLISION_GROUP_VEHICLE_CLIP,
+	["PROJECTILE"] = COLLISION_GROUP_PROJECTILE,
+	["DOOR_BLOCKER"] = COLLISION_GROUP_DOOR_BLOCKER,
+	["PASSABLE_DOOR"] = COLLISION_GROUP_PASSABLE_DOOR,
+	["DISSOLVING"] = COLLISION_GROUP_DISSOLVING,
+	["PUSHAWAY"] = COLLISION_GROUP_PUSHAWAY,
+	["NPC_ACTOR"] = COLLISION_GROUP_NPC_ACTOR,
+	["NPC_SCRIPTED"] = COLLISION_GROUP_NPC_SCRIPTED,
+	["WORLD"] = COLLISION_GROUP_WORLD
+}
+
+
+end
