@@ -5,7 +5,7 @@ local function registerSent(class, data)
 	list.Set("starfall_creatable_sent", class, data)
 end
 
-local function tryCastColor(tbl, allow_alpha)
+local function castColor(tbl, allow_alpha)
 	return tonumber(tbl[1] or tbl.r) or 255,
 	       tonumber(tbl[2] or tbl.g) or 255,
 	       tonumber(tbl[3] or tbl.b) or 255,
@@ -74,7 +74,7 @@ end
 SF.PROPSENT = {
 	RegisterSent = registerSent,
 	GenerateDocs = genDocs,
-	TryCastColor = tryCastColor,
+	CastColor    = castColor,
 }
 
 ----------------------------------------
@@ -84,7 +84,7 @@ local checkluatype = SF.CheckLuaType
 -- Basic Gmod sents
 registerSent("gmod_balloon", {
 	_preFactory = function(self)
-		self.r, self.g, self.b = tryCastColor(self._color)
+		self.r, self.g, self.b = castColor(self._color)
 	end,
 	
 	{
@@ -137,7 +137,7 @@ registerSent("gmod_hoverball", {{
 
 registerSent("gmod_lamp", {
 	_preFactory = function(self)
-		self.r, self.g, self.b = tryCastColor(self._color)
+		self.r, self.g, self.b = castColor(self._color)
 	end,
 	
 	{
@@ -155,7 +155,7 @@ registerSent("gmod_lamp", {
 
 registerSent("gmod_light", {
 	_preFactory = function(self)
-		self.lightr, self.lightg, self.lightb = tryCastColor(self._color)
+		self.lightr, self.lightg, self.lightb = castColor(self._color)
 	end,
 	
 	{
@@ -189,7 +189,7 @@ if WireLib then
 
 registerSent("gmod_wire_spawner", {
 	_preFactory = function(self)
-		self.r, self.g, self.b, self.a = tryCastColor(self._color, true)
+		self.r, self.g, self.b, self.a = castColor(self._color, true)
 	end,
 	
 	{
@@ -360,8 +360,8 @@ registerSent("gmod_wire_soundemitter", {{
 
 registerSent("gmod_wire_textscreen", {
 	_preFactory = function(self)
-		self.fgcolor = Color(tryCastColor(self._fgcolor))
-		self.bgcolor = Color(tryCastColor(self._bgcolor))
+		self.fgcolor = Color(castColor(self._fgcolor))
+		self.bgcolor = Color(castColor(self._bgcolor))
 	end,
 	
 	{
@@ -410,7 +410,7 @@ registerSent("gmod_wire_teleporter", {{
 
 registerSent("gmod_wire_target_finder", {
 	_preFactory = function(self)
-		self.pcolR, self.pcolG, self.pcolB, self.pcolA = tryCastColor(self._pcolor, true)
+		self.pcolR, self.pcolG, self.pcolB, self.pcolA = castColor(self._pcolor, true)
 	end,
 	
 	{
@@ -457,7 +457,7 @@ registerSent("gmod_wire_trail", {
 	
 	_postFactory = function(self, enttbl)
 		self.Trail = {
-			Color     = Color(tryCastColor(enttbl._color, true)),
+			Color     = Color(castColor(enttbl._color, true)),
 			Length    = enttbl._length,
 			StartSize = enttbl._start_size,
 			EndSize   = enttbl._end_size,
@@ -659,7 +659,7 @@ registerSent("gmod_wire_explosive", {{
 
 registerSent("gmod_wire_light", {
 	_preFactory = function(self)
-		self.R, self.G, self.B = tryCastColor(self._color)
+		self.R, self.G, self.B = castColor(self._color)
 	end,
 	
 	{
@@ -675,7 +675,7 @@ registerSent("gmod_wire_light", {
 
 registerSent("gmod_wire_lamp", {
 	_preFactory = function(self)
-		self.r, self.g, self.b = tryCastColor(self._color)
+		self.r, self.g, self.b = castColor(self._color)
 	end,
 	
 	{
@@ -723,8 +723,8 @@ registerSent("gmod_wire_input", {{
 
 registerSent("gmod_wire_indicator", {
 	_preFactory = function(self)
-		self.ar, self.ag, self.ab, self.aa = tryCastColor(self._acolor, true)
-		self.br, self.bg, self.bb, self.ba = tryCastColor(self._bcolor, true)
+		self.ar, self.ag, self.ab, self.aa = castColor(self._acolor, true)
+		self.br, self.bg, self.bb, self.ba = castColor(self._bcolor, true)
 	end,
 	
 	{
@@ -746,8 +746,8 @@ registerSent("gmod_wire_igniter", {{
 
 registerSent("gmod_wire_hudindicator", {
 	_preFactory = function(self)
-		self.ar, self.ag, self.ab, self.aa = tryCastColor(self._acolor, true)
-		self.br, self.bg, self.bb, self.ba = tryCastColor(self._bcolor, true)
+		self.ar, self.ag, self.ab, self.aa = castColor(self._acolor, true)
+		self.br, self.bg, self.bb, self.ba = castColor(self._bcolor, true)
 	end,
 	
 	{
@@ -872,8 +872,8 @@ registerSent("gmod_wire_keyboard", {{
 
 registerSent("gmod_wire_dynamic_button", {
 	_preFactory = function(self)
-		self.on_r,  self.on_g,  self.on_b  = tryCastColor(self._color_on)
-		self.off_r, self.off_g, self.off_b = tryCastColor(self._color_off)
+		self.on_r,  self.on_g,  self.on_b  = castColor(self._color_on)
+		self.off_r, self.off_g, self.off_b = castColor(self._color_off)
 	end,
 	
 	{
