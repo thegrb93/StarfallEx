@@ -628,14 +628,14 @@ function SF.Throw(msg, level, uncatchable)
 end
 
 --- Throws a type error
+-- @param prefix Prefix to add before 'in function'
 -- @param expected The exprect type name
 -- @param got The type name that was provided
 -- @param level The stack level
--- @param prefix Prefix to add before 'in function'
-function SF.ThrowTypeError(expected, got, level, prefix)
+function SF.ThrowTypeError(prefix, expected, got, level)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") " .. (prefix and (prefix .. " ") or "") .. "in function " .. funcname, level)
+	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") " .. ((prefix and #prefix > 0) and (prefix .. " ") or "") .. "in function " .. funcname, level)
 end
 
 --- Lookup table of TYPE > name
@@ -690,7 +690,7 @@ SF.TYPENAME = {
 -- @param typeid The TYPE
 -- @return String name
 function SF.TypeName(typeid)
-	return SF.TYPENAME[typeid] or SF.TYPENAME[TYPE_NONE]
+	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
 
 --- Checks the lua type of val. Errors if the types don't match
@@ -707,7 +707,7 @@ function SF.CheckLuaType(val, typ, level, prefix)
 		assert(isnumber(typ))
 		
 		level = (level or 1) + 2
-		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, prefix)
+		SF.ThrowTypeError(prefix, SF.TypeName(typ), SF.GetType(val), level)
 	end
 end
 

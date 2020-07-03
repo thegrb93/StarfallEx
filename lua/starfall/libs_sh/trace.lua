@@ -48,7 +48,7 @@ local function convertFilter(filter)
 			if ret[1] then return ret[2] end
 		end
 	else
-		SF.ThrowTypeError("table or function", SF.GetType(filter), 3)
+		SF.ThrowTypeError(nil, "table or function", SF.GetType(filter), 3)
 	end
 end
 

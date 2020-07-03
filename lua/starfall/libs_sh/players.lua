@@ -397,7 +397,7 @@ end
 -- @param id The string or number id of the ammo
 -- @return The amount of ammo player has in reserve.
 function player_methods:getAmmoCount(id)
-	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError("number or string", SF.GetType(id), 2) end
+	if not isnumber(id) and not isstring(id) then SF.ThrowTypeError(nil, "number or string", SF.GetType(id), 2) end
 
 	return getply(self):GetAmmoCount(id)
 end
@@ -529,7 +529,7 @@ if CLIENT then
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
 		elseif not isnumber(animation) then
-			SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
+			SF.ThrowTypeError(nil, "number or string", SF.GetType(animation), 2)
 		end
 		
 		ply:AnimResetGestureSlot(slot)
@@ -578,7 +578,7 @@ if CLIENT then
 		if isstring(seq) then
 			seq = ply:LookupSequence(seq)
 		elseif not isnumber(seq) then
-			SF.ThrowTypeError("number or string", SF.GetType(seq), 2)
+			SF.ThrowTypeError(nil, "number or string", SF.GetType(seq), 2)
 		end
 		
 		if progress == nil then progress = 0 else checkluatype(progress, TYPE_NUMBER) end
@@ -590,7 +590,7 @@ if CLIENT then
 			if isstring(act) then
 				act = ply:LookupSequence(act)
 			elseif not isnumber(act) then
-				SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
+				SF.ThrowTypeError(nil, "number, string or nil", SF.GetType(act), 2)
 			end
 		end
 		
@@ -633,7 +633,7 @@ if CLIENT then
 		if isstring(act) then
 			act = ply:LookupSequence(act)
 		elseif act ~= nil and not isnumber(act) then
-			SF.ThrowTypeError("number, string or nil", SF.GetType(act), 2)
+			SF.ThrowTypeError(nil, "number, string or nil", SF.GetType(act), 2)
 		end
 		
 		anim.activity = act

@@ -264,7 +264,7 @@ function SF.Instance:BuildEnvironment()
 		else
 			assert(istable(typ) and typ.__metatable and isstring(typ.__metatable))
 			level = (level or 1) + 2
-			SF.ThrowTypeError(typ.__metatable, SF.GetType(val), level)
+			SF.ThrowTypeError(nil, typ.__metatable, SF.GetType(val), level)
 		end
 	end
 
