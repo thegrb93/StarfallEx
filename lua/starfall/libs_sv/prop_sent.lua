@@ -949,6 +949,23 @@ registerSent("gmod_wire_freezer", {{
 	model = {"Model", TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 }})
 
+-- Chip bois
+registerSent("gmod_wire_expression2", {
+	_preFactory = function(self)
+		self._inputs = {{}, {}}
+		self._outputs = {{}, {}}
+		self._vars = {}
+		self.inc_files = {}
+		self.filepath = "generic_starfall.txt"
+	end,
+	
+	{
+		model = {"Model",     TYPE_STRING, "models/beer/wiremod/gate_e2.mdl"},
+		code  = {"_original", TYPE_STRING, "print(\"Hello World!\")"},
+		name  = {"_name",     TYPE_STRING, "Generic"},
+	}
+})
+
 end
 end)
 
