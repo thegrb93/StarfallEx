@@ -372,7 +372,7 @@ registerSent("gmod_wire_textscreen", {
 		valign     = {"valign",     TYPE_NUMBER, 0},
 		tfont      = {"tfont",      TYPE_STRING, "Arial"},
 		fgcolor    = {"_fgcolor",   TYPE_TABLE,  {255, 255, 255}},
-		bgcolor    = {"_bgcolor",   TYPE_TABLE,  {255, 255, 255}},
+		bgcolor    = {"_bgcolor",   TYPE_TABLE,  {0, 0, 0}},
 	}
 })
 
