@@ -628,10 +628,69 @@ function SF.Throw(msg, level, uncatchable)
 end
 
 --- Throws a type error
-function SF.ThrowTypeError(expected, got, level)
+-- @param expected The exprect type name
+-- @param got The type name that was provided
+-- @param level The stack level
+-- @param prefix Prefix to add before 'in function'
+function SF.ThrowTypeError(expected, got, level, prefix)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
+	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") " .. (prefix and (prefix .. " ") or "") .. "in function " .. funcname, level)
+end
+
+--- Lookup table of TYPE > name
+SF.TYPENAME = {
+	[TYPE_NONE]             = "Invalid type",
+	[TYPE_NIL]              = "nil",
+	[TYPE_BOOL]             = "boolean",
+	[TYPE_LIGHTUSERDATA]    = "light userdata",
+	[TYPE_NUMBER]           = "number",
+	[TYPE_STRING]           = "string",
+	[TYPE_TABLE]            = "table",
+	[TYPE_FUNCTION]         = "function",
+	[TYPE_USERDATA]         = "userdata",
+	[TYPE_THREAD]           = "thread",
+	[TYPE_ENTITY]           = "Entity",
+	[TYPE_VECTOR]           = "Vector",
+	[TYPE_ANGLE]            = "Angle",
+	[TYPE_PHYSOBJ]          = "PhysObj",
+	[TYPE_SAVE]             = "ISave",
+	[TYPE_RESTORE]          = "IRestore",
+	[TYPE_DAMAGEINFO]       = "CTakeDamageInfo",
+	[TYPE_EFFECTDATA]       = "CEffectData",
+	[TYPE_RECIPIENTFILTER]  = "CUserCmd",
+	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Depricated, also TYPE Enum doesnt specify the name so this it is
+	[TYPE_MATERIAL]         = "IMaterial",
+	[TYPE_PANEL]            = "Panel",
+	[TYPE_PARTICLE]         = "CLuaParticle",
+	[TYPE_PARTICLEEMITTER]  = "CLuaEmitter",
+	[TYPE_TEXTURE]          = "ITexture",
+	[TYPE_USERMSG]          = "bf_read",
+	[TYPE_CONVAR]           = "ConVar",
+	[TYPE_IMESH]            = "IMesh",
+	[TYPE_MATRIX]           = "VMatrix",
+	[TYPE_SOUND]            = "CSoundPatch",
+	[TYPE_PIXELVISHANDLE]   = "pixelvis_handle_t",
+	[TYPE_DLIGHT]           = "dlight_t",
+	[TYPE_VIDEO]            = "IVideoWriter",
+	[TYPE_FILE]             = "File",
+	[TYPE_LOCOMOTION]       = "CLuaLocomotion",
+	[TYPE_PATH]             = "PathFollower",
+	[TYPE_NAVAREA]          = "CNavArea",
+	[TYPE_SOUNDHANDLE]      = "IGModAudioChannel",
+	[TYPE_NAVLADDER]        = "CNavLadder",
+	[TYPE_PARTICLESYSTEM]   = "CNewParticleEffect",
+	[TYPE_PROJECTEDTEXTURE] = "ProjectedTexture",
+	[TYPE_PHYSCOLLIDE]      = "PhysCollide",
+	[TYPE_SURFACEINFO]      = "SurfaceInfo",
+	[TYPE_COLOR]            = "Color" -- TypeID doesnt return this but lets still add it
+}
+
+--- Returns corresponding name of the TypeID
+-- @param typeid The TYPE
+-- @return String name
+function SF.TypeName(typeid)
+	return SF.TYPENAME[typeid] or SF.TYPENAME[TYPE_NONE]
 end
 
 --- Checks the lua type of val. Errors if the types don't match
@@ -645,19 +704,9 @@ function SF.CheckLuaType(val, typ, level)
 	else
 		-- Failed, throw error
 		assert(isnumber(typ))
-		local typeLookup = {
-			[TYPE_BOOL] = "boolean",
-			[TYPE_FUNCTION] = "function",
-			[TYPE_NIL] = "nil",
-			[TYPE_NUMBER] = "number",
-			[TYPE_STRING] = "string",
-			[TYPE_TABLE] = "table",
-			[TYPE_THREAD] = "thread",
-			[TYPE_USERDATA] = "userdata"
-		}
-
+		
 		level = (level or 1) + 2
-		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
+		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level)
 	end
 end
 
