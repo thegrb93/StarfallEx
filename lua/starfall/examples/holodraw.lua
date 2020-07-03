@@ -1,43 +1,72 @@
 --@name Holodraw
 --@author Name
---@client
+--@shared
 
--- This example shows you how to properly use Hologram:draw method on a rendertarget with transparent background
--- To solve the weird lighting issues, use render.setLightingMode with values of 1 (fullbright) or 2 (increased fullbright)
--- Please note, this won't work for all models, ie. models/Gibs/HGIBS.mdl or most, if not all of the Facepunch models
--- To solve that, you need to draw the hologram with at least 1 alpha and light it manually using player's flashlight or gmod_lamp (not gmod_light)
+-- This code explains how to correctly use Hologram.draw method on a randertarget with transparent background
+-- Steps shown in here are not required if you're drawing it directly to a screen or a HUD
+-- Two methods are shown here, but they cannot be combined, therefore the appropriate one has to be chosen depending on the model
 
-local holo = holograms.create(Vector(), Angle(), "models/spacecode/sfchip.mdl", Vector(1))
-holo:setNoDraw(true)
+local origin = chip():getPos()
 
-render.createRenderTarget("canvas")
-
-hook.add("drawhud", "drawstuff", function()
-    holo:setAngles(Angle(45, timer.curtime() * 100, 0))
+if CLIENT then
     
-    render.selectRenderTarget("canvas")
-        render.clear(Color(0,0,0,0), true)
-        
-        -- border
-        render.setColor(Color(255,0,0))
-        render.drawRectOutline(1, 1, 1022, 1022)
-        
-        render.pushViewMatrix({
-            type = "3D",
-            origin = Vector(15, 0, 0),
-            angles = Angle(0, 180, 0),
-            fov = 60,
-            aspect = 1,
-        })
-        
-        render.setLightingMode(2)
-            holo:draw()
-        render.setLightingMode(0)
-        
-        render.popViewMatrix()
-    render.selectRenderTarget()
+    local holo1 = holograms.create(origin + Vector(0,8,40), Angle(), "models/spacecode/sfchip.mdl", Vector(1.4))
+    local holo2 = holograms.create(origin + Vector(0,-8,37), Angle(), "models/Lamarr.mdl", Vector(0.45))
+    -- We can hide the holograms, but 'holo2' needs to render in order to work with the second method
+    --holo1:setNoDraw(true)
+    --holo2:setColor(Color(0,0,0,1))
     
-    render.setColor(Color(255,255,255))
-    render.setRenderTargetTexture("canvas")
-    render.drawTexturedRect(16, 16, 512, 512)
-end)
+    render.createRenderTarget("canvas")
+    
+    hook.add("drawhud", "drawstuff", function()
+        holo1:setAngles(Angle(45, timer.curtime() * 100, 0))
+        holo2:setAngles(Angle(0, -timer.curtime() * 100, 0))
+        
+        render.selectRenderTarget("canvas")
+            render.clear(Color(0,0,0,0), true)
+            
+            render.setColor(Color(0,255,255))
+            render.drawRectOutline(1, 1, 1022, 1022)
+            
+            render.pushViewMatrix({
+                type = "3D",
+                origin = origin + Vector(-30, 0, 40),
+                angles = Angle(),
+                fov = 60,
+                aspect = 1,
+            })
+            
+            -- This is the simplest way of combating weird lighting issues
+            -- It doesn't work for all models though, ragdolls in particular
+            -- Value for this function can be 1 (total fullbright) or 2 (increased fullbright), depending on the needs
+            render.setLightingMode(1)
+                holo1:draw()
+            render.setLightingMode(0)
+            
+            holo2:draw()
+            
+            render.popViewMatrix()
+        render.selectRenderTarget()
+        
+        render.setColor(Color(255,255,255))
+        render.setRenderTargetTexture("canvas")
+        render.drawTexturedRect(16, 256, 512, 512)
+    end)
+    
+    if player() == owner() then
+        render.setHUDActive(true)
+    end
+else
+    
+    -- To combat the lighting on this hologram, we have to expose it to env_projectedtexture
+    -- This special entity can be created by gmod_lamp (player's flashlight works too!)
+    -- The lamp itself can have a brightness of 0 and can be made non-intrusive by making it invisible and disabling the collisions
+    local lamp = prop.createSent(origin + Vector(0,-8,75), Angle(90,0,0), "gmod_lamp", true, {
+        starton = true,
+        brightness = 0,
+        fov = 10,
+        model = "models/maxofs2d/lamp_flashlight.mdl",
+    })
+    --lamp:setColor(Color(0,0,0,0))
+    --lamp:setCollisionGroup(10) -- COLLISION_GROUP_IN_VEHICLE
+end
