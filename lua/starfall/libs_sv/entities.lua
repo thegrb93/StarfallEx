@@ -232,26 +232,26 @@ function ents_methods:applyForceCenter(vec)
 end
 
 --- Applies linear force to the entity with an offset
--- @param vec The force vector
--- @param offset An optional offset position
-function ents_methods:applyForceOffset(vec, offset)
+-- @param force The force vector in world coordinates
+-- @param position The force position in world coordinates
+function ents_methods:applyForceOffset(force, position)
 	local ent = getent(self)
 
-	local vec = vunwrap(vec)
-	local offset = vunwrap(offset)
+	local force = vunwrap(force)
+	local position = vunwrap(position)
 
-	checkvector(vec)
-	checkvector(offset)
+	checkvector(force)
+	checkvector(position)
 
 	local phys = ent:GetPhysicsObject()
 	if not phys:IsValid() then SF.Throw("Physics object is invalid", 2) end
 
 	checkpermission(instance, ent, "entities.applyForce")
 
-	phys:ApplyForceOffset(vec, offset)
+	phys:ApplyForceOffset(force, position)
 end
 
---- Applies angular force to the entity
+--- Applies angular force to the entity (This function is garbage, use applyTorque instead)
 -- @param ang The force angle
 function ents_methods:applyAngForce(ang)
 	local ent = getent(self)

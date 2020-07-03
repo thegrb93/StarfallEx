@@ -250,8 +250,8 @@ if SERVER then
 
 	--- Applys an offset force to a physics object
 	-- @server
-	-- @param force The force vector to apply
-	-- @param position The position in world coordinates
+	-- @param force The force vector in world coordinates
+	-- @param position The force position in world coordinates
 	function physobj_methods:applyForceOffset(force, position)
 
 		force = vunwrap(force)
