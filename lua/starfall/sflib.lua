@@ -697,7 +697,8 @@ end
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckLuaType(val, typ, level)
+-- @param prefix Prefix to add before 'in function' when the check fails.
+function SF.CheckLuaType(val, typ, level, prefix)
 	local valtype = TypeID(val)
 	if valtype == typ then
 		return val
@@ -706,7 +707,7 @@ function SF.CheckLuaType(val, typ, level)
 		assert(isnumber(typ))
 		
 		level = (level or 1) + 2
-		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level)
+		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, prefix)
 	end
 end
 
