@@ -472,7 +472,19 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			local value = data[param]
 			
 			if value then
-				checkluatype(value, org[2])
+				-- checkluatype(value, org[2])
+				local typeid = TypeID(value)
+				if typeid ~= org[2] then
+					local typeLookup = {
+						[TYPE_BOOL] = "boolean",
+						[TYPE_NUMBER] = "number",
+						[TYPE_STRING] = "string",
+						[TYPE_TABLE] = "table",
+					}
+					
+					local funcname = debug.getinfo(1, "n").name or "<unnamed>"
+					SF.Throw("Type mismatch (Expected " .. typeLookup[typeid] .. ", got " .. SF.GetType(val) .. ") for data parameter " .. param .. " in function " .. funcname, 2)
+				end
 				
 				enttbl[org[1]] = value
 			else
