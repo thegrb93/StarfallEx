@@ -629,7 +629,7 @@ end
 
 --- Throws a type error
 -- @param prefix Prefix to add before 'in function'
--- @param expected The exprect type name
+-- @param expected The expected type name
 -- @param got The type name that was provided
 -- @param level The stack level
 function SF.ThrowTypeError(prefix, expected, got, level)
