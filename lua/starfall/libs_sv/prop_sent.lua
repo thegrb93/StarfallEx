@@ -1,6 +1,8 @@
 -- Simple helper function that provides model if it doesnt exist
 local function registerSent(class, data)
-	data[1].model = data[1].model or {"Model", TYPE_STRING, "models/props_junk/watermelon01.mdl"}
+	if not data[1].model then
+		data[1].model = {"Model", TYPE_STRING, "models/props_junk/watermelon01.mdl"}
+	end
 	
 	list.Set("starfall_creatable_sent", class, data)
 end
