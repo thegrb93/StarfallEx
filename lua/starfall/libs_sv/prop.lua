@@ -314,7 +314,7 @@ end
 -- @param ang Angle of created sent
 -- @param class Class of created sent
 -- @param frozen True to spawn frozen
--- @param data Table additional entity data to be supplied
+-- @param data Optional table, additional entity data to be supplied
 -- @server
 -- @return The sent object
 function props_library.createSent(pos, ang, class, frozen, data)
@@ -465,6 +465,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 		
 		local enttbl = {}
+		data = data or {}
 		
 		-- Apply data
 		for param, org in pairs(sent2[1]) do
