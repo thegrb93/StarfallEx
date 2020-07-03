@@ -278,6 +278,37 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	return ewrap(comp)
 end
 
+--- Get a list of all spawnable sents.
+-- @param ordered True to get an ordered list
+-- @return The table
+function props_library.getSpawnableSents(ordered)
+	local tbl = {}
+	
+	local add
+	if ordered then
+		add = function(list_name)
+			tbl[list_name] = {}
+			for class, _ in pairs(list.Get(list_name)) do
+				table.insert(tbl[list_name], class)
+			end
+		end
+	else
+		add = function(list_name)
+			for class, _ in pairs(list.Get(list_name)) do
+				table.insert(tbl, class)
+			end
+		end
+	end
+	
+	add("Weapon")
+	add("SpawnableEntities")
+	add("NPC")
+	add("Vehicles")
+	add("starfall_creatable_sent")
+	
+	return tbl
+end
+
 --- Creates a sent.
 -- @param pos Position of created sent
 -- @param ang Angle of created sent
@@ -460,6 +491,10 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 		
 		entity = duplicator.CreateEntityFromTable(ply, enttbl)
+		
+		if sent2._postFactory then
+			sent2._postFactory(entity, enttbl)
+		end
 		
 		hookcall = "PlayerSpawnedSENT"
 	end
