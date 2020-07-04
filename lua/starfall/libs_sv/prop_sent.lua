@@ -907,11 +907,42 @@ registerSent("gmod_wire_watersensor", {{
 	model = {"Model", TYPE_STRING, "models/beer/wiremod/watersensor.mdl"},
 }})
 
--- TODO: this
--- registerSent("gmod_wire_value", {{
--- 	model = {"Model", TYPE_STRING, "models/kobilica/value.mdl"},
--- 	value = {"value", TYPE_STRING, "{do_me_later}"},
--- }})
+registerSent("gmod_wire_value", {
+	_preFactory = function(ply, self)
+		self.value = {}
+		
+		local valid_types = {
+			NORMAL  = true,
+			VECTOR  = true,
+			VECTOR2 = true,
+			VECTOR4 = true,
+			ANGLE   = true,
+			STRING  = true,
+		}
+		
+		for i, val in ipairs(self._value) do
+			checkluatype(val, TYPE_TABLE, 2, "Parameter: value[" .. i .. "]")
+			checkluatype(val[1], TYPE_STRING, 2, "Parameter: value[" .. i .. "][1]")
+			
+			local typ = string.upper(val[1])
+			if not valid_types[typ] then
+				SF.Throw("value[" .. i .. "] type is invalid " .. typ, 2)
+			end
+			
+			checkluatype(val[2], TYPE_STRING, 2, "Parameter: value[" .. i .. "][2]")
+			
+			self.value[i] = {
+				DataType = typ,
+				Value = val[2]
+			}
+		end
+	end,
+	
+	{
+		model = {"Model", TYPE_STRING, "models/kobilica/value.mdl"},
+		value = {"_value", TYPE_TABLE,  {{"NORMAL", "123"}, {"VECTOR4", "1, 2, 3, 4"}}},
+	}
+})
 
 registerSent("gmod_wire_adv_emarker", {{
 	model = {"Model", TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
