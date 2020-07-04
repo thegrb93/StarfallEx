@@ -288,13 +288,13 @@ function props_library.getSpawnableSents(ordered)
 	if ordered then
 		add = function(list_name)
 			tbl[list_name] = {}
-			for class, _ in pairs(list.Get(list_name)) do
+			for class, _ in pairs(list.GetForEdit(list_name)) do
 				table.insert(tbl[list_name], class)
 			end
 		end
 	else
 		add = function(list_name)
-			for class, _ in pairs(list.Get(list_name)) do
+			for class, _ in pairs(list.GetForEdit(list_name)) do
 				table.insert(tbl, class)
 			end
 		end
@@ -330,11 +330,11 @@ function props_library.createSent(pos, ang, class, frozen, data)
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
 
-	local swep = list.Get("Weapon")[class]
-	local sent = list.Get("SpawnableEntities")[class]
-	local npc = list.Get("NPC")[class]
-	local vehicle = list.Get("Vehicles")[class]
-	local sent2 = list.Get("starfall_creatable_sent")[class]
+	local swep = list.GetForEdit("Weapon")[class]
+	local sent = list.GetForEdit("SpawnableEntities")[class]
+	local npc = list.GetForEdit("NPC")[class]
+	local vehicle = list.GetForEdit("Vehicles")[class]
+	local sent2 = list.GetForEdit("starfall_creatable_sent")[class]
 
 	local propdata = instance.data.props
 	local entity
