@@ -81,6 +81,10 @@ function ENT:DrawCLHologram()
 	else
 		self:DrawModel()
 	end
+	
+	if self.AutomaticFrameAdvance then
+		self:FrameAdvance(0)
+	end
 end
 
 function ENT:GetRenderMesh()
