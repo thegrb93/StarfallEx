@@ -1302,6 +1302,11 @@ return function() end
 -- number radius = "300"
 -- boolean affectother = "false"
 -- 
+-- > gmod_wire_expression2
+-- string model = "models/beer/wiremod/gate_e2.mdl"
+-- string code = "print(\"Hello World!\")"
+-- table includes = "{}"
+-- 
 -- > gmod_wire_extbus
 -- string model = "models/jaanus/wiretool/wiretool_gate.mdl"
 -- 
@@ -1383,6 +1388,20 @@ return function() end
 -- table acolor = "{255,0,0,255,}"
 -- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
 -- 
+-- > gmod_wire_hydraulic
+-- number width = "3"
+-- Vector pos2 = "Vector(0, 0, 0)"
+-- string model = "models/beer/wiremod/hydraulic.mdl"
+-- boolean stretchonly = "false"
+-- number fixed = "0"
+-- string material = "cable/rope"
+-- number speed = "16"
+-- number bone1 = "0"
+-- nil ent1 = "nil"
+-- number bone2 = "0"
+-- Vector pos1 = "Vector(0, 0, 0)"
+-- nil ent2 = "nil"
+-- 
 -- > gmod_wire_igniter
 -- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
 -- number range = "2048"
@@ -1441,6 +1460,18 @@ return function() end
 -- 
 -- > gmod_wire_locator
 -- string model = "models/props_lab/powerbox02d.mdl"
+-- 
+-- > gmod_wire_motor
+-- nil ent1 = "nil"
+-- number bone2 = "0"
+-- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number friction = "1"
+-- number torque = "500"
+-- number forcelimit = "0"
+-- number bone1 = "0"
+-- Vector pos2 = "Vector(0, 0, 0)"
+-- Vector pos1 = "Vector(0, 0, 0)"
+-- nil ent2 = "nil"
 -- 
 -- > gmod_wire_nailer
 -- number flim = "0"
@@ -1568,7 +1599,7 @@ return function() end
 -- 
 -- > gmod_wire_textscreen
 -- number textjust = "1"
--- table bgcolor = "{255,255,255,}"
+-- table bgcolor = "{0,0,0,}"
 -- number chrperline = "6"
 -- string tfont = "Arial"
 -- number valign = "0"
@@ -1622,6 +1653,10 @@ return function() end
 -- number range = "200"
 -- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
 -- 
+-- > gmod_wire_value
+-- string model = "models/kobilica/value.mdl"
+-- table value = "{{\"NORMAL\",\"123\",},{\"VECTOR4\",\"1, 2, 3, 4\",},}"
+-- 
 -- > gmod_wire_vectorthruster
 -- string soundname = ""
 -- number force = "1500"
@@ -1649,6 +1684,19 @@ return function() end
 -- 
 -- > gmod_wire_weight
 -- string model = "models/props_interiors/pot01a.mdl"
+-- 
+-- > gmod_wire_wheel
+-- number back_value = "-1"
+-- number bone = "0"
+-- number friction = "1"
+-- number forcelimit = "0"
+-- number torque = "3000"
+-- Vector axis = "Vector(0, 1, 0)"
+-- number forward_value = "1"
+-- nil base = "nil"
+-- string model = "models/props_vehicles/carparts_wheel01a.mdl"
+-- Vector pos = "Vector(0, 0, 0)"
+-- number stop_value = "0"
 -- 
 -- > gmod_wire_adv_emarker
 -- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
