@@ -529,7 +529,7 @@ if CLIENT then
 		if isstring(animation) then
 			animation = ply:GetSequenceActivity(ply:LookupSequence(animation))
 		elseif not isnumber(animation) then
-			SF.ThrowTypeError(nil, "number or string", SF.GetType(animation), 2)
+			SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
 		end
 		
 		ply:AnimResetGestureSlot(slot)
