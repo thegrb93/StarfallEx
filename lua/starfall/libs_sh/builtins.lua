@@ -753,7 +753,7 @@ end
 -- @param fields A string that specifies the information to be retrieved. Defaults to all (flnSu).
 -- @return DebugInfo table
 function builtins_library.debugGetInfo(funcOrStackLevel, fields)
-	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError(nil, "function or number", SF.GetType(TfuncOrStackLevel), 2) end
+	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	if fields then checkluatype(fields, TYPE_STRING) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
@@ -769,7 +769,7 @@ end
 -- @param index The index of the local to get
 -- @return The name of the local
 function builtins_library.debugGetLocal(funcOrStackLevel, index)
-	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError(nil, "function or number", SF.GetType(TfuncOrStackLevel), 2) end
+	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
 	checkluatype(index, TYPE_NUMBER)
 
 	local name = debug.getlocal(funcOrStackLevel, index)

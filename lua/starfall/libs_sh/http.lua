@@ -116,7 +116,7 @@ function http_library.post(url, payload, callbackSuccess, callbackFail, headers)
 		elseif payloadType == TYPE_STRING then
 			request.body = payload
 		else
-			SF.ThrowTypeError(nil, "table or string", SF.GetType(payload), 2)
+			SF.ThrowTypeError("table or string", SF.GetType(payload), 2)
 		end
 	end
 

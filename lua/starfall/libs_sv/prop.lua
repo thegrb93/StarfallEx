@@ -472,7 +472,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			local value = data[param]
 			
 			if value then
-				checkluatype(value, org[2], nil, "for data parameter " .. param)
+				checkluatype(value, org[2], nil, "Parameter: " .. param)
 				
 				enttbl[org[1]] = value
 			else
