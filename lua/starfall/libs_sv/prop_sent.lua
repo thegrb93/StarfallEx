@@ -85,7 +85,7 @@ local checkluatype = SF.CheckLuaType
 
 -- Basic Gmod sents
 registerSent("gmod_balloon", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.r, self.g, self.b = castColor(self._color)
 	end,
 	
@@ -138,7 +138,7 @@ registerSent("gmod_hoverball", {{
 }})
 
 registerSent("gmod_lamp", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.r, self.g, self.b = castColor(self._color)
 	end,
 	
@@ -156,7 +156,7 @@ registerSent("gmod_lamp", {
 })
 
 registerSent("gmod_light", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.lightr, self.lightg, self.lightb = castColor(self._color)
 	end,
 	
@@ -190,7 +190,7 @@ timer.Simple(0, function()
 if WireLib then
 
 registerSent("gmod_wire_spawner", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.r, self.g, self.b, self.a = castColor(self._color, true)
 	end,
 	
@@ -361,7 +361,7 @@ registerSent("gmod_wire_soundemitter", {{
 }})
 
 registerSent("gmod_wire_textscreen", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.fgcolor = Color(castColor(self._fgcolor))
 		self.bgcolor = Color(castColor(self._bgcolor))
 	end,
@@ -383,11 +383,11 @@ registerSent("gmod_wire_holoemitter", {{
 }})
 
 registerSent("gmod_wire_textreceiver", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.Matches = {}
 		
 		for i, str in ipairs(self._matches) do
-			checkluatype(str, TYPE_STRING)
+			checkluatype(str, TYPE_STRING, 2, "in data parameter matches")
 			self.Matches[i] = str
 		end
 	end,
@@ -411,7 +411,7 @@ registerSent("gmod_wire_teleporter", {{
 }})
 
 registerSent("gmod_wire_target_finder", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.pcolR, self.pcolG, self.pcolB, self.pcolA = castColor(self._pcolor, true)
 	end,
 	
@@ -453,11 +453,11 @@ registerSent("gmod_wire_digitalscreen", {{
 }})
 
 registerSent("gmod_wire_trail", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.Trail = {}
 	end,
 	
-	_postFactory = function(self, enttbl)
+	_postFactory = function(ply, self, enttbl)
 		self.Trail = {
 			Color     = Color(castColor(enttbl._color, true)),
 			Length    = enttbl._length,
@@ -477,7 +477,7 @@ registerSent("gmod_wire_trail", {
 })
 
 registerSent("gmod_wire_egp", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.model = self.Model
 	end,
 	
@@ -500,7 +500,7 @@ registerSent("gmod_wire_speedometer", {{
 }})
 
 registerSent("gmod_wire_trigger", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.model = self.Model
 	end,
 	
@@ -660,7 +660,7 @@ registerSent("gmod_wire_explosive", {{
 }})
 
 registerSent("gmod_wire_light", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.R, self.G, self.B = castColor(self._color)
 	end,
 	
@@ -676,7 +676,7 @@ registerSent("gmod_wire_light", {
 })
 
 registerSent("gmod_wire_lamp", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.r, self.g, self.b = castColor(self._color)
 	end,
 	
@@ -692,7 +692,7 @@ registerSent("gmod_wire_lamp", {
 })
 
 registerSent("gmod_wire_keypad", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.Password = util.CRC(self._password)
 	end,
 	
@@ -724,7 +724,7 @@ registerSent("gmod_wire_input", {{
 }})
 
 registerSent("gmod_wire_indicator", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.ar, self.ag, self.ab, self.aa = castColor(self._acolor, true)
 		self.br, self.bg, self.bb, self.ba = castColor(self._bcolor, true)
 	end,
@@ -747,7 +747,7 @@ registerSent("gmod_wire_igniter", {{
 -- TODO: gmod_wire_hydraulic, it do be constraint thing
 
 registerSent("gmod_wire_hudindicator", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.ar, self.ag, self.ab, self.aa = castColor(self._acolor, true)
 		self.br, self.bg, self.bb, self.ba = castColor(self._bcolor, true)
 	end,
@@ -778,7 +778,7 @@ registerSent("gmod_wire_hoverball", {{
 }})
 
 registerSent("gmod_wire_fx_emitter", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.effect = ComboBox_Wire_FX_Emitter_Options[self._effect]
 	end,
 	
@@ -873,7 +873,7 @@ registerSent("gmod_wire_keyboard", {{
 }})
 
 registerSent("gmod_wire_dynamic_button", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
 		self.on_r,  self.on_g,  self.on_b  = castColor(self._color_on)
 		self.off_r, self.off_g, self.off_b = castColor(self._color_off)
 	end,
@@ -953,23 +953,36 @@ registerSent("gmod_wire_freezer", {{
 
 -- Chip bois
 registerSent("gmod_wire_expression2", {
-	_preFactory = function(self)
+	_preFactory = function(ply, self)
+		self._name = "Generic" -- Can be changed with e2 itself anyways
 		self._inputs = {{}, {}}
 		self._outputs = {{}, {}}
 		self._vars = {}
 		self.inc_files = {}
 		self.filepath = "generic_starfall.txt"
+		
+		for path, code in pairs(self._includes) do
+			checkluatype(path, TYPE_STRING, 2, "in data parameter includes")
+			checkluatype(code, TYPE_STRING, 2, "in data parameter includes")
+			
+			self.inc_files[path] = code
+		end
 	end,
 	
 	{
-		model = {"Model",     TYPE_STRING, "models/beer/wiremod/gate_e2.mdl"},
-		code  = {"_original", TYPE_STRING, "print(\"Hello World!\")"},
-		name  = {"_name",     TYPE_STRING, "Generic"},
+		model     = {"Model",     TYPE_STRING, "models/beer/wiremod/gate_e2.mdl"},
+		code      = {"_original", TYPE_STRING, "print(\"Hello World!\")"},
+		includes  = {"_includes", TYPE_TABLE,  {}},
 	}
 })
 
 end
 end)
+
+----------------------------------------
+-- So the library doesn't produce an error when loaded
+
+return function() end
 
 ----------------------------------------
 -- Docs
