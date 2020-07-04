@@ -16,6 +16,12 @@ end
 
 -- Function to generate some docs, it aint fancy but works i guess
 local function genDocs()
+	local tostr = {
+		table  = table.ToString,
+		Vector = function(x) return string.format("Vector(%s, %s, %s)", x[1], x[2], x[3]) end,
+		Angle  = function(x) return string.format("Angle(%s, %s, %s)",  x[1], x[2], x[3]) end,
+	}
+	
 	local classes = {"--- "}
 	
 	--
@@ -56,7 +62,8 @@ local function genDocs()
 		local str = {"-- > " .. data.class}
 		for param, org in pairs(data.data[1]) do
 			local typ = type(org[3])
-			table.insert(str, string.format("-- %s %s = %q", typ, param, typ == "table" and table.ToString(org[3]) or org[3]))
+			-- table.insert(str, string.format("-- %s %s = %q", typ, param, typ == "table" and table.ToString(org[3]) or org[3]))
+			table.insert(str, string.format("-- %s %s = %q", typ, param, tostr[typ] and tostr[typ](org[3]) or org[3]))
 		end
 		
 		table.insert(str, "-- ")
@@ -666,15 +673,15 @@ registerSent("gmod_wire_motor", {
 	end,
 	
 	{
-		model =      {"Model",      TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-		ent1 =       {"Ent1",       TYPE_ENTITY, nil},
-		ent2 =       {"Ent2",       TYPE_ENTITY, nil},
-		bone1 =      {"Bone1",      TYPE_NUMBER, 0},
-		bone2 =      {"Bone2",      TYPE_NUMBER, 0},
-		pos1 =       {"LPos1",      TYPE_VECTOR, Vector()},
-		pos2 =       {"LPos2",      TYPE_VECTOR, Vector()},
-		friction =   {"friction",   TYPE_NUMBER, 1},
-		torque =     {"torque",     TYPE_NUMBER, 500},
+		model      = {"Model",      TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
+		ent1       = {"Ent1",       TYPE_ENTITY, nil},
+		ent2       = {"Ent2",       TYPE_ENTITY, nil},
+		bone1      = {"Bone1",      TYPE_NUMBER, 0},
+		bone2      = {"Bone2",      TYPE_NUMBER, 0},
+		pos1       = {"LPos1",      TYPE_VECTOR, Vector()},
+		pos2       = {"LPos2",      TYPE_VECTOR, Vector()},
+		friction   = {"friction",   TYPE_NUMBER, 1},
+		torque     = {"torque",     TYPE_NUMBER, 500},
 		forcelimit = {"forcelimit", TYPE_NUMBER, 0},
 	}
 })
@@ -816,17 +823,17 @@ registerSent("gmod_wire_hydraulic", {
 	end,
 	
 	{
-		model =       {"Model",       TYPE_STRING, "models/beer/wiremod/hydraulic.mdl"},
-		ent1 =        {"Ent1",        TYPE_ENTITY, nil},
-		ent2 =        {"Ent2",        TYPE_ENTITY, nil},
-		bone1 =       {"Bone1",       TYPE_NUMBER, 0},
-		bone2 =       {"Bone2",       TYPE_NUMBER, 0},
-		pos1 =        {"LPos1",       TYPE_VECTOR, Vector()},
-		pos2 =        {"LPos2",       TYPE_VECTOR, Vector()},
-		width =       {"width",       TYPE_NUMBER, 3},
-		material =    {"material",    TYPE_STRING, "cable/rope"},
-		speed =       {"speed",       TYPE_NUMBER, 16},
-		fixed =       {"fixed",       TYPE_NUMBER, 0},
+		model       = {"Model",       TYPE_STRING, "models/beer/wiremod/hydraulic.mdl"},
+		ent1        = {"Ent1",        TYPE_ENTITY, nil},
+		ent2        = {"Ent2",        TYPE_ENTITY, nil},
+		bone1       = {"Bone1",       TYPE_NUMBER, 0},
+		bone2       = {"Bone2",       TYPE_NUMBER, 0},
+		pos1        = {"LPos1",       TYPE_VECTOR, Vector()},
+		pos2        = {"LPos2",       TYPE_VECTOR, Vector()},
+		width       = {"width",       TYPE_NUMBER, 3},
+		material    = {"material",    TYPE_STRING, "cable/rope"},
+		speed       = {"speed",       TYPE_NUMBER, 16},
+		fixed       = {"fixed",       TYPE_NUMBER, 0},
 		stretchonly = {"stretchonly", TYPE_BOOL,   false},
 	}
 })
@@ -1033,7 +1040,36 @@ registerSent("gmod_wire_adv_emarker", {{
 	model = {"Model", TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 }})
 
--- TODO: gmod_wire_wheel, same thing, constraint stuff
+registerSent("gmod_wire_wheel", {
+	_preFactory = function(ply, self)
+		if not IsValid(self.Base) then SF.Throw("Invalid Entity, Parameter: base", 3) end
+	end,
+	
+	_postFactory = function(ply, self, enttbl)
+		local motor, axis = constraint.Motor(self, enttbl.Base, 0, enttbl.Bone, Vector(), enttbl.LPos, enttbl.friction, 1000, 0, 0, false, ply, enttbl.forcelimit)
+		self:SetWheelBase(enttbl.Base)
+		self:SetMotor(motor)
+		self:SetDirection(motor.direction)
+		local axis = Vector(enttbl.LAxis[1], enttbl.LAxis[2], enttbl.LAxis[3])
+		axis:Rotate(self:GetAngles())
+		self:SetAxis(axis)
+		self:DoDirectionEffect()
+	end,
+	
+	{
+		model         = {"Model",      TYPE_STRING, "models/props_vehicles/carparts_wheel01a.mdl"},
+		base          = {"Base",       TYPE_ENTITY, nil},
+		bone          = {"Bone",       TYPE_NUMBER, 0},
+		pos           = {"LPos",       TYPE_VECTOR, Vector()},
+		axis          = {"LAxis",      TYPE_VECTOR, Vector(0, 1, 0)},
+		forward_value = {"fwd",        TYPE_NUMBER, 1},
+		back_value    = {"bck",        TYPE_NUMBER, -1},
+		stop_value    = {"bck",        TYPE_NUMBER, 0},
+		torque        = {"BaseTorque", TYPE_NUMBER, 3000},
+		friction      = {"friction",   TYPE_NUMBER, 1},
+		forcelimit    = {"forcelimit", TYPE_NUMBER, 0},
+	}
+})
 
 registerSent("gmod_wire_gyroscope", {{
 	model  = {"Model",  TYPE_STRING, "models/bull/various/gyroscope.mdl"},

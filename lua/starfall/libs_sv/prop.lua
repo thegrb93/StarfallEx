@@ -499,8 +499,11 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			sent2._postFactory(ply, entity, enttbl)
 		end
 		
-		if entity.ApplyDupeInfo then
-			entity:ApplyDupeInfo(ply, entity, {[entity:EntIndex()] = entity})
+		if entity.PreEntityCopy then
+			entity:PreEntityCopy()
+		end
+		if entity.PostEntityPaste then
+			entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
 		end
 		
 		hookcall = "PlayerSpawnedSENT"
