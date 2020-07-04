@@ -794,7 +794,7 @@ function ents_methods:testPVS(other)
 	elseif meta==ent_meta then
 		other = getent(other)
 	else
-		SF.ThrowTypeError(nil, "Entity or Vector", SF.GetType(other), 2)
+		SF.ThrowTypeError("Entity or Vector", SF.GetType(other), 2)
 	end
 
 	return ent:TestPVS(other)

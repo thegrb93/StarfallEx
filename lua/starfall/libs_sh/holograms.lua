@@ -512,7 +512,7 @@ function hologram_methods:setAnimation(animation, frame, rate)
 	if isstring(animation) then
 		animation = holo:LookupSequence(animation)
 	elseif not isnumber(animation) then
-		SF.ThrowTypeError(nil, "number or string", SF.GetType(animation), 2)
+		SF.ThrowTypeError("number or string", SF.GetType(animation), 2)
 	end
 
 	if frame == nil then

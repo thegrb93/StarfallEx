@@ -628,14 +628,14 @@ function SF.Throw(msg, level, uncatchable)
 end
 
 --- Throws a type error
--- @param prefix Prefix to add before 'in function'
 -- @param expected The expected type name
 -- @param got The type name that was provided
 -- @param level The stack level
-function SF.ThrowTypeError(prefix, expected, got, level)
+-- @param msg Optional error message
+function SF.ThrowTypeError(expected, got, level, msg)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") " .. ((prefix and #prefix > 0) and (prefix .. " ") or "") .. "in function " .. funcname, level)
+	SF.Throw((msg and #msg>0 and (msg .. " ") or "") .. "Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
 end
 
 --- Lookup table of TYPE > name
@@ -697,8 +697,8 @@ end
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
--- @param prefix Prefix to add before 'in function' when the check fails.
-function SF.CheckLuaType(val, typ, level, prefix)
+-- @param msg Optional error message
+function SF.CheckLuaType(val, typ, level, msg)
 	local valtype = TypeID(val)
 	if valtype == typ then
 		return val
@@ -707,7 +707,7 @@ function SF.CheckLuaType(val, typ, level, prefix)
 		assert(isnumber(typ))
 		
 		level = (level or 1) + 2
-		SF.ThrowTypeError(prefix, SF.TypeName(typ), SF.GetType(val), level)
+		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, msg)
 	end
 end
 
