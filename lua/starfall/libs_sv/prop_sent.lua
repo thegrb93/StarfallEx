@@ -636,7 +636,48 @@ registerSent("gmod_wire_output", {{
 	key   = {"key",   TYPE_NUMBER, 1},
 }})
 
--- TODO: gmod_wire_motor, dont wanna deal with constraints atm
+registerSent("gmod_wire_motor", {
+	_preFactory = function(ply, self)
+		checkluatype(self.Ent1, TYPE_ENTITY, 2, "Parameter: ent1")
+		checkluatype(self.Ent2, TYPE_ENTITY, 2, "Parameter: ent2")
+		
+		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
+		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
+		
+		self.model = self.Model
+		self.MyId = "starfall_createsent"
+	end,
+	
+	_postFactory = function(ply, self, enttbl)
+		MakeWireMotor(
+			ply,
+			enttbl.Ent1,
+			enttbl.Ent2,
+			enttbl.Bone1,
+			enttbl.Bone2,
+			enttbl.LPos1,
+			enttbl.LPos2,
+			enttbl.friction,
+			enttbl.torque,
+			0,
+			enttbl.torque,
+			enttbl.MyId
+		)
+	end,
+	
+	{
+		model =      {"Model",      TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
+		ent1 =       {"Ent1",       TYPE_ENTITY, nil},
+		ent2 =       {"Ent2",       TYPE_ENTITY, nil},
+		bone1 =      {"Bone1",      TYPE_NUMBER, 0},
+		bone2 =      {"Bone2",      TYPE_NUMBER, 0},
+		pos1 =       {"LPos1",      TYPE_VECTOR, Vector()},
+		pos2 =       {"LPos2",      TYPE_VECTOR, Vector()},
+		friction =   {"friction",   TYPE_NUMBER, 1},
+		torque =     {"torque",     TYPE_NUMBER, 500},
+		forcelimit = {"forcelimit", TYPE_NUMBER, 0},
+	}
+})
 
 registerSent("gmod_wire_explosive", {{
 	model           = {"Model",           TYPE_STRING, "models/props_c17/oildrum001_explosive.mdl"},
