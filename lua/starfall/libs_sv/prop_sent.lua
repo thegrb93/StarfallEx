@@ -387,7 +387,7 @@ registerSent("gmod_wire_textreceiver", {
 		self.Matches = {}
 		
 		for i, str in ipairs(self._matches) do
-			checkluatype(str, TYPE_STRING, 2, "in data parameter matches")
+			checkluatype(str, TYPE_STRING, 2, "Parameter: matches[" .. i .. "]")
 			self.Matches[i] = str
 		end
 	end,
@@ -962,8 +962,8 @@ registerSent("gmod_wire_expression2", {
 		self.filepath = "generic_starfall.txt"
 		
 		for path, code in pairs(self._includes) do
-			checkluatype(path, TYPE_STRING, 2, "in data parameter includes")
-			checkluatype(code, TYPE_STRING, 2, "in data parameter includes")
+			checkluatype(path, TYPE_STRING, 2, "Parameter: includes[" .. path .. "]")
+			checkluatype(code, TYPE_STRING, 2, "Parameter: includes[" .. path .. "]")
 			
 			self.inc_files[path] = code
 		end
