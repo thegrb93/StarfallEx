@@ -472,7 +472,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			local value = data[param]
 			
 			if value then
-				value = ounwrap(value)
+				value = ounwrap(value) or value
 				
 				checkluatype(value, org[2], nil, "Parameter: " .. param)
 				
