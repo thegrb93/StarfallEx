@@ -1064,7 +1064,7 @@ registerSent("gmod_wire_wheel", {
 		axis          = {"LAxis",      TYPE_VECTOR, Vector(0, 1, 0)},
 		forward_value = {"fwd",        TYPE_NUMBER, 1},
 		back_value    = {"bck",        TYPE_NUMBER, -1},
-		stop_value    = {"bck",        TYPE_NUMBER, 0},
+		stop_value    = {"stop",       TYPE_NUMBER, 0},
 		torque        = {"BaseTorque", TYPE_NUMBER, 3000},
 		friction      = {"friction",   TYPE_NUMBER, 1},
 		forcelimit    = {"forcelimit", TYPE_NUMBER, 0},
