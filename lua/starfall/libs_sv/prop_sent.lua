@@ -744,7 +744,51 @@ registerSent("gmod_wire_igniter", {{
 	range         = {"Range",         TYPE_NUMBER, 2048},
 }})
 
--- TODO: gmod_wire_hydraulic, it do be constraint thing
+registerSent("gmod_wire_hydraulic", {
+	_preFactory = function(ply, self)
+		checkluatype(self.Ent1, TYPE_ENTITY, 2, "Parameter: ent1")
+		checkluatype(self.Ent2, TYPE_ENTITY, 2, "Parameter: ent2")
+		
+		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
+		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
+		
+		self.model = self.Model
+		self.MyId = "starfall_createsent"
+	end,
+	
+	_postFactory = function(ply, self, enttbl)
+		MakeWireHydraulic(
+			ply,
+			enttbl.Ent1,
+			enttbl.Ent2,
+			enttbl.Bone1,
+			enttbl.Bone2,
+			enttbl.LPos1,
+			enttbl.LPos2,
+			enttbl.width,
+			enttbl.material,
+			enttbl.speed,
+			enttbl.fixed,
+			enttbl.stretchonly,
+			enttbl.MyId
+		)
+	end,
+	
+	{
+		model =       {"Model",       TYPE_STRING, "models/beer/wiremod/hydraulic.mdl"},
+		ent1 =        {"Ent1",        TYPE_ENTITY, nil},
+		ent2 =        {"Ent2",        TYPE_ENTITY, nil},
+		bone1 =       {"Bone1",       TYPE_NUMBER, 0},
+		bone2 =       {"Bone2",       TYPE_NUMBER, 0},
+		pos1 =        {"LPos1",       TYPE_VECTOR, Vector()},
+		pos2 =        {"LPos2",       TYPE_VECTOR, Vector()},
+		width =       {"width",       TYPE_NUMBER, 3},
+		material =    {"material",    TYPE_STRING, "cable/rope"},
+		speed =       {"speed",       TYPE_NUMBER, 16},
+		fixed =       {"fixed",       TYPE_NUMBER, 0},
+		stretchonly = {"stretchonly", TYPE_BOOL,   false},
+	}
+})
 
 registerSent("gmod_wire_hudindicator", {
 	_preFactory = function(ply, self)
