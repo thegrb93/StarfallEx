@@ -61,8 +61,7 @@ local function genDocs()
 	for _, data in pairs(sorted) do
 		local str = {"-- > " .. data.class}
 		for param, org in pairs(data.data[1]) do
-			local typ = type(org[3])
-			-- table.insert(str, string.format("-- %s %s = %q", typ, param, typ == "table" and table.ToString(org[3]) or org[3]))
+			local typ = SF.TypeName(org[2])
 			table.insert(str, string.format("-- %s %s = %q", typ, param, tostr[typ] and tostr[typ](org[3]) or org[3]))
 		end
 		
@@ -1391,10 +1390,10 @@ return function() end
 -- string material = "cable/rope"
 -- number speed = "16"
 -- number bone1 = "0"
--- nil ent1 = "nil"
+-- Entity ent1 = "nil"
 -- number bone2 = "0"
 -- Vector pos1 = "Vector(0, 0, 0)"
--- nil ent2 = "nil"
+-- Entity ent2 = "nil"
 -- 
 -- > gmod_wire_igniter
 -- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
@@ -1456,7 +1455,7 @@ return function() end
 -- string model = "models/props_lab/powerbox02d.mdl"
 -- 
 -- > gmod_wire_motor
--- nil ent1 = "nil"
+-- Entity ent1 = "nil"
 -- number bone2 = "0"
 -- string model = "models/jaanus/wiretool/wiretool_siren.mdl"
 -- number friction = "1"
@@ -1465,7 +1464,7 @@ return function() end
 -- number bone1 = "0"
 -- Vector pos2 = "Vector(0, 0, 0)"
 -- Vector pos1 = "Vector(0, 0, 0)"
--- nil ent2 = "nil"
+-- Entity ent2 = "nil"
 -- 
 -- > gmod_wire_nailer
 -- number flim = "0"
@@ -1687,7 +1686,7 @@ return function() end
 -- number torque = "3000"
 -- Vector axis = "Vector(0, 1, 0)"
 -- number forward_value = "1"
--- nil base = "nil"
+-- Entity base = "nil"
 -- string model = "models/props_vehicles/carparts_wheel01a.mdl"
 -- Vector pos = "Vector(0, 0, 0)"
 -- number stop_value = "0"
