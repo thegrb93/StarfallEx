@@ -645,9 +645,6 @@ registerSent("gmod_wire_output", {{
 
 registerSent("gmod_wire_motor", {
 	_preFactory = function(ply, self)
-		checkluatype(self.Ent1, TYPE_ENTITY, 2, "Parameter: ent1")
-		checkluatype(self.Ent2, TYPE_ENTITY, 2, "Parameter: ent2")
-		
 		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
 		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
 		
@@ -794,9 +791,6 @@ registerSent("gmod_wire_igniter", {{
 
 registerSent("gmod_wire_hydraulic", {
 	_preFactory = function(ply, self)
-		checkluatype(self.Ent1, TYPE_ENTITY, 2, "Parameter: ent1")
-		checkluatype(self.Ent2, TYPE_ENTITY, 2, "Parameter: ent2")
-		
 		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
 		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
 		
