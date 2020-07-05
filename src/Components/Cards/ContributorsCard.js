@@ -12,7 +12,7 @@ export default function ContributorsCard(props)
     }   
     useEffect(() => {
         fetchData();
-    });
+    }, [false]);
 
     if(contributorsData.length < 1)
     {
