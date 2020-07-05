@@ -634,19 +634,21 @@ function builtins_library.requiredir(dir, loadpriority)
 	end
 
 	local returns = {}
+	local alreadyRequired = {}
 
 	if loadpriority then
 		for i = 1, #loadpriority do
 			local file = path .. "/" .. loadpriority[i]
 			if instance.scripts[file] and not table.HasValue(instance.requirestack, file) then
 				returns[file] = builtins_library.require("/"..file)
+				alreadyRequired[file] = true
 			end
 		end
-	else
-		for file, _ in pairs(instance.scripts) do
-			if (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) and not table.HasValue(instance.requirestack, file) then
-				returns[file] = builtins_library.require("/"..file)
-			end
+	end
+
+	for file, _ in pairs(instance.scripts) do
+		if not alreadyRequired[file] and (string.match(file, "^"..path.."/[^/]+%.txt$") or string.match(file, "^"..path.."/[^/]+%.lua$")) and not table.HasValue(instance.requirestack, file) then
+			returns[file] = builtins_library.require("/"..file)
 		end
 	end
 
@@ -682,19 +684,21 @@ function builtins_library.dodir(dir, loadpriority)
 	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
 
 	local returns = {}
+	local alreadyRequired = {}
 
 	if loadpriority then
 		for i = 0, #loadpriority do
 			for file, _ in pairs(instance.scripts) do
 				if string.find(file, dir .. "/" .. loadpriority[i] , 1) == 1 then
 					returns[file] = builtins_library.dofile(file)
+					alreadyRequired[file] = true
 				end
 			end
 		end
 	end
 
 	for file, _ in pairs(instance.scripts) do
-		if string.find(file, dir, 1) == 1 then
+		if not alreadyRequired[file] and string.find(file, dir, 1) == 1 then
 			returns[file] = builtins_library.dofile(file)
 		end
 	end
