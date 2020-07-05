@@ -625,10 +625,12 @@ hook.Add("Think", "SF_Think", function()
 	local ram = collectgarbage("count")
 	if SF.Instance.Ram then
 		if ram > SF.RamCap:GetInt() then
+			local doClean = false
 			for instance, _ in pairs(SF.allInstances) do
+				doClean = true
 				instance:Error(SF.MakeError("Global RAM usage limit exceeded!!", 1))
 			end
-			collectgarbage()
+			if doClean then collectgarbage() end
 		end
 		SF.Instance.Ram = ram
 		SF.Instance.RamAvg = SF.Instance.RamAvg*0.999 + ram*0.001
