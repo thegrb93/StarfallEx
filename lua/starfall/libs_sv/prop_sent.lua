@@ -16,12 +16,13 @@ end
 
 local function stringsOnlyTable(tbl)
 	local r = {}
-	for k, v in pairs(tbl) do if isstring(v) then r[#r+1] = v end end
+	for k, v in ipairs(tbl) do if isstring(v) then r[#r+1] = v end end
 	return r
 end
+
 local function stringsOnlyTableTable(tbl)
 	local r = {}
-	for k, v in pairs(tbl) do if istable(v) then r[#r+1] = stringsOnlyTable(v) end end
+	for k, v in ipairs(tbl) do if istable(v) then r[#r+1] = stringsOnlyTable(v) end end
 	return r
 end
 
