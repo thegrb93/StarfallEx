@@ -142,7 +142,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local mindist = minVertexDistance:GetFloat()^2
 	local maxVerticesPerConvex = maxVerticesPerConvex:GetInt()
 	local maxConvexesPerProp = maxConvexesPerProp:GetInt()
-	
+
 	local totalVertices = 0
 	local streamdata = SF.StringStream()
 	streamdata:writeInt32(#vertices)
@@ -175,7 +175,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	plyVertexCount:free(-totalVertices)
 
 	local propdata = instance.data.props
-	
+
 	local propent = ents.Create("starfall_prop")
 	register(propent, instance)
 	propent.streamdata = streamdata
@@ -183,7 +183,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
 	propent:Spawn()
-	
+
 	local physobj = propent:GetPhysicsObject()
 	if not physobj:IsValid() then
 		SF.Throw("Custom prop generated with invalid physics object!", 2)
@@ -283,7 +283,7 @@ end
 -- @return The table
 function props_library.getSpawnableSents(categorized)
 	local tbl = {}
-	
+
 	local add
 	if categorized then
 		add = function(list_name)
@@ -299,13 +299,13 @@ function props_library.getSpawnableSents(categorized)
 			end
 		end
 	end
-	
+
 	add("Weapon")
 	add("SpawnableEntities")
 	add("NPC")
 	add("Vehicles")
 	add("starfall_creatable_sent")
-	
+
 	return tbl
 end
 
@@ -463,7 +463,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if scripted_ents.GetStored(class).t.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
 		end
-		
+
 		local enttbl = {}
 		local sentparams = sent2[1]
 		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
@@ -480,10 +480,10 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		-- Apply data
 		for param, org in pairs(sentparams) do
 			local value = data[param]
-			
+
 			if value~=nil then
 				value = ounwrap(value) or value
-				
+
 				if org[1]==TYPE_COLOR then
 					if not IsColor(value) then SF.ThrowTypeError("Color", SF.GetType(value), 2, "Parameter: " .. param) end
 					enttbl[param] = value
@@ -491,41 +491,41 @@ function props_library.createSent(pos, ang, class, frozen, data)
 					checkluatype(value, org[1], nil, "Parameter: " .. param)
 					enttbl[param] = value
 				end
-				
+
 			elseif org[2]~=nil then
 				enttbl[param] = org[2]
 			else
 				SF.Throw("Missing data parameter: " .. param, 2)
 			end
 		end
-		
+
 		-- Supply additional data
 		enttbl.Data = enttbl
 		enttbl.Name = ""
 		enttbl.Class = class
 		enttbl.Pos = pos
 		enttbl.Angle = ang
-		
+
 		if sent2._preFactory then
 			sent2._preFactory(ply, enttbl)
 		end
-		
+
 		entity = duplicator.CreateEntityFromTable(ply, enttbl)
-		
+
 		if sent2._postFactory then
 			sent2._postFactory(ply, entity, enttbl)
 		end
-		
+
 		if entity.PreEntityCopy then
 			entity:PreEntityCopy() -- To build dupe modifiers
 		end
 		if entity.PostEntityPaste then
 			entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
 		end
-		
+
 		hookcall = "PlayerSpawnedSENT"
 	end
-	
+
 	if entity and entity:IsValid() then
 		register(entity, instance)
 
@@ -543,7 +543,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 					undo.AddEntity(entity)
 				undo.Finish("SF (" .. class .. ")")
 			end
-		
+
 			ply:AddCleanup("props", entity)
 			gamemode.Call(hookcall, ply, entity)
 		end

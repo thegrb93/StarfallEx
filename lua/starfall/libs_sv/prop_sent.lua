@@ -6,15 +6,15 @@ end
 -- Function to generate some docs, it aint fancy but works i guess
 local function genDocs()
 	local tostr = {
-		table  = table.ToString,
+		table = table.ToString,
 		Vector = function(x) return string.format("Vector(%s, %s, %s)", x[1], x[2], x[3]) end,
-		Angle  = function(x) return string.format("Angle(%s, %s, %s)",  x[1], x[2], x[3]) end,
+		Angle = function(x) return string.format("Angle(%s, %s, %s)", x[1], x[2], x[3]) end,
 	}
-	
+
 	local classes = {"--- "}
-	
+
 	--
-	
+
 	local sorted = {}
 	for class, data in pairs(list.Get("starfall_creatable_sent")) do
 		local undercount = 0
@@ -23,45 +23,45 @@ local function genDocs()
 				undercount = undercount + 1
 			end
 		end
-		
+
 		table.insert(sorted, {class = class, class_length = #class, undercount = undercount, data = data})
 	end
-	
+
 	table.sort(sorted, function(a, b)
 		if a.undercount < b.undercount then
 			return true
 		elseif a.undercount == b.undercount then
 			for i = 1, a.class_length do
 				local ab, bb = string.byte(a.class[i]), string.byte(b.class[i])
-				
+
 				if ab < bb then
 					return true
 				elseif ab > bb then
 					return false
 				end
 			end
-			
+
 			return a.class_length < b.class_length
 		end
-		
+
 		return false
 	end)
-	
+
 	for _, data in pairs(sorted) do
 		local str = {"-- > " .. data.class}
 		for param, org in pairs(data.data[1]) do
 			local typ = SF.TypeName(org[2])
 			table.insert(str, string.format("-- %s %s = %q", typ, param, tostr[typ] and tostr[typ](org[3]) or org[3]))
 		end
-		
+
 		table.insert(str, "-- ")
 		table.insert(classes, table.concat(str, "\n"))
 	end
-	
+
 	--
-	
+
 	table.insert(classes, "-- @name props_library.SENT_Data_Structures\n-- @class table")
-	
+
 	for _, str in ipairs(classes) do
 		print(str)
 	end
@@ -90,14 +90,14 @@ registerSent("gmod_button", {{
 	["Model"] = {TYPE_STRING, "models/maxofs2d/button_05.mdl"},
 	["description"] = {TYPE_STRING, ""},
 	["key"] = {TYPE_NUMBER, -1},
-	["toggle"] = {TYPE_BOOL,   true},
+	["toggle"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_cameraprop", {{
 	["Model"] = {TYPE_STRING, "models/dav0r/camera.mdl"},
 	["controlkey"] = {TYPE_NUMBER, -1},
-	["locked"] = {TYPE_BOOL,   false},
-	["toggle"] = {TYPE_BOOL,   true},
+	["locked"] = {TYPE_BOOL, false},
+	["toggle"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_dynamite", {{
@@ -105,7 +105,7 @@ registerSent("gmod_dynamite", {{
 	["key"] = {TYPE_NUMBER, -1},
 	["Damage"] = {TYPE_NUMBER, 200},
 	["delay"] = {TYPE_NUMBER, 0},
-	["remove"] = {TYPE_BOOL,   false},
+	["remove"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_emitter", {{
@@ -114,8 +114,8 @@ registerSent("gmod_emitter", {{
 	["key"] = {TYPE_NUMBER, -1},
 	["delay"] = {TYPE_NUMBER, 0},
 	["scale"] = {TYPE_NUMBER, 1},
-	["toggle"] = {TYPE_BOOL,   true},
-	["starton"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, true},
+	["starton"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_hoverball", {{
@@ -134,8 +134,8 @@ registerSent("gmod_lamp", {{
 	["fov"] = {TYPE_NUMBER, 90},
 	["distance"] = {TYPE_NUMBER, 1024},
 	["brightness"] = {TYPE_NUMBER, 4},
-	["toggle"] = {TYPE_BOOL,   true},
-	["on"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, true},
+	["on"] = {TYPE_BOOL, false},
 	["r"] = {TYPE_NUMBER, 255},
 	["g"] = {TYPE_NUMBER, 255},
 	["b"] = {TYPE_NUMBER, 255},
@@ -146,8 +146,8 @@ registerSent("gmod_light", {{
 	["KeyDown"] = {TYPE_NUMBER, -1},
 	["Size"] = {TYPE_NUMBER, 256},
 	["Brightness"] = {TYPE_NUMBER, 2},
-	["toggle"] = {TYPE_BOOL,   true},
-	["on"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, true},
+	["on"] = {TYPE_BOOL, false},
 	["lightr"] = {TYPE_NUMBER, 255},
 	["lightg"] = {TYPE_NUMBER, 255},
 	["lightb"] = {TYPE_NUMBER, 255},
@@ -160,8 +160,8 @@ registerSent("gmod_thruster", {{
 	["key"] = {TYPE_NUMBER, -1},
 	["key_bck"] = {TYPE_NUMBER, -1},
 	["force"] = {TYPE_NUMBER, 1500},
-	["toggle"] = {TYPE_BOOL,   false},
-	["damageable"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
+	["damageable"] = {TYPE_BOOL, false},
 }})
 
 ----------------------------------------
@@ -192,15 +192,15 @@ registerSent("gmod_wire_forcer", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 	["Force"] = {TYPE_NUMBER, 1},
 	["Length"] = {TYPE_NUMBER, 100},
-	["ShowBeam"] = {TYPE_BOOL,   true},
-	["Reaction"] = {TYPE_BOOL,   false},
+	["ShowBeam"] = {TYPE_BOOL, true},
+	["Reaction"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_adv_input", {{
 	["Model"] = {TYPE_STRING, "models/beer/wiremod/numpad.mdl"},
 	["keymore"] = {TYPE_NUMBER, 3},
 	["keyless"] = {TYPE_NUMBER, 1},
-	["toggle"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
 	["value_min"] = {TYPE_NUMBER, 0},
 	["value_max"] = {TYPE_NUMBER, 10},
 	["value_start"] = {TYPE_NUMBER, 5},
@@ -217,20 +217,20 @@ registerSent("gmod_wire_dhdd", {{
 
 registerSent("gmod_wire_friendslist", {{
 	["Model"] = {TYPE_STRING, "models/kobilica/value.mdl"},
-	["save_on_entity"] = {TYPE_BOOL,   false},
+	["save_on_entity"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_nailer", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 	["Flim"] = {TYPE_NUMBER, 0},
 	["Range"] = {TYPE_NUMBER, 100},
-	["ShowBeam"] = {TYPE_BOOL,   true},
+	["ShowBeam"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_grabber", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_range.mdl"},
 	["Range"] = {TYPE_NUMBER, 100},
-	["Gravity"] = {TYPE_BOOL,   true},
+	["Gravity"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_weight", {{
@@ -251,7 +251,7 @@ registerSent("gmod_wire_dataport", {{
 
 registerSent("gmod_wire_colorer", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-	["outColor"] = {TYPE_BOOL,   false},
+	["outColor"] = {TYPE_BOOL, false},
 	["Range"] = {TYPE_NUMBER, 2000},
 }})
 
@@ -299,13 +299,13 @@ registerSent("gmod_wire_vectorthruster", {{
 	["force_max"] = {TYPE_NUMBER, 10000},
 	["oweffect"] = {TYPE_STRING, "fire"},
 	["uweffect"] = {TYPE_STRING, "same"},
-	["owater"] = {TYPE_BOOL,   true},
-	["uwater"] = {TYPE_BOOL,   true},
-	["bidir"] = {TYPE_BOOL,   true},
+	["owater"] = {TYPE_BOOL, true},
+	["uwater"] = {TYPE_BOOL, true},
+	["bidir"] = {TYPE_BOOL, true},
 	["soundname"] = {TYPE_STRING, ""},
 	["mode"] = {TYPE_NUMBER, 0},
-	["angleinputs"] = {TYPE_BOOL,   false},
-	["lengthismul"] = {TYPE_BOOL,   false},
+	["angleinputs"] = {TYPE_BOOL, false},
+	["lengthismul"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_user", {{
@@ -319,7 +319,7 @@ registerSent("gmod_wire_twoway_radio", {{
 
 registerSent("gmod_wire_numpad", {{
 	["Model"] = {TYPE_STRING, "models/beer/wiremod/numpad.mdl"},
-	["toggle"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
 	["value_off"] = {TYPE_NUMBER, 0},
 	["value_on"] = {TYPE_NUMBER, 0},
 }})
@@ -365,7 +365,7 @@ registerSent("gmod_wire_textreceiver", {
 		end
 		self.Matches = matches
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_range.mdl"},
 		["UseLuaPatterns"] = {TYPE_BOOL, false},
@@ -380,37 +380,37 @@ registerSent("gmod_wire_textentry", {{
 
 registerSent("gmod_wire_teleporter", {{
 	["Model"] = {TYPE_STRING, "models/props_c17/utilityconducter001.mdl"},
-	["UseSounds"] = {TYPE_BOOL,   true},
-	["UseEffects"] = {TYPE_BOOL,   true},
+	["UseSounds"] = {TYPE_BOOL, true},
+	["UseEffects"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_target_finder", {{
 	["Model"] = {TYPE_STRING, "models/beer/wiremod/targetfinder.mdl"},
 	["range"] = {TYPE_NUMBER, 1000},
-	["players"] = {TYPE_BOOL,   false},
-	["npcs"] = {TYPE_BOOL,   true},
+	["players"] = {TYPE_BOOL, false},
+	["npcs"] = {TYPE_BOOL, true},
 	["npcname"] = {TYPE_STRING, ""},
-	["beacons"] = {TYPE_BOOL,   false},
-	["hoverballs"] = {TYPE_BOOL,   false},
-	["thrusters"] = {TYPE_BOOL,   false},
-	["props"] = {TYPE_BOOL,   false},
+	["beacons"] = {TYPE_BOOL, false},
+	["hoverballs"] = {TYPE_BOOL, false},
+	["thrusters"] = {TYPE_BOOL, false},
+	["props"] = {TYPE_BOOL, false},
 	["propmodel"] = {TYPE_STRING, ""},
-	["vehicles"] = {TYPE_BOOL,   false},
+	["vehicles"] = {TYPE_BOOL, false},
 	["playername"] = {TYPE_STRING, ""},
-	["casesen"] = {TYPE_BOOL,   false},
-	["rpgs"] = {TYPE_BOOL,   false},
-	["painttarget"] = {TYPE_BOOL,   true},
+	["casesen"] = {TYPE_BOOL, false},
+	["rpgs"] = {TYPE_BOOL, false},
+	["painttarget"] = {TYPE_BOOL, true},
 	["minrange"] = {TYPE_NUMBER, 1},
 	["maxtargets"] = {TYPE_NUMBER, 1},
 	["maxbogeys"] = {TYPE_NUMBER, 1},
-	["notargetowner"] = {TYPE_BOOL,   false},
+	["notargetowner"] = {TYPE_BOOL, false},
 	["entity"] = {TYPE_STRING, ""},
-	["notownersstuff"] = {TYPE_BOOL,   false},
+	["notownersstuff"] = {TYPE_BOOL, false},
 	["steamname"] = {TYPE_STRING, ""},
-	["colorcheck"] = {TYPE_BOOL,   false},
-	["colortarget"] = {TYPE_BOOL,   false},
-	["checkbuddylist"] = {TYPE_BOOL,   false},
-	["onbuddylist"] = {TYPE_BOOL,   false},
+	["colorcheck"] = {TYPE_BOOL, false},
+	["colortarget"] = {TYPE_BOOL, false},
+	["checkbuddylist"] = {TYPE_BOOL, false},
+	["onbuddylist"] = {TYPE_BOOL, false},
 	["pcolR"] = {TYPE_NUMBER, 255},
 	["pcolG"] = {TYPE_NUMBER, 255},
 	["pcolB"] = {TYPE_NUMBER, 255},
@@ -427,19 +427,19 @@ registerSent("gmod_wire_trail", {
 	_preFactory = function(ply, self)
 		self.Trail = {}
 	end,
-	
+
 	_postFactory = function(ply, self, enttbl)
 		self.Trail = {
-			Color     = enttbl.Color,
-			Length    = enttbl.Length,
+			Color = enttbl.Color,
+			Length = enttbl.Length,
 			StartSize = enttbl.StartSize,
-			EndSize   = enttbl.EndSize,
-			Material  = enttbl.Material
+			EndSize = enttbl.EndSize,
+			Material = enttbl.Material
 		}
 	end,
 
 	{
-		["Color"] = {TYPE_COLOR,  Color(255, 255, 255)},
+		["Color"] = {TYPE_COLOR, Color(255, 255, 255)},
 		["Length"] = {TYPE_NUMBER, 5},
 		["StartSize"] = {TYPE_NUMBER, 32},
 		["EndSize"] = {TYPE_NUMBER, 0},
@@ -451,7 +451,7 @@ registerSent("gmod_wire_egp", {
 	_preFactory = function(ply, self)
 		self.model = self.Model
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/kobilica/wiremonitorbig.mdl"},
 	}
@@ -475,11 +475,11 @@ registerSent("gmod_wire_trigger", {
 	_preFactory = function(ply, self)
 		self.model = self.Model
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 		["filter"] = {TYPE_NUMBER, 0},
-		["owneronly"] = {TYPE_BOOL,   false},
+		["owneronly"] = {TYPE_BOOL, false},
 		["sizex"] = {TYPE_NUMBER, 64},
 		["sizey"] = {TYPE_NUMBER, 64},
 		["sizez"] = {TYPE_NUMBER, 64},
@@ -491,7 +491,7 @@ registerSent("gmod_wire_trigger", {
 
 registerSent("gmod_wire_socket", {{
 	["Model"] = {TYPE_STRING, "models/props_lab/tpplugholder_single.mdl"},
-	["ArrayInput"] = {TYPE_BOOL,   false},
+	["ArrayInput"] = {TYPE_BOOL, false},
 	["WeldForce"] = {TYPE_NUMBER, 5000},
 	["AttachRange"] = {TYPE_NUMBER, 5},
 }})
@@ -500,7 +500,7 @@ registerSent("gmod_wire_simple_explosive", {{
 	["Model"] = {TYPE_STRING, "models/props_c17/oildrum001_explosive.mdl"},
 	["key"] = {TYPE_NUMBER, 1},
 	["damage"] = {TYPE_NUMBER, 200},
-	["removeafter"] = {TYPE_BOOL,   false},
+	["removeafter"] = {TYPE_BOOL, false},
 	["radius"] = {TYPE_NUMBER, 300},
 }})
 
@@ -518,14 +518,14 @@ registerSent("gmod_wire_sensor", {{
 
 registerSent("gmod_wire_screen", {{
 	["Model"] = {TYPE_STRING, "models/props_lab/monitor01b.mdl"},
-	["SingleValue"] = {TYPE_BOOL,   false},
-	["SingleBigFont"] = {TYPE_BOOL,   true},
+	["SingleValue"] = {TYPE_BOOL, false},
+	["SingleBigFont"] = {TYPE_BOOL, true},
 	["TextA"] = {TYPE_STRING, "Value A"},
 	["TextB"] = {TYPE_STRING, "Value B"},
-	["LeftAlign"] = {TYPE_BOOL,   false},
-	["Floor"] = {TYPE_BOOL,   false},
-	["FormatNumber"] = {TYPE_BOOL,   false},
-	["FormatTime"] = {TYPE_BOOL,   false},
+	["LeftAlign"] = {TYPE_BOOL, false},
+	["Floor"] = {TYPE_BOOL, false},
+	["FormatNumber"] = {TYPE_BOOL, false},
+	["FormatTime"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_detonator", {{
@@ -541,38 +541,38 @@ registerSent("gmod_wire_relay", {{
 	["keygroup4"] = {TYPE_NUMBER, 4},
 	["keygroup5"] = {TYPE_NUMBER, 5},
 	["keygroupoff"] = {TYPE_NUMBER, 0},
-	["toggle"] = {TYPE_BOOL,   true},
+	["toggle"] = {TYPE_BOOL, true},
 	["normclose"] = {TYPE_NUMBER, 0},
 	["poles"] = {TYPE_NUMBER, 1},
 	["throws"] = {TYPE_NUMBER, 2},
-	["nokey"] = {TYPE_BOOL,   false},
+	["nokey"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_ranger", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_range.mdl"},
 	["range"] = {TYPE_NUMBER, 1500},
-	["default_zero"] = {TYPE_BOOL,   true},
-	["show_beam"] = {TYPE_BOOL,   true},
-	["ignore_world"] = {TYPE_BOOL,   false},
-	["trace_water"] = {TYPE_BOOL,   false},
-	["out_dist"] = {TYPE_BOOL,   true},
-	["out_pos"] = {TYPE_BOOL,   false},
-	["out_vel"] = {TYPE_BOOL,   false},
-	["out_ang"] = {TYPE_BOOL,   false},
-	["out_col"] = {TYPE_BOOL,   false},
-	["out_val"] = {TYPE_BOOL,   false},
-	["out_sid"] = {TYPE_BOOL,   false},
-	["out_uid"] = {TYPE_BOOL,   false},
-	["out_eid"] = {TYPE_BOOL,   false},
-	["out_hnrm"] = {TYPE_BOOL,   false},
-	["hires"] = {TYPE_BOOL,   false},
+	["default_zero"] = {TYPE_BOOL, true},
+	["show_beam"] = {TYPE_BOOL, true},
+	["ignore_world"] = {TYPE_BOOL, false},
+	["trace_water"] = {TYPE_BOOL, false},
+	["out_dist"] = {TYPE_BOOL, true},
+	["out_pos"] = {TYPE_BOOL, false},
+	["out_vel"] = {TYPE_BOOL, false},
+	["out_ang"] = {TYPE_BOOL, false},
+	["out_col"] = {TYPE_BOOL, false},
+	["out_val"] = {TYPE_BOOL, false},
+	["out_sid"] = {TYPE_BOOL, false},
+	["out_uid"] = {TYPE_BOOL, false},
+	["out_eid"] = {TYPE_BOOL, false},
+	["out_hnrm"] = {TYPE_BOOL, false},
+	["hires"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_radio", {{
 	["Model"] = {TYPE_STRING, "models/props_lab/binderblue.mdl"},
 	["Channel"] = {TYPE_STRING, "1"},
 	["values"] = {TYPE_NUMBER, 4},
-	["Secure"] = {TYPE_BOOL,   false},
+	["Secure"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_thruster", {{
@@ -582,9 +582,9 @@ registerSent("gmod_wire_thruster", {{
 	["force_max"] = {TYPE_NUMBER, 10000},
 	["oweffect"] = {TYPE_STRING, "fire"},
 	["uweffect"] = {TYPE_STRING, "same"},
-	["owater"] = {TYPE_BOOL,   true},
-	["uwater"] = {TYPE_BOOL,   true},
-	["bidir"] = {TYPE_BOOL,   true},
+	["owater"] = {TYPE_BOOL, true},
+	["uwater"] = {TYPE_BOOL, true},
+	["bidir"] = {TYPE_BOOL, true},
 	["soundname"] = {TYPE_STRING, ""},
 }})
 
@@ -613,11 +613,11 @@ registerSent("gmod_wire_motor", {
 	_preFactory = function(ply, self)
 		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
 		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
-		
+
 		self.model = self.Model
 		self.MyId = "starfall_createsent"
 	end,
-	
+
 	_postFactory = function(ply, self, enttbl)
 		MakeWireMotor(
 			ply,
@@ -634,7 +634,7 @@ registerSent("gmod_wire_motor", {
 			enttbl.MyId
 		)
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 		["Ent1"] = {TYPE_ENTITY, nil},
@@ -654,27 +654,27 @@ registerSent("gmod_wire_explosive", {{
 	["key"] = {TYPE_NUMBER, 1},
 	["damage"] = {TYPE_NUMBER, 200},
 	["delaytime"] = {TYPE_NUMBER, 0},
-	["removeafter"] = {TYPE_BOOL,   false},
+	["removeafter"] = {TYPE_BOOL, false},
 	["radius"] = {TYPE_NUMBER, 300},
-	["affectother"] = {TYPE_BOOL,   false},
-	["notaffected"] = {TYPE_BOOL,   false},
+	["affectother"] = {TYPE_BOOL, false},
+	["notaffected"] = {TYPE_BOOL, false},
 	["delayreloadtime"] = {TYPE_NUMBER, 0},
 	["maxhealth"] = {TYPE_NUMBER, 100},
-	["bulletproof"] = {TYPE_BOOL,   false},
-	["explosionproof"] = {TYPE_BOOL,   false},
-	["fallproof"] = {TYPE_BOOL,   false},
-	["explodeatzero"] = {TYPE_BOOL,   true},
-	["resetatexplode"] = {TYPE_BOOL,   true},
-	["fireeffect"] = {TYPE_BOOL,   true},
-	["coloreffect"] = {TYPE_BOOL,   true},
-	["invisibleatzero"] = {TYPE_BOOL,   false},
+	["bulletproof"] = {TYPE_BOOL, false},
+	["explosionproof"] = {TYPE_BOOL, false},
+	["fallproof"] = {TYPE_BOOL, false},
+	["explodeatzero"] = {TYPE_BOOL, true},
+	["resetatexplode"] = {TYPE_BOOL, true},
+	["fireeffect"] = {TYPE_BOOL, true},
+	["coloreffect"] = {TYPE_BOOL, true},
+	["invisibleatzero"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_light", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-	["directional"] = {TYPE_BOOL,   false},
-	["radiant"] = {TYPE_BOOL,   false},
-	["glow"] = {TYPE_BOOL,   false},
+	["directional"] = {TYPE_BOOL, false},
+	["radiant"] = {TYPE_BOOL, false},
+	["glow"] = {TYPE_BOOL, false},
 	["brightness"] = {TYPE_NUMBER, 2},
 	["size"] = {TYPE_NUMBER, 256},
 	["R"] = {TYPE_NUMBER, 255},
@@ -688,7 +688,7 @@ registerSent("gmod_wire_lamp", {{
 	["FOV"] = {TYPE_NUMBER, 90},
 	["Dist"] = {TYPE_NUMBER, 1024},
 	["Brightness"] = {TYPE_NUMBER, 8},
-	["on"] = {TYPE_BOOL,   false},
+	["on"] = {TYPE_BOOL, false},
 	["r"] = {TYPE_NUMBER, 255},
 	["g"] = {TYPE_NUMBER, 255},
 	["b"] = {TYPE_NUMBER, 255},
@@ -698,7 +698,7 @@ registerSent("gmod_wire_keypad", {
 	_preFactory = function(ply, self)
 		self.Password = util.CRC(self.Password)
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/props_lab/keypad.mdl"},
 		["Password"] = {TYPE_STRING},
@@ -721,7 +721,7 @@ registerSent("gmod_wire_clutch", {{
 registerSent("gmod_wire_input", {{
 	["Model"] = {TYPE_STRING, "models/beer/wiremod/numpad.mdl"},
 	["keygroup"] = {TYPE_NUMBER, 7},
-	["toggle"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
 	["value_off"] = {TYPE_NUMBER, 0},
 	["value_on"] = {TYPE_NUMBER, 1},
 }})
@@ -742,7 +742,7 @@ registerSent("gmod_wire_indicator", {{
 
 registerSent("gmod_wire_igniter", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-	["TargetPlayers"] = {TYPE_BOOL,   false},
+	["TargetPlayers"] = {TYPE_BOOL, false},
 	["Range"] = {TYPE_NUMBER, 2048},
 }})
 
@@ -750,11 +750,11 @@ registerSent("gmod_wire_hydraulic", {
 	_preFactory = function(ply, self)
 		if not IsValid(self.Ent1) then SF.Throw("Invalid Entity, Parameter: ent1", 3) end
 		if not IsValid(self.Ent2) then SF.Throw("Invalid Entity, Parameter: ent2", 3) end
-		
+
 		self.model = self.Model
 		self.MyId = "starfall_createsent"
 	end,
-	
+
 	_postFactory = function(ply, self, enttbl)
 		MakeWireHydraulic(
 			ply,
@@ -772,7 +772,7 @@ registerSent("gmod_wire_hydraulic", {
 			enttbl.MyId
 		)
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/beer/wiremod/hydraulic.mdl"},
 		["Ent1"] = {TYPE_ENTITY, nil},
@@ -785,7 +785,7 @@ registerSent("gmod_wire_hydraulic", {
 		["material"] = {TYPE_STRING, "cable/rope"},
 		["speed"] = {TYPE_NUMBER, 16},
 		["fixed"] = {TYPE_NUMBER, 0},
-		["stretchonly"] = {TYPE_BOOL,   false},
+		["stretchonly"] = {TYPE_BOOL, false},
 	}
 })
 
@@ -794,12 +794,12 @@ registerSent("gmod_wire_hudindicator", {{
 	["a"] = {TYPE_NUMBER, 0},
 	["b"] = {TYPE_NUMBER, 1},
 	["material"] = {TYPE_STRING, "models/debug/debugwhite"},
-	["showinhud"] = {TYPE_BOOL,   false},
+	["showinhud"] = {TYPE_BOOL, false},
 	["huddesc"] = {TYPE_STRING, ""},
-	["hudaddname"] = {TYPE_BOOL,   false},
+	["hudaddname"] = {TYPE_BOOL, false},
 	["hudshowvalue"] = {TYPE_NUMBER, 0},
 	["hudstyle"] = {TYPE_NUMBER, 0},
-	["allowhook"] = {TYPE_BOOL,   true},
+	["allowhook"] = {TYPE_BOOL, true},
 	["fullcircleangle"] = {TYPE_NUMBER, 0},
 	["ar"] = {TYPE_NUMBER, 255},
 	["ag"] = {TYPE_NUMBER, 0},
@@ -816,14 +816,14 @@ registerSent("gmod_wire_hoverball", {{
 	["speed"] = {TYPE_NUMBER, 1},
 	["resistance"] = {TYPE_NUMBER, 0},
 	["strength"] = {TYPE_NUMBER, 1},
-	["starton"] = {TYPE_BOOL,   true},
+	["starton"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_fx_emitter", {
 	_preFactory = function(ply, self)
 		self.effect = ComboBox_Wire_FX_Emitter_Options[self.effect]
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/props_lab/tpplug.mdl"},
 		["delay"] = {TYPE_NUMBER, 0.07},
@@ -833,20 +833,20 @@ registerSent("gmod_wire_fx_emitter", {
 
 registerSent("gmod_wire_hologrid", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-	["usegps"] = {TYPE_BOOL,   false},
+	["usegps"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_data_transferer", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 	["Range"] = {TYPE_NUMBER, 25000},
-	["DefaultZero"] = {TYPE_BOOL,   false},
-	["IgnoreZero"] = {TYPE_BOOL,   false},
+	["DefaultZero"] = {TYPE_BOOL, false},
+	["IgnoreZero"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_graphics_tablet", {{
 	["Model"] = {TYPE_STRING, "models/kobilica/wiremonitorbig.mdl"},
-	["gmode"] = {TYPE_BOOL,   false},
-	["draw_background"] = {TYPE_BOOL,   true},
+	["gmode"] = {TYPE_BOOL, false},
+	["draw_background"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_gps", {{
@@ -859,11 +859,11 @@ registerSent("gmod_wire_gimbal", {{
 
 registerSent("gmod_wire_button", {{
 	["Model"] = {TYPE_STRING, "models/props_c17/clock01.mdl"},
-	["toggle"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
 	["value_off"] = {TYPE_NUMBER, 0},
 	["value_on"] = {TYPE_NUMBER, 1},
 	["description"] = {TYPE_STRING, ""},
-	["entityout"] = {TYPE_BOOL,   false},
+	["entityout"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_extbus", {{
@@ -876,22 +876,22 @@ registerSent("gmod_wire_locator", {{
 
 registerSent("gmod_wire_cameracontroller", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-	["ParentLocal"] = {TYPE_BOOL,   false},
-	["AutoMove"] = {TYPE_BOOL,   false},
-	["FreeMove"] = {TYPE_BOOL,   false},
-	["LocalMove"] = {TYPE_BOOL,   false},
-	["AllowZoom"] = {TYPE_BOOL,   false},
-	["AutoUnclip"] = {TYPE_BOOL,   false},
-	["DrawPlayer"] = {TYPE_BOOL,   true},
-	["AutoUnclip_IgnoreWater"] = {TYPE_BOOL,   false},
-	["DrawParent"] = {TYPE_BOOL,   true},
+	["ParentLocal"] = {TYPE_BOOL, false},
+	["AutoMove"] = {TYPE_BOOL, false},
+	["FreeMove"] = {TYPE_BOOL, false},
+	["LocalMove"] = {TYPE_BOOL, false},
+	["AllowZoom"] = {TYPE_BOOL, false},
+	["AutoUnclip"] = {TYPE_BOOL, false},
+	["DrawPlayer"] = {TYPE_BOOL, true},
+	["AutoUnclip_IgnoreWater"] = {TYPE_BOOL, false},
+	["DrawParent"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_dual_input", {{
 	["Model"] = {TYPE_STRING, "models/beer/wiremod/numpad.mdl"},
 	["keygroup"] = {TYPE_NUMBER, 7},
 	["keygroup2"] = {TYPE_NUMBER, 4},
-	["toggle"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
 	["value_off"] = {TYPE_NUMBER, 0},
 	["value_on"] = {TYPE_NUMBER, 1},
 	["value_on2"] = {TYPE_NUMBER, -1},
@@ -900,7 +900,7 @@ registerSent("gmod_wire_dual_input", {{
 registerSent("gmod_wire_cd_ray", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_beamcaster.mdl"},
 	["Range"] = {TYPE_NUMBER, 64},
-	["DefaultZero"] = {TYPE_BOOL,   false},
+	["DefaultZero"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_datarate", {{
@@ -909,18 +909,18 @@ registerSent("gmod_wire_datarate", {{
 
 registerSent("gmod_wire_keyboard", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_input.mdl"},
-	["AutoBuffer"] = {TYPE_BOOL,   true},
-	["Synchronous"] = {TYPE_BOOL,   true},
-	["EnterKeyAscii"] = {TYPE_BOOL,   true},
+	["AutoBuffer"] = {TYPE_BOOL, true},
+	["Synchronous"] = {TYPE_BOOL, true},
+	["EnterKeyAscii"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_wire_dynamic_button", {{
 	["Model"] = {TYPE_STRING, "models/bull/ranger.mdl"},
-	["toggle"] = {TYPE_BOOL,   false},
+	["toggle"] = {TYPE_BOOL, false},
 	["value_on"] = {TYPE_NUMBER, 1},
 	["value_off"] = {TYPE_NUMBER, 0},
 	["description"] = {TYPE_STRING, ""},
-	["entityout"] = {TYPE_BOOL,   false},
+	["entityout"] = {TYPE_BOOL, false},
 	["material_on"] = {TYPE_STRING, "bull/dynamic_button_1"},
 	["material_off"] = {TYPE_STRING, "bull/dynamic_button_0"},
 	["on_r"] = {TYPE_NUMBER, 255},
@@ -933,7 +933,7 @@ registerSent("gmod_wire_dynamic_button", {{
 
 registerSent("gmod_wire_damage_detector", {{
 	["Model"] = {TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
-	["includeconstrained"] = {TYPE_BOOL,   false},
+	["includeconstrained"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_hdd", {{
@@ -949,24 +949,24 @@ registerSent("gmod_wire_watersensor", {{
 registerSent("gmod_wire_value", {
 	_preFactory = function(ply, self)
 		local valid_types = {
-			NORMAL  = true,
-			VECTOR  = true,
+			NORMAL = true,
+			VECTOR = true,
 			VECTOR2 = true,
 			VECTOR4 = true,
-			ANGLE   = true,
-			STRING  = true,
+			ANGLE = true,
+			STRING = true,
 		}
-		
+
 		local value = {}
 		for i, val in ipairs(self.value) do
 			checkluatype(val, TYPE_TABLE, 3, "Parameter: value[" .. i .. "]")
 			checkluatype(val[1], TYPE_STRING, 3, "Parameter: value[" .. i .. "][1]")
-			
+
 			local typ = string.upper(val[1])
 			if not valid_types[typ] then SF.Throw("value[" .. i .. "] type is invalid " .. typ, 3) end
-			
+
 			checkluatype(val[2], TYPE_STRING, 3, "Parameter: value[" .. i .. "][2]")
-			
+
 			value[i] = {
 				DataType = typ,
 				Value = val[2]
@@ -974,7 +974,7 @@ registerSent("gmod_wire_value", {
 		end
 		self.value = value
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/kobilica/value.mdl"},
 		["value"] = {TYPE_TABLE},
@@ -989,7 +989,7 @@ registerSent("gmod_wire_wheel", {
 	_preFactory = function(ply, self)
 		if not IsValid(self.Base) then SF.Throw("Invalid Entity, Parameter: base", 3) end
 	end,
-	
+
 	_postFactory = function(ply, self, enttbl)
 		local motor, axis = constraint.Motor(self, enttbl.Base, 0, enttbl.Bone, Vector(), enttbl.LPos, enttbl.friction, 1000, 0, 0, false, ply, enttbl.forcelimit)
 		self:SetWheelBase(enttbl.Base)
@@ -1000,7 +1000,7 @@ registerSent("gmod_wire_wheel", {
 		self:SetAxis(axis)
 		self:DoDirectionEffect()
 	end,
-	
+
 	{
 		["Model"] = {TYPE_STRING, "models/props_vehicles/carparts_wheel01a.mdl"},
 		["Base"] = {TYPE_ENTITY, nil},
@@ -1018,7 +1018,7 @@ registerSent("gmod_wire_wheel", {
 
 registerSent("gmod_wire_gyroscope", {{
 	["Model"] = {TYPE_STRING, "models/bull/various/gyroscope.mdl"},
-	["out180"] = {TYPE_BOOL,   false},
+	["out180"] = {TYPE_BOOL, false},
 }})
 
 registerSent("gmod_wire_datasocket", {{
@@ -1055,21 +1055,21 @@ registerSent("gmod_wire_expression2", {
 		self._outputs = {{}, {}}
 		self._vars = {}
 		self.filepath = "generic_starfall.txt"
-		
+
 		local inc_files = {}
 		for path, code in pairs(self.inc_files) do
 			checkluatype(path, TYPE_STRING, 3, "Parameter: inc_files[" .. path .. "]")
 			checkluatype(code, TYPE_STRING, 3, "Parameter: inc_files[" .. path .. "]")
-			
+
 			inc_files[path] = code
 		end
 		self.inc_files = inc_files
-	end,	
+	end,
 	{
 		["Model"] = {TYPE_STRING, "models/beer/wiremod/gate_e2.mdl"},
 		["_name"] = {TYPE_STRING, "Generic"},
 		["_original"] = {TYPE_STRING, "print(\"Hello World!\")"},
-		["inc_files"] = {TYPE_TABLE,  {}},
+		["inc_files"] = {TYPE_TABLE, {}},
 	}
 })
 
