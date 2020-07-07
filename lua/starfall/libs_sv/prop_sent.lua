@@ -14,6 +14,17 @@ local function castColor(tbl, allow_alpha)
 	       allow_alpha and tonumber(tbl[4] or tbl.a) or 255
 end
 
+local function stringsOnlyTable(tbl)
+	local r = {}
+	for k, v in pairs(tbl) do if isstring(v) then r[#r+1] = v end end
+	return r
+end
+local function stringsOnlyTableTable(tbl)
+	local r = {}
+	for k, v in pairs(tbl) do if istable(v) then r[#r+1] = stringsOnlyTable(v) end end
+	return r
+end
+
 -- Function to generate some docs, it aint fancy but works i guess
 local function genDocs()
 	local tostr = {
@@ -98,7 +109,7 @@ registerSent("gmod_balloon", {
 	{
 		model = {"Model",  TYPE_STRING, "models/maxofs2d/balloon_classic.mdl"},
 		force = {"force",  TYPE_NUMBER, 500},
-		color = {"_color", TYPE_TABLE,  {255, 255, 255}},
+		color = {"_color", castColor,  {255, 255, 255}},
 	}
 })
 
@@ -157,7 +168,7 @@ registerSent("gmod_lamp", {
 		brightness = {"brightness", TYPE_NUMBER, 4},
 		toggle     = {"toggle",     TYPE_BOOL,   true},
 		starton    = {"on",         TYPE_BOOL,   false},
-		color      = {"_color",     TYPE_TABLE,  {255, 255, 255}},
+		color      = {"_color",     castColor,  {255, 255, 255}},
 	}
 })
 
@@ -173,7 +184,7 @@ registerSent("gmod_light", {
 		brightness = {"Brightness", TYPE_NUMBER, 2},
 		toggle     = {"toggle",     TYPE_BOOL,   true},
 		starton    = {"on",         TYPE_BOOL,   false},
-		color      = {"_color",     TYPE_TABLE,  {255, 255, 255}},
+		color      = {"_color",     castColor,  {255, 255, 255}},
 	}
 })
 
@@ -205,7 +216,7 @@ registerSent("gmod_wire_spawner", {
 		undo_delay   = {"undo_delay",   TYPE_NUMBER, 0},
 		spawn_effect = {"spawn_effect", TYPE_NUMBER, 0},
 		mat          = {"mat",          TYPE_STRING, ""},
-		color        = {"_color",       TYPE_TABLE,  {255, 255, 255, 255}},
+		color        = {"_color",       castColor,  {255, 255, 255, 255}},
 		skin         = {"skin",         TYPE_NUMBER, 0},
 	}
 })
@@ -379,8 +390,8 @@ registerSent("gmod_wire_textscreen", {
 		textjust   = {"textJust",   TYPE_NUMBER, 1},
 		valign     = {"valign",     TYPE_NUMBER, 0},
 		tfont      = {"tfont",      TYPE_STRING, "Arial"},
-		fgcolor    = {"_fgcolor",   TYPE_TABLE,  {255, 255, 255}},
-		bgcolor    = {"_bgcolor",   TYPE_TABLE,  {0, 0, 0}},
+		fgcolor    = {"_fgcolor",   castColor,  {255, 255, 255}},
+		bgcolor    = {"_bgcolor",   castColor,  {0, 0, 0}},
 	}
 })
 
@@ -401,7 +412,7 @@ registerSent("gmod_wire_textreceiver", {
 	{
 		model           = {"Model",           TYPE_STRING, "models/jaanus/wiretool/wiretool_range.mdl"},
 		useluapatterns  = {"UseLuaPatterns",  TYPE_BOOL,   false},
-		matches         = {"_matches",        TYPE_TABLE,  {"Hello World"}},
+		matches         = {"_matches",        stringsOnlyTable,  {"Hello World"}},
 		caseinsensitive = {"CaseInsensitive", TYPE_BOOL,   true},
 	}
 })
@@ -446,7 +457,7 @@ registerSent("gmod_wire_target_finder", {
 		steamname      = {"steamname",      TYPE_STRING, ""},
 		colorcheck     = {"colorcheck",     TYPE_BOOL,   false},
 		colortarget    = {"colortarget",    TYPE_BOOL,   false},
-		pcolor         = {"_pcolor",        TYPE_TABLE,  {255, 255, 255, 255}},
+		pcolor         = {"_pcolor",        castColor,  {255, 255, 255, 255}},
 		checkbuddylist = {"checkbuddylist", TYPE_BOOL,   false},
 		onbuddylist    = {"onbuddylist",    TYPE_BOOL,   false},
 	}
@@ -474,7 +485,7 @@ registerSent("gmod_wire_trail", {
 	end,
 
 	{
-		color      = {"_color",      TYPE_TABLE,  {255, 255, 255, 255}},
+		color      = {"_color",      castColor,  {255, 255, 255, 255}},
 		length     = {"_length",     TYPE_NUMBER, 5},
 		start_size = {"_start_size", TYPE_NUMBER, 32},
 		end_size   = {"_end_size",   TYPE_NUMBER, 0},
@@ -715,7 +726,7 @@ registerSent("gmod_wire_light", {
 		glow        = {"glow",        TYPE_BOOL,   false},
 		brightness  = {"brightness",  TYPE_NUMBER, 2},
 		size        = {"size",        TYPE_NUMBER, 256},
-		color       = {"_color",      TYPE_TABLE,  {255, 255, 255}},
+		color       = {"_color",      castColor,  {255, 255, 255}},
 	}
 })
 
@@ -726,7 +737,7 @@ registerSent("gmod_wire_lamp", {
 	
 	{
 		model      = {"Model",      TYPE_STRING, "models/lamps/torch.mdl"},
-		color      = {"_color",     TYPE_TABLE,  {255, 255, 255}},
+		color      = {"_color",     castColor,  {255, 255, 255}},
 		texture    = {"Texture",    TYPE_STRING, "effects/flashlight001"},
 		fov        = {"FOV",        TYPE_NUMBER, 90},
 		dist       = {"Dist",       TYPE_NUMBER, 1024},
@@ -776,9 +787,9 @@ registerSent("gmod_wire_indicator", {
 	{
 		model  = {"Model",   TYPE_STRING, "models/segment.mdl"},
 		a      = {"a",       TYPE_NUMBER, 0},
-		acolor = {"_acolor", TYPE_TABLE,  {255, 0, 0, 255}},
+		acolor = {"_acolor", castColor,  {255, 0, 0, 255}},
 		b      = {"b",       TYPE_NUMBER, 1},
-		bcolor = {"_bcolor", TYPE_TABLE,  {0, 255, 0, 255}},
+		bcolor = {"_bcolor", castColor,  {0, 255, 0, 255}},
 	}
 })
 
@@ -840,9 +851,9 @@ registerSent("gmod_wire_hudindicator", {
 	{
 		model           = {"Model",           TYPE_STRING, "models/jaanus/wiretool/wiretool_siren.mdl"},
 		a               = {"a",               TYPE_NUMBER, 0},
-		acolor          = {"_acolor",         TYPE_TABLE,  {255, 0, 0, 255}},
+		acolor          = {"_acolor",         castColor,  {255, 0, 0, 255}},
 		b               = {"b",               TYPE_NUMBER, 1},
-		bcolor          = {"_bcolor",         TYPE_TABLE,  {0, 255, 0, 255}},
+		bcolor          = {"_bcolor",         castColor,  {0, 255, 0, 255}},
 		material        = {"material",        TYPE_STRING, "models/debug/debugwhite"},
 		showinhud       = {"showinhud",       TYPE_BOOL,   false},
 		huddesc         = {"huddesc",         TYPE_STRING, ""},
@@ -972,8 +983,8 @@ registerSent("gmod_wire_dynamic_button", {
 		entityout    = {"entityout",    TYPE_BOOL,   false},
 		material_on  = {"material_on",  TYPE_STRING, "bull/dynamic_button_1"},
 		material_off = {"material_off", TYPE_STRING, "bull/dynamic_button_0"},
-		color_on     = {"_color_on",    TYPE_TABLE,  {0, 255, 0, 255}},
-		color_off    = {"_color_off",   TYPE_TABLE,  {255, 0, 0, 255}},
+		color_on     = {"_color_on",    castColor,  {0, 255, 0, 255}},
+		color_off    = {"_color_off",   castColor,  {255, 0, 0, 255}},
 	}
 })
 
@@ -1025,7 +1036,7 @@ registerSent("gmod_wire_value", {
 	
 	{
 		model = {"Model", TYPE_STRING, "models/kobilica/value.mdl"},
-		value = {"_value", TYPE_TABLE,  {{"NORMAL", "123"}, {"VECTOR4", "1, 2, 3, 4"}}},
+		value = {"_value", stringsOnlyTableTable,  {{"NORMAL", "123"}, {"VECTOR4", "1, 2, 3, 4"}}},
 	}
 })
 
@@ -1117,7 +1128,7 @@ registerSent("gmod_wire_expression2", {
 	{
 		model     = {"Model",     TYPE_STRING, "models/beer/wiremod/gate_e2.mdl"},
 		code      = {"_original", TYPE_STRING, "print(\"Hello World!\")"},
-		includes  = {"_includes", TYPE_TABLE,  {}},
+		includes  = {"_includes", stringsOnlyTable,  {}},
 	}
 })
 
