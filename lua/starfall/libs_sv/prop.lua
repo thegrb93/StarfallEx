@@ -467,6 +467,11 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		local enttbl = {}
 		local sentparams = sent2[1]
 		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
+		if data.Model and isstring(data.Model) then
+			data.Model = SF.NormalizePath(data.Model)
+			if not (util.IsValidModel(data.Model) and util.IsValidProp(data.Model)) then SF.Throw("Invalid model", 2) end
+			if ply ~= NULL and gamemode.Call("PlayerSpawnProp", ply, data.Model)==false then SF.Throw("Another hook prevented the model for this SENT", 2) end
+		end
 
 		for k, v in pairs(data) do
 			if not sentparams[k] then SF.Throw("Invalid parameter in data: " .. tostring(k), 2) end
@@ -479,16 +484,16 @@ function props_library.createSent(pos, ang, class, frozen, data)
 			if value~=nil then
 				value = ounwrap(value) or value
 				
-				if isfunction(org[2]) then
-					checkluatype(value, TYPE_TABLE, nil, "Parameter: " .. param)
-					enttbl[org[1]] = org[2](value)
+				if org[1]==TYPE_COLOR then
+					if not IsColor(value) then SF.ThrowTypeError("Color", SF.GetType(value), 2, "Parameter: " .. param) end
+					enttbl[param] = value
 				else
-					checkluatype(value, org[2], nil, "Parameter: " .. param)
-					enttbl[org[1]] = value
+					checkluatype(value, org[1], nil, "Parameter: " .. param)
+					enttbl[param] = value
 				end
 				
-			elseif org[3]~=nil then
-				enttbl[org[1]] = org[3]
+			elseif org[2]~=nil then
+				enttbl[param] = org[2]
 			else
 				SF.Throw("Missing data parameter: " .. param, 2)
 			end
@@ -512,7 +517,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		end
 		
 		if entity.PreEntityCopy then
-			entity:PreEntityCopy()
+			entity:PreEntityCopy() -- To build dupe modifiers
 		end
 		if entity.PostEntityPaste then
 			entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
