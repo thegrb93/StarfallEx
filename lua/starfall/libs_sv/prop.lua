@@ -279,13 +279,13 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 end
 
 --- Get a list of all spawnable sents.
--- @param ordered True to get an ordered list
+-- @param categorized True to get an categorized list
 -- @return The table
-function props_library.getSpawnableSents(ordered)
+function props_library.getSpawnableSents(categorized)
 	local tbl = {}
 	
 	local add
-	if ordered then
+	if categorized then
 		add = function(list_name)
 			tbl[list_name] = {}
 			for class, _ in pairs(list.GetForEdit(list_name)) do
@@ -491,7 +491,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 					enttbl[org[1]] = value
 				end
 				
-			elseif org[3] then
+			elseif org[3]~=nil then
 				enttbl[org[1]] = org[3]
 			else
 				SF.Throw("Missing data parameter: " .. param, 2)
