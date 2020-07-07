@@ -358,7 +358,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		hookcall = "PlayerSpawnedSWEP"
 	elseif sent then
 		if ply ~= NULL then
-			if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
+			if sent.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
 		end
 
@@ -378,7 +378,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		hookcall = "PlayerSpawnedSENT"
 	elseif npc then
 		if ply ~= NULL then
-			if (npc.AdminOnly and not ply:IsAdmin()) then SF.Throw("This npc is admin only!", 2) end
+			if npc.AdminOnly and not ply:IsAdmin() then SF.Throw("This npc is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnNPC", ply, class, "") == false then SF.Throw("Another hook prevented the npc from spawning", 2) end
 		end
 
@@ -460,15 +460,20 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		hookcall = "PlayerSpawnedVehicle"
 	elseif sent2 then
 		if ply ~= NULL then
-			if (scripted_ents.GetStored(class).t.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
+			if scripted_ents.GetStored(class).t.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
 		end
 		
 		local enttbl = {}
-		data = data or {}
-		
+		local sentparams = sent2[1]
+		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
+
+		for k, v in pairs(data) do
+			if not sentparams[k] then SF.Throw("Invalid parameter in data: " .. tostring(k), 2) end
+		end
+
 		-- Apply data
-		for param, org in pairs(sent2[1]) do
+		for param, org in pairs(sentparams) do
 			local value = data[param]
 			
 			if value then
