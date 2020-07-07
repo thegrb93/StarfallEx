@@ -3,9 +3,6 @@ local function registerSent(class, data)
 	list.Set("starfall_creatable_sent", class, data)
 end
 
--- Make them accessable globally
-SF.RegisterPropSent = registerSent
-
 ----------------------------------------
 -- Sent registering
 local checkluatype = SF.CheckLuaType
@@ -1009,7 +1006,36 @@ registerSent("gmod_wire_expression2", {
 end
 end)
 
-----------------------------------------
--- So the library doesn't produce an error when loaded
+function SF.PrintCustomSENTDocs()
+	local tostr = {
+		table = table.ToString,
+		Vector = function(x) return string.format("Vector(%s, %s, %s)", x[1], x[2], x[3]) end,
+		Angle = function(x) return string.format("Angle(%s, %s, %s)", x[1], x[2], x[3]) end,
+	}
+
+	local sorted = {}
+	for class, data in pairs(list.Get("starfall_creatable_sent")) do
+		sorted[#sorted+1] = {class = class, classlower = string.lower(class), data = data}
+	end
+	table.SortByMember(sorted, "classlower")
+
+	local classes = {"--- "}
+	for _, data in pairs(sorted) do
+		local str = {"-- > " .. data.class}
+		for param, org in pairs(data.data[1]) do
+			local typ = SF.TypeName(org[2])
+			table.insert(str, string.format("-- %s %s = %q", typ, param, tostr[typ] and tostr[typ](org[3]) or org[3]))
+		end
+
+		table.insert(str, "-- ")
+		table.insert(classes, table.concat(str, "\n"))
+	end
+
+	table.insert(classes, "-- @name props_library.SENT_Data_Structures\n-- @class table")
+
+	for _, str in ipairs(classes) do
+		print(str)
+	end
+end
 
 return function() end
