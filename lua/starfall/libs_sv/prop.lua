@@ -476,7 +476,7 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		for param, org in pairs(sentparams) do
 			local value = data[param]
 			
-			if value then
+			if value~=nil then
 				value = ounwrap(value) or value
 				
 				if isfunction(org[2]) then
