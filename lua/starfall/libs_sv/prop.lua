@@ -481,9 +481,20 @@ function props_library.createSent(pos, ang, class, frozen, data)
 				
 				checkluatype(value, org[2], nil, "Parameter: " .. param)
 				
-				enttbl[org[1]] = value
-			else
+				if istable(value) then
+					if isnumber(value[1]) and isnumber(value[2]) and isnumber(value[3]) and isnumber(value[4]) then
+						enttbl[org[1]] = Color(value[1], value[2], value[3], value[4])
+					else
+						SF.Throw("Invalid table for data parameter: " .. param, 2)
+					end
+				else
+					enttbl[org[1]] = value
+				end
+				
+			elseif org[3] then
 				enttbl[org[1]] = org[3]
+			else
+				SF.Throw("Missing data parameter: " .. param, 2)
 			end
 		end
 		
