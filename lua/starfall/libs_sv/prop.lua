@@ -314,7 +314,7 @@ end
 -- @param ang Angle of created sent
 -- @param class Class of created sent
 -- @param frozen True to spawn frozen
--- @param data Optional table, additional entity data to be supplied
+-- @param data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
 -- @return The sent object
 function props_library.createSent(pos, ang, class, frozen, data)
