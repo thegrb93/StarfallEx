@@ -1012,7 +1012,7 @@ function SF.PrintCustomSENTDocs()
 		table = table.ToString,
 		Vector = function(x) return string.format("Vector(%s, %s, %s)", x[1], x[2], x[3]) end,
 		Angle = function(x) return string.format("Angle(%s, %s, %s)", x[1], x[2], x[3]) end,
-		Color = function(x) return string.format("Color(%s, %s, %s)", x[1], x[2], x[3]) end,
+		Color = function(x) return string.format("Color(%s, %s, %s)", x.r, x.g, x.b) end,
 	}
 
 	local sorted = {}
@@ -1665,9 +1665,9 @@ return function() end
 -- boolean UseLuaPatterns = false
 -- 
 -- > gmod_wire_textscreen
--- Color bgcolor = Color(nil, nil, nil)
+-- Color bgcolor = Color(0, 0, 0)
 -- number chrPerLine = 6
--- Color fgcolor = Color(nil, nil, nil)
+-- Color fgcolor = Color(255, 255, 255)
 -- string Model = "models/kobilica/wiremonitorbig.mdl"
 -- string text = ""
 -- number textJust = 1
@@ -1687,7 +1687,7 @@ return function() end
 -- string uweffect = "same"
 -- 
 -- > gmod_wire_trail
--- Color Color = Color(nil, nil, nil)
+-- Color Color = Color(255, 255, 255)
 -- number EndSize = 0
 -- number Length = 5
 -- string Material = "trails/lol"
