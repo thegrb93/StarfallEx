@@ -18,7 +18,7 @@ local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wr
 local plywrap = instance.Types.Player.Wrap
 
 local function convert(results, func)
-	if func then checkluatype (func, TYPE_FUNCTION) end
+	if func~=nil then checkluatype (func, TYPE_FUNCTION) end
 	local wrap = instance.WrapObject
 
 	local t = {}

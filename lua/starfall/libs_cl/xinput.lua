@@ -88,7 +88,7 @@ xinput_library.getControllers = xinput.getControllers
 -- @param hardPercent A number between 0.0-1.0 for how much the hard rumble motor should vibrate.
 function xinput_library.setRumble(id, softPercent, hardPercent)
 	-- This longer function makes sure that the rumble doesn't continue when the instance is gone.
-	SF.CheckLuaType(id, TYPE_NUMBER)
+	checkluatype(id, TYPE_NUMBER)
 	id = math.floor(id)
 	xinput.setRumble(id, softPercent, hardPercent) -- Does the rest of the type checking
 	instance.data.xinputRumble[id][1] = softPercent

@@ -69,7 +69,7 @@ function http_library.get(url, callbackSuccess, callbackFail, headers)
 	checkluatype(url, TYPE_STRING)
 	checkluatype(callbackSuccess, TYPE_FUNCTION)
 	if callbackFail ~= nil then checkluatype(callbackFail, TYPE_FUNCTION) end
-	if headers ~= nil then
+	if headers~=nil then
 		checkluatype(headers, TYPE_TABLE)
 		for k, v in pairs(headers) do
 			if not isstring(k) or not isstring(v) then

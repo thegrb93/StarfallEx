@@ -84,7 +84,7 @@ function ents_methods:setParent(parent, attachment)
 
 		ent:SetParent(parentent)
 
-		if attachment then
+		if attachment~=nil then
 			checkluatype(attachment, TYPE_STRING)
 			ent:Fire("SetParentAttachmentMaintainOffset", attachment, 0.01)
 		end
@@ -430,7 +430,7 @@ function ents_methods:ignite(length, radius)
 
 	checkpermission(instance, ent, "entities.ignite")
 
-	if radius then
+	if radius~=nil then
 		checkluatype(radius, TYPE_NUMBER)
 		local obbmins, obbmaxs = ent:OBBMins(), ent:OBBMaxs()
 		radius = math.Clamp(radius, 0, (obbmaxs.x - obbmins.x + obbmaxs.y - obbmins.y) / 2)

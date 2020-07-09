@@ -320,7 +320,7 @@ else
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		if val then
+		if val~=nil then
 			checkluatype(val, TYPE_NUMBER)
 			holo.filter_mag = val
 		else
@@ -336,7 +336,7 @@ else
 
 		checkpermission(instance, holo, "hologram.setRenderProperty")
 
-		if val then
+		if val~=nil then
 			checkluatype(val, TYPE_NUMBER)
 			holo.filter_min = val
 		else

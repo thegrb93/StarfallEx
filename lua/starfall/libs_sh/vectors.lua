@@ -37,9 +37,9 @@ end
 -- @param z - Z
 -- @return Vector
 function instance.env.Vector(x, y, z)
-	if x then checkluatype(x, TYPE_NUMBER) else x = 0 end
-	if z then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
-	if y then checkluatype(y, TYPE_NUMBER) else y = x end
+	if x~=nil then checkluatype(x, TYPE_NUMBER) else x = 0 end
+	if z~=nil then checkluatype(z, TYPE_NUMBER) else z = (y and 0 or x) end
+	if y~=nil then checkluatype(y, TYPE_NUMBER) else y = x end
 	return wrap({ x, y, z })
 end
 

@@ -116,7 +116,7 @@ end
 -- @param fade Time in seconds to fade out, if nil or 0 the sound stops instantly.
 function sound_methods:stop(fade)
 	checkpermission(instance, nil, "sound.modify")
-	if fade then
+	if fade~=nil then
 		checkluatype(fade, TYPE_NUMBER)
 		unwrap(self):FadeOut(math.max(fade, 0))
 	else
@@ -147,7 +147,7 @@ function sound_methods:setVolume(vol, fade)
 	checkpermission(instance, nil, "sound.modify")
 	checkluatype(vol, TYPE_NUMBER)
 
-	if fade then
+	if fade~=nil then
 		checkluatype (fade, TYPE_NUMBER)
 		fade = math.abs(fade, 0)
 	else
@@ -165,7 +165,7 @@ function sound_methods:setPitch(pitch, fade)
 	checkpermission(instance, nil, "sound.modify")
 	checkluatype(pitch, TYPE_NUMBER)
 
-	if fade then
+	if fade~=nil then
 		checkluatype (fade, TYPE_NUMBER)
 		fade = math.max(fade, 0)
 	else

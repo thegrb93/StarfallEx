@@ -89,7 +89,7 @@ end
 --@param unreliable Optional choose whether it's more important for the message to actually reach its destination (false) or reach it as fast as possible (true).
 function net_library.send(target, unreliable)
 	if target~=nil then checkluatype(target, TYPE_TABLE) end
-	if unreliable then checkluatype(unreliable, TYPE_BOOL) end
+	if unreliable~=nil then checkluatype(unreliable, TYPE_BOOL) end
 	if not instance.data.net.started then SF.Throw("net message not started", 2) end
 
 	local newtarget

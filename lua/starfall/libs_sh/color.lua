@@ -39,10 +39,10 @@ end
 -- @param a - Alpha
 -- @return New color
 instance.env.Color = function (r, g, b, a)
-	if r then checkluatype(r, TYPE_NUMBER) else r = 255 end
-	if g then checkluatype(g, TYPE_NUMBER) else g = 255 end
-	if b then checkluatype(b, TYPE_NUMBER) else b = 255 end
-	if a then checkluatype(a, TYPE_NUMBER) else a = 255 end
+	if r~=nil then checkluatype(r, TYPE_NUMBER) else r = 255 end
+	if g~=nil then checkluatype(g, TYPE_NUMBER) else g = 255 end
+	if b~=nil then checkluatype(b, TYPE_NUMBER) else b = 255 end
+	if a~=nil then checkluatype(a, TYPE_NUMBER) else a = 255 end
 	return wrap({ r, g, b, a })
 end
 

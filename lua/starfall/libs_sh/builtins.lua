@@ -50,7 +50,7 @@ end
 --- Same as owner() on the server. On the client, returns the local player
 -- @return Returns player with given UserID or if none specified then returns either the owner (server) or the local player (client)
 function builtins_library.player(num)
-	if num then
+	if num~=nil then
 		checkluatype(num, TYPE_NUMBER)
 		return instance.Types.Player.Wrap(Player(num))
 	end
@@ -612,7 +612,7 @@ end
 -- @return Table of return values of the scripts
 function builtins_library.requiredir(dir, loadpriority)
 	checkluatype(dir, TYPE_STRING)
-	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
+	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
 
 	local path
 	if string.sub(dir, 1, 1)=="/" then
@@ -681,7 +681,7 @@ end
 -- @return Table of return values of the scripts
 function builtins_library.dodir(dir, loadpriority)
 	checkluatype(dir, TYPE_STRING)
-	if loadpriority then checkluatype(loadpriority, TYPE_TABLE) end
+	if loadpriority~=nil then checkluatype(loadpriority, TYPE_TABLE) end
 
 	local returns = {}
 	local alreadyRequired = {}
@@ -758,7 +758,7 @@ end
 -- @return DebugInfo table
 function builtins_library.debugGetInfo(funcOrStackLevel, fields)
 	if not isfunction(funcOrStackLevel) and not isnumber(funcOrStackLevel) then SF.ThrowTypeError("function or number", SF.GetType(TfuncOrStackLevel), 2) end
-	if fields then checkluatype(fields, TYPE_STRING) end
+	if fields~=nil then checkluatype(fields, TYPE_STRING) end
 
 	local ret = debug.getinfo(funcOrStackLevel, fields)
 	if ret then

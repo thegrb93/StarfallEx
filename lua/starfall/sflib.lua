@@ -699,10 +699,7 @@ end
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
 -- @param msg Optional error message
 function SF.CheckLuaType(val, typ, level, msg)
-	local valtype = TypeID(val)
-	if valtype == typ then
-		return val
-	else
+	if TypeID(val) ~= typ then
 		-- Failed, throw error
 		assert(isnumber(typ))
 		

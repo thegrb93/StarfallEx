@@ -1334,8 +1334,8 @@ function render_library.drawSimpleText(x, y, text, xalign, yalign)
 	checkluatype (x, TYPE_NUMBER)
 	checkluatype (y, TYPE_NUMBER)
 	checkluatype (text, TYPE_STRING)
-	if xalign then checkluatype (xalign, TYPE_NUMBER) end
-	if yalign then checkluatype (yalign, TYPE_NUMBER) end
+	if xalign~=nil then checkluatype (xalign, TYPE_NUMBER) end
+	if yalign~=nil then checkluatype (yalign, TYPE_NUMBER) end
 
 	local font = renderdata.font or defaultFont
 

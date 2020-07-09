@@ -35,9 +35,9 @@ end
 -- @param r - Roll
 -- @return Angle
 instance.env.Angle = function (p, y, r)
-	if p then checkluatype(p, TYPE_NUMBER) else p = 0 end
-	if y then checkluatype(y, TYPE_NUMBER) else y = p end
-	if r then checkluatype(r, TYPE_NUMBER) else r = p end
+	if p~=nil then checkluatype(p, TYPE_NUMBER) else p = 0 end
+	if y~=nil then checkluatype(y, TYPE_NUMBER) else y = p end
+	if r~=nil then checkluatype(r, TYPE_NUMBER) else r = p end
 	return wrap({ p, y, r })
 end
 
