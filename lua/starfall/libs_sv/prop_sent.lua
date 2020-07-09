@@ -10,7 +10,7 @@ local checkluatype = SF.CheckLuaType
 -- Basic Gmod sents
 registerSent("gmod_balloon", {{
 	["Model"] = {TYPE_STRING, "models/maxofs2d/balloon_classic.mdl"},
-	["force"] = {TYPE_NUMBER, 500},
+	["force"] = {TYPE_NUMBER},
 	["r"] = {TYPE_NUMBER, 255},
 	["g"] = {TYPE_NUMBER, 255},
 	["b"] = {TYPE_NUMBER, 255},
@@ -19,20 +19,20 @@ registerSent("gmod_balloon", {{
 registerSent("gmod_button", {{
 	["Model"] = {TYPE_STRING, "models/maxofs2d/button_05.mdl"},
 	["description"] = {TYPE_STRING, ""},
-	["key"] = {TYPE_NUMBER, -1},
+	["key"] = {TYPE_NUMBER},
 	["toggle"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_cameraprop", {{
 	["Model"] = {TYPE_STRING, "models/dav0r/camera.mdl"},
-	["controlkey"] = {TYPE_NUMBER, -1},
+	["controlkey"] = {TYPE_NUMBER},
 	["locked"] = {TYPE_BOOL, false},
 	["toggle"] = {TYPE_BOOL, true},
 }})
 
 registerSent("gmod_dynamite", {{
 	["Model"] = {TYPE_STRING, "models/dav0r/tnt/tnt.mdl"},
-	["key"] = {TYPE_NUMBER, -1},
+	["key"] = {TYPE_NUMBER},
 	["Damage"] = {TYPE_NUMBER, 200},
 	["delay"] = {TYPE_NUMBER, 0},
 	["remove"] = {TYPE_BOOL, false},
@@ -40,8 +40,8 @@ registerSent("gmod_dynamite", {{
 
 registerSent("gmod_emitter", {{
 	["Model"] = {TYPE_STRING, "models/props_lab/tpplug.mdl"},
-	["effect"] = {TYPE_STRING, "sparks"},
-	["key"] = {TYPE_NUMBER, -1},
+	["effect"] = {TYPE_STRING},
+	["key"] = {TYPE_NUMBER},
 	["delay"] = {TYPE_NUMBER, 0},
 	["scale"] = {TYPE_NUMBER, 1},
 	["toggle"] = {TYPE_BOOL, true},
@@ -1008,23 +1008,31 @@ end)
 
 function SF.PrintCustomSENTDocs()
 	local tostr = {
+		string = function(x) return "\"" .. x .. "\"" end,
 		table = table.ToString,
 		Vector = function(x) return string.format("Vector(%s, %s, %s)", x[1], x[2], x[3]) end,
 		Angle = function(x) return string.format("Angle(%s, %s, %s)", x[1], x[2], x[3]) end,
+		Color = function(x) return string.format("Color(%s, %s, %s)", x[1], x[2], x[3]) end,
 	}
 
 	local sorted = {}
-	for class, data in pairs(list.Get("starfall_creatable_sent")) do
+	for class, data in pairs(list.GetForEdit("starfall_creatable_sent")) do
 		sorted[#sorted+1] = {class = class, classlower = string.lower(class), data = data}
 	end
 	table.SortByMember(sorted, "classlower")
 
 	local classes = {"--- "}
-	for _, data in pairs(sorted) do
+	for _, data in ipairs(sorted) do
 		local str = {"-- > " .. data.class}
 		for param, org in pairs(data.data[1]) do
-			local typ = SF.TypeName(org[2])
-			table.insert(str, string.format("-- %s %s = %q", typ, param, tostr[typ] and tostr[typ](org[3]) or org[3]))
+			local typ = SF.TypeName(org[1])
+			local def
+			if org[2]~=nil then
+				def = " = " .. (tostr[typ] and tostr[typ](org[2]) or tostring(org[2]))
+			else
+				def = ""
+			end
+			table.insert(str, "-- " .. typ .. " " .. param .. def)
 		end
 
 		table.insert(str, "-- ")
@@ -1039,3 +1047,721 @@ function SF.PrintCustomSENTDocs()
 end
 
 return function() end
+
+--- 
+-- > gmod_wire_wheel
+-- number stop = 0
+-- Vector LPos = Vector(0, 0, 0)
+-- Entity Base
+-- number bck = -1
+-- number forcelimit = 0
+-- number friction = 1
+-- number fwd = 1
+-- number BaseTorque = 3000
+-- number Bone = 0
+-- string Model = "models/props_vehicles/carparts_wheel01a.mdl"
+-- Vector LAxis = Vector(0, 1, 0)
+-- 
+-- > gmod_wire_weight
+-- string Model = "models/props_interiors/pot01a.mdl"
+-- 
+-- > gmod_wire_waypoint
+-- string Model = "models/props_lab/powerbox02d.mdl"
+-- number range = 150
+-- 
+-- > gmod_wire_watersensor
+-- string Model = "models/beer/wiremod/watersensor.mdl"
+-- 
+-- > gmod_wire_vehicle
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_vectorthruster
+-- string soundname = ""
+-- string uweffect = "same"
+-- boolean bidir = true
+-- string oweffect = "fire"
+-- number mode = 0
+-- boolean uwater = true
+-- boolean angleinputs = false
+-- number force = 1500
+-- boolean lengthismul = false
+-- boolean owater = true
+-- number force_max = 10000
+-- string Model = "models/jaanus/wiretool/wiretool_speed.mdl"
+-- number force_min = 0
+-- 
+-- > gmod_wire_value
+-- string Model = "models/kobilica/value.mdl"
+-- table value
+-- 
+-- > gmod_wire_user
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number Range = 200
+-- 
+-- > gmod_wire_twoway_radio
+-- string Model = "models/props_lab/binderblue.mdl"
+-- 
+-- > gmod_wire_turret
+-- number force = 1
+-- number tracernum = 1
+-- number delay = 0.05
+-- string Model = "models/weapons/w_smg1.mdl"
+-- string tracer = "Tracer"
+-- string sound = "0"
+-- number damage = 10
+-- number numbullets = 1
+-- number spread = 0
+-- 
+-- > gmod_wire_trigger
+-- number sizey = 64
+-- number sizez = 64
+-- boolean owneronly = false
+-- number offsety = 0
+-- number offsetz = 0
+-- number filter = 0
+-- number offsetx = 0
+-- number sizex = 64
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_trail
+-- number EndSize = 0
+-- string Material = "trails/lol"
+-- Color Color = Color(nil, nil, nil)
+-- number Length = 5
+-- number StartSize = 32
+-- 
+-- > gmod_wire_thruster
+-- string soundname = ""
+-- string uweffect = "same"
+-- boolean bidir = true
+-- string oweffect = "fire"
+-- boolean uwater = true
+-- number force = 1500
+-- boolean owater = true
+-- number force_max = 10000
+-- string Model = "models/props_c17/lampShade001a.mdl"
+-- number force_min = 0
+-- 
+-- > gmod_wire_textscreen
+-- number textJust = 1
+-- Color bgcolor = Color(nil, nil, nil)
+-- number chrPerLine = 6
+-- Color fgcolor = Color(nil, nil, nil)
+-- string tfont = "Arial"
+-- number valign = 0
+-- string Model = "models/kobilica/wiremonitorbig.mdl"
+-- string text = ""
+-- 
+-- > gmod_wire_textreceiver
+-- boolean CaseInsensitive = true
+-- table Matches
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- boolean UseLuaPatterns = false
+-- 
+-- > gmod_wire_textentry
+-- string Model = "models/beer/wiremod/keyboard.mdl"
+-- 
+-- > gmod_wire_teleporter
+-- boolean UseSounds = true
+-- string Model = "models/props_c17/utilityconducter001.mdl"
+-- boolean UseEffects = true
+-- 
+-- > gmod_wire_target_finder
+-- string propmodel = ""
+-- number pcolG = 255
+-- boolean onbuddylist = false
+-- boolean colortarget = false
+-- number maxbogeys = 1
+-- boolean checkbuddylist = false
+-- string playername = ""
+-- boolean npcs = true
+-- boolean rpgs = false
+-- boolean thrusters = false
+-- boolean casesen = false
+-- number minrange = 1
+-- number range = 1000
+-- number pcolB = 255
+-- boolean hoverballs = false
+-- number pcolA = 255
+-- number pcolR = 255
+-- number maxtargets = 1
+-- string entity = ""
+-- string steamname = ""
+-- boolean players = false
+-- boolean beacons = false
+-- boolean colorcheck = false
+-- string npcname = ""
+-- boolean notownersstuff = false
+-- boolean notargetowner = false
+-- boolean props = false
+-- boolean painttarget = true
+-- string Model = "models/beer/wiremod/targetfinder.mdl"
+-- boolean vehicles = false
+-- 
+-- > gmod_wire_speedometer
+-- boolean z_only = false
+-- boolean AngVel = false
+-- string Model
+-- 
+-- > gmod_wire_spawner
+-- number spawn_effect = 0
+-- number g = 255
+-- string mat = ""
+-- number a = 255
+-- number skin = 0
+-- number delay = 0
+-- number r = 255
+-- number b = 255
+-- string Model
+-- number undo_delay = 0
+-- 
+-- > gmod_wire_soundemitter
+-- string Model = "models/cheeze/wires/speaker.mdl"
+-- string sound = "synth/square.wav"
+-- 
+-- > gmod_wire_socket
+-- number WeldForce = 5000
+-- number AttachRange = 5
+-- string Model = "models/props_lab/tpplugholder_single.mdl"
+-- boolean ArrayInput = false
+-- 
+-- > gmod_wire_simple_explosive
+-- boolean removeafter = false
+-- number radius = 300
+-- number damage = 200
+-- string Model = "models/props_c17/oildrum001_explosive.mdl"
+-- number key = 1
+-- 
+-- > gmod_wire_sensor
+-- boolean velocity_normalized = false
+-- boolean outdist = true
+-- boolean direction_vector = false
+-- boolean gpscord = false
+-- boolean target_velocity = false
+-- boolean outbrng = false
+-- boolean xyz_mode = false
+-- string Model
+-- boolean direction_normalized = false
+-- 
+-- > gmod_wire_screen
+-- boolean FormatTime = false
+-- boolean FormatNumber = false
+-- string TextA = "Value A"
+-- boolean Floor = false
+-- boolean SingleBigFont = true
+-- boolean SingleValue = false
+-- boolean LeftAlign = false
+-- string Model = "models/props_lab/monitor01b.mdl"
+-- string TextB = "Value B"
+-- 
+-- > gmod_wire_relay
+-- number keygroup2 = 2
+-- boolean nokey = false
+-- boolean toggle = true
+-- number keygroup4 = 4
+-- number keygroup1 = 1
+-- number throws = 2
+-- number keygroup3 = 3
+-- number keygroupoff = 0
+-- number normclose = 0
+-- number poles = 1
+-- number keygroup5 = 5
+-- string Model = "models/kobilica/relay.mdl"
+-- 
+-- > gmod_wire_ranger
+-- boolean out_vel = false
+-- boolean hires = false
+-- boolean show_beam = true
+-- number range = 1500
+-- boolean out_ang = false
+-- boolean default_zero = true
+-- boolean out_uid = false
+-- boolean out_pos = false
+-- boolean out_dist = true
+-- boolean trace_water = false
+-- boolean out_val = false
+-- boolean out_eid = false
+-- boolean out_hnrm = false
+-- boolean out_sid = false
+-- boolean ignore_world = false
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- boolean out_col = false
+-- 
+-- > gmod_wire_radio
+-- boolean Secure = false
+-- string Channel = "1"
+-- string Model = "models/props_lab/binderblue.mdl"
+-- number values = 4
+-- 
+-- > gmod_wire_pod
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_pixel
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_output
+-- string Model = "models/beer/wiremod/numpad.mdl"
+-- number key = 1
+-- 
+-- > gmod_wire_oscilloscope
+-- string Model = "models/props_lab/monitor01b.mdl"
+-- 
+-- > gmod_wire_numpad
+-- number value_off = 0
+-- boolean toggle = false
+-- string Model = "models/beer/wiremod/numpad.mdl"
+-- number value_on = 0
+-- 
+-- > gmod_wire_nailer
+-- boolean ShowBeam = true
+-- number Flim = 0
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number Range = 100
+-- 
+-- > gmod_wire_motor
+-- Vector LPos1 = Vector(0, 0, 0)
+-- number Bone1 = 0
+-- number friction = 1
+-- Entity Ent1
+-- Vector LPos2 = Vector(0, 0, 0)
+-- number forcelimit = 0
+-- number torque = 500
+-- number Bone2 = 0
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- Entity Ent2
+-- 
+-- > gmod_wire_locator
+-- string Model = "models/props_lab/powerbox02d.mdl"
+-- 
+-- > gmod_wire_light
+-- number B = 255
+-- number size = 256
+-- number R = 255
+-- boolean glow = false
+-- boolean directional = false
+-- boolean radiant = false
+-- number brightness = 2
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number G = 255
+-- 
+-- > gmod_wire_lever
+-- number Min = 0
+-- number Max = 1
+-- 
+-- > gmod_wire_latch
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_las_receiver
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- 
+-- > gmod_wire_lamp
+-- number Dist = 1024
+-- boolean on = false
+-- number g = 255
+-- number b = 255
+-- number FOV = 90
+-- number r = 255
+-- string Model = "models/lamps/torch.mdl"
+-- number Brightness = 8
+-- string Texture = "effects/flashlight001"
+-- 
+-- > gmod_wire_keypad
+-- boolean Secure
+-- string Password
+-- string Model = "models/props_lab/keypad.mdl"
+-- 
+-- > gmod_wire_keyboard
+-- boolean Synchronous = true
+-- boolean AutoBuffer = true
+-- string Model = "models/jaanus/wiretool/wiretool_input.mdl"
+-- boolean EnterKeyAscii = true
+-- 
+-- > gmod_wire_input
+-- number value_off = 0
+-- boolean toggle = false
+-- number keygroup = 7
+-- string Model = "models/beer/wiremod/numpad.mdl"
+-- number value_on = 1
+-- 
+-- > gmod_wire_indicator
+-- number bb = 0
+-- number aa = 255
+-- number ab = 0
+-- number br = 0
+-- number ag = 0
+-- number b = 1
+-- number ar = 255
+-- number bg = 255
+-- string Model = "models/segment.mdl"
+-- number a = 0
+-- number ba = 255
+-- 
+-- > gmod_wire_igniter
+-- boolean TargetPlayers = false
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number Range = 2048
+-- 
+-- > gmod_wire_hydraulic
+-- Vector LPos1 = Vector(0, 0, 0)
+-- number width = 3
+-- number Bone1 = 0
+-- Entity Ent2
+-- number fixed = 0
+-- Entity Ent1
+-- Vector LPos2 = Vector(0, 0, 0)
+-- boolean stretchonly = false
+-- number speed = 16
+-- number Bone2 = 0
+-- string Model = "models/beer/wiremod/hydraulic.mdl"
+-- string material = "cable/rope"
+-- 
+-- > gmod_wire_hudindicator
+-- boolean hudaddname = false
+-- number fullcircleangle = 0
+-- number br = 0
+-- number ag = 0
+-- number b = 1
+-- number ar = 255
+-- number hudshowvalue = 0
+-- number hudstyle = 0
+-- boolean showinhud = false
+-- number ba = 255
+-- string huddesc = ""
+-- number bb = 0
+-- number aa = 255
+-- number ab = 0
+-- boolean allowhook = true
+-- number bg = 255
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number a = 0
+-- string material = "models/debug/debugwhite"
+-- 
+-- > gmod_wire_hoverball
+-- number strength = 1
+-- boolean starton = true
+-- number speed = 1
+-- string Model = "models/dav0r/hoverball.mdl"
+-- number resistance = 0
+-- 
+-- > gmod_wire_hologrid
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- boolean usegps = false
+-- 
+-- > gmod_wire_holoemitter
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- 
+-- > gmod_wire_hdd
+-- number DriveCap = 128
+-- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
+-- number DriveID = 0
+-- 
+-- > gmod_wire_gyroscope
+-- string Model = "models/bull/various/gyroscope.mdl"
+-- boolean out180 = false
+-- 
+-- > gmod_wire_graphics_tablet
+-- boolean draw_background = true
+-- boolean gmode = false
+-- string Model = "models/kobilica/wiremonitorbig.mdl"
+-- 
+-- > gmod_wire_grabber
+-- boolean Gravity = true
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- number Range = 100
+-- 
+-- > gmod_wire_gpulib_controller
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_gps
+-- string Model = "models/beer/wiremod/gps.mdl"
+-- 
+-- > gmod_wire_gimbal
+-- string Model = "models/props_c17/canister01a.mdl"
+-- 
+-- > gmod_wire_gate
+-- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
+-- string action = "+"
+-- 
+-- > gmod_wire_fx_emitter
+-- string effect = "sparks"
+-- string Model = "models/props_lab/tpplug.mdl"
+-- number delay = 0.07
+-- 
+-- > gmod_wire_friendslist
+-- string Model = "models/kobilica/value.mdl"
+-- boolean save_on_entity = false
+-- 
+-- > gmod_wire_freezer
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_forcer
+-- boolean ShowBeam = true
+-- boolean Reaction = false
+-- number Length = 100
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number Force = 1
+-- 
+-- > gmod_wire_eyepod
+-- number DefaultToZero = 1
+-- number ClampY = 0
+-- number ClampX = 0
+-- number ClampXMax = 0
+-- number ClampXMin = 0
+-- number ClampYMin = 0
+-- number ClampYMax = 0
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number ShowRateOfChange = 1
+-- 
+-- > gmod_wire_extbus
+-- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
+-- 
+-- > gmod_wire_expression2
+-- string _original = "print("Hello World!")"
+-- string _name = "Generic"
+-- string Model = "models/beer/wiremod/gate_e2.mdl"
+-- table inc_files = {}
+-- 
+-- > gmod_wire_explosive
+-- boolean explosionproof = false
+-- boolean explodeatzero = true
+-- number delayreloadtime = 0
+-- boolean resetatexplode = true
+-- boolean bulletproof = false
+-- boolean fireeffect = true
+-- boolean coloreffect = true
+-- number delaytime = 0
+-- number maxhealth = 100
+-- boolean fallproof = false
+-- boolean affectother = false
+-- boolean invisibleatzero = false
+-- number radius = 300
+-- string Model = "models/props_c17/oildrum001_explosive.mdl"
+-- boolean removeafter = false
+-- boolean notaffected = false
+-- number key = 1
+-- number damage = 200
+-- 
+-- > gmod_wire_exit_point
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- 
+-- > gmod_wire_emarker
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_egp_hud
+-- string Model = "models/bull/dynamicbutton.mdl"
+-- 
+-- > gmod_wire_egp_emitter
+-- string Model = "models/bull/dynamicbutton.mdl"
+-- 
+-- > gmod_wire_egp
+-- string Model = "models/kobilica/wiremonitorbig.mdl"
+-- 
+-- > gmod_wire_dynamic_button
+-- number value_off = 0
+-- number on_r = 255
+-- boolean toggle = false
+-- number off_g = 255
+-- number off_b = 255
+-- number off_r = 255
+-- number on_b = 255
+-- string Model = "models/bull/ranger.mdl"
+-- string material_off = "bull/dynamic_button_0"
+-- number value_on = 1
+-- number on_g = 255
+-- string material_on = "bull/dynamic_button_1"
+-- boolean entityout = false
+-- string description = ""
+-- 
+-- > gmod_wire_dual_input
+-- number keygroup2 = 4
+-- boolean toggle = false
+-- number value_on2 = -1
+-- number value_off = 0
+-- number keygroup = 7
+-- string Model = "models/beer/wiremod/numpad.mdl"
+-- number value_on = 1
+-- 
+-- > gmod_wire_digitalscreen
+-- number ScreenHeight = 32
+-- string Model = "models/props_lab/monitor01b.mdl"
+-- number ScreenWidth = 32
+-- 
+-- > gmod_wire_dhdd
+-- string Model
+-- 
+-- > gmod_wire_detonator
+-- string Model = "models/props_combine/breenclock.mdl"
+-- number damage = 1
+-- 
+-- > gmod_wire_datasocket
+-- number WeldForce = 5000
+-- string Model = "models/hammy/pci_slot.mdl"
+-- number AttachRange = 5
+-- 
+-- > gmod_wire_datarate
+-- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
+-- 
+-- > gmod_wire_dataport
+-- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
+-- 
+-- > gmod_wire_data_transferer
+-- boolean DefaultZero = false
+-- boolean IgnoreZero = false
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number Range = 25000
+-- 
+-- > gmod_wire_data_store
+-- string Model = "models/jaanus/wiretool/wiretool_range.mdl"
+-- 
+-- > gmod_wire_data_satellitedish
+-- string Model = "models/props_wasteland/prison_lamp001c.mdl"
+-- 
+-- > gmod_wire_damage_detector
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- boolean includeconstrained = false
+-- 
+-- > gmod_wire_consolescreen
+-- string Model = "models/props_lab/monitor01b.mdl"
+-- 
+-- > gmod_wire_colorer
+-- boolean outColor = false
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- number Range = 2000
+-- 
+-- > gmod_wire_clutch
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_cd_ray
+-- boolean DefaultZero = false
+-- string Model = "models/jaanus/wiretool/wiretool_beamcaster.mdl"
+-- number Range = 64
+-- 
+-- > gmod_wire_cd_disk
+-- number Precision = 4
+-- number Skin = 0
+-- string Model = "models/venompapa/wirecd_medium.mdl"
+-- number IRadius = 10
+-- 
+-- > gmod_wire_cameracontroller
+-- boolean AllowZoom = false
+-- boolean AutoUnclip_IgnoreWater = false
+-- boolean ParentLocal = false
+-- boolean DrawParent = true
+-- boolean DrawPlayer = true
+-- boolean FreeMove = false
+-- boolean AutoUnclip = false
+-- boolean AutoMove = false
+-- boolean LocalMove = false
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_button
+-- number value_off = 0
+-- boolean toggle = false
+-- boolean entityout = false
+-- string description = ""
+-- string Model = "models/props_c17/clock01.mdl"
+-- number value_on = 1
+-- 
+-- > gmod_wire_adv_input
+-- number value_min = 0
+-- number keyless = 1
+-- boolean toggle = false
+-- number value_start = 5
+-- number value_max = 10
+-- number keymore = 3
+-- string Model = "models/beer/wiremod/numpad.mdl"
+-- number speed = 1
+-- 
+-- > gmod_wire_adv_emarker
+-- string Model = "models/jaanus/wiretool/wiretool_siren.mdl"
+-- 
+-- > gmod_wire_addressbus
+-- number Mem2st = 0
+-- number Mem4sz = 0
+-- number Mem3st = 0
+-- number Mem2sz = 0
+-- number Mem1st = 0
+-- number Mem3sz = 0
+-- number Mem4st = 0
+-- string Model = "models/jaanus/wiretool/wiretool_gate.mdl"
+-- number Mem1sz = 0
+-- 
+-- > gmod_thruster
+-- boolean damageable = false
+-- string soundname = "PhysicsCannister.ThrusterLoop"
+-- boolean toggle = false
+-- number force
+-- string effect = "fire"
+-- number key_bck
+-- number key
+-- string Model = "models/props_phx2/garbage_metalcan001a.mdl"
+-- 
+-- > gmod_light
+-- number lightg = 255
+-- number lightr = 255
+-- boolean on = false
+-- number Size = 256
+-- number KeyDown = -1
+-- boolean toggle = true
+-- string Model = "models/maxofs2d/light_tubular.mdl"
+-- number Brightness = 2
+-- number lightb = 255
+-- 
+-- > gmod_lamp
+-- number fov = 90
+-- boolean toggle = true
+-- boolean on = false
+-- number g = 255
+-- number b = 255
+-- string Texture = "effects/flashlight001"
+-- number KeyDown = -1
+-- number r = 255
+-- number distance = 1024
+-- string Model = "models/lamps/torch.mdl"
+-- number brightness = 4
+-- 
+-- > gmod_hoverball
+-- number strength = 1
+-- number resistance = 0
+-- string Model = "models/dav0r/hoverball.mdl"
+-- number key_u = -1
+-- number key_d = -1
+-- number speed = 1
+-- 
+-- > gmod_emitter
+-- number scale = 1
+-- boolean toggle = true
+-- number delay = 0
+-- boolean starton = false
+-- string Model = "models/props_lab/tpplug.mdl"
+-- string effect
+-- number key
+-- 
+-- > gmod_dynamite
+-- boolean remove = false
+-- number delay = 0
+-- number Damage = 200
+-- number key
+-- string Model = "models/dav0r/tnt/tnt.mdl"
+-- 
+-- > gmod_cameraprop
+-- boolean toggle = true
+-- number controlkey
+-- string Model = "models/dav0r/camera.mdl"
+-- boolean locked = false
+-- 
+-- > gmod_button
+-- boolean toggle = true
+-- number key
+-- string Model = "models/maxofs2d/button_05.mdl"
+-- string description = ""
+-- 
+-- > gmod_balloon
+-- number b = 255
+-- number force
+-- number r = 255
+-- string Model = "models/maxofs2d/balloon_classic.mdl"
+-- number g = 255
+-- 
+-- @name props_library.SENT_Data_Structures
+-- @class table
