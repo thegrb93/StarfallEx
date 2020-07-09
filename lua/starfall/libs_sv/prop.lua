@@ -17,7 +17,6 @@ local plyVertexCount = SF.LimitObject("props_custom_vertices", "custom prop vert
 local maxVerticesPerConvex = CreateConVar("sf_props_custom_maxverticesperconvex", "300", FCVAR_ARCHIVE, "The max verteces allowed per convex")
 local maxConvexesPerProp = CreateConVar("sf_props_custom_maxconvexesperprop", "48", FCVAR_ARCHIVE, "The max convexes per prop")
 
-
 --- Library for creating and manipulating physics-less models AKA "Props".
 -- @name prop
 -- @class library
@@ -143,7 +142,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	local mindist = minVertexDistance:GetFloat()^2
 	local maxVerticesPerConvex = maxVerticesPerConvex:GetInt()
 	local maxConvexesPerProp = maxConvexesPerProp:GetInt()
-	
+
 	local totalVertices = 0
 	local streamdata = SF.StringStream()
 	streamdata:writeInt32(#vertices)
@@ -176,7 +175,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	plyVertexCount:free(-totalVertices)
 
 	local propdata = instance.data.props
-	
+
 	local propent = ents.Create("starfall_prop")
 	register(propent, instance)
 	propent.streamdata = streamdata
@@ -184,7 +183,7 @@ function props_library.createCustom(pos, ang, vertices, frozen)
 	propent:SetAngles(ang)
 	propent.Mesh = uwVertices
 	propent:Spawn()
-	
+
 	local physobj = propent:GetPhysicsObject()
 	if not physobj:IsValid() then
 		SF.Throw("Custom prop generated with invalid physics object!", 2)
@@ -279,15 +278,46 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 	return ewrap(comp)
 end
 
+--- Get a list of all spawnable sents.
+-- @param categorized True to get an categorized list
+-- @return The table
+function props_library.getSpawnableSents(categorized)
+	local tbl = {}
+
+	local add
+	if categorized then
+		add = function(list_name)
+			tbl[list_name] = {}
+			for class, _ in pairs(list.GetForEdit(list_name)) do
+				table.insert(tbl[list_name], class)
+			end
+		end
+	else
+		add = function(list_name)
+			for class, _ in pairs(list.GetForEdit(list_name)) do
+				table.insert(tbl, class)
+			end
+		end
+	end
+
+	add("Weapon")
+	add("SpawnableEntities")
+	add("NPC")
+	add("Vehicles")
+	add("starfall_creatable_sent")
+
+	return tbl
+end
+
 --- Creates a sent.
 -- @param pos Position of created sent
 -- @param ang Angle of created sent
 -- @param class Class of created sent
 -- @param frozen True to spawn frozen
+-- @param data Optional table, additional entity data to be supplied to certain SENTs. See prop.SENT_Data_Structures table in Docs for list of SENTs
 -- @server
 -- @return The sent object
-function props_library.createSent(pos, ang, class, frozen)
-
+function props_library.createSent(pos, ang, class, frozen, data)
 	checkpermission(instance,  nil, "prop.create")
 
 	checkluatype(class, TYPE_STRING)
@@ -300,10 +330,11 @@ function props_library.createSent(pos, ang, class, frozen)
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
 
-	local swep = list.Get("Weapon")[class]
-	local sent = list.Get("SpawnableEntities")[class]
-	local npc = list.Get("NPC")[class]
-	local vehicle = list.Get("Vehicles")[class]
+	local swep = list.GetForEdit("Weapon")[class]
+	local sent = list.GetForEdit("SpawnableEntities")[class]
+	local npc = list.GetForEdit("NPC")[class]
+	local vehicle = list.GetForEdit("Vehicles")[class]
+	local sent2 = list.GetForEdit("starfall_creatable_sent")[class]
 
 	local propdata = instance.data.props
 	local entity
@@ -325,10 +356,9 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedSWEP"
-
 	elseif sent then
 		if ply ~= NULL then
-			if (sent.AdminOnly and not ply:IsAdmin()) then SF.Throw("This sent is admin only!", 2) end
+			if sent.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
 		end
 
@@ -346,10 +376,9 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedSENT"
-
 	elseif npc then
 		if ply ~= NULL then
-			if (npc.AdminOnly and not ply:IsAdmin()) then SF.Throw("This npc is admin only!", 2) end
+			if npc.AdminOnly and not ply:IsAdmin() then SF.Throw("This npc is admin only!", 2) end
 			if gamemode.Call("PlayerSpawnNPC", ply, class, "") == false then SF.Throw("Another hook prevented the npc from spawning", 2) end
 		end
 
@@ -382,7 +411,6 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedNPC"
-
 	elseif vehicle then
 		if ply ~= NULL and gamemode.Call("PlayerSpawnVehicle", ply, vehicle.Model, vehicle.Class, vehicle) == false then SF.Throw("Another hook prevented the vehicle from spawning", 2) end
 
@@ -430,7 +458,72 @@ function props_library.createSent(pos, ang, class, frozen)
 		end
 
 		hookcall = "PlayerSpawnedVehicle"
+	elseif sent2 then
+		if ply ~= NULL then
+			if scripted_ents.GetStored(class).t.AdminOnly and not ply:IsAdmin() then SF.Throw("This sent is admin only!", 2) end
+			if gamemode.Call("PlayerSpawnSENT", ply, class) == false then SF.Throw("Another hook prevented the sent from spawning", 2) end
+		end
 
+		local enttbl = {}
+		local sentparams = sent2[1]
+		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
+		if data.Model and isstring(data.Model) then
+			data.Model = SF.NormalizePath(data.Model)
+			if not (util.IsValidModel(data.Model) and util.IsValidProp(data.Model)) then SF.Throw("Invalid model", 2) end
+			if ply ~= NULL and gamemode.Call("PlayerSpawnProp", ply, data.Model)==false then SF.Throw("Another hook prevented the model for this SENT", 2) end
+		end
+
+		for k, v in pairs(data) do
+			if not sentparams[k] then SF.Throw("Invalid parameter in data: " .. tostring(k), 2) end
+		end
+
+		-- Apply data
+		for param, org in pairs(sentparams) do
+			local value = data[param]
+
+			if value~=nil then
+				value = ounwrap(value) or value
+
+				if org[1]==TYPE_COLOR then
+					if not IsColor(value) then SF.ThrowTypeError("Color", SF.GetType(value), 2, "Parameter: " .. param) end
+					enttbl[param] = value
+				else
+					checkluatype(value, org[1], nil, "Parameter: " .. param)
+					enttbl[param] = value
+				end
+
+			elseif org[2]~=nil then
+				enttbl[param] = org[2]
+			else
+				SF.Throw("Missing data parameter: " .. param, 2)
+			end
+		end
+
+		-- Supply additional data
+		enttbl.Data = enttbl
+		enttbl.Name = ""
+		enttbl.Class = class
+		enttbl.Pos = pos
+		enttbl.Angle = ang
+
+		if sent2._preFactory then
+			sent2._preFactory(ply, enttbl)
+		end
+
+		entity = duplicator.CreateEntityFromTable(ply, enttbl)
+
+		if sent2._postFactory then
+			sent2._postFactory(ply, entity, enttbl)
+		end
+
+		if entity.PreEntityCopy then
+			entity:PreEntityCopy() -- To build dupe modifiers
+		end
+		if entity.PostEntityPaste then
+			entity:PostEntityPaste(ply, entity, {[entity:EntIndex()] = entity})
+		end
+
+		hookcall = "PlayerSpawnedSENT"
 	end
 
 	if entity and entity:IsValid() then
@@ -450,7 +543,7 @@ function props_library.createSent(pos, ang, class, frozen)
 					undo.AddEntity(entity)
 				undo.Finish("SF (" .. class .. ")")
 			end
-		
+
 			ply:AddCleanup("props", entity)
 			gamemode.Call(hookcall, ply, entity)
 		end

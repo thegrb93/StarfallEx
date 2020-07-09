@@ -628,36 +628,86 @@ function SF.Throw(msg, level, uncatchable)
 end
 
 --- Throws a type error
-function SF.ThrowTypeError(expected, got, level)
+-- @param expected The expected type name
+-- @param got The type name that was provided
+-- @param level The stack level
+-- @param msg Optional error message
+function SF.ThrowTypeError(expected, got, level, msg)
 	local level = 1 + (level or 1)
 	local funcname = debug.getinfo(level-1, "n").name or "<unnamed>"
-	SF.Throw("Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
+	SF.Throw((msg and #msg>0 and (msg .. " ") or "") .. "Type mismatch (Expected " .. expected .. ", got " .. got .. ") in function " .. funcname, level)
+end
+
+--- Lookup table of TYPE > name
+SF.TYPENAME = {
+	[TYPE_NONE]             = "Invalid type",
+	[TYPE_NIL]              = "nil",
+	[TYPE_BOOL]             = "boolean",
+	[TYPE_LIGHTUSERDATA]    = "light userdata",
+	[TYPE_NUMBER]           = "number",
+	[TYPE_STRING]           = "string",
+	[TYPE_TABLE]            = "table",
+	[TYPE_FUNCTION]         = "function",
+	[TYPE_USERDATA]         = "userdata",
+	[TYPE_THREAD]           = "thread",
+	[TYPE_ENTITY]           = "Entity",
+	[TYPE_VECTOR]           = "Vector",
+	[TYPE_ANGLE]            = "Angle",
+	[TYPE_PHYSOBJ]          = "PhysObj",
+	[TYPE_SAVE]             = "ISave",
+	[TYPE_RESTORE]          = "IRestore",
+	[TYPE_DAMAGEINFO]       = "CTakeDamageInfo",
+	[TYPE_EFFECTDATA]       = "CEffectData",
+	[TYPE_RECIPIENTFILTER]  = "CUserCmd",
+	[TYPE_SCRIPTEDVEHICLE]  = "ScriptedVehicle", -- Depricated, also TYPE Enum doesnt specify the name so this it is
+	[TYPE_MATERIAL]         = "IMaterial",
+	[TYPE_PANEL]            = "Panel",
+	[TYPE_PARTICLE]         = "CLuaParticle",
+	[TYPE_PARTICLEEMITTER]  = "CLuaEmitter",
+	[TYPE_TEXTURE]          = "ITexture",
+	[TYPE_USERMSG]          = "bf_read",
+	[TYPE_CONVAR]           = "ConVar",
+	[TYPE_IMESH]            = "IMesh",
+	[TYPE_MATRIX]           = "VMatrix",
+	[TYPE_SOUND]            = "CSoundPatch",
+	[TYPE_PIXELVISHANDLE]   = "pixelvis_handle_t",
+	[TYPE_DLIGHT]           = "dlight_t",
+	[TYPE_VIDEO]            = "IVideoWriter",
+	[TYPE_FILE]             = "File",
+	[TYPE_LOCOMOTION]       = "CLuaLocomotion",
+	[TYPE_PATH]             = "PathFollower",
+	[TYPE_NAVAREA]          = "CNavArea",
+	[TYPE_SOUNDHANDLE]      = "IGModAudioChannel",
+	[TYPE_NAVLADDER]        = "CNavLadder",
+	[TYPE_PARTICLESYSTEM]   = "CNewParticleEffect",
+	[TYPE_PROJECTEDTEXTURE] = "ProjectedTexture",
+	[TYPE_PHYSCOLLIDE]      = "PhysCollide",
+	[TYPE_SURFACEINFO]      = "SurfaceInfo",
+	[TYPE_COLOR]            = "Color" -- TypeID doesnt return this but lets still add it
+}
+
+--- Returns corresponding name of the TypeID
+-- @param typeid The TYPE
+-- @return String name
+function SF.TypeName(typeid)
+	return assert(SF.TYPENAME[typeid], "Type not defined")
 end
 
 --- Checks the lua type of val. Errors if the types don't match
 -- @param val The value to be checked.
 -- @param typ A string type or metatable.
 -- @param level Level at which to error at. 2 is added to this value. Default is 1.
-function SF.CheckLuaType(val, typ, level)
+-- @param msg Optional error message
+function SF.CheckLuaType(val, typ, level, msg)
 	local valtype = TypeID(val)
 	if valtype == typ then
 		return val
 	else
 		-- Failed, throw error
 		assert(isnumber(typ))
-		local typeLookup = {
-			[TYPE_BOOL] = "boolean",
-			[TYPE_FUNCTION] = "function",
-			[TYPE_NIL] = "nil",
-			[TYPE_NUMBER] = "number",
-			[TYPE_STRING] = "string",
-			[TYPE_TABLE] = "table",
-			[TYPE_THREAD] = "thread",
-			[TYPE_USERDATA] = "userdata"
-		}
-
+		
 		level = (level or 1) + 2
-		SF.ThrowTypeError(typeLookup[typ], SF.GetType(val), level)
+		SF.ThrowTypeError(SF.TypeName(typ), SF.GetType(val), level, msg)
 	end
 end
 
