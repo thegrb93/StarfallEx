@@ -177,6 +177,18 @@ function input_library.isKeyDown(key)
 	return input.IsKeyDown(key)
 end
 
+--- Gets whether a mouse button is down
+-- @client
+-- @param key The mouse button id, see input
+-- @return True if the key is down
+function input_library.isMouseDown(key)
+	SF.CheckLuaType(key, TYPE_NUMBER)
+
+	checkpermission(instance, nil, "input")
+
+	return input.IsMouseDown(key)
+end
+
 --- Gets the name of a key from the id
 -- @client
 -- @param key The key id, see input
