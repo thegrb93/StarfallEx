@@ -1,6 +1,7 @@
 -- Global to all starfalls
 local registerprivilege = SF.Permissions.registerPrivilege
 local haspermission = SF.Permissions.hasAccess
+local checkluatype = SF.CheckLuaType
 
 -- This should manage the player button hooks for singleplayer games.
 local PlayerButtonDown, PlayerButtonUp
@@ -153,7 +154,7 @@ local vwrap = instance.Types.Vector.Wrap
 -- @return The name of the first key bound
 
 function input_library.lookupBinding(binding)
-	SF.CheckLuaType(binding, TYPE_STRING)
+	checkluatype(binding, TYPE_STRING)
 
 	checkpermission(instance, nil, "input")
 
@@ -170,11 +171,23 @@ end
 -- @param key The key id, see input
 -- @return True if the key is down
 function input_library.isKeyDown(key)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	checkluatype(key, TYPE_NUMBER)
 
 	checkpermission(instance, nil, "input")
 
 	return input.IsKeyDown(key)
+end
+
+--- Gets whether a mouse button is down
+-- @client
+-- @param key The mouse button id, see input
+-- @return True if the key is down
+function input_library.isMouseDown(key)
+	checkluatype(key, TYPE_NUMBER)
+
+	checkpermission(instance, nil, "input")
+
+	return input.IsMouseDown(key)
 end
 
 --- Gets the name of a key from the id
@@ -182,7 +195,7 @@ end
 -- @param key The key id, see input
 -- @return The name of the key
 function input_library.getKeyName(key)
-	SF.CheckLuaType(key, TYPE_NUMBER)
+	checkluatype(key, TYPE_NUMBER)
 
 	checkpermission(instance, nil, "input")
 
@@ -233,8 +246,8 @@ end
 -- @return Aim vector
 function input_library.screenToVector(x, y)
 	checkpermission(instance, nil, "input")
-	SF.CheckLuaType(x, TYPE_NUMBER)
-	SF.CheckLuaType(y, TYPE_NUMBER)
+	checkluatype(x, TYPE_NUMBER)
+	checkluatype(y, TYPE_NUMBER)
 	return vwrap(gui.ScreenToVector(x, y))
 end
 
@@ -242,7 +255,7 @@ end
 -- @client
 -- @param enabled Whether or not the cursor should be enabled
 function input_library.enableCursor(enabled)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
+	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input")
 
 	if not instance:isHUDActive() then
@@ -267,7 +280,7 @@ end
 -- @client
 -- @param enabled Whether to lock or unlock the controls
 function input_library.lockControls(enabled)
-	SF.CheckLuaType(enabled, TYPE_BOOL)
+	checkluatype(enabled, TYPE_BOOL)
 	checkpermission(instance, nil, "input")
 
 	if not instance:isHUDActive() and (enabled or not instance.data.input.controlsLocked) then
