@@ -702,7 +702,7 @@ if CLIENT then
 		return meshes
 	end
 
-	--- Creats a mesh without any vertex data.
+	--- Creates a mesh without any vertex data.
 	-- @return Mesh object
 	-- @client
 	function mesh_library.createEmpty()
@@ -786,7 +786,7 @@ if CLIENT then
 		
 		checkpermission(instance, nil, "mesh")
 		
-		if mesh then
+		if mesh ~= nil then
 			mesh = unwrap(mesh)
 			if not data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
 		end
