@@ -776,7 +776,7 @@ if CLIENT then
 	end
 
 	--- Starts a new dynamic mesh. If an Mesh object is passed, it will use that mesh instead
-	-- @param mesh Optional Mesh object (Default nil), mesh to use
+	-- @param mesh Optional Mesh object, mesh to build, can be nil to build a 'dynamic' mesh
 	-- @param prim_type Int, primitive type, see MATERIAL
 	-- @param prim_count Int, the amount of primitives
 	-- @client
