@@ -574,6 +574,9 @@ if CLIENT then
 	-- Register functions to be called when the chip is initialised and deinitialised
 	instance:AddHook("initialize", function()
 		instance.data.meshes = {}
+		instance.data.mesh_dynamic = {
+			started = false
+		}
 	end)
 
 	instance:AddHook("deinitialize", function()
@@ -699,6 +702,16 @@ if CLIENT then
 		return meshes
 	end
 
+	--- Creats a mesh without any vertex data.
+	-- @return Mesh object
+	-- @client
+	function mesh_library.createEmpty()
+		checkpermission(instance, nil, "mesh")
+		local mesh = Mesh()
+		instance.data.meshes[mesh] = { ntriangles = 0 }
+		return wrap(mesh)
+	end
+
 	local function wrapVertex(p)
 		local tri = {}
 		if p.color then tri.color = cwrap(p.color) end
@@ -762,6 +775,191 @@ if CLIENT then
 		end
 	end
 
+	--- Starts a new dynamic mesh. If an Mesh object is passed, it will use that mesh instead
+	-- @param mesh Optional Mesh object (Default nil), mesh to use
+	-- @param primitive_type Int, primitive type, see MATERIAL
+	-- @param primitive_count Int, the amount of primitives
+	-- @client
+	function mesh_library.begin(mesh, prim_type, prim_count)
+		local data = instance.data
+		if data.mesh_dynamic.started then SF.Throw("Dyanic mesh was already started.", 2) end
+		
+		checkpermission(instance, nil, "mesh")
+		
+		if mesh then
+			mesh = unwrap(mesh)
+			if not data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
+		end
+		
+		checkluatype(prim_type, TYPE_NUMBER)
+		checkluatype(prim_count, TYPE_NUMBER)
+		
+		data.mesh_dynamic = {
+			started = true,
+			mesh = mesh,
+			prim_type = prim_type,
+			prim_count = prim_count,
+			instructions = {},
+			vertices = 0,
+			true_vertices = 0,
+			modified_vertex = false,
+		}
+	end
+	
+	--- Ends the mesh and renders it if inside a render hook
+	-- @client
+	function mesh_library.finish()
+		local data = instance.data
+		local meshd = data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		local tri_count = math.ceil(meshd.true_vertices / 3)
+		plyTriangleCount:use(instance.player, tri_count)
+		if data.render.isRendering then
+			plyTriangleRenderBurst:use(instance.player, tri_count)
+		end
+		
+		if meshd.mesh then
+			if not data.meshes[meshd.mesh] then SF.Throw("Provided mesh got invalidated.", 2) end
+			mesh.Begin(meshd.mesh, meshd.prim_type, meshd.prim_count)
+		else
+			mesh.Begin(meshd.prim_type, meshd.prim_count)
+		end
+		
+		for _, v in ipairs(meshd.instructions) do
+			v[1](unpack(v[2]))
+		end
+		mesh.End()
+		
+		meshd.started = false
+	end
+	
+	--- Sets the vertex color by RGBA values
+	-- @client
+	function mesh_library.writeColor(r, g, b, a)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		checkluatype(r, TYPE_NUMBER)
+		checkluatype(g, TYPE_NUMBER)
+		checkluatype(b, TYPE_NUMBER)
+		checkluatype(a, TYPE_NUMBER)
+		
+		meshd.modified_vertex = true
+		table.insert(meshd.instructions, {mesh.AdvanceVertex, {r, g, b, a}})
+	end
+	
+	--- Sets the vertex normal
+	-- @param normal Vector
+	-- @client
+	function mesh_library.writeNormal(norm)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		meshd.modified_vertex = true
+		table.insert(meshd.instructions, {mesh.Normal, {vunwrap(norm)}})
+	end
+	
+	--- Sets the vertex position
+	-- @param position Vector
+	-- @client
+	function mesh_library.writePosition(pos)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		meshd.modified_vertex = true
+		table.insert(meshd.instructions, {mesh.Position, {vunwrap(pos)}})
+	end
+	
+	--- Sets the vertex texture coordinates
+	-- @param stage Number, stage of the texture coordinate
+	-- @param u Number, u coordinate
+	-- @param v Number, v coordinate
+	-- @client
+	function mesh_library.writeUV(stage, u, v)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		checkluatype(stage, TYPE_NUMBER)
+		checkluatype(u, TYPE_NUMBER)
+		checkluatype(v, TYPE_NUMBER)
+		
+		meshd.modified_vertex = true
+		table.insert(meshd.instructions, {mesh.TexCoord, {stage, u, v}})
+	end
+	
+	--- Sets the vertex user data
+	-- @param tangent_x
+	-- @param tangent_y
+	-- @param tangent_z
+	-- @param tangent_handedness
+	-- @client
+	function mesh_library.writeUserData(x, y, z, handedness)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		checkluatype(x, TYPE_NUMBER)
+		checkluatype(y, TYPE_NUMBER)
+		checkluatype(z, TYPE_NUMBER)
+		checkluatype(handedness, TYPE_NUMBER)
+		
+		meshd.modified_vertex = true
+		table.insert(meshd.instructions, {mesh.UserData, {x, y, z, handedness}})
+	end
+	
+	--- Draws a quad using 4 vertices
+	-- @client
+	function mesh_library.writeQuad(v1, v2, v3, v4)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		meshd.modified_vertex = true
+		meshd.true_vertices = meshd.true_vertices + 4
+		table.insert(meshd.instructions, {mesh.Quad, {vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4)}})
+	end
+	
+	--- Draws a quad using a position, normal and size
+	-- @param position Vector
+	-- @param normal Vector
+	-- @param w Number
+	-- @param h Number
+	-- @client
+	function mesh_library.writeQuadEasy(pos, norm, w, h)
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		checkluatype(w, TYPE_NUMBER)
+		checkluatype(h, TYPE_NUMBER)
+		
+		meshd.modified_vertex = true
+		meshd.true_vertices = meshd.true_vertices + 4
+		table.insert(meshd.instructions, {mesh.QuadEasy, {vunwrap(pos), vunwrap(norm), w, h}})
+	end
+	
+	--- Pushes the vertex data onto the render stack
+	-- @client
+	function mesh_library.advanceVertex()
+		local meshd = instance.data.mesh_dynamic
+		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		
+		if meshd.modified_vertex then
+			meshd.vertices = meshd.vertices + 1
+			meshd.true_vertices = meshd.true_vertices + 1
+			meshd.modified_vertex = false
+		end
+		
+		table.insert(meshd.instructions, {mesh.AdvanceVertex, {}})
+	end
+	
+	--- Returns the amount of vertices that have yet been pushed
+	-- @client
+	function mesh_library.vertexCount()
+		local meshd = instance.data.mesh_dynamic
+		
+		if not meshd.started then return 0 end
+		return meshd.vertices
+	end
+	
 	--- Draws the mesh. Must be in a 3D rendering context.
 	-- @client
 	function mesh_methods:draw()
