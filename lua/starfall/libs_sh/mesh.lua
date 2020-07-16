@@ -777,12 +777,12 @@ if CLIENT then
 
 	--- Starts a new dynamic mesh. If an Mesh object is passed, it will use that mesh instead
 	-- @param mesh Optional Mesh object (Default nil), mesh to use
-	-- @param primitive_type Int, primitive type, see MATERIAL
-	-- @param primitive_count Int, the amount of primitives
+	-- @param prim_type Int, primitive type, see MATERIAL
+	-- @param prim_count Int, the amount of primitives
 	-- @client
 	function mesh_library.begin(mesh, prim_type, prim_count)
 		local data = instance.data
-		if data.mesh_dynamic.started then SF.Throw("Dyanic mesh was already started.", 2) end
+		if data.mesh_dynamic.started then SF.Throw("Dynamic mesh was already started.", 2) end
 		
 		checkpermission(instance, nil, "mesh")
 		
@@ -811,7 +811,7 @@ if CLIENT then
 	function mesh_library.finish()
 		local data = instance.data
 		local meshd = data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		local tri_count = math.ceil(meshd.true_vertices / 3)
 		plyTriangleCount:use(instance.player, tri_count)
@@ -835,10 +835,14 @@ if CLIENT then
 	end
 	
 	--- Sets the vertex color by RGBA values
+	-- @param r Number, red value
+	-- @param g Number, green value
+	-- @param b Number, blue value
+	-- @param a Number, alpha value
 	-- @client
 	function mesh_library.writeColor(r, g, b, a)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		checkluatype(r, TYPE_NUMBER)
 		checkluatype(g, TYPE_NUMBER)
@@ -852,12 +856,12 @@ if CLIENT then
 	--- Sets the vertex normal
 	-- @param normal Vector
 	-- @client
-	function mesh_library.writeNormal(norm)
+	function mesh_library.writeNormal(normal)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		meshd.modified_vertex = true
-		table.insert(meshd.instructions, {mesh.Normal, {vunwrap(norm)}})
+		table.insert(meshd.instructions, {mesh.Normal, {vunwrap(normal)}})
 	end
 	
 	--- Sets the vertex position
@@ -865,7 +869,7 @@ if CLIENT then
 	-- @client
 	function mesh_library.writePosition(pos)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		meshd.modified_vertex = true
 		table.insert(meshd.instructions, {mesh.Position, {vunwrap(pos)}})
@@ -878,7 +882,7 @@ if CLIENT then
 	-- @client
 	function mesh_library.writeUV(stage, u, v)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		checkluatype(stage, TYPE_NUMBER)
 		checkluatype(u, TYPE_NUMBER)
@@ -888,15 +892,15 @@ if CLIENT then
 		table.insert(meshd.instructions, {mesh.TexCoord, {stage, u, v}})
 	end
 	
-	--- Sets the vertex user data
-	-- @param tangent_x
-	-- @param tangent_y
-	-- @param tangent_z
-	-- @param tangent_handedness
+	--- Sets the vertex tangent user data
+	-- @param x Number
+	-- @param y Number
+	-- @param z Number
+	-- @param handedness Number
 	-- @client
 	function mesh_library.writeUserData(x, y, z, handedness)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		checkluatype(x, TYPE_NUMBER)
 		checkluatype(y, TYPE_NUMBER)
@@ -908,10 +912,14 @@ if CLIENT then
 	end
 	
 	--- Draws a quad using 4 vertices
+	-- @param v1 Vector, vertex1 position
+	-- @param v2 Vector, vertex2 position
+	-- @param v3 Vector, vertex3 position
+	-- @param v4 Vector, vertex4 position
 	-- @client
 	function mesh_library.writeQuad(v1, v2, v3, v4)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		meshd.modified_vertex = true
 		meshd.true_vertices = meshd.true_vertices + 4
@@ -924,23 +932,23 @@ if CLIENT then
 	-- @param w Number
 	-- @param h Number
 	-- @client
-	function mesh_library.writeQuadEasy(pos, norm, w, h)
+	function mesh_library.writeQuadEasy(position, normal, w, h)
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		checkluatype(w, TYPE_NUMBER)
 		checkluatype(h, TYPE_NUMBER)
 		
 		meshd.modified_vertex = true
 		meshd.true_vertices = meshd.true_vertices + 4
-		table.insert(meshd.instructions, {mesh.QuadEasy, {vunwrap(pos), vunwrap(norm), w, h}})
+		table.insert(meshd.instructions, {mesh.QuadEasy, {vunwrap(position), vunwrap(normal), w, h}})
 	end
 	
 	--- Pushes the vertex data onto the render stack
 	-- @client
 	function mesh_library.advanceVertex()
 		local meshd = instance.data.mesh_dynamic
-		if not meshd.started then SF.Throw("Dyanic mesh not started.", 2) end
+		if not meshd.started then SF.Throw("Dynamic mesh not started.", 2) end
 		
 		if meshd.modified_vertex then
 			meshd.vertices = meshd.vertices + 1
