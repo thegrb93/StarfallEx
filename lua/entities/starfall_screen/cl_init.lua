@@ -47,6 +47,7 @@ function ENT:Initialize()
 	self.Aspect = info.RatioX
 	self.Scale = info.RS
 	self.Origin = info.offset
+	self.Transform = self:GetWorldTransformMatrix() * self.ScreenMatrix
 
 	local w, h = 512 / self.Aspect, 512
 	self.ScreenQuad = {Vector(0,0,0), Vector(w,0,0), Vector(w,h,0), Vector(0,h,0), Color(0, 0, 0, 255)}
