@@ -19,6 +19,15 @@ function ENT:UpdateTransmitState()
 	return TRANSMIT_ALWAYS
 end
 
+function ENT:ValidateCustomModel(model)
+	if not util.IsValidModel(model) or not util.IsValidProp(model) then
+		return false
+	elseif IsValid(self.owner) and self.owner:IsPlayer() and not hook.Run("PlayerSpawnObject", self.owner, model) then
+		return false
+	end
+	return true
+end
+
 function ENT:SetCustomModel(model)
 	if self:GetModel() == model then return end
 	if self:GetParent():IsValid() then
