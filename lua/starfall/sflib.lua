@@ -892,6 +892,22 @@ function SF.CheckMaterial(material)
 	return mat
 end
 
+
+function SF.CheckModel(model, player)
+	if #model > 260 then return false end
+	model = SF.NormalizePath(string.lower(model))
+	if util.IsValidModel(model) and util.IsValidProp(model) then
+		if player and player:IsValid() then
+			if hook.Run("PlayerSpawnObject", player, model)~=false then
+				return model
+			end
+		else
+			return model
+		end
+	end
+	return false
+end
+
 --- Returns a path with all .. accounted for
 function SF.NormalizePath(path)
 	local null = string.find(path, "\x00", 1, true)
