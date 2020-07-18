@@ -802,9 +802,10 @@ if CLIENT then
 			mesh.Begin(mesh, prim_type, prim_count)
 		end
 		
-		pcall(func)
+		local ok, err = pcall(func)
 		mesh.End()
 		meshgenerating = false
+		if not ok then SF.Throw(err, 2) end
 	end
 	
 	--- Sets the vertex color by RGBA values
