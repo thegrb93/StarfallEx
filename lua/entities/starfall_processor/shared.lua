@@ -94,7 +94,7 @@ function ENT:SetupFiles(sfdata)
 	if SERVER then
 		if self.instance and self.instance.ppdata.models and self.instance.mainfile then
 			local model = self.instance.ppdata.models[self.instance.mainfile]
-			if model and self:ValidateCustomModel(model) then
+			if model and SF.CheckModel(model, self.owner) then
 				self:SetCustomModel(model)
 			end
 		end

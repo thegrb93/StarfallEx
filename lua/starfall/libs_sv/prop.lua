@@ -73,11 +73,10 @@ function props_library.create(pos, ang, model, frozen)
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
-	model = SF.NormalizePath(model)
-	if not (util.IsValidModel(model) and util.IsValidProp(model)) then SF.Throw("Invalid model", 2) end
 
 	local ply = instance.player
-
+	model = SF.CheckModel(model, ply)
+	if not model then SF.Throw("Invalid model", 2) end
 
 	plyPropBurst:use(ply, 1)
 	plyCount:checkuse(ply, 1)
@@ -232,10 +231,11 @@ function props_library.createComponent(pos, ang, class, model, frozen)
 
 	local pos = SF.clampPos(vunwrap(pos))
 	local ang = aunwrap(ang)
-	model = SF.NormalizePath(model)
-	if not (util.IsValidModel(model) and util.IsValidProp(model)) then SF.Throw("Invalid model", 2) end
 
 	local ply = instance.player
+	model = SF.CheckModel(model, ply)
+	if not model then SF.Throw("Invalid model", 2) end
+
 	local propdata = instance.data.props
 
 	if not ply:CheckLimit("starfall_components") then SF.Throw("Limit of components reached!", 2) end
@@ -468,9 +468,8 @@ function props_library.createSent(pos, ang, class, frozen, data)
 		local sentparams = sent2[1]
 		if data ~= nil then checkluatype(data, TYPE_TABLE) else data = {} end
 		if data.Model and isstring(data.Model) then
-			data.Model = SF.NormalizePath(data.Model)
-			if not (util.IsValidModel(data.Model) and util.IsValidProp(data.Model)) then SF.Throw("Invalid model", 2) end
-			if ply ~= NULL and gamemode.Call("PlayerSpawnProp", ply, data.Model)==false then SF.Throw("Another hook prevented the model for this SENT", 2) end
+			data.Model = SF.CheckModel(data.Model, ply)
+			if not model then SF.Throw("Invalid model", 2) end
 		end
 
 		for k, v in pairs(data) do
