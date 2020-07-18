@@ -796,27 +796,24 @@ if CLIENT then
 		checkluatype(prim_count, TYPE_NUMBER)
 		checkluatype(func, TYPE_FUNCTION)
 		
+		local tri_count = math.ceil(prim_count / 3)
 		if mesh_obj == nil then
 			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
+			plyTriangleRenderBurst:use(instance.player, tri_count)
 			meshgenerating = true
 			mesh.Begin(prim_type, prim_count)
 		else
 			mesh_obj = unwrap(mesh_obj)
 			if not instance.data.meshes[mesh_obj] then SF.Throw("Tried to use invalid mesh.", 2) end
+			plyTriangleCount:use(instance.player, tri_count)
 			meshgenerating = mesh_obj
 			mesh.Begin(mesh_obj, prim_type, prim_count)
 		end
 		
 		local ok, err = pcall(func)
-		local tri_count = math.ceil(mesh.VertexCount() / 3)
 		mesh.End()
 		meshgenerating = false
 		if not ok then SF.Throw(err, 2) end
-		if mesh_obj == nil then
-			plyTriangleRenderBurst:use(instance.player, tri_count)
-		else
-			plyTriangleCount:use(instance.player, tri_count)
-		end
 	end
 	
 	--- Sets the vertex color by RGBA values
