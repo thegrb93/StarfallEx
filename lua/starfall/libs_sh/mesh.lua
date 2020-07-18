@@ -782,12 +782,12 @@ if CLIENT then
 
 	local meshgenerating = false
 	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
-	-- @param mesh Optional Mesh object, mesh to build. (default: nil)
+	-- @param mesh_obj Optional Mesh object, mesh to build. (default: nil)
 	-- @param prim_type Int, primitive type, see MATERIAL
 	-- @param prim_count Int, the amount of primitives
 	-- @param func The function provided that will generate the mesh vertices
 	-- @client
-	function mesh_library.generate(mesh, prim_type, prim_count, func)
+	function mesh_library.generate(mesh_obj, prim_type, prim_count, func)
 		if meshgenerating then SF.Throw("Dynamic mesh was already started.", 2) end
 		
 		checkpermission(instance, nil, "mesh")
@@ -796,24 +796,27 @@ if CLIENT then
 		checkluatype(prim_count, TYPE_NUMBER)
 		checkluatype(func, TYPE_FUNCTION)
 		
-		local tri_count = math.ceil(prim_count / 3)
-		if mesh == nil then
-			if not data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
-			plyTriangleRenderBurst:use(instance.player, tri_count)
+		if mesh_obj == nil then
+			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
 			meshgenerating = true
 			mesh.Begin(prim_type, prim_count)
 		else
-			plyTriangleCount:use(instance.player, tri_count)
-			mesh = unwrap(mesh)
-			if not data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
-			meshgenerating = mesh
-			mesh.Begin(mesh, prim_type, prim_count)
+			mesh_obj = unwrap(mesh_obj)
+			if not instance.data.meshes[mesh_obj] then SF.Throw("Tried to use invalid mesh.", 2) end
+			meshgenerating = mesh_obj
+			mesh.Begin(mesh_obj, prim_type, prim_count)
 		end
 		
 		local ok, err = pcall(func)
+		local tri_count = math.ceil(mesh.VertexCount() / 3)
 		mesh.End()
 		meshgenerating = false
 		if not ok then SF.Throw(err, 2) end
+		if mesh_obj == nil then
+			plyTriangleRenderBurst:use(instance.player, tri_count)
+		else
+			plyTriangleCount:use(instance.player, tri_count)
+		end
 	end
 	
 	--- Sets the vertex color by RGBA values
