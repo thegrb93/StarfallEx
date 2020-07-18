@@ -781,6 +781,17 @@ if CLIENT then
 	end
 
 	local meshgenerating = false
+	local prim_triangles = {
+		[MATERIAL_LINES] = function(count) return (count * 2) / 3 end,
+		[MATERIAL_LINE_LOOP] = function(count) return count / 3 end,
+		[MATERIAL_LINE_STRIP] = function(count) return (count + 1) / 3 end,
+		-- Disabled since it seems to crash the game
+		-- [MATERIAL_POINTS] = function(count) return count / 3 end,
+		[MATERIAL_POLYGON] = function(count) return count - 2 end,
+		[MATERIAL_QUADS] = function(count) return count * 2 end,
+		[MATERIAL_TRIANGLES] = function(count) return count end,
+		[MATERIAL_TRIANGLE_STRIP] = function(count) return count end
+	}
 	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
 	-- @param mesh_obj Optional Mesh object, mesh to build. (default: nil)
 	-- @param prim_type Int, primitive type, see MATERIAL
@@ -796,7 +807,12 @@ if CLIENT then
 		checkluatype(prim_count, TYPE_NUMBER)
 		checkluatype(func, TYPE_FUNCTION)
 		
-		local tri_count = math.ceil(prim_count / 3)
+		local prim_trifunc = prim_triangles[prim_type]
+		if not prim_trifunc then SF.Throw("Invalid Primitive.", 2) end
+		
+		prim_count = math.floor(prim_count)
+		
+		local tri_count = math.max(0, math.ceil(prim_trifunc(prim_count)))
 		if mesh_obj == nil then
 			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
 			plyTriangleRenderBurst:use(instance.player, tri_count)
