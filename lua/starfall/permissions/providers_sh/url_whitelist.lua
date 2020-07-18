@@ -63,6 +63,8 @@ end
 ---  https://dl.dropboxusercontent.com/content_link/abc123/file?dl=1
 
 simple [[dl.dropboxusercontent.com]]
+pattern [[%w+%.dl%.dropboxusercontent%.com/(.+)]]
+simple [[www.dropbox.com]]
 simple [[dl.dropbox.com]] --Sometimes redirects to usercontent link
 
 -- OneDrive
@@ -167,9 +169,11 @@ pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 --- Examples:
 ---  https://i.redd.it/u46wumt13an01.jpg
 ---  https://i.redditmedia.com/RowF7of6hQJAdnJPfgsA-o7ioo_uUzhwX96bPmnLo0I.jpg?w=320&s=116b72a949b6e4b8ac6c42487ffb9ad2
+---  https://preview.redd.it/injjlk3t6lb51.jpg?width=640&height=800&crop=smart&auto=webp&s=19261cc37b68ae0216bb855f8d4a77ef92b76937
 
 simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
+simple [[preview.redd.it]]
 
 -- Furry things
 --- Examples:
