@@ -554,6 +554,16 @@ env.COLLISION_GROUP = {
 	["WORLD"] = COLLISION_GROUP_WORLD
 }
 
+--- ENUMs of mesh types. To be used with mesh.generate
+-- @name builtins_library.MATERIAL
+-- @field MATERIAL_LINES
+-- @field MATERIAL_LINE_LOOP
+-- @field MATERIAL_LINE_STRIP
+-- @field MATERIAL_POINTS
+-- @field MATERIAL_POLYGON
+-- @field MATERIAL_QUADS
+-- @field MATERIAL_TRIANGLES
+-- @field MATERIAL_TRIANGLE_STRIP
 env.MATERIAL = {
 	["LINES"] = MATERIAL_LINES,
 	["LINE_LOOP"] = MATERIAL_LINE_LOOP,
