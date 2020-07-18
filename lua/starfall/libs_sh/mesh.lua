@@ -542,9 +542,11 @@ SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to 
 
 local plyTriangleCount = SF.LimitObject("mesh_triangles", "total mesh triangles", 200000, "How many triangles total can be loaded for meshes.")
 local plyTriangleRenderBurst = SF.BurstObject("mesh_triangles", "rendered triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
+local plyMeshCount = SF.LimitObject("mesh", "total meshes", 1000, "How many meshes total can be loaded.")
 
 local function destroyMesh(ply, mesh, meshdata)
 	plyTriangleCount:free(ply, meshdata[mesh].ntriangles)
+	plyMeshCount:free(ply, 1)
 	mesh:Destroy()
 	meshdata[mesh] = nil
 end
@@ -650,6 +652,7 @@ if CLIENT then
 		local ntriangles = nvertices / 3
 
 		plyTriangleCount:checkuse(instance.player, ntriangles)
+		plyMeshCount:checkuse(instance.player, 1)
 
 		local unwrapped = {}
 		for i, vertex in ipairs(verteces) do
@@ -668,7 +671,8 @@ if CLIENT then
 		local mesh = Mesh()
 		mesh:BuildFromTriangles(unwrapped)
 		instance.data.meshes[mesh] = { ntriangles = ntriangles }
-		plyTriangleCount:free(instance.player, -ntriangles)
+		plyTriangleCount:use(instance.player, ntriangles)
+		plyMeshCount:use(instance.player, 1)
 		return wrap(mesh)
 	end
 
@@ -688,7 +692,10 @@ if CLIENT then
 		local meshes = SF.ParseObj(obj, threaded and thread_yield, Vector, triangulate)
 		for name, vertices in pairs(meshes) do
 			local ntriangles = #vertices / 3
+			plyTriangleCount:checkuse(instance.player, ntriangles)
+			plyMeshCount:checkuse(instance.player, 1)
 			plyTriangleCount:use(instance.player, ntriangles)
+			plyMeshCount:use(instance.player, 1)
 
 			local mesh = Mesh()
 			mesh:BuildFromTriangles(vertices)
@@ -704,6 +711,10 @@ if CLIENT then
 	-- @client
 	function mesh_library.createEmpty()
 		checkpermission(instance, nil, "mesh")
+		
+		plyMeshCount:checkuse(instance.player, 1)
+		plyMeshCount:use(instance.player, 1)
+		
 		local mesh = Mesh()
 		instance.data.meshes[mesh] = { ntriangles = 0 }
 		return wrap(mesh)
