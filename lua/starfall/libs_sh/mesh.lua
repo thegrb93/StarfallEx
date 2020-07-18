@@ -692,8 +692,6 @@ if CLIENT then
 		local meshes = SF.ParseObj(obj, threaded and thread_yield, Vector, triangulate)
 		for name, vertices in pairs(meshes) do
 			local ntriangles = #vertices / 3
-			plyTriangleCount:checkuse(instance.player, ntriangles)
-			plyMeshCount:checkuse(instance.player, 1)
 			plyTriangleCount:use(instance.player, ntriangles)
 			plyMeshCount:use(instance.player, 1)
 
@@ -712,7 +710,6 @@ if CLIENT then
 	function mesh_library.createEmpty()
 		checkpermission(instance, nil, "mesh")
 		
-		plyMeshCount:checkuse(instance.player, 1)
 		plyMeshCount:use(instance.player, 1)
 		
 		local mesh = Mesh()
