@@ -63,6 +63,8 @@ end
 ---  https://dl.dropboxusercontent.com/content_link/abc123/file?dl=1
 
 simple [[dl.dropboxusercontent.com]]
+pattern [[%w+%.dl%.dropboxusercontent%.com/(.+)]]
+simple [[www.dropbox.com]]
 simple [[dl.dropbox.com]] --Sometimes redirects to usercontent link
 
 -- OneDrive
@@ -133,8 +135,10 @@ simple [[puu.sh]]
 -- Steam
 --- Examples:
 ---  http://images.akamai.steamusercontent.com/ugc/367407720941694853/74457889F41A19BD66800C71663E9077FA440664/
+---  https://steamuserimages-a.akamaihd.net/ugc/1475443067859980096/685F2468519E31C5C214959EC3AA0B0757B01E1B/
 ---  https://steamcdn-a.akamaihd.net/steamcommunity/public/images/apps/4000/dca12980667e32ab072d79f5dbe91884056a03a2.jpg
 simple [[images.akamai.steamusercontent.com]]
+simple [[steamuserimages-a.akamaihd.net]]
 simple [[steamcdn-a.akamaihd.net]]
 blacklist [[steamcommunity.com/linkfilter]]
 
@@ -167,9 +171,11 @@ pattern [[images-([%w%-]+)%.discordapp%.net/external/(.+)]]
 --- Examples:
 ---  https://i.redd.it/u46wumt13an01.jpg
 ---  https://i.redditmedia.com/RowF7of6hQJAdnJPfgsA-o7ioo_uUzhwX96bPmnLo0I.jpg?w=320&s=116b72a949b6e4b8ac6c42487ffb9ad2
+---  https://preview.redd.it/injjlk3t6lb51.jpg?width=640&height=800&crop=smart&auto=webp&s=19261cc37b68ae0216bb855f8d4a77ef92b76937
 
 simple [[i.redditmedia.com]]
 simple [[i.redd.it]]
+simple [[preview.redd.it]]
 
 -- Furry things
 --- Examples:
