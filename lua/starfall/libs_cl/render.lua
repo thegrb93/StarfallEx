@@ -596,6 +596,10 @@ function render_library.setColor(clr)
 end
 
 --- Sets the draw color by RGBA values
+-- @param r Number, red value
+-- @param g Number, green value
+-- @param b Number, blue value
+-- @param a Number, alpha value
 function render_library.setRGBA(r, g, b, a)
 	checkluatype (r, TYPE_NUMBER) checkluatype (g, TYPE_NUMBER) checkluatype (b, TYPE_NUMBER) checkluatype (a, TYPE_NUMBER)
 	currentcolor = Color(r, g, b, a)

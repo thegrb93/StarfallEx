@@ -542,9 +542,11 @@ SF.Permissions.registerPrivilege("mesh", "Create custom mesh", "Allows users to 
 
 local plyTriangleCount = SF.LimitObject("mesh_triangles", "total mesh triangles", 200000, "How many triangles total can be loaded for meshes.")
 local plyTriangleRenderBurst = SF.BurstObject("mesh_triangles", "rendered triangles", 50000, 50000, "Number of triangles that can be rendered per frame", "Number of triangles that can be drawn in a short period of time", 60)
+local plyMeshCount = SF.LimitObject("mesh", "total meshes", 1000, "How many meshes total can be loaded.")
 
 local function destroyMesh(ply, mesh, meshdata)
 	plyTriangleCount:free(ply, meshdata[mesh].ntriangles)
+	plyMeshCount:free(ply, 1)
 	mesh:Destroy()
 	meshdata[mesh] = nil
 end
@@ -650,6 +652,7 @@ if CLIENT then
 		local ntriangles = nvertices / 3
 
 		plyTriangleCount:checkuse(instance.player, ntriangles)
+		plyMeshCount:checkuse(instance.player, 1)
 
 		local unwrapped = {}
 		for i, vertex in ipairs(verteces) do
@@ -668,7 +671,8 @@ if CLIENT then
 		local mesh = Mesh()
 		mesh:BuildFromTriangles(unwrapped)
 		instance.data.meshes[mesh] = { ntriangles = ntriangles }
-		plyTriangleCount:free(instance.player, -ntriangles)
+		plyTriangleCount:use(instance.player, ntriangles)
+		plyMeshCount:use(instance.player, 1)
 		return wrap(mesh)
 	end
 
@@ -689,6 +693,7 @@ if CLIENT then
 		for name, vertices in pairs(meshes) do
 			local ntriangles = #vertices / 3
 			plyTriangleCount:use(instance.player, ntriangles)
+			plyMeshCount:use(instance.player, 1)
 
 			local mesh = Mesh()
 			mesh:BuildFromTriangles(vertices)
@@ -697,6 +702,19 @@ if CLIENT then
 			if threaded then thread_yield() end
 		end
 		return meshes
+	end
+
+	--- Creates a mesh without any vertex data.
+	-- @return Mesh object
+	-- @client
+	function mesh_library.createEmpty()
+		checkpermission(instance, nil, "mesh")
+		
+		plyMeshCount:use(instance.player, 1)
+		
+		local mesh = Mesh()
+		instance.data.meshes[mesh] = { ntriangles = 0 }
+		return wrap(mesh)
 	end
 
 	local function wrapVertex(p)
@@ -762,6 +780,132 @@ if CLIENT then
 		end
 	end
 
+	local meshgenerating = false
+	local prim_triangles = {
+		[MATERIAL_LINES] = function(count) return (count * 2) / 3 end,
+		[MATERIAL_LINE_LOOP] = function(count) return count / 3 end,
+		[MATERIAL_LINE_STRIP] = function(count) return (count + 1) / 3 end,
+		-- Disabled since it seems to crash the game
+		-- [MATERIAL_POINTS] = function(count) return count / 3 end,
+		[MATERIAL_POLYGON] = function(count) return count - 2 end,
+		[MATERIAL_QUADS] = function(count) return count * 2 end,
+		[MATERIAL_TRIANGLES] = function(count) return count end,
+		[MATERIAL_TRIANGLE_STRIP] = function(count) return count end
+	}
+	--- Generates mesh data. If an Mesh object is passed, it will populate that mesh with the data. Otherwise, it will render directly to renderer.
+	-- @param mesh_obj Optional Mesh object, mesh to build. (default: nil)
+	-- @param prim_type Int, primitive type, see MATERIAL
+	-- @param prim_count Int, the amount of primitives
+	-- @param func The function provided that will generate the mesh vertices
+	-- @client
+	function mesh_library.generate(mesh_obj, prim_type, prim_count, func)
+		if meshgenerating then SF.Throw("Dynamic mesh was already started.", 2) end
+		
+		checkpermission(instance, nil, "mesh")
+		
+		checkluatype(prim_type, TYPE_NUMBER)
+		checkluatype(prim_count, TYPE_NUMBER)
+		checkluatype(func, TYPE_FUNCTION)
+		
+		local prim_trifunc = prim_triangles[prim_type]
+		if not prim_trifunc then SF.Throw("Invalid Primitive.", 2) end
+		
+		if prim_count<1 then SF.Throw("Can't generate with less than 1 primitive", 2) end
+		if prim_count>65535 then SF.Throw("Can't generate more than 65535 primitives", 2) end
+		prim_count = math.floor(prim_count)
+		
+		local tri_count = math.max(1, math.ceil(prim_trifunc(prim_count)))
+		if mesh_obj == nil then
+			if not instance.data.render.isRendering then SF.Throw("Not in rendering hook.", 2) end 
+			plyTriangleRenderBurst:use(instance.player, tri_count)
+			meshgenerating = true
+			mesh.Begin(prim_type, prim_count)
+		else
+			mesh_obj = unwrap(mesh_obj)
+			local mesh_tbl = instance.data.meshes[mesh_obj]
+			if not mesh_tbl then SF.Throw("Tried to use invalid mesh.", 2) end
+			-- Seems to be opengl error, while windows can opt-in to use opengl there is no way to check i think?
+			if not system.IsWindows() and mesh_tbl.ntriangles>0 then SF.Throw("Linux can't mesh.generate on a non-empty mesh", 2) end
+			plyTriangleCount:use(instance.player, tri_count)
+			meshgenerating = mesh_obj
+			mesh.Begin(mesh_obj, prim_type, prim_count)
+		end
+		
+		local ok, err = pcall(func)
+		mesh.End()
+		meshgenerating = false
+		if not ok then SF.Throw(err, 2) end
+	end
+	
+	--- Sets the vertex color by RGBA values
+	-- @param r Number, red value
+	-- @param g Number, green value
+	-- @param b Number, blue value
+	-- @param a Number, alpha value
+	-- @client
+	function mesh_library.writeColor(r, g, b, a)
+		mesh.Color(r, g, b, a)
+	end
+	
+	--- Sets the vertex normal
+	-- @param normal Vector
+	-- @client
+	function mesh_library.writeNormal(normal)
+		mesh.Normal(vunwrap(normal))
+	end
+	
+	--- Sets the vertex position
+	-- @param position Vector
+	-- @client
+	function mesh_library.writePosition(pos)
+		mesh.Position(vunwrap(pos))
+	end
+	
+	--- Sets the vertex texture coordinates
+	-- @param stage Number, stage of the texture coordinate
+	-- @param u Number, u coordinate
+	-- @param v Number, v coordinate
+	-- @client
+	function mesh_library.writeUV(stage, u, v)
+		mesh.TexCoord(stage, u, v)
+	end
+	
+	--- Sets the vertex tangent user data
+	-- @param x Number
+	-- @param y Number
+	-- @param z Number
+	-- @param handedness Number
+	-- @client
+	function mesh_library.writeUserData(x, y, z, handedness)
+		mesh.UserData(x, y, z, handedness)
+	end
+	
+	--- Draws a quad using 4 vertices
+	-- @param v1 Vector, vertex1 position
+	-- @param v2 Vector, vertex2 position
+	-- @param v3 Vector, vertex3 position
+	-- @param v4 Vector, vertex4 position
+	-- @client
+	function mesh_library.writeQuad(v1, v2, v3, v4)
+		mesh.Quad(vunwrap(v1), vunwrap(v2), vunwrap(v3), vunwrap(v4))
+	end
+	
+	--- Draws a quad using a position, normal and size
+	-- @param position Vector
+	-- @param normal Vector
+	-- @param w Number
+	-- @param h Number
+	-- @client
+	function mesh_library.writeQuadEasy(position, normal, w, h)
+		mesh.QuadEasy(vunwrap(position), vunwrap(normal), w, h)
+	end
+	
+	--- Pushes the vertex data onto the render stack
+	-- @client
+	function mesh_library.advanceVertex()
+		mesh.AdvanceVertex()
+	end
+	
 	--- Draws the mesh. Must be in a 3D rendering context.
 	-- @client
 	function mesh_methods:draw()
@@ -779,6 +923,7 @@ if CLIENT then
 	function mesh_methods:destroy()
 		local mesh = unwrap(self)
 		if not instance.data.meshes[mesh] then SF.Throw("Tried to use invalid mesh.", 2) end
+		if meshgenerating == mesh then SF.Throw("Cannot destroy mesh currently being generated.", 2) end
 		destroyMesh(instance.player, mesh, instance.data.meshes)
 	end
 end
