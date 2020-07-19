@@ -825,8 +825,7 @@ if CLIENT then
 			local mesh_tbl = instance.data.meshes[mesh_obj]
 			if not mesh_tbl then SF.Throw("Tried to use invalid mesh.", 2) end
 			-- Seems to be opengl error, while windows can opt-in to use opengl there is no way to check i think?
-			-- We will just silently return out of the function to not disrupt anything else.
-			if not system.IsWindows() and mesh_tbl.generated then return end
+			if not system.IsWindows() and mesh_tbl.ntriangles>0 then SF.Throw("Linux can't mesh.generate on a non-empty mesh", 2) end
 			plyTriangleCount:use(instance.player, tri_count)
 			meshgenerating = mesh_obj
 			mesh.Begin(mesh_obj, prim_type, prim_count)
@@ -836,9 +835,6 @@ if CLIENT then
 		mesh.End()
 		meshgenerating = false
 		if not ok then SF.Throw(err, 2) end
-		if not system.IsWindows() and mesh_obj ~= nil then
-			instance.data.meshes[mesh_obj].generated = true
-		end
 	end
 	
 	--- Sets the vertex color by RGBA values
