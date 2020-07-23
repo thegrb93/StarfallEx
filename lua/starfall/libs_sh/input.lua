@@ -35,6 +35,17 @@ if game.SinglePlayer() then
 		end)
 	end
 end
+
+local function CheckButtonPerms(instance, ply, button)
+	if (IsFirstTimePredicted() or game.SinglePlayer()) and haspermission(instance, nil, "input") then
+		return true, { button }
+	end
+	return false
+end
+
+SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
+SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
+
 if SERVER then
 	util.AddNetworkString("starfall_lock_control")
 	return function() end
@@ -79,17 +90,6 @@ net.Receive("starfall_lock_control", function()
 		end
 	end
 end)
-
-
-local function CheckButtonPerms(instance, ply, button)
-	if (IsFirstTimePredicted() or game.SinglePlayer()) and haspermission(instance, nil, "input") then
-		return true, { button }
-	end
-	return false
-end
-
-SF.hookAdd("PlayerButtonDown", "inputpressed", CheckButtonPerms)
-SF.hookAdd("PlayerButtonUp", "inputreleased", CheckButtonPerms)
 
 SF.hookAdd("StartCommand", "mousemoved", function(instance, ply, cmd)
 	if haspermission(instance, nil, "input") then
@@ -318,13 +318,13 @@ end
 
 
 --- Called when a button is pressed
--- @client
+-- @shared
 -- @name inputPressed
 -- @class hook
 -- @param button Number of the button
 
 --- Called when a button is released
--- @client
+-- @shared
 -- @name inputReleased
 -- @class hook
 -- @param button Number of the button
