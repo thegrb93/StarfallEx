@@ -25,6 +25,7 @@ function ENT:OnRemove()
 end
 
 function ENT:GetOverlayText()
+	if self:GetColor().a == 0 then return "" end
 	local state = self:GetNWInt("State", 1)
 	local clientstr, serverstr
 	if self.instance then
