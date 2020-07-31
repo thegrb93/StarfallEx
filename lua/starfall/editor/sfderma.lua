@@ -202,7 +202,6 @@ local invalid_filename_chars = {
 	[">"] = "",
 	["<"] = "",
 	["|"] = "",
-	["\\"] = "",
 	['"'] = "",
 }
 
@@ -324,11 +323,16 @@ function PANEL:DoRightClick(node)
 						if text == "" then return end
 						text = string.gsub(text, ".", invalid_filename_chars)
 						local oldFile = node:GetFileName()
-						local saveFile = string.GetPathFromFilename(node:GetFileName())..text..".txt"
+						local saveFile
+						if string.sub(text, 1, 1)=="/" then
+							saveFile = "starfall/"..SF.NormalizePath(text)..".txt"
+						else
+							saveFile = string.GetPathFromFilename(node:GetFileName())..SF.NormalizePath(text)..".txt"
+						end
 						SF.Editor.renameFile(oldFile,saveFile)
 						self:ReloadTree()
+					end)
 				end)
-			end)
 		self.menu:AddSpacer()
 		self.menu:AddOption("Delete", function ()
 				Derma_Query("Are you sure you want to delete this file?",
@@ -348,7 +352,7 @@ function PANEL:DoRightClick(node)
 					"",
 					function (text)
 						if text == "" then return end
-						text = string.gsub(text, ".", invalid_filename_chars)
+						text = string.GetFileFromFilename(string.gsub(text, ".", invalid_filename_chars))
 						local saveFile = node:GetFolder().."/"..text..".txt"
 						SF.FileWrite(saveFile, SF.DefaultCode())
 						SF.AddNotify(LocalPlayer(), "New file: " .. saveFile, "GENERIC", 7, "DRIP3")
@@ -363,7 +367,7 @@ function PANEL:DoRightClick(node)
 					"",
 					function (text)
 						if text == "" then return end
-						text = string.gsub(text, ".", invalid_filename_chars)
+						text = string.GetFileFromFilename(string.gsub(text, ".", invalid_filename_chars))
 						local saveFile = node:GetFolder().."/"..text
 						file.CreateDir(saveFile)
 						SF.AddNotify(LocalPlayer(), "New folder: " .. saveFile, "GENERIC", 7, "DRIP3")
