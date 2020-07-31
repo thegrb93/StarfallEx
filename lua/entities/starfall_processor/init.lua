@@ -114,7 +114,7 @@ end
 
 function ENT:PreEntityCopy()
 	duplicator.ClearEntityModifier(self, "SFDupeInfo")
-	if self.instance then
+	if self.files and self.mainfile then
 		local info = WireLib and WireLib.BuildDupeInfo(self) or {}
 		info.starfall = SF.SerializeCode(self.files, self.mainfile)
 		info.starfalluserdata = self.starfalluserdata
