@@ -661,7 +661,7 @@ function ents_methods:getQuotaAverage()
 	local ent = getent(self)
 	if ent.Starfall then
 		return ent.instance and ent.instance:movingCPUAverage() or 0
-	elseif ent.WireDebugName == "Expression 2" then
+	elseif ent:GetClass()=="gmod_wire_expression2" then
 		return SERVER and ent.context.timebench or ent:GetOverlayData().timebench
 	else
 		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
@@ -676,7 +676,7 @@ function ents_methods:getQuotaMax()
 	local ent = getent(self)
 	if ent.Starfall then
 		return ent.instance and ent.instance.cpuQuota or 0
-	elseif ent.WireDebugName == "Expression 2" then
+	elseif ent:GetClass()=="gmod_wire_expression2" then
 		return GetConVarNumber("wire_expression2_quotatime")
 	else
 		SF.Throw("The entity isn't a starfall or expression2 chip", 2)
