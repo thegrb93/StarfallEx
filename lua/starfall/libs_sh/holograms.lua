@@ -95,7 +95,7 @@ SF.RegisterType("Hologram", true, false, nil, "Entity")
 
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 
 local holograms_library = instance.Libraries.holograms
@@ -177,7 +177,7 @@ function holograms_library.create(pos, ang, model, scale)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
 			holoent:Spawn()
 
-			if ply ~= NULL then gamemode.Call("PlayerSpawnedSENT", ply, holoent) end
+			if ply ~= SF.Superuser then gamemode.Call("PlayerSpawnedSENT", ply, holoent) end
 
 			holodata[holoent] = true
 

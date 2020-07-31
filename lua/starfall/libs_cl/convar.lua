@@ -11,7 +11,7 @@ SF.Permissions.registerPrivilege("convar", "Read ConVars", "Allows Starfall to r
 SF.RegisterLibrary("convar")
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local convar_library = instance.Libraries.convar
 

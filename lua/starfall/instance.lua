@@ -56,9 +56,9 @@ function SF.Instance.Compile(code, mainfile, player, data)
 		SF.Preprocessor.ParseDirectives(filename, source, instance.ppdata)
 	end
 
-	if player ~= NULL and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
+	if player ~= SF.Superuser and instance.ppdata.superuser and instance.ppdata.superuser[mainfile] then
 		if player:IsSuperAdmin() then
-			player = NULL
+			player = SF.Superuser
 		else
 			return false, { message = "Can't use --@superuser unless you are superadmin!", traceback = "" }
 		end
@@ -66,7 +66,7 @@ function SF.Instance.Compile(code, mainfile, player, data)
 	instance.player = player
 
 	local quotaRun
-	if player == NULL then
+	if player == SF.Superuser then
 		quotaRun = SF.Instance.runWithoutOps
 	else
 		if SERVER then

@@ -16,7 +16,7 @@ registerprivilege("http.post", "HTTP Post method", "Allows the user to post html
 SF.RegisterLibrary("http")
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 -- Initializes the lastRequest variable to a value which ensures that the first call to httpRequestReady returns true
 -- and the "active requests counter" to 0

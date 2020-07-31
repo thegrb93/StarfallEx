@@ -168,11 +168,11 @@ local renderhooks = {
 
 
 SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
-	return (instance.player == NULL or haspermission(instance, nil, "render.offscreen")), {}
+	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.offscreen")), {}
 end)
 
 SF.hookAdd("RenderScene", "renderscene", function(instance)
-	return (instance.player == NULL or haspermission(instance, nil, "render.renderscene")), {}
+	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.renderscene")), {}
 end)
 
 SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
@@ -180,11 +180,11 @@ SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, draw
 end)
 
 local function canRenderHudSafeArgs(instance, ...)
-	return instance:isHUDActive() and (instance.player == NULL or haspermission(instance, nil, "render.hud")), {...}
+	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.hud")), {...}
 end
 
 local function canCalcview(instance, ply, pos, ang, fov, znear, zfar)
-	return instance:isHUDActive() and (instance.player == NULL or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
+	return instance:isHUDActive() and (instance.player == SF.Superuser or haspermission(instance, nil, "render.calcview")), {instance.Types.Vector.Wrap(pos), instance.Types.Angle.Wrap(ang), fov, znear, zfar}
 end
 
 local function returnCalcview(instance, tbl)
@@ -223,7 +223,7 @@ SF.RegisterLibrary("render")
 
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local renderdata = {}
 renderdata.renderedViews = 0

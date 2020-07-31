@@ -4,6 +4,7 @@
 SF.Modules = {}
 SF.Types = {}
 SF.Libraries = {}
+SF.Superuser = {IsValid = function() return false end}
 local dgetmeta = debug.getmetatable
 
 -- Make sure this is done after metatables have been set
@@ -95,7 +96,7 @@ function SF.EntityTable(key, destructor, dontwait)
 	return setmetatable({}, {
 		__newindex = function(t, e, v)
 			rawset(t, e, v)
-			if e ~= NULL then
+			if e ~= SF.Superuser then
 				if dontwait then
 					e:CallOnRemove("SF_" .. key, function()
 						if t[e] then
@@ -145,10 +146,10 @@ setmetatable(SF.StructWrapper, SF.StructWrapper)
 SF.BurstObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() or ply==NULL then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
 				local new = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max) - amount
-				if new < 0 and ply~=NULL then
+				if new < 0 and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." burst limit has been exceeded.", 3)
 				end
 				obj.lasttick = CurTime()
@@ -158,7 +159,7 @@ SF.BurstObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() or ply==NULL then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
 				obj.val = math.min(obj.val + (CurTime() - obj.lasttick) * self.rate, self.max)
 				obj.lasttick = CurTime()
@@ -206,10 +207,10 @@ setmetatable(SF.BurstObject, SF.BurstObject)
 SF.LimitObject = {
 	__index = {
 		use = function(self, ply, amount)
-			if ply:IsValid() or ply==NULL then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
 				local new = obj.val + amount
-				if new > self.max and ply~=NULL then
+				if new > self.max and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 				obj.val = new
@@ -218,9 +219,9 @@ SF.LimitObject = {
 			end
 		end,
 		checkuse = function(self, ply, amount)
-			if ply:IsValid() or ply==NULL then
+			if ply:IsValid() or ply==SF.Superuser then
 				local obj = self:get(ply)
-				if obj.val + amount > self.max and ply~=NULL then
+				if obj.val + amount > self.max and ply~=SF.Superuser then
 					SF.Throw("The ".. self.name .." limit has been reached. (".. self.max ..")", 3)
 				end
 			else
@@ -228,7 +229,7 @@ SF.LimitObject = {
 			end
 		end,
 		check = function(self, ply)
-			if ply:IsValid() or ply==NULL then
+			if ply:IsValid() or ply==SF.Superuser then
 				return self.max - self:get(ply).val
 			else
 				SF.Throw("Invalid starfall user", 3)
@@ -291,7 +292,7 @@ SF.ResourceHandler = {
 			end
 		end,
 		check = function(self, ply)
-			return self.players[ply] < self.max or ply==NULL
+			return self.players[ply] < self.max or ply==SF.Superuser
 		end,
 		free = function(self, ply, object)
 			local t = self.typer(object)
@@ -1067,7 +1068,7 @@ else
 		local plyStr
 		if ply:IsValid() then
 			plyStr = ply:Nick() .. " [" .. ply:SteamID() .. "]"
-		elseif ply == NULL then
+		elseif ply == SF.Superuser then
 			plyStr = "Superuser"
 		else
 			plyStr = "Invalid user"

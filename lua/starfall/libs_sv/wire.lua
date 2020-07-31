@@ -27,7 +27,7 @@ SF.RegisterType("Wirelink", false, true)
 
 return function(instance)
 if not (WireLib and WireLib.CreateInputs) then return end
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 
 local getent

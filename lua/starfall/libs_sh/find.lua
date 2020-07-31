@@ -11,7 +11,7 @@ SF.Permissions.registerPrivilege("find", "Find", "Allows the user to access the 
 SF.RegisterLibrary("find")
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local find_library = instance.Libraries.find
 local vec_meta, vwrap, vunwrap = instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap

@@ -13,7 +13,7 @@ registerprivilege("notification.hud", "Create notifications with HUD connected",
 SF.RegisterLibrary("notification")
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 
 instance:AddHook("initialize", function()
@@ -68,7 +68,7 @@ function notification_library.addProgress(id, text)
 	if #text > 256 then SF.Throw("Text is greater than 256 limit!", 2) end
 
 	--Keep the ID unique to each player
-	if instance.player == NULL then
+	if instance.player == SF.Superuser then
 		id = "SF:Superuser"..id
 	elseif instance.player:IsValid() then
 		id = "SF:"..instance.player:SteamID64()..id

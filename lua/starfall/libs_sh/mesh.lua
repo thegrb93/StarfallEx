@@ -568,8 +568,8 @@ end
 
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
-local haspermission = instance.player ~= NULL and SF.Permissions.hasAccess or function() return true end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
+local haspermission = instance.player ~= SF.Superuser and SF.Permissions.hasAccess or function() return true end
 
 
 if CLIENT then

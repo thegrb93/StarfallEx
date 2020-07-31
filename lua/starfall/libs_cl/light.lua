@@ -74,7 +74,7 @@ SF.RegisterType("Light", true, false)
 
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 
 -- Register functions to be called when the chip is initialised and deinitialised

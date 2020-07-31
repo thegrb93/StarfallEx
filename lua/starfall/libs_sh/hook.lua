@@ -49,7 +49,7 @@ else
 	add("FinishChat")
 	add("OnPlayerChat", "playerchat")
 	add("ChatTextChanged", nil, function(instance, txt)
-		if instance.player == NULL or haspermission(instance, nil, "input") then
+		if instance.player == SF.Superuser or haspermission(instance, nil, "input") then
 			return true, { txt }
 		end
 		return false

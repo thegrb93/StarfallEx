@@ -29,7 +29,7 @@ SF.RegisterLibrary("constraint")
 
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 
 local getent

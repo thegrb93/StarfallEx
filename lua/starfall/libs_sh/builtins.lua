@@ -19,7 +19,7 @@ end
 SF.RegisterLibrary("os")
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
 local ent_meta, ewrap, eunwrap = instance.Types.Entity, instance.Types.Entity.Wrap, instance.Types.Entity.Unwrap
@@ -982,7 +982,7 @@ end
 -- @class directive
 -- @param filename The file to run as main on client
 
---- Lets the chip run with no restrictions and the chip owner becomes NULL. Can only be used in the main file. --@superuser
+--- Lets the chip run with no restrictions and the chip owner becomes SF.Superuser. Can only be used in the main file. --@superuser
 -- @name superuser
 -- @class directive
 

@@ -21,7 +21,7 @@ end
 SF.RegisterLibrary("trace")
 
 return function(instance)
-local checkpermission = instance.player ~= NULL and SF.Permissions.check or function() end
+local checkpermission = instance.player ~= SF.Superuser and SF.Permissions.check or function() end
 
 local trace_library = instance.Libraries.trace
 local owrap, ounwrap = instance.WrapObject, instance.UnwrapObject
