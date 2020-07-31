@@ -103,7 +103,7 @@ net.Receive("starfall_hologram", function(len, ply)
 	local self = net.ReadEntity()
 	if self:IsValid() and self.IsSFHologram then
 		net.Start("starfall_hologram")
-		net.WriteUInt(16, self:EntIndex())
+		net.WriteUInt(self:EntIndex(), 16)
 
 		if self.scale.x~=1 or self.scale.y~=1 or self.scale.z~=1 then
 			net.WriteBool(true)
