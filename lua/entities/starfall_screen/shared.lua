@@ -30,8 +30,8 @@ function ENT:LinkEnt(ent, transmit)
 
 		if SERVER then
 			net.Start("starfall_processor_link")
-			net.WriteEntity(self)
-			net.WriteEntity(ent)
+			net.WriteUInt(self:EntIndex(), 16)
+			net.WriteUInt(ent:EntIndex(), 16)
 			if transmit then net.Send(transmit) else net.Broadcast() end
 		end
 	end

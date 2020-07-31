@@ -7,7 +7,7 @@ function ENT:Initialize()
 	self.BaseClass.Initialize(self)
 
 	net.Start("starfall_processor_link")
-		net.WriteEntity(self)
+		net.WriteUInt(self:EntIndex(), 16)
 	net.SendToServer()
 end
 
