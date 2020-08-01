@@ -451,31 +451,39 @@ end
 -- @shared
 -- @return table of attachment id and attachment name or nil
 function ents_methods:getAttachments()
-	local ent = getent(self)
-	return ent:GetAttachments()
+	return getent(self):GetAttachments()
+end
+
+--- Gets the collision group enum of the entity
+-- @return The collision group enum of the entity. https://wiki.facepunch.com/gmod/Enums/COLLISION_GROUP
+function ents_methods:getCollisionGroup()
+	return getent(self):GetCollisionGroup()
+end
+
+--- Gets the movetype enum of the entity
+-- @return The movetype enum of the entity. https://wiki.facepunch.com/gmod/Enums/MOVETYPE
+function ents_methods:getMoveType()
+	return getent(self):GetMoveType()
 end
 
 --- Converts a ragdoll bone id to the corresponding physobject id
 -- @param boneid The ragdoll boneid
 -- @return The physobj id
 function ents_methods:translateBoneToPhysBone(boneid)
-	local ent = getent(self)
-	return ent:TranslateBoneToPhysBone(boneid)
+	return getent(self):TranslateBoneToPhysBone(boneid)
 end
 
 --- Converts a physobject id to the corresponding ragdoll bone id
 -- @param boneid The physobject id
 -- @return The ragdoll bone id
 function ents_methods:translatePhysBoneToBone(boneid)
-	local ent = getent(self)
-	return ent:TranslatePhysBoneToBone(boneid)
+	return getent(self):TranslatePhysBoneToBone(boneid)
 end
 
 --- Gets the number of physicsobjects of an entity
 -- @return The number of physics objects on the entity
 function ents_methods:getPhysicsObjectCount()
-	local ent = getent(self)
-	return ent:GetPhysicsObjectCount()
+	return getent(self):GetPhysicsObjectCount()
 end
 
 --- Gets the main physics objects of an entity
@@ -491,16 +499,14 @@ end
 -- @return The physics object of the entity
 function ents_methods:getPhysicsObjectNum(id)
 	checkluatype(id, TYPE_NUMBER)
-	local ent = getent(self)
-	return pwrap(ent:GetPhysicsObjectNum(id))
+	return pwrap(getent(self):GetPhysicsObjectNum(id))
 end
 
 --- Gets the color of an entity
 -- @shared
 -- @return Color
 function ents_methods:getColor()
-	local ent = getent(self)
-	return cwrap(ent:GetColor())
+	return cwrap(getent(self):GetColor())
 end
 
 --- Gets the clipping of an entity
@@ -577,48 +583,42 @@ end
 -- @shared
 -- @return True if player, false if not
 function ents_methods:isPlayer()
-	local ent = getent(self)
-	return ent:IsPlayer()
+	return getent(self):IsPlayer()
 end
 
 --- Checks if an entity is a weapon.
 -- @shared
 -- @return True if weapon, false if not
 function ents_methods:isWeapon()
-	local ent = getent(self)
-	return ent:IsWeapon()
+	return getent(self):IsWeapon()
 end
 
 --- Checks if an entity is a vehicle.
 -- @shared
 -- @return True if vehicle, false if not
 function ents_methods:isVehicle()
-	local ent = getent(self)
-	return ent:IsVehicle()
+	return getent(self):IsVehicle()
 end
 
 --- Checks if an entity is an npc.
 -- @shared
 -- @return True if npc, false if not
 function ents_methods:isNPC()
-	local ent = getent(self)
-	return ent:IsNPC()
+	return getent(self):IsNPC()
 end
 
 --- Checks if the entity ONGROUND flag is set
 -- @shared
 -- @return Boolean if it's flag is set or not
 function ents_methods:isOnGround()
-	local ent = getent(self)
-	return ent:IsOnGround()
+	return getent(self):IsOnGround()
 end
 
 --- Returns if the entity is ignited
 -- @shared
 -- @return Boolean if the entity is on fire or not
 function ents_methods:isOnFire()
-	local ent = getent(self)
-	return ent:IsOnFire()
+	return getent(self):IsOnFire()
 end
 
 --- Returns the starfall or expression2's name
