@@ -687,7 +687,7 @@ function builtins_library.dodir(dir, loadpriority)
 	local alreadyRequired = {}
 
 	if loadpriority then
-		for i = 0, #loadpriority do
+		for i = 1, #loadpriority do
 			for file, _ in pairs(instance.scripts) do
 				if string.find(file, dir .. "/" .. loadpriority[i] , 1) == 1 then
 					returns[file] = builtins_library.dofile(file)
