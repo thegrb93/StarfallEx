@@ -50,7 +50,7 @@ function net.WriteStarfall(sfdata)
 		filecodes[#filecodes + 1] = code
 	end
 	local data = table.concat(filecodes)
-	net.WriteStream(data)
+	return net.WriteStream(data)
 end
 
 if SERVER then
@@ -58,8 +58,21 @@ if SERVER then
 
 	function SF.SendStarfall(msg, sfdata, recipient)
 		net.Start(msg)
-		net.WriteStarfall(sfdata)
-		if recipient then net.Send(recipient) else net.Broadcast() end
+		if recipient then
+			local stream = net.WriteStarfall(sfdata)
+			net.Send(recipient)
+			
+			-- Newly joined players might drop the receive packet. Try again if no progress made
+			timer.Simple(5, function()
+				if recipient:IsValid() and stream:GetProgress(recipient)==0 then
+					stream:Remove()
+					SF.SendStarfall(msg, sfdata, recipient)
+				end
+			end)
+		else
+			net.WriteStarfall(sfdata)
+			net.Broadcast()
+		end
 	end
 
 	local uploaddata = setmetatable({},{__mode="k"})
