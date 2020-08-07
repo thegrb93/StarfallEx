@@ -811,7 +811,7 @@ if CLIENT then
 		if not prim_trifunc then SF.Throw("Invalid Primitive.", 2) end
 		
 		if prim_count<1 then SF.Throw("Can't generate with less than 1 primitive", 2) end
-		if prim_count>65535 then SF.Throw("Can't generate more than 65535 primitives", 2) end
+		if prim_count>8192 then SF.Throw("Can't generate more than 8192 primitives", 2) end
 		prim_count = math.floor(prim_count)
 		
 		local tri_count = math.max(1, math.ceil(prim_trifunc(prim_count)))
