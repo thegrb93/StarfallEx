@@ -672,7 +672,7 @@ function mesh_library.generateNormals(vertices, inverted)
 	checkluatype(vertices, TYPE_TABLE)
 	if inverted ~= nil then checkluatype(inverted, TYPE_BOOL) else inverted = false end
 	local nvertices = #vertices
-	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
+	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
 	
 	SF.GenerateNormals(vertices, inverted, vector)
 end
@@ -684,7 +684,7 @@ function mesh_library.generateUV(vertices, scale)
 	checkluatype(vertices, TYPE_TABLE)
 	checkluatype(scale, TYPE_NUMBER)
 	local nvertices = #vertices
-	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
+	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
 	
 	SF.GenerateUV(vertices, scale, vector, angle, worldtolocal)
 end
@@ -694,7 +694,7 @@ end
 function mesh_library.generateTangents(vertices)
 	checkluatype(vertices, TYPE_TABLE)
 	local nvertices = #vertices
-	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices for the mesh's triangles.", 2) end
+	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
 	
 	SF.GenerateTangents(vertices, nil, vector)
 end
