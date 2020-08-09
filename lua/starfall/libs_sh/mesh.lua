@@ -96,64 +96,8 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 			if thread_yield then thread_yield() end
 		end
 
-		-- Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
-		-- GLua version credit @willox https://github.com/CapsAdmin/pac3/pull/578/commits/43fa75c262cde661713cdaa9d1b09bc29ec796b4
-		local tan1, tan2 = {}, {}
-		for i = 1, #vertices do
-			tan1[i] = Vector(0, 0, 0)
-			tan2[i] = Vector(0, 0, 0)
-		end
-
-		local v = Vector()
-		local add = v.add or v.Add
-		local dot = v.dot or v.Dot
-		local cross = v.cross or v.Cross
-		local normalize = v.normalize or v.Normalize
-
-		for i = 1, #vertices - 2, 3 do
-			local vert1, vert2, vert3 = vertices[i], vertices[i+1], vertices[i+2]
-
-			local p1, p2, p3 = vert1.pos, vert2.pos, vert3.pos
-			local u1, u2, u3 = vert1.u, vert2.u, vert3.u
-			local v1, v2, v3 = vert1.v, vert2.v, vert3.v
-
-			local x1 = p2.x - p1.x;
-			local x2 = p3.x - p1.x;
-			local y1 = p2.y - p1.y;
-			local y2 = p3.y - p1.y;
-			local z1 = p2.z - p1.z;
-			local z2 = p3.z - p1.z;
-
-			local s1 = u2 - u1;
-			local s2 = u3 - u1;
-			local t1 = v2 - v1;
-			local t2 = v3 - v1;
-
-			local r = 1 / (s1 * t2 - s2 * t1)
-			local sdir = Vector((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
-			local tdir = Vector((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
-
-			add(tan1[i], sdir)
-			add(tan1[i+1], sdir)
-			add(tan1[i+2], sdir)
-
-			add(tan2[i], tdir)
-			add(tan2[i+1], tdir)
-			add(tan2[i+2], tdir)
-		end
-		if thread_yield then thread_yield() end
-
-		for i = 1, #vertices do
-			local n = vertices[i].normal
-			local t = tan1[i]
-
-			local tan = (t - n * dot(n, t))
-			normalize(tan)
-
-			local w = dot(cross(n, t), tan2[i]) < 0 and -1 or 1
-
-			vertices[i].userdata = {tan[1], tan[2], tan[3], w}
-		end
+		SF.GenerateTangents(vertices, thread_yield, Vector)
+		
 		if thread_yield then thread_yield() end
 		meshes[name] = vertices
 		faces[name] = face
@@ -162,6 +106,116 @@ function SF.ParseObj(obj, thread_yield, Vector, triangulate)
 		nextname = nil
 	end
 	return meshes, {positions = pos, normals = norm, texturecoords = uv, faces = faces}
+end
+
+function SF.GenerateTangents(vertices, thread_yield, Vector)
+	-- Lengyel, Eric. “Computing Tangent Space Basis Vectors for an Arbitrary Mesh”. Terathon Software, 2001. http://terathon.com/code/tangent.html
+	-- GLua version credit @willox https://github.com/CapsAdmin/pac3/pull/578/commits/43fa75c262cde661713cdaa9d1b09bc29ec796b4
+	local tan1, tan2 = {}, {}
+	for i = 1, #vertices do
+		tan1[i] = Vector(0, 0, 0)
+		tan2[i] = Vector(0, 0, 0)
+	end
+
+	local v = Vector()
+	local add = v.add or v.Add
+	local dot = v.dot or v.Dot
+	local cross = v.cross or v.Cross
+	local normalize = v.normalize or v.Normalize
+
+	for i = 1, #vertices - 2, 3 do
+		local vert1, vert2, vert3 = vertices[i], vertices[i+1], vertices[i+2]
+
+		local p1, p2, p3 = vert1.pos, vert2.pos, vert3.pos
+		local u1, u2, u3 = vert1.u, vert2.u, vert3.u
+		local v1, v2, v3 = vert1.v, vert2.v, vert3.v
+
+		local x1 = p2.x - p1.x;
+		local x2 = p3.x - p1.x;
+		local y1 = p2.y - p1.y;
+		local y2 = p3.y - p1.y;
+		local z1 = p2.z - p1.z;
+		local z2 = p3.z - p1.z;
+
+		local s1 = u2 - u1;
+		local s2 = u3 - u1;
+		local t1 = v2 - v1;
+		local t2 = v3 - v1;
+
+		local r = 1 / (s1 * t2 - s2 * t1)
+		local sdir = Vector((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
+		local tdir = Vector((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+
+		add(tan1[i], sdir)
+		add(tan1[i+1], sdir)
+		add(tan1[i+2], sdir)
+
+		add(tan2[i], tdir)
+		add(tan2[i+1], tdir)
+		add(tan2[i+2], tdir)
+	end
+	if thread_yield then thread_yield() end
+
+	for i = 1, #vertices do
+		local n = vertices[i].normal
+		local t = tan1[i]
+
+		local tan = (t - n * dot(n, t))
+		normalize(tan)
+
+		local w = dot(cross(n, t), tan2[i]) < 0 and -1 or 1
+
+		vertices[i].userdata = {tan[1], tan[2], tan[3], w}
+	end
+end
+
+function SF.GenerateUV(vertices, scale, Vector, Angle, worldtolocal)
+	local v = Vector()
+	local a = Angle()
+	local cross = v.cross or v.Cross
+	local getangle = v.getAngle or v.Angle
+	
+	local function uv(vertex, ang)
+		local p = worldtolocal(vertex.pos, a, v, ang)
+		vertex.u = p.y * scale
+		vertex.v = p.z * scale
+	end
+	
+	for i = 1, #vertices - 2, 3 do
+		local a = vertices[i]
+		local b = vertices[i + 1]
+		local c = vertices[i + 2]
+		local ang = getangle(cross(b.pos - a.pos, c.pos - a.pos))
+		
+		uv(a, ang)
+		uv(b, ang)
+		uv(c, ang)
+	end
+end
+
+function SF.GenerateNormals(vertices, inverted, Vector)
+	local v = Vector()
+	local cross = v.cross or v.Cross
+	local normalize = v.normalize or v.Normalize
+	
+	if inverted then
+		local org = cross
+		cross = function(a, b)
+			return org(b, a)
+		end
+	end
+	
+	for i = 1, #vertices - 2, 3 do
+		local a = vertices[i]
+		local b = vertices[i + 1]
+		local c = vertices[i + 2]
+		local norm = cross(b.pos - a.pos, c.pos - a.pos)
+		normalize(norm)
+		
+		a.normal = norm
+		b.normal = norm
+		c.normal = norm
+	end
 end
 
 
@@ -590,9 +644,11 @@ end
 
 local mesh_library = instance.Libraries.mesh
 local thread_yield = instance.Libraries.coroutine.yield
-local vector
+local vector, angle, worldtolocal
 instance:AddHook("initialize", function()
 	vector = instance.env.Vector
+	angle = instance.env.Angle
+	worldtolocal = instance.env.worldToLocal
 end)
 
 --- Parses obj data into a table of vertices, normals, texture coordinates, colors, and tangents
@@ -607,6 +663,40 @@ function mesh_library.parseObj(obj, threaded, triangulate)
 	if triangulate ~= nil then checkluatype(triangulate, TYPE_BOOL) end
 
 	return SF.ParseObj(obj, threaded and thread_yield, vector, triangulate)
+end
+
+--- Generates normal vectors for the provided vertices table
+-- @param vertices The table of vertices
+-- @param inverted Optional bool, invert the normal
+function mesh_library.generateNormals(vertices, inverted)
+	checkluatype(vertices, TYPE_TABLE)
+	if inverted ~= nil then checkluatype(inverted, TYPE_BOOL) else inverted = false end
+	local nvertices = #vertices
+	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
+	
+	SF.GenerateNormals(vertices, inverted, vector)
+end
+
+--- Generates the uv for the provided vertices table
+-- @param vertices The table of vertices
+-- @param scale The scale of the uvs
+function mesh_library.generateUV(vertices, scale)
+	checkluatype(vertices, TYPE_TABLE)
+	checkluatype(scale, TYPE_NUMBER)
+	local nvertices = #vertices
+	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
+	
+	SF.GenerateUV(vertices, scale, vector, angle, worldtolocal)
+end
+
+--- Generates the tangents for the provided vertices table
+-- @param vertices The table of vertices
+function mesh_library.generateTangents(vertices)
+	checkluatype(vertices, TYPE_TABLE)
+	local nvertices = #vertices
+	if nvertices<3 or nvertices%3~=0 then SF.Throw("Expected a multiple of 3 vertices.", 2) end
+	
+	SF.GenerateTangents(vertices, nil, vector)
 end
 
 if CLIENT then
