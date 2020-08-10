@@ -61,6 +61,10 @@ function ENT:Draw()
 		render.PopCustomClipPlane()
 	end
 	render.EnableClipping(false)
+	
+	if self.AutomaticFrameAdvance then
+		self:FrameAdvance(0)
+	end
 end
 
 function ENT:GetRenderMesh()
