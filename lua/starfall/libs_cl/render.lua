@@ -1905,30 +1905,30 @@ end
 --- Calculates the light color of a certain surface
 -- @param pos Vector position to sample from
 -- @param normal Normal vector of the surface
--- @return Color of the light at the given point
+-- @return Vector representing color of the light
 function render_library.computeLighting(pos, normal) 
-	return cwrap(render.ComputeLighting(vunwrap(pos), vunwrap(normal)):ToColor())
+	return vwrap(render.ComputeLighting(vunwrap(pos), vunwrap(normal)))
 end
 
 --- Calculates the lighting caused by dynamic lights for the specified surface
 -- @param pos Vector position to sample from
 -- @param normal Normal vector of the surface
--- @return Color of the light at the given point
+-- @return Vector representing color of the light
 function render_library.computeDynamicLighting(pos, normal)
-	return cwrap(render.ComputeDynamicLighting(vunwrap(pos), vunwrap(normal)):ToColor())
+	return vwrap(render.ComputeDynamicLighting(vunwrap(pos), vunwrap(normal)))
 end
 
 --- Gets the light exposure on the specified position
 -- @param pos Vector position to sample from
--- @return Color of the light at the given point
+-- @return Vector representing color of the light
 function render_library.getLightColor(pos)
-	return cwrap(render.GetLightColor(vunwrap(pos)):ToColor())
+	return vwrap(render.GetLightColor(vunwrap(pos)))
 end
 
 --- Returns the ambient color of the map
--- @return Color of the map
+-- @return Vector representing color of the light
 function render_library.getAmbientLightColor()
-	return cwrap(render.GetAmbientLightColor():ToColor())
+	return vwrap(render.GetAmbientLightColor())
 end
 
 end
