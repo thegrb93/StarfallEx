@@ -171,8 +171,8 @@ SF.hookAdd("PostDrawHUD", "renderoffscreen", function(instance)
 	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.offscreen")), {}
 end)
 
-SF.hookAdd("RenderScene", "renderscene", function(instance)
-	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.renderscene")), {}
+SF.hookAdd("RenderScene", "renderscene", function(instance, origin, angles, fov)
+	return (instance.player == SF.Superuser or haspermission(instance, nil, "render.renderscene")), {instance.Types.Vector.Wrap(origin), instance.Types.Angle.Wrap(angles), fov}
 end)
 
 SF.hookAdd("PreDrawOpaqueRenderables", "hologrammatrix", function(instance, drawdepth, drawskybox)
@@ -1940,6 +1940,9 @@ end
 -- @name renderscene
 -- @class hook
 -- @client
+-- @param origin View origin
+-- @param angles View angles
+-- @param fov View FOV
 
 --- Called when the player connects to a HUD component linked to the Starfall Chip
 -- @name hudconnected
