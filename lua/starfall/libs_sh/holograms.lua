@@ -10,15 +10,7 @@ local plyCount = SF.LimitObject("holograms", "holograms", 200, "The number of ho
 
 local maxclips = CreateConVar("sf_holograms_maxclips", "8", { FCVAR_ARCHIVE, FCVAR_REPLICATED }, "The max number of clips per hologram entity")
 
-local hologramSENT
 if CLIENT then
-	hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
-	if not hologramSENT then
-		hook.Add("Initialize","SF_GetHologramRenderFunc",function()
-			hologramSENT = scripted_ents.GetStored( "starfall_hologram" )
-		end)
-	end
-	
 	function SF.SetHologramScale(holo, scale)
 		holo.scale = scale
 		if scale == Vector(1, 1, 1) then
@@ -188,16 +180,16 @@ function holograms_library.create(pos, ang, model, scale)
 			return wrap(holoent)
 		end
 	else
-		holoent = ClientsideModel(model, RENDERGROUP_TRANSLUCENT)
+		holoent = ents.CreateClientside("starfall_hologram")
 		if holoent and holoent:IsValid() then
 			holoent.SFHoloOwner = ply
+
 			holoent:SetPos(SF.clampPos(pos))
 			holoent:SetAngles(ang)
+			holoent:SetModel(model)
+			holoent:SetRenderMode(RENDERGROUP_TRANSLUCENT)
 			holoent:CallOnRemove("starfall_hologram_delete", hologramOnDestroy, holodata, ply)
-			table.Inherit(holoent:GetTable(), hologramSENT.t)
-			holoent:Initialize()
-			holoent.RenderOverride = holoent.Draw
-			holoent.DrawHologram = holoent.DrawCLHologram
+			
 			debug.setmetatable(holoent, cl_hologram_meta)
 
 			holodata[holoent] = true
@@ -362,6 +354,7 @@ else
 				holo:EnableMatrix("RenderMultiply", matrix)
 			end
 		else
+			holo.HoloMatrix = nil
 			holo:DisableMatrix("RenderMultiply")
 		end
 	end

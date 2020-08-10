@@ -10,10 +10,12 @@ function ENT:Initialize()
 	self.suppressEngineLighting = false
 	self.scale = Vector(1,1,1)
 	self.userrenderbounds = false
-
-	net.Start("starfall_hologram")
-	net.WriteEntity(self)
-	net.SendToServer()
+	
+	if self:EntIndex() ~= -1 then
+		net.Start("starfall_hologram")
+		net.WriteEntity(self)
+		net.SendToServer()
+	end
 end
 
 function ENT:SetClip(index, enabled, normal, origin, entity)
@@ -46,10 +48,10 @@ function ENT:Draw()
 	
 	if self.suppressEngineLighting then
 		render.SuppressEngineLighting(true)
-		self:DrawHologram()
+		self:DrawModel()
 		render.SuppressEngineLighting(false)
 	else
-		self:DrawHologram()
+		self:DrawModel()
 	end
 	
 	if filter_mag then render.PopFilterMag() end
@@ -61,36 +63,10 @@ function ENT:Draw()
 	render.EnableClipping(false)
 end
 
-function ENT:DrawHologram()
-	self:DrawModel()
-end
-
-function ENT:DrawCLHologram()
-	local data = self:GetRenderMesh()
-	
-	if data then
-		if self.HoloMatrix then
-			cam.PushModelMatrix(self:GetWorldTransformMatrix() * self.HoloMatrix)
-		else
-			cam.PushModelMatrix(self:GetWorldTransformMatrix())
-		end
-		
-		render.SetMaterial(data.Material)
-		data.Mesh:Draw()
-		cam.PopModelMatrix()
-	else
-		self:DrawModel()
-	end
-	
-	if self.AutomaticFrameAdvance then
-		self:FrameAdvance(0)
-	end
-end
-
 function ENT:GetRenderMesh()
 	if self.custom_mesh then
 		if self.custom_mesh_data[self.custom_mesh] then
-			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.render_matrix]] }
+			return { Mesh = self.custom_mesh, Material = self.Material--[[, Matrix = self.HoloMatrix]] }
 		else
 			self.custom_mesh = nil
 		end
