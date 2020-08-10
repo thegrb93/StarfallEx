@@ -315,9 +315,13 @@ function constraint_library.rope(index, e1, e2, bone1, bone2, v1, v2, length, ad
 	local vec1 = vunwrap(v1)
 	local vec2 = vunwrap(v2)
 
+	local dist = ent1:LocalToWorld(vec1):DistToSqr(ent2:LocalToWorld(vec2))
+	if dist < 0.0000000001 then
+		SF.Throw("Insufficient distance between constraint positions", 2)
+	end
+
 	checkConstraint(ent1, "constraints.rope")
 	checkConstraint(ent2, "constraints.rope")
-
 
 	bone1 = bone1 or 0
 	bone2 = bone2 or 0
@@ -364,6 +368,11 @@ function constraint_library.slider(e1, e2, bone1, bone2, v1, v2, width)
 	local vec1 = vunwrap(v1)
 	local vec2 = vunwrap(v2)
 
+	local dist = ent1:LocalToWorld(vec1):DistToSqr(ent2:LocalToWorld(vec2))
+	if dist < 0.0000000001 then
+		SF.Throw("Insufficient distance between constraint positions", 2)
+	end
+	
 	checkConstraint(ent1, "constraints.slider")
 	checkConstraint(ent2, "constraints.slider")
 
