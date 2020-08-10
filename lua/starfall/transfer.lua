@@ -29,7 +29,7 @@ function net.ReadStarfall(ply, callback)
 	return sfdata
 end
 
-function net.WriteStarfall(sfdata)
+function net.WriteStarfall(sfdata, callback)
 	if #sfdata.mainfile > 255 then error("Main file name too large: " .. #sfdata.mainfile .. " (max is 255)") end
 	if SERVER then
 		net.WriteEntity(sfdata.proc)
@@ -50,16 +50,16 @@ function net.WriteStarfall(sfdata)
 		filecodes[#filecodes + 1] = code
 	end
 	local data = table.concat(filecodes)
-	return net.WriteStream(data)
+	return net.WriteStream(data, callback)
 end
 
 if SERVER then
 	util.AddNetworkString("starfall_upload")
 
-	function SF.SendStarfall(msg, sfdata, recipient)
+	function SF.SendStarfall(msg, sfdata, recipient, callback)
 		net.Start(msg)
+		local stream = net.WriteStarfall(sfdata, callback)
 		if recipient then
-			local stream = net.WriteStarfall(sfdata)
 			net.Send(recipient)
 			
 			-- Newly joined players might drop the receive packet. Try again if no progress made
@@ -72,7 +72,6 @@ if SERVER then
 				end)
 			end
 		else
-			net.WriteStarfall(sfdata)
 			net.Broadcast()
 		end
 	end
@@ -119,9 +118,9 @@ if SERVER then
 else
 
 	-- Sends starfall files to server
-	function SF.SendStarfall(msg, sfdata)
+	function SF.SendStarfall(msg, sfdata, callback)
 		net.Start(msg)
-		net.WriteStarfall(sfdata)
+		net.WriteStarfall(sfdata, callback)
 		net.SendToServer()
 	end
 

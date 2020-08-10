@@ -109,7 +109,12 @@ function ENT:SendCode(recipient)
 			end
 		end
 	end
-	SF.SendStarfall("starfall_processor_download", sfdata, recipient)
+	SF.SendStarfall("starfall_processor_download", sfdata, recipient, function(ply)
+		local instance = self.instance
+		if instance then
+			instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))
+		end
+	end)
 end
 
 function ENT:PreEntityCopy()
@@ -175,14 +180,7 @@ util.AddNetworkString("starfall_report_error")
 net.Receive("starfall_processor_download", function(len, ply)
 	local proc = net.ReadEntity()
 	if ply:IsValid() and proc:IsValid() then
-		if net.ReadBool() then -- True = we want to download; False = finished downloading
-			proc:SendCode(ply)
-		else
-			local instance = proc.instance
-			if instance then
-				instance:runScriptHook("clientinitialized", instance.Types.Player.Wrap(ply))
-			end
-		end
+		proc:SendCode(ply)
 	end
 end)
 

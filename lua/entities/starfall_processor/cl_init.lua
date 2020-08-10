@@ -63,23 +63,8 @@ end
 net.Receive("starfall_processor_download", function(len)
 
 	local sfdata = net.ReadStarfall(nil, function(ok, sfdata)
-		if sfdata.proc:IsValid() then
-			if ok then
-				if sfdata.owner:IsValid() or sfdata.owner==SF.Superuser then
-					sfdata.proc:SetupFiles(sfdata)
-					if sfdata.proc.instance then
-						net.Start("starfall_processor_download")
-						net.WriteEntity(sfdata.proc)
-						net.WriteBool(false)
-						net.SendToServer()
-					end
-				end
-			else
-				net.Start("starfall_processor_download")
-				net.WriteEntity(sfdata.proc)
-				net.WriteBool(true)
-				net.SendToServer()
-			end
+		if ok and sfdata.proc:IsValid() and (sfdata.owner:IsValid() or sfdata.owner==SF.Superuser) then
+			sfdata.proc:SetupFiles(sfdata)
 		end
 	end)
 
