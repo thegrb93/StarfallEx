@@ -1289,7 +1289,6 @@ end
 
 --- Returns a table of brushes surfaces for brush model entities.
 -- @shared
--- @class function
 -- @return Table of SurfaceInfos if the entity has a brush model, or no value otherwise.
 function ents_methods:getBrushSurfaces()
 	local ent = getent(self)
@@ -1300,6 +1299,25 @@ function ents_methods:getBrushSurfaces()
 		out[k] = swrap(surface)
 	end
 	return out
+end
+
+--- Returns info about the given brush plane
+-- @shared
+-- @param id Plane index. Starts from 0
+-- @return The origin of the plane
+-- @return The normal of the plane
+-- @return The distance to the plane
+function ents_methods:getBrushPlane(id)
+	checkluatype(id, TYPE_NUMBER)
+	local origin, normal, distance = getent(self):GetBrushPlane(id)
+	return vwrap(origin), vwrap(normal), distance
+end
+
+--- Returns the amount of planes of the brush entity
+-- @shared
+-- @return The amount of brush planes
+function ents_methods:getBrushPlaneCount()
+	return getent(self):GetBrushPlaneCount()
 end
 
 end
