@@ -29,14 +29,16 @@ end
 
 --Received data so process it
 function net.Stream.ReadStream:Read(size)
-
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
+
+	local progress = net.ReadUInt(32)
+	if self.chunks[progress] then return end
 
 	local crc = net.ReadString()
 	local data = net.ReadData(size)
 
 	if crc == util.CRC(data) then
-		self.chunks[#self.chunks + 1] = data
+		self.chunks[progress] = data
 	end
 	if #self.chunks == self.numchunks then
 		self.returndata = table.concat(self.chunks)
@@ -101,6 +103,7 @@ function net.Stream.WriteStream:Write(ply)
 		self.clients[ply].progress = progress
 		net.Start("NetStreamDownload")
 		net.WriteUInt(#chunk.data, 32)
+		net.WriteUInt(progress, 32)
 		net.WriteString(chunk.crc)
 		net.WriteData(chunk.data, #chunk.data)
 		if CLIENT then net.SendToServer() else net.Send(ply) end
