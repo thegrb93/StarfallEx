@@ -1902,6 +1902,35 @@ function render_library.setHUDActive(active)
 	instance.hudoverride = active
 end
 
+--- Calculates the light color of a certain surface
+-- @param pos Vector position to sample from
+-- @param normal Normal vector of the surface
+-- @return Vector representing color of the light
+function render_library.computeLighting(pos, normal) 
+	return vwrap(render.ComputeLighting(vunwrap(pos), vunwrap(normal)))
+end
+
+--- Calculates the lighting caused by dynamic lights for the specified surface
+-- @param pos Vector position to sample from
+-- @param normal Normal vector of the surface
+-- @return Vector representing color of the light
+function render_library.computeDynamicLighting(pos, normal)
+	return vwrap(render.ComputeDynamicLighting(vunwrap(pos), vunwrap(normal)))
+end
+
+--- Gets the light exposure on the specified position
+-- @param pos Vector position to sample from
+-- @return Vector representing color of the light
+function render_library.getLightColor(pos)
+	return vwrap(render.GetLightColor(vunwrap(pos)))
+end
+
+--- Returns the ambient color of the map
+-- @return Vector representing color of the light
+function render_library.getAmbientLightColor()
+	return vwrap(render.GetAmbientLightColor())
+end
+
 end
 
 --- Called when a frame is requested to be drawn on screen. (2D/3D Context)
