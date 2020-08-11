@@ -28,9 +28,10 @@ function net.Stream.ReadStream:Request()
 end
 
 --Received data so process it
-function net.Stream.ReadStream:Read(size, progress)
-
+function net.Stream.ReadStream:Read(size)
 	timer.Remove("NetStreamReadTimeout" .. self.identifier)
+
+	local progress = net.ReadUInt(32)
 	if self.chunks[progress] then return end
 
 	local crc = net.ReadString()
@@ -345,8 +346,7 @@ net.Receive("NetStreamDownload", function(len, ply)
 	if queue then
 		local size = net.ReadUInt(32)
 		if size > 0 then
-			local progress = net.ReadUInt(32)
-			queue[1]:Read(size, progress)
+			queue[1]:Read(size)
 		else
 			local id = net.ReadUInt(32)
 			for k, v in ipairs(queue) do
