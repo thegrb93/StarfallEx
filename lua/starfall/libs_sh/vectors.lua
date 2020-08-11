@@ -444,7 +444,7 @@ end
 
 --- Converts vector to color
 -- @return New color object
-function vec_methods:toColor()
+function vec_methods:getColor()
 	return cwrap(unwrap(self):ToColor())
 end
 
