@@ -270,7 +270,7 @@ function quat_meta.__div(lhs, rhs)
 			(-lhs1 * rhs4 + lhs4 * rhs1 - lhs2 * rhs3 + lhs3 * rhs2) / len
 		})
 		
-	elseif lhs_meta == quat_meta then
+	elseif dgetmeta(lhs) == quat_meta then
 		checkluatype(rhs, TYPE_NUMBER)
 	else
 		checkluatype(lhs, TYPE_NUMBER)
@@ -279,11 +279,17 @@ end
 
 function quat_meta.__pow(lhs, rhs)
 	if isnumber(rhs) then
-		local m = math.log(rhs)
-		return wrap(quatExp({ lhs[1] * m, lhs[2] * m, lhs[3] * m, lhs[4] * m }))
+		local log = quatLog(lhs)
+		return wrap({ log[1] * rhs, log[2] * rhs, log[3] * rhs, log[4] * rhs })
+		
 	elseif isnumber(lhs) then
-		local m = quatLog(rhs)
-		return wrap(quatExp({ rhs[1] * m, rhs[2] * m, rhs[3] * m, rhs[4] * m }))
+		if rhs == 0 then
+			return wrap({ 0, 0, 0, 0 })
+		end
+		
+		local log = math_log(lhs)
+		return wrap(quatExp({ rhs[1] * log, rhs[2] * log, rhs[3] * log, rhs[4] * log }))
+		
 	elseif dgetmeta(lhs) == quat_meta then
 		checkluatype(rhs, TYPE_NUMBER)
 	else
@@ -301,7 +307,7 @@ function quat_meta.__add(lhs, rhs)
 	elseif dgetmeta(lhs) == quat_meta and dgetmeta(rhs) == quat_meta then -- Q + Q
 		return wrap({ lhs[1] + rhs[1], lhs[2] + rhs[2], lhs[3] + rhs[3], lhs[4] + rhs[4] })
 		
-	elseif lhs_meta == quat_meta then
+	elseif dgetmeta(lhs) == quat_meta then
 		checkluatype(rhs, TYPE_NUMBER)
 	else
 		checkluatype(lhs, TYPE_NUMBER)
@@ -318,7 +324,7 @@ function quat_meta.__sub(lhs, rhs)
 	elseif dgetmeta(lhs) == quat_meta and dgetmeta(rhs) == quat_meta then -- Q - Q
 		return wrap({ lhs[1] - rhs[1], lhs[2] - rhs[2], lhs[3] - rhs[3], lhs[4] - rhs[4] })
 		
-	elseif lhs_meta == quat_meta then
+	elseif dgetmeta(lhs) == quat_meta then
 		checkluatype(rhs, TYPE_NUMBER)
 	else
 		checkluatype(lhs, TYPE_NUMBER)
@@ -681,6 +687,7 @@ V Meta events
 V Better name for qMod
 V math.slerpQuaternion
 Documentation
+Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
 Replace rad2deg -> math.deg; deg2rad -> math.rad
 Credits
 Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite

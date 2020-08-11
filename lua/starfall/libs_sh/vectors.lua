@@ -109,7 +109,6 @@ end
 -- @param rhs Right side of equation
 -- @return Scaled vector.
 function vec_meta.__mul(a, b)
-	print("OLABOGA")
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	elseif isnumber(a) then
@@ -117,7 +116,6 @@ function vec_meta.__mul(a, b)
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == vec_meta then
 		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == quat_meta then -- Vector * Quaternion
-		print("UGABUGA")
 		local a2, a3, a4 = a[1], a[2], a[3]
 		local b1, b2, b3, b4 = b[1], b[2], b[3], b[4]
 		return qwrap({
