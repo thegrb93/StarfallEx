@@ -25,6 +25,7 @@ return function(instance)
 local checktype = instance.CheckType
 local vec_methods, vec_meta, vwrap, unwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local quat_meta, qwrap = instance.Types.Quaternion, instance.Types.Quaternion.Wrap
 local function wrap(tbl)
 	return setmetatable(tbl, vec_meta)
 end
@@ -108,12 +109,23 @@ end
 -- @param rhs Right side of equation
 -- @return Scaled vector.
 function vec_meta.__mul(a, b)
+	print("OLABOGA")
 	if isnumber(b) then
 		return wrap({ a[1] * b, a[2] * b, a[3] * b })
 	elseif isnumber(a) then
 		return wrap({ b[1] * a, b[2] * a, b[3] * a })
 	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == vec_meta then
 		return wrap({ a[1] * b[1], a[2] * b[2], a[3] * b[3] })
+	elseif dgetmeta(a) == vec_meta and dgetmeta(b) == quat_meta then -- Vector * Quaternion
+		print("UGABUGA")
+		local a2, a3, a4 = a[1], a[2], a[3]
+		local b1, b2, b3, b4 = b[1], b[2], b[3], b[4]
+		return qwrap({
+			-a2 * b2 - a3 * b3 - a4 * b4,
+			a2 * b1 + a3 * b4 - a4 * b3,
+			a3 * b1 + a4 * b2 - a2 * b4,
+			a4 * b1 + a2 * b3 - a3 * b2
+		})
 	elseif dgetmeta(a) == vec_meta then
 		checkluatype(b, TYPE_NUMBER)
 	else
