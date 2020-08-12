@@ -1,6 +1,19 @@
 local checkluatype = SF.CheckLuaType
 local dgetmeta = debug.getmetatable
 
+local math_sqrt = math.sqrt
+local math_exp = math.exp
+local math_log = math.log
+local math_sin = math.sin
+local math_cos = math.cos
+local math_min = math.min
+local math_acos = math.acos
+local math_clamp = math.Clamp
+local math_max = math.max
+local math_rad = math.rad
+local math_deg = math.deg
+
+
 --- Quaternion type. Recently reworked library, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
 -- @name Quaternion
 -- @class type
@@ -37,18 +50,6 @@ instance:AddHook("initialize", function()
 end)
 
 -------------------------------------
-
-local math_sqrt = math.sqrt
-local math_exp = math.exp
-local math_log = math.log
-local math_sin = math.sin
-local math_cos = math.cos
-local math_min = math.min
-local math_acos = math.acos
-local math_clamp = math.Clamp
-local math_max = math.max
-local math_rad = math.rad
-local math_deg = math.deg
 
 -- Following helper functions are strictly operating on tables, so be sure to wrap the return value
 
@@ -235,16 +236,6 @@ function quat_meta.__mul(lhs, rhs)
 			lhs1 * rhs2 + lhs3 * rhs4 - lhs4 * rhs3,
 			lhs1 * rhs3 + lhs4 * rhs2 - lhs2 * rhs4,
 			lhs1 * rhs4 + lhs2 * rhs3 - lhs3 * rhs2
-		})
-		
-	elseif lhs_meta == vec_meta and rhs_meta == quat_meta then -- V * Q
-		local lhs2, lhs3, lhs4 = lhs[1], lhs[2], lhs[3]
-		local rhs1, rhs2, rhs3, rhs4 = rhs[1], rhs[2], rhs[3], rhs[4]
-		return wrap({
-			-lhs2 * rhs2 - lhs3 * rhs3 - lhs4 * rhs4,
-			lhs2 * rhs1 + lhs3 * rhs4 - lhs4 * rhs3,
-			lhs3 * rhs1 + lhs4 * rhs2 - lhs2 * rhs4,
-			lhs4 * rhs1 + lhs2 * rhs3 - lhs3 * rhs2
 		})
 		
 	elseif lhs_meta == quat_meta then
@@ -449,7 +440,8 @@ function quat_methods:getConjecture()
 	return wrap({ self[1], -self[2], -self[3], -self[4] })
 end
 
-function quat_methods:conjecture()
+-- TEST
+function quat_methods:conjugate()
 	self[2] = -self[2]
 	self[3] = -self[3]
 	self[4] = -self[4]
@@ -520,12 +512,22 @@ function quat_methods:getMatrix(normalize)
 	
 	local w, x, y, z = quat[1], quat[2], quat[3], quat[4]
 	
+	-- TEST
+	local m = Matrix()
+	return mwrap(m:SetUnpacked(
+		1 - 2*y*y - 2*z*z,	2*x*y - 2*z*w,		2*x*z + 2*y*w,		0,
+		2*x*y + 2*z*w,		1 - 2*x*y - 2*z*z,	2*y*z - 2*x*w,		0,
+		2*x*z - 2*y*w,		2*y*z + 2*x*w,		1 - 2*x*x - 2*y*y,	0,
+		0,					0,					0,					0))
+	
+	
+	--[[
 	return mwrap(Matrix({
 		{ 1 - 2*y*y - 2*z*z,	2*x*y - 2*z*w,		2*x*z + 2*y*w,		0 },
 		{ 2*x*y + 2*z*w,		1 - 2*x*y - 2*z*z,	2*y*z - 2*x*w,		0 },
 		{ 2*x*z - 2*y*w,		2*y*z + 2*x*w,		1 - 2*x*x - 2*y*y,	0 },
 		{ 0,					0,					0,					0 }
-	}))
+	}))]]--
 end
 
 -- quat_lib.rotationEulerAngle(q)
@@ -694,7 +696,6 @@ function math_library.slerpQuaternion(from, to, t)
 	end
 end
 
--- TEST
 function math_library.nlerpQuaternion(from, to, t)
 	quat1 = unwrap(from)
 	quat2 = unwrap(to)
