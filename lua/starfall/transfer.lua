@@ -58,19 +58,9 @@ if SERVER then
 
 	function SF.SendStarfall(msg, sfdata, recipient, callback)
 		net.Start(msg)
-		local stream = net.WriteStarfall(sfdata, callback)
+		net.WriteStarfall(sfdata, callback)
 		if recipient then
 			net.Send(recipient)
-			
-			-- Newly joined players might drop the receive packet. Try again if no progress made
-			if stream then
-					timer.Simple(5, function()
-					if recipient:IsValid() and stream:GetProgress(recipient)==0 then
-						stream:Remove()
-						SF.SendStarfall(msg, sfdata, recipient)
-					end
-				end)
-			end
 		else
 			net.Broadcast()
 		end

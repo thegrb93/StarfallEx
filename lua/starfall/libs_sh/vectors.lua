@@ -25,6 +25,7 @@ return function(instance)
 local checktype = instance.CheckType
 local vec_methods, vec_meta, vwrap, unwrap = instance.Types.Vector.Methods, instance.Types.Vector, instance.Types.Vector.Wrap, instance.Types.Vector.Unwrap
 local ang_meta, awrap, aunwrap = instance.Types.Angle, instance.Types.Angle.Wrap, instance.Types.Angle.Unwrap
+local col_meta, cwrap, cunwrap = instance.Types.Color, instance.Types.Color.Wrap, instance.Types.Color.Unwrap
 local quat_meta, qwrap = instance.Types.Quaternion, instance.Types.Quaternion.Wrap
 local function wrap(tbl)
 	return setmetatable(tbl, vec_meta)
@@ -449,6 +450,12 @@ end
 -- @return A table {x=screenx,y=screeny,visible=visible}
 function vec_methods:toScreen()
 	return unwrap(self):ToScreen()
+end
+
+--- Converts vector to color
+-- @return New color object
+function vec_methods:getColor()
+	return cwrap(unwrap(self):ToColor())
 end
 
 --- Returns whenever the given vector is in a box created by the 2 other vectors.
