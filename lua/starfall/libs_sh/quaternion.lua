@@ -70,7 +70,7 @@ local function quatExp(q)
 		local sin_m = math_sin(m)
 		return { r * math_cos(m), r * (q[2] * sin_m / m), r * (q[3] * sin_m / m), r * (q[4] * sin_m / m) }
 	else
-		return { r * math_cos(m), 0, 0, 0 }
+		return { r, 0, 0, 0 }
 	end
 end
 
