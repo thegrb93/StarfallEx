@@ -731,16 +731,16 @@ V math.slerpQuaternion
 V Replace rad2deg -> math.deg; deg2rad -> math.rad
 V Make quatDot (qdot) and quatNormalize (qNorm) function
 V Get rid of the unused parts of imported libs
+V Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
 Documentation
 Credits
-Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite - SOMETHING IS WRONG WITH nlerpQuaternion! maybe due to quatDot or quatNorm
+Compare all the calculations to E2 to ensure that there were no mistakes during original Starfall rewrite
 Translate Fizyk's applyTorque example to SF
 Blackmain Divran to test this
 Remove quaternions.txt
 
 TOOLAZYTODO:
 Check if quatLong and other functions that use E2's `delta` thingy work correctly without it
-Write changelog (include which functions have transformed into methods) and link to it at the top of quat lib
 
 ]]
 
