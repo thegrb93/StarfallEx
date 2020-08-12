@@ -14,6 +14,7 @@ local math_rad = math.rad
 local math_deg = math.deg
 
 
+-- Based on Expression's 2 quaternion library: https://github.com/wiremod/wire/blob/master/lua/entities/gmod_wire_expression2/core/quaternion.lua
 --- Quaternion type. Recently reworked, for full changelist visit: https://github.com/thegrb93/StarfallEx/pull/953
 -- @name Quaternion
 -- @class type
@@ -40,12 +41,12 @@ local vec_methods, vec_meta, vwrap, vunwrap = instance.Types.Vector.Methods, ins
 local mwrap = instance.Types.VMatrix.Wrap
 local math_library = instance.Libraries.math
 
-local function wrap(tbl)
-	return setmetatable(tbl, quat_meta)
+local function wrap(q)
+	return setmetatable(q, quat_meta)
 end
 
-local function qunpack(tbl)
-	return self[1], self[2], self[3], self[4]
+local function qunpack(q)
+	return q[1], q[2], q[3], q[4]
 end
 
 local getent
@@ -58,7 +59,7 @@ end)
 -- Following helper functions are strictly operating on tables, so be sure to wrap the return value
 
 local function quatLen(q)
-	return self[1] * self[1] + self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+	return q[1] * q[1] + q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 end
 
 local function quatLenSqrt(q)
@@ -66,7 +67,7 @@ local function quatLenSqrt(q)
 end
 
 local function quatImaginaryLen(q)
-	return self[2] * self[2] + self[3] * self[3] + self[4] * self[4]
+	return q[2] * q[2] + q[3] * q[3] + q[4] * q[4]
 end
 
 local function quatImaginaryLenSqrt(q)
@@ -310,11 +311,11 @@ end
 -- @param rhs Right side of equation
 -- @return Power
 function quat_meta.__pow(lhs, rhs)
-	if isnumber(rhs) then
+	if isnumber(rhs) then -- Q ^ N
 		local log = quatLog(lhs)
 		return wrap({ log[1] * rhs, log[2] * rhs, log[3] * rhs, log[4] * rhs })
 		
-	elseif isnumber(lhs) then
+	elseif isnumber(lhs) then -- N ^ Q
 		if rhs == 0 then
 			return wrap({ 0, 0, 0, 0 })
 		end
@@ -524,7 +525,6 @@ function quat_methods:getConjecture()
 	return wrap({ self[1], -self[2], -self[3], -self[4] })
 end
 
--- TEST
 --- Conjugates the quaternion.
 function quat_methods:conjugate()
 	self[2] = -self[2]
@@ -548,8 +548,8 @@ function quat_methods:inverse()
 	self[4] = self[4] / len
 end
 
---- Gets the quaternion representing rotation contained within an angle between 0 and 180 degrees
 -- credits: https://github.com/coder0xff
+--- Gets the quaternion representing rotation contained within an angle between 0 and 180 degrees
 -- @return Quaternion with contained rotation
 function quat_methods:getMod()
 	if self[1] < 0 then
@@ -600,14 +600,14 @@ function quat_methods:getVector()
 	return vwrap(Vector(self[2], self[3], self[4]))
 end
 
---- Converts quaternion to a matrix
 -- credits: Malte Clasen (https://stackoverflow.com/a/1556470)
+--- Converts quaternion to a matrix
 -- @param Optional bool, normalizes the quaternion
 -- @return Transformation matrix
 function quat_methods:getMatrix(normalize)
 	local quat
 	if normalize then
-		checkluatype(normalize, BOOL)
+		checkluatype(normalize, TYPE_BOOL)
 		quat = quatNorm(self)
 	else
 		quat = unwrap(self)
@@ -615,22 +615,14 @@ function quat_methods:getMatrix(normalize)
 	
 	local w, x, y, z = quat[1], quat[2], quat[3], quat[4]
 	
-	-- TEST
 	local m = Matrix()
-	return mwrap(m:SetUnpacked(
+	m:SetUnpacked(
 		1 - 2*y*y - 2*z*z,	2*x*y - 2*z*w,		2*x*z + 2*y*w,		0,
 		2*x*y + 2*z*w,		1 - 2*x*y - 2*z*z,	2*y*z - 2*x*w,		0,
 		2*x*z - 2*y*w,		2*y*z + 2*x*w,		1 - 2*x*x - 2*y*y,	0,
-		0,					0,					0,					0))
+		0,					0,					0,					0)
 	
-	
-	--[[
-	return mwrap(Matrix({
-		{ 1 - 2*y*y - 2*z*z,	2*x*y - 2*z*w,		2*x*z + 2*y*w,		0 },
-		{ 2*x*y + 2*z*w,		1 - 2*x*y - 2*z*z,	2*y*z - 2*x*w,		0 },
-		{ 2*x*z - 2*y*w,		2*y*z + 2*x*w,		1 - 2*x*x - 2*y*y,	0 },
-		{ 0,					0,					0,					0 }
-	}))]]--
+	return mwrap(m)
 end
 
 --- Returns the euler angle of rotation in degrees
@@ -665,8 +657,8 @@ function quat_methods:getEulerAngle()
 	end
 end
 
---- Returns the angle of rotation in degrees
 -- credits: https://github.com/coder0xff
+--- Returns the angle of rotation in degrees
 -- @param full Optional bool, if true returned angle will be between -180 and 180, otherwise between 0 and 360
 -- @return Angle number
 function quat_methods:getRotationAngle(full)
@@ -688,8 +680,8 @@ function quat_methods:getRotationAngle(full)
 	end
 end
 
---- Returns the axis of rotation
 -- credits: https://github.com/cder0xff
+--- Returns the axis of rotation
 -- @return Vector axis
 function quat_methods:getRotationAxis()
 	local ilen = quatImaginaryLen(self)
@@ -701,8 +693,8 @@ function quat_methods:getRotationAxis()
 	end
 end
 
---- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degrees
 -- credits: https://github.com/cder0xff
+--- Returns the rotation vector - rotation axis where magnitude is the angle of rotation in degrees
 -- @return Rotation vector
 function quat_methods:getRotationVector()
 	local len = quatLen(self)
@@ -761,8 +753,8 @@ function vec_methods:getQuaternionFromAxis(ang)
 	return wrap({ math_cos(rang), axis[1] * math_sin(rang), axis[2] * math_sin(rang), axis[3] * math_sin(rang) })
 end
 
---- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, it's magnitude is angle in degrees
 -- credits: https://github.com/cder0xff
+--- Constructs a quaternion from the rotation vector. Vector direction is axis of rotation, it's magnitude is angle in degrees
 -- @return Rotated quaternion
 function vec_methods:getQuaternionFromRotation()
 	local vec_len = self[1] * self[1] + self[2] * self[2] + self[3] * self[3]
